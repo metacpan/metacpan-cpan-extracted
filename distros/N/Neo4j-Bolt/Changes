@@ -1,5 +1,8 @@
 Revision history for Perl module Neo4j::Bolt
 
+0.5002  2026-01-01
+    - Fix 'numeric' warning when using params in auto-commit queries
+
 0.5001  2025-12-10
     - More reliable XS build using Alien::Base::Wrapper
     - Error message when trying to install on a Perl without 64-bit integers

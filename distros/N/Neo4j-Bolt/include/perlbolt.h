@@ -30,6 +30,8 @@ struct cxn_obj {
 
 typedef struct cxn_obj cxn_obj_t;
 
+typedef cxn_obj_t *Neo4j__Bolt__Cxn;  // XS type Neo4j::Bolt::Cxn
+
 struct txn_obj {
   neo4j_transaction_t *tx;
   int errnum;

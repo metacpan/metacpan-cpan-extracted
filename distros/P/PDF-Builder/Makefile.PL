@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker 6.66;
 my $PERL_version = '5.028000';  # Both here and in "use" statement above,
                                 # PDFbuild.pl updates from 'version' file
 my $MakeMaker_version = '6.66';
-my $version = '3.027';          # PDFbuild.pl updates from 'version' file
+my $version = '3.028';          # PDFbuild.pl updates from 'version' file
 
 # optional libraries... most users will attempt to install full set. they are
 # nice to have but not vital for many users. if one fails to install, it might 
@@ -20,6 +20,13 @@ my $version = '3.027';          # PDFbuild.pl updates from 'version' file
 # for future consideration
 #my $master  = 'lib/PDF/Builder.pm';
 #my $version = MM->parse_version($master);
+
+# ================================== messages ===========================
+print "\nR E M I N D E R for users: ==============================================\n";
+print "\nBe sure to read INFO/DEPRECATED for information on withdrawn facilities";
+print "\nand facilities scheduled to be withdrawn, so that you may update your own";
+print "\ncode in a timely manner.\n";
+print   "=========================================================================\n\n";
 
 my %WriteMakefileArgs =
 (

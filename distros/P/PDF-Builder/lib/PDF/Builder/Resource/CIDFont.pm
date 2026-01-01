@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::BaseFont';
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -60,10 +60,35 @@ sub new {
     return $self;
 }
 
+=head2 glyphByCId
+
+    $n = $font->glyphByCId($gid)
+
+=over
+
+Returns a character's glyph name (string), given its glyph ID.
+
+=back
+
+=cut
+
 sub glyphByCId { 
     my ($self, $gid) = @_;
     return $self->data()->{'g2n'}->[$gid]; 
 }
+
+=head2 uniByCId
+
+    $u = $font->uniByCId($gid)
+
+=over
+
+Returns a character's Unicode point, given its glyph ID. If no match, return
+U+0000.
+
+=back
+
+=cut
 
 sub uniByCId { 
     my ($self, $gid) = @_;
@@ -73,6 +98,18 @@ sub uniByCId {
     return $uni;
 }
 
+=head2 cidByUni
+
+    $c = $font->cidByUni($uid)
+
+=over
+
+Returns a glyph ID, given its Unicode point.
+
+=back
+
+=cut
+
 # TBD note that cidByUni has been seen returning 'undef' in some cases. 
 # be sure to handle this!
 sub cidByUni { 
@@ -80,10 +117,36 @@ sub cidByUni {
     return $self->data()->{'u2g'}->{$gid}; 
 }
 
+=head2 cidByEnc
+
+    $c = $font->cidByEnc($char)
+
+=over
+
+Returns a character's glyph ID, given its encoding (single
+byte value 0 to 255).
+
+=back
+
+=cut
+
 sub cidByEnc { 
     my ($self, $gid) = @_;
     return $self->data()->{'e2g'}->[$gid]; 
 }
+
+=head2 wxByCId
+
+    $w = $font->wxByCId($gid)
+
+=over
+
+Returns a character's width, given its glyph ID.
+Typically this is based on a 1000 unit wide grid.
+
+=back
+
+=cut
 
 sub wxByCId {
     my ($self, $g) = @_;
@@ -102,20 +165,73 @@ sub wxByCId {
     return $w;
 }
 
+=head2 wxByUni
+
+    $w = $font->wxByUni($uid)
+
+=over
+
+Returns a character's width, given its Unicode point.
+Typically this is based on a 1000 unit wide grid.
+
+=back
+
+=cut
+
 sub wxByUni { 
     my ($self, $gid) = @_;
     return $self->wxByCId($self->data()->{'u2g'}->{$gid}); 
 }
+
+=head2 wxByEnc
+
+    $w = $font->wxByEnc($enc)
+
+=over
+
+Returns a character's width, given its encoding (a single
+byte character in the range 0 to 255).
+Typically this is based on a 1000 unit wide grid.
+
+=back
+
+=cut
 
 sub wxByEnc { 
     my ($self, $gid) = @_;
     return $self->wxByCId($self->data()->{'e2g'}->[$gid]); 
 }
 
+=head2 width
+
+    $w = $font->width($string)
+
+=over
+
+Returns a string's width.
+This is typically based on a 1000 wide grid for each glyph.
+
+=back
+
+=cut
+
 sub width {
     my ($self, $text) = @_;
     return $self->width_cid($self->cidsByStr($text));
 }
+
+=head2 width_cid
+
+    $w = $font->width_cid($gid)
+
+=over
+
+Returns a character's width, given its glyph ID.
+This is typically based on a 1000 wide grid for a glyph.
+
+=back
+
+=cut
 
 sub width_cid {
     my ($self, $text) = @_;
@@ -141,7 +257,8 @@ sub width_cid {
 
 =over
 
-Returns the cid-string from string based on the font's encoding map.
+Returns the cid-string (as a single text string, not an array) from string, 
+based on the font's encoding map.
 
 =back
 
@@ -189,7 +306,7 @@ sub cidsByStr {
 
 =over
 
-Returns the CID-encoded string from utf8-string.
+Returns the CID-encoded string (a text string, not an array) from utf8-string.
 
 =back
 
@@ -209,15 +326,51 @@ sub cidsByUtf {
     return $s;
 }
 
+=head2 textByStr
+
+    $cid_string = $font->textByStr($text)
+
+=over
+
+Returns a cid text string, given a text string.
+
+=back
+
+=cut
+
 sub textByStr {
     my ($self, $text) =  @_;
     return $self->text_cid($self->cidsByStr($text));
 }
 
+=head2 textByStrKern
+
+    $cid_string = $font->textByStrKern($text, $size, $indent)
+
+=over
+
+Returns a cid string, given character text, size, and indentation.
+
+=back
+
+=cut
+
 sub textByStrKern {
     my ($self, $text, $size, $indent) = @_;
     return $self->text_cid_kern($self->cidsByStr($text), $size, $indent);
 }
+
+=head2 text
+
+    $stream_str = $font->text($text, $size, $indent)
+
+=over
+
+Returns a PDF text stream-ready code block to output the given text.
+
+=back
+
+=cut
 
 sub text {
     my ($self, $text, $size, $indent) = @_;
@@ -273,6 +426,19 @@ if (!defined $wordspace || !defined $fontsize || $fontsize <= 0) {
     return $out_str;
 }
 
+=head2 text_cid
+
+    $stream_str = $font->text_cid($text, $size)
+
+=over
+
+Returns a PDF text stream-ready output using glyph IDs, given input text and 
+size.
+
+=back
+
+=cut
+
 sub text_cid {
     my ($self, $text, $size) = @_;
 
@@ -288,6 +454,19 @@ sub text_cid {
         return "<$newtext>";
     }
 }
+
+=head2 text_cid_kern
+
+    $font->text_cid_kern($text, $size, $indent)
+
+=over
+
+Returns a PDF output-ready stream command using glyph IDs, given text, size, 
+and indentation.
+
+=back
+
+=cut
 
 sub text_cid_kern {
     my ($self, $text, $size, $indent) = @_;
@@ -340,6 +519,18 @@ sub haveKernPairs {
     return 0;  # PDF::API2 changed to just 'return;'
 }
 
+=head2 encodeByName
+
+    $font = $font->encodeByName($enc)
+
+=over
+
+Returns updated $font object, given an input encoding.
+
+=back
+
+=cut
+
 sub encodeByName {
     my ($self, $enc) = @_;
 
@@ -375,6 +566,19 @@ sub subsetByCId {
 sub subvec {
     return 1;
 }
+
+=head2 glyphNum
+
+    $g_or_w = $font->glyphNum()
+
+=over
+
+If 'glyphs' table is defined for a font, return its size;
+otherwise, return the 'wx' widths table size.
+
+=back
+
+=cut
 
 sub glyphNum {
     my $self = shift;

@@ -50,7 +50,6 @@ my %WriteMakefileArgs = (
     "Pod::Usage" => 0,
     "Term::ReadKey" => 0,
     "Time::HiRes" => 0,
-    "Win32::Console" => 0,
     "parent" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -60,7 +59,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "20251230.2042",
+  "VERSION" => "20251231.1441",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -94,7 +93,6 @@ my %FallbackPrereqs = (
   "Term::ReadKey" => 0,
   "Test::More" => 0,
   "Time::HiRes" => 0,
-  "Win32::Console" => 0,
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

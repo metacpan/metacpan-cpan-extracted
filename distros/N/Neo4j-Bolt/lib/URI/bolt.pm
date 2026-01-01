@@ -1,6 +1,6 @@
 package URI::bolt;
  
-our $VERSION = '0.5001';
+our $VERSION = '0.5002';
 
 require URI::_server;
 @ISA=qw(URI::_server);

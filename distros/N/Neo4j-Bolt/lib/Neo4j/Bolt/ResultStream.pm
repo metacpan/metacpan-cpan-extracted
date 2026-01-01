@@ -3,7 +3,7 @@ use v5.12;
 use warnings;
 
 BEGIN {
-  our $VERSION = "0.5001";
+  our $VERSION = "0.5002";
   require Neo4j::Bolt::Cxn;
   require Neo4j::Bolt::CResultStream;
   require XSLoader;
@@ -160,7 +160,7 @@ L<Neo4j::Bolt>, L<Neo4j::Bolt::Cxn>.
 
 =head1 LICENSE
 
-This software is Copyright (c) 2019-2024 by Mark A. Jensen.
+This software is Copyright (c) 2019-2026 by Mark A. Jensen.
 
 This is free software, licensed under:
 

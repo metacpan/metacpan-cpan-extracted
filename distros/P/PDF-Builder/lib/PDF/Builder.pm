@@ -5,8 +5,8 @@ use warnings;
 
 # $VERSION defined here so developers can run PDF::Builder from git.
 # it should be automatically updated as part of the CPAN build.
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 # updated during CPAN build
 my $GrTFversion  = 19;       # minimum version of Graphics::TIFF
@@ -150,66 +150,12 @@ for details.
 PDF::Builder intends to support all major Perl versions that were released in
 the past six years, plus one, in order to continue working for the life of
 most long-term-stable (LTS) server distributions.
-See the L<https://www.cpan.org/src/> table 
-B<First release in each branch of Perl> x.xxxx0 "Major" release dates.
-
-For example, a version of PDF::Builder released on 2018-06-05 would support 
-the last major version of Perl released I<on or after> 2012-06-05 (5.18), and 
-then one before that, which would be 5.16. Alternatively, the last major 
-version of Perl released I<before> 2012-06-05 is 5.16.
-
-The intent is to avoid expending unnecessary effort in supporting very old
-(obsolete) versions of Perl.
-
-=head3 Anticipated Support Cutoff Dates
-
-B<Note> that these are I<not> hard and fast dates. In particular, we develop
-on Strawberry Perl, which sometimes falls a little behind the official Perl
-release!
-
-=over
-
-=item * 
-
-5.28 current minimum supported version, until next PDF::Builder release after 22 May, 2025. This is currently the minimum tested version.
-
-=item * 
-
-5.30 future minimum supported version, until next PDF::Builder release after 20 June, 2026
-
-=item * 
-
-5.32 future minimum supported version, until next PDF::Builder release after 20 May, 2027. This is currently our primary development version.
-
-=item * 
-
-5.34 future minimum supported version, until next PDF::Builder release after 28 May, 2028
-
-=item * 
-
-5.36 future minimum supported version, until next PDF::Builder release after 02 Jul, 2029
-
-=item * 
-
-5.38 future minimum supported version, until next PDF::Builder release some time after 02 Jul, 2029. This is currently the maximum tested version.
-
-=back
-
-If you need to use this module on a server with an extremely out-of-date version
-of Perl, consider using either plenv or Perlbrew to run a newer version of Perl
-without needing admin privileges.
-
-On the other hand, any feature in PDF::Builder should continue to work 
-unchanged for the life of most long-term-stable (LTS) server distributions.
-Their lifetime is usually about six (6) years. Note that this does B<not>
-constitute a statement of warranty, but that we I<intend> to try to keep any
-particular release of PDF::Builder working for a period of years. Of course,
-it helps if you periodically update your Perl installation to something
-released in the recent past.
+See L<PDF::Builder::Docs/Supported Perl Versions> for more information, 
+including expected cutoff dates for Perl versions.
 
 =head2 KNOWN ISSUES
 
-This module does not work with perl's -l command-line switch.
+This module does not work with Perl's -l command-line switch.
 
 There is a file INFO/KNOWN_INCOMP which lists known incompatibilities with 
 PDF::API2, in case you're thinking of porting over something from that world, 
@@ -445,7 +391,7 @@ sub new {
 
 =head2 default_page_size
 
-    $pdf->default_page_size($size); # Set
+    @rectangle = $pdf->default_page_size($size); # Set
 
     @rectangle = $pdf->default_page_size() # Get
 
@@ -453,7 +399,8 @@ sub new {
 
 Set the default physical size for pages in the PDF. If called without
 arguments (Get), return an array of the coordinates of the rectangle 
-describing the default physical page size (the Media Box).
+describing the default physical page size (the Media Box). I<Setting> the
+size also returns the resulting media size.
 
 This is essentially an alternate method of defining the C<mediabox()> call,
 and added for compatibility with PDF::API2.
@@ -484,8 +431,8 @@ sub default_page_size {
 
 =head2 default_page_boundaries
 
-    $pdf->default_page_boundaries('media' => [xmin, ymin, xmax, ymax]); 
-         # Set the media box
+    %boundaries = $pdf->default_page_boundaries('media' => 
+         [xmin, ymin, xmax, ymax]);  # Set the media box
 
     %boundaries = $pdf->default_page_boundaries(); # Get (all five)
     @media_rect = @{ $boundaries{'media'} }; # show 'media' box
@@ -495,7 +442,8 @@ sub default_page_size {
 Set default prepress page boundaries ('boxes') for pages in the PDF. If called 
 without arguments, returns the coordinates of the rectangles describing each 
 of the supported page boundaries, as a hash of array refs. Each will be US 
-Letter size, unless it has been explicitly changed.
+Letter size, unless it has been explicitly changed. I<Setting> the values
+will also return the hash.
 
 See the equivalent C<page_boundaries> method in L<PDF::Builder::Page> for 
 details.
@@ -2642,7 +2590,7 @@ B<Note:> You can only import a page from an existing PDF file.
 
 B<Alternate name:> importpage
 
-This name is still valid in PDF::API2, so it is included here for compatiblity.
+This name is still valid in PDF::API2, so it is included here for compatibility.
 
 =back
 
@@ -3046,7 +2994,8 @@ B<Supported Options:>
 B<Roman> (I,II,III,...), B<roman> (i,ii,iii,...), B<decimal> (1,2,3,...), 
 B<Alpha> (A,B,C,...), B<alpha> (a,b,c,...), or B<nocounter>. This is the 
 styling of the counter part of the label (unless C<nocounter>, in which case 
-there is no counter output).
+there is no counter output). Note that B<arabic> is permitted as a synonym
+for B<decimal>.
 
 =item start
 
@@ -3223,6 +3172,7 @@ sub pageLabel {
                                     $opts->{'style'} eq 'roman' ? 'r' :
                                     $opts->{'style'} eq 'Alpha' ? 'A' :
                                     $opts->{'style'} eq 'alpha' ? 'a' :
+                                    $opts->{'style'} eq 'arabic' ? 'D' :
                                     $opts->{'style'} eq 'decimal' ? 'D' : 'D');
 	    } else {
 		# for nocounter (no styled counter), do not create /S entry
@@ -3538,7 +3488,7 @@ font definitions for the purpose of improving portability of PDF files. Note
 that font copyright and licensing terms vary by font provider, and some may 
 prohibit embedding of their fonts, either entirely, or allowing only the subset 
 of glyphs actually used in the document. You should be aware of the terms, and 
-use the C<noembed> or C<nosubset> flags as appropriate. The PDF::Builder font
+use the C<embed> and C<nosubset> flags as appropriate. The PDF::Builder font
 routines currently have no means to automatically detect any embedding 
 limitations for a given font, and cannot default their behavior accordingly!
 
@@ -3651,16 +3601,24 @@ sub ttfont {
     my ($self, $file, %opts) = @_;
     # copy dashed name options to preferred undashed format
     if (defined $opts{'-unicodemap'} && !defined $opts{'unicodemap'}) { $opts{'unicodemap'} = delete($opts{'-unicodemap'}); }
+
+    # noembed deprecated in API2, some may be using embed in code
     if (defined $opts{'-noembed'} && !defined $opts{'noembed'}) { $opts{'noembed'} = delete($opts{'-noembed'}); }
+    if (defined $opts{'-embed'} && !defined $opts{'embed'}) { $opts{'embed'} = delete($opts{'-embed'}); }
 
     # PDF::Builder doesn't set BaseEncoding for TrueType fonts, so text
     # isn't searchable unless a ToUnicode CMap is included.  Include
     # the ToUnicode CMap by default, but allow it to be disabled (for
     # performance and file size reasons) by setting 'unicodemap' to 0.
     $opts{'unicodemap'} = 1 unless exists $opts{'unicodemap'};
-    $opts{'noembed'}    = 0 unless exists $opts{'noembed'};
+    # if BOTH embed and noembed given, use embed
+    if (defined $opts{'noembed'} && !defined $opts{'embed'}) {
+	$opts{'embed'} = !$opts{'noembed'};
+    }
+    $opts{'embed'} //= 1;
 
-    $file = _findFont($file);
+    $file = UNIVERSAL::isa($file, 'Font::TTF::Font')? $file:
+            _findFont($file) or croak "Unable to find font \"$file\"";
     require PDF::Builder::Resource::CIDFont::TrueType;
     my $obj = PDF::Builder::Resource::CIDFont::TrueType->new($self->{'pdf'}, $file, %opts);
 
@@ -3751,7 +3709,8 @@ format. Returns the font object, to be used by L<PDF::Builder::Content>.
 
 The font C<$name> is either the name of one of the standard 14 fonts 
 (L<PDF::Builder::Resource::Font::CoreFont/STANDARD FONTS>), such as
-C<Helvetica> or the path to a font file (including an extension/filetype).
+C<Helvetica>, a C<Font::TTF::Font> object, or the path to a font file 
+(including an extension/filetype).
 There are 15 additional core fonts on a Windows system.
 Note that the exact name of a core font needs to be given.
 The file extension (if path given) determines what type of font file it is.
@@ -3832,6 +3791,7 @@ sub font {
     }
 
     my $format = $opts{'format'};
+    $format //= 'truetype' if UNIVERSAL::isa($name, 'Font::TTF::Font');
     $format //= ($name =~ /\.[ot]tf$/i ? 'truetype' :
                  $name =~ /\.pf[ab]$/i ? 'type1'    :
                  $name =~ /\.t1$/i ?     'type1'    :
@@ -3854,6 +3814,56 @@ sub font {
     }
 }
 
+=head3 standard_fonts
+
+    @names = $pdf->standard_fonts($flag)
+ 
+Returns the names of the 14 standard (built-in) "core" fonts, if C<$flag> is
+omitted or "false" (0). See
+L<PDF::API2::Resource::Font::CoreFont> for details.
+B<Note> that these do I<not> include the 14 additional Windows "core"
+fonts extension, unless C<$flag> is given with a value of "true" (1).
+
+=cut
+
+sub standard_fonts {
+    my $self = shift;
+    my $Windows_ext = 0;
+    if (@_ and $_[0]) { $Windows_ext = 1; }
+
+    require PDF::Builder::Resource::Font::CoreFont;
+
+    my @cores = PDF::Builder::Resource::Font::CoreFont->names($Windows_ext);
+
+    return @cores;
+}
+ 
+=head3 is_standard_font
+
+    $boolean = PDF::Builder->is_standard_font($name);
+ 
+    $boolean = PDF::Builder->is_standard_font($name, $flag);
+ 
+Returns true if C<$name> is an exact, case-sensitive match for one of the
+standard font names.
+
+B<Note> that these do I<not> include the 14 additional Windows "core"
+fonts extension, unless C<$flag> is given with a value of "true" (1), in which case,
+C<$name> will also be checked against the additional font names.
+
+=cut
+
+sub is_standard_font {
+    my $self = shift;
+    my $name = shift;
+    my $Windows_ext = 0;
+    if (@_ and $_[0]) { $Windows_ext = 1; }
+
+    require PDF::Builder::Resource::Font::CoreFont;
+
+    return PDF::Builder::Resource::Font::CoreFont->is_standard($name, $Windows_ext);
+}
+ 
 =head3 font_path
 
     @directories = PDF::Builder->font_path()
@@ -4108,6 +4118,24 @@ See L<PDF::Builder::FontManager>/get_font for details.
 sub get_font {
     my $self = shift;
     return $self->{' FM'}->get_font(@_);
+}
+
+=head3 get_external_font
+
+    $rc = $pdf->get_external_font()
+
+=over
+
+See if there is already a predefined (opened) font that the user wants to use.
+See L<PDF::Builder::FontManager>/get_external_font for details.
+
+=back
+
+=cut
+
+sub get_external_font {
+    my $self = shift;
+    return $self->{' FM'}->get_external_font(@_);
 }
 
 =head3 dump_font_tables
@@ -5152,13 +5180,25 @@ sub shading {
 
 =head2 named_destination
 
-    $ndest = $pdf->named_destination()
+    $ndest = $pdf->named_destination($cat, $name, $obj)
 
 =over
 
-Returns a new or existing named destination object.
+Returns a new named destination object. C<$cat> is the category,
+and is normally the string C<'Dests'> (it's a PDF keyword). The C<$name> is
+the B<unique> (within an entire PDF document) name, such as "foo" in the
+example below. 
+
+See L<PDF::Builder::NamedDestination> for more information.
+
+B<Example:>
 
 =back
+
+    my $dest = PDF::Builder::NamedDestination->new($pdf);
+    #$dest->goto($page, 'xyz' => [undef, undef, undef]);  old style
+    $dest->goto($page, 'xyz', (undef, undef, undef));
+    $pdf->named_destination('Dests', 'foo', $dest);
 
 =cut
 
@@ -5193,6 +5233,152 @@ sub named_destination {
 
     return $obj;
 } # end of named_destination()
+
+=head2 init_state()
+
+Initialize 'state' variable that carries information across multiple
+document passes for C<column()> call.
+See L<PDF::Builder::Content::Column_docs> for documentation.
+ 
+=cut
+
+# initialize state holder hash
+sub init_state {
+    my ($self, $lists) = @_;
+
+    my %state = ();
+    $state{'settings'} = {}; # hold settings between column() calls, TBD
+    # remember: multiple xrefs may point to the same target xreft, so no
+    #             way to automatically point back to link source in xrefs!
+    #           self-contained links (Named Destination, physical page) will
+    #             have a '#' or '##' target id and not match an xreft list entry
+    #           self-contained links have xrefs entry with or without a 
+    #             filepath (for external or internal links, respectively)
+    $state{'sindex'} = 0;  # current size/next write of xrefs array
+    $state{'xrefs'} = [];  # source (<_ref>) link data
+      # each array element is an anonymous hash containing:
+      #
+      # {'id'} target's id ('#ND' or '##ppn if self-contained link)
+      # {'tfn'} filepath (final position and name) for external links 
+      #     give for all links, even if internal, to permit external linking
+      # {'tppn'} physical page number of target
+      # {'sppn'} physical page number of source
+      # {'fit'} fit information ('' if not given)
+      # {'tfpn'} formatted page number of target
+      # {'page_numbers'} TBD in case want to override global default
+      # {'other_pg'} # other page text ("on page N", "on facing page", etc.) 
+      #              if $page_numbers > 0 (TBD)
+      #   {'prev_other_pg'}* see if 'other_pg' changed
+      # {'tx'} and {'ty'} location on page of target
+      # {'title'} title= or natural text for link
+      #     if none found yet, '[no title text]' is used
+      #     for Index, user-defined term
+      # {'tag'} # tag (type) that produced this target 
+      #     useful for formatting TOC, etc
+      # {'click'} [] of click area(s) for this _ref, each [sppn, [x,y, x,y]]
+      #
+      # * = for discovering changes to visible text, requiring another pass
+    $state{'xreft'} = ();  # target (<_reft> et al.) link data
+      #
+      # {$listname}  e.g., '_reft', 'TOC', etc.
+      #   {'id'} target id=
+      #     {'tfn'} filepath (final position and name) for external links 
+      #         give for all links, even if internal, to permit external linking
+      #     {'tppn'}* physical page number of target
+      #     {'sppn'}* physical page number of source
+      #     {'tfpn'}* formatted page number of target
+      #         used if $page_number > 0 (TBD)
+      #     {'tx'}* and {'ty'}* location on page of target
+      #     {'title'} title= or natural text for link
+      #         if none found yet, '[no title text]' is used
+      #         copied to xrefs entry if it does not have its own title
+      #     {'tag'} tag (type) that produced this entry
+      #        useful for formatting TOC, etc.
+      #
+      # * liable to change as text shifts around. copy to xrefs. if visible
+      #   change (change to title and/or formatted page number) -- will need
+      #   another pass (see 'changed_target')
+    $state{'changed_target'} = {};  # list of tgtids whose data changed
+      #   enough (AFTER the last text output by xrefs) to change the printed 
+      #   content and thus require another pass
+    $state{'tag_lists'} = {};  # user-defined lists of tags, e.g., TOC for
+      # {$list_name} = [ tag1, tag2, ... ]
+      #   to define what tags (with ids) get listed as targets. 
+      #   _reft is predefined with '_reft' for use as <_ref> tgtids.
+      #   add TOC for table of contents, Index for index, LoT for List of 
+      #   Tables, etc.
+    $state{'nameddest'} = {}; # <_nameddest> defs save up for final output
+      #  these are ND's defined in THIS document, NOT targets in links
+      # {'name'}  name of Named Destination
+      #   {'ppn'}  physical page number
+      #   {'x'}    x location in page
+      #   {'y'}    y location in page
+      #   {'fit'}  fit (location, parms) information
+
+    # predefined (started) lists
+    $state{'tag_lists'}{'_reft'} = [ '_reft' ];
+
+    # extend _reft and add additional tags lists per user input
+    foreach my $listname (keys %{$lists}) {
+	# add the anonymous list of tag names to an existing list ($listname
+	# element) by this key, or create if none already exists.
+	# a given tag may appear in multiple lists
+	my @list;  # one user-given tag list
+	if (exists $state{'tag_lists'}{$listname}) {
+	    @list = @{ $state{'tag_lists'}{$listname} };
+	    push @list, @{ $lists->{$listname} };
+	} else {
+	    # create new list
+	    $state{'tag_lists'}{$listname} = []; # empty, so far
+	    @list = @{ $lists->{$listname} };
+	}
+	# cull any duplicates from the list, such as user misunderstanding and
+	# explicitly specifying '_reft' in the _reft tag list
+	for (my $ti=0; $ti<scalar(@list)-1; $ti++) {
+	    for (my $tj=$ti+1; $tj<@list; $tj++) {
+		if ($list[$ti] eq $list[$tj]) {
+		    # duplicate found, delete second one
+		    splice(@list, $tj--, 1);
+		}
+	    }
+	}
+	# fill or replace existing entry
+	$state{'tag_lists'}{$listname} = \@list;
+
+        # create xreft target list heads
+        $state{'xreft'}->{$listname} = {}; # always will have _reft list
+    }
+
+    return %state;
+}
+
+=head2 pass_start_state()
+
+Update 'state' variable that carries information across multiple
+document passes for C<column()> call, at the beginning of each pass.
+See L<PDF::Builder::Content::Column_docs> for documentation.
+
+=cut
+
+sub pass_start_state {
+    my ($self, $pass_no, $max_passes, $state) = @_;
+    # $state = ref to %state structure
+
+    # TBD this may disappear, if clear changed_target flag upon text output
+#    if ($pass_no > 1) {
+#        $state->{'changed_target'} = {};  # clear all
+#
+#	# changed visible text (fpn), reset "previous" version
+#        for (my $sindex=0; $sindex<scalar(@{$state->{'xrefs'}}); $sindex++) {
+#	    $state->{'prev_other_pg'} = $state->{'other_pg'}; # not always used
+#	}
+#    }
+
+    $state->{'sindex'} = 0; # position to write on first pass, update > 1
+
+
+    return;
+}
 
 # ==================================================
 # input: level of checking, PDF as a string

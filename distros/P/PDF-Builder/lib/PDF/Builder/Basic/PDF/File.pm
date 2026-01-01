@@ -20,8 +20,8 @@ package PDF::Builder::Basic::PDF::File;
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -821,7 +821,7 @@ sub readval {
         # fredo: yes they can !!! -- use the MacOS, Luke.
 	    # TBD isn't this covered by $cr as space CR?
         if (($str =~ s/^stream(?:(?:\015\012)|\012|\015)//) and ($result->{'Length'}->val() != 0)) {   # stream
-            my $length = $result->{'Length'}->val();
+            my $length = $result->{'Length'}->val() + 0; # ensure seen as decimal
             $result->{' streamsrc'} = $fh;
             $result->{' streamloc'} = $fh->tell() - length($str);
 
@@ -849,8 +849,8 @@ sub readval {
 
     } elsif ($str =~ m/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+R/s) {
         # Indirect Object
-        my $num = $1;
-        $value = $2;
+        my $num = $1 + 0; # ensure seen as decimal value
+        $value = $2 + 0;
         $str =~ s/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+R//s;
         unless ($result = $self->test_obj($num, $value)) {
             $result = PDF::Builder::Basic::PDF::Objind->new();
@@ -869,8 +869,8 @@ sub readval {
     } elsif ($str =~ m/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+obj/s) {
         # Object
         my $obj;
-        my $num = $1;
-        $value = $2;
+        my $num = $1 + 0; # ensure seen as decimal value
+        $value = $2 + 0;
         $str =~ s/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+obj//s;
         ($obj, $str) = $self->readval($str, %opts);
         if ($result = $self->test_obj($num, $value)) {

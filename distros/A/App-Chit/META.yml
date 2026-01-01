@@ -1,0 +1,80 @@
+---
+abstract: 'chat with AI from the command line'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test2::Plugin::BailOnFail: '0'
+  Test2::Require::AuthorTesting: '0'
+  Test2::Require::Module: '0'
+  Test2::Tools::Spec: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Chit
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  App::Chit:
+    file: lib/App/Chit.pm
+    version: '0.001001'
+  App::Chit::Command::chat:
+    file: lib/App/Chit/Command/chat.pm
+    version: '0.001001'
+  App::Chit::Command::init:
+    file: lib/App/Chit/Command/init.pm
+    version: '0.001001'
+  App::Chit::Command::maxhistory:
+    file: lib/App/Chit/Command/maxhistory.pm
+    version: '0.001001'
+  App::Chit::Command::model:
+    file: lib/App/Chit/Command/model.pm
+    version: '0.001001'
+  App::Chit::Command::role:
+    file: lib/App/Chit/Command/role.pm
+    version: '0.001001'
+  App::Chit::Command::show:
+    file: lib/App/Chit/Command/show.pm
+    version: '0.001001'
+  App::Chit::Command::temperature:
+    file: lib/App/Chit/Command/temperature.pm
+    version: '0.001001'
+  App::Chit::Command::which:
+    file: lib/App/Chit/Command/which.pm
+    version: '0.001001'
+  App::Chit::Util:
+    file: lib/App/Chit/Util.pm
+    version: '0.001001'
+requires:
+  AI::Chat: '0'
+  App::Cmd: '0'
+  Cwd: '0'
+  Path::Tiny: '0'
+  Term::ANSIColor: '0'
+  Term::Spinner::Color: '0'
+  YAML::XS: '0'
+  perl: '5.020000'
+  utf8::all: '0'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/App-Chit/project
+  bugtracker: https://github.com/tobyink/p5-app-chit/issues
+  homepage: https://metacpan.org/release/App-Chit
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-app-chit.git
+version: '0.001001'
+x_provides_scripts:
+  chit:
+    file: bin/chit
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@
       "FUJIWARA Shunichiro <fujiwara@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v0.14.1",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "perl_5"
    ],
@@ -33,16 +33,14 @@
       },
       "configure" : {
          "requires" : {
-            "CPAN::Meta" : "0",
-            "CPAN::Meta::Prereqs" : "0",
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -63,7 +61,7 @@
    "provides" : {
       "Parallel::Benchmark" : {
          "file" : "lib/Parallel/Benchmark.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -73,12 +71,16 @@
       },
       "homepage" : "https://github.com/fujiwara/p5-Parallel-Benchmark",
       "repository" : {
-         "url" : "git://github.com/fujiwara/p5-Parallel-Benchmark.git",
+         "type" : "git",
+         "url" : "https://github.com/fujiwara/p5-Parallel-Benchmark.git",
          "web" : "https://github.com/fujiwara/p5-Parallel-Benchmark"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_contributors" : [
-      "FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>"
-   ]
+      "FUJIWARA Shunichiro <67804+fujiwara@users.noreply.github.com>",
+      "fujiwara <fujiwara.shunichiro@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
 }

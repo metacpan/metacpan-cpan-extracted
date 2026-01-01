@@ -21,5 +21,5 @@ requires:
   ExtUtils::MakeMaker: '5.4302'
   HTTP::Request: '0'
   LWP::UserAgent: '0'
-version: '2.044'
+version: '2.045'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

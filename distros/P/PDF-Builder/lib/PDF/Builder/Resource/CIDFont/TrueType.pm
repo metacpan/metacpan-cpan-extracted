@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::CIDFont';
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Resource::CIDFont::TrueType::FontFile;
@@ -61,7 +61,20 @@ Enables kerning if data is available.
 
 C<kerning> is still accepted as an (older) B<alternative> to C<dokern>.
 
+=item embed
+
+If set (non-zero), which is the default, the font (entire or subsetted) will
+be embedded in the PDF file. See the comments in C<noembed> about the possible
+hazards of I<not> embedding the font, and limitations on embedding.
+
+C<true> (non-zero) and C<false> (zero) are the values of C<embed>. It is 
+possible that in the future, some non-zero values may get special meaning (such
+as permission flags), so it is best to use only 0 and 1 for a value.
+
 =item noembed
+
+B<noembed> is I<ignored> if B<embed> I<is> given. C<noembed> is deprecated,
+while C<embed> (default true) is preferred.
 
 Disables embedding of the font file. B<Note that this is potentially hazardous,
 as the glyphs provided on the PDF reader machine may not match what was used on
@@ -71,11 +84,6 @@ PDF::Builder; not embedding the font may be acceptable, in return for a smaller
 PDF file size. Note that the Reader needs to know where to find the font file
 -- it can't be in any random place, but typically needs to be listed in a path 
 that the Reader follows. Otherwise, it will be unable to render the text!
-
-The only value for the C<noembed> flag currently checked for is B<1>, which
-means to I<not> embed the font file in the PDF. Any other value currently
-results in the font file being embedded (by B<default>), although in the future,
-other values might be given significance (such as checking permission bits).
 
 Some additional comments on embedding font file(s) into the PDF: besides 
 substantially increasing the size of the PDF (even if the font is subsetted,
@@ -135,11 +143,15 @@ is not 1.
 
 sub new {
     my ($class, $pdf, $file, %opts) = @_;
+
     # copy dashed option names to preferred undashed names
     if (defined $opts{'-encode'} && !defined $opts{'encode'}) { $opts{'encode'} = delete($opts{'-encode'}); }
     if (defined $opts{'-nosubset'} && !defined $opts{'nosubset'}) { $opts{'nosubset'} = delete($opts{'-nosubset'}); }
-    if (defined $opts{'-noembed'} && !defined $opts{'noembed'}) { $opts{'noembed'} = delete($opts{'-noembed'}); }
     if (defined $opts{'-dokern'} && !defined $opts{'dokern'}) { $opts{'dokern'} = delete($opts{'-dokern'}); }
+
+    # embed should already be set by ttfont(), so ignore noembed too
+   #if (defined $opts{'-noembed'} && !defined $opts{'noembed'}) { $opts{'noembed'} = delete($opts{'-noembed'}); }
+   #if (defined $opts{'-embed'} && !defined $opts{'embed'}) { $opts{'embed'} = delete($opts{'-embed'}); }
 
     $opts{'encode'} //= 'latin1';
     my ($ff, $data) = PDF::Builder::Resource::CIDFont::TrueType::FontFile->new($pdf, $file, %opts);
@@ -161,7 +173,8 @@ sub new {
     ## $de->{'BaseFont'} = PDFName(pdfkey().'+'.($self->fontname()).'~'.time());
     $de->{'BaseFont'} = PDFName($self->fontname());
     $de->{'DW'} = PDFNum($self->missingwidth());
-    if (($opts{'noembed'}||0) != 1) {
+    if ($opts{'embed'}) {
+	# TBD: check, API2 omits ->data() term
     	$des->{$self->data()->{'iscff'}? 'FontFile3': 'FontFile2'} = $ff;
     }
     unless ($self->issymbol()) {
@@ -220,7 +233,7 @@ sub fontobj {
 
 =over
 
-Returns unscaled glyph width, given the glyph ID (CID).
+Returns unscaled glyph width, given its glyph ID (CID).
 
 =back
 
@@ -279,9 +292,9 @@ sub kernPairCid {
     return $self->fontfile()->kernPairCid(@_);
 }
 
-=head2 subsetByCid
+=head2 subsetByCId
 
-    $font->subsetByCid($gID)
+    $font->subsetByCId($gID)
 
 =over
 

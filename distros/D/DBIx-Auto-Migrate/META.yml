@@ -5,6 +5,8 @@ author:
 build_requires:
   DBD::Pg: '0'
   Test::Exception: '0'
+  Test::MockModule: '0'
+  Test::MockObject: '0'
   Test::More: '0'
   Test::PostgreSQL: '0'
 configure_requires:
@@ -19,12 +21,12 @@ name: DBIx-Auto-Migrate
 provides:
   DBIx::Auto::Migrate:
     file: lib/DBIx/Auto/Migrate.pm
-    version: '0.6'
+    version: '0.7'
 requires:
   DBI: '0'
   perl: v5.16.3
 resources:
   bugtracker: https://github.com/sergiotarxz/Perl-DBIx-Auto-Migrate/issues
   repository: https://github.com/sergiotarxz/Perl-DBIx-Auto-Migrate
-version: '0.6'
+version: '0.7'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

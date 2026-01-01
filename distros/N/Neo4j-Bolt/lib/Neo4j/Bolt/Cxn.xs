@@ -117,6 +117,10 @@ void DESTROY (SV *cxn_ref)
 
 MODULE = Neo4j::Bolt::Cxn  PACKAGE = Neo4j::Bolt::Cxn  
 
+TYPEMAP: <<EOF
+Neo4j::Bolt::Cxn T_PTROBJ
+EOF
+
 PROTOTYPES: DISABLE
 
 
@@ -163,6 +167,14 @@ server_id_ (cxn_ref)
 const char *
 protocol_version_ (cxn_ref)
         SV *    cxn_ref
+
+Neo4j::Bolt::Cxn
+new_ (package)
+  # For unit test only (regular objects are created by Neo4j::Bolt::connect_)
+  CODE:
+    Newxz(RETVAL, 1, cxn_obj_t);
+  OUTPUT:
+    RETVAL
 
 void
 DESTROY (cxn_ref)

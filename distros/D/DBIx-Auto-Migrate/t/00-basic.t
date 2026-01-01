@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 use Test::PostgreSQL;
 use Test::Exception;
+$^O eq 'linux' or plan skip_all => 'No linux, no postgresql test';
 eval { Test::PostgreSQL->new() }
     or plan skip_all => $@;
 my $create_index = sub {

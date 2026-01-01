@@ -1,5 +1,9 @@
 Revision history for Perl extension Parallel::Benchmark
 
+0.11 2026-01-01T05:38:15Z
+	- Fix for fatalization of calling import/unimport method with argument
+	  https://github.com/fujiwara/p5-Parallel-Benchmark/pull/4
+
 0.10 2015-04-14T04:30:10Z
         - Depends on Parallel::ForkManager 1.12
 

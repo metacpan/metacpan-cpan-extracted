@@ -6,7 +6,7 @@ use PDF::Builder;
 #use Data::Dumper; # for debugging
 # $Data::Dumper::Sortkeys = 1; # hash keys in sorted order
 
-our $VERSION = '3.027'; # VERSION
+our $VERSION = '3.028'; # VERSION
 our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 my $showVB = 1; # 1 to show viewbox and any baseline

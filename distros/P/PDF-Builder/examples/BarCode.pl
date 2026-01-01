@@ -9,7 +9,7 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.027'; # VERSION
+our $VERSION = '3.028'; # VERSION
 our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use Math::Trig;
@@ -31,7 +31,7 @@ my $PDFname = $0;
 my $globalX = 0; 
 my $globalY = 0;
 
-my $pdf = PDF::Builder->new(-compress => $compress);
+my $pdf = PDF::Builder->new('compress' => $compress);
 
 my ($page, $grfx, $text); # objects for page, graphics, text
 my (@base, @points, $i);
@@ -89,13 +89,13 @@ $type = 'Codabar';
 ##$content = 'A32134567890123B';  # len 16 includes start/stop chars, encode=16
 $content = 'A23342453D';  # not like scandit example, and start/stop chars gone
 $barcode = $pdf->xo_codabar(
-    -code => $content,
-    -zone => $bar_height,
-    -umzn => 0,
-    -lmzn => 10,
-    -font => $fontH,
-    -fnsz => 10,
-    -mils => $mils,
+    'code' => $content,
+    'zone' => $bar_height,
+    'umzn' => 0,
+    'lmzn' => 10,
+    'font' => $fontH,
+    'fnsz' => 10,
+    'mils' => $mils,
 );
 $barcode->{'-docompress'} = 0;
 delete $barcode->{'Filter'};
@@ -133,13 +133,13 @@ $text->leading(15);
 $type = 'Code 128 A';
 $content = 'TEST of '.$type;
 $barcode = $pdf->xo_code128(
-    -code => $content,
-    -zone => $bar_height,
-    -umzn => 0,
-    -lmzn => 10,
-    -font => $fontH,
-    -fnsz => 10,
-    -mils => $mils,
+    'code' => $content,
+    'zone' => $bar_height,
+    'umzn' => 0,
+    'lmzn' => 10,
+    'font' => $fontH,
+    'fnsz' => 10,
+    'mils' => $mils,
 );
 $barcode->{'-docompress'} = 0;
 delete $barcode->{'Filter'};
@@ -178,13 +178,13 @@ $type = 'Code 128 B';
 ##$content = 'Test Of '.$type;
 $content = 'Count01234567 :';  # does NOT match scandit example!
 $barcode = $pdf->xo_code128(
-    -code => $content,
-    -zone => $bar_height,
-    -umzn => 0,
-    -lmzn => 10,
-    -font => $fontH,
-    -fnsz => 10,
-    -mils => $mils,
+    'code' => $content,
+    'zone' => $bar_height,
+    'umzn' => 0,
+    'lmzn' => 10,
+    'font' => $fontH,
+    'fnsz' => 10,
+    'mils' => $mils,
 );
 $barcode->{'-docompress'} = 0;
 delete $barcode->{'Filter'};
@@ -219,13 +219,13 @@ $type = 'Code 128 C';
 #$content = '0123456789';  # doesn't work!
 $content = 'Test Of '.$type;
 $barcode = $pdf->xo_code128(
-    -code => $content,
-    -zone => $bar_height,
-    -umzn => 0,
-    -lmzn => 10,
-    -font => $fontH,
-    -fnsz => 10,
-    -mils => $mils,
+    'code' => $content,
+    'zone' => $bar_height,
+    'umzn' => 0,
+    'lmzn' => 10,
+    'font' => $fontH,
+    'fnsz' => 10,
+    'mils' => $mils,
 );
 $barcode->{'-docompress'} = 0;
 delete $barcode->{'Filter'};
@@ -266,13 +266,13 @@ $type = 'Code EAN-128';
 #$content = '00123456780000000001';  # seems to be too long
 $content = '(00)12345(11)0001';
 $barcode = $pdf->xo_code128(
-    -code => $content,
-    -zone => $bar_height,
-    -umzn => 0,
-    -lmzn => 10,
-    -font => $fontH,
-    -fnsz => 10,
-    -mils => $mils,
+    'code' => $content,
+    'zone' => $bar_height,
+    'umzn' => 0,
+    'lmzn' => 10,
+    'font' => $fontH,
+    'fnsz' => 10,
+    'mils' => $mils,
 );
 $barcode->{'-docompress'} = 0;
 delete $barcode->{'Filter'};
@@ -308,13 +308,13 @@ $type = 'Code 3 of 9';
 ##$content = 'Test '.$type;  # 3 of 9 will uppercase this
 $content = 'ABC 123';  # does NOT match scandit example!
 $barcode = $pdf->xo_3of9(
-    -code => $content,
-    -zone => $bar_height,
-    -umzn => 0,
-    -lmzn => 10,
-    -font => $fontH,
-    -fnsz => 10,
-    -mils => $mils,
+    'code' => $content,
+    'zone' => $bar_height,
+    'umzn' => 0,
+    'lmzn' => 10,
+    'font' => $fontH,
+    'fnsz' => 10,
+    'mils' => $mils,
 );
 $barcode->{'-docompress'} = 0;
 delete $barcode->{'Filter'};
@@ -349,13 +349,13 @@ $text->leading(15);
 $type = 'Code 3 of 9';
 $content = 'Test '.$type;  # 3 of 9 will uppercase this
 $barcode = $pdf->xo_3of9(
-    -code => $content,
-    -zone => $bar_height,
-    -umzn => 0,
-    -lmzn => 10,
-    -font => $fontH,
-    -fnsz => 10,
-    -mils => $mils,
+    'code' => $content,
+    'zone' => $bar_height,
+    'umzn' => 0,
+    'lmzn' => 10,
+    'font' => $fontH,
+    'fnsz' => 10,
+    'mils' => $mils,
 );
 $barcode->{'-docompress'} = 0;
 delete $barcode->{'Filter'};
@@ -390,13 +390,13 @@ $text->leading(15);
 $type = 'Code 3 of 9';
 $content = 'Test '.$type;  # 3 of 9 will uppercase this
 $barcode = $pdf->xo_3of9(
-    -code => $content,
-    -zone => $bar_height,
-    -umzn => 0,
-    -lmzn => 10,
-    -font => $fontH,
-    -fnsz => 10,
-    -mils => $mils,
+    'code' => $content,
+    'zone' => $bar_height,
+    'umzn' => 0,
+    'lmzn' => 10,
+    'font' => $fontH,
+    'fnsz' => 10,
+    'mils' => $mils,
 );
 $barcode->{'-docompress'} = 0;
 delete $barcode->{'Filter'};
@@ -431,13 +431,13 @@ $text->leading(15);
 $type = 'Code 3 of 9';
 $content = 'Test '.$type;  # 3 of 9 will uppercase this
 $barcode = $pdf->xo_3of9(
-    -code => $content,
-    -zone => $bar_height,
-    -umzn => 0,
-    -lmzn => 10,
-    -font => $fontH,
-    -fnsz => 10,
-    -mils => $mils,
+    'code' => $content,
+    'zone' => $bar_height,
+    'umzn' => 0,
+    'lmzn' => 10,
+    'font' => $fontH,
+    'fnsz' => 10,
+    'mils' => $mils,
 );
 $barcode->{'-docompress'} = 0;
 delete $barcode->{'Filter'};
@@ -491,13 +491,13 @@ $type = 'Code EAN-13';
 ##$content = '9123456789013';
 $content = '1325764098273';  # does NOT match scandit example!
 $barcode = $pdf->xo_ean13(
-    -code => $content,
-    -zone => $bar_height,
-    -umzn => 0,
-    -lmzn => 10,
-    -font => $fontH,
-    -fnsz => 10,
-    -mils => $mils*2,
+    'code' => $content,
+    'zone' => $bar_height,
+    'umzn' => 0,
+    'lmzn' => 10,
+    'font' => $fontH,
+    'fnsz' => 10,
+    'mils' => $mils*2,
 );
 $barcode->{'-docompress'} = 0;
 delete $barcode->{'Filter'};
@@ -533,13 +533,13 @@ $type = 'Code Int 2 of 5';
 ##$content = '0123456789';
 $content = '01234565';  # looks pretty close to scandit example
 $barcode = $pdf->xo_2of5int(
-    -code => $content,
-    -zone => $bar_height,
-    -umzn => 0,
-    -lmzn => 10,
-    -font => $fontH,
-    -fnsz => 10,
-    -mils => $mils*2,
+    'code' => $content,
+    'zone' => $bar_height,
+    'umzn' => 0,
+    'lmzn' => 10,
+    'font' => $fontH,
+    'fnsz' => 10,
+    'mils' => $mils*2,
 );
 $barcode->{'-docompress'} = 0;
 delete $barcode->{'Filter'};

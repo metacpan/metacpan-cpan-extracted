@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 use Math::Trig;    # CAUTION: deg2rad(0) = deg2rad(360) = 0!
 use Unicode::UCD 'charinfo';
@@ -32,7 +32,7 @@ attributes in the original font, such as:
     * slant/obliqueness 
     * extra weight/boldness (by drawing glyph outlines at various line 
       thicknesses, rather than just filling enclosed areas)
-    * condense/expand (narrower or wider characters)
+    * condense/expand (narrower or wider characters) a.k.a. B<stretch>
     * extra space between characters
     * small caps (synthesized, not using any provided with a font)
     * change the encoding
@@ -83,6 +83,8 @@ B<Alternate name:> C<name> (for PDF::API2 compatibility)
 Character width condense/expand factor (0.1-0.9 = condense, 1 = normal/default, 
 1.1+ = expand). It is the multiplier to apply to the width of each character.
 
+In some font systems, this aspect or axis is known as I<stretch>.
+
 B<Alternate names:> C<hscale> and C<slant> (for PDF::API2 compatibility) 
 
 The I<slant> option is a deprecated name in both PDF::Builder and PDF::API2.
@@ -98,6 +100,16 @@ skewed (sheared), top to the right. While it's unlikely that anyone will want
 to slant characters at +/-360 degrees, they should be aware that these will be 
 treated as an angle of 0 degrees (deg2rad() wraps around). 0 degrees of italic 
 slant (obliqueness) is the default.
+
+Note that a font management system may have separate axes for normal/italic
+fonts, and the degree of I<slant>. Italic is a different (but related) face
+to the regular (e.g., Roman) face, sometimes made to resemble handwritten
+characters, and is usually a binary selection (it's either italic or it's not). 
+Slant, on the other hand, can be in arbitrary amounts, and may be applied to either
+normal (originally Roman posture) or italics (which are often themselves 
+slightly slanted). Finally, what many fonts call "italic" others may call
+"slanted" or "oblique", and in these cases the coordinate system is merely
+sheared to slant the character box.
 
 B<Alternate name:> C<angle> (for PDF::API2 compatibility)
 

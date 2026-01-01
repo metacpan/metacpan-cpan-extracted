@@ -6,7 +6,7 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.027'; # VERSION
+our $VERSION = '3.028'; # VERSION
 our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use Math::Trig;
@@ -64,7 +64,8 @@ my $LoremIpsumPara =
 
 my ($unused, $cell_height, $j, $cont);
 
-my $pdf = PDF::Builder->new();
+#my $pdf = PDF::Builder->new();
+my $pdf = PDF::Builder->new('compress'=>'none');
 my ($page, $grfx, $text); # objects for page, graphics, text
 my (@base, @points, $i, $lw);
 #$pdf->{'forcecompress'} = 0;  # don't compress, so we can see what's happening
@@ -79,7 +80,7 @@ my $fontR = $pdf->corefont('Times-Roman');
 my $fontI = $pdf->corefont('Times-Italic');
 my $fontC = $pdf->corefont('Courier');
 
-# ----------------------------------------------------
+# ---------------------------------------------------- page 1
 # 1. text_left()  alias for text
 @cellLoc = makeCellLoc(0, 0);
 @cellSize = (170, 131); 
@@ -176,7 +177,7 @@ $grfx->stroke();
 $i = $DofI;
 $text->translate($base[0]+15, $base[1]+105);
 while ($i ne '') {
-  ($lw, $i) = $text->text_fill_left($i, 140, -spillover=>0);
+  ($lw, $i) = $text->text_fill_left($i, 140, 'spillover'=>0);
   $text->cr();
 }
 
@@ -210,7 +211,7 @@ $grfx->stroke();
 $i = $DofI;
 $text->translate($base[0]+15, $base[1]+105);
 while ($i ne '') {
-  ($lw, $i) = $text->text_fill($i, 140, -spillover=>0);
+  ($lw, $i) = $text->text_fill($i, 140, 'spillover'=>0);
   $text->cr();
 }
 
@@ -244,7 +245,7 @@ $grfx->stroke();
 $i = $DofI;
 $text->translate($base[0]+15+140/2, $base[1]+105);
 while ($i ne '') {
-  ($lw, $i) = $text->text_fill_center($i, 140, -spillover=>0);
+  ($lw, $i) = $text->text_fill_center($i, 140, 'spillover'=>0);
   $text->cr();
 }
 
@@ -278,7 +279,7 @@ $grfx->stroke();
 $i = $DofI;
 $text->translate($base[0]+15+140, $base[1]+105);
 while ($i ne '') {
-  ($lw, $i) = $text->text_fill_right($i, 140, -spillover=>0);
+  ($lw, $i) = $text->text_fill_right($i, 140, 'spillover'=>0);
   $text->cr();
 }
 
@@ -312,7 +313,7 @@ $grfx->stroke();
 $i = $DofI;
 $text->translate($base[0]+15, $base[1]+105);
 while ($i ne '') {
-  ($lw, $i) = $text->text_fill_justified($i, 140, -spillover=>0);
+  ($lw, $i) = $text->text_fill_justified($i, 140, 'spillover'=>0);
   $text->cr();
 }
 
@@ -347,7 +348,7 @@ $i = $DofI;
 $text->translate($base[0]+15, $base[1]+105);
 while ($i ne '') {
   ($lw, $i) = $text->text_fill_justified($i, 140, 
-	                 -spillover=>0, -last_align => 'c');
+	                 'spillover'=>0, 'last_align' => 'c');
   $text->cr();
 }
 
@@ -382,7 +383,7 @@ $i = $DofI;
 $text->translate($base[0]+15, $base[1]+105);
 while ($i ne '') {
   ($lw, $i) = $text->text_fill_justified($i, 140, 
-	                 -spillover=>0, -last_align => 'r');
+	                 'spillover'=>0, 'last_align' => 'r');
   $text->cr();
 }
 
@@ -417,7 +418,7 @@ $i = $LoremIpsumPara;
 
 $text->translate($base[0]+15, $base[1]+105);
 ($i, $unused) = $text->paragraph($i, 140,110, 0,
-	                 -spillover=>0);
+	                 'spillover'=>0);
 if ($i ne '') { print "paragraph() had leftover text!\n"; }
 
 # caption
@@ -450,8 +451,8 @@ $grfx->stroke();
 $i = $LoremIpsumPara;
 
 $text->translate($base[0]+15, $base[1]+105);
-($i, $unused) = $text->paragraph($i, 140,110, 0, -spillover=>0,
-	-align => 'left', -pndnt => 1.5 );
+($i, $unused) = $text->paragraph($i, 140,110, 0, 'spillover'=>0,
+	'align' => 'left', 'pndnt' => 1.5 );
 if ($i ne '') { print "paragraph() had leftover text!\n"; }
 
 # caption
@@ -459,7 +460,7 @@ drawCaption(['paragraph() ind 1.5em'], 'LC');
 
 $grfx->restore();
 
-# ----------------------------------------------------
+# ---------------------------------------------------- page 2
 # 12. paragraph() left aligned, outdent 1.5em
 @cellLoc = makeCellLoc(0);
 @cellSize = (170, 131); 
@@ -484,8 +485,8 @@ $grfx->stroke();
 $i = $LoremIpsumPara;
 
 $text->translate($base[0]+15, $base[1]+105);
-($i, $unused) = $text->paragraph($i, 140,110, 0, -spillover=>0,
-	-align => 'left', -pndnt => -1.5 );
+($i, $unused) = $text->paragraph($i, 140,110, 0, 'spillover'=>0,
+	'align' => 'left', 'pndnt' => -1.5 );
 if ($i ne '') { print "paragraph() had leftover text!\n"; }
 
 # caption
@@ -518,8 +519,8 @@ $grfx->stroke();
 $i = $LoremIpsumPara;
 
 $text->translate($base[0]+15, $base[1]+105);
-($i, $unused) = $text->paragraph($i, 140,110, 0, -spillover=>0,
-	-align => 'justified' );
+($i, $unused) = $text->paragraph($i, 140,110, 0, 'spillover'=>0,
+	'align' => 'justified' );
 if ($i ne '') { print "paragraph() had leftover text!\n"; }
 
 # caption
@@ -552,8 +553,8 @@ $grfx->stroke();
 $i = $LoremIpsumPara;
 
 $text->translate($base[0]+15, $base[1]+105);
-($i, $unused) = $text->paragraph($i, 140,110, 0, -spillover=>0,
-	-align => 'justified', -pndnt => 1.5 );
+($i, $unused) = $text->paragraph($i, 140,110, 0, 'spillover'=>0,
+	'align' => 'justified', 'pndnt' => 1.5 );
 if ($i ne '') { print "paragraph() had leftover text!\n"; }
 
 # caption
@@ -586,8 +587,8 @@ $grfx->stroke();
 $i = $LoremIpsumPara;
 
 $text->translate($base[0]+15, $base[1]+105);
-($i, $unused) = $text->paragraph($i, 140,110, 0, -spillover=>0,
-	-align => 'justified', -pndnt => -1.5 );
+($i, $unused) = $text->paragraph($i, 140,110, 0, 'spillover'=>0,
+	'align' => 'justified', 'pndnt' => -1.5 );
 if ($i ne '') { print "paragraph() had leftover text!\n"; }
 
 # caption
@@ -620,8 +621,8 @@ $grfx->stroke();
 $i = $LoremIpsumPara;
 
 $text->translate($base[0]+15+140, $base[1]+105);
-($i, $unused) = $text->paragraph($i, 140,110, 0, -spillover=>0,
-	-align => 'right' );
+($i, $unused) = $text->paragraph($i, 140,110, 0, 'spillover'=>0,
+	'align' => 'right' );
 if ($i ne '') { print "paragraph() had leftover text!\n"; }
 
 # caption
@@ -654,8 +655,8 @@ $grfx->stroke();
 $i = $LoremIpsumPara;
 
 $text->translate($base[0]+15+140, $base[1]+105);
-($i, $unused) = $text->paragraph($i, 140,110, 0, -spillover=>0,
-	-align => 'right', -pndnt => 2.5 );
+($i, $unused) = $text->paragraph($i, 140,110, 0, 'spillover'=>0,
+	'align' => 'right', 'pndnt' => 2.5 );
 if ($i ne '') { print "paragraph() had leftover text!\n"; }
 
 # caption
@@ -688,8 +689,8 @@ $grfx->stroke();
 $i = $LoremIpsumPara;
 
 $text->translate($base[0]+15+140, $base[1]+105);
-($i, $unused) = $text->paragraph($i, 140,110, 0, -spillover=>0,
-	-align => 'right', -pndnt => -2.0 );
+($i, $unused) = $text->paragraph($i, 140,110, 0, 'spillover'=>0,
+	'align' => 'right', 'pndnt' => -2.0 );
 if ($i ne '') { print "paragraph() had leftover text!\n"; }
 
 # caption
@@ -722,8 +723,8 @@ $grfx->stroke();
 $i = $LoremIpsumPara;
 
 $text->translate($base[0]+15+140/2, $base[1]+105);
-($i, $unused) = $text->paragraph($i, 140,110, 0, -spillover=>0,
-	-align => 'center' );
+($i, $unused) = $text->paragraph($i, 140,110, 0, 'spillover'=>0,
+	'align' => 'center' );
 if ($i ne '') { print "paragraph() had leftover text!\n"; }
 
 # caption
@@ -731,7 +732,7 @@ drawCaption(['paragraph() centered'], 'LC');
 
 $grfx->restore();
 
-# ----------------------------------------------------
+# ---------------------------------------------------- page 3
 # 20. section() 
 @cellLoc = makeCellLoc(4);  # new page
 @cellLoc = makeCellLoc(0, 2);  # full page, start at second row up
@@ -766,7 +767,7 @@ $cont = 0;
 for ($j=0; $j<3; $j++) {
   $text->translate($base[0]+15+175*$j, $base[1]+$cell_height-23);
   ($i, $cont, $unused) = $text->section($i, 140,$cell_height-42, $cont, 
-	  -spillover=>0, -align => 'left' );
+	  'spillover'=>0, 'align' => 'left' );
 }
 if ($i ne '') { print "section() had leftover text!\n"; }
 
@@ -775,7 +776,7 @@ drawCaption(['section() left aligned (3 calls)'], 'LC');
 
 $grfx->restore();
 
-# ----------------------------------------------------
+# ---------------------------------------------------- page 4
 # 21. section()  with 10pt paragraph spacing
 @cellLoc = makeCellLoc(5);  # new page
 @cellLoc = makeCellLoc(0, 2);  # full page, start at second row up
@@ -810,7 +811,7 @@ $cont = 0;
 for ($j=0; $j<3; $j++) {
   $text->translate($base[0]+15+175*$j, $base[1]+$cell_height-23);
   ($i, $cont, $unused) = $text->section($i, 140,$cell_height-42, $cont, 
-  	  -spillover=>0, -align => 'left', -pvgap => 10 );
+  	  'spillover'=>0, 'align' => 'left', 'pvgap' => 10 );
 }
 if ($i ne '') { print "section() had leftover text!\n"; }
 
@@ -819,7 +820,7 @@ drawCaption(['section() left align 10pt para gap (3 calls)'], 'LC');
 
 $grfx->restore();
 
-# ----------------------------------------------------
+# ---------------------------------------------------- page 5
 # 22. section()  with 2em paragraph indent
 @cellLoc = makeCellLoc(5);  # new page
 @cellLoc = makeCellLoc(0, 2);  # full page, start at second row up
@@ -854,7 +855,7 @@ $cont = 0;
 for ($j=0; $j<3; $j++) {
   $text->translate($base[0]+15+175*$j, $base[1]+$cell_height-23);
   ($i, $cont, $unused) = $text->section($i, 140,$cell_height-42, $cont, 
-	  -spillover=>0, -align => 'left', -pndnt => 2 );
+	  'spillover'=>0, 'align' => 'left', 'pndnt' => 2 );
 }
 if ($i ne '') { print "section() had leftover text!\n"; }
 
@@ -863,7 +864,7 @@ drawCaption(['section() left align 2em para indent (3 calls)'], 'LC');
 
 $grfx->restore();
 
-# ----------------------------------------------------
+# ---------------------------------------------------- page 6
 # 23. section()  with 2em paragraph outdent
 @cellLoc = makeCellLoc(5);  # new page
 @cellLoc = makeCellLoc(0, 2);  # full page, start at second row up
@@ -898,7 +899,7 @@ $cont = 0;
 for ($j=0; $j<3; $j++) {
   $text->translate($base[0]+15+175*$j, $base[1]+$cell_height-23);
   ($i, $cont, $unused) = $text->section($i, 140,$cell_height-42, $cont,
-	  -spillover=>0, -align => 'left', -pndnt => -2 );
+	  'spillover'=>0, 'align' => 'left', 'pndnt' => -2 );
 }
 if ($i ne '') { print "section() had leftover text!\n"; }
 
@@ -907,7 +908,7 @@ drawCaption(['section() left align 2em para outdent (3 calls)'], 'LC');
 
 $grfx->restore();
 
-# ----------------------------------------------------
+# ---------------------------------------------------- page 7
 # 24. section() justified with 2em paragraph indent
 @cellLoc = makeCellLoc(5);  # new page
 @cellLoc = makeCellLoc(0, 2);  # full page, start at second row up
@@ -942,7 +943,7 @@ $cont = 0;
 for ($j=0; $j<3; $j++) {
   $text->translate($base[0]+15+175*$j, $base[1]+$cell_height-23);
   ($i, $cont, $unused) = $text->section($i, 140,$cell_height-42, $cont,
-	  -spillover=>0, -align => 'justified', -pndnt => 2 );
+	  'spillover'=>0, 'align' => 'justified', 'pndnt' => 2 );
 }
 if ($i ne '') { print "section() had leftover text!\n"; }
 
@@ -951,7 +952,7 @@ drawCaption(['section() justified 2em para indent (3 calls)'], 'LC');
 
 $grfx->restore();
 
-# ----------------------------------------------------
+# ---------------------------------------------------- page 8
 # 25. section() justified with 2em paragraph indent and 5pt gap
 @cellLoc = makeCellLoc(5);  # new page
 @cellLoc = makeCellLoc(0, 2);  # full page, start at second row up
@@ -986,7 +987,7 @@ $cont = 0;
 for ($j=0; $j<3; $j++) {
   $text->translate($base[0]+15+175*$j, $base[1]+$cell_height-23);
   ($i, $cont, $unused) = $text->section($i, 140,$cell_height-42, $cont,
-	  -spillover=>0, -align => 'justify', -pndnt => 2, -pvgap => 5 );
+	  'spillover'=>0, 'align' => 'justify', 'pndnt' => 2, 'pvgap' => -5 );
 }
 if ($i ne '') { print "section() had leftover text!\n"; }
 
@@ -995,9 +996,9 @@ drawCaption(['section() justified 2em para indent 5pt gap (3 calls)'], 'LC');
 
 $grfx->restore();
 
-# ----------------------------------------------------
+# ---------------------------------------------------- page 9
 # 26. textlabel() examples
-# code borrowed from examples/020_textunderline and modified
+# code borrowed from examples/020_textunderline and modified, extended
 @cellLoc = makeCellLoc(5);  # new page
 @cellLoc = makeCellLoc(0, 3);  # full page, start at bottom row 
 $cell_height = 500;
@@ -1013,8 +1014,8 @@ $text->strokecolor('black');
 $text->fillcolor('black');
 $text->leading(15);
 
-#my $f1 = $pdf->corefont('Helvetica', -encode=>'latin1');
-my $f2 = $pdf->corefont('Helvetica-Bold', -encode=>'latin1');
+#my $f1 = $pdf->corefont('Helvetica', 'encode'=>'latin1');
+my $f2 = $pdf->corefont('Helvetica-Bold', 'encode'=>'latin1');
 
 # place black dot at text origin coordinates
 $grfx->linewidth(2);
@@ -1022,73 +1023,73 @@ $grfx->strokecolor('black');
 
 $grfx->circle(50,530, 0.5);
 $grfx->stroke();
-$text->textlabel(50,530, $f2, 20, 'Normal Helvetica Bold Text in Red', -color=>'red');
+$text->textlabel(50,530, $f2, 20, 'Normal Helvetica Bold Text in Red', 'color'=>'red');
 
 $grfx->circle(50,430, 0.5);
 $grfx->stroke();
 $text->textlabel(50,430, $f2, 20, 'Normal Text in Blue Triple Underline in Red+Yellow+Black -45d',
-    -color=>'#0000CC',
-    -rotate=>-45,
-    -hscale=>65,
+    'color'=>'#0000CC',
+    'rotate'=>-45,
+    'hscale'=>65,
     # 3 underlines:
     #   distance 4, thickness 1, color red
     #   distance 7, thickness 1.5, color yellow
     #   distance 11, thickness 2, color (strokecolor default) black
-    -underline=>[4,[1,'red'],7,[1.5,'yellow'],11,2],
+    'underline'=>[4,[1,'red'],7,[1.5,'yellow'],11,2],
 );
 
 $grfx->circle(300,430, 0.5);
 $grfx->stroke();
 $text->textlabel(300,430, $f2, 20, 'Text Centered +45d',
-    -color=>'#0000CC',
-    -rotate=>45,
-    -center=>1,
-    -underline=>[4,[2,'red']],
+    'color'=>'#0000CC',
+    'rotate'=>45,
+    'center'=>1,
+    'underline'=>[4,[2,'red']],
 );
 
 $grfx->circle(520,430, 0.5);
 $grfx->stroke();
 $text->textlabel(520,430, $f2, 20, 'Text Right -45d',
-    -color=>'#0000CC',
-    -rotate=>-45,
-    -right=>1,
-    -underline=>[4,[2,'red']],
+    'color'=>'#0000CC',
+    'rotate'=>-45,
+    'right'=>1,
+    'underline'=>[4,[2,'red']],
 );
 
 $grfx->circle(300,360, 0.5);
 $grfx->stroke();
 $text->textlabel(300,360, $f2, 20, '"auto" underline',
-    -color=>'#0000CC',
-    -underline=>'auto',
+    'color'=>'#0000CC',
+    'underline'=>'auto',
 );
 
 $grfx->circle(300,330, 0.5);
 $grfx->stroke();
 $text->textlabel(300,330, $f2, 20, 'Extra word spacing',
-    -color=>'#0000CC',
-    -wordspace=>10,
+    'color'=>'#0000CC',
+    'wordspace'=>10,
 );
 
 $grfx->circle(300,300, 0.5);
 $grfx->stroke();
 $text->textlabel(300,300, $f2, 20, 'Extra char spacing',
-    -color=>'#0000CC',
-    -charspace=>2,
+    'color'=>'#0000CC',
+    'charspace'=>2,
 );
 
 $grfx->circle(300,270, 0.5);
 $grfx->stroke();
 $text->textlabel(300,270, $f2, 20, 'Condensed text',
-    -color=>'#0000CC',
-    -charspace=>-2,
+    'color'=>'#0000CC',
+    'charspace'=>-2,
 );
 
 $grfx->circle(300,240, 0.5);
 $grfx->stroke();
 $text->textlabel(300,240, $f2, 20, 'Render mode 1',
     # note that color is fill color, which is not used (only stroke color)
-    -color=>'#0000CC',
-    -render=>1,
+    'color'=>'#0000CC',
+    'render'=>1,
 );
 
 # caption
@@ -1104,7 +1105,7 @@ my $DofIh =
     "con\xADnect\xADed them with ano\xADther...";
 
 @cellLoc = makeCellLoc(1); # skip to new page
-# ----------------------------------------------------
+# ---------------------------------------------------- page 10
 # 27. text_fill() with soft hyphens and a couple of hard hyphens, no hyphenate
 # no splitting of words
 @cellLoc = makeCellLoc(0);
@@ -1130,7 +1131,7 @@ $grfx->stroke();
 $i = $DofIh;
 $text->translate($base[0]+15, $base[1]+105);
 while ($i ne '') {
-  ($lw, $i) = $text->text_fill($i, 140, -spillover=>0);
+  ($lw, $i) = $text->text_fill($i, 140, 'spillover'=>0);
   $text->cr();
 }
 
@@ -1165,7 +1166,7 @@ $grfx->stroke();
 $i = $DofIh;
 $text->translate($base[0]+15, $base[1]+105);
 while ($i ne '') {
-  ($lw, $i) = $text->text_fill($i, 140, -spillover=>0, -hyphenate=>1);
+  ($lw, $i) = $text->text_fill($i, 140, 'spillover'=>0, 'hyphenate'=>1);
   $text->cr();
 }
 
@@ -1199,7 +1200,7 @@ $grfx->stroke();
 
 $i = $DofIh;
 $text->translate($base[0]+15, $base[1]+105);
-($lw, $i) = $text->paragraph($i, 140,110, 0, -spillover=>0, -pndnt=>3.5, -hyphenate=>1 );
+($lw, $i) = $text->paragraph($i, 140,110, 0, 'spillover'=>0, 'pndnt'=>3.5, 'hyphenate'=>1 );
 
 # caption
 drawCaption(['Latin-1, ind frc new'], 'LC');
@@ -1234,7 +1235,7 @@ $grfx->stroke();
 $i = $DofIh;
 $text->translate($base[0]+15, $base[1]+105);
 while ($i ne '') {
-  ($lw, $i) = $text->text_fill($i, 140, -spillover=>0);
+  ($lw, $i) = $text->text_fill($i, 140, 'spillover'=>0);
   $text->cr();
 }
 
@@ -1269,7 +1270,7 @@ $grfx->stroke();
 $i = $DofIh;
 $text->translate($base[0]+15, $base[1]+105);
 while ($i ne '') {
-  ($lw, $i) = $text->text_fill($i, 140, -spillover=>0, -hyphenate=>1);
+  ($lw, $i) = $text->text_fill($i, 140, 'spillover'=>0, 'hyphenate'=>1);
   $text->cr();
 }
 
@@ -1303,7 +1304,7 @@ $grfx->stroke();
 
 $i = $DofIh;
 $text->translate($base[0]+15, $base[1]+105);
-($lw, $i) = $text->paragraph($i, 140,110, 0, -spillover=>0, -pndnt=>3.5, -hyphenate=>1 );
+($lw, $i) = $text->paragraph($i, 140,110, 0, 'spillover'=>0, 'pndnt'=>3.5, 'hyphenate'=>1 );
 
 # caption
 drawCaption(['UTF-8, ind frc new'], 'LC');
@@ -1338,7 +1339,7 @@ $grfx->stroke();
 
 $i = $nonsense;
 $text->translate($base[0]+15, $base[1]+105);
-($lw, $i) = $text->paragraph($i, 140,110, 0, -spillover=>0, -pndnt=>0, -hyphenate=>1 );
+($lw, $i) = $text->paragraph($i, 140,110, 0, 'spillover'=>0, 'pndnt'=>0, 'hyphenate'=>1 );
 
 # caption
 drawCaption(['Latin-1 non-hyphen'], 'LC');
@@ -1369,7 +1370,7 @@ $grfx->stroke();
 
 $i = $nonsense;
 $text->translate($base[0]+15, $base[1]+105);
-($lw, $i) = $text->paragraph($i, 140,110, 0, -spillover=>0, -pndnt=>-1.0, -hyphenate=>1 );
+($lw, $i) = $text->paragraph($i, 140,110, 0, 'spillover'=>0, 'pndnt'=>-1.0, 'hyphenate'=>1 );
 
 # caption
 drawCaption(['Latin-1 non-hyphen, outd'], 'LC');
@@ -1417,6 +1418,7 @@ sub greenLine {
 # ---------------------------------------
 sub nextPage {
   $pageNo++;
+  print "=================== page $pageNo\n";
   $page = $pdf->page();
   $grfx = $page->gfx();
   $text = $page->text();

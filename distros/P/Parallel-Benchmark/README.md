@@ -34,7 +34,7 @@ Parallel::Benchmark is parallel benchmark module.
 
 # METHODS
 
-- __new__(%args)
+- **new**(%args)
 
     create Parallel::Benchmark instance.
 
@@ -46,7 +46,7 @@ Parallel::Benchmark is parallel benchmark module.
           concurrency: Int     num of child processes. default=1
           debug:       Bool    output debug log.       default=0
 
-- __run__()
+- **run**()
 
     run benchmark. returns result hashref.
 
@@ -60,7 +60,7 @@ Parallel::Benchmark is parallel benchmark module.
           'elapsed' => '3.0022655', # elapsed time (sec)
         };
 
-- __stash__
+- **stash**
 
     HashRef to store some data while processing.
 
@@ -69,7 +69,7 @@ Parallel::Benchmark is parallel benchmark module.
         $result = $bm->run;
         $result->{stashes}->{$id}; #= $self->stash on child $id
 
-- __halt__()
+- **halt**()
 
     Halt benchmark on child processes. it means normally exit.
 

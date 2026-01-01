@@ -1,0 +1,10 @@
+GPL2.txt
+ARTISTIC.txt
+MANIFEST
+t/use.t
+lib/Task/BeLike/DCANTRELL.pm
+Makefile.PL
+CHANGELOG
+MANIFEST.SKIP
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

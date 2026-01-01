@@ -6,7 +6,7 @@ my $build = Module::Build->new(
     license       => 'perl_5',
     dist_author   => 'Sergio Iglesias <sergioxz@cpan.org>',
     dist_abstract =>
-      'DBIx::Auto::Migrate - Wrap your database connections and automatically apply db migrations',
+'DBIx::Auto::Migrate - Wrap your database connections and automatically apply db migrations',
     requires => {
         'perl' => '5.16.3',
         'DBI'  => 0,
@@ -15,7 +15,9 @@ my $build = Module::Build->new(
         'Test::Exception'  => 0,
         'Test::PostgreSQL' => 0,
         'Test::More'       => 0,
-	'DBD::Pg' => 0,
+        'DBD::Pg'          => 0,
+        'Test::MockModule' => 0,
+        'Test::MockObject' => 0,
     },
     meta_merge => {
         resources => {

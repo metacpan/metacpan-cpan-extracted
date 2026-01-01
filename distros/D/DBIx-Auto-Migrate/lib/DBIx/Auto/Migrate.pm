@@ -1,6 +1,6 @@
 package DBIx::Auto::Migrate;
 
-our $VERSION = "0.6";
+our $VERSION = "0.7";
 
 use v5.16.3;
 use strict;
@@ -118,12 +118,20 @@ sub _apply_migration {
             die "$current_migration\n failed with: $@";
         }
     }
+    my $success = eval {
     $dbh->do( <<'EOF', undef, 'current_migration', $migration_number );
 INSERT INTO options (name, value)
-VALUES ($1, $2) 
-ON CONFLICT (name) DO 
-UPDATE SET value = $2;
+VALUES (?, ?) 
 EOF
+	    1;
+    };
+    if (!$success) {
+	    $dbh->do( <<'EOF', undef,  $migration_number, 'current_migration' );
+UPDATE options
+SET value = ?
+WHERE name = ?
+EOF
+    }
 }
 1;
 
@@ -163,7 +171,8 @@ DBIx::Auto::Migrate - Wrap your database connections and automatically apply db 
  		'CREATE TABLE options (
  			id BIGSERIAL PRIMARY KEY,
  			name TEXT,
- 			value TEXT 
+ 			value TEXT,
+			UNIQUE (name)
  		)',
  		create_index(qw/options name/),
  		'CREATE TABLE users (
@@ -226,7 +235,8 @@ To check an example project that uses this code you can check L<https://github.c
  		'CREATE TABLE options (
  			id BIGSERIAL PRIMARY KEY,
  			name TEXT,
- 			value TEXT 
+ 			value TEXT,
+			UNIQUE (name)
  		)',
  		'CREATE TABLE users (
  			id BIGSERIAL PRIMARY KEY,

@@ -1,0 +1,39 @@
+---
+abstract: 'Asynchronous database operations for DBIx::Class'
+author:
+  - 'Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Async
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  DBIx::Class::Async:
+    file: lib/DBIx/Class/Async.pm
+    version: '0.01'
+requires:
+  CHI: '0'
+  Carp: '0'
+  Digest::MD5: '0'
+  IO::Async::Function: '0'
+  IO::Async::Loop: '0'
+  Metrics::Any: '0'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  Type::Params: '0'
+  Types::Standard: '0'
+  perl: '5.014'
+resources:
+  repository: https://github.com/manwar/DBIx-Class-Async.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

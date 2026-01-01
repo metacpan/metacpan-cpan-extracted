@@ -5,7 +5,7 @@ use warnings;
 use Carp qw/croak/;
 
 BEGIN {
-  our $VERSION = "0.5001";
+  our $VERSION = "0.5002";
   require Neo4j::Bolt::CTypeHandlers;
   require Neo4j::Bolt::ResultStream;  
   require XSLoader;
@@ -135,7 +135,7 @@ Completely analogous to same functions in L<Neo4j::Bolt::Cxn>.
 
 =head1 LICENSE
 
-This software is Copyright (c) 2019-2024 by Mark A. Jensen.
+This software is Copyright (c) 2019-2026 by Mark A. Jensen.
 
 This is free software, licensed under:
 

@@ -40,8 +40,8 @@ is an example scan file:
 # Lines starting with '#' are read as comments and ignored
 [noss]
     Version = 2.00
-    # Look for <a> hrefs that match the following
     Page = https://www.cpan.org/authors/id/S/SA/SAMYOUNG/
+    # Look for <a> hrefs that match the following
     Match = WWW-Noss-@VERSION@.tar.gz
 
 [perl]

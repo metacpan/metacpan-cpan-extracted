@@ -3,7 +3,7 @@ package PDF::Builder::Lite;
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
+our $VERSION = '3.028'; # VERSION
 our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 # NOTE that this sub-package has not been tested and is not well documented!
 #      It is possible that it will be deprecated and removed.
@@ -23,7 +23,7 @@ BEGIN {
 
 =head1 NAME
 
-PDF::Builder::Lite - Lightweight PDF creation methods
+PDF::Builder::Lite - Lightweight PDF creation methods (UNMAINTAINED)
 
 =head1 SYNOPSIS
 
@@ -35,6 +35,8 @@ PDF::Builder::Lite - Lightweight PDF creation methods
 
 =head1 DESCRIPTION
 
+=======================================================================
+
 This class is unmaintained (since 2007) and should not be used in new code. It
 combines many of the methods from L<PDF::Builder> and L<PDF::Builder::Content> 
 into a single class but isn't really otherwise any easier to use.
@@ -42,6 +44,14 @@ into a single class but isn't really otherwise any easier to use.
 There have been many improvements and clarifications made to the rest of the
 distribution that aren't reflected here, so the term "Lite" no longer applies.
 It remains solely for compatibility with existing legacy code.
+
+B<As it is unmaintained, we I<strongly> suggest that you not use "Lite". If
+you have old applications that make use of it, we suggest that you consider
+upgrading them to use current, supported, PDF::Builder facilities. Although
+we try to maintain backwards compatibility for calls made by "Lite", there is
+no guarantee that something may break when called by "Lite"!>
+
+=======================================================================
 
 =head1 METHODS
 

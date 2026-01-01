@@ -2,7 +2,7 @@ package App::newver::Scanner;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(scan_version);

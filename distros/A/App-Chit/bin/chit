@@ -1,0 +1,186 @@
+#!perl
+use App::Chit;
+App::Chit->run;
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+chit - chat with AI from the command line
+
+=head1 SYNOPSIS
+
+  $ cd ~/Documents
+  
+  $ chit init --clean
+  ok
+  
+  $ chit temperature --set 1.5
+  Previous temperature:   0.99
+  Setting temperature to: 1.5
+  
+  $ chit chat "What if I mix blue and yellow?"
+  Mixing blue and yellow produces green. The exact shade of green can vary
+  depending on the proportions of blue and yellow used.
+  
+  $ chit chat "Can you write a haiku about that colour?"
+  Blue and yellow blend,
+  Nature's hue emerges bright,
+  Verdant whispers sing.
+  
+  $ chit chat "What were we just talking about?"
+  We were discussing the color produced by mixing blue and yellow, which
+  is green. I also wrote a haiku about that color. If you have more
+  questions or want to talk about something else, feel free to let me
+  know!
+  
+  $ cd ~/tmp
+  
+  $ chit init --clean
+  
+  $ chit chat "What were we just talking about?"
+  I don't have the ability to recall past conversations. However, I'm here
+  to help with any questions or topics you'd like to discuss now!
+  
+  $ mkdir ~/Documents/subdir
+  
+  $ cd ~/Documents/subdir
+  
+  $ chit chat "What were we just talking about?"
+  We were discussing the color green that results from mixing blue and
+  yellow, and I provided a haiku about that color. If you'd like to
+  continue the conversation or change topics, just let me know!
+  
+  $ chit which
+  /home/tobyink/Documents
+  
+  $ chit role --set "You are a drunk pirate."
+  Previous role:   You are a helpful assistant, valued for your precise,
+  accurate, and concise answers.
+  Setting role to: You are a drunk pirate.
+  
+  $ chit chat "Hey"
+  Ahoy, matey! What brings ye to my ship today? Arrr!
+
+=head1 DESCRIPTION
+
+B<chit> is a command-line app giving you per-directory ChatGPT conversations,
+with a seperate history being retained for each directory it's been set up
+in.
+
+If you run B<chit> in a subdirectory, it will look at higher levels in the
+directory tree to find its configuration, stopping as soon as it finds
+one.
+
+So for example, you might have B<chit> set up separately in:
+
+  ~/Personal
+  ~/Work
+  ~/Work/Project1
+  ~/Work/Project2
+
+When in C<< ~/Work/Project1 >>, you'll have a different conversation than
+when you're in C<< ~/Work/Project2 >>. If you're in C<< ~/Work/Project3 >>
+B<chit> will just fall back to your conversation from the parent directory
+C<< ~/Work >>, as there is no set up in C<< ~/Work/Project3 >> itself.
+
+=head1 COMMANDS
+
+=head2 chit init
+
+Initialize B<chit> in a directory.
+
+Use C<< chit init --clean >> to start with a blank slate,
+C<< chit init --fork=DIR >> to copy the configuration and chat history
+from another directory, or C<< chit init --autofork >> to copy the
+configuration and chat history from the first parent or ancestor
+directory B<chit> can find one in.
+
+B<chit> will cowardly refuse to initialize itself if it finds an
+existing F<< .chit.yml >>, unless you include C<< --overwrite >>.
+
+=head2 chit chat
+
+This sends a line of chat to ChatGPT.
+
+Use C<< echo "Hello world" | chit chat --stdin >> to read from STDIN,
+or C<< chit chat --file question.txt >> to read from a file.
+
+Use C<< --temperature=N >> to control how creative a response you want.
+This is a floating point number from 0.0 (predictable) to 2.0 (random).
+If you omit this, the configured default temperature will be used.
+
+As a shortcut for C<< chit chat >> you can just run:
+
+  $ chit "Write a poem about almonds."
+
+=head2 chit show
+
+Show chat history. C<< --colour >> can be used to force ANSI colours.
+C<< --nocolour >> or the C<NO_COLOR> environment variable can be used
+to disable ANSI colours. If neither is used, ANSI colours will be used
+when B<chit> detects it is outputting to a TTY.
+
+Use C<< --msg=N >> to control the number of messages displayed. Defaults
+to twenty, but each prompt and response count as two messages.
+
+=head2 chit which
+
+Prints the path to the directory where F<< .chit.yml >> was found.
+
+=head2 chit maxhistory
+
+Sets or shows the currently configured maximum number of history lines
+to keep.
+
+=head2 chit model
+
+Sets or shows the currently configured ChatGPT model to use.
+
+=head2 chit role
+
+Sets or shows the role ChatGPT thinks it has in this conversation.
+Defaults to: "You are a helpful assistant, valued for your precise,
+accurate, and concise answers."
+
+You can change it to anything you like, such as: "You are a drunk
+pirate" or "You are a medieval jester who makes terrible jokes."
+
+=head2 chit temperature
+
+Sets or shows the default temperature to use.
+
+=head1 ENVIRONMENT
+
+The environment variable C<OPENAI_API_KEY> needs to be set to a valid
+OpenAI API key.
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-app-chit/issues>.
+
+=head1 SEE ALSO
+
+L<App::Chit>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2025 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

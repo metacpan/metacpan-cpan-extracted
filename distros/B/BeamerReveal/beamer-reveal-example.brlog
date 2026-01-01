@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------------
-  beamer-reveal.pl                                          v20251230.2041  
+  beamer-reveal.pl                                          v20251230.2129  
   (C) 2025-2026 Walter PM Daems <wdaems@cpan.org>                    GPLv3  
 ----------------------------------------------------------------------------
 
@@ -34,28 +34,28 @@
 - Generating the images
       - Preparing media generation of 187 frames in 12 threads at 16 frames per thread
         - /usr/bin/pdfcrop run in thread no 11 finished
-        - /usr/bin/pdfcrop run in thread no 00 finished
-        - /usr/bin/pdfcrop run in thread no 02 finished
-        - /usr/bin/pdfcrop run in thread no 01 finished
-        - /usr/bin/pdfcrop run in thread no 06 finished
-        - /usr/bin/pdfcrop run in thread no 05 finished
-        - /usr/bin/pdfcrop run in thread no 04 finished
         - /usr/bin/pdfcrop run in thread no 09 finished
+        - /usr/bin/pdfcrop run in thread no 06 finished
+        - /usr/bin/pdfcrop run in thread no 01 finished
         - /usr/bin/pdfcrop run in thread no 10 finished
+        - /usr/bin/pdfcrop run in thread no 05 finished
         - /usr/bin/pdfcrop run in thread no 07 finished
         - /usr/bin/pdfcrop run in thread no 08 finished
-        - /usr/bin/pdfcrop run in thread no 03 finished
+        - /usr/bin/pdfcrop run in thread no 02 finished
+        - /usr/bin/pdfcrop run in thread no 04 finished
+        - /usr/bin/pdfcrop run in thread no 00 finished
         - /usr/bin/pdftoppm run in thread no 11 finished
-        - /usr/bin/pdftoppm run in thread no 00 finished
-        - /usr/bin/pdftoppm run in thread no 02 finished
+        - /usr/bin/pdfcrop run in thread no 03 finished
         - /usr/bin/pdftoppm run in thread no 06 finished
-        - /usr/bin/pdftoppm run in thread no 01 finished
-        - /usr/bin/pdftoppm run in thread no 05 finished
-        - /usr/bin/pdftoppm run in thread no 04 finished
         - /usr/bin/pdftoppm run in thread no 09 finished
+        - /usr/bin/pdftoppm run in thread no 01 finished
+        - /usr/bin/pdftoppm run in thread no 10 finished
         - /usr/bin/pdftoppm run in thread no 07 finished
         - /usr/bin/pdftoppm run in thread no 08 finished
-        - /usr/bin/pdftoppm run in thread no 10 finished
+        - /usr/bin/pdftoppm run in thread no 02 finished
+        - /usr/bin/pdftoppm run in thread no 04 finished
+        - /usr/bin/pdftoppm run in thread no 05 finished
+        - /usr/bin/pdftoppm run in thread no 00 finished
         - /usr/bin/pdftoppm run in thread no 03 finished
       - returning to single-threaded operation
         - /usr/bin/ffmpeg run in thread no 0 finished

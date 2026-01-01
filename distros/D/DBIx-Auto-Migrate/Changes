@@ -10,3 +10,5 @@
 	- DBD::Pg is needed for tests.
 0.6 Wed Dec 31 07:03:22 AM CET 2025
 	- Skipping tests if no postgresql
+0.7 Wed Dec 31 11:38:13 AM CET 2025
+	- Test for cases where no real db tests can be run.

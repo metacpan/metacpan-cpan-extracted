@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Test::More tests => 6;
-use Bit::Set qw(:all);     
+use Bit::Set     qw(:all);
 use Bit::Set::DB qw(:all);
 use FFI::Platypus::Buffer;    # added to facilitate buffer management
 
@@ -73,6 +73,20 @@ subtest 'Basic Operations' => sub {
     }
     ok( $cleared_correctly, 'Bit_clear clears range correctly' );
     Bit_free( \$bitset );
+
+    # test aset
+    $bitset = Bit_new(SIZE_OF_TEST_BIT);
+    my @indices = ( 1, 3, 5, 7, 9 );
+    Bit_aset( $bitset, \@indices );
+    my $aset_success = 1;
+    for my $i ( 0 .. $#indices ) {
+        $aset_success &&= ( Bit_get( $bitset, $indices[$i] ) == 1 );
+        warn "Bit at index $indices[$i] is not set"
+          unless ( Bit_get( $bitset, $indices[$i] ) == 1 );
+    }
+    ok( $aset_success, 'Bit_aset sets multiple bits correctly' );
+    undef $bitset;
+    undef @indices;
 
     # test_bit_count
     $bitset = Bit_new(SIZE_OF_TEST_BIT);
@@ -335,10 +349,7 @@ subtest 'BitDB Operations' => sub {
       ( BitDB_length($bitdb) == SIZE_OF_TEST_BIT && BitDB_nelem($bitdb) == 10 );
     ok( $props_success, 'BitDB properties are correct' );
 
-    BitDB_free( \$bitdb );
-
     # test_bitDB_get_put
-    $bitdb = BitDB_new( SIZE_OF_TEST_BIT, 10 );
     my $bitset = Bit_new(SIZE_OF_TEST_BIT);
     Bit_bset( $bitset, 1 );
     Bit_bset( $bitset, 3 );
@@ -386,7 +397,6 @@ subtest 'BitDB Operations' => sub {
 
     Bit_free( \$bitset );
     Bit_free( \$retrieved );
-    BitDB_free( \$bitdb );
 };
 
 # Note: Skipping the BitDB intersection count test as it requires the SETOP_COUNT_OPTS

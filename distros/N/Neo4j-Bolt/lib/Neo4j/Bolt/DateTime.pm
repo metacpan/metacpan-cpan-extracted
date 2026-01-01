@@ -1,7 +1,7 @@
 package Neo4j::Bolt::DateTime;
 # ABSTRACT: Representation of Neo4j date/time related structs
 
-$Neo4j::Bolt::DateTime::VERSION = '0.5001';
+$Neo4j::Bolt::DateTime::VERSION = '0.5002';
 
 use v5.12;
 use warnings;
@@ -214,7 +214,7 @@ L<Neo4j::Bolt>, L<Neo4j::Types::DateTime>, L<DateTime>
 
 =head1 LICENSE
 
-This software is Copyright (c) 2024 by Mark A. Jensen.
+This software is Copyright (c) 2024-2026 by Mark A. Jensen.
 
 This is free software, licensed under:
 

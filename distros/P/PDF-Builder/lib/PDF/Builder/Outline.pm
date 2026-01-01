@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 use Carp qw(croak);
 use PDF::Builder::Basic::PDF::Utils;
@@ -517,6 +517,9 @@ the same as the calling page's.
 
 Connect the Outline to a "Named Destination" defined elsewhere,
 and optional positioning as described above.
+
+Note that PDF::Builder's C<dest()> is B<not> the same (i.e., an alias)
+as PDF::API2's C<destination()>. The argument lists are quite different.
 
 =back
 

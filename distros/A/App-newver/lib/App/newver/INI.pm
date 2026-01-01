@@ -2,7 +2,7 @@ package App::newver::INI;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(read_ini);
@@ -64,7 +64,7 @@ L<newver> uses the following dialect of INI:
 
 =over 2
 
-=item Key-value pairs are seperated by equals (=) signs.
+=item Key-value pairs are separated by equals (=) signs.
 
 =item Sections are lines enclosed in brackets.
 
@@ -75,6 +75,8 @@ L<newver> uses the following dialect of INI:
 =item Whitespace is trimmed.
 
 =item Leading and trailing whitespace is trimmed.
+
+=back
 
 =head1 SUBROUTINES
 
@@ -127,4 +129,4 @@ the terms of the Artistic License 2.0.
 
 L<newver>
 
-=back
+=cut

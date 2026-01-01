@@ -6,7 +6,7 @@ use Test::More tests => 2;
 
 use PDF::Builder;
 
-my $pdf = PDF::Builder->new('-compress' => 'none');
+my $pdf = PDF::Builder->new('compress' => 'none');
 
 my $cs = $pdf->colorspace_web();
 my $gfx = $pdf->page->gfx();

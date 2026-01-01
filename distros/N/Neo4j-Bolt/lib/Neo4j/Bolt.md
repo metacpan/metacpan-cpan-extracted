@@ -142,7 +142,7 @@ For further details, see the individual modules:
 
 # LICENSE
 
-This software is Copyright (c) 2019-2024 by Mark A. Jensen.
+This software is Copyright (c) 2019-2026 by Mark A. Jensen.
 
 This is free software, licensed under:
 

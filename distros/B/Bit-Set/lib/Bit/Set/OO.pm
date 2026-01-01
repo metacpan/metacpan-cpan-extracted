@@ -1,173 +1,8 @@
 #!/home/chrisarg/perl5/perlbrew/perls/current/bin/perl
 package Bit::Set::OO;
-$Bit::Set::OO::VERSION = '0.10';
-use strict;
-use warnings;
-
-use Alien::Bit;
-use Bit::Set qw( :all );
-use FFI::Platypus;
-
-###############################################################################
-# Code for the OO interface
-# The functions in the OO interface are named identically to the procedural
-# one  sans the brefix "Bit_"
-
-use Scalar::Util qw(blessed);
-
-package Bit::Set {
-$Bit::Set::VERSION = '0.10';
-    # Creation and Destruction
-    sub new {
-        my ( $class, $length ) = @_;
-        my $set = Bit_new($length);
-        return bless( \$set, $class );
-    }
-
-    sub DESTROY {
-        my ($self) = @_;
-        Bit_free($self);
-    }
-
-    sub load {
-        my ( $class, $length, $buffer ) = @_;
-        my $set = Bit_load( $length, $buffer );
-        return bless( \$set, $class );
-    }
-
-    sub extract {
-        my ( $self, $buffer ) = @_;
-        return Bit_extract( $$self, $buffer );
-    }
-
-    # Properties
-    sub buffer_size {
-        my ( $class, $length ) = @_;
-        return Bit_buffer_size($length);
-    }
-
-    sub length {
-        my ($self) = @_;
-        return Bit_length($$self);
-    }
-
-    sub count {
-        my ($self) = @_;
-        return Bit_count($$self);
-    }
-
-    # Manipulation
-    sub aset {
-        my ( $self, $indices, $n ) = @_;
-        Bit_aset( $$self, $indices, $n );
-    }
-
-    sub bset {
-        my ( $self, $index ) = @_;
-        Bit_bset( $$self, $index );
-    }
-
-    sub aclear {
-        my ( $self, $indices, $n ) = @_;
-        Bit_aclear( $$self, $indices, $n );
-    }
-
-    sub bclear {
-        my ( $self, $index ) = @_;
-        Bit_bclear( $$self, $index );
-    }
-
-    sub clear {
-        my ( $self, $lo, $hi ) = @_;
-        Bit_clear( $$self, $lo, $hi );
-    }
-
-    sub get {
-        my ( $self, $index ) = @_;
-        return Bit_get( $$self, $index );
-    }
-
-    sub not {
-        my ( $self, $lo, $hi ) = @_;
-        Bit_not( $$self, $lo, $hi );
-    }
-
-    sub put {
-        my ( $self, $n, $val ) = @_;
-        return Bit_put( $$self, $n, $val );
-    }
-
-    sub set {
-        my ( $self, $lo, $hi ) = @_;
-        Bit_set( $$self, $lo, $hi );
-    }
-
-    # Comparisons
-
-    sub eq {
-        my ( $self, $other ) = @_;
-        return Bit_eq( $$self, $$other );
-    }
-
-    sub leq {
-        my ( $self, $other ) = @_;
-        return Bit_leq( $$self, $$other );
-    }
-
-    sub lt {
-        my ( $self, $other ) = @_;
-        return Bit_lt( $$self, $$other );
-    }
-
-    # Set Operations
-
-    sub diff {
-        my ( $self, $other ) = @_;
-        my $new_set = Bit_diff( $$self, $$other );
-        return bless( \$new_set, "Bit::Set" );
-    }
-
-    sub inter {
-        my ( $self, $other ) = @_;
-        my $new_set = Bit_inter( $$self, $$other );
-        return bless( \$new_set, "Bit::Set" );
-    }
-
-    sub minus {
-        my ( $self, $other ) = @_;
-        my $new_set = Bit_minus( $$self, $$other );
-        return bless( \$new_set, "Bit::Set" );
-    }
-
-    sub union {
-        my ( $self, $other ) = @_;
-        my $new_set = Bit_union( $$self, $$other );
-        return bless( \$new_set, "Bit::Set" );
-    }
-
-    # Set Operation Counts
-
-    sub diff_count {
-        my ( $self, $other ) = @_;
-        return Bit_diff_count( $$self, $$other );
-    }
-
-    sub inter_count {
-        my ( $self, $other ) = @_;
-        return Bit_inter_count( $$self, $$other );
-    }
-
-    sub minus_count {
-        my ( $self, $other ) = @_;
-        return Bit_minus_count( $$self, $$other );
-    }
-
-    sub union_count {
-        my ( $self, $other ) = @_;
-        return Bit_union_count( $$self, $$other );
-    }
-}
-
+$Bit::Set::OO::VERSION = '0.11';
+use XSLoader ();
+XSLoader::load("Bit::Set");
 
 1;
 
@@ -179,16 +14,14 @@ Bit::Set::OO - Perl Object Oriented (OO) interface to the 'bit' C library
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
   use Bit::Set::OO;         ## OO interface to Bit C library
-  use Bit::Set qw(:all);    ## Procedural interface to Bit C library
-                            ## (but do you need this if you use OO?)
 
   # Create a new bitset
-  my $set = Bit::Set::OO->new(1024);
+  my $set = Bit::Set->new(1024);
 
   # Set some bits
   $set->bset(0);
@@ -202,19 +35,21 @@ version 0.10
 
 =head1 DESCRIPTION
 
-This module provides an OO Perl interface to the C library L<Bit|https://github.com/chrisarg/Bit>, 
+This module provides an OO Perl interface to the C library L<Bit|https://github.com/chrisarg/Bit>,
 for creating and manipulating bitsets. The interface mirrors the procedural
- interface provided by L<Bit::Set|https://metacpan.org/pod/Bit::Set>, 
+ interface provided by L<Bit::Set|https://metacpan.org/pod/Bit::Set>,
  with methods corresponding to the functions in that module.
 
-As currently implemented the OO interfaces are currently layered on top of the 
-procedural API, and thus incur some overhead compared to direct calls to the 
-procedural API. 
+Up to version 0.10, the OO interfaces were layered on top of the
+procedural API, and thus incured some overhead compared to direct calls to the
+procedural API.
+
+After version 0.11, the OO interface is implemented directly in XS  (code contributed by Joe Schaefer), thus avoiding the overhead of the procedural layer.
 
 =head1 Methods
 
-The methods in the Bit::Set::OO module are grouped into several categories for 
-clarity, as described below. The method names correspond to the function names 
+The methods in the Bit::Set::OO module are grouped into several categories for
+clarity, as described below. The method names correspond to the function names
 in the procedural interface without the C<Bit_> prefix. Note that the methods
 are created in the Bit::Set namespace.
 
@@ -224,7 +59,7 @@ are created in the Bit::Set namespace.
 
 =item B<Bit::Set-E<gt>new(length)>
 
-Creates a new bitset with the specified capacity (=length) in bits. The object 
+Creates a new bitset with the specified capacity (=length) in bits. The object
 is of type Bit::Set (not Bit::Set::OO).
 
 
@@ -261,17 +96,17 @@ Returns the population count (number of set bits) of the bitset.
 
 =over 4
 
-=item B<$bitset-E<gt>aset(indices, n)>
+=item B<$bitset-E<gt>aset(indices)>
 
-Sets an array of bits specified by indices.
+Sets an array of bits specified by indices (which must be a reference to an array).
 
 =item B<$bitset-E<gt>bset(index)>
 
 Sets a single bit at the specified index to 1.
 
-=item B<$bitset-E<gt>aclear(indices, n)>
+=item B<$bitset-E<gt>aclear(indices)>
 
-Clears an array of bits specified by indices.
+Clears an array of bits specified by indices (which must be a reference to an array).
 
 =item B<$bitset-E<gt>bclear(index)>
 
@@ -346,22 +181,22 @@ Returns a new bitset containing the union of this bitset and other.
 
 =item B<$bitset-E<gt>diff_count(other)>
 
-Returns the population count of the difference of this bitset and other without 
+Returns the population count of the difference of this bitset and other without
 creating a new bitset.
 
 =item B<$bitset-E<gt>inter_count(other)>
 
-Returns the population count of the intersection of this bitset and other without 
+Returns the population count of the intersection of this bitset and other without
 creating a new bitset.
 
 =item B<$bitset-E<gt>minus_count(other)>
 
-Returns the population count of the symmetric difference of this bitset and other 
+Returns the population count of the symmetric difference of this bitset and other
 without creating a new bitset.
 
 =item B<$bitset-E<gt>union_count(other)>
 
-Returns the population count of the union of this bitset and other without 
+Returns the population count of the union of this bitset and other without
 creating a new bitset.
 
 =back
@@ -369,14 +204,14 @@ creating a new bitset.
 
 =head1 EXAMPLES
 
-Examples of the use of the C<Bit::Set::OO> module. These examples are the OO 
+Examples of the use of the C<Bit::Set::OO> module. These examples are the OO
 "traslations" of examples in the C<Bit::Set> module.
 
 =over 4
 
 =item Example 1: Creating and using a bitset
 
-Simple example in which we create, set and test for setting of individual 
+Simple example in which we create, set and test for setting of individual
 bits into a bitset.
 
   use Bit::Set::OO;    ## OO interface to Bit C library
@@ -394,9 +229,9 @@ bits into a bitset.
 
 =item Example 2: Comparison operations between bitsets
 
-This example illustrates the use of the comparison functions provided by the 
-C<Bit::Set::OO> module. The equality comparison function is shown for simplicity, 
-but the example can serve as blue print for other comparisons functions e.g. 
+This example illustrates the use of the comparison functions provided by the
+C<Bit::Set::OO> module. The equality comparison function is shown for simplicity,
+but the example can serve as blue print for other comparisons functions e.g.
 less than equal to.
 
   use Bit::Set::OO;    ## OO interface to Bit C library
@@ -421,6 +256,86 @@ less than equal to.
   undef $set1;
   undef $set2;
 
+=item Example 3: The seal of the speed
+
+This example which was created by Joe Schaefer as a small benchmark test
+illustrates the performance benefits of sealing the object to avoid the overhead
+of dynamic method lookup, i.e. the methods are resolved at compile time. 
+
+  use Test::More tests => 1;
+  use POSIX 'dup2';
+  dup2 fileno(STDERR), fileno(STDOUT);
+  use strict;
+  use warnings;
+  use Benchmark ':all';
+  use base 'sealed';
+  use sealed 'deparse';
+
+  use Bit::Set ':all';
+  use Bit::Set::OO;
+
+
+  use constant SIZE_OF_TEST_BIT => 65536;
+  use constant SIZEOF_BITDB     => 45;
+
+
+  cmpthese 20_000_000, {
+    bsoo => sub {
+      my $b = Bit::Set->new(SIZE_OF_TEST_BIT);
+      $b->bset(2);
+      $b->put(3, 1);
+      die unless $b->get(2) == 1;
+      die unless $b->get(3) == 1;
+      undef $b;
+    },
+    sealed => sub :Sealed {
+      my Bit::Set $b;
+      $b = $b->new(SIZE_OF_TEST_BIT);
+      $b->bset(2);
+      $b->put(3, 1);
+      die unless $b->get(2) == 1;
+      die unless $b->get(3) == 1;
+      undef $b;
+    },
+    bs => sub {
+      my $b = Bit_new(SIZE_OF_TEST_BIT);
+      Bit_bset($b,2);
+      Bit_put($b,3,1);
+      die unless Bit_get($b, 2) == 1;
+      die unless Bit_get($b, 3) == 1;
+      Bit_free(\$b);
+    }
+  };
+
+  ok(1);
+
+B<Background on Performant Object Oriented interfaces>
+
+Joe Scahefer's L<sealed|https://metacpan.org/pod/sealed> in combination with XS provide unique opportunities to improve the peformance of OO interfaces without the overhead of traditional Perl OO systems by "sealing" the methods at compile time.  As Joe L<points out|https://www.iconoclasts.blog/joe/perl7-sealed-lexicals> wrote:
+
+    "Perl 5s OO runtime method lookup has 50% more performance overhead than a
+    direct, named subroutine invocation."
+
+Doug MacEachern proposed a very L<solution|https://www.perl.com/pub/2000/06/dougpatch.html/> which however never made it into the core.
+Joe's sealed package implements Doug's idea in a modern way, allowing the
+creation of efficient OO interfaces without the overhead of traditional Perl OO
+systems by "sealing" the methods at compile time. In order for these methods to shine, the right combination of ingredients is needed:
+
+=over 4
+=item 1 The overhead of the dynamic lookup should be significant compared to the work done in the method itself. 
+
+This is the case for small methods that do little work, such as getters and setters. However, this is also the case when the underlying C function is very fast, as is the case with the Bit library.
+
+=item 2 The XS interface should materially decrease the overhead of the method call itself.
+
+This is really a corollary of point 1 above, but it is worth stating explicitly.
+
+=item 3 The methods should be used to process large numbers of objects in tight loops.
+
+This is where the overhead of dynamic method lookup really adds up, and where the benefits of XS and sealing the methods at compile time become apparent.
+
+
+
 =back
 
 =head1 SEE ALSO
@@ -429,8 +344,8 @@ less than equal to.
 
 =item L<Alien::Bit|https://metacpan.org/pod/Alien::Bit>
 
-This distribution provides the library Bit so that it can be used by other Perl 
-distributions that are on CPAN. It will download Bit from Github and will build 
+This distribution provides the library Bit so that it can be used by other Perl
+distributions that are on CPAN. It will download Bit from Github and will build
 the (static and dynamic) versions of the library for use by other Perl modules.
 
 =item L<benchmarking-bits|https://github.com/chrisarg/benchmarking-bits>
@@ -439,20 +354,20 @@ A collection of benchmarking scripts for various bitset libraries in C and Perl.
 
 =item L<Bit|https://github.com/chrisarg/Bit>
 
-Bit is a high-performance, uncompressed bitset implementation in C, optimized 
-for modern architectures. The library provides an efficient way to create, 
-manipulate, and query bitsets with a focus on performance and memory alignment. 
-The API and the interface is largely based on David Hanson's Bit_T library 
-discussed in Chapter 13 of "C Interfaces and Implementations", 
-Addison-Wesley ISBN 0-201-49841-3 extended to incorporate additional operations 
-(such as counts on unions/differences/intersections of sets), 
-fast population counts using the libpocnt library and GPU operations for packed 
+Bit is a high-performance, uncompressed bitset implementation in C, optimized
+for modern architectures. The library provides an efficient way to create,
+manipulate, and query bitsets with a focus on performance and memory alignment.
+The API and the interface is largely based on David Hanson's Bit_T library
+discussed in Chapter 13 of "C Interfaces and Implementations",
+Addison-Wesley ISBN 0-201-49841-3 extended to incorporate additional operations
+(such as counts on unions/differences/intersections of sets),
+fast population counts using the libpocnt library and GPU operations for packed
 containers of (collections) of Bit(sets).
 
 =item L<Bit::Set|https://metacpan.org/pod/Bit::Set>
 
-C<Bit::Set> is a Perl module that provides a high-level I<procedural> interface 
-for working with bitsets. It is built on top of the Bit library and offers a 
+C<Bit::Set> is a Perl module that provides a high-level I<procedural> interface
+for working with bitsets. It is built on top of the Bit library and offers a
 more user-friendly Perl API for common bitset operations.
 
 =item L<Bit::Set::DB|https://metacpan.org/pod/Bit::Set::DB>
@@ -471,39 +386,33 @@ Efficient bit vector, set of integers and "big int" math library
 
 Bit vector implementation used in the L<Lucy|https://metacpan.org/pod/Lucy> search engine library.
 
+=item L<sealed|https://metacpan.org/pod/sealed>
+
+Subroutine attribute for compile-time method lookups on its typed lexicals.
+
 =back
 
 =head1 TO DO
 
 =over 4
 
-=item B<Implement Performant Object Oriented interfaces> 
+=item * Add more examples.
 
-Explore Joe Scahefer's L<sealed|https://metacpan.org/pod/sealed>  in order to 
-create efficient OO interfaces without the overhead of traditional Perl OO 
-systems by "sealing" the methods at compile time. Subroutine attribute for 
-compile-time method lookups on its typed lexicals. 
-As Joe L<points out|https://www.iconoclasts.blog/joe/perl7-sealed-lexicals>:
-
-    "Perl 5s OO runtime method lookup has 50% more performance overhead than a 
-    direct, named subroutine invocation." 
-
-Doug MacEachern proposed a very L<solution|https://www.perl.com/pub/2000/06/dougpatch.html/> which however never made it into the core. 
-Joe's sealed package implements Doug's idea in a modern way, allowing the 
-creation of efficient OO interfaces without the overhead of traditional Perl OO
-systems by "sealing" the methods at compile time.
+=item* Add more tests.
 
 =back
 
 =head1 AUTHOR
 
-Christos Argyropoulos.
+Christos Argyropoulos and Joe Schaefer after v0.11.
+Christos Argyropoulos with asistance from Github Copilot (Claude Sonnet 4) up to v0.10.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Christos Argyropoulos.
+This software up to and including v0.10 is copyright (c) 2025 Christos Argyropoulos.
+For versions after v0.10, the distribution as a whole is copyright (c) 2025 Joe Schaefer and Christos Argyropoulos.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This software is released under the L<MIT license|https://mit-license.org/>.
+
 
 =cut

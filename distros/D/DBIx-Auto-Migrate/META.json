@@ -29,6 +29,8 @@
          "requires" : {
             "DBD::Pg" : "0",
             "Test::Exception" : "0",
+            "Test::MockModule" : "0",
+            "Test::MockObject" : "0",
             "Test::More" : "0",
             "Test::PostgreSQL" : "0"
          }
@@ -37,7 +39,7 @@
    "provides" : {
       "DBIx::Auto::Migrate" : {
          "file" : "lib/DBIx/Auto/Migrate.pm",
-         "version" : "0.6"
+         "version" : "0.7"
       }
    },
    "release_status" : "stable",
@@ -49,6 +51,6 @@
          "url" : "https://github.com/sergiotarxz/Perl-DBIx-Auto-Migrate"
       }
    },
-   "version" : "0.6",
+   "version" : "0.7",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

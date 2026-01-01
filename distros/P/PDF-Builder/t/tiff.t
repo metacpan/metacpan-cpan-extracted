@@ -21,12 +21,12 @@ my $failed;
 # usable, otherwise they will display just TIFF. you can use this information
 # if you are not sure about the status of Graphics::TIFF.
 
-my $pdf = PDF::Builder->new('-compress' => 'none'); # common $pdf all tests
+my $pdf = PDF::Builder->new('compress' => 'none'); # common $pdf all tests
 my $has_GT = 0; # global flag for all tests that need to know if Graphics::TIFF
 my ($page, $img, $example, $expected);
 
-# -silent shuts off one-time warning for rest of run
-my $tiff = $pdf->image_tiff('t/resources/1x1.tif', -silent => 1, -nouseGT => $noGT);
+# silent flag shuts off one-time warning for rest of run
+my $tiff = $pdf->image_tiff('t/resources/1x1.tif', 'silent' => 1, 'nouseGT' => $noGT);
 # 1
 if ($tiff->usesLib() == 1) {
     $has_GT = 1;
@@ -53,7 +53,7 @@ like($pdf->to_string(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
 $pdf = PDF::Builder->new();
 open my $fh, '<', 't/resources/1x1.tif' or
    die "Couldn't open file t/resources/1x1.tif";
-$tiff = $pdf->image_tiff($fh, -nouseGT => 1);
+$tiff = $pdf->image_tiff($fh, 'nouseGT' => 1);
 isa_ok($tiff, 'PDF::Builder::Resource::XObject::Image::TIFF',
     q{$pdf->image_tiff(filehandle)});
 
@@ -65,10 +65,10 @@ close $fh;
 
 # LZW Compression  2 tests ------------------
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 
 # 6
-my $lzw_tiff = $pdf->image_tiff('t/resources/1x1-lzw.tif', -nouseGT => $noGT);
+my $lzw_tiff = $pdf->image_tiff('t/resources/1x1-lzw.tif', 'nouseGT' => $noGT);
 if ($lzw_tiff->usesLib() == 1) {
     isa_ok($lzw_tiff, 'PDF::Builder::Resource::XObject::Image::TIFF_GT',
         q{$pdf->image_tiff(), LZW compression});
@@ -88,7 +88,7 @@ like($pdf->to_string(), qr/q 216 0 0 432 72 360 cm \S+ Do Q/,
 
 # 8
 $pdf = PDF::Builder->new();
-eval { $pdf->image_tiff('t/resources/this.file.does.not.exist', -nouseGT => $noGT) };
+eval { $pdf->image_tiff('t/resources/this.file.does.not.exist', 'nouseGT' => $noGT) };
 ok($@, q{Fail fast if the requested file doesn't exist});
 
 ##############################################################
@@ -113,7 +113,8 @@ my ($convert, $gs, $convertX, $gsX);
 # On v7, this is called via "magick convert"
 # On Windows, be careful NOT to run "convert", as this is a HDD reformatter!
 if      (can_run("magick")) {
-    $convert = "magick convert";
+   #$convert = "magick convert";
+    $convert = "magick";
 } elsif ($OSNAME ne 'MSWin32' and can_run("convert")) {
     $convert = "convert";
 }
@@ -159,11 +160,11 @@ SKIP: {
 
 system("$convert -depth 1 -gravity center -pointsize 78 -size ${width}x${height} caption:\"A caption for the image\" $tiff_f");
 # ----------
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox($width, $height);
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => $noGT);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => $noGT);
 $gfx->image($img, 0, 0, $width, $height);
 $pdf->save();
 $pdf->end();
@@ -187,11 +188,11 @@ SKIP: {
 
 system("$convert -depth 1 -gravity center -pointsize 78 -size ${width}x${height} caption:\"A caption for the image\" -background white -alpha off -compress Group4 $tiff_f");
 # ----------
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox($width, $height);
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => $noGT);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => $noGT);
 $gfx->image($img, 0, 0, $width, $height);
 $pdf->save();
 $pdf->end();
@@ -215,11 +216,11 @@ SKIP: {
 
 system("$convert -depth 1 -gravity center -pointsize 78 -size ${width}x${height} caption:\"A caption for the image\" -background white -alpha off -compress lzw $tiff_f");
 # ----------
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox( $width, $height );
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => 0);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => 0);
 $gfx->image( $img, 0, 0, $width, $height );
 $pdf->save();
 $pdf->end();
@@ -240,11 +241,11 @@ SKIP: {
 
 system("$convert -depth 1 -gravity center -pointsize 78 -size ${width}x${height} caption:\"A caption for the image\" -background white -alpha off -define tiff:rows-per-strip=50 -compress lzw $tiff_f");
 # ----------
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox( $width, $height );
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => 0);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => 0);
 $gfx->image( $img, 0, 0, $width, $height );
 $pdf->save();
 $pdf->end();
@@ -268,11 +269,11 @@ $width = 20;
 $height = 20;
 system("$convert -depth 8 -size 2x2 pattern:gray50 -scale 1000% -alpha off -define tiff:predictor=2 -compress lzw $tiff_f");
 # ----------
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox( $width, $height );
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => 0);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => 0);
 $gfx->image( $img, 0, 0, $width, $height );
 $pdf->save();
 $pdf->end();
@@ -296,11 +297,11 @@ $height = 100;
 
 system("$convert -depth 1 -gravity center -pointsize 78 -size ${width}x${height} caption:\"A caption for the image\" -compress lzw $tiff_f");
 # ----------
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox( $width, $height );
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => $noGT);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => $noGT);
 $gfx->image( $img, 0, 0, $width, $height );
 $pdf->save();
 $pdf->end();
@@ -321,11 +322,11 @@ SKIP: {
 
 system("$convert -depth 1 -gravity center -pointsize 78 -size ${width}x${height} caption:\"A caption for the image\" -background white -alpha off -compress lzw $tiff_f");
 # ----------
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox( $width, $height );
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => 1);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => 1);
 $gfx->image( $img, 0, 0, $width, $height );
 $pdf->save();
 $pdf->end();
@@ -348,11 +349,11 @@ $width = 20;
 $height = 20;
 system("$convert -depth 8 -size 2x2 pattern:gray50 -scale 1000% -alpha off -define tiff:predictor=2 -compress lzw $tiff_f");
 # ----------
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox( $width, $height );
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => 1);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => 1);
 $gfx->image( $img, 0, 0, $width, $height );
 $pdf->save();
 $pdf->end();
@@ -373,11 +374,11 @@ SKIP: {
     skip "multi-strip lzw without GT is not currently supported", 1;
 system("$convert -depth 1 -gravity center -pointsize 78 -size ${width}x${height} caption:\"A caption for the image\" -background white -alpha off -define tiff:rows-per-strip=50 -compress lzw $tiff_f");
 # ----------
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox( $width, $height );
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => 1);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => 1);
 $gfx->image( $img, 0, 0, $width, $height );
 $pdf->save();
 $pdf->end();
@@ -403,11 +404,11 @@ SKIP: {
 my $colormap = File::Spec->catfile($directory, 'colormap.png');
 system("$convert rose: -type palette -depth 2 $colormap");
 system("$convert $colormap $tiff_f");
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page;
 $page->mediabox( $width, $height );
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => $noGT);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => $noGT);
 $gfx->image( $img, 0, 0, $width, $height );
 $pdf->save();
 $pdf->end();
@@ -422,11 +423,11 @@ SKIP: {
 $width = 6;
 $height = 1;
 system("$convert -depth 1 -size ${width}x${height} pattern:gray50 -alpha on $tiff_f");
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox( $width, $height );
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => 0);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => 0);
 $gfx->image( $img, 0, 0, $width, $height );
 $pdf->save();
 $pdf->end();
@@ -458,11 +459,11 @@ SKIP: {
 $width = 6;
 $height = 1;
 system("$convert -depth 1 -size ${width}x${height} pattern:gray50 -alpha on $tiff_f");
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox( $width, $height );
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => 1);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => 1);
 $gfx->image( $img, 0, 0, $width, $height );
 $pdf->save();
 $pdf->end();
@@ -488,11 +489,11 @@ SKIP: {
 $width = 6;
 $height = 2;
 system("$convert -depth 1 -size ${width}x${height} pattern:gray50 -alpha off -define tiff:rows-per-strip=1 -compress fax $tiff_f");
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox( $width, $height );
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => 0);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => 0);
 $gfx->image( $img, 0, 0, $width, $height );
 $pdf->save();
 $pdf->end();
@@ -514,11 +515,11 @@ SKIP: {
 $width = 6;
 $height = 2;
 system("$convert -depth 1 -size ${width}x${height} pattern:gray50 -alpha off -define tiff:rows-per-strip=1 -compress group4 $tiff_f");
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox( $width, $height );
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => 0);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => 0);
 $gfx->image( $img, 0, 0, $width, $height );
 $pdf->save();
 $pdf->end();
@@ -540,11 +541,11 @@ SKIP: {
 $width = 6;
 $height = 2;
 system("$convert -depth 1 -size ${width}x${height} pattern:gray50 -alpha off -define tiff:rows-per-strip=1 -define quantum:polarity=min-is-black -compress fax $tiff_f");
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox( $width, $height );
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => 0);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => 0);
 $gfx->image( $img, 0, 0, $width, $height );
 $pdf->save();
 $pdf->end();
@@ -566,11 +567,11 @@ SKIP: {
 $width = 6;
 $height = 2;
 system("$convert -depth 1 -size ${width}x${height} pattern:gray50 -alpha off -define tiff:rows-per-strip=1 -define quantum:polarity=min-is-black -compress group4 $tiff_f");
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox( $width, $height );
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => 0);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => 0);
 $gfx->image( $img, 0, 0, $width, $height );
 $pdf->save();
 $pdf->end();
@@ -592,11 +593,11 @@ SKIP: {
 $width = 6;
 $height = 2;
 system("$convert -depth 1 -size ${width}x${height} pattern:gray50 -alpha off -define tiff:fill-order=lsb -compress group4 $tiff_f");
-$pdf = PDF::Builder->new(-file => $pdfout);
+$pdf = PDF::Builder->new('file' => $pdfout);
 $page = $pdf->page();
 $page->mediabox( $width, $height );
 $gfx = $page->gfx();
-$img = $pdf->image_tiff($tiff_f, -nouseGT => 0);
+$img = $pdf->image_tiff($tiff_f, 'nouseGT' => 0);
 $gfx->image( $img, 0, 0, $width, $height );
 $pdf->save();
 $pdf->end();

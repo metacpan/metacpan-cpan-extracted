@@ -6,8 +6,8 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 my $PDFname = $0;
    $PDFname =~ s/\..*$//;  # remove extension such as .pl
@@ -41,10 +41,10 @@ my $leading = 1.6; # baseline-to-baseline * font size
 my $latinFont =   # for kerning, ligature demos
   # '/WINDOWS/Fonts/times.ttf';
   # '/WINDOWS/Fonts/arial.ttf';
-    '/Users/Phil/AppData/Local/Microsoft/Windows/Fonts/NimbusRoman-Regular.otf';
+    '/Users/philp/AppData/Local/Microsoft/Windows/Fonts/NimbusRoman-Regular.otf';
 my $ligFont =     # for full ligature list, Shaper ignores
   # $latinFont;
-  # '/Users/Phil/AppData/Local/Microsoft/Windows/Fonts/NimbusRoman-Regular.otf';
+  # '/Users/philp/AppData/Local/Microsoft/Windows/Fonts/NimbusRoman-Regular.otf';
   # '/WINDOWS/Fonts/verdana.ttf';
   # '/WINDOWS/Fonts/arial.ttf';
     '/WINDOWS/Fonts/times.ttf';  # missing fj, ij, and et
@@ -157,7 +157,7 @@ my %samples = (
    # Some Khmer text (a Cambodian script). I don't think the first "word" means
    # anything, but the second may be something like "a dog".
    'Khmer' => { 'title' => "Khmer", 
-	        'fontFile' => '/Users/Phil/Desktop/closed tickets/D.O.N.E/khmer/KhmerOS_.ttf',
+	        'fontFile' => '/Users/philp/OneDrive/Desktop/closed tickets/D.O.N.E/khmer/KhmerOS_.ttf',
 		'dir' => 'L',
 		'script' => 'Khmr',
 		# KA COENG KA and "dog" CHA COENG KA AE 

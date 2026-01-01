@@ -3,7 +3,7 @@ use v5.12;
 use warnings;
 
 BEGIN {
-  our $VERSION = "0.5001";
+  our $VERSION = "0.5002";
   require XSLoader;
   XSLoader::load();
 }
@@ -68,7 +68,7 @@ L<libneo4j-client API|http://neo4j-client.net/doc/latest/neo4j-client_8h.html>.
 
 =head1 LICENSE
 
-This software is Copyright (c) 2019-2024 by Mark A. Jensen.
+This software is Copyright (c) 2019-2026 by Mark A. Jensen.
 
 This is free software, licensed under:
 

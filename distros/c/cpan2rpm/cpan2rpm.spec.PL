@@ -4,9 +4,9 @@
 use strict;
 
 my $reqs = join ";"
-    , qq([ -e /etc/SuSE-release -o -e /etc/UnitedLinux-release ] && SuSE=1)
-    , qq(ver=`rpm -q rpm --qf %%{version}|awk -F . '{print \$1}'`)
-    , qq([ \$ver -le 3 -o -n "\$SuSE" ] && echo rpm || echo rpm-build)
+    , q([ -e /etc/SuSE-release -o -e /etc/UnitedLinux-release ] && SuSE=1)
+    , q(ver=`rpm -q rpm --qf %%{version}|awk -F . '{print $1}'`)
+    , q([ $ver -le 3 -o -n "$SuSE" ] && echo rpm || echo rpm-build)
     ;
 
 my @cmd = (

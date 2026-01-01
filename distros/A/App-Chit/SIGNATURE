@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 5dd492e96a88855f8e53d4f6f49e1541fbf4739e90fabb925dd1707b489ac784 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 3d25a1029216a78121ff5829ee1f0ae1c914f429f93f6112915d44dcf76bb8d1 Changes
+SHA256 d134a2affc3b685b9ba6cc9acda25cf6e202d53668cfbf96330732c6b03e75a4 INSTALL
+SHA256 8e7094312357a5a73b44c1b87d32fca39e6d2f6c5a5504bcbcd0f0cf34b7c9cc LICENSE
+SHA256 94ffd71e60242197e1a5ac6fd5208c7e5c61ee5c44755fb6b172aa33a6fe9802 MANIFEST
+SHA256 cde6a93cd9de2dccd198aa67f765e93dfd61bfd6e7c1209fd6097193e588f025 META.json
+SHA256 140f3d4b053ffabf9e007fb3d8e63fc9f9b0801a3fb84fa8a12661fa518897eb META.yml
+SHA256 7a4b3f2fc681ee472be8760bcdd99ac2a5980369452ea71a3508491ce2932a84 Makefile.PL
+SHA256 f67103d5d847e83a54fd1d432702d9921c19ba24bce2994efdbaff7b755c4aaa README
+SHA256 23854fcb17ff49649efc5991c5f36b5cf4baebe916093808f78fa440bf93dcad bin/chit
+SHA256 f006ae1dbf9f7cd3adc88941afa61f2478f7c636cadbd5c2ab26f46d7ffa11c2 dist.ini
+SHA256 eb12b5a3452c975cf5863a5cff14bad52d875a642a99fa8b54f0fe1de3f167b8 doap.ttl
+SHA256 dd27e9f5643be8858abae6ef49a2dc24b7aa4cb16574929e88c08e1aae9fc426 lib/App/Chit.pm
+SHA256 0495a6fc9e6a724fb40c9963b0020af6024940b0eda249617f3f45eb0e57aa46 lib/App/Chit/Command/chat.pm
+SHA256 af5aa353d2934c050801056603d5e3dd8a4222ed1ff0cbad79533ed839b8d98b lib/App/Chit/Command/init.pm
+SHA256 ba33cc688e13643ec940b50a2b2991def86da701a11c2cdac94934aa9cabf856 lib/App/Chit/Command/maxhistory.pm
+SHA256 f3742421320cf33e86c7a10417a11586b9a7517de922c513b9aa63c4c93147cc lib/App/Chit/Command/model.pm
+SHA256 521fe6e91c021996711de72b1776d1d61eb5e9a203363c1137ac0bae3a700575 lib/App/Chit/Command/role.pm
+SHA256 9a47454f2b0c13bcd54091d6eca017a9103852a7a33fc8fd11a80348cc826212 lib/App/Chit/Command/show.pm
+SHA256 bd72b8d9f344a0bd696a37e40e2084316a70aac2be55dd1728c15b6f4e2d6868 lib/App/Chit/Command/temperature.pm
+SHA256 3dfebd60b65812a02adfdd9f877ad66180208127707fe2280007c7df4657d12a lib/App/Chit/Command/which.pm
+SHA256 6caf1c044b91405c04cebe53d33bbec03f46d6c1e2c211dba061fd36c8f7880d lib/App/Chit/Util.pm
+SHA256 c913e59c24c141a7176bf572e8ff5aea149f80ca168c3dd087de0c5be096da8b t/00start.t
+SHA256 d1dfa15f1b3468fdc8ef0216f02638470998b5634e01e8834ed2ac7008eb00a4 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCaVWQigAKCRDOv4Eoaip9
+OUOUAJ9iM4krMuUVFYlRgz3c5LFG/CfezQCgnGj5kcK54yTyftHd1zocZORp1IM=
+=jT86
+-----END PGP SIGNATURE-----

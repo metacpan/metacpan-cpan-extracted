@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::CIDFont';
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
@@ -201,6 +201,18 @@ sub tounicodemap {
     # no-op since PDF knows its char-collection
     return $self;
 }
+
+=head2 glyphByCId
+
+    $n = $font->glyphByCId($gid)
+
+=over
+
+Returns a character's glyph name (string), given its glyph ID.
+
+=back
+
+=cut
 
 sub glyphByCId {
     my ($self, $cid) = @_;

@@ -13,6 +13,7 @@ MANIFEST
 META.json
 META.yml
 README.md
+SECURITY.md
 tools/1_pc.pl
 tools/2_t-tests.pl
 tools/3_examples.pl
@@ -35,11 +36,6 @@ INFO/Prereq_fixes.md
 INFO/RoadMap
 INFO/SPONSORS
 INFO/SUPPORT
-INFO/old/contrib.bat
-INFO/old/dist.ini.old
-INFO/old/examples.bat
-INFO/old/pc.bat
-INFO/old/t-tests.bat
 contrib/combine_pdfs.pl
 contrib/pdf-debug.pl
 contrib/pdf-deoptimize.pl
@@ -84,12 +80,15 @@ examples/BarCode.pl
 examples/Boxes.pl
 examples/Bspline.pl
 examples/Column.pl
+#examples/Column_layouts.pl TBD
 examples/Column_lists.pl
-#examples/Column_layouts.pl
+examples/Column_xrefs.pl
+examples/Column_md_xrefs.pl
 examples/Content.pl
 examples/ContentText.pl
 examples/FontManager.pl
 examples/HarfBuzz.pl
+examples/NamedDest.pl
 examples/RMtutorial.pl
 examples/Rotated.pl
 examples/ShowFont.pl
@@ -123,6 +122,7 @@ lib/PDF/Builder/Basic/PDF/Utils.pm
 # lib/PDF/Builder/Content/Barcode/DataMatrix.pm
 lib/PDF/Builder/Content/Hyphenate_basic.pm
 lib/PDF/Builder/Content/Text.pm
+lib/PDF/Builder/Content/Column_docs.pm
 lib/PDF/Builder/Resource/CIDFont/CJKFont/adobemingstdlightacro.data
 lib/PDF/Builder/Resource/CIDFont/CJKFont/adobemyungjostdmediumacro.data
 lib/PDF/Builder/Resource/CIDFont/CJKFont/adobesongstdlightacro.data

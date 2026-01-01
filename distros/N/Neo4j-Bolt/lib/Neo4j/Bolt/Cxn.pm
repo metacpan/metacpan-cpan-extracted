@@ -5,7 +5,7 @@ use warnings;
 use Carp qw/croak/;
 
 BEGIN {
-  our $VERSION = "0.5001";
+  our $VERSION = "0.5002";
   require Neo4j::Bolt::CTypeHandlers;
   require Neo4j::Bolt::ResultStream;
   require XSLoader;
@@ -26,7 +26,7 @@ sub run_query {
   unless ($query) {
     croak "Arg 1 should be Cypher query string";
   }
-  if ($parms && !(ref $parms == 'HASH')) {
+  if (defined $parms && ref $parms ne 'HASH') {
     croak "Arg 2 should be a hashref of { param => \$value, ... }";
   }
   croak "No connection" unless $self->connected;
@@ -40,7 +40,7 @@ sub send_query {
   unless ($query) {
     croak "Arg 1 should be Cypher query string";
   }
-  if ($parms && !(ref $parms == 'HASH')) {
+  if (defined $parms && ref $parms ne 'HASH') {
     croak "Arg 2 should be a hashref of { param => \$value, ... }";
   }
   croak "No connection" unless $self->connected;
@@ -161,7 +161,7 @@ L<Neo4j::Bolt>, L<Neo4j::Bolt::ResultStream>.
 
 =head1 LICENSE
 
-This software is Copyright (c) 2019-2024 by Mark A. Jensen.
+This software is Copyright (c) 2019-2026 by Mark A. Jensen.
 
 This is free software, licensed under:
 

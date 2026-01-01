@@ -18,6 +18,8 @@ my %WriteMakefileArgs = (
         'File::Spec' => '0',
     },
     PREREQ_PM => {
+        'File::Basename' => '0',
+        'File::Spec' => '0',
         'Getopt::Long' => '0',
         'HTML::TreeBuilder' => '5.00',
         'JSON::PP' => '0',

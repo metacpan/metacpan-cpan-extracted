@@ -6,7 +6,7 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.027'; # VERSION
+our $VERSION = '3.028'; # VERSION
 our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use Math::Trig;
@@ -27,7 +27,7 @@ my $globalY = 0;
 my $compress = 'none';
 #my $compress = 'flate';
 
-my $pdf = PDF::Builder->new(-compress => $compress);
+my $pdf = PDF::Builder->new('compress' => $compress);
 my ($page, $textUnder, $grfx, $text); # objects for page, graphics, text
 my (@base, @styles, @points, $i, $lw, $angle, @npts);
 my (@cellLoc, @cellSize, $font, $width, $d1, $d2, $d3, $d4);
@@ -53,8 +53,8 @@ makeCell(@cellLoc, @cellSize);
 
 # old axes at "0,0"
 colors('black');
-$grfx->transform(-translate => \@base);
-$text->transform(-translate => \@base);
+$grfx->transform('translate' => \@base);
+$text->transform('translate' => \@base);
 drawAxes();  
 drawLabels('oldX', 'oldY');
 $grfx->restore();
@@ -64,8 +64,8 @@ $grfx->save();
 colors('red');
 $base[0] += 36;
 $base[1] += 36;
-$grfx->transform(-translate => \@base);
-$text->transform(-translate => \@base);
+$grfx->transform('translate' => \@base);
+$text->transform('translate' => \@base);
 drawAxes();
 drawLabels('newX', 'newY');
 
@@ -88,8 +88,8 @@ $base[1] += 15;
 
 # old axes at "0,0"
 colors('black');
-$grfx->transform(-translate => \@base);
-$text->transform(-translate => \@base);
+$grfx->transform('translate' => \@base);
+$text->transform('translate' => \@base);
 drawAxes();  
 drawLabels('oldX', 'oldY');
 $grfx->restore();
@@ -101,10 +101,10 @@ colors('red');
 # alpha must be less than 90 degrees
 $base[0] += 2.627; # AOy(sin(alpha) + sin(alpha+90) - 1)
 $base[1] -= 1.740; # AOx(cos(alpha) + cos(alpha+90) - 1)
-$grfx->transform(-translate => \@base,
-                 -rotate    => 30);
-$text->transform(-translate => \@base,
-                 -rotate    => 30);
+$grfx->transform('translate' => \@base,
+                 'rotate'    => 30);
+$text->transform('translate' => \@base,
+                 'rotate'    => 30);
 drawAxes();  
 drawLabels('newX', 'newY');
 
@@ -127,8 +127,8 @@ $base[1] += 15;
 
 # old axes at "0,0"
 colors('black');
-$grfx->transform(-translate => \@base);
-$text->transform(-translate => \@base);
+$grfx->transform('translate' => \@base);
+$text->transform('translate' => \@base);
 drawAxes();  
 drawLabels('oldX', 'oldY');
 $grfx->restore();
@@ -140,10 +140,10 @@ colors('red');
 # when scaled in both directions
 $base[0] -=  1.0;
 $base[1] +=  2.5;
-$grfx->transform(-translate => \@base,
-                 -scale     => [1.2, 0.5]);
-$text->transform(-translate => \@base,
-                 -scale     => [1.2, 0.5]);
+$grfx->transform('translate' => \@base,
+                 'scale'     => [1.2, 0.5]);
+$text->transform('translate' => \@base,
+                 'scale'     => [1.2, 0.5]);
 drawAxes();  
 drawLabels('newX', 'newY');
 
@@ -166,8 +166,8 @@ $base[1] += 15;
 
 # old axes at "0,0"
 colors('black');
-$grfx->transform(-translate => \@base);
-$text->transform(-translate => \@base);
+$grfx->transform('translate' => \@base);
+$text->transform('translate' => \@base);
 drawAxes();  
 drawLabels('oldX', 'oldY');  
 $grfx->restore();
@@ -179,10 +179,10 @@ colors('red');
 # when skewed in both directions
 $base[0] -=  1.0;
 $base[1] -=  1.0;
-$grfx->transform(-translate => \@base,
-                 -skew      => [10, 15]);
-$text->transform(-translate => \@base,
-                 -skew      => [10, 15]);
+$grfx->transform('translate' => \@base,
+                 'skew'      => [10, 15]);
+$text->transform('translate' => \@base,
+                 'skew'      => [10, 15]);
 drawAxes();
 drawLabels('newX', 'newY');
 
@@ -205,8 +205,8 @@ $base[1] +=  0;
 
 # old axes at "0,0"
 colors('black');
-$grfx->transform(-translate => \@base);
-$text->transform(-translate => \@base);
+$grfx->transform('translate' => \@base);
+$text->transform('translate' => \@base);
 drawAxes();  
 drawLabels('oldX', 'oldY');  
 $grfx->restore();
@@ -216,10 +216,10 @@ $grfx->save();
 colors('red');
 $base[0] += 50;
 $base[1] += 15;
-$grfx->transform(-translate => \@base,
-                 -rotate    => 30);
-$text->transform(-translate => \@base,
-                 -rotate    => 30);
+$grfx->transform('translate' => \@base,
+                 'rotate'    => 30);
+$text->transform('translate' => \@base,
+                 'rotate'    => 30);
 drawAxes();
 drawLabels('newX', 'newY');
 
@@ -242,8 +242,8 @@ $base[1] +=  0;
 
 # old axes at "0,0"
 colors('black');
-$grfx->transform(-translate => \@base);
-$text->transform(-translate => \@base);
+$grfx->transform('translate' => \@base);
+$text->transform('translate' => \@base);
 drawAxes();  
 drawLabels('oldX', 'oldY');  
 $grfx->restore();
@@ -260,10 +260,10 @@ $grfx->save();
 colors('red');
 $base[0] += 35.80;
 $base[1] += 37.99;
-$grfx->transform(-translate => \@base,
-                 -rotate    => 30);
-$text->transform(-translate => \@base,
-                 -rotate    => 30);
+$grfx->transform('translate' => \@base,
+                 'rotate'    => 30);
+$text->transform('translate' => \@base,
+                 'rotate'    => 30);
 drawAxes();
 drawLabels('newX', 'newY');
 
@@ -824,7 +824,7 @@ makeCell(@cellLoc, @cellSize);
 $base[0] += 10;
 $base[1] += 10;
 
-@styles = ('linedash()', 'linedash(10)', 'linedash(15, 10)', 'linedash(-pattern=>[15,8, 2,5], -shift=>8)');
+@styles = ('linedash()', 'linedash(10)', 'linedash(15, 10)', 'linedash(\'pattern\'=>[15,8, 2,5], \'shift\'=>8)');
 $grfx->translate(@base);
 $grfx->strokecolor('black');
 $grfx->linewidth(2);
@@ -840,7 +840,7 @@ foreach my $pat (0, 1, 2, 3) {
   } elsif ($pat == 2) {
     $grfx->linedash(15, 10);
   } else {
-    $grfx->linedash(-pattern=>[15,8, 2,5], -shift=>8);
+    $grfx->linedash('pattern'=>[15,8, 2,5], 'shift'=>8);
   }
   $grfx->poly(20,20+25*$pat, 130,20+25*$pat);
   $grfx->stroke();
@@ -1255,13 +1255,13 @@ $grfx->translate(@base);
 @points = (0,0, 20,40, 70,50, 115,40, 145,35, 145,45, 115,40, 70,5); 
 $grfx->linedash();
 $grfx->move(0,0);
-$grfx->bspline(\@points, -debug=>4);
+$grfx->bspline(\@points, 'debug'=>4);
 $grfx->stroke();
 
 @points = (0,65, 20,105, 70,115, 115,105, 145,100, 145,110, 115,105, 70,70); 
 $grfx->linedash();
 $grfx->move(0,65);
-$grfx->bspline(\@points, -debug=>1);
+$grfx->bspline(\@points, 'debug'=>1);
 $grfx->stroke();
 
 # caption
@@ -2291,19 +2291,19 @@ $text->fillcolor('black');
 $text->leading(15);
 
 $text->translate($base[0]+15, $base[1]+110);
-$text->text('Some underlined text.', -underline=>'auto');
+$text->text('Some underlined text.', 'underline'=>'auto');
 
 $text->translate($base[0]+15, $base[1]+90);
-$text->text('Loosely underlined text.', -underline=>5);
+$text->text('Loosely underlined text.', 'underline'=>5);
 
 $text->translate($base[0]+15, $base[1]+65);
-$text->text('Double underlined text.', -underline=>[3, 2, 8, 1]);
+$text->text('Double underlined text.', 'underline'=>[3, 2, 8, 1]);
 
 $text->translate($base[0]+15, $base[1]+35);
-$text->text('Overlined text.', -underline=>-11);
+$text->text('Overlined text.', 'underline'=>-11);
 
 $text->translate($base[0]+15, $base[1]+15);
-$text->text('Indented 36pt text.', -indent=>36);
+$text->text('Indented 36pt text.', 'indent'=>36);
 
 # caption
 drawCaption(['text() underline, indent'], 'LC');
@@ -2327,22 +2327,22 @@ $text->leading(15);
 
 $text->translate($base[0]+12, $base[1]+85);
 $text->text('Auto ');
-$text->text('struck-through', -strikethru=>'auto');
+$text->text('struck-through', 'strikethru'=>'auto');
 $text->text(' text.');
 
 $text->translate($base[0]+12, $base[1]+65);
 $text->text('Positioned ');
-$text->text('struck-through', -strikethru=>4.5);
+$text->text('struck-through', 'strikethru'=>4.5);
 $text->text(' text.');
 
 $text->translate($base[0]+12, $base[1]+45);
 $text->text('Doubly ');
-$text->text('struck-through', -strikethru=>[5, 0.7, 2, 0.7]);
+$text->text('struck-through', 'strikethru'=>[5, 0.7, 2, 0.7]);
 $text->text(' text.');
 
 $text->translate($base[0]+12, $base[1]+25);
 $text->text('Color ');
-$text->text('struck-through', -strikethru=>[5, [0.4, 'green'], 2, [0.6, 'red']]);
+$text->text('struck-through', 'strikethru'=>[5, [0.4, 'green'], 2, [0.6, 'red']]);
 $text->text(' text.');
 
 # caption

@@ -12,7 +12,7 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::KeepAlive v11.10.0;
+package Protocol::Sys::Virt::KeepAlive v11.10.1;
 
 use Carp qw(croak);
 use Log::Any qw($log);
@@ -53,13 +53,12 @@ sub register {
 
                 if ($args{header}->{proc} == $msgs->PROC_PONG) {
                     $self->{inactive} = 0; # our PING; keep pinging
-                    $self->{on_ack}->($self, $transport);
-                    return;
+                    return $self->{on_ack}->($self, $transport);
                 }
 
                 $self->mark_active;
                 if ($args{header}->{proc} == $msgs->PROC_PING) {
-                    $self->{on_ping}->($self, $transport);
+                    return $self->{on_ping}->($self, $transport);
                 }
                 return;
             },
@@ -77,11 +76,11 @@ sub ping {
 
     $self->{inactive}++;
     if ($self->{inactive} > $self->{max_inactive}) {
-        $self->{on_fail}->($self);
+        return $self->{on_fail}->($self);
     }
     if ($self->{inactive}) {
         $log->trace("Inactivity timer: $self->{inactive}");
-        $self->{sender}->($msgs->PROC_PING, $type->MESSAGE, data => '');
+        return $self->{sender}->($msgs->PROC_PING, $type->MESSAGE, data => '');
     }
     else {
         $log->trace("Activity found; no need to PING");
@@ -104,7 +103,7 @@ Protocol::Sys::Virt::KeepAlive - Check transport link availability
 
 =head1 VERSION
 
-v11.10.0
+v11.10.1
 
 Based on LibVirt tag v11.10.0
 
@@ -199,10 +198,10 @@ taking the current activity as sufficient proof of an open connection.
 
 Sends a C<PROC_PING> message over the C<$transport> on which it is registered.
 If the number of unacknowledged pings grows above the threshold, triggers the
-C<on_fail> event.
+C<on_fail> event, returning the callbacks results.
 
-Returns either nothing at all (in case no PING message needed to be sent),
-or the return value of the sender routine registered with the transport
+Otherwise returns either nothing at all (in case no PING message needed to be
+sent), or the return value of the sender routine registered with the transport
 when a PING message was sent.
 
 =head2 pong

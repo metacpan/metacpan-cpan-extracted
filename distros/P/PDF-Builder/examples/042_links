@@ -21,7 +21,8 @@ my $PDFname = $0;
    $PDFname =~ s/\..*$//;  # remove any existing extension
    $PDFname .= '.pdf';     # add new extension
 
-my $pdf = PDF::Builder->new(-compress => 'none');
+my $pdf = PDF::Builder->new('compress' => 'none');
+# ===================== Page 1: goto browser ==================================
 my $page = $pdf->page();
 my $text = $page->text();
 my $font = $pdf->corefont('Times-Roman');
@@ -37,6 +38,7 @@ $text->text("Page 1. Go to a web page in a browser.");
 $x = 100;
 $y = 600;
 
+print "1A ann->uri to google\n";
 $text->translate($x, $y);
 $text->text("Click ");
 $x += $text->advancewidth("Click ");
@@ -46,14 +48,18 @@ $text->fillcolor($link_text_color);
 $text->text("here");
 my $target_width = $text->advancewidth("here");
 
-my $annotation = $page->annotation();
+my $ann = $page->annotation();
 # method 'url' is still usable
-$annotation->uri("https://www.google.com",
-	         -rect => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
-		                         # clickable area
-		 -border => [0, 0, $border],    # show border
-		 -color => [$b_red, $b_green, $b_blue], # border color
-		);
+#
+# note that instead of using options in the method, you could use
+#  $ann->rect() etc. to set the options BEFORE invoking uri().
+#  it's a stylistic choice.
+$ann->uri("https://www.google.com",
+          'rect' => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		               # clickable area
+	  'border' => [0, 0, $border],    # show border
+	  'color' => [$b_red, $b_green, $b_blue], # border color
+	);
 
 # restore color and do rest of line
 $text->fillcolor($normal_text_color);
@@ -63,6 +69,7 @@ $text->text(" to go to Google.");
 $x = 100;
 $y = 500;
 
+print "1B ann->url to CTS #ND\n";
 $text->translate($x, $y);
 $text->text("Go to ");
 $x += $text->advancewidth("Go to ");
@@ -72,14 +79,14 @@ $text->fillcolor($link_text_color);
 $text->text("a specific point");
 $target_width = $text->advancewidth("a specific point");
 
-$annotation = $page->annotation();
+$ann = $page->annotation();
 # method 'url' is still usable
-$annotation->uri("https://www.catskilltech.com/#Catskills",
-	         -rect => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
-		                         # clickable area
-		 -border => [0, 0, $border],    # show border
-		 -color => [$b_red, $b_green, $b_blue], # border color
-		);
+$ann->url("https://www.catskilltech.com/#Catskills",
+	  'rect' => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                # clickable area
+	  'border' => [0, 0, $border],    # show border
+	  'color' => [$b_red, $b_green, $b_blue], # border color
+	 );
 
 # restore color and do rest of line
 $text->fillcolor($normal_text_color);
@@ -93,6 +100,7 @@ $text->text("In these examples the link text is explicitly colored blue and the"
 $text->translate($x, $y-25);
 $text->text("link box is outlined in green. These may be changed in the code.");
 
+# ===================== Page 2: goto page in this PDF =========================
 # ---------- go to a page within THIS document
 $page = $pdf->page();  # page 2
 $text = $page->text();
@@ -115,23 +123,25 @@ $text->fillcolor($link_text_color);
 $text->text("here");
 $target_width = $text->advancewidth("here");
 
-$annotation = $page->annotation();
+$ann = $page->annotation();
 my $tgt_page = $pdf->openpage(1);  # target page 1
 # method 'link' is still usable
-$annotation->link($tgt_page,
-	         -rect => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
-		                         # clickable area
-		 -border => [0, 0, $border],    # show border
-		 -color => [$b_red, $b_green, $b_blue], # border color
-		);
+print "2A ann->link with opened page 1, default fit\n";
+$ann->link($tgt_page,
+	   'rect' => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                  # clickable area
+	   'border' => [0, 0, $border],    # show border
+	   'color' => [$b_red, $b_green, $b_blue], # border color
+	  );
 
 # restore color and do rest of line
 $text->fillcolor($normal_text_color);
 $text->text(" to go to Page 1.");
 
+# ---------------------
 # same, except position and zoom
 $x = 100;
-$y = 400;
+$y = 500;
 
 $text->translate($x, $y);
 $text->text("Click ");
@@ -142,22 +152,86 @@ $text->fillcolor($link_text_color);
 $text->text("here");
 $target_width = $text->advancewidth("here");
 
-$annotation = $page->annotation();
+$ann = $page->annotation();
 $tgt_page = $pdf->openpage(1);  # target page 1
 # method 'link' is still usable
-$annotation->link($tgt_page,
-	         -rect => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
-		                         # clickable area
-		 -border => [0, 0, $border],    # show border
-		 -color => [$b_red, $b_green, $b_blue], # border color
-                 -xyz => [ 200,550, 1.5 ],  # new position, zoom factor 150%
-		);
+print "2B ann->goto with page 1, fit=xyz\n";
+$ann->goto($tgt_page,
+	   'rect' => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                 # clickable area
+	   'border' => [0, 0, $border],    # show border
+	   'color' => [$b_red, $b_green, $b_blue], # border color
+           'xyz' => [ 200,550, 1.5 ],  # new position, zoom factor 150%
+	  );
 
 # restore color and do rest of line
 $text->fillcolor($normal_text_color);
 $text->text(" to go to Page 1 positioned/zoomed.");
 
+# ---------------------
+# go to a page in this document, using Named Destination
 
+$x = 100;
+$y = 400;
+$text->translate($x, $y);
+$text->text("As above, except using Named Destinations.");
+# these ND's are also usable directly from the command line (depending on
+# the OS and PDF Reader used)
+
+$x = 100;
+$y = 300;
+
+$text->translate($x, $y);
+$text->text("Click ");
+$x += $text->advancewidth("Click ");
+
+# x,y should be at LL corner of "here" (on baseline)
+$text->fillcolor($link_text_color);
+$text->text("here");
+$target_width = $text->advancewidth("here");
+
+$ann = $page->annotation();
+# method 'link' is still usable
+print "2C ann->link with ND foo, no fit\n";
+$ann->link('foo', # Named Destination defined on page 4
+	   'rect' => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                  # clickable area
+	   'border' => [0, 0, $border],    # show border
+	   'color' => [$b_red, $b_green, $b_blue], # border color
+	  );
+
+# restore color and do rest of line
+$text->fillcolor($normal_text_color);
+$text->text(" to go to Page 4.");
+
+# ---------------------
+$x = 100;
+$y = 200;
+
+$text->translate($x, $y);
+$text->text("Click ");
+$x += $text->advancewidth("Click ");
+
+# x,y should be at LL corner of "here" (on baseline)
+$text->fillcolor($link_text_color);
+$text->text("here");
+$target_width = $text->advancewidth("here");
+
+$ann = $page->annotation();
+# method 'link' is still usable
+print "2D ann->goto with ND bar, no fit\n";
+$ann->goto('bar', # Named Destination defined on page 4
+	   'rect' => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                  # clickable area
+	   'border' => [0, 0, $border],    # show border
+	   'color' => [$b_red, $b_green, $b_blue], # border color
+	  );
+
+# restore color and do rest of line
+$text->fillcolor($normal_text_color);
+$text->text(" to go to Page 4, positioned and zoomed in.");
+
+# ===================== Page 3: goto page in another PDF ======================
 # ---------- go to a page in ANOTHER document
 $page = $pdf->page();  # page 3
 $text = $page->text();
@@ -168,6 +242,7 @@ $y = 700;
 $text->translate($x, $y);
 $text->text("Page 3. Go to a point in another PDF document (on Page 1).");
 
+# -------------------
 $x = 100;
 $y = 600;
 
@@ -180,23 +255,25 @@ $text->fillcolor($link_text_color);
 $text->text("here");
 $target_width = $text->advancewidth("here");
 
-$annotation = $page->annotation();
+$ann = $page->annotation();
 # methods 'pdfile' and 'pdf_file' are still usable
-$annotation->pdf("resources/040_annotation.pdf",
-                 1, # page number
-	         -rect => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
-		                         # clickable area
-		 -border => [0, 0, $border],    # show border
-		 -color => [$b_red, $b_green, $b_blue], # border color
-		);
+print "3A ann->pdf with page 1, default fit\n";
+$ann->pdf("resources/040_annotation.pdf",
+          1, # page number
+	  'rect' => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		               # clickable area
+	  'border' => [0, 0, $border],    # show border
+	  'color' => [$b_red, $b_green, $b_blue], # border color
+	 );
 
 # restore color and do rest of line
 $text->fillcolor($normal_text_color);
 $text->text(" to go to Page 1 of another PDF document.");
 
+# -------------------
 # same, except position and zoom
 $x = 100;
-$y = 400;
+$y = 500;
 
 $text->translate($x, $y);
 $text->text("Click ");
@@ -207,25 +284,102 @@ $text->fillcolor($link_text_color);
 $text->text("here");
 $target_width = $text->advancewidth("here");
 
-$annotation = $page->annotation();
+$ann = $page->annotation();
 # methods 'pdfile' and 'pdf_file' are still usable
-$annotation->pdf("resources/040_annotation.pdf",
-                 1, # page number
-	         -rect => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
-		                         # clickable area
-		 -border => [0, 0, $border],    # show border
-		 -color => [$b_red, $b_green, $b_blue], # border color
-                 -fitr => [0,0, 100,250], # new viewport
-		);
+print "3B ann->pdf_file with page 1 in 040, fitr\n";
+$ann->pdf_file("resources/040_annotation.pdf",
+          1, # page number
+	  'rect' => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                 # clickable area
+	  'border' => [0, 0, $border],    # show border
+	  'color' => [$b_red, $b_green, $b_blue], # border color
+          'fitr' => [0,0, 100,250], # new viewport
+	 );
 
 # restore color and do rest of line
 $text->fillcolor($normal_text_color);
-$text->text(" to go to Page 1 of another PDF document, windowed.");
+$text->text(" to go to Page 1 of another PDF document,");
+$text->translate(100,$y-20);
+$text->text(" windowed.");
 
+# -------------------
+$x = 100;
+$y = 400;
+$text->translate($x, $y);
+$text->text("As above, except using Named Destinations.");
+# ND's 'foo' and 'bar' are defined in 040_annotation and resulting PDF
+# these ND's are also usable directly from the command line (depending on
+# the OS and PDF Reader used)
+
+$x = 100;
+$y = 300;
+$text->translate($x, $y);
+$text->text("Click ");
+$x += $text->advancewidth("Click ");
+
+# x,y should be at LL corner of "here" (on baseline)
+$text->fillcolor($link_text_color);
+$text->text("here");
+$target_width = $text->advancewidth("here");
+
+$ann = $page->annotation();
+print "3C ann->pdfile with ND foo in 040, no fit\n";
+$ann->pdfile("resources/040_annotation.pdf",
+          'foo',
+	  'rect' => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                 # clickable area
+	  'border' => [0, 0, $border],    # show border
+	  'color' => [$b_red, $b_green, $b_blue], # border color
+	 );
+
+# restore color and do rest of line
+$text->fillcolor($normal_text_color);
+$text->text(" to go to full Page 2 of another PDF document.");
+
+# -------------------
+$x = 100;
+$y = 200;
+$text->translate($x, $y);
+$text->text("Click ");
+$x += $text->advancewidth("Click ");
+
+# x,y should be at LL corner of "here" (on baseline)
+$text->fillcolor($link_text_color);
+$text->text("here");
+$target_width = $text->advancewidth("here");
+
+$ann = $page->annotation();
+print "3D ann->pdf with ND bar in 040, fit xyz\n";
+$ann->pdf("resources/040_annotation.pdf",
+          'bar',
+	  'rect' => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                 # clickable area
+	  'border' => [0, 0, $border],    # show border
+	  'color' => [$b_red, $b_green, $b_blue], # border color
+          'xyz' => [ 100,300, 1.5 ],
+	 );
+
+# restore color and do rest of line
+$text->fillcolor($normal_text_color);
+$text->text(" to find Nemo on Page 2 of another PDF document.");
+
+# ===================== Page 4: launch local applications =====================
 # ---------- launch (default OS action) another file
 $page = $pdf->page();  # page 4
 $text = $page->text();
 $text->font($font, $font_size);
+
+# add a couple of externally visible named destinations
+# 'foo' is showing entire page 4
+print "4A foo ND defined\n";
+my $dest = PDF::Builder::NamedDestination->new($pdf);
+$dest->goto($page, 'xyz'=>[undef, undef, undef]);
+$pdf->named_destination('Dests', 'foo', $dest);
+# 'bar' is zoomed in on page 4
+print "4B bar ND defined\n";
+$dest = PDF::Builder::NamedDestination->new($pdf);
+$dest->goto($page, 'xyz'=>[50,700, 1.5]);
+$pdf->named_destination('Dests', 'bar', $dest);
 
 $x = 100;
 $y = 700;
@@ -246,14 +400,15 @@ $text->fillcolor($link_text_color);
 $text->text("here");
 $target_width = $text->advancewidth("here");
 
-$annotation = $page->annotation();
+print "4C launch sample.txt\n";
+$ann = $page->annotation();
 # method 'file' is still usable
-$annotation->launch("resources/sample.txt",
-	         -rect => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
-		                         # clickable area
-		 -border => [0, 0, $border],    # show border
-		 -color => [$b_red, $b_green, $b_blue], # border color
-		);
+$ann->launch("resources/sample.txt",
+	     'rect' => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                  # clickable area
+	     'border' => [0, 0, $border],    # show border
+	     'color' => [$b_red, $b_green, $b_blue], # border color
+	    );
 
 # restore color and do rest of line
 $text->fillcolor($normal_text_color);
@@ -263,6 +418,7 @@ $text->text(" to \"launch\" a .txt file.");
 $x = 100;
 $y = 500;
 
+print "4D file sample.txt\n";
 $text->translate($x, $y);
 
 # x,y should be at LL corner of full text (on baseline)
@@ -271,14 +427,14 @@ my $line_of_text = "Whole line is link with fancy border";
 $text->text($line_of_text);
 $target_width = $text->advancewidth($line_of_text);
 
-$annotation = $page->annotation();
+$ann = $page->annotation();
 # method 'file' is still usable
-$annotation->launch("resources/sample.txt",
-	         -rect => [$x-4, $y-7, $x+5+$target_width, $y-7+6+$font_size],
-		                         # clickable area
-		 -border => [0, 0, 3, [5,5]],    # show border (thick, dashed)
-		 -color => [1, 1, 0],            # yellow border color
-		);
+$ann->launch("resources/sample.txt",
+	     'rect' => [$x-4, $y-7, $x+5+$target_width, $y-7+6+$font_size],
+		                # clickable area
+	     'border' => [0, 0, 3, [5,5]],    # show border (thick, dashed)
+	     'color' => [1, 1, 0],            # yellow border color
+	    );
 
 # restore color 
 $text->fillcolor($normal_text_color);
@@ -295,11 +451,11 @@ if ($local_movie ne '' && -r $local_movie) {
   $movie_title =~ s#^.*/##;
   $movie_title =~ s#\.[^.]+$##;
 
-  $annotation->movie($local_movie, 'Movie',
-      -rect => [100,150, 400,300], # both click rectangle AND display area
-      -text => $movie_title,  # not sure where this is supposed to go!
-      -border => [0, 0, 2, [1,1]],
-      -color => [0, 1, 0]  # dashed bright green border
+  $ann->movie($local_movie, 'Movie',
+      'rect' => [100,150, 400,300], # both click rectangle AND display area
+      'text' => $movie_title,  # not sure where this is supposed to go!
+      'border' => [0, 0, 2, [1,1]],
+      'color' => [0, 1, 0]  # dashed bright green border
     );
 }
  

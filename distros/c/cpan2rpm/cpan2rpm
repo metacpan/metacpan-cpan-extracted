@@ -27,7 +27,7 @@ use File::Basename qw(dirname);
 use Getopt::Long;
 use Sys::Hostname;
 use vars qw($VERSION);
-$VERSION = "2.044";
+$VERSION = "2.045";
 
 my ($ME, $RPM, $TMPDIR, %RPMDIR, $CWD, %info, %meta, $ARGS, $VX);
 my $tarRE = q/\.(tar\.(g?z|bz2)|tgz|zip)$/;
@@ -105,7 +105,7 @@ sub init {
         # -- aggregate options
         "requires=s@"     => "packages required for installation",
         "provides=s@"     => "modules provided by the package",
-        "buildrequires=s@" => "packages required for building",
+        "buildrequires=s@"=> "packages required for building",
         "no-requires=s@"  => "suppresses generation of a set of reqs",
         "no-provides=s@"  => "suppresses generation of a set of provides",
         "source|s=s@"     => "specifies (multiple) sources to use",
@@ -399,6 +399,8 @@ sub get_meta {
 
     #   handle aggregate options
 
+    push @{ $info->{"buildrequires"} }, ($info->{"find-requires"} || "/usr/lib/rpm/perl.req");
+    push @{ $info->{"buildrequires"} }, ($info->{"find-provides"} || "/usr/lib/rpm/perl.prov");
     $info->{"$_-list"} = optagg($info) for @{$info->{"opts-agg"}};
     $info->{"define-list"} .= "";
     foreach (@{$info->{"define"}}) {
@@ -870,14 +872,14 @@ sub mk_spec {
         if $info->{PL} =~ /^Build/;
 
     if ($info->{"shadow-pure"}) {
-        # Force pure perl installs into first @INC slot
-        $info->{"make-maker"} .= sprintf("; %%{__perl} -pi -e '%s' Makefile",
-            q|s/^(INSTALL[PVS]\w+LIB =).*/$1 \$(INSTALLARCHLIB)/|
+        # Force installation toward beginning of @INC
+        $info->{"make-maker"} .= sprintf(" INSTALLDIRS=site; %%{__perl} -pi -e '%s' Makefile",
+            q|s/^(INSTALL\w+LIB =).*/$1 \$(INSTALLSITEARCH)/|
             );
 
         # Avoid man page conflicts with default
         $info->{"make-maker"} .= sprintf("; %%{__perl} -pi -e '%s' Makefile",
-            q|s,(INSTALLMAN3DIR =[^/]+)/.*,$1/man/man3,|
+            q|s,^(INSTALL\w*MAN3DIR =).*,$1 \$(INSTALLSITEMAN1DIR),|
             );
         }
 
@@ -2113,8 +2115,9 @@ By default, the system passes I<--clean> to F<rpmbuild>, thus removing the unpac
 
 =item B<--shadow-pure>
 
-Forces installation under F<installarchlib> even if the module is pure perl.  This is significant because it is first in the @INC search for module determination.  This will not do any good for modules with XS code or those that are already installed into an architecture dependent path.  This is most useful for those pure perl modules that come stock with the perl rpm itself (i.e. Test::Harness) but you wish to try another version without having to be forced to use "rpm --replacefiles" and destroying the old files.  Using this option will allow both versions of the module to be installed, but the new version will just mask the old version later in the @INC.  Additionally, the new man pages will mask the old man pages even though the man pages for both version will be installed.  This option should only be used as a last resort to install a module when "conflicts" errors occur on rpm installation such as the following: C<file from install of perl-Module-1.11-1 conflicts with file from package perl-5.x.x>
-User may be required to use --force (see below) in conjuction with this option to build a fresh rpm before attempting to --install again.
+Forces installation under F<installsitearch> which usually comes earliest in the @INC.  This may not do as much good for modules with XS code or those that are already installed into an architecture dependent path and are already first in the @INC.  This is most useful for those pure perl modules that come stock with the perl rpm itself (i.e. Test::Harness) but you wish to try another version without having to be forced to use "rpm --replacefiles" and destroying the old files.  Using this option will allow both versions of the module to be installed, but the new version will just mask the old version later in the @INC.  Additionally, the new man pages will attempt to be relocated to allow both versions to be installed.  This option is intended to be used to install a module when "conflicts" errors occur on rpm installation such as the following: C<file from install of perl-Module-1.11-1 conflicts with file from package perl-5.x.x>
+
+You may need to remove the previously-generated rpm or use --force (see below) in conjuction with this option to actually rebuild a fresh rpm before attempting to --install again.
 
 =item B<--force>
 

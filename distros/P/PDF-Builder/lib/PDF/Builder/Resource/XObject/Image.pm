@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject';
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 
@@ -51,7 +51,8 @@ Get the width (in points) of the image object.
 B<Note> that this function also has the ability to I<set> the width,
 by giving the new width (in points), but it appears that it never 
 worked correctly. The I<set> capability has been B<deprecated>, and 
-is scheduled to be removed some time after October, 2025. If you are
+may be removed soon, unless it is found to be needed for an E<lt>img>
+tag in C<column()>. If you are
 using the C<width()> method in some manner to I<set> the image width,
 please let us know, so we can plan to keep it enabled!
 
@@ -77,7 +78,8 @@ Get the height (in points) of the image object.
 B<Note> that this function also has the ability to I<set> the height,
 by giving the new height (in points), but it appears that it never 
 worked correctly. The I<set> capability has been B<deprecated>, and 
-is scheduled to be removed some time after October, 2025. If you are
+may be removed soon, unless it is found to be needed for an E<lt>img>
+tag in C<column()>. If you are
 using the C<height()> method in some manner to I<set> the image height,
 please let us know, so we can plan to keep it enabled!
 

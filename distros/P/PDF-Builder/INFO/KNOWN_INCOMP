@@ -21,6 +21,44 @@ PDF::API2 if you have a package or library intended to run on both!
 
 ============================================================================
 
+3.028     2025-12-31
+
+   PDF::API2 has a number of optional arguments to various methods that are
+     not the preferred name found in PDF::Builder. We will attempt to provide
+     the PDF::API2 option names as an alternative. Please report as a GitHub
+     bug any optional argument names you find that are valid in PDF::API2 but
+     not in PDF::Builder.
+
+   PDF::API2 from time to time changes method names. PDF::Builder has either
+     adopted the new names (and kept the old ones as alternatives), or allows
+     the new name as an alias (alternative) for a method. Please report as a
+     GitHub bug any method names you find that are valid in PDF::API2 but are
+     not recognized in PDF::Builder.
+
+   PDF::API also appears to support a number of options with "dashed" names
+     (at least, in the "Lite" subsystem, and possibly elsewhere) to the
+     exclusion of "undashed" names (e.g., '-afmfile' in the "Lite"
+     subsystem). PDF::Builder has changed all option names to undashed
+     (unhyphened) forms, but silently accepts legacy dashed versions.
+
+3.027     2025-04-18
+
+   A while back, PDF::API2's Content.pm was modified to return the color just
+     set for strokecolor/stroke_color and fillcolor/fill_color (as an RGB list).
+     I have chosen to retain these methods returning '$self', so that they may
+     be chained if desired, rather than returning the same color you just gave 
+     them, which doesn't seem all that useful.
+
+   PDF::API2 formerly (and PDF::Builder still does) define "fit" (destination)
+     elements as hash elements (e.g., 'fitb'=> 1) for NamedDestination,
+     Outline, selected Annotation entries, and startup preferences; while it 
+     now names the destination as a location string (e.g., 'fitb') and an 
+     array of data (e.g., [ 1 ]). Staying with the old system permits the 
+     continued use an options hash, which PDF::API2 no longer supports.
+
+   PDF::API2::Outline's destination() is NOT the same as PDF::Builder::Outline's
+     dest(). They have different argument lists.
+
 3.024     2022-09-12
 
    PDF::API2 now initializes page display to a fairly tightly zoomed-in
@@ -29,13 +67,6 @@ PDF::API2 if you have a package or library intended to run on both!
 
    PDF::API2 added a bar code convenience function "barcode()", which is not
      in PDF::Builder. Something like this might be added in the future.
-
-   PDF::API2 formerly (and PDF::Builder still does) define "fit" (destination)
-     elements as hash elements (e.g., 'fitb'=> 1) for NamedDestination,
-     Outline, selected Annotation entries, and startup preferences; while it 
-     now names the destination as a location string (e.g., 'fitb') and an 
-     array of data (e.g., [ 1 ]). Staying with the old system permits the 
-     continued use an options hash, which PDF::API2 no longer supports.
 
    PDF::API2 allows a GIF version of 00 to 99, a to z, while PDF::Builder
      permits 00 to 99, a to b. I am not aware of any GIF versions other than

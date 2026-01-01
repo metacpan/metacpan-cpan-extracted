@@ -16,7 +16,7 @@ and issue the following command:
 
 Alternatively you can supply rpm with a url, like this:
 
-	rpm -Uvh http://somelocation/cpan2rpm*.rpm
+	yum install http://somelocation/cpan2rpm-...rpm
 
 If a package for your platform is not available, download the .src RPM
 and rebuild.  You can also simply download the tarball and rebuild it
@@ -26,21 +26,15 @@ like this:
 
 after which the resulting package will be located in
 
-	/usr/src/redhat/RPMS/<your-platform-here>
+	/usr/src/redhat/RPMS/noarch
 
 - NOTES & FIXES -
 
 1) cpan2rpm can fetch tarballs from URLs.  To do this it needs either LWP
 installed, or the HTTP::Lite module.  If neither of these is available, the
-system will try various external programs e.g. lynx, ncftp, etc.  You can
-get an RPM of HTTP::Lite from our web site (the source RPM is also
-available) but should the package not be available for your platform you
-can also bootstrap it like this (thanks to Jim Radford for this suggestion):
+system will try various external programs e.g. lynx, ncftp, etc.  Example:
 
-	./cpan2rpm  HTTP::Lite
-	rpm -Uvh .../HTTP-Lite-<version-release.arch>.rpm
-	./cpan2rpm cpan2rpm-1.49.tar.gz
-	rpm -Uvh .../cpan2rpm-1.49-1.noarch.rpm
+	./cpan2rpm --install https://cpan.metacpan.org/authors/id/N/NE/NEILB/HTTP-Lite-2.44.tar.gz
 
 2) To fix a problem with the rpm-build dependency generator, we've
 included the file perl.req.patch which may need be applied as root.
@@ -76,31 +70,18 @@ Note that whilst cpan2rpm will firts try other means of retrieval, if
 these fail (and they will when beind firewalls) wget will eventually
 get run, assuming it is installed on your system.
 
-6) If you are building on Redhat 9.0 and are experiencing weird
-problems with corrupt makefiles, please be aware there is a bug
-with the perl package shipped with that distribution.  The short
-answer is: do not set your LANG environment variable to UTF, the
-problem has something to do with UTF translations.  Do something
-like this:
-
-    # export LANG=en_US
-
-For more information see:
-
-    http://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=87682
 
 - DOCUMENTATION -
 
 For full documentation see the accompanying man page or refer to
 
-	http://perl.arix.com/cpan2rpm/
+	https://github.com/ekkis/cpan2rpm/
 
 - SUPPORT -
 
-For help and thank you notes, e-mail ecalder@cpan.org.  To review
-known issues, report a new bug, submit a patch, or add to the
-wishlist, please visit:
+For help, or to review known issues, report a new bug,
+submit a patch, or add to the wishlist, please visit:
 
-    http://rt.cpan.org/NoAuth/Bugs.html?Dist=cpan2rpm
+    https://github.com/ekkis/cpan2rpm/issues
 
 $Id: README,v 2.11 2004-03-12 22:21:31 ekkis Exp $

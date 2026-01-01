@@ -1,12 +1,12 @@
 package Parallel::Benchmark;
 use strict;
 use warnings;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Mouse;
 use Log::Minimal;
 use Time::HiRes qw/ tv_interval gettimeofday /;
-use Parallel::ForkManager "1.12";
+use Parallel::ForkManager 1.12;
 use Parallel::Scoreboard;
 use File::Temp qw/ tempdir /;
 use POSIX qw/ SIGUSR1 SIGUSR2 SIGTERM /;

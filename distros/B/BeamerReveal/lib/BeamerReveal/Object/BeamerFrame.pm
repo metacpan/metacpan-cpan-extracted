@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::Object::BeamerFrame;
-our $VERSION = '20251230.2042'; # VERSION
+our $VERSION = '20251231.1441'; # VERSION
 
 use parent 'BeamerReveal::Object';
 use Carp;
@@ -234,7 +234,7 @@ BeamerReveal::Object::BeamerFrame - BeamerFrame object
 
 =head1 VERSION
 
-version 20251230.2042
+version 20251231.1441
 
 =head1 SYNOPSIS
 

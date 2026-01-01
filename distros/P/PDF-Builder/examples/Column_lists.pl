@@ -6,7 +6,7 @@ use PDF::Builder;
 #use Data::Dumper; # for debugging
 # $Data::Dumper::Sortkeys = 1; # hash keys in sorted order
 
-our $VERSION = '3.027'; # VERSION
+our $VERSION = '3.028'; # VERSION
 our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 #my $pdf = PDF::Builder->new();
@@ -132,7 +132,7 @@ restore_props($text, $grfx);
 ($rc, $next_y, $unused) =
     $text->column($page, $text, $grfx, 'html', $content, 
 	          'rect'=>[50,750, 500,300], 'outline'=>$magenta, 
-		  'marker_width'=>10, 'marker_gap'=>4,
+		  'marker_width'=>8, 'marker_gap'=>4,
 		  'para'=>[ 0, 0 ] );
 if ($rc) {
     print STDERR "list example overflowed column!\n";
@@ -261,29 +261,29 @@ $grfx = $page->gfx();
 
 $content = <<"END_OF_CONTENT";
 <h2>Extended functionality of list-style-position</h2>
-<h3>Indented 60% from 'inside' to 'outside'</h3>
-<ul style="list-style-position: 60%;">
+<h3>Indented 70% from 'inside' to 'outside'</h3>
+<ul style="list-style-position: 70%;">
   <li>This is going to show that continuation line(s) of a list item are
-  positioned partially "inside" 60% of the way, which we are explicitly giving in CSS.</li>
+  positioned partially "inside" 70% of the way, which we are explicitly giving in CSS.</li>
   <li>Again, this is going to show that continuation line(s) of a list item are
   positioned partially "inside", which we are explicitly giving in CSS.
-  <ul style="list-style-position: 60%;">
+  <ul style="list-style-position: 70%;">
     <li>This is going to show that continuation line(s) of a list item are
-    positioned "inside" 60% of the way, which we are explicitly giving in CSS.</li>
+    positioned "inside" 70% of the way, which we are explicitly giving in CSS.</li>
     <li>Again, this is going to show that continuation line(s) of a list item are
     positioned partially "inside", which we are explicitly giving in CSS.</li>
   </ul></li>
 </ul>
 
-<h3>Indented 12pt from 'inside'</h3>
-<ul style="list-style-position: 12pt;">
+<h3>Indented 11pt from 'inside'</h3>
+<ul style="list-style-position: 11pt;">
   <li>This is going to show that continuation line(s) of a list item are
-  positioned partially "inside" 12 points in, which we are explicitly giving in CSS.</li>
+  positioned partially "inside" 11 points in, which we are explicitly giving in CSS.</li>
   <li>Again, this is going to show that continuation line(s) of a list item are
   positioned partially "inside", which we are explicitly giving in CSS.
-  <ul style="list-style-position: 12pt;">
+  <ul style="list-style-position: 11pt;">
     <li>This is going to show that continuation line(s) of a list item are
-    positioned partially "inside" 12 points in, which we are explicitly giving in CSS.</li>
+    positioned partially "inside" 11 points in, which we are explicitly giving in CSS.</li>
     <li>Again, this is going to show that continuation line(s) of a list item are
     positioned partially "inside", which we are explicitly giving in CSS.</li>
   </ul></li>
@@ -360,7 +360,9 @@ restore_props($text, $grfx);
 ($rc, $next_y, $unused) =
     $text->column($page, $text, $grfx, 'html', $content, 
 	          'rect'=>[50,750, 500,425], 'outline'=>$magenta, 
-		  'para'=>[ 0, 0 ] );
+		  'para'=>[ 0, 0 ],
+	          'marker_width'=>1.5*$fs,
+	         );
 if ($rc) {
     print STDERR "reversed list example overflowed column!\n";
 }
@@ -380,7 +382,9 @@ restore_props($text, $grfx);
 ($rc, $next_y, $unused) =
     $text->column($page, $text, $grfx, 'md1', $content, 
 	          'rect'=>[50,275, 500,100], 'outline'=>$magenta, 
-		  'para'=>[ 0, 0 ] );
+		  'para'=>[ 0, 0 ],
+	          'marker_width'=>1.5*$fs,
+	         );
 if ($rc) { 
     print STDERR "Markdown CSS example overflowed column!\n";
 }
@@ -401,7 +405,8 @@ restore_props($text, $grfx);
     $text->column($page, $text, $grfx, 'md1', $content, 
 	          'rect'=>[50,165, 500,100], 'outline'=>$magenta, 
 		  'para'=>[ 0, 0 ],
-	          'style'=>"
+	          'marker_width'=>1.5*$fs,
+		  'style'=>"
         ol { _marker-before: '(' ; _marker-after: ')' ; }
         li { margin-top: 0; margin-bottom: 0 } 
         h2 { color: green; }
@@ -617,6 +622,7 @@ if ($top_depth < $entire_depth) {
         $text->column($page, $text, $grfx, 'pre', $unused, 
  	              'rect'=>[50,750-$top_depth-10, 
 			       500,$entire_depth-$top_depth], 
+		      
 		      'outline'=>$magenta, 'para'=>[ 0, 2 ],
 	     );
 

@@ -1,5 +1,317 @@
 See also INFO/Changes_2023 for earlier version 3 release logs.
 
+3.028     2025-12-31 
+* = work in progress
+
+  ==== New features
+
+    lib/PDF/Builder/Content/Text.pm, examples/Column.pl
+      The 'align' attribute has been added to the <hr> tag to 'left', 'center' 
+      (default), or 'right' align a rule which is less than the full width of
+      the column. This brings <hr> (and equivalent Markdown) in column() into
+      compliance with standard HTML behavior. You may of course add CSS to left
+      align <hr>s if you desire.
+
+    lib/PDF/Builder/Content/Text.pm, examples/Column.pl
+     <code> HTML tag now supported, using Courier (fixed pitch font) at 85%
+      of font-size. This will reduce the number of warnings in the Column* 
+      examples.
+
+    lib/PDF/Builder/Content/Text.pm, examples/Column.pl
+     Add checks for valid (supported) CSS property names. Clarify that the 
+      warning message for the invalid tag <glotz> is a test and is expected and 
+      normal, and likewise the warnings for CSS properties 'snork' and 'snuck' 
+      are tests that are expected and normal. Ref #235.
+
+    lib/PDF/Builder/Content/Text-Column_docs.pm
+     Additional length units for CSS values in column(). In addition to pt and
+      % of current font size; em (= font size), en (= 1/2 font size), ex (= 1/2
+      font size), in (inches), cm, mm, and px (assume 78dpi display) are added.
+      Negative values are now allowed, although negative margins are NOT yet
+      fully supported. Future plans are for 'ex' to use the actual font 
+      x-height, if available, and for some way to specify the screen resolution 
+      (dpi) for px.
+
+    lib/PDF/Builder/Content/Text.pm
+     For Markdown (md1), if extra blank lines between list items, Text::Markdown
+      produces paragraphs within list items. Suppress paragraphs within lists.
+
+    lib/PDF/Builder/Content/Text-Column_docs.pm
+     Reduce heading (h1..h6) top margins, and bottom margins by somewhat more, 
+      to give a more balanced appearance and consume less vertical space.
+       h1 (200% font size) top/bottom margins 75%/75%   -> 40%/30%
+       h2 (150% font size) top/bottom margins 100%/100% -> 54%/40%
+       h3 (115% font size) top/bottom margins 130%/130% -> 68%/51%
+       h4 (100% font size) top/bottom margins 150%/150% -> 82%/61%
+       h5 (85% font size)  top/bottom margins 175%/175% -> 95%/71%
+       h6 (75% font size)  top/bottom margins 200%/200% -> 106%/80%
+      These are the default values. You are free to change them in CSS if you
+      find a different balance more pleasing to you.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Docs.pm, Version, Makefile.PL
+     Prepare for 3.028 release. Minimum Perl version remains at 5.28.
+
++------------------------------------------------------------------------------+
+| C A U T I O N -- Cross reference work is not 100% complete. It does not      |
+|   handle multiple-pass (for forward references) yet. We hope to have that    |
+|   feature out to GitHub soon, and definitely in the following release        |
+|   (3.029). Meanwhile, backwards references and fully-defined target texts are|
+|   properly  handled (in a single pass). You should set the maximum number of |
+|   passes to 1 to prevent problems due to multiple passes in the current code.|
++------------------------------------------------------------------------------+
+*   lib/PDF/Builder.pm, lib/PDF/Builder/Content/Text.pm, 
+      lib/PDF/Builder/Docs.pm, MANIFEST, examples/Column_xrefs.pl (new), 
+      examples/Column_md_xrefs.pl (new), examples/README, 
+      examples/examples.output, tools/3_examples.pl, INFO/SPONSORS
+     Add cross references to column() to add internal (within a document) and 
+      external links to another document, both to a specific target point (by
+      id) or a physical page number or a named destination.
+      <a href="#pgno-x-y-zoom">link title</a> existing internal PDF link
+              "ePDF#pgno-x-y-zoom"  new ext link to another PDF
+              "#pgno"            new int link in doc, default fit
+              "ePDF#pgno"        new ext link to another PDF
+              "url"              existing link to browser URL (start with p://)
+              "id" or "#id"      new (int or ext) link to doc by id
+                                 may have optional leading # *unless* the id
+                                   is all digits (numeric)
+              "##nameddest"      new int link to a ND
+              "ePDF##nameddest"  new ext link to ND in another doc
+      "ePDF" is a path (usually relative) to a PDF document.
+      For native Markdown, [link text](href string). As an *alternative*, the 
+      new extended HTML tag may be given in either HTML or Markdown:
+        <_ref tgtid="href" title="link title" fit="fit info">
+      but <a href="href"> also works, and is produced by Markdown links.
+
+      If no convenient HTML or Markdown tag is available with an id to link
+      to, a reference target extended HTML tag is provided:
+        <_reft id="unique id" title="optional link title fallback">.
+      As described below, any child text for a tag may contain {#idname} to
+      define an "id" for its parent Markdown tag.
+
+      Work sponsored by Amtivo Group. Future plans call for extension of this
+      functionality to generate Tables of Contents, Lists of Figures/Tables/
+      Equations, etc., indexes, glossaries, bibliographies, footnotes/chapter
+      notes/endnotes, etc.
+
+      This is an improvement over the existing <a href= > method, because it
+      can also handle external PDF files and Named Destinations, and can 
+      determine the page and location of the target (rather than requiring the 
+      author to manually enter this information into the "href" field) using
+      multiple passes over the text source. 
+
+      "link title" may be given in the <a> tag's child text (before </a>). If 
+      missing (empty or blank), use any link title given in the target, and if 
+      that is also missing, use any target child text (such as a heading's 
+      text). For HTML markup, title="link title text" may be given, to override
+      use of the tag's child text. In either HTML or Markdown, {^title text}
+      may optionally be given in the tag's child text.
+
+      "fit" is PDF target page fit, consisting of the type, followed by any 
+      parameters. E.g., 'xyz,200,400,1.5' for a window on the page at 200,400 
+      with 150% scale; or 'fit' to fit the entire page in the viewer. In HTML
+      markup, fit="fitv,200" attribute may be given. In either HTML or Markdown,
+      {%fitv,200} in the tag's child text (link text) may be given.
+
+      The Markdown specification permits an id to be defined in a heading 
+      (#...) entry by appending {#id-name} to the heading text. Although 
+      Text::Markdown does not natively support this, Builder has been extended
+      to look for such a substring, and to pull it out into an id= attribute. 
+      It is further extended to look for such an id definition in any tag with
+      child text, such as <p>, <i>, <blockquote>, etc. Note that most HTML tags 
+      can already explicitly receive an id= attribute, so this is intended 
+      primarily for Markdown usage.
+
+      Markdown specifies a way to get an HTML title= attribute in links:
+      [link text](url hover-title-text) but at this time it does not seem to
+      be useful for PDF purposes, and is ignored. {#id-name} (to define an ID)
+      has been extended with additional fields such as %fit and ^title (e.g., 
+      {$myid}{%myfit}{^mytitle}) so that Markdown usage has all the 
+      capabilities of HTML usage.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Docs.pm, 
+      lib/PDF/Builder/Content/Text.pm, 
+      lib/PDF/Builder/Content/Column_docs.pm (new), MANIFEST
+     Move POD cocerning the use of column() and related routines to one place, 
+      for easier reference and updating it.
+
+    lib/PDF/Builder/Resource/CIDFont.pm, 
+      lib/PDF/Builder/Resource/CIDFont/TrueType-CJKFont.pm
+     Make a start at updating POD to try to document many font-related
+      utility routines, especially for TTFs (TrueType).
+
+    lib/PDF/Builder/Content.pm, lib/PDF/Builder/Content/Text.pm,
+      examples/ContentText.pl
+      The section()/paragraphs() method is updated to permit a negative 
+      'pvgap' value. The |pvgap| value is still used to add additional vertical 
+      space between paragraphs, but if negative, no space is added after the 
+      last paragraph in the section(). The ContentText example is updated.
+
+    examples/Content.pl, examples/ContentText.pl
+     Update to change old-style -name options to 'name'.
+
+    META.json, META.yml, devtools/PDFBuild.pl
+     Add "provides" section to build description.
+
+    SECURITY.md (new), MANIFEST
+     Although, given its nature, it is unlikely that there are any potential 
+      security vulnerabilities in PDF::Builder, all package providers and 
+      maintainers have been asked to provide a standardized guide for 
+      reporting suspected security-related problems.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Resource/CIDFont/TrueType/FontFile.pm,
+      lib/PDF/Builder/FontManager.pm
+     Per PDF::API2 PR#92, contributed by Johan Vromans, add the ability to 
+      pass in an already-existing TTF/OTF font object (Font::TTF::Font) to 
+      ttfont() and font(). This is useful if you already have such an object, 
+      such as already read-in as an embedded font or built on-the-fly, rather 
+      than having to write out a TTF font file and read it back in via ttfont().
+      It is also expected to prove useful for future TTC (TrueType Collection) 
+      support. The ability to register such a font object in FontManager
+      (object as a "file name") has been added.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/FontManager.pm, 
+      lib/PDF/Builder/Content/Text.pm, examples/Column-Column_lists.pl
+     Fix inconsistency in no longer supporting the use of a preloaded font
+      before the column() call being used as the current body font. You may
+       * option 'font_info'=>'-ext-' says that user code has ALREADY loaded a 
+         font (either by Builder primitives or through FontManager), and to use
+         that (font-family named '-external-) as the body font. If there is no 
+         preloaded font, use the FontManager default (core Times-Roman).
+       * default (or option 'font_info'=>'-fm-') load the FontManager
+         default font (core Times-Roman) as the body font.
+       * option 'font_info'=>'face:style:weight:color' says to load as the 
+         current font a 'face' KNOWN TO FontManager, with optional specification
+         of the style and weight (default both normal) and color (unchanged).
+         - style: 0/normal (default) = unitalicized, 1/italic = italicized
+         - weight: 0/normal (default) = normal weight, 1/bold = bold weight
+         - color: named color or gray value 0 to 1. defaults to current color
+      There are several ways of overriding the column() call's specified font 
+      (whether set by default or via 'font_info').
+       * in the column() call, use option 
+         'style'=>'body { font-family: face; font-style =... }' CSS to
+         override anything else. 
+       * in Markdown or HTML source, add a <style> tag at the beginning, to
+         specify CSS to set the body's font-family.
+
+      In all cases, the font-family etc. must be KNOWN to FontManager (i.e., 
+      add_font() the new face if not a core default), except for an external
+      font (font_info -ext-), which can be from any source. However, keep in 
+      mind that column() can NOT switch to and from italic or bold if an 
+      -external- font is being used, as it does NOT know the font-family and 
+      FontManager face, and thus how to get to the italic or bold face.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Content/Text.pm
+     'arabic' is permitted as a synonym for 'decimal' numbering (1,2,3...)
+      for both page labels ($pdf->page_labels) and ordered lists in column()
+      (CSS list-style-type). Ref PDF::API2#40.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/NamedDestination-Annotation-Docs.pm, 
+      examples/040_annotation-042_links, examples/resources/040_annotation.pdf,
+      examples/NamedDest.pl (new), examples/examples.output, examples/README,
+      t/named-destinations.t, MANIFEST, tools/3_examples.pl
+     Update documentation and examples to demonstrate use of Named Destinations,
+      per #202. 040_annotation had two Named Destinations added on page 2 
+      ('foo' whole page and 'bar' zoomed in) and the resources copy of the PDF 
+      was updated (referred to by 042_links). 042_links had two Named 
+      Destinations added on page 4 ('foo' whole page and 'bar' zoomed in), as 
+      well as links demonstrating the four Named Destination examples. Many
+      thanks to @sciurius for his help on figuring out ND's!
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Resource/Font/CoreFont.pm,
+      lib/PDF/Builder/FontManager.pm, lib/PDF/Builder/Docs.pm, 
+      t/font-corefont.t, examples/020_corefonts
+     Per API2 contribution by Johan Vromans (PR #76), add two functions listing 
+      and checking core fonts. For PDF::Builder, added ability to select normal 
+      core set (default), or add the 15 Windows core font extension. In
+      FontManager, always load the Windows core fonts -- can still produce a
+      document even if it can't be displayed on a non-Windows platform. In
+      contrast, in examples/020_corefonts, output Windows core fonts only if
+      running on Windows, as the intent is to be able to display them.
+
+    lib/PDF/Builder/Content.pm
+     Per change in PDF::API2, add to description of endpath/end method.
+
+  ==== Bug fixes
+
+    Makefile.PL, INFO/DEPRECATED
+     Add installation-time reminder to check DEPRECATED for anything scheduled
+      to be removed, including dashed option names (to be unsupported starting
+      with release 3.030 or later).
+
+    lib/PDF/Builder/Content/Text-Column_docs.pm
+     Since the introduction, the CSS property 'text-height' has been used for
+     the unitless multiplier of font size to get the line-to-line spacing. This
+     has been corrected to the name 'line-height'. 'text-height' will be allowed
+     for an alias or synonym for 'line-height' for releases 3.028 and 3.029, but
+     will be removed as early as release 3.030, so plan accordingly.
+
+    lib/PDF/Builder/Content/Text.pm
+     Fix loss of heading margin top after horizontal rule at top of page.
+
+    t/svg.t
+     Remove section of comparison that included 'gray' color as RGB. The old
+      SVGPDF library used 3 x 0x7F, while the new one uses a different color
+      library which defines gray as 3 x 0x80. This change allows testing with
+      either the old or the new version of SVGPDF. Re #237.
+
+    lib/PDF/Builder/Content/Text.pm
+     Fixed a code path where a paragraph top margin could be applied twice,
+      resulting in excessive space between paragraphs or with headings.
+
+    lib/PDF/Builder/Docs.pm
+     Ref #231, explain that an externally produced PDF (from "Canva") was 
+      leaving the fill state as "transparent", and so any graphics fill or
+      text was disappearing. The solution is to use egstate() to reset fill
+      state to "opaque" (transparency to 0, see examples/060_transparency
+      and ticket #231).
+
+    lib/PDF/Builder/Content/Text.pm
+     When revising the baseline due to taller text, there was a miscalculation
+      of the length of the line, resulting in false reports of the line being
+      too long, and the baseline revision therefore not being performed.
+
+    lib/PDF/Builder.pm, lib/PDF/Page.pm
+     Ref #230, clarify POD (documentation) on what is returned when *setting*
+      values via default_page_size(), default_page_boundaries(), and
+      boundaries().
+
+    lib/PDF/Builder/Content/Text.pm
+     Fix problem with not consistently supporting the 'style' option in
+      column().
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Resource/CIDFont/TrueType.pm,
+      lib/PDF/Builder/Resource/CIDFont/TrueType/FontFile.pm
+     Some cleanup related to API2's change from -noembed flag for TTF to
+      -embed (-'s are optional, preferably omitted). 'embed' option now works.
+      Per PDF::API2 #90 and possibly PDF::Builder #222. 
+       Aside: the data structure in a TTF file is 'noembed', so presumably the 
+       ttfont() option was originally named 'noembed' too (default 0/false), 
+       but recently changed to 'embed' (default 1/true) as being more 
+       straightforward for coders. 
+      'noembed' is still valid, although it is ignored if 'embed' is also given.
+      Note that #222 is not fully resolved. Although the size of 'noembed' <
+       size of 'subset' (default) < size of 'nosubset' (full font embed), it
+       appears that there is still some extra font-related material (such as
+       a full CMap?) in the noembed and subset usages. This still needs to be
+       looked at.
+
+    lib/PDF/Builder/Resource/Font/CoreFont/symbol.pm
+     While thinking about an implementation of #56 (fallback glyphs), I took
+      a deep look at the Symbol core font (for the eventual purpose of adding
+      the Greek alphabet to the TrueType fonts that lack it), using a glyph 
+      fallback mechanism. I added some notes in the code on what is the 
+      "regular" form of a given Greek letter, and what is the "variant" form 
+      (suffixed with "1", except that "sigma1" is the terminal form of sigma). 
+      It appears that Symbol swapped the two forms of "phi". What it calls 
+      "regular" phi (0x66) should be called the "variant" form, and what it 
+      calls "variant" phi ('phi1', 0x6A) is really the regular form. As the 
+      order of the alphabet is so scrambled, hopefully no one is simply using 
+      it "in order", but instead carefully picking each letter!
+
+    lib/PDF/Builder/Basic/PDF/File.pm
+     Per #198, add 0 to object numbers when read in, to ensure that they are
+      seen as decimal numbers, and not misinterpreted as octal values.
+
 3.027     2025-04-18
 
   ==== New features

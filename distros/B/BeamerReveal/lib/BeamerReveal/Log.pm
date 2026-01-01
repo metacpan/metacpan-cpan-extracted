@@ -3,17 +3,14 @@
 
 
 package BeamerReveal::Log;
-our $VERSION = '20251230.2042'; # VERSION
+our $VERSION = '20251231.1441'; # VERSION
 
 use parent 'Exporter';
 use Carp;
 
-use BeamerReveal::Log::Win32;
 use BeamerReveal::Log::Ansi;
 
 use IO::File;
-
-our $is_win = ( $^O eq 'MSWin32' );
 
 our $logger;
 
@@ -32,16 +29,11 @@ sub new {
     and exists $args->{labelsize}
     and exists $args->{activitysize}
     or die( "Error: missing argument to (child of) BeamerReveal::Log::new()\n" );
-  my $self;
-  if( $is_win ) {
-    $self = BeamerReveal::Log::Win32->new( %$args );
-  }
-  else {
-    $self = BeamerReveal::Log::Ansi->new( %$args );
-  }
+  my $self = BeamerReveal::Log::Ansi->new( %$args );
+
   $self->{tasks} = [];
 
-  $self->{termwidth} = $self->terminal_width() - 2;
+  $self->{termwidth} = $self->_terminal_width() - 2;
   $self->{extra} = ' ';
   $self->{barsize} = $self->{termwidth} - $self->{labelsize} - $self->{activitysize} - 12;
   
@@ -127,24 +119,6 @@ sub _bar_line {
 		);
 }
 
-sub terminal_width {
-    # Win32 native backend
-    if (defined $backend && $backend eq 'win32' && defined $WCON) {
-        my ($cols, $rows) = $WCON->Size();
-        return $cols if $cols;
-    }
-
-    # Cross-platform fallback
-    eval {
-        require Term::ReadKey;
-        my ($cols, $rows) = Term::ReadKey::GetTerminalSize();
-        return $cols if $cols;
-    };
-
-    # Last resort
-    return 80;
-}
-
 sub _formatLines {
   my ( $linearrayref, $width, $extra ) = @_;
   $extra ||= '';
@@ -177,7 +151,7 @@ BeamerReveal::Log - Log
 
 =head1 VERSION
 
-version 20251230.2042
+version 20251231.1441
 
 =head1 SYNOPSIS
 

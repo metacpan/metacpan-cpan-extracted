@@ -3,13 +3,16 @@ package PDF::Builder::Docs;
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 # originally part of Builder.pm, it was split out due to its length
 #
 # WARNING: be sure to keep in synch with changes to POD elsewhere, especially
 #   for column() markup! (also list in #195 and in Content::Text)
+#
+#   do not attempt to use Unicode entities, such as E<euro> -- the POD to
+#   HTML converter will barf on them!
 
 =head1 NAME
 
@@ -30,6 +33,12 @@ Simply installing PDF::Builder as a prerequisite for running some other
 package. All you need to do is install the CPAN package for PDF::Builder, and
 it will load the .pm files into your Perl library. If the other package prereqs
 PDF::Builder, its installer may download and install PDF::Builder automatically.
+
+Note that PDF::Builder has a number of I<optional> prerequisites. It will
+happily install and run without them, but advanced functionality (possibly
+including that needed by another package) will B<not> be available unless you
+manually install the desired packages. See L</Optional Libraries> or the 
+C<README> file for the list of optional packages.
 
 =item 2.
 
@@ -73,11 +82,19 @@ help out and expand PDF::Builder.
 
 PDF::Builder can make use of some optional libraries, which are not I<required>
 for a successful installation. If you want improved speed and capabilities for
-certain functions, you may want to install and use these libraries:
+certain functions, you may want to install and use these libraries. 
+PDF::Builder's C<README> file lists the minimum versions needed, and 
+C<INFO/Prereq_fixes> lists known updates needed for some.
 
 =over
 
-=item * 
+=item *
+
+Perl::Critic
+
+Needed if running C<tools/1_pc.pl> to check the library content.
+
+=item *
 
 Graphics::TIFF
 
@@ -140,6 +157,13 @@ https://www.catskilltech.com/FreeSW/product/PDF-Builder/title/PDF%3A%3ABuilder/f
 under the "Documentation" link. This online documentation is updated at 
 every CPAN release, but not necessarily when the GitHub repository is updated.
 
+=item *
+
+SVGPDF
+
+This library is used to convert SVG image files into PDF primitives, so SVG
+images may be included in a PDF.
+
 =back
 
 Note that the installation process will B<not> attempt to install these 
@@ -183,6 +207,84 @@ will need to be aware of what encoding your text strings are (in the Perl string
 and for declaring output glyph generation).
 See L</Core Fonts>, L</PS Fonts> and L</TrueType Fonts> in L</FONT METHODS> 
 for additional information.
+
+=head2 Supported Perl Versions
+
+PDF::Builder intends to support all major Perl versions that were released in
+the past six years, plus one, in order to continue working for the life of
+most long-term-stable (LTS) server distributions.
+See the L<https://www.cpan.org/src/> table 
+B<First release in each branch of Perl> x.xxxx0 "Major" release dates.
+
+For example, a version of PDF::Builder released on 2018-06-05 would support 
+the last major version of Perl released I<on or after> 2012-06-05 (5.18), and 
+then one before that, which would be 5.16. Alternatively, the last major 
+version of Perl released I<before> 2012-06-05 is 5.16.
+
+The intent is to avoid expending unnecessary effort in supporting very old
+(obsolete) versions of Perl.
+
+=head3 Anticipated Support Cutoff Dates
+
+B<Note> that these are I<not> hard and fast dates. In particular, we develop
+on Strawberry Perl, which sometimes falls a little behind the official Perl
+release!
+
+Also, due to user requests to allow I<new> releases of PDF::Builder to run on 
+earlier versions of Perl, we will try to stretch the lifetime of earlier Perl 
+versions. Eventually, some older Perl versions will have to be dropped if and 
+when we start making use of newer Perl operators and constructs. Nevertheless,
+it is still I<not> a good idea to continue to use very old Perl versions that 
+are beyond their support cutoff dates -- they become vulnerable to security 
+attacks, and bugs do not get fixed.
+
+=over
+
+=item * 
+
+5.28 current minimum supported version. Out of support, so use at your own risk.
+
+=item * 
+
+5.30 future minimum supported version, until next PDF::Builder release after 20 June, 2026.
+
+=item * 
+
+5.32 future minimum supported version, until next PDF::Builder release after 20 May, 2027.
+
+=item * 
+
+5.34 not released under Strawberry Perl, expected to be skipped
+
+=item * 
+
+5.36 future minimum supported version, until next PDF::Builder release after 28 May, 2028. This is currently our primary development version.
+
+=item * 
+
+5.38 future minimum supported version, until next PDF::Builder release after 02 Jul, 2029.
+
+=item * 
+
+5.40 future minimum supported version, until next PDF::Builder release after 09 June, 2030. This is currently the maximum tested version.
+
+=item * 
+
+5.42 future minimum supported version, until next PDF::Builder release after 03 July, 2031.
+
+=back
+
+If you need to use this module on a server with an extremely out-of-date version
+of Perl, consider using either plenv or Perlbrew to run a newer version of Perl
+without needing admin privileges.
+
+On the other hand, any feature in PDF::Builder should continue to work 
+unchanged for the life of most long-term-stable (LTS) server distributions.
+Their lifetime is usually about six (6) years. Note that this does B<not>
+constitute a statement of warranty, but that we I<intend> to try to keep any
+particular release of PDF::Builder working for a period of years. Of course,
+it helps if you periodically update your Perl installation to something
+released in the recent past.
 
 =head3 Some Internal Details
 
@@ -267,6 +369,7 @@ hopefully illustrate the issue:
  my $page = $pdf->page();
  # adjust path for your operating system
  my $fontTR = $pdf->ttfont('C:\\Windows\\Fonts\\timesbd.ttf');
+    # or 'C:/Windows/Fonts/timesbd.ttf' will also work on Windows
 
 For the first group, you might expect the "under" line to be output, then the
 filled circle (disc) partly covering it, then the "over" line covering the
@@ -526,6 +629,8 @@ settings.
  # write a huge amount of stuff to $grfx1
  # write a huge amount of stuff to $grfx2, picking up where $grfx1 left off
 
+=head3 Rendering with a shared (mixed) object
+
 In any case, now that you understand the rendering order and how the order
 of object declarations affects it, how text and graphics are drawn can now be
 completely controlled as desired. There is really no need to add another "both"
@@ -542,6 +647,31 @@ temporarily exiting (ET) to graphics mode to draw the lines, and then returning
 (BT) to text mode. This was done so that baseline coordinate adjustments could
 be easily made. Since "BT" resets some text settings, this needs to be done
 with care!
+
+A number of PDF-producing products out there mix their text and graphics into a
+single object. So long as PDF::Builder is I<not> expecting to pick apart a 
+"text" or "graphics" stream from an existing PDF file, in order to look inside
+it, this should not be expected to cause any problems. However, if you add a
+new text-only or graphics-only object to an existing PDF via PDF::Builder, you
+need to be aware of the rendering order. Presumably the new object(s) will be
+I<after> the original one, but you should be aware of what's going on. A text,
+graphics, or mixed object is all the same to a PDF reader, which cares only 
+for who has the lower object number (to be rendered first).
+
+=head3 Graphics state left by existing PDFs
+
+There was a problem recently reported (ticket 231) which suggested that the 
+expected rendering order of output wasn't being respected. What it turned out
+to be was that a utility ("Canva") used to generate a template PDF, was writing 
+graphics commands to a single stream (a mixed graphics and text stream, rather than 
+separate streams, but that's not important here). Apparently it was leaving 
+the PDF it created with a graphics state of B<transparent> "fill" mode. Further
+text (as well as filled graphics draws) added by the user in PDF::Builder (open
+PDF, open_page, add graphics and text in new streams) was still being drawn, 
+but was made invisible when rendered! Remember that text is by default (render
+mode 0) drawn only with fill, not outlined. The solution was to first use the 
+C<egstate()> call to set transparency back to 0 (off), making "fill" opaque 
+again. See C<examples/060_transparency> for a code sample, or ticket 231.
 
 =head2 Notes on Reader support of features
 
@@ -665,10 +795,11 @@ Drop me a line if I've overlooked your contribution!
 
 B<Note:> older versions of this package named various (hash element) options
 with leading dashes (hyphens) in the name, e.g., '-encode'. The use of a dash
-is now optional, and options are documented with names I<not> using dashes. At
-some point in the future, it is possible that support for dashed names will be
-deprecated (and eventually withdrawn), so it would be good practice to start
-using undashed names in new and revised code.
+is now optional, and options are documented with names I<not> using dashes. 
+While the use of dashed option names is deprecated and discouraged, they will
+remain legal for some time to come. At some point in the future, it is possible 
+that support for dashed names will be withdrawn, so it would be good practice 
+to start using undashed names in new and revised code.
 
 =head2 After saving a file...
 
@@ -836,69 +967,99 @@ Print duplex by default and flip on the long edge of the sheet.
 
 These options are used for the C<firstpage> layout, as well as for 
 Annotations, Named Destinations and Outlines.
+For Annotations and Named Destinations, the first form given is for the
+fit as a hash element (option), while the second is as given as a list (before
+any options).
 
 =over
 
 =item 'fit' => 1
 
+=item 'fit'
+
 Display the page designated by C<$page>, with its contents magnified just
 enough to fit the entire page within the window both horizontally and
 vertically. If the required horizontal and vertical magnification
 factors are different, use the smaller of the two, centering the page
-within the window in the other dimension.
+within the window in the other dimension. Bottom line: the entire page is
+shown, as large as possible.
 
 =item 'fith' => $top
+
+=item 'fith', $top
 
 Display the page designated by C<$page>, with the vertical coordinate C<$top>
 positioned at the top edge of the window and the contents of the page
 magnified just enough to fit the entire width of the page within the
-window.
+window. Bottom line: like 'fit', but scrolled vertically to put desired y
+coordinate at the very top edge.
 
 =item 'fitv' => $left
+
+=item 'fitv', $left
 
 Display the page designated by C<$page>, with the horizontal coordinate
 C<$left> positioned at the left edge of the window and the contents of the
 page magnified just enough to fit the entire height of the page within
-the window.
+the window. Bottom line: like 'fit', but scrolled horizontally to put desired x
+coordinate at the very left edge.
 
 =item 'fitr' => [ $left, $bottom, $right, $top ]
+
+=item 'fitr', $left, $bottom, $right, $top
 
 Display the page designated by C<$page>, with its contents magnified just
 enough to fit the rectangle specified by the coordinates C<$left>, C<$bottom>,
 C<$right>, and C<$top> entirely within the window both horizontally and
 vertically. If the required horizontal and vertical magnification
 factors are different, use the smaller of the two, centering the
-rectangle within the window in the other dimension.
+rectangle within the window in the other dimension. Bottom line: defines a
+I<viewport> into the page by giving its corners. Cf. 'xyz', but all 4 corners
+of the viewport rectangle are given.
 
 =item 'fitb' => 1
+
+=item 'fitb'
 
 Display the page designated by C<$page>, with its contents magnified just
 enough to fit its bounding box entirely within the window both
 horizontally and vertically. If the required horizontal and vertical
 magnification factors are different, use the smaller of the two,
 centering the bounding box within the window in the other dimension.
+Similar to 'fit'.
 
 =item 'fitbh' => $top
+
+=item 'fitbh', $top
 
 Display the page designated by C<$page>, with the vertical coordinate C<$top>
 positioned at the top edge of the window and the contents of the page
 magnified just enough to fit the entire width of its bounding box
-within the window.
+within the window. Like 'fitb', but scrolled vertically so that C<$top> is
+at the top edge of the display.
 
 =item 'fitbv' => $left
+
+=item 'fitbv', $left
 
 Display the page designated by C<$page>, with the horizontal coordinate
 C<$left> positioned at the left edge of the window and the contents of the
 page magnified just enough to fit the entire height of its bounding
-box within the window.
+box within the window. Like 'fitb', but scrolled horizontally so that C<$left> 
+is at the left edge of the display.
 
 =item 'xyz' => [ $left, $top, $zoom ]
 
-Display the page designated by C<$page>, with the coordinates C<$[$left, $top]>
-positioned at the top-left corner of the window and the contents of
-the page magnified by the factor C<$zoom>. A zero (0) value for any of the
+=item 'xyz', $left, $top, $zoom
+
+Display the page designated by C<$page>, with the coordinates C<[$left, $top]>
+positioned at the B<top-left corner> of the viewport and the contents of
+the page B<magnified> by the factor C<$zoom>. An C<undef> value for any of the
 parameters C<$left>, C<$top>, or C<$zoom> specifies that the current value of 
-that parameter is to be retained unchanged.
+that parameter is to be retained unchanged. So, if you are viewing a page at
+a certain location and zoom factor, your new page should be positioned at the
+same x,y and be at the same zoom (if all three are C<undef>). Cf. 'fitr', but
+only one corner is given, along with the magnification.
 
 =back
 
@@ -1551,7 +1712,7 @@ Outlines/Bookmarks column is usually fairly narrow.
 
 These are the "built-in" fonts, in the sense that any PDF Reader is guaranteed
 to supply and support them. The I<metrics> for the supported fonts are 
-shipped with PDF::Builder, but not the fonts themeselves.
+shipped with PDF::Builder, but not the fonts themselves.
 
 Core fonts are limited to B<single byte encodings>. The default encoding for 
 the core fonts is WinAnsiEncoding (roughly the CP-1252/Windows-1252 superset of 
@@ -1569,6 +1730,15 @@ Gothic): Georgia [serif], Verdana [sans serif], and Trebuchet [sans serif] in
 I<usually> available on a Windows platform (but not guaranteed!). They are 
 usually not installed by default on Linux, Mac, and other non-Windows 
 platforms, so use caution if specifying these fonts.
+
+PDF::Builder I<does> supply the B<metrics> for the Windows core fonts (as well
+as the standard ones), so it should be possible to use PDF::Builder to
+generate documents (PDF files) containing these fonts, even if your platform
+may not be able to I<display> them. For instance, Font Manager will load the
+Windows core fonts on all platforms. It is up to the user to take care in
+selecting fonts, if they plan to be able to view documents using those fonts!
+On the other hand, the 020_corefonts example will not attempt to create listings
+of Windows core fonts unless it is run on a Windows platform.
 
 =head4 Examples
 
@@ -1594,7 +1764,7 @@ as well as being built into FontManager
 You B<cannot> use UTF-8 or other multibyte encodings with core fonts, I<only>
 single byte encodings (256 characters maximum). A PDF Reader simply does not
 know what to do with a multibyte character, and likely will render it as a
-sequence of single characters (producing garbage). Although most single-byte 
+sequence of single characters (producing gibberish). Although most single-byte 
 encodings, at least for European languages, are supported, it is possible that 
 you might encounter an encoding that includes a character I<not> found in a 
 given font file, or vice-versa (the font includes characters that the encoding 
@@ -1605,12 +1775,12 @@ does not give you access to).
 Do not confuse Unicode character points (such as given with an HTML entity) 
 with single byte values or multibyte characters. The only way to access a
 character defined for a given encoding is with a I<single> byte value in the 
-range 0 to 255. For example, if you can't directly type a "Euro" symbol, it is 
-C<\x80> in many encodings -- you would use that instead of the Unicode 
-C<\x{20AC}> code point or C<x\{E282AC}> UTF-8 byte string. It's a matter of 
-giving a single byte value that the PDF Reader can look up in its font 
-definition to get the desired glyph. If the "Euro" symbol is not found in the 
-encoding you're using, well, you're out of luck.
+range 0 to 255. For example, if you can't directly type a "Euro" symbol,
+it is C<\x80> in many encodings -- you would use that instead of the 
+Unicode C<\x{20AC}> code point or C<x\{E282AC}> UTF-8 byte string. It's a 
+matter of giving a single byte value that the PDF Reader can look up in its 
+font definition to get the desired glyph. If the "Euro" symbol is not 
+found in the encoding you're using, well, you're out of luck.
 
 =item *
 
@@ -1737,11 +1907,11 @@ as well as being capable of being loaded into FontManager
 You B<cannot> use UTF-8 or other multibyte encodings with PS fonts, I<only>
 single byte encodings (256 characters maximum). A PDF Reader (or Writer!) 
 simply does not know what to do with a multibyte character, and likely will 
-render it as a sequence of single characters (producing garbage). Although most 
-single-byte encodings, at least for European languages, are supported, it is 
-possible that you might encounter an encoding that includes a character I<not> 
-found in a given font file, or vice-versa (the font includes characters that 
-the encoding does not give you access to).
+render it as a sequence of single characters (producing gibberish). Although 
+most single-byte encodings, at least for European languages, are supported, it 
+is possible that you might encounter an encoding that includes a character 
+I<not> found in a given font file, or vice-versa (the font includes characters 
+that the encoding does not give you access to).
 
 =item *
 
@@ -2311,305 +2481,6 @@ Currently, C<textHS()> can only handle a single text string. We are looking at
 how fitting to a line length (splitting up an array) could be done, as well as 
 how words might be split on hard and soft hyphens. At some point, full paragraph
 and page shaping could be possible.
-
-=head2 MARKUP
-
-This section documents the markup capabilities of the C<column()> method.
-It is expected to be updated over time as more functionality is added.
-
-A certain flavor of I<Markdown> is supported, as translated by the 
-Text::Markdown package into HTML. That I<HTML> (and more, as direct input), 
-along with a subset of CSS, is 
-supported by C<column()>. This is I<not> the full Markdown or HTML languages, 
-by any stretch of the imagination, so check before using! Also, a small I<none> 
-markup which only does paragraphs (separated by empty lines) is provided.
-
-In all markup cases, certain CSS settings can be given as parameters or options
-to the C<column()> call, including a CSS <style> section which applies to both
-'none' and Markdown source input.
-
-=head3 Other input formats
-
-PDF::Builder currently only supports the markup languages described above.
-If you want to use something else (e.g., Perl's POD, or I<man> format, or even 
-MS Word or some other WYSIWYG format), you will need to find a converter 
-utility to convert it to a supported flavor of Markdown or HTML. Many such 
-converters already exist, so take a look (although you may well have to do some 
-cleanup before C<column()> accepts it). 
-
-Perhaps in the future, PDF::Builder will directly support additional formats, 
-but no promises. You will probably never see TeX/LaTeX input, as these already 
-have excellent PDF output (and would be a massive undertaking to process).
-
-=head3 Current HTML/Markdown supported
-
-=over
-
-=item * 
-
-B<<iE<gt>> and B<<emE<gt>> tags (Markdown B<_>, B<*>) as italic font style
-
-=item * 
-
-B<<bE<gt>> and B<<strongE<gt>> tags (Markdown B<**>) as bold font weight
-
-=item * 
-
-B<<pE<gt>> tag (Markdown empty line) as a paragraph
-
-=item * 
-
-B<<font face="font-family" color="color" size="font-size"E<gt>> as selecting face, color and size
-
-=item * 
-
-B<<spanE<gt>> needs style= attribute with CSS to do anything useful
-
-=item * 
-
-B<<ulE<gt>> tag (Markdown B<->) unordered (bulleted) list. type to override marker supported
-
-=item * 
-
-B<<olE<gt>> tag (Markdown B<1.>) ordered (numbered) list. start and type supported.
-
-=item *
-
-B<<_markerE<gt>> tag (I<not> standard HTML) provide a place to specify, on a
-I<per list item basis>, overrides to default marker settings (see C<_marker-*>
-CSS extensions below). If omitted, the same HTML list markers and CSS properties are used for each list item (per usual practice)
-
-=item * 
-
-B<<liE<gt>> tag list item. value to override ordered list counter, and type to override marker type supported
-
-=item * 
-
-B<<a href="URL"E<gt>> tag (Markdown B<[]()>) anchor/link, web page URL or this document target C<#p[-x-y[-z]]>
-
-=item * 
-
-B<<h1E<gt>> through B<<h6E<gt>> tags (Markdown B<#> through B<######>) headings
-
-=item * 
-
-B<<hr width="length" size="length"E<gt>> tag (Markdown B<--->) horizontal rule. currently no B<align> property (left alignment only). Default is C<width> = full column, and C<size> = 0.5pt.
-
-=item * 
-
-B<<sE<gt>>, B<<strikeE<gt>>, B<<delE<gt>> tags (Markdown B<~~>) text line-through
-
-=item * 
-
-B<<uE<gt>>, B<<insE<gt>> tags text underline
-
-=item * 
-
-B<<blockquoteE<gt>> tag (Markdown B<E<gt>>) indented both sides block of smaller text
-
-=item * 
-
-B<<_markerE<gt>> tag (non-standard) to explicitly set list marker properties (_marker-*) for one specific (immediately following) E<lt>liE<gt> list item
-
-=item * 
-
-B<<_moveE<gt>> tag (non-standard) to explicitly move current write point left or right. C<x="value"> is an absolute move (in points), while C<dx="value"> is a relative move
-
-=back
-
-I<Numbered> (decimal and hexadecimal) entities are supported, as well as I<named> entities (e.g., C<E<amp>mdash;>). Both lists get a "gutter" (for the marker) of I<marker_width> points wide, so list alignments are consistent over the call.
-
-=head3 Current CSS supported
-
-Note that the default CSS also applies to Markdown, unless you give a C<style =E<gt>> entry to the column() call to revise the CSS.
-
-In HTML, you can define B<<styleE<gt>> tags, but B<caution:> these are pulled out into a global style block (cumulative and global, as though they had all been given in the B<<headE<gt>>), applied after the CSS property defaults are defined and then any column() global C<style =E<gt> 'CSS list'> has been applied.
-
-CSS Selectors are very primitive:: a simple tag name (including B<body>), such as B<ol>; a class name such as B<.error>; or an ID such as B<#myID>. There are no hierarchies or combinations supported (e.g., nothing like B<p.abstract> or B<li E<gt> p>). The (decreasing) order of precedence follows a browser's: in a B<style => attribute, as a tag attribute (which may have a different name from the CSS's), an ID, a class, or a tag name. Comments /* and */ are B<NOT> currently supported in CSS.
-
-=over
-
-=item color
-
-foreground color, in standard PDF::Builder formats
-
-=item display 
-
-I<inline> or I<block>
-
-=item font-family
-
-as defined to Font Manager, e.g., I<Times>
-
-=item font-size
-
-I<n> points, I<n>pt, I<n%> of current font size. more units in future
-
-=item font-style
-
-I<normal> or I<italic>
-
-=item font-weight
-
-I<normal> or I<bold>
-
-=item height
-
-I<n> points or I<n>pt, thickness/size of horizontal rule B<ONLY>
-
-=item list-style-position
-
-I<outside> or I<inside>, or (CSS extension) C<Npt> or C<N%> (percentage of C<marker_width>) indent from inside position
-
-=item list-style-type
-
-marker description, per standard CSS, plus "box" (I<extension> for unordered list to give a box I<outline> marker (an unfilled "square"))
-
-=item margin-top/right/bottom/left
-
-per standard CSS. combined B<margin> in the future
-
-=item _marker-*
-
-I<extensions>: these are CSS property overides to the appearance of list item markers (the formatted counter or bullet in front of the item). These may be applied to an entire list by placing them in CSS <styleE<gt> or a style= attribute within <olE<gt> or <ulE<gt>, or to override a single list item's entry by placing it in an optional <_markerE<gt> tag. 
-
-The corresponding CSS attributes (color, font-family, font-style, font-size, font-weight) are cascaded as usual, and the _marker-* attributes are cascaded as usual. When outputting a list's marker, if the final C<_marker-*> property is not empty (''), it overrides the corresponding CSS property. C<_marker-text>, if not '', overrides whatever text the list would have otherwise used (formatted counter or bullet).
-
-If you are I<nesting> lists, C<_marker-*> properties will be inherited, as is the usual practice. If you want a nested list to use standard properties, you will need to cancel the current state of inherited C<_marker-*> propertie(s) by setting it/them to '' in the <olE<gt> or <ulE<gt> tag
-
-=over
-
-=item _marker-before
-
-text to insert I<before> ordered list marker
-
-=item _marker-after
-
-text to insert I<after> ordered list marker
-
-=item _marker-text
-
-define a text string to use as the list item marker that is different from the defaut. It may include multi-character text (e.g., '=>' or an entity), but don't use multi-byte (e.g., UTF-8) characters unless your selected font (see C<_marker-font>) supports it
-
-=item _marker-color
-
-override the default text color for this (or all) markers, e.g., 'blue' to set bullets or counters blue (as opposed to the normal black text). An example of using this color override would be a bulleted list with red bullets indicating a problem, yellow bullets indicating an area of concern, and green bullets indicating that all is well
-
-=item _marker-font
-
-override the standard font family used for a list item I<_marker>. The standard is to use whatever font-family was in effect at the list tag, for ordered lists (formatted counters), or ZapfDingbats for unordered (bulleted) lists
-
-=item _marker-style
-
-override the styling ('normal' or 'italic') for a list item marker. The standard is to use whatever styling was in effect at the list tag
-
-=item _marker-size
-
-override the font size ('font-size' property) for a list item marker. The standard is to use whatever font-size was in effect at the list tag for ordered lists, and 50% of that for bulleted lists. You can choose to modify the marker's font size to make it more or less conspicuous, as desired
-
-=item _marker-weight
-
-override the font weight (boldness, 'normal' or 'bold') for a list item marker. The standard is to use 'bold' for both ordered and unordered lists
-
-=item _marker-align
-
-override the list marker alignment or justification (default: 'right') within the 'marker_width' gutter. 'left' and 'center' alignment are permitted
-
-=back
-
-B<Caution:> a I<nested> list will inherit the settings of its parent list, including any C<_marker-*> settings. You may need to explicitly cancel unwanted settings by making them ''
-
-=item text-decoration
-
-per standard CSS
-
-=item text-height
-
-change leading, ratio of baseline-to-baseline to font size. future: set as a length or % of font size
-
-=item text-indent
-
-paragraph etc. indentation, I<n> points, I<npt>, I<n%> of font size
-
-=item text-align
-
-align a string of text to I<start> at the current position (left-aligned, 'left'), be I<centered> at the current position ('center'), or I<end> at the current position ('right' align). You will normally need to first set the current position to write at, before outputting aligned text, using the C<<_moveE<gt>> tag. For 'center' or 'right' alignment, use care to stay within the bounds of the column and not unsuccessfully try to wrap to the next line!
-
-=item width
-
-I<n> point or, I<npt>, width of horizontal rule B<ONLY>
-
-=back
-
-=head3 Global Settings
-
-There are a number of global settings either required or available for tuning the behavior of C<column()>. In the parameter list you can set
-
-=over
-
-=item font_size
-
-default initial font size (points) to be used, but can be overridden by CSS or C<<font sizeE<gt>>. Initially C<12>.
-
-=item leading
-
-default leading (text-height) ratio. Initially C<1.125>.
-
-=item marker_width
-
-points, set width of gutter where a list's marker goes. Initially C<2 * <font sizeE<gt>> (2 em).
-
-=item marker_gap
-
-points, set width of additional space between the marker and the start of the list item text. Initially C<<font sizeE<gt>> (1 em).
-
-=item para
-
-list of indentation (text-indent) and inter-paragraph spacing (margin-top), both in points. These are the defaults for all formatting modes, unless overridden by a style => entry. Initially C<[ <font sizeE<gt>, 0 ]>.
-
-=item color
-
-initial text and graphics color setting, in standard PDF::Builder formats. Initially C<'black'>.
-
-=item style
-
-CSS declarations to be applied after CSS properties initialization and before any global <style> tags, Initially C<''>.
-
-=back
-
-The Font Manager system is used to supply the requested fonts, so it is up to
-the application to pre-load the desired font information I<before> C<column()>
-is called. Any request to change the encoding within C<column()> will be
-ignored, as the fonts have already been specified for a specific encoding.
-Needless to say, the encoding used in creating the input text needs to match
-the specified font encoding.
-
-Absent any markup changing the font face or styling, whatever is defined by
-Font Manager as the I<current> font will be what is used. This way, you may
-inherit the font from the previous C<column()>, or call 
-C<$text->font($pdf-E<gt>get_font(), size)> to set both the font and size, or 
-just call C<$pdf->get_font()> to set only the font, relying on the C<font_size> 
-option or CSS markup to set the size.
-
-Line fitting (paragraph shaping) is currently quite primitive. Words will
-not be split (hyphenated).  I<It is planned to eventually add Knuth-Plass 
-paragraph shaping, along with proper language-dependent hyphenation.>
-
-Each change of font automatically supplies its maximum ascender and minimum
-descender, the B<extents> above and below the text line's baseline. Each block
-of text with a given face and variant, or change of font size, will be given
-the same I<vertical> extents -- the extents are font-wide, and not determined 
-on a per-glyph basis. So, unfortunately, a block of text "acemnorsuvwz" will 
-have the same vertical extents as a block of text "bdfghijklpqty". For a given
-line of text, the highest ascender and the lowest descender (plus leading) will
-be used to position the line at the appropriate distance below the previous 
-line (or the top of the column). No attempt is made to "fit" projections into
-recesses (jigsaw-puzzle like). If there is an inset into the side of a column,
-or it is otherwise not a straight vertical line,
-so long as the baseline fits within the column outline, no check is made 
-whether descenders or ascenders will fall outside the defined column (i.e., 
-project into the inset). We suggest that you try to keep font sizes fairly
-consistent, to keep reasonably consistent text vertical extents.
 
 =cut
 

@@ -1,334 +1,24 @@
 #!/home/chrisarg/perl5/perlbrew/perls/current/bin/perl
 package Bit::Set;
-$Bit::Set::VERSION = '0.10';
+$Bit::Set::VERSION = '0.11';
 use strict;
 use warnings;
 
-use Alien::Bit;
-use FFI::Platypus;
+use XSLoader ();
+XSLoader::load('Bit::Set');
 
+use Exporter 'import';
 
-# Set up the FFI object
-my $ffi = FFI::Platypus->new( api => 2 );
-$ffi->lib( Alien::Bit->dynamic_libs );
-
-# Define opaque types
-$ffi->type( 'opaque' => 'Bit_T' );
-
-# LLM did not create an opaque pointer to a pointer
-$ffi->type( 'opaque*' => 'Bit_T_Ptr' );
-
-# Define a helper for debug checks that can be stripped at compile time
-# LLM provided this: use constant DEBUG => $ENV{DEBUG};
-BEGIN {
-    use constant DEBUG => $ENV{DEBUG} // 0;
-    if (DEBUG) {
-        print "* Debugging is enabled\n";
-    }
-}
-
-# Function definitions for FFI attachment - table-driven approach
-my %functions = (
-
-    # Creation / Destruction / Properties
-    Bit_new => {
-        args  => ['int'],
-        ret   => 'Bit_T',
-        check => sub {
-            my ($length) = @_;
-            die "Bit_new: length must be >= 0 and <= INT_MAX"
-              if $length < 0 || $length > 2147483647;
-        }
-    },
-    Bit_free => {
-        args => ['Bit_T_Ptr'],
-        ret  => 'opaque',
-    },
-    Bit_load => {
-        args  => [ 'int', 'opaque' ],
-        ret   => 'Bit_T',
-        check => sub {
-            my ( $length, $buffer ) = @_;
-            die "Bit_load: length must be >= 0 and <= INT_MAX"
-              if $length < 0 || $length > 2147483647;
-            die "Bit_load: buffer cannot be NULL" if !defined $buffer;
-        }
-    },
-    Bit_extract => {
-        args  => [ 'Bit_T', 'opaque' ],
-        ret   => 'int',
-        check => sub {
-            my ( $set, $buffer ) = @_;
-            die "Bit_extract: set cannot be NULL"    if !defined $set;
-            die "Bit_extract: buffer cannot be NULL" if !defined $buffer;
-        }
-    },
-    Bit_buffer_size => {
-        args  => ['int'],
-        ret   => 'int',
-        check => sub {
-            my ($length) = @_;
-            die "Bit_buffer_size: length must be >= 0 and <= INT_MAX"
-              if $length < 0 || $length > 2147483647;
-        }
-    },
-    Bit_length => {
-        args  => ['Bit_T'],
-        ret   => 'int',
-        check => sub {
-            my ($set) = @_;
-            die "Bit_length: set cannot be NULL" if !defined $set;
-        }
-    },
-    Bit_count => {
-        args  => ['Bit_T'],
-        ret   => 'int',
-        check => sub {
-            my ($set) = @_;
-            die "Bit_count: set cannot be NULL" if !defined $set;
-        }
-    },
-
-    # Manipulation functions
-    Bit_aset => {
-        args  => [ 'Bit_T', 'int[]', 'int' ],
-        ret   => 'void',
-        check => sub {
-            my ( $set, $indices, $n ) = @_;
-            die "Bit_aset: set cannot be NULL"           if !defined $set;
-            die "Bit_aset: indices array cannot be NULL" if !defined $indices;
-            die "Bit_aset: n must be >= 0"               if $n < 0;
-        }
-    },
-    Bit_bset => {
-        args  => [ 'Bit_T', 'int' ],
-        ret   => 'void',
-        check => sub {
-            my ( $set, $index ) = @_;
-            die "Bit_bset: set cannot be NULL" if !defined $set;
-            die "Bit_bset: index must be >= 0" if $index < 0;
-        }
-    },
-    Bit_aclear => {
-        args  => [ 'Bit_T', 'int[]', 'int' ],
-        ret   => 'void',
-        check => sub {
-            my ( $set, $indices, $n ) = @_;
-            die "Bit_aclear: set cannot be NULL"           if !defined $set;
-            die "Bit_aclear: indices array cannot be NULL" if !defined $indices;
-            die "Bit_aclear: n must be >= 0"               if $n < 0;
-        }
-    },
-    Bit_bclear => {
-        args  => [ 'Bit_T', 'int' ],
-        ret   => 'void',
-        check => sub {
-            my ( $set, $index ) = @_;
-            die "Bit_bclear: set cannot be NULL" if !defined $set;
-            die "Bit_bclear: index must be >= 0" if $index < 0;
-        }
-    },
-    Bit_clear => {
-        args  => [ 'Bit_T', 'int', 'int' ],
-        ret   => 'void',
-        check => sub {
-            my ( $set, $lo, $hi ) = @_;
-            die "Bit_clear: set cannot be NULL" if !defined $set;
-            die "Bit_clear: lo must be >= 0"    if $lo < 0;
-            die "Bit_clear: hi must be >= lo"   if $hi < $lo;
-        }
-    },
-    Bit_get => {
-        args  => [ 'Bit_T', 'int' ],
-        ret   => 'int',
-        check => sub {
-            my ( $set, $index ) = @_;
-            die "Bit_get: set cannot be NULL" if !defined $set;
-            die "Bit_get: index must be >= 0" if $index < 0;
-        }
-    },
-    Bit_not => {
-        args  => [ 'Bit_T', 'int', 'int' ],
-        ret   => 'void',
-        check => sub {
-            my ( $set, $lo, $hi ) = @_;
-            die "Bit_not: set cannot be NULL" if !defined $set;
-            die "Bit_not: lo must be >= 0"    if $lo < 0;
-            die "Bit_not: hi must be >= lo"   if $hi < $lo;
-        }
-    },
-    Bit_put => {
-        args  => [ 'Bit_T', 'int', 'int' ],
-        ret   => 'int',
-        check => sub {
-            my ( $set, $n, $val ) = @_;
-            die "Bit_put: set cannot be NULL" if !defined $set;
-            die "Bit_put: n must be >= 0"     if $n < 0;
-        }
-    },
-    Bit_set => {
-        args  => [ 'Bit_T', 'int', 'int' ],
-        ret   => 'void',
-        check => sub {
-            my ( $set, $lo, $hi ) = @_;
-            die "Bit_set: set cannot be NULL" if !defined $set;
-            die "Bit_set: lo must be >= 0"    if $lo < 0;
-            die "Bit_set: hi must be >= lo"   if $hi < $lo;
-        }
-    },
-
-    # Comparison functions
-    Bit_eq => {
-        args  => [ 'Bit_T', 'Bit_T' ],
-        ret   => 'int',
-        check => sub {
-            my ( $s, $t ) = @_;
-            die "Bit_eq: bitsets cannot be NULL" if !defined $s || !defined $t;
-        }
-    },
-    Bit_leq => {
-        args  => [ 'Bit_T', 'Bit_T' ],
-        ret   => 'int',
-        check => sub {
-            my ( $s, $t ) = @_;
-            die "Bit_leq: bitsets cannot be NULL" if !defined $s || !defined $t;
-        }
-    },
-    Bit_lt => {
-        args  => [ 'Bit_T', 'Bit_T' ],
-        ret   => 'int',
-        check => sub {
-            my ( $s, $t ) = @_;
-            die "Bit_lt: bitsets cannot be NULL" if !defined $s || !defined $t;
-        }
-    },
-
-    # Set operations
-    Bit_diff => {
-        args  => [ 'Bit_T', 'Bit_T' ],
-        ret   => 'Bit_T',
-        check => sub {
-            my ( $s, $t ) = @_;
-            die "Bit_diff: bitsets cannot be NULL"
-              if !defined $s || !defined $t;
-        }
-    },
-    Bit_inter => {
-        args  => [ 'Bit_T', 'Bit_T' ],
-        ret   => 'Bit_T',
-        check => sub {
-            my ( $s, $t ) = @_;
-            die "Bit_inter: bitsets cannot be NULL"
-              if !defined $s || !defined $t;
-        }
-    },
-    Bit_minus => {
-        args  => [ 'Bit_T', 'Bit_T' ],
-        ret   => 'Bit_T',
-        check => sub {
-            my ( $s, $t ) = @_;
-            die "Bit_minus: bitsets cannot be NULL"
-              if !defined $s || !defined $t;
-        }
-    },
-    Bit_union => {
-        args  => [ 'Bit_T', 'Bit_T' ],
-        ret   => 'Bit_T',
-        check => sub {
-            my ( $s, $t ) = @_;
-            die "Bit_union: bitsets cannot be NULL"
-              if !defined $s || !defined $t;
-        }
-    },
-
-    # Set operation counts
-    Bit_diff_count => {
-        args  => [ 'Bit_T', 'Bit_T' ],
-        ret   => 'int',
-        check => sub {
-            my ( $s, $t ) = @_;
-            die "Bit_diff_count: bitsets cannot be NULL"
-              if !defined $s || !defined $t;
-        }
-    },
-    Bit_inter_count => {
-        args  => [ 'Bit_T', 'Bit_T' ],
-        ret   => 'int',
-        check => sub {
-            my ( $s, $t ) = @_;
-            die "Bit_inter_count: bitsets cannot be NULL"
-              if !defined $s || !defined $t;
-        }
-    },
-    Bit_minus_count => {
-        args  => [ 'Bit_T', 'Bit_T' ],
-        ret   => 'int',
-        check => sub {
-            my ( $s, $t ) = @_;
-            die "Bit_minus_count: bitsets cannot be NULL"
-              if !defined $s || !defined $t;
-        }
-    },
-    Bit_union_count => {
-        args  => [ 'Bit_T', 'Bit_T' ],
-        ret   => 'int',
-        check => sub {
-            my ( $s, $t ) = @_;
-            die "Bit_union_count: bitsets cannot be NULL"
-              if !defined $s || !defined $t;
-        }
-    },
-);
-
-# Attach all functions
-for my $name ( sort keys %functions ) {
-    my $spec        = $functions{$name};
-    my @attach_args = ( $name, $spec->{args}, $spec->{ret} );
-
-    if (DEBUG)
-    { ##  if (DEBUG && exists $spec->{check}) { -> LLM version, break into nested ifs
-        if ( exists $spec->{check} ) {
-            my $checker = $spec->{check};
-
-        # version returned by the LLM
-        #            push @attach_args, wrapper => sub { # as created by the LLM
-        #                my $orig = shift;
-        #                $checker->(@_);
-        #                return $orig->(@_);
-        #            };
-
-            push @attach_args, sub {
-                my $orig = shift;
-                $checker->(@_);
-                return $orig->(@_);
-            };
-        }
-    }
-    $ffi->attach(@attach_args);
-}
-
-# Verification that all C functions are mapped (excluding macros and Bit_map)
-my @c_functions = qw(
-  Bit_new Bit_free Bit_load Bit_extract Bit_buffer_size Bit_length Bit_count
+our @EXPORT = qw(Bit_new Bit_free);
+our @EXPORT_OK = qw(
+  Bit_load Bit_extract
+  Bit_buffer_size Bit_length Bit_count
   Bit_aset Bit_bset Bit_aclear Bit_bclear Bit_clear Bit_get Bit_not Bit_put Bit_set
   Bit_eq Bit_leq Bit_lt
   Bit_diff Bit_inter Bit_minus Bit_union
   Bit_diff_count Bit_inter_count Bit_minus_count Bit_union_count
 );
-
-my %perl_functions;
-@perl_functions{ keys %functions } = ();
-for my $c_func (@c_functions) {
-    die "FATAL: C function '$c_func' not implemented in Bit::Set"
-      unless exists $perl_functions{$c_func};
-}
-
-# LLM forgot to export the Bit::Set functions
-use Exporter 'import';
-our @EXPORT_OK   = keys %functions;
-our %EXPORT_TAGS = ( all => [@EXPORT_OK] );
-
-our @EXPORT = qw(Bit_new  Bit_free);
+our %EXPORT_TAGS = ( all => [ @EXPORT, @EXPORT_OK ] );
 
 
 1;
@@ -341,7 +31,7 @@ Bit::Set - Perl procedural interface to the 'bit' C library
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -354,6 +44,7 @@ version 0.10
   Bit_bset($set, 0);
   Bit_bset($set, 42);
 
+
   # Get population count
   my $count = Bit_count($set);
 
@@ -363,8 +54,8 @@ version 0.10
 =head1 DESCRIPTION
 
 This module provides a procedural Perl interface to the C library L<Bit|https://github.com/chrisarg/Bit>,
-for creating and manipulating bitsets. It uses C<FFI::Platypus> to wrap the
-C functions and C<Alien::Bit> to locate and link to the C library.
+for creating and manipulating bitsets. It uses C<Alien::Bit> to locate and link to the C library and up to version 0.10 of the package it relied on  C<FFI::Platypus> to bind to the C functions. B<As of version 0.11 the procedural interface is implemented using XS>, and does not
+invoke the library via FFI.
 
 The API is a direct mapping of the C functions. For detailed semantics of each
 function, please refer to L<Bit|https://github.com/chrisarg/Bit>.
@@ -376,11 +67,19 @@ Only the constructor and destructor are exported by default. You can import all 
 
 =head2 Note on the Procedural interface
 
-The B<procedural> API in the module was created during a "vibecoding" experiment in Github Copilot running through the VS Code editor. The section C<VIBECODING A FFI API THAT DIRECTLY MAPS THE C INTERFACE OF BIT> of the documentation discusses the prompts used to generate the FFI bindings, and the manual edits of the generated code. While I went through various iterations of the prompt, only the final one is provided (and documented). It is estimated that somewhere between 20-30 hours of "vibecoding" (prompt authoring, refinement, verification of the output and exploration of various chatbots) went into the creation of this module. Unless stated otherwise, the source code of the module retains the original output as returned by the chatbot. In the case that manual edits were made to the generated code, the original output has been retained  in the comments of the module code. Some (but not all!) noteworthy edits are discussed in the documentation. Only the functions that have a direct corresponding to the C interface were wrapped via vibecoding, while all the subsequent functions (e.g. the verification that all C functions were mapped and the object oriented API) were manually created.
+The initial B<procedural> API in the module was created during a "vibecoding" experiment in Github Copilot running through the VS Code editor. The section C<VIBECODING A FFI API THAT DIRECTLY MAPS THE C INTERFACE OF BIT> of the documentation discusses the prompts used to generate the FFI bindings, and the manual edits of the generated code. While I went through various iterations of the prompt, only the final one is provided (and documented). It is estimated that somewhere between 20-30 hours of "vibecoding" (prompt authoring, refinement, verification of the output and exploration of various chatbots) went into the creation of this module. Unless stated otherwise, the source code of the module retains the original output as returned by the chatbot. In the case that manual edits were made to the generated code, the original output has been retained  in the comments of the module code. Some (but not all!) noteworthy edits are discussed in the documentation. Only the functions that have a direct corresponding to the C interface were wrapped via vibecoding, while all the subsequent functions (e.g. the verification that all C functions were mapped and the object oriented API) were manually created.
+
+During benchmarking at version 0.10 of the package,  it became obvious that the code was slower than what it should have been,  and Joe Schaefer (PAUSEID L<JOESUF|https://metacpan.org/author/JOESUF>) kindly contributed a direct XS interface to improve performance relative to the FFI version. I used Joe's XS code as a blueprint to generate the XS bindings for the procedural interface; the benchmarking github repository
+L<benchmarking-bits|https://github.com/chrisarg/benchmarking-bits> executes a full benchmark of the performance enhancement of the XS version relative to the FFI version. 
 
 =head2 Note on the Object Oriented interface
 
-I had hesitated to release an B<Object Oriented> API for the Bit library largely because of performance concerns. The OO interfaces are currently layered on top of the procedural API, and thus incur some overhead compared to direct calls to the procedural API. See L<Bit::Set::OO|https://metacpan.org/pod/Bit::Set::OO> for the OO interface. Only the procedural API was created via vibecoding, while the OO interface was manually created.
+I had hesitated to release an B<Object Oriented> API for the Bit library largely because of performance concerns. The OO interface released with v0.10 was layered on top of the procedural API, and thus incur considerab;e overhead compared to direct calls to the procedural API. See L<Bit::Set::OO|https://metacpan.org/pod/Bit::Set::OO> for the OO interface. The initial OO interface was created manually without AI coding assistance. 
+
+B<As of v0.11, both the OO and the procedural interfaces bind to the underlying C code using manually generated XS (contributed by JOESUF), and not through the "vibecoded" FFI binding.> We chose to retain the "vibecoding" sections in the documentation in the name of preserving this activity and invite the interested reader to download v0.10 of the source code of the package to examine the FFI-based implementation.
+
+The OO interface's performance can be increased by 5%-15% by using JOESUF's technique of sealing the object to avoid the overhead of dynamic method lookup, i.e. the methods are resolved at compile time. A small benchmarking test is now included with the examples of the OO interface. See L<Bit::Set::OO|https://metacpan.org/pod/Bit::Set::OO> for details.
+
 
 
 =head1 Functions in the procedural interface
@@ -397,7 +96,9 @@ Creates a new bitset with the specified capacity (=length) in bits.
 
 =item B<Bit_free(set_ref)>
 
-Frees the memory associated with the bitset. Expects a reference to the scalar holding the bitset.
+Frees the memory associated with the bitset. Expects a reference to the scalar holding the bitset. The C function returns the address of the storage
+if allocated externally, or NULL if the bitset was allocated by the library.
+These values are NOT returned to the Perl caller (so if you used an externally allocated buffer, you need to manage its memory yourself).
 
 =item B<Bit_load(length, buffer)>
 
@@ -432,17 +133,17 @@ Returns the population count (number of set bits) of the bitset.
 
 =over 4
 
-=item B<Bit_aset(set, indices, n)>
+=item B<Bit_aset(set, indices)>
 
-Sets an array of bits specified by indices.
+Sets an array of bits specified by indices (provided as a reference to an array).
 
 =item B<Bit_bset(set, index)>
 
 Sets a single bit at the specified index to 1.
 
-=item B<Bit_aclear(set, indices, n)>
+=item B<Bit_aclear(set, indices)>
 
-Clears an array of bits specified by indices.
+Clears an array of bits specified by indices (provided as a reference to an array).
 
 =item B<Bit_bclear(set, index)>
 
@@ -1141,13 +842,14 @@ alternative interface to the containerized operations provided by Bit::Set::DB.
 
 =head1 AUTHOR
 
-Christos Argyropoulos with asistance from Github Copilot (Claude Sonnet 4).
+Christos Argyropoulos and Joe Schaefer after v0.11.
+Christos Argyropoulos with asistance from Github Copilot (Claude Sonnet 4) up to v0.10.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Christos Argyropoulos.
+This software up to and including v0.10 is copyright (c) 2025 Christos Argyropoulos.
+For versions after v0.10, the distribution as a whole is copyright (c) 2025 Joe Schaefer and Christos Argyropoulos.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This software is released under the L<MIT license|https://mit-license.org/>.
 
 =cut

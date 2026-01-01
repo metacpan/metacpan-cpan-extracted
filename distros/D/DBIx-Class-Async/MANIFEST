@@ -1,0 +1,27 @@
+Changes
+lib/DBIx/Class/Async.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-construct-destruct.t
+t/02-crud-operations.t
+t/03-search-with-attr.t
+t/04-batch-operations.t
+t/05-statistics.t
+t/06-health-checks.t
+t/07-cache.t
+t/08-relationships.t
+t/09-concurrent-operations.t
+t/10-accessors-configs.t
+t/manifest.t
+t/pod.t
+t/test.db
+t/lib/TestSchema.pm
+t/lib/TestSchema/Result/User.pm
+t/lib/TestSchema/Result/Order.pm
+t/create_test_db.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

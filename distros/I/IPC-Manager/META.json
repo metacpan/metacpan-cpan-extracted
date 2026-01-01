@@ -1,0 +1,89 @@
+{
+   "abstract" : "Decentralized local IPC through various protocols.",
+   "author" : [
+      "Chad Granum <exodist@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "IPC-Manager",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Atomic::Pipe" : "0.022",
+            "DBD::MariaDB" : "1.00",
+            "DBD::Pg" : "v3.5.0",
+            "DBD::SQLite" : "1.44",
+            "DBD::mysql" : "4.00",
+            "DBI" : "1.644",
+            "DBIx::QuickDB" : "0.000038",
+            "IO::Select" : "1.55",
+            "IO::Socket::UNIX" : "1.55",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Errno" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Importer" : "0.026",
+            "Object::HashBase" : "0.015",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "Test2::Util::UUID" : "0.002010",
+            "Time::HiRes" : "0",
+            "overload" : "0",
+            "parent" : "0",
+            "perl" : "5.012000"
+         },
+         "suggests" : {
+            "Atomic::Pipe" : "0.022",
+            "DBD::MariaDB" : "1.00",
+            "DBD::Pg" : "v3.5.0",
+            "DBD::SQLite" : "1.44",
+            "DBD::mysql" : "4.00",
+            "DBI" : "1.644",
+            "DBIx::QuickDB" : "0.000038",
+            "IO::Select" : "1.55",
+            "IO::Socket::UNIX" : "1.55"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::API" : "1.302219",
+            "Test2::Require::Module" : "1.302219",
+            "Test2::Tools::QuickDB" : "0.000038",
+            "Test2::V1" : "1.302219"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/exodist/IPC-Manager/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/exodist/IPC-Manager/"
+      }
+   },
+   "version" : "0.000001",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

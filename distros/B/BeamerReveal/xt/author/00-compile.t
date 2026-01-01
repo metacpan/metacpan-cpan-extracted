@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 13;
+plan tests => 12;
 
 my @module_files = (
     'BeamerReveal.pm',
@@ -14,7 +14,6 @@ my @module_files = (
     'BeamerReveal/IPC/Run.pm',
     'BeamerReveal/Log.pm',
     'BeamerReveal/Log/Ansi.pm',
-    'BeamerReveal/Log/Win32.pm',
     'BeamerReveal/MediaManager.pm',
     'BeamerReveal/Object.pm',
     'BeamerReveal/Object/BeamerFrame.pm',

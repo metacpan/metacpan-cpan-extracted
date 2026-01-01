@@ -1,0 +1,17 @@
+App-Chit
+========
+
+Created:      2025-12-31
+Home page:    <https://metacpan.org/release/App-Chit>
+Bug tracker:  <https://github.com/tobyink/p5-app-chit/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.001001	2025-12-31
+
+ [ Documentation ]
+ - Document use of environment variables.
+
+ [ Packaging ]
+ - Add missing dependency (utf8::all).
+
+0.001000	2025-12-31	Initial release

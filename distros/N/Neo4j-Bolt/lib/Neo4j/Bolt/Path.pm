@@ -1,7 +1,7 @@
 package Neo4j::Bolt::Path;
 # ABSTRACT: Representation of Neo4j Path
 
-$Neo4j::Bolt::Path::VERSION = '0.5001';
+$Neo4j::Bolt::Path::VERSION = '0.5002';
 
 use v5.12;
 use warnings;
@@ -109,7 +109,7 @@ L<Neo4j::Bolt>, L<Neo4j::Types::Path>
 
 =head1 LICENSE
 
-This software is Copyright (c) 2020-2024 by Arne Johannessen.
+This software is Copyright (c) 2020-2026 by Arne Johannessen.
 
 This is free software, licensed under:
 

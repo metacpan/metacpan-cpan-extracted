@@ -73,6 +73,10 @@ perl -MModule::CPANTS::Analyse -e '
         $failed = 1;
         say uc "\t### $check failed ###";
     }
+    if (system "podman run -it --rm -v \$(realpath .):/Library:ro,Z  perl-dbix-auto bash -c \"tar -xf /Library/DBIx-Auto-Migrate-$version.tar.gz; cd DBIx-Auto-Migrate-$version && yes | cpan .\"") {
+
+	    exit 1;
+    }
     exit 1 if $failed;
     exit 0;
 ' && SUCCESS_CPANTS=1

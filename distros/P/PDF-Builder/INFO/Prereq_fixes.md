@@ -27,6 +27,22 @@ you will need to follow the above instructions.**
 
 -----------------------
 
+* **Building libtiff for Graphics::TIFF optional prerequisite**, 
+some users may encounter problems with not being able to install the Graphics::TIFF
+package due to the libtiff library not being successfully built (by Alien::libtiff).
+We have no information on other operating systems and Perls, but this has been
+successfully worked around on Windows with Strawberry Perl:
+
+* This id due to the package Alien::MSYS not installing, which in turn prevents Alien::libtiff from building
+* Bring up the DOS Command Prompt (command line window)
+* > \strawberry-5.xx\portableshell.bat (\Strawberry-5.xx is the Perl level you're using)
+* >> cpanm -i Alien::MSYS
+* >> exit  (from portableshell)
+* > exit  (from the Command Prompt shell)
+* Now you should be able to install Graphics::TIFF in the usual manner, which will in turn build the libtiff library
+
+-----------------------
+
 * **Running on older Macs:** It has been reported that some versions of Mac 
 Perl systems have a 'convert' utility that is missing the default Arial font, 
 and thus will fail (see ticket 223). You may need to install the Arial font on

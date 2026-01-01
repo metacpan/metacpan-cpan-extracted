@@ -1,7 +1,7 @@
 package Neo4j::Bolt::Bytes;
 # ABSTRACT: Representation of a Neo4j byte array
 
-$Neo4j::Bolt::Bytes::VERSION = '0.5001';
+$Neo4j::Bolt::Bytes::VERSION = '0.5002';
 
 use v5.12;
 use warnings;
@@ -89,7 +89,7 @@ L<Neo4j::Bolt>, L<Neo4j::Types::ByteArray>
 
 =head1 LICENSE
 
-This software is Copyright (c) 2024 by Arne Johannessen.
+This software is Copyright (c) 2024-2026 by Arne Johannessen.
 
 This is free software, licensed under:
 

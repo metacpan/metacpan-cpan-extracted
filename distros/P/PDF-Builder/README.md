@@ -1,4 +1,4 @@
-# PDF::Builder release 3.027
+# PDF::Builder release 3.028
 
 A Perl library to create and modify PDF (Portable Document Format) files
 
@@ -22,19 +22,19 @@ more powerful and versatile.
 \*Note that PDF::Builder is **not** built on PDF::API2, and does **not**
 require that it be installed. The two libraries are completely independent of
 each other and one will not interfere with the other if both are installed.
+However, you should _not_ try mixing the two libraries within one running
+program, as they still share many routine names!
 
-**Gadzooks!** For a delightful look at the (rather grisly) origin of this
-typographical term, as well as many other terms, watch
-https://www.youtube.com/watch?v=cd5iFbuNKv8 .
-
-[Home Page](https://www.catskilltech.com/FreeSW/product/PDF%2DBuilder/title/PDF%3A%3ABuilder/freeSW_full), including Documentation and Examples.
+The
+[Home Page](https://www.catskilltech.com/FreeSW/product/PDF%2DBuilder/title/PDF%3A%3ABuilder/freeSW_full)
+includes Documentation and Examples.
 
 [![Open Issues](https://img.shields.io/github/issues/PhilterPaper/Perl-PDF-Builder)](https://github.com/PhilterPaper/Perl-PDF-Builder/issues)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://makeapullrequest.com)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/PhilterPaper/Perl-PDF-Builder/graphs/commit-activity)
 
 This archive contains the distribution PDF::Builder.
-See **Changes** file for the version and list of changes from the previous 
+See **Changes** file for the version and list of changes from the previous
 release.
 
 ## Obtaining and Installing the Package
@@ -43,7 +43,7 @@ The installable Perl package may be obtained from
 "https://metacpan.org/pod/PDF::Builder", or via a CPAN installer package. If
 you install this product, only the run-time modules will be installed. Download
 the full `.tar.gz` file and unpack it (uncompress, then extract directory --
-hint: on Windows, **7-Zip File Manager** is an excellent tool) to get 
+hint: on Windows, **7-Zip File Manager** is an excellent tool) to get
 utilities, test buckets, example usage, etc.
 
 Alternatively, you can obtain the full source files from
@@ -83,13 +83,20 @@ the CPAN installer may refuse to install it. The reason this version was
 chosen was so that LTS (Long Term Support) versions of Perl going back about
 6 years are officially supported (by PDF::Builder), and older versions are not
 supported. The intent is to not waste time and effort trying to fix bugs which
-are an artifact of old Perl releases. 
+are an artifact of old Perl releases. Frankly, if you're running a Perl version
+more than 6 years old, you should be thinking about upgrading.
 
 Usually about once a year the minimum level is bumped up, but this depends on 
 whether Strawberry releases the newest Perl level. As Strawberry Perl releases 
 new Perl levels, usually on an annual basis, we intend to bump up our required 
 minimum Perl level (even-numbered production releases), to keep support for the 
-last 6 calendar years of Perl releases, dropping older ones.
+last 6 calendar years of Perl releases, dropping older ones. 
+
+Note that we have
+been informed that enough users want to run PDF::Builder at older levels that
+**for the time being** we will stay at **5.28**. If we make use of newer Perl
+constructs and operators in the code, however, and PDF::Builder no longer works
+with 5.28, we will have to raise the minimum level.
 
 #### Older Perls
 
@@ -144,7 +151,13 @@ functionality.
 * Pod::Simple::XHTML (3.45 or higher, needed if using buildDoc.pl utility to create HTML documentation)
 * SVGPDF (0.087 or higher, needed if using SVG image functions)
 
-If an optional package is needed for cetain extended functionality, but not
+The following external applications (programs) are needed for fully testing some TIFF-related
+PDF::Builder functionality. Install _before_ installing PDF::Builder or Graphics::TIFF.
+
+* ImageMagick (module 'magick' or 'convert')
+* Ghostscript (module 'gs', 'gswin64c', or 'gswin32c')
+
+If an optional package is needed for certain extended functionality, but not
 installed, sometimes PDF::Builder
 will be able to fall back to built-in partial functionality (TIFF and PNG
 images), but other times will fail. After installing the missing package, you
@@ -240,6 +253,7 @@ a pointer to _your_ work. The more cross-pollination, the better!
 * LICENSE file for more on the license term
 * INFO/RoadMap file for the PDF::Builder road map
 * INFO/ACKNOWLEDGE.md for "thank yous" to those who contributed to this product
+* INFO/SPONSORS for "thank yous" to those who financially sponsored this product
 * INFO/CONVERSION file for how to convert from PDF::API2 to PDF::Builder
 * INFO/Changes\* files for older change logs
 * INFO/PATENTS file for information on patents
@@ -288,6 +302,13 @@ Letter top: 3mm = .125" = 9pt
 Letter right:  9mm = .375" = 27pt (Letter wider than A4)
 A4 right:      3mm = .125" = 9pt
 ```
+If not using the _Universal_ size, you can choose _Letter_ size, with an
+extra-wide right margin of at least 27pt, or _A4_ size media with an extra
+deep top margin of at least 60pt. In both cases, allow a minimum of 9pt for
+left and bottom margins, for paper-handling purposes. This should give you
+results printable on either US Letter or A4 media, anywhere in the world,
+without accidentally losing content.
+
 Please see the discussion on `mediabox()` and other "box" calls, about how
 much of a page can actually be _printed_ on, allowing for pinch rollers and
 other paper transport mechanisms. The above suggested margins assume, in

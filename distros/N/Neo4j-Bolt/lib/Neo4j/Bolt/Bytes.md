@@ -59,7 +59,7 @@ This class provides the following method defined by
 
 # LICENSE
 
-This software is Copyright (c) 2024 by Arne Johannessen.
+This software is Copyright (c) 2024-2026 by Arne Johannessen.
 
 This is free software, licensed under:
 

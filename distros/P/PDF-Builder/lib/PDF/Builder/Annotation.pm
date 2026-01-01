@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use List::Util qw(min max);
@@ -20,20 +20,31 @@ Inherits from L<PDF::Builder::Basic::PDF::Dict>
 
 =head1 SYNOPSIS
 
+An "annotation" is an extra feature on a page that may change the appearance
+(e.g., highlighting), or perform some action when
+clicked on. Some actions may require a single click and others a double click;
+this depends on the PDF Reader used. Some may warn you and/or ask permission
+to perform a certain action, while others may refuse to do something (which
+may be configurable).
+
     my $pdf = PDF::Builder->new();
     my $font = $pdf->font('Helvetica');
     my $page1 = $pdf->page();
     my $page2 = $pdf->page();
+
     my $content = $page1->text();
     my $message = 'Go to Page 2';
     my $size = 18;
+
     $content->distance(1 * 72, 9 * 72);
     $content->font($font, $size);
     $content->text($message);
+
     my $annotation = $page1->annotation();
     my $width = $content->text_width($message);
     $annotation->rect(1 * 72, 9 * 72, 1 * 72 + $width, 9 * 72 + $size);
     $annotation->link($page2);
+
     $pdf->save('sample.pdf');
 
 =head1 METHODS
@@ -42,6 +53,7 @@ Note that the handling of annotations can vary from Reader to Reader. The
 available icon set may be larger or smaller than given here, and some Readers
 activate an annotation on a single mouse click, while others require a double
 click. Not all features provided here may be available on all PDF Readers.
+In particular, Named Destinations seem to be handled in widely varying ways!
 
 =head2 new
 
@@ -59,7 +71,7 @@ It is normally I<not> necessary to explicitly call this method (see examples).
 
 # %opts removed, as there are currently none
 sub new {
-    my ($class) = @_;
+    my $class = shift;
 
     my $self = $class->SUPER::new();
     $self->{'Type'}   = PDFName('Annot');
@@ -83,47 +95,137 @@ sub new {
 # note that %opts is given as the only format in most cases, as rect
 # is a mandatory "option"
 
+=head2 Common parameters
+
+For the annotation calls given below, all require a clickable rectangular area 
+(button) on the page to activate the call. These all share common parameters to 
+define this "button". Note that I<your> code is responsible for creating the 
+visible content of the button (if any), while the 'rect' parameter tells the 
+annotation what (invisible) area on the page activates it, and the 'border' 
+and 'color' parameters describe the border drawn around the button.
+
+Note that this is in contrast to C<NamedDestination>, which ignores any of
+these entries, as it does not define a "button" to press.
+
+    'rect'   => [ LLx,LLy, URx,URy ]
+
+This defines the rectangle of the "button". Your code is responsible for any
+fill or text visible to the user, via normal text and graphics calls.
+As an alternative (mandatory if 'rect' is not given), you may
+specify the rectangle with the C<$ann-E<gt>rect(LLx,LLy, URx,URy);> call.
+I<Note:> the other diagonals (UL to LR, LR to UL, UR to LL) are usually allowed.
+
+Instead of this hash element being used, the 
+
+    $ann->rect( LLx,LLy, URx,URy )
+
+method may be used (I<before> the annotation method itself is invoked).
+
+    'border' => [ Rx,Ry, w, [dash-pattern] ]
+
+This defines the border around the button. If not given, the default is 
+[ 0, 0, 1 ]. Rx and Ry are corner radii (0 for sharp corners), I<w> is the
+stroke width (0 for no visible border), and an optional dash-pattern may be 
+given to draw something other than a solid line (e.g., [5, 5] for a 5pt long
+dash and 5pt space pattern). Note that the square brackets [ ] are actually
+used, as the dash-pattern is an anonymous array.
+
+Instead of this hash element being used, the
+
+    $ann->border(Rx,Ry, w, [dash-pattern]) 
+
+method may be used (I<before> the annotation method itself is invoked).
+
+    'color'  => [ Red, Green, Blue ]
+
+This defines the stroke color of the button border, using the RGB triplet way
+of describing a color (RGB anonymous array, each value 0 to 1). 
+If 0 width does not work on all Readers to suppress the border, selecting a 
+color that matches any fill or background color in the button may work instead.
+
+Instead of this hash element being used, the
+
+    $ann->Color(Red, Green, Blue)
+
+method may be used (I<before> the annotation method itself is invoked). Note
+that Color is capitalized, unlike the hash option method.
+
+It's a matter of stylistic choice whether to give these settings as options
+to the annotation object in the call, or call their methods directly I<before> 
+the annotation action method itself is called.
+
+Some calls have additional optional parameters, which will be described in
+their section.
+
 =head2 Annotation types
 
-=head3 link
+=head3 goto, link
 
-    $annotation->link($page, %opts)
+    $annotation->goto($page, $location, @args, %opts) # preferred
+
+    $annotation->goto($page, %opts)  # location info as a hash element
 
 =over
 
-Defines the annotation as a launch-page with page C<$page> (within I<this>
-document) and opts %opts (rect, border, color, I<fit>: see 
-descriptions below).
+Defines the annotation as a PDF launch-page with page object C<$page> (within 
+I<this> document), 'fit', and opts %opts (common parameters and optionally 
+I<fit>: see descriptions below).
 
-B<Note> that C<$page> is I<not> a simple page number, but is a page structure
-such as C<$pdf-E<gt>openpage(page_number)>, I<or> a Named Destination defined
-elsewhere. 
+B<Note> that C<$page> is I<not> a simple page number, but is either a page 
+I<object> such as C<$pdf-E<gt>openpage(page_number)>, I<or> a Named 
+Destination defined elsewhere (a prefix of '#' or '/' is optional, except when 
+the Named Destination is entirely numeric, and then it is required). 'foo', 
+'#foo', and '/3659' are examples of Named Destinations.
+If a Named Destination is given, the page fit (location) is ignored, as the 
+Named Destination handles that.
+
+Note that the I<options> %opts is a hash, permitting 'rect', 'border', and 
+'color' to be described in a more natural manner than flattening the hash into 
+an array. The location and its arguments (fit data) may be either a list
+(in the PDF::API2 style) or another hash element.
+
+B<Alternate name:> C<link>
+
+Originally this method was named C<link>, but PDF::API2 changed it to
+C<goto>, to correspond to the B<GoTo> PDF command used. For compatibility, it 
+has been changed to C<goto>, with C<link> still available as an alias.
 
 =back
 
 =cut
 
-# consider goto() as alias, for consistency with NamedDestination
-#sub goto { return link(@_); }  ## no critic
+# this nonsense seems to be necessary (to alias goto with link) because
+# Perl gets confused and thinks it's a "goto label" statement!
+sub link {   ## no critic
+    my $self = shift;
+    return $self->goto(@_); }
 
-sub link { 
-    my ($self, $page, %opts) = @_;
-    # copy dashed names over to preferred non-dashed names
-    if (defined $opts{'-rect'} && !defined $opts{'rect'}) { $opts{'rect'} = delete($opts{'-rect'}); }
-    if (defined $opts{'-border'} && !defined $opts{'border'}) { $opts{'border'} = delete($opts{'-border'}); }
-    if (defined $opts{'-color'} && !defined $opts{'color'}) { $opts{'color'} = delete($opts{'-color'}); }
+sub goto { 
+    my ($self, $page, @args) = @_;
+    # page may be a page object, or a Named Destination string
+    # if location and its parms are a list, made a hash element,
+    # like any rect/color/border hash elements
 
-    $self->{'Subtype'} = PDFName('Link');
+    # dest() will process it again, but we need hash for button settings
+    my %opts = PDF::Builder::NamedDestination->list2hash(@args);
+    $self->{'Subtype'}  = PDFName('Link');
+    $self->{'A'}        = PDFDict();
+    $self->{'A'}->{'S'} = PDFName('GoTo');
     if (ref($page)) {
 	# page structure
-        $self->{'A'}        = PDFDict();
-        $self->{'A'}->{'S'} = PDFName('GoTo');
+        $self->{'A'}->{'D'} = 
+	   PDF::Builder::NamedDestination->dest($page, %opts);  
+           # fit type and parameters in args
     } else {
 	# named destination
-	$self->{'Dest'} = PDFString($page, 'n');
-	# PDF::API2 returns $self at this point!
+	# strip off any # or /, make sure it's a string
+	if ($page =~ /^[#\/](.+)/) {
+            $page = "$1";
+	}
+	$self->{'A'}->{'D'} = PDFString($page, 'n');
     }
-    $self->dest($page, %opts);
+
+    # click area rectangle (button)
     $self->rect(@{$opts{'rect'}}) if defined $opts{'rect'};
     $self->border(@{$opts{'border'}}) if defined $opts{'border'};
     $self->Color(@{$opts{'color'}}) if defined $opts{'color'};
@@ -133,21 +235,34 @@ sub link {
 
 =head3 pdf, pdfile, pdf_file
 
-    $annotation->pdf($pdffile, $page_number, %opts)
+    $annotation->pdf($pdffile, $page_number, $location, @args, %opts) # preferred
+
+    $annotation->pdf($pdffile, $page_number, %opts) # including location & data
 
 =over
 
-Defines the annotation as a PDF-file with filepath C<$pdffile>, on page 
-C<$page_number>, and opts %opts (rect, border, color, I<fit>: see 
-descriptions below). This differs from the C<link> call in that the target 
-is found in a different PDF file, not the current document.
+Defines the annotation as an B<external> PDF-file with filepath C<$pdffile>, 
+on page C<$page_number>, and options %opts (common parameters and I<fit>: see 
+descriptions below). This differs from the C<goto> call in that the target 
+is found in a I<different> PDF file, not the current document. Your operating
+system may warn you that you are going to a different file.
 
-C<$page_number> is the physical page number, starting at 1: 1, 2,...
+C<$page_number> is the physical page number, starting at 1: 1, 2,..., I<or> a 
+Named Destination defined in that document (a prefix of '#' or '/' is optional, 
+except when the Named Destination is entirely numeric, and then it is 
+required). 'foo', '/foo', and '#3659' are examples of Named Destinations.
+If a Named Destination is used, the page fit (location) is ignored, as the 
+Named Destination handles that.
+
+Note that the I<options> %opts is a hash, while the location and fit @args 
+may be described as a list (PDF::API2 style), or as another hash element.
+This permits 'rect', 'border', and 'color' to be
+described in a more natural manner than flattening the hash into an array.
 
 B<Alternate names:> C<pdfile> and C<pdf_file>
 
-Originally this method was named C<pdfile>, and then C<pdf_file> but a recent 
-PDF::API2 change made it C<pdf>. For compatibility, it has been changed to 
+Originally this method was named C<pdfile>, and then C<pdf_file> but 
+PDF::API2 changed it to C<pdf>. For compatibility, it has been changed to 
 C<pdf>, with C<pdfile> and C<pdf_file> still available as aliases.
 
 =back
@@ -158,20 +273,76 @@ sub pdfile { return pdf(@_); } ## no critic
 sub pdf_file { return pdf(@_); } ## no critic 
 
 sub pdf {
-    my ($self, $url, $page_number, %opts) = @_;
-    # note that although "url" is used, it may be a local file
-    # copy dashed names over to preferred non-dashed names
-    if (defined $opts{'-rect'} && !defined $opts{'rect'}) { $opts{'rect'} = delete($opts{'-rect'}); }
-    if (defined $opts{'-color'} && !defined $opts{'color'}) { $opts{'color'} = delete($opts{'-color'}); }
-    if (defined $opts{'-border'} && !defined $opts{'border'}) { $opts{'border'} = delete($opts{'-border'}); }
+    # page may be a page number, or a Named Destination string
+    # args include location and its parms as either hash element or a list,
+    # and optionally (if not set externally), rect/color/border hash elements
+
+    my ($self, $file, $page_number, @args) = @_;
+    # dest() will process it again, but we need hash for button settings
+    my %opts = PDF::Builder::NamedDestination->list2hash(@args);
 
     $self->{'Subtype'}  = PDFName('Link');
     $self->{'A'}        = PDFDict();
     $self->{'A'}->{'S'} = PDFName('GoToR');
-    $self->{'A'}->{'F'} = PDFString($url, 'u');
+    $self->{'A'}->{'F'} = PDFString($file, 'u');
 
-    $page_number--;  # wants it numbered starting at 0
-    $self->dest(PDFNum($page_number), %opts);
+    # if an integer $page_number, /D [page_num fit]
+    if ($page_number =~ /^\d+$/) {
+        $page_number--;  # wants it numbered starting at 0
+        $self->{'A'}->{'D'} = 
+	    PDF::Builder::NamedDestination->dest($page_number, %opts); 
+            # fit info opts
+    } else {
+	# string 'page_number' is a Named Destination, /D (foo)
+	# any prefix of '#' or '/' will be stripped off
+	if ($page_number =~ /^[#\/](.+)$/) {
+	    $page_number = "$1"; # if all numeric, make sure it's a string
+	}
+        $self->{'A'}->{'D'} = PDFString("$page_number", 'n');
+    }
+
+    $self->rect(@{$opts{'rect'}}) if defined $opts{'rect'};
+    $self->border(@{$opts{'border'}}) if defined $opts{'border'};
+    $self->Color(@{$opts{'color'}}) if defined $opts{'color'};
+
+    return $self;
+}
+
+=head3 uri, url
+
+    $annotation->uri($url, %opts)
+
+=over
+
+Defines the annotation as a launch-url with url C<$url> and
+options %opts (common parameters). 
+This page is usually brought up in a browser, and may be remote. This
+depends on your operating system configuration.
+
+B<Alternate name:> C<url>
+
+Originally this method was named C<url>, but PDF::API2 changed it to
+C<uri> to correspond to the B<URI> PDF command used. For compatibility, it has 
+been changed to C<uri>, with C<url> still available as an alias.
+
+=back
+
+=cut
+
+sub url { return uri(@_); } ## no critic
+
+sub uri {
+    my ($self, $url, %opts) = @_;
+    # copy dashed names over to preferred non-dashed names
+    # there are no other options, unlike goto() and pdf(), so no call dest()
+    %opts = dashed2nondashed(%opts);
+
+    $self->{'Subtype'}    = PDFName('Link');
+    $self->{'A'}          = PDFDict();
+    # note that the following code produces /A << /S /URI /URI (url) >>
+    $self->{'A'}->{'S'}   = PDFName('URI');
+    $self->{'A'}->{'URI'} = PDFString($url, 'u');
+
     $self->rect(@{$opts{'rect'}}) if defined $opts{'rect'};
     $self->Color(@{$opts{'color'}}) if defined $opts{'color'};
     $self->border(@{$opts{'border'}}) if defined $opts{'border'};
@@ -185,15 +356,18 @@ sub pdf {
 
 =over
 
-Defines the annotation as a launch-file with filepath C<$file> (a local file)
-and options %opts (rect, border, color: see descriptions below). 
-I<How> the file is displayed depends on the operating system, type of file, 
-and local configuration or mapping.
+Defines the annotation as a launch-file with filepath C<$file> (a local file,
+often an executable or script/batch file)
+and options %opts (common parameters). 
+I<How> the file is "launched" or displayed depends on the operating system, 
+type of file, and local configuration or mapping. Common applications are to
+bring up a text editor to display a file, or start a photo viewer.
 
 B<Alternate name:> C<file>
 
-Originally this method was named C<file>, but a recent PDF::API2 change made it
-C<launch>. For compatibility, it has been changed to C<launch>, with C<file> 
+Originally this method was named C<file>, but PDF::API2 changed it to
+C<launch> to correspond to the B<Launch> PDF command used. For compatibility, 
+it has been changed to C<launch>, with C<file> 
 still available as an alias.
 
 =back
@@ -205,55 +379,12 @@ sub file { return launch(@_); } ## no critic
 sub launch {
     my ($self, $file, %opts) = @_;
     # copy dashed names over to preferred non-dashed names
-    if (defined $opts{'-rect'} && !defined $opts{'rect'}) { $opts{'rect'} = delete($opts{'-rect'}); }
-    if (defined $opts{'-color'} && !defined $opts{'color'}) { $opts{'color'} = delete($opts{'-color'}); }
-    if (defined $opts{'-border'} && !defined $opts{'border'}) { $opts{'border'} = delete($opts{'-border'}); }
+    %opts = dashed2nondashed(%opts);
 
     $self->{'Subtype'}  = PDFName('Link');
     $self->{'A'}        = PDFDict();
     $self->{'A'}->{'S'} = PDFName('Launch');
     $self->{'A'}->{'F'} = PDFString($file, 'f');
-
-    $self->rect(@{$opts{'rect'}}) if defined $opts{'rect'};
-    $self->Color(@{$opts{'color'}}) if defined $opts{'color'};
-    $self->border(@{$opts{'border'}}) if defined $opts{'border'};
-
-    return $self;
-}
-
-=head3 uri, url
-
-    $annotation->uri($url, %opts)
-
-=over
-
-Defines the annotation as a launch-url with url C<$url> and
-options %opts (rect, border, color: see descriptions below). 
-This page is usually brought up in a browser, and may be remote.
-
-B<Alternate name:> C<url>
-
-Originally this method was named C<url>, but a recent PDF::API2 change made it
-C<uri>. For compatibility, it has been changed to C<uri>, with C<url> still
-available as an alias.
-
-=back
-
-=cut
-
-sub url { return uri(@_); } ## no critic
-
-sub uri {
-    my ($self, $url, %opts) = @_;
-    # copy dashed names over to preferred non-dashed names
-    if (defined $opts{'-rect'} && !defined $opts{'rect'}) { $opts{'rect'} = delete($opts{'-rect'}); }
-    if (defined $opts{'-color'} && !defined $opts{'color'}) { $opts{'color'} = delete($opts{'-color'}); }
-    if (defined $opts{'-border'} && !defined $opts{'border'}) { $opts{'border'} = delete($opts{'-border'}); }
-
-    $self->{'Subtype'}    = PDFName('Link');
-    $self->{'A'}          = PDFDict();
-    $self->{'A'}->{'S'}   = PDFName('URI');
-    $self->{'A'}->{'URI'} = PDFString($url, 'u');
 
     $self->rect(@{$opts{'rect'}}) if defined $opts{'rect'};
     $self->Color(@{$opts{'color'}}) if defined $opts{'color'};
@@ -269,9 +400,9 @@ sub uri {
 =over
 
 Defines the annotation as a text note with content string C<$text> and
-options %opts (rect, color, text, open: see descriptions below). 
-The C<$text> may include newlines \n for multiple lines. The option border is
-ignored, since an I<icon> is used.
+options %opts (common parameters, text, open: see descriptions below). 
+The C<$text> may include newlines \n for multiple lines. Note that the option 
+'border' is ignored, since an I<icon> is used.
 
 The option C<text> is the popup's label string, not to be confused with the 
 main C<$text>.
@@ -316,13 +447,7 @@ the outline and the fill color. The default is 1.0.
 sub text {
     my ($self, $text, %opts) = @_;
     # copy dashed names over to preferred non-dashed names
-    if (defined $opts{'-rect'} && !defined $opts{'rect'}) { $opts{'rect'} = delete($opts{'-rect'}); }
-    if (defined $opts{'-color'} && !defined $opts{'color'}) { $opts{'color'} = delete($opts{'-color'}); }
-    if (defined $opts{'-border'} && !defined $opts{'border'}) { $opts{'border'} = delete($opts{'-border'}); }
-    if (defined $opts{'-open'} && !defined $opts{'open'}) { $opts{'open'} = delete($opts{'-open'}); }
-    if (defined $opts{'-text'} && !defined $opts{'text'}) { $opts{'text'} = delete($opts{'-text'}); }
-    if (defined $opts{'-opacity'} && !defined $opts{'opacity'}) { $opts{'opacity'} = delete($opts{'-opacity'}); }
-    if (defined $opts{'-icon'} && !defined $opts{'icon'}) { $opts{'icon'} = delete($opts{'-icon'}); }
+    %opts = dashed2nondashed(%opts);
 
     $self->{'Subtype'} = PDFName('Text');
     $self->content($text);
@@ -376,8 +501,8 @@ One or more sets of numeric coordinates are given, defining the quadrilateral
 are four sets of C<x,y> coordinates, given (for Left-to-Right text) as the 
 upper bound Upper Left to Upper Right and then the lower bound Lower Left to 
 Lower Right. B<Note that this is different from what is (erroneously)
-documented in the PDF specification!> It is important that the coordinates be
-given in this order.
+documented in some PDF specifications!> It is important that the coordinates 
+be given in this order.
 
 Multiple sets of quadrilateral corners may be given, such as for highlighted
 text that wraps around to new line(s). The minimum is one set (8 numbers).
@@ -429,10 +554,7 @@ the outline and the fill color. The default is 1.0.
 sub markup {
     my ($self, $text, $PointList, $highlight, %opts) = @_;
     # copy dashed names over to preferred non-dashed names
-    if (defined $opts{'-color'} && !defined $opts{'color'}) { $opts{'color'} = delete($opts{'-color'}); }
-    if (defined $opts{'-open'} && !defined $opts{'open'}) { $opts{'open'} = delete($opts{'-open'}); }
-    if (defined $opts{'-text'} && !defined $opts{'text'}) { $opts{'text'} = delete($opts{'-text'}); }
-    if (defined $opts{'-opacity'} && !defined $opts{'opacity'}) { $opts{'opacity'} = delete($opts{'-opacity'}); }
+    %opts = dashed2nondashed(%opts);
 
     my @pointList = @{ $PointList };
     if ((scalar @pointList) == 0 || (scalar @pointList)%8) {
@@ -474,10 +596,10 @@ sub markup {
 
 Defines the annotation as a movie from C<$file> with 
 content (MIME) type C<$contentType> and
-options %opts (rect, border, color, text: see descriptions below).
+options %opts (common parameters, text: see descriptions below).
 
-The C<rect> rectangle also serves as the area where the movie is played, so it
-should be of usable size and aspect ratio. It does not use a separate popup
+The C<rect> rectangle B<also serves as the area where the movie is played>, so 
+it should be of usable size and aspect ratio. It does not use a separate popup
 player. It is known to play .avi and .wav files -- others have not been tested.
 Using Adobe Reader, it will not play .mpg files (unsupported type). More work
 is probably needed on this annotation method.
@@ -489,10 +611,7 @@ is probably needed on this annotation method.
 sub movie {
     my ($self, $file, $contentType, %opts) = @_;
     # copy dashed names over to preferred non-dashed names
-    if (defined $opts{'-rect'} && !defined $opts{'rect'}) { $opts{'rect'} = delete($opts{'-rect'}); }
-    if (defined $opts{'-color'} && !defined $opts{'color'}) { $opts{'color'} = delete($opts{'-color'}); }
-    if (defined $opts{'-border'} && !defined $opts{'border'}) { $opts{'border'} = delete($opts{'-border'}); }
-    if (defined $opts{'-text'} && !defined $opts{'text'}) { $opts{'text'} = delete($opts{'-text'}); }
+    %opts = dashed2nondashed(%opts);
 
     $self->{'Subtype'}      = PDFName('Movie'); # subtype = movie (req)
     $self->{'A'}            = PDFBool(1); # play using default activation parms
@@ -526,7 +645,7 @@ sub movie {
 =over
 
 Defines the annotation as a file attachment with file $file and options %opts
-(rect, color: see descriptions below). Note that C<color> applies to
+(common parameters: see descriptions below). Note that C<color> applies to
 the icon fill color, not to a selectable area outline. The icon is resized
 (including aspect ratio changes) based on the selectable rectangle given by
 C<rect>, so watch your rectangle dimensions!
@@ -602,13 +721,7 @@ separate OS version paths B<may> be considered obsolescent!>.
 sub file_attachment {
     my ($self, $file, %opts) = @_;
     # copy dashed names over to preferred non-dashed names
-    if (defined $opts{'-rect'} && !defined $opts{'rect'}) { $opts{'rect'} = delete($opts{'-rect'}); }
-    if (defined $opts{'-color'} && !defined $opts{'color'}) { $opts{'color'} = delete($opts{'-color'}); }
-#   if (defined $opts{'-border'} && !defined $opts{'border'}) { $opts{'border'} = delete($opts{'-border'}); }
-    if (defined $opts{'-text'} && !defined $opts{'text'}) { $opts{'text'} = delete($opts{'-text'}); }
-    if (defined $opts{'-opacity'} && !defined $opts{'opacity'}) { $opts{'opacity'} = delete($opts{'-opacity'}); }
-    if (defined $opts{'-icon'} && !defined $opts{'icon'}) { $opts{'icon'} = delete($opts{'-icon'}); }
-    if (defined $opts{'-notrimpath'} && !defined $opts{'notrimpath'}) { $opts{'notrimpath'} = delete($opts{'-notrimpath'}); }
+    %opts = dashed2nondashed(%opts);
 
     my $icon;  # defaults to Reader's default (usually PushPin)
     $icon = $opts{'icon'} if exists $opts{'icon'};
@@ -691,6 +804,9 @@ sub file_attachment {
 
 =head2 Internal routines and common options
 
+The common options may be called separately (applied against $annotation before
+calling the action routine), or passed as options to the call.
+
 =head3 rect
 
     $annotation->rect($llx,$lly, $urx,$ury)
@@ -704,14 +820,18 @@ The default clickable area is the icon itself.
 
 Defining option. I<Note that this "option" is actually B<required>.>
 
+I<This call may be replaced by a hash element 'rect'=E<gt> in many calls
+(see Common parameters).>
+
 =back
 
 =over
 
 =item rect => [LLx, LLy, URx, URy]
 
-Set annotation rectangle at C<[LLx,LLy]> to C<[URx,URy]> (lower left and
-upper right coordinates). LL to UR is customary, but any diagonal is allowed.
+Set annotation rectangle I<as an option> at C<[LLx,LLy]> to C<[URx,URy]> 
+(lower left and upper right coordinates). 
+LL to UR is customary, but any diagonal is allowed.
 
 =back
 
@@ -772,6 +892,9 @@ The corner radii I<may> work on some other Readers.
 
 =back
 
+I<This call may be replaced by a hash element 'border'=E<gt> in many calls
+(see Common parameters).>
+
 =cut
 
 sub border {
@@ -786,6 +909,86 @@ sub border {
     } else {
         die "annotation->border() style requires 3 or 4 parameters ";
     }
+    return $self;
+}
+
+=head3 Color
+
+    $annotation->Color(@color)
+
+=over
+
+Set the icon's fill color I<or> the click area's border color. The color is 
+an array of 1, 3, or 4 numbers, each
+in the range 0.0 to 1.0. If 1 number is given, it is the grayscale value (0 = 
+black to 1 = white). If 3 numbers are given, it is an RGB color value. If 4
+numbers are given, it is a CMYK color value. Currently, named colors (strings)
+are not handled.
+
+For link and url annotations, this is the color of the rectangle border 
+(border given with a width of at least 1).
+
+If an invalid array length or numeric value is given, a medium gray ( [0.5] ) 
+value is used, without any message. If no color is given, the usual fill color
+is black.
+
+Defining option:
+
+Named colors (e.g., 'black') are not supported at this time.
+
+=back
+
+=over
+
+=item color => [ ] or not 1, 3, or 4 numbers 0.0-1.0
+
+A medium gray (0.5 value) will be used if an invalid color is given.
+
+=item color => [ g ]
+
+If I<g> is between 0.0 (black) and 1.0 (white), the fill color will be gray.
+
+=item color => [ r, g, b ]
+
+If I<r> (red), I<g> (green), and I<b> (blue) are all between 0.0 and 1.0, the 
+fill color will be the defined RGB hue. [ 0, 0, 0 ] is black, [ 1, 1, 0 ] is
+yellow, and [ 1, 1, 1 ] is white.
+
+=item color => [ c, m, y, k ]
+
+If I<c> (red), I<m> (magenta), I<y> (yellow), and I<k> (black) are all between 
+0.0 and 1.0, the fill color will be the defined CMYK hue. [ 0, 0, 0, 0 ] is
+white, [ 1, 0, 1, 0 ] is green, and [ 1, 1, 1, 1 ] is black.
+
+=back
+
+I<This call may be replaced by a hash element 'color'=E<gt> in many calls
+(see Common parameters).>
+
+=cut
+
+sub Color {
+    my ($self, @color) = @_;
+
+    if      (scalar @color == 1 &&
+             $color[0] >= 0 && $color[0] <= 1.0) {
+        $self->{'C'} = PDFArray(map { PDFNum($_) } $color[0]);
+    } elsif (scalar @color == 3 &&
+             $color[0] >= 0 && $color[0] <= 1.0 &&
+             $color[1] >= 0 && $color[1] <= 1.0 &&
+             $color[2] >= 0 && $color[2] <= 1.0) {
+        $self->{'C'} = PDFArray(map { PDFNum($_) } $color[0], $color[1], $color[2]);
+    } elsif (scalar @color == 4 &&
+             $color[0] >= 0 && $color[0] <= 1.0 &&
+             $color[1] >= 0 && $color[1] <= 1.0 &&
+             $color[2] >= 0 && $color[2] <= 1.0 &&
+             $color[3] >= 0 && $color[3] <= 1.0) {
+        $self->{'C'} = PDFArray(map { PDFNum($_) } $color[0], $color[1], $color[2], $color[3]);
+    } else {
+        # invalid color entry. just set to medium gray without message
+        $self->{'C'} = PDFArray(map { PDFNum($_) } 0.5 );
+    }
+
     return $self;
 }
 
@@ -849,158 +1052,9 @@ sub open {  ## no critic
     return $self;
 }
 
-=head3 dest
-
-    $annotation->dest($page, I<fit_setting>)
-
-=over
-
-For certain annotation types (C<link> or C<pdf_file>), the I<fit_setting> 
-specifies how the content of the page C<$page> is to be fit to the window,
-while preserving its aspect ratio. 
-These fit settings are listed in L<PDF::Builder::Docs/Page Fit Options>.
-
-"xyz" is the B<default> fit setting, with position (left and top) and zoom
-the same as the calling page's ([undef, undef, undef]).
-
-=back
-
-    $annotation->dest($name)
-
-=over
-
-Connect the Annotation to a "Named Destination" defined elsewhere, including
-the optional desired I<fit> (default: xyz undef*3).
-
-=back
-
-=cut
-
-sub dest {
-    my ($self, $page, %position) = @_;
-    # copy dashed names over to preferred non-dashed names
-    if (defined $position{'-fit'} && !defined $position{'fit'}) { $position{'fit'} = delete($position{'-fit'}); }
-    if (defined $position{'-fith'} && !defined $position{'fith'}) { $position{'fith'} = delete($position{'-fith'}); }
-    if (defined $position{'-fitb'} && !defined $position{'fitb'}) { $position{'fitb'} = delete($position{'-fitb'}); }
-    if (defined $position{'-fitbh'} && !defined $position{'fitbh'}) { $position{'fitbh'} = delete($position{'-fitbh'}); }
-    if (defined $position{'-fitv'} && !defined $position{'fitv'}) { $position{'fitv'} = delete($position{'-fitv'}); }
-    if (defined $position{'-fitbv'} && !defined $position{'fitbv'}) { $position{'fitbv'} = delete($position{'-fitbv'}); }
-    if (defined $position{'-fitr'} && !defined $position{'fitr'}) { $position{'fitr'} = delete($position{'-fitr'}); }
-    if (defined $position{'-xyz'} && !defined $position{'xyz'}) { $position{'xyz'} = delete($position{'-xyz'}); }
-
-    if (ref $page) {
-        $self->{'A'} //= PDFDict();
-
-        # old-fashioned 'fittype' => value
-        if      (defined $position{'fit'}) {
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('Fit'));
-        } elsif (defined $position{'fith'}) {
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitH'), PDFNum($position{'fith'}));
-        } elsif (defined $position{'fitb'}) {
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitB'));
-        } elsif (defined $position{'fitbh'}) {
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitBH'), PDFNum($position{'fitbh'}));
-        } elsif (defined $position{'fitv'}) {
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitV'), PDFNum($position{'fitv'}));
-        } elsif (defined $position{'fitbv'}) {
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitBV'), PDFNum($position{'fitbv'}));
-        } elsif (defined $position{'fitr'}) {
-            die "Insufficient parameters to fitr => []) " unless scalar @{$position{'fitr'}} == 4;
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('FitR'), map {PDFNum($_)} @{$position{'fitr'}});
-        } elsif (defined $position{'xyz'}) {
-            die "Insufficient parameters to xyz => []) " unless scalar @{$position{'xyz'}} == 3;
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('XYZ'), map {defined $_ ? PDFNum($_) : PDFNull()} @{$position{'xyz'}});
-        } else {
-	    # no "fit" option found. use default.
-            $position{'xyz'} = [undef,undef,undef];
-            $self->{'A'}->{'D'} = PDFArray($page, PDFName('XYZ'), map {defined $_ ? PDFNum($_) : PDFNull()} @{$position{'xyz'}});
-        }
-    } else {
-        $self->{'Dest'} = PDFString($page, 'n');
-    }
-
-    return $self;
-}
-
-=head3 Color
-
-    $annotation->Color(@color)
-
-=over
-
-Set the icon's fill color. The color is an array of 1, 3, or 4 numbers, each
-in the range 0.0 to 1.0. If 1 number is given, it is the grayscale value (0 = 
-black to 1 = white). If 3 numbers are given, it is an RGB color value. If 4
-numbers are given, it is a CMYK color value. Currently, named colors (strings)
-are not handled.
-
-For link and url annotations, this is the color of the rectangle border 
-(border given with a width of at least 1).
-
-If an invalid array length or numeric value is given, a medium gray ( [0.5] ) 
-value is used, without any message. If no color is given, the usual fill color
-is black.
-
-Defining option:
-
-Named colors (e.g., 'black') are not supported at this time.
-
-=back
-
-=over
-
-=item color => [ ] or not 1, 3, or 4 numbers 0.0-1.0
-
-A medium gray (0.5 value) will be used if an invalid color is given.
-
-=item color => [ g ]
-
-If I<g> is between 0.0 (black) and 1.0 (white), the fill color will be gray.
-
-=item color => [ r, g, b ]
-
-If I<r> (red), I<g> (green), and I<b> (blue) are all between 0.0 and 1.0, the 
-fill color will be the defined RGB hue. [ 0, 0, 0 ] is black, [ 1, 1, 0 ] is
-yellow, and [ 1, 1, 1 ] is white.
-
-=item color => [ c, m, y, k ]
-
-If I<c> (red), I<m> (magenta), I<y> (yellow), and I<k> (black) are all between 
-0.0 and 1.0, the fill color will be the defined CMYK hue. [ 0, 0, 0, 0 ] is
-white, [ 1, 0, 1, 0 ] is green, and [ 1, 1, 1, 1 ] is black.
-
-=back
-
-=cut
-
-sub Color {
-    my ($self, @color) = @_;
-
-    if      (scalar @color == 1 &&
-             $color[0] >= 0 && $color[0] <= 1.0) {
-        $self->{'C'} = PDFArray(map { PDFNum($_) } $color[0]);
-    } elsif (scalar @color == 3 &&
-             $color[0] >= 0 && $color[0] <= 1.0 &&
-             $color[1] >= 0 && $color[1] <= 1.0 &&
-             $color[2] >= 0 && $color[2] <= 1.0) {
-        $self->{'C'} = PDFArray(map { PDFNum($_) } $color[0], $color[1], $color[2]);
-    } elsif (scalar @color == 4 &&
-             $color[0] >= 0 && $color[0] <= 1.0 &&
-             $color[1] >= 0 && $color[1] <= 1.0 &&
-             $color[2] >= 0 && $color[2] <= 1.0 &&
-             $color[3] >= 0 && $color[3] <= 1.0) {
-        $self->{'C'} = PDFArray(map { PDFNum($_) } $color[0], $color[1], $color[2], $color[3]);
-    } else {
-        # invalid color entry. just set to medium gray without message
-        $self->{'C'} = PDFArray(map { PDFNum($_) } 0.5 );
-    }
-
-    return $self;
-}
-
 =head3 text string
 
-    text => string
+    'text' => string
 
 =over
 
@@ -1129,6 +1183,17 @@ sub icon_appearance {
     }
 
     return $self;
+}
+
+# strip off any leading - from all options (hash keys)
+sub dashed2nondashed {
+    my @opts = @_;
+    for (my $i=0; $i<@opts; $i+=2) {
+	if ($opts[$i] =~ /^-(.*)$/) {
+	    $opts[$i] = $1;
+	}
+    }
+    return @opts;
 }
 
 1;

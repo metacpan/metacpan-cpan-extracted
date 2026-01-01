@@ -7,12 +7,15 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
+our $VERSION = '3.028'; # VERSION
 our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 # command line flags, mutually exclusive:
 # -raw   show full output of each t-test run
 # -noOK  exclude "ok" lines so can easily spot error lines  DEFAULT
+
+# NOTE TO MAINTAINER;
+#  don't forget to update MANIFEST with any new t-tests
 
  # add after filter-lzwdecode when new TIFF code finished
  #   filter-ccittfaxdecode
@@ -91,7 +94,7 @@ if      (scalar @ARGV == 0) {
 
 foreach my $file (@test_list) {
     if ($file eq 'tiff') {
-	print "\nNote: t/tiff.t takes quite a bit longer than the others to run. Don't Panic!\n";
+	print "\nNote: t/tiff.t make take quite a bit longer than the others to run. Don't Panic!\n";
     }
 
     my @results = `perl t/$file.t`;

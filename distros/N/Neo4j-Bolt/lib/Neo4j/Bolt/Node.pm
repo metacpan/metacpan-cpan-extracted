@@ -1,7 +1,7 @@
 package Neo4j::Bolt::Node;
 # ABSTRACT: Representation of Neo4j Node
 
-$Neo4j::Bolt::Node::VERSION = '0.5001';
+$Neo4j::Bolt::Node::VERSION = '0.5002';
 
 use v5.12;
 use warnings;
@@ -132,7 +132,7 @@ L<Neo4j::Bolt>, L<Neo4j::Types::Node>
 
 =head1 LICENSE
 
-This software is Copyright (c) 2019-2024 by Arne Johannessen.
+This software is Copyright (c) 2019-2026 by Arne Johannessen.
 
 This is free software, licensed under:
 

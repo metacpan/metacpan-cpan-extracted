@@ -3,7 +3,7 @@ use v5.12;
 use warnings;
 
 BEGIN {
-  our $VERSION = "0.5001";
+  our $VERSION = "0.5002";
   require Neo4j::Bolt::CTypeHandlers;
   require Neo4j::Bolt::CResultStream;
   require XSLoader;
@@ -112,7 +112,7 @@ a boolean when found in a query parameter.
 
 =head1 LICENSE
 
-This software is Copyright (c) 2019-2024 by Mark A. Jensen.
+This software is Copyright (c) 2019-2026 by Mark A. Jensen.
 
 This is free software, licensed under:
 

@@ -48,6 +48,7 @@ t/001_useok.t
 t/004_query.t
 t/005_errors.t
 t/007_transact.t
+t/014_cxn.t
 t/020_types.t
 t/021_types_roles.t
 t/022_types_as_simple.t

@@ -1,0 +1,89 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-BeLike-DCANTRELL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Algorithm::Diff::JSON: '0'
+  App::ptimeout: '0'
+  CPAN::DistnameInfo: '0'
+  CPAN::FindDependencies: '0'
+  CPAN::ParseDistribution: '0'
+  CPU::Emulator::Memory: '0'
+  CPU::Emulator::Z80: '0'
+  Class::CanBeA: '0'
+  Class::Mockable: '0'
+  Color::ANSI::Util: '0'
+  DBIx::Class::QueryLog::WithStackTrace: '0'
+  DBIx::Class::SingletonRows: '0'
+  DBM::Deep: '0'
+  Data::CompactReadonly: '0'
+  Data::Compare: '0'
+  Data::Dumper::Concise: '0'
+  Data::Hexdumper: '0'
+  Data::Transactional: '0'
+  Date::Roman: '0'
+  Devel::Caller::IgnoreNamespaces: '0'
+  Devel::CheckOS: '0'
+  Devel::Cover: '0'
+  Devel::Deprecations::Environmental: '0'
+  Devel::Hide: '0'
+  Devel::NYTProf: '0'
+  Email::Valid: '0'
+  File::Find::Rule::Permissions: '0'
+  File::Slurp: '0'
+  File::Slurper: '0'
+  File::cd: '0'
+  Graphics::ColorNames: '0'
+  HTTP::Date: '0'
+  HTTP::Tiny: '0'
+  JSON: '0'
+  JSON::Parse: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  MIME::Lite: '0'
+  MIME::Types: '0'
+  MooseX::Types::StrictScalarTypes: '0'
+  Net::DNS: '0'
+  Number::Phone: '0'
+  Number::Phone::UK::DetailedLocations: '0'
+  Params::Validate::Dependencies: '0'
+  Params::Validate::Dependencies::all_or_none_of: '0'
+  Parse::CPAN::Packages::Fast: '0'
+  Path::Tiny: '0'
+  Scalar::Type: '0'
+  Sort::MultipleFields: '0'
+  Sort::Naturally: '0'
+  Statistics::ChiSquare: '0'
+  Statistics::SerialCorrelation: '0'
+  String::Binary::Interpolation: '0'
+  Sub::Attribute: '0'
+  Sub::WrapPackages: '0'
+  Template: '0'
+  Test::Differences: '0'
+  Test::Mojo::Role::HTTPstatus: '0'
+  Test::Most: '0'
+  Tie::Hash::Vivify: '0'
+  Tie::STDOUT: '0'
+  WWW::Mechanize: '0'
+  XML::DoubleEncodedEntities: '0'
+  YAML::XS: '0'
+resources:
+  bugtracker: https://github.com/DrHyde/perl-modules-Task-BeLike-DCANTRELL/issues
+  repository: https://github.com/DrHyde/perl-modules-Task-BeLike-DCANTRELL
+version: '1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

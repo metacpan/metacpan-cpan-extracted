@@ -87,7 +87,7 @@ This field is required.
 =item B<ReturnURL> = I<url>
 
 URL to report for updated versions, instead of the default behavior of
-reporting the newest matched URL. Occurances of C<@VERSION@> in I<url> will
+reporting the newest matched URL. Occurences of C<@VERSION@> in I<url> will
 be replaced by the new version string.
 
 =back

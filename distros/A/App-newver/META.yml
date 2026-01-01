@@ -20,6 +20,8 @@ no_index:
     - t
     - inc
 requires:
+  File::Basename: '0'
+  File::Spec: '0'
   Getopt::Long: '0'
   HTML::TreeBuilder: '5.00'
   JSON::PP: '0'
@@ -31,5 +33,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/1-1sam/newver/issues
   repository: https://codeberg.org/1-1sam/newver.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,8 +3,8 @@ package PDF::Builder::FontManager;
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 use Carp;
 use Scalar::Util qw(weaken);
@@ -15,7 +15,7 @@ use Scalar::Util qw(weaken);
 # TBD (future)
 #  spec use of synfont() against a base to get
 #   fake bold, italic, bold+italic
-#   small caps, perhaps petite caps
+#   small caps (80% height), perhaps petite caps (1 ex height)
 #   condensed and expanded (or via hscale())
 #  support for UTF-8 subfonts for single byte encoding fonts
 
@@ -28,7 +28,7 @@ PDF::Builder::FontManager - Managing the font library for PDF::Builder
 These routines are called from the PDF::Builder class (see C<get_font(),
 add_font()> methods).
 
-    # core fonts come pre-loaded
+    # core fonts come preloaded
     # Add new a new font face and variants
     my $rc = $pdf->add_font(
         'face' => $unique_face_name,  # font family, e.g., Times
@@ -61,7 +61,7 @@ add_font()> methods).
 Some of the global data, which can be reset via the C<font_settings()> method:
 
     * default-face:  initialized to Times-Roman (core), used if you start
-      formatting text without explicitly setting a face
+      formatting text without explicitly setting a face, or inheriting one
     * default-serif: initialized to Times-Roman (core), used if you want
       a "generic" serif typeface
     * default-sansserif: initialized to Helvetica (core), used if you want
@@ -352,6 +352,24 @@ and the other a TTF font). Give them different names (face names are case
 I<sensitive>, so 'Times' is different from 'times'). The C<face> name is
 used to retrieve the desired font.
 
+The default core font face names
+(I<Times, Helvetica, Courier, Symbol, ZapfDingbats, 
+Georgia, Verdana, Trebuchet, Wingdings, Webdings>),
+as well as class names
+I<current, default, serif, sans-serif, constant, script, symbol, -external->
+are B<reserved> and should not be used for user-added faces.
+They I<may> be redefined at your discretion.
+The MS Windows core extension I<BankGothic> is currently B<not> added to the
+core fonts automatically. I<-external-> may or may not be defined, and should
+not be used by user code.
+
+B<Note> that use of Windows extension "core" fonts (Georgia, Verdana, Trebuchet,
+Wingdings, and Webdings) expect those fonts to be installed on platforms if
+they are used, and a (hopefully) close substitution will be attempted if not.
+These fonts are normally available on Windows platforms, but may not be 
+available on non-Windows platforms. Use (create PDFs specifying them) at your 
+own risk.
+
 =item type => 'type string'
 
 This tells which Builder font routine to use to load the font. The allowed
@@ -362,7 +380,7 @@ entries are:
 =item B<core>
 
 This is a core font, and is loaded via the C<CoreFont()> routine. Note that
-the core fonts are automatically pre-loaded (including additional ones on
+the core fonts are automatically preloaded (including additional ones on
 Windows systems), so you should not need to explicitly load any core fonts
 (at least, the 14 basic ones). All PDF installation are supposed to include
 these 14 basic core fonts, but the precise actual file type may vary among
@@ -374,7 +392,9 @@ loaded. These are Georgia, Verdana, Trebuchet, Wingdings, and Webdings faces.
 Use caution if making use of these additional core fonts, as non-Windows
 systems may not include them without explicit manual installation of these
 fonts. These fonts may be safe to use if you know that all your PDF readers
-will be running on Windows systems.
+will be running on Windows systems. Finally, PDF::Builder includes metrics
+for Bank Gothic, but this is not automatically loaded into the core set, as
+it is not clear whether all Windows systems actually include this font.
 
 =item B<ttf>
 
@@ -464,8 +484,19 @@ useful to you for defining a generic style font.
 
 =item file => {anonymous hash of source files}
 
-This tells the Font Manager where to find the actual font file. For core fonts,
-it is the standard name, rather than a file (and remember, they are pre-loaded).
+This tells the Font Manager where to find the actual font file. 
+
+Various font paths are tried from the C<font_path> list to find an actual file. 
+TrueType and OpenType fonts
+(C<'type'=E<gt>'ttf'>) may instead be given as a C<Font::TTF::Font> I<object>,
+such as one extracted from a TTC (TrueType Collection) file, one per "file"
+('roman', 'italic', etc.). In a dump of the FontManager tables 
+(C<dump_font_tables()>), these will show up as a file "name" of 
+C<Font::TTF::Font=HASH(....)>. B<Other ways of specifying TTC fonts are 
+expected to be added in the future.>
+
+For core fonts, it is the standard I<name>, rather than a I<file> (and 
+remember, they are preloaded).
 For all other types, it lists from one to four of the following variants:
 
 =over
@@ -539,13 +570,13 @@ sub add_font {
 	}
     }
     # is this face name reserved?
-    foreach (qw/current default serif sans-serif constant script symbol/) {
-	if ($_ eq $info{'face'}) {
-	    carp "add_font finds face name '$info{'face'} is reserved!";
-	    $rc = 1;
-	    last;
-	}
-    }
+#   foreach (qw/current default serif sans-serif constant script symbol -external-/) {
+#       if ($_ eq $info{'face'}) {
+#           carp "add_font finds face name '$info{'face'} is reserved!";
+#           $rc = 1;
+#           last;
+#       }
+#   }
 
     if (!defined $info{'type'}) {
 	carp "add_font missing 'type' entry";
@@ -556,7 +587,8 @@ sub add_font {
 	$info{'type'} ne 'ttf' &&
         $info{'type'} ne 'type1' && 
 	$info{'type'} ne 'cjk' &&
-        $info{'type'} ne 'bdf') {
+        $info{'type'} ne 'bdf' &&
+        !($info{'type'} eq '?' && $info{'face'} eq '-external-')) {
 	carp "add_font unknown 'type' entry $info{'type'}";
 	$rc = 1;
     }
@@ -576,7 +608,8 @@ sub add_font {
 	$info{'style'} ne 'sans-serif' &&
         $info{'style'} ne 'constant' && 
 	$info{'style'} ne 'script' &&
-        $info{'style'} ne 'symbol') {
+        $info{'style'} ne 'symbol' &&
+        !($info{'style'} eq '?' && $info{'face'} eq '-external-')) {
 	carp "add_font unknown 'style' entry $info{'style'}";
 	$rc = 1;
     }
@@ -586,7 +619,8 @@ sub add_font {
 	$rc = 1;
     }
     if ($info{'width'} ne 'proportional' && 
-	$info{'width'} ne 'constant') {
+	$info{'width'} ne 'constant' &&
+        !($info{'width'} eq '?' && $info{'face'} eq '-external-')) {
 	carp "add_font unknown 'width' entry $info{'width'}";
 	$rc = 1;
     }
@@ -635,6 +669,7 @@ sub _initialize_core {
     my $single = 'cp-1252';  # let's try this one for single byte encodings
     # the universal core fonts. note that some systems may have similar
     # fonts substituted (but the metrics should be the same)
+    # index = 0
     $self->add_font('face' => 'Times', 'type' => 'core', 
 	        'settings' => { 'encode' => $single },
 	        'style' => 'serif', 'width' => 'proportional',
@@ -642,6 +677,7 @@ sub _initialize_core {
                            'italic' => 'Times-Italic',
                            'bold' => 'Times-Bold', 
                            'bold-italic' => 'Times-BoldItalic'} );
+    # index = 1
     $self->add_font('face' => 'Helvetica', 'type' => 'core', 
 	        'settings' => { 'encode' => $single },
 	        'style' => 'sans-serif', 'width' => 'proportional',
@@ -649,6 +685,7 @@ sub _initialize_core {
                            'italic' => 'Helvetica-Oblique',
                            'bold' => 'Helvetica-Bold', 
                            'bold-italic' => 'Helvetica-BoldOblique'} );
+    # index = 2
     $self->add_font('face' => 'Courier', 'type' => 'core', 
 	        'settings' => { 'encode' => $single },
 	        'style' => 'serif', 'width' => 'constant',
@@ -656,18 +693,21 @@ sub _initialize_core {
                            'italic' => 'Courier-Oblique',
                            'bold' => 'Courier-Bold', 
                            'bold-italic' => 'Courier-BoldOblique'} );
+    # index = 3
     $self->add_font('face' => 'Symbol', 'type' => 'core', 
 	        'settings' => { 'encode' => $single },
 	        'style' => 'symbol', 'width' => 'proportional',
                 'file' => {'symbol' => 'Symbol'} );
+    # index = 4
     $self->add_font('face' => 'ZapfDingbats', 'type' => 'core', 
 	        'settings' => { 'encode' => $single },
 	        'style' => 'symbol', 'width' => 'proportional',
                 'file' => {'symbol' => 'ZapfDingbats'} );
 
 # apparently available on Windows systems
-    if ($^O eq 'MSWin32') {
+   #if ($^O eq 'MSWin32') { # always allow, even on non-Windows platforms
 
+    # index = 5
     $self->add_font('face' => 'Georgia', 'type' => 'core', 
                 'settings' => { 'encode' => $single }, 
 		'style' => 'serif', 'width' => 'proportional',
@@ -675,6 +715,7 @@ sub _initialize_core {
                            'italic' => 'GeorgiaItalic',
                            'bold' => 'GeorgiaBold',
                            'bold-italic' => 'GeorgiaBoldItalic'} );
+    # index = 6
     $self->add_font('face' => 'Verdana', 'type' => 'core', 
                 'settings' => { 'encode' => $single }, 
 		'style' => 'sans-serif', 'width' => 'proportional',
@@ -682,6 +723,7 @@ sub _initialize_core {
                            'italic' => 'VerdanaItalic',
                            'bold' => 'VerdanaBold',
                            'bold-italic' => 'VerdanaBoldItalic'} );
+    # index = 7
     $self->add_font('face' => 'Trebuchet', 'type' => 'core', 
                 'settings' => { 'encode' => $single }, 
 		'style' => 'sans-serif', 'width' => 'proportional',
@@ -689,10 +731,12 @@ sub _initialize_core {
                            'italic' => 'TrebuchetItalic',
                            'bold' => 'TrebuchetBold',
                            'bold-italic' => 'TrebuchetBoldItalic'} );
+    # index = 8
     $self->add_font('face' => 'Wingdings', 'type' => 'core', 
                 'settings' => { 'encode' => $single }, 
 		'style' => 'symbol', 'width' => 'proportional',
                 'file' => {'symbol' => 'Wingdings'} );
+    # index = 9
     $self->add_font('face' => 'Webdings', 'type' => 'core', 
                 'settings' => { 'encode' => $single }, 
 		'style' => 'symbol', 'width' => 'proportional',
@@ -714,7 +758,7 @@ sub _initialize_core {
 #                         #'bold-italic' => 'BankGothicBoldItalic'} 
 #                         } );
 
-    } # Windows additional core fonts
+   #} # Windows additional core fonts
 
     return;
 } # end of _initialize_core()
@@ -970,10 +1014,17 @@ sub get_font {
 	$font = $self->{' pdf'}->corefont($file, %$settings);
 
     } elsif ($type eq 'ttf') {
-	foreach my $filepath ($self->_filepath($file)) {
-	    if (!(-f $filepath && -r $filepath)) { next; }
-	    $font = $self->{' pdf'}->ttfont($filepath, %$settings);
-	    if (defined $font) { last; }
+	if (ref($file) eq 'Font::TTF::Font') {
+	    # it's a Font::TTF::Font object, not a real file
+	    # may be used as input to ttfont() to get a real font out of it
+	    $font = $self->{' pdf'}->ttfont($file, %$settings);
+	} else {
+	    # it's a regular real file
+	    foreach my $filepath ($self->_filepath($file)) {
+	        if (!(-f $filepath && -r $filepath)) { next; }
+	        $font = $self->{' pdf'}->ttfont($filepath, %$settings);
+	        if (defined $font) { last; }
+            }
         }
 
     } elsif ($type eq 'type1') {
@@ -1071,6 +1122,72 @@ sub _filepath {
 
     return @out_list;
 }
+
+=head2 get_external_font
+
+    $rc = $pdf->get_external_font($text)
+
+=over
+
+If the user has already defined a font outside of C<FontManager>, in the 
+C<$text> text context, this call permits it to be retrieved as the 
+I<current font>, named B<-external->. If no font has been defined already,
+nothing is changed and the return code is 1.
+
+If C<$text-E<gt>{' font'}> has been defined, that font is stored in the
+internal cache (as an "already read" font) in a new "-external-" font, and
+it is made the current font. The return code is 0.
+
+If there is no existing preloaded font, 
+nothing is done and the return code is 1.
+
+This is a way for those using "markdown" formatting to define the font used,
+as an alternative to using C<'style'=E<gt>'body { font-family: ... '}> to
+define the body font.
+
+=back
+
+=cut
+
+sub get_external_font {
+    my ($self, $text) = @_;
+
+    if (!defined $text->{' font'}) {
+	# there is no existing font defined
+	return 1;
+    }
+    my $font = $text->{' font'};
+    # does -external- already exist? search list of defined faces
+    my $index = $self->_face2index('-external-');
+    # $index == -1 if not found
+
+    if ($index == -1) {
+	# not yet added
+        $self->add_font(
+            'face' => '-external-',   # special reserved name
+	    'type' => '?',            # we know nothing about the actual font!
+	    'style' => '?',
+	    'width' => '?',
+            # will never be looking at for a filepath
+	    'file' => { 'roman'       => '?',
+	                'italic'      => '?',
+	                'bold'        => '?',
+	                'bold-italic' => '?' }
+        );
+        $index = $self->_face2index('-external-');
+    }
+
+    # -external- exists at $index, update $font entries
+    # unlike regular fonts, all variants point to the same font entry
+    foreach my $key (qw/roman italic bold bold-italic/) {
+        $self->{' font-list'}->[$index]->{'entry'}->{$key} = $font;
+    }
+    # set current font to -external-. italic and bold irrelevant
+    $self->{' current-font'} = {'face' => '-external-', 'index' => $index,
+                                'italic' => 0, 'bold' => 0};
+
+    return 0;
+} # end of get_external_font()
 
 =head2 dump_font_tables
 

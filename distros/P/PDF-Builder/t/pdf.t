@@ -15,6 +15,7 @@ is($info{'Producer'}, 'PDF::Builder Test Suite', 'Check info string');
 
 my $gfx = $pdf->page()->gfx();
 $gfx->fillcolor('blue');
+$gfx->_Gpending(); # flush buffered output
 
 my $new = PDF::Builder->from_string($pdf->to_string());
 %info = $new->info();
@@ -100,6 +101,7 @@ like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /P \(Test\) /S /D /St 1 
 $pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 $gfx->fillcolor('blue');
+$gfx->_Gpending(); # flush buffered output
 
 $string = $pdf->to_string();
 like($string, qr/0 0 1 rg/,
@@ -122,6 +124,7 @@ like($string, qr/0 0 1 rg/,
 $pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 $gfx->fillcolor('blue');
+$gfx->_Gpending(); # flush buffered output
 
 ($fh, $filename) = tempfile();
 print $fh $pdf->to_string();
@@ -130,9 +133,11 @@ close $fh;
 $pdf = PDF::Builder->open($filename, 'compress' => 'none');
 $gfx = $pdf->page()->gfx();
 $gfx->fillcolor('red');
+$gfx->_Gpending(); # flush buffered output
 $pdf->saveas($filename);
 
 $pdf = PDF::Builder->open($filename, 'compress' => 'none');
+$gfx->_Gpending(); # flush buffered output
 $string = $pdf->to_string();
 like($string, qr/0 0 1 rg/,
      q{saveas($opened_filename) contains original content});

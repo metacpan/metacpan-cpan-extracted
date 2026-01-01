@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 use Carp;
 use Compress::Zlib qw();
@@ -90,6 +90,19 @@ sub new {
     $self->{' flatness'}       = 1;      # see also gs FL
     $self->{' apiistext'}      = 0;
     $self->{' openglyphlist'}  = 0;
+    # hold only latest of multiple instances
+    $self->{' doPending'}      = 0;   # DISABLE for now
+    $self->{' Tpending'}         = ();
+      $self->{' Tpending'}{'Tm'} = '';
+      $self->{' Tpending'}{'Tf'} = '';
+     # Td (and T*) are relative positioning, so don't buffer
+     #$self->{' Tpending'}{'Td'} = '';
+      $self->{' Tpending'}{'color'} = ''; # rg, g, k, etc.
+      $self->{' Tpending'}{'Color'} = ''; # RG, G, K, etc.
+    $self->{' Gpending'}         = ();
+      $self->{' Gpending'}{'color'} = ''; # rg, g, k, etc.
+      $self->{' Gpending'}{'Color'} = ''; # RG, G, K, etc.
+      # consider line width, dash pattern, linejoin, linecap, etc.
 
     return $self;
 }
@@ -483,7 +496,10 @@ In graphics mode, C<$self> is B<returned>.
 sub _matrix_text {
     my ($a, $b, $c, $d, $e, $f) = @_;
 
-    return (floats($a, $b, $c, $d, $e, $f), 'Tm');
+   #return (floats($a, $b, $c, $d, $e, $f), 'Tm');
+    return
+       float($a).' '.float($b).' '.float($c).' '.float($d).' '.
+       float($e).' '.float($f).' Tm';
 }
 
 sub _matrix_gfx {
@@ -506,10 +522,16 @@ sub matrix {
 
     if (defined $a) {
         if ($self->_in_text_object()) {
-            $self->add(_matrix_text($a, $b, $c, $d, $e, $f));
+	    # in text mode, buffer the Tm output
+	    if ($self->{' doPending'}) {
+	        $self->{' Tpending'}{'Tm'} = _matrix_text($a, $b, $c, $d, $e, $f);
+	    } else {
+                $self->add(_matrix_text($a, $b, $c, $d, $e, $f));
+	    }
             @{$self->{' textmatrix'}} = ($a, $b, $c, $d, $e, $f);
             @{$self->{' textlinematrix'}} = (0,0);
         } else {
+	    # in graphics mode, directly output cm 
             $self->add(_matrix_gfx($a, $b, $c, $d, $e, $f));
         }
     }
@@ -955,6 +977,7 @@ sub _move {
 sub move {
     my ($self) = shift;
 
+    $self->_Gpending();
     my ($x,$y);
     while (scalar @_ >= 2) {
         $x = shift;
@@ -1035,6 +1058,7 @@ sub _line {
 sub line {
     my ($self) = shift;
 
+    $self->_Gpending();
     my ($x,$y);
     while (scalar @_ >= 2) {
         $x = shift;
@@ -1073,6 +1097,7 @@ or to the the current x and new y (C<vline>).
 sub hline {
     my ($self, $x) = @_;
 
+    $self->_Gpending();
     if ($self->_in_text_object()) {
         $self->add_post(floats($x, $self->{' y'}), 'l');
     } else {
@@ -1087,6 +1112,7 @@ sub hline {
 sub vline {
     my ($self, $y) = @_;
 
+    $self->_Gpending();
     if ($self->_in_text_object()) {
         $self->add_post(floats($self->{' x'}, $y), 'l');
     } else {
@@ -1126,6 +1152,7 @@ sub polyline {
         croak 'polyline requires pairs of coordinates';
     }
 
+    $self->_Gpending();
     while (@_) {
         my $x = shift();
         my $y = shift();
@@ -1165,6 +1192,7 @@ sub poly {
     my $x      = shift;
     my $y      = shift;
 
+    $self->_Gpending();
     $self->move($x,$y);
     $self->line(@_);
 
@@ -1206,6 +1234,7 @@ sub rectangle {
         $y2 = $y;
     }
 
+    $self->_Gpending();
     $self->add(floats($x1, $y1, ($x2 - $x1), ($y2 - $y1)), 're');
     $self->{' x'} = $x1;
     $self->{' y'} = $y1;
@@ -1241,6 +1270,7 @@ sub rect {
     my $self = shift;
 
     my ($x,$y, $w,$h);
+    $self->_Gpending();
     while (scalar @_ >= 4) {
         $x = shift;
         $y = shift;
@@ -1281,6 +1311,7 @@ permits the corner points to be specified in any order.
 sub rectxy {
     my ($self, $x,$y, $x2,$y2) = @_;
 
+   #$self->_Gpending();  unnecessary, handled by rect()
     $self->rect($x,$y, ($x2-$x),($y2-$y));
 
     return $self;
@@ -1307,6 +1338,7 @@ radius. It does B<not> change the current position.
 sub circle {
     my ($self, $xc,$yc, $r) = @_;
 
+    $self->_Gpending();
     $self->arc($xc,$yc, $r,$r, 0,360, 1);
     $self->close();
 
@@ -1330,6 +1362,7 @@ It does not change the current position.
 sub ellipse {
     my ($self, $xc,$yc, $rx,$ry) = @_;
 
+    $self->_Gpending();
     $self->arc($xc,$yc, $rx,$ry, 0,360, 1);
     $self->close();
 
@@ -1461,6 +1494,7 @@ sub arc {
     my @points = _arctocurve($rx,$ry, $alpha,$beta, $dir);
     my ($p0_x,$p0_y, $p1_x,$p1_y, $p2_x,$p2_y, $p3_x,$p3_y);
 
+    $self->_Gpending();
     $p0_x = $xc + shift @points;
     $p0_y = $yc + shift @points;
 
@@ -1519,6 +1553,7 @@ sub pie {
 
     if (!defined $dir) { $dir = 0; }
     my ($p0_x,$p0_y) = _arctocurve($rx,$ry, $alpha,$beta, $dir);
+   #$self->_Gpending();  move() will take care of this
     $self->move($xc,$yc);
     $self->line($p0_x+$xc, $p0_y+$yc);
     $self->arc($xc,$yc, $rx,$ry, $alpha,$beta, 0, $dir);
@@ -1551,6 +1586,7 @@ sub curve {
     my ($self) = shift;
 
     my ($cx1,$cy1, $cx2,$cy2, $x,$y);
+    $self->_Gpending();
     while (scalar @_ >= 6) {
         $cx1 = shift;
         $cy1 = shift;
@@ -1616,6 +1652,7 @@ sub spline { return qbspline(@_); } ## no critic
 sub qbspline {
     my ($self) = shift;
 
+   #$self->_Gpending();  curve() will take care of this
     while (scalar @_ >= 4) {
         my $cx = shift;  # single Control Point
         my $cy = shift;
@@ -1722,7 +1759,7 @@ where I<mode> is
 This is the B<default> behavior.
 This forces the last segment (to the last given input point)
 to be drawn as a cubic Bezier curve. This means that the direction of the curve
-goin to the last point is unconstrained (it will end up being a reflection
+going to the last point is unconstrained (it will end up being a reflection
 of the tangent at the next-to-last given point).
 
 =item line1
@@ -1881,6 +1918,7 @@ sub bspline {
 	$debug = 0;  # default
     }
 
+    $self->_Gpending();
     # copy input point list pairs, checking for duplicates
     my (@inputs, $x,$y);
     @inputs = ([$self->{' x'}, $self->{' y'}]); # initialize to current point
@@ -2491,9 +2529,9 @@ half the distance between the points (resulting in an arc that is a
 semicircle). This is a silent error, as even if the points are correct, due
 to rounding etc. they may not fall I<exactly> on the two circles.
 
-You can think of "looking" from I<P1> to I<P2>. In the dengenerate case, where
+You can think of "looking" from I<P1> to I<P2>. In the degenerate case, where
 the radius is exactly half the distance between the points, there is no
-difference between "small" and "large" arcs, and both cirles will coincide
+difference between "small" and "large" arcs, and both circles will coincide
 with their center half way between I<P1> and I<P2>. Only the direction matters.
 Once the radius is any larger, the two circles become distinct. The primary 
 circle is centered to your right, whose small arc is CW on your left; the 
@@ -2525,6 +2563,7 @@ sub bogen {
     $larc = 0 if !defined $larc;
     $dir  = 0 if !defined $dir;
 
+    $self->_Gpending();
     $dx = $x2 - $x1;
     $dy = $y2 - $y1;
     $z = sqrt($dx**2 + $dy**2);
@@ -2613,6 +2652,7 @@ sub _stroke {
 sub stroke {
     my ($self) = shift;
 
+    $self->_Gpending(); # flush buffered commands
     $self->add(_stroke());
 
     return $self;
@@ -2665,6 +2705,7 @@ The "rule" parameter is added for PDF::API2 compatibility.
 sub fill {
     my ($self) = shift;
 
+    $self->_Gpending(); # flush buffered commands
     my $even_odd = 0; # default (use non-zero rule)
     if (@_ == 2) {  # hash list (one element) given
         my %opts = @_;
@@ -2846,6 +2887,8 @@ sub clip {
 Ends the current path without explicitly enclosing it.
 That is, unlike C<close>, there is B<no> line segment 
 drawn back to the starting position.
+This is often used to end the current path without filling or
+stroking, for the side effect of changing the current clipping path.
 
 B<Alternate name:> C<end>
 
@@ -3024,12 +3067,14 @@ sub _makecolor {
             # colorname (alpha) or # (RGB) or ! (HSV) specifier and 3/6/9/12 digits
             # with rgb target colorspace
             # namecolor always returns an RGB
-            return namecolor($clr[0]), ($sf? 'rg': 'RG');
+           #return namecolor($clr[0]), ($sf? 'rg': 'RG');
+            return join(' ',namecolor($clr[0])).' '.($sf? 'rg': 'RG');
     
         } elsif ($clr[0] =~ m/^%/) {
             # % (CMYK) specifier and 4/8/12/16 digits
             # with cmyk target colorspace
-            return namecolor_cmyk($clr[0]), ($sf? 'k': 'K');
+           #return namecolor_cmyk($clr[0]), ($sf? 'k': 'K');
+            return join(' ',namecolor_cmyk($clr[0])).' '.($sf? 'k': 'K');
 
         } elsif ($clr[0] =~ m/^[\$\&]/) {
             # & (HSL) or $ (L*a*b) specifier
@@ -3042,12 +3087,14 @@ sub _makecolor {
                 $dc->{'Gamma'} = PDFArray(map { PDFNum($_) } qw(2.2 2.2 2.2));
                 $self->resource('ColorSpace', 'LabS', $cs);
             }
-            return '/LabS', ($sf? 'cs': 'CS'), namecolor_lab($clr[0]), ($sf? 'sc': 'SC');
+           #return '/LabS', ($sf? 'cs': 'CS'), namecolor_lab($clr[0]), ($sf? 'sc': 'SC');
+            return '/LabS '.($sf? 'cs': 'CS').' '.join(' ',namecolor_lab($clr[0])).' '.($sf? 'sc': 'SC');
 
         } else { # should be a float number... add a test and else failure?
             # grey color spec.
             $clr[0] = _clamp($clr[0], 0, 0, 1);
-            return $clr[0], ($sf? 'g': 'G');
+           #return $clr[0], ($sf? 'g': 'G');
+            return $clr[0].' '.($sf? 'g': 'G');
 
        #} else {
        #    die 'invalid color specification.';
@@ -3058,7 +3105,12 @@ sub _makecolor {
             # indexed colorspace plus color-index(es)
             # or custom colorspace plus param(s)
             my $cs = shift @clr;
-            return '/'.$cs->name(), ($sf? 'cs': 'CS'), $cs->param(@clr), ($sf? 'sc': 'SC');
+           #return '/'.($cs->name()).' '.($sf? 'cs': 'CS').' '.($cs->param(@clr)).' '.($sf? 'sc': 'SC');
+	    my $out = '/'.($cs->name());
+	    $out .= ' '.($sf? 'cs': 'CS');
+	    $out .= " @clr";
+	    $out .= ' '.($sf? 'sc': 'SC');
+            return $out;
 
        # What exactly is the difference between the following case and the 
        # previous case? The previous allows multiple indices or parameters and
@@ -3074,7 +3126,8 @@ sub _makecolor {
             $clr[0] = _clamp($clr[0], 0, 0, 1);
             $clr[1] = _clamp($clr[1], 0, 0, 1);
             $clr[2] = _clamp($clr[2], 0, 0, 1);
-            return floats($clr[0], $clr[1], $clr[2]), ($sf? 'rg': 'RG');
+           #return floats($clr[0], $clr[1], $clr[2]), ($sf? 'rg': 'RG');
+            return join(' ',floats($clr[0], $clr[1], $clr[2])).' '.($sf? 'rg': 'RG');
 
         } elsif (scalar @clr == 4) {
             # legacy cmyk color-spec (0 <= x <= 1)
@@ -3082,7 +3135,8 @@ sub _makecolor {
             $clr[1] = _clamp($clr[1], 0, 0, 1);
             $clr[2] = _clamp($clr[2], 0, 0, 1);
             $clr[3] = _clamp($clr[3], 0, 0, 1);
-            return floats($clr[0], $clr[1], $clr[2], $clr[3]), ($sf? 'k': 'K');
+           #return floats($clr[0], $clr[1], $clr[2], $clr[3]), ($sf? 'k': 'K');
+            return join(' ',floats($clr[0], $clr[1], $clr[2], $clr[3])).' '.($sf? 'k': 'K');
 
         } else {
             die 'invalid color specification.';
@@ -3127,7 +3181,20 @@ sub fillcolor {
 
     if (@_) {
         @{$self->{' fillcolor'}} = @_;
-        $self->add($self->_fillcolor(@_));
+	my $string = $self->_fillcolor(@_);
+	if ($self->_in_text_object()) {
+	    if ($self->{' doPending'}) {
+	        $self->{' Tpending'}{'color'} = $string;
+	    } else {
+                $self->add($string);
+	    }
+	} else {
+	    if ($self->{' doPending'}) {
+	        $self->{' Gpending'}{'color'} = $string;
+	    } else {
+                $self->add($string);
+	    }
+        }
 
 	return $self;
     } else {
@@ -3155,7 +3222,20 @@ sub strokecolor {
 
     if (@_) {
         @{$self->{' strokecolor'}} = @_;
-        $self->add($self->_strokecolor(@_));
+	my $string = $self->_strokecolor(@_);
+	if ($self->_in_text_object()) {
+	    if ($self->{' doPending'}) {
+	        $self->{' Tpending'}{'Color'} = $string;
+	    } else {
+                $self->add($string);
+	    }
+	} else {
+	    if ($self->{' doPending'}) {
+	        $self->{' Gpending'}{'Color'} = $string;
+	    } else {
+                $self->add($string);
+	    }
+	}
 
 	return $self;
     } else {
@@ -3614,7 +3694,7 @@ sub wordspace {
 =over
 
 Sets the percentage of horizontal text scaling (relative sizing, I<not> 
-spacing). This is initally 100 (percent, i.e., no scaling). A scale of greater 
+spacing). This is initially 100 (percent, i.e., no scaling). A scale of greater 
 than 100 will stretch the text, while less than 100 will compress it.
 If C<$scale> is given, the current setting is replaced by that value and
 C<$self> is B<returned> (to permit chaining).
@@ -3797,7 +3877,7 @@ sub rise {
 
 =head4 textstate
 
-    %state = $content->textstate(charspace => $value, wordspace => $value, ...)
+    %state = $content->textstate('charspace'=>$value, 'wordspace'=>$value, ...)
 
 =over
 
@@ -3913,7 +3993,12 @@ sub font {
         croak q{A font size is required};
     }
     $self->_fontset($font, $size);
-    $self->add(_font($font, $size));
+    # buffer the Tf command
+    if ($self->{' doPending'}) {
+        $self->{' Tpending'}{'Tf'} = _font($font, $size);
+    } else {
+        $self->add(_font($font, $size));
+    }
     $self->{' fontset'} = 1;
 
     return $self;
@@ -3968,7 +4053,12 @@ sub position {
     }
 
     if (defined $x) { # Set
-        $self->add(float($x), float($y), 'Td');
+	$self->_Tpending();
+#       if ($self->{' doPending'}) {
+#           $self->{' Tpending'}{'Td'} = float($x).' '.float($y).' Td';
+#       } else {
+            $self->add(float($x), float($y), 'Td');
+#       }
         $self->matrix_update($x, $y);
         $self->{' textlinematrix'}->[0] = $self->{' textlinestart'} + $x;
         $self->{' textlinestart'} = $self->{' textlinematrix'}->[0];
@@ -4048,7 +4138,12 @@ lines will be indented by that amount.
 sub distance {
     my ($self, $dx,$dy) = @_;
 
-    $self->add(float($dx), float($dy), 'Td');
+    $self->_Tpending();
+#   if ($self->{' doPending'}) {
+#       $self->{' Tpending'}{'Td'} = float($dx).' '.float($dy).' Td';
+#   } else {
+        $self->add(float($dx), float($dy), 'Td');
+#   }
     $self->matrix_update($dx,$dy);
     $self->{' textlinematrix'}->[0] = $self->{' textlinestart'} + $dx;
     $self->{' textlinestart'} = $self->{' textlinematrix'}->[0];
@@ -4088,8 +4183,13 @@ the C<leading> setting, you may wish to use the C<crlf> method instead.
 sub cr {
     my ($self, $offset) = @_;
 
+    $self->_Tpending();
     if (defined $offset) {
-        $self->add(0, float($offset), 'Td');
+#       if ($self->{' doPending'}) {
+#           $self->{' Tpending'}{'Td'} = '0 '.float($offset).' Td';
+#       } else {
+            $self->add(0, float($offset), 'Td');
+#       }
         $self->matrix_update(0, $offset);
     } else {
         $self->add('T*');
@@ -4125,6 +4225,8 @@ the C<leading> setting, you may wish to use the C<crlf> method instead.
 sub nl {
     my ($self, $indent) = @_;
 
+    $self->_Tpending();
+
     # can't use Td, because it permanently changes the line start by $indent
     # same problem using the distance() call
     $self->add('T*');  # go to start of next line
@@ -4159,13 +4261,18 @@ C<cr> and C<nl> methods.
 
 sub crlf {
     my $self = shift();
+    $self->_Tpending();
     my $leading = $self->leading();
     if ($leading or not $self->{' fontsize'}) {
         $self->add('T*');
     }
     else {
         $leading = $self->{' fontsize'} * 1.2;
-        $self->add(0, float($leading * -1), 'Td');
+#       if ($self->{' doPending'}) {
+#           $self->{' Tpending'}{'Td'} = '0 '.float($leading * -1).' Td';
+#       } else {
+            $self->add(0, float($leading * -1), 'Td');
+#       }
     }
 
     $self->matrix_update(0, $leading * -1);
@@ -4530,6 +4637,8 @@ sub text {
 	}
     }
 
+    $self->_Tpending(); # flush any accumulated PDF text settings
+
     if ($self->{' fontset'} == 0) {
         unless (defined($self->{' font'}) and $self->{' fontsize'}) {
             croak q{Can't add text without first setting a font and font size};
@@ -4785,6 +4894,8 @@ sub textHS {
     if (defined $opts{'-strikethru'} && !defined $opts{'strikethru'}) { $opts{'strikethru'} = delete($opts{'-strikethru'}); }
     if (defined $opts{'-strokecolor'} && !defined $opts{'strokecolor'}) { $opts{'strokecolor'} = delete($opts{'-strokecolor'}); }
 
+    $self->_Tpending();
+
     my $font = $self->{' font'};
     my $fontsize = $self->{' fontsize'};
     my $dir = $settings->{'dir'} || 'L';
@@ -5021,6 +5132,39 @@ sub textHS {
 
     return $chunkLength;
 } # end of textHS
+
+# output any pending text state-related commands before ink hits paper
+# currently text matrix (Tm), font select (Tf), displacement (Td), 
+#           stroke color (text, RG/K/G/SC), fill color (text, rg/k/g/sc)
+# future?
+sub _Tpending {
+    my ($self) = @_;
+    my $item;
+    foreach (qw(Tf Tm color Color)) {
+        $item = $self->{' Tpending'}{$_};
+        if (defined $item && $item ne '') {
+	    $self->add($item);
+	    $self->{' Tpending'}{$_} = '';
+        }
+    }
+    return;
+}
+
+# output any pending graphics state-related commands before ink hits paper
+# currently stroke color (graphics), fill color (graphics)
+# future? linewidth (w), linejoin (j), linecap (J), linedash (d), et al.
+sub _Gpending {
+    my ($self) = @_;
+    my $item;
+    foreach (qw(color Color)) {
+        $item = $self->{' Gpending'}{$_};
+        if (defined $item && $item ne '') {
+	    $self->add($item);
+	    $self->{' Gpending'}{$_} = '';
+        }
+    }
+    return;
+}
 
 sub _startCID {
     my ($self) = @_;
@@ -5267,6 +5411,7 @@ sub save {
 	    $MSG_COUNT[2]++;
 	}
     } else {
+        $self->_Gpending(); # flush buffered commands
         $self->add(_save());
     }
 
@@ -5327,7 +5472,7 @@ double quotes (quotation marks), rather than single quotes (apostrophes).
 Use extreme care if inserting B<BT> and B<ET> markers into the PDF stream.
 You may want to use C<textstart()> and C<textend()> calls instead, and even
 then, there are many side effects either way. It is generally not useful 
-to suspend text mode with ET/textend and BT/textstart, but it is possible, 
+to suspend text mode with ET/textend() and BT/textstart(), but it is possible, 
 if you I<really> need to do it.
 
 Another, useful, case is when your input PDF is from the B<Chrome browser> 
@@ -5336,7 +5481,7 @@ headers and/or footers. In some versions, this leaves the PDF page with a
 strange scaling (such as the page height in points divided by 3300) and the 
 Y-axis flipped so 0 is at the top. This causes problems when trying to add
 additional text or graphics in a new text or graphics record, where text is 
-flipped (mirrored) upsidedown and at the wrong end of the page. If this 
+flipped (mirrored) upside down and at the wrong end of the page. If this 
 happens, you might be able to cure it by adding
 
     $scale = .23999999; # example, 792/3300, examine PDF or experiment!
@@ -5393,10 +5538,24 @@ sub add {
     my $self = shift;
 
     if (@_) {
-        unless ($self->{' stream'} =~ m|\s$|) {
+        unless (defined $self->{' stream'} && $self->{' stream'} =~ m|\s$|) {
             $self->{' stream'} .= ' ';
 	}
-        $self->{' stream'} .= encode('iso-8859-1', join(' ', @_) . ' ');
+        # have started seeing undefined elements in @_. skip them for now.
+       #$self->{' stream'} .= encode('iso-8859-1', join(' ', @_) . ' ');
+	my $ecstr = '';
+	foreach (@_) {
+	    if (defined $_) {
+		if ($ecstr eq '') { # first
+		    $ecstr = $_;
+		} else {
+		    $ecstr .= " $_";
+		}
+	    }
+	}
+	if ($ecstr ne '') {
+            $self->{' stream'} .= encode('iso-8859-1', $ecstr . ' ');
+	}
     }
 
     return $self;

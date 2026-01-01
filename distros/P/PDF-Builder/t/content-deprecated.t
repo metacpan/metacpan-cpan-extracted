@@ -46,6 +46,7 @@ $pdf = PDF::Builder->new('compress' => 0);
 $gfx = $pdf->page->gfx();
 
 $gfx->fillcolor('blue');
+$gfx->move(0, 0);  # force pending output
 like($pdf->to_string(), qr/0 0 1 rg/, q{fillcolor('blue')});
 
 # Stroke Color
@@ -54,6 +55,7 @@ $pdf = PDF::Builder->new('compress' => 0);
 $gfx = $pdf->page->gfx();
 
 $gfx->strokecolor('blue');
+$gfx->move(0, 0);  # force pending output
 like($pdf->to_string(), qr/0 0 1 RG/, q{strokecolor('blue')});
 
 # Line Width
@@ -291,6 +293,7 @@ $pdf = PDF::Builder->new('compress' => 0);
 $gfx = $pdf->page->gfx();
 
 $gfx->distance(3, 4);
+$gfx->_Tpending();  # force pending output
 like($pdf->to_string, qr/3 4 Td/, q{distance(3, 4)});
 
 # cr
@@ -300,7 +303,9 @@ $gfx = $pdf->page->gfx();
 
 $gfx->cr();
 $gfx->cr(12.5);
+$gfx->_Tpending();  # force pending output
 $gfx->cr(0);
+$gfx->_Tpending();  # force pending output
 like($pdf->to_string, qr/T\* 0 12.5 Td 0 0 Td/, q{cr});
 
 # nl

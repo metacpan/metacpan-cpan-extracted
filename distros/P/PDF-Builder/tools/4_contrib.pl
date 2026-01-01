@@ -7,11 +7,14 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
+our $VERSION = '3.028'; # VERSION
 our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 # command line:
 # 
+
+# NOTE TO MAINTAINER;
+#  don't forget to update MANIFEST with any new contributions
 
 # for Linux and Unix systems, the directory separator is /
 # for Windows systems, the directory separator is \\ (doubled again)

@@ -30,7 +30,8 @@ DBIx::Auto::Migrate - Wrap your database connections and automatically apply db 
                    'CREATE TABLE options (
                            id BIGSERIAL PRIMARY KEY,
                            name TEXT,
-                           value TEXT 
+                           value TEXT,
+                           UNIQUE (name)
                    )',
                    create_index(qw/options name/),
                    'CREATE TABLE users (
@@ -93,7 +94,8 @@ To check an example project that uses this code you can check [https://github.co
                    'CREATE TABLE options (
                            id BIGSERIAL PRIMARY KEY,
                            name TEXT,
-                           value TEXT 
+                           value TEXT,
+                           UNIQUE (name)
                    )',
                    'CREATE TABLE users (
                            id BIGSERIAL PRIMARY KEY,

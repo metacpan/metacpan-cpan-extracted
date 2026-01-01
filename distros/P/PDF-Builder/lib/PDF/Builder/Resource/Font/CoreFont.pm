@@ -5,11 +5,11 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 use File::Basename;
-
+use List::Util qw(any);
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
 
@@ -58,19 +58,19 @@ See examples/020_corefonts for a list of each font's glyphs.
 
 =over
 
-=item * helvetica, helveticaoblique, helveticabold, helvetiaboldoblique
+=item * Helvetica, Helvetica-Oblique, Helvetica-Bold, Helvetia-BoldOblique
 
 Sans-serif, may have Arial substituted on some systems (e.g., Windows).
 
-=item * courier, courieroblique, courierbold, courierboldoblique
+=item * Courier, Courier-Oblique, Courier-Bold, Courier-BoldOblique
 
 Fixed pitch, may have Courier New substituted on some systems (e.g., Windows).
 
-=item * timesroman, timesitalic, timesbold, timesbolditalic
+=item * Times-Roman, Times-Italic, Times-Bold, Times-BoldItalic
 
 Serif, may have Times New Roman substituted on some systems (e.g., Windows).
 
-=item * symbol, zapfdingbats
+=item * Symbol, ZapfDingbats
 
 Various symbols, including the Greek alphabet (in Symbol).
 
@@ -79,28 +79,29 @@ Various symbols, including the Greek alphabet (in Symbol).
 =head3 Primarily Windows typefaces
 
 See examples/022_truefonts /Windows/Fonts/<name>.ttf 
-for a list of each font's glyphs.
+for a list of each font's glyphs. examples/020_corefonts can also be used.
 
 =over
 
-=item * georgia, georgiaitalic, georgiabold, georgiabolditalic
+=item * Georgia, Georgia-Italic, Georgia-Bold, Georgia-BoldItalic
 
 Serif proportional.
 
-=item * verdana, verdanaitalic, verdanabold, verdanabolditalic
+=item * Trebuchet, Trebuchet-Italic, Trebuchet-Bold, Trebuchet-BoldItalic
 
 Sans-serif proportional with simple strokes.
 
-=item * trebuchet, trebuchetitalic, trebuchetbold, trebuchetbolditalic
+=item * Verdana, Verdana-Italic, Verdana-Bold, Verdana-BoldItalic
 
 Sans-serif proportional with simple strokes.
 
-=item * bankgothic, bankgothicitalic, bankgothicbold, bankgothicitalic
+=item * BankGothic, BankGothic-Italic, BankGothic-Bold, BankGothic-BoldItalic
 
 Sans-serif proportional with simple strokes.
-Free versions of Bank Gothic are often only medium weight Roman (bankgothic).
+Free versions of Bank Gothic are often only medium weight Roman (BankGothic),
+and this is all that usually comes with Windows.
 
-=item * webdings, wingdings
+=item * Webdings, Wingdings
 
 Various symbols, in the vein of Zapf Dingbats.
 
@@ -134,7 +135,7 @@ Changes the encoding of the font from its default. Notice that the encoding
 256 glyphs associated with this encoding (I<and> that are available in this 
 font). 
 
-See I<perl's Encode> for the supported values. B<Warning:> only single byte 
+See I<Perl's Encode> for the supported values. B<Warning:> only single byte 
 encodings are permitted. Multibyte encodings such as 'utf8' are forbidden.
 
 =item dokern
@@ -155,28 +156,66 @@ retrieved via $pdfname=$font->name().
 If given, it is expected to be an anonymous hash of font file data. This is
 to be used instead of looking up the I<$fontname>.pm file for width and other
 data. You may need to use this option if your installed font happens to be
-out of synch with the PDF::Builder built-in core font metrics file (e.g.,
+out of sync with the PDF::Builder built-in core font metrics file (e.g.,
 I<helveticabold.pm>).
 
 =back
 
 =cut
 
-sub _look_for_font {
-    my $fname = shift;
+# PDF standard 14 core fonts
+my @standard_fonts = qw(
+    Courier Courier-Oblique Courier-Bold Courier-BoldOblique
+    Helvetica Helvetica-Oblique Helvetica-Bold Helvetica-BoldOblique
+    Times-Roman Times-Italic Times-Bold Times-BoldItalic
+    Symbol ZapfDingbats
+);
 
-    ## return %{$fonts->{$fname}} if defined $fonts->{$fname};
-    eval "require PDF::Builder::Resource::Font::CoreFont::$fname; "; ## no critic
+# Windows extension of 15 core fonts
+my @windows_fonts = qw(
+    BankGothic
+    Georgia Georgia-Italic Georgia-Bold Georgia-BoldItalic
+    Trebuchet Trebuchet-Italic Trebuchet-Bold Trebuchet-BoldItalic
+    Verdana Verdana-Italic Verdana-Bold Verdana-BoldItalic
+    Webdings Wingdings
+);
+
+# Windows Fonts with Type1 equivalence
+$alias = {
+    'arial'                     => 'helvetica',
+    'arialitalic'               => 'helveticaoblique',
+    'arialbold'                 => 'helveticabold',
+    'arialbolditalic'           => 'helveticaboldoblique',
+
+    'times'                     => 'timesroman',
+    'timesnewromanbolditalic'   => 'timesbolditalic',
+    'timesnewromanbold'         => 'timesbold',
+    'timesnewromanitalic'       => 'timesitalic',
+    'timesnewroman'             => 'timesroman',
+
+    'couriernewbolditalic'      => 'courierboldoblique',
+    'couriernewbold'            => 'courierbold',
+    'couriernewitalic'          => 'courieroblique',
+    'couriernew'                => 'courier',
+};
+
+sub _look_for_font {
+    my $name = shift;
+
+    ## return %{$fonts->{$name}} if defined $fonts->{$name};
+    eval "require PDF::Builder::Resource::Font::CoreFont::$name; "; ## no critic
     unless($@) {
-        my $class = "PDF::Builder::Resource::Font::CoreFont::$fname";
-        $fonts->{$fname} = deep_copy($class->data());
-        $fonts->{$fname}->{'uni'} ||= [];
+        my $class = "PDF::Builder::Resource::Font::CoreFont::$name";
+        my $font = _deep_copy($class->data());
+        $font->{'uni'} ||= [];
         foreach my $n (0..255) {
-            $fonts->{$fname}->{'uni'}->[$n] = uniByName($fonts->{$fname}->{'char'}->[$n]) unless defined $fonts->{$fname}->{'uni'}->[$n];
+	    unless (defined $fonts->{'uni'}->[$n]) {
+                $font->{'uni'}->[$n] = uniByName($font->{'char'}->[$n]);
+            }
         }
-        return %{$fonts->{$fname}};
+        return %$font;
     } else {
-        die "requested core font '$fname' not installed ";
+        die "requested core font '$name' not installed ";
     }
 }
 
@@ -184,27 +223,27 @@ sub _look_for_font {
 # Deep copy something, thanks to Randal L. Schwartz
 # Changed to deal w/ CODE refs, in which case it doesn't try to deep copy
 #
-sub deep_copy {
+sub _deep_copy {
     my $this = shift;
 
     if      (not ref $this) {
         return $this;
-    } elsif (ref $this eq "ARRAY") {
-        return [map &deep_copy($_), @$this];   ## no critic
-    } elsif (ref $this eq "HASH") {
-        return +{map { $_ => &deep_copy($this->{$_}) } keys %$this};
-    } elsif (ref $this eq "CODE") {
+    } elsif (ref($this) eq "ARRAY") {
+        return [ map { _deep_copy($_) } @$this];   ## no critic
+    } elsif (ref($this) eq "HASH") {
+        return +{ map { $_ => _deep_copy($this->{$_}) } keys %$this };
+    } elsif (ref($this) eq "CODE") {
         # Can't deep copy code refs
         return $this;
     } else {
-        die "what type is $_?";
+        die "what type is $_? Unable to copy a ".ref($this);
     }
 }
 
 sub new {
     my ($class, $pdf, $name, @opts) = @_;
 
-    my ($self,$data);
+    my ($self, $data);
     my %opts = ();
     my $is_standard = is_standard($name);
 
@@ -213,7 +252,7 @@ sub new {
         $name = basename($name,'.pm');
     }
     my $lookname = lc($name);
-    $lookname =~ s/[^a-z0-9]+//gi;
+    $lookname =~ s/[^a-z0-9]+//gi; # e.g., Times-Roman to timesroman
     %opts = @opts if (scalar @opts)%2 == 0;
     # copy dashed name options to preferred undashed names
     if (defined $opts{'-encode'} && !defined $opts{'encode'}) { $opts{'encode'} = delete($opts{'-encode'}); }
@@ -254,7 +293,7 @@ sub new {
     #    return PDF::Builder::Resource::Font::gFont->new($pdf, $data, @opts);
     #}
 
-    $class = ref $class if ref $class;
+    $class = ref($class) if ref($class);
 #   $self = $class->SUPER::new($pdf, $data->{'apiname'}.pdfkey().'~'.time());
     $self = $class->SUPER::new($pdf, $data->{'apiname'}.pdfkey());
     $pdf->new_obj($self) unless $self->is_obj($pdf);
@@ -292,68 +331,101 @@ sub new {
 
     $bool = $class->is_standard($name)
 
+    $bool = $class->is_standard($name, $win_flag)
+
 =over
 
 Returns true if C<$name> is an exact, case-sensitive match for one of the
 standard font names shown above.
+If C<$win_flag> is given, and is true (1), check against not only the basic
+14 fonts, but also against the additional 15 Windows core font extensions.
 
 =back
 
 =cut
 
 sub is_standard {
-    my $name = pop();
+    # depending on whether it's called as a method or as a local
+    # subroutine, it will or will not have a blessed object as
+    # first argument
+    my $self = shift;
+    my $name;
+    if ($self =~ /^PDF::Builder/) {
+        $name = shift;
+    } else {
+	$name = $self;
+    }
+    my $win_flag = 0;
+    if (@_) { $win_flag = $_[0]; }
 
-    return 1 if $name eq 'Courier';
-    return 1 if $name eq 'Courier-Bold';
-    return 1 if $name eq 'Courier-BoldOblique';
-    return 1 if $name eq 'Courier-Oblique';
-    return 1 if $name eq 'Helvetica';
-    return 1 if $name eq 'Helvetica-Bold';
-    return 1 if $name eq 'Helvetica-BoldOblique';
-    return 1 if $name eq 'Helvetica-Oblique';
-    return 1 if $name eq 'Symbol';
-    return 1 if $name eq 'Times-Bold';
-    return 1 if $name eq 'Times-BoldItalic';
-    return 1 if $name eq 'Times-Italic';
-    return 1 if $name eq 'Times-Roman';
-    return 1 if $name eq 'ZapfDingbats';
-    # TBD what about the 15 Windows fonts?
-    # BankGothic
-    # Georgia (plus italic, bold, bold-italic)
-    # Trebuchet (plus italic, bold, bold-italic)
-    # Verdana (plus italic, bold, bold-italic)
-    # Webdings, Wingdings
-    return;
+    if ($win_flag) {
+	return any { $_ eq $name } (@standard_fonts, @windows_fonts);
+    } else {
+	return any { $_ eq $name } @standard_fonts;
+    }
 }
 
+=head2 names
+
+    my @font_names = PDF::Builder::Resource::Font::CoreFont->names($flag);
+
+    my $array_ref  = PDF::Builder::Resource::Font::CoreFont->names($flag);
+
+Returns an array or a reference to an array containing the names of the built-in
+core (standard) fonts.
+
+If called with an optional C<$flag> of "true" value (1), 
+the additional 15 Windows core fonts are included.
+
+=cut
+
+sub names {
+    my $self = shift;
+    # need to revise if ever called as direct subroutine in CoreFont.pm
+    my $Win_ext = 0;
+    if (@_) {
+	$Win_ext = $_[0];
+    }
+    
+    if ($Win_ext) {
+        return wantarray() ? (@standard_fonts,@windows_fonts) : 
+	                    [(@standard_fonts,@windows_fonts)];
+    } else {
+        return wantarray() ? @standard_fonts : [@standard_fonts];
+    }
+}
+
+# removed from PDF::API2
 =head2 loadallfonts
 
-    PDF::Builder::Resource::Font::CoreFont->loadallfonts()
+    PDF::Builder::Resource::Font::CoreFont->loadallfonts($flag)
 
 =over
 
-"Requires in" all fonts available as corefonts.
+"Requires in" all fonts available as corefonts, including Windows extensions
+if the optional C<$flag> is given and is "true" (1).
+
+B<Warning:> "dies" if any requested font is not found!
 
 =back
 
 =cut
 
 sub loadallfonts {
-    foreach my $f (qw[
-	bankgothic 
-        courier courierbold courierboldoblique courieroblique
-        georgia georgiabold georgiabolditalic georgiaitalic
-        helveticaboldoblique helveticaoblique helveticabold helvetica
-        symbol
-        timesbolditalic timesitalic timesroman timesbold
-        verdana verdanabold verdanabolditalic verdanaitalic
-        trebuchet trebuchetbold trebuchetbolditalic trebuchetitalic
-        webdings
-        wingdings
-        zapfdingbats
-    ]) {
+    my $self = shift;
+    # need to revise if ever called as local sub in CoreFont.pm
+    my $Win_ext = 0;
+    if (@_) {
+	$Win_ext = $_[0];
+    }
+
+    foreach my $f (@standard_fonts) {
         _look_for_font($f);
+    }
+    if ($Win_ext) {
+        foreach my $f (@windows_fonts) {
+            _look_for_font($f);
+        }
     }
     return;
 }
@@ -367,25 +439,7 @@ sub loadallfonts {
 BEGIN
 {
 
-    $alias = {
-        ## Windows Fonts with Type1 equivalence
-        'arial'                     => 'helvetica',
-        'arialitalic'               => 'helveticaoblique',
-        'arialbold'                 => 'helveticabold',
-        'arialbolditalic'           => 'helveticaboldoblique',
-
-        'times'                     => 'timesroman',
-        'timesnewromanbolditalic'   => 'timesbolditalic',
-        'timesnewromanbold'         => 'timesbold',
-        'timesnewromanitalic'       => 'timesitalic',
-        'timesnewroman'             => 'timesroman',
-
-        'couriernewbolditalic'      => 'courierboldoblique',
-        'couriernewbold'            => 'courierbold',
-        'couriernewitalic'          => 'courieroblique',
-        'couriernew'                => 'courier',
-    };
-
+    # substitutes via synfont() for missing BankGothic variants
     $subs = {
          'bankgothicbold' => {
              'apiname'       => 'Bg2',

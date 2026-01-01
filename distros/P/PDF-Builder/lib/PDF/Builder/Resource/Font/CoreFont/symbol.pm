@@ -3,8 +3,8 @@ package PDF::Builder::Resource::Font::CoreFont::symbol;
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -106,6 +106,7 @@ sub data { return {
         'Eta',                                   # C+0x48 # U+0xF048
         'Iota',                                  # C+0x49 # U+0xF049
         'theta1',                                # C+0x4A # U+0xF04A
+	    # variant 'theta'
         'Kappa',                                 # C+0x4B # U+0xF04B
         'Lambda',                                # C+0x4C # U+0xF04C
         'Mu',                                    # C+0x4D # U+0xF04D
@@ -118,6 +119,7 @@ sub data { return {
         'Tau',                                   # C+0x54 # U+0xF054
         'Upsilon',                               # C+0x55 # U+0xF055
         'sigma1',                                # C+0x56 # U+0xF056
+	    # a.k.a. 'terminal sigma'
         'Omega',                                 # C+0x57 # U+0xF057
         'Xi',                                    # C+0x58 # U+0xF058
         'Psi',                                   # C+0x59 # U+0xF059
@@ -134,10 +136,12 @@ sub data { return {
         'delta',                                 # C+0x64 # U+0xF064
         'epsilon',                               # C+0x65 # U+0xF065
         'phi',                                   # C+0x66 # U+0xF066
+	    # 'phi' is actually the variant 'phi'
         'gamma',                                 # C+0x67 # U+0xF067
         'eta',                                   # C+0x68 # U+0xF068
         'iota',                                  # C+0x69 # U+0xF069
         'phi1',                                  # C+0x6A # U+0xF06A
+	    # 'phi1' is actually the regular 'phi'
         'kappa',                                 # C+0x6B # U+0xF06B
         'lambda',                                # C+0x6C # U+0xF06C
         'mu',                                    # C+0x6D # U+0xF06D
@@ -150,6 +154,7 @@ sub data { return {
         'tau',                                   # C+0x74 # U+0xF074
         'upsilon',                               # C+0x75 # U+0xF075
         'omega1',                                # C+0x76 # U+0xF076
+	    # omega1 is actually 'omega pi'
         'omega',                                 # C+0x77 # U+0xF077
         'xi',                                    # C+0x78 # U+0xF078
         'psi',                                   # C+0x79 # U+0xF079
@@ -193,6 +198,7 @@ sub data { return {
         '.notdef',                               # C+0x9F # U+0x0000
         'Euro',                                  # C+0xA0 # U+0xF0A0
         'Upsilon1',                              # C+0xA1 # U+0xF0A1
+	    # Upsilon variant (Upsilon with hook)
         'minute',                                # C+0xA2 # U+0xF0A2
         'lessequal',                             # C+0xA3 # U+0xF0A3
         'fraction',                              # C+0xA4 # U+0xF0A4

@@ -1,6 +1,6 @@
 #!/home/chrisarg/perl5/perlbrew/perls/current/bin/perl
 package Bit::Set::DB;
-$Bit::Set::DB::VERSION = '0.10';
+$Bit::Set::DB::VERSION = '0.11';
 use strict;
 use warnings;
 use FFI::Platypus::Record;
@@ -9,7 +9,7 @@ use FFI::Platypus::Record;
 {
 
     package Bit::Set::DB::SETOP_COUNT_OPTS;
-$Bit::Set::DB::SETOP_COUNT_OPTS::VERSION = '0.10';
+$Bit::Set::DB::SETOP_COUNT_OPTS::VERSION = '0.11';
 use FFI::Platypus::Record;
     record_layout_1(
         'int'  => 'num_cpu_threads',
@@ -406,7 +406,7 @@ Bit::Set::DB - Perl procedural interface for bitset containers from the C<Bit> C
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -1444,15 +1444,28 @@ Bit vector implementation used in the L<Lucy|https://metacpan.org/pod/Lucy> sear
 
 =back
 
+=head1 TO DO
+
+=over 4
+
+=item * Add more examples.
+
+=item * Add more tests.
+
+=item* Switch to XS for better performance.
+
+=back
+
 =head1 AUTHOR
 
-Christos Argyropoulos with asistance from Github Copilot (Claude Sonnet 4).
+Christos Argyropoulos and Joe Schaefer after v0.11.
+Christos Argyropoulos with asistance from Github Copilot (Claude Sonnet 4) up to v0.10.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Christos Argyropoulos.
+This software up to and including v0.10 is copyright (c) 2025 Christos Argyropoulos.
+For versions after v0.10, the distribution as a whole is copyright (c) 2025 Joe Schaefer and Christos Argyropoulos.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This software is released under the L<MIT license|https://mit-license.org/>.
 
 =cut

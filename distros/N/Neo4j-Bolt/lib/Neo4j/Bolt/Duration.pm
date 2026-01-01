@@ -1,7 +1,7 @@
 package Neo4j::Bolt::Duration;
 # ABSTRACT: Representation of Neo4j duration struct
 
-$Neo4j::Bolt::Duration::VERSION = '0.5001';
+$Neo4j::Bolt::Duration::VERSION = '0.5002';
 
 use v5.12;
 use warnings;
@@ -111,7 +111,7 @@ L<Neo4j::Bolt>, L<Neo4j::Types::Duration>, L<DateTime>, L<DateTime::Duration>
 
 =head1 LICENSE
 
-This software is Copyright (c) 2024 by Mark A. Jensen.
+This software is Copyright (c) 2024-2026 by Mark A. Jensen.
 
 This is free software, licensed under:
 

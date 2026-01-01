@@ -253,11 +253,19 @@ Bspline.pl
 
 Column.pl
   Column.pdf
-   10 pages demonstrating column() method with markup
+   12 pages demonstrating column() method with markup
 
 Column_lists.pl
   Column_lists.pdf
-   3 pages demonstrating column() method output of ol and ul lists
+   8 pages demonstrating column() method output of ol and ul and other lists
+
+Column_xrefs.pl
+  Column_xrefs.pdf
+   2 pages demonstrating cross references (inter- and intra-PDF links)
+
+Column_md_xrefs.pl
+  Column_md_xrefs.pdf
+   Same as Column_xrefs, except Markdown instead of HTML source
 
 #Column_layouts.pl    TBD
 #  Column_layouts.pdf
@@ -346,6 +354,12 @@ HarfBuzz.pl
    A copy of the output file is provided for your convenience (in case
            you don't have HarfBuzz::Shaper installed) on the CTS
            website https://www.catskilltech.com/.
+
+NamedDest.pl
+  NDthis.pdf, NDthat.pdf
+   Create two PDFs which have intradocument links to Named Destinations and
+    interdocument links to Named Destinations. Note that the PDF names differ
+    from the creation program.
 
 RMtutorial.pl
   RMtutorial.pdf

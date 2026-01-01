@@ -1,7 +1,13 @@
 Revision history for cpan2rpm
 
+2.045 12/31/2025 23:00:00
+ - Update --shadow-pure to reduce conflicts
+ - Add BuildRequires perl-generators
+ - Clean up spec.PL
+
 2.044 09/26/2025 02:00:00
  - Fix dist module for CPAN Index.
+ - Update README.
 
 2.043 09/26/2025 01:00:00
  - Update DISTNAME for fastapi

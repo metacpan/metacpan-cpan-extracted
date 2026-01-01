@@ -101,6 +101,7 @@ WriteMakefile(
   TEST_REQUIRES => {
     'Test::Exception' => 0,
     'Test::Neo4j::Types' => '0.06',
+    'Test2::V0' => 0,
     'Try::Tiny' => 0,
   },
   ABSTRACT => "Neo4j server agent using Bolt protocol",

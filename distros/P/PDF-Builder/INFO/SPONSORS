@@ -8,6 +8,8 @@ Amtivo Group, Kings Hill, Kent, England -- FontManager and Column with MD
     and HTML markup. Also support added to PDF::Table to use these new
     features with PDF::Builder.
 
+    Also work to add cross reference links to Column and basis for general
+    links such as Table of Contents, index, glossary, list of ____.
 
 If you would like to see new features for PDF::Builder on an accelerated
 schedule, please feel free to contact us (via catskilltech.com Contact page)

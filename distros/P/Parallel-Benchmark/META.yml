@@ -3,17 +3,15 @@ abstract: 'parallel benchmark module'
 author:
   - 'FUJIWARA Shunichiro <fujiwara@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
+  ExtUtils::MakeMaker: '6.36'
 configure_requires:
-  CPAN::Meta: 0
-  CPAN::Meta::Prereqs: 0
-  Module::Build: 0.38
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v0.14.1, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Parallel-Benchmark
 no_index:
   directory:
@@ -28,20 +26,23 @@ no_index:
 provides:
   Parallel::Benchmark:
     file: lib/Parallel/Benchmark.pm
-    version: 0.10
+    version: '0.11'
 requires:
-  File::Temp: 0
-  Log::Minimal: 0
-  Mouse: 0
-  POSIX: 0
-  Parallel::ForkManager: 1.12
-  Parallel::Scoreboard: 0
-  Time::HiRes: 0
-  Try::Tiny: 0
+  File::Temp: '0'
+  Log::Minimal: '0'
+  Mouse: '0'
+  POSIX: '0'
+  Parallel::ForkManager: '1.12'
+  Parallel::Scoreboard: '0'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
 resources:
   bugtracker: https://github.com/fujiwara/p5-Parallel-Benchmark/issues
   homepage: https://github.com/fujiwara/p5-Parallel-Benchmark
-  repository: git://github.com/fujiwara/p5-Parallel-Benchmark.git
-version: 0.10
+  repository: https://github.com/fujiwara/p5-Parallel-Benchmark.git
+version: '0.11'
 x_contributors:
-  - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
+  - 'FUJIWARA Shunichiro <67804+fujiwara@users.noreply.github.com>'
+  - 'fujiwara <fujiwara.shunichiro@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

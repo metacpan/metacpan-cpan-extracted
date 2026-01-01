@@ -15,18 +15,19 @@ my $compress = 'none'; # uncompressed streams
 #my $compress = 'flate'; # compressed streams
 
 my ($ant, $ant2, $ant3, $ant4, $ant5, $ant6);
-my $pdf = PDF::Builder->new(-compress => $compress);
+my $pdf = PDF::Builder->new('compress' => $compress);
 
-#my $f1 = $pdf->corefont('Helvetica', -encode=>'latin1'); # unused
-my $f2 = $pdf->corefont('Helvetica-Bold', -encode=>'latin1'); # page heading
+#my $f1 = $pdf->corefont('Helvetica', 'encode'=>'latin1'); # unused
+my $f2 = $pdf->corefont('Helvetica-Bold', 'encode'=>'latin1'); # page heading
 
+# =============== Page 1
 my $page = $pdf->page();
 $page->mediabox(595,842); # A4 paper
 
 # just some random text near the top of the page
 my $gfx = $page->gfx();
 my $text = $page->text();
-$text->textlabel(50,750, $f2,20, 'Hello World!', -color=>'red');
+$text->textlabel(50,750, $f2,20, 'Hello World!', 'color'=>'red');
 
 # draw a grid with 50pt blocks to see where rectangles are
 $gfx->strokecolor("#CCC");
@@ -52,9 +53,9 @@ $gfx->stroke();
 # little larger than the visible icon! BTW, the icon can be dragged and dropped.
 $ant = $page->annotation();
 $ant->text("This is an initially open note.\nnext line", 
-	   -color=>[ 0.8 ],  # light gray icon fill
-	   -icon=>'Key',
-	   -rect=>[60,10, 160,110], -open=>1);
+	   'color'=>[ 0.8 ],  # light gray icon fill
+	   'icon'=>'Key',
+	   'rect'=>[60,10, 160,110], 'open'=>1);
 
 # initially closed note (annotation), can be replied to multiple times by users.
 # active area is supposed to be 100x100 at 200,300 (LL), but it seems to be 
@@ -62,17 +63,27 @@ $ant->text("This is an initially open note.\nnext line",
 # note that a new annotation object must be created.
 $ant2 = $page->annotation();
 $ant2->text('This is an initially closed note', 
-	   -color=>[ 0.3 ],  # dark gray icon fill
-	   -text=>'Closed for the day!',  # extra note on rollover
-	   -opacity=> 0.75, # a little translucency
-	   # -border=>[10,10, 10],  # prominent border  N/A
-	   # -icon   use default (Note)
-	   -rect=>[210,110, 310,210]);
+	   'color'=>[ 0.3 ],  # dark gray icon fill
+	   'text'=>'Closed for the day!',  # extra note on rollover
+	   'opacity'=> 0.75, # a little translucency
+	   # 'border'=>[10,10, 10],  # prominent border  N/A
+	   # 'icon'   use default (Note)
+	   'rect'=>[210,110, 310,210]);
 
-# ------------------
+# =============== Page 2
 # some text on a new page to illustrate some more annotations
 $page = $pdf->page();
 $page->mediabox(595,842); # A4 paper
+
+# add a couple of externally visible named destinations
+# 'foo' is showing entire page 2
+my $dest = PDF::Builder::NamedDestination->new($pdf);
+$dest->goto($page, 'xyz'=>[undef, undef, undef]);
+$pdf->named_destination('Dests', 'foo', $dest);
+# 'bar' is zoomed in on page 2
+$dest = PDF::Builder::NamedDestination->new($pdf);
+$dest->goto($page, 'xyz'=>[200,650, 2]);
+$pdf->named_destination('Dests', 'bar', $dest);
 
 # just some random text near the top of the page
 my $LoremIpsum = 
@@ -97,20 +108,20 @@ $text->font($f2, $fontsize);
 $text->leading($leading);
 $text->translate(75, 700);  # upper left baseline of 250-wide paragraph
 my ($spill, $unused) = 
-    $text->paragraph($LoremIpsum, 250,640, 0, -spillover=>1); 
+    $text->paragraph($LoremIpsum, 250,640, 0, 'spillover'=>1); 
 
 # Now to do some annotations
 $ant3 = $page->annotation();  # 1 line down from upper line
 my $note = "This has a highlighter effect.";
 my @topbot = y_topbot(700, 1, $leading, $fontsize, $descender);
 my $corners = [115,$topbot[0], 221,$topbot[0], 115,$topbot[1], 221,$topbot[1]];
-$ant3->markup($note, $corners, "Highlight", -color=>[1, .82, 0]);
+$ant3->markup($note, $corners, "Highlight", 'color'=>[1, .82, 0]);
 
 $ant4 = $page->annotation();  # 7 lines down from upper line
 $note = "This uses a squiggly line.";
 @topbot = y_topbot(700, 7, $leading, $fontsize, $descender);
 $corners = [75,$topbot[0], 298,$topbot[0], 75,$topbot[1], 298,$topbot[1]];
-$ant4->markup($note, $corners, "Squiggly", -color=>[0, 0, 1]);
+$ant4->markup($note, $corners, "Squiggly", 'color'=>[0, 0, 1]);
 
 $ant5 = $page->annotation();  # 11 lines down from upper line
 $note = "This uses an underline spanning two lines.";
@@ -118,8 +129,8 @@ $note = "This uses an underline spanning two lines.";
 $corners = [277,$topbot[0], 330,$topbot[0], 277,$topbot[1], 330,$topbot[1],
             75,$topbot[0]-$leading, 157,$topbot[0]-$leading,
             75,$topbot[1]-$leading, 157,$topbot[1]-$leading];
-$ant5->markup($note, $corners, "Underline", -color=>[0, 1, 0], 
-             -text=>"Some title text");
+$ant5->markup($note, $corners, "Underline", 'color'=>[0, 1, 0], 
+             'text'=>"Some title text");
 
 $ant6 = $page->annotation();  # 15 lines down from upper line
 $note = "This uses a strikeout spanning three lines.";
@@ -129,7 +140,7 @@ $corners = [257,$topbot[0], 350,$topbot[0], 257,$topbot[1], 350,$topbot[1],
             75,$topbot[1]-$leading, 340,$topbot[1]-$leading,
             75,$topbot[0]-2*$leading, 338,$topbot[0]-2*$leading,
             75,$topbot[1]-2*$leading, 338,$topbot[1]-2*$leading];
-$ant6->markup($note, $corners, "StrikeOut", -opacity=>0.5);
+$ant6->markup($note, $corners, "StrikeOut", 'opacity'=>0.5);
 
 # ------------------
 $pdf->saveas("$0.pdf");

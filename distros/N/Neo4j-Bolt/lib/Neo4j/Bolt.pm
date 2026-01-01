@@ -6,7 +6,7 @@ use warnings::register;
 use Cwd qw/realpath getcwd/;
 
 BEGIN {
-  our $VERSION = "0.5001";
+  our $VERSION = "0.5002";
   my @min_lib_version = (5,0,7);
 
   require Neo4j::Bolt::Cxn;
@@ -218,7 +218,7 @@ L<Neo4j::Bolt::Cxn>, L<Neo4j::Bolt::ResultStream>, L<Neo4j::Types>.
 
 =head1 LICENSE
 
-This software is Copyright (c) 2019-2024 by Mark A. Jensen.
+This software is Copyright (c) 2019-2026 by Mark A. Jensen.
 
 This is free software, licensed under:
 

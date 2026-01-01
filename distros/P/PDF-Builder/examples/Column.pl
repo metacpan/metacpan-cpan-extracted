@@ -3,16 +3,24 @@
 use warnings;
 use strict;
 use PDF::Builder;
-#use Data::Dumper; # for debugging
+# for debugging use
+#use Data::Dumper; 
 # $Data::Dumper::Sortkeys = 1; # hash keys in sorted order
+if (0) { #############################################
+} #############################################
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 # README.md is used below on page 5. Be sure to insert a fresh copy at build 
 #  time, and check if goes more pages. \ -> \\, $PERL_version -> \$PERL_version
-my $use_Table = 1; # if 1, use PDF::Table for table example
-# TBD automatically check if PDF::Table available, and if so, use it
+# automatically check if PDF::Table available, and if so, use it
+my $use_Table; # if 1, use PDF::Table for table example
+$use_Table = eval {
+    require PDF::Table;
+    1;
+};
+if (!defined $use_Table) { $use_Table = 0; } # else is 1
 
 #my $pdf = PDF::Builder->new();
 my $pdf = PDF::Builder->new('compress'=>'none');
@@ -27,15 +35,13 @@ my $magenta = '#ff00ff';
 my $fs = 15;
 my ($rc, $next_y, $unused);
 print "CAUTION: page 4 requires that your HTML::Tagset installation be patched\n  so that <ins> and <del> are handled properly!\n";
-# for debugging use
-if (0) { #############################################
-} #############################################
 
 print "======================================================= pg 1\n";
 $page = $pdf->page();
 $grfx = $page->gfx();
 $text = $page->text();
-footer(++$page_num, $pdf, $text);
+footer(++$page_num, $pdf, $text); # current font known to FontManager
+                                  # is sans-serif (Helvetica)
 
 print "---- single string entries\n";
 $text->column($page, $text, $grfx, 'none', 
@@ -90,8 +96,8 @@ $text->column($page, $text, $grfx, 'pre', [
 	{'text'=>'!', 'tag'=>''},
 	{'text'=>'', 'tag'=>'/b'},
 	{'text'=>'', 'tag'=>'/i'},
-	{'text'=>'', 'tag'=>'/p'},
-], 'rect'=>[50,150, 500,50], 'outline'=>$magenta);
+	{'text'=>'', 'tag'=>'/p'}, ], 
+        'rect'=>[50,150, 500,50], 'outline'=>$magenta);
 
 # larger font size and narrower columns to force line wraps
 print "======================================================= pg 2\n";
@@ -215,23 +221,25 @@ my $SLoremIpsum = join("\n",@ALoremIpsum);
 
 print "---- Lorem Ipsum array of string entries, default paragraphs\n";
 $text->column($page, $text, undef, 'html', 
-  "<h2>Paragraphs with default characteristics</h2>", 'rect'=>[50,730, 500,25]);
+  "<h2>Paragraphs with default characteristics</h2>", 
+  'rect'=>[50,730, 500,25]);
 # default paragraph indent and top margin
 restore_props($text, $grfx);
 ($rc, $next_y, $unused) =
     $text->column($page, $text, $grfx, 'none', \@ALoremIpsum, 
-	          'rect'=>[50,700, 500,250], 'outline'=>$magenta );
+	    'rect'=>[50,700, 500,275], 'outline'=>$magenta );
 if ($rc) { 
     print STDERR "Lorem Ipsum array overflowed the column!\n";
 }
 print "---- Lorem Ipsum string entry, block-style paragraphs\n";
 $text->column($page, $text, undef, 'html', 
-  "<h2>Paragraphs with block style (no indent, vertical space)</h2>", 'rect'=>[50,380, 500,25]);
+  "<h2>Paragraphs with block style (no indent, vertical space)</h2>", 
+            'rect'=>[50,380, 500,25]);
 # no indent, extra top margin
 restore_props($text, $grfx);
 ($rc, $next_y, $unused) =
     $text->column($page, $text, $grfx, 'none', $SLoremIpsum, 
-	          'rect'=>[50,350, 500,300], 'outline'=>$magenta, 
+	          'rect'=>[50,350, 500,275], 'outline'=>$magenta, 
 		  'para'=>[ 0, 5 ] );
 if ($rc) { 
     print STDERR "Lorem Ipsum string overflowed the column!\n";
@@ -262,9 +270,9 @@ And a numbered list:
 1. Item one
 2. Item two
 
-# We will need a heading
+# We will need a heading {#h1hdg}
 
-## And a subheading
+## And a subheading {#h2hdg}
 
 Finally we&#x92;ll need some [external links](https://duckduckgo.com).
 
@@ -275,10 +283,20 @@ underlines. Show some <del>deleted</del> text, <strike>strike-out</strike> text,
 and <s>s'd out</s> text that show line-throughs. 
 More than <span style="text-decoration: 'underline line-through overline'">one
 at a time</span> are possible via style attribute, also via
-<u><s>nested tags</s></u>.
+<u><s>nested tags</s></u> and <del><ins>nested tags</ins></del>.
 
 Then we need some styling features in tables as shown in the table below. There is no need to support this in text blocks, although it would be a nice feature (colored text is already available in text blocks using its options).
 END_OF_CONTENT
+# links that require state environment to be defined. See Column_xrefs.pl
+#This is a PDF id [Link Text PDF id](%id) there.
+#This is an internal phys page no [Link Text PDF int ppn](#5) there.
+#This is an external phys page no [Link Text PDF ext ppn](ext.pdf#4) there.
+#This is an internal p-x-y-z [Link Text old pp](#7-20-30-1.5) there.
+#This is an internal named dest [Link Text ND int](##NDi) there.
+#This is an external named dest [Link Text ND ext](ext2.pdf#NDe) there.
+#This is a browser URL [Link text URL](file.html) there.
+#This is a browser URL with anchor [Link text URL w/ anchor](file2.htm#blah) there.
+
 # TBD in above text, <u><s>nested</s></u> <del><ins>tags</ins></del> lost the
 # space between the words in Treebuilder? needs investigating
 
@@ -300,7 +318,7 @@ if ($use_Table) {
     # you need to be careful to end a cell with font, etc. restored
     #   this only works if PDF::Table installed!
 
-    use PDF::Table;
+    # PDF::Table already required
     my $table = PDF::Table->new();
     my $table_data = [
         # row 1, solid color lines
@@ -363,7 +381,7 @@ if ($use_Table) {
     # "table" 2 columns width 500, padding 5, font size 12, draw borders 
     # and rules
     # we will show a number of different techniques
-    # do 6 cells as 6 small columns in 3x2 grid
+    # do 8 cells as 8 small columns in 4x2 grid
     my $table_rows = 4;
     my $table_cols = 2;
     my $cell_height = 20;
@@ -445,26 +463,28 @@ if ($use_Table) {
     }
     # vertical divider between columns
     $grfx->move(300,$next_y);
-    $grfx->vline($next_y-60);
+    $grfx->vline($next_y - $table_rows*$cell_height);
     # draw it all
     $grfx->strokecolor('black');
     $grfx->stroke();
 }
 
 # more pages with more extensive MD
-print "======================================================= pg 5-10\n";
+print "======================================================= pg 5-9\n";
 print "---- A README.md file for PDF::Builder\n";
+print "   You should see warnings about invalid or unknown tag <img>.\n";
+print "   This tag is not yet implemented and is ignored.\n";
 $page = $pdf->page();
 $grfx = $page->gfx();
 $text = $page->text();
 footer(++$page_num, $pdf, $text);
 #  might need three or four pages
-#  three <img> calls (GitHub buttons), several `code` 
+#  three <img> calls (GitHub buttons)
 #  escape $ and \ in several lines, unescape \* 
 #  example block in Paper Sizes note needs manual reformat (revisit
 #    when <pre> supported)
 $content = <<"END_OF_CONTENT";
-# PDF::Builder release 3.027
+# PDF::Builder release 3.028
 
 A Perl library to create and modify PDF (Portable Document Format) files
 
@@ -488,12 +508,12 @@ more powerful and versatile.
 \\*Note that PDF::Builder is **not** built on PDF::API2, and does **not**
 require that it be installed. The two libraries are completely independent of
 each other and one will not interfere with the other if both are installed.
+However, you should _not_ try mixing the two libraries within one running 
+program, as they still share many routine names!
 
-**Gadzooks!** For a delightful look at the (rather grisly) origin of this
-typographical term, as well as many other terms, watch
-https://www.youtube.com/watch?v=cd5iFbuNKv8 .
-
-[Home Page](https://www.catskilltech.com/FreeSW/product/PDF%2DBuilder/title/PDF%3A%3ABuilder/freeSW_full), including Documentation and Examples.
+The
+[Home Page](https://www.catskilltech.com/FreeSW/product/PDF%2DBuilder/title/PDF%3A%3ABuilder/freeSW_full)
+includes Documentation and Examples.
 
 [![Open Issues](https://img.shields.io/github/issues/PhilterPaper/Perl-PDF-Builder)](https://github.com/PhilterPaper/Perl-PDF-Builder/issues)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://makeapullrequest.com)
@@ -549,13 +569,20 @@ the CPAN installer may refuse to install it. The reason this version was
 chosen was so that LTS (Long Term Support) versions of Perl going back about
 6 years are officially supported (by PDF::Builder), and older versions are not
 supported. The intent is to not waste time and effort trying to fix bugs which
-are an artifact of old Perl releases.
+are an artifact of old Perl releases. Frankly, if you're running a Perl version
+more than 6 years old, you should be thinking about upgrading.
 
 Usually about once a year the minimum level is bumped up, but this depends on 
 whether Strawberry releases the newest Perl level. As Strawberry Perl releases 
 new Perl levels, usually on an annual basis, we intend to bump up our required 
 minimum Perl level (even-numbered production releases), to keep support for the 
 last 6 calendar years of Perl releases, dropping older ones.
+
+Note that we have
+been informed that enough users want to run PDF::Builder at older levels that
+**for the time being** we will stay at **5.28**. If we make use of newer Perl
+constructs and operators in the code, however, and PDF::Builder no longer works
+with 5.28, we will have to raise the minimum level.
 
 #### Older Perls
 
@@ -609,6 +636,12 @@ functionality.
 * HTML::TreeBuilder (5.07 or higher, needed if using 'html' or 'md1' markup)
 * Pod::Simple::XHTML (3.45 or higher, needed if using buildDoc.pl utility to create HTML documentation)
 * SVGPDF (0.087 or higher, needed if using SVG image functions)
+
+The following external applications (programs) are needed for fully testing some TIFF-related
+PDF::Builder functionality. Install _before_ installing PDF::Builder or Graphics::TIFF.
+
+* ImageMagick (module 'magick' or 'convert') 
+* Ghostscript (module 'gs', 'gswin64c', or 'gswin32c')
 
 If an optional package is needed for certain extended functionality, but not
 installed, sometimes PDF::Builder
@@ -706,6 +739,7 @@ a pointer to _your_ work. The more cross-pollination, the better!
 * LICENSE file for more on the license term
 * INFO/RoadMap file for the PDF::Builder road map
 * INFO/ACKNOWLEDGE.md for "thank yous" to those who contributed to this product
+* INFO/SPONSORS for "thank yous" to those who financially sponsored this product
 * INFO/CONVERSION file for how to convert from PDF::API2 to PDF::Builder
 * INFO/Changes\* files for older change logs
 * INFO/PATENTS file for information on patents
@@ -758,6 +792,13 @@ US Letter _or_ A4 media, with the following **minimum** margins (allowing
 
 `A4 right:      3mm = .125" = 9pt`
 
+If not using the _Universal_ size, you can choose _Letter_ size, with an
+extra-wide right margin of at least 27pt, or _A4_ size media with an extra
+deep top margin of at least 60pt. In both cases, allow a minimum of 9pt for
+left and bottom margins, for paper-handling purposes. This should give you
+results printable on either US Letter or A4 media, anywhere in the world,
+without accidentally losing content.
+
 Please see the discussion on `mediabox()` and other "box" calls, about how
 much of a page can actually be _printed_ on, allowing for pinch rollers and
 other paper transport mechanisms. The above suggested margins assume, in
@@ -766,12 +807,12 @@ addition to Letter paper being .25" wider and .7" shorter than A4, that 1/8"
 END_OF_CONTENT
 
 restore_props($text,$grfx);
-# page 5
+# page 5. tune length to avoid orphaning a couple of headings
 ($rc, $next_y, $unused) =
     $text->column($page, $text, $grfx, 'md1', $content, 
-	          'rect'=>[50,750, 500,700], 'outline'=>$magenta, 
+	          'rect'=>[50,750, 500,640], 'outline'=>$magenta, 
 		  'para'=>[ 0, 5 ] );
-# pages 6-8
+# pages 6-8. tune length a bit
 while ($rc) { 
     # new page. uses fixed column template, no headers/footers/page numbers
     $page = $pdf->page();
@@ -782,14 +823,14 @@ while ($rc) {
 #print Dumper($unused) if $page_num == 7;
     ($rc, $next_y, $unused) =
         $text->column($page, $text, $grfx, 'pre', $unused, 
-		      'rect'=>[50,750, 500,700], 'outline'=>$magenta, 
-		      'para'=>[ 0, 5 ] );
+		  'rect'=>[50,750, 500,640], 'outline'=>$magenta, 
+		  'para'=>[ 0, 5 ] );
 }
 
 # for various lists, see Column_lists.pl
 
 # block quotes and font extent changes
-print "======================================================= pg 11\n";
+print "======================================================= pg 10\n";
 print "---- Block quotes\n";
 $page = $pdf->page();
 $grfx = $page->gfx();
@@ -832,7 +873,7 @@ restore_props($text, $grfx);
 ($rc, $next_y, $unused) =
     $text->column($page, $text, $grfx, 'html', $content, 
 	          'rect'=>[50,750, 500,300], 'outline'=>$magenta, 
-		  'para'=>[ 0, 0 ] );
+		  'para'=>[ 0, 5 ] );
 if ($rc) { 
     print STDERR "Block quotes example overflowed column!\n";
 }
@@ -856,7 +897,7 @@ if ($rc) {
 }
 
 # setting your own CSS for Markdown or none
-print "======================================================= pg 12\n";
+print "======================================================= pg 11\n";
 $page = $pdf->page();
 $grfx = $page->gfx();
 $text = $page->text();
@@ -882,7 +923,7 @@ END_OF_CONTENT
 restore_props($text, $grfx);
 ($rc, $next_y, $unused) =
     $text->column($page, $text, $grfx, 'md1', $content, 
-	          'rect'=>[50,750, 500,125], 'outline'=>$magenta, 
+	          'rect'=>[50,750, 500,170], 'outline'=>$magenta, 
 		  'para'=>[ 0, 0 ],
 	         );
 if ($rc) { 
@@ -891,61 +932,67 @@ if ($rc) {
 
 # note some tags capitalized, and some attributes capitalized
 print "---- horizontal rules HTML\n";
+# note that current alignment is 'left', while the default HTML alignment 
+#   appears to be 'center' (not currently supported)
+# TBD add align= attribute, support for margin-* auto for center, right align
 $content = <<"END_OF_CONTENT";
 <p>HTML horizontal rules, with CSS</p>
-<hR>
+<hR> <!-- will be folded to lowercase -->
 <p>Between two rules, above is default settings</p>
 <hr style="height: 5; color: blue">
 <p>Between two rules, above is very thick and blue</p>
-<hr style="width: 200" />
-<P>Above rule is only 200pt long</p>
+<hr style="width: 200" align="left" />
+<P>Above rule is only 200pt long, and explicitly left aligned</p>
 <HR size="17" Color="orange" WIDTH="300">
-<p>Above rule is <em>very</em> thick orange and 300pt long</p>
+<p>Above rule is <em>very</em> thick orange and 300pt long, centered by default</p>
 END_OF_CONTENT
 
 restore_props($text, $grfx);
 ($rc, $next_y, $unused) =
     $text->column($page, $text, $grfx, 'html', $content, 
-	          'rect'=>[50,585, 500,185], 'outline'=>$magenta, 
+	          'rect'=>[50,550, 500,235], 'outline'=>$magenta, 
 		  'para'=>[ 0, 0 ],
 	         );
 if ($rc) { 
     print STDERR "HTML horizontal rule example overflowed column!\n";
 }
 
-print "---- PDF page link\n";
-$content = <<"END_OF_CONTENT";
-Let's try linking to [another page](#4) of this document.
-
-Also try a link to a [specific place](#4-50-200) unzoomed.
-
-While we're here, how about [linking](#4-50-200-1.5) with zoom-in?
-END_OF_CONTENT
-
-restore_props($text, $grfx);
-($rc, $next_y, $unused) =
-    $text->column($page, $text, $grfx, 'md1', $content, 
-	          'rect'=>[50,375, 500,100], 'outline'=>$magenta, 
-		  'para'=>[ 0, 10 ],
-	         );
-if ($rc) { 
-    print STDERR "PDF links example overflowed column!\n";
-}
+# the following links require 'state' environment to be initialized.
+# See Column_xrefs.pl instead
+#print "---- PDF page link\n";
+#$content = <<"END_OF_CONTENT";
+#Let's try linking to [another page](#4) of this document.
+#
+#Also try a link to a [specific place](#4-50-200) unzoomed.
+#
+#While we're here, how about [linking](#4-50-200-1.5) with zoom-in?
+#END_OF_CONTENT
+#
+#restore_props($text, $grfx);
+#($rc, $next_y, $unused) =
+#    $text->column($page, $text, $grfx, 'md1', $content, 
+#    'rect'=>[50,375, 500,100], 'outline'=>$magenta, 
+#    'para'=>[ 0, 10 ],
+#    );
+#if ($rc) { 
+#    print STDERR "PDF links example overflowed column!\n";
+#}
 
 # --------------
 # some bogus tags and CSS properties
-# expect one message about invalid 'glotz' tag. notice that HTML::TreeBuilder
-#   does NOT insert an extra </glotz> tag into the stream, as one already found
-# expect 'snork' CSS to be ignored
 #
 print "---- Bogus HTML tags and CSS property names\n";
+print "   You should see warnings about an invalid HTML tag <glotz> and invalid \n";
+print "   CSS properties 'snork' and 'snuck'. Don't worry about these messages,\n";
+print "   they're intentional tests.\n";
+# note that global properties must go under the 'body' selector
 $content = <<"END_OF_CONTENT";
-<p>
+<p> <!-- expect one message -->
 <glotz>This is within a 'glotz' tag</glotz>. 
 This is <glotz>within another.</glotz>
 </p>
 
-<p style="snork: 1em;">This paragraph has CSS 'snork' property.</p>
+<p style="snork: 1em;">This paragraph has CSS 'snork' property and is green.</p>
 END_OF_CONTENT
 
 restore_props($text, $grfx);
@@ -953,6 +1000,7 @@ restore_props($text, $grfx);
     $text->column($page, $text, $grfx, 'md1', $content, 
 	          'rect'=>[50,260, 500,60], 'outline'=>$magenta, 
 		  'para'=>[ 0, 10 ],
+                  'style'=>'body {color: green; snuck: shlump;}',
 	         );
 if ($rc) { 
     print STDERR "Invalid tags and CSS example overflowed column!\n";
@@ -972,6 +1020,7 @@ restore_props($text, $grfx);
     $text->column($page, $text, $grfx, 'html', $content, 
 	          'rect'=>[100,187, 400,13], 'outline'=>$magenta, 
 		  'para'=>[ 0, 0 ],
+		  'style'=>'body {color: black;}',  # reset color
 	         );
 if ($rc) { 
     print STDERR "1. <_move> and text-align example overflowed column!\n";
@@ -1007,8 +1056,6 @@ restore_props($text, $grfx);
 	         );
 if ($rc) { 
     print STDERR "3. <_move> and text-align example overflowed column!\n";
-print "rc=$rc, leftover text =\n";
-print Dumper(@$unused);
 }
  
 $content = <<"END_OF_CONTENT";
@@ -1046,6 +1093,196 @@ if ($rc) {
     print STDERR "5. <_move> and text-align example overflowed column!\n";
 }
  
+if (0) { ####################################### future MultiMarkdown
+##### needs <br>, <pre> support
+print "======================================================= pg 12-13\n";
+print "---- MultiMarkdown web page\n";
+$page = $pdf->page();
+$grfx = $page->gfx();
+$text = $page->text();
+footer(++$page_num, $pdf, $text);
+
+$content = << "END_OF_CONTENT";
+(This content is borrowed from the MultiMarkdown web page, https://fletcherpenney.net/multimarkdown)
+
+Title:	MultiMarkdown  
+Tags:	MultiMarkdown
+
+
+<!-- Navigational markup, not in MMD 
+<ul class="nav">
+<li class="nav-active"><a href="./">Intro</a></li>
+<li><a href="features/">Features</a></li>
+<li><a href="download/">Download</a></li>
+<li><a href="install/">Install</a></li>
+<li><a href="use/">Use</a></li>
+<li><a href="help/">Help</a></li>
+<li><a href="ports/">Ports</a></li>
+</ul> -->
+
+"As the world goes multi-platform with all of the new mobile operating
+systems, MultiMarkdown provides an easy way to share formatting between all of
+my devices. It's easy to learn (even for us mortals) and immediately useful."
+> --- David Sparks, [MacSparky.com](http://MacSparky.com/)
+
+"Personally, it's changed my game --- it's how I think now. Can't imagine
+writing more than a paragraph in anything that doesn't do MMD."
+> --- Merlin Mann, [kung fu
+> grippe](http://www.kungfugrippe.com/post/346554639/multimarkdown-in-case-that-last-thing-seemed-too)
+
+## What is MultiMarkdown? ##
+
+MultiMarkdown, or MMD,  is a tool to help turn  minimally marked-up plain text
+into  well formatted  documents,  including  HTML, PDF  (by  way of  [LaTeX]),
+[OPML], or  OpenDocument (specifically, Flat [OpenDocument]  or '.fodt', which
+can in  turn be converted into  [RTF], Microsoft Word, or  virtually any other
+word-processing format).
+
+MMD is a superset of the [Markdown] syntax, originally created by John Gruber.
+It adds multiple syntax features (tables,  footnotes, and citations, to name a
+few), in  addition to the various  output formats listed above  (Markdown only
+creates  HTML). Additionally,  it  builds in  "smart"  typography for  various
+languages (proper left- and right-sided quotes, for example).
+
+MultiMarkdown started as a Perl script, which was modified from the original
+Markdown.pl.
+
+MultiMarkdown v3 (aka 'peg-multimarkdown') was based on John MacFarlane's
+[peg-markdown].  It used a parsing expression grammar (PEG), and was written
+in C in order to compile on almost any operating system.  Thanks to work by
+Daniel Jalkut, MMD v3 was built so that it didn't have any external library
+requirements.
+
+MultiMarkdown v4 was basically a complete rewrite of v3.  It used the same
+basic PEG for parsing (Multi)Markdown text, but otherwise was almost
+completely rebuilt:
+
+MultiMarkdown v5 was largely the same codebase as v4, but the build system was
+restructured to use CMake.
+
+MultiMarkdown v6 is the biggest rewrite since v3.  The parser was completely
+rewritten to improve accuracy and (most importantly) performance.  v6 includes
+multiple new features, reimagines a couple of existing features, and
+deprecates one or two old syntax structures.
+
+For another description of what MultiMarkdown is, you can also check out a PDF
+[slide show] that describes and demonstrates how MultiMarkdown can be used.
+
+[slide show]:
+https://github.com/fletcher/MultiMarkdown-Gallery/raw/master/What-Is-MMD/what_is_mmd.pdf
+
+## Why should I use MultiMarkdown? ##
+
+Writing with MultiMarkdown allows you to separate the content and structure of
+your document  from the formatting. You  focus on the actual  writing, without
+having to  worry about  making the  styles of your  chapter headers  match, or
+ensuring the proper spacing between paragraphs. And with a little forethought,
+a single  plain text  document can  easily be  converted into  multiple output
+formats without having to rewrite the entire  thing or format it by hand. Even
+better, you  don't have to  write in  "computer-ese" to create  well formatted
+HTML or LaTeX commands. You just write, MultiMarkdown takes care of the rest.
+
+For example, instead of writing:
+
+	<p>In order to create valid 
+	<a href="http://en.wikipedia.org/wiki/HTML">HTML</a>, you 
+	need properly coded syntax that can be cumbersome for 
+	&#8220;non-programmers&#8221; to write. Sometimes, you
+	just want to easily make certain words <strong>bold
+	</strong>, and certain words <em>italicized</em> without
+	having to remember the syntax. Additionally, for example,
+	creating lists:</p>
+
+	<ul>
+	<li>should be easy</li>
+	<li>should not involve programming</li>
+	</ul>
+
+You simply write:
+
+	In order to create valid [HTML], you need properly
+	coded syntax that can be cumbersome for 
+	"non-programmers" to write. Sometimes, you just want
+	to easily make certain words **bold**, and certain 
+	words *italicized* without having to remember the 
+	syntax. Additionally, for example, creating lists:
+
+	* should be easy
+	* should not involve programming
+
+	[HTML]: http://en.wikipedia.org/wiki/HTML
+
+
+Additionally, you  can write a MultiMarkdown  document in any text  editor, on
+any operating system,  and know that it will be  compatible with MultiMarkdown
+on any other operating  system and processed into the same  output. As a plain
+text format, your documents  will be safe no matter how  many times you switch
+computers, operating  systems, or  favorite applications.  You will  always be
+able to open  and edit your documents,  even when the version  of the software
+you originally wrote them in is long gone.
+
+These features have prompted several people to use MultiMarkdown in the
+process of writing their books, theses, and countless other documents.
+
+There are many other reasons to use MultiMarkdown, but I won't get into all of
+them here.
+
+*By the way* --- this web site is created using MultiMarkdown. To view the MMD
+source for any  page, add `.txt` to the  end of the URL. If the  URL ends with
+`/`, then add `index.txt` to the end instead. This page, for example, would be
+["/multimarkdown/index.txt"](/multimarkdown/index.txt).
+
+## Enhancements for PDF::Builder ##
+### list problems with blank lines ###
+
+* bullet item 1
+
+* bullet item 2
+  second line
+
+* bullet item 3
+second line
+third line
+
+### support 3 x = horizontal rule ###
+
+===
+
+Should be a horizontal rule above
+
+### support double tilde strikeout ###
+Some text should be ~~struck out~~ inline.
+
+
+[LaTeX]:		http://en.wikipedia.org/wiki/LaTeX
+[OPML]:			http://en.wikipedia.org/wiki/OPML
+[Markdown]:		http://daringfireball.net/projects/markdown/
+[peg-markdown]:	https://github.com/jgm/peg-markdown
+[RTF]:			http://en.wikipedia.org/wiki/Rich_Text_Format
+[OpenDocument]:	http://en.wikipedia.org/wiki/OpenDocument
+[User's Manual]:
+http://fletcher.github.com/peg-multimarkdown/mmd-manual.pdf
+END_OF_CONTENT
+
+restore_props($text, $grfx);
+($rc, $next_y, $unused) =
+    $text->column($page, $text, $grfx, 'md2', $content, 
+	          'rect'=>[50,750, 500,700], 'outline'=>$magenta, 
+		  'para'=>[ 0, 5 ] );
+while ($rc) { 
+    # new page. uses fixed column template, no headers/footers/page numbers
+    $page = $pdf->page();
+    $grfx = $page->gfx();
+    $text = $page->text();
+    footer(++$page_num, $pdf, $text);
+
+    ($rc, $next_y, $unused) =
+        $text->column($page, $text, $grfx, 'pre', $unused, 
+		  'rect'=>[50,750, 500,700], 'outline'=>$magenta, 
+		  'para'=>[ 0, 5 ] );
+}
+} ####################################### end MultiMarkdown sample
+
 # Column_layouts.pl TBD
 # TBD figure out a good way to fall back for unavailable fonts
 # demonstrate balanced columns two long columns and one short, first pass
@@ -1085,6 +1322,8 @@ sub footer {
 }
 # -----------------------
 
+# note that the columns are deliberately quite narrow, which will trigger
+# some odd word breaks
 sub multicol {
     my ($page, $text, $grfx, $markup, $content, $rect, $outline, $fs) = @_;
 
@@ -1092,12 +1331,12 @@ sub multicol {
 
     ($rc, $start_y, $content) = 
         $text->column($page, $text, $grfx, $markup, $content, 
-		      'rect'=>$rect, 'outline'=>$outline, 'font_size'=>$fs);
+		  'rect'=>$rect, 'outline'=>$outline, 'font_size'=>$fs);
     while ($rc == 1) { # ran out of column, do another
 	$rect->[0] += 50+$rect->[2];
         ($rc, $start_y, $content) = 
             $text->column($page, $text, $grfx, 'pre', $content, 
-		          'rect'=>$rect, 'outline'=>$outline, 'font_size'=>$fs);
+		  'rect'=>$rect, 'outline'=>$outline, 'font_size'=>$fs);
     }
     return;
 }

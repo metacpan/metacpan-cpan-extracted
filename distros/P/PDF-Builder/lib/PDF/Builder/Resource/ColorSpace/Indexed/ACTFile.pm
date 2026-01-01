@@ -5,7 +5,7 @@ use base 'PDF::Builder::Resource::ColorSpace::Indexed';
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
+our $VERSION = '3.028'; # VERSION
 our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
@@ -26,7 +26,7 @@ Inherits from L<PDF::Builder::Resource::ColorSpace::Indexed>
 
 =over
 
-Returns a new colorspace object created from an adobe color table file (ACT/8BCT).
+Returns a new colorspace object created from an Adobe color table file (ACT/8BCT).
 See
 Adobe Photoshop(R) 6.0 --
 File Formats Specification Version 6.0 Release 2,

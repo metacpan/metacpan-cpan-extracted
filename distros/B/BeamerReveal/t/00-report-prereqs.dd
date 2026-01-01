@@ -41,7 +41,6 @@ do { my $x = {
                                       'Pod::Usage' => '0',
                                       'Term::ReadKey' => '0',
                                       'Time::HiRes' => '0',
-                                      'Win32::Console' => '0',
                                       'parent' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'

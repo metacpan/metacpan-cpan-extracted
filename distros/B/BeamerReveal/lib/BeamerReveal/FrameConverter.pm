@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::FrameConverter;
-our $VERSION = '20251230.2042'; # VERSION
+our $VERSION = '20251231.1441'; # VERSION
 
 use strict;
 use warnings;
@@ -95,7 +95,7 @@ BeamerReveal::FrameConverter - FrameConverter
 
 =head1 VERSION
 
-version 20251230.2042
+version 20251231.1441
 
 =head1 SYNOPSIS
 

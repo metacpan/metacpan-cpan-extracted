@@ -16,7 +16,7 @@ like($pdf->to_string(), qr/1 0 0 1 72 144 cm/, q{translate(72, 144)});
 
 # Rotate
 
-$pdf = PDF::Builder->new('-compress' => 0);
+$pdf = PDF::Builder->new('compress' => 0);
 $gfx = $pdf->page()->gfx();
 
 $gfx->rotate(65);
@@ -32,7 +32,7 @@ like($pdf->to_string, qr/1.1 0 0 2.5 0 0 cm/, q{scale(1.1, 2.5)});
 
 # Skew
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->graphics();
 
 $gfx->skew(15, 25);
@@ -40,7 +40,7 @@ like($pdf->to_string, qr/1 0.26795 0.46631 1 0 0 cm/, q{skew(15, 25)});
 
 # Transform
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->transform(-translate => [20, 50],
@@ -55,7 +55,7 @@ like($pdf->to_string, qr/1.3854 0.78142 -1.0586 2.8596 20 50 cm 1.3854 0.78142 -
 
 # Relative Transform
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->transform(-translate => [20, 50],
@@ -71,7 +71,7 @@ like($pdf->to_string, qr/1.3854 0.78142 -1.0586 2.8596 20 50 cm 1.7193 4.0475 -5
 
 # Matrix
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->matrix(1.3854, 0.78142, -1.0586, 2.8596, 20, 50);
@@ -79,7 +79,7 @@ like($pdf->to_string, qr/1.3854 0.78142 -1.0586 2.8596 20 50 cm/, q{matrix});
 
 # Save
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->save();
@@ -87,7 +87,7 @@ like($pdf->to_string, qr/q/, q{save});
 
 # Restore
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->restore();
@@ -95,92 +95,103 @@ like($pdf->to_string, qr/Q/, q{restore});
 
 # Named Fill Color
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->fill_color('blue');
+$gfx->move(0,0); # force pending output
 like($pdf->to_string(), qr/0 0 1 rg/, q{fill_color('blue')});
 
 # RGB Fill Color
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->fillcolor('#ff0000');  # red
+$gfx->move(0,0);
 like($pdf->to_string(), qr/1 0 0 rg/, q{fillcolor('#ff0000')});
 
 # CMYK Fill Color
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->fillcolor('%ff000000');  # cyan
+$gfx->move(0,0);
 like($pdf->to_string, qr/1 0 0 0 k/, q{fillcolor('%ff000000')});
 
 # Named Stroke Color
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->stroke_color('blue');
+$gfx->move(0,0);
 like($pdf->to_string(), qr/0 0 1 RG/, q{stroke_color('blue')});
 
 # RGB Stroke Color
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->strokecolor('#ff0000');  # red
+$gfx->move(0,0);
 like($pdf->to_string(), qr/1 0 0 RG/, q{strokecolor('#ff0000')});
 
 # CMYK Stroke Color
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->strokecolor('%ff000000');  # cyan
+$gfx->move(0,0);
 like($pdf->to_string, qr/1 0 0 0 K/, q{strokecolor('%ff000000')});
 
 # HSV Fill Color
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->fillcolor('!ffffcccc3333');  # dark red color
+$gfx->move(0,0);
 like($pdf->to_string, qr/0.2 0.04 0.0426667 rg/, q{fillcolor('!ffffcccc3333')});
 
 # L*a*b Fill Color
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->fillcolor('&abc');  # ? color
+$gfx->move(0,0);
 like($pdf->to_string, qr|/LabS cs 94.6667 -51.8545 -51.8545 sc|, q{fillcolor('&abc')});
 
 # Grayscale Fill Color
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->fillcolor(0.5);  # medium gray
+$gfx->move(0,0);
 like($pdf->to_string, qr/0.5 g/, q{fillcolor(0.5)});
 
 # pattern or shading space Fill Color TBD
 
 # Legacy format RGB Fill Color
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->fillcolor(0, 0.5, 0.5);  # medium cyan
+$gfx->move(0,0);
 like($pdf->to_string, qr/0 0.5 0.5 rg/, q{fillcolor(0, 0.5, 0.5)});
 
 # Legacy format CMYK Fill Color
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->fillcolor(0.5, 0.5, 0, 0);  # medium blue
+$gfx->move(0,0);
 like($pdf->to_string, qr/0.5 0.5 0 0 k/, q{fillcolor(0.5, 0.5, 0, 0)});
 
 # indexed colorspace plus color-index Fill Color TBD
@@ -188,44 +199,49 @@ like($pdf->to_string, qr/0.5 0.5 0 0 k/, q{fillcolor(0.5, 0.5, 0, 0)});
 
 # HSV Stroke Color (note: 11 digits; 9 will be used)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->strokecolor('!ffffcccc333');  # dark red color
+$gfx->move(0,0);
 like($pdf->to_string, qr/0.0124971 0.00249943 0.00266606 RG/, q{strokecolor('!ffffcccc333')});
 
 # L*a*b Stroke Color
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->strokecolor('&778899');  # ? color
+$gfx->move(0,0);
 like($pdf->to_string, qr|/LabS CS 81.3333 -52.0374 11.6854 SC|, q{strokecolor('&778899')});
 
 # Grayscale Stroke Color
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->strokecolor(1.7);  # white, after being clamped to 1.0 max
+$gfx->move(0,0);
 like($pdf->to_string, qr/1 G/, q{strokecolor(1.7)});
 
 # pattern or shading space Stroke Color TBD
 
 # Legacy format RGB Stroke Color
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->strokecolor(1, 5, 0);  # yellow after Green clamped to max 1.0
+$gfx->move(0,0);
 like($pdf->to_string, qr/1 1 0 RG/, q{strokecolor(1, 5, 0)});
 
 # Legacy format CMYK Stroke Color
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->strokecolor(0.5, 0.5, -1, 0);  # medium blue after Yellow clamped to 0
+$gfx->move(0,0);
 like($pdf->to_string, qr/0.5 0.5 0 0 K/, q{strokecolor(0.5, 0.5, -1, 0)});
 
 # indexed colorspace plus color-index Stroke Color TBD
@@ -233,7 +249,7 @@ like($pdf->to_string, qr/0.5 0.5 0 0 K/, q{strokecolor(0.5, 0.5, -1, 0)});
 
 # Line Width
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->linewidth(8.125);
@@ -247,13 +263,13 @@ like($pdf->to_string, qr/9.125 w/, q{line_width(9.125)});
 
 # Line Cap Style
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->linecap(1);
 like($pdf->to_string, qr/1 J/, q{linecap(1)});
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->line_cap(2);
@@ -261,13 +277,13 @@ like($pdf->to_string, qr/2 J/, q{line_cap(2)});
 
 # Line Join Style
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->linejoin(1);
 like($pdf->to_string, qr/1 j/, q{linejoin(1)});
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->line_join(2);
@@ -275,13 +291,13 @@ like($pdf->to_string, qr/2 j/, q{line_join(2)});
 
 # Miter Limit
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->miterlimit(3);
 like($pdf->to_string, qr/3 M/, q{miterlimit(3)});
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->miter_limit(3.5);
@@ -289,7 +305,7 @@ like($pdf->to_string, qr/3.5 M/, q{miter_limit(3.5)});
 
 # Line Dash (no args)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->linedash();
@@ -297,7 +313,7 @@ like($pdf->to_string, qr/\[ \] 0 d/, q{linedash()});
 
 # Line Dash (1 arg)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->linedash(3);
@@ -305,7 +321,7 @@ like($pdf->to_string, qr/\[ 3 \] 0 d/, q{linedash(3)});
 
 # Line Dash (2 args)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->line_dash_pattern(2, 1);
@@ -313,7 +329,7 @@ like($pdf->to_string, qr/\[ 2 1 \] 0 d/, q{line_dash_pattern(2, 1)});
 
 # Line Dash (hash)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->linedash(-pattern => [15, 5, 3, 2], -shift => 8);
@@ -321,13 +337,13 @@ like($pdf->to_string, qr/\[ 15 5 3 2 \] 8 d/, q{linedash(-pattern => [15, 5, 3, 
 
 # Flatness Tolerance
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->flatness(5);
 like($pdf->to_string, qr/5 i/, q{flatness(5)});
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->flatness_tolerance(7);
@@ -339,7 +355,7 @@ like($pdf->to_string, qr/7 i/, q{flatness_tolerance(7)});
 
 # Horizontal Line
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->move(72, 144);
@@ -349,7 +365,7 @@ like($pdf->to_string, qr/72 144 m 288 144 l S/, q{hline});
 
 # Vertical Line
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->move(72, 144);
@@ -359,7 +375,7 @@ like($pdf->to_string, qr/72 144 m 72 288 l S/, q{vline});
 
 # Poly-Line (4 args, 1 line segment)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->poly(72, 144, 216, 288);
@@ -376,14 +392,14 @@ like($pdf->to_string, qr/72 144 m 216 288 l S/, q{polyline, two arguments});
 
 # Poly-Line (6 args, 2 line segments)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->poly(72, 144, 216, 288, 100, 200);
 $gfx->stroke();
 like($pdf->to_string, qr/72 144 m 216 288 l 100 200 l S/, q{poly, six arguments});
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->move(0, 0);
@@ -393,7 +409,7 @@ like($pdf->to_string, qr/0 0 m 72 144 l 216 288 l 100 200 l S/, q{polyline, six 
 
 # Rectangle
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->rect(100, 200, 25, 50);
@@ -415,7 +431,7 @@ like($pdf->to_string, qr/100 200 25 50 re S 100 200 25 50 re S/, q{rectangle});
 
 # XY Rectangle
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->rectxy(100, 200, 125, 250);
@@ -426,7 +442,7 @@ like($pdf->to_string, qr/100 200 25 50 re S 100 200 25 -50 re S/, q{rectxy});
 
 # Curve
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->move(72, 144);
@@ -436,7 +452,7 @@ like($pdf->to_string, qr/72 144 m 100 200 125 250 144 288 c S/, q{curve});
 
 # qbSpline
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->move(30, 60);
@@ -446,7 +462,7 @@ like($pdf->to_string, qr/30 60 m 70 100 110 140 150 180 c S/, q{qbspline});
 
 # bSpline
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 my @points = (20,40, 70,50, 115,40, 145,35, 145,45, 115,40, 70,5);
 
@@ -457,7 +473,7 @@ like($pdf->to_string, qr/30 60 m 30 60 m 22.547 60.065 15.476 45.923 20 40 c 30.
 
 # Arc (with move)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->move(72, 144);
@@ -468,7 +484,7 @@ like($pdf->to_string, qr/72 144 m 216 360 m 197.09 360 178.36 358.14 160.89 354.
 
 # Arc (without move)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->move(72, 144);
@@ -479,7 +495,7 @@ like($pdf->to_string, qr/72 144 m 197.09 360 178.36 358.14 160.89 354.52 c 143.4
 
 # Pie
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->pie(216, 288, 100, 80, 30, 100);
@@ -489,7 +505,7 @@ like($pdf->to_string, qr/216 288 m 302.6 328 l 297.5 335.07 291.08 341.47 283.56
 
 # Bogen (with move)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->bogen(72, 72, 216, 72, 72, 1);
@@ -499,7 +515,7 @@ like($pdf->to_string, qr/72 72 m 72 81.455 73.862 90.818 77.481 99.553 c 81.099 
 
 # Bogen (without move)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->move(72, 72);
@@ -510,7 +526,7 @@ like($pdf->to_string, qr/72 72 m 72 81.455 73.862 90.818 77.481 99.553 c 81.099 
 
 # Bogen (without move, outer)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->move(72, 72);
@@ -521,7 +537,7 @@ like($pdf->to_string, qr/72 72 m 64.919 72 57.876 73.045 51.1 75.1 c 44.323 77.1
 
 # Bogen (without move, inner, reverse)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->move(72, 72);
@@ -532,7 +548,7 @@ like($pdf->to_string, qr/72 72 m 81.455 72 90.818 73.862 99.553 77.481 c 108.29 
 
 # Close Path
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->move(72, 144);
@@ -545,7 +561,7 @@ like($pdf->to_string, qr/72 144 m 216 288 l 360 432 l h S/,
 
 # End Path
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->move(72, 144);
@@ -556,7 +572,7 @@ like($pdf->to_string, qr/72 144 m 216 288 l n/,
 
 # Ellipse
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->ellipse(144, 216, 108, 36);
@@ -567,7 +583,7 @@ like($pdf->to_string, qr/252 216 m 252 220.73 249.21 225.41 243.78 229.78 c 238.
 
 # Circle
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->circle(144, 216, 72);
@@ -577,7 +593,7 @@ like($pdf->to_string, qr/216 216 m 216 225.46 214.14 234.82 210.52 243.55 c 206.
 
 # Horizontal Scale
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->hscale(105);
@@ -585,7 +601,7 @@ like($pdf->to_string, qr/105 Tz/, q{hscale(105)});
 
 # Fill Path
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->fill();
@@ -595,7 +611,7 @@ like($pdf->to_string, qr/f h S/, q{fill()});
 
 # Fill Path (even-odd rule)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->fill(1);
@@ -605,7 +621,7 @@ like($pdf->to_string, qr/f\* h S/, q{fill(1)});
 
 # Fill and Stroke
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->fillstroke();
@@ -615,7 +631,7 @@ like($pdf->to_string, qr/B h S/, q{fillstroke()});
 
 # Fill and Stroke (even-odd rule)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->fillstroke(1);
@@ -625,7 +641,7 @@ like($pdf->to_string, qr/B\* h S/, q{fillstroke(1)});
 
 # Clipping Path
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->clip();
@@ -635,7 +651,7 @@ like($pdf->to_string, qr/W h S/, q{clip()});
 
 # Clipping Path (even-odd rule)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->clip(1);
@@ -645,19 +661,19 @@ like($pdf->to_string, qr/W\* h S/, q{clip(1)});
 
 # Character Spacing
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->charspace(2);
 like($pdf->to_string, qr/2 Tc/, q{charspace(2)});
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->char_space(3);
 like($pdf->to_string, qr/3 Tc/, q{char_space(3)});
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->character_spacing(4);
@@ -665,19 +681,19 @@ like($pdf->to_string, qr/4 Tc/, q{character_spacing(4)});
 
 # Word Spacing
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->wordspace(2);
 like($pdf->to_string, qr/2 Tw/, q{wordspace(2)});
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->word_space(3);
 like($pdf->to_string, qr/3 Tw/, q{word_space(3)});
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->word_spacing(4);
@@ -685,7 +701,7 @@ like($pdf->to_string, qr/4 Tw/, q{word_spacing(4)});
 
 # Text Leading
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->leading(14);
@@ -693,7 +709,7 @@ like($pdf->to_string, qr/14 TL/, q{leading(14)});
 
 # Text Rendering Mode
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->render(4);
@@ -701,7 +717,7 @@ like($pdf->to_string, qr/4 Tr/, q{render(4)});
 
 # Text Rise
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->rise(4);
@@ -709,26 +725,30 @@ like($pdf->to_string, qr/4 Ts/, q{rise(4)});
 
 # Distance
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->distance(3, 4);
+$gfx->_Tpending(); # force pending output
 like($pdf->to_string, qr/3 4 Td/, q{distance(3, 4)});
 
 # cr
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->cr();
 $gfx->cr(12.5);
+$gfx->_Tpending(); # force pending output
 $gfx->cr(0);
+$gfx->_Tpending(); # force pending output
 $gfx->cr(-9);
+$gfx->_Tpending(); # force pending output
 like($pdf->to_string, qr/T\* 0 12.5 Td 0 0 Td 0 -9 Td/, q{cr() cr(12.5) cr(0) cr(-9)});
 
 # nl
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->nl();
@@ -736,7 +756,7 @@ like($pdf->to_string, qr/T\*/, q{nl});
 
 # nl(0)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->nl(0);
@@ -744,7 +764,7 @@ like($pdf->to_string, qr/T\*/, q{nl(0)});
 
 # nl(width)
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 
 $gfx->nl(300);

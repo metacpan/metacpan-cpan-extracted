@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
+our $VERSION = '3.028'; # VERSION
 our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use PDF::Builder;
@@ -249,13 +249,13 @@ if ($do_noncore) {
     my @fontpaths;
 
     # ==== type1 (PS)
-    push @fontpaths, "C:/Users/Phil/fonts/T1fonts";  # Windows absolute path with drive letter
+    push @fontpaths, "C:/Users/philp/fonts/T1fonts";  # Windows absolute path with drive letter
     # URW Bookman for MikTex (Windows)
     push @fontpaths, "/Program Files/MikTex 2.9/fonts/type1/urw/bookman";
     # URW Bookman for older versions of MikTex (Windows)
     push @fontpaths, "/Program Files (x86)/MikTex 2.9/fonts/type1/urw/bookman";
     # ==== BDF (bitmapped)
-    push @fontpaths, "/Users/Phil/fonts/BDFfonts";
+    push @fontpaths, "/Users/philp/fonts/BDFfonts";
     # ==== CJK (Chinese)
     push @fontpaths, "/Program Files/Adobe/Acrobat DC/Resource/CIDFont";
 

@@ -158,6 +158,9 @@ tested with each release thereafter
 
  Column_lists.pl demonstrate column() for various lists
 
+ Column_xrefs.pl demonstrate column() for cross references (PDF links)
+ Column_md_xrefs.pl like Column_xrefs, but using Markdown instead of HTML
+
  Content.pl      demonstrate Content.pm graphics and text calls, 5 pages.
 
  ContentText.pl  demonstrate Content-related text call, 10 pages.
@@ -167,6 +170,8 @@ tested with each release thereafter
 
  HarfBuzz.pl     show use with HarfBuzz::Shaper to shape complex scripts as
                  well as ligatures and kerning in Latin fonts.
+
+ NamedDest.pl    show Named Destinations usage.
 
  RMtutorial.pl   Rich Measham's basic tutorial on using PDF::API2, updated
                  for PDF::Builder.

@@ -1,0 +1,21 @@
+TYPEMAP
+Bit_T             Bit_T
+INTEGER_ARRAY_REF  INTEGER_ARRAY_REF
+
+INPUT
+Bit_T
+	if (!SvROK($arg) || !sv_isobject($arg) || !sv_derived_from($arg, "Bit::Set"))
+		croak("expected a Bit::Set object");
+	{
+		IV tmp = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, tmp);
+	}
+
+INTEGER_ARRAY_REF
+	if (!SvOK($arg) || !SvROK($arg))
+		croak(UNDEF_NON_REF_ARRAY_ERROR);
+	if (SvTYPE(SvRV($arg)) != SVt_PVAV)
+		croak("indices should be an array reference");
+	$var = $arg;
+
+

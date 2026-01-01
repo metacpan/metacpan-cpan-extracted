@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::Log::Ansi;
-our $VERSION = '20251230.2042'; # VERSION
+our $VERSION = '20251231.1441'; # VERSION
 
 use parent 'BeamerReveal::Log';
 use Carp;
@@ -55,12 +55,12 @@ sub _ansi_down      { print "\e[" . $_[0] . "B"; }
 sub _ansi_cr        { print "\r"; }
 sub _ansi_clr_eol   { print "\e[K"; }
 
-sub terminal_width {
+sub _terminal_width {
   my $self = shift;
   my ($cols, $rows) = Term::ReadKey::GetTerminalSize();
   return $cols;
 };
-  
+
 1;
 
 __END__
@@ -75,7 +75,7 @@ BeamerReveal::Log::Ansi - Log::Ansi
 
 =head1 VERSION
 
-version 20251230.2042
+version 20251231.1441
 
 =head1 SYNOPSIS
 

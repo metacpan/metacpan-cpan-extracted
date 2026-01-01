@@ -58,6 +58,7 @@
       },
       "test" : {
          "requires" : {
+            "Test2::V0" : "0",
             "Test::Exception" : "0",
             "Test::Neo4j::Types" : "0.06",
             "Try::Tiny" : "0"
@@ -75,7 +76,7 @@
          "web" : "https://github.com/majensen/perlbolt"
       }
    },
-   "version" : "0.5001",
+   "version" : "0.5002",
    "x_contributors" : [
       "Mark A. Jensen <majensen@cpan.org>",
       "Arne Johannessen <ajnn@cpan.org>"

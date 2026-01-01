@@ -25,7 +25,7 @@
 %% The Current Maintainer of this work is Walter Daems.
 %% 
 
-\documentclass[11pt,aspectratio=1610,t]{beamer}
+\documentclass[11pt,aspectratio=169,t]{beamer}
 \setbeamertemplate{navigation symbols}{}
 
 \usepackage[width=1920]{beamer-reveal}
@@ -99,14 +99,11 @@
   \small
   However, now you can pimp your slides like never before. You can incorporate:
   \begin{itemize}
-  \item videos
-  \item animated GIFs
-  \item TikZ animations
+  \item videos and audio fragments
+  \item animated GIFs and LaTeX animations
   \item iframe content
-  \item audio fragments
   \end{itemize}
   without being tied to Acrobat reader.
-
   In addition, there are some extra features
   \begin{itemize}
   \item press '?' for keyboard help, amongst which you will find:
@@ -135,7 +132,7 @@
   {}
   \only<1>{On this first slide there is nothing to see. On the next animation frame, a video will appear.}
   \only<2>{Here it is!}
-  \video<2>[above,draw,autoplay,width=0.75,aspectratio=16/9,
+  \video<2>[above,draw,autoplay,height=0.7,aspectratio=16/9,
             background=yellow,fit=contain]
   at (0.5,0.1) {Media/beamer-reveal-testvideo.mp4}
 \end{frame}
@@ -166,9 +163,9 @@
 
   Click and drag on the iframe below. You can manipulate it! Use your mouse
   scroll-wheel to zoom in or out.
-  \iframe[draw,anchor=north west,width=0.7,aspectratio=16/9,
+  \iframe[draw,anchor=north,height=0.6,aspectratio=16/9,
           fit=cover]
-  at (0.15,0.7) {Media/beamer-reveal-PCB.html}
+  at (0.5,0.7) {Media/beamer-reveal-PCB.html}
 \end{frame}
 
 \subsection{Resonance for the ear}
@@ -180,13 +177,13 @@
   that automatically starts playing.
   \audio[draw,autoplay,controls,width=0.1,aspectratio=16/9,
          background=blue,fit=cover]
-  at (0.9,0.1) {Media/beamer-reveal-AudioSample.ogg}
+  at (0.85,0.1) {Media/beamer-reveal-AudioSample.ogg}
 \end{frame}
 
-\subsection{Make (video) animations with TikZ}
+\subsection{Make (video) animations with LaTeX}
 
-\begin{frame}
-  {Making animations with TikZ}
+\begin{frame}[fragile]
+  {Making animations with LaTeX (using TikZ as example)}
   {It is easier than ever before}
   \small The animation content is exported to a standalone \LaTeX-document that creates a
   loop over it, for a duration of \texttt{duration} seconds at
@@ -195,8 +192,8 @@
   \texttt{framerate} frames. The beamer-reveal.pl script transforms it to mp4 exploiting
   your full potential of your multi-core hardware.
 
-  \animation[framerate=25,duration=7.5,autoplay,loop] at (0.5,0.35) {
-    \begin{tikzpicture}[font=\footnotesize,transform shape,scale=0.85]
+  \animation[framerate=25,duration=7.5,pdfprogress=0.1,autoplay,loop] at (0.5,0.35) {
+    \begin{tikzpicture}[font=\footnotesize,transform shape,scale=0.75]
       \pgfmathsetmacro\angle{\progress*540}%
       \clip (-2,-5.25) rectangle (8,2);
       \node[below left,inner sep=1pt] at (0,0) {\tiny 0};
@@ -263,7 +260,6 @@
 
 \end{document}
 
-%% \subsection{Postamble}
 \endinput
 %%
 %% End of file `beamer-reveal-example.tex'.

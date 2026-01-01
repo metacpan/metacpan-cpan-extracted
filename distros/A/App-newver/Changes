@@ -1,4 +1,11 @@
 Revision history newver (App::newver).
 
+0.02  2025-12-31 15:33:07-06:00
+  - Add missing prerequisite modules to Makefile.PL. Not too big of an issue
+    as they are all core Perl modules.
+    - File::Spec, File::Basename
+  - Fix module POD.
+  - Fix typos in documentation.
+
 0.01  2025-12-23 10:52:05-06:00
   - Initial release.

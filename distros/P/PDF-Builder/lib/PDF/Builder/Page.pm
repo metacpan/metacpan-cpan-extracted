@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '3.027'; # VERSION
-our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
+our $VERSION = '3.028'; # VERSION
+our $LAST_UPDATE = '3.028'; # manually update whenever code is changed
 
 use Carp;
 use POSIX qw(floor);
@@ -153,6 +153,161 @@ sub update {
 
 =head2 Page Size Methods
 
+=head3 Page Sizes
+
+PDF page sizes are stored as rectangular coordinates. For convenience, 
+PDF::Builder also supports a number of aliases and shortcuts that are more 
+human-friendly. The following formats are available:
+
+=over
+
+=item a standard paper size
+
+    $page->boundaries('media' => 'A4');
+
+Aliases for the most common paper sizes are built in (case-insensitive).
+US: Letter, Legal, Ledger, Tabloid (and others)
+Metric: 4A0, 2A0, A0 - A6, 4B0, 2B0, and B0 - B6 (and others)
+
+See L<PDF::Builder::Resource::PaperSizes> for the full list.
+
+=item a "WxH" string in inches
+
+    $page->boundaries('media' => '8.5x11');
+
+Many US paper sizes are commonly identified by their size in inches rather than
+by a particular name. These can be passed as strings with the width and height
+separated by an C<x>.
+Examples: C<4x6>, C<12x18>, C<8.5x11>
+
+=item a number representing a reduction (in points) from the next-larger box
+
+For example, a 12" x 18" physical sheet to be trimmed down to an 11" x 17" sheet
+can be specified as follows:
+
+    # Note: There are 72 points per inch
+    $page->boundaries('media' => '12x18', 'trim' => 0.5 * 72);
+
+    # Equivalent
+    $page->boundaries('media' => [0,        0,        12   * 72, 18   * 72],
+                      'trim'  => [0.5 * 72, 0.5 * 72, 11.5 * 72, 17.5 * 72]);
+
+This example shows a 12" x 18" physical sheet that will be reduced to a final
+size of 11" x 17" by trimming 0.5" from each edge. The smaller page boundary is
+assumed to be centered within the larger one.
+
+The "next-larger box" follows this order, stopping at the first defined value:
+
+    art -> trim -> bleed -> media
+    crop -> media
+
+This option isn't available for the media box, since it is by definition, the
+largest boundary.
+
+=item [$width, $height] in points
+
+    $page->boundaries('media' => [8.5 * 72, 11 * 7.2]);
+
+For other page or boundary sizes, the width and height (in points) can be given 
+directly as an array.
+
+=item [$x1, $y1, $x2, $y2] in points
+
+    $page->boundaries('media' => [0, 0, 8.5 * 72, 11 * 72]);
+
+Finally, the absolute (raw) coordinates of the bottom-left and top-right corners
+of a rectangle can be specified.
+
+=back
+
+=cut
+
+# returns ARRAY of 4 elements
+sub _to_rectangle {
+    my $value = shift();
+
+    # An array of two or four numbers in points
+    if (ref($value) eq 'ARRAY') {
+        if      (@$value == 2) {
+            return (0, 0, @$value);
+        } elsif (@$value == 4) {
+            return (@$value);
+        }
+        croak "Page boundary array must contain two or four numbers";
+    }
+
+    # WxH in inches
+    if ($value =~ /^([0-9.]+)\s*x\s*([0-9.]+)$/) {
+        my ($w, $h) = ($1, $2);
+        if (looks_like_number($w) and looks_like_number($h)) {
+            return (0, 0, $w * 72, $h * 72);
+        }
+    }
+
+    # Common names for page sizes
+    my %page_sizes = PDF::Builder::Resource::PaperSizes::get_paper_sizes();
+
+    if ($page_sizes{lc $value}) {
+        return (0, 0, @{$page_sizes{lc $value}});
+    }
+
+    if (ref($value)) {
+        croak "Unrecognized page size";
+    } else {
+        croak "Unrecognized page size: $value";
+    }
+}
+
+=head3 Page Boundaries
+
+PDF defines five page boundaries.  When creating PDFs for print shops, you'll
+most commonly use just the media box and trim box.  Traditional print shops may
+also use the bleed box when adding printer's marks and other information.
+
+=over
+
+=item media
+
+The media box defines the boundaries of the physical medium on which the page is
+to be printed.  It may include any extended area surrounding the finished page
+for bleed, printing marks, or other such purposes. The default value is as
+defined for PDF, a US letter page (8.5" x 11").
+B<CAUTION:> Most printers can I<not> print all the way to the edge of the
+physical medium (paper, etc.). Some space around the edges will be reserved
+for pinch rollers, etc. to move the paper without smearing around toner or ink.
+
+=item crop
+
+The crop box defines the region to which the contents of the page shall be
+clipped (cropped) when displayed or printed. The default value is the page's
+media box.
+This is a historical page boundary. You'll likely want to set the bleed and/or
+trim boxes instead.
+
+=item bleed
+
+The bleed box defines the region to which the contents of the page shall be
+clipped when output in a production environment. This may include any extra
+bleed area needed to accommodate the physical limitations of cutting, folding,
+and trimming equipment. The actual printed page (media box) may include
+printing marks that fall outside the bleed box. The default value is the page's
+crop box.
+
+=item trim
+
+The trim box defines the intended dimensions of the finished page after
+trimming. It may be smaller than the media box to allow for production-related
+content, such as printing instructions, cut marks, or color bars. The default
+value is the page's crop box.
+
+=item art
+
+The art box defines the extent of the page's meaningful content (including
+potential white space) as intended by the page's creator. The default value is
+the page's crop box.
+
+=back
+
 =head3 userunit
 
     $page->userunit($value)
@@ -281,23 +436,23 @@ sub mediabox {
     return _bbox('MediaBox', @_);
 }
 
-=head4 get_mediabox
-
-    ($llx,$lly, $urx,$ury) = $page->get_mediabox()
-
-=over
-
-Gets the Media Box corner coordinates based on best estimates or the default.
-These are in the order given in a mediabox call (4 coordinates).
-
-This method is B<Deprecated>, and has been B<removed>. Use
-the global (C<$pdf>) or page (C<$page>) mediabox() call with no parameters
-instead.
-
-=back
-
-=cut
-
+#=head4 get_mediabox
+#
+#    ($llx,$lly, $urx,$ury) = $page->get_mediabox()
+#
+#=over
+#
+#Gets the Media Box corner coordinates based on best estimates or the default.
+#These are in the order given in a mediabox call (4 coordinates).
+#
+#This method is B<Deprecated>, and has been B<removed>. Use
+#the global (C<$pdf>) or page (C<$page>) mediabox() call with no parameters
+#instead.
+#
+#=back
+#
+#=cut
+#
 #sub get_mediabox {
 #    my $self = shift();
 #    return $self->mediabox();
@@ -329,22 +484,22 @@ sub cropbox {
     return _bbox('CropBox', @_);
 }
 
-=head4 get_cropbox
-
-    ($llx,$lly, $urx,$ury) = $page->get_cropbox()
-
-=over
-
-Gets the Crop Box based on best estimates or the default.
-
-This method is B<Deprecated>, and has been B<removed>. Use
-the global (C<$pdf>) or page (C<$page>) cropbox() call with no parameters
-instead.
-
-=back
-
-=cut
-
+#=head4 get_cropbox
+#
+#    ($llx,$lly, $urx,$ury) = $page->get_cropbox()
+#
+#=over
+#
+#Gets the Crop Box based on best estimates or the default.
+#
+#This method is B<Deprecated>, and has been B<removed>. Use
+#the global (C<$pdf>) or page (C<$page>) cropbox() call with no parameters
+#instead.
+#
+#=back
+#
+#=cut
+#
 #sub get_cropbox {
 #    my $self = shift();
 #    return $self->cropbox();
@@ -376,22 +531,22 @@ sub bleedbox {
     return _bbox('BleedBox', @_);
 }
 
-=head4 get_bleedbox
-
-    ($llx,$lly, $urx,$ury) = $page->get_bleedbox()
-
-=over
-
-Gets the Bleed Box based on best estimates or the default.
-
-This method is B<Deprecated>, and has been B<removed>. Use
-the global (C<$pdf>) or page (C<$page>) bleedbox() call with no parameters
-instead.
-
-=back
-
-=cut
-
+#=head4 get_bleedbox
+#
+#    ($llx,$lly, $urx,$ury) = $page->get_bleedbox()
+#
+#=over
+#
+#Gets the Bleed Box based on best estimates or the default.
+#
+#This method is B<Deprecated>, and has been B<removed>. Use
+#the global (C<$pdf>) or page (C<$page>) bleedbox() call with no parameters
+#instead.
+#
+#=back
+#
+#=cut
+#
 #sub get_bleedbox {
 #    my $self = shift();
 #    return $self->bleedbox();
@@ -423,22 +578,22 @@ sub trimbox {
     return _bbox('TrimBox', @_);
 }
 
-=head4 get_trimbox
-
-    ($llx,$lly, $urx,$ury) = $page->get_trimbox()
-
-=over
-
-Gets the Trim Box based on best estimates or the default.
-
-This method is B<Deprecated>, and has been B<removed>. Use
-the global (C<$pdf>) or page (C<$page>) trimbox() call with no parameters
-instead.
-
-=back
-
-=cut
-
+#=head4 get_trimbox
+#
+#    ($llx,$lly, $urx,$ury) = $page->get_trimbox()
+#
+#=over
+#
+#Gets the Trim Box based on best estimates or the default.
+#
+#This method is B<Deprecated>, and has been B<removed>. Use
+#the global (C<$pdf>) or page (C<$page>) trimbox() call with no parameters
+#instead.
+#
+#=back
+#
+#=cut
+#
 #sub get_trimbox {
 #    my $self = shift();
 #    return $self->trimbox();
@@ -470,85 +625,26 @@ sub artbox {
     return _bbox('ArtBox', @_);
 }
 
-=head4 get_artbox
-
-    ($llx,$lly, $urx,$ury) = $page->get_artbox()
-
-=over
-
-Gets the Art Box based on best estimates or the default.
-
-This method is B<Deprecated>, and has been B<removed>. Use
-the global (C<$pdf>) or page (C<$page>) artbox() call with no parameters
-instead.
-
-=back
-
-=cut
-
+#=head4 get_artbox
+#
+#    ($llx,$lly, $urx,$ury) = $page->get_artbox()
+#
+#=over
+#
+#Gets the Art Box based on best estimates or the default.
+#
+#This method is B<Deprecated>, and has been B<removed>. Use
+#the global (C<$pdf>) or page (C<$page>) artbox() call with no parameters
+#instead.
+#
+#=back
+#
+#=cut
+#
 #sub get_artbox {
 #    my $self = shift();
 #    return $self->artbox();
 #}
-
-=head3 rotate, rotation
-
-    $page->rotate($deg)
-
-=over
-
-Rotates the page by the given degrees, which must be a multiple of 90.
-An angle that is not a multiple of 90 will be rounded to the nearest 90 
-degrees, with a message.
-
-Note that the rotation angle is I<clockwise> for a positive amount!
-E.g., a rotation of +90 (or -270) will have the bottom edge of the paper at
-the left of the screen.
-After rotating the page 180 degrees, C<[0, 0]> (originally lower left corner)
-will be be in the top right corner of the page, rather than the bottom left.
-X will increase to the right, and Y will increase downward.
-
-(This allows you to auto-rotate to landscape without changing the mediabox!
-There are other ways to accomplish this end, such as using the C<size()>
-method, which will not change the coordinate system (move the origin).)
-
-B<Note> that some users have reported problems with using C<rotate>, that
-the dimensions were limited to the smaller of the original height or width. If
-you experience this, be sure to check whether you are doing some sort of I<crop
-box> or other clipping, that might not rotate as expected with the rest of the
-page. In other words, you might need to manually adjust the crop box dimensions.
-
-Do not confuse this C<rotate()> call with the I<graphics context> rotation 
-(Content.pm) C<rotate()>, which permits any angle, is of opposite direction, 
-and does not shift the origin!
-
-B<Alternate name:> C<rotation>
-
-This has been added for PDF::API2 compatibility.
-
-=back
-
-=cut
-
-sub rotation { return rotate(@_); } ## no critic
-
-sub rotate {
-    my ($self, $degrees) = @_;
-
-    $degrees //= 0;
-    # Ignore rotation of 360 or more (in either direction)
-    $degrees = $degrees % 360; # range [0, 360)
-
-    if ($degrees % 90) {
-      my $deg = int(($degrees + 45)/90)*90;
-      carp "page rotate($degrees) invalid, not multiple of 90 degrees.\nChanged to $deg";
-      $degrees = $deg;
-    }
-
-    $self->{'Rotate'} = PDFNum($degrees);
-
-    return $self;
-}
 
 =head3 size
 
@@ -571,7 +667,7 @@ This is an alternate method provided for compatibility with PDF::API2.
     # Get the page coordinates in points
     my @rectangle = $page->size();
 
-See Page Sizes below for possible values.
+See Page Sizes above for possible values.
 The size method is a convenient shortcut for setting the PDF's media box when
 other prepress (print-related) page boundaries aren't required. It's equivalent 
 to the following:
@@ -601,7 +697,7 @@ sub size {
 
     $page = $page->boundaries(%boundaries)
 
-    \%boundaries = $page->boundaries()
+    %boundaries = $page->boundaries()
 
 =over
 
@@ -610,7 +706,7 @@ boundaries if called without arguments.
 This is an alternate method provided for compatibility with PDF::API2.
 
     # Set
-    $page->boundaries(
+    %boundaries = $page->boundaries(
         # 13x19 inch physical sheet size
         'media' => '13x19',
         # sheet content is 11x17 with 0.25" bleed
@@ -619,172 +715,23 @@ This is an alternate method provided for compatibility with PDF::API2.
         'trim'  => 0.25 * 72,
     );
 
+The C<%boundaries> hash contains one or more page boundary keys (see Page
+Boundaries) to set or replace, each with a corresponding size (see Page Sizes). 
+The resulting boundaries hash will be returned.
+
     # Get
     %boundaries = $page->boundaries();
     ($x1,$y1, $x2,$y2) = $page->boundaries('trim');
 
-The C<%boundaries> hash contains one or more page boundary keys (see Page
-Boundaries) to set or replace, each with a corresponding size (see Page Sizes). 
-
 If called without arguments, the returned hashref will contain (Get) all five 
 boundaries. If called with one string argument, it returns the coordinates for 
-the specified page boundary. If more than one boundary type is given, only the 
-first is processed, and a warning is given that the remainder are ignored.
-
-=back
-
-=head3 Page Boundaries
-
-PDF defines five page boundaries.  When creating PDFs for print shops, you'll
-most commonly use just the media box and trim box.  Traditional print shops may
-also use the bleed box when adding printer's marks and other information.
-
-=over
-
-=item media
-
-The media box defines the boundaries of the physical medium on which the page is
-to be printed.  It may include any extended area surrounding the finished page
-for bleed, printing marks, or other such purposes. The default value is as
-defined for PDF, a US letter page (8.5" x 11").
-B<CAUTION:> Most printers can I<not> print all the way to the edge of the
-physical medium (paper, etc.). Some space around the edges will be reserved
-for pinch rollers, etc. to move the paper without smearing around toner or ink.
-
-=item crop
-
-The crop box defines the region to which the contents of the page shall be
-clipped (cropped) when displayed or printed. The default value is the page's
-media box.
-This is a historical page boundary. You'll likely want to set the bleed and/or
-trim boxes instead.
-
-=item bleed
-
-The bleed box defines the region to which the contents of the page shall be
-clipped when output in a production environment. This may include any extra
-bleed area needed to accommodate the physical limitations of cutting, folding,
-and trimming equipment. The actual printed page (media box) may include
-printing marks that fall outside the bleed box. The default value is the page's
-crop box.
-
-=item trim
-
-The trim box defines the intended dimensions of the finished page after
-trimming. It may be smaller than the media box to allow for production-related
-content, such as printing instructions, cut marks, or color bars. The default
-value is the page's crop box.
-
-=item art
-
-The art box defines the extent of the page's meaningful content (including
-potential white space) as intended by the page's creator. The default value is
-the page's crop box.
-
-=back
-
-=head3 Page Sizes
-
-PDF page sizes are stored as rectangular coordinates. For convenience, 
-PDF::Builder also supports a number of aliases and shortcuts that are more 
-human-friendly. The following formats are available:
-
-=over
-
-=item a standard paper size
-
-    $page->boundaries('media' => 'A4');
-
-Aliases for the most common paper sizes are built in (case-insensitive).
-US: Letter, Legal, Ledger, Tabloid (and others)
-Metric: 4A0, 2A0, A0 - A6, 4B0, 2B0, and B0 - B6 (and others)
-
-=item a "WxH" string in inches
-
-    $page->boundaries('media' => '8.5x11');
-
-Many US paper sizes are commonly identified by their size in inches rather than
-by a particular name. These can be passed as strings with the width and height
-separated by an C<x>.
-Examples: C<4x6>, C<12x18>, C<8.5x11>
-
-=item a number representing a reduction (in points) from the next-larger box
-
-For example, a 12" x 18" physical sheet to be trimmed down to an 11" x 17" sheet
-can be specified as follows:
-
-    # Note: There are 72 points per inch
-    $page->boundaries('media' => '12x18', 'trim' => 0.5 * 72);
-
-    # Equivalent
-    $page->boundaries('media' => [0,        0,        12   * 72, 18   * 72],
-                      'trim'  => [0.5 * 72, 0.5 * 72, 11.5 * 72, 17.5 * 72]);
-
-This example shows a 12" x 18" physical sheet that will be reduced to a final
-size of 11" x 17" by trimming 0.5" from each edge. The smaller page boundary is
-assumed to be centered within the larger one.
-
-The "next-larger box" follows this order, stopping at the first defined value:
-
-    art -> trim -> bleed -> media
-    crop -> media
-
-This option isn't available for the media box, since it is by definition, the
-largest boundary.
-
-=item [$width, $height] in points
-
-    $page->boundaries('media' => [8.5 * 72, 11 * 7.2]);
-
-For other page or boundary sizes, the width and height (in points) can be given 
-directly as an array.
-
-=item [$x1, $y1, $x2, $y2] in points
-
-    $page->boundaries('media' => [0, 0, 8.5 * 72, 11 * 72]);
-
-Finally, the absolute (raw) coordinates of the bottom-left and top-right corners
-of a rectangle can be specified.
+the specified page (media, crop, bleed, trim, or art) boundary. If more than 
+one boundary type is given, only the first is processed, and a warning is 
+given that the remainder are ignored.
 
 =back
 
 =cut
-
-# returns ARRAY of 4 elements
-sub _to_rectangle {
-    my $value = shift();
-
-    # An array of two or four numbers in points
-    if (ref($value) eq 'ARRAY') {
-        if      (@$value == 2) {
-            return (0, 0, @$value);
-        } elsif (@$value == 4) {
-            return (@$value);
-        }
-        croak "Page boundary array must contain two or four numbers";
-    }
-
-    # WxH in inches
-    if ($value =~ /^([0-9.]+)\s*x\s*([0-9.]+)$/) {
-        my ($w, $h) = ($1, $2);
-        if (looks_like_number($w) and looks_like_number($h)) {
-            return (0, 0, $w * 72, $h * 72);
-        }
-    }
-
-    # Common names for page sizes
-    my %page_sizes = PDF::Builder::Resource::PaperSizes::get_paper_sizes();
-
-    if ($page_sizes{lc $value}) {
-        return (0, 0, @{$page_sizes{lc $value}});
-    }
-
-    if (ref($value)) {
-        croak "Unrecognized page size";
-    } else {
-        croak "Unrecognized page size: $value";
-    }
-}
 
 sub boundaries {
     my $self = shift();
@@ -918,6 +865,8 @@ sub precontent {
     unshift(@{$self->{'Contents'}->val()}, @objs);
     return;
 }
+
+=head2 Page Operation Methods
 
 =head3 gfx, graphics
 
@@ -1142,6 +1091,65 @@ sub text {
     $self->content($text, $prepend);
 
     return $text;
+}
+
+=head3 rotate, rotation
+
+    $page->rotate($deg)
+
+=over
+
+Rotates the page by the given degrees, which must be a multiple of 90.
+An angle that is not a multiple of 90 will be rounded to the nearest 90 
+degrees, with a message.
+
+Note that the rotation angle is I<clockwise> for a positive amount!
+E.g., a rotation of +90 (or -270) will have the bottom edge of the paper at
+the left of the screen.
+After rotating the page 180 degrees, C<[0, 0]> (originally lower left corner)
+will be be in the top right corner of the page, rather than the bottom left.
+X will increase to the right, and Y will increase downward.
+
+(This allows you to auto-rotate to landscape without changing the mediabox!
+There are other ways to accomplish this end, such as using the C<size()>
+method, which will not change the coordinate system (move the origin).)
+
+B<Note> that some users have reported problems with using C<rotate>, that
+the dimensions were limited to the smaller of the original height or width. If
+you experience this, be sure to check whether you are doing some sort of I<crop
+box> or other clipping, that might not rotate as expected with the rest of the
+page. In other words, you might need to manually adjust the crop box dimensions.
+
+Do not confuse this C<rotate()> call with the I<graphics context> rotation 
+(Content.pm) C<rotate()>, which permits any angle, is of opposite direction, 
+and does not shift the origin!
+
+B<Alternate name:> C<rotation>
+
+This has been added for PDF::API2 compatibility.
+
+=back
+
+=cut
+
+sub rotation { return rotate(@_); } ## no critic
+
+sub rotate {
+    my ($self, $degrees) = @_;
+
+    $degrees //= 0;
+    # Ignore rotation of 360 or more (in either direction)
+    $degrees = $degrees % 360; # range [0, 360)
+
+    if ($degrees % 90) {
+      my $deg = int(($degrees + 45)/90)*90;
+      carp "page rotate($degrees) invalid, not multiple of 90 degrees.\nChanged to $deg";
+      $degrees = $deg;
+    }
+
+    $self->{'Rotate'} = PDFNum($degrees);
+
+    return $self;
 }
 
 =head3 object
