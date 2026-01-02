@@ -2,7 +2,7 @@
 
 *Note: All code examples use modern Perl with subroutine signatures and ****\`\`**** for clarity. This is a documentation preference and ****not**** a requirement of the PAGI specification.*
 
-**Version**: 0.1 (Draft)
+**Version**: 0.2 (Draft)
 
 ## Introduction
 
@@ -10,7 +10,7 @@ While work has been done to support asynchronous response handling in PSGI (the 
 
 Considering the above and the fact that similar specifications have existed for several years now for other languages, the time has arrived to create a fully asynchronous webserver gateway interface specification for Perl.
 
-Perl does not natively support Python's `async/await` pattern, but we can achieve similar functionality using **Futures** (from `Future.pm`) and **IO::Async** (from `IO::Async::Loop`). Below is how we translate key ASGI components into Perl.
+Perl does not natively support Python's `async/await` pattern, but we can achieve similar functionality using **Future::AsyncAwait** which provides `async/await` syntax on top of `Future.pm`. Below is how we translate key ASGI components into Perl.
 
 ## Abstract
 
@@ -39,7 +39,7 @@ PAGI consists of two main components:
 
 - An *application* which is invoked once per connection and communicates via asynchronous message passing.
 
-Applications are written as asynchronous subroutines using `Future` and `IO::Async`. They receive a `scope` describing the connection, and two coderefs, `$recv` and `$send`, which return Futures representing event input and output.
+Applications are written as asynchronous subroutines using `Future::AsyncAwait`. They receive a `scope` describing the connection, and two coderefs, `$recv` and `$send`, which return Futures representing event input and output.
 
 Unlike PSGI, PAGI applications persist for the entire connection lifecycle. They process incoming events from the server and emit outgoing events in response.
 
@@ -56,8 +56,8 @@ Each incoming connection causes the application to be invoked with a `scope` has
 
 - `type`: Protocol type, e.g., `http`, `websocket`
 - `pagi`: A hashref with at least:
-  - `version => '0.1'`
-  - `spec_version => '0.1'` (optional; protocol-specific override if it diverges)
+  - `version => '0.2'`
+  - `spec_version => '0.2'` (optional; protocol-specific override if it diverges)
   - `features` (optional): a hashref of server-reported capabilities such as:
     - `supports_streaming` => 1 if streaming responses are supported for this scope
     - `max_request_body_size` => maximum accepted request body size (in bytes)
@@ -191,12 +191,10 @@ async sub app ($scope, $recv, $send) {
     await $send->({ type => 'http.response.body', body => 'Hello' });
 }
 
-# WRONG: sends happen after app Future resolves
+# WRONG: send not awaited, app Future resolves before send completes
 async sub app ($scope, $recv, $send) {
-    $loop->delay_future(after => 1)->then(sub {
-        $send->({ type => 'http.response.body', body => 'Hello' });
-    })->retain;
-    return;  # App Future resolves immediately, but send hasn't happened!
+    $send->({ type => 'http.response.body', body => 'Hello' })->retain;
+    return;  # App Future resolves immediately, send may not complete!
 }
 ```
 

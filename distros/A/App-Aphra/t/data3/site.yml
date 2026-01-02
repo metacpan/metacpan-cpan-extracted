@@ -1,0 +1,5 @@
+title: Test title
+uri: https://example.com/
+redirects:
+  - from: /test/
+    to: /newpage/

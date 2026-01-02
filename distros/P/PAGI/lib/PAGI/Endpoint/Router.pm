@@ -281,6 +281,32 @@ sub mount {
     return $self;
 }
 
+# Pass through name() to internal router
+sub name {
+    my ($self, $name) = @_;
+    $self->{router}->name($name);
+    return $self;
+}
+
+# Pass through as() to internal router
+sub as {
+    my ($self, $namespace) = @_;
+    $self->{router}->as($namespace);
+    return $self;
+}
+
+# Pass through uri_for() to internal router
+sub uri_for {
+    my ($self, @args) = @_;
+    return $self->{router}->uri_for(@args);
+}
+
+# Pass through named_routes() to internal router
+sub named_routes {
+    my ($self) = @_;
+    return $self->{router}->named_routes;
+}
+
 1;
 
 __END__
@@ -339,7 +365,7 @@ PAGI::Endpoint::Router - Class-based router with wrapped handlers
     async sub chat_handler {
         my ($self, $ws) = @_;
         await $ws->accept;
-        $ws->start_heartbeat(25);
+        await $ws->keepalive(25);
         await $ws->each_json(async sub {
             my ($data) = @_;
             await $ws->send_json({ echo => $data });

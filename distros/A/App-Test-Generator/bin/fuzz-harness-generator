@@ -11,7 +11,7 @@ use Pod::Usage;
 
 =head1 NAME
 
-fuzz-harness-generator - Generate fuzzing + corpus-based test harnesses
+fuzz-harness-generator - Generate fuzzing + corpus-based test harnesses from test schemas
 
 =head1 SYNOPSIS
 

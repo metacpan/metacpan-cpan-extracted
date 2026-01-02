@@ -94,6 +94,10 @@ SV * q2s(pTHX_ SV * nv) {
 #endif
 }
 
+SV * fx2s(pTHX_ SV * nv) {
+  return newSVpv(f2s((float)SvNV(nv)), 0);
+}
+
 int ryu_SvIOK(SV * sv) {
     if(SvIOK(sv)) return 1;
     return 0;
@@ -297,11 +301,19 @@ SV * fmtpy(pTHX_ SV * in) {
     if(s[0] == 'I') {
       if(is_neg) {
         s--;
-        if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return newSVpv(SvPV_nolen(get_sv("Math::Ryu::ninfstr", 0)), 0);
+/*      if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return newSVpv(SvPV_nolen(get_sv("Math::Ryu::ninfstr", 0)), 0); */
+        if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) {
+          outsv = SvREFCNT_inc(get_sv("Math::Ryu::ninfstr", 0));
+          return outsv;
+        }
         return newSVpv("-inf", 0);
       }
       else {
-        if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return newSVpv(SvPV_nolen(get_sv("Math::Ryu::pinfstr", 0)), 0);
+/*      if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return newSVpv(SvPV_nolen(get_sv("Math::Ryu::pinfstr", 0)), 0); */
+        if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) {
+          outsv = SvREFCNT_inc(get_sv("Math::Ryu::pinfstr", 0));
+          return outsv;
+        }
         return newSVpv("inf", 0);
       }
     }
@@ -310,7 +322,11 @@ SV * fmtpy(pTHX_ SV * in) {
         s--;
         croak("rubbish input of '%s'", s);
       }
-      if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return newSVpv(SvPV_nolen(get_sv("Math::Ryu::nanvstr", 0)), 0);
+/*    if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return newSVpv(SvPV_nolen(get_sv("Math::Ryu::nanvstr", 0)), 0); */
+      if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) {
+        outsv = SvREFCNT_inc(get_sv("Math::Ryu::nanvstr", 0));
+        return outsv;
+      }
       return newSVpv("nan", 0);
     }
     /* mantissa is single-digit */
@@ -424,6 +440,13 @@ q2s (nv)
 	SV *	nv
 CODE:
   RETVAL = q2s (aTHX_ nv);
+OUTPUT:  RETVAL
+
+SV *
+fx2s (nv)
+	SV *	nv
+CODE:
+  RETVAL = fx2s (aTHX_ nv);
 OUTPUT:  RETVAL
 
 int

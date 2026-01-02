@@ -6,7 +6,6 @@ use Getopt::Long qw(GetOptionsFromArray :config pass_through no_auto_abbrev no_i
 use Pod::Usage;
 use File::Spec;
 use POSIX qw(setsid);
-use IO::Async::Loop;
 
 use PAGI;
 
@@ -70,6 +69,10 @@ Mode is determined by (in order of precedence):
     1. -E / --env command line flag
     2. PAGI_ENV environment variable
     3. Auto-detection: TTY = development, no TTY = production
+
+After determining the mode, the runner sets C<PAGI_ENV> to the resolved
+value. This allows your application to check C<$ENV{PAGI_ENV}> to know
+what mode it's running in, similar to Plack's C<PLACK_ENV>.
 
 Use C<--no-default-middleware> to disable auto-middleware while keeping
 the mode for other purposes.
@@ -502,6 +505,7 @@ sub load_server {
         host       => $self->{host} // '127.0.0.1',
         port       => $self->{port} // 5000,
         quiet      => $self->{quiet} // 0,
+        ($self->{loop} ? (loop_type => $self->{loop}) : ()),
         (defined $access_log || $disable_log
             ? (access_log => $access_log) : ()),
         %server_opts,
@@ -548,30 +552,10 @@ sub _parse_server_options {
         );
 
         # Build ssl hash if certs provided
+        # Note: TLS module availability is checked by the server, not here
         if ($opts{_ssl_cert} || $opts{_ssl_key}) {
             die "--ssl-cert and --ssl-key must be specified together\n"
                 unless $opts{_ssl_cert} && $opts{_ssl_key};
-
-            # Check TLS modules are installed
-            my $tls_available = eval {
-                require IO::Async::SSL;
-                require IO::Socket::SSL;
-                1;
-            };
-            unless ($tls_available) {
-                die <<"END_TLS_ERROR";
---ssl-cert/--ssl-key require TLS modules which are not installed.
-
-To enable HTTPS/TLS support, install:
-
-    cpanm IO::Async::SSL IO::Socket::SSL
-
-Or on Debian/Ubuntu:
-
-    apt-get install libio-socket-ssl-perl
-
-END_TLS_ERROR
-            }
 
             die "SSL cert not found: $opts{_ssl_cert}\n"
                 unless -f $opts{_ssl_cert};
@@ -602,9 +586,12 @@ END_TLS_ERROR
     $runner->run(@ARGV);
 
 Main entry point. Parses options, loads the app, creates the server,
-and runs the event loop.
+and delegates to C<< $server->run() >> which manages the event loop.
 
 =cut
+
+# Package variable for END block cleanup
+our $_current_runner;
 
 sub run {
     my $self = shift;
@@ -616,6 +603,10 @@ sub run {
 
     # Parse options
     $self->parse_options(@_);
+
+    # Export resolved mode to environment so apps can check it
+    # (similar to Plack's PLACK_ENV)
+    $ENV{PAGI_ENV} = $self->mode;
 
     # Handle --version
     if ($self->{show_version}) {
@@ -635,31 +626,8 @@ sub run {
     # Create server
     my $server = $self->load_server;
 
-    # Create event loop
-    my $loop = $self->_create_loop;
-    $loop->add($server);
-
-    # Start listening with proper error handling
-    my $port = $self->{port} // 5000;
-    eval {
-        $server->listen->get;
-    };
-    if ($@) {
-        my $error = $@;
-        if ($error =~ /Cannot bind\(\).*Address already in use/i) {
-            die "Error: Port $port is already in use\n";
-        }
-        elsif ($error =~ /Cannot bind\(\).*Permission denied/i) {
-            die "Error: Permission denied to bind to port $port\n";
-        }
-        elsif ($error =~ /Cannot bind\(\)/) {
-            $error =~ s/\s+at\s+\S+\s+line\s+\d+.*//s;
-            die "Error: $error\n";
-        }
-        die "Error starting server: $error\n";
-    }
-
-    # Daemonize after binding (so errors go to terminal)
+    # Daemonize before running (bind errors will be lost in daemon mode,
+    # but this is acceptable for production where systemd/docker is preferred)
     if ($self->{daemonize}) {
         $self->_daemonize;
     }
@@ -667,35 +635,27 @@ sub run {
     # Write PID file (after daemonizing so we record the daemon's PID)
     if ($self->{pid_file}) {
         $self->_write_pid_file($self->{pid_file});
+        # Store for END block cleanup
+        $_current_runner = $self;
     }
 
-    # Drop privileges (after binding to privileged port, after writing PID)
+    # Drop privileges
     if ($self->{user} || $self->{group}) {
         $self->_drop_privileges;
     }
 
-    # Set up PID file cleanup on exit
-    if ($self->{_pid_file_path}) {
-        $loop->watch_signal(TERM => sub {
-            $self->_remove_pid_file;
-        });
-        $loop->watch_signal(INT => sub {
-            $self->_remove_pid_file;
-        });
-    }
+    # Run server (server owns the event loop)
+    $server->run;
 
-    # HUP handling for single-worker: log and ignore
-    my $workers = $self->{server_options} ?
-        (grep { /^--?w(?:orkers)?$/ } @{$self->{server_options}}) : 0;
-    if (!$workers) {
-        $loop->watch_signal(HUP => sub {
-            warn "Received HUP signal (graceful restart only works in multi-worker mode)\n"
-                unless $self->{quiet};
-        });
-    }
+    # Cleanup PID file on normal exit
+    $self->_remove_pid_file if $self->{_pid_file_path};
+}
 
-    # Run the event loop
-    $loop->run;
+# END block for PID file cleanup on abnormal exit
+END {
+    if ($_current_runner && $_current_runner->{_pid_file_path}) {
+        $_current_runner->_remove_pid_file;
+    }
 }
 
 # Internal methods
@@ -783,19 +743,6 @@ sub _parse_app_args {
         }
     }
     return %result;
-}
-
-sub _create_loop {
-    my ($self) = @_;
-
-    if ($self->{loop}) {
-        my $loop_class = "IO::Async::Loop::$self->{loop}";
-        eval "require $loop_class"
-            or die "Error: Cannot load loop backend '$self->{loop}': $@\n" .
-                   "Install it with: cpanm $loop_class\n";
-        return $loop_class->new;
-    }
-    return IO::Async::Loop->new;
 }
 
 sub _show_help {

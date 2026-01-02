@@ -28,8 +28,8 @@ $z > $q ? print "ok 2\n"
 $z >= $q ? print "ok 3\n"
          : print "not ok 3\n";
 
-($z <=> $q) > 0 ? print "ok 4\n"
-                : print "ok 4\n";
+($z <=> $q) == 1 ? print "ok 4\n"
+                : print "not ok 4\n";
 
 $z *= -1;
 
@@ -41,8 +41,8 @@ $z < $q ? print "ok 6\n"
 $z <= $q ? print "ok 7\n"
          : print "not ok 7\n";
 
-($z <=> $q) < 0 ? print "ok 8\n"
-                : print "ok 8\n";
+($z <=> $q) == -1 ? print "ok 8\n"
+                  : print "not ok 8\n";
 
 $z != $q ? print "ok 9\n"
          : print "not ok 9\n";
@@ -61,5 +61,5 @@ $z >= $q ? print "ok 13\n"
          : print "not ok 13\n";
 
 ($z <=> $q) == 0 ? print "ok 14\n"
-                 : print "ok 14\n";
+                 : print "not ok 14\n";
 

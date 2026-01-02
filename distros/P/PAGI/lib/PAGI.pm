@@ -3,7 +3,7 @@ package PAGI;
 use strict;
 use warnings;
 
-our $VERSION = '0.001011';
+our $VERSION = '0.001012';
 
 1;
 
@@ -290,7 +290,7 @@ Raw PAGI example with explicit UTF-8 handling:
 
 =item * Perl 5.18+
 
-=item * IO::Async (event loop)
+=item * IO::Async (event loop, for PAGI::Server)
 
 =item * Future::AsyncAwait (async/await support)
 

@@ -23,30 +23,55 @@ my $send = sub {
 
 my $receive = sub { Future->done({ type => 'websocket.connect' }) };
 
-subtest 'start_heartbeat method exists' => sub {
+subtest 'keepalive method exists' => sub {
     my $ws = PAGI::WebSocket->new(make_scope(), $receive, $send);
-    ok($ws->can('start_heartbeat'), 'start_heartbeat method exists');
+    ok($ws->can('keepalive'), 'keepalive method exists');
 };
 
-subtest 'start_heartbeat returns self for chaining' => sub {
+subtest 'keepalive sends websocket.keepalive event' => sub {
+    @sent_messages = ();
     my $ws = PAGI::WebSocket->new(make_scope(), $receive, $send);
     $ws->_set_state('connected');
-    my $result = $ws->start_heartbeat(25);
+
+    $ws->keepalive(30)->get;
+
+    is(scalar @sent_messages, 1, 'one message sent');
+    is($sent_messages[0]{type}, 'websocket.keepalive', 'correct event type');
+    is($sent_messages[0]{interval}, 30, 'correct interval');
+    ok(!exists $sent_messages[0]{timeout}, 'no timeout when not specified');
+};
+
+subtest 'keepalive with timeout sends both interval and timeout' => sub {
+    @sent_messages = ();
+    my $ws = PAGI::WebSocket->new(make_scope(), $receive, $send);
+    $ws->_set_state('connected');
+
+    $ws->keepalive(30, 20)->get;
+
+    is(scalar @sent_messages, 1, 'one message sent');
+    is($sent_messages[0]{type}, 'websocket.keepalive', 'correct event type');
+    is($sent_messages[0]{interval}, 30, 'correct interval');
+    is($sent_messages[0]{timeout}, 20, 'correct timeout');
+};
+
+subtest 'keepalive returns self for chaining' => sub {
+    my $ws = PAGI::WebSocket->new(make_scope(), $receive, $send);
+    $ws->_set_state('connected');
+    my $result = $ws->keepalive(25)->get;
     is(ref($result), ref($ws), 'returns same type');
     ok($result == $ws, 'returns $self for chaining');
 };
 
-subtest 'start_heartbeat with 0 interval does nothing' => sub {
+subtest 'keepalive with 0 interval disables keepalive' => sub {
+    @sent_messages = ();
     my $ws = PAGI::WebSocket->new(make_scope(), $receive, $send);
     $ws->_set_state('connected');
-    my $result = $ws->start_heartbeat(0);
-    ok($result == $ws, 'returns $self');
-    ok(!exists $ws->{_heartbeat_timer}, 'no timer created for 0 interval');
-};
 
-subtest 'stop_heartbeat method exists' => sub {
-    my $ws = PAGI::WebSocket->new(make_scope(), $receive, $send);
-    ok($ws->can('stop_heartbeat'), 'stop_heartbeat method exists');
+    $ws->keepalive(0)->get;
+
+    is(scalar @sent_messages, 1, 'message sent');
+    is($sent_messages[0]{type}, 'websocket.keepalive', 'correct event type');
+    is($sent_messages[0]{interval}, 0, 'interval is 0 to disable');
 };
 
 subtest 'param method for route parameters' => sub {

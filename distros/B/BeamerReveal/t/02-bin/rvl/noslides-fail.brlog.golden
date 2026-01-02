@@ -1,0 +1,12 @@
+----------------------------------------------------------------------------
+--  beamer-reveal.pl                                       v20260101.1423 --
+--  (C) 2025-2026 Walter PM Daems <wdaems@cpan.org>                 GPLv3 --
+----------------------------------------------------------------------------
+
+- Reading driver file t/02-bin/rvl/noslides-fail.rvl
+- Installing quarto/reveal.js boilerplate
+- Processing the presentation
+- Generating the images
+Error: subprocess /usr/bin/pdftoppm returned 256
+Syntax Error: Document stream is empty
+

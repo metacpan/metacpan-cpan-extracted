@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::MediaManager;
-our $VERSION = '20251231.1441'; # VERSION
+our $VERSION = '20260101.1937'; # VERSION
 
 use strict;
 use warnings;
@@ -116,7 +116,7 @@ sub new {
 
   $self->{copyBackOrders}  = [];
   $self->{constructionBackOrders}  = [];
-  
+
   return $self;
 }
 
@@ -383,6 +383,7 @@ sub processCopyBackOrders {
   my $logger = $BeamerReveal::Log::logger;
   
   my $totalNofBackOrders = @{$self->{copyBackOrders}};
+
   for( my $i = 0; $i < $totalNofBackOrders; ++$i ) {
     my $bo = $self->{copyBackOrders}->[$i];
 
@@ -393,7 +394,7 @@ sub processCopyBackOrders {
     $logger->progress( $progressId, $i, "file $i/$totalNofBackOrders", $totalNofBackOrders );
     File::Copy::cp( $bo->{from}, $bo->{to} );
   }
-  $logger->progress( $progressId, $totalNofBackOrders, "file $totalNofBackOrders/$totalNofBackOrders", $totalNofBackOrders );
+  $logger->progress( $progressId, 1, "file $totalNofBackOrders/$totalNofBackOrders", 1 );
 }
 
 
@@ -518,7 +519,7 @@ BeamerReveal::MediaManager - MediaManager
 
 =head1 VERSION
 
-version 20251231.1441
+version 20260101.1937
 
 =head1 SYNOPSIS
 

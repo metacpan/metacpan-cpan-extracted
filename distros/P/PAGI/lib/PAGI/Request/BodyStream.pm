@@ -4,8 +4,6 @@ use strict;
 use warnings;
 
 use Future::AsyncAwait;
-use IO::Async::Loop;
-use PAGI::Util::AsyncFile;
 use Encode qw(decode FB_CROAK FB_DEFAULT LEAVE_SRC);
 use Carp qw(croak);
 
@@ -66,7 +64,7 @@ of data. The stream handles:
 
 =item * Client disconnect detection
 
-=item * Efficient file streaming using async I/O
+=item * Convenient file streaming with C<stream_to_file()>
 
 =back
 
@@ -230,15 +228,28 @@ sub error {
 
     await $stream->stream_to_file($path);
 
-Streams the entire request body to a file using async I/O. Returns a Future
-that resolves to the number of bytes written.
+Streams the entire request body to a file. Returns a Future that resolves
+to the number of bytes written.
 
 This is efficient for large uploads as it doesn't load the entire body into
-memory.
+memory - chunks are written incrementally as they arrive from the network.
+
+B<Note:> File writes are B<blocking> (synchronous I/O). Since chunks are
+typically small (e.g., 64KB), each write completes quickly. The method
+remains async overall because it awaits network chunks between writes.
 
 B<Note:> Cannot be used with the C<decode> option as that would corrupt binary
 data. Use C<stream_to()> with a custom handler if you need decoded chunks
 written to a file.
+
+For fully non-blocking file I/O, use C<stream_to()> with your preferred
+async file library:
+
+    # Non-blocking alternative (bring your own async file library)
+    await $stream->stream_to(async sub {
+        my ($chunk) = @_;
+        await $my_async_file_writer->write($chunk);
+    });
 
 =cut
 
@@ -248,26 +259,31 @@ async sub stream_to_file {
     croak("stream_to_file() cannot be used with decode option - use stream_to() instead")
         if $self->{decode};
 
-    my $loop = IO::Async::Loop->new;
     my $bytes_written = 0;
-
-    # We need to write chunks as we receive them
-    # First chunk: write (truncate), subsequent: append
-    my $first_chunk = 1;
+    my $fh;
 
     while (!$self->is_done) {
         my $chunk = await $self->next_chunk;
         last unless defined $chunk;
         next unless length $chunk;
 
-        if ($first_chunk) {
-            await PAGI::Util::AsyncFile->write_file($loop, $path, $chunk);
-            $first_chunk = 0;
-        } else {
-            await PAGI::Util::AsyncFile->append_file($loop, $path, $chunk);
+        # Open file on first chunk (truncate mode)
+        unless ($fh) {
+            open $fh, '>:raw', $path
+                or croak("Cannot open $path for writing: $!");
         }
 
+        # Blocking write - typically fast for small chunks
+        print $fh $chunk
+            or croak("Cannot write to $path: $!");
+
         $bytes_written += length($chunk);
+    }
+
+    # Close file if we opened it
+    if ($fh) {
+        close $fh
+            or croak("Cannot close $path: $!");
     }
 
     return $bytes_written;
@@ -471,7 +487,7 @@ Always wrap stream operations in eval/try-catch:
 
 =head1 SEE ALSO
 
-L<PAGI::Request>, L<PAGI::Util::AsyncFile>, L<Future::AsyncAwait>
+L<PAGI::Request>, L<Future::AsyncAwait>
 
 =head1 AUTHOR
 

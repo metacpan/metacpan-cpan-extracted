@@ -108,11 +108,13 @@ To use PAGI, you'll need:
 
 =item * L<Future::AsyncAwait> - Provides async/await syntax
 
-=item * L<IO::Async> - Event loop and async I/O primitives
-
 =item * Basic understanding of Futures and async programming (we'll cover the essentials)
 
 =back
+
+B<Note:> PAGI applications only require C<Future::AsyncAwait>. The event loop
+(L<IO::Async>) is an implementation detail of L<PAGI::Server>. Using C<Future::IO>
+for timers and I/O keeps your application code portable across different servers.
 
 =head2 1.2 Installation
 
@@ -133,6 +135,18 @@ To include development dependencies (for testing):
 Verify the installation:
 
   pagi-server --version
+
+=head3 About pagi-server
+
+Throughout this tutorial, we'll use C<pagi-server> to run our examples. L<PAGI::Server>
+is the reference implementation of a PAGI server - it's a fully-featured async HTTP
+server built on L<IO::Async> that supports HTTP/1.1, WebSockets, Server-Sent Events,
+TLS, and multi-worker mode.
+
+At the time of writing, C<pagi-server> is the only PAGI-compatible server available.
+However, the PAGI specification is designed to be server-agnostic, so future servers
+(perhaps built on different event loops like L<Mojo::IOLoop> or L<AnyEvent>) could
+run the same application code without modification.
 
 =head2 1.3 Your First PAGI App
 
@@ -220,7 +234,8 @@ specification violations early and provides helpful error messages.
 
 No middleware is auto-enabled, and access logging is disabled for maximum
 performance. This is the default when running under systemd, docker, cron,
-or any non-TTY environment. Use C<--access-log FILE> to enable logging.
+or any non-TTY environment. Use C<--access-log FILE> or C<--access-log FILE>
+to enable logging.
 
 =item B<none>
 
@@ -233,6 +248,10 @@ Mode is determined by (in order of precedence):
   1. -E / --env command line flag
   2. PAGI_ENV environment variable
   3. Auto-detection: TTY = development, no TTY = production
+
+After determining the mode, pagi-server sets C<PAGI_ENV> to the resolved
+value. Your app can check C<$ENV{PAGI_ENV}> to know what mode it's running
+in, similar to Plack's C<PLACK_ENV>.
 
 Examples:
 
@@ -311,7 +330,7 @@ Understanding the event loop is crucial to writing efficient PAGI applications. 
 
 =head3 The Event Loop
 
-PAGI uses L<IO::Async::Loop> to manage asynchronous operations. Here's a simplified view of how the event loop handles multiple connections:
+PAGI servers use an event loop to manage asynchronous operations. Here's a simplified view of how the event loop handles multiple connections:
 
   Single-Threaded Event Loop
 
@@ -332,31 +351,19 @@ When you use C<await>, you're telling the event loop "I'm waiting for something,
 These operations yield control to the event loop:
 
   use Future::AsyncAwait;
-  use IO::Async::Loop;
-  use IO::Async::Timer::Countdown;
-  use Net::Async::HTTP;
+  use Future::IO;
 
   async sub good_app {
       my ($scope, $receive, $send) = @_;
 
-      # IO::Async::Loop->new returns the singleton loop instance
-      my $loop = IO::Async::Loop->new;
-
-      # Good: Async timer (doesn't block)
-      my $timer = IO::Async::Timer::Countdown->new(
-          delay => 5,
-          on_expire => sub { },
-      );
-      $loop->add($timer);
-      $timer->start;
-      await $timer->future;
+      # Good: Async sleep (doesn't block) - loop-agnostic!
+      await Future::IO->sleep(5);
 
       # Good: Async HTTP client (doesn't block)
-      my $http = Net::Async::HTTP->new;
-      $loop->add($http);
-      my $response = await $http->GET('https://api.example.com/data');
+      # Use Net::Async::HTTP, HTTP::Tiny::Async, or similar
+      # my $response = await $http->GET('https://api.example.com/data');
 
-      # Good: Async database query (using a hypothetical async DB driver)
+      # Good: Async database query (using an async DB driver)
       # my $row = await $db->selectrow_async('SELECT * FROM users WHERE id = ?', $user_id);
 
       await $send->({
@@ -434,7 +441,7 @@ In a single-threaded event loop, one blocking operation prevents ALL other conne
 
 =head3 Solutions for Blocking Operations
 
-When you must use blocking operations, you have three options:
+When you must use blocking operations, you have options:
 
 =over 4
 
@@ -444,38 +451,21 @@ Prefer async alternatives when available:
 
 =over 4
 
+=item * C<Future::IO-E<gt>sleep($secs)> instead of C<sleep()> - loop-agnostic!
+
 =item * L<Net::Async::HTTP> instead of L<LWP::UserAgent>
 
 =item * L<Net::Async::Redis> instead of synchronous Redis clients
 
 =item * L<Database::Async> for async database access (PostgreSQL, MySQL, SQLite)
 
-=item * L<IO::Async::Timer::Countdown> instead of C<sleep()>
-
 =back
 
-=item 2. B<Use IO::Async::Function>
+=item 2. B<Use a Worker Pool for CPU-bound Work>
 
-Offload blocking operations to a subprocess via L<IO::Async::Function>:
-
-  use IO::Async::Loop;
-  use IO::Async::Function;
-
-  my $loop = IO::Async::Loop->new;  # Returns singleton
-
-  my $worker = IO::Async::Function->new(
-      code => sub {
-          my ($password) = @_;
-          # This runs in a separate process (fork)
-          return bcrypt_hash($password);
-      },
-  );
-  $loop->add($worker);  # Forks the worker process here
-
-  # Call the blocking operation asynchronously
-  my $hashed = await $worker->call(args => [$password]);
-
-B<Note:> IO::Async::Function uses C<fork()> to create worker processes. If you're already running the server in worker mode (C<--workers 4>), each server worker may fork additional Function workers. Be mindful of total process count - too many forks leads to memory pressure and context-switching overhead. For high-volume blocking work, consider a dedicated job queue (Redis, RabbitMQ) instead.
+For CPU-intensive operations (password hashing, image processing), offload to
+a subprocess. See L<PAGI::Cookbook> for patterns using L<IO::Async::Function>
+or external job queues.
 
 =back
 
@@ -517,7 +507,7 @@ L<PAGI::Server> supports two deployment modes: single-process and multi-worker.
   WebSocket/SSE with shared state    | Yes            | Needs PubSub
   Development/testing                | Yes            | Optional
 
-B<Important:> Worker mode does NOT fix blocking operations. Each worker still runs a single-threaded event loop. If you do a blocking operation in a worker, ALL connections on that worker freeze (including any WebSocket or SSE connections). To avoid blocking, use async libraries or L<IO::Async::Function> as described in section 1.4.
+B<Important:> Worker mode does NOT fix blocking operations. Each worker still runs a single-threaded event loop. If you do a blocking operation in a worker, ALL connections on that worker freeze (including any WebSocket or SSE connections). To avoid blocking, use async libraries as described in section 1.4.
 
 =head3 Running with Workers
 
@@ -587,23 +577,18 @@ This will NOT work correctly across workers:
 
 =head3 Right: External State Storage
 
-Use a shared backend for state:
+Use a shared backend for state. For example with Redis (see L<PAGI::Cookbook>
+for complete Redis examples):
 
   use Future::AsyncAwait;
-  use IO::Async::Loop;
-  use Net::Async::Redis;
+
+  # Assume $redis is set up during lifespan startup
+  # See PAGI::Cookbook for Redis connection patterns
 
   async sub app {
       my ($scope, $receive, $send) = @_;
 
-      my $loop = IO::Async::Loop->new;
-
-      # Connect to Redis (shared across all workers)
-      my $redis = Net::Async::Redis->new;
-      $loop->add($redis);
-      await $redis->connect(host => 'localhost', port => 6379);
-
-      # Increment counter in Redis
+      # Increment counter in Redis (shared across all workers)
       my $counter = await $redis->incr('request_counter');
 
       await $send->({
@@ -672,7 +657,6 @@ For HTTP requests (C<type =E<gt> 'http'>):
       client => ['127.0.0.1', 54321],# Client address and port
       scheme => 'http',              # 'http' or 'https'
       http_version => '1.1',         # HTTP version
-      loop => $loop,                 # IO::Async::Loop instance
       extensions => { ... },         # PAGI extensions
   }
 
@@ -962,16 +946,13 @@ Server-Sent Events allow the server to push updates to clients over HTTP. Here's
   use strict;
   use warnings;
   use Future::AsyncAwait;
-  use IO::Async::Loop;
-  use IO::Async::Timer::Periodic;
+  use Future::IO;
 
   async sub app {
       my ($scope, $receive, $send) = @_;
 
       # Only handle SSE connections
       die "Expected sse scope" unless $scope->{type} eq 'sse';
-
-      my $loop = IO::Async::Loop->new;
 
       # Start the SSE response
       await $send->({
@@ -983,29 +964,20 @@ Server-Sent Events allow the server to push updates to clients over HTTP. Here's
           ],
       });
 
-      # Create a timer that fires every second
-      my $timer = IO::Async::Timer::Periodic->new(
-          interval => 1,
-          on_tick => async sub {
-              # Send the current time as an SSE event
-              await $send->({
-                  type => 'sse.response.body',
-                  data => scalar(localtime()),
-                  # Optional fields:
-                  # event => 'clock',     # Event type
-                  # id => '123',          # Event ID
-                  # retry => 5000,        # Retry interval in ms
-              });
-          },
-      );
+      # Send the current time every second (loop-agnostic!)
+      while (1) {
+          await $send->({
+              type => 'sse.response.body',
+              data => scalar(localtime()),
+              # Optional fields:
+              # event => 'clock',     # Event type
+              # id => '123',          # Event ID
+              # retry => 5000,        # Retry interval in ms
+          });
 
-      # Add timer to the event loop
-      $loop->add($timer);
-      $timer->start;
-
-      # Keep the connection open indefinitely
-      # (In practice, you'd detect client disconnect)
-      await $loop->loop_forever;
+          # Wait 1 second before next event
+          await Future::IO->sleep(1);
+      }
   }
 
   \&app;
@@ -1058,15 +1030,12 @@ You can stream HTTP response bodies by sending multiple C<http.response.body> ev
   use strict;
   use warnings;
   use Future::AsyncAwait;
-  use IO::Async::Loop;
-  use IO::Async::Timer::Countdown;
+  use Future::IO;
 
   async sub app {
       my ($scope, $receive, $send) = @_;
 
       die "Expected http scope" unless $scope->{type} eq 'http';
-
-      my $loop = IO::Async::Loop->new;
 
       # Start response with chunked encoding
       await $send->({
@@ -1086,14 +1055,8 @@ You can stream HTTP response bodies by sending multiple C<http.response.body> ev
               more => 1,  # More chunks coming
           });
 
-          # Wait 1 second between chunks
-          my $timer = IO::Async::Timer::Countdown->new(
-              delay => 1,
-              on_expire => sub { },
-          );
-          $loop->add($timer);
-          $timer->start;
-          await $timer->future;
+          # Wait 1 second between chunks (loop-agnostic!)
+          await Future::IO->sleep(1);
       }
 
       # Send final chunk (more => 0 is the default, so can be omitted)
@@ -1458,10 +1421,8 @@ This pattern looks reasonable but is B<broken>:
   async sub app {
       my ($scope, $receive, $send) = @_;
 
-      my $loop = IO::Async::Loop->new;
-
-      # Schedule work for later...
-      $loop->delay_future(after => 1)->then(sub {
+      # Schedule work for later without awaiting...
+      Future::IO->sleep(1)->then(sub {
           $send->({
               type    => 'http.response.start',
               status  => 200,
@@ -1484,7 +1445,7 @@ B<What goes wrong:>
 
 =item 2. Server thinks response is done (but nothing was sent!)
 
-=item 3. The C<delay_future> callback runs 1 second later
+=item 3. The C<sleep> callback runs 1 second later
 
 =item 4. By then, the connection may be closed or reused
 
@@ -1502,10 +1463,8 @@ Always await all response-affecting work:
   async sub app {
       my ($scope, $receive, $send) = @_;
 
-      my $loop = IO::Async::Loop->new;
-
       # Wait for the delay
-      await $loop->delay_future(after => 1);
+      await Future::IO->sleep(1);
 
       # Now send response (still within the app's Future)
       await $send->({
@@ -1518,37 +1477,6 @@ Always await all response-affecting work:
           type => 'http.response.body',
           body => 'Hello after 1 second',
       });
-  }
-
-=head3 When C<-E<gt>retain> IS Appropriate
-
-Use C<retain> only for truly independent background work that doesn't affect the current response:
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      my $loop = IO::Async::Loop->new;
-
-      # Send response first
-      await $send->({
-          type    => 'http.response.start',
-          status  => 200,
-          headers => [['content-type', 'text/plain']],
-      });
-
-      await $send->({
-          type => 'http.response.body',
-          body => 'Request received!',
-      });
-
-      # NOW it's safe to do background work
-      # Response is already sent, this is truly independent
-      $loop->delay_future(after => 60)->then(sub {
-          log_analytics($scope);  # Fire and forget
-      })->on_fail(sub {
-          my ($error) = @_;
-          warn "Analytics failed: $error";
-      })->retain;
   }
 
 =head3 Detecting This Problem
@@ -2182,13 +2110,11 @@ L<PAGI::SSE> simplifies Server-Sent Events:
   # Send JSON
   await $sse->send_json({ count => 5 }, event => 'update');
 
-  # Periodic updates
-  await $sse->every(1, async sub {
-      await $sse->send_event("Time: " . time);
-  });
-
   # Keepalive to prevent proxy timeouts
-  $sse->keepalive(15);
+  await $sse->keepalive(15);
+
+  # Wait for disconnect
+  await $sse->run;
 
 =head1 PART 5: BUILT-IN APPLICATIONS
 
@@ -2326,14 +2252,15 @@ Useful for incremental migration from PSGI to PAGI.
 
 The C<$scope> hashref contains connection metadata:
 
-=head3 Accessing the Event Loop
+=head3 Async Operations Without Loop Access
 
-The event loop is B<not> part of C<$scope>. To access it, use the L<IO::Async::Loop> singleton:
+For async operations like delays, use L<Future::IO> which is loop-agnostic:
 
-  use IO::Async::Loop;
-  my $loop = IO::Async::Loop->new;  # Returns cached singleton
+  use Future::IO;
+  await Future::IO->sleep(5);  # Works with any event loop
 
-This works because L<IO::Async::Loop> caches the loop instance.
+This keeps your application code portable across different PAGI server
+implementations.
 
 =head3 Common Fields (All Types)
 
@@ -2469,7 +2396,7 @@ You've covered the essentials! For more information:
 
 =item * L<Future::AsyncAwait> - Async/await syntax for Perl
 
-=item * L<IO::Async::Loop> - Event loop implementation
+=item * L<Future::IO> - Loop-agnostic async primitives (sleep, I/O)
 
 =back
 

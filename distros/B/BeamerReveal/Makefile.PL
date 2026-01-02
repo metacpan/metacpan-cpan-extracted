@@ -21,7 +21,8 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "BeamerReveal",
   "EXE_FILES" => [
-    "bin/beamer-reveal.pl"
+    "bin/beamer-reveal.pl",
+    "bin/beamer-reveal.pl~"
   ],
   "LICENSE" => "open_source",
   "NAME" => "BeamerReveal",
@@ -56,12 +57,13 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
+    "File::Compare" => 0,
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "20251231.1441",
+  "VERSION" => "20260101.1937",
   "test" => {
-    "TESTS" => "t/*.t"
+    "TESTS" => "t/*.t t/02-bin/*.t"
   }
 );
 
@@ -75,6 +77,7 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Basename" => 0,
+  "File::Compare" => 0,
   "File::Copy" => 0,
   "File::Copy::Recursive" => 0,
   "File::Path" => 0,

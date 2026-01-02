@@ -1,0 +1,34 @@
+---
+abstract: 'Comprehensive GitHub Actions workflow generator, analyzer, and optimizer'
+author:
+  - 'Nigel Horne <njh@nigelhorne.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::DescribeMe: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-GHGen
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Getopt::Long: '0'
+  Path::Tiny: '0'
+  Term::ANSIColor: '0'
+  YAML::XS: '0'
+  perl: '5.036'
+resources:
+  bugtracker: https://github.com/nigelhorne/App-GHGen/issues
+  homepage: https://metacpan.org/pod/App::GHGen
+  repository: git://github.com/nigelhorne/App-GHGen.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

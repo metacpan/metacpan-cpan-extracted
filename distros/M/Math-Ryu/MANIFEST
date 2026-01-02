@@ -9,6 +9,7 @@ Ryu.pod
 Ryu.xs
 d2fixed.c
 d2s.c
+f2s.c
 s2d.c
 
 t/1_basic.t
@@ -28,6 +29,8 @@ ryu_headers/common.h
 ryu_headers/d2fixed_full_table.h
 ryu_headers/d2s_full_table.h
 ryu_headers/d2s_intrinsics.h
+ryu_headers/f2s_full_table.h
+ryu_headers/f2s_intrinsics.h
 ryu_headers/d2s_small_table.h
 ryu_headers/digit_table.h
 ryu_headers/ryu.h

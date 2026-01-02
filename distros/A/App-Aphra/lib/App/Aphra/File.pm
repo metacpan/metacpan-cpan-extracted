@@ -120,6 +120,14 @@ sub process {
 
     debug("tt: $template -> $out");
 
+    # Check if output file already exists
+    my $output_path = Path::Tiny::path($self->app->config->{target}, $out);
+    if (-e $output_path) {
+      my $source = $self->full_name;
+      warn "Output file $output_path already exists, skipping processing of $source\n";
+      return;
+    }
+
     my $template_text = Path::Tiny::path($self->full_name)->slurp_utf8;
     my $front_matter = Text::FrontMatter::YAML->new(
       document_string => $template_text,
@@ -141,6 +149,15 @@ sub process {
     $orig_layout and $self->app->template->{SERVICE}{WRAPPER} = $orig_layout;
   } else {
     my $file = $self->full_name;
+    my $filename = Path::Tiny::path($file)->basename;
+    my $output_path = Path::Tiny::path($dest, $filename);
+    
+    # Check if output file already exists
+    if (-e $output_path) {
+      warn "Output file $output_path already exists, skipping processing of $file\n";
+      return;
+    }
+    
     debug("Copy: $file -> ", $self->destination_dir);
     copy $file, $self->destination_dir;
   }

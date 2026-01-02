@@ -10,7 +10,7 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
    this module's source (in the Ryu_Library/ryu folder). It is therefore
    unnecessary to download that Ryu code - but, should you wish to grab
    it, it's also available at:
-   https://github.com/ulfjack/ryu/tree/master/ryu
+   L<https://github.com/ulfjack/ryu/tree/master/ryu>
 
 =head1 PREAMBLE
 
@@ -43,11 +43,12 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
                           # the condition ("0.1" == 0.1) is also true.
 
    This module provides the nv2s() function which returns a decimal
-   string representation of its (NV) argumennt. Unless $nv is NaN:
+   string representation of its (NV) argument.
+   Unless $nv is NaN:
     1) the condition ( nv2s($nv) == $nv ) is always true;
       and
     2) the string returned by nv2s($nv) will contain the fewest number of
-       siginificant decimal digits needed for that first condition to hold.
+       significant decimal digits needed for that first condition to hold.
 
    The aim is that the formatting of the string returned by nv2s() will
    be the same as provided by python3's print() function.
@@ -89,18 +90,19 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
     compromising that accuracy.
     $str is formatted by fmtpy() - documented below. (The format is the
     same as provided by Python3's print() function for the same value.)
-    There is no need for the caller to know the type (nvtype) of NV that
-    $nv is - the nv2s() function handles that.
-
+    There is no need for the caller to know the type ($Config{nvtype})
+    of $nv - the nv2s() function handles that.
 
     Note: nv2s() spends some time reformatting the string that the ryu
           library returned. If you are happy enough with that original
-          string, then save some time by avoiding the reformating and
-          just run d2s() or ld2s() or q2s() - whichever is appropriate
-          for your nvtype. (Or employ your own reformatting sub.)
+          string, then save some time by avoiding the reformatting and
+          instead run d2s() or ld2s() or q2s() - whichever is appropriate.
+          See the d2s/ld2s/q2s documentation (below) to determine which
+          is appropriate for your perl.
           Run the script in the "benchmark" folder of Math-Ryu source
           distro (perl benchmark.p), for comparative timings of "with"
           and "without" reformatting.
+          You are, of course, free to employ your own reformatting sub.
 
    $str = n2s($sv);
     Use this function if the argument is to be evaluated in numeric context.
@@ -111,8 +113,10 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
     given argument, according to whether that numeric value is an integer
     value (that fits into an IV or UV) or a floating point value.
     If the argument ($sv) is itself a string, then $str will reflect the
-    value of $sv considered in numeric context. For example
-    n2s('hello world') would return '0.0', not 'hello world'.
+    value of $sv considered in numeric context.
+    For example:
+     n2s('hello world') will return '0.0', not 'hello world';
+     n2s('0.10000000000000001') will return '0.1' if nvtype is 'double'.
 
  $str = d2s($nv);  # Use only when $Config{nvtype} is 'double'.
     Returns a decimal string representation of the value of $nv in the
@@ -131,6 +135,13 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
     in the format 'mantissaEexponent' - eg '1E-1' (for 0.1) and
     '1.4142135623730950488016887242096982E0' (for square root of 2).
 
+  $str = fx2s($nv);
+    Cast $nv to a single precision float value.
+    Returns a decimal string representation of that single precision
+    float value in the format 'mantissaEexponent' - eg:
+      '1E-1' (for 0.1) and
+      '1.4142135E0' (for square root of 2).
+
   $bool = is_NV($arg);
     Returns 1 if $arg should be deemed an NV (perl scalar floating
     point value) for the purposes of this module.
@@ -143,15 +154,20 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
     The argument $s is a string as returned by either d2s() or ld2s()
     or q2s(). We aim to reformat $s to be the same as the string that
     python3 would produce, and then return it as $str.
-    NOTE: Doing 'fmtpy(d2s($nv))' or 'fmtpy(ld2s($nv))' or
-          'fmtpy(q2s($nv))' is equivalent to doing 'nv2s($nv))'.
+    NOTE: If it's appropriate to do'fmtpy(d2s($nv))' then that's
+          the same as doing 'nv2s($nv))'.
+          If it's appropriate to do'fmtpy(ld2s($nv))' then that's
+          the same as doing 'nv2s($nv))'.
+          If it's appropriate to do'fmtpy(q2s($nv))' then that's
+          the same as doing 'nv2s($nv))'.
 
   $bool = ryu_lln($sv);
    This is an interface to the API function 'looks_like_number'.
    Returns 1 if $sv looks like a number, else returns 0.
    There's not really any reason to export this subroutine, but
    it's there to use if it's ever helpful.
-   It's NOT identical to Scalar::Util::looks_like_number().
+   It does NOT handle MAGIC and is therefore NOT identical to
+   Scalar::Util::looks_like_number().
 
   $bool = ryu_SvIOK($sv);
   $bool = ryu_SvNOK($sv);
@@ -189,30 +205,40 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
 
   pany(@args); # "p"rint "any"
   sany(@args); # "s"ay   "any"
-   Both functions simply do a "print $arg;" if the perl API function
-   looks_like_number($arg) returns true && either:
-     a) the POK flag is set;
+   For each of the arguments ($_) in @args, both functions simply do a
+   "print $_;" if the perl API function looks_like_number($_) returns
+   true && either:
+     a) the POK flag for $_ is set;
      or
-     b) the IOK flag is set.
+     b) the IOK flag for $_ is set.
 
-   If looks_like_number($arg) returns true but both the POK and
+   If looks_like_number($_) returns true but both the POK and
    IOK flags are unset, then $arg must be an NV.
    If that NV fits into an IV, then cast it to an IV, and print out
    that (IV) value. Else print out nv2s($arg).
 
+   NOTE: If perl's NV precision is less than IV precision (as is the most
+         common perl configuration) then pany() can produce a result
+         that differs from nv2s(). Eg: pany(6.886264645392433e+16) will,
+         in accordance with this documentation, output 68862646453924328.
+         But nv2s(6.886264645392433e+16) will, in accordance with its
+         documentation return the float string 6.886264645392433e+16.
+         Aside from that, "pany($nv);" and "print nv2s($nv);" will
+         produce identical outputs - assuming $nv is an NV, of course.
+
    For all other arguments (ie those for which looks_like_number($arg)
-   has returned false), simply "print $arg;".
+   has returned false), pany() will simply "print $_;".
 
    After sany() has printed the final arg, a terminating "\n" is printed.
    Otherwise sany() and pany() are identical.
-   We should find that pany() and sany() produce  outputs aidentical to
-   print() - except for those NV values that perl would misrepresent.
+   We should find that pany() and sany() produce outputs that are
+   identical to print()/say() - except for those NV values for which
+   perl's interpolation differs from the string returned by nv2s().
    The aim is that pany/sany alone will suffice, and there is no need
    for the user to ever call perl's print()/say() functions if
    Math::Ryu has been loaded.
    Of course, if you really do want to print out an NV as stringified
-   by perl (as opposed to being stringified by nv2s) then you'll need
-   to use print/say, not pany()/sany().
+   by perl then you'll need to use print/say, not pany/sany.
 
    Unlike "print" and "say", which are generally called without
    bracketed args, "pany()" and "sany()" should be called with their
@@ -260,7 +286,7 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
    The Boost Software License can be found at:
    https://www.boost.org/LICENSE_1_0.txt
 
-   This perl module is Copyright 2024 Sisyphus
+   This perl module is Copyright 2024-25 Sisyphus
 =head1 AUTHOR
 
    Sisyphus <sisyphus at(@) cpan dot (.) org>

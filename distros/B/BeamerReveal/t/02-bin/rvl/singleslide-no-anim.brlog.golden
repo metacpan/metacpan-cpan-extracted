@@ -1,0 +1,14 @@
+----------------------------------------------------------------------------
+--  beamer-reveal.pl                                       v20260101.1407 --
+--  (C) 2025-2026 Walter PM Daems <wdaems@cpan.org>                 GPLv3 --
+----------------------------------------------------------------------------
+
+- Reading driver file t/02-bin/rvl/singleslide-no-anim.rvl
+- Installing quarto/reveal.js boilerplate
+- Processing the presentation
+  - making slide 1
+- Generating the images
+- Producing presentation
+  - Writing t/02-bin/rvl/singleslide-no-anim.html
+  - Creating index.html link
+Done

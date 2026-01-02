@@ -12,7 +12,7 @@ use Math::GMPz qw(:mpz __GNU_MP_VERSION __GNU_MP_VERSION_MINOR
 print "1..10\n";
 
 
-if((MATH_GMPz_UV_MAX <=> MATH_GMPz_IV_MAX) > 0 ) {print "ok 1\n"}
+if((MATH_GMPz_UV_MAX <=> MATH_GMPz_IV_MAX) == 1) {print "ok 1\n"}
 else {print "not ok 1\n"}
 
 if(MATH_GMPz_IV_MAX < MATH_GMPz_UV_MAX ) {print "ok 2\n"}

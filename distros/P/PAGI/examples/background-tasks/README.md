@@ -34,10 +34,11 @@ Runs in a child process, doesn't block the event loop.
 
 ### 3. Quick Sync Work
 
-For very fast operations (<10ms) after response:
+For very fast operations (<10ms) after response - just call directly after `await`:
 
 ```perl
-$res->loop->later(sub { quick_sync_task("log"); });
+await $res->json({ status => 'ok' });
+quick_sync_task("log");  # runs after response is sent
 ```
 
 **Warning:** Any blocking here blocks ALL requests!

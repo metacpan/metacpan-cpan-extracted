@@ -1,0 +1,28 @@
+---
+name: GHGen Check (CI Mode)
+
+'on':
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Check workflows
+        uses: nigelhorne/ghgen-action@v1
+        with:
+          mode: check
+      
+      - name: Fail if issues found
+        if: steps.check.outputs.issues-found > 0
+        run: |
+          echo "Found ${{ steps.check.outputs.issues-found }} workflow issues"
+          echo "Run 'ghgen analyze --fix' locally to fix them"
+          exit 1

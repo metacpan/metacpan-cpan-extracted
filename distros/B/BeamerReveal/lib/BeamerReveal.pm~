@@ -1,0 +1,80 @@
+# -*- cperl -*-
+# ABSTRACT: BeamerReveal
+
+=head1 SYNOPSIS
+
+Factory object to make objects that correspond to the basic chunks in the C<.rvl> file.
+These objects correspond to the actual beamer to reveal conversion.
+
+=cut
+
+package BeamerReveal;
+# VERSION
+
+use strict;
+use warnings;
+
+use Carp;
+
+use BeamerReveal::Object::Presentation;
+use BeamerReveal::Object::BeamerFrame;
+
+use BeamerReveal::Log;
+
+=method new()
+
+  $f = BeamerReveal->new()
+
+Constructor
+
+=cut
+
+sub new {
+  my $class = shift;
+
+  my $self = {};
+  $class = (ref $class ? ref $class : $class );
+  bless $self, $class;
+
+  return $self;
+}
+
+=method createFromChunk
+
+  $f->createFromChunk( $chunk, $chunkStartLine )
+
+factory method: creates a basic object.
+
+=over 4
+
+=item . C<$chunk>
+
+string that contains the data to create the basic object from (i.e. to parse).
+
+=item . C<$chunkStartLine>
+
+The starting line of the chunk (used for error reporting).
+
+=back
+
+=cut
+
+sub createFromChunk {
+  my $self = shift;
+  my ( $chunk, $chunkStartLine ) = @_;
+  
+  my ( $chunkLine, @lines ) = split( "\n", $chunk );
+  my ( $chunkType, $chunkData ) = split( ':', $chunkLine );
+  
+  if( $chunkType eq 'Presentation' ) {
+    return BeamerReveal::Object::Presentation->new( $chunkData, \@lines, $chunkStartLine );
+  }
+  if( $chunkType eq 'BeamerFrame' ) {
+    return BeamerReveal::Object::BeamerFrame->new( $chunkData, \@lines, $chunkStartLine );
+  }
+  else {
+    $BeamerReveal::Log::logger->fatal( 0, "Error: unknown chunk type $chunkType on line $chunkStartLine\n" );
+  }
+}
+
+1;

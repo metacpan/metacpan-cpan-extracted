@@ -1,0 +1,30 @@
+# Version control
+\bRCS\b
+\bCVS\b
+^\.git/
+^\.gitignore
+
+# Build artifacts
+^Makefile$
+^Makefile\.old$
+^blib/
+^pm_to_blib
+^_build/
+^Build$
+^Build\.bat$
+^MYMETA\.
+
+# Testing
+^cover_db/
+^nytprof
+\.tar\.gz$
+
+# Editor files
+~$
+\.swp$
+\.bak$
+^\.DS_Store$
+
+# Local files
+^local/
+^\.carton/

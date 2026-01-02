@@ -23,5 +23,6 @@ for (keys %config) {
 
 isa_ok($app->template, 'Template');
 can_ok($app, qw[run build]);
+is($app->ver, $App::Aphra::VERSION, 'Version is correct');
 
 done_testing;

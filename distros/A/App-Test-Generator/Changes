@@ -1,5 +1,12 @@
 Revision history for App-Test-Generator
 
+0.25	Thu Jan  1 15:41:06 EST 2026
+	Ternary ? 1 : 0 return is taken to be an indicator of boolean returns
+	Now parses this pod to know that it's supposed to return a string:
+		Returns the sanitized HTML string
+	Use :: to call methods in non-oo modules, rather than ->
+	Flag when type is set to object by can is not set
+
 0.24	Sun Dec 28 15:10:09 EST 2025
 	Return chances of false positive file path semantics
 	If the type of an variable can't be determined, guess at string, but lower the confidence level

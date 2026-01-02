@@ -1,8 +1,12 @@
 Revision history for cpan2rpm
 
+2.046 01/01/2026 23:00:00
+ - If --upgrade fails, show exact errors.
+ - Now upgrade works with the new dist name.
+
 2.045 12/31/2025 23:00:00
- - Update --shadow-pure to reduce conflicts
- - Add BuildRequires perl-generators
+ - Update --shadow-pure to reduce conflicts.
+ - Add BuildRequires perl-generators package.
  - Clean up spec.PL
 
 2.044 09/26/2025 02:00:00

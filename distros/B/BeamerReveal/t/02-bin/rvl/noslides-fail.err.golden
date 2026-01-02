@@ -1,0 +1,4 @@
+Error: subprocess /usr/bin/pdftoppm returned 256
+Syntax Error: Document stream is empty
+
+Check the logfile t/02-bin/rvl/noslides-fail.brlog for more information.

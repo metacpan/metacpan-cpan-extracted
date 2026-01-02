@@ -2,7 +2,7 @@ package PAGI::Server;
 use strict;
 use warnings;
 
-our $VERSION = '0.001005';
+our $VERSION = '0.001006';
 
 use parent 'IO::Async::Notifier';
 use IO::Async::Listener;
@@ -11,7 +11,15 @@ use IO::Async::Loop;
 use IO::Socket::INET;
 use Future;
 use Future::AsyncAwait;
+
 use Scalar::Util qw(weaken refaddr);
+
+# If Future::IO is available, configure it to use IO::Async
+# This enables Future::IO->sleep() etc. in user apps running under PAGI::Server
+BEGIN {
+    eval { require Future::IO::Impl::IOAsync; 1 };
+    # Silently ignore if not installed - Future::IO is optional
+}
 use POSIX ();
 
 use PAGI::Server::Connection;
@@ -373,14 +381,14 @@ B<CLI:> C<--max-ws-frame-size 1048576>
 =item max_connections => $count
 
 Maximum number of concurrent connections before returning HTTP 503.
-Default: 0 (auto-detect from ulimit - 50).
+Default: 0 (auto-detect based on process file descriptor limit).
 
 When at capacity, new connections receive a 503 Service Unavailable
 response with a Retry-After header. This prevents file descriptor
 exhaustion crashes under heavy load.
 
-The auto-detected limit uses: C<ulimit -n> minus 50 for headroom
-(file operations, logging, database connections, etc.).
+The auto-detected limit uses the process soft limit (from
+C<getrlimit(RLIMIT_NOFILE)>) minus C<fd_headroom> (default 100).
 
 B<Example:>
 
@@ -393,6 +401,92 @@ B<CLI:> C<--max-connections 200>
 
 B<Monitoring:> Use C<< $server->connection_count >> and
 C<< $server->effective_max_connections >> to monitor usage.
+
+=item fd_headroom => $count
+
+B<Power user setting.> Number of file descriptors to reserve for
+non-connection use when auto-detecting C<max_connections>.
+Default: 100.
+
+This headroom accounts for: listen socket, worker IPC pipes, log files,
+static file handles, TLS internals, database connections, DNS lookups,
+and other system resources.
+
+B<When to adjust:>
+
+=over 4
+
+=item * B<Increase> (e.g., 150-200) if your application opens many
+database connections, serves many static files simultaneously, or
+uses middleware that opens additional file handles.
+
+=item * B<Decrease> (e.g., 50-75) if running a minimal setup with no
+database, no static files, and you want to maximize connection capacity.
+
+=back
+
+B<Note:> This setting is ignored if C<max_connections> is set explicitly.
+
+B<Example:>
+
+    # Heavy database usage - reserve more headroom
+    my $server = PAGI::Server->new(
+        app         => $app,
+        fd_headroom => 200,
+    );
+
+=item write_high_watermark => $bytes
+
+B<Power user setting.> Maximum bytes to buffer in the socket write queue
+before applying backpressure. When exceeded, C<< $send->() >> calls will
+pause until the buffer drains below C<write_low_watermark>.
+Default: 65536 (64KB).
+
+This prevents unbounded memory growth when the server writes data faster
+than the client can receive it. The default matches Python's asyncio
+transport defaults, providing a good balance between throughput and
+memory efficiency.
+
+B<When to adjust:>
+
+=over 4
+
+=item * B<Increase> (e.g., 256KB-1MB) for high-throughput bulk transfers
+where you want fewer context switches and higher throughput at the cost
+of more per-connection memory.
+
+=item * B<Decrease> (e.g., 16KB-32KB) if supporting many concurrent
+connections where memory efficiency is critical.
+
+=back
+
+B<Example:>
+
+    # High-throughput file server - larger buffers
+    my $server = PAGI::Server->new(
+        app                  => $app,
+        write_high_watermark => 262144,  # 256KB
+        write_low_watermark  => 65536,   # 64KB
+    );
+
+=item write_low_watermark => $bytes
+
+B<Power user setting.> Threshold below which sending resumes after
+backpressure was applied. Must be less than or equal to
+C<write_high_watermark>. Default: 16384 (16KB, which is high/4).
+
+A larger gap between high and low watermarks reduces oscillation
+(frequent pause/resume cycles). A smaller gap provides more responsive
+backpressure but may increase context switching.
+
+B<Example:>
+
+    # Minimize oscillation with wider gap
+    my $server = PAGI::Server->new(
+        app                  => $app,
+        write_high_watermark => 131072,  # 128KB
+        write_low_watermark  => 16384,   # 16KB (8:1 ratio)
+    );
 
 =item max_body_size => $bytes
 
@@ -490,6 +584,40 @@ B<CLI:> C<--max-requests 10000>
 Example: With 4 workers and max_requests=10000, total capacity before any
 restart is 40,000 requests. Workers restart individually without downtime.
 
+=item timeout => $seconds
+
+Connection idle timeout in seconds. Closes connections that are idle between
+requests (applies to keep-alive connections waiting for the next request).
+
+B<Default:> 60
+
+B<Performance note:> Each connection with a non-zero timeout creates a timer
+that is reset on every read event. For maximum throughput in high-performance
+scenarios, set C<timeout =E<gt> 0> to disable the idle timer entirely. This
+eliminates timer management overhead but means idle connections will never
+be automatically closed.
+
+B<Example:>
+
+    # Disable idle timeout for maximum performance
+    my $server = PAGI::Server->new(
+        app     => $app,
+        timeout => 0,
+    );
+
+    # Short timeout to reclaim connections quickly
+    my $server = PAGI::Server->new(
+        app     => $app,
+        timeout => 30,
+    );
+
+B<CLI:> C<--timeout 0> or C<--timeout 30>
+
+B<Note:> This differs from C<request_timeout> (stall timeout during active
+request processing). The C<timeout> applies between requests; the
+C<request_timeout> applies during a request. For WebSocket and SSE, use
+C<ws_idle_timeout> and C<sse_idle_timeout> respectively.
+
 =item request_timeout => $seconds
 
 Maximum time in seconds a request can stall without any I/O activity before
@@ -575,7 +703,7 @@ B<Example:>
 B<CLI:> C<--ws-idle-timeout 300>
 
 B<Note:> For more sophisticated keep-alive behavior with ping/pong, use
-the C<PAGI::Middleware::WebSocket::Heartbeat> middleware instead.
+C<< $ws->keepalive($interval, $timeout) >> for protocol-level ping/pong.
 
 =item sse_idle_timeout => $seconds
 
@@ -597,9 +725,35 @@ B<Example:>
 
 B<CLI:> C<--sse-idle-timeout 120>
 
-B<Note:> For SSE connections that may be legitimately idle, consider
-using the C<PAGI::Middleware::SSE::Heartbeat> middleware to send
-periodic comment keepalives.
+B<Note:> For SSE connections that may be legitimately idle, use
+C<< $sse->keepalive($interval) >> to send periodic comment keepalives.
+
+=item loop_type => $backend
+
+Specifies the IO::Async::Loop subclass to use when calling C<run()>.
+This option is ignored when embedding the server in an existing loop.
+
+B<Default:> Auto-detect (IO::Async chooses the best available backend)
+
+B<Common values:>
+
+    'EPoll'   - Linux epoll (recommended for Linux)
+    'EV'      - libev-based (cross-platform, requires EV module)
+    'Poll'    - POSIX poll() (portable fallback)
+    'Select'  - select() (most portable, least scalable)
+
+B<Example:>
+
+    my $server = PAGI::Server->new(
+        app       => $app,
+        loop_type => 'EPoll',
+    );
+    $server->run;
+
+B<CLI:> C<--loop EPoll> (via pagi-server)
+
+B<Note:> The specified backend module must be installed. For example,
+C<loop_type =E<gt> 'EPoll'> requires L<IO::Async::Loop::EPoll>.
 
 =back
 
@@ -1010,10 +1164,17 @@ sub _init {
     $self->{max_receive_queue} = delete $params->{max_receive_queue} // 1000;  # Max WebSocket receive queue size (messages)
     $self->{max_ws_frame_size} = delete $params->{max_ws_frame_size} // 65536;  # Max WebSocket frame size in bytes (64KB default)
     $self->{max_connections}     = delete $params->{max_connections} // 0;  # 0 = auto-detect
+    $self->{fd_headroom}         = delete $params->{fd_headroom} // 100;  # FDs reserved for non-connection use
     $self->{sync_file_threshold} = delete $params->{sync_file_threshold} // 65536;  # Threshold for sync file reads (0=always async)
     $self->{request_timeout}     = delete $params->{request_timeout} // 0;  # Request stall timeout in seconds (0 = disabled, default for performance)
     $self->{ws_idle_timeout}     = delete $params->{ws_idle_timeout} // 0;   # WebSocket idle timeout (0 = disabled)
     $self->{sse_idle_timeout}    = delete $params->{sse_idle_timeout} // 0;  # SSE idle timeout (0 = disabled)
+    $self->{write_high_watermark} = delete $params->{write_high_watermark} // 65536;   # 64KB - pause sending above this
+    $self->{write_low_watermark}  = delete $params->{write_low_watermark}  // 16384;   # 16KB - resume sending below this
+    $self->{loop_type}           = delete $params->{loop_type};  # Optional loop backend (EPoll, EV, Poll, etc.)
+    # Dev-mode event validation: explicit flag, or auto-enable in development mode
+    $self->{validate_events}     = delete $params->{validate_events}
+        // (($ENV{PAGI_ENV} // '') eq 'development' ? 1 : 0);
 
     $self->{running}     = 0;
     $self->{bound_port}  = undef;
@@ -1099,6 +1260,9 @@ sub configure {
     if (exists $params{max_connections}) {
         $self->{max_connections} = delete $params{max_connections};
     }
+    if (exists $params{fd_headroom}) {
+        $self->{fd_headroom} = delete $params{fd_headroom};
+    }
     if (exists $params{request_timeout}) {
         $self->{request_timeout} = delete $params{request_timeout};
     }
@@ -1161,6 +1325,85 @@ Or on Debian/Ubuntu:
 
 Then restart your application.
 END_TLS_ERROR
+}
+
+=head2 run
+
+    $server->run;
+
+Standalone entry point that creates an event loop, starts the server,
+and runs until shutdown. This is the simplest way to run a PAGI server:
+
+    my $server = PAGI::Server->new(
+        app  => $app,
+        port => 8080,
+    );
+    $server->run;
+
+For embedding in an existing IO::Async application, use the traditional
+pattern instead:
+
+    my $loop = IO::Async::Loop->new;
+    $loop->add($server);
+    $server->listen->get;
+    $loop->run;
+
+The C<run()> method handles:
+
+=over 4
+
+=item * Creating the event loop (respecting C<loop_type> if set)
+
+=item * Adding the server to the loop
+
+=item * Starting the listener
+
+=item * Setting up signal handlers for graceful shutdown
+
+=item * Running the event loop until shutdown
+
+=back
+
+=cut
+
+sub run {
+    my ($self) = @_;
+
+    my $loop = $self->_create_loop;
+    $loop->add($self);
+
+    # Start listening with error handling
+    eval { $self->listen->get };
+    if ($@) {
+        my $error = $@;
+        my $port = $self->{port};
+        if ($error =~ /Address already in use/i) {
+            die "Error: Port $port is already in use\n";
+        }
+        elsif ($error =~ /Permission denied/i) {
+            die "Error: Permission denied to bind to port $port\n";
+        }
+        die "Error starting server: $error\n";
+    }
+
+    # Run the event loop (signal handlers were set up by listen())
+    $loop->run;
+}
+
+# Create an event loop, respecting loop_type config
+sub _create_loop {
+    my ($self) = @_;
+
+    if (my $loop_type = $self->{loop_type}) {
+        my $loop_class = "IO::Async::Loop::$loop_type";
+        eval "require $loop_class"
+            or die "Cannot load loop backend '$loop_type': $@\n" .
+                   "Install it with: cpanm $loop_class\n";
+        return $loop_class->new;
+    }
+
+    require IO::Async::Loop;
+    return IO::Async::Loop->new;
 }
 
 async sub listen {
@@ -1288,6 +1531,14 @@ async sub _listen_singleworker {
         };
         $self->loop->watch_signal(TERM => $shutdown_handler);
         $self->loop->watch_signal(INT => $shutdown_handler);
+
+        # HUP in single-worker mode just warns (graceful restart requires multi-worker)
+        my $weak_self = $self;
+        weaken($weak_self);
+        $self->loop->watch_signal(HUP => sub {
+            $weak_self->_log(warn => "Received HUP signal (graceful restart only works in multi-worker mode)")
+                if $weak_self && !$weak_self->{quiet};
+        });
     }
 
     my $scheme = $self->{tls_enabled} ? 'https' : 'http';
@@ -1295,6 +1546,15 @@ async sub _listen_singleworker {
     $loop_class =~ s/^IO::Async::Loop:://;  # Shorten for display
     my $max_conn = $self->effective_max_connections;
     my $tls_status = $self->_tls_status_string;
+
+    # Warn if access_log is a terminal (slow for benchmarks)
+    if ($self->{access_log} && -t $self->{access_log}) {
+        $self->_log(warn =>
+            "access_log is a terminal; this may impact performance. " .
+            "Consider redirecting to a file or setting access_log => undef for benchmarks."
+        );
+    }
+
     $self->_log(info => "PAGI Server listening on $scheme://$self->{host}:$self->{bound_port}/ (loop: $loop_class, max_conn: $max_conn, tls: $tls_status)");
 
     return $self;
@@ -1345,6 +1605,15 @@ sub _listen_multiworker {
     my $mode = $reuseport ? 'reuseport' : 'shared-socket';
     my $max_conn = $self->effective_max_connections;
     my $tls_status = $self->_tls_status_string;
+
+    # Warn if access_log is a terminal (slow for benchmarks)
+    if ($self->{access_log} && -t $self->{access_log}) {
+        $self->_log(warn =>
+            "access_log is a terminal; this may impact performance. " .
+            "Consider redirecting to a file or setting access_log => undef for benchmarks."
+        );
+    }
+
     $self->_log(info => "PAGI Server (multi-worker, $mode) listening on $scheme://$self->{host}:$self->{bound_port}/ with $workers workers (loop: $loop_class, max_conn: $max_conn/worker, tls: $tls_status)");
 
     my $loop = $self->loop;
@@ -1674,6 +1943,9 @@ sub _on_connection {
         max_receive_queue => $self->{max_receive_queue},
         max_ws_frame_size => $self->{max_ws_frame_size},
         sync_file_threshold => $self->{sync_file_threshold},
+        validate_events   => $self->{validate_events},
+        write_high_watermark => $self->{write_high_watermark},
+        write_low_watermark  => $self->{write_low_watermark},
     );
 
     # Track the connection (O(1) hash insert)
@@ -1812,8 +2084,8 @@ async sub _run_lifespan_startup {
     my $scope = {
         type => 'lifespan',
         pagi => {
-            version      => '0.1',
-            spec_version => '0.1',
+            version      => '0.2',
+            spec_version => '0.2',
             is_worker    => $self->{is_worker} // 0,
             worker_num   => $self->{worker_num},  # undef for single-worker, 1-N for multi-worker
         },
@@ -2055,11 +2327,17 @@ sub effective_max_connections {
     # If explicitly set, use that
     return $self->{max_connections} if $self->{max_connections} && $self->{max_connections} > 0;
 
-    # Auto-detect from ulimit
-    my $ulimit = eval { POSIX::sysconf(POSIX::_SC_OPEN_MAX()) } // 1024;
+    # Auto-detect from process soft limit (not system max)
+    # getrlimit returns the actual per-process limit, unlike sysconf which
+    # may return the system-wide maximum on some platforms
+    my $ulimit = eval {
+        my ($soft, $hard) = POSIX::getrlimit(POSIX::RLIMIT_NOFILE());
+        $soft;
+    } // 1024;
 
-    # Reserve 50 FDs for: logging, static files, DB connections, etc.
-    my $headroom = 50;
+    # Reserve FDs for: listen socket, worker IPC pipes, logging,
+    # static files, TLS internals, DB connections, DNS, etc.
+    my $headroom = $self->{fd_headroom} // 100;
 
     # Each connection uses 1 FD (or 2 if proxying)
     my $safe_limit = $ulimit - $headroom;

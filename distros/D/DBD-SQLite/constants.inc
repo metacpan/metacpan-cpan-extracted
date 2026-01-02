@@ -519,6 +519,34 @@ _const_database_connection_configuration_options_3042000_zero()
 
 #endif
 
+#if SQLITE_VERSION_NUMBER >= 3049000
+
+IV
+_const_database_connection_configuration_options_3049000()
+    ALIAS:
+        SQLITE_DBCONFIG_ENABLE_ATTACH_CREATE = SQLITE_DBCONFIG_ENABLE_ATTACH_CREATE
+        SQLITE_DBCONFIG_ENABLE_ATTACH_WRITE = SQLITE_DBCONFIG_ENABLE_ATTACH_WRITE
+        SQLITE_DBCONFIG_ENABLE_COMMENTS = SQLITE_DBCONFIG_ENABLE_COMMENTS
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_database_connection_configuration_options_3049000_zero()
+    ALIAS:
+        SQLITE_DBCONFIG_ENABLE_ATTACH_CREATE = 1
+        SQLITE_DBCONFIG_ENABLE_ATTACH_WRITE = 2
+        SQLITE_DBCONFIG_ENABLE_COMMENTS = 3
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
 #if SQLITE_VERSION_NUMBER >= 3006002
 
 IV
@@ -1287,6 +1315,38 @@ _const_extended_result_codes_3043000_zero()
 
 #endif
 
+#if SQLITE_VERSION_NUMBER >= 3051000
+
+IV
+_const_extended_result_codes_3051000()
+    ALIAS:
+        SQLITE_ERROR_RESERVESIZE = SQLITE_ERROR_RESERVESIZE
+        SQLITE_ERROR_KEY = SQLITE_ERROR_KEY
+        SQLITE_ERROR_UNABLE = SQLITE_ERROR_UNABLE
+        SQLITE_IOERR_BADKEY = SQLITE_IOERR_BADKEY
+        SQLITE_IOERR_CODEC = SQLITE_IOERR_CODEC
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_extended_result_codes_3051000_zero()
+    ALIAS:
+        SQLITE_ERROR_RESERVESIZE = 1
+        SQLITE_ERROR_KEY = 2
+        SQLITE_ERROR_UNABLE = 3
+        SQLITE_IOERR_BADKEY = 4
+        SQLITE_IOERR_CODEC = 5
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
 IV
 _const_flags_for_file_open_operations()
     ALIAS:
@@ -1469,6 +1529,30 @@ _const_flags_for_file_open_operations_3037000_zero()
 
 #endif
 
+#if SQLITE_VERSION_NUMBER >= 3050000
+
+IV
+_const_flags_for_sqlite3_setlk_timeout_3050000()
+    ALIAS:
+        SQLITE_SETLK_BLOCK_ON_CONNECT = SQLITE_SETLK_BLOCK_ON_CONNECT
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_flags_for_sqlite3_setlk_timeout_3050000_zero()
+    ALIAS:
+        SQLITE_SETLK_BLOCK_ON_CONNECT = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
 #if SQLITE_VERSION_NUMBER >= 3008003
 
 IV
@@ -1560,6 +1644,30 @@ IV
 _const_function_flags_3044001_zero()
     ALIAS:
         SQLITE_RESULT_SUBTYPE = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3047000
+
+IV
+_const_function_flags_3047000()
+    ALIAS:
+        SQLITE_SELFORDER1 = SQLITE_SELFORDER1
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_function_flags_3047000_zero()
+    ALIAS:
+        SQLITE_SELFORDER1 = 1
     CODE:
         RETVAL = 0;
     OUTPUT:

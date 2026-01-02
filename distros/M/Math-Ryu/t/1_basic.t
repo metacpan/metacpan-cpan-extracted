@@ -11,7 +11,7 @@ else { warn "\nCompiler HAS_UINT128: 0\n" }
 warn "PV_NV_BUG: ", Math::Ryu::PV_NV_BUG, "\n";
 warn "MAX_DEC_DIG: ", Math::Ryu::MAX_DEC_DIG, "\n";
 
-cmp_ok($Math::Ryu::VERSION, 'eq', '1.07', "\$Math::Ryu::VERSION is as expected");
+cmp_ok($Math::Ryu::VERSION, 'eq', '1.08', "\$Math::Ryu::VERSION is as expected");
 
 cmp_ok(Math::Ryu::MAX_DEC_DIG, '!=', 0, "MAX_DEC_DIG is non-zero");
 
@@ -97,5 +97,9 @@ cmp_ok(nv2s($nv),  'eq', '6.125e+' . "$nvprec", "6.125e+${nvprec}  ok");
 cmp_ok(nv2s(-$nv),  'eq', '-6.125e+' . "$nvprec", "-6.125e+${nvprec}  ok");
 cmp_ok(fmtpy_pp(NV2S($nv)),  'eq', '6.125e+' . "$nvprec", "6.125e+${nvprec} fmtpy_pp ok");
 cmp_ok(fmtpy_pp(NV2S(-$nv)),  'eq', '-6.125e+' . "$nvprec", "-6.125e+${nvprec} fmtpy_pp ok");
+
+like(fx2s(sqrt(2)), qr/^1\.4142135E0$/i, "fx2s() handles sqrt(2) correctly");
+like(fx2s(sqrt(3)), qr/^1\.7320508E0$/i, "fx2s() handles sqrt(3) correctly");
+
 
 done_testing();

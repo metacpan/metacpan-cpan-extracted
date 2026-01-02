@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::Object::BeamerFrame;
-our $VERSION = '20251231.1441'; # VERSION
+our $VERSION = '20260101.1937'; # VERSION
 
 use parent 'BeamerReveal::Object';
 use Carp;
@@ -183,8 +183,8 @@ sub makeSlide {
   # process the frame itself  
   my $fTemplate = $templateStore->fetch( 'html', 'beamerframe.html' );
 
-  $self->{parameters}->{title} ||= '<empty>';
-
+  $self->{parameters}->{title} = _modernize( $self->{parameters}->{title} );
+  
   my $menuTitle;
   if ( exists $self->{parameters}->{toc} ) {
     if( $self->{parameters}->{toc} eq 'titlepage' ) {
@@ -220,6 +220,70 @@ sub makeSlide {
 
 sub _topercent { return sprintf( "%.2f%%", $_[0] * 100 ); }
 
+sub _modernize {
+  my $string = shift;
+  my $dictionary = {		# a
+		    qr/\\`\{?a\}?/ => 'à',
+		    qr/\\'\{?a\}?/ => 'á',
+		    qr/\\"\{?a\}?/ => 'ä',
+		    qr/\\\^\{?a\}?/ => 'â',
+		    qr/\\~\{?a\}?/ => 'ã',
+		    qr/\\=\{?a\}?/ => 'ā',
+		    qr/\\\.\{?a\}?/ => 'ȧ',
+		    qr/\\u\{?a\}?/ => 'ă',
+		    qr/\\v\{?a\}?/ => 'ǎ',
+		    qr/\\c\{?a\}?/ => 'ą',
+		    qr/\\r\{?a\}?/ => 'å',
+		    qr/\\`\{?e\}?/ => 'è',
+		    qr/\\'\{?e\}?/ => 'é',
+		    qr/\\"\{?e\}?/ => 'ë',
+		    qr/\\\^\{?e\}?/ => 'ê',
+		    qr/\\~\{?e\}?/ => 'ẽ',
+		    qr/\\=\{?e\}?/ => 'ē',
+		    qr/\\\.\{?e\}?/ => 'ė',
+		    qr/\\u\{?e\}?/ => 'ĕ',
+		    qr/\\v\{?e\}?/ => 'ě',
+		    qr/\\c\{?e\}?/ => 'ę',
+		    qr/\\`\{?\\?i(?:\{\})?\}?/ => 'ì',
+		    qr/\\'\{?\\?i(?:\{\})?\}?/ => 'í',
+		    qr/\\"\{?\\?i(?:\{\})?\}?/ => 'ï',
+		    qr/\\\^\{?\\?i(?:\{\})?\}?/ => 'î',
+		    qr/\\~\{?\\?i(?:\{\})?\}?/ => 'ĩ',
+		    qr/\\=\{?\\?i(?:\{\})?\}?/ => 'ī',
+		    qr/\\u\{?\\?i(?:\{\})?\}?/ => 'ĭ',
+		    qr/\\v\{?\\?i(?:\{\})?\}?/ => 'ǐ',
+		    qr/\\c\{?\\?i(?:\{\})?\}?/ => 'į',
+		    qr/\\`\{?o\}?/ => 'ò',
+		    qr/\\'\{?o\}?/ => 'ó',
+		    qr/\\"\{?o\}?/ => 'ö',
+		    qr/\\\^\{?o\}?/ => 'ô',
+		    qr/\\~\{?o\}?/ => 'õ',
+		    qr/\\=\{?o\}?/ => 'ō',
+		    qr/\\\.\{?o\}?/ => 'ȯ',
+		    qr/\\u\{?o\}?/ => 'ŏ',
+		    qr/\\v\{?o\}?/ => 'ǒ',
+		    qr/\\c\{?o\}?/ => 'ǫ',
+		    qr/\\`\{?u\}?/ => 'ù',
+		    qr/\\'\{?u\}?/ => 'ú',
+		    qr/\\"\{?u\}?/ => 'ü',
+		    qr/\\\^\{?u\}?/ => 'û',
+		    qr/\\~\{?u\}?/ => 'ũ',
+		    qr/\\=\{?u\}?/ => 'ū',
+		    qr/\\u\{?u\}?/ => 'ŭ',
+		    qr/\\v\{?u\}?/ => 'ǔ',
+		    qr/\\c\{?u\}?/ => 'ų',
+		    qr/\\r\{?u\}?/ => 'ů',
+		    qr/\\c\{?c\}?/ => 'ç',
+		    qr/\\~\{?n\}?/ => 'ñ',
+		    qr/\\oe/ => 'œ',
+		    qr/\\OE/ => 'Œ',
+		   };
+  while( my ( $regexp, $rep ) = each ( %$dictionary ) ) {
+    $string =~ s/$regexp/$rep/g;
+  }
+  return $string;
+}
+
 1;
 
 __END__
@@ -234,7 +298,7 @@ BeamerReveal::Object::BeamerFrame - BeamerFrame object
 
 =head1 VERSION
 
-version 20251231.1441
+version 20260101.1937
 
 =head1 SYNOPSIS
 

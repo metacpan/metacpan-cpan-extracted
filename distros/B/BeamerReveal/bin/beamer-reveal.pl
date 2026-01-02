@@ -57,8 +57,8 @@ $jobname =~ s/\\/\//g;
 my $openinglines =
   [
    '-|-',
-   "  beamer-reveal.pl|v${BeamerReveal::VERSION}  ",
-   '  (C) 2025-2026 Walter PM Daems <wdaems@cpan.org>|GPLv3  ',
+   "--  beamer-reveal.pl|v${BeamerReveal::VERSION} --",
+   '--  (C) 2025-2026 Walter PM Daems <wdaems@cpan.org>|GPLv3 --',
    '-|-',
   ];
 my $closinglines = [ '-|-' ];
@@ -100,7 +100,7 @@ my $rvlFileName = $jobname . ".rvl";
 $logger->log( 0, "- Reading driver file $rvlFileName" );
 my $rvlFile = IO::File->new();
 $rvlFile->open( "<$rvlFileName" )
-  or $logger->fatal( 0, "Error: cannot read reveal file '$rvlFileName'\n" );
+  or $logger->fatal( "Error: cannot read reveal file '$rvlFileName'\n" );
 
 # skip first comment lines
 my $lineCtr = 0;
@@ -139,7 +139,7 @@ eval {
   }
   1;
 } or do {
-  $logger->fatal( 0, "$@" );
+  $logger->fatal( "$@" );
 };
 
 ######################
@@ -202,7 +202,7 @@ my $oFileName = "$jobname.html";
 $logger->log( 2, "- Writing $oFileName" );
 my $oFile = IO::File->new();
 $oFile->open( ">$oFileName" )
-  or $logger->fatal( 0, "Error: cannot write to '$oFileName'" );
+  or $logger->fatal( "Error: cannot write to '$oFileName'" );
 print $oFile
   BeamerReveal::TemplateStore::stampTemplate( $mainTemplate,
 					      { TITLE => 'presentation',
@@ -236,7 +236,7 @@ beamer-reveal.pl - converts the .rvl file and the corresponding pdf file to a fu
 
 =head1 VERSION
 
-version 20251231.1441
+version 20260101.1937
 
 =head1 SYNOPSIS
 

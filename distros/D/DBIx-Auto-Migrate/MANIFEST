@@ -10,3 +10,4 @@ META.yml
 README.md
 t/00-basic.t
 t/01-no-db-test.t
+Dockerfile

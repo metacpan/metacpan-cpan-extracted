@@ -37,6 +37,18 @@ PAGI::App::Router - Unified routing for HTTP, WebSocket, and SSE
     # Static files as fallback
     $router->mount('/' => $static_files);
 
+    # Named routes for URL generation
+    $router->get('/users/:id' => $get_user)->name('users.get');
+    $router->post('/users' => $create_user)->name('users.create');
+
+    my $url = $router->uri_for('users.get', { id => 42 });
+    # Returns: "/users/42"
+
+    # Namespace mounted routers
+    $router->mount('/api/v1' => $api_router)->as('api');
+    $router->uri_for('api.users.get', { id => 42 });
+    # Returns: "/api/v1/users/42"
+
     my $app = $router->to_app;  # Handles all scope types
 
 =cut
@@ -50,14 +62,37 @@ sub new {
         sse_routes       => [],
         mounts           => [],
         not_found        => $args{not_found},
+        _named_routes    => {},   # name => route info
+        _last_route      => undef, # for ->name() chaining
+        _last_mount      => undef, # for ->as() chaining
     }, $class;
 }
 
 sub mount {
     my ($self, $prefix, @rest) = @_;
     $prefix =~ s{/$}{};  # strip trailing slash
-    my ($middleware, $app) = $self->_parse_route_args(@rest);
-    push @{$self->{mounts}}, { prefix => $prefix, app => $app, middleware => $middleware };
+    my ($middleware, $app_or_router) = $self->_parse_route_args(@rest);
+
+    # Check if it's a router object (has named_routes method)
+    my $sub_router;
+    my $app;
+    if (blessed($app_or_router) && $app_or_router->isa('PAGI::App::Router')) {
+        $sub_router = $app_or_router;
+        $app = $sub_router->to_app;
+    } else {
+        $app = $app_or_router;
+    }
+
+    my $mount = {
+        prefix      => $prefix,
+        app         => $app,
+        middleware  => $middleware,
+        sub_router  => $sub_router,  # Keep reference for ->as()
+    };
+    push @{$self->{mounts}}, $mount;
+    $self->{_last_mount} = $mount;
+    $self->{_last_route} = undef;  # Clear route tracking
+
     return $self;
 }
 
@@ -73,13 +108,17 @@ sub websocket {
     my ($self, $path, @rest) = @_;
     my ($middleware, $app) = $self->_parse_route_args(@rest);
     my ($regex, @names) = $self->_compile_path($path);
-    push @{$self->{websocket_routes}}, {
+    my $route = {
         path       => $path,
         regex      => $regex,
         names      => \@names,
         app        => $app,
         middleware => $middleware,
     };
+    push @{$self->{websocket_routes}}, $route;
+    $self->{_last_route} = $route;
+    $self->{_last_mount} = undef;
+
     return $self;
 }
 
@@ -87,13 +126,17 @@ sub sse {
     my ($self, $path, @rest) = @_;
     my ($middleware, $app) = $self->_parse_route_args(@rest);
     my ($regex, @names) = $self->_compile_path($path);
-    push @{$self->{sse_routes}}, {
+    my $route = {
         path       => $path,
         regex      => $regex,
         names      => \@names,
         app        => $app,
         middleware => $middleware,
     };
+    push @{$self->{sse_routes}}, $route;
+    $self->{_last_route} = $route;
+    $self->{_last_mount} = undef;
+
     return $self;
 }
 
@@ -102,7 +145,7 @@ sub route {
 
     my ($middleware, $app) = $self->_parse_route_args(@rest);
     my ($regex, @names) = $self->_compile_path($path);
-    push @{$self->{routes}}, {
+    my $route = {
         method     => uc($method),
         path       => $path,
         regex      => $regex,
@@ -110,6 +153,10 @@ sub route {
         app        => $app,
         middleware => $middleware,
     };
+    push @{$self->{routes}}, $route;
+    $self->{_last_route} = $route;
+    $self->{_last_mount} = undef;  # Clear mount tracking
+
     return $self;
 }
 
@@ -130,6 +177,100 @@ sub _compile_path {
     }
 
     return (qr{^$regex$}, @names);
+}
+
+# ============================================================
+# Named Routes
+# ============================================================
+
+sub name {
+    my ($self, $name) = @_;
+
+    croak "name() called without a preceding route" unless $self->{_last_route};
+    croak "Route name required" unless defined $name && length $name;
+
+    my $route = $self->{_last_route};
+    $route->{name} = $name;
+    $self->{_named_routes}{$name} = {
+        path   => $route->{path},
+        names  => $route->{names},
+        prefix => '',
+    };
+
+    return $self;
+}
+
+sub as {
+    my ($self, $namespace) = @_;
+
+    croak "as() called without a preceding mount" unless $self->{_last_mount};
+    croak "Namespace required" unless defined $namespace && length $namespace;
+
+    my $mount = $self->{_last_mount};
+    my $sub_router = $mount->{sub_router};
+
+    croak "as() requires mounting a router object, not an app coderef"
+        unless $sub_router;
+
+    # Import all named routes from sub-router with namespace prefix
+    my $prefix = $mount->{prefix};
+    for my $name (keys %{$sub_router->{_named_routes}}) {
+        my $info = $sub_router->{_named_routes}{$name};
+        my $full_name = "$namespace.$name";
+        $self->{_named_routes}{$full_name} = {
+            path   => $info->{path},
+            names  => $info->{names},
+            prefix => $prefix . ($info->{prefix} // ''),
+        };
+    }
+
+    return $self;
+}
+
+sub named_routes {
+    my ($self) = @_;
+    return { %{$self->{_named_routes}} };
+}
+
+sub uri_for {
+    my ($self, $name, $path_params, $query_params) = @_;
+
+    $path_params  //= {};
+    $query_params //= {};
+
+    my $info = $self->{_named_routes}{$name}
+        or croak "Unknown route name: '$name'";
+
+    my $path = $info->{path};
+    my $prefix = $info->{prefix} // '';
+
+    # Substitute path parameters
+    for my $param_name (@{$info->{names}}) {
+        unless (exists $path_params->{$param_name}) {
+            croak "Missing required path parameter '$param_name' for route '$name'";
+        }
+        my $value = $path_params->{$param_name};
+        $path =~ s/:$param_name\b/$value/;
+        $path =~ s/\*$param_name\b/$value/;
+    }
+
+    # Prepend mount prefix
+    $path = $prefix . $path if $prefix;
+
+    # Add query string if any
+    if (%$query_params) {
+        my @pairs;
+        for my $key (sort keys %$query_params) {
+            my $value = $query_params->{$key};
+            # Simple URL encoding
+            $key   =~ s/([^A-Za-z0-9\-_.~])/sprintf("%%%02X", ord($1))/ge;
+            $value =~ s/([^A-Za-z0-9\-_.~])/sprintf("%%%02X", ord($1))/ge;
+            push @pairs, "$key=$value";
+        }
+        $path .= '?' . join('&', @pairs);
+    }
+
+    return $path;
 }
 
 sub _parse_route_args {
@@ -580,5 +721,58 @@ can access them via C<< ->path_param('name') >> regardless of which
 router implementation populated them.
 
 For mounted apps, C<root_path> is updated to include the mount prefix.
+
+=head1 NAMED ROUTES
+
+Routes can be named for URL generation using the C<name()> method:
+
+    $router->get('/users/:id' => $handler)->name('users.get');
+    $router->post('/users' => $handler)->name('users.create');
+
+=head2 name
+
+    $router->get('/path' => $handler)->name('route.name');
+
+Assign a name to the most recently added route. Returns C<$self> for chaining.
+Croaks if called without a preceding route or with an empty name.
+
+=head2 uri_for
+
+    my $path = $router->uri_for($name, \%path_params, \%query_params);
+
+Generate a URL path for a named route.
+
+    $router->uri_for('users.get', { id => 42 });
+    # Returns: "/users/42"
+
+    $router->uri_for('users.list', {}, { page => 2, limit => 10 });
+    # Returns: "/users?limit=10&page=2"
+
+Croaks if the route name is unknown or if a required path parameter is missing.
+
+=head2 named_routes
+
+    my $routes = $router->named_routes;
+
+Returns a hashref of all named routes for inspection.
+
+=head2 as
+
+    $router->mount('/api' => $sub_router)->as('api');
+
+Assign a namespace to a mounted router's named routes. This imports all
+named routes from the sub-router into the parent with the namespace prefix.
+
+    my $api = PAGI::App::Router->new;
+    $api->get('/users/:id' => $h)->name('users.get');
+
+    my $main = PAGI::App::Router->new;
+    $main->mount('/api/v1' => $api)->as('api');
+
+    $main->uri_for('api.users.get', { id => 42 });
+    # Returns: "/api/v1/users/42"
+
+Croaks if called without a preceding mount or if the mount target is an
+app coderef rather than a router object.
 
 =cut

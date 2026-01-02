@@ -9,40 +9,118 @@ DESCRIPTION
     as "*##- Please type your reply above this line -##*".
 
 RT VERSION
-    Known to work with RT 4.2.16, 4.4.4, and 5.0.1.
+    Known to work with RT 4.2.16, 4.4.4, 5.0.1, and 6.0.2.
 
 INSTALLATION
-    perl Makefile.PL
-    make
-    make install
-        May need root permissions.
+    As root, build the Makefile and use it to install the extension. This
+    example works with Debian's request-tracker5 package:
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
-        Add these lines:
+     export RTHOME=/usr/share/request-tracker5/lib
+     perl Makefile.PL
+     make
+     make install
 
-            Set(@EmailReplyDelimiters, '##- Please type your reply above this line -##');
-            Plugin('RT::Extension::EmailReplyDelimiter');
+    Edit your RT_SiteConfig.pm file or equivalent, such as
+    /etc/request-tracker5/RT_SiteConfig.pm, and add these lines:
 
-    Restart your web server
+     Set(@EmailReplyDelimiters,
+         '##- Please type your reply above this line -##',
+         qr/<div[^>]+id="appendonsend"/
+     );
+     Plugin('RT::Extension::EmailReplyDelimiter');
+
+    Then, restart the service.
 
 CONFIGURATION
     In RT_SiteConfig.pm, adjust *@EmailReplyDelimiters* so it contains a
-    list of all of the email reply delimiters you will be using. Restart the
-    service after making changes to this configuration item.
+    list of all of the email reply delimiters you will be using.
+
+    Delimiters can be either literal strings (quoted with single or double
+    quotes), or compiled regular expressions (quoted using qr//).
+
+    Restart the service after making changes to this configuration item.
 
     Then adjust the relevant RT templates to include a reply delimiter, on a
     line by itself, in the appropriate place.
 
+  Examples
+    Note that for the extension to be enabled, this line is always required:
+
+     Plugin('RT::Extension::EmailReplyDelimiter');
+
+    The following examples only suggest different reply delimiters; the
+    Plugin() line should always also be present.
+
+    Simplest possible configuration:
+
+     Set(@EmailReplyDelimiters,
+         '##- Please type your reply above this line -##'
+     );
+
+    For this to work, you'll need to add "*##- Please type your reply above
+    this line -##*" to all of your RT templates in the appropriate place.
+    Then, when someone replies to an RT message by email, the quoted message
+    they are replying to will not be included when their reply reaches RT.
+
+    Configuration which finds and removes the quoted message when the sender
+    is using a recent Outlook version, or Outlook webmail, and also includes
+    the template-dependent configuration above:
+
+     Set(@EmailReplyDelimiters,
+         '##- Please type your reply above this line -##',
+         qr/<div[^>]+id="appendonsend"/
+     );
+
+    A configuration which removes the quoted part from most messages sent
+    from Outlook, with two fallback template-dependent delimiters which work
+    as above:
+
+     Set(@EmailReplyDelimiters,
+         # New Outlook and webmail put this right before the quoted text starts:
+         qr/<div[^>]+id="appendonsend"/,
+ 
+         # Mobile Outlook puts this around the quoted message:
+         qr/<div[^>]+id="divRplyFwdMsg"/,
+ 
+         # Classic Outlook inserts a div like this before quoted text:
+         '<div style="border:none;border-top:solid #E1E1E1 1.0pt;padding:3.0pt 0in 0in 0in">',
+ 
+         # Outlook puts this in the plain text version - a line made of
+         # underscores then From on the line below that, with a Windows style
+         # newline:
+         "________________________________\r\nFrom: ",
+ 
+         # Put these in the RT templates themselves, so we can detect and remove
+         # the quoted part of replies even if none of the above matches:
+         '##- Please type your reply above this line.',
+         '##- Do not edit quoted section when replying.',
+     );
+
+    The benefit of the more complex configuration is that it can strip all
+    of the quoted text, not leaving any header parts. The downside is that
+    if someone *forwards* an email from Outlook to RT, the forwarded content
+    is likely to be lost.
+
 ISSUES AND CONTRIBUTIONS
     The project is held on Codeberg <https://codeberg.org>; its issue
     tracker is at
-    <https://codeberg.org/a-j-wood/rt-extension-emailreplydelimiter/issues>.
+    <https://codeberg.org/ivarch/rt-extension-emailreplydelimiter/issues>.
+
+    The following people have contributed to this project, and their
+    assistance is acknowledged and greatly appreciated:
+
+    *   grantemsley <https://codeberg.org/grantemsley> - fixed issues with
+        quoted-printable messages, added support for regular expression
+        delimiters, and provided examples for removing quoted text from
+        messages sent from Outlook (#1
+        <https://codeberg.org/ivarch/rt-extension-emailreplydelimiter/pulls/
+        1>).
 
 LICENSE AND COPYRIGHT
-    Copyright 2023 Andrew Wood.
+    Copyright 2023, 2026 Andrew Wood.
 
     License GPLv3+: GNU GPL version 3 or later:
-    https://gnu.org/licenses/gpl.html
+    <https://gnu.org/licenses/gpl.html>
 
     This is free software: you are free to change and redistribute it. There
     is NO WARRANTY, to the extent permitted by law.

@@ -258,6 +258,6 @@ L<PAGI::Middleware> - Base class for middleware
 
 L<PAGI::Middleware::RateLimit> - HTTP rate limiting
 
-L<PAGI::Middleware::WebSocket::Heartbeat> - WebSocket keepalive
+L<PAGI::WebSocket> - WebSocket helper with native keepalive support
 
 =cut

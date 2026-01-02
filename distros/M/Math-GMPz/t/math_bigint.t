@@ -1083,7 +1083,7 @@ else {
 }
 
 my $c = $zop <=> $bitop;
-if($c > 0) {print "ok 120\n"}
+if($c == 1) {print "ok 120\n"}
 else {
   warn "\nexpected a positive value, got $c\n";
   print "not ok 120\n";
@@ -1098,7 +1098,7 @@ else {
 $zop *= -2; # -34
 
 $c = $zop <=> $bitop;
-if($c < 0) {print "ok 122\n"}
+if($c == -1) {print "ok 122\n"}
 else {
   warn "\nexpected a negative value, got $c\n";
   print "not ok 122\n";

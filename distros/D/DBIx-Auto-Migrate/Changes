@@ -12,3 +12,5 @@
 	- Skipping tests if no postgresql
 0.7 Wed Dec 31 11:38:13 AM CET 2025
 	- Test for cases where no real db tests can be run.
+0.8 Thu Jan  1 10:25:02 PM CET 2026
+	- Fixing indentation typo in docs.

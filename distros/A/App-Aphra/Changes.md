@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.2.5] - 2026-01-01
+
+### Fixed
+
+- Don't recreate files that already exist in the output directory
+- Skip processing source files when the output file already exists (e.g., from redirects)
+- Emit warnings when skipping file processing to avoid overwriting existing files
+
 ## [0.2.4] - 2024-11-27
 
 ### Fixed

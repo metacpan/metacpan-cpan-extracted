@@ -9,7 +9,7 @@
 use strict;
 use warnings;
 use Future::AsyncAwait;
-use IO::Async::Loop;
+use Future::IO;
 
 # Drain the request body - keeps reading http.request events until
 # we get one with more => 0 (end of body) or a non-request event.
@@ -30,9 +30,6 @@ async sub app {
     my ($scope, $receive, $send) = @_;
 
     die "Unsupported scope type: $scope->{type}" if $scope->{type} ne 'http';
-
-    # Get the event loop for non-blocking delays
-    my $loop = IO::Async::Loop->new;
 
     # First, drain any request body
     await drain_request($receive);
@@ -66,11 +63,7 @@ async sub app {
         }
 
         await $send->({ type => 'http.response.body', body => $body, more => $more });
-
-        # Sleep 1 second between chunks (non-blocking - yields to event loop)
-        if ($more && $loop) {
-            await $loop->delay_future(after => 1);
-        }
+        await Future::IO->sleep(1) if $more;
     }
 
     # Check disconnect before sending trailers

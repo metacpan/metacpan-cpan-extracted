@@ -324,7 +324,7 @@ subtest 'default ws and sse idle timeouts' => sub {
     );
 
     # Default should be 0 (disabled) or some reasonable value
-    # For now, default is 0 (disabled, rely on middleware like WebSocket::Heartbeat)
+    # For now, default is 0 (disabled, use $ws->keepalive() or $sse->keepalive())
     is($server->{ws_idle_timeout}, 0, 'default ws_idle_timeout is 0 (disabled)');
     is($server->{sse_idle_timeout}, 0, 'default sse_idle_timeout is 0 (disabled)');
 };

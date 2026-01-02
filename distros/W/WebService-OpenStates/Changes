@@ -1,0 +1,10 @@
+Changes file for WebService::OpenStates
+
+1.01      2026-01-01 19:52:08-05:00 America/New_York
+
+  - Sort results by legislators' last names.
+  - Fix typo in POD.
+
+1.00      2026-01-01 06:57:59-05:00 America/New_York
+
+  - First version, released on an unsuspecting world.

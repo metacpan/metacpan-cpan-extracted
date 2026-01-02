@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::Log;
-our $VERSION = '20251231.1441'; # VERSION
+our $VERSION = '20260101.1937'; # VERSION
 
 use parent 'Exporter';
 use Carp;
@@ -34,7 +34,6 @@ sub new {
   $self->{tasks} = [];
 
   $self->{termwidth} = $self->_terminal_width() - 2;
-  $self->{extra} = ' ';
   $self->{barsize} = $self->{termwidth} - $self->{labelsize} - $self->{activitysize} - 12;
   
   $self->{logfile} = IO::File->new();
@@ -44,7 +43,7 @@ sub new {
   # build opening lines for logfile
   say {$self->{logfile}} _formatLines( $self->{opening}, 76 );
   # build opening lines for terminal
-  print _formatLines( $self->{opening}, $self->{termwidth}, $self->{extra} );
+  print _formatLines( $self->{opening}, $self->{termwidth} );
   
   $logger = $self;
   
@@ -151,7 +150,7 @@ BeamerReveal::Log - Log
 
 =head1 VERSION
 
-version 20251231.1441
+version 20260101.1937
 
 =head1 SYNOPSIS
 

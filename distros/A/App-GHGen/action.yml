@@ -1,0 +1,190 @@
+name: 'GHGen Workflow Analyzer'
+description: 'Analyze GitHub Actions workflows and suggest optimizations'
+author: 'Nigel Horne'
+
+branding:
+  icon: 'check-circle'
+  color: 'blue'
+
+inputs:
+  github-token:
+    description: 'GitHub token for commenting on PRs'
+    required: true
+    default: ${{ github.token }}
+  
+  mode:
+    description: 'Action mode: comment, auto-fix, or pr'
+    required: false
+    default: 'comment'
+  
+  auto-fix:
+    description: 'Automatically fix issues (true/false)'
+    required: false
+    default: 'false'
+  
+  create-pr:
+    description: 'Create a PR with fixes (true/false)'
+    required: false
+    default: 'false'
+  
+  perl-version:
+    description: 'Perl version to use'
+    required: false
+    default: '5.40'
+
+outputs:
+  issues-found:
+    description: 'Number of issues found'
+    value: ${{ steps.analyze.outputs.issues }}
+  
+  fixes-applied:
+    description: 'Number of fixes applied'
+    value: ${{ steps.analyze.outputs.fixes }}
+  
+  comment-url:
+    description: 'URL of the comment (if created)'
+    value: ${{ steps.comment.outputs.url }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Perl
+      uses: shogo82148/actions-setup-perl@v1
+      with:
+        perl-version: ${{ inputs.perl-version }}
+      shell: bash
+    
+    - name: Install App::GHGen
+      shell: bash
+      run: |
+        cpanm --notest --quiet App::cpanminus
+        cpanm --notest --quiet YAML::XS Path::Tiny Term::ANSIColor
+        # Install from local path if testing, otherwise from CPAN
+        if [ -f "${{ github.action_path }}/lib/App/GHGen.pm" ]; then
+          cd ${{ github.action_path }}
+          cpanm --notest --installdeps .
+          cpanm --notest .
+        else
+          cpanm --notest App::GHGen
+        fi
+    
+    - name: Analyze workflows
+      id: analyze
+      shell: bash
+      env:
+        AUTO_FIX: ${{ inputs.auto-fix }}
+      run: |
+        echo "Running GHGen analysis..."
+        
+        # Run analysis and capture output
+        if [ "$AUTO_FIX" = "true" ]; then
+          output=$(ghgen analyze --fix 2>&1)
+          exit_code=$?
+        else
+          output=$(ghgen analyze 2>&1)
+          exit_code=$?
+        fi
+        
+        echo "$output"
+        
+        # Extract metrics
+        issues=$(echo "$output" | grep "Total issues found:" | awk '{print $NF}')
+        fixes=$(echo "$output" | grep "Fixes applied:" | awk '{print $NF}')
+        
+        echo "issues=${issues:-0}" >> $GITHUB_OUTPUT
+        echo "fixes=${fixes:-0}" >> $GITHUB_OUTPUT
+        
+        # Save full output for commenting
+        echo "$output" > /tmp/ghgen-analysis.txt
+        
+        exit 0  # Don't fail the action if issues found
+    
+    - name: Generate comment
+      if: github.event_name == 'pull_request' && inputs.mode == 'comment'
+      id: generate-comment
+      shell: bash
+      run: |
+        cat > /tmp/comment.md << 'EOF'
+        ## 🔍 GHGen Workflow Analysis
+        
+        EOF
+        
+        # Add analysis results
+        if [ -f /tmp/ghgen-analysis.txt ]; then
+          echo '```' >> /tmp/comment.md
+          cat /tmp/ghgen-analysis.txt >> /tmp/comment.md
+          echo '```' >> /tmp/comment.md
+        fi
+        
+        # Add recommendations
+        issues=${{ steps.analyze.outputs.issues }}
+        if [ "$issues" -gt 0 ]; then
+          cat >> /tmp/comment.md << 'EOF'
+        
+        ### 💡 Recommendations
+        
+        Run `ghgen analyze --fix` locally to automatically apply these fixes, or enable auto-fix mode in this action:
+        
+        ```yaml
+        - uses: nigelhorne/ghgen-action@v1
+          with:
+            auto-fix: true
+        ```
+        
+        EOF
+        fi
+        
+        cat /tmp/comment.md
+    
+    - name: Comment on PR
+      if: github.event_name == 'pull_request' && inputs.mode == 'comment' && steps.analyze.outputs.issues > 0
+      id: comment
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+          const fs = require('fs');
+          const comment = fs.readFileSync('/tmp/comment.md', 'utf8');
+          
+          const { data } = await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: comment
+          });
+          
+          core.setOutput('url', data.html_url);
+          return data.html_url;
+    
+    - name: Create PR with fixes
+      if: inputs.create-pr == 'true' && steps.analyze.outputs.fixes > 0
+      uses: peter-evans/create-pull-request@v6
+      with:
+        token: ${{ inputs.github-token }}
+        commit-message: 'chore: optimize GitHub Actions workflows'
+        title: '🤖 Optimize GitHub Actions workflows'
+        body: |
+          ## Automated Workflow Optimization
+          
+          This PR was automatically created by GHGen to optimize your GitHub Actions workflows.
+          
+          ### Changes Applied
+          
+          - ✅ Updated action versions to latest
+          - ✅ Added dependency caching
+          - ✅ Added security permissions
+          - ✅ Added concurrency controls
+          - ✅ Optimized workflow triggers
+          
+          ### Fixes Applied: ${{ steps.analyze.outputs.fixes }}
+          
+          Please review these changes and merge if they look good!
+          
+          ---
+          *Generated by [GHGen](https://github.com/nigelhorne/ghgen)*
+        branch: ghgen-optimize-workflows
+        delete-branch: true
+        labels: |
+          automation
+          github-actions
+          optimization

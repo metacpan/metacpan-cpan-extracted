@@ -163,7 +163,7 @@ sub _build_scope {
 
     my $scope = {
         type         => 'http',
-        pagi         => { version => '0.1', spec_version => '0.1' },
+        pagi         => { version => '0.2', spec_version => '0.2' },
         http_version => '1.1',
         method       => $method,
         scheme       => 'http',
@@ -272,7 +272,7 @@ sub websocket {
 
     my $scope = {
         type         => 'websocket',
-        pagi         => { version => '0.1', spec_version => '0.1' },
+        pagi         => { version => '0.2', spec_version => '0.2' },
         http_version => '1.1',
         scheme       => 'ws',
         path         => $path,
@@ -357,10 +357,15 @@ sub sse {
         push @headers, ['cookie', $cookie];
     }
 
+    # SSE supports all HTTP methods (GET is default, but POST/PUT work with
+    # modern libraries like fetch-event-source used by htmx4, datastar, etc.)
+    my $method = uc($opts{method} // 'GET');
+
     my $scope = {
         type         => 'sse',
-        pagi         => { version => '0.1', spec_version => '0.1' },
+        pagi         => { version => '0.2', spec_version => '0.2' },
         http_version => '1.1',
+        method       => $method,
         scheme       => 'http',
         path         => $path,
         query_string => $query_string,
@@ -395,7 +400,7 @@ sub start {
 
     my $scope = {
         type  => 'lifespan',
-        pagi  => { version => '0.1', spec_version => '0.1' },
+        pagi  => { version => '0.2', spec_version => '0.2' },
         state => $self->{state},
     };
 

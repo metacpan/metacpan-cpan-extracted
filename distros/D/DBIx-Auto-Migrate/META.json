@@ -39,7 +39,7 @@
    "provides" : {
       "DBIx::Auto::Migrate" : {
          "file" : "lib/DBIx/Auto/Migrate.pm",
-         "version" : "0.7"
+         "version" : "0.8"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "url" : "https://github.com/sergiotarxz/Perl-DBIx-Auto-Migrate"
       }
    },
-   "version" : "0.7",
+   "version" : "0.8",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -4,10 +4,13 @@
 requires 'perl', '5.018';
 
 # Core async framework
-requires 'IO::Socket::IP', '0.43'; # Without this IO::Async doesn't work as well 
+requires 'IO::Socket::IP', '0.43'; # Without this IO::Async doesn't work as well
 requires 'IO::Async', '0.802';  # Includes IO::Async::Function for worker pools
 requires 'Future', '0.50';
 requires 'Future::AsyncAwait', '0.66';
+
+# Loop-agnostic async I/O (for apps - optional but recommended)
+recommends 'Future::IO', '0.16';  # Provides sleep, read, write without loop coupling
 
 # HTTP parsing
 requires 'HTTP::Parser::XS', '0.17';

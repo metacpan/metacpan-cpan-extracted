@@ -7,6 +7,7 @@ cpanfile
 lib/Daje/Workflow.pm
 lib/Daje/Workflow/Activities.pm
 lib/Daje/Workflow/Activities/Closed.pm
+lib/Daje/Workflow/Activities/Delete.pm
 lib/Daje/Workflow/Activities/Document/Builder.pm
 lib/Daje/Workflow/Activities/Files/Save.pm
 lib/Daje/Workflow/Activities/Save.pm
@@ -27,6 +28,7 @@ lib/Daje/Workflow/Errors/Error.pm
 lib/Daje/Workflow/Loader.pm
 lib/Daje/Workflow/Observers.pm
 lib/Daje/Workflow/Roadmap/Load.pm
+lib/testbench/filesave.pl
 minil.toml
 script/documents.pl
 script/generate.pl

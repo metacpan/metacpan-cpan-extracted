@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::Log::Ansi;
-our $VERSION = '20251231.1441'; # VERSION
+our $VERSION = '20260101.1937'; # VERSION
 
 use parent 'BeamerReveal::Log';
 use Carp;
@@ -36,9 +36,9 @@ sub progress {
   $task->{activity} = $activity if defined( $activity );
   $task->{progress} = $progress;
   _ansi_down( $taskId ) if( $taskId ); _ansi_clr_eol();
-  print ' ' . BeamerReveal::Log::_bar_line( $task->{label}, $self->{labelsize},
-					    $task->{activity}, $self->{activitysize},
-					    $progress, $task->{total}, $self->{barsize} );
+  print BeamerReveal::Log::_bar_line( $task->{label}, $self->{labelsize},
+				      $task->{activity}, $self->{activitysize},
+				      $progress, $task->{total}, $self->{barsize} );
   print "\n";
   _ansi_up( $taskId + 1 );
 }
@@ -75,7 +75,7 @@ BeamerReveal::Log::Ansi - Log::Ansi
 
 =head1 VERSION
 
-version 20251231.1441
+version 20260101.1937
 
 =head1 SYNOPSIS
 

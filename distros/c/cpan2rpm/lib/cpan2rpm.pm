@@ -3,7 +3,7 @@ package cpan2rpm;
 use strict;
 use warnings;
 
-our $VERSION = "2.045";
+our $VERSION = "2.046";
 
 1;
 

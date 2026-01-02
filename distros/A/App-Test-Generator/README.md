@@ -1,10 +1,10 @@
 # NAME
 
-App::Test::Generator - Generate fuzz and corpus-driven test harnesses
+App::Test::Generator - Generate fuzz and corpus-driven test harnesses from test schemas
 
 # VERSION
 
-Version 0.22
+Version 0.25
 
 # SYNOPSIS
 

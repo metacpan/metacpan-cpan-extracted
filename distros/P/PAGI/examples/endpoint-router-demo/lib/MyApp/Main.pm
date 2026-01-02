@@ -182,7 +182,7 @@ async sub home {
 
             sse.addEventListener('metrics', (e) => {
                 const data = JSON.parse(e.data);
-                logSse('Metrics: requests=' + data.requests + ' ws_active=' + data.ws_active + ' seq=' + data.sse_seq, 'event');
+                logSse('Metrics: requests=' + data.requests + ' ws_active=' + data.ws_active + ' ws_msgs=' + (data.ws_messages || 0) + ' seq=' + data.sse_seq, 'event');
             });
 
             sse.onerror = () => {
@@ -274,7 +274,7 @@ async sub ws_echo {
     my ($self, $ws) = @_;
 
     await $ws->accept;
-    $ws->start_heartbeat(25);
+    await $ws->keepalive(25);
 
     # Access metrics via $ws->state (populated by Lifespan startup)
     my $metrics = $ws->state->{metrics};
@@ -328,13 +328,25 @@ async sub sse_metrics {
         );
     }
 
+    # Enable keepalive to prevent proxy timeouts
+    await $sse->keepalive(15);
+
+    # Log disconnect reason - useful for debugging connection issues
+    $sse->on_close(sub {
+        my ($sse, $reason) = @_;
+        # In production, you might track this in metrics or logs
+        warn "SSE client disconnected: $reason\n"
+            unless $reason eq 'client_closed';  # Only log unexpected disconnects
+    });
+
+    # Send metrics every 2 seconds using loop-agnostic every()
+    # Requires Future::IO to be installed
     await $sse->every(2, async sub {
         $metrics->{sse_seq}++;
-
         await $sse->send_event(
             event => 'metrics',
             data  => $metrics,
-            id    => $metrics->{sse_seq},  # Browser tracks this for reconnection
+            id    => $metrics->{sse_seq},
         );
     });
 }

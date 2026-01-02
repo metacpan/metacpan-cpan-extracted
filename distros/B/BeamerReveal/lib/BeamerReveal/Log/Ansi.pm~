@@ -1,0 +1,76 @@
+# -*- cperl -*-
+# ABSTRACT: Log::Ansi
+
+=head1 SYNOPSIS
+
+Logging facility for Ansi terminal
+
+=cut
+
+package BeamerReveal::Log::Ansi;
+# VERSION
+
+use parent 'BeamerReveal::Log';
+use Carp;
+use Term::ReadKey;
+
+=method new()
+
+
+=cut
+
+sub new {
+  my $class =  shift;
+  my $self = { @_ };
+  $class = (ref $class ? ref $class : $class );
+  bless $self, $class;
+  return $self;
+}
+
+=method activate()
+
+=cut
+
+sub activate {
+  my $self = shift;
+  my $nofTasks = @{$self->{tasks}};
+  # make initial drawing
+  for( my $i = 0; $i < $nofTasks; ++$i ) {
+    $self->progress( $i, 0 );
+  }
+}
+
+sub progress {
+  my $self = shift;
+  my ( $taskId, $progress, $activity, $total ) = @_;
+  my $task = $self->{tasks}->[$taskId];
+  $task->{total} = $total if defined( $total );
+  $task->{activity} = $activity if defined( $activity );
+  $task->{progress} = $progress;
+  _ansi_down( $taskId ) if( $taskId ); _ansi_clr_eol();
+  print ' ' . BeamerReveal::Log::_bar_line( $task->{label}, $self->{labelsize},
+					    $task->{activity}, $self->{activitysize},
+					    $progress, $task->{total}, $self->{barsize} );
+  print "\n";
+  _ansi_up( $taskId + 1 );
+}
+
+sub finalize {
+  my $self = shift;
+  _ansi_down( scalar @{$self->{tasks}} );
+  print BeamerReveal::Log::_formatLines( $self->{closing}, $self->{termwidth}, $self->{extra} );
+  $self->log( '0', 'Done' );
+}
+
+sub _ansi_up        { print "\e[" . $_[0] . "A"; }
+sub _ansi_down      { print "\e[" . $_[0] . "B"; }
+sub _ansi_cr        { print "\r"; }
+sub _ansi_clr_eol   { print "\e[K"; }
+
+sub _terminal_width {
+  my $self = shift;
+  my ($cols, $rows) = Term::ReadKey::GetTerminalSize();
+  return $cols;
+};
+
+1;

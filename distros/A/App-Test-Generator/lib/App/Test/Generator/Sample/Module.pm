@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 NAME
 
@@ -65,7 +65,7 @@ sub validate_email {
 Calculate age from birth year.
 
 Parameters:
-  $birth_year - integer (1900-2024), year of birth
+  $birth_year - integer (1900-2025), year of birth
 
 Returns:
   Age in years (integer)
@@ -77,9 +77,9 @@ sub calculate_age {
 
     croak "Birth year required" unless defined $birth_year;
     croak "Birth year must be a number" unless $birth_year =~ /^\d+$/;
-    croak "Birth year out of range" unless $birth_year >= 1900 && $birth_year <= 2024;
+    croak "Birth year out of range" unless $birth_year >= 1900 && $birth_year <= 2025;
 
-    my $current_year = 2024;
+    my $current_year = 2025;
     return $current_year - $birth_year;
 }
 

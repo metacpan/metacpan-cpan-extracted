@@ -21,6 +21,14 @@ use strict;
 use warnings;
 use Future::AsyncAwait;
 
+# Try to load Future::IO for loop-agnostic sleep, fall back to immediate if not available
+my $HAS_FUTURE_IO = eval { require Future::IO; 1 };
+
+sub maybe_sleep {
+    my ($seconds) = @_;
+    return $HAS_FUTURE_IO ? Future::IO->sleep($seconds) : Future->done;
+}
+
 use PAGI::App::Router;
 use PAGI::Response;
 use PAGI::Request;
@@ -43,7 +51,7 @@ async sub send_welcome_email {
 
     # This is NON-BLOCKING - yields to event loop while "waiting"
     # In real code: await $http_client->post_async($email_api, ...)
-    await IO::Async::Loop->new->delay_future(after => 2);
+    await maybe_sleep(2);
 
     warn "[async] Email sent to $email!\n";
 }
@@ -52,7 +60,7 @@ async sub send_welcome_email {
 async sub log_to_analytics {
     my ($event, $data) = @_;
     warn "[async] Logging '$event' to analytics...\n";
-    await IO::Async::Loop->new->delay_future(after => 1);
+    await maybe_sleep(1);
     warn "[async] Analytics logged!\n";
 }
 
@@ -114,12 +122,14 @@ sub run_blocking_task {
 }
 
 #---------------------------------------------------------
-# PATTERN 3: Quick Sync Work (loop->later)
+# PATTERN 3: Quick Sync Work (after await)
 #
 # For very fast synchronous operations that just need to
-# run after the response is sent. Must be FAST (<10ms).
+# run after the response is sent. Since we use async/await,
+# code after `await $res->json(...)` already runs after the
+# response is sent. Just call your sync function directly.
 #
-# WARNING: Any blocking calls here will block ALL requests!
+# Must be FAST (<10ms) - blocking calls block ALL requests!
 #---------------------------------------------------------
 
 sub quick_sync_task {
@@ -192,10 +202,8 @@ $router->get('/async' => async sub {
     fire_and_forget(send_welcome_email('user@example.com'));
     fire_and_forget(log_to_analytics('page_view', { path => '/' }));
 
-    # Quick sync work - runs after this handler yields
-    $res->loop->later(sub {
-        quick_sync_task("Logging request");
-    });
+    # Quick sync work - runs after response is sent (we already awaited above)
+    quick_sync_task("Logging request");
 });
 
 # GOOD: CPU-bound work in subprocess
@@ -233,10 +241,8 @@ $router->post('/signup' => async sub {
     fire_and_forget(send_welcome_email($email));
     fire_and_forget(log_to_analytics('signup', { email => $email }));
 
-    # Quick sync logging
-    $res->loop->later(sub {
-        quick_sync_task("New signup: $email");
-    });
+    # Quick sync logging - runs after response (we already awaited above)
+    quick_sync_task("New signup: $email");
 
     # For CPU-intensive work (e.g., generating PDF):
     # run_blocking_task("generate_welcome_pdf", 5);

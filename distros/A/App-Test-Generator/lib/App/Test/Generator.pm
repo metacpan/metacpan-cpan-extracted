@@ -34,7 +34,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use constant {
 	DEFAULT_ITERATIONS => 50,
@@ -45,11 +45,11 @@ use constant CONFIG_TYPES => ('test_nuls', 'test_undef', 'test_empty', 'test_non
 
 =head1 NAME
 
-App::Test::Generator - Generate fuzz and corpus-driven test harnesses
+App::Test::Generator - Generate fuzz and corpus-driven test harnesses from test schemas
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =head1 SYNOPSIS
 
@@ -1491,10 +1491,15 @@ sub generate
 		if($output{'returns_self'}) {
 			$call_code .= "ok(\$result eq \$obj, \"$function returns self\")";
 		}
-		$position_code = "\$result = \$obj->$function(\@alist);";
-	} elsif(defined($module)) {
-		$call_code = "\$result = $module\->$function(\$input);";
-		$position_code = "\$result = $module\->$function(\@alist);";
+		$position_code = "(\$result = scalar(\@alist) == 1) ? \$obj->$function(\$alist[0]) : (scalar(\@alist) == 0) ? \$obj->$function() : \$obj->$function(\@alist);";
+	} elsif(defined($module) && length($module)) {
+		if($function eq 'new') {
+			$call_code = "\$result = ${module}\->$function(\$input);";
+			$position_code = "(\$result = scalar(\@alist) == 1) ? ${module}\->$function(\$alist[0]) : (scalar(\@alist) == 0) ? ${module}\->$function() : ${module}\->$function(\@alist);";
+		} else {
+			$call_code = "\$result = ${module}::$function(\$input);";
+			$position_code = "(\$result = scalar(\@alist) == 1) ? ${module}::$function(\$alist[0]) : (scalar(\@alist) == 0) ? ${module}::$function() : ${module}::$function(\@alist);";
+		}
 	} else {
 		$call_code = "\$result = $function(\$input);";
 		$position_code = "\$result = $function(\@alist);";

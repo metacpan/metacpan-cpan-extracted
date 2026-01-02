@@ -143,16 +143,14 @@ Route Server-Sent Events by path:
 
   my $router = PAGI::App::Router->new;
 
-  # SSE clock
+  # SSE stream
   $router->sse('/events' => async sub {
       my ($scope, $receive, $send) = @_;
       my $sse = PAGI::SSE->new($scope, $receive, $send);
 
-      await $sse->start;
-
-      await $sse->every(1, async sub {
-          await $sse->send_event("Time: " . time);
-      });
+      await $sse->keepalive(30);  # Prevent proxy timeouts
+      await $sse->send_event("Connected at: " . time);
+      await $sse->run;  # Wait for disconnect
   });
 
   # SSE with path parameters
@@ -401,11 +399,9 @@ SSE handlers receive C<($self, $sse)>:
   async sub handle_events {
       my ($self, $sse) = @_;
 
-      await $sse->start;
-
-      await $sse->every(1, async sub {
-          await $sse->send_event("Time: " . time);
-      });
+      await $sse->keepalive(30);
+      await $sse->send_event("Connected at: " . time);
+      await $sse->run;
   }
 
   # SSE with path parameters
@@ -703,10 +699,9 @@ Here's a complete working example demonstrating all features:
 
   async sub events {
       my ($self, $sse) = @_;
-      await $sse->start;
-      await $sse->every(1, async sub {
-          await $sse->send_json({ time => time });
-      });
+      await $sse->keepalive(30);
+      await $sse->send_json({ connected => time });
+      await $sse->run;
   }
 
   1;
@@ -890,8 +885,8 @@ For real-time features with multiple WebSocket clients:
 
       await $ws->accept;
 
-      # Keep connection alive through proxies/NAT (sends JSON ping every 25s)
-      $ws->start_heartbeat(25);
+      # Keep connection alive through proxies/NAT (protocol-level ping every 25s)
+      await $ws->keepalive(25);
 
       # Join room
       $rooms{$room}{$client_id} = $ws;
@@ -929,24 +924,25 @@ Server-Sent Events are ideal for real-time dashboards:
 
   my $router = PAGI::App::Router->new;
 
-  $router->get('/events' => async sub {
+  $router->sse('/events' => async sub {
       my ($scope, $receive, $send) = @_;
 
       my $sse = PAGI::SSE->new($scope, $receive, $send);
-      await $sse->start;
 
-      # Enable keepalive to prevent timeout
-      $sse->keepalive(15);
+      # Enable keepalive to prevent proxy timeout
+      await $sse->keepalive(15);
 
-      # Send updates every second
-      await $sse->every(1, async sub {
-          await $sse->send_json({
-              cpu => rand(100),
-              memory => rand(100),
-              requests => int(rand(1000)),
-              timestamp => time(),
-          }, event => 'metrics');
+      # Subscribe to metrics updates (your pub/sub system)
+      my $sub_id = subscribe_metrics(sub {
+          my ($metrics) = @_;
+          $sse->try_send_event(
+              event => 'metrics',
+              data  => $metrics,
+          );
       });
+
+      $sse->on_close(sub { unsubscribe_metrics($sub_id) });
+      await $sse->run;
   });
 
   $router->to_app;
@@ -976,6 +972,7 @@ use C<< ->on_fail() >> to handle errors, then C<< ->retain() >> to prevent
   use strict;
   use warnings;
   use Future::AsyncAwait;
+  use Future::IO;
   use PAGI::App::Router;
   use PAGI::Response;
 
@@ -985,7 +982,7 @@ use C<< ->on_fail() >> to handle errors, then C<< ->retain() >> to prevent
   async sub send_welcome_email {
       my ($email) = @_;
       # In reality: await $http_client->post_async($email_api, ...);
-      await IO::Async::Loop->new->delay_future(after => 2);
+      await Future::IO->sleep(2);
       warn "Email sent to $email\n";
   }
 
@@ -1005,15 +1002,17 @@ use C<< ->on_fail() >> to handle errors, then C<< ->retain() >> to prevent
 
   $router->to_app;
 
-B<Warning:> Using C<< ->retain() >> alone silently swallows errors. Always
-add C<< ->on_fail() >> to log or handle failures.
+B<Warning:> C<< ->retain() >> alone silently swallows errors - always add
+C<< ->on_fail() >> first.
 
-B<Note:> If you're writing middleware or server extensions that inherit from
-L<IO::Async::Notifier>, prefer C<< $self->adopt_future($f) >> instead of
-C<< ->retain() >>. The C<adopt_future> method properly tracks futures and
-propagates errors to the notifier's error handling.
+B<Middleware authors:> If your middleware inherits from L<IO::Async::Notifier>,
+use C<< $self->adopt_future($f) >> instead. It properly tracks futures and
+propagates unhandled errors to the notifier's C<invoke_error> method.
 
 =head2 CPU-Bound Work in Subprocess
+
+B<Note:> This pattern uses L<IO::Async::Function>, which is specific to
+L<PAGI::Server>'s L<IO::Async> backend. It won't work with other PAGI servers.
 
 For blocking or CPU-intensive work, use L<IO::Async::Function> to run in a child process:
 
@@ -1122,8 +1121,8 @@ See C<examples/background-tasks/> for complete working examples.
               my $size = $upload->size;
               my $type = $upload->content_type;
 
-              # Save to disk
-              $upload->save_to('/uploads/' . $filename);
+              # Save to disk (blocking I/O)
+              $upload->move_to('/uploads/' . $filename);
 
               # Or read content
               # my $content = $upload->content;

@@ -1,0 +1,15 @@
+- [ ] implement png version (instead of jpeg version)
+- [ ] think about absolute measures for size of objects?
+- [ ] Upload to CTAN
+- [X] Upload to CPAN
+- [X] Fix the Perl side for packaging to CPAN
+- [ ] Windows installer (for the perl package + the pdftoppm Poppler)
+- [X] improve gobbling of output of subcommands, to show neat log
+- [ ] make menu use short title entries instead of long ones
+- [X] slide transitions
+- [X] check for keys that are not appropriate
+- [X] move to l3build
+- [X] complete LaTeX documentation for poppler / windows build etc.
+- [X] Write Perl documentation
+- [ ] add parts of latex test document as tests
+  

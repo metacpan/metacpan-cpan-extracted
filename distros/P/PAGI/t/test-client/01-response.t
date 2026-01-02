@@ -69,4 +69,57 @@ subtest 'convenience methods' => sub {
     is $res->location, '/redirect-target', 'location';
 };
 
+subtest 'text decoding with charset' => sub {
+    use Encode;
+
+    # UTF-8 with explicit charset
+    my $utf8_body = Encode::encode('UTF-8', "Héllo Wörld");
+    my $res1 = PAGI::Test::Response->new(
+        status  => 200,
+        headers => [['content-type', 'text/plain; charset=utf-8']],
+        body    => $utf8_body,
+    );
+    is $res1->text, "Héllo Wörld", 'text decodes UTF-8 charset';
+    is $res1->content, $utf8_body, 'content returns raw bytes';
+
+    # ISO-8859-1 (Latin-1) charset
+    my $latin1_body = Encode::encode('ISO-8859-1', "café");
+    my $res2 = PAGI::Test::Response->new(
+        status  => 200,
+        headers => [['content-type', 'text/html; charset=ISO-8859-1']],
+        body    => $latin1_body,
+    );
+    is $res2->text, "café", 'text decodes ISO-8859-1 charset';
+
+    # Quoted charset value
+    my $res3 = PAGI::Test::Response->new(
+        status  => 200,
+        headers => [['content-type', 'text/plain; charset="utf-8"']],
+        body    => $utf8_body,
+    );
+    is $res3->text, "Héllo Wörld", 'text handles quoted charset';
+
+    # No charset defaults to UTF-8
+    my $res4 = PAGI::Test::Response->new(
+        status  => 200,
+        headers => [['content-type', 'text/plain']],
+        body    => $utf8_body,
+    );
+    is $res4->text, "Héllo Wörld", 'text defaults to UTF-8 when no charset';
+
+    # No Content-Type header defaults to UTF-8
+    my $res5 = PAGI::Test::Response->new(
+        status => 200,
+        body   => $utf8_body,
+    );
+    is $res5->text, "Héllo Wörld", 'text defaults to UTF-8 when no Content-Type';
+
+    # Empty body
+    my $res6 = PAGI::Test::Response->new(
+        status => 200,
+        body   => '',
+    );
+    is $res6->text, '', 'empty body returns empty string';
+};
+
 done_testing;

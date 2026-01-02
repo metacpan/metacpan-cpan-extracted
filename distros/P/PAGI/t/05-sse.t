@@ -219,6 +219,10 @@ subtest 'SSE disconnect detection' => sub {
         my ($scope, $receive, $send) = @_;
         die "Unsupported scope type: $scope->{type}" if $scope->{type} ne 'sse';
 
+        # Consume the initial sse.request event (body, even if empty for GET)
+        my $req_event = await $receive->();
+        # Should be sse.request with empty body for GET
+
         await $send->({
             type    => 'sse.start',
             status  => 200,
@@ -396,6 +400,96 @@ subtest 'SSE id and retry fields' => sub {
 
         like($response, qr/id: msg-123/, 'id field present');
         like($response, qr/retry: 5000/, 'retry field present');
+    }
+
+    $server->shutdown->get;
+};
+
+# Test 7: SSE with POST method (for htmx/datastar/fetch-event-source)
+subtest 'SSE with POST method' => sub {
+    my $scope_type = '';
+    my $scope_method = '';
+    my $body_received = '';
+
+    my $test_app = async sub {
+        my ($scope, $receive, $send) = @_;
+
+        # Handle lifespan scope
+        if ($scope->{type} eq 'lifespan') {
+            while (1) {
+                my $event = await $receive->();
+                if ($event->{type} eq 'lifespan.startup') {
+                    await $send->({ type => 'lifespan.startup.complete' });
+                }
+                elsif ($event->{type} eq 'lifespan.shutdown') {
+                    await $send->({ type => 'lifespan.shutdown.complete' });
+                    last;
+                }
+            }
+            return;
+        }
+
+        $scope_type = $scope->{type};
+        $scope_method = $scope->{method};
+
+        # Read POST body (sse.request event, like http.request)
+        my $event = await $receive->();
+        if ($event->{type} eq 'sse.request') {
+            $body_received = $event->{body} // '';
+        }
+
+        await $send->({
+            type    => 'sse.start',
+            status  => 200,
+            headers => [ [ 'content-type', 'text/event-stream' ] ],
+        });
+
+        await $send->({ type => 'sse.send', event => 'echo', data => $body_received });
+    };
+
+    my $server = create_server($test_app);
+    my $port = $server->port;
+
+    use IO::Socket::INET;
+    my $sock = IO::Socket::INET->new(
+        PeerAddr => '127.0.0.1',
+        PeerPort => $port,
+        Proto    => 'tcp',
+        Timeout  => 5,
+    );
+
+    SKIP: {
+        skip "Cannot connect", 4 unless $sock;
+
+        my $body = '{"query": "test data"}';
+        my $body_len = length($body);
+
+        print $sock "POST /stream HTTP/1.1\r\n";
+        print $sock "Host: 127.0.0.1:$port\r\n";
+        print $sock "Accept: text/event-stream\r\n";
+        print $sock "Content-Type: application/json\r\n";
+        print $sock "Content-Length: $body_len\r\n";
+        print $sock "\r\n";
+        print $sock $body;
+
+        $sock->blocking(0);
+        my $response = '';
+        my $deadline = time + 3;
+        while (time < $deadline) {
+            my $buf;
+            my $n = sysread($sock, $buf, 4096);
+            if (defined $n && $n > 0) {
+                $response .= $buf;
+            }
+            $loop->loop_once(0.1);
+            last if $response =~ /event: echo/;
+        }
+        close $sock;
+
+        is($scope_type, 'sse', 'POST request with Accept: text/event-stream gets sse scope');
+        is($scope_method, 'POST', 'Method is preserved as POST');
+        like($response, qr/HTTP\/1\.1 200/, 'SSE response is 200 OK');
+        like($response, qr/data: \{"query": "test data"\}/, 'POST body echoed in SSE event');
     }
 
     $server->shutdown->get;

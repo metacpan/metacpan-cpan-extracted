@@ -74,14 +74,4 @@ subtest 'param returns undef when no route params in scope' => sub {
     is($sse->path_params, {}, 'params returns empty hash when no params');
 };
 
-subtest 'every method exists' => sub {
-    my $scope = {
-        type    => 'sse',
-        path    => '/events',
-        headers => [],
-    };
-    my $sse = PAGI::SSE->new($scope, $receive, $send);
-    ok($sse->can('every'), 'every method exists');
-};
-
 done_testing;

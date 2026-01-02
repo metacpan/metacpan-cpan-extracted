@@ -9,7 +9,7 @@ no warnings 'once';
 use Term::ANSIColor qw(:constants);
 use Module::Install::Base;
 use base 'Module::Install::Base';
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use FindBin;
 use File::Glob     ();
@@ -50,14 +50,12 @@ sub RTx {
     $ENV{RTHOME} =~ s{/RT\.pm$}{} if defined $ENV{RTHOME};
     $ENV{RTHOME} =~ s{/lib/?$}{}  if defined $ENV{RTHOME};
     my @try = $ENV{RTHOME} ? ($ENV{RTHOME}, "$ENV{RTHOME}/lib") : ();
-    my $prefix = $ENV{PREFIX};
-    push @INC, "$prefix/lib";
     while (1) {
         my @look = @INC;
         unshift @look, grep {defined and -d $_} @try;
         push @look, grep {defined and -d $_}
-            map { ( "$_/rt5/lib", "$_/lib/rt5", "$_/rt4/lib", "$_/lib/rt4", "$_/lib" ) } @prefixes;
-        last if eval {local @INC = @look; require RT; $RT::LocalPluginPath = '$(DESTDIR)'."$prefix/plugins"; $RT::LocalLibPath};
+            map { ( "$_/rt6/lib", "$_/lib/rt6", "$_/rt5/lib", "$_/lib/rt5", "$_/rt4/lib", "$_/lib/rt4", "$_/lib" ) } @prefixes;
+        last if eval {local @INC = @look; require RT; $RT::LocalLibPath};
 
         warn
             "Cannot find the location of RT.pm that defines \$RT::LocalPath in: @look\n";
@@ -315,4 +313,4 @@ sub _load_rt_handle {
 
 __END__
 
-#line 486
+#line 484

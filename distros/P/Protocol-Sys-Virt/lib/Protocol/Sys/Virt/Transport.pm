@@ -13,7 +13,7 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::Transport v11.10.1;
+package Protocol::Sys::Virt::Transport v11.10.2;
 
 use Carp qw(croak);
 use Log::Any qw($log);
@@ -251,9 +251,9 @@ sub receive {
 sub _send {
     my ($self, $prog, $version, $proc, $type, %args) = @_;
 
-    my $hdr = '';
+    my $hdr = pack('L>', 0);
     my $serial;
-    my $idx    = 0;
+    my $idx    = length($hdr);
     my $status = $args{status} // $msgs->OK;
     if ($type == $msgs->CALL
         or $type == $msgs->CALL_WITH_FDS) {
@@ -285,9 +285,11 @@ sub _send {
             # Add FD count before the call arguments data
         }
 
-        my $len = pack('L>',
-                       4 + length($hdr) + length($args{data} // 0));
-        return $self->{on_send}->( $serial, $len, $hdr, $args{data} );
+        my $length = length($hdr) + length($args{data} // '');
+        croak "Message too large: $length" if $length > $msgs->MAX;
+
+        substr($hdr, 0, 4) = pack('L>', $length);
+        return $self->{on_send}->( $serial, $hdr, $args{data} );
         ###BUG: Send FDs
     }
     elsif ($status == $msgs->ERROR) {
@@ -298,13 +300,16 @@ sub _send {
             $msgs->serialize_Error( $args{error}, $i, $payload );
         }
 
-        my $len = pack('L>', 4 + length($hdr) + length($payload));
-        return $self->{on_send}->( $serial, $len, $hdr, $payload );
+        my $length = length($hdr) + length($payload);
+        croak "Message too large: $length" if $length > $msgs->MAX;
+
+        substr($hdr, 0, 4) = pack('L>', $length);
+        return $self->{on_send}->( $serial, $hdr, $payload );
     }
     elsif ($status == $msgs->CONTINUE) {
-        my $payload;
-        my $i = 0;
+        my $payload = '';
         if ($type == $msgs->STREAM_HOLE) {
+            my $i = 0;
             $msgs->serialize_StreamHole( $args{hole}, $i, $payload );
         }
         elsif ($type == $msgs->STREAM) {
@@ -314,8 +319,11 @@ sub _send {
             croak $log->fatal( "Unsupported frame type $type with status CONTINUE" );
         }
 
-        my $len = pack('L>', 4 + length($hdr) + length($payload // ''));
-        return $self->{on_send}->( $serial, $len, $hdr, $payload );
+        my $length = length($hdr) + length($payload // '');
+        croak "Message too large: $length" if $length > $msgs->MAX;
+
+        substr($hdr, 0, 4) = pack('L>', $length);
+        return $self->{on_send}->( $serial, $hdr, $payload );
     }
     else {
         croak $log->fatal( "Unsupported frame status $status" );
@@ -334,7 +342,7 @@ Protocol::Sys::Virt::Transport - Low level Libvirt connection protocol
 
 =head1 VERSION
 
-v11.10.1
+v11.10.2
 
 Based on LibVirt tag v11.10.0
 

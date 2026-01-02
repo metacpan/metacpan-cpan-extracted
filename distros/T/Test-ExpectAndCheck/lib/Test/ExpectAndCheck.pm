@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2026 -- leonerd@leonerd.org.uk
 
-package Test::ExpectAndCheck 0.07;
+package Test::ExpectAndCheck 0.08;
 
 use v5.14;
 use warnings;
@@ -79,7 +79,7 @@ our $VERBOSE = 0;
 
 =head2 create
 
-   ( $controller, $mock ) = Test::ExpectAndCheck->create;
+   ( $controller, $mock ) = Test::ExpectAndCheck->create( %params );
 
 Objects are created in "entangled pairs" by the C<create> method. The first
 object is called the "controller", and is used by the unit testing script to
@@ -88,17 +88,41 @@ The second object is the "mock", the object to be passed to the code being
 tested, on which the expected method calls are (hopefully) invoked. It will
 have whatever interface is implied by the method call expectations.
 
+Takes the following optional named parameters:
+
+=over 4
+
+=item isa
+
+   isa => [qw( Some Class Names )],
+
+I<Since version 0.08.>
+
+Specifies a list of class names that the mock object will claim to be if
+interrogated by its C<isa> method. This is useful if the code under test will
+use an C<< ->isa >> check on the passed-in mocking object and therefore it
+needs to pretend to be of some particular class.
+
+Note though that no I<actual> method inheritence will take place here. This
+simply provides the C<isa> method. Any actual required behaviour will still
+have to be created using the L</expect> or L</whenever> methods as usual.
+
+=back
+
 =cut
 
 sub create
 {
    my $class = shift;
+   my %params = @_;
 
    my $controller = bless {
       expectations => [],
       whenever     => {},
    }, $class;
-   my $mock = Test::ExpectAndCheck::_Obj->new( $controller );
+   my $mock = Test::ExpectAndCheck::_Obj->new( $controller,
+      isa => $params{isa},
+   );
 
    return ( $controller, $mock );
 }
@@ -204,13 +228,14 @@ sub _stringify
       return qq('$v');
    }
    else {
-      if( $v =~ m/[^\n\x20-\x7E]/ ) {
+      if( $v =~ m/[^\n\r\x20-\x7E]/ ) {
          # string contains something non-printable; just hexdump it all
          $v =~ s{(.)}{sprintf "\\x%02X", ord $1}gse;
       }
       else {
          $v =~ s/([\\'\$\@])/\\$1/g;
          $v =~ s{\n}{\\n}g;
+         $v =~ s{\r}{\\r}g;
       }
       return qq("$v");
    }
@@ -600,9 +625,23 @@ our @CARP_NOT = qw( Test::ExpectAndCheck );
 sub new
 {
    my $class = shift;
-   my ( $controller ) = @_;
+   my ( $controller, %params ) = @_;
 
-   return bless [ $controller ], $class;
+   my $isa = $params{isa} ? [ @{$params{isa}} ] : undef;
+
+   return bless [ $controller, $isa ], $class;
+}
+
+sub isa
+{
+   my $self = shift;
+   my ( $pkg ) = @_;
+
+   if( my $isa = $self->[1] ) {
+      $pkg eq $_ and return 1 for @$isa;
+   }
+
+   return $self->SUPER::isa( $pkg );
 }
 
 sub AUTOLOAD

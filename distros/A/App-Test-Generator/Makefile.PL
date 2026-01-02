@@ -16,7 +16,9 @@ WriteMakefile(
 	VERSION_FROM => 'lib/App/Test/Generator.pm',
 	ABSTRACT_FROM => 'lib/App/Test/Generator.pm',
 	AUTHOR => 'Nigel Horne <njh@nigelhorne.com>',
-	LICENSE => 'GPL',
+	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
+		? ('LICENSE'=> 'GPL')
+		: ()),
 	EXE_FILES => ['bin/fuzz-harness-generator', 'bin/extract-schemas'],
 	MIN_PERL_VERSION => '5.036',
 	PREREQ_PM => {
@@ -37,8 +39,7 @@ WriteMakefile(
 		'Safe' => 0,
 		'Template' => 0,
 		'YAML::XS' => 0
-	},
-	TEST_REQUIRES => {
+	}, TEST_REQUIRES => {
 		'Cwd' => 0,
 		'Data::Random' => 0,
 		'Data::Random::String' => 0,

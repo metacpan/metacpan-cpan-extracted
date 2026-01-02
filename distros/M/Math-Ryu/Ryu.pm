@@ -65,12 +65,12 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 DynaLoader::bootstrap Math::Ryu $VERSION;
 
 my @tagged = qw(
-  d2s ld2s q2s nv2s
+  d2s ld2s q2s nv2s fx2s
   is_NV
   pn pnv pany sn snv sany
   spanyf

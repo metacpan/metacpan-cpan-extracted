@@ -1,0 +1,274 @@
+# -*- cperl -*-
+# ABSTRACT: BeamerFrame object
+
+=head1 SYNOPSIS
+
+Represents a BeamerFrame
+
+=cut
+
+package BeamerReveal::Object::BeamerFrame;
+# VERSION
+
+use parent 'BeamerReveal::Object';
+use Carp;
+
+use Data::Dumper;
+
+use BeamerReveal::TemplateStore;
+use BeamerReveal::MediaManager;
+
+use BeamerReveal::Log;
+
+use Digest::SHA;
+
+=method new()
+
+  $bf = BeamerReveal::Object::BeamerFrame->new( $data, $lines, $linectr )
+
+Generates a beamerframe from the correspond chunk data in the C<.rvl> file.
+
+=over 4
+
+=item . C<$data>
+
+chunkdata to parse
+
+=item . C<$lines>
+
+body lines to parse
+
+=item . C<$lineCtr>
+
+starting line of the chunk (used for error reporting)
+
+=item . C<$bf>
+
+the beamerframe object
+
+=back
+
+=cut
+
+our $maxRawPage;
+sub nofdigits { length( "$_[0]" ) }
+
+sub new {
+  my $class = shift;
+  my ( $chunkData, $lines, $lineCtr ) = @_;
+  
+  $class = (ref $class ? ref $class : $class );
+  my $self = {};
+  bless $self, $class;
+
+  my $logger = $BeamerReveal::Log::logger;
+  
+  $self->{videos}     = [];
+  $self->{audios}     = [];
+  $self->{images}     = [];
+  $self->{iframes}    = [];
+  $self->{animations} = [];
+  ++$lineCtr;
+  for( my $i = 0; $i < @$lines; ++$i ) {
+    ( $lines->[$i] =~ /^-(?<command>\w+):(?<payload>.*)$/ )
+      or $logger->fatal( "Error: syntax incorrect in rvl file on line $lineCtr '$lines->[$i]'\n" );
+    if ( $+{command} eq 'parameters' ) {
+      $self->{parameters} = BeamerReveal::Object::readParameterLine( $+{payload} );
+    }
+    elsif ( $+{command} eq 'video' ) {
+      push @{$self->{videos}}, BeamerReveal::Object::readParameterLine( $+{payload} );
+    }
+    elsif ( $+{command} eq 'audio' ) {
+      push @{$self->{audios}}, BeamerReveal::Object::readParameterLine( $+{payload} );
+    }
+    elsif ( $+{command} eq 'image' ) {
+      push @{$self->{images}}, BeamerReveal::Object::readParameterLine( $+{payload} );
+    }
+    elsif ( $+{command} eq 'iframe' ) {
+      push @{$self->{iframes}}, BeamerReveal::Object::readParameterLine( $+{payload} );
+    }
+    elsif ( $+{command} eq 'animation' ) {
+      push @{$self->{animations}}, BeamerReveal::Object::readParameterLine( $+{payload} );
+      $self->{animations}->[-1]->{tex} = $lines->[++$i];
+    }
+    else {
+      $logger->fatal( "Error: unknown BeamerFrame data on line @{[ $lineCtr + $i ]} '$lines->[$i]'\n" );
+    }
+  }
+
+  # The correctness of this relies on the pages appearing in order in the .rvl file
+  $maxRawPage = $self->{parameters}->{rawpage};
+  
+  return $self;
+}
+
+=method makeSlide()
+
+  $html = $bf->makeSlide( $mediaManager )
+
+generate a HTML slides from this beamerframe.
+
+=over 4
+
+=item . C<$mediaManager>
+
+mediamanager to use, to access all media files (and geneate animations when needed)
+
+=item . C<$html>
+
+HTML of the beamer frame, ready to be interpolated in the reveal framework.
+
+=back
+
+=cut
+
+sub makeSlide {
+  my $self = shift;
+  my ( $i, $mediaManager ) = @_;
+
+  my $logger = $BeamerReveal::Log::logger;
+  $logger->log( 2, "- making slide $i" );
+  
+  my $templateStore = BeamerReveal::TemplateStore->new();
+  my $content = '';
+  
+  #############################
+  # process all video material
+  foreach my $video (@{$self->{videos}}) {
+    $logger->log( 4, "- adding video" );
+    my $vTemplate = $templateStore->fetch( 'html', 'video.html' );
+    my $vStamps =
+      { X => _topercent( $video->{x} ),
+	Y => _topercent( $video->{y} ),
+	W => _topercent( $video->{width} ),
+	H => _topercent( $video->{height} ),
+	VIDEO => $mediaManager->videoFromStore( $video->{file} ),
+	FIT => $video->{fit},
+	AUTOPLAY => exists $video->{autoplay} ? 'data-autoplay' : '',
+	CONTROLS => exists $video->{controls} ? 'controls' : '',
+	LOOP => exists $video->{loop} ? 'loop' : '',
+      };
+    $content .= BeamerReveal::TemplateStore::stampTemplate( $vTemplate,
+							    $vStamps );
+  }
+
+  #############################
+  # process all audio material
+  foreach my $audio (@{$self->{audios}}) {
+    $logger->log( 4, "- adding audio" );
+    my $aTemplate = $templateStore->fetch( 'html', 'audio.html' );
+    my $aStamps =
+      { X => _topercent( $audio->{x} ),
+	Y => _topercent( $audio->{y} ),
+	W => _topercent( $audio->{width} ),
+	H => _topercent( $audio->{height} ),
+	AUDIO => $mediaManager->audioFromStore( $audio->{file} ),
+	FIT => $audio->{fit},
+	AUTOPLAY => exists $audio->{autoplay} ? 'data-autoplay' : '',
+	CONTROLS => exists $audio->{controls} ? 'controls' : '',
+	LOOP => exists $video->{loop} ? 'loop' : '',
+      };
+    $content .= BeamerReveal::TemplateStore::stampTemplate( $aTemplate,
+							    $aStamps );
+  }
+
+  #############################
+  # process all image material
+  foreach my $image (@{$self->{images}}) {
+    $logger->log( 4, "- adding image" );
+    my $iTemplate = $templateStore->fetch( 'html', 'image.html' );
+    my $iStamps =
+      { X => _topercent( $image->{x} ),
+	Y => _topercent( $image->{y} ),
+	W => _topercent( $image->{width} ),
+	H => _topercent( $image->{height} ),
+	IMAGE => $mediaManager->imageFromStore( $image->{file} ),
+	FIT => $image->{fit}
+      };
+    $content .= BeamerReveal::TemplateStore::stampTemplate( $iTemplate,
+							    $iStamps );
+  }
+
+  #############################
+  # process all iframe material
+  foreach my $iframe (@{$self->{iframes}}) {
+    $logger->log( 4, "- adding iframe" );
+    my $iTemplate = $templateStore->fetch( 'html', 'iframe.html' );
+    my $iStamps =
+      { X => _topercent( $iframe->{x} ),
+	Y => _topercent( $iframe->{y} ),
+	W => _topercent( $iframe->{width} ),
+	H => _topercent( $iframe->{height} ),
+	IFRAME => $mediaManager->iframeFromStore( $iframe->{file} ),
+	FIT => $iframe->{fit}
+      };
+    $content .= BeamerReveal::TemplateStore::stampTemplate( $iTemplate,
+							    $iStamps );
+  }
+
+  #########################
+  # process all animations
+  foreach my $animation (@{$self->{animations}}) {
+    $logger->log( 4, "- adding animation" );
+
+    # 1. Generate the animation
+    my $file = $mediaManager->animationFromStore( $animation );
+    
+    # 2. Embed it into the html
+    my $aTemplate = $templateStore->fetch( 'html', 'animation.html' );
+    my $aStamps =
+      { X => _topercent( $animation->{x} ),
+	Y => _topercent( $animation->{y} ),
+	W => _topercent( $animation->{width} ),
+	H => _topercent( $animation->{height} ),
+	AUTOPLAY  => exists $animation->{autoplay} ? 'data-autoplay' : '',
+	CONTROLS  => exists $animation->{controls} ? 'controls' : '',
+	LOOP      => exists $animation->{loop} ? 'loop' : '',
+	ANIMATION => $file,
+	FIT       => $animation->{fit}
+      };
+    $content .= BeamerReveal::TemplateStore::stampTemplate( $aTemplate,
+							    $aStamps );
+  }
+
+  # process the frame itself  
+  my $fTemplate = $templateStore->fetch( 'html', 'beamerframe.html' );
+
+  $self->{parameters}->{title} ||= '<empty>';
+
+  my $menuTitle;
+  if ( exists $self->{parameters}->{toc} ) {
+    if( $self->{parameters}->{toc} eq 'titlepage' ) {
+      $menuTitle = "<span class='menu-title'>%s</span>";
+    }
+    elsif( $self->{parameters}->{toc} eq 'section' ) {
+      $menuTitle = "<span class='menu-section'>&bull; %s</span>";
+    }
+    elsif( $self->{parameters}->{toc} eq 'subsection' ) {
+      $menuTitle = "<span class='menu-subsection'>&SmallCircle; %s</span>";
+    }
+    else {
+      $logger->fatal( "Error: invalid toc parameter in rvl file" );
+    }
+  }
+  else {
+    $menuTitle = "<span class='menu-slide'>&bullet; %s</span>";
+  }
+  $menuTitle = sprintf( $menuTitle,
+			$self->{parameters}->{title} );
+			# $self->{parameters}->{truepage} );
+  my $fStamps =
+    {
+     'DATA-MENU-TITLE' => $menuTitle,
+     SLIDEIMAGE   => $mediaManager->slideFromStore( sprintf( 'slide-%0' . nofdigits( $maxRawPage ) . 'd.jpg',
+		                                           $self->{parameters}->{rawpage} ) ),
+     SLIDECONTENT => $content,
+     TRANSITION   => $self->{parameters}->{transition} || 'none',
+    };
+
+  return BeamerReveal::TemplateStore::stampTemplate( $fTemplate, $fStamps );
+}
+
+sub _topercent { return sprintf( "%.2f%%", $_[0] * 100 ); }
+
+1;

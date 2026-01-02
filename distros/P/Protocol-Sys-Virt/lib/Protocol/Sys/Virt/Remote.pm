@@ -13,13 +13,13 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::Remote v11.10.1;
+package Protocol::Sys::Virt::Remote v11.10.2;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v11.10.1;
-use Protocol::Sys::Virt::Transport::XDR v11.10.1;
+use Protocol::Sys::Virt::Remote::XDR v11.10.2;
+use Protocol::Sys::Virt::Transport::XDR v11.10.2;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 my $transport = 'Protocol::Sys::Virt::Transport::XDR';
 
@@ -3051,7 +3051,7 @@ Protocol::Sys::Virt::Remote - Connect to remote libvirt daemon
 
 =head1 VERSION
 
-v11.10.1
+v11.10.2
 
 Based on LibVirt tag v11.10.0
 

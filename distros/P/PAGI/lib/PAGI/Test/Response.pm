@@ -20,8 +20,30 @@ sub status { shift->{status} }
 # Raw body bytes
 sub content { shift->{body} }
 
-# Decoded text (alias for now, charset handling later)
-sub text { shift->{body} }
+# Decoded text based on Content-Type charset
+sub text {
+    my ($self) = @_;
+    my $body = $self->{body};
+    return $body unless defined $body && length $body;
+
+    # Parse charset from Content-Type header
+    my $charset = $self->_extract_charset // 'UTF-8';
+
+    require Encode;
+    return Encode::decode($charset, $body, Encode::FB_CROAK());
+}
+
+# Extract charset from Content-Type header
+sub _extract_charset {
+    my ($self) = @_;
+    my $ct = $self->content_type or return undef;
+
+    # Match charset=... (with or without quotes)
+    if ($ct =~ /charset\s*=\s*"?([^";,\s]+)"?/i) {
+        return $1;
+    }
+    return undef;
+}
 
 # Header lookup (case-insensitive)
 sub header {

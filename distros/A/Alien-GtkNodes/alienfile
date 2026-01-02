@@ -1,0 +1,24 @@
+use alienfile;
+
+plugin 'PkgConfig' => (
+    pkg_name => 'gtknodes',
+    atleast_version => '0.1'
+);
+
+share {
+    plugin Download => (
+        url => 'https://github.com/aluntzer/gtknodes/tarball/5122531'
+    );
+    plugin Extract => 'tar.gz';
+
+    plugin 'Gather::Dino';
+    plugin 'Build::Autoconf';
+
+    build [
+        'sh autogen.sh',
+        '%{configure}', # --enable-static --enable-shared',
+        '%{make}',
+        '%{make} install',
+    ];
+
+}

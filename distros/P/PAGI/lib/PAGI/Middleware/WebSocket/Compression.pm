@@ -264,7 +264,7 @@ Hashref containing C<level>, C<min_size>, and C<available> flags.
 
 L<PAGI::Middleware> - Base class for middleware
 
-L<PAGI::Middleware::WebSocket::Heartbeat> - WebSocket keepalive
+L<PAGI::WebSocket> - WebSocket helper with native keepalive support
 
 RFC 7692 - Compression Extensions for WebSocket
 

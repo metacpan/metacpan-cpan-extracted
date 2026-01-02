@@ -51,7 +51,7 @@ METHODS
 
  create
 
-       ( $controller, $mock ) = Test::ExpectAndCheck->create;
+       ( $controller, $mock ) = Test::ExpectAndCheck->create( %params );
 
     Objects are created in "entangled pairs" by the create method. The
     first object is called the "controller", and is used by the unit
@@ -60,6 +60,24 @@ METHODS
     be passed to the code being tested, on which the expected method calls
     are (hopefully) invoked. It will have whatever interface is implied by
     the method call expectations.
+
+    Takes the following optional named parameters:
+
+    isa
+
+         isa => [qw( Some Class Names )],
+
+      Since version 0.08.
+
+      Specifies a list of class names that the mock object will claim to be
+      if interrogated by its isa method. This is useful if the code under
+      test will use an ->isa check on the passed-in mocking object and
+      therefore it needs to pretend to be of some particular class.
+
+      Note though that no actual method inheritence will take place here.
+      This simply provides the isa method. Any actual required behaviour
+      will still have to be created using the "expect" or "whenever"
+      methods as usual.
 
  expect
 

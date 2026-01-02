@@ -485,4 +485,30 @@ subtest '-e error handling' => sub {
     );
 };
 
+# Test 32: PAGI_ENV is exported after mode resolution
+subtest 'PAGI_ENV exported after mode resolution' => sub {
+    # Clear PAGI_ENV first
+    local $ENV{PAGI_ENV};
+
+    # Simulate what run() does: parse options then set PAGI_ENV
+    my $runner = PAGI::Runner->new;
+    $runner->parse_options('-E', 'production', 'app.pl');
+
+    # This is what run() does after parse_options
+    $ENV{PAGI_ENV} = $runner->mode;
+
+    is($ENV{PAGI_ENV}, 'production', 'PAGI_ENV set to resolved mode');
+
+    # Test with TTY auto-detection (no -E flag)
+    delete $ENV{PAGI_ENV};
+    my $runner2 = PAGI::Runner->new;
+    $runner2->parse_options('app.pl');
+    $ENV{PAGI_ENV} = $runner2->mode;
+
+    # Should be development (if TTY) or production (if not)
+    # In test environment, this depends on how tests are run
+    ok(defined $ENV{PAGI_ENV}, 'PAGI_ENV set even with auto-detection');
+    like($ENV{PAGI_ENV}, qr/^(development|production)$/, 'PAGI_ENV is valid mode');
+};
+
 done_testing;

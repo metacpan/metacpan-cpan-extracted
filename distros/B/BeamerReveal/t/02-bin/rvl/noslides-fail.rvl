@@ -1,0 +1,3 @@
+%% Beamer-revealdriverfile
+@@Presentation: 
+-parameters:compiler={pdflatex},canvaswidth={1920},canvasheight={1200}

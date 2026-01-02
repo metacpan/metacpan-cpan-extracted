@@ -34,8 +34,8 @@ cmp_ok(-4, '<', $two, "IV < Math::GMPz object");
 cmp_ok($two, '<=', 6,  "Math::GMPz object <= IV");
 cmp_ok(-4, '<=', $two, "IV <= Math::GMPz object");
 
-cmp_ok($two <=> 6, '<', 0, "Math::GMPz object <=> IV");
-cmp_ok(6 <=> $two, '>', 0, "IV <=> Math::GMPz object");
+cmp_ok($two <=> 6, '==', -1, "Math::GMPz object <=> IV");
+cmp_ok(6 <=> $two, '==', 1, "IV <=> Math::GMPz object");
 
 my $iv = 50000;
 eval {my $res = $iv << Math::GMPz->new(5);};

@@ -6,7 +6,6 @@ use Future::AsyncAwait;
 use IO::Async::Loop;
 
 use PAGI::Middleware::RateLimit;
-use PAGI::Middleware::Timeout;
 
 my $loop = IO::Async::Loop->new;
 
@@ -222,106 +221,6 @@ subtest 'RateLimit - custom key generator' => sub {
     my @events3;
     run_async { $wrapped->($scope1, async sub { {} }, async sub { push @events3, shift }) };
     is $events3[0]{status}, 429, '/path1 second request blocked';
-};
-
-# ===================
-# Timeout Middleware Tests
-# ===================
-
-subtest 'Timeout - allows fast requests' => sub {
-    my $timeout = PAGI::Middleware::Timeout->new(
-        timeout => 5,
-        loop    => $loop,
-    );
-
-    my $app = async sub  {
-        my ($scope, $receive, $send) = @_;
-        await $send->({
-            type    => 'http.response.start',
-            status  => 200,
-            headers => [['Content-Type', 'text/plain']],
-        });
-        await $send->({
-            type => 'http.response.body',
-            body => 'Fast response',
-            more => 0,
-        });
-    };
-
-    my $wrapped = $timeout->wrap($app);
-    my $scope = make_scope();
-
-    my @events;
-    my $send = async sub  {
-        my ($event) = @_; push @events, $event };
-    my $receive = async sub { { type => 'http.request', body => '', more => 0 } };
-
-    run_async { $wrapped->($scope, $receive, $send) };
-
-    is $events[0]{status}, 200, 'fast request succeeds';
-    is $events[1]{body}, 'Fast response', 'body received';
-};
-
-subtest 'Timeout - times out slow requests' => sub {
-    my $timeout_called = 0;
-    my $timeout = PAGI::Middleware::Timeout->new(
-        timeout    => 0.1,  # 100ms
-        loop       => $loop,
-        on_timeout => sub { $timeout_called = 1 },
-    );
-
-    my $app = async sub  {
-        my ($scope, $receive, $send) = @_;
-        # Simulate slow processing
-        await $loop->delay_future(after => 1);  # 1 second
-        await $send->({
-            type    => 'http.response.start',
-            status  => 200,
-            headers => [['Content-Type', 'text/plain']],
-        });
-        await $send->({
-            type => 'http.response.body',
-            body => 'Slow response',
-            more => 0,
-        });
-    };
-
-    my $wrapped = $timeout->wrap($app);
-    my $scope = make_scope();
-
-    my @events;
-    my $send = async sub  {
-        my ($event) = @_; push @events, $event };
-    my $receive = async sub { { type => 'http.request', body => '', more => 0 } };
-
-    run_async { $wrapped->($scope, $receive, $send) };
-
-    is $events[0]{status}, 504, 'slow request times out with 504';
-    ok $timeout_called, 'on_timeout callback was called';
-};
-
-subtest 'Timeout - passes through non-HTTP requests' => sub {
-    my $timeout = PAGI::Middleware::Timeout->new(
-        timeout => 1,
-        loop    => $loop,
-    );
-
-    my $app = async sub  {
-        my ($scope, $receive, $send) = @_;
-        await $send->({ type => 'websocket.accept' });
-    };
-
-    my $wrapped = $timeout->wrap($app);
-    my $scope = { type => 'websocket' };
-
-    my @events;
-    my $send = async sub  {
-        my ($event) = @_; push @events, $event };
-    my $receive = async sub { {} };
-
-    run_async { $wrapped->($scope, $receive, $send) };
-
-    is $events[0]{type}, 'websocket.accept', 'non-HTTP passed through';
 };
 
 done_testing;

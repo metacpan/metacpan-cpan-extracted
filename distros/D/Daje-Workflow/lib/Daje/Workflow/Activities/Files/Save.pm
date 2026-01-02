@@ -103,7 +103,8 @@ sub _make_dir($self, $file) {
     my $file_name = path($file)->basename();
     my $path = $file;
     $path =~ s/$file_name//;
-    path($path)->make_path();
+    my $result = path($path)->make_path();
+    return $result;
 }
 
 sub _save_file($self, $file, $data) {

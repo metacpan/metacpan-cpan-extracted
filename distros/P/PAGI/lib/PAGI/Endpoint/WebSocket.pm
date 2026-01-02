@@ -6,8 +6,6 @@ use warnings;
 use Future::AsyncAwait;
 use Carp qw(croak);
 use Module::Load qw(load);
-use Scalar::Util qw(weaken);
-use JSON::MaybeXS ();
 
 
 # Factory class method - override in subclass for customization
@@ -15,10 +13,6 @@ sub websocket_class { 'PAGI::WebSocket' }
 
 # Encoding: 'text', 'bytes', or 'json'
 sub encoding { 'text' }
-
-# Ping interval in seconds (0 = disabled)
-# Override in subclass to enable server-side keepalive
-sub ping_interval { 0 }
 
 sub to_app {
     my ($class) = @_;
@@ -55,46 +49,11 @@ async sub handle {
     }
 
     # Register disconnect callback
-    my $ping_timer;
-    my $connected = 1;
-
     if ($self->can('on_disconnect')) {
         $ws->on_close(sub {
             my ($code, $reason) = @_;
-            $connected = 0;
             $self->on_disconnect($ws, $code, $reason);
         });
-    } else {
-        $ws->on_close(sub {
-            $connected = 0;
-        });
-    }
-
-    # Set up ping timer if configured
-    my $ping_interval = $self->ping_interval;
-    if ($ping_interval > 0) {
-        require IO::Async::Loop;
-        require IO::Async::Timer::Periodic;
-
-        my $loop = IO::Async::Loop->new;  # Singleton
-
-        my $weak_send = $send;
-        weaken($weak_send);
-
-        $ping_timer = IO::Async::Timer::Periodic->new(
-            interval => $ping_interval,
-            on_tick  => sub {
-                return unless $connected && $weak_send;
-                eval {
-                    $weak_send->({
-                        type => 'websocket.send',
-                        text => JSON::MaybeXS::encode_json({ type => 'ping', ts => time() }),
-                    });
-                };
-            },
-        );
-        $loop->add($ping_timer);
-        $ping_timer->start;
     }
 
     # Handle messages based on encoding
@@ -124,17 +83,7 @@ async sub handle {
             await $ws->run;
         }
     };
-    my $error = $@;
-
-    # Cleanup ping timer
-    if ($ping_timer) {
-        $ping_timer->stop;
-        if (my $loop = $scope->{pagi}{loop}) {
-            $loop->remove($ping_timer);
-        }
-    }
-
-    die $error if $error;
+    die $@ if $@;
 }
 
 1;
@@ -152,7 +101,6 @@ PAGI::Endpoint::WebSocket - Class-based WebSocket endpoint handler
     use Future::AsyncAwait;
 
     sub encoding { 'json' }  # or 'text', 'bytes'
-    sub ping_interval { 25 } # Send ping every 25 seconds
 
     async sub on_connect {
         my ($self, $ws) = @_;
@@ -179,19 +127,6 @@ PAGI::Endpoint::WebSocket - Class-based WebSocket endpoint handler
 
 PAGI::Endpoint::WebSocket provides a Starlette-inspired class-based
 approach to handling WebSocket connections with lifecycle hooks.
-
-=head2 Connection Keepalive
-
-WebSocket connections may be closed by proxies, load balancers, or NAT
-devices after periods of inactivity (typically 30-60 seconds). To prevent
-this, enable server-side ping by overriding C<ping_interval>:
-
-    sub ping_interval { 25 }  # Send ping every 25 seconds
-
-The server sends JSON messages C<< { type => 'ping', ts => <timestamp> } >>
-at the specified interval. Clients can optionally respond with
-C<< { type => 'pong' } >> to confirm receipt, though this is not required
-for keepalive purposes.
 
 =head1 LIFECYCLE METHODS
 
@@ -273,33 +208,6 @@ B<Example - Text encoding:>
     }
 
 This follows the same pattern as L<Starlette's WebSocketEndpoint|https://www.starlette.io/endpoints/>.
-
-=head2 ping_interval
-
-    sub ping_interval { 25 }  # seconds, 0 = disabled (default)
-
-Seconds between server-initiated ping messages. Set to a positive value
-to enable keepalive pings that prevent proxy/NAT timeouts on idle
-connections.
-
-When enabled, the server sends JSON messages at the specified interval:
-
-    { "type": "ping", "ts": 1703275200 }
-
-Common values:
-
-=over 4
-
-=item C<25> - Safe for most proxies (30s timeout common)
-
-=item C<55> - Safe for aggressive proxies (60s timeout)
-
-=item C<0> - Disabled (default) - connection may timeout if idle
-
-=back
-
-B<Note:> Requires the PAGI event loop to be available in the scope
-(automatically provided by PAGI::Server).
 
 =head2 websocket_class
 

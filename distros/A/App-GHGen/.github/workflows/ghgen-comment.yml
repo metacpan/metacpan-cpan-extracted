@@ -1,0 +1,24 @@
+---
+name: GHGen Analysis (Comment Mode)
+
+'on':
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Analyze workflows
+        uses: nigelhorne/ghgen-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          mode: comment
+          auto-fix: false

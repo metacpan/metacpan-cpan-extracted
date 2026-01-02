@@ -1,6 +1,6 @@
 # Lifespan Protocol
 
-**Version**: 0.1 (Draft)
+**Version**: 0.2 (Draft)
 
 The Lifespan **PAGI** sub-specification outlines how to communicate
 lifespan events such as startup and shutdown within PAGI.
@@ -26,46 +26,6 @@ to manage state correctly in async-safe scopes.
 Lifespans and requests **must occur on the same event loop**. This guarantees
 that async-local state (such as DB pools or background tasks) is not shared
 unsafely across threads or processes.
-
-## Event Loop Access
-
-Unlike ASGI (where Python's `asyncio.get_running_loop()` provides ambient access
-to the current event loop), PAGI applications obtain the event loop via
-`IO::Async::Loop->new`.
-
-In IO::Async, calling `IO::Async::Loop->new` returns the existing cached loop
-instance if one has already been created (via the `$ONE_TRUE_LOOP` package
-variable). This means:
-
-```perl
-# First call creates the loop (done by the server at startup)
-my $loop = IO::Async::Loop->new;
-
-# Subsequent calls anywhere in the codebase return the SAME instance
-my $same_loop = IO::Async::Loop->new;  # Same object as $loop
-```
-
-Applications requiring direct event loop access (for timers, spawning tasks, or
-integrating with other IO::Async-based libraries) can simply call
-`IO::Async::Loop->new` from anywhere in their code:
-
-```perl
-use IO::Async::Loop;
-
-async sub app ($scope, $receive, $send) {
-    my $loop = IO::Async::Loop->new;  # Gets the server's cached loop
-
-    # Use for timers, async operations, etc.
-    await $loop->delay_future(after => 1);
-
-    # ... rest of application
-}
-```
-
-**Key difference from Python's asyncio**: IO::Async's `->new` will create a loop
-if none exists, whereas `asyncio.get_running_loop()` raises `RuntimeError`
-outside async context. For PAGI applications where a loop is guaranteed to exist
-during request handling, this distinction is not relevant.
 
 A possible implementation of this protocol in **modern Perl** using `Future::AsyncAwait`
 could look like this:
@@ -115,7 +75,7 @@ The scope information passed in `scope` contains basic metadata:
 
 - `type` (String) – `"lifespan"`.
 - `pagi["version"]` (String) – The version of the PAGI core spec that governs the worker.
-- `pagi["spec_version"]` (String) – The version of this lifespan sub-specification. Optional; if missing it defaults to `"0.1"`.
+- `pagi["spec_version"]` (String) – The version of this lifespan sub-specification. Optional; if missing it defaults to `"0.2"`.
 - `pagi["is_worker"]` (Int, optional) – `1` if running as a worker in a multi-process deployment, `0` or absent for single-process mode. Applications can use this to avoid duplicate initialization (e.g., only print startup messages from worker 1).
 - `pagi["worker_num"]` (Int, optional) – Worker identifier (1, 2, 3, ...) in multi-process mode. Absent or `undef` for single-process mode. Combined with `is_worker`, applications can identify which worker they are running in.
 - `state` (HashRef, optional) – A namespace where the application can persist values to be copied into subsequent request scopes. Servers omit this key if the feature is unsupported.

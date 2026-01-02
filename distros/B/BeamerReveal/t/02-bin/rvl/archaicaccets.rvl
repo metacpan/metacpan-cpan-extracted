@@ -1,0 +1,8 @@
+%% Beamer-revealdriverfile
+@@Presentation: 
+-parameters:compiler={pdflatex},canvaswidth={1920},canvasheight={1200}
+@@BeamerFrame: 
+-parameters:rawpage={1},truepage={1},overlay={1},transition={none},title={}
+@@BeamerFrame: 
+-parameters:rawpage={2},truepage={2},overlay={1},transition={none},title={Chebyshev: Sur la coupe des v\unhbox \voidb@x \bgroup \let \unhbox \voidb@x \setbox \@tempboxa \hbox {e\global \mathchardef \accent@spacefactor \spacefactor }\let \begingroup \let \typeout \protect \begingroup \def \MessageBreak {
+(Font)              }\let \protect \immediate\write \m@ne {LaTeX Font Info:     on input line 45.}\endgroup \endgroup \relax \let \ignorespaces \relax \accent 94 e\egroup \spacefactor \accent@spacefactor tements}

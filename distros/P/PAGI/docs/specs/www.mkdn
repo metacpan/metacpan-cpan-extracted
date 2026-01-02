@@ -1,6 +1,6 @@
 # HTTP, WebSocket & SSE PAGI Message Format
 
-**Version**: 0.1 (Draft)
+**Version**: 0.2 (Draft)
 
 The HTTP, WebSocket & SSE PAGI sub-specification defines how HTTP/1.1, HTTP/2, WebSocket, and Server-Side Events (SSE) connections are transported within PAGI.
 
@@ -8,6 +8,7 @@ It is designed to be a superset of the PSGI specification and specifies how to t
 
 ## Spec Versions
 
+- `0.2`: Added keepalive events (`websocket.keepalive`, `sse.keepalive`), send timeouts, disconnect reasons, SSE support for all HTTP methods (not just GET) with `sse.request` receive event for request body. Added `pagi.connection` scope key for non-destructive disconnect detection.
 - `0.1`: Initial draft, based on ASGI 2.5, including Server-Side Events support.
 
 ## Common Data Types
@@ -191,7 +192,7 @@ Each HTTP request has a single-request connection scope. Scope keys:
 
 - `type` (String) -- `"http"`
 - `pagi["version"]` (String) -- PAGI version
-- `pagi["spec_version"]` (String) -- PAGI HTTP spec version (default `"0.1"`)
+- `pagi["spec_version"]` (String) -- PAGI HTTP spec version (default `"0.2"`)
 - `http_version` (String) -- `"1.0"`, `"1.1"`, or `"2"`
 - `method` (String) -- Uppercase HTTP method
 - `scheme` (String, default `"http"`) -- URL scheme (`"http"` or `"https"`)
@@ -203,6 +204,7 @@ Each HTTP request has a single-request connection scope. Scope keys:
 - `client` (ArrayRef[String, Int], optional) -- `[host, port]` of client
 - `server` (ArrayRef[String, Optional[Int]], optional) -- `[host, port]` or `[path, undef]` for Unix sockets
 - `state` (HashRef, optional) -- State namespace from lifespan
+- `pagi.connection` (Object) -- Connection state object for disconnect detection. See [Connection State](#connection-state) below.
 
 ### Request - `receive` event
 
@@ -318,6 +320,173 @@ Keys:
 
 - `type` -- `"http.disconnect"`
 
+### Connection State
+
+The `pagi.connection` scope key provides a mechanism for applications to detect client disconnection **without consuming messages from the receive queue**. This addresses a fundamental limitation where checking for disconnect via `receive()` may inadvertently consume request body data.
+
+#### The Problem
+
+In PAGI's pull-based receive model, the only way to know if a client has disconnected is to consume the next message:
+
+```perl
+my $message = await $receive->();
+if ($message->{type} eq 'http.disconnect') {
+    # Client is gone - but if it wasn't a disconnect, that data is lost!
+}
+```
+
+The connection state object solves this with synchronous, non-destructive checks.
+
+#### Connection Object Interface
+
+Servers MUST provide a connection state object with these methods:
+
+**`is_connected()`** - Returns true if the connection is still open.
+
+```perl
+my $connected = $conn->is_connected;  # Boolean, synchronous
+```
+
+**`disconnect_reason()`** - Returns the disconnect reason string, or `undef` if still connected.
+
+```perl
+my $reason = $conn->disconnect_reason;  # String or undef
+```
+
+**`on_disconnect($callback)`** - Registers a callback to be invoked when disconnect occurs.
+
+```perl
+$conn->on_disconnect(sub {
+    my ($reason) = @_;
+    cleanup_resources();
+});
+```
+
+- May be called multiple times to register multiple callbacks
+- Callbacks are invoked in registration order
+- If registered after disconnect already occurred, callback is invoked immediately
+
+**`disconnect_future()`** - Returns a Future that resolves when the connection closes.
+
+```perl
+my $future = $conn->disconnect_future;  # Future or undef
+my $reason = await $future;
+```
+
+Servers SHOULD provide this method. Returns `undef` if not supported.
+
+#### Standard Disconnect Reasons
+
+Servers MUST use these standard reason strings:
+
+| Reason | Description |
+|--------|-------------|
+| `client_closed` | Client initiated clean close (TCP FIN) |
+| `client_timeout` | Client stopped responding (read timeout) |
+| `idle_timeout` | Connection idle too long between requests |
+| `write_timeout` | Response write timed out |
+| `write_error` | Socket write failed (EPIPE, ECONNRESET) |
+| `read_error` | Socket read failed |
+| `protocol_error` | HTTP parse error, invalid request |
+| `server_shutdown` | Server shutting down gracefully |
+| `body_too_large` | Request body exceeded limit |
+
+Servers MAY define additional reasons prefixed with `x-` (e.g., `x-rate-limited`).
+
+#### Server Requirements
+
+1. MUST provide `pagi.connection` in scope for `http` type requests
+2. MUST implement `is_connected()`, `disconnect_reason()`, and `on_disconnect()` methods
+3. SHOULD implement `disconnect_future()` method returning a Future
+4. MUST update connection state as soon as disconnect is detected
+5. MUST use standard reason strings where applicable
+6. MUST NOT transition `is_connected()` back to true once false (one-way transition)
+
+#### State Transition Order
+
+When disconnect is detected, servers MUST update state in this order:
+
+1. Set `is_connected()` to return false
+2. Set `disconnect_reason()` to return the reason string
+3. Resolve `disconnect_future()` with the reason (if provided)
+4. Invoke `on_disconnect` callbacks in registration order
+5. Send `http.disconnect` message to receive queue
+
+#### Applicability
+
+| Scope Type | Connection State |
+|------------|------------------|
+| `http` | MUST provide `pagi.connection` |
+| `websocket` | NOT APPLICABLE (use `websocket.disconnect` events) |
+| `sse` | NOT APPLICABLE (use `sse.disconnect` events) |
+
+WebSocket and SSE have dedicated disconnect events and typically use handler objects (like `PAGI::WebSocket`, `PAGI::SSE`) that already manage connection state.
+
+#### Example: Basic Connection Check
+
+```perl
+async sub handler {
+    my ($scope, $receive, $send) = @_;
+    my $conn = $scope->{'pagi.connection'};
+
+    # Check before expensive work
+    return unless $conn->is_connected;
+
+    my $result = await expensive_operation();
+
+    # Check again before responding
+    return unless $conn->is_connected;
+
+    await $send->({ type => 'http.response.start', status => 200, headers => [] });
+    await $send->({ type => 'http.response.body', body => $result, more => 0 });
+}
+```
+
+#### Example: Cleanup on Disconnect
+
+```perl
+async sub handler {
+    my ($scope, $receive, $send) = @_;
+    my $conn = $scope->{'pagi.connection'};
+
+    my $temp_file = create_temp_file();
+
+    # Register cleanup - runs automatically if client disconnects
+    $conn->on_disconnect(sub {
+        my ($reason) = @_;
+        $temp_file->unlink;
+        log_info("Client disconnected: $reason");
+    });
+
+    my $result = await process_data($temp_file);
+    $temp_file->unlink;  # Normal cleanup
+
+    await send_response($send, $result);
+}
+```
+
+#### Example: Racing Against Disconnect
+
+```perl
+async sub long_poll_handler {
+    my ($scope, $receive, $send) = @_;
+    my $conn = $scope->{'pagi.connection'};
+
+    my $disconnect_future = $conn->disconnect_future;
+    my $event_future = wait_for_event();
+
+    if ($disconnect_future) {
+        # Race: wait for event OR disconnect
+        await Future->wait_any($disconnect_future, $event_future);
+
+        return unless $conn->is_connected;
+    }
+
+    my $event = $event_future->get;
+    await send_response($send, $event);
+}
+```
+
 ## WebSocket
 
 WebSocket servers handle fragmentation and PING/PONG messages. Servers MUST wait for a reply to `websocket.connect` before completing the handshake. If `websocket.close` is sent instead of `websocket.accept`, the server MUST reject the connection with HTTP 403.
@@ -326,7 +495,7 @@ WebSocket servers handle fragmentation and PING/PONG messages. Servers MUST wait
 
 - `type` (String) -- `"websocket"`
 - `pagi["version"]` (String) -- PAGI version
-- `pagi["spec_version"]` (String) -- PAGI HTTP spec version (default `"0.1"`)
+- `pagi["spec_version"]` (String) -- PAGI HTTP spec version (default `"0.2"`)
 - `http_version` (String, default `"1.1"`) -- HTTP version used for handshake
 - `scheme` (String, default `"ws"`) -- URL scheme (`"ws"` or `"wss"`)
 - `path` (String) -- Decoded path string
@@ -377,14 +546,51 @@ connection with close code 1007 (Invalid frame payload data) per RFC 6455.
 - `type` -- `"websocket.send"`
 - `bytes` (Bytes, optional)
 - `text` (String, optional)
+- `timeout` (Number, optional) -- Send timeout in seconds. If the write does not complete within this time, the Future fails and the connection is closed.
 
-Exactly one must be non-null.
+Exactly one of `bytes` or `text` must be non-null.
+
+#### Keepalive - `send` event
+
+Enables WebSocket protocol-level ping/pong keepalive. The server sends ping frames (opcode 0x9) at the specified interval. Clients automatically respond with pong frames per RFC 6455 - no application code required.
+
+- `type` -- `"websocket.keepalive"`
+- `interval` (Number) -- Seconds between ping frames. `0` disables keepalive.
+- `timeout` (Number, optional) -- Seconds to wait for pong response. If no pong is received within this time, the connection is closed with code 1006 and the application receives a `websocket.disconnect` event with `reason => 'keepalive timeout'`.
+
+**Behavior:**
+- Multiple `websocket.keepalive` events update settings (last wins)
+- Omitting `timeout` enables keepalive without dead connection detection (useful for high-latency connections)
+- Setting `interval => 0` stops the keepalive timer
+
+**Example:**
+```perl
+# Enable keepalive with 30s ping interval, 20s pong timeout
+await $send->({
+    type     => 'websocket.keepalive',
+    interval => 30,
+    timeout  => 20,
+});
+```
 
 #### Disconnect - `receive` event
 
+Sent when the WebSocket connection is closed, either by the client, server, or due to error conditions.
+
 - `type` -- `"websocket.disconnect"`
-- `code` (Int, default `1005`)
-- `reason` (String, default empty)
+- `code` (Int, default `1005`) -- WebSocket close code per RFC 6455
+- `reason` (String, default empty) -- Human-readable disconnect reason
+
+**Common close codes and reasons:**
+
+| Code | Reason | Meaning |
+|------|--------|---------|
+| 1000 | (from client) | Normal closure |
+| 1001 | `'going away'` | Client/server going away |
+| 1006 | `'keepalive timeout'` | No pong received within timeout |
+| 1006 | `'send timeout'` | Send operation timed out |
+| 1006 | `'write error'` | Write to socket failed |
+| 1007 | `'invalid UTF-8'` | Text frame contained invalid UTF-8 |
 
 #### Disconnected Client - `send` exception
 
@@ -401,16 +607,44 @@ Raises server-specific subclass of `OSError`.
 SSE connections stream `text/event-stream` data to clients.
 
 ### SSE Connection Detection
+
 PAGI servers MUST detect SSE requests and assign a scope of type `sse` when all of the following are true:
-- The HTTP method is `GET`.
+
 - The `Accept` header includes the media type `text/event-stream`.
 - The request has not been upgraded to WebSocket.
+
 Otherwise the connection uses a normal `http` scope.
+
+**Note on HTTP methods:** SSE works with any HTTP method, not just GET. While the browser's native `EventSource` API only supports GET, libraries like Microsoft's `fetch-event-source` (used by htmx 4, datastar, and others) enable SSE over POST, PUT, and other methods via the Fetch API. PAGI servers MUST support SSE for all HTTP methods to enable these modern patterns.
+
 Routing based on URL or application logic is not used to infer SSE.
 
 ### SSE Connection Scope
 
 SSE scopes reuse the HTTP scope structure. Servers MUST populate the same keys (`http_version`, `method`, `scheme`, `path`, `headers`, `client`, `server`, `state`, etc.) but set `type => 'sse'`. Header casing rules follow the HTTP section.
+
+### Request Body - `receive` event
+
+For SSE requests with a body (POST, PUT, etc.), the application receives the body via `sse.request` events, similar to HTTP:
+
+- `type` -- `"sse.request"`
+- `body` (Bytes, default `""`) -- Request body chunk
+- `more` (Int, default `0`) -- `1` if more body data is forthcoming, otherwise `0`
+
+For GET requests (no body), a single `sse.request` event with empty body and `more => 0` is returned.
+
+**Example (POST SSE with htmx/datastar):**
+
+```perl
+my $event = await $receive->();
+if ($event->{type} eq 'sse.request') {
+    my $body = $event->{body};
+    # Parse JSON body, extract query parameters, etc.
+}
+
+await $send->({ type => 'sse.start', status => 200 });
+# ... send SSE events based on POST body ...
+```
 
 ### Start SSE - `send` event
 
@@ -451,11 +685,58 @@ await $send->({
 
 The server emits the comment followed by two newlines (`:keepalive\n\n`). This keeps the connection alive through proxies without triggering application-level event handlers on the client.
 
+### SSE Keepalive - `send` event
+
+Enables automatic SSE keepalive comments. The server sends comment lines at the specified interval to prevent proxy/load balancer timeouts on idle connections.
+
+- `type` -- `"sse.keepalive"`
+- `interval` (Number) -- Seconds between keepalive comments. `0` disables keepalive.
+- `comment` (String, default `''`) -- Comment text to send. Empty string sends just `:` followed by newlines.
+
+**Behavior:**
+- Multiple `sse.keepalive` events update settings (last wins)
+- Setting `interval => 0` stops the keepalive timer
+- Comments do not trigger client's `onmessage` handler
+
+**Example:**
+```perl
+# Enable keepalive with 30s interval
+await $send->({
+    type     => 'sse.keepalive',
+    interval => 30,
+    comment  => 'ping',
+});
+```
+
+### SSE Send Timeout
+
+The `sse.send` event supports an optional `timeout` field:
+
+- `timeout` (Number, optional) -- Send timeout in seconds. If the write does not complete within this time, the Future fails and the connection is closed.
+
+**Example:**
+```perl
+await $send->({
+    type    => 'sse.send',
+    data    => 'hello',
+    timeout => 5,
+});
+```
+
 ### SSE Disconnect - `receive` event
 
 Sent to the application if the client disconnects or if the server shuts down the SSE stream after `sse.start`.
 
 - `type` -- `"sse.disconnect"`
+- `reason` (String, default empty) -- Human-readable disconnect reason
+
+**Common reasons:**
+
+| Reason | Meaning |
+|--------|---------|
+| `'client disconnect'` | Client closed connection normally |
+| `'write error'` | Failed to write (keepalive or send) |
+| `'send timeout'` | Send timeout exceeded |
 
 ## PAGI to PSGI Compatibility
 
@@ -473,7 +754,7 @@ PAGI translates keys explicitly to maintain compatibility with PSGI:
 - `psgi.url_scheme` → `scheme`
 - `psgi.version` → `[1, 1]` (PAGI servers MUST advertise the PSGI version they emulate when bridging)
 - `psgi.input` → constructed from `http.request` events
-- `psgi.errors` → handled by the server as appropriate (often tied to the loop's logging sink)
+- `psgi.errors` → handled by the server as appropriate
 - `psgi.streaming`, `psgi.nonblocking`, `psgi.multithread`, `psgi.multiprocess` → derived from PAGI server capabilities and advertised via PSGI adapter docs
 
 Response mappings:

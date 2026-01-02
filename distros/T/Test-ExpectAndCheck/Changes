@@ -1,5 +1,11 @@
 Revision history for Test-ExpectAndCheck
 
+0.08    2026-01-01
+        [CHANGES]
+         * Optionally allow mock objects to claim to be instances of given
+           classes
+         * Treat "\r" as escapeable plain text when rendering argument strings
+
 0.07    2024-10-13
         [CHANGES]
          * Added `namedargs()` helper for dealing with methods that take named

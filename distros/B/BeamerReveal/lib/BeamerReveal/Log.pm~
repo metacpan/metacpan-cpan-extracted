@@ -13,12 +13,9 @@ package BeamerReveal::Log;
 use parent 'Exporter';
 use Carp;
 
-use BeamerReveal::Log::Win32;
 use BeamerReveal::Log::Ansi;
 
 use IO::File;
-
-our $is_win = ( $^O eq 'MSWin32' );
 
 our $logger;
 
@@ -46,7 +43,6 @@ sub new {
   $self->{tasks} = [];
 
   $self->{termwidth} = $self->_terminal_width() - 2;
-  $self->{extra} = ' ';
   $self->{barsize} = $self->{termwidth} - $self->{labelsize} - $self->{activitysize} - 12;
   
   $self->{logfile} = IO::File->new();
@@ -56,7 +52,7 @@ sub new {
   # build opening lines for logfile
   say {$self->{logfile}} _formatLines( $self->{opening}, 76 );
   # build opening lines for terminal
-  print _formatLines( $self->{opening}, $self->{termwidth}, $self->{extra} );
+  print _formatLines( $self->{opening}, $self->{termwidth} );
   
   $logger = $self;
   

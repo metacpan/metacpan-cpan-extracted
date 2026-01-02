@@ -754,7 +754,7 @@ else {
 #########################
 
 if("$strinf" =~ /^inf/i || $^O =~ /MSWin/) {
-  if((Math::GMPz->new(10) <=> "$strinf") < 0) {print "ok 101\n"}
+  if((Math::GMPz->new(10) <=> "$strinf") == -1) {print "ok 101\n"}
   else {
     warn "\n 10 !< inf\n";
     print "not ok 101\n";
@@ -790,13 +790,13 @@ else {
   print "not ok 104\n";
 }
 
-if((Math::GMPz->new(10) <=> $inf) < 0){print "ok 105\n"}
+if((Math::GMPz->new(10) <=> $inf) == -1){print "ok 105\n"}
 else {
   warn "\n 10 !< inf\n";
   print "not ok 105\n";
 }
 
-if((Math::GMPz->new(10) <=> $inf * -1) > 0){print "ok 106\n"}
+if((Math::GMPz->new(10) <=> $inf * -1) == 1){print "ok 106\n"}
 else {
   warn "\n 10 !> inf\n";
   print "not ok 106\n";
@@ -1145,7 +1145,7 @@ if("$strninf" =~ /^\-inf/i || $^O =~ /MSWin/) {
   }
   else {print "ok 154\n"}
 
-  if(($z <=> "$strninf") > 0) {print "ok 155\n"}
+  if(($z <=> "$strninf") == 1) {print "ok 155\n"}
   else {
     warn "\n $z !> infinity\n";
     print "not ok 155\n";

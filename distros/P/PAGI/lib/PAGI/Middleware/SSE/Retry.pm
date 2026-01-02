@@ -136,6 +136,6 @@ header and resume from the appropriate point in the event stream.
 
 L<PAGI::Middleware> - Base class for middleware
 
-L<PAGI::Middleware::SSE::Heartbeat> - SSE keepalive comments
+L<PAGI::SSE> - SSE helper with native keepalive support
 
 =cut

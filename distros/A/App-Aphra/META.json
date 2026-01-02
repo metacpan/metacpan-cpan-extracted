@@ -56,6 +56,6 @@
          "web" : "https://github.com/davorg-cpan/app-aphra"
       }
    },
-   "version" : "v0.2.4",
+   "version" : "v0.2.5",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

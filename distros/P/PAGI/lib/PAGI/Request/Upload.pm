@@ -2,9 +2,6 @@ package PAGI::Request::Upload;
 use strict;
 use warnings;
 
-use Future::AsyncAwait;
-use IO::Async::Loop;
-use PAGI::Util::AsyncFile;
 use File::Basename qw(fileparse);
 use File::Copy qw(move);
 use File::Spec;
@@ -103,9 +100,10 @@ sub fh {
     croak("No content available");
 }
 
-# Copy upload to destination using async I/O
-async sub copy_to {
+# Move upload to destination (BLOCKING - performs synchronous file I/O)
+sub move_to {
     my ($self, $destination) = @_;
+
     # Ensure destination directory exists
     my ($name, $dir) = fileparse($destination);
     if ($dir && !-d $dir) {
@@ -113,45 +111,18 @@ async sub copy_to {
         File::Path::make_path($dir);
     }
 
-    # Get the singleton event loop
-    my $loop = IO::Async::Loop->new;
-
     if ($self->is_in_memory) {
-        # Write data to destination using async I/O
-        await PAGI::Util::AsyncFile->write_file($loop, $destination, $self->{data});
-        return;
-    } elsif ($self->is_on_disk) {
-        # Read from temp file and write to destination
-        my $data = await PAGI::Util::AsyncFile->read_file($loop, $self->{temp_path});
-        await PAGI::Util::AsyncFile->write_file($loop, $destination, $data);
-        return;
-    }
-
-    croak("No content to copy");
-}
-
-# Move upload to destination using async I/O
-async sub move_to {
-    my ($self, $destination) = @_;
-    # Ensure destination directory exists
-    my ($name, $dir) = fileparse($destination);
-    if ($dir && !-d $dir) {
-        require File::Path;
-        File::Path::make_path($dir);
-    }
-
-    # Get the singleton event loop
-    my $loop = IO::Async::Loop->new;
-
-    if ($self->is_in_memory) {
-        # Write data to destination using async I/O
-        await PAGI::Util::AsyncFile->write_file($loop, $destination, $self->{data});
+        # Write data to destination (blocking I/O)
+        open my $fh, '>:raw', $destination
+            or croak("Cannot open $destination for writing: $!");
+        print $fh $self->{data};
+        close $fh;
 
         # Mark as cleaned up so destructor doesn't touch the saved file
         delete $self->{data};
         $self->{_cleaned_up} = 1;
 
-        return;
+        return $self;
     } elsif ($self->is_on_disk) {
         # Use File::Copy::move (typically a rename, very fast)
         move($self->{temp_path}, $destination)
@@ -161,16 +132,10 @@ async sub move_to {
         delete $self->{temp_path};
         $self->{_cleaned_up} = 1;
 
-        return;
+        return $self;
     }
 
     croak("No content to move");
-}
-
-# Alias for move_to
-async sub save_to {
-    my ($self, $destination) = @_;
-    await $self->move_to($destination);
 }
 
 # Discard the upload
@@ -210,7 +175,7 @@ PAGI::Request::Upload - Uploaded file representation
         my $size = $upload->size;
         my $content = $upload->slurp;
 
-        await $upload->save_to('/path/to/save');
+        $upload->move_to('/path/to/save');
     }
 
 =head1 DESCRIPTION
@@ -286,28 +251,44 @@ Read entire file content into memory.
 
 Get a filehandle for reading the upload.
 
-=head1 ASYNC METHODS
-
-=head2 copy_to
-
-    await $upload->copy_to('/path/to/destination');
-
-Copy the uploaded file to a destination.
+=head1 FILE METHODS
 
 =head2 move_to
 
-    await $upload->move_to('/path/to/destination');
+    $upload->move_to('/path/to/destination');
 
-Move the uploaded file to a destination (more efficient for disk files).
+Move the uploaded file to a destination path. Returns the upload object
+for chaining.
 
-=head2 save_to
+B<Note:> This is a B<blocking> operation that performs synchronous file I/O.
+For most uploads this completes quickly:
 
-Alias for C<copy_to>.
+=over 4
+
+=item * On-disk uploads use C<File::Copy::move()> (typically a fast rename)
+
+=item * In-memory uploads write data directly to the destination file
+
+=back
+
+For very large files where blocking is a concern, use C<slurp()> or C<fh()>
+to access the data and handle file I/O yourself with your preferred async
+file library:
+
+    # Non-blocking alternative (bring your own async file library)
+    my $data = $upload->slurp;
+    await $my_async_file_writer->write($destination, $data);
+
+    # Or stream via filehandle
+    my $fh = $upload->fh;
+    while (my $chunk = read($fh, my $buf, 65536)) {
+        await $my_async_writer->write($buf);
+    }
 
 =head1 CLEANUP
 
 Temporary files are automatically deleted when the Upload object is
-destroyed. If you want to keep the file, use C<move_to> or C<copy_to>.
+destroyed. If you want to keep the file, use C<move_to>.
 
 =head1 SEE ALSO
 

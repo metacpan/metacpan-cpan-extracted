@@ -3,7 +3,7 @@ use warnings;
 
 package RT::Extension::EmailReplyDelimiter;
 
-our $VERSION = '0.01';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -17,50 +17,126 @@ delimiter such as "I<##- Please type your reply above this line -##>".
 
 =head1 RT VERSION
 
-Known to work with RT 4.2.16, 4.4.4, and 5.0.1.
+Known to work with RT 4.2.16, 4.4.4, 5.0.1, and 6.0.2.
 
 =head1 INSTALLATION
 
-=over
+As root, build the Makefile and use it to install the extension.
+This example works with Debian's B<request-tracker5> package:
 
-=item C<perl Makefile.PL>
+ export RTHOME=/usr/share/request-tracker5/lib
+ perl Makefile.PL
+ make
+ make install
 
-=item C<make>
+Edit your F<RT_SiteConfig.pm> file or equivalent, such as
+F</etc/request-tracker5/RT_SiteConfig.pm>, and add these lines:
 
-=item C<make install>
+ Set(@EmailReplyDelimiters,
+     '##- Please type your reply above this line -##',
+     qr/<div[^>]+id="appendonsend"/
+ );
+ Plugin('RT::Extension::EmailReplyDelimiter');
 
-May need root permissions.
-
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
-
-Add these lines:
-
-    Set(@EmailReplyDelimiters, '##- Please type your reply above this line -##');
-    Plugin('RT::Extension::EmailReplyDelimiter');
-
-=item Restart your web server
-
-=back
+Then, restart the service.
 
 =head1 CONFIGURATION
 
 In F<RT_SiteConfig.pm>, adjust I<@EmailReplyDelimiters> so it contains a
-list of all of the email reply delimiters you will be using.  Restart the
-service after making changes to this configuration item.
+list of all of the email reply delimiters you will be using.
+
+Delimiters can be either literal strings (quoted with single or double
+quotes), or compiled regular expressions (quoted using C<qr//>).
+
+Restart the service after making changes to this configuration item.
 
 Then adjust the relevant RT templates to include a reply delimiter, on a
 line by itself, in the appropriate place.
 
+=head2 Examples
+
+Note that for the extension to be enabled, this line is always required:
+
+ Plugin('RT::Extension::EmailReplyDelimiter');
+
+The following examples only suggest different reply delimiters; the
+C<Plugin()> line should always also be present.
+
+Simplest possible configuration:
+
+ Set(@EmailReplyDelimiters,
+     '##- Please type your reply above this line -##'
+ );
+
+For this to work, you'll need to add
+"I<##- Please type your reply above this line -##>"
+to all of your RT templates in the appropriate place.
+Then, when someone replies to an RT message by email, the quoted message
+they are replying to will not be included when their reply reaches RT.
+
+Configuration which finds and removes the quoted message when the sender is
+using a recent Outlook version, or Outlook webmail, and also includes the
+template-dependent configuration above:
+
+ Set(@EmailReplyDelimiters,
+     '##- Please type your reply above this line -##',
+     qr/<div[^>]+id="appendonsend"/
+ );
+
+A configuration which removes the quoted part from most messages sent from
+Outlook, with two fallback template-dependent delimiters which work as
+above:
+
+ Set(@EmailReplyDelimiters,
+     # New Outlook and webmail put this right before the quoted text starts:
+     qr/<div[^>]+id="appendonsend"/,
+ 
+     # Mobile Outlook puts this around the quoted message:
+     qr/<div[^>]+id="divRplyFwdMsg"/,
+ 
+     # Classic Outlook inserts a div like this before quoted text:
+     '<div style="border:none;border-top:solid #E1E1E1 1.0pt;padding:3.0pt 0in 0in 0in">',
+ 
+     # Outlook puts this in the plain text version - a line made of
+     # underscores then From on the line below that, with a Windows style
+     # newline:
+     "________________________________\r\nFrom: ",
+ 
+     # Put these in the RT templates themselves, so we can detect and remove
+     # the quoted part of replies even if none of the above matches:
+     '##- Please type your reply above this line.',
+     '##- Do not edit quoted section when replying.',
+ );
+
+The benefit of the more complex configuration is that it can strip all of
+the quoted text, not leaving any header parts.
+The downside is that if someone I<forwards> an email from Outlook to RT, the
+forwarded content is likely to be lost.
+
 =head1 ISSUES AND CONTRIBUTIONS
 
 The project is held on L<Codeberg|https://codeberg.org>; its issue tracker
-is at L<https://codeberg.org/a-j-wood/rt-extension-emailreplydelimiter/issues>.
+is at L<https://codeberg.org/ivarch/rt-extension-emailreplydelimiter/issues>.
+
+The following people have contributed to this project, and their assistance
+is acknowledged and greatly appreciated:
+
+=over
+
+=item *
+
+L<grantemsley|https://codeberg.org/grantemsley> - fixed issues with
+quoted-printable messages, added support for regular expression delimiters,
+and provided examples for removing quoted text from messages sent from
+Outlook (L<#1|https://codeberg.org/ivarch/rt-extension-emailreplydelimiter/pulls/1>).
+
+=back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2023 Andrew Wood.
+Copyright 2023, 2026 Andrew Wood.
 
-License GPLv3+: GNU GPL version 3 or later: https://gnu.org/licenses/gpl.html
+License GPLv3+: GNU GPL version 3 or later: L<https://gnu.org/licenses/gpl.html>
 
 This is free software: you are free to change and redistribute it.  There is
 NO WARRANTY, to the extent permitted by law.
@@ -179,6 +255,14 @@ sub _ProcessEntity {
     $BodyContent = $Entity->bodyhandle->as_string;
     return if ( not defined $BodyContent );
 
+    # Decode quoted-printable if needed
+    my $WasQuotedPrintable = 0;
+    if ( $Entity->head->mime_encoding =~ /quoted-printable/i ) {
+        require MIME::QuotedPrint;
+        $BodyContent = MIME::QuotedPrint::decode($BodyContent);
+        $WasQuotedPrintable = 1;
+    }
+
     $RemovedContent = undef;
 
     # If any entity updates fail, we will write the original message to stdout
@@ -187,14 +271,28 @@ sub _ProcessEntity {
 
     # If a delimiter is found, remove it and anything following it.
     foreach my $Delimiter ( @{ $Delimiters || [] } ) {
-
+        my $IsRegex = ref($Delimiter) eq 'Regexp';
+        
+        $RT::Logger->debug("EmailReplyDelimiter testing: " . 
+            ($IsRegex ? "regex pattern" : $Delimiter));
+        
         if ( $TextType eq 'plain' ) {
-            $RemovedContent = $1
-              if ( $BodyContent =~ s/(\s+\Q$Delimiter\E.+)$//s );
+            if ( $IsRegex ) {
+                $RemovedContent = $1
+                  if ( $BodyContent =~ s/(\s+$Delimiter.+)$//s );
+            } else {
+                $RemovedContent = $1
+                  if ( $BodyContent =~ s/(\s+\Q$Delimiter\E.+)$//s );
+            }
         }
         else {
-            $RemovedContent = $2
-              if ( $BodyContent =~ s/(\s+|>\s*)(\Q$Delimiter\E.+)$/$1/s );
+            if ( $IsRegex ) {
+                $RemovedContent = $2
+                  if ( $BodyContent =~ s/(\s+|>\s*)($Delimiter.+)$/$1/s );
+            } else {
+                $RemovedContent = $2
+                  if ( $BodyContent =~ s/(\s+|>\s*)(\Q$Delimiter\E.+)$/$1/s );
+            }
 
             if ( defined $RemovedContent ) {
                 $BodyContent .= '</body></html>'
@@ -203,6 +301,14 @@ sub _ProcessEntity {
         }
 
         if ( defined $RemovedContent ) {
+            # Re-encode if we decoded earlier
+            if ( $WasQuotedPrintable ) {
+                $BodyContent = MIME::QuotedPrint::encode($BodyContent);
+            }
+            
+            $RT::Logger->info("EmailReplyDelimiter Removed " . 
+                length($RemovedContent) . " characters after delimiter");
+            
             my $IO;
             $IO = $Entity->bodyhandle->open('w');
             if ($IO) {

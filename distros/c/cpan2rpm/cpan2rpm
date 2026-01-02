@@ -27,7 +27,7 @@ use File::Basename qw(dirname);
 use Getopt::Long;
 use Sys::Hostname;
 use vars qw($VERSION);
-$VERSION = "2.045";
+$VERSION = "2.046";
 
 my ($ME, $RPM, $TMPDIR, %RPMDIR, $CWD, %info, %meta, $ARGS, $VX);
 my $tarRE = q/\.(tar\.(g?z|bz2)|tgz|zip)$/;
@@ -1763,15 +1763,14 @@ sub upgrade {
     }
     print "Upgrading...\n";
     my $tarball = get_cpan_api({ dist => "cpan2rpm" });
-    if (!$tarball or !-s $tarball) {
-        local $\ = $/;
-        print "\nERROR: Unable to retrieve tarball, please visit our web\n";
-        print "site at: https://github.com/ekkis/cpan2rpm\n";
+    if (!$tarball or !-s($tarball = "$RPMDIR{SOURCES}/$tarball")) {
+        print "\nERROR: Unable to retrieve tarball,\n";
+        print "please visit our web site at: https://github.com/ekkis/cpan2rpm\n";
         print "to download the latest version.\n";
         exit(-1);
         }
     my @ret = qx|$RPM -ta $tarball 2>&1|;
-    die "upgrade(): $!" if $?;
+    die "upgrade failed! [$RPM -ta $tarball]\n@ret" if $?;
     /Wrote:\s+(.*)$/ && ($info{rpm} = $1) && last for reverse @ret;
     inst_rpm(\%info);
     exit;

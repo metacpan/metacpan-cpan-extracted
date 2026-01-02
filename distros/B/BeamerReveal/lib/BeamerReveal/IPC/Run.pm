@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::IPC::Run;
-our $VERSION = '20251231.1441'; # VERSION
+our $VERSION = '20260101.1937'; # VERSION
 
 use strict;
 use warnings;
@@ -65,7 +65,7 @@ sub runsmart {
       $$progress = '';
     }
   }
-  finish $h or $logger->fatal( 0, "Error: subprocess $cmd->[0] returned $?" );
+  finish $h or $logger->fatal( "Error: subprocess $cmd->[0] returned $?\n$err" );
 }
 
 1;
@@ -82,7 +82,7 @@ BeamerReveal::IPC::Run - IPC::Run
 
 =head1 VERSION
 
-version 20251231.1441
+version 20260101.1937
 
 =head1 SYNOPSIS
 

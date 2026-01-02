@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::FrameConverter;
-our $VERSION = '20251231.1441'; # VERSION
+our $VERSION = '20260101.1937'; # VERSION
 
 use strict;
 use warnings;
@@ -34,11 +34,15 @@ sub new {
 	     };
   $class = (ref $class ? ref $class : $class );
   bless $self, $class;
+
+  my $logger = $BeamerReveal::Log::logger;
   
   $self->{pdftoppm} = File::Which::which( 'pdftoppm' )
-    or $Beamer::Log::logger->fatal( "Error: your setup is incomplete, I cannot find pdftoppm (part of the poppler library)\n" .
+    or $logger->fatal( "Error: your setup is incomplete, I cannot find pdftoppm (part of the poppler library)\n" .
 	    "Install 'Poppler-utils' and make sure pdftoppm is accessible in a directory on your PATH list variable\n" );
 
+  $logger->fatal( "Error: cannot find $pdffile, run your latex compiler first to produce the PDF file." ) unless ( -r $pdffile );
+  
   #  $self->{slides} = File::Spec->catfile( $self->{base}, 'media', 'Slides' );
   $self->{slides} = "$self->{base}/media/Slides";
   
@@ -95,7 +99,7 @@ BeamerReveal::FrameConverter - FrameConverter
 
 =head1 VERSION
 
-version 20251231.1441
+version 20260101.1937
 
 =head1 SYNOPSIS
 

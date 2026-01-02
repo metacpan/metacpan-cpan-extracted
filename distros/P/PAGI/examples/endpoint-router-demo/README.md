@@ -4,8 +4,8 @@ Demonstrates PAGI::Endpoint::Router features:
 
 - Lifespan hooks (on_startup/on_shutdown)
 - HTTP routes with method handlers
-- WebSocket with start_heartbeat()
-- SSE with every() for periodic events
+- WebSocket with keepalive()
+- SSE with keepalive for proxy compatibility
 - Subrouters with stash inheritance
 - Middleware as methods
 

@@ -9,11 +9,23 @@ use Protocol::WebSocket::Frame;
 use Digest::SHA qw(sha1_base64);
 use Encode;
 use IO::Async::Timer::Countdown;
+use IO::Async::Timer::Periodic;
 use Time::HiRes qw(gettimeofday tv_interval);
-use PAGI::Util::AsyncFile;
+use PAGI::Server::AsyncFile;
+use PAGI::Server::ConnectionState;
 
 
 use constant FILE_CHUNK_SIZE => 65536;  # 64KB chunks for file streaming
+
+# =============================================================================
+# Unrecognized Event Type Handler (PAGI spec compliance)
+# =============================================================================
+# Per main.mkdn: "Servers must raise exceptions if... The type field is unrecognized"
+
+sub _unrecognized_event_type {
+    my ($type, $protocol) = @_;
+    die "Unrecognized event type '$type' for $protocol protocol\n";
+}
 
 # =============================================================================
 # Header Validation (CRLF Injection Prevention)
@@ -112,6 +124,13 @@ sub new {
         max_receive_queue => $args{max_receive_queue} // 1000,  # Max WebSocket receive queue size
         max_ws_frame_size => $args{max_ws_frame_size} // 65536,  # Max WebSocket frame size in bytes
         sync_file_threshold => $args{sync_file_threshold} // 65536,  # Threshold for sync file reads (default 64KB)
+        validate_events => $args{validate_events} // 0,  # Dev-mode event validation (0 = disabled)
+        # Send-side backpressure (watermarks in bytes)
+        # Defaults match Python asyncio: 64KB high, 16KB low (high/4)
+        write_high_watermark => $args{write_high_watermark} // 65536,   # 64KB - pause sending above this
+        write_low_watermark  => $args{write_low_watermark}  // 16384,   # 16KB - resume sending below this
+        _drain_waiters       => [],   # Pending Futures waiting for buffer drain
+        _drain_check_active  => 0,    # Flag to prevent redundant on_outgoing_empty setup
         tls_info      => undef,  # Populated on first request if TLS
         buffer        => '',
         closed        => 0,
@@ -136,6 +155,15 @@ sub new {
         # SSE state
         sse_mode          => 0,
         sse_started       => 0,
+        sse_disconnect_reason => undef,  # Reason for SSE disconnect (client_closed, write_error, etc.)
+        # Keepalive state (protocol-level ping/pong for WebSocket, comments for SSE)
+        ws_keepalive_timer  => undef,  # Periodic timer for sending WebSocket pings
+        ws_pong_timeout     => undef,  # Timeout timer for pong response
+        ws_waiting_pong     => 0,      # Flag: are we waiting for a pong?
+        ws_keepalive_interval => 0,    # Current keepalive interval (0 = disabled)
+        ws_keepalive_timeout  => 0,    # Current pong timeout (0 = no timeout check)
+        sse_keepalive_timer => undef,  # Periodic timer for sending SSE keepalive comments
+        sse_keepalive_comment => '',   # Comment text to send
         # Cached connection info (populated in start(), used by _create_scope)
         client_host       => '127.0.0.1',
         client_port       => 0,
@@ -187,6 +215,7 @@ sub start {
                 return unless $weak_self;
                 return if $weak_self->{closed};
                 # Close idle connection
+                $weak_self->_handle_disconnect('idle_timeout');
                 $weak_self->_close;
             },
         );
@@ -289,6 +318,7 @@ sub _start_stall_timer {
                 $weak_self->{server}->_log(warn =>
                     "Request stall timeout ($weak_self->{request_timeout}s) - closing connection");
             }
+            $weak_self->_handle_disconnect('client_timeout');
             $weak_self->_close;
         },
     );
@@ -381,6 +411,7 @@ sub _start_sse_idle_timer {
                 $weak_self->{server}->_log(warn =>
                     "SSE idle timeout ($weak_self->{sse_idle_timeout}s) - closing connection");
             }
+            $weak_self->{sse_disconnect_reason} = 'idle_timeout';
             $weak_self->_close;
         },
     );
@@ -408,6 +439,279 @@ sub _stop_sse_idle_timer {
     $self->{sse_idle_timer} = undef;
 }
 
+# ============================================================================
+# Send-side backpressure support
+# ============================================================================
+#
+# Prevents unbounded memory growth when apps send faster than slow clients
+# can receive. Uses watermark-based flow control:
+# - High watermark (default 1MB): pause sending when buffer exceeds this
+# - Low watermark (default 256KB): resume sending when buffer drops below this
+#
+# The $send->() Future will block (await) when high watermark is exceeded,
+# and resolve when buffer drains below low watermark.
+
+sub _get_write_buffer_size {
+    my ($self) = @_;
+
+    return 0 unless $self->{stream};
+
+    # Access IO::Async::Stream's internal write queue
+    # IO::Async doesn't expose a public API for buffer size, so we access internals
+    my $queue = $self->{stream}{writequeue} // [];
+    my $total = 0;
+
+    for my $writer (@$queue) {
+        my $data = $writer->data;
+        if (defined $data && !ref $data) {
+            $total += length($data);
+        }
+    }
+
+    return $total;
+}
+
+sub _check_drain_waiters {
+    my ($self) = @_;
+
+    return unless @{$self->{_drain_waiters}};
+    return unless $self->{stream};
+
+    my $buffered = $self->_get_write_buffer_size;
+
+    # Resolve all waiters if we've drained below low watermark
+    if ($buffered < $self->{write_low_watermark}) {
+        my @waiters = splice @{$self->{_drain_waiters}};
+        for my $f (@waiters) {
+            $f->done unless $f->is_ready;
+        }
+        # Disable drain checking until next high watermark hit
+        $self->{_drain_check_active} = 0;
+    }
+}
+
+sub _setup_drain_detection {
+    my ($self) = @_;
+
+    # Avoid redundant setup
+    return if $self->{_drain_check_active};
+    $self->{_drain_check_active} = 1;
+
+    weaken(my $weak_self = $self);
+
+    # Primary mechanism: check when write queue empties
+    # This guarantees we notice drain even for fast-draining connections
+    # Store previous handler to chain if needed
+    my $prev_on_empty = $self->{_prev_on_outgoing_empty};
+
+    $self->{stream}->configure(
+        on_outgoing_empty => sub {
+            return unless $weak_self;
+            $weak_self->_check_drain_waiters;
+            # Call previous handler if any
+            $prev_on_empty->(@_) if $prev_on_empty;
+        },
+    );
+}
+
+sub _wait_for_drain {
+    my ($self) = @_;
+
+    # Fast path: already below low watermark
+    my $buffered = $self->_get_write_buffer_size;
+    if ($buffered < $self->{write_low_watermark}) {
+        return Future->done;
+    }
+
+    # Create Future to be resolved when drained
+    my $f = $self->{server}->loop->new_future;
+    push @{$self->{_drain_waiters}}, $f;
+
+    # Ensure drain detection is active
+    $self->_setup_drain_detection;
+
+    return $f;
+}
+
+sub _cancel_drain_waiters {
+    my ($self, $reason) = @_;
+    $reason //= 'connection closed';
+
+    my @waiters = splice @{$self->{_drain_waiters}};
+    for my $f (@waiters) {
+        # Resolve (not fail) - app should check connection state after await
+        $f->done unless $f->is_ready;
+    }
+    $self->{_drain_check_active} = 0;
+}
+
+# ============================================================================
+
+# WebSocket keepalive - sends protocol-level ping frames (RFC 6455)
+sub _start_ws_keepalive {
+    my ($self, $interval, $timeout) = @_;
+
+    # Stop existing timers first
+    $self->_stop_ws_keepalive;
+
+    return unless $interval && $interval > 0;
+    return unless $self->{server};
+
+    $self->{ws_keepalive_interval} = $interval;
+    $self->{ws_keepalive_timeout} = $timeout // 0;
+
+    weaken(my $weak_self = $self);
+
+    my $timer = IO::Async::Timer::Periodic->new(
+        interval => $interval,
+        on_tick  => sub {
+            return unless $weak_self;
+            return if $weak_self->{closed};
+            return unless $weak_self->{websocket_mode};
+
+            # Send ping frame
+            my $ping = Protocol::WebSocket::Frame->new(
+                type   => 'ping',
+                buffer => '',
+            );
+            $weak_self->{stream}->write($ping->to_bytes);
+
+            # Start pong timeout if configured
+            if ($weak_self->{ws_keepalive_timeout} > 0) {
+                $weak_self->{ws_waiting_pong} = 1;
+                $weak_self->_start_ws_pong_timeout;
+            }
+        },
+    );
+
+    $self->{ws_keepalive_timer} = $timer;
+    $self->{server}->add_child($timer);
+    $timer->start;
+}
+
+sub _start_ws_pong_timeout {
+    my ($self) = @_;
+
+    # Don't start another timeout if one is running
+    return if $self->{ws_pong_timeout};
+    return unless $self->{ws_keepalive_timeout} > 0;
+    return unless $self->{server};
+
+    weaken(my $weak_self = $self);
+
+    my $timer = IO::Async::Timer::Countdown->new(
+        delay => $self->{ws_keepalive_timeout},
+        on_expire => sub {
+            return unless $weak_self;
+            return if $weak_self->{closed};
+
+            if ($weak_self->{ws_waiting_pong}) {
+                # No pong received within timeout - close connection
+                if ($weak_self->{server} && $weak_self->{server}->can('_log')) {
+                    $weak_self->{server}->_log(warn =>
+                        "WebSocket keepalive timeout - no pong received within $weak_self->{ws_keepalive_timeout}s");
+                }
+
+                # Queue disconnect event with reason
+                push @{$weak_self->{receive_queue}}, {
+                    type   => 'websocket.disconnect',
+                    code   => 1006,
+                    reason => 'keepalive timeout',
+                };
+
+                # Notify waiting receive
+                if ($weak_self->{receive_pending} && !$weak_self->{receive_pending}->is_ready) {
+                    my $f = $weak_self->{receive_pending};
+                    $weak_self->{receive_pending} = undef;
+                    $f->done;
+                }
+
+                $weak_self->_close;
+            }
+        },
+    );
+
+    $self->{ws_pong_timeout} = $timer;
+    $self->{server}->add_child($timer);
+    $timer->start;
+}
+
+sub _cancel_ws_pong_timeout {
+    my ($self) = @_;
+
+    $self->{ws_waiting_pong} = 0;
+
+    return unless $self->{ws_pong_timeout};
+    $self->{ws_pong_timeout}->stop if $self->{ws_pong_timeout}->is_running;
+    if ($self->{server}) {
+        $self->{server}->remove_child($self->{ws_pong_timeout});
+    }
+    $self->{ws_pong_timeout} = undef;
+}
+
+sub _stop_ws_keepalive {
+    my ($self) = @_;
+
+    # Stop pong timeout first
+    $self->_cancel_ws_pong_timeout;
+
+    return unless $self->{ws_keepalive_timer};
+    $self->{ws_keepalive_timer}->stop if $self->{ws_keepalive_timer}->is_running;
+    if ($self->{server}) {
+        $self->{server}->remove_child($self->{ws_keepalive_timer});
+    }
+    $self->{ws_keepalive_timer} = undef;
+    $self->{ws_keepalive_interval} = 0;
+    $self->{ws_keepalive_timeout} = 0;
+}
+
+# SSE keepalive - sends comment lines to prevent proxy timeouts
+sub _start_sse_keepalive {
+    my ($self, $interval, $comment) = @_;
+
+    # Stop existing timer first
+    $self->_stop_sse_keepalive;
+
+    return unless $interval && $interval > 0;
+    return unless $self->{server};
+
+    $self->{sse_keepalive_comment} = $comment // '';
+
+    weaken(my $weak_self = $self);
+
+    my $timer = IO::Async::Timer::Periodic->new(
+        interval => $interval,
+        on_tick  => sub {
+            return unless $weak_self;
+            return if $weak_self->{closed};
+            return unless $weak_self->{sse_mode};
+
+            # Send comment line with chunked encoding
+            my $text = $weak_self->{sse_keepalive_comment};
+            $text = ":$text" unless $text =~ /^:/;
+            my $chunk = "$text\n\n";
+            my $len = sprintf("%x", length($chunk));
+            $weak_self->{stream}->write("$len\r\n$chunk\r\n");
+        },
+    );
+
+    $self->{sse_keepalive_timer} = $timer;
+    $self->{server}->add_child($timer);
+    $timer->start;
+}
+
+sub _stop_sse_keepalive {
+    my ($self) = @_;
+
+    return unless $self->{sse_keepalive_timer};
+    $self->{sse_keepalive_timer}->stop if $self->{sse_keepalive_timer}->is_running;
+    if ($self->{server}) {
+        $self->{server}->remove_child($self->{sse_keepalive_timer});
+    }
+    $self->{sse_keepalive_timer} = undef;
+    $self->{sse_keepalive_comment} = '';
+}
+
 sub _try_handle_request {
     my ($self) = @_;
 
@@ -424,6 +728,8 @@ sub _try_handle_request {
 
     # Handle parse errors (malformed request, header too large)
     if ($request->{error}) {
+        # Mark connection as disconnected with protocol_error reason (PAGI spec compliance)
+        $self->_handle_disconnect('protocol_error');
         $self->_send_error_response($request->{error}, $request->{message});
         $self->_close;
         return;
@@ -493,10 +799,10 @@ sub _is_sse_request {
     my ($self, $request) = @_;
 
     # SSE detection per spec:
-    # - HTTP method is GET
     # - Accept header includes text/event-stream
     # - Request has not been upgraded to WebSocket (already checked)
-    return 0 unless $request->{method} eq 'GET';
+    # Note: SSE works with any HTTP method (GET, POST, etc.) to support
+    # modern patterns like htmx 4 and datastar using fetch-event-source
 
     for my $header (@{$request->{headers}}) {
         my ($name, $value) = @$header;
@@ -558,6 +864,7 @@ async sub _handle_request {
         $self->{request_start} = undef;
         $self->{current_request} = undef;
         $self->{request_future} = undef;
+        $self->{current_connection_state} = undef;  # Clear for next request
 
         # Check if there's more data in the buffer (pipelining)
         if (length($self->{buffer}) > 0) {
@@ -601,16 +908,19 @@ sub _should_keep_alive {
 sub _create_scope {
     my ($self, $request) = @_;
 
-    # Get the event loop from the server for async operations
-    my $loop = $self->{server} ? $self->{server}->loop : undef;
+    # Create connection state object for disconnect tracking (PAGI spec 0.3)
+    my $disconnect_future = Future->new;
+    my $connection_state = PAGI::Server::ConnectionState->new(
+        future => $disconnect_future,
+    );
+    $self->{current_connection_state} = $connection_state;
 
     my $scope = {
         type         => 'http',
         pagi         => {
-            version      => '0.1',
-            spec_version => '0.1',
+            version      => '0.2',
+            spec_version => '0.2',
             features     => {},
-            loop         => $loop,  # IO::Async::Loop for async operations
         },
         http_version => $request->{http_version},
         method       => $request->{method},
@@ -625,6 +935,8 @@ sub _create_scope {
         # Optimized: avoid hash copy when state is empty (common case)
         state        => %{$self->{state}} ? { %{$self->{state}} } : {},
         extensions   => $self->_get_extensions_for_scope,
+        # Connection state for non-destructive disconnect detection (PAGI spec 0.3)
+        'pagi.connection' => $connection_state,
     };
 
     return $scope;
@@ -735,6 +1047,7 @@ sub _create_receive {
                     if ($weak_self->{max_body_size} && $bytes_read > $weak_self->{max_body_size}) {
                         # Body too large - close connection
                         $weak_self->_send_error_response(413, 'Payload Too Large');
+                        $weak_self->_handle_disconnect('body_too_large');
                         $weak_self->_close;
                         return { type => 'http.disconnect' };
                     }
@@ -860,6 +1173,12 @@ sub _create_send {
 
         my $type = $event->{type} // '';
 
+        # Dev-mode event validation (PAGI spec compliance)
+        if ($weak_self->{validate_events}) {
+            require PAGI::Server::EventValidator;
+            PAGI::Server::EventValidator::validate_http_send($event);
+        }
+
         if ($type eq 'http.response.start') {
             return if $response_started;
             $response_started = 1;
@@ -920,6 +1239,17 @@ sub _create_send {
                 }
                 return;  # Don't send any body for HEAD
             }
+
+            # --- BACKPRESSURE CHECK ---
+            # Wait for buffer to drain if we're above high watermark
+            # This prevents unbounded memory growth with slow clients
+            if ($weak_self->_get_write_buffer_size >= $weak_self->{write_high_watermark}) {
+                await $weak_self->_wait_for_drain;
+                # Re-check connection state after await
+                return Future->done unless $weak_self;
+                return Future->done if $weak_self->{closed};
+            }
+            # --- END BACKPRESSURE CHECK ---
 
             # Determine body source: body, file, or fh (mutually exclusive)
             my $body = $event->{body};
@@ -1003,6 +1333,10 @@ sub _create_send {
             # For this reference implementation, we return immediately as the
             # write buffer will be flushed by the event loop.
         }
+        else {
+            # Per PAGI spec: servers must raise exceptions for unrecognized event types
+            _unrecognized_event_type($type, 'http');
+        }
 
         return;
     };
@@ -1068,14 +1402,35 @@ sub _write_access_log {
 }
 
 sub _handle_disconnect {
-    my ($self) = @_;
+    my ($self, $reason) = @_;
+
+    # Cancel any pending drain waiters (backpressure)
+    $self->_cancel_drain_waiters($reason);
+
+    # Auto-detect server shutdown (PAGI spec compliance)
+    # If no explicit reason and server is shutting down, use server_shutdown
+    if (!$reason && $self->{server} && $self->{server}{shutting_down}) {
+        $reason = 'server_shutdown';
+    }
+
+    # Default reason is client_closed (TCP FIN received)
+    $reason //= 'client_closed';
+
+    # Mark HTTP connection state as disconnected (PAGI spec 0.3)
+    # Only for HTTP - WebSocket/SSE have their own patterns
+    if ($self->{current_connection_state} && !$self->{websocket_mode} && !$self->{sse_mode}) {
+        $self->{current_connection_state}->_mark_disconnected($reason);
+    }
 
     # Determine disconnect event type based on mode
     my $disconnect_event;
     if ($self->{websocket_mode}) {
         $disconnect_event = { type => 'websocket.disconnect', code => 1006, reason => '' };
     } elsif ($self->{sse_mode}) {
-        $disconnect_event = { type => 'sse.disconnect' };
+        $disconnect_event = {
+            type   => 'sse.disconnect',
+            reason => $self->{sse_disconnect_reason} // 'client_closed',
+        };
     } else {
         $disconnect_event = { type => 'http.disconnect' };
     }
@@ -1118,6 +1473,9 @@ sub _close {
     return if $self->{closed};
     $self->{closed} = 1;
 
+    # Cancel pending drain waiters early (before other cleanup)
+    $self->_cancel_drain_waiters('connection closing');
+
     # Clean up WebSocket frame parser to free memory immediately
     delete $self->{websocket_frame};
 
@@ -1144,6 +1502,10 @@ sub _close {
     $self->_stop_ws_idle_timer;
     $self->_stop_sse_idle_timer;
 
+    # Stop keepalive timers
+    $self->_stop_ws_keepalive;
+    $self->_stop_sse_keepalive;
+
     # Complete any pending receive with disconnect
     $self->_handle_disconnect;
 
@@ -1152,7 +1514,10 @@ sub _close {
     if ($self->{websocket_mode}) {
         $disconnect_event = { type => 'websocket.disconnect', code => 1006, reason => '' };
     } elsif ($self->{sse_mode}) {
-        $disconnect_event = { type => 'sse.disconnect' };
+        $disconnect_event = {
+            type   => 'sse.disconnect',
+            reason => $self->{sse_disconnect_reason} // 'client_closed',
+        };
     } else {
         $disconnect_event = { type => 'http.disconnect' };
     }
@@ -1372,16 +1737,12 @@ async sub _handle_sse_request {
 sub _create_sse_scope {
     my ($self, $request) = @_;
 
-    # Get the event loop from the server for async operations
-    my $loop = $self->{server} ? $self->{server}->loop : undef;
-
     my $scope = {
         type         => 'sse',
         pagi         => {
-            version      => '0.1',
-            spec_version => '0.1',
+            version      => '0.2',
+            spec_version => '0.2',
             features     => {},
-            loop         => $loop,
         },
         http_version => $request->{http_version},
         method       => $request->{method},
@@ -1404,23 +1765,83 @@ sub _create_sse_scope {
 sub _create_sse_receive {
     my ($self, $request) = @_;
 
+    my $content_length = $request->{content_length};
+    my $has_body = defined($content_length) && $content_length > 0;
+    my $body_complete = 0;
+    my $bytes_read = 0;
+
     weaken(my $weak_self = $self);
 
+    # Helper to create SSE disconnect event with reason
+    my $sse_disconnect = sub {
+        return {
+            type   => 'sse.disconnect',
+            reason => ($weak_self ? $weak_self->{sse_disconnect_reason} : undef) // 'client_closed',
+        };
+    };
+
     return sub {
-        return Future->done({ type => 'sse.disconnect' })
+        return Future->done($sse_disconnect->())
             unless $weak_self;
-        return Future->done({ type => 'sse.disconnect' })
+        return Future->done($sse_disconnect->())
             if $weak_self->{closed};
 
         my $future = (async sub {
-            return { type => 'sse.disconnect' }
+            return $sse_disconnect->()
                 unless $weak_self;
-            return { type => 'sse.disconnect' }
+            return $sse_disconnect->()
                 if $weak_self->{closed};
 
             # Check queue first
             if (@{$weak_self->{receive_queue}}) {
                 return shift @{$weak_self->{receive_queue}};
+            }
+
+            # Handle request body for POST/PUT SSE requests
+            if ($has_body && !$body_complete) {
+                my $remaining = $content_length - $bytes_read;
+
+                # Wait for data if buffer is empty
+                while (length($weak_self->{buffer}) == 0 && !$weak_self->{closed} && $remaining > 0) {
+                    if (!$weak_self->{receive_pending}) {
+                        $weak_self->{receive_pending} = Future->new;
+                    }
+                    await $weak_self->{receive_pending};
+                    $weak_self->{receive_pending} = undef;
+
+                    if (@{$weak_self->{receive_queue}}) {
+                        return shift @{$weak_self->{receive_queue}};
+                    }
+                }
+
+                return $sse_disconnect->() if $weak_self->{closed};
+
+                # Read available data up to remaining
+                my $to_read = $remaining < length($weak_self->{buffer})
+                    ? $remaining
+                    : length($weak_self->{buffer});
+
+                my $chunk = substr($weak_self->{buffer}, 0, $to_read, '');
+                $bytes_read += length($chunk);
+
+                my $more = ($bytes_read < $content_length) ? 1 : 0;
+                $body_complete = 1 if !$more;
+
+                return {
+                    type => 'sse.request',
+                    body => $chunk,
+                    more => $more,
+                };
+            }
+
+            # No body or body complete - return empty body if not yet returned
+            if (!$body_complete) {
+                $body_complete = 1;
+                return {
+                    type => 'sse.request',
+                    body => '',
+                    more => 0,
+                };
             }
 
             # Wait for disconnect
@@ -1429,7 +1850,7 @@ sub _create_sse_receive {
                     return shift @{$weak_self->{receive_queue}};
                 }
 
-                return { type => 'sse.disconnect' }
+                return $sse_disconnect->()
                     if $weak_self->{closed};
 
                 if (!$weak_self->{receive_pending}) {
@@ -1462,6 +1883,12 @@ sub _create_sse_send {
         $weak_self->_reset_sse_idle_timer;
 
         my $type = $event->{type} // '';
+
+        # Dev-mode event validation (PAGI spec compliance)
+        if ($weak_self->{validate_events}) {
+            require PAGI::Server::EventValidator;
+            PAGI::Server::EventValidator::validate_sse_send($event);
+        }
 
         if ($type eq 'sse.start') {
             return if $weak_self->{sse_started};
@@ -1500,6 +1927,14 @@ sub _create_sse_send {
         }
         elsif ($type eq 'sse.send') {
             return unless $weak_self->{sse_started};
+
+            # --- BACKPRESSURE CHECK ---
+            if ($weak_self->_get_write_buffer_size >= $weak_self->{write_high_watermark}) {
+                await $weak_self->_wait_for_drain;
+                return Future->done unless $weak_self;
+                return Future->done if $weak_self->{closed};
+            }
+            # --- END BACKPRESSURE CHECK ---
 
             # Format SSE event
             my $sse_data = '';
@@ -1545,6 +1980,18 @@ sub _create_sse_send {
             my $len = sprintf("%x", length($comment));
             $weak_self->{stream}->write("$len\r\n$comment\r\n");
         }
+        elsif ($type eq 'sse.keepalive') {
+            # SSE keepalive - starts/stops periodic comment timer
+            my $interval = $event->{interval} // 0;
+            my $comment = $event->{comment};
+
+            if ($interval > 0) {
+                $weak_self->_start_sse_keepalive($interval, $comment);
+            }
+            else {
+                $weak_self->_stop_sse_keepalive;
+            }
+        }
         elsif ($type eq 'http.fullflush') {
             # Fullflush extension - force immediate TCP buffer flush
             # Per spec: servers that don't advertise the extension must reject
@@ -1559,6 +2006,10 @@ sub _create_sse_send {
                 require Socket;
                 $handle->setsockopt(Socket::IPPROTO_TCP(), Socket::TCP_NODELAY(), 1);
             }
+        }
+        else {
+            # Per PAGI spec: servers must raise exceptions for unrecognized event types
+            _unrecognized_event_type($type, 'sse');
         }
 
         return;
@@ -1622,16 +2073,12 @@ sub _create_websocket_scope {
     # Store ws_key for handshake response
     $self->{ws_key} = $ws_key;
 
-    # Get the event loop from the server for async operations
-    my $loop = $self->{server} ? $self->{server}->loop : undef;
-
     my $scope = {
         type         => 'websocket',
         pagi         => {
-            version      => '0.1',
-            spec_version => '0.1',
+            version      => '0.2',
+            spec_version => '0.2',
             features     => {},
-            loop         => $loop,
         },
         http_version => $request->{http_version},
         scheme       => $self->_get_ws_scheme,
@@ -1736,6 +2183,12 @@ sub _create_websocket_send {
 
         my $type = $event->{type} // '';
 
+        # Dev-mode event validation (PAGI spec compliance)
+        if ($weak_self->{validate_events}) {
+            require PAGI::Server::EventValidator;
+            PAGI::Server::EventValidator::validate_websocket_send($event);
+        }
+
         if ($type eq 'websocket.accept') {
             return if $weak_self->{websocket_accepted};
 
@@ -1795,6 +2248,14 @@ sub _create_websocket_send {
         elsif ($type eq 'websocket.send') {
             return unless $weak_self->{websocket_mode};
 
+            # --- BACKPRESSURE CHECK ---
+            if ($weak_self->_get_write_buffer_size >= $weak_self->{write_high_watermark}) {
+                await $weak_self->_wait_for_drain;
+                return Future->done unless $weak_self;
+                return Future->done if $weak_self->{closed};
+            }
+            # --- END BACKPRESSURE CHECK ---
+
             my $frame;
             if (defined $event->{text}) {
                 $frame = Protocol::WebSocket::Frame->new(
@@ -1839,6 +2300,23 @@ sub _create_websocket_send {
             if ($weak_self->{close_received}) {
                 $weak_self->_close;
             }
+        }
+        elsif ($type eq 'websocket.keepalive') {
+            return unless $weak_self->{websocket_mode};
+
+            my $interval = $event->{interval} // 0;
+            my $timeout = $event->{timeout};
+
+            if ($interval > 0) {
+                $weak_self->_start_ws_keepalive($interval, $timeout);
+            }
+            else {
+                $weak_self->_stop_ws_keepalive;
+            }
+        }
+        else {
+            # Per PAGI spec: servers must raise exceptions for unrecognized event types
+            _unrecognized_event_type($type, 'websocket');
         }
 
         return;
@@ -1997,7 +2475,8 @@ sub _process_websocket_frames {
             $self->{stream}->write($pong->to_bytes);
         }
         elsif ($opcode == 10) {
-            # Pong - ignore (response to our ping, if any)
+            # Pong - cancel any pending timeout (response to our ping)
+            $self->_cancel_ws_pong_timeout;
         }
     }
 
@@ -2046,7 +2525,7 @@ async sub _send_file_response {
         my $loop = $self->{server} ? $self->{server}->loop : undef;
         die "No event loop available for async file I/O" unless $loop;
 
-        await PAGI::Util::AsyncFile->read_file_chunked(
+        await PAGI::Server::AsyncFile->read_file_chunked(
             $loop, $file,
             sub {
                 my ($chunk) = @_;

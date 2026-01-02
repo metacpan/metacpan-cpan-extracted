@@ -74,6 +74,10 @@ Mode is determined by (in order of precedence):
     2. PAGI_ENV environment variable
     3. Auto-detection: TTY = development, no TTY = production
 
+After determining the mode, C<pagi-server> sets C<PAGI_ENV> to the resolved
+value. Your app can check C<$ENV{PAGI_ENV}> to know what mode it's running
+in, similar to Plack's C<PLACK_ENV>.
+
 =head1 OPTIONS
 
 =head2 Common Options

@@ -1,5 +1,9 @@
 -----
 
+11.10.2   2026-01-01
+    [Changed]
+       * Transfer of the dataframe header reduced from 2 to 1 write operation
+
 11.10.1   2025-12-31
     [Changed]
        * Return return-value of callbacks and *::Transport->receive(), allowing
@@ -18,7 +22,7 @@
 11.8.0    2025-10-12
     [Changed]
        * Minimum versions of XDR::Gen and Protocol::Sys::Virt::Devel increased
-       * Updated to libvirt tag v11.8.0 (from 11.7.0 - no actual changes) 
+       * Updated to libvirt tag v11.8.0 (from 11.7.0 - no actual changes)
 
 11.7.0    2025-09-06
     [Changed]

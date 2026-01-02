@@ -1,0 +1,5 @@
+%% Beamer-revealdriverfile
+@@Presentation: 
+-parameters:compiler={lualatex},canvaswidth={1920},canvasheight={1200}
+@@BeamerFrame: 
+-parameters:rawpage={1},truepage={1},overlay={1},transition={none},title={}

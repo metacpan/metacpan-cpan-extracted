@@ -1101,8 +1101,8 @@
 
     YMMV if you use old versions of Math::GMPq and Math::MPFR, but if you
     have Math-GMPq-0.61 (or later) and Math-MPFR-4.37 (or later) then, apart
-    from the exceptions noted below, you will be able to use Math::GMPq and
-    Math::MPFR objects with the overloaded Math::GMPz operations. Such
+    from the exceptions noted below, you will also be able to use Math::GMPq
+    and Math::MPFR objects with the overloaded Math::GMPz operations. Such
     operations return Math::GMPq and (respectively) Math::MPFR objects.
 
    The following operators are overloaded:
@@ -1292,7 +1292,7 @@
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2006-20011, 2013-24, Sisyphus
+    Copyright 2006-20011, 2013-26, Sisyphus
 
 =head1 AUTHOR
 

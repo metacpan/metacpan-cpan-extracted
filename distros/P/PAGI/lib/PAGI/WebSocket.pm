@@ -522,157 +522,20 @@ async sub run {
     return;
 }
 
-# Timeout support
+# Keepalive support using WebSocket protocol-level ping/pong (RFC 6455)
+# Sends websocket.keepalive event to server - loop-agnostic, server handles timers
+async sub keepalive {
+    my ($self, $interval, $timeout) = @_;
 
-sub set_loop {
-    my ($self, $loop) = @_;
-    $self->{_loop} = $loop;
-    return $self;
-}
+    $interval //= 0;
 
-sub loop {
-    my ($self) = @_;
-    return $self->{_loop} if $self->{_loop};
-
-    # Try to get default loop
-    require IO::Async::Loop;
-    $self->{_loop} = IO::Async::Loop->new;
-    return $self->{_loop};
-}
-
-async sub receive_with_timeout {
-    my ($self, $timeout) = @_;
-
-    return undef if $self->is_closed;
-
-    my $loop = $self->loop;
-    my $start_time = time;
-
-    while (1) {
-        my $elapsed = time - $start_time;
-        my $remaining = $timeout - $elapsed;
-
-        if ($remaining <= 0) {
-            return undef;
-        }
-
-        my $receive_f = $self->{receive}->();
-        my $timeout_f = $loop->delay_future(after => $remaining);
-        my $winner = await Future->wait_any($receive_f, $timeout_f);
-
-        if ($timeout_f->is_ready && !$receive_f->is_ready) {
-            # Timeout won - cancel receive and return undef
-            $receive_f->cancel;
-            return undef;
-        }
-
-        # Shouldn't happen, but safety check
-        if ($receive_f->is_cancelled) {
-            return undef;
-        }
-
-        # Message received
-        my $event = $receive_f->get;
-
-        if (!defined($event) || $event->{type} eq 'websocket.disconnect') {
-            my $code = $event->{code} // 1005;
-            my $reason = $event->{reason} // '';
-            $self->_set_closed($code, $reason);
-            await $self->_run_close_callbacks;
-            return undef;
-        }
-
-        # Skip connect events - they're handled by accept()
-        next if $event->{type} eq 'websocket.connect';
-
-        return $event;
-    }
-}
-
-async sub receive_text_with_timeout {
-    my ($self, $timeout) = @_;
-
-    my $event = await $self->receive_with_timeout($timeout);
-    return undef unless $event;
-    return undef unless $event->{type} eq 'websocket.receive';
-    return undef unless exists $event->{text};
-
-    return $event->{text};
-}
-
-async sub receive_bytes_with_timeout {
-    my ($self, $timeout) = @_;
-
-    my $event = await $self->receive_with_timeout($timeout);
-    return undef unless $event;
-    return undef unless $event->{type} eq 'websocket.receive';
-    return undef unless exists $event->{bytes};
-
-    return $event->{bytes};
-}
-
-async sub receive_json_with_timeout {
-    my ($self, $timeout) = @_;
-
-    my $text = await $self->receive_text_with_timeout($timeout);
-    return undef unless defined $text;
-
-    return JSON::MaybeXS::decode_json($text);
-}
-
-# Heartbeat/keepalive support
-sub start_heartbeat {
-    my ($self, $interval) = @_;
-
-    return $self if !$interval || $interval <= 0;
-
-    require IO::Async::Timer::Periodic;
-
-    my $loop = $self->loop;
-
-    my $weak_self = $self;
-    Scalar::Util::weaken($weak_self);
-
-    my $timer = IO::Async::Timer::Periodic->new(
+    my $event = {
+        type     => 'websocket.keepalive',
         interval => $interval,
-        on_tick  => sub {
-            return unless $weak_self && $weak_self->is_connected;
-            eval {
-                $weak_self->{send}->({
-                    type => 'websocket.send',
-                    text => JSON::MaybeXS::encode_json({
-                        type => 'ping',
-                        ts   => time(),
-                    }),
-                });
-            };
-        },
-    );
+    };
+    $event->{timeout} = $timeout if defined $timeout;
 
-    $loop->add($timer);
-    $timer->start;
-
-    # Store for cleanup
-    $self->{_heartbeat_timer} = $timer;
-    $self->{_heartbeat_loop} = $loop;
-
-    # Auto-stop on close
-    $self->on_close(sub {
-        $self->stop_heartbeat;
-    });
-
-    return $self;
-}
-
-sub stop_heartbeat {
-    my ($self) = @_;
-
-    if (my $timer = delete $self->{_heartbeat_timer}) {
-        $timer->stop if $timer->is_running;
-        if (my $loop = delete $self->{_heartbeat_loop}) {
-            eval { $loop->remove($timer) };
-        }
-    }
+    await $self->{send}->($event);
 
     return $self;
 }
@@ -775,8 +638,6 @@ protocol boilerplate and provides:
 =item * Callback-based event handling (on, run)
 
 =item * Per-connection storage (stash)
-
-=item * Timeout support for receives
 
 =back
 
@@ -954,12 +815,6 @@ Waits for specific frame type, skipping others. Returns undef on disconnect.
 
 Receives text frame and decodes as JSON. Dies on invalid JSON.
 
-=head2 receive_with_timeout, receive_text_with_timeout, etc.
-
-    my $event = await $ws->receive_with_timeout(30);  # 30 seconds
-
-Returns undef on timeout (connection remains open).
-
 =head1 ITERATION HELPERS
 
 =head2 each_message, each_text, each_bytes, each_json
@@ -1039,18 +894,33 @@ Callback-based event loop (alternative to C<each_*> iteration).
 Runs until disconnect, dispatching messages to registered callbacks.
 Errors in callbacks are caught and passed to error handlers.
 
-=head1 HEARTBEAT / KEEPALIVE
+=head1 KEEPALIVE
 
-=head2 start_heartbeat
+WebSocket keepalive uses protocol-level ping/pong frames (RFC 6455). The server
+sends ping frames automatically; clients respond with pong frames without any
+application code needed.
 
-    $ws->start_heartbeat(25);  # Ping every 25 seconds
+=head2 keepalive
 
-Starts sending periodic JSON ping messages to keep the connection alive.
-Useful for preventing proxy/NAT timeout on idle connections.
+    await $ws->keepalive(30);       # Ping every 30 seconds
+    await $ws->keepalive(30, 20);   # Ping every 30s, expect pong within 20s
+    await $ws->keepalive(0);        # Disable keepalive
 
-The ping message format is:
+Enables or disables WebSocket protocol-level keepalive by sending a
+C<websocket.keepalive> event to the server. The server handles the timer
+and ping/pong frames.
 
-    { "type": "ping", "ts": <unix_timestamp> }
+Arguments:
+
+=over 4
+
+=item C<$interval> - Seconds between ping frames. Use C<0> to disable.
+
+=item C<$timeout> - (Optional) Seconds to wait for pong response. If no pong is
+received within this time, the connection is closed with code 1006 and the
+application receives a disconnect event with C<reason =E<gt> 'keepalive timeout'>.
+
+=back
 
 Common intervals:
 
@@ -1062,13 +932,6 @@ Common intervals:
 
 =back
 
-Automatically stops when connection closes. Returns C<$self> for chaining.
-
-=head2 stop_heartbeat
-
-    $ws->stop_heartbeat;
-
-Manually stops the heartbeat timer. Called automatically on connection close.
 Returns C<$self> for chaining.
 
 =head1 COMPLETE EXAMPLE

@@ -1,5 +1,11 @@
 Revision history for Perl module Math::GMPz
 
+0.68
+ - Ensure that overloaded <=> operations return one of 1, -1, 0, and undef.
+   Required some amendments to GMPz.xs, and some rewriting of parts of some
+   test scripts.
+   Issue raised by https://rt.cpan.org/Ticket/Display.html?id=168076 .
+
 0.67
  - Fix bug in t/overload_op_eq.t. Fixes:
    https://www.cpantesters.org/cpan/report/92ed61d1-72f8-1014-830e-990a97a7943c

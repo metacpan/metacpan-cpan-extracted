@@ -40,9 +40,9 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => "1.9764",
     "URI" => "1.60"
   },
-  "VERSION" => "0.001011",
+  "VERSION" => "0.001012",
   "test" => {
-    "TESTS" => "t/*.t t/app/*.t t/endpoint/*.t t/middleware/*.t t/request/*.t t/sse/*.t t/test-client/*.t t/utf8/*.t t/util/*.t t/websocket/*.t"
+    "TESTS" => "t/*.t t/app/*.t t/endpoint/*.t t/lifespan/*.t t/middleware/*.t t/request/*.t t/server/*.t t/sse/*.t t/test-client/*.t t/utf8/*.t t/websocket/*.t"
   }
 );
 

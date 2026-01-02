@@ -95,7 +95,7 @@ async sub _handle_submit {
             my $dest = "$UPLOAD_DIR/$safe_name";
 
             my $save_ok = eval {
-                await $attachment->save_to($dest);
+                $attachment->move_to($dest);
                 1;
             };
             if ($save_ok) {

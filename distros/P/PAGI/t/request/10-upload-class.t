@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use Test2::V0;
 use File::Temp qw(tempfile tempdir);
-use Future::AsyncAwait;
 
 use lib 'lib';
 use PAGI::Request::Upload;
@@ -79,7 +78,7 @@ subtest 'is_empty' => sub {
     is($empty->size, 0, 'size is 0');
 };
 
-subtest 'copy_to async' => sub {
+subtest 'move_to from memory' => sub {
     my $upload = PAGI::Request::Upload->new(
         field_name   => 'file',
         filename     => 'test.txt',
@@ -88,21 +87,18 @@ subtest 'copy_to async' => sub {
     );
 
     my $dir = tempdir(CLEANUP => 1);
-    my $dest = "$dir/copied.txt";
+    my $dest = "$dir/moved.txt";
 
-    (async sub { await $upload->copy_to($dest) })->()->get;
+    $upload->move_to($dest);
 
     ok(-f $dest, 'file created');
     open my $fh, '<', $dest;
     my $content = do { local $/; <$fh> };
     close $fh;
     is($content, 'test content 123', 'content matches');
-
-    # Original still accessible
-    is($upload->slurp, 'test content 123', 'original still readable');
 };
 
-subtest 'move_to async' => sub {
+subtest 'move_to from disk' => sub {
     my $dir = tempdir(CLEANUP => 1);
     my ($fh, $temp_path) = tempfile(DIR => $dir);
     print $fh "moveable content";
@@ -117,7 +113,7 @@ subtest 'move_to async' => sub {
     );
 
     my $dest = "$dir/moved.txt";
-    (async sub { await $upload->move_to($dest) })->()->get;
+    $upload->move_to($dest);
 
     ok(-f $dest, 'destination exists');
     ok(!-f $temp_path, 'temp file removed');

@@ -1,0 +1,113 @@
+---
+name: Perl CI
+
+'on':
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        perl:
+          - '5.40'
+          - '5.38'
+          - '5.36'
+    name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
+    env:
+      AUTOMATED_TESTING: 1
+      NO_NETWORK_TESTING: 1
+      NONINTERACTIVE_TESTING: 1
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+
+      - name: Cache CPAN modules
+        uses: actions/cache@v5
+        with:
+          path: ~/perl5
+          key: ${{ runner.os }}-${{ matrix.perl }}-${{ hashFiles('cpanfile') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.perl }}-
+
+      - name: Install cpanm and local::lib
+        if: runner.os != 'Windows'
+        run: cpanm --notest --local-lib=~/perl5 local::lib
+
+      - name: Install cpanm and local::lib (Windows)
+        if: runner.os == 'Windows'
+        run: cpanm --notest App::cpanminus local::lib
+
+      - name: Install dependencies
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          eval $(perl -I ~/perl5/lib/perl5 -Mlocal::lib)
+          cpanm --notest --installdeps .
+
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          @echo off
+          set "PATH=%USERPROFILE%\perl5\bin;%PATH%"
+          set "PERL5LIB=%USERPROFILE%\perl5\lib\perl5"
+          cpanm --notest --installdeps .
+
+      - name: Run tests
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          eval $(perl -I ~/perl5/lib/perl5 -Mlocal::lib)
+          prove -lr t/
+
+      - name: Run tests (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          @echo off
+          set "PATH=%USERPROFILE%\perl5\bin;%PATH%"
+          set "PERL5LIB=%USERPROFILE%\perl5\lib\perl5"
+          prove -lr t/
+
+      - name: Run Perl::Critic
+        if: matrix.perl == '5.36' && matrix.os == 'ubuntu-latest'
+        continue-on-error: true
+        run: |
+          eval $(perl -I ~/perl5/lib/perl5 -Mlocal::lib)
+          cpanm --notest Perl::Critic
+          perlcritic --severity 3 lib/ || true
+        shell: bash
+
+      - name: Test coverage
+        if: matrix.perl == '5.36' && matrix.os == 'ubuntu-latest'
+        run: |
+          eval $(perl -I ~/perl5/lib/perl5 -Mlocal::lib)
+          cpanm --notest Devel::Cover
+          cover -delete
+          HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t/
+          cover
+        shell: bash

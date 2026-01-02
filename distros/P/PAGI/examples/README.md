@@ -3,8 +3,12 @@
 This directory contains progressively more advanced PAGI examples. Each subdirectory is prefixed with a two-digit number so you can follow along in order.
 
 ## Requirements
-- Perl 5.18+ with `Future::AsyncAwait` and `IO::Async`
+- Perl 5.18+ with `Future::AsyncAwait`
+- For timers/sleeps: `Future::IO` (loop-agnostic)
 - Run examples with: `pagi-server examples/01-hello-http/app.pl --port 5000`
+
+Note: Some advanced examples (job-runner, chat) use `IO::Async` directly for
+timer and subprocess features. These are PAGI::Server-specific patterns.
 
 Examples assume you understand the core spec (`docs/specs/main.mkdn`) plus the relevant protocol documents.
 

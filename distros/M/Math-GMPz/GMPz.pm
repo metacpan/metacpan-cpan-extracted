@@ -124,7 +124,7 @@ zgmp_urandomb_ui zgmp_urandomm_ui
     );
 
     @Math::GMPz::EXPORT_OK = (@untagged, @tagged);
-    our $VERSION = '0.67';
+    our $VERSION = '0.68';
     #$VERSION = eval $VERSION;
 
     Math::GMPz->DynaLoader::bootstrap($VERSION);
@@ -151,6 +151,7 @@ sub new {
     # If there are no args, then we just want to return an
     # initialized Math::GMPz
     if(!@_) {return Rmpz_init()}
+    if(@_ == 1 && ref($_[0]) eq 'Math::GMPz') { return Rmpz_init_set($_[0]) }
 
     if(@_ > 3) {die "Too many arguments supplied to new()"}
 
@@ -162,10 +163,30 @@ sub new {
     # an object - which we'll do by using the ref() function.
     # Also first check that the POK flag is set - to avoid setting the
     # POK flag on perl-5.18 and earlier.
+
+    my $called_as_method = 0;
+
     if(!ref($_[0]) && Math::GMPz::_SvPOK($_[0]) && $_[0] eq "Math::GMPz") {
       shift;
       if(!@_) {return Rmpz_init()}
-      }
+      $called_as_method = 1;
+    }
+    # The following elsif block is currently not implemented
+    #elsif(ref($_[0]) eq "Math::GMPz") {
+    #
+    #  # new() was called as $math_gmpz_object->new($val). Apart from $_[0] which
+    #  # is (the automatically included $math_gmpz_object), only one argument ($val)
+    #  # should have been explicitly provided ... unless, of course, $val is a PV
+    #  # (string), in which case a a second ($base) argument is optionally allowed.
+    #
+    #   shift; # Remove 1st argument
+    #
+    #  # Allow for possibility of an additional ($base) argument.
+    #  # The possibility of there being even more arguments has already been ruled out.
+    #
+    #   if(@_ > 1 && _itsa($_[0]) != _POK_T ) {die "Too many arguments supplied to new() - expected only one"}
+    #   return Math::GMPz->new(@_);
+    #} # close elsif
 
     # @_ can now contain a maximum of 2 args - the value, and iff the value is
     # a string, (optionally) the base of the numeric string.

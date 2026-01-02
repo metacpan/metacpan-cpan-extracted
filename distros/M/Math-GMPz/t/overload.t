@@ -651,7 +651,7 @@ my @k2 = (($mers<=>1234),($mers<=>-1234),($mers<=>$m),($mers<=>-$m),($mers<=>$w)
 
 $ok = 1;
 for(0..7) {
-   if($k1[$_] >= 0 || $k2[$_] <= 0) {$ok = 0}
+   if( $k1[$_] != -1  || $k2[$_] != 1 ) {$ok = 0}
    }
 
 for(8..10) {
@@ -810,8 +810,8 @@ if($p == 10 && Math::GMPz::get_refcnt($p) == $expected_refcnt) {print "ok 36\n"}
 else {print "not ok 36\n"}
 
 if($p < $string && $p <= $string && $string > $p
-   && $string >= $p && ($p <=> $string) < 0
-   && ($string <=> $p) > 0 && Math::GMPz::get_refcnt($p) == $expected_refcnt
+   && $string >= $p && ($p <=> $string) == -1
+   && ($string <=> $p) == 1 && Math::GMPz::get_refcnt($p) == $expected_refcnt
    && $p != $string) {print "ok 37\n"}
 else {print "not ok 37\n"}
 

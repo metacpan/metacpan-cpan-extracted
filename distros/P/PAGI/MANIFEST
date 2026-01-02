@@ -7,10 +7,6 @@ META.json
 META.yml
 Makefile.PL
 README
-README.md
-SECURITY.md
-TODO_PRIORITY.md
-TODO_SPLITPLAN.md
 bin/pagi-server
 cpanfile
 dist.ini
@@ -18,9 +14,6 @@ docs/extensions.mkdn
 docs/implementations.mkdn
 docs/index.mkdn
 docs/introduction.mkdn
-docs/plans/2025-12-27-runner-modes-refactor.md
-docs/plans/log-any-integration.md
-docs/plans/metrics-any-integration.md
 docs/specs/index.mkdn
 docs/specs/lifespan.mkdn
 docs/specs/main.mkdn
@@ -79,6 +72,8 @@ examples/app-01-file/static/subdir/nested.txt
 examples/app-01-file/static/test.txt
 examples/background-tasks/README.md
 examples/background-tasks/app.pl
+examples/backpressure-test/README.md
+examples/backpressure-test/app.pl
 examples/endpoint-demo/README.md
 examples/endpoint-demo/app.pl
 examples/endpoint-demo/public/index.html
@@ -100,9 +95,9 @@ examples/websocket-chat-v2/lib/ChatApp/State.pm
 examples/websocket-chat-v2/lib/ChatApp/WebSocket.pm
 examples/websocket-echo-v2/README.md
 examples/websocket-echo-v2/app.pl
+examples/worker-pool-prototype.pl
 lib/PAGI.pm
 lib/PAGI/App/Cascade.pm
-lib/PAGI/App/Delayed.pm
 lib/PAGI/App/Directory.pm
 lib/PAGI/App/File.pm
 lib/PAGI/App/Healthcheck.pm
@@ -112,7 +107,6 @@ lib/PAGI/App/Proxy.pm
 lib/PAGI/App/Redirect.pm
 lib/PAGI/App/Router.pm
 lib/PAGI/App/SSE/Pubsub.pm
-lib/PAGI/App/SSE/Stream.pm
 lib/PAGI/App/Throttle.pm
 lib/PAGI/App/URLMap.pm
 lib/PAGI/App/WebSocket/Broadcast.pm
@@ -154,15 +148,12 @@ lib/PAGI/Middleware/RequestId.pm
 lib/PAGI/Middleware/ReverseProxy.pm
 lib/PAGI/Middleware/Rewrite.pm
 lib/PAGI/Middleware/Runtime.pm
-lib/PAGI/Middleware/SSE/Heartbeat.pm
 lib/PAGI/Middleware/SSE/Retry.pm
 lib/PAGI/Middleware/SecurityHeaders.pm
 lib/PAGI/Middleware/Session.pm
 lib/PAGI/Middleware/Static.pm
-lib/PAGI/Middleware/Timeout.pm
 lib/PAGI/Middleware/TrustedHosts.pm
 lib/PAGI/Middleware/WebSocket/Compression.pm
-lib/PAGI/Middleware/WebSocket/Heartbeat.pm
 lib/PAGI/Middleware/WebSocket/RateLimit.pm
 lib/PAGI/Middleware/XSendfile.pm
 lib/PAGI/Request.pm
@@ -174,8 +165,11 @@ lib/PAGI/Response.pm
 lib/PAGI/Runner.pm
 lib/PAGI/SSE.pm
 lib/PAGI/Server.pm
+lib/PAGI/Server/AsyncFile.pm
 lib/PAGI/Server/Compliance.pod
 lib/PAGI/Server/Connection.pm
+lib/PAGI/Server/ConnectionState.pm
+lib/PAGI/Server/EventValidator.pm
 lib/PAGI/Server/Protocol/HTTP1.pm
 lib/PAGI/Spec.pod
 lib/PAGI/Spec/Lifespan.pod
@@ -186,7 +180,6 @@ lib/PAGI/Test/Response.pm
 lib/PAGI/Test/SSE.pm
 lib/PAGI/Test/WebSocket.pm
 lib/PAGI/Tutorial.pod
-lib/PAGI/Util/AsyncFile.pm
 lib/PAGI/WebSocket.pm
 t/00-load.t
 t/01-hello-http.t
@@ -219,8 +212,16 @@ t/30-error-propagation.t
 t/31-memory-leak.t
 t/32-middleware-on-error.t
 t/32-request-timeout.t
+t/33-csrf-timing-safe.t
 t/33-ws-sse-idle-timeout.t
+t/34-directory-security.t
+t/35-gzip-concurrency.t
+t/36-request-is-disconnected.t
+t/37-connection-state.t
+t/38-unrecognized-event-type.t
+t/39-disconnect-reasons.t
 t/40-connection-limiting.t
+t/40-event-validation.t
 t/41-connection-limiting-stress.t
 t/42-file-response.t
 t/app-file.t
@@ -253,6 +254,8 @@ t/endpoint/10-integration.t
 t/integration-endpoint-router-demo.t
 t/lib/Test/PAGI/Server.pm
 t/lifespan.t
+t/lifespan/02-worker-fields.t
+t/middleware-builder-resolution.t
 t/middleware/00-base.t
 t/middleware/01-content-length.t
 t/middleware/02-head.t
@@ -292,7 +295,9 @@ t/response-convenience.t
 t/response-integration.t
 t/response.t
 t/router-middleware.t
+t/router-named-routes.t
 t/runner.t
+t/server/01-async-file.t
 t/signal-graceful-restart.t
 t/signal-graceful-shutdown.t
 t/signal-worker-scaling.t
@@ -313,6 +318,7 @@ t/static_test_files/hello.txt
 t/static_test_files/index.html
 t/static_test_files/style.css
 t/static_test_files/subdir/file.txt
+t/test-client-scope-method.t
 t/test-client/01-response.t
 t/test-client/02-client-http.t
 t/test-client/03-websocket.t
@@ -322,8 +328,8 @@ t/test-client/06-integration.t
 t/test-client/07-multi-value.t
 t/test-client/08-exception-handling.t
 t/tls-optional.t
+t/tutorial.t
 t/utf8/01-raw-utf8.t
-t/util/01-async-file.t
 t/websocket-heartbeat.t
 t/websocket-state.t
 t/websocket/01-constructor.t
@@ -334,6 +340,5 @@ t/websocket/05-safe-send.t
 t/websocket/06-receive.t
 t/websocket/07-iteration.t
 t/websocket/08-cleanup.t
-t/websocket/09-timeout.t
 t/websocket/10-integration.t
 t/websocket/11-stash-and-callbacks.t

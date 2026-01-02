@@ -5,7 +5,7 @@ use strict;
 use DBI   1.57 ();
 use XSLoader ();
 
-our $VERSION = '1.76';
+our $VERSION = '1.78';
 
 # sqlite_version cache (set in the XS bootstrap)
 our ($sqlite_version, $sqlite_version_number);
@@ -433,7 +433,7 @@ sub primary_key_info {
             next if defined $table && $table ne '%' && $table ne $tbname;
 
             my $quoted_tbname = $dbh->quote_identifier($tbname);
-            my $t_sth = $dbh->prepare("PRAGMA $quoted_dbname.table_info($quoted_tbname)") or return;
+            my $t_sth = $dbh->prepare("PRAGMA $quoted_dbname.table_xinfo($quoted_tbname)") or return;
             $t_sth->execute or return;
             my @pk;
             while(my $col = $t_sth->fetchrow_hashref) {
@@ -611,7 +611,7 @@ sub foreign_key_info {
                     my $quoted_tb = $dbh->quote_identifier($row->{table});
                     for my $db (@$databases) {
                         my $quoted_db = $dbh->quote_identifier($db->{name});
-                        my $t_sth = $dbh->prepare("PRAGMA $quoted_db.table_info($quoted_tb)") or return;
+                        my $t_sth = $dbh->prepare("PRAGMA $quoted_db.table_xinfo($quoted_tb)") or return;
                         $t_sth->execute or return;
                         my $cols = {};
                         while(my $r = $t_sth->fetchrow_hashref) {
@@ -932,7 +932,7 @@ END_SQL
     # Taken from Fey::Loader::SQLite
     my @cols;
     while ( my ($schema, $table) = $sth_tables->fetchrow_array ) {
-        my $sth_columns = $dbh->prepare(qq{PRAGMA "$schema".table_info("$table")}) or return;
+        my $sth_columns = $dbh->prepare(qq{PRAGMA "$schema".table_xinfo("$table")}) or return;
         $sth_columns->execute or return;
 
         for ( my $position = 1; my $col_info = $sth_columns->fetchrow_hashref; $position++ ) {
@@ -1074,7 +1074,7 @@ are limited by the typeless nature of the SQLite database.
 =head1 SQLITE VERSION
 
 DBD::SQLite is usually compiled with a bundled SQLite library
-(SQLite version S<3.46.1> as of this release) for consistency.
+(SQLite version S<3.51.1> as of this release) for consistency.
 However, a different version of SQLite may sometimes be used for
 some reasons like security, or some new experimental features.
 

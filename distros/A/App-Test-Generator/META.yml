@@ -1,5 +1,5 @@
 ---
-abstract: 'Generate fuzz and corpus-driven test harnesses'
+abstract: 'Generate fuzz and corpus-driven test harnesses from test schemas'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
@@ -58,5 +58,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Test-Generator
   homepage: https://metacpan.org/pod/App::Test::Generator
   repository: git://github.com/nigelhorne/App-Test-Generator.git
-version: '0.24'
+version: '0.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

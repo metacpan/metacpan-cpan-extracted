@@ -1,6 +1,6 @@
 package DBIx::Auto::Migrate;
 
-our $VERSION = "0.7";
+our $VERSION = "0.8";
 
 use v5.16.3;
 use strict;
@@ -172,7 +172,7 @@ DBIx::Auto::Migrate - Wrap your database connections and automatically apply db 
  			id BIGSERIAL PRIMARY KEY,
  			name TEXT,
  			value TEXT,
-			UNIQUE (name)
+ 			UNIQUE (name)
  		)',
  		create_index(qw/options name/),
  		'CREATE TABLE users (
@@ -236,7 +236,7 @@ To check an example project that uses this code you can check L<https://github.c
  			id BIGSERIAL PRIMARY KEY,
  			name TEXT,
  			value TEXT,
-			UNIQUE (name)
+ 			UNIQUE (name)
  		)',
  		'CREATE TABLE users (
  			id BIGSERIAL PRIMARY KEY,

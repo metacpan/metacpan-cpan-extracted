@@ -2,6 +2,8 @@
 module: Email::Valid
 function: rfc822
 
+new:
+
 config:
   properties:
     enable: true

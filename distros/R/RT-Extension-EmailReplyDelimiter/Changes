@@ -1,4 +1,10 @@
 Revision history for RT-Extension-EmailReplyDelimiter
 
-0.01 Sat Aug 29 2023
+0.10 - Thu Jan  1 2026
+ - Patch from Grant Emsley: update supported RT versions list, fix issues
+   with quoted-printable messages, add support for regular expression
+   delimiters, and provide examples for removing quoted text from messages
+   sent from Outlook (issue #1).
+
+0.01 - Sat Aug 29 2023
  - Initial version

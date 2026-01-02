@@ -3486,6 +3486,14 @@ SV * _overload_spaceship(pTHX_ mpz_t * a, SV * b, SV * third) {
 
      if(SV_IS_IOK(b)) {
        ret = Rmpz_cmp_IV(aTHX_ a, b);
+       /*
+          spaceship operator should return 1, -1 for unequal
+          operands but mpz_cmp* functions are documented to
+          return only >0 or <0. See:
+          https://rt.cpan.org/Ticket/Display.html?id=168076
+       */
+       if(ret > 0) ret = 1;
+       if(ret < 0) ret = -1;
        if(SWITCH_ARGS) ret *= -1;
        return newSViv(ret);
      }
@@ -3503,6 +3511,8 @@ SV * _overload_spaceship(pTHX_ mpz_t * a, SV * b, SV * third) {
        if(mpz_init_set_str(t, SvPV_nolen(b), 0))
          croak("Invalid string (%s) supplied to Math::GMPz::overload_spaceship", SvPV_nolen(b));
        ret = mpz_cmp(*a, t);
+       if(ret > 0) ret = 1;
+       if(ret < 0) ret = -1;
        mpz_clear(t);
        if(SWITCH_ARGS) ret *= -1;
        return newSViv(ret);
@@ -3510,6 +3520,8 @@ SV * _overload_spaceship(pTHX_ mpz_t * a, SV * b, SV * third) {
 
      if(SV_IS_NOK(b)) {
        ret = Rmpz_cmp_NV(aTHX_ a, b);
+       if(ret > 0) ret = 1;
+       if(ret < 0) ret = -1;
        if(SWITCH_ARGS) ret *= -1;
        return newSViv(ret);
      }
@@ -3518,15 +3530,21 @@ SV * _overload_spaceship(pTHX_ mpz_t * a, SV * b, SV * third) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          ret = mpz_cmp(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
+         if(ret > 0) ret = 1;
+         if(ret < 0) ret = -1;
          return newSViv(ret);
        }
 
        if(strEQ(h, "Math::GMPq")) {
 #if __GNU_MP_RELEASE < 60099
          ret = my_cmp_z(INT2PTR(mpq_t *, SvIVX(SvRV(b))), a);
+         if(ret > 0) ret = 1;
+         if(ret < 0) ret = -1;
          return newSViv(ret * -1);
 #else
          ret = mpq_cmp_z(*(INT2PTR(mpq_t *, SvIVX(SvRV(b)))), *a);
+         if(ret > 0) ret = 1;
+         if(ret < 0) ret = -1;
          return newSViv(ret * -1);
 #endif
        }
@@ -3541,16 +3559,22 @@ SV * _overload_spaceship(pTHX_ mpz_t * a, SV * b, SV * third) {
            if(strEQ("-", sign)) {
              mpz_neg((mpz_ptr)mpz, (mpz_srcptr)mpz);
              ret = mpz_cmp(*a, (mpz_srcptr)mpz);
+             if(ret > 0) ret = 1;
+             if(ret < 0) ret = -1;
              mpz_neg((mpz_ptr)mpz, (mpz_srcptr)mpz); /* restore to original */
              return newSViv(ret);
            }
 
            ret = mpz_cmp(*a, (mpz_srcptr)mpz);
+           if(ret > 0) ret = 1;
+           if(ret < 0) ret = -1;
            return newSViv(ret);
          }
 
          mpz_init_set_str(t, SvPV_nolen(b), 0);
          ret = mpz_cmp(*a, t);
+         if(ret > 0) ret = 1;
+         if(ret < 0) ret = -1;
          mpz_clear(t);
          /* if(SWITCH_ARGS) ret *= -1; */
          return newSViv(ret);

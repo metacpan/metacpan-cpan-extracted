@@ -14,7 +14,7 @@ use File::Path qw(make_path);
 use Safe;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 # Configure YAML::XS to not quote numeric strings
 $YAML::XS::QuoteNumericStrings = 0;
@@ -25,7 +25,7 @@ App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =head1 SYNOPSIS
 
@@ -673,7 +673,7 @@ Methods that always return true (typically for side effects):
         return 1;  # Success indicator
     }
 
-Sets C<success_indicator> flag when method consistently returns 1.
+Sets C<_success_indicator> flag when method consistently returns 1.
 
 =head3 Schema Output
 
@@ -688,7 +688,7 @@ Enhanced return analysis adds these fields to method schemas:
         type: integer
       returns_self: 1               # Returns $self
       void_context: 1            # No meaningful return
-      success_indicator: 1       # Always returns true
+      _success_indicator: 1       # Always returns true
       error_return: undef        # How errors are signaled
       success_failure_pattern: 1 # Mixed return types
       error_handling:            # Detailed error patterns
@@ -2206,23 +2206,36 @@ sub _analyze_pod {
 
 		$params{$name} ||= { _source => 'pod' };
 
-		# Try to extract type and constraints from description
-		if ($desc =~ /(\w+)(?:\s*\(([^)]+)\))?/) {
+		# Explicit typed form only:
+		#   $param - type (constraints)
+		if ($desc =~ /^\s*(string|integer|int|number|num|float|boolean|bool|array|arrayref|hash|hashref)\b(?:\s*\(([^)]+)\))?/i) {
 			my $type = lc($1);
 			my $constraint = $2;
 
 			# Normalize type names
-			$type = 'integer' if $type eq 'int';
-			$type = 'number' if $type eq 'num' || $type eq 'float';
-			$type = 'boolean' if $type eq 'bool';
+			$type = 'integer'  if $type eq 'int';
+			$type = 'number'   if $type eq 'num' || $type eq 'float';
+			$type = 'boolean'  if $type eq 'bool';
 			$type = 'arrayref' if $type eq 'array';
-			$type = 'hashref' if $type eq 'hash';
+			$type = 'hashref'  if $type eq 'hash';
 
 			$params{$name}{type} = $type;
 
-			# Parse constraints
 			if ($constraint) {
 				$self->_parse_constraints($params{$name}, $constraint);
+			}
+
+			$self->_log("  POD: Explicit type '$type' for $name");
+		} else {
+			# Heuristic inference from description text
+			if ($desc =~ /\bstring\b/i) {
+				$params{$name}{type} = 'string';
+			} elsif ($desc =~ /\b(int|integer)\b/i) {
+				$params{$name}{type} = 'integer';
+			} elsif ($desc =~ /\b(num|number|float)\b/i) {
+				$params{$name}{type} = 'number';
+			} elsif ($desc =~ /\b(bool|boolean)\b/i) {
+				$params{$name}{type} = 'boolean';
 			}
 		}
 
@@ -2759,33 +2772,39 @@ sub _detect_void_context {
 		'printer' => qr/^(?:print|say|dump)_/,
 	};
 
-    # Check if method name suggests void context
-    foreach my $type (keys %$void_patterns) {
-        if ($method_name =~ $void_patterns->{$type}) {
-            $output->{void_context_hint} = $type;
-            $self->_log("  OUTPUT: Method name suggests $type (typically void context)");
-            last;
-        }
-    }
+	# Check if method name suggests void context
+	foreach my $type (keys %$void_patterns) {
+		if ($method_name =~ $void_patterns->{$type}) {
+			$output->{void_context_hint} = $type;
+			$self->_log("  OUTPUT: Method name suggests $type (typically void context)");
+			last;
+		}
+	}
 
 	# Analyze return statements
 	my @returns = $code =~ /return\s*([^;]*);/g;
 
-	$self->_log('  DEBUG Found ' . scalar(@returns) . " return statements");
+	$self->_log('  DEBUG Found ' . scalar(@returns) . ' return statements');
 
 	# Count different return patterns
 	my $no_value_returns = 0;
 	my $true_returns = 0;
 	my $self_returns = 0;
 
-    foreach my $ret (@returns) {
-        $ret =~ s/^\s+|\s+$//g;
-        $self->_log("  DEBUG return value: [$ret]");
-        $no_value_returns++ if $ret eq '';
-        $no_value_returns++ if($ret =~ /^(if|unless)\s/);
-        $true_returns++ if $ret eq '1';
-        $self_returns++ if $ret eq '$self';
-    }
+	foreach my $ret (@returns) {
+		$ret =~ s/^\s+|\s+$//g;
+		$self->_log("  DEBUG return value: [$ret]");
+		$no_value_returns++ if $ret eq '';
+		$no_value_returns++ if($ret =~ /^(if|unless)\s/);
+		$true_returns++ if $ret eq '1';
+		$self_returns++ if $ret eq '$self';
+		if ($ret =~ /\?\s*1\s*:\s*0\b/) {
+			# Strong boolean signal: ternary returning 1/0
+			$true_returns++;
+			# $self->_log("  OUTPUT: Ternary 1:0 return detected, treating as boolean (+40)");
+			$self->_log('  OUTPUT: Ternary 1:0 return detected, treating as boolean');
+		}
+	}
 
 	my $total_returns = scalar(@returns);
 
@@ -2795,11 +2814,10 @@ sub _detect_void_context {
 	if ($no_value_returns > 0 && $no_value_returns == $total_returns) {
 		$output->{void_context} = 1;
 		$output->{type} = 'void';  # This should override any previous type
-		$self->_log("  OUTPUT: All returns are empty - void context method");
-	}
-	# Methods that always return true (success indicator)
-	elsif ($true_returns > 0 && $true_returns == $total_returns && $total_returns >= 1) {
-		$output->{success_indicator} = 1;
+		$self->_log('  OUTPUT: All returns are empty - void context method');
+	} elsif ($true_returns > 0 && $true_returns == $total_returns && $total_returns >= 1) {
+		# Methods that always return true (success indicator)
+		$output->{_success_indicator} = 1;
 		# Don't override type if already set to boolean
 		unless ($output->{type} && $output->{type} eq 'boolean') {
 			$output->{type} = 'boolean';
@@ -2982,6 +3000,7 @@ sub _infer_type_from_expression {
     if ($expr =~ /^['"]/ || $expr =~ /['"]$/) {
         return { type => 'string' };
     }
+
 
     # Check for numbers
     if ($expr =~ /^-?\d+$/) {
@@ -4643,11 +4662,11 @@ sub _calculate_output_confidence {
         push @factors, "Chainable method (fluent interface) (+15)";
     }
 
-    # Void context
-    if ($output->{void_context}) {
-        $score += 20;
-        push @factors, "Void context method (no meaningful return) (+20)";
-    }
+	# Void context
+	if ($output->{void_context}) {
+		$score += 20;
+		push @factors, "Void context method (no meaningful return) (+20)";
+	}
 
 	# Exception handling
 	if ($output->{error_handling} && $output->{error_handling}{exception_handling}) {
@@ -4697,23 +4716,25 @@ sub _generate_confidence_report
 	push @report, "Overall Confidence: " . uc($analysis->{overall_confidence});
 	push @report, '';
 
-    if ($analysis->{confidence_factors}{input}) {
-        push @report, "Input Parameters:";
-        push @report, "  Confidence Level: " . uc($analysis->{input_confidence});
-        foreach my $factor (@{$analysis->{confidence_factors}{input}}) {
-            push @report, "  - $factor";
-        }
-        push @report, '';
-    }
+	if ($analysis->{confidence_factors}{input}) {
+		push @report, (
+			"Input Parameters:",
+			 "  Confidence Level: " . uc($analysis->{input_confidence})
+		);
+		foreach my $factor (@{$analysis->{confidence_factors}{input}}) {
+			push @report, "  - $factor";
+		}
+		push @report, '';
+	}
 
-    if ($analysis->{confidence_factors}{output}) {
-        push @report, "Return Value:";
-        push @report, "  Confidence Level: " . uc($analysis->{output_confidence});
-        foreach my $factor (@{$analysis->{confidence_factors}{output}}) {
-            push @report, "  - $factor";
-        }
-        push @report, '';
-    }
+	if ($analysis->{confidence_factors}{output}) {
+		push @report, 'Return Value:',
+			"  Confidence Level: " . uc($analysis->{output_confidence});
+		foreach my $factor (@{$analysis->{confidence_factors}{output}}) {
+			push @report, "  - $factor";
+		}
+		push @report, '';
+	}
 
 	if ($analysis->{per_parameter_scores}) {
 		push @report, 'Per-Parameter Analysis:';
@@ -5575,9 +5596,10 @@ sub _needs_object_instantiation {
 
 	# 3. Check if this is an instance method that needs an object
 	my $is_instance_method = $self->_detect_instance_method($method_name, $method_body);
-	if ($is_instance_method && ($is_instance_method->{explicit_self} ||
-								$is_instance_method->{shift_self} ||
-								$is_instance_method->{accesses_object_data})) {
+	if($is_instance_method &&
+	    ($is_instance_method->{explicit_self} ||
+			$is_instance_method->{shift_self} ||
+			$is_instance_method->{accesses_object_data})) {
 		$result->{needs_object} = 1;
 		$result->{type} = 'instance_method';
 		$result->{details} = $is_instance_method;

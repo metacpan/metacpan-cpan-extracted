@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use Test2::V0;
 use Future::AsyncAwait;
-use IO::Async::Loop;
 use File::Temp qw(tempfile);
 
 use PAGI::Request::BodyStream;

@@ -27,12 +27,13 @@ sub new {
     return $scope->{'pagi.sse'} if $scope->{'pagi.sse'};
 
     my $self = bless {
-        scope     => $scope,
-        receive   => $receive,
-        send      => $send,
-        _state    => 'pending',  # pending -> started -> closed
-        _on_close => [],
-        _on_error => [],
+        scope             => $scope,
+        receive           => $receive,
+        send              => $send,
+        _state            => 'pending',  # pending -> started -> closed
+        _on_close         => [],
+        _on_error         => [],
+        _disconnect_reason => undef,     # Set when disconnect received
     }, $class;
 
     # Cache in scope for reuse (weakened to avoid circular reference leak)
@@ -91,6 +92,13 @@ sub is_closed {
     return $self->{_state} eq 'closed';
 }
 
+# Disconnect reason - why the connection closed
+# Common values: 'client_closed', 'write_error', 'send_timeout', 'idle_timeout'
+sub disconnect_reason {
+    my $self = shift;
+    return $self->{_disconnect_reason};
+}
+
 # Internal state setters
 sub _set_state {
     my ($self, $state) = @_;
@@ -100,15 +108,6 @@ sub _set_state {
 sub _set_closed {
     my ($self) = @_;
     $self->{_state} = 'closed';
-
-    # Stop keepalive timer if running
-    if ($self->{_keepalive_timer}) {
-        $self->{_keepalive_timer}->stop;
-        if ($self->{_loop}) {
-            $self->{_loop}->remove($self->{_keepalive_timer});
-        }
-        delete $self->{_keepalive_timer};
-    }
 }
 
 # Start the SSE stream
@@ -130,55 +129,16 @@ async sub start {
     return $self;
 }
 
-# Set or get the event loop
-sub set_loop {
-    my ($self, $loop) = @_;
-    $self->{_loop} = $loop;
-    return $self;
-}
-
-sub loop {
-    my ($self) = @_;
-    return $self->{_loop} if $self->{_loop};
-
-    require IO::Async::Loop;
-    $self->{_loop} = IO::Async::Loop->new;
-    return $self->{_loop};
-}
-
-# Enable/disable keepalive timer
-sub keepalive {
+# Enable keepalive - sends sse.keepalive event to server
+# Server handles the timer; this is loop-agnostic
+async sub keepalive {
     my ($self, $interval, $comment) = @_;
-    $comment //= ':keepalive';
 
-    # Stop existing timer if any
-    if ($self->{_keepalive_timer}) {
-        $self->{_keepalive_timer}->stop;
-        $self->loop->remove($self->{_keepalive_timer});
-        delete $self->{_keepalive_timer};
-    }
-
-    # If interval is 0 or undef, just disable
-    return $self unless $interval && $interval > 0;
-
-    require IO::Async::Timer::Periodic;
-    require Scalar::Util;
-
-    my $weak_self = $self;
-    Scalar::Util::weaken($weak_self);
-
-    my $timer = IO::Async::Timer::Periodic->new(
-        interval => $interval,
-        on_tick  => sub {
-            return unless $weak_self && !$weak_self->is_closed;
-            # Send as SSE comment (not data) to avoid triggering onmessage
-            $weak_self->try_send_comment($comment);
-        },
-    );
-
-    $self->loop->add($timer);
-    $timer->start;
-    $self->{_keepalive_timer} = $timer;
+    await $self->{send}->({
+        type     => 'sse.keepalive',
+        interval => $interval // 0,
+        comment  => $comment // '',
+    });
 
     return $self;
 }
@@ -409,9 +369,11 @@ async sub _run_close_callbacks {
     return if $self->{_close_callbacks_ran};
     $self->{_close_callbacks_ran} = 1;
 
+    my $reason = $self->{_disconnect_reason} // 'unknown';
+
     for my $cb (@{$self->{_on_close}}) {
         eval {
-            my $r = $cb->($self);
+            my $r = $cb->($self, $reason);
             if (blessed($r) && $r->isa('Future')) {
                 await $r;
             }
@@ -445,6 +407,7 @@ async sub run {
         my $type = $event->{type} // '';
 
         if ($type eq 'sse.disconnect') {
+            $self->{_disconnect_reason} = $event->{reason} // 'client_closed';
             $self->_set_closed;
             await $self->_run_close_callbacks;
             last;
@@ -495,43 +458,62 @@ async sub each {
     return $self;
 }
 
-# Periodic event sending
+# Periodic callback execution with interval delay
+# Requires Future::IO to be installed
 async sub every {
     my ($self, $interval, $callback) = @_;
 
-    my $loop = $self->loop;
+    croak "every() requires interval" unless defined $interval && $interval > 0;
+    croak "every() requires callback coderef" unless ref $callback eq 'CODE';
+
+    # Future::IO is required for every() - fail clearly if not available
+    eval { require Future::IO; 1 }
+        or croak "every() requires Future::IO to be installed. "
+               . "Install it with: cpanm Future::IO";
 
     await $self->start unless $self->is_started;
 
     # Start background disconnect monitor
-    $self->_start_disconnect_monitor unless $self->{_disconnect_monitor_started};
+    my $disconnect_future = $self->_watch_for_disconnect;
 
     while (!$self->is_closed) {
-        # Try to send - if it fails, connection is closed
+        # Execute the callback
         my $ok = eval { await $callback->(); 1 };
         unless ($ok) {
+            my $err = $@;
+            # Callback failed - connection likely closed or error occurred
             $self->_set_closed;
             await $self->_run_close_callbacks;
             last;
         }
 
-        await $loop->delay_future(after => $interval);
+        # Race between sleep and disconnect detection
+        my $sleep_future = Future::IO->sleep($interval);
+        my $winner = await Future->wait_any($sleep_future, $disconnect_future);
+
+        # If disconnect won, exit the loop
+        if ($self->is_closed) {
+            $sleep_future->cancel if $sleep_future->can('cancel') && !$sleep_future->is_ready;
+            last;
+        }
     }
+
+    # Clean up disconnect monitor if still running
+    $disconnect_future->cancel if $disconnect_future->can('cancel') && !$disconnect_future->is_ready;
+
+    return $self;
 }
 
-# Start a background task to monitor for disconnect events
-sub _start_disconnect_monitor {
+# Background future that completes when disconnect is detected
+sub _watch_for_disconnect {
     my ($self) = @_;
-    return if $self->{_disconnect_monitor_started};
-    $self->{_disconnect_monitor_started} = 1;
 
     my $receive = $self->{receive};
-    my $weak_self = $self;
     require Scalar::Util;
+    my $weak_self = $self;
     Scalar::Util::weaken($weak_self);
 
-    # This runs in the background and waits for disconnect
-    my $monitor = (async sub {
+    return (async sub {
         while ($weak_self && !$weak_self->is_closed) {
             my $event = eval { await $receive->() };
             last unless $event;
@@ -539,6 +521,7 @@ sub _start_disconnect_monitor {
             my $type = $event->{type} // '';
             if ($type eq 'sse.disconnect') {
                 if ($weak_self) {
+                    $weak_self->{_disconnect_reason} = $event->{reason} // 'client_closed';
                     $weak_self->_set_closed;
                     await $weak_self->_run_close_callbacks;
                 }
@@ -546,10 +529,6 @@ sub _start_disconnect_monitor {
             }
         }
     })->();
-
-    # Keep the future alive but don't block on it
-    $monitor->on_fail(sub { }); # Ignore errors
-    $self->{_disconnect_monitor} = $monitor;
 }
 
 1;
@@ -572,11 +551,13 @@ PAGI::SSE - Convenience wrapper for PAGI Server-Sent Events connections
         my $sse = PAGI::SSE->new($scope, $receive, $send);
 
         # Enable keepalive for proxy compatibility
-        $sse->keepalive(25);
+        await $sse->keepalive(25);
 
-        # Cleanup on disconnect
+        # Cleanup on disconnect - with reason for logging
         $sse->on_close(sub {
+            my ($sse, $reason) = @_;
             remove_subscriber($sse->stash->{sub_id});
+            log_disconnect($reason);  # 'client_closed', 'write_error', etc.
         });
 
         # Handle reconnection
@@ -733,6 +714,26 @@ handler to keep the connection open.
     if ($sse->is_closed) { ... }
     my $state = $sse->connection_state;    # 'pending', 'started', 'closed'
 
+=head2 disconnect_reason
+
+    my $reason = $sse->disconnect_reason;
+
+Returns the reason for disconnect, if available. Common values:
+
+=over 4
+
+=item * C<client_closed> - Client closed connection normally
+
+=item * C<write_error> - Failed to write data (network error)
+
+=item * C<send_timeout> - Send operation timed out
+
+=item * C<idle_timeout> - Connection closed due to inactivity
+
+=back
+
+Returns C<undef> if connection is still open or reason is unknown.
+
 =head1 SEND METHODS
 
 =head2 send
@@ -772,12 +773,13 @@ Useful for broadcasting to multiple clients.
 
 =head2 keepalive
 
-    $sse->keepalive(30);              # Ping every 30 seconds
-    $sse->keepalive(30, ':ping');     # Custom comment text
-    $sse->keepalive(0);               # Disable
+    await $sse->keepalive(30);              # Ping every 30 seconds
+    await $sse->keepalive(30, 'ping');      # Custom comment text
+    await $sse->keepalive(0);               # Disable
 
-Sends periodic comment pings to prevent proxy timeouts.
-Requires an event loop (auto-created if needed).
+Sends an C<sse.keepalive> event to the server, which then handles sending
+periodic SSE comments to keep the connection alive and prevent proxy timeouts.
+The server manages the timer internally - this method is loop-agnostic.
 
 =head1 ITERATION
 
@@ -807,27 +809,61 @@ If callback returns a hashref, sends it as an event.
 
 =head2 every
 
-    await $sse->every(1, async sub {
+    # Send metrics every 2 seconds
+    await $sse->every(2, async sub {
         await $sse->send_event(
-            event => 'tick',
-            data  => { ts => time },
+            event => 'metrics',
+            data  => get_current_metrics(),
         );
     });
 
-Calls the callback every C<$interval> seconds until client disconnects.
-Useful for periodic updates.
+Periodically executes a callback with a delay between iterations.
+The loop continues until the connection closes or the callback throws.
+
+B<Requires Future::IO> - this method will C<croak> if Future::IO is not
+installed. Install with: C<cpanm Future::IO>
+
+Parameters:
+
+=over 4
+
+=item * C<$interval> - Seconds between iterations (required, must be > 0)
+
+=item * C<$callback> - Async coderef to execute (required)
+
+=back
+
+The callback is executed first, then the method sleeps for the interval
+before the next iteration. If the callback throws, the connection is
+closed and on_close callbacks are run.
 
 =head1 EVENT CALLBACKS
 
 =head2 on_close
 
     $sse->on_close(sub {
-        my ($sse) = @_;
-        cleanup_resources();
+        my ($sse, $reason) = @_;
+        if ($reason eq 'client_closed') {
+            # Normal disconnect
+            cleanup_resources();
+        } else {
+            # Error condition
+            log_error("Unexpected disconnect: $reason");
+        }
     });
 
 Registers cleanup callback. Runs on disconnect or close().
 Multiple callbacks run in registration order.
+
+Callbacks receive two arguments:
+
+=over 4
+
+=item * C<$sse> - The SSE connection object
+
+=item * C<$reason> - Why the connection closed (see L</disconnect_reason>)
+
+=back
 
 =head2 on_error
 
@@ -845,7 +881,7 @@ Registers error callback.
 
         my $sse = PAGI::SSE->new($scope, $receive, $send);
 
-        $sse->keepalive(25);
+        await $sse->keepalive(25);
 
         # Send initial state
         await $sse->send_event(
@@ -863,7 +899,11 @@ Registers error callback.
         });
 
         $sse->on_close(sub {
+            my ($sse, $reason) = @_;
             unsubscribe_metrics($sub_id);
+            # Log abnormal disconnects for debugging
+            warn "SSE client disconnected: $reason"
+                unless $reason eq 'client_closed';
         });
 
         await $sse->run;

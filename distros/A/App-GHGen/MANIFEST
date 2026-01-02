@@ -1,0 +1,28 @@
+.github/dependabot.yml
+.github/workflows/ghgen-check.yml
+.github/workflows/ghgen-comment.yml
+.github/workflows/perl-ci.yml
+action.yml
+bin/ghgen
+Changes
+cpanfile
+lib/App/GHGen.pm
+lib/App/GHGen/Analyzer.pm
+lib/App/GHGen/CostEstimator.pm
+lib/App/GHGen/Detector.pm
+lib/App/GHGen/Fixer.pm
+lib/App/GHGen/Generator.pm
+lib/App/GHGen/Interactive.pm
+lib/App/GHGen/PerlCustomizer.pm
+lib/App/GHGen/Reporter.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/30-basics.t
+t/detector.t
+t/eof.t
+t/eol.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
