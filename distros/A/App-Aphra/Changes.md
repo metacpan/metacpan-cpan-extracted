@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.2.6] - 2026-01-02
+
+### Fixed
+
+- Naming confusion in new test
+
 ## [0.2.5] - 2026-01-01
 
 ### Fixed

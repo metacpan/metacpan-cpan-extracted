@@ -22,6 +22,6 @@ t/data2/docs/static.txt
 t/data2/site.yml
 t/data2/layouts/page
 t/06-skip-existing.t
-t/data3/in/test/index.md
+t/data3/in/test/index.html.md
 t/data3/layouts/page
 t/data3/site.yml
