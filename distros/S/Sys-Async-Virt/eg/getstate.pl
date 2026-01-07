@@ -6,20 +6,17 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Feature::Compat::Try;
 
-use IO::Async::Loop;
+use Future::IO;
 use Log::Any qw($log);
 use Log::Any::Adapter;
 use Log::Any::Adapter::Stdout;
 use Sys::Async::Virt;
 
 Log::Any::Adapter->set('Stdout', log_level => 'trace');
-my $loop = IO::Async::Loop->new;
-
 
 my $virt = Sys::Async::Virt->new(
     url => 'qemu:///system'
     );
-$loop->add( $virt );
 $log->trace( 'Created libvirt client application layer' );
 
 my %states = (
@@ -30,29 +27,38 @@ my %states = (
    Sys::Async::Virt::Domain->SHUTDOWN => 'shut down',
 );
 
-await $virt->connect;
+async sub main() {
+    await $virt->connect;
 
-use Data::Dumper;
-try {
-    my $doms = await $virt->list_domains;
+    use Data::Dumper;
+    try {
+        my $doms = await $virt->list_domains;
 
-    my $dom_id = $doms && $doms->@* && $doms->[0];
-    if ($dom_id) {
-        my $dom = await $virt->domain_lookup_by_id( $dom_id );
-        my $state = await $dom->get_state;
-        say Dumper($state);
-        say $states{$state->{state}};
+        my $dom_id = $doms && $doms->@* && $doms->[0];
+        if ($dom_id) {
+            my $dom = await $virt->domain_lookup_by_id( $dom_id );
+            my $state = await $dom->get_state;
+            say Dumper($state);
+            say $states{$state->{state}};
 
-        say Dumper(await $dom->memory_stats);
-        say Dumper(await $dom->get_disk_errors);
+            say Dumper(await $dom->memory_stats);
+            say Dumper(await $dom->get_disk_errors);
+        }
+        else {
+            say 'There are no active domains';
+        }
     }
-    else {
-        say 'There are no active domains';
+    catch ($e) {
+        say 'Exception: ' . Dumper($e);
     }
-}
-catch ($e) {
-    say 'Exception: ' . Dumper($e);
+
+    await $virt->close;
+    $virt->stop;
 }
 
-await $virt->close;
 
+await Future->await_all(
+    Future::IO->sleep(1), # work around some futures not having ->await()
+    $virt->run,
+    main()
+    );

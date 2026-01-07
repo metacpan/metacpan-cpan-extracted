@@ -4,6 +4,7 @@ use Test::More;
 use Test::Mojo;
 use Mojolicious::Lite;
 use Mojo::Util qw(encode trim);
+use Data::Dumper;
 
 $ENV{MOJO_MAIL_TEST} = 1;
 #$ENV{MOJO_LOG_LEVEL} = 'debug';
@@ -36,9 +37,9 @@ get '/text' => sub {
     my $self = shift;
 
     my $mail = $self->send_mail(
-        to      => '"Jane Doe" test@example.org',
-        cc      => '"Jane Doe" <test@example.org>, Jane Doe test@example.org',
-        bcc     => 'test@example.org',
+        to      => '"Jane Doe" <test@example.org>, "Jane Doe 2" test2@example.org',
+        cc      => '"Jane Doe 3" <test3@example.org>, Jane Doe 4 test4@example.org',
+        bcc     => 'test4@example.org',
         subject => 'Test letter 🤔',
         text    => 'Hello! 👋',
     );
@@ -194,16 +195,16 @@ my $h = _to_mojo_headers($json->{headers});
 my $xmailer = join ' ', 'Mojolicious',  $Mojolicious::VERSION, 'Mojolicious::Plugin::EmailMailer', $Mojolicious::Plugin::EmailMailer::VERSION, '(Perl)';
 my $messageid = qr/\d+\.[a-zA-Z0-9]+\.\d+\@.*/;
 
-$t->test('is',   $h->header('Subject'),                   'Test letter =?US-ASCII?Q?=F0=9F=A4=94?=', '/html, good Subject header');
-$t->test('is',   $h->header('From'),                      'sender-test@example.org',        '/html, good From header');
-$t->test('is',   $h->header('To'),                        'test@example.org',               '/html, good To header');
-$t->test('is',   $h->header('MIME-Version'),              '1.0',                            '/html, good MIME-Version header');
-$t->test('like', $h->header('Content-Type'),              qr@^multipart\/mixed; boundary=@, '/html, good Content-Type header');
-$t->test('is',   $h->header('Content-Transfer-Encoding'), '7bit',                           '/html, good Content-Transfer-Encoding header');
-$t->test('is',   $h->header('X-Mailer'),                   $xmailer,                        '/html, good X-Mailer header');
-$t->test('like', $h->header('Message-ID'),                 $messageid,                      '/html, good Content-Type header');
+$t->test('is',   $h->header('Subject'),                   '=?UTF-8?B?VGVzdCBsZXR0ZXIg8J+klA==?=', '/html, good Subject header');
+$t->test('is',   $h->header('From'),                      'sender-test@example.org',              '/html, good From header');
+$t->test('is',   $h->header('To'),                        'test@example.org',                     '/html, good To header');
+$t->test('is',   $h->header('MIME-Version'),              '1.0',                                  '/html, good MIME-Version header');
+$t->test('like', $h->header('Content-Type'),              qr@^multipart\/mixed; boundary=@,       '/html, good Content-Type header');
+$t->test('is',   $h->header('Content-Transfer-Encoding'), '7bit',                                 '/html, good Content-Transfer-Encoding header');
+$t->test('is',   $h->header('X-Mailer'),                   $xmailer,                              '/html, good X-Mailer header');
+$t->test('like', $h->header('Message-ID'),                 $messageid,                            '/html, good Content-Type header');
 
-$t->test('is', t($json->{bodys}->{plain}->{content}), 'Hello! 👋',                   '/html, plain text body');
+$t->test('is', t($json->{bodys}->{plain}->{content}), 'Hello! =F0=9F=91=8B',         '/html, plain text body');
 $t->test('is', t($json->{bodys}->{html}->{content}),  '<p>Hello! =F0=9F=91=8B</p>=', '/html, html body');
 
 ## /text
@@ -217,14 +218,15 @@ $json = $t->get_ok('/text')
 
 $h = _to_mojo_headers($json->{headers});
 
-$t->test('is',   $h->header('Subject'),                   'Test letter =?UTF8?Q?=F0=9F=A4=94?=', '/text, good Subject header');
-$t->test('is',   $h->header('From'),                      'sender-test@example.org',     '/text, good From header');
-$t->test('is',   $h->header('To'),                        '"Jane Doe" test@example.org', '/text, good To header');
-$t->test('is',   $h->header('MIME-Version'),              '1.0',                         '/text, good MIME-Version header');
-$t->test('is',   $h->header('Content-Type'),              'text/plain; charset=utf8',    '/text, good Content-Type header');
-$t->test('is',   $h->header('Content-Transfer-Encoding'), 'quoted-printable',            '/text, good Content-Transfer-Encoding header');
-$t->test('is',   $h->header('X-Mailer'),                   $xmailer,                     '/text, good X-Mailer header');
-$t->test('like', $h->header('Message-ID'),                 $messageid,                   '/text, good Content-Type header');
+$t->test('is',   $h->header('Subject'),                   '=?UTF-8?B?VGVzdCBsZXR0ZXIg8J+klA==?=', '/text, good Subject header');
+$t->test('is',   $h->header('From'),                      'sender-test@example.org',              '/text, good From header');
+$t->test('is',   $h->header('To'),                        '"Jane Doe" <test@example.org>',        '/text, removed bad address in To header');
+$t->test('is',   $h->header('Cc'),                        '"Jane Doe 3" <test3@example.org>',     '/text, removed bad address in Cc header');
+$t->test('is',   $h->header('MIME-Version'),              '1.0',                                  '/text, good MIME-Version header');
+$t->test('is',   $h->header('Content-Type'),              'text/plain; charset=UTF-8',            '/text, good Content-Type header');
+$t->test('is',   $h->header('Content-Transfer-Encoding'), 'quoted-printable',                     '/text, good Content-Transfer-Encoding header');
+$t->test('is',   $h->header('X-Mailer'),                   $xmailer,                              '/text, good X-Mailer header');
+$t->test('like', $h->header('Message-ID'),                 $messageid,                            '/text, good Content-Type header');
 
 $t->test('is', t($json->{bodys}->{plain}->{content}), 'Hello! =F0=9F=91=8B=', '/text, plain text body');
 $t->test('is', $json->{bodys}->{html},                 undef,      '/text, no html part');
@@ -251,7 +253,7 @@ $t->test('is',   $h->header('To'),                        'test@example.org',   
 $t->test('like', $h->header('Message-ID'),                 $messageid,                    '/attach, good Content-Type header');
 
 $h = _to_mojo_headers($json->{bodys}->{plain}->{headers});
-$t->test('is', t($json->{bodys}->{plain}->{content}), 'This is a multi-part message in MIME format.', '/attach, plain text body');
+$t->test('is', t($json->{bodys}->{plain}->{content}), 'This is a multi-part message in MIME format.=', '/attach, plain text body');
 $t->test('is', $h->header('MIME-Version'),            '1.0',                                          '/attach, good MIME-Version header for plain text');
 $t->test('is', $json->{bodys}->{html},                 undef,                                         '/attach, no html part');
 
@@ -313,14 +315,14 @@ for my $mail (@{$json->{mails}}) {
         $t->test('is', $mail->{bodys}->{html}, undef, '/multi'.$i.', no html part');
 
         $h = _to_mojo_headers($mail->{bodys}->{plain}->{headers});
-        $t->test('is', $h->header('Content-Type'),              'text/plain; charset=utf8', '/multi'.$i.', good Content-Type header');
-        $t->test('is', $h->header('Content-Transfer-Encoding'), 'quoted-printable',         '/multi'.$i.', good Content-Transfer-Encoding header');
+        $t->test('is', $h->header('Content-Type'),              'text/plain; charset=UTF-8', '/multi'.$i.', good Content-Type header');
+        $t->test('is', $h->header('Content-Transfer-Encoding'), 'quoted-printable',          '/multi'.$i.', good Content-Transfer-Encoding header');
     } else {
-        $t->test('is', t($mail->{bodys}->{plain}->{content}), 'This is a mail send multiple times.', '/multi'.$i.', plain text body');
+        $t->test('is', t($mail->{bodys}->{plain}->{content}), 'This is a mail send multiple times.=', '/multi'.$i.', plain text body');
         $t->test('is', t($mail->{bodys}->{html}->{content}),  '<p>Test html in multi message</p>=',   '/multi'.$i.', html body');
 
         $h = _to_mojo_headers($mail->{bodys}->{plain}->{headers});
-        $t->test('is', $h->header('Content-Type'), 'text/plain', '/multi'.$i.', good Content-Type header');
+        $t->test('is', $h->header('Content-Type'), 'text/plain; charset=UTF-8', '/multi'.$i.', good Content-Type header');
     }
     $i++;
 }
@@ -355,10 +357,10 @@ sub _to_mojo_headers {
     return $h;
 };
 
-sub e {
-    return encode('UTF-8', shift);
-}
-
+#sub e {
+#    return encode('UTF-8', shift);
+#}
+#
 sub t {
     return trim(shift);
 }

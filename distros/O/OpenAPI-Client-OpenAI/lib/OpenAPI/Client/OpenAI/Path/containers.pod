@@ -79,7 +79,7 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 
     {
        "data" : [
-          "{\n   \"id\": \"cntr_682dfebaacac8198bbfe9c2474fb6f4a085685cbe3cb5863\",\n   \"object\": \"container\",\n   \"created_at\": 1747844794,\n   \"status\": \"running\",\n   \"expires_after\": {\n     \"anchor\": \"last_active_at\",\n     \"minutes\": 20\n   },\n   \"last_active_at\": 1747844794,\n   \"name\": \"My Container\"\n}\n"
+          "{\n   \"id\": \"cntr_682dfebaacac8198bbfe9c2474fb6f4a085685cbe3cb5863\",\n   \"object\": \"container\",\n   \"created_at\": 1747844794,\n   \"status\": \"running\",\n   \"expires_after\": {\n     \"anchor\": \"last_active_at\",\n     \"minutes\": 20\n   },\n   \"last_active_at\": 1747844794,\n   \"memory_limit\": \"1g\",\n   \"name\": \"My Container\"\n}\n"
        ]
     }
 
@@ -155,6 +155,7 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
          "minutes": 20
        },
        "last_active_at": 1747844794,
+       "memory_limit": "1g",
        "name": "My Container"
     }
 
@@ -167,7 +168,7 @@ L<OpenAPI::Client::OpenAI::Path>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2023-2025 by Nelson Ferraz
+Copyright (C) 2023-2026 by Nelson Ferraz
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

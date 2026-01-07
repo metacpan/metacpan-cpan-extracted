@@ -1,6 +1,6 @@
 package Google::RestApi;
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.1.0';
 
 use Google::RestApi::Setup;
 
@@ -10,12 +10,15 @@ use JSON::MaybeXS qw( decode_json encode_json JSON );
 use List::Util ();
 use Log::Log4perl qw( get_logger );
 use Module::Load qw( load );
-use Scalar::Util qw( blessed );
+use PerlX::Maybe qw( maybe provided );
 use Retry::Backoff qw( retry );
+use Scalar::Util qw( blessed );
 use Storable qw( dclone );
 use Try::Tiny qw( catch try );
 use URI ();
 use URI::QueryParam ();
+
+use Test::Utils qw( find_test_caller );
 
 sub new {
   my $class = shift;
@@ -72,11 +75,13 @@ sub api {
   $request->{uri} = $uri->as_string();
   DEBUG("Rest API request:\n", Dump($request));
 
-  my $req = HTTP::Request->new(
+  my $http_req = HTTP::Request->new(
     $request->{method}, $request->{uri}, \@headers, $request_json
   );
+
   # this is where the action is.
-  my ($response, $tries, $last_error) = $self->_api($req);
+  my ($response, $tries, $last_error) = $self->_api($http_req);
+
   # save the api call details so that the user can examine it in detail if necessary.
   # further information is also recorded below in this routine.
   $self->{transaction} = {
@@ -96,27 +101,33 @@ sub api {
   # calls the callback when an api call is madem, if any.
   $self->_api_callback();
 
-  # this is for capturing request/responses for unit tests. copy/paste the results
-  # in the log into t/etc/uri_responses/* for unit testing. log appender 'UnitTestCapture'
-  # is defined in t/etc/log4perl.conf. you can use this logger by pointing to it via
-  # GOOGLE_RESTAPI_LOGGER env var.
+  # this is for capturing request/responses for unit tests.
   if ($response && Log::Log4perl::appenders->{'UnitTestCapture'}) {
     # special log category for this. it should be tied to the UnitTestCapture appender.
     # we want to dump this in the same format as what we need to store in
     # t/etc/uri_responses.
-    my %request_response;
-    my $json = JSON->new->ascii->pretty->canonical;
-    my $pretty_request_json = $request_json ?
-      $json->encode(decode_json($request_json)) : '';
-    my $pretty_response_json = $response->content() ?
-      $json->encode(decode_json($response->content())) : '';
-    $request_response{ $request->{method} } = {
-      $request->{uri} => {
-        ($pretty_request_json) ? (content  => $pretty_request_json) : (),
-        response => $pretty_response_json,
-      },
-    };
-    get_logger('unit.test.capture')->info(Dump(\%request_response) . "\n\n");
+    my $test_method = find_test_caller();
+    my %exchange = (
+      source  => $test_method,
+      request => $request->{method} . ' ' . $uri->path,
+
+      provided $request->{params} && $request->{params}->%*,
+      query_params => $request->{params},
+
+      provided $request->{content},
+      request_content => $request->{content},
+
+      response => {
+        code    => $response->code,
+        message => $response->message,
+        headers => [ $response->headers->flatten ],
+
+        maybe
+        content => $response->{content},
+      }
+    );
+
+    get_logger('unit.test.capture')->info(Dump(\%exchange) . "\n");
   }
 
   if (!$response || !$response->is_success()) {
@@ -137,9 +148,7 @@ sub _api {
   # default is exponential backoff, initial delay 1.
   my $tries = 0;
   my $last_error;
-  my $response = retry sub {
-      $self->{ua}->request($req);
-    },
+  my $response = retry sub { $self->{ua}->request($req); },
     retry_if => sub {
       my $h = shift;
       my $r = $h->{attempt_result};   # Furl::Response
@@ -222,6 +231,12 @@ sub stats {
   return $stats;
 }
 
+sub reset_stats {
+  my $self = shift;
+  delete $self->{stats};
+  return;
+}
+
 # this is built for every api call so the entire api call can be examined,
 # params, body content, http codes, etc etc.
 sub transaction { shift->{transaction} || {}; }
@@ -234,9 +249,11 @@ sub _caller_internal {
   do {
     ($package, undef, $line, $subroutine) = caller(++$i);
   } while($package &&
-    ($package =~ m[^Cache::Memory] ||
-     $subroutine =~ m[api$] ||
-     $subroutine =~ m[^Cache|_cache])
+    (
+      $package    =~ m|^Cache::Memory| ||
+      $subroutine =~ m[^Cache|_cache] ||
+      $subroutine =~ m|api$|
+    )
   );
   # not usually going to happen, but during testing we call
   # RestApi::api directly, so have to backtrack.
@@ -336,6 +353,8 @@ to send API requests to the Google API endpoint on behalf of the underlying API 
 
 =item * L<Google::RestApi::SheetsApi4::Range::Cell>
 
+=item * L<Google::RestApi::SheetsApi4::Range::Iterator>
+
 =item * L<Google::RestApi::SheetsApi4::RangeGroup>
 
 =item * L<Google::RestApi::SheetsApi4::RangeGroup::Iterator>
@@ -422,7 +441,7 @@ Returns the response hash from Google API.
 =back
 
 The last transaction details are passed to the callback. What you do with this information is up to you. For an example of how this is used, see the
-C<t/tutorial/sheets/*> scripts.
+C<tutorial/sheets/*> scripts.
 
 Returns the previous callback, if any.
 
@@ -454,6 +473,6 @@ Robin Murray mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright (c) 2021, Robin Murray. All rights reserved.
+Copyright (c) 2019-2026 Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

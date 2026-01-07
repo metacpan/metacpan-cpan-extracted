@@ -9,6 +9,22 @@ if [ -z $INTERNET_AVAILABLE ]; then
 fi
 echo 'CHECKING FOR INTERNET';
 ping -c1 8.8.8.8 || INTERNET_AVAILABLE=0
+for x in $(find lib -name '*.pm'); do
+	if rg $x MANIFEST >/dev/null; then
+		echo $x present in manifest
+	else
+		echo $x is missing in manifest;
+	       	error;
+	fi
+done
+for x in $(find t -name '*.t'); do
+	if rg $x MANIFEST >/dev/null; then
+		echo $x present in manifest
+	else
+		echo $x is missing in manifest;
+	       	error;
+	fi
+done
 
 if [[ $INTERNET_AVAILABLE == 1 ]]; then
     echo 'Installing CPANTS checker and Path::Tiny'

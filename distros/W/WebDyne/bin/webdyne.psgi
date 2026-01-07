@@ -1,8 +1,8 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 #
 #  This file is part of WebDyne.
 #
-#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -41,7 +41,7 @@ use WebDyne::Request::PSGI::Constant;
 
 #  Version information
 #
-$VERSION='2.038';
+$VERSION='2.046';
 
 
 #  API file name cache
@@ -130,11 +130,16 @@ if (!caller || exists $ENV{PAR_TEMP}) {
     
             #  We can do indexing
             #
-            $DOCUMENT_DEFAULT=File::Spec->rel2abs(File::Spec->catfile($test_dn, 'index.psp'));
+            $DOCUMENT_DEFAULT=File::Spec->rel2abs(File::Spec->catfile($test_dn, $WEBDYNE_PSGI_INDEX));
             
         }
         
     }
+    
+    
+    #  Read in local webdyne.conf.pl
+    #
+    &local_constant_load($DOCUMENT_ROOT);
     
     
     #  Show error information by default
@@ -158,6 +163,11 @@ else {
         || $DOCUMENT_ROOT || $test_fn;
     $DOCUMENT_ROOT=&normalize_dn($DOCUMENT_ROOT);
 
+
+    #  Read in local webdyne.conf.pl
+    #
+    &local_constant_load($DOCUMENT_ROOT);
+
 }
 
 
@@ -177,6 +187,23 @@ sub normalize_dn {
     $abs_dn =~ s{/$}{} unless $abs_dn eq '/';
     return $abs_dn;
     
+}
+
+
+sub local_constant_load {
+
+
+    #  Read in local webdyne.conf.pl
+    #
+    my $root_dn=shift();
+    
+    
+    #  If root_dn is a file get dir name
+    if (-f $root_dn) {
+        $root_dn=(File::Spec->splitpath($root_dn))[1];
+    }
+    WebDyne::Constant->import(File::Spec->catfile($root_dn, sprintf('.%s', $WEBDYNE_CONF_FN)));
+
 }
     
 
@@ -236,13 +263,13 @@ sub handler_build {
             }
         }
     }
-    if ($WEBDYNE_PSGI_ENV_KEEP || $WEBDYNE_PSGI_ENV_SET) {
-        require Plack::Middleware::ForceEnv;
-        $handler_cr=Plack::Middleware::ForceEnv->wrap($handler_cr, 
-            %{$WEBDYNE_PSGI_ENV_SET},
-            map {$_=>$ENV{$_}} @{$WEBDYNE_PSGI_ENV_KEEP}
-        )
-    }
+    #if ($WEBDYNE_PSGI_ENV_KEEP || $WEBDYNE_PSGI_ENV_SET) {
+    #    require Plack::Middleware::ForceEnv;
+    #    $handler_cr=Plack::Middleware::ForceEnv->wrap($handler_cr, 
+    #        %{$WEBDYNE_PSGI_ENV_SET},
+    #        map {$_=>$ENV{$_}} @{$WEBDYNE_PSGI_ENV_KEEP}
+    #    )
+    #}
     return $handler_cr;
     
 }
@@ -257,12 +284,20 @@ sub handler {
     #
     my ($env_hr, @param)=@_;
     local *ENV=$env_hr;
-    debug('in handler, env: %s, param:%s', Dumper(\%ENV));
+    debug('in handler, env: %s, param:%s', Dumper(\%ENV, \@param));
     
+    
+    #  Set any env vars we want
+    #
+    @ENV{qw(DOCUMENT_ROOT DOCUMENT_DEFAULT)}=($DOCUMENT_ROOT, $DOCUMENT_DEFAULT);
+    if (WEBDYNE_PSGI_ENV_SET) {
+        map { $ENV{$_}=$WEBDYNE_PSGI_ENV_SET->{$_} } keys %{$WEBDYNE_PSGI_ENV_SET}
+    }
+
 
     #  Cache handler for a location
     #
-    my ($handler, %handler);
+    #my ($handler, %handler);
 
 
     #  Create new PSGI Request object, will pull filename from
@@ -276,25 +311,30 @@ sub handler {
     debug("r: $r");
 
 
-    #  Get handler
+    #  Get handler. Update - Commented out. Let WebDyne handle this as borks if
+    #  using WebDyne::Template and index.psp gets called. Keep code for reference
     #
-    unless ($handler=$handler{my $location=$r->location()}) {
-        my $handler_package=
-            $r->dir_config('WebDyneHandler') || $ENV{'WebDyneHandler'};
-        if ($handler_package) {
-            local $SIG{'__DIE__'};
-            (my $handler_package_pm=$handler_package)=~s{::}{/}g;
-            $handler_package_pm.='.pm';
-            unless (eval {require $handler_package_pm}) {
-                #  Didn't load - let Webdyne handle the error.
-                $handler='WebDyne';
+    my $handler='WebDyne';
+    if (0) {
+        my %handler;
+        unless ($handler=$handler{my $location=$r->location()}) {
+            my $handler_package=
+                $r->dir_config('WebDyneHandler') || $ENV{'WebDyneHandler'};
+            if ($handler_package) {
+                local $SIG{'__DIE__'};
+                (my $handler_package_pm=$handler_package)=~s{::}{/}g;
+                $handler_package_pm.='.pm';
+                unless (eval {require $handler_package_pm}) {
+                    #  Didn't load - let Webdyne handle the error.
+                    $handler='WebDyne';
+                }
+                else {
+                    $handler=$handler{$location}=$handler_package;
+                }
             }
             else {
-                $handler=$handler{$location}=$handler_package;
+                $handler=$handler{$location}='WebDyne';
             }
-        }
-        else {
-            $handler=$handler{$location}='WebDyne';
         }
     }
     debug("calling handler: $handler");
@@ -394,7 +434,7 @@ sub handler {
         }
 
     }
-    debug("final handler status is $status, html:$html");
+    debug("final handler status: %s, content_type: %s, html:%s", $status, $r->content_type(), $html);
 
 
 	#  If html defined set header content type unless already set during handler run
@@ -524,7 +564,7 @@ Andrew Speer <andrew.speer@isolutions.com.au>
 
 This file is part of WebDyne.
 
-This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -532,6 +572,7 @@ the same terms as the Perl 5 programming language system itself.
 Full license text is available at:
 
 <http://dev.perl.org/licenses/>
+
 
 =end markdown
 
@@ -603,7 +644,7 @@ Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
 
 This file is part of WebDyne.
 
-This software is copyright (c) 2025 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
+This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

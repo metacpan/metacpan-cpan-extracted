@@ -6,7 +6,7 @@ use 5.020;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 Travel::Status::DE::DBRIS::JourneyAtStop->mk_ro_accessors(
 	qw(type dep sched_dep rt_dep delay is_cancelled line stop_eva id platform rt_platform destination via_last
@@ -40,8 +40,12 @@ sub new {
 		shift( @{ $ref->{via} } );
 	}
 
-	$ref->{maybe_train_no} = $ref->{train}     =~ s{^.* ++}{}r;
-	$ref->{maybe_line_no}  = $ref->{train_mid} =~ s{^.* ++}{}r;
+	if ( defined $ref->{train} ) {
+		$ref->{maybe_train_no} = $ref->{train} =~ s{^.* ++}{}r;
+	}
+	if ( defined $ref->{train_mid} ) {
+		$ref->{maybe_line_no} = $ref->{train_mid} =~ s{^.* ++}{}r;
+	}
 
 	bless( $ref, $obj );
 

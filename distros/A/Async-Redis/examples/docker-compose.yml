@@ -1,0 +1,25 @@
+# Docker Compose for Async::Redis examples
+#
+# Start:  docker compose -f examples/docker-compose.yml up -d
+# Stop:   docker compose -f examples/docker-compose.yml down
+# Logs:   docker compose -f examples/docker-compose.yml logs -f
+# Status: docker compose -f examples/docker-compose.yml ps
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: future-io-redis-example
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  redis-data:

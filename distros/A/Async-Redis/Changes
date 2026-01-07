@@ -1,0 +1,32 @@
+Revision history for Future-IO-Redis
+
+0.001  2026-01-03
+    - Initial release
+    - Core Features:
+        - Full async/await support via Future::IO
+        - Event loop agnostic (IO::Async, AnyEvent, UV, etc.)
+        - RESP2 protocol support via Protocol::Redis
+        - All Redis commands via auto-generated methods
+    - Connection Features:
+        - TCP and TLS/SSL connections
+        - URI connection strings
+        - Automatic reconnection with exponential backoff
+        - Connection pooling with health checks
+        - Fork-safe for pre-fork servers
+    - Command Features:
+        - Pipelining for improved throughput
+        - Transactions (MULTI/EXEC/WATCH)
+        - Lua scripting with EVALSHA optimization
+        - SCAN iterators (SCAN, HSCAN, SSCAN, ZSCAN)
+        - Key prefixing
+    - PubSub:
+        - Channel and pattern subscriptions
+        - Sharded subscriptions (Redis 7+)
+    - Observability:
+        - OpenTelemetry tracing and metrics
+        - Debug logging
+        - Credential redaction
+    - Testing:
+        - Comprehensive test suite
+        - Integration tests
+        - Performance benchmarks

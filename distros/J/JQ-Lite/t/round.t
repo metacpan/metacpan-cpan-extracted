@@ -8,7 +8,8 @@ my $json = q({
   "discount": 1.5,
   "debt": -1.7,
   "tiny": -0.2,
-  "numbers": [1.49, 1.5, -1.49, -1.5, "n/a", null, [2.6, -2.6, 3]]
+  "numbers": [1.49, 1.5, -1.49, -1.5, "n/a", null, [2.6, -2.6, 3]],
+  "bools": [true, false, [true]]
 });
 
 my $jq = JQ::Lite->new;
@@ -30,6 +31,13 @@ is_deeply(
     $round_values[0],
     [1, 2, -1, -2, 'n/a', undef, [3, -3, 3]],
     'round processes arrays recursively and preserves non-numeric values'
+);
+
+my @round_bools = $jq->run_query($json, '.bools | round');
+is_deeply(
+    $round_bools[0],
+    [1, 0, [1]],
+    'round treats booleans as numeric values'
 );
 
 my @round_missing = $jq->run_query($json, '.missing | round');

@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range;
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.1.0';
 
 use Google::RestApi::Setup;
 
@@ -443,6 +443,318 @@ sub delete_named {
   return $self;
 }
 
+sub named_u { shift->update_named(@_); }
+sub update_named {
+  my $self = shift;
+
+  state $check = compile_named(
+    name   => Optional[Str],
+    range  => Optional[HashRef],
+    fields => Str, { optional => 1 },
+  );
+  my $p = $check->(@_);
+
+  my $named = $self->named() or LOGDIE "Not a named range";
+  my %named_range = (namedRangeId => $named);
+  $named_range{name} = $p->{name} if defined $p->{name};
+  $named_range{range} = $p->{range} if $p->{range};
+
+  my @field_list;
+  push @field_list, 'name' if defined $p->{name};
+  push @field_list, 'range' if $p->{range};
+  my $fields = $p->{fields} || join(',', @field_list);
+
+  $self->batch_requests(
+    updateNamedRange => {
+      namedRange => \%named_range,
+      fields     => $fields,
+    },
+  );
+
+  return $self;
+}
+
+sub auto_fill {
+  my $self = shift;
+
+  state $check = compile_named(
+    source       => HasMethods['range_to_index'],
+    use_template => Bool, { default => 1 },
+  );
+  my $p = $check->(@_);
+
+  $self->batch_requests(
+    autoFill => {
+      range                => $self->range_to_index(),
+      sourceAndDestination => {
+        source    => $p->{source}->range_to_index(),
+        dimension => 'ROWS',
+        fillLength => 1,
+      },
+      useAlternateSeries   => bool(!$p->{use_template}),
+    },
+  );
+
+  return $self;
+}
+
+sub append_cells {
+  my $self = shift;
+
+  state $check = compile_named(
+    rows   => ArrayRef,
+    fields => Str, { default => '*' },
+  );
+  my $p = $check->(@_);
+
+  $self->batch_requests(
+    appendCells => {
+      sheetId => $self->worksheet_id(),
+      rows    => $p->{rows},
+      fields  => $p->{fields},
+    },
+  );
+
+  return $self;
+}
+
+sub paste_data {
+  my $self = shift;
+
+  state $check = compile_named(
+    data      => Str,
+    delimiter => Str, { default => "\t" },
+    type      => Str, { default => 'PASTE_NORMAL' },
+    html      => Bool, { default => 0 },
+  );
+  my $p = $check->(@_);
+
+  # pasteData requires a GridCoordinate (single cell), not a GridRange
+  my $range_index = $self->range_to_index();
+  my %coordinate = (
+    sheetId     => $range_index->{sheetId},
+    rowIndex    => $range_index->{startRowIndex},
+    columnIndex => $range_index->{startColumnIndex},
+  );
+
+  my %request = (
+    coordinate => \%coordinate,
+    data       => $p->{data},
+    type       => $p->{type},
+  );
+  if ($p->{html}) {
+    $request{html} = bool(1);
+  } else {
+    $request{delimiter} = $p->{delimiter};
+  }
+
+  $self->batch_requests(pasteData => \%request);
+
+  return $self;
+}
+
+sub text_to_columns {
+  my $self = shift;
+
+  state $check = compile_named(
+    delimiter      => Optional[Str],
+    delimiter_type => Str, { default => 'AUTODETECT' },
+  );
+  my $p = $check->(@_);
+
+  my %request = (
+    source        => $self->range_to_index(),
+    delimiterType => $p->{delimiter_type},
+  );
+  $request{delimiter} = $p->{delimiter} if defined $p->{delimiter};
+
+  $self->batch_requests(textToColumns => \%request);
+
+  return $self;
+}
+
+sub find_replace {
+  my $self = shift;
+
+  state $check = compile_named(
+    find               => Str,
+    replacement        => Str, { default => '' },
+    match_case         => Bool, { default => 0 },
+    match_entire_cell  => Bool, { default => 0 },
+    search_by_regex    => Bool, { default => 0 },
+    include_formulas   => Bool, { default => 0 },
+  );
+  my $p = $check->(@_);
+
+  $self->batch_requests(
+    findReplace => {
+      range            => $self->range_to_index(),
+      find             => $p->{find},
+      replacement      => $p->{replacement},
+      matchCase        => bool($p->{match_case}),
+      matchEntireCell  => bool($p->{match_entire_cell}),
+      searchByRegex    => bool($p->{search_by_regex}),
+      includeFormulas  => bool($p->{include_formulas}),
+    },
+  );
+
+  return $self;
+}
+
+sub set_data_validation {
+  my $self = shift;
+
+  state $check = compile_named(
+    rule => HashRef,
+  );
+  my $p = $check->(@_);
+
+  $self->batch_requests(
+    setDataValidation => {
+      range => $self->range_to_index(),
+      rule  => $p->{rule},
+    },
+  );
+
+  return $self;
+}
+
+sub clear_data_validation {
+  my $self = shift;
+
+  $self->batch_requests(
+    setDataValidation => {
+      range => $self->range_to_index(),
+    },
+  );
+
+  return $self;
+}
+
+sub data_validation_list {
+  my $self = shift;
+
+  state $check = compile_named(
+    values        => ArrayRef,
+    strict        => Bool, { default => 1 },
+    show_custom   => Bool, { default => 0 },
+    input_message => Optional[Str],
+  );
+  my $p = $check->(@_);
+
+  my @condition_values = map { { userEnteredValue => $_ } } @{ $p->{values} };
+  my %rule = (
+    condition => {
+      type   => 'ONE_OF_LIST',
+      values => \@condition_values,
+    },
+    strict       => bool($p->{strict}),
+    showCustomUi => bool($p->{show_custom}),
+  );
+  $rule{inputMessage} = $p->{input_message} if defined $p->{input_message};
+
+  $self->set_data_validation(rule => \%rule);
+}
+
+sub data_validation_range {
+  my $self = shift;
+
+  state $check = compile_named(
+    source        => HasMethods['range'],
+    strict        => Bool, { default => 1 },
+    show_custom   => Bool, { default => 0 },
+    input_message => Optional[Str],
+  );
+  my $p = $check->(@_);
+
+  my %rule = (
+    condition => {
+      type   => 'ONE_OF_RANGE',
+      values => [{ userEnteredValue => '=' . $p->{source}->range() }],
+    },
+    strict       => bool($p->{strict}),
+    showCustomUi => bool($p->{show_custom}),
+  );
+  $rule{inputMessage} = $p->{input_message} if defined $p->{input_message};
+
+  $self->set_data_validation(rule => \%rule);
+}
+
+sub randomize_range {
+  my $self = shift;
+
+  $self->batch_requests(
+    randomizeRange => {
+      range => $self->range_to_index(),
+    },
+  );
+
+  return $self;
+}
+
+sub trim_whitespace {
+  my $self = shift;
+
+  $self->batch_requests(
+    trimWhitespace => {
+      range => $self->range_to_index(),
+    },
+  );
+
+  return $self;
+}
+
+sub delete_duplicates {
+  my $self = shift;
+
+  state $check = compile_named(
+    comparison_columns => Optional[ArrayRef],
+  );
+  my $p = $check->(@_);
+
+  my %request = (range => $self->range_to_index());
+  if ($p->{comparison_columns}) {
+    $request{comparisonColumns} = [
+      map { { sheetId => $self->worksheet_id(), dimension => 'COLUMNS', startIndex => $_, endIndex => $_ + 1 } }
+        @{ $p->{comparison_columns} }
+    ];
+  }
+
+  $self->batch_requests(deleteDuplicates => \%request);
+
+  return $self;
+}
+
+sub sort_range {
+  my $self = shift;
+
+  state $check = compile_named(
+    sort_specs => ArrayRef,
+  );
+  my $p = $check->(@_);
+
+  $self->batch_requests(
+    sortRange => {
+      range     => $self->range_to_index(),
+      sortSpecs => $p->{sort_specs},
+    },
+  );
+
+  return $self;
+}
+
+sub sort_asc {
+  my $self = shift;
+  my $col = shift // 0;
+  $self->sort_range(sort_specs => [{ dimensionIndex => $col, sortOrder => 'ASCENDING' }]);
+}
+
+sub sort_desc {
+  my $self = shift;
+  my $col = shift // 0;
+  $self->sort_range(sort_specs => [{ dimensionIndex => $col, sortOrder => 'DESCENDING' }]);
+}
+
 sub _clear {
   my $self = shift;
   return $self->SUPER::_clear(@_, $self->range_to_index());
@@ -479,6 +791,6 @@ Robin Murray mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright (c) 2021, Robin Murray. All rights reserved.
+Copyright (c) 2019-2026 Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

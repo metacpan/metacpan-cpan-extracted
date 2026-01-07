@@ -106,7 +106,9 @@ RUN carton install --deployment
 #
 WORKDIR ..
 #RUN carton exec -- cpanm --local-lib-contained=${PERL_CARTON_PATH} .
-RUN carton exec -- cpanm .
+#RUN carton exec -- cpanm .
+RUN set -e; carton exec -- cpanm . || { rc=$?; echo "Build failed:"; find /root/.cpanm/work -name build.log -exec cat {} \;; exit $rc; }
+
 # Clean carton cache and create empty webdyne cache dir
 RUN rm -rf ${PERL_CARTON_PATH}/cache
 RUN mkdir ${PERL_CARTON_PATH}/cache
@@ -167,9 +169,9 @@ LABEL org.opencontainers.image.source="https://github.com/aspeer/WebDyne.git"
 LABEL org.opencontainers.image.documentation="https://github.com/aspeer/WebDyne#readme"
 LABEL org.opencontainers.image.authors="Andrew Speer <andrew.speer@isolutions.com.au>"
 LABEL org.opencontainers.image.licenses="Artistic-1.0-Perl OR GPL-1.0-or-later"
-LABEL org.opencontainers.image.created="2025-08-03T08:40:10Z"
-LABEL org.opencontainers.image.version="2.012_265"
-LABEL org.opencontainers.image.revision="1ac7a2a"
+LABEL org.opencontainers.image.created="2026-01-03T03:00:34Z"
+LABEL org.opencontainers.image.version="2.042"
+LABEL org.opencontainers.image.revision="d99451a"
 LABEL org.opencontainers.image.base=${BASE}
 
 

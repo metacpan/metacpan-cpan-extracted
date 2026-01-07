@@ -21,6 +21,8 @@ C<App::perl::distrolint::CheckRole::TreeSitterPerl> - role for checks that parse
 
 =head1 DESCRIPTION
 
+=for highlighter language=perl
+
 This role provides a number of helper methods for implementing check classes
 that parse Perl source code, by using F<tree-sitter-perl>.
 
@@ -41,7 +43,7 @@ Perl language, using F<tree-sitter-perl>.
 
 =cut
 
-method tree_sitter_perl
+method tree_sitter_perl ()
 {
    return $TSPERL //= Text::Treesitter->new(
       lang_name => "perl",

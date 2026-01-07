@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "v5.10.0"
+            "perl" : "v5.14.0"
          }
       },
       "develop" : {
@@ -61,9 +61,12 @@
             "HTTP::Tiny" : "0",
             "JSON::MaybeXS" : "0",
             "Moo" : "0",
+            "Try::Tiny" : "0",
+            "Types::Common::Numeric" : "0",
             "Types::Common::String" : "0",
+            "URI" : "0",
             "namespace::clean" : "0",
-            "perl" : "v5.10.0"
+            "perl" : "v5.14.0"
          }
       },
       "test" : {
@@ -71,14 +74,14 @@
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Pod::Coverage" : "0",
-            "perl" : "v5.10.0"
+            "perl" : "v5.14.0"
          }
       }
    },
    "provides" : {
       "WebService::OpenStates" : {
          "file" : "lib/WebService/OpenStates.pm",
-         "version" : "1.01"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -92,7 +95,7 @@
          "web" : "https://github.com/1nickt/p5-Net-Google-CivicInformation"
       }
    },
-   "version" : "1.01",
+   "version" : "1.03",
    "x_generated_by_perl" : "v5.40.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -1,0 +1,13 @@
+INSTALL
+INSTALL.md
+LICENSE
+MANIFEST
+Makefile.PL
+README
+README.md
+lib/Task/WebDyne/Plack.pm
+cpanfile                                 
+lib/Task/WebDyne/Plack.pm.md             
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+ChangeLog                                Module ChangeLog (added by ExtUtils::Git)

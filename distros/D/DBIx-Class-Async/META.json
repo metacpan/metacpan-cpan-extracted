@@ -49,7 +49,31 @@
    "provides" : {
       "DBIx::Class::Async" : {
          "file" : "lib/DBIx/Class/Async.pm",
-         "version" : "0.01"
+         "version" : "0.10"
+      },
+      "DBIx::Class::Async::Cursor" : {
+         "file" : "lib/DBIx/Class/Async/Cursor.pm",
+         "version" : "0.10"
+      },
+      "DBIx::Class::Async::ResultSet" : {
+         "file" : "lib/DBIx/Class/Async/ResultSet.pm",
+         "version" : "0.10"
+      },
+      "DBIx::Class::Async::Row" : {
+         "file" : "lib/DBIx/Class/Async/Row.pm",
+         "version" : "0.10"
+      },
+      "DBIx::Class::Async::Schema" : {
+         "file" : "lib/DBIx/Class/Async/Schema.pm",
+         "version" : "0.10"
+      },
+      "DBIx::Class::Async::Storage" : {
+         "file" : "lib/DBIx/Class/Async/Storage.pm",
+         "version" : "0.10"
+      },
+      "DBIx::Class::Async::TxnGuard" : {
+         "file" : "lib/DBIx/Class/Async/TxnGuard.pm",
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -60,6 +84,6 @@
          "web" : "https://github.com/manwar/DBIx-Class-Async"
       }
    },
-   "version" : "0.01",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

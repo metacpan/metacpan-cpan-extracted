@@ -1,6 +1,6 @@
 package DBIx::Class::Async;
 
-$DBIx::Class::Async::VERSION   = '0.01';
+$DBIx::Class::Async::VERSION   = '0.10';
 $DBIx::Class::Async::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ DBIx::Class::Async - Asynchronous database operations for DBIx::Class
 
 =head1 VERSION
 
-Version 0.01
+Version 0.10
 
 =cut
 
@@ -28,6 +28,8 @@ use Time::HiRes qw(time);
 use Digest::MD5 qw(md5_hex);
 use Type::Params qw(compile);
 use Types::Standard qw(Str HashRef ArrayRef Maybe Int CodeRef);
+
+our $METRICS;
 
 use constant {
     DEFAULT_WORKERS       => 4,
@@ -257,6 +259,814 @@ sub new {
     return $self;
 }
 
+=head1 METHODS
+
+=head2 search
+
+Performs a search query.
+
+    my $results = await $async_db->search(
+        $resultset_name,
+        $search_conditions,    # Optional hashref
+        $attributes,           # Optional hashref
+    );
+
+Attributes may include:
+
+    {
+        order_by  => 'name DESC',
+        rows      => 50,
+        page      => 2,
+        columns   => [qw/id name/],
+        prefetch  => 'relation',
+        cache     => 1,
+        cache_key => 'custom_key',
+    }
+
+All results are returned as arrayrefs of hashrefs.
+
+=cut
+
+sub search {
+    my ($self, $resultset, $search_args, $attrs) = @_;
+
+    state $check = compile(Str, Maybe[HashRef], Maybe[HashRef]);
+    $check->($resultset, $search_args, $attrs);
+
+    $self->{stats}{queries}++;
+    $self->_record_metric('inc', 'db_async_queries_total');
+
+    my $cache_key = delete $attrs->{cache_key} // _generate_cache_key('search', $resultset, $search_args, $attrs);
+    my $use_cache = exists $attrs->{cache} ? delete $attrs->{cache} : defined $self->{cache_ttl};
+
+    if ($use_cache) {
+        my $cached = $self->{cache}->get($cache_key);
+        if ($cached) {
+            $self->{stats}{cache_hits}++;
+            $self->_record_metric('inc', 'db_async_cache_hits_total');
+            return Future->done($cached);
+        }
+        $self->{stats}{cache_misses}++;
+        $self->_record_metric('inc', 'db_async_cache_misses_total');
+    }
+
+    my $start_time = time;
+
+    my $future = $self->{enable_retry}
+        ? $self->_call_with_retry('search', $resultset, $search_args, $attrs)
+        : $self->_call_worker('search', $resultset, $search_args, $attrs);
+
+    return $future->then(sub {
+        my ($result) = @_;
+
+        my $duration = time - $start_time;
+        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+
+        if ($use_cache && defined $self->{cache_ttl}) {
+            $self->{cache}->set($cache_key, $result, $self->{cache_ttl});
+        }
+
+        return Future->done($result);
+    });
+}
+
+=head2 search_multi
+
+Executes multiple search queries concurrently.
+
+    my @results = await $async_db->search_multi(
+        ['User', { active => 1 }, { rows => 10 }],
+        ['Product', { category => 'books' }],
+        ['Order', undef, { order_by => 'created_at DESC', rows => 5 }],
+    );
+
+Returns: Array of results in the same order as queries.
+
+=cut
+
+sub search_multi {
+    my ($self, @queries) = @_;
+
+    $self->{stats}{queries} += scalar @queries;
+    $self->_record_metric('inc', 'db_async_queries_total', scalar @queries);
+
+    my @futures = map {
+        my ($resultset, $search_args, $attrs) = @$_;
+        $self->_call_worker('search', $resultset, $search_args, $attrs)
+    } @queries;
+
+    my $start_time = time;
+
+    return Future->wait_all(@futures)->then(sub {
+        my @results = @_;
+
+        my $duration = time - $start_time;
+        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+
+        # Extract values from completed futures
+        my @values = map { $_->get } @results;
+
+        return Future->done(@values);
+    });
+}
+
+=head2 search_with_prefetch (BROKEN)
+
+Search with eager loading of relationships.
+
+    my $users_with_orders = await $async_db->search_with_prefetch(
+        'User',
+        { active => 1 },
+        'orders',  # Relationship name or arrayref for multiple
+        { rows => 10 }
+    );
+
+Returns: Arrayref of results with prefetched data.
+
+This method consistently fails with "closed" errors across all database
+backends.
+
+B<Migration Path>:
+
+Replace any C<search_with_prefetch> calls with separate queries:
+
+    # Old code (broken):
+    my $users = await $db->search_with_prefetch(
+        'User', { active => 1 }, 'posts', {}
+    );
+
+    # New code (working):
+    my $users = await $db->search('User', { active => 1 }, {});
+    foreach my $user (@$users) {
+        my $posts = await $db->search('Post', { user_id => $user->{id} }, {});
+        $user->{posts} = $posts;
+    }
+
+For parallel fetching, see L</KNOWN ISSUES> for optimised patterns using
+C<Future::Utils::fmap_concat>.
+
+=cut
+
+sub search_with_prefetch {
+    my ($self, $resultset, $search_args, $prefetch, $attrs) = @_;
+
+    state $check = compile(Str, Maybe[HashRef], Str|ArrayRef, Maybe[HashRef]);
+    $check->($resultset, $search_args, $prefetch, $attrs);
+
+    $self->{stats}{queries}++;
+    $self->_record_metric('inc', 'db_async_queries_total');
+
+    my $start_time = time;
+
+    return $self->_call_worker(
+        'search_with_prefetch',
+        $resultset,
+        $search_args,
+        $prefetch,
+        $attrs
+    )->then(sub {
+        my ($result) = @_;
+        my $duration = time - $start_time;
+        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+        return Future->done($result);
+    });
+}
+
+sub _generate_cache_key {
+    my ($operation, @args) = @_;
+
+    my @clean_args = map {
+        if (!defined $_) {
+            'UNDEF';
+        } elsif (ref $_ eq 'HASH') {
+            my $hashref = $_;
+            join(',', sort map { "$_=>$hashref->{$_}" } keys %$hashref);
+        } elsif (ref $_ eq 'ARRAY') {
+            join(',', @$_);
+        } else {
+            $_;
+        }
+    } @args;
+
+    return join(':', $operation, md5_hex(join('|', @clean_args)));
+}
+
+=head2 find
+
+Finds a single row by primary key.
+
+    my $row = await $async_db->find($resultset_name, $id);
+
+Returns: Hashref of row data or undef if not found.
+
+=cut
+
+sub find {
+    my ($self, $resultset, $id) = @_;
+
+    state $check = compile(Str, Int|Str);
+    $check->($resultset, $id);
+
+    $self->{stats}{queries}++;
+    $self->_record_metric('inc', 'db_async_queries_total');
+
+    my $start_time = time;
+
+    return $self->_call_worker('find', $resultset, $id)->then(sub {
+        my ($result) = @_;
+        my $duration = time - $start_time;
+        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+        return Future->done($result);
+    });
+}
+
+=head2 create
+
+Creates a new row.
+
+    my $new_row = await $async_db->create(
+        $resultset_name,
+        { name => 'John', email => 'john@example.com' }
+    );
+
+Returns: Hashref of created row data.
+
+=cut
+
+sub create {
+    my ($self, $resultset, $data) = @_;
+
+    state $check = compile(Str, HashRef);
+    $check->($resultset, $data);
+
+    $self->{stats}{queries}++;
+    $self->_record_metric('inc', 'db_async_queries_total');
+
+    $self->_invalidate_cache_for($resultset);
+
+    my $start_time = time;
+
+    return $self->_call_worker('create', $resultset, $data)->then(sub {
+        my ($result) = @_;
+        my $duration = time - $start_time;
+        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+        return Future->done($result);
+    });
+}
+
+=head2 update
+
+Updates an existing row.
+
+    my $updated_row = await $async_db->update(
+        $resultset_name,
+        $id,
+        { name => 'Jane', status => 'active' }
+    );
+
+Returns: Hashref of updated row data or undef if row not found.
+
+=cut
+
+sub update {
+    my ($self, $resultset, $id, $data) = @_;
+
+    state $check = compile(Str, Int|Str, HashRef);
+    $check->($resultset, $id, $data);
+
+    $self->{stats}{queries}++;
+    $self->_record_metric('inc', 'db_async_queries_total');
+
+    $self->_invalidate_cache_for($resultset);
+    $self->_invalidate_cache_for("$resultset:$id");
+
+    my $start_time = time;
+
+    return $self->_call_worker('update', $resultset, $id, $data)->then(sub {
+        my ($result) = @_;
+        my $duration = time - $start_time;
+        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+        return Future->done($result);
+    });
+}
+
+=head2 update_bulk
+
+    $db->update_bulk($table, $condition, $data);
+
+Performs a bulk update operation on multiple rows in the specified table.
+
+This method updates all rows in the given table that match the specified
+conditions with the provided data values. It is particularly useful for
+batch operations where multiple records need to be modified with the same
+set of changes.
+
+=over 4
+
+=item Parameters
+
+=over 8
+
+=item C<$table>
+
+The name of the table to update (String, required).
+
+=item C<$condition>
+
+A hash reference specifying the WHERE conditions for selecting rows to update.
+Each key-value pair in the hash represents a column and its required value.
+Rows matching ALL conditions will be updated (HashRef, required).
+
+Example: C<< { status => 'pending', active => 1 } >>
+
+=item C<$data>
+
+A hash reference containing the column-value pairs to update.
+Each key-value pair specifies a column and its new value (HashRef, required).
+
+Example: C<< { status => 'processed', updated_at => '2024-01-01 10:00:00' } >>
+
+=back
+
+=item Returns
+
+Returns the result of the update operation from the worker. Typically this
+would be the number of rows affected or a success indicator, depending on
+your worker implementation.
+
+=item Exceptions
+
+=over 4
+
+=item *
+
+Throws a validation error if any parameter does not match the expected type.
+
+=item *
+
+Throws an exception if the underlying worker call fails.
+
+=back
+
+=item Examples
+
+    # Update all pending orders from a specific customer
+    my $result = $db->update_bulk(
+        'orders',
+        { customer_id => 123, status => 'pending' },
+        { status => 'processed', processed_at => \'NOW()' }
+    );
+
+    print "Updated $result rows\n";
+
+    # Deactivate all users who haven't logged in since 2023
+    $db->update_bulk(
+        'users',
+        { last_login => { '<' => '2023-01-01' } },
+        { active => 0, deactivation_date => \'CURRENT_DATE' }
+    );
+
+=back
+
+=cut
+
+sub update_bulk {
+    my ($self, $table, $condition, $data) = @_;
+
+    state $check = compile(Str, HashRef, HashRef);
+    $check->($table, $condition, $data);
+
+    return $self->_call_worker('update_bulk', $table, $condition, $data);
+}
+
+=head2 delete
+
+Deletes a row.
+
+    my $success = await $async_db->delete($resultset_name, $id);
+
+Returns: 1 if deleted, 0 if row not found.
+
+=cut
+
+sub delete {
+    my ($self, $resultset, $id) = @_;
+
+    state $check = compile(Str, Int|Str);
+    $check->($resultset, $id);
+
+    $self->{stats}{queries}++;
+    $self->_record_metric('inc', 'db_async_queries_total');
+
+    $self->_invalidate_cache_for($resultset);
+    $self->_invalidate_cache_for("$resultset:$id");
+
+    my $start_time = time;
+
+    return $self->_call_worker('delete', $resultset, $id)->then(sub {
+        my ($result) = @_;
+        my $duration = time - $start_time;
+        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+        return Future->done($result);
+    });
+}
+
+=head2 count
+
+Counts rows matching conditions.
+
+    my $count = await $async_db->count(
+        $resultset_name,
+        { active => 1, status => 'pending' }  # Optional
+    );
+
+Returns: Integer count.
+
+=cut
+
+sub count {
+    my ($self, $resultset, $search_args) = @_;
+
+    state $check = compile(Str, Maybe[HashRef]);
+    $check->($resultset, $search_args);
+
+    $self->{stats}{queries}++;
+    $self->_record_metric('inc', 'db_async_queries_total');
+
+    my $start_time = time;
+
+    return $self->_call_worker('count', $resultset, $search_args)->then(sub {
+        my ($result) = @_;
+        my $duration = time - $start_time;
+        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+        return Future->done($result);
+    });
+}
+
+=head2 raw_query
+
+Executes raw SQL query.
+
+    my $results = await $async_db->raw_query(
+        'SELECT * FROM users WHERE age > ? AND status = ?',
+        [25, 'active']  # Optional bind values
+    );
+
+Returns: Arrayref of hashrefs.
+
+=cut
+
+sub raw_query {
+    my ($self, $query, $bind_values) = @_;
+
+    state $check = compile(Str, Maybe[ArrayRef]);
+    $check->($query, $bind_values);
+
+    $self->{stats}{queries}++;
+    $self->_record_metric('inc', 'db_async_queries_total');
+
+    my $start_time = time;
+
+    return $self->_call_worker('raw_query', $query, $bind_values)->then(sub {
+        my ($result) = @_;
+        my $duration = time - $start_time;
+        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+        return Future->done($result);
+    });
+}
+
+=head2 txn_do
+
+Executes a transaction.
+
+    my $result = await $async_db->txn_do(sub {
+        my $schema = shift;
+
+        # Multiple operations that should succeed or fail together
+        $schema->resultset('Account')->find(1)->update({ balance => \'balance - 100' });
+        $schema->resultset('Account')->find(2)->update({ balance => \'balance + 100' });
+
+        return 'transfer_complete';
+    });
+
+The callback receives a DBIx::Class::Schema instance and should return the
+transaction result.
+
+B<IMPORTANT:> This method has limitations due to serialisation constraints.
+The CODE reference passed to C<txn_do> must be serialisable by L<Sereal>,
+which may not support anonymous subroutines or CODE references with closed
+over variables in all configurations.
+
+If you encounter serialisation errors, consider:
+
+=over 4
+
+=item * Using named subroutines instead of anonymous ones
+
+=item * Recompiling L<Sereal> with C<ENABLE_SRL_CODEREF> support
+
+=item * Using individual async operations instead of transactions
+
+=item * Using the C<txn_batch> method for predefined operations
+
+=back
+
+Common error: C<Found type 13 CODE(...), but it is not representable by the
+Sereal encoding format>
+
+This indicates that your Sereal installation does not support CODE reference
+serialization. You may need to recompile Sereal with:
+
+    perl Makefile.PL --enable-srl-coderef
+    make
+    make install
+
+Alternatively, structure your code to avoid passing CODE references through
+worker boundaries.
+
+=cut
+
+sub txn_do {
+    my ($self, $code) = @_;
+
+    state $check = compile(CodeRef);
+    $check->($code);
+
+    $self->{stats}{queries}++;
+    $self->_record_metric('inc', 'db_async_queries_total');
+
+    if (defined $self->{cache_ttl} && $self->{cache_ttl} > 0) {
+        $self->{cache}->clear;
+    }
+
+    my $start_time = time;
+
+    # Try to pass the CODE ref directly - this might fail with Sereal
+    # but let the error propagate naturally
+    return $self->_call_worker('txn_do', $code)->then(sub {
+        my ($result) = @_;
+        my $duration = time - $start_time;
+        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+        return Future->done($result);
+    })->catch(sub {
+        my $error = shift;
+        # If it fails due to serialization, provide a better error message
+        if ($error =~ /not representable by the Sereal encoding format/) {
+            return Future->fail(
+                "txn_do cannot serialise CODE references through IO::Async workers. " .
+                "Consider using individual async methods or a different approach."
+            );
+        }
+        return Future->fail($error);
+    });
+}
+
+=head2 txn_batch
+
+Executes a batch of operations within a transaction. This is the recommended
+alternative to C<txn_do> as it avoids CODE reference serialisation issues.
+
+    my $result = await $async_db->txn_batch(
+        # Update operations
+        { type => 'update', resultset => 'Account', id => 1,
+          data => { balance => \'balance - 100' } },
+        { type => 'update', resultset => 'Account', id => 2,
+          data => { balance => \'balance + 100' } },
+
+        # Create operation
+        { type => 'create', resultset => 'Log',
+          data => { event => 'transfer', amount => 100, timestamp => \'NOW()' } },
+    );
+
+    # Returns count of successful operations
+    say "Executed $result operations in transaction";
+
+Supported operation types:
+
+=over 4
+
+=item * B<update> - Update an existing record
+
+    {
+        type      => 'update',
+        resultset => 'User',       # ResultSet name
+        id        => 123,          # Primary key value
+        data      => { name => 'New Name', status => 'active' }
+    }
+
+=item * B<create> - Create a new record
+
+    {
+        type      => 'create',
+        resultset => 'Order',
+        data      => { user_id => 1, amount => 99.99, status => 'pending' }
+    }
+
+=item * B<delete> - Delete a record
+
+    {
+        type      => 'delete',
+        resultset => 'Session',
+        id        => 456
+    }
+
+=item * B<raw> - Execute raw SQL (use with caution)
+
+    {
+        type => 'raw',
+        sql  => 'UPDATE accounts SET balance = balance - ? WHERE id = ?',
+        bind => [100, 1]
+    }
+
+=back
+
+All operations succeed or fail together. If any operation fails, the entire
+transaction is rolled back.
+
+Returns: Number of successfully executed operations.
+
+=cut
+
+sub txn_batch {
+    my ($self, @operations) = @_;
+
+    # Validate operations
+    for my $op (@operations) {
+        unless (ref $op eq 'HASH' && $op->{type}) {
+            croak "Each operation must be a hashref with 'type' key";
+        }
+
+        if ($op->{type} eq 'update' || $op->{type} eq 'delete') {
+            croak "Operation type '$op->{type}' requires 'id' parameter"
+                unless exists $op->{id};
+        }
+
+        if ($op->{type} eq 'update' || $op->{type} eq 'create') {
+            croak "Operation type '$op->{type}' requires 'data' parameter"
+                unless ref $op->{data} eq 'HASH';
+        }
+
+        if ($op->{type} eq 'raw') {
+            croak "Operation type 'raw' requires 'sql' parameter"
+                unless $op->{sql};
+        }
+    }
+
+    $self->{stats}{queries}++;
+    $self->_record_metric('inc', 'db_async_queries_total');
+
+    # Invalidate all cache for safety
+    if (defined $self->{cache_ttl} && $self->{cache_ttl} > 0) {
+        $self->{cache}->clear;
+    }
+
+    my $start_time = time;
+
+    return $self->_call_worker('txn_batch', \@operations)->then(sub {
+        my ($result) = @_;
+        my $duration = time - $start_time;
+        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+        return Future->done($result);
+    });
+}
+
+=head2 health_check
+
+Performs health check on all workers.
+
+    my $healthy_workers = await $async_db->health_check;
+
+Returns: Number of healthy workers.
+
+=cut
+
+sub health_check {
+    my $self = shift;
+
+    my @checks = map {
+        my $worker_info = $_;
+        my $worker = $worker_info->{instance};
+        $worker->call(
+            args => [
+                $self->{schema_class},
+                $self->{connect_info},
+                $self->{workers_config},
+                'health_check',
+            ],
+            timeout => 5,
+        )->then(sub {
+            $worker_info->{healthy} = 1;
+            return Future->done(1);
+        }, sub {
+            $worker_info->{healthy} = 0;
+            return Future->done(0);
+        })
+    } @{$self->{workers}};
+
+    return Future->wait_all(@checks)->then(sub {
+        my @results = @_;
+        my $healthy_count = grep { $_->get } @results;
+
+        $self->_record_metric('set', 'db_async_workers_active', $healthy_count);
+
+        return Future->done($healthy_count);
+    });
+}
+
+sub _record_metric {
+    my ($self, $type, $name, @args) = @_;
+
+    return unless $self->{enable_metrics} && defined $METRICS;
+
+    if ($type eq 'inc') {
+        $METRICS->inc($name, @args);
+    } elsif ($type eq 'observe') {
+        $METRICS->observe($name, @args);
+    } elsif ($type eq 'set') {
+        $METRICS->set($name, @args);
+    }
+}
+
+=head2 stats
+
+Returns statistics about database operations.
+
+    my $stats = $async_db->stats;
+
+Returns: Hashref with query counts, cache hits, errors, etc.
+
+=cut
+
+sub stats {
+    my $self = shift;
+    return { %{$self->{stats}} };  # Return copy
+}
+
+=head2 disconnect
+
+Gracefully disconnects all workers and cleans up resources.
+
+    $async_db->disconnect;
+
+=cut
+
+sub disconnect {
+    my $self = shift;
+
+    return unless $self->{is_connected};
+
+    # Stop health checks
+    if ($self->{health_check_timer}) {
+        $self->{loop}->remove($self->{health_check_timer});
+        undef $self->{health_check_timer};
+    }
+
+    # Stop all workers
+    for my $worker (@{$self->{workers}}) {
+        if (defined $worker->{instance}) {
+            $self->{loop}->remove($worker->{instance});
+        }
+    }
+
+    $self->{workers} = [];
+    $self->{is_connected} = 0;
+
+    # Clear cache
+    if (defined $self->{cache}) {
+        $self->{cache}->clear;
+    }
+}
+
+=head2 loop
+
+Returns the IO::Async::Loop instance.
+
+    my $loop = $async_db->loop;
+
+=cut
+
+sub loop {
+    my $self = shift;
+    return $self->{loop};
+}
+
+=head2 schema_class
+
+Returns the schema class name.
+
+    my $class = $async_db->schema_class;
+
+=cut
+
+sub schema_class {
+    my $self = shift;
+    return $self->{schema_class};
+}
+
+#
+#
+# INTERNAL METHODS
+
 sub _build_default_cache {
     my ($ttl) = @_;
 
@@ -271,29 +1081,27 @@ sub _build_default_cache {
     return CHI->new(%params);
 }
 
-our $metrics;
-
 sub _init_metrics {
     my $self = shift;
 
     # Try to load Metrics::Any
     eval {
         require Metrics::Any;
-        Metrics::Any->import('$metrics');
+        Metrics::Any->import('$METRICS');
 
         # Initialize metrics
-        $metrics->make_counter('db_async_queries_total');
-        $metrics->make_counter('db_async_cache_hits_total');
-        $metrics->make_counter('db_async_cache_misses_total');
-        $metrics->make_histogram('db_async_query_duration_seconds');
-        $metrics->make_gauge('db_async_workers_active');
+        $METRICS->make_counter('db_async_queries_total');
+        $METRICS->make_counter('db_async_cache_hits_total');
+        $METRICS->make_counter('db_async_cache_misses_total');
+        $METRICS->make_histogram('db_async_query_duration_seconds');
+        $METRICS->make_gauge('db_async_workers_active');
 
     };
 
     # Silently ignore if Metrics::Any is not available
     if ($@) {
         $self->{enable_metrics} = 0;
-        undef $metrics;
+        undef $METRICS;
     }
 }
 
@@ -427,703 +1235,6 @@ sub _start_health_checks {
     }
 }
 
-=head1 METHODS
-
-=head2 search
-
-Performs a search query.
-
-    my $results = await $async_db->search(
-        $resultset_name,
-        $search_conditions,    # Optional hashref
-        $attributes,           # Optional hashref
-    );
-
-Attributes may include:
-
-    {
-        order_by  => 'name DESC',
-        rows      => 50,
-        page      => 2,
-        columns   => [qw/id name/],
-        prefetch  => 'relation',
-        cache     => 1,
-        cache_key => 'custom_key',
-    }
-
-All results are returned as arrayrefs of hashrefs.
-
-=cut
-
-sub search {
-    my ($self, $resultset, $search_args, $attrs) = @_;
-
-    state $check = compile(Str, Maybe[HashRef], Maybe[HashRef]);
-    $check->($resultset, $search_args, $attrs);
-
-    $self->{stats}{queries}++;
-    $self->_record_metric('inc', 'db_async_queries_total');
-
-    my $cache_key = delete $attrs->{cache_key} // _generate_cache_key('search', $resultset, $search_args, $attrs);
-    my $use_cache = exists $attrs->{cache} ? delete $attrs->{cache} : defined $self->{cache_ttl};
-
-    if ($use_cache) {
-        my $cached = $self->{cache}->get($cache_key);
-        if ($cached) {
-            $self->{stats}{cache_hits}++;
-            $self->_record_metric('inc', 'db_async_cache_hits_total');
-            return Future->done($cached);
-        }
-        $self->{stats}{cache_misses}++;
-        $self->_record_metric('inc', 'db_async_cache_misses_total');
-    }
-
-    my $start_time = time;
-
-    my $future = $self->{enable_retry}
-        ? $self->_call_with_retry('search', $resultset, $search_args, $attrs)
-        : $self->_call_worker('search', $resultset, $search_args, $attrs);
-
-    return $future->then(sub {
-        my ($result) = @_;
-
-        my $duration = time - $start_time;
-        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
-
-        if ($use_cache && defined $self->{cache_ttl}) {
-            $self->{cache}->set($cache_key, $result, $self->{cache_ttl});
-        }
-
-        return Future->done($result);
-    });
-}
-
-sub _generate_cache_key {
-    my ($operation, @args) = @_;
-
-    my @clean_args = map {
-        if (!defined $_) {
-            'UNDEF';
-        } elsif (ref $_ eq 'HASH') {
-            my $hashref = $_;
-            join(',', sort map { "$_=>$hashref->{$_}" } keys %$hashref);
-        } elsif (ref $_ eq 'ARRAY') {
-            join(',', @$_);
-        } else {
-            $_;
-        }
-    } @args;
-
-    return join(':', $operation, md5_hex(join('|', @clean_args)));
-}
-
-=head2 find
-
-Finds a single row by primary key.
-
-    my $row = await $async_db->find($resultset_name, $id);
-
-Returns: Hashref of row data or undef if not found.
-
-=cut
-
-sub find {
-    my ($self, $resultset, $id) = @_;
-
-    state $check = compile(Str, Int|Str);
-    $check->($resultset, $id);
-
-    $self->{stats}{queries}++;
-    $self->_record_metric('inc', 'db_async_queries_total');
-
-    my $start_time = time;
-
-    return $self->_call_worker('find', $resultset, $id)->then(sub {
-        my ($result) = @_;
-        my $duration = time - $start_time;
-        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
-        return Future->done($result);
-    });
-}
-
-=head2 create
-
-Creates a new row.
-
-    my $new_row = await $async_db->create(
-        $resultset_name,
-        { name => 'John', email => 'john@example.com' }
-    );
-
-Returns: Hashref of created row data.
-
-=cut
-
-sub create {
-    my ($self, $resultset, $data) = @_;
-
-    state $check = compile(Str, HashRef);
-    $check->($resultset, $data);
-
-    $self->{stats}{queries}++;
-    $self->_record_metric('inc', 'db_async_queries_total');
-
-    $self->_invalidate_cache_for($resultset);
-
-    my $start_time = time;
-
-    return $self->_call_worker('create', $resultset, $data)->then(sub {
-        my ($result) = @_;
-        my $duration = time - $start_time;
-        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
-        return Future->done($result);
-    });
-}
-
-=head2 update
-
-Updates an existing row.
-
-    my $updated_row = await $async_db->update(
-        $resultset_name,
-        $id,
-        { name => 'Jane', status => 'active' }
-    );
-
-Returns: Hashref of updated row data or undef if row not found.
-
-=cut
-
-sub update {
-    my ($self, $resultset, $id, $data) = @_;
-
-    state $check = compile(Str, Int|Str, HashRef);
-    $check->($resultset, $id, $data);
-
-    $self->{stats}{queries}++;
-    $self->_record_metric('inc', 'db_async_queries_total');
-
-    $self->_invalidate_cache_for($resultset);
-    $self->_invalidate_cache_for("$resultset:$id");
-
-    my $start_time = time;
-
-    return $self->_call_worker('update', $resultset, $id, $data)->then(sub {
-        my ($result) = @_;
-        my $duration = time - $start_time;
-        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
-        return Future->done($result);
-    });
-}
-
-=head2 delete
-
-Deletes a row.
-
-    my $success = await $async_db->delete($resultset_name, $id);
-
-Returns: 1 if deleted, 0 if row not found.
-
-=cut
-
-sub delete {
-    my ($self, $resultset, $id) = @_;
-
-    state $check = compile(Str, Int|Str);
-    $check->($resultset, $id);
-
-    $self->{stats}{queries}++;
-    $self->_record_metric('inc', 'db_async_queries_total');
-
-    $self->_invalidate_cache_for($resultset);
-    $self->_invalidate_cache_for("$resultset:$id");
-
-    my $start_time = time;
-
-    return $self->_call_worker('delete', $resultset, $id)->then(sub {
-        my ($result) = @_;
-        my $duration = time - $start_time;
-        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
-        return Future->done($result);
-    });
-}
-
-=head2 count
-
-Counts rows matching conditions.
-
-    my $count = await $async_db->count(
-        $resultset_name,
-        { active => 1, status => 'pending' }  # Optional
-    );
-
-Returns: Integer count.
-
-=cut
-
-sub count {
-    my ($self, $resultset, $search_args) = @_;
-
-    state $check = compile(Str, Maybe[HashRef]);
-    $check->($resultset, $search_args);
-
-    $self->{stats}{queries}++;
-    $self->_record_metric('inc', 'db_async_queries_total');
-
-    my $start_time = time;
-
-    return $self->_call_worker('count', $resultset, $search_args)->then(sub {
-        my ($result) = @_;
-        my $duration = time - $start_time;
-        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
-        return Future->done($result);
-    });
-}
-
-=head2 raw_query
-
-Executes raw SQL query.
-
-    my $results = await $async_db->raw_query(
-        'SELECT * FROM users WHERE age > ? AND status = ?',
-        [25, 'active']  # Optional bind values
-    );
-
-Returns: Arrayref of hashrefs.
-
-=cut
-
-sub raw_query {
-    my ($self, $query, $bind_values) = @_;
-
-    state $check = compile(Str, Maybe[ArrayRef]);
-    $check->($query, $bind_values);
-
-    $self->{stats}{queries}++;
-    $self->_record_metric('inc', 'db_async_queries_total');
-
-    my $start_time = time;
-
-    return $self->_call_worker('raw_query', $query, $bind_values)->then(sub {
-        my ($result) = @_;
-        my $duration = time - $start_time;
-        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
-        return Future->done($result);
-    });
-}
-
-=head2 txn_do
-
-Executes a transaction.
-
-    my $result = await $async_db->txn_do(sub {
-        my $schema = shift;
-
-        # Multiple operations that should succeed or fail together
-        $schema->resultset('Account')->find(1)->update({ balance => \'balance - 100' });
-        $schema->resultset('Account')->find(2)->update({ balance => \'balance + 100' });
-
-        return 'transfer_complete';
-    })->get;
-
-The callback receives a DBIx::Class::Schema instance and should return the
-transaction result.
-
-B<IMPORTANT:> This method has limitations due to serialisation constraints.
-The CODE reference passed to C<txn_do> must be serialisable by L<Sereal>,
-which may not support anonymous subroutines or CODE references with closed
-over variables in all configurations.
-
-If you encounter serialisation errors, consider:
-
-=over 4
-
-=item * Using named subroutines instead of anonymous ones
-
-=item * Recompiling L<Sereal> with C<ENABLE_SRL_CODEREF> support
-
-=item * Using individual async operations instead of transactions
-
-=item * Using the C<txn_batch> method for predefined operations
-
-=back
-
-Common error: C<Found type 13 CODE(...), but it is not representable by the
-Sereal encoding format>
-
-This indicates that your Sereal installation does not support CODE reference
-serialization. You may need to recompile Sereal with:
-
-    perl Makefile.PL --enable-srl-coderef
-    make
-    make install
-
-Alternatively, structure your code to avoid passing CODE references through
-worker boundaries.
-
-=cut
-
-sub txn_do {
-    my ($self, $code) = @_;
-
-    state $check = compile(CodeRef);
-    $check->($code);
-
-    $self->{stats}{queries}++;
-    $self->_record_metric('inc', 'db_async_queries_total');
-
-    if (defined $self->{cache_ttl} && $self->{cache_ttl} > 0) {
-        $self->{cache}->clear;
-    }
-
-    my $start_time = time;
-
-    # Try to pass the CODE ref directly - this might fail with Sereal
-    # but let the error propagate naturally
-    return $self->_call_worker('txn_do', $code)->then(sub {
-        my ($result) = @_;
-        my $duration = time - $start_time;
-        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
-        return Future->done($result);
-    })->catch(sub {
-        my $error = shift;
-        # If it fails due to serialization, provide a better error message
-        if ($error =~ /not representable by the Sereal encoding format/) {
-            return Future->fail(
-                "txn_do cannot serialise CODE references through IO::Async workers. " .
-                "Consider using individual async methods or a different approach."
-            );
-        }
-        return Future->fail($error);
-    });
-}
-
-=head2 txn_batch
-
-Executes a batch of operations within a transaction. This is the recommended
-alternative to C<txn_do> as it avoids CODE reference serialisation issues.
-
-    my $result = $async_db->txn_batch(
-        # Update operations
-        { type => 'update', resultset => 'Account', id => 1,
-          data => { balance => \'balance - 100' } },
-        { type => 'update', resultset => 'Account', id => 2,
-          data => { balance => \'balance + 100' } },
-
-        # Create operation
-        { type => 'create', resultset => 'Log',
-          data => { event => 'transfer', amount => 100, timestamp => \'NOW()' } },
-    )->get;
-
-    # Returns count of successful operations
-    say "Executed $result operations in transaction";
-
-Supported operation types:
-
-=over 4
-
-=item * B<update> - Update an existing record
-
-    {
-        type      => 'update',
-        resultset => 'User',       # ResultSet name
-        id        => 123,          # Primary key value
-        data      => { name => 'New Name', status => 'active' }
-    }
-
-=item * B<create> - Create a new record
-
-    {
-        type      => 'create',
-        resultset => 'Order',
-        data      => { user_id => 1, amount => 99.99, status => 'pending' }
-    }
-
-=item * B<delete> - Delete a record
-
-    {
-        type      => 'delete',
-        resultset => 'Session',
-        id        => 456
-    }
-
-=item * B<raw> - Execute raw SQL (use with caution)
-
-    {
-        type => 'raw',
-        sql  => 'UPDATE accounts SET balance = balance - ? WHERE id = ?',
-        bind => [100, 1]
-    }
-
-=back
-
-All operations succeed or fail together. If any operation fails, the entire
-transaction is rolled back.
-
-Returns: Number of successfully executed operations.
-
-=cut
-
-sub txn_batch {
-    my ($self, @operations) = @_;
-
-    # Validate operations
-    for my $op (@operations) {
-        unless (ref $op eq 'HASH' && $op->{type}) {
-            croak "Each operation must be a hashref with 'type' key";
-        }
-
-        if ($op->{type} eq 'update' || $op->{type} eq 'delete') {
-            croak "Operation type '$op->{type}' requires 'id' parameter"
-                unless exists $op->{id};
-        }
-
-        if ($op->{type} eq 'update' || $op->{type} eq 'create') {
-            croak "Operation type '$op->{type}' requires 'data' parameter"
-                unless ref $op->{data} eq 'HASH';
-        }
-
-        if ($op->{type} eq 'raw') {
-            croak "Operation type 'raw' requires 'sql' parameter"
-                unless $op->{sql};
-        }
-    }
-
-    $self->{stats}{queries}++;
-    $self->_record_metric('inc', 'db_async_queries_total');
-
-    # Invalidate all cache for safety
-    if (defined $self->{cache_ttl} && $self->{cache_ttl} > 0) {
-        $self->{cache}->clear;
-    }
-
-    my $start_time = time;
-
-    return $self->_call_worker('txn_batch', \@operations)->then(sub {
-        my ($result) = @_;
-        my $duration = time - $start_time;
-        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
-        return Future->done($result);
-    });
-}
-
-=head2 search_multi
-
-Executes multiple search queries concurrently.
-
-    my @results = await $async_db->search_multi(
-        ['User', { active => 1 }, { rows => 10 }],
-        ['Product', { category => 'books' }],
-        ['Order', undef, { order_by => 'created_at DESC', rows => 5 }],
-    );
-
-Returns: Array of results in the same order as queries.
-
-=cut
-
-sub search_multi {
-    my ($self, @queries) = @_;
-
-    $self->{stats}{queries} += scalar @queries;
-    $self->_record_metric('inc', 'db_async_queries_total', scalar @queries);
-
-    my @futures = map {
-        my ($resultset, $search_args, $attrs) = @$_;
-        $self->_call_worker('search', $resultset, $search_args, $attrs)
-    } @queries;
-
-    my $start_time = time;
-
-    return Future->wait_all(@futures)->then(sub {
-        my @results = @_;
-
-        my $duration = time - $start_time;
-        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
-
-        # Extract values from completed futures
-        my @values = map { $_->get } @results;
-
-        return Future->done(@values);
-    });
-}
-
-=head2 search_with_prefetch
-
-Search with eager loading of relationships.
-
-    my $users_with_orders = await $async_db->search_with_prefetch(
-        'User',
-        { active => 1 },
-        'orders',  # Relationship name or arrayref for multiple
-        { rows => 10 }
-    );
-
-Returns: Arrayref of results with prefetched data.
-
-=cut
-
-sub search_with_prefetch {
-    my ($self, $resultset, $search_args, $prefetch, $attrs) = @_;
-
-    state $check = compile(Str, Maybe[HashRef], Str|ArrayRef, Maybe[HashRef]);
-    $check->($resultset, $search_args, $prefetch, $attrs);
-
-    $self->{stats}{queries}++;
-    $self->_record_metric('inc', 'db_async_queries_total');
-
-    my $start_time = time;
-
-    return $self->_call_worker(
-        'search_with_prefetch',
-        $resultset,
-        $search_args,
-        $prefetch,
-        $attrs
-    )->then(sub {
-        my ($result) = @_;
-        my $duration = time - $start_time;
-        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
-        return Future->done($result);
-    });
-}
-
-=head2 health_check
-
-Performs health check on all workers.
-
-    my $healthy_workers = await $async_db->health_check;
-
-Returns: Number of healthy workers.
-
-=cut
-
-sub health_check {
-    my $self = shift;
-
-    my @checks = map {
-        my $worker_info = $_;
-        my $worker = $worker_info->{instance};
-        $worker->call(
-            args => [
-                $self->{schema_class},
-                $self->{connect_info},
-                $self->{workers_config},
-                'health_check',
-            ],
-            timeout => 5,
-        )->then(sub {
-            $worker_info->{healthy} = 1;
-            return Future->done(1);
-        }, sub {
-            $worker_info->{healthy} = 0;
-            return Future->done(0);
-        })
-    } @{$self->{workers}};
-
-    return Future->wait_all(@checks)->then(sub {
-        my @results = @_;
-        my $healthy_count = grep { $_->get } @results;
-
-        $self->_record_metric('set', 'db_async_workers_active', $healthy_count);
-
-        return Future->done($healthy_count);
-    });
-}
-
-sub _record_metric {
-    my ($self, $type, $name, @args) = @_;
-
-    return unless $self->{enable_metrics} && defined $metrics;
-
-    if ($type eq 'inc') {
-        $metrics->inc($name, @args);
-    } elsif ($type eq 'observe') {
-        $metrics->observe($name, @args);
-    } elsif ($type eq 'set') {
-        $metrics->set($name, @args);
-    }
-}
-
-=head2 stats
-
-Returns statistics about database operations.
-
-    my $stats = $async_db->stats;
-
-Returns: Hashref with query counts, cache hits, errors, etc.
-
-=cut
-
-sub stats {
-    my $self = shift;
-    return { %{$self->{stats}} };  # Return copy
-}
-
-=head2 disconnect
-
-Gracefully disconnects all workers and cleans up resources.
-
-    $async_db->disconnect;
-
-=cut
-
-sub disconnect {
-    my $self = shift;
-
-    return unless $self->{is_connected};
-
-    # Stop health checks
-    if ($self->{health_check_timer}) {
-        $self->{loop}->remove($self->{health_check_timer});
-        undef $self->{health_check_timer};
-    }
-
-    # Stop all workers
-    for my $worker (@{$self->{workers}}) {
-        if (defined $worker->{instance}) {
-            $self->{loop}->remove($worker->{instance});
-        }
-    }
-
-    $self->{workers} = [];
-    $self->{is_connected} = 0;
-
-    # Clear cache
-    if (defined $self->{cache}) {
-        $self->{cache}->clear;
-    }
-}
-
-=head2 loop
-
-Returns the IO::Async::Loop instance.
-
-    my $loop = $async_db->loop;
-
-=cut
-
-sub loop {
-    my $self = shift;
-    return $self->{loop};
-}
-
-=head2 schema_class
-
-Returns the schema class name.
-
-    my $class = $async_db->schema_class;
-
-=cut
-
-sub schema_class {
-    my $self = shift;
-    return $self->{schema_class};
-}
-
-#
-#
-# INTERNAL METHODS
-
 sub _execute_operation {
     my ($schema, $operation, @args) = @_;
 
@@ -1147,19 +1258,40 @@ sub _execute_operation {
     elsif ($operation eq 'find') {
         my ($resultset, $id) = @args;
         my $row = $schema->resultset($resultset)->find($id);
-        return $row ? {$row->get_columns} : undef;
+        return $row ? {$row->get_inflated_columns} : undef;
     }
     elsif ($operation eq 'create') {
-        my ($resultset, $data) = @args;
-        my $row = $schema->resultset($resultset)->create($data);
-        return {$row->get_columns};
+        my ($source_name, $data) = @args;
+        try {
+            my $rs  = $schema->resultset($source_name);
+            my $row = $rs->create($data);
+            return { $row->get_columns };
+        }
+        catch {
+            return { __error => $_ };
+        }
     }
     elsif ($operation eq 'update') {
         my ($resultset, $id, $data) = @args;
         my $row = $schema->resultset($resultset)->find($id);
         return undef unless $row;
         $row->update($data);
-        return {$row->get_columns};
+        return {$row->get_inflated_columns};
+    }
+    elsif ($operation eq 'update_bulk') {
+        my ($source_name, $condition, $data) = @args;
+
+        try {
+            my $resultset = $schema->resultset($source_name);
+            $resultset = $resultset->search($condition)
+                if $condition && %$condition;
+            my $count = $resultset->update($data);
+
+            return $count;
+        }
+        catch {
+            return 0;
+        }
     }
     elsif ($operation eq 'delete') {
         my ($resultset, $id) = @args;
@@ -1462,6 +1594,63 @@ Transactions execute on a single worker only.
 All rows are loaded into memory. Use pagination for large datasets.
 
 =back
+
+=head1 KNOWN ISSUES
+
+=head2 search_with_prefetch is Broken
+
+The C<search_with_prefetch> method B<does not work> with any database backend
+(SQLite, MySQL, or PostgreSQL). Worker processes consistently crash with
+"closed" errors when attempting to perform eager loading of relationships.
+
+B<Root Cause>: The issue appears to be in how the worker process handles
+complex queries with joins/prefetch, not database-specific concurrency problems.
+
+B<Workaround - Use Separate Queries>:
+
+Instead of attempting to prefetch relationships, fetch them separately:
+
+    # Broken - do not use
+    my $users = await $db->search_with_prefetch('User', {}, 'posts', {});
+
+    # Working solution - separate queries
+    my $users = await $db->search('User', {}, {});
+
+    foreach my $user (@$users) {
+        my $posts = await $db->search(
+            'Post',
+            { user_id => $user->{id} },
+            {}
+        );
+        $user->{posts} = $posts;  # Manually attach
+    }
+
+B<Performance Optimisation>:
+
+For better performance when fetching related data for multiple records, use
+parallel queries with controlled concurrency:
+
+    use Future::Utils qw(fmap_concat);
+
+    my $users = await $db->search('User', {}, { rows => 100 });
+
+    # Fetch posts for all users with max 5 concurrent queries
+    my @enriched = await fmap_concat {
+        my ($user) = @_;
+
+        $db->search('Post', { user_id => $user->{id} }, {})
+        ->then(sub {
+            my ($posts) = @_;
+            return Future->done({ %$user, posts => $posts });
+        });
+    } foreach => $users, concurrent => 5;
+
+This approach provides similar benefits to prefetch (reduced round trips through
+batching) while avoiding the broken C<search_with_prefetch> implementation.
+
+B<Status>: This is a fundamental issue with the current DBIx::Class::Async
+implementation. Users should avoid C<search_with_prefetch> entirely until this
+is resolved in a future release.
 
 =head1 AUTHOR
 

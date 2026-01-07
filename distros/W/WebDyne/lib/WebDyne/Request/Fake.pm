@@ -1,7 +1,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -25,7 +25,7 @@ no warnings qw(uninitialized);
 
 #  External modules
 #
-use Cwd qw(cwd);
+use Cwd qw(fastcwd);
 use Data::Dumper;
 use HTTP::Status (RC_OK);
 use WebDyne::Util;
@@ -44,7 +44,7 @@ my %Package;
 
 #  Version information
 #
-$VERSION='2.038';
+$VERSION='2.046';
 
 
 #  Debug load
@@ -113,7 +113,35 @@ sub dir_config {
     #
     my $constant_hr=$WEBDYNE_DIR_CONFIG;
     debug('using constant_hr: %s', Dumper($constant_hr));
+
+
+    #  Optionally load WEBDYNE_DIR_CONFIG from current dir
+    #
+    if ($WEBDYNE_DIR_CONFIG_CWD_LOAD) {
     
+
+        #  Yes, wanted. Get cwd, skip if already processed
+        #
+        my $cwd_dn=$r->cwd();
+        my $dir_config_hr=($Package{'_dir_config'}{$cwd_dn} ||= do {
+            my $webdyne_conf_fn=File::Spec->catfile($cwd_dn, sprintf('.%s', $WEBDYNE_CONF_FN));
+            debug("fn: $webdyne_conf_fn");
+            if (-f $webdyne_conf_fn) {
+                debug("found: $webdyne_conf_fn, reading");
+                my $webdyne_conf_hr=do($webdyne_conf_fn) ||
+                    warn "unable to read document root dir_config constant file, $!";
+                debug('webdyne_conf_hr: %s', Dumper($webdyne_conf_hr));
+                $webdyne_conf_hr->{'WebDyne::Constant'}{'WEBDYNE_DIR_CONFIG'};
+            }} || {}
+        );
+        if (keys %{$dir_config_hr}) {
+            $constant_hr={
+                %{$constant_hr},
+                %{$dir_config_hr}
+            } 
+        }
+    }    
+
 
     #  OK - heirarchy is this:
     #
@@ -121,8 +149,10 @@ sub dir_config {
     #
     #  $ENV{$key} # Wins everything
     #  $hr->{$servername}{$location}{$key}
+    #  $hr->{$servername}{''}{$key}
+    #  $hr->{$servername}{$key}
     #  $hr->{$location}{$key}
-    #  $hr->{''}{$key} # Legacy - "/" preferred
+    #  $hr->{''}{$key} 
     #  $hr->{$key}
     #
 
@@ -148,12 +178,15 @@ sub dir_config {
             #
             my $location=$r->location();
             debug("in dir_config looking for key $key at location $location");
+            
+            
+            #  Array of hashes we may need to look through
+            #
+            my @constant_hr=($constant_hr);
 
 
             #  Do we have $hr->{$servername}{$location} ?
             #
-            my $constant_server_hr;
-            #if (my $server=($Dir_config_env{'WebDyneServer'} || $ENV{'HOSTNAME'} ||  $ENV{'SERVER_NAME'})) {
             if (my $server=($ENV{'WebDyneServer'} || $ENV{'HOSTNAME'} ||  $ENV{'SERVER_NAME'})) {
 
                 #  Have $servername
@@ -161,55 +194,45 @@ sub dir_config {
                 debug("using server: $server");
                 if (exists $constant_hr->{$server}) {
                 
-                    #  Have $hr->{$servername}
+                    #  Add to array of hashes we have to look at
                     #
-                    my $constant_server_hr=$constant_hr->{$server};
-                    debug("found constant_server_hr: $constant_server_hr (%s)", Dumper($constant_server_hr));
-                    if (exists $constant_server_hr->{$location}) {
+                    unshift @constant_hr, (my $constant_server_hr=$constant_hr->{$server});
+                    debug("pushing $constant_server_hr onto dir_config review stack: %s", Dumper($constant_server_hr));
                     
-                        #  Have $hr->{$servername}{$location} 
-                        #
-                        debug("found location: $location in constant_server_hr, looking for key: $key");
-                        if (exists $constant_server_hr->{$location}{$key}) {
-                            debug("found key: $key in constant_server_hr, returning value: %s", $constant_server_hr->{$location}{$key});
-                            
-                            #  Have Have $hr->{$servername}{$location}{$key}, return it
-                            #
-                            return $constant_server_hr->{$location}{$key};
-                        }
+                }
+                
+            }
+            
+            
+            #  Now iterate across array, return on first match
+            #
+            foreach my $hr (@constant_hr) {
+                foreach my $hr_key ($location, '') {
+                    debug("looking at hr: $hr, k: $hr_key");
+                    #  Maybe $hr->{$location}{$key} or $hr->{''}{$key} ?
+                    #
+                    if (exists $constant_hr->{$hr_key}) {
+                        debug('found $hr->{%s}', $hr_key);
+                        return $hr->{$hr_key}{$key} if exists($hr->{$hr_key}{$key});
+                    }
+                    else {
+                        debug('no match on hr:$hr {%s}', $hr_key);
                     }
                 }
-                debug('fell through server code');
+                #  No - $hr->{$key} is last chance
+                #
+                if (exists $hr->{$key}) {
+                    debug('found $hr->{%s}', $key);
+                    return $hr->{$key}
+                }
+                else {
+                    debug("no match on $hr {%s}", $key);
+                }
             }
-            
-            
-            #  No. Do we have $hr->{$location}{$key} ?
-            #
-            if (exists $constant_hr->{$location}) {
-                debug('found $constant_hr->{%s}', $location);
-                return $constant_hr->{$location}{$key} if exists($constant_hr->{$location}{$key});
-            }
-            
-            
-            #  No. Do we have $hr->{''}{$key} 
-            #
-            elsif (exists $constant_hr->{''}) {
-                debug('found $constant_hr->{\'\'}');
-                return $constant_hr->{''}{$key} if exists($constant_hr->{''}{$key});
-            }
-            
-            
-            #  No $hr->{$key} is last chance
-            #
-            elsif (exists $constant_hr->{$key}) {
-                debug('found $constant_hr->{%s}', $key);
-                return $constant_hr->{$key}
-            }
-            
-            
+                
             #  Nothing found
             #
-            debug("no key found for location: $location, %s");
+            debug("no key found for location: $location or any other match, %s");
             return undef;
             
         }
@@ -239,7 +262,7 @@ sub filename {
     my $r=shift();
 
     #  Store cwd as takes a fair bit of processing time.
-    File::Spec->rel2abs($r->{'filename'}, ($Package{'_cwd'} ||= cwd()));
+    File::Spec->rel2abs($r->{'filename'}, ($Package{'_cwd'} ||= fastcwd()));
 
 }
 
@@ -468,7 +491,7 @@ sub uri {
 sub document_root {
 
     my $r=shift();
-    @_ ? $r->{'document_root'}=shift() : $r->{'document_root'} || ($ENV{'DOCUMENT_ROOT'} || cwd());
+    @_ ? $r->{'document_root'}=shift() : $r->{'document_root'} || ($ENV{'DOCUMENT_ROOT'} || fastcwd());
     
 }
 
@@ -560,6 +583,32 @@ sub args {
 
     return $ENV{'QUERY_STRING'};
     
+}
+
+
+sub cwd {
+
+    #  Return cwd of current psp file
+    #
+    my $r=shift();
+    return $r->{'_cwd'} ||= do {
+        debug("$r, fn: %s", $r->filename());
+        my $fn=$r->filename();
+        my $dn;
+        unless (-d ($dn=File::Spec->rel2abs($fn))) {
+            #  Not a directory, must be file
+            #
+            $dn=(File::Spec->splitpath($fn))[1] || fastcwd();
+            debug("return calculated dn: $dn");
+            $dn;
+        }
+        else {
+            debug("return existing dn: $dn");
+            $dn;
+        }
+        
+    }
+
 }
 
 

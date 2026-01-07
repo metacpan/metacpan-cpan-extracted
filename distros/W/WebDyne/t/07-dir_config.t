@@ -23,7 +23,9 @@ my $r=WebDyne::Request::Fake->new(
     location => '/examples/'
 );
 ok(ref($r) eq 'WebDyne::Request::Fake');
+#diag($r->location());
 ok($r->location() eq '/examples/');
+#diag($r->dir_config('a'));
 ok($r->dir_config('a')==1);
 
 
@@ -32,7 +34,7 @@ ok($r->dir_config('a')==1);
 my $hr;
 { local $/; $hr=eval(<DATA>) }
 #diag(Dumper($hr));
-#iag(Dumper($r->dir_config()));
+#diag(Dumper($r->dir_config()));
 ok(eq_deeply($hr, $r->dir_config())); 
 
 

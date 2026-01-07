@@ -9,12 +9,11 @@
   <refnamediv>
     <refname>WebDyne::Constant</refname>
 
-    <refpurpose>WebDyne module that sets constants and defaults for WebDyne
-    processing</refpurpose>
+    <refpurpose>WebDyne module that sets constants and defaults for WebDyne processing</refpurpose>
   </refnamediv>
 
   <refsynopsisdiv>
-    <programlisting>#!env perl
+    <programlisting>#!/usr/bin/env perl
 #
 use WebDyne::Constant;
 print $WEBDYNE_DTD</programlisting>
@@ -27,11 +26,8 @@ $ perl -MWebDyne::Constant=dump</screen>
   <refsection>
     <title>Description</title>
 
-    <para>This module provides a list of configuration constantDs used in the
-    WebDyne code. These constants are used to configure the behavior of the
-    WebDyne module and can be accessed by importing the module and referencing
-    the constants by name. Constants can be configured to different values by
-    overriding values in local configuration files, setting environment
+    <para>This module provides a list of configuration constantDs used in the WebDyne code. These constants are used to configure the behavior of the WebDyne module and can be accessed by
+    importing the module and referencing the constants by name. Constants can be configured to different values by overriding values in local configuration files, setting environment
     variables, command line options, or Apache directives.</para>
 
     <para>Common uses for modifying constant values allow for:</para>
@@ -42,18 +38,15 @@ $ perl -MWebDyne::Constant=dump</screen>
       </listitem>
 
       <listitem>
-        <para>Modifying or adding new meta-data or default headers to
-        output</para>
+        <para>Modifying or adding new meta-data or default headers to output</para>
       </listitem>
 
       <listitem>
-        <para>Adding default style-sheets or other inclusions to all output
-        files</para>
+        <para>Adding default style-sheets or other inclusions to all output files</para>
       </listitem>
     </itemizedlist>
 
-    <para>Default values for these configuration constants can be updated in
-    one of two locations: </para>
+    <para>Default values for these configuration constants can be updated the following locations:</para>
 
     <orderedlist>
       <listitem>
@@ -63,13 +56,18 @@ $ perl -MWebDyne::Constant=dump</screen>
       <listitem>
         <para>$HOME/.webdyne.conf.pl</para>
       </listitem>
+
+      <listitem>
+        <para>$DOCUMENT_ROOT/.webdyne.conf.pl</para>
+      </listitem>
     </orderedlist>
 
-    <para>The WebDyne::Constant module is sub-classed by other WebDyne
-    modules, and the values for any constants in the
-    WebDyne::&lt;Module&gt;::Constant family of modules can be overridden by
-    creating/updating one of the above two files. Here is a sample
-    configuration file:</para>
+    <para>As a special case when running under PSGI environments, if WEBDYNE_DIR_CONFIG_CWD_LOAD is true (which it is by default) then each directory that a .psp file is run from is checked
+    for the .webdyne.conf.pl file - but only WEBDYNE_DIR_CONFIG entries from the file are loaded. This allows for configuration of settings such a WebDyneChain modules to load, WebDyneTemplate
+    configuration etc. on a per directory basis</para>
+
+    <para>The WebDyne::Constant module is sub-classed by other WebDyne modules, and the values for any constants in the WebDyne::&lt;Module&gt;::Constant family of modules can be overridden by
+    creating/updating one of the above two files. Here is a sample configuration file:</para>
 
     <programlisting>$_={
 
@@ -95,7 +93,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         #
         WEBDYNE_ERROR_SHOW_EXTENDED =&gt; 1,
 
-        #  Update CGI upload capacity to 2GV
+        #  Update CGI upload capacity to 2GB
         #
         WEBDYNE_CGI_POST_MAX        =&gt; (2048*1024),
 
@@ -118,9 +116,7 @@ $ perl -MWebDyne::Constant=dump</screen>
 };</programlisting>
 
     <warning>
-      <para>Ensure the configuration file has the correct syntax by checking
-      the Perl interpreter doesn't throw any errors. Use <command>perl -c
-      -w</command> to check syntax:</para>
+      <para>Ensure the configuration file has the correct syntax by checking the Perl interpreter doesn't throw any errors. Use <command>perl -c -w</command> to check syntax:</para>
 
       <screen># perl -c -w /etc/webdyne.conf.pl
 /etc/webdyne.conf.pl syntax OK
@@ -132,21 +128,16 @@ $ perl -MWebDyne::Constant=dump</screen>
   <refsection>
     <title>CONSTANTS</title>
 
-    <para>The following configuration constants are defined. The default value
-    of the configuration item is provided after the constant name. Most can be
-    overridden or adjusted however where they are read-only this is
-    noted.</para>
+    <para>The following configuration constants are defined. The default value of the configuration item is provided after the constant name. Most can be overridden or adjusted however where
+    they are read-only this is noted.</para>
 
     <variablelist>
       <varlistentry>
         <term>WEBDYNE_CACHE_DN ()</term>
 
         <listitem>
-          <para>Directory where compiled pages are stored. Unset by default on
-          command line, usually set to temporary directory by installer or
-          PSGI handler. Pages that are compiled from .psp source into an
-          intermediate data structure in Storable format are stored in this
-          location.</para>
+          <para>Directory where compiled pages are stored. Unset by default on command line, usually set to temporary directory by installer or PSGI handler. Pages that are compiled from .psp
+          source into an intermediate data structure in Storable format are stored in this location.</para>
         </listitem>
       </varlistentry>
 
@@ -154,9 +145,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_STARTUP_CACHE_FLUSH (1)</term>
 
         <listitem>
-          <para>Flush cache files at startup. If set will delete all cache
-          files and force re-read and recompile of all source .psp files at
-          startup. Recommended to leave at (1)</para>
+          <para>Flush cache files at startup. If set will delete all cache files and force re-read and recompile of all source .psp files at startup. Recommended to leave at (1)</para>
         </listitem>
       </varlistentry>
 
@@ -164,9 +153,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_CACHE_CHECK_FREQ (256)</term>
 
         <listitem>
-          <para>Perl process frequency (number of runs) to check cache for
-          excess entries and clean any that exceed the cache high water
-          mark.</para>
+          <para>Perl process frequency (number of runs) to check cache for excess entries and clean any that exceed the cache high water mark.</para>
         </listitem>
       </varlistentry>
 
@@ -174,9 +161,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_CACHE_HIGH_WATER (64)</term>
 
         <listitem>
-          <para>High water mark for cache entries. Once this limit is reaped
-          cache entries will be deleted down to the low water mark
-          level.</para>
+          <para>High water mark for cache entries. Once this limit is reaped cache entries will be deleted down to the low water mark level.</para>
         </listitem>
       </varlistentry>
 
@@ -184,8 +169,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_CACHE_LOW_WATER (32)</term>
 
         <listitem>
-          <para>Low water mark for cache entries. Once high water mark is
-          reached cached entries will be deleted down to this level.</para>
+          <para>Low water mark for cache entries. Once high water mark is reached cached entries will be deleted down to this level.</para>
         </listitem>
       </varlistentry>
 
@@ -193,8 +177,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_CACHE_CLEAN_METHOD (1)</term>
 
         <listitem>
-          <para>Method to clean cache (0: last used time, 1: frequency of
-          use).</para>
+          <para>Method to clean cache (0: last used time, 1: frequency of use).</para>
         </listitem>
       </varlistentry>
 
@@ -202,9 +185,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_EVAL_SAFE (0)</term>
 
         <listitem>
-          <para>Type of eval code to run (0: Direct, 1: Safe). All dynamic
-          components of a .psp page are run in an eval block. Running using
-          eval via the Safe module is experimental. </para>
+          <para>Type of eval code to run (0: Direct, 1: Safe). All dynamic components of a .psp page are run in an eval block. Running using eval via the Safe module is experimental.</para>
         </listitem>
       </varlistentry>
 
@@ -228,9 +209,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_STRICT_VARS (1)</term>
 
         <listitem>
-          <para>Use strict variable checking. If any variables are referenced
-          which are not populated in a render(variable=&gt;&lt;value&gt;) call
-          an error will thrown.</para>
+          <para>Use strict variable checking. If any variables are referenced which are not populated in a render(variable=&gt;&lt;value&gt;) call an error will thrown.</para>
         </listitem>
       </varlistentry>
 
@@ -238,10 +217,8 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_AUTOLOAD_POLLUTE (0)</term>
 
         <listitem>
-          <para>Pollute WebDyne class with method references for minor
-          speedup. Saves AUTOLOAD trying to find method in call stack but at
-          the price of potentially clashing with an inbuilt method. Use with
-          care.</para>
+          <para>Pollute WebDyne class with method references for minor speedup. Saves AUTOLOAD trying to find method in call stack but at the price of potentially clashing with an inbuilt
+          method. Use with care.</para>
         </listitem>
       </varlistentry>
 
@@ -249,8 +226,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_DUMP_FLAG (0)</term>
 
         <listitem>
-          <para>Flag to display current CGI value and other information if
-          &lt;dump&gt; tag is used.</para>
+          <para>Flag to display current CGI value and other information if &lt;dump&gt; tag is used.</para>
         </listitem>
       </varlistentry>
 
@@ -282,9 +258,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_SCRIPT_TYPE_EXECUTABLE_HR</term>
 
         <listitem>
-          <para>Script types which are executable on the browser and won't
-          have substitution imposed on variables that match WebDyne syntax
-          (e.g. ${foo}). includes:</para>
+          <para>Script types which are executable on the browser and won't have substitution imposed on variables that match WebDyne syntax (e.g. ${foo}). includes:</para>
 
           <itemizedlist>
             <listitem>
@@ -306,7 +280,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_HTML_CHARSET ('UTF-8')</term>
 
         <listitem>
-          <para> Character set for HTML.</para>
+          <para>Character set for HTML.</para>
         </listitem>
       </varlistentry>
 
@@ -319,8 +293,7 @@ $ perl -MWebDyne::Constant=dump</screen>
       </varlistentry>
 
       <varlistentry>
-        <term>WEBDYNE_META ({charset =&gt; 'UTF-8', viewport' =&gt;
-        'width=device-width, initial-scale=1.0'})</term>
+        <term>WEBDYNE_META ({charset =&gt; 'UTF-8', viewport' =&gt; 'width=device-width, initial-scale=1.0'})</term>
 
         <listitem>
           <para>Meta information for HTML</para>
@@ -347,9 +320,8 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_START_HTML_PARAM ()</term>
 
         <listitem>
-          <para>Default attributes for any &lt;start_html&gt; tags, e.g.
-          include_style=&gt;['foo.css', 'bar.css']. These will be inserted
-          automatically into any start_html tag seen in any .psp page.</para>
+          <para>Default attributes for any &lt;start_html&gt; tags, e.g. include_style=&gt;['foo.css', 'bar.css']. These will be inserted automatically into any start_html tag seen in any .psp
+          page.</para>
         </listitem>
       </varlistentry>
 
@@ -357,9 +329,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_START_HTML_PARAM_STATIC (1)</term>
 
         <listitem>
-          <para>Make include/other sections in start_html tag static, i.e.
-          load them at compile time and they never change. Make undef to force
-          re-include every page load</para>
+          <para>Make include/other sections in start_html tag static, i.e. load them at compile time and they never change. Make undef to force re-include every page load</para>
         </listitem>
       </varlistentry>
 
@@ -367,12 +337,8 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_HEAD_INSERT ()</term>
 
         <listitem>
-          <para>Anything that should be added in &lt;head&gt; section. Will be
-          inserted verbatim before &lt;/head&gt;. No interpolation or
-          variables, simple text string only. Useful for setting global
-          stylesheet, e.g. &lt;link
-          href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"
-          rel="stylesheet"&gt;. Will be added to all &lt;head&gt; sections
+          <para>Anything that should be added in &lt;head&gt; section. Will be inserted verbatim before &lt;/head&gt;. No interpolation or variables, simple text string only. Useful for
+          setting global stylesheet, e.g. &lt;link href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css" rel="stylesheet"&gt;. Will be added to all &lt;head&gt; sections
           universally.</para>
         </listitem>
       </varlistentry>
@@ -405,8 +371,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_COMPILE_IMPLICIT_BODY_P_TAG (1)</term>
 
         <listitem>
-          <para>Implicitly add &lt;body&gt; and &lt;p&gt; tags in
-          compile</para>
+          <para>Implicitly add &lt;body&gt; and &lt;p&gt; tags in compile</para>
         </listitem>
       </varlistentry>
 
@@ -462,7 +427,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_CGI_AUTOESCAPE (0)</term>
 
         <listitem>
-          <para> Disable CGI autoescape of form fields.</para>
+          <para>Disable CGI autoescape of form fields.</para>
         </listitem>
       </varlistentry>
 
@@ -486,8 +451,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_ERROR_SHOW_EXTENDED (0)</term>
 
         <listitem>
-          <para>Show extended error information, including backtraces and
-          source code</para>
+          <para>Show extended error information, including backtraces and source code</para>
         </listitem>
       </varlistentry>
 
@@ -604,9 +568,7 @@ $ perl -MWebDyne::Constant=dump</screen>
       </varlistentry>
 
       <varlistentry>
-        <term>WEBDYNE_ERROR_SHOW_ALTERNATE` ('error display disabled - enable
-        WEBDYNE_ERROR_SHOW to show errors, or review web server error
-        log.')</term>
+        <term>WEBDYNE_ERROR_SHOW_ALTERNATE` ('error display disabled - enable WEBDYNE_ERROR_SHOW to show errors, or review web server error log.')</term>
 
         <listitem>
           <para>Alternate error message if error display is disabled.</para>
@@ -625,8 +587,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_HTML_TINY_MODE ('html')</term>
 
         <listitem>
-          <para> Mode for HTML::Tiny object used for generating output (XML or
-          HTML).</para>
+          <para>Mode for HTML::Tiny object used for generating output (XML or HTML).</para>
         </listitem>
       </varlistentry>
 
@@ -650,7 +611,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_HTTP_HEADER (&lt;HashRef&gt;)</term>
 
         <listitem>
-          <para> Default HTTP response headers to send. Includes:</para>
+          <para>Default HTTP response headers to send. Includes:</para>
 
           <itemizedlist>
             <listitem>
@@ -684,9 +645,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_API_ENABLE (1)</term>
 
         <listitem>
-          <para>Enable support for the &lt;api&gt; tag. Will cause slight
-          slow-down as routes are converted to .psp file names. Enabled by
-          default.</para>
+          <para>Enable support for the &lt;api&gt; tag. Will cause slight slow-down as routes are converted to .psp file names. Enabled by default.</para>
         </listitem>
       </varlistentry>
 
@@ -694,20 +653,15 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_ALPINE_VUE_ATTRIBUTE_HACK_ENABLE ('x-on')</term>
 
         <listitem>
-          <para>Converts @click="dosomething()" attributes to
-          x-on:click="dosomething()" in tags as HTML::Parser does not support
-          the '@' character in tag attributes.</para>
+          <para>Converts @click="dosomething()" attributes to x-on:click="dosomething()" in tags as HTML::Parser does not support the '@' character in tag attributes.</para>
         </listitem>
       </varlistentry>
 
       <varlistentry>
-        <term>WEBDYNE_HTTP_HEADER_AJAX_HR ({ hx-request=&gt;1,
-        x-alpine-request=&gt;1 })</term>
+        <term>WEBDYNE_HTTP_HEADER_AJAX_HR ({ hx-request=&gt;1, x-alpine-request=&gt;1 })</term>
 
         <listitem>
-          <para>List of HTTP request headers that denote the request is part
-          of an AJAX (e.g. HTMX) request and only partial HTML response is
-          required.</para>
+          <para>List of HTTP request headers that denote the request is part of an AJAX (e.g. HTMX) request and only partial HTML response is required.</para>
         </listitem>
       </varlistentry>
 
@@ -715,8 +669,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_PSGI_STATIC (1)</term>
 
         <listitem>
-          <para>Allow the PSGI module to serve static content (css files
-          etc.)</para>
+          <para>Allow the PSGI module to serve static content (css files etc.)</para>
         </listitem>
       </varlistentry>
 
@@ -724,8 +677,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_PSP_EXT (.psp)</term>
 
         <listitem>
-          <para>Extension for .psp pages. Do not change unless you know what
-          you are doing.</para>
+          <para>Extension for .psp pages. Do not change unless you know what you are doing.</para>
         </listitem>
       </varlistentry>
 
@@ -733,9 +685,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_MIME_TYPE_HR (&lt;HashRef&gt;)</term>
 
         <listitem>
-          <para>Very minimal MIME type hash used by lookup_file function. See
-          file for default content, usual definitions for text, images,
-          style-sheets, PDF etc.</para>
+          <para>Very minimal MIME type hash used by lookup_file function. See file for default content, usual definitions for text, images, style-sheets, PDF etc.</para>
         </listitem>
       </varlistentry>
 
@@ -743,18 +693,24 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>WEBDYNE_DIR_CONFIG ()</term>
 
         <listitem>
-          <para>Hash that contains location based hierarchy of configuration
-          variables similar to that returned by Apache mod_perl dir_config
-          module. See test (t) directory in source for example. </para>
+          <para>Hash ref that contains location based hierarchy of configuration variables similar to that returned by Apache mod_perl dir_config module. See test (t) directory in source for
+          example.</para>
         </listitem>
       </varlistentry>
 
       <varlistentry>
-        <term>WEBDYNE_LOCAL_CONSTANT_FN (&lt;ArrayRef&gt;)</term>
+        <term>WEBDYNE_DIR_CONFIG_CWD_LOAD (1)</term>
 
         <listitem>
-          <para>Read-only value as and array reference showing location of
-          files used to create the values for constants in this module</para>
+          <para>Enable loading of WEBDYNE_DIR_CONFIG hash ref from the current .psp file working directory if a .webdyne.conf.pl file is present.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>WEBDYNE_CONF_HR (&lt;HashRef&gt;)</term>
+
+        <listitem>
+          <para>Read-only value as hash reference showing location of files used to create the values for constants in this module.</para>
         </listitem>
       </varlistentry>
 
@@ -762,8 +718,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>MP2 (mod_perl version)</term>
 
         <listitem>
-          <para>Mod_perl level. Auto-detected, do not change unless you know
-          what you are doing.</para>
+          <para>Mod_perl level. Auto-detected, do not change unless you know what you are doing.</para>
         </listitem>
       </varlistentry>
 
@@ -771,8 +726,7 @@ $ perl -MWebDyne::Constant=dump</screen>
         <term>MOD_PERL (mod_perl version)</term>
 
         <listitem>
-          <para>Mod_perl environment runtime detected. Do not change unless
-          you know what you are doing</para>
+          <para>Mod_perl environment runtime detected. Do not change unless you know what you are doing</para>
         </listitem>
       </varlistentry>
     </variablelist>

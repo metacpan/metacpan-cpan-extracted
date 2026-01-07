@@ -21,7 +21,7 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004', # test_requires
    },
    requires => {
-      'perl' => '5.014',
+      'perl' => '5.020',
       'meta' => '0.009',
 
       'List::Util' => '1.33',

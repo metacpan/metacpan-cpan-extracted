@@ -1,0 +1,56 @@
+{
+  "id": "picking_up_the_pieces",
+  "title": "Picking Up The Pieces",
+  "description": "Help repair infrastructure after the storm. The community needs your assistance to recover.",
+  "maps": [
+    {"id": "dam", "name": "Dam Battlegrounds"},
+    {"id": "spaceport", "name": "The Spaceport"},
+    {"id": "buried-city", "name": "Buried City"},
+    {"id": "blue-gate", "name": "Blue Gate"},
+    {"id": "stella-montis", "name": "Stella Montis"}
+  ],
+  "steps": [
+    {"title": "Loot containers", "amount": 3}
+  ],
+  "trader": {
+    "id": "shani",
+    "name": "Shani",
+    "type": "Security",
+    "description": "A security officer dedicated to protecting the settlement.",
+    "image": "/arc/images/shani.png",
+    "icon": "/arc/icons/shani.svg"
+  },
+  "requiredItems": [],
+  "rewards": [
+    {
+      "item": {
+        "id": "rattler_iii",
+        "name": "Rattler III",
+        "rarity": "common",
+        "type": "weapon"
+      },
+      "amount": 1
+    },
+    {
+      "item": {
+        "id": "medium_ammo",
+        "name": "Medium Ammo",
+        "rarity": null,
+        "type": "ammo"
+      },
+      "amount": 80
+    },
+    {
+      "item": {
+        "id": "binoculars",
+        "name": "Binoculars",
+        "rarity": "common",
+        "type": "tool"
+      },
+      "amount": 1,
+      "grantedOnAccept": true
+    }
+  ],
+  "xpReward": 0,
+  "updatedAt": "2025-10-31T12:00:00.000Z"
+}

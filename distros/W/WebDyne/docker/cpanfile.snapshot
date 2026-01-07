@@ -19,6 +19,27 @@ DISTRIBUTIONS
       CGI::Simple::Util 1.281
     requirements:
       ExtUtils::MakeMaker 0
+  Capture-Tiny-0.50
+    pathname: D/DA/DAGOLDEN/Capture-Tiny-0.50.tar.gz
+    provides:
+      Capture::Tiny 0.50
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.17
+      File::Spec 0
+      File::Temp 0
+      IO::Handle 0
+      Scalar::Util 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Class-Accessor-Lite-0.08
+    pathname: K/KA/KAZUHO/Class-Accessor-Lite-0.08.tar.gz
+    provides:
+      Class::Accessor::Lite 0.08
+    requirements:
+      ExtUtils::MakeMaker 6.36
   Class-Inspector-1.36
     pathname: P/PL/PLICEASE/Class-Inspector-1.36.tar.gz
     provides:
@@ -558,6 +579,27 @@ DISTRIBUTIONS
       WWW::Form::UrlEncoded 0.23
       parent 0
       perl 5.012000
+  Plack-Middleware-ForceEnv-0.02
+    pathname: T/TS/TSIBLEY/Plack-Middleware-ForceEnv-0.02.tar.gz
+    provides:
+      Plack::Middleware::ForceEnv 0.02
+    requirements:
+      ExtUtils::MakeMaker 6.42
+      Plack 0.9925
+  Router-Simple-0.17
+    pathname: T/TO/TOKUHIROM/Router-Simple-0.17.tar.gz
+    provides:
+      Router::Simple 0.17
+      Router::Simple::Declare undef
+      Router::Simple::Route undef
+      Router::Simple::SubMapper undef
+    requirements:
+      Class::Accessor::Lite 0.05
+      List::Util 0
+      Module::Build 0.38
+      Scalar::Util 0
+      parent 0
+      perl 5.008_001
   Starman-0.4017
     pathname: M/MI/MIYAGAWA/Starman-0.4017.tar.gz
     provides:
@@ -586,6 +628,17 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 6.30
       IO::File 1.14
+  Sub-Uplevel-0.2800
+    pathname: D/DA/DAGOLDEN/Sub-Uplevel-0.2800.tar.gz
+    provides:
+      Sub::Uplevel 0.2800
+    requirements:
+      Carp 0
+      ExtUtils::MakeMaker 6.17
+      constant 0
+      perl 5.006
+      strict 0
+      warnings 0
   Test-Deep-1.205
     pathname: R/RJ/RJBS/Test-Deep-1.205.tar.gz
     provides:
@@ -647,6 +700,22 @@ DISTRIBUTIONS
       Test::Builder 0
       Test::More 0.96
       perl 5.012
+  Test-Exception-0.43
+    pathname: E/EX/EXODIST/Test-Exception-0.43.tar.gz
+    provides:
+      Test::Exception 0.43
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      Sub::Uplevel 0.18
+      Test::Builder 0.7
+      Test::Builder::Tester 1.07
+      Test::Harness 2.03
+      base 0
+      perl 5.006001
+      strict 0
+      warnings 0
   Test-Fatal-0.017
     pathname: R/RJ/RJBS/Test-Fatal-0.017.tar.gz
     provides:

@@ -26,6 +26,7 @@ use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
 eval { use Sim::OPTcue; 1 };
+eval { use Sim::OPTcue::Patternsearch; 1 };
 
 use Data::Dump qw(dump);
 use feature 'say';
@@ -1169,6 +1170,7 @@ sub morph
 	my @maketabledata = @main::maketabledata;
 	my @filter_columns = @main::filter_columns;
 	my %vals = %main::vals;
+    my ( $unsuited, @unsuiteds );
 
 	if ( $tofile eq "" )
 	{
@@ -1487,7 +1489,7 @@ sub morph
             $cntv++;
 
             my $countmorphing = 1;
-            #while (  $countmorphing  <= $numberof_morphings )
+            while (  $countmorphing  <= $numberof_morphings ) ### IF NEEDED MUTE HERE!!!
 			{
 				if ( not (defined ( $vals{$countmorphing}{$countvar}{general_variables} ) ) )
 				{
@@ -1555,22 +1557,22 @@ sub morph
 				my $sequencer = $$general_variables[1];
 				my $dffile = "df-$file.txt";
 
-				#my $semph = 0;
-				#unless ( ( $exeonfiles eq "n" ) or ( $semph > 0 ) )
-				#{
-				#	my $starttarget = Sim::OPT::giveback( \%mids );
-				#	$starttarget = "$mypath/$file" . "_" . "$starttarget"; say $tee "\$starttarget $starttarget";
-				#	if ( not ( -e $starttarget ) )
-				#	{
-				#		`cp -R $mypath/$file $starttarget`;
-				#		say $tee "LEVEL 0a: cp -R $mypath/$file $starttarget\n";
-				#	}
-				#	$semph++;
-				#}
-                my $target = $to{crypto};
-				my $orig = $orig{crypto};
+                #my $target = $to{crypto};
+                #my $orig = $orig{crypto};
 
-				my $starttarget = Sim::OPT::giveback( \%mids );  #say $tee "STARTTARGET $starttarget";
+                my $starttarget = Sim::OPT::giveback( \%mids );  #say $tee "STARTTARGET $starttarget";
+				my $semph = 0;
+				unless ( ( $exeonfiles eq "n" ) or ( $semph > 0 ) )
+				{
+					$starttarget = "$mypath/$file" . "_" . "$starttarget"; say $tee "\$starttarget $starttarget";
+					if ( not ( -e $starttarget ) )
+					{
+						`cp -R $mypath/$file $starttarget`;
+						say $tee "LEVEL 0a: cp -R $mypath/$file $starttarget\n";
+					}
+					$semph++;
+				}
+                
 
 				#if ( ( ( ( $countblock > 0 ) and ( $countstep > 1 ) ) and ( not ( ( $dirfiles{randompick} eq "y" ) and ( $dirfiles{ga} eq "y" ) ) ) )
 				#  or ( ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{ga} eq "y" ) ) ) )
@@ -1584,16 +1586,24 @@ sub morph
 
 						print MORPHLIST "$to{cleanto}\n";
 
-						unless ( ( $exeonfiles eq "n") or ( ( $laxmode eq "y" ) and ( $countp > 0 ) ) ) #HERE I.
+						unless ( ( $exeonfiles eq "n") 
+                          or ( ( $laxmode eq "y" ) and ( $countp > 0 ) ) 
+                          ) #HERE I.
 						{
-							if ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{newrandompick} eq "y" ) 
-                               or ( $dirfiles{latinhypercube} eq "y" ) or ( $dirfiles{ga} eq "y" ) )
+							#if ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{newrandompick} eq "y" ) or ( $dirfiles{patternsearch} )
+                               #or ( $dirfiles{latinhypercube} eq "y" ) or ( $dirfiles{ga} eq "y" ) 
+                               # or ( $dirfiles{NSGAII} eq "y" ) or ( $dirfiles{NSGAIII} eq "y" ) 
+                           # or ( $dirfiles{simulatedannealing} eq "y" ) or ( $dirfiles{MOEAD} eq "y" ) 
+                           #or ( $dirfiles{pso} eq "y" ) or ( $dirfiles{armijo} eq "y" ) 
+                           #or ( $dirfiles{neldermead} eq "y" ) or ( $dirfiles{MOEAD} eq "y" ) )                           )
 							{
 								if ( ( "begin" ~~ @whatto ) and ( not ( "end" ~~ @whatto ) ) and ( $dowhat{jumpinst} eq "y" ) )
 								{
 									$orig = "$mypath/$file";
 									$target = "$to{crypto}" . "-trans-$stamp" ;
-									if ( ( not ( -e $orig ) ) and ( $origin eq $starttarget ) )
+									if ( ( not ( -e $orig ) ) 
+                                     #and ( $origin eq $starttarget )
+                                      )
 									{
 										$orig = "$mypath/$file";
 									}
@@ -1607,7 +1617,9 @@ sub morph
 								{
 									$orig = "$mypath/$file";
 									$target = "$to{crypto}";
-									if ( ( not ( -e $orig ) ) and ( $origin eq $starttarget ) )
+									if ( ( not ( -e $orig ) ) 
+                                     #and ( $origin eq $starttarget ) 
+                                      )
 									{
 										$orig = "$mypath/$file";
 									}
@@ -1624,7 +1636,9 @@ sub morph
 								{
 									$orig = "$orig{crypto}" . "-trans-$stamp";
 									$target = "$to{crypto}" . "-trans-$stamp" ;
-									if ( ( not ( -e $orig ) ) and ( $origin eq $starttarget ) )
+									if ( ( not ( -e $orig ) ) 
+                                     #( AND $origin eq $starttarget ) 
+                                      )
 									{
 										$orig = "$mypath/$file";
 									}
@@ -1640,7 +1654,9 @@ sub morph
 								{
 									$orig = "$orig{crypto}";
 									$target = "$to{crypto}";
-									if ( ( not ( -e $orig ) ) and ( $origin eq $starttarget ) )
+									if ( ( not ( -e $orig ) )
+                                     #and ( $origin eq $starttarget )
+                                      )
 									{
 										$orig = "$mypath/$file";
 									}
@@ -1656,7 +1672,9 @@ sub morph
 								{
 	                                $orig = "$orig{crypto}" . "-trans-$stamp";
 									$target = "$to{crypto}";
-									if ( ( not ( -e $orig ) ) and ( $origin eq $starttarget ) )
+									if ( ( not ( -e $orig ) )  
+                                     #and ( $origin eq $starttarget ) 
+                                      )
 									{
 										$orig = "$mypath/$file";
 									}
@@ -1671,7 +1689,9 @@ sub morph
 								{
 	                                $orig = "$orig{crypto}";
 									$target = "$to{crypto}";
-									if ( ( not ( -e $orig ) ) and ( $origin eq $starttarget ) )
+									if ( ( not ( -e $orig ) )
+                                     #and ( $origin eq $starttarget ) 
+                                      )
 									{
 										$orig = "$mypath/$file";
 									}
@@ -1687,7 +1707,9 @@ sub morph
 								{
 	                                $orig = "$orig{crypto}";
 									$target = "$to{crypto}";
-									if ( ( not ( -e $orig ) ) and ( $origin eq $starttarget ) )
+									if ( ( not ( -e $orig ) )  
+                                     #and ( $origin eq $starttarget ) 
+                                      )
 									{
 										$orig = "$mypath/$file";
 									}
@@ -1701,13 +1723,21 @@ sub morph
 
 							}
 
-							if ( ( not ( $dirfiles{randompick} eq "y" ) ) and ( not ( $dirfiles{newrandompick} eq "y" ) ) and ( not ( $dirfiles{latinhypercube} eq "y" ) )
-							 and ( not ( $dirfiles{ga} eq "y" ) ) )
+							if ( ( not ( $dirfiles{randompick} eq "y" ) ) and ( not ( $dirfiles{newrandompick} eq "y" ) ) 
+                              and ( not ( $dirfiles{patternsearch} eq "y" ) ) and ( not ( $dirfiles{latinhypercube} eq "y" ) )
+							  and ( not ( $dirfiles{ga} eq "y" ) ) and ( not ( $dirfiles{simulatedannealing} eq "y" ) )
+                              and ( not ( $dirfiles{armijo} eq "y" ) ) and ( not ( $dirfiles{NSAII} eq "y" ) )
+                              and ( not ( $dirfiles{NSAIII} eq "y" ) ) and ( not ( $dirfiles{pso} eq "y" ) )
+                              and ( not ( $dirfiles{MOEAD} eq "y" ) )
+                              and ( not ( ( $laxmode eq "y" ) and ( $dirfiles{prelaxmode} eq "y" ) ) ) ### TO DO!!!
+                             )
 							{
 								$orig;
 								$target = "$to{crypto}";
 
-								if ( ( not ( -e $origin ) ) and ( $origin eq $starttarget ) )
+								if ( ( not ( -e $origin ) ) 
+                                 #and ( $origin eq $starttarget ) 
+                                 )
 								{
 									$orig = "$mypath/$file";
 								}
@@ -1731,7 +1761,12 @@ sub morph
 
 						if ( $dowhat{actonmodels} eq "y" )
 						{ #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 6";
-							my $countop = 0; # "$countop" IS THE COUNTER OF THE OPERATIONS
+							#if ( ( $laxmode eq "y" ) and ( $dirfiles{prelaxmode} eq "y" ) )
+                            #{
+                            # ### TO DO!!!
+                            #}
+
+                            my $countop = 0; # "$countop" IS THE COUNTER OF THE OPERATIONS
 							foreach my $op ( @applytype )
 							{ #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 7 ";
 
@@ -1850,7 +1885,11 @@ sub morph
 										{
                                             if ( Sim::OPT::checkOPTcue() )
                                             {
-                                              Sim::OPTcue::genmodnew( $to, $stepsvar, $countop, $countstep, \@applytype, \@genmodnew, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance, $tee );
+                                              ( $unsuited ) = Sim::OPTcue::genmodnew( $to, $stepsvar, $countop, $countstep, 
+                                                \@applytype, \@genmodnew, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, 
+                                                $countinstance, \%dirfiles, $laxmode, \@blockelts, \%varnums, \%mids, $countp, \@{ $dirfiles{rebomb} }, \@instances, $tee );
+                                                @instances = @$instances_r;
+                                                push( @unsuiteds, $unsuited );
                                             }
                                             else 
                                             {
@@ -2269,7 +2308,7 @@ sub morph
 					}
 				}
 				#if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 13, EXECUTING ";
-                #$countmorphing++;
+                $countmorphing++;
 			} #########
             $countp++; #HERE I.
 		}########
@@ -2279,7 +2318,7 @@ sub morph
 	close TOFILE;
 	close OUTFILE;
 	#if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 14, EXITING ";
-	return ( \%dirfiles );
+	return ( \%dirfiles, \@unsuiteds );
 }    # END SUB morph
 
 

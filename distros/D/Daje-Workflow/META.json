@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "Daje::Config" : "0",
-            "Daje::Database::Model" : "0.07",
+            "Daje::Database::Model" : "0.11",
             "Future::AsyncAwait" : "0.52",
             "Mojo::Loader" : "0",
             "Mojo::Pg" : "0",
@@ -59,7 +59,7 @@
    "provides" : {
       "Daje::Workflow" : {
          "file" : "lib/Daje/Workflow.pm",
-         "version" : "0.26"
+         "version" : "0.50"
       },
       "Daje::Workflow::Activities" : {
          "file" : "lib/Daje/Workflow/Activities.pm"
@@ -77,6 +77,9 @@
       "Daje::Workflow::Activities::Files::Save" : {
          "file" : "lib/Daje/Workflow/Activities/Files/Save.pm",
          "version" : "1.11"
+      },
+      "Daje::Workflow::Activities::Process::Run" : {
+         "file" : "lib/Daje/Workflow/Activities/Process/Run.pm"
       },
       "Daje::Workflow::Activities::Save" : {
          "file" : "lib/Daje/Workflow/Activities/Save.pm"
@@ -150,7 +153,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow"
       }
    },
-   "version" : "0.26",
+   "version" : "0.50",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

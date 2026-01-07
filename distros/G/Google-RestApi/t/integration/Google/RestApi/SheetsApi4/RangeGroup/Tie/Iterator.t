@@ -12,7 +12,7 @@ use aliased "Google::RestApi::SheetsApi4::Range::Row";
 use aliased "Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator";
 
 # use Carp::Always;
-# init_logger($DEBUG);
+init_logger;
 
 delete_all_spreadsheets(sheets_api());
 

@@ -2,7 +2,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -34,7 +34,7 @@ $Data::Dumper::Indent=1;
 
 #  Version info
 #
-$VERSION='2.038';
+$VERSION='2.046';
 
 
 #  Get command line options, add them to environment so picked up
@@ -201,7 +201,7 @@ Andrew Speer <andrew.speer@isolutions.com.au>
 
 This file is part of WebDyne.
 
-This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -209,6 +209,7 @@ the same terms as the Perl 5 programming language system itself.
 Full license text is available at:
 
 <http://dev.perl.org/licenses/>
+
 
 =end markdown
 
@@ -372,7 +373,7 @@ Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
 
 This file is part of WebDyne.
 
-This software is copyright (c) 2025 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
+This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

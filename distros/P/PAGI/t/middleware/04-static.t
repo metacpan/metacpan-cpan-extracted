@@ -414,6 +414,60 @@ subtest 'Static middleware pass_through falls back to app' => sub {
     is $sent[1]{body}, 'From app', 'response from inner app';
 };
 
+subtest 'Static middleware path coderef can rewrite via return value' => sub {
+    my $mw = PAGI::Middleware::Static->new(
+        root => $test_root,
+        path => sub {
+            my ($path) = @_;
+            return unless $path =~ m{^/static/};
+            $path =~ s{^/static}{/};
+            return $path;
+        },
+    );
+
+    my $app = async sub { };
+    my $wrapped = $mw->wrap($app);
+
+    my @sent;
+    run_async(async sub {
+        await $wrapped->(
+            { type => 'http', path => '/static/hello.txt', method => 'GET', headers => [] },
+            async sub { { type => 'http.disconnect' } },
+            async sub  {
+        my ($event) = @_; push @sent, $event },
+        );
+    });
+
+    is $sent[0]{status}, 200, 'status is 200 for rewritten path';
+    like $sent[1]{file}, qr/hello\.txt$/, 'file path points to hello.txt';
+};
+
+subtest 'Static middleware path coderef supports in-place rewrite without leading slash' => sub {
+    my $mw = PAGI::Middleware::Static->new(
+        root => $test_root,
+        path => sub {
+            $_[0] =~ s{^/static/}{};
+            return 1;
+        },
+    );
+
+    my $app = async sub { };
+    my $wrapped = $mw->wrap($app);
+
+    my @sent;
+    run_async(async sub {
+        await $wrapped->(
+            { type => 'http', path => '/static/hello.txt', method => 'GET', headers => [] },
+            async sub { { type => 'http.disconnect' } },
+            async sub  {
+        my ($event) = @_; push @sent, $event },
+        );
+    });
+
+    is $sent[0]{status}, 200, 'status is 200 after normalized rewrite';
+    like $sent[1]{file}, qr/hello\.txt$/, 'file path points to hello.txt';
+};
+
 subtest 'Static middleware serves index file for directory' => sub {
     my $mw = PAGI::Middleware::Static->new(root => $test_root);
 

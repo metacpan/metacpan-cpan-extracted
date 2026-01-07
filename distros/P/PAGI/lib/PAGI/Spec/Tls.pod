@@ -167,6 +167,20 @@ C<client_cert_name> duplicates information that is also available in C<client_ce
 
 There are theoretical interoperability problems with C<client_cert_name>, since it depends on a list of object ID names that is maintained by IANA and theoretically can change. In practice, this is not a real problem, since the object IDs that are actually used in certificates have not changed in many years. So in practice it will be fine.
 
+=head2 Version History
+
+=over 4
+
+=item *
+
+0.2 (Draft): No changes from 0.1
+
+=item *
+
+0.1 (Draft): Initial TLS extension specification
+
+=back
+
 =head2 Copyright
 
 This document has been placed in the public domain.

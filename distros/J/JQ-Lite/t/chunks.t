@@ -26,6 +26,14 @@ is_deeply($result[0], $expected, 'chunks handles empty arrays');
 $expected = [ [1], [2], [3], [4], [5] ];
 is_deeply($result[0], $expected, 'chunks(0) falls back to size 1');
 
+my $negative_ok = eval { $jq->run_query($json, '.numbers | chunks(-2)') };
+ok(!$negative_ok && $@ =~ /chunks\(\): size must be a non-negative integer/,
+   'chunks() rejects negative sizes');
+
+my $non_numeric_ok = eval { $jq->run_query($json, '.numbers | chunks(foo)') };
+ok(!$non_numeric_ok && $@ =~ /chunks\(\): size must be a non-negative integer/,
+   'chunks() rejects non-numeric sizes');
+
 @result = $jq->run_query($json, 'chunks(2)');
 is_deeply($result[0], $decoded, 'chunks leaves non-array values unchanged');
 

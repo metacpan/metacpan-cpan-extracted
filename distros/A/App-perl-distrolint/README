@@ -18,14 +18,15 @@ DESCRIPTION
 
     At present in this very early version, many of these checks are very
     opinionated, doing things specific to the way I personally lay out my
-    code. I fully imagine that at some point I'll get around to adding more
-    flexibility here, via some kind of configuration system, whereby other
-    users can change or disable various checks as they see fit to suit
-    their own coding style. This distribution currently exists largely to
-    allow people to see the kinds of things that are possible, and also
-    acts as a demonstration of the use of Text::Treesitter and
-    tree-sitter-perl to be used as a static linting tool for Perl source
-    code.
+    code. This distribution currently exists largely to allow people to see
+    the kinds of things that are possible, and also acts as a demonstration
+    of the use of Text::Treesitter and tree-sitter-perl to be used as a
+    static linting tool for Perl source code.
+
+    A limited amount of customisation and configuration can be performed on
+    a per-project or per-user basis, by writing settings into
+    distrolint.ini files. This is described in more detail in
+    App::perl::distrolint::Config.
 
 AUTHOR
 

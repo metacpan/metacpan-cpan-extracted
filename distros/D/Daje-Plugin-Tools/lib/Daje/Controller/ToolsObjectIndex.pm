@@ -1,6 +1,6 @@
 package Daje::Controller::ToolsObjectIndex;
 use Mojo::Base 'Mojolicious::Controller', -signatures;
-use v5.40;
+use v5.42;
 
 # NAME
 # ====
@@ -49,8 +49,9 @@ sub load_object_indexes ($self) {
     $self->app->log->debug($self->req->headers->header('X-Token-Check'));
     # my $setting = $self->param('setting');
     $self->tools_objects_index->load_tools_object_fkey_p($tools_objects_fkey)->then(sub($result) {
-        $self->render(json => { data => $result->{data}, result => => 1 });
+        $self->render(json => $result->{data});
     })->catch(sub($err) {
+        $self->app->log->error('Daje::Controller::ToolsObjectIndex::load_object_indexes ' . $err);
         $self->render(json => { 'result' => 0, data => $err });
     })->wait;
 }
@@ -67,8 +68,9 @@ sub load_object_index ($self) {
     $self->app->log->debug($self->req->headers->header('X-Token-Check'));
     # my $setting = $self->param('setting');
     $self->tools_objects_index->load_tools_object_index_pkey_p($tools_object_index_pkey)->then(sub($result) {
-        $self->render(json => { data => $result->{data}, result => => 1 });
+        $self->render(json => $result->{data});
     })->catch(sub($err) {
+        $self->app->log->error('Daje::Controller::ToolsObjectIndex::load_object_index ' . $err);
         $self->render(json => { 'result' => 0, data => $err });
     })->wait;
 }

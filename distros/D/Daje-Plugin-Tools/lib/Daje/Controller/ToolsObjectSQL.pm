@@ -47,11 +47,11 @@ sub load_object_sql ($self) {
     # );
     my $tools_object_sql_pkey = $self->param('tools_object_sql_pkey');
 
-    $self->app->log->debug($self->req->headers->header('X-Token-Check'));
     # my $setting = $self->param('setting');
     $self->tools_objects_sql->load_tools_object_sql_pkey_p($tools_object_sql_pkey)->then(sub($result) {
-        $self->render(json => { data => $result->{data}, result => => 1 });
+        $self->render(json => $result->{data});
     })->catch(sub($err) {
+        $self->app->log->error('Daje::Controller::ToolsObjectSQL::load_object_sql ' . $err);
         $self->render(json => { 'result' => 0, data => $err });
     })->wait;
 }

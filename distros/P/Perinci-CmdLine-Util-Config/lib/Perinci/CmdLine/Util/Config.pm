@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-02'; # DATE
+our $DATE = '2025-11-15'; # DATE
 our $DIST = 'Perinci-CmdLine-Util-Config'; # DIST
-our $VERSION = '1.726'; # VERSION
+our $VERSION = '1.727'; # VERSION
 
 our @EXPORT_OK = (
     'get_default_config_dirs',
@@ -150,7 +150,12 @@ sub read_config {
                 }
             }
 
-            next unless !defined($wanted_section) || $s eq $wanted_section;
+            # 2025-11-15 - i forgot why i skip filling out config for other
+            # sections is it performance? now i fill out all sections for
+            # programs that want to read the section contents without having to
+            # re-read configuration file all over again by itself.
+
+            # next unless !defined($wanted_section) || $s eq $wanted_section;
 
             for (keys %$hash) {
                 $res{$section}{$_} = $hash->{$_};
@@ -430,7 +435,7 @@ Perinci::CmdLine::Util::Config - Utility routines related to config files
 
 =head1 VERSION
 
-This document describes version 1.726 of Perinci::CmdLine::Util::Config (from Perl distribution Perinci-CmdLine-Util-Config), released on 2022-05-02.
+This document describes version 1.727 of Perinci::CmdLine::Util::Config (from Perl distribution Perinci-CmdLine-Util-Config), released on 2025-11-15.
 
 =head1 FUNCTIONS
 
@@ -483,21 +488,39 @@ Arguments ('*' denotes required arguments):
 
 =item * B<args> => I<hash>
 
+(No description)
+
 =item * B<common_opts> => I<any>
+
+(No description)
 
 =item * B<config> => I<any>
 
+(No description)
+
 =item * B<config_profile> => I<any>
+
+(No description)
 
 =item * B<meta> => I<any>
 
+(No description)
+
 =item * B<meta_is_normalized> => I<any>
+
+(No description)
 
 =item * B<plugins> => I<array>
 
+(No description)
+
 =item * B<r> => I<any>
 
+(No description)
+
 =item * B<subcommand_name> => I<any>
+
+(No description)
 
 
 =back
@@ -552,13 +575,23 @@ Arguments ('*' denotes required arguments):
 
 =item * B<config_dirs> => I<any>
 
+(No description)
+
 =item * B<config_filename> => I<any>
+
+(No description)
 
 =item * B<config_paths> => I<any>
 
+(No description)
+
 =item * B<hook_section> => I<any>
 
+(No description)
+
 =item * B<program_name> => I<any>
+
+(No description)
 
 
 =back
@@ -599,13 +632,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

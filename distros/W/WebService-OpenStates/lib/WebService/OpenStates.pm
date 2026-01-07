@@ -1,10 +1,10 @@
 package WebService::OpenStates;
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 use strict;
 use warnings;
-use v5.10;
+use v5.14;
 
 use Carp 'croak';
 use HTTP::Tiny;
@@ -96,7 +96,7 @@ __END__
 
 =head1 VERSION
 
-version 1.01
+version 1.03
 
 =encoding utf8
 

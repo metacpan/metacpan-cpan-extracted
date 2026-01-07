@@ -14,7 +14,8 @@
         https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js
         https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js#defer
     )}"
-    include_script="@{qw(index.js)}" 
+    include_script="@{qw(index.js)}"
+    handler="WebDyne"
 >
 
 

@@ -1,0 +1,15 @@
+<start_html>
+<json handler="true"/>
+<json handler="false"/>
+<json handler="hash"/>
+__PERL__
+use JSON;
+sub true {
+    return JSON::true
+}
+sub false {
+    return JSON::false
+}
+sub hash {
+    return { true=>&true, false=>&false }
+}

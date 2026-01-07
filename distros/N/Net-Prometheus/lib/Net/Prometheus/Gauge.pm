@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2026 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Gauge 0.14;
+package Net::Prometheus::Gauge 0.15;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Net::Prometheus::Metric );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use Carp;
 
@@ -73,11 +76,9 @@ L<Net::Prometheus::Metric>.
 
 =cut
 
-sub new
+sub new ( $class, %opts )
 {
-   my $class = shift;
-
-   my $self = $class->SUPER::new( @_ );
+   my $self = $class->SUPER::new( %opts );
 
    $self->{values}    = {};
    $self->{functions} = {};
@@ -105,11 +106,8 @@ If the gauge has any labels defined, the values for them must be given first.
 =cut
 
 __PACKAGE__->MAKE_child_method( 'set' );
-sub _set_child
+sub _set_child ( $self, $labelkey, $value )
 {
-   my $self = shift;
-   my ( $labelkey, $value ) = @_;
-
    $self->{values}{$labelkey} = $value;
 }
 
@@ -131,11 +129,8 @@ return a single value
 =cut
 
 __PACKAGE__->MAKE_child_method( 'set_function' );
-sub _set_function_child
+sub _set_function_child ( $self, $labelkey, $func )
 {
-   my $self = shift;
-   my ( $labelkey, $func ) = @_;
-
    # Need to store some sort of value so we still iterate on this labelkey
    # during ->samples
    $self->{values}{$labelkey}    = undef;
@@ -155,10 +150,8 @@ supplied.
 =cut
 
 __PACKAGE__->MAKE_child_method( 'inc' );
-sub _inc_child
+sub _inc_child ( $self, $labelkey, $delta = undef )
 {
-   my $self = shift;
-   my ( $labelkey, $delta ) = @_;
    defined $delta or $delta = 1;
 
    $self->{values}{$labelkey} += $delta;
@@ -177,35 +170,26 @@ supplied.
 =cut
 
 __PACKAGE__->MAKE_child_method( 'dec' );
-sub _dec_child
+sub _dec_child ( $self, $labelkey, $delta = undef )
 {
-   my $self = shift;
-   my ( $labelkey, $delta ) = @_;
    defined $delta or $delta = 1;
 
    $self->{values}{$labelkey} -= $delta;
 }
 
 # remove is generated automatically
-sub _remove_child
+sub _remove_child ( $self, $labelkey )
 {
-   my $self = shift;
-   my ( $labelkey ) = @_;
-
    delete $self->{values}{$labelkey};
 }
 
-sub clear
+sub clear ( $self )
 {
-   my $self = shift;
-
-   undef %{ $self->{values} };
+   undef $self->{values}->%*;
 }
 
-sub samples
+sub samples ( $self )
 {
-   my $self = shift;
-
    my $values    = $self->{values};
    my $functions = $self->{functions};
 

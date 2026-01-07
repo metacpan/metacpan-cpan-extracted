@@ -1,0 +1,11 @@
+Revision history for Conduit
+
+0.02    2026-01-05
+        [CHANGES]
+         * Fix a few distrolint complaints
+
+        [BUGFIXES]
+         * Remember to declare dependencies for Metrics::Any-related modules
+
+0.01    2026-01-02
+        First version, released on an unsuspecting world.

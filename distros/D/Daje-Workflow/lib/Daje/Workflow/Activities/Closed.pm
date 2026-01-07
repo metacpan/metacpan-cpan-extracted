@@ -5,6 +5,12 @@ use v5.40;
 
 sub closed($self) {
 
+    $self->model->insert_history(
+        "Workflow closed",
+        "Daje::Workflow::Activities::Closed::closed",
+        1
+    );
+
     $self->error->add_error("This workflow is closed");
 }
 1;

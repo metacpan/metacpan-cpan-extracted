@@ -1,0 +1,305 @@
+---
+request: POST /v4/spreadsheets
+request_content:
+  properties:
+    title: mock_spreadsheet1
+response:
+  code: 200
+  content: |
+    {
+      "spreadsheetId": "1n4ItTVaxsWd_pE8Aa26eeBS0ggserRIQ9b_T_-KrjFw",
+      "properties": {
+        "title": "mock_spreadsheet1",
+        "locale": "en_GB",
+        "autoRecalc": "ON_CHANGE",
+        "timeZone": "Etc/GMT",
+        "defaultFormat": {
+          "backgroundColor": {
+            "red": 1,
+            "green": 1,
+            "blue": 1
+          },
+          "padding": {
+            "top": 2,
+            "right": 3,
+            "bottom": 2,
+            "left": 3
+          },
+          "verticalAlignment": "BOTTOM",
+          "wrapStrategy": "OVERFLOW_CELL",
+          "textFormat": {
+            "foregroundColor": {},
+            "fontFamily": "arial,sans,sans-serif",
+            "fontSize": 10,
+            "bold": false,
+            "italic": false,
+            "strikethrough": false,
+            "underline": false,
+            "foregroundColorStyle": {
+              "rgbColor": {}
+            }
+          },
+          "backgroundColorStyle": {
+            "rgbColor": {
+              "red": 1,
+              "green": 1,
+              "blue": 1
+            }
+          }
+        },
+        "spreadsheetTheme": {
+          "primaryFontFamily": "Arial",
+          "themeColors": [
+            {
+              "colorType": "TEXT",
+              "color": {
+                "rgbColor": {}
+              }
+            },
+            {
+              "colorType": "BACKGROUND",
+              "color": {
+                "rgbColor": {
+                  "red": 1,
+                  "green": 1,
+                  "blue": 1
+                }
+              }
+            },
+            {
+              "colorType": "ACCENT1",
+              "color": {
+                "rgbColor": {
+                  "red": 0.25882354,
+                  "green": 0.52156866,
+                  "blue": 0.95686275
+                }
+              }
+            },
+            {
+              "colorType": "ACCENT2",
+              "color": {
+                "rgbColor": {
+                  "red": 0.91764706,
+                  "green": 0.2627451,
+                  "blue": 0.20784314
+                }
+              }
+            },
+            {
+              "colorType": "ACCENT3",
+              "color": {
+                "rgbColor": {
+                  "red": 0.9843137,
+                  "green": 0.7372549,
+                  "blue": 0.015686275
+                }
+              }
+            },
+            {
+              "colorType": "ACCENT4",
+              "color": {
+                "rgbColor": {
+                  "red": 0.20392157,
+                  "green": 0.65882355,
+                  "blue": 0.3254902
+                }
+              }
+            },
+            {
+              "colorType": "ACCENT5",
+              "color": {
+                "rgbColor": {
+                  "red": 1,
+                  "green": 0.42745098,
+                  "blue": 0.003921569
+                }
+              }
+            },
+            {
+              "colorType": "ACCENT6",
+              "color": {
+                "rgbColor": {
+                  "red": 0.27450982,
+                  "green": 0.7411765,
+                  "blue": 0.7764706
+                }
+              }
+            },
+            {
+              "colorType": "LINK",
+              "color": {
+                "rgbColor": {
+                  "red": 0.06666667,
+                  "green": 0.33333334,
+                  "blue": 0.8
+                }
+              }
+            }
+          ]
+        }
+      },
+      "sheets": [
+        {
+          "properties": {
+            "sheetId": 0,
+            "title": "Sheet1",
+            "index": 0,
+            "sheetType": "GRID",
+            "gridProperties": {
+              "rowCount": 1000,
+              "columnCount": 26
+            }
+          }
+        }
+      ],
+      "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1n4ItTVaxsWd_pE8Aa26eeBS0ggserRIQ9b_T_-KrjFw/edit"
+    }
+  headers:
+  - x-frame-options
+  - SAMEORIGIN
+  - accept-ranges
+  - none
+  - x-xss-protection
+  - '0'
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - server
+  - ESF
+  - x-content-type-options
+  - nosniff
+  - date
+  - Sat, 03 Jan 2026 00:37:57 GMT
+  - x-l2-request-path
+  - l2-managed-6
+  - transfer-encoding
+  - chunked
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - content-type
+  - application/json; charset=UTF-8
+  message: OK
+source: Test::Unit::TestBase::startup
+
+---
+query_params:
+  fields: sheets.properties(title,sheetId)
+request: GET /v4/spreadsheets/1n4ItTVaxsWd_pE8Aa26eeBS0ggserRIQ9b_T_-KrjFw
+response:
+  code: 200
+  content: |
+    {
+      "sheets": [
+        {
+          "properties": {
+            "sheetId": 0,
+            "title": "Sheet1"
+          }
+        }
+      ]
+    }
+  headers:
+  - accept-ranges
+  - none
+  - x-xss-protection
+  - '0'
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - server
+  - ESF
+  - x-content-type-options
+  - nosniff
+  - x-frame-options
+  - SAMEORIGIN
+  - date
+  - Sat, 03 Jan 2026 00:37:58 GMT
+  - x-l2-request-path
+  - l2-managed-6
+  - transfer-encoding
+  - chunked
+  - content-type
+  - application/json; charset=UTF-8
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  message: OK
+source: Test::Google::RestApi::SheetsApi4::Range::Col::range
+
+---
+request: DELETE /drive/v3/files/1n4ItTVaxsWd_pE8Aa26eeBS0ggserRIQ9b_T_-KrjFw
+response:
+  code: 204
+  content: ''
+  headers:
+  - content-type
+  - text/html
+  - expires
+  - Mon, 01 Jan 1990 00:00:00 GMT
+  - cache-control
+  - no-cache, no-store, max-age=0, must-revalidate
+  - date
+  - Sat, 03 Jan 2026 00:38:01 GMT
+  - x-content-type-options
+  - nosniff
+  - server
+  - ESF
+  - pragma
+  - no-cache
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - content-length
+  - '0'
+  - x-xss-protection
+  - '0'
+  - vary
+  - Origin, X-Origin
+  - x-frame-options
+  - SAMEORIGIN
+  message: No Content
+source: Test::Unit::TestBase::shutdown
+
+---
+query_params:
+  fields: nextPageToken, files(id, name)
+  q: mimeType = 'application/vnd.google-apps.spreadsheet'and (name contains 'mock_spreadsheet')
+request: GET /drive/v3/files
+response:
+  code: 200
+  content: "{\n  \"files\": []\n}\n"
+  headers:
+  - transfer-encoding
+  - chunked
+  - expires
+  - Mon, 01 Jan 1990 00:00:00 GMT
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - content-type
+  - application/json; charset=UTF-8
+  - x-frame-options
+  - SAMEORIGIN
+  - pragma
+  - no-cache
+  - x-content-type-options
+  - nosniff
+  - server
+  - ESF
+  - vary
+  - Origin, X-Origin,Accept-Encoding
+  - accept-ranges
+  - none
+  - x-xss-protection
+  - '0'
+  - date
+  - Sat, 03 Jan 2026 00:38:02 GMT
+  - cache-control
+  - no-cache, no-store, max-age=0, must-revalidate
+  message: OK
+source: Test::Unit::TestBase::shutdown
+

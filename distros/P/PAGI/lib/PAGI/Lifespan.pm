@@ -9,18 +9,48 @@ use Carp qw(croak);
 sub new {
     my ($class, %args) = @_;
 
-    my $app = delete $args{app}
-        or croak "PAGI::Lifespan requires 'app' parameter";
+    my $app = delete $args{app};
 
-    return bless {
-        app      => $app,
+    my @handlers;
+    push @handlers, {
         startup  => $args{startup},
         shutdown => $args{shutdown},
-        _state   => {},
+    } if $args{startup} || $args{shutdown};
+
+    return bless {
+        app       => $app,
+        _handlers => \@handlers,
+        _state    => undef,
     }, $class;
 }
 
 sub state { shift->{_state} }
+
+sub on_startup {
+    my ($self, $cb) = @_;
+    return $self->register(startup => $cb);
+}
+
+sub on_shutdown {
+    my ($self, $cb) = @_;
+    return $self->register(shutdown => $cb);
+}
+
+sub register {
+    my ($self, %args) = @_;
+    return $self unless $args{startup} || $args{shutdown};
+    push @{$self->{_handlers}}, {
+        startup  => $args{startup},
+        shutdown => $args{shutdown},
+    };
+    return $self;
+}
+
+sub for_scope {
+    my ($class, $scope) = @_;
+    croak "scope is required" unless $scope && ref($scope) eq 'HASH';
+    return $scope->{'pagi.lifespan.manager'} //= $class->new;
+}
 
 sub wrap {
     my ($class, $app, %args) = @_;
@@ -32,38 +62,54 @@ sub wrap {
 sub to_app {
     my ($self) = @_;
 
-    my $app      = $self->{app};
-    my $startup  = $self->{startup};
-    my $shutdown = $self->{shutdown};
-    my $state    = $self->{_state};
+    my $app = $self->{app};
+    croak "PAGI::Lifespan->to_app requires an app" unless $app;
 
-    return async sub {
+    my $wrapper = async sub {
         my ($scope, $receive, $send) = @_;
 
         my $type = $scope->{type} // '';
 
         if ($type eq 'lifespan') {
-            await _handle_lifespan($state, $startup, $shutdown, $receive, $send);
-            return;
+            $scope->{'pagi.lifespan.manager'} //= $self;
+            $scope->{state} //= {};
+            await $app->($scope, $receive, $send);
+            return await $self->handle($scope, $receive, $send);
         }
 
-        # Inject state into scope for all other request types
-        $scope->{'pagi.state'} = $state;
+        my $inner_scope = { %$scope };
+        $inner_scope->{state} //= ($self->{_state} // {});
+        $self->{_state} = $inner_scope->{state};
 
-        await $app->($scope, $receive, $send);
+        await $app->($inner_scope, $receive, $send);
     };
+
+    return $wrapper;
 }
 
-async sub _handle_lifespan {
-    my ($state, $startup, $shutdown, $receive, $send) = @_;
+async sub handle {
+    my ($self, $scope, $receive, $send) = @_;
+    return 0 unless $scope && ($scope->{type} // '') eq 'lifespan';
+    return 0 if $scope->{'pagi.lifespan.handled'};
+    $scope->{'pagi.lifespan.handled'} = 1;
+
+    my @handlers;
+    if (my $extra = $scope->{'pagi.lifespan.handlers'}) {
+        push @handlers, @$extra;
+    }
+    push @handlers, @{$self->{_handlers} // []};
+
+    my $state = $scope->{state} //= {};
+    $self->{_state} = $state;
 
     while (1) {
         my $msg = await $receive->();
         my $type = $msg->{type} // '';
 
         if ($type eq 'lifespan.startup') {
-            if ($startup) {
-                eval { await $startup->($state) };
+            for my $handler (@handlers) {
+                next unless $handler->{startup};
+                eval { await $handler->{startup}->($state) };
                 if ($@) {
                     await $send->({
                         type    => 'lifespan.startup.failed',
@@ -75,11 +121,12 @@ async sub _handle_lifespan {
             await $send->({ type => 'lifespan.startup.complete' });
         }
         elsif ($type eq 'lifespan.shutdown') {
-            if ($shutdown) {
-                eval { await $shutdown->($state) };
+            for my $handler (reverse @handlers) {
+                next unless $handler->{shutdown};
+                eval { await $handler->{shutdown}->($state) };
             }
             await $send->({ type => 'lifespan.shutdown.complete' });
-            return;
+            return 1;
         }
     }
 }
@@ -138,11 +185,19 @@ lifespan context manager yields state to C<request.state>.
     },
 
 For every request, this state is injected into the scope as
-C<$scope-E<gt>{'pagi.state'}>. This makes it accessible via:
+C<$scope-E<gt>{state}>. This makes it accessible via:
 
     $req->state->{db}    # In HTTP handlers
     $ws->state->{db}     # In WebSocket handlers
     $sse->state->{db}    # In SSE handlers
+
+=head2 Hook Aggregation
+
+Multiple C<PAGI::Lifespan> wrappers can be nested. Each wrapper registers
+its C<startup> and C<shutdown> callbacks in C<< $scope->{'pagi.lifespan.handlers'} >>.
+Startup callbacks run in registration order (outer to inner), and shutdown
+callbacks run in reverse order (inner to outer). The actual application
+does not receive lifespan events unless it explicitly handles them.
 
 =head1 METHODS
 

@@ -121,4 +121,12 @@ my $error = eval { $jq->run_query($json, 'setpath("details"; 1)'); 1 };
 ok(!$error, 'setpath throws on non-array path argument');
 like($@, qr/^setpath\(\): path must be an array/, 'setpath error message indicates array requirement');
 
+$error = eval { $jq->run_query($json, 'setpath(["details", null]; 1)'); 1 };
+ok(!$error, 'setpath throws when path contains undefined/null elements');
+like($@, qr/^setpath\(\): path elements must be defined/, 'setpath rejects null path elements');
+
+$error = eval { $jq->run_query($json, 'setpath(["details", {"oops":true}]; 1)'); 1 };
+ok(!$error, 'setpath throws when path contains non-scalar elements');
+like($@, qr/^setpath\(\): path elements must be scalars/, 'setpath rejects non-scalar path segments');
+
 done_testing;

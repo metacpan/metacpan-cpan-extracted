@@ -19,45 +19,45 @@ name: Net-Prometheus
 provides:
   Net::Prometheus:
     file: lib/Net/Prometheus.pm
-    version: '0.14'
+    version: '0.15'
   Net::Prometheus::Counter:
     file: lib/Net/Prometheus/Counter.pm
-    version: '0.14'
+    version: '0.15'
   Net::Prometheus::Gauge:
     file: lib/Net/Prometheus/Gauge.pm
-    version: '0.14'
+    version: '0.15'
   Net::Prometheus::Histogram:
     file: lib/Net/Prometheus/Histogram.pm
-    version: '0.14'
+    version: '0.15'
   Net::Prometheus::Metric:
     file: lib/Net/Prometheus/Metric.pm
-    version: '0.14'
+    version: '0.15'
   Net::Prometheus::PerlCollector:
     file: lib/Net/Prometheus/PerlCollector.pm
-    version: '0.14'
+    version: '0.15'
   Net::Prometheus::ProcessCollector:
     file: lib/Net/Prometheus/ProcessCollector.pm
-    version: '0.14'
+    version: '0.15'
   Net::Prometheus::ProcessCollector::linux:
     file: lib/Net/Prometheus/ProcessCollector/linux.pm
-    version: '0.14'
+    version: '0.15'
   Net::Prometheus::Registry:
     file: lib/Net/Prometheus/Registry.pm
-    version: '0.14'
+    version: '0.15'
   Net::Prometheus::Summary:
     file: lib/Net/Prometheus/Summary.pm
-    version: '0.14'
+    version: '0.15'
   Net::Prometheus::Types:
     file: lib/Net/Prometheus/Types.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   List::Util: '1.33'
   Ref::Util: '0'
   Struct::Dumb: '0'
   URI: '0'
   meta: '0.009'
-  perl: '5.014'
+  perl: '5.020'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

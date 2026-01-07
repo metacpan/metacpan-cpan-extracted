@@ -1,14 +1,14 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 6;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 7;
 use Test::Warn qw( warning_like );
 
 my $module;
 
 BEGIN {
   $module = 'Getopt::Guided';
-  use_ok $module, qw( getopts getopts3 ) or BAIL_OUT "Cannot loade module '$module'!"
+  use_ok $module, qw( getopts ) or BAIL_OUT "Cannot loade module '$module'!"
 }
 
 subtest 'Logically negate flag value; exclamation mark ("!") flag indicator' => sub {
@@ -73,18 +73,30 @@ subtest 'List of option-arguments; comma (",") option-argument indicator' => sub
 subtest 'POD synopsis (getopts processing)' => sub {
   plan tests => 3;
 
-  local @ARGV = qw( -d dv1 -c -v -a av1 -d dv2 -a av2 -d -- -vv v1 v2 );
+  local @ARGV = qw( -d dv1 -c -va av1 -ddv2 -a av2 -d -- -vv v1 v2 );
   ok getopts( 'a:bcd,v+', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'av2', c => 1, d => [ 'dv1', 'dv2', '--' ], v => 3 }, 'Options properly set';
   is_deeply \@ARGV, [ qw( v1 v2 ) ], 'Options removed from @ARGV'
 };
 
-subtest 'POD synopsis (getopts3 processing)' => sub {
+subtest 'POD synopsis (getopts three-parameter form processing with parenthesis)' => sub {
   plan tests => 3;
 
   # On purpose don't work with a localized @ARGV
-  my @argv = qw( -d dv1 -c -v -a av1 -d dv2 -a av2 -d -- -vv v1 v2 );
-  ok getopts3( @argv, 'a:bcd,v+', my %got_opts ), 'Succeeded';
+  my @argv = qw( -d dv1 -c -va av1 -ddv2 -a av2 -d -- -vv v1 v2 );
+  ok getopts( 'a:bcd,v+', my %got_opts, @argv ), 'Succeeded';
+  is_deeply \%got_opts, { a => 'av2', c => 1, d => [ 'dv1', 'dv2', '--' ], v => 3 }, 'Options properly set';
+  is_deeply \@argv, [ qw( v1 v2 ) ], 'Options removed from @argv'
+};
+
+subtest 'POD synopsis (getopts three-parameter form processing without parenthesis)' => sub {
+  plan tests => 3;
+
+  # On purpose don't work with a localized @ARGV
+  my @argv = qw( -d dv1 -c -va av1 -ddv2 -a av2 -d -- -vv v1 v2 );
+  no warnings 'parenthesis'; ## no critic ( ProhibitNoWarnings )
+  my $return_value = getopts 'a:bcd,v+', my %got_opts, @argv;
+  ok $return_value, 'Succeeded';
   is_deeply \%got_opts, { a => 'av2', c => 1, d => [ 'dv1', 'dv2', '--' ], v => 3 }, 'Options properly set';
   is_deeply \@argv, [ qw( v1 v2 ) ], 'Options removed from @argv'
 }

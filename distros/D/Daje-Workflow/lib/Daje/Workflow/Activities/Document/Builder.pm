@@ -50,8 +50,13 @@ our $VERSION = "0.01";
 
 sub process($self) {
 
+    $self->model->insert_history(
+        "Build documents",
+        "Daje::Workflow::Activities::Document::Builder::process",
+        1
+    );
+
     my $data = $self->context->{context};
-    say Dumper($data);
     if(my $tt = $self->_load_template()) {
         if(my $templates = $self->_load_templates() and $self->error->has_error() == 0) {
             if($self->error->has_error() == 0) {

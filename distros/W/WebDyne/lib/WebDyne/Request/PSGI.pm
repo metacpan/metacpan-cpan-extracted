@@ -1,7 +1,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -47,7 +47,7 @@ use WebDyne::Request::Fake;
 
 #  Version information
 #
-$VERSION='2.038';
+$VERSION='2.046';
 
 
 #  Debug load
@@ -195,7 +195,8 @@ sub content_type {
 
     my $r=shift();
     my $hr=$r->headers_out();
-    @_ ? $r->headers_out()->{'Content-Type'}=shift() : $r->SUPER::content_type();
+    #@_ ? $r->headers_out()->{'Content-Type'}=shift() : $r->SUPER::content_type();
+    return @_ ? $r->headers_out()->{'Content-Type'}=shift() : ($r->headers_out()->{'Content-Type'} || $ENV{'CONTENT_TYPE'});
 
 }
 

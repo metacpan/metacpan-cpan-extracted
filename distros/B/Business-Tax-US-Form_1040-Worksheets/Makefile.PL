@@ -10,6 +10,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM        => 'lib/Business/Tax/US/Form_1040/Worksheets.pm',
     AUTHOR              => 'James E Keenan (jkeenan@cpan.org)',
     ABSTRACT_FROM       => 'lib/Business/Tax/US/Form_1040/Worksheets.pm',
+    LICENSE             => 'perl_5',
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM           => {
         'Test::Simple' => 0.44,

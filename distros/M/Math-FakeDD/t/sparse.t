@@ -71,155 +71,580 @@ cmp_ok($sub, '==', dd_sub_4196($op1, $op2), "ok");
 cmp_ok($sub, '==', dd_sub_4196($op1, $op2), "$op1 - $op2 ok");
 
 
-# [0xp1+550 -0xp1-300]
+# [0x1p+550 -0xp1-300]
 my $ret = Math::FakeDD->new(2 ** 550) - Math::FakeDD->new(2 ** -300);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+my $dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+my $dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+# Test 1290 is next
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
 
-# [0xp1+1000 0]
-$ret = Math::FakeDD->new(2 ** 1000);
-$repro = dd_repro($ret);
-chop_inc_test($repro, $ret);
-#ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+unless($Math::FakeDD::MPFR_PREC_MIN == 2) {
+  # [0x1p+1000]
+  $ret = Math::FakeDD->new(2 ** 1000);
+  $repro = dd_repro($ret);
+  chop_inc_test($repro, $ret); # Test 1291
+  #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+  ################################################################################
+  $dd_up = dd_nextup($ret);
+  cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+  $dd_down = dd_nextdown($ret);
+  cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+  ################################################################################
 
-# [0x1p-550] + [0xp-552] + [0x1p-600]
-$ret = Math::FakeDD->new(2 ** -550) + Math::FakeDD->new(2 ** -552) + Math::FakeDD->new(2 ** -600);
-$repro = dd_repro($ret);
-chop_inc_test($repro, $ret);
-#ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+  # [0x1p-550] + [0xp-552] + [0x1p-600]
+  $ret = Math::FakeDD->new(2 ** -550) + Math::FakeDD->new(2 ** -552) + Math::FakeDD->new(2 ** -600);
+  $repro = dd_repro($ret);
+  chop_inc_test($repro, $ret);
+  #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+  ################################################################################
+  $dd_up = dd_nextup($ret);
+  cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+  $dd_down = dd_nextdown($ret);
+  cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+  ################################################################################
+}
 
 # [0x1p+550 -0x1p-300 ]
 $ret = Math::FakeDD->new(2 ** 550) - Math::FakeDD->new(2 ** -300);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
-# [0x1p-550 0]
-$ret = Math::FakeDD->new(2 ** -550);
-$repro = dd_repro($ret);
-chop_inc_test($repro, $ret);
-#ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+unless($Math::FakeDD::MPFR_PREC_MIN == 2) {
+  # [0x1p-550 0]
+  $ret = Math::FakeDD->new(2 ** -550);
+  $repro = dd_repro($ret);
+  chop_inc_test($repro, $ret);
+  #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+  ################################################################################
+  $dd_up = dd_nextup($ret);
+  cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+  $dd_down = dd_nextdown($ret);
+  cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+  ################################################################################
+}
 
 # [0x1p+950 -0x1p+800]
 $ret = Math::FakeDD->new(2 ** 950) - Math::FakeDD->new(2 ** 800);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 # [0x1p+900 -0x1p+750]
 $ret = Math::FakeDD->new(2 ** 900) - Math::FakeDD->new(2 ** 750);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 # [-0x1p+900 0x1p+750]
 $ret = Math::FakeDD->new(-(2 ** 900)) + Math::FakeDD->new(2 ** 750);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 #[0x1p-550 -0x1p-1050]
 $ret = Math::FakeDD->new(2 ** -550) - Math::FakeDD->new(2 ** -1050);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 #[-0x1p-550 0x1p-1050]
 $ret = Math::FakeDD->new(-(2 ** -550)) + Math::FakeDD->new(2 ** -1050);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 # [0x1p+950 -0x1p+800]
 $ret = Math::FakeDD->new(2 ** 950) - Math::FakeDD->new(2 ** 800);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
+
 
 # [-0x1p+950 0x1p+800]
 $ret = Math::FakeDD->new(-(2 ** 950)) + Math::FakeDD->new(2 ** 800);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 # [0x1.0000000000004p+700 -0x1p-350]
 $ret = Math::FakeDD->new(2 ** 700) + Math::FakeDD->new(2 ** 650) - Math::FakeDD->new(2 **-350);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 # [-0x1.ffffffffffff8p+849 0x1p-350]
 $ret = Math::FakeDD->new(2 ** 800) - Math::FakeDD->new(2 ** 850) - Math::FakeDD->new(2 **-350);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
-
-#[0x1p+200 0x1p-549]
-$ret = Math::FakeDD->new(2 ** 200) + Math::FakeDD->new(2 ** -549);
-$repro = dd_repro($ret);
-chop_inc_test($repro, $ret);
-#ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 #[0x1p+200 -0x1p-549]
 $ret = Math::FakeDD->new(2 ** 200) - Math::FakeDD->new(2 ** -549);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
+
+my @exponents = (-1017, -1007, -957, -924, -921, -811, -808, -791, -788, -705, -695, -662, -652, -549,
+                 -509, -496, -489, -383, -366, -296, -140, -97, -77, -44, -24, 59, 69, 72, 79, 99, 129,
+                 109, 119, 132, 142);
+#[0x1p+200 0x1p-549]
+for my $exponent (@exponents) {
+  $ret = Math::FakeDD->new(2 ** 200) + Math::FakeDD->new(2 ** $exponent);
+  $repro = dd_repro($ret);
+  my $actual_exponent = $exponent + 1;
+  cmp_ok(dd_repro_test($repro, $ret), '==', 15, "EXP: $actual_exponent - dd_repro_test ok");
+  chop_inc_test($repro, $ret);
+################################################################################
+  my $dd_up = dd_nextup($ret);
+  cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+  my $dd_down = dd_nextdown($ret);
+  cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
+  $ret += 2 ** ($exponent + 1);
+  $repro = dd_repro($ret);
+  $actual_exponent = $exponent + 2;
+  cmp_ok(dd_repro_test($repro, $ret), '==', 15, "EXP: $actual_exponent - dd_repro_test ok");
+  chop_inc_test($repro, $ret);
+################################################################################
+  $dd_up = dd_nextup($ret);
+  cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+  $dd_down = dd_nextdown($ret);
+  cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 # [0x1.ffffffffffff8p+999 0x1p-549]
-$ret = Math::FakeDD->new('0x1.ffffffffffff8p+999') + Math::FakeDD->new(2 ** -549);
-$repro = dd_repro($ret);
-chop_inc_test($repro, $ret);
-#ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+  $ret = Math::FakeDD->new('0x1.ffffffffffff8p+999') + Math::FakeDD->new(2 ** $exponent);
+  $repro = dd_repro($ret);
+  $actual_exponent = $exponent + 1;
+  cmp_ok(dd_repro_test($repro, $ret), '==', 15, "EXP: $actual_exponent - dd_repro_test ok");
+  chop_inc_test($repro, $ret);
+################################################################################
+  $dd_up = dd_nextup($ret);
+  cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+  $dd_down = dd_nextdown($ret);
+  cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
+
+  $ret += 2 ** ($exponent + 1);
+  $repro = dd_repro($ret);
+  $actual_exponent = $exponent + 2;
+  cmp_ok(dd_repro_test($repro, $ret), '==', 15, "EXP: $actual_exponent - dd_repro_test ok");
+  chop_inc_test($repro, $ret);
+################################################################################
+  $dd_up = dd_nextup($ret);
+  cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+  $dd_down = dd_nextdown($ret);
+  cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
+
+}
 
 # [0x1.ffffffffffff8p+999 -0x1p-549]
 $ret = Math::FakeDD->new('0x1.ffffffffffff8p+999') - Math::FakeDD->new(2 ** -549);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 # [0x1.ffffffffffff8p+999 -0x1p-548]
 $ret = Math::FakeDD->new('0x1.ffffffffffff8p+999') - Math::FakeDD->new(2 ** -548);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 # [0x1.ffffffffffff8p+999 -0x1p-550]
 $ret = Math::FakeDD->new('0x1.ffffffffffff8p+999') - Math::FakeDD->new(2 ** -550);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 # [0x1.ffffffffffff8p+999 -0x1p-551]
 $ret = Math::FakeDD->new('0x1.ffffffffffff8p+999') - Math::FakeDD->new(2 ** -551);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 # [0x1.ffffffffffff8p+999 -0x1p-548 - 0xp-555]
 $ret = Math::FakeDD->new('0x1.ffffffffffff8p+999') - Math::FakeDD->new(2 ** -548) - Math::FakeDD->new(2 ** -555);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 # [0x1.ffffffffffff8p+999 -0x1p-549 - 0xp-556]
 $ret = Math::FakeDD->new('0x1.ffffffffffff8p+999') - Math::FakeDD->new(2 ** -549) - Math::FakeDD->new(2 ** -556) ;
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 # [0x1.ffffffffffff8p+999 -0x1p-550 - 0xp-557]
 $ret = Math::FakeDD->new('0x1.ffffffffffff8p+999') - Math::FakeDD->new(2 ** -550) - Math::FakeDD->new(2 ** -557);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
 
 # [0x1.ffffffffffff8p+999 -0x1p-551 - 0xp-558]
 $ret = Math::FakeDD->new('0x1.ffffffffffff8p+999') - Math::FakeDD->new(2 ** -551) - Math::FakeDD->new(2 ** -558);
 $repro = dd_repro($ret);
 chop_inc_test($repro, $ret);
 #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
+
+# [0x1.8p+550 -0xp1-300]
+$ret = Math::FakeDD->new(2 ** 550) + 2 ** 549 - Math::FakeDD->new(2 ** -300);
+$repro = dd_repro($ret);
+cmp_ok(dd_repro_test(dd_repro($ret), $ret), '==', 15, "dd_repro_test ok for ". sprintx($ret));
+
+# [0x1.8p+550 -0xp1-300]
+$ret = Math::FakeDD->new(2 ** 550) + (2 ** 549) - Math::FakeDD->new(2 ** -300);
+$repro = dd_repro($ret);
+chop_inc_test($repro, $ret);
+#ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
+
+unless($Math::FakeDD::MPFR_PREC_MIN == 2) {
+  # [0x1.8p+1000]
+  $ret = Math::FakeDD->new(2 ** 1000) + (2 ** 999);
+  $repro = dd_repro($ret);
+  chop_inc_test($repro, $ret);
+  #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+  ################################################################################
+  $dd_up = dd_nextup($ret);
+  cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+  $dd_down = dd_nextdown($ret);
+  cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+  ################################################################################
+
+
+  # [0x1.8p-550] + [0xp-552] + [0x1p-600]
+  $ret = Math::FakeDD->new(2 ** -550) + Math::FakeDD->new(2 ** -551) + Math::FakeDD->new(2 ** -600);
+  $repro = dd_repro($ret);
+  chop_inc_test($repro, $ret);
+  #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+  ################################################################################
+  $dd_up = dd_nextup($ret);
+  cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+  $dd_down = dd_nextdown($ret);
+  cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+  ################################################################################
+}
+
+# [0x1.8p+550 -0x1p-300 ]
+$ret = Math::FakeDD->new(2 ** 550) + (2 ** 549) - Math::FakeDD->new(2 ** -300);
+$repro = dd_repro($ret);
+chop_inc_test($repro, $ret);
+#ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
+unless($Math::FakeDD::MPFR_PREC_MIN == 2) {
+  # [0x1.8p-550 0]
+  $ret = Math::FakeDD->new(2 ** -550) + (2 ** -551);
+  $repro = dd_repro($ret);
+  chop_inc_test($repro, $ret);
+  #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+  ################################################################################
+  $dd_up = dd_nextup($ret);
+  cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+  $dd_down = dd_nextdown($ret);
+  cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+  cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+  ################################################################################
+}
+
+# [0x1.8p+950 -0x1p+800]
+$ret = Math::FakeDD->new(2 ** 950) + (2 ** 949) - Math::FakeDD->new(2 ** 800);
+$repro = dd_repro($ret);
+chop_inc_test($repro, $ret);
+#ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
+
+# [0x1.8p+900 -0x1p+750]
+$ret = Math::FakeDD->new(2 ** 900) + (2 ** 899) - Math::FakeDD->new(2 ** 750);
+$repro = dd_repro($ret);
+chop_inc_test($repro, $ret);
+#ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
+
+# [-0x1.8p+900 0x1p+750]
+$ret = Math::FakeDD->new(-(2 ** 900)) - (2 ** 899) + Math::FakeDD->new(2 ** 750);
+$repro = dd_repro($ret);
+chop_inc_test($repro, $ret);
+#ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
+
+#[0x1.8p-550 -0x1p-1050]
+$ret = Math::FakeDD->new(2 ** -550) + (2 ** 549) - Math::FakeDD->new(2 ** -1050);
+$repro = dd_repro($ret);
+chop_inc_test($repro, $ret);
+#ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
+
+#[-0x1.8p-550 0x1p-1050]
+$ret = Math::FakeDD->new(-(2 ** -550)) - (2 ** -551) + Math::FakeDD->new(2 ** -1050);
+$repro = dd_repro($ret);
+chop_inc_test($repro, $ret);
+#ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
+
+# [0x1.8p+950 -0x1p+800]
+$ret = Math::FakeDD->new(2 ** 950) + (2 ** 949) - Math::FakeDD->new(2 ** 800);
+$repro = dd_repro($ret);
+chop_inc_test($repro, $ret);
+#ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
+
+# [-0x1.8p+950 0x1p+800]
+$ret = Math::FakeDD->new(-(2 ** 950)) - (2 ** 949) + Math::FakeDD->new(2 ** 800);
+$repro = dd_repro($ret);
+chop_inc_test($repro, $ret);
+#ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
+$dd_up = dd_nextup($ret);
+cmp_ok($dd_up, '>', $ret, "$dd_up > $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_up), $dd_up), '==', 15, "dd_repro_test ok for  " . sprintx($dd_up));
+$dd_down = dd_nextdown($ret);
+cmp_ok($dd_down, '<', $ret, "$dd_down < $ret");
+cmp_ok(dd_repro_test(dd_repro($dd_down), $dd_down), '==', 15, "dd_repro_test ok for  " . sprintx($dd_down));
+################################################################################
+
+# [0x1.0000000000004p+700 -0x1p-350]
+$ret = Math::FakeDD->new(2 ** 700) + Math::FakeDD->new(2 ** 650) - Math::FakeDD->new(2 **-350);
+$repro = dd_repro($ret);
+chop_inc_test($repro, $ret);
+#ok(Math::FakeDD::tz_test($repro) == 1, sprintx($ret));
+################################################################################
 
 done_testing();
 
@@ -249,6 +674,7 @@ sub sparse_test {
   cmp_ok($div, '==', dd_div_4196($op1, $op2), "$op1 / $op2 ok");
 
   my $sub = $op1 - $op2;
+
   $repro = dd_repro($sub);
   #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($sub));
   chop_inc_test($repro, $sub);

@@ -13,6 +13,7 @@ require App::perl::distrolint::Check::HardTabs;
 require App::perl::distrolint::Check::NoStrictRefs;
 require App::perl::distrolint::Check::Pod;
 require App::perl::distrolint::Check::StrictAndWarnings;
+require App::perl::distrolint::Check::SubSignatures;
 require App::perl::distrolint::Check::Unimport;
 require App::perl::distrolint::Check::Test2;
 require App::perl::distrolint::Check::UseUTF8;

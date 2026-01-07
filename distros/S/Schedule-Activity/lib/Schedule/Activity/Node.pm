@@ -5,7 +5,7 @@ use warnings;
 use List::Util qw/any/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION='0.2.7';
+our $VERSION='0.2.8';
 
 my %property=map {$_=>undef} qw/tmmin tmavg tmmax next finish message attribute note attributes require/;
 

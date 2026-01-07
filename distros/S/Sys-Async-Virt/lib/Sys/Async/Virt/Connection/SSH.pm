@@ -14,35 +14,20 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
-use Object::Pad;
+use Object::Pad ':experimental(inherit_field)';
 
-class Sys::Async::Virt::Connection::SSH v0.1.10;
+class Sys::Async::Virt::Connection::SSH v0.2.1;
 
-inherit Sys::Async::Virt::Connection '$_in', '$_out';
+inherit Sys::Async::Virt::Connection::Process;
 
 use Carp qw(croak);
-use IO::Async::Stream;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::UNIXSocket v11.10.0; # imports socket_path
-use Protocol::Sys::Virt::URI v11.10.0; # imports parse_url
+use Protocol::Sys::Virt::UNIXSocket v11.10.1; # imports socket_path
+use Protocol::Sys::Virt::URI v11.10.1; # imports parse_url
 
-field $_url      :reader :param;
 field $_socket   :reader :param = undef;
 field $_readonly :reader :param;
-field $_process;
-
-method close() {
-    $_process->kill( 'TERM' ) if not $_process->is_exited;
-}
-
-method configure(%args) {
-    delete $args{url};
-    delete $args{socket};
-    delete $args{readonly};
-
-    $self->SUPER::configure(%args);
-}
 
 sub shell_escape($val) {
     if ($val !~ m/[\s!"'`$<>#&*?;\\\[\]{}()~|^]/) { # no shell chars
@@ -68,8 +53,8 @@ my $auto_proxy =
     q{else %s; } .
     q{fi};
 
-async method connect() {
-    my %c = parse_url( $_url );
+method _command( $url ) {
+    my %c = parse_url( $url );
     my @args =  ('-e', 'none');
     push @args, ('-p', $c{port}) if $c{port};
     push @args, ('-l', $c{username}) if $c{username};
@@ -88,7 +73,11 @@ async method connect() {
     my $nc_command = sprintf($nc_proxy,
                              $c{query}->{netcat} // 'nc',
                              $socket_path);
-    my $native_command = 'virt-ssh-helper ' . shell_escape("$c{proxy}");
+    my $native_command = 'virt-ssh-helper ';
+    $native_command .= '-r ' if $_readonly;
+
+    # $c{proxy} is the URL to use on the proxy
+    $native_command .= shell_escape($c{proxy});
     if ($proxy_mode eq 'netcat') {
         $remote_cmd = sprintf(q|sh -c %s|, shell_escape($nc_command));
     }
@@ -105,31 +94,12 @@ async method connect() {
         croak $log->fatal( "Unknown proxy mode '$proxy_mode'" );
     }
 
+    $log->trace("SSH remote command: $remote_cmd");
+
     my $local_cmd  = $c{query}->{command} // 'ssh';
     my @cmd = ($local_cmd, @args, '--', $c{host}, $remote_cmd);
-    $log->trace("SSH remote command: $remote_cmd");
-    $log->trace("SSH total command: " . join(' ', @cmd) );
-    $_process = $self->loop->open_process(
-        command => \@cmd,
-        stdout => {
-            on_read => sub { 0 },
-        },
-        stderr => {
-            on_read => sub {
-                # eat stderr input
-                my $bufref = $_[1]; say $bufref; ${$bufref} = ''; 0;
-            },
-        },
-        stdin => {
-            via => 'pipe_write'
-        },
-        on_finish => sub { }, # on_finish is mandatory
-        );
 
-    $_in  = $_process->stdout;
-    $_out = $_process->stdin;
-
-    return;
+    return @cmd;
 }
 
 method is_secure() {
@@ -147,7 +117,7 @@ Sys::Async::Virt::Connection::SSH - Connection to LibVirt server over SSH
 
 =head1 VERSION
 
-v0.1.10
+v0.2.1
 
 =head1 SYNOPSIS
 
@@ -161,7 +131,12 @@ v0.1.10
 =head1 DESCRIPTION
 
 This module connects to a local LibVirt server through an ssh binary in
-the system PATH.
+the system PATH, inheriting most of its behaviour from
+L< Sys::Async::Virt::Connection::Process >.
+
+B< NOTE > This module requires the C<< Future::IO->waitpid >> call to work,
+which the default implementation does not provide. Any of the other backends
+listed in L< Future::IO > needs to be active for this module to work.
 
 =head1 URL PARAMETERS
 
@@ -198,10 +173,6 @@ Not to be called directly. Instantiated via the connection factory
 (L<Sys::Async::Virt::Connection::Factory>).
 
 =head1 METHODS
-
-=head2 connect
-
-  await $conn->connect;
 
 =head2 is_secure
 

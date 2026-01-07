@@ -3,9 +3,9 @@ NAME
     files
 
 VERSION
-    This document describes version 1.726 of Perinci::CmdLine::Util::Config
+    This document describes version 1.727 of Perinci::CmdLine::Util::Config
     (from Perl distribution Perinci-CmdLine-Util-Config), released on
-    2022-05-02.
+    2025-11-15.
 
 FUNCTIONS
   get_args_from_config
@@ -53,21 +53,39 @@ FUNCTIONS
 
     *   args => *hash*
 
+        (No description)
+
     *   common_opts => *any*
+
+        (No description)
 
     *   config => *any*
 
+        (No description)
+
     *   config_profile => *any*
+
+        (No description)
 
     *   meta => *any*
 
+        (No description)
+
     *   meta_is_normalized => *any*
+
+        (No description)
 
     *   plugins => *array*
 
+        (No description)
+
     *   r => *any*
 
+        (No description)
+
     *   subcommand_name => *any*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -117,13 +135,23 @@ FUNCTIONS
 
     *   config_dirs => *any*
 
+        (No description)
+
     *   config_filename => *any*
+
+        (No description)
 
     *   config_paths => *any*
 
+        (No description)
+
     *   hook_section => *any*
 
+        (No description)
+
     *   program_name => *any*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -161,14 +189,13 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020, 2019, 2018, 2017 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

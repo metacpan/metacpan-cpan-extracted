@@ -67,11 +67,11 @@ PSGI uses a flat array with implicit pairs: `['Content-Type', 'text/html', 'X-Cu
 PSGI's flat array format is more compatible with `HTTP::Headers->flatten()`. If you need to interoperate:
 
 ```perl
-# PAGI tuples → flat array (for HTTP::Headers)
+# PAGI tuples -> flat array (for HTTP::Headers)
 my @flat = map { @$_ } @$pagi_headers;
 my $hh = HTTP::Headers->new(@flat);
 
-# Flat array → PAGI tuples
+# Flat array -> PAGI tuples
 my @flat = $http_headers->flatten;
 my @pagi = map { [$flat[$_*2], $flat[$_*2+1]] } 0 .. ($#flat/2);
 ```
@@ -184,7 +184,7 @@ headers => [
 ]
 ```
 
-The server does not parse the cookie string into key-value pairs — parsing is left to middleware or application code. The server only guarantees RFC-compliant normalization.
+The server does not parse the cookie string into key-value pairs -- parsing is left to middleware or application code. The server only guarantees RFC-compliant normalization.
 
 ### HTTP Connection Scope
 
@@ -742,20 +742,20 @@ Sent to the application if the client disconnects or if the server shuts down th
 
 PAGI translates keys explicitly to maintain compatibility with PSGI:
 
-- `REQUEST_METHOD` → `method`
-- `SCRIPT_NAME` → `root_path`
-- `PATH_INFO` → `path` minus `root_path`
-- `QUERY_STRING` → `query_string`
-- `CONTENT_TYPE` → extracted from `headers`
-- `CONTENT_LENGTH` → extracted from `headers`
-- `SERVER_NAME`, `SERVER_PORT` → `server`
-- `REMOTE_ADDR`, `REMOTE_PORT` → `client`
-- `SERVER_PROTOCOL` → `http_version`
-- `psgi.url_scheme` → `scheme`
-- `psgi.version` → `[1, 1]` (PAGI servers MUST advertise the PSGI version they emulate when bridging)
-- `psgi.input` → constructed from `http.request` events
-- `psgi.errors` → handled by the server as appropriate
-- `psgi.streaming`, `psgi.nonblocking`, `psgi.multithread`, `psgi.multiprocess` → derived from PAGI server capabilities and advertised via PSGI adapter docs
+- `REQUEST_METHOD` -> `method`
+- `SCRIPT_NAME` -> `root_path`
+- `PATH_INFO` -> `path` minus `root_path`
+- `QUERY_STRING` -> `query_string`
+- `CONTENT_TYPE` -> extracted from `headers`
+- `CONTENT_LENGTH` -> extracted from `headers`
+- `SERVER_NAME`, `SERVER_PORT` -> `server`
+- `REMOTE_ADDR`, `REMOTE_PORT` -> `client`
+- `SERVER_PROTOCOL` -> `http_version`
+- `psgi.url_scheme` -> `scheme`
+- `psgi.version` -> `[1, 1]` (PAGI servers MUST advertise the PSGI version they emulate when bridging)
+- `psgi.input` -> constructed from `http.request` events
+- `psgi.errors` -> handled by the server as appropriate
+- `psgi.streaming`, `psgi.nonblocking`, `psgi.multithread`, `psgi.multiprocess` -> derived from PAGI server capabilities and advertised via PSGI adapter docs
 
 Response mappings:
 
@@ -777,6 +777,8 @@ Response mappings:
 
 ## Version History
 
+- `0.2` (Draft): SSE POST method support, keepalive events, disconnect reasons,
+  clarified scope fields (method required for HTTP/SSE, not for WebSocket)
 - `0.1` (Draft): Initial draft based on ASGI 2.5, supporting HTTP, WebSocket, and SSE.
 
 ## Copyright

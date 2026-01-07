@@ -1,5 +1,13 @@
 Revision history for App-perl-distrolint
 
+0.08    2026-01-04
+        [CHANGES]
+         * Added the beginnings of a config system, allowing users to disable
+           specific checks, skip files, or otherwise tune the behaviour
+         * Added a check for subroutine signatures
+         * Optionally complain about verbatim Pod paragraphs without a
+           preceding `=for highlighter`
+
 0.07    2024-12-10
         [CHANGES]
          * Have Pod checker also check that minisynopsis does not use trailing

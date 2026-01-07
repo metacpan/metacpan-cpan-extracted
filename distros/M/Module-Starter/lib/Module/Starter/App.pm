@@ -6,14 +6,14 @@ Module::Starter::App - the code behind the command line program
 
 =head1 VERSION
 
-version 1.78
+version 1.79
 
 =cut
 
 use warnings;
 use strict;
 
-our $VERSION = '1.78';
+our $VERSION = '1.79';
 
 use File::Spec;
 use Getopt::Long;
@@ -83,8 +83,9 @@ sub _process_command_line {
         mb           => sub { push @{$config{builder}}, 'Module::Build' },
         mi           => sub { push @{$config{builder}}, 'Module::Install' },
 
-        'author=s'   => \$config{author},
+        'author=s@'  => \@{ $config{author} },
         'email=s'    => \$config{email},
+        'github=s'   => \$config{github},
         'license=s'  => \$config{license},
         genlicense   => \$config{genlicense},
         'minperl=s'  => \$config{minperl},

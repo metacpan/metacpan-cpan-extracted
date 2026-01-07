@@ -35,8 +35,14 @@ is_deeply(
     'test() coerces scalars and treats non-strings as false'
 );
 
-my @invalid = $jq->run_query($json, '.title | test("(")');
-ok(!$invalid[0], 'test() returns false for invalid patterns without dying');
+my $invalid_ok = eval { $jq->run_query($json, '.title | test("(")'); 1 };
+my $invalid_error = $@;
+ok(!$invalid_ok, 'test() dies when given an invalid regular expression');
+like(
+    $invalid_error,
+    qr/test\(\): invalid regular expression/, 
+    'test() surfaces regex compile errors with a helpful message'
+);
 
 my @default_chain = $jq->run_query($json, '.missing? | test("foo") | default("fallback")');
 is($default_chain[0], 'fallback', 'test() preserves undef so default() can supply a fallback');

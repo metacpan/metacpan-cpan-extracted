@@ -6,10 +6,10 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0'
   Test::Pod::Coverage: '0'
-  perl: v5.10.0
+  perl: v5.14.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: v5.10.0
+  perl: v5.14.0
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -20,20 +20,23 @@ name: WebService-OpenStates
 provides:
   WebService::OpenStates:
     file: lib/WebService/OpenStates.pm
-    version: '1.01'
+    version: '1.03'
 requires:
   Carp: '0'
   Function::Parameters: '0'
   HTTP::Tiny: '0'
   JSON::MaybeXS: '0'
   Moo: '0'
+  Try::Tiny: '0'
+  Types::Common::Numeric: '0'
   Types::Common::String: '0'
+  URI: '0'
   namespace::clean: '0'
-  perl: v5.10.0
+  perl: v5.14.0
 resources:
   bugtracker: https://github.com/1nickt/p5-Net-Google-CivicInformation/issues
   repository: git://github.com/1nickt/p5-Net-Google-CivicInformation.git
-version: '1.01'
+version: '1.03'
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

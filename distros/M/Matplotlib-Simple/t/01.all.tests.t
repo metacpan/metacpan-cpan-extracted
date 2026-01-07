@@ -201,6 +201,23 @@ dies_ok {
 		'output.file' => '/tmp/dies_ok.svg',
 	});
 } '"plt" dies when given a non-File::Temp object';
+foreach my $numeric_arg ('cbpad', 'ncols', 'nrows', 'scale', 'scalex', 'scaley') {
+	dies_ok {
+		plt({
+			$numeric_arg  => 'A',
+			data          => [[0,1], [0,3]],
+			'plot.type'   => 'imshow', # this plot.type actually has all of these options
+			'output.file' => '/tmp/dies_ok.svg',
+		});
+	} '"plt" dies when "' . $numeric_arg . '" is non-numeric';
+}
+dies_ok {
+	plt({
+		data          => {A => [0,1], B => [0,3]},
+		'plot.type'   => 'imshow', # this plot.type actually has all of these options
+		'output.file' => '/tmp/dies_ok.svg',
+	});
+} '"plt" dies when "imshow" gets something besides an array (dies with better error)';
 # Λέγω οὖν, μὴ ἀπώσατο ὁ θεὸς
 sub linspace {    # mostly written by Grok
 	my ( $start, $stop, $num, $endpoint ) = @_;   # endpoint means include $stop
@@ -1674,6 +1691,35 @@ plt({
 	'shared.colorbar' => [0,1], # plots 0 and 1 share a colorbar
 	suptitle          => 'Dictionary of Secondary Structure in Proteins (DSSP)',
 });
+my @plots = ({
+	data => {
+			'sin' => [map {sin($_ * 3.14159265/180)} 0..360],
+			'cos' => [map {cos($_ * 3.14159265/180)} 0..360]
+		},
+	'plot.type' => 'hist2d',
+	cbpad       => 0.001,
+	title       => 'pad = 0.001'
+});
+for (my $pad = 0.01; $pad <= 0.09; $pad += 0.03) {
+	push @plots, {
+		data => {
+			'sin' => [map {sin($_ * 3.14159265/180)} 0..360],
+			'cos' => [map {cos($_ * 3.14159265/180)} 0..360]
+		},
+		'plot.type' => 'hist2d',
+		cbpad       => $pad,
+		title       => "pad = $pad"
+	};
+}
+plt({
+	execute       => 0,
+	fh            => $fh,
+	'output.file' => '/tmp/hist2d.pads.svg',
+	plots         => \@plots,
+	ncols         => 2,
+	nrows         => 2,
+	scale         => 2
+});
 plt({
 	fh                => $fh,
 	execute           => 1,
@@ -1772,7 +1818,7 @@ plt({
 	'output.file' => '/tmp/hist2d.svg',
 });
 # σὺ δὲ τῇ πίστει ἕστηκας. μὴ ὑψηλὰ φρόνει, ἀλλὰ φοβοῦ
-my @output_files = ('/tmp/add.single.svg', '/tmp/single.wide.svg', '/tmp/single.array.svg', '/tmp/wide.subplots.svg', '/tmp/single.pie.svg', '/tmp/pie.svg', '/tmp/single.boxplot.svg', '/tmp/boxplot.svg', '/tmp/single.violinplot.svg', '/tmp/violin.svg', '/tmp/single.barplot.svg', '/tmp/single.hexbin.svg', '/tmp/single.hist2d.svg', '/tmp/hexbin.svg', '/tmp/plots.svg', '/tmp/plot.single.svg', '/tmp/plot.single.arr.svg', '/tmp/barplots.svg', '/tmp/single.hist.svg', '/tmp/histogram.svg', '/tmp/single.scatter.svg', '/tmp/scatterplots.svg', '/tmp/imshow.single.svg', '/tmp/imshow.multiple.svg', '/tmp/single.tab.svg', '/tmp/single.bonds.svg', '/tmp/hlines.svg', '/tmp/dssp.single.svg', '/tmp/dssp.multiple.svg', '/tmp/hist2d.svg');
+my @output_files = ('/tmp/add.single.svg', '/tmp/single.wide.svg', '/tmp/single.array.svg', '/tmp/wide.subplots.svg', '/tmp/single.pie.svg', '/tmp/pie.svg', '/tmp/single.boxplot.svg', '/tmp/boxplot.svg', '/tmp/single.violinplot.svg', '/tmp/violin.svg', '/tmp/single.barplot.svg', '/tmp/single.hexbin.svg', '/tmp/single.hist2d.svg', '/tmp/hexbin.svg', '/tmp/plots.svg', '/tmp/plot.single.svg', '/tmp/plot.single.arr.svg', '/tmp/barplots.svg', '/tmp/single.hist.svg', '/tmp/histogram.svg', '/tmp/single.scatter.svg', '/tmp/scatterplots.svg', '/tmp/imshow.single.svg', '/tmp/imshow.multiple.svg', '/tmp/single.tab.svg', '/tmp/single.bonds.svg', '/tmp/hlines.svg', '/tmp/dssp.single.svg', '/tmp/dssp.multiple.svg', '/tmp/hist2d.pads.svg', '/tmp/hist2d.svg');
 my %file2SHA;
 open my $tsv, '<', $sha_sum_filename;
 while (<$tsv>) {
@@ -1783,7 +1829,7 @@ while (<$tsv>) {
 close $tsv;
 sub check_SHA_sum {
 	my ($sum, $file) = @_;
-	say "Testing $file";
+#	say "Testing $file";
 	die "$file has no defined sum" unless defined $sum;
 	my $text = file2string($file);
 	my @text = split /\n/, $text;
@@ -1806,9 +1852,9 @@ sub check_SHA_sum {
 	}
 }
 my %check_files = map {'/tmp/' . "$_.svg" => 1} ('add.single', 'barplots',
-'imshow.multiple','imshow.single', 'pie', 'plot.single', 'plots',
-'tab.multiple', 'tab.single', 'barplots', 'single.barplot', 'hlines',
-'single.pie', 'dssp.single', 'dssp.multiple');
+'imshow.multiple','imshow.single', 'plot.single', 'plots',
+'single.bonds', 'single.tab', 'barplots', 'single.barplot', 'hlines',
+'dssp.single', 'dssp.multiple', 'plot.single.arr', 'hist2d.pads');
 foreach my $file (@output_files) {
 	if (defined $check_files{$file}) {
 		ok(check_SHA_sum($file2SHA{$file}, $file), "$file matches verified file SHA sum");

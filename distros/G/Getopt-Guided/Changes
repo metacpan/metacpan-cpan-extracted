@@ -1,15 +1,26 @@
 Release history for Getopt-Guided
 
+3.0.1    Tue Jan  6 10:17:06 AM CET 2026
+         - Catch exception raised by die() to make "broken" utility testable
+         - Fix wrong getopts() invocations
+
+3.0.0    Sun Jan  4 08:53:59 AM CET 2026
+         - BREAKING CHANGE: getopts3() function removed
+         - Introduce new processopts() function (beta pre-release)
+         - Load Carp and File::Basename lazily
+         - Rewrite documentation
+         - Tidy source code
+
 2.0.0    Tue Dec 16 09:04:28 AM CET 2025
          - BREAKING CHANGE: Common flags do not increment with repetition
            anymore; use new incrementable flags instead
-         - Rewrite documentation
          - Don't use Exporter anymore
+         - Rewrite documentation
 
 1.1.0    Wed Dec  3 07:33:31 AM CET 2025
-         - Fix test script and documentation
-         - Improve utility integration test script
          - Introduce new getopts3() function
+         - Improve utility integration test script
+         - Fix test script and documentation
 
 1.0.0    Mon Dec  1 07:25:09 AM CET 2025
          - Initial release

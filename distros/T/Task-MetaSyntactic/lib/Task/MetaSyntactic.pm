@@ -1,5 +1,5 @@
 package Task::MetaSyntactic;
-$Task::MetaSyntactic::VERSION = '1.044';
+$Task::MetaSyntactic::VERSION = '1.046';
 use strict;
 use warnings;
 
@@ -21,7 +21,8 @@ Task::MetaSyntactic - All Acme::MetaSyntactic themes at once
 
 =head1 DESCRIPTION
 
-L<Acme::MetaSyntactic> is a module designed to fill all your metasyntactic
+L<Acme::MetaSyntactic> is a module designed to fill all your
+L<metasyntactic|https://en.wikipedia.org/wiki/Foobar>
 needs. There was a weekly update with new themes on CPAN between January
 15, 2005 and November 6, 2006.
 
@@ -55,11 +56,19 @@ L<Acme::MetaSyntactic::Themes> - The original Acme::MetaSyntactic themes (BOOK)
 
 L<Acme::MetaSyntactic::Themes::Abigail> - More themes by Abigail (ABIGAIL)
 
+L<Acme::MetaSyntactic::always_sunny> - Characters from the sitcom It's Always Sunny In Philadephia (2005-) (PERLANCAR)
+
+L<Acme::MetaSyntactic::boboiboy> - The BoboiBoy theme (PERLANCAR)
+
+L<Acme::MetaSyntactic::breaking_bad> - Characters from the TV show Breaking Bad (2008-2013) (PERLANCAR)
+
 L<Acme::MetaSyntactic::buzzwords> - Pointy-haired boss lingo (JQUELIN)
 
 L<Acme::MetaSyntactic::chinese_zodiac> - The Chinese zodiac theme (PERLANCAR)
 
 L<Acme::MetaSyntactic::christmas> - The Christmas theme (PERLANCAR)
+
+L<Acme::MetaSyntactic::corner_gas> - Characters from the sitcom Corner Gas (2004-2009) (PERLANCAR)
 
 L<Acme::MetaSyntactic::countries> - Country names (PERLANCAR)
 
@@ -89,6 +98,8 @@ L<Acme::MetaSyntactic::legobatman> - LEGO Batman theme (BINGOS)
 
 L<Acme::MetaSyntactic::legocityundercover> - LEGO City Undercover theme (BINGOS)
 
+L<Acme::MetaSyntactic::legodcsupervillains> - LEGO DC Super Villains theme (BINGOS)
+
 L<Acme::MetaSyntactic::legoharrypotter> - LEGO Harry Potter theme (BINGOS)
 
 L<Acme::MetaSyntactic::legoindianajones> - LEGO Indiana Jones theme (BINGOS)
@@ -109,6 +120,8 @@ L<Acme::MetaSyntactic::legostarwarstheforceawakens> - LEGO Star Wars The Force A
 
 L<Acme::MetaSyntactic::legothehobbit> - LEGO The Hobbit game theme (BINGOS)
 
+L<Acme::MetaSyntactic::legotheincredibles> - LEGO The Incredibles theme (BINGOS)
+
 L<Acme::MetaSyntactic::legoworlds> - LEGO Worlds theme (BINGOS)
 
 L<Acme::MetaSyntactic::metal_heroes> - The Metal Heroes series theme (PERLANCAR)
@@ -118,6 +131,14 @@ L<Acme::MetaSyntactic::mlpfim> - a meta syntactic variable for everypony! (SHLOM
 L<Acme::MetaSyntactic::morning_musume> - The Mumusu theme (ELBEHO)
 
 L<Acme::MetaSyntactic::nethack> - The largest time waster in the world of *nix (ELLIOTJS)
+
+L<Acme::MetaSyntactic::newsradio> - Characters from the sitcom Newsradio (1995-1999) (PERLANCAR)
+
+L<Acme::MetaSyntactic::not_going_out> - Characters from the britcom Not Going Out (2006-) (PERLANCAR)
+
+L<Acme::MetaSyntactic::ozark> - The Ozark theme (PERLANCAR)
+
+L<Acme::MetaSyntactic::schitts_creek> - Characters from the sitcom Schitt's Creek (2015-2020) (PERLANCAR)
 
 L<Acme::MetaSyntactic::seinfeld> - Characters from the sitcom Seinfeld (1989) (PERLANCAR)
 
@@ -214,6 +235,8 @@ This module is a base class for C<WordList::MetaSyntactic::*> modules,
 wordlist modules that get their wordlist from corresponding
 C<Acme::MetaSyntactic::*> modules.
 
+Renamed to L<WordListBase::MetaSyntactic> on 2020-05-01.
+
 =item L<WordList::MetaSyntactic::dangdut> (PERLANCAR)
 
 First released on 2016-06-06.
@@ -268,7 +291,14 @@ An alternative to the L<meta> front-end to L<Acme::MetaSyntactic>.
 
 First release on 2020-05-01.
 
-Base class for C<WordList::MetaSyntactic::*>.
+Base class for C<WordList::MetaSyntactic::*>,
+renamed from C<WordList::MetaSyntactic>.
+
+=item L<WordList::MetaSyntactic::Any>
+
+Wordlist from any C<Acme::MetaSyntactic::*> module.
+
+First release on 2020-05-04.
 
 =back
 
@@ -278,7 +308,7 @@ Philippe Bruhat (BooK), <book@cpan.org>.
 
 =head1 COPYRIGHT
 
-Copyright 2005-2020 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2005-2026 Philippe Bruhat (BooK), All Rights Reserved.
 
 =head1 LICENSE
 

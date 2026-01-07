@@ -1,0 +1,180 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use File::Slurp qw(read_file);
+use Text::Diff;
+use App::makefilepl2cpanfile;
+
+=head1 NAME
+
+makefilepl2cpanfile - Convert a Makefile.PL to a cpanfile
+
+=head1 SYNOPSIS
+
+    bin/makefilepl2cpanfile [options]
+
+Options:
+
+    --with-develop    Include author/development dependencies (default)
+    --no-develop      Exclude author/development dependencies
+    --dry-run         Print output to STDOUT instead of writing cpanfile
+    --diff            Show diff against existing cpanfile if it exists
+    --check           Verify all Makefile.PL dependencies appear in output
+    --help            Show this usage message
+
+=head1 DESCRIPTION
+
+This script reads a Makefile.PL and generates a corresponding cpanfile.
+It preserves existing develop blocks and allows post-processing checks to ensure
+no dependencies are dropped.
+
+=cut
+
+# ----------------------------
+# Parse CLI options
+# ----------------------------
+my ($with_dev, $no_dev, $dry, $diff, $check, $help);
+
+GetOptions(
+	'with-develop' => \$with_dev,
+	'no-develop'   => \$no_dev,
+	'dry-run'      => \$dry,
+	'diff'         => \$diff,
+	'check'        => \$check,
+	'help'         => \$help,
+) or usage();
+
+usage() if $help;
+
+$with_dev //= !$no_dev;
+
+# ----------------------------
+# Read existing cpanfile if it exists
+# ----------------------------
+my $existing = -r 'cpanfile' ? read_file('cpanfile') : '';
+
+# ----------------------------
+# Generate cpanfile content
+# ----------------------------
+my $out = App::makefilepl2cpanfile::generate(
+	makefile      => 'Makefile.PL',
+	existing      => $existing,
+	with_develop  => $with_dev,
+);
+
+# ----------------------------
+# Check flag: ensure all Makefile.PL deps are present
+# ----------------------------
+if ($check) {
+    my $content = read_file('Makefile.PL');
+    my %expected;
+
+    for my $key (qw(PREREQ_PM TEST_REQUIRES CONFIGURE_REQUIRES)) {
+        while ($content =~ /
+            $key\s*=>\s*\{
+            ( (?: [^{}] | \{[^}]*\} )*? )
+            \}
+        /gsx) {
+            my $block = $1;
+            while ($block =~ /
+                ['"]([^'"]+)['"]
+                \s*=>\s*
+                ['"]?([\d._]+)?['"]?
+            /gx) {
+                $expected{$1} = $2 // 0;
+            }
+        }
+    }
+
+    my @missing;
+    for my $mod (sort keys %expected) {
+        push @missing, $mod unless $out =~ /\b\Q$mod\E\b/;
+    }
+
+    if (@missing) {
+        warn "WARNING: The following modules from Makefile.PL did not appear in the cpanfile output:\n";
+        warn "  $_\n" for @missing;
+    } else {
+        print "All Makefile.PL prerequisites are present in the output.\n";
+    }
+}
+
+# ----------------------------
+# Show diff if requested
+# ----------------------------
+if ($diff && $existing) {
+    print diff \$existing, \$out, { STYLE => 'Unified' };
+    exit;
+}
+
+# ----------------------------
+# Dry-run: print to STDOUT
+# ----------------------------
+if ($dry) {
+    print $out;
+    exit;
+}
+
+# ----------------------------
+# Write cpanfile to disk
+# ----------------------------
+open my $fh, '>', 'cpanfile' or die "Cannot write cpanfile: $!";
+print $fh $out;
+close $fh;
+
+print "cpanfile written successfully.\n";
+
+# ----------------------------
+# Usage subroutine
+# ----------------------------
+sub usage {
+    print <<"EOF";
+
+Usage: $0 [options]
+
+Options:
+    --with-develop    Include author/development dependencies (default)
+    --no-develop      Exclude author/development dependencies
+    --dry-run         Print output instead of writing cpanfile
+    --diff            Show diff against existing cpanfile
+    --check           Verify all Makefile.PL dependencies appear in output
+    --help            Show this help message
+
+EOF
+    exit;
+}
+
+1;
+
+__END__
+
+=head1 SUPPORT
+
+This module is provided as-is without any warranty.
+
+=head1 AUTHOR
+
+Nigel Horne <njh@nigelhorne.com>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2025 Nigel Horne.
+
+Usage is subject to licence terms.
+
+The licence terms of this software are as follows:
+
+=over 4
+
+=item * Personal single user, single computer use: GPL2
+
+=item * All other users (including Commercial, Charity, Educational, Government)
+  must apply in writing for a licence for use from Nigel Horne at the
+  above e-mail.
+
+=back
+
+=cut

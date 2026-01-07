@@ -146,23 +146,23 @@ Reserved C<type> prefixes include:
 
 =item *
 
-C<http> â standard HTTP events
+C<http> -- standard HTTP events
 
 =item *
 
-C<websocket> â WebSocket events
+C<websocket> -- WebSocket events
 
 =item *
 
-C<lifespan> â process lifecycle events
+C<lifespan> -- process lifecycle events
 
 =item *
 
-C<pagi> â reserved for future PAGI-defined system events
+C<pagi> -- reserved for future PAGI-defined system events
 
 =item *
 
-C<ext.> â reserved for experimental or nonstandard events
+C<ext.> -- reserved for experimental or nonstandard events
 
 =back
 
@@ -231,7 +231,7 @@ Values must contain only permitted data types.
 
 =back
 
-B<Note:> Booleans are intentionally omitted from the core spec to avoid ambiguity in Perl, which lacks a native boolean type. In contexts where ASGI would use C<true>/C<false>, PAGI protocol specifications will define expected values explicitly â usually C<0> or C<1>, or by the presence/absence of a defined value.
+B<Note:> Booleans are intentionally omitted from the core spec to avoid ambiguity in Perl, which lacks a native boolean type. In contexts where ASGI would use C<true>/C<false>, PAGI protocol specifications will define expected values explicitly -- usually C<0> or C<1>, or by the presence/absence of a defined value.
 
 =head3 Applications
 
@@ -438,7 +438,7 @@ The C<type> field is unrecognized
 
 Applications should do the same when receiving malformed events.
 
-Extra fields in events B<must not> cause errors â this supports forward-compatible upgrades.
+Extra fields in events B<must not> cause errors -- this supports forward-compatible upgrades.
 
 If C<$send> is called after connection closure, it should be a no-op unless specified otherwise.
 
@@ -465,6 +465,10 @@ Byte content (e.g., body payloads) must be passed as Perl scalars B<without> the
 =head2 Version History
 
 =over 4
+
+=item *
+
+0.2 (Draft): Loop-agnostic applications, improved event validation, clarified application completion contract, added extension mechanism documentation
 
 =item *
 

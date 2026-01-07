@@ -180,11 +180,11 @@ foreach my ($idx, $line) (indexed @test) {
 		push @output_files, "$1.svg" unless $1 eq '/tmp/dies_ok';
 		next;
 	}
-	if ($line =~ m/^my \@output_files\h*=\h*\(.+\);$/) {
+	if ($line =~ m/^my \@output_files\h*=\h*.+\);$/) {
 		$output_idx = $idx;
 	}
 }
-die 'Could not find @output_files declaration' unless $output_idx >= 0;
+die 'Could not find @output_files declaration in t/01.all.tests.t' unless $output_idx >= 0;
 die 'no output files found' if scalar @output_files == 0;
 $test[$output_idx] = 'my @output_files = (\'' . join ("', '", @output_files) . "');";
 open my $t, '>', 't/01.all.tests.t';

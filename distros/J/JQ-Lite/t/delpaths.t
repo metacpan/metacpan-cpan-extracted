@@ -74,5 +74,27 @@ like(
     'delpaths rejects paths arrays containing non-array entries'
 );
 
+$error = eval {
+    $jq->run_query(
+        $json_object,
+        '.profile | delpaths([["name", {"nested":true}]])'
+    );
+    1;
+};
+ok(!$error, 'delpaths throws when any path segment is non-scalar');
+like(
+    $@,
+    qr/^delpaths\(\): path elements must be scalars/,
+    'delpaths rejects non-scalar path segments'
+);
+
+$error = eval { $jq->run_query($json_object, '.profile | delpaths([[null]])'); 1 };
+ok(!$error, 'delpaths throws when a path contains an undefined/null segment');
+like(
+    $@,
+    qr/^delpaths\(\): path elements must be defined/,
+    'delpaths rejects null path elements'
+);
+
 done_testing;
 

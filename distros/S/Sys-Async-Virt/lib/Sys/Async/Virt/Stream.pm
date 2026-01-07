@@ -16,35 +16,24 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad 0.821;
 
-class Sys::Async::Virt::Stream v0.1.10;
-
-# inheriting from IO::Async::Notifier (a non-Object::Pad base class) implies ':repr(HASH)'
-inherit IO::Async::Notifier;
+class Sys::Async::Virt::Stream v0.2.1;
 
 use Carp qw(croak);
+use Future;
 use Future::Queue;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.1.10;
+use Protocol::Sys::Virt::Remote::XDR v11.10.1;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 field $_id :param :reader;
 field $_proc :param :reader;
 field $_client :param :reader;
 field $_direction :param :reader;
-field $_max_items :param :reader;
+field $_max_items :param :reader = 5;
 field $_pending_error = undef;
-field $_finished = undef;
-field $_queue = undef;
-
-method _add_to_loop($loop) {
-    $_finished = $loop->new_future;
-    $_queue    = Future::Queue->new(
-        prototype => sub { $self->new_future },
-        max_items => $_max_items,
-        );
-    $self->SUPER::_add_to_loop($loop);
-}
+field $_finished = Future->new;
+field $_queue = Future::Queue->new;
 
 async method receive() {
     if ($_direction eq 'send') {
@@ -56,7 +45,7 @@ async method receive() {
     }
 
     return { data => '' } if $_finished->is_ready; # stop all reads
-    await $_queue->shift;
+    return await $_queue->shift;
 }
 
 async method _dispatch_receive($data, $final) {
@@ -71,6 +60,7 @@ async method _dispatch_receive($data, $final) {
 
     # throttle receiving if the queue gets too long
     await $_queue->push($data);
+    return;
 }
 
 async method _dispatch_error($error) {
@@ -92,9 +82,10 @@ async method send($data, $offset = 0, $length = undef) {
     }
     return if $_finished->is_ready; # discard all transfers
 
+    my $chunk = ($offset or $length) ? substr($data, $offset, $length) : $data;
     return await $_client->_send(
         $_proc, $_id,
-        data => ($offset or $length) ? substr($data, $offset, $length) : $data );
+        data => $chunk );
 }
 
 async method send_hole($length, $flags = 0) {
@@ -113,7 +104,8 @@ async method send_hole($length, $flags = 0) {
 }
 
 async method abort() {
-    await $_client->_send_finish( $_proc, $_id, 1 );
+    return if $_finished->is_ready;
+    $_client->_send_finish( $_finished, $_proc, $_id, 1 );
     await $_finished;
 
     $self->cleanup;
@@ -125,8 +117,6 @@ async method abort() {
 }
 
 method cleanup() {
-    $_client->_remove_stream( $_id );
-    $self->remove_from_parent;
     $_queue = undef;
     $_finished->done
         unless $_finished->is_ready;
@@ -135,7 +125,8 @@ method cleanup() {
 }
 
 async method finish() {
-    await $_client->_send_finish( $_proc, $_id, 0 );
+    return if $_finished->is_ready;
+    $_client->_send_finish( $_finished, $_proc, $_id, 0 );
     await $_finished;
 
     $self->cleanup;
@@ -148,7 +139,8 @@ async method finish() {
 
 method DESTROY() {
     if (not $_finished->is_ready) {
-        $self->abort->retain;
+        # abort the stream
+        $_client->_send_finish( undef, $_proc, $_id, 1 );
     }
 }
 
@@ -162,7 +154,7 @@ Sys::Async::Virt::Stream - Client side of a data transfer channel
 
 =head1 VERSION
 
-v0.1.10
+v0.2.1
 
 =head1 SYNOPSIS
 
@@ -196,9 +188,6 @@ v0.1.10
 A stream models a uni-directional data transfer channel. They are used to
 upload and download the content of storage volumes, during migration of
 guests among others.
-
-Instances have L<IO::Async::Notifier> mixed in because they need access to
-awaitable futures.  C<$self->loop->new_future> provides that access.
 
 =head1 EVENTS
 

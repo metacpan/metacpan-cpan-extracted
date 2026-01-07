@@ -1,20 +1,56 @@
 Revision history for Perl extension Google::RestApi.
 
-0.1  Thu Sep  5 11:47:30 2019
-	- original version; created by h2xs 1.23 with options
-		-X -n Google::RestApi
-0.2  Wed Oct 30 2019
-        - Simplified login code in session_creator and RestApi. Breaking change.
-        - POD/comments/debug message improvements.
+1,1,0 2026-01-04
+        - Fill out missing API calls for sheets, should be comprehensive now.
 
-0.3 Mon Nov 11 2019
-        - Added spreadsheet attrs cache
-        - Fixed missing files in MANIFEST
-        - Removes testing dependency on Spreadsheets::Perl
-        - Bug fixes in Range object
-        - Fixed bugs in test suite, added more unit tests
+1.0.6 2026-01-03
+        - Add missing PerlX::Maybe in Makefile.PL
 
-0.4 Tue Nov 26 2019
+1.0.5 2026-01-02
+        - Fixed bug in converting int columns to alpha for any columns > 52 (AZ).
+        - Moved tutorial out of t dir as it never really belonged there.
+        - Cleaned up tutorial.
+        - Renamed Drive filter_files to list.
+        - Added pagination support for Drive->list.
+        - Fixed listing/deleting spreadsheets by name.
+        - Allow listing/deleting spreadsheets by filters.
+        - Renamed SheetsApi4 delete_all_spreadsheets to delete_all_spreadsheets_by_filters.
+        - Complete makeover of testing framework to automatically load mock data from live api.
+
+1.0.4 2022-11-29
+        - Support both multisig variables in Type::Params
+
+1.0.3 2022-11-26
+        - Fixes to support Type::Params upgrade
+        - Fix t/tutorial
+
+1.0.2 2022-03-13
+        - Add support for renaming a worksheet
+        - Fix test for win32 file comparisons
+
+1.0.1 2022-03-06
+        - Comments in code
+        - Remove Time::Out since Time::HiRes::alarm is not available in windows
+
+1.0.0 2021-11-27
+        - Minor integration test fix, improved documentation
+        - Stable release, no further major changes to api's expected.
+
+0.9 2021-11-22
+        - Major refactoring of code, simplification, added tests
+
+0.7 2021-07-08
+        - Add ToolSet dependency
+
+0.6 2021-07-07
+        - Fix dist problems
+
+0.5 2021-07-04
+        - Code cleanup and simplification
+        - Made tests more comprehensive
+        - Improved documentation
+
+0.4 2019-11-26
         - Support for multiple authorization mechanisms
         - Support for Google Service Account authorization
         - Support for borders and other cell formatting
@@ -22,33 +58,18 @@ Revision history for Perl extension Google::RestApi.
         - Cleaned up range unit tests
         - Minor bug fixes
 
-0.5 Mon Jul 4 2021
-        - Code cleanup and simplification
-        - Made tests more comprehensive
-        - Improved documentation
+0.3 2019-11-11
+        - Added spreadsheet attrs cache
+        - Fixed missing files in MANIFEST
+        - Removes testing dependency on Spreadsheets::Perl
+        - Bug fixes in Range object
+        - Fixed bugs in test suite, added more unit tests
 
-0.6 Wed Jul 7 2021
-        - Fix dist problems
+0.2  2019-10-30
+        - Simplified login code in session_creator and RestApi. Breaking change.
+        - POD/comments/debug message improvements.
 
-0.7 Thu Jul 8 2021
-        - Add ToolSet dependency
+0.1  2019-09-05 11:47:30
+	- original version; created by h2xs 1.23 with options
+		-X -n Google::RestApi
 
-0.9 Mon Nov 22 2021
-        - Major refactoring of code, simplification, added tests
-
-1.0.0 Sat Nov 27 2021
-        - Minor integration test fix, improved documentation
-        - Stable release, no further major changes to api's expected.
-
-1.0.1 Mar 6 2022
-        - Comments in code
-        - Remove Time::Out since Time::HiRes::alarm is not available in windows
-
-1.0.2 Mar 13 2022
-        - Add support for renaming a worksheet
-        - Fix test for win32 file comparisons
-1.0.3 Nov 26 2022
-        - Fixes to support Type::Params upgrade
-        - Fix t/tutorial
-1.0.4 Nov 29 2022
-        - Support both multisig variables in Type::Params

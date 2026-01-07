@@ -198,11 +198,11 @@ test_FV_cc_expiry_month: {
 ###############################################################################
 test_FV_cc_expiry_year: {
     my $results = Data::FormValidator->check(
-        { 'yy-future'       => 25,
+        { 'yy-future'       => 50,
           'yy-past'         => 70,
           'yy-invalid'      => 'xx',
 
-          'yyyy-future'     => 2025,
+          'yyyy-future'     => 2050,
           'yyyy-past'       => 1970,
           'yyyy-invalid'    => 'xxxx',
         },

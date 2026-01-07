@@ -8,7 +8,7 @@ use DBI;
 use DBD::SQLite;
 use JSON::XS;
 
-our $VERSION = '1.42'; # VERSION
+our $VERSION = '1.44'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -25,14 +25,38 @@ sub new {
     $self->{file} = $bot->vars('store') || 'store.sqlite';
     my $pre_exists = ( -f $self->{file} ) ? 1 : 0;
 
-    $self->{dbh} = DBI->connect( 'dbi:SQLite:dbname=' . $self->{file} ) or die "$@\n";
+    $self->{dbh} = DBI->connect(
+        'dbi:SQLite:dbname=' . $self->{file},
+        undef,
+        undef,
+        {
+            PrintError                   => 0,
+            RaiseError                   => 1,
+            sqlite_see_if_its_a_number   => 1,
+            sqlite_defensive             => 1,
+            sqlite_extended_result_codes => 1,
+            sqlite_string_mode           => 6,
+                # 4 = DBD_SQLITE_STRING_MODE_UNICODE_NAIVE
+                # 5 = DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK
+                # 6 = DBD_SQLITE_STRING_MODE_UNICODE_STRICT
+        },
+    ) or die "$@\n";
+
+    $self->{dbh}->do("PRAGMA $_->[0] = $_->[1]") for (
+        [ encoding           => '"UTF-8"'  ],
+        [ foreign_keys       => 'ON'       ],
+        [ journal_mode       => 'WAL'      ],
+        [ recursive_triggers => 'ON'       ],
+        [ temp_store         => 'MEMORY'   ],
+    );
 
     $self->{dbh}->do(q{
         CREATE TABLE IF NOT EXISTS bot_store (
-            id INTEGER PRIMARY KEY ASC,
-            namespace TEXT,
-            key TEXT,
-            value TEXT
+            bot_store_id INTEGER PRIMARY KEY,
+            namespace    TEXT,
+            key          TEXT,
+            value        TEXT,
+            created      TEXT NOT NULL DEFAULT ( STRFTIME( '%Y-%m-%d %H:%M:%f', 'NOW', 'LOCALTIME' ) )
         )
     }) unless ($pre_exists);
 
@@ -71,6 +95,8 @@ sub set {
     my $namespace = ( caller() )[0];
 
     try {
+        $self->{dbh}->begin_work;
+
         $self->{dbh}->prepare_cached(q{
             DELETE FROM bot_store WHERE namespace = ? AND key = ?
         })->execute( $namespace, $key ) or die $self->{dbh}->errstr;
@@ -82,8 +108,11 @@ sub set {
             $key,
             $self->{json}->encode( { value => $value } ),
         ) or die $self->{dbh}->errstr;
+
+        $self->{dbh}->commit;
     }
     catch ($e) {
+        $self->{dbh}->rollback;
         my $e = $_ || $@;
         warn "Store set error with $namespace (likely an IRC::Store::SQLite issue); key = $key; error = $e\n";
     }
@@ -105,7 +134,7 @@ Bot::IRC::Store::SQLite - Bot::IRC persistent data storage with SQLite
 
 =head1 VERSION
 
-version 1.42
+version 1.44
 
 =head1 SYNOPSIS
 

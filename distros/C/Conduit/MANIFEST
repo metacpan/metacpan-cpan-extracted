@@ -1,0 +1,17 @@
+.editorconfig
+Build.PL
+Changes
+examples/metrics.pl
+lib/Conduit.pm
+lib/Conduit/Client.pm
+lib/Conduit/Metrics.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01psgi.t
+t/02psgi-streaming.t
+t/70metrics.t
+t/99pod.t

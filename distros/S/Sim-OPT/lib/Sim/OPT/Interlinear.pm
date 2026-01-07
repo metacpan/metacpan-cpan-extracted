@@ -29,6 +29,7 @@ use Sim::OPT::Takechance;
 use Sim::OPT::Parcoord3d;
 use Sim::OPT::Interlinear;
 eval { use Sim::OPTcue; 1 };
+eval { use Sim::OPTcue::Patternsearch; 1 };
 
 # NOTE: TO USE THE PROGRAM AS A SCRIPT, THE ABOVE "use Sim::OPT..." lines should be deleted or commented.
 
@@ -1972,7 +1973,7 @@ sub interlinear
   $newfile = $sourcefile . "_meta.csv";
   $report = $newfile . "_tofile.txt";
   @mode = ( "wei" ); # #"wei" is weighted gradient linear interpolation of the nearest neighbours.
-  #my @mode = ( "near" ); # "nea" means "nearest neighbour"
+  #my @mode = ( "near" ); # "near" means "nearest neighbour"
   #@mode = ( ""mix" ); # "mix" means sequentially mixed in each loop.
   #my @mode = ( "wei", "near", "near", "purelin" ); # a sequence
   @weights = (  ); #my @weights = ( 0.7, 0.3 ); # THE FIRST IS THE WEIGHT FOR linear interpolation, THE SECOND FOR nearest neighbour.

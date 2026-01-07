@@ -6,30 +6,12 @@ use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator';
 
 use parent qw(Test::Unit::TestBase);
 
-sub setup : Tests(setup) {
-  my $self = shift;
-  $self->SUPER::setup(@_);
-
-  $self->_fake_http_auth();
-  $self->_fake_http_no_retries();
-
-  $self->_uri_responses(qw(
-    get_spreadsheet_named_ranges
-    get_worksheet_properties_title_sheetid
-    get_worksheet_values_cell
-    get_worksheet_values_row
-    post_worksheet_values_x_y_z
-  ));
-
-  return;
-}
+init_logger;
 
 sub interate : Tests(14) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-
-  my $ws0 = fake_worksheet();
+  my $ws0 = $self->mock_worksheet();
   $ws0->enable_header_row();
 
   my %ties = (

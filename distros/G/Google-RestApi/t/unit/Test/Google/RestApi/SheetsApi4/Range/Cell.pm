@@ -6,57 +6,30 @@ use aliased 'Google::RestApi::SheetsApi4::Range::Cell';
 
 use parent qw(Test::Class Test::Google::RestApi::SheetsApi4::Range::Base);
 
+init_logger;
+
 my $sheet = "'Sheet1'";
 
 sub range : Tests(13) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
+  my $ws0 = $self->mock_worksheet;
 
-  my $x = 'A1';
-
-  my $range = _new_range($x);
-  is $range->range(), "$sheet!$x", "$x should be $x";
-
-  $range = _new_range(['A', 1]);
-  is $range->range(), "$sheet!$x", "['A', 1] should be $x";
-
-  $range = _new_range([['A', 1]]);
-  is $range->range(), "$sheet!$x", "[['A', 1]] should be $x";
-
-  $range = _new_range([1, 1]);
-  is $range->range(), "$sheet!$x", "[1, 1] should be $x";
-
-  $range = _new_range([[1, 1]]);
-  is $range->range(), "$sheet!$x", "[[1, 1]] should be $x";
-
-  $range = _new_range({row => 1, col => 'A'});
-  is $range->range(), "$sheet!$x", "{row => 1, col => 'A'} should be $x";
-
-  $range = _new_range([ {row => 1, col => 'A'} ]);
-  is $range->range(), "$sheet!$x", "[{row => 1, col => 'A'}] should be $x";
-
-  $range = _new_range({row => 1, col => 1});
-  is $range->range(), "$sheet!$x", "{row => 1, col => 1} should be $x";
-
-  $range = _new_range([ {row => 1, col => 1} ]);
-  is $range->range(), "$sheet!$x", "[{row => 1, col => 1}] should be $x";
-
-  $range = _new_range([['A', 1], ['A', 1]]);
-  is $range->range(), "$sheet!$x", "[['A', 1], ['A', 1]] should be $x";
-
-  $range = _new_range([[1, 1], [1, 1]]);
-  is $range->range(), "$sheet!$x", "[[1, 1], [1, 1]] should be $x";
-
-  $range = _new_range( {row => 1, col => 'A'}, {row => 1, col => 'A'} );
-  is $range->range(), "$sheet!$x", "{row => 1, col => 'A'}, {row => 1, col => 'A'} should be $x";
-
-  $range = _new_range( {row => 1, col => 1}, {row => 1, col => 1} );
-  is $range->range(), "$sheet!$x", "{row => 1, col => 1}, {row => 1, col => 1} should be $x";
+  is $ws0->range_cell('A1')->range(),       "$sheet!A1", "A1 should be A1";
+  is $ws0->range_cell(['A', 1])->range(),   "$sheet!A1", "['A', 1] should be A1";
+  is $ws0->range_cell([['A', 1]])->range(), "$sheet!A1", "[['A', 1]] should be A1";
+  is $ws0->range_cell([1, 1])->range(),     "$sheet!A1", "[1, 1] should be A1";
+  is $ws0->range_cell([[1, 1]])->range(),   "$sheet!A1", "[[1, 1]] should be A1";
+  is $ws0->range_cell({row => 1, col => 'A'})->range(),     "$sheet!A1", "{row => 1, col => 'A'} should be A1";
+  is $ws0->range_cell([ {row => 1, col => 'A'} ])->range(), "$sheet!A1", "[{row => 1, col => 'A'}] should be A1";
+  is $ws0->range_cell({row => 1, col => 1})->range(),       "$sheet!A1", "{row => 1, col => 1} should be A1";
+  is $ws0->range_cell([ {row => 1, col => 1} ])->range(),   "$sheet!A1", "[{row => 1, col => 1}] should be A1";
+  is $ws0->range_cell([['A', 1], ['A', 1]])->range(),       "$sheet!A1", "[['A', 1], ['A', 1]] should be A1";
+  is $ws0->range_cell([[1, 1], [1, 1]])->range(),           "$sheet!A1", "[[1, 1], [1, 1]] should be A1";
+  is $ws0->range_cell( {row => 1, col => 'A'}, {row => 1, col => 'A'} )->range(), "$sheet!A1", "{row => 1, col => 'A'}, {row => 1, col => 'A'} should be A1";
+  is $ws0->range_cell( {row => 1, col => 1}, {row => 1, col => 1} )->range(), "$sheet!A1", "{row => 1, col => 1}, {row => 1, col => 1} should be A1";
 
   return;
 }
-
-sub _new_range { fake_worksheet()->range_cell(shift); }
 
 1;

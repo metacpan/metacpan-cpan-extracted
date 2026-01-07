@@ -6,24 +6,14 @@ use aliased 'Google::RestApi::SheetsApi4::Worksheet';
 
 use parent 'Test::Unit::TestBase';
 
-# init_logger($TRACE);
+init_logger;
 
 sub setup : Tests(setup) {
   my $self = shift;
-  $self->SUPER::setup(@_);
 
-  $self->_uri_responses(qw(
-    get_worksheet_properties_title_sheetid
-    get_worksheet_values_col
-    get_worksheet_values_cols
-    get_worksheet_values_row
-    get_worksheet_values_rows
-    post_worksheet_values_x_y_z
-    put_worksheet_values_col
-    put_worksheet_values_row
-  ));
-  $self->_fake_http_auth();
-  $self->_fake_http_no_retries();
+  my $ws0 = $self->mock_worksheet();
+  my $all = $ws0->range("A1:C1000");
+  $all->reset()->submit_requests;
 
   return;
 }
@@ -31,22 +21,23 @@ sub setup : Tests(setup) {
 sub _constructor : Tests(7) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
+  my $ms = $self->mock_spreadsheet();
+  my $ms_id = $ms->spreadsheet_id;
 
-  ok my $ws0 = $self->_fake_worksheet(), 'Constructor should succeed';
+  throws_ok sub { Worksheet->new(spreadsheet => $ms) },
+    qr/At least one of/i,
+    'Constructor with missing params should throw';
+
+  ok my $ws0 = Worksheet->new(spreadsheet => $ms, id => 0), 'Constructor with "id" should succeed';
   isa_ok $ws0, Worksheet, 'Constructor with "id" returns';
 
-  ok $ws0 = $self->_fake_worksheet(name => fake_worksheet_name()),
+  ok $ws0 = Worksheet->new(spreadsheet => $ms, name => mock_worksheet_name()),
     'Constructor with "name" should succeed';
   isa_ok $ws0, Worksheet, 'Constructor with "name" returns';
 
-  ok $ws0 = $self->_fake_worksheet(uri => fake_worksheet_uri()),
+  ok $ws0 = Worksheet->new(spreadsheet => $ms, uri => $self->mock_worksheet_uri()),
     'Constructor with "uri`" should succeed';
   isa_ok $ws0, Worksheet, 'Constructor with "uri" returns';
-
-  throws_ok sub { $ws0 = Worksheet->new(spreadsheet => fake_spreadsheet()) },
-    qr/At least one of/i,
-    'Constructor with missing params should throw';
 
   return;
 }
@@ -74,9 +65,7 @@ sub properties : Tests() {
 sub col : Tests(3) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-
-  my $ws0 = $self->_fake_worksheet();
+  my $ws0 = $self->mock_worksheet();
   is $ws0->col('A'), undef, 'Col returns undef';
   is_deeply $ws0->col('A', [qw(joe)]), [qw(joe)], 'Col returns the correct array of values';
   # just do a basic test to make sure bad range args are not accepted. range tests will
@@ -89,9 +78,7 @@ sub col : Tests(3) {
 sub cols : Tests(3) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-
-  my $ws0 = $self->_fake_worksheet();
+  my $ws0 = $self->mock_worksheet();
   is_valid $ws0->cols(['A', 'B', 'C']), ArrayRef[Undef], 'Cols returns undef';
   my $cols = [['joe'], ['fred'], ['charlie']];
   is_deeply $ws0->cols(['A', 'B', 'C'], $cols), $cols, 'Cols returns the correct array of values';
@@ -103,9 +90,7 @@ sub cols : Tests(3) {
 sub row : Tests(3) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-
-  my $ws0 = $self->_fake_worksheet();
+  my $ws0 = $self->mock_worksheet();
   is $ws0->row(1), undef, 'Row returns undef';
   is_deeply $ws0->row(1, [qw(joe)]), [qw(joe)], 'Row returns an array of values';
   throws_ok sub { $ws0->row('A1:B2') }, qr/Unable to translate/i, 'Bad row throws';
@@ -116,9 +101,7 @@ sub row : Tests(3) {
 sub rows : Tests(3) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-
-  my $ws0 = $self->_fake_worksheet();
+  my $ws0 = $self->mock_worksheet();
   is_valid $ws0->rows([1, 2, 3]), ArrayRef[Undef], 'Rows returns undef';
   my $rows = [['joe'], ['fred'], ['charlie']];
   is_deeply $ws0->rows([1, 2, 3], $rows), $rows, 'Rows returns the correct array of values';
@@ -184,13 +167,6 @@ sub submit_requests : Tests() {
 sub config : Tests() {
   my $self = shift;
   return;
-}
-
-sub _fake_worksheet {
-  my $self = shift;
-  my %p = @_;
-  $p{id} = fake_worksheet_id() if !%p;
-  return Worksheet->new(%p, spreadsheet => fake_spreadsheet());
 }
 
 1;

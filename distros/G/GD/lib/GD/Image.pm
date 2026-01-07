@@ -5,7 +5,7 @@ use strict;
 use GD;
 use Symbol 'gensym','qualify_to_ref';
 use vars '$VERSION';
-$VERSION = '2.83';
+$VERSION = '2.84';
 
 =head1 NAME
 
@@ -17,7 +17,8 @@ See L<GD>
 
 =head1 DESCRIPTION
 
-Supported Image formats:
+Supported Image formats, also returned by C<supported()>,
+as lowercase strings.
 
 =over 4
 
@@ -35,7 +36,11 @@ Supported Image formats:
 
 =item BMP
 
+=item GifAnim
+
 =item Webp
+
+=item Heif
 
 =item Avif
 
@@ -50,10 +55,6 @@ Unsupported Image formats:
 =item Gd2
 
 =item Xpm
-
-=item GifAnim
-
-=item Heif
 
 =back
 
@@ -297,6 +298,14 @@ sub newFromWebp {
     $class->_newFromWebp($fh);
 }
 
+sub newFromHeif {
+    croak("Usage: newFromHeif(class,filehandle)") unless @_==2;
+    my($class,$f) = @_;
+    my $fh = $class->_make_filehandle($f);
+    binmode($fh);
+    $class->_newFromHeif($fh);
+}
+
 sub newFromAvif {
     croak("Usage: newFromAvif(class,filehandle)") unless @_==2;
     my($class,$f) = @_;
@@ -321,6 +330,23 @@ sub newFromBmp {
     my $fh = $class->_make_filehandle($f);
     binmode($fh);
     $class->_newFromBmp($fh,@_);
+}
+
+# dynamically generated from your libgd features
+sub supported {
+    return qw(
+	png
+	gif
+	jpeg
+	tiff
+	xbm
+	wbmp
+	bmp
+	gifanim
+	webp
+	heif
+	avif
+      );
 }
 
 # Autoload methods go after __END__, and are processed by the autosplit program.

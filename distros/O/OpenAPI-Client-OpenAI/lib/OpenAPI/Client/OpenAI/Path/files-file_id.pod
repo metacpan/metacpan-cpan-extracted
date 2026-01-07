@@ -16,7 +16,7 @@ This document describes the API endpoint at C</files/{file_id}>.
 Delete file
 
 
-Delete a file.
+Delete a file and remove it from all vector stores.
 
 
 
@@ -124,7 +124,7 @@ L<OpenAPI::Client::OpenAI::Path>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2023-2025 by Nelson Ferraz
+Copyright (C) 2023-2026 by Nelson Ferraz
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

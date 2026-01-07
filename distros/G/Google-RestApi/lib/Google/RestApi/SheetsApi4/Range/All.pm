@@ -2,7 +2,7 @@ package Google::RestApi::SheetsApi4::Range::All;
 
 # TODO: this class has not been fully tested. use at your own risk.
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.1.0';
 
 use Google::RestApi::Setup;
 
@@ -51,6 +51,6 @@ Robin Murray mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright (c) 2021, Robin Murray. All rights reserved.
+Copyright (c) 2019-2026 Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

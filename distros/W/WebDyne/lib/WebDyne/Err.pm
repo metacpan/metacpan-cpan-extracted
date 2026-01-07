@@ -1,7 +1,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -38,7 +38,7 @@ $Data::Dumper::Indent=1;
 
 #  Version information
 #
-$VERSION='2.038';
+$VERSION='2.046';
 
 
 #  Debug
@@ -162,7 +162,8 @@ sub err_html {
             "using text error (%s:%s:%s:%s) - update $r content_type",
             $WEBDYNE_ERROR_TEXT, $WEBDYNE_EVAL_SAFE, $self->{'_error_handler_run'}, $cgi_or
         );
-        $r->content_type('text/plain');
+        #$r->content_type('text/plain');
+        $r->content_type($WEBDYNE_CONTENT_TYPE_TEXT);
         
 
         #  Push error

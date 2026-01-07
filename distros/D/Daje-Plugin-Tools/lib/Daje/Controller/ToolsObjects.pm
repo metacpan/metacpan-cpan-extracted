@@ -53,6 +53,7 @@ sub load_object ($self) {
         $self->app->log->debug('Daje::Controller::ToolsObjects::load_object ' . Dumper($result->{data}));
         $self->render(json =>  $result->{data});
     })->catch(sub($err) {
+        $self->app->log->error('Daje::Controller::ToolsObjects::load_object ' . $err);
         $self->render(json => { 'result' => 0, data => $err });
     })->wait;
 }

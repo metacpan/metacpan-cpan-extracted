@@ -101,15 +101,38 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 Upload file
 
 
-Upload a file that can be used across various endpoints. Individual files can be up to 512 MB, and the size of all files uploaded by one organization can be up to 1 TB.
+Upload a file that can be used across various endpoints. Individual files
+can be up to 512 MB, and the size of all files uploaded by one organization
+can be up to 1 TB.
 
-The Assistants API supports files up to 2 million tokens and of specific file types. See the L<Assistants Tools guide|https://platform.openai.com/docs/assistants/tools> for details.
+=over
 
-The Fine-tuning API only supports C<.jsonl> files. The input also has certain required formats for fine-tuning L<chat|https://platform.openai.com/docs/api-reference/fine-tuning/chat-input> or L<completions|https://platform.openai.com/docs/api-reference/fine-tuning/completions-input> models.
+=item -
 
-The Batch API only supports C<.jsonl> files up to 200 MB in size. The input also has a specific required L<format|https://platform.openai.com/docs/api-reference/batch/request-input>.
+The Assistants API supports files up to 2 million tokens and of specific
+  file types. See the L<Assistants Tools guide|https://platform.openai.com/docs/assistants/tools> for
+  details.
 
-Please L<contact us|https://help.openai.com/> if you need to increase these storage limits.
+
+=item -
+
+The Fine-tuning API only supports C<.jsonl> files. The input also has
+  certain required formats for fine-tuning
+  L<chat|https://platform.openai.com/docs/api-reference/fine-tuning/chat-input> or
+  L<completions|https://platform.openai.com/docs/api-reference/fine-tuning/completions-input> models.
+
+
+=item -
+
+The Batch API only supports C<.jsonl> files up to 200 MB in size. The input
+  also has a specific required
+  L<format|https://platform.openai.com/docs/api-reference/batch/request-input>.
+
+
+=back
+
+Please L<contact us|https://help.openai.com/> if you need to increase these
+storage limits.
 
 
 
@@ -179,7 +202,7 @@ L<OpenAPI::Client::OpenAI::Path>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2023-2025 by Nelson Ferraz
+Copyright (C) 2023-2026 by Nelson Ferraz
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

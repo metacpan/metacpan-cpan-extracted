@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Getopt::Long;
-use JSON::XS qw/decode_json/;
+use JSON::MaybeXS qw/decode_json/;
 use Pod::Usage;
 use Schedule::Activity;
 use Schedule::Activity::Attribute::Report;
@@ -71,6 +71,12 @@ sub materialize {
 	foreach my $entry (@materialized) { print join(' ',@$entry),"\n" }
 }
 
+sub attrvalue {
+	my (%schedule)=@_;
+	print "\n";
+	my $reporter=Schedule::Activity::Attribute::Report->new(%schedule);
+	print $reporter->report(type=>'summary',values=>'y',header=>1,names=>1,fmt=>'%0.4g',sep=>"\t",format=>'text')."\n";
+}
 sub attrgrid {
 	my (%schedule)=@_;
 	print "\n";
@@ -78,18 +84,18 @@ sub attrgrid {
 	my @rhs=@{$reporter->report(type=>'summary',values=>'avg',header=>1,names=>1,fmt=>'%0.4g',format=>'table')//[]};
 	foreach my $row (@{$reporter->report(type=>'grid',values=>'y',header=>1,names=>0,fmt=>'%0.4g',format=>'table')//[]}) { print join("\t",@$row,@{shift(@rhs)//[]}),"\n" }
 }
+sub attraverage {
+	my (%schedule)=@_;
+	print "\n";
+	my $reporter=Schedule::Activity::Attribute::Report->new(%schedule);
+	print $reporter->report(type=>'summary',values=>'avg',header=>1,names=>1,fmt=>'%0.4g',sep=>"\t",format=>'text')."\n";
+}
 sub attravggrid {
 	my (%schedule)=@_;
 	print "\n";
 	my $reporter=Schedule::Activity::Attribute::Report->new(%schedule);
 	my @rhs=@{$reporter->report(type=>'summary',values=>'avg',header=>1,names=>1,fmt=>'%0.4g',format=>'table')//[]};
 	foreach my $row (@{$reporter->report(type=>'grid',values=>'avg',header=>1,names=>0,fmt=>'%0.4g',format=>'table')//[]}) { print join("\t",@$row,@{shift(@rhs)//[]}),"\n" }
-}
-sub attraverage {
-	my (%schedule)=@_;
-	print "\n";
-	my $reporter=Schedule::Activity::Attribute::Report->new(%schedule);
-	print $reporter->report(type=>'summary',values=>'avg',header=>1,names=>1,fmt=>'%0.4g',sep=>"\t",format=>'text')."\n";
 }
 
 my %opt=(
@@ -133,16 +139,13 @@ if($opt{man})  { pod2usage(-verbose=>2,-exitval=>2) }
 if($opt{help}) { pod2usage(-verbose=>1,-exitval=>2) }
 
 my (%configuration,%after,%goal);
-if($opt{after}) {
-	%after=loadafter($opt{after});
-	%configuration=%{$after{configuration}};
-	%after=(after=>$after{schedule});
-}
-else { %configuration=
-	$opt{schedule} ? loadeval($opt{schedule}) :
-	$opt{json}     ? loadjson($opt{json}) :
+%after=$opt{after}? loadafter($opt{after}):();
+%configuration=
+	$opt{schedule}  ? loadeval($opt{schedule}) :
+	$opt{json}      ? loadjson($opt{json}) :
+	$opt{after}     ? %{$after{configuration}} :
 	die 'Configuration is required';
-}
+%after=$opt{after}?(after=>$after{schedule}):();
 
 my $scheduler=Schedule::Activity->new(unsafe=>$opt{unsafe},configuration=>\%configuration);
 my %check=$scheduler->compile();
@@ -158,7 +161,15 @@ if($opt{goal}) {
 
 if($opt{activities}) { foreach my $pair (split(/;/,$opt{activities})) { push @{$opt{activity}},$pair } }
 if(!@{$opt{activity}}&&!$opt{after}) { die 'Activities are required' }
-for(my $i=0;$i<=$#{$opt{activity}};$i++) { $opt{activity}[$i]=[split(/,/,$opt{activity}[$i],2)] }
+for(my $i=0;$i<=$#{$opt{activity}};$i++) {
+	$opt{activity}[$i]=[split(/,/,$opt{activity}[$i],3)];
+	if($opt{activity}[$i][2]) {
+		my $href;
+		eval "\$href=$opt{activity}[$i][2];";
+		if($@) { die "Goal format failure:  $@" }
+		$opt{activity}[$i][2]=$href;
+	}
+}
 
 my %schedule=$scheduler->schedule(goal=>\%goal,%after,activities=>$opt{activity},tensionslack=>$opt{tslack},tensionbuffer=>$opt{tbuffer},nonote=>!$opt{notemerge});
 if($schedule{error}) {
@@ -192,6 +203,7 @@ if($opt{notemerge}) {
 
 materialize(%schedule);
 
+if($opt{attribute}=~/\bvalue\b/)   { attrvalue(%schedule) }
 if($opt{attribute}=~/\bgrid\b/)    { attrgrid(%schedule) }
 if($opt{attribute}=~/\baverage\b/) { attraverage(%schedule) }
 if($opt{attribute}=~/\bavggrid\b/) { attravggrid(%schedule) }
@@ -211,7 +223,7 @@ schedule-activity.pl - Build activity schedules.
     configuration:  [--schedule=file | --json=file]
     activities:     [--activity=time,name ... | --activities='time,name;time,name;...']
 
-The C<--schedule> file should be a non-cyclic Perl evaluable hash or hash reference.  A C<--json> file should be a hash reference.  The format of the schedule configuration is described in L<Schedule::Activity>.
+The C<--schedule> file should be a non-cyclic Perl evaluable hash or hash reference.  A C<--json> file should be a hash reference.  Activity names may not contain commas or semicolons if used from the commandline.  The format of the schedule configuration is described in L<Schedule::Activity>.
 
 =head1 OPTIONS
 
@@ -231,9 +243,9 @@ Only merge the annotation groups specified by the names.  Default is all, alphab
 
 Do not merge annotation messages into the final schedule.
 
-=head2 --attribute=grid,average,avggrid
+=head2 --attribute=value,grid,average,avggrid
 
-Comma-separated, one or more:  'grid' shows values over time and overall average.  'average' shows only overall averages.  'avggrid' shows averages over time.
+Comma-separated, one or more:  'value' shows the final values.  'grid' shows values over time and overall average.  'average' shows only overall averages.  'avggrid' shows averages over time.
 
 =head2 --goal=(hash)
 
@@ -255,17 +267,23 @@ Schedules can be incrementally constructed from a starting configuration as foll
   schedule-activity.pl --after=file1a.dat --activity=time,name --save=file2a.dat
   schedule-activity.pl --after=file2a.dat --nonotemerge
 
-The C<schedule> must be provided initially, and the C<activity> or C<activities> will be built into the list of scheduled activities normally.  Results are stored in the C<save> filename.  Use C<after> to specify a savefile as a starting point for scheduling.  As a special case, omitting an C<activity> list is permitted with an C<after> file, and the saved schedule will be shown on stdout.  The configuration does not need to be indicated after the bootstrapping step.
+The C<schedule> must be provided initially, and the C<activity> or C<activities> will be built into the list of scheduled activities normally.  Results are stored in the C<save> filename.  Use C<after> to specify a savefile as a starting point for scheduling.  As a special case, omitting an C<activity> list is permitted with an C<after> file, and the saved schedule will be shown on stdout.  The configuration does not need to be provided after the bootstrapping step.
+
+Providing C<schedule> on a subsequent run will fully overwrite the saved configuration.  Existing scheduling results will be unaffected (but see below regarding annotations).  (This is experimental starting with 0.2.8)
 
 This permits buliding multiple, randomized schedules from the configuration into separate files for comparison and selection.  Subsequent activities can be built incrementally to achieve targets not specified within the configuration (attribute goals, etc.).
 
-At each step, the schedule is output normally, including annotations unless C<nonotemerge> has been specified.
-
-Annotations are I<not> saved.  Annotations apply generally to all actions in a schedule, so incremental builds are not equivalent to a full schedule build.  While the annotations are shown with the output at each stage of construction, they are recomputed each time.
+At each step, the schedule is output normally, including annotations unless C<nonotemerge> has been specified.  Annotations are I<not> saved.  Annotations apply generally to all actions in a schedule, so incremental builds are not equivalent to a full schedule build.  While the annotations are shown with the output at each stage of construction, they are recomputed each time.
 
 =head1 PER-ACTIVITY GOALS
 
-Per-activity goals are not yet supported directly from the commandline, but can be achieved using incremental construction.  See L<Schedule::Activity/"Per-Activity Goals">.
+Per-activity goals are supported in both C<activity> and C<activities> options:
+
+  ... --activity='100,activity A,{goal=>{cycles=>100,attribute=>{...}}}' --activity='100,activity B,{goal=>{cycles=>100,attribute=>{...}}}'
+  or
+  ... --activities='100,activity A,{goal=>{cycles=>100,attribute=>{...}}};100,activity B,{goal=>{cycles=>100,attribute=>{...}}}'
+
+See L<Schedule::Activity/"Per-Activity Goals"> for additional details.
 
 =head1 NOTES
 

@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.20;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Metrics::Any::Adapter::Prometheus" );
+require Metrics::Any::Adapter::Prometheus;
 
+pass( 'Modules loaded' );
 done_testing;

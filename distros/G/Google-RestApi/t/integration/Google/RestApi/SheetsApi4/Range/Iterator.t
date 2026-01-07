@@ -6,7 +6,7 @@ use aliased "Google::RestApi::SheetsApi4::Range::Cell";
 use aliased "Google::RestApi::SheetsApi4::Range::Iterator";
 
 # use Carp::Always;
-# init_logger($DEBUG);
+init_logger;
 
 delete_all_spreadsheets(sheets_api());
 

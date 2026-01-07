@@ -9,7 +9,7 @@ use Devel::Confess 'color';
 
 package Matplotlib::Simple;
 require 5.010;
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use Term::ANSIColor;
@@ -24,48 +24,47 @@ our @EXPORT = ('plt', 'bar', 'barh', 'boxplot', 'colored_table', 'hist', 'hist2d
 our @EXPORT_OK = @EXPORT;
 # import matplotlib.colors as mcolors
 # mcolors.CSS4_COLORS is %css4
-=my %css4 = (
-'aliceblue' => '#F0F8FF', 'antiquewhite' => '#FAEBD7', 'aqua'=> '#00FFFF',
-'aquamarine'=> '#7FFFD4', 'azure'=> '#F0FFFF', 'beige'=> '#F5F5DC', 'bisque'=> '#FFE4C4',
-'black'=> '#000000', 'blanchedalmond'=> '#FFEBCD', 'blue'=> '#0000FF', 'blueviolet'=> '#8A2BE2',
-'brown'=> '#A52A2A', 'burlywood'=> '#DEB887', 'cadetblue'=> '#5F9EA0', 'chartreuse'=> '#7FFF00', 'chocolate'=> '#D2691E', 'coral'=> '#FF7F50', 'cornflowerblue'=> '#6495ED', 'cornsilk'=> '#FFF8DC',
- 'crimson'=> '#DC143C', 'cyan'=> '#00FFFF', 'darkblue'=> '#00008B', 'darkcyan'=> '#008B8B',
-'darkgoldenrod'=> '#B8860B', 'darkgray'=> '#A9A9A9', 'darkgreen'=> '#006400',
-'darkgrey'=> '#A9A9A9', 'darkkhaki'=> '#BDB76B', 'darkmagenta'=> '#8B008B',
-'darkolivegreen'=> '#556B2F', 'darkorange'=> '#FF8C00', 'darkorchid'=> '#9932CC',
-'darkred'=> '#8B0000', 'darksalmon'=> '#E9967A', 'darkseagreen'=> '#8FBC8F',
-'darkslateblue'=> '#483D8B', 'darkslategray'=> '#2F4F4F', 'darkslategrey'=> '#2F4F4F',
-'darkturquoise'=> '#00CED1', 'darkviolet'=> '#9400D3', 'deeppink'=> '#FF1493',
-'deepskyblue'=> '#00BFFF', 'dimgray'=> '#696969', 'dimgrey'=> '#696969',
-'dodgerblue'=> '#1E90FF', 'firebrick'=> '#B22222', 'floralwhite'=> '#FFFAF0',
-'forestgreen'=> '#228B22', 'fuchsia'=> '#FF00FF', 'gainsboro'=> '#DCDCDC',
-'ghostwhite'=> '#F8F8FF', 'gold'=> '#FFD700', 'goldenrod'=> '#DAA520', 'gray'=> '#808080',
-'green'=> '#008000', 'greenyellow'=> '#ADFF2F', 'grey'=> '#808080', 'honeydew'=> '#F0FFF0',
-'hotpink'=> '#FF69B4', 'indianred'=> '#CD5C5C', 'indigo'=> '#4B0082', 'ivory'=> '#FFFFF0',
-'khaki'=> '#F0E68C', 'lavender'=> '#E6E6FA', 'lavenderblush'=> '#FFF0F5',
-'lawngreen'=> '#7CFC00', 'lemonchiffon'=> '#FFFACD', 'lightblue'=> '#ADD8E6',
- 'lightcoral'=> '#F08080', 'lightcyan'=> '#E0FFFF', 'lightgoldenrodyellow'=> '#FAFAD2', 'lightgray'=> '#D3D3D3', 'lightgreen'=> '#90EE90', 'lightgrey'=> '#D3D3D3',
-'lightpink'=> '#FFB6C1', 'lightsalmon'=> '#FFA07A', 'lightseagreen'=> '#20B2AA',
-'lightskyblue'=> '#87CEFA', 'lightslategray'=> '#778899', 'lightslategrey'=> '#778899', 'lightsteelblue'=> '#B0C4DE', 'lightyellow'=> '#FFFFE0', 'lime'=> '#00FF00',
-'limegreen'=> '#32CD32', 'linen'=> '#FAF0E6', 'magenta'=> '#FF00FF', 'maroon'=> '#800000',
-'mediumaquamarine'=> '#66CDAA', 'mediumblue'=> '#0000CD', 'mediumorchid'=> '#BA55D3',
-'mediumpurple'=> '#9370DB', 'mediumseagreen'=> '#3CB371', 'mediumslateblue'=> '#7B68EE',
-'mediumspringgreen'=> '#00FA9A', 'mediumturquoise'=> '#48D1CC', 'mediumvioletred'=> '#C71585',
-'midnightblue'=> '#191970', 'mintcream'=> '#F5FFFA', 'mistyrose'=> '#FFE4E1',
-'moccasin'=> '#FFE4B5', 'navajowhite'=> '#FFDEAD', 'navy'=> '#000080', 'oldlace'=> '#FDF5E6',
-'olive'=> '#808000', 'olivedrab'=> '#6B8E23', 'orange'=> '#FFA500', 'orangered'=> '#FF4500',
-'orchid'=> '#DA70D6', 'palegoldenrod'=> '#EEE8AA', 'palegreen'=> '#98FB98',
-'paleturquoise'=> '#AFEEEE', 'palevioletred'=> '#DB7093', 'papayawhip'=> '#FFEFD5',
-'peachpuff'=> '#FFDAB9', 'peru'=> '#CD853F', 'pink'=> '#FFC0CB', 'plum'=> '#DDA0DD',
-'powderblue'=> '#B0E0E6', 'purple'=> '#800080', 'rebeccapurple'=> '#663399', 'red'=> '#FF0000',
-'rosybrown'=> '#BC8F8F', 'royalblue'=> '#4169E1', 'saddlebrown'=> '#8B4513', 'salmon'=> '#FA8072',
-'sandybrown'=> '#F4A460', 'seagreen'=> '#2E8B57', 'seashell'=> '#FFF5EE',
-'sienna'=> '#A0522D', 'silver'=> '#C0C0C0', 'skyblue'=> '#87CEEB', 'slateblue'=> '#6A5ACD',
-'slategray'=> '#708090', 'slategrey'=> '#708090', 'snow'=> '#FFFAFA', 'springgreen'=> '#00FF7F', 'steelblue'=> '#4682B4', 'tan'=> '#D2B48C', 'teal'=> '#008080', 'thistle'=> '#D8BFD8',
-'tomato'=> '#FF6347', 'turquoise'=> '#40E0D0', 'violet'=> '#EE82EE', 'wheat'=> '#F5DEB3',
-'white'=> '#FFFFFF', 'whitesmoke'=> '#F5F5F5', 'yellow'=> '#FFFF00', 'yellowgreen'=> '#9ACD32'
-);
-=cut
+#my %css4 = (
+#'aliceblue' => '#F0F8FF', 'antiquewhite' => '#FAEBD7', 'aqua'=> '#00FFFF',
+#'aquamarine'=> '#7FFFD4', 'azure'=> '#F0FFFF', 'beige'=> '#F5F5DC', 'bisque'=> '#FFE4C4',
+#'black'=> '#000000', 'blanchedalmond'=> '#FFEBCD', 'blue'=> '#0000FF', 'blueviolet'=> '#8A2BE2',
+#'brown'=> '#A52A2A', 'burlywood'=> '#DEB887', 'cadetblue'=> '#5F9EA0', 'chartreuse'=> '#7FFF00', 'chocolate'=> '#D2691E', 'coral'=> '#FF7F50', 'cornflowerblue'=> '#6495ED', 'cornsilk'=> '#FFF8DC',
+# 'crimson'=> '#DC143C', 'cyan'=> '#00FFFF', 'darkblue'=> '#00008B', 'darkcyan'=> '#008B8B',
+#'darkgoldenrod'=> '#B8860B', 'darkgray'=> '#A9A9A9', 'darkgreen'=> '#006400',
+#'darkgrey'=> '#A9A9A9', 'darkkhaki'=> '#BDB76B', 'darkmagenta'=> '#8B008B',
+#'darkolivegreen'=> '#556B2F', 'darkorange'=> '#FF8C00', 'darkorchid'=> '#9932CC',
+#'darkred'=> '#8B0000', 'darksalmon'=> '#E9967A', 'darkseagreen'=> '#8FBC8F',
+#'darkslateblue'=> '#483D8B', 'darkslategray'=> '#2F4F4F', 'darkslategrey'=> '#2F4F4F',
+#'darkturquoise'=> '#00CED1', 'darkviolet'=> '#9400D3', 'deeppink'=> '#FF1493',
+#'deepskyblue'=> '#00BFFF', 'dimgray'=> '#696969', 'dimgrey'=> '#696969',
+#'dodgerblue'=> '#1E90FF', 'firebrick'=> '#B22222', 'floralwhite'=> '#FFFAF0',
+#'forestgreen'=> '#228B22', 'fuchsia'=> '#FF00FF', 'gainsboro'=> '#DCDCDC',
+#'ghostwhite'=> '#F8F8FF', 'gold'=> '#FFD700', 'goldenrod'=> '#DAA520', 'gray'=> '#808080',
+#'green'=> '#008000', 'greenyellow'=> '#ADFF2F', 'grey'=> '#808080', 'honeydew'=> '#F0FFF0',
+#'hotpink'=> '#FF69B4', 'indianred'=> '#CD5C5C', 'indigo'=> '#4B0082', 'ivory'=> '#FFFFF0',
+#'khaki'=> '#F0E68C', 'lavender'=> '#E6E6FA', 'lavenderblush'=> '#FFF0F5',
+#'lawngreen'=> '#7CFC00', 'lemonchiffon'=> '#FFFACD', 'lightblue'=> '#ADD8E6',
+# 'lightcoral'=> '#F08080', 'lightcyan'=> '#E0FFFF', 'lightgoldenrodyellow'=> '#FAFAD2', 'lightgray'=> '#D3D3D3', 'lightgreen'=> '#90EE90', 'lightgrey'=> '#D3D3D3',
+#'lightpink'=> '#FFB6C1', 'lightsalmon'=> '#FFA07A', 'lightseagreen'=> '#20B2AA',
+#'lightskyblue'=> '#87CEFA', 'lightslategray'=> '#778899', 'lightslategrey'=> '#778899', 'lightsteelblue'=> '#B0C4DE', 'lightyellow'=> '#FFFFE0', 'lime'=> '#00FF00',
+#'limegreen'=> '#32CD32', 'linen'=> '#FAF0E6', 'magenta'=> '#FF00FF', 'maroon'=> '#800000',
+#'mediumaquamarine'=> '#66CDAA', 'mediumblue'=> '#0000CD', 'mediumorchid'=> '#BA55D3',
+#'mediumpurple'=> '#9370DB', 'mediumseagreen'=> '#3CB371', 'mediumslateblue'=> '#7B68EE',
+#'mediumspringgreen'=> '#00FA9A', 'mediumturquoise'=> '#48D1CC', 'mediumvioletred'=> '#C71585',
+#'midnightblue'=> '#191970', 'mintcream'=> '#F5FFFA', 'mistyrose'=> '#FFE4E1',
+#'moccasin'=> '#FFE4B5', 'navajowhite'=> '#FFDEAD', 'navy'=> '#000080', 'oldlace'=> '#FDF5E6',
+#'olive'=> '#808000', 'olivedrab'=> '#6B8E23', 'orange'=> '#FFA500', 'orangered'=> '#FF4500',
+#'orchid'=> '#DA70D6', 'palegoldenrod'=> '#EEE8AA', 'palegreen'=> '#98FB98',
+#'paleturquoise'=> '#AFEEEE', 'palevioletred'=> '#DB7093', 'papayawhip'=> '#FFEFD5',
+#'peachpuff'=> '#FFDAB9', 'peru'=> '#CD853F', 'pink'=> '#FFC0CB', 'plum'=> '#DDA0DD',
+#'powderblue'=> '#B0E0E6', 'purple'=> '#800080', 'rebeccapurple'=> '#663399', 'red'=> '#FF0000',
+#'rosybrown'=> '#BC8F8F', 'royalblue'=> '#4169E1', 'saddlebrown'=> '#8B4513', 'salmon'=> '#FA8072',
+#'sandybrown'=> '#F4A460', 'seagreen'=> '#2E8B57', 'seashell'=> '#FFF5EE',
+#'sienna'=> '#A0522D', 'silver'=> '#C0C0C0', 'skyblue'=> '#87CEEB', 'slateblue'=> '#6A5ACD',
+#'slategray'=> '#708090', 'slategrey'=> '#708090', 'snow'=> '#FFFAFA', 'springgreen'=> '#00FF7F', 'steelblue'=> '#4682B4', 'tan'=> '#D2B48C', 'teal'=> '#008080', 'thistle'=> '#D8BFD8',
+#'tomato'=> '#FF6347', 'turquoise'=> '#40E0D0', 'violet'=> '#EE82EE', 'wheat'=> '#F5DEB3',
+#'white'=> '#FFFFFF', 'whitesmoke'=> '#F5F5F5', 'yellow'=> '#FFFF00', 'yellowgreen'=> '#9ACD32'
+#);
 my @prop_cycle = ('#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2',
  '#7f7f7f', '#bcbd22', '#17becf'); #plt.rcParams['axes.prop_cycle']
 sub execute {
@@ -260,10 +259,8 @@ my %opt = (
 		'shared.colorbar', # array of 0-based indices for sharing a colorbar
 		'show.numbers',# show the numbers or not, by default off.  0 = "off"; "show.numbers" > 0 => "on"
 		'undef.color', # what color will undefined points be
-#		'xlabel',	# xlabel prints in a bad position, so I removed this as a possible option
-#		'ylabel',	# ylabel prints under the row labels
 	],
-	hexbin_helper => [
+	hexbin_helper => [ @cb_arg,
 	  'cb_logscale',
 	  'cmap',         # "gist_rainbow" by default
 	  'colorbar.on',  # only draw colorbar if colorbar is on
@@ -755,7 +752,7 @@ sub colored_table_helper {
 		@rows = sort keys %data;
 	}
 	my ($min, $max) = ('inf', '-inf');
-	say {$args->{fh}} 'data = []';
+	say {$args->{fh}} 'd = []';
 	say {$args->{fh}} 'import numpy as np';
 	foreach my $k1 (@cols) {
 		foreach my $k2 (grep {!defined $data{$k1}{$_}} @cols) {
@@ -766,7 +763,7 @@ sub colored_table_helper {
 			$min = min($min, $data{$k1}{$k2});
 			$max = max($max, $data{$k1}{$k2});
 		}
-		say {$args->{fh}} 'data.append([' . join (',', @{ $data{$k1} }{@cols}) . '])';
+		say {$args->{fh}} 'd.append([' . join (',', @{ $data{$k1} }{@cols}) . '])';
 	}
 	$min = $args->{cb_min} // $min;
 	$max = $args->{cb_max} // $max;
@@ -777,11 +774,11 @@ sub colored_table_helper {
 	$plot->{'undef.color'} = $plot->{'undef.color'} // 'gray';
 	say {$args->{fh}} 'plt.cm.gist_rainbow.set_bad("' . $plot->{'undef.color'} . '")';
 	say {$args->{fh}} "norm = plt.Normalize($min, $max)";
-	say {$args->{fh}} 'datacolors = plt.cm.gist_rainbow(norm(data))';
+	say {$args->{fh}} 'datacolors = plt.cm.gist_rainbow(norm(d))';
 	if ($plot->{cblogscale} > 0) {
-		say {$args->{fh}} "img = ax$ax.imshow(data, cmap='$plot->{cmap}', norm=colors.LogNorm())";
+		say {$args->{fh}} "img = ax$ax.imshow(d, cmap='$plot->{cmap}', norm=colors.LogNorm())";
 	} else {
-		say {$args->{fh}} "img = ax$ax.imshow(data, cmap='$plot->{cmap}')";
+		say {$args->{fh}} "img = ax$ax.imshow(d, cmap='$plot->{cmap}')";
 	}
 	$plot->{'colorbar.on'} = $plot->{'colorbar.on'} // 1;
 	if (defined $plot->{cblabel}) {
@@ -791,12 +788,12 @@ sub colored_table_helper {
 	}
 	say {$args->{fh}} 'img.set_visible(False)';
 	$plot->{'show.numbers'} = $plot->{'show.numbers'} // 0;
-	say {$args->{fh}} 'for ri, row in enumerate(data):';
+	say {$args->{fh}} 'for ri, row in enumerate(d):';
 	say {$args->{fh}} '	for ii, item in enumerate(row):';
 	say {$args->{fh}} '		if np.isnan(item):';
-	say {$args->{fh}} '			data[ri][ii] = ""';
-	if ($plot->{'show.numbers'} > 0) {
-		say {$args->{fh}} "table = ax$ax" . '.table(cellText=data, rowLabels=["' . join ('","', @rows) . '"], colLabels = ["' . join ('","', @cols) . '"], cellColours = datacolors, loc = "center", bbox=[0,0,1,1])';
+	say {$args->{fh}} '			d[ri][ii] = ""';
+	if ($plot->{'show.numbers'}) {
+		say {$args->{fh}} "table = ax$ax" . '.table(cellText=d, rowLabels=["' . join ('","', @rows) . '"], colLabels = ["' . join ('","', @cols) . '"], cellColours = datacolors, loc = "center", bbox=[0,0,1,1])';
 	} else {
 		say {$args->{fh}} "table = ax$ax" . '.table(rowLabels=["' . join ('","', @rows) . '"], colLabels = ["' . join ('","', @cols) . '"], cellColours = datacolors, loc = "center", bbox=[0,0,1,1])';
 	}
@@ -825,12 +822,12 @@ sub hexbin_helper {
 	}
 	my @reqd_args = (
 		'fh',      # e.g. $py, $fh, which will be passed by the subroutine
-	  'plot',    # args to original function
+		'plot',    # args to original function
 	);
 	my @undef_args = grep { !defined $args->{$_} } @reqd_args;
 	if ( scalar @undef_args > 0 ) {
-	  p @undef_args;
-	  die 'the above args are necessary, but were not defined.';
+		p @undef_args;
+		die 'the above args are necessary, but were not defined.';
 	}
 	my @opt = (
 	  @ax_methods, @fig_methods, @arg, @plt_methods,
@@ -883,7 +880,7 @@ sub hexbin_helper {
 	my $options =
 	", gridsize = ($plot->{xbins}, $plot->{ybins}), cmap = '$plot->{cmap}'"
 	;    # these args go to the plt.hist call
-	if ( $plot->{cb_logscale} > 0 ) {
+	if ( $plot->{cb_logscale} ) {
 	  say { $args->{fh} } 'from matplotlib.colors import LogNorm';
 	  $options .= ', norm = LogNorm()';
 	}
@@ -909,11 +906,29 @@ sub hexbin_helper {
 	say { $args->{fh} } 'y = ['
 	. join( ',', @{ $plot->{data}{ $keys[1] } } ) . ']';
 	my $ax = $args->{ax} // '';
-	say { $args->{fh} } "im = ax$ax.hexbin(x, y $options)\n";
+	say { $args->{fh} } "im$ax = ax$ax.hexbin(x, y $options)\n";
+	my $opts = '';
+	foreach my $o (grep {defined $plot->{$_}} ('cblabel', 'cblocation', 'cborientation')) { #str
+		my $mpl_opt = $o;
+		$mpl_opt =~ s/^cb//;
+		$opts .= ", $mpl_opt = '$plot->{$o}'";
+	}
+	foreach my $o (grep {defined $plot->{$_}} ('cbdrawedges', 'cbpad')) { # numeric
+		die "$o = $plot->{$o} must be numeric" unless (looks_like_number($plot->{$o}));
+		my $mpl_opt = $o;
+		$mpl_opt =~ s/^cb//;
+		$opts .= ", $mpl_opt = $plot->{$o}";
+	}
+	$plot->{'colorbar.on'} = $plot->{'colorbar.on'} // 1;
+	if (($plot->{'colorbar.on'}) && (defined $plot->{'shared.colorbar'})) {
+		my @ax = map {"ax$_"} @{ $plot->{'shared.colorbar'} };
+		$opts .= ', ax = [' . join (',', @ax) . '] ';
+	}
+#	say { $args->{fh} } "cbar = fig.colorbar(im$ax $opts)" if $plot->{'colorbar.on'};
 	if ( defined $plot->{cblabel} ) {
-	  say { $args->{fh} } 'plt.colorbar(im' . ", label = '$plot->{cblabel}')";
+	  say { $args->{fh} } "plt.colorbar(im$ax, label = '$plot->{cblabel}' $opts)";
 	} else {
-	  say { $args->{fh} } 'plt.colorbar(im, label = "Density")';
+	  say { $args->{fh} } "plt.colorbar(im$ax, label = 'Density' $opts)";
 	}
 }
 
@@ -1055,7 +1070,7 @@ sub hist2d_helper {
 	$plot->{ylabel} = $plot->{ylabel} // $keys[1];
 	$plot->{cmap}   = $plot->{cmap}   // 'gist_rainbow';
 	my $options = ", cmap = '$plot->{cmap}'"; # these args go to the plt.hist call
-	if ( $plot->{cb_logscale} > 0 ) {
+	if ( $plot->{cb_logscale} ) {
 		say {$args->{fh}} 'from matplotlib.colors import LogNorm';
 		# prevents "ValueError: Passing a Normalize instance simultaneously with vmin/vmax is not supported.  Please pass vmin/vmax directly to the norm when creating it"
 		my @logNorm_opt;
@@ -1114,10 +1129,28 @@ sub hist2d_helper {
 	say {$args->{fh}} 'min_hist2d_box = np.min(hist2d_n)';
 	say {$args->{fh}} "print(f'plot $ax hist2d density range = [{min_hist2d_box}, {max_hist2d_box}]')";
 	return 0 if $plot->{'show.colorbar'} == 0;
+	my $opts = '';
+	foreach my $o (grep {defined $plot->{$_}} ('cblabel', 'cblocation', 'cborientation')) { #str
+		my $mpl_opt = $o;
+		$mpl_opt =~ s/^cb//;
+		$opts .= ", $mpl_opt = '$plot->{$o}'";
+	}
+	foreach my $o (grep {defined $plot->{$_}} ('cbdrawedges', 'cbpad')) { # numeric
+		die "$o = $plot->{$o} must be numeric" unless (looks_like_number($plot->{$o}));
+		my $mpl_opt = $o;
+		$mpl_opt =~ s/^cb//;
+		$opts .= ", $mpl_opt = $plot->{$o}";
+	}
+	$plot->{'colorbar.on'} = $plot->{'colorbar.on'} // 1;
+	if (($plot->{'colorbar.on'}) && (defined $plot->{'shared.colorbar'})) {
+		my @ax = map {"ax$_"} @{ $plot->{'shared.colorbar'} };
+		$opts .= ', ax = [' . join (',', @ax) . '] ';
+	}
+#	say { $args->{fh} } "cbar = fig.colorbar(im$ax $opts)" if $plot->{'colorbar.on'};
 	if ( defined $plot->{cblabel} ) {
-		say { $args->{fh} } "plt.colorbar(im$ax, label = '$plot->{cblabel}')";
+	  say { $args->{fh} } "plt.colorbar(im$ax, label = '$plot->{cblabel}' $opts)";
 	} else {
-		say { $args->{fh} } "plt.colorbar(im$ax, label = 'Density')";
+	  say { $args->{fh} } "plt.colorbar(im$ax, label = 'Density' $opts)";
 	}
 }
 
@@ -1149,6 +1182,11 @@ sub imshow_helper {
 	  p @undef_args;
 	  die
 	"The above arguments aren't defined for $plot->{'plot.type'} in $current_sub";
+	}
+	my $data_ref = ref $plot->{data};
+	unless ($data_ref eq 'ARRAY') {
+		p $args;
+		die "$current_sub can only accept 2-D arrays as input in \"data\", but received $data_ref";
 	}
 	my $non_numeric_data = 0;
 	foreach my $row (@{ $plot->{data} }) {
@@ -1341,7 +1379,7 @@ sub plot_helper {
 			say { $args->{fh} } "ax$args->{ax}.plot(x, y $options) # " . __LINE__;
 			$arr_i++;
 		}
-		return 0; # the rest only applies if $plot->{data} is a hash
+		return 1; # the rest only applies if $plot->{data} is a hash
 	}
 	my @key_order;
 	if ( defined $plot->{'key.order'} ) {
@@ -1404,7 +1442,7 @@ sub plot_helper {
 		}
 		say { $args->{fh} } "ax$args->{ax}.plot(x, y $label $options) # " . __LINE__;
 	}
-	return 0;
+	return 1;
 }
 
 sub scatter_helper {
@@ -1561,6 +1599,41 @@ sub scatter_helper {
 	}
 }
 
+sub venn_helper {
+	my ($args) = @_;
+	my $current_sub = ( split( /::/, ( caller(0) )[3] ) )[-1]
+	; # https://stackoverflow.com/questions/2559792/how-can-i-get-the-name-of-the-current-subroutine-in-perl
+	unless ( ref $args eq 'HASH' ) {
+		die "args must be given as a hash ref, e.g. \"$current_sub({ data => \@blah })\"";
+	}
+	my @reqd_args = (
+	  'fh',      # e.g. $py, $fh, which will be passed by the subroutine
+	  'plot',    # args to original function
+	);
+	my @undef_args = grep { !defined $args->{$_} } @reqd_args;
+	if ( scalar @undef_args > 0 ) {
+	  p @undef_args;
+	  die 'the above args are necessary, but were not defined.';
+	}
+	my @opt = (@ax_methods, @plt_methods, @fig_methods, @arg, 'ax', @{ $opt{$current_sub} });
+	my $plot      = $args->{plot};
+	my @undef_opt = grep {
+	  my $key = $_;
+	  not grep { $_ eq $key } @opt
+	} keys %{$plot};
+	if ( scalar @undef_opt > 0 ) {
+		p @undef_opt;
+		die "The above arguments aren't defined for $plot->{'plot.type'} using $current_sub";
+	}
+	my $data_ref = ref $plot->{data};
+	unless ($data_ref eq 'HASH') {
+		p $args;
+		die "Data ref to $current_sub is \"$data_ref\", but must be \"HASH\"";
+	}
+	my $n_keys = scalar keys %{ $plot->{data} };
+	
+}
+
 sub violin_helper {
 	my ($args) = @_;
 	my $current_sub = ( split( /::/, ( caller(0) )[3] ) )[-1]
@@ -1604,7 +1677,7 @@ sub violin_helper {
 	$plot->{whiskers} = $plot->{whiskers} // 1;
 	$plot->{edgecolor} = $plot->{edgecolor} // 'black';
 	my $options = '';    # these args go to the plt.hist call
-	if ( ( defined $plot->{'log'} ) && ( $plot->{'log'} > 0 ) ) {
+	if ( $plot->{'log'} ) {
 	  $options .= ', log = True';
 	}
 	say { $args->{fh} } 'd = []';
@@ -1636,13 +1709,13 @@ sub violin_helper {
 	} else {
 		say { $args->{fh} } 'for pc in vp["bodies"]:';
 		if ( defined $plot->{color} ) {
-			print { $args->{fh} } "\tpc.set_facecolor('$plot->{color}')\n";
+			say { $args->{fh} } "\tpc.set_facecolor('$plot->{color}')";
 		}
-		print { $args->{fh} } "\tpc.set_edgecolor('black')\n";
+		say { $args->{fh} } "\tpc.set_edgecolor('black')";
 
 		#		say {$args->{fh}} "\tpc.set_alpha(1)";
 	}
-	if ( $plot->{whiskers} > 0 ) {
+	if ( $plot->{whiskers} ) {
 	 # https://matplotlib.org/stable/gallery/statistics/customized_violin.html
 	  say { $args->{fh} } 'import numpy as np';
 	  say { $args->{fh} } 'def adjacent_values(vals, q1, q3):';
@@ -1945,7 +2018,7 @@ sub plt {
 		p $args;
 		die '"data" is an empty hash';
 	}
-	@bad_args = grep {defined $args->{$_} && (not looks_like_number($args->{$_}))} ('ncols', 'nrows', 'scale', 'scalex', 'scaley');
+	@bad_args = grep {defined $args->{$_} && (not looks_like_number($args->{$_}))} ('cbpad', 'ncols', 'nrows', 'scale', 'scalex', 'scaley');
 	if (scalar @bad_args > 0) {
 		p $args;
 		p @bad_args;
@@ -1991,10 +2064,11 @@ sub plt {
 	say 'temp file is ' . $fh->filename;
 	say $fh 'import matplotlib.pyplot as plt';
 	if ( $single_plot == 0 ) {
-		$args->{sharex} = $args->{sharex} // 'False';
+		$args->{sharex} = $args->{sharex} // 0;
+		$args->{sharey} = $args->{sharey} // 0;
 		say $fh 'fig, ('
 		 . join( ',', @py )
-		 . ") = plt.subplots($args->{nrows}, $args->{ncols}, sharex = $args->{sharex}, layout = 'constrained') #" . __LINE__;
+		 . ") = plt.subplots($args->{nrows}, $args->{ncols}, sharex = $args->{sharex}, sharey = $args->{sharey}, layout = 'constrained') #" . __LINE__;
 	} elsif ( $single_plot == 1 ) {
 		say $fh 'fig, ax0 = plt.subplots(1,1, layout = "constrained")';
 	} else {
@@ -2634,6 +2708,8 @@ sub wide { # a wrapper to simplify calling
 Take a data structure in Perl, and automatically write a Python3 script using matplotlib to generate an image.  The Python3 script is saved in C</tmp>, to be edited at the user's discretion.
 Requires python3 and matplotlib installations.
 
+My aim is to simplify the most common tasks as much as possible.  In my opinion, using this module is much easier than matplotlib itself.
+
 =head1 Single Plots
 
 Simplest use case:
@@ -2709,6 +2785,42 @@ which produces the following subplots image:
 
 
 C<bar>, C<barh>, C<boxplot>, C<hexbin>, C<hist>, C<hist2d>, C<imshow>, C<pie>, C<plot>, C<scatter>, and C<violinplot> all match the methods in matplotlib itself.
+
+=head2 Options
+
+C<sharex> and C<sharey> are both implemented at the plot, rather than subplot, level.  See Matplotlib's documentation for more clarity.
+
+=head1 Color Bars (colorbars)
+
+Colarbar args attempt to match matplotlib closely
+
+=for html
+<table>
+<tbody>
+<tr><td>Option</td><td>Description</td><td>Example</td></tr>
+<tr><td>--------</td><td>-------</td><td>------- </td></tr>
+<tr><td><code>cbdrawedges</code></td><td>Whether to draw lines at color boundaries</td><td><code>cbdrawedges => 1</code></td></tr>
+<tr><td><code>cblabel</code></td><td>The label on the colorbar's long axis</td><td><code>cblabel => 1</code></td></tr>
+<tr><td><code>cblocation</code></td><td>of the colorbar None or {'left', 'right', 'top', 'bottom'}</td><td></td></tr>
+<tr><td><code>cborientation</code></td><td># None or {<code>vertical</code>, <code>horizontal</code>}</td><td></td></tr>
+<tr><td><code>cbpad</code></td><td>pad : float, default: 0.05 if vertical, 0.15 if horizontal; Fraction of original Axes between colorbar and new image Axes</td><td></td></tr>
+<tr><td><code>cb_logscale</code></td><td>Perl true (anything but 0) or false (0)</td><td></td></tr>
+<tr><td><code>shared.colorbar</code></td><td>share colorbar between different plots: specify plot indices</td><td><code>'shared.colorbar' => [0,1]</code></td></tr>
+</tbody>
+</table>
+
+=head1 Size/Dimensions of output file
+
+=for html
+<table>
+<tbody>
+<tr><td>Option</td><td>Description</td><td>Example</td></tr>
+<tr><td>--------</td><td>-------</td><td>-------</td></tr>
+<tr><td><code>scale</code></td><td>scale/multiply the size of the output figure</td><td><code>scale => 2.4</code></td></tr>
+<tr><td><code>scalex</code></td><td>scale/multiply the x-axis only</td><td><code>scalex => 2.4</code></td></tr>
+<tr><td><code>scaley</code></td><td>scale/multiply the y-axis only</td><td><code>scalex => 1.4</code></td></tr>
+</tbody>
+</table>
 
 =head1 Examples/Plot Types
 

@@ -1,0 +1,1 @@
+{"id": 2003, "name": "test-record", "type": "A", "value": "192.168.1.100", "ttl": 300, "gtdLocation": "DEFAULT", "source": 1, "sourceId": 100001, "dynamicDns": false, "failed": false, "failover": false, "monitor": false, "hardLink": false}

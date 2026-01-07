@@ -14,7 +14,7 @@ use constant milli_to_nano => 1_000_000;
 
 use DateTime::Format::Natural::Helpers qw(%flag);
 
-our $VERSION = '1.72';
+our $VERSION = '1.73';
 
 our (%init,
      %timespan,
@@ -47,10 +47,10 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
 
 %re = (number   => qr/(\d+)/,
        year     => qr/(\d{4})/,
-       time     => qr/((?:\d{1,2})(?:\:\d{2}(?:\:\d{2}(?:\.\d{3})?)?)?)/,
-       time_am  => qr/((?:\d{1,2})(?:\:\d{2}(?:\:\d{2}(?:\.\d{3})?)?)?)am/i,
-       time_pm  => qr/((?:\d{1,2})(?:\:\d{2}(?:\:\d{2}(?:\.\d{3})?)?)?)pm/i,
-       time_min => qr/(\d{1,2}\:\d{2}(?:\:\d{2}(?:\.\d{3})?)?)/,
+       time     => qr/((?:\d{1,2})(?:([:\.])\d{2}(?:\2\d{2}(?:\.\d{3})?)?)?)/,
+       time_am  => qr/((?:\d{1,2})(?:([:\.])\d{2}(?:\2\d{2}(?:\.\d{3})?)?)?)a\.?m\.?/i,
+       time_pm  => qr/((?:\d{1,2})(?:([:\.])\d{2}(?:\2\d{2}(?:\.\d{3})?)?)?)p\.?m\.?/i,
+       time_min => qr/(\d{1,2}([:\.])\d{2}(?:\2\d{2}(?:\.\d{3})?)?)/,
        day      => qr/(\d+)($suffixes{ordinal})?/i,
        monthday => qr/(\d{1,2})($suffixes{ordinal})?/i);
 {
@@ -134,8 +134,8 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
         },
         from_count_to_count => {
             regexes => {
-                time_meridiem => qr/\d{1,2}(?:\:\d{2}){0,2}(?:\s*?(?:am|pm))/i,
-                time          => qr/\d{1,2}(?:\:\d{2}){1,2}/,
+                time_meridiem => qr/\d{1,2}(?:[:\.]\d{2}){0,2}(?:\s*?(?:a\.?m\.?|p\.?m\.?))/i,
+                time          => qr/\d{1,2}(?:[:\.]\d{2}){1,2}/,
                 day_ordinal   => qr/\d{1,3}(?:$suffixes{ordinal})/i,
                 day           => qr/\d{1,3}/,
             },
@@ -203,7 +203,7 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
     {
         my ($first_stack, $rest_stack, $pos, $error) = @_;
 
-        my ($hour) = split /:/, $first_stack->{$pos->[0]};
+        my ($hour) = split /[:\.]/, $first_stack->{$pos->[0]};
 
         if ($hour == 0) {
             $$error = 'hour zero must be literal 12';
@@ -4882,7 +4882,9 @@ also parsable with precision in (milli)seconds):
  4pm
  4:20pm
  06:56:06 am
+ 06.56.06 am
  06:56:06 pm
+ 06.56.06 pm
  mon 2:35
  1:00 sun
  1am sun
@@ -4891,7 +4893,11 @@ also parsable with precision in (milli)seconds):
  1am on sun
  1pm on sun
  12:14 PM
+ 12.14 P.M.
+ 12.14 P.M
  12:14 AM
+ 12:14 A.M.
+ 12:14 A.M
 
 =head2 Complex
 
@@ -5102,6 +5108,9 @@ also parsable with precision in (milli)seconds):
  18 oct 5 pm
  dec 25
  feb 28 3:00
+ feb 28 3.00 pm
+ feb 28 3.00 p.m.
+ feb 28 3.00.15 a.m
  feb 28 3am
  feb 28 3pm
  feb 28 3 am
@@ -5119,6 +5128,7 @@ also parsable with precision in (milli)seconds):
  march 1st 2009
  October 2006
  february 14, 2004
+ Nov 24th 2006 17.00.00
  jan 3 2010
  3 jan 2000
  2010 october 28
@@ -5130,6 +5140,7 @@ also parsable with precision in (milli)seconds):
  3/1 16:00
  4:00
  17:00
+ 17.00
  3:20:00
  -5min
  +2d

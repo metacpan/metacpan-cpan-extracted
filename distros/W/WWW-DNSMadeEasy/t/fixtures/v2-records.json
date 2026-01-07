@@ -1,0 +1,4 @@
+{"data": [
+  {"id": 2001, "name": "www", "type": "A", "value": "192.168.1.1", "ttl": 300, "gtdLocation": "DEFAULT", "source": 1, "sourceId": 100001, "dynamicDns": false, "failed": false, "failover": false, "monitor": false, "hardLink": false},
+  {"id": 2002, "name": "mail", "type": "A", "value": "192.168.1.2", "ttl": 300, "gtdLocation": "DEFAULT", "source": 1, "sourceId": 100001, "dynamicDns": false, "failed": false, "failover": false, "monitor": false, "hardLink": false}
+]}

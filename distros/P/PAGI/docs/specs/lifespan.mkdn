@@ -73,12 +73,12 @@ The lifespan scope exists for the duration of the event loop.
 
 The scope information passed in `scope` contains basic metadata:
 
-- `type` (String) – `"lifespan"`.
-- `pagi["version"]` (String) – The version of the PAGI core spec that governs the worker.
-- `pagi["spec_version"]` (String) – The version of this lifespan sub-specification. Optional; if missing it defaults to `"0.2"`.
-- `pagi["is_worker"]` (Int, optional) – `1` if running as a worker in a multi-process deployment, `0` or absent for single-process mode. Applications can use this to avoid duplicate initialization (e.g., only print startup messages from worker 1).
-- `pagi["worker_num"]` (Int, optional) – Worker identifier (1, 2, 3, ...) in multi-process mode. Absent or `undef` for single-process mode. Combined with `is_worker`, applications can identify which worker they are running in.
-- `state` (HashRef, optional) – A namespace where the application can persist values to be copied into subsequent request scopes. Servers omit this key if the feature is unsupported.
+- `type` (String) - `"lifespan"`.
+- `pagi["version"]` (String) - The version of the PAGI core spec that governs the worker.
+- `pagi["spec_version"]` (String) - The version of this lifespan sub-specification. Optional; if missing it defaults to `"0.2"`.
+- `pagi["is_worker"]` (Int, optional) - `1` if running as a worker in a multi-process deployment, `0` or absent for single-process mode. Applications can use this to avoid duplicate initialization (e.g., only print startup messages from worker 1).
+- `pagi["worker_num"]` (Int, optional) - Worker identifier (1, 2, 3, ...) in multi-process mode. Absent or `undef` for single-process mode. Combined with `is_worker`, applications can identify which worker they are running in.
+- `state` (HashRef, optional) - A namespace where the application can persist values to be copied into subsequent request scopes. Servers omit this key if the feature is unsupported.
 
 If an exception is raised when calling the application coderef with a
 `lifespan.startup` message (or when a `lifespan` scope is created), the server must cease sending further lifespan events for that worker. The server should log the error and may either exit or continue starting without lifespan support, depending on operator configuration. Applications that wish to prevent startup entirely should explicitly send `lifespan.startup.failed` with a message.
@@ -119,7 +119,7 @@ but before it has started to do so.
 
 **Keys**:
 
-- `type` (String) – `"lifespan.startup"`.
+- `type` (String) - `"lifespan.startup"`.
 
 ## Startup Complete - `send` event
 
@@ -128,7 +128,7 @@ must wait for this message before it starts processing connections.
 
 **Keys**:
 
-- `type` (String) – `"lifespan.startup.complete"`.
+- `type` (String) - `"lifespan.startup.complete"`.
 
 ## Startup Failed - `send` event
 
@@ -137,8 +137,8 @@ sees this it should log/print the message provided and then exit.
 
 **Keys**:
 
-- `type` (String) – `"lifespan.startup.failed"`.
-- `message` (String) – Optional; if missing defaults to `""`.
+- `type` (String) - `"lifespan.startup.failed"`.
+- `message` (String) - Optional; if missing defaults to `""`.
 
 ## Shutdown - `receive` event
 
@@ -147,7 +147,7 @@ all active connections.
 
 **Keys**:
 
-- `type` (String) –  `"lifespan.shutdown"`.
+- `type` (String) -  `"lifespan.shutdown"`.
 
 ## Shutdown Complete - `send` event
 
@@ -156,7 +156,7 @@ must wait for this message before terminating.
 
 **Keys**:
 
-- `type` (String) – `"lifespan.shutdown.complete"`.
+- `type` (String) - `"lifespan.shutdown.complete"`.
 
 ## Shutdown Failed - `send` event
 
@@ -165,14 +165,14 @@ sees this it should log/print the message provided and then terminate.
 
 **Keys**:
 
-- `type` (String) – `"lifespan.shutdown.failed"`.
-- `message` (String) – Optional; if missing defaults to `""`.
+- `type` (String) - `"lifespan.shutdown.failed"`.
+- `message` (String) - Optional; if missing defaults to `""`.
 
 ## Version History
 
-- 0.1 (Draft)
+- 0.2 (Draft): Added is_worker and worker_num fields for multi-worker support
+- 0.1 (Draft): Initial lifespan specification
 
 ## Copyright
 
 This document has been placed in the public domain.
-

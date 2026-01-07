@@ -1,0 +1,57 @@
+[
+  {
+    "id": "acoustic_guitar",
+    "name": "Acoustic Guitar",
+    "description": "A playable acoustic guitar used to attract ARC's attention.",
+    "rarity": "legendary",
+    "type": "quick use",
+    "foundIn": [],
+    "value": 7000,
+    "icon": "/arc/icons/acoustic_guitar.webp",
+    "updatedAt": "2025-12-28T14:24:01.035Z"
+  },
+  {
+    "id": "wires",
+    "name": "Wires",
+    "description": "Electrical wiring components.",
+    "rarity": "uncommon",
+    "type": "component",
+    "foundIn": ["ARC"],
+    "value": 200,
+    "icon": "/arc/icons/wires.webp",
+    "updatedAt": "2025-12-20T10:00:00.000Z"
+  },
+  {
+    "id": "metal_parts",
+    "name": "Metal Parts",
+    "description": "Scrap metal useful for crafting.",
+    "rarity": "common",
+    "type": "component",
+    "foundIn": ["ARC", "raider"],
+    "value": 75,
+    "icon": "/arc/icons/metal_parts.webp",
+    "updatedAt": "2025-12-20T10:00:00.000Z"
+  },
+  {
+    "id": "rattler_iii",
+    "name": "Rattler III",
+    "description": "A reliable assault rifle with fully-automatic firing.",
+    "rarity": "common",
+    "type": "weapon",
+    "foundIn": [],
+    "value": 2500,
+    "icon": "/arc/icons/rattler_iii.webp",
+    "updatedAt": "2025-11-15T08:30:00.000Z"
+  },
+  {
+    "id": "medium_ammo",
+    "name": "Medium Ammo",
+    "description": "Standard ammunition for assault and battle rifles.",
+    "rarity": null,
+    "type": "ammo",
+    "foundIn": ["ARC"],
+    "value": 4,
+    "icon": "/arc/icons/medium_ammo.webp",
+    "updatedAt": "2025-10-01T12:00:00.000Z"
+  }
+]

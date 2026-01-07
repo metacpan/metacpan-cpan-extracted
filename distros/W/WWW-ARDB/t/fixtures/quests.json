@@ -1,0 +1,41 @@
+[
+  {
+    "id": "picking_up_the_pieces",
+    "title": "Picking Up The Pieces",
+    "description": "Help repair infrastructure after the storm.",
+    "maps": [
+      {"id": "dam", "name": "Dam Battlegrounds"},
+      {"id": "spaceport", "name": "The Spaceport"}
+    ],
+    "steps": [
+      {"title": "Loot containers", "amount": 3}
+    ],
+    "trader": {
+      "id": "shani",
+      "name": "Shani",
+      "type": "Security"
+    },
+    "requiredItems": [],
+    "xpReward": 0,
+    "updatedAt": "2025-10-31T12:00:00.000Z"
+  },
+  {
+    "id": "supply_run",
+    "title": "Supply Run",
+    "description": "Gather supplies from the wasteland.",
+    "maps": [
+      {"id": "buried-city", "name": "Buried City"}
+    ],
+    "steps": [
+      {"title": "Find supply crates", "amount": 5}
+    ],
+    "trader": {
+      "id": "marcus",
+      "name": "Marcus",
+      "type": "Merchant"
+    },
+    "requiredItems": [],
+    "xpReward": 100,
+    "updatedAt": "2025-11-05T14:00:00.000Z"
+  }
+]

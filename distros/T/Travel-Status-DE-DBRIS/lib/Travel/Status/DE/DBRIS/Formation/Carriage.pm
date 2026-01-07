@@ -8,7 +8,7 @@ use utf8;
 use parent 'Class::Accessor';
 use Carp qw(cluck);
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 Travel::Status::DE::DBRIS::Formation::Carriage->mk_ro_accessors(
 	qw(class_type is_closed is_dosto is_locomotive is_powercar
 	  number model section uic_id type
@@ -83,14 +83,16 @@ sub new {
 	$ref->{has_first_class}  = $json{type}{hasFirstClass};
 	$ref->{has_second_class} = $json{type}{hasEconomyClass};
 
-	if ( $ref->{type} =~ m{AB} ) {
-		$ref->{class_type} = 12;
-	}
-	elsif ( $ref->{type} =~ m{A} ) {
-		$ref->{class_type} = 1;
-	}
-	elsif ( $ref->{type} =~ m{B|WR} ) {
-		$ref->{class_type} = 2;
+	if ( $ref->{type} ) {
+		if ( $ref->{type} =~ m{AB} ) {
+			$ref->{class_type} = 12;
+		}
+		elsif ( $ref->{type} =~ m{A} ) {
+			$ref->{class_type} = 1;
+		}
+		elsif ( $ref->{type} =~ m{B|WR} ) {
+			$ref->{class_type} = 2;
+		}
 	}
 
 	my $pos             = $json{platformPosition};
@@ -147,6 +149,11 @@ sub parse_type {
 	my $type = $self->{type};
 	my @desc;
 
+	if ( not $type ) {
+		$self->{attributes} = [];
+		return;
+	}
+
 	if ( $type =~ m{^D} ) {
 		$self->{is_dosto} = 1;
 		push( @desc, 'Doppelstock' );
@@ -201,6 +208,9 @@ sub parse_type {
 sub is_first_class {
 	my ($self) = @_;
 
+	if ( not defined $self->{type} ) {
+		return;
+	}
 	if ( $self->{type} =~ m{^D?A} ) {
 		return 1;
 	}
@@ -210,6 +220,9 @@ sub is_first_class {
 sub is_second_class {
 	my ($self) = @_;
 
+	if ( not defined $self->{type} ) {
+		return;
+	}
 	if ( $self->{type} =~ m{^D?A?B} ) {
 		return 1;
 	}

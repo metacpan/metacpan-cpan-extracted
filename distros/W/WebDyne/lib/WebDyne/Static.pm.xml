@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<refentry version="5.2" xmlns="http://docbook.org/ns/docbook"><refmeta><refentrytitle>WebDyne::Static</refentrytitle><manvolnum>3pm</manvolnum></refmeta><refnamediv><refname>WebDyne::Static</refname><refpurpose>WebDyne module to flag pages as static and compile once to
-    HTML</refpurpose></refnamediv><refsynopsisdiv><programlisting>#  Sample time.psp compiled to static HTML. Every time this page is requested it will show
-#  the same time
+<refentry version="5.2" xmlns="http://docbook.org/ns/docbook"><refmeta><refentrytitle>WebDyne::Static</refentrytitle><manvolnum>3pm</manvolnum></refmeta><refnamediv><refname>WebDyne::Static</refname><refpurpose>WebDyne module to flag pages as static and compile once to HTML</refpurpose></refnamediv><refsynopsisdiv><programlisting>#  Sample time.psp compiled to static HTML. Every time this page is requested it will show
+#  the same time - the time it was first run/compiled
 #
 &lt;start_html>
 This page was first loaded at &lt;? localtime ?>
 __PERL__
-use WebDyne::Static;</programlisting></refsynopsisdiv><refsection><title>DESCRIPTION</title><para>The WebDyne::Static module will flag that all dynamic components of
-    a page should be run at compile time, and the resulting HTML saved as a
-    static file which will be served on subsequent requests.</para><para>The WebDyne framework will monitor for changes in the source file
-    and recompile to a new HTML if the source .psp file is updated.</para></refsection><refsection><title>METHODS</title><variablelist><varlistentry><term>static()</term><listitem><para>Get or set the static attribute for this page. When setting
-          the static attribute for a page it is only set for that instance of
-          the page. To set a page as permanently static (except on source file
-          update) use the WebDyne::Static module as per synopsis, or update
-          the meta data via $self->meta->{'static'}=1;</para></listitem></varlistentry></variablelist></refsection><refsection><title>OPTIONS</title><para>WebDyne::Static does not expose any options to the import function
-    when called via use.</para></refsection><refsection><title>AUTHOR</title><para>Andrew Speer &lt;andrew.speer@isolutions.com.au> and
-    contributors.</para></refsection><refsection><title>LICENSE and COPYRIGHT</title><para>This file is part of WebDyne.</para><para>This software is copyright (c) 2025 by Andrew Speer &lt;andrew.speer@isolutions.com.au>.</para><para>This is free software; you can redistribute it and/or modify it underthe same terms as the Perl 5 programming language system itself.</para><para>Full license text is available at:</para><para>&lt;http://dev.perl.org/licenses/></para></refsection></refentry>
+use WebDyne::Static;</programlisting></refsynopsisdiv><refsection><title>DESCRIPTION</title><para>The WebDyne::Static module will flag that all dynamic components of a page should be run at compile time, and the resulting HTML saved as a static file which will be served on
+    subsequent requests.</para><para>The WebDyne framework will monitor for changes in the source file and recompile to a new HTML if the source .psp file is updated.</para></refsection><refsection><title>METHODS</title><variablelist><varlistentry><term>static()</term><listitem><para>Get or set the static attribute for this page. When setting the static attribute for a page it is only set for that instance of the page. To set a page as permanently static
+          (except on source file update) use the WebDyne::Static module as per synopsis, or update the meta data via $self->meta->{'static'}=1;</para></listitem></varlistentry></variablelist></refsection><refsection><title>OPTIONS</title><para>WebDyne::Static does not expose any options to the import function when called via use.</para></refsection><refsection><title>AUTHOR</title><para>Andrew Speer &lt;andrew.speer@isolutions.com.au> and contributors.</para></refsection><refsection><title>LICENSE and COPYRIGHT</title><para>This file is part of WebDyne.</para><para>This software is copyright (c) 2026 by Andrew Speer &lt;andrew.speer@isolutions.com.au>.</para><para>This is free software; you can redistribute it and/or modify it underthe same terms as the Perl 5 programming language system itself.</para><para>Full license text is available at:</para><para>&lt;http://dev.perl.org/licenses/></para></refsection></refentry>

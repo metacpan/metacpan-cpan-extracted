@@ -453,11 +453,21 @@ sub _apply_paths {
     my ($value) = @_;
 
     if (!ref $value || ref($value) eq 'JSON::PP::Boolean') {
-        return [ [] ];
+        return [];
     }
 
     my @paths;
     _collect_paths($value, [], \@paths);
+    return \@paths;
+}
+
+sub _apply_scalar_paths {
+    my ($value) = @_;
+
+    return [] if _is_scalar_value($value);
+
+    my @paths;
+    _collect_scalar_paths($value, [], \@paths);
     return \@paths;
 }
 
@@ -479,6 +489,13 @@ sub _validate_path_array {
     $caller //= 'getpath';
 
     die "$caller(): path must be an array" if ref($path) ne 'ARRAY';
+
+    for my $segment (@$path) {
+        my $is_boolean = ref($segment) && ref($segment) eq 'JSON::PP::Boolean';
+
+        die "$caller(): path elements must be defined" if !defined $segment;
+        die "$caller(): path elements must be scalars" if ref($segment) && !$is_boolean;
+    }
 
     return [ @$path ];
 }
@@ -738,6 +755,26 @@ sub _normalize_array_index_for_set {
     return $index;
 }
 
+sub _normalize_array_index_for_get {
+    my ($segment, $length) = @_;
+
+    return undef if !defined $segment;
+
+    if (ref($segment) eq 'JSON::PP::Boolean') {
+        $segment = $segment ? 1 : 0;
+    }
+
+    return undef if ref $segment;
+    return undef if $segment !~ /^-?\d+$/;
+
+    my $index = int($segment);
+    $index += $length if $index < 0;
+
+    return undef if $index < 0;
+
+    return $index;
+}
+
 sub _ensure_array_length {
     my ($array_ref, $index) = @_;
 
@@ -780,6 +817,40 @@ sub _collect_paths {
     push @$paths, [@$current_path];
 }
 
+sub _collect_scalar_paths {
+    my ($value, $current_path, $paths) = @_;
+
+    if (ref $value eq 'HASH') {
+        for my $key (sort keys %$value) {
+            my $child = $value->{$key};
+            my @next  = (@$current_path, $key);
+
+            if (_is_scalar_value($child)) {
+                push @$paths, [@next];
+            }
+            elsif (ref $child eq 'HASH' || ref $child eq 'ARRAY') {
+                _collect_scalar_paths($child, \@next, $paths);
+            }
+        }
+        return;
+    }
+
+    if (ref $value eq 'ARRAY') {
+        for my $index (0 .. $#$value) {
+            my $child = $value->[$index];
+            my @next  = (@$current_path, $index);
+
+            if (_is_scalar_value($child)) {
+                push @$paths, [@next];
+            }
+            elsif (ref $child eq 'HASH' || ref $child eq 'ARRAY') {
+                _collect_scalar_paths($child, \@next, $paths);
+            }
+        }
+        return;
+    }
+}
+
 sub _traverse_path_array {
     my ($value, $path) = @_;
 
@@ -792,25 +863,21 @@ sub _traverse_path_array {
         return undef unless defined $cursor;
 
         if (ref $cursor eq 'HASH') {
-            my $key = defined $segment ? "$segment" : return undef;
+            my $key = _coerce_hash_key($segment);
+            return undef unless defined $key;
             return undef unless exists $cursor->{$key};
             $cursor = $cursor->{$key};
             next;
         }
 
         if (ref $cursor eq 'ARRAY') {
-            return undef unless defined $segment;
+            my $index = _normalize_array_index_for_get($segment, scalar @$cursor);
+            return undef unless defined $index;
 
-            my $index = "$segment";
-            if ($index =~ /^-?\d+$/) {
-                my $numeric = int($index);
-                $numeric += @$cursor if $numeric < 0;
-                return undef if $numeric < 0 || $numeric > $#$cursor;
-                $cursor = $cursor->[$numeric];
-                next;
-            }
+            return undef if $index > $#$cursor;
 
-            return undef;
+            $cursor = $cursor->[$index];
+            next;
         }
 
         return undef;
@@ -863,6 +930,10 @@ sub _is_leaf_value {
     return 0 if ref($value) eq 'ARRAY';
     return 0 if ref($value) eq 'HASH';
     return 1;
+}
+
+sub _is_scalar_value {
+    return _is_leaf_value(@_);
 }
 
 1;

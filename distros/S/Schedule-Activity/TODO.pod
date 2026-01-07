@@ -26,7 +26,9 @@ The following are planned as part of the 0.3.0 release.
 
 =item Per-activity goals (done)
 
-=item Script incremental build supports configuration overwrite (todo)
+=item Script incremental build supports configuration overwrite (done)
+
+=item Goals support attribute weighting (done)
 
 =item Automatic attributes per node (maybe)
 
@@ -38,7 +40,7 @@ The following are planned as part of the 0.3.0 release.
 
 Scheduling goals are available starting with 0.2.4.  Only attribute-based, average value goals seeking is planned at this time.
 
-Per-activity goals are experimental starting with 0.2.7.  Support from the commandline is being considered.
+Per-activity goals are experimental starting with 0.2.7.  Commandline support and attribute weighting is available with 0.2.8.
 
 =head2 Attributes
 
@@ -46,7 +48,7 @@ Attribute recomputation is supported starting with 0.2.2, primarily for merged a
 
 Attribute average values are available for goals starting with 0.2.5, which also cleaned up behavioral questions about initial average values, and averages during time overlaps.  See L<Schedule::Activity/Consistency>.
 
-Attribute reporting supports many different output formats starting in 0.2.7.  Support for all options from the commandline is still pending.
+Attribute reporting supports many different output formats starting in 0.2.7.
 
 JSON output from the script is being considered, and would include JSON renderings of the attribute outputs.
 

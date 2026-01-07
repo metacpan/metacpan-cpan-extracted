@@ -1,0 +1,9 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    "# Both should work#"
+    <pre> @0.1.1
+      "Hello: ${name}"
+    <pre> @0.1.2
+      "Hello: ${name}"
+    "__PERL__use Data::Dumper;sub handler { my ($self, $param)=@_; ret..."

@@ -62,6 +62,8 @@ examples/12-utf8/app.pl
 examples/13-contact-form/README.md
 examples/13-contact-form/app.pl
 examples/13-contact-form/public/index.html
+examples/14-lifespan-utils/README.md
+examples/14-lifespan-utils/app.pl
 examples/README.md
 examples/app-01-file/README.md
 examples/app-01-file/app.pl
@@ -82,6 +84,8 @@ examples/endpoint-router-demo/app.pl
 examples/endpoint-router-demo/lib/MyApp/API.pm
 examples/endpoint-router-demo/lib/MyApp/Main.pm
 examples/endpoint-router-demo/public/index.html
+examples/full-demo/README.md
+examples/full-demo/app.pl
 examples/sse-dashboard/README.md
 examples/sse-dashboard/app.pl
 examples/sse-dashboard/public/index.html
@@ -180,6 +184,7 @@ lib/PAGI/Test/Response.pm
 lib/PAGI/Test/SSE.pm
 lib/PAGI/Test/WebSocket.pm
 lib/PAGI/Tutorial.pod
+lib/PAGI/Utils.pm
 lib/PAGI/WebSocket.pm
 t/00-load.t
 t/01-hello-http.t
@@ -330,6 +335,7 @@ t/test-client/08-exception-handling.t
 t/tls-optional.t
 t/tutorial.t
 t/utf8/01-raw-utf8.t
+t/utils-lifespan.t
 t/websocket-heartbeat.t
 t/websocket-state.t
 t/websocket/01-constructor.t

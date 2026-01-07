@@ -2,8 +2,8 @@ NAME
     App::FindUtils - Utilities related to finding files
 
 VERSION
-    This document describes version 0.005 of App::FindUtils (from Perl
-    distribution App-FindUtils), released on 2025-11-26.
+    This document describes version 0.007 of App::FindUtils (from Perl
+    distribution App-FindUtils), released on 2026-01-05.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -39,6 +39,10 @@ FUNCTIONS
         this e.g. to find duplicate in some part of the filename. As an
         alternative, see the "--regex" option.
 
+    *   exclude_directories => *bool*
+
+        Exclude directories.
+
     *   exclude_filename_regex => *re_from_str*
 
         Filename regex to exclude.
@@ -49,6 +53,9 @@ FUNCTIONS
         first capture $1 will be used to compare for duplicate instead of
         the original name. You can use this to find duplicate in some part
         of the filename. As an alternative, see the "--eval" option.
+
+        If regex does not match or if there is no capture, the filename will
+        be used instead as the fallback.
 
     Returns an enveloped result (an array).
 
@@ -95,7 +102,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2026, 2025 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

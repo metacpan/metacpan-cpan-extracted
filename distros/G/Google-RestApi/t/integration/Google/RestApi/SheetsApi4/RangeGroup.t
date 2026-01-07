@@ -5,7 +5,7 @@ use Test::Most tests => 8;
 use aliased "Google::RestApi::SheetsApi4::RangeGroup";
 
 # use Carp::Always;
-# init_logger($DEBUG);
+init_logger;
 
 delete_all_spreadsheets(sheets_api());
 

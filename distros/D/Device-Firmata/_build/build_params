@@ -1,0 +1,141 @@
+do{ my $x = [
+       {
+         'ARGV' => []
+       },
+       {},
+       {
+         'PL_files' => undef,
+         '_added_to_INC' => [],
+         'allow_mb_mismatch' => 0,
+         'allow_pureperl' => 0,
+         'auto_configure_requires' => 1,
+         'autosplit' => undef,
+         'base_dir' => '/home/highlander/perl/perl-firmata',
+         'bindoc_dirs' => [
+                            'blib/script'
+                          ],
+         'blib' => 'blib',
+         'build_bat' => 0,
+         'build_class' => 'Module::Build',
+         'build_elements' => [
+                               'PL',
+                               'support',
+                               'pm',
+                               'xs',
+                               'share_dir',
+                               'pod',
+                               'script'
+                             ],
+         'build_requires' => {
+                               'Test::More' => 0
+                             },
+         'build_script' => 'Build',
+         'bundle_inc' => [],
+         'bundle_inc_preload' => [],
+         'c_source' => undef,
+         'config' => undef,
+         'config_dir' => '_build',
+         'configure_requires' => {},
+         'conflicts' => {},
+         'cover' => undef,
+         'cpan_client' => 'cpan',
+         'create_license' => undef,
+         'create_makefile_pl' => 0,
+         'create_packlist' => 1,
+         'create_readme' => 0,
+         'debug' => undef,
+         'debugger' => undef,
+         'destdir' => undef,
+         'dist_abstract' => 'module for controlling Firmata devices',
+         'dist_author' => [
+                            'Aki Mimoto <amimoto@cpan.org>',
+                            'Norbert Truchsess <ntruchses@cpan.org>',
+                            'Jens B. <jnsbyr@cpan.org>'
+                          ],
+         'dist_name' => 'Device-Firmata',
+         'dist_suffix' => undef,
+         'dist_version' => '0.70',
+         'dist_version_from' => 'lib/Device/Firmata.pm',
+         'distribution_type' => 'module',
+         'dynamic_config' => 1,
+         'extra_compiler_flags' => [],
+         'extra_linker_flags' => [],
+         'extra_manify_args' => undef,
+         'get_options' => {},
+         'has_config_data' => undef,
+         'html_css' => '',
+         'include_dirs' => [],
+         'install_base' => undef,
+         'install_base_relpaths' => {},
+         'install_path' => {},
+         'install_sets' => {},
+         'installdirs' => 'site',
+         'libdoc_dirs' => [
+                            'blib/lib',
+                            'blib/arch'
+                          ],
+         'license' => 'perl_5',
+         'magic_number' => undef,
+         'mb_version' => '0.4234',
+         'meta_add' => {},
+         'meta_merge' => {
+                           'resources' => {
+                                            'bugtracker' => 'https://github.com/ntruchsess/perl-firmata/issues',
+                                            'repository' => 'https://github.com/ntruchsess/perl-firmata/'
+                                          }
+                         },
+         'metafile' => 'META.yml',
+         'metafile2' => 'META.json',
+         'module_name' => 'Device::Firmata',
+         'mymetafile' => 'MYMETA.yml',
+         'mymetafile2' => 'MYMETA.json',
+         'needs_compiler' => !!0,
+         'orig_dir' => '/home/highlander/perl/perl-firmata',
+         'original_prefix' => {},
+         'perl' => '/usr/bin/perl',
+         'pm_files' => undef,
+         'pod_files' => undef,
+         'pollute' => undef,
+         'prefix' => undef,
+         'prefix_relpaths' => {},
+         'prereq_action_types' => [
+                                    'requires',
+                                    'build_requires',
+                                    'test_requires',
+                                    'conflicts',
+                                    'recommends'
+                                  ],
+         'program_name' => undef,
+         'pureperl_only' => 0,
+         'quiet' => undef,
+         'recommends' => {},
+         'recurse_into' => [],
+         'recursive_test_files' => undef,
+         'release_status' => 'stable',
+         'requires' => {
+                         'Device::SerialPort' => 0,
+                         'Exporter' => 0,
+                         'IO::Select' => 0,
+                         'IO::Socket::INET' => 0,
+                         'Time::HiRes' => 0,
+                         'strict' => 0,
+                         'warnings' => 0
+                       },
+         'script_files' => undef,
+         'scripts' => undef,
+         'share_dir' => undef,
+         'sign' => undef,
+         'tap_harness_args' => {},
+         'test_file_exts' => [
+                               '.t'
+                             ],
+         'test_files' => undef,
+         'test_requires' => {},
+         'use_rcfile' => 1,
+         'use_tap_harness' => 0,
+         'verbose' => undef,
+         'version' => '0.70',
+         'xs_files' => undef
+       }
+     ];
+$x; }

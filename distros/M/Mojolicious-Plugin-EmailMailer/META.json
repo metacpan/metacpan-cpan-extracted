@@ -4,7 +4,7 @@
       "Luc Didry <ldidry@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,13 +32,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Email::Mailer" : "1.15",
-            "Email::Sender" : "1.300034",
+            "Email::Mailer" : "1.22",
+            "Email::Sender" : "2.601",
             "Hash::Merge" : "0",
-            "MIME::Words" : "0",
-            "Mojolicious" : "8.36",
-            "Try::Tiny" : "0.30",
-            "perl" : "5.02"
+            "MIME::Words" : "5.515",
+            "Mojolicious" : "9.34",
+            "Try::Tiny" : "0.31",
+            "perl" : "5.020"
          }
       }
    },
@@ -53,6 +53,6 @@
          "web" : "https://framagit.org/luc/mojolicious-plugin-emailmailer"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

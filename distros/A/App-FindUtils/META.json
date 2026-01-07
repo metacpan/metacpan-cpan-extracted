@@ -64,7 +64,7 @@
    "provides" : {
       "App::FindUtils" : {
          "file" : "lib/App/FindUtils.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/perlancar/perl-App-FindUtils"
       }
    },
-   "version" : "0.005",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040002"

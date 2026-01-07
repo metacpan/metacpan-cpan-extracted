@@ -3,9 +3,10 @@
    "author" : [
       "Adriano Ferreira <ferreira@cpan.org>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
    "license" : [
+      "unknown",
       "perl_5"
    ],
    "meta-spec" : {
@@ -30,19 +31,7 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "develop" : {
-         "requires" : {
-            "Test::Pod" : "1.18",
-            "Test::Pod::Coverage" : "1.04"
-         }
-      },
       "runtime" : {
-         "requires" : {
-            "File::Temp" : "0",
-            "perl" : "5.006001"
-         }
-      },
-      "test" : {
          "requires" : {
             "Test::More" : "0.82"
          }
@@ -50,12 +39,13 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/DrHyde/Devel-Hide/issues"
+      },
       "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/aferreira/cpan-Devel-Hide.git",
-         "web" : "https://github.com/aferreira/cpan-Devel-Hide"
+         "url" : "https://github.com/DrHyde/Devel-Hide"
       }
    },
-   "version" : "0.0015",
+   "version" : "0.0016",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

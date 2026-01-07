@@ -5,13 +5,15 @@ use v5.10;
 use parent qw( Tie::Cycle );
 use vars qw( $VERSION );
 
-$VERSION = '1.088';
+$VERSION = '1.091';
 
 sub TIESCALAR {
 	my $class = shift;
 	my $self = [ 0, 2, [ 0 == 1, 1 == 1] ];
 	bless $self, $class;
 	}
+
+1;
 
 __END__
 
@@ -57,7 +59,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2000-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2000-2026, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

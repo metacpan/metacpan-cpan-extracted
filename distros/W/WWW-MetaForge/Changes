@@ -1,0 +1,6 @@
+0.001     2026-01-05 05:03:59Z
+
+ - Initial release
+ - ARC Raiders API client (items, quests, traders, arcs, events, map data)
+ - CLI tool: metaforge-arcraiders
+ - Response caching with configurable TTL

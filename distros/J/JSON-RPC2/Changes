@@ -1,7 +1,10 @@
 Revision history for JSON-RPC2
 
+v2.2.0  2026-01-05 22:27:04 EET
+	- Add JSON::RPC2::Client lax_response_version option to skip version checking.
+
 v2.1.3  2024-08-29 20:05:18 EEST
-        - Fix compatibility with modern JSON::XS.
+	- Fix compatibility with modern JSON::XS.
 
 v2.1.2  2018-04-03 18:14:29 EEST
 	- Fix compatibility with perl-5.26.

@@ -6,13 +6,15 @@
 use v5.36;
 use Object::Pad 0.800;
 
-package App::perl::distrolint 0.07;
+package App::perl::distrolint 0.08;
 class App::perl::distrolint;
 
 use List::Util qw( max );
 use Module::Pluggable::Object;
 
 use String::Tagged::Terminal;
+
+use App::perl::distrolint::Config;
 
 =head1 NAME
 
@@ -34,14 +36,15 @@ performed are described more in the various C<App::perl::distrolint::Check::*>
 modules.
 
 At present in this very early version, many of these checks are very
-opinionated, doing things specific to the way I personally lay out my code. I
-fully imagine that at some point I'll get around to adding more flexibility
-here, via some kind of configuration system, whereby other users can change or
-disable various checks as they see fit to suit their own coding style. This
-distribution currently exists largely to allow people to see the kinds of
+opinionated, doing things specific to the way I personally lay out my code.
+This distribution currently exists largely to allow people to see the kinds of
 things that are possible, and also acts as a demonstration of the use of
 L<Text::Treesitter> and F<tree-sitter-perl> to be used as a static linting
 tool for Perl source code.
+
+A limited amount of customisation and configuration can be performed on a
+per-project or per-user basis, by writing settings into F<distrolint.ini>
+files. This is described in more detail in C<App::perl::distrolint::Config>.
 
 =cut
 
@@ -83,6 +86,9 @@ method run ( @argv )
    $notecount = 0;
 
    foreach my $check ( @checks ) {
+      App::perl::distrolint::Config->is_check_enabled( $check->{name} ) or
+         next;
+
       my $name = $check->{name};
       $name .= "." x ($namelen - length $name);
 
@@ -113,7 +119,7 @@ method run ( @argv )
    return 0;
 }
 
-method checks
+method checks ()
 {
    my @checks = map {
       my $pkg = $_;

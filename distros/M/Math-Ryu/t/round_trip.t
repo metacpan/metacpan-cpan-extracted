@@ -11,7 +11,17 @@ my $count = 0;
 END{ done_testing(); };
 
 my @range = (0 .. 50, 200 .. 250, 290 .. 324);
-@range = (0 .. 50, 200 .. 250, 290 .. 324, 3950 .. 4050) if Math::Ryu::MAX_DEC_DIG > 17;
+push (@range, 3950 .. 4050) if Math::Ryu::MAX_DEC_DIG > 17;
+
+# Assign using s2d() when perl has been built using an MS compiler
+# && $Config{ccversion) < 19 && the exponent is in the subnormal range.
+
+my $use_s2d = '';
+{
+  no warnings 'numeric';
+  $use_s2d = 'MSVC'
+    if( $^O eq 'MSWin32' && $Config{cc} eq 'cl' && $Config{ccversion} < 19 );
+}
 
 #######################
 if(Math::Ryu::MAX_DEC_DIG == 17) {
@@ -51,14 +61,27 @@ else {
 
 ########################
 
-if( $] >= 5.030 || $Config{nvtype} eq '__float128') {
+if( $] >= 5.030 || $Config{nvtype} eq '__float128' || $Config{nvtype} eq 'double') {
 
   # Because we're using perl to assign the string (returned by nv2s) to an NV, we
   # must avoid the buggy perls prior to 5.30.0 that frequently mis-assigned those values.
   # The -Dusequadmath builds (that set $Config{nvtype} to __float128) were not subjected
   # to this bugginess.
+  # And we will assign using s2d() on perls whose nvtype is 'double'.
+
+  $use_s2d = 'ALL' if( $] < 5.030 && $Config{nvtype} eq 'double');
+
+  warn "Assigning all (double precision) values using Math::Ryu::s2d() as perl is unreliable\n"
+    if($use_s2d eq 'ALL' );
+
+  warn "Assigning (double precision) subnormal values using Math::Ryu::s2d() as perl is unreliable\n"
+    if $use_s2d eq 'MSVC';
+
+
+  my $format = '%.' . Math::Ryu::MAX_DEC_DIG . 'g';
 
   for my $p (@range) {
+    my $nv;
     my $exp = $p;
     $exp = "-$exp" if $exp & 1;
     for my $it(1..20) {
@@ -67,10 +90,18 @@ if( $] >= 5.030 || $Config{nvtype} eq '__float128') {
       $count ++;
       $str = '-' . $str unless $count % 5;
 
-      my $nv = $str + 0;           # line 64
+      if($use_s2d eq 'ALL' && $Config{nvtype} eq 'double') { $nv = s2d($str) }
+      elsif($use_s2d eq 'MSVC' && $exp < -305) { $nv = s2d($str) } # $Config{nvtype} must be 'double'
+      else { $nv = $str + 0 }
+
       $nv /= 10 unless $count % 3;
 
-      cmp_ok(nv2s($nv), '==', $nv, sprintf("%.17g", $nv) . ": round trip succeeds");
+      if( $use_s2d eq 'ALL' || ($use_s2d eq 'MSVC' && $exp < -305) ) {
+        cmp_ok(s2d(nv2s($nv)), '==', $nv, sprintf("$format", $nv) . ": round trip succeeds");
+      }
+      else {
+        cmp_ok(nv2s($nv), '==', $nv, sprintf("$format", $nv) . ": round trip succeeds");
+      }
     }
   }
 }
@@ -86,3 +117,7 @@ sub random_digits {
     $ret .= int(rand(10)) for 1 .. 10;
     return $ret;
 }
+
+__END__
+
+

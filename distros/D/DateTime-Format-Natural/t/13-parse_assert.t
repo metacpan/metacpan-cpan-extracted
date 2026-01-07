@@ -5,7 +5,7 @@ use warnings;
 use boolean qw(true false);
 
 use DateTime::Format::Natural;
-use Test::More tests => 23;
+use Test::More tests => 25;
 
 {
     # Assert for prefixed dates that an extracted unit which is
@@ -139,4 +139,14 @@ use Test::More tests => 23;
     # Assert that trace() without traces returns cleanly.
     $parser = DateTime::Format::Natural->new;
     is_deeply([$parser->trace], [], 'trace() without traces returns cleanly');
+}
+
+{
+    # Assert that parsing time with mixed characters fails.
+    my $parser = DateTime::Format::Natural->new;
+
+    $parser->parse_datetime('06:56.06 am');
+    ok(!$parser->success, 'parsing time with mixed characters failed');
+    $parser->parse_datetime('06.56:06 am');
+    ok(!$parser->success, 'parsing time with mixed characters failed');
 }

@@ -1,0 +1,95 @@
+# Docker Compose configuration for Async::Redis testing
+# Usage: docker-compose -f docker-compose.test.yml up -d
+
+version: '3.8'
+
+services:
+  # Basic Redis instance
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  # Redis with password authentication
+  redis-auth:
+    image: redis:7-alpine
+    ports:
+      - "6381:6379"
+    command: redis-server --requirepass testpassword
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "testpassword", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  # Redis replica (for testing replica reads)
+  redis-replica:
+    image: redis:7-alpine
+    ports:
+      - "6382:6379"
+    command: redis-server --replicaof redis 6379
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # Redis Cluster node 1
+  redis-cluster-1:
+    image: redis:7-alpine
+    ports:
+      - "7001:7001"
+    command: >
+      redis-server
+      --port 7001
+      --cluster-enabled yes
+      --cluster-config-file nodes.conf
+      --cluster-node-timeout 5000
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "7001", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  # Redis Cluster node 2
+  redis-cluster-2:
+    image: redis:7-alpine
+    ports:
+      - "7002:7002"
+    command: >
+      redis-server
+      --port 7002
+      --cluster-enabled yes
+      --cluster-config-file nodes.conf
+      --cluster-node-timeout 5000
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "7002", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  # Redis Cluster node 3
+  redis-cluster-3:
+    image: redis:7-alpine
+    ports:
+      - "7003:7003"
+    command: >
+      redis-server
+      --port 7003
+      --cluster-enabled yes
+      --cluster-config-file nodes.conf
+      --cluster-node-timeout 5000
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "7003", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+# Networks for isolation testing
+networks:
+  default:
+    name: future-io-redis-test

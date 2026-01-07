@@ -5,7 +5,7 @@ my $mm_ver = ExtUtils::MakeMaker->VERSION;
 
 WriteMakefile(
     NAME         => 'File::Save::Home',
-    VERSION_FROM => 'lib/File/Save/Home.pm', # finds \$VERSION
+    VERSION_FROM => 'lib/File/Save/Home.pm',
     AUTHOR       => 'James E Keenan (jkeenan@cpan.org)',
     ABSTRACT     => 'Place file safely under user home directory',
     LICENSE      => "perl",

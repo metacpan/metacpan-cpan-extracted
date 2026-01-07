@@ -1,3 +1,15 @@
+4.8.6  2026-05-01
+
+  - Clean up code
+
+4.8.5  2026-04-01
+
+  - Bug fix at unicode session data
+
+4.8.4  2026-04-01
+
+  - Bug fix at unicode session data
+
 4.8.3  2025-12-31
 
   - Changes at saved session data file names

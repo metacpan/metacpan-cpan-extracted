@@ -1,5 +1,9 @@
 Revision history for Future-IO-Impl-Uring
 
+0.003     2026-01-02 22:33:44+01:00 Europe/Brussels
+          - Implement send and recv
+          - Implement ready_for_read and ready_for_write
+
 0.002     2025-02-19 17:05:07+01:00 Europe/Brussels
           - Make syswrite_exactly actually work
           - Make sleep and waitpid also cancelable

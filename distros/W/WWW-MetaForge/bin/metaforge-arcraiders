@@ -1,0 +1,94 @@
+#!/usr/bin/env perl
+# ABSTRACT: CLI for the MetaForge ARC Raiders API
+# PODNAME: metaforge-arcraiders
+
+use strict;
+use warnings;
+use open ':std', ':encoding(UTF-8)';
+use WWW::MetaForge::ArcRaiders::CLI;
+
+WWW::MetaForge::ArcRaiders::CLI->new_with_cmd;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+metaforge-arcraiders - CLI for the MetaForge ARC Raiders API
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+  # List all items
+  metaforge-arcraiders items
+
+  # Search items
+  metaforge-arcraiders items --search Ferro
+
+  # Show single item details
+  metaforge-arcraiders item ferro-i
+
+  # List quests
+  metaforge-arcraiders quests
+
+  # List traders
+  metaforge-arcraiders traders
+
+  # Show event timers
+  metaforge-arcraiders events
+
+=head1 DESCRIPTION
+
+Command-line interface for querying the MetaForge ARC Raiders API.
+
+=head1 SUPPORT
+
+Repository
+
+  https://github.com/Getty/p5-www-metaforge
+  Pull request and additional contributors are welcome
+
+Issue Tracker
+
+  https://github.com/Getty/p5-www-metaforge/issues
+
+Discord
+
+  https://discord.gg/Y2avVYpquV
+
+IRC
+
+  irc://irc.perl.org/ai
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/Getty/p5-www-metaforge>
+
+  git clone https://github.com/Getty/p5-www-metaforge.git
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

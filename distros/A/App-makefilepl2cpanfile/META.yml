@@ -1,0 +1,40 @@
+---
+abstract: 'Convert Makefile.PL to a cpanfile automatically'
+author:
+  - 'Nigel Horne <njh@nigelhorne.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  Test::Carp: '0'
+  Test::Compile: '0'
+  Test::DescribeMe: '0'
+  Test::Most: '0'
+  Test::NoWarnings: '0'
+  Test::RequiresInternet: '0'
+  Test::Returns: '0'
+  Test::Warn: '0'
+  Test::Which: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-makefilepl2cpanfile
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::HomeDir: '0'
+  File::Slurp: '0'
+  YAML::Tiny: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/nigelhorne/App-makefilepl2cpanfile/issues
+  homepage: https://metacpan.org/pod/App::makefilepl2cpanfile
+  repository: git://github.com/nigelhorne/App-makefilepl2cpanfile.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

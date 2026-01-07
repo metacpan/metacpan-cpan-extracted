@@ -1,12 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2026 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::Prometheus 0.06;
+package Metrics::Any::Adapter::Prometheus 0.07;
 
-use v5.14;
+use v5.20;
 use warnings;
+use feature qw( signatures postderef );
+no warnings qw( experimental::signatures experimental::postderef );
 
 use Carp;
 
@@ -21,6 +23,8 @@ use Net::Prometheus::Histogram 0.10;
 C<Metrics::Any::Adapter::Prometheus> - a metrics reporting adapter for Prometheus
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Metrics::Any::Adapter 'Prometheus';
 
@@ -42,43 +46,33 @@ of export data, by setting the C<use_histograms> import argument to false:
 Timer metrics are implemented as distribution metrics with the units set to
 C<seconds>.
 
-This adapter type supports batch mdoe reporting. Callbacks are invoked at the
+This adapter type supports batch mode reporting. Callbacks are invoked at the
 beginning of the C<Net::Prometheus> C<render> method.
 
 =cut
 
 package Metrics::Any::Adapter::Prometheus::_BatchCollector
 {
-   sub new
+   sub new ( $class )
    {
-      my $class = shift;
-
       return bless [], $class;
    }
 
-   sub collect
+   sub collect ( $self, $ )
    {
-      my $self = shift;
-
       foreach my $cb ( @$self ) { $cb->(); }
 
       return ();
    }
 
-   sub add_callback
+   sub add_callback ( $self, $cb )
    {
-      my $self = shift;
-      my ( $cb ) = @_;
-
       push @$self, $cb;
    }
 }
 
-sub new
+sub new ( $class, %args )
 {
-   my $class = shift;
-   my ( %args ) = @_;
-
    my $self = bless {
       metrics => {},
       batch_collector => Metrics::Any::Adapter::Prometheus::_BatchCollector->new,
@@ -98,19 +92,13 @@ sub new
 
 use constant HAVE_BATCH_MODE => 1;
 
-sub add_batch_mode_callback
+sub add_batch_mode_callback ( $self, $cb )
 {
-   my $self = shift;
-   my ( $cb ) = @_;
-
    $self->{batch_collector}->add_callback( $cb );
 }
 
-sub mangle_name
+sub mangle_name ( $self, $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
-
    $name = join "_", @$name if ref $name eq "ARRAY";
 
    # TODO: Consider lowercase, squashing unallowed chars to _,...
@@ -118,11 +106,8 @@ sub mangle_name
    return $name;
 }
 
-sub make_counter
+sub make_counter ( $self, $handle, %args )
 {
-   my $self = shift;
-   my ( $handle, %args ) = @_;
-
    my $name = $self->mangle_name( delete $args{name} // $handle );
    my $help = delete $args{description} // "Metrics::Any counter $handle";
 
@@ -144,18 +129,15 @@ sub make_counter
    );
 }
 
-sub inc_counter_by
+sub inc_counter_by ( $self, $handle, $amount, @labelvalues )
 {
-   my $self = shift;
-   my ( $handle, $amount, @labelvalues ) = @_;
-
    ( $self->{metrics}{$handle} or croak "No such counter named '$handle'" )
       ->inc( @labelvalues, $amount );
 }
 
 =head2 make_distribution
 
-   $adapter->make_distribution( $name, %args )
+   $adapter->make_distribution( $name, %args );
 
 In addition to the standard arguments, the following are recognised:
 
@@ -189,11 +171,8 @@ my %BUCKETS_FOR_UNITS = (
    seconds => undef, # Prometheus defaults are fine
 );
 
-sub make_distribution
+sub make_distribution ( $self, $handle, %args )
 {
-   my $self = shift;
-   my ( $handle, %args ) = @_;
-
    my $name = $self->mangle_name( delete $args{name} // $handle );
    my $units = delete $args{units};
    my $help  = delete $args{description} // "Metrics::Any $units distribution $handle";
@@ -202,7 +181,7 @@ sub make_distribution
    $name .= "_$units" if length $units and $name !~ m/_\Q$units\E$/;
 
    unless( $args{buckets} ) {
-      %args = ( %{ $BUCKETS_FOR_UNITS{$units} }, %args ) if $BUCKETS_FOR_UNITS{$units};
+      %args = ( $BUCKETS_FOR_UNITS{$units}->%*, %args ) if $BUCKETS_FOR_UNITS{$units};
    }
 
    my $metric_class = $self->{use_histograms} ? "Net::Prometheus::Histogram" :
@@ -217,11 +196,8 @@ sub make_distribution
    );
 }
 
-sub report_distribution
+sub report_distribution ( $self, $handle, $amount, @labelvalues )
 {
-   my $self = shift;
-   my ( $handle, $amount, @labelvalues ) = @_;
-
    # TODO: Sanity-check that @labelvalues is as long as the label count
 
    ( $self->{metrics}{$handle} or croak "No such distribution named '$handle'" )
@@ -230,11 +206,8 @@ sub report_distribution
 
 *inc_distribution_by = \&report_distribution;
 
-sub make_gauge
+sub make_gauge ( $self, $handle, %args )
 {
-   my $self = shift;
-   my ( $handle, %args ) = @_;
-
    my $name = $self->mangle_name( delete $args{name} // $handle );
    my $help = delete $args{description} // "Metrics::Any gauge $handle";
 
@@ -247,29 +220,20 @@ sub make_gauge
    );
 }
 
-sub set_gauge_to
+sub set_gauge_to ( $self, $handle, $amount, @labelvalues )
 {
-   my $self = shift;
-   my ( $handle, $amount, @labelvalues ) = @_;
-
    ( $self->{metrics}{$handle} or croak "No such gauge named '$handle'" )
       ->set( @labelvalues, $amount );
 }
 
-sub inc_gauge_by
+sub inc_gauge_by ( $self, $handle, $amount, @labelvalues )
 {
-   my $self = shift;
-   my ( $handle, $amount, @labelvalues ) = @_;
-
    ( $self->{metrics}{$handle} or croak "No such gauge named '$handle'" )
       ->inc( @labelvalues, $amount );
 }
 
-sub make_timer
+sub make_timer ( $self, $handle, %args )
 {
-   my $self = shift;
-   my ( $handle, %args ) = @_;
-
    $args{description} //= "Metrics::Any timer $handle";
 
    return $self->make_distribution( $handle,

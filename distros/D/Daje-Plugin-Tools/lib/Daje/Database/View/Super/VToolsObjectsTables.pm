@@ -31,7 +31,7 @@ use v5.40;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-has 'fields' => 'tools_object_tables_pkey, tools_version_fkey, tools_objects_fkey, fieldname, length, scale, tools_objects_tables_datatypes_fkey, active, visible, datatype, "notnull", "default", "foreign_key", "unique"';
+has 'fields' => 'tools_object_tables_pkey, tools_version_fkey, tools_objects_fkey, fieldname, length, scale, tools_objects_tables_datatypes_fkey, active, visible, datatype, "notnull", "default", "foreign_key", "unique", "mandatory", "project"';
 has 'primary_keys' => "tools_object_tables_pkey";
 has 'foreign_keys' => "tools_version_fkey, tools_objects_fkey";
 has 'view_name' => "v_tools_objects_tables_datatypes";

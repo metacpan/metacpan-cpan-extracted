@@ -7,7 +7,7 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Metrics::Any::Adapter::Prometheus',
    requires => {
-      'perl' => '5.014',
+      'perl' => '5.020',
       'Net::Prometheus::Counter' => 0,
       'Net::Prometheus::Gauge' => 0,
       'Net::Prometheus::Histogram' => '0.10',
@@ -15,7 +15,7 @@ my $build = Module::Build->new(
    },
    test_requires => {
       'Metrics::Any' => '0.09',
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

@@ -1,5 +1,18 @@
 Revision history for Perl module Math::FakeDD
 
+1.03
+ - Hopefully, fix test failure in t/next.t.
+   See https://www.cpantesters.org/cpan/report/d94d1268-e806-11f0-ad26-816632b299cf
+
+ - Hopefully, fix test failure in t/subnormal.t
+   See https://www.cpantesters.org/cpan/report/22132fc6-e93f-11f0-9d90-f7446e8775ea
+
+1.02
+ - Add dd_frexp function (mainly for use in dd_repro - but export it, anyway).
+ - Fix printing (dd_stringify) for infinities.
+ - Sanitize string returned by rand() in t/print.t.
+ - Add t/subnormal.t and t/lsd_max.t.
+
 1.01
  - Add new function dd_dump().
  - Rework the internals. (Details in pod.)

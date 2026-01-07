@@ -1,3 +1,9 @@
+1.727   2025-11-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Set keys from all sections (not just wanted one) into result
+          hash.
+
+
 1.726   2022-05-02  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Enable warn_perl attribute of Config::IOD::Reader.

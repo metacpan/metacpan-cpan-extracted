@@ -3,10 +3,13 @@
 #
 #  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::_FutureIO 0.14;
+package Net::Prometheus::_FutureIO 0.15;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( signatures );
+no warnings qw( experimental::signatures );
 
 use Future::IO 0.11;
 use Future::Utils qw( repeat );
@@ -15,34 +18,30 @@ use Future::Utils qw( repeat );
 
 my %running_clients;
 
-sub start
+sub start ( $pkg, $prometheus, $listensock )
 {
-   my $pkg = shift;
-   my ( $prometheus, $listensock ) = @_;
-
    Future::IO->HAVE_MULTIPLE_FILEHANDLES or
       die "Net::Prometheus::_FutureIO requires a Future::IO implementation that supports multiple filehandles\n";
 
    return ( repeat {
-      return Future::IO->accept( $listensock )->then( sub {
-         my ( $clientsock ) = @_;
+      return Future::IO->accept( $listensock )->then( sub ( $clientsock ) {
          my $fileno = $clientsock->fileno;
 
          my $f = $pkg->serve( $prometheus, $clientsock );
          $running_clients{$fileno} = $f;
 
-         $f->on_done( sub {
+         $f->on_done( sub ( @ ) {
             delete $running_clients{$fileno};
          });
-         $f->on_fail( sub {
-            warn "Net::Prometheus builtin HTTP server failed for [$fileno]: $_[0]";
+         $f->on_fail( sub ( $err, @ ) {
+            warn "Net::Prometheus builtin HTTP server failed for [$fileno]: $err";
             delete $running_clients{$fileno};
          });
 
          return Future->done;
       });
-   } while => sub { !$_[0]->failure } )->on_fail( sub {
-      warn "Net::Prometheus builtin HTTP server crashed: $_[0]";
+   } while => sub ( $f ) { !$f->failure } )->on_fail( sub ( $err, @ ) {
+      warn "Net::Prometheus builtin HTTP server crashed: $err";
    });
 }
 
@@ -52,21 +51,18 @@ my %HTTP_CODES = (
    405 => "Method Not Allowed",
 );
 
-sub serve
+sub serve ( $pkg, $prometheus, $fh )
 {
-   my $pkg = shift;
-   my ( $prometheus, $fh ) = @_;
-
    my $buf = "";
    my $f = repeat {
-      Future::IO->sysread( $fh, 8192 )->then( sub {
-         $buf .= $_[0];
+      Future::IO->sysread( $fh, 8192 )->then( sub ( $more ) {
+         $buf .= $more;
          Future->done;
       } );
-   } until => sub { $_[0]->failure or $buf =~ m/\x0d\x0a\x0d\x0a/ };
+   } until => sub ( $f ) { $f->failure or $buf =~ m/\x0d\x0a\x0d\x0a/ };
 
    # Parse request and generate a response code
-   $f = $f->then( sub {
+   $f = $f->then( sub ( @ ) {
       my ( $req ) = $buf =~ m/^(.*\x0d\x0a\x0d\x0a)/s;
       ( my ( $firstline, $headers ) = split m/\x0d\x0a/, $req, 2 ) == 2 or
          return Future->done( 400 );
@@ -81,9 +77,7 @@ sub serve
    });
 
    # Render an actual response and send it
-   $f = $f->then( sub {
-      my ( $code, $is_head ) = @_;
-
+   $f = $f->then( sub ( $code, $is_head = undef ) {
       my $body = "";
       $body .= $prometheus->render if $code == 200;
 

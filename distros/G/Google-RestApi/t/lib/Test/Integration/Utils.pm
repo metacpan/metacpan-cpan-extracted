@@ -3,8 +3,6 @@ package Test::Integration::Utils;
 use strict;
 use warnings;
 
-use Test::More;
-
 use aliased "Google::RestApi";
 use aliased "Google::RestApi::SheetsApi4";
 
@@ -16,7 +14,7 @@ our @EXPORT_OK = qw(
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
 # used to clean up spreadsheets after tests are done.
-sub delete_all_spreadsheets { shift->delete_all_spreadsheets(spreadsheet_name()); }
+sub delete_all_spreadsheets { shift->delete_all_spreadsheets_by_filters("name = '" . spreadsheet_name() . "'"); }
 
 # standard testing spreadsheet name.
 sub spreadsheet_name { 'google_restapi_sheets_integration_testing'; }

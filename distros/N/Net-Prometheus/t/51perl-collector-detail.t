@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.20;
 use warnings;
 
 use Test2::V0;
@@ -47,7 +47,7 @@ $Net::Prometheus::PerlCollector::DETAIL = 2;
 if( HAVE_TEST_MEMORYGROWTH ) {
    Test::MemoryGrowth::no_growth( sub {
       $client->render;
-   }, calls => 1000, burn_in => 2,
+   }, calls => 1000, burn_in => 20,
       'Detailed rendering does not leak memory' );
 }
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension App-dozo
 
+1.00 2026-01-05T06:40:24Z
+
+    - version 1.00 release
+    - allow single port specification for -P option (e.g., -P 8000 becomes 8000:8000)
+    - update copyright year to 2025-2026
+
 0.9928 2025-12-25T13:41:29Z
 
     - use Getopt::Long::Bash CPAN package instead of bundled submodule

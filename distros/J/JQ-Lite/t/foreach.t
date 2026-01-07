@@ -10,6 +10,11 @@ my @running_totals = $jq->run_query($numbers, 'foreach .numbers[] as $n (0; . + 
 
 is_deeply(\@running_totals, [1, 3, 6, 10], 'foreach emits running totals without extractor');
 
+my $init_filter = '[1, 2, 3]';
+my @length_seed = $jq->run_query($init_filter, 'foreach .[] as $n (length; . + $n)');
+
+is_deeply(\@length_seed, [4, 6, 9], 'foreach init expression uses filter evaluation when needed');
+
 my @emitted = $jq->run_query(
     $numbers,
     'foreach .numbers[] as $n (0; . + $n; $n)'

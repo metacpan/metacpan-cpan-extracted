@@ -1,0 +1,13 @@
+{
+  "id": 100001,
+  "name": "example.com",
+  "activeThirdParties": [],
+  "created": 1609459200000,
+  "delegateNameServers": [],
+  "folderId": 0,
+  "gtdEnabled": false,
+  "nameServers": ["ns1.dnsmadeeasy.com", "ns2.dnsmadeeasy.com"],
+  "pendingActionId": 0,
+  "processMulti": false,
+  "updated": 1609545600000
+}

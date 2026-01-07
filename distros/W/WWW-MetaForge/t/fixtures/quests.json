@@ -1,0 +1,18 @@
+{
+  "data": [
+    {
+      "id": "a-bad-feeling",
+      "name": "A Bad Feeling",
+      "description": "Find and search any ARC Probe or ARC Courier",
+      "objectives": ["Find and search any ARC Probe or ARC Courier"],
+      "rewards": [
+        {"item": "Metal Parts", "quantity": 1},
+        {"item": "Steel Spring", "quantity": 1}
+      ]
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "total": 1
+  }
+}

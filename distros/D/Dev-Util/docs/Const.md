@@ -4,7 +4,7 @@ Dev::Util::Const - Defines named constants as Readonly.
 
 # VERSION
 
-Version v2.19.33
+Version v2.19.35
 
 # SYNOPSIS
 

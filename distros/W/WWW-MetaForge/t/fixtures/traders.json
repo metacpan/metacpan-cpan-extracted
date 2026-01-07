@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "data": {
+    "Apollo": [
+      {
+        "id": "barricade-kit",
+        "name": "Barricade Kit",
+        "value": 640,
+        "rarity": "Uncommon",
+        "item_type": "Quick Use",
+        "description": "A deployable cover that can block incoming damage.",
+        "trader_price": 1920
+      }
+    ],
+    "TianWen": [
+      {
+        "id": "ferro-i",
+        "name": "Ferro I",
+        "value": 475,
+        "rarity": "Common",
+        "item_type": "Weapon",
+        "description": "Heavy break-action rifle.",
+        "trader_price": 1425
+      }
+    ]
+  }
+}

@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-11-26'; # DATE
+our $DATE = '2026-01-05'; # DATE
 our $DIST = 'App-FindUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our %SPEC;
 
@@ -55,6 +55,9 @@ Specify a regex with a capture to get part of the filename. The first capture
 use this to find duplicate in some part of the filename. As an alternative, see
 the `--eval` option.
 
+If regex does not match or if there is no capture, the filename will be used
+instead as the fallback.
+
 MARKDOWN
             cmdline_aliases => {r=>{}},
         },
@@ -62,6 +65,11 @@ MARKDOWN
             schema => 're_from_str*',
             summary => 'Filename regex to exclude',
             cmdline_aliases => {x=>{}},
+        },
+        exclude_directories => {
+            schema => 'bool*',
+            summary => 'Exclude directories',
+            cmdline_aliases => {D=>{}},
         },
     },
     examples => [
@@ -95,7 +103,7 @@ sub find_duplicate_filenames {
         my $code = "no strict; no warnings; package main; sub { local \$_=\$_; " . $args{eval} . "; return \$_ }";
         $eval = eval $code or return [400, "Can't compile code in eval: $@"]; ## no critic: BuiltinFunctions::ProhibitStringyEval
     } elsif (defined $args{regex}) {
-        $eval = sub { /$args{regex}/; $1 };
+        $eval = sub { /$args{regex}/; $1 // $_ };
     }
 
     #my $ci = $args{case_insensitive};
@@ -104,9 +112,20 @@ sub find_duplicate_filenames {
     File::Find::find(
         sub {
             no warnings 'once'; # for $File::find::dir
+
+            if ($args{exclude_directories} && (-d)) {
+                log_info "Excluding directory: $_";
+                return;
+            }
+
             # XXX inefficient
             my $realpath = Cwd::realpath($_);
             log_debug "Found path $realpath";
+
+            unless ($realpath) {
+                log_warn "Can't find real path for $_: $!, skipped";
+                return;
+            }
 
             if ($args{exclude_filename_regex}) {
                 if ($_ =~ $args{exclude_filename_regex}) {
@@ -118,6 +137,10 @@ sub find_duplicate_filenames {
             my $name;
             if ($eval) {
                 $name = $eval->();
+                unless (defined $name) {
+                    log_warn "Eval code produced undef for $_, skipped";
+                    return;
+                }
             } else {
                 $name = $_;
             }
@@ -157,7 +180,7 @@ App::FindUtils - Utilities related to finding files
 
 =head1 VERSION
 
-This document describes version 0.005 of App::FindUtils (from Perl distribution App-FindUtils), released on 2025-11-26.
+This document describes version 0.007 of App::FindUtils (from Perl distribution App-FindUtils), released on 2026-01-05.
 
 =head1 DESCRIPTION
 
@@ -201,6 +224,10 @@ expected to change and return a new "name" that will be compared for duplicate
 instead of the original name. You can use this e.g. to find duplicate in some
 part of the filename. As an alternative, see the C<--regex> option.
 
+=item * B<exclude_directories> => I<bool>
+
+Exclude directories.
+
 =item * B<exclude_filename_regex> => I<re_from_str>
 
 Filename regex to exclude.
@@ -211,6 +238,9 @@ Specify a regex with a capture to get part of the filename. The first capture
 C<$1> will be used to compare for duplicate instead of the original name. You can
 use this to find duplicate in some part of the filename. As an alternative, see
 the C<--eval> option.
+
+If regex does not match or if there is no capture, the filename will be used
+instead as the fallback.
 
 
 =back
@@ -262,7 +292,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026, 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

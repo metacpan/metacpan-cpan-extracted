@@ -55,7 +55,7 @@
    "provides" : {
       "App::dozo" : {
          "file" : "lib/App/dozo.pm",
-         "version" : "0.9928"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/tecolicom/App-dozo"
       }
    },
-   "version" : "0.9928",
+   "version" : "1.00",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],

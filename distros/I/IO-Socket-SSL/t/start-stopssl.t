@@ -8,7 +8,7 @@ do './testlib.pl' || do './t/testlib.pl' || die "no testlib";
 
 $|=1;
 my @tests = qw( start stop start stop:write close );
-print "1..26\n";
+print "1..30\n";
 
 my $server = IO::Socket::INET->new(
     LocalAddr => '127.0.0.1',
@@ -31,9 +31,9 @@ sub client {
     $client->autoflush;
     print "ok # client connect\n";
 
-    for my $test (@tests) {
+    while (my $test = shift @tests) {
 	alarm(15);
-	#print STDERR "begin test $test\n";
+	print "# begin test $test\n";
 	if ( $test eq 'start' ) {
 	    syswrite($client,"start\n");
 	    sleep(1); # avoid race condition, if client calls start but server is not yet available
@@ -78,15 +78,16 @@ sub client {
 
 	    ref($client) eq $class or print "not ";
 	    print "ok # client::class=".ref($client)."\n";
+	    print "# finished '$test' and closed sockets - DONE\n";
 	    last;
 	}
-	#print STDERR "cont test $test\n";
+	print "# cont test $test\n";
 
-	sysread($client, my $line, 1024) or return;
+	defined(my $line = _downgrade_safe_sysread($client,'client')) || last;
 	die "'$line'" if $line ne "OK\n";
     }
+    die "@tests not run\n" if @tests;
 }
-
 
 sub server {
     my $client = $server->accept || die $!;
@@ -94,7 +95,7 @@ sub server {
     my $peer_shutdown;
     while (1) {
 	alarm(15);
-	sysread($client, my $line, 1024) or last;
+	defined(my $line = _downgrade_safe_sysread($client,'server')) || last;
 	chomp($line);
 	if ( $line eq 'start' ) {
 	    #print STDERR ">>$$ start\n";
@@ -139,17 +140,17 @@ sub server {
 
 	    # but will show as not having (anymore) SSL
 	    $client->is_SSL and print "not ";
-	    print "ok # is_SSL returns false\n";
+	    print "ok # server is_SSL returns false\n";
 
 	    # write before explict stop_SSL will fail with EPERM
 	    $n = syswrite($client, 'foo', 3);
 	    print "not " if defined($n) or not $!{EPERM};
-	    print "ok # write results in undef/EPERM\n";
+	    print "ok # server write results in undef/EPERM\n";
 
 	    # same with read
 	    $n = sysread($client, $line, 100);
 	    print "not " if defined($n) or not $!{EPERM};
-	    print "ok # read results in undef/EPERM\n";
+	    print "ok # server read results in undef/EPERM\n";
 
 	    # will both work after explicit stop_SSL
 	    $client->stop_SSL();
@@ -164,7 +165,7 @@ sub server {
 
 	    $n = syswrite($client,"OK\n");
 	    print "not " unless defined $n and $n>0;
-	    print "ok # plain write\n";
+	    print "ok # server plain write\n";
 
 	} elsif ( $line eq 'close' ) {
 	    my $class = ref($client);
@@ -176,4 +177,25 @@ sub server {
 	    last;
 	}
     }
+}
+
+sub _downgrade_safe_sysread {
+    my ($fd,$who) = @_;
+  retry_sysread:
+    my $ssl0 = UNIVERSAL::can($fd,'is_SSL');
+    $ssl0 = $ssl0 && $ssl0->($fd) || '';
+    # print "# $who $fd ssl=$ssl0\n";
+    my $n = sysread($fd, my $buf, 1024);
+    # print "# $who $fd sysread -> $n\n";
+    my $ssl1 = UNIVERSAL::can($fd,'is_SSL');
+    $ssl1 = $ssl1 && $ssl1->($fd) || '';
+    if (!$n) {
+	print "# $who sysread -> ".(defined $n ? $n : '<undef>')." ssl=$ssl0>$ssl1\n";
+	if (defined $n && $ssl0 && !$ssl1) {
+	    # eof due to stop_SSL, but downgraded socket is still open
+	    goto retry_sysread;
+	}
+	return;
+    }
+    return $buf;
 }

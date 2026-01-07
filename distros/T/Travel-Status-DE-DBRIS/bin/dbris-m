@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 use utf8;
 use DateTime;
@@ -601,7 +601,9 @@ if ($train_no) {
 	if ( my $min_percentage = min @start_percentages ) {
 		print ' ' x ( $min_percentage - 1 );
 	}
-	print $wr->direction == 100 ? '>' : '<';
+	if ( defined $wr->direction ) {
+		print $wr->direction == 100 ? '>' : '<';
+	}
 
 	for my $wagon ( $wr->carriages ) {
 		my $wagon_length  = $wagon->length_percent;
@@ -683,7 +685,7 @@ B<dbris-m> B<?>I<query>|I<lat>B<:>I<lon>
 
 =head1 VERSION
 
-version 0.20
+version 0.22
 
 =head1 DESCRIPTION
 
@@ -830,7 +832,7 @@ None.
 
 =head1 AUTHOR
 
-Copyright (C) 2024-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2024-2026 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

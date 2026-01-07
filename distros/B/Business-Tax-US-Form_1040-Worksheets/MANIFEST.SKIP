@@ -38,7 +38,8 @@ nytprof.out
 \.travis.yml
 ^README.md
 ^.README.pod
-\.appveyor.yml
+^appveyor\.yml$
+^\.appveyor\.yml$
 .version_info.pl
 .gitignore
 tax/

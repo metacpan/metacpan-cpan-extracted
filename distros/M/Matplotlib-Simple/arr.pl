@@ -5,86 +5,46 @@ no source::encoding;
 use warnings FATAL => 'all';
 use autodie ':default';
 use Matplotlib::Simple;
-use File::Temp;
+#use File::Temp;
 
-my $fh = File::Temp->new(DIR => '/tmp', SUFFIX => '.py', UNLINK => 0);
-plt({
-	cbpad       => 0.01,          # default 0.05 is too big
-	data        => [              # imshow gets a 2D array
-		[' ', ' ', ' ', ' ', 'G'], # bottom
-		['S', 'I', 'T', 'E', 'H'], # top
-	],
-	execute     => 0,
-	fh          => $fh,
-	'plot.type' => 'imshow',
-	stringmap   => {
-		'H' => 'Alpha helix',
-		'B' => 'Residue in isolated β-bridge',
-		'E' => 'Extended strand, participates in β ladder',
-		'G' => '3-helix (3/10 helix)',
-		'I' => '5 helix (pi helix)',
-		'T' => 'hydrogen bonded turn',
-		'S' => 'bend',
-		' ' => 'Loops and irregular elements'
+my @plots = ({
+	data => {
+		'sin' => [map {sin($_ * 3.14159265/180)} 0..360],
+		'cos' => [map {cos($_ * 3.14159265/180)} 0..360]
 	},
-	'output.file' => '/tmp/dssp.single.svg',
-	scalex        => 2.4,
-	set_ylim      => '0, 1',
-	title         => 'Dictionary of Secondary Structure in Proteins (DSSP)',
-	xlabel        => 'xlabel',
-	ylabel        => 'ylabel'
+	'plot.type' => 'hist2d',
+	cbpad       => 0.001,
+	title       => 'pad = 0.001'
 });
-plt({
-	cbpad       => 0.01,          # default 0.05 is too big
-	plots       => [
-		{ # 1st plot
-			data 	=> [
-				[' ', ' ', ' ', ' ', 'G'], # bottom
-				['S', 'I', 'T', 'E', 'H'], # top
-			],
-			'plot.type' => 'imshow',
-			set_xticklabels=> '[]', # remove x-axis labels
-			set_ylim    => '0, 1',
-			stringmap   => {
-				'H' => 'Alpha helix',
-				'B' => 'Residue in isolated β-bridge',
-				'E' => 'Extended strand, participates in β ladder',
-				'G' => '3-helix (3/10 helix)',
-				'I' => '5 helix (pi helix)',
-				'T' => 'hydrogen bonded turn',
-				'S' => 'bend',
-				' ' => 'Loops and irregular elements'
-			},
-			title         => 'top plot',
-			ylabel        => 'ylabel'
+for (my $pad = 0.01; $pad <= 0.06; $pad += 0.03) {
+	push @plots, {
+		data => {
+			'sin' => [map {sin($_ * 3.14159265/180)} 0..360],
+			'cos' => [map {cos($_ * 3.14159265/180)} 0..360]
 		},
-		{ # 2nd plot
-			data 	=> [
-				[' ', ' ', ' ', ' ', 'G'], # bottom
-				['S', 'I', 'T', 'E', 'H'], # top
-			],
-			'plot.type' => 'imshow',
-			set_ylim    => '0, 1',
-			stringmap   => {
-				'H' => 'Alpha helix',
-				'B' => 'Residue in isolated β-bridge',
-				'E' => 'Extended strand, participates in β ladder',
-				'G' => '3-helix (3/10 helix)',
-				'I' => '5 helix (pi helix)',
-				'T' => 'hydrogen bonded turn',
-				'S' => 'bend',
-				' ' => 'Loops and irregular elements'
-			},
-			title         => 'bottom plot',
-			xlabel        => 'xlabel',
-			ylabel        => 'ylabel'
-		}
-	],
-	execute           => 1,
-	fh                => $fh,
-	nrows             => 2,
-	'output.file'     => '/tmp/dssp.multiple.svg',
-	scalex            => 2.4,
-	'shared.colorbar' => [0,1], # plots 0 and 1 share a colorbar
-	suptitle          => 'Dictionary of Secondary Structure in Proteins (DSSP)',
+		'plot.type' => 'hist2d',
+		cbdrawedges => 1,
+		cbpad       => $pad,
+		title       => "pad = $pad"
+	};
+}
+plt({
+	'output.file' => '/tmp/hist2d.pads.svg',
+	plots         => \@plots,
+	ncols         => 1,
+	nrows         => 3,
+	sharey        => 1,
+	scale         => 2
 });
+#my $fh = File::Temp->new(DIR => '/tmp', SUFFIX => '.py', UNLINK => 0);
+=plt({
+	cbpad       => 0.01,          # default 0.05 is too big
+	data        => {
+		'sin' => [map {sin($_ * 3.141592653/180)} 0..360],
+		'cos' => [map {cos($_ * 3.141592653/180)} 0..360]
+	},
+	'plot.type'   => 'hexbin',
+	'output.file' => '/tmp/hexbin.svg',
+	set_ylim      => '0, 1',
+});
+

@@ -1,0 +1,671 @@
+package DBIx::Class::Async::Schema;
+
+use strict;
+use warnings;
+use utf8;
+
+use Carp;
+use Future;
+use Try::Tiny;
+use Scalar::Util 'blessed';
+use DBIx::Class::Async;
+use DBIx::Class::Async::Storage;
+use DBIx::Class::Async::TxnGuard;
+use DBIx::Class::Async::ResultSet;
+
+our $VERSION = '0.10';
+
+=head1 NAME
+
+DBIx::Class::Async::Schema - Asynchronous Schema for DBIx::Class::Async
+
+=head1 VERSION
+
+Version 0.10
+
+=cut
+
+=head1 SYNOPSIS
+
+    use DBIx::Class::Async::Schema;
+
+    # Connect with async options
+    my $schema = DBIx::Class::Async::Schema->connect(
+        'dbi:mysql:database=test',  # DBI connect string
+        'username',                 # Database username
+        'password',                 # Database password
+        { RaiseError => 1 },        # DBI options
+        {                           # Async options
+            schema_class => 'MyApp::Schema',
+            workers      => 4,
+        }
+    );
+
+    # Get a resultset
+    my $users_rs = $schema->resultset('User');
+
+    # Asynchronous operations
+    $users_rs->search({ active => 1 })->all->then(sub {
+        my ($active_users) = @_;
+        foreach my $user (@$active_users) {
+            say "Active user: " . $user->name;
+        }
+    });
+
+    # Disconnect when done
+    $schema->disconnect;
+
+=head1 DESCRIPTION
+
+C<DBIx::Class::Async::Schema> provides an asynchronous schema class that mimics
+the L<DBIx::Class::Schema> API but performs all database operations
+asynchronously using L<Future> objects.
+
+This class acts as a bridge between the synchronous DBIx::Class API and the
+asynchronous backend provided by L<DBIx::Class::Async>. It manages connection
+pooling, result sets, and transaction handling in an asynchronous context.
+
+=head1 CONSTRUCTOR
+
+=head2 connect
+
+    my $schema = DBIx::Class::Async::Schema->connect(
+        $dsn,           # Database DSN
+        $user,          # Database username
+        $password,      # Database password
+        $db_options,    # Hashref of DBI options
+        $async_options, # Hashref of async options
+    );
+
+Connects to a database and creates an asynchronous schema instance.
+
+=over 4
+
+=item B<Parameters>
+
+The first four parameters are standard DBI connection parameters. The fifth
+parameter is a hash reference containing asynchronous configuration:
+
+=over 8
+
+=item C<schema_class> (required)
+
+The name of the DBIx::Class schema class to use (e.g., 'MyApp::Schema').
+
+=item C<workers>
+
+Number of worker processes (default: 4).
+
+=item C<connect_timeout>
+
+Connection timeout in seconds (default: 10).
+
+=item C<max_retries>
+
+Maximum number of retry attempts for failed operations (default: 3).
+
+=back
+
+=item B<Returns>
+
+A new C<DBIx::Class::Async::Schema> instance.
+
+=item B<Throws>
+
+=over 4
+
+=item *
+
+Croaks if C<schema_class> is not provided.
+
+=item *
+
+Croaks if the schema class cannot be loaded.
+
+=item *
+
+Croaks if the async instance cannot be created.
+
+=back
+
+=back
+
+=cut
+
+sub connect {
+    my ($class, @args) = @_;
+
+    # Separate async options from connect_info
+    my $async_options = {};
+    if (ref $args[-1] eq 'HASH' && !exists $args[-1]->{RaiseError}) {
+        # Last arg is async options hash
+        $async_options = pop @args;
+    }
+
+    my $schema_class = $async_options->{schema_class}
+        or croak "schema_class is required in async options";
+
+    my $schema_loaded = 0;
+
+    # Method 1: Check if class already exists
+    if (eval { $schema_class->can('connect') }) {
+        $schema_loaded = 1;
+    }
+    # Method 2: Try to require it (for .pm files)
+    elsif (eval "require $schema_class") {
+        $schema_loaded = 1;
+    }
+    # Method 3: Check if it's defined in memory (inline class)
+    elsif (eval "package main; \$${schema_class}::VERSION ||= '0.01'; 1") {
+        # The class exists in memory (defined inline)
+        $schema_loaded = 1;
+    }
+
+    unless ($schema_loaded) {
+        croak "Cannot load schema class $schema_class: $@";
+    }
+
+    my $async_db = eval {
+        DBIx::Class::Async->new(
+            schema_class => $schema_class,
+            connect_info => \@args,
+            %$async_options,
+        );
+    };
+
+    if ($@) {
+        croak "Failed to create async instance: $@";
+    }
+
+    my $self = bless {
+        async_db      => $async_db,
+        schema_class  => $schema_class,
+        connect_info  => \@args,
+        sources_cache => {},  # Cache for source lookups
+    }, $class;
+
+    return $self;
+}
+
+=head1 METHODS
+
+=head2 resultset
+
+    my $rs = $schema->resultset('User');
+
+Returns a result set for the specified source/table.
+
+=over 4
+
+=item B<Parameters>
+
+=over 8
+
+=item C<$source_name>
+
+Name of the result source (table) to get a result set for.
+
+=back
+
+=item B<Returns>
+
+A L<DBIx::Class::Async::ResultSet> object.
+
+=item B<Throws>
+
+Croaks if C<$source_name> is not provided.
+
+=back
+
+=cut
+
+sub resultset {
+    my ($self, $source_name) = @_;
+
+    croak "resultset() requires a source name" unless $source_name;
+
+    return DBIx::Class::Async::ResultSet->new(
+        schema      => $self,
+        async_db    => $self->{async_db},
+        source_name => $source_name,
+    );
+}
+
+=head2 source
+
+    my $source = $schema->source('User');
+
+Returns the result source object for the specified source/table.
+
+=over 4
+
+=item B<Parameters>
+
+=over 8
+
+=item C<$source_name>
+
+Name of the result source (table).
+
+=back
+
+=item B<Returns>
+
+A L<DBIx::Class::ResultSource> object.
+
+=item B<Notes>
+
+Sources are cached internally after first lookup to avoid repeated
+database connections.
+
+=back
+
+=cut
+
+sub source {
+    my ($self, $source_name) = @_;
+
+    unless (exists $self->{sources_cache}{$source_name}) {
+        my $temp_schema = $self->{schema_class}->connect(@{$self->{connect_info}});
+        $self->{sources_cache}{$source_name} = $temp_schema->source($source_name);
+        $temp_schema->storage->disconnect;
+    }
+
+    return $self->{sources_cache}{$source_name};
+}
+
+=head2 sources
+
+    my @source_names = $schema->sources;
+
+Returns a list of all available source/table names.
+
+=over 4
+
+=item B<Returns>
+
+Array of source names (strings).
+
+=item B<Notes>
+
+This method creates a temporary synchronous connection to the database
+to fetch the source list.
+
+=back
+
+=cut
+
+sub sources {
+    my $self = shift;
+
+    my $temp_schema = $self->{schema_class}->connect(@{$self->{connect_info}});
+    my @sources = $temp_schema->sources;
+    $temp_schema->storage->disconnect;
+
+    return @sources;
+}
+
+=head2 storage
+
+    my $storage = $schema->storage;
+
+Returns a storage object for compatibility with DBIx::Class.
+
+=over 4
+
+=item B<Returns>
+
+A L<DBIx::Class::Async::Storage> object.
+
+=item B<Notes>
+
+This storage object does not provide direct database handle access
+since operations are performed asynchronously by worker processes.
+
+=back
+
+=cut
+
+sub storage {
+    my $self = shift;
+
+    # Return a mock storage object
+    return DBIx::Class::Async::Storage->new(
+        _schema => $self,
+        dbh     => undef,
+    );
+}
+
+=head2 txn_do
+
+    $schema->txn_do(sub {
+        my $txn_schema = shift;
+        # Perform async operations within transaction
+        return $txn_schema->resultset('User')->create({
+            name  => 'Alice',
+            email => 'alice@example.com',
+        });
+    })->then(sub {
+        my ($result) = @_;
+        # Transaction committed successfully
+    })->catch(sub {
+        my ($error) = @_;
+        # Transaction rolled back
+    });
+
+Executes a code reference within a database transaction.
+
+=over 4
+
+=item B<Parameters>
+
+=over 8
+
+=item C<$code>
+
+Code reference to execute within the transaction. The code receives
+the schema instance as its first argument.
+
+=item C<@args>
+
+Additional arguments to pass to the code reference.
+
+=back
+
+=item B<Returns>
+
+A L<Future> that resolves to the return value of the code reference
+if the transaction commits, or rejects with an error if the transaction
+rolls back.
+
+=item B<Throws>
+
+=over 4
+
+=item *
+
+Croaks if the first argument is not a code reference.
+
+=back
+
+=back
+
+=cut
+
+sub txn_do {
+    my ($self, $code, @args) = @_;
+
+    croak "txn_do requires a coderef" unless ref $code eq 'CODE';
+
+    return $self->{async_db}->txn_do($code);
+}
+
+=head2 txn_scope_guard
+
+    my $guard = $schema->txn_scope_guard;
+    # Perform async operations
+    $guard->commit;  # or rolls back if $guard goes out of scope
+
+Returns a transaction scope guard for manual transaction management.
+
+=over 4
+
+=item B<Returns>
+
+A L<DBIx::Class::Async::TxnGuard> object.
+
+=item B<Notes>
+
+If the guard object goes out of scope without an explicit C<commit>,
+the transaction will be rolled back automatically.
+
+=back
+
+=cut
+
+sub txn_scope_guard {
+    my $self = shift;
+
+    return DBIx::Class::Async::TxnGuard->new(
+        schema => $self,
+    );
+}
+
+=head2 set_default_context
+
+    $schema->set_default_context;
+
+Sets the default context for the schema.
+
+=over 4
+
+=item B<Returns>
+
+The schema object itself (for chaining).
+
+=item B<Notes>
+
+This is a no-op method provided for compatibility with DBIx::Class.
+
+=back
+
+=cut
+
+sub set_default_context {
+    my $self = shift;
+    # No-op for compatibility
+    return $self;
+}
+
+=head2 clone
+
+    my $cloned_schema = $schema->clone;
+
+Creates a clone of the schema with a fresh worker pool.
+
+=over 4
+
+=item B<Returns>
+
+A new C<DBIx::Class::Async::Schema> instance with fresh connections.
+
+=item B<Notes>
+
+The cloned schema shares no state with the original and has its own
+worker processes and source cache.
+
+=back
+
+=cut
+
+sub clone {
+    my $self = shift;
+
+    return bless {
+        %$self,
+        # Clone with fresh worker pool
+        async_db => DBIx::Class::Async->new(
+            schema_class => $self->{schema_class},
+            connect_info => $self->{connect_info},
+            workers      => $self->{async_db}->{workers_config}{count},
+        ),
+        sources_cache => {},  # Fresh cache
+    }, ref $self;
+}
+
+=head2 disconnect
+
+    $schema->disconnect;
+
+Disconnects all worker processes and cleans up resources.
+
+=over 4
+
+=item B<Notes>
+
+This method is called automatically when the schema object is destroyed,
+but it's good practice to call it explicitly when done with the schema.
+
+=back
+
+=cut
+
+sub disconnect {
+    my $self = shift;
+    $self->{async_db}->disconnect if $self->{async_db};
+}
+
+=head2 AUTOLOAD
+
+The schema uses AUTOLOAD to delegate unknown methods to the underlying
+L<DBIx::Class::Async> instance. This allows direct access to async
+methods like C<search>, C<find>, C<create>, etc., without going through
+a resultset.
+
+Example:
+
+    # These are equivalent:
+    $schema->find('User', 123);
+    $schema->resultset('User')->find(123);
+
+Methods that are not found in the schema or the async instance will
+throw an error.
+
+=cut
+
+sub AUTOLOAD {
+    my $self = shift;
+
+    our $AUTOLOAD;
+    my ($method) = $AUTOLOAD =~ /([^:]+)$/;
+
+    return if $method eq 'DESTROY';
+
+    if ($self->{async_db} && $self->{async_db}->can($method)) {
+        return $self->{async_db}->$method(@_);
+    }
+
+    croak "Method $method not found in " . ref($self);
+}
+
+=head1 DESTROY
+
+The schema's destructor automatically calls C<disconnect> to clean up
+worker processes and other resources.
+
+=cut
+
+sub DESTROY {
+    my $self = shift;
+    $self->disconnect;
+}
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<DBIx::Class::Async> - Core asynchronous DBIx::Class implementation
+
+=item *
+
+L<DBIx::Class::Async::ResultSet> - Asynchronous result sets
+
+=item *
+
+L<DBIx::Class::Async::Row> - Asynchronous row objects
+
+=item *
+
+L<DBIx::Class::Async::Storage> - Storage compatibility layer
+
+=item *
+
+L<DBIx::Class::Schema> - Standard DBIx::Class schema
+
+=item *
+
+L<Future> - Asynchronous programming abstraction
+
+=back
+
+=head1 AUTHOR
+
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
+
+=head1 REPOSITORY
+
+L<https://github.com/manwar/DBIx-Class-Async>
+
+=head1 BUGS
+
+Please report any bugs or feature requests through the web interface at L<https://github.com/manwar/DBIx-Class-Async/issues>.
+I will  be notified and then you'll automatically be notified of progress on your
+bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc DBIx::Class::Async::Schema
+
+You can also look for information at:
+
+=over 4
+
+=item * BUG Report
+
+L<https://github.com/manwar/DBIx-Class-Async/issues>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/DBIx-Class-Async>
+
+=item * Search MetaCPAN
+
+L<https://metacpan.org/dist/DBIx-Class-Async/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Mohammad Sajid Anwar.
+
+This program  is  free software; you can redistribute it and / or modify it under
+the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full
+license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any  use,  modification, and distribution of the Standard or Modified Versions is
+governed by this Artistic License.By using, modifying or distributing the Package,
+you accept this license. Do not use, modify, or distribute the Package, if you do
+not accept this license.
+
+If your Modified Version has been derived from a Modified Version made by someone
+other than you,you are nevertheless required to ensure that your Modified Version
+ complies with the requirements of this license.
+
+This  license  does  not grant you the right to use any trademark,  service mark,
+tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge patent license
+to make,  have made, use,  offer to sell, sell, import and otherwise transfer the
+Package with respect to any patent claims licensable by the Copyright Holder that
+are  necessarily  infringed  by  the  Package. If you institute patent litigation
+(including  a  cross-claim  or  counterclaim) against any party alleging that the
+Package constitutes direct or contributory patent infringement,then this Artistic
+License to you shall terminate on the date that such litigation is filed.
+
+Disclaimer  of  Warranty:  THE  PACKAGE  IS  PROVIDED BY THE COPYRIGHT HOLDER AND
+CONTRIBUTORS  "AS IS'  AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED
+WARRANTIES    OF   MERCHANTABILITY,   FITNESS   FOR   A   PARTICULAR  PURPOSE, OR
+NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS
+REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT,
+INDIRECT, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE
+OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut
+
+1; # End of DBIx::Class::Async::Schema

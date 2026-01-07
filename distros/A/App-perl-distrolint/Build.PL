@@ -12,6 +12,7 @@ my $build = Module::Build->new(
       'Object::Pad' => '0.807',
       'Syntax::Keyword::Match' => '0.13',
 
+      'Config::Tiny' => 0,
       'File::Basename' => 0,
       'File::Find' => 0,
       'File::Slurper' => 0,

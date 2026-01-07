@@ -1,0 +1,73 @@
+{
+   "abstract" : "Convert Makefile.PL to a cpanfile automatically",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-makefilepl2cpanfile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::HomeDir" : "0",
+            "File::Slurp" : "0",
+            "YAML::Tiny" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::Carp" : "0",
+            "Test::Compile" : "0",
+            "Test::DescribeMe" : "0",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::RequiresInternet" : "0",
+            "Test::Returns" : "0",
+            "Test::Warn" : "0",
+            "Test::Which" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-App-makefilepl2cpanfile@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/App-makefilepl2cpanfile/issues",
+         "x_url" : "https://github.com/nigelhorne/App-makefilepl2cpanfile/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/App::makefilepl2cpanfile",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/App-makefilepl2cpanfile.git",
+         "web" : "https://github.com/nigelhorne/App-makefilepl2cpanfile",
+         "x_repository" : "https://github.com/nigelhorne/App-makefilepl2cpanfile"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

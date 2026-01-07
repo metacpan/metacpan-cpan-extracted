@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2026 -- leonerd@leonerd.org.uk
 
 use v5.36;
 use Object::Pad 0.800;
@@ -18,6 +18,8 @@ use List::Util 1.29 qw( any );
 C<App::perl::distrolint::CheckRole::EachFile> - role for checks that iterate over files
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 This role provides a number of helper trampoline methods for implementing
 check classes whose logic should iterate over various types of file found in
@@ -38,16 +40,33 @@ my @SKIP_TOP = qw(
    _build
 );
 
+my sub glob2regexp ( $s )
+{
+   # Convert glob-like pattern into a regexp. Ish. It's not very good
+   $s =~ s{(\*\*)|(\*)|(\?)|(\.)|(.)}
+          {$1 ? ".+"    :  # ** becomes .+
+           $2 ? "[^/]+" :  # * becomes [^/]+
+           $3 ? "."     :  # ? becomes .
+           $4 ? "\\."   :  # . becomes \.
+           quotemeta $5}ge;
+   return qr(^$s$);
+}
+
 method _run_foreach ( $opts, $method, @args )
 {
    my $ok = 1;
 
+   my @skip_patterns = split m/\s+/,
+      App::perl::distrolint::Config->check_config( $self, "skip", "" );
+
+   $_ = glob2regexp $_ for @skip_patterns;
+
    File::Find::find({
       no_chdir => 1,
-      preprocess => sub {
-         return sort { $a cmp $b } @_;
+      preprocess => sub (@names) {
+         return sort { $a cmp $b } @names;
       },
-      wanted => sub {
+      wanted => sub () {
          my $path = $_;
 
          return if $path eq ".";
@@ -64,6 +83,8 @@ method _run_foreach ( $opts, $method, @args )
          -f $path or return;
 
          return if $opts->{if_basename} and $basename !~ $opts->{if_basename};
+
+         $path =~ $_ and return for @skip_patterns;
 
          $ok &= $self->$method( $path, @args );
       },

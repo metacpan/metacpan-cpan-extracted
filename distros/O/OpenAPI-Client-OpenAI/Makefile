@@ -63,11 +63,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = OpenAPI::Client::OpenAI
 NAME_SYM = OpenAPI_Client_OpenAI
-VERSION = 0.24
+VERSION = 0.25
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_24
+VERSION_SYM = 0_25
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.24
+XS_VERSION = 0.25
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -177,12 +177,20 @@ MAN3PODS = lib/OpenAPI/Client/OpenAI.pm \
 	lib/OpenAPI/Client/OpenAI/Path/audio-speech.pod \
 	lib/OpenAPI/Client/OpenAI/Path/audio-transcriptions.pod \
 	lib/OpenAPI/Client/OpenAI/Path/audio-translations.pod \
+	lib/OpenAPI/Client/OpenAI/Path/audio-voice_consents-consent_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/audio-voice_consents.pod \
+	lib/OpenAPI/Client/OpenAI/Path/audio-voices.pod \
 	lib/OpenAPI/Client/OpenAI/Path/batches-batch_id-cancel.pod \
 	lib/OpenAPI/Client/OpenAI/Path/batches-batch_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/batches.pod \
 	lib/OpenAPI/Client/OpenAI/Path/chat-completions-completion_id-messages.pod \
 	lib/OpenAPI/Client/OpenAI/Path/chat-completions-completion_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/chat-completions.pod \
+	lib/OpenAPI/Client/OpenAI/Path/chatkit-sessions-session_id-cancel.pod \
+	lib/OpenAPI/Client/OpenAI/Path/chatkit-sessions.pod \
+	lib/OpenAPI/Client/OpenAI/Path/chatkit-threads-thread_id-items.pod \
+	lib/OpenAPI/Client/OpenAI/Path/chatkit-threads-thread_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/chatkit-threads.pod \
 	lib/OpenAPI/Client/OpenAI/Path/completions.pod \
 	lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files-file_id-content.pod \
 	lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files-file_id.pod \
@@ -229,6 +237,12 @@ MAN3PODS = lib/OpenAPI/Client/OpenAI.pm \
 	lib/OpenAPI/Client/OpenAI/Path/organization-certificates-deactivate.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-certificates.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-costs.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-roles.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-users-user_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-users.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-invites-invite_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-invites.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-api_keys-key_id.pod \
@@ -237,6 +251,8 @@ MAN3PODS = lib/OpenAPI/Client/OpenAI.pm \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates-activate.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates-deactivate.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-groups-group_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-groups.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-rate_limits-rate_limit_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-rate_limits.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-service_accounts-service_account_id.pod \
@@ -245,6 +261,8 @@ MAN3PODS = lib/OpenAPI/Client/OpenAI.pm \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-users.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-roles.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-audio_speeches.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-audio_transcriptions.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-code_interpreter_sessions.pod \
@@ -253,10 +271,26 @@ MAN3PODS = lib/OpenAPI/Client/OpenAI.pm \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-images.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-moderations.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-vector_stores.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id-roles.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-users.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-groups-group_id-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-groups-group_id-roles.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-roles.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-users-user_id-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-users-user_id-roles.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-accept.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-hangup.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-refer.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-reject.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-calls.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-client_secrets.pod \
 	lib/OpenAPI/Client/OpenAI/Path/realtime-sessions.pod \
 	lib/OpenAPI/Client/OpenAI/Path/realtime-transcription_sessions.pod \
+	lib/OpenAPI/Client/OpenAI/Path/responses-compact.pod \
+	lib/OpenAPI/Client/OpenAI/Path/responses-input_tokens.pod \
 	lib/OpenAPI/Client/OpenAI/Path/responses-response_id-cancel.pod \
 	lib/OpenAPI/Client/OpenAI/Path/responses-response_id-input_items.pod \
 	lib/OpenAPI/Client/OpenAI/Path/responses-response_id.pod \
@@ -285,7 +319,11 @@ MAN3PODS = lib/OpenAPI/Client/OpenAI.pm \
 	lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id-files.pod \
 	lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id-search.pod \
 	lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id.pod \
-	lib/OpenAPI/Client/OpenAI/Path/vector_stores.pod
+	lib/OpenAPI/Client/OpenAI/Path/vector_stores.pod \
+	lib/OpenAPI/Client/OpenAI/Path/videos-video_id-content.pod \
+	lib/OpenAPI/Client/OpenAI/Path/videos-video_id-remix.pod \
+	lib/OpenAPI/Client/OpenAI/Path/videos-video_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/videos.pod
 
 # Where to build things
 INST_LIBDIR      = $(INST_LIB)/OpenAPI/Client
@@ -312,12 +350,20 @@ TO_INST_PM = lib/OpenAPI/Client/OpenAI.pm \
 	lib/OpenAPI/Client/OpenAI/Path/audio-speech.pod \
 	lib/OpenAPI/Client/OpenAI/Path/audio-transcriptions.pod \
 	lib/OpenAPI/Client/OpenAI/Path/audio-translations.pod \
+	lib/OpenAPI/Client/OpenAI/Path/audio-voice_consents-consent_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/audio-voice_consents.pod \
+	lib/OpenAPI/Client/OpenAI/Path/audio-voices.pod \
 	lib/OpenAPI/Client/OpenAI/Path/batches-batch_id-cancel.pod \
 	lib/OpenAPI/Client/OpenAI/Path/batches-batch_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/batches.pod \
 	lib/OpenAPI/Client/OpenAI/Path/chat-completions-completion_id-messages.pod \
 	lib/OpenAPI/Client/OpenAI/Path/chat-completions-completion_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/chat-completions.pod \
+	lib/OpenAPI/Client/OpenAI/Path/chatkit-sessions-session_id-cancel.pod \
+	lib/OpenAPI/Client/OpenAI/Path/chatkit-sessions.pod \
+	lib/OpenAPI/Client/OpenAI/Path/chatkit-threads-thread_id-items.pod \
+	lib/OpenAPI/Client/OpenAI/Path/chatkit-threads-thread_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/chatkit-threads.pod \
 	lib/OpenAPI/Client/OpenAI/Path/completions.pod \
 	lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files-file_id-content.pod \
 	lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files-file_id.pod \
@@ -364,6 +410,12 @@ TO_INST_PM = lib/OpenAPI/Client/OpenAI.pm \
 	lib/OpenAPI/Client/OpenAI/Path/organization-certificates-deactivate.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-certificates.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-costs.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-roles.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-users-user_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-users.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-invites-invite_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-invites.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-api_keys-key_id.pod \
@@ -372,6 +424,8 @@ TO_INST_PM = lib/OpenAPI/Client/OpenAI.pm \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates-activate.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates-deactivate.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-groups-group_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-groups.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-rate_limits-rate_limit_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-rate_limits.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-service_accounts-service_account_id.pod \
@@ -380,6 +434,8 @@ TO_INST_PM = lib/OpenAPI/Client/OpenAI.pm \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-users.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-roles.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-audio_speeches.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-audio_transcriptions.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-code_interpreter_sessions.pod \
@@ -388,10 +444,26 @@ TO_INST_PM = lib/OpenAPI/Client/OpenAI.pm \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-images.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-moderations.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-vector_stores.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id-roles.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-users.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-groups-group_id-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-groups-group_id-roles.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-roles.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-users-user_id-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-users-user_id-roles.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-accept.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-hangup.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-refer.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-reject.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-calls.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-client_secrets.pod \
 	lib/OpenAPI/Client/OpenAI/Path/realtime-sessions.pod \
 	lib/OpenAPI/Client/OpenAI/Path/realtime-transcription_sessions.pod \
+	lib/OpenAPI/Client/OpenAI/Path/responses-compact.pod \
+	lib/OpenAPI/Client/OpenAI/Path/responses-input_tokens.pod \
 	lib/OpenAPI/Client/OpenAI/Path/responses-response_id-cancel.pod \
 	lib/OpenAPI/Client/OpenAI/Path/responses-response_id-input_items.pod \
 	lib/OpenAPI/Client/OpenAI/Path/responses-response_id.pod \
@@ -420,7 +492,11 @@ TO_INST_PM = lib/OpenAPI/Client/OpenAI.pm \
 	lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id-files.pod \
 	lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id-search.pod \
 	lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id.pod \
-	lib/OpenAPI/Client/OpenAI/Path/vector_stores.pod
+	lib/OpenAPI/Client/OpenAI/Path/vector_stores.pod \
+	lib/OpenAPI/Client/OpenAI/Path/videos-video_id-content.pod \
+	lib/OpenAPI/Client/OpenAI/Path/videos-video_id-remix.pod \
+	lib/OpenAPI/Client/OpenAI/Path/videos-video_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/videos.pod
 PERL_ARCHLIBDEP = /Users/ovid/perl5/perlbrew/perls/perl-5.40.0/lib/5.40.0/darwin-2level
 PERL_INCDEP = /Users/ovid/perl5/perlbrew/perls/perl-5.40.0/lib/5.40.0/darwin-2level/CORE
 
@@ -499,7 +575,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = OpenAPI-Client-OpenAI
-DISTVNAME = OpenAPI-Client-OpenAI-0.24
+DISTVNAME = OpenAPI-Client-OpenAI-0.25
 
 
 # --- MakeMaker macro section:
@@ -661,12 +737,20 @@ manifypods : pure_all config  \
 	lib/OpenAPI/Client/OpenAI/Path/audio-speech.pod \
 	lib/OpenAPI/Client/OpenAI/Path/audio-transcriptions.pod \
 	lib/OpenAPI/Client/OpenAI/Path/audio-translations.pod \
+	lib/OpenAPI/Client/OpenAI/Path/audio-voice_consents-consent_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/audio-voice_consents.pod \
+	lib/OpenAPI/Client/OpenAI/Path/audio-voices.pod \
 	lib/OpenAPI/Client/OpenAI/Path/batches-batch_id-cancel.pod \
 	lib/OpenAPI/Client/OpenAI/Path/batches-batch_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/batches.pod \
 	lib/OpenAPI/Client/OpenAI/Path/chat-completions-completion_id-messages.pod \
 	lib/OpenAPI/Client/OpenAI/Path/chat-completions-completion_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/chat-completions.pod \
+	lib/OpenAPI/Client/OpenAI/Path/chatkit-sessions-session_id-cancel.pod \
+	lib/OpenAPI/Client/OpenAI/Path/chatkit-sessions.pod \
+	lib/OpenAPI/Client/OpenAI/Path/chatkit-threads-thread_id-items.pod \
+	lib/OpenAPI/Client/OpenAI/Path/chatkit-threads-thread_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/chatkit-threads.pod \
 	lib/OpenAPI/Client/OpenAI/Path/completions.pod \
 	lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files-file_id-content.pod \
 	lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files-file_id.pod \
@@ -713,6 +797,12 @@ manifypods : pure_all config  \
 	lib/OpenAPI/Client/OpenAI/Path/organization-certificates-deactivate.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-certificates.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-costs.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-roles.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-users-user_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-users.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-groups.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-invites-invite_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-invites.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-api_keys-key_id.pod \
@@ -721,6 +811,8 @@ manifypods : pure_all config  \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates-activate.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates-deactivate.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-groups-group_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-groups.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-rate_limits-rate_limit_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-rate_limits.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-service_accounts-service_account_id.pod \
@@ -729,6 +821,8 @@ manifypods : pure_all config  \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-users.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-projects.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-roles.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-audio_speeches.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-audio_transcriptions.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-code_interpreter_sessions.pod \
@@ -737,10 +831,26 @@ manifypods : pure_all config  \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-images.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-moderations.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-usage-vector_stores.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id-roles.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/organization-users.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-groups-group_id-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-groups-group_id-roles.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-roles.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-users-user_id-roles-role_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/projects-project_id-users-user_id-roles.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-accept.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-hangup.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-refer.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-reject.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-calls.pod \
+	lib/OpenAPI/Client/OpenAI/Path/realtime-client_secrets.pod \
 	lib/OpenAPI/Client/OpenAI/Path/realtime-sessions.pod \
 	lib/OpenAPI/Client/OpenAI/Path/realtime-transcription_sessions.pod \
+	lib/OpenAPI/Client/OpenAI/Path/responses-compact.pod \
+	lib/OpenAPI/Client/OpenAI/Path/responses-input_tokens.pod \
 	lib/OpenAPI/Client/OpenAI/Path/responses-response_id-cancel.pod \
 	lib/OpenAPI/Client/OpenAI/Path/responses-response_id-input_items.pod \
 	lib/OpenAPI/Client/OpenAI/Path/responses-response_id.pod \
@@ -769,7 +879,11 @@ manifypods : pure_all config  \
 	lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id-files.pod \
 	lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id-search.pod \
 	lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id.pod \
-	lib/OpenAPI/Client/OpenAI/Path/vector_stores.pod
+	lib/OpenAPI/Client/OpenAI/Path/vector_stores.pod \
+	lib/OpenAPI/Client/OpenAI/Path/videos-video_id-content.pod \
+	lib/OpenAPI/Client/OpenAI/Path/videos-video_id-remix.pod \
+	lib/OpenAPI/Client/OpenAI/Path/videos-video_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/videos.pod
 	$(NOECHO) $(POD2MAN) --section=$(MAN3SECTION) --perm_rw=$(PERM_RW) -u \
 	  lib/OpenAPI/Client/OpenAI.pm $(INST_MAN3DIR)/OpenAPI::Client::OpenAI.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Methods.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Methods.$(MAN3EXT) \
@@ -779,12 +893,20 @@ manifypods : pure_all config  \
 	  lib/OpenAPI/Client/OpenAI/Path/audio-speech.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::audio-speech.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/audio-transcriptions.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::audio-transcriptions.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/audio-translations.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::audio-translations.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/audio-voice_consents-consent_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::audio-voice_consents-consent_id.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/audio-voice_consents.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::audio-voice_consents.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/audio-voices.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::audio-voices.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/batches-batch_id-cancel.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::batches-batch_id-cancel.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/batches-batch_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::batches-batch_id.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/batches.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::batches.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/chat-completions-completion_id-messages.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::chat-completions-completion_id-messages.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/chat-completions-completion_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::chat-completions-completion_id.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/chat-completions.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::chat-completions.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/chatkit-sessions-session_id-cancel.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::chatkit-sessions-session_id-cancel.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/chatkit-sessions.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::chatkit-sessions.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/chatkit-threads-thread_id-items.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::chatkit-threads-thread_id-items.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/chatkit-threads-thread_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::chatkit-threads-thread_id.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/chatkit-threads.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::chatkit-threads.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/completions.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::completions.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files-file_id-content.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::containers-container_id-files-file_id-content.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files-file_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::containers-container_id-files-file_id.$(MAN3EXT) \
@@ -831,6 +953,12 @@ manifypods : pure_all config  \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-certificates-deactivate.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-certificates-deactivate.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-certificates.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-certificates.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-costs.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-costs.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-roles-role_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-groups-group_id-roles-role_id.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-roles.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-groups-group_id-roles.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-users-user_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-groups-group_id-users-user_id.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-users.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-groups-group_id-users.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-groups-group_id.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/organization-groups.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-groups.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-invites-invite_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-invites-invite_id.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-invites.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-invites.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-api_keys-key_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-projects-project_id-api_keys-key_id.$(MAN3EXT) \
@@ -839,6 +967,8 @@ manifypods : pure_all config  \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates-activate.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificates-activate.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates-deactivate.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificates-deactivate.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificates.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-groups-group_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-projects-project_id-groups-group_id.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-groups.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-projects-project_id-groups.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-rate_limits-rate_limit_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-projects-project_id-rate_limits-rate_limit_id.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-rate_limits.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-projects-project_id-rate_limits.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-service_accounts-service_account_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-projects-project_id-service_accounts-service_account_id.$(MAN3EXT) \
@@ -847,6 +977,8 @@ manifypods : pure_all config  \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-users.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-projects-project_id-users.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-projects-project_id.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-projects.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-projects.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/organization-roles-role_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-roles-role_id.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/organization-roles.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-roles.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-usage-audio_speeches.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-usage-audio_speeches.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-usage-audio_transcriptions.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-usage-audio_transcriptions.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-usage-code_interpreter_sessions.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-usage-code_interpreter_sessions.$(MAN3EXT) \
@@ -855,10 +987,26 @@ manifypods : pure_all config  \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-usage-images.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-usage-images.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-usage-moderations.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-usage-moderations.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-usage-vector_stores.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-usage-vector_stores.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id-roles-role_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-users-user_id-roles-role_id.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id-roles.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-users-user_id-roles.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-users-user_id.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/organization-users.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::organization-users.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/projects-project_id-groups-group_id-roles-role_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::projects-project_id-groups-group_id-roles-role_id.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/projects-project_id-groups-group_id-roles.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::projects-project_id-groups-group_id-roles.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/projects-project_id-roles-role_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::projects-project_id-roles-role_id.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/projects-project_id-roles.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::projects-project_id-roles.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/projects-project_id-users-user_id-roles-role_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::projects-project_id-users-user_id-roles-role_id.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/projects-project_id-users-user_id-roles.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::projects-project_id-users-user_id-roles.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-accept.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::realtime-calls-call_id-accept.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-hangup.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::realtime-calls-call_id-hangup.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-refer.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::realtime-calls-call_id-refer.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-reject.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::realtime-calls-call_id-reject.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/realtime-calls.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::realtime-calls.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/realtime-client_secrets.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::realtime-client_secrets.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/realtime-sessions.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::realtime-sessions.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/realtime-transcription_sessions.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::realtime-transcription_sessions.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/responses-compact.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::responses-compact.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/responses-input_tokens.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::responses-input_tokens.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/responses-response_id-cancel.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::responses-response_id-cancel.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/responses-response_id-input_items.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::responses-response_id-input_items.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/responses-response_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::responses-response_id.$(MAN3EXT) \
@@ -887,7 +1035,11 @@ manifypods : pure_all config  \
 	  lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id-files.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-files.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id-search.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-search.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id.$(MAN3EXT) \
-	  lib/OpenAPI/Client/OpenAI/Path/vector_stores.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::vector_stores.$(MAN3EXT) 
+	  lib/OpenAPI/Client/OpenAI/Path/vector_stores.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::vector_stores.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/videos-video_id-content.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::videos-video_id-content.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/videos-video_id-remix.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::videos-video_id-remix.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/videos-video_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::videos-video_id.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/videos.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::videos.$(MAN3EXT) 
 
 
 
@@ -995,7 +1147,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) 'resources:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  bugtracker: https://github.com/nferraz/perl-openapi-client-openai/issues' >> META_new.yml
 	$(NOECHO) $(ECHO) '  repository: https://github.com/nferraz/perl-openapi-client-openai.git' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: '\''0.24'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: '\''0.25'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -1070,7 +1222,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '         "web" : "https://github.com/nferraz/perl-openapi-client-openai"' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0.24",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "0.25",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.16"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
@@ -1380,7 +1532,7 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="OpenAPI-Client-OpenAI" VERSION="0.24">' > OpenAPI-Client-OpenAI.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="OpenAPI-Client-OpenAI" VERSION="0.25">' > OpenAPI-Client-OpenAI.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>A client for the OpenAI API</ABSTRACT>' >> OpenAPI-Client-OpenAI.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Nelson Ferraz &lt;nferraz@gmail.com&gt;</AUTHOR>' >> OpenAPI-Client-OpenAI.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> OpenAPI-Client-OpenAI.ppd
@@ -1410,12 +1562,20 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	  'lib/OpenAPI/Client/OpenAI/Path/audio-speech.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/audio-speech.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/audio-transcriptions.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/audio-transcriptions.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/audio-translations.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/audio-translations.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/audio-voice_consents-consent_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/audio-voice_consents-consent_id.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/audio-voice_consents.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/audio-voice_consents.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/audio-voices.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/audio-voices.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/batches-batch_id-cancel.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/batches-batch_id-cancel.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/batches-batch_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/batches-batch_id.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/batches.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/batches.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/chat-completions-completion_id-messages.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/chat-completions-completion_id-messages.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/chat-completions-completion_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/chat-completions-completion_id.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/chat-completions.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/chat-completions.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/chatkit-sessions-session_id-cancel.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/chatkit-sessions-session_id-cancel.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/chatkit-sessions.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/chatkit-sessions.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/chatkit-threads-thread_id-items.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/chatkit-threads-thread_id-items.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/chatkit-threads-thread_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/chatkit-threads-thread_id.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/chatkit-threads.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/chatkit-threads.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/completions.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/completions.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files-file_id-content.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files-file_id-content.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files-file_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files-file_id.pod' \
@@ -1462,6 +1622,12 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-certificates-deactivate.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-certificates-deactivate.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-certificates.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-certificates.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-costs.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-costs.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-roles-role_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-roles-role_id.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-roles.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-roles.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-users-user_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-users-user_id.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-users.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id-users.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-groups-group_id.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/organization-groups.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-groups.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-invites-invite_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-invites-invite_id.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-invites.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-invites.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-api_keys-key_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-api_keys-key_id.pod' \
@@ -1470,6 +1636,8 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates-activate.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates-activate.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates-deactivate.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates-deactivate.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-certificates.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-groups-group_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-groups-group_id.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-groups.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-groups.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-rate_limits-rate_limit_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-rate_limits-rate_limit_id.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-rate_limits.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-rate_limits.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-service_accounts-service_account_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-service_accounts-service_account_id.pod' \
@@ -1478,6 +1646,8 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-users.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id-users.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-projects-project_id.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-projects.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-projects.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/organization-roles-role_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-roles-role_id.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/organization-roles.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-roles.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-usage-audio_speeches.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-usage-audio_speeches.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-usage-audio_transcriptions.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-usage-audio_transcriptions.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-usage-code_interpreter_sessions.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-usage-code_interpreter_sessions.pod' \
@@ -1486,10 +1656,26 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-usage-images.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-usage-images.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-usage-moderations.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-usage-moderations.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-usage-vector_stores.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-usage-vector_stores.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id-roles-role_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id-roles-role_id.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id-roles.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id-roles.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-users-user_id.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/organization-users.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/organization-users.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/projects-project_id-groups-group_id-roles-role_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/projects-project_id-groups-group_id-roles-role_id.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/projects-project_id-groups-group_id-roles.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/projects-project_id-groups-group_id-roles.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/projects-project_id-roles-role_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/projects-project_id-roles-role_id.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/projects-project_id-roles.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/projects-project_id-roles.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/projects-project_id-users-user_id-roles-role_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/projects-project_id-users-user_id-roles-role_id.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/projects-project_id-users-user_id-roles.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/projects-project_id-users-user_id-roles.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-accept.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-accept.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-hangup.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-hangup.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-refer.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-refer.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-reject.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/realtime-calls-call_id-reject.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/realtime-calls.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/realtime-calls.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/realtime-client_secrets.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/realtime-client_secrets.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/realtime-sessions.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/realtime-sessions.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/realtime-transcription_sessions.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/realtime-transcription_sessions.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/responses-compact.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/responses-compact.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/responses-input_tokens.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/responses-input_tokens.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/responses-response_id-cancel.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/responses-response_id-cancel.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/responses-response_id-input_items.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/responses-response_id-input_items.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/responses-response_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/responses-response_id.pod' \
@@ -1518,7 +1704,11 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	  'lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id-files.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id-files.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id-search.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id-search.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/vector_stores-vector_store_id.pod' \
-	  'lib/OpenAPI/Client/OpenAI/Path/vector_stores.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/vector_stores.pod' 
+	  'lib/OpenAPI/Client/OpenAI/Path/vector_stores.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/vector_stores.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/videos-video_id-content.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/videos-video_id-content.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/videos-video_id-remix.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/videos-video_id-remix.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/videos-video_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/videos-video_id.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/videos.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/videos.pod' 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 

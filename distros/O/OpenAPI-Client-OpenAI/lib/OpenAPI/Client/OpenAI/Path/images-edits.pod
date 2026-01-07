@@ -43,13 +43,17 @@ C<createImageEdit>
 
 =head4 Models
 
-The model to use for image generation. Only C<dall-e-2> and C<gpt-image-1> are supported. Defaults to C<dall-e-2> unless a parameter specific to C<gpt-image-1> is used.
+The model to use for image generation. Only C<dall-e-2> and the GPT image models are supported. Defaults to C<dall-e-2> unless a parameter specific to the GPT image models is used.
 
 =over 4
       
+=item * C<gpt-image-1.5>
+
 =item * C<dall-e-2>
 
 =item * C<gpt-image-1>
+
+=item * C<gpt-image-1-mini>
 
 =back
       
@@ -61,7 +65,6 @@ Example:
        "n" : 1,
        "output_compression" : 100,
        "output_format" : "png",
-       "partial_images" : 1,
        "prompt" : "A cute baby sea otter wearing a beret",
        "quality" : "high",
        "response_format" : "url",
@@ -128,7 +131,7 @@ L<OpenAPI::Client::OpenAI::Path>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2023-2025 by Nelson Ferraz
+Copyright (C) 2023-2026 by Nelson Ferraz
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

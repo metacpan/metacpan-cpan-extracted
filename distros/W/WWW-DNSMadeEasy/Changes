@@ -1,3 +1,28 @@
 Revision history for WWW-DNSMadeEasy
 
+0.100     2026-01-05 19:23:57Z
+  - Switch default branch from master to main
+  - Switch to HTTPS for API endpoints
+  - Default API version changed from 1.2 to 2.0
+  - Removed .travis.yml (no longer used)
+  - Moved dependencies to cpanfile
+  - Added comprehensive test suite with MockUA fixtures
+  - Tests support live API via TEST_WWW_DNSMADEEASY_API_KEY/API_SECRET
+  - Optional write tests via TEST_WWW_DNSMADEEASY_WRITE=1
+  - Fixed CRLF line endings
+
+  Merged API 2.0 support by Eric Johnson (KABLAMO):
+  - Added WWW::DNSMadeEasy::ManagedDomain for V2 managed domains
+  - Added WWW::DNSMadeEasy::ManagedDomain::Record for V2 domain records
+  - Added WWW::DNSMadeEasy::Monitor for DNS failover and system monitoring
+  - Added WWW::DNSMadeEasy::Response for better response handling
+  - Added create_managed_domain(), get_managed_domain(), managed_domains() methods
+  - Added wait_for_pending_action() and wait_for_delete() to ManagedDomain
+  - Added record filtering: records(type => 'A', name => 'www')
+  - Added get_monitor() and create_monitor() to ManagedDomain::Record
+  - Improved V1 API: Domain and Domain::Record with lazy builders
+  - Added as_hashref() accessor to V2 objects
+  - Fixed various bugs in V1 and V2 implementations
+
 0.001     2012-01-07 04:03:04 Europe/Berlin
+  - Initial release

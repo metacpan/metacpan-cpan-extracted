@@ -2,6 +2,7 @@
 bin/perl-distrolint
 Build.PL
 Changes
+distrolint.ini
 lib/App/perl/distrolint.pm
 lib/App/perl/distrolint/Check/DeprecatedFeatures.pm
 lib/App/perl/distrolint/Check/Editorconfig.pm
@@ -11,6 +12,7 @@ lib/App/perl/distrolint/Check/NoStrictRefs.pm
 lib/App/perl/distrolint/Check/PerlVersionVar.pm
 lib/App/perl/distrolint/Check/Pod.pm
 lib/App/perl/distrolint/Check/StrictAndWarnings.pm
+lib/App/perl/distrolint/Check/SubSignatures.pm
 lib/App/perl/distrolint/Check/Test2.pm
 lib/App/perl/distrolint/Check/Unimport.pm
 lib/App/perl/distrolint/Check/UseUTF8.pm
@@ -18,6 +20,7 @@ lib/App/perl/distrolint/Check/UseVERSION.pm
 lib/App/perl/distrolint/Check/VersionVar.pm
 lib/App/perl/distrolint/CheckRole/EachFile.pm
 lib/App/perl/distrolint/CheckRole/TreeSitterPerl.pm
+lib/App/perl/distrolint/Config.pm
 LICENSE
 MANIFEST			This list of files
 META.json
@@ -28,6 +31,7 @@ t/50deprecated-features.t
 t/50no-strict-refs.t
 t/50perl-version-var.t
 t/50strict-and-warnings.t
+t/50sub-signatures.t
 t/50unimport.t
 t/50use-version.t
 t/50version-var.t

@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "JSON-RPC2",
    "no_index" : {
@@ -57,15 +57,15 @@
    "provides" : {
       "JSON::RPC2" : {
          "file" : "lib/JSON/RPC2.pm",
-         "version" : "v2.1.3"
+         "version" : "v2.2.0"
       },
       "JSON::RPC2::Client" : {
          "file" : "lib/JSON/RPC2/Client.pm",
-         "version" : "v2.1.3"
+         "version" : "v2.2.0"
       },
       "JSON::RPC2::Server" : {
          "file" : "lib/JSON/RPC2/Server.pm",
-         "version" : "v2.1.3"
+         "version" : "v2.2.0"
       }
    },
    "release_status" : "stable",
@@ -80,12 +80,14 @@
          "web" : "https://github.com/powerman/perl-JSON-RPC2"
       }
    },
-   "version" : "v2.1.3",
+   "version" : "v2.2.0",
    "x_contributors" : [
+      "dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+      "Michael Bunk <micha@freedict.org>",
       "Scott Miller (ROS) <scott.miller@veritas.com>"
    ],
-   "x_generated_by_perl" : "v5.40.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.40.2",
+   "x_serialization_backend" : "JSON::XS version 4.04",
    "x_spdx_expression" : "MIT",
    "x_static_install" : 1
 }

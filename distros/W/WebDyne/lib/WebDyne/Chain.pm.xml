@@ -15,15 +15,14 @@
   <refsynopsisdiv>
     <title>SYNOPSIS</title>
 
-    <programlisting language="perl">#  Basic usage in a simple chain.psp file:
+    <programlisting>#  Basic usage. Save as file named chain.psp:
 #
 &lt;start_html&gt;
 Server local time is: &lt;? localtime ?&gt;
 __PERL__
-use WebDyne::Chain qw(WebDyne::Session)
+use WebDyne::Chain qw(WebDyne::Session)</programlisting>
 
-
-#  Render with wdrender. Note the session variable
+    <screen language="perl">#  Render with wdrender. Note the session variable
 #
 $ wdrender --header ./chain.psp
 Status: 200
@@ -45,7 +44,7 @@ Content-Length: 242
 #
 $ WebDyneChain=WebDyne::Session wdrender --header --handler WebDyne::Chain time.psp 
 
-</programlisting>
+</screen>
   </refsynopsisdiv>
 
   <refsect1>
@@ -133,8 +132,8 @@ use WebDyne::Session;</programlisting>
   <refsect1>
     <title>OPTIONS</title>
 
-    <para>WebDyne::Chain does not expose any options other than the names of modules to add to the handler chain via the import() method on module use - as seen in the Usage section above.
-    </para>
+    <para>WebDyne::Chain does not expose any options other than the names of modules to add to the handler chain via the import() method on module use - as seen in the Usage section
+    above.</para>
   </refsect1>
 
   <refsect1>

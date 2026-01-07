@@ -10,7 +10,12 @@ use File::Spec;
 use File::Temp;
 use Getopt::Long qw(GetOptionsFromArray);
 use JSON::PP;
+use Time::Piece;
 use YAML::PP;
+
+use constant {
+    ISO_DATE_FMT => '%Y-%m-%dT%H:%M:%S',
+};
 
 my $DEBUG = 0;
 my $VERBOSE = 0;
@@ -81,6 +86,28 @@ sub configure() {
     }
 }
 
+sub _map_certs($dir, $cb) {
+    opendir( my $dh, $dir )
+        or die "Could not open directory '$dir': $!";
+
+    for my $file ( File::Spec->no_upwards( readdir($dh) ) ) {
+        my $path = File::Spec->catfile( $dir, $file );
+
+        if (-d $path) {
+            _map_certs( $path, $cb );
+        } else {
+            $cb->( cert_load_from_path( $path ), $path );
+        }
+    }
+
+    closedir($dh);
+}
+
+sub map_certs($cb) {
+    _map_certs( opt( 'certsdir' ), $cb );
+    return;
+}
+
 sub cert_new($identity, %args) {
     return {
         id => $identity,
@@ -101,9 +128,11 @@ sub cert_identity($cert) {
     return $cert->{id};
 }
 
-sub cert_path($serial, $create = undef) {
+sub cert_path($serial_or_cert, $create = undef) {
+    my $serial = (ref $serial_or_cert)
+        ? $serial_or_cert->{serial} : $serial_or_cert;
     $digest->reset;
-    $digest->add( $serial );
+    $digest->add( "$serial" );
     my $hash = $digest->hexdigest;
     $hash =~ m/^(..)(..)/;
 
@@ -115,10 +144,16 @@ sub cert_path($serial, $create = undef) {
     return File::Spec->catfile( $dir, "$hash.json");
 }
 
+sub cert_load_from_path($path) {
+    open(my $fh, '<:encoding(UTF-8)', $path)
+        or die "Unable to open certificate file '$path': $!";
+    return $json->decode( do { local $/ = undef; <$fh> } );
+}
+
 sub cert_load($serial) {
     my $path = cert_path($serial);
     open(my $fh, '<:encoding(UTF-8)', $path)
-        or die "Unable to open certificate file for serial '$serial'";
+        or die "Unable to open certificate file for serial '$serial': $!";
     return $json->decode( do { local $/ = undef; <$fh> } );
 }
 
@@ -239,6 +274,54 @@ sub ssh_cert_issue($cert) {
     cert_certkey( $cert, $certkey );
 }
 
+sub ssh_cert_parse($cert) {
+    my $fh = File::Temp->new;
+    my $fn = $fh->filename;
+
+    say $fh $cert->{certkey};
+    $fh->flush;
+
+    my %rv;
+    my $indent = '';
+    my $multivalue = '';
+    for my $line (qx|ssh-keygen -q -L -f $fn|) {
+        if ($multivalue) {
+            if ($line =~ m/$indent\s+(.*)$/) {
+                push $rv{$multivalue}->@*, $1;
+                next;
+            }
+            else {
+                $multivalue = '';
+            }
+        }
+        $line =~ m/(?<INDENT>\s+)(?<NAME>[^:]+):\s(?<VALUE>.*)/
+            or next;
+        my %r = %+;
+
+        $indent = $r{INDENT};
+        if ($r{NAME} eq 'Valid') {
+            if ($r{VALUE} =~ m/(?:from (\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d))/) {
+                $rv{Valid}->{from} = Time::Piece->strptime( $1, ISO_DATE_FMT );
+            }
+            if ($r{VALUE} =~ m/(?:to (\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d))/) {
+                $rv{Valid}->{to} = Time::Piece->strptime( $1, ISO_DATE_FMT );
+            }
+        }
+        else {
+            if ($r{VALUE} eq '(none)') {
+                $rv{$r{NAME}} = [];
+            }
+            elsif ($r{VALUE} eq '') {
+                $rv{$r{NAME}} = [];
+                $multivalue = $r{NAME};
+            }
+            else {
+                $rv{$r{NAME}} = $r{VALUE};
+            }
+        }
+    }
+    \%rv;
+}
 
 sub _init_ca_key( %args ) {
     my @args = (
@@ -372,6 +455,12 @@ sub cmd_renew(@args) {
 }
 
 sub cmd_revoke(@args) {
+    my $serial = shift @args;
+    my $cert = cert_load( $serial );
+
+    cert_state( $cert, 'REVOKED' );
+    cert_save( $cert );
+
     return 0;
 }
 
@@ -379,6 +468,72 @@ sub cmd_history(@args) {
     return 0;
 }
 
+sub _filter_expiry($cb) {
+    say STDERR "Filtering by expiry: $options{expiry}";
+    my $before = Time::Piece->strptime( $options{expiry}, ISO_DATE_FMT );
+    sub ($cert_data, $cert, @rest) {
+        return unless ($cert_data->{Valid}
+                       and $cert_data->{Valid}->{to}
+                       and $cert_data->{Valid}->{to} < $before);
+        $cb->($cert_data, $cert, @rest);
+    }
+}
+
+sub _filter_issued($cb) {
+    say STDERR "Filtering ISSUED certs only";
+    sub ($cert_data, $cert, @rest) {
+        return unless $cert->{status} eq 'ISSUED';
+        $cb->($cert_data, $cert, @rest);
+    }
+}
+
+sub _filter_wrap_parsed_cert($cb) {
+    sub ($cert, @rest) {
+        my $data = ssh_cert_parse( $cert );
+        $cb->( $data, $cert, @rest );
+    }
+}
+
+sub cmd_list(@args) {
+    my $matched = '';
+    my $fn =
+        sub ($cert_data, $cert, $path, @) {
+            my $cert_path = cert_path( $cert->{serial} );
+            my $enddate = $cert_data->{Valid}->{to};
+            $enddate = $enddate ? ('/' . $enddate->datetime) : '';
+            say "$cert->{serial}/$cert->{state}/$cert->{id}$enddate";
+            $matched = 1;
+    };
+    $fn = _filter_expiry( $fn )
+        if $options{expiry};
+    $fn = _filter_wrap_parsed_cert( $fn );
+    map_certs($fn);
+
+    # exit code as 'grep':
+    return ($matched ? 0 : 1);
+}
+
+sub cmd_cleanup(@args) {
+    my $now = gmtime();
+    say "Dry-run cleanup\n" if $options{"dry-run"};
+    map_certs(
+        sub ($cert, $path, @) {
+            my $data = ssh_cert_parse( $cert );
+            my $enddate = $data->{Valid}->{to};
+            if ($enddate
+                and $enddate < $now) {
+                say "Removing expired cert with serial '$cert->{serial}'";
+                unless ($options{"dry-run"}) {
+                    my $p = cert_path( $cert );
+                    unless (unlink( $p ) == 1) {
+                        die "Unable to remove certificate path '$p' (reported: $path)";
+                    }
+                }
+            }
+        });
+
+    return 0;
+}
 
 my $help = <<'HELP';
 usage: sshca <command> [options] args...
@@ -389,6 +544,8 @@ usage: sshca <command> [options] args...
     renew
     revoke
     history
+    list
+    cleanup
 HELP
 
 sub usage() {
@@ -405,6 +562,8 @@ my %cmd = (
     renew => \&cmd_renew,
     revoke => \&cmd_revoke,
     history => \&cmd_history,
+    list => \&cmd_list,
+    cleanup => \&cmd_cleanup,
     );
 
 my %common_opts = (
@@ -423,13 +582,23 @@ my %cmd_opts = (
                'principal=s' => \@{$options{certprincipals}},
                'validity=s'  => \$options{certvalidity},
                %common_opts },
-    renew => { 'serial'      => sub { $options{renewal} = 'serial' },
-               'fingerprint' => sub { $options{renewal} = 'fingerprint'; die "Fingerprint renewals are planned\n" },
+    renew =>  { 'serial'      => sub { $options{renewal} = 'serial' },
+                'fingerprint' => sub { $options{renewal} = 'fingerprint'; die "Fingerprint renewals are planned\n" },
+                'identity'    => sub { $options{renewal} = 'identity'; die "Identity renewals are planned\n" },
+                'validity=s'  => \$options{certvalidity},
+                %common_opts },
+    revoke => { 'serial'      => sub { $options{renewal} = 'serial' },
+                'fingerprint' => sub { $options{renewal} = 'fingerprint'; die "Fingerprint renewals are planned\n" },
                'identity'    => sub { $options{renewal} = 'identity'; die "Identity renewals are planned\n" },
                'validity=s'  => \$options{certvalidity},
                %common_opts },
-    revoke => { %common_opts },
-    history => { %common_opts }
+    history => { %common_opts },
+    list    => { 'expiry=s'    => sub {
+                      $options{expiry} = ($_[1] =~ s/[+]00:00$//r);
+                 },
+                 %common_opts },
+    cleanup => { 'dry-run' => \$options{"dry-run"},
+                 %common_opts },
     );
 
 Getopt::Long::Configure( 'require_order' );
@@ -456,7 +625,7 @@ sshca - Minimalistic SSH Certificate Authority
 
 =head1 VERSION
 
-version 0.0.4
+version 0.0.5
 
 =head1 SYNOPSIS
 
@@ -473,6 +642,10 @@ version 0.0.4
 This is a simple SSH Certificate Authority. SSH certificates greatly
 enhance the functionality of SSH public keys. The C<sshca> script hands
 out certificates for public keys and tracks these certs.
+
+=head1 SEE ALSO
+
+For documentation of the command line utility, see L<App::sshca>.
 
 =head1 LICENSE AND COPYRIGHT
 

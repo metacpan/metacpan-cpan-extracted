@@ -36,7 +36,7 @@ dozo -I IMAGE \[ options \] \[ command ... \]
 
 # VERSION
 
-Version 0.9927
+Version 1.00
 
 # USAGE
 
@@ -229,9 +229,11 @@ for option parsing.
 
     Use live (persistent) container.
 
-- **-P** _port_, **--port**=_port_
+- **-P** _port_, **-P** _host_:_container_, **--port**=_host_:_container_
 
-    Specify port mapping (e.g., `8080:80`). Repeatable.
+    Specify port mapping. If only _port_ is given (without `:`), it is
+    mapped to the same port in the container (e.g., `-P 8000` becomes
+    `8000:8000`). Repeatable.
 
 - **-O** _option_, **--other**=_option_
 
@@ -467,7 +469,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2025 Kazumasa Utashiro.
+Copyright © 2025-2026 Kazumasa Utashiro.
 
 This software is released under the MIT License.
 [https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT)

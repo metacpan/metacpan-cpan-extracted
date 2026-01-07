@@ -23,6 +23,7 @@ use Sim::OPT::Sim;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
+eval { use Sim::OPTcue::Patternsearch; 1 };
 eval { use Sim::OPTcue; 1 };
 
 
@@ -43,7 +44,7 @@ use Switch::Back;
 
 our @EXPORT = qw( newretrieve newreport get_files );
 
-$VERSION = '0.123';
+$VERSION = '0.125';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################

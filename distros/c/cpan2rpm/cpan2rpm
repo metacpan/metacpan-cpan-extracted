@@ -27,7 +27,7 @@ use File::Basename qw(dirname);
 use Getopt::Long;
 use Sys::Hostname;
 use vars qw($VERSION);
-$VERSION = "2.046";
+$VERSION = "2.047";
 
 my ($ME, $RPM, $TMPDIR, %RPMDIR, $CWD, %info, %meta, $ARGS, $VX);
 my $tarRE = q/\.(tar\.(g?z|bz2)|tgz|zip)$/;
@@ -1483,10 +1483,11 @@ sub http_get {
 
     $HTTPWARN = 1 if $info{dist} =~ /libwww-perl/;
 
-    if ($@ = "", eval "use HTTP::Request::Common; use LWP::UserAgent;", !$@) {
+    if (eval { require LWP::UserAgent; 1}) {
         my $ua = LWP::UserAgent->new();
         $ua->env_proxy();
-        return $ua->request(GET($url))->content || "";
+        my $resp = $ua->get($url);
+        return ($resp && $resp->code == 200 && $resp->content) || "";
         }
     elsif ($HTTPWARN == 0) {
         print "\nWARNING: libwww-perl module not found.  To install, one ";
@@ -1506,10 +1507,10 @@ sub http_get {
         print "Trying HTTP::Lite...";
         }
 
-    if ($@ = "", eval "use HTTP::Lite;", !$@) {
+    if (eval { require HTTP::Lite; 1 }) {
         my $http = HTTP::Lite->new();
-        $http->request($url) || die "http_get(): $!.  Stopped";
-        return $http->body() || "";
+        $http->request($url) or die "http_get(): HTTP::Lite failed!";
+        return ($http->status() == 200 && $http->body()) || "";
         }
     elsif ($HTTPWARN == 0) {
         print "\nWARNING: this alternative module could not be found ";
@@ -1522,11 +1523,12 @@ sub http_get {
 
     my ($host, $doc) = $url =~ m|tp://(.*?)(/.*)|;
     my @prg = (
+        "/usr/bin/curl -s -o - $url",
         "/usr/bin/lynx -source $url",
         "/usr/bin/links -source $url",
         "/usr/bin/wget -O - $url",
         "/usr/bin/ncftpget $url && cat " . ($url =~ m|.*/(.*)|),
-        "echo -e \"user anonymous x\@x.com\nget $doc\" |/usr/bin/ftp -u $host",
+        "/bin/echo -e \"user anonymous x\@x.com\nget $doc\" |/usr/bin/ftp -u $host",
         );
 
     for (@prg) {
@@ -1553,7 +1555,7 @@ sub write_url {
     my $tar; ($tar = $url) =~ s|.*/||;
     return $tar if -s "$d/$tar" && -r _ && !$info{force};
 
-    print "Retrieving URL\n";
+    print "Retrieving URL: $url\n";
     local $_ = http_get($url);
     return if /^Fail/;    # Failed to establish connection
     return unless $_;

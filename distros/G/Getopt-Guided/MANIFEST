@@ -9,7 +9,9 @@ README
 t/examples/broken
 t/examples/fine
 t/extension.t
+t/processopts.t
 t/standard.t
 t/utility.t
+t/validation.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

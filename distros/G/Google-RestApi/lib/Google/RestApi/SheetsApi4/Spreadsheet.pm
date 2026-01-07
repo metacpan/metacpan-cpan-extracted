@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Spreadsheet;
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.1.0';
 
 use Google::RestApi::Setup;
 
@@ -16,8 +16,8 @@ use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet";
 sub new {
   my $class = shift;
 
-  my $qr_id = SheetsApi4->Spreadsheet_Id;
-  my $qr_uri = SheetsApi4->Spreadsheet_Uri;
+  my $qr_id = $Google::RestApi::SheetsApi4::Spreadsheet_Id;
+  my $qr_uri = $Google::RestApi::SheetsApi4::Spreadsheet_Uri;
   # pass one of id/name/title/uri and this will work out the others.
   state $check = compile_named(
     sheets_api => HasApi,
@@ -58,14 +58,14 @@ sub spreadsheet_id {
 
   if (!$self->{id}) {
     if ($self->{uri}) {
-      my $qr_id = SheetsApi4->Spreadsheet_Id;
-      my $qr_uri = SheetsApi4->Spreadsheet_Uri;
+      my $qr_id = $Google::RestApi::SheetsApi4::Spreadsheet_Id;
+      my $qr_uri = $Google::RestApi::SheetsApi4::Spreadsheet_Uri;
       ($self->{id}) = $self->{uri} =~ m|^$qr_uri/($qr_id)|;   # can end with '/edit'
       LOGDIE "Unable to extract a sheet id from uri" if !$self->{id};
       DEBUG("Got sheet ID '$self->{id}' via URI '$self->{uri}'.");
     } else {
-      my @spreadsheets = grep { $_->{name} eq $self->{name}; } $self->sheets_api()->spreadsheets();
-      LOGDIE "Sheet '$self->{name}' not found on Google Drive" if !@spreadsheets;
+      my @spreadsheets = $self->sheets_api()->spreadsheets($self->{name});
+      LOGDIE "Sheet '$self->{name}' not found on Google Drive" unless @spreadsheets;
       LOGDIE "More than one spreadsheet found with name '$self->{name}'. Specify 'id' or 'uri' instead."
         if scalar @spreadsheets > 1;
       $self->{id} = $spreadsheets[0]->{id};
@@ -361,6 +361,7 @@ sub sheets_api { shift->{sheets_api}; }
 sub rest_api { shift->sheets_api()->rest_api(); }
 sub transaction { shift->sheets_api()->transaction(); }
 sub stats { shift->sheets_api()->stats(); }
+sub reset_stats { shift->sheets_api->reset_stats(); }
 
 1;
 
@@ -576,6 +577,6 @@ Robin Murray mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright (c) 2021, Robin Murray. All rights reserved.
+Copyright (c) 2019-2026 Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

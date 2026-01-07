@@ -1,5 +1,0 @@
-DELETE:
-  "https://www.googleapis.com/drive/v3/files/fake_spreadsheet_id1":
-    response: ''
-  "https://www.googleapis.com/drive/v3/files/x":
-    response: ''

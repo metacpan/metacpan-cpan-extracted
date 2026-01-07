@@ -1,0 +1,6 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    "Template Content"
+    <p> @0.1.1
+      "Template Footer"

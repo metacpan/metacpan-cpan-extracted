@@ -1,5 +1,8 @@
 Revision history for Perl module Tie::Cycle
 
+1.232 2026-01-06T09:19:34Z
+	* refresh for latest release process
+
 1.231 2025-04-13T19:31:08Z
 	* require a newer version.pm for v5.10.1 tests
 

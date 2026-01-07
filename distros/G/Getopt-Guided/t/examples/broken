@@ -1,12 +1,15 @@
 use strict;
 use warnings;
 
-use Getopt::Guided qw( getopts3 );
+use Getopt::Guided qw( getopts );
 
 sub run ( \@ ) {
   my @argv = @{ $_[ 0 ] };
 
-  return 2 unless getopts3 @argv, '-a:b', my %opts;
+  unless ( eval { getopts( '-a:b', my %opts, @argv ) } ) {
+    print STDERR $@ if $@;
+    return 2
+  }
   0
 }
 

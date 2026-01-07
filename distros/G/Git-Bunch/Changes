@@ -1,3 +1,10 @@
+0.632   2026-01-03  Released-By: PERLANCAR; Urgency: medium
+
+        - [new] Add subcommand: ls-bunches.
+
+        - [ux] Always sort repos by recent.
+
+
 0.631   2024-10-22  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

@@ -1,11 +1,11 @@
 package Module::Starter::Simple;
 
-use 5.006;
+use 5.008003;
 use strict;
 use warnings;
 
 use Cwd 'cwd';
-use File::Path qw( make_path remove_tree );
+use File::Path qw( make_path );
 use File::Spec ();
 use Carp qw( carp confess croak );
 use Module::Runtime qw( require_module );
@@ -18,11 +18,11 @@ Module::Starter::Simple - a simple, comprehensive Module::Starter plugin
 
 =head1 VERSION
 
-version 1.78
+version 1.79
 
 =cut
 
-our $VERSION = '1.78';
+our $VERSION = '1.79';
 
 =head1 SYNOPSIS
 
@@ -96,18 +96,23 @@ sub create_distro {
 
     if ( ( not $self->{author} ) && ( $^O ne 'MSWin32' ) ) {
         ( $self->{author} ) = split /,/, ( getpwuid $> )[6];
+        $self->{author} = [ 
+            exists $ENV{EMAIL} 
+                ? "$self->{author} <$ENV{EMAIL}>" 
+                : $self->{author} 
+        ];
     }
 
-    if ( not $self->{email} and exists $ENV{EMAIL} ) {
-        $self->{email} = $ENV{EMAIL};
-    }
+    croak "Must specify one or more authors\n" 
+        unless $self->{author}
+        && ref($self->{author}) eq 'ARRAY'
+        && @{$self->{author}} > 0;
 
-    croak "Must specify an author\n" unless $self->{author};
-    croak "Must specify an email address\n" unless $self->{email};
-    ($self->{email_obfuscated} = $self->{email}) =~ s/@/ at /;
-
+    croak "author strings must be in the format: 'Author Name <author-email\@domain.tld>'"
+        if grep { $_ !~ m/^.*?\s*\<.*?\>\s*$/ } @{$self->{author}};
+    
     $self->{license}      ||= 'artistic2';
-    $self->{minperl}      ||= '5.006';
+    $self->{minperl}      ||= '5.008003';
     $self->{ignores_type} ||= ['generic'];
     $self->{manifest_skip} = !! grep { /manifest/ } @{ $self->{ignores_type} };
     
@@ -136,9 +141,8 @@ sub create_distro {
 
     $self->create_MANIFEST( $build_results{'manifest_method'} ) unless ( $self->{manifest_skip} );
     # TODO: put files to ignore in a more standard form?
-    # XXX: no need to return the files created
 
-    return;
+    return @files;
 }
 
 =head2 post_create_distro
@@ -173,14 +177,9 @@ sub create_basedir {
 
     # Make sure there's no directory
     if ( -e $self->{basedir} ) {
-        die( "$self->{basedir} already exists.  ".
-             "Use --force if you want to stomp on it.\n"
+        warn( "$self->{basedir} already exists.  ".
+             "Will not overwrite files unless --force is used.\n"
             ) unless $self->{force};
-
-        remove_tree $self->{basedir};
-
-        die "Couldn't delete existing $self->{basedir}: $!\n"
-          if -e $self->{basedir};
     }
 
     CREATE_IT: {
@@ -267,7 +266,7 @@ sub _license_blurb {
     my $license_blurb = defined($record) ?
         $record->notice :
         <<"EOT";
-This software is Copyright (c) @{[ $self->_thisyear ]} by $self->{author}.
+This software is Copyright (c) @{[ $self->_thisyear ]} by @{[ join ',', @{ $self->{author} } ]}.
 
 This program is released under the following license:
 
@@ -329,8 +328,9 @@ sub _reference_links {
         title    => 'CPAN\'s request tracker (report bugs here)',
         link     => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=%s',
       },
-      { title    => 'CPAN Ratings',
-        link     => 'https://cpanratings.perl.org/d/%s',
+      { title    => 'GitHub issue tracker',
+        link     => 'https://github.com/%s/%s/issues',
+        option   => 'github',
       },
       { title    => 'Search CPAN',
         link     => 'https://metacpan.org/release/%s',
@@ -407,11 +407,15 @@ sub Makefile_PL_guts {
     my $main_module = shift;
     my $main_pm_file = shift;
 
-    (my $author = "$self->{author} <$self->{email}>") =~ s/'/\'/g;
+    my $author = '[' . 
+       join(',', map { "'" . s/'/\'/rg . "'" } @{$self->{author}}) 
+       . ']';
     
     my $slname = $self->{license_record} ? $self->{license_record}->meta2_name : $self->{license};
 
     my $warnings = sprintf 'warnings%s;', ($self->{fatalize} ? " FATAL => 'all'" : '');
+
+    my $meta_merge = $self->Makefile_PL_meta_merge;
 
     return <<"HERE";
 use $self->{minperl};
@@ -421,7 +425,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
     NAME             => '$main_module',
-    AUTHOR           => q{$author},
+    AUTHOR           => $author,
     VERSION_FROM     => '$main_pm_file',
     ABSTRACT_FROM    => '$main_pm_file',
     LICENSE          => '$slname',
@@ -438,7 +442,7 @@ my %WriteMakefileArgs = (
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => '$self->{distro}-*' },
-);
+$meta_merge);
 
 # Compatibility with old versions of ExtUtils::MakeMaker
 unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {
@@ -463,6 +467,30 @@ HERE
 
 }
 
+=head2 Makefile_PL_meta_merge
+
+Method called by Makefile_PL_guts. Returns the C<META_MERGE> section - currently
+only if the option C<github> is set, in which case the C<resources => repository>
+entry is created.
+
+=cut
+
+sub Makefile_PL_meta_merge {
+    my $self = shift;
+    return '' unless $self->{github};
+    return sprintf "    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources   => {
+            repository => {
+                type => 'git',
+                url  => 'git://github.com/%s/%s.git',
+                web  => 'https://github.com/%s/%s',
+            },
+        },
+    },
+", $self->{github}, $self->{distro}, $self->{github}, $self->{distro}
+}
+
 =head2 MI_Makefile_PL_guts( $main_module, $main_pm_file )
 
 This method is called by create_MI_Makefile_PL and returns text used to populate
@@ -476,10 +504,14 @@ sub MI_Makefile_PL_guts {
     my $main_module = shift;
     my $main_pm_file = shift;
 
-    my $author = "$self->{author} <$self->{email}>";
+    my $author = join ',', @{$self->{author}};
     $author =~ s/'/\'/g;
-    
+
     my $license_url = $self->{license_record} ? $self->{license_record}->url : '';
+
+    # if there is more than one author, select the first one as
+    # the repository owner
+    my ($repo_author) = (split /\s*\</, $self->{author}->[0])[0];
 
     my $warnings = sprintf 'warnings%s;', ($self->{fatalize} ? " FATAL => 'all'" : '');
 
@@ -502,8 +534,8 @@ resources (
    #homepage   => 'http://yourwebsitehere.com',
    #IRC        => 'irc://irc.perl.org/#$self->{distro}',
    license    => '$license_url',
-   #repository => 'git://github.com/$self->{author}/$self->{distro}.git',
-   #repository => 'https://bitbucket.org/$self->{author}/$self->{distro}',
+   #repository => 'git://github.com/$repo_author/$self->{distro}.git',
+   #repository => 'https://bitbucket.org/$repo_author/$self->{distro}',
    bugtracker => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=$self->{distro}',
 );
 
@@ -568,7 +600,9 @@ sub Build_PL_guts {
     my $main_module = shift;
     my $main_pm_file = shift;
 
-    (my $author = "$self->{author} <$self->{email}>") =~ s/'/\'/g;
+    my $author = '[' . 
+       join(',', map { "'" . s/'/\'/rg . "'" } @{$self->{author}}) 
+       . ']';
 
     my $slname = $self->{license_record} ? $self->{license_record}->meta2_name : $self->{license};
     
@@ -584,7 +618,7 @@ Module::Build->VERSION('0.4004');
 my \$builder = Module::Build->new(
     module_name         => '$main_module',
     license             => '$slname',
-    dist_author         => q{$author},
+    dist_author         => $author,
     dist_version_from   => '$main_pm_file',
     release_status      => 'stable',
     configure_requires => {
@@ -704,10 +738,12 @@ sub _README_information {
     my $content = "You can also look for information at:\n";
 
     foreach my $ref (@reference_links){
+        next if $ref->{option} && !$self->{$ref->{option}};
+
         my $title;
         $title = "$ref->{nickname}, " if exists $ref->{nickname};
         $title .= $ref->{title};
-        my $link  = sprintf($ref->{link}, $self->{distro});
+        my $link  = sprintf($ref->{link}, $ref->{option} ? $self->{$ref->{option}} : (), $self->{distro});
 
         $content .= qq[
     $title
@@ -722,7 +758,6 @@ sub _README_license {
     my $self = shift;
 
     my $license_blurb = $self->_license_blurb();
-
 return <<"HERE";
 LICENSE AND COPYRIGHT
 
@@ -1267,6 +1302,13 @@ sub create_file {
     my $self = shift;
     my $fname = shift;
 
+    if ( -f $fname ) {
+        if ( !$self->{'force'} ) {
+            warn "Will not overwrite '$fname' (--force option not enabled)";
+            return;
+        }
+    }
+
     my @content = @_;
     open( my $fh, '>', $fname ) or confess "Can't create $fname: $!\n";
     print {$fh} @content;
@@ -1424,8 +1466,10 @@ You can also look for information at:
 ];
 
     foreach my $ref (@reference_links) {
+        next if $ref->{option} && !$self->{$ref->{option}};
+
         my $title;
-        my $link = sprintf($ref->{link}, $self->{distro});
+        my $link = sprintf($ref->{link}, $ref->{option} ? $self->{$ref->{option}} : (), $self->{distro});
 
         $title = "$ref->{nickname}: " if exists $ref->{nickname};
         $title .= $ref->{title};
@@ -1448,7 +1492,6 @@ sub _module_license {
     my $rtname = shift;
 
     my $license_blurb = $self->_license_blurb();
-
     my $content = qq[
 \=head1 LICENSE AND COPYRIGHT
 
@@ -1464,11 +1507,12 @@ sub module_guts {
     my $rtname = shift;
 
     # Sub-templates
-    my $header  = $self->_module_header($module, $rtname);
-    my $bugs    = $self->_module_bugs($module, $rtname);
-    my $support = $self->_module_support($module, $rtname);
-    my $license = $self->_module_license($module, $rtname);
-
+    my $header        = $self->_module_header($module, $rtname);
+    my $bugs          = $self->_module_bugs($module, $rtname);
+    my $support       = $self->_module_support($module, $rtname);
+    my $license       = $self->_module_license($module, $rtname);
+    my $author_string = join ',', @{$self->{author}};
+    
     my $content = <<"HERE";
 $header
 
@@ -1506,7 +1550,7 @@ sub function2 {
 
 \=head1 AUTHOR
 
-$self->{author}, C<< <$self->{email_obfuscated}> >>
+$author_string
 
 $bugs
 

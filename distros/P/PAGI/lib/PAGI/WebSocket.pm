@@ -66,7 +66,7 @@ sub stash {
 # Application state (injected by PAGI::Lifespan, read-only)
 sub state {
     my $self = shift;
-    return $self->{scope}{'pagi.state'} // {};
+    return $self->{scope}{state} // {};
 }
 
 # Path parameter accessors - captured from URL path by router
@@ -651,7 +651,7 @@ Creates a new WebSocket wrapper. Requires:
 
 =over 4
 
-=item * C<$scope> - PAGI scope hashref with C<type => 'websocket'>
+=item * C<$scope> - PAGI scope hashref with C<< type => 'websocket' >>
 
 =item * C<$receive> - Async coderef returning Futures for events
 

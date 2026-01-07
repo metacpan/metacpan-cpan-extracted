@@ -128,7 +128,7 @@ note("single_or_married_sep / single");
         l15 => 7000.00,                     # Form 1040, line 15
         l3a => 4900.00,                     # Form 1040, line 3a
         sD  => 1600.00,                     # If filing Schedule D, enter smaller
-                                            #  of Schedule D, line 15 o4 16;
+                                            #  of Schedule D, line 15 or 16;
                                             #  if not, enter Form 1040, line 7.
         status1 => 'single_or_married_sep', # Permissible values:
                                             #  single_or_married_sep

@@ -12,7 +12,7 @@ foreach my $attr (
 	['counter',type=>'int'],
 ) {
 	my @errors=$attrs->register(@$attr);
-	if(@errors) { print join("\n",@errors,''); ... }
+	if(@errors) { die join("\n",@errors,'') }
 }
 
 foreach my $event (

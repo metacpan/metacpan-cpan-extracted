@@ -12,7 +12,7 @@ use Travel::Status::DE::DBRIS::Formation::Group;
 use Travel::Status::DE::DBRIS::Formation::Sector;
 use Travel::Status::DE::DBRIS::Formation::Carriage;
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 Travel::Status::DE::DBRIS::Formation->mk_ro_accessors(
 	qw(direction platform train_type));
@@ -102,7 +102,8 @@ sub parse_carriages {
 			push( @{ $self->{carriages} }, $carriage_object );
 		}
 		@group_carriages
-		  = sort { $a->start_percent <=> $b->start_percent } @group_carriages;
+		  = sort { ( $a->start_percent // 0 ) <=> ( $b->start_percent // 0 ) }
+		  @group_carriages;
 		my $group_obj = Travel::Status::DE::DBRIS::Formation::Group->new(
 			json      => $group,
 			carriages => \@group_carriages,
@@ -111,13 +112,16 @@ sub parse_carriages {
 		push( @numbers, $group_obj->train_no );
 	}
 
-	@groups = sort { $a->start_percent <=> $b->start_percent } @groups;
+	@groups = sort { ( $a->start_percent // 0 ) <=> ( $b->start_percent // 0 ) }
+	  @groups;
 
 	@numbers = uniq @numbers;
 	$self->{train_numbers} = \@numbers;
 
 	if ( @{ $self->{carriages} // [] } > 1 ) {
-		if ( $self->{carriages}[0]->{start_percent}
+		if (    defined $self->{carriages}[0]->{start_percent}
+			and defined $self->{carriages}[-1]->{start_percent}
+			and $self->{carriages}[0]->{start_percent}
 			> $self->{carriages}[-1]->{start_percent} )
 		{
 			$self->{direction} = 100;

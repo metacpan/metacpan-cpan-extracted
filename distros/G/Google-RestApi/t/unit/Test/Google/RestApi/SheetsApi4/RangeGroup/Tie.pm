@@ -9,21 +9,15 @@ use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie';
 
 use parent 'Test::Unit::TestBase';
 
+init_logger;
+
 sub setup : Tests(setup) {
   my $self = shift;
-  $self->SUPER::setup(@_);
 
-  $self->_uri_responses(qw(
-    get_worksheet_properties_title_sheetid
-    get_worksheet_values_cell
-    get_worksheet_values_a1_b1_c1
-    get_worksheet_values_range
-    post_worksheet_values_x_y_z
-    post_worksheet_batch_request
-    put_worksheet_values_range
-  ));
-  $self->_fake_http_auth();
-  $self->_fake_http_no_retries();
+  my $ws0 = $self->mock_worksheet();
+  my $all = $ws0->range("A1:C1000");
+  $all->reset()->submit_requests;
+  $ws0->spreadsheet->cache_seconds(0);
 
   return;
 }
@@ -31,9 +25,8 @@ sub setup : Tests(setup) {
 sub tie : Tests(16) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-  my $ws0 = fake_worksheet();
-  my $ws0_name = fake_worksheet_name();
+  my $ws0 = $self->mock_worksheet();
+  my $ws0_name = mock_worksheet_name();
   $ws0->rest_api()->max_attempts(1);
 
   is_hash my $tied = $ws0->tie_cells(A1 => 'A1', B1 => 'B1', C1 => 'C1'), "Tie some cells";
@@ -68,9 +61,8 @@ sub tie : Tests(16) {
 sub tie_cols : Tests(18) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-  my $ws0 = fake_worksheet();
-  my $ws0_name = fake_worksheet_name();
+  my $ws0 = $self->mock_worksheet();
+  my $ws0_name = mock_worksheet_name();
   $ws0->rest_api()->max_attempts(1);
   $ws0->enable_header_row();
 
@@ -114,9 +106,8 @@ sub tie_cols : Tests(18) {
 sub tie_rows : Tests(18) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-  my $ws0 = fake_worksheet();
-  my $ws0_name = fake_worksheet_name();
+  my $ws0 = $self->mock_worksheet();
+  my $ws0_name = mock_worksheet_name();
   $ws0->rest_api()->max_attempts(1);
 
   my %ties = (
@@ -125,8 +116,7 @@ sub tie_rows : Tests(18) {
     address => { row => 4 },
   );
   
-  my $tied;
-  is_hash $tied = $ws0->tie_rows(%ties), "Tie rows";
+  is_hash my $tied = $ws0->tie_rows(%ties), "Tie rows";
 
   tied(%$tied)->fetch_range(1);
   for (keys %$tied) {
@@ -162,8 +152,7 @@ sub tie_rows : Tests(18) {
 sub tie_cells : Tests(7) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-  my $ws0 = fake_worksheet();
+  my $ws0 = $self->mock_worksheet();
   $ws0->rest_api()->max_attempts(1);
 
   my $tied;
@@ -188,8 +177,7 @@ sub tie_cells : Tests(7) {
 sub tie_slice : Tests(10) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-  my $ws0 = fake_worksheet();
+  my $ws0 = $self->mock_worksheet();
   $ws0->rest_api()->max_attempts(1);
 
   is_hash my $tied = $ws0->tie(), "Create blank tie";
@@ -213,9 +201,8 @@ sub tie_slice : Tests(10) {
 sub tie_named : Tests(16) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-  my $ws0 = fake_worksheet();
-  my $ws0_name = fake_worksheet_name();
+  my $ws0 = $self->mock_worksheet();
+  my $ws0_name = mock_worksheet_name();
   $ws0->rest_api()->max_attempts(1);
 
   my %ties = (
@@ -256,8 +243,7 @@ sub tie_named : Tests(16) {
 sub tie_return_objects : Tests(6) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-  my $ws0 = fake_worksheet();
+  my $ws0 = $self->mock_worksheet();
   $ws0->rest_api()->max_attempts(1);
 
   my $cols = $ws0->tie_cols(id => 'B:B', name => 'C:C', address => 'D:D');

@@ -48,6 +48,7 @@
             "Mojo::Base" : "0",
             "Mojo::Util" : "0",
             "Scalar::Util" : "0",
+            "String::Util" : "1.35",
             "Template" : "3.102",
             "perl" : "v5.42.0"
          }
@@ -186,8 +187,17 @@
       "Daje::Database::View::Super::VToolsObjects" : {
          "file" : "lib/Daje/Database/View/Super/VToolsObjects.pm"
       },
+      "Daje::Database::View::Super::VToolsObjectsActive" : {
+         "file" : "lib/Daje/Database/View/Super/VToolsObjectsActive.pm"
+      },
+      "Daje::Database::View::Super::VToolsObjectsSql" : {
+         "file" : "lib/Daje/Database/View/Super/VToolsObjectsSql.pm"
+      },
       "Daje::Database::View::Super::VToolsObjectsTables" : {
          "file" : "lib/Daje/Database/View/Super/VToolsObjectsTables.pm"
+      },
+      "Daje::Database::View::Super::VToolsObjectsTablesActive" : {
+         "file" : "lib/Daje/Database/View/Super/VToolsObjectsTablesActive.pm"
       },
       "Daje::Database::View::Super::VToolsObjectsTypes" : {
          "file" : "lib/Daje/Database/View/Super/VToolsObjectsTypes.pm"
@@ -207,8 +217,17 @@
       "Daje::Database::View::VToolsObjects" : {
          "file" : "lib/Daje/Database/View/VToolsObjects.pm"
       },
+      "Daje::Database::View::VToolsObjectsActive" : {
+         "file" : "lib/Daje/Database/View/VToolsObjectsActive.pm"
+      },
+      "Daje::Database::View::VToolsObjectsSql" : {
+         "file" : "lib/Daje/Database/View/VToolsObjectsSql.pm"
+      },
       "Daje::Database::View::VToolsObjectsTables" : {
          "file" : "lib/Daje/Database/View/VToolsObjectsTables.pm"
+      },
+      "Daje::Database::View::VToolsObjectsTablesActive" : {
+         "file" : "lib/Daje/Database/View/VToolsObjectsTablesActive.pm"
       },
       "Daje::Database::View::VToolsObjectsTypes" : {
          "file" : "lib/Daje/Database/View/VToolsObjectsTypes.pm"
@@ -225,15 +244,27 @@
       "Daje::Database::View::VTreeList" : {
          "file" : "lib/Daje/Database/View/VTreeList.pm"
       },
+      "Daje::Document::Templates::Tools::Generate::Angular" : {
+         "file" : "lib/Daje/Document/Templates/Tools/Generate/Angular.pm"
+      },
+      "Daje::Document::Templates::Tools::Generate::Perl" : {
+         "file" : "lib/Daje/Document/Templates/Tools/Generate/Perl.pm"
+      },
       "Daje::Document::Templates::Tools::Generate::SQL" : {
          "file" : "lib/Daje/Document/Templates/Tools/Generate/SQL.pm"
       },
       "Daje::Plugin::Tools" : {
          "file" : "lib/Daje/Plugin/Tools.pm",
-         "version" : "0.25"
+         "version" : "1.00"
+      },
+      "Daje::Workflow::Activities::Tools::Generate::Angular" : {
+         "file" : "lib/Daje/Workflow/Activities/Tools/Generate/Angular.pm"
       },
       "Daje::Workflow::Activities::Tools::Generate::Base" : {
          "file" : "lib/Daje/Workflow/Activities/Tools/Generate/Base.pm"
+      },
+      "Daje::Workflow::Activities::Tools::Generate::Perl" : {
+         "file" : "lib/Daje/Workflow/Activities/Tools/Generate/Perl.pm"
       },
       "Daje::Workflow::Activities::Tools::Generate::SQL" : {
          "file" : "lib/Daje/Workflow/Activities/Tools/Generate/SQL.pm"
@@ -254,7 +285,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Plugin-Tools"
       }
    },
-   "version" : "0.25",
+   "version" : "1.00",
    "x_contributors" : [
       "janeskil1525 <janeskil1525@gmail.com>"
    ],

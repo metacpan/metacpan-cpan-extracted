@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.800;
 
-class App::perl::distrolint::Check::Editorconfig 0.07;
+class App::perl::distrolint::Check::Editorconfig 0.08;
 
 use constant DESC => "check that .editorconfig exists";
 use constant SORT => 5;
@@ -25,7 +25,7 @@ L<https://editorconfig.org/>
 
 =cut
 
-method run
+method run ( $app )
 {
    return -e ".editorconfig";
 }

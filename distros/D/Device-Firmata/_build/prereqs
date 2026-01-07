@@ -1,0 +1,18 @@
+do{ my $x = {
+       'build_requires' => {
+                             'Test::More' => 0
+                           },
+       'conflicts' => {},
+       'recommends' => {},
+       'requires' => {
+                       'Device::SerialPort' => 0,
+                       'Exporter' => 0,
+                       'IO::Select' => 0,
+                       'IO::Socket::INET' => 0,
+                       'Time::HiRes' => 0,
+                       'strict' => 0,
+                       'warnings' => 0
+                     },
+       'test_requires' => {}
+     };
+$x; }

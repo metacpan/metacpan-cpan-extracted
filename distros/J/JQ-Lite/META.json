@@ -1,7 +1,7 @@
 {
    "abstract" : "A lightweight jq-like JSON query engine in Perl",
    "author" : [
-      "Kawamura Shingo <perl.jq.lite@gmail.com>"
+      "Kawamura Shingo <pannakoota1@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
@@ -60,6 +60,6 @@
          "web" : "https://github.com/kawamurashingo/JQ-Lite"
       }
    },
-   "version" : "1.68",
+   "version" : "1.98",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

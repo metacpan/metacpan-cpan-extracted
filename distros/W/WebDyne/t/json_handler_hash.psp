@@ -1,0 +1,6 @@
+<start_html>
+<json handler>
+__PERL__
+sub handler {
+    return {a=>1}
+}

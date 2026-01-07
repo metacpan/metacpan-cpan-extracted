@@ -6,7 +6,8 @@ use JQ::Lite;
 my $json = q({
   "price": 19.2,
   "debt": -1.7,
-  "numbers": [1.1, -1.1, "n/a", null, [2.3, -2.3]]
+  "numbers": [1.1, -1.1, "n/a", null, [2.3, -2.3]],
+  "bools": [true, false, [true]]
 });
 
 my $jq = JQ::Lite->new;
@@ -24,6 +25,13 @@ is_deeply(
     'ceil processes arrays recursively and leaves non-numeric values untouched'
 );
 
+my @ceil_bools = $jq->run_query($json, '.bools | ceil');
+is_deeply(
+    $ceil_bools[0],
+    [1, 0, [1]],
+    'ceil treats booleans as numeric values'
+);
+
 my @floor_price = $jq->run_query($json, '.price | floor');
 is($floor_price[0], 19, 'floor rounds positive scalar down');
 
@@ -35,6 +43,13 @@ is_deeply(
     $floor_values[0],
     [1, -2, 'n/a', undef, [2, -3]],
     'floor processes arrays recursively and leaves non-numeric values untouched'
+);
+
+my @floor_bools = $jq->run_query($json, '.bools | floor');
+is_deeply(
+    $floor_bools[0],
+    [1, 0, [1]],
+    'floor treats booleans as numeric values'
 );
 
 

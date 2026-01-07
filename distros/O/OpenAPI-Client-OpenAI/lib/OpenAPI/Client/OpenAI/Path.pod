@@ -75,6 +75,48 @@ See L<OpenAPI::Client::OpenAI::Path::audio-transcriptions> for more details.
 
 See L<OpenAPI::Client::OpenAI::Path::audio-translations> for more details.
 
+=head2 C</audio/voice_consents>
+
+=over
+
+=item * C<GET> - List voice consents
+
+
+=item * C<POST> - Create voice consent
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::audio-voice_consents> for more details.
+
+=head2 C</audio/voice_consents/{consent_id}>
+
+=over
+
+=item * C<DELETE> - Delete voice consent
+
+
+=item * C<GET> - Retrieve voice consent
+
+
+=item * C<POST> - Update voice consent
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::audio-voice_consents-consent_id> for more details.
+
+=head2 C</audio/voices>
+
+=over
+
+=item * C<POST> - Create voice
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::audio-voices> for more details.
+
 =head2 C</batches>
 
 =over
@@ -152,6 +194,64 @@ See L<OpenAPI::Client::OpenAI::Path::chat-completions-completion_id> for more de
 =back
 
 See L<OpenAPI::Client::OpenAI::Path::chat-completions-completion_id-messages> for more details.
+
+=head2 C</chatkit/sessions>
+
+=over
+
+=item * C<POST> - Create ChatKit session
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::chatkit-sessions> for more details.
+
+=head2 C</chatkit/sessions/{session_id}/cancel>
+
+=over
+
+=item * C<POST> - Cancel chat session
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::chatkit-sessions-session_id-cancel> for more details.
+
+=head2 C</chatkit/threads>
+
+=over
+
+=item * C<GET> - List ChatKit threads
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::chatkit-threads> for more details.
+
+=head2 C</chatkit/threads/{thread_id}>
+
+=over
+
+=item * C<DELETE> - Delete ChatKit thread
+
+
+=item * C<GET> - Retrieve ChatKit thread
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::chatkit-threads-thread_id> for more details.
+
+=head2 C</chatkit/threads/{thread_id}/items>
+
+=over
+
+=item * C<GET> - List ChatKit thread items
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::chatkit-threads-thread_id-items> for more details.
 
 =head2 C</completions>
 
@@ -720,6 +820,84 @@ See L<OpenAPI::Client::OpenAI::Path::organization-certificates-certificate_id> f
 
 See L<OpenAPI::Client::OpenAI::Path::organization-costs> for more details.
 
+=head2 C</organization/groups>
+
+=over
+
+=item * C<GET> - List groups
+
+
+=item * C<POST> - Create group
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-groups> for more details.
+
+=head2 C</organization/groups/{group_id}>
+
+=over
+
+=item * C<DELETE> - Delete group
+
+
+=item * C<POST> - Update group
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id> for more details.
+
+=head2 C</organization/groups/{group_id}/roles>
+
+=over
+
+=item * C<GET> - List group organization role assignments
+
+
+=item * C<POST> - Assign organization role to group
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id-roles> for more details.
+
+=head2 C</organization/groups/{group_id}/roles/{role_id}>
+
+=over
+
+=item * C<DELETE> - Unassign organization role from group
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id-roles-role_id> for more details.
+
+=head2 C</organization/groups/{group_id}/users>
+
+=over
+
+=item * C<GET> - List group users
+
+
+=item * C<POST> - Add group user
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id-users> for more details.
+
+=head2 C</organization/groups/{group_id}/users/{user_id}>
+
+=over
+
+=item * C<DELETE> - Remove group user
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id-users-user_id> for more details.
+
 =head2 C</organization/invites>
 
 =over
@@ -845,6 +1023,31 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificat
 
 See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificates-deactivate> for more details.
 
+=head2 C</organization/projects/{project_id}/groups>
+
+=over
+
+=item * C<GET> - List project groups
+
+
+=item * C<POST> - Add project group
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-groups> for more details.
+
+=head2 C</organization/projects/{project_id}/groups/{group_id}>
+
+=over
+
+=item * C<DELETE> - Remove project group
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-groups-group_id> for more details.
+
 =head2 C</organization/projects/{project_id}/rate_limits>
 
 =over
@@ -925,6 +1128,34 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-users> for
 =back
 
 See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-users-user_id> for more details.
+
+=head2 C</organization/roles>
+
+=over
+
+=item * C<GET> - List organization roles
+
+
+=item * C<POST> - Create organization role
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-roles> for more details.
+
+=head2 C</organization/roles/{role_id}>
+
+=over
+
+=item * C<DELETE> - Delete organization role
+
+
+=item * C<POST> - Update organization role
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-roles-role_id> for more details.
 
 =head2 C</organization/usage/audio_speeches>
 
@@ -1042,6 +1273,175 @@ See L<OpenAPI::Client::OpenAI::Path::organization-users> for more details.
 
 See L<OpenAPI::Client::OpenAI::Path::organization-users-user_id> for more details.
 
+=head2 C</organization/users/{user_id}/roles>
+
+=over
+
+=item * C<GET> - List user organization role assignments
+
+
+=item * C<POST> - Assign organization role to user
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-users-user_id-roles> for more details.
+
+=head2 C</organization/users/{user_id}/roles/{role_id}>
+
+=over
+
+=item * C<DELETE> - Unassign organization role from user
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-users-user_id-roles-role_id> for more details.
+
+=head2 C</projects/{project_id}/groups/{group_id}/roles>
+
+=over
+
+=item * C<GET> - List project group role assignments
+
+
+=item * C<POST> - Assign project role to group
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-groups-group_id-roles> for more details.
+
+=head2 C</projects/{project_id}/groups/{group_id}/roles/{role_id}>
+
+=over
+
+=item * C<DELETE> - Unassign project role from group
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-groups-group_id-roles-role_id> for more details.
+
+=head2 C</projects/{project_id}/roles>
+
+=over
+
+=item * C<GET> - List project roles
+
+
+=item * C<POST> - Create project role
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-roles> for more details.
+
+=head2 C</projects/{project_id}/roles/{role_id}>
+
+=over
+
+=item * C<DELETE> - Delete project role
+
+
+=item * C<POST> - Update project role
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-roles-role_id> for more details.
+
+=head2 C</projects/{project_id}/users/{user_id}/roles>
+
+=over
+
+=item * C<GET> - List project user role assignments
+
+
+=item * C<POST> - Assign project role to user
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-users-user_id-roles> for more details.
+
+=head2 C</projects/{project_id}/users/{user_id}/roles/{role_id}>
+
+=over
+
+=item * C<DELETE> - Unassign project role from user
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-users-user_id-roles-role_id> for more details.
+
+=head2 C</realtime/calls>
+
+=over
+
+=item * C<POST> - Create call
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::realtime-calls> for more details.
+
+=head2 C</realtime/calls/{call_id}/accept>
+
+=over
+
+=item * C<POST> - Accept call
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::realtime-calls-call_id-accept> for more details.
+
+=head2 C</realtime/calls/{call_id}/hangup>
+
+=over
+
+=item * C<POST> - Hang up call
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::realtime-calls-call_id-hangup> for more details.
+
+=head2 C</realtime/calls/{call_id}/refer>
+
+=over
+
+=item * C<POST> - Refer call
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::realtime-calls-call_id-refer> for more details.
+
+=head2 C</realtime/calls/{call_id}/reject>
+
+=over
+
+=item * C<POST> - Reject call
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::realtime-calls-call_id-reject> for more details.
+
+=head2 C</realtime/client_secrets>
+
+=over
+
+=item * C<POST> - Create client secret
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::realtime-client_secrets> for more details.
+
 =head2 C</realtime/sessions>
 
 =over
@@ -1074,6 +1474,28 @@ See L<OpenAPI::Client::OpenAI::Path::realtime-transcription_sessions> for more d
 =back
 
 See L<OpenAPI::Client::OpenAI::Path::responses> for more details.
+
+=head2 C</responses/compact>
+
+=over
+
+=item * C<POST> - Compact a response
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::responses-compact> for more details.
+
+=head2 C</responses/input_tokens>
+
+=over
+
+=item * C<POST> - Get input token counts
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::responses-input_tokens> for more details.
 
 =head2 C</responses/{response_id}>
 
@@ -1425,10 +1847,60 @@ See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-files-file_id
 
 See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-search> for more details.
 
+=head2 C</videos>
+
+=over
+
+=item * C<GET> - List videos
+
+
+=item * C<POST> - Create video
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::videos> for more details.
+
+=head2 C</videos/{video_id}>
+
+=over
+
+=item * C<DELETE> - Delete video
+
+
+=item * C<GET> - Retrieve video
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::videos-video_id> for more details.
+
+=head2 C</videos/{video_id}/content>
+
+=over
+
+=item * C<GET> - Retrieve video content
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::videos-video_id-content> for more details.
+
+=head2 C</videos/{video_id}/remix>
+
+=over
+
+=item * C<POST> - Remix video
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::videos-video_id-remix> for more details.
+
 =cut
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2023-2025 by Nelson Ferraz
+Copyright (C) 2023-2026 by Nelson Ferraz
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

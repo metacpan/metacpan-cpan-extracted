@@ -1,3 +1,172 @@
+1.98  2026-01-06
+
+    - Promote release to version 1.98 capturing stricter join() input
+      validation and coverage for null elements to align behavior with jq.
+
+1.97  2026-01-05
+
+    - Promote release to version 1.97 restoring jq-compatible flatten behavior:
+      depth-based array flattening while keeping .[] traversal separate.
+    - Preserve null outputs through map(... ) | flatten flows (no silent drops),
+      and expand tests covering passthrough and the null regression scenario.
+
+1.96  2026-01-05
+
+    - Promote release to version 1.96 capturing the substr argument
+      validation updates and expanded negative test coverage.
+
+1.95  2026-01-05
+
+    - Promote release to version 1.95 covering substr boolean stringification
+      before slicing and expanded regression tests for scalar/array cases.
+
+1.94  2026-01-05
+
+    - Promote release to version 1.94 capturing the init-expression
+      fallback fixes for foreach/reduce and the expanded test coverage
+      around filtered initializers.
+
+1.93  2026-01-05
+
+    - Promote release to version 1.93 covering the stricter invalid regex
+      handling for match conditions and the accompanying regression tests.
+
+1.92  2026-01-05
+
+    - Promote release to version 1.92 capturing improved split handling
+      for boolean values and mixed arrays, with accompanying test coverage.
+    - Ensure split returns flat arrays when applied to arrays, avoiding
+      nested results for boolean and string elements.
+
+1.91  2026-01-05
+
+    - Promote release to version 1.91 covering string scalar flattening
+      improvements and expanded test coverage.
+
+1.90  2026-01-05
+
+    - Promote release to version 1.90 including argument validation for
+      drop(), tail(), and chunks() along with expanded slice tests.
+
+1.89  2026-01-05
+
+    - Release version 1.89 with stricter limit() validation and expanded
+      tests covering invalid arguments.
+
+1.88  2026-01-05
+
+    - Promote release to version 1.88 including the invalid regex error
+      handling improvements and additional test coverage.
+
+1.87  2026-01-05
+
+    - Clarified and enforced usage errors when --raw-input is used without
+      a filter expression, including distinct diagnostics for standalone
+      and --slurp modes.
+    - Added CLI regression tests to lock in exit code 5 and the expected
+      usage messages for missing-query scenarios.
+
+1.86  2026-01-05
+
+    - Refined the count filter to operate per input value, correctly handling
+      streamed inputs and nested arrays without implicit aggregation.
+
+    - Expanded count test coverage to validate stream semantics, including
+      objects, scalars, null values, and composed pipelines.
+
+
+1.85  2026-01-05
+
+    - Hardened range() argument validation to reject booleans, references,
+      and numeric-looking strings instead of silently coercing them.
+    - Expanded range tests to cover invalid bounds and step values,
+      ensuring runtime errors are raised consistently.
+
+1.84  2026-01-05
+
+    - Promote release to version 1.84 incorporating stricter path element
+      validation and expanded coverage for setpath() and delpaths().
+
+1.83  2026-01-05
+
+    - Promote release to version 1.83 capturing the compile-time validation
+      improvements for empty comma-separated filters and expanded CLI
+      contract coverage.
+
+1.82  2026-01-04
+
+    - Ignore SIGPIPE in CLI to avoid premature termination when pipes are closed
+      early, stabilizing CLI behavior
+
+1.81  2026-01-04
+
+    - Promote release to version 1.81 including the type() handling
+      updates for scientific notation and numeric-looking strings.
+
+1.80  2026-01-04
+
+    - Promote release to version 1.80 reflecting normalized boolean path
+      traversal handling in getpath.
+
+1.79  2026-01-04
+
+    - Promote release to version 1.79 including the boolean handling
+      improvements for numeric rounding helpers and expanded coverage.
+
+1.78  2026-01-04
+
+    - Promote release to version 1.78 after tightening percentile
+      validation and extending test coverage.
+
+1.77  2026-01-04
+
+    - Promote release to version 1.77 aligning with the expanded
+      percentile test coverage.
+
+1.76  2026-01-04
+
+    - Promote release to version 1.76 reflecting the updated version
+      output.
+
+1.75  2026-01-03
+
+    - Promote release to version 1.75 including the expanded
+      --help-functions output that lists all supported built-ins.
+
+1.74  2026-01-03
+
+    - Improved POD documentation to clarify jq compatibility and intended use cases
+      in environments where the jq binary cannot be installed.
+
+    - No functional changes.
+
+1.73  2026-01-03
+
+    - Guard the CLI broken pipe contract test against SIGPIPE so runs on
+      Perl 5.16 no longer abort with missing TAP output.
+
+1.72  2026-01-03
+
+    - Suppress EINVAL warnings when flushing STDOUT on broken pipes in
+      older Perl versions.
+
+1.71  2026-01-03
+
+    - Preserve comparison filters during parsing so conditional branches
+      evaluate paths like `.score >= 70` correctly.
+    - Avoid treating map/object filters with comparisons as arithmetic
+      expressions while still recognizing standalone comparison queries.
+
+1.70  2026-01-03
+
+    - Release jq-compatible `paths` and `paths(scalars)` filters and
+      document scalar input behavior.
+
+1.69  2026-01-03
+
+    - Promote release to 1.69 documenting jq-compatible wildcard
+      iteration over object values.
+
 1.68  2025-12-27
 
     - Enforce jq-style runtime errors when setpath or delpaths receive
@@ -1072,40 +1241,6 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

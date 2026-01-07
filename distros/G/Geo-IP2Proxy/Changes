@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::IP2Proxy
 
+3.50  Wed January 01 16:00:00 2025
+      Added new function "getFraudScore"
+
 3.40  Tue January 02 16:00:00 2024
       Support "CPN" in consumer privacy networks detection in PX11+
       Support "EPN" in enterprise private networks detection in PX11+

@@ -18,7 +18,7 @@ name: DBIx-Quick
 provides:
   DBIx::Quick:
     file: lib/DBIx/Quick.pm
-    version: '0.7'
+    version: '0.8'
   DBIx::Quick::Converter:
     file: lib/DBIx/Quick/Converter.pm
   DBIx::Quick::Role:
@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/sergiotarxz/Perl-DBIx-Quick/issues
   repository: https://github.com/sergiotarxz/Perl-DBIx-Quick
-version: '0.7'
+version: '0.8'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -14,55 +14,48 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
-use Object::Pad;
+use Object::Pad ':experimental(inherit_field)';
 
-class Sys::Async::Virt::Connection::Process v0.1.10;
+class Sys::Async::Virt::Connection::Process v0.2.1;
 
 inherit Sys::Async::Virt::Connection '$_in', '$_out';
 
 use Carp qw(croak);
-use IO::Async::Stream;
+use Future::IO;
+use IO::Handle;
+use IPC::Open2;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::URI v11.10.0; # imports parse_url
+use Protocol::Sys::Virt::URI v11.10.1; # imports parse_url
 
 field $_url :param :reader;
-field $_process = undef;
+field $_pid;
+field $_exit_f;
 
-method close() {
-    $_process->kill( 'TERM' )
-        if not $_process->is_exited;
+async method close() {
+    unless ($_exit_f->is_ready) {
+        kill 'TERM', $_pid;
+    }
+    ### TODO: log exit status
+    await $_exit_f;
 }
 
-method configure(%args) {
-    delete $args{url};
-
-    $self->SUPER::configure(%args);
+method _command( $url ) {
+    my %c = parse_url( $url );
+    return $c{command};
 }
 
 async method connect() {
-    my %c = parse_url( $_url );
+    my @cmd = $self->_command( $_url );
+    $log->trace('Connection process command: ' . join(' ', @cmd));
 
-    my $cmd  = $c{command};
-    my $process = $self->loop->open_process(
-        command => $cmd,
-        stdout => {
-            on_read => sub { 0 },
-        },
-        stderr => {
-            on_read => sub {
-                # eat stderr input
-                my $bufref = $_[1]; say $bufref; ${$bufref} = ''; 0;
-            },
-        },
-        stdin => {
-            via => 'pipe_write'
-        },
-        on_finish => sub { }, # on_finish is mandatory
-        );
-
-    $_in  = $process->stdout;
-    $_out = $process->stdin;
+    $_pid = open2( $_in, $_out, @cmd )
+        or die "Unable to open external command: $!";
+    $_out->autoflush( 1 );
+    $_out->blocking( 0 );
+    $_in->autoflush( 1 );
+    $_in->blocking( 0 );
+    $_exit_f = Future::IO->waitpid( $_pid );
 
     return;
 }
@@ -79,7 +72,7 @@ Sys::Async::Virt::Connection::Process - Connection to LibVirt server using
 
 =head1 VERSION
 
-v0.1.10
+v0.2.1
 
 =head1 SYNOPSIS
 
@@ -94,6 +87,10 @@ v0.1.10
 
 This module connects to a local LibVirt server through an external command
 which forwards standard input to and standard output from the LibVirt server.
+
+B< NOTE > This module requires the C<< Future::IO->waitpid >> call to work,
+which the default implementation does not provide. Any of the other backends
+listed in L<Future::IO> needs to be active for this module to work.
 
 =head1 URL PARAMETERS
 

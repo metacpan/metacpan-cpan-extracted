@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Worksheet;
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.1.0';
 
 use Google::RestApi::Setup;
 
@@ -20,7 +20,7 @@ use parent 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet';
 sub new {
   my $class = shift;
 
-  my $qr_worksheet_uri = SheetsApi4->Worksheet_Uri;
+  my $qr_worksheet_uri = $Google::RestApi::SheetsApi4::Worksheet_Uri;
   state $check = compile_named(
     spreadsheet => HasApi,
     id          => Str, { optional => 1 },    # the worksheet id (1, 2, 3 etc).
@@ -45,7 +45,7 @@ sub worksheet_id {
   my $self = shift;
   if (!defined $self->{id}) {
     if ($self->{uri}) {
-      my $qr_worksheet_uri = SheetsApi4->Worksheet_Uri;
+      my $qr_worksheet_uri = $Google::RestApi::SheetsApi4::Worksheet_Uri;
       ($self->{id}) = $self->{uri} =~ m|$qr_worksheet_uri|;
       LOGDIE "Unable to extract a worksheet id from URI '$self->{uri}'" if !defined $self->{id};
     } else {
@@ -714,6 +714,6 @@ Robin Murray mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright (c) 2021, Robin Murray. All rights reserved.
+Copyright (c) 2019-2026 Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

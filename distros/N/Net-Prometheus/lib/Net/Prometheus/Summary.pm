@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2026 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Summary 0.14;
+package Net::Prometheus::Summary 0.15;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Net::Prometheus::Metric );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use Carp;
 use List::Util 1.33 qw( any );
@@ -63,15 +66,12 @@ L<Net::Prometheus::Metric>.
 
 =cut
 
-sub new
+sub new ( $class, %opts )
 {
-   my $class = shift;
-   my %opts = @_;
-
-   $opts{labels} and any { $_ eq "quantile" } @{ $opts{labels} } and
+   $opts{labels} and any { $_ eq "quantile" } $opts{labels}->@* and
       croak "A Summary may not have a label called 'quantile'";
 
-   my $self = $class->SUPER::new( @_ );
+   my $self = $class->SUPER::new( %opts );
 
    $self->{counts} = {};
    $self->{sums}   = {};
@@ -95,37 +95,27 @@ Increment the summary sum by the given value, and the count by 1.
 =cut
 
 __PACKAGE__->MAKE_child_method( 'observe' );
-sub _observe_child
+sub _observe_child ( $self, $labelkey, $value )
 {
-   my $self = shift;
-   my ( $labelkey, $value ) = @_;
-
    $self->{counts}{$labelkey} += 1;
    $self->{sums}  {$labelkey} += $value;
 }
 
 # remove is generated automatically
-sub _remove_child
+sub _remove_child ( $self, $labelkey )
 {
-   my $self = shift;
-   my ( $labelkey ) = @_;
-
    delete $self->{counts}{$labelkey};
    delete $self->{sums}{$labelkey};
 }
 
-sub clear
+sub clear ( $self )
 {
-   my $self = shift;
-
-   undef %{ $self->{counts} };
-   undef %{ $self->{sums} };
+   undef $self->{counts}->%*;
+   undef $self->{sums}->%*;
 }
 
-sub samples
+sub samples ( $self )
 {
-   my $self = shift;
-
    my $counts = $self->{counts};
    my $sums   = $self->{sums};
 

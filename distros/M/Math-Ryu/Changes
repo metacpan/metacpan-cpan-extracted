@@ -1,3 +1,11 @@
+1.09
+     - Add "-Dinline=__inline" to compiler flags when building with Visual Studio as
+       this is needed by pre-VS2022 C compilations.
+     - Modify t/round_trip.t to enable broader testing.
+     - Silence warnings in t/sprintf.t
+     - Slight modification to $ENV{PERL_MM_OPT} substitution regex in Makefile.PL,
+       just in case that amendment is ever needed)
+
 1.08
      - Add fx2s() function.
      - Improve pod documentation.

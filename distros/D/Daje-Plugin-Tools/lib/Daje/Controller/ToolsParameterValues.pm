@@ -36,8 +36,6 @@ use v5.40;
 # janeskil1525 E<lt>janeskil1525@gmail.com
 #
 
-use Data::Dumper;
-
 sub load_parameter_value ($self) {
 
 

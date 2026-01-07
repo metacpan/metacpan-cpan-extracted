@@ -7,6 +7,8 @@ use aliased 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range
 
 use parent 'Test::Unit::TestBase';
 
+init_logger;
+
 my $index = {
   sheetId          => 'Sheet1',
   startColumnIndex => 0,
@@ -15,25 +17,8 @@ my $index = {
   endRowIndex      => 1,
 };
 
-sub setup : Tests(setup) {
-  my $self = shift;
-  $self->SUPER::setup(@_);
-
-  $self->_fake_http_auth();
-  $self->_fake_http_no_retries();
-
-  $self->_uri_responses(qw(
-    get_worksheet_properties_title_sheetid
-    post_worksheet_batch_request
-  ));
-
-  return;
-}
-
 sub range_text_format : Tests(29) {
   my $self = shift;
-
-  $self->_fake_http_response_by_uri();
 
   my $cell = {
     repeatCell => {
@@ -47,7 +32,7 @@ sub range_text_format : Tests(29) {
     },
   };
 
-  my $range = $self->_new_range("A1");
+  my $range = $self->mock_worksheet->range("A1");
   $cell->{repeatCell}->{range} = $range->range_to_index();
 
   _range_text_format($cell, $range, 'bold');
@@ -55,7 +40,7 @@ sub range_text_format : Tests(29) {
   _range_text_format($cell, $range, 'strikethrough');
   _range_text_format($cell, $range, 'underline');
   _range_text_format($cell, $range, 'font_family', 'joe');
-  _range_text_format($cell, $range, 'font_size', 1.1);
+  _range_text_format($cell, $range, 'font_size', 2);
 
   _range_text_format_color($cell, $range, 'red');
   _range_text_format_color($cell, $range, 'blue', 0.2);
@@ -64,7 +49,7 @@ sub range_text_format : Tests(29) {
 
   isa_ok $range->
     bold()->italic()->strikethrough()->underline()->
-    red()->blue(0.2)->green(0)->font_family('joe')->font_size(1.1),
+    red()->blue(0.2)->green(0)->font_family('joe')->font_size(2),
     Range, "Build all for text format";
   my @requests = $range->batch_requests();
   is scalar @requests, 1, "Batch requests should have one entry.";
@@ -125,8 +110,6 @@ sub _range_text_format_color {
 sub range_background_color : Tests(13) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-
   my $cell = {
     repeatCell => {
       range => '',
@@ -139,7 +122,7 @@ sub range_background_color : Tests(13) {
     },
   };
 
-  my $range = $self->_new_range("A1");
+  my $range = $self->mock_worksheet->range("A1");
   $cell->{repeatCell}->{range} = $range->range_to_index();
  
   _range_background_color($cell, $range, 'red', 1);
@@ -178,8 +161,6 @@ sub _range_background_color {
 sub range_misc : Tests(12) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-
   my $cell = {
     repeatCell => {
       range => '',
@@ -194,7 +175,7 @@ sub range_misc : Tests(12) {
     },
   };
 
-  my $range = $self->_new_range("A1");
+  my $range = $self->mock_worksheet->range("A1");
   $cell->{repeatCell}->{range} = $range->range_to_index();
   my $user = $cell->{repeatCell}->{cell}->{userEnteredFormat};
 
@@ -242,15 +223,13 @@ sub range_misc : Tests(12) {
 sub range_borders : Tests(22) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-
   my $cell = {
     updateBorders => {
       range => '',
     },
   };
 
-  my $range = $self->_new_range("A1");
+  my $range = $self->mock_worksheet->range("A1");
   my $borders = $cell->{updateBorders};
   $borders->{range} = $range->range_to_index();
 
@@ -300,8 +279,6 @@ sub _range_borders {
 sub range_border_style : Tests(14) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-
   my $cell = {
     updateBorders => {
       range => '',
@@ -311,7 +288,7 @@ sub range_border_style : Tests(14) {
     },
   };
 
-  my $range = $self->_new_range("A1");
+  my $range = $self->mock_worksheet->range("A1");
   $cell->{updateBorders}->{range} = $range->range_to_index();
 
   _range_border_style($cell, $range, $_)
@@ -338,8 +315,6 @@ sub _range_border_style {
 sub range_border_colors : Tests(13) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-
   my $cell = {
     updateBorders => {
       range => '',
@@ -349,7 +324,7 @@ sub range_border_colors : Tests(13) {
     },
   };
 
-  my $range = $self->_new_range("A1");
+  my $range = $self->mock_worksheet->range("A1");
   $cell->{updateBorders}->{range} = $range->range_to_index();
 
   _range_border_colors($cell, $range, 'red', 1);
@@ -386,8 +361,6 @@ sub _range_border_colors {
 sub range_border_cells : Tests(7) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-
   my $cell = {
     repeatCell => {
       range => '',
@@ -400,7 +373,7 @@ sub range_border_cells : Tests(7) {
     },
   };
 
-  my $range = $self->_new_range("A1");
+  my $range = $self->mock_worksheet->range("A1");
   $cell->{repeatCell}->{range} = $range->range_to_index();
   my $borders = $cell->{repeatCell}->{cell}->{userEnteredFormat}->{borders};
   my $fields = $cell->{repeatCell}->{fields};
@@ -424,8 +397,6 @@ sub range_border_cells : Tests(7) {
 sub range_merge : Tests(6) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-
   my $cell = {
     mergeCells => {
       range     => '',
@@ -433,8 +404,9 @@ sub range_merge : Tests(6) {
     },
   };
 
-  my $range = $self->_new_range("A1:B2");
+  my $range = $self->mock_worksheet->range("A1:B2");
   $cell->{mergeCells}->{range} = $range->range_to_index();
+
   my @requests;
 
   $range->red()->merge_cols();
@@ -458,15 +430,302 @@ sub range_merge : Tests(6) {
   return;
 }
 
-sub _new_range {
-  my $self = shift;
-  return Google::RestApi::SheetsApi4::Range::factory(worksheet => fake_worksheet(), range => shift);
-}
-
 sub _add_field {
   my ($cell, $field) = (@_);
   my %fields = map { $_ => 1; } split(',', $cell->{repeatCell}->{fields}), $field;
   $cell->{repeatCell}->{fields} = join(',', sort keys %fields);
+  return;
+}
+
+sub range_paste_data : Tests(4) {
+  my $self = shift;
+
+  my $range = $self->mock_worksheet->range("A1");
+
+  # pasteData uses GridCoordinate (single cell), not GridRange
+  my $range_index = $range->range_to_index();
+  my $coordinate = {
+    sheetId     => $range_index->{sheetId},
+    rowIndex    => $range_index->{startRowIndex},
+    columnIndex => $range_index->{startColumnIndex},
+  };
+
+  is $range->paste_data(data => "A\tB\tC\n1\t2\t3"), $range, "paste_data should return same range";
+  my @requests = $range->batch_requests();
+  my $expected = {
+    pasteData => {
+      coordinate => $coordinate,
+      data       => "A\tB\tC\n1\t2\t3",
+      type       => 'PASTE_NORMAL',
+      delimiter  => "\t",
+    },
+  };
+  is_deeply $requests[0], $expected, "paste_data should be staged";
+
+  $range->submit_requests();
+
+  is $range->paste_data(data => "<table><tr><td>A</td></tr></table>", html => 1), $range, "paste_data html should return same range";
+  @requests = $range->batch_requests();
+  $expected = {
+    pasteData => {
+      coordinate => $coordinate,
+      data       => "<table><tr><td>A</td></tr></table>",
+      type       => 'PASTE_NORMAL',
+      html       => 'true',
+    },
+  };
+  is_deeply $requests[0], $expected, "paste_data html should be staged";
+
+  $range->submit_requests();
+
+  return;
+}
+
+sub range_text_to_columns : Tests(4) {
+  my $self = shift;
+
+  my $range = $self->mock_worksheet->range("A1:A10");
+
+  is $range->text_to_columns(), $range, "text_to_columns should return same range";
+  my @requests = $range->batch_requests();
+  my $expected = {
+    textToColumns => {
+      source        => $range->range_to_index(),
+      delimiterType => 'AUTODETECT',
+    },
+  };
+  is_deeply $requests[0], $expected, "text_to_columns should be staged";
+
+  $range->submit_requests();
+
+  is $range->text_to_columns(delimiter => ',', delimiter_type => 'CUSTOM'), $range, "text_to_columns custom should return same range";
+  @requests = $range->batch_requests();
+  $expected->{textToColumns}->{delimiter} = ',';
+  $expected->{textToColumns}->{delimiterType} = 'CUSTOM';
+  is_deeply $requests[0], $expected, "text_to_columns custom should be staged";
+
+  $range->submit_requests();
+
+  return;
+}
+
+sub range_find_replace : Tests(4) {
+  my $self = shift;
+
+  my $range = $self->mock_worksheet->range("A1:Z100");
+
+  is $range->find_replace(find => 'foo', replacement => 'bar'), $range, "find_replace should return same range";
+  my @requests = $range->batch_requests();
+  my $expected = {
+    findReplace => {
+      range           => $range->range_to_index(),
+      find            => 'foo',
+      replacement     => 'bar',
+      matchCase       => 'false',
+      matchEntireCell => 'false',
+      searchByRegex   => 'false',
+      includeFormulas => 'false',
+    },
+  };
+  is_deeply $requests[0], $expected, "find_replace should be staged";
+
+  $range->submit_requests();
+
+  is $range->find_replace(
+    find              => 'test.*',
+    replacement       => 'replaced',
+    match_case        => 1,
+    search_by_regex   => 1,
+  ), $range, "find_replace with options should return same range";
+  @requests = $range->batch_requests();
+  $expected->{findReplace}->{find} = 'test.*';
+  $expected->{findReplace}->{replacement} = 'replaced';
+  $expected->{findReplace}->{matchCase} = 'true';
+  $expected->{findReplace}->{searchByRegex} = 'true';
+  is_deeply $requests[0], $expected, "find_replace with options should be staged";
+
+  $range->submit_requests();
+
+  return;
+}
+
+sub range_data_validation : Tests(6) {
+  my $self = shift;
+
+  my $range = $self->mock_worksheet->range("A1:A10");
+
+  my $rule = {
+    condition => {
+      type   => 'NUMBER_GREATER',
+      values => [{ userEnteredValue => '0' }],
+    },
+    strict => 'true',
+  };
+
+  is $range->set_data_validation(rule => $rule), $range, "set_data_validation should return same range";
+  my @requests = $range->batch_requests();
+  my $expected = {
+    setDataValidation => {
+      range => $range->range_to_index(),
+      rule  => $rule,
+    },
+  };
+  is_deeply $requests[0], $expected, "set_data_validation should be staged";
+
+  $range->submit_requests();
+
+  is $range->clear_data_validation(), $range, "clear_data_validation should return same range";
+  @requests = $range->batch_requests();
+  $expected = {
+    setDataValidation => {
+      range => $range->range_to_index(),
+    },
+  };
+  is_deeply $requests[0], $expected, "clear_data_validation should be staged";
+
+  $range->submit_requests();
+
+  is $range->data_validation_list(values => ['Yes', 'No', 'Maybe']), $range, "data_validation_list should return same range";
+  @requests = $range->batch_requests();
+  $expected = {
+    setDataValidation => {
+      range => $range->range_to_index(),
+      rule  => {
+        condition => {
+          type   => 'ONE_OF_LIST',
+          values => [
+            { userEnteredValue => 'Yes' },
+            { userEnteredValue => 'No' },
+            { userEnteredValue => 'Maybe' },
+          ],
+        },
+        strict       => 'true',
+        showCustomUi => 'false',
+      },
+    },
+  };
+  is_deeply $requests[0], $expected, "data_validation_list should be staged";
+
+  $range->submit_requests();
+
+  return;
+}
+
+sub range_sort : Tests(4) {
+  my $self = shift;
+
+  my $range = $self->mock_worksheet->range("A1:C10");
+
+  is $range->sort_asc(0), $range, "sort_asc should return same range";
+  my @requests = $range->batch_requests();
+  my $expected = {
+    sortRange => {
+      range     => $range->range_to_index(),
+      sortSpecs => [{ dimensionIndex => 0, sortOrder => 'ASCENDING' }],
+    },
+  };
+  is_deeply $requests[0], $expected, "sort_asc should be staged";
+
+  $range->submit_requests();
+
+  is $range->sort_desc(1), $range, "sort_desc should return same range";
+  @requests = $range->batch_requests();
+  $expected->{sortRange}->{sortSpecs} = [{ dimensionIndex => 1, sortOrder => 'DESCENDING' }];
+  is_deeply $requests[0], $expected, "sort_desc should be staged";
+
+  $range->submit_requests();
+
+  return;
+}
+
+sub range_randomize : Tests(2) {
+  my $self = shift;
+
+  my $range = $self->mock_worksheet->range("A1:C10");
+
+  is $range->randomize_range(), $range, "randomize_range should return same range";
+  my @requests = $range->batch_requests();
+  my $expected = {
+    randomizeRange => {
+      range => $range->range_to_index(),
+    },
+  };
+  is_deeply $requests[0], $expected, "randomize_range should be staged";
+
+  $range->submit_requests();
+
+  return;
+}
+
+sub range_trim_whitespace : Tests(2) {
+  my $self = shift;
+
+  my $range = $self->mock_worksheet->range("A1:C10");
+
+  is $range->trim_whitespace(), $range, "trim_whitespace should return same range";
+  my @requests = $range->batch_requests();
+  my $expected = {
+    trimWhitespace => {
+      range => $range->range_to_index(),
+    },
+  };
+  is_deeply $requests[0], $expected, "trim_whitespace should be staged";
+
+  $range->submit_requests();
+
+  return;
+}
+
+sub range_delete_duplicates : Tests(4) {
+  my $self = shift;
+
+  my $range = $self->mock_worksheet->range("A1:C10");
+
+  is $range->delete_duplicates(), $range, "delete_duplicates should return same range";
+  my @requests = $range->batch_requests();
+  my $expected = {
+    deleteDuplicates => {
+      range => $range->range_to_index(),
+    },
+  };
+  is_deeply $requests[0], $expected, "delete_duplicates should be staged";
+
+  $range->submit_requests();
+
+  is $range->delete_duplicates(comparison_columns => [0, 1]), $range, "delete_duplicates with columns should return same range";
+  @requests = $range->batch_requests();
+  $expected->{deleteDuplicates}->{comparisonColumns} = [
+    { sheetId => $range->worksheet_id(), dimension => 'COLUMNS', startIndex => 0, endIndex => 1 },
+    { sheetId => $range->worksheet_id(), dimension => 'COLUMNS', startIndex => 1, endIndex => 2 },
+  ];
+  is_deeply $requests[0], $expected, "delete_duplicates with columns should be staged";
+
+  $range->submit_requests();
+
+  return;
+}
+
+sub range_append_cells : Tests(2) {
+  my $self = shift;
+
+  my $range = $self->mock_worksheet->range("A1");
+  my $rows = [
+    { values => [{ userEnteredValue => { stringValue => 'Test' } }] },
+  ];
+
+  is $range->append_cells(rows => $rows), $range, "append_cells should return same range";
+  my @requests = $range->batch_requests();
+  my $expected = {
+    appendCells => {
+      sheetId => $range->worksheet_id(),
+      rows    => $rows,
+      fields  => '*',
+    },
+  };
+  is_deeply $requests[0], $expected, "append_cells should be staged";
+
+  $range->submit_requests();
+
   return;
 }
 

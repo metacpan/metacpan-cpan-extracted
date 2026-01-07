@@ -1,4 +1,4 @@
-package Test::Google::RestApi::SheetsApi::Types;
+package Test::Google::RestApi::SheetsApi4::Types;
 
 # this does basic tests of each type of range, but does not test
 # Range::factory or any more complex tests.

@@ -22,5 +22,6 @@ t/Q.pm                                   "
 t/R.pm                                   "
 
 lib/Devel/Hide.pm
+MANIFEST.SKIP
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

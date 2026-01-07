@@ -1,0 +1,10 @@
+#  Error expected here - param shouldn't be array
+#
+<start_html>
+<perl handler param="@{qw(Alice)}"/>
+__PERL__
+use Data::Dumper;
+sub handler {
+    my ($self, $param_ar)=@_;
+    $self->print(Dumper($param_ar));
+}

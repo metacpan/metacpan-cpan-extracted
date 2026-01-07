@@ -37,8 +37,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1",
-            "version" : "0.86"
+            "Test::More" : "1"
          }
       }
    },
@@ -54,6 +53,6 @@
          "web" : "https://github.com/briandfoy/tie-cycle"
       }
    },
-   "version" : "1.231",
+   "version" : "1.232",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

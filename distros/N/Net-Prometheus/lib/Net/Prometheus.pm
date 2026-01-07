@@ -1,12 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2026 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus 0.14;
+package Net::Prometheus 0.15;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use Carp;
 
@@ -115,11 +118,8 @@ enabled.
 
 =cut
 
-sub new
+sub new ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
-
    my $self = bless {
       registry => Net::Prometheus::Registry->new,
    }, $class;
@@ -149,11 +149,8 @@ method. The collector instance itself is returned, for convenience.
 
 =cut
 
-sub register
+sub register ( $self, $collector )
 {
-   my $self = shift;
-   my ( $collector ) = @_;
-
    return $self->{registry}->register( $collector );
 }
 
@@ -165,11 +162,8 @@ Removes a previously-registered collector.
 
 =cut
 
-sub unregister
+sub unregister ( $self, $collector )
 {
-   my $self = shift;
-   my ( $collector ) = @_;
-
    return $self->{registry}->unregister( $collector );
 }
 
@@ -182,11 +176,8 @@ registers it with the exporter. The newly-constructed gauge is returned.
 
 =cut
 
-sub new_gauge
+sub new_gauge ( $self, %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    return $self->register( Net::Prometheus::Gauge->new( %args ) );
 }
 
@@ -199,11 +190,8 @@ registers it with the exporter. The newly-constructed counter is returned.
 
 =cut
 
-sub new_counter
+sub new_counter ( $self, %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    return $self->register( Net::Prometheus::Counter->new( %args ) );
 }
 
@@ -216,11 +204,8 @@ and registers it with the exporter. The newly-constructed summary is returned.
 
 =cut
 
-sub new_summary
+sub new_summary ( $self, %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    return $self->register( Net::Prometheus::Summary->new( %args ) );
 }
 
@@ -234,11 +219,8 @@ returned.
 
 =cut
 
-sub new_histogram
+sub new_histogram ( $self, %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    return $self->register( Net::Prometheus::Histogram->new( %args ) );
 }
 
@@ -270,11 +252,8 @@ passing in these values as overrides.
 
 =cut
 
-sub new_metricgroup
+sub new_metricgroup ( $self, %args )
 {
-   my $self = shift;
-   my ( %args ) = @_;
-
    return Net::Prometheus::_MetricGroup->new(
       $self, %args
    );
@@ -289,25 +268,22 @@ of the currently-registered collectors.
 
 =cut
 
-sub collect
+sub collect ( $self, $opts = undef )
 {
-   my $self = shift;
-   my ( $opts ) = @_;
-
    $opts //= {};
 
    my %samples_by_name;
    foreach my $collector ( $self->{registry}->collectors, Net::Prometheus::Registry->collectors ) {
-      push @{ $samples_by_name{ $_->fullname } }, $_ for $collector->collect( $opts );
+      push $samples_by_name{ $_->fullname }->@*, $_ for $collector->collect( $opts );
    }
 
    return map {
-      my @results = @{ $samples_by_name{ $_ } };
+      my @results = $samples_by_name{ $_ }->@*;
       my $first = $results[0];
 
       @results > 1 ?
          MetricSamples( $first->fullname, $first->type, $first->help,
-            [ map { @{ $_->samples } } @results ]
+            [ map { $_->samples->@* } @results ]
          ) :
          $first;
    } sort keys %samples_by_name;
@@ -330,20 +306,16 @@ applies to gauges). Values set to NaN will be rendered as C<NaN>.
 
 =cut
 
-sub _render_label_value
+sub _render_label_value ( $v )
 {
-   my ( $v ) = @_;
-
    $v =~ s/(["\\])/\\$1/g;
    $v =~ s/\n/\\n/g;
 
    return qq("$v");
 }
 
-sub _render_labels
+sub _render_labels ( $labels )
 {
-   my ( $labels ) = @_;
-
    return "" if !scalar @$labels;
 
    return "{" .
@@ -351,11 +323,8 @@ sub _render_labels
       "}";
 }
 
-sub render
+sub render ( $self, $opts = undef )
 {
-   my $self = shift;
-   my ( $opts ) = @_;
-
    return join "", map {
       my $metricsamples = $_;
 
@@ -376,7 +345,7 @@ sub render
                _render_labels( $sample->labels ),
                ( ( $value != $value ) ? "NaN" : $value ) :
             ();
-      } @{ $metricsamples->samples }
+      } $metricsamples->samples->@*
    } $self->collect( $opts );
 }
 
@@ -410,27 +379,21 @@ application which uses these objects. For example:
 =cut
 
 # Some handy pseudomethods to make working on HTTP::Response less painful
-my $set_header = sub {
-   my $resp = shift;
-   $resp->header( @_ );
+my $set_header = sub ( $resp, @args ) {
+   $resp->header( @args );
    $resp;
 };
-my $set_content = sub {
-   my $resp = shift;
-   $resp->content( @_ );
+my $set_content = sub ( $resp, @args ){
+   $resp->content( @args );
    $resp;
 };
-my $fix_content_length = sub {
-   my $resp = shift;
+my $fix_content_length = sub ( $resp ) {
    $resp->content_length or $resp->content_length( length $resp->content );
    $resp;
 };
 
-sub handle
+sub handle ( $self, $request )
 {
-   my $self = shift;
-   my ( $request ) = @_;
-
    require HTTP::Response;
 
    $request->method eq "GET" or return
@@ -474,14 +437,11 @@ application which is uses or is based on PSGI. For example:
 
 =cut
 
-sub psgi_app
+sub psgi_app ( $self )
 {
-   my $self = shift;
-
    require URI;
 
-   return sub {
-      my $env = shift;
+   return sub ( $env ) {
       my $method = $env->{REQUEST_METHOD};
 
       $method eq "GET" or return [
@@ -537,11 +497,8 @@ is using for its own purposes.
 
 =cut
 
-sub export_to_Future_IO
+sub export_to_Future_IO ( $self, %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    require Net::Prometheus::_FutureIO;
    require IO::Socket::IP;
 
@@ -587,21 +544,15 @@ Port number on which to listen for incoming HTTP requests.
 
 =cut
 
-sub export_to_IO_Async
+sub export_to_IO_Async ( $self, $loop, %args )
 {
-   my $self = shift;
-   my ( $loop, %args ) = @_;
-
    require IO::Async::Loop;
    require Net::Async::HTTP::Server;
 
    $loop //= IO::Async::Loop->new;
 
    my $httpserver = Net::Async::HTTP::Server->new(
-      on_request => sub {
-         my $httpserver = shift;
-         my ( $req ) = @_;
-
+      on_request => sub ( $httpserver, $req ) {
          $req->respond( $self->handle( $req->as_http_request ) );
       },
    );
@@ -619,10 +570,8 @@ sub export_to_IO_Async
    package
       Net::Prometheus::_MetricGroup;
 
-   sub new
+   sub new ( $class, $prometheus, %args )
    {
-      my $class = shift;
-      my ( $prometheus, %args ) = @_;
       return bless {
          prometheus => $prometheus,
          namespace  => $args{namespace},
@@ -633,12 +582,11 @@ sub export_to_IO_Async
    my $metapkg = meta::get_this_package;
 
    foreach my $method (qw( new_gauge new_counter new_summary new_histogram )) {
-      $metapkg->add_named_sub( $method => sub {
-         my $self = shift;
+      $metapkg->add_named_sub( $method => sub ( $self, @args ) {
          $self->{prometheus}->$method(
             namespace => $self->{namespace},
             subsystem => $self->{subsystem},
-            @_,
+            @args,
          );
       } );
    }

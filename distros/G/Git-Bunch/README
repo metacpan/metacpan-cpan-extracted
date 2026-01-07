@@ -3,8 +3,8 @@ NAME
     repos)
 
 VERSION
-    This document describes version 0.631 of Git::Bunch (from Perl
-    distribution Git-Bunch), released on 2024-10-22.
+    This document describes version 0.632 of Git::Bunch (from Perl
+    distribution Git-Bunch), released on 2026-01-03.
 
 SYNOPSIS
     See the included gitbunch script.
@@ -104,6 +104,10 @@ FUNCTIONS
     *   repo => *str*
 
         Only process a single repo.
+
+    *   sort => *str*
+
+        Order entries.
 
     *   source* => *str*
 
@@ -205,6 +209,10 @@ FUNCTIONS
     *   repo => *str*
 
         Only process a single repo.
+
+    *   sort => *str*
+
+        Order entries.
 
     *   source* => *str*
 
@@ -394,6 +402,44 @@ FUNCTIONS
     *   source* => *str*
 
         Directory to check.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  list_bunches
+    Usage:
+
+     list_bunches(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List bunches defined in configuration.
+
+    A gitbunch directory is defined in the configuration file as a section,
+    e.g.:
+
+     [bunch NAME]
+     path = SOMEPATH
+ 
+     [bunch NAME2]
+     path = !path ~/SOMEPATH
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -630,7 +676,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

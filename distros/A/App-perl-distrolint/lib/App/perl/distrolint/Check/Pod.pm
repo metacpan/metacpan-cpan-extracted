@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.807;
 
-class App::perl::distrolint::Check::Pod 0.07;
+class App::perl::distrolint::Check::Pod 0.08;
 
 apply App::perl::distrolint::CheckRole::EachFile;
 apply App::perl::distrolint::CheckRole::TreeSitterPerl;
@@ -36,6 +36,18 @@ Additionally checks that each of the following C<=head1> sections appear:
    =head1 AUTHOR
 
 Additional checks are applied to the contents of various C<=head> sections.
+
+=head1 CONFIGURATION
+
+The following extra configuration may be added to the C<[check Pod]>
+section of F<distrolint.ini>:
+
+=head2 require_highlighter_directive
+
+   require_highlighter_directive = true
+
+If true, prints a note (not a failure) if any verbatim paragraphs are found
+before a C<=for highlighter language=...> directive. Defaults to false.
 
 =cut
 
@@ -76,6 +88,9 @@ method check_file ( $file )
       return 0;
    }
 
+   my $require_highlighter_directive =
+      App::perl::distrolint::Config->check_config( $self, "require_highlighter_directive", 0 );
+
    state $TSPOD //= Text::Treesitter->new( lang_name => "pod" );
 
    my $text = $tree->text;
@@ -85,6 +100,8 @@ method check_file ( $file )
    my %nodes_per_head1;
 
    my $ok = 1;
+
+   my $highlighter;
 
    foreach my $pod ( @pod_nodes ) {
       my $podtree = $TSPOD->parse_string_range( $text,
@@ -101,6 +118,8 @@ method check_file ( $file )
       $qc->exec( $QUERY, $podtree->root_node );
 
       while( my $captures = $qc->next_match_captures ) {
+         my $paratype = $captures->{para}->type;
+
          my $contentnode = $captures->{content};
          my $content = $contentnode->text;
          $content =~ s/\n// unless $contentnode->type eq "verbatim_paragraph";
@@ -123,6 +142,21 @@ method check_file ( $file )
          if( ( $command // "" ) eq "=head2" and
              my $meth = $self->can( "check_head2_$last_head1" ) ) {
             $ok &= $meth->( $self, $file, $contentnode );
+         }
+
+         if( ( $command // "" ) eq "=for" and $content =~ s/^highlighter\s+// ) {
+            my @args = split m/\s+/, $content;
+            $args[0] = "language=$args[0]" if @args and $args[0] !~ m/=/;
+
+            undef $highlighter;
+            m/^language=(.*)$/ and $highlighter = $1, last
+               for @args;
+         }
+
+         if( $paratype eq "verbatim_paragraph" ) {
+            if( $require_highlighter_directive and !defined $highlighter ) {
+               App->note( App->format_file( $file, $contentnode->start_row + 1 ), " verbatim paragraph without highlighter config" );
+            }
          }
       }
    }
@@ -198,6 +232,8 @@ arguments passed. It can optionally use an C<await> expression, used to
 indicate it is a L<Future>-returning asynchronous function or method.
 
 E.g.
+
+=for highlighter language=perl
 
    funcname;
    funcname(@args);

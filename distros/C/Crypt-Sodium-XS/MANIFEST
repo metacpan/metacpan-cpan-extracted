@@ -73,8 +73,8 @@ lib/Crypt/Sodium/XS/shorthash.pm
 lib/Crypt/Sodium/XS/sign.pm
 lib/Crypt/Sodium/XS/stream.pm
 ppport.h
-src/libsodium-1.0.20.tar.gz
-src/libsodium-1.0.20.tar.gz.sig
+src/libsodium-1.0.20-stable.tar.gz
+src/libsodium-1.0.20-stable.tar.gz.minisig
 t/aead.t
 t/auth.t
 t/base64.t

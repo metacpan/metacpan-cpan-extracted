@@ -1,3 +1,12 @@
+Travel::Status::DE::DBRIS 0.22 - Sun Jan 04 2026
+
+    * Further fixes for fundefined fvalues
+    * Update train and operator names (patch by Lili Chelsea Urban)
+
+Travel::Status::DE::DBRIS 0.21 - Fri Jan 02 2026
+
+    * Formation: Fix uninitialized value warnings
+
 Travel::Status::DE::DBRIS 0.20 - Sun Dec 28 2025
 
     * Formation::Group: Update carriage name list (patch by Lili Chelsea Urban)

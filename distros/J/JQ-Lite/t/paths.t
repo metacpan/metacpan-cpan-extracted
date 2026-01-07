@@ -1,54 +1,53 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 4;
 use JSON::PP;
 use JQ::Lite;
 
 my $jq = JQ::Lite->new;
 
-# --- 1. Nested object with arrays and booleans
-my $json1 = '{"user":{"name":"Alice","tags":["perl","json"],"active":true}}';
+sub unordered_paths_ok {
+    my ($got, $expected, $name) = @_;
+
+    my @got_sorted = sort map { encode_json($_) } @$got;
+    my @exp_sorted = sort map { encode_json($_) } @$expected;
+
+    is_deeply(\@got_sorted, \@exp_sorted, $name);
+}
+
+# --- 1. paths includes container nodes
+my $json1 = '{"a":[1,2]}';
 my @result1 = $jq->run_query($json1, 'paths');
-is_deeply(
-    $result1[0],
+unordered_paths_ok(
+    \@result1,
     [
-        [ 'user' ],
-        [ 'user', 'active' ],
-        [ 'user', 'name' ],
-        [ 'user', 'tags' ],
-        [ 'user', 'tags', 0 ],
-        [ 'user', 'tags', 1 ],
+        [ 'a' ],
+        [ 'a', 0 ],
+        [ 'a', 1 ],
     ],
-    'paths() lists every nested key/index in order',
+    'paths() emits container and child paths',
 );
 
-# --- 2. Mixed array contents
-my $json2 = '[1,{"foo":[2,null]}]';
-my @result2 = $jq->run_query($json2, 'paths');
-is_deeply(
-    $result2[0],
+# --- 2. paths(scalars) only reports scalar leaves
+my $json2 = '{"a":[1,{"b":true}],"c":null}';
+my @result2 = $jq->run_query($json2, 'paths(scalars)');
+unordered_paths_ok(
+    \@result2,
     [
-        [ 0 ],
-        [ 1 ],
-        [ 1, 'foo' ],
-        [ 1, 'foo', 0 ],
-        [ 1, 'foo', 1 ],
+        [ 'a', 0 ],
+        [ 'a', 1, 'b' ],
+        [ 'c' ],
     ],
-    'paths() traverses arrays and nested objects',
+    'paths(scalars) emits only scalar-leaf paths',
 );
 
-# --- 3. Scalar input returns the empty path
+# --- 3. Scalar input produces an empty stream for paths
 my $json3 = '"hello"';
 my @result3 = $jq->run_query($json3, 'paths');
-is_deeply($result3[0], [ [] ], 'paths() returns empty path for scalars');
+is_deeply(\@result3, [], 'paths() yields no results for scalar input');
 
-# --- 4. Null input returns the empty path
-my $json4 = 'null';
-my @result4 = $jq->run_query($json4, 'paths');
-is_deeply($result4[0], [ [] ], 'paths() returns empty path for null values');
-
-# --- 5. Empty containers yield no paths
-my $json5 = '{"items":[]}';
-my @result5 = $jq->run_query($json5, 'paths');
-is_deeply($result5[0], [ ['items'] ], 'paths() reports empty arrays as leaves');
+# --- 4. Scalar input produces an empty stream for paths(scalars)
+my $json4 = 'true';
+my @result4 = $jq->run_query($json4, 'paths(scalars)');
+is_deeply(\@result4, [], 'paths(scalars) yields no results for scalar input');
 

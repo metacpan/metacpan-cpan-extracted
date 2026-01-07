@@ -6,7 +6,7 @@
       "Jens B. <jnsbyr@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -52,7 +52,7 @@
          "web" : "https://github.com/ntruchsess/perl-firmata"
       }
    },
-   "version" : "0.69",
+   "version" : "0.70",
    "x_homepage" : "https://github.com/ntruchsess/perl-firmata/",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -5,6 +5,7 @@ use warnings;
 
 use List::Util qw(sum min max);
 use Scalar::Util qw(looks_like_number);
+use B qw(SVp_IOK SVp_NOK);
 use JQ::Lite::Util ();
 
 sub apply {
@@ -61,6 +62,20 @@ sub apply {
                     push @next_results, undef;
                 }
             }
+            @$out_ref = @next_results;
+            return 1;
+        }
+
+        # support for binding the current value to a variable: . as $x | ...
+        if ($normalized =~ /^as\s+\$(\w+)$/) {
+            my $var_name = $1;
+            @next_results = ();
+
+            for my $item (@results) {
+                $self->{_vars}{$var_name} = $item;
+                push @next_results, $item;
+            }
+
             @$out_ref = @next_results;
             return 1;
         }
@@ -303,7 +318,14 @@ sub apply {
                 my @items = $self->run_query($json, $foreach->{generator});
 
                 my ($init_values, $init_ok) = JQ::Lite::Util::_evaluate_value_expression($self, $value, $foreach->{init_expr});
-                my $acc = ($init_ok && @$init_values) ? $init_values->[0] : undef;
+                my $acc;
+                if ($init_ok) {
+                    $acc = @$init_values ? $init_values->[0] : undef;
+                }
+                else {
+                    my @init_outputs = $self->run_query(JQ::Lite::Util::_encode_json($value), $foreach->{init_expr});
+                    $acc = @init_outputs ? $init_outputs[0] : undef;
+                }
 
                 for my $element (@items) {
                     my %existing = %{ $self->{_vars} || {} };
@@ -409,7 +431,14 @@ sub apply {
                 my @items = $self->run_query($json, $reduce->{generator});
 
                 my ($init_values, $init_ok) = JQ::Lite::Util::_evaluate_value_expression($self, $value, $reduce->{init_expr});
-                my $acc = ($init_ok && @$init_values) ? $init_values->[0] : undef;
+                my $acc;
+                if ($init_ok) {
+                    $acc = @$init_values ? $init_values->[0] : undef;
+                }
+                else {
+                    my @init_outputs = $self->run_query(JQ::Lite::Util::_encode_json($value), $reduce->{init_expr});
+                    $acc = @init_outputs ? $init_outputs[0] : undef;
+                }
 
                 for my $element (@items) {
                     my %existing = %{ $self->{_vars} || {} };
@@ -435,10 +464,13 @@ sub apply {
             return 1;
         }
 
-        # support for flatten (alias for .[])
-        if ($part eq 'flatten') {
+        # support for .[] iteration
+        if ($part eq '.[]') {
             @next_results = map {
-                ref $_ eq 'ARRAY' ? @$_ : ()
+                ref $_ eq 'ARRAY' ? @$_
+              : ref $_ eq 'HASH'  ? values %$_
+              : JQ::Lite::Util::_is_string_scalar($_) ? split(//, "$_")
+              : ()
             } @results;
             @$out_ref = @next_results;
             return 1;
@@ -452,6 +484,9 @@ sub apply {
             my $has_wildcard_array = index($cond, '[]') != -1;
             my $has_comparison = ($cond =~ /(==|!=|>=|<=|>|<|\band\b|\bor\b|\bcontains\b|\bhas\b|\bmatch\b)/i);
             my $use_streaming_eval = $has_wildcard_array || !$has_comparison;
+
+            # allow built-in filters like match() and test() to run so their errors surface
+            $use_streaming_eval ||= ($cond =~ /^\s*(match|test)\s*\(/);
 
             VALUE: for my $value (@results) {
                 my $simple = JQ::Lite::Util::_evaluate_condition($value, $cond) ? 1 : 0;
@@ -467,13 +502,7 @@ sub apply {
                         $error = $@;
                     }
 
-                    if ($error) {
-                        if ($simple) {
-                            push @next_results, $value;
-                        }
-
-                        next VALUE;
-                    }
+                    die $error if $error;
 
                     if (@cond_results) {
                         my $truthy = 0;
@@ -689,8 +718,16 @@ sub apply {
         }
 
         # support for limit(n)
-        if ($part =~ /^limit\((\d+)\)$/) {
-            my $limit = $1;
+        if ($part =~ /^limit\((.+)\)$/) {
+            my $limit_str = $1;
+            $limit_str =~ s/^\s+|\s+$//g;
+
+            if ($limit_str !~ /^\d+$/) {
+                die "limit(): count must be a non-negative integer";
+            }
+
+            my $limit = $limit_str + 0;
+
             @next_results = map {
                 if (ref $_ eq 'ARRAY') {
                     my $arr = $_;
@@ -706,8 +743,15 @@ sub apply {
         }
 
         # support for drop(n)
-        if ($part =~ /^drop\((\d+)\)$/) {
-            my $count = $1;
+        if ($part =~ /^drop\((.+)\)$/) {
+            my $count_str = $1;
+            $count_str =~ s/^\s+|\s+$//g;
+
+            if ($count_str !~ /^\d+$/) {
+                die "drop(): count must be a non-negative integer";
+            }
+
+            my $count = $count_str + 0;
             @next_results = map {
                 if (ref $_ eq 'ARRAY') {
                     my $arr = $_;
@@ -725,8 +769,15 @@ sub apply {
         }
 
         # support for tail(n)
-        if ($part =~ /^tail\((\d+)\)$/) {
-            my $count = $1;
+        if ($part =~ /^tail\((.+)\)$/) {
+            my $count_str = $1;
+            $count_str =~ s/^\s+|\s+$//g;
+
+            if ($count_str !~ /^\d+$/) {
+                die "tail(): count must be a non-negative integer";
+            }
+
+            my $count = $count_str + 0;
             @next_results = map {
                 if (ref $_ eq 'ARRAY') {
                     my $arr = $_;
@@ -749,8 +800,15 @@ sub apply {
         }
 
         # support for chunks(n)
-        if ($part =~ /^chunks\((\d+)\)$/) {
-            my $size = $1;
+        if ($part =~ /^chunks\((.+)\)$/) {
+            my $size_str = $1;
+            $size_str =~ s/^\s+|\s+$//g;
+
+            if ($size_str !~ /^\d+$/) {
+                die "chunks(): size must be a non-negative integer";
+            }
+
+            my $size = $size_str + 0;
             $size = 1 if $size < 1;
 
             @next_results = map {
@@ -794,9 +852,18 @@ sub apply {
         if ($part =~ /^map\((.+)\)$/) {
             my $filter = $1;
             @next_results = map {
-                ref $_ eq 'ARRAY'
-                    ? [ grep { defined($_) } map { $self->run_query(JQ::Lite::Util::_encode_json($_), $filter) } @$_ ]
-                    : $_
+                if (ref $_ eq 'ARRAY') {
+                    my @mapped;
+
+                    for my $element (@$_) {
+                        my @outputs = $self->run_query(JQ::Lite::Util::_encode_json($element), $filter);
+                        push @mapped, @outputs if @outputs;
+                    }
+
+                    \@mapped;
+                } else {
+                    $_;
+                }
             } @results;
             @$out_ref = @next_results;
             return 1;
@@ -1440,15 +1507,18 @@ sub apply {
 
         # support for count
         if ($part eq 'count') {
-            my $n = 0;
-            for my $item (@results) {
-                if (ref $item eq 'ARRAY') {
-                    $n += scalar(@$item);
-                } else {
-                    $n += 1;  # count as 1 item
+            @next_results = map {
+                if (ref $_ eq 'ARRAY') {
+                    scalar(@$_);
                 }
-            }
-            @$out_ref = ($n);
+                elsif (!defined $_) {
+                    0;
+                }
+                else {
+                    1;    # count as 1 item for scalars and objects
+                }
+            } @results;
+            @$out_ref = @next_results;
             return 1;
         }
 
@@ -1478,11 +1548,8 @@ sub apply {
             $sep =~ s/^['"](.*?)['"]$/$1/;  # remove quotes around separator
 
             @next_results = map {
-                if (ref $_ eq 'ARRAY') {
-                    join($sep, map { defined $_ ? $_ : '' } @$_)
-                } else {
-                    ''
-                }
+                die 'join(): input must be an array' if ref($_) ne 'ARRAY';
+                join($sep, map { defined $_ ? $_ : '' } @$_)
             } @results;
             @$out_ref = @next_results;
             return 1;
@@ -1568,7 +1635,9 @@ sub apply {
         # support for flatten()
         if ($part eq 'flatten()' || $part eq 'flatten') {
             @next_results = map {
-                (ref $_ eq 'ARRAY') ? @$_ : ()
+                ref $_ eq 'ARRAY'
+                    ? JQ::Lite::Util::_flatten_depth($_, 1)
+                    : $_
             } @results;
             @$out_ref = @next_results;
             return 1;
@@ -1625,11 +1694,10 @@ sub apply {
                     'object';
                 }
                 elsif (ref($_) eq '') {
-                    if (/^-?\d+(?:\.\d+)?$/) {
-                        'number';
-                    } else {
-                        'string';
-                    }
+                    my $sv    = B::svref_2object(\$_);
+                    my $flags = $sv->FLAGS;
+
+                    ($flags & (SVp_IOK | SVp_NOK)) ? 'number' : 'string';
                 }
                 elsif (ref($_) eq 'JSON::PP::Boolean') {
                     'boolean';
@@ -1796,6 +1864,17 @@ sub apply {
             my $flags   = defined $flags_expr   ? JQ::Lite::Util::_parse_string_argument($flags_expr)   : '';
 
             @next_results = map { JQ::Lite::Util::_apply_test($_, $pattern, $flags) } @results;
+            @$out_ref = @next_results;
+            return 1;
+        }
+
+        # support for match("pattern"[, "flags"])
+        if ($part =~ /^match\((.+)\)$/) {
+            my ($pattern_expr, $flags_expr) = JQ::Lite::Util::_split_semicolon_arguments($1, 2);
+            my $pattern = defined $pattern_expr ? JQ::Lite::Util::_parse_string_argument($pattern_expr) : '';
+            my $flags   = defined $flags_expr   ? JQ::Lite::Util::_parse_string_argument($flags_expr)   : '';
+
+            @next_results = map { JQ::Lite::Util::_apply_match($_, $pattern, $flags) } @results;
             @$out_ref = @next_results;
             return 1;
         }
@@ -1976,7 +2055,26 @@ sub apply {
 
         # support for paths()
         if ($part eq 'paths()' || $part eq 'paths') {
-            @next_results = map { JQ::Lite::Util::_apply_paths($_) } @results;
+            @next_results = ();
+
+            for my $value (@results) {
+                my $paths = JQ::Lite::Util::_apply_paths($value);
+                push @next_results, @$paths;
+            }
+
+            @$out_ref = @next_results;
+            return 1;
+        }
+
+        # support for paths(scalars)
+        if ($part =~ /^paths\(\s*scalars\s*\)$/) {
+            @next_results = ();
+
+            for my $value (@results) {
+                my $paths = JQ::Lite::Util::_apply_scalar_paths($value);
+                push @next_results, @$paths;
+            }
+
             @$out_ref = @next_results;
             return 1;
         }
@@ -2078,6 +2176,33 @@ sub apply {
             } @results;
             @$out_ref = @next_results;
             return 1;
+        }
+
+        # Fallback: value expressions (including literals like null/0/"text")
+        {
+            my $all_ok = 1;
+            @next_results = ();
+
+            for my $item (@results) {
+                my ($values, $ok) = JQ::Lite::Util::_evaluate_value_expression($self, $item, $part);
+                if ($ok) {
+                    if (@$values) {
+                        push @next_results, @$values;
+                    }
+                    else {
+                        push @next_results, undef;
+                    }
+                }
+                else {
+                    $all_ok = 0;
+                    last;
+                }
+            }
+
+            if ($all_ok) {
+                @$out_ref = @next_results;
+                return 1;
+            }
         }
 
     return 0;

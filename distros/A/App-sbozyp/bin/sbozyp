@@ -6,7 +6,7 @@ use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported versio
 
 package Sbozyp;
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.4.1';
 
 use Digest::MD5 qw();
 use File::Basename qw(basename dirname);
@@ -187,14 +187,14 @@ sub main_query {
         'q'      => \my $opt_printqueue,
         'r'      => \my $opt_readme,
         's'      => \my $opt_slackbuild,
-        'u'      => \my $opt_listneedupgrade,
-        'v'      => \my $opt_listneedupgradeversion
+        'u'      => \my $opt_listneedupdate,
+        'v'      => \my $opt_listneedupdateversion
     );
     if ($opt_help) { print command_help_msg('query'); return }
     if (@_ > 1) { die command_usage('query') }
-    my $num_opts_set = 0; for ($opt_listinstalled,$opt_printpackagedir,$opt_printrepodir,$opt_slackdesc,$opt_info,$opt_pkgsnodependents,$opt_recdependents,$opt_directdependents,$opt_pkginstalled,$opt_printqueue,$opt_readme,$opt_slackbuild,$opt_listneedupgrade,$opt_listneedupgradeversion) { $num_opts_set++ if defined }
+    my $num_opts_set = 0; for ($opt_listinstalled,$opt_printpackagedir,$opt_printrepodir,$opt_slackdesc,$opt_info,$opt_pkgsnodependents,$opt_recdependents,$opt_directdependents,$opt_pkginstalled,$opt_printqueue,$opt_readme,$opt_slackbuild,$opt_listneedupdate,$opt_listneedupdateversion) { $num_opts_set++ if defined }
     if    ($num_opts_set != 1)  { sbozyp_die("must set exactly 1 query option but $num_opts_set were set") }
-    my $opt = $opt_listinstalled ? '-a' : $opt_printpackagedir ? '-b' : $opt_printrepodir ? '-c' : $opt_slackdesc ? '-d' : $opt_info ? '-i' : $opt_pkgsnodependents ? '-m' : $opt_recdependents ? '-n' : $opt_directdependents ? '-o' : $opt_pkginstalled ? '-p' : $opt_printqueue ? '-q' : $opt_readme ? '-r' : $opt_slackbuild ? '-s' : $opt_listneedupgrade ? '-u' : $opt_listneedupgradeversion ? '-v' : die;
+    my $opt = $opt_listinstalled ? '-a' : $opt_printpackagedir ? '-b' : $opt_printrepodir ? '-c' : $opt_slackdesc ? '-d' : $opt_info ? '-i' : $opt_pkgsnodependents ? '-m' : $opt_recdependents ? '-n' : $opt_directdependents ? '-o' : $opt_pkginstalled ? '-p' : $opt_printqueue ? '-q' : $opt_readme ? '-r' : $opt_slackbuild ? '-s' : $opt_listneedupdate ? '-u' : $opt_listneedupdateversion ? '-v' : die;
     my $pkg; if ($opt_printpackagedir || $opt_slackdesc || $opt_info || $opt_recdependents || $opt_directdependents || $opt_pkginstalled || $opt_printqueue || $opt_readme || $opt_slackbuild) {
         @_ == 1 or sbozyp_die("query option '$opt' requires single PKGNAME argument");
         $pkg = pkg($_[0]);
@@ -231,14 +231,14 @@ sub main_query {
         sbozyp_print_file("$pkg->{PKGDIR}/README");
     } elsif ($opt_slackbuild) {
         sbozyp_print_file("$pkg->{PKGDIR}/$pkg->{PRGNAM}.SlackBuild");
-    } elsif ($opt_listneedupgrade) {
+    } elsif ($opt_listneedupdate) {
         my %installed_sbo_pkgs = installed_sbo_pkgs();
         for my $pkgname (sort keys %installed_sbo_pkgs) {
             my $installed_version = $installed_sbo_pkgs{$pkgname};
             my $available_version = pkg($pkgname)->{VERSION};
             print $pkgname, "\n" if version_gt($available_version, $installed_version);
         }
-    } elsif ($opt_listneedupgradeversion) {
+    } elsif ($opt_listneedupdateversion) {
         my %installed_sbo_pkgs = installed_sbo_pkgs();
         for my $pkgname (sort keys %installed_sbo_pkgs) {
             my $installed_version = $installed_sbo_pkgs{$pkgname};
@@ -993,7 +993,7 @@ Every command has its own options, these are just the global ones:
 
 Commands:
 
- install|in    Install or upgrade packages
+ install|in    Install or update packages
  build|bu      Build but don't install packages
  remove|rm     Remove packages
  query|qr      Query for information about a package
@@ -1075,7 +1075,7 @@ Defaults to C<SRCDIR=/var/lib/sbozyp/source-cache>.
 
  Usage: sbozyp <install|in> [-h] [-f] [-k] [-r] [-y] [-z] <pkgname...>
 
-Install or upgrade packages.
+Install or update packages.
 
 Options are:
 
@@ -1094,7 +1094,7 @@ Examples:
  sbozyp in -k -r system/password-store
  sbozyp in -f -i -r password-store
  sbozyp -S -R $REPO in -f -r password-store
- sbozyp in -r $(sbozyp -S qr -u) ### upgrade all packages
+ sbozyp in -r $(sbozyp -S qr -u) ### update all packages
 
 =head2 BUILD
 
@@ -1161,7 +1161,7 @@ Options are:
  -q            Print PKGNAME's installation queue (finds PKGNAMES dependencies)
  -r            Print PKGNAME's README file
  -s            Print PKGNAME's .SlackBuild file
- -u            Print all packages that have upgrades available
+ -u            Print all packages that have updates available
  -v            Like -u, but also print the version information
 
 Examples:
@@ -1219,7 +1219,7 @@ Nicholas B. Hubbard (nicholashubbard@posteo.net)
 
 =head1 COPYRIGHT
 
-Copyright (c) 2023-2025 by Nicholas B. Hubbard (nicholashubbard@posteo.net)
+Copyright (c) 2023-2026 by Nicholas B. Hubbard (nicholashubbard@posteo.net)
 
 =head1 LICENSE
 

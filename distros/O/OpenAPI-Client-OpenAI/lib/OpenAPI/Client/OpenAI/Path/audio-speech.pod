@@ -43,7 +43,7 @@ C<createSpeech>
 
 =head4 Models
 
-One of the available L<TTS models|https://platform.openai.com/docs/models#tts>: C<tts-1>, C<tts-1-hd> or C<gpt-4o-mini-tts>.
+One of the available L<TTS models|https://platform.openai.com/docs/models#tts>: C<tts-1>, C<tts-1-hd>, C<gpt-4o-mini-tts>, or C<gpt-4o-mini-tts-2025-12-15>.
 
 =over 4
       
@@ -52,6 +52,8 @@ One of the available L<TTS models|https://platform.openai.com/docs/models#tts>: 
 =item * C<tts-1-hd>
 
 =item * C<gpt-4o-mini-tts>
+
+=item * C<gpt-4o-mini-tts-2025-12-15>
 
 =back
       
@@ -99,7 +101,7 @@ L<OpenAPI::Client::OpenAI::Path>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2023-2025 by Nelson Ferraz
+Copyright (C) 2023-2026 by Nelson Ferraz
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

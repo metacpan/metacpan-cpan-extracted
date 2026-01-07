@@ -2,7 +2,7 @@ package PAGI::Server;
 use strict;
 use warnings;
 
-our $VERSION = '0.001006';
+our $VERSION = '0.001007';
 
 use parent 'IO::Async::Notifier';
 use IO::Async::Listener;
@@ -576,7 +576,7 @@ B<When to use:>
 
 =back
 
-B<Note:> Only applies in multi-worker mode (C<workers> > 0). In single-worker
+B<Note:> Only applies in multi-worker mode (C<< workers > 0 >>). In single-worker
 mode, this setting is ignored.
 
 B<CLI:> C<--max-requests 10000>

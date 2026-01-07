@@ -26,7 +26,7 @@ no_index:
 provides:
   Daje::Database::Model:
     file: lib/Daje/Database/Model.pm
-    version: '0.09'
+    version: '0.11'
   Daje::Database::Model::Super::Common::Base:
     file: lib/Daje/Database/Model/Super/Common/Base.pm
   Daje::Database::Model::Super::Common::Defaults:
@@ -37,6 +37,6 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje-Database-Model/issues
   homepage: https://github.com/janeskil1525/Daje-Database-Model
   repository: https://github.com/janeskil1525/Daje-Database-Model.git
-version: '0.09'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

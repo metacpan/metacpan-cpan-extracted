@@ -5,7 +5,7 @@ use Test::Most tests => 3;
 use aliased "Google::RestApi";
 
 # use Carp::Always;
-# init_logger($DEBUG);
+init_logger;
 
 my $api;
 $api = RestApi->new(config_file => config_file());

@@ -24,5 +24,5 @@ requires:
 resources:
   homepage: https://github.com/briandfoy/tie-toggle
   repository: https://github.com/briandfoy/tie-toggle
-version: '1.088'
+version: '1.091'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -31,6 +31,7 @@ subtest 'status method' => sub {
 
     my $ret = $res->status(404);
     is $ret, $res, 'status returns self for chaining';
+    is $res->status, 404, 'status getter returns current status';
 };
 
 subtest 'header method' => sub {
@@ -39,6 +40,7 @@ subtest 'header method' => sub {
 
     my $ret = $res->header('X-Custom' => 'value');
     is $ret, $res, 'header returns self for chaining';
+    is $res->header('X-Custom'), 'value', 'header getter returns last value';
 };
 
 subtest 'content_type method' => sub {
@@ -47,6 +49,7 @@ subtest 'content_type method' => sub {
 
     my $ret = $res->content_type('application/xml');
     is $ret, $res, 'content_type returns self for chaining';
+    is $res->content_type, 'application/xml', 'content_type getter returns value';
 };
 
 subtest 'chaining multiple methods' => sub {
@@ -70,6 +73,7 @@ subtest 'header adds to headers array' => sub {
     $res->header('X-Custom' => 'value1');
     $res->header('X-Other' => 'value2');
     is scalar(@{$res->{_headers}}), 2, 'two headers added';
+    is scalar(@{$res->headers}), 2, 'headers getter returns arrayref';
 };
 
 subtest 'content_type replaces existing' => sub {
@@ -80,6 +84,41 @@ subtest 'content_type replaces existing' => sub {
     my @ct = grep { lc($_->[0]) eq 'content-type' } @{$res->{_headers}};
     is scalar(@ct), 1, 'only one content-type header';
     is $ct[0][1], 'text/plain', 'content-type replaced';
+    is $res->content_type, 'text/plain', 'content_type getter reflects current';
+};
+
+subtest 'try setters and has_*' => sub {
+    my $send = sub { Future->done };
+    my $res = PAGI::Response->new({}, $send);
+
+    ok !$res->has_status, 'no explicit status set initially';
+    ok !$res->has_content_type, 'no content-type set initially';
+    ok !$res->has_header('X-Foo'), 'no header set initially';
+
+    $res->status_try(201);
+    ok $res->has_status, 'status_try sets status once';
+    is $res->{_status}, 201, 'status_try sets status';
+    $res->status_try(202);
+    is $res->{_status}, 201, 'status_try does not override existing status';
+
+    $res->header_try('X-Foo' => 'a');
+    ok $res->has_header('x-foo'), 'header_try marks header as set';
+    $res->header_try('X-Foo' => 'b');
+    my @foo = grep { lc($_->[0]) eq 'x-foo' } @{$res->{_headers}};
+    is scalar(@foo), 1, 'header_try does not add duplicate header';
+    is $foo[0]->[1], 'a', 'header_try keeps original header value';
+    is $res->header('X-Foo'), 'a', 'header getter returns original value';
+    my @foo_all = $res->header_all('X-Foo');
+    is scalar(@foo_all), 1, 'header_all returns one value';
+    is $foo_all[0], 'a', 'header_all returns correct value';
+
+    $res->content_type_try('text/plain');
+    ok $res->has_content_type, 'content_type_try marks content-type as set';
+    my @ct = grep { lc($_->[0]) eq 'content-type' } @{$res->{_headers}};
+    is $ct[0][1], 'text/plain', 'content_type_try sets content-type';
+    $res->content_type_try('application/json');
+    @ct = grep { lc($_->[0]) eq 'content-type' } @{$res->{_headers}};
+    is $ct[0][1], 'text/plain', 'content_type_try does not override';
 };
 
 subtest 'status rejects invalid codes' => sub {

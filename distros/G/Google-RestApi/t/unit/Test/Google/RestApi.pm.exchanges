@@ -1,0 +1,92 @@
+---
+request: 'GET '
+response:
+  code: '200'
+  content: '{}'
+  headers: []
+  message: OK
+source: Test::Google::RestApi::api
+
+---
+request: 'GET '
+response:
+  code: '200'
+  content: '{}'
+  headers: []
+  message: OK
+source: Test::Google::RestApi::api
+
+---
+query_params:
+  fred: joe
+request: 'GET '
+response:
+  code: '200'
+  content: '{}'
+  headers: []
+  message: OK
+source: Test::Google::RestApi::api
+
+---
+request: 'GET '
+response:
+  code: 400
+  content: '{}'
+  headers: []
+  message: Bad Request
+source: Test::Google::RestApi::api
+
+---
+request: 'GET '
+response:
+  code: 429
+  content: '{}'
+  headers: []
+  message: Too Many Requests
+source: Test::Google::RestApi::api
+
+---
+request: 'GET '
+response:
+  code: 500
+  content: '{}'
+  headers: []
+  message: Internal Server Error
+source: Test::Google::RestApi::api
+
+---
+request: 'GET '
+response:
+  code: '200'
+  content: '{}'
+  headers: []
+  message: OK
+source: Test::Google::RestApi::api_callback
+
+---
+request: 'GET '
+response:
+  code: 429
+  content: '{}'
+  headers: []
+  message: Too Many Requests
+source: Test::Google::RestApi::api_callback
+
+---
+request: 'GET '
+response:
+  code: 500
+  content: '{}'
+  headers: []
+  message: Internal Server Error
+source: Test::Google::RestApi::api_callback
+
+---
+request: 'GET '
+response:
+  code: '200'
+  content: '{}'
+  headers: []
+  message: OK
+source: Test::Google::RestApi::api_callback
+

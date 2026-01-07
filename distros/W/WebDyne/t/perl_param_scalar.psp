@@ -1,0 +1,27 @@
+#  Both should work
+#
+<start_html>
+<perl handler param="Alice">
+<pre>
+Hello: ${name}
+<? Dumper($_[1]) ?>
+</pre>
+</perl>
+
+<perl handler="handler1" param="%{ name => Alice }">
+<pre>
+Hello: ${name}
+<? Dumper($_[1]) ?>
+</pre>
+</perl>
+__PERL__
+use Data::Dumper;
+sub handler {
+    my ($self, $param)=@_;
+    return $self->render( name=>$param);
+}
+
+sub handler1 {
+    my ($self, $param_hr)=@_;
+    return $self->render($param_hr);
+}

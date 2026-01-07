@@ -1,0 +1,4 @@
+[
+  {"id": 1001, "name": "www", "type": "A", "data": "192.168.1.1", "ttl": 300, "gtdLocation": "DEFAULT"},
+  {"id": 1002, "name": "mail", "type": "A", "data": "192.168.1.2", "ttl": 300, "gtdLocation": "DEFAULT"}
+]

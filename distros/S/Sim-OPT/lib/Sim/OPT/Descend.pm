@@ -23,6 +23,7 @@ use Sim::OPT::Report;
 use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
 eval { use Sim::OPTcue; 1 };
+eval { use Sim::OPTcue::Patternsearch; 1 };
 
 
 $Data::Dumper::Indent = 0;
@@ -38,7 +39,7 @@ no warnings;
 
 our @EXPORT = qw( descend prepareblank tee ); # our @EXPORT = qw( );
 
-$VERSION = '0.171'; # our $VERSION = '';
+$VERSION = '0.173'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -204,6 +205,7 @@ sub descend
   {
     $dirfiles{repfile} = "$mypath/$file-report-$countcase-$countblock.csv";
   }
+  my $repfile = $dirfiles{repfile};
   
   if ( !$dirfiles{sortmixed} )
   {
@@ -601,6 +603,8 @@ sub descend
     }
 
 
+    
+
     my $countcolm = 0;
     foreach my $colref ( @containerone )
     {
@@ -612,30 +616,88 @@ sub descend
       }
       else
       {
-        push ( @maxes, "NOTHING1" );
+        push ( @maxes, "" );
       }
     
       push ( @mins, min( @column ) );
     
       foreach my $el ( @column )
       {
-        my $eltrans;
-        if ( $maxes[ $countcolm ] != 0 )
+        if ( abs( $maxes[ $countcolm ] ) >= abs( $mins[$countcolm] ) )
         {
-          print $tee "\$weights[\$countcolm]: $weights[$countcolm]\n";
-          $eltrans = ( $el / $maxes[$countcolm] ) ;
+          $absmaxes[ $countcolm ] = abs( $maxes[ $countcolm ] );
+        }
+        else 
+        {
+          $absmaxes[ $countcolm ] = abs( $mins[ $countcolm ] );
+        }
+
+        my $eltrans;
+        if ( $absmaxes[ $countcolm ] != 0 )
+        {
+          $eltrans = ( $el / $absmaxes[$countcolm] ) ;
         }
         else
         {
-          $eltrans = "NOTHING2" ;
+          $eltrans = "" ;
         }
-        push ( @{ $containertwo[$countcolm] }, $eltrans) ; print $tee "ELTRANS: $eltrans\n";
+        push ( @{ $containertwo[$countcolm] }, $eltrans) ; #print $tee "ELTRANS: $eltrans\n";
       }
       $countcolm++;
     }
     #say $tee "HERE \@containerone: " . dump( @containerone ); #say $tee "\@containertwo: " . dump( @containertwo );
     #say $tee "\@maxes: " . dump( @maxes ); #say $tee "\@mins: " . dump( @mins );
     #say $tee "\@containernames: " . dump( @containernames );
+
+
+
+
+
+    $dirfiles{absmaxes} ||= ();
+    $dirfiles{absmins}  ||= ();
+
+    my $c = 0;
+    foreach my $max ( @maxes ) 
+    {
+
+      if ( !defined( $max ) or ( $max eq "NOTHING1") ) {  # keep index alignment
+        $c++;
+        next;
+      }
+
+      if ( !defined($dirfiles{absmaxes}[$c]) or ( $max > $dirfiles{absmaxes}[$c] ) ) 
+      {
+        $dirfiles{absmaxes}[$c] = $max;
+      } else {
+        $max = $dirfiles{absmaxes}[$c];
+      }
+      $c++;
+    }
+
+    $c = 0;
+    foreach my $min ( @mins ) 
+    {
+      if ( !defined( $min ) ) 
+      { 
+        $c++; 
+        next; 
+      }
+
+      if ( !defined($dirfiles{absmins}[$c]) or ( $min < $dirfiles{absmins}[$c] ) ) 
+      {
+        $dirfiles{absmins}[$c] = $min;
+      } 
+      else 
+      {
+        $min = $dirfiles{absmins}[$c];   
+      }
+      $c++;
+    } 
+
+
+
+
+    
 
     my $countrow = 0;
     foreach ( @lines )
@@ -904,7 +966,7 @@ sub descend
 
       #########################################à
     }
-    elsif ( $searchname eq "y" )###################################à
+    elsif ( $searchname eq "y" )###################################
     {
       #my @theselines;
       my @theselines = @packet;
@@ -1107,6 +1169,8 @@ sub descend
     push ( @containertitles, $touse );
   }
 
+  
+
   my $countcolm = 0;
   foreach my $colref ( @containerone )
   {
@@ -1118,30 +1182,86 @@ sub descend
     }
     else
     {
-      push ( @maxes, "NOTHING1" );
+      push ( @maxes, "" );
     }
   
     push ( @mins, min( @column ) );
   
     foreach my $el ( @column )
     {
-      my $eltrans;
-      if ( $maxes[ $countcolm ] != 0 )
+      if ( abs( $maxes[ $countcolm ] ) >= abs( $mins[$countcolm] ) )
       {
-        print $tee "\$weights[\$countcolm]: $weights[$countcolm]\n";
-        $eltrans = ( $el / $maxes[$countcolm] ) ;
+        $absmaxes[ $countcolm ] = abs( $maxes[ $countcolm ] );
+      }
+      else 
+      {
+        $absmaxes[ $countcolm ] = abs( $mins[ $countcolm ] );
+      }
+
+      my $eltrans;
+      if ( $absmaxes[ $countcolm ] != 0 )
+      {
+        $eltrans = ( $el / $absmaxes[$countcolm] ) ;
       }
       else
       {
-        $eltrans = "NOTHING2" ;
+        $eltrans = "" ;
       }
-      push ( @{ $containertwo[$countcolm] }, $eltrans) ; print $tee "ELTRANS: $eltrans\n";
+      push ( @{ $containertwo[$countcolm] }, $eltrans) ; #print $tee "ELTRANS: $eltrans\n";
     }
     $countcolm++;
   }
   #say $tee "HERE \@containerone: " . dump( @containerone ); #say $tee "\@containertwo: " . dump( @containertwo );
   #say $tee "\@maxes: " . dump( @maxes ); #say $tee "\@mins: " . dump( @mins );
   #say $tee "\@containernames: " . dump( @containernames );
+
+
+
+  
+  $dirfiles{absmaxes} ||= ();
+  $dirfiles{absmins}  ||= ();
+
+  my $c = 0;
+  foreach my $max ( @maxes ) 
+  {
+
+    if ( !defined( $max ) or ( $max eq "NOTHING1") ) {  # keep index alignment
+      $c++;
+      next;
+    }
+
+    if ( !defined($dirfiles{absmaxes}[$c]) or ( $max > $dirfiles{absmaxes}[$c] ) ) 
+    {
+      $dirfiles{absmaxes}[$c] = $max;
+    } else {
+      $max = $dirfiles{absmaxes}[$c];
+    }
+    $c++;
+  }
+
+  $c = 0;
+  foreach my $min ( @mins ) 
+  {
+    if ( !defined( $min ) ) 
+    { 
+      $c++; 
+      next; 
+    }
+
+    if ( !defined($dirfiles{absmins}[$c]) or ( $min < $dirfiles{absmins}[$c] ) ) 
+    {
+      $dirfiles{absmins}[$c] = $min;
+    } 
+    else 
+    {
+      $min = $dirfiles{absmins}[$c];   
+    }
+    $c++;
+  }
+
+    
+    
+
 
   my @newbowl;
   my $countrow = 0;
@@ -1236,6 +1356,7 @@ sub descend
   close TOTRES;
 
 
+#################################################################################
 
 
 
@@ -1882,12 +2003,12 @@ sub descend
                 say $tee "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
                 my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles, \%inst );
               }
-
+ 
+              my( $packet_r, $dirfiles_r );
               if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
               {
-
                 say $tee "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-                ( my $packet_r, my $dirfiles_r, $csim ) = Sim::OPT::Sim::sim(
+                ( $packet_r, $dirfiles_r, $csim ) = Sim::OPT::Sim::sim(
                     { instances => \@instancees, dirfiles => \%dirfiles, dowhat => \%dowhat, vehicles => \%vehicles, inst => \%inst } );
                 @packet = uniq( @$packet_r ); say $tee "RECEIVED PACKET " . dump( @packet );
                 %dirfiles = %$dirfiles;
@@ -2062,11 +2183,11 @@ sub descend
                 my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles, \%inst );
               }
 
+              my( $packet_r, $dirfiles_r );
               if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
               {
-
                 #say $tee "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-                ( my $packet_r, my $dirfiles_r, $csim ) = Sim::OPT::Sim::sim(
+                ( $packet_r, $dirfiles_r, $csim ) = Sim::OPT::Sim::sim(
                     { instances => \@instancees, dirfiles => \%dirfiles, dowhat => \%dowhat, vehicles => \%vehicles, inst => \%inst } );
                     @packet = uniq( @$packet_r ); say $tee "RECEIVED PACKET " . dump( @packet );
                     %dirfiles = %$dirfiles;

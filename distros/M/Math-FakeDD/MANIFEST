@@ -2,6 +2,7 @@ MANIFEST
 Changes
 FakeDD.pm
 FakeDD.pod
+FakeDD.xs
 Makefile.PL
 README
 
@@ -13,15 +14,18 @@ t/dd_repro_basics.t
 t/div.t
 t/dump.t
 t/log_exp.t
+t/lsd_max.t
 t/mul.t
 t/mpfr2dd.t
 t/new.t
 t/next.t
 t/overload.t
 t/print.t
+t/single_double.t
 t/sparse.t
 t/sqrt.t
 t/stringify.t
+t/subnormal.t
 t/sub.t
 t/test_check.t
 t/validate.t

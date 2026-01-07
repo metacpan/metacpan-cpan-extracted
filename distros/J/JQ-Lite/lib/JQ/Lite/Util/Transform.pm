@@ -62,6 +62,11 @@ sub _apply_numeric_function {
 
     return undef if !defined $value;
 
+    if (ref($value) eq 'JSON::PP::Boolean') {
+        my $numeric = $value ? 1 : 0;
+        return $callback->($numeric);
+    }
+
     if (!ref $value) {
         return looks_like_number($value) ? $callback->($value) : $value;
     }
@@ -151,6 +156,9 @@ sub _normalize_percentile {
     return undef unless looks_like_number($value);
 
     my $fraction = 0 + $value;
+
+    return undef if $fraction != $fraction;             # NaN
+    return undef if ($fraction * 0) != ($fraction * 0); # infinity
 
     if ($fraction > 1) {
         $fraction /= 100 if $fraction <= 100;
@@ -593,6 +601,9 @@ sub _traverse {
                 if (ref $item eq 'ARRAY') {
                     push @next_stack, @$item;
                 }
+                elsif (ref $item eq 'HASH') {
+                    push @next_stack, values %$item;
+                }
             }
             # index access: key[index]
             elsif ($step =~ /^(.*?)\[(\d+)\]$/) {
@@ -611,12 +622,20 @@ sub _traverse {
                     if (ref $val eq 'ARRAY') {
                         push @next_stack, @$val;
                     }
+                    elsif (ref $val eq 'HASH') {
+                        push @next_stack, values %$val;
+                    }
                 }
                 elsif (ref $item eq 'ARRAY') {
                     for my $sub (@$item) {
                         if (ref $sub eq 'HASH' && exists $sub->{$key}) {
                             my $val = $sub->{$key};
-                            push @next_stack, @$val if ref $val eq 'ARRAY';
+                            if (ref $val eq 'ARRAY') {
+                                push @next_stack, @$val;
+                            }
+                            elsif (ref $val eq 'HASH') {
+                                push @next_stack, values %$val;
+                            }
                         }
                     }
                 }
@@ -707,16 +726,35 @@ sub _evaluate_condition {
     # support for the match operator (with optional 'i' flag)
     if ($cond =~ /^\s*\.(.+?)\s+match\s+"(.*?)"(i?)\s*$/) {
         my ($path, $pattern, $ignore_case) = ($1, $2, $3);
-        my $re = eval {
-            $ignore_case eq 'i' ? qr/$pattern/i : qr/$pattern/
-        };
-        return 0 unless $re;
+        my ($re, $error) = _build_regex($pattern, $ignore_case);
+        if ($error) {
+            $error =~ s/[\r\n]+$//;
+            die "match(): invalid regular expression - $error";
+        }
 
         my @vals = _traverse($item, $path);
         for my $val (@vals) {
             next if ref $val;
             return 1 if $val =~ $re;
         }
+        return 0;
+    }
+
+    # support for the =~ operator: select(. =~ "pattern")
+    if ($cond =~ /^\s*\.(.+?)\s*=~\s*"(.*?)"(i?)\s*$/) {
+        my ($path, $pattern, $ignore_case) = ($1, $2, $3);
+        my ($re, $error) = _build_regex($pattern, $ignore_case);
+        if ($error) {
+            $error =~ s/[\r\n]+$//;
+            die "=~: invalid regular expression - $error";
+        }
+
+        my @vals = _traverse($item, $path);
+        for my $val (@vals) {
+            next if ref $val;
+            return 1 if $val =~ $re;
+        }
+
         return 0;
     }
  
@@ -993,7 +1031,22 @@ sub _apply_test {
     my ($value, $pattern, $flags) = @_;
 
     my ($regex, $error) = _build_regex($pattern, $flags);
-    return JSON::PP::false if $error;
+    if ($error) {
+        $error =~ s/[\r\n]+$//;
+        die "test(): invalid regular expression - $error";
+    }
+
+    return _test_against_regex($value, $regex);
+}
+
+sub _apply_match {
+    my ($value, $pattern, $flags) = @_;
+
+    my ($regex, $error) = _build_regex($pattern, $flags);
+    if ($error) {
+        $error =~ s/[\r\n]+$//;
+        die "match(): invalid regular expression - $error";
+    }
 
     return _test_against_regex($value, $regex);
 }
@@ -1270,11 +1323,30 @@ sub _apply_split {
     my ($value, $separator) = @_;
 
     if (ref $value eq 'ARRAY') {
-        return [ map { _apply_split($_, $separator) } @$value ];
+        my @parts;
+
+        for my $element (@$value) {
+            if (ref($element) eq 'JSON::PP::Boolean') {
+                my $stringified = $element ? 'true' : 'false';
+                my $result = _apply_split($stringified, $separator);
+                push @parts, ref($result) eq 'ARRAY' ? @$result : $result;
+                next;
+            }
+
+            my $result = _apply_split($element, $separator);
+            push @parts, ref($result) eq 'ARRAY' ? @$result : $result;
+        }
+
+        return \@parts;
     }
 
-    return [] if !defined $value;
-    return $value if ref $value;
+    return undef if !defined $value;
+    if (ref($value) eq 'JSON::PP::Boolean') {
+        $value = $value ? 'true' : 'false';
+    }
+    elsif (ref $value) {
+        return $value;
+    }
 
     $separator = '' unless defined $separator;
 
@@ -1338,13 +1410,24 @@ sub _apply_substr {
     }
 
     return undef if !defined $value;
-    return $value if ref $value;
+    if (ref($value) eq 'JSON::PP::Boolean') {
+        $value = $value ? 'true' : 'false';
+    }
+    elsif (ref $value) {
+        return $value;
+    }
 
     my ($start, $length) = @args;
+    if (defined $start && !looks_like_number($start)) {
+        die 'substr(): start index must be numeric';
+    }
     $start = 0 unless defined $start;
     $start = int($start);
 
     if (defined $length) {
+        if (!looks_like_number($length)) {
+            die 'substr(): length must be numeric';
+        }
         $length = int($length);
         return substr($value, $start, $length);
     }
@@ -1599,14 +1682,14 @@ sub _apply_range {
     my ($value, $args_ref) = @_;
 
     my $sequence = _build_range_sequence($args_ref);
-    return defined $sequence ? @$sequence : ($value);
+    return @$sequence;
 }
 
 sub _build_range_sequence {
     my ($args_ref) = @_;
 
     my @args = @$args_ref;
-    return undef unless @args;
+    die 'range(): bounds must be numeric' unless @args;
 
     @args = @args[0 .. 2] if @args > 3;
 
@@ -1628,8 +1711,8 @@ sub _build_range_sequence {
         $step  = _coerce_range_number($args[2]);
     }
 
-    return undef unless defined $start && defined $end;
-    return undef if !defined $step;
+    die 'range(): bounds must be numeric' unless defined $start && defined $end;
+    die 'range(): step must be numeric'    if !defined $step;
     return []    if $step == 0;
 
     if ($step > 0) {
@@ -1656,10 +1739,8 @@ sub _coerce_range_number {
     my ($value) = @_;
 
     return undef if !defined $value;
-
-    if (ref($value) eq 'JSON::PP::Boolean') {
-        return $value ? 1 : 0;
-    }
+    return undef if ref $value;
+    return undef if _is_string_scalar($value);
 
     return looks_like_number($value) ? 0 + $value : undef;
 }

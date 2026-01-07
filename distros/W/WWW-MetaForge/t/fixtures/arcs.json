@@ -1,0 +1,41 @@
+{
+  "data": [
+    {
+      "id": "salvage-run",
+      "name": "Salvage Run",
+      "type": "Salvage",
+      "description": "Quick salvage operation to gather resources.",
+      "maps": ["dam", "spaceport"],
+      "duration": 600,
+      "cooldown": 300,
+      "loot": [
+        {"item": "Metal Parts", "chance": 0.8},
+        {"item": "Steel Spring", "chance": 0.4}
+      ],
+      "xp_reward": 100,
+      "coin_reward": 50
+    },
+    {
+      "id": "breach-mission",
+      "name": "Breach Mission",
+      "type": "Combat",
+      "description": "Assault an ARC facility and extract valuable data.",
+      "maps": ["buried-city"],
+      "duration": 1200,
+      "cooldown": 600,
+      "loot": [
+        {"item": "Advanced Circuit", "chance": 0.5},
+        {"item": "Basic Circuit", "chance": 0.7}
+      ],
+      "xp_reward": 250,
+      "coin_reward": 150
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 2,
+    "totalPages": 1,
+    "hasNextPage": false
+  }
+}

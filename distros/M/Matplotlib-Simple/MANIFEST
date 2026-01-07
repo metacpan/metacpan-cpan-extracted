@@ -10,7 +10,6 @@ arr.pl
 color.table.pl
 colored.table.pl
 dist.ini
-fix.pod.pl
 lib/Matplotlib/Simple.pm
 make.subs.pl
 md2pod.pl
@@ -50,7 +49,6 @@ output.images/tab.multiple.png
 output.images/trig.subplots.png
 output.images/violin.png
 output.images/wide.subplots.png
-pod.simple.debug.pl
 sha.sums.tsv
 t/01.all.tests.t
 t/make.SHA.sum.pl
@@ -60,6 +58,7 @@ t/output.images/boxplot.svg
 t/output.images/dssp.multiple.svg
 t/output.images/dssp.single.svg
 t/output.images/hexbin.svg
+t/output.images/hist2d.pads.svg
 t/output.images/hist2d.svg
 t/output.images/histogram.svg
 t/output.images/hlines.svg

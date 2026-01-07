@@ -1,5 +1,5 @@
 
-use v5.14;
+use v5.20;
 use warnings;
 
 use Test2::V0;

@@ -44,6 +44,12 @@ use Mojo::Loader qw(load_class);
 
 sub delete ($self) {
 
+    $self->model->insert_history(
+        "Delete data",
+        "Daje::Workflow::Activities::Delete::delete",
+        1
+    );
+
     my $data = $self->context->{context}->{payload};
     my $class = $self->activity_data->{class};
     if (my $e = load_class $class) {

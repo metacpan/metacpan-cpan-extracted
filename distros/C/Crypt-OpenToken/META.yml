@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,12 +36,13 @@ requires:
   MIME::Base64: '0'
   Moose: '0'
   namespace::autoclean: '0'
-  perl: '5.008001'
+  perl: '5.012'
 resources:
   bugtracker: https://github.com/bleargh45/Crypt-OpenToken/issues
+  homepage: https://metacpan.org/release/Crypt-OpenToken/
   repository: git://github.com/bleargh45/Crypt-OpenToken.git
-version: '0.10'
-x_generated_by_perl: v5.32.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.11'
+x_generated_by_perl: v5.42.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0
 x_static_install: 1

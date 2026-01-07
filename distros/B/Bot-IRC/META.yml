@@ -12,12 +12,12 @@ build_requires:
   Test::More: '0'
   Test::Output: '0'
   exact::class: '1.10'
-  perl: '5.014'
+  perl: '5.016'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.014'
+  perl: '5.016'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +34,6 @@ requires:
   Email::Mailer: '0'
   Email::Valid: '0'
   Encode: '0'
-  Encode::Detect::Detector: '0'
   File::Grep: '0'
   IO::Socket::IP: '0'
   IO::Socket::SSL: '0'
@@ -45,14 +44,14 @@ requires:
   YAML::XS: '0'
   exact: '1.14'
   exact::class: '1.10'
-  perl: '5.014'
+  perl: '5.016'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/gryphonshafer/Bot-IRC/issues
   homepage: https://github.com/gryphonshafer/Bot-IRC
   repository: https://github.com/gryphonshafer/Bot-IRC.git
-version: '1.42'
-x_generated_by_perl: v5.40.2
+version: '1.44'
+x_generated_by_perl: v5.40.3
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

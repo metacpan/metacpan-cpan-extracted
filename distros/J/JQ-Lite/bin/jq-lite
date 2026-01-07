@@ -121,6 +121,13 @@ sub _validate_query_syntax {
     if (grep { !defined $_ || $_ !~ /\S/ } @pipeline_parts) {
         _compile_error('Invalid query syntax: empty filter segment');
     }
+
+    for my $segment (@pipeline_parts) {
+        my @comma_parts = JQ::Lite::Util::_split_top_level_commas($segment);
+        if (grep { !defined $_ || $_ !~ /\S/ } @comma_parts) {
+            _compile_error('Invalid query syntax: empty filter segment');
+        }
+    }
 }
 
 sub _is_truthy {
@@ -132,13 +139,12 @@ sub _is_truthy {
         return $value ? 1 : 0;
     }
 
-    return 1 if ref $value;
-    return $value ? 1 : 0;
+    return 1;
 }
 
 # ---------- Help text ----------
 my $USAGE = <<'USAGE';
-jq-lite - A lightweight jq-like JSON query tool written in pure Perl
+jq-lite - minimal jq-style JSON filter (pure Perl)
 
 Usage:
   jq-lite [options] '.query' [file.json]
@@ -152,6 +158,7 @@ Options:
   --color              Colorize JSON output (keys, strings, numbers, booleans)
   --use <Module>       Force JSON decoder module (e.g. JSON::PP, JSON::XS, Cpanel::JSON::XS)
   --debug              Show which JSON module is being used
+  -e, --exit-status    Set exit code to 1 when the final result is false, null, or empty
   --arg NAME VALUE     Set jq-style variable $NAME to the string VALUE
   --rawfile NAME FILE  Set jq-style variable $NAME to the raw contents of FILE
   --slurpfile NAME FILE Set jq-style variable $NAME to an array of JSON values from FILE
@@ -324,11 +331,23 @@ if ($want_help) {
 }
 
 if ($want_version) {
-    print "jq-lite $JQ::Lite::VERSION (c) Shingo Kawamura\n";
+    print "jq-lite $JQ::Lite::VERSION\n";
     exit 0;
 }
 
-$SIG{PIPE} = 'IGNORE';
+$SIG{PIPE} = sub { exit 0 };
+
+END {
+    return unless defined fileno(STDOUT);
+
+    if (!close STDOUT) {
+        # On older perls a closed pipeline can report EINVAL instead of
+        # EPIPE. Both conditions indicate the writer has no consumer, so do
+        # not emit a warning in either case.
+        return if $!{EPIPE} || $!{EINVAL};
+        warn "Unable to flush stdout: $!";
+    }
+}
 
 # ---------- Positional args: '.query' and [file.json] ----------
 # Unknown options are already rejected above; only query and file remain.
@@ -375,13 +394,21 @@ if (@query_files) {
 
 if (@ARGV == 0) {
     if (!defined $query) {
+        if ($slurpfile_probably_missing_file) {
+            _usage_error('--slurpfile requires a file path');
+        }
+
+        if ($raw_input) {
+            my $reason = $slurp_input
+                ? '--raw-input requires a query when used with --slurp.'
+                : '--raw-input requires a query when not using --slurp.';
+            _usage_error($reason);
+        }
+
         if ($null_input) {
             $query = '.';
         } else {
             if ($non_help_option_used) {
-                if ($slurpfile_probably_missing_file) {
-                    _usage_error('--slurpfile requires a file path');
-                }
                 _usage_error('filter expression is required');
             }
 
@@ -509,6 +536,11 @@ if (@slurpfiles) {
 
         $arg_vars{$var_name} = [$decoded];
     }
+}
+
+# ---------- Validate query before reading input ----------
+if (defined $query) {
+    _validate_query_syntax($query);
 }
 
 # ---------- Read JSON input ----------
@@ -688,8 +720,11 @@ sub print_results {
 }
 
 # ---------- Interactive mode ----------
-if ($raw_input && !$slurp_input && !defined $query) {
-    _usage_error('--raw-input requires a query when not using --slurp.');
+if ($raw_input && !defined $query) {
+    my $reason = $slurp_input
+        ? '--raw-input requires a query when used with --slurp.'
+        : '--raw-input requires a query when not using --slurp.';
+    _usage_error($reason);
 }
 
 if (!defined $query) {
@@ -776,8 +811,6 @@ if (!defined $query) {
     exit 0;
 }
 
-_validate_query_syntax($query);
-
 # ---------- One-shot mode ----------
 my @results;
 
@@ -817,6 +850,7 @@ Supported Functions:
   keys             - Extract sorted keys from a hash or indexes from an array
   keys_unsorted    - Extract object keys without sorting (jq-compatible)
   values           - Extract values from a hash (v0.34)
+  leaf_paths()     - Emit only terminal paths to leaf values
   sort             - Sort array items
   sort_desc        - Sort array items in descending order
   sort_by(KEY)     - Sort array of objects by key
@@ -836,6 +870,8 @@ Supported Functions:
                    - Emit numbers from START (default 0) up to but not including END using STEP (default 1)
   enumerate()      - Pair each array element with its zero-based index
   transpose()      - Rotate arrays-of-arrays from rows into columns
+  scalars          - Pass through only scalar inputs (string/number/bool/null)
+  objects          - Pass through only object inputs
   count            - Count total number of matching items
   map(EXPR)        - Map/filter array items with a subquery
   map_values(FILTER)
@@ -867,9 +903,16 @@ Supported Functions:
   round()          - Round numbers to the nearest integer (half-up semantics)
   clamp(MIN, MAX)  - Clamp numeric values within an inclusive range
   tostring()       - Convert values into their JSON string representation
+  @json            - Format the input as JSON text (jq-style formatter)
+  @csv             - Format arrays/scalars as a single CSV row
+  @tsv             - Format arrays/scalars as a single TSV row
+  @base64          - Encode input as a Base64 string
+  @base64d         - Decode Base64-encoded text into strings/arrays
+  @uri             - Percent-encode text (URL-safe)
   tojson()         - Encode values as JSON text regardless of type
   fromjson()       - Decode JSON text into native values (arrays handled element-wise)
-  to_number()      - Coerce numeric-looking strings/booleans into numbers
+  tonumber() / to_number()
+                   - Coerce numeric-looking strings/booleans into numbers
   nth(N)           - Get the Nth element of an array (zero-based index)
   index(VALUE)     - Return the zero-based index of VALUE within arrays or strings
   rindex(VALUE)    - Return the zero-based index of the last VALUE within arrays or strings
@@ -888,8 +931,12 @@ Supported Functions:
   from_entries     - Convert entry arrays back into an object
   with_entries(FILTER)
                    - Transform entries using FILTER and rebuild an object
+  delpaths(PATHS)  - Delete keys at the supplied PATHS array (jq-compatible)
   has              - Check if objects contain a key or arrays expose an index
   contains         - Check if strings include a fragment, arrays contain an element, or hashes have a key
+  contains_subset(VALUE)
+                   - jq-style subset containment for arrays (order-insensitive)
+  inside(CONTAINER) - Check if the input value is contained within CONTAINER
   any([FILTER])    - Return true if any input (optionally filtered) is truthy
   all([FILTER])    - Return true if every input (optionally filtered) is truthy
   not              - Logical negation following jq truthiness rules
@@ -910,6 +957,8 @@ Supported Functions:
   is_empty         - Check if an array or object is empty
   upper()          - Convert scalars and array elements to uppercase
   lower()          - Convert scalars and array elements to lowercase
+  ascii_upcase()   - ASCII-only uppercase conversion (leaves non-ASCII untouched)
+  ascii_downcase() - ASCII-only lowercase conversion (leaves non-ASCII untouched)
   titlecase()      - Convert scalars and array elements to title case
   trim()           - Strip leading/trailing whitespace from strings (recurses into arrays)
   ltrimstr(PFX)    - Remove PFX when it appears at the start of strings (arrays handled element-wise)
@@ -946,8 +995,8 @@ jq-lite - minimal jq-style JSON filter (pure Perl)
 
 =head1 DESCRIPTION
 
-B<jq-lite> is a lightweight, jq-style JSON filter implemented
-entirely in pure Perl.
+B<jq-lite> is a jq-compatible JSON processor written entirely in
+pure Perl.
 
 It is intended for use on systems where B<jq> is unavailable but Perl
 is present, providing awk/sed-like convenience for processing JSON
@@ -964,9 +1013,10 @@ and commonly used built-in functions
 
 =item *
 
-Command-line options such as C<-R>, C<-r>, C<-c>, C<-a>, C<--slurp>,
-C<--null-input>, C<--from-file>, C<--arg>, C<--argfile>, C<--argjson>,
-C<--rawfile>, and C<--yaml>
+Command-line options such as C<-R>, C<-r>, C<-c>, C<-a>, C<--color>,
+C<--use>, C<--debug>, C<-e>, C<--slurp>, C<--null-input>, C<-s>,
+C<--from-file>, C<--arg>, C<--argfile>, C<--argjson>, C<--rawfile>,
+C<--slurpfile>, C<--help-functions>, C<-h>, and C<-v>
 
 =item *
 
@@ -988,42 +1038,88 @@ differently from jq.
 
 =over 4
 
-=item B<-r>, B<--raw-output>
-
-Output strings without JSON quoting.
-
 =item B<-R>, B<--raw-input>
 
-Read input as raw text, treating each line as a separate value.
-Use B<-s> together with B<-R> to process the entire input as a single string.
+Read input as raw text instead of JSON, running the filter once per line. Use
+B<-s> with B<-R> to process the entire input as a single string.
 
-=item B<-s>, B<--slurp>
+=item B<-r>, B<--raw-output>
 
-Read the entire input into a single value.
+Print raw strings instead of JSON-encoded values.
+
+=item B<-c>, B<--compact-output>
+
+Emit JSON on a single line without pretty-printing whitespace.
 
 =item B<-a>, B<--ascii-output>
 
-Escape non-ASCII characters in output.
+Escape all non-ASCII characters in JSON output.
+
+=item B<--color>
+
+Colorize JSON output (keys, strings, numbers, booleans).
+
+=item B<--use> I<Module>
+
+Force the JSON decoder module (for example C<JSON::PP>, C<JSON::XS>,
+or C<Cpanel::JSON::XS>).
+
+=item B<--debug>
+
+Show which JSON module is being used.
+
+=item B<-e>, B<--exit-status>
+
+Set exit code to 1 when the final result is false, null, or empty.
 
 =item B<--arg> I<name> I<value>
 
 Define a string variable.
 
-=item B<--argfile> I<name> I<file>
+=item B<--rawfile> I<name> I<file>
 
-Read I<file> as JSON and bind it to the variable.
+Read I<file> as raw text and bind it to the variable.
+
+=item B<--slurpfile> I<name> I<file>
+
+Read I<file> as JSON and bind it to the variable as an array of values.
 
 =item B<--argjson> I<name> I<value>
 
 Define a JSON variable.
 
+=item B<--argfile> I<name> I<file>
+
+Read I<file> as JSON and bind it to the variable.
+
+=item B<-f>, B<--from-file> I<file>
+
+Read the jq filter from I<file> instead of the command line (use C<-> for
+STDIN).
+
+=item B<-n>, B<--null-input>
+
+Use C<null> as input instead of reading JSON data.
+
+=item B<-s>, B<--slurp>
+
+Read the entire input stream as an array of JSON values.
+
 =item B<--yaml>
 
-Force YAML input parsing.
+Parse input as YAML (auto-detected for C<.yml> / C<.yaml> files).
 
 =item B<-h>, B<--help>
 
 Display help and exit.
+
+=item B<--help-functions>
+
+Show the list of supported built-in functions.
+
+=item B<-v>, B<--version>
+
+Display version information.
 
 =back
 
@@ -1041,7 +1137,7 @@ https://kawamurashingo.github.io/JQ-Lite/
 
 =head1 AUTHOR
 
-川村慎吾 (Shingo Kawamura)
+Shingo Kawamura
 
 =head1 COPYRIGHT AND LICENSE
 

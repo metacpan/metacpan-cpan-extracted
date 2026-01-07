@@ -16,12 +16,12 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::DomainCheckpoint v0.1.10;
+class Sys::Async::Virt::DomainCheckpoint v0.2.1;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.1.10;
+use Protocol::Sys::Virt::Remote::XDR v0.2.1;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -80,7 +80,7 @@ Sys::Async::Virt::DomainCheckpoint - Client side proxy to remote LibVirt domain 
 
 =head1 VERSION
 
-v0.1.10
+v0.2.1
 
 =head1 SYNOPSIS
 

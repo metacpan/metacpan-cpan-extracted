@@ -7,8 +7,11 @@ use Future::AsyncAwait;
 use FindBin;
 use File::Temp qw(tempdir);
 use File::Spec;
+use Cwd qw(abs_path);
 
-use lib "$FindBin::Bin/../lib";
+our $test_bin;
+BEGIN { $test_bin = $FindBin::Bin; }
+use lib "$test_bin/../lib";
 use PAGI::Runner;
 
 # Test 1: Basic construction
@@ -115,12 +118,35 @@ subtest 'parse app args' => sub {
 # Test 9: Load app from file
 subtest 'load app from file' => sub {
     my $runner = PAGI::Runner->new;
-    $runner->{app_spec} = "$FindBin::Bin/../examples/01-hello-http/app.pl";
+    $runner->{app_spec} = "$test_bin/../examples/01-hello-http/app.pl";
 
     my $app = $runner->load_app;
 
     ok(ref $app eq 'CODE', 'loaded app is coderef');
     is($runner->{app}, $app, 'app stored in runner');
+};
+
+subtest 'load app from file sets FindBin::Bin to app directory' => sub {
+    my $tmpdir = tempdir(CLEANUP => 1);
+    my $app_file = File::Spec->catfile($tmpdir, 'findbin_app.pl');
+
+    open my $fh, '>', $app_file or die "Cannot write $app_file: $!";
+    print $fh <<'APP';
+package App::FindBinTest;
+use FindBin;
+our $BIN = $FindBin::Bin;
+sub app { }
+return \&app;
+APP
+    close $fh;
+
+    my $runner = PAGI::Runner->new;
+    $runner->{app_spec} = $app_file;
+    my $app = $runner->load_app;
+
+    ok(ref $app eq 'CODE', 'loaded app is coderef');
+    no warnings 'once';
+    is(abs_path($App::FindBinTest::BIN), abs_path($tmpdir), 'FindBin::Bin matches app directory');
 };
 
 # Test 10: Load app from module
@@ -216,7 +242,7 @@ subtest 'integration: server responds to requests' => sub {
     my $loop = IO::Async::Loop->new;
 
     my $runner = PAGI::Runner->new(port => 0, quiet => 1);
-    $runner->{app_spec} = "$FindBin::Bin/../examples/01-hello-http/app.pl";
+    $runner->{app_spec} = "$test_bin/../examples/01-hello-http/app.pl";
     $runner->{default_middleware} = 0;  # Disable Lint for test
     $runner->prepare_app;
     my $server = $runner->load_server;

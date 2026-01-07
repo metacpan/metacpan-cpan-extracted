@@ -19,7 +19,7 @@ name: App-FindUtils
 provides:
   App::FindUtils:
     file: lib/App/FindUtils.pm
-    version: '0.005'
+    version: '0.007'
 requires:
   Cwd: '0'
   Data::Sah::Compiler::perl::TH::array: '0.914'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-FindUtils
   homepage: https://metacpan.org/release/App-FindUtils
   repository: git://github.com/perlancar/perl-App-FindUtils.git
-version: '0.005'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.040002'

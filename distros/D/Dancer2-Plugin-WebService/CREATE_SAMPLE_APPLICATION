@@ -84,6 +84,7 @@ Write your TestService code at the file /home/dancer/TestService/lib/TestService
   use Dancer2::Plugin::WebService;
   set no_default_middleware => true;
   our $VERSION = exists config->{appversion} ? config->{appversion} : '0.0.0.0';
+  my  $arg;
 
   # Wellcome & help screen (classic html)
   get '/' => sub{send_as html => template 'index' => {'title' => 'TestService'}, {layout=>'main'}};
@@ -103,6 +104,14 @@ Write your TestService code at the file /home/dancer/TestService/lib/TestService
   any['get','post']       => '/Protected'     => sub { Error('ώπα');  reply  UserData        };
   get '/Protected_text_ref'                   => sub { Error('ok');   reply \'hello world'   }; # text reference
   get '/project/commit'                       => sub { reply 'commited'                      };
+
+
+  # UniCode tests
+  any['get','post']=> '/unicode_test_mirror'      => sub { reply               UserData()   };
+  any['get','post']=> '/unicode_test_session_set' => sub { reply   SessionSet( UserData )   };
+  any['delete']    => '/unicode_test_session_del' => sub { reply   SessionDel( UserData )   };
+  get                 '/unicode_test_session_get' => sub { reply { SessionGet( UserData ) } };
+
 
   # Store persistent data
   # SessionSet( { k1=>'v1' , k2=>'v2' }  );
@@ -154,23 +163,27 @@ plugins:
     - "*"
 
     Routes:
-      text              : { Protected: false }
-      mirror            : { Protected: false }
-      Protected         : { Protected: true  }
-      Protected_text_ref: { Protected: true  }
-      list              : { Protected: false }
-      list_ref          : { Protected: false }
-      hash              : { Protected: false }
-      code\/text        : { Protected: false }
-      code\/list        : { Protected: false }
-      code\/hash        : { Protected: false }
-      code\/text_ref    : { Protected: false }
-      code\/list_ref    : { Protected: false }
-      keys_selected     : { Protected: false }
-      project\/commit   : { Protected: true, Groups: [ git , ansibleremote ] }
-      session_save      : { Protected: true, Groups: [] }
-      session_read      : { Protected: true, Groups: [] }
-      session_delete    : { Protected: true, Groups: [] }
+      unicode_test_mirror      : { Protected: false }
+      unicode_test_session_set : { Protected: false }
+      unicode_test_session_get : { Protected: false }
+      unicode_test_session_del : { Protected: false }
+      text                     : { Protected: false }
+      mirror                   : { Protected: false }
+      Protected                : { Protected: true  }
+      Protected_text_ref       : { Protected: true  }
+      list                     : { Protected: false }
+      list_ref                 : { Protected: false }
+      hash                     : { Protected: false }
+      code\/text               : { Protected: false }
+      code\/list               : { Protected: false }
+      code\/hash               : { Protected: false }
+      code\/text_ref           : { Protected: false }
+      code\/list_ref           : { Protected: false }
+      keys_selected            : { Protected: false }
+      project\/commit          : { Protected: true, Groups: [ git , ansibleremote ] }
+      session_save             : { Protected: true, Groups: [] }
+      session_read             : { Protected: true, Groups: [] }
+      session_delete           : { Protected: true, Groups: [] }
 
     Authentication methods:
 
@@ -294,7 +307,7 @@ Login to obtain a valid token
 
   curl -X POST $url/login -H "$H" -d '{"username": "joe", "password": "SomePassword"}'
 
-  export token=1767129791-9f1ea721ca4050bd8aa484dd-0
+  export token=1767562075-fe4e621515a63a7df0608630-0
 
   curl $url/git/commit?token=$token
   curl $url/Protected
@@ -306,14 +319,26 @@ Login to obtain a valid token
 
 Store persistent data
 
-  curl $url/session_save?token=$token   -H "$H" -X POST   -d '{"k1":"v1", "k2":"δύο", "k3":"τρία"}'
   curl $url/session_save?token=$token   -H "$H" -X POST   -d '{ "Latin":"Hello world", "Ελληνικά":"Γειά σου κόσμε", "한국":"안녕 세계" }'
+  curl $url/session_read?token=$token   -H "$H" -X POST   -d '[ "Latin", "Ελληνικά", "한국" ]'
   curl $url/session_read?token=$token
-  curl $url/session_read?token=$token   -H "$H" -X POST   -d '["k1","k2","Ελληνικά"]'
-  curl $url/session_delete?token=$token -H "$H" -X DELETE -d '["k1", "k2", "Ελληνικά", "한국"]'
+  curl $url/session_delete?token=$token -H "$H" -X DELETE -d '[ "Latin", "Ελληνικά", "한국" ]'
 
   curl $url/logout?token=$token
   curl $url/logout -H "$H" -X POST -d "{\"token\":\"$token\"}"
+
+Unicode
+Test if the unicode posted or replied data are handled successufully. Login is required
+
+  curl -X POST  $url/unicode_test_mirror                    -H "$H"  -d '{"Latin":"Hello world", "Ελληνικά":"Γειά σου κόσμε", "한국":"안녕 세계"}'
+  curl -X POST "$url/unicode_test_mirror?from=xml&to=xml"   -H "HXML" -d '<?xml version="1.0" encoding="UTF-8"?><root><Latin>hello world</Latin><Ελληνικά>Γειά σου κόσμε</Ελληνικά><한국>안녕 세계</한국></root>'
+  curl -X POST   $url/login                                 -H "$H" -d '{"username":"joe", "password":"SomePassword"}'
+  export token=1767608823-2166cefaeba07576c7989e58-0
+  curl -X POST   $url/unicode_test_session_set?token=$token -H "$H" -d '{ "Latin":"Hello world", "Ελληνικά":"Γειά σου κόσμε", "한국":"안녕 세계" }'
+  curl -X GET    $url/unicode_test_session_get?token=$token -H "$H" -d '[ "Latin", "Ελληνικά", "한국" ]'
+  curl -X DELETE $url/unicode_test_session_del?token=$token -H "$H" -d '[ "Latin", "Ελληνικά", "한국" ]'
+  curl -X POST   $url/logout                                -H "$H" -d "{\"token\":\"$token\"}"
+
 
 To start your application as Linux service
 If you plan to use a reverse proxy change the listening IP (BIND) from  0.0.0.0  to  127.0.0.1

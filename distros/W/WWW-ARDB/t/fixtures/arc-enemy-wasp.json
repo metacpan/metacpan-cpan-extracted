@@ -1,0 +1,43 @@
+{
+  "id": "wasp",
+  "name": "Wasp",
+  "icon": "/arc/icons/wasp.svg",
+  "image": "/arc/images/wasp.png",
+  "dropTable": [
+    {
+      "id": "medium_ammo",
+      "name": "Medium Ammo",
+      "rarity": "common",
+      "type": "ammo",
+      "foundIn": ["ARC"],
+      "value": 4,
+      "icon": "/arc/icons/medium_ammo.webp",
+      "updatedAt": "2025-10-01T12:00:00.000Z"
+    },
+    {
+      "id": "wires",
+      "name": "Wires",
+      "rarity": "uncommon",
+      "type": "component",
+      "foundIn": ["ARC"],
+      "value": 200,
+      "icon": "/arc/icons/wires.webp",
+      "updatedAt": "2025-12-20T10:00:00.000Z"
+    },
+    {
+      "id": "scrap_electronics",
+      "name": "Scrap Electronics",
+      "rarity": "rare",
+      "type": "component",
+      "foundIn": ["ARC"],
+      "value": 1000,
+      "icon": "/arc/icons/scrap_electronics.webp",
+      "updatedAt": "2025-11-10T08:00:00.000Z"
+    }
+  ],
+  "relatedMaps": [
+    {"id": "dam", "name": "Dam Battlegrounds"},
+    {"id": "spaceport", "name": "The Spaceport"}
+  ],
+  "updatedAt": "2025-10-23T12:37:58.471Z"
+}

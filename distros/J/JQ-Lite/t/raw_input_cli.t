@@ -50,4 +50,28 @@ is($exit, 0, 'process exits successfully for slurped raw text');
 like($stderr, qr/No such file or directory|Cannot open file/, 'error surfaced when file is missing under --raw-input');
 ok($exit != 0, 'nonexistent file under raw input causes non-zero exit');
 
+($stdout, $stderr, $exit) = run_cli(
+    args => [ '-R' ],
+);
+
+is($stdout, '', 'no output is produced when --raw-input is provided without a query');
+like(
+    $stderr,
+    qr/^\[USAGE\]--raw-input requires a query when not using --slurp\./,
+    'usage error is raised when --raw-input lacks a query'
+);
+is($exit, 5, '--raw-input without a query exits with usage code');
+
+($stdout, $stderr, $exit) = run_cli(
+    args => [ '-R', '-s' ],
+);
+
+is($stdout, '', 'no output is produced when --raw-input and --slurp are used without a query');
+like(
+    $stderr,
+    qr/^\[USAGE\]--raw-input requires a query when used with --slurp\./,
+    'usage error is raised when --raw-input --slurp lacks a query'
+);
+is($exit, 5, '--raw-input --slurp without a query exits with usage code');
+
 done_testing;

@@ -26,13 +26,17 @@ DBIx::Quick::Converter - Role to convert fields after database recover and befor
  use DateTime::Format::Pg;
 
  sub to_db {
-	shift;
- 	return DateTime::Format::Pg->new->format_datetime(shift);
+ 	shift;
+ 	my $dt = shift;
+ 	return undef if !$dt;
+ 	return DateTime::Format::Pg->new->format_datetime($dt);
  }
 
  sub from_db {
-	shift;
- 	return DateTime::Format::Pg->new->parse_datetime(shift);
+ 	shift;
+ 	my $date = shift;
+ 	return undef if !$date;
+ 	return DateTime::Format::Pg->new->parse_datetime($date);
  }
  
  with 'DBIx::Quick::Converter';

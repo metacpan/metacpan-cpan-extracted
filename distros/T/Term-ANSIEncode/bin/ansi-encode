@@ -14,7 +14,7 @@
 #######################################################################
 
 use strict;
-use utf8; # Required
+use utf8; # In Windows, Codepage 65001 needs to be set "chcp 65001 >nul"
 use warnings;
 use charnames();
 use constant {

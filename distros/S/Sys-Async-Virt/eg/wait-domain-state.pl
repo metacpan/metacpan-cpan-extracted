@@ -7,11 +7,9 @@ use Future::AsyncAwait;
 use Feature::Compat::Try;
 
 use Getopt::Long;
-use IO::Async::Loop;
 use Log::Any qw($log);
 use Log::Any::Adapter;
 use Log::Any::Adapter::Stdout;
-use Scalar::Util qw( blessed );
 use Sys::Async::Virt;
 
 my $url;
@@ -50,11 +48,9 @@ $domain = shift @ARGV;
 $target_state_name = shift @ARGV;
 
 
-my $loop = IO::Async::Loop->new;
 my $virt = Sys::Async::Virt->new(
     url => $url // 'qemu:///system',
     );
-$loop->add( $virt );
 $log->trace( 'Created libvirt client application layer' );
 
 my %states = (
@@ -87,34 +83,48 @@ unless (defined $target_state) {
     exit 1;
 }
 
-try {
-    await $virt->connect;
-    my $dom = await $virt->domain_lookup_by_name( $domain );
-    my $cb = await $virt->domain_event_register_any(
-        $virt->DOMAIN_EVENT_ID_LIFECYCLE, $dom );
+async sub main() {
+    try {
+        await $virt->connect;
+        my $dom = await $virt->domain_lookup_by_name( $domain );
+        die "Domain $domain unknown on target"
+            unless $dom;
+        my $cb = await $virt->domain_event_register_any(
+            $virt->DOMAIN_EVENT_ID_LIFECYCLE, $dom );
 
-    my $event_f;
-    my $state;
-    do {
-        $event_f = $cb->next_event;
-        $state   = await $dom->get_state;
-    } while ($event_f->is_ready); # get stable state (i.e. without mixed events)
-
-    say "Current state: $states{$state->{state}}";
-    if ($state->{state} != $target_state) {
-        while (my $event_data = await $event_f) {
-            $state = await $dom->get_state;
-            say "Lifecycle event; current state: $states{$state->{state}}";
-            if ($state->{state} == $target_state) {
-                await $cb->cancel;
-            }
+        my $event_f;
+        my $state;
+        do {
             $event_f = $cb->next_event;
+            $state   = await $dom->get_state;
+        } while ($event_f->is_done); # get stable state (i.e. without mixed events)
+
+        say "Current state: $states{$state->{state}}";
+        if ($state->{state} != $target_state) {
+            while (my $event_data = await $event_f) {
+                $state = await $dom->get_state;
+                say "Lifecycle event; current state: $states{$state->{state}}";
+                if ($state->{state} == $target_state) {
+                    await $cb->cancel;
+                }
+                $event_f = $cb->next_event;
+            }
         }
+
+        await $virt->close;
+    }
+    catch ($e) {
+        say "Error: $e";
+        exit 1;
+    }
+    finally {
+        $virt->stop;
     }
 
-    await $virt->close;
 }
-catch ($e) {
-    say "Error: $e";
-    exit 1;
-}
+
+await Future->wait_all(
+    Future::IO->sleep(1), # work around some futures not having ->await()
+    $virt->run,
+    main()
+    );

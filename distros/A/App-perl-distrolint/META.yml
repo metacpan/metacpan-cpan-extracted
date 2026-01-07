@@ -16,47 +16,54 @@ name: App-perl-distrolint
 provides:
   App::perl::distrolint:
     file: lib/App/perl/distrolint.pm
-    version: '0.07'
+    version: '0.08'
   App::perl::distrolint::Check::DeprecatedFeatures:
     file: lib/App/perl/distrolint/Check/DeprecatedFeatures.pm
-    version: '0.07'
+    version: '0.08'
   App::perl::distrolint::Check::Editorconfig:
     file: lib/App/perl/distrolint/Check/Editorconfig.pm
-    version: '0.07'
+    version: '0.08'
   App::perl::distrolint::Check::FilePaths:
     file: lib/App/perl/distrolint/Check/FilePaths.pm
-    version: '0.07'
+    version: '0.08'
   App::perl::distrolint::Check::HardTabs:
     file: lib/App/perl/distrolint/Check/HardTabs.pm
-    version: '0.07'
+    version: '0.08'
   App::perl::distrolint::Check::NoStrictRefs:
     file: lib/App/perl/distrolint/Check/NoStrictRefs.pm
-    version: '0.07'
+    version: '0.08'
   App::perl::distrolint::Check::PerlVersionVar:
     file: lib/App/perl/distrolint/Check/PerlVersionVar.pm
-    version: '0.07'
+    version: '0.08'
   App::perl::distrolint::Check::Pod:
     file: lib/App/perl/distrolint/Check/Pod.pm
-    version: '0.07'
+    version: '0.08'
   App::perl::distrolint::Check::StrictAndWarnings:
     file: lib/App/perl/distrolint/Check/StrictAndWarnings.pm
-    version: '0.07'
+    version: '0.08'
+  App::perl::distrolint::Check::SubSignatures:
+    file: lib/App/perl/distrolint/Check/SubSignatures.pm
+    version: '0.08'
   App::perl::distrolint::Check::Test2:
     file: lib/App/perl/distrolint/Check/Test2.pm
-    version: '0.07'
+    version: '0.08'
   App::perl::distrolint::Check::Unimport:
     file: lib/App/perl/distrolint/Check/Unimport.pm
-    version: '0.07'
+    version: '0.08'
   App::perl::distrolint::Check::UseUTF8:
     file: lib/App/perl/distrolint/Check/UseUTF8.pm
-    version: '0.07'
+    version: '0.08'
   App::perl::distrolint::Check::UseVERSION:
     file: lib/App/perl/distrolint/Check/UseVERSION.pm
-    version: '0.07'
+    version: '0.08'
   App::perl::distrolint::Check::VersionVar:
     file: lib/App/perl/distrolint/Check/VersionVar.pm
-    version: '0.07'
+    version: '0.08'
+  App::perl::distrolint::Config:
+    file: lib/App/perl/distrolint/Config.pm
+    version: '0.08'
 requires:
+  Config::Tiny: '0'
   File::Basename: '0'
   File::Find: '0'
   File::Slurper: '0'
@@ -69,5 +76,5 @@ requires:
   perl: '5.036'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

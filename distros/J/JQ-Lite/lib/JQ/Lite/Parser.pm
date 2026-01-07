@@ -20,11 +20,18 @@ sub parse_query {
 
     @parts = map {
         if ($_ eq '.[]') {
-            'flatten';
+            '.[]';
         }
         elsif ($_ =~ /^\.(.+)$/) {
             my $rest = $1;
-            if ($rest =~ /^\s*[+\-*\/%]/ || $rest =~ /[+\-*\/%]/ || $rest =~ /\b(?:floor|ceil|round|tonumber)\b/) {
+            if ($rest =~ /,/) {
+                $_;    # preserve leading dot when sequence filters are present
+            }
+            elsif ($rest =~ /^\s*[+\-*\/%]/
+                || $rest =~ /[+\-*\/%]/
+                || $rest =~ /(?:==|!=|>=|<=|>|<|\band\b|\bor\b)/i
+                || $rest =~ /\b(?:floor|ceil|round|tonumber)\b/)
+            {
                 $_;
             }
             else {

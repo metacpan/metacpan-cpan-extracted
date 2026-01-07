@@ -428,11 +428,20 @@
 
 =head1 OTHER FUNCTIONS
 
-  $obj = dd_inf([$iv]); # $iv is an optional arg, which will be
-                        # evaluated in (signed) numeric context
+  ($nv, $iv) = dd_frexp($nv_arg);
 
-   If the optional arg $iv, is less than 0 (in numeric context, then
-   a Math::FakeDD object with value -Inf is returned.
+   For the NV $nv_arg, calculate $nv and $iv as per the C standard
+   library's frexp() function. $nv_arg is cast to a double before
+   being passed to frexp(). The returned $nv has therefore also
+   been calculated to double precision.
+   This function is provided mainly for internal use (in dd_repro)
+   so that we can easily determine whether $obj->{lsd} or
+   $obj->{msd} is an integer power of 2.
+
+  $obj = dd_inf([$iv]); # $iv is an optional arg.
+
+   If the optional arg $iv, is less than 0, then a Math::FakeDD
+   object with value -Inf will be returned.
    Else return a +Inf Math::FakeDD object.
 
   $obj = dd_nan();
@@ -531,7 +540,7 @@
 
   This program is free software; you may redistribute it and/or
   modify it under the same terms as Perl itself.
-  Copyright 2022-23, Sisyphus
+  Copyright 2022-26, Sisyphus
 
 =head1 AUTHOR
 

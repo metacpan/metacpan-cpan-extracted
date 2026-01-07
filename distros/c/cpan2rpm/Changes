@@ -1,5 +1,11 @@
 Revision history for cpan2rpm
 
+2.047 01/02/2026 07:00:00
+ - Display which URL is being downloaded.
+ - Fallback to "curl" to download a URL.
+ - Don't return content from error pages.
+ - Remove cpan2rpm.pm stub module.
+
 2.046 01/01/2026 23:00:00
  - If --upgrade fails, show exact errors.
  - Now upgrade works with the new dist name.

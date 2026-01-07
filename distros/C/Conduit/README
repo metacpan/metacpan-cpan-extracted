@@ -1,0 +1,92 @@
+NAME
+
+    Conduit - serve HTTP with Future::IO
+
+SYNOPSIS
+
+       use Conduit;
+       use Future::AsyncAwait;
+    
+       my $server = Conduit->new(
+          port     => 8080,
+          psgi_app => sub ( $env ) {
+             return [
+                200,
+                [ "Content-Type" => "text/plain" ],
+                [ "Hello, world!" ]
+             ];
+          },
+       );
+    
+       await $server->run;
+
+DESCRIPTION
+
+    This module allows a program to respond asynchronously to HTTP requests
+    as part of a program based on Future::IO. It currently only supports a
+    PSGI-based application, but the intention is to allow PAGI and possibly
+    other interface shapes in a later version.
+
+    This is currently experimental, serving also as a testbed for how to
+    design larger systems using Future::IO, and hopefully soon as a way to
+    test out the PAGI design.
+
+    This module reports basic metrics about received requests and sent
+    responses via Metrics::Any, as described by Conduit::Metrics.
+
+PARAMETERS
+
+ port
+
+       port => $int
+
+    TCP port number to listen on for HTTP requests.
+
+    Either this or the listensock parameter must be provided; though the
+    latter is intended for internal and unit-test purposes and will not be
+    otherwise documented.
+
+ psgi_app
+
+       psgi_app => $app
+
+    A code reference to the PSGI application used for handling requests.
+
+    Currently this is mandatory, but the intention is soon to allow other
+    forms of responders, such as PAGI as alternatives.
+
+METHODS
+
+ run
+
+       $run_f = $conduit->run;
+
+    Starts operation of the server, allowing it to accept new connections,
+    serve requests, and run the application.
+
+    Returns a Future instance that in normal circumstances should never
+    complete; it will remain pending indefinitely. The toplevel program can
+    either await this if it has nothing else to do, or add that to a
+    collection such as with Future::Selector.
+
+TODO
+
+    Honestly, quite a lot. Almost everything in fact. ;)
+
+      * PAGI support; likely in preference to any more PSGI.
+
+      * Maybe support streaming PSGI responses, though it would still be
+      preferrable to do this with PAGI first.
+
+      * Investigate split IPv4+IPv6 serving, whether it needs two socket or
+      one will suffice. This may be OS-dependent.
+
+      * HTTPS, perhaps via IO::Socket::SSL or maybe something newer?
+
+      * Look into what's required to support some sort of websocket thing
+      in addition to plain HTTP.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

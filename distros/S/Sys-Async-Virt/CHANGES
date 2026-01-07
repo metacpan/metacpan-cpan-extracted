@@ -1,5 +1,25 @@
 -----
 
+0.2.1    2026-01-04
+   [Fixed]
+       * Writes of data frames bigger than 8192 bytes as is likely the case
+         when using upload streams
+       * Versions in Protocol::Sys::Virt 'use' statements list
+         Sys::Virt::Async version numbers (instead of dependency versions)
+
+
+0.2.0    2026-01-02
+   [Breaking]
+       * Migrated from IO::Async to Future::IO
+   [Changed]
+       * SSH connections implemented as specialization of Process connections
+   [Fixed]
+       * 'readonly' flag not passed to remote SSH helper (-r option)
+       * Undefined value warnings during event callback registration
+       * Errors during cleanup calls on cleaned up callbacks
+       * Experimental warnings on inherited fields in Connection classes
+       * Typo preventing correct instantiation of StorageVol classes
+
 0.1.10   2025-12-02
    [Changed]
        * Updated libvirt to v11.10.0 (from v11.9.0)

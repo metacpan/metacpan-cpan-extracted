@@ -60,6 +60,7 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
       "id": "batch_abc123",
       "object": "batch",
       "endpoint": "/v1/completions",
+      "model": "gpt-5-2025-08-07",
       "errors": null,
       "input_file_id": "file-abc123",
       "completion_window": "24h",
@@ -80,6 +81,17 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
         "completed": 95,
         "failed": 5
       },
+      "usage": {
+        "input_tokens": 1500,
+        "input_tokens_details": {
+          "cached_tokens": 1024
+        },
+        "output_tokens": 500,
+        "output_tokens_details": {
+          "reasoning_tokens": 300
+        },
+        "total_tokens": 2000
+      },
       "metadata": {
         "customer_id": "user_123456789",
         "batch_description": "Nightly eval job",
@@ -95,7 +107,7 @@ L<OpenAPI::Client::OpenAI::Path>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2023-2025 by Nelson Ferraz
+Copyright (C) 2023-2026 by Nelson Ferraz
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

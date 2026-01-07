@@ -1,187 +1,186 @@
 package Test::Unit::TestBase;
 
-# the '_' subroutines are considered 'protected', not 'private', so child classes will call them.
+# regenerate exchanges by setting the appropriate env vars, e.g:
+# TEST_CLASS=Test::Google::RestApi::SheetsApi4 GOOGLE_RESTAPI_CONFIG=~/.google/rest_api.yaml \
+# GOOGLE_RESTAPI_LOGGER=t/etc/log4perl.conf prove -v t/run_unit_tests.t
 
 use Test::Unit::Setup;
 
-use File::Slurp qw(read_file);
+use Carp qw(confess);
+use FindBin;
+use Furl::Response;
 use Hash::Merge qw(merge);
-use Mock::MonkeyPatch;
+use HTTP::Status qw(:constants status_message);
 use Module::Load qw(load);
+use PerlX::Maybe;
+use Sub::Override;
 use Try::Tiny;
 use YAML::Any qw(LoadFile);
 
-use Test::Unit::UriResponse;
-
 use parent 'Test::Class';
 
-sub setup : Tests(setup) {
+sub dont_suppress_retries { 0; }
+sub dont_create_mock_spreadsheets { 0; }
+
+sub startup : Tests(startup) {
   my $self = shift;
 
-  # temp storage to fake spreadsheet cells, set by post_*, used by get_* in etc/uri_responses.
-  $self->{cell_values} = {};
+  my $module = ref($self);
+  $module =~ s|::|/|g;
+  my $exchange_path = "$FindBin::RealBin/unit/$module.pm.exchanges";
 
-  # ensure that we don't send any network traffic to google during our unit tests.
-  # this can happen if we don't have 'Furl::request' overridden with a canned response.
-  $self->_fake('http_connection', 'Furl::HTTP', 'connect',
-    sub { die "For testing you need to set _fake_http_response"; }
-  );
+  if (my $appender = Log::Log4perl->appender_by_name('UnitTestCapture')) {
+    $appender->file_switch($exchange_path);
+  } elsif (-f $exchange_path) {
+    # normalize the exchanges that we previously collected.
+    for (LoadFile($exchange_path)) {
+      my $source = delete $_->{source};
+      push($self->{exchanges}->{$source}->@*, $_);
+    }
+  
+    $self->_sub_override('Furl', 'request', sub {
+      my $test_method = find_test_caller();
+      my $exchange = shift $self->{exchanges}->{$test_method}->@*
+        or confess "Out of exchanges for $test_method";
+      my $response = $exchange->{response};
+      my $furl = Furl::Response->new(
+        1, $response->{code}, $response->{message}, $response->{headers}, $response->{content},
+      );
+      return $furl;
+    });
 
-  return;
-}
+    # if we are not capturing exchanges, ensure that we don't send any network
+    # traffic during our unit tests. this can happen if we don't have
+    # 'Furl::request' overridden with a canned response.
+    $self->_sub_override('Furl::HTTP', 'connect',
+      sub { confess "For unit testing you need to capture exchanges first"; }
+    );
 
-sub teardown : Tests(teardown) { shift->_unfake(); return; }
+    $self->mock_auth;
+    $self->mock_http_no_retries() unless $self->dont_suppress_retries;
 
-sub _uri_responses {
-  my $self = shift;
-  $self->{responses_by_uri} = {};
-  foreach my $response_file (@_) {
-    my $response_yaml;
-    try {
-      $response_yaml = LoadFile(fake_uri_responses_file($response_file));
-    } catch {
-      my $err = $_;
-      LOGDIE "Unable to load responses file '$response_file': $err";
-    };
-    $self->{responses_by_uri} = merge($self->{responses_by_uri}, $response_yaml);
+    # this allows the tests to check on rest failures without having to wait for retries.
+    # sets the right part of retry::backoff to only wait for .1 seconds between retries.
+    # otherwise unit tests take ages to run.
+    $self->_sub_override('Algorithm::Backoff::Exponential', '_failure', sub { 0.1; });
+  } else {
+    $self->mock_auth;
+    $self->mock_http_no_retries() unless $self->dont_suppress_retries;
   }
+
+  $self->create_mock_spreadsheets() unless $self->dont_create_mock_spreadsheets;
+
   return;
 }
 
-# don't send any auth request to google, just use blank headers.
-# TODO: see if some other non-G::R routine can be faked so this doesn't have to be
-# 'required' in the tests.
-sub _fake_http_auth {
+sub shutdown : Tests(shutdown) {
   my $self = shift;
-  $self->_fake('http_auth', 'Google::RestApi::Auth::OAuth2Client', 'headers', sub { []; });
+  $self->delete_mock_spreadsheets unless $self->dont_create_mock_spreadsheets;
+  $self->_sub_restore();
   return;
 }
 
-# TODO: same as above.
-sub _fake_http_no_retries {
+sub create_mock_spreadsheets {
   my $self = shift;
-  $self->_fake('http_no_retries', 'Google::RestApi', 'max_attempts', sub { 1; });
+  my @names = @_;
+  push @names, mock_spreadsheet_name() unless @names;
+  my $sheets_api = mock_sheets_api();
+  $self->{mock_spreadsheets}{$_} = $sheets_api->create_spreadsheet(title => $_) for (@names);
+  return scalar @names;
+}
+
+sub delete_mock_spreadsheets {
+  my $self = shift;
+  my $sheets_api = mock_sheets_api();
+  $sheets_api->delete_spreadsheet($_->spreadsheet_id) for (values $self->{mock_spreadsheets}->%*);
+  delete $self->{mock_spreadsheets};
+  $sheets_api->delete_all_spreadsheets_by_filters("name contains 'mock_spreadsheet'");
   return;
 }
 
-# for the next call to the network, respond appropriately. this is currently
-# more flexible than the below uri matching, but requires that you respond
-# properly to the uri you're submitting, something a little harder to track
-# than the uri matching pattern. you could easily respond to a delete request
-# with spreadsheet properties or something, and it won't be obvious unless
-# you turn on debug and check. with uri matching, it's all laid out for you:
-# when you send this uri, respond with this json... a lot easier. so only
-# use this when testing basic stuff like error checking and whatnot.
-sub _fake_http_response {
+sub mock_auth {
   my $self = shift;
+  $self->_sub_override('Google::RestApi::Auth::OAuth2Client', 'headers', sub { []; });
+}
+
+sub mock_spreadsheet {
+  my $self = shift;
+  my $name = shift || mock_spreadsheet_name();
+  return $self->{mock_spreadsheets}{$name};
+}
+
+sub mock_spreadsheet_id {
+  my $self = shift;
+  my $name = shift || mock_spreadsheet_name();
+  return $self->{mock_spreadsheets}{$name}->spreadsheet_id;
+}
+
+sub mock_spreadsheet_uri {
+  my $self = shift;
+  my $name = shift || mock_spreadsheet_name();
+  return $self->{mock_spreadsheets}{$name}->spreadsheet_uri;
+}
+
+sub mock_worksheet {
+  my $self = shift;
+  my $ss = $self->mock_spreadsheet(@_);
+  return $ss->open_worksheet(id => 0);
+}
+
+sub mock_worksheet_uri {
+  my $self = shift;
+  my $name = shift || mock_worksheet_name();
+  return $self->mock_worksheet->worksheet_uri;
+}
+
+sub mock_http_no_retries {
+  my $self = shift;
+  $self->_sub_override('Google::RestApi', 'max_attempts', sub { 1; });
+  return;
+}
+
+sub mock_http_response {
+  my $self = shift;
+
   my $p = validate_named(\@_,
-    code     => Int|StrMatch[qr/^die$/], { default => 200 },
+    code     => Int|StrMatch[qr/^die$/], { default => HTTP_OK },
     response => Str, { default => '{}' },
     message  => Str, { optional => 1 },
   );
 
-  my %messages = (
-    200 => 'OK',
-    400 => 'Bad request',
-    429 => 'Too many requests',
-    500 => 'Server error',
-    die => 'Furl died',
-  );
-
   my $code = $p->{code};
   my $response = $p->{response};
-  my $message = ($p->{message} || $messages{$code}) or die "Message missing for code $code";
+  my $message = $p->{code} eq 'die' ? "Furl died" : status_message($code);
 
-  $response = read_file($response) if -f $response;
-  
   my $sub = $code eq 'die' ?
     sub { die $message; }
       :
     sub { Furl::Response->new(1, $code, $message, [], $response); };
 
-  $self->_fake('http_response', 'Furl', 'request', $sub);
+  $self->_sub_override('Furl', 'request', $sub);
   # this allows the tests to check on rest failures without having to wait for retries.
   # sets the right part of retry::backoff to only wait for .1 seconds between retries.
   # otherwise unit tests take ages to run.
-  $self->_fake('http_response', 'Algorithm::Backoff::Exponential', '_failure', sub { 0.1; });
+  $self->_sub_override('Algorithm::Backoff::Exponential', '_failure', sub { 0.1; });
 
   return;
 }
 
-# do a series of fake responses if an api call requires more than one transaction sent
-# to the network. the last response remains for any further calls. utilize the 'api_callback'
-# feature of RestApi to hand in each response in the array.
-# TODO: this is probably not needed since we have uri matching below. keeping it for a while.
-sub _fake_http_responses {
+sub _sub_override {
   my $self = shift;
-  my ($api, @responses) = @_;
+  my ($module, $sub, $code) = @_;
 
-  my $response = shift @responses;
-  if ($response) {
-    $self->_fake_http_response(%$response);
-    # kinda recursive in a round-about way.
-    $api->api_callback( sub { $self->_fake_http_responses($api, @responses); } );
-  } else {
-    $api->api_callback();
-  }
-
-  return;
-}
-
-# intercept furl's call to the network and see if the uri and content match something
-# that's already been registered previously. see etc/uri_responses.
-sub _fake_http_response_by_uri {
-  my $self = shift;
-
-  die "No responses registered" if !$self->{responses_by_uri};  
-
-  my $sub = sub {
-    my ($furl, $req) = @_;  # $furl is furl's $self.
-    my $uri_response = Test::Unit::UriResponse->new(
-      request     => $req,
-      responses   => $self->{responses_by_uri},
-      cell_values => $self->{cell_values},
-    );
-    my ($response_json, $code, $message) = $uri_response->response();
-    return Furl::Response->new(1, $code, $message, [], $response_json);
-  };
-
-  $self->_fake('http_response', 'Furl', 'request', $sub);
-  $self->_fake('http_response', 'Algorithm::Backoff::Exponential', '_failure', sub { 0.1; });
-
-  return;
-}
-
-sub _fake {
-  my $self = shift;
-  my ($group, $module, $sub, $code) = @_;
-
-  # warn("Faking $group => $module => $sub");
-  load($module);   # module must be loaded before you can fake it.
-
-  # if we don't restore this first, things go a bit haywire, like the
-  # destructor runs after we do the fake below and resets what we
-  # just faked.
-  my $fake = $self->{fakes}->{$group}->{$module}->{$sub};
-  $fake->restore() if $fake;
-
-  $self->{fakes}->{$group}->{$module}->{$sub} = Mock::MonkeyPatch->patch("${module}::${sub}" => $code);
-  # warn("Faked modules after fake:\n" . Dump($self->{fakes}));
+  load($module);
+  $self->{overrides} //= Sub::Override->new;
+  $self->{overrides}->replace("${module}::${sub}" => $code);
 
   return;
 }
 
 # delete the references so the modules get restored.
-sub _unfake {
+sub _sub_restore {
   my $self = shift;
-  my ($group) = @_;
-  if ($group) {
-    delete $self->{fakes}->{$group};
-    # warn("Faked modules after unfake:\n" . Dump($self->{fakes}));
-  } else {
-    delete $self->{fakes};
-    # warn("All fakes removed.");
-  }
+  delete $self->{overrides};
   return;
 }
 

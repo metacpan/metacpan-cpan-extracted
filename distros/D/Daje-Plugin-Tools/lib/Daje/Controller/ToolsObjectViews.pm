@@ -39,7 +39,7 @@ use v5.42;
 use Data::Dumper;
 
 sub load_object_views ($self) {
-    $self->app->log->debug('Daje::Controller::ToolsObjectIndex::load_object_indexes');
+    $self->app->log->debug('Daje::Controller::ToolsObjectViews::load_object_views');
     $self->render_later;
     # my ($companies_pkey, $users_pkey) = $self->jwt->companies_users_pkey(
     #     $self->req->headers->header('X-Token-Check')
@@ -49,15 +49,16 @@ sub load_object_views ($self) {
     $self->app->log->debug($self->req->headers->header('X-Token-Check'));
     # my $setting = $self->param('setting');
     $self->tools_objects_views->load_tools_views_fkey_p($tools_objects_fkey)->then(sub($result) {
-        $self->render(json => { data => $result->{data}, result => => 1 });
+        $self->render($result->{data});
     })->catch(sub($err) {
+        $self->app->log->error('Daje::Controller::ToolsObjectViews::load_object_views ' . $err);
         $self->render(json => { 'result' => 0, data => $err });
     })->wait;
 }
 
 sub load_object_view ($self) {
 
-    $self->app->log->debug('Daje::Controller::ToolsObjectIndex::load_object_index');
+    $self->app->log->debug('Daje::Controller::ToolsObjectViews::load_object_view');
     $self->render_later;
     # my ($companies_pkey, $users_pkey) = $self->jwt->companies_users_pkey(
     #     $self->req->headers->header('X-Token-Check')
@@ -67,8 +68,9 @@ sub load_object_view ($self) {
     $self->app->log->debug($self->req->headers->header('X-Token-Check'));
     # my $setting = $self->param('setting');
     $self->tools_objects_views->load_tools_object_views_pkey_p($tools_object_views_pkey)->then(sub($result) {
-        $self->render(json => { data => $result->{data}, result => => 1 });
+        $self->render(json => $result->{data});
     })->catch(sub($err) {
+        $self->app->log->error('Daje::Controller::ToolsObjectViews::load_object_view ' . $err);
         $self->render(json => { 'result' => 0, data => $err });
     })->wait;
 }

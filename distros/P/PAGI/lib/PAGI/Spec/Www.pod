@@ -88,11 +88,11 @@ B<HTTP::Headers Compatibility:>
 
 PSGI's flat array format is more compatible with C<< HTTP::Headers->flatten() >>. If you need to interoperate:
 
-    # PAGI tuples â flat array (for HTTP::Headers)
+    # PAGI tuples -> flat array (for HTTP::Headers)
     my @flat = map { @$_ } @$pagi_headers;
     my $hh = HTTP::Headers->new(@flat);
 
-    # Flat array â PAGI tuples
+    # Flat array -> PAGI tuples
     my @flat = $http_headers->flatten;
     my @pagi = map { [$flat[$_*2], $flat[$_*2+1]] } 0 .. ($#flat/2);
 
@@ -263,7 +263,7 @@ The PAGI scope must include:
       [ 'cookie', 'a=1; b=2; c=3' ]
     ]
 
-The server does not parse the cookie string into key-value pairs â parsing is left to middleware or application code. The server only guarantees RFC-compliant normalization.
+The server does not parse the cookie string into key-value pairs -- parsing is left to middleware or application code. The server only guarantees RFC-compliant normalization.
 
 =head3 HTTP Connection Scope
 
@@ -1180,59 +1180,59 @@ PAGI translates keys explicitly to maintain compatibility with PSGI:
 
 =item *
 
-C<REQUEST_METHOD> â C<method>
+C<REQUEST_METHOD> -> C<method>
 
 =item *
 
-C<SCRIPT_NAME> â C<root_path>
+C<SCRIPT_NAME> -> C<root_path>
 
 =item *
 
-C<PATH_INFO> â C<path> minus C<root_path>
+C<PATH_INFO> -> C<path> minus C<root_path>
 
 =item *
 
-C<QUERY_STRING> â C<query_string>
+C<QUERY_STRING> -> C<query_string>
 
 =item *
 
-C<CONTENT_TYPE> â extracted from C<headers>
+C<CONTENT_TYPE> -> extracted from C<headers>
 
 =item *
 
-C<CONTENT_LENGTH> â extracted from C<headers>
+C<CONTENT_LENGTH> -> extracted from C<headers>
 
 =item *
 
-C<SERVER_NAME>, C<SERVER_PORT> â C<server>
+C<SERVER_NAME>, C<SERVER_PORT> -> C<server>
 
 =item *
 
-C<REMOTE_ADDR>, C<REMOTE_PORT> â C<client>
+C<REMOTE_ADDR>, C<REMOTE_PORT> -> C<client>
 
 =item *
 
-C<SERVER_PROTOCOL> â C<http_version>
+C<SERVER_PROTOCOL> -> C<http_version>
 
 =item *
 
-C<psgi.url_scheme> â C<scheme>
+C<psgi.url_scheme> -> C<scheme>
 
 =item *
 
-C<psgi.version> â C<[1, 1]> (PAGI servers MUST advertise the PSGI version they emulate when bridging)
+C<psgi.version> -> C<[1, 1]> (PAGI servers MUST advertise the PSGI version they emulate when bridging)
 
 =item *
 
-C<psgi.input> â constructed from C<http.request> events
+C<psgi.input> -> constructed from C<http.request> events
 
 =item *
 
-C<psgi.errors> â handled by the server as appropriate
+C<psgi.errors> -> handled by the server as appropriate
 
 =item *
 
-C<psgi.streaming>, C<psgi.nonblocking>, C<psgi.multithread>, C<psgi.multiprocess> â derived from PAGI server capabilities and advertised via PSGI adapter docs
+C<psgi.streaming>, C<psgi.nonblocking>, C<psgi.multithread>, C<psgi.multiprocess> -> derived from PAGI server capabilities and advertised via PSGI adapter docs
 
 =back
 
@@ -1265,6 +1265,10 @@ C<path>: Decoded UTF-8 string from percent-encoded input. The server first perce
 =head2 Version History
 
 =over 4
+
+=item *
+
+C<0.2> (Draft): SSE POST method support, keepalive events, disconnect reasons, clarified scope fields (method required for HTTP/SSE, not for WebSocket)
 
 =item *
 

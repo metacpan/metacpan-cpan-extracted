@@ -268,30 +268,9 @@ Example:
 
     {
        "model" : "gpt-4o",
-       "temperature" : 1,
-       "tool_resources" : {
-          "code_interpreter" : {
-             "file_ids" : [
-                null
-             ]
-          },
-          "file_search" : {
-             "vector_store_ids" : [
-                null
-             ],
-             "vector_stores" : [
-                {
-                   "file_ids" : [
-                      null
-                   ]
-                }
-             ]
-          }
-       },
        "tools" : [
           null
-       ],
-       "top_p" : 1
+       ]
     }
 
 
@@ -342,7 +321,7 @@ L<OpenAPI::Client::OpenAI::Path>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2023-2025 by Nelson Ferraz
+Copyright (C) 2023-2026 by Nelson Ferraz
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

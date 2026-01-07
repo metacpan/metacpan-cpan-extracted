@@ -52,6 +52,20 @@ ok($boolean_path[0], 'getpath handles JSON::PP::Boolean values');
 my @negative_index = $jq->run_query($json, '.profile | getpath(["emails", -1])');
 is($negative_index[0], 'alice.work@example.com', 'getpath supports negative indices for arrays');
 
+my $boolean_keys = encode_json({ true => 'yes', false => 'no' });
+my @bool_true  = $jq->run_query($boolean_keys, 'getpath([true])');
+my @bool_false = $jq->run_query($boolean_keys, 'getpath([false])');
+
+is($bool_true[0], 'yes', 'getpath resolves boolean true key to string key');
+is($bool_false[0], 'no', 'getpath resolves boolean false key to string key');
+
+my $boolean_indices = q([10, 20, 30]);
+my @bool_index_zero = $jq->run_query($boolean_indices, 'getpath([false])');
+my @bool_index_one  = $jq->run_query($boolean_indices, 'getpath([true])');
+
+is($bool_index_zero[0], 10, 'getpath treats boolean false as index 0');
+is($bool_index_one[0], 20, 'getpath treats boolean true as index 1');
+
 my @non_array = $jq->run_query('"scalar"', 'getpath([0])');
 ok(!defined $non_array[0], 'getpath returns undef when traversing non-container with path');
 

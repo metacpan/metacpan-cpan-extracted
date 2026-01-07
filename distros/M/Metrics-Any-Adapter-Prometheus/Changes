@@ -1,5 +1,13 @@
 Revision history for Metrics-Any-Adapter-Prometheus
 
+0.07    2026-01-03
+        [CHANGES]
+         * Modernise to perl v5.20:
+            + Make use of the signatures and postfix deref features
+         * Fix typo 'mdoe' in docs
+         * Fix other minor Pod issues
+         * Swap unit tests from Test::More to Test2::V0
+
 0.06    2022-11-28
         [CHANGES]
          * Implement batch-mode API of Metrics::Any v0.09

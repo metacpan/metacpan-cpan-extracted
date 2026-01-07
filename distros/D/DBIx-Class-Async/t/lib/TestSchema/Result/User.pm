@@ -13,12 +13,12 @@ __PACKAGE__->add_columns(
     },
     name => {
         data_type   => 'varchar',
-        size        => 50,
+        size        => 100,
         is_nullable => 0,
     },
     email => {
         data_type   => 'varchar',
-        size        => 100,
+        size        => 255,
         is_nullable => 1,
     },
     active => {

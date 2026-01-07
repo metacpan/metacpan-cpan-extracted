@@ -1,0 +1,10 @@
+{
+  "recordId": 2001,
+  "port": 80,
+  "protocol": "HTTP",
+  "sensitivity": 5,
+  "failover": true,
+  "systemDescription": "Test monitor",
+  "maxEmails": 1,
+  "contactList": []
+}

@@ -7,6 +7,9 @@ my $json = <<'JSON';
 {
   "name": "Alice",
   "age": 30,
+  "tiny": 1e-40,
+  "huge": 1e40,
+  "sci": "1e6",
   "active": true,
   "profile": {
     "country": "US"
@@ -20,6 +23,9 @@ my $jq = JQ::Lite->new;
 
 is_deeply([$jq->run_query($json, '.name | type')], ['string'], 'type of string');
 is_deeply([$jq->run_query($json, '.age | type')], ['number'], 'type of number');
+is_deeply([$jq->run_query($json, '.tiny | type')], ['number'], 'type treats scientific notation as number (tiny)');
+is_deeply([$jq->run_query($json, '.huge | type')], ['number'], 'type treats scientific notation as number (huge)');
+is_deeply([$jq->run_query($json, '.sci | type')], ['string'], 'type does not misclassify numeric-looking strings');
 is_deeply([$jq->run_query($json, '.active | type')], ['boolean'], 'type of boolean');
 is_deeply([$jq->run_query($json, '.profile | type')], ['object'], 'type of object');
 is_deeply([$jq->run_query($json, '.tags | type')], ['array'], 'type of array');

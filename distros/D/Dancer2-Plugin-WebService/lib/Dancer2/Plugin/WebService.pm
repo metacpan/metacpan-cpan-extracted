@@ -5,7 +5,7 @@
 # Joan Ntzougani, ✞
 
 package Dancer2::Plugin::WebService;
-our $VERSION = '4.8.3';
+our $VERSION = '4.8.6';
 if ( $^O =~/(?i)MSWin/ ) { CORE::warn "\nOperating system is not supported\n"; CORE::exit 1 }
 
 use strict;
@@ -785,7 +785,7 @@ my $plg=shift;
   for (my ($k,$v)=(0,1); $k<$#_-(@_ % 2); $k+=2,$v+=2) {
   next if 'token' eq $_[$k];
   push @keys, $_[$k];
-  $TokenDB{$plg->token}->{data}->{$tmp} = $_[$v];
+  $TokenDB{$plg->token}->{data}->{$_[$k]} = $_[$v];
 
     unless ( Storable::lock_store ref $_[$v] ? $_[$v] : \$_[$v],  "$plg->{dir_session}/". $plg->token  ."/data/$_[$k]" ) {
     $plg->error("Could not store session key $_[$k] because $!");
@@ -797,10 +797,10 @@ my $plg=shift;
 }
 
 
-#	Retrieves session data
+#	Retrieves session keys
 #
-#	my %data = SessionGet();                 # return a hash of all keys
-#	my %data = SessionGet('k1', 'k2', ...);  # return a hash of the selected keys
+#	my %data = SessionGet();                 # hash of all keys
+#	my %data = SessionGet('k1', 'k2', ...);  # hash of the selected keys
 
 sub SessionGet :PluginKeyword
 {
@@ -834,7 +834,7 @@ my $plg	= shift;
 
 		if ('ARRAY' eq ref $_[0]) {
 		# At new Perl versions hash slice  %{$TokenDB{ $plg->token }->{data}}{@{$_[0]}}
-    map { exists $TokenDB{$plg->token}->{data}->{$_} ? ( $_ , $TokenDB{$plg->token}->{data}->{$_} ) : () } @{$_[0]}
+    map {exists $TokenDB{$plg->token}->{data}->{$_} ? ( $_ , $TokenDB{$plg->token}->{data}->{$_} ) : ()} @{$_[0]}
 		}
 		else {
          exists $TokenDB{$plg->token}->{data}->{$_[0]} ? ( $_[0] , $TokenDB{$plg->token}->{data}->{$_[0]} ) : ()
@@ -842,7 +842,7 @@ my $plg	= shift;
 	}
 	else {
   # Some records, normal, not array reference
-  map { ( Encode::encode('utf8',$_) , $TokenDB{$plg->token}->{data}->{$_} ) }  grep exists $TokenDB{$plg->token}->{data}->{$_} , @_
+  map { ( $_ , $TokenDB{$plg->token}->{data}->{$_} ) }  grep exists $TokenDB{$plg->token}->{data}->{$_} , @_
 	}
 }
 
@@ -925,7 +925,7 @@ Dancer2::Plugin::WebService - Rest APIs with login, persistent data, multiple in
 
 =head1 VERSION
 
-version 4.8.3
+version 4.8.6
 
 =head1 SYNOPSIS
 
@@ -1371,7 +1371,7 @@ George Bouras <george.mpouras@yandex.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by George Bouras.
+This software is copyright (c) 2026 by George Bouras.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

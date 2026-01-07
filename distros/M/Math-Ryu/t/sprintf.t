@@ -38,7 +38,11 @@ like($str, qr/\d\.0$/, "nv2s() returns a number when handed a scalar reference")
 $str = '6.5rubbish';
 cmp_ok(n2s($str), 'eq', '6.5', "n2s('6.5 rubbish') handled as expected");
 
-my $test = 'hello world' + 0;
+my $test;
+{
+  no warnings 'numeric';
+  $test = 'hello world' + 0;
+}
 # $test is an IV on old perls, but an NV from about 5.12.0 onwards.
 # We must therefore taylor the next test to cater for both possibilities.
 my $expected = '0.0';              # Assume $test is an NV.

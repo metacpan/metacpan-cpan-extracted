@@ -1,3 +1,23 @@
+0.000042 Jan 4 2026
+
+IMPORTANT SECURITY UPDATE: bundled libsodium updated to 1.0.20-stable. fixes
+CVE-2025-15444 (upstream CVE-2025-69277). libsodium version 1.0.20-stable is
+both a vulnerable and not-vulnerable version for this CVE. the included copy of
+this "stable release" (daily snapshot) is the version of 1.0.20-stable released
+January 3, 2026 which includes a fix for the vulnerability.
+
+vulnerability notes:
+
+* C::S::XS::curve25519::core_ed25519_is_valid_point could have improperly
+  reported invalid curve points as valid. only users of this low-level function
+  (e.g., for implementing custom crypto) are affected.
+
+* this update only affects users of the bundled version of libsodium. users
+  of an externally-provided libsodium (e.g., software packaged by operating
+  system distribution) must update that library to a not-vulnerable version.
+  for those external library users, this Crypt::Sodium::XS update is not
+  necessary and will not remediate the vulnerability.
+
 0.000041 Dec 5 2025
 
 - add fallback for older Fcntl

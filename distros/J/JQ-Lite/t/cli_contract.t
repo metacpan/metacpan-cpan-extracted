@@ -8,6 +8,9 @@ use Symbol qw(gensym);
 #   JQ_LITE_BIN=jq-lite prove -lv t/cli_contract.t
 my $BIN = $ENV{JQ_LITE_BIN} || 'bin/jq-lite';
 
+# Prevent the test process from aborting if the child closes its pipe early.
+$SIG{PIPE} = 'IGNORE';
+
 sub run_cmd {
     my (%opt) = @_;
     my $stdin = defined $opt{stdin} ? $opt{stdin} : '';
@@ -68,7 +71,6 @@ sub assert_err_contract {
 # ============================================================
 
 # Compile error
-# NOTE(TODO): Current jq-lite reads input before compile; provide stdin
 {
     my $res = run_cmd(cmd => [$BIN, '.['], stdin => "{}\n");
     assert_err_contract(
@@ -87,6 +89,17 @@ sub assert_err_contract {
         rc     => 2,
         prefix => '[COMPILE]',
         name   => 'compile error: empty filter segment',
+    );
+}
+
+# Compile error: trailing comma produces empty filter segment
+{
+    my $res = run_cmd(cmd => [$BIN, '.foo,'], stdin => "{}\n");
+    assert_err_contract(
+        res    => $res,
+        rc     => 2,
+        prefix => '[COMPILE]',
+        name   => 'compile error: trailing comma creates empty segment',
     );
 }
 
@@ -219,13 +232,13 @@ sub assert_err_contract {
     like($res->{err}, qr/^\s*\z/s, '-e empty => stderr empty');
 }
 
-# -e truthy values (CURRENT behavior: 0 is falsey)
+# -e truthy values
 {
     my $res = run_cmd(
         cmd   => [$BIN, '-e', '.'],
         stdin => "0\n",
     );
-    is($res->{rc}, 1, '-e 0 => exit 1 (CURRENT BEHAVIOR; TODO fix truthiness)');
+    is($res->{rc}, 0, '-e 0 => exit 0');
     like($res->{out}, qr/^0\b/m, '-e 0 => stdout contains 0');
     like($res->{err}, qr/^\s*\z/s, '-e 0 => stderr empty');
 }
@@ -257,20 +270,60 @@ sub assert_err_contract {
     like($res->{err}, qr/^\s*\z/s, '--argjson scalar => stderr empty');
 }
 
+# --argjson string scalar
+{
+    my $res = run_cmd(
+        cmd   => [$BIN, '--argjson', 'msg', '"hi"', '$msg'],
+        stdin => "null\n",
+    );
+    is($res->{rc}, 0, '--argjson string scalar => exit 0');
+    like($res->{out}, qr/\A"hi"\s*\z/s, '--argjson string scalar => exact output');
+    like($res->{err}, qr/^\s*\z/s, '--argjson string scalar => stderr empty');
+}
+
 # ============================================================
 # Broken pipe (SIGPIPE / EPIPE)
 # ============================================================
 
 {
-    # Finite input to avoid hanging, but still trigger early pipe close
-    my $cmd = "yes '{}' | head -n 2000 | $BIN '.' 2>/dev/null | head -n 1 >/dev/null";
-    my $rc = system('sh', '-c', $cmd);
-    $rc = ($rc >> 8);
+    my $err = gensym;
+    my $pid = open3(my $in, my $out, $err, $BIN, '-R', '.');
 
-    ok(
-        $rc == 0 || $rc == 1,
-        "broken pipe is not fatal (exit=$rc)",
+    local $SIG{PIPE} = 'IGNORE';
+    print {$in} "hello\n" for 1 .. 5000;
+    close $in;
+
+    my $first = <$out> // '';
+    close $out;    # simulate downstream consumer closing early
+
+    my $stderr = do { local $/; <$err> } // '';
+    waitpid($pid, 0);
+    my $rc = ($? >> 8);
+
+    ok($rc == 0 || $rc == 1, "broken pipe is not fatal (exit=$rc)");
+    is($stderr, '', 'broken pipe stderr is suppressed');
+    ok($first =~ /\S/, 'pipeline produced at least one line before pipe closed');
+}
+
+# paths() and paths(scalars) on scalar input should be no-ops with success
+{
+    my $res_paths = run_cmd(
+        cmd   => [$BIN, 'paths'],
+        stdin => qq|"hi"\n|,
     );
+
+    is($res_paths->{rc}, 0, 'paths on scalar exits 0');
+    is($res_paths->{out}, '', 'paths on scalar emits no output');
+    is($res_paths->{err}, '', 'paths on scalar emits no errors');
+
+    my $res_scalar_paths = run_cmd(
+        cmd   => [$BIN, 'paths(scalars)'],
+        stdin => qq|true\n|,
+    );
+
+    is($res_scalar_paths->{rc}, 0, 'paths(scalars) on scalar exits 0');
+    is($res_scalar_paths->{out}, '', 'paths(scalars) on scalar emits no output');
+    is($res_scalar_paths->{err}, '', 'paths(scalars) on scalar emits no errors');
 }
 
 done_testing();

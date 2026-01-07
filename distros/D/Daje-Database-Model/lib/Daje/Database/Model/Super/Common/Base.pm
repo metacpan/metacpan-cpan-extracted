@@ -97,5 +97,11 @@ sub update($self, $table, $data, $keys) {
     return $result;
 }
 
+sub delete($self, $table, $keys) {
+    my $result->{result} = 0;
+    $self->db->delete($table, $keys);
+    $result->{result} = 1;
+    return $result;
+}
 1;
 

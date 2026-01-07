@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+
+# NOTE: this script needs access to t/lib to find some support modules.
+# if you copy any of the scripts in this dir, you must update the 'use lib'
+# statements below to resolve what they need in order to run.
+
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+use lib "$FindBin::RealBin/../../t/lib";
+
+# this points to the local copy of Google::RestApi. if you don't need to test a
+# local copy of the pacakge, and you have G::R already installed, then you may
+# comment this out and G::R will be resolved with the standard installed
+# module path in INC.
+use lib "$FindBin::RealBin/../../lib";
+
+use Tutorial::Setup;
+
+# see Test::Utils::init_logger.
+init_logger($TRACE) if $ENV{DEBUG};
+
+my $name = spreadsheet_name();
+my $sheets_api = sheets_api();
+# clean up any failed previous runs.
+$sheets_api->delete_all_spreadsheets_by_filters("name = '$name'");
+# now set a callback to display the api request/response.
+$sheets_api->rest_api()->api_callback(\&show_api);
+
+start("Now we will create a new spreadsheet named '$name'.");
+my $ss = $sheets_api->create_spreadsheet(title => $name);
+my $uri = $ss->spreadsheet_uri();
+end("Spreadsheet successfully created:\n$uri.");
+
+start("Now we will make a copy of the spreadsheet named '${name}_copy'.");
+my $ss_copy = $ss->copy_spreadsheet(title => "${name}_copy");
+my $uri_copy = $ss_copy->spreadsheet_uri();
+end("Spreadsheet successfully copied, uri: '$uri_copy'.");
+
+start("Now we will delete the copy of the spreadsheet.");
+$ss_copy->delete_spreadsheet();
+end("Spreadsheet successfully deleted.");
+
+message('green', "\nOpen url '$uri' in your browser and proceed to 20_worksheet.pl.\n");
+
+message('blue', "We are done, here are some api stats:\n", Dump($ss->stats()));

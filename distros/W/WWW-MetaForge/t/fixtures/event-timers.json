@@ -1,0 +1,40 @@
+{
+  "data": [
+    {
+      "name": "Cold Snap",
+      "map": "Dam",
+      "icon": "https://cdn.metaforge.app/arc-raiders/custom/coldsnap.webp",
+      "startTime": 1767556800000,
+      "endTime": 1767564000000
+    },
+    {
+      "name": "Cold Snap",
+      "map": "Dam",
+      "icon": "https://cdn.metaforge.app/arc-raiders/custom/coldsnap.webp",
+      "startTime": 1767585600000,
+      "endTime": 1767592800000
+    },
+    {
+      "name": "Cold Snap",
+      "map": "Dam",
+      "icon": "https://cdn.metaforge.app/arc-raiders/custom/coldsnap.webp",
+      "startTime": 1767614400000,
+      "endTime": 1767621600000
+    },
+    {
+      "name": "Harvester",
+      "map": "Blue Gate",
+      "icon": "https://cdn.metaforge.app/arc-raiders/custom/harvester.webp",
+      "startTime": 1767582000000,
+      "endTime": 1767585600000
+    },
+    {
+      "name": "Harvester",
+      "map": "Blue Gate",
+      "icon": "https://cdn.metaforge.app/arc-raiders/custom/harvester.webp",
+      "startTime": 1767614400000,
+      "endTime": 1767618000000
+    }
+  ],
+  "cachedAt": 1767556800000
+}

@@ -38,10 +38,13 @@ my %WriteMakefile=(
         'Devel::Confess'    => 0,
         'Router::Simple'    => 0,
         'Hash::MultiValue'  => 0,
+        'Devel::Confess'    => 0,
+        'Time::HiRes'       => 0,
         
         #  Plack recommended but not mandatory
         #
         #'Plack'             => 0,
+        #'Plack::Middleware::ForceEnv => 0,
 
         #  Needed for installer - can be ignored if not using installer
         'Text::Template' => 0,
@@ -52,11 +55,19 @@ my %WriteMakefile=(
         'Test::Simple'      => 0.44,
         'Test::More'        => 0,
         'Capture::Tiny'     => 0,
-        'Test::Deep'        => 0
+        'Test::Deep'        => 0,
+        'Test::Exception'   => 0,
     },
     META_MERGE => {
         'meta-spec' => {
             version => 2
+        },
+        "prereqs" => {
+            "runtime" => {
+                "recommends" => {
+                    'Plack' => 0,
+                },
+            },
         },
         resources => {
             homepage   => 'https://github.com/aspeer/WebDyne',

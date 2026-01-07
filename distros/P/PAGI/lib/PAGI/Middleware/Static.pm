@@ -24,6 +24,27 @@ PAGI::Middleware::Static - Static file serving middleware
         $my_app;
     };
 
+    # Rewrite /static/... to /...
+    my $app = builder {
+        enable 'Static',
+            root => '/var/www/static',
+            path => sub {
+                my ($path) = @_;
+                return unless $path =~ m{^/static/};
+                $path =~ s{^/static}{/};
+                return $path;  # Rewrite via return value
+            };
+        $my_app;
+    };
+
+    # Legacy (in-place) rewrite - still supported
+    my $app = builder {
+        enable 'Static',
+            root => '/var/www/static',
+            path => sub { $_[0] =~ s{^/static}{/} };
+        $my_app;
+    };
+
 =head1 DESCRIPTION
 
 PAGI::Middleware::Static serves static files from a specified directory.
@@ -41,6 +62,21 @@ The root directory to serve files from.
 =item * path (default: qr{^/})
 
 A regex or coderef to match request paths. Only matching paths are handled.
+
+When C<path> is a coderef, it can also rewrite the request path:
+
+=over 4
+
+=item * Return a string to use as the rewritten path.
+
+=item * Return a true value (e.g., C<1>) to match without rewriting.
+
+=item * Return a false value to skip static handling.
+
+=back
+
+In-place mutation of C<$_[0]> is still supported for compatibility, but
+returning the rewritten path is preferred.
 
 =item * pass_through (default: 0)
 
@@ -159,10 +195,19 @@ sub wrap {
                 return;
             }
         } elsif (ref($path_match) eq 'CODE') {
-            unless ($path_match->($path)) {
+            my $result = $path_match->($path);
+            unless ($result) {
                 await $app->($scope, $receive, $send);
                 return;
             }
+            if (defined $result && !ref($result) && $result ne '1') {
+                $path = $result;
+            }
+        }
+
+        # Normalize rewritten paths to start with /
+        if (defined $path && $path ne '' && $path !~ m{^/}) {
+            $path = '/' . $path;
         }
 
         # Build file path

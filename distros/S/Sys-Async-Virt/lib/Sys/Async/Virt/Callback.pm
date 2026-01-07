@@ -17,14 +17,14 @@ use Feature::Compat::Try;
 use Future::AsyncAwait;
 use Object::Pad 0.821;
 
-class Sys::Async::Virt::Callback v0.1.10;
+class Sys::Async::Virt::Callback v0.2.1;
 
 
 use Carp qw(croak);
 use Future::Queue;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.1.10;
+use Protocol::Sys::Virt::Remote::XDR v11.10.1;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 field $_id              :reader :param;
@@ -46,23 +46,25 @@ async method next_event() {
 }
 
 async method cancel() {
-    return if ($_cancelled
-               and $_cancelled->is_ready);
     return await $_cancelled if $_cancelled;
 
-    $_cancelled = $_client->_call(
-        $_deregister_call,
-        { callbackID => $_id });
+    $_cancelled = $_client->loop->new_future;
+    $self->cleanup;
     await $_cancelled;
 
-    $self->cleanup;
     return;
 }
 
 method cleanup() {
+    return unless $_queue;
+
     $_queue->finish;
     $_queue = undef;
-    delete $_client->{_callbacks}->{$_id};
+    $_client->_deregister_callback(
+        $_cancelled,
+        $_deregister_call,
+        $_id );
+
     return;
 }
 
@@ -73,13 +75,12 @@ method _dispatch_event($event) {
         $_queue->push($event);
     }
     catch ($e) {
-        ###TODO: Rather not RETAIN here?
-        $self->cancel->retain;
+        $self->cleanup;
     }
 }
 
 method DESTROY() {
-    $self->cancel->retain unless $_cancelled;
+    $self->cleanup;
 }
 
 
@@ -93,7 +94,7 @@ Sys::Async::Virt::Callback - Client side proxy to remote LibVirt event source
 
 =head1 VERSION
 
-v0.1.10
+v0.2.1
 
 =head1 SYNOPSIS
 

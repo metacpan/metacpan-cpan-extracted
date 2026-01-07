@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2026 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Counter 0.14;
+package Net::Prometheus::Counter 0.15;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Net::Prometheus::Metric );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use Carp;
 
@@ -58,11 +61,9 @@ L<Net::Prometheus::Metric>.
 
 =cut
 
-sub new
+sub new ( $class, %opts )
 {
-   my $class = shift;
-
-   my $self = $class->SUPER::new( @_ );
+   my $self = $class->SUPER::new( %opts );
 
    $self->{values} = {};
 
@@ -88,10 +89,8 @@ supplied and must be non-negative.
 =cut
 
 __PACKAGE__->MAKE_child_method( 'inc' );
-sub _inc_child
+sub _inc_child ( $self, $labelkey, $delta = undef )
 {
-   my $self = shift;
-   my ( $labelkey, $delta ) = @_;
    defined $delta or $delta = 1;
    $delta >= 0 or
       croak "Cannot increment a counter by a negative value";
@@ -100,25 +99,18 @@ sub _inc_child
 }
 
 # remove is generated automatically
-sub _remove_child
+sub _remove_child ( $self, $labelkey )
 {
-   my $self = shift;
-   my ( $labelkey ) = @_;
-
    delete $self->{values}{$labelkey};
 }
 
-sub clear
+sub clear ( $self )
 {
-   my $self = shift;
-
-   undef %{ $self->{values} };
+   undef $self->{values}->%*;
 }
 
-sub samples
+sub samples ( $self )
 {
-   my $self = shift;
-
    my $values = $self->{values};
 
    return map {

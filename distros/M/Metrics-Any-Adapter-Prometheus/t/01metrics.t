@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.20;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Metrics::Any 0.09 '$metrics';
 use Metrics::Any::Adapter 'Prometheus';
@@ -42,7 +42,7 @@ my $prom = Net::Prometheus->new;
 
    # Buckets
    my @buckets = grep { m/^the_distribution_bytes_bucket/ } split m/\n/, $prom->render;
-   is_deeply( \@buckets,
+   is( \@buckets,
       [
          'the_distribution_bytes_bucket{le="100"} 0',
          'the_distribution_bytes_bucket{le="1000"} 0',

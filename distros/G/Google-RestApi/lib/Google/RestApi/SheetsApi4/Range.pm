@@ -79,7 +79,7 @@ package Google::RestApi::SheetsApi4::Range;
 # too complex, and the simple workaround is to just A1:B2.
 # [A1, B2]
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.1.0';
 
 use Google::RestApi::Setup;
 
@@ -140,52 +140,51 @@ sub factory {
   my $range = $range_args->{range};
   
   # be careful here, recursive.
-  given (${^_TYPE_PARAMS_MULTISIG} || ${^TYPE_PARAMS_MULTISIG}) {
-    when (0) { return Col->new(%$range_args); }
-    when (1) { return Row->new(%$range_args); }
-    when (2) { return Cell->new(%$range_args); }
+  my $result = ${^_TYPE_PARAMS_MULTISIG} || ${^TYPE_PARAMS_MULTISIG};
+  if    ($result == 0) { return Col->new(%$range_args); }
+  elsif ($result == 1) { return Row->new(%$range_args); }
+  elsif ($result == 2) { return Cell->new(%$range_args); }
 
-    # if we've translated a range, it now may be a better fit for one of the above.
-    when (3) {
-      # convert the range to A1:A1 format and redrive the factory routine to see
-      # if it ends up being a col, row, or cell range.
-      if ($range ne $original_range) {
-        DEBUG(sprintf("Range '%s' converted to '$range'", flatten_range($original_range)));
-        # resolve cells by collapsing A1:A1 to just A1. also A:A and 1:1 will be
-        # properly resolved to cols/rows.
-        my ($start, $end) = split(':', $range);
-        $range = $start if $end && $start eq $end;
-        return factory(%$range_args);                       ##### recursion
-      }
-      # we're already in A1:A1 format so just create a new range object.
-      return __PACKAGE__->new(%$range_args);
+  # if we've translated a range, it now may be a better fit for one of the above.
+  elsif ($result == 3) {
+    # convert the range to A1:A1 format and redrive the factory routine to see
+    # if it ends up being a col, row, or cell range.
+    if ($range ne $original_range) {
+      DEBUG(sprintf("Range '%s' converted to '$range'", flatten_range($original_range)));
+      # resolve cells by collapsing A1:A1 to just A1. also A:A and 1:1 will be
+      # properly resolved to cols/rows.
+      my ($start, $end) = split(':', $range);
+      $range = $start if $end && $start eq $end;
+      return factory(%$range_args);                       ##### recursion
     }
+    # we're already in A1:A1 format so just create a new range object.
+    return __PACKAGE__->new(%$range_args);
+  }
 
-    # range could be a named range or a column/row header. we have to resolve the
-    # range first, then see what the best fit will be above.
-    when (4) {
-      my $worksheet = $range_args->{worksheet};
+  # range could be a named range or a column/row header. we have to resolve the
+  # range first, then see what the best fit will be above.
+  elsif ($result == 4) {
+    my $worksheet = $range_args->{worksheet};
 
-      my $named = $range;
-      $range = $worksheet->resolve_header_range($named);
-      if ($range) {
-        # remove original range so it doesn't screw up Type::Params.
-        delete $range_args->{range};
-        $range = factory(%$range_args, range => $range);    ##### recursion
-        $range->{header_name} = $named;
-        return $range;
-      }
-
-      $range = $worksheet->normalize_named($named)
-        or LOGDIE("Unable to resolve named range '$named'");
-      # we've resolved the name to A1 format, so redrive factory routine to
-      # generate a range object with the resolved range.
+    my $named = $range;
+    $range = $worksheet->resolve_header_range($named);
+    if ($range) {
       # remove original range so it doesn't screw up Type::Params.
       delete $range_args->{range};
-      $range = factory(%$range_args, range => $range);      ##### recursion
-      $range->{named} = $named;
+      $range = factory(%$range_args, range => $range);    ##### recursion
+      $range->{header_name} = $named;
       return $range;
     }
+
+    $range = $worksheet->normalize_named($named)
+      or LOGDIE("Unable to resolve named range '$named'");
+    # we've resolved the name to A1 format, so redrive factory routine to
+    # generate a range object with the resolved range.
+    # remove original range so it doesn't screw up Type::Params.
+    delete $range_args->{range};
+    $range = factory(%$range_args, range => $range);      ##### recursion
+    $range->{named} = $named;
+    return $range;
   }
 
   LOGDIE("Unable to resolve '$range_args->{range}' to a range object");
@@ -565,8 +564,8 @@ sub _col_a2i {
   my $incr = 0;
   for (my $i = length($a); $i > 0 ; $i--) {
     my $char = substr($a, $i - 1);
-    my $curr += ord(lc($char)) - ord('a') + 1;
-    $curr *= $incr if ($incr);
+    my $curr = ord(lc($char)) - ord('a') + 1;
+    $curr *= $incr if $incr;
     $result += $curr;
     $incr += 26;
   }
@@ -1013,6 +1012,6 @@ Robin Murray mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright (c) 2021, Robin Murray. All rights reserved.
+Copyright (c) 2019-2026 Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

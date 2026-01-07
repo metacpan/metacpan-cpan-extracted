@@ -9,7 +9,7 @@ use Schedule::Activity::Message;
 use Schedule::Activity::Node;
 use Schedule::Activity::NodeFilter;
 
-our $VERSION='0.2.7';
+our $VERSION='0.2.8';
 
 sub new {
 	my ($ref,%opt)=@_;
@@ -163,8 +163,8 @@ sub safetyChecks {
 	my %activities=map {$$builtNode{$_}=>$$builtNode{$_}{finish}} grep {defined($$builtNode{$_}{finish})} keys(%$builtNode);
 	my %finishes=map {$_=>1} values(%activities);
 	my %actions=map {$_=>$$builtNode{$_}} grep {!exists($activities{$$builtNode{$_}})&&!exists($finishes{$$builtNode{$_}})} keys(%$builtNode);
+	my %incompleteActivities=map {$_=>1} grep{!defined($reach{min}{$$builtNode{$_}}{$activities{$$builtNode{$_}}})} grep {defined($$builtNode{$_}{finish})} keys(%$builtNode);
 	#
-	my %incompleteActivities=map {$_=>1} grep{!defined($reach{min}{$_}{$activities{$_}})} keys(%activities);
 	push @errors,map {"Finish for activity $_ is unreachable"} keys(%incompleteActivities);
 	#
 	my (%orphans,%dualParent,%dualFinish,%dangling,%infiniteCycle);
@@ -271,7 +271,8 @@ sub findpath {
 
 sub scheduler {
 	my (%opt)=@_; # goal,node,config
-	if(!is_hashref($opt{node})) { die 'scheduler called with invalid node' }
+	if(!is_hashref($opt{node}))      { die 'scheduler called with invalid node' }
+	if(!defined($opt{node}{finish})) { die 'scheduler called with non-activity node' }
 	$opt{retries}//=10; $opt{retries}--;
 	if($opt{retries}<0) { die $opt{error}//'scheduling retries exhausted' }
 	#
@@ -378,10 +379,11 @@ sub goalScheduling {
 			my %cmp=%{$goal{attribute}{$k}};
 			my %attr=%{$schedule{attributes}{$k}//{}};
 			my $avg=$attr{avg}//0;
-			if   ($cmp{op} eq 'max') { $res+=$avg }
-			elsif($cmp{op} eq 'min') { $res-=$avg }
-			elsif($cmp{op} eq 'eq')  { $res-=abs($avg-$cmp{value}) }
-			elsif($cmp{op} eq 'ne')  { $res+=abs($avg-$cmp{value}) }
+			my $weight=$cmp{weight}//1;
+			if   ($cmp{op} eq 'max') { $res+=$avg*$weight }
+			elsif($cmp{op} eq 'min') { $res-=$avg*$weight }
+			elsif($cmp{op} eq 'eq')  { $res-=abs($avg-$cmp{value})*$weight }
+			elsif($cmp{op} eq 'ne')  { $res+=abs($avg-$cmp{value})*$weight }
 			elsif($cmp{op} eq 'XX')  {
 				my $xy=$attr{xy}//[];
 				foreach my $i (0..$#$xy-1) {
@@ -555,7 +557,7 @@ Schedule::Activity - Generate activity schedules
 
 =head1 VERSION
 
-Version 0.2.7
+Version 0.2.8
 
 =head1 SYNOPSIS
 
@@ -892,16 +894,16 @@ Goal seeking retries schedule construction and finds the best, I<random> schedul
   %schedule=$scheduler->schedule(goal=>{
     cycles=>N,
     attribute=>{
-      'name'=>{op=>'max'},
+      'name'=>{op=>'max', weight=>1},
       'name'=>{op=>'min'},
       'name'=>{op=>'eq', value=>x},
       'name'=>{op=>'ne', value=>x},
     }
   },...)
 
-One or more attributes may be included in the goal, and each of the C<cycles> (default 10) schedules will be scored based on the configured conditions.  The C<max> and C<min> operators seek the largest/smallest attribute I<average value> for the schedule.  The C<eq> and C<ne> operators score near/far from the provided C<value>.  Note that generated schedules may have a different number of activities, so some attribute goals may be equivalent to finding the shortest/longest action counts.
+One or more attributes may be included in the goal, and each of the C<cycles> (default 10) schedules will be scored based on the configured conditions.  The C<max> and C<min> operators seek the largest/smallest attribute I<average value> for the schedule.  The C<eq> and C<ne> operators score near/far from the provided C<value>.  The optional C<weight> is a multiplier for the attribute value in the scoring function; see C<samples/goalweights.pl> for more details.  Note that generated schedules may have a different number of activities, so some attribute goals may be equivalent to finding the shortest/longest action counts.
 
-Goal scheduling is experimental starting with 0.2.4.  Attributes currently have equal weighting and scores are linear.  If no schedule can be generated, the most recent error will raise via C<die()>.  Goals can be different during different invocations of incremental construction.
+Goal scheduling is experimental starting with 0.2.4.  If no schedule can be generated, the most recent error will raise via C<die()>.  Goals can be different during different invocations of incremental construction.
 
 =head2 Per-Activity Goals
 

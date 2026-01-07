@@ -19,12 +19,12 @@ use namespace::clean -except => [qw/_options_data _options_config/];
 sub genereate_sql() {
 
     my $pg = Mojo::Pg->new()->dsn(
-        "dbi:Pg:dbname=Toolstest;host=database;port=54321;user=test;password=test"
+        "dbi:Pg:dbname=daje;host=192.168.1.124;port=5432;user=daje;password=PV58nova64"
     );
 
     my $model = Daje::Workflow::Database::Model->new(db => $pg->db);
 
-    my $context->{context}->{payload}->{tools_projects_pkey} = 8;
+    my $context->{context}->{payload}->{tools_projects_fkey} = 1;
     my $generate = Daje::Workflow::Activities::Tools::Generate::SQL->new(
         db      => $pg->db,
         context => $context,

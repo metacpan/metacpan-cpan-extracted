@@ -16,9 +16,9 @@ use POSIX qw(strftime);
 use String::ShellQuote;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-10-22'; # DATE
+our $DATE = '2026-01-03'; # DATE
 our $DIST = 'Git-Bunch'; # DIST
-our $VERSION = '0.631'; # VERSION
+our $VERSION = '0.632'; # VERSION
 
 our @EXPORT_OK = qw(check_bunch sync_bunch exec_bunch);
 
@@ -429,6 +429,7 @@ Will die if can't chdir into bunch or git repository.
 MARKDOWN
     args          => {
         %common_args,
+        %sort_args,
     },
     deps => {
         all => [
@@ -924,7 +925,7 @@ sub sync_bunch {
 
     local $CWD = $source;
     my @entries = _list(\%args);
-    @entries = _sort_entries_by_recent(@entries) if $args{min_repo_access_time};
+    @entries = _sort_entries_by_recent(@entries);# if $args{min_repo_access_time};
     #log_trace("entries: %s", \@entries);
 
     $CWD = $target unless $action eq 'list-source-repos';
@@ -1198,6 +1199,7 @@ default message).
 MARKDOWN
     args          => {
         %common_args,
+        %sort_args,
         message => {
             summary => 'Commit message',
             schema => 'str*',
@@ -1251,6 +1253,64 @@ sub commit_bunch {
     [200];
 }
 
+$SPEC{list_bunches} = {
+    v             => 1.1,
+    summary       =>
+        'List bunches defined in configuration',
+    description   => <<'MARKDOWN',
+
+A gitbunch directory is defined in the configuration file as a section, e.g.:
+
+    [bunch NAME]
+    path = SOMEPATH
+
+    [bunch NAME2]
+    path = !path ~/SOMEPATH
+
+MARKDOWN
+    args          => {
+        detail => {
+            schema => 'bool*',
+            cmdline_aliases => {l=>{}},
+        },
+    },
+    deps => {
+    },
+    features => {
+    },
+};
+sub list_bunches {
+    my %args = @_;
+    my $cmdline = $args{-cmdline};
+    my $cmdline_r = $args{-cmdline_r};
+
+    my $config = $cmdline_r->{config};
+    my @section_names0 = sort {
+        my $order_a = $cmdline_r->{_config_section_read_order}{$a} // [9999, 9999];
+        my $order_b = $cmdline_r->{_config_section_read_order}{$b} // [9999, 9999];
+        $order_a->[0] <=> $order_b->[0] ||
+            $order_a->[1] <=> $order_b->[1] || 0;
+    } grep { /^bunch\s/ } keys %$config;
+
+    my @bunches;
+    for my $section_name0 (@section_names0) {
+        my $section_config = $config->{$section_name0};
+        (my $section_name = $section_name0) =~ s/(\s+\S+=\S*)+$//;
+        (my $bunch_name = $section_name) =~ s/^bunch\s+//;
+        $bunch_name =~ s/^"(.+)"$/$1/;
+        push @bunches, {
+            name => $bunch_name,
+            path => $section_config->{path},
+        };
+    } # for section_name0
+
+    unless ($args{detail}) {
+        @bunches = map { $_->{name} } @bunches;
+    }
+
+    [200, "OK", \@bunches];
+}
+
 1;
 # ABSTRACT: Manage gitbunch directory (directory which contain git repos)
 
@@ -1266,7 +1326,7 @@ Git::Bunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.631 of Git::Bunch (from Perl distribution Git-Bunch), released on 2024-10-22.
+This document describes version 0.632 of Git::Bunch (from Perl distribution Git-Bunch), released on 2026-01-03.
 
 =head1 SYNOPSIS
 
@@ -1370,6 +1430,10 @@ full check/sync).
 =item * B<repo> => I<str>
 
 Only process a single repo.
+
+=item * B<sort> => I<str>
+
+Order entries.
 
 =item * B<source>* => I<str>
 
@@ -1476,6 +1540,10 @@ full check/sync).
 =item * B<repo> => I<str>
 
 Only process a single repo.
+
+=item * B<sort> => I<str>
+
+Order entries.
 
 =item * B<source>* => I<str>
 
@@ -1676,6 +1744,48 @@ Order entries.
 =item * B<source>* => I<str>
 
 Directory to check.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 list_bunches
+
+Usage:
+
+ list_bunches(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+List bunches defined in configuration.
+
+A gitbunch directory is defined in the configuration file as a section, e.g.:
+
+ [bunch NAME]
+ path = SOMEPATH
+ 
+ [bunch NAME2]
+ path = !path ~/SOMEPATH
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<detail> => I<bool>
+
+(No description)
 
 
 =back
@@ -1920,7 +2030,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

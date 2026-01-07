@@ -1,0 +1,4 @@
+<start_html title="Content">
+Template Content
+__PERL__
+use WebDyne::Template qw(template.psp);

@@ -1,22 +1,15 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.20;
 use warnings;
 
-use Net::Prometheus;
-
+use Future::IO;
 use Metrics::Any::Adapter 'Prometheus';
+use Net::Prometheus;
 
 use constant LISTEN_PORT => 8200;
 
-# Try to find a usable Future::IO impl
-foreach (qw( UV Glib IOAsync Tickit )) {
-   ( my $file = ( my $class = "Future::IO::Impl::$_" ) . ".pm" ) =~ s(::)(/)g;
-   eval { require $file } and do {
-      print STDERR "Using $class\n";
-      last;
-   };
-}
+Future::IO->load_impl(qw( UV Glib IOAsync Tickit ));
 
 my $client = Net::Prometheus->new;
 

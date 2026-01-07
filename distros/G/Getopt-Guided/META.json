@@ -57,7 +57,7 @@
    "provides" : {
       "Getopt::Guided" : {
          "file" : "lib/Getopt/Guided.pm",
-         "version" : "v2.0.0"
+         "version" : "v3.0.1"
       }
    },
    "release_status" : "stable",
@@ -71,5 +71,5 @@
          "web" : "https://github.com/XSven/Getopt-Guided"
       }
    },
-   "version" : "v2.0.0"
+   "version" : "v3.0.1"
 }

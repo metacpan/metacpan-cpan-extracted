@@ -1,6 +1,6 @@
 package App::dozo;
 
-our $VERSION = "0.9928";
+our $VERSION = "1.00";
 
 1;
 =encoding utf-8
@@ -40,7 +40,7 @@ dozo -I IMAGE [ options ] [ command ... ]
 
 =head1 VERSION
 
-Version 0.9928
+Version 1.00
 
 =head1 USAGE
 
@@ -240,9 +240,11 @@ Kill and remove existing container.
 
 Use live (persistent) container.
 
-=item B<-P> I<port>, B<--port>=I<port>
+=item B<-P> I<port>, B<-P> I<host>:I<container>, B<--port>=I<host>:I<container>
 
-Specify port mapping (e.g., C<8080:80>). Repeatable.
+Specify port mapping. If only I<port> is given (without C<:>), it is
+mapped to the same port in the container (e.g., C<-P 8000> becomes
+C<8000:8000>). Repeatable.
 
 =item B<-O> I<option>, B<--other>=I<option>
 
@@ -548,7 +550,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2025 Kazumasa Utashiro.
+Copyright © 2025-2026 Kazumasa Utashiro.
 
 This software is released under the MIT License.
 L<https://opensource.org/licenses/MIT>

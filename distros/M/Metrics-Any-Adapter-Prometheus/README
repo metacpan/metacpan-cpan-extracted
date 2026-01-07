@@ -26,14 +26,14 @@ DESCRIPTION
     Timer metrics are implemented as distribution metrics with the units
     set to seconds.
 
-    This adapter type supports batch mdoe reporting. Callbacks are invoked
+    This adapter type supports batch mode reporting. Callbacks are invoked
     at the beginning of the Net::Prometheus render method.
 
 METHODS
 
  make_distribution
 
-       $adapter->make_distribution( $name, %args )
+       $adapter->make_distribution( $name, %args );
 
     In addition to the standard arguments, the following are recognised:
 

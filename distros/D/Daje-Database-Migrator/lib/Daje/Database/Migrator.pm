@@ -42,7 +42,7 @@ use Mojo::Loader qw(load_class);
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.01";
+our $VERSION = "1.00";
 
 has 'pg';
 has 'migrations';
@@ -52,15 +52,22 @@ sub migrate($self) {
     my $length = scalar @{$self->migrations};
     for (my $i = 0; $i < $length; $i++) {
         if (exists @{$self->migrations}[$i]->{class}) {
-            my $cl = load_class @{$self->migrations}[$i]->{class};
-            $self->pg->migrations->name(
-                @{$self->migrations}[$i]->{name}
-            )->from_data(
-                @{$self->migrations}[$i]->{class},
-                @{$self->migrations}[$i]->{name}
-            )->migrate(
-                @{$self->migrations}[$i]->{migration}
-            );
+            try {
+                my $cl = load_class @{$self->migrations}[$i]->{class};
+                $self->pg->migrations->name(
+                    @{$self->migrations}[$i]->{name}
+                )->from_data(
+                    @{$self->migrations}[$i]->{class},
+                    @{$self->migrations}[$i]->{name}
+                )->migrate(
+                    @{$self->migrations}[$i]->{migration}
+                );
+            } catch($e) {
+                say $e;
+                say @{$self->migrations}[$i]->{class};
+                say @{$self->migrations}[$i]->{name};
+                say @{$self->migrations}[$i]->{migration};
+            }
         } elsif (exists @{$self->migrations}[$i]->{file}) {
             $self->pg->migrations->name(
                 @{$self->migrations}[$i]->{name}

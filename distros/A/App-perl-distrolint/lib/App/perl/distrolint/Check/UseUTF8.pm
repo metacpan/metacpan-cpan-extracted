@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.807;
 
-class App::perl::distrolint::Check::UseUTF8 0.07;
+class App::perl::distrolint::Check::UseUTF8 0.08;
 
 apply App::perl::distrolint::CheckRole::EachFile;
 apply App::perl::distrolint::CheckRole::TreeSitterPerl;

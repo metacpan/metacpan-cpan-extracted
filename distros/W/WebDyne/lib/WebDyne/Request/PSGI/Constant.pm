@@ -1,7 +1,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -32,7 +32,7 @@ require WebDyne::Constant;
 
 #  Version information
 #
-$VERSION='2.038';
+$VERSION='2.046';
 
 
 
@@ -51,6 +51,11 @@ $VERSION='2.038';
     #  file specified.
     #
     DOCUMENT_DEFAULT	=> 'app.psp',
+    
+    
+    #  File to use for indexing
+    #
+    WEBDYNE_PSGI_INDEX	=> 'index.psp',
     
     
     #  Middeware config, static module. Loaded by default for convenience if

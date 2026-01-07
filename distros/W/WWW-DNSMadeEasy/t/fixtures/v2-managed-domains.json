@@ -1,0 +1,4 @@
+{"data": [
+  {"id": 100001, "name": "example.com", "gtdEnabled": false, "created": 1609459200000, "updated": 1609545600000},
+  {"id": 100002, "name": "test.org", "gtdEnabled": false, "created": 1609459200000, "updated": 1609545600000}
+]}

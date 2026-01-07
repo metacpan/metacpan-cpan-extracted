@@ -1,12 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2026 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Registry 0.14;
+package Net::Prometheus::Registry 0.15;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( signatures );
+no warnings qw( experimental::signatures );
 
 use Carp;
 
@@ -42,9 +45,8 @@ Returns a new registry instance.
 
 =cut
 
-sub new
+sub new ( $class )
 {
-   my $class = shift;
    return bless [], $class;
 }
 
@@ -62,10 +64,9 @@ returned, for convenience of chaining method calls on it.
 
 =cut
 
-sub register
+sub register ( $self, $collector )
 {
-   my $collectors = ( ref $_[0] ) ? $_[0] : \@COLLECTORS;
-   my ( undef, $collector ) = @_;
+   my $collectors = ( ref $self ) ? $self : \@COLLECTORS;
 
    # TODO: ban duplicate registration
    push @$collectors, $collector;
@@ -82,10 +83,9 @@ Removes a previously-registered collector.
 
 =cut
 
-sub unregister
+sub unregister ( $self, $collector )
 {
-   my $collectors = ( ref $_[0] ) ? $_[0] : \@COLLECTORS;
-   my ( undef, $collector ) = @_;
+   my $collectors = ( ref $self ) ? $self : \@COLLECTORS;
 
    my $found;
    @$collectors = grep {
@@ -105,9 +105,9 @@ Returns a list of the currently-registered collectors.
 
 =cut
 
-sub collectors
+sub collectors ( $self )
 {
-   my $collectors = ( ref $_[0] ) ? $_[0] : \@COLLECTORS;
+   my $collectors = ( ref $self ) ? $self : \@COLLECTORS;
    return @$collectors;
 }
 

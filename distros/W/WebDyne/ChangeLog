@@ -1,3 +1,209 @@
+commit 1fc5077807b336f8901d0fda5702602eb0d512e8
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Jan 5 23:27:43 2026 +1030
+
+    VERSION increment: 2.046
+
+commit 4bebe44501cbc0b0ea5d86becb1a552c9c99dc97
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Jan 5 23:27:11 2026 +1030
+
+    Remove Plack::Middleware::ForceEnv dependency
+
+commit bc78f39f02b2787dd481d38e68b8a527e772438c
+Merge: d01c9be 0798a07
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Jan 5 10:18:46 2026 +1030
+
+    WIP on main: d01c9be VERSION increment: 2.045
+
+commit 0798a0787d83be7f550678d46856030118edf930
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Jan 5 10:18:46 2026 +1030
+
+    index on main: d01c9be VERSION increment: 2.045
+
+commit d01c9be004e7ee4cf9e216ae950eaddfaad0dce9
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Jan 4 12:00:07 2026 +1030
+
+    VERSION increment: 2.045
+
+commit 59a8fabb6cc73f2b8e1b7b73b8f20d7a1c6d7088
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Jan 4 11:59:45 2026 +1030
+
+    Fix json_handler_boolean.psp test
+
+commit 98ca8ed00a4728954b3a2685522f14a745f424f7
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Jan 3 18:01:13 2026 +1030
+
+    VERSION increment: 2.044
+
+commit ac543b9f8e5365f6939634635b6a390c913e51d4
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Jan 3 18:00:56 2026 +1030
+
+    Added new tests for JSON output from perl handlers
+
+commit 225cdda38fbc8c6bc6afc022bceb9fb28b39551d
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Jan 3 17:17:21 2026 +1030
+
+    Fixed the way we handle JSON data return to support hash, array, scalar and boolean returns
+
+commit 5f845692c557dfd603ba16a9c8ce88c7966825a8
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Jan 3 13:47:03 2026 +1030
+
+    VERSION increment: 2.043
+
+commit 5fe74bf8497447ccfac068fd99ccf656e782dc0f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Jan 3 13:31:28 2026 +1030
+
+    Added two missing test files causing build to fail
+
+commit d99451a6068bbeca5e88ed7b748c16cb3394d763
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Jan 3 12:41:02 2026 +1030
+
+    Add carton diagnostics to try and flush out Docker build error
+
+commit 2fc75def03911d7de6c2b81fb1f72d55f6e008ea
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Jan 3 12:01:47 2026 +1030
+
+    Add carton diagnostics to try and flush out Docker build error
+
+commit e5f49cf58cadf0f1994c4bb732acb5add08f415e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Jan 3 10:50:07 2026 +1030
+
+    Add diagnostics to Alpine build
+
+commit a8a3d907dadff1323af7de79f403e22588c44af6
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Jan 3 10:06:25 2026 +1030
+
+    Add diagnostics to Dockerfile to debug carton failure
+
+commit a896c03adf85ee328f6faa41c86434a27082e524
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 2 21:47:58 2026 +1030
+
+    VERSION increment: 2.042
+
+commit ebcf1f466e0a4342937a5112e365698d4ebce674
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 2 18:14:20 2026 +1030
+
+    Add 11-constant.t to MANIFEST
+
+commit 047050e9660c02eda557dde9919822a181f77655
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 2 18:13:40 2026 +1030
+
+    Cleanup WebDyne::Constant import function to work more consistantly, cleanup text/html, text/plain etc. variables and add encoding, add WebDyne::Constant test
+
+commit c07c617ab748e9fb48db3b262664860ccfbc2f6f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 2 00:05:28 2026 +1030
+
+    Interim commit
+
+commit f3457bdde43fc2da7406b14899e2390d1de1f1e4
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Dec 30 12:04:08 2025 +1030
+
+    VERSION increment: 2.041
+
+commit a1e9bed501faf48f194832b54bc96a492760b391
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Dec 30 12:03:32 2025 +1030
+
+    Update documentation, cpanfile, docker/cpanfile
+
+commit 93fe101f0bdb7209f5ea36f0726c4fa53b2041ee
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 29 15:34:56 2025 +1030
+
+    VERSION increment: 2.040
+
+commit bdd9b520735415eebee92afc37f2b89d79af76e4
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 29 15:33:36 2025 +1030
+
+    Added missing 09-static.t test file to MANIFEST
+
+commit e0ab6432d769961c275f65a3347de1c260a26bb0
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 29 15:30:35 2025 +1030
+
+    Add new title and template test files
+
+commit 92ce7bcc8c15ed5f8644a01782dbd4c92b230f8a
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 29 15:26:08 2025 +1030
+
+    Optimise some WebDyne vars by changing for constant versions (no $ symbol) + fixeds to WebDyne::Template
+
+commit 50ef9687d6789a5c43dac0ebea1ada46c1b102d2
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Dec 28 18:36:57 2025 +1030
+
+    VERSION increment: 2.039
+
+commit 54e3b9f0c8544ff3cf10d807c9464bf7c5c713ea
+Merge: bb3c767 43b4a55
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Dec 28 18:36:04 2025 +1030
+
+    Merge branch 'documentation'
+
+commit 43b4a55f522898a45dafff5d58187ff57331b9ba
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Dec 28 18:24:44 2025 +1030
+
+    More work on dir_config to allow loading config from any .webdyne.conf.pl file in a directory
+
+commit e7ae75130890537532e2ff3991dad7d73213b1a6
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Dec 28 11:58:22 2025 +1030
+
+    Modify WebDyne::Constant to allow late import of local WEBDYNE_CONF file, update webdyne.psgi to read WEBDYNE_CONF as .webdyne.conf.pl from DOCUMENT_ROOT at startup
+
+commit 69de0afdb3490f6415c74e10e7dbc904834f9c84
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Dec 27 23:49:30 2025 +1030
+
+    Allow dir_config to load up WEBDYNE_DIR_CONFIG from .webdyne.conf.pl in DOCUMENT_ROOT location
+
+commit fffb8f6613be72b2b998b0e609c620a339c690e0
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Dec 27 23:05:08 2025 +1030
+
+    Alter webdyne.psgi to just use WebDyne handler - don't try to work it out. Add some more internal dumps to error handler, fix PSGI content_type method to be self-contained, not use SUPER::content_type
+
+commit 753524d749d86cb5e28b9adf5fb46b150b5218b1
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Dec 27 17:08:32 2025 +1030
+
+    Clean up index.psp code so it overrides any local handler and always just uses plain WebDyne handler
+
+commit 319d5e17e2e7147ab740a3c699c62c16382b2521
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Dec 27 14:52:30 2025 +1030
+
+    Convert shebang to '\!/usr/bin/env perl' so works better on Mac
+
+commit d1feafcce4d21c23c2f809ae0a26aa1c19fc580e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Dec 26 09:27:04 2025 +1030
+
+    Fix incorrect decode of HTML entities in README.md
+
 commit bb3c767e0b51e61ede2fde84d20d5991eb849bc8
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Wed Dec 24 20:07:00 2025 +1030

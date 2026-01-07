@@ -93,20 +93,66 @@ These methods return C<$self> for fluent chaining.
 =head2 status
 
     $res->status(404);
+    my $code = $res->status;
 
-Set the HTTP status code (100-599).
+Set or get the HTTP status code (100-599). Returns C<$self> when setting
+for fluent chaining. When getting, returns 200 if no status has been set.
+
+    my $res = PAGI::Response->new($scope, $send);
+    $res->status;           # 200 (default, nothing set yet)
+    $res->has_status;       # false
+    $res->status(201);      # set explicitly
+    $res->has_status;       # true
+
+=head2 status_try
+
+    $res->status_try(404);
+
+Set the HTTP status code only if one hasn't been set yet. Useful in
+middleware or error handlers to provide fallback status codes without
+overriding choices made by the application:
+
+    $res->status_try(202);  # sets to 202 (nothing was set)
+    $res->status_try(500);  # no-op, 202 already set
 
 =head2 header
 
     $res->header('X-Custom' => 'value');
+    my $value = $res->header('X-Custom');
 
 Add a response header. Can be called multiple times to add multiple headers.
+If called with only a name, returns the last value for that header or C<undef>.
+
+=head2 headers
+
+    my $headers = $res->headers;
+
+Returns the full header arrayref C<[ name, value ]> in order.
+
+=head2 header_all
+
+    my @values = $res->header_all('Set-Cookie');
+
+Returns all values for the given header name (case-insensitive).
+
+=head2 header_try
+
+    $res->header_try('X-Custom' => 'value');
+
+Add a response header only if that header name has not already been set.
 
 =head2 content_type
 
     $res->content_type('text/html; charset=utf-8');
+    my $type = $res->content_type;
 
 Set the Content-Type header, replacing any existing one.
+
+=head2 content_type_try
+
+    $res->content_type_try('text/html; charset=utf-8');
+
+Set the Content-Type header only if it has not already been set.
 
 =head2 cookie
 
@@ -127,21 +173,6 @@ httponly, samesite.
     $res->delete_cookie('session');
 
 Delete a cookie by setting it with Max-Age=0.
-
-=head2 path_param
-
-    my $id = $res->path_param('id');
-
-Returns a path parameter by name. Path parameters are captured from the URL
-path by a router and stored in C<< $scope->{path_params} >>. Returns C<undef>
-if the parameter is not found or if no scope was provided.
-
-=head2 path_params
-
-    my $params = $res->path_params;
-
-Returns hashref of all path parameters from scope. Returns an empty hashref
-if no path parameters exist or if no scope was provided.
 
 =head2 stash
 
@@ -172,6 +203,27 @@ See L<PAGI::Request/stash> for detailed documentation on how stash works.
 Returns true if the response has already been finalized (sent to the client).
 Useful in error handlers or middleware that need to check whether they can
 still send a response.
+
+=head2 has_status
+
+    if ($res->has_status) { ... }
+
+Returns true if a status code has been explicitly set via C<status> or
+C<status_try>.
+
+=head2 has_header
+
+    if ($res->has_header('content-type')) { ... }
+
+Returns true if the given header name has been set via C<header> or
+C<header_try>. Header names are case-insensitive.
+
+=head2 has_content_type
+
+    if ($res->has_content_type) { ... }
+
+Returns true if Content-Type has been explicitly set via C<content_type>,
+C<content_type_try>, or C<header>/C<header_try> with a Content-Type name.
 
 =head2 cors
 
@@ -234,14 +286,14 @@ B<Important CORS Notes:>
 
 =over 4
 
-=item * When C<credentials> is true, you cannot use C<origin => '*'>.
+=item * When C<credentials> is true, you cannot use C<< origin => '*' >>.
 Either specify an exact origin, or pass C<request_origin> with the
 client's actual Origin header.
 
 =item * The C<Vary: Origin> header is always set to ensure proper caching
 when origin-specific responses are used.
 
-=item * For preflight (OPTIONS) requests, set C<preflight => 1> and
+=item * For preflight (OPTIONS) requests, set C<< preflight => 1 >> and
 typically respond with C<< $res->status(204)->empty() >>.
 
 =back
@@ -660,10 +712,11 @@ sub new {
     croak("send must be a coderef") unless ref($send) eq 'CODE';
 
     my $self = bless {
-        send    => $send,
-        scope   => $scope,
-        _status => 200,
-        _headers => [],
+        send              => $send,
+        scope             => $scope,
+        # _status not set here - uses exists() check and lazy default of 200
+        _headers            => [],
+        _header_set         => {},
     }, $class;
 
     return $self;
@@ -671,39 +724,93 @@ sub new {
 
 sub status {
     my ($self, $code) = @_;
+    return $self->{_status} // 200 if @_ == 1;  # lazy default
     croak("Status must be a number between 100-599")
-        unless defined $code && $code =~ /^\d+$/ && $code >= 100 && $code <= 599;
+        unless $code =~ /^\d+$/ && $code >= 100 && $code <= 599;
     $self->{_status} = $code;
     return $self;
 }
 
+sub status_try {
+    my ($self, $code) = @_;
+    return $self if exists $self->{_status};
+    return $self->status($code);
+}
+
 sub header {
     my ($self, $name, $value) = @_;
+    croak("Header name is required") unless defined $name;
+    if (@_ == 2) {
+        my $key = lc($name);
+        for (my $i = $#{$self->{_headers}}; $i >= 0; $i--) {
+            my $pair = $self->{_headers}[$i];
+            return $pair->[1] if lc($pair->[0]) eq $key;
+        }
+        return undef;
+    }
     push @{$self->{_headers}}, [$name, $value];
+    my $key = lc($name // '');
+    $self->{_header_set}{$key} = 1 if length $key;
+    if ($key eq 'content-type') {
+        $self->{_content_type} = $value;
+    }
     return $self;
+}
+
+sub headers {
+    my ($self) = @_;
+    return $self->{_headers};
+}
+
+sub header_all {
+    my ($self, $name) = @_;
+    croak("Header name is required") unless defined $name;
+    my $key = lc($name);
+    my @values;
+    for my $pair (@{$self->{_headers}}) {
+        push @values, $pair->[1] if lc($pair->[0]) eq $key;
+    }
+    return @values;
+}
+
+sub header_try {
+    my ($self, $name, $value) = @_;
+    return $self if $self->has_header($name);
+    return $self->header($name, $value);
 }
 
 sub content_type {
     my ($self, $type) = @_;
+    return $self->{_content_type} if @_ == 1;
     # Remove existing content-type headers
     $self->{_headers} = [grep { lc($_->[0]) ne 'content-type' } @{$self->{_headers}}];
     push @{$self->{_headers}}, ['content-type', $type];
+    $self->{_header_set}{'content-type'} = 1;
+    $self->{_content_type} = $type;
     return $self;
 }
 
-# Path parameters - captured from URL path by router
-# Stored in scope->{path_params} for router-agnostic access
-sub path_params {
-    my ($self) = @_;
-    return {} unless $self->{scope};
-    return $self->{scope}{path_params} // {};
+sub content_type_try {
+    my ($self, $type) = @_;
+    return $self if exists $self->{_content_type};
+    return $self->content_type($type);
 }
 
-sub path_param {
+sub has_status {
+    my ($self) = @_;
+    return exists $self->{_status} ? 1 : 0;
+}
+
+sub has_header {
     my ($self, $name) = @_;
-    return undef unless $self->{scope};
-    my $params = $self->{scope}{path_params} // {};
-    return $params->{$name};
+    my $key = lc($name // '');
+    return 0 unless length $key;
+    return $self->{_header_set}{$key} ? 1 : 0;
+}
+
+sub has_content_type {
+    my ($self) = @_;
+    return exists $self->{_content_type} ? 1 : 0;
 }
 
 # Per-request storage - lives in scope, shared across Request/Response/WebSocket/SSE
@@ -741,7 +848,7 @@ async sub send_raw {
     # Send start
     await $self->{send}->({
         type    => 'http.response.start',
-        status  => $self->{_status},
+        status  => $self->status,  # uses lazy default of 200
         headers => $self->{_headers},
     });
 
@@ -807,8 +914,8 @@ async sub redirect {
 
 async sub empty {
     my ($self) = @_;
-    # Use 204 if status hasn't been explicitly set to something other than 200
-    if ($self->{_status} == 200) {
+    # Use 204 if status hasn't been explicitly set
+    unless (exists $self->{_status}) {
         $self->{_status} = 204;
     }
     await $self->send_raw(undef);
@@ -882,52 +989,6 @@ sub cors {
     return $self;
 }
 
-# Writer class for streaming
-package PAGI::Response::Writer {
-    use strict;
-    use warnings;
-    use Future::AsyncAwait;
-    use Carp qw(croak);
-
-    sub new {
-        my ($class, $send) = @_;
-        return bless {
-            send => $send,
-            bytes_written => 0,
-            closed => 0,
-        }, $class;
-    }
-
-    async sub write {
-        my ($self, $chunk) = @_;
-        croak("Writer already closed") if $self->{closed};
-        $self->{bytes_written} += length($chunk // '');
-        await $self->{send}->({
-            type => 'http.response.body',
-            body => $chunk,
-            more => 1,
-        });
-    }
-
-    async sub close {
-        my ($self) = @_;
-        return if $self->{closed};
-        $self->{closed} = 1;
-        await $self->{send}->({
-            type => 'http.response.body',
-            body => '',
-            more => 0,
-        });
-    }
-
-    sub bytes_written {
-        my ($self) = @_;
-        return $self->{bytes_written};
-    }
-}
-
-package PAGI::Response;
-
 async sub stream {
     my ($self, $callback) = @_;
     $self->_mark_sent;
@@ -935,7 +996,7 @@ async sub stream {
     # Send start
     await $self->{send}->({
         type    => 'http.response.start',
-        status  => $self->{_status},
+        status  => $self->status,  # uses lazy default of 200
         headers => $self->{_headers},
     });
 
@@ -1025,7 +1086,7 @@ async sub send_file {
     # Send response start
     await $self->{send}->({
         type    => 'http.response.start',
-        status  => $self->{_status},
+        status  => $self->status,  # uses lazy default of 200
         headers => $self->{_headers},
     });
 
@@ -1040,6 +1101,50 @@ async sub send_file {
     $body_event->{length} = $length if $length < $max_length;
 
     await $self->{send}->($body_event);
+}
+
+# Writer class for streaming responses
+package PAGI::Response::Writer {
+    use strict;
+    use warnings;
+    use Future::AsyncAwait;
+    use Carp qw(croak);
+
+    sub new {
+        my ($class, $send) = @_;
+        return bless {
+            send => $send,
+            bytes_written => 0,
+            closed => 0,
+        }, $class;
+    }
+
+    async sub write {
+        my ($self, $chunk) = @_;
+        croak("Writer already closed") if $self->{closed};
+        $self->{bytes_written} += length($chunk // '');
+        await $self->{send}->({
+            type => 'http.response.body',
+            body => $chunk,
+            more => 1,
+        });
+    }
+
+    async sub close {
+        my ($self) = @_;
+        return if $self->{closed};
+        $self->{closed} = 1;
+        await $self->{send}->({
+            type => 'http.response.body',
+            body => '',
+            more => 0,
+        });
+    }
+
+    sub bytes_written {
+        my ($self) = @_;
+        return $self->{bytes_written};
+    }
 }
 
 1;

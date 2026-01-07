@@ -16,7 +16,7 @@ my %FIXED;
 my %PRIMARY_KEYS;
 my %CONVERTERS;
 
-our $VERSION = "0.7";
+our $VERSION = "0.8";
 
 sub import {
     my $caller          = caller;

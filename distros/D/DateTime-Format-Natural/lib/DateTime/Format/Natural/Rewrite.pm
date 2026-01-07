@@ -3,7 +3,7 @@ package DateTime::Format::Natural::Rewrite;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub _rewrite
 {
@@ -22,7 +22,7 @@ sub _rewrite_regular
     my ($date_string) = @_;
 
     $$date_string =~ tr/,//d;
-    $$date_string =~ s/\s+?(am|pm)\b/$1/gi;
+    $$date_string =~ s/\s+?(a\.?m\.?|p\.?m\.?)\b/$1/gi;
 }
 
 sub _rewrite_conditional

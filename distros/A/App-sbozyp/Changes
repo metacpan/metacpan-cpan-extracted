@@ -1,5 +1,10 @@
+1.4.1  2026-01-02
+
+   - Documentation updates
+
 1.4.0  2025-12-25
 
+   - FIRST STABLE VERSION
    - Added install/build -z flag to save sources (PR #22)
    - Moved contributor list into CONTRIBUTORS file
    - Move sbozyp package-specific files into package/ dir

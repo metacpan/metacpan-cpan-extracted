@@ -146,7 +146,7 @@ You can do the same with `send_multiple_mail`:
         ]
     );
 
-`mail`, a hashref, obviously contains the `Email::Mailer-`new()> arguments and `send`, an arrayref,
+`mail`, a hashref, obviously contains the `Email::Mailer->new()` arguments and `send`, an arrayref,
 contains the `Email::Mailer-`send()> arguments.
 
 If `send_multiple_mail()` succeeds, it'll return an array or arrayref (based on context) of the [Email::Mailer](https://metacpan.org/pod/Email::Mailer)

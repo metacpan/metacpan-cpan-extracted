@@ -1,14 +1,14 @@
 package Daje::Database::Model::Super::ToolsObjectSQL;
 use Mojo::Base 'Daje::Database::Model::Super::Common::Base', -base, -signatures, -async_await;;
 
-has 'fields' => "tools_object_sql_pkey, editnum, insby, insdatetime, modby, moddatetime, tools_version_fkey, tools_objects_fkey, sql_string";
+has 'fields' => "tools_object_sql_pkey, editnum, insby, insdatetime, modby, moddatetime, tools_version_fkey, tools_objects_fkey, name, comment, sql_string";
 has 'primary_key_name' => "tools_object_sql_pkey";
 has 'table_name' => "tools_object_sql";
 
 
 
 async sub load_tools_object_sql_pkey_p($self, $tools_object_sql_pkey) {
-    return $self->load_tools_object_pkey($tools_object_sql_pkey)
+    return $self->load_tools_object_sql_pkey($tools_object_sql_pkey)
 }
 
 sub load_tools_object_sql_pkey($self, $tools_object_sql_pkey) {

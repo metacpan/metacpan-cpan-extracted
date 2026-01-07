@@ -1,7 +1,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -58,7 +58,7 @@ my %Package;
 
 #  Version information
 #
-$VERSION='2.038';
+$VERSION='2.046';
 
 
 #  Debug load
@@ -314,8 +314,7 @@ sub _start_html {
 
     #  Pull out meta attributes leaving rest presumably native html tag attribs
     #
-    #my %attr_page=map {$_=>delete $attr_hr->{$_}} qw(
-    my %attr_page=map {$_ => delete $attr{$_}} qw(
+    my %attr_page=map {$_ => delete $attr{$_}}  grep { exists($attr{$_}) } qw(
         title
         meta
         style
@@ -328,6 +327,7 @@ sub _start_html {
         include_style
         static
         cache
+        handler
     );
     debug('start_html %s', Dumper(\%attr_page));
 
@@ -340,7 +340,7 @@ sub _start_html {
     #  Static, cache ? If so mark as such in HTML::Tiny object to be 
     #  reviewed at end of parse by Treebuilder. Not ideal, good enough
     #
-    foreach my $attr (qw(static cache)) {
+    foreach my $attr (qw(static cache handler)) {
         if (my $value=$attr_page{$attr}) {
             debug("found attr: $attr, setting to value: $value");
             $self->{"_${attr}"}=$value;
@@ -471,7 +471,24 @@ sub _start_html {
     #
     my $title;
     unless (@include && (grep {/<title>.*?<\/title>/i} @include)) {
-        $title=$attr_page{'title'} || $WEBDYNE_HTML_DEFAULT_TITLE;
+        if (defined($attr_page{'title'})) {
+            #  Title is defined (presumably some string)
+            #
+            debug('title attr defined, using: %s', $attr_page{'title'});
+            $title=$self->title($attr_page{'title'});
+        }
+        elsif (exists($attr_page{'title'})) {
+            #  Exists but undefined, leave title undef also
+            #
+            debug('title attr exists but undefined, leaving undefined');
+            $title=undef;
+        }
+        else {
+            #  No title attr at all, use default
+            #
+            debug('title attr not present, using default title');
+            $title=$self->title($WEBDYNE_HTML_DEFAULT_TITLE);
+        }
     }
     debug('title: %s', $title || '*undef*');
         
@@ -481,14 +498,13 @@ sub _start_html {
     my $head=$self->SUPER::head(
         join(
             $/,
-            grep {$_}
-                #$self->title($attr_page{'title'} ? $attr_page{'title'} : $WEBDYNE_HTML_DEFAULT_TITLE),
-                $title && $self->title($title),
-            #$title,
-            @meta,
-            @link,
-            @script,
-            @include
+            grep {$_} (
+                $title,
+                @meta,
+                @link,
+                @script,
+                @include
+            )
         ));
 
 

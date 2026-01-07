@@ -9,7 +9,7 @@ my $json = q({
     { "name": "Alice" },
     { "name": "Bob" }
   ],
-  "mixed": ["alpha beta", null, ["inner"], {"skip": "value"}],
+  "mixed": ["alpha beta", null, ["inner"], {"skip": "value"}, true],
   "trailing": "tail,",
   "dots": "a.b.c"
 });
@@ -24,12 +24,25 @@ is_deeply($chars[0], [qw(A l i c e)], 'split("") returns individual characters')
 
 my @array = $jq->run_query($json, '.mixed | split(" ")');
 my $expected = [
-    [qw(alpha beta)],
-    [],
-    [[qw(inner)]],
+    qw(alpha beta),
+    undef,
+    'inner',
     { skip => 'value' },
+    'true',
 ];
-is_deeply($array[0], $expected, 'split applies recursively to arrays and keeps non-strings untouched');
+is_deeply($array[0], $expected, 'split applies recursively to arrays and flattens nested results');
+
+my @null_value = $jq->run_query('null', 'split(",")');
+ok(!defined $null_value[0], 'split propagates null inputs rather than dropping them');
+
+my @bool_chars = $jq->run_query('true', 'split("")');
+is_deeply($bool_chars[0], [qw(t r u e)], 'split treats booleans like strings when splitting characters');
+
+my @bool_array = $jq->run_query('[true,false]', 'split(",")');
+is_deeply($bool_array[0], [qw(true false)], 'split flattens results for arrays of booleans');
+
+my @mixed_flat = $jq->run_query('[true,"a,b",false]', 'split(",")');
+is_deeply($mixed_flat[0], [qw(true a b false)], 'split flattens results for mixed arrays containing strings and booleans');
 
 my @literal = $jq->run_query($json, '.dots | split(".")');
 is_deeply($literal[0], [qw(a b c)], 'split uses literal separator rather than regex');

@@ -3,7 +3,7 @@ use experimental 'class';
 
 class Daje::Workflow::Roadmap::Load {
     use Daje::Config;
-use Data::Dumper;
+    use Data::Dumper;
 
     field $workflow :reader;
     field $path :param;
@@ -25,8 +25,6 @@ use Data::Dumper;
 
     method get_state( $workflow_name, $state_name) {
         my $flow = $workflow->{$workflow_name};
-        say Dumper($flow);
-        say $state_name;
         my $length = scalar @{$flow};
         my $state;
         for (my $i = 0; $i < $length; $i++) {

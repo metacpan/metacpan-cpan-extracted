@@ -64,7 +64,7 @@ open my $tsv, '>', $filename;
 foreach my $file (list_regex_files('\.svg$', 'output.images')) {
 	my $text = file2string($file);
 	my @text = split /\n/, $text;
-	printf("$file: Starting with %u lines\n", scalar @text);
+	my $starting_size = scalar @text;
 	@text = grep {$_ !~ m/^\h*\<dc:title\>made.+\/Simple\.pm\<\/dc:title\>$/} @text;
 	@text = grep {$_ !~ m/^\h*\<dc:date\>/}        @text;
 	@text = grep {$_ !~ m/^\h*\<path\h+id="/}      @text;
@@ -74,7 +74,7 @@ foreach my $file (list_regex_files('\.svg$', 'output.images')) {
 	foreach my $line (grep {/id="image[a-z\d]+"/} @text) {
 		$line =~ s/\h+id="image[a-z\d]+"//;
 	}
-	printf("$file: Ending with %u lines\n", scalar @text);
+	printf("$file: Went from $starting_size lines -> %u lines\n", scalar @text);
 	say '------------';
 	$text = join ("\n", @text);
 	$file =~ s/^output\.images/\/tmp/;

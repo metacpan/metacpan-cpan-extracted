@@ -1,0 +1,36 @@
+commit e37bd4de74cfd5e37cbd23763cf51071d9f8c81a
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Jan 6 00:33:16 2026 +1030
+
+    VERSION increment: 0.003
+
+commit 5909925bfe65b2574c1ff4536ab08cb5874fec8b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Jan 6 00:32:58 2026 +1030
+
+    Updated doc
+
+commit 12851b889a59be9d21e5649ecc524dd987e5d893
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Jan 6 00:17:34 2026 +1030
+
+    VERSION increment: 0.002
+
+commit 0abc78a54f2e8c605dde0b38533b4c2a63fadaf0
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Jan 6 00:17:28 2026 +1030
+
+    Version fix
+
+commit 7e8ef0a6cf28ff0b790be1158ce3ce333d63cc2f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Jan 5 11:49:36 2026 +1030
+
+    Initial commit
+
+commit dd117dd8d3f43fac201427ca31dcccba3ffe0b6f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Jan 5 11:48:23 2026 +1030
+
+    MANIFEST Import
+

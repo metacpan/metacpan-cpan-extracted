@@ -11,6 +11,7 @@
 #  <http://dev.perl.org/licenses/>
 #
 <html lang="en">
+<meta name="WebDyne" content="handler=WebDyne">
 <head>
 
 <!-- Heading section with status code as page title -->
@@ -268,6 +269,18 @@ ${webdyne_err_internal}
 </pre>
 </td></tr>
 
+<tr><td>
+<br>
+<br>
+<b>Request:</b>
+</td></tr>
+
+<tr><td class="td">
+<br>
+<pre>
+${webdyne_request_dump}
+</pre>
+</td></tr>
 
 
 </block>
@@ -650,7 +663,9 @@ sub err_display {
     if ($WEBDYNE_ERROR_INTERNAL_SHOW) {
         my $webdyne_err_internal_dumper=Data::Dumper->Dump([\%err_internal], ['WebDyne::ERROR']);
         $webdyne_err_internal_dumper=$cgi_or->escapeHTML($webdyne_err_internal_dumper);
-        $self->render_block('webdyne_err_internal', webdyne_err_internal=>$webdyne_err_internal_dumper);
+        my $webdyne_request_dump=Data::Dumper->Dump([$r], ['WebDyne::Request']);
+        $webdyne_request_dump=$cgi_or->escapeHTML($webdyne_request_dump);
+        $self->render_block('webdyne_err_internal', webdyne_err_internal=>$webdyne_err_internal_dumper, webdyne_request_dump=>$webdyne_request_dump);
     }
 
 

@@ -167,6 +167,11 @@ theoretically can change. In practice, this is not a real problem, since the
 object IDs that are actually used in certificates have not changed in many
 years. So in practice it will be fine.
 
+## Version History
+
+- 0.2 (Draft): No changes from 0.1
+- 0.1 (Draft): Initial TLS extension specification
+
 ## Copyright
 
 This document has been placed in the public domain.

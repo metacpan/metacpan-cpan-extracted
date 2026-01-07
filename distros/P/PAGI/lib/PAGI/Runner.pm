@@ -6,6 +6,7 @@ use Getopt::Long qw(GetOptionsFromArray :config pass_through no_auto_abbrev no_i
 use Pod::Usage;
 use File::Spec;
 use POSIX qw(setsid);
+use FindBin ();
 
 use PAGI;
 
@@ -99,6 +100,11 @@ it's treated as a file path:
     pagi-server /path/to/myapp.psgi
 
 The file is loaded via C<do> and must return a coderef.
+
+For compatibility with Plack's C<plackup>, the runner localizes C<$0> to the
+app file before loading it. This ensures C<FindBin::Bin> resolves to the app
+file directory inside the app. If C<FindBin> was already loaded, the runner
+also calls C<FindBin::again()> to refresh its cached path.
 
 =head2 Default
 
@@ -713,6 +719,13 @@ sub _load_file {
     $file = File::Spec->rel2abs($file);
 
     die "App file not found: $file\n" unless -f $file;
+
+    # Match plackup behavior so FindBin::Bin resolves to the app file directory
+    local $0 = $file;
+    local @ARGV = ($file);
+    if (exists $INC{'FindBin.pm'}) {
+        FindBin::again();
+    }
 
     my $app = do $file;
 

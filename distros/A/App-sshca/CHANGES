@@ -1,4 +1,11 @@
 
+0.0.5   2026-01-03
+   [Added]
+     - Add 'list' command for monitoring certificate expiry
+     - Add 'revoke' command -- changes certificate status;
+       does not (yet) generate a revocation list
+     - Add 'cleanup' command to remove expired certificates
+
 0.0.4   2025-07-24
    [Fixed]
      - Certificate principles and options silently

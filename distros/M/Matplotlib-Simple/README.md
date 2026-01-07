@@ -3,6 +3,8 @@
 Take a data structure in Perl, and automatically write a Python3 script using matplotlib to generate an image.  The Python3 script is saved in `/tmp`, to be edited at the user's discretion.
 Requires python3 and matplotlib installations.
 
+My aim is to simplify the most common tasks as much as possible.  In my opinion, using this module is much easier than matplotlib itself.
+
 # Single Plots
 Simplest use case:
 
@@ -68,9 +70,33 @@ which produces the following subplots image:
 
 `bar`, `barh`, `boxplot`, `hexbin`, `hist`, `hist2d`, `imshow`, `pie`, `plot`, `scatter`, and `violinplot` all match the methods in matplotlib itself.
 
+## Options
+
+`sharex` and `sharey` are both implemented at the plot, rather than subplot, level.  See Matplotlib's documentation for more clarity.
+
+# Color Bars (colorbars)
+
+Colarbar args attempt to match matplotlib closely
+
+| Option | Description | Example |
+| -------- | ------- | ------- 
+|`cbdrawedges` | Whether to draw lines at color boundaries | `cbdrawedges => 1`|
+|`cblabel`      | The label on the colorbar's long axis | `cblabel => 1` |
+|`cblocation`   |  of the colorbar None or {'left', 'right', 'top', 'bottom'} | |
+|`cborientation` | # None or {`vertical`, `horizontal`} |
+|`cbpad`        | pad : float, default: 0.05 if vertical, 0.15 if horizontal; Fraction of original Axes between colorbar and new image Axes
+|`cb_logscale`  | Perl true (anything but 0) or false (0)| |
+|`shared.colorbar` | share colorbar between different plots: specify plot indices | `'shared.colorbar' => [0,1]`|
+
+# Size/Dimensions of output file
+
+| Option | Description | Example |
+| -------- | ------- | ------- |
+|`scale`  | scale/multiply the size of the output figure | `scale => 2.4`|
+|`scalex` | scale/multiply the x-axis only | `scalex => 2.4` |
+|`scaley` | scale/multiply the y-axis only | `scalex => 1.4` |
 
 # Examples/Plot Types
-
 
 Consider the following helper subroutines to generate data to plot:
 

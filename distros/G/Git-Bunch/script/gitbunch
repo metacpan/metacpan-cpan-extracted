@@ -7,9 +7,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-10-22'; # DATE
+our $DATE = '2026-01-03'; # DATE
 our $DIST = 'Git-Bunch'; # DIST
-our $VERSION = '0.631'; # VERSION
+our $VERSION = '0.632'; # VERSION
 
 Perinci::CmdLine::Any->new(
     url => '/Git/Bunch/',
@@ -19,8 +19,11 @@ Perinci::CmdLine::Any->new(
         exec   => { url => '/Git/Bunch/exec_bunch' },
         ls     => { url => '/Git/Bunch/list_bunch_contents' },
         sync   => { url => '/Git/Bunch/sync_bunch' },
+
+        "ls-bunches" => { url => '/Git/Bunch/list_bunches' },
     },
     log => 1,
+    pass_cmdline_object => 1,
 )->run;
 
 1;
@@ -39,7 +42,7 @@ gitbunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.631 of gitbunch (from Perl distribution Git-Bunch), released on 2024-10-22.
+This document describes version 0.632 of gitbunch (from Perl distribution Git-Bunch), released on 2026-01-03.
 
 =head1 SYNOPSIS
 
@@ -53,6 +56,20 @@ To synchronize bunch to another (will do a 'git pull/push' for each git repo,
 and do an rsync for everything else):
 
  % gitbunch sync ~/repos /mnt/laptop/repos
+
+=head2 Listing repositories
+
+ % gitbunch ls        ; # just list each repository names
+ % gitbunch ls -l     ; # list repository name, groups
+
+=head2 Group-related commands
+
+To list all defined groups:
+
+ % gitbunch ls-groups    ; # just list the group names
+ % gitbunch ls-groups -l ; # list each group's name, summary, and number of repos belonging to that group
+
+To list
 
 =head1 DESCRIPTION
 
@@ -99,6 +116,19 @@ command.
 List contents inside gitbunch directory.
 
 Will list each repo or non-repo dir/file.
+
+
+=head2 B<ls-bunches>
+
+List bunches defined in configuration.
+
+A gitbunch directory is defined in the configuration file as a section, e.g.:
+
+ [bunch NAME]
+ path = SOMEPATH
+ 
+ [bunch NAME2]
+ path = !path ~/SOMEPATH
 
 
 =head2 B<sync>
@@ -170,7 +200,7 @@ interactive terminal (i.e. whether output is piped). This option specifically
 chooses an output format.
 
 
-=item B<--help>, B<-h>, B<-?>
+=item B<--help>, B<-h>
 
 Display help message and exit.
 
@@ -340,6 +370,14 @@ See C<--min-repo-access-time>.
 
 Only process a single repo.
 
+=item B<--sort>=I<s>
+
+Order entries.
+
+Valid values:
+
+ ["name","-name","mtime","-mtime","commit_time","-commit_time","status_time","-status_time","pull_time","-pull_time"]
+
 =item B<--source>=I<s>*
 
 Directory to check.
@@ -442,6 +480,14 @@ See C<--min-repo-access-time>.
 =item B<--repo>=I<s>
 
 Only process a single repo.
+
+=item B<--sort>=I<s>
+
+Order entries.
+
+Valid values:
+
+ ["name","-name","mtime","-mtime","commit_time","-commit_time","status_time","-status_time","pull_time","-pull_time"]
 
 =item B<--source>=I<s>*
 
@@ -652,6 +698,17 @@ Can also be specified as the 1st command-line argument.
 Shortcut for --min-repo-access-time="2 weeks ago".
 
 See C<--min-repo-access-time>.
+
+=back
+
+=head2 Options for subcommand ls-bunches
+
+=over
+
+=item B<--detail>, B<-l>
+
+(No description)
+
 
 =back
 
@@ -904,6 +961,7 @@ List of available configuration parameters:
  include_repos_pat (see --include-repos-pat)
  min_repo_access_time (see --min-repo-access-time)
  repo (see --repo)
+ sort (see --sort)
  source (see --source)
 
 =head2 Configuration for subcommand commit
@@ -918,6 +976,7 @@ List of available configuration parameters:
  message (see --message)
  min_repo_access_time (see --min-repo-access-time)
  repo (see --repo)
+ sort (see --sort)
  source (see --source)
 
 =head2 Configuration for subcommand exec
@@ -947,6 +1006,10 @@ List of available configuration parameters:
  repo (see --repo)
  sort (see --sort)
  source (see --source)
+
+=head2 Configuration for subcommand ls-bunches
+
+ detail (see --detail)
 
 =head2 Configuration for subcommand sync
 
@@ -1033,7 +1096,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

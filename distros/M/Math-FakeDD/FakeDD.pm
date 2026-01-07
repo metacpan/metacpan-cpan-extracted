@@ -70,9 +70,11 @@ use overload
 
 require Exporter;
 *import = \&Exporter::import;
+require DynaLoader;
 
 my $v = MPFR_VERSION_MAJOR;
 if($v < 4) {
+  $Math::FakeDD::MPFR_PREC_MIN = 2;
   warn "
   This module requires that Math::MPFR was built against version 4
   of the mpfr C library. You have only ", Rmpfr_get_version, ".\n",
@@ -82,11 +84,12 @@ if($v < 4) {
   The need to use a 1-bit precision value is fairly limited, so
   we'll go ahead anyway. You have been warned !!\n";
 }
+else {   $Math::FakeDD::MPFR_PREC_MIN = 1 }
 
 my @tags = qw(
   NV_IS_DOUBLE NV_IS_DOUBLEDOUBLE NV_IS_QUAD NV_IS_80BIT_LD MPFR_LIB_VERSION
   dd_abs dd_add dd_add_eq dd_assign dd_atan2 dd_catalan dd_cmp dd_clone dd_copy dd_cos dd_dec
-  dd_div dd_div_eq dd_dump dd_eq dd_euler dd_exp dd_exp2 dd_exp10
+  dd_div dd_div_eq dd_dump dd_eq dd_euler dd_exp dd_exp2 dd_exp10 dd_frexp
   dd_gt dd_gte dd_hex dd_inf dd_is_inf dd_is_nan dd_int dd_log dd_log2 dd_log10 dd_lt dd_lte
   dd_mul dd_mul_eq dd_nan dd_neq
   dd_nextup dd_nextdown dd_numify dd_pi dd_pow dd_pow_eq dd_repro dd_repro_test
@@ -101,7 +104,10 @@ my @tags = qw(
 
 %Math::FakeDD::EXPORT_TAGS = (all => [@tags]);
 
-$Math::FakeDD::VERSION =  '1.01';
+$Math::FakeDD::VERSION =  '1.03';
+Math::FakeDD->DynaLoader::bootstrap($Math::FakeDD::VERSION);
+
+sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
 # Whenever dd_repro($obj) returns its string representation of
 # the value of $obj, $Math::FakeDD::REPRO_PREC is set to the
@@ -211,15 +217,8 @@ sub dd_repro {
     Rmpfr_prec_round($mpfr, $prec, MPFR_RNDN);
     $Math::FakeDD::REPRO_PREC = $prec;
 
-    if(abs($arg->{msd}) <= 2 ** -348 && abs($arg->{msd}) >= 2 ** -1067) {
-      # Provide 2nd arg of 728 to mpfrtoa().
-      # 2 ** -348 (prec = 727) needs this.
-      return '-' . mpfrtoa($mpfr, 728) if $neg;
-      return mpfrtoa($mpfr, 728);
-    }
-
-    return '-' . mpfrtoa($mpfr) if $neg;
-    return mpfrtoa($mpfr);
+    return '-' . mpfrtoa($mpfr, $prec + 1) if $neg;
+    return mpfrtoa($mpfr, $prec + 1);
 
   } # close $arg->{lsd} == 0
 
@@ -236,7 +235,8 @@ sub dd_repro {
     # lsd is not subnormal.
     $prec = Rmpfr_get_exp($m_msd) - Rmpfr_get_exp($m_lsd) + 53;
     if( ($arg->{lsd} < 0 && $arg->{msd} > 0) || ($arg->{msd} < 0 && $arg->{lsd} > 0) ) {
-      $prec--;
+      # $prec--; # originally, an *unqualified* decrement.
+      $prec-- if abs( (dd_frexp($arg->{msd}))[0] ) == 0.5;      # MSD is a power of 2
       $different_signs = 1; # one double < 0, the other > 0
     }
     my $mpfr_copy = Rmpfr_init2(2098);
@@ -324,22 +324,29 @@ sub dd_repro {
   } # close different signs
 
   # msd and lsd are either both >0, or both <0.
-  # We need to detect the (rare) case that a chopped and
+  # We need to detect the (rare) cases that a chopped and
   # then incremented mantissa passes the round trip.
+  # AFAIK, this can happen only if the LSD is an integer power of 2.
+  # Two examples: [0x1p+200 0x1p-549] & [0x1.ffffffffffff8p+999 0x1p-549].
 
-  my $can = mpfrtoa($mpfr); # was mpfrtoa($mpfr, 53) - apparently unnecessary
-  my $ret = _chop_test($can, $arg, 1);
+  my $candidate = mpfrtoa($mpfr);
+  #my @frexp = dd_frexp($arg->{lsd});
+  if(abs( (dd_frexp($arg->{lsd}))[0]) == 0.5) { # LSD is an integer power of 2.
 
-  if($ret eq 'ok') {
-    $Math::FakeDD::REPRO_PREC = $prec;
-    return '-' . $can if $neg;
-    return $can;
+    my $ret = _chop_test($candidate, $arg, 1); # $ret will either be set to 'ok' (in which case
+                                               # we return $candidate), or $ret will be set to
+                                               # the correct value (in which case we return $ret).
+
+    unless($ret eq 'ok') {
+      $Math::FakeDD::REPRO_PREC = "> $prec";
+      return '-' . $ret if $neg;
+      return $ret;
+    }
   }
 
-  $Math::FakeDD::REPRO_PREC = "> $prec";
-  return '-' . $ret if $neg;
-  return $ret;
-
+  $Math::FakeDD::REPRO_PREC = $prec;
+  return '-' . $candidate if $neg;
+  return $candidate;
 }
 
 sub _decrement {
@@ -374,9 +381,9 @@ sub _chop_test {
   my @r = split /e/i, shift;
   my $op = shift;
 
-  # If $do_increment is set, then all we are not interested
+  # If $do_increment is set, then we are not interested
   # in the result of the chop test. We are interested in the
-  # result of the incrmentation - which we requires that we
+  # result of the incrmentation - which requires that we
   # first perform the chop.
 
   my $do_increment = defined($_[0]) ? shift
@@ -1405,6 +1412,15 @@ sub dd_stringify {
 
   return "[0.0 0.0]" if($self->{msd} == 0 && $self->{lsd} == 0); # Don't look at the exponent of a
                                                                  # Math::MPFR object whose value is 0.
+
+  # If $Config{nvsize} != 8, an assertion failure was making
+  # it difficult for this sub to work with infinities. So,
+  # we now simply detect the inf and return the appropriate
+  # string, irrespective of the value of $Config{nvsize}.
+  if(dd_is_inf($self)) {
+    return "[Inf 0.0]" if $self > 0;
+    return "[-Inf 0.0]";
+  }
   my($mpfrm, $mpfrl) = (Rmpfr_init2(53), Rmpfr_init2(53));
   Rmpfr_set_d($mpfrm, $self->{msd}, MPFR_RNDN);
   Rmpfr_set_d($mpfrl, $self->{lsd}, MPFR_RNDN);

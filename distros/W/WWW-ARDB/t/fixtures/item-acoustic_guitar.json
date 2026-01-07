@@ -1,0 +1,33 @@
+{
+  "id": "acoustic_guitar",
+  "name": "Acoustic Guitar",
+  "description": "A playable acoustic guitar used to attract ARC's attention, and impress other Raiders.",
+  "rarity": "legendary",
+  "type": "quick use",
+  "foundIn": [],
+  "value": 7000,
+  "weight": 1,
+  "stackSize": 1,
+  "icon": "/arc/icons/acoustic_guitar.webp",
+  "maps": [],
+  "breakdown": [
+    {
+      "id": "wires",
+      "name": "Wires",
+      "rarity": "uncommon",
+      "type": "component",
+      "value": 200,
+      "amount": 6
+    },
+    {
+      "id": "metal_parts",
+      "name": "Metal Parts",
+      "rarity": "common",
+      "type": "component",
+      "value": 75,
+      "amount": 4
+    }
+  ],
+  "crafting": [],
+  "updatedAt": "2025-12-28T14:24:01.035Z"
+}

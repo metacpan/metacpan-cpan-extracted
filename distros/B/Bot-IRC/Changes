@@ -1,5 +1,15 @@
 Revision history for Bot::IRC
 
+1.44      2026-01-02 15:53:36-08:00 America/Los_Angeles
+        - Set minimum Perl version to 5.16
+
+1.43      2026-01-02 15:44:26-08:00 America/Los_Angeles
+        - Fix SSL connection failure
+        - Set a default SSL port (if SSL used)
+        - Fix some character encoding issues
+        - Improve Store::SQLite robustness
+        - Rotate delegation through children instead of at random
+
 1.42      2025-06-13 10:22:57-07:00 America/Los_Angeles
         - Add security policy as per CPANSec recommendation
 

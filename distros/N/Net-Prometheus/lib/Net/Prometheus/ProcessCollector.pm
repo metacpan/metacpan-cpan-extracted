@@ -1,12 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2026 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::ProcessCollector 0.14;
+package Net::Prometheus::ProcessCollector 0.15;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( signatures );
+no warnings qw( experimental::signatures );
 
 use Net::Prometheus::Types qw( MetricSamples Sample );
 
@@ -76,10 +79,9 @@ labels will be set.
 
 =cut
 
-sub new
+sub new ( $class, @args )
 {
-   my $class = shift;
-   $class->for_OS( $^O, @_ );
+   $class->for_OS( $^O, @args );
 }
 
 =head2 for_OS
@@ -92,11 +94,8 @@ Call L</new> instead.
 
 =cut
 
-sub for_OS
+sub for_OS ( $class, $os, @args )
 {
-   shift; # class
-   my ( $os, @args ) = @_;
-
    my $pkg = __PACKAGE__ . "::$os";
 
    ( my $file = "$pkg.pm" ) =~ s{::}{/}g;
@@ -110,22 +109,16 @@ sub for_OS
 
 # Methods for subclasses
 
-sub __new
+sub __new ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
-
    return bless {
       prefix => $args{prefix} || "process",
       labels => $args{labels} || [],
    }, $class;
 }
 
-sub _make_metric
+sub _make_metric ( $self, $varname, $value, $type, $help )
 {
-   my $self = shift;
-   my ( $varname, $value, $type, $help ) = @_;
-
    my $prefix = $self->{prefix};
 
    return MetricSamples( "${prefix}_$varname", $type, $help,

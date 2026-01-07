@@ -118,6 +118,8 @@ my @simple = (
     { '4{min_sec}{ }pm'                => [ '24.11.2006 16:{min_sec}', truncated ] },
     { '4:20{sec}{ }pm'                 => [ '24.11.2006 16:20:{sec}',  truncated ] },
     { '06:56:06{ }am'                  => [ '24.11.2006 06:56:06',     truncated ] },
+    { '06.56.06{ }am'                  => [ '24.11.2006 06:56:06',     truncated ] },
+    { '06.56.06{ }pm'                  => [ '24.11.2006 18:56:06',     truncated ] },
     { '06:56:06{ }pm'                  => [ '24.11.2006 18:56:06',     truncated ] },
     { 'mon 2:35{sec}'                  => [ '20.11.2006 02:35:{sec}',  truncated ] },
     { '1:00{sec} sun'                  => [ '26.11.2006 01:00:{sec}',  truncated ] },
@@ -127,7 +129,12 @@ my @simple = (
     { '1{min_sec}{ }am on sun'         => [ '26.11.2006 01:{min_sec}', truncated ] },
     { '1{min_sec}{ }pm on sun'         => [ '26.11.2006 13:{min_sec}', truncated ] },
     { '12:14{sec}{ }PM'                => [ '24.11.2006 12:14:{sec}',  truncated ] },
+    { '12:14{sec}{ }P.M.'              => [ '24.11.2006 12:14:{sec}',  truncated ] },
+    { '12:14{sec}{ }P.M'               => [ '24.11.2006 12:14:{sec}',  truncated ] },
     { '12:14{sec}{ }AM'                => [ '24.11.2006 00:14:{sec}',  truncated ] },
+    { '12:14{sec}{ }A.M.'              => [ '24.11.2006 00:14:{sec}',  truncated ] },
+    { '12:14{sec}{ }A.M'               => [ '24.11.2006 00:14:{sec}',  truncated ] },
+
 );
 
 my @complex = (
@@ -273,6 +280,9 @@ my @specific = (
     { '18 oct {at} 5{min_sec}{ }pm'        => [ '18.10.2006 17:{min_sec}', truncated ] },
     { 'dec 25'                             => [ '25.12.2006 00:00:00',     truncated ] },
     { 'feb 28 {at} 3:00{sec}'              => [ '28.02.2006 03:00:{sec}',  truncated ] },
+    { 'feb 28 {at} 3.00 pm'                => [ '28.02.2006 15:00:00',     truncated ] },
+    { 'feb 28 {at} 3.00 p.m.'              => [ '28.02.2006 15:00:00',     truncated ] },
+    { 'feb 28 {at} 3.00.15 a.m'            => [ '28.02.2006 03:00:15',     truncated ] },
     { 'feb 28 2001 {at} 3:00{sec}'         => [ '28.02.2001 03:00:{sec}',  truncated ] },
     { 'feb 28 {at} 3{min_sec}{ }am'        => [ '28.02.2006 03:{min_sec}', truncated ] },
     { 'feb 28 {at} 3{min_sec}{ }pm'        => [ '28.02.2006 15:{min_sec}', truncated ] },
@@ -298,12 +308,14 @@ my @specific = (
     { '6'                                  => [ '24.11.2006 06:00:00',     truncated ] },
     { '4:00'                               => [ '24.11.2006 04:00:00',     truncated ] },
     { '17:00'                              => [ '24.11.2006 17:00:00',     truncated ] },
+    { '17.00'                              => [ '24.11.2006 17:00:00',     truncated ] },
+    { 'Nov 24th 2006 {at} 17.00.00'        => [ '24.11.2006 17:00:00',     truncated ] },
     { '3:20:00'                            => [ '24.11.2006 03:20:00',     truncated ] },
     { '-5min'                              => [ '24.11.2006 01:08:08',     unaltered ] },
     { '+2d'                                => [ '26.11.2006 01:13:08',     unaltered ] },
 );
 
-_run_tests(691, [ [ \@simple ], [ \@complex ], [ \@specific ] ], \&compare);
+_run_tests(720, [ [ \@simple ], [ \@complex ], [ \@specific ] ], \&compare);
 
 sub compare
 {

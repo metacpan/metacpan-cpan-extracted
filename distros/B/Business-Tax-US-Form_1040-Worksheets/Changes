@@ -29,3 +29,7 @@ Revision history for Perl module Business::Tax::US::Form_1040::Worksheets
 0.06 Wed Mar 20 05:12:32 PM EDT 2024
     - Comment out all instances of Data::Dump, as they were only used
       during development
+
+0.07 Fri Jan  2 04:24:55 PM EST 2026
+    - Update for tax year 2024
+

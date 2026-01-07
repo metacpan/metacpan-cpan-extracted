@@ -1,18 +1,17 @@
 package Bot::IRC;
 # ABSTRACT: Yet Another IRC Bot
 
-use 5.014;
+use 5.016;
 use exact;
 
 use Daemon::Device;
 use Date::Format 'time2str';
-use Encode 'decode';
-use Encode::Detect::Detector 'detect';
+use Encode qw( encode decode );
 use IO::Socket::IP -register;
 use IO::Socket::SSL;
 use Time::Crontab;
 
-our $VERSION = '1.42'; # VERSION
+our $VERSION = '1.44'; # VERSION
 
 sub new {
     my $class = shift;
@@ -27,7 +26,7 @@ sub new {
 
     $self->{connect}{nick} //= 'bot';
     $self->{connect}{name} //= 'Yet Another IRC Bot';
-    $self->{connect}{port} ||= 6667;
+    $self->{connect}{port} ||= ( $self->{connect}{ssl} ) ? 6670 : 6667;
 
     $self->{disconnect} //= sub {};
 
@@ -70,16 +69,10 @@ sub run {
         SSL_verify_mode => SSL_VERIFY_NONE,
     ) or die $!;
 
-    if ( $self->{encoding} ) {
-        try {
-            binmode( $self->{socket}, "encoding($self->{encoding})" );
-        }
-        catch ($e) {}
-    }
-
     if ( $self->{send_user_nick} eq 'on_connect' ) {
-        $self->{socket}->print("USER $self->{nick} 0 * :$self->{connect}{name}\r\n");
+        $self->{socket}->print("PASS $self->{connect}{password}\r\n") if ( $self->{connect}{password} );
         $self->{socket}->print("NICK $self->{nick}\r\n");
+        $self->{socket}->print("USER $self->{nick} 0 * :$self->{connect}{name}\r\n");
     }
 
     try {
@@ -113,7 +106,7 @@ sub note {
         warn $msg;
     }
     else {
-        print $msg;
+        print decode( $self->{encoding}, $msg );
     }
 
     return;
@@ -124,13 +117,13 @@ sub _parent {
     my $self     = $device->data('self');
     my $session  = { start => time };
     my $delegate = sub {
-        my ($random_child) =
-            map { $_->[0] }
-            sort { $a->[1] <=> $b->[1] }
-            map { [ $_, rand() ] }
-            @{ $device->children };
-
-        $device->message( $random_child, @_ );
+        my $fresh_children = $device->children;
+        $session->{children} = $fresh_children if (
+            not $session->{children} or
+            join( ',', sort @{ $session->{children} } ) ne join( ',', sort @$fresh_children )
+        );
+        push( @{ $session->{children} }, shift @{ $session->{children} } );
+        $device->message( $session->{children}->[0], @_ );
     };
     my $broadcast = sub {
         my @messages = @_;
@@ -159,13 +152,16 @@ sub _parent {
     local $SIG{__WARN__} = sub { note( undef, $_[0], 'warn' ) };
     local $SIG{__DIE__}  = sub { note( undef, $_[0], 'die'  ) };
 
-    srand();
     my @lines;
 
     try {
         if ( $self->{send_user_nick} eq 'on_parent' ) {
-            $self->say("USER $self->{nick} 0 * :$self->{connect}{name}");
+            if ( $self->{connect}{password} ) {
+                $self->{socket}->print("PASS $self->{connect}{password}\r\n");
+                $self->note("<<< PASS ********");
+            }
             $self->say("NICK $self->{nick}");
+            $self->say("USER $self->{nick} 0 * :$self->{connect}{name}");
         }
 
         while ( my $line = $self->{socket}->getline ) {
@@ -178,12 +174,17 @@ sub _parent {
             if ( not $session->{established} ) {
                 if ( not $session->{user} ) {
                     if ( $self->{send_user_nick} eq 'on_reply' ) {
-                        $self->say("USER $self->{nick} 0 * :$self->{connect}{name}");
+                        if ( $self->{connect}{password} ) {
+                            $self->{socket}->print("PASS $self->{connect}{password}\r\n");
+                            $self->note("<<< PASS ********");
+                        }
                         $self->say("NICK $self->{nick}");
+                        $self->say("USER $self->{nick} 0 * :$self->{connect}{name}");
                     }
                     elsif ( $self->{send_user_nick} eq 'on_connect' ) {
-                        $self->note("<<< USER $self->{nick} 0 * :$self->{connect}{name}\r\n");
+                        $self->note("<<< PASS ********") if ( $self->{connect}{password} );
                         $self->note("<<< NICK $self->{nick}\r\n");
+                        $self->note("<<< USER $self->{nick} 0 * :$self->{connect}{name}\r\n");
                     }
                     $session->{user} = 1;
                 }
@@ -244,7 +245,6 @@ sub _child {
     local $SIG{__WARN__} = sub { note( undef, $_[0], 'warn' ) };
     local $SIG{__DIE__}  = sub { note( undef, $_[0], 'die'  ) };
 
-    srand();
     sleep 1 while (1);
 }
 
@@ -252,11 +252,12 @@ sub _on_message {
     my $device = shift;
     my $self   = $device->data('self');
     my $passwd = $device->data('passwd');
+    my $ppid   = $device->ppid;
 
     for my $line (@_) {
-        if ( $self->{encoding} ) {
-            my $charset = detect($line);
-            $line = decode( $charset => $line ) if ( $charset and $charset eq $self->{encoding} );
+        if ( $ppid == $$ ) {
+            $self->{socket}->print( $line . "\r\n" );
+            next;
         }
 
         push( @{ $self->{numerics} }, $line )
@@ -318,9 +319,13 @@ sub _on_message {
 
         if ( $self->{in}{to_me} ) {
             if ( $self->{in}{text} =~ /^\s*help\W*$/i ) {
+                my @sorted_key_helps = sort keys %{ $self->{helps} };
                 $self->reply_to(
-                    'Ask me for help with "help topic" where the topic is one of the following: ' .
-                    $self->list( ', ', 'and', sort keys %{ $self->{helps} } ) . '.'
+                    (@sorted_key_helps)
+                        ?
+                            'Ask me for help with "help topic" where the topic is one of the following: ' .
+                            $self->list( ', ', 'and', @sorted_key_helps ) . '.'
+                        : 'I have no help topics from which to provide you help.'
                 );
                 next;
             }
@@ -620,11 +625,19 @@ sub msg {
 }
 
 sub say {
-    my $self = shift;
+    my $self   = shift;
+    my $device = $self->{device};
+    my $ppid   = ($device) ? $device->ppid : 0;
 
     for (@_) {
         my $string = $_;
-        $self->{socket}->print( $string . "\r\n" );
+        if ( $ppid == $$ ) {
+            $self->{socket}->print( $string . "\r\n" );
+        }
+        else {
+            $string = encode( $self->{encoding}, $string );
+            $device->message( $ppid, $string ) if $device;
+        }
         $self->note("<<< $string");
     }
     return $self;
@@ -713,7 +726,7 @@ Bot::IRC - Yet Another IRC Bot
 
 =head1 VERSION
 
-version 1.42
+version 1.44
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC)
@@ -845,17 +858,16 @@ set or added to through other methods off the instantiated object.
         vars    => {},
     )->run;
 
-C<spawn> will default to 2. Under C<connect>, C<port> will default to 6667.
-C<join> can be either a string or an arrayref of strings representing channels
-to join after connnecting. C<ssl> is a true/false setting for whether to
-connect to the server over SSL. C<ipv6> is also true/false setting for whether
-to forcibly connect to the server over IPv6.
+C<spawn> will default to 2. Under C<connect>, C<join> can be either a string or
+an arrayref of strings representing channels to join after connecting. C<ssl> is
+a true/false setting for whether to connect to the server over SSL. C<ipv6> is
+also true/false setting for whether to forcibly connect to the server over IPv6.
+C<port> will default to 6667 if C<ssl> is false or 6670 if true.
 
-You can optionally also provide an C<encoding> string representing a strict name
-of an encoding standard. If you don't set this, it will default to "UTF-8"
-internally. The encoding string is used to set the binmode for log files and for
-message text decoding as necessary. If you want to turn off this functionality,
-set C<encoding> to any defined false value.
+You can optionally provide an C<encoding> string representing a strict name
+of an encoding standard. It will default to "UTF-8". You can optionally also
+provide a C<password> string, which will be sent to the server on connect as a
+server password.
 
 Read more about plugins below for more information about C<plugins> and C<vars>.
 Consult L<Daemon::Device> and L<Daemon::Control> for more details about C<spawn>

@@ -14,15 +14,16 @@ use List::Util qw(min max); # Helpful for returning the minimum or maximum value
 BEGIN {
     require Exporter;
     our @ISA       = qw( Exporter );
-    our $VERSION   = '1.25';
+    our $VERSION   = '1.26';
     our @EXPORT    = qw( _perl_logo _coin splash );
     our @EXPORT_OK = qw();
 } ## end BEGIN
 
 sub splash {
-    my $self    = shift;
-    my $version = shift || $self->{'VERSION'};
-    return if ($self->{'SPLASH'} == 0);
+    my $self = shift;
+    my $wait = shift;
+
+    return if ($wait == 0);
 
     my $X = $self->{'X_CLIP'};
     my $Y = $self->{'Y_CLIP'};
@@ -288,7 +289,7 @@ sub splash {
                 'height'       => 236 * $vf,
                 'wscale'       => 1,
                 'color'        => 'FFFFFFFF',
-                'text'         => sprintf('Version %.02f', $version),
+                'text'         => sprintf('Version %.02f', $self->{'VERSION'}),
                 'bounding_box' => TRUE,
                 'center'       => $self->{'CENTER_X'},
                 'antialias'    => ($self->{'BITS'} >= 24) ? TRUE : FALSE
@@ -318,6 +319,7 @@ sub splash {
     $self->_perl_logo();
 	$self->_coin();
     $self->normal_mode();
+	sleep $wait;
 } ## end sub splash
 
 sub _perl_logo {

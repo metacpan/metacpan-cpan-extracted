@@ -358,7 +358,7 @@ sub stash {
 # Application state (injected by PAGI::Lifespan, read-only)
 sub state {
     my $self = shift;
-    return $self->{scope}{'pagi.state'} // {};
+    return $self->{scope}{state} // {};
 }
 
 # Body streaming - mutually exclusive with buffered body methods
@@ -1089,8 +1089,29 @@ subrouters inherit them. The stash "flows through" via scope sharing.
         await $res->json($user);
     }
 
-B<Note:> For worker-level state (database connections, config), use
-C<< $self->state >> in C<PAGI::Endpoint::Router> subclasses.
+B<Note:> For worker-level state (database connections, config), see
+the C<state> method below.
+
+=head2 state
+
+    my $db = $req->state->{db};
+    my $config = $req->state->{config};
+
+Returns the application state hashref injected by L<PAGI::Lifespan>.
+This contains worker-level shared state like database connections
+and configuration. Returns empty hashref if no state was injected.
+
+B<Key differences from stash:>
+
+=over 4
+
+=item * C<state> is read-only, set during lifespan startup
+
+=item * C<state> is shared across all requests in a worker
+
+=item * C<stash> is per-request, writable by middleware/handlers
+
+=back
 
 =head1 SEE ALSO
 

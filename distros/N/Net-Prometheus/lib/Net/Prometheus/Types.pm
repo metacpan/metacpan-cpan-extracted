@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Types 0.14;
+package Net::Prometheus::Types 0.15;
 
-use v5.14;
+use v5.20;
 use warnings;
 
 use Exporter 'import';

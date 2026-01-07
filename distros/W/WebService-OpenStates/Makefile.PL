@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "WebService-OpenStates",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "WebService::OpenStates",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -22,7 +22,10 @@ my %WriteMakefileArgs = (
     "HTTP::Tiny" => 0,
     "JSON::MaybeXS" => 0,
     "Moo" => 0,
+    "Try::Tiny" => 0,
+    "Types::Common::Numeric" => 0,
     "Types::Common::String" => 0,
+    "URI" => 0,
     "namespace::clean" => 0
   },
   "TEST_REQUIRES" => {
@@ -30,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod::Coverage" => 0
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +49,10 @@ my %FallbackPrereqs = (
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Test::Pod::Coverage" => 0,
+  "Try::Tiny" => 0,
+  "Types::Common::Numeric" => 0,
   "Types::Common::String" => 0,
+  "URI" => 0,
   "namespace::clean" => 0
 );
 

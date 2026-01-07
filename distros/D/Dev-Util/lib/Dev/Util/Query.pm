@@ -7,7 +7,7 @@ use IO::Interactive qw(is_interactive);
 use IO::Prompt      qw();                 # don't import prompt
 use Term::ReadKey;
 
-our $VERSION = version->declare("v2.19.33");
+our $VERSION = version->declare("v2.19.35");
 
 our %EXPORT_TAGS = (
                      misc => [ qw(
@@ -146,7 +146,7 @@ Dev::Util::Query - Functions to prompt user for input, y/n, or menus.
 
 =head1 VERSION
 
-Version v2.19.33
+Version v2.19.35
 
 =head1 SYNOPSIS
 

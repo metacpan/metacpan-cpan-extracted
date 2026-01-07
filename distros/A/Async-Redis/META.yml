@@ -1,0 +1,44 @@
+---
+abstract: 'Async Redis client using Future::IO'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Future::IO::Impl::IOAsync: '0'
+  IO::Async::Loop: '0'
+  IO::Async::Process: '0'
+  IO::Async::Timer::Periodic: '0'
+  Test2::V0: '0'
+  Test::Lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Async-Redis
+no_index:
+  directory:
+    - examples
+recommends:
+  IO::Socket::SSL: '0'
+  Protocol::Redis::XS: '0'
+requires:
+  Digest::SHA: '0'
+  Future: '0.49'
+  Future::AsyncAwait: '0.66'
+  Future::IO: '0.17'
+  IO::Socket::INET: '0'
+  Protocol::Redis: '0'
+  Socket: '0'
+  Time::HiRes: '0'
+  perl: '5.018'
+resources:
+  bugtracker: https://github.com/jjn1056/Async-Redis/issues
+  homepage: https://github.com/jjn1056/Async-Redis
+  repository: https://github.com/jjn1056/Async-Redis
+version: '0.001001'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: Artistic-2.0

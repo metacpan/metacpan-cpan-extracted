@@ -1,7 +1,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -34,7 +34,7 @@ use File::Spec;
 #  Version information in a formate suitable for CPAN etc. Must be
 #  all on one line
 #
-$VERSION='2.038';
+$VERSION='2.046';
 
 
 #  Debug
@@ -149,7 +149,7 @@ sub filter {
 
     #  The real guts. Wedge one HTML page into a wrapper page
     #
-    my ($self, $data_main_ar, $meta_main_hr)=@_;
+    my ($self, $data_content_ar, $meta_content_hr)=@_;
     debug("in $self filter");
 
 
@@ -171,7 +171,7 @@ sub filter {
     #  just show as is
     #
     ($template_cn eq $r->filename()) &&
-        return $data_main_ar;
+        return $data_content_ar;
 
 
     #  Get the template structure data ref
@@ -187,16 +187,16 @@ sub filter {
 
     #  Concatenate meta perl sections
     #
-    #my $perl_main_ar=$meta_main_hr->{'perl'};
+    #my $perl_content_ar=$meta_content_hr->{'perl'};
     my $perl_template_ar=$meta_template_hr->{'perl'};
-    push @{$meta_main_hr->{'perl'}}, @{$perl_template_ar};
+    push @{$meta_content_hr->{'perl'}}, @{$perl_template_ar};
 
 
     #  Below fixes up HEAD section
     #
 
 
-    #  Find body block, ie <head> tag in data ref
+    #  Find head block, ie <head> tag in data ref
     #
     my $data_template_head_ar=(
         $self->find_node({
@@ -244,28 +244,28 @@ sub filter {
         Dumper($data_template_head_block_ar));
 
 
-    #  Get the <head> section from the main HTML page, ie the page to be
+    #  Get the <head> section from the content HTML page, ie the page to be
     #  embedded
     #
-    my $data_main_head_ar=(
+    my $data_content_head_ar=(
         $self->find_node({
 
-                data_ar => $data_main_ar,
+                data_ar => $data_content_ar,
                 tag     => 'head'
 
             })
             || return err())->[0];
     debug(
-        "data_main_head_ar $data_main_head_ar %s",
-        Dumper($data_main_head_ar));
+        "data_content_head_ar $data_content_head_ar %s",
+        Dumper($data_content_head_ar));
 
 
     #  Concatenate titles
     #
-    my $data_main_title_ar=(
+    my $data_content_title_ar=(
         $self->find_node({
 
-                data_ar => $data_main_ar,
+                data_ar => $data_content_ar,
                 tag     => 'title'
 
             })
@@ -278,35 +278,39 @@ sub filter {
 
             })
             || return err())->[0];
-    $data_main_title_ar->[$WEBDYNE_NODE_CHLD_IX][0]=join(
+    $data_template_title_ar->[WEBDYNE_NODE_CHLD_IX][0]=join(
         ' - ',
         grep {$_}
-            $data_template_title_ar->[$WEBDYNE_NODE_CHLD_IX][0], $data_main_title_ar->[$WEBDYNE_NODE_CHLD_IX][0]);
+            $data_template_title_ar->[WEBDYNE_NODE_CHLD_IX][0], $data_content_title_ar->[WEBDYNE_NODE_CHLD_IX][0]);
+    #$data_template_title_ar->[WEBDYNE_NODE_CHLD_IX][0]=$data_content_title_ar->[WEBDYNE_NODE_CHLD_IX][0];
 
-    #debug('titles, %s, %s', Dumper($data_main_title_ar, $data_template_title_ar));
+    debug('titles, %s, %s', Dumper($data_content_title_ar, $data_template_title_ar));
+    #die;
 
 
     #  Replace menu head attr with any head attr from main page
     #
-    $data_template_head_ar->[$WEBDYNE_NODE_ATTR_IX]=
-        $data_main_head_ar->[$WEBDYNE_NODE_ATTR_IX];
+    #die Dumper($data_template_head_ar);
+    $data_template_head_ar->[WEBDYNE_NODE_ATTR_IX]=
+        $data_content_head_ar->[WEBDYNE_NODE_ATTR_IX];
+    #die Dumper($data_template_head_ar);
 
 
     #  Search for head block in head block parent
     #
-    foreach my $data_chld_ix (0..$#{$data_template_head_block_prnt_ar->[$WEBDYNE_NODE_CHLD_IX]}) {
+    foreach my $data_chld_ix (0..$#{$data_template_head_block_prnt_ar->[WEBDYNE_NODE_CHLD_IX]}) {
 
 
         #  Skip if not found
         #
-        my $data_chld_ar=$data_template_head_block_prnt_ar->[$WEBDYNE_NODE_CHLD_IX][$data_chld_ix];
+        my $data_chld_ar=$data_template_head_block_prnt_ar->[WEBDYNE_NODE_CHLD_IX][$data_chld_ix];
         next unless ($data_chld_ar eq $data_template_head_block_ar);
 
 
         #  Must have found node if get to here, splice in head
         #
-        splice @{$data_template_head_block_prnt_ar->[$WEBDYNE_NODE_CHLD_IX]}, $data_chld_ix, 1,
-            @{$data_main_head_ar->[$WEBDYNE_NODE_CHLD_IX]};
+        splice @{$data_template_head_block_prnt_ar->[WEBDYNE_NODE_CHLD_IX]}, $data_chld_ix, 1,
+            @{$data_content_head_ar->[WEBDYNE_NODE_CHLD_IX]};
         last;
 
     }
@@ -367,40 +371,40 @@ sub filter {
     #  Get the <body> section from the main HTML page, ie the page to be
     #  embedded
     #
-    my $data_main_body_ar=(
+    my $data_content_body_ar=(
         $self->find_node({
 
-                data_ar => $data_main_ar,
+                data_ar => $data_content_ar,
                 tag     => 'body'
 
             })
             || return err())->[0];
     debug(
-        "data_main_body_ar $data_main_body_ar %s",
-        Dumper($data_main_body_ar));
+        "data_content_body_ar $data_content_body_ar %s",
+        Dumper($data_content_body_ar));
 
 
     #  Replace menu body attr with any body attr from main page
     #
-    $data_template_body_ar->[$WEBDYNE_NODE_ATTR_IX]=
-        $data_main_body_ar->[$WEBDYNE_NODE_ATTR_IX];
+    $data_template_body_ar->[WEBDYNE_NODE_ATTR_IX]=
+        $data_content_body_ar->[WEBDYNE_NODE_ATTR_IX];
 
 
     #  Search for body block in body block parent
     #
-    foreach my $data_chld_ix (0..$#{$data_template_body_block_prnt_ar->[$WEBDYNE_NODE_CHLD_IX]}) {
+    foreach my $data_chld_ix (0..$#{$data_template_body_block_prnt_ar->[WEBDYNE_NODE_CHLD_IX]}) {
 
 
         #  Skip if not found
         #
-        my $data_chld_ar=$data_template_body_block_prnt_ar->[$WEBDYNE_NODE_CHLD_IX][$data_chld_ix];
+        my $data_chld_ar=$data_template_body_block_prnt_ar->[WEBDYNE_NODE_CHLD_IX][$data_chld_ix];
         next unless ($data_chld_ar eq $data_template_body_block_ar);
 
 
         #  Must have found node if get to here, splice in body
         #
-        splice @{$data_template_body_block_prnt_ar->[$WEBDYNE_NODE_CHLD_IX]}, $data_chld_ix, 1,
-            @{$data_main_body_ar->[$WEBDYNE_NODE_CHLD_IX]};
+        splice @{$data_template_body_block_prnt_ar->[WEBDYNE_NODE_CHLD_IX]}, $data_chld_ix, 1,
+            @{$data_content_body_ar->[WEBDYNE_NODE_CHLD_IX]};
         last;
 
 

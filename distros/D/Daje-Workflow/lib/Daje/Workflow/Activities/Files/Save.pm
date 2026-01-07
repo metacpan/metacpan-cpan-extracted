@@ -71,6 +71,12 @@ our $VERSION = "1.11";
 
 sub save($self) {
 
+    $self->model->insert_history(
+        "Save file(s)",
+        "Daje::Workflow::Activities::Files::Save::save",
+        1
+    );
+
     try {
         my $files = $self->context->{context}->{payload}->{$self->activity_data->{file}->{file_list_tag}};
         my $length = scalar @{$files};

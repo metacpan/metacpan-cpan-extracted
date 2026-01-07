@@ -4,7 +4,6 @@ MANIFEST
 LICENSE
 Makefile.PL
 Changes
-lib/cpan2rpm.pm
 lib/CPAN/RPM.pm
 cpan2rpm
 t/100_compile.t

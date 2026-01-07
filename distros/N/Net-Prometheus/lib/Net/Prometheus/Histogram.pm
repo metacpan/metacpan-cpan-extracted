@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2026 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Histogram 0.14;
+package Net::Prometheus::Histogram 0.15;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Net::Prometheus::Metric );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use Carp;
 use List::Util 1.33 qw( any );
@@ -92,11 +95,8 @@ supplied) and C<bucket_max> (or a default of 1000 if not supplied).
 
 =cut
 
-sub new
+sub new ( $class, %opts )
 {
-   my $class = shift;
-   my %opts = @_;
-
    if( !$opts{buckets} and grep { m/^bucket/ } keys %opts ) {
       _gen_buckets( \%opts );
    }
@@ -106,10 +106,10 @@ sub new
    $buckets->[$_] > $buckets->[$_-1] or
       croak "Histogram bucket limits must be monotonically-increasing" for 1 .. $#$buckets;
 
-   $opts{labels} and any { $_ eq "le" } @{ $opts{labels} } and
+   $opts{labels} and any { $_ eq "le" } $opts{labels}->@* and
       croak "A Histogram may not have a label called 'le'";
 
-   my $self = $class->SUPER::new( @_ );
+   my $self = $class->SUPER::new( %opts );
 
    $self->{bounds}       = [ @$buckets ]; # clone it
    $self->{bucketcounts} = {};
@@ -123,14 +123,12 @@ sub new
    return $self;
 }
 
-sub _gen_buckets
+sub _gen_buckets ( $opts )
 {
-   my ( $opts ) = @_;
-
    my $min = $opts->{bucket_min} // 1E-3;
    my $max = $opts->{bucket_max} // 1E3;
 
-   my @values_per_decade = @{ $opts->{buckets_per_decade} // [ 1 ] };
+   my @values_per_decade = ( $opts->{buckets_per_decade} // [ 1 ] )->@*;
 
    my $power = 0;
    my $value;
@@ -164,10 +162,9 @@ C<+Inf> bucket.
 
 =cut
 
-sub bucket_bounds
+sub bucket_bounds ( $self )
 {
-   my $self = shift;
-   return @{ $self->{bounds} };
+   return $self->{bounds}->@*;
 }
 
 =head2 observe
@@ -183,11 +180,8 @@ where the value is less than or equal to the bucket upper bound.
 =cut
 
 __PACKAGE__->MAKE_child_method( 'observe' );
-sub _observe_child
+sub _observe_child ( $self, $labelkey, $value )
 {
-   my $self = shift;
-   my ( $labelkey, $value ) = @_;
-
    my $bounds  = $self->{bounds};
    my $buckets = $self->{bucketcounts}{$labelkey} ||= [ ( 0 ) x ( @$bounds + 1 ) ];
 
@@ -198,27 +192,20 @@ sub _observe_child
 }
 
 # remove is generated automatically
-sub _remove_child
+sub _remove_child ( $self, $labelkey )
 {
-   my $self = shift;
-   my ( $labelkey ) = @_;
-
    delete $self->{bucketcounts}{$labelkey};
    delete $self->{sums}{$labelkey};
 }
 
-sub clear
+sub clear ( $self )
 {
-   my $self = shift;
-
-   undef %{ $self->{bucketcounts} };
-   undef %{ $self->{sums} };
+   undef $self->{bucketcounts}->%*;
+   undef $self->{sums}->%*;
 }
 
-sub samples
+sub samples ( $self )
 {
-   my $self = shift;
-
    my $bounds       = $self->{bounds};
    my $bucketcounts = $self->{bucketcounts};
    my $sums         = $self->{sums};

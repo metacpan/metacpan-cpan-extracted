@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Ref::Util qw/is_plain_hashref/;
 
-our $VERSION='0.2.7';
+our $VERSION='0.2.8';
 
 my %property=map {$_=>undef} qw/f attr op value boolean filters mod/;
 my %matcher=(

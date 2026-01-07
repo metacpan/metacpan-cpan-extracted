@@ -1,6 +1,6 @@
 package Dancer2::Plugin::SyntaxHighlight::Perl;
 
-our $VERSION = '0.0009';
+our $VERSION = '1.00';
 
 use strict; use warnings;
 use Data::Dumper; $Data::Dumper::Indent = $Data::Dumper::Sortkeys = 1;
@@ -66,7 +66,7 @@ __END__
 
 =head1 VERSION
 
-version 0.0009
+version 1.00
 
 =head1 NAME
 
@@ -102,7 +102,7 @@ This module provides on-the-fly conversion of Perl to syntax-highlighted HTML. F
 Or:
 
   <div>
-    <pre>[%example_code %]</pre>
+    <pre>[% example_code %]</pre>
   </div>
 
 =head1 EXAMPLE OUTPUT
@@ -147,7 +147,7 @@ Nick Tonkin <tonkin@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Nick Tonkin.
+This software is copyright (c) 2026 by Nick Tonkin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

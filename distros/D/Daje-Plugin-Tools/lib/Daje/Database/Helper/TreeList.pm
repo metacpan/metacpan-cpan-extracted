@@ -50,29 +50,30 @@ async sub load_treelist($self, $tools_projects_pkey) {
 
 sub _add_tools_object_views($self, $node, $tools_objects_fkey) {
     my $objects_view = $self->_load_tools_object_view($tools_objects_fkey);
+
     if($objects_view->{result} > 0) {
         my $length = scalar @{$objects_view->{data}};
         for (my $i = 0; $i < $length; $i++) {
             my $res->{id} = @{$objects_view->{data}}[$i]->{tools_object_view_pkey} . "-tools_object_view";
             $res->{label} = @{$objects_view->{data}}[$i]->{name};
             $res->{data} = @{$objects_view->{data}}[$i];
-            $res->{icon} = 'pi pi-fw pi-folder';
+            $res->{icon} = 'pi pi-fw pi-tablet';
             $res->{children} = [];
             push(@{$node->{children}}, $res);
         }
     }
+    return $node;
 }
 
 sub _add_tools_object_sql($self, $node, $tools_objects_fkey) {
-    my $objects_index = $self->_load_tools_object_sql($tools_objects_fkey);
-
-    if($objects_index->{result} > 0) {
-        my $length = scalar @{$objects_index->{data}};
+    my $objects_sql = $self->_load_tools_object_sql($tools_objects_fkey);
+    if($objects_sql->{result} > 0) {
+        my $length = scalar @{$objects_sql->{data}};
         for (my $i = 0; $i < $length; $i++) {
-            my $res->{id} = @{$objects_index->{data}}[$i]->{tools_object_sql_pkey} . "-tools_object_sql";
-            $res->{label} = @{$objects_index->{data}}[$i]->{name};
-            $res->{data} = @{$objects_index->{data}}[$i];
-            $res->{icon} = 'pi pi-fw pi-folder';
+            my $res->{id} = @{$objects_sql->{data}}[$i]->{tools_object_sql_pkey} . "-tools_object_sql";
+            $res->{label} = @{$objects_sql->{data}}[$i]->{name};
+            $res->{data} = @{$objects_sql->{data}}[$i];
+            $res->{icon} = 'pi pi-fw pi-wrench';
             $res->{children} = [];
             push(@{$node->{children}}, $res);
         }
@@ -87,9 +88,9 @@ sub _add_tools_object_indexes($self, $node, $tools_objects_fkey) {
         my $length = scalar @{$objects_index->{data}};
         for (my $i = 0; $i < $length; $i++) {
             my $res->{id} = @{$objects_index->{data}}[$i]->{tools_object_index_pkey} . "-tools_object_index";
-            $res->{label} = @{$objects_index->{data}}[$i]->{tablename};
+            $res->{label} = @{$objects_index->{data}}[$i]->{table_name};
             $res->{data} = @{$objects_index->{data}}[$i];
-            $res->{icon} = 'pi pi-fw pi-folder';
+            $res->{icon} = 'pi pi-fw pi-forward';
             $res->{children} = [];
             push(@{$node->{children}}, $res);
         }
@@ -156,6 +157,12 @@ sub _add_objects($self, $data, $type ) {
     $res->{data} = $data ;
     if($data->{tools_object_types_fkey} == 1) {
         $res->{icon} = 'pi pi-fw pi-envelope';
+    } elsif ($data->{tools_object_types_fkey} == 2) {
+        $res->{icon} = 'pi pi-fw pi-arrow-up';
+    } elsif ($data->{tools_object_types_fkey} == 3) {
+        $res->{icon} = 'pi pi-fw pi-sort-alpha-up';
+    } elsif ($data->{tools_object_types_fkey} == 4) {
+        $res->{icon} = 'pi pi-fw pi-tags';
     }
     $res->{children} = [];
 

@@ -1,3 +1,40 @@
+_build/auto_features
+_build/build_params
+_build/cleanup
+_build/config_data
+_build/features
+_build/magicnum
+_build/notes
+_build/prereqs
+_build/runtime_params
+blib/arch/.exists
+blib/arch/auto/Device/Firmata/.exists
+blib/bin/.exists
+blib/lib/auto/Device/Firmata/.exists
+blib/lib/Device/.exists
+blib/lib/Device/Firmata.pm
+blib/lib/Device/Firmata/Base.pm
+blib/lib/Device/Firmata/Constants.pm
+blib/lib/Device/Firmata/Error.pm
+blib/lib/Device/Firmata/IO/NetIO.pm
+blib/lib/Device/Firmata/IO/SerialIO.pm
+blib/lib/Device/Firmata/Language.pm
+blib/lib/Device/Firmata/Platform.pm
+blib/lib/Device/Firmata/Platform/Arduino.pm
+blib/lib/Device/Firmata/Protocol.pm
+blib/man1/.exists
+blib/man3/.exists
+blib/man3/Device::Firmata.3pm
+blib/man3/Device::Firmata::Base.3pm
+blib/man3/Device::Firmata::Constants.3pm
+blib/man3/Device::Firmata::Error.3pm
+blib/man3/Device::Firmata::IO::NetIO.3pm
+blib/man3/Device::Firmata::IO::SerialIO.3pm
+blib/man3/Device::Firmata::Language.3pm
+blib/man3/Device::Firmata::Platform.3pm
+blib/man3/Device::Firmata::Platform::Arduino.3pm
+blib/man3/Device::Firmata::Protocol.3pm
+blib/script/.exists
 Changes
 CONTRIBUTING
 environment
@@ -30,6 +67,9 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.json
+META.yml
+pm_to_blib
 presentation/images/ArduinoDuemilanove.png
 presentation/images/ArduinoIDE.png
 presentation/images/bear-work.png
@@ -77,5 +117,3 @@ t/boilerplate.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

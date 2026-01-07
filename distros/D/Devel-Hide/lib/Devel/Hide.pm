@@ -1,10 +1,10 @@
 package Devel::Hide;
 
-use 5.006001;
+use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.0015';
+our $VERSION = '0.0016';
 
 # blech! package variables
 #
@@ -12,7 +12,9 @@ our $VERSION = '0.0015';
 # $phase is used to identify which version of the hints hash to
 #   use - either %^H when we're updating it, or pulling it out
 #   of caller() when we want to read it
-use vars qw( @HIDDEN $phase );
+our @HIDDEN;
+our $phase;
+
 BEGIN { $phase = 'runtime'; }
 
 # settings are a comma- (and only comma, no quotes or spaces)
@@ -340,10 +342,11 @@ update existing code.
 
 =item perl 5.6
 
-Support will be dropped at some point after 2022-01-01 with no
-further warning. This is because bugs in older perls prevent
-some code improvements. See commit dd27e50 in the repository
-if you care to know what those are.
+Perl version 5.6 is no longer supported. The last version of this
+module to support perl 5.6 was 0.0015, and 5.6 has been deprecated
+since 0.0012. This is because bugs in older perls prevent some code
+improvements. See commit dd27e50 in the repository if you care to know what
+those are.
 
 =back
 

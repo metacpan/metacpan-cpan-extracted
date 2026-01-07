@@ -840,7 +840,7 @@ subtest 'Incremental build'=>sub {
 };
 
 subtest 'Goal seeking'=>sub {
-	plan tests=>7;
+	plan tests=>10;
 	my ($scheduler,%schedule);
 	$scheduler=Schedule::Activity->new(configuration=>{node=>{
 		start=>{next=>[qw/A B/],finish=>'finish',tmavg=>0,attributes=>{bee=>{set=>0}}},
@@ -975,6 +975,42 @@ subtest 'Goal seeking'=>sub {
 	eval { %schedule=$scheduler->schedule(goal=>{cycles=>20,attribute=>{bee=>{op=>'max'}}},activities=>[[11,'start']],tensionbuffer=>1,tensionslack=>1) };
 	like($@,qr/Excess exceeds/,'Goal scheduling raises last error if no schedule found');
 	#
+	# Weighting
+	$scheduler=Schedule::Activity->new(configuration=>{node=>{
+		start=>{next=>[qw/A B C/],finish=>'finish',tmavg=>0,attributes=>{bee=>{set=>0},cee=>{set=>0},dee=>{set=>0}}},
+		finish=>{tmavg=>0},
+		A=>{attributes=>{bee=>{incr=>+1},cee=>{incr=>+0},dee=>{incr=>+0}},tmmin=>2,tmavg=>2,tmmax=>2,next=>[qw/A B C finish/]},
+		B=>{attributes=>{bee=>{incr=>+0},cee=>{incr=>+2},dee=>{incr=>+0}},tmmin=>2,tmavg=>2,tmmax=>2,next=>[qw/A B C finish/]},
+		C=>{attributes=>{bee=>{incr=>+0},cee=>{incr=>+0},dee=>{incr=>+3}},tmmin=>2,tmavg=>2,tmmax=>2,next=>[qw/A B C finish/]},
+	}});
+	($pass,$steps,$maxouter)=(0,0,3351); # pfail<=1e-6
+	while($steps<$maxouter) {
+		my $cycles=int(20+rand(100));
+		$steps+=$cycles;
+		eval { %schedule=$scheduler->schedule(goal=>{cycles=>3351,attribute=>{bee=>{op=>'max'},cee=>{op=>'max'},dee=>{op=>'max'}}},activities=>[[10,'start']],tensionbuffer=>1,tensionslack=>1) };
+		if($schedule{attributes}{dee}{y}>=15) { $pass=1; $maxouter=$steps }
+	}
+	ok($pass,'Weighted 3x3 (dee)');
+	($pass,$steps,$maxouter)=(0,0,3351); # pfail<=1e-6
+	while($steps<$maxouter) {
+		my $cycles=int(20+rand(100));
+		$steps+=$cycles;
+		eval { %schedule=$scheduler->schedule(goal=>{cycles=>3351,attribute=>{bee=>{op=>'max'},cee=>{op=>'max',weight=>2},dee=>{op=>'max'}}},activities=>[[10,'start']],tensionbuffer=>1,tensionslack=>1) };
+		if($schedule{attributes}{cee}{y}>=10) { $pass=1; $maxouter=$steps }
+	}
+	ok($pass,'Weighted 3x3 (cee)');
+	($pass,$steps,$maxouter)=(0,0,3351); # pfail<=1e-6
+	while($steps<$maxouter) {
+		my $cycles=int(20+rand(100));
+		$steps+=$cycles;
+		eval { %schedule=$scheduler->schedule(goal=>{cycles=>$steps,attribute=>{bee=>{op=>'max',weight=>20},cee=>{op=>'max'},dee=>{op=>'max'}}},activities=>[[10,'start']],tensionbuffer=>1,tensionslack=>1) };
+		if($schedule{attributes}{bee}{y}>=5) { $pass=1; $maxouter=$steps }
+	}
+	ok($pass,'Weighted 3x3 (bee)');
+	#
+	# It may be possible to build a test like the final example in samples/goalweights.pl where the unbalanced nature of the scheduling nodes
+	# permits different outcomes based on the selected weight.  In that example, the results look consistent, but would need to prove
+	# those outcomes are the clear winners.
 };
 
 subtest 'Per-activity goals'=>sub {

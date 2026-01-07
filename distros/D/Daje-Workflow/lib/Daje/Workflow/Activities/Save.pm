@@ -44,6 +44,12 @@ use Mojo::Loader qw(load_class);
 
 sub save ($self) {
 
+    $self->model->insert_history(
+        "Save data",
+        "Daje::Workflow::Activities::Save::save",
+        1
+    );
+
     my $data = $self->context->{context}->{payload};
     my $class = $self->activity_data->{class};
     if (my $e = load_class $class) {

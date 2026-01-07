@@ -16,18 +16,27 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad ':experimental(inherit_field)';
 
-class Sys::Async::Virt::Connection v0.1.10;
-
-# inheriting from IO::Async::Notifier (a non-Object::Pad base class) implies ':repr(HASH)'
-inherit IO::Async::Notifier;
+class Sys::Async::Virt::Connection v0.2.1;
 
 field $_in  :inheritable = undef;
 field $_out :inheritable = undef;
 
+# Futures indicating status of the last read/write action
+field $_read_f           = Future->done;
+field $_write_f          = Future->done;
+field $_eof;
+
 use Carp qw(croak);
+use Future::IO;
 use Log::Any qw($log);
 
-method close() {
+method _finalize_io() {
+    $_eof = 1;
+    $_write_f->cancel;
+    $_write_f = Future->fail( 'closed' );
+}
+
+async method close() {
     die $log->fatal(
         "The 'close' method must be implemented by concrete sub-classes");
 }
@@ -37,8 +46,12 @@ async method connect() {
         "The 'connect' method must be implemented by concrete sub-classes");
 }
 
+method connected() {
+    return ($_in and $_out);
+}
+
 method is_read_eof() {
-    return $_in->is_read_eof;
+    return $_eof;
 }
 
 method is_secure() {
@@ -46,14 +59,31 @@ method is_secure() {
 }
 
 method is_write_eof() {
-    return $_out->is_write_eof;
+    return $_eof;
 }
 
 async method read($type, $len) {
     die $log->fatal( "Unsupported transfer type $type" ) unless $type eq 'data';
+    return undef if $_eof;
+
     $log->trace( "Starting read of length $len" );
-    await $_in->read_exactly( $len );
+    $_read_f = $_read_f->then(sub { Future::IO->read_exactly( $_in, $len ) });
+
+    my $data = await $_read_f;
+    $log->trace( "Finished read of length $len" );
+    $_eof = not defined $data;
+
+    return $data;
 }
+
+method _write_chunk($data) {
+    die "Write to closed file" if $_eof;
+
+    $log->trace( 'Low-level write of ' . length($data) . ' bytes' );
+    $_write_f = $_write_f->then(sub { Future::IO->write_exactly( $_out, $data ) });
+    return $_write_f;
+}
+
 
 async method write(@data) {
     return if @data == 0;
@@ -63,13 +93,13 @@ async method write(@data) {
     # all data into the send queue at once, so
     # other write calls can't mix their data
     # with ours
-    my $f = $_out->write( shift @data );
+    my $f = $self->_write_chunk( shift @data );
 
     while (@data) {
         my $data = shift @data;
         next unless $data;
 
-        $_out->write( $data );
+        $self->_write_chunk( $data );
     }
 
     return await $f;
@@ -86,7 +116,7 @@ Sys::Async::Virt::Connection - Connection to LibVirt server (abstract
 
 =head1 VERSION
 
-v0.1.10
+v0.2.1
 
 =head1 SYNOPSIS
 

@@ -18,7 +18,7 @@ WriteMakefile(
     NAME             => 'JQ::Lite',
     VERSION_FROM     => 'lib/JQ/Lite.pm',
     ABSTRACT         => 'A lightweight jq-like JSON query engine in Perl',
-    AUTHOR           => 'Kawamura Shingo <perl.jq.lite@gmail.com>',
+    AUTHOR           => 'Kawamura Shingo <pannakoota1@gmail.com>',
     LICENSE          => 'perl',
     MIN_PERL_VERSION => '5.014',
     PREREQ_PM        => {
@@ -45,4 +45,5 @@ WriteMakefile(
         resources => $resources,
     },
 );
+
 

@@ -24,6 +24,7 @@ t/client-call_named.t
 t/client-notify.t
 t/client-notify_named.t
 t/client-pending.t
+t/client-relax.t
 t/client-response.t
 t/release-distribution.t
 t/server-batch.t

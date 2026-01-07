@@ -22,7 +22,7 @@ __PACKAGE__->add_columns(
     },
     status => {
         data_type     => 'varchar',
-        size          => 20,
+        size          => 255,
         is_nullable   => 0,
         default_value => 'pending',
     },

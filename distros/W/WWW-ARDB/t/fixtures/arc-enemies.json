@@ -1,0 +1,20 @@
+[
+  {
+    "id": "wasp",
+    "name": "Wasp",
+    "icon": "/arc/icons/wasp.svg",
+    "updatedAt": "2025-10-23T12:37:58.471Z"
+  },
+  {
+    "id": "grunt",
+    "name": "Grunt",
+    "icon": "/arc/icons/grunt.svg",
+    "updatedAt": "2025-10-23T12:00:00.000Z"
+  },
+  {
+    "id": "harvester",
+    "name": "Harvester",
+    "icon": "/arc/icons/harvester.svg",
+    "updatedAt": "2025-10-23T12:00:00.000Z"
+  }
+]

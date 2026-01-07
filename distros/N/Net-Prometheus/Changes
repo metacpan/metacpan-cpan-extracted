@@ -1,5 +1,11 @@
 Revision history for Net-Prometheus
 
+0.15    2026-01-05
+        [CHANGES]
+         * Modernise to perl v5.20:
+            + Make use of the signatures and postfix deref features
+         * Also include the IO counters from /proc/$PID/io in ProcessCollector
+
 0.14    2024-10-25
         [CHANGES]
          * Added `->remove` and `->clear` methods to all metric types

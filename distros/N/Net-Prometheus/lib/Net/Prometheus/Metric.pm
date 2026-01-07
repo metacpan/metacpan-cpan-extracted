@@ -1,12 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2026 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Metric 0.14;
+package Net::Prometheus::Metric 0.15;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use Carp;
 our @CARP_NOT = qw( Net::Prometheus );
@@ -102,11 +105,8 @@ Optional ARRAY reference giving the names of labels for the metric.
 
 =cut
 
-sub new
+sub new ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
-
    defined $args{name} or
       croak "Required 'name' argument missing";
    defined $args{help} or
@@ -147,9 +147,8 @@ defined values for C<namespace>, C<subsystem> and C<name> with C<'_'>.
 
 =cut
 
-sub fullname
+sub fullname ( $self )
 {
-   my $self = shift;
    return $self->{fullname};
 }
 
@@ -161,10 +160,9 @@ Returns the number of labels defined for this metric.
 
 =cut
 
-sub labelcount
+sub labelcount ( $self )
 {
-   my $self = shift;
-   return scalar @{ $self->{labels} };
+   return scalar $self->{labels}->@*;
 }
 
 =head2 labels
@@ -186,11 +184,8 @@ This object may be cached for efficiency.
 
 =cut
 
-sub labels
+sub labels ( $self, @values )
 {
-   my $self = shift;
-   my @values = @_;
-
    if( @values == 1 and is_hashref( $values[0] ) ) {
       my $labels = $self->{labels};
       my $href = $values[0];
@@ -198,7 +193,7 @@ sub labels
       defined $href->{$_} or croak "No value for $_ label given"
          for @$labels;
 
-      @values = @{$href}{ @$labels };
+      @values = $href->@{ @$labels };
    }
 
    my $labelcount = $self->labelcount;
@@ -235,30 +230,28 @@ sub labels
       LABELKEY => 1,
    };
 
-   sub new
+   sub new ( $class, $metric, $labelkey )
    {
-      my $class = shift;
-      my ( $metric, $labelkey ) = @_;
       return bless [ $metric, $labelkey ], $class;
    }
 
-   sub metric   { shift->[METRIC] }
-   sub labelkey { shift->[LABELKEY] }
+   sub metric   ( $self ) { $self->[METRIC] }
+   sub labelkey ( $self ) { $self->[LABELKEY] }
 }
 
 # A metaclass method for declaring the child class
-sub MAKE_child_class
+sub MAKE_child_class ( $class )
 {
-   my $class = shift;
-
    # The careful ordering of these two changes should make it possible to
    #   further subclass metrics and metric child classes recursively
    my $childclass_metapkg = meta::get_package( "${class}::_Child" );
-   @{ $childclass_metapkg->get_or_add_symbol( '@ISA' )->reference } =
+   $childclass_metapkg->get_or_add_symbol( '@ISA' )->reference->@* =
       $class->CHILDCLASS;
 
    my $class_metapkg = meta::get_package( $class );
-   $class_metapkg->add_named_sub( CHILDCLASS => sub() { "${class}::_Child" } );
+   $class_metapkg->add_named_sub(
+      CHILDCLASS => sub ( $ = undef ) { "${class}::_Child" }
+   );
 
    # All Metric subclasses should support ->remove
    $class->MAKE_child_method( 'remove' );
@@ -266,26 +259,21 @@ sub MAKE_child_class
 
 # A metaclass method for declaring what Metric subclass methods are proxied
 #   via child instances
-sub MAKE_child_method
+sub MAKE_child_method ( $class, $method )
 {
-   my $class = shift;
-   my ( $method ) = @_;
-
    my $class_metapkg = meta::get_package( $class );
 
-   $class_metapkg->add_named_sub( $method => sub {
-      my $self = shift;
-      my @values = splice @_, 0, is_hashref( $_[0] ) ? 1 : $self->labelcount;
+   $class_metapkg->add_named_sub( $method => sub ( $self, @args ) {
+      my @values = splice @args, 0, is_hashref( $args[0] ) ? 1 : $self->labelcount;
 
-      $self->labels( @values )->$method( @_ );
+      $self->labels( @values )->$method( @args );
    } );
 
    my $childclass_metapkg = meta::get_package( "${class}::_Child" );
 
    my $childmethod = "_${method}_child";
-   $childclass_metapkg->add_named_sub( $method => sub {
-      my $self = shift;
-      $self->metric->$childmethod( $self->labelkey, @_ );
+   $childclass_metapkg->add_named_sub( $method => sub ( $self, @args ) {
+      $self->metric->$childmethod( $self->labelkey, @args );
    } );
 }
 
@@ -302,25 +290,20 @@ values to be added to the sample.
 
 =cut
 
-sub make_sample
+sub make_sample ( $self, $suffix, $labelkey, $value, $extralabels = undef )
 {
-   my $self = shift;
-   my ( $suffix, $labelkey, $value, $extralabels ) = @_;
-
    my $labelnames  = $self->{labels};
    my $labelvalues = $self->{labelvalues}{$labelkey};
 
    return Sample(
       ( $suffix ? $self->fullname . "_$suffix" : $self->fullname ),
-      [ ( map { $labelnames->[$_], $labelvalues->[$_] } 0 .. $#$labelnames ), @{ $extralabels || [] } ],
+      [ ( map { $labelnames->[$_], $labelvalues->[$_] } 0 .. $#$labelnames ), ( $extralabels || [] )->@* ],
       $value,
    );
 }
 
-sub collect
+sub collect ( $self, $ )
 {
-   my $self = shift;
-
    return MetricSamples(
       $self->fullname, $self->_type, $self->{help},
       [ $self->samples ],
@@ -340,7 +323,7 @@ from this metric.
 
 =cut
 
-sub samples
+sub samples ( $self )
 {
    croak "Abstract Net::Prometheus::Metric->samples invoked directly";
 }
@@ -372,7 +355,7 @@ empty state.
 =cut
 
 # must be created by each child class
-sub clear
+sub clear ( $self )
 {
    croak "Abstract Net::Prometheus::Metric->clear invoked directly";
 }

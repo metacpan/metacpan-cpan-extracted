@@ -3,7 +3,7 @@ require 5.006_001;
 use strict;
 use warnings;
 use Exporter ();
-our $VERSION     = '0.11';
+our $VERSION     = '0.12';
 our @ISA         = qw(Exporter);
 our @EXPORT_OK   = qw(
     get_home_directory
@@ -45,7 +45,7 @@ File::Save::Home - Place file safely under user home directory
 
 =head1 VERSION
 
-This document refers to version 0.11, released October 26 2017.
+This document refers to version 0.12, released January 03 2026.
 
 =head1 SYNOPSIS
 
@@ -509,10 +509,9 @@ The latter two packages are part of the ExtUtils::ModuleMaker distribution
 available from the same author on CPAN.  They and the ExtUtils::ModuleMaker
 test suite provide examples of the use of File::Save::Home.
 
-Two other distributions located on CPAN, File::HomeDir and
-File::HomeDir::Win32, may also be used to locate a suitable value for a user's
-home directory.  It should be noted, however, that those modules and
-File::Save::Home each take a different approach to defining a home directory
+One other CPAN distribution, File::HomeDir can also be used to locate a suitable value for a user's
+home directory.  It should be noted, however, that this module and
+File::Save::Home take different approaches to defining a home directory
 on Win32 systems.  Hence, each may deliver a different result on a given
 system.  I cannot say that one distribution's approach is any more or less
 correct than the other two's approaches.  The following comments should be
@@ -556,8 +555,7 @@ the source code for each module.
 File::HomeDir's objective is to provide a value for a user's home directory on
 a wide variety of operating systems.  When invoked, it detects the operating
 system you're on and calls a subclassed module.  When used on a Win32 system,
-that subclass is called File::HomeDir::Windows (not to be confused with the
-separate CPAN distribution File::HomeDir::Win32).
+that subclass is called File::HomeDir::Windows.
 C<File::HomeDir::Windows-E<gt>my_home()> looks like this:
 
     sub my_home {
@@ -627,23 +625,12 @@ you can supply any valid directory as an optional additional argument to the
 two File::Save::Home functions which normally default to calling
 C<get_home_directory> internally.
 
-=head2 File::HomeDir::Win32
-
-File::HomeDir::Win32 was originally written by Rob Rothenberg and is now
-maintained by Randy Kobes.  According to Adam Kennedy
-(L<http://annocpan.org/~JKEENAN/File-Save-Home-0.07/lib/File/Save/Home.pm#note_636>),
-''The functionality in File::HomeDir::Win32 is gradually being merged into
-File::HomeDir over time and will eventually be deprecated (although left in
-place for compatibility purposes).''  Because I have not yet fully installed
-File::HomeDir::Win32, I will defer further comparison between it and
-File::Save::Home to a later date.
-
 =head1 AUTHOR
 
 	James E Keenan
 	CPAN ID: JKEENAN
 	jkeenan@cpan.org
-	http://search.cpan.org/~jkeenan
+    https://metacpan.org/pod/File::Save::Home
 
 =head1 ACKNOWLEDGMENTS
 
@@ -668,7 +655,7 @@ Group for patches.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005-2017 James E. Keenan.  United States.  All rights reserved.
+Copyright (c) 2005-2026 James E. Keenan.  United States.  All rights reserved.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

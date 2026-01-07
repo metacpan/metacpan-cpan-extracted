@@ -12,3 +12,5 @@
     - Adding converter role and option in field.
 0.7 Tue Dec 30 07:50:13 PM CET 2025
     - Adding missing converter role to manifest.
+0.8 Sat Jan  3 03:52:31 AM CET 2026
+    - Fixes in Converter docs in style and allowing undef in the DateTime example converter.

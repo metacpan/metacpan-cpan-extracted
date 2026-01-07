@@ -13,12 +13,12 @@ WriteMakefile(
   },
   MIN_PERL_VERSION => 5.020,
   PREREQ_PM    => {
-      'Mojolicious'   => '8.36',
-      'Email::Mailer' => '1.15',
-      'Email::Sender' => '1.300034',
-      'Try::Tiny'     => '0.30',
+      'Mojolicious'   => '9.34',
+      'Email::Mailer' => '1.22',
+      'Email::Sender' => '2.601',
+      'Try::Tiny'     => '0.31',
       'Hash::Merge'   => '0',
-      'MIME::Words'   => '0'
+      'MIME::Words'   => '5.515'
   },
   LICENSE      => 'perl_5',
   test         => {TESTS => 't/*.t'},

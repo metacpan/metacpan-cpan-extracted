@@ -8,7 +8,7 @@ use Hash::Merge qw(merge);
 use MIME::Words qw(encode_mimeword);
 use Try::Tiny;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use constant TEST => $ENV{MOJO_MAIL_TEST} || 0;
 use constant FROM => 'test-emailmailer-plugin@mojolicio.us';
@@ -37,7 +37,6 @@ sub register ($self, $app, $conf = {}) {
 
 sub _send_mail ($c, %args) {
     %args = %{_text_encoding(%args)} if (defined($args{text}) && !defined($args{html}));
-    %args = %{_encode_subject(%args)};
 
     try {
         return Email::Mailer->send(%{merge(\%args, $plugin_conf)})->[0];
@@ -52,11 +51,9 @@ sub _send_multiple_mail ($c, %args) {
     return 0 unless (defined($args{mail}) && defined($args{send}));
 
     $args{mail} = _text_encoding(%{$args{mail}}) if (defined($args{mail}->{text}) && !defined($args{mail}->{html}));
-    $args{mail} = _encode_subject(%{$args{mail}});
 
     for my $mail (@{$args{send}}) {
         $mail = _text_encoding(%{$mail}) if (defined($mail->{text}) && !defined($mail->{html}));
-        $mail = _encode_subject(%{$mail});
     }
 
     try {
@@ -71,7 +68,7 @@ sub _send_multiple_mail ($c, %args) {
 sub _render_mail ($c, @args) {
     my $bytestream = $c->render_to_string(@args, format => 'mail');
     return $bytestream->to_string if $bytestream;
-    return undef;
+    return;
 }
 
 sub _normalize_transport_name ($c, $class = '') {
@@ -98,16 +95,7 @@ sub _text_encoding (%args) {
 
     $ct //= 'Content-Type';
     (my $encoding = $args{$ct}) =~ s/.*charset=([^;]+);?.*/$1/;
-    $args{text} = encode($encoding, $args{text});
-
-    return \%args;
-}
-
-sub _encode_subject (%args) {
-    for my $header ('subject', 'to', 'from') {
-        my $key     = _header_key($header, %args);
-        $args{$key} = encode('UTF-8', $args{$key}) if $key;
-    }
+    $args{text} = encode($encoding, $args{text}) unless $encoding eq 'utf8';
 
     return \%args;
 }

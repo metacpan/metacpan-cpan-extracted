@@ -19,42 +19,40 @@ use Future::AsyncAwait;
 use Object::Pad 0.821;
 use Sublike::Extended 0.29 'method', 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-class Sys::Async::Virt v0.1.10;
-
-# inheriting from IO::Async::Notifier (a non-Object::Pad base class) implies ':repr(HASH)'
-inherit IO::Async::Notifier;
+class Sys::Async::Virt v0.2.1;
 
 
 use Carp qw(croak);
 use Future;
-use Future::Queue;
+use Future::IO;
+use Future::Selector;
 use Log::Any qw($log);
 use Scalar::Util qw(reftype weaken);
 
-use Protocol::Sys::Virt::Remote::XDR v11.10.0;
+use Protocol::Sys::Virt::Remote::XDR v11.10.1;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-use Protocol::Sys::Virt::KeepAlive v11.10.0;
-use Protocol::Sys::Virt::Remote v11.10.0;
-use Protocol::Sys::Virt::Transport v11.10.0;
-use Protocol::Sys::Virt::URI v11.10.0; # imports parse_url
+use Protocol::Sys::Virt::KeepAlive v11.10.1;
+use Protocol::Sys::Virt::Remote v11.10.1;
+use Protocol::Sys::Virt::Transport v11.10.1;
+use Protocol::Sys::Virt::URI v11.10.1; # imports parse_url
 
-use Sys::Async::Virt::Connection::Factory v0.1.10;
-use Sys::Async::Virt::Domain v0.1.10;
-use Sys::Async::Virt::DomainCheckpoint v0.1.10;
-use Sys::Async::Virt::DomainSnapshot v0.1.10;
-use Sys::Async::Virt::Network v0.1.10;
-use Sys::Async::Virt::NetworkPort v0.1.10;
-use Sys::Async::Virt::NwFilter v0.1.10;
-use Sys::Async::Virt::NwFilterBinding v0.1.10;
-use Sys::Async::Virt::Interface v0.1.10;
-use Sys::Async::Virt::StoragePool v0.1.10;
-use Sys::Async::Virt::StorageVol v0.1.10;
-use Sys::Async::Virt::NodeDevice v0.1.10;
-use Sys::Async::Virt::Secret v0.1.10;
+use Sys::Async::Virt::Connection::Factory v0.2.1;
+use Sys::Async::Virt::Domain v0.2.1;
+use Sys::Async::Virt::DomainCheckpoint v0.2.1;
+use Sys::Async::Virt::DomainSnapshot v0.2.1;
+use Sys::Async::Virt::Network v0.2.1;
+use Sys::Async::Virt::NetworkPort v0.2.1;
+use Sys::Async::Virt::NwFilter v0.2.1;
+use Sys::Async::Virt::NwFilterBinding v0.2.1;
+use Sys::Async::Virt::Interface v0.2.1;
+use Sys::Async::Virt::StoragePool v0.2.1;
+use Sys::Async::Virt::StorageVol v0.2.1;
+use Sys::Async::Virt::NodeDevice v0.2.1;
+use Sys::Async::Virt::Secret v0.2.1;
 
-use Sys::Async::Virt::Callback v0.1.10;
-use Sys::Async::Virt::Stream v0.1.10;
+use Sys::Async::Virt::Callback v0.2.1;
+use Sys::Async::Virt::Stream v0.2.1;
 
 use constant {
     CLOSE_REASON_ERROR                                  => 0,
@@ -294,6 +292,18 @@ use constant {
 };
 
 
+use constant {
+    _STATE_NONE           => 0,
+    _STATE_INITIALIZING   => 1,
+    _STATE_INITIALIZED    => 2,
+    _STATE_AUTHENTICATING => 3,
+    _STATE_AUTHENTICATED  => 4,
+    _STATE_OPENING        => 5,
+    _STATE_OPENED         => 6,
+    _STATE_CLEANING_UP    => 7,
+    _STATE_CLOSING        => 8,
+    _STATE_CLOSED         => 9,
+};
 
 field $_domains            = {};
 field $_domain_checkpoints = {};
@@ -329,10 +339,10 @@ field $_on_close      :param = sub {};
 field $_on_stream     :param = undef;
 field $_on_message    :param = sub {};
 
-field $_keepalive_future = undef;
-field $_pump_future      = undef;
-field $_state            = 'DISCONNECTED'; # state machine
-field $_substate         = ''; # when _state=='CONNECTED'
+field $_selector         = Future::Selector->new;
+field $_completed_f      = undef;
+field $_eof              = 0;
+field $_state            = _STATE_NONE; # state machine
 field $_replies          = {};
 
 
@@ -845,7 +855,6 @@ my @reply_translators = (
     sub { 453; my $client = shift; _translated_msg($client, { dom => \&_translate_remote_nonnull_domain }, @_) }
 );
 
-
 sub _map( $client, $unwrap, $argmap, $data) {
     for my $key (keys $argmap->%*) {
         my $val = $data->{$key};
@@ -1070,7 +1079,7 @@ method _storage_vol_instance($id) {
     my $c = $_storage_vols->{$id->{key}};
     unless ($c) {
         $c = $_storage_vols->{$id->{key}} =
-            _storage_vol_factory->(
+            _storage_vol_factory(
                 client => $self,
                 remote => $_remote,
                 id => $id );
@@ -1109,9 +1118,13 @@ async method _call($proc, $args = {}, :$unwrap = '', :$stream = '', :$empty = ''
     die $log->fatal( "RPC call without remote connection (proc: $proc)" )
         unless $self->is_connected;
     my $serial = await $_remote->call( $proc, $args );
-    my $f = $self->loop->new_future;
+    my $f = Future->new;
     $log->trace( "Setting serial $serial future (proc: $proc)" );
     $_replies->{$serial} = $f;
+    $_selector->add(
+        data => 'reply',
+        f    => $f
+        );
     ### Return a stream somehow...
     my @rv = await $f;
     $rv[0] = $rv[0]->{$unwrap} if $unwrap;
@@ -1125,10 +1138,10 @@ async method _call($proc, $args = {}, :$unwrap = '', :$stream = '', :$empty = ''
             );
         $_streams->{$serial} = $s;
         weaken $_streams->{$serial};
-        $self->add_child( $s );
 
         push @rv, $s;
     }
+
     return @rv;
 }
 
@@ -1167,10 +1180,6 @@ async method _send($proc, $serial, :$data = undef, :$hole = undef, %rest) {
         hole => $hole);
 }
 
-async method _send_finish($proc, $serial, $abort) {
-    await $_remote->stream_end($proc, $serial, $abort);
-}
-
 async method _typed_param_string_okay() {
     return $_typed_param_string_okay //=
         ((await $self->_supports_feature(
@@ -1188,6 +1197,7 @@ async method _filter_typed_param_string($params) {
 
 method _dispatch_closed(@args) {
     $_on_close->( $self, @args );
+
     # dispatch only once, on first-come-first-serve basis:
     $_on_close = sub { };
 }
@@ -1203,16 +1213,16 @@ method _dispatch_message(:$data = undef, :$header = undef, %args) {
         my %cbargs = $reply_translators[$header->{proc}]->(
             $self, data => $data, header => $header, %args
             );
-        $cb->_dispatch_event($cbargs{data});
+        return $cb->_dispatch_event($cbargs{data});
     }
     else {
         my %cbargs = $reply_translators[$header->{proc}]->( $self, %args );
-        $_on_message->( $cbargs{data} );
+        return $_on_message->( $cbargs{data} );
     }
 }
 
 method _dispatch_reply(:$header, %args) {
-    $log->trace( "Dispatching serial $header->{serial}" );
+    $log->trace( "Dispatching serial $header->{serial} / $header->{proc}" );
     if ($_keepalive) {
         $_keepalive->mark_active;
     }
@@ -1229,7 +1239,8 @@ method _dispatch_reply(:$header, %args) {
         die 'Unhandled reply';
     }
 
-    return;
+    $log->trace( "Dispatching serial $header->{serial} done" );
+    return $f;
 }
 
 method _dispatch_stream(:$header, %args) {
@@ -1265,53 +1276,50 @@ method register($r) {
     $_remote = $r;
 }
 
+async method run_once() {
+    my ($len, $type) = $_transport->need;
+    $log->trace( 'Reading data from connection' );
 
-async sub _pump($conn, $transport) {
-    my $eof;
-    my $data;
-    while (not $eof) {
-        my ($len, $type) = $transport->need;
-        $log->trace( "Reading data from connection: initiated (len: $len)" );
-        ($data, $eof) = await $conn->read( $type, $len );
-        last if length($data) == 0 and $eof;
-        $log->trace( 'Reading data from connection: completed' );
+    # closing the connection will kill the 'read' action
+    my ($data, $eof) = await $_connection->read( $type, $len );
+    $_keepalive->mark_active if $_keepalive and $data;
+    $log->trace( 'Reading data from connection: completed' );
 
-        await Future->wait_all( $transport->receive($data) );
-        $log->trace( 'Processed input data from connection' );
-    }
-    $log->info( 'EOF' );
+    return ($data, $eof);
 }
 
-method is_connected() {
-    return $_state eq 'CONNECTED';
-}
+method _deregister_callback($f, $proc, $id) {
+    delete $_callbacks->{$id};
+    my $r = $self->_call( $proc, { callbackID => $id } );
+    $r->on_ready( $f ) if $f;
 
-method is_opened() {
-    return ($_state eq 'CONNECTED'
-            and $_substate eq 'OPENED');
-}
-
-method _remove_stream($id) {
-    delete $_streams->{$id};
+    $_selector->add(
+        data => 'callback',
+        f    => $r
+    );
     return;
 }
 
-# ENTRYPOINT: REMOTE_PROC_CONNECT_IS_SECURE
-async method is_secure() {
-    return ($self->is_opened
-        and $_connection->is_secure
-        and await $self->_call( $remote->PROC_CONNECT_IS_SECURE,
-                                {}, unwrap => 'secure' ));
+method _send_finish($f, $proc, $serial, $abort) {
+    my $r = $_remote->stream_end($proc, $serial, $abort);
+    # streams send a final "OK" message; we should be awaiting that
+    # instead of declaring the future $f done here
+
+    $_selector->add(
+        data => 'stream',
+        f    => $r
+    );
+    return;
 }
 
-async method connect(:$pump //= \&_pump) {
-    return if $_state ne 'DISCONNECTED';
+async method initialize() {
+    return unless $_state == _STATE_NONE;
+    $_state = _STATE_INITIALIZING;
 
     unless ($_connection) {
         $_factory    //= Sys::Async::Virt::Connection::Factory->new;
         $_connection = $_factory->create_connection( $_url,
                                                      readonly => $_readonly );
-        $self->add_child( $_connection );
     }
 
     unless ($_transport) {
@@ -1327,88 +1335,127 @@ async method connect(:$pump //= \&_pump) {
     $_remote->register( $_transport );
     $self->register( $_remote );
 
-    $_state = 'CONNECTING';
-    await $_connection->connect;
-    $_state    = 'CONNECTED';
-    $_substate = 'NONE';
-    $log->trace( "Connected" );
-
-    my $f = $pump->( $_connection, $_transport );
-    $self->adopt_future( $f );
-    $f->on_done(
-        sub {
-            $self->_close( $self->CLOSE_REASON_EOF );
-        });
-    $f->on_fail(
-        sub {
-            $self->_close( $self->CLOSE_REASON_ERROR );
-        });
-    $_pump_future = $f;
-
-    $_substate = 'AUTHENTICATING';
-    await $self->auth();
-    $_substate = 'AUTHENTICATED';
-    $log->trace( "Authenticated" );
-    # auth( $auth_type )
-    #  --> clients take the selected auth mechanism from the
-    #      connection URL: auth='sasl[.<mech>]" / auth='none' / auth='polkit'
-    # in order to be able to handle SASL AUTH, we'll need an Authen::SASL
-    # authentication parameter to be passed in though...
-
-    if (await $self->_supports_feature(
-            $_remote->DRV_FEATURE_PROGRAM_KEEPALIVE )) {
-        $_keepalive //= Protocol::Sys::Virt::KeepAlive->new(
-            max_inactive => 5,
-            on_ack       => sub { $log->trace('KeepAlive PING ACK'); return; },
-            on_ping      => sub {
-                $log->trace('KeepAlive ACK-ing PING');
-                $self->adopt_future( $_[0]->pong );
-                return;
-            },
-            on_fail      => sub {
-                $log->fatal('KeepAlive time out - closing connection');
-                $self->adopt_future(
-                    $self->_close( $self->CLOSE_REASON_KEEPALIVE ) );
-                return;
-            });
-
-        $_keepalive->register( $_transport );
-        my $keep_pump = async sub {
-            while (1) {
-                await $self->loop->delay_future(
-                    after => $_ping_interval
-                    );
-                $log->trace('Sending PING');
-                if (my $f = $_keepalive->ping ) {
-                    $self->adopt_future( $f );
-                }
-            }
-        };
-        my $f = $keep_pump->();
-        $self->adopt_future( $f );
-        $_keepalive_future = $f;
+    unless ($_connection->connected) {
+        await Future->wait_any(
+            $_connection->connect,
+            Future::IO->sleep( 60 )
+                ->then(sub { Future->fail('timeout') })
+            );
     }
+    $log->trace( "Connected" );
+    $_selector->add( data => 'data',
+                     gen  => sub { $_completed_f->is_ready ? undef : $self->run_once } );
 
-    $_substate = 'OPENING';
-    await $self->open();
-    $_substate = 'OPENED';
+    $_state = _STATE_INITIALIZED;
+}
 
+async method _dispatch_data( $f ) {
+    my ($data, $eof) = do {
+        try {
+            await $f;
+        }
+        catch ($e) {
+            $_selector->add(
+                data => 'closing',
+                f    => $self->_close( $self->CLOSE_REASON_ERROR )
+                );
+            die $e;
+        }
+    };
+
+
+    # submit $data to $_transport, allowing $transport to raise an error
+    # if the stream is terminated early.
+    #
+    # $_transport->receive() may return a list of futures to be awaited.
+    if (my @dispatch_values = $_transport->receive($data)) {
+        my $p = Future->wait_all( @dispatch_values )
+            ->on_done(sub {
+                $log->trace( 'Processed input data from connection' )
+                      });
+
+        # Enable async handling while we process further input from
+        # the connection.
+        $_selector->add( data => 'dispatch',
+                         f    => $p );
+    }
+    if (length($data) == 0 and $eof) {
+        $_eof = 1;
+        $log->info( 'EOF' );
+        $_selector->add(
+            data => 'closing',
+            f    => $self->_close( $self->CLOSE_REASON_EOF )
+            );
+    }
+}
+
+async method run() {
+    return if $_completed_f;
+
+    my $running = 1;
+    $_completed_f = Future->new->on_ready(sub { $running = 0 });
+    $_selector->add( data => '',
+                     f    => $_completed_f );
+    while ($running) {
+        my ( $tag, $f ) = await $_selector->select;
+        $tag //= '';
+
+        if ( $tag eq 'data' ) {
+            await $self->_dispatch_data( $f );
+        }
+        else {
+            await $f;
+        }
+    }
+}
+
+method stop() {
+    croak 'Not running' unless $_completed_f;
+    $_completed_f->done unless $_completed_f->is_ready;
+}
+
+method is_connected() {
+    return not ($_state == _STATE_NONE
+                or $_state == _STATE_INITIALIZING
+                or $_state == _STATE_CLOSED);
+}
+
+method is_opened() {
+    return ($_state == _STATE_OPENED);
+}
+
+method _remove_stream($id) {
+    delete $_streams->{$id};
     return;
 }
 
+# ENTRYPOINT: REMOTE_PROC_CONNECT_IS_SECURE
+async method is_secure() {
+    return ($self->is_opened
+            and $_connection->is_secure
+            and await $self->_call( $remote->PROC_CONNECT_IS_SECURE,
+                                    {}, unwrap => 'secure' ));
+}
+
+async method connect() {
+    await $self->initialize;
+    await $self->auth;
+    await $self->open;
+}
 
 # ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_CALLBACK_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_CALLBACK_DEREGISTER_ANY
 async method domain_event_register_any($eventID, $domain = undef) {
+    my $dom = $domain ? $domain->id : undef;
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_DOMAIN_EVENT_CALLBACK_REGISTER_ANY,
-        { eventID => $eventID, dom => $domain->id });
+        { eventID => $eventID, dom => $dom });
     my $dereg = $remote->PROC_CONNECT_DOMAIN_EVENT_CALLBACK_DEREGISTER_ANY;
     my $cb = Sys::Async::Virt::Callback->new(
         id => $rv->{callbackID},
         client => $self,
         deregister_call => $dereg,
-        factory => sub { $self->loop->new_future }
+        factory => sub { Future->new }
         );
     $_callbacks->{$rv->{callbackID}} = $cb;
     weaken $_callbacks->{$rv->{callbackID}};
@@ -1419,15 +1466,16 @@ async method domain_event_register_any($eventID, $domain = undef) {
 # ENTRYPOINT: REMOTE_PROC_CONNECT_NETWORK_EVENT_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_NETWORK_EVENT_DEREGISTER_ANY
 async method network_event_register_any($eventID, $network = undef) {
+    my $net = $network ? $network->id : undef;
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_NETWORK_EVENT_REGISTER_ANY,
-        { eventID => $eventID, net => $network->id });
+        { eventID => $eventID, net => $net });
     my $dereg = $remote->PROC_CONNECT_NETWORK_EVENT_DEREGISTER_ANY;
     my $cb = Sys::Async::Virt::Callback->new(
         id => $rv->{callbackID},
         client => $self,
         deregister_call => $dereg,
-        factory => sub { $self->loop->new_future }
+        factory => sub { Future->new }
         );
     $_callbacks->{$rv->{callbackID}} = $cb;
 
@@ -1437,15 +1485,16 @@ async method network_event_register_any($eventID, $network = undef) {
 # ENTRYPOINT: REMOTE_PROC_CONNECT_STORAGE_POOL_EVENT_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_STORAGE_POOL_EVENT_DEREGISTER_ANY
 async method storage_pool_event_register_any($eventID, $pool = undef) {
+    my $p = $pool ? $pool->id : undef;
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_STORAGE_POOL_EVENT_REGISTER_ANY,
-        { eventID => $eventID, pool => $pool->id });
+        { eventID => $eventID, pool => $p });
     my $dereg = $remote->PROC_CONNECT_STORAGE_POOL_EVENT_DEREGISTER_ANY;
     my $cb = Sys::Async::Virt::Callback->new(
         id => $rv->{callbackID},
         client => $self,
         deregister_call => $dereg,
-        factory => sub { $self->loop->new_future }
+        factory => sub { Future->new }
         );
     $_callbacks->{$rv->{callbackID}} = $cb;
 
@@ -1455,15 +1504,16 @@ async method storage_pool_event_register_any($eventID, $pool = undef) {
 # ENTRYPOINT: REMOTE_PROC_CONNECT_NODE_DEVICE_EVENT_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_NODE_DEVICE_EVENT_DEREGISTER_ANY
 async method node_device_event_register_any($eventID, $dev = undef) {
+    my $d = $dev ? $dev->id : undef;
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_NODE_DEVICE_EVENT_REGISTER_ANY,
-        { eventID => $eventID, dev => $dev->id });
+        { eventID => $eventID, dev => $d });
     my $dereg = $remote->PROC_CONNECT_NODE_DEVICE_EVENT_DEREGISTER_ANY;
     my $cb = Sys::Async::Virt::Callback->new(
         id => $rv->{callbackID},
         client => $self,
         deregister_call => $dereg,
-        factory => sub { $self->loop->new_future }
+        factory => sub { Future->new }
         );
     $_callbacks->{$rv->{callbackID}} = $cb;
 
@@ -1473,15 +1523,16 @@ async method node_device_event_register_any($eventID, $dev = undef) {
 # ENTRYPOINT: REMOTE_PROC_CONNECT_SECRET_EVENT_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_SECRET_EVENT_DEREGISTER_ANY
 async method secret_event_register_any($eventID, $secret = undef) {
+    my $s = $secret ? $secret->id : undef;
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_SECRET_EVENT_REGISTER_ANY,
-        { eventID => $eventID, secret => $secret->id });
+        { eventID => $eventID, secret => $s });
     my $dereg = $remote->PROC_CONNECT_SECRET_EVENT_DEREGISTER_ANY;
     my $cb = Sys::Async::Virt::Callback->new(
         id => $rv->{callbackID},
         client => $self,
         deregister_call => $dereg,
-        factory => sub { $self->loop->new_future }
+        factory => sub { Future->new }
         );
     $_callbacks->{$rv->{callbackID}} = $cb;
 
@@ -1491,10 +1542,19 @@ async method secret_event_register_any($eventID, $secret = undef) {
 # ENTRYPOINT: REMOTE_PROC_AUTH_LIST
 # ENTRYPOINT: REMOTE_PROC_AUTH_POLKIT
 # ENTRYPOINT: REMOTE_PROC_AUTH_SASL_INIT
+
+# auth( $auth_type )
+#  --> clients take the selected auth mechanism from the
+#      connection URL: auth='sasl[.<mech>]" / auth='none' / auth='polkit'
+# in order to be able to handle SASL AUTH, we'll need an Authen::SASL
+# authentication parameter to be passed in though...
+
 async method auth($auth_type = undef) {
+    return unless $_state == _STATE_INITIALIZED;
+    $_state = _STATE_AUTHENTICATING;
+
     my $auth_types = await $self->_call( $remote->PROC_AUTH_LIST, {},
                                          unwrap => 'types' );
-
     my $selected;
     if (defined $auth_type) {
         my $want;
@@ -1527,20 +1587,54 @@ async method auth($auth_type = undef) {
     $log->trace( "Selected auth method: $selected" );
     if ($selected == $remote->AUTH_POLKIT) {
         await $self->_call( $remote->PROC_AUTH_POLKIT );
-        return;
     }
-    if ($selected == $remote->AUTH_SASL) {
+    elsif ($selected == $remote->AUTH_SASL) {
         my $mechs = await $self->_call( $remote->PROC_AUTH_SASL_INIT, {},
                                         unwrap => 'mechlist' );
         ...
     }
+
+    $_state = _STATE_AUTHENTICATED;
     return;
 }
 
+async method _register_keepalive() {
+    if (await $self->_supports_feature(
+            $_remote->DRV_FEATURE_PROGRAM_KEEPALIVE )) {
+        $_keepalive //= Protocol::Sys::Virt::KeepAlive->new(
+            max_inactive => 5,
+            on_ack       => sub { $log->trace('KeepAlive PING ACK'); return; },
+            on_ping      => sub {
+                $log->trace('KeepAlive ACK-ing PING');
+                return $_[0]->pong unless $_eof;
+            },
+            on_fail      => sub {
+                $log->fatal('KeepAlive time out - closing connection');
+                return $self->_close( $self->CLOSE_REASON_KEEPALIVE );
+            });
+
+        $_keepalive->register( $_transport );
+        $_selector->add( data => 'PING',
+                         gen  => sub {
+                             Future::IO
+                                 ->sleep( $_ping_interval )
+                                 ->on_done(sub {
+                                     $log->trace('Sending PING');
+                                 })
+                                 ->then(sub {
+                                     $_keepalive->ping unless $_eof;
+                                 })
+                         });
+    }
+}
 
 # ENTRYPOINT: REMOTE_PROC_CONNECT_OPEN
 # ENTRYPOINT: REMOTE_PROC_CONNECT_REGISTER_CLOSE_CALLBACK
 async method open() {
+    return unless $_state == _STATE_AUTHENTICATED;
+    $_state = _STATE_OPENING;
+
+    await $self->_register_keepalive();
     my %parsed_url = parse_url( $_url );
     my $flags = $_readonly ? RO : 0;
     await $self->_call( $remote->PROC_CONNECT_OPEN,
@@ -1553,16 +1647,16 @@ async method open() {
             $_remote->DRV_FEATURE_REMOTE_EVENT_CALLBACK )) {
         die "Remote does not support REMOTE_EVENT_CALLBACK feature";
     }
+
+    $_state = _STATE_OPENED;
 }
 
 # ENTRYPOINT: REMOTE_PROC_CONNECT_CLOSE
 # ENTRYPOINT: REMOTE_PROC_CONNECT_UNREGISTER_CLOSE_CALLBACK
 async method _close($reason) {
-    return unless $_state eq 'CONNECTED';
-    return if ($_substate eq 'CLOSING'
-               or $_substate eq 'CLEANING UP');
+    return unless (_STATE_INITIALIZED <= $_state <= _STATE_OPENED );
+    $_state = _STATE_CLEANING_UP;
 
-    $_substate = 'CLEANING UP';
     unless ($_connection->is_read_eof
             or $_connection->is_write_eof) {
         # when orderly connected both for reading and writing,
@@ -1570,28 +1664,20 @@ async method _close($reason) {
         try {
             await Future->wait_all(
                 (map { $_->cancel }
-                 grep values $_callbacks->%*),
+                 grep { $_ } values $_callbacks->%*),
                 (map { $_->abort }
-                 grep values $_streams->%*)
+                 grep { $_ } values $_streams->%*)
                 );
             $log->debug( 'Unregistering CLOSE CALLBACK' );
             await $self->_call(
                 $remote->PROC_CONNECT_UNREGISTER_CLOSE_CALLBACK );
 
             $log->debug( 'Closing session' );
-            $_substate = 'CLOSING';
             await $self->_call( $remote->PROC_CONNECT_CLOSE );
 
-            # stop loops reading from and writing to the connection
-            $_keepalive_future->cancel;
-            my $timeout = $self->loop->delay_future( after => 60 ); # 60s timeout
-            $timeout->on_done(
-                sub {
-                    $log->info( 'Server failed to close connection timely; '
-                                . 'forcibly closing client socket' );
-                });
-            await Future->wait_any( $timeout, $_pump_future );
-            $_connection->close;
+            $_completed_f->done;
+            await $_connection->close;
+            # @@@TODO: wait for server to close the connection?
         }
         catch ($e) {
             $log->error( "Error during release of server resources: $e" );
@@ -1599,51 +1685,52 @@ async method _close($reason) {
     }
     else {
         # stop loops reading from and writing to the connection
-        $_keepalive_future->cancel;
-        my $timeout = $self->loop->delay_future( at => 60 ); # 60s timeout
-        $timeout->on_done(
-            sub {
-                $log->info( 'Server failed to close connection timely; '
-                            . 'forcibly closing client socket' );
-            });
-        await Future->wait_any( $timeout, $_pump_future );
-        $_connection->close;
+        await $_connection->close;
+        # @@@TODO: wait for server to close the connection?
     }
 
     # These *should* have been de-allocated above; however,
     # when the connection to the server doesn't work properly
     # anymore, we want to simply discard the client side resources
     # ... the server is on its own
+
+    $_state = _STATE_CLOSING;
     if (my @callbacks = values $_callbacks->%*) {
         $log->debug( 'Cleaning up callbacks not deregistered from the server' );
         for my $cb (@callbacks) {
+            next unless $cb;
+
             # 'cleanup' cleans the items from the array
             $cb->cleanup;
         }
     }
-    if (my @streams = grep values $_streams->%*) {
+    if (my @streams = values $_streams->%*) {
         $log->debug( 'Cleaning up streams not deregistered from the server' );
         for my $stream (@streams) {
+            next unless $stream;
+
             # 'cleanup' cleans the items from the array
             $stream->cleanup;
         }
     }
-    if (my @replies = grep keys $_replies->%*) {
+    if (my @replies = keys $_replies->%*) {
         $log->debug( 'Cleaning up (failing) on-going RPC calls' );
         for my $serial (@replies) {
             my $reply = delete $_replies->{$serial};
+            next unless $reply;
+
             $reply->fail( 'Closed before reply received' );
         }
     }
 
-    $_state = 'DISCONNECTED';
-    $_substate = '';
+    $_state = _STATE_CLOSED;
     $self->_dispatch_closed( $reason );
+    $_completed_f->done;
     return;
 }
 
 async method close() {
-    return if $_state ne 'CONNECTED';
+    return if ($_state == _STATE_NONE or _STATE_CLEANING_UP <= $_state);
     await $self->_close( $self->CLOSE_REASON_CLIENT );
 }
 
@@ -2351,21 +2438,30 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.1.10
+v0.2.1
 
 Based on LibVirt tag v11.10.0
 
 =head1 SYNOPSIS
 
-  use IO::Async::Loop;
+  use Future::AsyncAwait;
+
+  use Future;
   use Sys::Async::Virt;
 
-  my $loop = IO::Async::Loop->new;
-  my $client = Sys::Async::Virt->new(url => 'qemu:///system');
+  async sub main( $client ) {
+     await $client->connect;
+     my $domains = await $client->list_all_domains;
 
-  $loop->add( $client );
-  await $client->connect;
-  my $domains = await $client->list_all_domains;
+     await $virt->close;
+     $virt->stop;
+  }
+
+  my $c = Sys::Async::Virt->new(url => 'qemu:///system');
+  await Future->await(
+     $client->run,
+     main( $client )
+  );
 
 
 =head1 DESCRIPTION
@@ -2601,6 +2697,20 @@ When not supplied, defaults to the environment variable C<LIBVIRT_DEFAULT_URI>.
 =head2 register
 
   $client->register( $remote );
+
+=head2 run
+
+   my $run_f = $client->run;
+
+Returns a future which resolves when the connection is explicitly stopped
+(through C<< $client->stop >>) or upon a connection error.
+
+=head2 stop
+
+  $client->stop;
+
+Marks the future returned by the C< run > method as resolved, stopping
+all processing related to the connection to the server.
 
 =head2 connect
 
@@ -3971,10 +4081,12 @@ replies.
 
 =over 8
 
-=item * Sort interaction between C<connect> and C<auth> methods
+=item * Streams created with << $vol->upload() >> broken
 
-Currently, C<connect> always calls C<auth>, which makes having a public
-C<auth> method rather pointless.
+These streams seem to be malfunctioning, albeit that the tests were very limited:
+Only on Ubuntu Noble with LibVirt 10.0.0 ; this could very well be a problem
+long solved. If you have other experiences, please share them through the issue
+tracker.
 
 =item * Modules implementing connections for various protocols (tcp, tls, etc)
 

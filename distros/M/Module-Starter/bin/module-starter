@@ -6,7 +6,7 @@ module-starter - creates a skeleton module distribution
 
 =head1 VERSION
 
-version 1.78
+version 1.79
 
 =cut
 
@@ -15,7 +15,7 @@ use strict;
 
 use Module::Starter::App;
 
-our $VERSION = '1.78';
+our $VERSION = '1.79';
 
 Module::Starter::App->run;
 
@@ -35,14 +35,17 @@ Options:
     --mi             Same as --builder=Module::Install (discouraged)
 
     --author=name    Author's name (taken from getpwuid if not provided)
-    --email=email    Author's email (taken from EMAIL if not provided)
+                     and Email address ( taken from $ENV{EMAIL} if Author's name is not provided )
+                     Format: Author Name <author_email@domain.tld>
+                     This option can be supplied multiple times for projects 
+                     that have multiple authors.
 
     --ignores=type   Ignore type files to include (repeatable)
     --license=type   License under which the module will be distributed
                      (default is artistic2)
     --genlicense     Generate LICENSE file according to specified license
     --minperl=ver    Minimum Perl version required (optional;
-                     default is 5.006)
+                     default is 5.008003)
 
     --fatalize       Generate code that causes all warnings to be fatal with:
                      use warnings FATAL => 'all'
@@ -70,6 +73,10 @@ Example:
 
     module-starter --module=Foo::Bar,Foo::Bat \
         --author="Andy Lester" --email=andy@petdance.com
+
+    module-starter --module=Foo::Bar,Foo::Bat \
+        --author="Andy Lester <andy@petdance.com> \
+        --author="Sawyer X <sawyerx@cpan.org>
 
 =head1 DESCRIPTION
 
@@ -106,5 +113,8 @@ configuration file entry. A sample configuration file might read:
 
 This format may become more elaborate in the future, but a file of this type
 should remain valid.
+
+Please note, as of right now the configuration file does *not* have support 
+for multiple authors.
 
 =cut

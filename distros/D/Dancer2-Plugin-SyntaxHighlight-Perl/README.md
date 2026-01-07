@@ -32,7 +32,7 @@ This module provides on-the-fly conversion of Perl to syntax-highlighted HTML. F
 Or:
 
     <div>
-      <pre>[%example_code %]</pre>
+      <pre>[% example_code %]</pre>
     </div>
 
 # EXAMPLE OUTPUT

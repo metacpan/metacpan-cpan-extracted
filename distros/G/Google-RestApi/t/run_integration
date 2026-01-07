@@ -5,4 +5,4 @@
 # to run individual tests, specify integration/Google/RestApi/SheetsApi4/Range.t
 # or whatever set of tests. add -v to see each individual test.
 
-prove -Ilib -I../lib -r integration "$@"
+prove -Ilib -It/lib -r t/integration "$@"

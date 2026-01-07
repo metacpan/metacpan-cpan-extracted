@@ -1,4 +1,4 @@
-package Term::ANSIEncode 1.61;
+package Term::ANSIEncode 1.62;
 
 #######################################################################
 #            _   _  _____ _____   ______                     _        #
@@ -606,7 +606,7 @@ sub _global_ansi_meta {    # prefills the hash cache
             'DEEP SAFFRON'                  => { 'out' => $csi . '38;2;255;153;51m',  'desc' => 'Deep saffron' },
             'DEEP SKY BLUE'                 => { 'out' => $csi . '38;2;0;191;255m',   'desc' => 'Deep sky blue' },
             'DEEP SKY BLUE'                 => { 'out' => $csi . '38;2;0;191;255m',   'desc' => 'Deep sky blue' },
-            'DEFAULT'                       => { 'out' => $csi . '39m',               'desc' => 'Default foreground color' },
+            'DEFAULT'                       => { 'out' => $csi . '39m',               'desc' => 'Default Foreground/Background Color' },
             'DENIM'                         => { 'out' => $csi . '38;2;21;96;189m',   'desc' => 'Denim' },
             'DESERT'                        => { 'out' => $csi . '38;2;193;154;107m', 'desc' => 'Desert' },
             'DESERT SAND'                   => { 'out' => $csi . '38;2;237;201;175m', 'desc' => 'Desert sand' },
@@ -1224,6 +1224,7 @@ sub _global_ansi_meta {    # prefills the hash cache
 
     foreach my $name (keys %{ $tmp->{'foreground'} }) {
         $tmp->{'background'}->{"B_$name"}->{'desc'} = $tmp->{'foreground'}->{$name}->{'desc'};
+#		$tmp->{'background'}->{"B_$name"}->{'desc'} =~ s/foreground/background/;
         $tmp->{'background'}->{"B_$name"}->{'out'}  = $csi . '4' . substr($tmp->{'foreground'}->{$name}->{'out'}, 3);
     }
 
@@ -1539,6 +1540,8 @@ Begins the frame definition
 =item ENDBOX
 
 Ends the frame definition
+
+=back
 
 =head1 AUTHOR & COPYRIGHT
 

@@ -1,5 +1,37 @@
 Revision history for OpenAPI-Client-OpenAI
 
+0.25    2026-01-02
+
+        - Model Updates: Updated examples and internal constants to reflect the
+        latest `gpt-5.2` series models.
+        - Evals API Introduction: Added a comprehensive set of endpoints for
+        managing model evaluations, including creating evaluations, executing
+        evaluation runs, and retrieving detailed output items.
+        - Audio API Enhancements:
+            - Introduced support for speaker diarization in transcriptions via the
+            new `diarized_json` response format.
+            - Added new endpoints for managing Voice Consents and creating custom
+            Voices.
+        - Conversations API Updates:
+            - Restructured conversation item management under the
+            `/conversations/{conversation_id}/items` path.
+            - Added the `include` parameter to allow fetching enhanced metadata
+            such as tool outputs and reasoning tokens.
+        - Realtime API (Beta) Updates: Expanded server events to include support
+        for Model Context Protocol (MCP) tool calls and audio transcript
+        deltas.
+        - Assistant API Enhancements:
+            - Added support for new tools, including `web_search_preview` and
+            `computer_use_preview`.
+            - Introduced the `reasoning_effort` parameter and prompt cache
+            retention policies for assistants.
+        - Batch API Expansion: Added support for including Moderations
+        (`/v1/moderations`) in batch requests.
+        - Containers API: Added `memory_limit` configuration support for
+        container objects.
+        - Documentation: Updated all code examples to prioritize the use of
+        the `OPENAI_API_KEY` environment variable.
+
 0.24    2025-08-22
 
         - Model Updates: Added support for new `gpt-5` series models, including

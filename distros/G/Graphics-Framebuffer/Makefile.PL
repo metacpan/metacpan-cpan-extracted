@@ -8,10 +8,6 @@ use constant {
     FALSE => 0,
 };
 
-# NOTE!  FreeBSD is not yet supported, but I am adding more and more
-#        code to accommodate building on FreeBSD to make ready for
-#        that day when I figure out how to get it to work on FreeBSD
-
 # These should be in Perl's installation already
 use Config;
 use Inline::MakeMaker; # Layers on top of ExtUtils::MakeMaker

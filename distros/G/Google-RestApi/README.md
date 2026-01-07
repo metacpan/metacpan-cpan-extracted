@@ -14,7 +14,8 @@ Google::RestApi - API to Google Drive API V3 and Sheets API V4.
 >       api_callback  => <coderef>,
 >     );
 >
->     # you can call the raw api directly, but usually Drive and Sheets will take care of forming the correct API calls for you.
+>     # you can call the raw api directly, but usually Drive and Sheets will
+      # take care of forming the correct API calls for you.
 >     $response = $rest_api->api(
 >       uri     => <google_api_url>,
 >       method  => get|head|put|patch|post|delete,
@@ -37,7 +38,7 @@ Google::RestApi - API to Google Drive API V3 and Sheets API V4.
 >     # values. this is less efficient but the simplest way to
 >     # interface with the api. you don't deal with any intermediate
 >     # api objects.
->     
+>
 >     # add some data to the worksheet:
 >     @values = (
 >       [ 1001, "Herb Ellis", "100", "10000" ],
@@ -90,7 +91,8 @@ Google::RestApi - API to Google Drive API V3 and Sheets API V4.
 >     # now actually send the values to the spreadsheet:
 >     $rg->submit_values();
 > 
->     # bold and italicize both cells, and put a solid border around each one, and send the formats to the spreadsheet:
+>     # bold and italicize both cells, and put a solid border around each one,
+      # and send the formats to the spreadsheet:
 >     $rg->bold()->italic()->bd_solid()->submit_requests();
 >
 
@@ -116,7 +118,7 @@ Once you have successfully created your OAuth2 token, you can run the integratio
 Set the environment variable GOOGLE_RESTAPI_CONFIG = to the path to your auth config file for the integration scripts to run.
 See t/run_integration for further instructions.
 
-t/tutorial/sheets also has a step-by-step tutorial of creating and updating a spreadsheet, showing you the API calls and return values for each step. This will help you understand how the API interacts with Google.
+tutorial/sheets also has a step-by-step tutorial of creating and updating a spreadsheet, showing you the API calls and return values for each step. This will help you understand how the API interacts with Google.
 
 # STATUS
 
@@ -135,6 +137,6 @@ its completeness.
 
 # COPYRIGHT
 
-Copyright (c) 2021, Robin Murray. All rights reserved.
+Copyright (c) 2019-2026 Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

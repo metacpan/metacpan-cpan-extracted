@@ -91,11 +91,11 @@ The `type` key in each event must be a namespaced string of the form `protocol.m
 
 Reserved `type` prefixes include:
 
-- `http` — standard HTTP events
-- `websocket` — WebSocket events
-- `lifespan` — process lifecycle events
-- `pagi` — reserved for future PAGI-defined system events
-- `ext.` — reserved for experimental or nonstandard events
+- `http` -- standard HTTP events
+- `websocket` -- WebSocket events
+- `lifespan` -- process lifecycle events
+- `pagi` -- reserved for future PAGI-defined system events
+- `ext.` -- reserved for experimental or nonstandard events
 
 Custom user-defined protocols should avoid clashing with these prefixes.
 
@@ -128,7 +128,7 @@ The following types are permitted in event data structures:
   - If keys represent textual data, they **must be explicitly encoded into UTF-8 byte strings** by the application.
   - Values must contain only permitted data types.
 
-**Note:** Booleans are intentionally omitted from the core spec to avoid ambiguity in Perl, which lacks a native boolean type. In contexts where ASGI would use `true`/`false`, PAGI protocol specifications will define expected values explicitly — usually `0` or `1`, or by the presence/absence of a defined value.
+**Note:** Booleans are intentionally omitted from the core spec to avoid ambiguity in Perl, which lacks a native boolean type. In contexts where ASGI would use `true`/`false`, PAGI protocol specifications will define expected values explicitly -- usually `0` or `1`, or by the presence/absence of a defined value.
 
 ### Applications
 
@@ -283,7 +283,7 @@ Servers must raise exceptions if:
 
 Applications should do the same when receiving malformed events.
 
-Extra fields in events **must not** cause errors — this supports forward-compatible upgrades.
+Extra fields in events **must not** cause errors -- this supports forward-compatible upgrades.
 
 If `$send` is called after connection closure, it should be a no-op unless specified otherwise.
 
@@ -313,6 +313,8 @@ Byte content (e.g., body payloads) must be passed as Perl scalars **without** th
 
 ## Version History
 
+- 0.2 (Draft): Loop-agnostic applications, improved event validation, clarified
+  application completion contract, added extension mechanism documentation
 - 0.1 (Draft): Initial PAGI version, modeled after ASGI 3.0
 
 ## Copyright

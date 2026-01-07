@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2026 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::ProcessCollector::linux 0.14;
+package Net::Prometheus::ProcessCollector::linux 0.15;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Net::Prometheus::ProcessCollector );
+
+use feature qw( signatures );
+no warnings qw( experimental::signatures );
 
 use constant {
    TICKS_PER_SEC  => 100,
@@ -78,11 +81,8 @@ count. If it is collecting a different process, it will not.
 
 my $BOOTTIME;
 
-sub new
+sub new ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
-
    # To report process_start_time_seconds correctly, we need the machine boot
    # time
    if( !defined $BOOTTIME ) {
@@ -100,19 +100,14 @@ sub new
    return $self;
 }
 
-sub _read_procfile
+sub _read_procfile ( $self, $path )
 {
-   my $self = shift;
-   my ( $path ) = @_;
-
    open my $fh, "<", "/proc/$self->{pid}/$path" or return;
    return <$fh>;
 }
 
-sub _open_fds
+sub _open_fds ( $self )
 {
-   my $self = shift;
-
    my $pid = $self->{pid};
 
    opendir my $dirh, "/proc/$pid/fd" or return undef;
@@ -123,9 +118,8 @@ sub _open_fds
    return $count;
 }
 
-sub _limit_fds
+sub _limit_fds ( $self )
 {
-   my $self = shift;
    my $line = ( grep m/^Max open files/, $self->_read_procfile( "limits" ) )[0];
    defined $line or return undef;
 
@@ -133,10 +127,8 @@ sub _limit_fds
    return +( split m/\s+/, $line )[3];
 }
 
-sub collect
+sub collect ( $self, $opts = undef )
 {
-   my $self = shift;
-
    my $statline = $self->_read_procfile( "stat" );
    defined $statline or return; # process missing
 
@@ -154,6 +146,8 @@ sub collect
    my $open_fds = $self->_open_fds;
 
    my $limit_fds = $self->_limit_fds;
+
+   my %io_stats = map { m/^(\S+): (\d+)$/ ? ( $1, $2 ) : () } $self->_read_procfile( "io" );
 
    return
       $self->_make_metric( cpu_user_seconds_total => $utime,
@@ -180,7 +174,23 @@ sub collect
       $self->_make_metric( start_time_seconds => $BOOTTIME + $starttime,
          "gauge", "Unix epoch time the process started at" ),
 
-      # TODO: consider some stats out of /proc/PID/io
+      # The following at not standard Prometheus ones, I just made up the names
+      ( defined $io_stats{rchar} ?
+         $self->_make_metric( read_bytes_total => $io_stats{rchar},
+            "counter", "Total bytes read" ) :
+         () ),
+      ( defined $io_stats{wchar} ?
+         $self->_make_metric( write_bytes_total => $io_stats{wchar},
+            "counter", "Total bytes written" ) :
+         () ),
+      ( defined $io_stats{syscr} ?
+         $self->_make_metric( read_calls_total => $io_stats{syscr},
+            "counter", "Total system calls for reading" ) :
+         () ),
+      ( defined $io_stats{syscw} ?
+         $self->_make_metric( write_calls_total => $io_stats{syscw},
+            "counter", "Total system calls for writing" ) :
+         () ),
 }
 
 =head1 AUTHOR

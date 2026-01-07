@@ -16,49 +16,48 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad ':experimental(inherit_field)';
 
-class Sys::Async::Virt::Connection::Local v0.1.10;
+class Sys::Async::Virt::Connection::Local v0.2.1;
 
 inherit Sys::Async::Virt::Connection '$_in', '$_out';
 
 use Carp qw(croak);
-use IO::Async::Stream;
+use Future::IO;
+use IO::Socket;
+use IO::Socket::UNIX;
 use Log::Any qw($log);
 
 field $_url :param :reader;
-field $_process = undef;
 field $_readonly :param = undef;
 field $_socket :param = undef;
 
-method close() {
-    $_in->close;
+async method close() {
+    # Work around for Future::IO which doesn't
+    # like handles being closed when there are
+    # outstanding read/write requests (causing
+    # warnings of undefined values)
+    $self->_finalize_io();
+    # When Future::IO and/or IO::Async are changed
+    # (ready_for_input() is where this happens),
+    # the handle *can* be closed.
+    # $_in->close;
+    return;
 }
 
 async method connect() {
     # disect URL
     $_socket //=
         '/run/libvirt/libvirt-sock' . ($_readonly ? '-ro' : '');
-    my $sock = await $self->loop->connect(
-        addr => {
-            family => 'unix',
-            socktype => 'stream',
-            path => $_socket
-        });
 
-    $_in = $_out = IO::Async::Stream->new(
-        handle => $sock,
-        on_read => sub { 0 }
+    my $sock = IO::Socket->new(
+        Domain => AF_UNIX,
+        Type => SOCK_STREAM,
         );
-    $self->add_child( $_in );
+    binmode $sock, ':bytes';
+    $sock->blocking( 0 );
 
-    return;
-}
-
-method configure(%args) {
-    delete $args{url};
-    delete $args{socket};
-    delete $args{readonly};
-
-    $self->SUPER::configure(%args);
+    $_in = $_out = $sock;
+    my $addr = sockaddr_un( $_socket );
+    await Future::IO->connect( $sock, $addr );
 }
 
 method is_secure() {
@@ -77,7 +76,7 @@ Sys::Async::Virt::Connection::Local - Connection to LibVirt server over Unix
 
 =head1 VERSION
 
-v0.1.10
+v0.2.1
 
 =head1 SYNOPSIS
 
@@ -100,9 +99,9 @@ of the URL, as per L<LibVirt's documentation|https://libvirt.org/uri.html#unix-t
 
 =over 8
 
-=item * mode (todo)
+=item * mode
 
-=item * socket
+=item * socket (todo)
 
 The path of the socket to be connected to.
 

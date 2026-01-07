@@ -1,0 +1,132 @@
+{
+  "data": [
+    {
+      "id": "ferro-i",
+      "name": "Ferro I",
+      "description": "Heavy break-action rifle. Packs a punch.",
+      "item_type": "Weapon",
+      "rarity": "Common",
+      "value": 475,
+      "stat_block": {
+        "damage": 40,
+        "fireRate": 6.6,
+        "range": 53.1,
+        "stability": 78.1,
+        "weight": 8.0,
+        "stackSize": 1
+      },
+      "components": []
+    },
+    {
+      "id": "ferro-ii",
+      "name": "Ferro II",
+      "description": "Upgraded Ferro rifle with better stats.",
+      "item_type": "Weapon",
+      "rarity": "Uncommon",
+      "value": 950,
+      "stat_block": {
+        "damage": 55,
+        "weight": 8.5,
+        "stackSize": 1
+      },
+      "components": [
+        {"component": "Ferro I", "quantity": 1},
+        {"component": "Metal Parts", "quantity": 5},
+        {"component": "Steel Spring", "quantity": 2}
+      ]
+    },
+    {
+      "id": "ferro-iii",
+      "name": "Ferro III",
+      "description": "Top-tier Ferro rifle.",
+      "item_type": "Weapon",
+      "rarity": "Rare",
+      "value": 1900,
+      "stat_block": {
+        "damage": 70,
+        "weight": 9.0,
+        "stackSize": 1
+      },
+      "components": [
+        {"component": "Ferro II", "quantity": 1},
+        {"component": "Advanced Circuit", "quantity": 2},
+        {"component": "Metal Parts", "quantity": 10}
+      ]
+    },
+    {
+      "id": "metal-parts",
+      "name": "Metal Parts",
+      "description": "Scrap metal useful for crafting.",
+      "item_type": "Material",
+      "rarity": "Common",
+      "value": 25,
+      "stat_block": {
+        "weight": 0.5,
+        "stackSize": 50
+      },
+      "components": []
+    },
+    {
+      "id": "steel-spring",
+      "name": "Steel Spring",
+      "description": "A durable spring for mechanical parts.",
+      "item_type": "Material",
+      "rarity": "Common",
+      "value": 40,
+      "stat_block": {
+        "weight": 0.3,
+        "stackSize": 50
+      },
+      "components": []
+    },
+    {
+      "id": "advanced-circuit",
+      "name": "Advanced Circuit",
+      "description": "Complex electronic component.",
+      "item_type": "Material",
+      "rarity": "Uncommon",
+      "value": 150,
+      "stat_block": {
+        "weight": 0.2,
+        "stackSize": 20
+      },
+      "components": [
+        {"component": "Basic Circuit", "quantity": 2},
+        {"component": "Metal Parts", "quantity": 1}
+      ]
+    },
+    {
+      "id": "basic-circuit",
+      "name": "Basic Circuit",
+      "description": "Simple electronic component.",
+      "item_type": "Material",
+      "rarity": "Common",
+      "value": 50,
+      "stat_block": {
+        "weight": 0.1,
+        "stackSize": 30
+      },
+      "components": []
+    },
+    {
+      "id": "angled-grip-i",
+      "name": "Angled Grip I",
+      "description": "Slightly reduces horizontal recoil.",
+      "item_type": "Modification",
+      "rarity": "Common",
+      "value": 640,
+      "stat_block": {
+        "weight": 0.25,
+        "stackSize": 1
+      },
+      "components": []
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 100,
+    "total": 8,
+    "totalPages": 1,
+    "hasNextPage": false
+  }
+}

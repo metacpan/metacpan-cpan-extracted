@@ -1,5 +1,9 @@
 Changes file for Dancer2::Plugin::SyntaxHighlight::Perl
 
+1.00      2026-01-05 06:17:57-05:00 America/New_York
+
+  - fix POD example
+
 0.0009    2017-11-16 09:33:24-05:00 America/New_York
 
   - require the current version of Dancer2 to bring in bug fixes

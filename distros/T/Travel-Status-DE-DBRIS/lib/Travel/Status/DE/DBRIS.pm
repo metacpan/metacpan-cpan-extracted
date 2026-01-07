@@ -19,7 +19,7 @@ use Travel::Status::DE::DBRIS::JourneyAtStop;
 use Travel::Status::DE::DBRIS::Journey;
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 # {{{ Constructors
 
@@ -473,7 +473,7 @@ Non-blocking variant;
 
 =head1 VERSION
 
-version 0.20
+version 0.22
 
 =head1 DESCRIPTION
 
@@ -650,7 +650,7 @@ L<https://github.com/derf/Travel-Status-DE-DBRIS>
 
 =head1 AUTHOR
 
-Copyright (C) 2024-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2024-2026 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

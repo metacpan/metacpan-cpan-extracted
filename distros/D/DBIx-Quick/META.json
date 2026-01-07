@@ -38,7 +38,7 @@
    "provides" : {
       "DBIx::Quick" : {
          "file" : "lib/DBIx/Quick.pm",
-         "version" : "0.7"
+         "version" : "0.8"
       },
       "DBIx::Quick::Converter" : {
          "file" : "lib/DBIx/Quick/Converter.pm"
@@ -56,6 +56,6 @@
          "url" : "https://github.com/sergiotarxz/Perl-DBIx-Quick"
       }
    },
-   "version" : "0.7",
+   "version" : "0.8",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,13 @@
 Changes file for WebService::OpenStates
 
+1.03      2026-01-02 10:28:18-05:00 America/New_York
+
+  - Add another couple of modules to the prereqs.
+
+1.02      2026-01-02 10:15:14-05:00 America/New_York
+
+  - Fix minimum Perl version and missing module.
+
 1.01      2026-01-01 19:52:08-05:00 America/New_York
 
   - Sort results by legislators' last names.

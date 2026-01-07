@@ -390,7 +390,8 @@ use Imager::Font::Wrap;
 use Graphics::Framebuffer::Mouse;                                   # The mouse handler
 use Graphics::Framebuffer::Splash;                                  # The splash code is here
 
-Imager->preload;                                                    # The Imager documentation says to do this, but doesn't give much of an explanation why.  However, I assume it is to initialize global variables ahead of time so threads behave.
+Imager->preload;                                                    # The Imager documentation says to do this, but doesn't give much of an explanation why.
+                                                                    # However, I assume it is to initialize global variables ahead of time so threads behave.
 
 ## This is for debugging, and should normally be commented out.
 # use Data::Dumper::Simple;$Data::Dumper::Sortkeys=TRUE;$Data::Dumper::Purity=TRUE;
@@ -399,7 +400,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.81';
+    our $VERSION   = '6.82';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -483,10 +484,10 @@ sub DESTROY {    # Always clean up after yourself before exiting
 
 use Inline Config => warnings => 0;
 use Inline C => <<'C_CODE', 'name' => 'Graphics::Framebuffer', 'VERSION' => $VERSION;
-/* Copyright 2018-2025 Richard Kelsch, All Rights Reserved
+/* Copyright 2018-2026 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.81
+   Version:  6.82
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
@@ -3097,8 +3098,8 @@ sub new {
             'FBINFO_HWACCEL_XPAN'      => FBINFO_HWACCEL_XPAN,      # 0x1000,
             'FBINFO_HWACCEL_YPAN'      => FBINFO_HWACCEL_YPAN,      # 0x2000,
             'FBINFO_HWACCEL_YWRAP'     => FBINFO_HWACCEL_YWRAP,     # 0x4000,
-			'VT_GETSTATE'              => VT_GETSTATE,              # 0x5603,
-			'KDSETMODE'                => KDSETMODE,                # 0x4B3A,
+            'VT_GETSTATE'              => VT_GETSTATE,              # 0x5603,
+            'KDSETMODE'                => KDSETMODE,                # 0x4B3A,
 
             ## Set up the Framebuffer driver "constants" defaults
             # Commands
@@ -3363,29 +3364,29 @@ sub new {
 ###
         if ($@) {
             print STDERR qq{
-                OUCH!  Graphics::Framebuffer cannot memory map the framebuffer!
+OUCH!  Graphics::Framebuffer cannot memory map the framebuffer!
 
-                This is usually caused by one or more of the following:
+This is usually caused by one or more of the following:
 
-                *  Your account does not have proper permission to access the framebuffer
-                  device.
+*  Your account does not have proper permission to access the framebuffer
+   device.
 
-                This usually requires adding the "video" group to your account.  This is
-                  usually accomplished via the following command (replace "username" with
-                      your actual username):
+   This usually requires adding the "video" group to your account.  This is
+   usually accomplished via the following command (replace "username" with
+   your actual username):
 
-                \tsudo usermod -a -G video username
+\tsudo usermod -a -G video username
 
-                *  You could be attempting to run this inside X-Windows/Wayland, which
-                  doesn't work.  You MUST run your script outside of X-Windows from the
-  system Console.  If you are inside X-Windows/Wayland, and you do not know
-  how to get to your console, just hit CTRL-ALT-F5 to access one of the
-  consoles.  This has no windows or mouse functionality.  It is command
-  line only (similar to old DOS).
+*  You could be attempting to run this inside X-Windows/Wayland, which
+   doesn't work.  You MUST run your script outside of X-Windows from the
+   system Console.  If you are inside X-Windows/Wayland, and you do not know
+   how to get to your console, just hit CTRL-ALT-F5 to access one of the
+   consoles.  This has no windows or mouse functionality.  It is command
+   line only (similar to old DOS).
 
-To get back into X-Windows/Wayland, you just hit ALT-F1 (or ALT-F8 or
-    ALT-F7 on some systems).  Linux can have many consoles, which are
-  usually mapped F1 to F9.  One of them is set aside for X-Windows/Wayland.
+   To get back into X-Windows/Wayland, you just hit ALT-F1 (or ALT-F8 or
+   ALT-F7 on some systems).  Linux can have many consoles, which are
+   usually mapped F1 to F9.  One of them is set aside for X-Windows/Wayland.
 
 Actual error reported:\n\n$@\n};
             sleep($self->{'RESET'}) ? 10 : 1;
@@ -3393,18 +3394,18 @@ Actual error reported:\n\n$@\n};
         } ## end if ($@)
     } elsif (exists($ENV{'DISPLAY'}) && (-e $self->{'FB_DEVICE'})) {
         print STDERR qq{
-        OUCH!  Graphics::Framebuffer cannot memory map the framebuffer!
+OUCH!  Graphics::Framebuffer cannot memory map the framebuffer!
 
-        You are attempting to run this inside X-Windows/Wayland, which doesn't work.
-  You MUST run your script outside of X-Windows from the system Console.  If
-  you are inside X-Windows/Wayland, and you do not know how to get to your
-  console, just hit CTRL-ALT-F5 to access one of the consoles.  This has no
-  windows or mouse functionality.  It is command line only (similar to old
-      DOS).
+You are attempting to run this inside X-Windows/Wayland, which doesn't work.
+You MUST run your script outside of X-Windows from the system Console.  If
+you are inside X-Windows/Wayland, and you do not know how to get to your
+console, just hit CTRL-ALT-F5 to access one of the consoles.  This has no
+windows or mouse functionality.  It is command line only (similar to old
+DOS).
 
 To get back into X-Windows/Wayland, you just hit ALT-F1 (or ALT-F7 or ALT-F8
-    on some systems).  Linux can have many consoles, which are usually mapped F1
-  to F9.  One of them is set aside for X-Windows/Wayland.
+on some systems).  Linux can have many consoles, which are usually mapped F1
+to F9.  One of them is set aside for X-Windows/Wayland.
   };
 ###
         sleep($self->{'RESET'}) ? 10 : 1;
@@ -3494,10 +3495,8 @@ To get back into X-Windows/Wayland, you just hit ALT-F1 (or ALT-F7 or ALT-F8
         $self->{'START_SCREEN'} = '' . $self->{'SCREEN'};    # Force Perl to copy the string, not the reference
     }
     chomp($self->{'this_tty'} = `tty`);
-    if ($self->{'SPLASH'} > 0) {
-        $self->splash($VERSION);
-        sleep $self->{'SPLASH'};
-    }
+    $self->graphics_mode();
+    $self->splash($self->{'SPLASH'});
     $self->attribute_reset();
     if (wantarray) {    # For the temporarily supported (but no longer) double buffering mode
         return ($self, $self);    # For those that coded for double buffering
@@ -9094,7 +9093,7 @@ sub RGB565_to_RGB888 {
         $r = $rgb565 & 31;
         $g = ($rgb565 >> 5) & 63;
         $b = ($rgb565 >> 11) & 31;
-	}
+    }
     $r = int($r * 527 + 23) >> 6;
     $g = int($g * 259 + 33) >> 6;
     $b = int($b * 527 + 23) >> 6;
@@ -9135,7 +9134,7 @@ sub RGB565_to_RGBA8888 {
     my $a           = $params->{'alpha'} || 255;
     my $color_order = $self->{'COLOR_ORDER'};
     my ($r, $g, $b);
-	if ($color_order == BGR) {
+    if ($color_order == BGR) {
         $b = $rgb565 & 31;
         $g = ($rgb565 >> 5) & 63;
         $r = ($rgb565 >> 11) & 31;
@@ -9159,7 +9158,7 @@ sub RGB565_to_RGBA8888 {
         $r = $rgb565 & 31;
         $g = ($rgb565 >> 5) & 63;
         $b = ($rgb565 >> 11) & 31;
-	}
+    }
     $r = int($r * 527 + 23) >> 6;
     $g = int($g * 259 + 33) >> 6;
     $b = int($b * 527 + 23) >> 6;
@@ -9746,7 +9745,7 @@ Richard Kelsch <rich@rk-internet.com>
 
 =head1 COPYRIGHT
 
-Copyright © 2003-2025 Richard Kelsch, All Rights Reserved.
+Copyright © 2003-2026 Richard Kelsch, All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under the GNU software license.
 
@@ -9768,7 +9767,7 @@ Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONT
 
 =head1 VERSION
 
-Version 6.81 (Dec 25, 2025)
+Version 6.82 (Jan 04, 2026)
 
 =head1 THANKS
 

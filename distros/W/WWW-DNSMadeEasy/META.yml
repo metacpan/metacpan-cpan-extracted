@@ -3,197 +3,383 @@ abstract: 'Accessing DNSMadeEasy API'
 author:
   - 'Torsten Raudssus <torsten@raudssus.de>'
 build_requires:
-  Test::More: 0.96
+  Path::Tiny: '0'
+  Test::More: '0.96'
+  Test::Most: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112150'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: WWW-DNSMadeEasy
 requires:
-  DateTime: 0
-  DateTime::Format::HTTP: 0.40
-  Digest::HMAC: 1.03
-  JSON: 2.50
-  LWP: 0
-  Moo: 0.009013
-  URI: 1.58
+  Data::Printer: '0'
+  DateTime: '0'
+  DateTime::Format::HTTP: '0'
+  Digest::HMAC: '0'
+  JSON: '0'
+  LWP: '0'
+  Moo: '0'
+  String::CamelSnakeKebab: '0'
 resources:
   homepage: https://github.com/Getty/p5-www-dnsmadeeasy
   repository: https://github.com/Getty/p5-www-dnsmadeeasy.git
-version: 0.001
+version: '0.100'
 x_Dist_Zilla:
+  perl:
+    version: '5.036000'
   plugins:
     -
-      class: Dist::Zilla::Plugin::GatherDir
-      name: '@GETTY/@Basic/GatherDir'
-      version: 4.300003
-    -
-      class: Dist::Zilla::Plugin::PruneCruft
-      name: '@GETTY/@Basic/PruneCruft'
-      version: 4.300003
+      class: Dist::Zilla::Plugin::Git::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename: []
+          exclude_match: []
+          follow_symlinks: 0
+          include_dotfiles: 1
+          prefix: ''
+          prune_directory: []
+          root: .
+        Dist::Zilla::Plugin::Git::GatherDir:
+          include_untracked: 0
+      name: '@Author::GETTY/Git::GatherDir'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
-      name: '@GETTY/@Basic/ManifestSkip'
-      version: 4.300003
+      name: '@Author::GETTY/@Filter/ManifestSkip'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaYAML
-      name: '@GETTY/@Basic/MetaYAML'
-      version: 4.300003
+      name: '@Author::GETTY/@Filter/MetaYAML'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::License
-      name: '@GETTY/@Basic/License'
-      version: 4.300003
+      name: '@Author::GETTY/@Filter/License'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Readme
-      name: '@GETTY/@Basic/Readme'
-      version: 4.300003
+      name: '@Author::GETTY/@Filter/Readme'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ExtraTests
-      name: '@GETTY/@Basic/ExtraTests'
-      version: 4.300003
+      name: '@Author::GETTY/@Filter/ExtraTests'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ExecDir
-      name: '@GETTY/@Basic/ExecDir'
-      version: 4.300003
+      name: '@Author::GETTY/@Filter/ExecDir'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ShareDir
-      name: '@GETTY/@Basic/ShareDir'
-      version: 4.300003
+      name: '@Author::GETTY/@Filter/ShareDir'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MakeMaker
-      name: '@GETTY/@Basic/MakeMaker'
-      version: 4.300003
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Author::GETTY/@Filter/MakeMaker'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Manifest
-      name: '@GETTY/@Basic/Manifest'
-      version: 4.300003
+      name: '@Author::GETTY/@Filter/Manifest'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::TestRelease
-      name: '@GETTY/@Basic/TestRelease'
-      version: 4.300003
+      name: '@Author::GETTY/@Filter/TestRelease'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
-      name: '@GETTY/@Basic/ConfirmRelease'
-      version: 4.300003
+      name: '@Author::GETTY/@Filter/ConfirmRelease'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
-      name: '@GETTY/@Basic/UploadToCPAN'
-      version: 4.300003
-    -
-      class: Dist::Zilla::Plugin::Git::NextVersion
-      name: '@GETTY/Git::NextVersion'
-      version: 1.112510
-    -
-      class: Dist::Zilla::Plugin::PkgVersion
-      name: '@GETTY/PkgVersion'
-      version: 4.300003
+      name: '@Author::GETTY/@Filter/UploadToCPAN'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaConfig
-      name: '@GETTY/MetaConfig'
-      version: 4.300003
+      name: '@Author::GETTY/MetaConfig'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaJSON
-      name: '@GETTY/MetaJSON'
-      version: 4.300003
-    -
-      class: Dist::Zilla::Plugin::NextRelease
-      name: '@GETTY/NextRelease'
-      version: 4.300003
+      name: '@Author::GETTY/MetaJSON'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
-      name: '@GETTY/PodSyntaxTests'
-      version: 4.300003
-    -
-      class: Dist::Zilla::Plugin::Repository
-      name: '@GETTY/Repository'
-      version: 0.18
+      name: '@Author::GETTY/PodSyntaxTests'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::GithubMeta
-      name: '@GETTY/GithubMeta'
-      version: 0.26
+      name: '@Author::GETTY/GithubMeta'
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::InstallRelease
-      name: '@GETTY/InstallRelease'
-      version: 0.006
+      name: '@Author::GETTY/InstallRelease'
+      version: '0.008'
     -
       class: Dist::Zilla::Plugin::Authority
-      name: '@GETTY/Authority'
-      version: 1.004
+      name: '@Author::GETTY/Authority'
+      version: '1.009'
     -
-      class: Dist::Zilla::Plugin::Prereqs
+      class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: test
-          type: requires
-      name: '@GETTY/TestMoreWithSubtests'
-      version: 4.300003
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.39.5
+          repo_root: .
+      name: '@Author::GETTY/Git::CheckFor::CorrectBranch'
+      version: '0.014'
+    -
+      class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
+      name: '@Author::GETTY/Prereqs::FromCPANfile'
+      version: '0.08'
     -
       class: Dist::Zilla::Plugin::PodWeaver
-      name: '@GETTY/PodWeaver'
-      version: 3.101641
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          config_plugins:
+            - '@Author::GETTY'
+          finder:
+            - ':InstallModules'
+            - ':PerlExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@GETTY/SingleEncoding'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@GETTY/Name'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@GETTY/Version'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@GETTY/Prelude'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@GETTY/Synopsis'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@GETTY/Description'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@GETTY/Overview'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@GETTY/Stability'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: Attributes
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: Methods
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: Functions
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@GETTY/Leftovers'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@GETTY/postlude'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Support
+              name: '@GETTY/Support'
+              version: '1.014'
+            -
+              class: Pod::Weaver::Section::Bugs
+              name: '@GETTY/Bugs'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@GETTY/Authors'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@GETTY/Legal'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Plugin::Transformer
+              name: '@GETTY/List'
+              version: '4.020'
+      name: '@Author::GETTY/PodWeaver'
+      version: '4.010'
     -
-      class: Dist::Zilla::Plugin::Git::Check
-      name: '@GETTY/@Git/Check'
-      version: 1.112510
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: recommends
+      name: '@Author::GETTY/@Git::VersionManager/pluginbundle version'
+      version: '6.032'
+    -
+      class: Dist::Zilla::Plugin::RewriteVersion::Transitional
+      config:
+        Dist::Zilla::Plugin::RewriteVersion:
+          add_tarball_name: 0
+          finders:
+            - ':ExecFiles'
+            - ':InstallModules'
+          global: 0
+          skip_version_provider: 0
+        Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
+      name: '@Author::GETTY/@Git::VersionManager/RewriteVersion::Transitional'
+      version: '0.009'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Update
+      name: '@Author::GETTY/@Git::VersionManager/MetaProvides::Update'
+      version: '0.007'
+    -
+      class: Dist::Zilla::Plugin::CopyFilesFromRelease
+      config:
+        Dist::Zilla::Plugin::CopyFilesFromRelease:
+          filename:
+            - Changes
+          match: []
+      name: '@Author::GETTY/@Git::VersionManager/CopyFilesFromRelease'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::Git::Commit
-      name: '@GETTY/@Git/Commit'
-      version: 1.112510
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: v%V%n%n%c
+          signoff: 0
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.39.5
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Author::GETTY/@Git::VersionManager/release snapshot'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Tag
-      name: '@GETTY/@Git/Tag'
-      version: 1.112510
-    -
-      class: Dist::Zilla::Plugin::Git::Push
-      name: '@GETTY/@Git/Push'
-      version: 1.112510
-    -
-      class: Dist::Zilla::Plugin::Prereqs
       config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: runtime
-          type: requires
-      name: Prereqs
-      version: 4.300003
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: Changes
+          signed: 0
+          tag: '0.100'
+          tag_format: '%v'
+          tag_message: v%V
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.39.5
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Author::GETTY/@Git::VersionManager/Git::Tag'
+      version: '2.048'
     -
-      class: Dist::Zilla::Plugin::Prereqs
+      class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: test
-          type: requires
-      name: TestRequires
-      version: 4.300003
+        Dist::Zilla::Plugin::BumpVersionAfterRelease:
+          finders:
+            - ':ExecFiles'
+            - ':InstallModules'
+          global: 0
+          munge_makefile_pl: 1
+        Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}
+      name: '@Author::GETTY/@Git::VersionManager/BumpVersionAfterRelease::Transitional'
+      version: '0.009'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@Author::GETTY/@Git::VersionManager/NextRelease'
+      version: '6.032'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: 'increment $VERSION after %v release'
+          signoff: 0
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Build.PL
+            - Changes
+            - Makefile.PL
+          allow_dirty_match:
+            - (?^:^lib/.*\.pm$)
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.39.5
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Author::GETTY/@Git::VersionManager/post-release commit'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: 4.300003
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: 4.300003
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: 4.300003
+      version: '6.032'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: 4.300003
+      version: '6.032'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: 4.300003
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: 4.300003
+      version: '6.032'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '6.032'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '6.032'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: 4.300003
+    version: '6.032'
 x_authority: cpan:GETTY
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

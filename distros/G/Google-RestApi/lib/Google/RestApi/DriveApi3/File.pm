@@ -1,6 +1,6 @@
 package Google::RestApi::DriveApi3::File;
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.1.0';
 
 use Google::RestApi::Setup;
 
@@ -8,7 +8,7 @@ use aliased 'Google::RestApi::DriveApi3';
 
 sub new {
   my $class = shift;
-  my $qr_id = DriveApi3->Drive_File_Id;
+  my $qr_id = $Google::RestApi::DriveApi3::Drive_File_Id;
   state $check = compile_named(
     drive => HasApi,
     id    => StrMatch[qr/$qr_id/],
@@ -86,6 +86,6 @@ Robin Murray mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright (c) 2021, Robin Murray. All rights reserved.
+Copyright (c) 2019-2026 Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

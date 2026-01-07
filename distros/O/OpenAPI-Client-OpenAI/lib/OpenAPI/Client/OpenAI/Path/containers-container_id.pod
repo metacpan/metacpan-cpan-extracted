@@ -102,6 +102,7 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
          "minutes": 20
        },
        "last_active_at": 1747844794,
+       "memory_limit": "1g",
        "name": "My Container"
     }
 
@@ -114,7 +115,7 @@ L<OpenAPI::Client::OpenAI::Path>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2023-2025 by Nelson Ferraz
+Copyright (C) 2023-2026 by Nelson Ferraz
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

@@ -86,27 +86,27 @@ The scope information passed in C<scope> contains basic metadata:
 
 =item *
 
-C<type> (String) â C<"lifespan">.
+C<type> (String) - C<"lifespan">.
 
 =item *
 
-C<pagi["version"]> (String) â The version of the PAGI core spec that governs the worker.
+C<pagi["version"]> (String) - The version of the PAGI core spec that governs the worker.
 
 =item *
 
-C<pagi["spec_version"]> (String) â The version of this lifespan sub-specification. Optional; if missing it defaults to C<"0.2">.
+C<pagi["spec_version"]> (String) - The version of this lifespan sub-specification. Optional; if missing it defaults to C<"0.2">.
 
 =item *
 
-C<pagi["is_worker"]> (Int, optional) â C<1> if running as a worker in a multi-process deployment, C<0> or absent for single-process mode. Applications can use this to avoid duplicate initialization (e.g., only print startup messages from worker 1).
+C<pagi["is_worker"]> (Int, optional) - C<1> if running as a worker in a multi-process deployment, C<0> or absent for single-process mode. Applications can use this to avoid duplicate initialization (e.g., only print startup messages from worker 1).
 
 =item *
 
-C<pagi["worker_num"]> (Int, optional) â Worker identifier (1, 2, 3, ...) in multi-process mode. Absent or C<undef> for single-process mode. Combined with C<is_worker>, applications can identify which worker they are running in.
+C<pagi["worker_num"]> (Int, optional) - Worker identifier (1, 2, 3, ...) in multi-process mode. Absent or C<undef> for single-process mode. Combined with C<is_worker>, applications can identify which worker they are running in.
 
 =item *
 
-C<state> (HashRef, optional) â A namespace where the application can persist values to be copied into subsequent request scopes. Servers omit this key if the feature is unsupported.
+C<state> (HashRef, optional) - A namespace where the application can persist values to be copied into subsequent request scopes. Servers omit this key if the feature is unsupported.
 
 =back
 
@@ -137,7 +137,7 @@ B<Keys>:
 
 =item *
 
-C<type> (String) â C<"lifespan.startup">.
+C<type> (String) - C<"lifespan.startup">.
 
 =back
 
@@ -151,7 +151,7 @@ B<Keys>:
 
 =item *
 
-C<type> (String) â C<"lifespan.startup.complete">.
+C<type> (String) - C<"lifespan.startup.complete">.
 
 =back
 
@@ -165,11 +165,11 @@ B<Keys>:
 
 =item *
 
-C<type> (String) â C<"lifespan.startup.failed">.
+C<type> (String) - C<"lifespan.startup.failed">.
 
 =item *
 
-C<message> (String) â Optional; if missing defaults to C<"">.
+C<message> (String) - Optional; if missing defaults to C<"">.
 
 =back
 
@@ -183,7 +183,7 @@ B<Keys>:
 
 =item *
 
-C<type> (String) â  C<"lifespan.shutdown">.
+C<type> (String) -  C<"lifespan.shutdown">.
 
 =back
 
@@ -197,7 +197,7 @@ B<Keys>:
 
 =item *
 
-C<type> (String) â C<"lifespan.shutdown.complete">.
+C<type> (String) - C<"lifespan.shutdown.complete">.
 
 =back
 
@@ -211,11 +211,11 @@ B<Keys>:
 
 =item *
 
-C<type> (String) â C<"lifespan.shutdown.failed">.
+C<type> (String) - C<"lifespan.shutdown.failed">.
 
 =item *
 
-C<message> (String) â Optional; if missing defaults to C<"">.
+C<message> (String) - Optional; if missing defaults to C<"">.
 
 =back
 
@@ -225,7 +225,11 @@ C<message> (String) â Optional; if missing defaults to C<"">.
 
 =item *
 
-0.1 (Draft)
+0.2 (Draft): Added isI<worker and worker>num fields for multi-worker support
+
+=item *
+
+0.1 (Draft): Initial lifespan specification
 
 =back
 

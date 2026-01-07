@@ -10,6 +10,7 @@ lib/Daje/Workflow/Activities/Closed.pm
 lib/Daje/Workflow/Activities/Delete.pm
 lib/Daje/Workflow/Activities/Document/Builder.pm
 lib/Daje/Workflow/Activities/Files/Save.pm
+lib/Daje/Workflow/Activities/Process/Run.pm
 lib/Daje/Workflow/Activities/Save.pm
 lib/Daje/Workflow/Checks.pm
 lib/Daje/Workflow/Checks/Mandatory.pm

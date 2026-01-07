@@ -1,5 +1,5 @@
 package Future::IO::Impl::Uring;
-$Future::IO::Impl::Uring::VERSION = '0.002';
+$Future::IO::Impl::Uring::VERSION = '0.003';
 use 5.020;
 use warnings;
 use experimental 'signatures';
@@ -12,11 +12,12 @@ use Errno 'ETIME';
 use Signal::Info qw/CLD_EXITED/;
 use Time::Spec;
 use IO::Socket;
+use IO::Poll qw/POLLIN POLLOUT/;
 
 my $ring = IO::Uring->new(32);
 
 sub accept($self, $fh) {
-	my $future = Future::IO::Uring::_Future->new;
+	my $future = Future::IO::Impl::Uring::_Future->new;
 	$ring->accept($fh, 0, sub($res, $flags) {
 		if ($res >= 0) {
 			my $accepted_fd = IO::Socket->new->fdopen($res, 'r+');
@@ -30,7 +31,7 @@ sub accept($self, $fh) {
 }
 
 sub alarm($self, $seconds) {
-	my $future = Future::IO::Uring::_Future->new;
+	my $future = Future::IO::Impl::Uring::_Future->new;
 	my $time_spec = Time::Spec->new($seconds);
 	my $id = $ring->timeout($time_spec, 0, IORING_TIMEOUT_REALTIME | IORING_TIMEOUT_ABS, 0, sub($res, $flags) {
 		if ($res != -ETIME) {
@@ -46,7 +47,7 @@ sub alarm($self, $seconds) {
 }
 
 sub connect($self, $fh, $name) {
-	my $future = Future::IO::Uring::_Future->new;
+	my $future = Future::IO::Impl::Uring::_Future->new;
 	my $id = $ring->connect($fh, $name, 0, sub($res, $flags) {
 		if ($res < 0) {
 			local $! = -$res;
@@ -59,8 +60,77 @@ sub connect($self, $fh, $name) {
 	return $future;
 }
 
+sub ready_for_read($self, $fh) {
+	my $future = Future::IO::Impl::Uring::_Future->new;
+	my $id = $ring->poll($fh, POLLIN, 0, sub($res, $flags) {
+		if ($res >= 0) {
+			$future->done;
+		} else {
+			local $! = -$res;
+			$future->fail("ready_for_read: $!\n", sysread => $fh, $!);
+		}
+	});
+	$future->on_cancel(sub { $ring->cancel($id, 0, 0) });
+	return $future;
+
+}
+
+sub ready_for_write($self, $fh) {
+	my $future = Future::IO::Impl::Uring::_Future->new;
+	my $id = $ring->poll($fh, POLLOUT, 0, sub($res, $flags) {
+		if ($res >= 0) {
+			$future->done;
+		} else {
+			local $! = -$res;
+			$future->fail("ready_for_write$!\n", sysread => $fh, $!);
+		}
+	});
+	$future->on_cancel(sub { $ring->cancel($id, 0, 0) });
+	return $future;
+
+}
+
+sub recv($self, $fh, $length, $flags) {
+	my $future = Future::IO::Impl::Uring::_Future->new;
+	my $buffer = "\0" x $length;
+	$flags //= 0;
+	my $id = $ring->recv($fh, $buffer, $flags, 0, IOSQE_ASYNC, sub($res, $flags) {
+		if ($res > 0) {
+			$future->done($res == $length ? $buffer : substr($buffer, 0, $res));
+		} elsif ($res == 0) {
+			$future->done;
+		} else {
+			local $! = -$res;
+			$future->fail("recv: $!\n", recv => $fh, $!);
+		}
+	});
+	$future->on_cancel(sub { $ring->cancel($id, 0, 0) });
+	return $future;
+}
+
+sub send($self, $fh, $buffer, $flags, $to) {
+	my $future = Future::IO::Impl::Uring::_Future->new;
+	my $callback = sub($res, $flags) {
+		if ($res >= 0) {
+			$future->done($res);
+		} else {
+			local $! = -$res;
+			$future->fail("send: $!\n", send => $fh, $!);
+		}
+	};
+	$flags //= 0;
+	my $id;
+	if (defined $to) {
+		$id = $ring->sendto($fh, $buffer, $flags, $to, 0, IOSQE_ASYNC, $callback);
+	} else {
+		$id = $ring->send($fh, $buffer, $flags, 0, IOSQE_ASYNC, $callback);
+	}
+	$future->on_cancel(sub { $ring->cancel($id, 0, 0) });
+	return $future;
+}
+
 sub sleep($self, $seconds) {
-	my $future = Future::IO::Uring::_Future->new;
+	my $future = Future::IO::Impl::Uring::_Future->new;
 	my $time_spec = Time::Spec->new($seconds);
 	my $id = $ring->timeout($time_spec, 0, 0, 0, sub($res, $flags) {
 		if ($res != -ETIME) {
@@ -76,7 +146,7 @@ sub sleep($self, $seconds) {
 }
 
 sub sysread($self, $fh, $length) {
-	my $future = Future::IO::Uring::_Future->new;
+	my $future = Future::IO::Impl::Uring::_Future->new;
 	my $buffer = "\0" x $length;
 	my $id = $ring->read($fh, $buffer, -1, IOSQE_ASYNC, sub($res, $flags) {
 		if ($res > 0) {
@@ -110,7 +180,7 @@ sub _sysread($fh, $future, $id, $buffer, $length, $offset) {
 }
 
 sub sysread_exactly($self, $fh, $length) {
-	my $future = Future::IO::Uring::_Future->new;
+	my $future = Future::IO::Impl::Uring::_Future->new;
 	my $buffer = "\0" x $length;
 	my $id;
 	_sysread($fh, $future, \$id, $buffer, $length, 0);
@@ -119,7 +189,7 @@ sub sysread_exactly($self, $fh, $length) {
 }
 
 sub syswrite($self, $fh, $buffer) {
-	my $future = Future::IO::Uring::_Future->new;
+	my $future = Future::IO::Impl::Uring::_Future->new;
 	my $id = $ring->write($fh, $buffer, -1, IOSQE_ASYNC, sub($res, $flags) {
 		if ($res >= 0) {
 			$future->done($res);
@@ -148,13 +218,13 @@ sub _syswrite($future, $fh, $buffer, $written) {
 }
 
 sub syswrite_exactly($self, $fh, $buffer) {
-	my $future = Future::IO::Uring::_Future->new;
+	my $future = Future::IO::Impl::Uring::_Future->new;
 	_syswrite($future, $fh, $buffer, 0);
 	return $future;
 }
 
 sub waitpid($self, $pid) {
-	my $future = Future::IO::Uring::_Future->new;
+	my $future = Future::IO::Impl::Uring::_Future->new;
 	my $info = Signal::Info->new;
 	my $id = $ring->waitid(P_PID, $pid, $info, WEXITED, 0, 0, sub($res, $flags) {
 		if ($res >= 0) {
@@ -168,7 +238,7 @@ sub waitpid($self, $pid) {
 }
 
 package
-	Future::IO::Uring::_Future;
+	Future::IO::Impl::Uring::_Future;
 
 use parent 'Future';
 
@@ -176,6 +246,8 @@ sub await($self) {
 	$ring->run_once until $self->is_ready;
 	return $self;
 }
+
+1;
 
 # ABSTRACT: A Future::IO implementation for IO::Uring
 
@@ -191,7 +263,7 @@ Future::IO::Impl::Uring - A Future::IO implementation for IO::Uring
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

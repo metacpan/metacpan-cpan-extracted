@@ -1,0 +1,7 @@
+Revision history for WWW-ARDB
+
+0.001     2026-01-05 04:56:22Z
+  - Initial release
+  - Items, Quests, ARC Enemies API endpoints
+  - CLI tool (bin/ardb)
+  - File-based caching

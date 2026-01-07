@@ -399,9 +399,9 @@ sub start {
     $self->{state} = {};
 
     my $scope = {
-        type  => 'lifespan',
-        pagi  => { version => '0.2', spec_version => '0.2' },
-        state => $self->{state},
+        type          => 'lifespan',
+        pagi          => { version => '0.2', spec_version => '0.2' },
+        state  => $self->{state},
     };
 
     my $phase = 'startup';
@@ -898,7 +898,7 @@ See L<PAGI::Test::SSE> for the SSE connection API.
 
     $client->start;
 
-Triggers lifespan.startup. Only needed if C<lifespan => 1> was passed
+Triggers lifespan.startup. Only needed if C<< lifespan => 1 >> was passed
 to the constructor.
 
 =head2 stop

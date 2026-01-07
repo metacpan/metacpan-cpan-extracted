@@ -1,7 +1,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -18,7 +18,7 @@ package WebDyne;
 use strict qw(vars);
 use vars   qw($VERSION $AUTHORITY $VERSION_GIT_REF %CGI_TAG_WEBDYNE @ISA $AUTOLOAD @EXPORT_OK);
 use warnings;
-no warnings qw(uninitialized redefine once);
+no warnings qw(uninitialized redefine once qw);
 use overload;
 
 
@@ -44,7 +44,7 @@ $Data::Dumper::Sortkeys=1;
 use HTML::Entities qw(decode_entities encode_entities);
 use CGI::Simple;
 use JSON;
-use Cwd qw(getcwd);
+use Cwd qw(fastcwd);
 
 
 #  Inherit from the Compile module, not loaded until needed though.
@@ -61,7 +61,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='2.038';
+$VERSION='2.046';
 chomp($VERSION_GIT_REF=do { local (@ARGV, $/) = ($_=__FILE__.'.ref'); <> if -f $_ });
 
 
@@ -105,7 +105,7 @@ my %Package;
 
 #  Eval safe not effective - die if turned on
 #
-if ($WEBDYNE_EVAL_SAFE) {die "WEBDYNE_EVAL_SAFE disabled in this version\n"}
+if (WEBDYNE_EVAL_SAFE) {die "WEBDYNE_EVAL_SAFE disabled in this version\n"}
 
 
 #  All done. Positive return
@@ -276,7 +276,7 @@ sub handler : method {    # no subsort
         debug('in __WARN__ sig handler, caller %s', join(',', (caller(0))[0..3]));
         return err(@_)
         }
-        if $WEBDYNE_WARNINGS_FATAL;
+        if WEBDYNE_WARNINGS_FATAL;
 
 
     #  Debug
@@ -371,9 +371,9 @@ sub handler : method {    # no subsort
     #  Only do if cache directory defined
     #
     my ($cache_pn, $cache_mtime);
-    if ($WEBDYNE_CACHE_DN) {
+    if (WEBDYNE_CACHE_DN) {
         debug("webdyne_cache_dn $WEBDYNE_CACHE_DN");
-        $cache_pn=File::Spec->catfile($WEBDYNE_CACHE_DN, $srce_inode);
+        $cache_pn=File::Spec->catfile(WEBDYNE_CACHE_DN, $srce_inode);
         $cache_mtime=((-f $cache_pn) && (stat(_))[9]);
         debug("webdyne_cache file: $cache_pn, cache_mtime: $cache_mtime");
     }
@@ -384,7 +384,7 @@ sub handler : method {    # no subsort
 
     #  Test if compile/reload needed
     #
-    if ($WEBDYNE_RELOAD || $self->{'_compile'} || ($cache_inode_hr->{'mtime'} < $srce_mtime) || ($cache_mtime > $cache_inode_hr->{'mtime'})) {
+    if (WEBDYNE_RELOAD || $self->{'_compile'} || ($cache_inode_hr->{'mtime'} < $srce_mtime) || ($cache_mtime > $cache_inode_hr->{'mtime'})) {
 
 
         #  Debug
@@ -396,7 +396,7 @@ sub handler : method {    # no subsort
 
         #  use Module::Reload to reload modules
         #
-        if ($WEBDYNE_RELOAD) {
+        if (WEBDYNE_RELOAD) {
             local $SIG{'__DIE__'};
             unless ($INC{'Module/Reload.pm'}) {
                 debug('loading Module::Reload');
@@ -540,7 +540,7 @@ sub handler : method {    # no subsort
         #
         #  delete $self->{'_CGI'} if $WEBDYNE_CGI_PARAM_EXPAND;
         #
-        if ((my $cgi_or=$self->{'_CGI'}) && $WEBDYNE_CGI_PARAM_EXPAND) {
+        if ((my $cgi_or=$self->{'_CGI'}) && WEBDYNE_CGI_PARAM_EXPAND) {
             $cgi_or->delete_all();  # Added this after cache code issues so don't get two instances of param. Keep and eye for problems with WebDyne::State
             $cgi_or->_initialize();
         }
@@ -718,10 +718,10 @@ sub handler : method {    # no subsort
                 my $r_child=$r->lookup_file($fn, $r->output_filters);
                 debug("r_child: $r_child");
                 $r_child->handler('default-handler');
-                $r_child->content_type($WEBDYNE_CONTENT_TYPE_HTML);
+                $r_child->content_type(WEBDYNE_CONTENT_TYPE_HTML);
 
                 #  Apache bug ? Need to set content type on r also
-                $r->content_type($WEBDYNE_CONTENT_TYPE_HTML);
+                $r->content_type(WEBDYNE_CONTENT_TYPE_HTML);
                 debug("set content type to: $WEBDYNE_CONTENT_TYPE_HTML, running");
                 return $r_child->run($self);
 
@@ -733,7 +733,7 @@ sub handler : method {    # no subsort
                 debug('using legacy path');
                 $r->filename($fn);
                 $r->handler('default-handler');
-                $r->content_type($WEBDYNE_CONTENT_TYPE_HTML);
+                $r->content_type(WEBDYNE_CONTENT_TYPE_HTML);
                 return &Apache::DECLINED;
             }
         }
@@ -782,7 +782,7 @@ sub handler : method {    # no subsort
 
     #  Set default content type to text/html, can be overridden by render code if needed
     #
-    $r->content_type($WEBDYNE_CONTENT_TYPE_HTML);
+    $r->content_type(WEBDYNE_CONTENT_TYPE_HTML);
 
 
     #  Redirect 'print' function to our own routine for later output
@@ -903,10 +903,10 @@ sub handler : method {    # no subsort
     #  add a perl handler to do it after we finish
     #
     if (
-        $WEBDYNE_CACHE_CHECK_FREQ
+        WEBDYNE_CACHE_CHECK_FREQ
         &&
         ($r eq ($r->main() || $r)) &&
-        !((my $nrun=++$Package{'_nrun'}) % $WEBDYNE_CACHE_CHECK_FREQ)
+        !((my $nrun=++$Package{'_nrun'}) % WEBDYNE_CACHE_CHECK_FREQ)
     ) {
 
 
@@ -928,7 +928,7 @@ sub handler : method {    # no subsort
 
 
     }
-    elsif ($WEBDYNE_CACHE_CHECK_FREQ) {
+    elsif (WEBDYNE_CACHE_CHECK_FREQ) {
 
         #  Only bother to update counters if we are checking cache periodically
         #
@@ -1033,8 +1033,8 @@ sub init_class {
 
     #  If set, delete all old cache files at startup
     #
-    if ($WEBDYNE_STARTUP_CACHE_FLUSH && (-d $WEBDYNE_CACHE_DN)) {
-        my @file_cn=glob(File::Spec->catfile($WEBDYNE_CACHE_DN, '*'));
+    if (WEBDYNE_STARTUP_CACHE_FLUSH && (-d WEBDYNE_CACHE_DN)) {
+        my @file_cn=glob(File::Spec->catfile(WEBDYNE_CACHE_DN, '*'));
         foreach my $fn (grep {/\w{32}(\.html)?$/} @file_cn) {
             unlink $fn;    #don't error here if problems, user will never see it
         }
@@ -1185,7 +1185,7 @@ sub init_class {
 
         #  Quick sanity check on return
         #
-        if (grep {ref($_) && (ref($_) !~ /(?:SCALAR|ARRAY|HASH)/)} @eval) {
+        if (grep {ref($_) && (ref($_) !~ /(?:SCALAR|ARRAY|HASH|JSON)/)} @eval) {
 
             #  Whatever it is we can't render it unless SCALAR, ARRAY or HASH
             #
@@ -1355,7 +1355,7 @@ sub init_class {
         my ($self, $data_ar, $eval_param_hr, $eval_text, $index, $tag_fg)=@_;
         debug("eval code start $eval_text");
         my $html_ar=$eval_perl_cr->(@_) || return err();
-        debug("eval code finish %s", Dumper($html_ar));
+        debug("eval code finish %s, %s", Dumper($html_ar, $eval_param_hr));
 
 
         #  We only accept first item of any array ref returned (which might be an array ref itself)
@@ -1401,7 +1401,7 @@ sub init_class {
 
         my $value=$_[2]->{$_[3]};
         unless ($value) {
-            if (!exists($_[2]->{$_[3]}) && $WEBDYNE_STRICT_VARS) {
+            if (!exists($_[2]->{$_[3]}) && WEBDYNE_STRICT_VARS) {
                 return err("no '$_[3]' parameter value supplied, parameters are: %s", join(',', map {"'$_'"} keys %{$_[2]}))
             }
         }
@@ -1451,7 +1451,7 @@ sub cache_clean {
     #  Values we want, either last run time (lrun) or number of times run
     #  (nrun)
     #
-    my $clean_method=$WEBDYNE_CACHE_CLEAN_METHOD ? 'nrun' : 'lrun';
+    my $clean_method=WEBDYNE_CACHE_CLEAN_METHOD ? 'nrun' : 'lrun';
 
 
     #  Sort into array of inode values, sorted descending by clean attr
@@ -1463,7 +1463,7 @@ sub cache_clean {
 
     #  If > high watermark entries, we need to clean
     #
-    if (@cache > $WEBDYNE_CACHE_HIGH_WATER) {
+    if (@cache > WEBDYNE_CACHE_HIGH_WATER) {
 
 
         #  Yes, clean
@@ -1473,7 +1473,7 @@ sub cache_clean {
 
         #  Delete excess entries
         #
-        my @clean=map {delete $cache_hr->{$_}} @cache[$WEBDYNE_CACHE_LOW_WATER..$#cache];
+        my @clean=map {delete $cache_hr->{$_}} @cache[WEBDYNE_CACHE_LOW_WATER..$#cache];
 
 
         #  Debug
@@ -1487,7 +1487,7 @@ sub cache_clean {
         #
         debug(
             'no cleanup needed, cache size %s less than high watermark %s',
-            scalar @cache, $WEBDYNE_CACHE_HIGH_WATER
+            scalar @cache, WEBDYNE_CACHE_HIGH_WATER
         );
 
     }
@@ -1600,7 +1600,7 @@ sub render_data_ar {
     #
     local *HTML::Tiny::entity_encode=sub {$_[1]}
         unless
-        $WEBDYNE_CGI_AUTOESCAPE;
+        WEBDYNE_CGI_AUTOESCAPE;
         
         
     #  Recursive anon sub to do the render, init and store in class space
@@ -1699,14 +1699,26 @@ sub render_cr {
     #  If param present, use for sub-render. Commented out was when render was co-mingled, not needed now separated to render_data_ar(), render() methods
     #
     #if (!exists($param_data_hr->{'param'})) {
-        if ($attr_hr->{'param'}) {
-            my %param_data=(%{$param_data_hr}, %{$attr_hr->{'param'}});
-            $param_data_hr=\%param_data;
-        }
+    ##    if ($attr_hr->{'param'}) {
+    ##        my %param_data=(%{$param_data_hr}, %{$attr_hr->{'param'}});
+    ##        $param_data_hr=\%param_data;
+    ##    }
     #}
     #elsif ($attr_hr->{'param'})  {
     #    $param_data_hr=$attr_hr->{'param'}
     #}
+
+    if (exists ($attr_hr->{'param'})) {
+        if (ref($attr_hr->{'param'}) eq 'HASH') {
+            my %param_data=(%{$param_data_hr}, %{$attr_hr->{'param'}});
+            $param_data_hr=\%param_data;
+        }
+        elsif (ref($attr_hr->{'param'})) {
+            return err("perl param attribute is %s ref, must be HASH ref or plain scalar", ref($attr_hr->{'param'}));
+        }
+    }
+
+
     debug('result: %s', Dumper($param_data_hr));
 
 
@@ -1916,13 +1928,13 @@ sub redirect {
         #
         my $r=$self->r() || return err();
         if ($param_hr->{'html'}) {
-            $r->content_type($WEBDYNE_CONTENT_TYPE_HTML)
+            $r->content_type(WEBDYNE_CONTENT_TYPE_HTML)
         }
         elsif ($param_hr->{'text'}) {
-            $r->content_type($WEBDYNE_CONTENT_TYPE_TEXT)
+            $r->content_type(WEBDYNE_CONTENT_TYPE_TEXT)
         }
         elsif ($param_hr->{'json'}) {
-            $r->content_type($WEBDYNE_CONTENT_TYPE_JSON)
+            $r->content_type(WEBDYNE_CONTENT_TYPE_JSON)
         }
 
 
@@ -2498,8 +2510,11 @@ sub json {
     #  Run the code in perl routine specifying it is JSON, get return ref of
     #  some kind
     #
-    my $json_xr=$self->perl(undef, {json => 1, %{$attr_hr}}) ||
+    defined(my $json_xr=$self->perl(undef, {json => 1, %{$attr_hr}})) ||
         return err();
+    if (ref($json_xr) eq 'SCALAR') {
+        $json_xr=${$json_xr}
+    }
     debug("json_xr %s", Dumper($json_xr));
 
 
@@ -2508,7 +2523,7 @@ sub json {
     my $json_or=JSON->new() ||
         return err('unable to create new JSON object');
     debug("json_or: $json_or");
-    $json_or->canonical(defined($attr_hr->{'canonical'}) ? $attr_hr->{'canonical'} : $WEBDYNE_JSON_CANONICAL);
+    $json_or->canonical(defined($attr_hr->{'canonical'}) ? $attr_hr->{'canonical'} : WEBDYNE_JSON_CANONICAL);
     my $json=eval {$json_or->encode($json_xr)} ||
         return err('error %s on json_encode of %s', $@, Dumper($json_xr));
     debug("json %s", Dumper($json));
@@ -2585,7 +2600,7 @@ sub htmx {
         #  No handler, just render
         #
         debug('htmx render without handler');
-        $html_sr=$self->render_data_ar(data=> $data_ar->[$WEBDYNE_NODE_CHLD_IX]) ||
+        $html_sr=$self->render_data_ar(data=> $data_ar->[WEBDYNE_NODE_CHLD_IX]) ||
             return err();
         debug("html_sr: $html_sr");
         
@@ -2676,7 +2691,7 @@ sub api {
         my $json_or=JSON->new() ||
             return err('unable to create new JSON object');
         debug("json_or: $json_or");
-        $json_or->canonical(defined($attr_hr->{'canonical'}) ? $attr_hr->{'canonical'} : $WEBDYNE_JSON_CANONICAL);
+        $json_or->canonical(defined($attr_hr->{'canonical'}) ? $attr_hr->{'canonical'} : WEBDYNE_JSON_CANONICAL);
         my $json=eval {$json_or->encode($json_xr)} ||
             return err('error %s on json_encode of %s', $@, Dumper($json_xr));
         debug("json %s", Dumper($json));
@@ -2706,6 +2721,13 @@ sub perl {
     #
     my ($self, $data_ar, $attr_hr, $param_data_hr, $text)=@_;
     debug("$self rendering perl tag in block $data_ar, attr %s", Dumper($attr_hr));
+    
+    
+    #  Look for run param and if exists only run if value evaluates to true
+    #
+    if(exists $attr_hr->{'run'}) {
+        return \undef unless $attr_hr->{'run'};
+    }
 
 
     #  Add current working directory to @INC for any use or require commands
@@ -2738,9 +2760,16 @@ sub perl {
     }
 
 
+    #  Get current autonewline setting, set if defined
+    #
+    my $autonewline=$self->autonewline($attr_hr->{'autonewline'});
+
+
     #  If inline, run now
     #
     if (my $perl_code=$attr_hr->{'perl'}) {
+    
+    
 
 
         #  May be inline code params to supply to this block
@@ -2754,7 +2783,8 @@ sub perl {
         #
         $html_sr=$Package{'_eval_cr'}{'!'}->($self, $data_ar, $perl_param_hr, $perl_code) ||
             err();
-
+        
+        
 
     }
     elsif (grep {$attr_hr->{$_}} qw(package method handler)) {
@@ -2816,13 +2846,32 @@ sub perl {
         
         #  Inherit params from data stack and add any supplied here
         #
-        my %param=(%{$self->{'_perl_data'}[0]}, %{$attr_hr->{'param'}});
+        my (%param, $param_scalar);
+        if (exists ($attr_hr->{'param'})) {
+            if (ref($attr_hr->{'param'}) eq 'HASH') {
+                %param=(%{$self->{'_perl_data'}[0]}, %{$attr_hr->{'param'}});
+            }
+            elsif (!ref($attr_hr->{'param'})) {
+                $param_scalar=$attr_hr->{'param'};
+            }
+            else {
+                return err("perl param attribute is %s ref, must be HASH ref or plain scalar", ref($attr_hr->{'param'}));
+            }
+        }
+        
+        
+        #  If want json set tag_fg to 1 so eval doesn't try and process. If we don't want json then tag_fg is set to
+        #  false which is default and fine.
+        #
+        my $tag_fg=$attr_hr->{'json'};
 
 
-        #  Run the eval code to get HTML
+        #  Run the eval code to get HTML. Various previous iterations get for reference
         #
         #$html_sr=$Package{'_eval_cr'}{'!'}->($self, $data_ar, $attr_hr->{'param'}, "&${function}") || do {
-        $html_sr=$Package{'_eval_cr'}{'!'}->($self, $data_ar, \%param, "&${function}") || do {
+        #$html_sr=$Package{'_eval_cr'}{'!'}->($self, $data_ar, \%param, "&${function}") || do {
+        #$html_sr=$Package{'_eval_cr'}{'!'}->($self, $data_ar, $param_scalar ? $param_scalar : \%param, "&${function}") || do {
+        defined($html_sr=$Package{'_eval_cr'}{'!'}->($self, $data_ar, $param_scalar ? $param_scalar : \%param, "&${function}", undef, $tag_fg)) || do {
 
 
             #  Error occurred. Pop data ref off stack and return
@@ -2874,6 +2923,14 @@ sub perl {
 
     }
 
+
+    #  Restore autonewline to whatever it was
+    #
+    $self->autonewline($autonewline);
+    
+    
+    #  Return whatever was generated unless hidden attr set
+    #
     return $attr_hr->{'hidden'} ? \undef : $html_sr;
 
 }
@@ -3099,7 +3156,7 @@ sub perl_init {
 
         #  Wrap in anon CR, eval for syntax
         #
-        if ($WEBDYNE_EVAL_SAFE) {
+        if (WEBDYNE_EVAL_SAFE) {
 
 
             #  Safe mode, vars don't matter so much
@@ -3462,7 +3519,7 @@ sub include {
 
             #  Render included block and return after stripping <p></p>
             #
-            my $html_sr=$self->render_data_ar(data => $block_ar->[$WEBDYNE_NODE_CHLD_IX], param => $param_hr->{'param'}) || 
+            my $html_sr=$self->render_data_ar(data => $block_ar->[WEBDYNE_NODE_CHLD_IX], param => $param_hr->{'param'}) || 
                 return err();
             #return $html_sr;
             push @html, ${$html_sr}
@@ -3523,7 +3580,7 @@ sub include {
 
             #  Set to attr always display
             #
-            $block_ar->[$WEBDYNE_NODE_ATTR_IX]{'display'}=1;
+            $block_ar->[WEBDYNE_NODE_ATTR_IX]{'display'}=1;
 
 
             #  Incorporate into top level data so we don't have to do this again if
@@ -3539,7 +3596,7 @@ sub include {
             #  child of results [WEBDYNE_NODE_CHLD_IX].
             #
             debug('calling render');
-            my $html_sr=$self->render_data_ar(data => $block_ar->[$WEBDYNE_NODE_CHLD_IX], param => ($param_hr->{'param'} || $param_data_hr)) || 
+            my $html_sr=$self->render_data_ar(data => $block_ar->[WEBDYNE_NODE_CHLD_IX], param => ($param_hr->{'param'} || $param_data_hr)) || 
                 return err();
             #return $html_sr;
             push @html, ${$html_sr};
@@ -3631,12 +3688,12 @@ sub find_node {
 
         #  Do we match at this level ?
         #
-        if ((my $data_ar_tag=$data_ar->[$WEBDYNE_NODE_NAME_IX]) eq $tag) {
+        if ((my $data_ar_tag=$data_ar->[WEBDYNE_NODE_NAME_IX]) eq $tag) {
 
 
             #  Match for tag name, now check any attrs
             #
-            my $tag_attr_hr=$data_ar->[$WEBDYNE_NODE_ATTR_IX];
+            my $tag_attr_hr=$data_ar->[WEBDYNE_NODE_ATTR_IX];
 
 
             #  Debug
@@ -3680,7 +3737,7 @@ sub find_node {
 
         #  Start looking through current node
         #
-        my @data_child_ar=$data_ar->[$WEBDYNE_NODE_CHLD_IX] ? @{$data_ar->[$WEBDYNE_NODE_CHLD_IX]} : undef;
+        my @data_child_ar=$data_ar->[WEBDYNE_NODE_CHLD_IX] ? @{$data_ar->[WEBDYNE_NODE_CHLD_IX]} : undef;
         foreach my $data_child_ar (@data_child_ar) {
 
 
@@ -3751,9 +3808,9 @@ sub delete_node {
 
         #  Iterate through child nodes
         #
-        foreach my $data_chld_ix (0..$#{$data_ar->[$WEBDYNE_NODE_CHLD_IX]}) {
+        foreach my $data_chld_ix (0..$#{$data_ar->[WEBDYNE_NODE_CHLD_IX]}) {
 
-            my $data_chld_ar=$data_ar->[$WEBDYNE_NODE_CHLD_IX][$data_chld_ix] ||
+            my $data_chld_ar=$data_ar->[WEBDYNE_NODE_CHLD_IX][$data_chld_ix] ||
                 return err("unable to get chld node from $data_ar");
             debug("looking at chld node $data_chld_ar");
 
@@ -3762,7 +3819,7 @@ sub delete_node {
                 #  Found node we want to delete. Get rid of it, all done
                 #
                 debug("match - splicing at chld $data_chld_ix from array %s", Dumper($data_ar));
-                splice(@{$data_ar->[$WEBDYNE_NODE_CHLD_IX]}, $data_chld_ix, 1);
+                splice(@{$data_ar->[WEBDYNE_NODE_CHLD_IX]}, $data_chld_ix, 1);
                 return \1;
 
             }
@@ -3836,7 +3893,7 @@ sub html_tiny {
 
     my $self=shift();
     debug("$self get HTML::Tiny object");
-    return ($self->{'_html_tiny_or'} ||= (WebDyne::HTML::Tiny->new(mode => $WEBDYNE_HTML_TINY_MODE, r=>$self->{'_r'}) ||
+    return ($self->{'_html_tiny_or'} ||= (WebDyne::HTML::Tiny->new(mode => WEBDYNE_HTML_TINY_MODE, r=>$self->{'_r'}) ||
         err('unable to instantiate new WebDybe::HTTP::Tiny object')));
 
 }
@@ -3890,7 +3947,7 @@ sub dump {
     my $cgi_or=$self->CGI() ||
         return err();
     my @html;
-    if ($WEBDYNE_DUMP_FLAG || $attr_hr->{'force'} || $attr_hr->{'display'}) {
+    if (WEBDYNE_DUMP_FLAG || $attr_hr->{'force'} || $attr_hr->{'display'}) {
     
 
         #  Always do CGI vars
@@ -3934,10 +3991,34 @@ sub dump {
 
             #  Constant
             #
-            my %constant=map { $_=> encode_entities($WebDyne::Constant::Constant{$_}) } keys(%WebDyne::Constant::Constant);
+            #my %constant=map { $_=> encode_entities($WebDyne::Constant::Constant{$_}) } keys(%WebDyne::Constant::Constant);
+            #push @html, Data::Dumper->Dump([\%constant], ['WebDyne::Constant']);
+
+
+            #  Update - take from WebDyne module vars, don't trust hasn't changed from Constants file
+            #
+            my %constant;
+            while (my ($k, $cv) = each %WebDyne::Constant::Constant) {
+                my $wv=${"WebDyne::${k}"};
+                $constant{$k}=($cv eq $wv) ? $wv : "$wv [$cv]";
+            }
             push @html, Data::Dumper->Dump([\%constant], ['WebDyne::Constant']);
+
             
         }
+        
+        
+        #  Dir_config
+        #
+        if ($attr_hr->{'dir_config'} || $attr_hr->{'all'}) {
+    
+
+            #  Yes, wanted
+            #
+            push @html, Data::Dumper->Dump([$self->r->dir_config()], ['WebDyne::Dir_Config']);
+            
+        }
+        
 
 
         #  Version mandatory
@@ -3982,7 +4063,7 @@ sub cwd {
         unless (-d ($dn=File::Spec->rel2abs($fn))) {
             #  Not a directory, must be file
             #
-            $dn=(File::Spec->splitpath($self->{'_r'}->filename()))[1] || getcwd();
+            $dn=(File::Spec->splitpath($fn))[1] || fastcwd();
             debug("return calculated dn: $dn");
             $dn;
         }
@@ -3990,6 +4071,7 @@ sub cwd {
             debug("return existing dn: $dn");
             $dn;
         }
+        
     }
 
 }
@@ -4057,7 +4139,7 @@ sub cache_filename {
     #
     my $self=shift();
     my $inode=@_ ? shift() : $self->{'_inode'};
-    my $inode_pn=File::Spec->catfile($WEBDYNE_CACHE_DN, $inode) if $WEBDYNE_CACHE_DN;
+    my $inode_pn=File::Spec->catfile(WEBDYNE_CACHE_DN, $inode) if WEBDYNE_CACHE_DN;
     \$inode_pn;
 
 }
@@ -4251,7 +4333,7 @@ sub data_ar_html_srce_fn {
     my ($self, $data_ar)=@_;
     debug("self: $self, data_ar: $data_ar");
     if ($data_ar ||= $self->data_ar_err()) {
-        return ${$data_ar->[$WEBDYNE_NODE_SRCE_IX]}
+        return ${$data_ar->[WEBDYNE_NODE_SRCE_IX]}
     }
 
 }
@@ -4265,7 +4347,7 @@ sub data_ar_html_line_no {
     my ($self, $data_ar)=@_;
     debug("self: $self, data_ar: $data_ar");
     if ($data_ar ||= $self->data_ar_err()) {
-        return wantarray ? @{$data_ar}[$WEBDYNE_NODE_LINE_IX, $WEBDYNE_NODE_LINE_TAG_END_IX] : $data_ar->[$WEBDYNE_NODE_LINE_IX];
+        return wantarray ? @{$data_ar}[WEBDYNE_NODE_LINE_IX, WEBDYNE_NODE_LINE_TAG_END_IX] : $data_ar->[WEBDYNE_NODE_LINE_IX];
     }
 
 
@@ -4275,7 +4357,7 @@ sub data_ar_html_line_no {
 sub print {
 
     my $self=shift();
-    debug("$self in print, %s", Dumper(\@_));
+    debug("$self in print, autonewline: %d, %s", $self->autonewline() ? 1 : 0, Dumper(\@_));
     return $self->say(@_) if $self->{'_autonewline'};
     #push @{$self->{'_print_ar'} ||= []}, [map {(ref($_) eq 'ARRAY') ? @{$_} : $_ } @_];
     push @{$self->{'_print_ar'} ||= []}, map {(ref($_) eq 'ARRAY') ? @{$_} : $_ } @_;
@@ -4296,8 +4378,15 @@ sub printf {
 
 
 sub autonewline {
+
     my $self=shift();
-    return @_ ? $self->{'_autonewline'}=($_[0] ? "\n" : 0) : $self->{'_autonewline'};
+    debug("$self in autonewline");
+    my $autonewline=$self->{'_autonewline'};
+    if (@_) {
+        $self->{'_autonewline'}=($_[0] ? "\n" : '');
+    }
+    return $autonewline;
+    #return @_ ? $self->{'_autonewline'}=($_[0] ? "\n" : 0) : $self->{'_autonewline'};
     
 }
 
@@ -4388,7 +4477,7 @@ sub AUTOLOAD {
         if (my $cr=UNIVERSAL::can($caller, $method)) {
 
             # POLLUTE is virtually useless - no speedup in real life ..
-            if ($WEBDYNE_AUTOLOAD_POLLUTE) {
+            if (WEBDYNE_AUTOLOAD_POLLUTE) {
                 my $class=ref($self);
                 *{"${class}::${method}"}=$cr;
             }
@@ -4581,7 +4670,7 @@ Andrew Speer <andrew.speer@isolutions.com.au> and contributors.
 
 This file is part of WebDyne.
 
-This software is copyright (c) 2025 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
+This software is copyright (c) 2026 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

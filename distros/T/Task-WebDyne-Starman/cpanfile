@@ -1,0 +1,12 @@
+requires 'Plack';
+requires 'WebDyne';
+
+on configure => sub {
+    requires 'Tie::File';
+    requires 'perl', '5.006';
+};
+
+on test => sub {
+    requires 'Test::More';
+    suggests 'Test::Pod', '1.14';
+};

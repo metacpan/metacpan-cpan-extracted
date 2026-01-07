@@ -1,3 +1,15 @@
+0.007   2026-01-05  Released-By: PERLANCAR; Urgency: medium
+
+        - Add option: --exclude-directories (-D).
+
+        - [bugfix] Handle undef in --regex.
+
+
+0.006   2026-01-05  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Avoid undefs.
+
+
 0.005   2025-11-26  Released-By: PERLANCAR; Urgency: medium
 
         [script find-duplicate-filenames]

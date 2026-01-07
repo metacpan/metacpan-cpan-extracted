@@ -1,10 +1,9 @@
 bin/jq-lite
 Changes
 CONTRIBUTING.md
-DESIGN.md
 docs/cli-contract.md
-download.sh
-FUNCTIONS.md
+docs/DESIGN.md
+docs/FUNCTIONS.md
 install-jq-lite.ps1
 lib/JQ/Lite.pm
 lib/JQ/Lite/Expression.pm
@@ -100,6 +99,7 @@ t/not.t
 t/nth.t
 t/null_input_cli.t
 t/object_constructor.t
+t/object_iteration.t
 t/objects.t
 t/path.t
 t/paths.t
