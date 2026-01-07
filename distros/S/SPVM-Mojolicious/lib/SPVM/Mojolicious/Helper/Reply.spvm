@@ -75,8 +75,6 @@ class Mojolicious::Helper::Reply {
     
     my $c = $self->{controller};
     
-    $c->stash_h->{"exception"} = $message;
-    
     if ($c->app->mode eq "development") {
       $c->render({text => $message, format => "txt", status => 500}) ;
       return;
@@ -95,8 +93,6 @@ class Mojolicious::Helper::Reply {
   method json_exception : void ($message : string) {
     
     my $c = $self->{controller};
-    
-    $c->stash_h->{"exception"} = $message;
     
     if ($c->app->mode eq "development") {
       $c->render({json => {error => $message}, status => 500}) ;

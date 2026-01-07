@@ -1,5 +1,5 @@
 package IO::Uring;
-$IO::Uring::VERSION = '0.007';
+$IO::Uring::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ IO::Uring - io_uring for Perl
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -149,6 +149,12 @@ Poll the file handle C<$fh> once. C<$mask> can have the same values as synchrono
 =head2 poll_multishot($fh, $mask, $s_flags, $callback)
 
 Poll the file handle C<$fh> and repeatedly call C<$callback> whenever new data is available. C<$mask> can have the same values as synchronous poll (e.g. C<POLLIN>, C<POLLOUT>).
+
+=head2 poll_update($id, $new_callback, $mask, $s_flags, $callback)
+
+Update the poll to have a new mask, a new callback or to make it multishot.
+
+=head2 poll_remove
 
 =head2 shutdown($fh, $how, $s_flags, $callback)
 
@@ -361,6 +367,18 @@ If set C<fsync> will do an C<fdatasync> instead: not sync if only metadata has c
 =item * C<IORING_RECVSEND_POLL_FIRST>
 
 If set, C<io_uring> will assume the socket is currently empty and attempting to receive data will be unsuccessful. For this case, io_uring will arm internal poll and trigger a receive of the data when the socket has data to be read. This initial receive attempt can be wasteful for the case where the socket is expected to be empty, setting this flag will bypass the initial receive attempt and go straight to arming poll. If poll does indicate that data is ready to be received, the operation will proceed.
+
+=back
+
+=head3 poll_update
+
+=over 4
+
+=item * IORING_POLL_ADD_MULTI
+
+=item * IORING_POLL_UPDATE_EVENTS
+
+=item * IORING_POLL_UPDATE_USER_DATA
 
 =back
 

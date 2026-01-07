@@ -1,5 +1,8 @@
 Revision history for Pg-SQL-PrettyPrinter
 
+0.12    2026-01-06
+        - Make multi-line join conditions indented in nicer way.
+
 0.11    2023-10-05
         - Update to work with JSON produced by pg_query 4.2.3
         - Handle DISTINCT clause in aggregates

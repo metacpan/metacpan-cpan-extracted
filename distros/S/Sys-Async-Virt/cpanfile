@@ -7,8 +7,6 @@ requires 'Future::AsyncAwait';
 requires 'Future::IO';
 requires 'Future::Selector';
 requires 'Future::Queue';
-requires 'IO::Async::Notifier';
-requires 'IO::Async::Stream';
 requires 'Log::Any';
 requires 'Object::Pad' => '0.821';
 requires 'Protocol::Sys::Virt' => '11.10.1';

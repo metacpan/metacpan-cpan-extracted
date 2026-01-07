@@ -1,16 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2026 -- leonerd@leonerd.org.uk
 
-package IO::Ppoll;
+package IO::Ppoll 0.13;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Carp;
-
-our $VERSION = '0.12';
 
 use Exporter 'import';
 our @EXPORT = qw(
@@ -24,7 +22,7 @@ our @EXPORT = qw(
 require POSIX;
 
 require XSLoader;
-XSLoader::load( __PACKAGE__, $VERSION );
+XSLoader::load( __PACKAGE__, our $VERSION );
 
 =head1 NAME
 
@@ -32,20 +30,22 @@ C<IO::Ppoll> - Object interface to Linux's C<ppoll()> call
 
 =head1 SYNOPSIS
 
- use IO::Ppoll qw( POLLIN POLLOUT );
- use POSIX qw( sigprocmask SIG_BLOCK SIGHUP );
+=for highlighter language=perl
 
- my $ppoll = IO::Ppoll->new();
- $ppoll->mask( $input_handle => POLLIN );
- $ppoll->mask( $output_handle => POLLOUT );
+   use IO::Ppoll qw( POLLIN POLLOUT );
+   use POSIX qw( sigprocmask SIG_BLOCK SIGHUP );
 
- $SIG{HUP} = sub { print "SIGHUP happened\n"; };
- sigprocmask( SIG_BLOCK, POSIX::SigSet->new( SIGHUP ), undef );
+   my $ppoll = IO::Ppoll->new();
+   $ppoll->mask( $input_handle => POLLIN );
+   $ppoll->mask( $output_handle => POLLOUT );
 
- # If a SIGHUP happens, it can only happen during this poll
- $ppoll->poll( $timeout );
+   $SIG{HUP} = sub { print "SIGHUP happened\n"; };
+   sigprocmask( SIG_BLOCK, POSIX::SigSet->new( SIGHUP ), undef );
 
- $input_ev = $poll->events( $input_handle );
+   # If a SIGHUP happens, it can only happen during this poll
+   $ppoll->poll( $timeout );
+
+   $input_ev = $poll->events( $input_handle );
 
 =head1 DESCRIPTION
 
@@ -76,7 +76,7 @@ be safe to do so.
 
 =head2 new
 
-   $ppoll = IO::Ppoll->new()
+   $ppoll = IO::Ppoll->new();
 
 Returns a new instance of an C<IO::Ppoll> object. It will contain no file
 handles and its signal mask will be empty.
@@ -103,11 +103,11 @@ sub new
 
 =head2 mask
 
-   $mask = $ppoll->mask( $handle )
+   $mask = $ppoll->mask( $handle );
 
 Returns the current mask bits for the given IO handle
 
-   $ppoll->mask( $handle, $newmask )
+   $ppoll->mask( $handle, $newmask );
 
 Sets the mask bits for the given IO handle. If C<$newmask> is 0, the handle
 will be removed.
@@ -141,18 +141,18 @@ sub mask
 
 =head2 mask_del
 
-   $ppoll->mask_add( $handle, $addmask )
+   $ppoll->mask_add( $handle, $addmask );
 
-   $ppoll->mask_del( $handle, $delmask )
+   $ppoll->mask_del( $handle, $delmask );
 
 I<Since version 0.12.>
 
 Convenient shortcuts to setting or clearing one or more bits in the mask of a
 handle. Equivalent, respectively, to the following lines
 
- $ppoll->mask( $handle, $ppoll->mask( $handle ) | $addmask )
+   $ppoll->mask( $handle, $ppoll->mask( $handle ) | $addmask );
 
- $ppoll->mask( $handle, $ppoll->mask( $handle ) & ~$delmask )
+   $ppoll->mask( $handle, $ppoll->mask( $handle ) & ~$delmask );
 
 Specifically note that C<$maskbits> contains bits to remove from the mask.
 
@@ -182,7 +182,7 @@ sub mask_del
 
 =head2 poll
 
-   $ret = $ppoll->poll( $timeout )
+   $ret = $ppoll->poll( $timeout );
 
 Call the C<ppoll()> system call. If C<$timeout> is not supplied then no
 timeout value will be passed to the system call. Returns the result of the
@@ -205,7 +205,7 @@ sub poll
 
 =head2 events
 
-   $bits = $ppoll->events( $handle )
+   $bits = $ppoll->events( $handle );
 
 Returns the event mask which represents the events that happened on the
 filehandle during the last call to C<poll()>.
@@ -225,7 +225,7 @@ sub events
 
 =head2 remove
 
-   $ppoll->remove( $handle )
+   $ppoll->remove( $handle );
 
 Removes the handle from the list of file descriptors for the next poll.
 
@@ -241,7 +241,7 @@ sub remove
 
 =head2 handles
 
-   @handles = $ppoll->handles( $bits )
+   @handles = $ppoll->handles( $bits );
 
 Returns a list of handles. If C<$bits> is not given then all of the handles
 will be returned. If C<$bits> is given then the list will only contain handles
@@ -269,14 +269,14 @@ sub handles
 
 =head2 sigmask
 
-   $sigset = $ppoll->sigmask
+   $sigset = $ppoll->sigmask;
 
 Returns the C<POSIX::SigSet> object in which the signal mask is stored. Since
 this is a reference to the object the C<IO::Ppoll> object uses, any
 modifications made to it will be reflected in the signal mask given to the
 C<ppoll()> system call.
 
-   $ppoll->sigmask( $newsigset )
+   $ppoll->sigmask( $newsigset );
 
 Sets the C<POSIX::SigSet> object in which the signal mask is stored. Usually
 this is not required, as a new C<IO::Ppoll> is initialised with an empty set,
@@ -300,7 +300,7 @@ sub sigmask
 
 =head2 sigmask_add
 
-   $ppoll->sigmask_add( @signals )
+   $ppoll->sigmask_add( @signals );
 
 Adds the given signals to the signal mask. These signals will be blocked
 during the C<poll()> call.
@@ -317,7 +317,7 @@ sub sigmask_add
 
 =head2 sigmask_del
 
-   $ppoll->sigmask_del( @signals )
+   $ppoll->sigmask_del( @signals );
 
 Removes the given signals from the signal mask. These signals will not be
 blocked during the C<poll()> call, and may be delivered while C<poll()> is
@@ -335,7 +335,7 @@ sub sigmask_del
 
 =head2 sigmask_ismember
 
-   $present = $ppoll->sigmask_ismember( $signal )
+   $present = $ppoll->sigmask_ismember( $signal );
 
 Tests if the given signal is present in the signal mask.
 

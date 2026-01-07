@@ -1,9 +1,8 @@
-package UV::Req;
+package UV::Req 2.001;
 
-our $VERSION = '2.000';
-
-use strict;
+use v5.14;
 use warnings;
+
 use UV ();
 
 # No pure-perl methods
@@ -18,8 +17,10 @@ UV::Req - An outstanding request in libuv
 
 =head1 SYNOPSIS
 
+=for highlighter language=perl
+
   #!/usr/bin/env perl
-  use strict;
+  use v5.14;
   use warnings;
 
   use UV;
@@ -45,7 +46,7 @@ L<UV::Req> makes the following methods available.
 
 =head2 cancel
 
-    $req->cancel
+    $req->cancel;
 
 Stops the pending operation. The exact semantics will depend on the type of
 operation the request represents.

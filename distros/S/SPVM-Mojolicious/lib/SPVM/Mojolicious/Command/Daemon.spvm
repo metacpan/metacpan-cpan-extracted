@@ -75,8 +75,8 @@ EOS
     my $specs = [
       "b|backlog=i",
       "c|clients=i",
-      "i|inactivity-timeout=i",
-      "k|keep-alive-timeout=i",
+      # "i|inactivity-timeout=i",
+      # "k|keep-alive-timeout=i",
       "l|listen=s",
       "p|proxy=s",
       "r|requests=i",
@@ -85,7 +85,7 @@ EOS
     eval { Mojo::Util->getopt(my $_ = [$args], $values_h, $specs); }
     
     if ($@) {
-      die $self->usage;
+      die $@ . ":" . $self->usage;
     }
     
     my $server = Mojo::Server::Daemon->new;
@@ -135,9 +135,9 @@ EOS
     return $server;
   }
   
-  method run : void ($args : string[]) {
+  method run : void ($argv : string[]) {
     
-    $self->build_server($args)->run;
+    $self->build_server($argv)->run;
   }
   
 }

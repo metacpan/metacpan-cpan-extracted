@@ -495,5 +495,16 @@ class Mojo::Util {
     
     return $str;
   }
+  
+  static method term_escape : string ($str : string) {
+    
+    $str = copy $str;
+    
+    Re->s((mutable string)$str, ["([\x00-\x09\x0b-\x1f\x7f\x80-\x9f])", "g"], method : string ($regex : Regex, $match : Regex::Match) {
+      return Fn->sprintf("\\x%02x", Fn->ord($match->cap1));
+    });
+    
+    return $str;
+  }
 
 }

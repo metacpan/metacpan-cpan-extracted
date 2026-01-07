@@ -381,6 +381,14 @@ Fix problems with MANIFEST
 
 This version is fully backwards compatible to Version 32
 
+=head2 VERSION 34
+
+Net::Clacks::Client now supports "fastdisconnect" that closes a connection immediately without sending QUIT first. (used in forkin clients)
+
+ClacksCache now only connects to server on first use, instead on instantiation.
+
+This version is fully backwards compatible to Version 33
+
 =head1 AUTHOR
 
 Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>

@@ -11,7 +11,6 @@ use constant {
 # These should be in Perl's installation already
 use Config;
 use ExtUtils::MakeMaker;
-use Term::ReadKey;
 use Term::ANSIColor;
 
 my $line = '-' x 30 . ' Term::ANSIEncode ' . '-' x 30;
@@ -51,6 +50,7 @@ WriteMakefile(
         'Time::HiRes'       => '0',
         'Getopt::Long'      => '0',
         'Text::Wrap::Smart' => '0',
+		'Text::Format'      => '0',
     },
     EXE_FILES => ['bin/ansi-encode'],
     dist      => {

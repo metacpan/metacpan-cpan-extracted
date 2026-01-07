@@ -1,0 +1,9 @@
+runtime:
+  requires:
+    perl: '5.008001'
+    parent: 0
+    Protocol::Redis: '1.0000'
+test:
+  requires:
+    Protocol::Redis::Test: 0
+    Test::More: '0.88'

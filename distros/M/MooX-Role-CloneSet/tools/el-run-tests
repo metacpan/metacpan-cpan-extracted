@@ -1,0 +1,14 @@
+#!/usr/bin/env execlineb
+# SPDX-FileCopyrightText: Peter Pentchev <roam@ringlet.net>
+# SPDX-License-Identifier: Artistic-2.0
+
+if {
+	minil test
+}
+if {
+	emptyenv -P
+	tools/el-podman-run-unit-tests
+} if {
+	emptyenv -P
+	tools/el-format check
+} echo "Seems fine"

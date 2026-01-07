@@ -11,7 +11,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ no_index:
 provides:
   Test2::Tools::LoadModule:
     file: lib/Test2/Tools/LoadModule.pm
-    version: '0.008'
+    version: '0.009'
 requires:
   Carp: '0'
   Exporter: '5.567'
@@ -43,5 +43,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Tools-LoadModule
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Test2-Tools-LoadModule.git
-version: '0.008'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.009'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

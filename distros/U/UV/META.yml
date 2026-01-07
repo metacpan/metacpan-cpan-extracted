@@ -9,7 +9,7 @@ configure_requires:
   Module::Build: '0.4004'
   Module::Build::Using::PkgConfig: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,57 +18,57 @@ name: UV
 provides:
   UV:
     file: lib/UV.pm
-    version: '2.000'
+    version: '2.001'
   UV::Async:
     file: lib/UV/Async.pm
-    version: '2.000'
+    version: '2.001'
   UV::Check:
     file: lib/UV/Check.pm
-    version: '2.000'
+    version: '2.001'
   UV::Exception:
     file: lib/UV.pm
   UV::Handle:
     file: lib/UV/Handle.pm
-    version: '2.000'
+    version: '2.001'
   UV::Idle:
     file: lib/UV/Idle.pm
-    version: '2.000'
+    version: '2.001'
   UV::Loop:
     file: lib/UV/Loop.pm
-    version: '2.000'
+    version: '2.001'
   UV::Pipe:
     file: lib/UV/Pipe.pm
-    version: '2.000'
+    version: '2.001'
   UV::Poll:
     file: lib/UV/Poll.pm
-    version: '2.000'
+    version: '2.001'
   UV::Prepare:
     file: lib/UV/Prepare.pm
-    version: '2.000'
+    version: '2.001'
   UV::Process:
     file: lib/UV/Process.pm
-    version: '2.000'
+    version: '2.001'
   UV::Req:
     file: lib/UV/Req.pm
-    version: '2.000'
+    version: '2.001'
   UV::Signal:
     file: lib/UV/Signal.pm
-    version: '2.000'
+    version: '2.001'
   UV::Stream:
     file: lib/UV/Stream.pm
-    version: '2.000'
+    version: '2.001'
   UV::TCP:
     file: lib/UV/TCP.pm
-    version: '2.000'
+    version: '2.001'
   UV::TTY:
     file: lib/UV/TTY.pm
-    version: '2.000'
+    version: '2.001'
   UV::Timer:
     file: lib/UV/Timer.pm
-    version: '2.000'
+    version: '2.001'
   UV::UDP:
     file: lib/UV/UDP.pm
-    version: '2.000'
+    version: '2.001'
 requires:
   Carp: '0'
   Exporter: '5.57'
@@ -79,5 +79,5 @@ resources:
   bugtracker: https://github.com/p5-UV/p5-UV/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/p5-UV/p5-UV.git
-version: '2.000'
+version: '2.001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

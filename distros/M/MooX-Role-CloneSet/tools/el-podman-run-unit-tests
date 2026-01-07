@@ -1,0 +1,28 @@
+#!/usr/bin/env execlineb
+# SPDX-FileCopyrightText: Peter Pentchev <roam@ringlet.net>
+# SPDX-License-Identifier: Artistic-2.0
+
+importas -S -D test-moox-role-cloneset TEST_CONTAINER_NAME
+importas -S -D stretch TEST_CONTAINER_LABEL
+
+backtick uid {
+	id -u
+}
+backtick gid {
+	id -g
+}
+importas -S uid
+importas -S gid
+
+podman run
+	--rm
+	-it
+	-v ".:/opt/src:rw"
+	-w /opt/src
+	-u "${uid}:${gid}"
+	--
+	"${TEST_CONTAINER_NAME}:${TEST_CONTAINER_LABEL}"
+	prove
+		-I/home/jrl/perl5/lib/perl5
+		-l
+		t

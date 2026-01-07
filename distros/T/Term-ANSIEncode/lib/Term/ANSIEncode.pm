@@ -1,4 +1,4 @@
-package Term::ANSIEncode 1.62;
+package Term::ANSIEncode 1.63;
 
 #######################################################################
 #            _   _  _____ _____   ______                     _        #
@@ -32,7 +32,7 @@ use constant {
 use Term::ANSIScreen qw( :cursor :screen );
 use Term::ANSIColor;
 use Time::HiRes qw( sleep );
-use Text::Wrap::Smart ':all';
+use Text::Format;
 
 # use Data::Dumper::Simple;$Data::Dumper::Terse=TRUE;$Data::Dumper::Indent=TRUE;$Data::Dumper::Useqq=TRUE;$Data::Dumper::Deparse=TRUE;$Data::Dumper::Quotekeys=TRUE;$Data::Dumper::Trailingcomma=TRUE;$Data::Dumper::Sortkeys=TRUE;$Data::Dumper::Purity=TRUE;$Data::Dumper::Deparse=TRUE;
 # use Term::Drawille;
@@ -147,6 +147,33 @@ sub ansi_decode {
     $text =~ s/\[\%\s*B_RGB\s+(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\%\]/
       do { my ($r,$g,$b)=($1&255,$2&255,$3&255); $csi . "48:2:$r:$g:$b" . 'm' }/eigs;
 
+	while ($text =~ /\[\%\s+WRAP\s+\%\](.*?)\[\%\s+ENDWRAP\s+\%\]/si) {
+		my $wrapped = $1;
+		my $format  = Text::Format->new(
+			'columns'     => $self->{'columns'} - 1,
+			'tabstop'     => 4,
+			'extraSpace'  => TRUE,
+			'firstIndent' => 0,
+		);
+		$wrapped = $format->format($wrapped);
+		chomp($wrapped);
+		$text =~ s/\[\%\s+WRAP\s+\%\].*?\[\%\s+ENDWRAP\s+\%\]/$wrapped/s;
+	} ## end while ($text =~ /\[\%\s+WRAP\s+\%\](.*?)\[\%\s+ENDWRAP\s+\%\]/si)
+
+	while ($text =~ /\[\%\s+JUSTIFIED\s+\%\](.*?)\[\%\s+ENDJUSTIFIED\s+\%\]/si) {
+		my $wrapped = $1;
+		my $format  = Text::Format->new(
+			'columns'     => $self->{'columns'} - 1,
+			'tabstop'     => 4,
+			'extraSpace'  => TRUE,
+			'firstIndent' => 0,
+			'justify'     => TRUE,
+		);
+		$wrapped = $format->format($wrapped);
+		chomp($wrapped);
+		$text =~ s/\[\%\s+JUSTIFIED\s+\%\].*?\[\%\s+ENDJUSTIFIED\s+\%\]/$wrapped/s;
+	} ## end while ($text =~ /\[\%\s+JUSTIFIED\s+\%\](.*?)\[\%\s+ENDJUSTIFIED\s+\%\]/si)
+
     #
     # Flatten the ansi_meta lookup to a simple, case-insensitive hash for a single-pass
     # substitution of tokens like [% RED %], [% RESET %], etc.
@@ -185,7 +212,15 @@ sub ansi_output {
 
     $text = $self->ansi_decode($text);
     $text =~ s/\[ \% TOKEN \% \]/\[\% TOKEN \%\]/;    # Special token to show [% TOKEN %] on output
-    print $text;
+	my $speed = $self->{'speed'};
+	if ($speed == 0) {
+		print $text;
+	} else {
+		for(my $index = 0; $index < length($text); $index++) {
+			print substr($text,$index,1);
+			sleep $speed;
+		}
+	}
     return (TRUE);
 } ## end sub ansi_output
 
@@ -224,7 +259,16 @@ sub box {
 
     # Position cursor inside box and wrap text
     $text .= locate($y + 1, $x + 1);
-    chomp(my @lines = fuzzy_wrap($string // '', ($w - 3)));
+
+	my $format  = Text::Format->new(
+		'columns'     => $w - 3,
+		'tabstop'     => 4,
+		'extraSpace'  => TRUE,
+		'firstIndent' => 0,
+	);
+	$string = $format->format($string);
+	chomp($string);
+	my @lines = split(/\n/,$string);
 
     my $line_y = $y + 1;
     foreach my $line (@lines) {
@@ -239,14 +283,17 @@ sub box {
 } ## end sub box
 
 sub new {
-    my ($class) = @_;
-    my $esc     = chr(27);
-    my $csi     = $esc . '[';
+    my $class = shift;
+    my $esc   = chr(27);
+    my $csi   = $esc . '[';
 
     my $self = {
         'ansi_prefix' => $csi,
         'list'        => [(0x20 .. 0x7F, 0xA0 .. 0xFF, 0x2010 .. 0x205F, 0x2070 .. 0x242F, 0x2440 .. 0x244F, 0x2460 .. 0x29FF, 0x1F300 .. 0x1F8BF, 0x1F900 .. 0x1FBBF, 0x1F900 .. 0x1FBCF, 0x1FBF0 .. 0x1FBFF)],
         'ansi_meta'   => $GLOBAL_ANSI_META,
+		'baud'        => 'FULL',
+		'columns'     => 80,
+		@_,
     };
 
     bless($self, $class);
@@ -1224,7 +1271,6 @@ sub _global_ansi_meta {    # prefills the hash cache
 
     foreach my $name (keys %{ $tmp->{'foreground'} }) {
         $tmp->{'background'}->{"B_$name"}->{'desc'} = $tmp->{'foreground'}->{$name}->{'desc'};
-#		$tmp->{'background'}->{"B_$name"}->{'desc'} =~ s/foreground/background/;
         $tmp->{'background'}->{"B_$name"}->{'out'}  = $csi . '4' . substr($tmp->{'foreground'}->{$name}->{'out'}, 3);
     }
 

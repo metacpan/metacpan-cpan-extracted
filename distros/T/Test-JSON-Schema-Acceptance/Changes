@@ -1,5 +1,11 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.036     2026-01-06 18:04:22Z
+        - do not add v1/ remotes when the implementation does not support that
+          version
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/d69537acea93fd7481ad80ff3015d88ab0b13d5a...3fc541796930c64960f334917629a221e4d74ceb
+
 1.035     2025-11-30 18:21:46Z
         - updated test suite:
           https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/8da0a7bcb23f3516590e70bc5c3e396400c27741...d69537acea93fd7481ad80ff3015d88ab0b13d5a

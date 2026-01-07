@@ -130,7 +130,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.171';
+our $VERSION = '0.172';
 our @EXPORT_OK = qw{
     shell
 
@@ -474,6 +474,7 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	    spacetrack_type	=> 'molczan',
 	    url		=> 'https://www.mmccants.org/tles/mcnames.zip',
 	},
+	# Removed 2025-12-15 or thereabouts
 	quicksat	=> {
 	    name	=> 'Quicksat-format magnitude file',
 	    member	=> undef,	# qs.mag
@@ -1013,7 +1014,7 @@ Copyright 2005-2022 by T. R. Wyant (wyant at cpan dot org).
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of
@@ -2927,7 +2928,7 @@ catalog names are:
  classified: Classified TLE file (classfd.zip)
  integrated: Integrated TLE file (inttles.zip)
  mcnames: Molczan-format magnitude file (mcnames.zip) REMOVED
- quicksat: Quicksat-format magnitude file (qsmag.zip)
+ quicksat: Quicksat-format magnitude file (qsmag.zip) REMOVED
  vsnames: Molczan-format mags of visual bodies (vsnames.zip) REMOVED
 
 The files marked B<REMOVED> have been removed from Mike McCants' web
@@ -5191,6 +5192,7 @@ sub _check_cookie_generic {
 	},
 	mccants	=> {
 	    mcnames	=> 2,
+	    quicksat	=> 1,
 	    vsnames	=> 2,
 	},
 	BODY_STATUS_IS_OPERATIONAL	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
@@ -7205,13 +7207,13 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2005-2025 by Thomas R. Wyant, III (F<wyant at cpan dot org>).
+Copyright 2005-2026 by Thomas R. Wyant, III (F<wyant at cpan dot org>).
 
 =head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

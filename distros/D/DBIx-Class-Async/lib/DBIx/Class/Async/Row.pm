@@ -7,6 +7,7 @@ use v5.14;
 
 use Carp;
 use Future;
+use Scalar::Util qw( blessed );
 
 =head1 NAME
 
@@ -14,11 +15,11 @@ DBIx::Class::Async::Row - Asynchronous Row Object for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.10
+Version 0.12
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -786,48 +787,156 @@ sub _get_source {
     return $self->{_source};
 }
 
+=head2 _build_relationship_accessor
+
+Builds an accessor for a relationship that checks for prefetched data first,
+then falls back to lazy loading if needed. For has_many relationships, the
+ResultSet object is cached in the row.
+
+=cut
+
 sub _build_relationship_accessor {
-    my ($self, $method, $rel_info) = @_;
-    my $foreign_source = $rel_info->{source};
+    my ($self, $rel_name, $rel_info) = @_;
 
+    my $rel_type = $rel_info->{attrs}{accessor} || 'single';
+    my $cond = $rel_info->{cond};
+
+    if ($rel_type eq 'single' || $rel_type eq 'filter') {
+        # belongs_to or might_have relationship
+        return sub {
+            my $row = shift;
+
+            # 1. CHECK FOR PREFETCHED DATA FIRST
+            if (exists $row->{_prefetched} && exists $row->{_prefetched}{$rel_name}) {
+                my $prefetched = $row->{_prefetched}{$rel_name};
+                return Future->done($prefetched) if blessed($prefetched);
+                return Future->done(undef);
+            }
+
+            # 2. LAZY LOAD: Extract foreign key from condition
+            my $fk = $row->_extract_foreign_key($cond);
+            return Future->done(undef) unless $fk;
+
+            my $fk_value = $row->get_column($fk->{self});
+            return Future->done(undef) unless defined $fk_value;
+
+            # 3. Fetch related row asynchronously via schema->resultset
+            my $rel_source = $row->_get_source->related_source($rel_name);
+            my $rel_rs = $row->{schema}->resultset($rel_source->source_name);
+
+            return $rel_rs->find({ $fk->{foreign} => $fk_value });
+        };
+
+    } elsif ($rel_type eq 'multi') {
+        # has_many relationship
+        return sub {
+            my $row = shift;
+            my $extra_cond = shift || {};
+
+            # Cache key for this relationship (includes extra conditions)
+            my $cache_key = $rel_name;
+            if (%$extra_cond) {
+                # If there are extra conditions, create a unique cache key
+                require Data::Dumper;
+                local $Data::Dumper::Sortkeys = 1;
+                local $Data::Dumper::Terse = 1;
+                $cache_key .= '_' . Data::Dumper::Dumper($extra_cond);
+            }
+
+            # 1. CHECK FOR CACHED RESULTSET (without extra conditions)
+            # Return cached ResultSet if it exists and no extra conditions were provided
+            if (!%$extra_cond && exists $row->{_relationship_cache} && exists $row->{_relationship_cache}{$rel_name}) {
+                return $row->{_relationship_cache}{$rel_name};
+            }
+
+            # 2. CHECK FOR PREFETCHED DATA
+            if (exists $row->{_prefetched} && exists $row->{_prefetched}{$rel_name}) {
+                my $prefetched_rs = $row->{_prefetched}{$rel_name};
+
+                # If extra conditions are provided, filter the prefetched data
+                if (%$extra_cond) {
+                    # Don't cache filtered ResultSets
+                    return $prefetched_rs->search($extra_cond);
+                }
+
+                # Cache the prefetched ResultSet (only for base relationship, no extra conditions)
+                $row->{_relationship_cache} ||= {};
+                $row->{_relationship_cache}{$rel_name} = $prefetched_rs;
+
+                return $prefetched_rs;
+            }
+
+            # 3. LAZY LOAD: Build the relationship condition
+            my $fk = $row->_extract_foreign_key($cond);
+            unless ($fk) {
+                my $rel_source = $row->_get_source->related_source($rel_name);
+                my $rs = $row->{schema}->resultset($rel_source->source_name)->search({});
+
+                # Don't cache if we couldn't extract FK (unusual case)
+                return $rs;
+            }
+
+            my $fk_value = $row->get_column($fk->{self});
+            my $related_cond = { $fk->{foreign} => $fk_value, %$extra_cond };
+
+            # 4. Create new ResultSet for lazy loading
+            my $rel_source = $row->_get_source->related_source($rel_name);
+            my $rs = $row->{schema}->resultset($rel_source->source_name)
+                ->search($related_cond);
+
+            # 5. Cache the ResultSet (only if no extra conditions)
+            if (!%$extra_cond) {
+                $row->{_relationship_cache} ||= {};
+                $row->{_relationship_cache}{$rel_name} = $rs;
+            }
+
+            return $rs;
+        };
+    }
+
+    # Default fallback
     return sub {
-        my $self = shift;
-
-        # 1. Return cached Future/ResultSet
-        return $self->{_related}{$method} if exists $self->{_related}{$method};
-
-        my $result;
-        # 2. Handle Single (belongs_to)
-        if ($rel_info->{attrs}{accessor} && $rel_info->{attrs}{accessor} eq 'single') {
-            if (exists $self->{_data}{$method} && defined $self->{_data}{$method}) {
-                my $row = $self->{schema}->resultset($foreign_source)->new_result($self->{_data}{$method});
-                $result = Future->done($row);
-            } else {
-                $result = $self->related_resultset($method)->single_future; # Use future-safe version
-            }
-        }
-        # 3. Handle Multi (has_many)
-        else {
-            # Check if we have prefetch data (even if it is undef/empty)
-            if (exists $self->{_data}{$method}) {
-                my $data = $self->{_data}{$method};
-
-                # FORCE it to be an array ref to satisfy ResultSet line 637
-                $data = [] if !defined $data;
-                $data = [$data] if ref $data ne 'ARRAY';
-
-                $result = $self->{schema}->resultset($foreign_source)->new_result_set({
-                    entries       => $data,
-                    is_prefetched => 1,
-                });
-            } else {
-                $result = $self->related_resultset($method);
-            }
-        }
-
-        $self->{_related}{$method} = $result;
-        return $result;
+        require Carp;
+        Carp::croak("Unknown relationship type for '$rel_name'");
     };
+}
+
+=head2 _extract_foreign_key
+
+Extracts foreign key mapping from a relationship condition.
+
+=cut
+
+sub _extract_foreign_key {
+    my ($self, $cond) = @_;
+
+    return undef unless $cond;
+
+    # Handle simple foreign key condition: { 'foreign.id' => 'self.user_id' }
+    if (ref $cond eq 'HASH') {
+        my ($foreign_col) = keys %$cond;
+        my $self_col = $cond->{$foreign_col};
+
+        # Handle case where self_col is a reference (e.g., { '=' => 'self.user_id' })
+        if (ref $self_col eq 'HASH') {
+            # Extract the actual column name from the hash
+            my ($op, $col) = %$self_col;
+            $self_col = $col;
+        }
+
+        # Strip prefixes if present
+        $foreign_col =~ s/^foreign\.//;
+        $self_col =~ s/^self\.// if defined $self_col && !ref $self_col;
+
+        return {
+            foreign => $foreign_col,
+            self => $self_col,
+        };
+    }
+
+    # Handle code ref conditions (more complex relationships)
+    # For now, we'll just return undef and let the relationship fail gracefully
+    return undef;
 }
 
 sub AUTOLOAD {

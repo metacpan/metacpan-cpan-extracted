@@ -149,10 +149,6 @@ class Mojo::Content extends Mojo::EventEmitter {
       $self->{body_buffer} = StringBuffer->new;
     }
     
-    unless ($self->{body_buffer}->length) {
-      $self->emit(drain => $offset);
-    }
-    
     if ($self->{body_buffer}->length) {
       my $body_buffer = $self->{body_buffer};
       $self->{body_buffer} = undef;
@@ -350,16 +346,12 @@ class Mojo::Content extends Mojo::EventEmitter {
     return $progress;
   }
   
-  method write : void ($chunk : string = undef, $cb : Mojo::Callback = undef) {
+  method write : void ($chunk : string = undef) {
     
     $self->{dynamic} = 1;
     
     if ($chunk) {
       $self->{body_buffer}->push($chunk);
-    }
-    
-    if ($cb) {
-      $self->once(drain => $cb);
     }
     
     if ($chunk && !length $chunk) {
@@ -368,7 +360,7 @@ class Mojo::Content extends Mojo::EventEmitter {
     
   }
   
-  method write_chunk : void ($chunk : string = undef, $cb : Mojo::Callback = undef) {
+  method write_chunk : void ($chunk : string = undef) {
     
     unless ($self->{chunked}) {
       $self->headers->set_transfer_encoding("chunked");
@@ -381,17 +373,13 @@ class Mojo::Content extends Mojo::EventEmitter {
       $self->{body_buffer}->push($self->_build_chunk($chunk));
     }
     
-    if ($cb) {
-      $self->once(drain => $cb);
-    }
-    
     if ($chunk && !length $chunk) {
       $self->{eof} = 1;
     }
     
   }
   
-  method write_sse : void ($event : Mojo::SSE::Event, $cb : Mojo::Callback) {
+  method write_sse : void ($event : Mojo::SSE::Event) {
     
     unless ($self->{sse}) {
       $self->headers->set_content_type("text/event-stream");
@@ -404,7 +392,7 @@ class Mojo::Content extends Mojo::EventEmitter {
       return;
     }
     
-    $self->write(Mojo::SSE->build_event($event), $cb);
+    $self->write(Mojo::SSE->build_event($event));
   }
   
   protected method _parse_until_body : void ($chunk : string) {

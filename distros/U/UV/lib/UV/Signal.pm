@@ -1,11 +1,10 @@
-package UV::Signal;
+package UV::Signal 2.001;
 
-our $VERSION = '2.000';
-
-use strict;
+use v5.14;
 use warnings;
-use Carp ();
 use parent 'UV::Handle';
+
+use Carp ();
 
 our @EXPORT_OK = (@UV::Signal::EXPORT_XS,);
 
@@ -35,8 +34,10 @@ UV::Signal - Signal handles in libuv
 
 =head1 SYNOPSIS
 
+=for highlighter language=perl
+
   #!/usr/bin/env perl
-  use strict;
+  use v5.14;
   use warnings;
 
   use UV;

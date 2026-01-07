@@ -1,3 +1,13 @@
+0.009		2026-01-06	T. R. Wyant
+    Repackage licenses so that GitHub can find them (maybe). Thanks to
+    Mikko Koivunalho (specifically his blog post
+    https://blogs.perl.org/users/mikko_koivunalho/2025/11/github-and-the-perl-license.html
+    for the how-to.
+
+    Add CONTRIBUTING, SECURITY.
+
+    Add Test2::Require::Module to SEE ALSO.
+
 0.008		2022-10-23	T. R. Wyant
     Specify Test2::API::Context (and friends) version number.
 

@@ -1,6 +1,6 @@
 package DBIx::Class::Async;
 
-$DBIx::Class::Async::VERSION   = '0.10';
+$DBIx::Class::Async::VERSION   = '0.12';
 $DBIx::Class::Async::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ DBIx::Class::Async - Asynchronous database operations for DBIx::Class
 
 =head1 VERSION
 
-Version 0.10
+Version 0.12
 
 =cut
 
@@ -368,87 +368,6 @@ sub search_multi {
 
         return Future->done(@values);
     });
-}
-
-=head2 search_with_prefetch (BROKEN)
-
-Search with eager loading of relationships.
-
-    my $users_with_orders = await $async_db->search_with_prefetch(
-        'User',
-        { active => 1 },
-        'orders',  # Relationship name or arrayref for multiple
-        { rows => 10 }
-    );
-
-Returns: Arrayref of results with prefetched data.
-
-This method consistently fails with "closed" errors across all database
-backends.
-
-B<Migration Path>:
-
-Replace any C<search_with_prefetch> calls with separate queries:
-
-    # Old code (broken):
-    my $users = await $db->search_with_prefetch(
-        'User', { active => 1 }, 'posts', {}
-    );
-
-    # New code (working):
-    my $users = await $db->search('User', { active => 1 }, {});
-    foreach my $user (@$users) {
-        my $posts = await $db->search('Post', { user_id => $user->{id} }, {});
-        $user->{posts} = $posts;
-    }
-
-For parallel fetching, see L</KNOWN ISSUES> for optimised patterns using
-C<Future::Utils::fmap_concat>.
-
-=cut
-
-sub search_with_prefetch {
-    my ($self, $resultset, $search_args, $prefetch, $attrs) = @_;
-
-    state $check = compile(Str, Maybe[HashRef], Str|ArrayRef, Maybe[HashRef]);
-    $check->($resultset, $search_args, $prefetch, $attrs);
-
-    $self->{stats}{queries}++;
-    $self->_record_metric('inc', 'db_async_queries_total');
-
-    my $start_time = time;
-
-    return $self->_call_worker(
-        'search_with_prefetch',
-        $resultset,
-        $search_args,
-        $prefetch,
-        $attrs
-    )->then(sub {
-        my ($result) = @_;
-        my $duration = time - $start_time;
-        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
-        return Future->done($result);
-    });
-}
-
-sub _generate_cache_key {
-    my ($operation, @args) = @_;
-
-    my @clean_args = map {
-        if (!defined $_) {
-            'UNDEF';
-        } elsif (ref $_ eq 'HASH') {
-            my $hashref = $_;
-            join(',', sort map { "$_=>$hashref->{$_}" } keys %$hashref);
-        } elsif (ref $_ eq 'ARRAY') {
-            join(',', @$_);
-        } else {
-            $_;
-        }
-    } @args;
-
-    return join(':', $operation, md5_hex(join('|', @clean_args)));
 }
 
 =head2 find
@@ -973,20 +892,6 @@ sub health_check {
     });
 }
 
-sub _record_metric {
-    my ($self, $type, $name, @args) = @_;
-
-    return unless $self->{enable_metrics} && defined $METRICS;
-
-    if ($type eq 'inc') {
-        $METRICS->inc($name, @args);
-    } elsif ($type eq 'observe') {
-        $METRICS->observe($name, @args);
-    } elsif ($type eq 'set') {
-        $METRICS->set($name, @args);
-    }
-}
-
 =head2 stats
 
 Returns statistics about database operations.
@@ -1067,6 +972,39 @@ sub schema_class {
 #
 # INTERNAL METHODS
 
+sub _record_metric {
+    my ($self, $type, $name, @args) = @_;
+
+    return unless $self->{enable_metrics} && defined $METRICS;
+
+    if ($type eq 'inc') {
+        $METRICS->inc($name, @args);
+    } elsif ($type eq 'observe') {
+        $METRICS->observe($name, @args);
+    } elsif ($type eq 'set') {
+        $METRICS->set($name, @args);
+    }
+}
+
+sub _generate_cache_key {
+    my ($operation, @args) = @_;
+
+    my @clean_args = map {
+        if (!defined $_) {
+            'UNDEF';
+        } elsif (ref $_ eq 'HASH') {
+            my $hashref = $_;
+            join(',', sort map { "$_=>$hashref->{$_}" } keys %$hashref);
+        } elsif (ref $_ eq 'ARRAY') {
+            join(',', @$_);
+        } else {
+            $_;
+        }
+    } @args;
+
+    return join(':', $operation, md5_hex(join('|', @clean_args)));
+}
+
 sub _build_default_cache {
     my ($ttl) = @_;
 
@@ -1089,7 +1027,7 @@ sub _init_metrics {
         require Metrics::Any;
         Metrics::Any->import('$METRICS');
 
-        # Initialize metrics
+        # Initialise metrics
         $METRICS->make_counter('db_async_queries_total');
         $METRICS->make_counter('db_async_cache_hits_total');
         $METRICS->make_counter('db_async_cache_misses_total');
@@ -1235,6 +1173,51 @@ sub _start_health_checks {
     }
 }
 
+sub _serialise_row_with_prefetch {
+    my ($row, $prefetch) = @_;
+    return unless $row;
+
+    # 1. Get the base columns
+    my %data = $row->get_columns;
+
+    # 2. Process Prefetches
+    if ($prefetch) {
+        # Normalise prefetch into a hash for easier recursion
+        # (Handles strings, arrays, and nested hashes like { comments => 'user' })
+        my $spec = _normalise_prefetch($prefetch);
+
+        foreach my $rel (keys %$spec) {
+            # Check if DBIC actually prefetched this relationship
+            # we check if the object has the related object already 'inflated'
+            if ($row->has_column_loaded($rel) || $row->can($rel)) {
+                my $related = eval { $row->$rel };
+                next if $@ || !defined $related;
+
+                if (ref($related) eq 'DBIx::Class::ResultSet' || $related->isa('DBIx::Class::ResultSet')) {
+                    # has_many relationship
+                    $data{$rel} = [
+                        map { _serialise_row_with_prefetch($_, $spec->{$rel}) } $related->all
+                    ];
+                } else {
+                    # belongs_to / might_have relationship
+                    $data{$rel} = _serialise_row_with_prefetch($related, $spec->{$rel});
+                }
+            }
+        }
+    }
+
+    return \%data;
+}
+
+sub _normalise_prefetch {
+    my $p = shift;
+    return {} unless $p;
+    return { $p => undef } if !ref $p;
+    return { map { $_ => undef } @$p } if ref $p eq 'ARRAY';
+    return $p if ref $p eq 'HASH';
+    return {};
+}
+
 sub _execute_operation {
     my ($schema, $operation, @args) = @_;
 
@@ -1242,10 +1225,15 @@ sub _execute_operation {
         my ($resultset, $search_args, $attrs) = @args;
 
         my $results = eval {
-            my $rs      = $schema->resultset($resultset);
-            $rs         = $rs->search($search_args || {}, $attrs || {});
-            my @rows    = $rs->all;
-            my @results = map { {$_->get_columns} } @rows;
+            my $rs = $schema->resultset($resultset);
+            $rs = $rs->search($search_args || {}, $attrs || {});
+            my @rows = $rs->all;
+
+            # Map rows to deep hashes if prefetch is active
+            my @results = map {
+                _serialise_row_with_prefetch($_, $attrs->{prefetch})
+            } @rows;
+
             \@results;
         };
 
@@ -1253,12 +1241,18 @@ sub _execute_operation {
             die "Search operation failed: $@";
         }
 
-        return $results;  # Return the captured value
+        return $results;
     }
     elsif ($operation eq 'find') {
-        my ($resultset, $id) = @args;
-        my $row = $schema->resultset($resultset)->find($id);
-        return $row ? {$row->get_inflated_columns} : undef;
+        my ($source_name, $id, $attrs) = @args;
+
+        my $row = eval {
+            $schema->resultset($source_name)->find($id, $attrs || {})
+        };
+
+        if ($@) { die "Find operation failed on $source_name: $@"; }
+
+        return $row ? _serialise_row_with_prefetch($row, $attrs->{prefetch}) : undef;
     }
     elsif ($operation eq 'create') {
         my ($source_name, $data) = @args;
@@ -1272,37 +1266,83 @@ sub _execute_operation {
         }
     }
     elsif ($operation eq 'update') {
-        my ($resultset, $id, $data) = @args;
-        my $row = $schema->resultset($resultset)->find($id);
-        return undef unless $row;
-        $row->update($data);
-        return {$row->get_inflated_columns};
+        # @args contains (source_name, id, data_to_update, attrs)
+        my ($source_name, $id, $data, $attrs) = @args;
+
+        my $results = eval {
+            my $rs  = $schema->resultset($source_name);
+            my $row = $rs->find($id);
+
+            return undef unless $row;
+
+            $row->update($data);
+
+            return _serialise_row_with_prefetch($row, $attrs->{prefetch});
+        };
+
+        if ($@) { die "Update operation failed on $source_name: $@"; }
+        return $results;
     }
     elsif ($operation eq 'update_bulk') {
         my ($source_name, $condition, $data) = @args;
 
-        try {
-            my $resultset = $schema->resultset($source_name);
-            $resultset = $resultset->search($condition)
-                if $condition && %$condition;
-            my $count = $resultset->update($data);
+        # Use eval or your try/catch, but ensure the error propagates
+        my $count = eval {
+            my $rs = $schema->resultset($source_name);
+            $rs = $rs->search($condition) if $condition && %$condition;
 
-            return $count;
+            # This executes a single UPDATE statement in the DB
+            $rs->update($data);
+        };
+
+        if ($@) {
+            # Log the error or re-throw so the Future in the main process fails
+            die "Bulk update failed on $source_name: $@";
         }
-        catch {
-            return 0;
-        }
+
+        return $count; # Returns number of rows updated
     }
     elsif ($operation eq 'delete') {
-        my ($resultset, $id) = @args;
-        my $row = $schema->resultset($resultset)->find($id);
-        return 0 unless $row;
-        $row->delete;
-        return 1;
+        # @args: (source_name, id, attrs)
+        my ($source_name, $id, $attrs) = @args;
+
+        my $result = eval {
+            my $rs = $schema->resultset($source_name);
+            my $row = $rs->find($id);
+
+            unless ($row) {
+                return 0;
+            }
+
+            $row->delete;
+            return 1;
+        };
+
+        # CRITICAL: Only die if there is an actual exception in $@
+        if ($@) {
+            my $err = $@ || 'No error message captured';
+            # Check if the error is a reference (like a DBIC error object)
+            $err = $err->{msg} if ref $err eq 'HASH' && $err->{msg};
+            die "Delete operation failed on $source_name for ID $id: $err";
+        };
+
+        return $result;
     }
     elsif ($operation eq 'count') {
-        my ($resultset, $search_args) = @args;
-        return $schema->resultset($resultset)->search($search_args || {})->count;
+        my ($source_name, $search_args, $attrs) = @args;
+
+        my $count = eval {
+            my $rs = $schema->resultset($source_name);
+            # Ensure we have hashes to avoid "Not a HASH reference" errors in DBIC
+            $rs->search($search_args || {}, $attrs || {})->count;
+        };
+
+        if ($@) {
+            my $err = $@ || 'Unknown DBIC count error';
+            die "Count operation failed on $source_name: $err";
+        }
+
+        return $count;
     }
     elsif ($operation eq 'raw_query') {
         my ($query, $bind_values) = @args;
@@ -1594,63 +1634,6 @@ Transactions execute on a single worker only.
 All rows are loaded into memory. Use pagination for large datasets.
 
 =back
-
-=head1 KNOWN ISSUES
-
-=head2 search_with_prefetch is Broken
-
-The C<search_with_prefetch> method B<does not work> with any database backend
-(SQLite, MySQL, or PostgreSQL). Worker processes consistently crash with
-"closed" errors when attempting to perform eager loading of relationships.
-
-B<Root Cause>: The issue appears to be in how the worker process handles
-complex queries with joins/prefetch, not database-specific concurrency problems.
-
-B<Workaround - Use Separate Queries>:
-
-Instead of attempting to prefetch relationships, fetch them separately:
-
-    # Broken - do not use
-    my $users = await $db->search_with_prefetch('User', {}, 'posts', {});
-
-    # Working solution - separate queries
-    my $users = await $db->search('User', {}, {});
-
-    foreach my $user (@$users) {
-        my $posts = await $db->search(
-            'Post',
-            { user_id => $user->{id} },
-            {}
-        );
-        $user->{posts} = $posts;  # Manually attach
-    }
-
-B<Performance Optimisation>:
-
-For better performance when fetching related data for multiple records, use
-parallel queries with controlled concurrency:
-
-    use Future::Utils qw(fmap_concat);
-
-    my $users = await $db->search('User', {}, { rows => 100 });
-
-    # Fetch posts for all users with max 5 concurrent queries
-    my @enriched = await fmap_concat {
-        my ($user) = @_;
-
-        $db->search('Post', { user_id => $user->{id} }, {})
-        ->then(sub {
-            my ($posts) = @_;
-            return Future->done({ %$user, posts => $posts });
-        });
-    } foreach => $users, concurrent => 5;
-
-This approach provides similar benefits to prefetch (reduced round trips through
-batching) while avoiding the broken C<search_with_prefetch> implementation.
-
-B<Status>: This is a fundamental issue with the current DBIx::Class::Async
-implementation. Users should avoid C<search_with_prefetch> entirely until this
-is resolved in a future release.
 
 =head1 AUTHOR
 

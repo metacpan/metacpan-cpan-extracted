@@ -1,11 +1,10 @@
-package UV::TCP;
+package UV::TCP 2.001;
 
-our $VERSION = '2.000';
-
-use strict;
+use v5.14;
 use warnings;
-use Carp ();
 use parent 'UV::Stream';
+
+use Carp ();
 
 sub open
 {
@@ -35,8 +34,10 @@ UV::TCP - TCP socket handles in libuv
 
 =head1 SYNOPSIS
 
+=for highlighter language=perl
+
   #!/usr/bin/env perl
-  use strict;
+  use v5.14;
   use warnings;
 
   use Socket;

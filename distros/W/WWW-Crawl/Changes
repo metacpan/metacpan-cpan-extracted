@@ -3,3 +3,11 @@ Revision history for WWW-Crawl
 0.1     26th September 2023
         First version, released on an unsuspecting world.
 
+0.2     6th January 2026
+        Added WWW::Crawl::Chromium
+        An alternative Crawl module using the Chromium browser to retrieve dynamic webpages.
+
+        We now support Perl v5.16 to v5.42 and later.
+
+
+

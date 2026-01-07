@@ -157,41 +157,43 @@ class TestCase::Online {
     $RESULT = IntList->new;
     
     Go->go(method : void () {
-      my $url = "http://google.com";
+      Go->go(method : void () {
+        my $url = "http://google.com";
+        
+        my $ua = Mojo::UserAgent->new;
+        
+        my $res = $ua->get($url)->result;
+        
+        my $body = $res->body;
+        
+        $RESULT->push(Fn->contains($body, "www.google.com"));
+      });
       
-      my $ua = Mojo::UserAgent->new;
+      Go->go(method : void () {
+        my $url = "http://google.com";
+        
+        my $ua = Mojo::UserAgent->new;
+        
+        my $res = $ua->get($url)->result;
+        
+        my $body = $res->body;
+        
+        $RESULT->push(Fn->contains($body, "www.google.com"));
+      });
       
-      my $res = $ua->get($url)->result;
-      
-      my $body = $res->body;
-      
-      $RESULT->push(Fn->contains($body, "www.google.com"));
-    });
-    
-    Go->go(method : void () {
-      my $url = "http://google.com";
-      
-      my $ua = Mojo::UserAgent->new;
-      
-      my $res = $ua->get($url)->result;
-      
-      my $body = $res->body;
-      
-      $RESULT->push(Fn->contains($body, "www.google.com"));
-    });
-    
-    Go->go(method : void () {
-      my $url = "https://google.com";
-      
-      my $ua = Mojo::UserAgent->new;
-      
-      $ua->set_max_redirects(20);
-      
-      my $res = $ua->get($url)->result;
-      
-      my $body = $res->body;
-      
-      $RESULT->push(Fn->contains($body, "</html>"));
+      Go->go(method : void () {
+        my $url = "https://google.com";
+        
+        my $ua = Mojo::UserAgent->new;
+        
+        $ua->set_max_redirects(20);
+        
+        my $res = $ua->get($url)->result;
+        
+        my $body = $res->body;
+        
+        $RESULT->push(Fn->contains($body, "</html>"));
+      });
     });
     
     Go->gosched;

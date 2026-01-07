@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
 
       #!/usr/bin/env perl
-      use strict;
+      use v5.14;
       use warnings;
     
       use UV;
@@ -199,7 +199,7 @@ EXCEPTIONS
     string describing the failure.
 
         try { ... }
-        catch my $e {
+        catch ($e) {
             if(blessed $e and $e->isa("UV::Exception")) {
                 print "The failure was ", $e->message, " of code ", $e->code;
             }
@@ -214,7 +214,7 @@ EXCEPTIONS
     types.
 
         try { ... }
-        catch my $e {
+        catch ($e) {
             if(blessed $e and $e->isa("UV::Exception::ECANCELED") {
                 # ignore
             }

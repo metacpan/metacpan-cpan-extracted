@@ -1,6 +1,6 @@
 #! /bin/false
 
-# Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2021-2026 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software. It comes without any warranty, to
@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Macro;
-$Chess::Plisco::Macro::VERSION = 'v1.0.1';
+$Chess::Plisco::Macro::VERSION = 'v1.0.2';
 use strict;
 
 use Filter::Util::Call;
@@ -81,9 +81,9 @@ sub cp_pos_material {}
 # - moving piece (3 bits)
 # - captured piece (3 bits)
 # - promotion (3 bits)
-# - colour (1 bit)
 # - from (6 bits)
 # - to (6 bits)
+# - colour (1 bit)
 # - en passant flag (1 bit)
 #
 # When ordering moves we often want to use the combination of attacker, victim,
@@ -143,6 +143,12 @@ sub cp_move_significant {}
 _define cp_move_equivalent => '$m1', '$m2',
 		'(cp_move_significant($m1) == cp_move_significant($m2))';
 sub cp_move_equivalent {}
+
+_define cp_move_compress => '$m', '((($m) & 0x1fffc0) >> 6)';
+sub cp_move_compress {}
+
+_define cp_move_uncompress => '$m', '(($m) << 6)';
+sub cp_move_compress {}
 
 # Bitboard macros.
 _define cp_bitboard_popcount => '$b', '$c',
@@ -209,6 +215,12 @@ _define cp_clamp => '$v', '$lo', '$hi', '($v) < ($lo) ? ($lo) : ($v) > ($hi) ? (
 
 # Zobrist keys.
 _define _cp_zk_lookup => '$p', '$c', '$s', '$zk_pieces[((($p) << 7) | (($c) << 6) | ($s)) - 128]';
+
+## TT probes and stores.
+_define_from_file _cp_value_from_tt => '$v', '$p', '$r50c', 'valueFromTT.pm';
+sub _cp_value_from_tt {}
+_define_from_file _cp_value_to_tt => '$v', '$p', 'valueToTT.pm';
+sub _cp_value_to_tt {}
 
 sub import {
 	my ($type) = @_;

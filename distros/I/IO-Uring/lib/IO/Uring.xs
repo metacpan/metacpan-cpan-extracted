@@ -9,7 +9,6 @@
 
 typedef struct ring {
 	struct io_uring uring;
-	unsigned cqe_count;
 } *IO__Uring;
 
 int uring_destroy(pTHX_ SV* sv, MAGIC* magic) {
@@ -27,8 +26,6 @@ static struct io_uring_sqe* S_get_sqe(pTHX_ struct ring* ring) {
 	struct io_uring_sqe* sqe = io_uring_get_sqe(&ring->uring);
 
 	if (!sqe) {
-		io_uring_cq_advance(&ring->uring, ring->cqe_count);
-		ring->cqe_count = 0;
 		io_uring_submit(&ring->uring);
 		sqe = io_uring_get_sqe(&ring->uring);
 		if (!sqe)
@@ -136,6 +133,8 @@ void* S_set_callback(pTHX_ struct io_uring_sqe* sqe, SV* callback) {
 #define URING_CONSTANT(cons) CONSTANT(IORING_##cons)
 #define SQE_CONSTANT(cons) CONSTANT(IOSQE_##cons)
 
+#define undef &PL_sv_undef
+
 MODULE = IO::Uring				PACKAGE = IO::Uring
 
 PROTOTYPES: DISABLE
@@ -197,6 +196,10 @@ BOOT:
 	CONSTANT(AT_SYMLINK_FOLLOW);
 	CONSTANT(AT_REMOVEDIR);
 
+	URING_CONSTANT(POLL_UPDATE_EVENTS);
+	URING_CONSTANT(POLL_UPDATE_USER_DATA);
+	URING_CONSTANT(POLL_ADD_MULTI);
+
 	CONSTANT(P_PID);
 	CONSTANT(P_PGID);
 	CONSTANT(P_PIDFD);
@@ -209,43 +212,36 @@ BOOT:
 IO::Uring new(class, UV entries)
 CODE:
 	RETVAL = safecalloc(1, sizeof(struct ring));
-	RETVAL->cqe_count = 0;
 	struct io_uring_params params = {};
-	params.flags = IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_DEFER_TASKRUN;
+	params.flags = IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_DEFER_TASKRUN | IORING_SETUP_SUBMIT_ALL;
 	io_uring_queue_init_params(entries, &RETVAL->uring, &params);
 OUTPUT:
 	RETVAL
 
 
-void run_once(IO::Uring self, unsigned min_events = 1)
-	PPCODE:
-	int result = io_uring_submit_and_wait(&self->uring, min_events);
+void run_once(IO::Uring self, unsigned min_events = 1, Time::Spec timeout = NULL)
+PPCODE:
+	struct io_uring_cqe *cqe;
+	int result = io_uring_submit_and_wait_timeout(&self->uring, &cqe, min_events, timeout, NULL);
 
 	if (result == -1 && errno == EINTR)
 		PERL_ASYNC_CHECK();
 
-	struct io_uring_cqe *cqe;
 	unsigned head;
 
 	EXTEND(SP, 2);
 	io_uring_for_each_cqe(&self->uring, head, cqe) {
-		++self->cqe_count;
 		struct callback* callback_data = (struct callback*)io_uring_cqe_get_data(cqe);
+		io_uring_cqe_seen(&self->uring, cqe);
 		if (callback_data->callback) {
 			PUSHMARK(SP);
 			mPUSHi(cqe->res);
 			mPUSHu(cqe->flags);
 			PUTBACK;
-			call_sv(callback_data->callback,  G_VOID | G_DISCARD | G_EVAL);
+			call_sv(callback_data->callback,  G_VOID | G_DISCARD);
 			if (!(cqe->flags & IORING_CQE_F_MORE)) {
 				SvREFCNT_dec(callback_data->callback);
 				Safefree(callback_data);
-			}
-
-			if (SvTRUE(ERRSV)) {
-				io_uring_cq_advance(&self->uring, self->cqe_count);
-				self->cqe_count = 0;
-				Perl_croak(aTHX_ NULL);
 			}
 
 			SPAGAIN;
@@ -253,9 +249,6 @@ void run_once(IO::Uring self, unsigned min_events = 1)
 		else if (!(cqe->flags & IORING_CQE_F_MORE))
 			Safefree(callback_data);
 	}
-
-	io_uring_cq_advance(&self->uring, self->cqe_count);
-	self->cqe_count = 0;
 
 
 SV* probe(IO::Uring self)
@@ -294,7 +287,7 @@ OUTPUT:
 	RETVAL
 
 
-UV cancel(IO::Uring self, UV user_data, UV flags, UV iflags, SV* callback = &PL_sv_undef)
+UV cancel(IO::Uring self, UV user_data, UV flags, UV iflags, SV* callback = undef)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_cancel(sqe, NUM2PTR(void*, user_data), flags);
@@ -375,7 +368,7 @@ OUTPUT:
 	RETVAL
 
 
-UV link_timeout(IO::Uring self, Time::Spec ts, UV flags, UV iflags, SV* callback = &PL_sv_undef)
+UV link_timeout(IO::Uring self, Time::Spec ts, UV flags, UV iflags, SV* callback = undef)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_link_timeout(sqe, ts, flags);
@@ -416,12 +409,13 @@ OUTPUT:
 	RETVAL
 
 
-UV nop(IO::Uring self, UV iflags, SV* callback)
+UV nop(IO::Uring self, UV iflags, SV* callback = undef)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_nop(sqe);
 	io_uring_sqe_set_flags(sqe, iflags);
-	RETVAL = PTR2UV(set_callback(sqe, callback));
+	void* cancel_data = set_callback(sqe, SvOK(callback) ? callback : NULL);
+	RETVAL = PTR2UV(cancel_data);
 OUTPUT:
 	RETVAL
 
@@ -462,6 +456,28 @@ CODE:
 	io_uring_prep_poll_multishot(sqe, fd, poll_mask);
 	io_uring_sqe_set_flags(sqe, iflags);
 	RETVAL = PTR2UV(set_callback(sqe, callback));
+OUTPUT:
+	RETVAL
+
+
+UV poll_update(IO::Uring self, UV old_userdata, SV* new_userdata, UV poll_mask, UV flags, UV iflags, SV* callback = undef)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_poll_update(sqe, old_userdata, 0, poll_mask, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	void* cancel_data = set_callback(sqe, SvOK(callback) ? callback : NULL);
+	RETVAL = PTR2UV(cancel_data);
+OUTPUT:
+	RETVAL
+
+
+UV poll_remove(IO::Uring self, UV old_userdata, UV iflags, SV* callback = undef)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_poll_remove(sqe, old_userdata);
+	io_uring_sqe_set_flags(sqe, iflags);
+	void* cancel_data = set_callback(sqe, SvOK(callback) ? callback : NULL);
+	RETVAL = PTR2UV(cancel_data);
 OUTPUT:
 	RETVAL
 
@@ -589,7 +605,7 @@ OUTPUT:
 	RETVAL
 
 
-UV timeout_remove(IO::Uring self, UV user_data, UV flags, UV iflags, SV* callback = &PL_sv_undef)
+UV timeout_remove(IO::Uring self, UV user_data, UV flags, UV iflags, SV* callback = undef)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_timeout_remove(sqe, user_data, flags);

@@ -357,6 +357,18 @@ Same as L<Chess::Plisco/moveEquivalent>.
 
 Same as L<Chess::Plisco/moveSignificant>.
 
+=item B<cp_move_compress(MOVE)>
+
+Same as L<Chess::Plisco/moveCompress>.
+
+This macro has been added in version 1.0.2.
+
+=item B<cp_move_uncompress(MOVE)>
+
+Same as L<Chess::Plisco/moveUncompress>.
+
+This macro has been added in version 1.0.2.
+
 =item B<cp_move_coordinate_notation(MOVE)>
 
 Same as L<Chess::Plisco/moveCoordinateNotation>.
@@ -489,7 +501,7 @@ the nearest boundary.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>.
+Copyright (C) 2021-2026 Guido Flohr <guido.flohr@cantanea.com>.
 
 =head1 SEE ALSO
 

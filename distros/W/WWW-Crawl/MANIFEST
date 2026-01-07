@@ -1,5 +1,6 @@
 Changes
 lib/WWW/Crawl.pm
+lib/WWW/Crawl/Chromium.pm
 Makefile.PL
 MANIFEST			This list of files
 README

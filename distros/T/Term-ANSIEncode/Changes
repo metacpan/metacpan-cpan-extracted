@@ -270,3 +270,9 @@
 1.62    Jan 03, 2026
 
         DEFAULT color description for foreground/background corrected.
+
+1.63    Jan 06, 2025
+
+        Added "WRAP text ENDWRAP" and "JUSTIFIED text ENDJUSTIFIED" tokens.
+		Added a baud rate feature for showing animated ANSI screens at the
+		correct speed.

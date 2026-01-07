@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker::CPANfile;
 use ExtUtils::Manifest;
 
-my $VERSION = '1.0.0';
+my $VERSION = '1.0.1';
 
 WriteMakefile(
     ABSTRACT          => 'Parse XDR (eXternal Data Representation) definitions into an AST (Abstract Syntax Tree)',

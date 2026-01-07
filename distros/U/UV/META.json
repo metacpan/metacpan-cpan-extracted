@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -43,74 +43,74 @@
    "provides" : {
       "UV" : {
          "file" : "lib/UV.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::Async" : {
          "file" : "lib/UV/Async.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::Check" : {
          "file" : "lib/UV/Check.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::Exception" : {
          "file" : "lib/UV.pm"
       },
       "UV::Handle" : {
          "file" : "lib/UV/Handle.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::Idle" : {
          "file" : "lib/UV/Idle.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::Loop" : {
          "file" : "lib/UV/Loop.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::Pipe" : {
          "file" : "lib/UV/Pipe.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::Poll" : {
          "file" : "lib/UV/Poll.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::Prepare" : {
          "file" : "lib/UV/Prepare.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::Process" : {
          "file" : "lib/UV/Process.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::Req" : {
          "file" : "lib/UV/Req.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::Signal" : {
          "file" : "lib/UV/Signal.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::Stream" : {
          "file" : "lib/UV/Stream.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::TCP" : {
          "file" : "lib/UV/TCP.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::TTY" : {
          "file" : "lib/UV/TTY.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::Timer" : {
          "file" : "lib/UV/Timer.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       },
       "UV::UDP" : {
          "file" : "lib/UV/UDP.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       }
    },
    "release_status" : "stable",
@@ -127,6 +127,6 @@
          "web" : "https://github.com/p5-UV/p5-UV"
       }
    },
-   "version" : "2.000",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "2.001",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

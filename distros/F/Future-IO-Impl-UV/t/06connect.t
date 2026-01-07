@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Future::IO::Impl;
 
 use Future::IO;

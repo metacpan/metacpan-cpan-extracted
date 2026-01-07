@@ -1,6 +1,15 @@
 Revision history for Perl extension MooX-Role-CloneSet
 
-v0.1.1 2023-07-25T05:49:32Z
+v0.1.2 2026-01-06T16:18:44Z
+
+    - Reformat the source code using `perltidy`.
+    - Fix many minor nits suggested by `perlcritic`.
+    - Add some `execline` tools to run `perltidy` and `perlcritic` via `tidyall`.
+    - Relicense under version 2 of the Artistic license.
+    - Switch to yearless copyright notices.
+    - Switch to SPDX copyright and license tags.
+
+v0.1.1 2023-07-25T05:49:51Z
 
     - Add Perl 5.22, 5.24, and 5.26 to the Travis CI testing.
     - Fix a test module's package/Exporter structure bug exposed by

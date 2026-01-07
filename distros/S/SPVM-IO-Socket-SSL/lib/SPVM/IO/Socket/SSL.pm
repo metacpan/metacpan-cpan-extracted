@@ -1,6 +1,6 @@
 package SPVM::IO::Socket::SSL;
 
-our $VERSION = "0.014";
+our $VERSION = "0.015";
 
 1;
 

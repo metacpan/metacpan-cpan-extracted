@@ -101,8 +101,6 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
     my $code = (my $_ = $self->{close_code}) > 0 ? $_ : 1006;
     
     my $reason = $self->{close_reason};
-    
-    $self->emit(finish => $code, $reason);
   }
   
   method connection : Mojo::Connection () { return $self->handshake->connection; }
@@ -162,10 +160,6 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
   
   method send : void ($msg : string|object[]|Mojo::WebSocket::Frame, $cb : Mojo::Callback = undef) {
     
-    if ($cb) {
-      $self->once(drain => $cb);
-    }
-    
     my $frame = (Mojo::WebSocket::Frame)undef;
     if ($msg isa string || $msg isa object[]) {
       $frame = $self->build_message($msg);
@@ -187,10 +181,6 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
   method server_write : string () {
     
     $self->{write} //= "";
-    
-    unless (length $self->{write}) {
-      $self->emit("drain") ;
-    }
     
     if (!length $self->{write} && $self->{closing}) {
       $self->completed;

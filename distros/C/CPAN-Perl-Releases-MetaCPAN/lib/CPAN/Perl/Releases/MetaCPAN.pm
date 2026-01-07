@@ -2,7 +2,7 @@ package CPAN::Perl::Releases::MetaCPAN;
 use strict;
 use warnings;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 use JSON::PP ();
 use HTTP::Tinyish;
 
@@ -55,7 +55,7 @@ sub get {
             die "$res->{status} $res->{reason}, $uri$message\n";
         }
         my $hash = $self->{json}->decode($res->{content});
-        $total = $hash->{hits}{total} unless defined $total;
+        $total = ref $hash->{hits}{total} ? $hash->{hits}{total}{value} : $hash->{hits}{total} unless defined $total;
         push @release, map { $_->{fields} } @{$hash->{hits}{hits}};
         last if $total <= @release;
         $from = @release;

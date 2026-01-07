@@ -16,6 +16,7 @@ use Test::Memory::Cycle;
 use lib 't/lib';
 use Helper;
 use JSON::Schema::Modern::Utilities 'jsonp';
+use Test::Needs;
 
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
@@ -1066,6 +1067,65 @@ YAML
   cmp_result([$doc->operations_with_tag('yup')], [], 'operations_with_tag("yup")');
 };
 
+subtest 'bad references' => sub {
+  test_needs({ 'JSON::Schema::Modern', '0.632'});
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'foo/api.json',
+    evaluator => my $js = JSON::Schema::Modern->new(strict => 1),
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  schemas:
+    schema0:
+      type: string
+    schema1:
+      $ref: '#/components/schemas/does_not_exist'     # does not exist
+    schema2:
+      $ref: '#/paths/~1foo~1%7Bfoo_id%7D~1bar!bloop'  # exists, but wrong entity
+    schema3:
+      $ref: 'https://example.com/unknown-schema'      # target is not local
+  responses:
+    response0:
+      $ref: '#/components/responses/does_not_exist'   # does not exist
+    response1:
+      $ref: '#/components'                            # exists, but not a referencable entity
+paths:
+  /foo/{foo_id}/bar!bloop:
+    $ref: '#/components/pathItems/bloop'              # does not exist
+YAML
+
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        keywordLocation => '/components/responses/response0/$ref',
+        absoluteKeywordLocation => 'foo/api.json#/components/responses/response0/$ref',
+        error => '$ref target "foo/api.json#/components/responses/does_not_exist" is a non-existent location',
+      },
+      {
+        keywordLocation => '/components/responses/response1/$ref',
+        absoluteKeywordLocation => 'foo/api.json#/components/responses/response1/$ref',
+        error => '$ref target "foo/api.json#/components" is not a referenceable location',
+      },
+      {
+        keywordLocation => jsonp(qw(/paths /foo/{foo_id}/bar!bloop $ref)),
+        absoluteKeywordLocation => Mojo::URL->new('foo/api.json')->fragment(jsonp(qw(/paths /foo/{foo_id}/bar!bloop $ref)))->to_string,
+        error => '$ref target "foo/api.json#/components/pathItems/bloop" is a non-existent location'
+      },
+      {
+        keywordLocation => '/components/schemas/schema1/$ref',
+        absoluteKeywordLocation => 'foo/api.json#/components/schemas/schema1/$ref',
+        error => '$ref target "foo/api.json#/components/schemas/does_not_exist" is a non-existent location',
+      },
+      {
+        keywordLocation => '/components/schemas/schema2/$ref',
+        absoluteKeywordLocation => 'foo/api.json#/components/schemas/schema2/$ref',
+        error => '$ref target "'.Mojo::URL->new('foo/api.json')->fragment(jsonp(qw(/paths /foo/{foo_id}/bar!bloop)))->to_string.'" is the wrong object type (path-item, expecting schema)',
+      },
+    ],
+    'bad references to local destinations are identified',
+  );
+};
+
 subtest '3.0 document' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
@@ -1193,6 +1253,70 @@ YAML
     ),
     'errors in a subschema are found before evaluation',
   );
+
+
+  subtest 'bad references' => sub {
+  test_needs({ 'JSON::Schema::Modern', '0.632'});
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'foo/api.json',
+    evaluator => $js = JSON::Schema::Modern->new(strict => 1),
+    schema => $yamlpp->load_string(<<'YAML'));
+openapi: 3.0.4
+info:
+  title: Test API
+  version: 1.2.3
+components:
+  schemas:
+    schema0:
+      type: string
+    schema1:
+      $ref: '#/components/schemas/does_not_exist'     # does not exist
+    schema2:
+      $ref: '#/paths/~1foo~1{foo_id}~1bar!bloop'      # exists, but wrong entity
+    schema3:
+      $ref: 'https://example.com/unknown-schema'      # target is not local
+  responses:
+    response0:
+      $ref: '#/components/responses/does_not_exist'   # does not exist
+    response1:
+      $ref: '#/components'                            # exists, but not a referencable entity
+paths:
+  /foo/{foo_id}/bar!bloop:
+    $ref: '#/components/pathItems/bloop'              # does not exist
+YAML
+
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        keywordLocation => '/components/responses/response0/$ref',
+        absoluteKeywordLocation => 'foo/api.json#/components/responses/response0/$ref',
+        error => '$ref target "foo/api.json#/components/responses/does_not_exist" is a non-existent location',
+      },
+      {
+        keywordLocation => '/components/responses/response1/$ref',
+        absoluteKeywordLocation => 'foo/api.json#/components/responses/response1/$ref',
+        error => '$ref target "foo/api.json#/components" is not a referenceable location',
+      },
+      {
+        keywordLocation => '/components/schemas/schema1/$ref',
+        absoluteKeywordLocation => 'foo/api.json#/components/schemas/schema1/$ref',
+        error => '$ref target "foo/api.json#/components/schemas/does_not_exist" is a non-existent location',
+      },
+      {
+        keywordLocation => '/components/schemas/schema2/$ref',
+        absoluteKeywordLocation => 'foo/api.json#/components/schemas/schema2/$ref',
+        error => '$ref target "'.Mojo::URL->new('foo/api.json')->fragment(jsonp(qw(/paths /foo/{foo_id}/bar!bloop)))->to_string.'" is the wrong object type (path-item, expecting schema)',
+      },
+      {
+        keywordLocation => '/paths/~1foo~1{foo_id}~1bar!bloop/$ref',
+        absoluteKeywordLocation => 'foo/api.json#/paths/~1foo~1%7Bfoo_id%7D~1bar!bloop/$ref',
+        error => '$ref target "foo/api.json#/components/pathItems/bloop" is a non-existent location'
+      },
+    ],
+    'bad $refs to local destinations are identified',
+  );
+  }; # end test_needs
 
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(

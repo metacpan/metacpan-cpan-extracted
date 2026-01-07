@@ -393,7 +393,7 @@ paths:
   /foo:
     post:
       parameters:
-      - $ref: '#/i_do_not_exist'
+      - $ref: 'http://example.com/otherapi#/i_do_not_exist'
 YAML
 
   cmp_result(
@@ -405,7 +405,7 @@ YAML
           instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo post parameters 0 $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 0 $ref)))->to_string,
-          error => 'EXCEPTION: unable to find resource "'.$doc_uri.'#/i_do_not_exist"',
+          error => 'EXCEPTION: unable to find resource "http://example.com/otherapi#/i_do_not_exist"',
         },
       ],
     },
@@ -419,7 +419,7 @@ YAML
 paths:
   /foo:
     parameters:
-    - $ref: '#/i_do_not_exist'
+    - $ref: 'http://example.com/otherapi#/i_do_not_exist'
     post: {}
 YAML
 
@@ -432,7 +432,7 @@ YAML
           instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo parameters 0 $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo parameters 0 $ref)))->to_string,
-          error => 'EXCEPTION: unable to find resource "'.$doc_uri.'#/i_do_not_exist"',
+          error => 'EXCEPTION: unable to find resource "http://example.com/otherapi#/i_do_not_exist"',
         },
       ],
     },
@@ -446,7 +446,7 @@ YAML
 components:
   parameters:
     foo:
-      $ref: '#/i_do_not_exist'
+      $ref: 'http://example.com/otherapi#/i_do_not_exist'
 paths:
   /foo:
     post:
@@ -463,7 +463,7 @@ YAML
           instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo post parameters 0 $ref $ref)),
           absoluteKeywordLocation => $doc_uri.'#/components/parameters/foo/$ref',
-          error => 'EXCEPTION: unable to find resource "'.$doc_uri.'#/i_do_not_exist"',
+          error => 'EXCEPTION: unable to find resource "http://example.com/otherapi#/i_do_not_exist"',
         },
       ],
     },
@@ -1167,7 +1167,7 @@ paths:
   /foo:
     get:
       requestBody:
-        $ref: '#/i_do_not_exist'
+        $ref: 'http://example.com/otherapi#/i_do_not_exist'
 YAML
 
   cmp_result(
@@ -1179,7 +1179,7 @@ YAML
           instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo get requestBody $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody $ref)))->to_string,
-          error => 'EXCEPTION: unable to find resource "'.$doc_uri.'#/i_do_not_exist"',
+          error => 'EXCEPTION: unable to find resource "http://example.com/otherapi#/i_do_not_exist"',
         },
       ],
     },
@@ -1224,8 +1224,8 @@ paths:
               not: true
 YAML
 
-  if ($::TYPE eq 'dancer2') {
-  todo 'Dancer2 parses chunked content at construction time' => sub {
+  {
+  my $todo = todo 'Dancer2 parses chunked content at construction time' if $::TYPE eq 'dancer2';
   $request = request('POST', 'http://example.com/foo',
     [ 'Content-Type' => 'text/plain', 'Content-Length' => 4, 'Transfer-Encoding' => 'chunked' ],
     "4\r\nabcd\r\n0\r\n\r\n");
@@ -1250,7 +1250,7 @@ YAML
     },
     'conflict between Content-Length + Transfer-Encoding headers (and body is still parseable)',
   );
-  }}
+  }
 
   # note: no content!
   $request = request('POST', 'http://example.com/foo');
@@ -1270,8 +1270,10 @@ YAML
     'request body is missing',
   );
 
-  if ($::TYPE eq 'lwp' or $::TYPE eq 'plack' or $::TYPE eq 'catalyst') {
-  todo 'mojo will strip the content body when parsing a stringified request that lacks Content-Length' => sub {
+  {
+    my $todo = todo 'mojo will strip the content body when parsing a stringified request that lacks Content-Length'
+      if $::TYPE eq 'lwp' or $::TYPE eq 'plack' or $::TYPE eq 'catalyst' or $::TYPE eq 'dancer2';
+
     # this works without a charset because all characters fit into a single byte, essentially
     # acting like latin1.
     $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], 'éclair');
@@ -1292,7 +1294,7 @@ YAML
       },
       'Content-Length is required in requests with a message body',
     );
-  }}
+  }
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/bloop' ], 'plain text');
   cmp_result(
@@ -2195,7 +2197,7 @@ paths:
       - name: ArrayWithBrokenRef
         in: header
         schema:
-          $ref: '#/components/schemas/i_do_not_exist'
+          $ref: 'http://example.com/otherapi#/components/schemas/i_do_not_exist'
 YAML
 
   my $request = request('GET', 'http://example.com/foo', [ SingleValue => '  mystring  ' ]);
@@ -2212,8 +2214,9 @@ YAML
     'multiple values in a single header are validated as a string, with only leading and trailing whitespace stripped',
   );
 
-  if ($::TYPE eq 'plack' or $::TYPE eq 'catalyst') {
-  todo 'HTTP::Message::to_psgi fetches all headers as a single concatenated string' => sub {
+  {
+  my $todo = todo 'HTTP::Message::to_psgi fetches all headers as a single concatenated string'
+    if $::TYPE eq 'plack' or $::TYPE eq 'catalyst' or $::TYPE eq 'dancer2';
   $request = request('GET', 'http://example.com/foo', [
       MultipleValuesAsString => '  one ',
       MultipleValuesAsString => ' two  ',
@@ -2224,7 +2227,7 @@ YAML
     { valid => true },
     'multiple headers on separate lines are validated as a string, with leading and trailing whitespace stripped',
   );
-  }}
+  }
 
   $request = request('GET', 'http://example.com/foo', [ MultipleValuesAsArray => '  one, two, three  ' ]);
   cmp_result(
@@ -2331,7 +2334,7 @@ YAML
           instanceLocation => '/request/header/ArrayWithBrokenRef',
           keywordLocation => jsonp(qw(/paths /foo get parameters 10 schema $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 10 schema $ref)))->to_string,
-          error => 'EXCEPTION: unable to find resource "'.$doc_uri.'#/components/schemas/i_do_not_exist"',
+          error => 'EXCEPTION: unable to find resource "http://example.com/otherapi#/components/schemas/i_do_not_exist"',
         },
       ],
     },

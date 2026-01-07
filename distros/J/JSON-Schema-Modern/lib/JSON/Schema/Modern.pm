@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.630-6-g27fd691c
+package JSON::Schema::Modern; # git description: v0.631-7-g486a9f1e
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.631';
+our $VERSION = '0.632';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -296,7 +296,7 @@ sub evaluate_json_string ($self, $json_data, $schema, $config_override = {}) {
 # Returns the internal $state object accumulated during the traversal.
 sub traverse ($self, $schema_reference, $config_override = {}) {
   my %overrides = %$config_override;
-  delete @overrides{qw(callbacks initial_schema_uri metaschema_uri traversed_keyword_path specification_version)};
+  delete @overrides{qw(callbacks initial_schema_uri metaschema_uri traversed_keyword_path specification_version skip_ref_checks)};
   croak join(', ', sort keys %overrides), ' not supported as a config override in traverse'
     if keys %overrides;
 
@@ -325,6 +325,7 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
     errors => [],
     identifiers => {},
     subschemas => [],
+    $config_override->{skip_ref_checks} ? () : (references => []),
     callbacks => $config_override->{callbacks} // {},
     evaluator => $self,
     traverse => 1,
@@ -372,7 +373,6 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
     }
   }
 
-  delete $state->{traverse};
   return $state;
 }
 
@@ -1304,7 +1304,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.631
+version 0.632
 
 =head1 SYNOPSIS
 
@@ -1664,6 +1664,10 @@ C<data_path>: adjusts the effective path of the data instance as of the start of
 
 C<traversed_keyword_path>: adjusts the accumulated path as of the start of evaluation (or last C<$id> or C<$ref>)
 
+=item *
+
+C<callbacks>: see below
+
 =back
 
 You can pass a series of callback subs to this method corresponding to keywords, which is useful for
@@ -1718,6 +1722,14 @@ C<initial_schema_uri>: adjusts the absolute keyword location as of the start of 
 =item *
 
 C<metaschema_uri>: use the indicated URI as the metaschema
+
+=item *
+
+C<callbacks>: see below
+
+=item *
+
+C<specification_version>: overrides the specification version to be used
 
 =back
 

@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "IO::Ppoll" );
+require IO::Poll;
 
+pass( 'Modules loaded' );
 done_testing;

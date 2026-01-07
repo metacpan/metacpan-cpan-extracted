@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Coercion::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Coercion::VERSION   = '2.010000';
+	$Type::Coercion::VERSION   = '2.010001';
 }
 
 $Type::Coercion::VERSION =~ tr/_//d;
@@ -400,7 +400,7 @@ sub inline_coercion {
 	
 	push @sub, "$varname";
 	
-	"@sub";
+	return join q[ ], @sub;
 } #/ sub inline_coercion
 
 sub _build_moose_coercion {

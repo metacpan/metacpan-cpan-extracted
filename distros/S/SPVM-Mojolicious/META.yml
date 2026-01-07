@@ -29,6 +29,7 @@ requires:
   SPVM::File::Temp: '0.026'
   SPVM::FindBin: '0.035'
   SPVM::Getopt::Long: '0.003'
+  SPVM::Go: '0.014'
   SPVM::IO: '0.243'
   SPVM::IO::Socket::SSL: '0.014'
   SPVM::JSON: '1.003'
@@ -36,11 +37,11 @@ requires:
   SPVM::Math: '1.006'
   SPVM::Mozilla::CA: '0.001'
   SPVM::Regex: '0.255'
-  SPVM::Sys: '0.552'
+  SPVM::Sys: '0.553'
   SPVM::Time::HiRes: '0.005'
   SPVM::Time::Local: '0.112'
   SPVM::Time::Piece: '0.003'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Mojolicious.git
-version: '0.039'
+version: '0.040'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

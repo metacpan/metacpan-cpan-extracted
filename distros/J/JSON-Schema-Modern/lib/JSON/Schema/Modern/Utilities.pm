@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.631';
+our $VERSION = '0.632';
 
 use 5.020;
 use strictures 2;
@@ -390,7 +390,11 @@ sub canonical_uri_type () {
       my $schema = $evaluator->_json_decoder->decode($file->slurp);
 
       # avoid calling add_schema, which checksums the file to look for duplicates
-      $document = JSON::Schema::Modern::Document->new(schema => $schema, evaluator => $evaluator);
+      $document = JSON::Schema::Modern::Document->new(
+        schema => $schema,
+        evaluator => $evaluator,
+        skip_ref_checks => 1,
+      );
 
       # avoid calling add_document, which checks for duplicate identifiers (and would result in an
       # infinite loop)
@@ -634,7 +638,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.631
+version 0.632
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,13 @@
 Revision history for Future-IO-Impl-UV
 
+0.04    2026-01-06
+        [CHANGES]
+         * Modernise to perl v5.20:
+            + Make use of the signatures and postfix deref features
+         * Swap unit tests from Test::More to Test2::V0
+         * Unit-test the new ->send ->recv and ->recvfrom methods of
+           Future::IO 0.17
+
 0.03    2022-01-07
         [CHANGES]
          * Unit-test the new ->connect and ->accept methods of Future::IO 0.11

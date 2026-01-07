@@ -1,3 +1,12 @@
+0.172		2026-01-06	T. R. Wyant
+    Repackage licenses so that GitHub can find them (maybe). Thanks to
+    Mikko Koivunalho (specifically his blog post
+    https://blogs.perl.org/users/mikko_koivunalho/2025/11/github-and-the-perl-license.html
+    for the how-to.
+
+    Deprecate mccants( 'quicksat' ) since he dropped the underlying file
+    about December 15 2025.
+
 0.171		2025-10-06	T. R. Wyant
     Deprecate mccants() arguments 'mcnames' and 'vsnames'. The
     underlying files have been removed from the web site. This is an

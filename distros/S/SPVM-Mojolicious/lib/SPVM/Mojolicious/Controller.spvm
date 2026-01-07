@@ -60,16 +60,15 @@ class Mojolicious::Controller {
   
   has session_h : virtual ro Hash
     get {
-      my $stash = $self->stash_h;
-      unless ($stash->{"mojo.active_session"}->(int)) {
+      unless ($self->mojo_active_session) {
         $self->app->sessions->load($self);
       }
       
-      unless ($self->stash_h->exists("mojo.session")) {
-        $self->stash_h->{"mojo.session"} = Hash->new;
+      unless (exists $self->{mojo_session}) {
+        $self->{mojo_session} = Hash->new;
       }
       
-      return $self->stash_h->{"mojo.session"}->(Hash);
+      return $self->{mojo_session};
     }
   ;
   
@@ -84,8 +83,35 @@ class Mojolicious::Controller {
     }
   ;
   
+  has exception_format : rw string
+    get {
+      
+      unless (exists $self->{exception_format}) {
+        $self->{exception_format} = $self->app->exception_format;
+      }
+      
+      return $self->{exception_format};
+    }
+    
+    set {
+      $self->{exception_format} = $_;
+    }
+  ;
+  
   # Internal fields
+  has mojo_captures : rw Hash;
+  
   has mojo_static : rw byte;
+  
+  has mojo_active_session : rw int;
+  
+  has mojo_session : rw Hash;
+  
+  # Finish header data building
+  has mojo_finished : rw byte;
+  
+  # Finish header and body data building
+  has mojo_respond : rw byte;
   
   # Class Methods
   static method new : Mojolicious::Controller () {
@@ -164,9 +190,9 @@ class Mojolicious::Controller {
   method every_param : string[] ($name : string) {
     
     # Captured unreserved values
-    $self->stash_h->{"mojo.captures"} //= Hash->new;
+    $self->set_mojo_captures($self->mojo_captures // Hash->new);
     
-    my $captures = $self->stash_h->{"mojo.captures"}->(Hash);
+    my $captures = $self->mojo_captures;
     
     if ($captures->exists($name) && !$self->app->routes->is_reserved($name)) {
       my $value = $captures->get("$name");
@@ -293,27 +319,6 @@ class Mojolicious::Controller {
     }
   }
   
-  method on : void ($name : string, $cb : Mojo::Callback) {
-  
-    my $tx = $self->tx;
-    unless ($tx) {
-      die "Transaction already destroyed.";
-    }
-    
-    if ($tx->is_websocket && !$tx->(Mojo::Transaction::WebSocket)->established) {
-      $self->rendered(101);
-    }
-    
-    my $cb_with_instance = (Mojo::Callback)undef;
-    if ($cb) {
-      $cb_with_instance = [$self : Mojolicious::Controller, $cb : Mojo::Callback] method : void ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
-        $cb->($self, $arg1, $arg2, $arg3);
-      };
-    }
-    
-    $tx->on($name => $cb_with_instance);
-  }
-
   method param : string ($name : string) {
     
     my $every_param = $self->every_param($name);
@@ -338,21 +343,24 @@ class Mojolicious::Controller {
       }
     }
     
-    $self->stash_h->{"mojo.captures"}->(Hash)->{$name} = $value_;
+    $self->mojo_captures->{$name} = $value_;
   }
   
   method render : Mojo::ByteStream ($template : string|Hash|object[] = undef, $options : Hash|object[] = undef) {
     
+    my $options_ = Hash->new;
     my $template_ = (string)undef;
     if ($template isa string) {
       $template_ = $template->(string);
     }
     else {
-      $options = $template;
+      $options_->merge(Fn->to_hash($template));
       $template = undef;
     }
     
-    my $options = Fn->to_hash($options);
+    $options_->merge(Fn->to_hash($options));
+    
+    my $options = $options_;
     
     if ($template_) {
       $options->{"template"} = $template_;
@@ -360,7 +368,7 @@ class Mojolicious::Controller {
     
     my $app = $self->app;
     my $plugins = $app->plugins;
-    my $render_to_string = $options->{"mojo.string"}->(int);
+    my $render_to_string = $options->delete("mojo.string")->(int);
     
     unless ($render_to_string) {
       $plugins->emit_hook(before_render => $self, $options);
@@ -385,11 +393,12 @@ class Mojolicious::Controller {
     $renderer->respond($self, $output, $format, $options->{"status"});
   }
   
-  method render_to_string : Mojo::ByteStream ($options : Hash|object[] = undef) {
+  method render_to_string : Mojo::ByteStream ($template : string|Hash|object[] = undef, $options : Hash|object[] = undef) {
     
     my $options = Fn->to_hash($options);
     $options->merge_options({"mojo.string" => 1});
-    my $string = $self->render($options);
+    
+    my $string = $self->render($template, $options);
     
     return $string;
   }
@@ -402,9 +411,8 @@ class Mojolicious::Controller {
     }
     
     # Finish transaction
-    my $stash = $self->stash_h;
-    if (!$stash->{"mojo.finished"}->(int)) {
-      $stash->{"mojo.finished"} = 1;
+    if (!$self->{mojo_finished}) {
+      $self->{mojo_finished} = 1;
       
       my $res = $self->res;
       if (!$status && !$res->code) {
@@ -436,7 +444,7 @@ class Mojolicious::Controller {
       };
     }
     
-    $tx->(Mojo::Transaction::WebSocket)->send($msg, $cb_with_instance);
+    $tx->(Mojo::Transaction::WebSocket)->send($msg);
     
     unless ($tx->(Mojo::Transaction::WebSocket)->established) {
       $self->rendered(101);
@@ -527,77 +535,40 @@ class Mojolicious::Controller {
     return $self->url_for($target);
   }
 
-  method write : void ($chunk : string, $cb : Mojo::Callback = undef) {
+  method write : void ($chunk : string) {
     
-    my $cb_with_instance = (Mojo::Callback)undef;
-    if ($cb) {
-      $cb_with_instance = [$self : Mojolicious::Controller, $cb : Mojo::Callback] method : void ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
-        $cb->($self, $arg1, $arg2, $arg3);
-      };
-    }
-    
-    $self->res->content->write($chunk, $cb_with_instance);
-    
-    $self->rendered;
-  }
-
-  method write_chunk : void ($chunk : string, $cb : Mojo::Callback = undef) {
-    
-    my $cb_with_instance = (Mojo::Callback)undef;
-    if ($cb) {
-      $cb_with_instance = [$self : Mojolicious::Controller, $cb : Mojo::Callback] method : void ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
-        $cb->($self, $arg1, $arg2, $arg3);
-      };
-    }
-    
-    $self->res->content->write_chunk($chunk, $cb_with_instance);
-    
-    $self->rendered;
+    $self->res->content->write($chunk);
   }
   
-  method write_sse : void ($event : Mojo::SSE::Event, $cb : Mojo::Callback = undef) {
+  method write_chunk : void ($chunk : string) {
     
-    my $cb_with_instance = (Mojo::Callback)undef;
-    if ($cb) {
-      $cb_with_instance = [$self : Mojolicious::Controller, $cb : Mojo::Callback] method : void ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
-        $cb->($self, $arg1, $arg2, $arg3);
-      };
-    }
+    $self->res->content->write_chunk($chunk);
+  }
+  
+  method write_sse : void ($event : Mojo::SSE::Event) {
     
-    $self->res->content->write_sse($event, $cb_with_instance);
-   
-   $self->rendered;
+    $self->res->content->write_sse($event);
   }
   
   method reply : Mojolicious::Helper::Reply () {
     
-    unless ($self->shared_stash_h->exists("reply")) {
-      my $reply = my $_ = Mojolicious::Helper::Reply->new;
-      $_->set_controller($self);
-      
-      $self->shared_stash_h->{"reply"} = $reply;
-    }
+    my $reply = my $_ = Mojolicious::Helper::Reply->new;
+    $_->set_controller($self);
     
-    
-    return $self->shared_stash_h->{"reply"}->(Mojolicious::Helper::Reply);
+    return $reply;
   }
   
   method timing : Mojolicious::Helper::Timing () {
     
-    unless ($self->shared_stash_h->exists("timing")) {
-      my $timing = my $_ = Mojolicious::Helper::Timing->new;
-      $_->set_controller($self);
-      
-      $self->shared_stash_h->{"timing"} = $timing;
-    }
+    my $timing = my $_ = Mojolicious::Helper::Timing->new;
+    $_->set_controller($self);
     
-    
-    return $self->shared_stash_h->{"timing"}->(Mojolicious::Helper::Timing);
+    return $timing;
   }
   
-  method include : Mojo::ByteStream ($options : Hash|object[] = undef) {
+  method include : Mojo::ByteStream ($template_name : string, $options : Hash|object[] = undef) {
     
-    return $self->render_to_string($options);
+    return $self->render_to_string($template_name, $options);
   }
   
   method content : Mojo::ByteStream ($name : string = undef) {
@@ -699,22 +670,6 @@ class Mojolicious::Controller {
     return $route->name;
   }
   
-  method exception_format : string () {
-    
-    my $stash = $self->stash_h;
-    
-    $stash->{"mojo.exception_format"} //= $self->app->exception_format;
-    
-    return $stash->{"mojo.exception_format"}->(string);
-  }
-  
-  method set_exception_format : void ($format : string) {
-    
-    my $stash = $self->stash_h;
-    
-    $stash->{"mojo.exception_format"} = $format;
-  }
-
   method set_inactivity_timeout  : void ($timeout : double){
   
     my $connection = $self->tx->connection;
@@ -783,5 +738,9 @@ class Mojolicious::Controller {
     
     return $url;
   }
-
+  
+  method render_later : void () {
+    $self->rendered;
+  }
+  
 }

@@ -447,7 +447,7 @@ class Mojo::Template {
         
         # Escaped
         if ($op eq "excaped_expression" && !$escape || $op eq "expression" && $escape) {
-          $code->push("my \$_ = (object)$value;\$_O .= \$_ isa Mojo::ByteStream ? \$_->(Mojo::ByteStream)->to_string : Mojo::Util->xml_escape((string)\$_);\n");
+          $code->push("my \$_ = (object)$value;\$_O .= \$_ isa Mojo::ByteStream ? \$_->(Mojo::ByteStream)->to_string : Mojo::Util->xml_escape(\$_ isa Stringable ? \$_->(Stringable)->to_string : (string)\$_);\n");
         }
         
         # Raw

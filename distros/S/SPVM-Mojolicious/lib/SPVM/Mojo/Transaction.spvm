@@ -1,7 +1,7 @@
 # Copyright (c) 2025 Yuki Kimoto
 # MIT License
 
-class Mojo::Transaction extends Mojo::EventEmitter {
+class Mojo::Transaction {
   version_from Mojolicious;
   
   use Mojo::Message::Request;
@@ -71,14 +71,7 @@ class Mojo::Transaction extends Mojo::EventEmitter {
   
   has res : rw Mojo::Message::Response;
   
-  has connection : rw Mojo::Connection
-    set {
-      
-      $self->{connection} = $_;
-      
-      $self->emit(connection => $_);
-    }
-  ;
+  has connection : rw Mojo::Connection;
   
   # Undocumented Fields
   has completed : byte;
@@ -108,8 +101,6 @@ class Mojo::Transaction extends Mojo::EventEmitter {
   method closed : void () {
     
     $self->completed;
-    
-    $self->emit("finish");
   }
   
   method completed : void () {

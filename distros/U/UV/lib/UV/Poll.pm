@@ -1,12 +1,11 @@
-package UV::Poll;
+package UV::Poll 2.001;
 
-our $VERSION = '2.000';
-
-use strict;
+use v5.14;
 use warnings;
+use parent 'UV::Handle';
+
 use Carp ();
 use Exporter qw(import);
-use parent 'UV::Handle';
 
 our @EXPORT_OK = (@UV::Poll::EXPORT_XS,);
 
@@ -68,8 +67,10 @@ UV::Poll - Poll handles in libuv
 
 =head1 SYNOPSIS
 
+=for highlighter language=perl
+
   #!/usr/bin/env perl
-  use strict;
+  use v5.14;
   use warnings;
 
   use UV;

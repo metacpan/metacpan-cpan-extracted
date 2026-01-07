@@ -38,7 +38,7 @@
    "provides" : {
       "Pg::SQL::PrettyPrinter" : {
          "file" : "lib/Pg/SQL/PrettyPrinter.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "Pg::SQL::PrettyPrinter::Node" : {
          "file" : "lib/Pg/SQL/PrettyPrinter/Node.pm"
@@ -212,6 +212,6 @@
          "web" : "https://gitlab.com/depesz/pg-sql-prettyprinter"
       }
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

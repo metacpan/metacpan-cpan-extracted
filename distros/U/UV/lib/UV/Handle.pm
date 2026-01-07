@@ -1,9 +1,8 @@
-package UV::Handle;
+package UV::Handle 2.001;
 
-our $VERSION = '2.000';
-
-use strict;
+use v5.14;
 use warnings;
+
 use Carp ();
 use Exporter qw(import);
 use UV ();
@@ -58,8 +57,10 @@ UV::Handle - Handles in libuv
 
 =head1 SYNOPSIS
 
+=for highlighter language=perl
+
   #!/usr/bin/env perl
-  use strict;
+  use v5.14;
   use warnings;
 
   use UV;

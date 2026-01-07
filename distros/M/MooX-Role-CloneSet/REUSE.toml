@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: Peter Pentchev <roam@ringlet.net>
+# SPDX-License-Identifier: Artistic-2.0
+
+version = 1
+SPDX-PackageName = "MooX-Role-CloneSet"
+SPDX-PackageSupplier = "Peter Pentchev <roam@ringlet.net>"
+SPDX-PackageDownloadLocation = "https://github.com/ppentchev/MooX-Role-CloneSet"
+
+[[annotations]]
+path = [
+  "Build.PL",
+  "Changes",
+  "META.json",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Peter Pentchev <roam@ringlet.net>"
+SPDX-License-Identifier = "Artistic-2.0"

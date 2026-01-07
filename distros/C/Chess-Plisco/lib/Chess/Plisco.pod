@@ -572,6 +572,21 @@ L</moveEquivalent> for what is considered significant.
 Although, this is technically a class method you should keep in mind that 
 the redundant parts of the moves depend on the current position.
 
+=item B<moveCompress(MOVE)>
+
+Reduces a move to its significant part. The resulting integer is guaranteed
+to fit into 16 bits.  The compressed move can be used as an index into lookup
+tables.
+
+This method has been added in version 1.0.2.
+
+=item B<moveUncompress(MOVE)>
+
+Undoes what B<moveCompress()> has done. The resulting integer is not a complete
+move, but you can compare it to a complete move with B<moveEquivalent()>.
+
+This method has been added in version 1.0.2.
+
 =item B<moveFrom(MOVE)>
 
 Extracts the shift (0-63) of the starting square.
@@ -1606,7 +1621,7 @@ P stands for Perl.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>.
+Copyright (C) 2021-2026 Guido Flohr <guido.flohr@cantanea.com>.
 
 =head1 SEE ALSO
 

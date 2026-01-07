@@ -1,22 +1,22 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use IO::Ppoll qw( POLLIN POLLOUT POLLHUP );
 
 my $ppoll = IO::Ppoll->new();
 
 ok( defined $ppoll, 'defined $ppoll' );
-isa_ok( $ppoll, "IO::Ppoll", '$ppoll isa IO::Ppoll' );
+isa_ok( $ppoll, [ "IO::Ppoll" ], '$ppoll isa IO::Ppoll' );
 
-is_deeply( [ $ppoll->handles ], [], 'handles when empty' );
+is( [ $ppoll->handles ], [], 'handles when empty' );
 
 $ppoll->mask( \*STDIN, POLLIN );
 
-is_deeply( [ $ppoll->handles ], [ \*STDIN ], 'handles after adding STDIN' );
+is( [ $ppoll->handles ], [ \*STDIN ], 'handles after adding STDIN' );
 
 is( $ppoll->mask( \*STDIN ), POLLIN, 'mask(STDIN) after adding' );
 
@@ -34,6 +34,6 @@ is( $ppoll->mask( \*STDIN ), POLLIN|POLLOUT, 'mask(STDIN) after mask_del' );
 
 $ppoll->remove( \*STDIN );
 
-is_deeply( [ $ppoll->handles ], [], 'handles after removing STDIN' );
+is( [ $ppoll->handles ], [], 'handles after removing STDIN' );
 
 done_testing;

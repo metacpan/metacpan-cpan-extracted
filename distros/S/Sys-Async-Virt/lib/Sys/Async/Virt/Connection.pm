@@ -1,6 +1,6 @@
 ####################################################################
 #
-#     This file was generated using XDR::Parse version v0.3.1
+#     This file was generated using XDR::Parse version v1.0.1
 #                   and LibVirt version v11.10.0
 #
 #      Don't edit this file, use the source template instead
@@ -16,7 +16,7 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad ':experimental(inherit_field)';
 
-class Sys::Async::Virt::Connection v0.2.1;
+class Sys::Async::Virt::Connection v0.2.3;
 
 field $_in  :inheritable = undef;
 field $_out :inheritable = undef;
@@ -116,7 +116,7 @@ Sys::Async::Virt::Connection - Connection to LibVirt server (abstract
 
 =head1 VERSION
 
-v0.2.1
+v0.2.3
 
 =head1 SYNOPSIS
 

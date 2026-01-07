@@ -18,7 +18,7 @@ name: Pg-SQL-PrettyPrinter
 provides:
   Pg::SQL::PrettyPrinter:
     file: lib/Pg/SQL/PrettyPrinter.pm
-    version: '0.11'
+    version: '0.12'
   Pg::SQL::PrettyPrinter::Node:
     file: lib/Pg/SQL/PrettyPrinter/Node.pm
   Pg::SQL::PrettyPrinter::Node::A_ArrayExpr:
@@ -133,5 +133,5 @@ resources:
   homepage: https://gitlab.com/depesz/pg-sql-prettyprinter
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://gitlab.com/depesz/pg-sql-prettyprinter.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

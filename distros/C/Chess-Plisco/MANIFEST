@@ -19,6 +19,7 @@ lib/Chess/Plisco/EPD/Record.pod
 lib/Chess/Plisco/Engine.pm
 lib/Chess/Plisco/Engine.pod
 lib/Chess/Plisco/Engine/Book.pm
+lib/Chess/Plisco/Engine/Constants.pm
 lib/Chess/Plisco/Engine/InputWatcher.pm
 lib/Chess/Plisco/Engine/LimitsType.pm
 lib/Chess/Plisco/Engine/Position.pm
@@ -39,6 +40,8 @@ lib/Chess/Plisco/Macro/moveAttacked.pm
 lib/Chess/Plisco/Macro/movePinned.pm
 lib/Chess/Plisco/Macro/movesFromMask.pm
 lib/Chess/Plisco/Macro/promotionMovesFromMask.pm
+lib/Chess/Plisco/Macro/valueFromTT.pm
+lib/Chess/Plisco/Macro/valueToTT.pm
 lib/Chess/Plisco/Tablebase/SearchTree.pm
 lib/Chess/Plisco/Tablebase/Syzygy.pm
 lib/Chess/Plisco/Tablebase/Syzygy.pod

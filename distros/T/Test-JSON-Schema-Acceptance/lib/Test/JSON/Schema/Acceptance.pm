@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.034-4-g9c04ef2
+package Test::JSON::Schema::Acceptance; # git description: v1.035-5-geada242
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.035';
+our $VERSION = '1.036';
 
 use 5.020;
 use Moo;
@@ -159,11 +159,10 @@ sub acceptance {
         # skip resource files that are marked as being for an unsupported draft
         my $relative_path = $path->relative($self->additional_resources);
         my ($topdir) = split qr{/}, $relative_path, 2;
-        return if $topdir =~ /^draft/ and not grep $topdir eq $_, $self->supported_specifications->@*;
+        return if $topdir =~ /^(?:draft(?:[3467]|2019-09|2020-12)|v1)\z/ and not grep $topdir eq $_, $self->supported_specifications->@*;
 
         my $data = $self->json_deserialize($path->slurp_raw);
-        my $file = $path->relative($self->additional_resources);
-        my $uri = $base.'/'.$file;
+        my $uri = $base.'/'.$relative_path;
         $options->{add_resource}->($uri => $data,
           # ensure the evaluator parses this resource using its specified version
           $topdir =~ /^draft/ ? (specification_version => $topdir) : ());
@@ -555,7 +554,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.035
+version 1.036
 
 =head1 SYNOPSIS
 

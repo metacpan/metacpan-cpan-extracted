@@ -186,7 +186,7 @@ class Mojolicious::Renderer {
       $stash->{"handler"} = $layout_handler;
       $stash->{"format"} = $layout_format;
       $stash->{"template"} = $layout_template;
-      $stash->{"mojo.content"} // Hash->new;
+      $stash->{"mojo.content"} //= Hash->new;
       $stash->{"mojo.content"}->(Hash)->{"content"} = $output;
       
       my $layout_renderer = $self->handlers->get($layout_handler);
@@ -204,10 +204,10 @@ class Mojolicious::Renderer {
   
   method respond : void ($c : Mojolicious::Controller, $output : string, $format : string, $status : int) {
     
-    if ($c->stash_h->{"mojo.respond"}->(int)) {
+    if ($c->mojo_respond) {
       die "A response has already been rendered.";
     }
-    $c->stash_h->{"mojo.respond"} = 1;
+    $c->set_mojo_respond(1);
     
     # Gzip compression
     my $res = $c->res;

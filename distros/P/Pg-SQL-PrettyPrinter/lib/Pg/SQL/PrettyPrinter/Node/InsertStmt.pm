@@ -68,7 +68,7 @@ sub new {
 sub relname {
     my $self = shift;
     if ( !$self->{ '_relname' } ) {
-        my $R = $self->{ 'relation' };
+        my $R        = $self->{ 'relation' };
         my @elements = map { $self->quote_ident( $R->{ $_ } ) }
             grep { exists $R->{ $_ } } qw{ catalogname schemaname relname };
         $self->{ '_relname' } = join( '.', @elements );

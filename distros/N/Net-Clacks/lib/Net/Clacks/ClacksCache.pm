@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 33;
+our $VERSION = 34;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -25,7 +25,8 @@ sub new($proto, %config) {
 
     my $self = bless \%config, $class;
 
-    $self->reconnect();
+    # Connect on first use
+    #$self->reconnect();
 
     $self->{initfromhandle} = 0;
 
@@ -93,6 +94,14 @@ sub extraInits($self) {
 
 sub extraDestroys($self) {
     # Hook for application specific destroys
+    return;
+}
+
+sub fastdisconnect($self) {
+    eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+        $self->{clacks}->fastdisconnect();
+    };
+
     return;
 }
 

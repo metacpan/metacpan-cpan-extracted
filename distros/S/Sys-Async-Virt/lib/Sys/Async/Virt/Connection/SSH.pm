@@ -1,6 +1,6 @@
 ####################################################################
 #
-#     This file was generated using XDR::Parse version v0.3.1
+#     This file was generated using XDR::Parse version v1.0.1
 #                   and LibVirt version v11.10.0
 #
 #      Don't edit this file, use the source template instead
@@ -16,7 +16,7 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad ':experimental(inherit_field)';
 
-class Sys::Async::Virt::Connection::SSH v0.2.1;
+class Sys::Async::Virt::Connection::SSH v0.2.3;
 
 inherit Sys::Async::Virt::Connection::Process;
 
@@ -117,7 +117,7 @@ Sys::Async::Virt::Connection::SSH - Connection to LibVirt server over SSH
 
 =head1 VERSION
 
-v0.2.1
+v0.2.3
 
 =head1 SYNOPSIS
 
@@ -132,11 +132,11 @@ v0.2.1
 
 This module connects to a local LibVirt server through an ssh binary in
 the system PATH, inheriting most of its behaviour from
-L< Sys::Async::Virt::Connection::Process >.
+L<Sys::Async::Virt::Connection::Process>.
 
 B< NOTE > This module requires the C<< Future::IO->waitpid >> call to work,
 which the default implementation does not provide. Any of the other backends
-listed in L< Future::IO > needs to be active for this module to work.
+listed in L<Future::IO> needs to be active for this module to work.
 
 =head1 URL PARAMETERS
 

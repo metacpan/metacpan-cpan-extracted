@@ -1,3 +1,6 @@
+0.015 2026-01-07
+  [Test Chanes]
+    * Catch up with latest SPVM::Go.
 0.014 2025-12-10
   [Incompatible Changes]
     * Rename IO::Socket::SSL#write method to syswrite.

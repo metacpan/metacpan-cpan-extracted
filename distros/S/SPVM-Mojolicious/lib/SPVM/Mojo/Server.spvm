@@ -9,6 +9,8 @@ class Mojo::Server extends Mojo::EventEmitter {
   use Sys;
   use Re;
   use Mojo::Transaction;
+  use Sys;
+  use File::Spec;
   
   # Fields
   has app : rw Mojolicious;
@@ -41,8 +43,6 @@ class Mojo::Server extends Mojo::EventEmitter {
     }
     
     $self->{reverse_proxy} = (byte)$reverse_proxy;
-    
-    $self->on(request => method : void ($server : Mojo::Server, $tx : Mojo::Transaction::HTTP)  { $server->app->handler($tx); });
   }
   
   method build_app : Mojolicious ($app : Mojolicious) {
@@ -54,13 +54,36 @@ class Mojo::Server extends Mojo::EventEmitter {
     
     my $tx = $self->app->build_tx;
     
-    $tx->req->set_trusted_proxies(Array->merge_string($tx->req->trusted_proxies, $self->trusted_proxies));
+    $tx->req->set_trusted_proxies(Array->merge_string($tx->req->trusted_proxies, $self->trusted_proxies // new string[0]));
     
     if ($self->reverse_proxy) {
       $tx->req->set_reverse_proxy(1) ;
     }
     
     return $tx;
+  }
+  
+  method daemonize : void () {
+    
+    my $pid = Sys->fork;
+    
+    # Fork and kill parent
+    if ($pid) {
+      Sys->exit(0);
+    }
+    
+    # Start a new Unix session
+    Sys::Process->setsid;
+    
+    # Close C filehandles
+    Sys::IO->freopen(File::Spec->devnull, "r", Sys::IO->stdin);
+    Sys::IO->freopen(File::Spec->devnull, "w", Sys::IO->stdout);
+    Sys::IO->dup2(Sys->fileno(Sys::IO->stdout), Sys->fileno(Sys::IO->stderr));
+    
+    # Close SPVM filehandles
+    Sys::IO->freopen(File::Spec->devnull, "r", Sys::IO->spvm_stdin);
+    Sys::IO->freopen(File::Spec->devnull, "w", Sys::IO->spvm_stdout);
+    Sys::IO->dup2(Sys->fileno(Sys::IO->spvm_stdout), Sys->fileno(Sys::IO->spvm_stderr));
   }
   
   method run : void () { die "Not implemented."; }

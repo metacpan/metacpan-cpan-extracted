@@ -1,11 +1,10 @@
-package UV::Check;
+package UV::Check 2.001;
 
-our $VERSION = '2.000';
-
-use strict;
+use v5.14;
 use warnings;
-use Carp ();
 use parent 'UV::Handle';
+
+use Carp ();
 
 sub start {
     my $self = shift;
@@ -37,8 +36,10 @@ UV::Check - Check handles in libuv
 
 =head1 SYNOPSIS
 
+=for highlighter language=perl
+
   #!/usr/bin/env perl
-  use strict;
+  use v5.14;
   use warnings;
 
   use UV;

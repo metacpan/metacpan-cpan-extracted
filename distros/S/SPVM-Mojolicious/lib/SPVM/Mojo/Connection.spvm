@@ -9,13 +9,18 @@ class Mojo::Connection extends Mojo::EventEmitter {
   # Fields
   has handle : rw IO::Socket;
   
-  has timeout : rw double;
+  has timeout : virtual rw double
+    get {
+      $self->{handle}->timeout;
+    }
+    set {
+      $self->{handle}->set_timeout($_);
+    }
+  ;
   
   has next : rw Mojo::Transaction;
   
   has requests : rw int;
-  
-  has writing : rw byte;
   
   has tx : rw Mojo::Transaction;
   

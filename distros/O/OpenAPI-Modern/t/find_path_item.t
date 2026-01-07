@@ -47,7 +47,7 @@ subtest 'invalid request type, bad conversion to Mojo::Message::Request' => sub 
   );
 
   for (my $type_index = 0; $::TYPE = $::TYPES[$type_index]; $type_index++) {
-    my $TODO = todo 'Mojolicious does not parse an %ENV with method of 0: see https://github.com/mojolicious/mojo/pull/2280' if $::TYPE eq 'plack' or $::TYPE eq 'catalyst' or $::TYPE eq 'dancer2';
+    my $todo = todo 'Mojolicious does not parse an %ENV with method of 0: see https://github.com/mojolicious/mojo/pull/2280' if $::TYPE eq 'plack' or $::TYPE eq 'catalyst' or $::TYPE eq 'dancer2';
 
     my $request = request('0', 'http://example/nothing');
     ok(!$openapi->find_path_item($options = { request => $request }), to_str($request).': lookup failed');

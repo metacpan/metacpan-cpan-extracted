@@ -1,10 +1,10 @@
-package UV;
+package UV 2.001;
 
-our $VERSION = '2.000';
-our $XS_VERSION = $VERSION;
-
-use strict;
+use v5.14;
 use warnings;
+
+our $XS_VERSION = our $VERSION;
+
 use Carp ();
 use Exporter qw(import);
 require XSLoader;
@@ -109,8 +109,10 @@ UV - Perl interface to libuv
 
 =head1 SYNOPSIS
 
+=for highlighter language=perl
+
   #!/usr/bin/env perl
-  use strict;
+  use v5.14;
   use warnings;
 
   use UV;
@@ -302,7 +304,7 @@ code (which can be compared to one of the C<UV::UV_E*> error constants), and a
 C<message> method which returns a human-readable string describing the failure.
 
     try { ... }
-    catch my $e {
+    catch ($e) {
         if(blessed $e and $e->isa("UV::Exception")) {
             print "The failure was ", $e->message, " of code ", $e->code;
         }
@@ -316,7 +318,7 @@ Exceptions are blessed into a subclass of C<UV::Exception> named after the
 type of the failure code. This allows type-based testing of error types.
 
     try { ... }
-    catch my $e {
+    catch ($e) {
         if(blessed $e and $e->isa("UV::Exception::ECANCELED") {
             # ignore
         }

@@ -1,8 +1,10 @@
 Build.PL
 Changes
 LICENSE
+LICENSES/Artistic-2.0.txt
 META.json
 README.md
+REUSE.toml
 cpanfile
 lib/MooX/Role/CloneSet.pm
 lib/MooX/Role/CloneSet/BuildArgs.pm
@@ -14,5 +16,11 @@ t/lib/Something.pm
 t/lib/Something/Else.pm
 t/lib/Something/Mutable.pm
 t/lib/Test/CloneSet.pm
+tools/el-format
+tools/el-format-show-config
+tools/el-podman-build-unit-tests-container
+tools/el-podman-run-unit-tests
+tools/el-run-tests
+tools/podman/test-moox-role-cloneset/Containerfile
 META.yml
 MANIFEST

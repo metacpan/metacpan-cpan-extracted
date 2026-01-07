@@ -97,13 +97,13 @@ if( $os eq 'MSWin32' || $os eq 'MSWin64' || $os eq 'os2' )
     }
     else
     {
-      if (-e "$DB2/lib32")
+      if (-e "$DB2/lib")
       {
-         $DB2LIB = "$DB2/lib32";
+         $DB2LIB = "$DB2/lib";
       }
       else
       {
-        $DB2LIB = "$DB2/lib";
+        $DB2LIB = "$DB2/lib32";
       }
     }
   }
@@ -132,13 +132,13 @@ else
     }
     else
     {
-      if (-e "$DB2/lib32")
+      if (-e "$DB2/lib")
       {
-         $DB2LIB = "$DB2/lib32";
+         $DB2LIB = "$DB2/lib";
       }
       else
       {
-        $DB2LIB = "$DB2/lib";
+        $DB2LIB = "$DB2/lib32";
       }
     }
   }

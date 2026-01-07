@@ -411,7 +411,7 @@ class TestCase::Mojolicious::Controller {
         my $tx = Mojo::Transaction::HTTP->new;
         my $c = $app->build_controller($tx);
         
-        $c->set_stash("mojo.captures", Hash->new({var1 => "1"}));
+        $c->set_mojo_captures(Hash->new({var1 => "1"}));
         
         $c->req->url->query->set_param(var1 => "2");
         
@@ -534,10 +534,10 @@ class TestCase::Mojolicious::Controller {
       $c->set_stash(x => 123);
       
       my $templates = <<'EOS';
-@@minimal.html.ep
+@@ minimal.html.ep
 abc<%= $c->stash("x") %>
 
-@@other.html.ep
+@@ other.html.ep
 other
 EOS
       
@@ -602,7 +602,89 @@ EOS
       
     }
     
+    # set_layout, set_title
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_app($app);
+      $c->set_tx($tx);
+      $c->set_stash(x => 123);
+      
+      my $templates = <<'EOS';
+@@ minimal.html.ep
+% $c->set_layout("common");
+% $c->set_title("title");
+abc<%= $c->stash("x") %>
+@@ layouts/common.html.ep
+
+<%= $c->stash("title")->(string) %>
+layout
+<%= $c->content %>
+EOS
+      
+      $app->renderer->set_data_templates($templates);
+      my $bs = $c->render_to_string({template => "minimal"});
+      
+      unless (Re->m($bs->to_string, ["title.+layout.+abc123", "s"])) {
+        return 0;
+      }
+      
+    }
+    
+    # include
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_app($app);
+      $c->set_tx($tx);
+      $c->set_stash(x => 123);
+      
+      my $templates = <<'EOS';
+@@ minimal.html.ep
+%= $c->include("include", {x => 123});
+@@ include.html.ep
+include <%= $c->stash("x") %>
+EOS
+      
+      $app->renderer->set_data_templates($templates);
+      my $bs = $c->render_to_string({template => "minimal"});
+      
+      unless (Re->m($bs->to_string, "include 123")) {
+        return 0;
+      }
+      
+    }
+    
     return 1;
   }
   
+  static method render : int () {
+    
+    my $template_path = FindBin->Bin . "/templates";
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_app($app);
+      $c->set_tx($tx);
+      
+      $c->render({inline => "abc<%= 123 %>"});
+      
+      unless ($c->res->code == 200) {
+        return 0;
+      }
+      
+      unless (Re->m($c->res->body, "abc123")) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
 }

@@ -5,7 +5,7 @@
 # Joan Ntzougani, ✞
 
 package Dancer2::Plugin::WebService;
-our $VERSION = '4.8.6';
+our $VERSION = '4.8.7';
 if ( $^O =~/(?i)MSWin/ ) { CORE::warn "\nOperating system is not supported\n"; CORE::exit 1 }
 
 use strict;
@@ -925,7 +925,7 @@ Dancer2::Plugin::WebService - Rest APIs with login, persistent data, multiple in
 
 =head1 VERSION
 
-version 4.8.6
+version 4.8.7
 
 =head1 SYNOPSIS
 
@@ -1010,9 +1010,8 @@ Your last route's statement. Accepts a Perl data structure, and return it as jso
 Set the error. Normally at success B<error> should be 0
 It does not stop the route execution. You must place it before the reply()
 
-  get '/SomePath' => sub { Error('ok'); reply 'hello world' };
-  get '/SomePath' => sub { Error('oups') };
-  get '/SomePath' => sub { reply 'a', 'b' };
+  get '/SomePath' => sub { Error('oups') ; reply };
+  get '/SomePath' => sub { Error('ok')   ; reply 'hello world' };
 
 =head2 SessionSet
 

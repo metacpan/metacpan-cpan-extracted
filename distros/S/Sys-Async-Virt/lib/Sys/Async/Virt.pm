@@ -1,6 +1,6 @@
 ####################################################################
 #
-#     This file was generated using XDR::Parse version v0.3.1
+#     This file was generated using XDR::Parse version v1.0.1
 #                   and LibVirt version v11.10.0
 #
 #      Don't edit this file, use the source template instead
@@ -19,7 +19,7 @@ use Future::AsyncAwait;
 use Object::Pad 0.821;
 use Sublike::Extended 0.29 'method', 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-class Sys::Async::Virt v0.2.1;
+class Sys::Async::Virt v0.2.3;
 
 
 use Carp qw(croak);
@@ -37,22 +37,22 @@ use Protocol::Sys::Virt::Remote v11.10.1;
 use Protocol::Sys::Virt::Transport v11.10.1;
 use Protocol::Sys::Virt::URI v11.10.1; # imports parse_url
 
-use Sys::Async::Virt::Connection::Factory v0.2.1;
-use Sys::Async::Virt::Domain v0.2.1;
-use Sys::Async::Virt::DomainCheckpoint v0.2.1;
-use Sys::Async::Virt::DomainSnapshot v0.2.1;
-use Sys::Async::Virt::Network v0.2.1;
-use Sys::Async::Virt::NetworkPort v0.2.1;
-use Sys::Async::Virt::NwFilter v0.2.1;
-use Sys::Async::Virt::NwFilterBinding v0.2.1;
-use Sys::Async::Virt::Interface v0.2.1;
-use Sys::Async::Virt::StoragePool v0.2.1;
-use Sys::Async::Virt::StorageVol v0.2.1;
-use Sys::Async::Virt::NodeDevice v0.2.1;
-use Sys::Async::Virt::Secret v0.2.1;
+use Sys::Async::Virt::Connection::Factory v0.2.3;
+use Sys::Async::Virt::Domain v0.2.3;
+use Sys::Async::Virt::DomainCheckpoint v0.2.3;
+use Sys::Async::Virt::DomainSnapshot v0.2.3;
+use Sys::Async::Virt::Network v0.2.3;
+use Sys::Async::Virt::NetworkPort v0.2.3;
+use Sys::Async::Virt::NwFilter v0.2.3;
+use Sys::Async::Virt::NwFilterBinding v0.2.3;
+use Sys::Async::Virt::Interface v0.2.3;
+use Sys::Async::Virt::StoragePool v0.2.3;
+use Sys::Async::Virt::StorageVol v0.2.3;
+use Sys::Async::Virt::NodeDevice v0.2.3;
+use Sys::Async::Virt::Secret v0.2.3;
 
-use Sys::Async::Virt::Callback v0.2.1;
-use Sys::Async::Virt::Stream v0.2.1;
+use Sys::Async::Virt::Callback v0.2.3;
+use Sys::Async::Virt::Stream v0.2.3;
 
 use constant {
     CLOSE_REASON_ERROR                                  => 0,
@@ -1654,7 +1654,7 @@ async method open() {
 # ENTRYPOINT: REMOTE_PROC_CONNECT_CLOSE
 # ENTRYPOINT: REMOTE_PROC_CONNECT_UNREGISTER_CLOSE_CALLBACK
 async method _close($reason) {
-    return unless (_STATE_INITIALIZED <= $_state <= _STATE_OPENED );
+    return unless (_STATE_INITIALIZED <= $_state and $_state <= _STATE_OPENED );
     $_state = _STATE_CLEANING_UP;
 
     unless ($_connection->is_read_eof
@@ -2438,7 +2438,7 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.2.1
+v0.2.3
 
 Based on LibVirt tag v11.10.0
 
@@ -2705,6 +2705,14 @@ When not supplied, defaults to the environment variable C<LIBVIRT_DEFAULT_URI>.
 Returns a future which resolves when the connection is explicitly stopped
 (through C<< $client->stop >>) or upon a connection error.
 
+=head2 run_once
+
+  my $run_f = $client->run_once;
+
+Returns a future which resolves when the next data frame from the connection
+has been processed. When no frame is pending, waits for the next frame to be
+sent on the connection.
+
 =head2 stop
 
   $client->stop;
@@ -2712,16 +2720,24 @@ Returns a future which resolves when the connection is explicitly stopped
 Marks the future returned by the C< run > method as resolved, stopping
 all processing related to the connection to the server.
 
+=head2 initialize
+
+  await $client->initialize;
+
+Sets up and connects a low-level connection, if one doesn't already exist. Then
+proceeds to set up a transport to encode data to be sent over the connection.
+Finally, it creates an RPC (remote call procedure) proxy and links the three
+together.
+
+B<Note> This function requires that the C<run> method has been called and its
+future is being awaited.
+
 =head2 connect
 
-  await $client->connect( async sub pump($connection, $transport) { ... } );
+  await $client->connect;
 
-Sets up the transport connection to the server, including authentication
-keep alive monitoring and close callback registration.
-
-Calls C<pump> to receive data from the C<$connection>, sending the received
-data into C<$transport>. The function should throw an exception in case of
-error or return in case of an C<End-Of-File (EOF)> condition.
+Calls the C<initialize>, C<auth> and C<open> methods returning a future which
+completes when all three have completed.
 
 =head2 auth
 

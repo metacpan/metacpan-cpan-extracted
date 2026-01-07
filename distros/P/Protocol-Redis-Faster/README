@@ -1,42 +1,13 @@
 NAME
 
     Protocol::Redis::Faster - Optimized pure-perl Redis protocol
-    parser/encoder
-
-SYNOPSIS
-
-      use Protocol::Redis::Faster;
-      my $redis = Protocol::Redis::Faster->new(api => 1) or die "API v1 not supported";
-    
-      $redis->parse("+foo\r\n");
-    
-      # get parsed message
-      my $message = $redis->get_message;
-      print "parsed message: ", $message->{data}, "\n";
-    
-      # asynchronous parsing interface
-      $redis->on_message(sub {
-          my ($redis, $message) = @_;
-          print "parsed message: ", $message->{data}, "\n";
-      });
-    
-      # parse pipelined message
-      $redis->parse("+bar\r\n-error\r\n");
-    
-      # create message
-      print "Get key message:\n",
-        $redis->encode({type => '*', data => [
-           {type => '$', data => 'string'},
-           {type => '+', data => 'OK'}
-      ]});
+    parser/encoder (DEPRECATED)
 
 DESCRIPTION
 
-    This module implements the Protocol::Redis API with more optimized
-    pure-perl internals. See Protocol::Redis for usage documentation.
-
-    This is a low level parsing module, if you are looking to use Redis in
-    Perl, try Redis, Redis::hiredis, or Mojo::Redis.
+    This is an empty subclass of Protocol::Redis. The optimizations it used
+    to contain have been implemented in the base class. Consider
+    Protocol::Redis::XS for faster parsing.
 
 BUGS
 

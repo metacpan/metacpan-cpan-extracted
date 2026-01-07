@@ -1,6 +1,6 @@
 #! /bin/false
 
-# Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2021-2026 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software. It comes without any warranty, to
@@ -39,7 +39,7 @@
 # more extensive use of Chess::Plisco::Macro.
 
 package Chess::Plisco;
-$Chess::Plisco::VERSION = 'v1.0.1';
+$Chess::Plisco::VERSION = 'v1.0.2';
 use strict;
 use integer;
 
@@ -1277,6 +1277,18 @@ sub moveSignificant {
 	my ($self, $move) = @_;
 
 	return (($move) & 0x1fffc0);
+}
+
+sub moveCompress {
+	my ($self, $move) = @_;
+
+	return ((($move) & 0x1fffc0) >> 6);
+}
+
+sub moveUncompress {
+	my ($self, $m) = @_;
+
+	return (($m) << 6);
 }
 
 sub move {

@@ -1,0 +1,14 @@
+#!/usr/bin/env execlineb
+# SPDX-FileCopyrightText: Peter Pentchev <roam@ringlet.net>
+# SPDX-License-Identifier: Artistic-2.0
+
+if {
+	test -f .perltidyrc
+}
+if {
+	test -f .tidyallrc
+}
+if {
+	perltidy -dpro
+}
+exit 0

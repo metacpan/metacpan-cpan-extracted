@@ -1,4 +1,4 @@
-use strict;
+use v5.14;
 use warnings;
 
 use UV::Loop qw(UV_RUN_NOWAIT);
@@ -39,7 +39,9 @@ sub cb {
 
     $timer->start(1000, 0, \&cb);
 
-    ok($loop->backend_timeout() > 100, 'backend_timeout > 0.1 sec' );
+    # Don't bother asking if ->backend_timeout is non-zero yet because for
+    # libuv-internal reasons it might not be
+    #   https://github.com/p5-UV/p5-UV/issues/40
     ok($loop->backend_timeout() <= 1000, 'backend_timeout <= 1 sec');
 
     is($loop->run(), 0, 'run: ran successfully');

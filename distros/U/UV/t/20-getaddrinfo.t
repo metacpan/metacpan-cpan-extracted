@@ -1,4 +1,4 @@
-use strict;
+use v5.14;
 use warnings;
 
 use Socket qw( AF_INET IPPROTO_TCP SOCK_STREAM inet_aton unpack_sockaddr_in );

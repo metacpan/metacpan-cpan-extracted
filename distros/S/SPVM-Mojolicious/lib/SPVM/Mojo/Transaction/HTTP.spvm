@@ -57,8 +57,6 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
     
     $self->{res} = Mojo::Message::Response->new;
     
-    $self->emit(unexpected => $res);
-    
     my $leftovers = $res->content->leftovers;
     
     unless (length $leftovers) {
@@ -126,13 +124,6 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
     my $req = $self->req;
     
     $req->parse($chunk);
-    
-    if ($req->is_finished) {
-      unless ($self->{handled}++) {
-        $self->emit("request");
-      }
-    }
-    
   }
   
   method server_write : string () {

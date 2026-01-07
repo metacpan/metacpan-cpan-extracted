@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: Peter Pentchev <roam@ringlet.net>
+# SPDX-License-Identifier: Artistic-2.0
+
+FROM perl:5.12.5-stretch
+
+ARG UID=1000
+ARG GID=1000
+ARG USERNAME=jrl
+
+RUN groupadd -g "${GID}" -- "${USERNAME}"
+RUN useradd -g "${GID}" -m -N -p '' -u "${UID}" -- "${USERNAME}"
+
+USER ${UID}:${GID}
+
+RUN cpanm Moo namespace::clean
+RUN cpanm Test::More

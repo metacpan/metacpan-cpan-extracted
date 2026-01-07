@@ -116,218 +116,219 @@ class TestCase::IO::Socket::SSL {
   static method client_and_server_basic : int ($port : int) {
     
     my $success_ref = [1];
-    
-    my $wg = Go::Sync::WaitGroup->new;
-    
-    $wg->add(2);
-    
-    # Run a echo server
-    my $go_server_ref = [0];
-    Go->go([$go_server_ref : int[], $wg : Go::Sync::WaitGroup, $port : int] method : void () {
-      
-      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
-        $wg->done;
-      });
-      
-      $go_server_ref->[0] = 1;
-      
-      &run_echo_server_accept_once_with_options($port);
-    });
-    
-    # Tests
     my $go_tests_ref = [0];
-    Go->go([$go_tests_ref : int[], $wg : Go::Sync::WaitGroup, $success_ref : int[], $port : int] method : void () {
+    my $go_server_ref = [0];
+    
+    Go->go([$go_server_ref : int[], $success_ref : int[], $go_tests_ref : int[], $port : int] method : void () {
+      my $wg = Go::Sync::WaitGroup->new;
       
-      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
-        $wg->done;
+      $wg->add(2);
+      
+      # Run a echo server
+      Go->go([$go_server_ref : int[], $wg : Go::Sync::WaitGroup, $port : int] method : void () {
+        
+        Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+          $wg->done;
+        });
+        
+        $go_server_ref->[0] = 1;
+        
+        &run_echo_server_accept_once_with_options($port);
       });
       
-      $go_tests_ref->[0] = 1;
-      
-      {
-        my $default_passwd_cb = method : int ($buf : mutable string, $size : int, $rwflag : int) {
-          
-          my $password = "test";
-          my $password_length = length $password;
-          
-          Fn->memcpy($buf, 0, $password, 0, $password_length);
-          
-          return $password_length;
-        };
+      # Tests
+      Go->go([$go_tests_ref : int[], $wg : Go::Sync::WaitGroup, $success_ref : int[], $port : int] method : void () {
         
-        my $host = "127.0.0.1";
-        my $socket = IO::Socket::SSL->new({
-          PeerAddr => $host,
-          PeerPort => $port,
-          SSL_startHandshake => 0,
-          SSL_verify_mode => SSL->SSL_VERIFY_NONE,
-          SSL_cert_file => "$FILE_DIR/simple-cert.cert.pem",
-          SSL_key_file => "$FILE_DIR/simple-cert.key.enc.pem",
-          SSL_passwd_cb => $default_passwd_cb,
-          SSL_alpn_protocols => ["http/1.1"],
-          SSL_hostname => "localhost",
-          SSL_crl_file => "$FILE_DIR/simple-cert.csr.pem",
-          SSL_check_crl => 1,
-          SSL_hostname => "localhost",
+        Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+          $wg->done;
         });
         
-        my $ssl_ctx = $socket->ssl_ctx;
+        $go_tests_ref->[0] = 1;
         
-        $ssl_ctx->set_post_handshake_auth(1);
-        
-        my $msg_callback_results = new object[10];
-        
-        my $msg_callback = [$msg_callback_results : object[]]method : void ($write_p : int, $version : int, $content_type : int, $buf : string, $len : int, $ssl : Net::SSLeay) {          
-          unless ($msg_callback_results->[0]) {
-            warn "[Test Output]\$write_p:$write_p,\$version:$version,\$content_type:$content_type,\$buf:" . dump $buf . ",\$len:$len,\$ssl:" . type_name($ssl);
+        {
+          my $default_passwd_cb = method : int ($buf : mutable string, $size : int, $rwflag : int) {
             
-            $msg_callback_results->[0] = $write_p;
-            $msg_callback_results->[1] = $version;
-            $msg_callback_results->[2] = $content_type;
-            $msg_callback_results->[3] = $buf;
-            $msg_callback_results->[4] = $len;
+            my $password = "test";
+            my $password_length = length $password;
             
-            my $ssl_hash = Hash->new;
-            $ssl_hash->set("ssl", $ssl);
-            $ssl_hash->weaken("ssl");
+            Fn->memcpy($buf, 0, $password, 0, $password_length);
             
-            $msg_callback_results->[5] = $ssl_hash;
-            
+            return $password_length;
+          };
+          
+          my $host = "127.0.0.1";
+          my $socket = IO::Socket::SSL->new({
+            PeerAddr => $host,
+            PeerPort => $port,
+            SSL_startHandshake => 0,
+            SSL_verify_mode => SSL->SSL_VERIFY_NONE,
+            SSL_cert_file => "$FILE_DIR/simple-cert.cert.pem",
+            SSL_key_file => "$FILE_DIR/simple-cert.key.enc.pem",
+            SSL_passwd_cb => $default_passwd_cb,
+            SSL_alpn_protocols => ["http/1.1"],
+            SSL_hostname => "localhost",
+            SSL_crl_file => "$FILE_DIR/simple-cert.csr.pem",
+            SSL_check_crl => 1,
+            SSL_hostname => "localhost",
+          });
+          
+          my $ssl_ctx = $socket->ssl_ctx;
+          
+          $ssl_ctx->set_post_handshake_auth(1);
+          
+          my $msg_callback_results = new object[10];
+          
+          my $msg_callback = [$msg_callback_results : object[]]method : void ($write_p : int, $version : int, $content_type : int, $buf : string, $len : int, $ssl : Net::SSLeay) {          
+            unless ($msg_callback_results->[0]) {
+              warn "[Test Output]\$write_p:$write_p,\$version:$version,\$content_type:$content_type,\$buf:" . dump $buf . ",\$len:$len,\$ssl:" . type_name($ssl);
+              
+              $msg_callback_results->[0] = $write_p;
+              $msg_callback_results->[1] = $version;
+              $msg_callback_results->[2] = $content_type;
+              $msg_callback_results->[3] = $buf;
+              $msg_callback_results->[4] = $len;
+              
+              my $ssl_hash = Hash->new;
+              $ssl_hash->set("ssl", $ssl);
+              $ssl_hash->weaken("ssl");
+              
+              $msg_callback_results->[5] = $ssl_hash;
+              
+            }
+          };
+          
+          $socket->add_before_connect_SSL_cb([$msg_callback : Net::SSLeay::Callback::Msg] method : void ($socket : IO::Socket::SSL, $ssl : Net::SSLeay) {
+            $ssl->set_msg_callback($msg_callback);
+          });
+          
+          $socket->connect_SSL;
+          
+          my $ssl = $socket->ssl;
+          
+          my $version = $ssl->version;
+          
+          warn "[Test Output][Net::SSLeay#version]$version";
+          
+          my $version_string = $ssl->get_version;
+          
+          warn "[Test Output][Net::SSLeay#get_version]$version_string";
+          
+          $ssl = $socket->ssl;
+          
+          $ssl->set_msg_callback(undef);
+          
+          unless ($msg_callback_results->[0]->(int) >= 0) {
+            $success_ref->[0] = 0;
           }
-        };
-        
-        $socket->add_before_connect_SSL_cb([$msg_callback : Net::SSLeay::Callback::Msg] method : void ($socket : IO::Socket::SSL, $ssl : Net::SSLeay) {
-          $ssl->set_msg_callback($msg_callback);
-        });
-        
-        $socket->connect_SSL;
-        
-        my $ssl = $socket->ssl;
-        
-        my $version = $ssl->version;
-        
-        warn "[Test Output][Net::SSLeay#version]$version";
-        
-        my $version_string = $ssl->get_version;
-        
-        warn "[Test Output][Net::SSLeay#get_version]$version_string";
-        
-        $ssl = $socket->ssl;
-        
-        $ssl->set_msg_callback(undef);
-        
-        unless ($msg_callback_results->[0]->(int) >= 0) {
-          $success_ref->[0] = 0;
-        }
-        
-        unless ($msg_callback_results->[1]->(int) >= 0) {
-          $success_ref->[0] = 0;
-        }
-        
-        unless ($msg_callback_results->[2]->(int) > 0) {
-          $success_ref->[0] = 0;
-        }
-        
-        unless (length $msg_callback_results->[3]->(string) > 0) {
-          $success_ref->[0] = 0;
-        }
-        
-        unless ($msg_callback_results->[4]->(int) > 0) {
-          $success_ref->[0] = 0;
-        }
-        
-        unless ($msg_callback_results->[5]->(Hash)->get("ssl") is_type Net::SSLeay) {
-          $success_ref->[0] = 0;
-        }
-        
-        my $certificate = $ssl->get_certificate;
-        
-        my $peer_certificate = $ssl->get_peer_certificate;
-        
-        unless ($peer_certificate->get_subject_name->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=simple-cert.net-ssleay.example") {
-          $success_ref->[0] = 0;
-        }
-        
-        my $peer_cert_chains = $ssl->get_peer_cert_chain;
-        
-        unless (@$peer_cert_chains == 3) {
-          $success_ref->[0] = 0;
-        }
-        
-        unless ($peer_cert_chains->[0]->get_subject_name->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=simple-cert.net-ssleay.example") {
-          $success_ref->[0] = 0;
-        }
-        
-        unless ($peer_cert_chains->[1]->get_subject_name->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=Intermediate CA") {
-          $success_ref->[0] = 0;
-        }
-        
-        unless ($peer_cert_chains->[2]->get_subject_name->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=Root CA") {
-          $success_ref->[0] = 0;
-        }
-        
-        my $dump_peer_certificate = $ssl->dump_peer_certificate;
-        
-        unless (Fn->contains($dump_peer_certificate, "Subject Name: /C=PL/O=Net-SSLeay/OU=Test Suite/CN=simple-cert.net-ssleay.example")) {
-          $success_ref->[0] = 0;
-        }
-        
-        unless (Fn->contains($dump_peer_certificate, "Issuer  Name: /C=PL/O=Net-SSLeay/OU=Test Suite/CN=Intermediate CA")) {
-          $success_ref->[0] = 0;
-        }
-        
-        my $alpn_selected_protocol = $ssl->get0_alpn_selected_return_string;
-        
-        unless ($alpn_selected_protocol eq "http/1.1") {
-          $success_ref->[0] = 0;
-        }
-        
-        my $cipher = $ssl->get_cipher;
-        
-        unless ($cipher && !Fn->contains($cipher, "NONE")) {
-          $success_ref->[0] = 0;
-        }
-        
-        my $write_buffer = "abc";
           
-        $socket->syswrite($write_buffer);
-        
-        $socket->syswrite("\0");
-        
-        my $string_buffer = StringBuffer->new;
-        
-        my $recv_buffer = (mutable string)new_string_len 1;
-        
-        while (1) {
-          
-          my $recv_length = -1;
-          
-          eval { $recv_length = $socket->sysread($recv_buffer); }
-          
-          if ($recv_length > 0) {
-            $string_buffer->push($recv_buffer);
+          unless ($msg_callback_results->[1]->(int) >= 0) {
+            $success_ref->[0] = 0;
           }
-          else {
-            last;
+          
+          unless ($msg_callback_results->[2]->(int) > 0) {
+            $success_ref->[0] = 0;
           }
+          
+          unless (length $msg_callback_results->[3]->(string) > 0) {
+            $success_ref->[0] = 0;
+          }
+          
+          unless ($msg_callback_results->[4]->(int) > 0) {
+            $success_ref->[0] = 0;
+          }
+          
+          unless ($msg_callback_results->[5]->(Hash)->get("ssl") is_type Net::SSLeay) {
+            $success_ref->[0] = 0;
+          }
+          
+          my $certificate = $ssl->get_certificate;
+          
+          my $peer_certificate = $ssl->get_peer_certificate;
+          
+          unless ($peer_certificate->get_subject_name->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=simple-cert.net-ssleay.example") {
+            $success_ref->[0] = 0;
+          }
+          
+          my $peer_cert_chains = $ssl->get_peer_cert_chain;
+          
+          unless (@$peer_cert_chains == 3) {
+            $success_ref->[0] = 0;
+          }
+          
+          unless ($peer_cert_chains->[0]->get_subject_name->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=simple-cert.net-ssleay.example") {
+            $success_ref->[0] = 0;
+          }
+          
+          unless ($peer_cert_chains->[1]->get_subject_name->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=Intermediate CA") {
+            $success_ref->[0] = 0;
+          }
+          
+          unless ($peer_cert_chains->[2]->get_subject_name->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=Root CA") {
+            $success_ref->[0] = 0;
+          }
+          
+          my $dump_peer_certificate = $ssl->dump_peer_certificate;
+          
+          unless (Fn->contains($dump_peer_certificate, "Subject Name: /C=PL/O=Net-SSLeay/OU=Test Suite/CN=simple-cert.net-ssleay.example")) {
+            $success_ref->[0] = 0;
+          }
+          
+          unless (Fn->contains($dump_peer_certificate, "Issuer  Name: /C=PL/O=Net-SSLeay/OU=Test Suite/CN=Intermediate CA")) {
+            $success_ref->[0] = 0;
+          }
+          
+          my $alpn_selected_protocol = $ssl->get0_alpn_selected_return_string;
+          
+          unless ($alpn_selected_protocol eq "http/1.1") {
+            $success_ref->[0] = 0;
+          }
+          
+          my $cipher = $ssl->get_cipher;
+          
+          unless ($cipher && !Fn->contains($cipher, "NONE")) {
+            $success_ref->[0] = 0;
+          }
+          
+          my $write_buffer = "abc";
+            
+          $socket->syswrite($write_buffer);
+          
+          $socket->syswrite("\0");
+          
+          my $string_buffer = StringBuffer->new;
+          
+          my $recv_buffer = (mutable string)new_string_len 1;
+          
+          while (1) {
+            
+            my $recv_length = -1;
+            
+            eval { $recv_length = $socket->sysread($recv_buffer); }
+            
+            if ($recv_length > 0) {
+              $string_buffer->push($recv_buffer);
+            }
+            else {
+              last;
+            }
+          }
+          
+          unless ($string_buffer->to_string eq "abc") {
+            $success_ref->[0] = 0;
+          }
+          
+          unless ($ssl->get_shutdown == SSL->SSL_RECEIVED_SHUTDOWN) {
+            $success_ref->[0] = 0;
+          }
+          
+          $socket->shutdown_SSL;
         }
         
-        unless ($string_buffer->to_string eq "abc") {
-          $success_ref->[0] = 0;
-        }
-        
-        unless ($ssl->get_shutdown == SSL->SSL_RECEIVED_SHUTDOWN) {
-          $success_ref->[0] = 0;
-        }
-        
-        $socket->shutdown_SSL;
-      }
-      
+      });
+      $wg->wait;
     });
     
     Go->gosched;
-    
-    $wg->wait;
     
     unless ($go_server_ref->[0]) {
       return 0;
@@ -343,50 +344,51 @@ class TestCase::IO::Socket::SSL {
   static method client_and_server_no_connect_SSL : int ($port : int) {
     
     my $success_ref = [1];
-    
-    my $wg = Go::Sync::WaitGroup->new;
-    
-    $wg->add(2);
-    
-    # Run a echo server
-    my $go_server_ref = [0];
-    Go->go([$go_server_ref : int[], $wg : Go::Sync::WaitGroup, $port : int] method : void () {
-      
-      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
-        $wg->done;
-      });
-      
-      $go_server_ref->[0] = 1;
-      
-      &run_echo_server_accept_once($port);
-    });
-    
-    # Tests
     my $go_tests_ref = [0];
-    Go->go([$go_tests_ref : int[], $wg : Go::Sync::WaitGroup, $success_ref : int[], $port : int] method : void () {
+    my $go_server_ref = [0];
+    
+    Go->go([$go_server_ref : int[], $success_ref : int[], $go_tests_ref : int[], $port : int] method : void () {
+      my $wg = Go::Sync::WaitGroup->new;
       
-      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
-        $wg->done;
-      });
+      $wg->add(2);
       
-      $go_tests_ref->[0] = 1;
-      
-      {
-        my $host = "127.0.0.1";
-        my $socket = IO::Socket::SSL->new({
-          PeerAddr => $host,
-          PeerPort => $port,
-          SSL_startHandshake => 0,
-          SSL_verify_mode => SSL->SSL_VERIFY_NONE,
+      # Run a echo server
+      Go->go([$go_server_ref : int[], $wg : Go::Sync::WaitGroup, $port : int] method : void () {
+        
+        Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+          $wg->done;
         });
         
-      }
+        $go_server_ref->[0] = 1;
+        
+        &run_echo_server_accept_once($port);
+      });
       
+      # Tests
+      Go->go([$go_tests_ref : int[], $wg : Go::Sync::WaitGroup, $success_ref : int[], $port : int] method : void () {
+        
+        Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+          $wg->done;
+        });
+        
+        $go_tests_ref->[0] = 1;
+        
+        {
+          my $host = "127.0.0.1";
+          my $socket = IO::Socket::SSL->new({
+            PeerAddr => $host,
+            PeerPort => $port,
+            SSL_startHandshake => 0,
+            SSL_verify_mode => SSL->SSL_VERIFY_NONE,
+          });
+          
+        }
+        
+      });
+      $wg->wait;
     });
     
     Go->gosched;
-    
-    $wg->wait;
     
     unless ($go_server_ref->[0]) {
       return 0;
@@ -402,111 +404,112 @@ class TestCase::IO::Socket::SSL {
   static method client_and_server_SSL_key_SSL_cert : int ($port : int) {
     
     my $success_ref = [1];
-    
-    my $wg = Go::Sync::WaitGroup->new;
-    
-    $wg->add(2);
-    
-    # Run a echo server
-    my $go_server_ref = [0];
-    Go->go([$go_server_ref : int[], $wg : Go::Sync::WaitGroup, $port : int] method : void () {
-      
-      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
-        $wg->done;
-      });
-      
-      $go_server_ref->[0] = 1;
-      
-      &run_echo_server_accept_once($port);
-    });
-    
-    # Tests
     my $go_tests_ref = [0];
-    Go->go([$go_tests_ref : int[], $wg : Go::Sync::WaitGroup, $success_ref : int[], $port : int] method : void () {
+    my $go_server_ref = [0];
+    
+    Go->go([$go_server_ref : int[], $success_ref : int[], $go_tests_ref : int[], $port : int] method : void () {
+      my $wg = Go::Sync::WaitGroup->new;
       
-      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
-        $wg->done;
-      });
+      $wg->add(2);
       
-      $go_tests_ref->[0] = 1;
-      
-      {
-        my $certs_list = List->new(new Net::SSLeay::X509[0]);
+      # Run a echo server
+      Go->go([$go_server_ref : int[], $wg : Go::Sync::WaitGroup, $port : int] method : void () {
         
-        my $bio_cert = Net::SSLeay::BIO->new_file( "$FILE_DIR/simple-cert.cert.pem", "r");
-        
-        my $cert = Net::SSLeay::PEM->read_bio_X509($bio_cert);
-        $certs_list->push($cert);
-        
-        my $bio_chain_certs = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.certchain.pem", "r");
-        
-        my $chain_certs_list = List->new(new Net::SSLeay::X509[0]);
-        while (1) {
-          my $chain_cert = (Net::SSLeay::X509)undef;
-          
-          eval { $chain_cert = Net::SSLeay::PEM->read_bio_X509($bio_chain_certs); }
-          
-          if ($@) {
-            if (eval_error_id isa_error Net::SSLeay::Error::PEM_R_NO_START_LINE) {
-              last;
-            }
-            else {
-              die $@;
-            }
-          }
-          
-          $certs_list->push($chain_cert);
-        }
-        
-        my $certs = (Net::SSLeay::X509[])$certs_list->to_array;
-        
-        my $bio_pkey = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.key.pem", "r");
-        
-        my $pkey = Net::SSLeay::PEM->read_bio_PrivateKey($bio_pkey);
-        
-        my $host = "127.0.0.1";
-        my $socket = IO::Socket::SSL->new({
-          PeerAddr => $host,
-          PeerPort => $port,
-          SSL_verify_mode => SSL->SSL_VERIFY_NONE,
-          SSL_cert => $certs,
-          SSL_key => $pkey,
+        Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+          $wg->done;
         });
         
-        my $write_buffer = "abc";
-          
-        $socket->syswrite($write_buffer);
+        $go_server_ref->[0] = 1;
         
-        $socket->syswrite("\0");
-        
-        my $string_buffer = StringBuffer->new;
-        
-        my $recv_buffer = (mutable string)new_string_len 1;
-        
-        while (1) {
-          
-          my $recv_length = -1;
-          
-          eval { $recv_length = $socket->sysread($recv_buffer); }
-          
-          if ($recv_length > 0) {
-            $string_buffer->push($recv_buffer);
-          }
-          else {
-            last;
-          }
-        }
-        
-        unless ($string_buffer->to_string eq "abc") {
-          $success_ref->[0] = 0;
-        }
-      }
+        &run_echo_server_accept_once($port);
+      });
       
+      # Tests
+      Go->go([$go_tests_ref : int[], $wg : Go::Sync::WaitGroup, $success_ref : int[], $port : int] method : void () {
+        
+        Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+          $wg->done;
+        });
+        
+        $go_tests_ref->[0] = 1;
+        
+        {
+          my $certs_list = List->new(new Net::SSLeay::X509[0]);
+          
+          my $bio_cert = Net::SSLeay::BIO->new_file( "$FILE_DIR/simple-cert.cert.pem", "r");
+          
+          my $cert = Net::SSLeay::PEM->read_bio_X509($bio_cert);
+          $certs_list->push($cert);
+          
+          my $bio_chain_certs = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.certchain.pem", "r");
+          
+          my $chain_certs_list = List->new(new Net::SSLeay::X509[0]);
+          while (1) {
+            my $chain_cert = (Net::SSLeay::X509)undef;
+            
+            eval { $chain_cert = Net::SSLeay::PEM->read_bio_X509($bio_chain_certs); }
+            
+            if ($@) {
+              if (eval_error_id isa_error Net::SSLeay::Error::PEM_R_NO_START_LINE) {
+                last;
+              }
+              else {
+                die $@;
+              }
+            }
+            
+            $certs_list->push($chain_cert);
+          }
+          
+          my $certs = (Net::SSLeay::X509[])$certs_list->to_array;
+          
+          my $bio_pkey = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.key.pem", "r");
+          
+          my $pkey = Net::SSLeay::PEM->read_bio_PrivateKey($bio_pkey);
+          
+          my $host = "127.0.0.1";
+          my $socket = IO::Socket::SSL->new({
+            PeerAddr => $host,
+            PeerPort => $port,
+            SSL_verify_mode => SSL->SSL_VERIFY_NONE,
+            SSL_cert => $certs,
+            SSL_key => $pkey,
+          });
+          
+          my $write_buffer = "abc";
+            
+          $socket->syswrite($write_buffer);
+          
+          $socket->syswrite("\0");
+          
+          my $string_buffer = StringBuffer->new;
+          
+          my $recv_buffer = (mutable string)new_string_len 1;
+          
+          while (1) {
+            
+            my $recv_length = -1;
+            
+            eval { $recv_length = $socket->sysread($recv_buffer); }
+            
+            if ($recv_length > 0) {
+              $string_buffer->push($recv_buffer);
+            }
+            else {
+              last;
+            }
+          }
+          
+          unless ($string_buffer->to_string eq "abc") {
+            $success_ref->[0] = 0;
+          }
+        }
+        
+      });
+      $wg->wait;
     });
     
     Go->gosched;
-    
-    $wg->wait;
     
     unless ($go_server_ref->[0]) {
       return 0;

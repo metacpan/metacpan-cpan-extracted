@@ -41,18 +41,6 @@ Examples:
 
   $ws->on(binary => method : void ($ws : Mojo::Transaction::WebSocket, $bytes : string) { say "Binary: $bytes"; });
 
-=head2 drain
-
-Emitted once all data has been sent.
-
-Callback:
-
-C<method : void ($ws : L<Mojo::Transaction::WebSocket|SPVM::Mojo::Transaction::WebSocket>);>
-
-Examples:
-
-  $ws->on(drain => method : void ($ws : Mojo::Transaction::WebSocket) { $ws->send(time) });
-
 =head2 finish
 
 Emitted when the WebSocket connection has been closed.
@@ -291,10 +279,9 @@ Resume L</"handshake"> transaction.
 
 =head2 send
 
-C<method send : void ($msg : string|object[]|L<Mojo::WebSocket::Frame|SPVM::Mojo::WebSocket::Frame>, $cb : L<Mojo::Callback|SPVM::Mojo::Callback> = undef);>
+C<method send : void ($msg : string|object[]|L<Mojo::WebSocket::Frame|SPVM::Mojo::WebSocket::Frame>);>
 
-Send message or frame non-blocking via WebSocket, the optional drain callback will be executed once all data has been
-written.
+Send message or frame non-blocking via WebSocket.
 
 Examples:
 

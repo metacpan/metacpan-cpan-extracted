@@ -1,3 +1,6 @@
+0.004     2026-01-07 01:53:35 EST
+  - Deprecate and replace with an empty subclass as the optimizations have been integrated into Protocol::Redis.
+
 0.003     2019-09-01 09:42:19 EDT
   - Fix parsing of empty bulk string (und3f, #1)
 

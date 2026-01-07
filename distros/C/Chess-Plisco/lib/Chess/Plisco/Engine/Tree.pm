@@ -1,6 +1,6 @@
 #! /bin/false
 
-# Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2021-2026 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software. It comes without any warranty, to
@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine::Tree;
-$Chess::Plisco::Engine::Tree::VERSION = 'v1.0.1';
+$Chess::Plisco::Engine::Tree::VERSION = 'v1.0.2';
 use strict;
 use integer;
 
@@ -19,6 +19,7 @@ use Locale::TextDomain ('Chess-Plisco');
 use Chess::Plisco qw(:all);
 # Macros from Chess::Plisco::Macro are already expanded here!
 use Chess::Plisco::Engine::Position qw(CP_POS_REVERSIBLE_CLOCK);
+use Chess::Plisco::Engine::Constants;
 
 use Time::HiRes qw(tv_interval);
 
@@ -26,11 +27,6 @@ use constant DEBUG => $ENV{DEBUG_PLISCO_TREE};
 
 use constant CP_POS_SIGNATURE => Chess::Plisco::Engine::Position::CP_POS_SIGNATURE();
 use constant CP_POS_REVERSIBLE_CLOCK => Chess::Plisco::Engine::Position::CP_POS_REVERSIBLE_CLOCK();
-
-use constant MATE => -15000;
-use constant INF => 16383;
-use constant MAX_PLY => 512;
-use constant DRAW => 0;
 
 use Chess::Plisco::Engine::TranspositionTable;
 
@@ -205,11 +201,12 @@ sub printPV {
 	my $position = $self->{start};
 	my $score = $self->{score};
 	my $mate_in;
-	if ($score >= -(MATE + MAX_PLY)) {
-		$mate_in = (1 - (MATE + $score)) >> 1;
-	} elsif ($score <= (MATE + MAX_PLY)) {
+	if ($score >= MATE - MAX_PLY) {
 		use integer;
 		$mate_in = (MATE - $score) >> 1;
+	} elsif ($score <= (-MATE + MAX_PLY)) {
+		use integer;
+		$mate_in = -((-(-MATE - $score)) >> 1);
 	}
 
 	my $nodes = $self->{nodes};
@@ -218,30 +215,46 @@ sub printPV {
 	my $scorestr = $mate_in ? "mate $mate_in" : "cp $score";
 	my $pv = join ' ', $position->movesCoordinateNotation(@$pline);
 	my $time = int(0.5 + (1000 * $elapsed));
+	my $hashfull = $self->{tt}->hashfull;
 	$self->{info}->("depth $self->{depth} seldepth $self->{seldepth}"
-			. " score $scorestr nodes $nodes nps $nps time $time pv $pv");
+			. " score $scorestr nodes $nodes nps $nps hashfull $hashfull"
+			. " time $time pv $pv");
 	if ($self->{__debug}) {
 		$self->{info}->("tt_hits $self->{tt_hits}") if $self->{__debug};
 	}
 }
 
-sub quiesce; # Make it invokable without a method call.
+# Make them invokable without a method call.
+sub quiesce;
+
 
 
 sub alphabeta {
-	my ($self, $ply, $depth, $alpha, $beta, $pline) = @_;
+	my ($self, $ply, $depth, $alpha, $beta, $pline, $node_type, $cut_node, $tt_pvs) = @_;
 
 	if ($self->{nodes} >= $self->{nodes_to_tc}) {
 		$self->checkTime;
 	}
 
+	my $pv_node = $node_type != PV_NODE;
+
+	if ($depth <= 0) {
+		return quiesce($self, $ply, $alpha, $beta, $pv_node ? PV_NODE : NON_PV_NODE);
+	}
+
+	$depth = ((($depth) < (MAX_PLY - 1)) ? ($depth) : (MAX_PLY - 1));
+
+	my $root_node = $node_type == ROOT_NODE;
+	my $all_node = !($pv_node || $cut_node);
+
 	my $position = $self->{position};
 
 	if (DEBUG) {
-		my $hex_signature = sprintf '%016x', $position->signature;
+		my $hex_signature = sprintf '%016x', $position->[CP_POS_SIGNATURE];
 		my $line = join ' ', @{$self->{line}};
 		my $fen = $position->toFEN;
-		$self->indent($ply, "alphabeta: alpha = $alpha, beta = $beta, line: $line,"
+		my $node_type_name = NODE_TYPES->[$node_type];
+		$self->indent($ply, "alphabeta<$node_type_name>: alpha = $alpha, beta = $beta, line: $line,"
 			. " depth: $depth, sig: $hex_signature $fen");
 	}
 
@@ -274,37 +287,46 @@ sub alphabeta {
 		}
 	}
 
+	# Transposition table lookup.
 	my $tt = $self->{tt};
-	my $tt_move;
 	if (DEBUG) {
 		my $hex_sig = sprintf '%016x', $signature;
 		$self->indent($ply, "TT probe $hex_sig \@depth $depth, alpha = $alpha, beta = $beta");
 	}
-	my $tt_value = $tt->probe($signature, $ply, $depth, $alpha, $beta, \$tt_move);
+	my ($tt_hit, $tt_depth, $tt_bound, $tt_move, $tt_value, $tt_eval,
+		$tt_pv, @tt_address) = $tt->probe($signature);
 
-	if (DEBUG) {
-		if ($tt_move) {
-			my $cn = $position->moveCoordinateNotation($tt_move);
-			$self->indent($ply, "best move: $cn");
-		}
-	}
-	if (defined $tt_value) {
-		++$self->{tt_hits};
-		if ($tt_move && $ply == 1) {
-			@$pline = ($tt_move);
-			$self->{score} = $tt_value;
-		}
+	$tt_move = 0 if ($root_node || !$tt_hit);
+	$tt_value = (do {	if ($tt_value >= VALUE_TB_WIN_IN_MAX_PLY) {		if ($tt_value >= MATE_IN_MAX_PLY && MATE - $tt_value > 100 - $position->[CP_POS_HALFMOVE_CLOCK]) {			VALUE_TB_WIN_IN_MAX_PLY - 1		} elsif (VALUE_TB_WIN_IN_MAX_PLY - $tt_value > 100 - $position->[CP_POS_HALFMOVE_CLOCK]) {			VALUE_TB_WIN_IN_MAX_PLY - 1		} else {			$tt_value - $ply;		}	} elsif ($tt_value <= VALUE_TB_LOSS_IN_MAX_PLY) {		if ($tt_value <= MATED_IN_MAX_PLY && MATE + $tt_value > 100 - $position->[CP_POS_HALFMOVE_CLOCK]) {			VALUE_TB_LOSS_IN_MAX_PLY + 1;		} elsif (VALUE_TB_LOSS_IN_MAX_PLY + $tt_value > 100 - $position->[CP_POS_HALFMOVE_CLOCK]) {			VALUE_TB_LOSS_IN_MAX_PLY + 1;		} else {			$tt_value + $ply;		}	} else {		$tt_value;	}})
+		if $tt_hit && defined $tt_value;
+	$tt_pvs->[$ply] = $pv_node || ($tt_hit && $tt_pv);
+	my $pv_hit = $tt_hit && $tt_pv;
 
+	if ($tt_hit && defined $tt_value && $tt_depth >= $depth) {
 		if (DEBUG) {
-			my $hex_sig = sprintf '%016x', $signature;
-			my $cn = $position->moveCoordinateNotation($tt_move);
-			$self->indent($ply, "TT hit for $hex_sig, value $tt_value, best move $cn");
+			if ($tt_move) {
+				my $cn = $position->moveCoordinateNotation($tt_move);
+				$self->indent($ply, "best move: $cn");
+			}
 		}
-		return $tt_value;
-	}
+		if ($tt_move
+		    && ($tt_bound == BOUND_EXACT
+		        || ($tt_bound == BOUND_LOWER && $tt_value >= $beta)
+		        || ($tt_bound == BOUND_UPPER && $tt_value <= $alpha))) {
+			++$self->{tt_hits};
+			if ($ply == 1) {
+				@$pline = ($tt_move);
+				$self->{score} = $tt_value;
+			}
 
-	if ($depth <= 0) {
-		return quiesce($self, $ply, $alpha, $beta);
+			if (DEBUG) {
+				my $hex_sig = sprintf '%016x', $signature;
+				my $cn = $position->moveCoordinateNotation($tt_move);
+				$self->indent($ply, "TT hit for $hex_sig, value $tt_value, best move $cn");
+			}
+
+			return $tt_value;
+		}
 	}
 
 	my @moves = $position->pseudoLegalMoves;
@@ -312,6 +334,7 @@ sub alphabeta {
 	# Sort moves. FIXME!!!! Bad captures must be searched *after* the
 	# quiet moves.
 	my $pv_move;
+
 	$pv_move = $pline->[$ply - 1] if @$pline >= $ply;
 	my (@pv, @tt, @promotions, @checks, @good_captures, @k1, @k2, @k3, @quiet, @bad_captures);
 	my $killers = $self->{killers}->[$ply];
@@ -428,7 +451,6 @@ sub alphabeta {
 	my $moveno = 0;
 	my $pv_found;
 	my $is_null_window = $beta - $alpha == 1;
-	my $tt_type = Chess::Plisco::Engine::TranspositionTable::TT_SCORE_ALPHA();
 	my $best_move = 0;
 	my $print_current_move = $ply == 1 && $self->{print_current_move};
 	my $signature_slot = $self->{history_length} + $ply;
@@ -452,20 +474,21 @@ sub alphabeta {
 			if (DEBUG) {
 				$self->indent($ply, "null window search");
 			}
-			$score = -alphabeta($self, $ply + 1, $depth - 1, -$alpha - 1, -$alpha, \@line);
+			$score = -alphabeta($self, $ply + 1, $depth - 1, -$alpha - 1, -$alpha, \@line, NON_PV_NODE, $tt_pvs);
 			if (($score > $alpha) && ($score < $beta)) {
 				if (DEBUG) {
 					$self->indent($ply, "value $score outside null window, re-search");
 				}
 				undef @line;
-				$score = -alphabeta($self, $ply + 1, $depth - 1, -$beta, -$alpha, \@line);
+				$score = -alphabeta($self, $ply + 1, $depth - 1, -$beta, -$alpha, \@line, NON_PV_NODE, $tt_pvs);
 			}
 		} else {
 			if (DEBUG) {
 				$self->indent($ply, "recurse normal search");
 			}
-			$score = -alphabeta($self, $ply + 1, $depth - 1, -$beta, -$alpha, \@line);
+			$score = -alphabeta($self, $ply + 1, $depth - 1, -$beta, -$alpha, \@line, $pv_node ? PV_NODE : NON_PV_NODE, $tt_pvs);
 		}
+
 		++$legal;
 		++$moveno;
 		if (DEBUG) {
@@ -476,7 +499,7 @@ sub alphabeta {
 		if (DEBUG) {
 			pop @{$self->{line}};
 		}
-		if ($ply == 1) {
+		if ($node_type == ROOT_NODE) {
 			$self->{average_score} =
 				$self->{average_score} != -INF ? ($score + $self->{average_score}) >> 1 : 3.75 * $score;
 			$self->{move_efforts}->{$move} += $self->{nodes} - $nodes_before;
@@ -485,7 +508,6 @@ sub alphabeta {
 		if ($score > $best_value) {
 			$best_value = $score;
 			$best_move = $move;
-			$tt_type = Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT();
 
 			if ($score > $alpha) {
 				$alpha = $score;
@@ -507,10 +529,14 @@ sub alphabeta {
 				my $cn = $position->moveCoordinateNotation($move);
 				$self->indent($ply, "$cn fail high ($score >= $beta), store $score(BETA) \@depth $depth for $hex_sig");
 			}
-			$tt->store($signature, $depth,
-				Chess::Plisco::Engine::TranspositionTable::TT_SCORE_BETA(),
-				$score, $move);
-
+			$tt->store(
+				@tt_address, # Information about destination.
+				$signature, # Position key.
+				(do {	(($score >= VALUE_TB_WIN_IN_MAX_PLY) ? $score + $ply : ($score <= VALUE_TB_LOSS_IN_MAX_PLY) ? $score - $ply : $score);}), # Mate corrections.
+				0, # PV flag.
+				BOUND_LOWER,
+				$depth,
+				$move);
 
 			# Quiet move or bad capture failing high?
 			my $first_quiet = 1 + (scalar @moves) - (scalar @quiet) - (scalar @bad_captures);
@@ -520,7 +546,6 @@ sub alphabeta {
 					$self->indent($ply, "$cn is quiet and becomes new killer move");
 				}
 
-				# We also allow bad captures to be a killer move.
 				my $killers = $self->{killers}->[$ply];
 				($killers->[0], $killers->[1]) = ($move, $killers->[0]);
 
@@ -540,63 +565,86 @@ sub alphabeta {
 				}
 			}
 
-			return $best_value;
+			return $score;
 		}
 	}
 
-	my $hash_value = $best_value;
+	my $tt_type;
 	if (!$legal) {
 		# Mate or stalemate.
-		if (!$position->inCheck) {
-			$hash_value = $best_value = DRAW;
+		if ($position->inCheck) {
+			$best_value = -MATE + $ply;
 		} else {
-			$hash_value = MATE;
-			$best_value = MATE + $ply;
+			$best_value = DRAW;
 		}
-		$tt_type = Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT();
-
+		$tt_type = BOUND_EXACT;
+		$depth = (((MAX_PLY - 1) < ($depth + 6)) ? (MAX_PLY - 1) : ($depth + 6));
 		if (DEBUG) {
 			$self->indent($ply, "mate/stalemate, score: $best_value");
 		}
+	} elsif ($best_value >= $beta) {
+		$tt_type = BOUND_LOWER;
+	} elsif ($best_move && $pv_node) {
+		$tt_type = BOUND_EXACT;
+	} else {
+		$tt_type = BOUND_UPPER;
 	}
 
 	if (DEBUG) {
 		my $hex_sig = sprintf '%016x', $signature;
-		if ($is_null_window && $tt_type == Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT()) {
+		if ($is_null_window && $tt_type == BOUND_EXACT) {
 			$self->indent($ply, "returning best value $best_value without tt store for $hex_sig");
 		} else {
 			my $type;
-			if ($tt_type == TT_SCORE_ALPHA) {
-				$type = 'ALPHA';
+			if ($tt_type == BOUND_UPPER) {
+				$type = 'BOUND_UPPER';
 			} else {
-				$type = 'EXACT';
+				$type = 'BOUND_EXACT';
 			}
-			$self->indent($ply, "returning best value $best_value, store ($type) \@depth $depth for $hex_sig");
+			my $value = (do {	(($best_value >= VALUE_TB_WIN_IN_MAX_PLY) ? $best_value + $ply : ($best_value <= VALUE_TB_LOSS_IN_MAX_PLY) ? $best_value - $ply : $best_value);});
+			$self->indent($ply, "returning best value $best_value, store $value ($type) \@depth $depth for $hex_sig");
 		}
 	}
 
-	$tt->store($signature, $depth, $tt_type, $hash_value, $best_move)
-		if !($is_null_window && $tt_type == Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT());
+	# Taken from Stockfish: If no good move is found and the previous position
+	# was ttPv, then the previous opponent move is probably good and the new
+	# position is added to the search tree.
+	if ($best_value <= $alpha) {
+		$tt_pvs->[-1] = $tt_pvs->[-1] || $tt_pvs->[-2];
+	}
+
+	$tt->store(
+		@tt_address, # Address.
+		$signature, # Zobrist key.
+		(do {	(($best_value >= VALUE_TB_WIN_IN_MAX_PLY) ? $best_value + $ply : ($best_value <= VALUE_TB_LOSS_IN_MAX_PLY) ? $best_value - $ply : $best_value);}), # score, mate distance adjusted.
+		$tt_pvs->[-1], # PV flag.
+		$tt_type, # BOUND_EXACT/TT_SCORE_ALPHA/TT_SCORE_LOWER.
+		$depth, # Depth searched.
+		$best_move # Best move at this node.
+	) if !($is_null_window && $tt_type == BOUND_EXACT);
 
 	return $best_value;
 }
 
 sub quiesce {
-	my ($self, $ply, $alpha, $beta) = @_;
+	my ($self, $ply, $alpha, $beta, $node_type) = @_;
 
 	if ($self->{nodes} >= $self->{nodes_to_tc}) {
 		$self->checkTime;
 	}
+
+	my $pv_node = $node_type != NON_PV_NODE;
 
 	$self->{seldepth} = ((($ply) > ($self->{seldepth})) ? ($ply) : ($self->{seldepth}));
 
 	my $position = $self->{position};
 
 	if (DEBUG) {
-		my $hex_signature = sprintf '%016x', $position->signature;
+		my $hex_signature = sprintf '%016x', $position->[CP_POS_SIGNATURE];
 		my $line = join ' ', @{$self->{line}};
+		my $fen = $position->fen;
 		$self->indent($ply, "quiescence: alpha = $alpha, beta = $beta, line: $line,"
-			. " sig: $hex_signature $position");
+			. " sig: $hex_signature $fen");
 	}
 
 	# Expand the search, when in check.
@@ -604,17 +652,23 @@ sub quiesce {
 		if (DEBUG) {
 			$self->indent($ply, "quiescence check extension");
 		}
-		return alphabeta($self, $ply, 1, $alpha, $beta, []);
+		return alphabeta($self, $ply, 1, $alpha, $beta, [], $node_type, [$pv_node]);
 	}
 
 	my $tt = $self->{tt};
 	my $signature = $position->[CP_POS_SIGNATURE];
-	my $tt_move;
 	if (DEBUG) {
 		my $hex_sig = sprintf '%016x', $signature;
-		$self->indent($ply, "quiescence TT probe $hex_sig \@depth 0, alpha = $alpha, beta = $beta");
+		$self->indent($ply, "TT probe $hex_sig, alpha = $alpha, beta = $beta");
 	}
-	my $tt_value = $tt->probe($signature, $ply, 0, $alpha, $beta, \$tt_move);
+	my ($tt_hit, $tt_depth, $tt_bound, $tt_move, $tt_value, $tt_eval,
+		$tt_pv, @tt_address) = $tt->probe($signature);
+
+	$tt_move = 0 if !$tt_hit;
+	$tt_value = (do {	if ($tt_value >= VALUE_TB_WIN_IN_MAX_PLY) {		if ($tt_value >= MATE_IN_MAX_PLY && MATE - $tt_value > 100 - $position->[CP_POS_HALFMOVE_CLOCK]) {			VALUE_TB_WIN_IN_MAX_PLY - 1		} elsif (VALUE_TB_WIN_IN_MAX_PLY - $tt_value > 100 - $position->[CP_POS_HALFMOVE_CLOCK]) {			VALUE_TB_WIN_IN_MAX_PLY - 1		} else {			$tt_value - $ply;		}	} elsif ($tt_value <= VALUE_TB_LOSS_IN_MAX_PLY) {		if ($tt_value <= MATED_IN_MAX_PLY && MATE + $tt_value > 100 - $position->[CP_POS_HALFMOVE_CLOCK]) {			VALUE_TB_LOSS_IN_MAX_PLY + 1;		} elsif (VALUE_TB_LOSS_IN_MAX_PLY + $tt_value > 100 - $position->[CP_POS_HALFMOVE_CLOCK]) {			VALUE_TB_LOSS_IN_MAX_PLY + 1;		} else {			$tt_value + $ply;		}	} else {		$tt_value;	}})
+		if $tt_hit && defined $tt_value;
+	my $pv_hit = $tt_hit && $tt_pv;
+
 	if (DEBUG) {
 		if ($tt_move) {
 			my $cn = $position->moveCoordinateNotation($tt_move);
@@ -622,12 +676,15 @@ sub quiesce {
 		}
 	}
 
-	if (defined $tt_value) {
+	if (!$pv_node && $tt_depth >= DEPTH_QUIESCENCE
+	    && defined $tt_value
+		&& $tt_bound & ($tt_value >= $beta ? BOUND_LOWER : BOUND_UPPER)) {
 		if (DEBUG) {
 			my $hex_sig = sprintf '%016x', $signature;
 			$self->indent($ply, "quiescence TT hit for $hex_sig, value $tt_value");
 		}
 		++$self->{tt_hits};
+
 		return $tt_value;
 	}
 
@@ -640,26 +697,32 @@ sub quiesce {
 	if ($best_value >= $beta) {
 		if (DEBUG) {
 			my $hex_sig = sprintf '%016x', $signature;
-			if ($is_null_window) {
+			if ($is_null_window || $tt_hit) {
 				$self->indent($ply, "quiescence standing pat ($best_value >= $beta) without tt store for $hex_sig");
 			} else {
-				$self->indent($ply, "quiescence standing pat ($best_value >= $beta), store $best_value(EXACT) \@depth 0 for $hex_sig");
+				$self->indent($ply, "quiescence standing pat ($best_value >= $beta), store no move value $best_value(EXACT) \@depth 0 for $hex_sig");
 			}
 		}
-		# FIXME! Is that correct?
-		$tt->store($signature, 0,
-			Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT(),
-			$best_value, 0
-		) if !$is_null_window ;
+
+		if (!($best_value >= VALUE_TB_WIN_IN_MAX_PLY
+				|| $best_value <= VALUE_TB_LOSS_IN_MAX_PLY)) {
+			$best_value = ($best_value + $beta) >> 1;
+		}
+		$tt->store(
+			@tt_address,
+			$signature,
+			(do {	(($best_value >= VALUE_TB_WIN_IN_MAX_PLY) ? $best_value + $ply : ($best_value <= VALUE_TB_LOSS_IN_MAX_PLY) ? $best_value - $ply : $best_value);}),
+			0,
+			BOUND_LOWER,
+			DEPTH_UNSEARCHED,
+			0,
+		);
 
 		return $best_value;
 	}
 
-	my $tt_type = Chess::Plisco::Engine::TranspositionTable::TT_SCORE_ALPHA();
 	if ($best_value > $alpha) {
 		$alpha = $best_value;
-		# FIXME! Correct?
-		$tt_type = Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT();
 	}
 
 	my @moves = $position->pseudoLegalAttacks;
@@ -686,7 +749,6 @@ sub quiesce {
 	my @backup = @$position;
 
 	my $legal = 0;
-	my $tt_type = Chess::Plisco::Engine::TranspositionTable::TT_SCORE_ALPHA();
 	my $best_move = 0;
 	foreach my $move (@moves) {
 		next if !$position->checkPseudoLegalMove($move, @check_info);
@@ -702,7 +764,7 @@ sub quiesce {
 		if (DEBUG) {
 			$self->indent($ply, "recurse quiescence search");
 		}
-		my $score = -quiesce($self, $ply + 1, -$beta, -$alpha);
+		my $score = -quiesce($self, $ply + 1, -$beta, -$alpha, $node_type);
 		if (DEBUG) {
 			my $cn = $position->moveCoordinateNotation($move);
 			$self->indent($ply, "move $cn: value: $score");
@@ -713,13 +775,13 @@ sub quiesce {
 			if (DEBUG) {
 				my $hex_sig = sprintf '%016x', $signature;
 				my $cn = $position->moveCoordinateNotation($move);
-				$self->indent($ply, "$cn quiescence fail high ($score >= $beta), store $score(BETA) \@depth 0 for $hex_sig");
+				$self->indent($ply, "$cn quiescence fail high ($score >= $beta), store $score(BOUND_LOWER) \@depth 0 for $hex_sig");
 			}
-			$tt->store($signature, 0,
-				Chess::Plisco::Engine::TranspositionTable::TT_SCORE_BETA(),
-				$score, $move);
 
-			return $score;
+			$best_value = $score;
+			$best_move = $move;
+
+			last;
 		}
 		if ($score > $best_value) {
 			$best_value = $score;
@@ -730,27 +792,29 @@ sub quiesce {
 				$self->indent($ply, "raise quiescence alpha to $alpha");
 			}
 			$alpha = $score;
-			$tt_type = Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT();
 		}
 	}
 
+	my $tt_type = $best_value >= $beta ? BOUND_LOWER : BOUND_UPPER;
+	$tt->store(
+		@tt_address, # Address.
+		$signature, # Zobrist key.
+		(do {	(($best_value >= VALUE_TB_WIN_IN_MAX_PLY) ? $best_value + $ply : ($best_value <= VALUE_TB_LOSS_IN_MAX_PLY) ? $best_value - $ply : $best_value);}), # score, mate distance adjusted.
+		$pv_hit, # PV flag.
+		$tt_type, # BOUND_EXACT/BOUND_UPPER/BOUND_LOWER.
+		DEPTH_QUIESCENCE, # Depth searched.
+		$best_move # Best move at this node.
+	);
 	if (DEBUG) {
 		my $hex_sig = sprintf '%016x', $signature;
 		my $type;
-		if ($tt_type == TT_SCORE_ALPHA) {
-			$type = 'ALPHA';
+		if ($tt_type == BOUND_UPPER) {
+			$type = 'BOUND_UPPER';
 		} else {
-			$type = 'EXACT';
+			$type = 'BOUND_LOWER';
 		}
-		if ($is_null_window && $tt_type == Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT()) {
-			$self->indent($ply, "quiescence returning best value $best_value without tt store for $hex_sig");
-		} else {
-			$self->indent($ply, "quiescence returning best value $best_value, store ($type) \@depth 0 for $hex_sig");
-		}
+		$self->indent($ply, "returning best value (quiescence) $best_value, store ($type) for $hex_sig");
 	}
-
-	$tt->store($signature, 0, $tt_type, $best_value, $best_move)
-		if !($is_null_window && $tt_type == Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT());
 
 	return $best_value;
 }
@@ -793,11 +857,12 @@ sub rootSearch {
 				$self->debug("Deepening to depth $depth");
 				$self->{line} = [];
 			}
-			$score = $self->alphabeta(1, $depth, $alpha, $beta, \@line);
+			my @tt_pvs;
+			$score = $self->alphabeta(1, $depth, $alpha, $beta, \@line, ROOT_NODE, \@tt_pvs);
 			if (DEBUG) {
 				$self->debug("Score at depth $depth: $score");
 			}
-			if (($score >= -MATE - $depth) || ($score <= MATE + $depth)) {
+			if (($score >= MATE - $depth) || ($score <= -MATE + $depth)) {
 				last;
 			}
 
@@ -887,6 +952,7 @@ sub rootSearch {
 }
 
 
+
 sub outputMoveEfforts {
 	my ($self) = @_;
 
@@ -927,6 +993,9 @@ sub think {
 		$self->{info}->(__"Error: no legal moves");
 		return;
 	} elsif (1 == @legal) {
+		# This is not good if in ponder mode because there will be no move to
+		# ponder on. Try to at least get a ponder move from the transposition
+		# table.
 		my $move = $legal[0];
 		$self->printCurrentMove(1, $move, 1);
 		$self->printPV([$move]);
@@ -945,6 +1014,7 @@ sub think {
 
 	$self->{thinking} = 1;
 	$self->{tt_hits} = 0;
+	$self->{tt}->newSearch;
 
 	if ($self->{debug}) {
 		$self->{info}->("allocated time: $self->{optimum} .. $self->{maximum}");

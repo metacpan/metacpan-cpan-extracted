@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.631';
+our $VERSION = '0.632';
 
 use 5.020;
 use Moo;
@@ -26,7 +26,7 @@ use Safe::Isa 1.000008;
 use MooX::TypeTiny;
 use Types::Standard 1.016003 qw(InstanceOf HashRef Str Map Dict ArrayRef Enum ClassName Undef Slurpy Optional Bool);
 use Types::Common::Numeric 'PositiveOrZeroInt';
-use JSON::Schema::Modern::Utilities qw(json_pointer_type canonical_uri_type);
+use JSON::Schema::Modern::Utilities qw(json_pointer_type canonical_uri_type E);
 use namespace::clean;
 
 extends 'Mojo::JSON::Pointer';
@@ -154,10 +154,14 @@ sub BUILD ($self, $args) {
   # note! not a clone! Please don't change canonical_uri in-place.
   $self->_set_original_uri($self->canonical_uri);
 
-  # this should extract all identifiers and entities, and set canonical_uri, metaschema_uri
+  # this should extract all identifiers, references, and entities, and set canonical_uri,
+  # metaschema_uri
   my $state = $self->traverse(
     $args->{evaluator} // JSON::Schema::Modern->new,
-    $args->{specification_version} ? +{ $args->%{specification_version} } : (),
+    {
+      $args->{specification_version} ? $args->%{specification_version} : (),
+      $args->{skip_ref_checks} ? $args->%{skip_ref_checks} : (),
+    },
   );
 
   if ($state->{errors}->@*) {
@@ -182,6 +186,48 @@ sub BUILD ($self, $args) {
       $state->%{qw(specification_version vocabularies)},
     })
   if not $seen_root;
+
+  foreach my $ref (($state->{references}//[])->@*) {
+    my ($keyword, $path_location, $abs_target, $expected_entity) = @$ref;
+
+    # look for resource locally; fall back to the evaluator's index
+    my $resource = $self->_get_resource(my $uri = $abs_target->clone->fragment(undef));
+    my $document = $self;
+
+    if (not $resource) {
+      $resource = $args->{evaluator}->_get_resource($uri) if $args->{evaluator};
+      next if not $resource;
+      $document = $resource->{document};
+    }
+
+    my $fragment = $abs_target->fragment;
+    my $target_path;
+    if (not length $fragment or $fragment =~ m{^/}) {
+      ()= E({ %$state, keyword_path => $path_location, keyword => $keyword },
+          '%s target "%s" is a non-existent location', $keyword, $abs_target), next
+        if not $document->contains($target_path = $resource->{path}.($fragment//''));
+    }
+    elsif (my $subresource = ($resource->{anchors}//{})->{$fragment}) {
+      $target_path = $subresource->{path};
+    }
+    else {
+      ()= E({ %$state, keyword_path => $path_location, keyword => $keyword },
+        '%s target "%s" is a non-existent location', $keyword, $abs_target);
+      next;
+    }
+
+    my $entity = $document->get_entity_at_location($target_path);
+    ()= E({ %$state, keyword_path => $path_location, keyword => $keyword },
+        '%s target "%s" is not a referenceable location', $keyword, $abs_target), next
+      if not $entity;
+
+    ()= E({ %$state, keyword_path => $path_location, keyword => $keyword },
+        '%s target "%s" is the wrong object type (%s, expecting %s)',
+        $keyword, $abs_target, $entity, $expected_entity), next
+      if $entity ne $expected_entity;
+  }
+
+  $self->_set_errors($state->{errors}) if $state->{errors}->@*;
 }
 
 # a subclass's method will override this one
@@ -266,7 +312,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.631
+version 0.632
 
 =head1 SYNOPSIS
 
@@ -355,6 +401,13 @@ A L<JSON::Schema::Modern> object. Optional, unless custom metaschemas are used (
 under L</validate>).
 
 This argument is not preserved by the constructor, so it is not available as an accessor.
+
+=head2 skip_ref_checks
+
+Only a constructor argument, not an accessor method.
+
+When true, the normal checks for bad reference targets are skipped. This should only be used for
+large documents that are known to be valid, such as specification metaschemas.
 
 =head1 METHODS
 

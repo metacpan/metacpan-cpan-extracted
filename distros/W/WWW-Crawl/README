@@ -1,18 +1,44 @@
 WWW-Crawl
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+The WWW::Crawl module provides a simple web crawling utility for extracting links and other resources from web pages within a single domain. It can be used to recursively explore a website and retrieve URLs, including those found in HTML href attributes, form actions, external JavaScript files, and JavaScript window.open links.
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+WWW::Crawl will not stray outside the supplied domain.
 
+EXAMPLES
 
-INSTALLATION
+Basic crawling with HTTP::Tiny:
+
+    use WWW::Crawl;
+
+    my $crawler = WWW::Crawl->new();
+    my @visited = $crawler->crawl('https://example.com', \&process_page);
+
+    sub process_page {
+        my $url = shift;
+        print "Visited: $url\n";
+    }
+
+Crawling JavaScript-rendered pages with Chromium:
+
+    use WWW::Crawl::Chromium;
+
+    my $crawler = WWW::Crawl::Chromium->new(
+        chromium_path    => '/usr/bin/chromium',
+        chromium_timeout => 30,
+    );
+
+    my @visited = $crawler->crawl('https://example.com', \&process_page);
+
+    sub process_page {
+        my $url = shift;
+        print "Visited: $url\n";
+    }
+
+INSTALLATION & TESTING
+
+To run author tests, set the environment variable RELEASE_TESTING
+
+Installation tests are only run if Test::Mock::HTTP::Tiny in installed.  If you wish to run a full set of tests, ensure this module is installed before installing WWW::Crawl.
 
 To install this module, run the following commands:
 
@@ -32,9 +58,6 @@ You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
         https://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Crawl
-
-    CPAN Ratings
-        https://cpanratings.perl.org/d/WWW-Crawl
 
     Search CPAN
         https://metacpan.org/release/WWW-Crawl

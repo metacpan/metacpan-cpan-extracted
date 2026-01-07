@@ -1,11 +1,10 @@
-package UV::Prepare;
+package UV::Prepare 2.001;
 
-our $VERSION = '2.000';
-
-use strict;
+use v5.14;
 use warnings;
-use Carp ();
 use parent 'UV::Handle';
+
+use Carp ();
 
 sub start {
     my $self = shift;
@@ -37,8 +36,10 @@ UV::Prepare - Prepare handles in libuv
 
 =head1 SYNOPSIS
 
+=for highlighter language=perl
+
   #!/usr/bin/env perl
-  use strict;
+  use v5.14;
   use warnings;
 
   use UV;

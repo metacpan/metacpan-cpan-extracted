@@ -276,15 +276,21 @@ YAML
 components:
   responses:
     foo: {}
-  headers:
-    foo:
-      schema: {}
 paths:
   /foo:
     post:
       responses:
         200:
-          $ref: '#/components/headers/foo'
+          $ref: 'http://example.com/otherapi#/components/headers/foo'
+YAML
+
+  $openapi->evaluator->add_document(JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://example.com/otherapi',
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML')));
+components:
+  headers:
+    foo:
+      schema: {}
 YAML
 
   cmp_result(
@@ -296,7 +302,7 @@ YAML
           instanceLocation => '/response',
           keywordLocation => jsonp(qw(/paths /foo post responses 200 $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post responses 200 $ref)))->to_string,
-          error => 'EXCEPTION: bad $ref to '.$doc_uri.'#/components/headers/foo: not a "response"',
+          error => 'EXCEPTION: bad $ref to http://example.com/otherapi#/components/headers/foo: not a "response"',
         },
       ],
     },
@@ -310,7 +316,7 @@ YAML
 components:
   responses:
     foo:
-      $ref: '#/i_do_not_exist'
+      $ref: 'http://example.com/otherapi#/i_do_not_exist'
     default:
       headers:
         Content-Type:
@@ -343,7 +349,7 @@ YAML
           instanceLocation => '/response',
           keywordLocation => jsonp(qw(/paths /foo post responses 303 $ref $ref)),
           absoluteKeywordLocation => $doc_uri.'#/components/responses/foo/$ref',
-          error => 'EXCEPTION: unable to find resource "'.$doc_uri.'#/i_do_not_exist"',
+          error => 'EXCEPTION: unable to find resource "http://example.com/otherapi#/i_do_not_exist"',
         },
       ],
     },
@@ -523,6 +529,7 @@ YAML
     'conflict between Content-Length + Transfer-Encoding headers (and body is still parseable)',
   );
 
+
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
@@ -549,6 +556,10 @@ components:
         text/plain:
           schema:
             const: éclair
+    foo:
+      content:
+        application/json:
+          schema: {}
 paths:
   /foo:
     post:
@@ -835,8 +846,8 @@ YAML
   # note: when 204, mojo's $message->body always returns '' and Content-Length is stripped.
   # this test is only possible (for HTTP::Response) if we manually add a Content-Length; it will not
   # be added via parse().
-  if ($::TYPE eq 'mojo') {
-  todo 'Mojolicious will strip Content-Length for 204 responses' => sub {
+  {
+  my $todo = todo 'Mojolicious will strip Content-Length for 204 responses' if $::TYPE eq 'mojo';
   cmp_result(
     $openapi->validate_response(response(204, [ 'Content-Type' => 'text/plain', 'Content-Length' => 20 ], 'I should not have content'),
       { path_template => '/foo', method => 'POST' })->TO_JSON,
@@ -859,7 +870,7 @@ YAML
     },
     'an undesired response body is detectable for 204 responses',
   );
-  }}
+  }
 
 
   $openapi = OpenAPI::Modern->new(

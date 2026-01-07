@@ -16,9 +16,9 @@ Usage example:
         'service' => 'http://127.0.0.1:15283/',
         'sql' => 'select 1'
     );
+    $pp->parse();
 
-    my $nice = $pp->pretty_print();
-
+    my $nice = $pp->{ 'statements' }->[0]->pretty_print();
 
 =head1 FUNCTIONS
 

@@ -17,11 +17,11 @@ DBIx::Class::Async::ResultSet - Asynchronous ResultSet for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.10
+Version 0.12
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -240,6 +240,13 @@ Results are cached internally for use with C<next> and C<reset> methods.
 
 =cut
 
+=head2 all
+
+Returns all rows matching the current search criteria as L<DBIx::Class::Async::Row> objects,
+with prefetched relationships properly inflated.
+
+=cut
+
 sub all {
     my $self = shift;
 
@@ -247,11 +254,12 @@ sub all {
     if ($self->{is_prefetched} && $self->{entries}) {
         my @rows       = map { $self->new_result($_) } @{$self->{entries}};
         $self->{_rows} = \@rows;
-        return Future->done(@rows); # Resolves to the list of rows
+        return Future->done(\@rows);
     }
 
-    # 2. Standard Async Fetch
+    # 2. Standard Async Fetch with Prefetch Support
     my $source_name = $self->{source_name};
+
     return $self->{async_db}->search(
         $source_name,
         $self->{_cond},
@@ -259,7 +267,18 @@ sub all {
     )->then(sub {
         my ($rows_data) = @_;
 
-        my @rows       = map { $self->new_result($_) } @$rows_data;
+        my @rows = map {
+            my $row_data = $_;
+            my $row = $self->new_result($row_data);
+
+            # If the hash contains nested hashes or arrays, it's prefetched data
+            if (grep { ref($row_data->{$_}) } keys %$row_data) {
+                $self->_inflate_prefetch($row, $row_data, $self->{_attrs}{prefetch});
+            }
+
+            $row;
+        } @$rows_data;
+
         $self->{_rows} = \@rows;
         $self->{_pos}  = 0;
 
@@ -1111,6 +1130,164 @@ sub _get_source {
     my $self = shift;
     $self->{_source} ||= $self->{schema}->source($self->{source_name});
     return $self->{_source};
+}
+
+=head2 _inflate_prefetch
+
+Inflates prefetched relationship data into the row object.
+
+=cut
+
+sub _inflate_prefetch {
+    my ($self, $row, $data, $prefetch_spec) = @_;
+
+    # Initialize prefetch storage in the row if not exists
+    $row->{_prefetched} ||= {};
+
+    # Handle both scalar and arrayref prefetch specs
+    my @prefetches =
+        ref $prefetch_spec eq 'ARRAY' ? @$prefetch_spec : ($prefetch_spec);
+
+    foreach my $prefetch (@prefetches) {
+        # Handle nested prefetch (e.g., 'comments.user')
+        if ($prefetch =~ /\./) {
+            my @parts = split /\./, $prefetch;
+            $self->_inflate_nested_prefetch($row, $data, \@parts);
+        } else {
+            # Simple prefetch
+            $self->_inflate_simple_prefetch($row, $data, $prefetch);
+        }
+    }
+}
+
+=head2 _inflate_simple_prefetch
+
+Inflates a simple (non-nested) prefetched relationship.
+
+=cut
+
+sub _inflate_simple_prefetch {
+    my ($self, $row, $data, $rel_name) = @_;
+
+    # Get the relationship info from the result source
+    my $source = $self->result_source;
+
+    # Verify relationship exists
+    return unless $source->has_relationship($rel_name);
+
+    my $rel_info = $source->relationship_info($rel_name);
+    return unless $rel_info;
+
+    # Check if prefetch data exists in the row data
+    # Try multiple possible keys for prefetch data
+    my $prefetch_data;
+    for my $key ("prefetch_${rel_name}", $rel_name, "${rel_name}_prefetch") {
+        if (exists $data->{$key}) {
+            $prefetch_data = $data->{$key};
+            last;
+        }
+    }
+
+    return unless defined $prefetch_data;
+
+    my $rel_type = $rel_info->{attrs}{accessor} || 'single';
+
+    if ($rel_type eq 'multi') {
+        # has_many relationship - create a prefetched ResultSet
+        my $rel_source = $source->related_source($rel_name);
+
+        # Ensure prefetch_data is an arrayref
+        my $entries =
+            ref $prefetch_data eq 'ARRAY' ? $prefetch_data : [$prefetch_data];
+
+        my $rel_rs = $self->new_result_set({
+            source_name => $rel_source->source_name,
+            entries => $entries,
+            is_prefetched => 1,
+        });
+
+        # Store the prefetched ResultSet in the row
+        $row->{_prefetched}{$rel_name} = $rel_rs;
+
+    } else {
+        # belongs_to or might_have - single related object
+        if ($prefetch_data && ref $prefetch_data eq 'HASH') {
+            my $rel_source = $source->related_source($rel_name);
+
+            my $rel_row = $self->new_result_set({
+                source_name => $rel_source->source_name,
+            })->new_result($prefetch_data);
+
+            # Store the prefetched row
+            $row->{_prefetched}{$rel_name} = $rel_row;
+        } elsif (!$prefetch_data) {
+            # NULL relationship (e.g., optional belongs_to)
+            $row->{_prefetched}{$rel_name} = undef;
+        }
+    }
+}
+
+=head2 _inflate_nested_prefetch
+
+Inflates nested prefetched relationships (e.g., 'comments.user').
+
+=cut
+
+sub _inflate_nested_prefetch {
+    my ($self, $row, $data, $parts) = @_;
+
+    my $first_rel = shift @$parts;
+    my $remaining_path = join('.', @$parts);
+
+    # Inflate the first level
+    $self->_inflate_simple_prefetch($row, $data, $first_rel);
+
+    # If there are more levels, handle them recursively
+    if (@$parts && exists $row->{_prefetched}{$first_rel}) {
+        my $first_level = $row->{_prefetched}{$first_rel};
+
+        # Check if it's a ResultSet (has_many)
+        if (blessed($first_level)
+            && $first_level->isa('DBIx::Class::Async::ResultSet')) {
+            # Get the entries from the prefetched ResultSet
+            my $entries = $first_level->{entries} || [];
+
+            foreach my $nested_data (@$entries) {
+                my $rel_source = $self->result_source->related_source($first_rel);
+                my $nested_rs  = $self->new_result_set({
+                    source_name => $rel_source->source_name,
+                });
+
+                # Create a row object for this entry
+                my $nested_row = $nested_rs->new_result($nested_data);
+
+                # Recursively inflate the remaining path
+                $nested_rs->_inflate_nested_prefetch(
+                    $nested_row,
+                    $nested_data,
+                    [@$parts]
+                );
+            }
+
+        } elsif (blessed($first_level)
+                && $first_level->isa('DBIx::Class::Async::Row')) {
+            # Single related object (belongs_to)
+            my $rel_source = $self->result_source->related_source($first_rel);
+            my $nested_rs  = $self->new_result_set({
+                source_name => $rel_source->source_name,
+            });
+
+            # Get the raw data from the row
+            my $nested_data = $first_level->{_data};
+
+            # Recursively inflate the remaining path
+            $nested_rs->_inflate_nested_prefetch(
+                $first_level,
+                $nested_data,
+                [@$parts]
+            );
+        }
+    }
 }
 
 # Chainable modifiers

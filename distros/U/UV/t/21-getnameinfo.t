@@ -1,4 +1,4 @@
-use strict;
+use v5.14;
 use warnings;
 
 use Socket qw( AF_INET NI_NUMERICHOST NI_NUMERICSERV SOCK_STREAM inet_aton pack_sockaddr_in );

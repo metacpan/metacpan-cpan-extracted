@@ -1,14 +1,17 @@
 # Copyright (c) 2025 Yuki Kimoto
 # MIT License
 
-class Mojolicious::Commands extends Mojolicious::Command {
+class Mojolicious::Commands {
   version_from Mojolicious;
   
-  use Mojolicious::Command::Cgi;
+  use Mojolicious;
   use Mojolicious::Command::Daemon;
   use Mojolicious::Command::Prefork;
   use Mojolicious::Command::Morbo;
   use Mojolicious::Command::Hypnotoad;
+  use Mojolicious::Command::Cgi;
+  
+  has app : rw Mojolicious;
   
   # Class Methods
   static method new : Mojolicious::Commands () {
@@ -21,6 +24,33 @@ class Mojolicious::Commands extends Mojolicious::Command {
   # Instance Methods
   method run : void ($argv : string[]) {
     
+    my $argv = StringList->new($argv);
+    
+    my $command_name = $argv->shift;
+    
+    my $command = (Mojolicious::Command)undef;
+    if ($command_name eq "daemon") {
+      $command = Mojolicious::Command::Daemon->new;
+    }
+    elsif ($command_name eq "prefork") {
+      $command = Mojolicious::Command::Prefork->new;
+    }
+    elsif ($command_name eq "morbo") {
+      $command = Mojolicious::Command::Morbo->new;
+    }
+    elsif ($command_name eq "hypnotoad") {
+      $command = Mojolicious::Command::Hypnotoad->new;
+    }
+    elsif ($command_name eq "cgi") {
+      $command = Mojolicious::Command::Cgi->new;
+    }
+    else {
+      die "[Unexpected Error]Invalid command $command_name.";
+    }
+    
+    $command->set_app($self->app);
+    
+    $command->run($argv->to_array);
   }
   
 }

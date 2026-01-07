@@ -3,13 +3,13 @@ package WWW::Crawl;
 use strict;
 use warnings;
 
-use HTTP::Tiny 0.083;
+use HTTP::Tiny;
 use URI;
 use JSON::PP;
 use Carp qw(croak);
 
-our $VERSION = '0.1';
-$VERSION = eval $VERSION;
+our $VERSION = '0.3';
+# $VERSION = eval $VERSION;
 
 # TODO:
 # 1  - Use HTML Parser instead of regexps
@@ -48,7 +48,7 @@ sub crawl {
         next if $parsed{$url};
         $parsed{$url}++;
         
-        my $resp = $self->{'http'}->request('GET', $url);
+        my $resp = $self->_fetch_page($url);
         next if $resp->{'status'} == 404;
         if (!$resp->{'success'}) {
             croak "WWW::Crawl: HTTP Response " . $resp->{'status'} . " - " . $resp->{'reason'} . "\n" . $resp->{'content'};
@@ -104,6 +104,12 @@ sub crawl {
     return keys %parsed;
 }
 
+sub _fetch_page {
+    my ($self, $url) = @_;
+
+    return $self->{'http'}->request('GET', $url);
+}
+
 1;
 
 
@@ -113,7 +119,7 @@ WWW::Crawl - A simple web crawler for extracting links and more from web pages
 
 =head1 VERSION
 
-This documentation refers to WWW::Crawl version 0.1.
+This documentation refers to WWW::Crawl version 0.2.
 
 =head1 SYNOPSIS
 
@@ -167,7 +173,7 @@ The C<crawl> method will explore the provided URL and its linked resources. It w
 
 In exploring the website, C<crawl> will ignore links to the following types of file C<.pdf>, C<.css>, C<.png>, C<.jpg>, C<.svg> and C<.webmanifest>
 
-Returns an array of URLs that were parsed during the crawl. Unless the C<nolinks> option is passed to L<new|WWW::Crawl#new(%options)>, then it returns an array of links found on the itial page.
+Returns an array of URLs that were parsed during the crawl. Unless the C<nolinks> option is passed to L<new|WWW::Crawl#new(%options)>, then it returns an array of links found on the intial page.
 
 =head1 AUTHOR
 
@@ -210,7 +216,7 @@ L<https://metacpan.org/release/WWW-Crawl>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2023 by Ian Boddison.
+This software is Copyright (c) 2023-2026 by Ian Boddison.
 
 This program is released under the following license:
 
@@ -220,3 +226,5 @@ This program is released under the following license:
 =cut
 
 1; # End of WWW::Crawl
+
+

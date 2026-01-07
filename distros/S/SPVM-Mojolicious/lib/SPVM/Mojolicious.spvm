@@ -2,7 +2,7 @@
 # MIT License
 
 class Mojolicious {
-  version "0.039";
+  version "0.040";
   
   use Mojo::Home;
   use Mojo::Loader;
@@ -201,11 +201,13 @@ class Mojolicious {
       $argv = CommandInfo->ARGV;
     }
     
+    $self->commands->set_app($self);
+    
     $self->commands->run($argv);
   }
   
   method server : void ($server : Mojo::Server) {
-    
+    $self->plugins->emit_hook(before_server_start => $server, $self);
   }
   
   method build_tx : Mojo::Transaction::HTTP () {

@@ -1,6 +1,6 @@
 #! /bin/false
 
-# Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2021-2026 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software. It comes without any warranty, to
@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine::Position;
-$Chess::Plisco::Engine::Position::VERSION = 'v1.0.1';
+$Chess::Plisco::Engine::Position::VERSION = 'v1.0.2';
 use strict;
 use integer;
 
@@ -470,9 +470,10 @@ sub move {
 	$zk_update ^= $zk_colour;
 
 	$self->[CP_POS_GAME_PHASE] += $move_phase_deltas[
-		(((($move) >> 3) & 0x7) << 3) | ((($move) >> 6) & 0x7)
+		($captured << 3) | $promote
 	];
-	my $score_index = ($move & 0x3fffff & ~(1 << (CP_MOVE_COLOUR_OFFSET))) | (!($self->[CP_POS_TURN]) << (CP_MOVE_COLOUR_OFFSET));
+
+	my $score_index = ($move & 0x3fffff & ~(1 << (CP_MOVE_COLOUR_OFFSET))) | ($to_move << (CP_MOVE_COLOUR_OFFSET));
 	$self->[CP_POS_OPENING_SCORE] += $opening_deltas[$score_index];
 	$self->[CP_POS_ENDGAME_SCORE] += $endgame_deltas[$score_index];
 

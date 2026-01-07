@@ -47,10 +47,8 @@ shallowly copying all the rest of the original object's properties.
 
 # LICENSE
 
-Copyright (C) 2016  Peter Pentchev <roam@ringlet.net>
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+SPDX-FileCopyrightText: Peter Pentchev <roam@ringlet.net>
+SPDX-License-Identifier: Artistic-2.0
 
 # AUTHOR
 

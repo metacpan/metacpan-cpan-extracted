@@ -42,16 +42,6 @@ Examples:
     }
   });
 
-=head2 drain
-
-Emitted once all data has been written.
-
-Examples:
-
-  $content->on(drain => method : void ($content : Mojo::Content) {
-    $content->write_chunk(Sys->time);
-  });
-
 =head2 read
 
 Emitted when a new chunk of content arrives.
@@ -239,26 +229,24 @@ Size of content already received from message in bytes.
 
 =head2 write
 
-C<method write : void ($chunk : string, $cb : L<Mojo::Callback|SPVM::Mojo::Callback>);>
+C<method write : void ($chunk : string);>
 
-Write dynamic content non-blocking, the optional drain callback will be executed once all data has been written.
+Write dynamic content non-blocking.
 Calling this method without a chunk of data will finalize the L</"headers"> and allow for dynamic content to be written
 later. You can write an empty chunk of data at any time to end the stream.
 
 =head2 write_chunk  
 
-C<method write_chunk : void ($chunk : string, $cb : L<Mojo::Callback|SPVM::Mojo::Callback>);>
+C<method write_chunk : void ($chunk : string);>
 
-Write dynamic content non-blocking with chunked transfer encoding, the optional drain callback will be executed once
-all data has been written. Calling this method without a chunk of data will finalize the L</"headers"> and allow for
+Write dynamic content non-blocking with chunked transfer encoding. Calling this method without a chunk of data will finalize the L</"headers"> and allow for
 dynamic content to be written later. You can write an empty chunk of data at any time to end the stream.
 
 =head2 write_sse
 
-C<method write_sse : void ($event : L<Mojo::SSE::Event|SPVM::Mojo::SSE::Event>, $cb : L<Mojo::Callback|SPVM::Mojo::Callback>);>
+C<method write_sse : void ($event : L<Mojo::SSE::Event|SPVM::Mojo::SSE::Event>);>
 
-Write Server-Sent Event (SSE) non-blocking, the optional drain callback will be executed once all data has been
-written. Calling this method without an event will finalize the response headers and allow for events to be written
+Write Server-Sent Event (SSE) non-blocking. Calling this method without an event will finalize the response headers and allow for events to be written
 later. Note that this method is B<EXPERIMENTAL> and may change without warning!
 
 =head1 Well Known Child Classes

@@ -7,6 +7,12 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-type-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+2.010001	2026-01-06
+
+ [ Bug Fixes ]
+ - Fix for $LIST_SEPARATOR changes breaking Type::Coercion, Types::Common,
+   Types::Standard.
+
 2.010000	2025-12-30
 
  [ Documentation ]

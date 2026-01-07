@@ -1,8 +1,19 @@
 Revision history for IO-Ppoll
 
+0.13    2026-01-16
+        [CHANGES]
+         * Various module modernisations
+            + use v5.14
+            + Pod fixes
+         * Swap unit tests from Test::More to Test2::V0
+
+        [BUGFIXES]
+         * ppoll(2) needs `-D_GNU_SOURCE`, but some build configurations
+           wouldn't have added it
+
 0.12    2015/08/31 19:11:45
         [CHANGES]
-         * Added ->mask_add and ->mask_del methods
+         * Added ->mask_add and ->mask_del methods (RT106792)
          * "use strict; use warnings" in all unit tests
          * Miscellaneous updates to build system and documentation style
             + Use M::B's test_requires

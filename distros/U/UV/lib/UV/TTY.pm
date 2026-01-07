@@ -1,11 +1,10 @@
-package UV::TTY;
+package UV::TTY 2.001;
 
-our $VERSION = '2.000';
-
-use strict;
+use v5.14;
 use warnings;
-use Carp ();
 use parent 'UV::Stream';
+
+use Carp ();
 
 sub _new_args {
     my ($class, $args) = @_;
@@ -25,8 +24,10 @@ UV::TTY - TTY stream handles in libuv
 
 =head1 SYNOPSIS
 
+=for highlighter language=perl
+
   #!/usr/bin/env perl
-  use strict;
+  use v5.14;
   use warnings;
 
   # A new stream handle will be initialised against the default loop

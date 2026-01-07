@@ -271,6 +271,9 @@ t/08-selects.d/48-sublink-any-all.sql
 t/08-selects.d/49-variadic-func-call.json
 t/08-selects.d/49-variadic-func-call.psql
 t/08-selects.d/49-variadic-func-call.sql
+t/08-selects.d/50-long-join.json
+t/08-selects.d/50-long-join.psql
+t/08-selects.d/50-long-join.sql
 t/08-selects.t
 t/09-inserts.d/01-basic.json
 t/09-inserts.d/01-basic.psql

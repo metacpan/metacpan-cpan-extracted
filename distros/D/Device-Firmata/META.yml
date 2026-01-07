@@ -29,6 +29,6 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/ntruchsess/perl-firmata.git
-version: '0.70'
+version: '0.71'
 x_homepage: https://github.com/ntruchsess/perl-firmata/
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

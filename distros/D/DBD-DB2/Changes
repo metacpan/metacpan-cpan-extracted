@@ -3,6 +3,10 @@
 DBD::DB2::Changes - List of changes
 
 =cut
+=head2 Changes in DBD::DB2 1.92, Jan 7, 2026
+
+  RHEL 10 support. Tested on 5.40 and above.
+
 =head2 Changes in DBD::DB2 1.91, Aug 20, 2024
 
   Fixed format not a string literal and no format arguments [-Werror=format-security], 2899 | croak( msg );. Tested on 5.18 and above.

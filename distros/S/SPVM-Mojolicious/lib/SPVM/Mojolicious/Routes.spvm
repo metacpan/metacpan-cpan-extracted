@@ -78,7 +78,7 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
     my $stack_data = $stack->[$position];
     my $captures = $stack_data->captures;
     
-    $c->stash_h->{"mojo.captures"} = $captures;
+    $c->set_mojo_captures($captures);
     
     my $r = $stack_data->route;
     

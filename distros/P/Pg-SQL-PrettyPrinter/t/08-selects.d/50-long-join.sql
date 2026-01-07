@@ -1,0 +1,1 @@
+SELECT t1.a, t2.b, t3.c FROM table_1 AS t1 JOIN table_2 AS t2 ON t1.x = t2.x AND t1.y = t2.y AND t1.z = t2.z LEFT JOIN table_3 AS t3 ON t1.f = t3.f AND t2.g = t3.g WHERE t1.v = 1 AND t2.t = 'x' AND t3.m < 123

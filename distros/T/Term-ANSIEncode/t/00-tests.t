@@ -32,7 +32,7 @@ diag("\r" . colored(['bright_yellow'], '▏') . colored(['cyan on_black'], q{   
 diag("\r" . colored(['bright_yellow'], '▏') . colored(['cyan on_black'], q{   | |  __/\__ \ |_| | | | | (_| | }) . colored(['yellow'], '█'));
 diag("\r" . colored(['bright_yellow'], '▏') . colored(['cyan on_black'], q{   |_|\___||___/\__|_|_| |_|\__, | }) . colored(['yellow'], '█'));
 diag("\r" . colored(['bright_yellow'], '▏') . colored(['cyan on_black'], q{                             __/ | }) . colored(['yellow'], '█'));
-diag("\r" . colored(['bright_yellow'], '▏') . colored(['cyan on_black'], q{Term::ANSIEncode            |___/  }) . colored(['yellow'], '█'));
+diag("\r" . colored(['bright_yellow'], '▏') . colored(['white on_black'], q{Term::ANSIEncode}) . colored(['cyan on_black'],q{            |___/  }) . colored(['yellow'], '█'));
 diag("\r" . colored(['bright_yellow'], '▏                                   ') . colored(['yellow'], '█'));
 diag("\r" . colored(['bright_yellow'],        '◥████████████████████████████████████'));
 diag("\r  \n\r  " x 12 . "\e[13A");

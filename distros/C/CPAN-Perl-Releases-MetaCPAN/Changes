@@ -1,5 +1,8 @@
 Revision history for CPAN-Perl-Releases-MetaCPAN
 
+0.010  2026-01-07 08:31:56 JST
+    - Gracefully handle hashref for total hits (Grinnz #3)
+
 0.009  2024-01-01 01:05:04 JST
     - Add a release sample to pod
 

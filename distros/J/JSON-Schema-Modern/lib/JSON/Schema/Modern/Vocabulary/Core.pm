@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.631';
+our $VERSION = '0.632';
 
 use 5.020;
 use Moo;
@@ -289,6 +289,14 @@ sub _traverse_keyword_dynamicAnchor ($class, $schema, $state) {
 sub _traverse_keyword_ref ($class, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'string')
     or not assert_uri_reference($state, $schema);
+
+  push $state->{references}->@*, [
+    $state->{keyword},
+    ($state->{traversed_keyword_path}//'').$state->{keyword_path},
+    Mojo::URL->new($schema->{$state->{keyword}})->to_abs($state->{initial_schema_uri}//()),
+    'schema',
+  ] if $state->{references};
+
   return 1;
 }
 
@@ -413,7 +421,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.631
+version 0.632
 
 =head1 DESCRIPTION
 

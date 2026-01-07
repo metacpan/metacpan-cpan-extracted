@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use IO::Ppoll qw( POLLIN POLLOUT POLLHUP );
 
@@ -22,6 +22,6 @@ is( $ppoll->events( $rd ), 0,       'rd events' );
 is( $ppoll->events( $wr ), POLLOUT, 'wr events' );
 is( $ppoll->events( \*STDERR ), '',      'STDERR events' );
 
-is_deeply( [ $ppoll->handles( POLLOUT ) ], [ $wr ], 'handles(POLLOUT)' );
+is( [ $ppoll->handles( POLLOUT ) ], [ $wr ], 'handles(POLLOUT)' );
 
 done_testing;

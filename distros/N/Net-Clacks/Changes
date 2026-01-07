@@ -1,5 +1,35 @@
-@  changeset:   211:250b3a7fd0c8
+@  changeset:   217:1b87286ea326
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@virgo.cavac.at>
+|  date:        Wed Jan 07 09:27:35 2026 +0100
+|  summary:     Cleanup
+|
+o  changeset:   216:a0fde477fd9a
+|  user:        Rene Schickbauer <cavac@virgo.cavac.at>
+|  date:        Thu Dec 25 00:16:39 2025 +0100
+|  summary:     Bump version number to 34
+|
+o  changeset:   215:f2af45c9b9e3
+|  user:        Rene Schickbauer <cavac@virgo.cavac.at>
+|  date:        Thu Dec 25 00:14:06 2025 +0100
+|  summary:     Support "fastdisconnect" without sending a QUIT message
+|
+o  changeset:   214:49242339c480
+|  user:        Rene Schickbauer <cavac@virgo.cavac.at>
+|  date:        Fri Dec 19 21:52:24 2025 +0100
+|  summary:     Possible optimization: ClacksCache connect to clacks only on first use
+|
+o  changeset:   213:f6f2bdd84694
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Dec 19 15:04:38 2025 +0100
+|  summary:     BF
+|
+o  changeset:   212:d2317a651858
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Dec 19 15:03:48 2025 +0100
+|  summary:     Fix MANIFEST, re-release
+|
+o  changeset:   211:250b3a7fd0c8
 |  user:        Rene Schickbauer <cavac@palebluedot>
 |  date:        Fri Dec 19 15:02:41 2025 +0100
 |  summary:     MANIFEST

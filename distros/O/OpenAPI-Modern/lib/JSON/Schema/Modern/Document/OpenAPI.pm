@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.119';
+our $VERSION = '0.120';
 
 use 5.020;
 use utf8;
@@ -133,6 +133,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     specification_version => $evaluator->SPECIFICATION_VERSION_DEFAULT,
     vocabularies => [],
     subschemas => [],
+    references => [],
     depth => 0,
     traverse => 1,
   };
@@ -257,7 +258,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
   # evaluate the document against its metaschema to find any errors, to identify all schema
   # resources within to add to the global resource index, and to extract all operationIds
-  my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @servers_paths, %tag_operation_paths, @bad_3_0_paths);
+  my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @servers_paths, %tag_operation_paths, @bad_3_0_paths, @references);
   my $result = $evaluator->evaluate(
     $schema, $self->metaschema_uri,
     {
@@ -292,6 +293,10 @@ sub traverse ($self, $evaluator, $config_override = {}) {
                   if exists $data->{exclusiveMaximum} and not exists $data->{maximum};
               }
 
+              # "$ref" in path-item is not represented in the schema by a Reference object
+              push @references, [ '$ref', $state->{data_path}, Mojo::URL->new($data->{'$ref'})->to_abs($self->canonical_uri), 'path-item' ]
+                if $entity eq 'path-item' and exists $data->{'$ref'};
+
               if ($entity eq 'reference') {
                 $metaschema_doc //= $evaluator->_get_resource($self->metaschema_uri)->{document};
 
@@ -300,6 +305,8 @@ sub traverse ($self, $evaluator, $config_override = {}) {
                 my $schema_path = ($state->{initial_schema_uri}->fragment//'').$state->{keyword_path};
                 if ($schema_path =~ s{/oneOf/\K([01])\z}{$1 ^ 1}e) {
                   $entity = lc join('-', split /(?=[A-Z])/, substr($metaschema_doc->get($schema_path)->{'$ref'}, 14));
+                  $entity .= 's' if $entity eq 'callback';
+                  push @references, [ '$ref', $state->{data_path}, Mojo::URL->new($data->{'$ref'})->to_abs($self->canonical_uri), $entity ];
                 }
               }
 
@@ -315,6 +322,14 @@ sub traverse ($self, $evaluator, $config_override = {}) {
             # referenced in the schema without an -or-reference
             ($entity) = (($schema->{'$ref'} =~ m{#/\$defs/([^/]+?)(?:-or-reference)\z}),
                          ($schema->{'$ref'} =~ m{#/\$defs/(path-item)\z}));
+
+            push @references, [ '$ref', $state->{data_path}, Mojo::URL->new($data->{'$ref'})->to_abs($self->canonical_uri), 'path-item' ]
+              if ($entity//'') eq 'path-item' and exists $data->{'$ref'};
+
+            if ($schema->{'$ref'} eq '#/$defs/reference') {
+              my ($e) = ($state->{initial_schema_uri}->fragment =~ m{/\$defs/([^/]+?)(?:-or-reference)\z});
+              push @references, [ '$ref', $state->{data_path}, Mojo::URL->new($data->{'$ref'})->to_abs($self->canonical_uri), $e ];
+            }
           }
 
           $self->_add_entity_location($state->{data_path}, $entity) if $entity;
@@ -367,6 +382,17 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   }
 
   $self->_set_defaults($result->defaults) if $result->defaults;
+
+  foreach my $pair (@operation_paths) {
+    my ($operation_id, $path) = @$pair;
+    if (my $existing = $self->operationId_path($operation_id)) {
+      ()= E({ %$state, keyword_path => $path .'/operationId' },
+        'duplicate of operationId at %s', $existing);
+    }
+    else {
+      $self->_add_operationId($operation_id => $path);
+    }
+  }
 
   ()= E({ %$state, keyword_path => $_->[1] },
       $_->[0] eq 'items' ? '"items" must be present if type is "array"'
@@ -516,19 +542,12 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     push @real_json_schema_paths, $json_schema_paths[$idx];
   }
 
-  $self->_traverse_schema({ %$state, keyword_path => $_ }) foreach reverse @real_json_schema_paths;
-  $self->_add_entity_location($_, 'schema') foreach $state->{subschemas}->@*;
+  push $state->{references}->@*, @references if $state->{references};
 
-  foreach my $pair (@operation_paths) {
-    my ($operation_id, $path) = @$pair;
-    if (my $existing = $self->operationId_path($operation_id)) {
-      ()= E({ %$state, keyword_path => $path .'/operationId' },
-        'duplicate of operationId at %s', $existing);
-    }
-    else {
-      $self->_add_operationId($operation_id => $path);
-    }
-  }
+  $self->_traverse_schema({ %$state, keyword_path => $_ }) foreach reverse @real_json_schema_paths;
+  return $state if $state->{errors}->@*;
+
+  $self->_add_entity_location($_, 'schema') foreach $state->{subschemas}->@*;
 
   return $state;
 }
@@ -629,6 +648,7 @@ sub _traverse_schema ($self, $state) {
 
   push $state->{errors}->@*, $subschema_state->{errors}->@*;
   push $state->{subschemas}->@*, $subschema_state->{subschemas}->@*;
+  push $state->{references}->@*, ($subschema_state->{references}//[])->@* if $state->{references};
 
   foreach my $new_uri (sort keys $subschema_state->{identifiers}->%*) {
     if (not $state->{identifiers}{$new_uri}) {
@@ -724,7 +744,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.0, v3.1 or v3.2 documen
 
 =head1 VERSION
 
-version 0.119
+version 0.120
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,11 @@
+0.040 2025-12-23
+  [Requirement Changes]
+    * Require SPVM::Sys 0.553.
+    * Require SPVM::Go 0.014.
+  [Changes]
+    * Improve Mojo::Sever::Daemon.
+    * Catch up with latest SPVM::Go.
+  
 0.039 2025-12-18
   [Changes]
     * Improve and fix Controller, Static.

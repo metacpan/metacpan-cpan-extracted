@@ -1,6 +1,6 @@
 #! /bin/false
 
-# Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2021-2026 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software. It comes without any warranty, to
@@ -13,7 +13,7 @@
 # ABSTRACT: Opening book for Chess-Plisco engine.
 
 package Chess::Plisco::Engine::Book;
-$Chess::Plisco::Engine::Book::VERSION = 'v1.0.1';
+$Chess::Plisco::Engine::Book::VERSION = 'v1.0.2';
 use strict;
 
 use Chess::Opening::Book::Polyglot;

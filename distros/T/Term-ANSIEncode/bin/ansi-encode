@@ -55,6 +55,9 @@ my $crgb       = FALSE;
 my $frames     = FALSE;
 my $rules      = FALSE;
 my $ansi_modes = FALSE;
+my $width      = 80,
+my $baud       = 0;
+my $speed      = 0;
 
 GetOptions(
     'a|ansi-modes'       => \$ansi_modes,
@@ -68,7 +71,52 @@ GetOptions(
     'unicode'            => \$unicode,
     'frames'             => \$frames,
     'h|horizontal-rules' => \$rules,
+    'baud=i'             => \$baud,
+	'width=i'            => \$width,
 );
+
+if ($baud > 0) {
+    if ($baud < 75) {
+        $baud  = 75;
+        $speed = 1 / (75 / 8);
+    } elsif ($baud < 150) {
+        $baud  = 150;
+        $speed = 1 / (150 / 8);
+    } elsif ($baud < 600) {
+        $baud  = 300;
+        $speed = 1 / (300 / 8);
+    } elsif ($baud < 1200) {
+        $baud  = 600;
+        $speed = 1 / (600 / 8);
+    } elsif ($baud < 2400) {
+        $baud  = 1200;
+        $speed = 1 / (1200 / 8);
+    } elsif ($baud < 4800) {
+        $baud  = 2400;
+        $speed = 1 / (2400 / 8);
+    } elsif ($baud < 9600) {
+        $baud  = 4800;
+        $speed = 1 / (4800 / 8);
+    } elsif ($baud < 19200) {
+        $baud  = 9600;
+        $speed = 1 / (9600 / 8);
+    } elsif ($baud < 38400) {
+        $baud  = 19200;
+        $speed = 1 / (19200 / 8);
+    } elsif ($baud < 57600) {
+        $baud  = 38400;
+        $speed = 1 / (38400 / 8);
+    } elsif ($baud < 115200) {
+        $baud  = 57600;
+        $speed = 1 / (57600 / 8);
+    } else {
+        $baud  = 115200;
+        $speed = 1 / (115200 / 8);
+    }
+} else {
+    $baud  = 0;
+    $speed = 0;
+}
 
 if (exists($ENV{'COLORTERM'}) && $ENV{'COLORTERM'} eq 'truecolor') {
     $crgb = TRUE;
@@ -88,7 +136,7 @@ I suggest "SourceCodePro-Powerline-Awesome" when selecting a font
 
 ###
 
-my $ansi = Term::ANSIEncode->new();
+my $ansi = Term::ANSIEncode->new('baud' => $baud, 'speed' => $speed, 'columns' => $width);
 
 our @list = (
     0x20 .. 0x7F,
@@ -132,7 +180,7 @@ VERSION
     
     $ansi->ansi_output($text);
 } elsif ($ansi_modes) {
-    my $out = "[% B_YELLOW %][% BLACK %]      ANSI Modes supported       [% RESET %]\n";
+    my $out = "\n[% B_YELLOW %][% BLACK %]      ANSI Modes supported       [% RESET %]\n";
     if ($c8) {
         $out .= "     ANSI 3 BIT:  [% GREEN %]Supported[% RESET %]\n";
     } else {
@@ -153,7 +201,7 @@ VERSION
     } else {
         $out .= "    ANSI 24 BIT:  [% RED %]Not Supported[% RESET %]\n";
     }
-    $out .= "[% B_YELLOW %]                                 [% RESET %]\n";
+    $out .= "[% B_YELLOW %]                                 [% RESET %]\n\n";
     $ansi->ansi_output($out);
 } elsif ($help) {
     $ansi->ansi_output(help_text());
@@ -225,16 +273,16 @@ TOKENS
     {
         my $f;
         my $b;
-		$to .= '[% BRIGHT GREEN %]╞' . '═' x 36 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
-		$to .= "$bar [% CYAN %]COLORS, START BACKGROUND WITH 'B_' $bar [% CYAN %]DESCRIPTION                                            $bar\n";
+        $to .= '[% BRIGHT GREEN %]╞' . '═' x 36 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
+        $to .= "$bar [% CYAN %]COLORS, START BACKGROUND WITH 'B_' $bar [% CYAN %]DESCRIPTION                                            $bar\n";
 
         foreach my $code ('ANSI 3 BIT','ANSI 4 BIT','ANSI 8 BIT','ANSI 24 BIT') {
             if (($code eq 'ANSI 3 BIT' && $c8) || ($code eq 'ANSI 4 BIT' && $c16) || ($code eq 'ANSI 8 BIT' && $c256) || ($code eq 'ANSI 24 BIT' && $crgb)) {
-				if ($code eq 'ANSI 3 BIT') {
-					$to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]' . sprintf('%-11s',$code) . ' [% RESET %][% BRIGHT GREEN %]' . '═' x 16 . '╤' . '═' x 4 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
-				} else {
-					$to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]' . sprintf('%-11s',$code) . ' [% RESET %][% BRIGHT GREEN %]' . '═' x 16 . '╪' . '═' x 4 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
-				}
+                if ($code eq 'ANSI 3 BIT') {
+                    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]' . sprintf('%-11s',$code) . ' [% RESET %][% BRIGHT GREEN %]' . '═' x 16 . '╤' . '═' x 4 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
+                } else {
+                    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]' . sprintf('%-11s',$code) . ' [% RESET %][% BRIGHT GREEN %]' . '═' x 16 . '╪' . '═' x 4 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
+                }
                 my @names = grep(!/^(DEFAULT|COLOR|GRAY)/,(sort(keys %{$ansi->{'ansi_meta'}->{'foreground'}})));
                 unshift(@names,'DEFAULT');
                 if ($code eq 'ANSI 8 BIT') {
@@ -247,12 +295,12 @@ TOKENS
                 }
                 foreach my $name (@names) {
                     if (type($ansi->{'ansi_meta'}->{'foreground'}->{$name}->{'out'}) eq $code) {
-			    		if ($name =~ /^(DEFAULT|NAVY|COLOR 16|COLOR 17|BLACK|MEDIUM BLUE|ARMY GREEN|BISTRE|BULGARIAN ROSE|CHARCOAL|COOL BLACK|DARK BLUE|DARK GREEN|DARK JUNGLE GREEN|DARK MIDNIGHT BLUE|DUKE BLUE|EGYPTIAN BLUE|MEDIUM JUNGLE GREEN|MIDNIGHT BLUE|NAVY BLUE|ONYX|OXFORD BLUE|PHTHALO BLUE|PHTHALO GREEN|PRUSSIAN BLUE|SAINT PATRICK BLUE|SEAL BROWN|SMOKEY BLACK|ULTRAMARINE|ZINNWALDITE BROWN)$/) {
-				    		$to .= $bar . sprintf(' %-29s ',$name) . '[% RESET %]' . $bar . '[% B_' . $name . ' %]    [% RESET %]│' . sprintf(' %-54s ',$ansi->ansi_description('foreground',$name)) . "$bar\n";
-					    } else {
-    						$to .= $bar . '[% ' . $name . ' %]' . sprintf(' %-29s ',$name) . '[% RESET %]' . $bar . '[% B_' . $name . ' %]    [% RESET %]' . $bar . sprintf(' %-54s ',$ansi->ansi_description('foreground',$name)) . "$bar\n";
-	    				}
-		    		}
+                        if ($name =~ /^(DEFAULT|NAVY|COLOR 16|COLOR 17|BLACK|MEDIUM BLUE|ARMY GREEN|BISTRE|BULGARIAN ROSE|CHARCOAL|COOL BLACK|DARK BLUE|DARK GREEN|DARK JUNGLE GREEN|DARK MIDNIGHT BLUE|DUKE BLUE|EGYPTIAN BLUE|MEDIUM JUNGLE GREEN|MIDNIGHT BLUE|NAVY BLUE|ONYX|OXFORD BLUE|PHTHALO BLUE|PHTHALO GREEN|PRUSSIAN BLUE|SAINT PATRICK BLUE|SEAL BROWN|SMOKEY BLACK|ULTRAMARINE|ZINNWALDITE BROWN)$/) {
+                            $to .= $bar . sprintf(' %-29s ',$name) . '[% RESET %]' . $bar . '[% B_' . $name . ' %]    [% RESET %]│' . sprintf(' %-54s ',$ansi->ansi_description('foreground',$name)) . "$bar\n";
+                        } else {
+                            $to .= $bar . '[% ' . $name . ' %]' . sprintf(' %-29s ',$name) . '[% RESET %]' . $bar . '[% B_' . $name . ' %]    [% RESET %]' . $bar . sprintf(' %-54s ',$ansi->ansi_description('foreground',$name)) . "$bar\n";
+                        }
+                    }
                 }
             }
         }
@@ -304,7 +352,7 @@ TOKENS
         $to =~ s/ color,col,row,width,hght,type/$new/gs;
     }
 
-	$ansi->ansi_output($to);
+    $ansi->ansi_output($to);
 } elsif ($frames) {
 ###
     my $sample_frames = <<'FRAMES';
@@ -344,29 +392,29 @@ FRAMES
       '[% HORIZONTAL RULE YELLOW     %][% BLACK %][% B_YELLOW     %] YELLOW[% RESET     %]' . "\n" .
       '[% HORIZONTAL RULE NAVY       %][% WHITE %][% B_NAVY       %] NAVY[% RESET       %]' . "\n" .
       '[% HORIZONTAL RULE ROYAL BLUE %][% WHITE %][% B_ROYAL BLUE %] ROYAL BLUE[% RESET %]' . "\n\n";
-    $ansi->ansi_output("$header\n$sample_horizontal_rules");
+    $ansi->ansi_output("$header\n$sample_horizontal_rules\rCan be all colors your terminal supports.\n\n");
 } elsif ($rawtokens) {
-    print "\n╔", '═' x 131, "╗\n";
-    $ansi->ansi_output('║[% B_BLACK %][% BRIGHT YELLOW %]' . ' ' x 46 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 47 . "[% RESET %]║\n");
-    print '╠', '═' x 32, '╦', '═' x 32, '╦', '═' x 32, '╦', '═' x 32, '╣', "\n";
-    printf('║ %-31s║ %-31s║ %-31s║ %-31s║', 'COLOR 16 - COLOR 231', 'B_COLOR 16 - B_COLOR 231', 'GRAY 0 - GRAY 28', 'B_GRAY 0 - B_GRAY 28');
-    print "\n║";
+    my $text = "\n" . '[% GREEN %]╔' . '═' x 131 . '╗[% RESET %]' . "\n";
+    $text .= '[% GREEN %]║[% B_BLACK %][% BRIGHT YELLOW %]' . ' ' x 46 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 47 . '[% RESET %][% GREEN %]║[% RESET %]' . "\n";
+    $text .= '[% GREEN %]╠' . '═' x 32 . '╦' . '═' x 32 . '╦' . '═' x 32 . '╦' . '═' x 32 . '╣[% RESET %]' . "\n";
+    $text .= '[% GREEN %]║[% RESET %]';
     my $width = 4;
     my $count = 1;
     foreach my $codes ('clear','cursor','attributes','foreground','background') {
         foreach my $token (sort(keys %{ $ansi->{'ansi_meta'}->{$codes} })) {
-            next if ($token =~ /COLOR |GRAY /);
-            printf(' %-31s', $token);
+            $text .= sprintf(' %-31s', $token);
             $count++;
             if ($count > $width) {
                 $count = 1;
-                print "║\n║";
+                $text .= '[% GREEN %]║[% RESET %]' . "\n" . '[% GREEN %]║[% RESET %]';
             } else {
-                print '║';
+                $text .= '[% GREEN %]║[% RESET %]';
             }
-        } ## end foreach my $token (sort(keys...))
+        }
     }
-    print "\r╚", '═' x 32, '╩', '═' x 32, '╩', '═' x 32, '╩', '═' x 32, '╝', "\n\n";
+	$text .= "\r" . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s','JUSTIFIED') . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s','ENDJUSTIFIED') . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'WRAP') . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'ENDWRAP') . '[% GREEN %]║[% RESET %]' . "\n";
+    $text .= '[% GREEN %]╚' . '═' x 32 . '╩' . '═' x 32 . '╩' . '═' x 32 . '╩' . '═' x 32 . '╝[% RESET %]' . "\n\n";
+	$ansi->ansi_output($text);
 } elsif ($Dump) {
     my $temp = "\n\n";
     my @names;
@@ -422,6 +470,7 @@ FRAMES
         $ansi->ansi_output('[% COLOR 52 %]╰─────────┴' . '─' x 65 . '[% RESET %]' . "\n\n");
     }
 } elsif ($symbols) {
+	print "\nAssembling symbols...";
     my @names;
     my $search = (scalar(@ARGV)) ? uc(pop(@ARGV)) : undef;
     my $size = 0;
@@ -455,20 +504,21 @@ FRAMES
         }
     }
     if (scalar(@names)) {
-        $ansi->ansi_output("\nNOTE:  Not all terminals will support all characters\n" . '[% COLOR 52 %]╭─────────┬─' . '─' x $size . '─╮[% RESET %]' . "\n");
-        $ansi->ansi_output('[% COLOR 52 %]│[% B_BLACK %][% CYAN %] Unicode [% RESET %][% COLOR 52 %]│[% B_BLACK %]' . ' ' x ($size - 20) . '[% BRIGHT YELLOW %]Character Token Names [% RESET %]' . "[% COLOR 52 %]│[% RESET %]\n");
-        $ansi->ansi_output('[% COLOR 52 %]├─────────┼─' . '─' x $size . "─┤[% RESET %]\n");
+        my $text = "\nNOTE:  Not all terminals will support all characters\n" . '[% COLOR 52 %]╭─────────┬─' . '─' x $size . '─╮[% RESET %]' . "\n";
+        $text   .= '[% COLOR 52 %]│[% B_BLACK %][% CYAN %] Unicode [% RESET %][% COLOR 52 %]│[% B_BLACK %]' . ' ' x ($size - 20) . '[% BRIGHT YELLOW %]Character Token Names [% RESET %]' . "[% COLOR 52 %]│[% RESET %]\n";
+        $text   .= '[% COLOR 52 %]├─────────┼─' . '─' x $size . "─┤[% RESET %]\n";
         while (scalar(@names)) {
             my $name = shift(@names);
             if ($name ne '') {
                 if ($name =~ /^COMBINING/) {
-                    $ansi->ansi_output(sprintf('%s│ %s%-5X %s│%s %' . $size . 's %s│%s   %s', '[% COLOR 52 %]', '[% RESET %]U+', charnames::vianame($name), '[% COLOR 52 %]', '[% RESET %]', $name, '[% COLOR 52 %]', '[% RESET %]', charnames::string_vianame($name)) . "\n");
+                    $text .= sprintf('%s│ %s%-5X %s│%s %' . $size . 's %s│%s   %s', '[% COLOR 52 %]', '[% RESET %]U+', charnames::vianame($name), '[% COLOR 52 %]', '[% RESET %]', $name, '[% COLOR 52 %]', '[% RESET %]', charnames::string_vianame($name)) . "\n";
                 } else {
-                    $ansi->ansi_output(sprintf('%s│ %s%-5X %s│%s %' . $size . 's %s│%s %s', '[% COLOR 52 %]', '[% RESET %]U+', charnames::vianame($name), '[% COLOR 52 %]', '[% RESET %]', $name, '[% COLOR 52 %]', '[% RESET %]', charnames::string_vianame($name)) . "\n");
+                    $text .= sprintf('%s│ %s%-5X %s│%s %' . $size . 's %s│%s %s', '[% COLOR 52 %]', '[% RESET %]U+', charnames::vianame($name), '[% COLOR 52 %]', '[% RESET %]', $name, '[% COLOR 52 %]', '[% RESET %]', charnames::string_vianame($name)) . "\n";
                 }
             } ## end if ($name ne '')
         } ## end while (scalar(@names))
-        $ansi->ansi_output('[% COLOR 52 %]╰─────────┴─' . '─' x $size . '─╯[% RESET %]' . "\n\n");
+        $text .= '[% COLOR 52 %]╰─────────┴─' . '─' x $size . '─╯[% RESET %]' . "\n\n";
+		$ansi->ansi_output($text);
     } else {
         print "\nNothing found for $search\n\n";
     }
@@ -562,6 +612,10 @@ sub help_text {
 ║[% B_COLOR 52 %][% BRIGHT YELLOW %] OPTIONS                                                         [% RESET %]║
 ║     -[% BRIGHT BLUE %]a[% RESET %] or --[% BRIGHT BLUE %]ansi-modes[% RESET %]                                          ║
 ║         Show supported ANSI color modes                         ║
+║                                                                 ║
+║     --[% BRIGHT BLUE %]baud[% RESET %]=speed                                                ║
+║         "speed" can be 75, 150, 300, 600, 1200, 2400, 4800      ║
+║                        9600, 19200, 38400 or 115200             ║
 ║                                                                 ║
 ║     -[% BRIGHT BLUE %]c[% RESET %] or --[% BRIGHT BLUE %]colors[% RESET %]                                              ║
 ║         Show available colors                                   ║

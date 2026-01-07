@@ -1,4 +1,4 @@
-Test2-Tools-LoadModule is Copyright (C) 2019-2022 by Thomas R. Wyant, III
+Test2-Tools-LoadModule is Copyright (C) 2019-2026 by Thomas R. Wyant, III
 
 DESCRIPTION
 
@@ -41,7 +41,7 @@ LICENSING INFORMATION
 
 This package is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files LICENSE-Artistic and LICENSE-GPL.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

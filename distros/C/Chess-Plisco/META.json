@@ -77,7 +77,7 @@
          "web" : "http://github.com/gflohr/Chess-Plisco.git"
       }
    },
-   "version" : "v1.0.1",
+   "version" : "v1.0.2",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38"
 }

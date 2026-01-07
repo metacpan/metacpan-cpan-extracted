@@ -54,7 +54,7 @@ int  dbd_db_ping _((SV *dbh));
 int  dbd_st_table_info _((SV *sth, imp_sth_t *imp_sth, SV *attr));
 
 int  dbd_db_do _(( SV *dbh, char *statement) );                  
-
+int dbd_st_cancel(SV *sth, imp_sth_t *imp_sth); /* Added this line for RHEL 10 support*/
 int  dbd_st_primary_key_info _(( SV        *sth,
                                  imp_sth_t *imp_sth,
                                  char      *pszCatalog,

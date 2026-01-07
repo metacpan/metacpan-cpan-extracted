@@ -91,7 +91,17 @@ sub pretty_print {
         $join_cond = 'USING ( ' . join( ', ', map { $_->as_ident } @{ $self->{ 'usingClause' } } ) . ' )';
     }
     elsif ( $self->{ 'quals' } ) {
-        $join_cond = 'ON ' . $self->{ 'quals' }->pretty_print;
+        my $Q        = $self->{ 'quals' };
+        my $q_text   = $Q->as_text;
+        my $q_pretty = $Q->pretty_print;
+
+        # If join condition is multiline, indent it in nicer way.
+        if ( $q_pretty =~ /\n/ ) {
+            $join_cond = sprintf( "ON\n%s", $self->increase_indent( $q_pretty ) );
+        }
+        else {
+            $join_cond = 'ON ' . $q_pretty if $q_pretty !~ /\n/;
+        }
     }
     return sprintf "%s\n%s %s %s", $self->{ 'larg' }->pretty_print, $self->join_type, $self->{ 'rarg' }->pretty_print, $join_cond;
 }

@@ -25,8 +25,6 @@ requires:
   Future::IO: '0'
   Future::Queue: '0'
   Future::Selector: '0'
-  IO::Async::Notifier: '0'
-  IO::Async::Stream: '0'
   Log::Any: '0'
   Object::Pad: '0.821'
   Protocol::Sys::Virt: v11.10.1
@@ -40,5 +38,5 @@ requires:
 resources:
   bugtracker: https://github.com/ehuelsmann/perl-sys-async-virt/issues
   repository: git://github.com/ehuelsmann/perl-sys-async-virt.git
-version: v0.2.1
+version: v0.2.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

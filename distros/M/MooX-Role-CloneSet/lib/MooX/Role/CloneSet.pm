@@ -4,17 +4,16 @@ use 5.012;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare("v0.1.1");
-
 use Moo::Role;
 use namespace::clean;
 
-sub cset($ %)
-{
-	my ($self, %new) = @_;
+our $VERSION = v0.1.2;
+
+sub cset($ %) {
+	my ( $self, %new ) = @_;
 
 	# Hmm, so Moo doesn't have metaclasses, right?
-	return $self->new(%{$self}, %new);
+	return $self->new( %{$self}, %new );
 }
 
 1;
@@ -75,10 +74,8 @@ immutable objects.
 
 =head1 LICENSE
 
-Copyright (C) 2016  Peter Pentchev E<lt>roam@ringlet.netE<gt>
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+SPDX-FileCopyrightText: Peter Pentchev E<lt>roam@ringlet.netE<gt>
+SPDX-License-Identifier: Artistic-2.0
 
 =head1 AUTHOR
 

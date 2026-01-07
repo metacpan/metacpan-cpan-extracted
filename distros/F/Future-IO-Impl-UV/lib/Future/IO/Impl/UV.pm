@@ -1,13 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::Impl::UV 0.03;
+package Future::IO::Impl::UV 0.04;
 
-use v5.14;
+use v5.20;
 use warnings;
 use base qw( Future::IO::ImplBase );
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use UV;
 use UV::Poll;
@@ -24,6 +27,8 @@ C<Future::IO::Impl::UV> - implement C<Future::IO> using C<UV>
 
 =head1 DESCRIPTION
 
+=for highlighter language=perl
+
 This module provides an implementation for L<Future::IO> which uses L<UV>.
 
 There are no additional methods to use in this module; it simply has to be
@@ -37,16 +42,13 @@ loaded, and it will provide the C<Future::IO> implementation methods:
 
 =cut
 
-sub sleep
+sub sleep ( $, $secs )
 {
-   shift;
-   my ( $secs ) = @_;
-
    my $f = Future::IO::Impl::UV::_Future->new;
 
    my $timer = UV::Timer->new;
-   $timer->start( $secs * 1000, 0, sub { $f->done; } );
-   $f->on_cancel( sub { $timer->stop; } );
+   $timer->start( $secs * 1000, 0, sub ( $ ) { $f->done; } );
+   $f->on_cancel( sub ( $ ) { $timer->stop; } );
 
    return $f;
 }
@@ -58,23 +60,20 @@ my %read_futures_by_fileno;  # {fileno} => [@futures]
 my %write_futures_by_fileno; # {fileno} => [@futures]
 my %poll_by_fileno;
 
-sub _update_poll
+sub _update_poll ( $fh )
 {
-   my ( $fh ) = @_;
    my $fileno = $fh->fileno;
 
    my $poll = $poll_by_fileno{$fileno} //=
       UV::Poll->new(
          fh => $fh,
-         on_poll => sub {
-            my ( $poll, $status, $events ) = @_;
-
+         on_poll => sub ( $poll, $status, $events ) {
             if( $status or $events & UV::Poll::UV_READABLE ) {
-               my $f = shift @{ $read_futures_by_fileno{$fileno} };
+               my $f = shift $read_futures_by_fileno{$fileno}->@*;
                $f and $f->done;
             }
             if( $status or $events & UV::Poll::UV_WRITABLE ) {
-               my $f = shift @{ $write_futures_by_fileno{$fileno} };
+               my $f = shift $write_futures_by_fileno{$fileno}->@*;
                $f and $f->done;
             }
 
@@ -83,8 +82,8 @@ sub _update_poll
       );
 
    my $want = 0;
-   $want |= UV::Poll::UV_READABLE if scalar @{ $read_futures_by_fileno{$fileno}  // [] };
-   $want |= UV::Poll::UV_WRITABLE if scalar @{ $write_futures_by_fileno{$fileno} // [] };
+   $want |= UV::Poll::UV_READABLE if scalar ( $read_futures_by_fileno{$fileno}  // [] )->@*;
+   $want |= UV::Poll::UV_WRITABLE if scalar ( $write_futures_by_fileno{$fileno} // [] )->@*;
 
    if( $want ) {
       $poll->start( $want );
@@ -95,10 +94,8 @@ sub _update_poll
    }
 }
 
-sub ready_for_read
+sub ready_for_read ( $, $fh )
 {
-   shift;
-   my ( $fh ) = @_;
    my $fileno = $fh->fileno;
 
    my $futures = $read_futures_by_fileno{$fileno} //= [];
@@ -116,10 +113,8 @@ sub ready_for_read
 
 my %poll_write_by_fileno;
 
-sub ready_for_write
+sub ready_for_write ( $, $fh )
 {
-   shift;
-   my ( $fh ) = @_;
    my $fileno = $fh->fileno;
 
    my $futures = $write_futures_by_fileno{$fileno} //= [];
@@ -138,11 +133,8 @@ sub ready_for_write
 my $sigchld_watch;
 my %futures_waitpid; # {$pid} => [@futures]
 
-sub waitpid
+sub waitpid ( $, $pid )
 {
-   shift;
-   my ( $pid ) = @_;
-
    # libuv does not currently have a nice way to ask it to watch an existing
    # PID that it didn't fork/exec itself. All we can do here is ask to be
    # informed of SIGCHLD and then check if any of the processes we're keeping
@@ -151,7 +143,7 @@ sub waitpid
    #   https://github.com/libuv/libuv/issues/3100
    $sigchld_watch ||= do {
       my $w = UV::Signal->new( signal => POSIX::SIGCHLD );
-      $w->start(sub {
+      $w->start(sub ( $, $signum ) {
          foreach my $pid ( keys %futures_waitpid ) {
             next unless waitpid( $pid, POSIX::WNOHANG ) > 0;
             my $wstatus = $?;
@@ -171,7 +163,7 @@ sub waitpid
       return $f;
    }
 
-   push @{ $futures_waitpid{$pid} }, $f;
+   push $futures_waitpid{$pid}->@*, $f;
 
    return $f;
 }
@@ -179,9 +171,8 @@ sub waitpid
 package Future::IO::Impl::UV::_Future;
 use base qw( Future );
 
-sub await
+sub await ( $self )
 {
-   my $self = shift;
    UV::loop->run( UV::Loop::UV_RUN_ONCE ) until $self->is_ready;
    return $self;
 }

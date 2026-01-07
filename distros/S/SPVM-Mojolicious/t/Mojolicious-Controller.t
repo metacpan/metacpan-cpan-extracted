@@ -24,6 +24,8 @@ ok(SPVM::TestCase::Mojolicious::Controller->flash);
 
 ok(SPVM::TestCase::Mojolicious::Controller->render_to_string);
 
+ok(SPVM::TestCase::Mojolicious::Controller->render);
+
 SPVM::Fn->destroy_runtime_permanent_vars;
 
 my $end_memory_blocks_count = $api->get_memory_blocks_count;

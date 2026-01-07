@@ -1,5 +1,14 @@
 Revision history for Perl extension UV
 
+2.001 2026-01-06
+    - Don't assert that `$loop->backend_timeout` is nonzero initially
+      (fixes GH#40)
+    - Slight modernizations:
+       - `use v5.14` in every file
+       - Use Perl v5.14-style `package NAME VERSION` syntax instead of
+         explicit assignments to `our $VERSION`
+    - Misc small fixes to Pod documentation
+
 2.000 2021-07-28
     - Also add repository bugtracker URL to META files
     - Document the `$callback` argument to `$loop->getnameinfo()`

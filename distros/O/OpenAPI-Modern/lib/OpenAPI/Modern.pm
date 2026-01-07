@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.118-6-gcf4555e1
+package OpenAPI::Modern; # git description: v0.119-7-gce1a1a61
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.119';
+our $VERSION = '0.120';
 
 use 5.020;
 use utf8;
@@ -1240,7 +1240,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.119
+version 0.120
 
 =head1 SYNOPSIS
 
@@ -1697,8 +1697,8 @@ L<the specification|https://spec.openapis.org/oas/latest#schema-object>. Format 
 B<on>, and the use of content* keywords is off (see
 L<JSON::Schema::Modern/validate_content_schemas>).
 
-References (with the C<$ref>) keyword may reference any position within the entire OpenAPI document;
-as such, json pointers are relative to the B<root> of the document, not the root of the subschema
+As references (with the C<$ref> keyword) may reference any position within the entire OpenAPI
+document, json pointers are relative to the B<root> of the document, not the root of the subschema
 itself. References to other documents are also permitted, provided those documents have been loaded
 into the evaluator in advance (see L<JSON::Schema::Modern/add_schema>).
 

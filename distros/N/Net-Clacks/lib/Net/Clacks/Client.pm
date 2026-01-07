@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 33;
+our $VERSION = 34;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -227,6 +227,8 @@ sub doNetwork($self, $readtimeout = 0) {
         $readtimeout = 0;
     }
 
+    # Negative read timeout means "send only"
+
     if($self->{needreconnect}) {
         $self->reconnect();
     }
@@ -285,8 +287,12 @@ sub doNetwork($self, $readtimeout = 0) {
                 $self->{outbuffer} = substr($self->{outbuffer}, $written);
             }
         }
-
     }
+
+    if($readtimeout < 0) {
+        return 1;
+    }
+        
 
     {
         my @temp;
@@ -718,7 +724,7 @@ sub retrieve($self, $varname) {
     if($answerline =~ /^RETRIEVED\ (.+?)\=(.*)/) {
         my ($key, $val) = ($1, $2);
         if($key ne $varname) {
-            print STDERR "Retrieved clacks key $key does not match requested varname $varname!\n";
+            #print STDERR "Retrieved clacks key $key does not match requested varname $varname!\n";
             return;
         }
         return $val;
@@ -1128,6 +1134,14 @@ sub setAndStore($self, $varname, $value, $forcesend = 0) {
     return;
 }
 
+sub fastdisconnect($self) {
+    if(defined($self->{socket})) {
+        delete $self->{socket};
+    }
+    $self->{needreconnect} = 1;
+    return;
+}
+
 sub disconnect($self) {
     if($self->{needreconnect}) {
         # We are not connected, just do nothing
@@ -1136,14 +1150,20 @@ sub disconnect($self) {
 
     $self->flush();
     $self->{outbuffer} .= "QUIT\r\n";
-    my $endtime = time + 0.5; # Wait a maximum of one half second to send
+    my $endtime = time + 0.1; # Wait a maximum of one half second to send
     while(1) {
         last if(time > $endtime);
-        $self->doNetwork();
+        my $xstart = time;
+        $self->doNetwork(-1);
+        my $xend = time;
+        my $timetaken = $xend - $xstart;
+        if($timetaken > 1) {
+            #print STDERR "\n §§§§§§§§§§§§§§§§§§§§§§§§§§§§§     doNetwork() took ", $timetaken, " seconds\n";
+        }
         last if(!length($self->{outbuffer}));
-        sleep(0.05);
+        sleep(0.02);
     }
-    sleep(0.1); # Wait another tenth of a second for the OS to flush the socket
+    #sleep(0.1); # Wait another tenth of a second for the OS to flush the socket
 
     delete $self->{socket};
     $self->{needreconnect} = 1;

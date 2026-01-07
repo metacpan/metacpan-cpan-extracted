@@ -19,14 +19,14 @@ my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 subtest recursive_get => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new,
+    evaluator => my $js = JSON::Schema::Modern->new(max_traversal_depth => 15),
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
     foo: { $ref: '#/components/parameters/bar' }
     bar: { $ref: '#/components/parameters/foo' }
     baz: { name: baz, in: query, schema: {} }
-    blip: { $ref: '#/components/schemas/bar/properties/foo' }
+    blip: { $ref: 'http://far_far_away/api2#/components/schemas/beta/properties/alpha' }
   schemas:
     foo: { $ref: 'http://localhost:5678/api#/properties/foo' }
     bar:
@@ -39,7 +39,7 @@ paths:
   /foo:
     post:
       parameters:
-        - $ref: '#/i_do_not_exist'
+        - $ref: 'http://far_far_away/api2#/i_do_not_exist'
         - $ref: '#/components/parameters/foo'
         - $ref: '#/components/parameters/baz'
         - $ref: '#/components/parameters/blip' # -> parameter -> schema
@@ -49,6 +49,7 @@ YAML
 
   my $openapi = OpenAPI::Modern->new(
     openapi_document => $doc,
+    evaluator => $js,
   );
 
   my $doc2 = JSON::Schema::Modern::Document::OpenAPI->new(
@@ -68,7 +69,7 @@ YAML
 
   like(
     exception { $openapi->recursive_get('#/paths/~1foo/post/parameters/0') },
-    qr'^unable to find resource "http://localhost:1234/api#/i_do_not_exist"',
+    qr'^unable to find resource "http://far_far_away/api2#/i_do_not_exist"',
     'failure to resolve $ref',
   );
 
@@ -92,7 +93,7 @@ YAML
 
   like(
     exception { $openapi->recursive_get('#/paths/~1foo/post/parameters/3') },
-    qr!^bad \$ref to http://localhost:5678/api#/properties/foo: not a "parameter"!,
+    qr!^bad \$ref to http://far_far_away/api2#/components/schemas/beta/properties/alpha: not a "parameter"!,
     'multiple $refs, landing on the wrong type',
   );
 

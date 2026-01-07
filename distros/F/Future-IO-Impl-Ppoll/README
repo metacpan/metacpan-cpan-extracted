@@ -1,0 +1,27 @@
+NAME
+
+    Future::IO::Impl::Ppoll - implement Future::IO using ppoll(2)
+
+DESCRIPTION
+
+    This module provides an implementation for Future::IO which uses the
+    ppoll(2) Linux system call, via IO::Ppoll.
+
+    There are no additional methods to use in this module; it simply has to
+    be loaded, and it will provide the Future::IO implementation methods:
+
+       use Future::IO;
+       use Future::IO::Impl::Ppoll;
+    
+       my $f = Future::IO->sleep(5);
+       ...
+
+    Note that the waitpid method will take over the operation of
+    $SIG{CHLD}, and will print a warning if it discovers some other code
+    has already set it. Make sure not to otherwise override this signal
+    handler in your program, or else the waitpid futures will stop working.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

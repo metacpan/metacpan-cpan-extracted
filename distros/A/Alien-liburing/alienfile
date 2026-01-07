@@ -1,9 +1,9 @@
 use alienfile;
 
-plugin PkgConfig => pkg_name => 'liburing', minimum_version => '2.11';
+plugin PkgConfig => pkg_name => 'liburing', minimum_version => '2.13';
 
 share {
-  start_url 'extern/liburing-liburing-2.11.tar.gz';
+  start_url 'extern/liburing-2.13.tar.gz';
   plugin 'Fetch::Local';
   plugin Extract => format => 'tar.gz';
   plugin 'Gather::IsolateDynamic';

@@ -1,0 +1,47 @@
+---
+abstract: 'Use IO::Async with IO::Uring'
+author:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Async::LoopTests: '0.24'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-Async-Loop-Uring
+provides:
+  IO::Async::Loop::Uring:
+    file: lib/IO/Async/Loop/Uring.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  IO::Async::Loop: '0'
+  IO::Poll: '0'
+  IO::Uring: '0.008'
+  Linux::FD: '0.015'
+  Scalar::Util: '0'
+  Signal::Info: '0'
+  Signal::Mask: '0'
+  Time::Spec: '0'
+  constant: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Leont/io-async-loop-uring/issues
+  repository: git://github.com/Leont/io-async-loop-uring.git
+version: '0.001'
+x_generated_by_perl: v5.42.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

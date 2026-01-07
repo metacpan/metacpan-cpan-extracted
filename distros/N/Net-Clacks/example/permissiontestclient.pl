@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 33;
+our $VERSION = 34;
 use autodie qw( close );
 use Array::Contains;
 use utf8;

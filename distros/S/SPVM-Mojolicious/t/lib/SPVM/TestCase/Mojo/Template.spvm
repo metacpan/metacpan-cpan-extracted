@@ -219,6 +219,22 @@ EOS
       $mt->set_auto_escape(1);
       
       my $code = <<'EOS';
+% use StringBuffer;
+<%= StringBuffer->new("&<>\"'") %>
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^\s*&amp;&lt;&gt;&quot;&#39;\s*$")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      $mt->set_auto_escape(1);
+      
+      my $code = <<'EOS';
 <%== "&<>" %>
 EOS
       
