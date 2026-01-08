@@ -299,6 +299,24 @@ static infix_status prepare_forward_call_frame_arm64(infix_arena_t * arena,
         }
         bool placed_in_register = false;
         c23_maybe_unused bool is_variadic_arg = (i >= num_fixed_args);
+
+        // Arrays decay to pointers. Always treat as a GPR argument (8 bytes).
+        if (type->category == INFIX_TYPE_ARRAY) {
+            if (gpr_count < NUM_GPR_ARGS) {
+                layout->arg_locations[i].type = ARG_LOCATION_GPR;
+                layout->arg_locations[i].reg_index = (uint8_t)gpr_count++;
+                placed_in_register = true;
+            }
+            else {
+                layout->arg_locations[i].type = ARG_LOCATION_STACK;
+                layout->arg_locations[i].stack_offset = (uint32_t)stack_offset;
+                stack_offset += 8;
+                layout->num_stack_args++;
+                placed_in_register = true;
+            }
+            continue;
+        }
+
 #if defined(INFIX_OS_MACOS)
         // Apple ABI Deviation: All variadic arguments are passed on the stack.
         if (layout->is_variadic && is_variadic_arg) {
@@ -476,6 +494,12 @@ static infix_status generate_forward_argument_moves_arm64(code_buffer * buf,
         switch (loc->type) {
         case ARG_LOCATION_GPR:
             {
+                // Arrays passed by pointer. The data at X9 IS the pointer. Move X9 to dest reg.
+                if (type->category == INFIX_TYPE_ARRAY) {
+                    emit_arm64_mov_reg(buf, true, GPR_ARGS[loc->reg_index], X9_REG);
+                    break;
+                }
+
                 // C requires that signed integer types smaller than a full register be
                 // sign-extended when passed. We check for this case here.
                 bool is_signed_lt_64 = type->category == INFIX_TYPE_PRIMITIVE && type->size < 8 &&
@@ -571,6 +595,12 @@ static infix_status generate_forward_argument_moves_arm64(code_buffer * buf,
                 }
 #endif
                 // Generic stack argument handling (for non-macOS, or for structs on macOS)
+                // If it's an array passed on the stack, it's a pointer (8 bytes).
+                if (type->category == INFIX_TYPE_ARRAY) {
+                    emit_arm64_str_imm(buf, true, X9_REG, SP_REG, (int32_t)loc->stack_offset);
+                    break;
+                }
+
                 const int32_t max_imm_offset = 0xFFF * 8;
                 for (size_t offset = 0; offset < type->size; offset += 8) {
                     emit_arm64_ldr_imm(buf, true, X10_REG, X9_REG, (int32_t)offset);

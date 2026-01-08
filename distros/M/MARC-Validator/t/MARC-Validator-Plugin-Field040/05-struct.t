@@ -4,7 +4,7 @@ use warnings;
 use File::Object;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::Validator::Plugin::Field040;
-use Test::More 'tests' => 8;
+use Test::More 'tests' => 10;
 use Test::NoWarnings;
 
 # Data dir.
@@ -52,3 +52,42 @@ is_deeply(
 	},
 	'Get struct - checks (leader 018 is a and field 040e is rda).',
 );
+
+# Test.
+$obj = MARC::Validator::Plugin::Field040->new(
+	'error_id_def' => '015a',
+);
+$obj->init;
+$marc_record = MARC::File::XML->in($data_dir->file('fake2-incorrect_leader.xml')->s)->next;
+$obj->process($marc_record);
+$ret = $obj->struct;
+is_deeply(
+	$ret->{'checks'}->{'not_valid'},
+	{
+		'fake2' => [{
+			'error' => "Bad number in length.",
+			'params' => {
+				'String' => 'x1753',
+			},
+		}],
+	},
+	'Get struct - checks (leader has bad length number - >x1753<).',
+);
+
+# Test.
+$obj = MARC::Validator::Plugin::Field040->new(
+	'error_id_def' => '015a',
+);
+$obj->init;
+$marc_record = MARC::File::XML->in($data_dir->file('fake4-missing_field_040.xml')->s)->next;
+$obj->process($marc_record);
+$ret = $obj->struct;
+is_deeply(
+	$ret->{'checks'}->{'not_valid'},
+	{
+		'fake4' => [{
+			'error' => "Field 040 isn't present.",
+		}],
+	},
+	'Get struct - checks (field 040 isn\'t present).',
+)

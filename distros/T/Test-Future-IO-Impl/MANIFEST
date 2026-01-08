@@ -1,6 +1,7 @@
 .editorconfig
 Build.PL
 Changes
+distrolint.ini
 lib/Test/Future/IO/Impl.pm
 LICENSE
 MANIFEST			This list of files

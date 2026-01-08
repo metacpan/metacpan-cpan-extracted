@@ -1,0 +1,12 @@
+Revision history for Perl extension Retry-Policy
+
+0.02 2026-01-07T15:50:39Z
+
+  - Initial CPAN release
+  - Includes retry policy with exponential backoff and jitter
+  - Documentation, tests, and runnable examples
+
+0.01 2026-01-07T15:42:41Z
+
+  - original version
+

@@ -3,26 +3,34 @@ use strict;
 use warnings;
 use XSLoader;
 
-our $VERSION = '0.400005';
+our $VERSION = '0.500000';
 
 eval {
     require HTTP::Headers::Fast;
 
+    no warnings qw<redefine prototype>;
     # HTTP::Headers::Fast
-    *HTTP::Headers::Fast::new                    = *HTTP::XSHeaders::new;
-    *HTTP::Headers::Fast::DESTROY                = *HTTP::XSHeaders::DESTROY;
-    *HTTP::Headers::Fast::clone                  = *HTTP::XSHeaders::clone;
-    *HTTP::Headers::Fast::header                 = *HTTP::XSHeaders::header;
-    *HTTP::Headers::Fast::_header                = *HTTP::XSHeaders::_header;
-    *HTTP::Headers::Fast::clear                  = *HTTP::XSHeaders::clear;
-    *HTTP::Headers::Fast::push_header            = *HTTP::XSHeaders::push_header;
-    *HTTP::Headers::Fast::init_header            = *HTTP::XSHeaders::init_header;
-    *HTTP::Headers::Fast::remove_header          = *HTTP::XSHeaders::remove_header;
-    *HTTP::Headers::Fast::remove_content_headers = *HTTP::XSHeaders::remove_content_headers;
-    *HTTP::Headers::Fast::as_string              = *HTTP::XSHeaders::as_string;
-    *HTTP::Headers::Fast::as_string_without_sort = *HTTP::XSHeaders::as_string_without_sort;
-    *HTTP::Headers::Fast::header_field_names     = *HTTP::XSHeaders::header_field_names;
-    *HTTP::Headers::Fast::scan                   = *HTTP::XSHeaders::scan;
+    *HTTP::Headers::Fast::new = *HTTP::XSHeaders::new;
+
+    my %fast_orig;
+    my @fast_methods = qw(
+        clone header _header clear push_header init_header remove_header
+        remove_content_headers as_string as_string_without_sort header_field_names
+        psgi_flatten psgi_flatten_without_sort scan
+    );
+
+    for my $meth (@fast_methods) {
+        $fast_orig{$meth} = HTTP::Headers::Fast->can($meth);
+        no strict 'refs'; ## no critic
+        *{ "HTTP::Headers::Fast::$meth" } = sub {
+            HTTP::XSHeaders::_dispatch_xs_or_orig(
+                shift,
+                \&{ "HTTP::XSHeaders::$meth" },
+                $fast_orig{$meth},
+                @_,
+            );
+        };
+    }
 
     # Implemented in Pure-Perl
     # (candidates to move to XS)
@@ -37,19 +45,29 @@ eval {
 eval {
     require HTTP::Headers;
 
+    no warnings qw<redefine prototype>;
     # HTTP::Headers
-    *HTTP::Headers::new                    = *HTTP::XSHeaders::new;
-    *HTTP::Headers::clone                  = *HTTP::XSHeaders::clone;
-    *HTTP::Headers::header                 = *HTTP::XSHeaders::header;
-    *HTTP::Headers::_header                = *HTTP::XSHeaders::_header;
-    *HTTP::Headers::clear                  = *HTTP::XSHeaders::clear;
-    *HTTP::Headers::push_header            = *HTTP::XSHeaders::push_header;
-    *HTTP::Headers::init_header            = *HTTP::XSHeaders::init_header;
-    *HTTP::Headers::remove_header          = *HTTP::XSHeaders::remove_header;
-    *HTTP::Headers::remove_content_headers = *HTTP::XSHeaders::remove_content_headers;
-    *HTTP::Headers::as_string              = *HTTP::XSHeaders::as_string;
-    *HTTP::Headers::header_field_names     = *HTTP::XSHeaders::header_field_names;
-    *HTTP::Headers::scan                   = *HTTP::XSHeaders::scan;
+    *HTTP::Headers::new = *HTTP::XSHeaders::new;
+
+    my %headers_orig;
+    my @headers_methods = qw(
+        clone header _header clear push_header init_header remove_header
+        remove_content_headers as_string header_field_names psgi_flatten
+        psgi_flatten_without_sort scan
+    );
+
+    for my $meth (@headers_methods) {
+        $headers_orig{$meth} = HTTP::Headers->can($meth);
+        no strict 'refs'; ## no critic
+        *{ "HTTP::Headers::$meth" } = sub {
+            HTTP::XSHeaders::_dispatch_xs_or_orig(
+                shift,
+                \&{ "HTTP::XSHeaders::$meth" },
+                $headers_orig{$meth},
+                @_,
+            );
+        };
+    }
 
     # Implemented in Pure-Perl
     *HTTP::Headers::_date_header           = *HTTP::XSHeaders::_date_header;
@@ -81,6 +99,16 @@ XSLoader::load( 'HTTP::XSHeaders', $VERSION );
 
 use 5.00800;
 use Carp ();
+
+sub _dispatch_xs_or_orig {
+    my ( $self, $xs, $orig, @args ) = @_;
+    if ( HTTP::XSHeaders::_is_xsheaders($self) || !$orig ) {
+        @_ = ( $self, @args );
+        goto &$xs;
+    }
+    @_ = ( $self, @args );
+    goto &$orig;
+}
 
 sub _date_header {
     require HTTP::Date;
@@ -277,7 +305,7 @@ HTTP::Headers::Fast.
 
 =head1 VERSION
 
-Version 0.400005
+Version 0.500000
 
 =head1 SYNOPSIS
 

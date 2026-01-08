@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::Impl::UV 0.04;
+package Future::IO::Impl::UV 0.05;
 
 use v5.20;
 use warnings;
@@ -18,6 +18,17 @@ use UV::Timer;
 use UV::Signal;
 
 use POSIX ();
+
+BEGIN {
+   if( $^V ge v5.36 ) {
+      no if $^V ge v5.36, warnings => 'experimental::builtin';
+      builtin->import(qw( refaddr ));
+   }
+   else {
+      require Scalar::Util;
+      Scalar::Util->import(qw( refaddr ));
+   }
+}
 
 __PACKAGE__->APPLY;
 
@@ -56,24 +67,24 @@ sub sleep ( $, $secs )
 # libuv doesn't like having more than one uv_poll_t instance per filehandle,
 # so we'll have to combine reads and writes
 
-my %read_futures_by_fileno;  # {fileno} => [@futures]
-my %write_futures_by_fileno; # {fileno} => [@futures]
-my %poll_by_fileno;
+my %read_futures_by_refaddr;  # {refaddr} => [@futures]
+my %write_futures_by_refaddr; # {refaddr} => [@futures]
+my %poll_by_refaddr;
 
 sub _update_poll ( $fh )
 {
-   my $fileno = $fh->fileno;
+   my $refaddr = refaddr $fh;
 
-   my $poll = $poll_by_fileno{$fileno} //=
+   my $poll = $poll_by_refaddr{$refaddr} //=
       UV::Poll->new(
          fh => $fh,
          on_poll => sub ( $poll, $status, $events ) {
             if( $status or $events & UV::Poll::UV_READABLE ) {
-               my $f = shift $read_futures_by_fileno{$fileno}->@*;
+               my $f = shift $read_futures_by_refaddr{$refaddr}->@*;
                $f and $f->done;
             }
             if( $status or $events & UV::Poll::UV_WRITABLE ) {
-               my $f = shift $write_futures_by_fileno{$fileno}->@*;
+               my $f = shift $write_futures_by_refaddr{$refaddr}->@*;
                $f and $f->done;
             }
 
@@ -82,23 +93,23 @@ sub _update_poll ( $fh )
       );
 
    my $want = 0;
-   $want |= UV::Poll::UV_READABLE if scalar ( $read_futures_by_fileno{$fileno}  // [] )->@*;
-   $want |= UV::Poll::UV_WRITABLE if scalar ( $write_futures_by_fileno{$fileno} // [] )->@*;
+   $want |= UV::Poll::UV_READABLE if scalar ( $read_futures_by_refaddr{$refaddr}  // [] )->@*;
+   $want |= UV::Poll::UV_WRITABLE if scalar ( $write_futures_by_refaddr{$refaddr} // [] )->@*;
 
    if( $want ) {
       $poll->start( $want );
    }
    else {
       $poll->stop;
-      delete $poll_by_fileno{$fileno};
+      delete $poll_by_refaddr{$refaddr};
    }
 }
 
 sub ready_for_read ( $, $fh )
 {
-   my $fileno = $fh->fileno;
+   my $refaddr = refaddr $fh;
 
-   my $futures = $read_futures_by_fileno{$fileno} //= [];
+   my $futures = $read_futures_by_refaddr{$refaddr} //= [];
 
    my $f = Future::IO::Impl::UV::_Future->new;
 
@@ -111,13 +122,13 @@ sub ready_for_read ( $, $fh )
    return $f;
 }
 
-my %poll_write_by_fileno;
+my %poll_write_by_refaddr;
 
 sub ready_for_write ( $, $fh )
 {
-   my $fileno = $fh->fileno;
+   my $refaddr = refaddr $fh;
 
-   my $futures = $write_futures_by_fileno{$fileno} //= [];
+   my $futures = $write_futures_by_refaddr{$refaddr} //= [];
 
    my $f = Future::IO::Impl::UV::_Future->new;
 

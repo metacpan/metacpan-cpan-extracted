@@ -1,0 +1,277 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Affix::Build - A robust, polyglot build system for FFI extensions
+
+=head1 SYNOPSIS
+
+    use Affix::Build;
+
+    # Builds a shared library using Rust's native toolchain configuration.
+    my $rust = Affix::Build->new( name => 'my_rust_lib' );
+    $rust->add('src/logic.rs');
+    my $lib_path = $rust->compile_and_link(); # Returns path to .so/.dll (e.g., /tmp/.../my_rust_lib.dll)
+
+    # Compiles C and Go separately, then links them into a single library.
+    my $mix = Affix::Build->new(
+        name      => 'hybrid_lib',
+        build_dir => 'build/',
+        flags     => { cflags => '-O3', ldflags => '-L/opt/lib' },
+        debug     => 1
+    );
+
+    $mix->add('src/wrapper.c', flags => '-DDEBUG'); # Per-file overrides
+    $mix->add('src/core.go');
+
+    my $dll = $mix->link();
+
+=head1 DESCRIPTION
+
+C<Affix::Build> is a cross-platform compilation utility designed to generate shared libraries (C<.dll>, C<.so>,
+C<.dylib>) from source code in over 15 different programming languages.
+
+It is specifically engineered to support Foreign Function Interface (FFI) development. It abstracts away the complexity
+of invoking various compilers, normalizing object file extensions, handling platform-specific linker flags (such as
+MinGW vs MSVC on Windows), and ensuring that language runtimes (like the Go GC or .NET Runtime) are correctly
+initialized.
+
+To be honest, this might be an easy backdoor way to get the functionality of an L<Inline> module but I wrote it to test
+against compiled libs in the Affix test suite.
+
+=head2 Build Strategies
+
+The compiler automatically selects the best build strategy based on the input sources:
+
+=over
+
+=item 1. B<Native/Dynamic Strategy> (Single Language)
+
+If you provide source files for only B<one> language, C<Affix::Build> delegates the entire build process to that
+language's native toolchain (e.g., `go build -buildmode=c-shared`, `rustc --crate-type cdylib`, `dotnet publish`).
+
+This is the preferred method as it guarantees the language's standard library and runtime environment are configured
+exactly as the language maintainers intended.
+
+=item 2. B<Polyglot/Static Strategy> (Mixed Languages)
+
+If you provide source files from B<multiple> languages (e.g., C calling into Rust), the compiler switches to an
+aggregation strategy:
+
+=over
+
+=item 1. It instructs every compiler to output a B<Static Library> (C<.a> / C<.lib>) or B<Object File> (C<.o> / C<.obj>).
+
+=item 2. It aggregates these artifacts.
+
+=item 3. It invokes the system C/C++ linker (usually C<cc> or C<g++>) to link them all into a final shared library.
+
+=back
+
+=back
+
+=head1 CONSTRUCTOR
+
+    my $c = Affix::Build->new( %params );
+
+Creates a new compiler instance.
+
+=over
+
+=item C<name> (Default: C<'affix_lib'>)
+
+The base name of the resulting library. The compiler will automatically append the OS-specific extension (C<.dll> on
+Windows, C<.dylib> on macOS, C<.so> on Linux).
+
+=item C<build_dir> (Default: Temporary Directory)
+
+The directory where intermediate artifacts and the final library will be written. If not provided, a temporary
+directory is created via L<Path::Tiny> and cleaned up when the object is destroyed.
+
+=item C<debug> (Default: 0)
+
+If set to true, the exact system commands executed by the compiler will be printed to STDERR.
+
+=item C<flags> (Default: C<{}>)
+
+Hashref of global flags: C<cflags>, C<cxxflags>, C<ldflags>.
+
+=item C<os> (Default: C<$^O>)
+
+Override the detected operating system (useful for testing).
+
+=back
+
+=head1 METHODS
+
+=head2 C<add( ... )>
+
+    $c->add( 'path/to/file.c' );
+    $c->add( 'path/to/logic.rs' );
+    $c->add( 'file.c', flags => '-DDEBUG' );
+    $c->add( \'int main(){}', lang => 'c' );
+
+Adds a source file to the build manifest. The compiler auto-detects the language based on the file extension.
+
+You can also pass raw source code as a SCALAR reference; in this case, the C<lang> argument is required (e.g., C<'c'>,
+C<'rust'>, C<'go'>). See L</SUPPORTED LANGUAGES> for a list of recognized extensions.
+
+Optionally, this method accepts a C<flags> argument (string or arrayref) to pass specific flags to the compiler for
+this file.
+
+See L</SUPPORTED LANGUAGES> for a list of recognized extensions.
+
+=head2 C<compile_and_link( )>
+
+    my $path_object = $c->compile_and_link();
+
+Performs the build process:
+
+=over
+
+=item 1. Inspects added sources to determine the Build Strategy.
+
+=item 2. Compiles all sources to their appropriate intermediate or final formats.
+
+=item 3. Links the artifacts (if necessary) into a shared library.
+
+=back
+
+Returns a L<Path::Tiny> object pointing to the generated shared library. Dies with a detailed error message (including
+STDOUT/STDERR of the failed command) if compilation fails.
+
+=head2 C<link( )>
+
+An alias for L</compile_and_link( )> but only compiles and links if the state hasn't changed since the last build.
+
+=head1 SUPPORTED LANGUAGES
+
+C<Affix::Build> attempts to locate the necessary binaries in your C<PATH>.
+
+=head3 C / C++
+
+Automatically handles C<-fPIC> on non-Windows platforms.
+
+Supported extensions: C<.c>, C<.cpp>, C<.cxx>, C<.cc>
+
+Known compilers: C<cc>, C<gcc>, C<clang>, C<cl> (MSVC), C<c++>, C<g++>.
+
+=head3 Rust
+
+Extensions: C<.rs>
+
+Compiler: C<rustc>
+
+Windows Note: If running under Strawberry Perl (MinGW), you must have the GNU ABI target installed via C<rustup>:
+
+    > rustup target add x86_64-pc-windows-gnu
+
+=head3 C# / F#
+
+Uses **NativeAOT** to compile C# code directly to machine code. The source must use C<[UnmanagedCallersOnly]>.
+
+Extensions: C<.cs>, C<.fs>
+
+Compiler: C<dotnet> (SDK 8.0 or newer required)
+
+=head3 Go
+
+Extensions: C<.go>
+
+Compiler: C<go> or C<gccgo>
+
+Notes:
+
+=over
+
+=item * In Polyglot mode, requires C<gccgo> or standard C<go> with C<c-archive> support.
+
+=item * The Go runtime spins up background threads (for GC and scheduling) that do not shut down cleanly when a shared library is unloaded. This often causes access violations on Windows during program exit.
+
+Affix attempts to detect Go libraries (by looking for the C<_cgo_dummy_export> symbol) and keep them in memory to
+prevent this crash. However, if you still encounter segmentation faults during global destruction, you can force a safe
+exit using C<POSIX::_exit(0)>.
+
+=back
+
+=head3 Zig
+
+Extensions: C<.zig>
+
+Compiler: C<zig>
+
+=head3 Fortran
+
+Extensions: C<.f>, C<.f90>, C<.f95>, C<.for>
+
+Compiler: C<gfortran>, C<ifx>, C<ifort>
+
+=head3 Assembly
+
+Extensions: C<.asm> (Intel syntax), C<.s> (AT&T/GNU syntax)
+
+Compilers: C<nasm> (for .asm), System C<cc> (for .s)
+
+Notes: Correctly handles ARM64 (AArch64) via the system compiler and x86_64 via NASM.
+
+=head3 Other Languages
+
+Support is also included for:
+
+=over
+
+=item Odin (C<.odin>)
+
+=item D (C<.d>)
+
+=item Nim (C<.nim>)
+
+=item V (C<.v>)
+
+=item Swift (C<.swift>)
+
+=item Pascal (C<.pas>, C<.pp>) - via Free Pascal
+
+=item Crystal (C<.cr>)
+
+=item Haskell (C<.hs>) - via GHC
+
+=item Cobol (C<.cob>, C<.cbl>) - via GnuCOBOL
+
+=item OCaml (C<.ml>)
+
+=item Eiffel** (C<.e>) - via SmartEiffel
+
+=item Futhark** (C<.fut>) - Transpiles to C
+
+=back
+
+=head1 Platform Notes
+
+=head2 Windows (MinGW / Strawberry Perl)
+
+This environment is "Polyglot Hard Mode." C<Affix::Build> performs several tricks to make it work:
+
+=over
+
+=item 1. Rust Compatibility: Forces C<rustc> to use the GNU ABI target to ensure the resulting static libraries can link against Perl's GCC.
+
+=item 2. Whole Archive: When linking static libraries (C<.a>) into a shared library, passes C<-Wl,--whole-archive> to ensure symbols are exported.
+
+=item 3. Exports: Automatically adds C<-Wl,--export-all-symbols> when linking to ensure Fortran/Assembly symbols are visible without explicit decoration.
+
+=back
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2023 by Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

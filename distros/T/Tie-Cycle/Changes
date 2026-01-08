@@ -1,5 +1,8 @@
 Revision history for Perl module Tie::Cycle
 
+1.233 2026-01-07T15:26:59Z
+	* remove errant file from MANIFEST (#14)
+
 1.232 2026-01-06T09:19:34Z
 	* refresh for latest release process
 

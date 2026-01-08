@@ -9,7 +9,7 @@ use List::Util 1.45 qw( uniq );
 
 BEGIN {
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.015003';
+	our $VERSION   = '0.016001';
 	
 	if ( eval { require Types::Standard; 1 } ) {
 		Types::Standard->import(
@@ -31,6 +31,8 @@ BEGIN {
 	__PACKAGE__->XSLoader::load($VERSION);
 };
 
+our %META;
+
 sub import {
 	my $class = shift;
 	my ( $package, $methodname );
@@ -47,13 +49,16 @@ sub import {
 	else {
 		install_constructor("$package\::$methodname");
 	}
+	
+	$META{$package} ||= { package => $package };
 	inheritance_stuff($package);
 	
-	undef $_->{$package} for fetch_vars( $package, qw/ %BUILD %DEMOLISH / );
-	
-	my ($HAS, $REQUIRED, $ISA, $STRICT, $FLAGS, $COERCIONS, $DEFAULTS, $TT, $INIT_ARGS, $TRIGGERS ) =
-		fetch_vars( $package, qw/ @HAS @REQUIRED %ISA $STRICT %FLAGS %COERCIONS %DEFAULTS %TYPETINY %INIT_ARGS %TRIGGERS / );
-	$$STRICT = !!0;
+	do {
+		no strict 'refs';
+		no warnings 'once';
+		%{"${package}::__XSCON_BUILD"} = ();
+		%{"${package}::__XSCON_DEMOLISH"} = ();
+	};
 	
 	for my $pair (@{ mkopt \@_ }) {
 		my ($name, $thing) = @$pair;
@@ -61,43 +66,43 @@ sub import {
 		my $type;
 		
 		if ($name eq '!!') {
-			$$STRICT = !!1;
+			$META{$package}{strict_params} = !!1;
 			next;
 		}
 		
-		if (is_ArrayRef($thing)) {
+		if ( is_ArrayRef $thing ) {
 			%spec = @$thing;
 		}
-		elsif (is_HashRef($thing)) {
+		elsif ( is_HashRef $thing ) {
 			%spec = %$thing;
 		}
-		elsif (is_Object($thing) and $thing->can('compiled_check') || $thing->can('check')) {
+		elsif ( is_Object $thing and $thing->can('compiled_check') || $thing->can('check') ) {
 			%spec = ( isa => $thing );
 		}
-		elsif (is_CodeRef($thing)) {
+		elsif ( is_CodeRef $thing ) {
 			%spec = ( isa => $thing );
 		}
-		elsif (defined $thing) {
+		elsif ( defined $thing ) {
 			_croak("What is %s???", $thing);
 		}
 		
-		if ($name =~ /\A(.*)\!\z/) {
+		if ( $name =~ /\A(.*)\!\z/ ) {
 			$name = $1;
 			$spec{required} = !!1;
 		}
 		
-		if (is_Object($spec{isa}) and $spec{isa}->can('compiled_check')) {
+		if ( is_Object $spec{isa} and $spec{isa}->can('compiled_check') ) {
 			$type = $spec{isa};
 			$spec{isa} = $type->compiled_check;
 		}
-		elsif (is_Object($spec{isa}) and $spec{isa}->can('check')) {
+		elsif ( is_Object $spec{isa} and $spec{isa}->can('check') ) {
 			# Support it for compatibility with more basic Type::API::Constraint
 			# implementations, but this will be slowwwwww!
 			$type = $spec{isa};
 			$spec{isa} = sub { !! $type->check($_[0]) };
 		}
 		
-		if (defined $spec{coerce} and !ref $spec{coerce} and $spec{coerce} eq 1) {
+		if ( defined $spec{coerce} and !ref $spec{coerce} and $spec{coerce} eq 1 ) {
 			my $c;
 			if (
 				$type->can('has_coercion')
@@ -116,28 +121,76 @@ sub import {
 			_croak("Required attribute $name cannot have undef init_arg");
 		}
 		
-		my @unknown_keys = sort grep !/\A(isa|required|is|default|builder|coerce|init_arg|trigger|weak_ref)\z/, keys %spec;
-		if (@unknown_keys) {
+		my @unknown_keys = sort grep !/\A(isa|required|is|default|builder|coerce|init_arg|trigger|weak_ref|alias)\z/, keys %spec;
+		if ( @unknown_keys ) {
 			_croak("Unknown keys in spec: %d", join ", ", @unknown_keys);
 		}
 		
-		push @$HAS, $name;
-		push @$REQUIRED, $name if $spec{required};
-		$FLAGS->{$name} = $class->_build_flags( $name, \%spec, $type );
-		$ISA->{$name} = $spec{isa} if is_CodeRef $spec{isa};
-		$COERCIONS->{$name} = $spec{coerce} if is_CodeRef $spec{coerce};
-		$DEFAULTS->{$name} = $class->_canonicalize_defaults( \%spec ) if exists $spec{default} || defined $spec{builder};
-		$TT->{$name} = $type if is_Object($type) && $type->isa('Type::Tiny');
-		$INIT_ARGS->{$name} = $spec{init_arg} if exists $spec{init_arg};
-		$TRIGGERS->{$name} = $spec{trigger} if $spec{trigger};
+		my %meta_attribute = (
+			name     => $name,
+			spec     => \%spec,
+			flags    => $class->_build_flags( $name, \%spec, $type ),
+			required => !!$spec{required},
+			init_arg => exists( $spec{init_arg} ) ? $spec{init_arg} : $name,
+		);
+		
+		if ( is_CodeRef $spec{isa} ) {
+			$meta_attribute{check} = $spec{isa};
+		}
+		
+		if ( is_CodeRef $spec{trigger} ) {
+			$meta_attribute{trigger} = $spec{trigger};
+		}
+		elsif ( defined $spec{trigger} and not ref $spec{trigger} ) {
+			$meta_attribute{trigger} = $spec{trigger};
+		}
+
+		if ( is_CodeRef $spec{coerce} ) {
+			$meta_attribute{coercion} = $spec{coerce};
+		}
+		
+		if ( exists $spec{default} or defined $spec{builder} ) {
+			$meta_attribute{default} = $class->_canonicalize_defaults( \%spec );
+		}
+		
+		if ( is_Object $type and $type->isa('Type::Tiny') ) {
+			$meta_attribute{type} = $type;
+		}
+		
+		if ( is_ArrayRef $spec{alias} ) {
+			$meta_attribute{aliases} = $spec{alias};
+		}
+		elsif ( $spec{alias} ) {
+			$meta_attribute{aliases} = [ $spec{alias} ];
+		}
+		
+		# Add new attribute
+		push @{ $META{$package}{params} ||= [] }, \%meta_attribute;
 	}
 	
-	my %allow = map {
-		( $FLAGS->{$_} & XSCON_FLAG_NO_INIT_ARG )  ? () :
-		( $FLAGS->{$_} & XSCON_FLAG_HAS_INIT_ARG ) ? ( $INIT_ARGS->{$_} => 1 ) :
-		( $_ => 1 );
-	} @$HAS;
-	@{ fetch_vars( $package, qw/@ALLOW/ ) } = sort keys %allow;
+	if ( my $p = $META{$package}{params} ) {
+		# Dedupe by name, but keep *last* copy (reverse reverse!)
+		my %already;
+		@$p = reverse grep { not $already{$_->{name}}++ } reverse @$p;
+		
+		if ( $META{$package}{strict_params} ) {
+			# Keep big list of all allowed init_args
+			%already = ();
+			$META{$package}{allow} = [
+				'__no_BUILD__',
+				grep { not $already{$_}++ }
+				map {
+					my @names;
+					push @names, $_->{init_arg} if defined $_->{init_arg};
+					push @names, @{$_->{aliases}} if ref $_->{aliases};
+					@names;
+				} @$p
+			];
+		}
+	}
+	else {
+		$META{$package}{params} = [];
+	}
 }
 
 sub _canonicalize_defaults {
@@ -193,53 +246,53 @@ sub _type_to_number {
 	
 	if ( $type and $type->isa('Type::Tiny') ) {
 		require Types::Common;
-		if ( $type == Types::Common::Any() ) {
-			return 0;
+		if ( $type == Types::Common::Any() or $type == Types::Common::Item() ) {
+			return XSCON_TYPE_BASE_ANY;
 		}
 		elsif ( $type == Types::Common::Defined() ) {
-			return 1;
+			return XSCON_TYPE_BASE_DEFINED;
 		}
 		elsif ( $type == Types::Common::Ref() ) {
-			return 2;
+			return XSCON_TYPE_BASE_REF;
 		}
 		elsif ( $type == Types::Common::Bool() ) {
-			return 3;
+			return XSCON_TYPE_BASE_BOOL;
 		}
 		elsif ( $type == Types::Common::Int() ) {
-			return 4;
+			return XSCON_TYPE_BASE_INT;
 		}
 		elsif ( $type == Types::Common::PositiveOrZeroInt() ) {
-			return 5;
+			return XSCON_TYPE_BASE_PZINT;
 		}
 		elsif ( $type == Types::Common::Num() ) {
-			return 6;
+			return XSCON_TYPE_BASE_NUM;
 		}
 		elsif ( $type == Types::Common::PositiveOrZeroNum() ) {
-			return 7;
+			return XSCON_TYPE_BASE_PZNUM;
 		}
 		elsif ( $type == Types::Common::Str() ) {
-			return 8;
+			return XSCON_TYPE_BASE_STR;
 		}
 		elsif ( $type == Types::Common::NonEmptyStr() ) {
-			return 9;
+			return XSCON_TYPE_BASE_NESTR;
 		}
 		elsif ( $type == Types::Common::ClassName() ) {
-			return 10;
+			return XSCON_TYPE_BASE_CLASSNAME;
 		}
 		elsif ( $type == Types::Common::Object() ) {
-			return 12;
+			return XSCON_TYPE_BASE_OBJECT;
 		}
 		elsif ( $type == Types::Common::ScalarRef() ) {
-			return 13;
+			return XSCON_TYPE_BASE_SCALARREF;
 		}
 		elsif ( $type == Types::Common::CodeRef() ) {
-			return 14;
+			return XSCON_TYPE_BASE_CODEREF;
 		}
 		elsif ( $type == Types::Common::ArrayRef() ) {
-			return 16;
+			return XSCON_TYPE_ARRAYREF;
 		}
 		elsif ( $type == Types::Common::HashRef() ) {
-			return 32;
+			return XSCON_TYPE_HASHREF;
 		}
 		elsif ( $type->is_parameterized and @{ $type->parameters } == 1 and (
 			$type->parameterized_from == Types::Common::ArrayRef()
@@ -253,7 +306,7 @@ sub _type_to_number {
 	# 31 will be an arrayref of some unknown type.
 	# 47 will be an hashref of some unknown type.
 	# Class::XSAccessor won't be able to do the type check internally.
-	return 15;
+	return XSCON_TYPE_OTHER;
 }
 
 sub _build_flags {
@@ -271,6 +324,7 @@ sub _build_flags {
 	$flags |= XSCON_FLAG_HAS_INIT_ARG          if defined($spec->{init_arg}) && ( $spec->{init_arg} ne $name );
 	$flags |= XSCON_FLAG_HAS_TRIGGER           if $spec->{trigger};
 	$flags |= XSCON_FLAG_WEAKEN                if $spec->{weak_ref};
+	$flags |= XSCON_FLAG_HAS_ALIASES           if $spec->{alias};
 	
 	my $has_common_default = 0;
 	if ( exists $spec->{default} and !defined $spec->{default} ) {
@@ -311,34 +365,6 @@ sub _build_flags {
 	return $flags;
 }
 
-# use fetch_vars instead
-sub get_vars {
-	my $package = shift;
-	fetch_vars( $package, qw/ @HAS @REQUIRED %ISA %BUILD $STRICT %FLAGS %COERCIONS %DEFAULTS %TYPETINY %DEMOLISH / );
-}
-
-sub fetch_vars {
-	no strict 'refs';
-	my $package = shift;
-	my @r;
-	for my $var ( @_ ) {
-		my ( $sigil, $rest ) = ( $var =~ /^(.)(.+)$/ );
-		if ( $sigil eq '$' ) {
-			push @r, \${ "$package\::__XSCON_" . uc($rest) };
-		}
-		elsif ( $sigil eq '@' ) {
-			push @r, \@{ "$package\::__XSCON_" . uc($rest) };
-		}
-		elsif ( $sigil eq '%' ) {
-			push @r, \%{ "$package\::__XSCON_" . uc($rest) };
-		}
-		else {
-			die;
-		}
-	}
-	wantarray ? @r : (@r > 1) ? die : $r[0];
-}
-
 sub inheritance_stuff {
 	my $package = shift;
 	
@@ -348,74 +374,23 @@ sub inheritance_stuff {
 	pop @isa;  # discard $package itself
 	return unless @isa;
 	
-	my ($HAS, $REQUIRED, $ISA, $FLAGS, $COERCIONS, $DEFAULTS, $TT, $INIT_ARGS, $TRIGGERS) =
-		fetch_vars( $package, qw/ @HAS @REQUIRED %ISA %FLAGS %COERCIONS %DEFAULTS %TYPETINY %INIT_ARGS %TRIGGERS / );
-	
-	foreach my $parent (@isa) {
-		my ($pHAS, $pREQUIRED, $pISA, $pFLAGS, $pCOERCIONS, $pDEFAULTS, $pTT, $pINIT_ARGS, $pTRIGGERS) =
-			fetch_vars( $parent, qw/ @HAS @REQUIRED %ISA %FLAGS %COERCIONS %DEFAULTS %TYPETINY %INIT_ARGS %TRIGGERS / );
-		
-		@$HAS      = uniq(@$HAS, @$pHAS);
-		@$REQUIRED = uniq(@$REQUIRED, @$pREQUIRED);
-		
-		for my $k ( @$HAS ) {
-			for my $pair ( [$pISA=>$ISA], [$pCOERCIONS=>$COERCIONS], [$pDEFAULTS=>$DEFAULTS], [$pTT=>$TT], [$pINIT_ARGS=>$INIT_ARGS], [$pTRIGGERS=>$TRIGGERS] ) {
-				my ( $parent_hash, $this_hash ) = @$pair;
-				if ( exists $parent_hash->{$k} and not exists $this_hash->{$k} ) {
-					$this_hash->{$k} = $parent_hash->{$k};
-				}
-			}
-			if ( not exists $FLAGS->{$k} ) {
-				my $flags = 0;
-				$flags |= XSCON_FLAG_REQUIRED           if grep $k eq $_, @$REQUIRED;
-				$flags |= XSCON_FLAG_HAS_TYPE_COERCION  if is_CodeRef $COERCIONS->{$k};
-				$flags |= XSCON_FLAG_HAS_DEFAULT        if exists $DEFAULTS->{$k};
-				$flags |= XSCON_FLAG_NO_INIT_ARG        if exists $INIT_ARGS->{$k} && !defined $INIT_ARGS->{$k};
-				$flags |= XSCON_FLAG_HAS_INIT_ARG       if defined $INIT_ARGS->{$k} && $INIT_ARGS->{$k} && $INIT_ARGS->{$k} ne $k;
-				$flags |= XSCON_FLAG_HAS_TRIGGER        if $TRIGGERS->{$k};
-				$flags |= XSCON_FLAG_WEAKEN             if $pFLAGS->{$k} & XSCON_FLAG_WEAKEN;
-				if ( is_CodeRef $ISA->{$k} ) {
-					$flags |= XSCON_FLAG_HAS_TYPE_CONSTRAINT;
-					if ( is_Object $TT->{$k} ) {
-						$flags |= ( _type_to_number($TT->{$k}) << +XSCON_BITSHIFT_TYPES );
-					}
-					else {
-						$flags |= ( 15 << +XSCON_BITSHIFT_TYPES );
-					}
-				}
-				$FLAGS->{$k} = $flags;
-			}
-		}
-	}
-}
-
-sub populate_build {
-	my $package = ref($_[0]) || $_[0];
-	my $klass   = ref($_[1]) || $_[1];
-	
-	my ( $BUILD ) = fetch_vars( $package, '%BUILD' );
-	
-	if (!$klass->can('BUILD')) {
-		$BUILD->{$klass} = 0;
-		return;
+	my @attrs;
+	for my $parent ( @isa ) {
+		my $p_attrs = $META{$parent}{params} or next;
+		push @attrs, @$p_attrs;
 	}
 	
-	require( $] >= 5.010 ? "mro.pm" : "MRO/Compat.pm" );
-	no strict 'refs';
-	
-	$BUILD->{$klass} = [
-		map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-		map { "$_\::BUILD" } reverse @{ mro::get_linear_isa($klass) }
-	];
-	
-	return;
+	$META{$package}{params} = \@attrs;
 }
 
 sub populate_demolish {
 	my $package = ref($_[0]) || $_[0];
 	my $klass   = ref($_[1]) || $_[1];
 	
-	my ( $DEMOLISH ) = fetch_vars( $package, '%DEMOLISH' );
+	my $DEMOLISH = do {
+		no strict 'refs';
+		\%{"${package}::__XSCON_DEMOLISH"};
+	};
 	
 	if (!$klass->can('DEMOLISH')) {
 		$DEMOLISH->{$klass} = 0;
@@ -428,10 +403,62 @@ sub populate_demolish {
 	$DEMOLISH->{$klass} = [
 		reverse
 		map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-		map { "$_\::DEMOLISH" } reverse @{ mro::get_linear_isa($klass) }
+		map { "$_\::DEMOLISH" }
+		reverse @{ mro::get_linear_isa($klass) }
 	];
 	
 	return;
+}
+
+sub populate_build {
+	my $package = ref($_[0]) || $_[0];
+	my $klass   = ref($_[1]) || $_[1];
+	
+	my $BUILD = do {
+		no strict 'refs';
+		\%{"${package}::__XSCON_BUILD"};
+	};
+	
+	if (!$klass->can('BUILD')) {
+		$BUILD->{$klass} = 0;
+		return;
+	}
+	
+	require( $] >= 5.010 ? "mro.pm" : "MRO/Compat.pm" );
+	no strict 'refs';
+	
+	$BUILD->{$klass} = [
+		map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+		map { "$_\::BUILD" }
+		reverse @{ mro::get_linear_isa($klass) }
+	];
+	
+	return;
+}
+
+sub get_metadata {
+	my $klass = ref($_[0]) || $_[0];
+	return $META{$klass};
+}
+
+sub get_build_methods {
+	my $klass = ref($_[0]) || $_[0];
+	populate_build( $klass, $klass );
+	my $BUILD = do {
+		no strict 'refs';
+		\%{"${klass}::__XSCON_BUILD"};
+	};
+	return @{ $BUILD->{$klass} or [] };
+}
+
+sub get_demolish_methods {
+	my $klass = ref($_[0]) || $_[0];
+	populate_demolish( $klass, $klass );
+	my $DEMOLISH = do {
+		no strict 'refs';
+		\%{"${klass}::__XSCON_DEMOLISH"};
+	};
+	return @{ $DEMOLISH->{$klass} or [] };
 }
 
 1;
@@ -629,6 +656,18 @@ Supports C<init_arg> like L<Moose> and L<Moo>.
 
 =item *
 
+Supports C<alias>.
+
+  use Class::XSConstructor 'name' => { alias => [ 'moniker' ] };
+  
+  my $obj = __PACKAGE__->new( name => 'Bob' );
+  say $obj->{name};  # ==> "Bob"
+  
+  my $obj2 = __PACKAGE__->new( moniker => 'Bob' );
+  say $obj2->{name};  # ==> "Bob"
+
+=item *
+
 Supports C<trigger>, which may be a method name or a coderef. Triggers
 are only fired when the attribute is passed to the constructor explicitly.
 Defaults and builders do not trigger the trigger.
@@ -820,7 +859,7 @@ looking at ways to eliminate them.
 
 =head1 SEE ALSO
 
-L<Class::Tiny>, L<Class::XSAccessor>, L<Class::XSDestructor>.
+L<Class::Tiny>, L<Class::XSAccessor>, L<Class::XSDestructor>, L<Class::XSDelegation>.
 
 =head1 AUTHOR
 
@@ -832,7 +871,7 @@ To everybody in I<< #xs >> on irc.perl.org.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2018-2019, 2025 by Toby Inkster.
+This software is copyright (c) 2018-2019, 2025-2026 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

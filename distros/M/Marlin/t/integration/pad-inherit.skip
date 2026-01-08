@@ -1,0 +1,47 @@
+=pod
+
+=encoding utf-8
+
+=head1 PURPOSE
+
+Tests Marlin can inherit from Object::Pad.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2026 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+use Test2::V0;
+use Test2::Require::Module 'Object::Pad';
+use Data::Dumper;
+
+BEGIN {
+	use Object::Pad;
+	
+	class Local::Foo :repr(HASH) {
+		field $foo :param :reader;
+		
+		# Currently any methods defined here will segfault when
+		# called on the derived class.
+	}
+};
+
+BEGIN {
+	package Local::Bar;
+	use Marlin 'bar', -isa => [ 'Local::Foo' ];
+};
+
+my $thing = Local::Bar->new( foo => 1, bar => 2 );
+
+is( $thing->foo, 1 );
+is( $thing->bar, 2 );
+
+done_testing;

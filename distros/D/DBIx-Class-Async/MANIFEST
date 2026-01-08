@@ -36,6 +36,8 @@ t/21-debug-wrapper.t
 t/22-minimal-working.t
 t/23-cursor.t
 t/24-prefetch.t
+t/25-related-resultset.t
+t/26-slice.t
 t/manifest.t
 t/pod.t
 t/test.db

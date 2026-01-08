@@ -15,6 +15,7 @@ unless($@) {
     warn "\n  Skipping tests -  Math::MPFR version 4.19 (or later)\n" .
           "  is needed. We have only version $Math::MPFR::VERSION\n";
     is(1,1);
+    done_testing();
     exit 0;
   }
   else {

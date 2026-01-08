@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Koha;
 # ABSTRACT: Lien à Koha
-$Koha::Contrib::Sudoc::Koha::VERSION = '2.47';
+$Koha::Contrib::Sudoc::Koha::VERSION = '2.48';
 use Moose;
 use Modern::Perl;
 use Carp;
@@ -10,6 +10,7 @@ use ZOOM;
 use MARC::Moose::Record;
 use C4::Biblio qw/ GetFrameworkCode /;;
 use Search::Elasticsearch;
+use Koha::SearchEngine::Elasticsearch;
 use YAML;
 use MIME::Base64;
 use Try::Tiny;
@@ -80,7 +81,9 @@ sub BUILD {
 
     if ( C4::Context->preference('SearchEngine') eq 'Elasticsearch' ) {
         my $param = $c->{elasticsearch};
-        my $es = Search::Elasticsearch->new( nodes => $param->{server} );
+        my $es = Search::Elasticsearch->new(
+            Koha::SearchEngine::Elasticsearch::get_elasticsearch_params()
+        );
         $self->es( $es );
         $self->es_index( {
             biblios     => $param->{index_name} . '_biblios',
@@ -171,6 +174,7 @@ sub zauth {
 
 sub get_biblionumber {
     my ($self, $record) = @_;
+
     my $where = $self->biblionumber_where;
     my $tag = substr($where, 0, 3);
     my $letter = substr($where, 3);
@@ -219,9 +223,14 @@ sub get_biblio_by_ppn {
                 query => {  match => { ppn => $ppn }  }
             }
         );
-        my $hits = $res->{hits}->{hits};
-        if ( @$hits != 0 ) {
-            my $source = $hits->[0]->{_source};
+        my $total = $res->{hits}->{total};
+        $total = $total->{value} if ref($total) eq 'HASH';
+        if ( $total != 0 ) {
+            my $source = $res->{hits}->{hits}->[0]->{_source};
+            unless ($source) {
+                say Dump($res);
+                exit;
+            }
             $record = _record_from_es($source);
         }
     }
@@ -290,33 +299,7 @@ sub _record_from_es {
 
     my $record = MARC::Moose::Record->new();
 
-    my $raw;
-    if ( $raw = $source->{record} ) {
-        # FIXME: obsolete now?
-        my @fields;
-        for my $field ( @$raw ) {
-            my $tag = shift @$field;
-            if ( $tag eq 'LDR' ) {
-                $record->_leader($field->[3]);
-            }
-            elsif ( $tag le '009' ) {
-                push @fields, MARC::Moose::Field::Control->new(
-                    tag => $tag, value => $field->[3] );
-            }
-            else {
-                my $f = MARC::Moose::Field::Std->new(
-                    tag => $tag, ind1 => shift @$field, ind2 => shift @$field );
-                my @subf;
-                while (@$field) {
-                    push @subf, [ shift @$field => shift @$field ];
-                }
-                $f->subf( \@subf);
-                push @fields, $f;
-            }
-        }
-        $record->fields(\@fields );
-    }
-    elsif ( $raw = $source->{marc_data_array} ) {
+    if (my $raw = $source->{marc_data_array}) {
         my @fields;
         for my $field ( @{$raw->{fields}} ) {
             my $tag = [ keys %$field ]->[0];
@@ -340,13 +323,18 @@ sub _record_from_es {
         }
         $record->fields( \@fields );
         $record->_leader($raw->{leader});
+        return $record;
     }
-    elsif ($source->{marc_format} eq 'base64ISO2709') {
-        $record = MARC::Moose::Record::new_from(decode_base64($source->{marc_data}),'Iso2709');
+
+    my $format = $source->{marc_format};
+    unless ($format) {
+        say Dump($source);
+        exit;
     }
-    elsif ($source->{marc_format} eq 'MARCXML') {
-        $record = MARC::Moose::Record::new_from($source->{marc_data},'Marcxml');
-    }
+    my $data = $source->{marc_data};
+    $record = $format eq 'base64ISO2709'
+        ? MARC::Moose::Record::new_from(decode_base64($data), 'Iso2709')
+        : MARC::Moose::Record::new_from($data, 'Marcxml');
     return $record;
 }
 
@@ -363,9 +351,10 @@ sub get_auth_by_ppn {
                 query => {  match => { ppn => $ppn }  }
             }
         );
-        my $hits = $res->{hits}->{hits};
-        if ( @$hits != 0 ) {
-            my $source = $hits->[0]->{_source};
+        my $total = $res->{hits}->{total};
+        $total = $total->{value} if ref($total) eq 'HASH';
+        if ( $total != 0 ) {
+            my $source = $res->{hits}->{hits}->[0]->{_source};
             $record = _record_from_es($source);
         }
     }
@@ -400,7 +389,7 @@ Koha::Contrib::Sudoc::Koha - Lien à Koha
 
 =head1 VERSION
 
-version 2.47
+version 2.48
 
 =head1 DESCRIPTION
 
@@ -439,7 +428,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Fréderic Demians.
+This software is Copyright (c) 2026 by Fréderic Demians.
 
 This is free software, licensed under:
 

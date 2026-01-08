@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Sudoc
 
+2.48 2026-01-08
+
+  - ES avec login/password
+
 2.46 2024-11-04
 
   - Koha v24.05

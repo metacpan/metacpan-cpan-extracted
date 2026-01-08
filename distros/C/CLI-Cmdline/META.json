@@ -39,7 +39,7 @@
    "provides" : {
       "CLI::Cmdline" : {
          "file" : "lib/CLI/Cmdline.pm",
-         "version" : "1.18"
+         "version" : "1.20"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "web" : "https://github.com/HansH111/CLI-Cmdline.pm"
       }
    },
-   "version" : "1.18",
+   "version" : "1.20",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

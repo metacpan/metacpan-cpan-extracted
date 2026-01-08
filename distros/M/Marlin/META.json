@@ -40,7 +40,7 @@
             "B::Hooks::AtRuntime" : "0",
             "Class::Method::Modifiers" : "0",
             "Class::XSAccessor" : "1.19",
-            "Class::XSConstructor" : "0.015002",
+            "Class::XSConstructor" : "0.016001",
             "Clone" : "0",
             "Exporter::Tiny" : "1.006002",
             "LV" : "0",
@@ -49,12 +49,16 @@
             "Role::Tiny" : "0",
             "Sub::Accessor::Small" : "1.000002",
             "Sub::HandlesVia" : "0.052000",
-            "Type::Tiny" : "2.008000",
+            "Type::Tiny" : "2.010000",
             "Type::Tiny::XS" : "0",
             "perl" : "5.008008"
          }
       },
       "test" : {
+         "recommends" : {
+            "Moo" : "0",
+            "Moose" : "0"
+         },
          "requires" : {
             "Test2::Plugin::BailOnFail" : "0",
             "Test2::Require::AuthorTesting" : "0",
@@ -67,43 +71,50 @@
    "provides" : {
       "Marlin" : {
          "file" : "lib/Marlin.pm",
-         "version" : "0.010000"
+         "version" : "0.011000"
       },
       "Marlin::Attribute" : {
          "file" : "lib/Marlin/Attribute.pm",
-         "version" : "0.010000"
+         "version" : "0.011000"
+      },
+      "Marlin::Meta::Class" : {
+         "file" : "lib/Marlin.pm"
       },
       "Marlin::Role" : {
          "file" : "lib/Marlin/Role.pm",
-         "version" : "0.010000"
+         "version" : "0.011000"
       },
       "Marlin::Struct" : {
          "file" : "lib/Marlin/Struct.pm",
-         "version" : "0.010000"
+         "version" : "0.011000"
       },
       "Marlin::TypeConstraint" : {
          "file" : "lib/Marlin/TypeConstraint.pm",
-         "version" : "0.010000"
+         "version" : "0.011000"
       },
       "Marlin::Util" : {
          "file" : "lib/Marlin/Util.pm",
-         "version" : "0.010000"
+         "version" : "0.011000"
       },
       "Marlin::X::Clone" : {
          "file" : "lib/Marlin/X/Clone.pm",
-         "version" : "0.010000"
+         "version" : "0.011000"
       },
       "Marlin::XAttribute::Alias" : {
          "file" : "lib/Marlin/XAttribute/Alias.pm",
-         "version" : "0.010000"
+         "version" : "0.011000"
       },
       "Marlin::XAttribute::LocalWriter" : {
          "file" : "lib/Marlin/XAttribute/LocalWriter.pm",
-         "version" : "0.010000"
+         "version" : "0.011000"
       },
       "Marlin::XAttribute::Lvalue" : {
          "file" : "lib/Marlin/XAttribute/Lvalue.pm",
-         "version" : "0.010000"
+         "version" : "0.011000"
+      },
+      "MooseX::Marlin" : {
+         "file" : "lib/MooseX/Marlin.pm",
+         "version" : "0.011000"
       }
    },
    "release_status" : "stable",
@@ -122,6 +133,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Marlin/project"
    },
-   "version" : "0.010000",
+   "version" : "0.011000",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

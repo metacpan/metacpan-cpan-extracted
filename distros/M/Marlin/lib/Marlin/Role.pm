@@ -6,7 +6,7 @@ use utf8;
 package Marlin::Role;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.010000';
+our $VERSION   = '0.011000';
 
 use parent 'Marlin';
 
@@ -18,13 +18,17 @@ use Scalar::Util qw( blessed );
 
 sub setup_steps {
 	my $me = shift;
-	
+
+	# We don't really need accessors to be built in this package
+	# as the composing class will build them. But Moo wants them,
+	# so yeah.
 	return qw/
 		mark_inc
 		sanity_check
 		install_role_tiny
 		setup_roles
 		canonicalize_attributes
+		setup_accessors
 		setup_imports
 	/;
 }
@@ -56,6 +60,50 @@ sub install_role_tiny {
 	} or die $@;
 	
 	return $me;
+}
+
+sub inject_moose_metadata {
+	my $me = shift;
+	
+	# Recurse to other roles
+	for my $pkg ( @{ $me->roles } ) {
+		Module::Runtime::use_package_optimistically( $pkg->[0] );
+		Marlin->find_meta( $pkg->[0] )->inject_moose_metadata;
+	}
+	
+	require Moose::Util;
+	return if Moose::Util::find_meta( $me->this );
+	
+	require Moose::Meta::Role;
+	my $metarole = Moose::Meta::Role->initialize( $me->this );
+	
+	for my $attr ( @{ $me->attributes } ) {
+		$attr->inject_mooserole_metadata($metarole) or next;
+	}
+	
+	require Moose::Util::TypeConstraints;
+	my $tc = Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( $me->this );
+	$tc->{coercion} = $me->make_type_constraint( $me->this )->coercion->moose_coercion;
+}
+
+sub inject_moo_metadata {
+	my $me = shift;
+	
+	# Recurse to any parents or roles
+	for my $pkg ( @{ $me->parents }, @{ $me->roles } ) {
+		use_package_optimistically( $pkg->[0] );
+		Marlin->find_meta( $pkg->[0] )->inject_moo_metadata;
+	}
+	
+	require Moo::Role;
+	require Method::Generate::Accessor;
+	my $makers = ( $Moo::Role::INFO{$me->this} ||= {} );
+	$makers->{is_role} = 1;
+	$makers->{accessor_maker} = Method::Generate::Accessor->new;
+	
+	for my $attr ( @{ $me->attributes } ) {
+		$attr->inject_moorole_metadata($makers) or next;
+	}
 }
 
 1;

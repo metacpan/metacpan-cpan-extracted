@@ -4,5 +4,9 @@ MANIFEST
 README.md
 t/00-load.t
 t/01-basic.t
+t/02-alias.t
+t/03-complex.t
+t/04-error.t
+t/05-integration.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

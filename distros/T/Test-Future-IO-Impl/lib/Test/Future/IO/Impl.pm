@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2025 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2026 -- leonerd@leonerd.org.uk
 
-package Test::Future::IO::Impl 0.15;
+package Test::Future::IO::Impl 0.16;
 
 use v5.14;
 use warnings;
@@ -17,7 +17,7 @@ use Socket qw(
    pack_sockaddr_in sockaddr_family INADDR_LOOPBACK
    AF_INET AF_UNIX SOCK_DGRAM SOCK_STREAM PF_UNSPEC
 );
-use Time::HiRes qw( time );
+use Time::HiRes qw( sleep time );
 
 use Exporter 'import';
 our @EXPORT = qw( run_tests );
@@ -27,6 +27,8 @@ our @EXPORT = qw( run_tests );
 C<Test::Future::IO::Impl> - acceptance tests for C<Future::IO> implementations
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Test::More;
    use Test::Future::IO::Impl;
@@ -181,9 +183,10 @@ sub run_connect_test
    $serversock->close;
    undef $serversock;
 
-   # I really hate this, but apparently Win32 testers will fail if we don't
-   # do this.
-   sleep 1 if $^O eq "MSWin32";
+   # I really hate this, but apparently tests on most OSes will fail if we
+   # don't do this. Technically Linux can get away without it but it's only
+   # 100msec, nobody will notice
+   sleep 0.1;
 
    # ->connect fails
    {
@@ -357,11 +360,15 @@ sub run_send_test
 
       my $f = Future::IO->send( $wr, "BYTES" );
 
-      ok( !eval { $f->get }, 'Future::IO->send fails on EPIPE' );
+      $f->await;
+      ok( $f->is_ready, '->send future is now ready after EPIPE' );
 
-      is( [ $f->failure ],
-         [ "send: $errstr_EPIPE\n", send => $wr, $errstr_EPIPE ],
-         'Future::IO->send failure for EPIPE' );
+      # Sometimes we get EPIPE out of a send(2) system call (e.g Linux).
+      # Sometimes we get a croak out of IO::Socket->send itself because it
+      # checked getpeername() and found it missing (e.g. most BSDs). We
+      # shouldn't be overly concerned with _what_ the failure is, only that
+      # it failed somehow.
+      ok( scalar $f->failure, 'Future::IO->send failed after peer closed' );
    }
 
    # can be cancelled
@@ -566,7 +573,7 @@ sub run_waitpid_test
          exit 3;
       }
 
-      Time::HiRes::sleep 0.1;
+      sleep 0.1;
 
       my $f = Future::IO->waitpid( $pid );
       is( scalar $f->get, ( 3 << 8 ), 'Future::IO->waitpid yields child wait status for pre-exit' );
@@ -577,7 +584,7 @@ sub run_waitpid_test
       defined( my $pid = fork() ) or die "Unable to fork() - $!";
       if( $pid == 0 ) {
          # child
-         Time::HiRes::sleep 0.1;
+         sleep 0.1;
          exit 4;
       }
 

@@ -26,7 +26,7 @@ WriteMakefile(
         provides => {
             'CLI::Cmdline' => {
                 file    => 'lib/CLI/Cmdline.pm',
-                version => '1.18',
+                version => '1.20',
             },
         },
     },
@@ -36,4 +36,3 @@ WriteMakefile(
 
     test => { TESTS => 't/*.t' },
 );
-

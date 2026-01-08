@@ -1676,6 +1676,14 @@ SV * _overload_spaceship(pTHX_ mpq_t * a, SV * b, SV * third) {
 
      if(SV_IS_IOK(b)) {
        ret = Rmpq_cmp_IV(aTHX_ a, b, newSViv(1));
+       /*
+          spaceship operator should return 1, -1 for unequal
+          operands but mpq_cmp* functions are documented to
+          return only >0 or <0. See:
+          https://rt.cpan.org/Ticket/Display.html?id=168076
+       */
+       if(ret > 0) ret = 1;
+       if(ret < 0) ret = -1;
        if(SWITCH_ARGS) ret *= -1;
        return newSViv(ret);
      }
@@ -1697,6 +1705,8 @@ SV * _overload_spaceship(pTHX_ mpq_t * a, SV * b, SV * third) {
          croak("Invalid string supplied to Math::GMPq::overload_spaceship");
        mpq_canonicalize(t);
        ret = mpq_cmp(*a, t);
+       if(ret > 0) ret = 1;
+       if(ret < 0) ret = -1;
        mpq_clear(t);
        if(SWITCH_ARGS) ret *= -1;
        return newSViv(ret);
@@ -1704,6 +1714,8 @@ SV * _overload_spaceship(pTHX_ mpq_t * a, SV * b, SV * third) {
 
      if(SV_IS_NOK(b)) {
        ret = Rmpq_cmp_NV(aTHX_ a, b);
+       if(ret > 0) ret = 1;
+       if(ret < 0) ret = -1;
        if(SWITCH_ARGS) ret *= -1;
        return newSViv(ret);
      }
@@ -1712,14 +1724,20 @@ SV * _overload_spaceship(pTHX_ mpq_t * a, SV * b, SV * third) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::GMPq")) {
          ret = mpq_cmp(*a, *(INT2PTR(mpq_t *, SvIVX(SvRV(b)))));
+         if(ret > 0) ret = 1;
+         if(ret < 0) ret = -1;
          return newSViv(ret);
        }
        if(strEQ(h, "Math::GMPz")) {
 #if __GNU_MP_RELEASE < 60099
          ret = Rmpq_cmp_z(a, INT2PTR(mpz_t *, SvIVX(SvRV(b))));
+         if(ret > 0) ret = 1;
+         if(ret < 0) ret = -1;
          return newSViv(ret);
 #else
          ret = mpq_cmp_z(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
+         if(ret > 0) ret = 1;
+         if(ret < 0) ret = -1;
          return newSViv(ret);
 #endif
        }

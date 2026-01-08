@@ -9,5 +9,14 @@ Revision history for WWW-Crawl
 
         We now support Perl v5.16 to v5.42 and later.
 
+0.3     7th January 2026
+        Added proxy support to WWW::Crawl::Chromium
+
+0.4     7th January 2026
+        Added extra callback parameter containing the body of the page 
+        Increased default timeout to 120 seconds
+        
+
+
 
 

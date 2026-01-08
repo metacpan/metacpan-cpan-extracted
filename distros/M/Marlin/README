@@ -514,9 +514,14 @@ DESCRIPTION
           }
 
         Marlin currently only supports inheriting from other Marlin classes,
-        or from Class::XSConstructor, Moo, and Moose classes. Other base
-        classes *may* work, especially if they don't do anything much in their
-        constructor.
+        or from Class::XSConstructor, Class::Tiny, Moo, Moose, and Mouse
+        classes. Other base classes *may* work, especially if they use blessed
+        hashref instances and don't do anything fancy in their constructor.
+
+        Marlin can inherit from classes built with Mite, provided that the MOP
+        option was enabled (see Mite::Manual::MOP) and Moose is available.
+        (Mite doesn't expose attribute metadata, so Marlin needs to force the
+        class to "upgrade itself" to a Moose class.)
 
         You can include version numbers:
 
@@ -558,7 +563,7 @@ DESCRIPTION
           }
 
         Marlin classes can accept roles built with Marlin::Role, Role::Tiny,
-        Moo::Role, or Moose::Role.
+        Moo::Role, Moose::Role, or Mouse::Role.
 
         Like `-base`, you can include version numbers.
 
@@ -691,7 +696,9 @@ DESCRIPTION
         Marlin::Attribute object.
 
         Calling `$meta->canonicalize_attributes` will replace any hashrefs in
-        this list with Marlin::Attribute objects.
+        this list with Marlin::Attribute objects. That method is chainable, so
+        the best way to get a list of Marlin::Attribute objects is: `@{
+        $meta->canonicalize_attributes->attributes }`.
 
     `$meta->attributes_with_inheritance`
         Like `$meta->attributes`, but includes parent classes.
@@ -707,9 +714,9 @@ DESCRIPTION
         Class::Method::Modifiers keywords into the package.
 
     `$meta->inhaled_from`
-        Usually undef, but may be "Moose", "Moose::Role", "Moo", or
-        "Moo::Role" to indicate that this metadata was imported from Moose or
-        Moo.
+        Usually undef, but may be "Moose", "Moose::Role", "Moo", "Moo::Role",
+        "Mouse", "Mouse::Role", "Class::Tiny", or "Class::XSConstructor" to
+        indicate that this metadata was imported from another OO framework.
 
     `$meta->short_name`
         The package name without any colons. This is used in the
@@ -743,6 +750,8 @@ SEE ALSO
     Class::XSConstructor, Types::Common, Type::Params, and Sub::HandlesVia.
 
     Inspirations: Moose and Moo.
+
+    See also: MooseX::Marlin, MooX::Marlin.
 
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.

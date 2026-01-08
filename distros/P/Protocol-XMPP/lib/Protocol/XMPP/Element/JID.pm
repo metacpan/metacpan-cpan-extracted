@@ -1,16 +1,14 @@
 package Protocol::XMPP::Element::JID;
-$Protocol::XMPP::Element::JID::VERSION = '0.006';
+
 use strict;
 use warnings;
 use parent qw(Protocol::XMPP::TextElement);
 
+our $VERSION = '0.007'; ## VERSION
+
 =head1 NAME
 
 =head1 SYNOPSIS
-
-=head1 VERSION
-
-Version 0.006
 
 =head1 DESCRIPTION
 
@@ -19,11 +17,11 @@ Version 0.006
 =cut
 
 sub on_text_complete {
-	my $self = shift;
-	my $data = shift;
-	$self->{jid} = $data;
-	$self->stream->jid($data);
-	$self->debug("Full JID was [$data]");
+  my $self = shift;
+  my $data = shift;
+  $self->{jid} = $data;
+  $self->stream->jid($data);
+  $self->debug("Full JID was [$data]");
 }
 
 1;
@@ -32,8 +30,9 @@ __END__
 
 =head1 AUTHOR
 
-Tom Molesworth <cpan@entitymodel.com>
+Tom Molesworth <tom@perlsite.co.uk>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2010-2014. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2010-2026. Licensed under the same terms as Perl itself.
+

@@ -6,7 +6,7 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.010000';
+our $VERSION   = '0.011000';
 
 use constant _ATTRS => qw( caller this parents roles attributes strict constructor modifiers inhaled_from short_name is_struct plugins setup_steps_with_plugins );
 use B::Hooks::AtRuntime   qw( at_runtime after_runtime );
@@ -44,7 +44,7 @@ BEGIN {
 		if ( not exists $META{$for} ) {
 			$me->try_inhale( $for );
 		}
-		$META{$for};
+		$META{$for} ? $META{$for}->setup_compat : undef;
 	}
 
 	sub store_meta {
@@ -67,6 +67,7 @@ sub try_inhale {
 	( my $k_short = $k ) =~ s/(::|')//g;
 	
 	no strict 'refs';
+	no warnings 'once';
 	
 	# Native or already inhaled 
 	{
@@ -74,41 +75,47 @@ sub try_inhale {
 		return !!1 if $META{$k};
 	}
 	
-	# Inhale Class::XSAccessor
-	if ( @{"$k\::__XSCON_HAS"} ) {
-		my $has = \@{"$k\::__XSCON_HAS"};
-		my $isa = \%{"$k\::__XSCON_ISA"};
-		my $req = \@{"$k\::__XSCON_REQUIRED"};
-		my $str =  ${"$k\::__XSCON_STRICT"};
-		my $coe = \%{"$k\::__XSCON_COERCIONS"};
-		my $def = \%{"$k\::__XSCON_DEFAULTS"};
-		my $tt  = \%{"$k\::__XSCON_TYPETINY"};
-		my $tri = \%{"$k\::__XSCON_TRIGGERS"};
-		my $ia  = \%{"$k\::__XSCON_INIT_ARGS"};
-		my $flg = \%{"$k\::__XSCON_FLAGS"};
-		
+	# If class or role uses Mite, force Moose to be loaded
+	if ( my $mite = ${"${k}::USES_MITE"} ) {
+		if ( not $k->can('meta') ) {
+			require Carp;
+			Carp::carp("Marlin inhaled a non-MOP-enabled $mite: $k");
+		}
+		my $meta = $k->meta;
+		if ( $meta and $meta->isa('Moose::Meta::Class') ) {
+			$meta->make_immutable(
+				inline_constructor => 0,
+				inline_destructor  => 0,
+				inline_accessors   => 0,
+			);
+		}
+	}
+	
+	# Inhale Class::XSConstructor
+	if ( $INC{'Class/XSConstructor.pm'} and my $xscon_meta = do {
+		Class::XSConstructor::get_metadata($k);
+	} ) {
 		my @attrs = map {
-			my $slot = $_;
-			{
+			my $attr = $_;
+			my %spec = (
 				is       => 'bare',
 				package  => $k,
-				slot     => $slot,
-				$tt->{$slot} ? ( isa => $tt->{$slot} ) : $isa->{$slot} ? ( isa => $isa->{$slot} ): (),
-				$coe->{$slot} ? ( coerce => $coe->{$slot} ) : (),
-				$tri->{$slot} ? ( trigger => $tri->{$slot} ) : (),
-				exists( $ia->{$slot} ) ? ( init_arg => $ia->{$slot} ) : (),
-				isScalarRef( $def->{$slot} ) ? ( builder => ${$def->{$slot}} ) : exists($def->{$slot}) ? ( default => $def->{$slot} ) : (),
-				required => !!( grep $_ eq $slot, @{ $req || [] }),
-				( $flg->{$slot} & Class::XSConstructor::XSCON_FLAG_WEAKEN ) ? ( weak_ref => 1 ) : (),
-			};
-		} @{ $has || [] };
+				slot     => $attr->{name},
+				%{ $attr->{spec} },
+			);
+			# minor hack
+			if ( exists $spec{alias} ) {
+				$spec{':Alias'} = delete $spec{alias};
+			}
+			\%spec;
+		} @{ $xscon_meta->{params} or [] };
 		
 		__PACKAGE__->_new(
 			this         => $k,
 			attributes   => \@attrs,
 			parents      => [ @{"$k\::ISA"} ],
 			roles        => [],
-			strict       => $str,
+			strict       => $xscon_meta->{strict_params},
 			constructor  => "__Marlin_${k_short}_new", # ???
 			inhaled_from => 'Class::XSConstructor',
 			short_name   => $k_short,
@@ -172,7 +179,7 @@ sub try_inhale {
 				};
 			} $moose_meta->get_attribute_list;
 			
-			use Marlin::Role;
+			require Marlin::Role;
 			'Marlin::Role'->_new(
 				this         => $k,
 				attributes   => \@attrs,
@@ -226,6 +233,97 @@ sub try_inhale {
 		
 		return 'Moo::Role';
 	}
+
+	# Inhale Mouse
+	if ( $INC{'Mouse.pm'} and my $mouse_meta = do {
+		require Mouse::Util;
+		Mouse::Util::find_meta($k);
+	} ) {
+		# Moose classes
+		if ( $mouse_meta->isa('Mouse::Meta::Class') ) {
+			my @attrs = map {
+				my $attr = $_;
+				{
+					is       => $attr->{is} || 'bare',
+					package  => eval { $attr->associated_class->name } || $k,
+					slot     => $attr->name,
+					defined $attr->{does} ? ( isa => Types::Common::ConsumerOf()->of($attr->{does}) ) : (),
+					defined $attr->{isa} ? ( isa => Types::Common::to_TypeTiny($attr->{isa}) ) : (),
+					$attr->{coerce} ? ( coerce => 1 ) : (),
+					defined $attr->{trigger} ? ( trigger => $attr->{trigger} ) : (),
+					exists $attr->{init_arg} ? ( init_arg => $attr->{init_arg} ) : (),
+					defined $attr->{builder} ? ( builder => $attr->{builder} ) : exists $attr->{default} ? ( default => $attr->{default} ) : (),
+					$attr->{required} ? ( required => 1 ) : (),
+					$attr->{weak_ref} ? ( weak_ref => 1 ) : (),
+					$attr->{lazy} || $attr->{lazy_build} ? ( lazy => 1 ) : (),
+				};
+			} $mouse_meta->get_all_attributes;
+			
+			__PACKAGE__->_new(
+				this         => $k,
+				attributes   => \@attrs,
+				parents      => [ @{"$k\::ISA"} ],
+				roles        => [ uniqstr( map { $_->name } @{ $mouse_meta->roles } ) ],
+				strict       => !!eval { $mouse_meta->strict_constructor },
+				constructor  => $mouse_meta->{constructor_name} || 'new',
+				inhaled_from => 'Mouse',
+				short_name   => $k_short,
+			)->store_meta;
+			
+			return 'Mouse';
+		}
+		# Moose roles
+		elsif ( $mouse_meta->isa('Mouse::Meta::Role') ) {
+			my @attrs = map {
+				my $name = $_;
+				my $attr = $mouse_meta->get_attribute($_);
+				{
+					is       => $attr->{is} || 'bare',
+					package  => $k,
+					slot     => $name,
+					%$attr,
+					defined $attr->{does} ? ( isa => Types::Common::ConsumerOf->of($attr->{does}) ) : (),
+					defined $attr->{isa} ? ( isa => Types::Common::to_TypeTiny($attr->{isa}) ) : (),
+				};
+			} $mouse_meta->get_attribute_list;
+			
+			require Marlin::Role;
+			'Marlin::Role'->_new(
+				this         => $k,
+				attributes   => \@attrs,
+				roles        => [ uniqstr( map { $_->name } @{ $mouse_meta->get_roles } ) ],
+				inhaled_from => 'Mouse::Role',
+			)->store_meta;
+			
+			return 'Mouse::Role';
+		}
+	}
+	
+	# Inhale Class::Tiny
+	if ( $INC{'Class/Tiny.pm'} and $k->isa('Class::Tiny::Object') ) {
+		my $defaults = Class::Tiny->get_all_attribute_defaults_for( $k );
+		my @attrs = map {
+			+{
+				is       => 'rw',
+				package  => $k,
+				slot     => $_,
+				exists $defaults->{$_} ? ( lazy => 1, default => $defaults->{$_} ) : (),
+			};
+		} Class::Tiny->get_all_attributes_for( $k );
+		
+		__PACKAGE__->_new(
+			this         => $k,
+			attributes   => \@attrs,
+			parents      => [ @{"$k\::ISA"} ],
+			roles        => [],
+			strict       => !!0,
+			constructor  => 'new',
+			inhaled_from => 'Class::Tiny',
+			short_name   => $k_short,
+		)->store_meta;
+		
+		return 'Class::Tiny';
+	}
 	
 	return !!0;
 }
@@ -262,6 +360,9 @@ my $_parse_package_list = sub {
 	}
 	elsif ( is_ScalarRef $v ) {
 		push @r, [ split /\s+/, $$v ];
+	}
+	elsif ( is_Str $v ) {
+		push @r, [ $v ];
 	}
 	
 	return @r;
@@ -453,6 +554,7 @@ sub setup_steps {
 		setup_accessors
 		setup_imports
 		optimize_methods
+		setup_compat
 	/;
 }
 
@@ -499,21 +601,33 @@ sub setup_roles {
 		} @{ $me->roles }
 	) or return $me;
 	
-	my ( @moose_roles, @tiny_roles );
+	my ( $is_moose_role, $is_mouse_role, $is_op_role );
 	if ( $INC{'Moose/Role.pm'} ) {
-		require Moose::Util;
-		for my $r ( @roles ) {
-			my $m = Moose::Util::find_meta( $r );
-			if ( $m and $m->isa('Moose::Meta::Role') ) {
-				push @moose_roles, $r;
-			}
-			else {
-				push @tiny_roles, $r;
-			}
-		}
+		$is_moose_role = sub {
+			require Moose::Util;
+			my $m = Moose::Util::find_meta( $_[0] );
+			$m and $m->isa('Moose::Meta::Role');
+		};
 	}
-	else {
-		@tiny_roles = @roles;
+	if ( $INC{'Mouse/Role.pm'} ) {
+		$is_mouse_role = sub {
+			require Mouse::Util;
+			my $m = Mouse::Util::find_meta( $_[0] );
+			$m and $m->isa('Mouse::Meta::Role');
+		};
+	}
+
+	my ( @moose_roles, @mouse_roles, @op_roles, @tiny_roles );
+	for my $r ( @roles ) {
+		if ( $is_moose_role and $is_moose_role->($r) ) {
+			push @moose_roles, $r;
+		}
+		elsif ( $is_mouse_role and $is_mouse_role->($r) ) {
+			push @mouse_roles, $r;
+		}
+		else {
+			push @tiny_roles, $r;
+		}
 	}
 	
 	at_runtime {
@@ -525,6 +639,10 @@ sub setup_roles {
 		Moose::Util::ensure_all_roles( $me->this, @moose_roles );
 	} if @moose_roles;
 
+	at_runtime {
+		Mouse::Util::apply_all_roles( $me->this, @mouse_roles );
+	} if @mouse_roles;
+	
 	my $existing;
 	for my $r ( @roles ) {
 		my $r_meta = $me->find_meta( $r );
@@ -570,19 +688,7 @@ sub setup_constructor {
 		$me->export( $me->constructor, $code->finalize->compile );
 	}
 	else {
-		my @dfn = map {
-			my $name = $_->{slot};
-			my $req  = $_->{required} ? '!'           : '';
-			my $opt  = {};
-			$opt->{isa}      = $_->{isa}       if defined $_->{isa};
-			$opt->{coerce}   = 1               if $_->{coerce} && blessed $_->{isa};
-			$opt->{default}  = $_->{default}   if !$_->{lazy} && exists $_->{default};
-			$opt->{builder}  = $_->{builder}   if !$_->{lazy} && defined $_->{builder};
-			$opt->{init_arg} = $_->{init_arg}  if exists $_->{init_arg};
-			$opt->{trigger}  = $_->{trigger}   if $_->{trigger};
-			$opt->{weak_ref} = $_->{weak_ref}  if $_->{weak_ref};
-			$_->{storage} eq 'HASH' ? ( $name.$req => $opt ) : ();
-		} @$attr;
+		my @dfn = map { $_->xs_constructor_args } @$attr;
 		push @dfn, '!!' if $me->strict;
 		Class::XSConstructor->import( [ $me->this, $me->constructor ], @dfn );
 	}
@@ -603,6 +709,12 @@ sub setup_accessors {
 	
 	for my $attr ( @{ $me->attributes } ) {
 		$attr->install_accessors;
+	}
+	for my $attr ( @{ $me->attributes_with_inheritance } ) {
+		if ( $attr->{force_regenerate_accessors} && $attr->{package} ne $me->this ) {
+			my $clone = bless { %$attr, package => $me->this }, ref($attr);
+			$clone->install_accessors;
+		}
 	}
 	
 	return $me;
@@ -704,6 +816,9 @@ sub attributes_with_inheritance {
 	#
 	for my $k ( @isa ) {
 		$me->try_inhale( $k );
+		if ( my $meta = $me->find_meta( $k ) ) {
+			$meta->setup_compat;
+		}
 	}
 	
 	my %already;
@@ -730,7 +845,7 @@ sub build_pp_constructor {
 	$code->add_gap;
 	for my $at ( @$attr ) {
 		$at->{_locally_compiling_class} = $me->this;
-		$at->_compile_init( $code );
+		$at->add_code_for_initialization( $code );
 		delete $at->{_locally_compiling_class};
 	}
 	$code->add_gap;
@@ -744,10 +859,7 @@ sub build_pp_constructor {
 	$code->addf( '$_->( $self, \%%args ) for @{ $%s::BUILD_CACHE{$class} };', __PACKAGE__ );
 	if ( $me->strict ) {
 		$code->add_gap;
-		my @allowed =
-			grep { defined $_ }
-			map { exists($_->{init_arg}) ? $_->{init_arg} : $_->{slot} }
-			@$attr;
+		my @allowed = map { $_->allowed_constructor_parameters } @$attr;
 		my $check = do {
 			my $enum = Types::Common::Enum->of( @allowed );
 			$enum->can( '_regexp' )
@@ -766,7 +878,7 @@ sub build_pp_constructor {
 
 sub make_type_constraint {
 	my $me = shift;
-	my $name = shift;
+	my $name = shift; $name =~ s{(::|')}{}g;
 	require Marlin::TypeConstraint;
 	my $tc = Marlin::TypeConstraint->new( name => $name, class => $me->this );
 	$tc->{_marlin} = $me;
@@ -879,6 +991,81 @@ sub to_string {
 		( @pos && @named ) ? q{, } : q{},
 		join( q{, }, map { sprintf q{%s => %s}, @$_ } @named ),
 	);
+}
+
+sub setup_compat {
+	my $me = shift;
+	$me->inject_moose_metadata if $INC{'MooseX/Marlin.pm'};
+	$me->inject_moo_metadata if $INC{'MooX/Marlin.pm'};
+	return $me;
+}
+
+my $made_shim = 0;
+sub inject_moose_metadata {
+	my $me = shift;
+	
+	# Recurse to any parents or roles
+	for my $pkg ( @{ $me->parents }, @{ $me->roles } ) {
+		use_package_optimistically( $pkg->[0] );
+		Marlin->find_meta( $pkg->[0] )->inject_moose_metadata;
+	}
+	
+	require Moose::Util;
+	return if Moose::Util::find_meta( $me->this );
+	
+	eval q{
+		package Marlin::Meta::Class;
+		use Moose;
+		extends 'Moose::Meta::Class';
+		around _immutable_options => sub {
+			my ( $next, $self, @args ) = ( shift, shift, @_ );
+			return $self->$next( replace_constructor => 1, @args );
+		};
+		__PACKAGE__->meta->make_immutable;
+		1;
+	} unless $made_shim++;
+	
+	
+	my $metaclass = Marlin::Meta::Class->initialize( $me->this, package => $me->this );
+	
+	require Class::MOP;
+	Class::MOP::store_metaclass_by_name( $me->this, $metaclass );
+	
+	for my $attr ( @{ $me->attributes } ) {
+		$attr->inject_moose_metadata($metaclass) or next;
+	}
+	
+	$metaclass->superclasses( map $_->[0], @{ $me->parents } );
+	
+	require Moose::Util::TypeConstraints;
+	my $tc = Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( $me->this );
+	my $tt = $me->make_type_constraint( $me->short_name );
+	$tc->{coercion} = $tt->coercion->moose_coercion if $tt->has_coercion;
+}
+
+sub inject_moo_metadata {
+	my $me = shift;
+	
+	# Recurse to any parents or roles
+	for my $pkg ( @{ $me->parents }, @{ $me->roles } ) {
+		use_package_optimistically( $pkg->[0] );
+		Marlin->find_meta( $pkg->[0] )->inject_moo_metadata;
+	}
+	
+	require Moo;
+	require Method::Generate::Accessor;
+	require Method::Generate::Constructor;
+	my $makers = ( $Moo::MAKERS{$me->this} ||= {} );
+	$makers->{is_class} = 1;
+	$makers->{accessor} = Method::Generate::Accessor->new;
+	$makers->{constructor} = Method::Generate::Constructor->new(
+		package              => $me->this,
+		accessor_generator   => $makers->{accessor},
+	);
+	
+	for my $attr ( @{ $me->attributes } ) {
+		$attr->inject_moo_metadata($makers) or next;
+	}
 }
 
 1;
@@ -1431,8 +1618,14 @@ Sets the parent classes of your class.
   }
 
 Marlin currently only supports inheriting from other Marlin classes, or
-from L<Class::XSConstructor>, L<Moo>, and L<Moose> classes. Other base classes
-I<may> work, especially if they don't do anything much in their constructor.
+from L<Class::XSConstructor>, L<Class::Tiny>, L<Moo>, L<Moose>, and
+L<Mouse> classes. Other base classes I<may> work, especially if they use
+blessed hashref instances and don't do anything fancy in their constructor.
+
+Marlin can inherit from classes built with L<Mite>, provided that the
+MOP option was enabled (see L<Mite::Manual::MOP>) and Moose is available.
+(Mite doesn't expose attribute metadata, so Marlin needs to force the
+class to "upgrade itself" to a Moose class.)
 
 You can include version numbers:
 
@@ -1475,7 +1668,7 @@ Composes roles into your class.
   }
 
 Marlin classes can accept roles built with L<Marlin::Role>, L<Role::Tiny>,
-L<Moo::Role>, or L<Moose::Role>.
+L<Moo::Role>, L<Moose::Role>, or L<Mouse::Role>.
 
 Like C<< -base >>, you can include version numbers.
 
@@ -1634,7 +1827,9 @@ from composed roles, but not inherited attributes from parent classes.
 Each attribute is either a hashref or a L<Marlin::Attribute> object.
 
 Calling C<< $meta->canonicalize_attributes >> will replace any hashrefs
-in this list with Marlin::Attribute objects.
+in this list with Marlin::Attribute objects. That method is chainable, so
+the best way to get a list of L<Marlin::Attribute> objects is:
+C<< @{ $meta->canonicalize_attributes->attributes } >>.
 
 =item C<< $meta->attributes_with_inheritance >>
 
@@ -1655,8 +1850,9 @@ keywords into the package.
 
 =item C<< $meta->inhaled_from >>
 
-Usually undef, but may be "Moose", "Moose::Role", "Moo", or "Moo::Role" to
-indicate that this metadata was imported from Moose or Moo.
+Usually undef, but may be "Moose", "Moose::Role", "Moo", "Moo::Role",
+"Mouse", "Mouse::Role", "Class::Tiny", or "Class::XSConstructor" to
+indicate that this metadata was imported from another OO framework.
 
 =item C<< $meta->short_name >>
 
@@ -1707,6 +1903,9 @@ L<Type::Params>, and L<Sub::HandlesVia>.
 
 Inspirations:
 L<Moose> and L<Moo>.
+
+See also:
+L<MooseX::Marlin>, L<MooX::Marlin>.
 
 =head1 AUTHOR
 

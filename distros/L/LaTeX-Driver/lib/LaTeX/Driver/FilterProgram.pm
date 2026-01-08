@@ -34,51 +34,51 @@ sub execute {
     my ($source, $output, $tt2mode, $debug, @vars, %var);
 
     GetOptions( 'output:s' => \$output,
-		'tt2mode'  => \$tt2mode,
-		'define:s' => \@vars,
-		'debug'    => \$debug );
+                'tt2mode'  => \$tt2mode,
+                'define:s' => \@vars,
+                'debug'    => \$debug );
 
     if ( @ARGV ) {
-	$source = shift @ARGV;
+        $source = shift @ARGV;
     }
     else {
-	my $input = join '', <STDIN>;
-	$source = \$input;
+        my $input = join '', <STDIN>;
+        $source = \$input;
     }
 
     if ($tt2mode) {
-	eval {
-	    use Template;
-	};
-	if ($@) {
-	    die "Cannot load the Template Toolkit - tt2 mode is unavailable\n";
-	}
-	if (!ref $source) {
-	    ${$source} = read_file($source);
-	}
+        eval {
+            require Template;
+        };
+        if ($@) {
+            die "Cannot load the Template Toolkit - tt2 mode is unavailable\n";
+        }
+        if (!ref $source) {
+            ${$source} = read_file($source);
+        }
 
-	foreach (@vars) {
-	    my ($name, $value) = split / \s* = \s* /mx;
-	    printf(STDERR "defining %s as '%s'\n", $name, $value) if $debug;
-	    $var{$name} = $value;
-	}
+        foreach (@vars) {
+            my ($name, $value) = split / \s* = \s* /mx;
+            printf(STDERR "defining %s as '%s'\n", $name, $value) if $debug;
+            $var{$name} = $value;
+        }
 
-	my $input;
-	my $tt2  = Template->new({});
-	$tt2->process($source, \%var, \$input)
-	    or die $tt2->error(), "\n";
+        my $input;
+        my $tt2  = Template->new({});
+        $tt2->process($source, \%var, \$input)
+            or die $tt2->error(), "\n";
 
-	$source = \$input;
+        $source = \$input;
     }
 
     if (!$output or $output eq '-') {
-	my $tmp;
-	$output = \$tmp;
+        my $tmp;
+        $output = \$tmp;
     }
     eval {
-	my $drv = LaTeX::Driver->new( source => $source,
-				      output => $output,
-				      format => $options{format} );
+        my $drv = LaTeX::Driver->new( source => $source,
+                                      output => $output,
+                                      format => $options{format} );
         $drv->run;
     };
     if (my $e = LaTeX::Driver::Exception->caught()) {
@@ -104,6 +104,8 @@ __END__
 LaTeX::Driver::FilterProgram
 
 =head1 VERSION
+
+1.3.1
 
 =head1 SYNOPSIS
 

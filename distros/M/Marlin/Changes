@@ -6,6 +6,28 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.011000	2026-01-07
+
+ [ Packaging ]
+ - Require Class::XSAccessor 0.016000.
+ - Require Type::Tiny 2.010000.
+
+ [ Other ]
+ - Added: Provide MooseX::Marlin and MooX::Marlin to allow Moose and Moo to
+   inherit from Marlin classes and compose Marlin roles.
+ - Marlin::Struct's magical coercion from arrayrefs is now aware of
+   ':Alias'.
+ - Marlin::XAttribute::Alias no longer forces PP constructors to be
+   generated.
+ - Move some attribute logic from Marlin to Marlin::Attribute making it
+   easier for attribute extensions to override.
+ - Partial support for inheritance from Object::Pad classes (but sometimes
+   it segfaults).
+ - Support inheritance from Class::Tiny classes.
+ - Support inheritance from Mite classes and composing Mite roles.
+ - Support inheritance from Mouse classes and composing Mouse roles.
+ - Updated: Changes to work with newest Class::XSAccessor.
+
 0.010000	2025-12-29
 
  [ Documentation ]

@@ -1,3 +1,5 @@
+=encoding utf8
+
 =for comment POD_DERIVED_INDEX_GENERATED
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Protocol::XMPP::Stream
@@ -11,10 +13,6 @@ sure you change the first line.
 =head1 NAME
 
 Protocol::XMPP::Stream - handle XMPP protocol stream
-
-=head1 VERSION
-
-Version 0.006
 
 =head1 SYNOPSIS
 
@@ -183,12 +181,12 @@ Unsubscribe from the given contact. Takes a single JID as target.
 =cut
 
 sub unsubscribe {
-	my $self = shift;
-	my $to = shift;
-	Protocol::XMPP::Contact->new(	
-		stream	=> $self,
-		jid	=> $to,
-	)->unsubscribe;
+  my $self = shift;
+  my $to = shift;
+  Protocol::XMPP::Contact->new(
+    stream  => $self,
+    jid => $to,
+  )->unsubscribe;
 }
 
 =head2 authorise
@@ -215,8 +213,9 @@ L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_e
 
 =head1 AUTHOR
 
-Tom Molesworth <cpan@entitymodel.com>
+Tom Molesworth <tom@perlsite.co.uk>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2010-2014. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2010-2026. Licensed under the same terms as Perl itself.
+

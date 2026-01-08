@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Scroll;
 # ABSTRACT: A MetaCPAN::Client scroller
-$MetaCPAN::Client::Scroll::VERSION = '2.035000';
+$MetaCPAN::Client::Scroll::VERSION = '2.037000';
 use Moo;
 use Carp;
 use Ref::Util qw< is_hashref >;
@@ -187,7 +187,7 @@ MetaCPAN::Client::Scroll - A MetaCPAN::Client scroller
 
 =head1 VERSION
 
-version 2.035000
+version 2.037000
 
 =head1 METHODS
 

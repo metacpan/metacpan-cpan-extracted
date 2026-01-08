@@ -39,46 +39,6 @@ use Test::Requires { 'Type::Nano' => '0.013' };
 	use Class::XSConstructor qw( employee_id! );
 }
 
-# This is not part of the public API, but a simple way of
-# testing the import stuff works properly.
-#
-
-is_deeply(
-	\@Person::__XSCON_HAS,
-	[qw/ name age email phone /],
-	'Person attributes',
-);
-
-is_deeply(
-	\@Employee::__XSCON_HAS,
-	[qw/ name age email phone employee_id /],
-	'Employee attributes',
-);
-
-is_deeply(
-	\@Person::__XSCON_REQUIRED,
-	[qw/ name /],
-	'Person required attributes',
-);
-
-is_deeply(
-	\@Employee::__XSCON_REQUIRED,
-	[qw/ name employee_id /],
-	'Employee required attributes',
-);
-
-#is_deeply(
-#	\%Person::__XSCON_ISA,
-#	{ age => Types::Standard::Int->compiled_check },
-#	'Person type constraints',
-#);
-#
-#is_deeply(
-#	\%Employee::__XSCON_ISA,
-#	{ age => Types::Standard::Int->compiled_check },
-#	'Employee type constraints',
-#);
-
 my $alice0 = bless {
 	name         => "Alice",
 	employee_id  => "001",

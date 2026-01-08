@@ -3,9 +3,7 @@ use lib '../lib', 'lib';
 use blib;
 use Test2::Tools::Affix qw[:all];
 use Affix               qw[:all];
-use Config;
-
-# 1. Define the C source with complex, nested, and recursive types
+#
 my $c_source = <<'END_C';
 #include "std.h"
 //ext: .c
@@ -221,4 +219,5 @@ subtest 'Pinning / Dereferencing Deep Structures' => sub {
     my $ptr2 = $get_static_rect->();
     is $$ptr2->{top_left}{x}, 99, 'Changes persisted in C memory';
 };
+#
 done_testing;

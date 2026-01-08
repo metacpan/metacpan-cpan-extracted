@@ -1,0 +1,349 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Affix::Wrap - Frictionless C Header Introspection and FFI Wrapper Generation
+
+=head1 SYNOPSIS
+
+    use v5.40;
+    use Affix;
+    use Affix::Wrap;
+
+    # Parse headers and install symbols into the current package
+    Affix::Wrap->new(
+        project_files => [ 'include/mylib.h' ],
+        include_dirs  => [ '/usr/local/include' ]
+    )->wrap( 'libdemo.so' );
+
+    # Use the C functions immediately
+    my $val = mylib_function(10);
+
+=head1 DESCRIPTION
+
+C<Affix::Wrap> acts as a bridge between C/C++ header files and L<Affix>. It parses C header files to produce a
+structured object model (AST) representing functions, structs, enums, typedefs, macros, and variables.
+
+This module is designed to facilitate two primary workflows:
+
+=over
+
+=item 1. B<Runtime Wrapping>
+
+Parsing headers on the fly to wrap libraries dynamically via C<wrap()>. This is ideal for rapid prototyping, private
+tooling, or when you don't want to maintain a separate XS/FFI module file.
+
+=item 2. B<Static Generation>
+
+Creating F<.pm> files to be distributed on CPAN via C<parse()>. This provides the fastest load times for end users, as
+the parsing happens only once during development.
+
+=back
+
+Please be aware that this is experimental software!
+
+=head2 Drivers
+
+Affix::Wrap utilizes a dual-driver approach to parsing:
+
+=over
+
+=item * B<Clang driver>
+
+The preferred driver. It uses the system's C<clang> executable to dump the AST in JSON format. It is extremely
+accurate, handles C preprocessor logic (macros, includes), and resolves complex typedef chains correctly.
+
+=item * B<Regex driver>
+
+A fallback driver implemented in pure Perl. It scans headers using regular expressions. While zero-dependency, it may
+struggle with heavily macro-laden code or complex C++ templates.
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 C<new( ... )>
+
+    my $binder = Affix::Wrap->new(
+        project_files => [ 'lib.h' ],
+        include_dirs  => [ '/usr/include' ],
+        driver        => 'Clang'
+    );
+
+=over
+
+=item C<project_files>
+
+Required. An array reference of paths to the C header files (C<.h>, C<.hpp>, C<.hxx>) you wish to parse.
+
+=item C<include_dirs>
+
+Optional. An array reference of paths to search for C<#include "..."> directives. The directory of every file listed in
+C<project_files> is automatically added to this list.
+
+=item C<driver>
+
+Optional. Explicitly select the parser driver. Values are C<'Clang'> or C<'Regex'>. If omitted, C<Affix::Wrap> attempts
+to find the C<clang> executable and falls back to Regex if unavailable.
+
+=back
+
+=head1 METHODS
+
+=head2 wrap( $lib )
+
+    $binder->wrap( $lib );
+
+Parses the project files and immediately binds all found entities (functions, variables, constants, types) to the
+B<calling package>.
+
+=over
+
+=item C<$lib>
+
+An instance of an L<Affix> library object (created via C<Affix::load>).
+
+=back
+
+=head2 parse( [$entry_point] )
+
+    my @nodes = $binder->parse;
+
+Parses the project files and returns a list of Node objects (see B<Data Model> below). Use this if you want to inspect
+the C header structure or generate code strings for a static Perl module.
+
+The nodes are sorted by file name and line number to ensure deterministic output order.
+
+=over
+
+=item C<$entry_point>
+
+Optional. The specific file to start parsing from. Defaults to the first file in C<project_files>.
+
+=back
+
+=head1 Data Model
+
+The C<parse()> method returns a list of objects inheriting from C<Affix::Wrap::Entity>.
+
+All nodes provide at least two key methods:
+
+=over
+
+=item * C<affix_type>: Returns a B<string> of Perl code representing the type or declaration (e.g., C<"Int">, C<"typedef Foo => Int">). Used for code generation.
+
+=item * C<affix( $lib, $pkg )>: Performs the actual binding at runtime. Installs symbols into C<$pkg> using C<$lib>.
+
+=back
+
+=head2 Affix::Wrap::Type
+
+Represents a generic C type (e.g., C<int>, C<void>, C<size_t>).
+
+=head2 Affix::Wrap::Type::Pointer
+
+Represents C<T*> types. Wraps another type object.
+
+=head2 Affix::Wrap::Type::Array
+
+Represents C<T[N]> fixed-size arrays. Wraps a type object and a count.
+
+=head2 Affix::Wrap::Type::CodeRef
+
+Represents function pointers (callbacks), e.g., C<void (*)(int)>.
+
+=over
+
+=item * C<ret>: Return type object.
+
+=item * C<params>: ArrayRef of argument type objects.
+
+=item * C<affix_type>: Returns string C<Callback[[Args] =E<gt> Ret]>.
+
+=back
+
+=head2 Affix::Wrap::Argument
+
+Function arguments. Stringifies to "Type Name".
+
+=head2 Affix::Wrap::Member
+
+Struct/Union members.
+
+=over
+
+=item * C<definition>: If the member defines a nested struct/union inline, this holds that definition object.
+
+=item * C<affix_type>: Returns the signature of the type OR the nested definition.
+
+=back
+
+=head2 Affix::Wrap::Function
+
+A C function declaration.
+
+=over
+
+=item * C<affix_type>: Returns a complete Perl string to bind this function (e.g., C<affix $lib, name =E<gt> ...>).
+
+=item * C<affix( $lib, $pkg )>: Installs the function into C<$pkg>.
+
+=back
+
+=head2 Affix::Wrap::Struct
+
+A C struct or union definition.
+
+=over
+
+=item * C<tag>: Either 'struct' or 'union'.
+
+=item * C<affix_type>: Returns signature string C<Struct[ ... ]> or C<Union[ ... ]>.
+
+=back
+
+=head2 Affix::Wrap::Typedef
+
+A name alias for another type.
+
+=over
+
+=item * C<underlying>: The type object being aliased.
+
+=item * C<affix_type>: Returns string C<typedef Name =E<gt> UnderlyingType>.
+
+=back
+
+B<Note:> In C, C<typedef struct { ... } Name;> results in a C<Typedef> object where B<underlying> is the C<Struct>
+object.
+
+=head2 Affix::Wrap::Enum
+
+An enumeration.
+
+=over
+
+=item * C<affix_type>: Returns signature string C<Enum[ Name =E<gt> Val, ... ]>. String values/expressions in enums are quoted automatically to prevent eval errors.
+
+=back
+
+=head2 Affix::Wrap::Variable
+
+A global C<extern> variable.
+
+=over
+
+=item * C<affix_type>: Returns string C<pin my $var, $lib, name =E<gt> Type>.
+
+=item * C<affix( $lib, $pkg )>: Installs the variable accessor into C<$pkg>.
+
+=back
+
+=head2 Affix::Wrap::Macro
+
+A preprocessor C<#define>. Only simple value macros are captured.
+
+=over
+
+=item * C<affix_type>: Returns string C<use constant Name =E<gt> Value>. Expressions (e.g., C<A + B>) are quoted as strings, while literals are preserved.
+
+=item * C<affix( undef, $pkg )>: Installs the constant into C<$pkg>.
+
+=back
+
+=head1 Tutorials
+
+=head2 Runtime Library Wrappers
+
+If you want to use a C library immediately without creating a separate Perl module file, use the C<wrap> method.
+
+    use Affix;
+    use Affix::Wrap;
+
+    my $lib = Affix::load('libdemo.so');
+
+    # This parses demo.h and installs subroutines, constants,
+    # and types directly into the calling package.
+    Affix::Wrap->new( project_files => ['demo.h'] )->wrap($lib);
+
+    # Now you can use them:
+    my $obj = Demo_CreateStruct();
+
+=head3 Manual Control
+
+If you need to filter which functions are bound or rename them, you can iterate over the AST manually instead of
+calling C<wrap>:
+
+    my $binder = Affix::Wrap->new( project_files => ['demo.h'] );
+    for my $node ( $binder->parse ) {
+        next if $node->name =~ m[^Internal_]; # Skip internal functions
+        # Manually bind
+        if ( $node->can('affix') ) {
+            $node->affix($lib);
+        }
+    }
+
+=head2 Generating Affix Modules for CPAN
+
+To create a distributable module (e.g., C<My::Lib.pm>), use the C<affix_type> method. This returns Perl source code
+strings.
+
+    use Affix::Wrap;
+    use Path::Tiny;
+
+    my $binder = Affix::Wrap->new( project_files => ['mylib.h'] );
+    my $ast    = $binder->parse;
+
+    my $code = <<~'PERL';
+        package My::Lib;
+        use v5.40;
+        use Affix;
+
+        # Load the library (user must ensure this exists)
+        my $lib = Affix::load('libmylib');
+
+        PERL
+
+    for my $node (@$ast) {
+        # Add POD documentation derived from C comments
+        if ( defined $node->doc ) {
+            $code .= "\n=head2 " . $node->name . "\n\n";
+            $code .= $node->doc . "\n\n=cut\n";
+        }
+
+        # Generate Perl code
+        if ( $node isa Affix::Wrap::Function ) {
+            # e.g. "affix $lib, 'my_func', [Int], Void;"
+            $code .= $node->affix_type . "\n";
+        }
+        elsif ( $node isa Affix::Wrap::Typedef ) {
+            # e.g. "typedef MyStruct => Struct[ ... ];"
+            $code .= $node->affix_type . ";\n";
+        }
+        elsif ( $node isa Affix::Wrap::Macro ) {
+            # e.g. "use constant MAX_VAL => 100;"
+            $code .= $node->affix_type . ";\n";
+        }
+        elsif ( $node isa Affix::Wrap::Variable ) {
+            # e.g. "pin my $var, $lib, ..."
+            $code .= $node->affix_type . ";\n";
+        }
+    }
+
+    $code .= "\n1;\n";
+
+    path('lib/My/Lib.pm')->spew_utf8($code);
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2026 by Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

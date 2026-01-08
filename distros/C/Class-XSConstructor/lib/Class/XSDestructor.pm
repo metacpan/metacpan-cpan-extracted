@@ -6,7 +6,7 @@ use Class::XSConstructor ();
 package Class::XSDestructor;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015003';
+our $VERSION   = '0.016001';
 
 sub import {
 	my $class = shift;
@@ -60,7 +60,7 @@ methods at every level of the inheritance hierarchy.
 
 =head1 SEE ALSO
 
-L<Class::XSConstructor>, L<Class::XSAccessor>.
+L<Class::XSConstructor>, L<Class::XSDelegation>, L<Class::XSAccessor>.
 
 =head1 AUTHOR
 
@@ -68,7 +68,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2025 by Toby Inkster.
+This software is copyright (c) 2025-2026 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2025 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2026 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Liberachat::Bot;
-$App::SpreadRevolutionaryDate::Target::Liberachat::Bot::VERSION = '0.53';
+$App::SpreadRevolutionaryDate::Target::Liberachat::Bot::VERSION = '0.54';
 # ABSTRACT: Subclass overloading L<Bot::BasicBot> to post a message on some Liberachat channels
 
 use Moose;
@@ -121,7 +121,7 @@ App::SpreadRevolutionaryDate::Target::Liberachat::Bot - Subclass overloading L<B
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 SEE ALSO
 
@@ -179,7 +179,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2025 by Gérald Sédrati.
+This software is Copyright (c) 2019-2026 by Gérald Sédrati.
 
 This is free software, licensed under:
 

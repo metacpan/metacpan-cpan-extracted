@@ -23,6 +23,7 @@ t/data/cnb000008190-duplicates_in_035a_fields.xml
 t/data/cnb000295209-incorrect_field_008_syntax_space.xml
 t/data/cnb000545093-cnb001214971-duplicite_035a.xml
 t/data/cnb001410157-incorrect_field_020a_isbn_with_extra_characters.xml
+t/data/cnb001696044-bad_date2_in_currently_published.xml
 t/data/cnb001873805-incorrect_field_008_content-blank.xml
 t/data/cnb001880327-incorrect_260c.xml
 t/data/cnb001920818-incorrect_field_008_syntax_quote_mark.xml
@@ -30,6 +31,9 @@ t/data/cnb002172297-leader_desc_cataloging_form_coolidate_with_rda.xml
 t/data/cnb003260113-incorrect_field_020a_isbn_bad.xml
 t/data/cnb003698545-incorrect_field_020a_isbn_formatting.xml
 t/data/fake1-incorrect_field_020a.xml
+t/data/fake2-incorrect_leader.xml
+t/data/fake3-missing_field_008.xml
+t/data/fake4-missing_field_040.xml
 t/MARC-Validator-Abstract/01-use.t
 t/MARC-Validator-Abstract/02-version.t
 t/MARC-Validator-Abstract/03-new.t

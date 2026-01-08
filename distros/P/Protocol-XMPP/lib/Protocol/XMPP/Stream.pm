@@ -1,16 +1,14 @@
 package Protocol::XMPP::Stream;
-$Protocol::XMPP::Stream::VERSION = '0.006';
+
 use strict;
 use warnings;
 use parent qw{Protocol::XMPP::Base};
 
+our $VERSION = '0.007'; ## VERSION
+
 =head1 NAME
 
 Protocol::XMPP::Stream - handle XMPP protocol stream
-
-=head1 VERSION
-
-Version 0.006
 
 =head1 SYNOPSIS
 
@@ -54,13 +52,13 @@ and the following scalar parameters:
 =cut
 
 sub new {
-	my $class = shift;
-	my %args = @_;
+  my $class = shift;
+  my %args = @_;
 
-	my $self = $class->SUPER::new(%args);
-	$self->reset;
-	$self->{write_buffer} = [];
-	$self;
+  my $self = $class->SUPER::new(%args);
+  $self->reset;
+  $self->{write_buffer} = [];
+  $self;
 }
 
 =head2 on_data
@@ -70,13 +68,13 @@ Data has been received, pass it over to the SAX parser to trigger any required e
 =cut
 
 sub on_data {
-	my $self = shift;
-	my $data = shift;
-	return $self unless length $data;
+  my $self = shift;
+  my $data = shift;
+  return $self unless length $data;
 
-	$self->debug("<<< $data");
-	$self->{sax}->parse_chunk($data);
-	return $self;
+  $self->debug("<<< $data");
+  $self->{sax}->parse_chunk($data);
+  return $self;
 }
 
 =head2 queue_write
@@ -89,13 +87,13 @@ was defined.
 =cut
 
 sub queue_write {
-	my $self = shift;
-	my $v = shift;
-	$self->debug("Queued a write for [$v]");
-	my $f = $self->new_future;
-	push @{$self->{write_buffer}}, [ $v, $f ];
-	$self->{on_queued_write}->() if $self->{on_queued_write};
-	return $f;
+  my $self = shift;
+  my $v = shift;
+  $self->debug("Queued a write for [$v]");
+  my $f = $self->new_future;
+  push @{$self->{write_buffer}}, [ $v, $f ];
+  $self->{on_queued_write}->() if $self->{on_queued_write};
+  return $f;
 }
 
 =head2 write_buffer
@@ -113,20 +111,20 @@ Retrieves next pending message from the write buffer and removes it from the lis
 =cut
 
 sub extract_write {
-	my $self = shift;
-	return unless @{$self->{write_buffer}};
-	my $next = shift @{$self->{write_buffer}};
-	my ($v) = @$next;
-	$self->debug("Extract write [$v]");
-	return $v;
+  my $self = shift;
+  return unless @{$self->{write_buffer}};
+  my $next = shift @{$self->{write_buffer}};
+  my ($v) = @$next;
+  $self->debug("Extract write [$v]");
+  return $v;
 }
 
 sub extract_write_and_future {
-	my $self = shift;
-	return unless @{$self->{write_buffer}};
-	my $next = shift @{$self->{write_buffer}};
-	$self->debug("Extract write [$next->[0]]");
-	return $next;
+  my $self = shift;
+  return unless @{$self->{write_buffer}};
+  my $next = shift @{$self->{write_buffer}};
+  $self->debug("Extract write [$next->[0]]");
+  return $next;
 }
 
 =head2 ready_to_send
@@ -136,14 +134,14 @@ Returns true if there's data ready to be written.
 =cut
 
 sub ready_to_send {
-	my $self = shift;
-	$self->debug('Check whether ready to send, current length '. @{$self->{write_buffer}});
-	return @{$self->{write_buffer}};
+  my $self = shift;
+  $self->debug('Check whether ready to send, current length '. @{$self->{write_buffer}});
+  return @{$self->{write_buffer}};
 }
 
 sub features_complete {
-	my $self = shift;
-	$self->{features_complete} ||= $self->new_future;
+  my $self = shift;
+  $self->{features_complete} ||= $self->new_future;
 }
 
 =head2 reset
@@ -156,24 +154,24 @@ events. Used when we expect a new C<<stream>> element, for example after authent
 =cut
 
 sub reset {
-	my $self = shift;
-	$self->debug('Reset stream');
-	delete $self->{remote_opened};
-	delete $self->{features_complete};
-	my $handler = Protocol::XMPP::Handler->new(
-		stream => $self		# this will be converted to a weak ref to self...
-	);
-	$self->{handler} = $handler;	# ... but we keep a strong ref to the handler since we control it
+  my $self = shift;
+  $self->debug('Reset stream');
+  delete $self->{remote_opened};
+  delete $self->{features_complete};
+  my $handler = Protocol::XMPP::Handler->new(
+    stream => $self   # this will be converted to a weak ref to self...
+  );
+  $self->{handler} = $handler;  # ... but we keep a strong ref to the handler since we control it
 
-	# We need to be able to handle document fragments, so we specify a SAX parser here.
-	# TODO If ChunkParser advertised fragment handling as a feature we could require that
-	# rather than hardcoding the parser type here.
-	{
-		local $XML::SAX::ParserPackage = 'XML::LibXML::SAX::ChunkParser';
-		$self->{sax} = XML::SAX::ParserFactory->parser(Handler => $self->{handler}) or die "No SAX parser could be found";
-	};
-	$self->{data} = '';
-	return $self;
+  # We need to be able to handle document fragments, so we specify a SAX parser here.
+  # TODO If ChunkParser advertised fragment handling as a feature we could require that
+  # rather than hardcoding the parser type here.
+  {
+    local $XML::SAX::ParserPackage = 'XML::LibXML::SAX::ChunkParser';
+    $self->{sax} = XML::SAX::ParserFactory->parser(Handler => $self->{handler}) or die "No SAX parser could be found";
+  };
+  $self->{data} = '';
+  return $self;
 }
 
 =head2 dispatch_event
@@ -203,12 +201,12 @@ Currently defined events:
 =cut
 
 sub dispatch_event {
-	my $self = shift;
-	my $type = shift;
-	my $method = 'on_' . $type;
-	my $sub = $self->{$method} || $self->can($method);
-	return $sub->($self, @_) if $sub;
-	$self->debug("No method found for $method");
+  my $self = shift;
+  my $type = shift;
+  my $method = 'on_' . $type;
+  my $sub = $self->{$method} || $self->can($method);
+  return $sub->($self, @_) if $sub;
+  $self->debug("No method found for $method");
 }
 
 =head2 preamble
@@ -218,12 +216,12 @@ Returns the XML header and opening stream preamble.
 =cut
 
 sub preamble {
-	my $self = shift;
-	# TODO yeah fix this
-	return [
-		qq{<?xml version='1.0' ?>},
-		q{<stream:stream to='} . $self->hostname . q{' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' version='1.0'>}
-	];
+  my $self = shift;
+  # TODO yeah fix this
+  return [
+    qq{<?xml version='1.0' ?>},
+    q{<stream:stream to='} . $self->hostname . q{' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' version='1.0'>}
+  ];
 }
 
 =head2 jid
@@ -235,14 +233,14 @@ If given a parameter, will set the JID to that value, extracting hostname and us
 =cut
 
 sub jid {
-	my $self = shift;
-	if(@_) {
-		$self->{jid} = shift;
-		($self->{user}, $self->{hostname}) = split /\@/, $self->{jid}, 2;
-		($self->{hostname}, $self->{resource}) = split qr{/}, $self->{hostname}, 2 if index($self->{hostname}, '/') >= 0;
-		return $self;
-	}
-	return $self->{jid};
+  my $self = shift;
+  if(@_) {
+    $self->{jid} = shift;
+    ($self->{user}, $self->{hostname}) = split /\@/, $self->{jid}, 2;
+    ($self->{hostname}, $self->{resource}) = split qr{/}, $self->{hostname}, 2 if index($self->{hostname}, '/') >= 0;
+    return $self;
+  }
+  return $self->{jid};
 }
 
 =head2 user
@@ -269,7 +267,7 @@ Name of the host
 
 sub hostname { shift->{hostname} }
 
-=head2 resource 
+=head2 resource
 
 Fragment used to differentiate this client from any other active clients for this user (as defined by bare JID).
 
@@ -285,8 +283,8 @@ text stanzas.
 =cut
 
 sub write_xml {
-	my $self = shift;
-	$self->queue_write($self->_ref_to_xml(@_));
+  my $self = shift;
+  $self->queue_write($self->_ref_to_xml(@_));
 }
 
 =head2 write_text
@@ -296,8 +294,8 @@ Write raw text to the output stream.
 =cut
 
 sub write_text {
-	my $self = shift;
-	$self->queue_write($_) for @_;
+  my $self = shift;
+  $self->queue_write($_) for @_;
 }
 
 =head2 login
@@ -317,70 +315,70 @@ Takes optional named parameters:
 =cut
 
 sub login {
-	my $self = shift;
-	my %args = @_;
+  my $self = shift;
+  my %args = @_;
 
-	my $user = delete $args{user} // $self->user;
-	my $pass = delete $args{password} // $self->pass;
+  my $user = delete $args{user} // $self->user;
+  my $pass = delete $args{password} // $self->pass;
 
-	my $sasl = Authen::SASL->new(
-		mechanism => $self->{features}->_sasl_mechanism_list,
-		callback => {
-			pass => sub { $pass },
-			user => sub { $user },
-		}
-	);
+  my $sasl = Authen::SASL->new(
+    mechanism => $self->{features}->_sasl_mechanism_list,
+    callback => {
+      pass => sub { $pass },
+      user => sub { $user },
+    }
+  );
 
-	my $s = $sasl->client_new(
-		'xmpp',
-		$self->hostname,
-		0
-	);
-	$self->{features}->{sasl_client} = $s;
-	my $msg = $s->client_start;
-	my $mech = $s->mechanism;
-	if(defined($msg) && length($msg)) {
-		$self->debug("Have initial message");
-		$msg = MIME::Base64::encode($msg, ''); # no linebreaks
-	}
+  my $s = $sasl->client_new(
+    'xmpp',
+    $self->hostname,
+    0
+  );
+  $self->{features}->{sasl_client} = $s;
+  my $msg = $s->client_start;
+  my $mech = $s->mechanism;
+  if(defined($msg) && length($msg)) {
+    $self->debug("Have initial message");
+    $msg = MIME::Base64::encode($msg, ''); # no linebreaks
+  }
 
-	my $f = $self->new_future;
-	$self->subscribe_to_event(
-		login_success => sub {
-			my ($ev) = @_;
-			# We only wanted a one-shot notification here
-			$ev->unsubscribe;
-			$f->done
-		}
-	);
-	$self->debug("SASL mechanism: " . $mech);
-	$self->queue_write(
-		$self->_ref_to_xml(
-			[
-				'auth',
-				'_ns' => 'xmpp-sasl',
-				mechanism => $mech,
-				   $msg
-				? (_content => $msg)
-				: ()
-			]
-		)
-	);
-	return $f;
+  my $f = $self->new_future;
+  $self->subscribe_to_event(
+    login_success => sub {
+      my ($ev) = @_;
+      # We only wanted a one-shot notification here
+      $ev->unsubscribe;
+      $f->done
+    }
+  );
+  $self->debug("SASL mechanism: " . $mech);
+  $self->queue_write(
+    $self->_ref_to_xml(
+      [
+        'auth',
+        '_ns' => 'xmpp-sasl',
+        mechanism => $mech,
+           $msg
+        ? (_content => $msg)
+        : ()
+      ]
+    )
+  );
+  return $f;
 }
 
 sub pending_iq {
-	my ($self, $id, $f) = @_;
-	die "IQ request $id already exists" if exists $self->{pending_iq}{$id};
-	$self->{pending_iq}{$id} = $f;
-	$self
+  my ($self, $id, $f) = @_;
+  die "IQ request $id already exists" if exists $self->{pending_iq}{$id};
+  $self->{pending_iq}{$id} = $f;
+  $self
 }
 
 sub iq_complete {
-	my ($self, $id, $iq) = @_;
-	die "IQ request $id not found" unless exists $self->{pending_iq}{$id};
-	$self->{pending_iq}{$id}->done($iq);
-	$self
+  my ($self, $id, $iq) = @_;
+  die "IQ request $id not found" unless exists $self->{pending_iq}{$id};
+  $self->{pending_iq}{$id}->done($iq);
+  $self
 }
 
 =head2 is_authorised
@@ -390,32 +388,32 @@ Returns true if we are authorised already.
 =cut
 
 sub is_authorised {
-	my $self = shift;
-	if(@_) {
-		my $state = shift;
-		$self->{authorised} = $state;
-		$self->dispatch_event($state ? 'authorised' : 'unauthorised');
-		if($state) {
-			my $f;
-			$f = Future->needs_all(
-				$self->remote_opened,
-				$self->features_complete,
-			)->on_done(sub {
-				$self->login_complete->done;
-				$self->invoke_event(login_success => );
-			})->on_ready(sub { undef $f });
-		} else {
-			$self->login_complete->fail;
-			$self->invoke_event(login_fail => );
-		}
-		return $self;
-	}
-	return $self->{authorised};
+  my $self = shift;
+  if(@_) {
+    my $state = shift;
+    $self->{authorised} = $state;
+    $self->dispatch_event($state ? 'authorised' : 'unauthorised');
+    if($state) {
+      my $f;
+      $f = Future->needs_all(
+        $self->remote_opened,
+        $self->features_complete,
+      )->on_done(sub {
+        $self->login_complete->done;
+        $self->invoke_event(login_success => );
+      })->on_ready(sub { undef $f });
+    } else {
+      $self->login_complete->fail;
+      $self->invoke_event(login_fail => );
+    }
+    return $self;
+  }
+  return $self->{authorised};
 }
 
 sub login_complete {
-	my $self = shift;
-	$self->{login_complete} ||= $self->new_future
+  my $self = shift;
+  $self->{login_complete} ||= $self->new_future
 }
 
 =head2 is_loggedin
@@ -425,14 +423,14 @@ Returns true if we are logged in already.
 =cut
 
 sub is_loggedin {
-	my $self = shift;
-	if(@_) {
-		my $state = shift;
-		$self->{loggedin} = $state;
-		$self->dispatch_event($state ? 'login' : 'logout');
-		return $self;
-	}
-	return $self->{loggedin};
+  my $self = shift;
+  if(@_) {
+    my $state = shift;
+    $self->{loggedin} = $state;
+    $self->dispatch_event($state ? 'login' : 'logout');
+    return $self;
+  }
+  return $self->{loggedin};
 }
 
 =head2 stream
@@ -450,11 +448,11 @@ Returns the next ID in the sequence for outgoing requests.
 =cut
 
 sub next_id {
-	my $self = shift;
-	unless($self->{request_id}) {
-		$self->{request_id} = 'pxa0001';
-	}
-	return $self->{request_id}++;
+  my $self = shift;
+  unless($self->{request_id}) {
+    $self->{request_id} = 'pxa0001';
+  }
+  return $self->{request_id}++;
 }
 
 =head2 on_tls_complete
@@ -464,10 +462,10 @@ Continues the next part of the connection when TLS is complete.
 =cut
 
 sub on_tls_complete {
-	my $self = shift;
-	delete $self->{tls_pending};
-	$self->reset;
-	$self->write_text($_) for @{$self->preamble};
+  my $self = shift;
+  delete $self->{tls_pending};
+  $self->reset;
+  $self->write_text($_) for @{$self->preamble};
 }
 
 =head2 compose
@@ -477,12 +475,12 @@ Compose a new outgoing message.
 =cut
 
 sub compose {
-	my $self = shift;
-	my %args = @_;
-	return Protocol::XMPP::Message->new(	
-		stream	=> $self,
-		%args
-	);
+  my $self = shift;
+  my %args = @_;
+  return Protocol::XMPP::Message->new(
+    stream  => $self,
+    %args
+  );
 }
 
 =head2 subscribe
@@ -492,12 +490,12 @@ Subscribe to a new contact. Takes a single JID as target.
 =cut
 
 sub subscribe {
-	my $self = shift;
-	my $to = shift;
-	Protocol::XMPP::Contact->new(	
-		stream	=> $self,
-		jid	=> $to,
-	)->subscribe;
+  my $self = shift;
+  my $to = shift;
+  Protocol::XMPP::Contact->new(
+    stream  => $self,
+    jid => $to,
+  )->subscribe;
 }
 
 =head2 unsubscribe
@@ -506,12 +504,12 @@ Unsubscribe from the given contact. Takes a single JID as target.
 =cut
 
 sub unsubscribe {
-	my $self = shift;
-	my $to = shift;
-	Protocol::XMPP::Contact->new(	
-		stream	=> $self,
-		jid	=> $to,
-	)->unsubscribe;
+  my $self = shift;
+  my $to = shift;
+  Protocol::XMPP::Contact->new(
+    stream  => $self,
+    jid => $to,
+  )->unsubscribe;
 }
 
 =head2 authorise
@@ -521,12 +519,12 @@ Grant authorisation to the given contact. Takes a single JID as target.
 =cut
 
 sub authorise {
-	my $self = shift;
-	my $to = shift;
-	Protocol::XMPP::Contact->new(	
-		stream	=> $self,
-		jid	=> $to,
-	)->authorise;
+  my $self = shift;
+  my $to = shift;
+  Protocol::XMPP::Contact->new(
+    stream  => $self,
+    jid => $to,
+  )->authorise;
 }
 
 =head2 deauthorise
@@ -536,33 +534,51 @@ Revokes auth for the given contact. Takes a single JID as target.
 =cut
 
 sub deauthorise {
-	my $self = shift;
-	my $to = shift;
-	Protocol::XMPP::Contact->new(	
-		stream	=> $self,
-		jid	=> $to,
-	)->deauthorise;
+  my $self = shift;
+  my $to = shift;
+  Protocol::XMPP::Contact->new(
+    stream  => $self,
+    jid => $to,
+  )->deauthorise;
+}
+
+sub presence {
+  my ($self, %args) = @_;
+  $self->write_xml([
+    'presence',
+    (exists $args{to}
+    ? (to => $args{to})
+    : ()
+    ),
+    _content => [
+    #[
+    # 'show', _content => $args{show} || 'available',
+    #],
+    [
+      'status', _content => $args{status}
+    ]]
+  ]);
 }
 
 sub remote_opened {
-	my $self = shift;
-	$self->{remote_opened} ||= $self->new_future
+  my $self = shift;
+  $self->{remote_opened} ||= $self->new_future
 }
 
 sub remote_closed {
-	my $self = shift;
-	$self->{remote_closed} ||= $self->new_future
+  my $self = shift;
+  $self->{remote_closed} ||= $self->new_future
 }
 
 sub close {
-	my $self = shift;
-	$self->remote_opened->then(sub {
-		$self->queue_write(
-			'</stream:stream>'
-		)
-	})->then(sub {
-		$self->remote_closed
-	});
+  my $self = shift;
+  $self->remote_opened->then(sub {
+    $self->queue_write(
+      '</stream:stream>'
+    )
+  })->then(sub {
+    $self->remote_closed
+  });
 }
 
 1;
@@ -571,8 +587,9 @@ __END__
 
 =head1 AUTHOR
 
-Tom Molesworth <cpan@entitymodel.com>
+Tom Molesworth <tom@perlsite.co.uk>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2010-2014. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2010-2026. Licensed under the same terms as Perl itself.
+

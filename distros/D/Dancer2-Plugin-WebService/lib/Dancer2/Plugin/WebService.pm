@@ -5,7 +5,7 @@
 # Joan Ntzougani, ✞
 
 package Dancer2::Plugin::WebService;
-our $VERSION = '4.8.7';
+our $VERSION = '4.8.8';
 if ( $^O =~/(?i)MSWin/ ) { CORE::warn "\nOperating system is not supported\n"; CORE::exit 1 }
 
 use strict;
@@ -712,7 +712,7 @@ $plg->reply_text('');
 }
 
 
-#  Returns all or some of the posted data
+
 #  Retruns a  hash  referense if the data are posted as hash
 #  Retruns an array referense if the data are posted as list
 #
@@ -925,7 +925,7 @@ Dancer2::Plugin::WebService - Rest APIs with login, persistent data, multiple in
 
 =head1 VERSION
 
-version 4.8.7
+version 4.8.8
 
 =head1 SYNOPSIS
 

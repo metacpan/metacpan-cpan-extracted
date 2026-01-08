@@ -23,7 +23,9 @@ Files: README
  t/integration/destructors.t
  t/integration/localwriter.t
  t/integration/lvalues.t
+ t/integration/moo-inherit-reversed.t
  t/integration/moo-inherit.t
+ t/integration/moose-inherit-reversed.t
  t/integration/moose-inherit.t
  t/integration/plugin.t
  t/integration/roles.t
@@ -42,10 +44,13 @@ Files: INSTALL
  examples/lib/Local/Example/Marlin.pm
  examples/lib/Local/Example/Moo.pm
  examples/lib/Local/Example/Moose.pm
+ examples/lib/Local/Example/Mouse.pm
  examples/lib/Local/Example/Plain.pm
  examples/lib/Local/Example/Tiny.pm
  examples/peek_at_delegations.pl
  examples/test.pl
+ t/.mite/config
+ t/integration/pad-inherit.skip
 Copyright: Unknown
 License: Unknown
 
@@ -56,8 +61,21 @@ Files: Changes
  doap.ttl
  lib/Marlin/Attribute.pm
  lib/Marlin/TypeConstraint.pm
- t/lib/Local/Example/Marlin.pm
-Copyright: Copyright 2025 Toby Inkster.
+ t/integration/xsdelegation.t
+ t/lib/Local/Mitey.pm
+ t/lib/Local/Mitey.pm.mite.pm
+ t/lib/Local/Mitey/MOP.pm
+ t/lib/Local/Mitey/Mite.pm
+Copyright: Copyright 2026 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/MooX/Marlin.pm
+ lib/MooseX/Marlin.pm
+ t/integration/ct-inherit.t
+ t/integration/mite-inherit.t
+ t/integration/mouse-inherit.t
+ t/integration/xscon-inherit.t
+Copyright: This software is copyright (c) 2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -66,15 +84,19 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: t/lib/Local/Example/Marlin.pm
+Copyright: Copyright 2025 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2025 by the copyright holder(s).
+ This software is Copyright (c) 2026 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2025 by the copyright holder(s).
+ This software is Copyright (c) 2026 by the copyright holder(s).
  
  This is free software, licensed under:
  

@@ -2,9 +2,9 @@ use strict;
 use warnings;
 
 use English;
-use Error::Pure::Utils qw(clean);
+use Error::Pure::Utils qw(clean err_msg_hr);
 use MARC::Leader;
-use Test::More 'tests' => 52;
+use Test::More 'tests' => 56;
 use Test::NoWarnings;
 use Test::Output;
 
@@ -91,4 +91,24 @@ eval {
 	$obj->parse('foo');
 };
 is($EVAL_ERROR, "Bad length of MARC leader.\n", 'Bad length of MARC leader.');
+clean();
+
+# Test.
+$obj = MARC::Leader->new;
+eval {
+	$obj->parse('x1981nam a2200517 i 4500');
+};
+is($EVAL_ERROR, "Bad number in length.\n", 'Bad number in length (x1981).');
+my $err_hr = err_msg_hr();
+is($err_hr->{'String'}, 'x1981', 'Get bad string (x1981).');
+clean();
+
+# Test.
+$obj = MARC::Leader->new;
+eval {
+	$obj->parse('01981nam a22x0517 i 4500');
+};
+is($EVAL_ERROR, "Bad number in data base address.\n", 'Bad number in data base address (x0517).');
+$err_hr = err_msg_hr();
+is($err_hr->{'String'}, 'x0517', 'Get bad string (x0517).');
 clean();

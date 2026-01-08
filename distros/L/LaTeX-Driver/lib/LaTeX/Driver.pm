@@ -30,7 +30,7 @@ use Log::Any qw($log);
 
 Readonly our $DEFAULT_MAXRUNS => 10;
 
-our $VERSION = "1.2.0";
+our $VERSION = "1.3.1";
 
 __PACKAGE__->mk_accessors( qw( basename basedir basepath options
                                source output tmpdir format timeout stderr
@@ -817,7 +817,7 @@ LaTeX::Driver - Latex driver
 
 =head1 VERSION
 
-1.2.0
+1.3.1
 
 =head1 SYNOPSIS
 

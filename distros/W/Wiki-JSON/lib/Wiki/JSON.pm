@@ -11,7 +11,7 @@ use Const::Fast;
 use Wiki::JSON::Parser;
 use Wiki::JSON::HTML;
 
-our $VERSION = "0.0.31";
+our $VERSION = "0.0.32";
 
 const my $MAX_HX_SIZE                                           => 6;
 const my $EXTRA_CHARACTERS_BOLD_AND_ITALIC_WHEN_ITALIC          => 3;

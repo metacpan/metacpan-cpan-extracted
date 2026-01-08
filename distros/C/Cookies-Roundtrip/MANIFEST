@@ -1,0 +1,37 @@
+Changes
+lib/Cookies/Roundtrip.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/000-load.t
+t/050-MY-CookieMaker.t
+t/100-count-start-from-httpcookiejar.t
+t/150-count-start-from-httpcookies.t
+t/200-roundtrip-httpcookies-httpcookiejar.t
+t/210-firefoxmarionettecookies.t
+t/220-roundtrip-firefoxmarionettecookies-httpcookies.t
+t/230-roundtrip-firefoxmarionettecookies-httpcookiejar.t
+t/240-roundtrip-firefoxmarionettecookies-setcookies-via-httpcookiejar.t
+t/245-roundtrip-firefoxmarionettecookies-setcookies-via-httpcookies.t
+t/250-roundtrip-httpcookiejar-httpcookies.t
+t/300-file-from-httpcookiejar.t
+t/320-file-from-httpcookiejarlwp.t
+t/350-file-from-httpcookies.t
+t/360-file-cookier.t.doesnotwork
+t/500-lwpuseragent-start-from-httpcookiejar.t
+t/550-lwpuseragent-start-from-httpcookies.t
+t/600-wwwmechanize-start-from-httpcookiejar.t
+t/650-wwwmechanize-start-from-httpcookies.t
+t/manifest.t
+t/MY/CookieMaker.pm
+t/pod-coverage.t
+t/pod.t
+t/t-data/ibm/ibm.cookies-plus.json
+t/t-data/ibm/ibm.cookies.txt
+t/t-data/ibm/ibm.useragent-string.txt
+xt/boilerplate.t
+xt/live/700-firefoxmarionette-start-from-firefoxmarionettecookies.t
+xt/live/750-firefoxmarionette-start-from-httpcookies.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

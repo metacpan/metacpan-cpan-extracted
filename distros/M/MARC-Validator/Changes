@@ -1,3 +1,12 @@
+0.09 2026-01-07T17:29:03+01:00
+ - Add check for 008 field with continuing resource currently published.
+ - Add check for 040a field.
+ - Add test for missing 008 field in field_008 plugin.
+ - Add test for missing 040 field in field_040 plugin.
+ - Add tests for bad leader to field_008 and field_040 plugins.
+ - Change field 001 to fake1 in fake test file.
+ - Update copyright years.
+
 0.08 2025-11-28T12:34:20+01:00
  - Add another error check for duplicate 035a field.
 

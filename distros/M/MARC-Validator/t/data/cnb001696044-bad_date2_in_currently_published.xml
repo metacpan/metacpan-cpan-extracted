@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01525nai a2200409 a 4500</leader>
+  <controlfield tag="001">web20061696044</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20070119144047.0</controlfield>
+  <controlfield tag="007">cr cn </controlfield>
+  <controlfield tag="008">061102c19972002xr  x w s     0   b2cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb001696044</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">378</subfield>
+    <subfield code="x">Vysoké školy</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">22</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="9">
+    <subfield code="a">378</subfield>
+    <subfield code="x">Higher education</subfield>
+    <subfield code="2">Conspectus</subfield>
+    <subfield code="9">22</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">001</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">378.011.3-052</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">51</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(0.034.2)004.738.12</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="245" ind1="0" ind2="0">
+    <subfield code="a">Obrázky žlutých růží</subfield>
+    <subfield code="h">[elektronický zdroj] :</subfield>
+    <subfield code="b">časopis studentů MFF UK</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">[Praha :</subfield>
+    <subfield code="b">Luboš Motl],</subfield>
+    <subfield code="c">1997-2002</subfield>
+  </datafield>
+  <datafield tag="310" ind1=" " ind2=" ">
+    <subfield code="a">Častá aktualizace</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Název z titulní obrazovky (verze z 2.11.2006)</subfield>
+  </datafield>
+  <datafield tag="516" ind1=" " ind2=" ">
+    <subfield code="a">Webovská prezentace</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">Zaniklý časopis přinášející prostor pro tvorbu studentů Matematicko-fyzikální fakulty Univerzity Karlovy</subfield>
+  </datafield>
+  <datafield tag="538" ind1=" " ind2=" ">
+    <subfield code="a">Způsob přístupu: World Wide Web</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">věda</subfield>
+    <subfield code="7">ph116676</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">vysokoškolští studenti</subfield>
+    <subfield code="7">ph127281</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">matematika</subfield>
+    <subfield code="7">ph117231</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">science</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">college teachers</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">mathematics</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">webové dokumenty</subfield>
+    <subfield code="7">fd186892</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="9">
+    <subfield code="a">web documents</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="0">
+    <subfield code="u">http://www.kolej.mff.cuni.cz/~lmotm275/ruze/</subfield>
+    <subfield code="q">text/html</subfield>
+    <subfield code="4">N</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="0">
+    <subfield code="u">http://wayback.webarchiv.cz/wayback/www.kolej.mff.cuni.cz/~lmotm275/ruze/</subfield>
+    <subfield code="q">text/html</subfield>
+    <subfield code="z">archivní verze stránek</subfield>
+    <subfield code="4">N</subfield>
+  </datafield>
+  <datafield tag="929" ind1=" " ind2=" ">
+    <subfield code="a">Text</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">001696044</subfield>
+  </datafield>
+</record>
+
+</collection>

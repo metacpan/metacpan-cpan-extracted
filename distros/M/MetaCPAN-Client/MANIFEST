@@ -33,7 +33,6 @@ examples/module.pl
 examples/package.pl
 examples/permission.pl
 examples/pod.pl
-examples/rating.pl
 examples/recent.pl
 examples/recent_today.pl
 examples/release.pl

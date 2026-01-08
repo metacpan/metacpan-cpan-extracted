@@ -1,7 +1,9 @@
-package Test2::Tools::Affix v0.12.0 {
+package    #
+    Test2::Tools::Affix v0.12.0 {
     use v5.40;
     use blib;
     use Affix;
+    use Affix::Build;
     use Test2::API qw[context run_subtest];
     use Test2::V0 -no_srand => 1, '!subtest';
     use Test2::Util::Importer 'Test2::Tools::Subtest' => ( subtest_streamed => { -as => 'subtest' } );
@@ -18,12 +20,13 @@ package Test2::Tools::Affix v0.12.0 {
                 compile_ok affix_ok leaks
                 plan todo skip skip_all done_testing diag note
                 subtest ok isa_ok skip_all is isnt like
-                pass
+                pass fail
                 lives dies try_ok warns warning
                 U D T F DNE array string float number bool hash etc end
                 refcount
                 can_ok isa_ok
-                capture imported_ok warns]
+                capture imported_ok warns
+                path tempfile tempdir]
         ]
     );
     #
@@ -42,7 +45,7 @@ package Test2::Tools::Affix v0.12.0 {
         }
     }
     #
-    sub compile_ok( $name, $aggs //= '', $keep //= 0 ) {
+    sub compile_ok( $name, $aggs //= {}, $keep //= 0 ) {
         my $c = context();
 
         #~ return $c->pass_and_release($name) if 1;
@@ -68,8 +71,10 @@ package Test2::Tools::Affix v0.12.0 {
             $c->release;
             return ();
         }
-        my $compiler = Affix::Compiler->new( name => 'testing', version => '1.0', source => [ $opt->canonpath ], flags => { cflags => '-I' . $Inc } );
-        $compiler->compile;
+        $aggs->{cflags} .= ' -I' . $Inc;
+        my $compiler = Affix::Build->new( debug => 0, name => 'testing', version => '1.0', flags => $aggs );
+        $compiler->add( $opt->canonpath );
+        $compiler->link;
         push @cleanup, $opt->canonpath, $compiler->link unless $keep;
         $c->ok( 1, 'build lib: ' . $compiler->link );
         $c->release;
@@ -363,5 +368,5 @@ exit !$exit;
             $dir->remove_tree;
         }
     }
-};
+    };
 1;

@@ -129,6 +129,18 @@ PROTOTYPES: DISABLE
 
 #################################################################
 
+int
+_is_xsheaders(SV* sv)
+  PREINIT:
+    MAGIC* mg = NULL;
+  CODE:
+    SvGETMAGIC(sv);
+    if (SvROK(sv)) {
+      mg = THX_mg_find(aTHX_ SvRV(sv), &hlist_mgvtbl);
+    }
+    RETVAL = mg ? 1 : 0;
+  OUTPUT: RETVAL
+
 
 void
 new( SV* klass, ... )
@@ -539,6 +551,55 @@ as_string_without_sort(HList* hl, ...)
 
   CLEANUP:
     GMEM_DEL(str, char*, size);
+
+
+SV*
+psgi_flatten(HList* hl)
+  PREINIT:
+    AV* av = 0;
+    int j;
+    int k;
+  CODE:
+    GLOG(("=X= @@@ psgi_flatten(%p|%d)", hl, hlist_size(hl)));
+    hlist_sort(hl);
+    av = newAV();
+    for (j = 0; j < hl->ulen; ++j) {
+      HNode* hn = &hl->data[j];
+      const char* header = hn->header->name;
+      PList* pl = hn->values;
+      for (k = 0; k < pl->ulen; ++k) {
+        PNode* pn = &pl->data[k];
+        SV* value = (SV*) pn->ptr;
+        av_push(av, newSVpv(header, 0));
+        av_push(av, newSVsv(value));
+      }
+    }
+    RETVAL = newRV_noinc((SV*) av);
+  OUTPUT: RETVAL
+
+
+SV*
+psgi_flatten_without_sort(HList* hl)
+  PREINIT:
+    AV* av = 0;
+    int j;
+    int k;
+  CODE:
+    GLOG(("=X= @@@ psgi_flatten_without_sort(%p|%d)", hl, hlist_size(hl)));
+    av = newAV();
+    for (j = 0; j < hl->ulen; ++j) {
+      HNode* hn = &hl->data[j];
+      const char* header = hn->header->name;
+      PList* pl = hn->values;
+      for (k = 0; k < pl->ulen; ++k) {
+        PNode* pn = &pl->data[k];
+        SV* value = (SV*) pn->ptr;
+        av_push(av, newSVpv(header, 0));
+        av_push(av, newSVsv(value));
+      }
+    }
+    RETVAL = newRV_noinc((SV*) av);
+  OUTPUT: RETVAL
 
 
 void

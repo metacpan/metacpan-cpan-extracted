@@ -163,12 +163,20 @@ static bool return_value_is_by_reference(const infix_type * type) {
  * @brief Determines if a type must be passed by reference on the Windows x64 ABI.
  * @details The rule is that aggregates (and other non-primitive types) are passed by
  * reference if their size is not a power of two (1, 2, 4, or 8 bytes).
+ *
+ * Crucially, arrays passed as arguments in C decay to pointers. Therefore, `infix`
+ * handles `INFIX_TYPE_ARRAY` by passing the pointer to the array data, treating
+ * it as "by reference" in the sense that the register holds a pointer, not the value.
+ *
  * @param type The type to check.
- * @return `true` if the type is passed by reference, `false` otherwise.
+ * @return `true` if the type is passed by reference (or is an array), `false` otherwise.
  */
 static bool is_passed_by_reference(const infix_type * type) {
     if (type == nullptr)
         return false;
+    // Arrays passed as arguments decay to pointers. We must pass the address.
+    if (type->category == INFIX_TYPE_ARRAY)
+        return true;
     return type->size != 1 && type->size != 2 && type->size != 4 && type->size != 8;
 }
 /**
@@ -237,7 +245,7 @@ static infix_status prepare_forward_call_frame_win_x64(infix_arena_t * arena,
             layout->arg_locations[i].stack_offset = (uint32_t)current_stack_offset;
             layout->num_stack_args++;
             // Calculate space needed on the stack for this argument.
-            // By-reference types are just a pointer (8 bytes).
+            // By-reference types (including arrays) are just a pointer (8 bytes).
             size_t arg_stack_space = is_ref ? 8 : ((current_type->size + 7) & ~7);
             current_stack_offset += arg_stack_space;
             // Step 0: Make sure we aren't blowing ourselves up
@@ -339,6 +347,7 @@ static infix_status generate_forward_argument_moves_win_x64(code_buffer * buf,
         emit_mov_reg_mem(buf, R15_REG, R14_REG, (int32_t)(i * sizeof(void *)));
         if (loc->type == ARG_LOCATION_GPR) {
             if (is_passed_by_reference(current_type))
+                // For Arrays/By-Ref Structs: The data in R15 IS the pointer we want. Move it to destination.
                 emit_mov_reg_reg(buf, GPR_ARGS[loc->reg_index], R15_REG);
             else if (layout->is_variadic && is_variadic_arg && (is_float(current_type) || is_double(current_type))) {
                 // Variadic Rule: float/double are passed in both GPR and XMM.
@@ -393,6 +402,7 @@ static infix_status generate_forward_argument_moves_win_x64(code_buffer * buf,
         // R15 = pointer to the argument's data.
         emit_mov_reg_mem(buf, R15_REG, R14_REG, i * sizeof(void *));
         if (is_passed_by_reference(current_type))
+            // Arrays/By-Ref: R15 IS the pointer. Store it on the stack.
             emit_mov_mem_reg(buf, RSP_REG, loc->stack_offset, R15_REG);
         else {
             // Copy the argument data from the user's buffer to the stack, 8 bytes at a time.

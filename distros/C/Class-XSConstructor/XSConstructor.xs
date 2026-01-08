@@ -37,10 +37,375 @@ enum {
     XSCON_FLAG_HAS_INIT_ARG         =   32,
     XSCON_FLAG_HAS_TRIGGER          =   64,
     XSCON_FLAG_WEAKEN               =  128,
+    XSCON_FLAG_HAS_ALIASES          =  256,
 
-    XSCON_BITSHIFT_DEFAULTS         =    8,
-    XSCON_BITSHIFT_TYPES            =   16,
+    XSCON_BITSHIFT_DEFAULTS         =   16,
+    XSCON_BITSHIFT_TYPES            =   24,
 };
+
+enum {
+    XSCON_TYPE_BASE_ANY             =    0,
+    XSCON_TYPE_BASE_DEFINED         =    1,
+    XSCON_TYPE_BASE_REF             =    2,
+    XSCON_TYPE_BASE_BOOL            =    3,
+    XSCON_TYPE_BASE_INT             =    4,
+    XSCON_TYPE_BASE_PZINT           =    5,
+    XSCON_TYPE_BASE_NUM             =    6,
+    XSCON_TYPE_BASE_PZNUM           =    7,
+    XSCON_TYPE_BASE_STR             =    8,
+    XSCON_TYPE_BASE_NESTR           =    9,
+    XSCON_TYPE_BASE_CLASSNAME       =   10,
+    XSCON_TYPE_BASE_OBJECT          =   12,
+    XSCON_TYPE_BASE_SCALARREF       =   13,
+    XSCON_TYPE_BASE_CODEREF         =   14,
+
+    XSCON_TYPE_OTHER                =   15,
+
+    XSCON_TYPE_ARRAYREF             =   16,
+    XSCON_TYPE_HASHREF              =   32,
+};
+
+typedef struct {
+    char   *name;
+    I32     flags;
+    char   *init_arg;
+
+    char  **aliases;
+    I32     num_aliases;
+
+    SV     *default_sv;
+    SV     *trigger_sv;
+    CV     *check_cv;
+    CV     *coercion_cv;
+} xscon_param_t;
+
+typedef struct {
+    char *package;
+    bool is_placeholder;
+
+    xscon_param_t *params;
+    I32 num_params;
+
+    CV  **build_methods;
+    I32   num_build_methods;
+
+    bool strict_params;
+    char  **allow;
+    I32     num_allow;
+} xscon_constructor_t;
+
+typedef struct {
+    char *package;
+    bool is_placeholder;
+
+    CV  **demolish_methods;
+    I32   num_demolish_methods;
+} xscon_destructor_t;
+
+typedef struct {
+    char   *slot;
+    bool    has_default;
+    I32     default_flags;
+    SV     *default_sv;
+    bool    has_check;
+    I32     check_flags;
+    CV     *check_cv;
+    bool    has_coercion;
+    CV     *coercion_cv;
+} xscon_reader_t;
+
+typedef struct {
+    char *slot;
+    char *method_name;
+    bool has_curried;
+    AV *curried;
+    bool is_accessor;
+    bool is_try;
+} xscon_delegation_t;
+
+xscon_constructor_t*
+xscon_constructor_create(SV *sig_sv) {
+
+    dTHX;
+    dSP;
+
+    /* Validate and dereference the top-level hashref */
+    if (!SvROK(sig_sv) || SvTYPE(SvRV(sig_sv)) != SVt_PVHV) {
+        croak("signature must be a hashref");
+    }
+    HV *sig_hv = (HV *)SvRV(sig_sv);
+
+    SV **svp;
+
+    /* Allocate the signature struct */
+    xscon_constructor_t *sig;
+    Newxz(sig, 1, xscon_constructor_t);
+
+    /* This is not a placeholder. */
+    sig->is_placeholder = FALSE;
+
+    /* Extract package */
+    svp = hv_fetchs(sig_hv, "package", 0);
+    if (svp && *svp && SvOK(*svp)) {
+        sig->package = savepv(SvPV_nolen(*svp));
+    } else {
+        sig->package = NULL;
+    }
+
+    /* Get build methods */
+    {
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSVpv(sig->package, 0)));
+        PUTBACK;
+        I32 count = call_pv("Class::XSConstructor::get_build_methods", G_ARRAY);
+        SPAGAIN;
+        if (count > 0) {
+            Newxz(sig->build_methods, count, CV *);
+            sig->num_build_methods = count;
+            for (I32 i = count - 1; i >= 0; i--) {
+                SV *sv = POPs;
+                if (!SvROK(sv) || SvTYPE(SvRV(sv)) != SVt_PVCV) {
+                    croak("get_build_methods must return only coderefs");
+                }
+                sig->build_methods[i] = (CV *)SvREFCNT_inc(SvRV(sv));
+            }
+        }
+        else {
+            sig->num_build_methods = 0;
+        }
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+    }
+
+    /* Extract strict_params */
+    svp = hv_fetchs(sig_hv, "strict_params", 0);
+    sig->strict_params = (svp && *svp && SvTRUE(*svp));
+
+    /* Extract aliases (arrayref of strings) */
+    svp = hv_fetchs(sig_hv, "allow", 0);
+    if (sig->strict_params && svp && *svp) {
+        if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
+            croak("allow must be an arrayref");
+        }
+
+        AV *aav = (AV *)SvRV(*svp);
+        I32 na = av_len(aav) + 1;
+        sig->num_allow = na;
+        Newxz(sig->allow, na, char *);
+        for (I32 j = 0; j < na; j++) {
+            SV **asv = av_fetch(aav, j, 0);
+            if (!asv || !*asv || !SvOK(*asv)) {
+                croak("allow value must be a string");
+            }
+            sig->allow[j] = savepv(SvPV_nolen(*asv));
+        }
+    }
+
+    /* Fetch and validate params arrayref */
+    svp = hv_fetchs(sig_hv, "params", 0);
+    if (!svp || !*svp || !SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
+        croak("'params' must be an arrayref");
+    }
+    AV *params_av = (AV *)SvRV(*svp);
+
+    /* Allocate the params array */
+    I32 num_params = av_len(params_av) + 1;
+    sig->num_params = num_params;
+    Newxz(sig->params, num_params, xscon_param_t);
+
+    /* Iterate over params array */
+    for (I32 i = 0; i < num_params; i++) {
+
+        /* Extract param hashref */
+        SV **elem = av_fetch(params_av, i, 0);
+        if (!elem || !*elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV) {
+            croak("params[%d] must be a hashref", i);
+        }
+
+        HV *phv = (HV *)SvRV(*elem);
+        xscon_param_t *p = &sig->params[i];
+
+        /* Extract simple scalar fields */
+
+        /* name */
+        svp = hv_fetchs(phv, "name", 0);
+        if (!svp || !*svp || !SvOK(*svp)) {
+            croak("params[%d]{name} is required", i);
+        }
+        p->name = savepv(SvPV_nolen(*svp));
+
+        /* flags */
+        svp = hv_fetchs(phv, "flags", 0);
+        p->flags = (svp && *svp) ? SvIV(*svp) : 0;
+
+        /* init_arg */
+        svp = hv_fetchs(phv, "init_arg", 0);
+        if (svp && *svp && SvOK(*svp)) {
+            p->init_arg = savepv(SvPV_nolen(*svp));
+        }
+        else {
+            p->init_arg = NULL;
+        }
+
+        /* Extract aliases (arrayref of strings) */
+        svp = hv_fetchs(phv, "aliases", 0);
+        if (svp && *svp) {
+            if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
+                croak("aliases must be an arrayref");
+            }
+
+            AV *aav = (AV *)SvRV(*svp);
+            I32 na = av_len(aav) + 1;
+            p->num_aliases = na;
+            Newxz(p->aliases, na, char *);
+            for (I32 j = 0; j < na; j++) {
+                SV **asv = av_fetch(aav, j, 0);
+                if (!asv || !*asv || !SvOK(*asv)) {
+                    croak("alias must be a string");
+                }
+                p->aliases[j] = savepv(SvPV_nolen(*asv));
+            }
+        }
+
+        svp = hv_fetchs(phv, "default", 0);
+        if (svp && SvOK(*svp)) {
+            p->default_sv = SvREFCNT_inc(*svp);
+        } else {
+            p->default_sv = NULL;
+        }
+
+        svp = hv_fetchs(phv, "trigger", 0);
+        if (svp && SvOK(*svp)) {
+            p->trigger_sv = SvREFCNT_inc(*svp);
+        } else {
+            p->trigger_sv = NULL;
+        }
+
+        svp = hv_fetchs(phv, "check", 0);
+        if (svp && SvOK(*svp)) {
+            if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVCV)
+                croak("check must be a coderef");
+            p->check_cv = (CV *)SvREFCNT_inc(SvRV(*svp));
+        }
+        else {
+            p->check_cv = NULL;
+        }
+
+        svp = hv_fetchs(phv, "coercion", 0);
+        if (svp && SvOK(*svp)) {
+            if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVCV)
+                croak("coercion must be a coderef");
+            p->coercion_cv = (CV *)SvREFCNT_inc(SvRV(*svp));
+        }
+        else {
+            p->coercion_cv = NULL;
+        }
+    }
+    
+    return sig;
+}
+
+xscon_destructor_t*
+xscon_destructor_create(char *packagename) {
+
+    dTHX;
+    dSP;
+
+    /* Allocate the signature struct */
+    xscon_destructor_t *sig;
+    Newxz(sig, 1, xscon_destructor_t);
+
+    /* This is not a placeholder. */
+    sig->is_placeholder = FALSE;
+
+    /* Extract package */
+    sig->package = packagename;
+
+    /* Get demolish methods */
+    {
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSVpv(sig->package, 0)));
+        PUTBACK;
+        I32 count = call_pv("Class::XSConstructor::get_demolish_methods", G_ARRAY);
+        SPAGAIN;
+        if (count > 0) {
+            Newxz(sig->demolish_methods, count, CV *);
+            sig->num_demolish_methods = count;
+            for (I32 i = count - 1; i >= 0; i--) {
+                SV *sv = POPs;
+                if (!SvROK(sv) || SvTYPE(SvRV(sv)) != SVt_PVCV) {
+                    croak("get_demolish_methods must return only coderefs");
+                }
+                sig->demolish_methods[i] = (CV *)SvREFCNT_inc(SvRV(sv));
+            }
+        }
+        else {
+            sig->num_demolish_methods = 0;
+        }
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+    }
+
+    return sig;
+}
+
+void
+xscon_constructor_free(xscon_constructor_t *sig)
+{
+    dTHX;
+
+    if (sig->params) {
+        for (I32 i = 0; i < sig->num_params; i++) {
+            xscon_param_t *p = &sig->params[i];
+            Safefree(p->name);
+            Safefree(p->init_arg);
+            for (I32 j = 0; j < p->num_aliases; j++)
+                Safefree(p->aliases[j]);
+            Safefree(p->aliases);
+            SvREFCNT_dec(p->default_sv);
+            SvREFCNT_dec(p->trigger_sv);
+            SvREFCNT_dec(p->check_cv);
+            SvREFCNT_dec(p->coercion_cv);
+        }
+        Safefree(sig->params);
+    }
+    if (sig->allow) {
+        for (I32 j = 0; j < sig->num_allow; j++)
+            Safefree(sig->allow[j]);
+        Safefree(sig->allow);
+    }
+    if (sig->build_methods) {
+        for (I32 i = 0; i < sig->num_build_methods; i++) {
+            if (sig->build_methods[i]) {
+                SvREFCNT_dec(sig->build_methods[i]);
+            }
+        }
+        Safefree(sig->build_methods);
+    }
+    Safefree(sig);
+}
+
+void
+xscon_destructor_free(xscon_destructor_t *sig)
+{
+    dTHX;
+
+    if (sig->demolish_methods) {
+        for (I32 i = 0; i < sig->num_demolish_methods; i++) {
+            if (sig->demolish_methods[i]) {
+                SvREFCNT_dec(sig->demolish_methods[i]);
+            }
+        }
+        Safefree(sig->demolish_methods);
+    }
+    Safefree(sig);
+}
 
 SV*
 join_with_commas(AV *av) {
@@ -181,20 +546,19 @@ _is_class_loaded (SV* const klass ) {
 }
 
 static bool
-xscon_check_type(int flags, SV* const val, HV* const isa_hash, char* isa_hash_keyname, STRLEN isa_hash_keylen)
+xscon_check_type(char* keyname, SV* const val, int flags, CV* check_cv)
 {
     dTHX;
     assert(value);
 
-    // 15 indicates an unknown type constraint
+    // An unknown type constraint
     // We need to dive into the isa_hash to check it
-    if ( flags & 15 == 15 ) {
-        if ( ! hv_exists(isa_hash, isa_hash_keyname, isa_hash_keylen) ) {
-            warn( "Type constraint check coderef gone AWOL for attribute '%s', so just assuming value passes", isa_hash_keyname );
+    if ( flags & XSCON_TYPE_OTHER == XSCON_TYPE_OTHER ) {
+        if ( !check_cv ) {
+            warn( "Type constraint check coderef gone AWOL for attribute '%s', so just assuming value passes", keyname ? keyname : "unknown" );
             return 1;
         }
         
-        SV** const check = hv_fetch(isa_hash, isa_hash_keyname, isa_hash_keylen, 0);
         SV* result;
 
         dSP;
@@ -205,7 +569,7 @@ xscon_check_type(int flags, SV* const val, HV* const isa_hash, char* isa_hash_ke
         EXTEND(SP, 1);
         PUSHs(sv_2mortal(val));
         PUTBACK;
-        count  = call_sv(*check, G_SCALAR);
+        count  = call_sv((SV *)check_cv, G_SCALAR);
         SPAGAIN;
         result = POPs;
         bool return_val = SvTRUE(result);
@@ -215,44 +579,41 @@ xscon_check_type(int flags, SV* const val, HV* const isa_hash, char* isa_hash_ke
         return return_val;
     }
     
-    // ArrayRef-like types
-    if ( flags & 16 ) {
+    if ( flags & XSCON_TYPE_ARRAYREF ) {
         if ( !IsArrayRef(val) ) {
             return FALSE;
         }
-        // ArrayRef[Any] or ArrayRef
-        if ( flags == 16 ) {
+        if ( flags == XSCON_TYPE_ARRAYREF ) {
             return TRUE;
         }
-        int newflags = flags & 15;
+        int newflags = flags & ( XSCON_TYPE_ARRAYREF - 1 );
         AV* const av = (AV*)SvRV(val);
         I32 const len = av_len(av) + 1;
         I32 i;
         for (i = 0; i < len; i++) {
             SV* const subval = *av_fetch(av, i, TRUE);
-            if ( ! xscon_check_type(newflags, subval, NULL, NULL, 0) ) {
+            if ( ! xscon_check_type(NULL, subval, newflags, NULL) ) {
                 return FALSE;
             }
         }
         return TRUE;
     }
 
-    // HashRef-like types
-    if ( flags & 32 ) {
+    if ( flags & XSCON_TYPE_HASHREF ) {
         if ( !IsHashRef(val) ) {
             return FALSE;
         }
         // HashRef[Any] or HashRef
-        if ( flags == 32 ) {
+        if ( flags == XSCON_TYPE_HASHREF ) {
             return TRUE;
         }
-        int newflags = flags & 31;
+        int newflags = flags & ( XSCON_TYPE_HASHREF - 1 );
         HV* const hv = (HV*)SvRV(val);
         HE* he;
         hv_iterinit(hv);
         while ((he = hv_iternext(hv))) {
             SV* const subval = hv_iterval(hv, he);
-            if ( ! xscon_check_type(newflags, subval, NULL, NULL, 0) ) {
+            if ( ! xscon_check_type(NULL, subval, newflags, NULL) ) {
                 hv_iterinit(hv); /* reset */
                 return FALSE;
             }
@@ -261,13 +622,13 @@ xscon_check_type(int flags, SV* const val, HV* const isa_hash, char* isa_hash_ke
     }
     
     switch ( flags ) {
-        case 0: // Any or Item
+        case XSCON_TYPE_BASE_ANY:
             return TRUE;
-        case 1: // Defined
+        case XSCON_TYPE_BASE_DEFINED:
             return SvOK(val);
-        case 2: // Ref
+        case XSCON_TYPE_BASE_REF:
             return SvOK(val) && SvROK(val);
-        case 3: // Bool
+        case XSCON_TYPE_BASE_BOOL:
             if ( SvROK(val) || isGV(val) ) {
                 return FALSE;
             }
@@ -296,7 +657,7 @@ xscon_check_type(int flags, SV* const val, HV* const isa_hash, char* isa_hash_ke
                 // is a valid Bool.
                 return TRUE;
             }
-        case 4: // Int
+        case XSCON_TYPE_BASE_INT:
             if ( SvOK(val) && !SvROK(val) && !isGV(val) ) {
                 if ( SvPOK(val) ) {
                     return _S_pv_is_integer( SvPVX(val) );
@@ -309,7 +670,7 @@ xscon_check_type(int flags, SV* const val, HV* const isa_hash, char* isa_hash_ke
                 }
             }
             return FALSE;
-        case 5: // PositiveOrZeroInt
+        case XSCON_TYPE_BASE_PZINT:
             // Discard non-integers
             if ( (!SvOK(val)) || SvROK(val) || isGV(val) ) {
                 return FALSE;
@@ -334,34 +695,35 @@ xscon_check_type(int flags, SV* const val, HV* const isa_hash, char* isa_hash_ke
             STRLEN len;
             char* i = SvPVx(val, len);
             return ( (len > 0 && i[0] != '-') ? TRUE : FALSE );
-        case 6: // Num
+        case XSCON_TYPE_BASE_NUM:
             // In Perl We Trust
             return looks_like_number(val);
-        case 7: // PositiveOrZeroNum
+        case XSCON_TYPE_BASE_PZNUM:
             if ( ! looks_like_number(val) ) {
                 return FALSE;
             }
             NV numeric = SvNV(val);
             return numeric >= 0.0;
-        case 8: // Str
+        case XSCON_TYPE_BASE_STR:
             return SvOK(val) && !SvROK(val) && !isGV(val);
-        case 9: // NonEmptyStr
+        case XSCON_TYPE_BASE_NESTR:
             if ( SvOK(val) && !SvROK(val) && !isGV(val) ) {
                 STRLEN l = sv_len(val);
                 return ( (l==0) ? FALSE : TRUE );
             }
             return FALSE;
-        case 10: // ClassName
+        case XSCON_TYPE_BASE_CLASSNAME:
             return _is_class_loaded(val);
-        case 11: // might use later
+        case 11:
+            // might use later
             croak("PANIC!");
-        case 12: // Object
+        case XSCON_TYPE_BASE_OBJECT:
             return IsObject(val);
-        case 13: // ScalarRef
+        case XSCON_TYPE_BASE_SCALARREF:
             return IsScalarRef(val);
-        case 14: // CodeRef
+        case XSCON_TYPE_BASE_CODEREF:
             return IsCodeRef(val);
-        case 15:
+        case XSCON_TYPE_OTHER:
             // Should have already been checked by if block at start of function.
             croak("PANIC!");
         default:
@@ -370,20 +732,110 @@ xscon_check_type(int flags, SV* const val, HV* const isa_hash, char* isa_hash_ke
     } // switch ( flags )
 }
 
+SV*
+xscon_run_default(SV *object, char* keyname, int has_common_default, SV *default_sv)
+{
+    dTHX;
+
+    switch ( has_common_default ) {
+
+        // Undef
+        case 1:
+            return newSV(0);
+
+        // Number 0
+        case 2:
+            return newSViv(0);
+
+        // We're number 1
+        case 3:
+            return newSViv(1);
+
+        // False
+        case 4:
+            return &PL_sv_no;
+
+        // True
+        case 5:
+            return &PL_sv_yes;
+
+        // Empty string
+        case 6:
+            return newSVpvs("");
+
+        // Empty arrayref
+        case 7:
+            AV *av = newAV();
+            return newRV_noinc((SV*)av);
+
+        // Empty hashref
+        case 8:
+            HV *hv = newHV();
+            return newRV_noinc((SV*)hv);
+
+    }
+
+    if ( !default_sv ) {
+        croak("Attribute '%s' is required, but default is AWOL", keyname);
+        return &PL_sv_no;
+    }
+
+    // Coderef, call as method
+    if (IsCodeRef( default_sv )) {
+        dSP;
+        int count;
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        EXTEND(SP, 1);
+        PUSHs(object);
+        PUTBACK;
+        count = call_sv((SV*)default_sv, G_SCALAR);
+        SPAGAIN;
+        SV* got = POPs;
+        SV* val = newSVsv(got);
+        FREETMPS;
+        LEAVE;
+        return val;
+    }
+
+    // Scalarref to the name of a builder, call as method
+    if (IsScalarRef(default_sv)) {
+        STRLEN len;
+        SV *method_name_sv = SvRV(default_sv);
+        char *method_name = SvPV(method_name_sv, len);
+        dSP;
+        int count;
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        EXTEND(SP, 1);
+        PUSHs(object);
+        PUTBACK;
+        count = call_method(method_name, G_SCALAR);
+        SPAGAIN;
+        SV* got = POPs;
+        SV* val = newSVsv(got);
+        FREETMPS;
+        LEAVE;
+        return val;
+    }
+
+    return newSVsv(default_sv);
+}
+
 void
 xscon_run_trigger(SV *object,
-                  const char *attr_name,
-                  int attr_flags,
-                  HV *trigger_hash)
+                  xscon_param_t* param)
 {
     dTHX;
     dSP;
 
+    char* attr_name = param->name;
     STRLEN attr_len = strlen(attr_name);
 
     SV *mutexkey_sv;
     SV **svp;
-    SV *trigger_sv;
     SV *value_sv;
 
     HV *object_hv = (HV *)SvRV(object);
@@ -412,47 +864,24 @@ xscon_run_trigger(SV *object,
     ctx->key = mutexkey_sv;
     SAVEDESTRUCTOR_X(delete_mutex, ctx);
 
-    svp = hv_fetch(trigger_hash, attr_name, attr_len, 0);
-    if (!svp || !SvOK(*svp)) {
-        FREETMPS;
-        LEAVE;
-        return;
-    }
-
-    trigger_sv = *svp;
-
     svp = hv_fetch(object_hv, attr_name, attr_len, 0);
     value_sv = svp ? *svp : &PL_sv_undef;
 
+    SV* trigger_sv = param->trigger_sv;
+
     if (!SvROK(trigger_sv)) {
-
-        /* ----------------------------------------------
-         * Trigger is a method name (string)
-         * Perl: $object->$trigger($object->{$attr_name})
-         * ---------------------------------------------- */
-
-        PUSHMARK(SP);
-        XPUSHs((SV *)object);   /* invocant */
-        XPUSHs(value_sv);
-        PUTBACK;
-
-        call_method(SvPV_nolen(trigger_sv), G_VOID);
-
-    }
-    else if (SvTYPE(SvRV(trigger_sv)) == SVt_PVCV) {
-
-        /* ----------------------------------------------
-         * Trigger is a coderef
-         * Perl: $trigger->($object, $object->{$attr_name})
-         * ---------------------------------------------- */
-
         PUSHMARK(SP);
         XPUSHs((SV *)object);
         XPUSHs(value_sv);
         PUTBACK;
-
+        call_method(SvPV_nolen(trigger_sv), G_VOID);
+    }
+    else if (SvTYPE(SvRV(trigger_sv)) == SVt_PVCV) {
+        PUSHMARK(SP);
+        XPUSHs((SV *)object);
+        XPUSHs(value_sv);
+        PUTBACK;
         call_sv(trigger_sv, G_VOID);
-
     }
     else {
         croak("Unexpected trigger type");
@@ -462,218 +891,91 @@ xscon_run_trigger(SV *object,
     LEAVE;
 }
 
-static void
-xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV* const args, bool const is_cloning)
+int
+xscon_initialize_object(const xscon_constructor_t* sig, const char* klass, SV* const object, HV* const args, bool const is_cloning)
 {
     dTHX;
 
+    assert(sig);
     assert(object);
     assert(args);
+
+    if (sig->is_placeholder) {
+        croak("Called on a placeholder");
+    }
 
     if(mg_find((SV*)args, PERL_MAGIC_tied)){
         croak("You cannot use tied HASH reference as initializing arguments");
     }
 
-    HV* const stash = gv_stashpv(pkg, 1);
-    assert(stash != NULL);
-
     I32 i;
-    SV* attr;
-    SV* fliggity;
-    SV** tmp;
-    SV** tmp2;
-    char* keyname;
-    char* init_arg;
-    STRLEN keylen;
-    STRLEN init_arg_len;
-    int flags;
+    int used = 0;
 
-    /* find out allowed attributes */
-    SV** const HAS_globref = hv_fetch(stash, "__XSCON_HAS", 11, 0);
-    AV* const HAS_array = GvAV(*HAS_globref);
-    I32 const HAS_len = av_len(HAS_array) + 1;
-
-    /* Fliggity flags for each attribute */
-    SV** const FLAGS_globref = hv_fetch(stash, "__XSCON_FLAGS", 13, 0);
-    HV* const FLAGS_hash = GvHV(*FLAGS_globref);
-    
-    /* Type constraints, coercions, and defaults */
-    HV* ISA_hash = NULL;
-    HV* COERCIONS_hash = NULL;
-    HV* DEFAULTS_hash = NULL;
-    HV* TRIGGERS_hash = NULL;
-    HV* INIT_ARGS_hash = NULL;
-    
     /* copy allowed attributes */
-    for (i = 0; i < HAS_len; i++) {
-        tmp = av_fetch(HAS_array, i, 0);
-        assert(tmp);
-        attr = *tmp;
-        keyname = SvPV(attr, keylen);
-        init_arg = SvPV(attr, init_arg_len);
-        
-        tmp2 = hv_fetch(FLAGS_hash, keyname, keylen, 0);
-        assert(tmp2);
-        fliggity = *tmp2;
-        flags = (int)SvIV(fliggity);
-        
-        if ( flags & XSCON_FLAG_HAS_INIT_ARG && !( flags & XSCON_FLAG_NO_INIT_ARG ) ) {
-            if ( !INIT_ARGS_hash ) {
-               SV** const INIT_ARGS_globref = hv_fetch(stash, "__XSCON_INIT_ARGS", 17, 0);
-               INIT_ARGS_hash = GvHV(*INIT_ARGS_globref);
-            }
-            
-            SV** tmp = hv_fetch(INIT_ARGS_hash, init_arg, init_arg_len, 0);
-            SV* tmp2 = *tmp;
-            init_arg = SvPV(tmp2, init_arg_len);
+    for (i = 0; i < sig->num_params; i++) {
+        xscon_param_t *param = &sig->params[i];
+        int flags = param->flags;
+        char *keyname = param->name;
+        int keylen = strlen(param->name);
+        char *init_arg = param->init_arg;
+        int init_arg_len = -1;
+        if ( param->init_arg ) {
+            init_arg_len = strlen(param->init_arg);
         }
-        
+
         SV** valref;
         SV* val;
         bool has_value = FALSE;
         bool value_was_from_args = FALSE;
-        
-        if ( (!( flags & XSCON_FLAG_NO_INIT_ARG )) && hv_exists(args, init_arg, init_arg_len) ) {
+
+        if ( (!( flags & XSCON_FLAG_NO_INIT_ARG )) && init_arg_len >= 0 && hv_exists(args, init_arg, init_arg_len) ) {
             // Value provided in args hash
             valref = hv_fetch(args, init_arg, init_arg_len, 0);
             val = newSVsv(*valref);
             has_value = TRUE;
             value_was_from_args = TRUE;
+            used++;
         }
-        else if ( flags & XSCON_FLAG_HAS_DEFAULT ) {
+
+        if ( flags & XSCON_FLAG_HAS_ALIASES ) {
+            for (I32 i = 0; i < param->num_aliases; i++) {
+                char *alias = param->aliases[i];
+                int alias_len = strlen(alias);
+                if ( hv_exists(args, alias, alias_len) ) {
+                    if ( has_value ) {
+                        croak("Superfluous alias used for attribute '%s': %s", keyname, alias);
+                    }
+                    else {
+                        valref = hv_fetch(args, alias, alias_len, 0);
+                        val = newSVsv(*valref);
+                        has_value = TRUE;
+                        value_was_from_args = TRUE;
+                        used++;
+                    }
+                }
+            }
+        }
+
+        if ( !has_value && flags & XSCON_FLAG_HAS_DEFAULT ) {
             // There is a default/builder
             has_value = TRUE;
             // Some very common defaults are worth hardcoding into the flags
             // so we won't even need to do a hash lookup to find the default
             // value.
             I32 has_common_default = ( flags >> XSCON_BITSHIFT_DEFAULTS ) & 255;
-            switch ( has_common_default ) {
-                // Undef
-                case 1:
-                    val = newSV(0);
-                    break;
-                // Number 0
-                case 2:
-                    val = newSViv(0);
-                    break;
-                // We're number 1
-                case 3:
-                    val = newSViv(1);
-                    break;
-                // False
-                case 4:
-                    val = &PL_sv_no;
-                    break;
-                // True
-                case 5:
-                    val = &PL_sv_yes;
-                    break;
-                // Empty string
-                case 6:
-                    val = newSVpvs("");
-                    break;
-                // Empty arrayref
-                case 7:
-                    AV *av = newAV();
-                    val = newRV_noinc((SV*)av);
-                    break;
-                // Empty hashref
-                case 8:
-                    HV *hv = newHV();
-                    val = newRV_noinc((SV*)hv);
-                    break;
-                // For anything else, we need to consult the defaults hash.
-                default:
-                    if ( !DEFAULTS_hash ) {
-                        SV** const DEFAULTS_globref = hv_fetch(stash, "__XSCON_DEFAULTS", 16, 0);
-                        DEFAULTS_hash = GvHV(*DEFAULTS_globref);
-                    }
-                    if ( hv_exists(DEFAULTS_hash, keyname, keylen) ) {
-                        SV** const def = hv_fetch(DEFAULTS_hash, keyname, keylen, 0);
-                        // Coderef, call as method
-                        if (IsCodeRef(*def)) {
-                            dSP;
-                            int count;
-                            ENTER;
-                            SAVETMPS;
-                            PUSHMARK(SP);
-                            EXTEND(SP, 1);
-                            PUSHs(object);
-                            PUTBACK;
-                            count = call_sv(*def, G_SCALAR);
-                            SPAGAIN;
-                            SV* got = POPs;
-                            val = newSVsv(got);
-                            FREETMPS;
-                            LEAVE;
-                        }
-                        // Scalarref to the name of a builder, call as method
-                        else if (IsScalarRef(*def)) {
-                            STRLEN len;
-                            SV *method_name_sv = SvRV(*def);
-                            char *method_name = SvPV(method_name_sv, len);
-                            dSP;
-                            int count;
-                            ENTER;
-                            SAVETMPS;
-                            PUSHMARK(SP);
-                            EXTEND(SP, 1);
-                            PUSHs(object);
-                            PUTBACK;
-                            count = call_method(method_name, G_SCALAR);
-                            SPAGAIN;
-                            SV* got = POPs;
-                            val = newSVsv(got);
-                            FREETMPS;
-                            LEAVE;
-                        }
-                        // It's just a literal value.
-                        else {
-                            val = newSVsv(*def);
-                        }
-                    }
-                    else {
-                        has_value = FALSE;
-                        if ( flags & XSCON_FLAG_REQUIRED ) {
-                            if ( flags & XSCON_FLAG_HAS_INIT_ARG && strcmp(keyname, init_arg) != 0 ) {
-                                croak("Attribute '%s' (init arg '%s') is required", keyname, init_arg);
-                            }
-                            else {
-                                croak("Attribute '%s' is required", keyname);
-                            }
-                        }
-                    }
-            }
+            val = xscon_run_default( object, keyname, has_common_default, param->default_sv );
         }
-        else if ( flags & XSCON_FLAG_REQUIRED ) {
-            if ( flags & XSCON_FLAG_HAS_INIT_ARG && strcmp(keyname, init_arg) != 0 ) {
-                croak("Attribute '%s' (init arg '%s') is required", keyname, init_arg);
-            }
-            else {
-                croak("Attribute '%s' is required", keyname);
-            }
-        }
-        
+
         if ( has_value ) {
             /* there exists an isa check */
             if ( flags & XSCON_FLAG_HAS_TYPE_CONSTRAINT ) {
-                if ( !ISA_hash ) {
-                    SV** const ISA_globref = hv_fetch(stash, "__XSCON_ISA", 11, 0);
-                    ISA_hash = GvHV(*ISA_globref);
-                }
                 int type_flags = flags >> XSCON_BITSHIFT_TYPES;
-                bool result = xscon_check_type(type_flags, newSVsv(val), ISA_hash, keyname, keylen);
+                bool result = xscon_check_type(keyname, newSVsv(val), type_flags, param->check_cv);
             
                 /* we failed type check */
                 if ( !result ) {
-                    if ( !COERCIONS_hash ) {
-                        SV** const COERCIONS_globref = hv_fetch(stash, "__XSCON_COERCIONS", 17, 0);
-                        COERCIONS_hash = GvHV(*COERCIONS_globref);
-                    }
-                    if ( flags & XSCON_FLAG_HAS_TYPE_COERCION && hv_exists(COERCIONS_hash, keyname, keylen) ) {
-                        SV** const coercion = hv_fetch(COERCIONS_hash, keyname, keylen, 0);
+                    if ( flags & XSCON_FLAG_HAS_TYPE_COERCION && param->coercion_cv ) {
                         SV* newval;
-                        
                         dSP;
                         int count;
                         ENTER;
@@ -682,14 +984,14 @@ xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV
                         EXTEND(SP, 1);
                         PUSHs(val);
                         PUTBACK;
-                        count  = call_sv(*coercion, G_SCALAR);
+                        count  = call_sv((SV *)param->coercion_cv, G_SCALAR);
                         SPAGAIN;
                         SV* tmpval = POPs;
                         newval = newSVsv(tmpval);
                         FREETMPS;
                         LEAVE;
                         
-                        bool result = xscon_check_type(type_flags, newSVsv(newval), ISA_hash, keyname, keylen);
+                        bool result = xscon_check_type(keyname, newSVsv(newval), type_flags, param->check_cv);
                         if ( result ) {
                             val = newSVsv(newval);
                         }
@@ -706,42 +1008,78 @@ xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV
             (void)hv_store((HV *)SvRV(object), keyname, keylen, val, 0);
             
             if ( value_was_from_args && flags & XSCON_FLAG_HAS_TRIGGER ) {
-                if ( !TRIGGERS_hash ) {
-                   SV** const TRIGGERS_globref = hv_fetch(stash, "__XSCON_TRIGGERS", 16, 0);
-                   TRIGGERS_hash = GvHV(*TRIGGERS_globref);
-                }
-                xscon_run_trigger(object, keyname, flags, TRIGGERS_hash);
+                xscon_run_trigger(object, param);
             }
             
             if ( SvROK(val) && flags & XSCON_FLAG_WEAKEN ) {
                 sv_rvweaken(val);
             }
         }
+        else if ( flags & XSCON_FLAG_REQUIRED ) {
+            if ( flags & XSCON_FLAG_HAS_INIT_ARG && strcmp(keyname, init_arg) != 0 ) {
+                croak("Attribute '%s' (init arg '%s') is required", keyname, init_arg);
+            }
+            else {
+                croak("Attribute '%s' is required", keyname);
+            }
+        }
     }
+    
+    return used;
 }
 
 static void
-xscon_buildall(const char* pkg, const char* klass, SV* const object, SV* const args) {
+xscon_buildall(const xscon_constructor_t* sig, const char* klass, SV* const object, SV* const args) {
     dTHX;
+    dSP;
 
     assert(object);
     assert(args);
 
-    HV* const stash = gv_stashpv(pkg, 1);
+    /* __no_BUILD__ support */
+    if (hv_exists((HV *)SvRV(args), "__no_BUILD__", 12)) {
+        SV** val = hv_fetch((HV *)SvRV(args), "__no_BUILD__", 12, 0);
+        if (SvOK(*val) && SvTRUE(*val)) {
+            return;
+        }
+    }
+
+    /* If we can take the fast route... */
+    if ( strcmp(klass, sig->package) == 0 ) {
+        if ( sig->num_build_methods <= 0 )
+            return;
+        for (I32 i = 0; i < sig->num_build_methods; i++) {
+            CV *cv = sig->build_methods[i];
+            if (!cv)
+                continue;
+            ENTER;
+            SAVETMPS;
+            PUSHMARK(SP);
+            EXTEND(SP, 2);
+            PUSHs(object);
+            PUSHs(args);
+            PUTBACK;
+            call_sv((SV *)cv, G_VOID);
+            FREETMPS;
+            LEAVE;
+        }
+        return;
+    }
+
+    /* Fall back to slow route because BUILDALL called on a subclass */
+    HV* const stash = gv_stashpv(sig->package, 1);
     assert(stash != NULL);
     
-    SV *pkgsv = newSVpv(pkg, 0);
+    SV *pkgsv = newSVpv(sig->package, 0);
     SV *klasssv = newSVpv(klass, 0);
     
     /* get cache stuff */
     SV** const globref = hv_fetch(stash, "__XSCON_BUILD", 13, 0);
-    HV* buildall_hash = GvHV(*globref);
-    
+    HV* buildall_hash = buildall_hash = GvHV(*globref);
     STRLEN klass_len = strlen(klass);
     SV** buildall = hv_fetch(buildall_hash, klass, klass_len, 0);
     
     if ( !buildall || !SvOK(*buildall) ) {
-        dSP;
         int count;
         ENTER;
         SAVETMPS;
@@ -754,23 +1092,15 @@ xscon_buildall(const char* pkg, const char* klass, SV* const object, SV* const a
         PUTBACK;
         FREETMPS;
         LEAVE;
-        
         buildall = hv_fetch(buildall_hash, klass, klass_len, 0);
     }
     
-    if (!SvOK(*buildall)) {
+    if (!buildall || !SvOK(*buildall)) {
         croak("something should have happened!");
     }
     
     if (!SvROK(*buildall)) {
         return;
-    }
-
-    if (hv_exists((HV *)SvRV(args), "__no_BUILD__", 12)) {
-        SV** val = hv_fetch((HV *)SvRV(args), "__no_BUILD__", 12, 0);
-        if (SvOK(*val) && SvTRUE(*val)) {
-            return;
-        }
     }
 
     AV* const builds = (AV*)SvRV(*buildall);
@@ -801,15 +1131,39 @@ xscon_buildall(const char* pkg, const char* klass, SV* const object, SV* const a
 }
 
 static void
-xscon_demolishall(const char* pkg, const char* klass, SV* const object, I32 in_global_destruction) {
+xscon_demolishall(const xscon_destructor_t* sig, const char* klass, SV* const object, I32 in_global_destruction) {
     dTHX;
+    dSP;
 
     assert(object);
 
-    HV* const stash = gv_stashpv(pkg, 1);
+    /* If we can take the fast route... */
+    if ( strcmp(klass, sig->package) == 0 ) {
+        if ( sig->num_demolish_methods <= 0 )
+            return;
+        for (I32 i = 0; i < sig->num_demolish_methods; i++) {
+            CV *cv = sig->demolish_methods[i];
+            if (!cv)
+                continue;
+            ENTER;
+            SAVETMPS;
+            PUSHMARK(SP);
+            EXTEND(SP, 2);
+            PUSHs(object);
+            XPUSHs(sv_2mortal(newSViv((IV)in_global_destruction)));
+            PUTBACK;
+            call_sv((SV *)cv, G_VOID);
+            FREETMPS;
+            LEAVE;
+        }
+        return;
+    }
+
+    /* Fall back to slow route because DEMOLISHALL called on a subclass */
+    HV* const stash = gv_stashpv(sig->package, 1);
     assert(stash != NULL);
     
-    SV *pkgsv = newSVpv(pkg, 0);
+    SV *pkgsv = newSVpv(sig->package, 0);
     SV *klasssv = newSVpv(klass, 0);
     
     /* get cache stuff */
@@ -820,7 +1174,6 @@ xscon_demolishall(const char* pkg, const char* klass, SV* const object, I32 in_g
     SV** demolishall = hv_fetch(demolishall_hash, klass, klass_len, 0);
     
     if ( !demolishall || !SvOK(*demolishall) ) {
-        dSP;
         int count;
         ENTER;
         SAVETMPS;
@@ -873,25 +1226,15 @@ xscon_demolishall(const char* pkg, const char* klass, SV* const object, I32 in_g
 }
 
 static void
-xscon_strictcon(const char* pkg, SV* const object, SV* const args) {
+xscon_strictcon(const xscon_constructor_t* sig, const char* klassname, SV* const object, SV* const args) {
     dTHX;
 
     assert(object);
     assert(args);
 
-    HV* const stash = gv_stashpv(pkg, 1);
-    assert(stash != NULL);
-
-    SV** const STRICT_globref = hv_fetch(stash, "__XSCON_STRICT", 14, 0);
-    SV* const STRICT_flag = GvSV(*STRICT_globref);
-
-    if (!SvTRUE(STRICT_flag)) {
+    if ( ! sig->strict_params ) {
         return;
     }
-
-    SV** const ALLOW_globref = hv_fetch(stash, "__XSCON_ALLOW", 13, 0);
-    AV* const ALLOW_array = GvAV(*ALLOW_globref);
-    I32 const ALLOW_len = av_len(ALLOW_array) + 1;
 
     AV *badattrs = newAV();
 
@@ -901,12 +1244,13 @@ xscon_strictcon(const char* pkg, SV* const object, SV* const args) {
     hv_iterinit(argshv);
     while ((he = hv_iternext(argshv))) {
         SV* const k = hv_iterkeysv(he);
+        STRLEN k_len;
+        char *k_str = SvPV(k, k_len);
         bool found = FALSE;
 
         I32 i;
-        for (i = 0; i < ALLOW_len; i++) {
-            SV* const attr = *av_fetch(ALLOW_array, i, TRUE);
-            if (sv_eq(k, attr)) {
+        for (i = 0; i < sig->num_allow; i++) {
+            if (k_len == strlen(sig->allow[i]) && memcmp(k_str, sig->allow[i], k_len) == 0) {
                 found = TRUE;
                 break;
             }
@@ -943,8 +1287,30 @@ BOOT:
     newCONSTSUB(stash, "XSCON_FLAG_HAS_INIT_ARG",         newSViv(XSCON_FLAG_HAS_INIT_ARG));
     newCONSTSUB(stash, "XSCON_FLAG_HAS_TRIGGER",          newSViv(XSCON_FLAG_HAS_TRIGGER));
     newCONSTSUB(stash, "XSCON_FLAG_WEAKEN",               newSViv(XSCON_FLAG_WEAKEN));
+    newCONSTSUB(stash, "XSCON_FLAG_HAS_ALIASES",          newSViv(XSCON_FLAG_HAS_ALIASES));
+
     newCONSTSUB(stash, "XSCON_BITSHIFT_DEFAULTS",         newSViv(XSCON_BITSHIFT_DEFAULTS));
     newCONSTSUB(stash, "XSCON_BITSHIFT_TYPES",            newSViv(XSCON_BITSHIFT_TYPES));
+
+    newCONSTSUB(stash, "XSCON_TYPE_BASE_ANY",             newSViv(XSCON_TYPE_BASE_ANY));
+    newCONSTSUB(stash, "XSCON_TYPE_BASE_DEFINED",         newSViv(XSCON_TYPE_BASE_DEFINED));
+    newCONSTSUB(stash, "XSCON_TYPE_BASE_REF",             newSViv(XSCON_TYPE_BASE_REF));
+    newCONSTSUB(stash, "XSCON_TYPE_BASE_BOOL",            newSViv(XSCON_TYPE_BASE_BOOL));
+    newCONSTSUB(stash, "XSCON_TYPE_BASE_INT",             newSViv(XSCON_TYPE_BASE_INT));
+    newCONSTSUB(stash, "XSCON_TYPE_BASE_PZINT",           newSViv(XSCON_TYPE_BASE_PZINT));
+    newCONSTSUB(stash, "XSCON_TYPE_BASE_NUM",             newSViv(XSCON_TYPE_BASE_NUM));
+    newCONSTSUB(stash, "XSCON_TYPE_BASE_PZNUM",           newSViv(XSCON_TYPE_BASE_PZNUM));
+    newCONSTSUB(stash, "XSCON_TYPE_BASE_STR",             newSViv(XSCON_TYPE_BASE_STR));
+    newCONSTSUB(stash, "XSCON_TYPE_BASE_NESTR",           newSViv(XSCON_TYPE_BASE_NESTR));
+    newCONSTSUB(stash, "XSCON_TYPE_BASE_CLASSNAME",       newSViv(XSCON_TYPE_BASE_CLASSNAME));
+    newCONSTSUB(stash, "XSCON_TYPE_BASE_OBJECT",          newSViv(XSCON_TYPE_BASE_OBJECT));
+    newCONSTSUB(stash, "XSCON_TYPE_BASE_SCALARREF",       newSViv(XSCON_TYPE_BASE_SCALARREF));
+    newCONSTSUB(stash, "XSCON_TYPE_BASE_CODEREF",         newSViv(XSCON_TYPE_BASE_CODEREF));
+
+    newCONSTSUB(stash, "XSCON_TYPE_OTHER",                newSViv(XSCON_TYPE_OTHER));
+
+    newCONSTSUB(stash, "XSCON_TYPE_ARRAYREF",             newSViv(XSCON_TYPE_ARRAYREF));
+    newCONSTSUB(stash, "XSCON_TYPE_HASHREF",              newSViv(XSCON_TYPE_HASHREF));
 }
 
 void
@@ -952,19 +1318,55 @@ new_object(SV* klass, ...)
 CODE:
 {
     dTHX;
+    dSP;
+
     const char* klassname;
     SV* args;
     SV* object;
 
-    char *constructor_package_name = (char *) CvXSUBANY(cv).any_ptr;
+    xscon_constructor_t *sig = (xscon_constructor_t *) CvXSUBANY(cv).any_ptr;
 
+    if (sig->is_placeholder) {
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSVpv(sig->package, 0)));
+        PUTBACK;
+        I32 count = call_pv("Class::XSConstructor::get_metadata", G_SCALAR);
+        SPAGAIN;
+        SV *sv = POPs;
+        xscon_constructor_free(sig);
+        sig = xscon_constructor_create(sv);
+        sig->is_placeholder = FALSE;
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+
+        CvXSUBANY(cv).any_ptr = sig;
+    }
+
+    /* $klassname = shift */
     klassname = SvROK(klass) ? sv_reftype(SvRV(klass), 1) : SvPV_nolen_const(klass);
+
+    /* $args = ref($_[0]) eq 'HASH' ? %{+shift} : @_ */
     args = newRV_inc((SV*)xscon_buildargs(klassname, ax, items));
     sv_2mortal(args);
+
+    /* $object = bless( {}, $klassname ); */
     object = xscon_create_instance(klassname);
-    xscon_initialize_object(constructor_package_name, klassname, object, (HV*)SvRV(args), FALSE);
-    xscon_buildall(constructor_package_name, klassname, object, args);
-    xscon_strictcon(constructor_package_name, object, args);
+
+    /* Initialize parameters */
+    int used = xscon_initialize_object(sig, klassname, object, (HV*)SvRV(args), FALSE);
+
+    /* Call BUILD methods */
+    xscon_buildall(sig, klassname, object, args);
+
+    /* Strict constructor */
+    //if ( HvUSEDKEYS(args) > used ) {
+        xscon_strictcon(sig, klassname, object, args);
+    //}
+
+    /* return $object */
     ST(0) = object; /* because object is mortal, we should return it as is */
     XSRETURN(1);
 }
@@ -974,11 +1376,169 @@ destroy(SV* object, ...)
 CODE:
 {
     dTHX;
-    char *destructor_package_name = (char *) CvXSUBANY(cv).any_ptr;
+    xscon_destructor_t *sig = (xscon_destructor_t *) CvXSUBANY(cv).any_ptr;
+    if (sig->is_placeholder) {
+        char* pkg = sig->package;
+        xscon_destructor_free(sig);
+        sig = xscon_destructor_create(pkg);
+        sig->is_placeholder = FALSE;
+        CvXSUBANY(cv).any_ptr = sig;
+    }
     const char* klassname = SvROK(object) ? sv_reftype(SvRV(object), 1) : SvPV_nolen_const(object);
     I32 in_global_destruction = PL_dirty;
-    xscon_demolishall(destructor_package_name, klassname, object, in_global_destruction);
+    xscon_demolishall(sig, klassname, object, in_global_destruction);
     XSRETURN(0);
+}
+
+void
+reader(SV* object, ...)
+CODE:
+{
+    dTHX;
+    dSP;
+    
+    xscon_reader_t *sig = (xscon_reader_t *) CvXSUBANY(cv).any_ptr;
+    
+    HV *object_hv = (HV *)SvRV(object);
+    STRLEN slotlen = strlen(sig->slot);
+    
+    if ( sig->has_default && !hv_exists(object_hv, sig->slot, slotlen) ) {
+        SV* val = xscon_run_default(object, sig->slot, sig->default_flags, sig->default_sv);
+        if ( sig->has_check && !xscon_check_type(sig->slot, newSVsv(val), sig->check_flags, sig->check_cv) ) {
+            if ( sig->has_coercion ) {
+                SV* newval;
+                int count;
+                dSP;
+                ENTER;
+                SAVETMPS;
+                PUSHMARK(SP);
+                EXTEND(SP, 1);
+                PUSHs(val);
+                PUTBACK;
+                count  = call_sv((SV *)sig->coercion_cv, G_SCALAR);
+                SPAGAIN;
+                SV* tmpval = POPs;
+                newval = newSVsv(tmpval);
+                FREETMPS;
+                LEAVE;
+                
+                if ( xscon_check_type(sig->slot, newSVsv(newval), sig->check_flags, sig->check_cv) ) {
+                    val = newSVsv(newval);
+                }
+                else {
+                    croak("Coercion result '%s' failed type constraint for '%s'", SvPV_nolen(newval), sig->slot);
+                }
+            }
+            else {
+                croak("Value '%s' failed type constraint for '%s'", SvPV_nolen(val), sig->slot);
+            }
+        }
+        (void)hv_store(object_hv, sig->slot, slotlen, val, 0);
+    }
+    
+    SV** svp = hv_fetch(object_hv, sig->slot, slotlen, 0);
+    ST(0) = svp ? newSVsv(*svp) : &PL_sv_undef;
+    XSRETURN(1);
+}
+
+void
+delegation(SV* object, ...)
+CODE:
+{
+    dTHX;
+    dSP;
+    
+    I32 gimme = GIMME_V;
+    bool inc = FALSE;
+    
+    I32 nargs = items - 1;
+    AV *args = newAV();
+    for ( I32 i = 0; i < nargs; i++ ) {
+        SV *arg = ST( i + 1 );
+        av_push( args, arg );
+    }
+    
+    xscon_delegation_t *sig = (xscon_delegation_t *) CvXSUBANY(cv).any_ptr;
+    
+    /* Get handler object */
+    SV* handler;
+    if ( sig->is_accessor ) {
+        ENTER;
+        SAVETMPS;
+        
+        PUSHMARK(SP);
+        XPUSHs(object);
+        PUTBACK;
+        
+        I32 count = call_method(sig->slot, G_SCALAR | G_EVAL);
+        if (SvTRUE(ERRSV)) croak(NULL);
+        
+        SPAGAIN;
+        handler = POPs;
+        if ( handler != &PL_sv_undef ) {
+            SvREFCNT_inc(handler);
+            inc = TRUE;
+        }
+        
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+    }
+    else {
+        HV *object_hv = (HV *)SvRV(object);
+        STRLEN slotlen = strlen(sig->slot);
+        SV** svp = hv_fetch(object_hv, sig->slot, slotlen, 0);
+        handler = svp ? *svp : &PL_sv_undef;
+        if ( handler != &PL_sv_undef ) {
+            SvREFCNT_inc(handler);
+            inc = TRUE;
+        }
+    }
+    
+    if ( !IsObject(handler) ) {
+        if ( sig->is_try ) {
+            ST(0) = &PL_sv_undef;
+            XSRETURN(1);
+            return;
+        }
+        croak(
+            "Expected blessed object to delegate to; got %s",
+            ( handler == &PL_sv_undef ) ? "undef" : SvPV_nolen(handler)
+        );
+    }
+    
+    SP = MARK;
+    
+    ENTER;
+    SAVETMPS;
+    
+    PUSHMARK(SP);
+    XPUSHs(handler);
+    
+    /* add curried arguments */
+    if ( sig->has_curried ) {
+        I32 n = av_len(sig->curried) + 1;
+        for (I32 i = 0; i < n; i++) {
+            SV **svp = av_fetch(sig->curried, i, 0);
+            XPUSHs( svp ? *svp : &PL_sv_undef );
+        }
+    }
+    
+    /* forward all arguments except $object */
+    for (I32 i = 0; i < nargs; i++) {
+        SV **svp = av_fetch(args, i, 0);
+        XPUSHs( svp ? *svp : &PL_sv_undef );
+    }
+    
+    PUTBACK;
+    
+    I32 count = call_method(sig->method_name, gimme);
+    LEAVE;
+    
+    if (inc) SvREFCNT_dec(handler);
+    
+    /* Do not SPAGAIN or POPs: return values left on stack! */
+    XSRETURN(count);
 }
 
 void
@@ -1005,7 +1565,12 @@ CODE:
         pkg = strdup("");
     }
     
-    CvXSUBANY(cv).any_ptr = pkg;
+    xscon_constructor_t *sig;
+    Newxz(sig, 1, xscon_constructor_t);
+    sig->package = savepv(pkg);
+    sig->is_placeholder = TRUE;
+    
+    CvXSUBANY(cv).any_ptr = sig;
 }
 
 void
@@ -1032,5 +1597,76 @@ CODE:
         pkg = strdup("");
     }
     
-    CvXSUBANY(cv).any_ptr = pkg;
+    xscon_destructor_t *sig;
+    Newxz(sig, 1, xscon_destructor_t);
+    sig->package = savepv(pkg);
+    sig->is_placeholder = TRUE;
+    CvXSUBANY(cv).any_ptr = sig;
+}
+
+void
+install_delegation(char *name, char *slot, char *method_name, SV *curried, bool is_accessor, bool is_try)
+CODE:
+{
+    dTHX;
+    CV *cv = newXS(name, XS_Class__XSConstructor_delegation, (char*)__FILE__);
+    if (cv == NULL)
+        croak("ARG! Something went really wrong while installing a new XSUB!");
+    
+    xscon_delegation_t *sig;
+    Newxz(sig, 1, xscon_delegation_t);
+    sig->slot = savepv(slot);
+    sig->is_try = is_try;
+    sig->is_accessor = is_accessor;
+    sig->method_name = savepv(method_name);
+    
+    if (!curried || !SvROK(curried) || SvTYPE(SvRV(curried)) != SVt_PVAV) {
+        sig->has_curried = FALSE;
+        sig->curried = NULL;
+    }
+    else {
+        AV *curried_av = (AV *)SvRV(curried);
+        sig->has_curried = TRUE;
+        sig->curried = (AV *)SvREFCNT_inc((SV *)curried_av);
+    }
+    
+    CvXSUBANY(cv).any_ptr = sig;
+}
+
+void
+install_reader(char *name, char *slot, bool has_default, int default_flags, SV* default_sv, int check_flags, SV* check, SV* coercion)
+CODE:
+{
+    dTHX;
+    CV *cv = newXS(name, XS_Class__XSConstructor_reader, (char*)__FILE__);
+    if (cv == NULL)
+        croak("ARG! Something went really wrong while installing a new XSUB!");
+    
+    xscon_reader_t *sig;
+    Newxz(sig, 1, xscon_reader_t);
+    sig->slot           = savepv(slot);
+    sig->has_default    = has_default;
+    sig->default_flags  = default_flags;
+    sig->default_sv     = SvREFCNT_inc(default_sv);
+    sig->check_flags    = check_flags;
+    
+    if (check && IsCodeRef(check)) {
+        sig->has_check = TRUE;
+        sig->check_cv = (CV *)SvREFCNT_inc(SvRV(check));
+    }
+    else {
+        sig->has_check = FALSE;
+        sig->check_cv = NULL;
+    }
+    
+    if (coercion && IsCodeRef(coercion)) {
+        sig->has_coercion = TRUE;
+        sig->coercion_cv = (CV *)SvREFCNT_inc(SvRV(coercion));
+    }
+    else {
+        sig->has_coercion = FALSE;
+        sig->coercion_cv = NULL;
+    }
+
+    CvXSUBANY(cv).any_ptr = sig;
 }

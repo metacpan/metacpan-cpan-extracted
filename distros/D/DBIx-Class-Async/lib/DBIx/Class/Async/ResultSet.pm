@@ -17,11 +17,11 @@ DBIx::Class::Async::ResultSet - Asynchronous ResultSet for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -370,6 +370,17 @@ A L<Future> that resolves to the number of matching rows.
 sub count {
     my $self = shift;
 
+    # If we have rows/offset, we need to count differently
+    # We can't just pass the condition - we need to actually apply the slice
+    if (exists $self->{_attrs}{rows} || exists $self->{_attrs}{offset}) {
+        # For sliced ResultSets, we need to fetch and count
+        return $self->all->then(sub {
+            my ($results) = @_;
+            return Future->done(scalar @$results);
+        });
+    }
+
+    # Normal count without slice
     return $self->{async_db}->count(
         $self->{source_name},
         $self->{_cond},
@@ -797,6 +808,94 @@ sub prefetch {
     return $self->search(undef, { prefetch => $prefetch });
 }
 
+=head2 related_resultset
+
+  my $users_rs = $orders_rs->related_resultset('user');
+
+Returns a new ResultSet for a related table based on a relationship name.
+The new ResultSet will be constrained to only include records that are
+related to records in the current ResultSet.
+
+=cut
+
+sub related_resultset {
+    my ($self, $relation) = @_;
+
+    croak("Relationship name is required") unless defined $relation;
+
+    my $source = $self->result_source;
+
+    unless ($source->has_relationship($relation)) {
+        croak("No such relationship '$relation' on " . $source->source_name);
+    }
+
+    my $rel_info   = $source->relationship_info($relation);
+    my $rel_source = $source->related_source($relation);
+    my $cond       = $rel_info->{cond};
+
+    # Build the join condition
+    my ($foreign_key, $self_key);
+
+    if (ref $cond eq 'HASH') {
+        my ($foreign_col, $self_col) = %$cond;
+
+        # Handle complex condition structures
+        if (ref $self_col eq 'HASH') {
+            my ($op, $col) = %$self_col;
+            $self_col = $col;
+        }
+
+        $foreign_col =~ s/^foreign\.//;
+        $self_col    =~ s/^self\.//;
+        $foreign_key =  $foreign_col;
+        $self_key    =  $self_col;
+    } else {
+        croak("Complex relationship conditions not yet supported");
+    }
+
+    my $reverse_rel = $self->_find_reverse_relationship($source, $rel_source, $relation);
+
+    unless ($reverse_rel) {
+        croak("Cannot find reverse relationship from " .
+              $rel_source->source_name . " back to " .
+              $source->source_name);
+    }
+
+    # Build new search condition with prefixed keys
+    my %prefixed_cond;
+    while (my ($key, $value) = each %{$self->{_cond}}) {
+        # Add the reverse relationship prefix to existing conditions
+        if ($key =~ /\./) {
+            $prefixed_cond{$key} = $value;
+        } else {
+            $prefixed_cond{"$reverse_rel.$key"} = $value;
+        }
+    }
+
+    # Get all columns from the related source for proper GROUP BY
+    my @columns = $rel_source->columns;
+    my @select = map { "me.$_" } @columns;
+    my @group_by = map { "me.$_" } @columns;
+
+    # Create attributes with join
+    my %new_attrs = (
+        join     => $reverse_rel,
+        select   => \@select,
+        as       => \@columns,
+        group_by => \@group_by,
+        %{$self->{_attrs}},
+    );
+
+    # Remove any conflicting attributes from the original ResultSet
+    delete $new_attrs{prefetch} if exists $new_attrs{prefetch};
+
+    # Create and return the new ResultSet
+    return $self->{schema}->resultset($rel_source->source_name)->search(
+        \%prefixed_cond,
+        \%new_attrs
+    );
+}
+
 =head2 reset
 
     $rs->reset;
@@ -995,6 +1094,91 @@ Alias for C<all_future>.
 =cut
 
 sub search_future { shift->all_future(@_)  }
+
+=head2 slice
+
+  my ($first, $second, $third) = $rs->slice(0, 2);
+  my @records = $rs->slice(5, 10);
+  my $sliced_rs = $rs->slice(0, 9);  # scalar context
+
+Returns a resultset or object list representing a subset of elements from the
+resultset. Indexes are from 0.
+
+=over 4
+
+=item B<Parameters>
+
+=over 8
+
+=item C<$first>
+
+Zero-based starting index (inclusive).
+
+=item C<$last>
+
+Zero-based ending index (inclusive).
+
+=back
+
+=item B<Returns>
+
+In list context: Array of L<DBIx::Class::Async::Row> objects.
+
+In scalar context: A new L<DBIx::Class::Async::ResultSet> with appropriate
+C<rows> and C<offset> attributes set.
+
+=item B<Examples>
+
+  # Get first 3 records
+  my ($one, $two, $three) = $rs->slice(0, 2);
+
+  # Get records 10-19
+  my @batch = $rs->slice(10, 19);
+
+  # Get a ResultSet for records 5-14 (for further chaining)
+  my $subset_rs = $rs->slice(5, 14);
+  my $count = $subset_rs->count->get;
+
+=back
+
+=cut
+
+sub slice {
+    my ($self, $first, $last) = @_;
+
+    require Carp;
+    Carp::croak("slice requires two arguments (first and last index)")
+        unless defined $first && defined $last;
+
+    Carp::croak("slice indices must be non-negative integers")
+        if $first < 0 || $last < 0;
+
+    Carp::croak("first index must be less than or equal to last index")
+        if $first > $last;
+
+    # Calculate offset and number of rows
+    my $offset = $first;
+    my $rows = $last - $first + 1;
+
+    # In scalar context, return a new ResultSet with offset and rows set
+    unless (wantarray) {
+        return $self->search(undef, {
+            offset => $offset,
+            rows   => $rows,
+        });
+    }
+
+    # In list context, fetch the data and return the array
+    # We need to apply offset and rows, then fetch
+    my $sliced_rs = $self->search(undef, {
+        offset => $offset,
+        rows   => $rows,
+    });
+
+    # Fetch all results and return as list
+    my $results = $sliced_rs->all->get;
+    return @$results;
+}
 
 =head2 update
 
@@ -1288,6 +1472,77 @@ sub _inflate_nested_prefetch {
             );
         }
     }
+}
+
+=head2 _find_reverse_relationship (Internal)
+
+Finds the reverse relationship name on the related source.
+
+=cut
+
+sub _find_reverse_relationship {
+    my ($self, $source, $rel_source, $forward_rel) = @_;
+
+    my @rel_names    = $rel_source->relationships;
+    my $forward_info = $source->relationship_info($forward_rel);
+    my $forward_cond = $forward_info->{cond};
+
+    # Extract keys from forward condition
+    my ($forward_foreign, $forward_self);
+    if (ref $forward_cond eq 'HASH') {
+        my ($f, $s) = %$forward_cond;
+        if (ref $s eq 'HASH') {
+            my ($op, $col) = %$s;
+            $s = $col;
+        }
+        $forward_foreign = $f;
+        $forward_self    = $s;
+        $forward_foreign =~ s/^foreign\.//;
+        $forward_self    =~ s/^self\.//;
+    }
+
+    # Look for a relationship that points back to our source
+    foreach my $rev_rel (@rel_names) {
+        my $rev_info       = $rel_source->relationship_info($rev_rel);
+        my $rev_source_obj = $rel_source->related_source($rev_rel);
+
+        # Check if this relationship points back to our original source
+        next unless $rev_source_obj->source_name eq $source->source_name;
+
+        # Check if the foreign keys match (in reverse)
+        my $rev_cond = $rev_info->{cond};
+        if (ref $rev_cond eq 'HASH') {
+            my ($rev_foreign, $rev_self) = %$rev_cond;
+
+            if (ref $rev_self eq 'HASH') {
+                my ($op, $col) = %$rev_self;
+                $rev_self = $col;
+            }
+
+            $rev_foreign =~ s/^foreign\.//;
+            $rev_self    =~ s/^self\.//;
+
+            # Check if the keys match in reverse
+            # Forward: foreign.id => self.user_id
+            # Reverse: foreign.user_id => self.id
+            if ($rev_foreign eq $forward_self && $rev_self eq $forward_foreign) {
+                return $rev_rel;
+            }
+        }
+    }
+
+    # If we couldn't find it by key matching, try by source name
+    # This is a fallback for simple cases
+    foreach my $rev_rel (@rel_names) {
+        my $rev_info       = $rel_source->relationship_info($rev_rel);
+        my $rev_source_obj = $rel_source->related_source($rev_rel);
+
+        if ($rev_source_obj->source_name eq $source->source_name) {
+            return $rev_rel;
+        }
+    }
+
+    return undef;
 }
 
 # Chainable modifiers

@@ -8,7 +8,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(add_error check_260c_year);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub add_error {
 	my ($cnb, $struct_hr, $error_hr) = @_;

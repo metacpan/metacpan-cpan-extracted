@@ -1,16 +1,14 @@
 package Protocol::XMPP::TextElement;
-$Protocol::XMPP::TextElement::VERSION = '0.006';
+
 use strict;
 use warnings;
 use parent qw(Protocol::XMPP::ElementBase);
 
+our $VERSION = '0.007'; ## VERSION
+
 =head1 NAME
 
 Protocol::XMPP::TextElement - handle a text element
-
-=head1 VERSION
-
-Version 0.006
 
 =head1 SYNOPSIS
 
@@ -21,10 +19,10 @@ Version 0.006
 =cut
 
 sub new {
-	my $class = shift;
-	my $self = $class->SUPER::new(@_);
-	$self->{text_data} = '';
-	$self
+  my $class = shift;
+  my $self = $class->SUPER::new(@_);
+  $self->{text_data} = '';
+  $self
 }
 
 =head2 characters
@@ -32,10 +30,10 @@ sub new {
 =cut
 
 sub characters {
-	my $self = shift;
-	my $v = shift;
-	$self->{text_data} .= $v;
-	$self;
+  my $self = shift;
+  my $v = shift;
+  $self->{text_data} .= $v;
+  $self;
 }
 
 =head2 trim
@@ -51,10 +49,10 @@ sub trim { $_[0] =~ s/(?:^\s*)|(?:\s*$)//g; $_[0] }
 =cut
 
 sub end_element {
-	my $self = shift;
-	my $data = trim($self->{text_data});
-	$self->on_text_complete($data);
-	$self;
+  my $self = shift;
+  my $data = trim($self->{text_data});
+  $self->on_text_complete($data);
+  $self;
 }
 
 1;
@@ -63,8 +61,9 @@ __END__
 
 =head1 AUTHOR
 
-Tom Molesworth <cpan@entitymodel.com>
+Tom Molesworth <tom@perlsite.co.uk>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2010-2014. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2010-2026. Licensed under the same terms as Perl itself.
+

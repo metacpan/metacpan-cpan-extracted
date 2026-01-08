@@ -15,7 +15,7 @@ name: Wiki-JSON
 provides:
   Wiki::JSON:
     file: lib/Wiki/JSON.pm
-    version: v0.0.31
+    version: v0.0.32
   Wiki::JSON::Contributing:
     file: lib/Wiki/JSON/Contributing.pm
   Wiki::JSON::HTML:
@@ -36,5 +36,5 @@ requires:
 resources:
   bugtracker: https://github.com/sergiotarxz/Perl-Wiki-JSON/issues
   repository: https://github.com/sergiotarxz/Perl-Wiki-JSON
-version: v0.0.31
+version: v0.0.32
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

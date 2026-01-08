@@ -5,83 +5,42 @@ Affix - A Foreign Function Interface eXtension
 # SYNOPSIS
 
 ```perl
-use v5.40;
-use Affix qw[:all];
+use Affix;
 
 # Load a Library
-# Affix finds the system math library automatically
-my $libm = libm();
+my $lib = load_library('m'); # libm.so / m.dll
 
-# Bind Functions
-# double pow(double x, double y);
-affix $libm, 'pow', [Double, Double] => Double;
+# Bind a Function
+#    double pow(double x, double y);
+affix $lib, 'pow', [Double, Double] => Double;
 
-# Call from Perl
-warn pow(2.0, 10.0); # 1024
+# Call it
+say pow(2.0, 10.0); # 1024
 
-# Wrap an exported function in a code reference
-my $bar = wrap( 'libfoo', 'bar', [Str, Float] => Double );
-
-# Call from Perl
-print $bar->( 'Baz', 3.14 );
-
-# Bind an exported value to a Perl value
-pin( my $ver, 'libfoo', 'VERSION', Int );
-
-# Read the value
-say $ver;
-
-# Write to it too
-$ver = 9;
-
-# Complex Types (Structs)
-# typedef struct { int x, y; int w, h; } Rect;
-typedef Rect => Struct [
-    x => Int, y => Int,
-    w => Int, h => Int
-];
-
-# void draw_rect(Rect r);
-affix $lib, 'draw_rect', [ Rect() ] => Void;
-
-# Pass a simple HashRef - Affix marshals it automatically
-draw_rect( { x => 10, y => 10, w => 100, h => 50 } );
-
-# High performance memory
-# For hot loops, allocate once and reuse
-my $rect_ptr = calloc(1, Rect());
-
-# Create views into the memory for fast updates
-my $ptr_x = cast( $rect_ptr, Pointer[Int] );
-
-while ($running) {
-    # Pointer arithmetic and dereferencing
-    my $next_int = ptr_add($ptr_x, 4);
-    $$next_int = 99;
-
-    draw_rect($rect_ptr);  # Pass the pointer
-}
+# Manual Memory Management (optional)
+my $ptr = malloc(1024);
+# ... use ptr ...
+free($ptr);
 ```
 
 # DESCRIPTION
 
-**Affix** is a modern Foreign Function Interface (FFI) that allows Perl to call functions exported by dynamic libraries
-(DLLs, .so files, dylibs) developed in C, C++, Rust, Zig, Fortran, Assembly, and others without writing XS code.
+**Affix** is a Foreign Function Interface (FFI) for Perl. It allows you to load dynamic libraries (DLLs, shared objects)
+and call their functions natively without writing XS code or configuring a C compiler.
 
-It is built on top of **infix**, a lightweight C-based JIT engine designed specifically for zero-overhead calls. Affix
-handles the complex ABI details of passing Structs, Arrays, and Callbacks by value or reference, on Windows, macOS,
-Linux, and BSD, on both x64 and AArch64.
+It distinguishes itself from other FFI solutions by using **infix**, a custom lightweight JIT engine. When you bind a
+function, Affix generates machine code at runtime to handle the argument marshalling, resulting in significantly lower
+overhead than generic FFI wrappers.
 
 # EXPORTS
 
-No functions are exported by default. You may import them individually or using tags.
+Affix exports nothing by default. You can import tags:
 
 ```perl
-use Affix qw[:all];     # Everything
-use Affix qw[:types];   # Int, Float, Struct, Pointer, Enum...
-use Affix qw[:memory];  # malloc, free, cast, dump, ptr_add...
-use Affix qw[:lib];     # load_library, find_symbol, get_last_error_message...
-use Affix qw[:pin];     # pin, unpin
+use Affix qw[:all];    # Everything
+use Affix qw[:lib];    # Library loading (load_library, libc, ...)
+use Affix qw[:memory]; # malloc, free, cast, ...
+use Affix qw[:types];  # Int, Void, String, ...
 ```
 
 # THE BASICS
@@ -93,46 +52,36 @@ Affix's API is designed to be expressive. Let's start at the beginning with the 
 Attaches a given symbol to a named perl sub in the current namespace.
 
 ```perl
-affix libm, 'pow', [Double, Double] => Double;
-warn pow( 3, 5 );
+# Standard: Load from library
+affix $lib, 'pow', [Double, Double] => Double;
 
-affix libc, 'puts', [String], Int;
-puts( 'Hello' );
+# Rename: Load 'pow', install as 'power'
+affix $lib, ['pow' => 'power'], [Double, Double] => Double;
 
-# Rename a function during import
-affix './mylib.dll', ['output', 'write'], [String], Int;
-write( 'Hello' );
-
-# Use current process symbols (e.g. standard C library)
-affix undef, [ 'rint', 'round' ], [Double], Double;
-warn round(3.14);
+# Raw Pointer: Bind a specific memory address
+# Useful for vtables, JIT code, or manual dlsym
+affix undef, [ $ptr => 'my_func' ], [Int] => Void;
 ```
 
 Parameters:
 
-- `$lib` - required
+- `$lib`
 
-    A library handle returned by ["load\_library( $path )"](#load_library-path), a file path string, or `undef` (to pull functions from the
-    main executable).
+    A library handle returned by ["load\_library( $path )" in load\_library](https://metacpan.org/pod/load_library#load_library-path), a path string, or `undef` (main executable).
 
-- `$symbol_name` - required
+- `$symbol_name`
 
-    Name of the symbol to wrap.
+    The name of the function to find.
 
-    If you pass a string, Affix will try to load the symbol with that exact name.
+    Pass `['real_name', 'alias']` to rename it in Perl.
 
-    If you pass an array reference (e.g., `['real_name', 'alias']`), Affix will look up `real_name` in the library but
-    install the subroutine as `alias` in your Perl package.
-
-- `$parameters` - required
+- `$parameters`
 
     An array reference of argument types. See ["TYPES"](#types) for the full list (primitives, Struct, Pointer, etc.).
 
-    If you pass an empty array `[]`, Affix assumes the function takes no arguments.
+- `$return`
 
-- `$return` - required
-
-    A single return type for the function. Use `Void` if the function returns nothing.
+    A single return type for the function.
 
 On success, `affix( ... )` installs the subroutine and returns the generated code reference.
 
@@ -141,8 +90,15 @@ On success, `affix( ... )` installs the subroutine and returns the generated cod
 Creates a wrapper around a given symbol but returns it as an anonymous CodeRef.
 
 ```perl
-my $pow = wrap libm, 'pow', [Double, Double] => Double;
-warn $pow->(5, 10); # 5**10
+# From Library
+my $pow = wrap $lib, 'pow', [Double, Double] => Double;
+
+# Call the function
+my $x = $pow->(2, 5);
+
+# From Raw Pointer
+# Note: Library argument is undef
+my $func = wrap undef, $ptr, [Int] => Void;
 ```
 
 Arguments are nearly identical to ["affix( ... )"](#affix). `wrap( ... )` allows you to use FFI functions without polluting
@@ -178,8 +134,6 @@ Parameters:
 - `$type` - required
 
     Indicate to Affix what type of data the variable contains.
-
-This is might be broken on BSDs. I don't run BSD to figure out if it's impossible but patches are welcome.
 
 ## `unpin( ... )`
 
@@ -245,31 +199,29 @@ Convenience functions that return handles to the standard C library and Math lib
 
 # MEMORY FUNCTIONS
 
-Affix uses a concept I decided to call **pins** to manage C pointers safely. A pin is a magical scalar reference that
-holds a raw memory address.
+Affix provides tools to manage raw C memory via a concept called **pins**. A pin is a magical scalar reference that
+binds to a raw memory address.
 
-Memory functions are exported via the `:memory` or `:all` tags.
-
-## `malloc( ... )`
+## `malloc( $size )`
 
 ```perl
-my $ptr = malloc( $size );
+my $ptr = malloc( 1024 );
 ```
 
-Allocates `$size` bytes of uninitialized storage.
+Allocates `$size` bytes of uninitialized storage. Returns a **Pin** typed as `Pointer[Void]`.
 
-Returns a managed pin. When this variable goes out of scope in Perl, the memory is automatically freed.
+To read or write to this memory, you must ["cast( $ptr, $type )"](#cast-ptr-type) it to a specific type or use `memcpy`.
 
-## `calloc( ... )`
+## `calloc( $num, $size_or_type )`
 
 ```perl
-my $ptr = calloc( $num, $size_or_type );
+my $ptr = calloc( 10, Int );
 ```
 
 Allocates memory for an array of `$num` objects and initializes them to zero. You may pass a type object (like `Int`)
 as the second argument, and Affix will calculate the size for you. Returns a managed pin.
 
-## `realloc( ... )`
+## `realloc( $ptr, $new_size )`
 
 ```
 $ptr = realloc( $ptr, $new_size );
@@ -278,7 +230,7 @@ $ptr = realloc( $ptr, $new_size );
 Reallocates the given area of memory. Returns the new pointer (which may be different from the original). The original
 pointer object is updated to point to the new address.
 
-## `free( ... )`
+## `free( $ptr )`
 
 ```
 free( $ptr );
@@ -290,7 +242,7 @@ Manually deallocates the space pointed to by `$ptr`.
 probably uses the system allocator) will throw an exception to prevent heap corruption. To free C memory, you should
 bind the library's `free` function.
 
-## `cast( ... )`
+## `cast( $ptr, $type )`
 
 ```perl
 my $int_ptr = cast( $void_ptr, Pointer[Int] );
@@ -303,7 +255,7 @@ scalar value.
 - **To reference:** If casting to a Pointer or other aggregate type, it returns a new pin that aliases the same memory.
 You can dereference this pin (`$$pin`) to read or write to the memory using the new type definition.
 
-## `own( ... )`
+## `own( $ptr, $bool )`
 
 ```
 own( $ptr, $bool );
@@ -317,7 +269,7 @@ a C function that takes ownership of it.
 
 ## `address( $ptr )`
 
-Returns the numerical virtual memory address of a pointer as a `UInt64` (probably).
+Returns the numerical virtual memory address of a pointer as a `UInt64`.
 
 ## Pointer Utilities
 
@@ -360,7 +312,7 @@ layout issues.
 
 # INTROSPECTION
 
-## `sizeof( ... )`
+## `sizeof( $type )`
 
 ```perl
 my $size = sizeof( Int );
@@ -369,7 +321,7 @@ my $size_rect = sizeof( Struct[ x => Int, y => Int ] );
 
 Returns the size, in bytes, of the Type passed to it.
 
-## `offsetof( ... )`
+## `offsetof( $struct_type, $field_name )`
 
 ```perl
 my $struct = Struct[ name => String, age => Int ];
@@ -378,7 +330,7 @@ my $offset = offsetof( $struct, 'age' );
 
 Returns the byte offset of a field within a structure, accounting for platform alignment and padding.
 
-## `alignof( ... )`
+## `alignof( $type )`
 
 Returns the alignment requirement (in bytes) of a type.
 
@@ -448,8 +400,6 @@ affix $lib, 'split_float', [ Double, Pointer[Int], Pointer[Double] ] => Void;
 
 my ($whole, $frac);
 split_float( 3.14, \$whole, \$frac );
-
-say "Whole: $whole, Frac: $frac"; # Whole: 3, Frac: 0.14
 ```
 
 Affix automatically:
@@ -485,19 +435,66 @@ $$view = 123;             # Write 123 to the memory
 free($ptr);               # Free it manually (optional, GC handles it otherwise)
 ```
 
+## Special Types
+
+- `Buffer`
+
+    Passes a pointer to the raw string buffer of a Perl scalar. Useful for "Zero-Copy" or "Direct-Write" C functions that
+    populate a buffer.
+
+    ```perl
+    # C: void get_data(char *buf, int len);
+    affix $lib, 'get_data', [ Buffer, Int ] => Void;
+
+    my $buf = "\0" x 1024; # Pre-allocate
+    get_data($buf, 1024);
+    ```
+
+    **Warning:** The scalar must be writable and have sufficient pre-allocated capacity.
+
+- `File`
+
+    Represents the standard C `FILE` structure. Use `Pointer[File]` to map a Perl filehandle (Glob or IO object) to
+    `FILE*`.
+
+    ```perl
+    affix $lib, 'fprintf', [ Pointer[File], String ] => Int;
+    open my $fh, '>', 'log.txt';
+    fprintf($fh, "Hello from Affix!");
+    ```
+
+- `PerlIO`
+
+    Represents the internal `PerlIO` structure. Use `Pointer[PerlIO]` when the C function expects `PerlIO*`.
+
+- `SockAddr`
+
+    Safe marshalling for packed socket addresses (e.g. from `Socket::pack_sockaddr_in`). Passed to C as `struct
+    sockaddr*`.
+
 - `String`
 
     Alias for `const char*`. Affix automatically handles UTF-8 encoding (Perl to C) and decoding (C to Perl).
+
+- `StringList`
+
+    Maps a Perl Array Reference of strings (`[ "a", "b" ]`) to a null-terminated `char**` array (common in C APIs like
+    `execve` or `main(argc, argv)`).
+
+    ```perl
+    affix $lib, 'process_args', [ StringList ] => Int;
+    process_args( [ "arg1", "arg2" ] );
+    ```
+
+- `SV`
+
+    The raw Perl Interpreter Object (`SV`). Use this if you are writing a function that manipulates Perl internals
+    directly. Note that this must always be a pointer: `Pointer[SV]`.
 
 - `WString`
 
     Alias for `const wchar_t*`. Affix handles the complexity of UTF-16 (Windows) vs UTF-32 (Linux/macOS) and Surrogate
     Pairs automatically.
-
-- `SV`
-
-    The raw Perl Interpreter Object (`SV*`). Use this if you are writing a function that manipulates Perl internals
-    directly.
 
 ## Aggregates
 
@@ -509,16 +506,16 @@ Structs are the bread and butter of C APIs. In Affix, they map to **Perl Hash Re
 # C: typedef struct { int x; int y; } Point;
 #    void draw_line(Point a, Point b);
 
-# 1. Define the type (recommended for reuse)
+# Define the type (recommended for reuse)
 typedef Point => Struct [
     x => Int,
     y => Int
 ];
 
-# 2. Bind the function
+# Bind the function
 affix $lib, 'draw_line', [ Point, Point ] => Void;
 
-# 3. Call with HashRefs
+# Call with HashRefs
 draw_line( { x => 0, y => 0 }, { x => 100, y => 100 } );
 ```
 
@@ -572,25 +569,26 @@ handle_event( { pressure => 0.5 } );
 
 ## Working with Arrays
 
-Fixed-size C arrays are mapped to Perl Array References.
+- **Fixed-Size Arrays (`Array[Type, N]`)**
 
-```perl
-# C: void process_matrix(int matrix[9]);
-affix $lib, 'process_matrix', [ Array[Int, 9] ] => Void;
+    Fixed-size C arrays are mapped to Perl Array References. Affix handles the decay to pointers and automatically writes
+    back changes to your Perl array.
 
-# Pass a reference to a Perl array
-process_matrix( [1..9] );
-```
+    ```perl
+    # C: void process_matrix(int matrix[9]);
+    affix $lib, 'process_matrix', [ Array[Int, 9] ] => Void;
 
-For character arrays (`char[N]`), you can pass a standard Perl string. Affix will copy the bytes and ensure it is
-null-terminated if space permits, or truncated if it does not.
+    # Pass a reference to a Perl array
+    process_matrix( [1..9] );
+    ```
 
-```perl
-# C: void set_name(char name[32]);
-affix $lib, 'set_name', [ Array[Char, 32] ] => Void;
+- **Binary Data**
 
-set_name("Affix");
-```
+    For arrays of bytes (`Array[UChar]` or `Array[UInt8]`), Affix treats the data as a raw binary blob. Dereferencing a
+    Pin of this type yields a binary string, reading exactly the number of bytes specified.
+
+    For arrays of characters (`Array[Char]` or `Array[SInt8]`), Affix treats the data as a C String, reading until the
+    first null terminator or the array limit.
 
 ## SIMD Vectors
 
@@ -635,18 +633,40 @@ Defines a C enum backed by an integer.
 - **Constants**: `typedef` installs constants (like `OK`) into your package.
 - **Dualvars:** Values returned from C are dual-typed. `OK` behaves as the integer `0` in numeric operations, but prints
 as the string `"OK"`.
-- **Calculated Values:** You can use string expressions to define values. These are evaluated at definition time and can
-refer to previously defined constants within the same Enum.
+- **Calculated Values:** You can use string expressions to define values. These are evaluated at definition time.
 
-    ```perl
-    typedef Permissions => Enum [
-        [ READ    => 4 ],
-        [ WRITE   => 2 ],
-        [ EXEC    => 1 ],
-        [ R_W     => 'READ | WRITE' ],          # 6
-        [ ALL     => 'READ | WRITE | EXEC' ]    # 7
-    ];
-    ```
+## Variadic Functions (VarArgs)
+
+Affix supports C functions that take a variable number of arguments, like `printf`.
+
+```perl
+# C: int printf(const char* format, ...);
+affix libc, 'printf', [ String, VarArgs ] => Int;
+```
+
+When calling a variadic function, Affix performs dynamic type inference at runtime for the extra arguments:
+
+- Perl Integers -> `int64_t`
+- Perl Floats   -> `double` (Standard C promotion rules)
+- Perl Strings  -> `char*`
+
+```
+printf("Hello %s, count is %d\n", "World", 123);
+```
+
+### Hinting Types with `coerce()`
+
+Sometimes standard inference isn't enough (e.g., passing a `float` instead of `double`, or passing a Struct by
+value). Use `coerce($type, $value)` to explicitly hint the type.
+
+```perl
+# Passing a struct by value to a variadic function
+typedef Point => Struct [ x=>Int, y=>Int ];
+my $p = { x => 10, y => 20 };
+
+# Without coerce(), $p would likely be treated as an error or generic pointer
+my_variadic_func( "Point: %P", coerce( Point(), $p ) );
+```
 
 ## Callbacks
 
@@ -669,10 +689,20 @@ lifecycle automatically for the duration of the call).
 
 # UTILITIES
 
-## `get_system_error()`
+## `errno()`
 
-Returns the `errno` (Linux/Unix) or `GetLastError` (Windows) from the most recent FFI call. This must be called
+```perl
+my $err = get_system_error();
+die "Error $err: " . int($err);
+```
+
+Access the `errno` (Linux/Unix) or `GetLastError` (Windows) from the most recent FFI call. This must be called
 immediately after the function invokes to ensure accuracy.
+
+The return value is a **dualvar**:
+
+- **Numeric context**: Returns the integer error code.
+- **String context**: Returns the human-readable system error message (via `strerror` or `FormatMessage`).
 
 ## `sv_dump( $sv )`
 
@@ -680,12 +710,12 @@ Dumps the internal structure of a Perl scalar to STDERR. Useful for debugging Pe
 
 # COMPILER WRAPPER
 
-Affix includes a lightweight, cross-platform C compiler wrapper `Affix::Compiler`. This is useful for compiling small
-C stubs or "glue" code at runtime to bridge complex macros or inline functions that cannot be bound directly.
+Affix includes a lightweight, cross-platform C compiler wrapper `Affix::Build`. This is useful for compiling small C
+stubs or "glue" code at runtime to bridge complex macros or inline functions that cannot be bound directly.
 
 ```perl
 use Affix;
-my $compiler = Affix::Compiler->new(
+my $compiler = Affix::Build->new(
     name   => 'my_wrapper',
     source => [ 'wrapper.c' ]
 );
@@ -699,56 +729,15 @@ toolchain is installed on the system.
 
 # EXAMPLES
 
-## High Performance Batching
-
-```perl
-# Allocate one C struct and reuse it to avoid GC overhead
-my $rect = calloc(1, 'SDL_Rect');
-my $x_ptr = cast(address($rect) + 0, 'Pointer[int]');
-
-while ($running) {
-    # Update C memory directly
-    $$x_ptr++;
-    # Pass the pointer to C
-    SDL_RenderFillRect($renderer, $rect);
-}
-```
-
-## Vectors and 128bit Math
-
-```perl
-use Affix;
-
-# 128-bit Integers (Passed as Strings)
-# __int128_t add128(__int128_t a, __int128_t b);
-my $add = Affix::affix('libtest', 'add128', '(sint128, sint128) -> sint128');
-
-# Pass strings, receive string
-my $result = $add->("100000000000000000000", "5");
-print $result; # "100000000000000000005"
-
-
-# SIMD Vectors (Passed as Packed Data)
-# m128 add_vecs(m128 a, m128 b); # Adds 4 floats
-my $vec_add = Affix::affix('libtest', 'add_vecs', '(v[4:float], v[4:float]) -> v[4:float]');
-
-# Pack arguments (4 floats)
-my $v1 = pack('f4', 1.0, 2.0, 3.0, 4.0);
-my $v2 = pack('f4', 5.0, 5.0, 5.0, 5.0);
-
-# Pass binary strings directly (Fast Path)
-my $res_ref = $vec_add->($v1, $v2);
-
-# Result comes back as Array Ref by default from pull_vector
-use Data::Dumper;
-print Dumper($res_ref); # [6.0, 7.0, 8.0, 9.0]
-```
+See [The Affix Cookbook](https://github.com/sanko/Affix.pm/discussions/categories/recipes) for comprehensive guides to
+using Affix.
 
 # SEE ALSO
 
-[FFI::Platypus](https://metacpan.org/pod/FFI%3A%3APlatypus), [C::DynaLib](https://metacpan.org/pod/C%3A%3ADynaLib), [XS::TCC](https://metacpan.org/pod/XS%3A%3ATCC)
+[FFI::Platypus](https://metacpan.org/pod/FFI%3A%3APlatypus), [C::DynaLib](https://metacpan.org/pod/C%3A%3ADynaLib), [XS::TCC](https://metacpan.org/pod/XS%3A%3ATCC), [C::Blocks](https://metacpan.org/pod/C%3A%3ABlocks)
 
-All the heavy lifting is done by **infix** ([https://github.com/sanko/infix](https://github.com/sanko/infix)).
+All the heavy lifting is done by [infix](https://github.com/sanko/infix), my JIT compiler and type introspection
+engine.
 
 # AUTHOR
 

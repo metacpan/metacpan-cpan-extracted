@@ -3,7 +3,7 @@ package Protocol::XMPP;
 use strict;
 use warnings;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 # This package merely imports all necessary dependencies for XMPP support,
 # no actual code is provided here.
@@ -17,10 +17,6 @@ __END__
 =head1 NAME
 
 Protocol::XMPP - Protocol-level support for XMPP interaction
-
-=head1 VERSION
-
-Version 0.006
 
 =head1 SYNOPSIS
 
@@ -114,7 +110,7 @@ about XML notwithstanding) but more detailed than L<Protocol::XMPP>.
 
 =item * L<Net::XMPP> - another implementation, sadly the XML parser is blocking so although
 it provides the L<Net::XMPP::Protocol> abstraction layer for the XMPP protocol, which probably
-has better feature support than this module, it's not too suitable for dealing with asynchronous / 
+has better feature support than this module, it's not too suitable for dealing with asynchronous /
 event-based implementations. Also, I wasn't too keen on some of the implementation details, such
 as the direct checking for ref and callback handling.
 
@@ -144,4 +140,5 @@ that sort of thing
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2010-2014. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2010-2026. Licensed under the same terms as Perl itself.
+

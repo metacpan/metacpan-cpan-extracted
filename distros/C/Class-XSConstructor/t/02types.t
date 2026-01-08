@@ -6,8 +6,6 @@
 
 Test that Class::XSConstructor supports manual type constraints.
 
-B<< TODO: >> thia currently fails, but it's not documented yet anyway.
-
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
@@ -23,7 +21,7 @@ the same terms as the Perl 5 programming language system itself.
 
 use strict;
 use warnings;
-use Test::More;# skip_all => "TODO: why won't these pass???";
+use Test::More;
 use Test::Fatal;
 
 BEGIN {
@@ -47,69 +45,6 @@ ok(!$Local::Types::Int->('xyz'), "!Int('xyz')");
 	use parent -norequire, qw(Person);
 	use Class::XSConstructor qw( employee_id! );
 }
-
-# This is not part of the public API, but a simple way of
-# testing the import stuff works properly.
-#
-
-is_deeply(
-	\@Person::__XSCON_HAS,
-	[qw/ name age email phone /],
-	'Person attributes',
-);
-
-is_deeply(
-	\@Employee::__XSCON_HAS,
-	[qw/ name age email phone employee_id /],
-	'Employee attributes',
-);
-
-is_deeply(
-	\@Person::__XSCON_REQUIRED,
-	[qw/ name /],
-	'Person required attributes',
-);
-
-is_deeply(
-	\@Employee::__XSCON_REQUIRED,
-	[qw/ name employee_id /],
-	'Employee required attributes',
-);
-
-is_deeply(
-	\%Person::__XSCON_ISA,
-	{ age => $Local::Types::Int },
-	'Person type constraints',
-);
-
-is_deeply(
-	\%Employee::__XSCON_ISA,
-	{ age => $Local::Types::Int },
-	'Employee type constraints',
-);
-
-is_deeply(
-	\%Person::__XSCON_FLAGS,
-	{
-		name   => 1,
-		age    => 2 + ( 15 << 16 ),
-		email  => 0,
-		phone  => 0,
-	},
-	'Person attributes (flags)',
-);
-
-is_deeply(
-	\%Employee::__XSCON_FLAGS,
-	{
-		name   => 1,
-		age    => 2 + ( 15 << 16 ),
-		email  => 0,
-		phone  => 0,
-		employee_id => 1,
-	},
-	'Employee attributes (flags)',
-);
 
 my $alice0 = bless {
 	name         => "Alice",

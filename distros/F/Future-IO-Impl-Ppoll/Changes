@@ -1,4 +1,14 @@
 Revision history for Future-IO-Impl-Ppoll
 
+0.02    2026-01-07
+        [CHANGES]
+         * Extra debugging when filehandles lose their fileno
+         * Adjust module documentation to be less Linux-specific, as
+           `IO::Ppoll` is known to work on other platforms
+
+        [BUGFIXES]
+         * Remember to declare dependency on `IO::Ppoll` itself
+         * Fix memory leak when removing filehandles
+
 0.01    2026-01-06
         First version, released on an unsuspecting world.

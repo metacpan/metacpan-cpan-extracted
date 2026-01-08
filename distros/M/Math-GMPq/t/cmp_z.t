@@ -29,13 +29,13 @@ $q < $z ? print "ok 2\n"
 $q <= $z ? print "ok 3\n"
          : print "not ok 3\n";
 
-($q <=> $z) < 0 ? print "ok 4\n"
-                : print "ok 4\n";
+($q <=> $z) == -1 ? print "ok 4\n"
+                 : print "not ok 4\n";
 
 $z *= -1;
 
-Rmpq_cmp_z($q, $z) > 0 ? print "ok 5\n"
-                       : print "not ok 5\n";
+Rmpq_cmp_z($q, $z) == 1 ? print "ok 5\n"
+                        : print "not ok 5\n";
 
 $q > $z ? print "ok 6\n"
         : print "not ok 6\n";
@@ -43,8 +43,8 @@ $q > $z ? print "ok 6\n"
 $q >= $z ? print "ok 7\n"
          : print "not ok 7\n";
 
-($q <=> $z) > 0 ? print "ok 8\n"
-                : print "ok 8\n";
+($q <=> $z) == 1 ? print "ok 8\n"
+                 : print "not ok 8\n";
 
 $q != $z ? print "ok 9\n"
          : print "not ok 9\n";
@@ -64,5 +64,5 @@ $q >= $z ? print "ok 13\n"
          : print "not ok 13\n";
 
 ($q <=> $z) == 0 ? print "ok 14\n"
-                 : print "ok 14\n";
+                 : print "not ok 14\n";
 

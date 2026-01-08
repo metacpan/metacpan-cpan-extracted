@@ -7,13 +7,19 @@ set of modules
 
 =head1 VERSION
 
-0.01
+0.02
 
 =head1 DESCRIPTION
 
 Business::Westpac is a set of libraries for parsing/generating files
 for use with Westpac bank as documented at
 L<https://paymentsplus.westpac.com.au/docs/>
+
+Note that this distribution is a work in progress or, if you prefer,
+"incomplete" - we started working on it under the expectation of Westpac
+being our banking partner but ended up going with another one so have
+effectively abandoned development on this. It has been uploaded to
+CPAN/github for anyone else to use/extended/fork/etc.
 
 =head1 Do Not Use This Module Directly
 
@@ -22,7 +28,7 @@ work with.
 
 =cut
 
-$Business::Westpac::VERSION = '0.01';
+$Business::Westpac::VERSION = '0.02';
 
 =head1 SEE ALSO
 

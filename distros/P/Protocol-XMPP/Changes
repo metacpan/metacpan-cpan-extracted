@@ -1,3 +1,9 @@
+0.007     2026-01-07 21:44:46+08:00 Asia/Singapore
+  Mostly just a CPAN release to update issue tracking metadata and contact details.
+
+  New features:
+  - this release includes the `->presence` method for presence notifications
+
 0.006     2014-08-04 19:25:04+01:00 Europe/London
 	New features:
 	* API updates to support Futures

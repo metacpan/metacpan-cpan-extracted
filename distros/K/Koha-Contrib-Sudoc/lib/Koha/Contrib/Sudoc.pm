@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc;
 # ABSTRACT: Chargeur Koha par Tamil
-$Koha::Contrib::Sudoc::VERSION = '2.47';
+$Koha::Contrib::Sudoc::VERSION = '2.48';
 use Moose;
 use Modern::Perl;
 use YAML qw( LoadFile Dump );
@@ -313,7 +313,7 @@ Koha::Contrib::Sudoc - Chargeur Koha par Tamil
 
 =head1 VERSION
 
-version 2.47
+version 2.48
 
 =head1 DESCRIPTION
 
@@ -327,7 +327,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Fréderic Demians.
+This software is Copyright (c) 2026 by Fréderic Demians.
 
 This is free software, licensed under:
 

@@ -1,5 +1,12 @@
 Revision history for Test-Future-IO-Impl
 
+0.16    2026-01-07
+        [BUGFIXES]
+         * Be less sensitive to `->send` failure in peer-closed case, as OS
+           behaviour differs here
+         * sleep() unconditionally after closing listening server in connect
+           test, as most OSes need it. 100msec is sufficient
+
 0.15    2025-07-15
         [CHANGES]
          * Added tests for `send`, `recv` and `recvfrom` methods

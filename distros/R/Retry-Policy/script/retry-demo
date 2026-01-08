@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+# this is the command line tool to do proof of concept
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(GetOptions);
+use Retry::Policy;
+
+my $fail_until = 2;
+my $max        = 5;
+
+GetOptions(
+    'fail-until=i' => \$fail_until,
+    'max=i'        => \$max,
+) or die "Usage: $0 [--fail-until N] [--max N]\n";
+
+my $p = Retry::Policy->new(
+    max_attempts  => $max,
+    base_delay_ms => 100,
+    max_delay_ms  => 2000,
+    jitter        => 'full',
+    on_retry      => sub {
+        my (%i) = @_;
+        print "retry attempt=$i{attempt} delay_ms=$i{delay_ms} err=$i{error}\n";
+    },
+);
+
+my $result = $p->run(sub {
+    my ($attempt) = @_;
+    die "simulated failure\n" if $attempt <= $fail_until;
+    return "success on attempt $attempt";
+});
+
+print "Results:\n";
+print "$result\n";
+exit 0;
+

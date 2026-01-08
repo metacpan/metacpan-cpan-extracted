@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client;
 # ABSTRACT: A comprehensive, DWIM-featured client to the MetaCPAN API
-$MetaCPAN::Client::VERSION = '2.035000';
+$MetaCPAN::Client::VERSION = '2.037000';
 use Moo;
 use Carp;
 use Ref::Util qw< is_arrayref is_hashref is_ref >;
@@ -170,7 +170,11 @@ sub recent {
     $size eq 'today'
         and return $self->_recent(
             size   => 1000,
-            filter => _filter_today()
+            query => {
+                bool => {
+                    filter => _filter_today()
+                }
+            }
         );
 
     $size =~ /^[0-9]+$/
@@ -371,12 +375,13 @@ sub _reverse_deps {
             "/reverse_dependencies/dist/$dist",
             {
                 size   => 5000,
-                query  => { match_all => {} },
-                filter => {
-                    and => [
-                        { term => { 'status'     => 'latest' } },
-                        { term => { 'authorized' => 1        } },
-                    ]
+                query  => {
+                    bool => {
+                        must => [
+                            { term => { 'status'     => 'latest' } },
+                            { term => { 'authorized' => 1        } },
+                        ]
+                    }
                 },
             }
         );
@@ -449,7 +454,7 @@ MetaCPAN::Client - A comprehensive, DWIM-featured client to the MetaCPAN API
 
 =head1 VERSION
 
-version 2.035000
+version 2.037000
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2025 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2026 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Bluesky;
-$App::SpreadRevolutionaryDate::Target::Bluesky::VERSION = '0.53';
+$App::SpreadRevolutionaryDate::Target::Bluesky::VERSION = '0.54';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Bluesky.
 
 use Moose;
@@ -139,7 +139,7 @@ App::SpreadRevolutionaryDate::Target::Bluesky - Target class for L<App::SpreadRe
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 METHODS
 
@@ -207,7 +207,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2025 by Gérald Sédrati.
+This software is Copyright (c) 2019-2026 by Gérald Sédrati.
 
 This is free software, licensed under:
 

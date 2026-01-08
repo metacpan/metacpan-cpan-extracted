@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME         => 'WWW::Crawl',
-    VERSION      => '0.3',
+    VERSION      => '0.4',
     ABSTRACT     => 'Lightweight web crawler with optional JS rendering',
     AUTHOR       => 'Ian Boddison <bod@cpan.org>',
     LICENSE      => 'perl',

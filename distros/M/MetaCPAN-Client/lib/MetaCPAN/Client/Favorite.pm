@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Favorite;
 # ABSTRACT: A Favorite data object
-$MetaCPAN::Client::Favorite::VERSION = '2.035000';
+$MetaCPAN::Client::Favorite::VERSION = '2.037000';
 use Moo;
 
 with 'MetaCPAN::Client::Role::Entity';
@@ -43,7 +43,7 @@ MetaCPAN::Client::Favorite - A Favorite data object
 
 =head1 VERSION
 
-version 2.035000
+version 2.037000
 
 =head1 SYNOPSIS
 

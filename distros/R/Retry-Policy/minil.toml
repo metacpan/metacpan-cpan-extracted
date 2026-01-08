@@ -1,0 +1,13 @@
+name = "Retry-Policy"
+authors = ["Sergio de Sousa <sergio@serso.com>"]
+license = "perl_5"
+
+[release]
+branch = "main"
+
+[Metadata.resources]
+repository = "https://github.com/sergio-desousa/retry-policy-perl"
+bugtracker = "https://github.com/sergio-desousa/retry-policy-perl/issues"
+homepage   = "https://github.com/sergio-desousa/retry-policy-perl"
+
+

@@ -6,7 +6,7 @@ use utf8;
 package Marlin::Struct;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.010000';
+our $VERSION   = '0.011000';
 
 use Marlin ();
 
@@ -141,7 +141,6 @@ the order they were declared in.
   # These should all work!
   my $c = Point[ x => 1, y => 2 ];
   my $c = Point[ 1, y => 2 ];
-  my $c = Point[ 2, x => 1 ];   # Weird, but okay
   my $c = Point[ 1, 2 ];
 
 Lastly, you can call a few useful methods on it:

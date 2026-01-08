@@ -1,9 +1,10 @@
-# CLI::Cmdline.pm
+# CLI::Cmdline
 A minimal, zero-dependency command-line parser in pure Perl – supporting both short and long options.
 
 [![Perl](https://img.shields.io/badge/perl-5.010%2B-brightgreen)](https://www.perl.org/)
+[![CPAN version](https://img.shields.io/badge/CPAN-1.20-blue)](https://metacpan.org/pod/CLI::Cmdline/)
 [![License](https://img.shields.io/badge/license-Perl-orange)](https://dev.perl.org/licenses/)
-
+ 
 ## Features
 
 - Short options: `-v`, `-vh` (bundling), `-header`
@@ -13,6 +14,7 @@ A minimal, zero-dependency command-line parser in pure Perl – supporting both 
   - Attached: `--output=file.txt`
 - Single-letter short switches can be bundled: `-vh`, `-vvv`
 - Single-letter short options can be last in a bundle: `-vd dir`
+- aliases can be used, f.e. '-v|verbose -n|dry-run'
 - Switches are counted when repeated (`-v -v` → 2, `--verbose --verbose` → 2)
 - Options requiring arguments support repeated values:
   - Collect all values if default is an array reference `[]`
@@ -37,24 +39,24 @@ All this in ~120 lines of pure Perl. No dependencies.
     use warnings;
     use CLI::Cmdline qw(parse);
 
-    my $switches = '-v -h --verbose --quiet --help';
-    my $options  = '-f --file --output --header';
+    my $switches = '-v|verbose -x -h|help --quiet';
+    my $options  = '-f|file --output --header';
 
     my %opt = (
         header  => [],          # collect multiple values
         output  => 'default.out',
-        h => 5,
+        x => 5,
     );
 
     CLI::Cmdline::parse(\%opt, $switches, $options)
         or die "Invalid option or missing argument: @ARGV\n";
 
     # @ARGV now contains only positional arguments
-    print "Verbose level: $opt{verbose}\n";
+    print "Verbose level: $opt{v}\n";
     print "Output file: $opt{output}\n";
     print "Headers: @{$opt{header}}\n" if @{ $opt{header} };
 
-## Examples
+## Cmdline examples
 
     $ script.pl -vh --output=out.txt data.txt
     # → v=1, h=1, output='out.txt', @ARGV = ('data.txt')
@@ -70,6 +72,60 @@ All this in ~120 lines of pure Perl. No dependencies.
 
     $ script.pl --header title.txt -- --
     # → header => ['title.txt'], everything after -- left in @ARGV
+
+## Perl examples
+
+- **Minimal example – switches without explicit defaults**
+
+    You do not need to pre-define every switch with a default value.
+    Missing switches are automatically initialized to 0.
+
+        my %opt;
+        parse(\%opt, '-v|verbose -h -x')
+           or die "usage: $0 [-v] [-h] [-x] files...\n";
+
+        # After parsing ./script.pl -verbose -vvvx file.txt
+        # %opt will contain: (v => 4, h => 0, x => 1)
+        # @ARGV == ('file.txt')
+
+- **Required Options**
+
+    To make an option required, declare it with an empty string default and check afterward:
+
+        my %opt = ( mode => 'normal');
+        parse(\%opt, '', '--input --output --mode')
+          or die "usage: $0 --input=FILE [--output=FILE] [--mode=TYPE] files...\n";
+
+        die "Error: --input is required\n"   if ($opt{input} eq '');
+
+- **Collecting multiple values, no default array needed**
+
+    If you want multiple occurrences but don't want to pre-set an array:
+
+       my %opt = (
+           define => [],        # explicitly an array ref
+       );
+       parse(\%opt, '', '--define')
+           or die "usage: $0 [--define NAME=VAL ...] files...\n";
+
+       # ./script.pl --define DEBUG=1 --define TEST --define PROFILE
+       # $opt{define} == ['DEBUG=1', 'TEST', 'PROFILE']
+       
+       # Alternative: omit the default entirely (parser will not auto-create array)
+       # If you forget the [] default, repeated --define will overwrite the last value.
+
+- **Using -- to pass filenames starting with dash**
+
+       my %opt;
+       parse(\%opt, '-r')
+           or die "usage: $0 [-r] files...\n";
+    
+       # Command line:
+       ./script.pl -r -- -hidden-file.txt another-file
+  
+       # Results:
+       # $opt{r} == 1
+       # @ARGV == ('-hidden-file.txt', 'another-file')
 
 ## API
 

@@ -1,16 +1,14 @@
 package Protocol::XMPP::Element::Feature;
-$Protocol::XMPP::Element::Feature::VERSION = '0.006';
+
 use strict;
 use warnings;
 use parent qw(Protocol::XMPP::ElementBase);
 
+our $VERSION = '0.007'; ## VERSION
+
 =head1 NAME
 
 Protocol::XMPP::Feature - register ability to deal with a specific feature
-
-=head1 VERSION
-
-Version 0.006
 
 =head1 SYNOPSIS
 
@@ -25,11 +23,11 @@ Version 0.006
 =cut
 
 sub new {
-	my $class = shift;
-	my $self = $class->SUPER::new(@_);
-	my $feature = $self->attributes->{var};
+  my $class = shift;
+  my $self = $class->SUPER::new(@_);
+  my $feature = $self->attributes->{var};
 
-	$self->debug("Had feature [" . ($feature || 'undef') . "]");
+  $self->debug("Had feature [" . ($feature || 'undef') . "]");
 }
 
 =head2 end_element
@@ -37,7 +35,7 @@ sub new {
 =cut
 
 sub end_element {
-	my $self = shift;
+  my $self = shift;
 }
 
 1;
@@ -46,8 +44,9 @@ __END__
 
 =head1 AUTHOR
 
-Tom Molesworth <cpan@entitymodel.com>
+Tom Molesworth <tom@perlsite.co.uk>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2010-2014. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2010-2026. Licensed under the same terms as Perl itself.
+

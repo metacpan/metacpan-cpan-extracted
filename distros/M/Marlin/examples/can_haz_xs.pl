@@ -16,6 +16,7 @@ eval 'require Local::Example::Plain;  1' or warn $@;
 eval 'require Local::Example::Marlin; 1' or warn $@;
 eval 'require Local::Example::Moo;    1' or warn $@;
 eval 'require Local::Example::Moose;  1' or warn $@;
+eval 'require Local::Example::Mouse;  1' or warn $@;
 eval 'require Local::Example::Tiny;   1' or warn $@;
 
 sub is_xs {
@@ -48,11 +49,11 @@ sub show_class {
 sub show_method {
 	my $m = shift;
 	printf(
-		"%-15s %-7s %-7s %-7s %-7s %-7s %-7s\n",
+		"%-15s %-7s %-7s %-7s %-7s %-7s %-7s %-7s\n",
 		$m,
 		map {
 			is_xs("Local::Example::$_\::$current_class\::$m")
-		} qw( Moo Moose Tiny Core Plain Marlin ),
+		} qw( Moo Moose Mouse Tiny Core Plain Marlin ),
 	);
 }
 
@@ -60,16 +61,16 @@ sub show_methods {
 	show_method $_ for @_;
 }
 
-print "=" x 66, "\n";
-printf "%-15s %-7s %-7s %-7s %-7s %-7s %-7s\n", qw( Method Moo Moose Tiny Core Plain Marlin );
-print "=" x 66, "\n";
+print "=" x 74, "\n";
+printf "%-15s %-7s %-7s %-7s %-7s %-7s %-7s %-7s\n", qw( Method Moo Moose Mouse Tiny Core Plain Marlin );
+print "=" x 74, "\n";
 show_class('NamedThing');           show_methods qw/ new name /;
 show_class('Person');               show_methods qw/ new name age has_age introduction /;
 show_class('Employee');             show_methods qw/ new name age has_age employee_id introduction /;
 show_class('Employee::Developer');  show_methods qw/ new name age has_age employee_id introduction get_languages all_languages add_language /;
-print "=" x 66, "\n";
+print "=" x 74, "\n";
 print "Key: XS = XSUB, PP = Pure Perl, lowercase = via inheritance.\n";
-print "=" x 66, "\n";
+print "=" x 74, "\n";
 
 __END__
 ==================================================================

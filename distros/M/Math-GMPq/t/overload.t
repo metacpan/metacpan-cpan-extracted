@@ -519,8 +519,8 @@ if($p > $mbi &&
    $p >= $mbi &&
    $mbi < $p &&
    $mbi <= $p &&
-   ($p <=> $mbi) > 0 &&
-   ($mbi <=> $p) < 0 &&
+   ($p <=> $mbi) == 1 &&
+   ($mbi <=> $p) == -1 &&
    $p != $mbi &&
    !($p == $mbi)
 ) {print "ok 33\n"}

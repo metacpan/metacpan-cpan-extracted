@@ -35,34 +35,6 @@ use Test::Fatal;
 	use Class::XSConstructor qw( employee_id! );
 }
 
-# This is not part of the public API, but a simple way of
-# testing the import stuff works properly.
-#
-
-is_deeply(
-	\@Person::__XSCON_HAS,
-	[qw/ name age email phone /],
-	'Person attributes',
-);
-
-is_deeply(
-	\@Employee::__XSCON_HAS,
-	[qw/ name age email phone employee_id /],
-	'Employee attributes',
-);
-
-is_deeply(
-	\@Person::__XSCON_REQUIRED,
-	[qw/ name /],
-	'Person required attributes',
-);
-
-is_deeply(
-	\@Employee::__XSCON_REQUIRED,
-	[qw/ name employee_id /],
-	'Employee required attributes',
-);
-
 my $alice0 = bless {
 	name         => "Alice",
 	employee_id  => "001",

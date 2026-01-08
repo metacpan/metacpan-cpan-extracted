@@ -33,7 +33,7 @@ requires:
   English: 0
   Error::Pure: 0
   MARC::Field008: 0
-  MARC::Leader: 0.04
+  MARC::Leader: 0.08
   Mo::utils: 0.06
   Mo::utils::Hash: 0
   Module::Pluggable: 0
@@ -43,4 +43,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/MARC-Validator
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/MARC-Validator
-version: '0.08'
+version: '0.09'

@@ -1,0 +1,40 @@
+---
+abstract: 'Simple retry wrapper with exponential backoff and jitter'
+author:
+  - 'Sergio de Sousa <sergio@serso.com>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Retry-Policy
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Retry::Policy:
+    file: lib/Retry/Policy.pm
+    version: '0.02'
+requires:
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  perl: '5.030000'
+resources:
+  bugtracker: https://github.com/sergio-desousa/retry-policy-perl/issues
+  homepage: https://github.com/sergio-desousa/retry-policy-perl
+  repository: https://github.com/sergio-desousa/retry-policy-perl.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,41 +1,48 @@
 ---
-abstract: 'Latex driver'
+abstract: 'Run LaTeX/XeLaTeX/LuaTeX and helper programs'
 author:
-  - 'Erik Huelsmann  <erik@efficito.com>  (current maintainer)'
+  - 'Erik Huelsmann <erik@efficito.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
   Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: LaTeX::Driver
+  version: '1.4'
 name: LaTeX-Driver
-no_index:
-  directory:
-    - inc
-    - t
 requires:
-  Capture::Tiny: 0
-  Class::Accessor: 0
-  Cwd: 0
-  Exception::Class: 0
-  File::Slurp: 0
-  File::Spec: 0
+  Capture::Tiny: '0'
+  Class::Accessor: '0'
+  Cwd: '0'
+  Exception::Class: '0'
+  File::Slurp: '0'
   File::Temp: '0.23'
-  File::pushd: 0
-  Getopt::Long: 0
-  IO::File: 0
-  Log::Any: 0
-  Readonly: 0
-  parent: 0
-  perl: 5.8.5
+  File::pushd: '0'
+  Getopt::Long: '0'
+  IO::File: '0'
+  Log::Any: '0'
+  Readonly: '0'
+  parent: '0'
+  perl: v5.8.1
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/Template-Toolkit-Latex/LaTeX-Driver.git
-version: 1.2.0
+  bugtracker: https://github.com/Template-Toolkit-Latex/LaTeX-Driver/issues
+  homepage: https://github.com/Template-Toolkit-Latex/LaTeX-Driver
+  repository: git://github.com/Template-Toolkit-Latex/LaTeX-Driver.git
+version: 1.3.1
+x_contributors:
+  - 'Andrew Ford <Andrew.Ford@ford-mason.co.uk>'
+  - 'Andrew Ford <andrew@ford-mason.co.uk>'
+  - 'Chris Travers <chris.travers@gmail.com>'
+  - 'Chris Travers <chris@efficito.com>'
+  - 'Christian Walde <walde.christian@googlemail.com>'
+  - 'Erik Huelsmann <ehuels@gmail.com>'
+  - 'Harrison Chienjo <hhathersage@gmail.com>'
+  - 'Jens Rehsack <sno@netbsd.org>'
+  - 'ehuelsmann <ehuelsmann@jessie-lsmb>'
+  - 'simbabque <simbabque@cpan.org>'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

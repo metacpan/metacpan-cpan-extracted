@@ -28,6 +28,7 @@ sub parse {
     }
     $self->_parse_options($options);
     my @output;
+    $wiki_text =~ s/\r//g;
     $self->_parse_in_array( \@output, $wiki_text );
     $self->_strip_all_line_numbers( \@output );
     $self->used(1);
@@ -589,7 +590,7 @@ sub _recurse_pending_bold_or_italic {
       };
     push @{ $self->_current_element }, $element;
     $element->{start_line} = $start_line;
-    say $element->{start_line} . '';
+#    say $element->{start_line} . '';
     if ( !defined $element->{type} ) {
         return ( 0, $i, $buffer, $options );
     }

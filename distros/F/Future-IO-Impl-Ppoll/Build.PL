@@ -11,6 +11,7 @@ my $build = Module::Build->new(
 
       'Future' => 0,
       'Future::IO::ImplBase' => '0.17',
+      'IO::Ppoll' => 0,
       'Struct::Dumb' => 0,
    },
    test_requires => {

@@ -1,0 +1,1235 @@
+# NAME
+
+Cookies::Roundtrip - Convert between different HTTP Cookie formats, well, at least we tried!
+
+# VERSION
+
+Version 0.01
+
+# SYNOPSIS
+
+This module provides functionality for converting between some of the
+various HTTP Cookie formats. _Roundtrip_ is a bit of a wish really
+as there can be unsupported fields in the various Cookie formats.
+
+Anyway! Here we try to convert between [HTTP::Cookies](https://metacpan.org/pod/HTTP%3A%3ACookies), [HTTP::CookieJar](https://metacpan.org/pod/HTTP%3A%3ACookieJar),
+single [Firefox::Marionette::Cookie](https://metacpan.org/pod/Firefox%3A%3AMarionette%3A%3ACookie) or an ARRAY of [Firefox::Marionette::Cookie](https://metacpan.org/pod/Firefox%3A%3AMarionette%3A%3ACookie),
+an ARRAY of `Set-Cookie` header strings,
+which cover [WWW::Mechanize](https://metacpan.org/pod/WWW%3A%3AMechanize) (and subclasses), [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) (and subclasses)
+and [Firefox::Marionette](https://metacpan.org/pod/Firefox%3A%3AMarionette). Note that [WWW::Mechanize](https://metacpan.org/pod/WWW%3A%3AMechanize) (and subclasses)
+and [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) (and subclasses) support both
+[HTTP::Cookies](https://metacpan.org/pod/HTTP%3A%3ACookies), [HTTP::CookieJar](https://metacpan.org/pod/HTTP%3A%3ACookieJar) and this is controlled during construction.
+
+Example usage:
+
+    use Cookies::Roundtrip qw/:all/;
+    use HTTP::Cookies;
+    use HTTP::CookieJar;
+
+    # Skip discarded (expired etc.) cookies?
+    my $skip_discard = 1; # or 0
+    # Verbosity level
+    my $VERBOSITY = 1; # 0 to ...
+
+    # from this HTTP::CookieJar cookie ...
+    my $hcj = HTTP::CookieJar->new;
+    $hc->add(...);
+    # ... convert to HTTP::Cookies
+    my $hc = httpcookiejar2httpcookies($hcj, undef, $skip_discard, $VERBOSITY);
+    # ... or supply the HTTP::Cookies object ($hc) to append to as sub parameter
+    httpcookiejar2httpcookies($hcj, $hc, $skip_discard, $VERBOSITY) or die;
+
+    # and back ...
+    my $hcj2 = httpcookies2httpcookiejar($hc, undef, $skip_discard, $VERBOSITY);
+
+    # From LWP::UserAgent
+    my $ua = LWP::UserAgent->new(cookie_jar_class=>'HTTP::CookieJar');
+    ...
+    # extract them from LWP::UserAgent object
+    $hcj = lwpuseragent_get_cookies($ua, $VERBOSITY);
+    print "got ".count_cookies($hcj)." cookies\n";
+    # ... or load them into the LWP::UserAgent object
+    # note that the 2nd param ($hcj) can be a filename to load from file
+    # or any other Cookie object whose class we support
+    lwpuseragent_load_cookies($ua, $hcj, $VERBOSITY);
+
+    # write to files
+    wwwmechanize_save_cookies_to_file($mech, 'out.cookies', $skip_discard, $VERBOSITY);
+    lwpuseragent_save_cookies_to_file($ua, 'out.cookies', $skip_discard, $VERBOSITY);
+    firefoxmarionette_save_cookies_to_file($ffm, 'out.cookies', $skip_discard, $VERBOSITY);
+    # or load from files
+    wwwmechanize_load_cookies_from_file($mech, 'my.cookies', $skip_discard, $VERBOSITY);
+    wwwmechanize_load_cookies_from_file($ua, 'my.cookies', $skip_discard, $VERBOSITY);
+    wwwmechanize_load_cookies_from_file($ffm, 'my.cookies', $skip_discard, $VERBOSITY);
+    # write cookie to file
+    httpcookies2file($hc, 'out.cookies', $skip_discard, $VERBOSITY);
+    httpcookiejar2file($hcj, 'out.cookies', $skip_discard, $VERBOSITY);
+    # read cookies from file
+    $hc = file2httpcookies('my.cookies', undef, $VERBOSITY);
+    # or append them to existing cookies object
+    file2httpcookies('my.cookies', $hc, $VERBOSITY);
+
+    # count cookies of any Cookies object whose class we support
+    count_cookies($cookies_obj, $skip_discard, $VERBOSITY);
+    # clone cookies of any Cookies object whose class we support
+    my $newcook = clone_cookies($cookies_obj, $VERBOSITY);
+    # merge Cookie objects OF THE SAME class
+    $newcook = merge_cookies($cook1, $cook2, $skip_discard, $VERBOSITY);
+
+    # compare Cookie objects OF THE SAME class (we support) for equality
+    my $yes = cookies_are_equal($cook1, $cook2, $skip_discard, $VERBOSITY); # 1 or 0 or undef
+
+    # stringify any Cookies object whose class we support
+    print as_string_cookies($cook, $skip_discard, $VERBOSITY);
+
+# EXPORT
+
+By default no symbols are exported. You need to manually import any
+symbol you wish to use.
+However, for your convenience the following export tags are available
+for importing symbols in groups.
+
+Note that the `:all` tag will import all the exportable symbols.
+
+- `:all` : everything
+- `:lwpuseragent` : `lwpuseragent_save_cookies_to_file`, `lwpuseragent_load_cookies`, `lwpuseragent_load_cookies_from_file`, `lwpuseragent_load_setcookies`, `lwpuseragent_load_httpcookies`, `lwpuseragent_load_httpcookiejar`, `lwpuseragent_get_cookies`
+- `:wwwmechanize` : `wwwmechanize_save_cookies_to_file`, `wwwmechanize_load_cookies`, `wwwmechanize_load_cookies_from_file`, `wwwmechanize_load_setcookies`, `wwwmechanize_load_httpcookies`, `wwwmechanize_load_httpcookiejar`, `wwwmechanize_get_cookies`
+- `:firefoxmarionette` : `firefoxmarionettecookies2file`, `firefoxmarionettecookies2httpcookies`, `firefoxmarionettecookies2httpcookiejar`, `firefoxmarionettecookies2setcookies`,
+- `:clone` : `clone_httpcookiejar`, `clone_httpcookies`, `clone_setcookies`, `clone_cookies`
+- `:merge` : `merge_httpcookies`, `merge_httpcookiejar`, `merge_setcookies`, `merge_firefoxmarionettecookies`, `merge_cookies`
+- `:count` : `count_httpcookies`, `count_httpcookiejar`, `count_setcookies`, `count_firefoxmarionettecookies`, `count_cookies`
+- `:equal` : `cookies_are_equal`, `cookies_are_equal_httpcookies`, `cookies_are_equal_httpcookiejar`, `cookies_are_equal_setcookies`, `cookies_are_equal_firefoxmarionettecookie`, `cookies_are_equal_firefoxmarionettecookies`
+- `:setcookies2` : `setcookies2httpcookiejar`, `setcookies2httpcookies`
+- `:httpcookies2` : `httpcookies2setcookies`, `httpcookies2file`, `httpcookies2httpcookiejar`, `httpcookies2firefoxmarionettecookies`
+- `:httpcookiejar2` : `httpcookies2setcookies`, `httpcookies2file`, `httpcookies2httpcookiejar`, `httpcookies2firefoxmarionettecookies`
+- `:firefoxmarionettecookies2` : `firefoxmarionettecookies2file`, `firefoxmarionettecookies2httpcookies`, `firefoxmarionettecookies2httpcookiejar`, `firefoxmarionettecookies2setcookies`
+- `:new` : `new_firefoxmarionettecookie`, `new_firefoxmarionettecookies`
+- `:file` : `file2httpcookiejar`, `httpcookiejar2file`, `file2httpcookies`, `httpcookies2file`, `firefoxmarionettecookies2file`, `file2firefoxmarionettecookies`, `setcookies2file`, `file2setcookies`, `lwpuseragent_save_cookies_to_file`, `lwpuseragent_load_cookies_from_file`, `wwwmechanize_save_cookies_to_file`, `wwwmechanize_load_cookies_from_file`, `cookies2file`
+- `:as_string` : `as_string_httpcookiejar`, `as_string_httpcookies`, `as_string_setcookies`, `as_string_cookies`, `as_string_firefoxmarionettecookies`
+
+# SUBROUTINES
+
+Below, `$skip_discard` is a flag
+dictating whether
+to skip discarded cookies during the operation (value
+of `1`) or not (value of `0`).
+
+`$verbosity` denotes the verbosity level
+as an integer. `0` being mute.
+
+## `lwpuseragent_get_cookies`
+
+    my $ret = lwpuseragent_get_cookies($ua, $verbosity);
+
+Arguments:
+
+- `$ua`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+It returns the cookies of the specified [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) object.
+
+## `lwpuseragent_save_cookies_to_file`
+
+    my $ret = lwpuseragent_save_cookies_to_file($ua, $filename, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$ua`
+- `$filename`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+It saves the cookies held in specified [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) object to
+specified file. It returns (`$ret`) `1` on failure or `0` on success.
+
+## `lwpuseragent_load_cookies`
+
+    my $ret = lwpuseragent_load_cookies($ua, $cookies_or_file_etc, $verbosity);
+
+Arguments:
+
+- `$ua`
+- `$cookies_or_file_etc`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+This is a generic function to load any type of cookies
+into the specifed [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) object. Cookies
+can be in a file (`$cookies_or_file_etc` is a scalar holding the filename),
+or a Cookies object we support or an ARRAY\_REF of `SetCookie` strings
+or an ARRAY\_REF of [Firefox::Marionette::Cookie](https://metacpan.org/pod/Firefox%3A%3AMarionette%3A%3ACookie) objects.
+
+## `lwpuseragent_load_cookies_from_file`
+
+    my $ret = lwpuseragent_load_cookies_from_file($ua, $filename, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$ua`
+- `$filename`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+It loads cookies from file into the specifed [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) object.
+[lwpuseragent\_load\_cookies](https://metacpan.org/pod/lwpuseragent_load_cookies) will do the same job when specified
+with a filename.
+
+It returns `undef` on failure or
+the cookies read from file as a Cookies object on success.
+Note that [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) supports both [HTTP::Cookies](https://metacpan.org/pod/HTTP%3A%3ACookies) and
+[HTTP::CookieJar](https://metacpan.org/pod/HTTP%3A%3ACookieJar), the class of the returned object will
+be one of these, depending what the specified [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent)
+object was instructed to hold, by using
+
+    my $ua = LWP::UserAgent->new(cookie_jar_class=>'HTTP::CookieJar');
+
+## `lwpuseragent_load_setcookies`
+
+    my $ret = lwpuseragent_load_setcookies($ua, $setcookies, $verbosity);
+
+Arguments:
+
+- `$ua`
+- `$setcookies`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `lwpuseragent_load_firefoxmarionettecookies`
+
+    my $ret = lwpuseragent_load_firefoxmarionettecookies($ua, $firefoxmarionettecookies, $verbosity);
+
+Arguments:
+
+- `$ua`
+- `$firefoxmarionettecookies`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `lwpuseragent_load_httpcookies`
+
+    my $ret = lwpuseragent_load_httpcookies($ua, $httpcookies, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$ua`
+- `$httpcookies`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `lwpuseragent_load_httpcookiejar`
+
+    my $ret = lwpuseragent_load_httpcookiejar($ua, $httpcookiejar, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$ua`
+- `$httpcookiejar`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `firefoxmarionette_get_cookies`
+
+    my $ret = firefoxmarionette_get_cookies($ffmar, $verbosity);
+
+Arguments:
+
+- `$ffmar`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `firefoxmarionette_save_cookies_to_file`
+
+    my $ret = firefoxmarionette_save_cookies_to_file($ffmar, $filename, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$ffmar`
+- `$filename`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `firefoxmarionette_load_cookies`
+
+    my $ret = firefoxmarionette_load_cookies($ffmar, $cookies_or_file_etc, $visit_cookie_domain_first, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$ffmar`
+- `$cookies_or_file_etc`
+- `$visit_cookie_domain_first`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `firefoxmarionette_load_cookies_from_file`
+
+    my $ret = firefoxmarionette_load_cookies_from_file($ffmar, $filename, $visit_cookie_domain_first, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$ffmar`
+- `$filename`
+- `$visit_cookie_domain_first`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `firefoxmarionette_load_setcookies`
+
+    my $ret = firefoxmarionette_load_setcookies($ffmar, $setcookies, $visit_cookie_domain_first, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$ffmar`
+- `$setcookies`
+- `$visit_cookie_domain_first`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `firefoxmarionette_load_firefoxmarionettecookies`
+
+    my $ret = firefoxmarionette_load_firefoxmarionettecookies($ffmar, $firefoxmarionettecookies, $visit_cookie_domain_first, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$ffmar`
+- `$firefoxmarionettecookies`
+- `$visit_cookie_domain_first`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `firefoxmarionette_load_httpcookies`
+
+    my $ret = firefoxmarionette_load_httpcookies($ffmar, $httpcookies, $visit_cookie_domain_first, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$ffmar`
+- `$httpcookies`
+- `$visit_cookie_domain_first`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `firefoxmarionette_load_httpcookiejar`
+
+    my $ret = firefoxmarionette_load_httpcookiejar($ffmar, $httpcookiejar, $visit_cookie_domain_first, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$ffmar`
+- `$httpcookiejar`
+- `$visit_cookie_domain_first`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `wwwmechanize_get_cookies`
+
+    my $ret = wwwmechanize_get_cookies($mech, $verbosity);
+
+Arguments:
+
+- `$mech`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `wwwmechanize_save_cookies_to_file`
+
+    my $ret = wwwmechanize_save_cookies_to_file($mech, $filename, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$mech`
+- `$filename`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `wwwmechanize_load_cookies`
+
+    my $ret = wwwmechanize_load_cookies($mech, $cookies_or_file_etc, $verbosity);
+
+Arguments:
+
+- `$mech`
+- `$cookies_or_file_etc`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `wwwmechanize_load_cookies_from_file`
+
+    my $ret = wwwmechanize_load_cookies_from_file($mech, $filename, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$mech`
+- `$filename`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `wwwmechanize_load_setcookies`
+
+    my $ret = wwwmechanize_load_setcookies($mech, $setcookies, $verbosity);
+
+Arguments:
+
+- `$mech`
+- `$setcookies`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `wwwmechanize_load_firefoxmarionettecookies`
+
+    my $ret = wwwmechanize_load_firefoxmarionettecookies($mech, $firefoxmarionettecookies, $verbosity);
+
+Arguments:
+
+- `$mech`
+- `$firefoxmarionettecookies`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `wwwmechanize_load_httpcookies`
+
+    my $ret = wwwmechanize_load_httpcookies($mech, $httpcookies, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$mech`
+- `$httpcookies`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `wwwmechanize_load_httpcookiejar`
+
+    my $ret = wwwmechanize_load_httpcookiejar($mech, $httpcookiejar, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$mech`
+- `$httpcookiejar`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `new_firefoxmarionettecookie`
+
+    my $ret = new_firefoxmarionettecookie($params, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$params`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `new_firefoxmarionettecookies`
+
+    my $ret = new_firefoxmarionettecookies($params, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$params`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `cookies2file`
+
+    my $ret = cookies2file($cookies, $filename, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$cookies`
+- `$filename`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `httpcookiejar2file`
+
+    my $ret = httpcookiejar2file($httpcookiejar, $filename, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$httpcookiejar`
+- `$filename`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `file2httpcookiejar`
+
+    my $ret = file2httpcookiejar($filename, $httpcookiejar, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$filename`
+- `$httpcookiejar`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `file2httpcookies`
+
+    my $ret = file2httpcookies($filename, $httpcookies, $verbosity);
+
+Arguments:
+
+- `$filename`
+- `$httpcookies`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `httpcookies2file`
+
+    my $ret = httpcookies2file($httpcookies, $filename, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$httpcookies`
+- `$filename`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `firefoxmarionettecookies2file`
+
+    my $ret = firefoxmarionettecookies2file($firefoxmarionettecookies, $filename, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$firefoxmarionettecookies`
+- `$filename`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `file2firefoxmarionettecookies`
+
+    my $ret = file2firefoxmarionettecookies($filename, $firefoxmarionettecookies, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$filename`
+- `$firefoxmarionettecookies`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `setcookies2file`
+
+    my $ret = setcookies2file($setcookies, $filename, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$setcookies`
+- `$filename`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `file2setcookies`
+
+    my $ret = file2setcookies($filename, $setcookies, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$filename`
+- `$setcookies`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `httpcookies2httpcookiejar`
+
+    my $ret = httpcookies2httpcookiejar($httpcookies, $httpcookiejar, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$httpcookies`
+- `$httpcookiejar`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `httpcookies2firefoxmarionettecookies`
+
+    my $ret = httpcookies2firefoxmarionettecookies($httpcookies, $firefoxmarionettecookies, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$httpcookies`
+- `$firefoxmarionettecookies`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `clone_cookies`
+
+    my $ret = clone_cookies($w, $verbosity);
+
+Arguments:
+
+- `$w`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `clone_httpcookiejar`
+
+    my $ret = clone_httpcookiejar($httpcookiejar, $verbosity);
+
+Arguments:
+
+- `$httpcookiejar`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `clone_firefoxmarionettecookie`
+
+    my $ret = clone_firefoxmarionettecookie($firefoxmarionettecookie, $verbosity);
+
+Arguments:
+
+- `$firefoxmarionettecookie`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `clone_firefoxmarionettecookies`
+
+    my $ret = clone_firefoxmarionettecookies($firefoxmarionettecookies, $verbosity);
+
+Arguments:
+
+- `$firefoxmarionettecookies`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `clone_httpcookies`
+
+    my $ret = clone_httpcookies($httpcookies, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$httpcookies`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `merge_cookies`
+
+    my $ret = merge_cookies($obj1, $obj2, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$obj1`
+- `$obj2`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `merge_httpcookies`
+
+    my $ret = merge_httpcookies($httpcookies_src, $httpcookies_dst, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$httpcookies_src`
+- `$httpcookies_dst`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `merge_httpcookiejar`
+
+    my $ret = merge_httpcookiejar($httpcookiejar_src, $httpcookiejar_dst, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$httpcookiejar_src`
+- `$httpcookiejar_dst`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `merge_firefoxmarionettecookies`
+
+    my $ret = merge_firefoxmarionettecookies($src, $dst);
+
+Arguments:
+
+- `$src`
+- `$dst`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `setcookies2httpcookiejar`
+
+    my $ret = setcookies2httpcookiejar($setcookies, $httpcookiejar, $verbosity);
+
+Arguments:
+
+- `$setcookies`
+- `$httpcookiejar`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `setcookies2firefoxmarionettecookies`
+
+    my $ret = setcookies2firefoxmarionettecookies($setcookies, $firefoxmarionettecookies, $verbosity);
+
+Arguments:
+
+- `$setcookies`
+- `$firefoxmarionettecookies`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `setcookie2firefoxmarionettecookie`
+
+    my $ret = setcookie2firefoxmarionettecookie($setcookie, $firefoxmarionettecookie, $verbosity);
+
+Arguments:
+
+- `$setcookie`
+- `$firefoxmarionettecookie`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `count_cookies`
+
+    my $ret = count_cookies($w, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$w`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `count_httpcookies`
+
+    my $ret = count_httpcookies($httpcookies, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$httpcookies`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `setcookie2httpcookies_set_cookie_array`
+
+    my $ret = setcookie2httpcookies_set_cookie_array($setcookie, $verbosity);
+
+Arguments:
+
+- `$setcookie`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `setcookie2hash`
+
+    my $ret = setcookie2hash($setcookie, $verbosity);
+
+Arguments:
+
+- `$setcookie`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `setcookies2httpcookies`
+
+    my $ret = setcookies2httpcookies($setcookies, $httpcookies, $verbosity);
+
+Arguments:
+
+- `$setcookies`
+- `$httpcookies`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `firefoxmarionettecookies2setcookies`
+
+    my $ret = firefoxmarionettecookies2setcookies($firefoxmarionettecookies, $setcookies, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$firefoxmarionettecookies`
+- `$setcookies`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `firefoxmarionettecookies2httpcookiejar`
+
+    my $ret = firefoxmarionettecookies2httpcookiejar($firefoxmarionettecookies, $httpcookiejar, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$firefoxmarionettecookies`
+- `$httpcookiejar`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `httpcookiejar2httpcookies`
+
+    my $ret = httpcookiejar2httpcookies($httpcookiejar, $httpcookies, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$httpcookiejar`
+- `$httpcookies`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `firefoxmarionettecookies2httpcookies`
+
+    my $ret = firefoxmarionettecookies2httpcookies($firefoxmarionettecookies, $httpcookies, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$firefoxmarionettecookies`
+- `$httpcookies`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `httpcookies2setcookies`
+
+    my $ret = httpcookies2setcookies($httpcookies, $setcookies, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$httpcookies`
+- `$setcookies`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `httpcookiejar2setcookies`
+
+    my $ret = httpcookiejar2setcookies($httpcookiejar, $setcookies, $verbosity);
+
+Arguments:
+
+- `$httpcookiejar`
+- `$setcookies`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `httpcookiejar2firefoxmarionettecookies`
+
+    my $ret = httpcookiejar2firefoxmarionettecookies($httpcookiejar, $firefoxmarionettecookies, $verbosity);
+
+Arguments:
+
+- `$httpcookiejar`
+- `$firefoxmarionettecookies`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `as_string_cookies`
+
+    my $ret = as_string_cookies($w, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$w`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `as_string_firefoxmarionettecookies`
+
+    my $ret = as_string_firefoxmarionettecookies($w, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$w`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `as_string_firefoxmarionettecookie`
+
+    my $ret = as_string_firefoxmarionettecookie($w, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$w`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `as_string_httpcookies`
+
+    my $ret = as_string_httpcookies($httpcookies, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$httpcookies`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `cookies_are_equal`
+
+    my $ret = cookies_are_equal($obj1, $obj2, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$obj1`
+- `$obj2`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `cookies_are_equal_setcookies`
+
+    my $ret = cookies_are_equal_setcookies($obj1, $obj2, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$obj1`
+- `$obj2`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `cookies_are_equal_firefoxmarionettecookie`
+
+    my $ret = cookies_are_equal_firefoxmarionettecookie($obj1, $obj2, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$obj1`
+- `$obj2`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `cookies_are_equal_firefoxmarionettecookies`
+
+    my $ret = cookies_are_equal_firefoxmarionettecookies($obj1, $obj2, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$obj1`
+- `$obj2`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `cookies_are_equal_httpcookies`
+
+    my $ret = cookies_are_equal_httpcookies($obj1, $obj2, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$obj1`
+- `$obj2`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `cookies_are_equal_httpcookies_bad`
+
+    my $ret = cookies_are_equal_httpcookies_bad($obj1, $obj2, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$obj1`
+- `$obj2`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+## `cookies_are_equal_httpcookiejar`
+
+    my $ret = cookies_are_equal_httpcookiejar($obj1, $obj2, $skip_discard, $verbosity);
+
+Arguments:
+
+- `$obj1`
+- `$obj2`
+- `$skip_discard`
+- `$verbosity`
+
+Return value:
+
+- `$ret` : a cookie object on success or `undef` on failure.
+
+# CAVEATS
+
+Converting between Perl Cookie classes is a futile task.
+Those who implemented a second Perl Cookie class are
+doing a dis-service to the community.
+
+This module can fail at any time. If it does, please
+provide the details AND the remedy.
+
+# AUTHOR
+
+Andreas Hadjiprocopis, `<bliako at cpan.org>`
+
+# BUGS
+
+Please report any bugs or feature requests to `bug-cookies-roundtrip at rt.cpan.org`, or through
+the web interface at [https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Cookies-Roundtrip](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Cookies-Roundtrip).  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+# SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Cookies::Roundtrip
+
+You can also look for information at:
+
+- RT: CPAN's request tracker (report bugs here)
+
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Cookies-Roundtrip](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Cookies-Roundtrip)
+
+- CPAN Ratings
+
+    [https://cpanratings.perl.org/d/Cookies-Roundtrip](https://cpanratings.perl.org/d/Cookies-Roundtrip)
+
+- Search CPAN
+
+    [https://metacpan.org/release/Cookies-Roundtrip](https://metacpan.org/release/Cookies-Roundtrip)
+
+# ACKNOWLEDGEMENTS
+
+# LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2025 by Andreas Hadjiprocopis.
+
+This is free software, licensed under:
+
+    The Artistic License 2.0 (GPL Compatible)

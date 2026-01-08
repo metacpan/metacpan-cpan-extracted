@@ -36,6 +36,18 @@ my $y = $class->new( bar => 42 );
 is( $y->foo, 42 );
 is( $y->bar, 42 );
 
-like( dies { $class->new( foo => 4, bar => 2 ) }, qr/Unexpected keys? in constructor/ );
+like( dies { $class->new( foo => 4, bar => 2 ) }, qr/Superfluous alias/ );
+
+use Marlin::Struct Point => [
+	'x!' => { ':Alias' => 'horizontal' },
+	'y!' => { ':Alias' => 'vertical' },
+];
+
+my $p1 = Point->new( x => 66, y => 99 );
+my $p2 = Point[ horizontal => 66, vertical => 99 ];
+my $p3 = Point[ 66, 99 ];
+
+is( $p1, $p2 );
+is( $p1, $p3 );
 
 done_testing;

@@ -5,7 +5,7 @@ use warnings;
 package Marlin::XAttribute::Alias;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.010000';
+our $VERSION   = '0.011000';
 
 use Eval::TypeTiny ();
 use Role::Tiny;
@@ -47,23 +47,38 @@ after install_accessors => sub {
 	$me->install_coderef( $_, $coderef ) for @aliases;
 };
 
-before _compile_init => sub {
-	my $me = shift;
-	my $code = $_[0];
+before add_code_for_initialization => sub {
+	my ( $me, $code ) = @_;
 	
 	my $init_arg = exists($me->{init_arg}) ? $me->{init_arg} : $me->{slot};
 	return unless defined $init_arg;
 	
 	my @aliases = @{ $me->{':Alias'}{alias} };
 	
-	$code->addf( 'if ( not exists $args{%s} ) {', B::perlstring($init_arg) );
+	# If the caller provided the init_arg as expected, then need to
+	# check that no aliases were used!
+	$code->addf( 'if ( exists $args{%s} ) {', B::perlstring($init_arg) );
 	$code->increase_indent;
+	my $check = do {
+		my $enum = Types::Common::Enum->of( @aliases );
+		$enum->can( '_regexp' )
+			? sprintf( '/\\A%s\\z/', $enum->_regexp )
+			: $enum->inline_check( '$_' );
+	};
+	$code->addf( 'my @superfluous = grep { %s } keys %%args;', $check );
+	$code->addf( '%s("Superfluous %%s used for attribute \'%%s\': %%s" , @superfluous==1 ? "alias" : "aliases", %s, join( q[, ], sort @superfluous ) ) if @superfluous;', $me->_croaker, B::perlstring($me->{slot}) );
+	$code->decrease_indent;
+	$code->addf( '}' );
+	$code->addf( 'else {' );
+	$code->increase_indent;
+	$code->addf( 'my $found;' );
 	$code->addf( 'ALIAS: for my $alias ( %s ) {', join q{, } => map B::perlstring($_), @aliases );
 	$code->increase_indent;
 	$code->addf( 'if ( exists $args{$alias} ) {' );
 	$code->increase_indent;
+	$code->addf( '%s("Superfluous alias used for attribute \'%%s\': %%s", %s, $alias ) if defined $found;', $me->_croaker, B::perlstring($me->{slot}) );
 	$code->addf( '$args{%s} = delete $args{$alias};', B::perlstring($init_arg) );
-	$code->addf( 'last ALIAS;' );
+	$code->addf( '$found = $args{%s} = $alias;', B::perlstring( ':used_alias_for_' . $init_arg ) );
 	$code->decrease_indent;
 	$code->addf( '}' );
 	$code->decrease_indent;
@@ -72,11 +87,36 @@ before _compile_init => sub {
 	$code->addf( '}' );
 };
 
-# Any use of this extension forces the PP constructor.
-around requires_pp_constructor => sub {
+after add_code_for_initialization => sub {
+	my ( $me, $code ) = @_;
+	
+	my $init_arg = exists($me->{init_arg}) ? $me->{init_arg} : $me->{slot};
+	return unless defined $init_arg;
+	
+	$code->addf( 'if ( exists $args{%s} ) {', B::perlstring( ':used_alias_for_' . $init_arg ) );
+	$code->increase_indent;
+	$code->addf( '$args{delete $args{%s}} = delete $args{%s};', B::perlstring( ':used_alias_for_' . $init_arg ), B::perlstring($init_arg) );
+	$code->decrease_indent;
+	$code->addf( '}' );
+};
+
+around allowed_constructor_parameters => sub {
 	my $next = shift;
 	my $me = shift;
-	return 1;
+	return (
+		$me->$next( @_ ),
+		@{ $me->{':Alias'}{alias} },
+	);
+};
+
+around xs_constructor_args => sub {
+	my $next = shift;
+	my $me = shift;
+	my @args = $me->$next( @_ );
+	if ( @args ) {
+		$args[-1]{alias} = [ @{ $me->{':Alias'}{alias} } ];
+	}
+	return @args;
 };
 
 1;
@@ -149,8 +189,26 @@ for the reader, unless the attribute C<< is => "rw" >>, in which case the
 aliases will be aliases for the accessor. (In theory, it is possible to set
 them as aliases for a writer, predicate, or clearer, but that would be weird.)
 
-Using this extension will force your class, plus any classes that inherit from
-it, to use Marlin's Pure Perl constructor instead of the XS constructor.
+=head1 DIAGNOSTICS
+
+=over
+
+=item *
+
+B<< Superfluous alias used for attribute '%s' >>
+
+The following examples are errors as the same attribute is being initialized
+twice:
+
+  my $bob = Local::Person->new( name => 'Bob', moniker => 'Bob' );
+  
+  my $bob = Local::Person->new( label => 'Bob', moniker => 'Bob' );
+
+=item *
+
+B<< Superfluous aliases used for attribute '%s' >>
+
+Variant used when reporting multiple superfluous aliases.
 
 =head1 BUGS
 

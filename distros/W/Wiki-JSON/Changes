@@ -66,3 +66,5 @@
 
 0.0.12 Sun Aug 17 16:18:39 2025 +0200
     - Testing further lists and fixing errors related to element expansion inside of the same line of a list.
+0.0.32 Thu Jan  8 10:37:53 AM CET 2026
+    - Fixing carry return breaking the output.

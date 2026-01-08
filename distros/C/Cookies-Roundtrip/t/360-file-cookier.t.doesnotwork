@@ -1,0 +1,116 @@
+#!/usr/bin/env perl
+
+###################################################################
+#### NOTE env-var PERL_TEST_TEMPDIR_TINY_NOCLEANUP=1 will stop erasing tmp files
+###################################################################
+
+use strict;
+use warnings;
+
+our $VERSION = '0.01';
+
+use Test::More;
+use Test2::Plugin::UTF8;
+use Test::Script;
+use Test::Script::Run;
+use Test::TempDir::Tiny;
+use File::Spec;
+use FindBin;
+use File::Basename;
+use MIME::Base64;
+use Storable qw/dclone freeze thaw/;
+use Cookies::Roundtrip qw/:all/;
+use Data::Roundtrip qw/perl2dump jsonfile2perl no-unicode-escape-permanently/;
+
+#use lib ($FindBin::Bin, 'blib/lib');
+
+my $VERBOSITY = 4; # we need verbosity of 10 (max), so this is not used
+
+my $curdir = $FindBin::Bin;
+
+# if for debug you change this make sure that it has path in it e.g. ./xyz
+my $tmpdir = tempdir(); # will be erased unless a BAIL_OUT or env var set
+ok(-d $tmpdir, "tmpdir exists $tmpdir") or BAIL_OUT;
+
+my $skip_discard = 0;
+
+my $cookiesdir = File::Spec->catdir($curdir, 't-data', 'ibm');
+ok(-d $cookiesdir, "cookies dir '$cookiesdir' exists.") or BAIL_OUT;
+my $outbasename = File::Spec->catfile($cookiesdir, 'ibm');
+
+my %cookies_obj;
+
+# read the JSON
+my $cookiesjsonfilename = $outbasename . '.cookies-plus.json';
+my $perlobj = jsonfile2perl($cookiesjsonfilename);
+ok(defined $perlobj, "Read JSON file ($cookiesjsonfilename) as produced by the cookier") or BAIL_OUT();
+for my $k ('HTTP::Cookies-object', 'HTTP::Cookies-string',
+	   'Firefox::Marionette::Cookie-array-object',
+	   'Firefox::Marionette::Cookie-array-string',
+	   'SetCookies-array',
+	   'useragent-string'
+){
+	ok(exists $perlobj->{$k}, "Cookier output file '$cookiesjsonfilename' contains key '$k'.") or BAIL_OUT;
+	ok(defined $perlobj->{$k}, "Cookier output file '$cookiesjsonfilename' contains key '$k' and it has a defined value.") or BAIL_OUT;
+}
+
+# Check the objects (they are encoded in base64)
+my $rr = 'HTTP::Cookies';
+my $objb64 = MIME::Base64::decode_base64($perlobj->{$rr.'-object'});
+ok(defined $objb64, "'$rr-object' has been decoded from Base64.") or BAIL_OUT($perlobj->{'$rr-object'}."\nno, see above the alledged base64 string.");
+my $httpcookies_obj = eval { Storable::thaw($objb64) };
+ok(!$@, "'$rr-object' has been thaw'ed via eval successfully.") or BAIL_OUT("no: $@");
+ok(defined $httpcookies_obj, "'$rr-object' has been thaw'ed.") or BAIL_OUT;
+is(ref($httpcookies_obj), $rr, "'$rr-object' has the correct type ($rr).") or BAIL_OUT("no, it is of type '".ref($httpcookies_obj)."'.");
+$cookies_obj{'httpcookies_obj'} = $httpcookies_obj;
+
+$rr = 'SetCookies-array';
+my $setcookies_obj = $perlobj->{$rr};
+is(ref($setcookies_obj), 'ARRAY', "'$rr-object' has the correct type ($rr).") or BAIL_OUT("no, it is of type '".ref($setcookies_obj)."'.");
+for (@$setcookies_obj){
+	is(ref($_), '', "'$rr-object' is an array and its item(s) has the correct type ('Firefox::Marionette::Cookie').") or BAIL_OUT("no, it is of type '".ref($_)."'.");
+}
+$cookies_obj{'setcookies_obj'} = setcookies2httpcookies($setcookies_obj, undef, $VERBOSITY);
+
+#die as_string_cookies($cookies_obj{'setcookies_obj'});
+
+$rr = 'Firefox::Marionette::Cookie-array';
+$objb64 = MIME::Base64::decode_base64($perlobj->{$rr.'-object'});
+ok(defined $objb64, "'$rr-object' has been decoded from Base64.") or BAIL_OUT($perlobj->{'$rr-object'}."\nno, see above the alledged base64 string.");
+my $firefoxmarionettecookies_obj = eval { Storable::thaw($objb64) };
+ok(!$@, "'$rr-object' has been thaw'ed via eval successfully.") or BAIL_OUT("no: $@");
+is(ref($firefoxmarionettecookies_obj), 'ARRAY', "'$rr-object' has the correct type ($rr).") or BAIL_OUT("no, it is of type '".ref($firefoxmarionettecookies_obj)."'.");
+for (@$firefoxmarionettecookies_obj){
+	is(ref($_), 'Firefox::Marionette::Cookie', "'$rr-object' is an array and its item(s) has the correct type ('Firefox::Marionette::Cookie').") or BAIL_OUT("no, it is of type '".ref($_)."'.");
+}
+$cookies_obj{'firefoxmarionettecookies_obj'} = firefoxmarionettecookies2httpcookies($firefoxmarionettecookies_obj, undef, 0, $VERBOSITY);
+
+print "XXXXXXXXX "
+	." count setcookies_obj ".count_cookies($cookies_obj{'setcookies_obj'}, 0, 0)."\n"
+	." count firefoxmarionettecookies_obj: ".count_cookies($cookies_obj{'firefoxmarionettecookies_obj'}, 0, 0)."\n"
+	." count httpcookies_obj ".count_cookies($cookies_obj{'httpcookies_obj'}, 0, 0)."\n"
+;
+
+# compare all the cookies of the same thing we got from the return
+# they must all be equal
+my @k = sort keys %cookies_obj;
+for my $k1 (@k){
+	my $c1 = $cookies_obj{$k1};
+	my $count1 = count_cookies($c1, 0, $VERBOSITY);
+	for my $k2 (@k){
+		my $c2 = $cookies_obj{$k2};
+		next if $k1 eq $k2;
+		my $count2 = count_cookies($c2, 0, $VERBOSITY);
+		is($count1, $count2, "Cookies '$k1' have same number of items ($count1) with cookies '$k2' ($count2).") or BAIL_OUT("no, first has $count1 items and second has $count2 items.");
+#if( ! ok(cookies_are_equal($c1, $c2, 0, $VERBOSITY),"aa") ){
+#	diag "k1=$k1, k2=$k2";
+#	die 123;
+#}
+		ok(cookies_are_equal($c1, $c2, 0, $VERBOSITY), "Cookie '$k1' is equal to '$k2'.") or BAIL_OUT("--begin cookie ($k1):\n".as_string_cookies($c1)."\n--end cookie.\n--begin cookie ($k2).\n".as_string_cookies($c2)."--end cookie.\n"."no they are not for type '$k1', see above.");
+	}
+}
+
+diag "temp dir: $tmpdir ..." if exists($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}) && $ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}>0;
+
+# END
+done_testing();

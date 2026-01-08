@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::Impl::Ppoll 0.01;
+package Future::IO::Impl::Ppoll 0.02;
 
 use v5.20;
 use warnings;
@@ -11,6 +11,8 @@ use base qw( Future::IO::ImplBase );
 
 use feature qw( postderef signatures );
 no warnings qw( experimental::postderef experimental::signatures );
+
+use Carp;
 
 use IO::Ppoll qw( POLLIN POLLOUT POLLHUP );
 use POSIX qw( SIG_BLOCK sigprocmask );
@@ -39,7 +41,7 @@ C<Future::IO::Impl::Ppoll> - implement C<Future::IO> using C<ppoll(2)>
 =for highlighter language=perl
 
 This module provides an implementation for L<Future::IO> which uses the
-C<ppoll(2)> Linux system call, via L<IO::Ppoll>.
+C<ppoll(2)> system call, via L<IO::Ppoll>.
 
 There are no additional methods to use in this module; it simply has to be
 loaded, and it will provide the C<Future::IO> implementation methods:
@@ -70,13 +72,22 @@ sub ppoll () { $ppoll //= IO::Ppoll->new }
 sub _update_poll ( $fh )
 {
    my $refaddr = refaddr $fh;
+   $fh->fileno or
+      carp "Filehandle $fh lost its fileno (was closed?) during poll";
 
    my $mask = 0;
    $mask |= POLLIN  if scalar ( $read_futures_by_refaddr{$refaddr}  // [] )->@*;
    $mask |= POLLOUT if scalar ( $write_futures_by_refaddr{$refaddr} // [] )->@*;
 
    ppoll()->mask( $fh => $mask );
-   $mask ? $fh_by_refaddr{$refaddr} = $fh : delete $fh_by_refaddr{$refaddr};
+   if( $mask ) {
+      $fh_by_refaddr{$refaddr} = $fh;
+   }
+   else {
+      delete $fh_by_refaddr{$refaddr};
+      delete $read_futures_by_refaddr{$refaddr};
+      delete $write_futures_by_refaddr{$refaddr};
+   }
 }
 
 sub _tick ( $ )
@@ -141,6 +152,9 @@ sub sleep ( $class, $secs )
 
 sub ready_for_read ( $, $fh )
 {
+   defined $fh or
+      croak "Expected a defined filehandle for ->ready_for_read";
+
    my $refaddr = refaddr $fh;
 
    my $futures = $read_futures_by_refaddr{$refaddr} //= [];
@@ -158,6 +172,9 @@ sub ready_for_read ( $, $fh )
 
 sub ready_for_write ( $, $fh )
 {
+   defined $fh or
+      croak "Expected a defined filehandle for ->ready_for_write";
+
    my $refaddr = refaddr $fh;
 
    my $futures = $write_futures_by_refaddr{$refaddr} //= [];

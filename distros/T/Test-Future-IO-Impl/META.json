@@ -33,7 +33,7 @@
    "provides" : {
       "Test::Future::IO::Impl" : {
          "file" : "lib/Test/Future/IO/Impl.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -42,6 +42,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -30,7 +30,11 @@
          "xt",
          "share",
          "eg",
-         "infix"
+         "infix",
+         "lib/Affix/Platform"
+      ],
+      "package" : [
+         "Affix::Type"
       ]
    },
    "optional_features" : {
@@ -102,42 +106,15 @@
    "provides" : {
       "Affix" : {
          "file" : "lib/Affix.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       },
-      "Affix::Compiler" : {
-         "file" : "lib/Affix.pm",
-         "version" : "v0.12.0"
+      "Affix::Build" : {
+         "file" : "lib/Affix/Build.pm",
+         "version" : "v1.0.3"
       },
-      "Affix::Compiler::File" : {
-         "file" : "lib/Affix.pm"
-      },
-      "Affix::Platform::BSD" : {
-         "file" : "lib/Affix/Platform/BSD.pm",
-         "version" : "v0.12.0"
-      },
-      "Affix::Platform::MacOS" : {
-         "file" : "lib/Affix/Platform/MacOS.pm",
-         "version" : "v0.12.0"
-      },
-      "Affix::Platform::Solaris" : {
-         "file" : "lib/Affix/Platform/Solaris.pm",
-         "version" : "v0.12.0"
-      },
-      "Affix::Platform::Unix" : {
-         "file" : "lib/Affix/Platform/Unix.pm",
-         "version" : "v0.12.0"
-      },
-      "Affix::Platform::Windows" : {
-         "file" : "lib/Affix/Platform/Windows.pm",
-         "version" : "v0.12.0"
-      },
-      "Affix::Type" : {
-         "file" : "lib/Affix.pm",
-         "version" : "v0.12.0"
-      },
-      "Test2::Tools::Affix" : {
-         "file" : "lib/Test2/Tools/Affix.pm",
-         "version" : "v0.12.0"
+      "Affix::Wrap" : {
+         "file" : "lib/Affix/Wrap.pm",
+         "version" : "v1.0.3"
       }
    },
    "release_status" : "stable",
@@ -155,7 +132,7 @@
          "web" : "https://github.com/sanko/Affix.pm"
       }
    },
-   "version" : "v1.0.2",
+   "version" : "v1.0.3",
    "x_help_wanted" : [
       "Tester",
       "Documenter"
@@ -190,7 +167,8 @@
       "infix/CHANGELOG.md",
       "infix/CODE_OF_CONDUCT.md",
       "infix/CONTRIBUTING.md",
-      "infix/build.pl"
+      "infix/build.pl",
+      ".github/**"
    ],
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0,

@@ -5,7 +5,7 @@ use warnings;
 
 use Module::Pluggable require => 1;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 1;
 
@@ -77,7 +77,7 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2025 Michal Josef Špaček
+© 2025-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
@@ -90,6 +90,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

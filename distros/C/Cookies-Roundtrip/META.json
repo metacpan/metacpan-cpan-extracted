@@ -1,0 +1,77 @@
+{
+   "abstract" : "Convert between different HTTP Cookie formats, well, at least we tried!",
+   "author" : [
+      "Andreas Hadjiprocopis <bliako@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Cookies-Roundtrip",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Compare" : "0",
+            "Data::Roundtrip" : "0.30",
+            "DateTime" : "0",
+            "Devel::StackTrace" : "0",
+            "Exporter" : "0",
+            "Firefox::Marionette::Cookie" : "0",
+            "HTTP::CookieJar" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Headers::Util" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
+            "autovivification" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Roundtrip" : "0.30",
+            "DateTime" : "0",
+            "FindBin" : "0",
+            "Firefox::Marionette" : "0",
+            "Firefox::Marionette::Cookie" : "0",
+            "HTTP::CookieJar" : "0",
+            "HTTP::CookieJar::LWP" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
+            "LWP::UserAgent" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::More::UTF8" : "0",
+            "Test::TempDir::Tiny" : "0",
+            "URI" : "0",
+            "WWW::Mechanize" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

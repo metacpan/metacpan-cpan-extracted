@@ -35,6 +35,8 @@ typedef struct {
     infix_registry_t * registry;
     /// // Smart enums
     HV * enum_registry;
+    // Cache for coercion strings to avoid re-fetching from SV objects
+    HV * coercion_cache;
 } my_cxt_t;
 START_MY_CXT;
 // Helper macro to fetch a value from a hash if it exists, otherwise return a default.
@@ -48,7 +50,6 @@ START_MY_CXT;
 #define storeTHX(var) dNOOP
 #define dTHXfield(var)
 #endif
-
 
 // Forward-declare the primary structures.
 typedef struct Affix Affix;
@@ -175,10 +176,14 @@ struct Affix {
     Affix_Opcode ret_opcode;      ///< Optimized return opcode.
     void ** c_args;
 
-    /* Reconstruction info for threading/cloning */
+    // Reconstruction info for threading/cloning
     char * sig_str;
     char * sym_name;
     void * target_addr;
+
+    // Variadic demo
+    HV * variadic_cache;
+    size_t num_fixed_args;
 };
 /// Represents an Affix::Pin object, a blessed Perl scalar that wraps a raw C pointer.
 typedef struct {
@@ -223,6 +228,7 @@ extern void Affix_trigger_backend(pTHX_ CV *);
 // Main execution trigger
 extern void Affix_trigger_stack(pTHX_ CV *);
 extern void Affix_trigger_arena(pTHX_ CV *);
+extern void Affix_trigger_variadic(pTHX_ CV *);
 
 // Marshalling (Perl -> C)
 void sv2ptr(pTHX_ Affix * affix, SV * perl_sv, void * c_ptr, const infix_type * type);

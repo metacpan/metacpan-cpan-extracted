@@ -6,8 +6,7 @@ package Affix::Platform::MacOS v0.12.0 {
     our @EXPORT_OK   = qw[find_library];
     our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-    sub find_library ($) {
-        my ($name) = @_;
+    sub find_library ($name) {
         return $name if -f $name;
         for my $file ( "lib$name.dylib", "$name.dylib", "$name.framework/$name" ) {
             my $path = DynaLoader::dl_findfile($file);

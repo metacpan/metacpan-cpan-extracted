@@ -10,7 +10,7 @@ use IPC::Open3 qw(open3);
 use Symbol qw(gensym);
 use IO::Select;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 # $VERSION = eval $VERSION;
 
 sub _fetch_page {
@@ -20,12 +20,14 @@ sub _fetch_page {
         || $self->{'chrome_path'}
         || $self->{'chromium'}
         || 'chromium';
-    my $timeout = $self->{'chromium_timeout'} // 30;
+    my $timeout = $self->{'chromium_timeout'} // 120;
     my $virtual_time_budget = $self->{'chromium_time_budget'} // 10000;
+    my $proxy = $self->{'proxy'} // 'direct://';
 
     my @command = (
         $chromium_path,
         '--headless',
+        qq{--proxy-server=$proxy},
         '--no-sandbox',
         '--disable-gpu',
         '--disable-dev-shm-usage',
@@ -150,7 +152,7 @@ WWW::Crawl::Chromium - Crawl JavaScript-rendered pages with Chromium
 
 =head1 VERSION
 
-This documentation refers to WWW::Crawl::Chromium version 0.2.
+This documentation refers to WWW::Crawl::Chromium version 0.4.
 
 =head1 SYNOPSIS
 
@@ -197,6 +199,10 @@ C<chromium_timeout>: Timeout in seconds for a single page fetch. Defaults to
 
 C<chromium_time_budget>: Virtual time budget in milliseconds for Chromium to
 allow JavaScript to settle. Defaults to 10000.
+
+=item *
+
+C<proxy>: Proxy server to use (e.g. C<direct://> or C<http://proxy.example.com:8080>). Defaults to C<direct://>.
 
 =back
 

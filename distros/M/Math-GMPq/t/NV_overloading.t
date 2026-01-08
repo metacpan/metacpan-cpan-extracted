@@ -757,16 +757,16 @@ else {
   print "not ok 103\n";
 }
 
-if((Math::GMPq->new(10) <=> "61.2") < 0) { print "ok 104\n" }
+if((Math::GMPq->new(10) <=> "61.2") == -1) { print "ok 104\n" }
 else {  print "not ok 104\n" }
 
-if((Math::GMPq->new(10) <=> $inf) < 0){print "ok 105\n"}
+if((Math::GMPq->new(10) <=> $inf) == -1) { print "ok 105\n" }
 else {
   warn "\n 10 !< inf\n";
   print "not ok 105\n";
 }
 
-if((Math::GMPq->new(10) <=> $inf * -1) > 0){print "ok 106\n"}
+if((Math::GMPq->new(10) <=> $inf * -1) == 1) { print "ok 106\n"}
 else {
   warn "\n 10 !> inf\n";
   print "not ok 106\n";
@@ -1088,17 +1088,17 @@ else { print "ok 136\n" }
 ######## big- != big #######
 
 if($big_minus != $big) {
-  if((Math::GMPq->new($big_minus) <=> Math::GMPq->new($big)) < 0
+  if((Math::GMPq->new($big_minus) <=> Math::GMPq->new($big)) == -1
       &&
-     (Math::GMPq->new($big) <=> Math::GMPq->new($big_minus)) > 0
+     (Math::GMPq->new($big) <=> Math::GMPq->new($big_minus)) == 1
       &&
-     (Math::GMPq->new($big_minus) <=> $big) < 0
+     (Math::GMPq->new($big_minus) <=> $big) == -1
       &&
-     (Math::GMPq->new($big) <=> $big_minus) > 0
+     (Math::GMPq->new($big) <=> $big_minus) == 1
       &&
-     ($big_minus <=> Math::GMPq->new($big)) < 0
+     ($big_minus <=> Math::GMPq->new($big)) == -1
       &&
-     ($big <=> Math::GMPq->new($big_minus)) > 0) { print "ok 137\n" }
+     ($big <=> Math::GMPq->new($big_minus)) == 1) { print "ok 137\n" }
   else {
     warn "Math::GMPq overloading of '<=>' is mistaken\n";
     print "not ok 137\n";

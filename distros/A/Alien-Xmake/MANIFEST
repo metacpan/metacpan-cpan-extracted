@@ -1,0 +1,14 @@
+Build.PL
+Changes.md
+LICENSE
+MANIFEST
+META.json
+README.md
+builder/Alien/Xmake/Builder.pm
+cpanfile
+eg/xmake_demo.pl
+eg/xrepo_demo.pl
+lib/Alien/Xmake.pm
+t/00_compile.t
+t/01_build_cpp.t
+t/02_xrepo.t

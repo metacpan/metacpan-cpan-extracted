@@ -6,10 +6,10 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(err_get);
-use MARC::Leader;
+use MARC::Leader 0.08;
 use MARC::Field008;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub name {
 	my $self = shift;
@@ -87,6 +87,17 @@ sub process {
 						},
 					}];
 				}
+			}
+		}
+
+		if ($field_008->type_of_date eq 'c') {
+			if ($field_008->date2 ne '9999') {
+				$struct_hr->{'not_valid'}->{$error_id} = [{
+					'error' => 'Field 008 date 2 need to be 9999, it\'s currently published.',
+					'params' => {
+						'Value', $field_008_string,
+					},
+				}];
 			}
 		}
 	}

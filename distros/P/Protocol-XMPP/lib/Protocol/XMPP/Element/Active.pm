@@ -1,16 +1,14 @@
 package Protocol::XMPP::Element::Active;
-$Protocol::XMPP::Element::Active::VERSION = '0.006';
+
 use strict;
 use warnings;
 use parent qw(Protocol::XMPP::ElementBase);
 
+our $VERSION = '0.007'; ## VERSION
+
 =head1 NAME
 
 Protocol::XMPP::Feature - register ability to deal with a specific feature
-
-=head1 VERSION
-
-Version 0.006
 
 =head1 SYNOPSIS
 
@@ -25,8 +23,8 @@ Version 0.006
 =cut
 
 sub end_element {
-	my $self = shift;
-	$self->debug("Active element, TODO");
+  my $self = shift;
+  $self->debug("Active element, TODO");
 }
 
 1;
@@ -35,8 +33,9 @@ __END__
 
 =head1 AUTHOR
 
-Tom Molesworth <cpan@entitymodel.com>
+Tom Molesworth <tom@perlsite.co.uk>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2010-2014. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2010-2026. Licensed under the same terms as Perl itself.
+

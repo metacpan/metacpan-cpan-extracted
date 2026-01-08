@@ -159,6 +159,16 @@ DESCRIPTION
           my $obj = __PACKAGE__->new( moniker => 'Bob' );
           say $obj->{name};  # ==> "Bob"
 
+    *   Supports `alias`.
+
+          use Class::XSConstructor 'name' => { alias => [ 'moniker' ] };
+  
+          my $obj = __PACKAGE__->new( name => 'Bob' );
+          say $obj->{name};  # ==> "Bob"
+  
+          my $obj2 = __PACKAGE__->new( moniker => 'Bob' );
+          say $obj2->{name};  # ==> "Bob"
+
     *   Supports `trigger`, which may be a method name or a coderef. Triggers
         are only fired when the attribute is passed to the constructor
         explicitly. Defaults and builders do not trigger the trigger.
@@ -322,7 +332,7 @@ CAVEATS
     consider looking at ways to eliminate them.
 
 SEE ALSO
-    Class::Tiny, Class::XSAccessor, Class::XSDestructor.
+    Class::Tiny, Class::XSAccessor, Class::XSDestructor, Class::XSDelegation.
 
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.
@@ -331,7 +341,7 @@ THANKS
     To everybody in *#xs* on irc.perl.org.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2018-2019, 2025 by Toby Inkster.
+    This software is copyright (c) 2018-2019, 2025-2026 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,75 @@
+=pod
+
+=head1 NAME
+
+Version::Semantic - Tiny SemVer based class implementation
+
+=head1 SYNOPSIS
+
+  use Version::Semantic ();
+
+  my $v_unstable = Version::Semantic->parse( '1.0.0-alpha' );
+  my $v_testing  = Version::Semantic->parse( '1.0.0-beta' );
+  my $v_stable   = Version::Semantic->parse( 'v1.0.0' );
+
+  if ( $v_unstable < $v_testing and $v_testing < $v_stable ) {
+    ...
+  }
+
+=head1 DESCRIPTION
+
+This class defines immutable version objects that support the L<Semantic
+Versioning Specification (SemVer)|https://semver.org/spec/v2.0.0.html>.
+
+The class has a C<parse( $version )> factory method (a class method)
+to create objects from their semantic version strings. The method accepts
+semantic version strings that have a C<v> prefix (L<Is "v1.2.3" a semantic
+version?|https://semver.org/spec/v2.0.0.html#is-v123-a-semantic-version>).
+
+Each object has the mandatory attributes C<major>, C<minor>,
+and C<patch>.  Optional object attributes are C<pre_release> and
+C<build>. C<has_pre_release()> and C<has_build_()> predicate methods exist too.
+
+The C<version_core()> object method returns the semantic version string of an
+object with the C<v> prefix (if originally set) but without the pre-release
+and the build extensions.
+
+The C<to_string()> object method returns the semantic version string of an
+object including the C<v> prefix (if originally set). The method is used to
+overload the stringification C<""> operator.
+
+The C<compare_to()> object method implements the L<SemVer precedence
+rules|https://semver.org/spec/v2.0.0.html#spec-item-11>. This method is used
+to overload the numeric comparison C<E<lt>=E<gt>> operator. This allows you
+to compare version objects.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+L<SemVer::V2::Strict>
+
+=item *
+
+L<SemVer>
+
+=item *
+
+L<Version::Dotted::Semantic>
+
+=back
+
+=head1 AUTHOR
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.
+
+=cut

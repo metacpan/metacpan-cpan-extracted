@@ -24,7 +24,7 @@ requires 'DateTime' => 0;
 requires 'English' => 0;
 requires 'Error::Pure' => 0;
 requires 'MARC::Field008' => 0;
-requires 'MARC::Leader' => 0.04;
+requires 'MARC::Leader' => 0.08;
 requires 'Mo::utils' => 0.06;
 requires 'Mo::utils::Hash' => 0;
 requires 'Module::Pluggable' => 0;
@@ -38,7 +38,7 @@ test_requires 'MARC::File::XML' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.08';
+version '0.09';
 
 # Run.
 WriteAll();

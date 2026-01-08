@@ -37,8 +37,8 @@ cmp_ok(-4, '<', $two, "IV < Math::GMPq object");
 cmp_ok($two, '<=', 6,  "Math::GMPq object <= IV");
 cmp_ok(-4, '<=', $two, "IV <= Math::GMPq object");
 
-cmp_ok($two <=> 6, '<', 0, "Math::GMPq object <=> IV");
-cmp_ok(6 <=> $two, '>', 0, "IV <=> Math::GMPq object");
+cmp_ok($two <=> 6, '==', -1, "Math::GMPq object <=> IV");
+cmp_ok(6 <=> $two, '==', 1, "IV <=> Math::GMPq object");
 
 
 # These next 2 subs will cause failures here on perl-5.20.0
