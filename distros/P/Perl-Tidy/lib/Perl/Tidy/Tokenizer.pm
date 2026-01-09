@@ -33,14 +33,16 @@ use strict;
 use warnings;
 use English qw( -no_match_vars );
 
-our $VERSION = '20250912';
+our $VERSION = '20260109';
 
 use Carp;
 
-use constant DEVEL_MODE   => 0;
-use constant EMPTY_STRING => q{};
-use constant SPACE        => q{ };
-use constant BACKSLASH    => q{\\};
+use constant DEVEL_MODE       => 0;
+use constant DEBUG_GUESS_MODE => 0;
+use constant EMPTY_STRING     => q{};
+use constant SPACE            => q{ };
+use constant COMMA            => q{,};
+use constant BACKSLASH        => q{\\};
 
 { #<<< A non-indenting brace to contain all lexical variables
 
@@ -136,7 +138,11 @@ my (
     %is_trigraph,
     %is_valid_token_type,
     %other_line_endings,
-    %really_want_term,
+    %is_binary_operator_type,
+    %is_binary_keyword,
+    %is_binary_or_unary_operator_type,
+    %is_binary_or_unary_keyword,
+    %is_not_a_TERM_producer_type,
     @closing_brace_names,
     @opening_brace_names,
 
@@ -149,6 +155,7 @@ my (
     %is_code_block_token,
     %is_zero_continuation_block_type,
     %is_keyword,
+    %is_TERM_keyword,
     %is_my_our_state,
     %is_package,
     %matching_end_token,
@@ -214,7 +221,7 @@ BEGIN {
         _in_end_                             => $i++,
         _in_format_                          => $i++,
         _in_error_                           => $i++,
-        _in_trouble_                         => $i++,
+        _do_not_format_                      => $i++,
         _warning_count_                      => $i++,
         _html_tag_count_                     => $i++,
         _in_pod_                             => $i++,
@@ -304,6 +311,12 @@ sub Die {
     my ($msg) = @_;
     Perl::Tidy::Die($msg);
     croak "unexpected return from Perl::Tidy::Die";
+}
+
+sub Warn {
+    my ($msg) = @_;
+    Perl::Tidy::Warn($msg);
+    return;
 }
 
 sub Fault {
@@ -416,15 +429,26 @@ sub check_options {
     #------------------------------------------------
 
     my $use_feature_class = 1;
-    if ( $rOpts->{'use-feature'} ) {
-        if ( $rOpts->{'use-feature'} =~ /\bnoclass\b/ ) {
+
+    my $str = $rOpts->{'use-feature'};
+    if ( defined($str) && length($str) ) {
+        $str =~ s/^\s+//;
+        $str =~ s/\s+$//;
+        if ( !length($str) ) {
+            ## all spaces
+        }
+        elsif ( $str =~ /\bnoclass\b/ ) {
             $use_feature_class = 0;
         }
-        elsif ( $rOpts->{'use-feature'} =~ /\bclass\b/ ) {
+        elsif ( $str =~ /\bclass\b/ ) {
             $guess_if_method = 0;
         }
         else {
-            ## neither 'class' nor 'noclass' seen so use default
+            # At present, only 'class' and 'noclass' are valid strings
+            # This is just a Warn, for testing, but will eventually be Die
+            Warn(
+"Unexpected text in --use-feature: expecting 'class' or 'noclass'\n"
+            );
         }
     }
 
@@ -476,7 +500,7 @@ sub check_options {
         # Note that 'grep-alias-list' has been preprocessed to be a trimmed,
         # space-separated list
         my @q = split /\s+/, $rOpts->{'grep-alias-list'};
-        @is_grep_alias{@q} = (1) x scalar(@q);
+        $is_grep_alias{$_} = 1 for @q;
     }
 
     $rOpts_starting_indentation_level = $rOpts->{'starting-indentation-level'};
@@ -578,7 +602,7 @@ EOM
     # _in_code_skipping_     flag set if we are in a code skipping section
     # _in_format_skipping_   flag set if we are in a format skipping section
     # _in_error_             flag set if we saw severe error (binary in script)
-    # _in_trouble_           set if we saw a troublesome lexical like 'my sub s'
+    # _do_not_format_        flag set if formatting should be skipped
     # _warning_count_        number of calls to logger sub warning
     # _html_tag_count_       number of apparent html tags seen (indicates html)
     # _in_data_              flag set if we are in __DATA__ section
@@ -601,7 +625,7 @@ EOM
     $self->[_in_end_]               = 0;
     $self->[_in_format_]            = 0;
     $self->[_in_error_]             = 0;
-    $self->[_in_trouble_]           = 0;
+    $self->[_do_not_format_]        = 0;
     $self->[_warning_count_]        = 0;
     $self->[_html_tag_count_]       = 0;
     $self->[_in_pod_]               = 0;
@@ -802,6 +826,15 @@ sub warning {
     return;
 } ## end sub warning
 
+sub warning_do_not_format {
+    my ( $self, $msg ) = @_;
+
+    # Issue a warning message and set a flag to skip formatting this file.
+    $self->warning($msg);
+    $self->[_do_not_format_] = 1;
+    return;
+} ## end sub warning_do_not_format
+
 sub get_input_stream_name {
 
     my $self = shift;
@@ -924,11 +957,11 @@ sub report_tokenization_errors {
     # set severe error flag if tokenizer has encountered file reading problems
     # (i.e. unexpected binary characters)
     # or code which may not be formatted correctly (such as 'my sub q')
-    # The difference between _in_error_ and _in_trouble_ is that
+    # The difference between _in_error_ and _do_not_format_ is that
     # _in_error_ stops the tokenizer immediately whereas
-    # _in_trouble_ lets the tokenizer finish so that all errors are seen
+    # _do_not_format_ lets the tokenizer finish so that all errors are seen
     # Both block formatting and cause the input stream to be output verbatim.
-    my $severe_error = $self->[_in_error_] || $self->[_in_trouble_];
+    my $severe_error = $self->[_in_error_] || $self->[_do_not_format_];
 
     # And do not format if it looks like an html file (c209)
     $severe_error ||= $self->[_html_tag_count_] && $self->[_warning_count_];
@@ -1296,6 +1329,23 @@ sub get_line {
         $trimmed_input_line = $self->[_rtrimmed_input_lines_]->[$line_index];
         $input_line         = $rinput_lines->[ $line_index++ ];
         $self->[_input_line_index_next_] = $line_index;
+    }
+
+    # End of file .. check if file ends in a binary operator (c565)
+    else {
+        if (
+            $is_binary_or_unary_operator_type{$last_nonblank_type}
+            || (   $last_nonblank_type eq 'k'
+                && $is_binary_or_unary_keyword{$last_nonblank_token} )
+          )
+        {
+            $self->warning(
+                "Unexpected EOF at operator '$last_nonblank_token'\n");
+
+            # avoid repeating this message
+            $last_nonblank_token = ';';
+            $last_nonblank_type  = ';';
+        }
     }
 
     $self->[_line_of_text_] = $input_line;
@@ -2395,43 +2445,31 @@ EOM
 
     my @q;
 
-    my %is_logical_container;
-    @q = qw( if elsif unless while and or err not && ! || for foreach );
-    @is_logical_container{@q} = (1) x scalar(@q);
-
-    my %is_binary_type;
-    @q = qw( || && );
-    @is_binary_type{@q} = (1) x scalar(@q);
-
-    my %is_binary_keyword;
-    @q = qw( and or err eq ne cmp );
-    @is_binary_keyword{@q} = (1) x scalar(@q);
-
     # 'L' is token for opening { at hash key
     my %is_opening_type;
     @q = qw< L { ( [ >;
-    @is_opening_type{@q} = (1) x scalar(@q);
+    $is_opening_type{$_} = 1 for @q;
 
     my %is_opening_or_ternary_type;
     push @q, '?';
-    @is_opening_or_ternary_type{@q} = (1) x scalar(@q);
+    $is_opening_or_ternary_type{$_} = 1 for @q;
 
     # 'R' is token for closing } at hash key
     my %is_closing_type;
     @q = qw< R } ) ] >;
-    @is_closing_type{@q} = (1) x scalar(@q);
+    $is_closing_type{$_} = 1 for @q;
 
     my %is_closing_or_ternary_type;
     push @q, ':';
-    @is_closing_or_ternary_type{@q} = (1) x scalar(@q);
+    $is_closing_or_ternary_type{$_} = 1 for @q;
 
     my %is_redo_last_next_goto;
     @q = qw( redo last next goto );
-    @is_redo_last_next_goto{@q} = (1) x scalar(@q);
+    $is_redo_last_next_goto{$_} = 1 for @q;
 
     my %is_use_require;
     @q = qw( use require );
-    @is_use_require{@q} = (1) x scalar(@q);
+    $is_use_require{$_} = 1 for @q;
 
     # This hash holds the array index in $self for these keywords:
     # Fix for issue c035: removed 'format' from this hash
@@ -2439,11 +2477,6 @@ EOM
         '__END__'  => _in_end_,
         '__DATA__' => _in_data_,
     );
-
-    my %is_list_end_type;
-    @q = qw( ; { } );
-    push @q, ',';
-    @is_list_end_type{@q} = (1) x scalar(@q);
 
     # table showing how many quoted things to look for after quote operator..
     # s, y, tr have 2 (pattern and replacement)
@@ -2462,7 +2495,7 @@ EOM
 
     my %is_for_foreach;
     @q = qw( for foreach );
-    @is_for_foreach{@q} = (1) x scalar(@q);
+    $is_for_foreach{$_} = 1 for @q;
 
     # These keywords may introduce blocks after parenthesized expressions,
     # in the form:
@@ -2471,11 +2504,11 @@ EOM
     my %is_blocktype_with_paren;
     @q =
       qw(if elsif unless while until for foreach switch case given when catch);
-    @is_blocktype_with_paren{@q} = (1) x scalar(@q);
+    $is_blocktype_with_paren{$_} = 1 for @q;
 
     my %is_case_default;
     @q = qw( case default );
-    @is_case_default{@q} = (1) x scalar(@q);
+    $is_case_default{$_} = 1 for @q;
 
     #------------------------
     # end of tokenizer hashes
@@ -2525,7 +2558,7 @@ EOM
             push @{$rht},
               [
                 $tokenizer->[_here_doc_target_],
-                $tokenizer->[_here_quote_character_]
+                $tokenizer->[_here_quote_character_],
               ];
             if ( $tokenizer->[_rhere_target_list_] ) {
                 push @{$rht}, @{ $tokenizer->[_rhere_target_list_] };
@@ -2548,6 +2581,10 @@ EOM
 
     sub scan_bare_identifier {
         my $self = shift;
+
+        # Scan a token starting with an alphanumeric variable or package
+        # separator, :: or '.
+
         ( $i, $tok, $type, $prototype ) = $self->scan_bare_identifier_do(
 
             $input_line,
@@ -2556,12 +2593,15 @@ EOM
             $type,
             $prototype,
             $rtoken_map,
-            $max_token_index
+            $max_token_index,
         );
         return;
     } ## end sub scan_bare_identifier
 
     sub scan_identifier {
+
+        # Scan for an identifier following a sigil or -> or other
+        # identifier prefix, such as '::'
 
         my $self = shift;
 
@@ -2572,7 +2612,7 @@ EOM
             $type,
             $id_scan_state,
             $identifier,
-            my $split_pretoken_flag
+            my $split_pretoken_flag,
 
         ) = $self->scan_complex_identifier(
 
@@ -2582,7 +2622,7 @@ EOM
             $rtokens,
             $max_token_index,
             $expecting,
-            $rparen_type->[$paren_depth]
+            $rparen_type->[$paren_depth],
         );
 
         # Check for signal to fix a special variable adjacent to a keyword,
@@ -2772,7 +2812,7 @@ EOM
 
     sub method_ok_here {
 
-        my $self = shift;
+        my ( $self, $next_nonblank_token ) = @_;
 
         # Return:
         #   false if this is definitely an invalid method declaration
@@ -2785,6 +2825,23 @@ EOM
         #  method paint => sub {
         #    return;
         #  };
+
+        # Assume non-method if an error would occur
+        return if ( $expecting == OPERATOR );
+
+        # Currently marking a line-ending 'method' as a bareword (fix c532)
+        return if ( $i_tok >= $max_token_index );
+
+        # If a '$' follows 'method'...
+        # Check for possible Object::Pad lexical method like
+        #  'method $var {'
+        # TODO: maybe merge this with the code below by increasing pos by 1
+        if ( $next_nonblank_token eq '$' && new_statement_ok() ) {
+            return 1;
+        }
+
+        # Otherwise, not a method if non-word follows ..
+        if ( $next_nonblank_token !~ /^[\w\:]/ ) { return }
 
         # from do_scan_sub:
         my $i_beg   = $i + 1;
@@ -2922,6 +2979,9 @@ EOM
 
     sub scan_id {
         my $self = shift;
+
+        # Scan for a sub or package name
+
         ( $i, $tok, $type, $id_scan_state ) = $self->scan_id_do(
 
             $input_line,
@@ -2929,7 +2989,7 @@ EOM
             $rtokens,
             $rtoken_map,
             $id_scan_state,
-            $max_token_index
+            $max_token_index,
         );
         return;
     } ## end sub scan_id
@@ -3035,24 +3095,50 @@ EOM
         return $number;
     } ## end sub scan_number_fast
 
-    # a sub to warn if token found where term expected
     sub error_if_expecting_TERM {
-        my $self = shift;
-        if ( $expecting == TERM ) {
-            if ( $really_want_term{$last_nonblank_type} ) {
-                $self->report_unexpected(
-                    {
-                        found           => $tok,
-                        expecting       => "term",
-                        i_tok           => $i_tok,
-                        last_nonblank_i => $last_nonblank_i,
-                        rpretoken_map   => $rtoken_map,
-                        rpretoken_type  => $rtoken_type,
-                        input_line      => $input_line,
-                    }
-                );
-                return 1;
-            }
+        my ($self) = @_;
+
+        # Issue a warning if a binary operator is missing a term to operate on
+
+        # This should only be called if a term is expected here
+        if ( $expecting != TERM ) { return }
+
+        # Be sure a TERM is definitely required ..
+        if (
+
+            # .. following a binary operator token type, like '='
+            $is_binary_or_unary_operator_type{$last_nonblank_type}
+
+            # .. or following a binary keyword operator, like 'and'
+            || (   $last_nonblank_type eq 'k'
+                && $is_binary_or_unary_keyword{$last_nonblank_token} )
+
+            # .. or for a binary operator following something like a ';'
+            || (   $is_not_a_TERM_producer_type{$last_nonblank_type}
+                && $is_binary_operator_type{$tok} )
+          )
+        {
+
+            # We must exclude error checking in sub signatures which have some
+            # unusual syntax.  For example the following syntax is okay within
+            # a signature:
+            #   sub mysub ($=,) {...}
+            #   $ = undef
+            my $ct = $rparen_type->[$paren_depth];
+            if ( $ct && $ct =~ /^sub\b/ ) { return }
+
+            $self->report_unexpected(
+                {
+                    found           => $tok,
+                    expecting       => "term",
+                    i_tok           => $i_tok,
+                    last_nonblank_i => $last_nonblank_i,
+                    rpretoken_map   => $rtoken_map,
+                    rpretoken_type  => $rtoken_type,
+                    input_line      => $input_line,
+                }
+            );
+            return 1;
         }
         return;
     } ## end sub error_if_expecting_TERM
@@ -3097,26 +3183,6 @@ EOM
     #------------------
     # Tokenization subs
     #------------------
-    sub do_GREATER_THAN_SIGN {
-
-        my $self = shift;
-
-        # '>'
-        $self->error_if_expecting_TERM()
-          if ( $expecting == TERM );
-        return;
-    } ## end sub do_GREATER_THAN_SIGN
-
-    sub do_VERTICAL_LINE {
-
-        my $self = shift;
-
-        # '|'
-        $self->error_if_expecting_TERM()
-          if ( $expecting == TERM );
-        return;
-    } ## end sub do_VERTICAL_LINE
-
     # An identifier in possible indirect object location followed by any of
     # these tokens: -> , ; } (plus others) is not an indirect object. Fix c257.
     my %Z_test_hash;
@@ -3127,8 +3193,8 @@ EOM
           => =~ = == !~ || >= != *= .. && |= .= -= += <= %=
           ^= &&= ||= //= <=>
           #;
-        push @qZ, ',';
-        @Z_test_hash{@qZ} = (1) x scalar(@qZ);
+        push @qZ, COMMA;
+        $Z_test_hash{$_} = 1 for @qZ;
     }
 
     sub do_DOLLAR_SIGN {
@@ -3364,7 +3430,7 @@ EOM
         my $self = shift;
 
         # ','
-        if ( $last_nonblank_type eq ',' ) {
+        if ( $last_nonblank_type eq COMMA ) {
             $self->complain("Repeated ','s \n");
         }
 
@@ -3374,7 +3440,7 @@ EOM
             $self->warning("Unexpected leading ',' after a '('\n");
         }
         else {
-            # no complaints about the comma
+            ## Error check added in update c565, moved to end of $code loop.
         }
 
         # patch for operator_expected: note if we are in the list (use.t)
@@ -3408,6 +3474,9 @@ EOM
                 $type = 'f';
                 $rparen_semicolon_count->[$paren_depth]++;
             }
+        }
+        else {
+            ## Error check added in update c565, moved to end of $code loop.
         }
         return;
     } ## end sub do_SEMICOLON
@@ -3475,12 +3544,23 @@ EOM
             $is_pattern = 0;
         }
         elsif ( $expecting == UNKNOWN ) {    # indeterminate, must guess..
-            my $msg;
-            ( $is_pattern, $msg ) =
-              $self->guess_if_pattern_or_division( $i, $rtokens, $rtoken_type,
-                $rtoken_map, $max_token_index );
+            (
+                $is_pattern,
+                my $msg,
+
+            ) = $self->guess_if_pattern_or_division(
+
+                $i,
+                $rtokens,
+                $rtoken_type,
+                $rtoken_map,
+                $max_token_index,
+            );
 
             if ($msg) {
+                if ( 0 && DEBUG_GUESS_MODE ) {
+                    $self->warning("DEBUG_GUESS_MODE message:\n$msg\n");
+                }
                 $self->write_diagnostics("DIVIDE:$msg\n");
                 $self->write_logfile_entry($msg);
             }
@@ -3786,9 +3866,22 @@ EOM
 
         # '<' - angle operator or less than?
         if ( $expecting != OPERATOR ) {
-            ( $i, $type ) =
-              $self->find_angle_operator_termination( $input_line, $i,
-                $rtoken_map, $expecting, $max_token_index );
+            ( $i, $type ) = $self->find_angle_operator_termination(
+
+                $input_line,
+                $i,
+                $rtoken_map,
+                $expecting,
+                $max_token_index,
+            );
+            if ( DEBUG_GUESS_MODE && $expecting == UNKNOWN ) {
+                my $msg = "guessing that '<' is ";
+                $msg .=
+                  $type eq 'Q' ? "an angle operator" : "a less than symbol";
+                if ( $type eq 'Q' ) {
+                    $self->warning("DEBUG_GUESS_MODE message:\n$msg\n");
+                }
+            }
         }
         else {
         }
@@ -3831,12 +3924,25 @@ EOM
             #      ?(.*)? && (print $1,"\n");
             # In current versions it would have to be written with slashes:
             #      /(.*)/ && (print $1,"\n");
-            my $msg;
-            ( $is_pattern, $msg ) =
-              $self->guess_if_pattern_or_conditional( $i, $rtokens,
-                $rtoken_type, $rtoken_map, $max_token_index );
+            (
+                $is_pattern,
+                my $msg,
 
-            if ($msg) { $self->write_logfile_entry($msg) }
+            ) = $self->guess_if_pattern_or_conditional(
+
+                $i,
+                $rtokens,
+                $rtoken_type,
+                $rtoken_map,
+                $max_token_index,
+            );
+
+            if ($msg) {
+                $self->write_logfile_entry($msg);
+                if ( DEBUG_GUESS_MODE && $is_pattern ) {
+                    $self->warning("DEBUG_GUESS_MODE message:\n$msg\n");
+                }
+            }
         }
         else { $is_pattern = ( $expecting == TERM ) }
 
@@ -3860,13 +3966,17 @@ EOM
         my $self = shift;
 
         # '*' = typeglob, or multiply?
-        if ( $expecting == UNKNOWN ) {
-            if (   $last_nonblank_type eq 'Z'
-                && $next_type ne 'b'
-                && $next_type ne '('
-                && $next_type ne '#' )    # Fix c036
-            {
+
+        # Guess based on next token.  See also c036, and versions before 2026-
+        if ( $expecting == UNKNOWN && $next_type ne 'b' ) {
+
+            # Check for a normal glob, like *OUT:
+            if ( $next_tok =~ /^[_A-Za-z]/ ) {
                 $expecting = TERM;
+            }
+            else {
+                ## Could check for glob of a simple punctuation variable here
+                ## by looking ahead one more character
             }
         }
 
@@ -3904,12 +4014,6 @@ EOM
         # '.' =  what kind of . ?
         if ( $expecting != OPERATOR ) {
             $self->scan_number();
-            if ( $type eq '.' ) {
-                $self->error_if_expecting_TERM()
-                  if ( $expecting == TERM );
-            }
-        }
-        else {
         }
         return;
     } ## end sub do_DOT
@@ -4001,7 +4105,7 @@ EOM
         elsif ( $expecting == OPERATOR ) {
         }
         else {
-            if ( $next_type eq 'w' ) { $type = 'p' }
+            if ( $next_type eq 'w' || $next_type eq '{' ) { $type = 'p' }
         }
         return;
     } ## end sub do_PLUS_SIGN
@@ -4157,15 +4261,6 @@ EOM
                     $self->warning("Possible syntax error near '{^'\n");
                 }
             }
-
-            else {
-                if ( !$self->error_if_expecting_TERM() ) {
-
-                    # Something like this is valid but strange:
-                    # undef ^I;
-                    $self->complain("The '^' seems unusual here\n");
-                }
-            }
         }
         return;
     } ## end sub do_CARAT_SIGN
@@ -4185,14 +4280,23 @@ EOM
 
         # '<<' = maybe a here-doc?
         if ( $expecting != OPERATOR ) {
-            my ( $found_target, $here_doc_target, $here_quote_character,
-                $saw_error );
-            (
-                $found_target, $here_doc_target, $here_quote_character, $i,
-                $saw_error
-              )
-              = $self->find_here_doc( $expecting, $i, $rtokens, $rtoken_type,
-                $rtoken_map, $max_token_index );
+            my (
+                $found_target,
+                $here_doc_target,
+                $here_quote_character,
+                $i_return,
+                $saw_error,
+
+            ) = $self->find_here_doc(
+
+                $expecting,
+                $i,
+                $rtokens,
+                $rtoken_type,
+                $rtoken_map,
+                $max_token_index,
+            );
+            $i = $i_return;
 
             if ($found_target) {
                 push @{$rhere_target_list},
@@ -4251,14 +4355,23 @@ EOM
         return
           if ( $i >= $max_token_index );  # here-doc not possible if end of line
         if ( $expecting != OPERATOR ) {
-            my ( $found_target, $here_doc_target, $here_quote_character,
-                $saw_error );
-            (
-                $found_target, $here_doc_target, $here_quote_character, $i,
-                $saw_error
-              )
-              = $self->find_here_doc( $expecting, $i, $rtokens, $rtoken_type,
-                $rtoken_map, $max_token_index );
+            my (
+                $found_target,
+                $here_doc_target,
+                $here_quote_character,
+                $i_return,
+                $saw_error,
+
+            ) = $self->find_here_doc(
+
+                $expecting,
+                $i,
+                $rtokens,
+                $rtoken_type,
+                $rtoken_map,
+                $max_token_index,
+            );
+            $i = $i_return;
 
             if ($found_target) {
 
@@ -4390,36 +4503,6 @@ EOM
         return;
     } ## end sub do_MINUS_MINUS
 
-    sub do_LOGICAL_AND {
-
-        my $self = shift;
-
-        # '&&'
-        $self->error_if_expecting_TERM()
-          if ( $expecting == TERM && $last_nonblank_token ne ',' );    #c015
-        return;
-    } ## end sub do_LOGICAL_AND
-
-    sub do_LOGICAL_OR {
-
-        my $self = shift;
-
-        # '||'
-        $self->error_if_expecting_TERM()
-          if ( $expecting == TERM && $last_nonblank_token ne ',' );    #c015
-        return;
-    } ## end sub do_LOGICAL_OR
-
-    sub do_SLASH_SLASH {
-
-        my $self = shift;
-
-        # '//'
-        $self->error_if_expecting_TERM()
-          if ( $expecting == TERM );
-        return;
-    } ## end sub do_SLASH_SLASH
-
     sub do_DIGITS {
 
         my $self = shift;
@@ -4516,6 +4599,8 @@ EOM
 
         my $self = shift;
 
+        # We are at a pretoken starting with 'x' where an operator is expected
+
         if ( $tok eq 'x' ) {
             if ( $rtokens->[ $i + 1 ] eq '=' ) {    # x=
                 $tok  = 'x=';
@@ -4544,6 +4629,8 @@ EOM
     sub do_USE_CONSTANT {
 
         my $self = shift;
+
+        # We just saw 'use constant' and must look ahead
 
         $self->scan_bare_identifier();
         my ( $next_nonblank_tok2, $i_next2_uu ) =
@@ -4592,11 +4679,17 @@ EOM
             }
         }
 
+        # Catch some unexpected keyword errors; c517.
+        # Note that we only check keywords for OPERATOR expected, not TERM.
+        # This is because a large number of keywords which normally expect
+        # a TERM will also take an OPERATOR.
+        if ( $expecting == OPERATOR && $is_TERM_keyword{$tok} ) {
+            $self->error_if_expecting_OPERATOR();
+        }
+
         # recognize 'use' statements, which are special
         if ( $is_use_require{$tok} ) {
             $statement_type = $tok;
-            $self->error_if_expecting_OPERATOR()
-              if ( $expecting == OPERATOR );
         }
 
         # remember my and our to check for trailing ": shared"
@@ -4621,7 +4714,8 @@ EOM
 
               )
             {
-                $self->warning(
+                ## prevent formatting and avoid instability (b1553)
+                $self->warning_do_not_format(
                     "expecting '$tok' to follow one of 'if|elsif|unless'\n");
             }
         }
@@ -4647,7 +4741,8 @@ EOM
 
               )
             {
-                $self->warning(
+                ## prevent formatting and avoid instability (b1553)
+                $self->warning_do_not_format(
 "expecting '$tok' to follow one of 'if|elsif|unless|case|when'\n"
                 );
             }
@@ -4677,6 +4772,8 @@ EOM
     sub do_QUOTE_OPERATOR {
 
         my $self = shift;
+
+        # We have arrived at a quote operator: q, qq, qw, qx, qr, s, y, tr, m
 
         if ( $expecting == OPERATOR ) {
 
@@ -4726,6 +4823,8 @@ EOM
     sub do_UNKNOWN_BAREWORD {
 
         my ( $self, $next_nonblank_token ) = @_;
+
+        # We have encountered a bareword which needs more work to classify
 
         $self->scan_bare_identifier();
 
@@ -4935,22 +5034,22 @@ EOM
 
     BEGIN {
         my @qz = qw( w i U C );
-        @is_wiUC{@qz} = (1) x scalar(@qz);
+        $is_wiUC{$_} = 1 for @qz;
 
         @qz = qw( use require no );
-        @is_use_require_no{@qz} = (1) x scalar(@qz);
+        $is_use_require_no{$_} = 1 for @qz;
 
         # These pre-token types after a bareword imply that it
         # is not a constant, except when '(' is followed by ')'.
         @qz = qw# ( [ { $ @ " ' m #;
-        @is_function_follower{@qz} = (1) x scalar(@qz);
+        $is_function_follower{$_} = 1 for @qz;
 
         # These pre-token types after a bareword imply that it
         # MIGHT be a constant, but it also might be a function taking
         # 0 or more call args.
         @qz = qw# ; ) ] } if unless #;
-        push @qz, ',';
-        @is_constant_follower{@qz} = (1) x scalar(@qz);
+        push @qz, COMMA;
+        $is_constant_follower{$_} = 1 for @qz;
     }
 
     sub do_BAREWORD {
@@ -5261,27 +5360,13 @@ EOM
         # 'sub' or other sub alias
         elsif ( $is_sub{$tok_kw} ) {
 
-            # Update for --use-feature=class (rt145706):
-            # We have to be extra careful to avoid misparsing other uses of
-            # 'method' in older scripts.
-            if (
-                   $tok_kw eq 'method'
+            # Guess what to do for unknown word 'method':
+            # Updated for --use-feature=class (rt145706):
+            if (   $tok_kw eq 'method'
                 && $guess_if_method
-
-                # Patch for Object::Pad lexical method like 'method $var {'
-                && !( $next_nonblank_token eq '$' && new_statement_ok() )
-              )
+                && !$self->method_ok_here($next_nonblank_token) )
             {
-                if (   $expecting == OPERATOR
-                    || $next_nonblank_token !~ /^[\w\:]/
-                    || !$self->method_ok_here() )
-                {
-                    $self->do_UNKNOWN_BAREWORD($next_nonblank_token);
-                }
-                else {
-                    initialize_subname();
-                    $self->scan_id();
-                }
+                $self->do_UNKNOWN_BAREWORD($next_nonblank_token);
             }
             else {
                 $self->error_if_expecting_OPERATOR()
@@ -5328,6 +5413,11 @@ EOM
         # start rescanning we will be expecting a token of type TERM.
         # We will switch to type 'k' before outputting the tokens.
         elsif ( defined( $is_END_DATA{$tok_kw} ) ) {
+
+            # Warn if this follows an operator expecting a term (c565)
+            $self->error_if_expecting_TERM()
+              if ( $expecting == TERM );
+
             $type = ';';    # make tokenizer look for TERM next
 
             # Remember that we are in one of these three sections
@@ -5699,8 +5789,6 @@ EOM
     # ------------------------------------------------------------
     my $tokenization_code = {
 
-        '>'   => \&do_GREATER_THAN_SIGN,
-        '|'   => \&do_VERTICAL_LINE,
         '$'   => \&do_DOLLAR_SIGN,
         '('   => \&do_LEFT_PARENTHESIS,
         ')'   => \&do_RIGHT_PARENTHESIS,
@@ -5732,12 +5820,14 @@ EOM
         '++'  => \&do_PLUS_PLUS,
         '=>'  => \&do_FAT_COMMA,
         '--'  => \&do_MINUS_MINUS,
-        '&&'  => \&do_LOGICAL_AND,
-        '||'  => \&do_LOGICAL_OR,
-        '//'  => \&do_SLASH_SLASH,
 
         # No special code for these types yet, but syntax checks
         # could be added.
+        ##  '&&'  => \&do_LOGICAL_AND,
+        ##  '||'  => \&do_LOGICAL_OR,
+        ##  '>'   => \&do_GREATER_THAN_SIGN,
+        ##  '|'   => \&do_VERTICAL_LINE,
+        ##  '//'  => \&do_SLASH_SLASH,
         ##  '!'   => undef,
         ##  '!='  => undef,
         ##  '!~'  => undef,
@@ -5781,7 +5871,7 @@ EOM
 
     BEGIN {
         my @qZ = qw( -> Z );
-        @is_arrow_or_Z{@qZ} = (1) x scalar(@qZ);
+        $is_arrow_or_Z{$_} = 1 for @qZ;
     }
 
     sub tokenize_this_line {
@@ -5807,19 +5897,16 @@ EOM
         #-------------------------------------
         # Check for start of pod documentation
         #-------------------------------------
-        if ( substr( $untrimmed_input_line, 0, 1 ) eq '='
+        if (   !$in_quote
+            && substr( $untrimmed_input_line, 0, 1 ) eq '='
             && $untrimmed_input_line =~ /^=[A-Za-z_]/ )
         {
 
-            # Must not be in multi-line quote
-            # and must not be in an equation
+            # Must not be in an equation where an '=' could be expected.
+            # Perl has additional restrictions which are not checked here.
             my $blank_after_Z = 1;
-            if (
-                !$in_quote
-                && ( $self->operator_expected( '=', 'b', $blank_after_Z ) ==
-                    TERM )
-              )
-            {
+            $expecting = $self->operator_expected( '=', 'b', $blank_after_Z );
+            if ( $expecting == TERM ) {
                 $self->[_in_pod_] = 1;
                 return;
             }
@@ -5926,10 +6013,9 @@ EOM
                     && $rformat_skipping_list->[-1]->[0] == $on_off )
                 {
                     my $lno_last = $rformat_skipping_list->[-1]->[1];
-                    $self->warning(
+                    $self->warning_do_not_format(
 "consecutive format-skipping start markers - see line $lno_last\n"
                     );
-                    $self->[_in_trouble_] = 1;
                 }
                 push @{$rformat_skipping_list}, [ $on_off, $lno, $input_line ];
                 $self->[_in_format_skipping_] = $lno;
@@ -5954,10 +6040,9 @@ EOM
                     && $rformat_skipping_list->[-1]->[0] == $on_off )
                 {
                     my $lno_last = $rformat_skipping_list->[-1]->[1];
-                    $self->warning(
+                    $self->warning_do_not_format(
 "consecutive format-skipping end markers - see line $lno_last\n"
                     );
-                    $self->[_in_trouble_] = 1;
                 }
 
                 push @{$rformat_skipping_list}, [ $on_off, $lno, $input_line ];
@@ -6274,6 +6359,25 @@ EOM
 
                 # check for special cases which cannot be combined
 
+                # Smartmatch is being deprecated, but may exist in older
+                # scripts.
+                if ( $test_tok eq '~~' ) {
+
+                    # Do not combine if a TERM is required
+                    if ( $self->operator_expected( $tok, '~', undef ) == TERM )
+                    {
+
+                        # block types ';' may actually be hash refs, c567
+                        if ( $last_nonblank_type eq '}' ) {
+                            my $blk = $rbrace_type->[ $brace_depth + 1 ];
+                            if ( !$blk || $blk ne ';' ) { $combine_ok = 0 }
+                        }
+                        else {
+                            $combine_ok = 0;
+                        }
+                    }
+                }
+
                 # '//' must be defined_or operator if an operator is expected.
                 # TODO: Code for other ambiguous digraphs (/=, x=, **, *=)
                 # could be migrated here for clarity
@@ -6284,22 +6388,29 @@ EOM
                 # after type 'Z' (possible file handle).  The reason is that
                 # sub operator_expected gives TERM expected here, which is
                 # wrong in this case.
-                if ( $test_tok eq '//' && $last_nonblank_type ne 'Z' ) {
+                elsif ( $test_tok eq '//' ) {
+                    if ( $last_nonblank_type ne 'Z' ) {
 
-                    # note that here $tok = '/' and the next tok and type is '/'
-                    my $blank_after_Z;
-                    $expecting =
-                      $self->operator_expected( $tok, '/', $blank_after_Z );
+                        # note that here $tok = '/' and the next tok and type
+                        # is '/'
+                        my $blank_after_Z;
+                        $expecting =
+                          $self->operator_expected( $tok, '/', $blank_after_Z );
 
-                    # Patched for RT#101547, was 'unless ($expecting==OPERATOR)'
-                    $combine_ok = 0 if ( $expecting == TERM );
+                        # Patched for RT#101547, was
+                        #   'unless ($expecting==OPERATOR)'
+                        $combine_ok = 0 if ( $expecting == TERM );
+                    }
                 }
 
                 # Patch for RT #114359: mis-parsing of "print $x ** 0.5;
                 # Accept the digraphs '**' only after type 'Z'
                 # Otherwise postpone the decision.
-                if ( $test_tok eq '**' ) {
+                elsif ( $test_tok eq '**' ) {
                     if ( $last_nonblank_type ne 'Z' ) { $combine_ok = 0 }
+                }
+                else {
+                    ## no other special cases
                 }
 
                 if (
@@ -6400,6 +6511,18 @@ EOM
                 $code->($self);
                 redo if ($in_quote);
             }
+
+            # Check for a non-TERM where a TERM is expected. Note that this
+            # checks all symbols, even those without a $code (update c566)
+            if ( $expecting == TERM ) {
+                my $is_not_term =
+                     $type eq ';'
+                  || $type eq ','
+                  || $is_binary_operator_type{$type};
+                if ($is_not_term) {
+                    $self->error_if_expecting_TERM();
+                }
+            }
         }    ## End main tokenizer loop
 
         # Store the final token
@@ -6457,7 +6580,7 @@ EOM
         # Arrays to hold token values for this line:
         my (
             @output_levels,     @output_block_type, @output_type_sequence,
-            @output_token_type, @output_tokens
+            @output_token_type, @output_tokens,
         );
 
         $line_of_tokens->{_nesting_tokens_0} = $nesting_token_string;
@@ -6837,19 +6960,16 @@ BEGIN {
     # after package NAMESPACE, so expecting TERM)
     # Fix for c250: add new type 'S' for sub (not expecting operator)
     my @q = qw#
-      ; ! + x & ?  F J - p / Y : % f U ~ A G j L P S * . | ^ < = [ m {
-      #;
-    push @q, "\\";
-    push @q, qw#
-      > t
+      ; ! + x & ?  F J - p / Y : % f U ~ A G j L P S * . | ^ < = [ m { > t
       || >= != mm *= => .. !~ == && |= .= pp -= =~ += <= %= ^= x= ~~ ** << /=
       &= // >> ~. &. |. ^.
       ... **= <<= >>= &&= ||= //= <=> !~~ &.= |.= ^.= <<~
       #;
-    push @q, ',';
-    push @q, '(';     # for completeness, not currently a token type
-    push @q, '->';    # was previously in UNKNOWN
-    @op_expected_table{@q} = (TERM) x scalar(@q);
+    push @q, BACKSLASH;
+    push @q, COMMA;
+    push @q, '(';         # for completeness, not currently a token type
+    push @q, '->';        # was previously in UNKNOWN
+    $op_expected_table{$_} = TERM for @q;
 
     # No UNKNOWN table types:
     #  removed '->' for c030, now always TERM
@@ -6863,17 +6983,17 @@ BEGIN {
     # Fix for c250: added 'i' because new type 'P' was added
     @q = qw( -- C h R ++ ] Q <> i );
     push @q, ')';
-    @op_expected_table{@q} = (OPERATOR) x scalar(@q);
+    $op_expected_table{$_} = OPERATOR for @q;
 
     # Fix for git #62: added '*' and '%'
     @q = qw( < ? * % );
-    @is_weird_parsing_rule_exception{@q} = (1) x scalar(@q);
+    $is_weird_parsing_rule_exception{$_} = 1 for @q;
 
     @q = qw<) $>;
-    @is_paren_dollar{@q} = (1) x scalar(@q);
+    $is_paren_dollar{$_} = 1 for @q;
 
     @q = qw( n v );
-    @is_n_v{@q} = (1) x scalar(@q);
+    $is_n_v{$_} = 1 for @q;
 
 } ## end BEGIN
 
@@ -7024,58 +7144,55 @@ sub operator_expected {
 
     if ( $last_nonblank_type eq '}' ) {
 
-        # handle something after 'do' and 'eval'
-        if ( $is_block_operator{$last_nonblank_token} ) {
-
-            # something like $a = do { BLOCK } / 2;
-            return OPERATOR;    # block mode following }
-        }
-
-        #       $last_nonblank_token =~ /^(\)|\$|\-\>)/
-        if ( $is_paren_dollar{ substr( $last_nonblank_token, 0, 1 ) }
-            || substr( $last_nonblank_token, 0, 2 ) eq '->' )
-        {
-            if ( $last_nonblank_token eq '$' ) { return UNKNOWN }
+        #-------------------------------------------
+        # Section 2B1: Closing structural ')' or ']'
+        #-------------------------------------------
+        if ( $last_nonblank_token eq ')' || $last_nonblank_token eq ']' ) {
             return OPERATOR;
         }
 
-        # Check for smartmatch operator before preceding brace or square
-        # bracket.  For example, at the ? after the ] in the following
-        # expressions we are expecting an operator:
-        #
-        # qr/3/ ~~ ['1234'] ? 1 : 0;
-        # map { $_ ~~ [ '0', '1' ] ? 'x' : 'o' } @a;
-        if ( $last_nonblank_token eq '~~' ) {
+        #-------------------------------------
+        # Section 2B2: Closing block brace '}'
+        #-------------------------------------
+        my $blk = $rbrace_type->[ $brace_depth + 1 ];
+
+        # Non-blocks
+        if ( !defined($blk) ) {
             return OPERATOR;
         }
 
-        # A right brace here indicates the end of a simple block.  All
-        # non-structural right braces have type 'R' all braces associated with
-        # block operator keywords have been given those keywords as
-        # "last_nonblank_token" and caught above.  (This statement is order
-        # dependent, and must come after checking $last_nonblank_token).
-
-        # patch for dor.t (defined or).
-        if (   $tok eq '/'
-            && $next_type eq '/'
-            && $last_nonblank_token eq ']' )
-        {
-            return OPERATOR;
-        }
-
-        # Patch for RT #116344: misparse a ternary operator after an
-        # anonymous hash, like this:
-        #   return ref {} ? 1 : 0;
-        # The right brace should really be marked type 'R' in this case,
-        # and it is safest to return an UNKNOWN here. Expecting a TERM will
-        # cause the '?' to always be interpreted as a pattern delimiter
-        # rather than introducing a ternary operator.
-        if ( $tok eq '?' ) {
+        # Unidentified block type
+        if ( !$blk ) {
             return UNKNOWN;
         }
-        return TERM;
 
-    } ## end type '}'
+        # Blocks followed by a TERM
+        if (   $is_zero_continuation_block_type{$blk}
+            || $is_sort_map_grep{$blk}
+            || $is_grep_alias{$blk}
+            || substr( $blk, -1, 1 ) eq ':'       && $blk =~ /^\w+:$/
+            || substr( $blk,  0, 3 ) eq 'sub'     && $blk =~ /^sub\s/
+            || substr( $blk,  0, 7 ) eq 'package' && $blk =~ /^package\s/ )
+        {
+            return TERM;
+        }
+
+        # Blocks followed by an OPERATOR
+        #    do eval sub
+        if (   $is_block_operator{$blk}
+            || $is_sub{$blk} )
+        {
+            return OPERATOR;
+        }
+
+        # Any other block type is marked UNKNOWN to be safe (c566).
+        # For example, a block type marked ';' could be a hash ref:
+        #    { map { $_ => 'x' } keys %main:: } ~~ \%main::;
+        # The tokenizer would have to analyze the contents to distinguish
+        # between a block closure and a hash ref brace in this case.  So mark
+        # this as UNKNOWN and let the lower level routines figure it out.
+        return UNKNOWN;
+    }
 
     #-------------------------------
     # Section 2C: number or v-string
@@ -7525,7 +7642,7 @@ sub decide_if_code_block {
 
                 # it is a comma which is not a pattern delimiter except for qw
                 (
-                    $pre_types[$j] eq ','
+                    $pre_types[$j] eq COMMA
                     && !$is_q_qq_qx_qr_s_y_tr_m{ $pre_tokens[$jbeg] }
                 )
 
@@ -7543,7 +7660,11 @@ sub decide_if_code_block {
             # If this brace follows a bareword, then append a space as a signal
             # to the formatter that this may not be a block brace.  To find the
             # corresponding code in Formatter.pm search for 'b1085'.
-            $code_block_type .= SPACE if ( $code_block_type =~ /^\w/ );
+            # But not for the word 'method': fixes c534; this will cause the
+            # formatter to mark an asub block instead of a sub block.
+            if ( $code_block_type =~ /^\w/ && $code_block_type ne 'method' ) {
+                $code_block_type .= SPACE;
+            }
         }
     }
 
@@ -7604,10 +7725,10 @@ my %is_R_closing_sb;
 BEGIN {
 
     my @q = qw< $ & % * @ ) >;
-    @is_sigil_or_paren{@q} = (1) x scalar(@q);
+    $is_sigil_or_paren{$_} = 1 for @q;
 
     @q = qw( R ] );
-    @is_R_closing_sb{@q} = (1) x scalar(@q);
+    $is_R_closing_sb{$_} = 1 for @q;
 } ## end BEGIN
 
 sub is_non_structural_brace {
@@ -7912,7 +8033,7 @@ sub check_final_nesting_depths {
             my $hint = EMPTY_STRING;
             if ( $cd_aa == 1 ) {
                 $hint =
-                  " (its closing $closing_brace_names[$aa] was not found)";
+                  " .. did not find its closing $closing_brace_names[$aa]";
             }
             my $msg = <<"EOM";
 Final nesting depth of $opening_brace_names[$aa]s is $cd_aa
@@ -7993,6 +8114,16 @@ sub peek_ahead_for_nonblank_token {
 # Tokenizer guessing routines for ambiguous situations
 #######################################################################
 
+my %is_non_ternary_pretok;
+
+BEGIN {
+
+    # Some pre-tokens which cannot immediately follow a ternary '?'
+    my @q = qw# ; ? : ) } ] = > #;
+    push @q, COMMA;
+    %is_non_ternary_pretok = map { $_ => 1 } @q;
+}
+
 sub guess_if_pattern_or_conditional {
 
     my ( $self, $i, $rtokens, $rtoken_type, $rtoken_map_uu, $max_token_index )
@@ -8010,13 +8141,35 @@ sub guess_if_pattern_or_conditional {
     # USES GLOBAL VARIABLES: $last_nonblank_token
 
     my $is_pattern = 0;
-    my $msg        = "guessing that ? after '$last_nonblank_token' starts a ";
+    my $msg =
+"guessing that ? after type='$last_nonblank_type' token='$last_nonblank_token' starts a ";
 
     if ( $i >= $max_token_index ) {
         $msg .= "conditional (no end to pattern found on the line)\n";
         $is_pattern = 0;
         return ( $is_pattern, $msg );
     }
+
+    # See if we can rule out a ternary operator here before proceeding. c547.
+    my ( $next_nonblank_token, $i_next_uu ) =
+      find_next_nonblank_token_on_this_line( $i, $rtokens, $max_token_index );
+    if (
+        !(
+            $is_non_ternary_pretok{$next_nonblank_token}
+            || ( $last_nonblank_type eq 'k' && $last_nonblank_token eq 'split' )
+        )
+      )
+    {
+        # A ternary cannot be ruled out here. We will assume this is a ternary
+        # operator since '?' as pattern delimiter is deprecated.
+        $is_pattern = 0;
+        $msg .= "conditional (cannot rule it out)";
+        return ( $is_pattern, $msg );
+    }
+
+    # If we get here, then we either have a ternary with a syntax error or some
+    # ancient code which uses ? as a pattern delimiter. We will only select the
+    # pattern delimiter if we can find its matching closing delimiter.
 
     my $ibeg = $i;
     $i = $ibeg + 1;
@@ -8099,11 +8252,11 @@ BEGIN {
 
     # Constants like 'pi' in Trig.pm are common
     my @q = qw( pi pi2 pi4 pip2 pip4 );
-    @is_known_constant{@q} = (1) x scalar(@q);
+    $is_known_constant{$_} = 1 for @q;
 
     # parenless calls of 'ok' are common
     @q = qw( ok );
-    @is_known_function{@q} = (1) x scalar(@q);
+    $is_known_function{$_} = 1 for @q;
 } ## end BEGIN
 
 sub guess_if_pattern_or_division {
@@ -8187,7 +8340,7 @@ sub guess_if_pattern_or_division {
         $quote_character,
         $quote_pos,
         $quote_depth,
-        $quoted_string
+        $quoted_string,
       )
       = $self->follow_quoted_string(
 
@@ -8198,7 +8351,7 @@ sub guess_if_pattern_or_division {
         $quote_character,
         $quote_pos,
         $quote_depth,
-        $max_token_index
+        $max_token_index,
       );
 
     # if we didn't find an ending / on this line ..
@@ -8294,7 +8447,6 @@ sub guess_if_here_doc {
         if ( !defined($line) ) {
             $here_doc_expected = -1;    # hit eof without seeing target
             $msg .= " -- must be shift; target $next_token not in file\n";
-
         }
         else {                          # still unsure..taking a wild guess
 
@@ -8306,6 +8458,9 @@ sub guess_if_here_doc {
             else {
                 $msg .=
                   " -- guessing it's a shift ($next_token is a constant)\n";
+            }
+            if (DEBUG_GUESS_MODE) {
+                $self->warning("DEBUG_GUESS_MODE message:\n$msg\n");
             }
         }
     }
@@ -8329,7 +8484,7 @@ sub scan_bare_identifier_do {
         $type,
         $prototype,
         $rtoken_map,
-        $max_token_index
+        $max_token_index,
 
     ) = @_;
 
@@ -8568,7 +8723,7 @@ sub scan_id_do {
         $rtokens,
         $rtoken_map,
         $id_scan_state,
-        $max_token_index
+        $max_token_index,
 
     ) = @_;
 
@@ -8756,6 +8911,8 @@ sub do_scan_package {
 
     my ( $self, $rcall_hash ) = @_;
 
+    # Parse a package name.
+
     my $input_line      = $rcall_hash->{input_line};
     my $i               = $rcall_hash->{i};
     my $i_beg           = $rcall_hash->{i_beg};
@@ -8765,7 +8922,6 @@ sub do_scan_package {
     my $rtoken_map      = $rcall_hash->{rtoken_map};
     my $max_token_index = $rcall_hash->{max_token_index};
 
-    # Parse a package name.
     # This is called with $i_beg equal to the index of the first nonblank
     # token following a 'package' token.
     # USES GLOBAL VARIABLES: $current_package,
@@ -8855,10 +9011,11 @@ sub do_scan_package {
 
         # These are the only characters which can (currently) form special
         # variables, like $^W: (issue c066).
-        my @q = qw{ ? A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ };
-        push @q, "\\";
-        push @q, qw{ ] ^ _ };
-        @is_special_variable_char{@q} = (1) x scalar(@q);
+        my @q = qw{
+          ? A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ ] ^ _
+        };
+        push @q, BACKSLASH;
+        $is_special_variable_char{$_} = 1 for @q;
     } ## end BEGIN
 
     # These are the possible states for this scanner:
@@ -9473,7 +9630,7 @@ sub do_scan_package {
             $rtokens,
             $max_token_index,
             $expecting,
-            $container_type
+            $container_type,
 
         ) = @_;
 
@@ -9741,7 +9898,7 @@ EOM
             $type,
             $id_scan_state,
             $identifier,
-            $split_pretoken_flag
+            $split_pretoken_flag,
         );
     } ## end sub scan_complex_identifier
 } ## end closure for sub scan_complex_identifier
@@ -9768,6 +9925,8 @@ EOM
 
         my ( $self, $rcall_hash ) = @_;
 
+        # Parse a sub name and prototype.
+
         my $input_line      = $rcall_hash->{input_line};
         my $i               = $rcall_hash->{i};
         my $i_beg           = $rcall_hash->{i_beg};
@@ -9779,8 +9938,6 @@ EOM
         my $max_token_index = $rcall_hash->{max_token_index};
 
         my $id_prefix = $rcall_hash->{is_lexical_method} ? '$' : EMPTY_STRING;
-
-        # Parse a sub name and prototype.
 
         # At present there are three basic CALL TYPES which are
         # distinguished by the starting value of '$tok':
@@ -9891,7 +10048,7 @@ EOM
                     ## OLD CODING, before improved handling of lexical subs:
                     ## This may end badly, it is safest to avoid formatting.
                     ## For an example, see perl527/lexsub.t (issue c203)
-                    ## $self->[_in_trouble_] = 1;
+                    ## $self->[_do_not_format_] = 1;
                 }
             }
             else {
@@ -10295,8 +10452,8 @@ sub is_possible_numerator {
 
         # /(\)|\}|\;|\&\&|\|\||and|or|while|if|unless)/
         my @q = qw( & && | || ? : + - * and or while if unless );
-        push @q, ')', '}', ']', '>', ',', ';';
-        @pattern_test{@q} = (1) x scalar(@q);
+        push @q, ')', '}', ']', '>', COMMA, ';';
+        $pattern_test{$_} = 1 for @q;
     } ## end BEGIN
 
     sub pattern_expected {
@@ -10760,7 +10917,7 @@ sub find_here_doc {
         $rtokens,
         $rtoken_type,
         $rtoken_map_uu,
-        $max_token_index
+        $max_token_index,
 
     ) = @_;
 
@@ -10806,7 +10963,7 @@ sub find_here_doc {
             $here_quote_character,
             $quote_pos,
             $quote_depth,
-            $quoted_string
+            $quoted_string,
           )
           = $self->follow_quoted_string(
 
@@ -10817,7 +10974,7 @@ sub find_here_doc {
             $here_quote_character,
             $quote_pos,
             $quote_depth,
-            $max_token_index
+            $max_token_index,
           );
 
         if ($in_quote) {    # didn't find end of quote, so no target found
@@ -10839,7 +10996,7 @@ sub find_here_doc {
                 # we have to remove any backslash before the quote character
                 # so that the here-doc-target exactly matches this string
                 next
-                  if ( $tokj eq "\\"
+                  if ( $tokj eq BACKSLASH
                     && $j < $i - 1
                     && $rtokens->[ $j + 1 ] eq $here_quote_character );
                 $here_doc_target .= $tokj;
@@ -10928,7 +11085,7 @@ sub do_quote {
             $quote_character,
             $quote_pos,
             $quote_depth,
-            $quoted_string
+            $quoted_string,
           )
           = $self->follow_quoted_string(
 
@@ -10939,7 +11096,7 @@ sub do_quote {
             $quote_character,
             $quote_pos,
             $quote_depth,
-            $max_token_index
+            $max_token_index,
           );
         $quoted_string_2 .= $quoted_string;
         if ( $in_quote == 1 ) {
@@ -10960,7 +11117,7 @@ sub do_quote {
             $quote_character,
             $quote_pos,
             $quote_depth,
-            $quoted_string
+            $quoted_string,
           )
           = $self->follow_quoted_string(
 
@@ -10971,7 +11128,7 @@ sub do_quote {
             $quote_character,
             $quote_pos,
             $quote_depth,
-            $max_token_index
+            $max_token_index,
           );
         $quoted_string_1 .= $quoted_string;
         if ( $in_quote == 1 ) {
@@ -11144,8 +11301,8 @@ BEGIN {
 
     my @q = qw# / " ' { } ( ) [ ] < > ; + - * | % ! x ~ = ? : . ^ & #;
     push @q, '#';
-    push @q, ',';
-    @is_punct_char{@q} = (1) x scalar(@q);
+    push @q, COMMA;
+    $is_punct_char{$_} = 1 for @q;
 }
 
 sub follow_quoted_string {
@@ -11719,56 +11876,56 @@ BEGIN {
       .. :: << >> ** && || // -> => += -= .= %= &= |= ^= *= <>
       <= >= == =~ !~ != ++ -- /= x= ~~ ~. |. &. ^. ^^
       #;
-    @is_digraph{@digraphs} = (1) x scalar(@digraphs);
+    $is_digraph{$_} = 1 for @digraphs;
 
     @q = qw(
       . : < > * & | / - = + -  %  ^ !  x ~
     );
-    @can_start_digraph{@q} = (1) x scalar(@q);
+    $can_start_digraph{$_} = 1 for @q;
 
     my @trigraphs =
       qw( ... **= <<= >>= &&= ||= //= <=> !~~ &.= |.= ^.= <<~ ^^= );
-    @is_trigraph{@trigraphs} = (1) x scalar(@trigraphs);
+    $is_trigraph{$_} = 1 for @trigraphs;
 
     my @tetragraphs = qw( <<>> );
-    @is_tetragraph{@tetragraphs} = (1) x scalar(@tetragraphs);
+    $is_tetragraph{$_} = 1 for @tetragraphs;
 
     # make a hash of all valid token types for self-checking the tokenizer
     # (adding NEW_TOKENS : select a new character and add to this list)
     # fix for c250: added new token type 'P' and 'S'
     my @valid_token_types = qw#
       A b C G L R f h Q k t w i q n p m F pp mm U j J Y Z v P S
-      { } ( ) [ ] ; + - / * | % ! x ~ =
+      { } ( ) [ ] ; + - / * | % ! x ~ = ? : . < > ^ &
       #;
-    push @valid_token_types, "\\";
-    push @valid_token_types, qw#
-      ? : . < > ^ &
-      #;
+    push @valid_token_types, BACKSLASH;
     push( @valid_token_types, @digraphs );
     push( @valid_token_types, @trigraphs );
     push( @valid_token_types, @tetragraphs );
-    push( @valid_token_types, ( '#', ',', 'CORE::' ) );
-    @is_valid_token_type{@valid_token_types} = (1) x scalar(@valid_token_types);
+    push( @valid_token_types, ( '#', COMMA, 'CORE::' ) );
+    $is_valid_token_type{$_} = 1 for @valid_token_types;
 
     # a list of file test letters, as in -e (Table 3-4 of 'camel 3')
     my @file_test_operators =
       qw( A B C M O R S T W X b c d e f g k l o p r s t u w x z );
-    @is_file_test_operator{@file_test_operators} =
-      (1) x scalar(@file_test_operators);
+    $is_file_test_operator{$_} = 1 for @file_test_operators;
 
     # these functions have prototypes of the form (&), so when they are
     # followed by a block, that block MAY BE followed by an operator.
     # Smartmatch operator ~~ may be followed by anonymous hash or array ref
     @q = qw( do eval );
-    @is_block_operator{@q} = (1) x scalar(@q);
+    $is_block_operator{$_} = 1 for @q;
 
     # these functions allow an identifier in the indirect object slot
     @q = qw( print printf sort exec system say );
-    @is_indirect_object_taker{@q} = (1) x scalar(@q);
+    $is_indirect_object_taker{$_} = 1 for @q;
+
+    # Keywords which definitely produce error if an OPERATOR is expected
+    @q = qw( my our state local use require );
+    $is_TERM_keyword{$_} = 1 for @q;
 
     # Note: 'field' will be added by sub check_options if --use-feature=class
     @q = qw( my our state );
-    @is_my_our_state{@q} = (1) x scalar(@q);
+    $is_my_our_state{$_} = 1 for @q;
 
     # These tokens may precede a code block
     # patched for SWITCH/CASE/CATCH.  Actually these could be removed
@@ -11782,23 +11939,23 @@ BEGIN {
       map       grep     sort  switch case     given
       when      default  catch try    finally
     );
-    @is_code_block_token{@q} = (1) x scalar(@q);
+    $is_code_block_token{$_} = 1 for @q;
 
     # These block types terminate statements and do not need a trailing
     # semicolon; patched for SWITCH/CASE/;  This may be updated in sub
     # check_options.
     @q = qw( } { BEGIN END CHECK INIT AUTOLOAD DESTROY UNITCHECK continue ;
       if elsif else unless while until for foreach switch case given when );
-    @is_zero_continuation_block_type{@q} = (1) x scalar(@q);
+    $is_zero_continuation_block_type{$_} = 1 for @q;
 
     # Note: this hash was formerly named '%is_not_zero_continuation_block_type'
     # to contrast it with the block types in '%is_zero_continuation_block_type'
     # Note: added 'sub' for anonymous sub blocks (c443)
     @q = qw( sort map grep eval do sub );
-    @is_sort_map_grep_eval_do_sub{@q} = (1) x scalar(@q);
+    $is_sort_map_grep_eval_do_sub{$_} = 1 for @q;
 
     @q = qw( sort map grep );
-    @is_sort_map_grep{@q} = (1) x scalar(@q);
+    $is_sort_map_grep{$_} = 1 for @q;
 
     %is_grep_alias = ();
 
@@ -11881,7 +12038,7 @@ BEGIN {
     my @extra_vr = qw( constant vars );
     push( @value_requestor, @extra_vr );
 
-    @expecting_term_token{@value_requestor} = (1) x scalar(@value_requestor);
+    $expecting_term_token{$_} = 1 for @value_requestor;
 
     # this list contains keywords which do not look for arguments,
     # so that they might be followed by an operator, or at least
@@ -11902,16 +12059,14 @@ BEGIN {
 
     push( @operator_requestor, @extra_or );
 
-    @expecting_operator_token{@operator_requestor} =
-      (1) x scalar(@operator_requestor);
+    $expecting_operator_token{$_} = 1 for @operator_requestor;
 
     # these token TYPES expect trailing operator but not a term
     # note: ++ and -- are post-increment and decrement, 'C' = constant
     my @operator_requestor_types = qw( ++ -- C <> q );
 
     # NOTE: This hash is available but not currently used
-    @expecting_operator_types{@operator_requestor_types} =
-      (1) x scalar(@operator_requestor_types);
+    $expecting_operator_types{$_} = 1 for @operator_requestor_types;
 
     # these token TYPES consume values (terms)
     # note: pp and mm are pre-increment and decrement
@@ -11919,43 +12074,65 @@ BEGIN {
     my @value_requestor_type = qw#
       L { ( [ ~ !~ =~ ; . .. ... A : && ! || // = + - x
       **= += -= .= /= *= %= x= &= |= ^= <<= >>= &&= ||= //=
-      <= >= == != =>
-      #;
-    push @value_requestor_type, "\\";
-    push @value_requestor_type, qw#
-      > < % * / ? & | ** <=> ~~ !~~ <<~
+      <= >= == != => > < % * / ? & | ** <=> ~~ !~~ <<~
       f F pp mm Y p m U J G j >> << ^ t
       ~. ^. |. &. ^.= |.= &.= ^^
       #;
-    push( @value_requestor_type, ',' )
-      ;    # (perl doesn't like a ',' in a qw block)
+    push @value_requestor_type, BACKSLASH;
+    push @value_requestor_type, COMMA;
 
     # NOTE: This hash is available but not currently used
-    @expecting_term_types{@value_requestor_type} =
-      (1) x scalar(@value_requestor_type);
+    $expecting_term_types{$_} = 1 for @value_requestor_type;
 
     # Note: the following valid token types are not assigned here to
     # hashes requesting to be followed by values or terms, but are
     # instead currently hard-coded into sub operator_expected:
     # ) -> :: Q R Z ] b h i k n v w } #
 
-    # For simple syntax checking, it is nice to have a list of operators which
-    # will really be unhappy if not followed by a term.  This includes most
-    # of the above...
-    @really_want_term{@value_requestor_type} =
-      (1) x scalar(@value_requestor_type);
+    # A syntax error will occur if following operators are not followed by a
+    # TERM (with an exception made for tokens in sub signatures).
+    # NOTE: this list does not include unary operator '!'
 
-    # with these exceptions...
-    delete $really_want_term{'U'}; # user sub, depends on prototype
-    delete $really_want_term{'F'}; # file test works on $_ if no following term
-    delete $really_want_term{'Y'}; # indirect object, too risky to check syntax;
-                                   # let perl do it
+    # Note the following omissions from the syntax checking operators below
+    # 'U' = user sub, depends on prototype
+    # 'F' = file test works on $_ if no following term
+    # 'Y' = indirect object, too risky to check syntax
+
+    my @binary_ops = qw#
+      !~ =~ . .. : && || // = + - x
+      **= += -= .= /= *= %= x= &= |= ^= <<= >>= &&= ||= //=
+      <= >= == != > < % * / ? & | ** <=> ~~ !~~ <<~
+      >> << ^
+      ^. |. &. ^.= |.= &.= ^^
+      #;
+    $is_binary_operator_type{$_} = 1 for @binary_ops;
+
+    # Note: omitting unary file test type 'F' here because it assumes $_
+    my @unary_ops = qw# ! ~ ~. m p mm pp #;
+    $is_binary_operator_type{$_} = 1 for @binary_ops;
+    push @unary_ops, BACKSLASH;
+    $is_binary_or_unary_operator_type{$_} = 1 for ( @binary_ops, @unary_ops );
+
+    my @binary_keywords = qw( and or err eq ne cmp );
+    $is_binary_keyword{$_} = 1 for @binary_keywords;
+
+    $is_binary_or_unary_keyword{$_} = 1 for ( @binary_keywords, 'not' );
+
+    # A syntax error occurs if a binary operator follows any of these types:
+    # NOTE: a ',' cannot be included because of parenless calls (c015).
+    # For example this is valid: print "hello\n", && print "goodbye\n";
+    # NOTE: the 'not' keyword could be added to a corresponding _keyword list
+    # NOTE: label 'j' omitted, for example: -f $file ? redo BLOCK : last BLOCK;
+    # NOTE: Removed 'A': fixes git162.t
+    @q = qw< L { [ ( ; f J t >;
+    $is_not_a_TERM_producer_type{$_} = 1 for ( @q, @unary_ops );
+
     @q = qw( q qq qx qr s y tr m );
-    @is_q_qq_qx_qr_s_y_tr_m{@q} = (1) x scalar(@q);
+    $is_q_qq_qx_qr_s_y_tr_m{$_} = 1 for @q;
 
     # Note added 'qw' here
     @q = qw( q qq qw qx qr s y tr m );
-    @is_q_qq_qw_qx_qr_s_y_tr_m{@q} = (1) x scalar(@q);
+    $is_q_qq_qw_qx_qr_s_y_tr_m{$_} = 1 for @q;
 
     # Quote modifiers:
     # original ref: camel 3 p 147,
@@ -11982,22 +12159,22 @@ BEGIN {
 
     # Note: 'class' will be added by sub check_options if -use-feature=class
     @q = qw( package );
-    @is_package{@q} = (1) x scalar(@q);
+    $is_package{$_} = 1 for @q;
 
     @q = qw( if elsif unless );
-    @is_if_elsif_unless{@q} = (1) x scalar(@q);
+    $is_if_elsif_unless{$_} = 1 for @q;
 
     @q = qw( ; t );
-    @is_semicolon_or_t{@q} = (1) x scalar(@q);
+    $is_semicolon_or_t{$_} = 1 for @q;
 
     @q = qw( if elsif unless case when );
-    @is_if_elsif_unless_case_when{@q} = (1) x scalar(@q);
+    $is_if_elsif_unless_case_when{$_} = 1 for @q;
 
     # Hash of other possible line endings which may occur.
     # Keep these coordinated with the regex where this is used.
     # Note: chr(13) = chr(015)="\r".
     @q = ( chr(13), chr(29), chr(26) );
-    @other_line_endings{@q} = (1) x scalar(@q);
+    $other_line_endings{$_} = 1 for @q;
 
     # These keywords are handled specially in the tokenizer code:
     my @special_keywords =
@@ -12030,8 +12207,7 @@ BEGIN {
     );
 
     # NOTE: This hash is available but not currently used
-    @is_keyword_taking_list{@keyword_taking_list} =
-      (1) x scalar(@keyword_taking_list);
+    $is_keyword_taking_list{$_} = 1 for @keyword_taking_list;
 
     # perl functions which may be unary operators.
 
@@ -12039,8 +12215,7 @@ BEGIN {
     # can follow one of these keywords.
     @q = qw( chomp eof eval fc lc pop shift uc undef );
 
-    @is_keyword_rejecting_slash_as_pattern_delimiter{@q} =
-      (1) x scalar(@q);
+    $is_keyword_rejecting_slash_as_pattern_delimiter{$_} = 1 for @q;
 
     # These are keywords for which an arg may optionally be omitted.  They are
     # currently only used to disambiguate a ? used as a ternary from one used
@@ -12061,8 +12236,7 @@ BEGIN {
       uc       ucfirst  umask     undef     unlink  warn
       write
     );
-    @is_keyword_taking_optional_arg{@keywords_taking_optional_arg} =
-      (1) x scalar(@keywords_taking_optional_arg);
+    $is_keyword_taking_optional_arg{$_} = 1 for @keywords_taking_optional_arg;
 
     # This list is used to decide if a pattern delimited by question marks,
     # ?pattern?, can follow one of these keywords.  Note that from perl 5.22
@@ -12072,8 +12246,7 @@ BEGIN {
     # in older versions it could be a pattern.  The guessing algorithm will
     # decide.  We are combining two lists here to simplify the test.
     @q = ( @keywords_taking_optional_arg, @operator_requestor );
-    @is_keyword_rejecting_question_as_pattern_delimiter{@q} =
-      (1) x scalar(@q);
+    $is_keyword_rejecting_question_as_pattern_delimiter{$_} = 1 for @q;
 
     # These are not used in any way yet
     #    my @unused_keywords = qw(
@@ -12092,7 +12265,7 @@ BEGIN {
     #  ARGV DATA ENV SIG STDERR STDIN STDOUT
     #  __DATA__ __END__
 
-    @is_keyword{@Keywords} = (1) x scalar(@Keywords);
+    $is_keyword{$_} = 1 for @Keywords;
 
     %matching_end_token = (
         '{' => '}',

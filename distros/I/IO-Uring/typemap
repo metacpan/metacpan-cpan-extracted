@@ -5,24 +5,20 @@ struct timespec	T_TIMESPEC
 
 INPUT
 T_MAGICEXT
-	{
-	SV* arg = $arg;
-	MAGIC* magic = SvROK(arg) && SvMAGICAL(SvRV(arg)) ? mg_findext(SvRV(arg), PERL_MAGIC_ext, &${type}_magic) : NULL;
-	if (magic)
-		$var = ($type)magic->mg_ptr;
+	SV* arg_$var = $arg;
+	MAGIC* magic_$var = SvROK(arg_${var}) && SvMAGICAL(SvRV(arg_${var})) ? mg_findext(SvRV(arg_${var}), PERL_MAGIC_ext, &${type}_magic) : NULL;
+	if (magic_$var)
+		$var = ($type)magic_$var->mg_ptr;
 	else
 		Perl_croak(aTHX_ \"%s object is lacking magic\", \"$ntype\");
-	}
 
 T_MAGICEXT_BASE
-	{
-	SV* arg = $arg;
-	MAGIC* magic = SvROK(arg) && SvMAGICAL(SvRV(arg)) ? mg_find(SvRV(arg), PERL_MAGIC_ext) : NULL;
+	SV* arg_$var = $arg;
+	MAGIC* magic = SvROK(arg_$var) && SvMAGICAL(SvRV(arg_$var)) ? mg_find(SvRV(arg_$var), PERL_MAGIC_ext) : NULL;
 	if (magic && magic->mg_virtual)
 		$var = ($type)magic->mg_ptr;
 	else
 		Perl_croak(aTHX_ \"%s object is lacking magic\", \"$ntype\");
-	}
 
 T_SIGSET
 	if (SvROK($arg)) {
@@ -80,10 +76,8 @@ T_OPAQUEOBJ_MAYBE
 
 OUTPUT
 T_MAGICEXT
-	{
-	MAGIC* magic = sv_magicext(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, &${type}_magic, (const char*)$var, 0);
-	magic->mg_flags |= MGf_COPY|MGf_DUP;
-	}
+	MAGIC* magic_${var} = sv_magicext(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, &${type}_magic, (const char*)$var, 0);
+	magic_${var}->mg_flags |= MGf_DUP;
 
 T_TIMESPEC
 	sv_setnv($arg, $var.tv_sec + $var.tv_nsec / 1000000000.0);

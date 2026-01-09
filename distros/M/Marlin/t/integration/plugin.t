@@ -29,13 +29,33 @@ use Data::Dumper;
 
 {
 	package Local::Bar;
-	use Marlin qw( bar ), -extends => [ 'Local::Foo' ];
+	use Marlin bar => { ':Alias' => 'BAR' }, -extends => [ 'Local::Foo' ];
 }
 
 my $bar1 = Local::Bar->new( foo => 1, quux => 2, bar => 3 );
 my $bar2 = $bar1->clone( bar => 4 );
+my $bar3 = $bar1->clone( BAR => 4 );
 
 is( $bar1, bless( { foo => 1, quux => 2, bar => 3 }, 'Local::Bar' ) ) or diag Dumper( $bar1 );
 is( $bar2, bless( { foo => 1, quux => 2, bar => 4 }, 'Local::Bar' ) ) or diag Dumper( $bar2 );
+is( $bar3, bless( { foo => 1, quux => 2, bar => 4 }, 'Local::Bar' ) ) or diag Dumper( $bar3 );
+
+{
+	my $e = do {
+		local $@;
+		eval { $bar1->clone( wibble => 'wobble' ) };
+		$@;
+	};
+	like $e, qr/Unexpected keys in clone arguments/;
+}
+
+{
+	my $e = do {
+		local $@;
+		eval { $bar1->clone( bar => 1, BAR => 2 ) };
+		$@;
+	};
+	like $e, qr/Superfluous/;
+}
 
 done_testing;

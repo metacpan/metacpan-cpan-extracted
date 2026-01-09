@@ -8,8 +8,7 @@ WriteMakefile(
     ABSTRACT_FROM     => 'lib/Net/EANSearch.pm', # retrieve abstract from module
     AUTHOR            => 'Jan Willamowius <jan@willamowius.de>',
     LICENSE           => 'perl',
-    #Value must be from legacy list of licenses here
-    #http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI
+	MIN_PERL_VERSION  => '5.8.9',
     META_MERGE        => {
         'meta-spec' => { 'version' => 2 },
          'resources' => {

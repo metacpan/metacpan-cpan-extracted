@@ -29,6 +29,7 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key('id');
+__PACKAGE__->add_unique_constraint(user_email => [qw/email/]);
 __PACKAGE__->has_many( orders => 'TestSchema::Result::Order', 'user_id');
 
 1;

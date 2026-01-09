@@ -1,6 +1,11 @@
 ---
 
-0.999.10    TO BE RELEASED
+0.999.11    2026-01-09
+   [Fixed]
+       * MetaCPAN query adjusted to match upgraded ElasticSearch
+       * Argument count check and documentation of 'compute' command
+
+0.999.10    2025-08-13
    [Changed]
        * Install more LaTeX dependency packages on Debian and Federa
    [Fixed]

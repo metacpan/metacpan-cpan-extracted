@@ -1036,10 +1036,12 @@ xscon_buildall(const xscon_constructor_t* sig, const char* klass, SV* const obje
     assert(object);
     assert(args);
 
+    HV* args_hv = (HV *)SvRV(args);
+
     /* __no_BUILD__ support */
-    if (hv_exists((HV *)SvRV(args), "__no_BUILD__", 12)) {
-        SV** val = hv_fetch((HV *)SvRV(args), "__no_BUILD__", 12, 0);
-        if (SvOK(*val) && SvTRUE(*val)) {
+    if (hv_exists(args_hv, "__no_BUILD__", 12)) {
+        SV *val = hv_delete(args_hv, "__no_BUILD__", 12, 0);
+        if ( SvOK(val) && SvTRUE(val) ) {
             return;
         }
     }
@@ -1355,16 +1357,18 @@ CODE:
     /* $object = bless( {}, $klassname ); */
     object = xscon_create_instance(klassname);
 
-    /* Initialize parameters */
+    /* Initialize parameters: returns the number of keys in args that were actually used */
     int used = xscon_initialize_object(sig, klassname, object, (HV*)SvRV(args), FALSE);
 
     /* Call BUILD methods */
     xscon_buildall(sig, klassname, object, args);
 
     /* Strict constructor */
-    //if ( HvUSEDKEYS(args) > used ) {
-        xscon_strictcon(sig, klassname, object, args);
-    //}
+    if ( sig->strict_params ) {
+        if ( used < HvUSEDKEYS((HV*)SvRV(args)) ) {
+            xscon_strictcon(sig, klassname, object, args);
+        }
+    }
 
     /* return $object */
     ST(0) = object; /* because object is mortal, we should return it as is */

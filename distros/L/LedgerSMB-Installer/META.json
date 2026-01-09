@@ -57,6 +57,6 @@
          "web" : "https://github.com/ledgersmb/ledgersmb-installer"
       }
    },
-   "version" : "v0.999.10",
+   "version" : "v0.999.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

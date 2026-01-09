@@ -1,0 +1,18 @@
+Revision history for Perl module CLI::Cmdline
+
+1.22  2026-01-08
+    - Added this file Changes
+    - Added xt/release/kwalitee.t
+    - modify some tab to space in POD
+
+1.21  2026-01-08
+    - Added examples scripts
+    - Added better examples in POD
+
+1.20  2026-01-07
+    - Added alias support
+    - Optional define - or -- in switches and options
+    - Added extra testfiles
+
+1.19  2026-01-07
+    - Initial release

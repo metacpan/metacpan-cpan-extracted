@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION='0.2.8';
+our $VERSION='0.2.9';
 
 sub new {
 	my ($ref,%schedule)=@_;

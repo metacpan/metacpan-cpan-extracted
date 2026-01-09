@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,6 +48,6 @@
          "url" : "http://github.com/rjbs/MIME-Lite"
       }
    },
-   "version" : "3.033",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "3.035",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

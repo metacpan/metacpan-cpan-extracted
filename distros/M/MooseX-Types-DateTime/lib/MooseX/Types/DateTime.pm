@@ -1,10 +1,10 @@
-package MooseX::Types::DateTime; # git description: v0.12-2-g35c46dd
+package MooseX::Types::DateTime; # git description: v0.13-11-gdaeb2b4
 # ABSTRACT: L<DateTime> related constraints and coercions for Moose
 
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use 5.008003;
 use Moose 0.41 ();
@@ -97,7 +97,7 @@ MooseX::Types::DateTime - L<DateTime> related constraints and coercions for Moos
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -214,6 +214,14 @@ L<MooseX::Types::DateTime::MoreCoercions>
 
 L<DateTime>, L<DateTimeX::Easy>
 
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/MooseX-Types-DateTime>
+and a star in L<GitHub|https://github.com/moose/MooseX-Types-DateTime>.
+
 =head1 SUPPORT
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Types-DateTime>
@@ -223,7 +231,7 @@ There is also a mailing list available for users of this distribution, at
 L<http://lists.perl.org/list/moose.html>.
 
 There is also an irc channel available for users of this distribution, at
-irc://irc.perl.org/#moose.
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHOR
 
@@ -231,7 +239,7 @@ irc://irc.perl.org/#moose.
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Dagfinn Ilmari Mannsåker Florian Ragwitz John Napiorkowski Shawn M Moore Dave Rolsky
+=for stopwords Karen Etheridge Dagfinn Ilmari Mannsåker Florian Ragwitz John Napiorkowski Dave Rolsky Shawn M Moore
 
 =over 4
 
@@ -253,11 +261,11 @@ John Napiorkowski <jjnapiork@cpan.org>
 
 =item *
 
-Shawn M Moore <sartak@gmail.com>
+Dave Rolsky <autarch@urth.org>
 
 =item *
 
-Dave Rolsky <autarch@urth.org>
+Shawn M Moore <sartak@gmail.com>
 
 =back
 

@@ -12,9 +12,8 @@ use Math::Round;
 use List::Util qw[ min max reduce shuffle];
 use List::MoreUtils qw(uniq);
 use List::AllUtils qw(sum);
-use Sim::OPT::Stats qw(:all);
+use Sim::OPT::Stats qw( :all );
 use Storable qw(store retrieve lock_store lock_nstore lock_retrieve dclone);
-use IO::Tee;
 use File::Copy qw( move copy );
 use Set::Intersection;
 use List::Compare;
@@ -37,6 +36,7 @@ use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
 use Sim::OPT::Parcoord3d;
+use Sim::OPT::Stats;
 eval { use Sim::OPTcue; 1 };
 eval { use Sim::OPTcue::Patternsearch; 1 };
 eval { use Sim::OPTcue::NelderMead; 1 };
@@ -46,6 +46,7 @@ eval { use Sim::OPTcue::ParticleSwarm; 1 };
 eval { use Sim::OPTcue::SimulatedAnnealing; 1 };
 eval { use Sim::OPTcue::NSGAIII; 1 };
 eval { use Sim::OPTcue::MOEAD; 1 };
+eval { use Sim::OPTcue::SPEA2; 1 };
 
 our @ISA = qw( Exporter );
 #%EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
@@ -64,18 +65,19 @@ $simnetwork @themereports %simtitles %reporttitles %retrievedata
 @rankdata @rankcolumn @reporttempsdata @reportcomfortdata %reportdata
 @report_loadsortemps @files_to_filter @filter_reports @base_columns @maketabledata @filter_columns
 @files_to_filter @filter_reports @base_columns @maketabledata @filter_columns %vals
-@sweeps @miditers @varnumbers @caseseed @chanceseed @chancedata $dimchance $tee @pars_tocheck retrieve
+@sweeps @miditers @varnumbers @caseseed @chanceseed @chancedata $dimchance  @pars_tocheck retrieve
 report newretrieve newreport washn
 $target %dowhat readsweeps $max_processes $computype $calcprocedure %specularratios @totalcases @winneritems
 toil genstar solvestar integratebox filterbox__ clean %dowhat @weighttransforms
 );
 
-$VERSION = '0.851';
+$VERSION = '0.859';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented toward problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches, as well of searches more complely structured in graphs.';
 
 #################################################################################
 # Sim::OPT
 #################################################################################
+
 
 
 our %cryptc;
@@ -235,7 +237,7 @@ sub makeinstance
 
   # Take the last base instance as template (same as setpickinst does with pop)
   my $ins_r = shift( @baseinsts );
-  my @pairs = @$pairs_r; say $tee "IN makeinstance, \@pairs: " . dump( @pairs );
+  my @pairs = @$pairs_r; say  "IN makeinstance, \@pairs: " . dump( @pairs );
 
   my %b = %{ $ins_r };
 
@@ -280,11 +282,11 @@ sub makeinstance
     push( @vars, $var );
     push( @levs, $lev );
   }
-  say $tee "IN makeinstance, \@vars: " . dump( @vars );
-  say $tee "IN makeinstance, \@levs: " . dump( @levs );
+  say  "IN makeinstance, \@vars: " . dump( @vars );
+  say  "IN makeinstance, \@levs: " . dump( @levs );
 
-  my $varstring = join( "-", @vars ); say $tee "IN makeinstance, \$varstring: " . dump( $varstring );
-  my $levstring = join( "-", @levs ); say $tee "IN makeinstance, \$varstring: " . dump( $varstring );
+  my $varstring = join( "-", @vars ); say  "IN makeinstance, \$varstring: " . dump( $varstring );
+  my $levstring = join( "-", @levs ); say  "IN makeinstance, \$varstring: " . dump( $varstring );
 
   # Origin = current configuration; in setpickinst this is usually giveback(%mids)
   my $origin = giveback( \%mids );
@@ -758,7 +760,7 @@ sub filterinsts_winsts
 			push( @fewerinstnames, $d{is} );
 		}
 	}
-	#say $tee "FEWERINSTNAMES" . dump( @fewerinstnames );
+	#say  "FEWERINSTNAMES" . dump( @fewerinstnames );
 
 	my %newinst ;
 	foreach my $key ( keys %inst )
@@ -770,7 +772,7 @@ sub filterinsts_winsts
 				$newinst{$key} = $inst{$key};
 			}
 		}
-	} #say $tee "NEWINST1" . dump( \%newinst );
+	} #say  "NEWINST1" . dump( \%newinst );
 
 	foreach my $value ( values %newinst )
 	{
@@ -778,7 +780,7 @@ sub filterinsts_winsts
 		{
 			$newinst{$value} = $value{$value};
 		}
-	} #say $tee "NEWINST2" . dump( \%newinst );
+	} #say  "NEWINST2" . dump( \%newinst );
 
 	return( \@fewerinstnames, \%newinst );
 }
@@ -799,7 +801,7 @@ sub filterinsts_wnames
 				$newinst{$key} = $inst{$key};
 			}
 		}
-		#say $tee "NEWINST3" . dump( \%newinst );
+		#say  "NEWINST3" . dump( \%newinst );
 	}
 
 	foreach my $value ( values %newinst )
@@ -808,7 +810,7 @@ sub filterinsts_wnames
 		{
 			$newinst{$value} = $value{$value};
 		}
-	} #say $tee "NEWINST4" . dump( \%newinst );
+	} #say  "NEWINST4" . dump( \%newinst );
 
 	return( \%newinst );
 }
@@ -937,13 +939,13 @@ sub genstring
     my @bits = split( "-", $frag ); #say "\@bits: " . dump ( @bits ); say "\$bits[0]: " . dump ( $bits[0] ); 
     unless ( $bits[0] ~~ @blockelts )
     {  
-      push( @bowl, "$frag" ); #say $tee "INSERT \$frag $frag";
+      push( @bowl, "$frag" ); #say  "INSERT \$frag $frag";
     }
     else 
     {
-    	my $max = $varnums{ $bits[0] }; #say $tee "\$max $max";
-      my $lev = 1 + int( rand( $max ) ); #say $tee "\$lev $lev";
-      push( @bowl, "$bits[0]-$lev" ); #say $tee "CALC AND INSERT \$bits[0]-\$lev $bits[0]-$lev";
+    	my $max = $varnums{ $bits[0] }; #say  "\$max $max";
+      my $lev = 1 + int( rand( $max ) ); #say  "\$lev $lev";
+      push( @bowl, "$bits[0]-$lev" ); #say  "CALC AND INSERT \$bits[0]-\$lev $bits[0]-$lev";
     }
   }
   my $obtained = ( join "_", @bowl ); #say "\@obtained: " . dump ( @obtained );
@@ -1057,14 +1059,14 @@ sub distr
   my $min = min( @elts );
   my $max = max( @elts );
   my $ext = ( $max - $min );
-  my $incr = ( $ext / $num ); #say $tee "INCR $incr";
+  my $incr = ( $ext / $num ); #say  "INCR $incr";
 
   my $count = 0;
   my $low = $min;
   my $newlow;
   my ( @vals, @ranks, @alls, @allnums, @percnums );
   while ( $count < $num  )
-  { #say $tee "COUNT $count";
+  { #say  "COUNT $count";
     $newlow = ( $low + $incr );
     my $middle = ( ( $low + $newlow ) / 2 );
     push( @vals, $middle );
@@ -1087,7 +1089,7 @@ sub distr
     $low = ( $low + $incr );
     $count++;
   }
-  #say $tee "ALLS: " . dump( @alls );
+  #say  "ALLS: " . dump( @alls );
   #die;
 
 
@@ -1178,9 +1180,9 @@ sub sorttable
 
 	foreach my $row (@rows) {
 	    foreach (@$row) {
-		#print $tee "$_";
+		#print  "$_";
 	    }
-	    #print $tee "\n";
+	    #print  "\n";
 	}
 	return (@table);
 }
@@ -1257,7 +1259,7 @@ sub present
 {
 	foreach (@_)
 	{
-		say $tee "### $_ : " . dump($_);
+		say  "### $_ : " . dump($_);
 		say TOFILE "### $_ : " . dump($_);
 	}
 }
@@ -1949,8 +1951,8 @@ sub cleansweeps
 		}
 		push( @outbag, [ @midbag ] );
 	}
-	#say $tee "CLEANED \@outbag: " . dump( @outbag );
-	#say $tee "CLEANED \@sourcestruct: " . dump( @sourcestruct );
+	#say  "CLEANED \@outbag: " . dump( @outbag );
+	#say  "CLEANED \@sourcestruct: " . dump( @sourcestruct );
 	return ( \@outbag, \@sourcestruct );
 }
 
@@ -2035,18 +2037,18 @@ sub gencentres
         {
           if ( $inv == "n" )
           {
-            @newpair = ( $hsmin{$key}, $hsmax{$key} ); #say $tee "newpair 2: " . dump ( @newpair );
+            @newpair = ( $hsmin{$key}, $hsmax{$key} ); #say  "newpair 2: " . dump ( @newpair );
           }
           else
           {
-            @newpair = ( $hsmax{$key}, $hsmin{$key} ); #say $tee "newpair 3: " . dump ( @newpair );
+            @newpair = ( $hsmax{$key}, $hsmin{$key} ); #say  "newpair 3: " . dump ( @newpair );
           }
 					if ( ( $newpair[0] eq "undef" ) or ( $newpair[0] eq "" ) or ( $newpair[1] eq "undef" ) or ( $newpair[1] eq "" ) )
 					{
 						next;
 					}
           $newval = $newpair[0];
-					#say $tee "newpair: " . dump ( @newpair );
+					#say  "newpair: " . dump ( @newpair );
         }
         $signal++;
       }
@@ -2250,7 +2252,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	my %inst = %{ $d{inst} };
 	my %vehicles = %{ $d{vehicles} };
 	@varnumbers = Sim::OPT::washn( @varnumbers );
-  say $tee "IN CALLBLOCK EXE \$dirfiles{randompicknum} $dirfiles{randompicknum}";
+  say  "IN CALLBLOCK EXE \$dirfiles{randompicknum} $dirfiles{randompicknum}";
 
 
 	if ( $countcase > $#sweeps )   # NUMBER OF CASES OF THE CURRENT PROBLEM
@@ -2261,15 +2263,15 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		}
     elsif ( ( $dirfiles{checksensitivity} eq "y" ) and ( !checkOPTcue ) )
     {
-      say $tee "OPTcue must be installed to check sensitivity analysis ex-post. Skipping"
+      say  "OPTcue must be installed to check sensitivity analysis ex-post. Skipping"
     }
 
     exit(
-		say  $tee  "#END RUN."
+		say    "#END RUN."
 		);
   }
 
-	say $tee "#Beginning a search on case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+	say  "#Beginning a search on case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 
 	my @blockelts = @{ getblockelts( \@sweeps, $countcase, $countblock ) };
 
@@ -2310,7 +2312,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 
   ###...
 
-  @blockelts = @{ washblockelts( \@blockelts ) }; say $tee "WASHED BLOCKELTS " . dump( @blockelts );
+  @blockelts = @{ washblockelts( \@blockelts ) }; say  "WASHED BLOCKELTS " . dump( @blockelts );
   
   #my %varnums = %{ washvarnums( \%varnums ) };
  
@@ -2378,7 +2380,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	$dirfiles{morphblock} = "$mypath/$file-morphblock--$countcase-$countblock";
 	$dirfiles{retblock} = "$mypath/$file-retblock--$countcase-$countblock";
 	$dirfiles{repblock} = "$mypath/$file-repblock--$countcase-$countblock"; # # FOR RETRIEVAL
-	$dirfiles{repfile} = "$mypath/$file-report-$countcase-$countblock.csv"; say $tee "IN OPT ASSIGN \$countblock $countblock \$dirfiles{repblock} $dirfiles{repblock} to DIRFILES.";
+	$dirfiles{repfile} = "$mypath/$file-report-$countcase-$countblock.csv"; say  "IN OPT ASSIGN \$countblock $countblock \$dirfiles{repblock} $dirfiles{repblock} to DIRFILES.";
 	$dirfiles{sortmixed} = "$dirfiles{repfile}" . "_sortm.csv";
 	$dirfiles{totres} = "$mypath/$file-$countcase" . "_totres.csv";
 	$dirfiles{ordres} = "$mypath/$file-$countcase" . "_ordres.csv";
@@ -2410,7 +2412,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 	my @varnumbers = @{ $d{varnumbers} };
 	my %dowhat = %{ $d{dowhat} };
 
-	my @blockelts = @{ $d{blockelts} }; say $tee "IN DEFFILES \@blockelts " . dump( @blockelts );
+	my @blockelts = @{ $d{blockelts} }; say  "IN DEFFILES \@blockelts " . dump( @blockelts );
 	my @sourceblockelts = @{ $d{blockelts} };
 	my @blocks = @{ $d{blocks} };
 	my $from = $d{from};
@@ -2517,11 +2519,24 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 	}
 
 	my ( @bux, @buux );
-	if ( ( $dirfiles{starsign} eq "y" ) or
-			( ( $dirfiles{random} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-			( ( $dirfiles{latinhypercube} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-			( ( $dirfiles{factorial} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-			( ( $dirfiles{facecentered} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) )
+	if ( 
+    ( $dirfiles{starsign} eq "y" ) 
+			or ( ( $dirfiles{random} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) 
+			or ( ( $dirfiles{latinhypercube} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) 
+			or ( ( $dirfiles{factorial} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) 
+      or ( ( $dirfiles{facecentered} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) 
+			or ( ( $dirfiles{randompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{newrandompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{patternsearch} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{neldermead} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{armijo} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{NSGAII} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{NSGAIII} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{pso} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{simulatedannealing} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{MOEAD} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{SPEA2} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) 
+    )
 	{
 		if ( $dirfiles{starsign} eq "y" )
 		{
@@ -2538,10 +2553,24 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 
 		my ( $tmpblankfile, $bit );
 		my ( @bag, @fills, @fulls );
-		if ( ( ( $dirfiles{random} eq "y" ) and ( $dowhat{metamodel} eq "ys" ) )
+		if ( 
+      ( ( $dirfiles{random} eq "y" ) and ( $dowhat{metamodel} eq "ys" ) )
 		 	or ( ( $dirfiles{latinhypercube} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
 			or ( ( $dirfiles{factorial} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-			or ( ( $dirfiles{facecentered} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )	)
+			or ( ( $dirfiles{facecentered} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )	
+      or ( ( $dirfiles{factorial} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) 
+      or ( ( $dirfiles{randompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{newrandompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{patternsearch} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{neldermead} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{armijo} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{NSGAII} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{NSGAIII} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{pso} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{simulatedannealing} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{MOEAD} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      or ( ( $dirfiles{SPEA2} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+    )
 		{
 			$tmpblankfile = "$mypath/$file" . "_tmp_gen_blank.csv";
 			$bit = $file . "_";
@@ -2786,7 +2815,7 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
     
 		my %to = %{ extractcase( \%inst, \%dowhat, $newpars, \%carrier, $file, \@blockelts, $mypath, $instn ) };
 
-		my %orig = %{ extractcase( \%inst, \%dowhat, $oldpars, \%carrier, $file, \@blockelts, $mypath ) }; #say $tee "obtained \$instn: $instn, countinstance: $count, from: $from, \$to: $to, \%orig: " . dump( \%orig ) . ", \%carrier: " . dump( \%carrier );
+		my %orig = %{ extractcase( \%inst, \%dowhat, $oldpars, \%carrier, $file, \@blockelts, $mypath ) }; #say  "obtained \$instn: $instn, countinstance: $count, from: $from, \$to: $to, \%orig: " . dump( \%orig ) . ", \%carrier: " . dump( \%carrier );
 		my $origin = $orig{cleanto};
 		my $from = $origin;
   	my $c = $$elt[4];
@@ -2856,7 +2885,7 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 sub exe
 {
 	my %dat = %{ $_[0] };
-	my @instances = @{ $dat{instances} }; say $tee "\@instances at the beginning of sub exe: " . dump( @instances );
+	my @instances = @{ $dat{instances} }; say  "\@instances at the beginning of sub exe: " . dump( @instances );
 	my %dirfiles = %{ $dat{dirfiles} };
 	my %inst = %{ $dat{inst} };
 	my @precedents = @{ $dat{precedents} };
@@ -2892,9 +2921,9 @@ sub exe
 	my $precomputed = $dowhat{precomputed};
   my @takecolumns = @{ $dowhat{takecolumns} };
 	my ( @packet, @unsuiteds );
-	say $tee "#Performing a search on case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+	say  "#Performing a search on case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 
-  #say $tee "NOW!!! ENTERING EXE \%inst: " . dump (\%inst);
+  #say  "NOW!!! ENTERING EXE \%inst: " . dump (\%inst);
 
 	
 
@@ -2916,7 +2945,6 @@ sub exe
     {
       ( $fulls_r, $inst_r, $instances_r ) = Sim::OPTcue::expand(
       {
-        tee        => $tee,
         configfile => $configfile,
         precious   => $precious,
 
@@ -2944,7 +2972,7 @@ sub exe
     }
     else 
     {
-      say $tee "OPTcue is not installed and this operation is not possible without it.";
+      say  "OPTcue is not installed and this operation is not possible without it.";
     }
 	}
 
@@ -2952,45 +2980,45 @@ sub exe
 	{
 		if ( $dowhat{morph} eq "y" )
 		{
-			say $tee "#Calling morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+			say  "#Calling morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 			my ( $dirfiles_r, $unsuiteds_r ) = Sim::OPT::Morph::morph( $configfile, \@instances, \%dirfiles, \%dowhat, \%vehicles, \%inst, \@precedents );
       %dirfiles = %$dirfiles_r;
       @unsuiteds = @$unsuiteds_r;
 			#%inst = %{ $result[2] };
 		}
 
-    my ( $packet_r, $dirfiles_r ); say $tee "IN DESCENT FROM DIRFILES, \$countblock $countblock, \$repfile $repfile";
+    my ( $packet_r, $dirfiles_r ); say  "IN DESCENT FROM DIRFILES, \$countblock $countblock, \$repfile $repfile";
 		if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
 		{
 
-			say $tee "#Calling simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+			say  "#Calling simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 			( $packet_r, $dirfiles_r, $csim,  ) = Sim::OPT::Sim::sim(
 					{ instances => \@instances, dowhat => \%dowhat, dirfiles => \%dirfiles,
 					  vehicles => \%vehicles, inst => \%inst, precedents => \@precedents, onlyrep => "y" } );
 
-      @packet = uniq( @$packet_r ); say $tee "RECEIVED PACKET " . dump( @packet );
+      @packet = uniq( @$packet_r ); say  "RECEIVED PACKET " . dump( @packet );
       %dirfiles = %$dirfiles_r;
-			say $tee "#Performed simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+			say  "#Performed simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 		}
 
     my $cryptolinks;
     unless ( $dirfiles{ga} eq "y" )
     {
-      $cryptolinks = "$mypath/$file" . "_" . "$countcase" . "_cryptolinks.pl"; #say $tee "CRYPTOLINKS $cryptolinks";
+      $cryptolinks = "$mypath/$file" . "_" . "$countcase" . "_cryptolinks.pl"; #say  "CRYPTOLINKS $cryptolinks";
       open ( CRYPTOLINKS, ">$cryptolinks" ) or die;
       say CRYPTOLINKS "" . dump( \%inst );
       close CRYPTOLINKS;
      }
 	}
 
-	#say $tee"NOW ON THE BRINK";
-	#say $tee "\$dowhat{descend} $dowhat{descend}";
+	#say "NOW ON THE BRINK";
+	#say  "\$dowhat{descend} $dowhat{descend}";
 	if ( $dowhat{descend} eq "y" )
 	{
-		say $tee "#Calling descent for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
+		say  "#Calling descent for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
 		Sim::OPT::Descend::descend(	{ instances => \@instances, dowhat => \%dowhat,
 		 dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst, precedents => \@precedents, packet => \@packet } );
-		say $tee "#Performed descent for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
+		say  "#Performed descent for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
 	}
 
 	if ( $dowhat{substitutenames} eq "y" )
@@ -3147,14 +3175,13 @@ sub opt
 		$dowhat{hypercubefraction} = 1;
 	}
 
-	$tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL
 
-	say $tee "\nNow in Sim::OPT. \n";
+	say  "\nNow in Sim::OPT. \n";
 	$dowhat{file} = $file;
 
   if ( !checkOPTcue() )
   {
-    say $tee "THERE IS NO OPTCUE INSTALLED. SO, HALTING.";
+    say  "THERE IS NO OPTCUE INSTALLED. SO, HALTING.";
     die;
   }
   else 
@@ -3168,12 +3195,12 @@ sub opt
 
 	if ( ( $dowhat{justchecksensitivity} ne "" ) and ( checkOPTcue ) )
 	{
-		#say $tee "RECEIVED.";
+		#say  "RECEIVED.";
 		Sim::OPTcue::sense( $dowhat{justchecksensitivity}, $mypath, $dowhat{objectivecolumn}, "stop" );
 	}
   elsif ( ( $dowhat{justchecksensitivity} ne "" ) and ( !checkOPTcue ) )
   {
-    say $tee "To perform sensitivity analysis ex-post, OPTcue must be installed. Skipping. "
+    say  "To perform sensitivity analysis ex-post, OPTcue must be installed. Skipping. "
   }
 
   if ( $dowhat{randomsweeps} eq "y" ) #IT SHUFFLES  @sweeps UNDER REQUESTED SETTING.
@@ -3219,7 +3246,7 @@ sub opt
       $i++;
     }
     $dowhat{direction} = [ @newarr ];
-    say $tee "NEW RANDOMIZED DIRECTIONS: " . dump( $dowhat{direction} );
+    say  "NEW RANDOMIZED DIRECTIONS: " . dump( $dowhat{direction} );
   }
 
 
@@ -3281,7 +3308,7 @@ sub opt
       }
       $i++;
     }
-    say $tee "NEW INIT LEVELS: " . dump( @miditers );
+    say  "NEW INIT LEVELS: " . dump( @miditers );
   }
 
 	if ( not ( $target ) ) { $target = "opt"; }
@@ -3429,7 +3456,7 @@ sub opt
 			$dirfiles{tottot} = "$mypath/$file-$countcase" . "-tottot.csv";
 			$dirfiles{ordtot} = "$mypath/$file-$countcase" . "-ordtot.csv";
 			#@miditers = @pinmiditers;
-			#say $tee "miditers: " . dump ( @miditers );
+			#say  "miditers: " . dump ( @miditers );
 
 			if ( scalar( @miditers ) == 0 ) { calcmiditers( @varnumbers ); }
 
@@ -3468,7 +3495,7 @@ sub opt
 	close(OUTFILE);
 	close(TOFILE);
 	exit;
-} # ENDsub opt
+} # END
 
 #############################################################################
 

@@ -15,11 +15,11 @@ DBIx::Class::Async::Row - Asynchronous Row Object for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.14
+Version 0.20
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.20';
 
 =head1 SYNOPSIS
 
@@ -667,6 +667,13 @@ sub create_related {
 
 =head1 AUTOLOAD METHODS
 
+Called automatically for column and relationship access
+
+    my $value = $row->column_name;
+    my $related = $row->relationship_name;
+
+Handles dynamic method dispatch for columns and relationships.
+
 The class uses AUTOLOAD to provide dynamic accessors for:
 
 =over 4
@@ -683,54 +690,58 @@ Relationship accessors (e.g., C<< $row->orders >> for 'orders' relationship)
 
 Relationship results are cached in the object after first access.
 
-=head1 INTERNAL METHODS
+=cut
 
-These methods are for internal use and are documented for completeness.
+sub AUTOLOAD {
+    my $self = shift;
+    our $AUTOLOAD;
+    my ($method) = $AUTOLOAD =~ /([^:]+)$/;
 
-=head2 _ensure_accessors
+    # 1. Skip DESTROY
+    return if $method eq 'DESTROY';
 
-    $row->_ensure_accessors;
+    my $source = $self->_get_source;
 
-Creates accessor methods for all columns in the result source.
+    # 2. Check if this is a Relationship
+    # Relationships MUST be handled by the accessor factory to ensure
+    # they return objects (ResultSets or Futures) rather than raw data.
+    my $rel_info;
+    if ($source && $source->can('relationship_info')) {
+        $rel_info = $source->relationship_info($method);
+    }
 
-=head2 _get_primary_key_info
+    if ($rel_info) {
+        # Build the proper accessor (handles prefetch logic internally)
+        my $accessor = $self->_build_relationship_accessor($method, $rel_info);
 
-    my $pk_info = $row->_get_primary_key_info;
+        # Memoize the accessor into the package so AUTOLOAD isn't called next time
+        {
+            no strict 'refs';
+            *{ref($self) . "::$method"} = $accessor;
+        }
 
-Returns information about the primary key(s) for this row.
+        # Execute and return (will return a Future for single, ResultSet for multi)
+        return $accessor->($self);
+    }
 
-=over 4
+    # 3. Fast Path: Direct Column Access
+    # If it's in the data hash and NOT a relationship, return the value immediately.
+    if (exists $self->{_data}{$method}) {
+        return $self->{_data}{$method};
+    }
 
-=item B<Returns>
+    # 4. Lazy Column Guard
+    # If it's a valid column but hasn't been loaded into { _data } yet.
+    if ($source && $source->has_column($method)) {
+        return $self->get_column($method);
+    }
 
-Hash reference with keys:
-- C<columns>: Array reference of primary key column names
-- C<count>: Number of primary key columns
-- C<is_composite>: Boolean indicating composite primary key
+    # 5. Error Fallback
+    require Carp;
+    Carp::croak("Method '$method' not found in row object of type " . ref($self));
+}
 
-=back
-
-=head2 _get_source
-
-    my $source = $row->_get_source;
-
-Returns the result source for this row, loading it lazily if needed.
-
-=head2 _build_relationship_accessor
-
-    my $coderef = $row->_build_relationship_accessor($method, $rel_info);
-
-Builds an accessor coderef for a relationship.
-
-=head2 AUTOLOAD
-
-    # Called automatically for column and relationship access
-    my $value = $row->column_name;
-    my $related = $row->relationship_name;
-
-Handles dynamic method dispatch for columns and relationships.
-
-=head2 DESTROY
+=head1 DESTROY
 
     # Called automatically when object is destroyed
 
@@ -738,56 +749,17 @@ Destructor method.
 
 =cut
 
-sub _ensure_accessors {
-    my $self   = shift;
-    my $source = $self->_get_source;
-
-    foreach my $col (keys %{$self->{_data}}) {
-        # SKIP if it's a relationship - let AUTOLOAD/Builder handle it
-        next if $source->relationship_info($col);
-
-        # Only create the accessor if it doesn't exist yet
-        no strict 'refs';
-        my $method = ref($self) . "::$col";
-        unless (defined &$method) {
-            *$method = sub {
-                my $self = shift;
-                return $self->{_data}{$col};
-            };
-        }
-    }
+sub DESTROY {
+    # Nothing to do
 }
 
-sub _get_primary_key_info {
-    my $self   = shift;
-    my $source = $self->_get_source or return;
+=head1 INTERNAL METHODS
 
-    # CRITICAL: Call primary_columns in LIST context
-    my @primary_columns = $source->primary_columns;
-
-    return {
-        columns      => \@primary_columns,
-        count        => scalar @primary_columns,
-        is_composite => scalar @primary_columns > 1,
-    };
-}
-
-sub _get_source {
-    my $self = shift;
-
-    unless ($self->{_source}) {
-        if ($self->{schema}
-            && ref $self->{schema}
-            && $self->{schema}->can('source')) {
-            $self->{_source} = eval { $self->{schema}->source($self->{source_name}) };
-            return $self->{_source} if $self->{_source};
-        }
-    }
-
-    return $self->{_source};
-}
+These methods are for internal use and are documented for completeness.
 
 =head2 _build_relationship_accessor
+
+    my $coderef = $row->_build_relationship_accessor($method, $rel_info);
 
 Builds an accessor for a relationship that checks for prefetched data first,
 then falls back to lazy loading if needed. For has_many relationships, the
@@ -901,6 +873,34 @@ sub _build_relationship_accessor {
     };
 }
 
+=head2 _ensure_accessors
+
+    $row->_ensure_accessors;
+
+Creates accessor methods for all columns in the result source.
+
+=cut
+
+sub _ensure_accessors {
+    my $self   = shift;
+    my $source = $self->_get_source;
+
+    foreach my $col (keys %{$self->{_data}}) {
+        # SKIP if it's a relationship - let AUTOLOAD/Builder handle it
+        next if $source->relationship_info($col);
+
+        # Only create the accessor if it doesn't exist yet
+        no strict 'refs';
+        my $method = ref($self) . "::$col";
+        unless (defined &$method) {
+            *$method = sub {
+                my $self = shift;
+                return $self->{_data}{$col};
+            };
+        }
+    }
+}
+
 =head2 _extract_foreign_key
 
 Extracts foreign key mapping from a relationship condition.
@@ -939,57 +939,60 @@ sub _extract_foreign_key {
     return undef;
 }
 
-sub AUTOLOAD {
-    my $self = shift;
-    our $AUTOLOAD;
-    my ($method) = $AUTOLOAD =~ /([^:]+)$/;
+=head2 _get_primary_key_info
 
-    # 1. Skip DESTROY
-    return if $method eq 'DESTROY';
+    my $pk_info = $row->_get_primary_key_info;
 
-    my $source = $self->_get_source;
+Returns information about the primary key(s) for this row.
 
-    # 2. Check if this is a Relationship
-    # Relationships MUST be handled by the accessor factory to ensure
-    # they return objects (ResultSets or Futures) rather than raw data.
-    my $rel_info;
-    if ($source && $source->can('relationship_info')) {
-        $rel_info = $source->relationship_info($method);
-    }
+=over 4
 
-    if ($rel_info) {
-        # Build the proper accessor (handles prefetch logic internally)
-        my $accessor = $self->_build_relationship_accessor($method, $rel_info);
+=item B<Returns>
 
-        # Memoize the accessor into the package so AUTOLOAD isn't called next time
-        {
-            no strict 'refs';
-            *{ref($self) . "::$method"} = $accessor;
-        }
+Hash reference with keys:
+- C<columns>: Array reference of primary key column names
+- C<count>: Number of primary key columns
+- C<is_composite>: Boolean indicating composite primary key
 
-        # Execute and return (will return a Future for single, ResultSet for multi)
-        return $accessor->($self);
-    }
+=back
 
-    # 3. Fast Path: Direct Column Access
-    # If it's in the data hash and NOT a relationship, return the value immediately.
-    if (exists $self->{_data}{$method}) {
-        return $self->{_data}{$method};
-    }
+=cut
 
-    # 4. Lazy Column Guard
-    # If it's a valid column but hasn't been loaded into { _data } yet.
-    if ($source && $source->has_column($method)) {
-        return $self->get_column($method);
-    }
+sub _get_primary_key_info {
+    my $self   = shift;
+    my $source = $self->_get_source or return;
 
-    # 5. Error Fallback
-    require Carp;
-    Carp::croak("Method '$method' not found in row object of type " . ref($self));
+    # CRITICAL: Call primary_columns in LIST context
+    my @primary_columns = $source->primary_columns;
+
+    return {
+        columns      => \@primary_columns,
+        count        => scalar @primary_columns,
+        is_composite => scalar @primary_columns > 1,
+    };
 }
 
-sub DESTROY {
-    # Nothing to do
+=head2 _get_source
+
+    my $source = $row->_get_source;
+
+Returns the result source for this row, loading it lazily if needed.
+
+=cut
+
+sub _get_source {
+    my $self = shift;
+
+    unless ($self->{_source}) {
+        if ($self->{schema}
+            && ref $self->{schema}
+            && $self->{schema}->can('source')) {
+            $self->{_source} = eval { $self->{schema}->source($self->{source_name}) };
+            return $self->{_source} if $self->{_source};
+        }
+    }
+
+    return $self->{_source};
 }
 
 =head1 SEE ALSO

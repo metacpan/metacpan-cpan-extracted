@@ -6,7 +6,7 @@ use utf8;
 package Marlin::Role;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011000';
+our $VERSION   = '0.011001';
 
 use parent 'Marlin';
 

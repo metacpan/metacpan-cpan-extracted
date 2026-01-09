@@ -14,7 +14,6 @@ use Set::Intersection;
 use List::MoreUtils qw(uniq);
 use List::AllUtils qw(sum);
 use Data::Dump qw(dump);
-use IO::Tee;
 use feature 'say';
 no strict;
 no warnings;
@@ -28,6 +27,7 @@ use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Sim::OPT::Parcoord3d;
 use Sim::OPT::Interlinear;
+use Sim::OPT::Stats;
 eval { use Sim::OPTcue; 1 };
 eval { use Sim::OPTcue::Patternsearch; 1 };
 
@@ -35,7 +35,7 @@ eval { use Sim::OPTcue::Patternsearch; 1 };
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
-$VERSION = '0.191';
+$VERSION = '0.197';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete multivariate discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -62,9 +62,9 @@ sub odd
 sub tellstepsize
 {
   my ( $factlevels_ref, $lvconv ) = @_;
-  my %factlevels = %{ $factlevels_ref }; #say $tee "FACTLEVELS IN tellstepsize: " . dump( %factlevels ); say $tee "\$factlevels{pairs}: " . dump( $factlevels{pairs} );
+  my %factlevels = %{ $factlevels_ref }; #say  "FACTLEVELS IN tellstepsize: " . dump( %factlevels ); say  "\$factlevels{pairs}: " . dump( $factlevels{pairs} );
   foreach my $fact ( sort {$a <=> $b} ( keys %{ $factlevels{pairs} } ) )
-  { #say $tee "\$fact: " . dump( $fact );
+  { #say  "\$fact: " . dump( $fact );
 
     if ( $lvconv eq "" )
     {
@@ -79,14 +79,14 @@ sub tellstepsize
     my $stepsize;
     if ( not( $factlevels{pairs}{$fact} == 1 ) )
     {
-      $stepsize = ( 1 / ( $factlevels{pairs}{$fact} - 1 ) ) * $lvconv; #say $tee "\$stepsize: " . dump( $stepsize );
+      $stepsize = ( 1 / ( $factlevels{pairs}{$fact} - 1 ) ) * $lvconv; #say  "\$stepsize: " . dump( $stepsize );
     }
     else
     {
-      $stepsize = 0; #say $tee "\$stepsize: " . dump( $stepsize );
+      $stepsize = 0; #say  "\$stepsize: " . dump( $stepsize );
     }
     $factlevels{stepsizes}{$fact} = $stepsize ;
-  } #say $tee "FACTLEVELS1: " . dump( %factlevels );
+  } #say  "FACTLEVELS1: " . dump( %factlevels );
   return( \%factlevels );
 }
 
@@ -95,8 +95,8 @@ sub union
 {
   my $aref = shift;
   my $bref = shift;
-  my @aa = @$aref; #say $tee ""\@aa: " . dump( @aa );
-  my @bb = @$bref; #say $tee "\@bb: " . dump( @bb );
+  my @aa = @$aref; #say  ""\@aa: " . dump( @aa );
+  my @bb = @$bref; #say  "\@bb: " . dump( @bb );
 
   my @union = uniq( @aa, @bb );
   return @union;
@@ -183,11 +183,11 @@ sub preparearr
 
       if ( $row[1] eq undef )
       {
-        push ( @arr, [ $row[0], [ @pars ] ] );
+        push ( @arr, [ $row[0], [ @pars ], "", "", "missing" ] );
       }
       else
       {
-        push ( @arr, [ $row[0], [ @pars ], $row[1], 1 ] );
+        push ( @arr, [ $row[0], [ @pars ], $row[1], 1, "sampled" ] );
       }
     }
   }
@@ -220,14 +220,14 @@ sub preparearr
 
       if ( scalar( @row ) < $maxnum )
       {
-        push ( @arr, [ $header, [ @pars ] ] );
+        push ( @arr, [ $header, [ @pars ], "", "", "missing" ] );
       }
       else
       {
-        push ( @arr, [ $header, [ @pars ], $row[-1], 1 ] );
+        push ( @arr, [ $header, [ @pars ], $row[-1], 1, "sampled" ] );
       }
     }
-  } #say $tee "ARR: " . dump( @arr );
+  } #say  "ARR: " . dump( @arr );
   return( \@arr, $optformat );
 }
 
@@ -255,7 +255,7 @@ sub pythagoras
 
 sub weightvals1
 {
-  my ( $elt1, $boxgrads_ref, $boxdists_ref, $boxors_ref, $minreq_forcalc, $factbag_ref, $levbag_ref, $stepbag_ref, $elt2, $factlevels_ref, $maxdist, $elt3, $condweight ) = @_;
+  my ( $elt1, $boxgrads_ref, $boxdists_ref, $boxors_ref, $minreq_forcalc, $factbag_ref, $levbag_ref, $stepbag_ref, $levstep, $elt2, $factlevels_ref, $maxdist, $elt3, $condweight ) = @_;
   my @boxgrads = @{ $boxgrads_ref };
   my @boxdists = @{ $boxdists_ref };
   my @boxors = @{ $boxors_ref };
@@ -317,7 +317,10 @@ sub weightvals1
     $totstrength = ( 1 - $totdist );
   }
 
-  my $soughtinc = $soughtgrad;
+  # $soughtgrad is a slope (change per 1 level). To convert it into an increment,
+  # multiply by the number of levels spanned between neighbour and target (|Δlevel|).
+  if ( $levstep eq "" ) { $levstep = 1; }
+  my $soughtinc = ( $soughtgrad * $levstep );
 
   if ( ( $soughtinc ne "" ) and ( $totdist ne "" ) and ( $totstrength ne "" ) and ( $totstrength >= $minreq_forcalc ) )
   {
@@ -409,7 +412,7 @@ sub calcdist
       my @elts = split( "-", $el );
       push( @da2, $elts[0] );
       push( @da2par, $elts[1] );
-    } # say $tee "YES, Sim::OPTcueIM.";
+    } # say  "YES, Sim::OPTcueIM.";
 
     my $c = 0;
     foreach my $e ( @da1par )
@@ -537,7 +540,7 @@ sub calcmaxdist
   my $last = $arr[-1];
   my %hash = %{ calcdist( $first->[1], $last->[1], $factlevels_ref ) };
 
-  say $tee "raw max distance: " . dump( $hash{rawdist} );
+  say  "raw max distance: " . dump( $hash{rawdist} );
   return( $hash{rawdist}, $first->[0], $last->[0] );
 }
 
@@ -1006,12 +1009,12 @@ sub wei
 
   unless( ( $fulldo eq "$tight" ) and ( $count > 0 ) )
   {
-    say $tee "Entering gradients' \%bank.";
+    say  "Entering gradients' \%bank.";
     my ( $bank_ref, $nears_ref ) = fillbank( \@arr__, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels,
     $nfiltergrads, \@arra, $first0, $last0, \%nears, $limitgrads, $limitpoints, \@modality );
     %bank = %{ $bank_ref };
     %nears = %{ $nears_ref };
-    %bank = %{ clean( \%bank, $nfiltergrads, "principal", \@recedes ) }; say $tee "BANK DONE.";
+    %bank = %{ clean( \%bank, $nfiltergrads, "principal", \@recedes ) }; say  "BANK DONE.";
   }
 
 ###--###
@@ -1021,7 +1024,7 @@ sub wei
     my %bank = %{ $bank_ref };
     my %weldbank = %{ $weldbank_ref };
     my @parsws = @{ $parsws_ref };
-    say $tee "Mixing for welding " . dump( @parsws );
+    say  "Mixing for welding " . dump( @parsws );
     foreach my $trio ( keys %weldbank )
     {
       unless ( $trio eq "" )
@@ -1039,7 +1042,7 @@ sub wei
           push ( @{ $bank{$trio}{origins} }, @{ $weldbank{$trio}{origins} } );
           push ( @{ $bank{$trio}{orstrings} }, @{ $weldbank{$trio}{orstrings} } );
           push ( @{ $bank{$trio}{orstring} }, @{ $weldbank{$trio}{orstring} } );
-          say $tee "weld $num.";
+          say  "weld $num.";
         }
       }
     }
@@ -1049,11 +1052,11 @@ sub wei
   unless ( ( scalar( @weldsprepared ) == 0 )
   #or ( $count > 0 )
   )
-  { say $tee "Entering gradients' bank for welding.";
+  { say  "Entering gradients' bank for welding.";
     my $co = 0;
     foreach my $weldref ( @weldaarrs )
     {
-      my @parsws = @{ $parswelds[$co] }; #say $tee "\@parsws: " . dump( @parsws );
+      my @parsws = @{ $parswelds[$co] }; #say  "\@parsws: " . dump( @parsws );
       my @weldarr = @{ $weldref };
       my @weldarr__;
       if ( ( $limit_checkdistgrads ne "" ) or ( $limit_checkdistpoints ne "" ) )
@@ -1098,7 +1101,7 @@ sub wei
       %weldbank = %{ clean( \%weldbank, $nfiltergrads, "weld" ) };
 
       %bank = %{ mixbank( \%bank, \%weldbank, \@parsws ) };
-      #say $tee "KEYS \%bank: " . ( keys %bank );
+      #say  "KEYS \%bank: " . ( keys %bank );
 
       $co++;
     }
@@ -1197,6 +1200,7 @@ sub wei
                     my $d21 = $da2par[$co];
                     if ( ( $d10 eq $d20 ) )
                     {
+                      my $levstep = abs( $d11 - $d21 );
                       my $newpair = join( "-", ( $d11, $d21 ) );
 
                       my $newtrio = join( "-", $d10, $newpair );
@@ -1247,8 +1251,8 @@ sub wei
                       my ( $soughtinc, $totdist, $totstrength );
 
                       unless ( ( scalar( @boxgrads ) == 0 ) and ( scalar( @boxdists ) == 0 ) and ( scalar( @boxors ) == 0 ) )
-                      { #say $tee "CHEKK \$el->[3]: " . dump( $el->[3] );
-                        ( $soughtinc, $totdist, $totstrength ) = weightvals1( $elt->[1], \@boxgrads, \@boxdists, \@boxors, $minreq_forcalc, \@factbag, \@levbag, \@stepbag, $elt->[2], \%factlevels, $maxdist, $elt->[3], $condweight );
+                      { #say  "CHEKK \$el->[3]: " . dump( $el->[3] );
+                        ( $soughtinc, $totdist, $totstrength ) = weightvals1( $elt->[1], \@boxgrads, \@boxdists, \@boxors, $minreq_forcalc, \@factbag, \@levbag, \@stepbag, $levstep, $elt->[2], \%factlevels, $maxdist, $elt->[3], $condweight );
 
                         unless ( ( $soughtinc eq "" ) or ( $totdist eq "" ) )
                         {
@@ -1297,7 +1301,7 @@ sub wei
 
   my ( %wand, @limb0 );
 
-  say $tee "GOING TO CREATE NEW POINTS.";
+  say  "GOING TO CREATE NEW POINTS.";
 
   sub cyclearr_ancient
   {
@@ -1338,6 +1342,7 @@ sub wei
                     my $d21 = $da2par[$co];
                     if ( ( $d10 eq $d20 ) )
                     {
+                      my $levstep = abs( $d11 - $d21 );
                       my $newpair = join( "-", ( $d11, $d21 ) );
 
                       my $newtrio = join( "-", $d10, $newpair );
@@ -1388,7 +1393,7 @@ sub wei
 
                       unless ( ( scalar( @boxgrads ) == 0 ) and ( scalar( @boxdists ) == 0 ) and ( scalar( @boxors ) == 0 ) )
                       {
-                        ( $soughtinc, $totdist, $totstrength ) = weightvals1( $elt->[1], \@boxgrads, \@boxdists, \@boxors, $minreq_forcalc, \@factbag, \@levbag, \@stepbag, $elt->[2], \%factlevels, $maxdist, $elt->[3], $condweight );
+                        ( $soughtinc, $totdist, $totstrength ) = weightvals1( $elt->[1], \@boxgrads, \@boxdists, \@boxors, $minreq_forcalc, \@factbag, \@levbag, \@stepbag, $levstep, $elt->[2], \%factlevels, $maxdist, $elt->[3], $condweight );
 
                         unless ( ( $soughtinc eq "" ) or ( $totdist eq "" ) )
                         {
@@ -1433,7 +1438,7 @@ sub wei
   }
 
   %wand = %{ $wand_ref };
-  #say $tee "\nDONE.";
+  #say  "\nDONE.";
   %nears = %{ $nears_ref };
 
   @limb0;
@@ -1443,7 +1448,7 @@ sub wei
 
     if ( ( $soughtval ne "" ) and ( $totstrength ne "" ) )
     {
-      push ( @limb0, [ $wand{$ke}{name}, $wand{$ke}{bulk}, $soughtval, $totstrength ] );
+      push ( @limb0, [ $wand{$ke}{name}, $wand{$ke}{bulk}, $soughtval, $totstrength, "metamodelled" ] );
     }
   }
 
@@ -1732,7 +1737,7 @@ sub purelin
     unless ( $eltnum <= ( $instconcurrencies - 1 ) )
     {
       my $avg = mean( values( %{ $wand{$ke} } ) );
-      push ( @limb0, [ $spell{$ke}[0], $spell{$ke}[1] , $avg ] );
+      push ( @limb0, [ $spell{$ke}[0], $spell{$ke}[1] , $avg, "", "metamodelled" ] );
     }
   }
   return( @limb0 );
@@ -1795,7 +1800,7 @@ sub near
         my $bagmean = mean( @bag );
         unless ( scalar( @bag ) == 0 )
         {
-          push ( @limb0, [ $el->[0], $el->[1], $bagmean ] );
+          push ( @limb0, [ $el->[0], $el->[1], $bagmean, "", "metamodelled" ] );
         }
       }
     }
@@ -1973,7 +1978,7 @@ sub interlinear
   $newfile = $sourcefile . "_meta.csv";
   $report = $newfile . "_tofile.txt";
   @mode = ( "wei" ); # #"wei" is weighted gradient linear interpolation of the nearest neighbours.
-  #my @mode = ( "near" ); # "near" means "nearest neighbour"
+  #my @mode = ( "near" ); # "nea" means "nearest neighbour"
   #@mode = ( ""mix" ); # "mix" means sequentially mixed in each loop.
   #my @mode = ( "wei", "near", "near", "purelin" ); # a sequence
   @weights = (  ); #my @weights = ( 0.7, 0.3 ); # THE FIRST IS THE WEIGHT FOR linear interpolation, THE SECOND FOR nearest neighbour.
@@ -2028,7 +2033,6 @@ sub interlinear
   }
 
 
-  $tee = new IO::Tee(\*STDOUT, ">>$report"); # GLOBAL ZZZ
 
   if ( $sourcef ne "" ){ $sourcefile = $sourcef; }
 
@@ -2038,12 +2042,12 @@ sub interlinear
   if ( $blockelts_r ne "" ){ @blockelts = @{ $blockelts_r }; }
 
   my @mode = adjustmode( $maxloops, \@mode );
-  say $tee "Opening $sourcefile";
+  say  "Opening $sourcefile";
   open( SOURCEFILE, "$sourcefile" ) or die;
   my @lines = <SOURCEFILE>;
   close SOURCEFILE;
-  #print "THIS $tee";
-  say $tee "Preparing the dataseries, IN INTERLINEAR: \$countblock $countblock";
+  #print "THIS ";
+  say  "Preparing the dataseries, IN INTERLINEAR: \$countblock $countblock";
   #say "nfiltergrads: $nfiltergrads";
   #say "limit_checkdistgrads: $limit_checkdistgrads";
   #say "limit_checkdistpoints: $limit_checkdistpoints";
@@ -2055,14 +2059,14 @@ sub interlinear
 
   my @aarr = @{ $aarr_ref };
 
-  say $tee "Checking factors and levels.";
+  say  "Checking factors and levels.";
   my %factlevels = %{ prepfactlev( \@aarr ) };
-  say $tee "Done.";
+  say  "Done.";
 
 
   my ( $factlev_ref ) = tellstepsize( \%factlevels, $lvconversion );
-  my %factlev = %{ $factlev_ref }; #say $tee " \%factlev: " . dump( %factlev );
-  say $tee "Understood step sizes.";
+  my %factlev = %{ $factlev_ref }; #say  " \%factlev: " . dump( %factlev );
+  say  "Understood step sizes.";
 
 ###--###
   my ( @weldaarrs );
@@ -2114,7 +2118,7 @@ sub interlinear
       }
       if ( $t == 0)
       {
-        say $tee "EXITING. DONE.";
+        say  "EXITING. DONE.";
         printend( \@arr, $newfile, $optformat );
         last;
       }
@@ -2148,24 +2152,24 @@ sub interlinear
       %bank = %{ $bank_ref };
       %nears = %{ $nears_ref };
 
-      say $tee "THERE ARE " . scalar( @limbo_wei ) . " ITEMS IN THIS LOOP , NUMBER " . ( $count + 1 ). ", 1, FOR WEIGHTED GRADIENT INTERPOLATION OF THE NEAREST NEIGHBOUR.";
+      say  "THERE ARE " . scalar( @limbo_wei ) . " ITEMS IN THIS LOOP , NUMBER " . ( $count + 1 ). ", 1, FOR WEIGHTED GRADIENT INTERPOLATION OF THE NEAREST NEIGHBOUR.";
     }
-    #say $tee "OBTAINED LIMBO_WEI: " . dump( @limbo_wei );
+    #say  "OBTAINED LIMBO_WEI: " . dump( @limbo_wei );
 
     if ( ( $mode__ eq "purelin" ) or ( $mode__ eq "mix" ) )
     {
       @limbo_purelin = purelin( \@arr, $relaxlimit, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies, $count, \%factlev, $maxdist );
-      say $tee "THERE ARE " . scalar( @limbo_purelin ) . " ITEMS IN THIS LOOP , NUMBER " . ( $count + 1 ). ", 1, FOR PURE LINEAR INTERPOLATION.";
+      say  "THERE ARE " . scalar( @limbo_purelin ) . " ITEMS IN THIS LOOP , NUMBER " . ( $count + 1 ). ", 1, FOR PURE LINEAR INTERPOLATION.";
     }
-    #say $tee "OBTAINED LIMBO_PURELIN: " . dump( @limbo_purelin );
+    #say  "OBTAINED LIMBO_PURELIN: " . dump( @limbo_purelin );
 
     if ( ( $mode__ eq "near" ) or ( $mode__ eq "mix" ) )
     {
       @limbo_near = near( @arr, $nearrelaxlimit, $relaxmethod, $overweightnearest, $nearconcurrencies, $count, \%factlev, $maxdist );
-      say $tee "THERE ARE " . scalar( @limbo_near ) . " ITEMS IN THIS LOOP, NUMBER " . ( $count + 1 ) . ", 2, FOR THE NEAREST NEIGHBOUR STRATEGY.";
+      say  "THERE ARE " . scalar( @limbo_near ) . " ITEMS IN THIS LOOP, NUMBER " . ( $count + 1 ) . ", 2, FOR THE NEAREST NEIGHBOUR STRATEGY.";
     }
-    #say $tee "MAGIC: " . dump( %magic );
-    #say $tee "OBTAINED LIMBO_NEAR: " . dump( @limbo_near );
+    #say  "MAGIC: " . dump( %magic );
+    #say  "OBTAINED LIMBO_NEAR: " . dump( @limbo_near );
 
 
     if ( $mode__ eq "wei" )
@@ -2189,15 +2193,15 @@ sub interlinear
     #  @limbo = mixlimbo( \@limbo_prov, \@limbo_near, $presence, $linearprecedence, \@weights );
     #}
 
-    #say $tee "OBTAINED LIMBO: " . dump( @limbo );
-    say $tee "MIXING THE ARRAY UPDATES " . ( $count + 1 ) . " for $sourcefile";
-    say $tee "THERE ARE " . scalar( @limbo ) . " ITEMS COMING OUT FROM THIS MIX " . ( $count + 1 );
+    #say  "OBTAINED LIMBO: " . dump( @limbo );
+    say  "MIXING THE ARRAY UPDATES " . ( $count + 1 ) . " for $sourcefile";
+    say  "THERE ARE " . scalar( @limbo ) . " ITEMS COMING OUT FROM THIS MIX " . ( $count + 1 );
 
 
     if ( ( scalar( @limbo ) == 0 ) )
     {
-      #say $tee "ARR END: " . dump( @arr );
-      say $tee "EXITING.";
+      #say  "ARR END: " . dump( @arr );
+      say  "EXITING.";
       printend( \@arr, $newfile, $optformat );
       last;
     }
@@ -2208,27 +2212,49 @@ sub interlinear
       {
         if ( $el->[0] eq $elt->[0] )
         {
+          my $update_val      = $el->[2];
+          my $update_strength = $el->[3];
+          my $update_status   = $el->[4];
+
+          if ( $update_status eq "" ) { $update_status = "metamodelled"; }
+          if ( $elt->[4] eq "" )      { $elt->[4] = "missing"; }
+
+          # Do not overwrite sampled points.
+          if ( $elt->[4] eq "sampled" )
+          {
+            next;
+          }
+
+          # If the incoming update is sampled, it dominates.
+          if ( $update_status eq "sampled" )
+          {
+            $elt->[2] = $update_val;
+            $elt->[3] = 1;
+            $elt->[4] = "sampled";
+            next;
+          }
+
           if ( $elt ->[2] eq "" )
           {
-              push ( @{ $elt }, $el->[2], $el->[3] );
+            $elt->[2] = $update_val;
+            $elt->[3] = $update_strength;
+            $elt->[4] = $update_status;
           }
           else
           {
+            my ( $soughtval, $totstrength ) = weightvals_merge( [ $elt->[2], $update_val ], [ $elt->[3], $update_strength ], $minreq_formerge, $maxdist  );
+            if ( ( $soughtval ne "" ) and ( $totstrength ne "" ) )
             {
-              my ( $soughtval, $totstrength ) = weightvals_merge( [ $elt->[2], $el->[2] ], [ $elt->[3], $el->[3] ], $minreq_formerge, $maxdist  );
-              if ( ( $soughtval ne "" ) and ( $totstrength ne "" ) )
-              {
-                pop @{ $elt };
-                pop @{ $elt };
-                push ( @{ $elt }, $soughtval, $totstrength );
-              }
+              $elt->[2] = $soughtval;
+              $elt->[3] = $totstrength;
+              $elt->[4] = "metamodelled";
             }
           }
         }
       }
     }
     @arr2 = @arr ;
-    say $tee "INSERTING THE ARRAY UPDATES " . ( $count + 1 ) . " for $sourcefile";
+    say  "INSERTING THE ARRAY UPDATES " . ( $count + 1 ) . " for $sourcefile";
     $count++;
   }
   return( @arr );
@@ -2420,18 +2446,19 @@ Or to begin with a dialogue question:
 ./Interlinear.pm interstart;
 .
 
-The minimal operations for utilizing a data series which is incomplete as regards the parameter listings are the following:
 
-1) copy the executable "opt" in the work folder;
+=head1 FILE OUTPUT NAMES
 
-2) create a configuration file for Sim::OPT by modifying the "caravantrial.pl" file in the "examples" folder of this distribution (it is sufficient to modify the few values signalled by capital letters in the comments) and place it in the work folder;
+Interlinear’s internal defaults are:
 
-4) copy the .csv file in the work folder;
+  sourcefile              ("")         # overridden by caller
+  newfile                 ($sourcefile . "_meta.csv")
+  report                  ($newfile . "_tofile.txt")
 
-5) launch Sim::OPT in the shell: << ./opt >>;
+These are normally set by the caller (e.g., Descend) and do not typically need
+to be overridden in %dowhat.
 
-6) when asked, specify the name (with relative path) of the Sim::OPT configuration file. For example:
-./filename.pl .
+
 
 This module is dual-licensed, open-source and proprietary. The open-source distribution is available on CPAN (https://metacpan.org/dist/Sim-OPT ). A proprietary distribution, including additional modules (OPTcue), is available from the author’s website (https://sites.google.com/view/bioclimatic-design/home/software ).
 

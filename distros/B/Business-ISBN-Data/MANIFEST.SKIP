@@ -73,3 +73,5 @@ hacks/
 
 lib/Business/ISBN/RangeMessage.xml.new
 util/
+
+.downstream.json

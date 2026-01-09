@@ -1,0 +1,67 @@
+{
+   "abstract" : "EasyDNS Dynamic DNS updater (CLI-first App distribution)",
+   "author" : [
+      "Sergio de Sousa <sergio@serso.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-sdseasydyn",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Tiny" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Tiny" : "0",
+            "MIME::Base64" : "0",
+            "Retry::Policy" : "0.02",
+            "URI::Escape" : "0",
+            "perl" : "5.030",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sergio-desousa/sdseasydyn/issues"
+      },
+      "homepage" : "https://github.com/sergio-desousa/sdseasydyn",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sergio-desousa/sdseasydyn.git",
+         "web" : "https://github.com/sergio-desousa/sdseasydyn"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

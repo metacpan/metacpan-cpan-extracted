@@ -1,0 +1,139 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use FindBin ();
+use lib "$FindBin::Bin/../lib";
+
+use Getopt::Long qw(GetOptionsFromArray);
+
+use App::sdseasydyn ();
+use EasyDNS::DDNS ();
+
+sub _usage {
+    my ($code) = @_;
+    print <<"USAGE";
+sdseasydyn - EasyDNS Dynamic DNS updater
+
+Usage:
+  sdseasydyn [global options] <command> [command options]
+
+Commands:
+  update   Update one or more hostnames
+
+Global options:
+  -h, --help
+  -V, --version
+  -v, --verbose
+
+Update options:
+  -H, --host HOSTNAME        Repeatable. Hostname(s) to update.
+  -c, --config PATH          Config file path (default: ~/.config/sdseasydyn/config.ini)
+      --state PATH           State file path (default: ~/.local/state/sdseasydyn/last_ip)
+      --ip IP                Override detected public IP (for safe testing)
+      --ip-url URL           Public IP discovery URL (default: https://api.ipify.org)
+      --timeout SECONDS      HTTP timeout (default: 10)
+      --dry-run              Resolve config, compare state, and report intended action
+  -v, --verbose              Repeat to increase verbosity (e.g. -vv)
+
+Environment:
+  SDS_EASYDYN_CONFIG          Default config path override
+  SDS_EASYDYN_STATE           Default state path override
+  EASYDNS_USER                EasyDNS username
+  EASYDNS_TOKEN               EasyDNS dynamic token/password
+
+Exit codes:
+  0 success
+  2 usage/config error
+  3 auth/permission failure
+  4 transient failure (network/IP discovery)
+  5 provider/policy failure (TOOSOON, NOSERVICE, ILLEGAL, unknown)
+
+USAGE
+    exit $code;
+}
+
+sub _version {
+    my $ver = $App::sdseasydyn::VERSION // '0.0.0';
+    print "sdseasydyn $ver\n";
+    exit 0;
+}
+
+my @argv = @ARGV;
+
+Getopt::Long::Configure(qw(require_order no_ignore_case bundling));
+
+my $help    = 0;
+my $version = 0;
+my $verbose = 0;
+
+GetOptionsFromArray(
+    \@argv,
+    'help|h'     => \$help,
+    'version|V'  => \$version,
+    'verbose|v+' => \$verbose,
+) or _usage(2);
+
+_version() if $version;
+_usage(0)  if $help;
+
+my $cmd = shift(@argv) // '';
+_usage(0) if $cmd eq '';
+
+if ($cmd eq 'update') {
+    my @hosts;
+    my $config_path = $ENV{SDS_EASYDYN_CONFIG} // '';
+    my $state_path  = $ENV{SDS_EASYDYN_STATE}  // '';
+    my $ip          = '';
+    my $ip_url      = '';
+    my $timeout     = 0;
+    my $dry_run     = 0;
+
+    Getopt::Long::Configure(qw(no_ignore_case bundling));
+    GetOptionsFromArray(
+        \@argv,
+        'host|H=s@'   => \@hosts,
+        'config|c=s'  => \$config_path,
+        'state=s'     => \$state_path,
+        'ip=s'        => \$ip,
+        'ip-url=s'    => \$ip_url,
+        'timeout=i'   => \$timeout,
+        'dry-run'     => \$dry_run,
+        'verbose|v+'  => \$verbose,
+    ) or _usage(2);
+
+    if (@argv) {
+        print STDERR "Unexpected arguments: @argv\n";
+        _usage(2);
+    }
+
+    my $ddns = EasyDNS::DDNS->new(verbose => $verbose);
+
+    my $res = $ddns->cmd_update(
+        hosts       => \@hosts,
+        config_path => $config_path,
+        state_path  => $state_path,
+        ip          => $ip,
+        ip_url      => $ip_url,
+        timeout     => $timeout,
+        dry_run     => $dry_run,
+    );
+
+    if (!$res->{ok}) {
+        print STDERR $res->{error} . "\n";
+        exit($res->{exit_code} // 2);
+    }
+
+    if ($verbose) {
+        print STDERR $res->{message} . "\n" if $res->{message};
+        print STDERR "current_ip=$res->{current_ip}\n" if $res->{current_ip};
+    } else {
+        print $res->{message} . "\n" if $res->{message};
+    }
+
+    exit($res->{exit_code} // 0);
+}
+
+print STDERR "Unknown command: $cmd\n";
+_usage(2);
+

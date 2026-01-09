@@ -1,15 +1,22 @@
 TYPEMAP
-Bit_T             Bit_T
-INTEGER_ARRAY_REF  INTEGER_ARRAY_REF
+Bit_T_obj         	Bit_T_obj
+Bit_T			  	Bit_T   
+Bit_DB_T_obj		Bit_DB_T_obj
+Bit_DB_T		  	Bit_DB_T
+INTEGER_ARRAY_REF  	INTEGER_ARRAY_REF
+SETOP_COUNT_OPTS_t	SETOP_COUNT_OPTS_t
 
 INPUT
-Bit_T
-	if (!SvROK($arg) || !sv_isobject($arg) || !sv_derived_from($arg, "Bit::Set"))
+Bit_T_obj
+	if (!sv_isa($arg, "Bit::Set"))
 		croak("expected a Bit::Set object");
-	{
-		IV tmp = SvIV((SV*)SvRV($arg));
-		$var = INT2PTR($type, tmp);
-	}
+		$var = INT2PTR($type, SvIV((SV*)SvRV($arg)));
+
+SETOP_COUNT_OPTS_t
+	if (!sv_isa($arg, "Bit::Set::DB::SETOP_COUNT_OPTS"))
+		croak("Bit::Set::DB::SETOP_COUNT_OPTS");
+		$var = INT2PTR($type, SvIV((SV*)SvRV($arg)));
+
 
 INTEGER_ARRAY_REF
 	if (!SvOK($arg) || !SvROK($arg))
@@ -19,3 +26,24 @@ INTEGER_ARRAY_REF
 	$var = $arg;
 
 
+Bit_DB_T_obj
+	if (!sv_isa($arg, "Bit::Set::DB"))
+		croak("expected a Bit::Set::DB object");
+		$var = INT2PTR($type, SvIV((SV*)SvRV($arg)));
+
+
+
+
+OUTPUT
+
+Bit_T
+	$arg = newSVuv(PTR2UV($var));  
+
+Bit_T_obj
+	sv_setref_pv($arg, class, (void*)$var);
+
+Bit_DB_T
+	$arg = newSVuv(PTR2UV($var));
+
+Bit_DB_T_obj
+	sv_setref_pv($arg, class, (void*)$var);

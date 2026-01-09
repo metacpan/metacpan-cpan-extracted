@@ -37,7 +37,7 @@
    "provides" : {
       "Future::IO::Impl::UV" : {
          "file" : "lib/Future/IO/Impl/UV.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

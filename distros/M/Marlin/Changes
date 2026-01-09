@@ -6,10 +6,28 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.011001	2026-01-08
+
+ [ Bug Fixes ]
+ - Marlin::XAttribute::Alias pod syntax fix.
+
+ [ Documentation ]
+ - Marlin::X::Clone documentation improvements.
+
+ [ Packaging ]
+ - Require Class::XSAccessor 0.016002.
+
+ [ Other ]
+ - Check that code is actually compiling before using B::Hooks::AtRuntime,
+   otherwise just run stuff immediately.
+ - Marlin::X::Clone is now aware of Marlin::XAttribute::Alias.
+ - Marlin::X::Clone now supports more on_clone options.
+ - Marlin::X::Clone performance improvements.
+
 0.011000	2026-01-07
 
  [ Packaging ]
- - Require Class::XSAccessor 0.016000.
+ - Require Class::XSAccessor 0.016001.
  - Require Type::Tiny 2.010000.
 
  [ Other ]
@@ -21,8 +39,6 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    generated.
  - Move some attribute logic from Marlin to Marlin::Attribute making it
    easier for attribute extensions to override.
- - Partial support for inheritance from Object::Pad classes (but sometimes
-   it segfaults).
  - Support inheritance from Class::Tiny classes.
  - Support inheritance from Mite classes and composing Mite roles.
  - Support inheritance from Mouse classes and composing Mouse roles.

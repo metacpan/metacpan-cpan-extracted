@@ -10,7 +10,7 @@ App::Greple::tee - module to replace matched text by the external command result
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 DESCRIPTION
 
@@ -65,12 +65,16 @@ the result of executing the command are reverted back to the newline
 character. Thus, blocks consisting of multiple lines can be processed
 in batches without using the B<--discrete> option.
 
+This works well with L<ansifold> command's B<--crmode> option, which
+joins CR-separated text and outputs folded lines separated by CR.
+
 =item B<--fillup>
 
 Combine a sequence of non-blank lines into a single line before
 passing them to the filter command.  Newline characters between wide
-width characters are deleted, and other newline characters are
-replaced with spaces.
+width characters (Japanese, Chinese) are deleted, and other newline
+characters are replaced with spaces.  Korean (Hangul) is treated
+like ASCII text and joined with space.
 
 =item B<--squeeze>
 
@@ -89,6 +93,19 @@ as follows.
     greple -Mtee cat -n -- -ML 2::2
 
 =back
+
+=head1 CONFIGURATION
+
+Module parameters can be set with B<Getopt::EX::Config> module using
+the following syntax:
+
+    greple -Mtee::config(discrete) ...
+    greple -Mtee::config(fillup,crmode) ...
+
+This is useful when combined with shell aliases or module files.
+
+Available parameters are: B<discrete>, B<bulkmode>, B<crmode>,
+B<fillup>, B<squeeze>, B<blocks>.
 
 =head1 LEGACIES
 
@@ -172,9 +189,10 @@ Next command will find some indented part in LICENSE document.
          with your modifications.
 
 You can reformat this part by using B<tee> module with B<ansifold>
-command:
+command.  Using both B<--crmode> options together allows efficient
+processing of multi-line blocks:
 
-    greple -Mtee ansifold -rsw40 --prefix '     ' -- --discrete --re ...
+    greple -Mtee ansifold -sw40 --prefix '     ' --crmode -- --crmode --re ...
 
       a) distribute a Standard Version of
          the executables and library files,
@@ -186,16 +204,8 @@ command:
          machine-readable source of the
          Package with your modifications.
 
-The --discrete option will start multiple processes, so the process
-will take longer to execute.  So you can use C<--separate '\r'> option
-with C<ansifold> which produce single line using CR character instead
-of NL.
-
-    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
-
-Then convert CR char to NL after by L<tr(1)> command or some.
-
-    ... | tr '\r' '\n'
+The B<--discrete> option can also be used but will start multiple
+processes, so it takes longer to execute.
 
 =head1 EXAMPLE 3
 
@@ -234,10 +244,7 @@ L<https://github.com/tecolicom/Greple>
 
 L<App::Greple::xlate>
 
-=head1 BUGS
-
-The C<--fillup> option will remove spaces between Hangul characters when 
-concatenating Korean text.
+L<App::ansifold>, L<https://github.com/tecolicom/App-ansifold>
 
 =head1 AUTHOR
 
@@ -245,7 +252,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -254,24 +261,36 @@ it under the same terms as Perl itself.
 
 package App::Greple::tee;
 
-our $VERSION = "1.02";
+our $VERSION = "1.03";
 
-use v5.14;
+use v5.24;
 use warnings;
+use experimental 'refaliasing';
 use Carp;
 use List::Util qw(sum first);
 use Text::ParseWords qw(shellwords);
 use App::cdif::Command;
 use Data::Dumper;
+use Getopt::EX::Config;
+
+my $config = Getopt::EX::Config->new(
+    debug => 0,
+    blocks => 0,
+    discrete => 0,
+    fillup => 0,
+    squeeze => 0,
+    bulkmode => 0,
+    crmode => 0,
+);
 
 our $command;
-our $blocks;
-our $discrete;
-our $fillup;
-our $debug;
-our $squeeze;
-our $bulkmode;
-our $crmode;
+\our $debug    = \$config->{debug};
+\our $blocks   = \$config->{blocks};
+\our $discrete = \$config->{discrete};
+\our $fillup   = \$config->{fillup};
+\our $squeeze  = \$config->{squeeze};
+\our $bulkmode = \$config->{bulkmode};
+\our $crmode   = \$config->{crmode};
 
 my($mod, $argv);
 
@@ -287,9 +306,24 @@ sub initialize {
 
 use Unicode::EastAsianWidth;
 
+sub InConcatScript {
+    return <<"END";
++App::Greple::tee::InFullwidth
+-utf8::Hangul
+END
+}
+
+sub InFullwidthPunctuation {
+    return <<"END";
++App::Greple::tee::InFullwidth
+&utf8::Punctuation
+END
+}
+
 sub fillup_block {
     (my $s1, local $_, my $s2) = $_[0] =~ /\A(\s*)(.*?)(\s*)\z/s or die;
-    s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//g;
+    s/(?<=\p{InFullwidthPunctuation})\n//g;
+    s/(?<=\p{InConcatScript})\n(?=\p{InConcatScript})//g;
     s/\s+/ /g;
     $s1 . $_ . $s2;
 }

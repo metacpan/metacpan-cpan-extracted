@@ -1,3 +1,6 @@
+Changes
+examples/script_extended.pl
+examples/script_simple.pl
 lib/CLI/Cmdline.pm
 Makefile.PL
 MANIFEST
@@ -8,5 +11,6 @@ t/02-alias.t
 t/03-complex.t
 t/04-error.t
 t/05-integration.t
+xt/release/kwalitee.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

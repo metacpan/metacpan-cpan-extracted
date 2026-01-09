@@ -1,0 +1,13 @@
+Revision history for sdseasydyn
+
+0.1.0  2026-01-08
+  - First public release: EasyDNS DDNS updater CLI
+  - Config precedence (CLI/ENV/config/defaults) with safe secret handling
+  - Public IP discovery + skip update when unchanged (state file)
+  - Retries via Retry::Policy and HTTP::Tiny wrapper
+  - CI workflow, example config, and documentation
+
+0.001  2026-01-07
+  - Scaffold project layout (library + CLI + tests)
+
+

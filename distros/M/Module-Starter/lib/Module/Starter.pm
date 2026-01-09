@@ -11,11 +11,11 @@ Module::Starter - a simple starter kit for any module
 
 =head1 VERSION
 
-version 1.79
+version 1.80
 
 =cut
 
-our $VERSION = '1.79';
+our $VERSION = '1.80';
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,7 @@ Nothing in here is meant for public consumption.  Use L<module-starter>
 from the command line.
 
     module-starter --module=Foo::Bar,Foo::Bat \
-        --author="Andy Lester" --email=andy@petdance.com
+        --author="Andy Lester <andy@petdance.com>"
 
 =head1 DESCRIPTION
 
@@ -54,15 +54,17 @@ It takes a hash of params, as follows:
                                       # or specify more than one builder in an
                                       # arrayref
 
-    license      => $license,  # type of license; defaults to 'artistic2'
-    author       => $author,   # author's full name (taken from C<getpwuid> if not provided)
-    email        => $email,    # author's email address (taken from C<EMAIL> if not provided)
-    github       => $username, # author's github user name (for creating links to git repo)
-    ignores_type => $type,     # ignores file type ('generic', 'cvs', 'git', 'hg', 'manifest' )
-    fatalize     => $fatalize, # generate code that makes warnings fatal
+    license      => $license,    # type of license; defaults to 'artistic2'
+    author       => [ authors ], # author(s) name and email address
+                                 # (if not provided, name and email are taken from getpwuid and
+                                 # EMAIL respectively)
+                                 # format: Author Name <author-email@domain.tld>
+    github       => $username,   # author's GitHub user name (for creating links to issue tracker)
+    ignores_type => $type,       # ignores file type ('generic', 'cvs', 'git', 'hg', 'manifest')
+    fatalize     => $fatalize,   # generate code that makes warnings fatal
 
-    verbose      => $verbose,  # bool: print progress messages; defaults to 0
-    force        => $force     # bool: overwrite existing files; defaults to 0
+    verbose      => $verbose,    # bool: print progress messages; defaults to 0
+    force        => $force       # bool: overwrite existing files; defaults to 0
 
 The ignores_type is a new feature that allows one to create SCM-specific ignore files.
 These are the mappings:

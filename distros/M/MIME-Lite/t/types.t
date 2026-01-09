@@ -1,8 +1,9 @@
 #!/usr/bin/perl
-use lib "lib", "t";
+use strict;
+use warnings;
+
 use MIME::Lite;
 use Test::More;
-use Utils;
 
 if (eval { require MIME::Types; MIME::Types->VERSION(1.28); 1 }) {
   plan tests => 1;
@@ -69,4 +70,3 @@ This isn't really html. We are only checking the filename silly.
 EOFEXPECT
 
 is($ret, $expect, "we got the message we expected");
-

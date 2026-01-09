@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::OS::linux::debian v0.999.10;
+package LedgerSMB::Installer::OS::linux::debian v0.999.11;
 
 use v5.20;
 use experimental qw(signatures);

@@ -1,0 +1,26 @@
+bin/sdseasydyn
+Changes
+docs/EASYDNS.md
+docs/HOWTO.md
+examples/config.ini
+lib/App/sdseasydyn.pm
+lib/EasyDNS/DDNS.pm
+lib/EasyDNS/DDNS/Config.pm
+lib/EasyDNS/DDNS/HTTP.pm
+lib/EasyDNS/DDNS/State.pm
+lib/EasyDNS/DDNS/Util.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+scripts/run.sh
+scripts/sdseasydyn.env.example
+SECURITY.md
+t/00-load.t
+t/config.t
+t/http_retry.t
+t/redaction.t
+t/state.t
+t/update_logic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

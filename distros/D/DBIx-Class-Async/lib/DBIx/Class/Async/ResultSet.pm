@@ -17,11 +17,11 @@ DBIx::Class::Async::ResultSet - Asynchronous ResultSet for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.14
+Version 0.20
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.20';
 
 =head1 SYNOPSIS
 
@@ -222,8 +222,8 @@ sub new_result_set {
         # $rows is an arrayref of DBIx::Class::Async::Row objects
     });
 
-Returns all rows matching the current search criteria as L<DBIx::Class::Async::Row>
-objects.
+Returns all rows matching the current search criteria as L<DBIx::Class::Async::Row> objects,
+with prefetched relationships properly inflated.
 
 =over 4
 
@@ -237,13 +237,6 @@ objects.
 Results are cached internally for use with C<next> and C<reset> methods.
 
 =back
-
-=cut
-
-=head2 all
-
-Returns all rows matching the current search criteria as L<DBIx::Class::Async::Row> objects,
-with prefetched relationships properly inflated.
 
 =cut
 
@@ -551,6 +544,92 @@ sub delete {
     });
 }
 
+=head2 delete_all
+
+  $rs->delete_all->then(sub {
+      my ($deleted_count) = @_;
+      say "Deleted $deleted_count rows";
+  });
+
+Fetches all objects and deletes them one at a time via L<DBIx::Class::Row/delete>.
+
+=over 4
+
+=item B<Arguments>
+
+None
+
+=item B<Returns>
+
+A L<Future> that resolves to the number of rows deleted.
+
+=item B<Difference from delete()>
+
+C<delete_all> will run DBIC-defined triggers (such as C<before_delete>, C<after_delete>),
+and will handle cascading deletes through relationships, while C<delete()> performs
+a more efficient bulk delete that bypasses Row-level operations.
+
+Use C<delete_all> when you need:
+- Row-level triggers to fire
+- Cascading deletes to work properly
+- Accurate counts of rows affected
+
+Use C<delete> when you need:
+- Better performance for large datasets
+- Direct database-level deletion
+
+=item B<Example>
+
+  # Delete with triggers
+  $rs->search({ expired => 1 })->delete_all->then(sub {
+      my ($count) = @_;
+      say "Deleted $count expired records with triggers";
+  });
+
+  # Compare with bulk delete (no triggers)
+  $rs->search({ expired => 1 })->delete->then(sub {
+      my ($count) = @_;
+      say "Bulk deleted $count records (no triggers)";
+  });
+
+=back
+
+=cut
+
+sub delete_all {
+    my $self = shift;
+
+    # Fetch all rows as Row objects (not raw data)
+    return $self->all->then(sub {
+        my ($rows) = @_;
+
+        # If no rows, return 0
+        return Future->done(0) unless @$rows;
+
+        # Delete each Row object individually
+        # This will trigger all DBIC row-level operations
+        my @futures;
+
+        foreach my $row (@$rows) {
+            # Call delete on the Row object
+            # This ensures triggers and cascades work
+            push @futures, $row->delete;
+        }
+
+        return Future->wait_all(@futures)->then(sub {
+            # Count successful deletes
+            my $deleted_count = 0;
+            foreach my $f (@_) {
+                my $result = eval { $f->get };
+                if ($result && !$@) {
+                    $deleted_count++;
+                }
+            }
+            return Future->done($deleted_count);
+        });
+    });
+}
+
 =head2 find
 
     $rs->find($id)->then(sub {
@@ -614,6 +693,75 @@ sub find {
 
     # Fully async: search builds query, single_future executes async
     return $self->search($cond)->single_future;
+}
+
+=head2 find_or_new
+
+  my $future = $rs->find_or_new({ name => 'Alice' }, { key => 'user_name' });
+
+  $future->on_done(sub {
+      my $user = shift;
+      $user->insert if !$user->in_storage;
+  });
+
+Finds a record using C<find>. If no row is found, it returns a new Result object
+inflated with the provided data. This object is B<not> yet saved to the database.
+
+=cut
+
+sub find_or_new {
+    my ($self, $data, $attrs) = @_;
+
+    # 1. Attempt to find the record first
+    return $self->find($data, $attrs)->then(sub {
+        my ($row) = @_;
+
+        # 2. If found, return it
+        return Future->done($row) if $row;
+
+        # 3. If not found, instantiate a new result object locally.
+        # We merge the search data with ResultSet conditions (like foreign keys).
+        my %new_data = ( %{$self->{_cond} || {}}, %$data );
+        my %clean_data;
+        while (my ($k, $v) = each %new_data) {
+            (my $clean_key = $k)    =~ s/^(?:foreign|self)\.//;
+            $clean_data{$clean_key} = $v;
+        }
+
+        return Future->done($self->new_result(\%clean_data));
+    });
+}
+
+=head2 find_or_create
+
+  my $future = $rs->find_or_create({ name => 'Bob' });
+
+Attempts to find a record. If it does not exist, it performs an C<INSERT> and
+returns the resulting Result object.
+
+=cut
+
+sub find_or_create {
+    my ($self, $data, $attrs) = @_;
+
+    $attrs //= {};
+    my $source      = $self->result_source;
+    my $key_name    = $attrs->{key} || 'primary';
+    my @unique_cols = $source->unique_constraint_columns($key_name);
+
+    # Extract only the unique identifier columns for the lookup
+    my %lookup;
+    if (@unique_cols) {
+        @lookup{@unique_cols} = @{$data}{@unique_cols};
+    } else {
+        %lookup = %$data;
+    }
+
+    return $self->find(\%lookup, $attrs)->then(sub {
+        my $row = shift;
+        return Future->done($row) if $row;
+        return $self->create($data);
+    });
 }
 
 =head2 first
@@ -772,6 +920,169 @@ sub next {
 
     return $self->{_rows}[$self->{_pos}++];
 }
+
+
+=head2 populate
+
+  my $future = $rs->populate([
+      { title => 'First Post', content => 'Hello' },
+      { title => 'Second Post', content => 'World' },
+  ]);
+
+  $future->on_done(sub {
+      my @result_objects = @_;
+      print "Inserted: " . $_->title . "\n" for @result_objects;
+  });
+
+This method provides a way to insert multiple rows into the database and receive
+the resulting objects back. It behaves similarly to L<DBIx::Class::ResultSet/populate>,
+but operates asynchronously and returns a L<Future>.
+
+=over 4
+
+=item * B<Arguments:> C<[ \%col_data, ... ]> or C<[ \@column_list, [ \@row_values, ... ] ]>
+
+=item * B<Return Value:> A L<Future> that resolves to a list of Result objects.
+
+=back
+
+B<Processing Logic:>
+If an arrayref of hashrefs is provided, the method automatically merges any
+existing ResultSet conditions (such as foreign keys from a relationship) into
+each row. It also cleans C<foreign.> or C<self.> prefixes from keys to ensure
+compatibility with SQL insert statements.
+
+B<Note:> This method inflates every inserted row into a Result object. For very
+large datasets where objects are not needed, use L</populate_bulk> for
+significantly better performance.
+
+=cut
+
+sub populate {
+    my ($self, $data) = @_;
+
+    # Validating input similar to DBIC
+    unless (ref $data eq 'ARRAY') {
+        return Future->fail("populate() requires an arrayref", "usage_error");
+    }
+
+    # If the data is an array of hashrefs, we might need to merge
+    # current ResultSet conditions (like foreign keys), similar to create()
+    my $final_data = $data;
+    if (ref $data->[0] eq 'HASH') {
+        $final_data = [ map {
+            my $row = $_;
+            my %to_insert = ( %{$self->{_cond} || {}}, %$row );
+            my %clean_data;
+            while (my ($k, $v) = each %to_insert) {
+                my $clean_key = $k;
+                $clean_key =~ s/^(?:foreign|self)\.//;
+                $clean_data{$clean_key} = $v;
+            }
+            \%clean_data;
+        } @$data ];
+    }
+
+    return $self->{async_db}->populate(
+        $self->{source_name},
+        $final_data
+    )->then(sub {
+        my ($results) = @_;
+
+        # Error handling
+        if (ref $results eq 'HASH' && $results->{__error}) {
+            return Future->fail($results->{__error}, 'db_error');
+        }
+
+        # Re-inflate hashes back into DBIx::Class::Async::Result objects
+        my @objects = map { $self->new_result($_) } @$results;
+
+        # Return as list or arrayref depending on context is tricky in Promises.
+        # Usually, async APIs return the collection and let the user handle it.
+        return Future->done(@objects);
+    });
+}
+
+=head2 populate_bulk
+
+  my $future = $rs->populate_bulk(\@large_dataset);
+
+  $future->on_done(sub {
+      print "Bulk insert successful\n";
+  });
+
+A high-performance version of C<populate> intended for large-scale data ingestion.
+
+=over 4
+
+=item * B<Arguments:> C<[ \%col_data, ... ]> or C<[ \@column_list, [ \@row_values, ... ] ]>
+
+=item * B<Return Value:> A L<Future> that resolves to a truthy value (1) on success.
+
+=back
+
+B<Key Differences from populate:>
+
+=over 4
+
+=item 1. B<Context:> Executes the database operation in void context on the worker side.
+
+=item 2. B<No Inflation:> Does not create Result objects for the inserted rows.
+
+=item 3. B<Efficiency:> Reduces memory overhead and Inter-Process Communication (IPC)
+payload by only returning a success status rather than the full row data.
+
+=back
+
+Use this method when you need to "fire and forget" large amounts of data where
+individual object manipulation is not required immediately after insertion.
+
+=cut
+
+sub populate_bulk {
+    my ($self, $data) = @_;
+
+    # 1. Validation: Ensure we have an arrayref
+    unless (ref $data eq 'ARRAY') {
+        return Future->fail("populate_bulk() requires an arrayref", "usage_error");
+    }
+
+    # 1. Data Preparation: Handle potential prefixes and merge ResultSet conditions
+    my $final_data = $data;
+
+    # We only perform merging/cleaning if we are dealing with an array of hashrefs.
+    # If it's an array of arrays (bulk insert), we pass it through as-is for maximum speed.
+    if (ref $data->[0] eq 'HASH') {
+        $final_data = [ map {
+            my $row = $_;
+            my %to_insert = ( %{$self->{_cond} || {}}, %$row );
+            my %clean_data;
+            while (my ($k, $v) = each %to_insert) {
+                my $clean_key = $k;
+                $clean_key =~ s/^(?:foreign|self)\.//;
+                $clean_data{$clean_key} = $v;
+            }
+            \%clean_data;
+        } @$data ];
+    }
+
+    # 3. Execute: Call the background worker using the 'populate_bulk' operation
+    return $self->{async_db}->populate_bulk(
+        $self->{source_name},
+        $final_data
+    )->then(sub {
+        my ($result) = @_;
+
+        # 4. Error Handling
+        if (ref $result eq 'HASH' && $result->{__error}) {
+            return Future->fail($result->{__error}, 'db_error');
+        }
+
+        # 5. Return Success: We return a simple truthy value instead of a list of objects
+        return Future->done(1);
+    });
+}
+
 
 =head2 prefetch
 
@@ -991,6 +1302,41 @@ sub search {
     return $clone;
 }
 
+=head2 search_related
+
+  # Scalar context: returns a ResultSet
+  my $new_rs = $rs->search_related('orders');
+
+  # List context: returns a Future (implicit ->all)
+  my $future = $rs->search_related('orders');
+  my @orders = $future->get;
+
+In scalar context, works exactly like L</search_related_rs>. In list context, it
+returns a L<Future> that resolves to the list of objects in that relationship.
+
+=cut
+
+sub search_related {
+    my $self = shift;
+    return wantarray
+        ? $self->_do_search_related(@_)->all
+        : $self->_do_search_related(@_);
+}
+
+=head2 search_related_rs
+
+  my $rel_rs = $rs->search_related_rs('relationship_name', \%cond?, \%attrs?);
+
+Returns a new L<DBIx::Class::Async::ResultSet> representing the specified relationship.
+This is a synchronous metadata operation and does not hit the database.
+
+=cut
+
+sub search_related_rs {
+    my $self = shift;
+    return $self->_do_search_related(@_);
+}
+
 =head2 single
 
     my $row = $rs->single;
@@ -1180,6 +1526,43 @@ sub slice {
     return @$results;
 }
 
+=head2 source
+
+    my $source = $rs->source;
+
+Alias for C<result_source>.
+
+=over 4
+
+=item B<Returns>
+
+A L<DBIx::Class::ResultSource> object.
+
+=back
+
+sub source { shift->_get_source }
+
+=head2 source_name
+
+    my $source_name = $rs->source_name;
+
+Returns the source name for this result set.
+
+=over 4
+
+=item B<Returns>
+
+The source name (string).
+
+=back
+
+=cut
+
+sub source_name {
+    my $self = shift;
+    return $self->{source_name};
+}
+
 =head2 update
 
     $rs->search({ status => 'pending' })->update({ status => 'processed' })
@@ -1231,42 +1614,99 @@ sub update {
     });
 }
 
-=head2 source_name
+=head2 update_or_create
 
-    my $source_name = $rs->source_name;
+    my $future = $rs->update_or_create({
+         email => 'user@example.com',
+         name  => 'Updated Name',
+        active => 1
+    }, { key => 'user_email' });
 
-Returns the source name for this result set.
+    $future->on_done(sub {
+        my $row = shift;
+        print "Upserted user ID: " . $row->id;
+    });
+
+An "upsert" operation. It first attempts to locate an existing record using the unique
+constraints provided in the data hashref (or specified by the C<key> attribute).
 
 =over 4
 
-=item B<Returns>
+=item * If a matching record is found, it is updated with the remaining values in the hashref.
 
-The source name (string).
+=item * If no matching record is found, a new record is inserted into the database.
 
 =back
+
+Returns a L<Future> which, when resolved, provides the L<DBIx::Class::Async::Row>
+object representing the updated or newly created record.
 
 =cut
 
-sub source_name {
-    my $self = shift;
-    return $self->{source_name};
+sub update_or_create {
+    my ($self, $data, $attrs) = @_;
+
+    $attrs //= {};
+    my $source      = $self->result_source;
+    my $key_name    = $attrs->{key} || 'primary';
+    my @unique_cols = $source->unique_constraint_columns($key_name);
+
+    my %lookup;
+    if (@unique_cols) {
+        @lookup{@unique_cols} = @{$data}{@unique_cols};
+    } else {
+        %lookup = %$data;
+    }
+
+    # Try to find the record
+    return $self->find(\%lookup, $attrs)->then(sub {
+        my $row = shift;
+
+        if ($row) {
+            # Found: Perform an update with the provided data
+            return $row->update($data);
+        }
+
+        # Not Found: Create it
+        return $self->create($data);
+    });
 }
 
-=head2 source
+=head2 update_or_new
 
-    my $source = $rs->source;
+    my $future = $rs->update_or_new({
+         email => 'user@example.com',
+         name  => 'New Name'
+    }, { key => 'user_email' });
 
-Alias for C<result_source>.
+Similar to L</update_or_create>, but with a focus on in-memory instantiation.
 
 =over 4
 
-=item B<Returns>
+=item * If a matching record is found in the database, it is updated and the resulting
+object is returned.
 
-A L<DBIx::Class::ResultSource> object.
+=item * If no record is found, a new row object is instantiated (using L</new_result>)
+but B<not yet saved> to the database.
 
 =back
 
-sub source { shift->_get_source }
+This is useful for workflows where you want to ensure an object is synchronized with
+the database if it exists, but you aren't yet ready to commit a new record to storage.
+
+Returns a L<Future> resolving to a L<DBIx::Class::Async::Row> object.
+
+=cut
+
+sub update_or_new {
+    my ($self, $data, $attrs) = @_;
+
+    # Behavior: find it and update it, or return a 'new' object with the data
+    return $self->update_or_create($data, $attrs)->then(sub {
+        my $row = shift;
+        return Future->done($row);
+    });
+}
 
 =head1 CHAINABLE MODIFIERS
 
@@ -1301,6 +1741,56 @@ database queries.
 =head1 INTERNAL METHODS
 
 These methods are for internal use and are documented for completeness.
+
+=head2 _do_search_related
+
+  my $new_async_rs = $rs->_do_search_related($rel_name, $cond, $attrs);
+
+An internal helper method that performs the heavy lifting for L</search_related>
+and L</search_related_rs>.
+
+B<NOTE:> This method exists to break deep recursion issues caused by
+L<DBIx::Class> method aliasing. It bypasses the standard method dispatcher by
+manually instantiating a native L<DBIx::Class::ResultSet> to calculate
+relationship metadata before re-wrapping the result in the Async class.
+
+=over 4
+
+=item * B<Arguments:> Same as L</search_related_rs>.
+
+=item * B<Returns:> A new L<DBIx::Class::Async::ResultSet> object.
+
+=back
+
+=cut
+
+sub _do_search_related {
+    my ($self, $rel_name, $cond, $attrs) = @_;
+
+    # 1. Get the Raw ResultSource
+    my $source = $self->{_source} || $self->{schema}->source($self->{source_name});
+
+    # 2. Create a NATIVE DBIC ResultSet directly from the source
+    require DBIx::Class::ResultSet;
+    my $native_rs = DBIx::Class::ResultSet->new($source, {
+        cond  => $self->{_cond},
+        attrs => $self->{_attrs}
+    });
+
+    # 3. Perform the pivot on the native object
+    my $related_native_rs = $native_rs->search_related($rel_name, $cond, $attrs);
+
+    # 4. Manually construct the new Async RS object (Bypassing 'new')
+    return bless {
+        %$self,
+        source_name => $related_native_rs->result_source->source_name,
+        _cond       => $related_native_rs->{cond},
+        _attrs      => $related_native_rs->{attrs},
+        _source     => $related_native_rs->result_source,
+        _rows       => undef,
+        _pos        => 0,
+    }, ref($self);
+}
 
 =head2 _get_source
 
@@ -1474,7 +1964,7 @@ sub _inflate_nested_prefetch {
     }
 }
 
-=head2 _find_reverse_relationship (Internal)
+=head2 _find_reverse_relationship
 
 Finds the reverse relationship name on the related source.
 

@@ -40,7 +40,6 @@ my %WriteMakefileArgs = (
     "File::ShareDir" => 0,
     "Format::Human::Bytes" => 0,
     "Getopt::Long" => 0,
-    "Koha::SearchEngine::Elasticsearch" => 0,
     "List::Util" => 0,
     "Log::Dispatch" => 0,
     "Log::Dispatch::File" => 0,
@@ -71,7 +70,7 @@ my %WriteMakefileArgs = (
     "ZOOM" => 0,
     "utf8" => 0
   },
-  "VERSION" => "2.48",
+  "VERSION" => "2.49",
   "test" => {
     "TESTS" => ""
   }
@@ -90,7 +89,6 @@ my %FallbackPrereqs = (
   "File::ShareDir" => 0,
   "Format::Human::Bytes" => 0,
   "Getopt::Long" => 0,
-  "Koha::SearchEngine::Elasticsearch" => 0,
   "List::Util" => 0,
   "Log::Dispatch" => 0,
   "Log::Dispatch::File" => 0,

@@ -55,12 +55,12 @@ Files: README
 Copyright: This software is copyright (c) 2018-2019, 2025-2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/99destroy.t
-Copyright: Copyright 2025 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: dist.ini
 Copyright: Copyright 2018 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/99destroy.t
+Copyright: Copyright 2025 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/Class/XSDestructor.pm

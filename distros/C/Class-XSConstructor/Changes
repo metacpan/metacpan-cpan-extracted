@@ -6,6 +6,10 @@ Home page:    <https://metacpan.org/release/Class-XSConstructor>
 Bug tracker:  <https://github.com/tobyink/p5-class-xsconstructor/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.016002	2026-01-08
+
+ - Faster strict constructor checks.
+
 0.016001	2026-01-07
 
  [ Bug Fixes ]

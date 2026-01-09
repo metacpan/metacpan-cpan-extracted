@@ -6,7 +6,7 @@ use 5.010;
 # ABSTRACT: App::TimeTracker Jira plugin
 use App::TimeTracker::Utils qw(error_message warning_message);
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 use Moose::Role;
 use JIRA::REST ();
@@ -57,17 +57,17 @@ sub _build_jira_client {
         if ( my $token = $config->{token} ) {
             $auth_cfg{pat} = $token;
         }
-        elsif ( my $username = $config->{username} ) {
-            $auth_cfg{username} = $username;
+        elsif ( defined $config->{username} ) {
+            $auth_cfg{username} = $config->{username};
             $auth_cfg{password} = $config->{password};
         }
-        else {
+        elsif ( $config->{anonymous} ) {
             $auth_cfg{anonymous} = 1;
         }
         $jira_client = JIRA::REST->new( \%auth_cfg );
     }
     catch {
-        error_message("Could not build JIRA client.\nEither configure username or password in your tracker config, .netrc or via Config::Identity, see perldoc JIRA::REST.\nError was:\n'%s'", $_ );
+        error_message("Could not build JIRA client.\nEither configure token, anonymous, username/password in your tracker config, .netrc or via Config::Identity, see perldoc JIRA::REST.\nError was:\n'%s'", $_ );
         return;
     };
 
@@ -241,7 +241,7 @@ sub _init_jira_ticket {
         $ticket = $self->jira_client->GET(sprintf('/issue/%s',$id), { fields => '-comment' });
     }
     catch {
-        error_message( 'Could not fetch JIRA ticket: %s', $id );
+        error_message( 'Could not fetch JIRA ticket %s: "%s"', $id, $_ );
     };
     return
         unless defined $ticket;
@@ -327,7 +327,7 @@ App::TimeTracker::Command::Jira - App::TimeTracker Jira plugin
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 DESCRIPTION
 
@@ -439,7 +439,7 @@ Michael Kröll <pepl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2025 by Michael Kröll.
+This software is copyright (c) 2019-2026 by Michael Kröll.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

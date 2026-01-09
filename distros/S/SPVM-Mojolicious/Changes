@@ -1,4 +1,10 @@
-0.040 2025-12-23
+0.041 2026-01-09
+  [Requirement Changes]
+    * Require SPVM::Go 0.016.
+  [Changes]
+    * Improve Mojo::Sever::Daemon.
+  
+0.040 2026-01-07
   [Requirement Changes]
     * Require SPVM::Sys 0.553.
     * Require SPVM::Go 0.014.

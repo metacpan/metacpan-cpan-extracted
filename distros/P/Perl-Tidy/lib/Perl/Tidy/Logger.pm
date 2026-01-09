@@ -8,7 +8,7 @@
 package Perl::Tidy::Logger;
 use strict;
 use warnings;
-our $VERSION = '20250912';
+our $VERSION = '20260109';
 use Carp;
 use English qw( -no_match_vars );
 
@@ -296,7 +296,11 @@ sub make_line_information_string {
 } ## end sub make_line_information_string
 
 sub logfile_output {
+
     my ( $self, $prompt, $msg ) = @_;
+
+    # Write a message to the log file
+
     return if ( $self->{_block_log_output} );
 
     my $routput_array = $self->{_output_array};
@@ -397,6 +401,7 @@ sub warning {
             if ( !$fh_warnings ) {
                 Perl::Tidy::Die("couldn't open warning file '$warning_file'\n");
             }
+            Perl::Tidy::nag_flush($fh_warnings);
             Perl::Tidy::Warn_msg("## Please see file $warning_file\n")
               unless ( ref($warning_file) );
             $self->{_fh_warnings} = $fh_warnings;

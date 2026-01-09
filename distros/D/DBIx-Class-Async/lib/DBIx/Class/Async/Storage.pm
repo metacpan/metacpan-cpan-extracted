@@ -9,11 +9,11 @@ DBIx::Class::Async::Storage - Storage Layer for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.14
+Version 0.20
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.20';
 
 =head1 SYNOPSIS
 
@@ -189,33 +189,6 @@ sub debug {
     my ($self, $level) = @_;
     # No-op for compatibility
     return $level || 0;
-}
-
-=head2 debugobj
-
-    my $debugobj = $storage->debugobj;
-
-Returns a debug object.
-
-=over 4
-
-=item B<Returns>
-
-A mock debug object blessed into C<DBIx::Class::Async::DebugObj>.
-
-=item B<Notes>
-
-This method returns a minimal object for compatibility. Real debugging
-functionality may be limited in asynchronous contexts.
-
-=back
-
-=cut
-
-sub debugobj {
-    my $self = shift;
-    # Return a mock debug object
-    return bless {}, 'DBIx::Class::Async::DebugObj';
 }
 
 =head1 INTERNAL NOTES

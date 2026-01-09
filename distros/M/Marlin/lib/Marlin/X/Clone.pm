@@ -5,7 +5,7 @@ use warnings;
 package Marlin::X::Clone;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011000';
+our $VERSION   = '0.011001';
 
 use Carp 'croak';
 use Clone;
@@ -96,6 +96,7 @@ sub _make_clone_method {
 
 	$code->addf( 'my %%args  = ( @_ == 1 and %s ) ? %%{+shift} : @_;', HashRef->inline_check('$_[0]') );
 	$code->addf( 'my $clone = bless( {}, $class );' );
+	$code->addf( 'my $used = 0;' ) if $plugin->strict_args;
 	$code->add_gap;
 	
 	$marlin->canonicalize_attributes;
@@ -111,14 +112,35 @@ sub _make_clone_method {
 		$code->increase_indent;
 		$code->addf( 'my ( $value, $has_value );' );
 		
+		my @aliases;
+		@aliases = @{ $attr->{':Alias'}{alias} or [] } if $attr->{':Alias'};
+		
 		my $if = 'if';
 		my $init_arg = exists( $attr->{init_arg} ) ? $attr->{init_arg} : $attr->{slot};
 		push @allowed, $init_arg if defined $init_arg;
 		
-		if ( defined $init_arg ) {
+		if ( @aliases ) {
+			$code->addf( 'if ( my @found = grep { exists $args{$_} } %s ) {',
+				join( q[, ] => map { B::perlstring($_) } $init_arg, @aliases ) );
+			$code->increase_indent;
+			$code->addf( 'if ( @found > 1 ) {' );
+			$code->increase_indent;
+			$code->addf( 'shift @found;' );
+			$code->addf( '%s("Superfluous %%s used for attribute \'%%s\': %%s" , @found==1 ? "alias" : "aliases", %s, join( q[, ], sort @found ) );', $attr->_croaker, B::perlstring($attr->{slot}) );
+			$code->decrease_indent;
+			$code->addf( '}' );
+			$code->addf( '( $value, $has_value ) = ( $args{$found[0]}, !!1 );' );
+			$code->addf( '$used++;' ) if $plugin->strict_args;
+			$code->decrease_indent;
+			$code->addf( '}' );
+			$if = 'elsif';
+			push @allowed, @aliases;
+		}
+		elsif ( defined $init_arg ) {
 			$code->addf( 'if ( exists $args{%s} ) {', B::perlstring($init_arg) );
 			$code->increase_indent;
 			$code->addf( '( $value, $has_value ) = ( $args{%s}, !!1 );', B::perlstring($init_arg) );
+			$code->addf( '$used++;' ) if $plugin->strict_args;
 			$code->decrease_indent;
 			$code->addf( '}' );
 			$if = 'elsif';
@@ -139,6 +161,32 @@ sub _make_clone_method {
 			$code->decrease_indent;
 			$code->addf( '}' );
 		}
+		elsif ( $attr->{on_clone} eq 0 or $attr->{on_clone} eq ':none' ) {
+			# no clone
+		}
+		elsif ( !ref $attr->{on_clone} and $attr->{on_clone} =~ /:method\((.+?)\)/ ) {
+			my $clone_method = $1;
+			$code->addf( '%s ( %s and Scalar::Util::blessed( %s ) ) {', $if, $attr->inline_predicate('$self'), $attr->inline_access('$self') );
+			$code->increase_indent;
+			$code->addf( '( $value, $has_value ) = ( ( %s )->%s, !!1 );', $attr->inline_access('$self'), $clone_method );
+			$code->decrease_indent;
+			$code->addf( '}' );
+		}
+		elsif ( !ref $attr->{on_clone} and $attr->{on_clone} =~ /:method/ ) {
+			$code->addf( '%s ( %s and Scalar::Util::blessed( %s ) ) {', $if, $attr->inline_predicate('$self'), $attr->inline_access('$self') );
+			$code->increase_indent;
+			$code->addf( '( $value, $has_value ) = ( ( %s )->clone, !!1 );', $attr->inline_access('$self') );
+			$code->decrease_indent;
+			$code->addf( '}' );
+		}
+		elsif ( !ref $attr->{on_clone} and $attr->{on_clone} =~ /:selfmethod\((.+?)\)/ ) {
+			my $clone_method = $1;
+			$code->addf( '%s ( %s ) {', $if, $attr->inline_predicate('$self') );
+			$code->increase_indent;
+			$code->addf( '( $value, $has_value ) = ( scalar $self->%s( %s, %s ), !!1 );', $clone_method, B::perlstring($attr->{slot}), $attr->inline_access('$self') );
+			$code->decrease_indent;
+			$code->addf( '}' );
+		}
 		elsif ( !ref $attr->{on_clone} and $attr->{on_clone} =~ /^[\W0-9]\w+$/ ) {
 			$code->addf( '%s ( %s ) {', $if, $attr->inline_predicate('$self') );
 			$code->increase_indent;
@@ -146,14 +194,21 @@ sub _make_clone_method {
 			$code->decrease_indent;
 			$code->addf( '}' );
 		}
-		elsif ( !ref $attr->{on_clone} and $attr->{on_clone} eq ':deep' ) {
+		elsif ( !ref $attr->{on_clone} and $attr->{on_clone} =~ /:deep/ ) {
 			$code->addf( '%s ( %s ) {', $if, $attr->inline_predicate('$self') );
 			$code->increase_indent;
 			$code->addf( '( $value, $has_value ) = ( scalar Clone::clone( %s ), !!1 );', $attr->inline_access('$self') );
 			$code->decrease_indent;
 			$code->addf( '}' );
 		}
-				
+		elsif ( !ref $attr->{on_clone} and $attr->{on_clone} =~ /:simple/ ) {
+			$code->addf( '%s ( %s ) {', $if, $attr->inline_predicate('$self') );
+			$code->increase_indent;
+			$code->addf( '( $value, $has_value ) = ( %s, !!1 );', $attr->inline_access('$self') );
+			$code->decrease_indent;
+			$code->addf( '}' );
+		}
+		
 		$code->addf( 'if ( $has_value ) {' );
 		$code->increase_indent;
 		$code->add_line( $attr->inline_writer( '$clone', '$value' ) );
@@ -177,6 +232,8 @@ sub _make_clone_method {
 	}
 	
 	if ( $plugin->call_build ) {
+		$code->addf( 'if ( not delete $args{__no_BUILD__} ) {' );
+		$code->increase_indent;
 		$code->addf( '$%s::BUILD_CACHE{$class} ||= do {', ref($marlin) );
 		$code->increase_indent;
 		$code->add_line( 'no strict "refs";' );
@@ -186,6 +243,8 @@ sub _make_clone_method {
 		$code->add_line( '};' );
 		$code->addf( '$_->( $clone, \%%args ) for @{ $%s::BUILD_CACHE{$class} };', ref($marlin) );
 		$code->add_gap;
+		$code->decrease_indent;
+		$code->add_line( '}' );
 	}
 	
 	if ( $plugin->strict_args ) {
@@ -195,8 +254,12 @@ sub _make_clone_method {
 				? sprintf( '/\\A%s\\z/', $enum->_regexp )
 				: $enum->inline_check( '$_' );
 		};
+		$code->addf( 'if ( keys( %%args ) > $used ) {' );
+		$code->increase_indent;
 		$code->addf( 'my @unknown = grep not( %s ), keys %%args;', $check );
 		$code->addf( '%s("Unexpected keys in clone arguments: " . join( q[, ], sort @unknown ) ) if @unknown;', $marlin->_croaker );
+		$code->decrease_indent;
+		$code->add_line( '}' );
 		$code->add_gap;
 	}
 	
@@ -286,13 +349,92 @@ You can tweak an attribute's behaviour using:
 
   use Marlin foo => { on_clone => ... };
 
-The C<on_clone> option can be set to "1" if you wish to allow that attribute
-to be copied to clones (this is the default except for "PRIVATE" stored
-attributes), set to "0" to forbid if from being copied to clones, set to
-":deep" to make a deep clone of the attibute's value, or set to a coderef or
-the name of a method to make a custom clone of the attribute's value.
-(The coderef or method will be passed the name of the attribute and the
-attribute's value as parameters and should return the cloned value.)
+Valid values for C<on_clone>:
+
+=over
+
+=item C<< :simple >>
+
+A simple shallow copy. If the value is a reference, the cloned value will
+refer to the same data.
+
+  ## on_clone => ':simple'
+  $clone->{foo} = $self->{foo};
+
+This is the default and will be used if C<on_clone> is omitted, or
+for C<< on_clone => true >>.
+
+=item C<< :deep >>
+
+Uses the L<Clone> module to make a deep clone of the original value.
+
+  ## on_clone => ':deep'
+  $clone->{foo} = Clone::clone( $self->{foo} );
+
+=item C<< :none >>
+
+Does not clone the attribute value.
+
+You can also specify this as C<< on_clone => false >>.
+
+=item C<< :method >> or C<< :method(NAME) >>
+
+Calls a method on the original value, assuming it's a blessed object. If the
+original value is not a blessed object, it will silently be skipped. If no
+C<NAME> is provided, the name is assumed to be "clone".
+
+  ## on_clone => ':method'
+  if ( blessed $self->{foo} ) {
+    $clone->{foo} = $self->{foo}->clone;
+  }
+  
+  ## on_clone => ':method(make_copy)'
+  if ( blessed $self->{foo} ) {
+    $clone->{foo} = $self->{foo}->make_copy;
+  }
+
+=item C<< :selfmethod(NAME) >>
+
+Calls a method on the original object.
+
+  ## on_clone => ':selfmethod(make_copy)'
+  $clone->{foo} = $self->make_copy( foo => $self->{foo} );
+
+You can also specify this as C<< on_clone => "NAME" >> as a shortcut.
+
+=item CODE
+
+Setting C<< on_clone => sub {...} >> will call the coderef in a similar
+style to C<< :selfmethod >>.
+
+  ## on_clone => $coderef
+  $clone->{foo} = $self->$coderef( foo => $self->{foo} );
+
+=back
+
+Because C<< :method >> only works when the value is a blessed object,
+you can indicate a fallback that will be used in other cases.
+
+  ## on_clone => ':method(make_copy) :deep'
+  if ( blessed $self->{foo} ) {
+    $clone->{foo} = $self->{foo}->make_copy;
+  }
+  else {
+    $clone->{foo} = Clone::clone( $self->{foo} );
+  }
+  
+  ## on_clone => ':method(make_copy) :copy'
+  if ( blessed $self->{foo} ) {
+    $clone->{foo} = $self->{foo}->make_copy;
+  }
+  else {
+    $clone->{foo} = $self->{foo};
+  }
+  
+  ## on_clone => ':method(make_copy) :none'
+  if ( blessed $self->{foo} ) {
+    $clone->{foo} = $self->{foo}->make_copy;
+  }
 
 You can also set a few options for how the plugin behaves:
 

@@ -12,7 +12,6 @@ use Set::Intersection;
 use Storable qw(lock_store lock_nstore lock_retrieve dclone);
 use Data::Dump qw(dump);
 use Data::Dumper;
-use IO::Tee;
 use feature 'say';
 use Switch::Back;
 
@@ -22,6 +21,7 @@ use Sim::OPT::Sim;
 use Sim::OPT::Report;
 use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
+use Sim::OPT::Stats;
 eval { use Sim::OPTcue; 1 };
 eval { use Sim::OPTcue::Patternsearch; 1 };
 
@@ -37,9 +37,9 @@ no warnings;
 %EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our @EXPORT = qw( descend prepareblank tee ); # our @EXPORT = qw( );
+our @EXPORT = qw( descend prepareblank  ); # our @EXPORT = qw( );
 
-$VERSION = '0.173'; # our $VERSION = '';
+$VERSION = '0.179'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -104,7 +104,7 @@ sub auto_objcol_file
     {
       $c = $i;
     }
-  } #say $tee "!!! OBJECTIVECOLUMN: $c";
+  } #say  "!!! OBJECTIVECOLUMN: $c";
   return( $c );
 }
 
@@ -126,8 +126,7 @@ sub descend
   my $report = $main::report;
   my $simnetwork = $main::simnetwork;
 
-  $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL
-  #say $tee "\n#Now in Sim::OPT::Descend.\n";
+  #say  "\n#Now in Sim::OPT::Descend.\n";
 
   my %simtitles = %main::simtitles;
   my %retrievedata = %main::retrievedata;
@@ -151,35 +150,35 @@ sub descend
 
   my %dt = %{ $_[0] };  #say "IN DESCEND, ARRIVED " . dump( \%dt );
 
-  my @instances = @{ $dt{instances} }; #say $tee "HERE IN DESCEND \@instances: " . dump( @instances );
-  my %dirfiles = %{ $dt{dirfiles} }; #say $tee "HERE IN DESCEND \%dirfiles: " . dump( \%dirfiles );
-  my %vehicles = %{ $dt{vehicles} }; #say $tee "HERE IN DESCEND \%vehicles: " . dump( \%vehicles );
-  my %winhash = %{ $dt{winhash} }; #say $tee "HERE IN DESCEND \%winhash: " . dump( \%winhash );
+  my @instances = @{ $dt{instances} }; #say  "HERE IN DESCEND \@instances: " . dump( @instances );
+  my %dirfiles = %{ $dt{dirfiles} }; #say  "HERE IN DESCEND \%dirfiles: " . dump( \%dirfiles );
+  my %vehicles = %{ $dt{vehicles} }; #say  "HERE IN DESCEND \%vehicles: " . dump( \%vehicles );
+  my %winhash = %{ $dt{winhash} }; #say  "HERE IN DESCEND \%winhash: " . dump( \%winhash );
   #my $winning = $winhash{winning};
-  my %inst = %{ $dt{inst} }; #say $tee "HERE IN DESCEND \%inst: " . dump( \%inst );
-  my @precedents = @{ $dt{precedents} }; #say $tee "HERE IN DESCEND \@precedents: " . dump( @precedents );
+  my %inst = %{ $dt{inst} }; #say  "HERE IN DESCEND \%inst: " . dump( \%inst );
+  my @precedents = @{ $dt{precedents} }; #say  "HERE IN DESCEND \@precedents: " . dump( @precedents );
   my %dowhat = %{ $dt{dowhat} };
   #my $csim = $dt{csim}; #UNUSED
   my $precious = $dt{precious};
-  my @packet = @{ $dt{packet} }; say $tee "HERE IN DESCEND \@packet: " . dump( @packet );
+  my @packet = @{ $dt{packet} }; say  "HERE IN DESCEND \@packet: " . dump( @packet );
 
   my $exitname = $dirfiles{exitname};
 
-  #say $tee "IN ENTRY DESCEND3  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
+  #say  "IN ENTRY DESCEND3  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
 
   my %d = %{ $instances[0] };
-  my $countcase = $d{countcase}; #say $tee "HERE IN DESCEND \$countcase: " . dump( $countcase );
-  my $countblock = $d{countblock}; say $tee "HERE IN DESCEND \$countblock: " . dump( $countblock );
-  my %incumbents = %{ $d{incumbents} }; #say $tee "HERE IN DESCEND \%incumbents: " . dump( \%incumbents );
+  my $countcase = $d{countcase}; #say  "HERE IN DESCEND \$countcase: " . dump( $countcase );
+  my $countblock = $d{countblock}; say  "HERE IN DESCEND \$countblock: " . dump( $countblock );
+  my %incumbents = %{ $d{incumbents} }; #say  "HERE IN DESCEND \%incumbents: " . dump( \%incumbents );
   my @varnumbers = @{ $d{varnumbers} };
-  @varnumbers = Sim::OPT::washn( @varnumbers ); #say $tee "HERE IN DESCEND \@varnumbers: " . dump( @varnumbers );
+  @varnumbers = Sim::OPT::washn( @varnumbers ); #say  "HERE IN DESCEND \@varnumbers: " . dump( @varnumbers );
   my @miditers = @{ $d{miditers} };
-  @miditers = Sim::OPT::washn( @miditers ); #say $tee "HERE IN DESCEND \@miditers: " . dump( @miditers );
-  my @sweeps = @{ $d{sweeps} }; #say $tee "HERE IN DESCEND \@sweeps: " . dump( @sweeps );
-  my @sourcesweeps = @{ $d{sourcesweeps} }; #say $tee "HERE IN DESCEND \@sourcesweeps: " . dump( @sourcesweeps );
-  my @rootnames = @{ $d{rootnames} }; #say $tee "HERE IN DESCEND \@rootnames: " . dump( @rootnames );
-  my @winneritems = @{ $d{winneritems} }; #say $tee "HERE IN DESCEND \@winneritems: " . dump( @winneritems );
-  my $instn = $d{instn}; #say $tee "HERE IN DESCEND \$instn: " . dump( $instn );
+  @miditers = Sim::OPT::washn( @miditers ); #say  "HERE IN DESCEND \@miditers: " . dump( @miditers );
+  my @sweeps = @{ $d{sweeps} }; #say  "HERE IN DESCEND \@sweeps: " . dump( @sweeps );
+  my @sourcesweeps = @{ $d{sourcesweeps} }; #say  "HERE IN DESCEND \@sourcesweeps: " . dump( @sourcesweeps );
+  my @rootnames = @{ $d{rootnames} }; #say  "HERE IN DESCEND \@rootnames: " . dump( @rootnames );
+  my @winneritems = @{ $d{winneritems} }; #say  "HERE IN DESCEND \@winneritems: " . dump( @winneritems );
+  my $instn = $d{instn}; #say  "HERE IN DESCEND \$instn: " . dump( $instn );
 
   my $fire = $d{fire};
 
@@ -223,7 +222,7 @@ sub descend
     $dirfiles{ordres} = "$mypath/$file-$countcase" . "_ordres.csv";
   }
 
-  #say $tee "RELAUNCHED IN DESCEND WITH INST " . dump( %inst );
+  #say  "RELAUNCHED IN DESCEND WITH INST " . dump( %inst );
 
   my ( $direction, $starorder );
   if ( $outstarmode eq "y" )
@@ -260,8 +259,8 @@ sub descend
     }
 	}
 
-  #say $tee "\$direction: $direction ";
-  #say $tee "\${\$dowhat{direction}}[\$countcase][\$countblock]: ${$dowhat{direction}}[$countcase][$countblock]"; 
+  #say  "\$direction: $direction ";
+  #say  "\${\$dowhat{direction}}[\$countcase][\$countblock]: ${$dowhat{direction}}[$countcase][$countblock]"; 
 
   my $precomputed = $dowhat{precomputed};
   my @takecolumns = @{ $dowhat{takecolumns} }; #NEW
@@ -293,7 +292,7 @@ sub descend
   my $confinterlinear = "$mypath/" . $dowhat{confinterlinear} ;
 
   
-  my $repfile = $dirfiles{repfile}; say $tee "IN DESCENT FROM DIRFILES, \$countblock $countblock, \$repfile $repfile";
+  my $repfile = $dirfiles{repfile}; say  "IN DESCENT FROM DIRFILES, \$countblock $countblock, \$repfile $repfile";
 
   if ( $fire eq "y" )
   {
@@ -302,7 +301,7 @@ sub descend
 
   if ( not( $repfile ) )
   {
-    say $tee "I don't find \$repfile $repfile! at \$countblock $countblock. QUITTING."; 
+    say  "I don't find \$repfile $repfile! at \$countblock $countblock. QUITTING."; 
     die; 
   }
 
@@ -361,7 +360,7 @@ sub descend
   #  sourcesweeps => \@sourcesweeps, instn => $instn, inst => \%inst, vehicles => \%vehicles } );
   #}
 
-  #say $tee "!!!!IN DESCEND \$repfile " . dump($repfile);
+  #say  "!!!!IN DESCEND \$repfile " . dump($repfile);
   if ( ( $dowhat{dumpfiles} eq "y" ) and ( not( -e $repfile ) ) )
   { die "There isn't \$repfile: $repfile"; };
 
@@ -384,7 +383,7 @@ sub descend
   my $stepsvar = $varnums{$countvar};
 
 
-  say $tee "Descending into case " . ( $countcase + 1 ) . ", block " . ( $countcase + 1 ) . ".";
+  say  "Descending into case " . ( $countcase + 1 ) . ", block " . ( $countcase + 1 ) . ".";
 
   my @columns_to_report = @{ $reporttempsdata[1] };
   my $number_of_columns_to_report = scalar(@columns_to_report);
@@ -394,7 +393,7 @@ sub descend
 
   #my $throwclean = $repfile;
   #$throwclean =~ s/\.csv//;
-  #my $selectmixed = "$throwclean-select.csv"; #say $tee "!!!! \$throwclean-select.csv: $throwclean-select.csv";
+  #my $selectmixed = "$throwclean-select.csv"; #say  "!!!! \$throwclean-select.csv: $throwclean-select.csv";
 
   
   my $remember;
@@ -403,13 +402,13 @@ sub descend
   {   # IT CLEANS THE MIXED FILE AND SELECTS SOME COLUMNS, THEN COPIES THEM IN ANOTHER FILE
     my ( $repfile, $selectmixed, $inst_r, $countblock, $varnums_r, $blockelts_r, $from, $dowhat_r ) = @_;
     $inst_r ||= {};
-    my %varnums = %$varnums_r; #say $tee "IN DESCENT \@blockelts  " . dump( @blockelts );
+    my %varnums = %$varnums_r; #say  "IN DESCENT \@blockelts  " . dump( @blockelts );
     my @blockelts = @$blockelts_r;
     my %dowhat = %$dowhat_r;
 
-    #say $tee "IN DESCENT \@blockelts " . dump( @blockelts );
+    #say  "IN DESCENT \@blockelts " . dump( @blockelts );
     ####HERE!!!
-    my $expected_r = Sim::OPT::enumerate(\%varnums, \@blockelts, $from); say $tee "IN DESCENT \$countblock $countblock \$expected_r " . dump( $expected_r );
+    my $expected_r = Sim::OPT::enumerate(\%varnums, \@blockelts, $from); say  "IN DESCENT \$countblock $countblock \$expected_r " . dump( $expected_r );
     
     
     my %present;
@@ -417,19 +416,19 @@ sub descend
     my @lines = <MIXFILE>;
     close MIXFILE;
 
-    @lines = uniq( @lines ); say $tee "IN DESCEND \@lines: " . dump( @lines );
+    @lines = uniq( @lines ); say  "IN DESCEND \@lines: " . dump( @lines );
 
     foreach my $ln (@lines)
     {
       chomp $ln;
       next if $ln =~ /^\s*$/;
       ####HERE!!!
-      my $rid = Sim::OPT::instid( $ln, $file ); say $tee "IN DESCEND \$countblock $countblock \$rid " . dump( $rid );# NOT $repfile
+      my $rid = Sim::OPT::instid( $ln, $file ); say  "IN DESCEND \$countblock $countblock \$rid " . dump( $rid );# NOT $repfile
       if ( defined($rid) and $rid ne "" )
       {
-        #$dirfiles{reps}{$rid} = $ln; say $tee "IN DESCEND WRITING \$dirfiles{reps}{\$rid} \$dirfiles{reps}{$rid} " . dump( $dirfiles{reps}{$rid} );# NOT $repfile
-        $present{$rid} = 1; say $tee "IN DESCENT \$file $file \$ln $ln \$countblock $countblock \$present{\$rid} \$present{$rid} " . dump( $present{$rid} );# NOT $repfile
-        say $tee "IN DESCEND CHECKING: \$rid $rid \$dirfiles{reps}{\$rid}: " . dump( $dirfiles{reps}{$rid} );
+        #$dirfiles{reps}{$rid} = $ln; say  "IN DESCEND WRITING \$dirfiles{reps}{\$rid} \$dirfiles{reps}{$rid} " . dump( $dirfiles{reps}{$rid} );# NOT $repfile
+        $present{$rid} = 1; say  "IN DESCENT \$file $file \$ln $ln \$countblock $countblock \$present{\$rid} \$present{$rid} " . dump( $present{$rid} );# NOT $repfile
+        say  "IN DESCEND CHECKING: \$rid $rid \$dirfiles{reps}{\$rid}: " . dump( $dirfiles{reps}{$rid} );
       }
     }
     
@@ -441,7 +440,7 @@ sub descend
 
       if ( exists $dirfiles{reps}{$rid} )
       {
-        say MIXFILE $dirfiles{reps}{$rid}; say $tee "IN DESCENT EXISTS \$countblock $countblock \$dirfiles{reps}{\$rid} \$dirfiles{reps}{$rid} " . dump( $dirfiles{reps}{$rid} );# NOT $repfile
+        say MIXFILE $dirfiles{reps}{$rid}; say  "IN DESCENT EXISTS \$countblock $countblock \$dirfiles{reps}{\$rid} \$dirfiles{reps}{$rid} " . dump( $dirfiles{reps}{$rid} );# NOT $repfile
       }
     }
     close MIXFILE;
@@ -465,7 +464,7 @@ sub descend
         $line =~ s/ ?//;
         $line =~ s/ ?//;
 
-        my @elts = split(/,/, $line); #say $tee "ELTS: " . dump( @elts );
+        my @elts = split(/,/, $line); #say  "ELTS: " . dump( @elts );
         my $touse = $elts[0];
 
         $touse = Sim::OPT::clean( $touse, $mypath, $file );
@@ -488,16 +487,16 @@ sub descend
           $touse = $clear;
         }
 
-        my ( @elements, @names, @obtaineds, @newnames ); #say $tee "\@keepcolumns: " . dump( @keepcolumns );
+        my ( @elements, @names, @obtaineds, @newnames ); #say  "\@keepcolumns: " . dump( @keepcolumns );
         foreach my $elm_ref (@keepcolumns)
         {
           my @cols = @{ $elm_ref };
           my $name = $cols[0];
           my $number = $cols[1];
-          push ( @elements, $elts[$number] ); #say $tee "\PUSH \$elts[\$number]: " . dump( $elts[$number] );
-          #say $tee "\$elts: $elts, \$number: $number";
+          push ( @elements, $elts[$number] ); #say  "\PUSH \$elts[\$number]: " . dump( $elts[$number] );
+          #say  "\$elts: $elts, \$number: $number";
           push ( @names, $name );
-        } #say $tee "ELEMENTS: ". dump( @elements ); say $tee "NAMES: ". dump( @names );
+        } #say  "ELEMENTS: ". dump( @elements ); say  "NAMES: ". dump( @names );
 
         if ( not ( scalar( @weighttransforms ) == 0 ) )
         {
@@ -507,7 +506,7 @@ sub descend
             my @els = @{ $elt_ref };
             my $newname = $els[0];
             my $transform = $els[1];
-            my $obtained = eval ( $transform ); #say $tee "HERE \$transform: $transform, \$obtained: $obtained";
+            my $obtained = eval ( $transform ); #say  "HERE \$transform: $transform, \$obtained: $obtained";
             push ( @obtaineds, $obtained );
             push ( @newnames, $newname );
             $coun++;
@@ -518,8 +517,8 @@ sub descend
           @obtaineds = @elements;
           @newnames = @names;
         }
-        #say $tee "ELEMENTS: ". dump( @elements ); #say $tee "\@obtaineds: ". dump( @obtaineds );
-        #say $tee "NAMES: ". dump( @names ); #say $tee "NEWNAMES: ". dump( @newnames );
+        #say  "ELEMENTS: ". dump( @elements ); #say  "\@obtaineds: ". dump( @obtaineds );
+        #say  "NAMES: ". dump( @names ); #say  "NEWNAMES: ". dump( @newnames );
 
         if ( !defined( $dirfiles{countnettotrowlength}  ) ) #THIS SWITCHES OFF AFTER THE FIRST PASS
         {
@@ -527,12 +526,12 @@ sub descend
           $dirfiles{countnettotrowlength}++; #THIS CALCULATES THE LENGTH OF THE ROW AND STORES IT
         }
         
-        say $tee "IN DESCEND \$dowhat{discard} $dowhat{discard}";
+        say  "IN DESCEND \$dowhat{discard} $dowhat{discard}";
         unless ( $obtaineds[-1] eq $dowhat{discard} )
         {
           print SELECTEDMIXED "$touse,";
 
-          my $coun = 0; #say $tee "PRINTNG OBTAINEDS: " . dump ( @obtaineds ) ;
+          my $coun = 0; #say  "PRINTNG OBTAINEDS: " . dump ( @obtaineds ) ;
           foreach my $elt ( @obtaineds )
           {
             print SELECTEDMIXED "$newnames[$coun],";
@@ -558,7 +557,7 @@ sub descend
     #cleanselect( $repfile, $selectmixed, \%inst, $countblock, \%varnums, \@blockelts, $from, \%dowhat );
   }
 
-  ###say $tee "IN DESCEND AFTER CLEANSELECT; INST " . dump( \%inst );
+  ###say  "IN DESCEND AFTER CLEANSELECT; INST " . dump( \%inst );
 
 
   #my $throw = $selectmixed;
@@ -567,8 +566,8 @@ sub descend
   sub weight
   {
     my ( $selectmixed, $weight ) = @_;
-    say $tee "Scaling results for case " . ( $countcase + 1 ). ", block " . ( $countcase + 1 ) . ".";
-    open( SELECTEDMIXED, $selectmixed ) or die( "$!" );#say $tee "!!!! \$throw-weight.csv: $throw-weight.csv";
+    say  "Scaling results for case " . ( $countcase + 1 ). ", block " . ( $countcase + 1 ) . ".";
+    open( SELECTEDMIXED, $selectmixed ) or die( "$!" );#say  "!!!! \$throw-weight.csv: $throw-weight.csv";
     my @lines = <SELECTEDMIXED>;
     close SELECTEDMIXED;
 
@@ -641,13 +640,13 @@ sub descend
         {
           $eltrans = "" ;
         }
-        push ( @{ $containertwo[$countcolm] }, $eltrans) ; #print $tee "ELTRANS: $eltrans\n";
+        push ( @{ $containertwo[$countcolm] }, $eltrans) ; #print  "ELTRANS: $eltrans\n";
       }
       $countcolm++;
     }
-    #say $tee "HERE \@containerone: " . dump( @containerone ); #say $tee "\@containertwo: " . dump( @containertwo );
-    #say $tee "\@maxes: " . dump( @maxes ); #say $tee "\@mins: " . dump( @mins );
-    #say $tee "\@containernames: " . dump( @containernames );
+    #say  "HERE \@containerone: " . dump( @containerone ); #say  "\@containertwo: " . dump( @containertwo );
+    #say  "\@maxes: " . dump( @maxes ); #say  "\@mins: " . dump( @mins );
+    #say  "\@containernames: " . dump( @containernames );
 
 
 
@@ -745,7 +744,7 @@ sub descend
         $counterin++;
       }
 
-      #say $tee "HERE \@cnamesrow: " . dump( @cnamesrow ); #say $tee "\@c1row: " . dump( @c1row ); #say $tee "\@c2row: " . dump( @c2row );
+      #say  "HERE \@cnamesrow: " . dump( @cnamesrow ); #say  "\@c1row: " . dump( @c1row ); #say  "\@c2row: " . dump( @c2row );
 
       print WEIGHT "$containertitles[ $countrow ],";
 
@@ -779,7 +778,7 @@ sub descend
     #weight( $selectmixed, $weight ); #
   }
 
-  #say $tee "IN DESCEND AFTER WEIGHT; INST " . dump( %inst );
+  #say  "IN DESCEND AFTER WEIGHT; INST " . dump( %inst );
 
   #my $weighttwo = $weight;
 
@@ -791,7 +790,7 @@ sub descend
 
   if ( $objectivecolumn eq "" )
   {
-    $dowhat{objectivecolumn} = auto_objcol( \@packet ); say $tee "IN DESCENT CALCULATED \$dowhat{objectivecolumn} $dowhat{objectivecolumn}"; 
+    $dowhat{objectivecolumn} = auto_objcol( \@packet ); say  "IN DESCENT CALCULATED \$dowhat{objectivecolumn} $dowhat{objectivecolumn}"; 
     $objectivecolumn = $dowhat{objectivecolumn};
   }
 
@@ -814,15 +813,15 @@ sub descend
   {
     my ( $weighttwo, $sortmixed, $searchname, $entryfile, $exitfile, $orderedfile, $outstarmode,
      $instn, $inst_r, $dirfiles_r, $vehicles_r, $countcase, $countblock, $fire, $packet_r ) = @_;
-    say $tee "Processing results for case " . ( $countcase + 1 ) . ", block " . ( $countcase + 1 ) . ".";
-    my %inst = %{ $inst_r }; say $tee "IN SORTMIXED \%inst" . dump( \%inst );
+    say  "Processing results for case " . ( $countcase + 1 ) . ", block " . ( $countcase + 1 ) . ".";
+    my %inst = %{ $inst_r }; say  "IN SORTMIXED \%inst" . dump( \%inst );
     my %dirfiles = %{ $dirfiles_r };
     my %vehicles = %{ $vehicles_r };
-    my @packet = @$packet_r; say $tee "IN SORTMIXED RECEIVED \@packet: " . dump( @packet );
+    my @packet = @$packet_r; say  "IN SORTMIXED RECEIVED \@packet: " . dump( @packet );
 
 
     #my $weighttwoNEW = $weighttwo . "-NEW.csv"; ###HERE!!!### SWITCH
-    #open( WEIGHTTWONEW, ">$weighttwoNEW" ) or die( "$!" ); say $tee "!!!!!IN SORTMIXED \$weighttwo" . dump( $weighttwo );
+    #open( WEIGHTTWONEW, ">$weighttwoNEW" ) or die( "$!" ); say  "!!!!!IN SORTMIXED \$weighttwo" . dump( $weighttwo );
     #foreach my $l ( @packet )
     #{
     #  say WEIGHTTWONEW "$l";
@@ -832,7 +831,7 @@ sub descend
 
     if ( $searchname eq "n" )###################################
     {
-      #open( WEIGHTTWO, $weighttwo ) or die( "$!" ); say $tee "!!!!!IN SORTMIXED \$weighttwo" . dump( $weighttwo );
+      #open( WEIGHTTWO, $weighttwo ) or die( "$!" ); say  "!!!!!IN SORTMIXED \$weighttwo" . dump( $weighttwo );
       #my @lines = <WEIGHTTWO>;
       #close WEIGHTTWO;
 
@@ -852,7 +851,7 @@ sub descend
 
       #@lines = uniq( @lines );
       @lines = uniq( @packet );
-      #say $tee "\$objectivecolumn: $objectivecolumn, FIRSTLINE! " . dump( $lines[0] ) . "OF \$weighttwo: $weighttwo";
+      #say  "\$objectivecolumn: $objectivecolumn, FIRSTLINE! " . dump( $lines[0] ) . "OF \$weighttwo: $weighttwo";
 
       my @splitteds;
       foreach my $line ( @lines )
@@ -866,20 +865,20 @@ sub descend
         push( @splitteds, [ @elts ] );
       }
 
-      say $tee "\$direction $direction, \$starorder $starorder, \$objectivecolumn: $objectivecolumn, LINES! " . dump( @lines );
+      say  "\$direction $direction, \$starorder $starorder, \$objectivecolumn: $objectivecolumn, LINES! " . dump( @lines );
 
       my @sorted;
       if ( $direction ne "star" )
       {
         if ( $direction eq "<" )
         {
-          say $tee "I AM 1";
+          say  "I AM 1";
           #@sorted = sort { $a->[$objectivecolumn] <=> $b->[$objectivecolumn] } @splitteds;
           @sorted = sort { (split( ',', $a ))[ $objectivecolumn ] <=> ( split( ',', $b ))[ $objectivecolumn ] } @lines;
         }
         elsif ( $direction eq ">" )
         {
-          say $tee "I AM 2";
+          say  "I AM 2";
           #@sorted = sort { $b->[$objectivecolumn] <=> $a->[$objectivecolumn] } @splitteds;
           @sorted = sort { (split( ',', $b ))[ $objectivecolumn ] <=> ( split( ',', $a ))[ $objectivecolumn ] } @lines;
         }
@@ -901,13 +900,13 @@ sub descend
       {
         if ( $starorder eq "<" )
         {
-          say $tee "I AM 3";
+          say  "I AM 3";
           #@sorted = sort { $a->[$objectivecolumn] <=> $b->[$objectivecolumn] } @splitteds;
           @sorted = sort { (split( ',', $a))[ $objectivecolumn ] <=> ( split( ',', $b))[ $objectivecolumn ] } @lines;
         }
         elsif ( $starorder eq ">" )
         {
-          say $tee "I AM 4";
+          say  "I AM 4";
           #@sorted = sort { $b->[$objectivecolumn] <=> $a->[$objectivecolumn] } @splitteds;
           @sorted = sort { (split( ',', $b))[ $objectivecolumn ] <=> ( split( ',', $a))[ $objectivecolumn ] } @lines;
         }
@@ -916,25 +915,25 @@ sub descend
       {
         if ( $starorder eq "<" )
         {
-          say $tee "I AM 5a";
+          say  "I AM 5a";
           #@sorted = sort { $a->[$objectivecolumn] <=> $b->[$objectivecolumn] } @splitteds;
           @sorted = sort { (split( ',', $a))[ $objectivecolumn ] <=> ( split( ',', $b))[ $objectivecolumn ] } @lines;
         }
         elsif ( $starorder eq ">" )
         {
-          say $tee "I AM 6a";
+          say  "I AM 6a";
           #@sorted = sort { $b->[$objectivecolumn] <=> $a->[$objectivecolumn] } @splitteds;
           @sorted = sort { (split( ',', $b))[ $objectivecolumn ] <=> ( split( ',', $a))[ $objectivecolumn ] } @lines;
         }
       }
 
-      #say $tee "SORTED!: " . dump( @sorted );
+      #say  "SORTED!: " . dump( @sorted );
 
       open( SORTMIXED, ">$sortmixed" ) or die( "$!" );
       if ( not( -e $sortmixed ) ){ die; };
-      #say $tee "!!!!!!!!IN SORTMIXED \$sortmixed" . dump( $sortmixed );
+      #say  "!!!!!!!!IN SORTMIXED \$sortmixed" . dump( $sortmixed );
 
-      open( TOTRES, ">>$totres" ) or die; #say $tee "!!!!!!!!IN SORTMIXED \$totres" . dump( $totres );
+      open( TOTRES, ">>$totres" ) or die; #say  "!!!!!!!!IN SORTMIXED \$totres" . dump( $totres );
 
       foreach my $line ( @sorted )
       {
@@ -1003,12 +1002,12 @@ sub descend
 
 
       @theselines = uniq( @theselines );
-      say $tee "\$objectivecolumn: $objectivecolumn, LINES! " . dump( @theselines );
+      say  "\$objectivecolumn: $objectivecolumn, LINES! " . dump( @theselines );
 
       my $thoselines;
       if ( ( $entryfile ne "" ) and ( -e $entryfile ) )
       {
-        open( ENTRYFILE, "$entryfile" ) or die; #say $tee "IN DESCENT OPENING \$entryfile" . dump( $entryfile );
+        open( ENTRYFILE, "$entryfile" ) or die; #say  "IN DESCENT OPENING \$entryfile" . dump( $entryfile );
         $thoselines = <ENTRYFILE>;
         close ENTRYFILE;
       }
@@ -1040,13 +1039,13 @@ sub descend
       {
         if ( $direction eq "<" )
         {
-          say $tee "I AM 5";
+          say  "I AM 5";
           #@sorted = sort { $a->[$objectivecolumn] <=> $b->[$objectivecolumn] } @splitteds;
           @sorted = sort { (split( ',', $a ))[ $objectivecolumn ] <=> ( split( ',', $b ))[ $objectivecolumn ] } @lines;
         }
         elsif ( $direction eq ">" )
         {
-          say $tee "I AM 6";
+          say  "I AM 6";
           #@sorted = sort { $b->[$objectivecolumn] <=> $a->[$objectivecolumn] } @splitteds;
           @sorted = sort { (split( ',', $b ))[ $objectivecolumn ] <=> ( split( ',', $a ))[ $objectivecolumn ] } @lines;
         }
@@ -1068,19 +1067,19 @@ sub descend
       {
         if ( $starorder eq "<" )
         {
-          say $tee "I AM 7";
+          say  "I AM 7";
           #@sorted = sort { $a->[$objectivecolumn] <=> $b->[$objectivecolumn] } @splitteds;
           @sorted = sort { (split( ',', $a))[ $objectivecolumn ] <=> ( split( ',', $b))[ $objectivecolumn ] } @lines;
         }
         elsif ( $starorder eq ">" )
         {
-          say $tee "I AM 8";
+          say  "I AM 8";
           #@sorted = sort { $b->[$objectivecolumn] <=> $a->[$objectivecolumn] } @splitteds;
           @sorted = sort { (split( ',', $b))[ $objectivecolumn ] <=> ( split( ',', $a))[ $objectivecolumn ] } @lines;
         }
       }
 
-      say $tee "!!! SORTED!!: " . dump( @sorted );
+      say  "!!! SORTED!!: " . dump( @sorted );
 
       open ( ORDEREDFILE, ">>$orderedfile" ) or die;
       open( TOTRES, ">>$totres" ) or die;
@@ -1102,7 +1101,7 @@ sub descend
   my $firedvalue = sortmixed( $weighttwo, $sortmixed, $searchname, $entryfile, $exitfile, $orderedfile, $outstarmode,
   $instn, \%inst, \%dirfiles, \%vehicles, $countcase, $countblock, $fire, \@packet );
 
-  say $tee "IN DESCEND AFTER SORTMIXED; INST " . dump( %inst );
+  say  "IN DESCEND AFTER SORTMIXED; INST " . dump( %inst );
 
   if ( $firedvalue ne "" )
   {
@@ -1118,9 +1117,9 @@ sub descend
 
   ###HERE
 
-  #say $tee "TOTRES DEBUG: totres=[$totres]";
-  #say $tee "TOTRES DEBUG: exists=" . (defined($totres) && -e $totres ? 1 : 0) . " readable=" . (defined($totres) && -r $totres ? 1 : 0);
-  #say $tee "TOTRES DEBUG: cwd=" . `pwd`;
+  #say  "TOTRES DEBUG: totres=[$totres]";
+  #say  "TOTRES DEBUG: exists=" . (defined($totres) && -e $totres ? 1 : 0) . " readable=" . (defined($totres) && -r $totres ? 1 : 0);
+  #say  "TOTRES DEBUG: cwd=" . `pwd`;
 
   open( TOTRES, "<$totres" ) or die "Cannot open totres '$totres': $!";
   my @lins = <TOTRES>;
@@ -1138,7 +1137,7 @@ sub descend
 
   $dirfiles{counttotfiles}++;
   my $newtotdest = $totres . ".old" . $dirfiles{counttotfiles};
-  say $tee `mv -f $totres $newtotdest`;
+  say  `mv -f $totres $newtotdest`;
 
    
   my $counterline = 0;
@@ -1207,13 +1206,13 @@ sub descend
       {
         $eltrans = "" ;
       }
-      push ( @{ $containertwo[$countcolm] }, $eltrans) ; #print $tee "ELTRANS: $eltrans\n";
+      push ( @{ $containertwo[$countcolm] }, $eltrans) ; #print  "ELTRANS: $eltrans\n";
     }
     $countcolm++;
   }
-  #say $tee "HERE \@containerone: " . dump( @containerone ); #say $tee "\@containertwo: " . dump( @containertwo );
-  #say $tee "\@maxes: " . dump( @maxes ); #say $tee "\@mins: " . dump( @mins );
-  #say $tee "\@containernames: " . dump( @containernames );
+  #say  "HERE \@containerone: " . dump( @containerone ); #say  "\@containertwo: " . dump( @containertwo );
+  #say  "\@maxes: " . dump( @maxes ); #say  "\@mins: " . dump( @mins );
+  #say  "\@containernames: " . dump( @containernames );
 
 
 
@@ -1320,18 +1319,18 @@ sub descend
   }
 
 
-  my @sortthis; #say $tee "0 \$dowhat{objectivecolumn} $dowhat{objectivecolumn}, \$direction: $direction ";
+  my @sortthis; #say  "0 \$dowhat{objectivecolumn} $dowhat{objectivecolumn}, \$direction: $direction ";
   if ( $direction eq "<" )
   {
-    @sortthis = sort { $a->[$dowhat{objectivecolumn}] <=> $b->[$dowhat{objectivecolumn}] } @newbowl; #say $tee "1 \$dowhat{objectivecolumn} $dowhat{objectivecolumn}";
+    @sortthis = sort { $a->[$dowhat{objectivecolumn}] <=> $b->[$dowhat{objectivecolumn}] } @newbowl; #say  "1 \$dowhat{objectivecolumn} $dowhat{objectivecolumn}";
   }
   elsif ( $direction eq ">" )
   {
-    @sortthis = sort { $b->[$dowhat{objectivecolumn}] <=> $a->[$dowhat{objectivecolumn}] } @newbowl; #say $tee "2 \$dowhat{objectivecolumn} $dowhat{objectivecolumn}";
+    @sortthis = sort { $b->[$dowhat{objectivecolumn}] <=> $a->[$dowhat{objectivecolumn}] } @newbowl; #say  "2 \$dowhat{objectivecolumn} $dowhat{objectivecolumn}";
   }
   else
   {
-    @sortthis = @newbowl;   #say $tee "3 \$dowhat{objectivecolumn} $dowhat{objectivecolumn}";
+    @sortthis = @newbowl;   #say  "3 \$dowhat{objectivecolumn} $dowhat{objectivecolumn}";
   }
   
   my @bag;
@@ -1358,287 +1357,329 @@ sub descend
 
 #################################################################################
 
+# ------------------------------------------------------------
+# metamodel() dispatcher
+# - default (open): DWGN/Interlinear implementation
+# - optional (closed contract): delegated to Sim::OPTcue when enabled
+# ------------------------------------------------------------
+sub metamodel
+{
+  my ( $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
+    $direction, $starorder, $ordmeta, $varnums_r, $countblock ) = @_;
+
+  my %dowhat = %{ $dowhat_r || {} };
+
+  return unless ( defined($dowhat{metamodel}) && $dowhat{metamodel} eq "y" );
+
+  my $contract = "";
+  $contract = $dowhat{metamodelcontract} if defined $dowhat{metamodelcontract};
+  $contract = $dowhat{metamodel_contract} if ( $contract eq "" && defined $dowhat{metamodel_contract} );
+
+  if ( defined($contract) && $contract eq "cue" )
+  {
+    require Sim::OPTcue;
+    return Sim::OPTcue::metamodel_contract(
+      $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
+      $direction, $starorder, $ordmeta, $varnums_r, $countblock
+    );
+  }
+
+  return _metamodel_dwgn_impl(
+    $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
+    $direction, $starorder, $ordmeta, $varnums_r, $countblock
+  );
+}
 
 
-  sub metamodel
-	{
+
+
+  sub _metamodel_dwgn_impl
+  {
     my ( $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
       $direction, $starorder, $ordmeta, $varnums_r, $countblock ) = @_;
-    my %dowhat = %{ $dowhat_r };
 
-    if ( $dowhat{preprep} ne "" )
-    {
-      $sortmixed = $dowhat{preprep};
-      unless ( -e $sortmixed )
-      {
-        die;
-      }
-    }
-
-    if ( $dowhat{preprep} ne "" )
-    {
-      $sortmixed = $dowhat{preprep};
-      unless ( -e $sortmixed )
-      {
-        die;
-      }
-    }
-
-    my %dirfiles = %{ $dirfiles_r };
+    my %dowhat    = %{ $dowhat_r };
+    my %dirfiles  = %{ $dirfiles_r };
     my @blockelts = @{ $blockelts_r };
-    my %carrier = %{ $carrier_r };
-    my %varnums = %{ $varnums_r };
-    close SORTMIXED;
+    my %carrier   = %{ $carrier_r };
+    my %varnums   = %{ $varnums_r };
 
-		if ( $dowhat{metamodel} eq "y" )
-		{
-		  sub cleanres
-		  {
-		    my ( $sortmixed ) = @_;
-		    open( ORDRES, "$sortmixed") or die;
-		    my $cleanordres = $sortmixed . "_tmp_cleaned.csv";
-		    my @lines = <ORDRES>;
-	      close ORDRES;
+    return unless ( $dowhat{metamodel} eq "y" );
 
-	      open( CLEANORDRES, ">>$cleanordres" ) or die;
-	      foreach my $line ( @lines )
-	      {
-	        $line =~ s/^$mypath\/$file// ;
-	        $line =~ s/^_// ;
-	        print CLEANORDRES $line;
-	      }
-	      close CLEANORDRES;
-	      return( $cleanordres );
-	    }
+    # Optional override of the entrance file (for debugging / staging)
+    if ( defined( $dowhat{preprep} ) and ( $dowhat{preprep} ne "" ) )
+    {
+      $sortmixed = $dowhat{preprep};
+      die "PREPREP file not found: $sortmixed\n" unless ( -e $sortmixed );
+    }
 
+    # metamodel() is outside descend(), so do not rely on descend() lexicals
+    my $mypath = $main::mypath;
+    my $tofile = $main::tofile;
 
-      sub prepareblank
-	    {
-	      my ( $varnums_r, $blankfile, $blockelts_r, $bag_r, $file, $carrier_r ) = @_;
-	      my %varnums = %{ $varnums_r };
-	      my @blockelts = ( sort { $a <=> $b } @{ $blockelts_r } );
-        my @bag = @{ $bag_r };
-        my %carrier = %{ $carrier_r };
-        open( BLANKFILE, ">$blankfile" ) or die;
+    # Interlinear config path (same intent as in descend())
+    my $confinterlinear = $dowhat{confinterlinear};
+    if ( defined( $confinterlinear ) and ( $confinterlinear ne "" ) and defined( $mypath ) and ( $mypath ne "" ) )
+    {
+      $confinterlinear = "$mypath/$confinterlinear";
+    }
 
-        my @box = @{ Sim::OPT::toil( \@blockelts, \%varnums, $bag_r ) };
-	      @box = @{ $box[-1] };
-	      my $integrated_r = Sim::OPT::integratebox( \@box, \%carrier, $file, \@blockelts );
+    # ---------- helpers as closures (capture lexicals safely) ----------
 
-	      my @finalbox = @{ $integrated_r };
+    my $is_num = sub
+    {
+      my ( $v ) = @_;
+      return 0 unless defined $v;
+      return ( $v =~ /^\s*[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?\s*$/ ) ? 1 : 0;
+    };
 
-        foreach my $el ( @finalbox )
-	      {
-	        say BLANKFILE $el->[0];
-	      }
-	      close BLANKFILE;
-        return( \@finalbox )
-	    }
+    my $canon_id = sub
+    {
+      my ( $id ) = @_;
+      return "" unless defined $id;
+      $id =~ s/\r?\n$//;
 
-
-      sub prepvarnums
+      # strip path/file prefix if present
+      if ( defined( $mypath ) and ( $mypath ne "" ) and defined( $file ) and ( $file ne "" ) )
       {
-        my ( $varns_ref, $blockelts_r ) = @_;
-        my %varns = %{ $varns_ref };
-        my @blockelts = @{ $blockelts_r };
-        foreach my $key ( sort ( keys %varns ) )
-        {
-          if ( not( $key ~~ @blockelts ) )
-          {
-            $varns{$key} = 1;
-          }
-        }
-        return( %varns );
+        $id =~ s/^\Q$mypath\/$file\E//;
       }
 
-      my %varns;
-      if ( $dirfiles{starsign} eq "yes ")
+      # strip leading underscores
+      $id =~ s/^_+//;
+
+      # strip leading "file_" if present
+      if ( defined( $file ) and ( $file ne "" ) )
       {
-        %varns = prepvarnums( $dirfiles{varnumbershold}->[0], \@blockelts );
+        $id =~ s/^\Q$file\_\E//;
+      }
+      return $id;
+    };
+
+    my $compound_from_fields = sub
+    {
+      my ( $fields_r ) = @_;
+      my @f = @{ $fields_r };
+
+      # last numeric field is the safest definition across both full and short formats
+      for ( my $i = $#f; $i >= 0; $i-- )
+      {
+        if ( $is_num->( $f[$i] ) )
+        {
+          my $v = $f[$i];
+          $v =~ s/^\s+|\s+$//g;
+          return $v;
+        }
+      }
+      return ""; # should never happen for valid formats
+    };
+
+    # ---------- read and clean results (FULL format) ----------
+
+    open( my $IN, "<", $sortmixed ) or die "Cannot open $sortmixed: $!\n";
+    my @raw_full = <$IN>;
+    close $IN;
+
+    my @clean_full;
+    foreach my $ln ( @raw_full )
+    {
+      next unless defined $ln;
+      $ln =~ s/\r?\n$//;
+
+      # preserve the entire row, but canonicalize the ID field reliably
+      my @f = split( /,/, $ln, -1 );
+      next unless scalar( @f ) > 0;
+      $f[0] = $canon_id->( $f[0] );
+
+      my $rebuilt = join( ",", @f );
+      push( @clean_full, $rebuilt );
+    }
+
+    # Optional dump for review
+    if ( defined( $dowhat{dumpfiles} ) and ( $dowhat{dumpfiles} eq "y" ) )
+    {
+      my $cleanordres = $sortmixed . "_tmp_cleaned.csv";
+      open( my $CLEAN, ">", $cleanordres ) or die "Cannot write $cleanordres: $!\n";
+      foreach my $ln ( @clean_full ) { print $CLEAN $ln . "\n"; }
+      close $CLEAN;
+    }
+
+    # ---------- build blanks (IDs only) ----------
+
+    # %varns: for vars not in the block, keep one level only (as in the old pipeline)
+    my %varns = %varnums;
+    foreach my $key ( keys %varns )
+    {
+      if ( not( $key ~~ @blockelts ) )
+      {
+        $varns{$key} = 1;
+      }
+    }
+
+    my $bit = $file . "_";
+    my @bag = ( $bit );
+
+    my @box_refs = @{ Sim::OPT::toil( \@blockelts, \%varns, \@bag ) };
+    my @box      = @{ $box_refs[-1] };
+    my $integrated_r = Sim::OPT::integratebox( \@box, \%carrier, $file, \@blockelts );
+
+    my @blank_ids;
+    foreach my $el ( @{ $integrated_r } )
+    {
+      push( @blank_ids, $canon_id->( $el->[0] ) );
+    }
+    @blank_ids = uniq( @blank_ids );
+
+    if ( defined( $dowhat{dumpfiles} ) and ( $dowhat{dumpfiles} eq "y" ) )
+    {
+      my $blankfile = $sortmixed . "_tmp_blank.csv";
+      open( my $BL, ">", $blankfile ) or die "Cannot write $blankfile: $!\n";
+      foreach my $id ( @blank_ids ) { print $BL $id . "\n"; }
+      close $BL;
+    }
+
+    # ---------- normalize non-block variables (old prepfile logic) ----------
+
+    my %modhs;
+    my %torecovers;
+
+    foreach my $key ( sort keys %varnums )
+    {
+      if ( not( $key ~~ @blockelts ) )
+      {
+        $modhs{$key} = $varnums{$key};
+        $torecovers{$key} = $carrier{$key};
+      }
+    }
+
+    # Apply normalization to blanks
+    my @prep_blanks = @blank_ids;
+    if ( scalar( keys %modhs ) > 0 )
+    {
+      foreach my $id ( @prep_blanks )
+      {
+        foreach my $key ( keys %modhs )
+        {
+          $id =~ s/$key-\d+/$key-$modhs{$key}/;
+        }
+      }
+    }
+
+    # Apply normalization to results
+    my @prep_results = @clean_full;
+    if ( scalar( keys %modhs ) > 0 )
+    {
+      foreach my $ln ( @prep_results )
+      {
+        foreach my $key ( keys %modhs )
+        {
+          $ln =~ s/$key-\d+/$key-$modhs{$key}/;
+        }
+      }
+    }
+
+    if ( defined( $dowhat{dumpfiles} ) and ( $dowhat{dumpfiles} eq "y" ) )
+    {
+      my $prepblank = $sortmixed . "_tmp_prepblank.csv";
+      my $prepsort  = $sortmixed . "_tmp_prepsort.csv";
+      open( my $PB, ">", $prepblank ) or die "Cannot write $prepblank: $!\n";
+      foreach my $id ( @prep_blanks ) { print $PB $id . "\n"; }
+      close $PB;
+      open( my $PS, ">", $prepsort ) or die "Cannot write $prepsort: $!\n";
+      foreach my $ln ( @prep_results ) { print $PS $ln . "\n"; }
+      close $PS;
+    }
+
+    # ---------- join blanks + known values (FULL -> SHORT) in memory ----------
+
+    # Map: id -> compound (from FULL results; compound is last numeric field)
+    my %id2compound;
+    foreach my $ln ( @prep_results )
+    {
+      my @f = split( /,/, $ln, -1 );
+      next unless scalar( @f ) > 1;
+      my $id = $canon_id->( $f[0] );
+      my $compound = $compound_from_fields->( \@f );
+      next if ( $id eq "" );
+      next if ( $compound eq "" );
+      $id2compound{$id} = $compound;
+    }
+
+    # Interlinear input: "id" (unknown) or "id,compound" (known)
+    my @prepfile_lines;
+    foreach my $id ( @prep_blanks )
+    {
+      my $cid = $canon_id->( $id );
+      if ( exists( $id2compound{$cid} ) )
+      {
+        push( @prepfile_lines, $cid . "," . $id2compound{$cid} );
       }
       else
       {
-        %varns = prepvarnums( \%varnums, \@blockelts );
+        push( @prepfile_lines, $cid );
       }
+    }
 
-      my $cleanordres = cleanres( $sortmixed );
-	    my $blankfile = "$sortmixed" . "_tmp_blank.csv";
-	    my $bit = $file . "_";
-	    my @bag =( $bit );
-	    prepareblank( \%varns, $blankfile, \@blockelts, \@bag, $file, \%carrier ) ;
-
-
-      sub prepfile
-      {
-        my ( $blankfile, $prepblank, $cleanordres, $prepsort, $blockelts_r, $varnums_r, $carrier_r, $metafile ) = @_;
-        my @blockelts = @{ $blockelts_r };
-        my %varnums = %{ $varnums_r };
-        my %carrier = %{ $carrier_r };
-
-        my %modhs;
-        my %torecovers;
-        foreach my $el ( @blockelts )
-        {
-          foreach my $key ( sort ( keys( %varnums ) ) )
-          {
-            if ( not( $key ~~ @blockelts ) )
-            {
-              $modhs{$key} = $varnums{$key};
-              $torecovers{$key} = $carrier{$key};
-            }
-          }
-        }
-
-        open( BLANKFILE, "$blankfile" ) or die;
-        my @lines = <BLANKFILE>;
-        close BLANKFILE;
-
-        open( PREPBLANK, ">$prepblank" ) or die;
-        foreach my $line ( @lines )
-        {
-          foreach my $key ( keys %modhs )
-          {
-            $line =~ s/$key-\d+/$key-$modhs{$key}/ ;
-          }
-          print PREPBLANK $line;
-        }
-        close PREPBLANK;
-
-        open( CLEANORDRES, "$cleanordres" ) or die;
-        my @lines = <CLEANORDRES>;
-        close CLEANORDRES;
-
-        open( PREPSORT, ">$prepsort" ) or die;
-        foreach my $line ( @lines )
-        {
-          foreach my $key ( keys %modhs )
-          {
-            $line =~ s/$key-\d+/$key-$modhs{$key}/ ;
-          }
-          print PREPSORT $line;
-        }
-        close PREPSORT;
-
-        return( %torecovers );
-      }
-
-      my $prepblank = $sortmixed . "_tmp_prepblank.csv";
-      my $prepsort = $sortmixed . "_tmp_prepsort.csv";
-      my %torecovers = prepfile( $blankfile, $prepblank, $cleanordres, $prepsort, \@blockelts, \%varnums, \%carrier, $metafile );
-
-	    sub jointwo
-	    {
-	      my ( $prepsort, $prepblank, $prepfile ) = @_;
-	      open( PREPBLANK, $prepblank ) or die;
-	      my @blanklines = <PREPBLANK>;
-        @blanklines = uniq( @blanklines );
-	      close PREPBLANK;
-
-	      open( PREPSORT, $prepsort ) or die;
-	      my @ordlines = <PREPSORT>;
-        @ordlines = uniq( @ordlines );
-	      close PREPSORT;
-
-	      open( PREPFILE, ">$prepfile" ) or die;
-
-	      my @newarr;
-	      foreach my $blankline ( @blanklines )
-	      {
-	        chomp $blankline;
-	        my $signal = "n";
-	        foreach my $ordline ( @ordlines )
-	        {
-	          chomp $ordline;
-	          my @row = split( "," , $ordline );
-	          if ( ( $row[0] =~ /$blankline/ ) or ( /$blankline/ =~ $row[0] ) )
-	          {
-	            say PREPFILE "$blankline" . "," . "$row[1]" ;
-	            $signal = "y";
-	          }
-	        }
-	        if ( $signal eq "n" )
-	        {
-	          say PREPFILE $blankline ;
-	        }
-	      }
-	      close PREPFILE;
-	    }
-
+    if ( defined( $dowhat{dumpfiles} ) and ( $dowhat{dumpfiles} eq "y" ) )
+    {
       my $prepfile = $sortmixed . "_tmp_prepfile.csv";
-	    jointwo( $prepsort, $prepblank, $prepfile ) ;
+      open( my $PF, ">", $prepfile ) or die "Cannot write $prepfile: $!\n";
+      foreach my $ln ( @prepfile_lines ) { print $PF $ln . "\n"; }
+      close $PF;
+    }
 
-      my $rawmetafile = $metafile . "_tmp_raw.csv";
-	    #say $tee "ABOUT TO LAUNCH INTERLINEAR";
+    # ---------- call Interlinear (arrayref input; you already enabled this) ----------
 
-      my @prepwelds = @{ $dowhat{prewelds} };
-      my @parswelds = @{ $dowhat{parswelds} };
-      my @weldsprepared;
+    my $rawmetafile = $metafile . "_tmp_raw.csv";
+    Sim::OPT::Interlinear::interlinear( \@prepfile_lines, $confinterlinear, $rawmetafile, \@blockelts, $tofile, $countblock, $dowhat_r, $dirfiles_r );
 
-      if ( scalar( @prepwelds ) > 0 )
+    # ---------- restore non-block variables & write meta outputs ----------
+
+    open( my $RM, "<", $rawmetafile ) or die "Cannot open $rawmetafile: $!\n";
+    my @rawlines = <$RM>;
+    close $RM;
+
+    my @metas;
+    foreach my $ln ( @rawlines )
+    {
+      next unless defined $ln;
+      $ln =~ s/\r?\n$//;
+
+      foreach my $key ( keys %torecovers )
       {
-        my $c = 0;
-        foreach my $weld ( @prepwelds )
-        {
-          unless ( -e $weld )
-          {
-            die;
-          }
-          my $prepared = $weld . ".weldprep.csv";
-          push ( @weldsprepared, $prepared );
-
-          $c++;
-        }
+        $ln =~ s/$key-\d+/$key-$torecovers{$key}/;
       }
+      push( @metas, $ln );
+    }
 
-	    Sim::OPT::Interlinear::interlinear( $prepfile, $confinterlinear, $rawmetafile, \@blockelts, $tofile, $countblock );
+    @metas = uniq( @metas );
 
-      open( RAWMETAFILE, "$rawmetafile" ) or die;
-      my @rawlines = <RAWMETAFILE>;
-      close RAWMETAFILE;
+    open( my $MF, ">", $metafile ) or die "Cannot write $metafile: $!\n";
+    foreach my $ln ( @metas ) { print $MF $ln . "\n"; }
+    close $MF;
 
-      open( METAFILE, ">$metafile" ) or die;
-      foreach my $line ( @rawlines )
-      {
-        foreach my $key ( keys %torecovers )
-        {
-          $line =~ s/$key-\d+/$key-$torecovers{$key}/ ;
-        }
-        print METAFILE $line;
-      }
-      close METAFILE;
+    # Sort and write ORDMETA (overwrite, not append)
+    my @sorted;
+    if ( ( defined( $direction ) and ( $direction eq "<" ) ) or ( defined( $starorder ) and ( $starorder eq "<" ) ) )
+    {
+      @sorted = sort { (split( /,/, $a, -1 ))[1] <=> ( split( /,/, $b, -1 ))[1] } @metas;
+    }
+    else
+    {
+      @sorted = sort { (split( /,/, $b, -1 ))[1] <=> ( split( /,/, $a, -1 ))[1] } @metas;
+    }
 
-	    open( METAFILE, "$metafile" ) or die "THERE IS NO METAFILE $metafile!\n";
-	    my @totlines = <METAFILE>;
-      @totlines = uniq( @totlines );
-	    close METAFILE;
-
-	    if ( ( $direction eq "<" ) or ( $starorder eq "<" ) )
-	    {
-	      @sorted = sort { (split( ',', $a))[ 1 ] <=> ( split( ',', $b))[ 1 ] } @totlines;
-	    }
-	    elsif ( ( $direction eq ">" ) or ( $starorder eq ">" ) )
-	    {
-	      @sorted = sort { (split( ',', $b))[ 1 ] <=> ( split( ',', $a))[ 1 ] } @totlines;
-	    }
-
-      @sorted = uniq( @sorted );
-
-	    open( ORDMETA,  ">>$ordmeta" ) or die;
-	    foreach my $ln ( @sorted )
-	    {
-	      print ORDMETA $ln;
-	    }
-	    close ORDMETA;
-		}
-	}  # END SUB metamodel
-
+    open( my $OM, ">", $ordmeta ) or die "Cannot write $ordmeta: $!\n";
+    foreach my $ln ( @sorted ) { print $OM $ln . "\n"; }
+    close $OM;
+  }  # END SUB metamodel
 
   sub takeoptima
   {
     my ( $sortmixed, $carrier_r, $blockelts_r, $searchname, $orderedfile, $direction, $starorder, $mids_r,
     $blocks_r, $totres, $objectivecolumn, $ordres, $starpositions_r, $countstring, $starnumber, $ordtot,
     $file, $ordmeta, $orderedfile, $dirfiles_r, $countcase, $countblock, $varnums_r, $vehicles_r, $inst_r ) = @_;
-    my %carrier = %{ $carrier_r }; #say $tee "HERE 3 CARRIER: " . dump( \%carrier );
+    my %carrier = %{ $carrier_r }; #say  "HERE 3 CARRIER: " . dump( \%carrier );
     my @blockelts = @{ $blockelts_r };
     my @blocks = @{ $blocks_r };
     my @starpositions = @{ $starpositions_r };
@@ -1673,7 +1714,7 @@ sub descend
     my $winnerentry;
     if ( ( $direction eq ">" ) or ( ( $direction eq "star"  ) and ( $starorder eq ">"  ) ) )
     {
-      $winnerentry = $lines[0]; #say $tee "!!! \$winnerenty = \$lines[0]: $winnerenty";
+      $winnerentry = $lines[0]; #say  "!!! \$winnerenty = \$lines[0]: $winnerenty";
       if ( scalar( @{ $vehicles{nesting}{$dirfiles{nestclock}} } ) > 0 )
       {
         push( @{ $vehicles{$countcase}{$countblock} }, @lines[0..$slicenum]);
@@ -1698,12 +1739,12 @@ sub descend
     }
     chomp $winnerentry;
 
-    my @winnerelms = split( /,/, $winnerentry ); #say $tee "!!! \@winnerelms: " . dump( @winnerelms );
-    my $winneritem = $winnerelms[0]; #say $tee "!!! \$winneritem: $winneritem";
+    my @winnerelms = split( /,/, $winnerentry ); #say  "!!! \@winnerelms: " . dump( @winnerelms );
+    my $winneritem = $winnerelms[0]; #say  "!!! \$winneritem: $winneritem";
 
-    #say $tee "HERE WINNERITEM BEFORE CLEANING: $winneritem.";
+    #say  "HERE WINNERITEM BEFORE CLEANING: $winneritem.";
     $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
-    #say $tee "HERE WINNERITEM AFTER CLEANING: $winneritem.";
+    #say  "HERE WINNERITEM AFTER CLEANING: $winneritem.";
     push ( @{ $incumbents{$closingelt} }, $winneritem );
 
     my $message;
@@ -1775,7 +1816,7 @@ sub descend
           }
           else
           {
-            #say $tee "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
+            #say  "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
           }
         }
         elsif ( $direction eq "star" )
@@ -1790,7 +1831,7 @@ sub descend
           }
           else
           {
-            say $tee "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
+            say  "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
           }
         }
 
@@ -1838,7 +1879,7 @@ sub descend
               }
               else
               {
-                say $tee "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
+                say  "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
               }
             }
             elsif ( $direction eq "star" )
@@ -1853,7 +1894,7 @@ sub descend
               }
               else
               {
-                say $tee "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
+                say  "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
               }
             }
 
@@ -1870,13 +1911,13 @@ sub descend
         #my @morphcases = grep -d, <$mypath/$file_*>;
         unless ( $direction eq "star" )
         {
-          say $tee "#Optimal option for case " . ( $countcase + 1 ) . ": $newtarget.";
+          say  "#Optimal option for case " . ( $countcase + 1 ) . ": $newtarget.";
         }
 
         @totalcases = uniq( @totalcases );
         my $netinstnum = scalar( @totalcases );
 
-        say $tee "#Net number of instances: $netinstnum." ;
+        say  "#Net number of instances: $netinstnum." ;
         open( RESPONSE , ">>$mypath/response.txt" );
         unless ( $direction eq "star" )
         {
@@ -1885,7 +1926,7 @@ sub descend
 
         if ( $starstring eq "" )
         {
-          #say $tee "NOT DOING";
+          #say  "NOT DOING";
           say RESPONSE "#Net number of instances: $netinstnum.\n" ;
         }
         elsif ( $starstring ne "" )
@@ -1901,7 +1942,7 @@ sub descend
           }
           else
           {
-            say $tee "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
+            say  "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
           }
 
           my $num = scalar( @lines );
@@ -1916,7 +1957,7 @@ sub descend
         my $metafile = $sortmixed . "_meta.csv";
         my $ordmeta = $sortmixed . "_ordmeta.csv";
 
-        my @blockelts = @{ Sim::OPT::getblockelts( \@sweeps, $countcase, $countblock ) }; #say $tee "IN callblock \@blockelts " . dump( @blockelts );
+        my @blockelts = @{ Sim::OPT::getblockelts( \@sweeps, $countcase, $countblock ) }; #say  "IN callblock \@blockelts " . dump( @blockelts );
 
         metamodel( \%dowhat, $sortmixed, $file, \%dirfiles, \@blockelts, \%carrier, $metafile,
           $direction, $starorder, $ordmeta, \%varnums, $countblock );
@@ -2000,17 +2041,17 @@ sub descend
               push( @instancees, $instance );
               if ( $dowhat{morph} eq "y" )
               {
-                say $tee "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+                say  "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
                 my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles, \%inst );
               }
  
               my( $packet_r, $dirfiles_r );
               if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
               {
-                say $tee "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+                say  "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
                 ( $packet_r, $dirfiles_r, $csim ) = Sim::OPT::Sim::sim(
                     { instances => \@instancees, dirfiles => \%dirfiles, dowhat => \%dowhat, vehicles => \%vehicles, inst => \%inst } );
-                @packet = uniq( @$packet_r ); say $tee "RECEIVED PACKET " . dump( @packet );
+                @packet = uniq( @$packet_r ); say  "RECEIVED PACKET " . dump( @packet );
                 %dirfiles = %$dirfiles;
               }
             }
@@ -2022,8 +2063,8 @@ sub descend
           $dirfiles{launching} = "n";
         }
 
-        my @winnerelms = split( /,/, $winnerentry ); #say $tee "!!!! \@winnerelms: " . dump( @winnerelms );
-        my $winneritem = $winnerelms[0]; #say $tee "!!!! \$winnerelms[0]: " . dump( $winnerelms[0] );
+        my @winnerelms = split( /,/, $winnerentry ); #say  "!!!! \@winnerelms: " . dump( @winnerelms );
+        my $winneritem = $winnerelms[0]; #say  "!!!! \$winnerelms[0]: " . dump( $winnerelms[0] );
 
         $countblock = 0;
         $countcase++; ####!!!
@@ -2063,7 +2104,7 @@ sub descend
 
         @varnumbers = @{ dclone( $dirfiles{varnumbershold} ) };
         @miditers = @{ dclone( $dirfiles{miditershold} ) };
-        say $tee "WINNERITEMS: " . dump( @winneritems );
+        say  "WINNERITEMS: " . dump( @winneritems );
         Sim::OPT::callblock( { countcase => $countcase, countblock => $countblock,
         miditers => \@miditers,  winneritems => \@winneritems,
         dirfiles => \%dirfiles, varnumbers => \@varnumbers,
@@ -2072,16 +2113,16 @@ sub descend
       } ### END OF THE PART ON STAR CONFIGURATIONS
       else
       {
-        say $tee "IN CASE END NOT STARSIGN.";
+        say  "IN CASE END NOT STARSIGN.";
         $countblock = 0;
         $countcase++; ####!!!
 
         $countstring++;
         $dirfiles{countstring} = $countstring;
         $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
-        say $tee "\$winneritem: " . dump( $winneritem );
+        say  "\$winneritem: " . dump( $winneritem );
         push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem );
-        say $tee "WINNERITEMS: " . dump( @winneritems );
+        say  "WINNERITEMS: " . dump( @winneritems );
         Sim::OPT::callblock( { countcase => $countcase, countblock => $countblock,
         miditers => \@miditers,  winneritems => \@winneritems,
         dirfiles => \%dirfiles, varnumbers => \@varnumbers,
@@ -2179,23 +2220,23 @@ sub descend
               push( @instancees, $instance );
               if ( $dowhat{morph} eq "y" )
               {
-                say $tee "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+                say  "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
                 my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles, \%inst );
               }
 
               my( $packet_r, $dirfiles_r );
               if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
               {
-                #say $tee "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+                #say  "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
                 ( $packet_r, $dirfiles_r, $csim ) = Sim::OPT::Sim::sim(
                     { instances => \@instancees, dirfiles => \%dirfiles, dowhat => \%dowhat, vehicles => \%vehicles, inst => \%inst } );
-                    @packet = uniq( @$packet_r ); say $tee "RECEIVED PACKET " . dump( @packet );
+                    @packet = uniq( @$packet_r ); say  "RECEIVED PACKET " . dump( @packet );
                     %dirfiles = %$dirfiles;
               }
               #if ( $dowhat{descend} eq "y" )
               #{
-              #	#say $tee "#Calling descent for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
-              #	#say $tee "\@sourcesweeps: " . dump( @sourcesweeps );
+              #	#say  "#Calling descent for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
+              #	#say  "\@sourcesweeps: " . dump( @sourcesweeps );
               #	Sim::OPT::Descend::descend(	{ instances => \@instancees, dirfiles => \%dirfiles, vehicles => \%vehicles } );
               #}
             }
@@ -2214,7 +2255,7 @@ sub descend
         @miditers = @{ dclone( $dirfiles{miditershold} ) };
 
         $countblock++; ### !!!        push ( @{ $winneritems[$countcase][$countblock + 1] }, $winneritem );
-        say $tee "WINNERITEMS: " . dump( @winneritems );
+        say  "WINNERITEMS: " . dump( @winneritems );
         Sim::OPT::callblock( { countcase => $countcase, countblock => $countblock,
         miditers => \@miditers,  winneritems => \@winneritems,
         dirfiles => \%dirfiles, varnumbers => \@varnumbers,
@@ -2222,11 +2263,11 @@ sub descend
         sourcesweeps => \@sourcesweeps, instn => $instn, inst => \%inst, vehicles => \%vehicles } );
       } ### END OF THE PART ABOUT STAR CONFIGURATIONS
       else
-      { #say $tee "!!!! RELAUNCHING WITH INST " . dump( %inst ); 
+      { #say  "!!!! RELAUNCHING WITH INST " . dump( %inst ); 
         $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
-        say $tee "!!!! \winneritem: " . dump( @winneritem );
+        say  "!!!! \winneritem: " . dump( @winneritem );
         push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem );
-        say $tee "!!!! WINNERITEMS: " . dump( @winneritems );
+        say  "!!!! WINNERITEMS: " . dump( @winneritems );
         $countblock++; ### !!!
 
         Sim::OPT::callblock( { countcase => $countcase, countblock => $countblock,
@@ -2238,11 +2279,11 @@ sub descend
     }
   } # END SUB takeoptima
 
-  #say $tee "IN DESCEND BEFORE TAKEOPTIMA; INST " . dump( %inst );
-  #say $tee "HERE 2 CARRIER: " . dump( \%carrier );
+  #say  "IN DESCEND BEFORE TAKEOPTIMA; INST " . dump( %inst );
+  #say  "HERE 2 CARRIER: " . dump( \%carrier );
   takeoptima( $sortmixed, \%carrier, \@blockelts, $searchname, $orderedfile, $direction, $starorder,
   \%mids, \@blocks, $totres, $objectivecolumn, $ordres, \@starpositions, $countstring, $starnumber,
-  $ordtot, $file, $ordmeta, $orderedfile, \%dirfiles, $countcase, $countblock, \%varnums, \%vehicles, \%inst ); #say $tee "TAKEOPTIMA \$sortmixed : " . dump( $sortmixed );
+  $ordtot, $file, $ordmeta, $orderedfile, \%dirfiles, $countcase, $countblock, \%varnums, \%vehicles, \%inst ); #say  "TAKEOPTIMA \$sortmixed : " . dump( $sortmixed );
   close OUTFILE;
   close TOFILE;
 }    # END SUB descend

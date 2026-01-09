@@ -33,7 +33,6 @@
             "File::ShareDir" : "0",
             "Format::Human::Bytes" : "0",
             "Getopt::Long" : "0",
-            "Koha::SearchEngine::Elasticsearch" : "0",
             "List::Util" : "0",
             "Log::Dispatch" : "0",
             "Log::Dispatch::File" : "0",
@@ -77,7 +76,7 @@
          "url" : "https://github.com/fredericd/koha-sudoc"
       }
    },
-   "version" : "2.48",
+   "version" : "2.49",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "GPL-3.0-only"

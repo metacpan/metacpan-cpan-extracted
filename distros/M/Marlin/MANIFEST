@@ -11,6 +11,7 @@ README
 SIGNATURE
 dist.ini
 doap.ttl
+examples/antlers.pl
 examples/benchmark.pl
 examples/can_haz_xs.pl
 examples/lib/Local/Example/Core.pm

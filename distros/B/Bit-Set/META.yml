@@ -19,21 +19,19 @@ name: Bit-Set
 provides:
   Bit::Set:
     file: lib/Bit/Set.pm
-    version: '0.11'
+    version: '0.12'
   Bit::Set::DB:
     file: lib/Bit/Set/DB.pm
-    version: '0.11'
+    version: '0.12'
   Bit::Set::DB::OO:
     file: lib/Bit/Set/DB/OO.pm
-    version: '0.11'
+    version: '0.12'
   Bit::Set::OO:
     file: lib/Bit/Set/OO.pm
-    version: '0.11'
+    version: '0.12'
 requires:
   Alien::Bit: '0'
   Exporter: '0'
-  FFI::Platypus: '1.00'
-  FFI::Platypus::Record: '0'
   XSLoader: '0'
   constant: '0'
   strict: '0'
@@ -41,7 +39,7 @@ requires:
 resources:
   homepage: https://github.com/chrisarg/Bit-Set
   repository: https://github.com/chrisarg/Bit-Set.git
-version: '0.11'
+version: '0.12'
 x_generated_by_perl: v5.40.3
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

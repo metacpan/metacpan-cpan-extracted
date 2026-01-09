@@ -1,8 +1,9 @@
 #!/usr/bin/perl
-use lib "lib", "t";
+use strict;
+use warnings;
+
 use MIME::Lite;
 use Test::More tests => 2;
-use Utils;
 
 $MIME::Lite::VANILLA  = 1;
 $MIME::Lite::PARANOID = 1;

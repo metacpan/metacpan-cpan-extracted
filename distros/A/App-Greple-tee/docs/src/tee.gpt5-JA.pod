@@ -1,0 +1,202 @@
+=encoding utf-8
+
+=head1 NAME
+
+App::Greple::tee - マッチしたテキストを外部コマンドの結果で置き換えるモジュール
+
+=head1 SYNOPSIS
+
+    greple -Mtee command -- ...
+
+=head1 VERSION
+
+Version 1.03
+
+=head1 DESCRIPTION
+
+Greple の B<-Mtee> モジュールは、マッチしたテキスト部分を指定したフィルタコマンドに送り、そのコマンドの結果で置き換えます。アイデアは B<teip> と呼ばれるコマンドに由来します。データの一部を外部フィルタコマンドにバイパスするようなイメージです。
+
+フィルタコマンドはモジュール宣言（C<-Mtee>）に続けて記述し、二つのダッシュ（C<-->）で終端します。例えば、次のコマンドはデータ中のマッチした単語に対して、コマンド C<tr> を C<a-z A-Z> の引数で呼び出します。
+
+    greple -Mtee tr a-z A-Z -- '\w+' ...
+
+上記のコマンドは、マッチした単語をすべて小文字から大文字に変換します。実はこの例自体はあまり有用ではありません。というのも、B<greple> 自身が B<--cm> オプションで同様のことをより効率的に行えるからです。
+
+デフォルトでは、コマンドは単一プロセスとして実行され、すべてのマッチしたデータは混在したままそのプロセスに送られます。マッチしたテキストが改行で終わっていなければ、送信前に改行が追加され、受信後に取り除かれます。入力と出力のデータは行単位で対応付けられるため、入力と出力の行数は一致していなければなりません。
+
+B<--discrete> オプションを使うと、マッチした各テキスト領域ごとに個別のコマンドが呼び出されます。違いは次のコマンド群で確認できます。
+
+    greple -Mtee cat -n -- copyright LICENSE
+    greple -Mtee cat -n -- copyright LICENSE --discrete
+
+B<--discrete> オプションを用いる場合、入力と出力の行数は一致している必要はありません。
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<--discrete>
+
+マッチした各部分ごとに新しいコマンドを個別に起動します。
+
+=item B<--bulkmode>
+
+<--discrete> オプションでは各コマンドはオンデマンドで実行されます。<--bulkmode> オプションではすべての変換を一括で実行します。
+
+=item B<--crmode>
+
+このオプションは、各ブロックの途中にあるすべての改行文字をキャリッジリターンに置き換えます。コマンド実行結果に含まれるキャリッジリターンは改めて改行に戻されます。これにより、B<--discrete> オプションを使わずとも、複数行から成るブロックをバッチ処理できます。
+
+これは L<ansifold> コマンドの B<--crmode> オプションと相性がよく、CR 区切りのテキストを結合し、CR で区切られた折り畳み行を出力します。
+
+=item B<--fillup>
+
+フィルタコマンドに渡す前に、連続する非空行を1行にまとめます。全角文字（日本語、中国語）の間の改行は削除し、その他の改行は空白に置き換えます。韓国語（ハングル）は ASCII テキスト同様に空白で連結します。
+
+=item B<--squeeze>
+
+連続する2つ以上の改行を1つにまとめます。
+
+=item B<-ML> B<--offload> I<command>
+
+L<teip(1)> の B<--offload> オプションは、別モジュール L<App::Greple::L>（B<-ML>）で実装されています。
+
+    greple -Mtee cat -n -- -ML --offload 'seq 10 20'
+
+B<-ML> モジュールを使って、次のように偶数行のみを処理することもできます。
+
+    greple -Mtee cat -n -- -ML 2::2
+
+=back
+
+=head1 CONFIGURATION
+
+モジュールのパラメータは、次の文法で B<Getopt::EX::Config> モジュールにより設定できます。
+
+    greple -Mtee::config(discrete) ...
+    greple -Mtee::config(fillup,crmode) ...
+
+これはシェルのエイリアスやモジュールファイルと組み合わせると便利です。
+
+利用可能なパラメータは B<discrete>, B<bulkmode>, B<crmode>, B<fillup>, B<squeeze>, B<blocks> です。
+
+=head1 LEGACIES
+
+B<greple> に B<--stretch>（B<-S>）オプションが実装されたため、B<--blocks> オプションは不要になりました。次のように簡単に実行できます。
+
+    greple -Mtee cat -n -- --all -SE foo
+
+将来的に非推奨となる可能性があるため、B<--blocks> の使用は推奨されません。
+
+
+=over 7
+
+=item B<--blocks>
+
+通常、指定された検索パターンに一致する領域が外部コマンドに送られます。このオプションを指定すると、一致した領域ではなく、それを含むブロック全体が処理されます。
+
+例えば、パターン C<foo> を含む行を外部コマンドに送るには、行全体に一致するパターンを指定する必要があります:
+
+    greple -Mtee cat -n -- '^.*foo.*\n' --all
+
+しかし B<--blocks> オプションを使えば、次のように簡単に実行できます:
+
+    greple -Mtee cat -n -- foo --blocks
+
+B<--blocks> オプションを用いると、このモジュールは L<teip(1)> の B<-g> オプションにより近い動作になります。そうでなければ、動作は B<-o> オプションを付けた L<teip(1)> に似ています。
+
+B<--blocks> を B<--all> オプションと併用しないでください。ブロックがデータ全体になってしまいます。
+
+=back
+
+=head1 WHY DO NOT USE TEIP
+
+まず何より、B<teip> コマンドで実現できる場合はそれを使ってください。優れたツールであり、B<greple> よりもはるかに高速です。
+
+B<greple> は文書ファイルの処理を目的に設計されているため、マッチ領域の制御など、それに適した多くの機能を備えています。それらの機能を活用するために B<greple> を使う価値はあります。
+
+また、B<teip> は複数行のデータをひとつの単位として扱えませんが、B<greple> は複数行からなるデータチャンクに対して個別のコマンドを実行できます。
+
+=head1 EXAMPLE
+
+次のコマンドは、Perl モジュールファイルに含まれる L<perlpod(1)> 形式ドキュメント内のテキストブロックを見つけます。
+
+    greple --inside '^=(?s:.*?)(^=cut|\z)' --re '^([\w\pP].+\n)+' tee.pm
+
+上記コマンドに B<-Mtee> モジュールを組み合わせて B<deepl> コマンドを呼び出すことで、DeepL サービスで翻訳できます。使い方は次のとおりです:
+
+    greple -Mtee deepl text --to JA - -- --fillup ...
+
+ただし、この目的には専用モジュール L<App::Greple::xlate::deepl> のほうが効果的です。実際、B<tee> モジュールの実装のヒントは B<xlate> モジュールから得られました。
+
+=head1 EXAMPLE 2
+
+次のコマンドは、LICENSE ドキュメント内のいくつかのインデントされた部分を見つけます。
+
+    greple --re '^[ ]{2}[a-z][)] .+\n([ ]{5}.+\n)*' -C LICENSE
+
+      a) distribute a Standard Version of the executables and library files,
+         together with instructions (in the manual page or equivalent) on where to
+         get the Standard Version.
+
+      b) accompany the distribution with the machine-readable source of the Package
+         with your modifications.
+
+この部分は、B<tee> モジュールと B<ansifold> コマンドを使って再整形できます。両方の B<--crmode> オプションを併用すると、複数行ブロックを効率よく処理できます:
+
+    greple -Mtee ansifold -sw40 --prefix '     ' --crmode -- --crmode --re ...
+
+      a) distribute a Standard Version of
+         the executables and library files,
+         together with instructions (in the
+         manual page or equivalent) on where
+         to get the Standard Version.
+
+      b) accompany the distribution with the
+         machine-readable source of the
+         Package with your modifications.
+
+B<--discrete> オプションも使用できますが、複数のプロセスを起動するため、実行に時間がかかります。
+
+=head1 EXAMPLE 3
+
+ヘッダー行以外から文字列を grep したい状況を考えてみます。例えば、C<docker image ls> コマンドから Docker イメージ名を検索したいが、ヘッダー行は残したい場合です。以下のコマンドで実現できます。
+
+    greple -Mtee grep perl -- -ML 2: --discrete --all
+
+オプション C<-ML 2:> は、後ろから2行目以降を取り出して C<grep perl> コマンドに送ります。入力と出力の行数が変わるため --discrete オプションが必要ですが、コマンドは一度しか実行されないので性能上のデメリットはありません。
+
+同じことを B<teip> コマンドでやろうとすると、C<teip -l 2- -- grep> は出力行数が入力行数より少ないためエラーになります。ただし、得られる結果自体に問題はありません。
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+    $ cpanm App::Greple::tee
+
+=head1 SEE ALSO
+
+L<App::Greple::tee>, L<https://github.com/kaz-utashiro/App-Greple-tee>
+
+L<https://github.com/greymd/teip>
+
+L<App::Greple>, L<https://github.com/kaz-utashiro/greple>
+
+L<https://github.com/tecolicom/Greple>
+
+L<App::Greple::xlate>
+
+L<App::ansifold>, L<https://github.com/tecolicom/App-ansifold>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright © 2023-2026 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

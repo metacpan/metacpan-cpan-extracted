@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kaz-utashiro/App-Greple-tee/workflows/test/badge.svg)](https://github.com/kaz-utashiro/App-Greple-tee/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-Greple-tee.svg)](https://metacpan.org/release/App-Greple-tee)
+[![Actions Status](https://github.com/kaz-utashiro/App-Greple-tee/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/kaz-utashiro/App-Greple-tee/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/App-Greple-tee.svg)](https://metacpan.org/release/App-Greple-tee)
 # NAME
 
 App::Greple::tee - module to replace matched text by the external command result
@@ -9,7 +9,7 @@ App::Greple::tee - module to replace matched text by the external command result
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # DESCRIPTION
 
@@ -62,12 +62,16 @@ with **--discrete** option.
     character. Thus, blocks consisting of multiple lines can be processed
     in batches without using the **--discrete** option.
 
+    This works well with [ansifold](https://metacpan.org/pod/ansifold) command's **--crmode** option, which
+    joins CR-separated text and outputs folded lines separated by CR.
+
 - **--fillup**
 
     Combine a sequence of non-blank lines into a single line before
     passing them to the filter command.  Newline characters between wide
-    width characters are deleted, and other newline characters are
-    replaced with spaces.
+    width characters (Japanese, Chinese) are deleted, and other newline
+    characters are replaced with spaces.  Korean (Hangul) is treated
+    like ASCII text and joined with space.
 
 - **--squeeze**
 
@@ -84,6 +88,19 @@ with **--discrete** option.
     as follows.
 
         greple -Mtee cat -n -- -ML 2::2
+
+# CONFIGURATION
+
+Module parameters can be set with **Getopt::EX::Config** module using
+the following syntax:
+
+    greple -Mtee::config(discrete) ...
+    greple -Mtee::config(fillup,crmode) ...
+
+This is useful when combined with shell aliases or module files.
+
+Available parameters are: **discrete**, **bulkmode**, **crmode**,
+**fillup**, **squeeze**, **blocks**.
 
 # LEGACIES
 
@@ -162,9 +179,10 @@ Next command will find some indented part in LICENSE document.
          with your modifications.
 
 You can reformat this part by using **tee** module with **ansifold**
-command:
+command.  Using both **--crmode** options together allows efficient
+processing of multi-line blocks:
 
-    greple -Mtee ansifold -rsw40 --prefix '     ' -- --discrete --re ...
+    greple -Mtee ansifold -sw40 --prefix '     ' --crmode -- --crmode --re ...
 
       a) distribute a Standard Version of
          the executables and library files,
@@ -176,16 +194,8 @@ command:
          machine-readable source of the
          Package with your modifications.
 
-The --discrete option will start multiple processes, so the process
-will take longer to execute.  So you can use `--separate '\r'` option
-with `ansifold` which produce single line using CR character instead
-of NL.
-
-    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
-
-Then convert CR char to NL after by [tr(1)](http://man.he.net/man1/tr) command or some.
-
-    ... | tr '\r' '\n'
+The **--discrete** option can also be used but will start multiple
+processes, so it takes longer to execute.
 
 # EXAMPLE 3
 
@@ -224,10 +234,7 @@ problem with the result obtained.
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
-# BUGS
-
-The `--fillup` option will remove spaces between Hangul characters when 
-concatenating Korean text.
+[App::ansifold](https://metacpan.org/pod/App%3A%3Aansifold), [https://github.com/tecolicom/App-ansifold](https://github.com/tecolicom/App-ansifold)
 
 # AUTHOR
 
@@ -235,7 +242,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

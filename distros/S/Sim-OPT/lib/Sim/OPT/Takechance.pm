@@ -17,7 +17,6 @@ use List::Util qw[ min max reduce shuffle];
 use List::MoreUtils qw(uniq);
 use List::AllUtils qw(sum);
 use Sim::OPT::Stats qw(:all);
-use IO::Tee;
 use File::Copy qw( move copy );
 use Set::Intersection;
 use List::Compare;
@@ -42,6 +41,7 @@ use Sim::OPT::Sim;
 use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Interlinear;
+use Sim::OPT::Stats;
 eval { use Sim::OPTcue; 1 };
 
 
@@ -62,8 +62,7 @@ sub takechance
 	if ( not ( @ARGV ) )
 	{
 		$tofile = $main::tofile;
-		$tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
-		say $tee "\n#Now in Sim::OPT::Takechance.\n";
+		say  "\n#Now in Sim::OPT::Takechance.\n";
 		$configfile = $main::configfile;
 		@sweeps = @main::sweeps;
 		@sourcesweeps = @main::sourcesweeps;
@@ -91,7 +90,6 @@ sub takechance
 
 		#open ( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!";
 		#open ( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";
-		#$tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
 
 
 		%dowhat = %main::dowhat;
@@ -172,20 +170,20 @@ sub takechance
 		my $countbuild = 1;
 		while ( $countbuild <= $numberof_sweepstoadd )
 		{
-			say $tee "#######################################################################
+			say  "#######################################################################
 			ADDING \$countbuild $countbuild";
 
 			my $countchance = 1;
 			while ($countchance <= $dimchance)
 			{
-				say $tee"EXPLORING CHANCE, TIME \$countchance $countchance \$countbuild $countbuild";
+				say "EXPLORING CHANCE, TIME \$countchance $countchance \$countbuild $countbuild";
 				my %lab;
 				my ($beginning, @shuffledchanceres, @shuffledchanceelms, @overlap);
 				my $semaphore = 0;
 				my $countshuffle = 1;
 				sub _shuffle_
 				{
-					say $tee "#######################################################################
+					say  "#######################################################################
 					SHUFFLING NUMBER $countshuffle, \$countbuild $countbuild \$countchance $countchance";
 					@shuffledchanceelms = ();
 					@overlap = ();
@@ -194,10 +192,10 @@ sub takechance
 					push (@shuffledchanceelms, @shuffledchanceres, @shuffledchanceres, @shuffledchanceres );
 					$beginning = int(rand($blocklength-1) + $numberof_variables);
 					my $endblock = ( $beginninng + $blocklength );
-					#my @shuffledchanceslice = sort { $a <=> $b } (uniq(@shuffledchanceelms[$beginninng..$endblock])); say $tee "dump(INBUILD\@shuffledchanceslice): " . dump(@shuffledchanceslice); # my @shuffledchanceslice = @shuffledchanceelms[$beginning..$endblock] ;
+					#my @shuffledchanceslice = sort { $a <=> $b } (uniq(@shuffledchanceelms[$beginninng..$endblock])); say  "dump(INBUILD\@shuffledchanceslice): " . dump(@shuffledchanceslice); # my @shuffledchanceslice = @shuffledchanceelms[$beginning..$endblock] ;
 					@caserefs_alias = @blockrefs;
 					@chancerefs_alias = @chancerefs;
-					my @pastsweepblocks = Sim::OPT::fromopt_tosweep_simple( { casegroup => [@caserefs_alias], chancegroup => [@chancerefs_alias] } ); say $tee "dumpXX(INBUILD-AFTER\@pastsweepblocks): " . dump(@pastsweepblocks);
+					my @pastsweepblocks = Sim::OPT::fromopt_tosweep_simple( { casegroup => [@caserefs_alias], chancegroup => [@chancerefs_alias] } ); say  "dumpXX(INBUILD-AFTER\@pastsweepblocks): " . dump(@pastsweepblocks);
 
 					push (@caserefs_alias, [ $beginning, $blocklength ]);
 					push (@chancerefs_alias, [ @shuffledchanceelms ]);
@@ -225,32 +223,32 @@ sub takechance
 					my $lc = List::Compare->new(\@slice, \@pastslice);
 					my @intersection = $lc->get_intersection;
 
-					#my $res = Sim::OPT::checkduplicates( { slice => \@slice, sweepblocks => \@pastsweepblocks } ); say $tee "dumpXX(INBUILD\$res): " . dump($res);
+					#my $res = Sim::OPT::checkduplicates( { slice => \@slice, sweepblocks => \@pastsweepblocks } ); say  "dumpXX(INBUILD\$res): " . dump($res);
 
 					if ( scalar( @intersection ) == $blockoverlap ) { $semaphore = 1; }
 
 					if ( not ( $semaphore == 1 ) )
 					{
-						say $tee "NOT HIT. \$countshuffle: $countshuffle.";
+						say  "NOT HIT. \$countshuffle: $countshuffle.";
 						$countshuffle++;
 						&_shuffle_;
 					}
 					else
 					{
 						return (\@shuffledchanceres, \@shuffledchanceelms);
-						say $tee "HIT. \$countshuffle: $countshuffle.";
+						say  "HIT. \$countshuffle: $countshuffle.";
 					}
 				}
 				my @result = _shuffle_;
 				@shuffledchanceres = @{$result[0]};
 				@shuffledchanceelms = @{$result[1]};
-				say $tee "EXITING SHUFFLE WITH \@shuffledchanceres: @shuffledchanceres, \@shuffledchanceelms, @shuffledchanceelms";
+				say  "EXITING SHUFFLE WITH \@shuffledchanceres: @shuffledchanceres, \@shuffledchanceelms, @shuffledchanceelms";
 				$lab{$countcase}{$countbuild}{$countchance}{case} = \@caserefs_alias;
 				my @thiscase = @{ $lab{$countcase}{$countbuild}{$countchance}{case} };
 
 				$lab{$countcase}{$countbuild}{$countchance}{chance} = \@chancerefs_alias;
 				my @thischance = @{ $lab{$countcase}{$countbuild}{$countchance}{chance} };
-				say $tee "dump(OUTBUILD\%lab): " . dump(%lab);
+				say  "dump(OUTBUILD\%lab): " . dump(%lab);
 
 				################################
 				#> HERE THE CODE FOLLOWS FOR THE CALCULATION OF HEURISTIC INDICATORS MEASURING THE EFFECTIVENESS OF A SEARCH STRUCTURE FOR SEARCH.
@@ -288,7 +286,7 @@ sub takechance
 				my $countblockplus1 = 1;
 				foreach my $blockref (@caserefs_alias)
 				{
-					say $tee "################################################################
+					say  "################################################################
 					NOW DEALING WITH BLOCK $countblockplus1, \$countbuild $countbuild, \$countchance $countchance";
 					my @blockelts = @{$blockref};
 					my @presentblockelts = @blockelts;
@@ -378,7 +376,7 @@ sub takechance
 							$pastactiveblock = $pastblockelts[1];
 							$pastzoneend = ( $numberof_variables - $pastactiveblock );
 							my @pastslice = @chanceelts[ $pastattachment..($pastattachment+$pastactiveblock-1) ];
-							#@pastslice = Sim::OPT::_clean_ (\@pastslice); say $tee "dump(INBLOCK3\@pastslice): " . dump(@pastslice);
+							#@pastslice = Sim::OPT::_clean_ (\@pastslice); say  "dump(INBLOCK3\@pastslice): " . dump(@pastslice);
 							my @otherslice = @pastslice;
 
 							foreach $int (@pastslice)
@@ -485,19 +483,19 @@ sub takechance
 						$pastattachment = $pastblockelts[0];
 						$pastactiveblock = $pastblockelts[1];
 						$pastzoneend = ( $numberof_variables - $pastactiveblock );
-						#my $pastminusattachment = $pastminusblockelts[0]; say $tee "BEYOND1 \$pastminusattachment-->: $pastminusattachment";############ ZZZZ UNNEEDED
-						#my $pastminusactiveblock = $pastminusblockelts[1]; say $tee "BEYOND1 \$pastminusactiveblock $pastminusactiveblock";############ ZZZZ UNNEEDED
-						#my $pastminuszoneend = ( $numberof_variables - $pastminusactiveblock ); say $tee "BEYOND1 \$pastminuszoneend-->: $pastminuszoneend";############ ZZZZ UNNEEDED
+						#my $pastminusattachment = $pastminusblockelts[0]; say  "BEYOND1 \$pastminusattachment-->: $pastminusattachment";############ ZZZZ UNNEEDED
+						#my $pastminusactiveblock = $pastminusblockelts[1]; say  "BEYOND1 \$pastminusactiveblock $pastminusactiveblock";############ ZZZZ UNNEEDED
+						#my $pastminuszoneend = ( $numberof_variables - $pastminusactiveblock ); say  "BEYOND1 \$pastminuszoneend-->: $pastminuszoneend";############ ZZZZ UNNEEDED
 						@pastslice = @chanceelts[ $pastattachment..($pastattachment + $pastactiveblock-1) ];
 						@pastslice = sort { $a <=> $b } @pastslice;
-						#@pastminusslice = = @chanceelts[ $pastminusattachment..($pastminusattachment + $pastminusactiveblock-1) ]; say $tee "BEYOND1 \@pastsminuslice-->: @pastsminuslice";############ ZZZZ UNNEEDED
-						#@pastsminuslice = sort { $a <=> $b } @pastminusslice; say $tee "BEYOND1-ORDERED \@pastsminuslice-->: @pastsminuslice";############ ZZZZ UNNEEDED
+						#@pastminusslice = = @chanceelts[ $pastminusattachment..($pastminusattachment + $pastminusactiveblock-1) ]; say  "BEYOND1 \@pastsminuslice-->: @pastsminuslice";############ ZZZZ UNNEEDED
+						#@pastsminuslice = sort { $a <=> $b } @pastminusslice; say  "BEYOND1-ORDERED \@pastsminuslice-->: @pastsminuslice";############ ZZZZ UNNEEDED
 						@presentslice = @chanceelts[ $attachment..($attachment + $activeblock-1) ];
 						@presentslice = sort { $a <=> $b } @presentslice;
 						my $lc = List::Compare->new(\@presentslice, \@pastslice);
 						@intersection = $lc->get_intersection;
 						#my $lc2 = List::Compare->new(\@pastslice, @pastminusslice);############ ZZZZ UNNEEDED
-						#@intersectionminus = $lc2->get_intersection; say $tee "dump(INBLOCK2\@intersectionminus): " . dump(@intersectionminus);############ ZZZZ UNNEEDED
+						#@intersectionminus = $lc2->get_intersection; say  "dump(INBLOCK2\@intersectionminus): " . dump(@intersectionminus);############ ZZZZ UNNEEDED
 
 						my $counter = 0;
 						foreach my $presentelm (@presentslice)
@@ -509,16 +507,16 @@ sub takechance
 						}
 
 						#@resbunch = Sim::OPT::_clean_ (\@resbunch);
-						say $tee "BEYOND AFTERCLEAN: \@resbunch: @resbunch";
+						say  "BEYOND AFTERCLEAN: \@resbunch: @resbunch";
 
 						push (@resbunches, [@resbunch]);
 
 						#@resbunches = Sim::OPT::_clean_ (\@resbunches);
-						say $tee "BEYOND1 AFTERCLEAN  Dumper(\@resbunches:) " . Dumper(@resbunches) ;
+						say  "BEYOND1 AFTERCLEAN  Dumper(\@resbunches:) " . Dumper(@resbunches) ;
 
 						my @presentbunch = @{$resbunches[0]};
 						#@presentbunch = Sim::OPT::_clean_ (\@presentbunch);
-						say $tee "BEYOND1 AFTERCLEAN: \@presentbunch: @presentbunch";
+						say  "BEYOND1 AFTERCLEAN: \@presentbunch: @presentbunch";
 
 						my $countthis = 0;
 						foreach my $elm (@resbunches)
@@ -535,11 +533,11 @@ sub takechance
 						}
 
 						#@scores = Sim::OPT::_clean_ (\@scores);
-						say $tee "BEYOND1 OUTSIDE AFTERCLEAN \@scores: @scores";
+						say  "BEYOND1 OUTSIDE AFTERCLEAN \@scores: @scores";
 
 						$score = Sim::OPT::max(@scores);
 						my $newoccurrences = $activeblock - $score;
-						say $tee "BEYOND1 \$numberof_variables $numberof_variables\n";
+						say  "BEYOND1 \$numberof_variables $numberof_variables\n";
 						$novelty = $newoccurrences / $numberof_variables ;
 						# my $novelty = ($steps ** $newoccurrences) / ($steps ** $numberof_variables );
 					}
@@ -557,7 +555,7 @@ sub takechance
 
 					my $urr = ($n1_averageage * $novelty);
 					# my $urr = ($n1_averageage * $sumnovelty ) ** ( 1 / 2 ); # ALTERNATIVE.
-					say $tee "BEYOND2 \$urr-->: $urr"; # URR, Usefulness of Recursive Recombination say $tee "AFTERZONE \@freshbasket: @freshbasket"; say $tee "ZONE2OUT: \$countcase: $countcase, \$countbuild: $countbuild, \$countchance: $countchance, \$countblk:$countblk";
+					say  "BEYOND2 \$urr-->: $urr"; # URR, Usefulness of Recursive Recombination say  "AFTERZONE \@freshbasket: @freshbasket"; say  "ZONE2OUT: \$countcase: $countcase, \$countbuild: $countbuild, \$countchance: $countchance, \$countblk:$countblk";
 
 					my $stddev = stddev(@finalbasket);
 					if ($stddev == 0) {$stddev = 0.0001;}
@@ -581,7 +579,7 @@ sub takechance
 
 					#say
 					#REPORTFILE
-					#$tee "sequence:$countcase,\$countblk:$countblk,\@valuebasket:@valuebasket,\@finalbasket:@finalbasket,averageage:$averageage,\$stddev:$stddev,\$mix:$mix,\$result:$result,\$mixsize:$mixsize,\$regen:$regen,\$score:$score,\$novelty:$novelty,\$urr-->: $urr\n\n";
+					# "sequence:$countcase,\$countblk:$countblk,\@valuebasket:@valuebasket,\@finalbasket:@finalbasket,averageage:$averageage,\$stddev:$stddev,\$mix:$mix,\$result:$result,\$mixsize:$mixsize,\$regen:$regen,\$score:$score,\$novelty:$novelty,\$urr-->: $urr\n\n";
 
 					# END CALCULATION OF THE LOCAL SEARCH AGE.
 					#################################################################################################################
@@ -615,7 +613,7 @@ sub takechance
 					$localsizeproduct = $postsize * $antesize;
 
 					$overlapsize =  Sim::OPT::givesize(\@intersection, $countcase, \@tempvarnumbers);
-					###$overlapsize = ($steps ** $overlap); say $tee "BEYOND3 \$overlapsize $overlapsize";###DDD
+					###$overlapsize = ($steps ** $overlap); say  "BEYOND3 \$overlapsize $overlapsize";###DDD
 
 					if ($overlap == 0) {$overlapsize = 1;}
 
@@ -623,7 +621,7 @@ sub takechance
 					#{
 					#	print
 					#	#OUTFILEWRITE #TABLETITLES
-					#	$tee "\$countcase,\$countblk,\$attachment,\$activeblock,\$zoneend,\$pastattachment,\$pastactiveblock,\$pastzoneend,\$antesize,\$postsize,\$overlap,\$overlapsize,\$overlapminus,\$overlapminussize,\$overlapsum,\$overlapsumsize,\$localsize,\$localnetsize,\$totalsize,\$totaloverlapsize,\$totalnetsize,\$commonalityratio,\$commonality_volume,\$commonalityflow,\$recombinationflow,\$informationflow,\$cumulativecommonalityflow,\$cumulativerecombinationflow,\$cumulativeinformationflow,\$totalcommonalityflow,\$totalrecombinationflow,\$totalinformationflow,\$addcommonalityflow,\$addrecombinationflow,\$addinformationflow,\$recombinalityminusflow,\$cumulativerecombinalityminusflow,\$totalrecombinalityminusflow,\$recombinalityflow,\$cumulativerecombinalityflow,\$totalrecombinalityflow,\$renewalflow,\$cumulativerenewalflow,\$totalrenewalflow,\$infoflow,\$cumulativeinfoflow,\$totalinfoflow,\$refreshmentminus,\$recombination_ratio,\$proportionhike,\$hike,\$refreshment,\$infflow,\$cumulativeinfflow,\$totalinfflow,\$iruiflow,\$cumulativeiruif,\$totaliruif,\$averageageexport,\$cumulativeage,\$stdage,\$refreshratio,\$averageagesize,\$flowratio,\$cumulativeflowratio,\$flowageratio,\$cumulativeflowageratio,\$modiflow,\$cumulativemodiflow,\$refreshmentsize,\$refreshmentperformance,\$cumulativerefreshmentperformance,\$refreshmentvolume,\$IRUIF,\$mmIRUIF,\$IRUIFvolume,\$mmIRUIFvolume,\$hikefactor,\$otherIRUIF,\$othermmIRUIF,\$otherIRUIFvolume,\$othermmIRUIFvolume,\$averageage,\$steddev,\$mix,\$result,\$mixsize,\$regen,\$n1_averageage,\$n1_stddev,\$n1_averageagesize,\$mmresult,\$mmregen,\$novelty,\$urr,\$IRUIFnovelty,\$IRUIFurr,\$IRUIFnoveltysquare,\$IRUIFurrsquare,\$IRUIFnoveltycube,\$IRUIFurrcube";
+					#	 "\$countcase,\$countblk,\$attachment,\$activeblock,\$zoneend,\$pastattachment,\$pastactiveblock,\$pastzoneend,\$antesize,\$postsize,\$overlap,\$overlapsize,\$overlapminus,\$overlapminussize,\$overlapsum,\$overlapsumsize,\$localsize,\$localnetsize,\$totalsize,\$totaloverlapsize,\$totalnetsize,\$commonalityratio,\$commonality_volume,\$commonalityflow,\$recombinationflow,\$informationflow,\$cumulativecommonalityflow,\$cumulativerecombinationflow,\$cumulativeinformationflow,\$totalcommonalityflow,\$totalrecombinationflow,\$totalinformationflow,\$addcommonalityflow,\$addrecombinationflow,\$addinformationflow,\$recombinalityminusflow,\$cumulativerecombinalityminusflow,\$totalrecombinalityminusflow,\$recombinalityflow,\$cumulativerecombinalityflow,\$totalrecombinalityflow,\$renewalflow,\$cumulativerenewalflow,\$totalrenewalflow,\$infoflow,\$cumulativeinfoflow,\$totalinfoflow,\$refreshmentminus,\$recombination_ratio,\$proportionhike,\$hike,\$refreshment,\$infflow,\$cumulativeinfflow,\$totalinfflow,\$iruiflow,\$cumulativeiruif,\$totaliruif,\$averageageexport,\$cumulativeage,\$stdage,\$refreshratio,\$averageagesize,\$flowratio,\$cumulativeflowratio,\$flowageratio,\$cumulativeflowageratio,\$modiflow,\$cumulativemodiflow,\$refreshmentsize,\$refreshmentperformance,\$cumulativerefreshmentperformance,\$refreshmentvolume,\$IRUIF,\$mmIRUIF,\$IRUIFvolume,\$mmIRUIFvolume,\$hikefactor,\$otherIRUIF,\$othermmIRUIF,\$otherIRUIFvolume,\$othermmIRUIFvolume,\$averageage,\$steddev,\$mix,\$result,\$mixsize,\$regen,\$n1_averageage,\$n1_stddev,\$n1_averageagesize,\$mmresult,\$mmregen,\$novelty,\$urr,\$IRUIFnovelty,\$IRUIFurr,\$IRUIFnoveltysquare,\$IRUIFurrsquare,\$IRUIFnoveltycube,\$IRUIFurrcube";
 					#}
 
 					if  ($countblk == 0)
@@ -640,7 +638,7 @@ sub takechance
 					if ($totaloverlapsize == 0){$totaloverlapsize = 1;} ############ ZZZZ UNNEEDED?
 
 
-					#$overlapminussize = Sim::OPT::givesize(\@intersectionminus, $countcase, \@varnumbers); say $tee "BEYOND3 \$overlapsize $overlapsize"; ############ ZZZZ UNNEEDED
+					#$overlapminussize = Sim::OPT::givesize(\@intersectionminus, $countcase, \@varnumbers); say  "BEYOND3 \$overlapsize $overlapsize"; ############ ZZZZ UNNEEDED
 					#$overlapminussize = ($steps ** $overlapminus); ############ ZZZZ UNNEEDED
 
 					#if ($overlapminussize == 0){$overlapminussize = 1;}  ############ ZZZZ UNNEEDED
@@ -678,13 +676,13 @@ sub takechance
 						{
 							$localcommonalityratio = (  $overlapsize/ ( ( $antesize * $postsize) ** (1/2)));
 						}
-						else { print $tee "IT WAS ZERO AT DENOMINATOR OF \$localcommonalityratio.\n"; }
+						else { print  "IT WAS ZERO AT DENOMINATOR OF \$localcommonalityratio.\n"; }
 
 						if ( ( ( $antesize * $postsize) ** (1/2)) != 0)
 						{
 							$localiruifratio = ( $overlapminussize / ( ( $antesize * $postsize) ** (1/2)) );
 						}
-						else { print $tee "IT WAS ZERO AT DENOMINATOR OF \$localiruifratio.\n"; }
+						else { print  "IT WAS ZERO AT DENOMINATOR OF \$localiruifratio.\n"; }
 					}
 
 					if ($totalnetsize > 0)
@@ -708,12 +706,12 @@ sub takechance
 					$stdcommonality = stddev(@commonalities);#
 					$cumulativecommonalityflow = ($cumulativecommonalityflow + $commonalityflow );
 					$IRUIFurrsquare = $IRUIFurrsquare + ( $totalnetsize * ( ( $urr )  ** 2 ) );
-					#$cumulativeiruif = ($cumulativeiruif + $iruifflow ); say $tee"BEYOND4 \$cumulativeiruif: $cumulativeiruif"; # ############ ZZZZ UNNEEDED
+					#$cumulativeiruif = ($cumulativeiruif + $iruifflow ); say "BEYOND4 \$cumulativeiruif: $cumulativeiruif"; # ############ ZZZZ UNNEEDED
 
 					#if ($countblk == 0) { print OUTFILEWRITE "\n"; }
 
 
-					say $tee "RESULPLOT: \$countcase:$countcase,\$countblk:$countblk,\$countbuild:$countbuild,\$countchance:$countchance,\$attachment:$attachment,
+					say  "RESULPLOT: \$countcase:$countcase,\$countblk:$countblk,\$countbuild:$countbuild,\$countchance:$countchance,\$attachment:$attachment,
 					\$activeblock:$activeblock,\$zoneend:$zoneend,\$pastattachment:$pastattachment,\$pastactiveblock:$pastactiveblock,\$pastzoneend:$pastzoneend,
 					\$antesize:$antesize,\$postsize:$postsize,\$overlap:$overlap,\$overlapsize:$overlapsize,\$overlapminus:$overlapminus,
 					\$overlapminussize:$overlapminussize,\$overlapsum:$overlapsum,\$overlapsumsize:$overlapsumsize,\$localsize:$localsize,
@@ -778,17 +776,17 @@ sub takechance
 				return ($beststruct, $bestchance);
 			}
 			my @arr = pick($maxvalue);
-			$beststruct = $arr[0]; say $tee "POST\$beststruct " . dump($beststruct);
-			$bestchance = $arr[1]; say $tee "POST\$bestchance " . dump($bestchance);
+			$beststruct = $arr[0]; say  "POST\$beststruct " . dump($beststruct);
+			$bestchance = $arr[1]; say  "POST\$bestchance " . dump($bestchance);
 
-			say $tee "PRE\@blockrefs " . dump(@blockrefs);
-			@blockrefs = @$beststruct; say $tee "POST\@blockrefs " . dump(@blockrefs);
-			say $tee "PRE\@chancerefs " . dump(@chancerefs);
-			@chancerefs = @$bestchance; say $tee "POST\@chancerefs " . dump(@chancerefs);
-			say $tee "\$res " . dump(%res);
-			$chanceseed_[$countcase] = $bestchance; say $tee "POST\@chanceseed_ " . Dumper(@chanceseed_);
-			$caseseed_[$countcase] = $beststruct; say $tee "POST\@caseseed_ " . Dumper(@caseseed_);
-			@sweeps_ = Sim::OPT::fromopt_tosweep( casegroup => \@caseseed_, chancegroup => \@chanceseed_ ); say $tee "POST\@sweeps_ " . Dumper(@sweeps_);
+			say  "PRE\@blockrefs " . dump(@blockrefs);
+			@blockrefs = @$beststruct; say  "POST\@blockrefs " . dump(@blockrefs);
+			say  "PRE\@chancerefs " . dump(@chancerefs);
+			@chancerefs = @$bestchance; say  "POST\@chancerefs " . dump(@chancerefs);
+			say  "\$res " . dump(%res);
+			$chanceseed_[$countcase] = $bestchance; say  "POST\@chanceseed_ " . Dumper(@chanceseed_);
+			$caseseed_[$countcase] = $beststruct; say  "POST\@caseseed_ " . Dumper(@caseseed_);
+			@sweeps_ = Sim::OPT::fromopt_tosweep( casegroup => \@caseseed_, chancegroup => \@chanceseed_ ); say  "POST\@sweeps_ " . Dumper(@sweeps_);
 			close TEST;
 			close CASEFILE_PROV;
 			close CHANCEFILE_PROV;

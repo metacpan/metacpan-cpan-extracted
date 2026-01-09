@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Schedule::Activity;
-use Test::More tests=>20;
+use Test::More tests=>21;
 
 subtest 'validation'=>sub {
 	plan tests=>2;
@@ -408,6 +408,38 @@ subtest 'Attribute recomputation'=>sub {
 	my %attrNotes=$scheduler->computeAttributes(@{$schedule{activities}},@{$schedule{annotations}{group}{events}});
 	is_deeply({$$scheduler{attr}->report()},\%attrScheduler,'Scheduler attributes are unaltered');
 	ok($avgSchedule!=$attrNotes{A}{avg},'Computed attribute differs');
+};
+
+subtest 'Automatic attributes per node'=>sub {
+	plan tests=>3;
+	my ($scheduler,%schedule);
+	my %configuration=(PNA=>'ACT:',node=>{
+		start=>{message=>'start',next=>[qw/A B/],finish=>'finish',tmavg=>0},
+		A=>{message=>'A',next=>[qw/A B finish/],tmmin=>1,tmavg=>1,tmmax=>1},
+		B=>{message=>'B',next=>[qw/A B finish/],tmmin=>1,tmavg=>1,tmmax=>1},
+		finish=>{message=>'finish',tmavg=>0},
+	});
+	$scheduler=Schedule::Activity->new(configuration=>\%configuration);
+	%schedule=$scheduler->schedule(activities=>[[100,'start']]);
+	my ($pass,%counts)=(1);
+	foreach my $msg (map {$$_[1]{message}} @{$schedule{activities}}) { $counts{"ACT:$msg"}++ }
+	foreach my $attr (keys %counts) {
+		if($schedule{attributes}{$attr}{y}!=$counts{$attr}) { $pass=0 } }
+	if(!%counts) { $pass=0 }
+	ok($pass,'Basic node counts');
+	#
+	$scheduler=Schedule::Activity->new(configuration=>{%configuration,PNA=>undef});
+	%schedule=$scheduler->schedule(activities=>[[100,'start']]);
+	is_deeply($schedule{attributes},{},'Default disabled');
+	#
+	$scheduler=Schedule::Activity->new(configuration=>{PNA=>'ACT:',node=>{
+		start=>{message=>'start',next=>[qw/A B/],finish=>'finish',tmavg=>0},
+		A=>{message=>'A',next=>[qw/A B finish/],tmmin=>1,tmavg=>1,tmmax=>1},
+		B=>{message=>'B',next=>[qw/A B finish/],tmmin=>1,tmavg=>1,tmmax=>1,require=>{attr=>'ACT:A',op=>'ge',value=>80}},
+		finish=>{message=>'finish',tmavg=>0},
+	}});
+	%schedule=$scheduler->schedule(activities=>[[100,'start']]);
+	ok(($schedule{attributes}{'ACT:B'}{y}>0)&&($schedule{attributes}{'ACT:B'}{y}<20),'Node filtering'); # pfail<2e-6
 };
 
 subtest 'Annotations'=>sub {

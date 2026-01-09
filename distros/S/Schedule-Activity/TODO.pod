@@ -30,7 +30,13 @@ The following are planned as part of the 0.3.0 release.
 
 =item Goals support attribute weighting (done)
 
-=item Automatic attributes per node (maybe)
+=item Automatic attributes per node (done)
+
+=item Weighted 'next' configurations (todo)
+
+=item Remove historically completed items from the list below (todo)
+
+For summarization, features below often specify availability "starting with" a version.  Documentation has been reorganized and rewritten.  Expect feature lists below to remove any completed, non-experimental items.
 
 =back
 
@@ -50,9 +56,9 @@ Attribute average values are available for goals starting with 0.2.5, which also
 
 Attribute reporting supports many different output formats starting in 0.2.7.
 
-JSON output from the script is being considered, and would include JSON renderings of the attribute outputs.
+Automatic per-node attributes are available with 0.2.9.  They support a configurable prefix, a script-based reporting mechanism, node filtering, and goal seeking (by y-value).
 
-Attributes that are internal and automatic per node are being considered.  These attributes would always be of the form C<ACT:node name>, with a configurable prefix.  Such attributes would permit node filtering based on the previous appearance of nodes, without needing to create a separate named attribute.  Coupled with the modulus operator, a node could be activated "every N appearances", for example.
+JSON output from the script is being considered, and would include JSON renderings of the attribute outputs.
 
 =head2 Node filtering
 

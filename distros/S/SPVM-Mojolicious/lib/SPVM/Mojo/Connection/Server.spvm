@@ -128,7 +128,9 @@ EOS
   }
   
   method stop : void () {
-    
+    if ($self->handle->opened) {
+      $self->handle->close;
+    }
   }
   
   method _accept : void () {

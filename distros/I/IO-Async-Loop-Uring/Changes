@@ -1,4 +1,11 @@
 Revision history for IO-Async-Loop-Uring
 
+0.002     2026-01-09 02:00:13+01:00 Europe/Brussels
+          - Correctly scope watch reference to avoid descriptor reuse confusion
+          - Correctly advertize abilities
+          - Make run_once return undef on error
+          - Delete handler upon cancelation
+          - Add watchdog support
+
 0.001     2026-01-06 23:56:09+01:00 Europe/Brussels
           - Initial release

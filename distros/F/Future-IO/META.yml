@@ -5,7 +5,7 @@ author:
 build_requires:
   Test2::V0: '0'
   Test::ExpectAndCheck: '0.06'
-  Test::Future::IO::Impl: '0.15'
+  Test::Future::IO::Impl: '0.16'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -18,13 +18,13 @@ name: Future-IO
 provides:
   Future::IO:
     file: lib/Future/IO.pm
-    version: '0.17'
+    version: '0.18'
   Future::IO::ImplBase:
     file: lib/Future/IO/ImplBase.pm
-    version: '0.17'
+    version: '0.18'
   Future::IO::System:
     file: lib/Future/IO/System.pm
-    version: '0.17'
+    version: '0.18'
 requires:
   Future: '0'
   Struct::Dumb: '0'
@@ -32,5 +32,5 @@ requires:
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

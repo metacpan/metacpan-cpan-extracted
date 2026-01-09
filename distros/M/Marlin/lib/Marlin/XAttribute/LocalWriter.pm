@@ -5,7 +5,7 @@ use warnings;
 package Marlin::XAttribute::LocalWriter;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011000';
+our $VERSION   = '0.011001';
 
 use Eval::TypeTiny ();
 use Role::Tiny;

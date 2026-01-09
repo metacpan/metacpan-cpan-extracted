@@ -1,87 +1,100 @@
-LANGS    := DE EL ET FR ID JA KO NL RO RU TR UK ZH
-RM_LANGS := JA KO ZH
+.DELETE_ON_ERROR:
+
+LANGS    := DE EL ES ET FR ID JA KO NL RO RU TR ZH AR
+RM_LANGS :=                   JA KO             ZH
 IGNORE   := VERSION AUTHOR LICENSE
-USEAPI   ?= yes
 
-LIB    := ../lib/App/Greple
-SRCDIR := 
+ENGINES     := deepl gpt5
+#LANGS_deepl := DE EL ES ET FR ID JA KO NL RO RU TR ZH
+LANGS_gpt5  := JA KO ZH
 
-MODS   := $(wildcard $(LIB)/*.pm)
-PM     := $(notdir $(MODS))
-POD    := $(PM:.pm=.pod)
-NAME   := $(patsubst %.pm,%,$(firstword $(PM)))
-SRC    := $(POD:%=$(if $(SRCDIR),$(SRCDIR)/,)%)
-PODS   := $(foreach lang,$(LANGS),$(SRC:.pod=.$(lang).pod))
-MDS    := $(foreach lang,$(LANGS),$(POD:.pod=.$(lang).md))
-RM_MDS := $(RM_LANGS:%=../README.%.md)
-ALL    := $(PODS) $(MDS) README.md $(RM_MDS)
+MOD_NAME := $(shell perl -MJSON -0777nE 'say decode_json($$_)->{name}' ../META.json)
+MOD_PATH := ../lib/$(subst -,/,$(MOD_NAME)).pm
+MOD_FILE := $(notdir $(MOD_PATH))
+MOD_DIR  := $(dir $(MOD_PATH))
+MOD_NAME := $(MOD_FILE:.pm=)
+SRC_DIR  := src
+
+ORIGIN   := $(MOD_PATH)
+PM       := $(notdir $(ORIGIN))
+POD      := $(PM:.pm=.pod)
+SRC      := $(POD:%=$(if $(SRC_DIR),$(SRC_DIR)/,)%)
+###########
+$(foreach E,$(ENGINES),\
+$(foreach L,$(LANGS_$E),\
+  $(eval PODS    += $(SRC:.pod=.$E-$L.pod))\
+  $(eval MDS     += $(PM:.pm=.$E-$L.md))\
+  $(eval READMES += $(if $(filter $L,$(RM_LANGS)),../README.$E-$L.md))\
+))
+###########
+ALL      := $(PODS) $(MDS) README.md $(READMES)
 
 all: $(ALL)
 
-ifdef SRCDIR
-  $(SRCDIR):
-	mkdir -p $(SRCDIR)
+ifdef SRC_DIR
+  $(SRC_DIR):
+	mkdir -p $(SRC_DIR)
 endif
-SRCPATH := $(if $(SRCDIR),$(SRCDIR)/,)
+SRCPATH := $(if $(SRC_DIR),$(SRC_DIR)/,)
 
-PODIFY := greple -Mperl --nocolor --le :pod
-$(foreach mod,$(MODS),$(eval \
+GREPLE := perl -I../lib -S greple
+
+PODIFY := $(GREPLE) -Mperl --nocolor --le :pod
+$(foreach mod,$(ORIGIN),$(eval \
   $(SRCPATH)$(subst .pm,.pod,$(notdir $(mod))): $(mod) Makefile; $(PODIFY) $$< > $$@ \
 ))
 
+XLATE := $(GREPLE) -Mxlate
+XLATE += $(if $(XLATE_LABOR),--xlate-labor,--xlate)
+XLATE += --xlate-cache=$(if $(XLATE_INIT),clear,yes)
+XLATE += --match-podtext --xlate-format=none --all --need=0
+
+MASKFILE=PATTERN_MASK
+ifneq ($(wildcard $(MASKFILE)),)
+XLATE += --xlate-setopt maskfile=$(MASKFILE)
+endif
+
+CONTEXTFILE=CONTEXT.md
+ifneq ($(wildcard $(CONTEXTFILE)),)
+XLATE += --xlate-context "$$(cat $(CONTEXTFILE))"
+endif
+
 ifdef IGNORE
 $(foreach ignore,$(IGNORE),$(eval \
-  EXCLUDE += --exclude '^=head\d[ ]+(?i:$(ignore))\b(?s:.*?)(?=^=|\z)'\
+  XLATE += --exclude '^=head\d[ ]+(?i:$(ignore))\b(?s:.*?)(?=^=|\z)'\
 ))
 endif
 
-XLATE := xlate
-ifeq ($(USEAPI),yes)
-  XLATE += -a
-endif
-
-DESUMASU := NO
-ifeq ($(DESUMASU),GREPLE)
-JA_FORM   ?= dearu
-JA_DICT   := $(wildcard *.dict)
-JA_FILTER := greple -Mperl -Msubst::desumasu \
-	$(if $(findstring $(JA_FORM).dict,$(JA_DICT)), --dict $(JA_FORM).dict) \
+deepl_JA_FORM   ?= desumasu
+deepl_JA_DICT   := $(wildcard *.dict)
+deepl_JA_FILTER := $(GREPLE) -Mperl -Msubst::desumasu \
+	$(if $(findstring $(deepl_JA_FORM).dict,$(deepl_JA_DICT)),--dict $(deepl_JA_FORM).dict) \
 	--pod --subst --all --no-color --need=0 \
-	--$(JA_FORM)
-endif
-ifeq ($(DESUMASU),GPTY)
-JA_FILTER := perl -I../lib -S greple \
-	-Mtee gpty -d -q -t 0 \
-		-s '以下の項目に挙げる指示にしたがって、続く日本語の文章を変換してください' \
-		-s '語尾がない文については付け加えずにそのままにする' \
-		-s '語尾の部分だけを「である調」から「ですます調」に換える' \
-		- -- \
-	-Mperl --pod -E '^(\w.*\n)+' \
-	--discrete --bulkmode \
-	$(EXCLUDE) \
-	--all --no-color
-endif
+	--$(deepl_JA_FORM) 
 
 define LANG_POD
-  $(SRCPATH)%.$1.pod: $(SRCPATH)%.pod Makefile
-  ifdef $1_FILTER
-	$$(XLATE) -t $1 $$< | $$($1_FILTER) > $$@
+  $(SRCPATH)%.$2-$1.pod: $(SRCPATH)%.pod Makefile
+  ifdef $2_$1_FILTER
+	$$(XLATE) --xlate-engine=$2 --xlate-to $1 $$< | $$($2_$1_FILTER) > $$@
   else
-	$$(XLATE) -t $1 $$< > $$@
+	$$(XLATE) --xlate-engine=$2 --xlate-to $1 $$< > $$@
   endif
 endef
 
-$(foreach lang,$(LANGS),$(eval $(call LANG_POD,$(lang))))
+$(foreach E,$(ENGINES),$(foreach L,$(LANGS),$(eval $(call LANG_POD,$L,$E))))
 
 %.md: $(SRCPATH)%.pod
 	pod2markdown $< > $@
 
 define LANG_README
-  ../README.$1.md: $(NAME).$1.md
+  ../README.$2-$1.md: $(MOD_NAME).$2-$1.md
 	cp $$< $$@
 endef
 
-$(foreach lang,$(RM_LANGS),$(eval $(call LANG_README,$(lang))))
+$(foreach E,$(ENGINES),\
+$(foreach L,$(LANGS),\
+  $(eval $(call LANG_README,$L,$E))\
+))
 
 README.md: Makefile
 	exec > $@ && \

@@ -45,6 +45,8 @@ class Mojo::Server::Daemon extends Mojo::Server {
   
   has accept_semaphore_ch : Go::Channel;
   
+  has idle_accepted_connections_h : Hash of Mojo::Connection::Stream;
+  
   # Class Methods
   static method new : Mojo::Server::Daemon () {
     
@@ -82,6 +84,8 @@ class Mojo::Server::Daemon extends Mojo::Server {
     
     $self->{accept_semaphore_ch} = Go->make($self->max_clients);
     
+    $self->{idle_accepted_connections_h} = Hash->new;
+    
   }
   
   method ports : int[] () {
@@ -99,17 +103,25 @@ class Mojo::Server::Daemon extends Mojo::Server {
   
   method run : void () {
     
+    Go::OS::Signal->start_signal_handler;
     Go->go([$self : Mojo::Server::Daemon] method : void () {
+      
+      Fn->defer(method : void () {
+        Go::OS::Signal->stop_signal_handler;
+      });
+      
+      $self->add_signal_handler;
+      
       $self->start;
+      
+      $self->{accept_wg}->wait;
+      
+      $self->{signal_handler_stop_ch}->close;
+      
+      $self->{signal_handler_wg}->wait;
     });
     
     Go->gosched;
-    
-    $self->{accept_wg}->wait;
-    
-    $self->{signal_handler_stop_ch}->close;
-    
-    $self->{signal_handler_wg}->wait;
   }
   
   private method add_signal_handler : void () {
@@ -130,16 +142,11 @@ class Mojo::Server::Daemon extends Mojo::Server {
       $select->add_read($self->{signal_handler_stop_ch});
       
       while (1) {
-        
         my $result = $select->select;
         
         if ($result) {
           if ($result->channel == $signal_ch) {
-            for my $acceptor (@{$self->acceptors}) {
-              unless ($acceptor->handle->opened) {
-                $acceptor->handle->close;
-              }
-            }
+            $self->stop;
           }
           elsif ($result->channel == $self->{signal_handler_stop_ch}) {
             return;
@@ -170,6 +177,11 @@ class Mojo::Server::Daemon extends Mojo::Server {
         });
         
         while (1) {
+          
+          unless ($acceptor->handle->opened) {
+            return;
+          }
+          
           $self->{accept_semaphore_ch}->write(1);
           
           my $accepted_handle = (IO::Socket)undef;
@@ -185,7 +197,7 @@ class Mojo::Server::Daemon extends Mojo::Server {
           }
           
           $self->{accept_wg}->add(1);
-          Go->go([$self : Mojo::Server::Daemon, $accepted_handle : IO::Socket] method : void () {
+          Go->go([$self : Mojo::Server::Daemon, $accepted_handle : IO::Socket, $acceptor : Mojo::Connection::Server] method : void () {
             Fn->defer([$self : Mojo::Server::Daemon] method : void () {
               $self->{accept_semaphore_ch}->read;
               $self->{accept_wg}->done;
@@ -196,6 +208,16 @@ class Mojo::Server::Daemon extends Mojo::Server {
               $accepted_connection->set_handle($accepted_handle);
               
               while (1) {
+                
+                my $idle = 1;
+                
+                my $idle_accepted_connections_h = $self->{idle_accepted_connections_h};
+                
+                $idle_accepted_connections_h->{Fn->to_address($accepted_connection)} = $accepted_connection;
+                
+                unless ($acceptor->handle->opened) {
+                  return;
+                }
                 
                 unless ($accepted_connection->tx) {
                   my $tx = $self->_build_tx($accepted_connection);
@@ -210,10 +232,26 @@ class Mojo::Server::Daemon extends Mojo::Server {
                   if ($tx->req->is_finished) {
                     last;
                   }
-                  
-                  my $read_length = $accepted_connection->read($chunk);
-                  
-                  $tx->server_read(Fn->substr($chunk, 0, $read_length));
+                  else {
+                    my $read_length = (int)-1;
+                    eval { $read_length = $accepted_connection->read($chunk); }
+                    if ($@) {
+                      # Connection is closed
+                      return;
+                    }
+                    
+                    if ($idle) {
+                      $idle_accepted_connections_h->delete(Fn->to_address($accepted_connection));
+                      $idle = 0;
+                    }
+                    
+                    if ($read_length == 0) {
+                      # Client connection is closed with invalid HTTP request
+                      return;
+                    }
+                    
+                    $tx->server_read(Fn->substr($chunk, 0, $read_length));
+                  }
                 }
                 
                 # Do process
@@ -252,10 +290,15 @@ class Mojo::Server::Daemon extends Mojo::Server {
   
   method stop : void () {
     
-    for my $server (@{$self->acceptors}) {
-      $server->stop;
+    for my $acceptor (@{$self->acceptors}) {
+      $acceptor->stop;
     }
     
+    my $idle_accepted_connections_h = $self->{idle_accepted_connections_h};
+    for my $address (@{$idle_accepted_connections_h->keys}) {
+      my $idle_accepted_connection = $idle_accepted_connections_h->{$address};
+      $idle_accepted_connection->handle->close;
+    }
   }
   
   method _build_tx : Mojo::Transaction::HTTP ($accepted_connection : Mojo::Connection::Stream) {

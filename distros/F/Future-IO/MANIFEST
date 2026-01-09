@@ -1,6 +1,7 @@
 .editorconfig
 Build.PL
 Changes
+distrolint.ini
 lib/Future/IO.pm
 lib/Future/IO/ImplBase.pm
 lib/Future/IO/System.pm

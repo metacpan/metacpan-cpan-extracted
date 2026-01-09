@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::System 0.17;
+package Future::IO::System 0.18;
 
 use v5.14;
 use warnings;
@@ -142,7 +142,7 @@ sub run
       if( $want_in ) {
          close $infh[0];
          push @f, Future::IO->syswrite_exactly( $infh[1], $params{in} )
-            ->then( sub { close $infh[1]; Future->done() } );
+            ->then( sub { Future->done() } );
       }
 
       if( $want_out ) {

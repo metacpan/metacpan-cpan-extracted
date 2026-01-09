@@ -21,15 +21,20 @@ ok(defined($eansearch));
 if ($ENV{EAN_SEARCH_API_TOKEN}) {
 	$eansearch = Net::EANSearch->new($ENV{EAN_SEARCH_API_TOKEN});
 
+	my $credits_before = $eansearch->creditsRemaining();
+	ok($credits_before > 0, 'has credits');
+
 	my $product = $eansearch->barcodeLookup('5099750442227');
 	ok(defined($product), 'has result');
 	like($product->{name}, qr/Thriller/, 'correct product');
 	is($product->{ean}, '5099750442227', 'same EAN');
+	is($product->{issuingCountry}, 'UK', 'issuingCountry');
 
 	my $book = $eansearch->isbnLookup('1119578884');
 	ok(defined($book), 'has result');
 	like($book->{name}, qr/Linux Bible/, 'correct book');
 	is($book->{ean}, '9781119578888', 'correct ISBN-13');
+	is($book->{issuingCountry}, '', 'issuingCountry');
 
 	my @product_list = $eansearch->productSearch('Bananaboat', $Net::EANSearch::ALL_LANGUAGES);
 
@@ -37,5 +42,7 @@ if ($ENV{EAN_SEARCH_API_TOKEN}) {
 		like($p->{name}, qr/Bananaboat/, 'matching name');
 	}
 
+	my $credits_after = $eansearch->creditsRemaining();
+	ok($credits_after < $credits_before, 'has used credits');
 }
 

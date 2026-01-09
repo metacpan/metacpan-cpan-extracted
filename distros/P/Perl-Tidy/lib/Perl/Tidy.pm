@@ -3,7 +3,7 @@
 #
 #    perltidy - a perl script indenter and formatter
 #
-#    Copyright (c) 2000-2025 by Steve Hancock
+#    Copyright (c) 2000-2026 by Steve Hancock
 #    Distributed under the GPL license agreement; see file COPYING
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -136,12 +136,17 @@ BEGIN {
     # then the Release version must be bumped, and it is probably past time for
     # a release anyway.
 
-    $VERSION = '20250912';
+    $VERSION = '20260109';
 } ## end BEGIN
 
 {
     # List of hash keys to prevent -duk from listing them.
-    my @unique_hash_keys_uu = qw( html-toc-extension html-src-extension * );
+    my @unique_hash_keys_uu = qw(
+      *
+      html-src-extension
+      html-toc-extension
+      allow_module_path
+    );
 }
 
 sub DESTROY {
@@ -452,16 +457,45 @@ my $Warn_count;
 my $fh_stderr;
 my $loaded_unicode_gcstring;
 my $rstatus;
+my $nag_message;
+
+# Flush any accumulated nag message(s) if possible
+sub nag_flush {
+    my ($fh) = @_;
+    if ( length($nag_message) && $Warn_count > 0 ) {
+        $fh->print($nag_message);
+        $nag_message = EMPTY_STRING;
+    }
+    return;
+} ## end sub nag_flush
+
+# Accept a warning message that will only go out if regular warnings also go
+# out.  This is useful when we want to output a non-critical error message, but
+# only if another regular error message goes out, so that test runs do not fail
+# on unimportant issues, but that the user eventually gets to see the issue.
+# For example, we might want to inform the user that a certain parameter in his
+# perltidyrc will be deprecated, but do not want that to cause a test to fail.
+sub Nag {
+    my $msg = shift;
+    $nag_message .= $msg;
+    nag_flush($fh_stderr);
+    return;
+} ## end sub Nag
 
 # Bump Warn_count only: it is essential to bump the count on all warnings, even
 # if no message goes out, so that the correct exit status is set.
 sub Warn_count_bump { $Warn_count++; return }
 
-# Output Warn message only
-sub Warn_msg { my $msg = shift; $fh_stderr->print($msg); return }
+# Output Warn message
+sub Warn_msg {
+    my $msg = shift;
+    $fh_stderr->print($msg);
+    nag_flush($fh_stderr);
+    return;
+} ## end sub Warn_msg
 
-# Output Warn message and bump Warn count
-sub Warn { my $msg = shift; $fh_stderr->print($msg); $Warn_count++; return }
+# Bump Warn count and output Warn message
+sub Warn { my $msg = shift; $Warn_count++; Warn_msg($msg); return }
 
 sub Exit {
     my $flag = shift;
@@ -542,11 +576,131 @@ sub get_iteration_count {
     return $rstatus->{iteration_count};
 }
 
+sub check_for_valid_words {
+
+    my ($rcall_hash) = @_;
+
+    # Given hash ref with these keys:
+    #   rinput_list = ref to ARRAY of possible words
+    #   option_name  =  name of option to use for a warn or die message
+    #                   (caller should add leading dash(es))
+    #   on_error =
+    #               'warn'  ? call Warn and return ref to unknown words
+    #             : 'die'   ? call Die
+    #             :         return ref to list of unknown words
+    #   allow_module_path = true if words can have module paths with '::'
+    #   rexceptions   = optional ref to ARRAY or HASH of acceptable non-words
+    #   rvalid_words  = optional ref to ARRAY or HASH of acceptable words
+    #      - if given, only words in this list, or rexceptions, are valid
+    #      - if not given, words must be identifier-like or be in rexceptions
+
+    # Return (if it does not call Die):
+    #   - nothing if no errors, or
+    #   - ref to list of unknown words
+
+    if ( !defined($rcall_hash) ) {
+        Fault("received undefined arg\n");
+        return;
+    }
+
+    my $rinput_list       = $rcall_hash->{rinput_list};
+    my $option_name       = $rcall_hash->{option_name};
+    my $on_error          = $rcall_hash->{on_error};
+    my $allow_module_path = $rcall_hash->{allow_module_path};
+    my $rexceptions       = $rcall_hash->{rexceptions};
+    my $rvalid_words      = $rcall_hash->{rvalid_words};
+
+    return if ( !defined($rinput_list) );
+    my $msg_end = $option_name ? " with $option_name" : EMPTY_STRING;
+
+    my $make_hash_ref = sub {
+        my ( $rthing, $key_name ) = @_;
+
+        # If user supplied an array ref, make a corresponding hash ref
+
+        if ( defined($rthing) ) {
+            my $ref = ref($rthing);
+            if ( !$ref ) {
+                Fault("expecting {$key_name} to be a ref in call '$msg_end'\n");
+            }
+            if ( $ref eq 'ARRAY' ) {
+                $rthing = \map { $_ => 1 } @{$rthing};
+            }
+            if ( ref($rthing) ne 'HASH' ) {
+                Fault(
+"expecting {$key_name} to be a HASH or ARRAY ref in call '$msg_end\n"
+                );
+            }
+        }
+        return $rthing;
+    }; ## end $make_hash_ref = sub
+
+    $rexceptions  = $make_hash_ref->( $rexceptions,  'rexceptions' );
+    $rvalid_words = $make_hash_ref->( $rvalid_words, 'rvalid_words' );
+
+    my @non_words;
+
+    # Must match specific valid words
+    if ( defined($rvalid_words) ) {
+        foreach my $word ( @{$rinput_list} ) {
+            next if ( $rexceptions && $rexceptions->{$word} );
+            if ( !$rvalid_words->{$word} ) {
+
+                # Note: not currently checking for module prefixes in this case
+                push @non_words, $word;
+            }
+        }
+    }
+
+    # Must be identifier-like words, or an exception
+    else {
+        foreach my $word ( @{$rinput_list} ) {
+
+            next if ( $rexceptions     && $rexceptions->{$word} );
+            next if ( $word =~ /^\w+$/ && $word !~ /^\d/ );
+
+            # Words with a module path, like My::Module::function
+            if ( $allow_module_path && index( $word, ':' ) ) {
+                my @parts = split /::/, $word;
+                my $ok    = 1;
+                foreach my $sub_word (@parts) {
+                    next if ( !length($sub_word) );
+                    next if ( $sub_word =~ /^\w+$/ && $sub_word !~ /^\d/ );
+                    $ok = 0;
+                    last;
+                }
+                next if ($ok);
+            }
+            push @non_words, $word;
+        }
+    }
+
+    return if ( !@non_words );
+    if ($on_error) {
+        $on_error = lc($on_error);
+        if ( $on_error eq 'warn' || $on_error eq 'die' ) {
+            my $num         = @non_words;
+            my $str         = join SPACE, @non_words;
+            my $max_str_len = 120;
+            if ( length($str) > $max_str_len - 1 ) {
+                $str = substr( $str, 0, $max_str_len - 4 ) . "...";
+            }
+            my $msg = <<EOM;
+$num unrecognized words were input$msg_end :
+ $str
+EOM
+            Die($msg) if ( $on_error eq 'die' );
+            Warn($msg);
+        }
+    }
+    return \@non_words;
+} ## end sub check_for_valid_words
+
 my %is_known_markup_word;
 
 BEGIN {
     my @q = qw( ?xml !doctype !-- html meta );
-    @is_known_markup_word{@q} = (1) x scalar(@q);
+    $is_known_markup_word{$_} = 1 for @q;
 }
 
 sub is_not_perl {
@@ -595,6 +749,7 @@ BEGIN {
         _display_name_             => $i++,
         _file_extension_separator_ => $i++,
         _fileroot_                 => $i++,
+        _is_pure_ascii_data_       => $i++,
         _is_encoded_data_          => $i++,
         _length_function_          => $i++,
         _line_separator_default_   => $i++,
@@ -606,6 +761,7 @@ BEGIN {
         _postfilter_               => $i++,
         _prefilter_                => $i++,
         _rOpts_                    => $i++,
+        _rOpts_in_profile_         => $i++,
         _saw_pbp_                  => $i++,
         _teefile_stream_           => $i++,
         _user_formatter_           => $i++,
@@ -703,7 +859,8 @@ sub perltidy {
     };
 
     # Fix for issue git #57
-    $Warn_count = 0;
+    $Warn_count  = 0;
+    $nag_message = EMPTY_STRING;
 
     # don't overwrite callers ARGV
     # Localization of @ARGV could be avoided by calling GetOptionsFromArray
@@ -881,8 +1038,11 @@ EOM
     #-------------------------
     # get command line options
     #-------------------------
-    my ( $rOpts, $config_file, $rraw_options, $roption_string,
-        $rexpansion, $roption_category, $rinteger_option_range )
+    my (
+        $rOpts,                 $config_file,       $rraw_options,
+        $roption_string,        $rexpansion,        $roption_category,
+        $rinteger_option_range, $ris_string_option, $rOpts_in_profile
+      )
       = process_command_line(
         $perltidyrc_stream,  $is_Windows, $Windows_type,
         $rpending_complaint, $dump_options_type,
@@ -891,7 +1051,8 @@ EOM
     # Only filenames should remain in @ARGV
     my @Arg_files = @ARGV;
 
-    $self->[_rOpts_] = $rOpts;
+    $self->[_rOpts_]            = $rOpts;
+    $self->[_rOpts_in_profile_] = $rOpts_in_profile;
 
     my $saw_pbp =
       grep { $_ eq '-pbp' || $_ eq '-perl-best-practices' } @{$rraw_options};
@@ -965,6 +1126,7 @@ EOM
         dump-unique-keys
         dump-hash-keys
         dump-similar-keys
+        dump-keyword-usage
         )
       )
     {
@@ -976,13 +1138,19 @@ EOM
 --$opt_name expects 1 filename in the arg list but saw $num_files filenames
 EOM
             }
+            if ( $rOpts->{'outfile'} ) {
+                Die(<<EOM);
+--outfile is not allowed with --$opt_name because dump output goes to STDOUT
+EOM
+            }
         }
     }
 
     #----------------------------------------
     # check parameters and their interactions
     #----------------------------------------
-    $self->check_options( $num_files, $rinteger_option_range );
+    $self->check_options( $num_files, $rinteger_option_range,
+        $ris_string_option );
 
     if ($user_formatter) {
         $rOpts->{'format'} = 'user';
@@ -1013,8 +1181,12 @@ EOM
         $default_file_extension{ $rOpts->{'format'} } );
 
     # get parameters associated with the -b option
+    my $source =
+        defined($source_stream) ? $source_stream
+      : @Arg_files              ? $Arg_files[-1]
+      :                           undef;
     my ( $in_place_modify, $backup_extension, $delete_backup ) =
-      $self->check_in_place_modify( $source_stream, $destination_stream );
+      $self->check_in_place_modify( $source, $destination_stream );
 
     my $line_range_clipped = $rOpts->{'line-range-tidy'}
       && ( $self->[_line_tidy_begin_] > 1
@@ -1028,16 +1200,16 @@ EOM
         Perl::Tidy::HtmlWriter->check_options($rOpts);
     }
 
-    # Try to catch an unusual missing string parameter error, like this:
-    #    perltidy -wvt perltidy.pl
-    # The problem is that -wvt wants a string, so it grabs 'perltidy.pl'.
-    # Then there is no output filename, so input is assumed to be stdin.
-    # This make perltidy unexpectedly wait for input. To the user, it
-    # appears that perltidy has gone into an infinite loop. Issue c312.
-    # To avoid getting this far, it is best for parameters which take a
-    # string to check the strings in one of the 'check_options' subs, and
-    # exit if there is an obvious error. This has been done for -wvt,
-    # but are undoubtedly other parameters where this problem might occur.
+    # Try to catch an unusual missing string parameter error, where the
+    # intention is to format infile.pl, like this:
+    #    perltidy -title infile.pl
+    # The problem is that -title wants a string, so it grabs 'infile.pl'.  Then
+    # there is no filename, so input is assumed to be stdin.  This make
+    # perltidy unexpectedly wait for input. To the user, it appears that
+    # perltidy has gone into an infinite loop.  For most options, but not all,
+    # previous checks for bad string input will have already caught the
+    # problem.  A timeout will eventually occur as a final backup method for
+    # catching this problem.  Issue c312.
     if ( !$num_files && @ARGV_saved > 1 ) {
         my $opt_test  = $ARGV_saved[-2];
         my $file_test = $ARGV_saved[-1];
@@ -1048,9 +1220,8 @@ EOM
         {
 
             # These options can take filenames, so we will ignore them here
-            my %is_option_with_file_parameter;
-            my @qf = qw( outfile profile );
-            @is_option_with_file_parameter{@qf} = (1) x scalar(@qf);
+            my %is_option_with_file_parameter =
+              map { $_ => 1 } qw( outfile profile );
 
             # Expand an abbreviation into a long name
             my $long_name;
@@ -1275,7 +1446,7 @@ sub make_file_extension {
 
 sub check_in_place_modify {
 
-    my ( $self, $source_stream, $destination_stream ) = @_;
+    my ( $self, $source, $destination_stream ) = @_;
 
     # See if --backup-and-modify-in-place (-b) is set, and if so,
     # return its associated parameters
@@ -1294,13 +1465,39 @@ sub check_in_place_modify {
     # flag may have been in a .perltidyrc file and warnings break
     # Test::NoWarnings.  See email discussion with Merijn Brand 26 Feb 2014.
     if ($in_place_modify) {
-        if (   $rOpts->{'standard-output'}
-            || $destination_stream
-            || ref($source_stream)
+        if (   $destination_stream
+            || !defined($source)
+            || ref($source)
+            || $source eq '-'
             || $rOpts->{'outfile'}
             || defined( $rOpts->{'output-path'} ) )
         {
             $in_place_modify = 0;
+        }
+
+        # But Warn or Nag for certain conflicts with -st.  This can happen for
+        # example if user chooses -pbp and -b because -st is hidden in -pbp.
+        elsif ( $rOpts->{'standard-output'} ) {
+            $in_place_modify = 0;
+
+            my $rOpts_in_profile = $self->[_rOpts_in_profile_];
+            if ( !$rOpts_in_profile->{'backup-and-modify-in-place'} ) {
+                Warn(
+"## warning: conflict of -st with -b: -st has priority; use -nst to activate -b\n"
+                );
+            }
+            elsif ( $rOpts_in_profile->{'standard-output'} ) {
+                Nag(
+"## warning: conflict of -st and -b in profile: -st has priority; use -nst to activate -b\n"
+                );
+
+            }
+            else {
+                ## keep quiet
+            }
+        }
+        else {
+            ## ok to use -b
         }
     }
 
@@ -1394,7 +1591,7 @@ sub backup_method_copy {
     my ( $read_time, $write_time ) = @input_file_stat[ _atime_, _mtime_ ];
     if ( defined($write_time) ) {
         utime( $read_time, $write_time, $backup_file )
-          || Warn("error setting times for backup file '$backup_file'\n");
+          || Warn("error setting mtime for backup file '$backup_file'\n");
     }
 
     # Open the original input file for writing ... opening with ">" will
@@ -1435,7 +1632,7 @@ EOM
     # Keep original modification time if no change (rt#145999)
     if ( !$self->[_input_output_difference_] && defined($write_time) ) {
         utime( $read_time, $write_time, $input_file )
-          || Warn("error setting times for '$input_file'\n");
+          || Warn("error setting mtime for '$input_file'\n");
     }
 
     #---------------------------------------------------------
@@ -1573,7 +1770,7 @@ EOM
     my ( $read_time, $write_time ) = @input_file_stat[ _atime_, _mtime_ ];
     if ( !$self->[_input_output_difference_] && defined($write_time) ) {
         utime( $read_time, $write_time, $input_file )
-          || Warn("error setting times for '$input_file'\n");
+          || Warn("error setting mtime for '$input_file'\n");
     }
 
     #---------------------------------------------------------
@@ -1750,6 +1947,9 @@ sub get_decoded_string_buffer {
     my $decoded_input_as = EMPTY_STRING;
     $rstatus->{'char_mode_source'} = 0;
 
+    my $is_pure_ascii_data = !( ${$rinput_string} =~ /[^[:ascii:]]/ );
+    $self->[_is_pure_ascii_data_] = $is_pure_ascii_data;
+
     # Case 1: If Perl is already in a character-oriented mode for this
     # string rather than a byte-oriented mode.  Normally, this happens if
     # the caller has decoded a utf8 string before calling perltidy.  But it
@@ -1784,7 +1984,7 @@ sub get_decoded_string_buffer {
         # using an incorrect decoding.
 
         my $decoder;
-        if ( ${$rinput_string} =~ /[^[:ascii:]]/ ) {
+        if ( !$is_pure_ascii_data ) {
             $decoder = guess_encoding( ${$rinput_string}, 'utf8' );
         }
         if ( $decoder && ref($decoder) ) {
@@ -1944,7 +2144,8 @@ sub get_line_separator_default {
 
     my $line_separator_default = "\n";
 
-    my $ole = $rOpts->{'output-line-ending'};
+    my $opt_ole = 'output-line-ending';
+    my $ole     = $rOpts->{$opt_ole};
     if ($ole) {
         my %endings = (
             dos  => $CRLF,
@@ -1963,9 +2164,10 @@ EOM
         }
 
         # Check for conflict with -ple
-        if ( $rOpts->{'preserve-line-endings'} ) {
-            Warn("Ignoring -ple; conflicts with -ole\n");
-            $rOpts->{'preserve-line-endings'} = undef;
+        my $opt_ple = 'preserve-line-endings';
+        if ( $rOpts->{$opt_ple} ) {
+            Warn("Ignoring '--$opt_ple': conflicts with '--$opt_ole'\n");
+            $rOpts->{$opt_ple} = undef;
         }
     }
 
@@ -2272,50 +2474,46 @@ EOM
         #--------------------------
         # prepare the output stream
         #--------------------------
-        my $output_file;
+        my $output_file = $rOpts->{'outfile'};
         my $output_name = EMPTY_STRING;
         my $actual_output_extension;
 
-        if ( $rOpts->{'outfile'} ) {
+        if ( defined($output_file) && length($output_file) ) {
 
-            if ( $number_of_files <= 1 ) {
-
-                if ( $rOpts->{'standard-output'} ) {
-                    my $saw_pbp = $self->[_saw_pbp_];
-                    my $msg     = "You may not use -o and -st together";
-                    $msg .= " (-pbp contains -st; see manual)" if ($saw_pbp);
-                    Die("$msg\n");
-                }
-
-                if ($destination_stream) {
-                    Die(
-"You may not specify a destination array and -o together\n"
-                    );
-                }
-
-                if ( defined( $rOpts->{'output-path'} ) ) {
-                    Die("You may not specify -o and -opath together\n");
-                }
-
-                if ( defined( $rOpts->{'output-file-extension'} ) ) {
-                    Die("You may not specify -o and -oext together\n");
-                }
-
-                $output_file = $rOpts->{outfile};
-                $output_name = $output_file;
-
-                # make sure user gives a file name after -o
-                if ( $output_file =~ /^-/ ) {
-                    Die("You must specify a valid filename after -o\n");
-                }
-
-                # do not overwrite input file with -o
-                if ( @input_file_stat && ( $output_file eq $input_file ) ) {
-                    Die("Use 'perltidy -b $input_file' to modify in-place\n");
-                }
-            }
-            else {
+            if ( $number_of_files > 1 ) {
                 Die("You may not use -o with more than one input file\n");
+            }
+
+            if ( $rOpts->{'standard-output'} ) {
+                my $saw_pbp = $self->[_saw_pbp_];
+                my $msg     = "You may not use -o and -st together\n";
+                if ($saw_pbp) {
+                    $msg .= <<EOM;
+Note: -pbp is set and includes -st (see manual); use -nst to turn it off
+EOM
+                }
+                Die("$msg");
+            }
+
+            if ($destination_stream) {
+                Die(
+                    "You may not specify a destination array and -o together\n"
+                );
+            }
+
+            if ( defined( $rOpts->{'output-path'} ) ) {
+                Die("You may not specify -o and -opath together\n");
+            }
+
+            if ( defined( $rOpts->{'output-file-extension'} ) ) {
+                Die("You may not specify -o and -oext together\n");
+            }
+
+            $output_name = $output_file;
+
+            # do not overwrite input file with -o
+            if ( @input_file_stat && ( $output_file eq $input_file ) ) {
+                Die("Use 'perltidy -b $input_file' to modify in-place\n");
             }
         }
         elsif ( $rOpts->{'standard-output'} ) {
@@ -2323,7 +2521,7 @@ EOM
                 my $saw_pbp = $self->[_saw_pbp_];
                 my $msg =
                   "You may not specify a destination array and -st together\n";
-                $msg .= " (-pbp contains -st; see manual)" if ($saw_pbp);
+                $msg .= " (note: -pbp contains -st; see manual)" if ($saw_pbp);
                 Die("$msg\n");
             }
             $output_file = '-';
@@ -2740,7 +2938,7 @@ EOM
     }
 
     #-------------------------------------------------------------
-    # handle --preserve-line-endings or -output-line-endings flags
+    # handle --preserve-line-endings or -output-line-ending flags
     #-------------------------------------------------------------
     # The native line separator has been used in all intermediate
     # iterations and filter operations until here so that string
@@ -2792,6 +2990,7 @@ sub process_iteration_layer {
     my $display_name       = $self->[_display_name_];
     my $fileroot           = $self->[_fileroot_];
     my $is_encoded_data    = $self->[_is_encoded_data_];
+    my $is_pure_ascii_data = $self->[_is_pure_ascii_data_];
     my $length_function    = $self->[_length_function_];
     my $logger_object      = $self->[_logger_object_];
     my $rOpts              = $self->[_rOpts_];
@@ -2918,6 +3117,9 @@ sub process_iteration_layer {
                 extension          => $self->[_actual_output_extension_],
                 html_toc_extension => $html_toc_extension,
                 html_src_extension => $html_src_extension,
+                is_encoded_data    => $is_encoded_data,
+                is_pure_ascii_data => $is_pure_ascii_data,
+                logger_object      => $logger_object,
             );
         }
         elsif ( $rOpts->{'format'} eq 'tidy' ) {
@@ -3032,7 +3234,7 @@ EOM
                             $convergence_log_message)
                           if ($diagnostics_object);
 
-# Uncomment to search for blinking states
+# Uncomment to search for blinking states:
 # Warn( "$display_name: blinking; iter $iter same as for $saw_md5{$digest}\n" );
 
                     }
@@ -3193,7 +3395,6 @@ EOM
             }
           )
         {
-
             Warn(
 "Error attempting to encode output string ref; encoding not done\n"
             );
@@ -3822,21 +4023,24 @@ sub generate_options {
     ########################################
     $category = 7;    # Retaining or ignoring existing line breaks
     ########################################
-    $add_option->( 'break-at-old-keyword-breakpoints',   'bok', '!' );
-    $add_option->( 'break-at-old-logical-breakpoints',   'bol', '!' );
-    $add_option->( 'break-at-old-method-breakpoints',    'bom', '!' );
-    $add_option->( 'break-at-old-semicolon-breakpoints', 'bos', '!' );
-    $add_option->( 'break-at-old-ternary-breakpoints',   'bot', '!' );
-    $add_option->( 'break-at-old-attribute-breakpoints', 'boa', '!' );
-    $add_option->( 'keep-old-breakpoints-before',        'kbb', '=s' );
-    $add_option->( 'keep-old-breakpoints-after',         'kba', '=s' );
-    $add_option->( 'ignore-old-breakpoints',             'iob', '!' );
+    $add_option->( 'break-at-old-keyword-breakpoints',   'bok',  '!' );
+    $add_option->( 'break-at-old-logical-breakpoints',   'bol',  '!' );
+    $add_option->( 'break-at-old-method-breakpoints',    'bom',  '!' );
+    $add_option->( 'break-at-old-semicolon-breakpoints', 'bos',  '!' );
+    $add_option->( 'break-at-old-ternary-breakpoints',   'bot',  '!' );
+    $add_option->( 'break-at-old-attribute-breakpoints', 'boa',  '!' );
+    $add_option->( 'break-at-old-trailing-conditionals', 'botc', '!' );
+    $add_option->( 'break-at-old-trailing-loops',        'botl', '!' );
+    $add_option->( 'keep-old-breakpoints-before',        'kbb',  '=s' );
+    $add_option->( 'keep-old-breakpoints-after',         'kba',  '=s' );
+    $add_option->( 'ignore-old-breakpoints',             'iob',  '!' );
 
     ########################################
     $category = 8;    # Blank line control
     ########################################
     $add_option->( 'blanks-before-blocks',            'bbb',  '!' );
     $add_option->( 'blanks-before-comments',          'bbc',  '!' );
+    $add_option->( 'blanks-before-opening-comments',  'bboc', '!' );
     $add_option->( 'blank-lines-before-subs',         'blbs', '=i' );
     $add_option->( 'blank-lines-before-packages',     'blbp', '=i' );
     $add_option->( 'long-block-line-count',           'lbl',  '=i' );
@@ -3915,6 +4119,8 @@ sub generate_options {
     $add_option->( 'dump-mismatched-args',            'dma',   '!' );
     $add_option->( 'dump-mismatched-returns',         'dmr',   '!' );
     $add_option->( 'dump-mixed-call-parens',          'dmcp',  '!' );
+    $add_option->( 'dump-keyword-usage',              'dku',   '!' );
+    $add_option->( 'dump-keyword-usage-list',         'dkul',  '=s' );
     $add_option->( 'dump-options',                    'dop',   '!' );
     $add_option->( 'dump-profile',                    'dpro',  '!' );
     $add_option->( 'dump-short-names',                'dsn',   '!' );
@@ -3951,6 +4157,7 @@ sub generate_options {
     ########################################
     # Based on their known order
     $category = 12;    # HTML properties
+    $add_option->( 'use-pod-formatter', 'upf', '=s' );
     foreach my $opt (@option_string) {
         my $long_name = $opt;
         $long_name =~ s/(!|=.*|:.*)$//;
@@ -3984,12 +4191,15 @@ sub generate_options {
       add-whitespace
       blanks-before-blocks
       blanks-before-comments
+      blanks-before-opening-comments
 
       keyword-group-blanks-size=5
       nokeyword-group-blanks-inside
       nokeyword-group-blanks-delete
 
       break-at-old-logical-breakpoints
+      break-at-old-trailing-conditionals
+      break-at-old-trailing-loops
       break-at-old-ternary-breakpoints
       break-at-old-attribute-breakpoints
       break-at-old-keyword-breakpoints
@@ -4052,7 +4262,9 @@ sub generate_options {
       html-entities
     );
 
-    # Ranges and defaults of all integer options (type '=i').
+    #------------------------------------------------------------
+    # Set Ranges and defaults of all integer options (type '=i').
+    #------------------------------------------------------------
     # NOTES:
     # 1. All integer options must be in this table, not in @defaults
     # 2. 'closing-token-indentation' (cti), 'vertical-tightness' (vt),
@@ -4125,7 +4337,7 @@ sub generate_options {
         'square-bracket-vertical-tightness'         => [ 0, 2,     0 ],
         'square-bracket-vertical-tightness-closing' => [ 0, 3,     0 ],
         'starting-indentation-level'                => [ 0, undef, undef ],
-        'timeout-in-seconds'                        => [ 0, undef, 10 ],
+        'timeout-in-seconds'                        => [ 0, undef, 5 ],
         'valign-signed-numbers-limit'               => [ 0, undef, 20 ],
         'vertical-tightness'                        => [ 0, 2,     undef ],
         'vertical-tightness-closing'                => [ 0, 3,     undef ],
@@ -4141,6 +4353,16 @@ sub generate_options {
         if ( defined($val) ) {
             push @defaults, "$key=$val";
         }
+    }
+
+    #------------------------------------
+    # Locate strings options of type '=s'
+    #------------------------------------
+    my %is_string_option;
+    foreach my $opt (@option_string) {
+        next if ( substr( $opt, -2, 2 ) ne '=s' );
+        my $key = substr( $opt, 0, -2 );
+        $is_string_option{$key} = 1;
     }
 
     # Verify that only integers of type =i are in the above list during
@@ -4419,7 +4641,7 @@ q(wbb=% + - * / x != == >= <= =~ !~ < > | & = **= += *= &= <<= &&= -= /= |= >>= 
     # Uncomment next line to dump all expansions for debugging:
     # dump_short_names(\%expansion);
     return ( \@option_string, \@defaults, \%expansion, \%option_category,
-        \%integer_option_range );
+        \%integer_option_range, \%is_string_option );
 
 } ## end sub generate_options
 
@@ -4434,13 +4656,14 @@ my %process_command_line_cache;
 
 sub process_command_line {
 
+    # Use Getopt::Long to scan the command line for input parameters.
+    # This is the outer sub which handles memoization
+
     my @q = @_;
     my (
         $perltidyrc_stream,     $is_Windows_uu, $Windows_type_uu,
         $rpending_complaint_uu, $dump_options_type
     ) = @q;
-
-    # This is the outer sub which handles memoization
 
     my $use_cache = !defined($perltidyrc_stream) && !$dump_options_type;
     if ($use_cache) {
@@ -4471,6 +4694,7 @@ sub _process_command_line {
         $rpending_complaint, $dump_options_type
     ) = @_;
 
+    # Use Getopt::Long to scan the command line for input parameters.
     # This is the inner sub which actually processes the command line
 
     use Getopt::Long;
@@ -4489,7 +4713,7 @@ sub _process_command_line {
     else { $glc = undef }
 
     my ( $roption_string, $rdefaults, $rexpansion,
-        $roption_category, $rinteger_option_range )
+        $roption_category, $rinteger_option_range, $ris_string_option )
       = generate_options();
 
     #--------------------------------------------------------------
@@ -4609,7 +4833,7 @@ sub _process_command_line {
     );
 
     if ( $saw_dump_profile && $saw_ignore_profile ) {
-        Warn("No profile to dump because of -npro\n");
+        Warn("No profile to dump because of -npro setting\n");
         Exit(1);
     }
 
@@ -4678,6 +4902,9 @@ EOM
                 expand_command_abbreviations( $rexpansion, \@raw_options,
                     $config_file );
 
+                check_for_missing_string_options( $ris_string_option,
+                    $config_file );
+
                 if ( !GetOptions( \%Opts, @{$roption_string} ) ) {
                     Die(
 "Error in this config file: $config_file  \nUse -npro to ignore this file, -dpro to dump it, -h for help'\n"
@@ -4735,11 +4962,13 @@ EOM
                 #  dump-unusual-variables
                 #  dump-want-left-space
                 #  dump-want-right-space
+                #  dump-keyword-usage
 
-                # The following two dump configuration parameters which
+                # The following dump configuration parameters which
                 # take =i or =s would still be allowed:
-                #  dump-block-minimum-lines',        'dbl',   '=i' );
-                #  dump-block-types',                'dbt',   '=s' );
+                #  dump-block-minimum-lines,        'dbl',   '=i' );
+                #  dump-block-types,                'dbt',   '=s' );
+                #  dump-keyword-usage-list,         'dkul',  '=s' );
 
                 foreach my $cmd (
                     @dump_commands,
@@ -4759,10 +4988,24 @@ EOM
         }
     }
 
+    # Save selected options seen in the profile for use in error checking
+    my %Opts_in_profile = ();
+    foreach my $opt (
+        qw(
+        backup-and-modify-in-place
+        standard-output
+        )
+      )
+    {
+        $Opts_in_profile{$opt} = $Opts{$opt};
+    }
+
     #----------------------------------------
     # now process the command line parameters
     #----------------------------------------
     expand_command_abbreviations( $rexpansion, \@raw_options, $config_file );
+
+    check_for_missing_string_options($ris_string_option);
 
     local $SIG{'__WARN__'} = sub { Warn( $_[0] ) };
     if ( !GetOptions( \%Opts, @{$roption_string} ) ) {
@@ -4787,8 +5030,11 @@ EOM
         }
     }
 
-    return ( \%Opts, $config_file, \@raw_options, $roption_string,
-        $rexpansion, $roption_category, $rinteger_option_range );
+    return (
+        \%Opts,                 $config_file,       \@raw_options,
+        $roption_string,        $rexpansion,        $roption_category,
+        $rinteger_option_range, $ris_string_option, \%Opts_in_profile
+    );
 } ## end sub _process_command_line
 
 sub make_grep_alias_string {
@@ -4804,19 +5050,22 @@ sub make_grep_alias_string {
 
     # make a hash of any excluded words
     my %is_excluded_word;
-    my $exclude_string = $rOpts->{'grep-alias-exclusion-list'};
+    my $opt_name       = 'grep-alias-exclusion-list';
+    my $exclude_string = $rOpts->{$opt_name};
     if ($exclude_string) {
         $exclude_string =~ s/,/ /g;    # allow commas
         $exclude_string =~ s/^\s+//;
         $exclude_string =~ s/\s+$//;
         my @q = split /\s+/, $exclude_string;
-        @is_excluded_word{@q} = (1) x scalar(@q);
-        foreach my $word (@q) {
-            next if ( $word eq '*' );
-            if ( $word =~ /^\d/ || $word =~ /[^\w]/ ) {
-                my $opt_name = 'grep-alias-exclusion-list';
-                Die("unexpected word in --$opt_name: '$word'\n");
-            }
+        $is_excluded_word{$_} = 1 for @q;
+        if ( !$is_excluded_word{'*'} ) {
+            check_for_valid_words(
+                {
+                    rinput_list => \@q,
+                    option_name => "--$opt_name",
+                    on_error    => 'die',
+                }
+            );
         }
     }
 
@@ -4824,7 +5073,8 @@ sub make_grep_alias_string {
     if ( $is_excluded_word{'*'} ) { $default_string = EMPTY_STRING }
 
     # combine the defaults and any input list
-    my $input_string = $rOpts->{'grep-alias-list'};
+    $opt_name = 'grep-alias-list';
+    my $input_string = $rOpts->{$opt_name};
     if ($input_string) { $input_string .= SPACE . $default_string }
     else               { $input_string = $default_string }
 
@@ -4837,19 +5087,23 @@ sub make_grep_alias_string {
     my %seen;
 
     foreach my $word (@word_list) {
-        if ($word) {
-            if ( $word =~ /^\d/ || $word =~ /[^\w]/ ) {
-                my $opt_name = 'grep-alias-list';
-                Die("unexpected word in --$opt_name: '$word'\n");
-            }
-            if ( !$seen{$word} && !$is_excluded_word{$word} ) {
-                $seen{$word}++;
-                push @filtered_word_list, $word;
-            }
+        if ( !$seen{$word} && !$is_excluded_word{$word} ) {
+            $seen{$word}++;
+            push @filtered_word_list, $word;
         }
     }
+
+    check_for_valid_words(
+        {
+            rinput_list => \@filtered_word_list,
+            option_name => "--$opt_name",
+            on_error    => 'die',
+        }
+    );
+
     my $joined_words = join SPACE, @filtered_word_list;
-    $rOpts->{'grep-alias-list'} = $joined_words;
+    $rOpts->{$opt_name} = $joined_words;
+
     return;
 } ## end sub make_grep_alias_string
 
@@ -4886,25 +5140,108 @@ sub cleanup_word_list {
 
     my @filtered_word_list;
     foreach my $word (@input_list) {
-        if ($word) {
-
-            # look for obviously bad words
-            if ( $word =~ /^\d/ || $word !~ /^\w[\w\d]*$/ ) {
-                Warn("unexpected '$option_name' word '$word' - ignoring\n");
-            }
-            if ( !$seen{$word} ) {
-                $seen{$word}++;
-                push @filtered_word_list, $word;
-            }
+        if ( !$seen{$word} ) {
+            $seen{$word}++;
+            push @filtered_word_list, $word;
         }
     }
+    check_for_valid_words(
+        {
+            rinput_list => \@filtered_word_list,
+            option_name => "--$option_name",
+            on_error    => 'die',
+        }
+    );
     $rOpts->{$option_name} = join SPACE, @filtered_word_list;
     return \%seen;
 } ## end sub cleanup_word_list
 
+sub check_string_options {
+    my ( $self, $ris_string_option ) = @_;
+
+    # Make some basic checks for invalid characters in user-defined strings.
+    # More detailed checks are made later in sub check_options.
+
+    my $rOpts   = $self->[_rOpts_];
+    my $message = EMPTY_STRING;
+
+    my @all_string_options = grep { $ris_string_option->{$_} } keys %{$rOpts};
+    my @html_color_options = grep { /^html-color-/ } @all_string_options;
+
+    my @filename_options = qw(
+      cachedir
+      html-linked-style-sheet
+      htmlroot
+      libpods
+      outfile
+      output-path
+      podpath
+      podroot
+    );
+
+    my @file_extension_options = qw(
+      backup-file-extension
+      html-src-extension
+      html-toc-extension
+      output-file-extension
+    );
+
+    # What to check:
+    my %leading_dash_check =
+      map { $_ => 1 } ( @filename_options, @html_color_options );
+    my %leading_space_check =
+      map { $_ => 1 } ( @filename_options, @file_extension_options );
+    my %trailing_space_check = %leading_space_check;
+
+    foreach my $opt_name (@all_string_options) {
+        my $test_string = $rOpts->{$opt_name};
+
+        next if ( !defined($test_string) );
+
+        # Printable character check for all string options
+        if ( $test_string =~ /[^[:print:]]/g ) {
+            my $pos = pos($test_string);
+            my $ch  = substr( $test_string, $pos - 1, 1 );
+            my $ord = ord($ch);
+            $message .= <<EOM;
+--$opt_name has non-printable character(s) at character number $pos, decimal value=$ord
+EOM
+        }
+
+        # Leading dash check
+        if ( $leading_dash_check{$opt_name}
+            && substr( $test_string, 0, 1 ) eq '-' )
+        {
+            my $hint = EMPTY_STRING;
+            if ( $opt_name eq 'outfile' || $opt_name eq 'output_path' ) {
+                $hint .= "; add leading path (like ./) if necessary";
+            }
+            $message .= <<EOM;
+--$opt_name string must not begin with a dash$hint
+EOM
+        }
+
+        # Leading space checks
+        if ( $leading_space_check{$opt_name} && $test_string =~ /^\s/ ) {
+            $message .= "--$opt_name must not contain leading spaces\n";
+        }
+
+        # Trailing space check
+        if ( $trailing_space_check{$opt_name} && $test_string =~ /\s$/ ) {
+            $message .= "--$opt_name must not contain trailing spaces\n";
+        }
+    }
+
+    if ($message) {
+        Die($message);
+    }
+
+    return;
+} ## end sub check_string_options
+
 sub check_options {
 
-    my ( $self, $num_files, $rinteger_option_range ) = @_;
+    my ( $self, $num_files, $rinteger_option_range, $ris_string_option ) = @_;
 
     # Check options at a high level. Note that other modules have their
     # own sub 'check_options' for lower level checking.
@@ -4986,6 +5323,9 @@ EOM
         }
     }
 
+    # Do some very basic checks on string options
+    $self->check_string_options($ris_string_option);
+
     # Note that -vt, -vtc, and -cti are abbreviations. But under
     # msdos, an unquoted input parameter like vtc=1 will be
     # seen as 2 parameters, vtc and 1, so the abbreviations
@@ -5013,20 +5353,31 @@ EOM
     }
 
     # Syntax checking is no longer supported due to concerns about executing
-    # code in BEGIN blocks.  The flag is still accepted for backwards
-    # compatibility but is ignored if set.
-    $rOpts->{'check-syntax'} = 0;
+    # code in BEGIN blocks.  These flags are still accepted for backwards
+    # compatibility but ignored. They will be deleted in a future version.
+    foreach my $optname (qw( check-syntax perl-syntax-check-flags )) {
+        if ( $rOpts->{$optname} ) {
+            Nag("## NOTE: '--$optname' is deprecated and should be removed\n");
+            $rOpts->{$optname} = undef;
+        }
+    }
 
+    my $MAX_BLANK_COUNT   = 100;
     my $check_blank_count = sub {
         my ( $key, $abbrev ) = @_;
+
+        # Check certain user input for unreasonable numbers of blank lines
+
         if ( $rOpts->{$key} ) {
             if ( $rOpts->{$key} < 0 ) {
                 $rOpts->{$key} = 0;
-                Warn("negative value of $abbrev, setting 0\n");
+                Warn("negative value of $abbrev, resetting to 0\n");
             }
-            if ( $rOpts->{$key} > 100 ) {
-                Warn("unreasonably large value of $abbrev, reducing\n");
-                $rOpts->{$key} = 100;
+            if ( $rOpts->{$key} > $MAX_BLANK_COUNT ) {
+                Warn(
+"unreasonably large value of $abbrev, reducing to $MAX_BLANK_COUNT\n"
+                );
+                $rOpts->{$key} = $MAX_BLANK_COUNT;
             }
         }
         return;
@@ -5100,17 +5451,20 @@ EOM
         }
     }
 
-    # set a default tabsize to be used in guessing the starting indentation
+    # Set a default tabsize to be used in guessing the starting indentation
     # level if and only if this run does not use tabs and the old code does
     # use tabs
+    my $MAX_DEFAULT_TABSIZE = 20;
     if ( $rOpts->{'default-tabsize'} ) {
         if ( $rOpts->{'default-tabsize'} < 0 ) {
-            Warn("negative value of -dt, setting 0\n");
+            Warn("negative value of -dt, resetting to 0\n");
             $rOpts->{'default-tabsize'} = 0;
         }
-        if ( $rOpts->{'default-tabsize'} > 20 ) {
-            Warn("unreasonably large value of -dt, reducing\n");
-            $rOpts->{'default-tabsize'} = 20;
+        if ( $rOpts->{'default-tabsize'} > $MAX_DEFAULT_TABSIZE ) {
+            Warn(
+"unreasonably large value of -dt, reducing to $MAX_DEFAULT_TABSIZE\n"
+            );
+            $rOpts->{'default-tabsize'} = $MAX_DEFAULT_TABSIZE;
         }
     }
     else {
@@ -5334,6 +5688,86 @@ DIE
     } ## end of loop over all passes
     return;
 } ## end sub expand_command_abbreviations
+
+sub check_for_missing_string_options {
+    my ( $ris_string_option, ($config_file) ) = @_;
+
+    # Given:
+    #  $ris_string_option = hash with keys are options of type '=s'
+    #  ($config_file) = optional parameter:
+    #     - name of config file if processing config file
+    #     - undef if processing command line args
+
+    # Task:
+    # Look through @ARGV for string options which are not immediately followed
+    # by '=string'.  If the next word looks like another --option, then it may
+    # get gobbled up as the string arg. In that case, exit with an error
+    # message. The user can always force a string arg which looks like an
+    # option by using the '=string' input form.
+
+    # Example of the type of error this sub checks for:
+
+    #   perltidy -lpil -l=9 filename
+
+    # In this sub, any short option forms have already been expanded into their
+    # long forms, so this will appear here in the local copy of @ARGV as three
+    # list items:
+
+    #   @ARGV = qw(
+    #     --line-up-parentheses-inclusion-list
+    #     --maximum-line-length=9
+    #     filename
+    #   );
+
+    # Then, since -lpil wants a string value, it will be set equal to
+    # '--line-up-parentheses=9' by sub GetOptions, which is probably not the
+    # desired value.
+
+    # This sub will catch most errors of this type at the earliest possible
+    # stage. One exception is if the user enters just part of an option name
+    # and relies on name completion by sub GetOptions.  Another exception is if
+    # a filename follows the missing string option on the command line. In
+    # those cases we have to rely on later checks.
+
+    my $arg_seeking_string_last;
+    my $error_message = EMPTY_STRING;
+    foreach my $arg (@ARGV) {
+
+        my $arg_seeking_string;
+
+        # something like --option ?
+        if ( substr( $arg, 0, 2 ) eq '--' && length($arg) > 2 ) {
+
+            # Will the previous string without arg try to grab this option?
+            if ( $arg_seeking_string_last && $arg =~ /^\-\-[A-Za-z]/ ) {
+                $error_message .= <<EOM;
+  '$arg_seeking_string_last' may be missing its string parameter.
+EOM
+            }
+
+            # Is this a string option without a following '=value' ?
+            if ( index( $arg, '=' ) < 0
+                && $ris_string_option->{ substr( $arg, 2 ) } )
+            {
+                $arg_seeking_string = $arg;
+            }
+
+        }
+        $arg_seeking_string_last = $arg_seeking_string;
+    }
+
+    if ($error_message) {
+        my $pre_note = "Possible error ";
+        $pre_note .=
+          defined($config_file)
+          ? "in config file '$config_file':\n"
+          : "on the command line:\n";
+        my $post_note =
+          "Use the equals form '--option=string' to avoid this message.\n";
+        Die( $pre_note . $error_message . $post_note );
+    }
+    return;
+} ## end sub check_for_missing_string_options
 
 sub dump_short_names {
 
@@ -6162,7 +6596,7 @@ sub show_version {
     print {*STDOUT} <<"EOM";
 This is perltidy, v$VERSION
 
-Copyright 2000-2025 by Steve Hancock
+Copyright 2000-2026 by Steve Hancock
 
 Perltidy is free software and may be copied under the terms of the GNU
 General Public License, which is included in the distribution files.

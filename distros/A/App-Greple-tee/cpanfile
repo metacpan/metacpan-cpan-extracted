@@ -1,8 +1,10 @@
-requires 'perl', 'v5.18.2';
+requires 'perl', 'v5.24';
 
 requires 'App::Greple', '9.22';
 requires 'App::Greple::L', '1.01';
 requires 'App::sdif', '4.35';
+requires 'Getopt::EX', 'v2.2.1';
+requires 'Getopt::EX::Config';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

@@ -29,7 +29,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.10';
+our $VERSION = '1.20';
 
 our $ALL_LANGUAGES = 99;
 our $ENGLISH = 1;
@@ -59,10 +59,10 @@ sub new {
 	my $class = shift;
 	my $token = shift;
 
-	my $ua = LWP::UserAgent->new();
+	my $ua = LWP::UserAgent->new(agent => "perl-eansearch/$VERSION");
 	$ua->timeout(30);
 
-	my $self = bless { base_uri => $BASE_URI . $token, ua => $ua }, $class;
+	my $self = bless { base_uri => $BASE_URI . $token, ua => $ua, remaining => -1 }, $class;
 
     return $self;
 }
@@ -164,23 +164,33 @@ sub verifyChecksum {
 	return $json->[0]->{valid} + 0;
 }
 
+sub creditsRemaining {
+	my $self = shift;
+
+	if ($self->{remaining} < 0) {
+		$self->_apiCall($self->{base_uri} . "&op=account-status");
+	}
+	return $self->{remaining};
+}
+
 sub _apiCall {
 	my $self = shift;
 	my $url = shift;
 	my $tries = 0;
 
 	while ($tries < $MAX_API_TRIES) {
-		my $doc = $self->{ua}->request(HTTP::Request->new(GET => $url));
+		my $response = $self->{ua}->request(HTTP::Request->new(GET => $url));
 		$tries++;
-		if (!defined($doc) || $doc->is_error()) {
-			if ($doc->code == 429) { # auto-retry on 429 (too many requests)
+		if (!defined($response) || $response->is_error()) {
+			if ($response->code == 429) { # auto-retry on 429 (too many requests)
 				sleep 1;
 				next;
 			}
-			print STDERR 'Network error: ' . (defined($doc) ? $doc->code : 'unknown') . "\n";
+			print STDERR 'Network error: ' . (defined($response) ? $response->code : 'unknown') . "\n";
 			return undef;
 		} else {
-			return $doc->content;
+			$self->{remaining} = $response->header('X-Credits-Remaining');
+			return $response->content;
 		}
 	}
 	return undef;
@@ -291,7 +301,7 @@ Relaxed Communications GmbH, E<lt>info@relaxedcommunications.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2025 by Relaxed Communications GmbH, E<lt>info@relaxedcommunications.comE<gt>
+Copyright 2025-2026 by Relaxed Communications GmbH, E<lt>info@relaxedcommunications.comE<gt>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.30.0 or,

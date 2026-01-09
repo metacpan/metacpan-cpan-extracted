@@ -38,6 +38,7 @@ License: GPL-1.0+ or Artistic-1.0
 Files: INSTALL
  LICENSE
  Makefile.PL
+ examples/antlers.pl
  examples/benchmark.pl
  examples/can_haz_xs.pl
  examples/lib/Local/Example/Core.pm

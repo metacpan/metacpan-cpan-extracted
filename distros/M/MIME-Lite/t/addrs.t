@@ -1,8 +1,9 @@
 #!/usr/bin/perl
-use lib "lib", "t";
+use strict;
+use warnings;
+
 use MIME::Lite;
 use Test::More;
-use Utils;
 
 $MIME::Lite::VANILLA  = 1;
 $MIME::Lite::PARANOID = 1;
@@ -61,7 +62,7 @@ foreach my $pair (@pairs) {
 
   is(
     join(' ', map {"<$_>"} @addrs),
-	  $result,
-	  "addrs stringify together as expected",
+    $result,
+    "addrs stringify together as expected",
   );
 }

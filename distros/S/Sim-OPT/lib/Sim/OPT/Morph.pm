@@ -13,7 +13,6 @@ use List::AllUtils qw(sum);
 use Sim::OPT::Stats qw(:all);
 use Set::Intersection;
 use List::Compare;
-use IO::Tee;
 use Storable qw(dclone);
 use File::Copy qw( move copy );
 use Data::Dumper;
@@ -25,6 +24,7 @@ use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
+use Sim::OPT::Stats;
 eval { use Sim::OPTcue; 1 };
 eval { use Sim::OPTcue::Patternsearch; 1 };
 
@@ -1087,7 +1087,7 @@ sub setpickedinsts
                   $orig{cleancrypto} = $orig{cleanto}; ### TAKE CARE!!! REASSIGNIMENT!!!
                 }
 
-                #say $tee "HERE : \$countinst: $countinst, \$cn $cn, \$addinst: $addinst, \$origin: $origin, \$is: $is, \%to: " . dump( \%to ) . "\%orig: " . dump( \%orig );
+                #say  "HERE : \$countinst: $countinst, \$cn $cn, \$addinst: $addinst, \$origin: $origin, \$is: $is, \%to: " . dump( \%to ) . "\%orig: " . dump( \%orig );
                 push( @newinstances,
                 {
                     countcase => $countcase, countblock => $countblock,
@@ -1110,19 +1110,19 @@ sub setpickedinsts
             push( @newinstances, $instance );
         }
     }
-    #say $tee "IN MORPH PRINT NEWINSTANCES scalar " . scalar( @newinstances ) . dump ( @newinstances );
+    #say  "IN MORPH PRINT NEWINSTANCES scalar " . scalar( @newinstances ) . dump ( @newinstances );
 
     @instances = @newinstances; # REASSIGNMENT!!!!!!
-    #say $tee "GOING TO GIVE INSTANCES: " .dump( @instances );
-    #say $tee "AND HAD INST: " .dump( \%inst );
+    #say  "GOING TO GIVE INSTANCES: " .dump( @instances );
+    #say  "AND HAD INST: " .dump( \%inst );
     my (  $newinstnames_r, $newinst_r ) = Sim::OPT::filterinsts_winsts( \@instances, \%inst );
     %inst = %{ $newinst_r }; # REASSIGNMENT!!!!!!
     my @newinstnames = @{ $newinstnames_r };
     push( @{ $dirfiles{dones} }, @newinstnames );
     @{ $dirfiles{dones} } = uniq ( @{ $dirfiles{dones} } );
 
-    #say $tee "NEWINST: " . dump( %inst );
-    #say $tee "IN MORPH PRINT INSTANCES AFTER " . scalar( @instances ) . dump ( @instances );
+    #say  "NEWINST: " . dump( %inst );
+    #say  "IN MORPH PRINT INSTANCES AFTER " . scalar( @instances ) . dump ( @instances );
 
     $countinst++;
 
@@ -1177,13 +1177,12 @@ sub morph
 		$tofile = "./report.txt";
 	}
 
-	$tee = new IO::Tee( \*STDOUT, ">>$tofile" ); # GLOBAL ZZZ
-    #say $tee "NOW!!! IN MORPH RECEIVED \%inst: " . dump( \%inst );
-	say $tee "\n# Now in Sim::OPT::Morph.\n";
+    #say  "NOW!!! IN MORPH RECEIVED \%inst: " . dump( \%inst );
+	say  "\n# Now in Sim::OPT::Morph.\n";
 
-    #say $tee "RECEIVED NOW INSTANCES" . dump ( @instances ); # YOU MAY UNCOMMENT THIS.
+    #say  "RECEIVED NOW INSTANCES" . dump ( @instances ); # YOU MAY UNCOMMENT THIS.
 
-    #say $tee "MORPH ENTER: steps = " . scalar(@instances);
+    #say  "MORPH ENTER: steps = " . scalar(@instances);
 
 	if ( not ( $exeonfiles ) ) { $exeonfiles = "y"; }
 	if ( not ( $preventsim ) ) { $preventsim = "n"; }
@@ -1388,9 +1387,9 @@ sub morph
 		%dirfiles = %{ $dirfiles_ref };
 	}
 
-    #say $tee "NOWMORPH!!! \@instances: " . dump( @instances );
-    #say $tee "NOWMORPH!!! \%inst: " . dump( \%inst );
-    #say $tee "NOWMORPH!!! \%dirfiles: " . dump( \%dirfiles );
+    #say  "NOWMORPH!!! \@instances: " . dump( @instances );
+    #say  "NOWMORPH!!! \%inst: " . dump( \%inst );
+    #say  "NOWMORPH!!! \%dirfiles: " . dump( \%dirfiles );
 
     my @collect;
 	foreach $instance_r ( @instances )
@@ -1398,7 +1397,7 @@ sub morph
 		%d = %{ $instance_r };
 		push( @collect, $d{is} );
 	}
-	#say $tee "NOW COLLECTED INSTANCES " . dump( @collect );
+	#say  "NOW COLLECTED INSTANCES " . dump( @collect );
 
     my $counti = 0;
 	foreach my $instance ( @instances )
@@ -1419,9 +1418,9 @@ sub morph
 
 		if ( $d{treated} eq "treated" )
 		{
-			#print $tee "TREATED!: $d{treated}";
+			#print  "TREATED!: $d{treated}";
 		};
-		#say $tee "ARRIVED IN MORPH 1";
+		#say  "ARRIVED IN MORPH 1";
         
         my $laxmode = "n";
         my ( @countvars, @countsteps );
@@ -1474,7 +1473,7 @@ sub morph
         my $cntv = 0; #HERE I.
 		foreach my $countvar ( @countvars )
 		{
-            #say $tee "IN MORPH FOREACH \$countvar: " . dump( $countvar ); say $tee " \$cntv: " . dump( $cntv );
+            #say  "IN MORPH FOREACH \$countvar: " . dump( $countvar ); say  " \$cntv: " . dump( $cntv );
 
             if ( Sim::OPT::checkOPTcue() )
             {
@@ -1482,7 +1481,7 @@ sub morph
             }
             else 
             {
-              say $tee "OPTcue is not installed and this operation is not possible without it.";
+              say  "OPTcue is not installed and this operation is not possible without it.";
             }
 
             my $stepsvar = $varnums{$countvar};
@@ -1560,15 +1559,15 @@ sub morph
                 #my $target = $to{crypto};
                 #my $orig = $orig{crypto};
 
-                my $starttarget = Sim::OPT::giveback( \%mids );  #say $tee "STARTTARGET $starttarget";
+                my $starttarget = Sim::OPT::giveback( \%mids );  #say  "STARTTARGET $starttarget";
 				my $semph = 0;
 				unless ( ( $exeonfiles eq "n" ) or ( $semph > 0 ) )
 				{
-					$starttarget = "$mypath/$file" . "_" . "$starttarget"; say $tee "\$starttarget $starttarget";
+					$starttarget = "$mypath/$file" . "_" . "$starttarget"; say  "\$starttarget $starttarget";
 					if ( not ( -e $starttarget ) )
 					{
 						`cp -R $mypath/$file $starttarget`;
-						say $tee "LEVEL 0a: cp -R $mypath/$file $starttarget\n";
+						say  "LEVEL 0a: cp -R $mypath/$file $starttarget\n";
 					}
 					$semph++;
 				}
@@ -1581,7 +1580,7 @@ sub morph
 					push ( @{ $dirfiles{morphstruct}[$countcase][$countblock] }, $to{cleanto} );
 
 					if ( ( $dowhat{actonmodels} eq "y" ) and ( not ( $dowhat{inactivatemorph} eq "y" ) ) )
-					{ #say $tee "HERE 2 COUNTBLOCK: $countblock, \$countstep: $countstep, \$origin: $origin, \$is: $is \$from: $from, \$to{cleanto}: $to{cleanto}, \$to{thisto}: $to{thisto},  ";
+					{ #say  "HERE 2 COUNTBLOCK: $countblock, \$countstep: $countstep, \$origin: $origin, \$is: $is \$from: $from, \$to{cleanto}: $to{cleanto}, \$to{thisto}: $to{thisto},  ";
 						push ( @{ $dirfiles{morphcases} }, $is );
 
 						print MORPHLIST "$to{cleanto}\n";
@@ -1610,7 +1609,7 @@ sub morph
 									if ( not ( -e $target ) )
 									{
 										`cp -R $orig $target`;
-										print $tee "LEVEL 1a: cp -R $orig $target\n\n";
+										print  "LEVEL 1a: cp -R $orig $target\n\n";
 									}
 								}
 								elsif ( ( "begin" ~~ @whatto )  and ( not ( "end" ~~ @whatto ) ) and ( not ( $dowhat{jumpinst} eq "y" ) ) )
@@ -1626,7 +1625,7 @@ sub morph
 									if ( not ( -e $target ) )
 									{
 										`cp -R $orig $target`;
-										print $tee "LEVEL 1b: cp -R $orig $target\n\n";
+										print  "LEVEL 1b: cp -R $orig $target\n\n";
 										print "LEVEL 1b: cp -R $orig $target\n\n";
 									}
 								}
@@ -1645,7 +1644,7 @@ sub morph
 									if ( not ( -e $target ) )
 									{
 										`mv -f $orig $target`;
-										print $tee "LEVEL 1c: cp -R $orig $target\n\n";
+										print  "LEVEL 1c: cp -R $orig $target\n\n";
 										print  "LEVEL 1c: cp -R $orig $target\n\n";
 									}
 								}
@@ -1663,7 +1662,7 @@ sub morph
 									if ( not ( -e $target ) )
 									{
 										`cp -R $orig $target`;
-										print $tee "LEVEL 1d: cp -R $orig $target\n\n";
+										print  "LEVEL 1d: cp -R $orig $target\n\n";
 										print  "LEVEL 1d: cp -R $orig $target\n\n";
 									}
 								}
@@ -1681,7 +1680,7 @@ sub morph
 									if ( not ( -e $target ) )
 									{
 										`mv -f $orig $target`;
-										print $tee "LEVEL 1e1: cp -R $orig $target\n\n";
+										print  "LEVEL 1e1: cp -R $orig $target\n\n";
 										print  "LEVEL 1e1: cp -R $orig $target\n\n";
 									}
 								}
@@ -1698,7 +1697,7 @@ sub morph
 									if ( not ( -e $target ) )
 									{
 										`cp -R $orig $target`;
-										print $tee "LEVEL 1e2: cp -R $orig $target\n\n";
+										print  "LEVEL 1e2: cp -R $orig $target\n\n";
 										print  "LEVEL 1e2: cp -R $orig $target\n\n";
 									}
 								}
@@ -1716,7 +1715,7 @@ sub morph
 									if ( not ( -e $target ) )
 									{
 										`cp -R $orig $target`;
-										print $tee "LEVEL 1e2: cp -R $orig $target\n\n";
+										print  "LEVEL 1e2: cp -R $orig $target\n\n";
 										print  "LEVEL 1e2: cp -R $orig $target\n\n";
 									}
 								}
@@ -1749,18 +1748,18 @@ sub morph
 								if ( not ( -e $target ) )
 								{
 									`cp -R $orig $target`;
-									#say $tee "HERE 3 COUNTBLOCK: $countblock, \$countstep: $countstep, \$orig: $orig, \$target: $target, \$to{cleanto}: $to{cleanto}, \$to{thisto}: $to{thisto},  ";
-									print $tee "LEVEL 1g: cp -R $orig $target \n\n";
+									#say  "HERE 3 COUNTBLOCK: $countblock, \$countstep: $countstep, \$orig: $orig, \$target: $target, \$to{cleanto}: $to{cleanto}, \$to{thisto}: $to{thisto},  ";
+									print  "LEVEL 1g: cp -R $orig $target \n\n";
 									#print  "LEVEL 1g: cp -R $orig $target \n\n";
                                 }
 							}
 						}
 
-						my $to = $target; #say $tee "\$to: $to!!!"; ### TAKE CARE!!! REASSIGNIMENT!!!
-						my $from = $orig; #say $tee "\$from: $from!!!"; ### TAKE CARE!!! REASSIGNIMENT!!!
+						my $to = $target; #say  "\$to: $to!!!"; ### TAKE CARE!!! REASSIGNIMENT!!!
+						my $from = $orig; #say  "\$from: $from!!!"; ### TAKE CARE!!! REASSIGNIMENT!!!
 
 						if ( $dowhat{actonmodels} eq "y" )
-						{ #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 6";
+						{ #if ( $d{treated} eq "treated" ){ print  "TREATED: $d{treated} "; }; say  "ARRIVED IN MORPH 6";
 							#if ( ( $laxmode eq "y" ) and ( $dirfiles{prelaxmode} eq "y" ) )
                             #{
                             # ### TO DO!!!
@@ -1768,7 +1767,7 @@ sub morph
 
                             my $countop = 0; # "$countop" IS THE COUNTER OF THE OPERATIONS
 							foreach my $op ( @applytype )
-							{ #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 7 ";
+							{ #if ( $d{treated} eq "treated" ){ print  "TREATED: $d{treated} "; }; say  "ARRIVED IN MORPH 7 ";
 
 								my $skip = $skipop->[ $countop ]	;
 								my $modification_type = $applytype[$countop][0];
@@ -1777,33 +1776,33 @@ sub morph
 
 									unless ($exeonfiles eq "n")
 									{
-											say $tee `cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n`;
+											say  `cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n`;
 
-											say $tee `cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
+											say  `cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
 									}
-									#if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 8 "; print $tee "LEVEL 2:cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n\n";
-									print $tee "LEVEL 2: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
+									#if ( $d{treated} eq "treated" ){ print  "TREATED: $d{treated} "; }; say  "ARRIVED IN MORPH 8 "; print  "LEVEL 2:cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n\n";
+									print  "LEVEL 2: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
 								}
 
 								if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and ( $modification_type eq "changeconfig" ) )
 								{
 									unless ($exeonfiles eq "n")
 									{
-										say $tee `cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
+										say  `cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
 									}
-									print $tee "LEVEL 2b: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
+									print  "LEVEL 2b: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
 								}
 
 								`cd $to`;
-								say $tee "cd $to\n";
-                                #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 9 ";
-								my $launchline = "cd $to/cfg/ \n prj -file $fileconfig -mode script"; #say $tee "SO, LAUNCHLINE! " . dump( $launchline );
+								say  "cd $to\n";
+                                #if ( $d{treated} eq "treated" ){ print  "TREATED: $d{treated} "; }; say  "ARRIVED IN MORPH 9 ";
+								my $launchline = "cd $to/cfg/ \n prj -file $fileconfig -mode script"; #say  "SO, LAUNCHLINE! " . dump( $launchline );
 
 								#if ( ( ( ( $stepsvar > 1 ) and ( not ( eval ( $skip ) ) ) ) and ( not( $wascountvar =~ /-/ ) ) ) and 
                                 #( ( ( not ( eval ( $skip ) ) ) and ( $wascountvar =~ /-/ ) ) ) )
                                 if ( not ( eval ( $skip ) ) )
 								{
-                                    #say $tee "IN MORPH. I AM IN";
+                                    #say  "IN MORPH. I AM IN";
 									##########################################
 									my @mods;
 									if ( not( ref( $modification_type ) ) )
@@ -1814,12 +1813,12 @@ sub morph
 									{
 										push( @mods, @{ $modification_type } );
 									}
-                                    #say $tee "IN MORPH. \@mods: " . dump( @mods );
+                                    #say  "IN MORPH. \@mods: " . dump( @mods );
 									#########################################
-                                    #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 10 ";
+                                    #if ( $d{treated} eq "treated" ){ print  "TREATED: $d{treated} "; }; say  "ARRIVED IN MORPH 10 ";
 									foreach my $modtype ( @mods )
 									{
-                                        #say $tee "IN MORPH. \$modtype: " . dump( $modtype );
+                                        #say  "IN MORPH. \$modtype: " . dump( $modtype );
 										if ( $modtype eq "change_groundreflectance" )#
 										{
 											change_groundreflectance
@@ -1887,13 +1886,13 @@ sub morph
                                             {
                                               ( $unsuited ) = Sim::OPTcue::genmodnew( $to, $stepsvar, $countop, $countstep, 
                                                 \@applytype, \@genmodnew, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, 
-                                                $countinstance, \%dirfiles, $laxmode, \@blockelts, \%varnums, \%mids, $countp, \@{ $dirfiles{rebomb} }, \@instances, $tee );
+                                                $countinstance, \%dirfiles, $laxmode, \@blockelts, \%varnums, \%mids, $countp, \@{ $dirfiles{rebomb} }, \@instances,  );
                                                 @instances = @$instances_r;
                                                 push( @unsuiteds, $unsuited );
                                             }
                                             else 
                                             {
-                                                say $tee "TO PERFORM THE OPERATION REQUESTED (genmodnew), OPTcue must be installed, but isn't. So, quitting.";
+                                                say  "TO PERFORM THE OPERATION REQUESTED (genmodnew), OPTcue must be installed, but isn't. So, quitting.";
                                             }
 										}
 										elsif ( $modtype eq "change_thickness" )
@@ -1935,11 +1934,11 @@ sub morph
 										}
 										else
 										{
-											say $tee "Can't recognize the modification type $modtype. So quitting.";
+											say  "Can't recognize the modification type $modtype. So quitting.";
 											die( "$!" );
 										}
 									}
-                                     #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 11 ";
+                                     #if ( $d{treated} eq "treated" ){ print  "TREATED: $d{treated} "; }; say  "ARRIVED IN MORPH 11 ";
 
 
 									push ( @{ $done_instances[ $countvar ] }, $instance );
@@ -2070,7 +2069,7 @@ sub morph
 											}
 										}
 									}
-                                    #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 12 ";
+                                    #if ( $d{treated} eq "treated" ){ print  "TREATED: $d{treated} "; }; say  "ARRIVED IN MORPH 12 ";
 
 									if ( ( $countvar_after > $countvar )
 										or ( defined( $countvar ) and ( not ( defined( $countvar_after ) ) ) and ( not( scalar( @todolist ) == 0 ) ) ) )
@@ -2168,7 +2167,7 @@ sub morph
 															if ( ( defined( $genprop[$countop] ) ) and ( ( $action eq "read_gen" ) or ( $action eq "write_gen" ) ) )
 															{
 
-																say $tee "WORKING EX-POST ON NON-YET-UPDATED INSTANCES AFTER LAST MORPHED INSTANCE. NOw INSTANCE $numberdone OF $numberof.";
+																say  "WORKING EX-POST ON NON-YET-UPDATED INSTANCES AFTER LAST MORPHED INSTANCE. NOw INSTANCE $numberdone OF $numberof.";
 																( $names_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) =
 																	genprop ( $to_, $stepsvar_, $countop, $countstep_,
 																		\@applytype, $genchange, $countvar_, $fileconfig, $mypath, $file, $countmorphing, $action_,
@@ -2235,14 +2234,14 @@ sub morph
 															}
 
 															if ( defined( $recalculateish->[$countop] ) and ( $action eq "recalculateish" ) )
-															{   #say $tee "FOR $to CALLED \$recalculateish EX-POST " . dump( $recalculateish );
+															{   #say  "FOR $to CALLED \$recalculateish EX-POST " . dump( $recalculateish );
 																recalculateish
 																( $to, $stepsvar, $countop,
 																	$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
 															}
 
 															if ( defined( $rebuildconstr->[$countop] ) and ( $action eq "rebuildconstr" ) )
-															{   #say $tee "FOR $to CALLED \$rebuildconstr EX-POST " . dump( $rebuildconstr );
+															{   #say  "FOR $to CALLED \$rebuildconstr EX-POST " . dump( $rebuildconstr );
 																rebuildconstr
 																( $to, $stepsvar, $countop,
 																	$countstep, \@applytype, $rebuildconstr, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
@@ -2257,7 +2256,7 @@ sub morph
 
 
 															if ( defined( $use_modish->[$countop] )  and ( $action eq "use_modish" ) )
-															{   say $tee "FOR $to CALLED \$use_modish EX-POST " . dump( $use_modish );
+															{   say  "FOR $to CALLED \$use_modish EX-POST " . dump( $use_modish );
 																use_modish
 																( $to, $stepsvar, $countop,
 																	$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
@@ -2288,7 +2287,7 @@ sub morph
                                     recalculateish( $to, $stepsvar, $countop, 
                                         $countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, 
                                         \@menus, $countinstance, \%dowhat );
-                                        #say $tee "FOUNDIT";
+                                        #say  "FOUNDIT";
                                   }
                                 }
                                 elsif( $laxmode eq "y" )
@@ -2298,7 +2297,7 @@ sub morph
                                     recalculateish( $to, $stepsvar, $countop, 
                                         $countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, 
                                         \@menus, $countinstance, \%dowhat );
-                                        #say $tee "FOUNDIT";
+                                        #say  "FOUNDIT";
                                   }
                                 }
 								$countop++;
@@ -2307,7 +2306,7 @@ sub morph
 						}
 					}
 				}
-				#if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 13, EXECUTING ";
+				#if ( $d{treated} eq "treated" ){ print  "TREATED: $d{treated} "; }; say  "ARRIVED IN MORPH 13, EXECUTING ";
                 $countmorphing++;
 			} #########
             $countp++; #HERE I.
@@ -2317,7 +2316,7 @@ sub morph
 	}
 	close TOFILE;
 	close OUTFILE;
-	#if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 14, EXITING ";
+	#if ( $d{treated} eq "treated" ){ print  "TREATED: $d{treated} "; }; say  "ARRIVED IN MORPH 14, EXITING ";
 	return ( \%dirfiles, \@unsuiteds );
 }    # END SUB morph
 
@@ -2408,16 +2407,16 @@ sub rotate2d {
 sub rotate3d # CHECK! ZZZ
 {
 	my ( $vertices_ref, $angle, $centre_ref, $plantype, $flatten ) = @_;
-	my @vertices = @$vertices_ref; #print $tee  "\@vertices: " . Dumper( @vertices ) . "\n";
-	my @centreverts = @$centre_ref; #print $tee "centreverts; @centreverts \n";
+	my @vertices = @$vertices_ref; #print   "\@vertices: " . Dumper( @vertices ) . "\n";
+	my @centreverts = @$centre_ref; #print  "centreverts; @centreverts \n";
 	my ( $centre_x, $centre_y, $centre_z ) = @centreverts;
-	print "centre_x; $centre_x \n"; #print $tee "centre_y; $centre_y \n"; print "centre_z; $centre_z \n";
+	print "centre_x; $centre_x \n"; #print  "centre_y; $centre_y \n"; print "centre_z; $centre_z \n";
 
 	my @newbag;
 
 	foreach $vertex_ref ( @vertices )
 	{
-		( $x, $y, $z ) = ( $vertex_ref->[0], $vertex_ref->[1], $vertex_ref->[2]); #$print $tee "x; $x \n"; print "y; $y \n"; print "z; $z \n";
+		( $x, $y, $z ) = ( $vertex_ref->[0], $vertex_ref->[1], $vertex_ref->[2]); #$print  "x; $x \n"; print "y; $y \n"; print "z; $z \n";
 		if ( $plantype eq "xy" )
 		{
 			my ( $newx, $newy ) = rotate2d( $x, $y, $angle, $centre_x, $centre_y );
@@ -2600,7 +2599,7 @@ sub translate
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Translating zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Translating zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	if ( $stepsvar > 1 )
 	{
@@ -2695,7 +2694,7 @@ YYY
 
 		unless ($exeonfiles eq "n")
 		{
-			print `$printthis`; say $tee "$printthis"
+			print `$printthis`; say  "$printthis"
 		}
 
 		my $pinobs =  $$translate[$countop][3];
@@ -2725,7 +2724,7 @@ YYY
 
 
 			`mv -f $targetpath $oldfile`;
-			#print $tee "mv -f $targetpath $oldfile\n";
+			#print  "mv -f $targetpath $oldfile\n";
 
 			open( OLDFILE, $oldfile ) or die( "$!" );
 			my @oldlines = <OLDFILE>;
@@ -2749,7 +2748,7 @@ YYY
 			close NEWFILE;
 		}
 
-		print $tee "#Translating zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.\" $printthis";
+		print  "#Translating zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.\" $printthis";
 	}
 } # end sub translate
 
@@ -2766,7 +2765,7 @@ sub translate_surface
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Translating surfaces for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Translating surfaces for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my $transform_type = $$translate_surface[$countop][0];
 	my @surfs_to_transl = @{ $translate_surface->[$countop][1] };
@@ -2834,7 +2833,7 @@ YYY
 				{
 					print `$printthis`;
 				}
-				print $tee "#Translating surfaces for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance
+				print  "#Translating surfaces for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance
 				$printthis";
 
 				$countsurface++;
@@ -2925,7 +2924,7 @@ YYY
 					print `$printthis`;
 				}
 
-				print $tee "#Translating surfaces for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance
+				print  "#Translating surfaces for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance
 $printthis";
 
 				$countsurface++;
@@ -2954,7 +2953,7 @@ sub rotate_surface
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Rotating surfaces for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Rotating surfaces for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @surfs_to_rotate =  @{ $rotate_surface->[$countop][0] };
 	my @vertices_numbers =  @{ $rotate_surface->[$countop][1] };
@@ -3026,7 +3025,7 @@ YYY
 				print `$printthis`;
 			}
 
-			print  $tee "
+			print   "
 Rotating surfaces for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance
 $printthis";
 		}
@@ -3044,26 +3043,26 @@ sub translate_vertices
 	my @translate_vertices = @$translate_vertices_ref;
 
 	my @menus = @$menus_ref;
-	my %numvertmenu = %{ $menus[0] }; #say $tee "IN MORPH VERTS_TO_TRANSL: \%numvertmenu" . dump( %numvertmenu );
-	my %vertnummenu = %{ $menus[1] }; #say $tee "IN MORPH VERTS_TO_TRANSL: \%vertnummenu" . dump( %vertnummenu );
+	my %numvertmenu = %{ $menus[0] }; #say  "IN MORPH VERTS_TO_TRANSL: \%numvertmenu" . dump( %numvertmenu );
+	my %vertnummenu = %{ $menus[1] }; #say  "IN MORPH VERTS_TO_TRANSL: \%vertnummenu" . dump( %vertnummenu );
 
-	say $tee "Translating vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Translating vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @v;
-	my @verts_to_transl = @{ $translate_vertices[$countop][0] }; #say $tee "IN MORPH VERTS_TO_TRANSL: " . dump( @verts_to_transl );
+	my @verts_to_transl = @{ $translate_vertices[$countop][0] }; #say  "IN MORPH VERTS_TO_TRANSL: " . dump( @verts_to_transl );
 	my @transform_coordinates = @{ $translate_vertices[$countop][1] };
 	my @sourcefiles = @{ $translate_vertices[$countop][2] };
 
-	my $sourcefile = $sourcefiles[0]; #say $tee "HERE \sourcefile: $sourcefile";
-	my $sourceaddress = "$to$sourcefile"; #say $tee "HERE \sourceaddress: $sourceaddress";
+	my $sourcefile = $sourcefiles[0]; #say  "HERE \sourcefile: $sourcefile";
+	my $sourceaddress = "$to$sourcefile"; #say  "HERE \sourceaddress: $sourceaddress";
 	# my $zone_letter = $sourcefiles[1];
-	my $zone_letter = $applytype[$countop][3]; #say $tee "HERE ZONE_LETTER: $zone_letter";
+	my $zone_letter = $applytype[$countop][3]; #say  "HERE ZONE_LETTER: $zone_letter";
 
 	open( SOURCEFILE, $sourceaddress ) or die "Can't open $sourceaddress 2: $!\n";
 	my @lines = <SOURCEFILE>;
 	close SOURCEFILE;
 
-	my %verts = %numvertmenu; #say $tee "HERE \%verts: " . dump( \%verts );
+	my %verts = %numvertmenu; #say  "HERE \%verts: " . dump( \%verts );
 
 	foreach my $vert ( @verts_to_transl )
 	{
@@ -3076,7 +3075,7 @@ sub translate_vertices
 			{
 				if ( $rowelts[5] eq $vertnum )
 				{
-					push (@v, [ $rowelts[1], $rowelts[2], $rowelts[3], $vertnum ] ); #say $tee "\@v: " . dump( \@v );
+					push (@v, [ $rowelts[1], $rowelts[2], $rowelts[3], $vertnum ] ); #say  "\@v: " . dump( \@v );
 				}
 			}
 		}
@@ -3085,11 +3084,11 @@ sub translate_vertices
 	my $countvertex = 0;
 	foreach my $base_coordinates_ref ( @transform_coordinates )
 	{
-		#my $vertex_letter = $verts{ $verts_to_transl[ $countvertex ] }; say $tee "\$vertex_letter: $vertex_letter";
-		my $vertex_letter = $verts_to_transl[$countvertex]; #say $tee "\$vertex_letter: $vertex_letter";
+		#my $vertex_letter = $verts{ $verts_to_transl[ $countvertex ] }; say  "\$vertex_letter: $vertex_letter";
+		my $vertex_letter = $verts_to_transl[$countvertex]; #say  "\$vertex_letter: $vertex_letter";
 
 		my @basevs = @{ $v[ $countvertex ] };
-		my ( $x_base, $y_base, $z_base, $vertex_number ) = ( $basevs[0], $basevs[1], $basevs[2], $basevs[3] ); #say $tee "\$vertex_number: $vertex_number";
+		my ( $x_base, $y_base, $z_base, $vertex_number ) = ( $basevs[0], $basevs[1], $basevs[2], $basevs[3] ); #say  "\$vertex_number: $vertex_number";
 
 		my @base_coordinates = @{ $base_coordinates_ref };
 
@@ -3175,7 +3174,7 @@ YYY
 			print `$printthis`;
 		}
 
-		print $tee "#Translating vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+		print  "#Translating vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 		$countvertex++;
 	}
@@ -3193,7 +3192,7 @@ sub shift_vertices
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Shifting vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Shifting vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my ( $pace, $movement );
 	my $movementtype = $$shift_vertices[$countop][0];
@@ -3262,7 +3261,7 @@ YYY
 				{
 					print `$printthis`;
 				}
-				print $tee "#Shifting vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+				print  "#Shifting vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 
 				$countthis++;
@@ -3309,7 +3308,7 @@ YYY
 				{
 					print `$printthis`;
 				}
-				print $tee "#Shifting vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+				print  "#Shifting vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 			}
 		}
@@ -3328,7 +3327,7 @@ sub rotate    # generic zone rotation
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Rotating zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Rotating zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my ( $rotation_degrees, $pacerotate, $base );
 	my $swingrotate = $$rotate[$countop][1];
@@ -3394,7 +3393,7 @@ YYY
 
 		unless ($exeonfiles eq "n")
 		{
-			print `$printthis`; say $tee "$printthis";
+			print `$printthis`; say  "$printthis";
 		}
 
 
@@ -3425,7 +3424,7 @@ YYY
 
 
 			`mv -f $targetpath $oldfile`;
-			#print $tee "mv -f $targetpath $oldfile\n";
+			#print  "mv -f $targetpath $oldfile\n";
 
 			open( OLDFILE, $oldfile ) or die( "$!" );
 			my @oldlines = <OLDFILE>;
@@ -3452,7 +3451,7 @@ YYY
 
 
 
-		#print $tee		"#Rotating zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.$printthis";
+		#print 		"#Rotating zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.$printthis";
 	}
 } # END SUB rotate
 
@@ -3468,7 +3467,7 @@ sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE F
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Rotating zones on the vertical plane for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Rotating zones on the vertical plane for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @centerpoints = @{$$rotatez[0]};
 	my $centerpointsx = $centerpoints[0];
@@ -3607,17 +3606,17 @@ sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE F
 
 		close($_outfile_);
 		unless ($exeonfiles eq "n") { print `chmod 777 $infile`; }
-		print $tee "chmod -R 777 $infile\n";
+		print  "chmod -R 777 $infile\n";
 		unless ($exeonfiles eq "n") { print `chmod 777 $infile2`; }
-		print $tee "chmod -R 777 $infile2\n";
+		print  "chmod -R 777 $infile2\n";
 		unless ($exeonfiles eq "n") { print `rm $infile`; }
-		print $tee "rm $infile\n";
+		print  "rm $infile\n";
 		unless ($exeonfiles eq "n") { print `chmod 777 $outfile2`; }
-		print $tee "chmod 777 $outfile2\n";
+		print  "chmod 777 $outfile2\n";
 		unless ($exeonfiles eq "n") { print `cp $outfile2 $infile`; }
-		print $tee "cp $outfile2 $infile\n";
+		print  "cp $outfile2 $infile\n";
 		unless ($exeonfiles eq "n") { print `cp $outfile2 $infile2`; }
-		print $tee "cp $outfile2 $infile2\n";
+		print  "cp $outfile2 $infile2\n";
 	}
 } # END SUB rotatez
 
@@ -3626,10 +3625,10 @@ sub reassign_construction
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $reassign_construction, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
-        #say $tee "AAA \$to $to"  ;
-        #say $tee "AAA \$stepsvar $stepsvar" ;
-        #say $tee "AAA \$countop $countop"  ;
-        #say $tee "AAA \$countstep $countstep" ;
+        #say  "AAA \$to $to"  ;
+        #say  "AAA \$stepsvar $stepsvar" ;
+        #say  "AAA \$countop $countop"  ;
+        #say  "AAA \$countstep $countstep" ;
 	my @applytype = @{ $applytype_ref };
 	my $zone_letter = $applytype[$countop][3];
 
@@ -3637,7 +3636,7 @@ sub reassign_construction
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Reassign construction solutions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Reassign construction solutions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @surfaces_to_reassign = @{ $reassign_construction->[$countop][0] };
 	my @groups_to_choose = @{ $reassign_construction->[$countop][1] };
@@ -3681,7 +3680,7 @@ YYY
 		{
 			`$printthis`;
 		}
-		print $tee "#Reassign construction solutions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+		print  "#Reassign construction solutions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 		$count++;
 	}
@@ -3697,7 +3696,7 @@ sub change_thickness
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Changing thicknesses in construction layer for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Changing thicknesses in construction layer for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
     
     my @grouplistings = @{ $$thickness_change[$countop][0] };
 	my @entries_to_change = @{ $$thickness_change[$countop][1] };
@@ -3823,7 +3822,7 @@ YYY
 				{
 					print `$printthis`;
 				}
-				print $tee "#Changing thicknesses in construction layer for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+				print  "#Changing thicknesses in construction layer for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 				$countstrata++;
 			}
@@ -3831,14 +3830,14 @@ $printthis";
 		}
 		$" = " ";
 		unless ($exeonfiles eq "n") { print `$enter_esp$go_to_construction_database@change_entries_with_thicknesses$exit_construction_database_and_esp`; }
-		print $tee "$enter_esp$go_to_construction_database@change_entries_with_thicknesses$exit_construction_database_and_esp\n";
+		print  "$enter_esp$go_to_construction_database@change_entries_with_thicknesses$exit_construction_database_and_esp\n";
 	}
 } # END sub change_thickness
 
 
 sub readobsfile
 {    # THIS READS A GEO FILE TO GET THE DATA OF THE REQUESTED OBSTRUCTIONS
-	my ( $fullgeopath ) = @_; #say $tee "\$fullgeopath: $fullgeopath";
+	my ( $fullgeopath ) = @_; #say  "\$fullgeopath: $fullgeopath";
 
 	open( GEOF, "$fullgeopath" ) or die;
 	my @lines = <GEOF>;
@@ -3907,7 +3906,7 @@ sub obs_modify
 
 	my %obsn = ( "e" => 1, "f" => 2, "g" => 3, "h" => 4, "i" => 5, "j" => 6, "k" => 7, "l" => 8, "m" => 9 , "n" => 10, "o"  => 11); # RE-CHECK
 
-	say $tee "Modifying obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Modifying obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 	my $case_cycle_ref = $obs_modify_ref->[$countop];
 	my $configfile = $geofile;
 	my $fullgeopath = "$to/zones/$geofile";
@@ -3919,7 +3918,7 @@ sub obs_modify
 	my @obslines = <OBSFILE>;
 	close OBSFILE;
 	`cp -f $fullgeopath $fullgeopath.old`;
-	say $tee "mv -f $fullgeopath $fullgeopath.old";
+	say  "mv -f $fullgeopath $fullgeopath.old";
 
 	open( NEWOBSFILE, ">$fullgeopath" ) or die;
 
@@ -3939,7 +3938,7 @@ sub obs_modify
 				$semaphore = 1;
 			}
 			say NEWOBSFILE $obsline;
-			say $tee $obsline;
+			say  $obsline;
 		}
 		elsif ( $semaphore == 1 )
 		{
@@ -4131,17 +4130,17 @@ sub obs_modify
 			if ( ( $obsline =~ /\*end_block/ ) or ( $obsline =~ /block_start/ ) )
 			{
 				say NEWOBSFILE $obsline;
-				#say $tee $obsline;
+				#say  $obsline;
 			}
 			elsif (  $obsnum ~~ @obsbag )
 			{
 				say NEWOBSFILE "$obsts{$obsnum}{denomination},$obsts{$obsnum}{origin}->[0],$obsts{$obsnum}{origin}->[1],$obsts{$obsnum}{origin}->[2],$obsts{$obsnum}{dimensions}->[0],$obsts{$obsnum}{dimensions}->[1],$obsts{$obsnum}{dimensions}->[2],$obsts{$obsnum}{z_rotation},$obsts{$obsnum}{y_rotation},$obsts{$obsnum}{x_rotation},$obsts{$obsnum}{opacity},$obsts{$obsnum}{name}, $obsts{$obsnum}{construction},  # block  $obsts{$obsnum}{obsnum}" ;
-				say $tee "$obsts{$obsnum}{denomination},$obsts{$obsnum}{origin}->[0],$obsts{$obsnum}{origin}->[1],$obsts{$obsnum}{origin}->[2],$obsts{$obsnum}{dimensions}->[0],$obsts{$obsnum}{dimensions}->[1],$obsts{$obsnum}{dimensions}->[2],$obsts{$obsnum}{z_rotation},$obsts{$obsnum}{y_rotation},$obsts{$obsnum}{x_rotation},$obsts{$obsnum}{opacity},$obsts{$obsnum}{name}, $obsts{$obsnum}{construction},  # block  $obsts{$obsnum}{obsnum}" ;
+				say  "$obsts{$obsnum}{denomination},$obsts{$obsnum}{origin}->[0],$obsts{$obsnum}{origin}->[1],$obsts{$obsnum}{origin}->[2],$obsts{$obsnum}{dimensions}->[0],$obsts{$obsnum}{dimensions}->[1],$obsts{$obsnum}{dimensions}->[2],$obsts{$obsnum}{z_rotation},$obsts{$obsnum}{y_rotation},$obsts{$obsnum}{x_rotation},$obsts{$obsnum}{opacity},$obsts{$obsnum}{name}, $obsts{$obsnum}{construction},  # block  $obsts{$obsnum}{obsnum}" ;
 			}
 			else
 			{
 				say NEWOBSFILE "$obsline";
-				#say $tee "$obsline";
+				#say  "$obsline";
 			}
 			$countl++;
 		}
@@ -4166,7 +4165,7 @@ sub recalculateish
 
 	$launchline = " -file $to/cfg/$fileconfig -mode script";
 
-	say $tee "Updating the insolation calculations for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Updating the insolation calculations for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my $printthis;
 	if ( ( $whatto eq "y" ) or ( $dowhat{shadeupdate} eq "y" ) )
@@ -4250,7 +4249,7 @@ YYY
       print `$printthis`;
 	}
 
-	print $tee "#Updating the insolation calculations for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+	print  "#Updating the insolation calculations for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
   return( "done" );
 } #END SUB RECALCULATEISH
@@ -4267,11 +4266,11 @@ sub rebuildconstr
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	my @zone_letters = @{ $rebuildconstr }; #say $tee "ZONE LETTERS: " . dump( @zone_letters ) ;
+	my @zone_letters = @{ $rebuildconstr }; #say  "ZONE LETTERS: " . dump( @zone_letters ) ;
 
 	$launchline = " -file $to/cfg/$fileconfig -mode script";
 
-	say $tee "Updating the construction solutions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Updating the construction solutions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	foreach my $zone_letter ( @zone_letters )
   {
@@ -4303,7 +4302,7 @@ YYY
 	}
 
 
-	print $tee "#Updating the construction solutions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+	print  "#Updating the construction solutions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 } #END SUB REBUILDCONSTR
 
@@ -4328,7 +4327,7 @@ sub daylightcalc # IT WORKS ONLY IF THE "RAD" DIRECTORY IS EMPTY
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Performing daylight calculations through Radiance for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Performing daylight calculations through Radiance for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my $zone = $daylightcalc[0];
 	my $surface = $daylightcalc[1];
@@ -4511,7 +4510,7 @@ cd $mypath
 		print `$printthis`;
 	}
 
-	print $tee "#Performing daylight calculations through Radiance for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+	print  "#Performing daylight calculations through Radiance for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 
 	open( RADFILE, $pathdf) or die "Can't open $pathdf: $!\n";
@@ -4551,7 +4550,7 @@ sub change_config
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Substituting a configuration file for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Substituting a configuration file for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @change_conf = @{$change_config[ $countop ]};
 	my @original_configfiles = @{$change_conf[ 0 ]};
@@ -4565,7 +4564,7 @@ sub change_config
 		{
 
 			`cp -f $to/$new_configfile $to/$original_configfile\n`;
-			print $tee "cp -f $to/$new_configfile $to/$original_configfile\n";
+			print  "cp -f $to/$new_configfile $to/$original_configfile\n";
 
 		}
 	}
@@ -4579,13 +4578,13 @@ sub checkfile # THIS CHECKS IF A SOURCE FILE MUST BE SUBSTITUTED BY ANOTHER ONE.
 
 	unless ( ( $sourceaddress eq "" ) or ( $targetaddress eq "" ) or ( ( $sourceaddress eq $targetaddress ) ) )
 	{
-		#print $tee "TARGETFILE IN FUNCTION: $targetaddress\n";
+		#print  "TARGETFILE IN FUNCTION: $targetaddress\n";
 		if ( $sourceaddress ne $targetaddress )
 		{
 			unless ($exeonfiles eq "n")
 			{
 				`cp -f $sourceaddress $targetaddress\n`;
-				print $tee "cp -f $sourceaddress $targetaddress\n";
+				print  "cp -f $sourceaddress $targetaddress\n";
 			}
 		}
 	}
@@ -4608,7 +4607,7 @@ sub change_climate ### THIS SIMPLE SCRIPT HAS TO BE DEBUGGED. WHY DOES IT BLOCK 
 	my @change_climates = @{ $change_climate_ref };
 
 
-	say $tee "Substituting climate database for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Substituting climate database for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @climates = @{ $change_climates[ $countop ] };
 	my $newclimate = $climates[ $countstep - 1 ];
@@ -4650,10 +4649,10 @@ sub change_climate ### THIS SIMPLE SCRIPT HAS TO BE DEBUGGED. WHY DOES IT BLOCK 
 	unless ( $exeonfiles eq "n" )
 	{
 		`cp -R -f $tempfileconfig $myfile` ;
-		#print $tee "cp -R -f $tempfileconfig $myfile" ;
+		#print  "cp -R -f $tempfileconfig $myfile" ;
 	}
 
-	#print $tee "#Substituting a configuration file with climate updated for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance. $printthis";
+	#print  "#Substituting a configuration file with climate updated for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance. $printthis";
 }
 
 
@@ -4669,7 +4668,7 @@ sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING T
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Adequating the ventilation network for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Adequating the ventilation network for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my $filenet = $recalculatenet[0];
 
@@ -4858,7 +4857,7 @@ YYY
 					print `$printthis`;
 				}
 
-				print $tee "#Adequating the ventilation network for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+				print  "#Adequating the ventilation network for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 				$countnode++;
 			}
@@ -4905,7 +4904,7 @@ YYY
 						print `printthis`;
 					}
 
-					print $tee "#Adequating the ventilation network for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+					print  "#Adequating the ventilation network for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 					$countnode++;
 				}
@@ -4949,7 +4948,7 @@ YYY
 				print `$printthis`;
 			}
 
-			print $tee "#Adequating the ventilation network for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+			print  "#Adequating the ventilation network for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 
 			$countopening++;
@@ -4990,7 +4989,7 @@ YYY
 				print `$printthis`;
 			}
 
-			say $tee "$printthis";
+			say  "$printthis";
 
 			$countcrack++;
 			$countthing++;
@@ -5006,20 +5005,20 @@ sub pin_obstructions
 {
 	#use strict; use warnings;
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $pin_obstructions_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
-	my @applytype = @$applytype_ref;  #say $tee "\APPLYTYPE: " . dump( @applytype );
+	my @applytype = @$applytype_ref;  #say  "\APPLYTYPE: " . dump( @applytype );
 	my $zone_letter = $applytype[$countop][3];
-        #say $tee "\$pin_obstructions_ref: " . dump( $pin_obstructions_ref );
+        #say  "\$pin_obstructions_ref: " . dump( $pin_obstructions_ref );
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	my @pin_obstructions = @{ $pin_obstructions_ref->[ $countop ] }; #say $tee "\@pin_obstructions: " . dump( @pin_obstructions );
-	my $sourcefile = shift( @pin_obstructions ); #say $tee "\sourcefile: $sourcefile"; say $tee "\@pin_obstructions: " . dump( @pin_obstructions );
-	my $sourcepath = $mypath . "/" . $file . $sourcefile; #say $tee "\$sourcepath: $sourcepath";
+	my @pin_obstructions = @{ $pin_obstructions_ref->[ $countop ] }; #say  "\@pin_obstructions: " . dump( @pin_obstructions );
+	my $sourcefile = shift( @pin_obstructions ); #say  "\sourcefile: $sourcefile"; say  "\@pin_obstructions: " . dump( @pin_obstructions );
+	my $sourcepath = $mypath . "/" . $file . $sourcefile; #say  "\$sourcepath: $sourcepath";
 	my %keeplines ;
 	my @newlines;
 	open ( SOURCEFILE, $sourcepath ) or die( "$!" );
-	my @sourcelines = <SOURCEFILE>; #say $tee "\@sourcelines: " . dump( @sourcelines );
+	my @sourcelines = <SOURCEFILE>; #say  "\@sourcelines: " . dump( @sourcelines );
 	close SOURCEFILE;
 
 	foreach my $obs ( @pin_obstructions )
@@ -5031,13 +5030,13 @@ sub pin_obstructions
 				$keeplines{$obs} = $line ;
 			}
 		}
-	} say $tee "\%keeplines: " . dump( \%keeplines );
-	my $targetpath = $to . $sourcefile; #say $tee "\$targetpath: $targetpath";
+	} say  "\%keeplines: " . dump( \%keeplines );
+	my $targetpath = $to . $sourcefile; #say  "\$targetpath: $targetpath";
 
 	my $oldfile = $targetpath . ".old";
 
 	`mv -f $targetpath $oldfile`;
-	print $tee "mv -f $targetpath $oldfile\n";
+	print  "mv -f $targetpath $oldfile\n";
 
 	open( OLDFILE, $oldfile ) or die( "$!" );
 	my @oldlines = <OLDFILE>;
@@ -5082,7 +5081,7 @@ sub apply_constraints
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Applying constraints for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Applying constraints for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @sourcefiles = @{ $apply_constraints[$countop][0] };
 	my @numberfiles = @{ $apply_constraints[$countop][1] };
@@ -5170,7 +5169,7 @@ sub apply_constraints
   foreach my $sourcefile ( @sourcefiles )
   {
 
-	my $sourceaddress = "$to$sourcefile";  #say $tee "\$sourceaddress: " . dump( $sourceaddress );
+	my $sourceaddress = "$to$sourcefile";  #say  "\$sourceaddress: " . dump( $sourceaddress );
 
 	open( SOURCEFILE, $sourceaddress ) or die "Can't open $sourceaddress: $!\n";
 	my @lines = <SOURCEFILE>;
@@ -5311,33 +5310,33 @@ sub apply_constraints
 				$line =~ s/^\s+//;
 				$line =~ s/\s+/ /;
 				my @transitional = split(/#&&/, $line);
-				my $leftpart = $transitional[0]; #say $tee "AAAPPLY_CONSTRAINTS \$leftpart: " . dump( $leftpart );
-				my @elts = split(/\s+|,/, $leftpart); #say $tee "AAAPPLY_CONSTRAINTS \@elts: " . dump( @elts );
+				my $leftpart = $transitional[0]; #say  "AAAPPLY_CONSTRAINTS \$leftpart: " . dump( $leftpart );
+				my @elts = split(/\s+|,/, $leftpart); #say  "AAAPPLY_CONSTRAINTS \@elts: " . dump( @elts );
 
-				my $rightpart = $transitional[1]; #say $tee "AAAPPLY_CONSTRAINTS \$rightpartA: " . dump( $rightpart );
-				$rightpart =~ s/^\s+//; #say $tee "AAAPPLY_CONSTRAINTS \$rightpartB: " . dump( $rightpart );
-				$rightpart =~ s/\s+$//; #say $tee "AAAPPLY_CONSTRAINTS \$rightpartC: " . dump( $rightpart );
-				$rightpart =~ s/\s+/ /; #say $tee "AAAPPLY_CONSTRAINTS \$rightpartD: " . dump( $rightpart );
-				my @ins = split(/\s+|,/, $rightpart); #say $tee "AAAPPLY_CONSTRAINTS \@ins: " . dump( @ins );
+				my $rightpart = $transitional[1]; #say  "AAAPPLY_CONSTRAINTS \$rightpartA: " . dump( $rightpart );
+				$rightpart =~ s/^\s+//; #say  "AAAPPLY_CONSTRAINTS \$rightpartB: " . dump( $rightpart );
+				$rightpart =~ s/\s+$//; #say  "AAAPPLY_CONSTRAINTS \$rightpartC: " . dump( $rightpart );
+				$rightpart =~ s/\s+/ /; #say  "AAAPPLY_CONSTRAINTS \$rightpartD: " . dump( $rightpart );
+				my @ins = split(/\s+|,/, $rightpart); #say  "AAAPPLY_CONSTRAINTS \@ins: " . dump( @ins );
 
 				foreach my $in ( @ins )
 				{
 					unless ( ( $in eq undef ) or ( $leftpart eq undef ) or ( $rightpart eq undef ) )
 					{
-						my @elements = split(/-/, $in); #say $tee "AAAPPLY_CONSTRAINTS \@elements: " . dump( @elements );
+						my @elements = split(/-/, $in); #say  "AAAPPLY_CONSTRAINTS \@elements: " . dump( @elements );
 						my $name = $elements[0];
 						my $position = $elements[1];
-						$eds{$name}{file} = $file; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{file}: " . dump( $eds{$name}{file} );
-						$eds{$name}{line} = $cn; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{line}: " . dump( $eds{$name}{line} );
-						$eds{$name}{position} = $position; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{position}: " . dump( $eds{$name}{position} );
-						$eds{$name}{value} = $elts[$position];  #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{value}: " . dump( $eds{$name}{value} );
-						my $length = length($in); #say $tee "AAAPPLY_CONSTRAINTS \$length: " . dump( $length );
-						$eds{$name}{length} = $length; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{length}: " . dump( $eds{$name}{length} );
+						$eds{$name}{file} = $file; #say  "AAAPPLY_CONSTRAINTS \$eds{\$name}{file}: " . dump( $eds{$name}{file} );
+						$eds{$name}{line} = $cn; #say  "AAAPPLY_CONSTRAINTS \$eds{\$name}{line}: " . dump( $eds{$name}{line} );
+						$eds{$name}{position} = $position; #say  "AAAPPLY_CONSTRAINTS \$eds{\$name}{position}: " . dump( $eds{$name}{position} );
+						$eds{$name}{value} = $elts[$position];  #say  "AAAPPLY_CONSTRAINTS \$eds{\$name}{value}: " . dump( $eds{$name}{value} );
+						my $length = length($in); #say  "AAAPPLY_CONSTRAINTS \$length: " . dump( $length );
+						$eds{$name}{length} = $length; #say  "AAAPPLY_CONSTRAINTS \$eds{\$name}{length}: " . dump( $eds{$name}{length} );
 						my $beginning = index($line, $in);
-						$eds{$name}{beginning} = $beginning; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{beginning}: " . dump( $eds{$name}{beginning} );
+						$eds{$name}{beginning} = $beginning; #say  "AAAPPLY_CONSTRAINTS \$eds{\$name}{beginning}: " . dump( $eds{$name}{beginning} );
 						my $end = $beginning + $length;
-						$eds{$name}{end} = $end; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{end}: " . dump( $eds{$name}{end} );
-						$eds{$name}{rightpart} = $rightpart; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{rightpart}: " . dump( $eds{$name}{rightpart} );
+						$eds{$name}{end} = $end; #say  "AAAPPLY_CONSTRAINTS \$eds{\$name}{end}: " . dump( $eds{$name}{end} );
+						$eds{$name}{rightpart} = $rightpart; #say  "AAAPPLY_CONSTRAINTS \$eds{\$name}{rightpart}: " . dump( $eds{$name}{rightpart} );
 					}
 				}
 			}
@@ -5370,7 +5369,7 @@ sub apply_constraints
 			  }
 			  else
 			  {
-				  say $tee "\$configaddress does not exist. Exiting." and die;
+				  say  "\$configaddress does not exist. Exiting." and die;
 			  }
 		  }
 	  }
@@ -5389,30 +5388,30 @@ sub apply_constraints
 		  foreach my $line ( @lines )
 		  {
 			  if ( $line =~ /#&&/ )
-			  {       #say $tee "APPPLY_CONSTRAINTS \$line: " . dump( $line );
+			  {       #say  "APPPLY_CONSTRAINTS \$line: " . dump( $line );
 				  $line =~ s/ +/ /;
-				  my @splits = split( "$separator", $line ); #say $tee "APPPLY_CONSTRAINTS \@splits: " . dump( @splits );
+				  my @splits = split( "$separator", $line ); #say  "APPPLY_CONSTRAINTS \@splits: " . dump( @splits );
 
 				  my @transitional = split( /#&&/, $line );
 				  my $rightpart = $transitional[1];
 				  $rightpart =~ s/^ +//;
-					$rightpart =~ s/ +/ /; #say $tee "APPPLY_CONSTRAINTS \$rightpart: " . dump( $rightpart );
-				  my @elms = split( / /, $rightpart ); #say $tee "APPPLY_CONSTRAINTS \@elms: " . dump( @elms );
+					$rightpart =~ s/ +/ /; #say  "APPPLY_CONSTRAINTS \$rightpart: " . dump( $rightpart );
+				  my @elms = split( / /, $rightpart ); #say  "APPPLY_CONSTRAINTS \@elms: " . dump( @elms );
 
 		          foreach my $elm ( @elms )
 				  {
 						chomp $elm;
 					  my ( $name, $number ) = split( "-", $elm );
 
-						#say $tee "APPPLY_CONSTRAINTS \$name: " . dump( $name );
+						#say  "APPPLY_CONSTRAINTS \$name: " . dump( $name );
 					  if ( $eds{$name}{file} eq $file )
 					  {
 						  #if ( $eds{$name}{line} eq $cnt )
 						  #{
                                                           $splits[$eds{$name}{position}] = $eds{$name}{newvalue};
 
-                                                          #$line = ( substr( $line, 0, $eds{$name}{beginning} ) ) . ( substr( $line, $eds{$name}{end} ) ); say $tee "APPPLY_CONSTRAINTS \$line!: " . dump( $line );
-					                  #substr( $line, $eds{$name}{beginning}, 0) = $eds{$name}{newvalue}; say $tee "APPPLY_CONSTRAINTS \$line!: " . dump( $line );
+                                                          #$line = ( substr( $line, 0, $eds{$name}{beginning} ) ) . ( substr( $line, $eds{$name}{end} ) ); say  "APPPLY_CONSTRAINTS \$line!: " . dump( $line );
+					                  #substr( $line, $eds{$name}{beginning}, 0) = $eds{$name}{newvalue}; say  "APPPLY_CONSTRAINTS \$line!: " . dump( $line );
 
 							  #unless ( $line =~ /#&&/ )
 							  #{
@@ -5484,7 +5483,7 @@ YYY
 			  {
 				  print `$printthis`;
 			  }
-			  say $tee "$printthis";
+			  say  "$printthis";
 		  }
 		  elsif ( $output =~ /^obs/ )
       {
@@ -5567,7 +5566,7 @@ YYY
 			    {
 				    print `$printthis`;
 			    }
-			    say $tee "$printthis";
+			    say  "$printthis";
 		    }
 		    elsif ( $output =~ /^nod/ )
                {
@@ -5619,7 +5618,7 @@ YYY
 				{
 					print `$printthis`;
 				}
-				say $tee "$printthis";
+				say  "$printthis";
 			}
 
 			if ($new_type eq "e" ) # IF NODES ARE BOUNDARY ONES, WIND-INDUCED
@@ -5656,7 +5655,7 @@ YYY
 				{
 					print `$printthis`;
 				}
-				say $tee "$printthis";
+				say  "$printthis";
 			}
     }
 
@@ -5704,7 +5703,7 @@ YYY
 				{
 					print `$printthis`;
 				}
-				say $tee "$printthis";
+				say  "$printthis";
 			}
 
 			if ($new_type eq "l" ) # IF THE COMPONENT IS A CRACK
@@ -5736,7 +5735,7 @@ YYY
 				{
 					print `$printthis`;
 				}
-				say $tee "$printthis";
+				say  "$printthis";
 			}
 
 			if ($new_type eq "m" ) # IF THE COMPONENT IS A DOOR
@@ -5767,13 +5766,13 @@ YYY
 				{
 					print `$printthis`;
 				}
-				say $tee "$printthis";
+				say  "$printthis";
 			}
 		}
 
 		### XXX
 
-		say $tee "#Propagating constraints " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+		say  "#Propagating constraints " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 	}
 } # END SUB APPLY_CONSTRAINTS
@@ -5792,7 +5791,7 @@ sub reshape_windows # IT APPLIES CONSTRAINTS
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Reshaping windows for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Reshaping windows for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my ( @work_letters, @v );
 
@@ -5934,7 +5933,7 @@ YYY
 								print `$printthis`;
 							}
 
-							say $tee "#Reshaping windows for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+							say  "#Reshaping windows for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 						}
 					}
@@ -5959,7 +5958,7 @@ sub warp #
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Warping zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Warping zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @surfs_to_warp =  @{ $warp->[$countop][0] };
 	my @vertices_numbers =  @{ $warp->[$countop][1] };
@@ -6031,7 +6030,7 @@ YYY
 			{
 				print `$printthis`;
 			}
-			print  $tee "
+			print   "
 #Warping zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 		}
@@ -6131,7 +6130,7 @@ YYY
 			{
 				print `$printthis\n`;
 			}
-			print $tee "#Warping zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+			print  "#Warping zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 		}
 		$countthis++;
@@ -6167,7 +6166,7 @@ sub export_toenergyplus
 					$epwfile = $mypath . "\\" . $epw;
 				}
 
-				say $tee "Exporting to EnergyPlus for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+				say  "Exporting to EnergyPlus for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my $file_eplus = "$to.idf";
 
@@ -6190,7 +6189,7 @@ YYY
 	{
 		`$printthis\n`;
 	}
-	say $tee "#EXPORTING FILE $file_eplus TO ENERGYPLUS.\n $printthis";
+	say  "#EXPORTING FILE $file_eplus TO ENERGYPLUS.\n $printthis";
 	my $oldfile = $file_eplus;
 	$oldfile =~ s/\.idx//;
 	$oldfile = $oldfile . ".old.idx";
@@ -6201,7 +6200,7 @@ YYY
 		{
 			`mv -f $file_eplus $oldfile`;
 		}
-		#print $tee "mv -f $file_eplus $oldfile\n";
+		#print  "mv -f $file_eplus $oldfile\n";
 	}
 	else
 	{
@@ -6209,7 +6208,7 @@ YYY
 		{
 			`move /y $file_eplus $oldfile`;
 		}
-		#print $tee "move /y $file_eplus $oldfile\n";
+		#print  "move /y $file_eplus $oldfile\n";
 	}
 
 	open ( OLDFILEEPLUS, $oldfile ) or die( "$!" );
@@ -6238,7 +6237,7 @@ YYY
 			{
 				`runenergyplus $file_eplus $epwfile`;
 			}
-			#print $tee "runenergyplus $file_eplus $epwfile\n"; # EPW FILE, FOR INSTANCE: /usr/local/EnergyPlus-7-2-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw
+			#print  "runenergyplus $file_eplus $epwfile\n"; # EPW FILE, FOR INSTANCE: /usr/local/EnergyPlus-7-2-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw
 		}
 		else
 		{
@@ -6246,7 +6245,7 @@ YYY
 			{
 				`runeplus $file_eplus $epwfile`;
 			}
-			#print $tee "runeplus $file_eplus $epwfile\n"; # EPW FILE
+			#print  "runeplus $file_eplus $epwfile\n"; # EPW FILE
 		}
 	}
 
@@ -6268,7 +6267,7 @@ sub use_modish
 			my @applytype = @$applytype_ref;
 			my @use_modish = @{ $use_modish_ref->[ $countop ] };
 			my $pathhere = "$to/cfg/$fileconfig";
-			say $tee "Executing modish.pl for calculating the effect of solar reflections on obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+			say  "Executing modish.pl for calculating the effect of solar reflections on obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 			my @menus = @$menus_ref;
 			my %dowhat = %$dowhat_ref;
@@ -6282,7 +6281,7 @@ sub use_modish
 			{
 				foreach $cycle_ref ( @use_modish )
 				{
-					my @cycle = @$cycle_ref; say $tee "\@cycle " . dump( @cycle );
+					my @cycle = @$cycle_ref; say  "\@cycle " . dump( @cycle );
 
 					my $shortmodishdefpath;
 					if ( ref $cycle[0] )
@@ -6305,17 +6304,17 @@ sub use_modish
 			$" = " ";
 			#$" = ",";
 
-			#print $tee "rm -f $to/rad/*\n";
+			#print  "rm -f $to/rad/*\n";
 			`rm -f $to/rad/*`;
-			#print $tee "perl ./Modish.pm $to/cfg/$fileconfig $zonenumber @surfaces \r\n";
+			#print  "perl ./Modish.pm $to/cfg/$fileconfig $zonenumber @surfaces \r\n";
 			`perl ./Modish.pm $to/cfg/$fileconfig $zonenumber @surfaces `;
 
 			`cp -f $shdname $oldshdname`;
-			#print $tee "cp -f $shdname $oldshdname\n";
+			#print  "cp -f $shdname $oldshdname\n";
 			`cp -f $shdaname $oldshdaname`;
-			#print $tee "cp -f $shdname $oldshdname\n";
+			#print  "cp -f $shdname $oldshdname\n";
 			`cp -f $modshdaname $shdaname`;
-			#print $tee "cp -f $modshdaname $shdaname\n";
+			#print  "cp -f $modshdaname $shdaname\n";
 
 
 			$" = " ";
@@ -6337,10 +6336,10 @@ y
 -
 YYY
 ";
-				#print $tee "SETTING UP THINGS AFTER RUNNING modish.pl.\n $printthis";
+				#print  "SETTING UP THINGS AFTER RUNNING modish.pl.\n $printthis";
 				unless ($exeonfiles eq "n")
 				{
-					print `$printthis`; say $tee "$printthis";
+					print `$printthis`; say  "$printthis";
 				}
 			}
 			else
@@ -6366,7 +6365,7 @@ sub genchange
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Executing genchange for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Executing genchange for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 	my $this_cycledata = $genchange->[$countop];
 	my @filequestions = @{ $this_cycledata->[1] };
 	my ( @plaincontents, @filecontents, @newfilecontents );
@@ -6389,11 +6388,11 @@ sub genchange
 			my $thisfile = shift( @truequests );
 			$thisfile =~ /\.(\d+)?/ ;
 			$afterdot = $1 ;
-			#say $tee "AFTERDOT:\ $afterdot";
+			#say  "AFTERDOT:\ $afterdot";
 			my $fullfilepath = $to . $thisfile ;
 			my $new_fullfilepath = $fullfilepath . ".$afterdot" ;
 
-			#say $tee "fullfilepath: $fullfilepath";
+			#say  "fullfilepath: $fullfilepath";
 			open( FULLFILEPATH, "$fullfilepath" ) or die ( "$!" );
 			my @filerows = <FULLFILEPATH>;
 			my @passrows = @filerows;
@@ -6441,7 +6440,7 @@ sub genchange
 						{
 							#if ( $row_number == $countrow )
 							#{
-							#  say $tee "YES HERE \$row_number $row_number eq \$countrow $countrow";
+							#  say  "YES HERE \$row_number $row_number eq \$countrow $countrow";
 							#}
 							my @elts_pos_plus1 = @{ $quest->[1] };
 							my @elts_pos = decreasearray( @elts_pos_plus1 );
@@ -6812,7 +6811,7 @@ sub genchange
 							}
 							else
 							{
-								#$newel = sprintf( "%.3f", $newel ); say $tee "\$newel " . dump( $newel );
+								#$newel = sprintf( "%.3f", $newel ); say  "\$newel " . dump( $newel );
 								#$newrow = replace_nth( "$newrow", $countscore, "$thiselt,", "$newel," );
 								my $smallpiece;
 								if ( not ( $operation_type eq "wordchange" ) )
@@ -6889,20 +6888,20 @@ sub genchange
 
 			unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 			{
-				say $tee "mv -f $fullfilepath $oldfile";
+				say  "mv -f $fullfilepath $oldfile";
 				`mv -f $fullfilepath $oldfile` ;
-				#say $tee "cp -f $newfile $newfile_";
+				#say  "cp -f $newfile $newfile_";
 				#`cp -f $newfile $newfile_` ;
-				say $tee "mv -f $newfile $fullfilepath";
+				say  "mv -f $newfile $fullfilepath";
 				`mv -f $newfile $fullfilepath` ;
 			}
 			else
 			{
-				say $tee "xcopy  /e /c /r /y $fullfilepath $oldfile";
+				say  "xcopy  /e /c /r /y $fullfilepath $oldfile";
 				`xcopy  /e /c /r /y $fullfilepath $oldfile`  or die ("$!") ;
-				say $tee "xcopy  /e /c /r /y $newfile $newfile_";
+				say  "xcopy  /e /c /r /y $newfile $newfile_";
 				`xcopy  /e /c /r /y $newfile $newfile_` or die $! ;
-				say $tee "xcopy  /e /c /r /y $newfile $fullfilepath";
+				say  "xcopy  /e /c /r /y $newfile $fullfilepath";
 				`xcopy  /e /c /r /y $newfile $fullfilepath` or die $! ;
 
 			}
@@ -6951,7 +6950,7 @@ sub change_groundreflectance
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Changing ground reflectance for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Changing ground reflectance for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 	my ( $low, $high, $swing, $pace, $newvalue );
 
 	if ( $change_groundreflectance )
@@ -6991,7 +6990,7 @@ YYY
 	{
 		print `$printthis`;
 	}
-	say $tee "CHANGING GROUND REFLECTANCE.\n $printthis";
+	say  "CHANGING GROUND REFLECTANCE.\n $printthis";
 	#no strict;
 	#no warnings;
 }
@@ -7009,7 +7008,7 @@ sub vary_controls
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Variating controls for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Variating controls for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my ( $semaphore_zone, $semaphore_dataloop, $semaphore_massflow, $semaphore_setpoint, $doline );
 	my $count_controlmass = -1;
@@ -7245,7 +7244,7 @@ sub constrain_controls
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Constraining controls for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Constraining controls for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my $zone_letter = $applytype[$countop][3];
 	my @applytype = @$applytype_ref;
@@ -7340,7 +7339,7 @@ sub read_controls
 	# NOTICE THAT CURRENTLY ONLY THE "basic control law" IS SUPPORTED.
 
 	my ( $sourceaddress, $targetaddress, $swap, $swap2, $countvar ) = @_;
-	say $tee "Reading controls for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Reading controls for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @letters = @$swap;
 	my @period_letters = @$swap2;
@@ -7471,7 +7470,7 @@ sub read_control_constraints
 	# $countvar, WHICH TELLS THE PROGRAM WHAT NUMBER OF DESIGN PARAMETER THE PROGRAM IS WORKING AT.
 
 	my ( $to, $stepsvar, $countop, $countstep, $swap, $swap2, $swap3, $swap4, $countvar, $fileconfig, $countmorphing ) = @_;
-	say $tee "Reading controls constraints for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Reading controls constraints for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	@loopcontrol = @$swap;
 	@flowcontrol = @$swap2;
@@ -7600,7 +7599,7 @@ YYY
 			{
 				print `$printthis`;
 			}
-			say $tee "$printthis";
+			say  "$printthis";
 		}
 		$countloop++;
 	}
@@ -7611,7 +7610,7 @@ sub apply_flowcontrol_changes
 {  # THIS HAS TO BE CALLED WITH: apply_flowcontrol_changes($exeonfiles, \@new_flowcontrols);
 	# # THIS APPLIES CHANGES TO NETS IN CONTROLS
 	my ( $swap, $swap2, $countvar ) = @_;
-	say $tee "Applying changes to flow controls for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Applying changes to flow controls for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my $countflow = 0;
 	my @new_flowcontrols = @$swap;
@@ -7653,7 +7652,7 @@ YYY
 				print `$printthis`;
 			}
 
-			say $tee "$printthis";
+			say  "$printthis";
 		}
 		$countflow++;
 	}
@@ -7671,7 +7670,7 @@ sub vary_net
 	my $zone_letter = $applytype[$countop][3];
 	my @vary_net = @{ $vary_net_ref[ $countop ] };
 
-	say $tee "Executing variations on networks for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+	say  "Executing variations on networks for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my $activezone = $applytype[$countop][3];
 	my ($semaphore_node, $semaphore_component, $node_letter);

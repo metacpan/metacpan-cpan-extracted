@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2025 -- leonerd@leonerd.org.uk
 
-package Future::IO::ImplBase 0.17;
+package Future::IO::ImplBase 0.18;
 
 use v5.14;
 use warnings;
@@ -194,13 +194,19 @@ sub _send1
    my ( $f, $fh, $data, $flags, $to ) = @_;
 
    my $waitf = $self->ready_for_write( $fh )->on_done( sub {
-      my $len = $fh->send( $data, $flags, $to );
-      if( defined $len ) {
+      my $len;
+      # IO::Socket->send itself might die
+      my $e = eval { $len = $fh->send( $data, $flags, $to ); 1 } ? undef : $@;
+
+      if( defined $e ) {
+         $f->fail( "send: $e\n", send => $fh, $! );
+      }
+      elsif( defined $len ) {
          $f->done( $len );
       }
       elsif( $! == EAGAIN or $! == EWOULDBLOCK ) {
          # Try again
-         $self->_syswrite1( $f, $fh, $data, $flags, $to );
+         $self->_send1( $f, $fh, $data, $flags, $to );
       }
       else {
          $f->fail( "send: $!\n", send => $fh, $! );

@@ -6,10 +6,10 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011000';
+our $VERSION   = '0.011001';
 
-use constant _ATTRS => qw( caller this parents roles attributes strict constructor modifiers inhaled_from short_name is_struct plugins setup_steps_with_plugins );
-use B::Hooks::AtRuntime   qw( at_runtime after_runtime );
+use constant _ATTRS => qw( caller this parents roles attributes strict constructor modifiers inhaled_from short_name is_struct plugins setup_steps_with_plugins delayed );
+use B::Hooks::AtRuntime   ();
 use Class::XSAccessor     { getters => [ _ATTRS ] };
 use Class::XSConstructor  [ undef, '_new' ], _ATTRS;
 use Class::XSDestructor;
@@ -431,6 +431,7 @@ sub new {
 		modifiers    => !!0,
 		constructor  => 'new',
 		plugins      => [],
+		delayed      => [],
 	);
 	
 	while ( @_ ) {
@@ -554,6 +555,7 @@ sub setup_steps {
 		setup_accessors
 		setup_imports
 		optimize_methods
+		run_delayed
 		setup_compat
 	/;
 }
@@ -630,19 +632,6 @@ sub setup_roles {
 		}
 	}
 	
-	at_runtime {
-		require Role::Tiny;
-		Role::Tiny->apply_roles_to_package( $me->this, @tiny_roles );
-	} if @tiny_roles;
-	
-	at_runtime {
-		Moose::Util::ensure_all_roles( $me->this, @moose_roles );
-	} if @moose_roles;
-
-	at_runtime {
-		Mouse::Util::apply_all_roles( $me->this, @mouse_roles );
-	} if @mouse_roles;
-	
 	my $existing;
 	for my $r ( @roles ) {
 		my $r_meta = $me->find_meta( $r );
@@ -663,6 +652,50 @@ sub setup_roles {
 		}
 	}
 	
+	$me->delay( sub {
+		my $me = shift;
+		do {
+			require Role::Tiny;
+			Role::Tiny->apply_roles_to_package( $me->this, @tiny_roles );
+		} if @tiny_roles;
+		do {
+			Moose::Util::ensure_all_roles( $me->this, @moose_roles );
+		} if @moose_roles;
+		do {
+			Mouse::Util::apply_all_roles( $me->this, @mouse_roles );
+		} if @mouse_roles;
+	} );
+	
+	return $me;
+}
+
+sub delay {
+	my $me = shift;
+	my $coderef = shift;
+	my $after_runtime = shift;
+	
+	if ( eval { B::Hooks::AtRuntime::find_hooks(); 1 } ) {
+		if ( $after_runtime ) {
+			&B::Hooks::AtRuntime::after_runtime( sub { $coderef->( $me ) } );
+		}
+		else {
+			&B::Hooks::AtRuntime::at_runtime( sub { $coderef->( $me ) } );
+		}
+	}
+	elsif ( $me->delayed ) {
+		push @{ $me->delayed }, $coderef;
+	}
+	else {
+		$coderef->( $me );
+	}
+}
+
+sub run_delayed {
+	my $me = shift;
+	for my $code ( @{ $me->delayed } ) {
+		$code->( $me );
+	}
+	delete $me->{delayed};
 	return $me;
 }
 
@@ -788,7 +821,8 @@ my %SKIP_METHODS = map { $_ => 1 } qw(
 sub optimize_methods {
 	my $me = shift;
 	if ( @{ $me->parents or [] } ) {
-		after_runtime {
+		$me->delay( sub {
+			my $me = shift;
 			no strict 'refs';
 			for my $p ( @{ $me->parents or [] } ) {
 				my $parent = $p->[0];
@@ -801,7 +835,7 @@ sub optimize_methods {
 					*{"${child}::${_}"} = \&{"${parent}::${_}"};
 				}
 			}
-		};
+		} );
 	}
 	return $me;
 }

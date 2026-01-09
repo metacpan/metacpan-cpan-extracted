@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2025 -- leonerd@leonerd.org.uk
 
-package Future::IO 0.17;
+package Future::IO 0.18;
 
 use v5.14;
 use warnings;
@@ -29,6 +29,7 @@ C<Future::IO> - Future-returning IO methods
 =for highlighter language=perl
 
    use Future::IO;
+   Future::IO->load_best_impl;
 
    my $delay = Future::IO->sleep( 5 );
    # $delay will become done in 5 seconds time
@@ -68,23 +69,10 @@ C<O_NONBLOCK> flag) while performing IO on them.
 
 For cases where multiple filehandles are required, or for doing more involved
 IO operations, a real implementation based on an actual event loop should be
-provided. The following are known to exist; CPAN may provide others:
-
-=over 4
-
-=item *
-
-L<Future::IO::Impl::Glib>
-
-=item *
-
-L<Future::IO::Impl::IOAsync>
-
-=item *
-
-L<Future::IO::Impl::UV>
-
-=back
+loaded. It is recommended to use the L</load_best_impl> method to do this, if
+there are no other specific requirements. If the program is already using some
+other event system, such as L<UV> or L<IO::Async>, it is best to directly load
+the relevant implementation module in the toplevel program.
 
 =head2 Unit Testing
 
@@ -325,9 +313,9 @@ sub recvfrom
 
 =head2 send
 
-   $sent_lem = await Future::IO->send( $fh, $bytes );
-   $sent_lem = await Future::IO->send( $fh, $bytes, $flags );
-   $sent_lem = await Future::IO->send( $fh, $bytes, $flags, $to );
+   $sent_len = await Future::IO->send( $fh, $bytes );
+   $sent_len = await Future::IO->send( $fh, $bytes, $flags );
+   $sent_len = await Future::IO->send( $fh, $bytes, $flags, $to );
 
 I<Since version 0.17.>
 
@@ -499,6 +487,18 @@ sub override_impl
    ( $IMPL ) = @_;
 }
 
+sub try_load_impl
+{
+   shift;
+   my ( $name ) = @_;
+
+   $name =~ m/::/ or $name = "Future::IO::Impl::$name";
+   my $module = "$name.pm" =~ s{::}{/}gr;
+
+   eval { require $module } or return 0;
+   return 1;
+}
+
 =head2 load_impl
 
    Future::IO->load_impl( @names );
@@ -522,23 +522,112 @@ program. Since it sets the implementation, it would generally be considered
 inappropriate to invoke this method from some additional module that might be
 loaded by a containing program.
 
+This is now discouraged, in favour of letting C<Future::IO> decide instead by
+using L</load_best_impl>.
+
 =cut
 
 sub load_impl
 {
    shift;
-   my $loaded;
 
    foreach ( @_ ) {
-      my $name = $_;
-      $name =~ m/::/ or $name = "Future::IO::Impl::$name";
-      my $module = "$name.pm" =~ s{::}{/}gr;
-
-      eval { require $module } or next;
-      $loaded = 1;
-      last;
+      Future::IO->try_load_impl( $_ ) and return;
    }
-   $loaded or die "Unable to find a usable Future::IO::Impl subclass\n";
+   die "Unable to find a usable Future::IO::Impl subclass\n";
+}
+
+=head2 load_best_impl
+
+   Future::IO->load_best_impl();
+
+I<Since version 0.18.>
+
+Attempt to work out and load an implementation module.
+
+In most situations, most programs don't really care what specific
+implementation module they use, if they aren't already committed to some other
+event system and also using C<Future::IO> alongside it. This method allows
+programs to offload the decision-making about which specific implementations
+to try to load, to C<Future::IO> itself.
+
+This method works by attempting a few different strategies to determine the
+"best" implementation to use. It maintains a list of the currently-known CPAN
+modules which provide implementations, and attempts them in a given preference
+order.
+
+=over 4
+
+=item 1.
+
+First, any of the modules that attempt to wrap other event systems such
+as L<UV> or L<Glib> are attempted if it is detected that the other event
+system is already loaded.
+
+=item 2.
+
+If none of these were successful, next it attempts any OS-specific modules
+based on the OS name (given by C<$^O>).
+
+=item 3.
+
+Finally, a list of other generic modules is attempted, which also includes
+any of the wrapper implementations that can be started independently.
+
+=back
+
+For more details, consult the implementation code in this module to find the
+current list of known modules and the order they are attempted in.
+
+=cut
+
+# Try to account for every Future::IO::Impl::* module on CPAN
+#
+# Purposely omitting:
+#    Future::IO::Impl::Tickit - requires a $tickit instance to work
+
+my @IMPLS_WRAPPER = (
+   "UV",
+   "Glib",
+   [ IOAsync => "IO::Async::Loop" ],
+   "POE",
+   "AnyEvent",
+);
+
+my %IMPLS_FOR_OS = (
+   linux => [qw( Uring )],
+   # TODO: other OSes?
+);
+
+my @IMPLS_GENERIC = (qw(
+   Ppoll
+   UV
+   Glib
+));
+
+sub load_best_impl
+{
+   shift;
+
+   # First, load a wrapper impl if the wrapped system is already loaded
+   foreach ( @IMPLS_WRAPPER ) {
+      my ( $impl, $base ) = ref $_ ? @$_ : ( $_, $_ );
+      do { no strict 'refs'; %{"${base}::"} } or next;
+
+      Future::IO->try_load_impl( $impl ) and return 1;
+   }
+
+   # OK, maybe we can find a good impl for this particular OS
+   foreach my $impl ( @{ $IMPLS_FOR_OS{$^O} || [] } ) {
+      Future::IO->try_load_impl( $impl ) and return 1;
+   }
+
+   # Failing all of that, try the generic ones
+   foreach my $impl ( @IMPLS_GENERIC ) {
+      Future::IO->try_load_impl( $impl ) and return 1;
+   }
+
+   die "Unable to find a usable Future::IO::Impl subclass\n";
 }
 
 =head2 HAVE_MULTIPLE_FILEHANDLES
@@ -687,10 +776,16 @@ redo_select:
       my $wvec = '';
       vec( $wvec, $writers[0]->fh->fileno, 1 ) = 1 if @writers;
 
+      my $evec = $wvec;
+
       my $maxwait;
       $maxwait = $alarms[0]->time - time() if @alarms;
 
-      my $ret = select( $rvec, $wvec, undef, $maxwait );
+      my $ret = select( $rvec, $wvec, $evec, $maxwait );
+
+      # distribute evec to both r and w
+      $rvec |= $evec;
+      $wvec |= $evec;
 
       $rready = $ret && @readers && vec( $rvec, $readers[0]->fh->fileno, 1 );
       $wready = $ret && @writers && vec( $wvec, $writers[0]->fh->fileno, 1 );

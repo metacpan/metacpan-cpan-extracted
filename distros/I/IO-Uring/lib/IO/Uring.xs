@@ -11,7 +11,7 @@ typedef struct ring {
 	struct io_uring uring;
 } *IO__Uring;
 
-int uring_destroy(pTHX_ SV* sv, MAGIC* magic) {
+static int uring_destroy(pTHX_ SV* sv, MAGIC* magic) {
 	struct ring* self = (struct ring*)magic->mg_ptr;
 	io_uring_queue_exit(&self->uring);
 	safefree(self);
@@ -116,7 +116,7 @@ struct callback {
 	SV* callback;
 };
 
-void* S_set_callback(pTHX_ struct io_uring_sqe* sqe, SV* callback) {
+static void* S_set_callback(pTHX_ struct io_uring_sqe* sqe, SV* callback) {
 	struct callback* callback_data = safecalloc(1, sizeof(struct callback));
 	callback_data->callback = callback ? SvREFCNT_inc(callback) : NULL;
 	io_uring_sqe_set_data(sqe, callback_data);
@@ -209,11 +209,23 @@ BOOT:
 	CONSTANT(WCONTINUED);
 	CONSTANT(WNOWAIT);
 
-IO::Uring new(class, UV entries)
+IO::Uring new(class, UV entries, ...)
 CODE:
 	RETVAL = safecalloc(1, sizeof(struct ring));
 	struct io_uring_params params = {};
 	params.flags = IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_DEFER_TASKRUN | IORING_SETUP_SUBMIT_ALL;
+	for (int current = 2; current + 1 < items; items += 2) {
+		STRLEN key_length;
+		const char* key = SvPV(ST(current), key_length);
+		if (key_length == 11 && strEQ(key, "cqe_entries")) {
+			params.flags |= IORING_SETUP_CQSIZE;
+			params.cq_entries = SvIV(ST(current+1));
+		} else if (key_length == 6 && strEQ(key, "sqpoll")) {
+			params.flags |= IORING_SETUP_SQPOLL;
+			params.sq_thread_idle = SvIV(ST(current + 1));
+		} else
+			warn("Unknown named argument '%s'", key);
+	}
 	io_uring_queue_init_params(entries, &RETVAL->uring, &params);
 OUTPUT:
 	RETVAL
@@ -229,6 +241,8 @@ PPCODE:
 
 	unsigned head;
 
+	ENTER;
+	SAVETMPS;
 	EXTEND(SP, 2);
 	io_uring_for_each_cqe(&self->uring, head, cqe) {
 		struct callback* callback_data = (struct callback*)io_uring_cqe_get_data(cqe);
@@ -238,16 +252,23 @@ PPCODE:
 			mPUSHi(cqe->res);
 			mPUSHu(cqe->flags);
 			PUTBACK;
-			call_sv(callback_data->callback,  G_VOID | G_DISCARD);
+			call_sv(callback_data->callback,  G_VOID);
 			if (!(cqe->flags & IORING_CQE_F_MORE)) {
 				SvREFCNT_dec(callback_data->callback);
 				Safefree(callback_data);
 			}
-
 			SPAGAIN;
+			FREETMPS;
 		}
 		else if (!(cqe->flags & IORING_CQE_F_MORE))
 			Safefree(callback_data);
+	}
+	LEAVE;
+	if (result >= 0)
+		mPUSHi(result);
+	else {
+		errno = -result;
+		PUSHs(&PL_sv_undef);
 	}
 
 
@@ -267,6 +288,14 @@ CODE:
 OUTPUT:
 	RETVAL
 
+
+void ensure_sqes(IO::Uring ring, UV wanted)
+CODE:
+	unsigned space_left = io_uring_sq_space_left(&ring->uring);
+	if (space_left < wanted)
+		io_uring_submit(&ring->uring);
+
+
 UV accept(IO::Uring self, FileDescriptor fd, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
@@ -280,7 +309,7 @@ OUTPUT:
 UV bind(IO::Uring self, FileDescriptor fd, const char* sockaddr, size_t length(sockaddr), UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
-	io_uring_prep_bind(sqe, fd, (struct sockaddr*)sockaddr, STRLEN_length_of_sockaddr);
+	io_uring_prep_bind(sqe, fd, (struct sockaddr*)sockaddr, XSauto_length_of_sockaddr);
 	io_uring_sqe_set_flags(sqe, iflags);
 	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
@@ -301,7 +330,7 @@ OUTPUT:
 UV connect(IO::Uring self, FileDescriptor fd, const char* sockaddr, size_t length(sockaddr), UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
-	io_uring_prep_connect(sqe, fd, (struct sockaddr*)sockaddr, STRLEN_length_of_sockaddr);
+	io_uring_prep_connect(sqe, fd, (struct sockaddr*)sockaddr, XSauto_length_of_sockaddr);
 	io_uring_sqe_set_flags(sqe, iflags);
 	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
@@ -485,7 +514,7 @@ OUTPUT:
 UV read(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), UV offset, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
-	io_uring_prep_read(sqe, fd, buffer, STRLEN_length_of_buffer, offset);
+	io_uring_prep_read(sqe, fd, buffer, XSauto_length_of_buffer, offset);
 	io_uring_sqe_set_flags(sqe, iflags);
 	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
@@ -495,7 +524,7 @@ OUTPUT:
 UV recv(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV rflags, UV pflags, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
-	io_uring_prep_recv(sqe, fd, buffer, STRLEN_length_of_buffer, rflags);
+	io_uring_prep_recv(sqe, fd, buffer, XSauto_length_of_buffer, rflags);
 	io_uring_sqe_set_flags(sqe, iflags);
 	sqe->ioprio |= pflags;
 	RETVAL = PTR2UV(set_callback(sqe, callback));
@@ -526,7 +555,7 @@ OUTPUT:
 UV send(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV sflags, UV pflags, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
-	io_uring_prep_send(sqe, fd, buffer, STRLEN_length_of_buffer, sflags);
+	io_uring_prep_send(sqe, fd, buffer, XSauto_length_of_buffer, sflags);
 	io_uring_sqe_set_flags(sqe, iflags);
 	sqe->ioprio = pflags;
 	RETVAL = PTR2UV(set_callback(sqe, callback));
@@ -537,7 +566,7 @@ OUTPUT:
 UV sendto(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV sflags, const struct sockaddr* name, size_t length(name), UV pflags, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
-	io_uring_prep_sendto(sqe, fd, buffer, STRLEN_length_of_buffer, sflags, name, STRLEN_length_of_name);
+	io_uring_prep_sendto(sqe, fd, buffer, XSauto_length_of_buffer, sflags, name, XSauto_length_of_name);
 	io_uring_sqe_set_flags(sqe, iflags);
 	sqe->ioprio = pflags;
 	RETVAL = PTR2UV(set_callback(sqe, callback));
@@ -616,12 +645,13 @@ OUTPUT:
 	RETVAL
 
 
-UV timeout_update(IO::Uring self, Time::Spec ts, UV user_data, UV flags, UV iflags, SV* callback)
+UV timeout_update(IO::Uring self, Time::Spec ts, UV user_data, UV flags, UV iflags, SV* callback = undef)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_timeout_update(sqe, ts, user_data, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	RETVAL = PTR2UV(set_callback(sqe, callback));
+	void* cancel_data = set_callback(sqe, SvOK(callback) ? callback : NULL);
+	RETVAL = PTR2UV(cancel_data);
 OUTPUT:
 	RETVAL
 
@@ -659,7 +689,7 @@ OUTPUT:
 UV write(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), UV offset, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
-	io_uring_prep_write(sqe, fd, buffer, STRLEN_length_of_buffer, offset);
+	io_uring_prep_write(sqe, fd, buffer, XSauto_length_of_buffer, offset);
 	io_uring_sqe_set_flags(sqe, iflags);
 	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:

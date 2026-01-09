@@ -1,5 +1,8 @@
 Revision history for Schedule::Activity
 
+0.2.9 - 2026-01-08
+	- Per-node attributes
+
 0.2.8 - 2026-01-04
 	- Update to JSON::MaybeXS
 	- Goal attribute weights

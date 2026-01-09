@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::BiblioReader;
 #ABSTRACT: Lecture des notices biblio/autorité
-$Koha::Contrib::Sudoc::BiblioReader::VERSION = '2.48';
+$Koha::Contrib::Sudoc::BiblioReader::VERSION = '2.49';
 use Moose;
 use Moose::Util::TypeConstraints;
 use MARC::Moose::Record;
@@ -80,7 +80,7 @@ Koha::Contrib::Sudoc::BiblioReader - Lecture des notices biblio/autorité
 
 =head1 VERSION
 
-version 2.48
+version 2.49
 
 =head1 AUTHOR
 

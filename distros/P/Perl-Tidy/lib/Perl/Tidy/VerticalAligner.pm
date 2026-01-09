@@ -5,7 +5,7 @@ use Carp;
 
 { #<<< A non-indenting brace to contain all lexical variables
 
-our $VERSION = '20250912';
+our $VERSION = '20260109';
 use English qw( -no_match_vars );
 use Scalar::Util 'refaddr';    # perl 5.8.1 and later
 use Perl::Tidy::VerticalAligner::Alignment;
@@ -14,6 +14,7 @@ use Perl::Tidy::VerticalAligner::Line;
 use constant DEVEL_MODE   => 0;
 use constant EMPTY_STRING => q{};
 use constant SPACE        => q{ };
+use constant COMMA        => q{,};
 
 # The Perl::Tidy::VerticalAligner package collects output lines and
 # attempts to line up certain common tokens, such as => and #, which are
@@ -99,6 +100,12 @@ sub Die {
     croak "unexpected return from Perl::Tidy::Die";
 }
 
+sub Warn {
+    my ($msg) = @_;
+    Perl::Tidy::Warn($msg);
+    return;
+}
+
 sub Fault {
 
     my ($msg) = @_;
@@ -159,7 +166,8 @@ BEGIN {
       ralignments
     );
 
-    @valid_LINE_keys{@q} = (1) x scalar(@q);
+    $valid_LINE_keys{$_} = 1 for @q;
+
 } ## end BEGIN
 
 BEGIN {
@@ -234,6 +242,42 @@ my (
 
 );
 
+sub check_valign_list_items {
+    my ( $rlist, ( $option_name, $die_on_error ) ) = @_;
+
+    # Warn if obviously invalid token types or keywords occur in one of the
+    # --valign lists.  This is a crude check for valid token types and valid
+    # keywords.
+
+    # Given:
+    #   $rlist = ref to list of input items
+    #   $option_name = (optional) name of option for a warning message
+    # Return:
+    #   nothing if no errors, or
+    #   ref to list of unknown token types
+    return if ( !defined($rlist) );
+
+    my @unknown_items;
+    foreach my $item ( @{$rlist} ) {
+        next if ( Perl::Tidy::Tokenizer::is_valid_token_type($item) );
+        next if ( Perl::Tidy::Tokenizer::is_keyword($item) );
+        push @unknown_items, $item;
+    }
+    return if ( !@unknown_items );
+
+    if ($option_name) {
+        my $num = @unknown_items;
+        local $LIST_SEPARATOR = SPACE;
+        my $msg = <<EOM;
+$num unrecognized items input with $option_name :
+@unknown_items
+EOM
+        Die($msg) if ($die_on_error);
+        Warn($msg);
+    }
+    return \@unknown_items;
+} ## end sub check_valign_list_items
+
 sub check_options {
 
     my ($rOpts) = @_;
@@ -258,13 +302,15 @@ sub check_options {
         # The inclusion list is only relevant if there is an exclusion list
         if ( $rOpts->{'valign-inclusion-list'} ) {
             my @vil = split /\s+/, $rOpts->{'valign-inclusion-list'};
-            @valign_control_hash{@vil} = (1) x scalar(@vil);
+            check_valign_list_items( \@vil, 'valign-inclusion-list', 1 );
+            $valign_control_hash{$_} = 1 for @vil;
         }
 
         # Note that the -vxl list is done after -vil, so -vxl has priority
         # in the event of duplicate entries.
         my @vxl = split /\s+/, $rOpts->{'valign-exclusion-list'};
-        @valign_control_hash{@vxl} = (0) x scalar(@vxl);
+        check_valign_list_items( \@vxl, 'valign-exclusion-list', 1 );
+        $valign_control_hash{$_} = 0 for @vxl;
 
         # Optimization: revert to defaults if no exclusions.
         # This could happen with -vxl='  ' and any -vil list
@@ -527,39 +573,23 @@ my %is_closing_token;
 my %is_digit_char;
 my %is_plus_or_minus;
 my %is_if_or;
-my %is_assignment;
 my %is_comma_token;
+my %is_assignment;
 my %is_good_marginal_alignment;
 
 BEGIN {
 
-    my @q = qw< { ( [ >;
-    @is_opening_token{@q} = (1) x scalar(@q);
-
-    @q = qw< } ) ] >;
-    @is_closing_token{@q} = (1) x scalar(@q);
-
-    @q = qw( 0 1 2 3 4 5 6 7 8 9 );
-    @is_digit_char{@q} = (1) x scalar(@q);
-
-    @q = qw( + - );
-    @is_plus_or_minus{@q} = (1) x scalar(@q);
-
-    @q = qw( if unless or || );
-    @is_if_or{@q} = (1) x scalar(@q);
-
-    @q = qw( = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x= ^^= );
-    @is_assignment{@q} = (1) x scalar(@q);
-
-    @q = qw( => );
-    push @q, ',';
-    @is_comma_token{@q} = (1) x scalar(@q);
+    $is_opening_token{$_} = 1 for qw# { ( [ #;
+    $is_closing_token{$_} = 1 for qw# } ) ] #;
+    $is_digit_char{$_}    = 1 for qw# 0 1 2 3 4 5 6 7 8 9 #;
+    $is_plus_or_minus{$_} = 1 for qw# + - #;
+    $is_if_or{$_}         = 1 for qw# if unless or || #;
+    $is_comma_token{$_}   = 1 for ( '=>', COMMA );
+    $is_assignment{$_}    = 1
+      for qw# = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x= ^^= #;
 
     # We can be less restrictive in marginal cases at certain "good" alignments
-    @q = qw( { ? => = );
-    push @q, (',');
-    @is_good_marginal_alignment{@q} = (1) x scalar(@q);
-
+    $is_good_marginal_alignment{$_} = 1 for ( COMMA, qw# { ? => = # );
 }
 
 #--------------------------------------------
@@ -1415,8 +1445,7 @@ sub fix_terminal_else {
 my %is_closing_block_type;
 
 BEGIN {
-    my @q = qw< } ] >;
-    @is_closing_block_type{@q} = (1) x scalar(@q);
+    $is_closing_block_type{$_} = 1 for qw# } ] #;
 }
 
 # This is a flag for testing alignment by sub sweep_left_to_right only.
@@ -2275,6 +2304,7 @@ sub sweep_left_to_right {
     # So far we have divided the lines into groups having an equal number of
     # identical alignments.  Here we are going to look for common leading
     # alignments between the different groups and align them when possible.
+
     # For example, the three lines below are in three groups because each line
     # has a different number of commas.  In this routine we will sweep from
     # left to right, aligning the leading commas as we go, but stopping if we
@@ -2437,7 +2467,7 @@ sub sweep_left_to_right {
     #------------------------------
     # Step 3: Execute the task list
     #------------------------------
-    do_left_to_right_sweep(
+    tap_dancer(
         {
             rlines      => $rlines,
             rgroups     => $rgroups,
@@ -2450,7 +2480,7 @@ sub sweep_left_to_right {
     return;
 } ## end sub sweep_left_to_right
 
-{    ## closure for sub do_left_to_right_sweep
+{    ## closure for sub tap_dancer
 
     my %is_good_alignment_token;
 
@@ -2471,10 +2501,14 @@ sub sweep_left_to_right {
         # introduced (the hardwired $short_pad variable) . But for some 'good'
         # alignments we can be less restrictive.
 
-        # These are 'good' alignments, which are allowed more padding:
-        my @q = qw( => = ? if unless or || { );
-        push @q, ',';
-        @is_good_alignment_token{@q} = (0) x scalar(@q);
+        # The hash values are set so that:
+        #         if ($is_good_alignment_token{$raw_tok}) => best
+        # if defined ($is_good_alignment_token{$raw_tok}) => good or best
+
+        # Start by defining these 'good' alignments, which are allowed more
+        # padding (so note the '0' hash value here):
+        $is_good_alignment_token{$_} = 0
+          for ( COMMA, qw# => = ? if unless or || { # );
 
         # Promote a few of these to 'best', with essentially no pad limit:
         $is_good_alignment_token{'='}      = 1;
@@ -2482,17 +2516,13 @@ sub sweep_left_to_right {
         $is_good_alignment_token{'unless'} = 1;
         $is_good_alignment_token{'=>'}     = 1;
 
-        # Note the hash values are set so that:
-        #         if ($is_good_alignment_token{$raw_tok}) => best
-        # if defined ($is_good_alignment_token{$raw_tok}) => good or best
-
     } ## end BEGIN
 
     sub move_to_common_column {
 
         my ($rcall_hash) = @_;
 
-        # This is a sub called by sub do_left_to_right_sweep to
+        # This is a sub called by sub tap_dancer to
         # move the alignment column of token $itok to $col_want for a
         # sequence of groups.
 
@@ -2533,12 +2563,12 @@ sub sweep_left_to_right {
         return;
     } ## end sub move_to_common_column
 
-    sub do_left_to_right_sweep {
+    sub tap_dancer {
 
         my ($rcall_hash) = @_;
 
-        # This is the worker routine for sub 'sweep_left_to_right'. Make
-        # vertical alignments by sweeping from left to right over groups
+        # This is the worker routine for sub 'sweep_left_to_right'. It makes
+        # vertical alignments as it sweeps from left to right over groups
         # of lines which have been located and prepared by the caller.
 
         my $rlines      = $rcall_hash->{rlines};
@@ -2753,7 +2783,7 @@ sub sweep_left_to_right {
         } ## end loop over tasks
 
         return;
-    } ## end sub do_left_to_right_sweep
+    } ## end sub tap_dancer
 }
 
 sub delete_selected_tokens {
@@ -2794,8 +2824,7 @@ EOM
 
     # Convert deletion list to a hash to allow any order, multiple entries,
     # and avoid problems with index values out of range
-    my %delete_me;
-    @delete_me{ @{$ridel} } = (1) x scalar( @{$ridel} );
+    my %delete_me = map { $_ => 1 } @{$ridel};
 
     my $pattern_0      = $rpatterns_old->[0];
     my $field_0        = $rfields_old->[0];
@@ -3338,7 +3367,7 @@ sub delete_unmatched_tokens_main_loop {
                     # okay to delete second and higher copies of a token
 
                     # for a comma...
-                    if ( $raw_tok eq ',' ) {
+                    if ( $raw_tok eq COMMA ) {
 
                         # Do not delete commas before an equals
                         $delete_me = 0
@@ -3626,7 +3655,7 @@ sub compare_patterns {
     #   ( $a, $b ) = ( $b, $r );
     #   ( $x1, $x2 ) = ( $x2 - $q * $x1, $x1 );
     #   ( $y1, $y2 ) = ( $y2 - $q * $y1, $y1 );
-    if ( $alignment_token eq ',' ) {
+    if ( $alignment_token eq COMMA ) {
 
         # do not align commas unless they are in named
         # containers
@@ -3690,7 +3719,9 @@ sub compare_patterns {
         #  sub new { my ( $p, $v ) = @_; bless \$v, $p }
         #  sub iter { my ($x) = @_; return undef if $$x < 0; return $$x--; }
 
-        elsif ( ( index( $pat_m, ',' ) >= 0 ) ne ( index( $pat, ',' ) >= 0 ) ) {
+        elsif (
+            ( index( $pat_m, COMMA ) >= 0 ) ne ( index( $pat, COMMA ) >= 0 ) )
+        {
             $GoToMsg     = "mixed commas/no-commas before equals";
             $return_code = 1;
             if ( $lev eq $group_level ) {
@@ -3725,7 +3756,7 @@ sub fat_comma_to_comma {
     # count and commas do not.
 
     # For example, change '=>2+{-3.2' into ',2+{-3'
-    if ( $str =~ /^=>([^\.]*)/ ) { $str = ',' . $1 }
+    if ( $str =~ /^=>([^\.]*)/ ) { $str = COMMA . $1 }
     return $str;
 } ## end sub fat_comma_to_comma
 
@@ -4987,10 +5018,8 @@ BEGIN {
     # has changed things like 'print' to 'priNt' so that all 'n's are numbers.
     # The following patterns 'n' can match a signed number of interest.
     # Thus 'n'=a signed or unsigned number, 'b'=a space, '}'=one of ) ] }
-    my @q = ( 'n,', 'n,b', 'nb', 'nb}', 'nb},', 'n},', 'n};' );
-
-    @is_leading_sign_pattern{@q} = (1) x scalar(@q);
-
+    $is_leading_sign_pattern{$_} = 1
+      for ( 'n,', 'n,b', 'nb', 'nb}', 'nb},', 'n},', 'n};' );
 }
 
 sub min_max_median {
@@ -5491,8 +5520,8 @@ sub field_matches_end_pattern {
     my $field2_trim = EMPTY_STRING;
 
     # if pattern is one of: 'n,', 'n,b'
-    if ( $next_char eq ',' ) {
-        my $icomma = index( $field2, ',' );
+    if ( $next_char eq COMMA ) {
+        my $icomma = index( $field2, COMMA );
         if ( $icomma >= 0 ) {
             $field2_trim = substr( $field2, 0, $icomma );
         }

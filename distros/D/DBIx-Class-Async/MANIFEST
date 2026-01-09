@@ -38,6 +38,11 @@ t/23-cursor.t
 t/24-prefetch.t
 t/25-related-resultset.t
 t/26-slice.t
+t/27-async-populate.t
+t/28-find-or.t
+t/29-update-or.t
+t/30-delete-all.t
+t/31-search-related.t
 t/manifest.t
 t/pod.t
 t/test.db

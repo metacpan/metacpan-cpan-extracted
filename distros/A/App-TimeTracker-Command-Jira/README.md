@@ -4,7 +4,7 @@ App::TimeTracker::Command::Jira - App::TimeTracker Jira plugin
 
 # VERSION
 
-version 1.0
+version 1.1
 
 # DESCRIPTION
 
@@ -109,7 +109,7 @@ Michael Kröll <pepl@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2025 by Michael Kröll.
+This software is copyright (c) 2019-2026 by Michael Kröll.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

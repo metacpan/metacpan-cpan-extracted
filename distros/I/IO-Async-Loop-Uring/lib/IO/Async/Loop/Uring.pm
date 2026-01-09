@@ -1,5 +1,5 @@
 package IO::Async::Loop::Uring;
-$IO::Async::Loop::Uring::VERSION = '0.001';
+$IO::Async::Loop::Uring::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -8,7 +8,7 @@ use parent 'IO::Async::Loop';
 use Carp 'croak';
 use Scalar::Util 'weaken';
 use Errno 'ETIME';
-use IO::Uring 0.008 qw/IORING_POLL_UPDATE_EVENTS P_PID P_ALL WEXITED IOSQE_ASYNC
+use IO::Uring 0.009 qw/IORING_POLL_UPDATE_EVENTS P_PID P_ALL WEXITED IOSQE_ASYNC
                        IORING_TIMEOUT_ETIME_SUCCESS IORING_TIMEOUT_ABS IORING_TIMEOUT_BOOTTIME IORING_TIMEOUT_REALTIME/;
 use IO::Poll qw/POLLIN POLLOUT POLLHUP POLLERR POLLPRI/;
 use Linux::FD 0.015 qw/signalfd/;
@@ -17,7 +17,12 @@ use Signal::Info 'CLD_EXITED';
 use Time::Spec;
 
 use constant API_VERSION => '0.76';
-use constant _CAN_ON_HANGUP => !!0;
+use constant _CAN_ON_HANGUP => !!1;
+use constant _CAN_SUBSECOND_ACCURATELY => !!0; # supported but buggy in IO::Async's tests
+use constant _CAN_WATCH_ALL_PIDS => !!1;
+
+use constant _CAN_WATCHDOG => !!1;
+use constant WATCHDOG_ENABLE => IO::Async::Loop->WATCHDOG_ENABLE;
 
 sub new {
 	my ($class, %params) = @_;
@@ -29,18 +34,32 @@ sub new {
 
 sub loop_once {
 	my ($self, $timeout, %params) = @_;
-	my $id;
+	my $ret;
 	$self->pre_wait;
 	if (defined $timeout and $timeout != 0) {
 		$self->_adjust_timeout(\$timeout);
 		my $timespec = Time::Spec->new($timeout);
-		$self->{ring}->run_once(1, $timespec);
+		$ret = $self->{ring}->run_once(1, $timespec);
 	} else {
-		$self->{ring}->run_once(not defined $timeout);
+		$ret = $self->{ring}->run_once(not defined $timeout);
 	}
 	$self->post_wait;
-	$self->_manage_queues;
-	return;
+
+	return undef if !defined $ret and $! != ETIME;
+
+	if( WATCHDOG_ENABLE and !$self->{alarmed} ) {
+		alarm( IO::Async::Loop->WATCHDOG_INTERVAL );
+		$self->{alarmed}++;
+
+		$self->_manage_queues;
+
+		alarm(0);
+		undef $self->{alarmed};
+	} else {
+		$self->_manage_queues;
+	}
+
+	return 1;
 }
 
 sub is_running {
@@ -65,6 +84,8 @@ sub watch_io {
 	return if $mask == $curmask;
 	$self->{pollmask}{$fileno} = $mask;
 
+	my $alarmed = \$self->{alarmed};
+
 	my $this = $self;
 	weaken $this;
 
@@ -72,20 +93,30 @@ sub watch_io {
 		$self->{ring}->poll_update($id, undef, $mask | POLLHUP | POLLERR, IORING_POLL_UPDATE_EVENTS, 0);
 		return $id;
 	} else {
+		my $watch = $this->{iowatches}{$fileno};
+
 		my $id = $self->{ring}->poll_multishot($handle, $mask | POLLHUP | POLLERR, 0, sub {
 			my ($res, $flags) = @_;
-			return if $res < 0;
 
-			my $watch = $this->{iowatches}{$fileno};
+			if ($res > 0) {
+				if( WATCHDOG_ENABLE and !$$alarmed ) {
+					alarm( IO::Async::Loop->WATCHDOG_INTERVAL );
+					$$alarmed = 1;
+				}
 
-			if ($res & (POLLIN|POLLHUP|POLLERR)) {
-				$watch->[1]->($res) if defined $watch->[1];
-			}
-			if ($res & (POLLOUT|POLLPRI|POLLHUP|POLLERR)) {
-				$watch->[2]->() if defined $watch->[2];
-			}
-			if ($res & (POLLHUP|POLLERR)) {
-				$watch->[3]->() if defined $watch->[3];
+				if ($res & (POLLIN|POLLHUP|POLLERR)) {
+					$watch->[1]->() if defined $watch->[1];
+				}
+				if ($res & (POLLOUT|POLLPRI|POLLHUP|POLLERR)) {
+					$watch->[2]->() if defined $watch->[2];
+				}
+				if ($res & (POLLHUP|POLLERR)) {
+					$watch->[3]->() if defined $watch->[3];
+				}
+			} elsif ($flags == 0 && $this->{iowatches}{$fileno} && $this->{iowatches}{$fileno} == $watch) {
+				delete $this->{pollmask}{$fileno};
+				delete $this->{poll_id}{$fileno};
+				delete $this->{iowatches}{$fileno};
 			}
 		});
 		$self->{poll_id}{$fileno} = $id;
@@ -109,13 +140,13 @@ sub unwatch_io {
 	$mask &= ~POLLHUP if $params{on_hangup};
 
 	return if $mask == $curmask;
-	$self->{pollmask}{$fileno} = $mask;
 
 	if ($mask == 0) {
 		$self->{ring}->poll_remove($id, 0);
 		delete $self->{pollmask}{$fileno};
 		delete $self->{poll_id}{$fileno};
 	} else {
+		$self->{pollmask}{$fileno} = $mask;
 		$self->{ring}->poll_update($id, undef, $mask | POLLHUP | POLLERR, 0, IORING_POLL_UPDATE_EVENTS);
 	}
 }
@@ -244,7 +275,7 @@ IO::Async::Loop::Uring - Use IO::Async with IO::Uring
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

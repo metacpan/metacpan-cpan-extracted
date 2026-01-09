@@ -1,22 +1,19 @@
-"Schedule::Activity" Version 0.2.8
+"Schedule::Activity" Version 0.2.9
 
 Abstract:
 ---------
 This package provides a mechanism to construct "random" schedules of events using a graph-based configuration of activities and actions, together with event message randomization, attribute tracking and reporting, and secondary event notes.
 
-What's new in version 0.2.8:
+What's new in version 0.2.9:
 ----------------------------
-* Script incremental build supports configuration overwrite
-* Goal attribute weights
-* Switch to JSON::MaybeXS
-* Fix safety check for unreachable-finish
+* Per-node attributes
 
 What's new in recent versions:
 ------------------------------
 * Incremental schedule construction
-* Per-activity scheduling goals
 * Attribute report formatting tools
-* NodeFilter supports average values, modulus
+* Goals:  per-activity, weights
+* Improved safety checks
 
 Copyright & License:
 --------------------

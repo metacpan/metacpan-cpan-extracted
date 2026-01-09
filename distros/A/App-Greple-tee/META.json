@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.25",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,9 @@
             "App::Greple" : "9.22",
             "App::Greple::L" : "1.01",
             "App::sdif" : "4.35",
-            "perl" : "v5.18.2"
+            "Getopt::EX" : "v2.2.1",
+            "Getopt::EX::Config" : "0",
+            "perl" : "v5.24.0"
          }
       },
       "test" : {
@@ -58,7 +60,7 @@
    "provides" : {
       "App::Greple::tee" : {
          "file" : "lib/App/Greple/tee.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -73,7 +75,7 @@
          "web" : "https://github.com/kaz-utashiro/App-Greple-tee"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

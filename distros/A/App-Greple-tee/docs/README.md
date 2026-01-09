@@ -1,15 +1,5 @@
 ## Languages
 
-- [tee.DE.md](tee.DE.md)
-- [tee.EL.md](tee.EL.md)
-- [tee.ET.md](tee.ET.md)
-- [tee.FR.md](tee.FR.md)
-- [tee.ID.md](tee.ID.md)
-- [tee.JA.md](tee.JA.md)
-- [tee.KO.md](tee.KO.md)
-- [tee.NL.md](tee.NL.md)
-- [tee.RO.md](tee.RO.md)
-- [tee.RU.md](tee.RU.md)
-- [tee.TR.md](tee.TR.md)
-- [tee.UK.md](tee.UK.md)
-- [tee.ZH.md](tee.ZH.md)
+- [tee.gpt5-JA.md](tee.gpt5-JA.md)
+- [tee.gpt5-KO.md](tee.gpt5-KO.md)
+- [tee.gpt5-ZH.md](tee.gpt5-ZH.md)

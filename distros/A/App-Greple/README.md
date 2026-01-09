@@ -5,7 +5,7 @@ greple - extensible grep with lexical expression and region control
 
 # VERSION
 
-Version 10.01
+Version 10.02
 
 # SYNOPSIS
 
@@ -390,9 +390,10 @@ For example, if you want to search repeated characters, use
 `(\w)\g{-1}` or `(?<c>\w)\g{c}` rather than
 `(\w)\1`.
 
-Extended Bracketed Character Classes (`(?[...])`) can be used without
-warnings.  See ["Extended Bracketed Character
-Classes" in perlrecharclass](https://metacpan.org/pod/perlrecharclass#Extended-Bracketed-Character-Classes).
+Extended Bracketed Character Classes (`(?[...])`) and Variable Length
+Lookbehind can be used without warnings.  See
+["Extended Bracketed Character Classes" in perlrecharclass](https://metacpan.org/pod/perlrecharclass#Extended-Bracketed-Character-Classes) and
+["(?<=pattern)" in perlre](https://metacpan.org/pod/perlre#pattern).
 
 - **-e** _pattern_, **--and**=_pattern_
 
@@ -521,9 +522,10 @@ If you don't want these conversion, use `-E` (or `--re`) option.
     the pattern does not contain any capturing groups, it matches the
     entire pattern.
 
-    If `G` is specified in the **--colorindex** option, a corresponding
-    capture group number is assigned as an index (0 for entire match).
-    This will cause the strings corresponding to each capture group to be
+    If `G` is specified in the **--colorindex** option, a sequential
+    index starting from 0 is assigned to each capture group across all
+    patterns.  Patterns without capture groups count as one group.  This
+    will cause the strings corresponding to each capture group to be
     displayed in a different color.
 
 - **-S**, **--stretch**
@@ -1971,7 +1973,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 1991-2025 Kazumasa Utashiro
+Copyright 1991-2026 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

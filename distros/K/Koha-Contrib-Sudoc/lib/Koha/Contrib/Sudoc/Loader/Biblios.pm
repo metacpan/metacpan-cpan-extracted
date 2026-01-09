@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Loader::Biblios;
 # ABSTRACT: Chargeur de notices biblio
-$Koha::Contrib::Sudoc::Loader::Biblios::VERSION = '2.48';
+$Koha::Contrib::Sudoc::Loader::Biblios::VERSION = '2.49';
 use Moose;
 
 extends 'Koha::Contrib::Sudoc::Loader';
@@ -161,7 +161,7 @@ Koha::Contrib::Sudoc::Loader::Biblios - Chargeur de notices biblio
 
 =head1 VERSION
 
-version 2.48
+version 2.49
 
 =head1 AUTHOR
 

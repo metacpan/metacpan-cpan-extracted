@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::Impl::UV 0.05;
+package Future::IO::Impl::UV 0.06;
 
 use v5.20;
 use warnings;
@@ -21,8 +21,8 @@ use POSIX ();
 
 BEGIN {
    if( $^V ge v5.36 ) {
-      no if $^V ge v5.36, warnings => 'experimental::builtin';
       builtin->import(qw( refaddr ));
+      warnings->unimport(qw( experimental::builtin )) if $^V lt v5.40;
    }
    else {
       require Scalar::Util;
@@ -102,6 +102,8 @@ sub _update_poll ( $fh )
    else {
       $poll->stop;
       delete $poll_by_refaddr{$refaddr};
+      delete $read_futures_by_refaddr{$refaddr};
+      delete $write_futures_by_refaddr{$refaddr};
    }
 }
 

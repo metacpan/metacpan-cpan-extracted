@@ -1,187 +1,18 @@
 #!/home/chrisarg/perl5/perlbrew/perls/current/bin/perl
 package Bit::Set::DB::OO;
-$Bit::Set::DB::OO::VERSION = '0.11';
+$Bit::Set::DB::OO::VERSION = '0.12';
 use strict;
 use warnings;
 
-use Alien::Bit;
-use Bit::Set::DB qw( :all );
-use Bit::Set::OO;
-use FFI::Platypus;
-
-###############################################################################
-# Code for the OO interface
-# The functions in the OO interface are named identically to the procedural one
-# sans the prefix "BitDB_"
-
-# Creation and Destruction
-
-package Bit::Set::DB {
-$Bit::Set::DB::VERSION = '0.11';
-sub new {
-        my ( $class, $length, $num_of_bitsets ) = @_;
-        my $self = BitDB_new( $length, $num_of_bitsets );
-        return bless \$self, $class;
-    }
-
-    sub DESTROY {
-        my ($self) = @_;
-        BitDB_free($self);
-    }
-
-    sub load {
-        my ( $class, $length, $num_of_bitsets, $buffer ) = @_;
-        my $self = BitDB_load( $length, $num_of_bitsets, $buffer );
-        return bless \$self, $class;
-    }
-
-    # Properties
-
-    sub length {
-        my ($self) = @_;
-        return BitDB_length($$self);
-    }
-
-    sub nelem {
-        my ($self) = @_;
-        return BitDB_nelem($$self);
-    }
-
-    sub count_at {
-        my ( $self, $index ) = @_;
-        return BitDB_count_at( $$self, $index );
-    }
-
-    sub count {
-        my ($self) = @_;
-        return BitDB_count($$self);
-    }
-
-    # Manipulation
-    sub get_from {
-        my ( $self, $index ) = @_;
-        my $bit = BitDB_get_from( $$self, $index );
-        return bless( \$bit, 'Bit::Set' );
-    }
-
-    sub put_at {
-        my ( $self, $index, $bitset ) = @_;
-        BitDB_put_at( $$self, $index, $$bitset );
-    }
-
-    sub extract_from {
-        my ( $self, $index, $buffer ) = @_;
-        return BitDB_extract_from( $$self, $index, $buffer );
-    }
-
-    sub replace_at {
-        my ( $self, $index, $buffer ) = @_;
-        BitDB_replace_at( $$self, $index, $buffer );
-    }
-
-    sub clear {
-        my ($self) = @_;
-        BitDB_clear($$self);
-    }
-
-    sub clear_at {
-        my ( $self, $index ) = @_;
-        BitDB_clear_at( $$self, $index );
-    }
-
-    # SETOP Count Store CPU
-
-    sub inter_count_store_cpu {
-        my ( $self, $other, $buffer, $opts ) = @_;
-        return BitDB_inter_count_store_cpu( $$self, $$other, $buffer, $opts );
-    }
-
-    sub union_count_store_cpu {
-        my ( $self, $other, $buffer, $opts ) = @_;
-        return BitDB_union_count_store_cpu( $$self, $$other, $buffer, $opts );
-    }
-
-    sub diff_count_store_cpu {
-        my ( $self, $other, $buffer, $opts ) = @_;
-        return BitDB_diff_count_store_cpu( $$self, $$other, $buffer, $opts );
-    }
-
-    sub minus_count_store_cpu {
-        my ( $self, $other, $buffer, $opts ) = @_;
-        return BitDB_minus_count_store_cpu( $$self, $$other, $buffer, $opts );
-    }
-
-    # SETOP Count Store GPU
-
-    sub inter_count_store_gpu {
-        my ( $self, $other, $buffer, $opts ) = @_;
-        return BitDB_inter_count_store_gpu( $$self, $$other, $buffer, $opts );
-    }
-
-    sub union_count_store_gpu {
-        my ( $self, $other, $buffer, $opts ) = @_;
-        return BitDB_union_count_store_gpu( $$self, $$other, $buffer, $opts );
-    }
-
-    sub diff_count_store_gpu {
-        my ( $self, $other, $buffer, $opts ) = @_;
-        return BitDB_diff_count_store_gpu( $$self, $$other, $buffer, $opts );
-    }
-
-    sub minus_count_store_gpu {
-        my ( $self, $other, $buffer, $opts ) = @_;
-        return BitDB_minus_count_store_gpu( $$self, $$other, $buffer, $opts );
-    }
-
-    # SETOP Count CPU
-
-    sub inter_count_cpu {
-        my ( $self, $other, $opts ) = @_;
-        return BitDB_inter_count_cpu( $$self, $$other, $opts );
-    }
-
-    sub union_count_cpu {
-        my ( $self, $other, $opts ) = @_;
-        return BitDB_union_count_cpu( $$self, $$other, $opts );
-    }
-
-    sub diff_count_cpu {
-        my ( $self, $other, $opts ) = @_;
-        return BitDB_diff_count_cpu( $$self, $$other, $opts );
-    }
-
-    sub minus_count_cpu {
-        my ( $self, $other, $opts ) = @_;
-        return BitDB_minus_count_cpu( $$self, $$other, $opts );
-    }
-
-    # SETOP Count GPU
-
-    sub inter_count_gpu {
-        my ( $self, $other, $opts ) = @_;
-        return BitDB_inter_count_gpu( $$self, $$other, $opts );
-    }
-
-    sub union_count_gpu {
-        my ( $self, $other, $opts ) = @_;
-        return BitDB_union_count_gpu( $$self, $$other, $opts );
-    }
-
-    sub diff_count_gpu {
-        my ( $self, $other, $opts ) = @_;
-        return BitDB_diff_count_gpu( $$self, $$other, $opts );
-    }
-
-    sub minus_count_gpu {
-        my ( $self, $other, $opts ) = @_;
-        return BitDB_minus_count_gpu( $$self, $$other, $opts );
-    }
-}
+XSLoader::load('Bit::Set::DB');
+# Load the XS-based SETOP_COUNT_OPTS class
+use Bit::Set::DB::SETOP_COUNT_OPTS;
 
 1;
 
-
 __END__
+
+
 
 =head1 NAME
 
@@ -190,7 +21,7 @@ from the C<Bit> C library
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -220,9 +51,8 @@ multithreadedand hardware accelerated (e.g. GPU) versions of container
 operations e.g. forming the population count of the intersection of two 
 containers of bitsets.
 
-As currently implemented the OO interfaces are currently layered on top of the 
-procedural API, and thus incur some overhead compared to direct calls to the 
-procedural API.
+This is a pure OO interface using Perl's XS mechanism to interface with the
+C<Bit> library.
 
 
 
@@ -321,13 +151,13 @@ Perform the respective set operation count on the CPU:
 
 =over 5
 
-=item B<$container-E<gt>inter_count_cpu(container2, opts)>
+=item B<$container-E<gt>inter_count_cpu(container2, opts,...)>
 
-=item B<$container-E<gt>union_count_cpu(container2, opts)>
+=item B<$container-E<gt>union_count_cpu(container2, opts,...)>
 
-=item B<$container-E<gt>diff_count_cpu(container2, opts)>
+=item B<$container-E<gt>diff_count_cpu(container2, opts,...)>
 
-=item B<$container-E<gt>minus_count_cpu(container2, opts)>
+=item B<$container-E<gt>minus_count_cpu(container2, opts,...)>
 
 =back
 
@@ -335,17 +165,26 @@ Perform the respective set operation count on the GPU:
 
 =over 5
 
-=item B<$container-E<gt>inter_count_gpu(container2, opts)>
+=item B<$container-E<gt>inter_count_gpu(container2, opts,...)>
 
-=item B<$container-E<gt>union_count_gpu(container2, opts)>
+=item B<$container-E<gt>union_count_gpu(container2, opts,...)>
 
-=item B<$container-E<gt>diff_count_gpu(container2, opts)>   
+=item B<$container-E<gt>diff_count_gpu(container2, opts,...)>   
 
-=item B<$container-E<gt>minus_count_gpu(container2, opts)>
+=item B<$container-E<gt>minus_count_gpu(container2, opts,...)>
 
 =back
 
-Perform the respective set operation count on the CPU and store results in C<buffer>:
+
+The optional C<...> argument is used to determine the type of the returned counts buffer:
+
+=over 6
+
+=item If omitted,undef or zero the function returns a reference to an array of integers containing the counts.
+
+=item If the optional parameter argument value is set to the integer 1, the function will return a pointer to a buffer containing the counts as an array of integers. 
+
+This pointer can be used with the C<Task::MemManager> module to provide a memory leak-free way to manage its lifetime.
 
 =over 5
 
@@ -419,15 +258,17 @@ them to C<Bit::Set::DB> containers using the OO interface.
 
     # Create BitDB containers
     my $db1 = Bit::Set::DB->new( $size, $num_of_bits );
-    my $db2 = Bit::Set::DB->new( $size, $num_of_ref_bits );
+    my $DB = Bit::Set::DB->new( $size, $num_of_ref_bits );
 
     # Now put the bitsets into the containers
     for my $i ( 0 .. $num_of_bits - 1 ) {
         $db1->put_at( $i, $bits[$i] );
     }
     for my $i ( 0 .. $num_of_ref_bits - 1 ) {
-        $db2->put_at( $i, $bitsets[$i] );
+        $DB->put_at( $i, $bitsets[$i] );
     }
+    
+    say $_ for do{my $x = $db1->count; $x->@*};
 
 =item Example 2: Obtaining the counts of bitset operations using containers and OO
 
@@ -436,10 +277,6 @@ different ways: 1) iterating over the Perl arrays of bitsets and 2) using the
 BitDB containers directly. A major benefit of these containerized operations
 is that they can leverage multi-threading in the CPU and hardware acceleration
 in GPUs (and TPUs in the near future).
-When we use the interface over containers, we will need to interface the integer
-array returned by the C<Bit::Set::DB> interface function to Perl arrays.
-This is one possible way of doing so using the C<FFI::Platypus::Buffer> and
-C<FFI::Platypus::Buffer> modules. 
 
     use Test::More;
     use FFI::Platypus::Buffer;
@@ -456,7 +293,7 @@ C<FFI::Platypus::Buffer> modules.
         release_2nd_operand => 0,
         release_counts      => 0
     );
-    my $nelem = $db1->nelem() * $db2->nelem();
+    my $nelem = $db1->nelem() * $DB->nelem();
 
     # Method 1: Using Perl arrays of Bit::Set
     my @cpu_set_counts;
@@ -468,14 +305,10 @@ C<FFI::Platypus::Buffer> modules.
     }
 
     # Method 2: Using Bit::Set::DB containers
-    my $cpu_DB_counts_ptr = $db1->inter_count_cpu( $db2, $opts );
-
-    my $scalar = buffer_to_scalar $cpu_DB_counts_ptr, $nelem*$Config{intsize};
-    my  @cpu_DB_counts = unpack( "i[$nelem]", $scalar );
-    free $cpu_DB_counts_ptr;
+    my $cpu_DB_counts_ptr = $db1->inter_count_cpu( $DB, $opts );
     my $test_result = 1;
     for my $k ( 0 .. $nelem - 1 ) {
-        if ( $cpu_DB_counts[$k] != $cpu_set_counts[$k] ) {
+        if ( $cpu_DB_counts_ptr->[$k] != $cpu_set_counts[$k] ) {
             $test_result = 0;
             last;
         }
@@ -553,8 +386,8 @@ Christos Argyropoulos with asistance from Github Copilot (Claude Sonnet 4) up to
 
 =head1 COPYRIGHT AND LICENSE
 
-This software up to and including v0.10 is copyright (c) 2025 Christos Argyropoulos.
 For versions after v0.10, the distribution as a whole is copyright (c) 2025 Joe Schaefer and Christos Argyropoulos.
+This software up to and including v0.10 is copyright (c) 2025 Christos Argyropoulos.
 
 This software is released under the L<MIT license|https://mit-license.org/>.
 

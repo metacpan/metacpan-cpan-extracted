@@ -43,7 +43,7 @@
             "SPVM::File::Temp" : "0.026",
             "SPVM::FindBin" : "0.035",
             "SPVM::Getopt::Long" : "0.003",
-            "SPVM::Go" : "0.014",
+            "SPVM::Go" : "0.016",
             "SPVM::IO" : "0.243",
             "SPVM::IO::Socket::SSL" : "0.014",
             "SPVM::JSON" : "1.003",
@@ -69,6 +69,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Mojolicious"
       }
    },
-   "version" : "0.040",
+   "version" : "0.041",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

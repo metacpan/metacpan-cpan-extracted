@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw/:severities :classification/;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.0.5';
+our $VERSION = '0.0.6';
 
 Readonly::Scalar my $DESC  => q{Do not use inline do-blocks};
 Readonly::Scalar my $EXPL  => undef; # [ ];
@@ -69,7 +69,7 @@ Functions permit code reuse, isolate scope, and reduce complexity.
 
 	my $handler //= do { ... };         # no
 	my $handler //= build_handler(...); # ok
-	
+
 	my $value = 1 + do {...} + do {...}; # no
 	my $value = 1 + f(...) + g(...);     # ok
 

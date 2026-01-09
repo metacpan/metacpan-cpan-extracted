@@ -1,6 +1,6 @@
 #!/home/chrisarg/perl5/perlbrew/perls/current/bin/perl
 package Bit::Set::OO;
-$Bit::Set::OO::VERSION = '0.11';
+$Bit::Set::OO::VERSION = '0.12';
 use XSLoader ();
 XSLoader::load("Bit::Set");
 
@@ -14,7 +14,7 @@ Bit::Set::OO - Perl Object Oriented (OO) interface to the 'bit' C library
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -44,7 +44,7 @@ Up to version 0.10, the OO interfaces were layered on top of the
 procedural API, and thus incured some overhead compared to direct calls to the
 procedural API.
 
-After version 0.11, the OO interface is implemented directly in XS  (code contributed by Joe Schaefer), thus avoiding the overhead of the procedural layer.
+After version 0.11, the OO interface is implemented directly in XS (initial code was kindly contributed by Joe Schaefer), thus avoiding the overhead of the procedural layer.
 
 =head1 Methods
 
@@ -217,9 +217,9 @@ bits into a bitset.
   use Bit::Set::OO;    ## OO interface to Bit C library
 
   my $bitset = Bit::Set->new(64);
-  $bitset->set(1);
-  $bitset->set(3);
-  $bitset->set(5);
+  $bitset->bset(1);
+  $bitset->bset(3);
+  $bitset->bset(5);
 
   print "Bit 1 is ", $bitset->get(1) ? "set" : "not set", "\n";
   print "Bit 2 is ", $bitset->get(2) ? "set" : "not set", "\n";
@@ -239,13 +239,13 @@ less than equal to.
   my $set1 = Bit::Set->new(64);
   my $set2 = Bit::Set->new(64);
 
-  $set1->set(1);
-  $set1->set(3);
-  $set1->set(5);
+  $set1->bset(1);
+  $set1->bset(3);
+  $set1->bset(5);
 
-  $set2->set(1);
-  $set2->set(3);
-  $set2->set(5);
+  $set2->bset(1);
+  $set2->bset(3);
+  $set2->bset(5);
 
   if ( $set1->eq($set2) ) {
       print "The two bitsets are equal\n";

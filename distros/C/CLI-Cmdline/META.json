@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "configure" : {
@@ -34,22 +34,30 @@
          "requires" : {
             "perl" : "5.010"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
       }
    },
    "provides" : {
       "CLI::Cmdline" : {
          "file" : "lib/CLI/Cmdline.pm",
-         "version" : "1.20"
+         "version" : "1.22"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/HansH111/CLI-Cmdline.pm/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/HansH111/CLI-Cmdline.pm.git",
          "web" : "https://github.com/HansH111/CLI-Cmdline.pm"
       }
    },
-   "version" : "1.20",
+   "version" : "1.22",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,0 +1,367 @@
+# NAME
+
+Net::API::Nominatim - Perl client for local or public OpenStreetMap Nominatim Geocoding service. Open source, unrestricted and free.
+
+# VERSION
+
+Version 0.03
+
+# !NOMINATIM!
+
+[Nominatim](https://nominatim.org/)
+uses [OpenStreetMap](https://www.openstreetmap.org)
+data to find coordinates for locations on Earth by name and
+address (geocoding). It can also do the reverse, find an address
+for any location on the planet, given coordinates.
+
+Nominatim provides a public, free and un-restricted service,
+subject to fair usage, at [https://nominatim.openstreetmap.org/ui/search.html](https://nominatim.openstreetmap.org/ui/search.html)
+for all of your geocoding needs.
+
+Most importantly, a Nominatim server can be easily
+installed locally if you intend to geocode heavily
+or you do not have network access. Nominatim uses open source
+geocoding data  provided by [OpenStreetMap](https://www.openstreetmap.org).
+When you install Nominatim locally, you also install this geocoding data
+locally. The data is broken into different geographical locations so you
+can geocode for just your district, your country,
+your continent or the whole planet
+without relying on the closely guarded and
+prohibitevely copyrighted (really?) data
+provided by the usual big Capitalist players.
+
+If you decided to install Nominatim locally for your own geocoding needs
+it is also worth installing a Map Tile Server in order to
+provide your own open source maps!
+All the data open source, courtesy of [OpenStreetMap](https://www.openstreetmap.org).
+Have a look at the guide at [switch2osm.org](https://metacpan.org/pod/%7Chttps%3A#switch2osm.org-serving-tiles) for how
+to completely break free and never again have to rely on the usual
+big Capitalist players.
+
+For local installations, Nominatim can be accessed via a UNIX socket.
+This should be the fastest method to geocode locally.
+Unless you have implemented intermediate caching. Alternatively,
+for local or public Nominatim service, you can make a simple
+HTTP/GET query.
+
+This module offers both local UNIX socket and
+HTTP/GET queries.
+
+Remember, Capitalism is changing really fast, to the uglier,
+to the hungrier, to the scummier,
+by the day.
+Right now it is very hungry. It will become even more so.
+It is not a matter of "immoral", "stupid", "greedy"
+leaders "running" (yeah! right) the show, it is a matter
+of processes. The processes will continue irrespective of leaders.
+To the End.
+
+As a matter of life or death, break away from Capitalism NOW.
+
+# SYNOPSIS
+
+The current module provides functionality to query a Nominatim
+server, either via a local UNIX socket, if Nominatim is installed
+locally, or via HTTP/GET requests if you rely on the public Nominatim
+service. The [Nominatim API](https://nominatim.org/release-docs/develop/api/Overview)
+is extensive. But the current module covers only basic forward and reverse
+geocoding queries only with `/search`, `/reverse` and `/status`.
+
+Example usage:
+
+    use Net::API::Nominatim;
+
+    my $cparams = {
+        'server' => {
+            'url' => 'https://nominatim.openstreetmap.org',
+        },
+        # optional debug
+        'debug' => {
+            'verbosity' => 666,
+        },
+        # optional logger
+        'log' => {
+            'logger-file' => Mojo::Log->new,
+        }
+    };
+
+    my $client = Net::API::Nominatim->new($cparams);
+    my $addresses = $client->search({
+      q => 'Leika',
+    });
+    # we now have an ARRAY_REF of
+    # Net::API::Nominatim::Model::Address objects back
+    # these objects contain many useful things including
+    # proper address, coordinates and bounding box!
+    # Thank you OpenStreetMap!
+    print $_->toString()."\n" for @$addresses;
+
+    # or just get the JSON string back
+    my $jsonresponse = $client->search({
+      q => 'Leika',
+      'want-json' => 1,
+    });
+
+    # You can be more specific with a structured query
+    my $addresses = $client->search({
+      street => 'Leika',
+      city => 'Honolulu',
+      # county, country, etc.
+    });
+    # a structured query allows you to search for amenities
+    my $addresses = $client->search({
+      amenity => 'restaurant',
+      city => 'Honolulu',
+      # county, country, etc.
+    });
+
+    # Reverse geo-coding: from coordinates to address
+    my $address = $client->reverse({
+      lon => '15.014879', # quote them, you never know with floats ...
+      lat => '38.022967',
+    });
+    # it returns a single Net::API::Nominatim::Model::Address object
+    print $address->toString()."\n";
+
+    # server status
+    print "alive!\n" if $client->status();
+
+# METHODS
+
+## `new()`
+
+The constructor.
+
+The full list of arguments, provided as a hashref, is as follows:
+
+- `server` : a HASH\_REF with one of these keys:
+    - `url` : specify the Nominatim server URL, for example the public service is located at [https://nominatim.openstreetmap.org/ui/search.html](https://nominatim.openstreetmap.org/ui/search.html).
+    - `unix-socket` : alternatively, if you have installed Nominatim locally, you may want to
+    query it directly via its UNIX socket. This should then be the fullpath to the local UNIX socket
+    (which must have the appropriate permissions for the current user).
+- `log` : a HASH\_REF with one of these keys:
+    - `logger-file` : a filename to log into, or,
+    - `logger-object` : an already existing logger object which implements methods `info(string)`, `warn(string)` and `error(string)`.
+- `lwpuseragent` : only applicable if doing HTTP queries (and not UNIX socket).
+This is HASH\_REF with some of these keys:
+    - `cookies-object` : specify a cookies object for loading and saving session cookies, optional and most likely unused,
+    - `lwpuseragent-object` : specify an already existing [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) object to use.
+    **WARNING**: this object will have its UserAgent String altered to comply with Nominatim's
+    usage policy which states it must be a string to identify the client. So, this will be
+    our client's UserAgent String. If you intend to use the specified [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) object
+    then save its agent string (`my $oldstr = $ua->agent;`) and reload it later
+    (`$ua->agent($oldstr);`).
+    - `useragent-string` : DO NOT SPECIFY your own UserAgent String PLEASE. There is
+    already a default for this which identifies this current client uniquely. So, you do
+    not need to set this. But if you wish to do so, then nobody stops you.
+
+The constructor will return `undef` on failure (but will not die).
+
+### Caveat
+
+The user-specified `HASH_REF` of parameters into the constructor **will be modified**.
+Some fields will be added and some fields will be deleted. It would be ideal
+if it was cloned but since it can contain OBJECT references I find it difficult
+to tell [Clone](https://metacpan.org/pod/Clone) or [Storable](https://metacpan.org/pod/Storable) to skip cloning objects.
+
+## `search()`
+
+It does free-form or structured address search.
+The full list of arguments, provided as a hashref, is as follows:
+
+- The search can be free-form or structured. In case of
+free-form search you need to specify only `q` as a free-form address string.
+In case of a structured search you must NOT specify `q` at all but specify some
+of the other fields as specified below.
+Note that all strings will be url-encoded internally, taking into
+account if are unicode'd, do not url-encode them yourself.
+    - `q` : a free-form address string. It will be url-encoded when
+    making the query so do not encode it yourself.
+    - alternatively use some of these for a structured search: `amenity`, `street`, `city`, `county`, `state`, `country`, `postalcode`.
+    See the structured search [API](https://nominatim.org/release-docs/develop/api/Search/#structured-query)
+    for more details.
+- `want-json` : optionally, specify whether you want to have the
+raw server response back as a JSON string. This will save some time
+decoding the JSON into [Net::API::Nominatim::Model::Address](https://metacpan.org/pod/Net%3A%3AAPI%3A%3ANominatim%3A%3AModel%3A%3AAddress) objects.
+- `query-params` : optionally specify extra query params to your search as
+a `HASH_REF`. See the Nominatim Search [API](https://nominatim.org/release-docs/develop/api/Search/)
+for what these parameters can be. By default, you do not need to specify any of these extra
+parameters.
+
+It returns `undef` on communication failure.
+
+It returns back an `ARRAY_REF` of zero, one or more [Net::API::Nominatim::Model::Address](https://metacpan.org/pod/Net%3A%3AAPI%3A%3ANominatim%3A%3AModel%3A%3AAddress)
+objects on success. Unless the option `want-json` was set to `1`, in which case
+the return will be a JSON (array-of-hashes) string of results.
+
+### Warning
+
+Do not mix free-form query parameter (`q`) with structured query
+parameters (e.g. `street`, `country`, etc.).
+
+A structured query can return many results depending on how specific
+it is. For example, if you specify only `amenity=restaurant` there can
+be hundreds of results but the public Nominatim service has a default
+limit of returning only 10 results with a hard-limit of 40.
+
+## `reverse()`
+
+It does a reverse geocoding search. That is, it returns
+an address when coordinates are specified.
+
+The full list of arguments, provided as a hashref, is as follows:
+
+- `lat` : latitude
+- `lon` : longitude
+- `want-json` : optionally, specify whether you want to have the
+raw server response back as a JSON string. This will save some time
+decoding the JSON into [Net::API::Nominatim::Model::Address](https://metacpan.org/pod/Net%3A%3AAPI%3A%3ANominatim%3A%3AModel%3A%3AAddress) objects.
+- `query-params` : optionally specify extra query params to your search as
+a `HASH_REF`. See the Nominatim Search [API](https://nominatim.org/release-docs/develop/api/Reverse/)
+for what these parameters can be. By default, you do not need to specify any of these extra
+parameters.
+
+It returns `undef` on communication failure.
+
+It returns back a single [Net::API::Nominatim::Model::Address](https://metacpan.org/pod/Net%3A%3AAPI%3A%3ANominatim%3A%3AModel%3A%3AAddress) object
+on success. Unless the option `want-json` was set to `1`, in which case
+the return will be a JSON (hash) string of results.
+
+It differs from [search()](https://metacpan.org/pod/search%28%29) in that it returns a single address object
+and not an `ARRAY_REF` of objects. The returned JSON will be a hash
+containing a single address and not an array.
+
+# TODO
+
+The [Nominatim API](https://nominatim.org/release-docs/develop/api/Overview/)
+contains a lot more "verbs" than the three implemented in this module. Feel
+free to provide implementations if you find any of those useful and they will
+be incorporated in this module.
+
+# CAVEATS
+
+Queries can return many results depending on how specific
+they are, especially the structured query.
+For example, if you specify only `amenity=restaurant` there can
+be hundreds of results but the public Nominatim service has a default
+limit of returning only 10 results with a hard-limit of 40.
+This is specified in the [Nominatim API](https://nominatim.org/release-docs/develop/api/Search)
+under `limit`.
+
+# RELATED OPEN SOURCE SOFTWARE
+
+First of all, OpenStreetMap data is freely available
+for downloading, for the whole planet or for
+specific geographical areas from [GeoFabrik](http://download.geofabrik.de/)
+in the form of `.osm.pbf` files. This data is understood by
+Nominatim, the Map tile server and GeoDesk-Gol mentioned below.
+This data can also be inserted into a [PostGIS](https://postgis.net/)
+database and make your own queries on it.
+
+I have already mentioned in the [INTRODUCTION](https://metacpan.org/pod/INTRODUCTION)
+that it is quite easy and, definetely, not discouraged to
+host a Nominatim server locally. It will be totally self-sufficient
+in the sense that it will not need to access any external
+resources. All addresses for your geographical area or
+the whole planet are stored in a local
+[PostGIS](https://postgis.net/), powered by the amazing
+elephant-in-the-server-room [PostgreSQL](https://www.postgresql.org/).
+Check for what resources are required though. For small geographical
+areas, resources are moderate.
+
+You can also host your own map tiles and serve your own
+high-quality maps, styled as you like,
+without relying ever again on the big Capitalist players.
+Have a look at the guide offered at [Switch2osm](https://switch2osm.org)
+for how you can get started with this, although far more resources are
+needed and assembling the toolchain is more complicated
+than with Nominatim. But it works, just follow the [guide](https://switch2osm.org).
+
+Another open source project is [GeoDesk](https://github.com/clarisma/geodesk)
+and the command line query tool [GeoDesk-Gol](https://github.com/clarisma/geodesk-gol).
+This tool takes OpenStreetMap data for any geographical location,
+in the form of `.osm.pbf` files (see above on where to download them from)
+and constructs a portable, file-based database
+(called Gol, as in scoring a goal!) which you can then enquire with
+the provided command line tool. There is no need to create a [PostGIS](https://postgis.net/)
+database and insert data into it. The Gol file is all you need
+for doing queries like, _find all restaurants in this neighbourhood_,
+_list all street names in this district_, _list all bus-stops_, etc.
+It is pretty amazing and more so because it is portable, no database
+setup is required. Of course it is open source and kudos to their
+creator [Clarisma](https://github.com/clarisma), which by-the-way
+I am not affiliated in any way, just a fan.
+
+# TESTING
+
+Basic testing (`make test`) does not require,
+and, will not attempt online access. It tests instantiating the
+client and the other auxiliary classes.
+
+Live testing needs network access to a public Nominatim
+server or a local installation of Nominatim. It comes in two flavours:
+
+- `make livetesturl` : tests HTTP/GET queries to the public Nominatim server at
+[https://nominatim.openstreetmap.org/ui/search.html](https://nominatim.openstreetmap.org/ui/search.html).
+- `make livetestlocal` : tests socket queries to a local Nominatim installation
+via its local UNIX socket whose path can be set in all the test files in directory
+`xt/live/local-socket/` via the `$sockpath` variable,
+currently pointing to `/run/nominatim/nominatim.sock`.
+
+# RESPONSIBLE USE
+
+Be responsible in using the public Nominatim service and please
+observe their usage policy, summarised as
+
+- Uniquely and persistently identify your client.
+- No more than one request per second.
+
+The first clause we observe here by setting the default User-Agent string.
+
+The second clause is up to you. Please be responsible and do not forget
+that if you are going to do a lot of geocoding install your own Nominatim
+server locally. Then you can query it to your heart's content.
+
+# AUTHOR
+
+Andreas Hadjiprocopis, `<bliako at cpan.org>`
+
+# BUGS
+
+Please report any bugs or feature requests to `bug-net-api-nominatim at rt.cpan.org`, or through
+the web interface at [https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-API-Nominatim](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-API-Nominatim).  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+# SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Net::API::Nominatim
+
+You can also look for information at:
+
+- RT: CPAN's request tracker (report bugs here)
+
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-API-Nominatim](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-API-Nominatim)
+
+- CPAN Ratings
+
+    [https://cpanratings.perl.org/d/Net-API-Nominatim](https://cpanratings.perl.org/d/Net-API-Nominatim)
+
+- Search CPAN
+
+    [https://metacpan.org/release/Net-API-Nominatim](https://metacpan.org/release/Net-API-Nominatim)
+
+- PerlMonks!
+
+    [https://perlmonks.org/](https://perlmonks.org/)
+
+# ACKNOWLEDGEMENTS
+
+# LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2025 by Andreas Hadjiprocopis.
+
+This is free software, licensed under:
+
+    The Artistic License 2.0 (GPL Compatible)

@@ -5,17 +5,23 @@ MANIFEST
 META.yml
 Makefile.PL
 README
-Set.xs
-Set_procedural.xs
 bit.h
 dist.ini
 lib/Bit/Set.pm
+lib/Bit/Set.xs
 lib/Bit/Set/DB.pm
+lib/Bit/Set/DB.xs
 lib/Bit/Set/DB/OO.pm
+lib/Bit/Set/DB/SETOP_COUNT_OPTS.pm
+lib/Bit/Set/DB/SETOP_COUNT_OPTS.xs
+lib/Bit/Set/DB_procedural.xs.inc
 lib/Bit/Set/OO.pm
-macros_defs.h
+lib/Bit/Set/macros_defs.h
+lib/Bit/Set_procedural.xs.inc
 package_config.ini
 t/llm_prompted_test.t
+'t/test_bit DB_OO.t'
 't/test_bit OO.t'
 t/test_bit.t
+t/test_bit_DB.t
 typemap

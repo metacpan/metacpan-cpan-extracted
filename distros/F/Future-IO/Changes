@@ -1,5 +1,17 @@
 Revision history for Future-IO
 
+0.18    2026-01-08
+        [CHANGES]
+         * Added `->load_best_impl`
+
+        [BUGFIXES]
+         * Require `Test::Future::IO::Impl` version 0.16 for portability
+           bugfixes to the 'connect' and 'send' tests
+         * Be prepared for the fact that `IO::Socket->send` might throw
+         * Don't close() the local end of the STDIN stream in System.pm, as
+           that upsets most implementation modules
+         * `->send` in ImplBase should try agian using _send1, not _syswrite1
+
 0.17    2025-07-15
         [CHANGES]
          * Added new `->send`, `->recv` and `->recvfrom` socket IO wrapping

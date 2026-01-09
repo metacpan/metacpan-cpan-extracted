@@ -40,7 +40,7 @@ This module requires these other Perl modules:
 
 # COPYRIGHT AND LICENCE
 
-Copyright (C) 2024 by Relaxed Communications GmbH (info@relaxedcommunications.com)
+Copyright (C) 2025 by Relaxed Communications GmbH (info@relaxedcommunications.com)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.30.0 or,
@@ -68,7 +68,7 @@ my $product = $eansearch->barcodeLookup($ean);
 if (!defined($product)) {
 	print "No product found for EAN $ean\n";
 } else {
-	print "EAN $ean is $product->{name}\n";
+	print "EAN $ean is $product->{name} category $product->{categoryName} (Google category $product->{googleCategoryId}) issued in $product->{issuingCountry}\n";
 }
 
 my $book = $eansearch->isbnLookup($isbn);
@@ -115,7 +115,7 @@ my $country = $eansearch->issuingCountry($ean);
 print "Issuing country for EAN $ean is $country\n";
 
 my $img = $eansearch->barcodeImage($ean);
-#print "Image for EAN $ean is $img\n";
+print "Image for EAN $ean in HTML: <img src=\"data:image/png;base64,$img\">\n";
 
 my $ok = $eansearch->verifyChecksum($ean);
 print "EAN $ean is " . ($ok ? 'valid' : 'invalid') . "\n";

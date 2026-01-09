@@ -26,19 +26,19 @@ no_index:
 provides:
   Module::Starter:
     file: lib/Module/Starter.pm
-    version: '1.79'
+    version: '1.80'
   Module::Starter::App:
     file: lib/Module/Starter/App.pm
-    version: '1.79'
+    version: '1.80'
   Module::Starter::BuilderSet:
     file: lib/Module/Starter/BuilderSet.pm
-    version: '1.79'
+    version: '1.80'
   Module::Starter::Plugin::Template:
     file: lib/Module/Starter/Plugin/Template.pm
-    version: '1.79'
+    version: '1.80'
   Module::Starter::Simple:
     file: lib/Module/Starter/Simple.pm
-    version: '1.79'
+    version: '1.80'
 requires:
   File::Path: '0'
   File::Spec: '0'
@@ -56,7 +56,7 @@ resources:
   bugtracker: https://github.com/xsawyerx/module-starter/issues
   homepage: https://github.com/xsawyerx/module-starter
   repository: https://github.com/xsawyerx/module-starter.git
-version: '1.79'
+version: '1.80'
 x_contributors:
   - 'Brendan Byrd <byrd.b@insightcom.com>'
   - 'Brian Manning <cpan@xaoc.org>'
@@ -79,6 +79,7 @@ x_contributors:
   - 'petdance <petdance@bb7b6759-d628-0410-895d-7b6b7dc49dde>'
   - 'Richard Poole <richard@2ndQuadrant.com>'
   - 'rsignes <rsignes@bb7b6759-d628-0410-895d-7b6b7dc49dde>'
+  - 'ryoskzypu <ryoskzypu@proton.me>'
   - 'sawyer <sawyer@dungeon.(none)>'
   - 'Sawyer X <xsawyerx@cpan.org>'
   - 'Shlomi Fish <shlomif@iglu.org.il>'

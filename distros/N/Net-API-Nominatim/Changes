@@ -1,0 +1,12 @@
+Revision history for Net-API-Nominatim
+
+0.01    2025-01-08
+        First version, released on an unsuspecting world.
+
+0.02    2025-01-08
+        Pod enhancements.
+
+0.03    2025-01-08
+        Address and BoundingBox revamped with more testing.
+        Pod enhancements.
+

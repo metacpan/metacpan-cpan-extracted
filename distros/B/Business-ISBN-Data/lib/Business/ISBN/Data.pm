@@ -8,7 +8,7 @@ use Carp                  qw(carp);
 use File::Basename        qw(dirname);
 use File::Spec::Functions qw(catfile);
 
-our $VERSION = '20251223.001';
+our $VERSION = '20260109.001';
 
 =encoding utf8
 
@@ -107,7 +107,7 @@ use Business::ISBN 3.005 or later because the data structure changed.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2002-2026, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 
@@ -116,8 +116,8 @@ You may redistribute this under the terms of the Artistic License 2.0.
 sub _default_data {
 # BEGIN REPLACE
 	(
-	_data_date => 'Tue, 23 Dec 2025 03:58:51 GMT',
-	_serial    => '0790af4c-2f1e-4522-895d-85cbda3ea7fc',
+	_data_date => 'Fri, 9 Jan 2026 03:59:58 GMT',
+	_serial    => 'cc1965c4-fd8a-4b95-a614-cc0ceff6a962',
 	_source    => __FILE__,
 	978 => {
 		0     => [ 'English language'             => [ '00', '19', '200', '227', '2280', '2289', '229', '368', '3690', '3699', '370', '638', '6390', '6397', '6398000', '6399999', '640', '644', '6450000', '6459999', '646', '647', '6480000', '6489999', '649', '654', '6550', '6559', '656', '699', '7000', '8499', '85000', '89999', '900000', '900370', '9003710', '9003719', '900372', '949999', '9500000', '9999999' ] ],
@@ -376,7 +376,7 @@ sub _default_data {
 		99974 => [ 'Bolivia'                      => [ '0', '0', '10', '25', '260', '399', '40', '63', '640', '649', '65', '79', '800', '999' ] ],
 		99975 => [ 'Tajikistan'                   => [ '0', '2', '300', '399', '40', '79', '800', '999' ] ],
 		99976 => [ 'Srpska, Republic of'          => [ '00', '03', '040', '099', '10', '15', '160', '199', '20', '59', '600', '819', '82', '89', '900', '999' ] ],
-		99977 => [ 'Rwanda'                       => [ '0', '1', '40', '69', '700', '799', '975', '999' ] ],
+		99977 => [ 'Rwanda'                       => [ '0', '1', '40', '69', '700', '799', '900', '924', '975', '999' ] ],
 		99978 => [ 'Mongolia'                     => [ '0', '4', '50', '69', '700', '999' ] ],
 		99979 => [ 'Honduras'                     => [ '0', '3', '40', '79', '800', '999' ] ],
 		99980 => [ 'Bhutan'                       => [ '0', '0', '30', '64', '700', '999' ] ],

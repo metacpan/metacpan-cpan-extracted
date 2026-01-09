@@ -1,5 +1,8 @@
 Revision history for MooseX-Types-DateTime
 
+0.14      2026-01-08 17:09:43Z
+        - a decade of tooling updates
+
 0.13      2015-10-04 23:38:13Z
         - make all tests pass with both the current DateTime::Locale and the
           upcoming new version (currently still in trial releases).

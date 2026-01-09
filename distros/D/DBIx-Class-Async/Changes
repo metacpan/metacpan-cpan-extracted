@@ -1,5 +1,25 @@
 Revision history for DBIx::Class::Async
 
+0.20  2026-01-08
+      - Updated Makefile.PL w.r.t test requisite thanks Gabor Szabo.
+      - Added CI workflow thanks Gabor Szabo.
+      - Tidied up pod document.
+
+0.19  2026-01-08
+      - Added sub search_related[_rs] to DBIx::Class::Async::ResultSet.
+
+0.18  2026-01-08
+      - Added sub delete_all() to DBIx::Class::Async::ResultSet.
+
+0.17  2026-01-08
+      - Added sub update_or_[new|create]() to DBIx::Class::Async::ResultSet.
+
+0.16  2026-01-08
+      - Added sub find_or_[new|create]() to DBIx::Class::Async::ResultSet.
+
+0.15  2026-01-08
+      - Added sub populate() and populate_bulk() to DBIx::Class::Async::ResultSet.
+
 0.14  2026-01-08
       - Added sub slice() to DBIx::Class::Async::ResultSet.
 

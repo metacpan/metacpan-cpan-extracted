@@ -30,7 +30,7 @@ use Math::Trig;
 use List::Util qw[ min max reduce shuffle any];
 use List::MoreUtils qw(uniq);
 use List::AllUtils qw(sum);
-use Statistics::Basic qw(:all);
+use Sim::OPT::Stats;
 use Data::Dump qw(dump);
 use Regexp::Common;
 use Vector::Object3D::Polygon;

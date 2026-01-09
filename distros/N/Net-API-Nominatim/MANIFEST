@@ -1,0 +1,24 @@
+Changes
+lib/Net/API/Nominatim.pm
+lib/Net/API/Nominatim/Model/Address.pm
+lib/Net/API/Nominatim/Model/BoundingBox.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/000-load.t
+t/100-instantiate.t
+t/150-BoundingBox-instantiate.t
+t/170-Address-instantiate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+xt/live/local-socket/200-status-local-nominatim-server-socket.t
+xt/live/local-socket/250-search-local-nominatim-server-socket.t
+xt/live/local-socket/300-reverse-local-nominatim-server-socket.t
+xt/live/url/200-status-online-nominatim-server.t
+xt/live/url/250-search-online-nominatim-server.t
+xt/live/url/300-reverse-online-nominatim-server.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

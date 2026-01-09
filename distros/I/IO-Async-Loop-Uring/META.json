@@ -31,7 +31,7 @@
             "Carp" : "0",
             "IO::Async::Loop" : "0",
             "IO::Poll" : "0",
-            "IO::Uring" : "0.008",
+            "IO::Uring" : "0.009",
             "Linux::FD" : "0.015",
             "Scalar::Util" : "0",
             "Signal::Info" : "0",
@@ -39,7 +39,7 @@
             "Time::Spec" : "0",
             "constant" : "0",
             "parent" : "0",
-            "perl" : "5.010",
+            "perl" : "v5.14.0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -47,18 +47,20 @@
       "test" : {
          "requires" : {
             "File::Spec" : "0",
-            "IO::Async::LoopTests" : "0.24",
+            "IO::Async::Loop::Epoll" : "0",
+            "IO::Async::LoopTests" : "0.76",
+            "IO::Async::OS" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
-            "perl" : "5.010"
+            "perl" : "v5.14.0"
          }
       }
    },
    "provides" : {
       "IO::Async::Loop::Uring" : {
          "file" : "lib/IO/Async/Loop/Uring.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -72,7 +74,7 @@
          "web" : "https://github.com/Leont/io-async-loop-uring"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_generated_by_perl" : "v5.42.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

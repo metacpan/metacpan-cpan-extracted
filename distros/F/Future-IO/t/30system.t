@@ -14,6 +14,7 @@ sub load_impl_supporting_waitpid
 {
    # We need a Future::IO impl that can ->waitpid
    foreach my $impl (qw(
+         Future::IO::Impl::Ppoll
          Future::IO::Impl::UV
          Future::IO::Impl::Glib
          Future::IO::Impl::IOAsync

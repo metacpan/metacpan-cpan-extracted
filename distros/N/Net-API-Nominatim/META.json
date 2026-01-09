@@ -1,0 +1,83 @@
+{
+   "abstract" : "Perl client for local or public OpenStreetMap Nominatim Geocoding service. Open source, unrestricted and free.",
+   "author" : [
+      "Andreas Hadjiprocopis <bliako@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-API-Nominatim",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Pod::Markdown" : "0",
+            "Pod::Readme" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cookies::Roundtrip" : "0",
+            "Data::Roundtrip" : "0.30",
+            "Data::Structure::Util" : "0",
+            "Encode" : "0",
+            "File::Basename" : "0",
+            "HTTP::CookieJar::LWP" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Request" : "0",
+            "Hash::Merge" : "0",
+            "IO::Socket::UNIX" : "0",
+            "LWP::ConsoleLogger::Easy" : "0",
+            "LWP::UserAgent" : "0",
+            "Mojo::Log" : "0",
+            "Storable" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Roundtrip" : "0.30",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "HTTP::CookieJar::LWP" : "0",
+            "LWP::UserAgent" : "0",
+            "Mojo::Log" : "0",
+            "Test2::Plugin::UTF8" : "0",
+            "Test::More" : "0",
+            "Test::TempDir::Tiny" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hadjiprocopis/Net-API-Nominatim/issues"
+      },
+      "homepage" : "https://metacpan.org/module/Net::API::Nominatim",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hadjiprocopis/perl-Net-API-Nominatim",
+         "web" : "https://github.com/hadjiprocopis/perl-Net-API-Nominatim"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

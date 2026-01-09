@@ -1,5 +1,5 @@
 package IO::Uring;
-$IO::Uring::VERSION = '0.008';
+$IO::Uring::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ IO::Uring - io_uring for Perl
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -60,9 +60,21 @@ B<Note>: This is an early release and this module should still be regarded as ex
 
 =head1 METHODS
 
-=head2 new($queue_size)
+=head2 new($queue_size, %named_arguments)
 
-Create a new uring object, with the given submission queue size.
+Create a new uring object, with the given submission queue size. It takes the following optional named arguments:
+
+=over 4
+
+=item * cqe_entries
+
+The number of entries in the completion queue. It defaults to twice the size of the submission queue.
+
+=item * sqpoll
+
+This enables sqpoll mode, starting a kernel thread to poll for submissions so no system calls can be avoided. The value is the sq thread idle time in milliseconds.
+
+=back
 
 =head2 run_once($min_events = 1)
 
@@ -71,6 +83,10 @@ Submit all pending requests, and process at least C<$min_events> completed (but 
 =head2 probe()
 
 This probes for which features are supported on this system. It returns a hash of feature-name to true/false. Generally speaking feature names map directly to method names but note that for filesystem operations you should check for the C<*at> version (e.g. C<'openat'> not C<'open'>).
+
+=head2 ensure_sqes($count)
+
+This ensures the availability of a certain number of sqes. This is useful when creating linked chains.
 
 =head2 accept($sock, $flags, $s_flags, $callback)
 

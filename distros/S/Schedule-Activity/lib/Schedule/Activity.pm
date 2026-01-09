@@ -9,7 +9,7 @@ use Schedule::Activity::Message;
 use Schedule::Activity::Node;
 use Schedule::Activity::NodeFilter;
 
-our $VERSION='0.2.8';
+our $VERSION='0.2.9';
 
 sub new {
 	my ($ref,%opt)=@_;
@@ -21,6 +21,7 @@ sub new {
 		built   =>undef,
 		reach   =>undef,
 		unsafe  =>$opt{unsafe}//0,
+		PNA     =>undef, # per node attribute prefix, loaded via config
 	);
 	return bless(\%self,$class);
 }
@@ -190,11 +191,17 @@ sub safetyChecks {
 sub _buildConfig {
 	my ($self)=@_;
 	my %base=%{$$self{config}};
+	my $attr=$self->_attr();
 	my %res;
+	if($base{PNA}) { $$self{PNA}=$base{PNA} }
 	while(my ($k,$node)=each %{$base{node}}) {
 		if(is_plain_hashref($node)) { $res{node}{$k}=Schedule::Activity::Node->new(%$node) }
 		else { $res{node}{$k}=$node }
 		$res{node}{$k}{keyname}=$k;
+		if($$self{PNA}) {
+			$res{node}{$k}{attributes}{"$$self{PNA}$k"}={incr=>1};
+			$attr->register("$$self{PNA}$k",type=>'int',value=>0);
+		}
 	}
 	my $msgNames=$base{messages}//{};
 	while(my ($k,$node)=each %{$res{node}}) {
@@ -378,7 +385,9 @@ sub goalScheduling {
 		foreach my $k (keys %{$goal{attribute}}) {
 			my %cmp=%{$goal{attribute}{$k}};
 			my %attr=%{$schedule{attributes}{$k}//{}};
-			my $avg=$attr{avg}//0;
+			my $avg;
+			if($$self{PNA}&&($k=~/^\Q$$self{PNA}\E/)) { $avg=$attr{y}//0 }
+			else                                      { $avg=$attr{avg}//0 }
 			my $weight=$cmp{weight}//1;
 			if   ($cmp{op} eq 'max') { $res+=$avg*$weight }
 			elsif($cmp{op} eq 'min') { $res-=$avg*$weight }
@@ -557,7 +566,7 @@ Schedule::Activity - Generate activity schedules
 
 =head1 VERSION
 
-Version 0.2.8
+Version 0.2.9
 
 =head1 SYNOPSIS
 
@@ -589,12 +598,13 @@ Version 0.2.8
       annotations=>{...},
       attributes =>{...},
       messages   =>{...},
-    }
-	);
+      PNA        =>...,
+    },
+  );
   my %schedule=$scheduler->schedule(activities=>[
-		[30,'Activity'],
-		...
-	]);
+    [30,'Activity'],
+    ...
+  ]);
   if($schedule{error}) { die join("\n",@{$schedule{error}}) }
   print join("\n",map {"$$_[0]:  $$_[1]{message}"} @{$schedule{activities}});
 
@@ -749,6 +759,8 @@ Boolean types must be declared in this section.  It is recommended to set any no
 
 Attributes within message alternate configurations and named messages are identified during configuration validation.  Together with activity/action configurations, attributes are verified before schedule construction, which will fail if an attribute name is referenced in a conflicting manner.
 
+Automatic, per-node attributes may be enabled by including C<PNA=E<gt>'prefix:'> within the configuration.  Each node, "keyname", will automatically increment an attribute named "prefix:keyname" each time that activity/action appears in the schedule.  These attributes are included in the report and can be used for node filtering.  When used in goals, per-node attributes are compared based on their final y-value/count (not the average).  Per-activity goals should consider the accumulated totals, not just the change of the attribute within that activity; however, per-node attributes are not special and can be reset within an activity/action configuration.  Per-node attributes are disabled by default.
+
 =head2 Precedence
 
 When an activity/action node and a selected message both contain attributes, the value of the attribute is updated first from the action node and then from the message node.  For boolean attributes, this means the "value set in the message has precedence".  For integer attributes, suppose that the value is initially zero; then, if both the action and message have attribute operators, the result will be:
@@ -885,8 +897,6 @@ The final result above does generate annotations, but it's also possible to pass
 
   my %res=$scheduler->schedule(after=>$earlierSchedule, activities=>[]);
 
-This functionality is experimental starting with Version 0.2.1.
-
 =head2 Goals
 
 Goal seeking retries schedule construction and finds the best, I<random> schedule meeting criteria for attribute average values:
@@ -903,7 +913,7 @@ Goal seeking retries schedule construction and finds the best, I<random> schedul
 
 One or more attributes may be included in the goal, and each of the C<cycles> (default 10) schedules will be scored based on the configured conditions.  The C<max> and C<min> operators seek the largest/smallest attribute I<average value> for the schedule.  The C<eq> and C<ne> operators score near/far from the provided C<value>.  The optional C<weight> is a multiplier for the attribute value in the scoring function; see C<samples/goalweights.pl> for more details.  Note that generated schedules may have a different number of activities, so some attribute goals may be equivalent to finding the shortest/longest action counts.
 
-Goal scheduling is experimental starting with 0.2.4.  If no schedule can be generated, the most recent error will raise via C<die()>.  Goals can be different during different invocations of incremental construction.
+If no schedule can be generated, the most recent error will raise via C<die()>.  Goals can be different during different invocations of incremental construction.
 
 =head2 Per-Activity Goals
 
@@ -935,8 +945,6 @@ When per-activity scheduling is active, any goals specified in the call to C<sch
     goal=>{GOAL});
 
 Goal scheduling for an activity may be skipped with the goal C<{cycles=E<gt>1,attribute=E<gt>{}}>, or by calling incremental construction with goals only for the desired activities.
-
-Per-activity goal scheduling is experimental starting with 0.2.7.
 
 =head1 IMPORT MECHANISMS
 

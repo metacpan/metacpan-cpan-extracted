@@ -14,7 +14,6 @@ use List::Util qw[ min max reduce shuffle];
 use List::MoreUtils qw(uniq);
 use List::AllUtils qw(sum);
 use Sim::OPT::Stats qw(:all);
-use IO::Tee;
 use File::Copy qw( move copy );
 use Set::Intersection;
 use List::Compare;
@@ -35,6 +34,7 @@ use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
+use Sim::OPT::Stats;
 eval { use Sim::OPTcue; 1 };
 eval { use Sim::OPTcue::Patternsearch; 1 };
 
@@ -55,12 +55,11 @@ sub parcoord3d
 	if ( not ( @ARGV ) )
 	{
 		$tofile = $main::tofile;
-		#$tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
-		say $tee "\n#Now in Sim::OPT::Takechance.\n";
+		say  "\n#Now in Sim::OPT::Takechance.\n";
 		$configfile = $main::configfile;
 		@sweeps = @main::sweeps;
 		@sourcesweeps = @main::sourcesweeps;
-		@varnumbers = @main::varnumbers; say $tee "dump(\@varnumbers): " . dump(@varnumbers);
+		@varnumbers = @main::varnumbers; say  "dump(\@varnumbers): " . dump(@varnumbers);
 		@miditers = @main::miditers;
 		@rootnames = @main::rootnames;
 		%vals = %main::vals;

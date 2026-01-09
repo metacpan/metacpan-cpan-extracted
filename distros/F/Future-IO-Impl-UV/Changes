@@ -1,5 +1,11 @@
 Revision history for Future-IO-Impl-UV
 
+0.06    2026-01-08
+        [BUGFIXES]
+         * Fix memory leak when removing filehandles
+         * Fix quietening of `experimental::builtin` warnings on perl versions
+           5.36 and 5.38
+
 0.05    2026-01-07
         [BUGFIXES]
          * Use `refaddr($fh)` rather than fileno to defend against closed

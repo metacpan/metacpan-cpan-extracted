@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw/:severities :classification precedence_of/;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.0.5';
+our $VERSION = '0.0.6';
 
 Readonly::Scalar my $DESC  => q{Do not perform manual ref checks};
 Readonly::Scalar my $EXPL  => undef; # [ ];

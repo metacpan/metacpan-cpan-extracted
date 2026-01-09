@@ -1,4 +1,4 @@
-package LedgerSMB::Installer v0.999.10;
+package LedgerSMB::Installer v0.999.11;
 
 use v5.20;
 use experimental qw(signatures);
@@ -169,13 +169,17 @@ sub _compute_all_deps($class, $config) {
     my $iteration = 1;
     do {
         my $query = {
-            query => { match_all => {} },
             _source => [ qw( release distribution status provides ), 'dependency.*' ],
-            filter => {
-                and => [
-                    { term => { status => 'latest' } },
-                    { terms => { provides => [ @last_deps ] } }
-                    ]
+            query => {
+                bool => {
+                    must => [
+                        { term => { status => 'latest' } },
+                        { terms => { provides => [ @last_deps ] } }
+                        ],
+                    filter => {
+                        match_all => {}
+                    }
+                }
             }
         };
 
@@ -384,14 +388,15 @@ sub compute($class, @args) {
         \@args,
         [ 'yes|y!', 'target=s', 'local-lib=s', 'log-level=s' ]
         );
-    my $version = shift @args;
 
+    if (@args != 2) {
+        die "Incorrect number of arguments";
+    }
+
+    my $version = shift @args;
     $config->compute_deps( 1 );
     $config->version( $version ) if defined $version;
 
-    if (@args != 1) {
-        die "Incorrect number of arguments";
-    }
     my $deps_outfile = $args[0];
     open( my $out, '>:raw', $deps_outfile )
         or die "Unable to open output file '$deps_outfile': $!";

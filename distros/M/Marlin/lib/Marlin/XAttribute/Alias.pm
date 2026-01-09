@@ -5,7 +5,7 @@ use warnings;
 package Marlin::XAttribute::Alias;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011000';
+our $VERSION   = '0.011001';
 
 use Eval::TypeTiny ();
 use Role::Tiny;
@@ -209,6 +209,8 @@ twice:
 B<< Superfluous aliases used for attribute '%s' >>
 
 Variant used when reporting multiple superfluous aliases.
+
+=back
 
 =head1 BUGS
 

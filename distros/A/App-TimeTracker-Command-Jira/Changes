@@ -1,6 +1,8 @@
 Revision history for App-TimeTracker-Command-Jira
 
-1.0       2025-12-12 15:24:31+01:00 Europe/Vienna
+1.1       2026-01-08 16:18:07+01:00 Europe/Vienna
+
+    - Enable authentication via Config::Identify again.
 
 1.0       2025-12-12 15:22:11+02:00 Europe/Vienna
 

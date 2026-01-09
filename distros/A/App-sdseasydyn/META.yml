@@ -1,0 +1,37 @@
+---
+abstract: 'EasyDNS Dynamic DNS updater (CLI-first App distribution)'
+author:
+  - 'Sergio de Sousa <sergio@serso.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-sdseasydyn
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config::Tiny: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  HTTP::Tiny: '0'
+  MIME::Base64: '0'
+  Retry::Policy: '0.02'
+  URI::Escape: '0'
+  perl: '5.030'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/sergio-desousa/sdseasydyn/issues
+  homepage: https://github.com/sergio-desousa/sdseasydyn
+  repository: https://github.com/sergio-desousa/sdseasydyn.git
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
