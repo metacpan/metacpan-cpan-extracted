@@ -1,3 +1,8 @@
+0.004 2026-01-09
+
+  - Fixed some prereq dependecies
+  - Add strict/warnings to example code, use stringified enums
+
 0.003 2026-01-01
 
   - Update / add example code

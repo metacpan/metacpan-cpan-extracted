@@ -26,5 +26,5 @@ requires:
 resources:
   bugtracker: https://github.com/david-dick/date-holidays-au/issues
   repository: https://github.com/david-dick/date-holidays-au.git
-version: '0.35'
+version: '0.36'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

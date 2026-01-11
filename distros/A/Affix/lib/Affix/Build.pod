@@ -1,10 +1,11 @@
+
 =pod
 
 =encoding utf-8
 
 =head1 NAME
 
-Affix::Build - A robust, polyglot build system for FFI extensions
+Affix::Build - Robust, Polyglot Build System for FFI Extensions
 
 =head1 SYNOPSIS
 
@@ -192,7 +193,7 @@ Notes:
 
 Affix attempts to detect Go libraries (by looking for the C<_cgo_dummy_export> symbol) and keep them in memory to
 prevent this crash. However, if you still encounter segmentation faults during global destruction, you can force a safe
-exit using C<POSIX::_exit(0)>.
+exit using C<POSIX::_exit(0)> which skips global destructors.
 
 =back
 
@@ -242,9 +243,9 @@ Support is also included for:
 
 =item OCaml (C<.ml>)
 
-=item Eiffel** (C<.e>) - via SmartEiffel
+=item Eiffel (C<.e>) - via SmartEiffel
 
-=item Futhark** (C<.fut>) - Transpiles to C
+=item Futhark (C<.fut>) - Transpiles to C
 
 =back
 
@@ -270,8 +271,8 @@ Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2023 by Sanko Robinson.
+Copyright (C) 2023-2026 by Sanko Robinson.
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
 
 =cut

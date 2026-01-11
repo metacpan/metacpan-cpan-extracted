@@ -1,0 +1,8 @@
+Revision history for Crypt-Age
+
+0.001     2026-01-11 03:51:40Z
+  - Initial release
+  - X25519 recipient support
+  - Compatible with age/rage CLI tools
+  - Fixed payload key derivation to use nonce as HKDF salt per age spec
+  - Comprehensive POD documentation for all modules

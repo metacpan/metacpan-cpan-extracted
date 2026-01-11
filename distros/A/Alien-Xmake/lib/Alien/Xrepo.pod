@@ -1,0 +1,251 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Alien::Xrepo - Eases the Headache of Finding and Building Shared Libraries for FFI and XS
+
+=head1 SYNOPSIS
+
+    use v5.40;
+    use Alien::Xrepo;
+
+    # Initialize
+    my $repo = Alien::Xrepo->new( );
+
+    # Add a custom repository (optional)
+    # $repo->add_repo( 'my-repo', 'https://github.com/my/repo.git' );
+    # Install a shared lib with an automatic configuration
+    my $ogg = $repo->install('libvorbis');
+
+    # Install a library with specific configuration
+    # equivalent to: xrepo install -p windows -a x86_64 -m debug --configs='shared=true,vs_runtime=MD' libpng
+    my $pkg = $repo->install( 'libpng', '1.6.x', plat => 'windows', arch => 'x64', mode => 'debug', configs => { vs_runtime => 'MD' } );
+    die 'Install failed' unless $pkg;
+
+    # Automatically wrap zlib as a whole with Affix::Wrap
+    use Affix;
+    use Affix::Wrap;
+    my $zlib = $repo->install('zlib');
+    Affix::Wrap->new(
+        project_files => [ $zlib->find_header('zlib.h') ],
+        include_dirs  => [ $zlib->includedirs ],
+        types         => { gzFile_s => Pointer [Void] }
+    )->wrap( $zlib->libpath );
+    say 'zlib version:   ' . zlibVersion();
+
+    # Wrap a single function from sqlite3 with Affix
+    use Affix;
+    my $sqlite3 = $repo->install('sqlite3');
+    affix $sqlite3->libpath, 'sqlite3_libversion', [], String;
+    say 'SQLite version: ' . sqlite3_libversion();
+
+    # Wrap a single function from libpng with FFI::Platypus
+    use FFI::Platypus;
+    my $lz4 = $repo->install('lz4');
+    my $ffi = FFI::Platypus->new;
+    $ffi->lib( $lz4->libpath );
+    $ffi->attach( 'LZ4_versionString', [] => 'string' );
+    say 'LZ4 version:    ' . LZ4_versionString();
+
+=head1 DESCRIPTION
+
+This module acts as an intelligent bridge between Perl and the C<xrepo> package manager.
+
+While L<Affix> or L<FFI::Platypus> or L<Inline::C> can handle the binding or linking to native functions, Alien::Xrepo
+handles the B<acquisition> of the libraries containing those functions. It automates the entire dependency lifecycle:
+
+=over
+
+=item 1. Provisioning:
+
+Downloads and installs libraries (C<libpng>, C<openssl>, etc.) via C<xrepo>, handling version constraints and custom
+repository lookups.
+
+=item 2. Configuration:
+
+Ensures libraries are compiled with FFI compatible flags (forcing C<shared> libraries instead of static archives) and
+supports cross-compilation parameters (platform, architecture, toolchains).
+
+=item 3. Introspection:
+
+Parses the build metadata to locate the exact absolute paths to the runtime binaries (C<.dll>, C<.so>, C<.dylib>) and
+header files, abstracting away operating system filesystem differences.
+
+=back
+
+This eliminates the need for manual compilation steps or hard coding paths in your Perl scripts, making your FFI
+bindings or XS wrappers portable and reproducible.
+
+=head1 CONSTRUCTOR
+
+=head2 C<new>
+
+    my $repo = Alien::Xrepo->new( verbose => 1 );
+
+Creates a new instance.
+
+=over
+
+=item B<verbose>
+
+Boolean. If true, prints command output and status messages to C<STDOUT>. Defaults to C<0>.
+
+=back
+
+=head1 METHODS
+
+=head2 C<install( ... )>
+
+    my $pkg_info = $repo->install( $package_name, $version_constraint, %options );
+
+Installs (if missing) and fetches the metadata for a package.
+
+=over
+
+=item B<$package_name>
+
+The name of the package (e.g., C<zlib>, C<opencv>).
+
+=item B<$version_constraint>
+
+Optional semantic version string (C<1.2.x>, C<latest>). Pass C<undef> or an empty string for default.
+
+=item B<%options>
+
+Configuration options passed to C<xrepo>:
+
+=over
+
+=item B<plat>
+
+Target platform (e.g., C<windows>, C<linux>, C<macosx>, C<android>, C<iphoneos>, C<wasm>).
+
+=item B<arch>
+
+Target architecture (e.g., C<x86_64>, C<arm64>, C<riscv64>).
+
+=item B<mode>
+
+Build mode: C<debug> or C<release>.
+
+=item B<kind>
+
+Library kind: C<shared> (default) or C<static>.
+
+I<Note: For FFI, you almost always want C<shared>, but C<static> is available if you are linking archives with, say, an
+XS module.>
+
+=item B<toolchain>
+
+Specify a toolchain (e.g., C<llvm>, C<zig>, C<mingw>).
+
+=item B<configs>
+
+A hashsef or string of package-specific configurations.
+
+    configs => { openssl => 'true', shared => 'true' }
+    # becomes --configs='openssl=true,shared=true'
+
+=item B<includes>
+
+A list or string of extra dependencies to include in the environment.
+
+=back
+
+=back
+
+Returns an L<Alien::Xrepo::PackageInfo> object.
+
+=head2 C<uninstall( ... )>
+
+    $repo->uninstall('zlib');
+
+Removes the specified package from the local cache. Accepts the same C<%options> as C<install( ... )>.
+
+=head2 C<search>
+
+    $repo->search( 'png' );
+
+Runs `xrepo search` and prints the results to STDOUT.
+
+=head2 C<clean( )>
+
+    $repo->clean( );
+
+Cleans the cached packages and downloads.
+
+=head2 C<add_repo( ... )>
+
+    $repo->add_repo($name, $git_url, $branch);
+
+Adds a custom xmake repository.
+
+=head2 C<remove_repo( ... )>
+
+    $repo->remove_repo( $name );
+
+Removes a custom repository.
+
+=head2 C<update_repo( [...] )>
+
+    $repo->update_repo( );        # Update all
+    $repo->update_repo( 'main' ); # Update specific repo
+
+Updates the local package lists from the remote repositories.
+
+=head1 Alien::Xrepo::PackageInfo
+
+Returned by C<install( ... )>, this object contains the results of the dependency resolution.
+
+=head3 Attributes
+
+=over
+
+=item B<libpath>
+
+The absolute path to the main library file (C<.dll>, C<.dylib>, or C<.so>). Returns C<undef> if the package is
+header-only or the binary could not be identified.
+
+=item B<includedirs>
+
+List of include paths.
+
+=item B<libfiles>
+
+List of all library files associated with the package (may include import libs, static archives, etc.).
+
+=item B<license>
+
+The license identifier.
+
+=item B<version>
+
+The installed version.
+
+=back
+
+=head3 Methods
+
+=head4 C<find_header( ... )>
+
+    my $path = $info->find_header( 'png.h' );
+
+Scans C<includedirs> for the given filename and returns the absolute path if found. Returns C<undef> otherwise.
+
+=head1 SEE ALSO
+
+L<Affix::Wrap>, L<Alien::Xmake>, L<https://xrepo.xmake.io>
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2026 by Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
+
+=cut

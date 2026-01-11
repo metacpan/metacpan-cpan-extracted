@@ -1,0 +1,28 @@
+# Avoid version control files
+\B\.git\b
+\B\.gitignore\b
+
+# Avoid build artifacts
+^_alien/
+^blib/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.(json|yml)$
+^pm_to_blib$
+\.o$
+\.bs$
+
+# Avoid distribution artifacts
+^Alien-nghttp2-[\d.]+/
+\.tar\.gz$
+
+# Avoid editor backup files
+~$
+\.swp$
+\.bak$
+
+# Exclude CLAUDE.md (internal dev docs only)
+^CLAUDE\.md$
+
+# Avoid macOS metadata files
+\.DS_Store$

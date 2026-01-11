@@ -4,7 +4,7 @@ Date::Holidays::AU - Determine Australian Public Holidays
 
 # VERSION
 
-Version 0.35
+Version 0.36
 
 # SYNOPSIS
 

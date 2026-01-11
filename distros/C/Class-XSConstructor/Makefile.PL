@@ -41,9 +41,9 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Class::XSConstructor" => { file => "lib/Class/XSConstructor.pm", version => 0.016002 },
-                        "Class::XSDelegation"  => { file => "lib/Class/XSDelegation.pm", version => 0.016002 },
-                        "Class::XSDestructor"  => { file => "lib/Class/XSDestructor.pm", version => 0.016002 },
+                        "Class::XSConstructor" => { file => "lib/Class/XSConstructor.pm", version => 0.018001 },
+                        "Class::XSDelegation"  => { file => "lib/Class/XSDelegation.pm", version => 0.018001 },
+                        "Class::XSDestructor"  => { file => "lib/Class/XSDestructor.pm", version => 0.018001 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -59,7 +59,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/project",
                       },
-  "version"        => 0.016002,
+  "version"        => 0.018001,
 };
 
 my %dynamic_config;

@@ -1,0 +1,16 @@
+Revision history for Claude-Code-Review
+
+0.01    2026-01-10
+        First version, released on an unsuspecting world.
+        - AI-powered code review using Claude Agent SDK
+        - review(), review_files(), review_diff() async functions
+        - Structured JSON output with Issue and Report objects
+        - Custom MCP tools for enhanced analysis:
+          - get_file_context: Get surrounding code context
+          - search_codebase: Search for patterns
+          - check_tests: Verify test coverage
+          - get_dependencies: Analyze module dependencies
+          - analyze_complexity: Cyclomatic complexity analysis
+        - Support for staged changes review (git diff --cached)
+        - Configurable severity filtering and categories
+        - Text and JSON output formats

@@ -13,15 +13,15 @@ use DBIx::Class::Async::Cursor;
 
 =head1 NAME
 
-DBIx::Class::Async::ResultSet - Asynchronous ResultSet for DBIx::Class::Async
+DBIx::Class::Async::ResultSet - Asynchronous resultset for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.20
+Version 0.22
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 =head1 SYNOPSIS
 
@@ -442,7 +442,7 @@ the newly created row.
 sub create {
     my ($self, $data) = @_;
 
-    # MERGE: Combine the ResultSet's current search condition (which contains the foreign key)
+    # Combine the ResultSet's current search condition (which contains the foreign key)
     # with the new data provided by the user.
     my %to_insert = ( %{$self->{_cond} || {}}, %$data );
 
@@ -921,85 +921,107 @@ sub next {
     return $self->{_rows}[$self->{_pos}++];
 }
 
-
 =head2 populate
 
-  my $future = $rs->populate([
-      { title => 'First Post', content => 'Hello' },
-      { title => 'Second Post', content => 'World' },
-  ]);
-
-  $future->on_done(sub {
-      my @result_objects = @_;
-      print "Inserted: " . $_->title . "\n" for @result_objects;
+  # Array of hashrefs format
+  $rs->populate([
+      { name => 'Alice', email => 'alice@example.com' },
+      { name => 'Bob',   email => 'bob@example.com' },
+  ])->then(sub {
+      my ($users) = @_;
+      say "Created " . scalar(@$users) . " users";
   });
 
-This method provides a way to insert multiple rows into the database and receive
-the resulting objects back. It behaves similarly to L<DBIx::Class::ResultSet/populate>,
-but operates asynchronously and returns a L<Future>.
+  # Column list + rows format
+  $rs->populate([
+      [qw/ name email /],
+      ['Alice', 'alice@example.com'],
+      ['Bob',   'bob@example.com'],
+  ])->then(sub {
+      my ($users) = @_;
+  });
+
+Creates multiple rows at once. More efficient than calling C<create> multiple times.
 
 =over 4
 
-=item * B<Arguments:> C<[ \%col_data, ... ]> or C<[ \@column_list, [ \@row_values, ... ] ]>
+=item B<Arguments>
 
-=item * B<Return Value:> A L<Future> that resolves to a list of Result objects.
+=over 8
+
+=item C<$data>
+
+Either:
+
+- Array of hashrefs: C<< [ \%col_data, \%col_data, ... ] >>
+
+- Column list + rows: C<< [ \@column_list, \@row_values, \@row_values, ... ] >>
 
 =back
 
-B<Processing Logic:>
-If an arrayref of hashrefs is provided, the method automatically merges any
-existing ResultSet conditions (such as foreign keys from a relationship) into
-each row. It also cleans C<foreign.> or C<self.> prefixes from keys to ensure
-compatibility with SQL insert statements.
+=item B<Returns>
 
-B<Note:> This method inflates every inserted row into a Result object. For very
-large datasets where objects are not needed, use L</populate_bulk> for
-significantly better performance.
+A L<Future> that resolves to an arrayref of created L<DBIx::Class::Async::Row> objects.
+
+=back
 
 =cut
 
 sub populate {
     my ($self, $data) = @_;
 
-    # Validating input similar to DBIC
-    unless (ref $data eq 'ARRAY') {
-        return Future->fail("populate() requires an arrayref", "usage_error");
-    }
+    croak("data required")            unless defined $data;
+    croak("data must be an arrayref") unless ref $data eq 'ARRAY';
+    croak("data cannot be empty")     unless @$data;
 
-    # If the data is an array of hashrefs, we might need to merge
-    # current ResultSet conditions (like foreign keys), similar to create()
-    my $final_data = $data;
-    if (ref $data->[0] eq 'HASH') {
-        $final_data = [ map {
-            my $row = $_;
-            my %to_insert = ( %{$self->{_cond} || {}}, %$row );
-            my %clean_data;
-            while (my ($k, $v) = each %to_insert) {
-                my $clean_key = $k;
-                $clean_key =~ s/^(?:foreign|self)\.//;
-                $clean_data{$clean_key} = $v;
+    # Detect format: hashref array or column list + rows
+    my $first_elem = $data->[0];
+    my $is_column_list_format = ref $first_elem eq 'ARRAY';
+
+    my @rows_to_create;
+
+    if ($is_column_list_format) {
+        # Format: [ [qw/col1 col2/], [val1, val2], [val3, val4], ... ]
+        my @columns = @{ $data->[0] };
+
+        for my $i (1 .. $#$data) {
+            my @values = @{ $data->[$i] };
+
+            croak("Row $i has different number of values than columns")
+                unless @values == @columns;
+
+            my %row;
+            for my $j (0 .. $#columns) {
+                $row{$columns[$j]} = $values[$j];
             }
-            \%clean_data;
-        } @$data ];
+
+            push @rows_to_create, \%row;
+        }
+    } else {
+        # Format: [ {col1 => val1}, {col1 => val2}, ... ]
+        @rows_to_create = @$data;
     }
 
-    return $self->{async_db}->populate(
-        $self->{source_name},
-        $final_data
-    )->then(sub {
-        my ($results) = @_;
+    # Create all rows
+    my @futures;
+    foreach my $row_data (@rows_to_create) {
+        # Create the row, then immediately discard_changes to fetch defaults
+        my $f = $self->create($row_data)->then(sub {
+            my $new_row = shift;
+            return $new_row->discard_changes; # Returns a future resolving to the refreshed row
+        });
+        push @futures, $f;
+    }
 
-        # Error handling
-        if (ref $results eq 'HASH' && $results->{__error}) {
-            return Future->fail($results->{__error}, 'db_error');
+    # Wait for all creates to complete
+    return Future->wait_all(@futures)->then(sub {
+        my @results;
+        foreach my $f (@_) {
+            my $row = eval { $f->get };
+            push @results, $row if $row && !$@;
         }
 
-        # Re-inflate hashes back into DBIx::Class::Async::Result objects
-        my @objects = map { $self->new_result($_) } @$results;
-
-        # Return as list or arrayref depending on context is tricky in Promises.
-        # Usually, async APIs return the collection and let the user handle it.
-        return Future->done(@objects);
+        return Future->done(\@results);
     });
 }
 

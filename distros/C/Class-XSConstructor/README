@@ -186,7 +186,26 @@ DESCRIPTION
   
           defined $object->{thing} or die;  # dies
 
-    *   Supports Moose/Moo/Class::Tiny-style `BUILD` methods.
+    *   Custom slot initializers.
+
+          use Class::XSConstructor foo => {
+            slot_initializer => sub {
+              my ( $object, $value ) = @_;
+              $object->{FOO} = $value; 
+            },
+          };
+
+        One of the jobs that the constructor obviously does is insert each
+        value into the relevant slots in the object's underlying hash. In very
+        rare cases, you might want to provide a callback to do this. A use
+        case might be if you have particular attributes that you wish to store
+        using inside-out object techniques, or encrypt before storing.
+
+        Obviously your accessors will also need to be written to be able to
+        access the value from wherever you've stored it.
+
+    *   Supports Moose/Moo/Class::Tiny-style `BUILD`, `BUILDALL`, `BUILDARGS`,
+        and `FOREIGNBUILDARGS` methods.
 
         Including `__no_BUILD__`.
 
@@ -251,13 +270,6 @@ DESCRIPTION
           use Class::XSConstructor [ 'Person', 'new_by_phone' ] => qw( name! phone );
           use Class::XSConstructor [ 'Person', 'new_by_email' ] => qw( name! email );
 
-        However, you can create multiple contructors that all use the same
-        defined list of attributes.
-
-          use Class::XSConstructor [ 'Person', 'new' ] => qw( name! phone email );
-          Class::XSConstructor::install_constructor( 'Person::new_by_phone' );
-          Class::XSConstructor::install_constructor( 'Person::new_by_email' );
-
 API
     This section documents the API of Class::XSConstructor for other modules
     that wish to wrap its functionality (to perhaps provide additional
@@ -287,19 +299,16 @@ API
 
         Returns nothing.
 
-    Class::XSConstructor::install_constructor($subname)
-        Just installs the XS constructor without doing some of the necessary
-        setup. $subname is a fully qualified sub name, like "Foo::new".
+    Class::XSConstructor::get_metadata( $package )
+        Get a copy of the metadata that Class::XSConstructor holds for the
+        package.
 
-        This is automatically done as part of `import`, so if you're using
-        `import`, you don't need to do this.
-
-        Returns nothing.
-
-  Use of Package Variables
-    Class::XSConstructor stores its configuration for class Foo in a bunch of
-    package variables with the prefix `Foo::__XSCON_`. If you tamper with
-    those, your warranty will be void.
+        If you tamper with the metadata (which you probably shouldn't as it's
+        inviting segfaults), you should call
+        `Your::Class->XSCON_CLEAR_CONSTRUCTOR_CACHE` afterwards. You may also
+        need to clear $Class::XSConstructor::BUILD_CACHE{$package} and
+        $Class::XSConstructor::DEMOLISH_CACHE{$package} as those are separate
+        caches.
 
 CAVEATS
     Inheritance will automatically work if you are inheriting from another

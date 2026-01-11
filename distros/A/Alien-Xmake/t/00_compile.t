@@ -8,9 +8,11 @@ my $xmake = Alien::Xmake->new;
 diag 'Install type:  ' . $xmake->install_type;
 diag 'Xmake version: ' . $xmake->version;
 use Capture::Tiny qw[capture];
+my $exe = $xmake->exe;
+diag 'Path to exe:  ' . $exe;
+diag qx[$exe g --theme=plain] if $ENV{AUTOMATED_TESTING};
 #
 subtest xmake => sub {
-    my $exe = $xmake->exe;
     diag 'Path to exe:  ' . $exe;
     my ( $stdout, $stderr, $exit ) = capture { system $exe, '--version' };
     is $exit, 0, $exe . ' --version';
@@ -19,9 +21,7 @@ subtest xmake => sub {
 };
 #
 subtest xrepo => sub {
-    my $exe = $xmake->xrepo;
-    diag 'Path to exe:  ' . $exe;
-    my ( $stdout, $stderr, $exit ) = capture { system $exe, '--version' };
+    my ( $stdout, $stderr, $exit ) = capture { system $exe, 'lua', 'private.xrepo', '--version' };
     is $exit, 0, $exe . ' --version';
     diag $stdout if length $stdout;
     diag $stderr if length $stderr;

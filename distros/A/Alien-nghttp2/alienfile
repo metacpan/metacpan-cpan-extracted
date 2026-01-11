@@ -1,0 +1,33 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'libnghttp2';
+
+share {
+    requires 'Alien::Build::Plugin::Build::CMake' => '0.99';
+    requires 'Alien::cmake3' => '0.02';
+    requires 'Alien::Build::Plugin::Download::GitHub' => '0.10';
+
+    plugin 'Download::GitHub' => (
+        github_user => 'nghttp2',
+        github_repo => 'nghttp2',
+    );
+
+    plugin 'Extract' => 'tar.gz';
+
+    plugin 'Build::CMake' => ();
+
+    build [
+        ['%{cmake}',
+            @{ meta->prop->{plugin_build_cmake}->{args} },
+            '-DENABLE_LIB_ONLY=ON',
+            # Build static library for share install - simpler and more portable
+            '-DBUILD_STATIC_LIBS=ON',
+            '-DBUILD_SHARED_LIBS=OFF',
+            '-DBUILD_TESTING=OFF',
+            '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
+            '%{.install.extract}',
+        ],
+        ['%{make}'],
+        ['%{make}', 'install'],
+    ];
+};

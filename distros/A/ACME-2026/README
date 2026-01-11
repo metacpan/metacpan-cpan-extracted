@@ -1,0 +1,68 @@
+ACME-2026
+
+A tiny functional checklist module for 2026 goals. Plans are hashrefs
+that can be saved and loaded as JSON.
+
+SYNOPSIS
+
+    use ACME::2026 qw(:all);
+
+    my $plan = plan_new(
+        title => '2026',
+        storage => '2026.json',
+        autosave => 1,
+    );
+
+    my $id = add_item($plan, 'Run a marathon',
+        list => 'Health',
+        due => '2026-10-01',
+        tags => [qw/fitness endurance/],
+        priority => 2,
+    );
+
+    complete_item($plan, $id, note => 'Signed up for NYC');
+    my @open = items($plan, status => 'todo', list => 'Health', sort => 'due');
+
+    plan_save($plan);
+
+CLI
+
+This distribution includes a small wrapper script:
+
+    acme2026 add "Run a marathon" --list Health --tag fitness --due 2026-10-01
+    acme2026 complete 1 --note "Signed up"
+    acme2026 list --status todo --sort due
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc ACME::2026
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=ACME-2026
+
+    Search CPAN
+        https://metacpan.org/release/ACME-2026
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by Will Willis <wwillis@cpan.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

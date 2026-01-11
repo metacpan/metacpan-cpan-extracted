@@ -1,5 +1,5 @@
 ---
-abstract: "It's new $module"
+abstract: "It's the document builder"
 author:
   - 'janeskil1525 <janeskil1525@gmail.com>'
 build_requires:
@@ -26,7 +26,7 @@ no_index:
 provides:
   Daje::Document::Builder:
     file: lib/Daje/Document/Builder.pm
-    version: '0.01'
+    version: '0.10'
   Daje::Document::Builder::Html:
     file: lib/Daje/Document/Builder/Html.pm
   Daje::Document::Load::Template:
@@ -46,6 +46,6 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje-Document-Builder/issues
   homepage: https://github.com/janeskil1525/Daje-Document-Builder
   repository: https://github.com/janeskil1525/Daje-Document-Builder.git
-version: '0.01'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

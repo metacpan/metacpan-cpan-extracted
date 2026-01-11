@@ -1,0 +1,89 @@
+{
+   "abstract" : "Find or build the nghttp2 HTTP/2 C library",
+   "author" : [
+      "Your Name <your@email.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-nghttp2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "2.37",
+            "Alien::Build::MM" : "0.25",
+            "Alien::Build::Plugin::Build::CMake" : "0.99"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "2.37",
+            "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Build::CMake" : "0.99",
+            "Alien::Build::Plugin::Download::GitHub" : "0",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "2.37",
+            "Alien::Build" : "0.25",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Alien" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yourname/Alien-nghttp2/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yourname/Alien-nghttp2.git",
+         "web" : "https://github.com/yourname/Alien-nghttp2"
+      }
+   },
+   "version" : "0.001",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 2.84",
+      "requires" : {
+         "share" : {
+            "Alien::Build::Plugin::Build::CMake" : "0.99",
+            "Alien::Build::Plugin::Download::GitHub" : "0.10",
+            "Alien::Build::Plugin::Download::Negotiate" : "1.30",
+            "Alien::cmake3" : "0.02",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mojo::DOM" : "0",
+            "Mojolicious" : "7.00",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

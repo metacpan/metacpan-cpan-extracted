@@ -1,0 +1,115 @@
+Claude-Agent
+
+A Perl SDK for the Claude Agent SDK, providing programmatic access to Claude
+Code's agentic capabilities. Build AI agents that can read files, run commands,
+search the web, edit code, and more.
+
+This SDK communicates with the Claude Code CLI, similar to the official
+TypeScript and Python SDKs.
+
+SYNOPSIS
+
+    use Claude::Agent qw(query);
+    use Claude::Agent::Options;
+
+    my $options = Claude::Agent::Options->new(
+        allowed_tools   => ['Read', 'Glob', 'Grep'],
+        permission_mode => 'bypassPermissions',
+        max_turns       => 5,
+    );
+
+    my $iter = query(
+        prompt  => "Find all TODO comments in the codebase",
+        options => $options,
+    );
+
+    while (my $msg = $iter->next) {
+        if ($msg->isa('Claude::Agent::Message::Result')) {
+            print $msg->result, "\n";
+            last;
+        }
+    }
+
+FEATURES
+
+    - Async support via IO::Async and Future::AsyncAwait
+    - Streaming message iteration (blocking and async)
+    - Full tool support (Read, Write, Edit, Bash, Glob, Grep, WebFetch, etc.)
+    - Hook system for intercepting tool calls
+    - Permission callbacks for fine-grained control
+    - MCP server integration (SDK, stdio, SSE, HTTP)
+    - Custom subagent definitions
+    - Structured JSON output with schema validation
+    - Session management (resume, fork)
+
+REQUIREMENTS
+
+    - Perl 5.020 or higher
+    - Claude Code CLI installed (npm install -g @anthropic-ai/claude-code)
+    - Valid Anthropic API key or Claude subscription
+
+DEPENDENCIES
+
+    - Marlin (fast Moo-compatible OO)
+    - IO::Async
+    - Future::AsyncAwait
+    - Cpanel::JSON::XS
+    - JSON::Lines
+    - Types::Common
+    - Try::Tiny
+    - File::Which
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+EXAMPLES
+
+See the examples/ directory for complete working examples:
+
+    01-basic-query.pl      - Basic query with tool usage
+    02-custom-tools.pl     - Tool definition pattern
+    05-async-query.pl      - Async iteration with Future
+    06-client-session.pl   - Persistent multi-turn sessions
+    07-subagents.pl        - Custom subagent definitions
+    08-structured-output.pl - JSON schema structured outputs
+    10-mcp-servers.pl      - MCP server configuration
+
+DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command:
+
+    perldoc Claude::Agent
+    perldoc Claude::Agent::Options
+    perldoc Claude::Agent::Client
+    perldoc Claude::Agent::Query
+    perldoc Claude::Agent::Hook
+    perldoc Claude::Agent::Permission
+    perldoc Claude::Agent::MCP
+    perldoc Claude::Agent::Subagent
+
+SUPPORT AND DOCUMENTATION
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Claude-Agent
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Claude-Agent
+
+    Search CPAN
+        https://metacpan.org/release/Claude-Agent
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

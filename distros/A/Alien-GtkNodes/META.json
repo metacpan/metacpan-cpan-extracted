@@ -45,6 +45,7 @@
       "runtime" : {
          "requires" : {
             "Alien::Base" : "1.00",
+            "Alien::Build::Plugin::Gather::Dino" : "0.08",
             "Alien::Role::Dino" : "0",
             "DynaLoader" : "0",
             "Env" : "0",
@@ -71,7 +72,7 @@
          "web" : "https://codeberg.org/jbarrett/Alien-GtkNodes/"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.33",
       "requires" : {

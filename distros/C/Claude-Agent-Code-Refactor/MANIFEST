@@ -1,0 +1,20 @@
+Changes
+examples/refactor_until_clean.pl
+lib/Claude/Agent/Code/Refactor.pm
+lib/Claude/Agent/Code/Refactor/Options.pm
+lib/Claude/Agent/Code/Refactor/Result.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-basic.t
+t/02-internals.t
+t/03-options.t
+t/04-result.t
+t/05-edge-cases.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -33,7 +33,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Class-XSConstructor";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-014000>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-014001>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-015000>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-015001>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-015002>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-015003>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-016000>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-016001>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-016002>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-014000>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-014001>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-015000>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-015001>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-015002>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-015003>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-016000>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-016001>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-016002>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-017000>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-018000>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-018001>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-class-xsconstructor>;
@@ -426,6 +426,60 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Class-XSConstructor-0.016002.tar.gz>;
 	doap:revision        "0.016002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-017000>
+	a                    doap:Version;
+	dc:identifier        "Class-XSConstructor-0.017000"^^xsd:string;
+	dc:issued            "2026-01-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Hopefully fix errors on debugging builds of Perl.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "BUILDARGS/FOREIGNBUILDARGS/BUILDALL to play nice with other modules.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "slot_initializer.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Class-XSConstructor-0.017000.tar.gz>;
+	doap:revision        "0.017000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-018000>
+	a                    doap:Version;
+	dc:identifier        "Class-XSConstructor-0.018000"^^xsd:string;
+	dc:issued            "2026-01-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Class::XSConstructor::get_metadata() should return undef for classes we didn't build.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Somewhat document Class::XSConstructor::get_metadata().";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Somewhat supported way to clear internal caches.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Class-XSConstructor-0.018000.tar.gz>;
+	doap:revision        "0.018000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-018001>
+	a                    doap:Version;
+	dc:identifier        "Class-XSConstructor-0.018001"^^xsd:string;
+	dc:issued            "2026-01-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix bug trying to use '0' as an arrayref.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Class-XSConstructor-0.018001.tar.gz>;
+	doap:revision        "0.018001"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

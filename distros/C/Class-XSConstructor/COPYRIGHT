@@ -3,6 +3,22 @@ Upstream-Name: Class-XSConstructor
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Class-XSConstructor
 
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ t/13slotinit.t
+ t/30buildargs.t
+ t/31foreignconstructor.t
+ t/32foreignbuildargs.t
+ t/33buildall.t
+ t/40layercake.t
+ t/90clearer.t
+ t/97reader.t
+ t/98delegation.t
+Copyright: Copyright 2026 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: t/05strictconstructor.t
  t/06inherit-from.t
  t/07coercion.t
@@ -23,15 +39,6 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
-Files: Changes
- META.json
- META.yml
- doap.ttl
- t/97reader.t
- t/98delegation.t
-Copyright: Copyright 2026 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: t/01basic.t
  t/02types.t
  t/03typetiny.t
@@ -45,30 +52,30 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: lib/Class/XSDelegation.pm
- t/12aliases.t
-Copyright: This software is copyright (c) 2026 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: README
  lib/Class/XSConstructor.pm
 Copyright: This software is copyright (c) 2018-2019, 2025-2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: dist.ini
-Copyright: Copyright 2018 Toby Inkster.
+Files: lib/Class/XSDelegation.pm
+ t/12aliases.t
+Copyright: This software is copyright (c) 2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/99destroy.t
 Copyright: Copyright 2025 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: lib/Class/XSDestructor.pm
-Copyright: This software is copyright (c) 2025-2026 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: t/03typenano.t
 Copyright: This software is copyright (c) 2019 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+Copyright: Copyright 2018 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/Class/XSDestructor.pm
+Copyright: This software is copyright (c) 2025-2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

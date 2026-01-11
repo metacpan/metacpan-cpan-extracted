@@ -88,11 +88,9 @@ like($_, qr/\AAttribute 'name' is required/       , 'exception') for $e2, $e4;
 is($_, undef, 'no exception') for $e5, $e6;
 
 use Class::XSConstructor [ TestThing => 'create' ], qw( bleh !! );
-Class::XSConstructor::install_constructor( 'TestThing::alt_create' );
 
 is( exception { TestThing->create(bleh => 1) }, undef, 'Alternative package name and method name' );
 like( exception { TestThing->create(bleh => 1, blah => 2) }, qr/unknown attribute/i, '... with strict constructor' );
-is( exception { TestThing->alt_create(bleh => 1) }, undef, '... and alias' );
 
 done_testing;
 

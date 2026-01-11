@@ -51,6 +51,6 @@
          "web" : "https://github.com/david-dick/date-holidays-au"
       }
    },
-   "version" : "0.35",
+   "version" : "0.36",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

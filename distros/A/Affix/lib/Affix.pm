@@ -1,4 +1,4 @@
-package Affix v1.0.3 {    # 'FFI' is my middle name!
+package Affix v1.0.5 {    # 'FFI' is my middle name!
 
     #~ |-----------------------------------|-----------------------------------||
     #~ |--------------------------4---5~---|--4--------------------------------||
@@ -20,7 +20,7 @@ package Affix v1.0.3 {    # 'FFI' is my middle name!
     #
     BEGIN {
         use XSLoader;
-        $DynaLoad::dl_debug = 1;
+        $DynaLoad::dl_debug = $DynaLoad::dl_debug = 1;
         $okay               = XSLoader::load();
         my $platform
             = 'Affix::Platform::' .
@@ -48,7 +48,8 @@ package Affix v1.0.3 {    # 'FFI' is my middle name!
     #~ ];
     push @{ $EXPORT_TAGS{lib} }, qw[libm libc];
     $EXPORT_TAGS{types} = [
-        qw[         Void Bool
+        qw[ typedef
+            Void Bool
             Char UChar SChar WChar
             Short UShort
             Int UInt
@@ -70,7 +71,7 @@ package Affix v1.0.3 {    # 'FFI' is my middle name!
     ];
     {
         my %seen;
-        push @{ $EXPORT_TAGS{default} }, grep { !$seen{$_}++ } @{ $EXPORT_TAGS{$_} } for qw[core types cc lib];
+        push @{ $EXPORT_TAGS{default} }, grep { !$seen{$_}++ } @{ $EXPORT_TAGS{$_} } for qw[core types lib];
     }
     {
         my %seen;

@@ -1,6 +1,6 @@
 package DBIx::Class::Async;
 
-$DBIx::Class::Async::VERSION   = '0.20';
+$DBIx::Class::Async::VERSION   = '0.22';
 $DBIx::Class::Async::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ DBIx::Class::Async - Asynchronous database operations for DBIx::Class
 
 =head1 VERSION
 
-Version 0.20
+Version 0.22
 
 =cut
 
@@ -51,8 +51,7 @@ You are encouraged to try and share your suggestions.
     use DBIx::Class::Async;
 
     my $loop = IO::Async::Loop->new;
-
-    my $db = DBIx::Class::Async->new(
+    my $db   = DBIx::Class::Async->new(
         schema_class => 'MyApp::Schema',
         connect_info => [
             'dbi:SQLite:dbname=my.db',
@@ -86,7 +85,7 @@ You are encouraged to try and share your suggestions.
 
 =head1 DESCRIPTION
 
-DBIx::Class::Async provides asynchronous access to DBIx::Class using a
+C<DBIx::Class::Async> provides asynchronous access to L<DBIx::Class> using a
 process-based worker pool built on L<IO::Async::Function>.
 
 Each worker maintains a persistent database connection and executes blocking
@@ -102,7 +101,7 @@ Features include:
 
 =item * Process-based worker pool using L<IO::Async>
 
-=item * Persistent DBIx::Class connections per worker
+=item * Persistent L<DBIx::Class> connections per worker
 
 =item * Non-blocking CRUD operations via L<Future>
 
@@ -120,7 +119,7 @@ Features include:
 
 =head2 new
 
-Creates a new DBIx::Class::Async instance.
+Creates a new C<DBIx::Class::Async> instance.
 
     my $async_db = DBIx::Class::Async->new(
         schema_class   => 'MyApp::Schema', # Required
@@ -144,7 +143,7 @@ Parameters:
 
 =item * B<schema_class> (Required)
 
-The DBIx::Class::Schema class name.
+The L<DBIx::Class::Schema> class name.
 
 =item * B<connect_info> (Required)
 
@@ -669,7 +668,7 @@ Executes a transaction.
         return 'transfer_complete';
     });
 
-The callback receives a DBIx::Class::Schema instance and should return the
+The callback receives a L<DBIx::Class::Schema> instance and should return the
 transaction result.
 
 B<IMPORTANT:> This method has limitations due to serialisation constraints.
@@ -935,7 +934,7 @@ sub disconnect {
 
 =head2 loop
 
-Returns the IO::Async::Loop instance.
+Returns the L<IO::Async::Loop> instance.
 
     my $loop = $async_db->loop;
 
@@ -1641,7 +1640,7 @@ collects:
 
 =item * Result objects
 
-Returned rows are plain hashrefs, not DBIx::Class row objects.
+Returned rows are plain hashrefs, not L<DBIx::Class> row objects.
 
 =item * Transactions
 

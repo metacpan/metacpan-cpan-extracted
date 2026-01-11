@@ -1,7 +1,10 @@
 Revision history for Perl extension Daje-Document-Builder
 
-0.01 2025-11-16T12:06:46Z
+0.10 2026-01-10T15:47:31Z
 
+    - 2026-01-10 Add subs refactored to handle unlimited number of subs
+    - 2025-12-12 Minor bug fix
+    - 2025-11-16 Documentation improved
     - 2025-11-16 First working version
     - original version
 

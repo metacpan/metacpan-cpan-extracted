@@ -1,0 +1,68 @@
+{
+   "abstract" : "Perl SDK for the Claude Agent SDK",
+   "author" : [
+      "LNATION <email@lnation.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Claude-Agent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Const::XS" : "1.03",
+            "Crypt::URandom" : "0.54",
+            "File::Which" : "1.27",
+            "Future::AsyncAwait" : "0.60",
+            "IO::Async" : "0.80",
+            "JSON::Lines" : "1.10",
+            "Log::Any" : "1.710",
+            "Marlin" : "0.007000",
+            "Try::Tiny" : "0.30",
+            "Type::Tiny" : "2.0",
+            "Types::Common" : "2.0",
+            "namespace::clean" : "0.27",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "1.0",
+            "Test::Exception" : "0.43",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/lnation/Claude-Agent.git",
+         "web" : "https://github.com/lnation/Claude-Agent"
+      }
+   },
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

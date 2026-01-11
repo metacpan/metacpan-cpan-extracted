@@ -224,7 +224,7 @@ one of the following:
     Build from source using gmake instead of make or try this:
 
     ```
-    $
+    $ pkg install xmake-io
     ```
 
 - Android (Termux)
@@ -237,7 +237,7 @@ one of the following:
 
 [https://xmake.io/](https://xmake.io/)
 
-Demos for both \`xmake\` and \`xrepo\` in \`eg/\`.
+Demos for both `xmake` and `xrepo` in `eg/`.
 
 # LICENSE
 

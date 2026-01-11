@@ -43,6 +43,8 @@ t/28-find-or.t
 t/29-update-or.t
 t/30-delete-all.t
 t/31-search-related.t
+t/32-schema-class.t
+t/33-schema-populate.t
 t/manifest.t
 t/pod.t
 t/test.db

@@ -9,7 +9,7 @@ use List::Util 1.45 qw( uniq );
 
 BEGIN {
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.016002';
+	our $VERSION   = '0.018001';
 	
 	if ( eval { require Types::Standard; 1 } ) {
 		Types::Standard->import(
@@ -31,7 +31,7 @@ BEGIN {
 	__PACKAGE__->XSLoader::load($VERSION);
 };
 
-our %META;
+our ( %META, %BUILD_CACHE, %DEMOLISH_CACHE );
 
 sub import {
 	my $class = shift;
@@ -42,23 +42,25 @@ sub import {
 	$package    ||= our($SETUP_FOR) || caller;
 	$methodname ||= 'new';
 	
+	$META{$package} ||= { package => $package };
+	
 	if (our $REDEFINE) {
 		no warnings 'redefine';
-		install_constructor("$package\::$methodname");
+		install_constructor(
+			"$package\::$methodname",
+			"$package\::BUILDALL",
+			"$package\::XSCON_CLEAR_CONSTRUCTOR_CACHE",
+		);
 	}
 	else {
-		install_constructor("$package\::$methodname");
+		install_constructor(
+			"$package\::$methodname",
+			"$package\::BUILDALL",
+			"$package\::XSCON_CLEAR_CONSTRUCTOR_CACHE",
+		);
 	}
-	
-	$META{$package} ||= { package => $package };
+
 	inheritance_stuff($package);
-	
-	do {
-		no strict 'refs';
-		no warnings 'once';
-		%{"${package}::__XSCON_BUILD"} = ();
-		%{"${package}::__XSCON_DEMOLISH"} = ();
-	};
 	
 	for my $pair (@{ mkopt \@_ }) {
 		my ($name, $thing) = @$pair;
@@ -121,7 +123,7 @@ sub import {
 			_croak("Required attribute $name cannot have undef init_arg");
 		}
 		
-		my @unknown_keys = sort grep !/\A(isa|required|is|default|builder|coerce|init_arg|trigger|weak_ref|alias)\z/, keys %spec;
+		my @unknown_keys = sort grep !/\A(isa|required|is|default|builder|coerce|init_arg|trigger|weak_ref|alias|slot_initializer)\z/, keys %spec;
 		if ( @unknown_keys ) {
 			_croak("Unknown keys in spec: %d", join ", ", @unknown_keys);
 		}
@@ -162,6 +164,10 @@ sub import {
 		}
 		elsif ( $spec{alias} ) {
 			$meta_attribute{aliases} = [ $spec{alias} ];
+		}
+		
+		if ( is_CodeRef $spec{slot_initializer} ) {
+			$meta_attribute{slot_initializer} = $spec{slot_initializer};
 		}
 		
 		# Add new attribute
@@ -325,6 +331,7 @@ sub _build_flags {
 	$flags |= XSCON_FLAG_HAS_TRIGGER           if $spec->{trigger};
 	$flags |= XSCON_FLAG_WEAKEN                if $spec->{weak_ref};
 	$flags |= XSCON_FLAG_HAS_ALIASES           if $spec->{alias};
+	$flags |= XSCON_FLAG_HAS_SLOT_INITIALIZER  if $spec->{slot_initializer};
 	
 	my $has_common_default = 0;
 	if ( exists $spec->{default} and !defined $spec->{default} ) {
@@ -370,12 +377,32 @@ sub inheritance_stuff {
 	
 	require( $] >= 5.010 ? "mro.pm" : "MRO/Compat.pm" );
 	
-	my @isa = reverse @{ mro::get_linear_isa($package) };
-	pop @isa;  # discard $package itself
+	my @isa = @{ mro::get_linear_isa($package) };
+	shift @isa;  # discard $package itself
 	return unless @isa;
 	
-	my @attrs;
 	for my $parent ( @isa ) {
+		no strict 'refs';
+		# Moo will sometimes not have a constructor in &{"${parent}::new"}
+		# when by all that is good and holy, it should.
+		if ( $INC{'Moo.pm'} and $Moo::MAKERS{$parent} ) {
+			Moo->_constructor_maker_for( $parent )->install_delayed;
+			Sub::Defer::undefer_sub( \&{"${parent}::new"} );
+		}
+		if ( defined &{"${parent}::new"} ) {
+			if ( not $META{$parent} ) {
+				# We are inheriting from a foreign class.
+				$META{$package}{foreignclass}         = $parent;
+				$META{$package}{foreignconstructor}   = \&{"${parent}::new"};
+				$META{$package}{foreignbuildall}      = $parent->can('BUILDALL');
+				$META{$package}{foreignbuildargs}     = $parent->can('BUILDARGS');
+			}
+			last;
+		}
+	}
+	
+	my @attrs;
+	for my $parent ( reverse @isa ) {
 		my $p_attrs = $META{$parent}{params} or next;
 		push @attrs, @$p_attrs;
 	}
@@ -387,20 +414,15 @@ sub populate_demolish {
 	my $package = ref($_[0]) || $_[0];
 	my $klass   = ref($_[1]) || $_[1];
 	
-	my $DEMOLISH = do {
-		no strict 'refs';
-		\%{"${package}::__XSCON_DEMOLISH"};
-	};
-	
 	if (!$klass->can('DEMOLISH')) {
-		$DEMOLISH->{$klass} = 0;
+		$DEMOLISH_CACHE{$klass} = 0;
 		return;
 	}
 	
 	require( $] >= 5.010 ? "mro.pm" : "MRO/Compat.pm" );
 	no strict 'refs';
 	
-	$DEMOLISH->{$klass} = [
+	$DEMOLISH_CACHE{$klass} = [
 		reverse
 		map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
 		map { "$_\::DEMOLISH" }
@@ -414,20 +436,15 @@ sub populate_build {
 	my $package = ref($_[0]) || $_[0];
 	my $klass   = ref($_[1]) || $_[1];
 	
-	my $BUILD = do {
-		no strict 'refs';
-		\%{"${package}::__XSCON_BUILD"};
-	};
-	
 	if (!$klass->can('BUILD')) {
-		$BUILD->{$klass} = 0;
+		$BUILD_CACHE{$klass} = 0;
 		return;
 	}
 	
 	require( $] >= 5.010 ? "mro.pm" : "MRO/Compat.pm" );
 	no strict 'refs';
 	
-	$BUILD->{$klass} = [
+	$BUILD_CACHE{$klass} = [
 		map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
 		map { "$_\::BUILD" }
 		reverse @{ mro::get_linear_isa($klass) }
@@ -438,27 +455,23 @@ sub populate_build {
 
 sub get_metadata {
 	my $klass = ref($_[0]) || $_[0];
-	return $META{$klass};
+	my $meta  = $META{$klass} or return;
+	$meta->{buildargs}        ||= $klass->can('BUILDARGS');
+	$meta->{foreignbuildargs} ||= $klass->can('FOREIGNBUILDARGS')
+		if $meta->{foreignconstructor} && !$meta->{foreignbuildall};
+	return $meta;
 }
 
 sub get_build_methods {
 	my $klass = ref($_[0]) || $_[0];
-	populate_build( $klass, $klass );
-	my $BUILD = do {
-		no strict 'refs';
-		\%{"${klass}::__XSCON_BUILD"};
-	};
-	return @{ $BUILD->{$klass} or [] };
+	__PACKAGE__->populate_build( $klass );
+	return @{ $BUILD_CACHE{$klass} or [] };
 }
 
 sub get_demolish_methods {
 	my $klass = ref($_[0]) || $_[0];
-	populate_demolish( $klass, $klass );
-	my $DEMOLISH = do {
-		no strict 'refs';
-		\%{"${klass}::__XSCON_DEMOLISH"};
-	};
-	return @{ $DEMOLISH->{$klass} or [] };
+	__PACKAGE__->populate_demolish( $klass );
+	return @{ $DEMOLISH_CACHE{$klass} or [] };
 }
 
 1;
@@ -689,7 +702,28 @@ Supports C<weak_ref> like L<Moose> and L<Moo>.
 
 =item *
 
-Supports Moose/Moo/Class::Tiny-style C<BUILD> methods.
+Custom slot initializers.
+
+  use Class::XSConstructor foo => {
+    slot_initializer => sub {
+      my ( $object, $value ) = @_;
+      $object->{FOO} = $value; 
+    },
+  };
+
+One of the jobs that the constructor obviously does is insert each value
+into the relevant slots in the object's underlying hash. In very rare
+cases, you might want to provide a callback to do this. A use case might
+be if you have particular attributes that you wish to store using inside-out
+object techniques, or encrypt before storing.
+
+Obviously your accessors will also need to be written to be able to access
+the value from wherever you've stored it.
+
+=item * 
+
+Supports Moose/Moo/Class::Tiny-style C<BUILD>, C<BUILDALL>, C<BUILDARGS>,
+and C<FOREIGNBUILDARGS> methods.
 
 Including C<< __no_BUILD__ >>.
 
@@ -757,13 +791,6 @@ with different attributes for each:
   use Class::XSConstructor [ 'Person', 'new_by_phone' ] => qw( name! phone );
   use Class::XSConstructor [ 'Person', 'new_by_email' ] => qw( name! email );
 
-However, you can create multiple contructors that all use the same defined
-list of attributes.
-
-  use Class::XSConstructor [ 'Person', 'new' ] => qw( name! phone email );
-  Class::XSConstructor::install_constructor( 'Person::new_by_phone' );
-  Class::XSConstructor::install_constructor( 'Person::new_by_email' );
-
 =back
 
 =head1 API
@@ -798,23 +825,19 @@ using:
 
 Returns nothing.
 
-=item C<< Class::XSConstructor::install_constructor($subname) >>
+=item C<< Class::XSConstructor::get_metadata( $package ) >>
 
-Just installs the XS constructor without doing some of the necessary setup.
-C<< $subname >> is a fully qualified sub name, like "Foo::new".
+Get a copy of the metadata that Class::XSConstructor holds for the
+package.
 
-This is automatically done as part of C<import>, so if you're using C<import>,
-you don't need to do this.
-
-Returns nothing.
+If you tamper with the metadata (which you probably shouldn't as it's inviting
+segfaults), you should call C<< Your::Class->XSCON_CLEAR_CONSTRUCTOR_CACHE >>
+afterwards. You may also need to clear
+C<< $Class::XSConstructor::BUILD_CACHE{$package} >> and
+C<< $Class::XSConstructor::DEMOLISH_CACHE{$package} >> as those are
+separate caches.
 
 =back
-
-=head2 Use of Package Variables
-
-Class::XSConstructor stores its configuration for class Foo in a bunch of
-package variables with the prefix C<< Foo::__XSCON_ >>. If you tamper with
-those, your warranty will be void.
 
 =head1 CAVEATS
 

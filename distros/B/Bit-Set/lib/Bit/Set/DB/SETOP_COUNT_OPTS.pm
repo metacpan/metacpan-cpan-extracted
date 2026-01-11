@@ -1,5 +1,5 @@
 package Bit::Set::DB::SETOP_COUNT_OPTS;
-$Bit::Set::DB::SETOP_COUNT_OPTS::VERSION = '0.12';
+$Bit::Set::DB::SETOP_COUNT_OPTS::VERSION = '0.13';
 use strict;
 use warnings;
 
@@ -16,7 +16,7 @@ Bit::Set::DB::SETOP_COUNT_OPTS - Configuration options for container set operati
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

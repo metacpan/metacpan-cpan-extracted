@@ -6,6 +6,33 @@ Home page:    <https://metacpan.org/release/Class-XSConstructor>
 Bug tracker:  <https://github.com/tobyink/p5-class-xsconstructor/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.018001	2026-01-11
+
+ [ Bug Fixes ]
+ - Fix bug trying to use '0' as an arrayref.
+
+0.018000	2026-01-11
+
+ [ Bug Fixes ]
+ - Class::XSConstructor::get_metadata() should return undef for classes we
+   didn't build.
+
+ [ Documentation ]
+ - Somewhat document Class::XSConstructor::get_metadata().
+
+ [ Other ]
+ - Somewhat supported way to clear internal caches.
+
+0.017000	2026-01-10
+
+ [ Bug Fixes ]
+ - Hopefully fix errors on debugging builds of Perl.
+
+ [ Other ]
+ - Added: BUILDARGS/FOREIGNBUILDARGS/BUILDALL to play nice with other
+   modules.
+ - Added: slot_initializer.
+
 0.016002	2026-01-08
 
  - Faster strict constructor checks.

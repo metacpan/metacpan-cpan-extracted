@@ -8,12 +8,12 @@ no warnings 'experimental::class';
 class Alien::Xmake::Builder {
     use CPAN::Meta;
     use ExtUtils::Install qw[pm_to_blib install];
-    use ExtUtils::InstallPaths 0.002;
+    use ExtUtils::InstallPaths;
     use JSON::PP;
     use Config;
     use HTTP::Tiny;
-    use Path::Tiny qw[path cwd];
-    use ExtUtils::Helpers 0.028 qw[make_executable split_like_shell detildefy];
+    use Path::Tiny        qw[path cwd];
+    use ExtUtils::Helpers qw[make_executable split_like_shell detildefy];
     use Data::Dumper;
 
     # Configuration

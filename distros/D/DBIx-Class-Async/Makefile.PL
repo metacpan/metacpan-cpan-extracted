@@ -47,31 +47,31 @@ WriteMakefile(
         provides    => {
             'DBIx::Class::Async' => {
                 file    => 'lib/DBIx/Class/Async.pm',
-                version => '0.20'
+                version => MM->parse_version('lib/DBIx/Class/Async.pm')
             },
             'DBIx::Class::Async::Cursor' => {
                 file    => 'lib/DBIx/Class/Async/Cursor.pm',
-                version => '0.20'
+                version => MM->parse_version('lib/DBIx/Class/Async/Cursor.pm')
             },
             'DBIx::Class::Async::ResultSet' => {
                 file    => 'lib/DBIx/Class/Async/ResultSet.pm',
-                version => '0.20'
+                version => MM->parse_version('lib/DBIx/Class/Async/ResultSet.pm')
             },
             'DBIx::Class::Async::Row' => {
                 file    => 'lib/DBIx/Class/Async/Row.pm',
-                version => '0.20'
+                version => MM->parse_version('lib/DBIx/Class/Async/Row.pm')
             },
             'DBIx::Class::Async::Schema' => {
                 file    => 'lib/DBIx/Class/Async/Schema.pm',
-                version => '0.20'
+                version => MM->parse_version('lib/DBIx/Class/Async/Schema.pm')
             },
             'DBIx::Class::Async::Storage' => {
                 file    => 'lib/DBIx/Class/Async/Storage.pm',
-                version => '0.20'
+                version => MM->parse_version('lib/DBIx/Class/Async/Storage.pm')
             },
             'DBIx::Class::Async::TxnGuard' => {
                 file    => 'lib/DBIx/Class/Async/TxnGuard.pm',
-                version => '0.20'
+                version => MM->parse_version('lib/DBIx/Class/Async/TxnGuard.pm')
             },
         },
         resources => {
@@ -81,7 +81,7 @@ WriteMakefile(
                 web  => 'https://github.com/manwar/DBIx-Class-Async',
             },
             bugtracker => {
-                web => 'https://github.com/manwar/DBIx-Class-Async/issues'
+                web  => 'https://github.com/manwar/DBIx-Class-Async/issues'
             },
         }})
      : ()

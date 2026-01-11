@@ -1,0 +1,42 @@
+---
+abstract: 'Demo of Affix::Build'
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  Affix::Build: v1.0.3
+  HTTP::Tiny: '0'
+  Module::Build: '0.4005'
+  Path::Tiny: '0'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Image-Stb
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::Image::Stb:
+    file: lib/Acme\Image\Stb.pm
+    version: '0.01'
+requires:
+  Affix: v1.0.3
+  perl: v5.40.0
+resources:
+  bugtracker: https://github.com/sanko/Acme-Image-Stb/issues
+  homepage: https://github.com/sanko/Acme-Image-Stb
+  repository: https://github.com/sanko/Acme-Image-Stb.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 0

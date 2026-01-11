@@ -1,6 +1,6 @@
 #!/home/chrisarg/perl5/perlbrew/perls/current/bin/perl
 package Bit::Set;
-$Bit::Set::VERSION = '0.12';
+$Bit::Set::VERSION = '0.13';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Bit::Set - Perl procedural interface to the 'bit' C library
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

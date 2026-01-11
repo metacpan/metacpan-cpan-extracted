@@ -1,6 +1,6 @@
 #!/home/chrisarg/perl5/perlbrew/perls/current/bin/perl
 package Bit::Set::DB;
-$Bit::Set::DB::VERSION = '0.12';
+$Bit::Set::DB::VERSION = '0.13';
 use strict;
 use warnings;
 use XSLoader();
@@ -38,7 +38,7 @@ Bit::Set::DB - Extended XS-based interface for BitDB set operations
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

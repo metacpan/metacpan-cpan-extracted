@@ -4,11 +4,11 @@ Until I have the version 1.0.0 release, I'll support only the last two minor ver
 
 ## Supported Versions
 
-| Version  | Supported          |
-| -------- | ------------------ |
-| 0.1.x    | :white_check_mark: |
-| 0.55.x   | :white_check_mark: |
-| \<= 0.11 | :x:                |
+| Version    | Supported          |
+| ---------- | ------------------ |
+| v1.0.x     | :white_check_mark: |
+| v1.0.3     | :white_check_mark: |
+| \<= v1.0.2 | :x:                |
 
 # Reporting a Vulnerability
 

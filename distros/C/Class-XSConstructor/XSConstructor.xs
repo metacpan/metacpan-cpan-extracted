@@ -38,6 +38,7 @@ enum {
     XSCON_FLAG_HAS_TRIGGER          =   64,
     XSCON_FLAG_WEAKEN               =  128,
     XSCON_FLAG_HAS_ALIASES          =  256,
+    XSCON_FLAG_HAS_SLOT_INITIALIZER =  512,
 
     XSCON_BITSHIFT_DEFAULTS         =   16,
     XSCON_BITSHIFT_TYPES            =   24,
@@ -77,19 +78,25 @@ typedef struct {
     SV     *trigger_sv;
     CV     *check_cv;
     CV     *coercion_cv;
+    CV     *slot_initializer_cv;
 } xscon_param_t;
 
 typedef struct {
-    char *package;
-    bool is_placeholder;
+    char   *package;
+    bool    is_placeholder;
+
+    CV     *buildargs_cv;
+    CV     *foreignbuildargs_cv;
+    CV     *foreignconstructor_cv;
+    bool    foreignbuildall;
 
     xscon_param_t *params;
-    I32 num_params;
+    I32     num_params;
 
-    CV  **build_methods;
-    I32   num_build_methods;
+    CV    **build_methods;
+    I32     num_build_methods;
 
-    bool strict_params;
+    bool    strict_params;
     char  **allow;
     I32     num_allow;
 } xscon_constructor_t;
@@ -124,10 +131,28 @@ typedef struct {
 } xscon_delegation_t;
 
 xscon_constructor_t*
-xscon_constructor_create(SV *sig_sv) {
+xscon_constructor_create(SV *sig_sv, xscon_constructor_t* sig) {
 
     dTHX;
     dSP;
+
+    if (!sig_sv) {
+        if ( !sig ) {
+            croak("Expected sig_sv or sig");
+        }
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSVpv(sig->package, 0)));
+        PUTBACK;
+        I32 count = call_pv("Class::XSConstructor::get_metadata", G_SCALAR);
+        SPAGAIN;
+        SV *sv = POPs;
+        sig_sv = newSVsv(sv);
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+    }
 
     /* Validate and dereference the top-level hashref */
     if (!SvROK(sig_sv) || SvTYPE(SvRV(sig_sv)) != SVt_PVHV) {
@@ -138,8 +163,46 @@ xscon_constructor_create(SV *sig_sv) {
     SV **svp;
 
     /* Allocate the signature struct */
-    xscon_constructor_t *sig;
-    Newxz(sig, 1, xscon_constructor_t);
+    if ( sig == NULL ) {
+        xscon_constructor_t *sig;
+        Newxz(sig, 1, xscon_constructor_t);
+    }
+    else {
+        if (sig->params) {
+            for (I32 i = 0; i < sig->num_params; i++) {
+                xscon_param_t *p = &sig->params[i];
+                Safefree(p->name);
+                Safefree(p->init_arg);
+                for (I32 j = 0; j < p->num_aliases; j++)
+                    Safefree(p->aliases[j]);
+                Safefree(p->aliases);
+                SvREFCNT_dec(p->default_sv);
+                SvREFCNT_dec(p->trigger_sv);
+                SvREFCNT_dec(p->check_cv);
+                SvREFCNT_dec(p->coercion_cv);
+            }
+            Safefree(sig->params);
+        }
+        if (sig->allow) {
+            for (I32 j = 0; j < sig->num_allow; j++)
+                Safefree(sig->allow[j]);
+            Safefree(sig->allow);
+        }
+        if (sig->build_methods) {
+            for (I32 i = 0; i < sig->num_build_methods; i++) {
+                if (sig->build_methods[i]) {
+                    SvREFCNT_dec(sig->build_methods[i]);
+                }
+            }
+            Safefree(sig->build_methods);
+        }
+        if (sig->foreignbuildargs_cv)
+            Safefree(sig->foreignbuildargs_cv);
+        if (sig->foreignconstructor_cv)
+            Safefree(sig->foreignconstructor_cv);
+        if (sig->buildargs_cv)
+            Safefree(sig->buildargs_cv);
+    }
 
     /* This is not a placeholder. */
     sig->is_placeholder = FALSE;
@@ -150,6 +213,38 @@ xscon_constructor_create(SV *sig_sv) {
         sig->package = savepv(SvPV_nolen(*svp));
     } else {
         sig->package = NULL;
+    }
+
+    /* buildargs_cv */
+    svp = hv_fetchs(sig_hv, "buildargs", 0);
+    if (svp && SvOK(*svp)) {
+        sig->buildargs_cv = (CV *)SvREFCNT_inc(SvRV(*svp));
+    } else {
+        sig->buildargs_cv = NULL;
+    }
+
+    /* foreignbuildargs_cv */
+    svp = hv_fetchs(sig_hv, "foreignbuildargs", 0);
+    if (svp && SvOK(*svp)) {
+        sig->foreignbuildargs_cv = (CV *)SvREFCNT_inc(SvRV(*svp));
+    } else {
+        sig->foreignbuildargs_cv = NULL;
+    }
+
+    /* foreignconstructor_cv */
+    svp = hv_fetchs(sig_hv, "foreignconstructor", 0);
+    if (svp && SvOK(*svp)) {
+        sig->foreignconstructor_cv = (CV *)SvREFCNT_inc(SvRV(*svp));
+    } else {
+        sig->foreignconstructor_cv = NULL;
+    }
+
+    /* foreignbuildall */
+    svp = hv_fetchs(sig_hv, "foreignbuildall", 0);
+    if (svp && SvOK(*svp)) {
+        sig->foreignbuildall = TRUE;
+    } else {
+        sig->foreignbuildall = FALSE;
     }
 
     /* Get build methods */
@@ -303,6 +398,16 @@ xscon_constructor_create(SV *sig_sv) {
         else {
             p->coercion_cv = NULL;
         }
+
+        svp = hv_fetchs(phv, "slot_initializer", 0);
+        if (svp && SvOK(*svp)) {
+            if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVCV)
+                croak("slot_initializer must be a coderef");
+            p->slot_initializer_cv = (CV *)SvREFCNT_inc(SvRV(*svp));
+        }
+        else {
+            p->slot_initializer_cv = NULL;
+        }
     }
     
     return sig;
@@ -356,42 +461,6 @@ xscon_destructor_create(char *packagename) {
 }
 
 void
-xscon_constructor_free(xscon_constructor_t *sig)
-{
-    dTHX;
-
-    if (sig->params) {
-        for (I32 i = 0; i < sig->num_params; i++) {
-            xscon_param_t *p = &sig->params[i];
-            Safefree(p->name);
-            Safefree(p->init_arg);
-            for (I32 j = 0; j < p->num_aliases; j++)
-                Safefree(p->aliases[j]);
-            Safefree(p->aliases);
-            SvREFCNT_dec(p->default_sv);
-            SvREFCNT_dec(p->trigger_sv);
-            SvREFCNT_dec(p->check_cv);
-            SvREFCNT_dec(p->coercion_cv);
-        }
-        Safefree(sig->params);
-    }
-    if (sig->allow) {
-        for (I32 j = 0; j < sig->num_allow; j++)
-            Safefree(sig->allow[j]);
-        Safefree(sig->allow);
-    }
-    if (sig->build_methods) {
-        for (I32 i = 0; i < sig->num_build_methods; i++) {
-            if (sig->build_methods[i]) {
-                SvREFCNT_dec(sig->build_methods[i]);
-            }
-        }
-        Safefree(sig->build_methods);
-    }
-    Safefree(sig);
-}
-
-void
 xscon_destructor_free(xscon_destructor_t *sig)
 {
     dTHX;
@@ -426,9 +495,32 @@ join_with_commas(AV *av) {
 }
 
 static HV*
-xscon_buildargs(const char* klass, I32 ax, I32 items) {
+xscon_buildargs(const xscon_constructor_t* sig, const char* klass, I32 ax, I32 items) {
     dTHX;
     HV* args;
+
+    if ( sig->buildargs_cv ) {
+        dSP;
+        int count;
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        I32 i;
+        for (i = 0; i < items; i++) {
+            XPUSHs( newSVsv(ST(i)) );
+        }
+        PUTBACK;
+        count = call_sv((SV *)sig->buildargs_cv, G_SCALAR);
+        SPAGAIN;
+        SV* got = POPs;
+        SV* args_ref = newSVsv(got);
+        FREETMPS;
+        LEAVE;
+        if (!IsHashRef(args_ref)) {
+            croak("BUILDARGS did not return a hashref");
+        }
+        return (HV*)SvRV(args_ref);
+    }
 
     /* shift @_ */
     ax++;
@@ -458,8 +550,126 @@ xscon_buildargs(const char* klass, I32 ax, I32 items) {
     return args;
 }
 
+static AV*
+xscon_foreignbuildargs(const xscon_constructor_t* sig, const char* klass, I32 ax, I32 items, I32 context) {
+
+    dTHX;
+    dSP;
+
+    AV *av = newAV();
+
+    /* Case 1: no foreignbuildargs_cv → return copy of @_ */
+    if (!sig->foreignbuildargs_cv) {
+        for (I32 i = ax; i < items; i++) {
+            av_push(av, newSVsv(ST(i)));
+        }
+        return av;
+    }
+
+    /* Case 2: call foreignbuildargs CV */
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSVpv(klass, 0)));
+    for (I32 i = ax; i < items; i++) {
+        XPUSHs(ST(i));
+    }
+    PUTBACK;
+
+    I32 count = call_sv((SV *)sig->foreignbuildargs_cv, context);
+
+    SPAGAIN;
+
+    /* copy return values into AV */
+    av_extend(av, count - 1);
+    for (I32 i = 1; i <= count; i++) {
+        SV *sv = POPs;
+        av_store(av, count - i, newSVsv(sv));
+    }
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return av;
+}
+
 static SV*
-xscon_create_instance(const char* klass) {
+xscon_foreignconstructor(const xscon_constructor_t* sig, const char* klass, AV* fbargs) {
+    dTHX;
+    dSP;
+
+    SV *ret;
+
+    /* Must have a constructor CV */
+    if (!sig->foreignconstructor_cv) {
+        croak("No foreign constructor defined for class %s", klass);
+    }
+
+    /* --- call constructor in scalar context --- */
+    ENTER;
+    SAVETMPS;
+    
+    PUSHMARK(SP);
+
+    /* push class name as first argument */
+    XPUSHs(sv_2mortal(newSVpv(klass, 0)));
+
+    /* push fbargs as list */
+    I32 n = av_len(fbargs);
+    for (I32 i = 0; i <= n; i++) {
+        SV **svp = av_fetch(fbargs, i, 0);
+        XPUSHs(svp ? *svp : &PL_sv_undef);
+    }
+
+    PUTBACK;
+
+    I32 count = call_sv((SV *)sig->foreignconstructor_cv, G_SCALAR);
+
+    SPAGAIN;
+    
+    if (count != 1) {
+        FREETMPS;
+        LEAVE;
+        croak("Foreign constructor did not return a value");
+    }
+
+    ret = POPs;
+
+    /* take ownership before temporaries are freed */
+    SvREFCNT_inc(ret);
+    
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    /* --- validate return value --- */
+
+    if (SvROK(ret) && sv_isobject(ret)) {
+        
+        /* same class? */
+        if (sv_isa(ret, klass)) {
+            return ret;
+        }
+
+        /* different class → re-bless */
+        HV *newstash = gv_stashpv(klass, GV_ADD);
+        if (!newstash) {
+            SvREFCNT_dec(ret);
+            croak("Cannot find stash for class %s", klass);
+        }
+
+        sv_bless(ret, newstash);
+        return ret;
+    }
+    
+    SvREFCNT_dec(ret);
+    croak("Foreign constructor did not return an object");
+}
+
+static SV*
+xscon_create_instance(const xscon_constructor_t* sig, const char* klass) {
     dTHX;
     SV* instance;
     instance = sv_bless( newRV_noinc((SV*)newHV()), gv_stashpv(klass, 1) );
@@ -549,7 +759,7 @@ static bool
 xscon_check_type(char* keyname, SV* const val, int flags, CV* check_cv)
 {
     dTHX;
-    assert(value);
+    assert(val);
 
     // An unknown type constraint
     // We need to dive into the isa_hash to check it
@@ -958,12 +1168,13 @@ xscon_initialize_object(const xscon_constructor_t* sig, const char* klass, SV* c
 
         if ( !has_value && flags & XSCON_FLAG_HAS_DEFAULT ) {
             // There is a default/builder
-            has_value = TRUE;
             // Some very common defaults are worth hardcoding into the flags
             // so we won't even need to do a hash lookup to find the default
             // value.
             I32 has_common_default = ( flags >> XSCON_BITSHIFT_DEFAULTS ) & 255;
             val = xscon_run_default( object, keyname, has_common_default, param->default_sv );
+            has_value = TRUE;
+            value_was_from_args = FALSE;
         }
 
         if ( has_value ) {
@@ -1005,9 +1216,26 @@ xscon_initialize_object(const xscon_constructor_t* sig, const char* klass, SV* c
                 }
             }
             
-            (void)hv_store((HV *)SvRV(object), keyname, keylen, val, 0);
+            if ( param->slot_initializer_cv == NULL ) {
+                (void)hv_store((HV*)SvRV(object), keyname, keylen, val, 0);
+            }
+            else {
+                int count;
+                dSP;
+                ENTER;
+                SAVETMPS;
+                PUSHMARK(SP);
+                EXTEND(SP, 2);
+                PUSHs(object);
+                PUSHs(val);
+                PUTBACK;
+                count = call_sv((SV *)param->slot_initializer_cv, G_VOID);
+                SPAGAIN;
+                FREETMPS;
+                LEAVE;
+            }
             
-            if ( value_was_from_args && flags & XSCON_FLAG_HAS_TRIGGER ) {
+            if ( value_was_from_args && ( flags & XSCON_FLAG_HAS_TRIGGER ) ) {
                 xscon_run_trigger(object, param);
             }
             
@@ -1069,14 +1297,14 @@ xscon_buildall(const xscon_constructor_t* sig, const char* klass, SV* const obje
     }
 
     /* Fall back to slow route because BUILDALL called on a subclass */
-    HV* const stash = gv_stashpv(sig->package, 1);
+    HV* const stash = gv_stashpv("Class::XSConstructor", 1);
     assert(stash != NULL);
     
     SV *pkgsv = newSVpv(sig->package, 0);
     SV *klasssv = newSVpv(klass, 0);
     
     /* get cache stuff */
-    SV** const globref = hv_fetch(stash, "__XSCON_BUILD", 13, 0);
+    SV** const globref = hv_fetch(stash, "BUILD_CACHE", 11, 0);
     HV* buildall_hash = buildall_hash = GvHV(*globref);
     STRLEN klass_len = strlen(klass);
     SV** buildall = hv_fetch(buildall_hash, klass, klass_len, 0);
@@ -1162,14 +1390,14 @@ xscon_demolishall(const xscon_destructor_t* sig, const char* klass, SV* const ob
     }
 
     /* Fall back to slow route because DEMOLISHALL called on a subclass */
-    HV* const stash = gv_stashpv(sig->package, 1);
+    HV* const stash = gv_stashpv("Class::XSConstructor", 1);
     assert(stash != NULL);
     
     SV *pkgsv = newSVpv(sig->package, 0);
     SV *klasssv = newSVpv(klass, 0);
     
     /* get cache stuff */
-    SV** const globref = hv_fetch(stash, "__XSCON_DEMOLISH", 16, 0);
+    SV** const globref = hv_fetch(stash, "DEMOLISH_CACHE", 14, 0);
     HV* demolishall_hash = GvHV(*globref);
     
     STRLEN klass_len = strlen(klass);
@@ -1290,6 +1518,7 @@ BOOT:
     newCONSTSUB(stash, "XSCON_FLAG_HAS_TRIGGER",          newSViv(XSCON_FLAG_HAS_TRIGGER));
     newCONSTSUB(stash, "XSCON_FLAG_WEAKEN",               newSViv(XSCON_FLAG_WEAKEN));
     newCONSTSUB(stash, "XSCON_FLAG_HAS_ALIASES",          newSViv(XSCON_FLAG_HAS_ALIASES));
+    newCONSTSUB(stash, "XSCON_FLAG_HAS_SLOT_INITIALIZER", newSViv(XSCON_FLAG_HAS_SLOT_INITIALIZER));
 
     newCONSTSUB(stash, "XSCON_BITSHIFT_DEFAULTS",         newSViv(XSCON_BITSHIFT_DEFAULTS));
     newCONSTSUB(stash, "XSCON_BITSHIFT_TYPES",            newSViv(XSCON_BITSHIFT_TYPES));
@@ -1327,35 +1556,69 @@ CODE:
     SV* object;
 
     xscon_constructor_t *sig = (xscon_constructor_t *) CvXSUBANY(cv).any_ptr;
-
-    if (sig->is_placeholder) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(sv_2mortal(newSVpv(sig->package, 0)));
-        PUTBACK;
-        I32 count = call_pv("Class::XSConstructor::get_metadata", G_SCALAR);
-        SPAGAIN;
-        SV *sv = POPs;
-        xscon_constructor_free(sig);
-        sig = xscon_constructor_create(sv);
-        sig->is_placeholder = FALSE;
-        PUTBACK;
-        FREETMPS;
-        LEAVE;
-
-        CvXSUBANY(cv).any_ptr = sig;
-    }
+    if (sig->is_placeholder) xscon_constructor_create(NULL, sig);
 
     /* $klassname = shift */
     klassname = SvROK(klass) ? sv_reftype(SvRV(klass), 1) : SvPV_nolen_const(klass);
 
-    /* $args = ref($_[0]) eq 'HASH' ? %{+shift} : @_ */
-    args = newRV_inc((SV*)xscon_buildargs(klassname, ax, items));
-    sv_2mortal(args);
+    bool need_to_remove_no_build = FALSE;
 
-    /* $object = bless( {}, $klassname ); */
-    object = xscon_create_instance(klassname);
+    if ( sig->foreignbuildall ) {
+        if ( sig->foreignbuildargs_cv ) {
+            /* @fbargs = scalar $foreign->BUILDARGS( @_ ) */
+            AV* fbargs = xscon_foreignbuildargs(sig, klassname, ax, items, G_SCALAR);
+
+            /* $args = $fbargs[0] */
+            SV** svp = av_fetch(fbargs, 0, 0);
+            args = newSVsv(*svp);
+
+            if ( !args || !IsHashRef(args)) {
+                croak("Parent BUILDARGS did not return a hashref");
+            }
+        }
+        else {
+            /* $args = ref($_[0]) eq 'HASH' ? %{+shift} : @_ */
+            args = newRV_inc((SV*)xscon_buildargs(sig, klassname, ax, items));
+            sv_2mortal(args);
+        }
+
+        if ( !hv_exists((HV*)SvRV(args), "__no_BUILD__", 12) ) {
+            /* $args{__no_BUILD__} = !!1 */
+            (void)hv_store((HV*)SvRV(args), "__no_BUILD__", 12, &PL_sv_yes, 0);
+            need_to_remove_no_build = TRUE;
+        }
+
+        /* @args_but_list = ( $args ) */
+        AV *args_but_list = newAV();
+        av_push( args_but_list, newSVsv(args) );
+
+        /* $object = $klassname->SUPER::new( @args_but_list ); */
+        object = xscon_foreignconstructor(sig, klassname, args_but_list);
+
+        if ( need_to_remove_no_build ) {
+            (void)hv_delete((HV*)SvRV(args), "__no_BUILD__", 12, G_DISCARD);
+            need_to_remove_no_build = FALSE;
+        }
+    }
+    else if ( sig->foreignconstructor_cv ) {
+        /* @fbargs = $klassname->can('FOREIGNBUILDARGS') ? $klassname->FOREIGNBUILDARGS( @_ ) : @_ */
+        AV* fbargs = xscon_foreignbuildargs(sig, klassname, ax, items, G_ARRAY);
+
+        /* $object = $klassname->SUPER::new( @fbargs ); */
+        object = xscon_foreignconstructor(sig, klassname, fbargs);
+
+        /* $args = ref($_[0]) eq 'HASH' ? %{+shift} : @_ */
+        args = newRV_inc((SV*)xscon_buildargs(sig, klassname, ax, items));
+        sv_2mortal(args);
+    }
+    else {
+        /* $args = ref($_[0]) eq 'HASH' ? %{+shift} : @_ */
+        args = newRV_inc((SV*)xscon_buildargs(sig, klassname, ax, items));
+        sv_2mortal(args);
+
+        /* $object = bless( {}, $klassname ); */
+        object = xscon_create_instance(sig, klassname);
+    }
 
     /* Initialize parameters: returns the number of keys in args that were actually used */
     int used = xscon_initialize_object(sig, klassname, object, (HV*)SvRV(args), FALSE);
@@ -1372,6 +1635,42 @@ CODE:
 
     /* return $object */
     ST(0) = object; /* because object is mortal, we should return it as is */
+    XSRETURN(1);
+}
+
+void
+BUILDALL(SV* object, SV* args)
+CODE:
+{
+    dTHX;
+
+    xscon_constructor_t *sig = (xscon_constructor_t *) CvXSUBANY(cv).any_ptr;
+    if (sig->is_placeholder) xscon_constructor_create(NULL, sig);
+
+    const char *klassname = NULL;
+    HV *stash = SvSTASH(SvRV(object));
+    if (!stash) croak("Not a blessed object?");
+    klassname = HvNAME(stash);
+
+    /* Call BUILD methods */
+    xscon_buildall(sig, klassname, object, args);
+
+    /* return $object */
+    ST(0) = object; /* because object is mortal, we should return it as is */
+    XSRETURN(1);
+}
+
+void
+XSCON_CLEAR_CONSTRUCTOR_CACHE(SV* proto)
+CODE:
+{
+    dTHX;
+
+    xscon_constructor_t *sig = (xscon_constructor_t *) CvXSUBANY(cv).any_ptr;
+    sig->is_placeholder = TRUE;
+
+    /* return $proto */
+    ST(0) = proto;
     XSRETURN(1);
 }
 
@@ -1546,14 +1845,22 @@ CODE:
 }
 
 void
-install_constructor(char* name)
+install_constructor(char* name, char* name2, char* name3)
 CODE:
 {
     dTHX;
     CV *cv = newXS(name, XS_Class__XSConstructor_new_object, (char*)__FILE__);
     if (cv == NULL)
         croak("ARG! Something went really wrong while installing a new XSUB!");
-    
+
+     CV *cv2 = newXS(name2, XS_Class__XSConstructor_BUILDALL, (char*)__FILE__);
+     if (cv2 == NULL)
+         croak("ARG! Something went really wrong while installing a new XSUB!");
+
+     CV *cv3 = newXS(name3, XS_Class__XSConstructor_XSCON_CLEAR_CONSTRUCTOR_CACHE, (char*)__FILE__);
+     if (cv3 == NULL)
+         croak("ARG! Something went really wrong while installing a new XSUB!");
+
     char *full = savepv(name);
     const char *last = NULL;
     for (const char *p = full; (p = strstr(p, "::")); p += 2) {
@@ -1575,6 +1882,8 @@ CODE:
     sig->is_placeholder = TRUE;
     
     CvXSUBANY(cv).any_ptr = sig;
+    CvXSUBANY(cv2).any_ptr = sig;
+    CvXSUBANY(cv3).any_ptr = sig;
 }
 
 void

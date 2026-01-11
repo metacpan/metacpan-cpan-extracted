@@ -15,8 +15,12 @@ Affix::Wrap - Frictionless C Header Introspection and FFI Wrapper Generation
     # Parse headers and install symbols into the current package
     Affix::Wrap->new(
         project_files => [ 'include/mylib.h' ],
-        include_dirs  => [ '/usr/local/include' ]
-    )->wrap( 'libdemo.so' );
+        include_dirs  => [ '/usr/local/include' ],
+        types         => {
+            'git_repository' => Pointer[Void], # Treat opaque struct as void pointer
+            'git_off_t'      => Int64,         # Force specific integer width
+        }
+    )->wrap( load_library('demo') );
 
     # Use the C functions immediately
     my $val = mylib_function(10);
@@ -69,6 +73,10 @@ struggle with heavily macro-laden code or complex C++ templates.
     my $binder = Affix::Wrap->new(
         project_files => [ 'lib.h' ],
         include_dirs  => [ '/usr/include' ],
+        types         => {
+            'my_opaque_t' => Pointer[Void],
+            'my_int_t'    => Int64
+        },
         driver        => 'Clang'
     );
 
@@ -83,6 +91,25 @@ Required. An array reference of paths to the C header files (C<.h>, C<.hpp>, C<.
 Optional. An array reference of paths to search for C<#include "..."> directives. The directory of every file listed in
 C<project_files> is automatically added to this list.
 
+=item C<types>
+
+Optional. A hash reference mapping type names to L<Affix> type objects or definition strings.
+
+These are registered via C<typedef> before parsing begins. This is useful for:
+
+=over
+
+=item * Defining opaque types (e.g. mapping a complex C struct to C<Pointer[Void]>).
+
+=item * Fixing integer widths (e.g. forcing C<off_t> to C<Int64> across platforms).
+
+=item * Overriding definitions that the parser might misinterpret.
+
+=back
+
+If the parser encounters a struct, enum, or typedef in the C header with the same name as an entry in this hash, the C
+definition is B<skipped> to prevent redefinition warnings and ensure your override takes precedence.
+
 =item C<driver>
 
 Optional. Explicitly select the parser driver. Values are C<'Clang'> or C<'Regex'>. If omitted, C<Affix::Wrap> attempts
@@ -92,18 +119,23 @@ to find the C<clang> executable and falls back to Regex if unavailable.
 
 =head1 METHODS
 
-=head2 wrap( $lib )
+=head2 wrap( $lib, [$target] )
 
     $binder->wrap( $lib );
+    $binder->wrap( $lib, 'My::Package' );
 
 Parses the project files and immediately binds all found entities (functions, variables, constants, types) to the
-B<calling package>.
+target package.
 
 =over
 
 =item C<$lib>
 
-An instance of an L<Affix> library object (created via C<Affix::load>).
+An instance of an L<Affix> library object (created via C<load_library>).
+
+=item C<$target>
+
+Optional. The package name to install symbols into. Defaults to the B<calling package>.
 
 =back
 
@@ -262,7 +294,7 @@ If you want to use a C library immediately without creating a separate Perl modu
     use Affix;
     use Affix::Wrap;
 
-    my $lib = Affix::load('libdemo.so');
+    my $lib = load_library('demo');
 
     # This parses demo.h and installs subroutines, constants,
     # and types directly into the calling package.
@@ -302,7 +334,7 @@ strings.
         use Affix;
 
         # Load the library (user must ensure this exists)
-        my $lib = Affix::load('libmylib');
+        my $lib = load_library('mylib');
 
         PERL
 

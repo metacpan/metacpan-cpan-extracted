@@ -106,15 +106,15 @@
    "provides" : {
       "Affix" : {
          "file" : "lib/Affix.pm",
-         "version" : "v1.0.3"
+         "version" : "v1.0.5"
       },
       "Affix::Build" : {
          "file" : "lib/Affix/Build.pm",
-         "version" : "v1.0.3"
+         "version" : "v1.0.5"
       },
       "Affix::Wrap" : {
          "file" : "lib/Affix/Wrap.pm",
-         "version" : "v1.0.3"
+         "version" : "v1.0.5"
       }
    },
    "release_status" : "stable",
@@ -132,7 +132,7 @@
          "web" : "https://github.com/sanko/Affix.pm"
       }
    },
-   "version" : "v1.0.3",
+   "version" : "v1.0.5",
    "x_help_wanted" : [
       "Tester",
       "Documenter"
@@ -171,153 +171,5 @@
       ".github/**"
    ],
    "x_serialization_backend" : "JSON::PP version 4.16",
-   "x_static_install" : 0,
-   "x_x_prereqs" : {
-      "build" : {
-         "requires" : {
-            "DynaLoader" : "0",
-            "ExtUtils::CBuilder" : "0",
-            "Getopt::Long" : "2.36"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "CPAN::Meta" : "0",
-            "CPAN::Requirements::Dynamic" : "0",
-            "Config" : "0",
-            "ExtUtils::Helpers" : "0.028",
-            "ExtUtils::Install" : "0",
-            "ExtUtils::InstallPaths" : "0.002",
-            "File::Basename" : "0",
-            "File::Path" : "0",
-            "File::Spec::Functions" : "0",
-            "Getopt::Long" : "2.36",
-            "JSON::PP" : "2",
-            "Path::Tiny" : "0.144"
-         }
-      },
-      "develop" : {
-         "recommends" : {
-            "App::mii" : "v1.0.0",
-            "CPAN::Uploader" : "0"
-         },
-         "requires" : {
-            "Code::TidyAll" : "0",
-            "Code::TidyAll::Plugin::ClangFormat" : "0",
-            "Code::TidyAll::Plugin::JSON" : "0",
-            "Code::TidyAll::Plugin::PodChecker" : "0",
-            "Code::TidyAll::Plugin::PodSpell" : "0",
-            "Code::TidyAll::Plugin::PodTidy" : "0",
-            "Perl::Tidy" : "0",
-            "Pod::Markdown::Github" : "0",
-            "Pod::Tidy" : "0",
-            "Software::License::Artistic_2_0" : "0",
-            "Test::CPAN::Meta" : "0",
-            "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.07",
-            "Test::Pod" : "1.41",
-            "Test::Spellunker" : "v0.2.7",
-            "Version::Next" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "Carp" : "0",
-            "Storable" : "0",
-            "XSLoader" : "0",
-            "perl" : "v5.40.0"
-         }
-      },
-      "test" : {
-         "recommends" : {
-            "Benchmark" : "0",
-            "FFI::Platypus" : "0",
-            "Inline::C" : "0"
-         },
-         "requires" : {
-            "Capture::Tiny" : "0",
-            "Data::Dump" : "0",
-            "Data::Printer" : "0",
-            "IPC::Cmd" : "0",
-            "TAP::Harness::Env" : "0",
-            "Test2::Plugin::UTF8" : "0",
-            "Test2::Tools::Compare" : "0",
-            "Test2::V0" : "0"
-         }
-      }
-   },
-   "x_xprereqs" : {
-      "build" : {
-         "requires" : {
-            "DynaLoader" : "0",
-            "ExtUtils::CBuilder" : "0",
-            "Getopt::Long" : "2.36"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "CPAN::Meta" : "0",
-            "CPAN::Requirements::Dynamic" : "0",
-            "Config" : "0",
-            "ExtUtils::Helpers" : "0.028",
-            "ExtUtils::Install" : "0",
-            "ExtUtils::InstallPaths" : "0.002",
-            "File::Basename" : "0",
-            "File::Path" : "0",
-            "File::Spec::Functions" : "0",
-            "Getopt::Long" : "2.36",
-            "JSON::PP" : "2",
-            "Path::Tiny" : "0.144"
-         }
-      },
-      "develop" : {
-         "recommends" : {
-            "App::mii" : "v1.0.0",
-            "CPAN::Uploader" : "0"
-         },
-         "requires" : {
-            "Code::TidyAll" : "0",
-            "Code::TidyAll::Plugin::ClangFormat" : "0",
-            "Code::TidyAll::Plugin::JSON" : "0",
-            "Code::TidyAll::Plugin::PodChecker" : "0",
-            "Code::TidyAll::Plugin::PodSpell" : "0",
-            "Code::TidyAll::Plugin::PodTidy" : "0",
-            "Perl::Tidy" : "0",
-            "Pod::Markdown::Github" : "0",
-            "Pod::Tidy" : "0",
-            "Software::License::Artistic_2_0" : "0",
-            "Test::CPAN::Meta" : "0",
-            "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.07",
-            "Test::Pod" : "1.41",
-            "Test::Spellunker" : "v0.2.7",
-            "Version::Next" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "Carp" : "0",
-            "Storable" : "0",
-            "XSLoader" : "0",
-            "perl" : "v5.40.0"
-         }
-      },
-      "test" : {
-         "recommends" : {
-            "Benchmark" : "0",
-            "FFI::Platypus" : "0",
-            "Inline::C" : "0"
-         },
-         "requires" : {
-            "Capture::Tiny" : "0",
-            "Data::Dump" : "0",
-            "Data::Printer" : "0",
-            "IPC::Cmd" : "0",
-            "TAP::Harness::Env" : "0",
-            "Test2::Plugin::UTF8" : "0",
-            "Test2::Tools::Compare" : "0",
-            "Test2::V0" : "0"
-         }
-      }
-   }
+   "x_static_install" : 0
 }

@@ -1,0 +1,52 @@
+Revision history for Claude-Agent
+
+0.07    2026-01-11
+        - Added configurable logging system via Log::Any
+        - New Claude::Agent::Logger module for default adapter setup
+        - Environment variables: CLAUDE_AGENT_LOG_LEVEL, CLAUDE_AGENT_LOG_OUTPUT
+        - Backward compatible with CLAUDE_AGENT_DEBUG (1=debug, 2=trace)
+        - Users can configure their own Log::Any adapter for custom formatting
+        - Migrated all debug statements from warn to $log->debug/trace/info
+
+0.06    2026-01-10
+        - Added Perl hook execution via Claude::Agent::Hook::Executor
+        - Hooks now execute in-process (PreToolUse, PostToolUse, PostToolUseFailure)
+        - Added dry-run mode (dry_run option) to preview changes without executing
+        - New Claude::Agent::DryRun module for write-tool interception
+        - on_dry_run callback for custom dry-run handling
+        - Improved hook system integration in Query.pm
+        - Updated examples/03-hooks.pl to demonstrate working Perl hooks
+        - New examples/04-dry-run.pl for dry-run mode demonstration
+
+0.05    2026-01-10
+        - Added Claude::Agent::Code::Review module for AI-powered code review
+        - Perl::Critic integration for deterministic static analysis
+        - False positive filtering with custom filter support
+        - Structured output with Issue and Report objects
+
+0.04    2026-01-10
+        - Fixed JSON::Lines encode() calls to properly wrap hashrefs in arrays
+        - Added comprehensive MCP documentation with architecture diagram
+        - Added step-by-step tool creation guide and complete examples
+        - Fixed SDKRunner, SDKServer, and Query to use correct encode() API
+
+0.03    2026-01-10
+        - SDK MCP tools now execute locally via Unix socket IPC
+        - Added Claude::Agent::MCP::SDKServer for socket-based tool execution
+        - Added Claude::Agent::MCP::SDKRunner as the MCP protocol handler
+        - SDK servers are automatically converted to stdio MCP servers
+        - Tool handlers can now access application state, databases, and APIs
+        - Updated POD documentation for SDK MCP functionality
+        - Updated examples/02-custom-tools.pl and examples/10-mcp-servers.pl
+
+0.02    2026-01-10
+        - Async improvements: truly event-driven next_async() instead of polling
+        - Added 'loop' parameter to query(), Client, and Query for shared event loops
+        - Futures now resolve when messages arrive, not via delay_future polling
+        - Added _pending_futures queue for proper async message delivery
+        - Updated documentation and examples for proper async usage
+        - Added structured_output field normalization for Result messages
+
+0.01    2026-01-09
+        First version, released on an unsuspecting world.
+

@@ -9,11 +9,11 @@ DBIx::Class::Async::Storage - Storage Layer for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.20
+Version 0.22
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 =head1 SYNOPSIS
 

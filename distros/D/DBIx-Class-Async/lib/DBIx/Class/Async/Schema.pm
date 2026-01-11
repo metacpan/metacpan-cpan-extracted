@@ -13,15 +13,15 @@ use DBIx::Class::Async::Storage;
 use DBIx::Class::Async::TxnGuard;
 use DBIx::Class::Async::ResultSet;
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 =head1 NAME
 
-DBIx::Class::Async::Schema - Asynchronous Schema for DBIx::Class::Async
+DBIx::Class::Async::Schema - Asynchronous schema for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.20
+Version 0.22
 
 =cut
 
@@ -189,6 +189,211 @@ sub connect {
 
 =head1 METHODS
 
+=head2 class
+
+  my $class = $schema->class('User');
+  # Returns: 'MyApp::Schema::Result::User'
+
+Returns the class name for the given source name or moniker.
+
+=over 4
+
+=item B<Arguments>
+
+=over 8
+
+=item C<$source_name>
+
+The name of the source/moniker (e.g., 'User', 'Order').
+
+=back
+
+=item B<Returns>
+
+The full class name of the Result class (e.g., 'MyApp::Schema::Result::User').
+
+=item B<Throws>
+
+Dies if the source doesn't exist.
+
+=item B<Examples>
+
+  # Get the Result class for User
+  my $user_class = $schema->class('User');
+  # $user_class is now 'MyApp::Schema::Result::User'
+
+  # Can be used to call class methods
+  my $user_class = $schema->class('User');
+  my @columns = $user_class->columns;
+
+  # Or to create new objects directly
+  my $user = $schema->class('User')->new({
+      name => 'Alice',
+      email => 'alice@example.com',
+  });
+
+=back
+
+=cut
+
+sub class {
+    my ($self, $source_name) = @_;
+
+    require Carp;
+    Carp::croak("source_name required") unless defined $source_name;
+
+    # Get the source object
+    my $source = eval { $self->source($source_name) };
+
+    if ($@) {
+        Carp::croak("No such source '$source_name'");
+    }
+
+    # Return the result class
+    return $source->result_class;
+}
+
+=head2 clone
+
+    my $cloned_schema = $schema->clone;
+
+Creates a clone of the schema with a fresh worker pool.
+
+=over 4
+
+=item B<Returns>
+
+A new C<DBIx::Class::Async::Schema> instance with fresh connections.
+
+=item B<Notes>
+
+The cloned schema shares no state with the original and has its own
+worker processes and source cache.
+
+=back
+
+=cut
+
+sub clone {
+    my $self = shift;
+
+    return bless {
+        %$self,
+        # Clone with fresh worker pool
+        async_db => DBIx::Class::Async->new(
+            schema_class => $self->{schema_class},
+            connect_info => $self->{connect_info},
+            workers      => $self->{async_db}->{workers_config}{count},
+        ),
+        sources_cache => {},  # Fresh cache
+    }, ref $self;
+}
+
+=head2 disconnect
+
+    $schema->disconnect;
+
+Disconnects all worker processes and cleans up resources.
+
+=over 4
+
+=item B<Notes>
+
+This method is called automatically when the schema object is destroyed,
+but it's good practice to call it explicitly when done with the schema.
+
+=back
+
+=cut
+
+sub disconnect {
+    my $self = shift;
+    $self->{async_db}->disconnect if $self->{async_db};
+}
+
+=head2 populate
+
+  # Array of hashrefs format
+  my $users = $schema->populate('User', [
+      { name => 'Alice', email => 'alice@example.com' },
+      { name => 'Bob',   email => 'bob@example.com' },
+  ])->get;
+
+  # Column list + rows format
+  my $users = $schema->populate('User', [
+      [qw/ name email /],
+      ['Alice', 'alice@example.com'],
+      ['Bob',   'bob@example.com'],
+  ])->get;
+
+A convenience shortcut to L<DBIx::Class::Async::ResultSet/populate>.
+Creates multiple rows efficiently.
+
+=over 4
+
+=item B<Arguments>
+
+=over 8
+
+=item C<$source_name>
+
+The name of the source/moniker (e.g., 'User', 'Order').
+
+=item C<$data>
+
+Either:
+
+- Array of hashrefs: C<< [ \%col_data, \%col_data, ... ] >>
+
+- Column list + rows: C<< [ \@column_list, \@row_values, \@row_values, ... ] >>
+
+=back
+
+=item B<Returns>
+
+A L<Future> that resolves to an arrayref of L<DBIx::Class::Async::Row> objects
+in scalar context, or a list in list context.
+
+=item B<Examples>
+
+  # Array of hashrefs
+  $schema->populate('User', [
+      { name => 'Alice', email => 'alice@example.com', active => 1 },
+      { name => 'Bob',   email => 'bob@example.com',   active => 1 },
+      { name => 'Carol', email => 'carol@example.com', active => 0 },
+  ])->then(sub {
+      my ($users) = @_;
+      say "Created " . scalar(@$users) . " users";
+  });
+
+  # Column list + rows (more efficient for many rows)
+  $schema->populate('User', [
+      [qw/ name email active /],
+      ['Alice', 'alice@example.com', 1],
+      ['Bob',   'bob@example.com',   1],
+      ['Carol', 'carol@example.com', 0],
+  ])->then(sub {
+      my ($users) = @_;
+      foreach my $user (@$users) {
+          say "Created: " . $user->name;
+      }
+  });
+
+=back
+
+=cut
+
+sub populate {
+    my ($self, $source_name, $data) = @_;
+
+    croak("source_name required")     unless defined $source_name;
+    croak("data required")            unless defined $data;
+    croak("data must be an arrayref") unless ref $data eq 'ARRAY';
+
+    # Delegate to resultset->populate
+    return $self->resultset($source_name)->populate($data);
+}
+
 =head2 resultset
 
     my $rs = $schema->resultset('User');
@@ -229,6 +434,32 @@ sub resultset {
         async_db    => $self->{async_db},
         source_name => $source_name,
     );
+}
+
+=head2 set_default_context
+
+    $schema->set_default_context;
+
+Sets the default context for the schema.
+
+=over 4
+
+=item B<Returns>
+
+The schema object itself (for chaining).
+
+=item B<Notes>
+
+This is a no-op method provided for compatibility with DBIx::Class.
+
+=back
+
+=cut
+
+sub set_default_context {
+    my $self = shift;
+    # No-op for compatibility
+    return $self;
 }
 
 =head2 source
@@ -431,91 +662,7 @@ sub txn_scope_guard {
     );
 }
 
-=head2 set_default_context
-
-    $schema->set_default_context;
-
-Sets the default context for the schema.
-
-=over 4
-
-=item B<Returns>
-
-The schema object itself (for chaining).
-
-=item B<Notes>
-
-This is a no-op method provided for compatibility with DBIx::Class.
-
-=back
-
-=cut
-
-sub set_default_context {
-    my $self = shift;
-    # No-op for compatibility
-    return $self;
-}
-
-=head2 clone
-
-    my $cloned_schema = $schema->clone;
-
-Creates a clone of the schema with a fresh worker pool.
-
-=over 4
-
-=item B<Returns>
-
-A new C<DBIx::Class::Async::Schema> instance with fresh connections.
-
-=item B<Notes>
-
-The cloned schema shares no state with the original and has its own
-worker processes and source cache.
-
-=back
-
-=cut
-
-sub clone {
-    my $self = shift;
-
-    return bless {
-        %$self,
-        # Clone with fresh worker pool
-        async_db => DBIx::Class::Async->new(
-            schema_class => $self->{schema_class},
-            connect_info => $self->{connect_info},
-            workers      => $self->{async_db}->{workers_config}{count},
-        ),
-        sources_cache => {},  # Fresh cache
-    }, ref $self;
-}
-
-=head2 disconnect
-
-    $schema->disconnect;
-
-Disconnects all worker processes and cleans up resources.
-
-=over 4
-
-=item B<Notes>
-
-This method is called automatically when the schema object is destroyed,
-but it's good practice to call it explicitly when done with the schema.
-
-=back
-
-=cut
-
-sub disconnect {
-    my $self = shift;
-    $self->{async_db}->disconnect if $self->{async_db};
-}
-
-=head2 AUTOLOAD
+=head1 AUTOLOAD
 
 The schema uses AUTOLOAD to delegate unknown methods to the underlying
 L<DBIx::Class::Async> instance. This allows direct access to async

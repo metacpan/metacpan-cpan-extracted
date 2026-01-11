@@ -5157,23 +5157,19 @@ void boot_Affix(pTHX_ CV * cv) {
         // Core affix/wrap construction (Manual due to aliasing via XSANY)
         cv = newXSproto_portable("Affix::affix", Affix_affix, __FILE__, "$$$;$");
         XSANY.any_i32 = 0;
-        export_function("Affix", "affix", "base");
+        export_function("Affix", "affix", "core");
 
         cv = newXSproto_portable("Affix::wrap", Affix_affix, __FILE__, "$$$;$");
         XSANY.any_i32 = 1;
-        export_function("Affix", "wrap", "base");
+        export_function("Affix", "wrap", "core");
 
         cv = newXSproto_portable("Affix::direct_affix", Affix_affix, __FILE__, "$$$;$");
         XSANY.any_i32 = 2;
-        export_function("Affix", "direct_affix", "base");
+        export_function("Affix", "direct_affix", "core");
 
         cv = newXSproto_portable("Affix::direct_wrap", Affix_affix, __FILE__, "$$$;$");
         XSANY.any_i32 = 3;
-        export_function("Affix", "direct_wrap", "base");
-
-        // Re-export core names for tag grouping
-        export_function("Affix", "affix", "core");
-        export_function("Affix", "wrap", "core");
+        export_function("Affix", "direct_wrap", "core");
 
         // Destructors
         newXS("Affix::Bundled::DESTROY", Affix_Bundled_DESTROY, __FILE__);
@@ -5208,7 +5204,6 @@ void boot_Affix(pTHX_ CV * cv) {
         (void)newXSproto_portable("Affix::_typedef", Affix_typedef, __FILE__, "$;$");
         (void)newXSproto_portable("Affix::_register_enum_values", Affix_register_enum_values, __FILE__, "$;$");
         (void)newXSproto_portable("Affix::types", Affix_defined_types, __FILE__, "");
-        export_function("Affix", "typedef", "registry");
 
         // Debugging
         (void)newXSproto_portable("Affix::sv_dump", Affix_sv_dump, __FILE__, "$");

@@ -7,7 +7,7 @@
 /******************************************************************************
  *                                   CONSTANTS
  ******************************************************************************/
-
+#define STACK_MAX 65536 // maximum size array to allocate at the stack
 #define RETURN_PERL_ARRAY 0
 #define RETURN_RAW_BUFFER 1
 
@@ -30,11 +30,10 @@
        ? NULL                                                                  \
        : INT2PTR(void *, SvIV(sv)))
        
-#define STACK_MAX 65536 // maximum size array to allocate at the stack
+
 #define ALLOC_ARRAY_IN_STACK_OR_HEAP(name, type, n)                            \
-  type name##_stack[STACK_MAX];                                                \
-  type *name =                                                                 \
-      ((n) <= STACK_MAX) ? name##_stack : Newx(name, (n), type);
+  type name##_stack[STACK_MAX], *name;                                         \
+  ((n) <= STACK_MAX) ? name = name##_stack : Newx(name, (n), type);
 
 #define FREE_ARRAY_IN_STACK_OR_HEAP(name)                                      \
   do {                                                                         \

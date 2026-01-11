@@ -1,5 +1,8 @@
 #!/usr/bin/env perl
 
+use strict;
+use warnings;
+
 # Simple example ported from GtkNodes example.vala
 
 BEGIN {
@@ -30,13 +33,13 @@ $node->set_label('Demo');
 
 my $ilabel = Gtk3::Label->new('Input');
 $ilabel->set_xalign( 0 );
-my $input = $node->item_add( $ilabel, GTKNODES_NODE_SOCKET_SINK );
+my $input = $node->item_add( $ilabel, 'sink' );
 $input->signal_connect( socket_connect => sub { $ilabel->set_label('connected') } );
 $input->signal_connect( socket_disconnect => sub { $ilabel->set_label('disconnected') } );
 
 my $olabel = Gtk3::Label->new('Output');
 $olabel->set_xalign( 1 );
-$node->item_add( $olabel, GTKNODES_NODE_SOCKET_SOURCE );
+$node->item_add( $olabel, 'source' );
 
 $node_view->add( $node );
 $node->show;

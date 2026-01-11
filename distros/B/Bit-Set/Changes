@@ -1,5 +1,7 @@
 Revision history for Bit-Set
 
+0.13      2026-01-09 06:20:49-07:00 America/Denver
+- Modified allocation macro to eliminate risk for UB based on feedback received on Mastodon
 0.12      2026-01-08 21:47:04-07:00 America/Denver
 - Finished the XS interface
 0.11      2025-12-31 08:40:52-07:00 America/Denver

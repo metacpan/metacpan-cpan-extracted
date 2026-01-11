@@ -1,0 +1,159 @@
+#!/usr/bin/env perl
+use 5.008003;
+use strict;
+use warnings;
+
+use Getopt::Long qw(GetOptionsFromArray);
+use ACME::2026 qw(plan_new plan_load plan_save add_item complete_item items);
+
+sub usage {
+    my ($msg) = @_;
+    if ($msg) {
+        warn "$msg\n";
+    }
+    print <<'USAGE';
+Usage:
+  acme2026 add "Title" [--list NAME] [--tag TAG ...] [--priority N] [--due YYYY-MM-DD] [--note TEXT] [--file PATH]
+  acme2026 complete ID [--note TEXT] [--file PATH]
+  acme2026 list [--status todo|done|skipped] [--list NAME] [--tag TAG ...] [--sort FIELD] [--file PATH]
+
+Options:
+  --file, -f     Path to JSON storage (default: 2026.json or $ACME_2026_FILE)
+  --sort         One of: due, -due, priority, -priority, created, updated, title, -title
+  --help, -h     Show this help
+USAGE
+    exit($msg ? 1 : 0);
+}
+
+sub default_file {
+    return $ENV{ACME_2026_FILE} || '2026.json';
+}
+
+sub load_plan {
+    my ($path) = @_;
+    return -e $path ? plan_load($path) : plan_new(storage => $path);
+}
+
+my $cmd = shift @ARGV || '';
+usage() if $cmd eq '' || $cmd eq 'help' || $cmd eq '--help' || $cmd eq '-h';
+
+if ($cmd eq 'add') {
+    my $file = default_file();
+    my ($list, $priority, $due, $note, $help);
+    my @tags;
+    GetOptionsFromArray(
+        \@ARGV,
+        'file|f=s'     => \$file,
+        'list|l=s'     => \$list,
+        'tag|t=s@'     => \@tags,
+        'priority|p=i' => \$priority,
+        'due|d=s'      => \$due,
+        'note|n=s'     => \$note,
+        'help|h'       => \$help,
+    ) or usage('Invalid options for add');
+    usage() if $help;
+
+    my $title = shift @ARGV;
+    usage('add requires a title') unless defined $title && length $title;
+
+    my $plan = load_plan($file);
+    my %opts;
+    $opts{list} = $list if defined $list;
+    $opts{priority} = $priority if defined $priority;
+    $opts{due} = $due if defined $due;
+    $opts{note} = $note if defined $note;
+    $opts{tags} = \@tags if @tags;
+
+    my $id = add_item($plan, $title, %opts);
+    plan_save($plan, $file);
+    print "Added [$id] $title\n";
+    exit 0;
+}
+
+if ($cmd eq 'complete') {
+    my $file = default_file();
+    my ($note, $help);
+    GetOptionsFromArray(
+        \@ARGV,
+        'file|f=s' => \$file,
+        'note|n=s' => \$note,
+        'help|h'   => \$help,
+    ) or usage('Invalid options for complete');
+    usage() if $help;
+
+    my $id = shift @ARGV;
+    usage('complete requires an ID') unless defined $id && $id =~ /^\d+$/;
+    die "Plan file not found: $file\n" unless -e $file;
+
+    my $plan = plan_load($file);
+    complete_item($plan, $id, (defined $note ? (note => $note) : ()));
+    plan_save($plan, $file);
+    print "Completed [$id]\n";
+    exit 0;
+}
+
+if ($cmd eq 'list') {
+    my $file = default_file();
+    my ($status, $list, $sort, $help);
+    my @tags;
+    GetOptionsFromArray(
+        \@ARGV,
+        'file|f=s' => \$file,
+        'status|s=s' => \$status,
+        'list|l=s' => \$list,
+        'tag|t=s@' => \@tags,
+        'sort=s' => \$sort,
+        'help|h' => \$help,
+    ) or usage('Invalid options for list');
+    usage() if $help;
+
+    my $plan = load_plan($file);
+    my %filters;
+    $filters{status} = $status if defined $status;
+    $filters{list} = $list if defined $list;
+    $filters{tags} = \@tags if @tags;
+    $filters{sort} = $sort if defined $sort;
+
+    my @items = items($plan, %filters);
+    if (!@items) {
+        print "No items\n";
+        exit 0;
+    }
+
+    for my $item (@items) {
+        my $tags = $item->{tags} && @{ $item->{tags} } ? join(',', @{ $item->{tags} }) : '-';
+        my $due = defined $item->{due} && length $item->{due} ? $item->{due} : '-';
+        my $line = join("\t",
+            $item->{id},
+            $item->{status},
+            $item->{list} || 'General',
+            $due,
+            'p' . ($item->{priority} || 0),
+            $tags,
+            $item->{title},
+        );
+        print "$line\n";
+    }
+    exit 0;
+}
+
+usage("Unknown command: $cmd");
+
+__END__
+
+=head1 NAME
+
+acme2026 - Small CLI for ACME::2026 checklists
+
+=head1 SYNOPSIS
+
+  acme2026 add "Run a marathon" --list Health --tag fitness --due 2026-10-01
+  acme2026 complete 1 --note "Signed up"
+  acme2026 list --status todo --sort due
+
+=head1 DESCRIPTION
+
+This script is a minimal wrapper around ACME::2026 for adding, completing,
+and listing checklist items stored as JSON.
+
+=cut

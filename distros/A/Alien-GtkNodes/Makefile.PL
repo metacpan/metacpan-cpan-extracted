@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Alien::GtkNodes",
   "PREREQ_PM" => {
     "Alien::Base" => "1.00",
+    "Alien::Build::Plugin::Gather::Dino" => "0.08",
     "Alien::Role::Dino" => 0,
     "DynaLoader" => 0,
     "Env" => 0,
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::Alien" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +47,7 @@ my %FallbackPrereqs = (
   "Alien::Base" => "1.00",
   "Alien::Build" => "0.32",
   "Alien::Build::MM" => "0.32",
+  "Alien::Build::Plugin::Gather::Dino" => "0.08",
   "Alien::Role::Dino" => 0,
   "DynaLoader" => 0,
   "Env" => 0,

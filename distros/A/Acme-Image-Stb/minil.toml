@@ -1,0 +1,7 @@
+name = "Acme-Image-Stb"
+badges = ["github-actions/test.yml"]
+module_maker="ModuleBuild"
+static_install = "auto"
+
+[build]
+build_class = "builder::MyBuilder"

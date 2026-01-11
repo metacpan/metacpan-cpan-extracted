@@ -8,57 +8,73 @@ Affix - A Foreign Function Interface eXtension
 
 =head1 SYNOPSIS
 
+    use v5.40;
     use Affix;
 
     # Load a Library
-    my $lib = load_library('m'); # libm.so / m.dll
+    my $lib = load_library(libm);    # libm.so / msvcrt.dll
 
     # Bind a Function
     #    double pow(double x, double y);
-    affix $lib, 'pow', [Double, Double] => Double;
+    affix $lib, 'pow', [ Double, Double ] => Double;
 
     # Call it
-    say pow(2.0, 10.0); # 1024
+    say pow( 2.0, 10.0 );    # 1024
 
-    # Manual Memory Management (optional)
-    my $ptr = malloc(1024);
-    # ... use ptr ...
-    free($ptr);
+    # Allocate 1KiB of raw memory
+    my $ptr = Affix::malloc(1024);
+
+    # Write raw data to the pointer
+    Affix::memcpy( $ptr, 'test', 4 );
+
+    # Poiner arithmetic creates a new reference (doesn't modify original)
+    my $offset_ptr = Affix::ptr_add( $ptr, 12 );
+    Affix::memcpy( $offset_ptr, 'test', 4 );
+
+    # Inspect memory with a hex dump to STDOUT
+    Affix::dump( $ptr, 32 );
+
+    # Release the memory
+    Affix::free($ptr);
 
 =head1 DESCRIPTION
 
-B<Affix> is a Foreign Function Interface (FFI) for Perl. It allows you to load dynamic libraries (DLLs, shared objects)
-and call their functions natively without writing XS code or configuring a C compiler.
+B<Affix> is a high-performance Foreign Function Interface (FFI) for Perl. It allows you to load dynamic libraries
+(DLLs, shared objects) and call their functions natively without writing XS code or configuring a C compiler.
 
-It distinguishes itself from other FFI solutions by using B<infix>, a custom lightweight JIT engine. When you bind a
-function, Affix generates machine code at runtime to handle the argument marshalling, resulting in significantly lower
-overhead than generic FFI wrappers.
+It distinguishes itself from other FFI solutions by using L<B<infix>|https://github.com/sanko/infix/>, a custom
+lightweight JIT engine. When you bind a function, Affix generates machine code at runtime (a 'trampoline') to handle
+the argument marshalling. This results in significantly lower overhead than generic FFI wrappers that rely on dynamic
+dispatch per-call.
 
 =head1 EXPORTS
 
-Affix exports nothing by default. You can import tags:
+Affix exports standard types (C<Int>, C<Double>, etc.) and core functions (C<affix>, C<wrap>, C<load_library>) by
+default.
 
-    use Affix qw[:all];    # Everything
-    use Affix qw[:lib];    # Library loading (load_library, libc, ...)
-    use Affix qw[:memory]; # malloc, free, cast, ...
-    use Affix qw[:types];  # Int, Void, String, ...
+You can control imports using tags:
 
-=head1 THE BASICS
+    use Affix qw[:all];    # Import everything
+    use Affix qw[:lib];    # Library helpers (libc, libm, load_library...)
+    use Affix qw[:memory]; # malloc, free, memcpy, cast, dump...
+    use Affix qw[:pin];    # Variable binding (pin, unpin)
+    use Affix qw[:types];  # Types only (Int, Struct, Pointer...)
+
+=head1 Core API
 
 Affix's API is designed to be expressive. Let's start at the beginning with the eponymous C<affix( ... )> function.
 
 =head2 C<affix( ... )>
 
-Attaches a given symbol to a named perl sub in the current namespace.
+Attaches a symbol from a library to a named perl subroutine in the current namespace.
 
     # Standard: Load from library
-    affix $lib, 'pow', [Double, Double] => Double;
+    affix $lib, 'pow', [ Double, Double ] => Double;
 
     # Rename: Load 'pow', install as 'power'
-    affix $lib, ['pow' => 'power'], [Double, Double] => Double;
+    affix $lib, [ pow => 'power' ], [ Double, Double ] => Double;
 
-    # Raw Pointer: Bind a specific memory address
-    # Useful for vtables, JIT code, or manual dlsym
+    # Raw pointer: Bind a specific memory address (vtables, JIT, dlsym, etc.)
     affix undef, [ $ptr => 'my_func' ], [Int] => Void;
 
 Parameters:
@@ -67,17 +83,16 @@ Parameters:
 
 =item C<$lib>
 
-A library handle returned by L<load_library/load_library( $path )>, a path string, or C<undef> (main executable).
+A library handle returned by C<L<load_library( $path )|/load_library( $path )>>, a path string, or C<undef> (searches
+the main executable/process).
 
 =item C<$symbol_name>
 
-The name of the function to find.
-
-Pass C<['real_name', 'alias']> to rename it in Perl.
+The name of the function to find. Pass an array list (C<['real_name', 'alias']>) to rename it in Perl.
 
 =item C<$parameters>
 
-An array reference of argument types. See L</TYPES> for the full list (primitives, Struct, Pointer, etc.).
+An array reference of argument types. See L<Types|/Types> for the full list.
 
 =item C<$return>
 
@@ -89,28 +104,28 @@ On success, C<affix( ... )> installs the subroutine and returns the generated co
 
 =head2 C<wrap( ... )>
 
-Creates a wrapper around a given symbol but returns it as an anonymous CodeRef.
+Creates a wrapper around a given symbol and returns it as an anonymous C<CODE> reference.
 
-    # From Library
-    my $pow = wrap $lib, 'pow', [Double, Double] => Double;
+    # From library
+    my $pow = wrap $lib, 'pow', [ Double, Double ] => Double;
 
     # Call the function
-    my $x = $pow->(2, 5);
+    my $result = $pow->( 2, 5 );
 
-    # From Raw Pointer
+    # From a raw pointer
     # Note: Library argument is undef
     my $func = wrap undef, $ptr, [Int] => Void;
 
-Arguments are nearly identical to L</affix( ... )>. C<wrap( ... )> allows you to use FFI functions without polluting
-your namespace which means you cannot rename the function with an alias.
+Arguments are nearly identical to C<L<affix( ... )|/affix( ... )>> except you cannot provide an alias for the function
+name.
 
 =begin :experimental
 
 =head2 C<direct_affix( ... )>
 
-Same as C<affix>, but uses the 'direct marshalling' backend. This generates a specialized JIT trampoline that accesses
-Perl SVs directly, avoiding intermediate argument processing. This is experimental but significantly faster for
-primitives.
+Same as C<affix>, but utilizes the "Direct Marshalling" backend. This generates a highly specialized trampoline that
+reads Perl SVs directly from the stack, bypassing some of Affix's safety checks and intermediate processing. This is
+experimental but offers maximum performance for simple primitives.
 
 =head2 C<direct_wrap( ... )>
 
@@ -120,34 +135,35 @@ Same as C<wrap>, but uses the "Direct Marshalling" backend.
 
 =head2 C<pin( ... )>
 
-    my $errno;
-    pin $errno, libc, 'errno', Int;
-    print $errno;
-    $errno = 0;
+    my $scalar;
+    # Bind $scalar to the global integer variable 'errno' in libc
+    pin $scalar, libc(), 'errno', Int;
+    $scalar = 0;   # Writes to C memory
+    sysopen( ... );
+    say $scalar;   # Reads from C memory
 
-Variables exported by a library - also referred to as "global" or "extern" variables - can be accessed using C<pin( ...
-)>. The above example code applies magic to C<$errno> that binds it to the integer variable named "errno" as exported
-by the C runtime. Reading the scalar reads the memory; writing to it writes to the memory.
+Variables exported by a library (global/extern variables) can be accessed using C<pin>. Reading the scalar reads the
+memory; writing to it writes to the memory.
 
 Parameters:
 
 =over
 
-=item C<$var> - required
+=item C<$var>
 
-The scalar that will be bound to the exported variable.
+The scalar to bind.
 
-=item C<$lib> - required
+=item C<$lib>
 
-The library handle or path.
+The library handle.
 
-=item C<$symbol_name> - required
+=item C<$symbol>
 
 Name of the exported variable.
 
-=item C<$type> - required
+=item C<$type>
 
-Indicate to Affix what type of data the variable contains.
+The type of data the variable contains.
 
 =back
 
@@ -162,28 +178,35 @@ to C memory.
 
     typedef MyType => Struct[ name => String, age => Int ];
 
-    # Use it
+
+    # Now use it in signatures
     affix $lib, 'func', [ MyType() ] => Void;
 
-Registers a named type alias in the Affix system. This is required for:
+Registers a named type alias. This is required for:
 
-=over 4
+=over
 
-=item 1.
+=item 1. B<Recursive Types>: A struct that contains a pointer to itself.
 
-B<Recursive Types>: A struct that contains a pointer to itself.
+=item 2. B<Reusability>: Defining a complex signature once and using it in multiple functions.
 
-=item 2.
-
-B<Reusability>: Defining a complex signature once and using it in multiple functions.
-
-=item 3.
-
-B<Smart Enums>: Generating Perl constants in your package.
+=item 3. B<Smart Enums>: Generating Perl constants in your package.
 
 =back
 
-=head1 LIBRARY FUNCTIONS
+=head2 C<coerce( $type, $value )>
+
+Used primarily with L<Variadic Functions|/Variadic Functions (VarArgs)>. It wraps a value with type information so
+Affix knows how to marshal it when no compile-time signature is available.
+
+    # Hint that we are passing a Float, not a Double
+    coerce( Float, 1.5 );
+
+=head2 C<get_last_error_message( )>
+
+Returns a string describing the most recent error that occurred during library loading or symbol lookup.
+
+=head1 Library Utilities
 
 Locating libraries on different platforms can be tricky. These utilities help you load and manage dynamic libraries.
 
@@ -191,143 +214,125 @@ They are exported by default but may be imported specifically with the C<:lib> t
 
 =head2 C<load_library( $path )>
 
-    my $lib = load_library('user32.dll');
+    my $lib = load_library( 'user32.dll' );
 
-Locates and loads a dynamic library, returning an opaque handle (C<Affix::Lib>).
+Locates and loads a dynamic library, returning an opaque (C<Affix::Lib>) handle.
 
-If you pass a name without an extension (e.g., 'm'), Affix will apply platform-specific prefixes and suffixes (e.g.,
-'libm.so', 'libm.dylib', 'm.dll') and search standard system paths.
+If you pass a name without an extension (e.g., 'm'), Affix applies platform-specific prefixes/suffixes (e.g.,
+'libm.so', 'libm.dylib', 'm.dll') and searches standard system paths.
 
 =head2 C<locate_lib( $name, [$version] )>
 
     my $path = locate_lib('ssl', '1.1');
 
-Searches system paths (LD_LIBRARY_PATH, PATH, DYLD_LIBRARY_PATH, etc.) and returns the full absolute path to the
-library file, without loading it.
+Searches system paths (C<LD_LIBRARY_PATH>, C<PATH>, C<DYLD_LIBRARY_PATH>, etc.) and returns the full absolute path to
+the library file without loading it.
 
 =head2 C<find_symbol( $lib, $name )>
 
-Returns the raw memory address (as a pointer/integer) of a symbol within a loaded library.
-
-=head2 C<get_last_error_message( )>
-
-Returns a human-readable string describing the most recent error that occurred during library loading or symbol lookup.
+Returns the raw memory address (as an integer) of a symbol. Useful if you need to pass a function pointer B<value> to
+C, rather than calling it.
 
 =head2 C<libc()> / C<libm()>
 
-Convenience functions that return handles to the standard C library and Math library, respectively.
+Helpers returning handles to the standard C library and math library.
 
-=head1 MEMORY FUNCTIONS
+=head1 Memory Management
 
-Affix provides tools to manage raw C memory via a concept called B<pins>. A pin is a magical scalar reference that
-binds to a raw memory address.
+Affix uses B<pins> to manage raw memory. A pin is a magical scalar reference holding a memory address and type
+information.
 
 =head2 C<malloc( $size )>
 
     my $ptr = malloc( 1024 );
 
-Allocates C<$size> bytes of uninitialized storage. Returns a B<Pin> typed as C<Pointer[Void]>.
-
-To read or write to this memory, you must L</cast( $ptr, $type )> it to a specific type or use C<memcpy>.
+Allocates C<$size> bytes of uninitialized memory. Returns a C<Pointer[Void]> pin.
 
 =head2 C<calloc( $num, $size_or_type )>
 
-    my $ptr = calloc( 10, Int );
+    my $array = calloc( 10, Int );
 
-Allocates memory for an array of C<$num> objects and initializes them to zero. You may pass a type object (like C<Int>)
-as the second argument, and Affix will calculate the size for you. Returns a managed pin.
+Allocates memory for an array of C<$count> elements and initializes them to zero. You may pass a Type object (like
+C<Int>) or a raw size in bytes.
 
 =head2 C<realloc( $ptr, $new_size )>
 
     $ptr = realloc( $ptr, $new_size );
 
-Reallocates the given area of memory. Returns the new pointer (which may be different from the original). The original
-pointer object is updated to point to the new address.
+Resizes the memory pointed to by C<$ptr>. Returns the new pointer (the original pin is updated automatically).
 
 =head2 C<free( $ptr )>
 
     free( $ptr );
 
-Manually deallocates the space pointed to by C<$ptr>.
+Releases memory allocated by Affix.
 
-B<Note:> This only works on managed pins created by Affix. Attempting to free a pointer returned by a C library (which
-probably uses the system allocator) will throw an exception to prevent heap corruption. To free C memory, you should
-bind the library's C<free> function.
+B<Note:> Only use this on memory allocated by C<malloc>, C<calloc>, or C<strdup>. Do not attempt to free pointers
+returned by C libraries unless the library documentation explicitly says you own that memory.
 
 =head2 C<cast( $ptr, $type )>
 
-    my $int_ptr = cast( $void_ptr, Pointer[Int] );
+    my $void  = malloc(4);
+    my $int   = cast( $void, Int ); # Read immediate value
+    my $int_p = cast( $void, Pointer[Int] ); # Return new Pin
 
 Reinterprets a pointer.
 
 =over
 
-=item *
+=item * B<To value> (C<Int>, etc.): Reads the memory immediately and returns a Perl scalar.
 
-B<To value:> If casting to a value type (C<Int>, C<String>, etc.), it immediately reads the memory and returns a Perl
-scalar value.
-
-=item *
-
-B<To reference:> If casting to a Pointer or other aggregate type, it returns a new pin that aliases the same memory.
-You can dereference this pin (C<$$pin>) to read or write to the memory using the new type definition.
+=item * B<To reference> (C<Pointer[Int]>): Returns a new pin aliasing the memory. Dereferencing it (C<$$pin>) reads/writes the value.
 
 =back
 
-=head2 C<own( $ptr, $bool )>
+=head2 C<own( $ptr, [$bool] )>
 
     own( $ptr, $bool );
 
-Changes the ownership status of a pin.
+Controls lifecycle management.
 
 =over
 
-=item *
+=item * C<own($p, 1)>: Perl owns the memory; `free()` is called when `$p` goes out of scope.
 
-C<own($p, 1)>: Perl takes ownership. The memory will be freed when C<$p> goes out of scope.
-
-=item *
-
-C<own($p, 0)>: Perl relinquishes ownership. The memory will B<not> be freed by Perl. Use this when passing a buffer to
-a C function that takes ownership of it.
+=item * C<own($p, 0)>: Perl releases ownership. Useful when handing memory off to a C function.
 
 =back
 
 =head2 C<address( $ptr )>
 
-Returns the numerical virtual memory address of a pointer as a C<UInt64>.
+Returns the virtual memory address of the pointer as a C<UInt64>.
 
-=head2 Pointer Utilities
+=head2 Pointer Arithmetic & Utilities
 
 =over
 
-=item C<ptr_add( $ptr, $offset_bytes )>
+=item C<ptr_add( $ptr, $offset )>
 
-Returns a new unmanaged pin pointing C<$offset_bytes> from the original. If the original pin is an Array type (e.g.,
-C<[10:int]>), the new pin decays to a Pointer type (e.g., C<*int>).
+Returns a new unmanaged pin offset by C<$bytes>. If C<$ptr> is an array type, it decays to a pointer type.
 
 =item C<ptr_diff( $ptr1, $ptr2 )>
 
-Returns the difference in bytes between two pointers (C<$ptr1 - $ptr2>).
+Returns the difference in bytes (C<$ptr1 - $ptr2>).
 
 =item C<is_null( $ptr )>
 
-Returns true if the pointer is NULL (0x0).
+Returns true if the pointer is C<NULL> (C<0x0>).
 
 =item C<strdup( $string )>
 
-Allocates managed C memory and copies the Perl string into it (including the null terminator). Returns a
-C<Pointer[Char]> pin.
+Allocates memory and copies the Perl string (plus C<NULL> terminator) into it.
 
 =item C<strnlen( $ptr, $maxlen )>
 
-Calculates the length of a C string pointed to by C<$ptr>, checking at most C<$maxlen> bytes.
+Safe string length calculation.
 
 =back
 
-=head2 Raw Memory Ops
+=head2 Raw Memory Operatoins
 
-Standard C memory operations are available for high-performance manipulation of Pins.
+Standard C memory operations are available for high-performance manipulation of pins.
 
 =over
 
@@ -345,36 +350,35 @@ Standard C memory operations are available for high-performance manipulation of 
 
 =head2 C<dump( $ptr, $length )>
 
-Dumps C<$length> bytes of raw data from a given point in memory to STDOUT in a hex editor style. Useful for debugging
-layout issues.
+Prints a hex dump of the memory at C<$ptr> to C<STDOUT>.
 
-=head1 INTROSPECTION
+=head1 Introspection
 
 =head2 C<sizeof( $type )>
 
     my $size = sizeof( Int );
     my $size_rect = sizeof( Struct[ x => Int, y => Int ] );
 
-Returns the size, in bytes, of the Type passed to it.
+Returns the size, in bytes, of a Type object.
 
 =head2 C<offsetof( $struct_type, $field_name )>
 
     my $struct = Struct[ name => String, age => Int ];
     my $offset = offsetof( $struct, 'age' );
 
-Returns the byte offset of a field within a structure, accounting for platform alignment and padding.
+Returns the byte offset of a field within a Struct or Union.
 
 =head2 C<alignof( $type )>
 
-Returns the alignment requirement (in bytes) of a type.
+Returns the required alignment bytes for a Type.
 
 =head2 C<types()>
 
-Returns a list of all named types currently registered in the Affix system.
+Returns a list of all named types currently registered in the system.
 
-=head1 TYPES
+=head1 Types
 
-Affix uses type helpers to define signatures. These are exported via the C<:types> tag.
+Affix signatures are built using these helper functions
 
     # Example Signature
     [ Int, String ] => Void
@@ -383,9 +387,11 @@ Affix uses type helpers to define signatures. These are exported via the C<:type
 
 Primitives map to native C types.
 
+=begin text
+
     Type        Description
     ----------------------------------------------------------------------------
-    Void        Return type only
+    Void        Returns nothing
     Bool        Mapped to Perl true/false
     Char        signed char (8-bit usually)
     UChar       unsigned char
@@ -404,6 +410,38 @@ Primitives map to native C types.
     Size_t      size_t
     SSize_t     ssize_t
 
+=end text
+
+=begin html
+
+ <table border="1" cellpadding="4" cellspacing="0">
+    <thead>
+        <tr><th>Type</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Void</td><td>Returns nothing</td></tr>
+        <tr><td>Bool</td><td>Mapped to Perl true/false</td></tr>
+        <tr><td>Char</td><td>signed char (8-bit usually)</td></tr>
+        <tr><td>UChar</td><td>unsigned char</td></tr>
+        <tr><td>SChar</td><td>Explicitly signed char</td></tr>
+        <tr><td>Short</td><td>signed short</td></tr>
+        <tr><td>UShort</td><td>unsigned short</td></tr>
+        <tr><td>Int</td><td>signed int (platform native, usually 32-bit)</td></tr>
+        <tr><td>UInt</td><td>unsigned int</td></tr>
+        <tr><td>Long</td><td>signed long (32-bit on Win64, 64-bit on Linux64)</td></tr>
+        <tr><td>ULong</td><td>unsigned long</td></tr>
+        <tr><td>LongLong</td><td>signed long long (guaranteed 64-bit)</td></tr>
+        <tr><td>ULongLong</td><td>unsigned long long</td></tr>
+        <tr><td>Float</td><td>32-bit float</td></tr>
+        <tr><td>Double</td><td>64-bit float</td></tr>
+        <tr><td>LongDouble</td><td>Platform specific (80-bit or 128-bit)</td></tr>
+        <tr><td>Size_t</td><td>size_t</td></tr>
+        <tr><td>SSize_t</td><td>ssize_t</td></tr>
+    </tbody>
+ </table>
+
+=end html
+
 =head3 Explicit Width Types
 
 For precise control, use these types which are guaranteed to have specific bit widths across all platforms:
@@ -414,11 +452,15 @@ For precise control, use these types which are guaranteed to have specific bit w
     Int64, UInt64
     Int128, UInt128 (Passed as Decimal Strings)
 
+128-bit integers, if supported by the compiler, must be passed as strings to/from Perl.
+
 =head2 Pointers
 
 Pointers are the glue of C. Affix provides distinct ways to handle them based on intent.
 
-=head3 Basic Pointers (C<Pointer[Type]>)
+=over
+
+=item Basic Pointers (C<Pointer[Type]>)
 
 When a function expects C<int*> or C<double*>, pass a B<reference to a scalar>.
 
@@ -430,7 +472,7 @@ When a function expects C<int*> or C<double*>, pass a B<reference to a scalar>.
 
 Affix automatically:
 
-=over 4
+=over
 
 =item 1. Allocates temporary memory.
 
@@ -442,9 +484,9 @@ Affix automatically:
 
 =back
 
-=head3 Strings (C<String> vs C<Pointer[Char]>)
+=item Strings (C<String> vs C<Pointer[Char]>)
 
-=over 4
+=over
 
 =item * B<C<String>>: Use this for C<const char*> (input strings). Affix copies the Perl string to a temporary C buffer.
 
@@ -452,17 +494,19 @@ Affix automatically:
 
 =back
 
-=head3 Void Pointers (C<Pointer[Void]>)
+=item Void Pointers (C<Pointer[Void]>)
 
 Used for opaque handles or generic data.
 
-=over 4
+=over
 
 =item * Pass C<undef> to send C<NULL>.
 
 =item * Pass a reference C<\$scalar> to send the address of that scalar.
 
 =item * Pass a B<Pin> (from C<malloc> or C<cast>) to pass that memory address directly.
+
+=back
 
 =back
 
@@ -573,8 +617,7 @@ B<Nested Structs:> Affix handles deep structures automatically.
 
 =head3 Unions
 
-Unions allow storing different data types in the same memory location. In Affix, pass a Hash Reference with B<exactly
-one key> corresponding to the field you want to set.
+Maps to Perl hash references with a single key.
 
     # C: union Event { int key_code; float pressure; };
     typedef Event => Union [
@@ -635,13 +678,9 @@ two ways:
 
 =over
 
-=item 1.
+=item 1. B<Array References>: Simplest to read and write.
 
-B<Array References>: Simplest to read and write
-
-=item 2.
-
-B<Packed Strings>: Highest performance (avoids marshalling overhead)
+=item 2. B<Packed Strings>: Highest performance (avoids marshalling overhead).
 
 =back
 
@@ -699,7 +738,7 @@ Affix supports C functions that take a variable number of arguments, like C<prin
 
 When calling a variadic function, Affix performs dynamic type inference at runtime for the extra arguments:
 
-=over 4
+=over
 
 =item * Perl Integers -> C<int64_t>
 
@@ -740,11 +779,11 @@ B<Note:> The callback is valid only as long as the C function holds onto it. If 
 pointer globally, ensure your Perl code keeps the reference alive if necessary (though Affix handles the trampoline
 lifecycle automatically for the duration of the call).
 
-=head1 UTILITIES
+=head1 Utilities
 
 =head2 C<errno()>
 
-    my $err = get_system_error();
+    my $err = errno();
     die "Error $err: " . int($err);
 
 Access the C<errno> (Linux/Unix) or C<GetLastError> (Windows) from the most recent FFI call. This must be called
@@ -754,36 +793,15 @@ The return value is a B<dualvar>:
 
 =over
 
-=item *
+=item * B<Numeric context>: Returns the integer error code.
 
-B<Numeric context>: Returns the integer error code.
-
-=item *
-
-B<String context>: Returns the human-readable system error message (via C<strerror> or C<FormatMessage>).
+=item * B<String context>: Returns the human-readable system error message (via C<strerror> or C<FormatMessage>).
 
 =back
 
 =head2 C<sv_dump( $sv )>
 
-Dumps the internal structure of a Perl scalar to STDERR. Useful for debugging Perl internals.
-
-=head1 COMPILER WRAPPER
-
-Affix includes a lightweight, cross-platform C compiler wrapper C<Affix::Build>. This is useful for compiling small C
-stubs or "glue" code at runtime to bridge complex macros or inline functions that cannot be bound directly.
-
-    use Affix;
-    my $compiler = Affix::Build->new(
-        name   => 'my_wrapper',
-        source => [ 'wrapper.c' ]
-    );
-    $compiler->compile();
-    my $lib_path = $compiler->link;
-    affix $lib_path, 'some_function', [], Void;
-
-Supported languages include C and C++. Other languages will be supported in the future provided the underlying
-toolchain is installed on the system.
+Dumps the internal flags and structure of a Perl C<SV>.
 
 =head1 EXAMPLES
 
@@ -803,8 +821,8 @@ Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2023-2025 by Sanko Robinson.
+Copyright (C) 2023-2026 by Sanko Robinson.
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
 
 =cut

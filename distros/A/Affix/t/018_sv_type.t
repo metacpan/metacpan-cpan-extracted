@@ -7,12 +7,15 @@ use Affix::Build;
 use Config;
 use ExtUtils::Embed;
 #
+diag $Config{shrpenv};
+diag '$Config{useshrplib} claims to be ' . $Config{useshrplib};
 $Config{useshrplib} eq 'true' || exit skip_all 'Cannot embed perl in a shared lib without building a shared libperl.';
-
-# See https://metacpan.org/release/RJBS/perl-5.36.0/view/INSTALL#Building-a-shared-Perl-library
-#
-# 1. Compile C Library 1 (Basic Operations)
-my $lib = compile_ok( <<~'END', { cflags => ExtUtils::Embed::ccopts(), ldflags => ExtUtils::Embed::ldopts() } );
+eval {
+    # See https://metacpan.org/release/RJBS/perl-5.36.0/view/INSTALL#Building-a-shared-Perl-library
+    #
+    # Compile C Library 1 (Basic Operations)
+    my $lib
+        = compile_ok( <<~'END', { cflags => ExtUtils::Embed::ccopts() . ' ' . ExtUtils::Embed::perl_inc(), ldflags => ExtUtils::Embed::ldopts(1) } );
         #include "std.h"
         //ext: .c
         #undef warn
@@ -37,24 +40,25 @@ my $lib = compile_ok( <<~'END', { cflags => ExtUtils::Embed::ccopts(), ldflags =
         }
         END
 
-# 2. Test Argument Passing (SV)
-# The signature "SV" maps to "SV*" in C because Affix detects the "SV" type name
-isa_ok my $inc = wrap( $lib, 'inc_sv', [ Pointer [SV] ] => Void ), ['Affix'];
-my $val = 10;
-$inc->($val);
-is $val, 11, 'Passed SV to C, modified in place';
+    # Test Argument Passing (SV)
+    # The signature "SV" maps to "SV*" in C because Affix detects the "SV" type name
+    isa_ok my $inc = wrap( $lib, 'inc_sv', [ Pointer [SV] ] => Void ), ['Affix'];
+    my $val = 10;
+    $inc->($val);
+    is $val, 11, 'Passed SV to C, modified in place';
 
-# 3. Test Return Value (SV)
-isa_ok my $make = wrap( $lib, 'make_sv', [Int] => Pointer [SV] ), ['Affix'];
-my $res = $make->(42);
-is $res, 42, 'Received SV from C';
+    # Test Return Value (SV)
+    isa_ok my $make = wrap( $lib, 'make_sv', [Int] => Pointer [SV] ), ['Affix'];
+    my $res = $make->(42);
+    is $res, 42, 'Received SV from C';
 
-# 4. Test within Callbacks
-# Define a callback type that accepts and returns an SV*
-typedef CallbackSV => Callback [ [ Pointer [SV] ] => Pointer [SV] ];
+    # Test within Callbacks
+    # Define a callback type that accepts and returns an SV*
+    typedef CallbackSV => Callback [ [ Pointer [SV] ] => Pointer [SV] ];
 
-# We need a C function that takes this callback
-my $lib2 = compile_ok( <<~'END', { cflags => ExtUtils::Embed::ccopts() . ' -IC:\STRAWB~1\perl\lib\CORE', ldflags => ExtUtils::Embed::ldopts() } );
+    # We need a C function that takes this callback
+    my $lib2
+        = compile_ok( <<~'END', { cflags => ExtUtils::Embed::ccopts() . ' ' . ExtUtils::Embed::perl_inc(), ldflags => ExtUtils::Embed::ldopts(1) } );
         #include "std.h"
         //ext: .c
         #undef warn
@@ -82,12 +86,13 @@ my $lib2 = compile_ok( <<~'END', { cflags => ExtUtils::Embed::ccopts() . ' -IC:\
         }
         END
 
-# Wrap the C function. Affix will automatically generate a trampoline for the coderef passed as 'cb'.
-isa_ok my $caller = wrap( $lib2, 'call_perl', [ CallbackSV(), Int ] => Int ), ['Affix'];
-my $cb = sub ($sv) {
+    # Wrap the C function. Affix will automatically generate a trampoline for the coderef passed as 'cb'.
+    isa_ok my $caller = wrap( $lib2, 'call_perl', [ CallbackSV(), Int ] => Int ), ['Affix'];
+    my $cb = sub ($sv) {
 
-    # Verify we received a scalar
-    return $sv * 2;
+        # Verify we received a scalar
+        return $sv * 2;
+    };
+    is $caller->( $cb, 5 ), 10, 'Roundtrip SV through Callback';
 };
-is $caller->( $cb, 5 ), 10, 'Roundtrip SV through Callback';
 done_testing;

@@ -1,5 +1,5 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "It's the document builder",
    "author" : [
       "janeskil1525 <janeskil1525@gmail.com>"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "Daje::Document::Builder" : {
          "file" : "lib/Daje/Document/Builder.pm",
-         "version" : "0.01"
+         "version" : "0.10"
       },
       "Daje::Document::Builder::Html" : {
          "file" : "lib/Daje/Document/Builder/Html.pm"
@@ -86,7 +86,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Document-Builder"
       }
    },
-   "version" : "0.01",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

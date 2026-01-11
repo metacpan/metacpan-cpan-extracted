@@ -38,15 +38,11 @@ sub template() {
     my $versions;
     push @{$versions->{versions}}, $version;
 
-
-    say Dumper($versions);
-
-
     my $context->{context}->{payload}->{tools_projects_pkey} = 8;
     #$context->{context}->{payload};
 
     my $builder = Daje::Document::Builder->new(
-        source        => 'Daje::Document::Templates::Tools::Generate::SQL',
+        source        => 'Daje::Document::Templates::Tools::Generate::Perl',
         data_sections => 'sql',
         data          => $versions,
         error         => Daje::Workflow::Errors::Error->new()

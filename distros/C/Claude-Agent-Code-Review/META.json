@@ -1,0 +1,63 @@
+{
+   "abstract" : "AI-powered code review using Claude",
+   "author" : [
+      "LNATION <email@lnation.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Claude-Agent-Code-Review",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Claude::Agent" : "0.05",
+            "Cpanel::JSON::XS" : "4.0",
+            "Future::AsyncAwait" : "0.60",
+            "IO::Async" : "0.80",
+            "Marlin" : "0.007000",
+            "Path::Tiny" : "0.100",
+            "Types::Common" : "2.0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "1.0",
+            "Test::Exception" : "0.43",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/lnation/Claude-Agent-Code-Review.git",
+         "web" : "https://github.com/lnation/Claude-Agent-Code-Review"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

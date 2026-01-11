@@ -1,5 +1,12 @@
 Revision history for DBIx::Class::Async
 
+0.22  2026-01-11
+      - Added sub class() and populate() to DBIx::Class::Async::Schema.
+
+0.21  2026-01-09
+      - Updated Makefile.PL to pull version automatically.
+      - Tidied up pod document.
+
 0.20  2026-01-08
       - Updated Makefile.PL w.r.t test requisite thanks Gabor Szabo.
       - Added CI workflow thanks Gabor Szabo.

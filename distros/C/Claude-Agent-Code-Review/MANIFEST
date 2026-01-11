@@ -1,0 +1,33 @@
+Changes
+examples/01-basic-review.pl
+examples/02-review-directory.pl
+examples/03-review-staged.pl
+examples/04-json-output.pl
+examples/05-security-focus.pl
+examples/06-perlcritic.pl
+examples/07-perlcritic-only.pl
+ignore.txt
+lib/Claude/Agent/Code/Review.pm
+lib/Claude/Agent/Code/Review/Filter.pm
+lib/Claude/Agent/Code/Review/Issue.pm
+lib/Claude/Agent/Code/Review/Options.pm
+lib/Claude/Agent/Code/Review/Perlcritic.pm
+lib/Claude/Agent/Code/Review/Report.pm
+lib/Claude/Agent/Code/Review/Tools.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-basic.t
+t/02-tools.t
+t/03-filter.t
+t/04-report.t
+t/05-perlcritic.t
+t/06-internals.t
+t/07-issue.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

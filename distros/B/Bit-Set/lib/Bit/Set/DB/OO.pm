@@ -1,6 +1,6 @@
 #!/home/chrisarg/perl5/perlbrew/perls/current/bin/perl
 package Bit::Set::DB::OO;
-$Bit::Set::DB::OO::VERSION = '0.12';
+$Bit::Set::DB::OO::VERSION = '0.13';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ from the C<Bit> C library
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
