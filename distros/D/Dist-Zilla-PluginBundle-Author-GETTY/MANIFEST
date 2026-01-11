@@ -10,6 +10,7 @@ README
 cpanfile
 dist.ini
 lib/Dist/Zilla/PluginBundle/Author/GETTY.pm
+lib/Pod/Elemental/Transformer/Author/GETTY.pm
 lib/Pod/Weaver/PluginBundle/Author/GETTY.pm
 t/author-pod-syntax.t
 t/compile.t

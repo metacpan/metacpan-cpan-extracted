@@ -3,7 +3,6 @@
 use strict;
 
 use Time::HiRes 'sleep';
-use Term::ANSIColor;
 use Test::More tests => 2;
 
 # For debugging only
@@ -14,43 +13,54 @@ BEGIN {
     use_ok('Graphics::Framebuffer');
 }
 
+my $b  = "\e[34m";
+my $bb = "\e[94m";
+my $g  = "\e[32m";
+my $gg = "\e[92m";
+my $r  = "\e[31m";
+my $rr = "\e[91m";
+my $rs = "\e[0m";
+my $c  = "\e[36m";
+my $bk = "\e[40m";
+my $y  = "\e[33m";
+
 diag("\r ");
-diag("\r" . colored(['blue'], q{   #####\    })  );
-diag("\r" . colored(['blue'], q{  ##  __##\  })  );
-diag("\r" . colored(['blue'], q{  ## /  \__| })  );
-diag("\r" . colored(['blue'], q{  ## |####\  })  );
-diag("\r" . colored(['blue'], q{  ## |\_## | })  );
-diag("\r" . colored(['blue'], q{  ## |  ## | })  );
-diag("\r" . colored(['blue'], q{  \######  | })  );
-diag("\r" . colored(['blue'], q{   \______/  })  );
+diag("\r$b" . q{   #####\    } . $rs);
+diag("\r$b" . q{  ##  __##\  } . $rs);
+diag("\r$b" . q{  ## /  \__| } . $rs );
+diag("\r$b" . q{  ## |####\  } . $rs );
+diag("\r$b" . q{  ## |\_## | } . $rs );
+diag("\r$b" . q{  ## |  ## | } . $rs );
+diag("\r$b" . q{  \######  | } . $rs );
+diag("\r$b" . q{   \______/  } . $rs );
 sleep .3;
-diag("\r \e[8A\e[11C" . colored(['green'], q{ ########\  }));
-diag("\r \e[11C"      . colored(['green'], q{  ##  ____\ }));
-diag("\r \e[11C"      . colored(['green'], q{  ## |      }));
-diag("\r \e[11C"      . colored(['green'], q{  #####\    }));
-diag("\r \e[11C"      . colored(['green'], q{  ##  __|   }));
-diag("\r \e[11C"      . colored(['green'], q{  ## |      }));
-diag("\r \e[11C"      . colored(['green'], q{  ## |      }));
-diag("\r \e[11C"      . colored(['green'], q{  \__|      }));
+diag("\r \e[8A\e[11C$g" , q{ ########\  } . $rs);
+diag("\r \e[11C$g"      . q{  ##  ____\ } . $rs);
+diag("\r \e[11C$g"      . q{  ## |      } . $rs);
+diag("\r \e[11C$g"      . q{  #####\    } . $rs);
+diag("\r \e[11C$g"      . q{  ##  __|   } . $rs);
+diag("\r \e[11C$g"      . q{  ## |      } . $rs);
+diag("\r \e[11C$g"      . q{  ## |      } . $rs);
+diag("\r \e[11C$g"      . q{  \__|      } . $rs);
 sleep .3;
-diag("\r \e[8A\e[22C" . colored(['red'], q{ #######\   }));
-diag("\r \e[22C"      . colored(['red'], q{ ##  __##\  }));
-diag("\r \e[22C"      . colored(['red'], q{ ## |  ## | }));
-diag("\r \e[22C"      . colored(['red'], q{ #######\ | }));
-diag("\r \e[22C"      . colored(['red'], q{ ##  __##\  }));
-diag("\r \e[22C"      . colored(['red'], q{ ## |  ## | }));
-diag("\r \e[22C"      . colored(['red'], q{ #######  | }));
-diag("\r \e[22C"      . colored(['red'], q{ \_______/  }));
+diag("\r \e[8A\e[22C$r" . q{ #######\   } . $rs);
+diag("\r \e[22C$r"      . q{ ##  __##\  } . $rs);
+diag("\r \e[22C$r"      . q{ ## |  ## | } . $rs);
+diag("\r \e[22C$r"      . q{ #######\ | } . $rs);
+diag("\r \e[22C$r"      . q{ ##  __##\  } . $rs);
+diag("\r \e[22C$r"      . q{ ## |  ## | } . $rs);
+diag("\r \e[22C$r"      . q{ #######  | } . $rs);
+diag("\r \e[22C$r"      . q{ \_______/  } . $rs);
 sleep .3;
 
-diag("\r" . colored(['cyan on_black'],                                     q{  _______        _   _              }));
-diag("\r" . colored(['cyan on_black'],                                     q{ |__   __|      | | (_)             }));
-diag("\r" . colored(['cyan on_black'],                                     q{    | | ___  ___| |_ _ _ __   __ _  }));
-diag("\r" . colored(['cyan on_black'],                                     q{    | |/ _ \/ __| __| | '_ \ / _` | }));
-diag("\r" . colored(['cyan on_black'],                                     q{    | |  __/\__ \ |_| | | | | (_| | }));
-diag("\r" . colored(['cyan on_black'],                                     q{    |_|\___||___/\__|_|_| |_|\__, | }));
-diag("\r" . colored(['cyan on_black'],                                     q{                              __/ | }));
-diag("\r" . colored(['yellow on_black'], q{   Graphics::Framebuffer }) . colored(['cyan on_black'], q{    |___/  }));
+diag("\r$c$bk" .                                     q{  _______        _   _              } . $rs);
+diag("\r$c$bk" .                                     q{ |__   __|      | | (_)             } . $rs);
+diag("\r$c$bk" .                                     q{    | | ___  ___| |_ _ _ __   __ _  } . $rs);
+diag("\r$c$bk" .                                     q{    | |/ _ \/ __| __| | '_ \ / _` | } . $rs);
+diag("\r$c$bk" .                                     q{    | |  __/\__ \ |_| | | | | (_| | } . $rs);
+diag("\r$c$bk" .                                     q{    |_|\___||___/\__|_|_| |_|\__, | } . $rs);
+diag("\r$c$bk" .                                     q{                              __/ | } . $rs);
+diag("\r$y$bk" . q{   Graphics::Framebuffer } . $c . q{    |___/  } . $rs);
 diag("\r ");
 
 our $F = Graphics::Framebuffer->new('RESET' => 0, 'SPLASH' => 0);

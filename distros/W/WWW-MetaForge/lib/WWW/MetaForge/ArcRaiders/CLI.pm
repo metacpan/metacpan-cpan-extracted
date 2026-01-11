@@ -1,7 +1,7 @@
 package WWW::MetaForge::ArcRaiders::CLI;
-our $VERSION = '0.001';
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: CLI application for MetaForge ARC Raiders API
+our $VERSION = '0.002';
 
 use Moo;
 use WWW::MetaForge::ArcRaiders;
@@ -9,20 +9,24 @@ use Getopt::Long qw(:config pass_through);
 use namespace::clean;
 use MooX::Cmd;
 
+
 has debug => (
   is      => 'ro',
   default => sub { $ENV{WWW_METAFORGE_ARCRAIDERS_DEBUG} // 0 },
 );
+
 
 has no_cache => (
   is      => 'ro',
   default => sub { $ENV{WWW_METAFORGE_ARCRAIDERS_NO_CACHE} // 0 },
 );
 
+
 has json => (
   is      => 'ro',
   default => sub { $ENV{WWW_METAFORGE_ARCRAIDERS_JSON} // 0 },
 );
+
 
 around BUILDARGS => sub {
   my ($orig, $class, @args) = @_;
@@ -47,6 +51,7 @@ has api => (
   is      => 'lazy',
   builder => '_build_api',
 );
+
 
 sub _build_api {
   my ($self) = @_;
@@ -101,19 +106,17 @@ WWW::MetaForge::ArcRaiders::CLI - CLI application for MetaForge ARC Raiders API
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
-  use WWW::MetaForge::ArcRaiders::CLI;
-  WWW::MetaForge::ArcRaiders::CLI->new_with_cmd;
+    use WWW::MetaForge::ArcRaiders::CLI;
+    WWW::MetaForge::ArcRaiders::CLI->new_with_cmd;
 
 =head1 DESCRIPTION
 
 Main CLI class for the ARC Raiders API client. Uses L<MooX::Cmd> for
 subcommand handling.
-
-=head1 ATTRIBUTES
 
 =head2 debug
 
@@ -134,19 +137,20 @@ C<WWW_METAFORGE_ARCRAIDERS_JSON> environment variable.
 
 L<WWW::MetaForge::ArcRaiders> instance.
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
-
 =head1 SUPPORT
 
-=head2 Source Code
+=head2 Issues
 
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-metaforge/issues>.
 
-L<https://github.com/Getty/p5-www-metaforge>
+=head2 IRC
 
-  git clone https://github.com/Getty/p5-www-metaforge.git
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 

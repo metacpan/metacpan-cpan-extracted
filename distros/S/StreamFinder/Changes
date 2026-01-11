@@ -739,3 +739,22 @@ Revision history for StreamFinder
         as "&source=..." unless "-notrim" option set.
         Also now search for any Youtube urls embedded in webpages' JSON code 
         as a fallback.  Update copyright year to 2025.
+2.47    
+        - StreamFinder::Odysee - Fix failure to fetch artist field and streams 
+        from their webpages (they've tweaked their site and have added back 
+        stream-fetchability directly from their pages).  We also no longer call 
+        - StreamFinder::Rumble - Fix failure to fetch artist name and full 
+        description text (slight changes in their site).  Also reject streams 
+        named "*.[A-Z]aa.rec.{mp4|webm}" as these seem to be video-only / 
+        "dash"? streams, and any stream with non-numeric "quality" (except 
+        "hls" or "auto" (ie. "timeline", "pause_ads_params", etc. as these are 
+        not real streams.
+        StreamFinder::Youtube if -youtube => 'no', or if one or more streams 
+        are successfully fetched from their webpage(s) and 
+        -youtube => 'ifneeded' (how it was meant to work).
+        - StreamFinder::Youtube - Fix sometimes failure to fetch the proper 
+        image URL and/or the youtube video-url often embedded in many Odysee 
+        videos as the last line of their description via StreamFinder::Odysee.
+        Also allow the -format-fallback option to be set to "" or 0 to allow 
+        fallback to any available format (no -f option appended to yt-dlp or 
+        youtube-dl) - unless -formatonly option is set.

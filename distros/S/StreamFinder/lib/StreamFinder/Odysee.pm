@@ -4,7 +4,7 @@ StreamFinder::Odysee - Fetch actual raw streamable URLs from Odysee.com.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2023 by
+This module is Copyright (C) 2017-2026 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -336,7 +336,7 @@ L<http://search.cpan.org/dist/StreamFinder-Odysee/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2023 Jim Turner.
+Copyright 2017-2026 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -443,15 +443,34 @@ sub new
 	if ($html =~ m#\<script\s+type\=\"application\/ld\+json\"\>\s*\{([^\}]+)#s) {
 		my $jsonstuff = $1;
 		my $streams = '';
-		$self->{'title'} = $1  if ($jsonstuff =~ m#\"name\"\:\s*\"([^\"]+)#s);
-#x		$self->{'description'} = $1  if ($jsonstuff =~ m#\"description\"\:\s*\"([^\"]+)#s);
-		$self->{'iconurl'} = $1  if ($jsonstuff =~ m#\"thumbnailUrl\"\:\s*\"([^\"]+)#s);
-		($self->{'imageurl'} = $self->{'iconurl'}) =~ s#^.+?(https?\:\/.+)$#$1#i
-				if ($self->{'iconurl'});
+		$self->{'title'} = $1  if ($jsonstuff =~ s#\"name\"\:\s*\"([^\"]+)##s);
+		$self->{'description'} = $1  if ($jsonstuff =~ m#\"description\"\:\s*\"([^\"]+)#s);
+		$self->{'imageurl'} = $1  if ($jsonstuff =~ m#\"thumbnailUrl\"\:\s*\"([^\"]+)#s);
+		($self->{'iconurl'} = $self->{'imageurl'}) =~ s#^.+?(https?\:\/.+)$#$1#i
+				if ($self->{'imageurl'});
+		$self->{'iconurl'} ||= $self->{'imageurl'};
 		$self->{'year'} = $1  if ($jsonstuff =~ m#\"uploadDate\"\:\s*\"(\d\d\d\d)#s);
+		my $artist_name = ($jsonstuff =~ s#\"name\"\:\s*\"([^\"]+)##s) ? $1 : '';
+		if ($artist_name) {
+			$self->{'artist'} = $self->{'artist'} ? "$artist_name (".$self->{'artist'}.')'
+					: $artist_name;
+		}
+		my @nonYtStreams = ();
+		my $nonYtCnt = 0;
+		unless ($self->{'youtube'} =~ /only/i) {
+			#TRY TO FETCH ANY STREAM IN THE ODYSEE VIDEO PAGE ITSELF:
+			while ($jsonstuff =~ s#\"contentUrl\"\:\s*\"([^\"]+)##s) {
+				my $s = $1;
+				push (@nonYtStreams, $s)  unless ($self->{'nohls'} && $s =~ /\.m3u8?/o);
+			}
+			$nonYtCnt = scalar (@nonYtStreams);
+		}
+
 		my $haveYoutube = 0;
-		eval { require 'StreamFinder/Youtube.pm'; $haveYoutube = 1; };
-		print STDERR "\n-2 NO STREAMS FOUND IN PAGE (haveYoutube=$haveYoutube)\n"  if ($DEBUG && $self->{'cnt'} <= 0);
+		unless ($self->{'youtube'} =~ /no/i || ($nonYtCnt > 0 && $self->{'youtube'} =~ /ifneeded/i)) {
+			eval { require 'StreamFinder/Youtube.pm'; $haveYoutube = 1; };
+		}
+		print STDERR "\n-2 NO STREAMS FOUND IN PAGE (haveYoutube=$haveYoutube)\n"  if ($DEBUG && $nonYtCnt <= 0);
 		if ($haveYoutube) {
 			print STDERR "\n-2 TRYING youtube-dl...\n"  if ($DEBUG);
 			my %globalArgs = (
@@ -462,24 +481,24 @@ sub new
 				(my $arg0 = $arg) =~ s/^youtube\-(?!dl)//o;
 				$globalArgs{$arg0} = $self->{$arg}  if (defined $self->{$arg});
 			}
-			my @nonYtStreams = ();
-			my $nonYtCnt = 0;
 			my $yt = new StreamFinder::Youtube($url2fetch, %globalArgs);
 			if ($yt) {
 				if ($yt->count() > 0) {
+					#YES, THESE ARE NON-YOUTUBE STREAMS EVEN THOUGH WE'RE USING yt-dlp TO FETCH 'EM!:
 					my @ytStreams = $yt->get();
 					foreach my $s (@ytStreams) {
 						push (@nonYtStreams, $s)  unless ($self->{'nohls'} && $s =~ /\.m3u8?/o);
 					}
 					$nonYtCnt = scalar (@nonYtStreams);
 				}
-				print STDERR "--PREFER-YT=".$self->{'youtube'}."= iconURL=".$yt->{'iconurl'}."=\n"  if ($DEBUG);
-				if ($self->{'youtube'} =~ /(?:yes|top|first|last|only|ifneeded)/i && $yt->{'iconurl'} =~ /\b(?:youtube\.|youtu.be|ytimg\.)\b/) {
-					#ODYSEE VIDEOS USUALLY HAVE A YOUTUBE URL AS LAST LINE IN DESCRIPTION, WHICH ENDS
-					#UP IN THE iconurl ARGUMENT AND USER WOULD PREFER YOUTUBE, SO WE'LL TRY THAT!:
-					print STDERR "---user prefers Youtube (".$yt->{'iconurl'}.")!...\n"  if ($DEBUG);
+				print STDERR "--PREFER-YT=".$self->{'youtube'}."= _odysee_yturl=".$yt->{'_odysee_yturl'}."=\n"  if ($DEBUG);
+				if ($self->{'youtube'} =~ /(?:yes|top|first|last|only|ifneeded)/i
+							&& $yt->{'_odysee_yturl'} =~ /\b(?:youtube\.|youtu.be|ytimg\.)\b/) {
+					#ODYSEE VIDEOS OFTEN HAVE A YOUTUBE URL AS LAST LINE IN DESCRIPTION, WHICH ENDS
+					#UP IN THE _odysee_yturl ARGUMENT AND USER WOULD PREFER YOUTUBE, SO WE'LL TRY THAT!:
+					print STDERR "---user prefers Youtube (".$yt->{'_odysee_yturl'}.")!...\n"  if ($DEBUG);
 					#IF youtube-dl FOUND A NON-YOUTUBE STREAM & USER SAYS "ifneeded", THEN SKIP 2ND youtube-dl SEARCH!:
-					goto NOTNEEDED  if ($nonYtCnt > 0 && $self->{'youtube'} =~ /ifneeded/);
+					goto NOTNEEDED  if ($nonYtCnt > 0 && $self->{'youtube'} =~ /ifneeded/i);
 
 					my %globalArgs = (
 							'-noiframes' => 1, '-debug' => $DEBUG
@@ -489,16 +508,17 @@ sub new
 						(my $arg0 = $arg) =~ s/^youtube\-(?!dl)//o;
 						$globalArgs{$arg0} = $self->{$arg}  if (defined $self->{$arg});
 					}
-					my $yt0 = new StreamFinder::Youtube($yt->{'iconurl'}, %globalArgs);
+					my $yt0 = new StreamFinder::Youtube($yt->{'_odysee_yturl'}, %globalArgs);
 					if (defined($yt0) && $yt0->count() > 0) {
 						return $yt0  if ($self->{'youtube'} =~ /only/i);
 
-						my @ytStreams = $yt0->get();
+						my @ytStreams = $yt0->get();  #NOW THESE *ARE* YOUTUBE STREAMS!:
 						push @{$self->{'streams'}}, @ytStreams;
 						if ($self->{'youtube'} =~ /(?:top|first)/i) {
-							foreach my $field (qw(title description artist albumartist year iconurl articonurl)) {
+							foreach my $field (qw(title artist albumartist year iconurl articonurl)) {
 								$self->{$field} ||= $yt0->{$field}  if (defined($yt0->{$field}) && $yt0->{$field});
 							}
+							$self->{'description'} = $yt0->{'description'}  if (length($yt0->{'description'}) > $self->{'description'});
 						}
 						$self->{'cnt'} = scalar @{$self->{'streams'}};
 						print STDERR "i:Found (".$self->{'cnt'}.") Youtube stream(s) (".join('|',@ytStreams).") via youtube-dl.\n"  if ($DEBUG);
@@ -525,18 +545,25 @@ NOTNEEDED:
 			} else {
 				$self->{'description'} = $self->{'title'};
 			}
-			foreach my $i (qw(title description)) {
-				$self->{$i} = HTML::Entities::decode_entities($self->{$i});
-				$self->{$i} = uri_unescape($self->{$i});
-				$self->{$i} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egso;
-			}
+		} else {
+			push @{$self->{'streams'}}, @nonYtStreams;
+			$self->{'cnt'} = scalar @{$self->{'streams'}};
 		}
+	}
+	foreach my $i (qw(title description)) {
+		$self->{$i} = HTML::Entities::decode_entities($self->{$i});
+		$self->{$i} = uri_unescape($self->{$i});
+		$self->{$i} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egso;
 	}
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';
 	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
 			if ($DEBUG && $self->{'cnt'} > 0);
-	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
+	if ($DEBUG) {
+		foreach my $i (sort keys %{$self}) {
+			print STDERR "--KEY=$i= VAL=".$self->{$i}."=\n";
+		}
+	}
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!
@@ -573,9 +600,11 @@ sub fetchChannelPage {
 		print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
 		return ''  unless ($html);
 
-		$self->{'articonurl'} = $1  if ($html =~ m#\<meta\s+name\=\"twitter\:image\"\s+content\=\"([^\"]+)#s) ? $1 : '';
-		($self->{'artimageurl'} = $self->{'articonurl'}) =~ s#^.+?(https?\:\/.+)$#$1#i
-				if ($self->{'articonurl'});
+		$self->{'artimageurl'} = $1  if ($html =~ m#\<meta\s+property\=\"og\:image(?:\:secure_url)?\"\s+content\=\"([^\"]+)#s);
+		$self->{'artimageurl'} ||= $1  if ($html =~ m#\<meta\s+name\=\"twitter\:image\"\s+content\=\"([^\"]+)#s);
+		($self->{'articonurl'} = $self->{'artimageurl'}) =~ s#^.+?(https?\:\/.+)$#$1#i
+				if ($self->{'artimageurl'});
+		$self->{'articonurl'} ||= $self->{'artimageurl'};
 		print STDERR "--ART ($whichImg) URL=".$self->{$whichImg}."=\n"  if ($DEBUG);
 	}
 	return $self->{$whichImg};

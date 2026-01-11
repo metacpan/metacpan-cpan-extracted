@@ -2,7 +2,7 @@ package WWW::Noss::Timestamp;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use Time::Piece;
 
@@ -177,7 +177,7 @@ requests are welcome!
 
 =head1 COPYRIGHT
 
-Copyright (C) 2025 Samuel Young
+Copyright (C) 2025-2026 Samuel Young
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

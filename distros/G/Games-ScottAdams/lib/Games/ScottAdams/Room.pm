@@ -1,4 +1,4 @@
-# $Id: Room.pm,v 1.1 2006/10/31 20:31:21 mike Exp $
+# $Id: Room.pm,v 1.1 2006-10-31 20:31:21 mike Exp $
 
 # Room.pm - a room in a Scott Adams game.
 

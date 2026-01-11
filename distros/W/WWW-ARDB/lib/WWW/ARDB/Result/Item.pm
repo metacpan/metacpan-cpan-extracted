@@ -7,7 +7,8 @@ use Moo;
 use Types::Standard qw( Str Int Num ArrayRef HashRef Maybe );
 use namespace::clean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
+
 
 has id => (
     is       => 'ro',
@@ -15,11 +16,13 @@ has id => (
     required => 1,
 );
 
+
 has name => (
     is       => 'ro',
     isa      => Str,
     required => 1,
 );
+
 
 has description => (
     is      => 'ro',
@@ -27,11 +30,13 @@ has description => (
     default => sub { undef },
 );
 
+
 has rarity => (
     is      => 'ro',
     isa     => Maybe[Str],
     default => sub { undef },
 );
+
 
 has type => (
     is      => 'ro',
@@ -39,11 +44,13 @@ has type => (
     default => sub { undef },
 );
 
+
 has value => (
     is      => 'ro',
     isa     => Maybe[Num],
     default => sub { undef },
 );
+
 
 has weight => (
     is      => 'ro',
@@ -51,11 +58,13 @@ has weight => (
     default => sub { undef },
 );
 
+
 has stack_size => (
     is      => 'ro',
     isa     => Maybe[Int],
     default => sub { undef },
 );
+
 
 has icon => (
     is      => 'ro',
@@ -63,11 +72,13 @@ has icon => (
     default => sub { undef },
 );
 
+
 has found_in => (
     is      => 'ro',
     isa     => ArrayRef,
     default => sub { [] },
 );
+
 
 has maps => (
     is      => 'ro',
@@ -75,11 +86,13 @@ has maps => (
     default => sub { [] },
 );
 
+
 has breakdown => (
     is      => 'ro',
     isa     => ArrayRef,
     default => sub { [] },
 );
+
 
 has crafting => (
     is      => 'ro',
@@ -87,11 +100,13 @@ has crafting => (
     default => sub { [] },
 );
 
+
 has updated_at => (
     is      => 'ro',
     isa     => Maybe[Str],
     default => sub { undef },
 );
+
 
 has _raw => (
     is      => 'ro',
@@ -121,12 +136,14 @@ sub from_hashref {
     );
 }
 
+
 sub icon_url {
     my $self = shift;
     return unless $self->icon;
     return 'https://ardb.app' . $self->icon if $self->icon =~ m{^/};
     return $self->icon;
 }
+
 
 1;
 
@@ -142,7 +159,7 @@ WWW::ARDB::Result::Item - Item result object for WWW::ARDB
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -154,35 +171,34 @@ version 0.001
     print $item->value;         # 7000
     print $item->icon_url;      # Full URL to icon
 
-=head1 NAME
+=head1 DESCRIPTION
 
-WWW::ARDB::Result::Item - Item result object for WWW::ARDB
-
-=head1 ATTRIBUTES
+Result object representing an item from the ARC Raiders Database. Created via
+L<WWW::ARDB> methods like C<items()> and C<item()>.
 
 =head2 id
 
-String. Unique identifier.
+String. Unique identifier for the item (e.g., C<acoustic_guitar>).
 
 =head2 name
 
-String. Display name.
+String. Display name of the item.
 
 =head2 description
 
-String or undef. Item description.
+String or undef. Item description text.
 
 =head2 rarity
 
-String or undef. Rarity level (legendary, epic, rare, uncommon, common).
+String or undef. Rarity level: C<legendary>, C<epic>, C<rare>, C<uncommon>, C<common>.
 
 =head2 type
 
-String or undef. Item category.
+String or undef. Item category (e.g., C<quick use>, C<weapon>, C<armor>).
 
 =head2 value
 
-Number or undef. Item value.
+Number or undef. Item value in credits.
 
 =head2 weight
 
@@ -190,55 +206,61 @@ Number or undef. Item weight.
 
 =head2 stack_size
 
-Integer or undef. Maximum stack size.
+Integer or undef. Maximum stack size for the item.
 
 =head2 icon
 
-String or undef. Path to icon image.
+String or undef. Path to icon image (use C<icon_url()> for full URL).
 
 =head2 found_in
 
-ArrayRef. Locations where item can be found.
+ArrayRef of Strings. Locations where this item can be found.
 
 =head2 maps
 
-ArrayRef. Maps where item appears.
+ArrayRef. Maps where this item appears.
 
 =head2 breakdown
 
-ArrayRef. Components when item is broken down (detail endpoint only).
+ArrayRef of HashRefs. Components obtained when breaking down this item.
+Only populated for detail endpoint (C<item($id)>).
 
 =head2 crafting
 
-ArrayRef. Crafting requirements (detail endpoint only).
+ArrayRef of HashRefs. Materials required to craft this item.
+Only populated for detail endpoint (C<item($id)>).
 
 =head2 updated_at
 
 String or undef. ISO 8601 timestamp of last update.
 
-=head1 METHODS
+=head2 from_hashref
 
-=head2 from_hashref($data)
+    my $item = WWW::ARDB::Result::Item->from_hashref($data);
 
-Class method. Creates an Item object from API response data.
+Class method. Constructs an Item object from API response data (HashRef).
 
 =head2 icon_url
 
-Returns the full URL to the item's icon, or undef if no icon.
+    my $url = $item->icon_url;
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+Returns the full URL to the item's icon image, or undef if no icon is set.
+Automatically prepends C<https://ardb.app> to relative paths.
 
 =head1 SUPPORT
 
-=head2 Source Code
+=head2 Issues
 
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-ardb/issues>.
 
-L<https://github.com/Getty/p5-www-ardb>
+=head2 IRC
 
-  git clone https://github.com/Getty/p5-www-ardb.git
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 

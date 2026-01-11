@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.233';
+our $VERSION = '1.234';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -52,6 +52,7 @@ use Quiq::Exit;
 use Quiq::TempDir;
 use Cwd ();
 use POSIX ();
+use Quiq::Path;
 use Quiq::Time;
 use Quiq::Process;
 
@@ -3317,6 +3318,138 @@ sub moveToDateSubDir {
 
 # -----------------------------------------------------------------------------
 
+=head3 partionizeDir() - Verschiebe Dateien in Subverzeichnisse
+
+=head4 Synopsis
+
+  $this->partionizeDir($dir,%options);
+
+=head4 Arguments
+
+=over 4
+
+=item $dir
+
+Verzeichnis, dessen Dateien verschoben werden
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -destDir => $destDir (Default: $dir)
+
+Zielverzeichnis, in dem die Subverzeichnisse für die Dateien angelegt werden
+
+=item -maxFiles => $maxFiles (Default: 100)
+
+(Maximale) Anzahl an Dateien je Subverzeichnis
+
+=item -verbose => $bool (Default: 1)
+
+Gib Information aus
+
+=item -width => $width (Default: 5)
+
+Länge des (numerischen) Subverzeichnisnamens
+
+=back
+
+=head4 Description
+
+Ermittele alle Dateien in Verzeichnis $dir und verteile sie auf
+Subverzeichnisse im Zielverzeichnis $destDir mit der der maximalen Anzahl
+$maxFiles. Der Vereichnisname ist ein numerischer Wert mit der Breite $width.
+
+=head4 Example
+
+$ perl -MQuiq::Path -E 'Quiq::Path->partionizeDir($dir)'
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub partionizeDir {
+    my ($this,$dir) = splice @_,0,2;
+
+    # Optionen und Argumente
+
+    my $destDir = $dir;
+    my $maxFiles = 100;
+    my $verbose = 1;
+    my $width = 5;
+
+    $this->parameters(\@_,
+        -destDir => \$destDir,
+        -maxFiles => \$maxFiles,
+        -verbose => \$verbose,
+        -width => \$width,
+    );
+
+    # if ($verbose) {
+    #     say "$dir $destDir $maxFiles $verbose $width";
+    # }
+
+    my $p = Quiq::Path->new;
+
+    for ($dir,$destDir) {
+        if (!$p->exists($_)) {
+            $this->throw(
+                'PATH-00099: Directory does not exist',
+                Direcory => $_,
+            );
+        }
+    }
+
+    # Ermittele das Verzeichnis mit der maximalen Nummer ($maxSubDir) und
+    # baue die Liste der Dateien auf (@files).
+
+    my $maxSubDir = 0;
+    my @files;
+    my $dh = Quiq::DirHandle->new($dir);
+    while (my $e = $dh->next) {
+        if ($e eq '.' || $e eq '..') {
+            next;
+        }
+        if (-d "$dir/$e" && $e =~ /^\d+$/) {
+            if (!$maxSubDir || $e > $maxSubDir) {
+                $maxSubDir = $e;
+            }
+            next;
+        }
+        push @files,$e;
+    }
+    $dh->close;
+
+    @files = sort @files;
+
+    # Verteile die Dateien auf Subverzeichnisse
+
+    $maxSubDir ||= 1;
+    my $subDir = sprintf '%0*d',$width,$maxSubDir;
+    my $subDirCount = $p->exists("$destDir/$subDir")?
+        $p->count("$destDir/$subDir"): 0;
+# say $subDirCount;
+    while (my $name = shift @files) {
+        if ($subDirCount >= $maxFiles) {
+             $maxSubDir++;
+             $subDir = sprintf '%0*d',$width,$maxSubDir;
+             $subDirCount = 0;
+        }
+        if ($verbose) {
+            say "$dir/$name => $destDir/$subDir/$name ($subDirCount)";
+        }
+        $p->mkdir("$destDir/$subDir");
+        $this->duplicate('move',"$dir/$name","$destDir/$subDir/$name");
+        $subDirCount++;
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 mtime() - Setze/Liefere Modifikationszeit
 
 =head4 Synopsis
@@ -4599,7 +4732,7 @@ sub uid {
 
 =head1 VERSION
 
-1.233
+1.234
 
 =head1 AUTHOR
 
@@ -4607,7 +4740,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2025 Frank Seitz
+Copyright (C) 2026 Frank Seitz
 
 =head1 LICENSE
 

@@ -1,0 +1,21 @@
+{
+  "load_balancer": {
+    "id": 1000,
+    "name": "new-lb",
+    "public_net": {
+      "enabled": true,
+      "ipv4": { "ip": "203.0.113.100" },
+      "ipv6": { "ip": "2001:db8::2" }
+    },
+    "private_net": [],
+    "location": { "id": 1, "name": "fsn1" },
+    "load_balancer_type": { "id": 1, "name": "lb11" },
+    "protection": { "delete": false },
+    "labels": {},
+    "targets": [],
+    "services": [],
+    "algorithm": { "type": "round_robin" },
+    "created": "2024-06-01T12:00:00+00:00"
+  },
+  "action": { "id": 7777, "command": "create_load_balancer", "status": "success" }
+}

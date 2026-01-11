@@ -7,7 +7,8 @@ use Moo;
 use Types::Standard qw( Str ArrayRef HashRef Maybe );
 use namespace::clean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
+
 
 has id => (
     is       => 'ro',
@@ -15,11 +16,13 @@ has id => (
     required => 1,
 );
 
+
 has name => (
     is       => 'ro',
     isa      => Str,
     required => 1,
 );
+
 
 has icon => (
     is      => 'ro',
@@ -27,11 +30,13 @@ has icon => (
     default => sub { undef },
 );
 
+
 has image => (
     is      => 'ro',
     isa     => Maybe[Str],
     default => sub { undef },
 );
+
 
 has drop_table => (
     is      => 'ro',
@@ -39,17 +44,20 @@ has drop_table => (
     default => sub { [] },
 );
 
+
 has related_maps => (
     is      => 'ro',
     isa     => ArrayRef,
     default => sub { [] },
 );
 
+
 has updated_at => (
     is      => 'ro',
     isa     => Maybe[Str],
     default => sub { undef },
 );
+
 
 has _raw => (
     is      => 'ro',
@@ -72,12 +80,14 @@ sub from_hashref {
     );
 }
 
+
 sub icon_url {
     my $self = shift;
     return unless $self->icon;
     return 'https://ardb.app' . $self->icon if $self->icon =~ m{^/};
     return $self->icon;
 }
+
 
 sub image_url {
     my $self = shift;
@@ -86,10 +96,12 @@ sub image_url {
     return $self->image;
 }
 
+
 sub drops {
     my $self = shift;
     return [ map { $_->{name} } @{$self->drop_table} ];
 }
+
 
 1;
 
@@ -105,7 +117,7 @@ WWW::ARDB::Result::ArcEnemy - ARC Enemy result object for WWW::ARDB
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -121,15 +133,14 @@ version 0.001
     # Or just get drop names
     my $drops = $enemy->drops;  # ['Wires', 'Medium Ammo', ...]
 
-=head1 NAME
+=head1 DESCRIPTION
 
-WWW::ARDB::Result::ArcEnemy - ARC Enemy result object for WWW::ARDB
-
-=head1 ATTRIBUTES
+Result object representing an ARC enemy from the ARC Raiders Database. Created
+via L<WWW::ARDB> methods like C<arc_enemies()> and C<arc_enemy()>.
 
 =head2 id
 
-String. Unique identifier.
+String. Unique identifier for the enemy (e.g., C<wasp>).
 
 =head2 name
 
@@ -137,56 +148,67 @@ String. Enemy name.
 
 =head2 icon
 
-String or undef. Path to icon image.
+String or undef. Path to icon image (use C<icon_url()> for full URL).
 
 =head2 image
 
-String or undef. Path to full image.
+String or undef. Path to full enemy image (use C<image_url()> for full URL).
 
 =head2 drop_table
 
 ArrayRef of HashRefs. Items this enemy can drop, each with C<id>, C<name>,
-C<rarity>, C<type>, C<foundIn>, C<value>, C<icon> (detail endpoint only).
+C<rarity>, C<type>, C<foundIn>, C<value>, C<icon>.
+Only populated for detail endpoint (C<arc_enemy($id)>).
 
 =head2 related_maps
 
-ArrayRef. Maps where this enemy appears (detail endpoint only).
+ArrayRef of HashRefs. Maps where this enemy appears.
+Only populated for detail endpoint (C<arc_enemy($id)>).
 
 =head2 updated_at
 
 String or undef. ISO 8601 timestamp of last update.
 
-=head1 METHODS
+=head2 from_hashref
 
-=head2 from_hashref($data)
+    my $enemy = WWW::ARDB::Result::ArcEnemy->from_hashref($data);
 
-Class method. Creates an ArcEnemy object from API response data.
+Class method. Constructs an ArcEnemy object from API response data (HashRef).
 
 =head2 icon_url
 
-Returns the full URL to the enemy's icon, or undef if no icon.
+    my $url = $enemy->icon_url;
+
+Returns the full URL to the enemy's icon image, or undef if no icon is set.
+Automatically prepends C<https://ardb.app> to relative paths.
 
 =head2 image_url
 
-Returns the full URL to the enemy's image, or undef if no image.
+    my $url = $enemy->image_url;
+
+Returns the full URL to the enemy's full image, or undef if no image is set.
+Automatically prepends C<https://ardb.app> to relative paths.
 
 =head2 drops
 
-Returns an ArrayRef of drop item names.
+    my $names = $enemy->drops;
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+Returns an ArrayRef of drop item names extracted from the drop table.
 
 =head1 SUPPORT
 
-=head2 Source Code
+=head2 Issues
 
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-ardb/issues>.
 
-L<https://github.com/Getty/p5-www-ardb>
+=head2 IRC
 
-  git clone https://github.com/Getty/p5-www-ardb.git
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 

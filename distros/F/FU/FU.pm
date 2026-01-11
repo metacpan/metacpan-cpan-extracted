@@ -1,4 +1,4 @@
-package FU 1.3;
+package FU 1.4;
 use v5.36;
 use Carp 'confess', 'croak';
 use IO::Socket;
@@ -292,7 +292,8 @@ sub _read_req($c) {
                : $r == -2 ? "I/O error while reading from FastCGI socket\n"
                : $r == -3 ? "FastCGI protocol error\n"
                : $r == -4 ? "Too long FastCGI parameter\n"
-               : $r == -5 ? "Too long request body\n" : undef if $r != -7;
+               : $r == -5 ? "Too long request body\n"
+               : $r == -8 ? "I/O error while writing to FastCGI socket\n" : undef if $r != -7;
             delete $c->{fcgi_obj};
             fu->error(-1);
         }
@@ -400,7 +401,13 @@ sub _do_req($c) {
     }
 
     $REQ->{trace_end} = clock_gettime(CLOCK_MONOTONIC);
-    fu->_flush($c->{fcgi_obj} || $c->{client_sock});
+    eval {
+        fu->_flush($c->{fcgi_obj} || $c->{client_sock});
+        1;
+    } || do {
+        log_write "Error writing response: $@\n";
+        $c->{client_sock} = $c->{fcgi_obj} = undef;
+    };
 
     if (debug && $REQ->{trace_id} && $debug_info->{history} && $debug_info->{storage}) {
         require FU::DebugImpl;
@@ -491,6 +498,8 @@ sub _supervisor($c) {
             if (!$err && (!$childs{$pid} || $childs{$pid} != 2)) {
                 $err = 1;
                 log_write "Script exited before calling FU::run()\n";
+            } elsif ($?) {
+                log_write "Unclean shutdown of worker PID $pid status $?\n";
             }
             delete $childs{$pid};
         }
@@ -646,8 +655,8 @@ sub db {
     };
 }
 
-sub sql { shift->db->q(@_) }
-sub SQL { shift->db->Q(@_) }
+sub sql { shift->db->sql(@_) }
+sub SQL { shift->db->SQL(@_) }
 
 sub _fmt_section($s) { $s =~ s/^\s*/  /r =~ s/\s+$//r =~ s/\n/\n  /rg }
 
@@ -705,7 +714,8 @@ sub cookie {
         my %c;
         for my $c (split /; /, fu->header('cookie')||'') {
             my($n, $v) = split /=/, $c, 2;
-            if (!exists $c{$n}) { $c{$n} = $v }
+            if (!defined $v) {}
+            elsif (!exists $c{$n}) { $c{$n} = $v }
             elsif (ref $c{$n}) { push $c{$n}->@*, $v }
             else { $c{$n} = [ $c{$n}, $v ] }
         }
@@ -1305,11 +1315,11 @@ has successfully been processed, or rolled back if there was an error.
 
 =item fu->sql($query, @params)
 
-Convenient short-hand for C<< fu->db->q($query, @params) >>.
+Convenient short-hand for C<< fu->db->sql($query, @params) >>.
 
 =item fu->SQL(@args)
 
-Convenient short-hand for C<< fu->db->Q(@args) >>.
+Convenient short-hand for C<< fu->db->SQL(@args) >>.
 
 =item fu->log_verbose($message)
 

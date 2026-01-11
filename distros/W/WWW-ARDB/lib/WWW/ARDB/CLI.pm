@@ -9,22 +9,26 @@ use WWW::ARDB;
 use JSON::MaybeXS qw( encode_json );
 use Getopt::Long qw(:config pass_through);
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
+
 
 has debug => (
     is      => 'ro',
     default => sub { $ENV{WWW_ARDB_DEBUG} // 0 },
 );
 
+
 has no_cache => (
     is      => 'ro',
     default => sub { $ENV{WWW_ARDB_NO_CACHE} // 0 },
 );
 
+
 has json => (
     is      => 'ro',
     default => sub { $ENV{WWW_ARDB_JSON} // 0 },
 );
+
 
 around BUILDARGS => sub {
     my ($orig, $class, @args) = @_;
@@ -48,6 +52,7 @@ has api => (
     is      => 'lazy',
     builder => '_build_api',
 );
+
 
 sub _build_api {
     my $self = shift;
@@ -88,6 +93,7 @@ sub output_json {
     print encode_json($data) . "\n";
 }
 
+
 1;
 
 __END__
@@ -102,7 +108,7 @@ WWW::ARDB::CLI - Command-line interface for WWW::ARDB
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -114,44 +120,48 @@ version 0.001
 Main CLI class for the ARC Raiders Database API client. Uses L<MooX::Cmd>
 for subcommand handling.
 
-=head1 NAME
-
-WWW::ARDB::CLI - Command-line interface for WWW::ARDB
-
-=head1 ATTRIBUTES
+See C<ardb --help> for command-line usage.
 
 =head2 debug
 
-Enable debug output. Use C<--debug> or C<-d> flag, or set via
-C<WWW_ARDB_DEBUG> environment variable.
+Boolean. Enable debug output. Set via C<--debug> or C<-d> flag, or
+C<WWW_ARDB_DEBUG> environment variable. Defaults to C<0>.
 
 =head2 no_cache
 
-Disable response caching. Use C<--no-cache> flag, or set via
-C<WWW_ARDB_NO_CACHE> environment variable.
+Boolean. Disable response caching. Set via C<--no-cache> flag, or
+C<WWW_ARDB_NO_CACHE> environment variable. Defaults to C<0>.
 
 =head2 json
 
-Output results as JSON. Use C<--json> or C<-j> flag, or set via
-C<WWW_ARDB_JSON> environment variable.
+Boolean. Output results as JSON. Set via C<--json> or C<-j> flag, or
+C<WWW_ARDB_JSON> environment variable. Defaults to C<0>.
 
 =head2 api
 
-L<WWW::ARDB> instance.
+L<WWW::ARDB> instance used for API calls. Automatically configured with
+debug and caching settings.
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=head2 output_json
+
+    $cli->output_json($data);
+
+Helper method to output data as JSON. Used by subcommands.
 
 =head1 SUPPORT
 
-=head2 Source Code
+=head2 Issues
 
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-ardb/issues>.
 
-L<https://github.com/Getty/p5-www-ardb>
+=head2 IRC
 
-  git clone https://github.com/Getty/p5-www-ardb.git
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 

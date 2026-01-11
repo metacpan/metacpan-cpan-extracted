@@ -32,7 +32,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Lexical-Accessor";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_1-000000>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_1-000001>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_1-000002>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_1-000000>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_1-000001>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_1-000002>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_1-000003>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-lexical-accessor>;
@@ -304,6 +304,26 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lexical-Accessor-1.000002.tar.gz>;
 	doap:revision        "1.000002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_1-000003>
+	a                    doap:Version;
+	dc:identifier        "Lexical-Accessor-1.000003"^^xsd:string;
+	dc:issued            "2026-01-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix for lazy defaults/builders running triggers (triggers shouldn't run for defaults and builders).";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix for canonicalizing builder=>CODEREF.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix for accessors which a method name which is only one character long.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lexical-Accessor-1.000003.tar.gz>;
+	doap:revision        "1.000003"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/amon>
 	a                    foaf:Person;

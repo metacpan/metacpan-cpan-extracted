@@ -7,7 +7,7 @@ use Test::More tests => 1;
 
 use Test::PerlTidy ();
 
-my @wanted_files = sort qw(
+my @wanted_files = qw(
   Build.PL
   Makefile.PL
   scripts/tag-release.pl
@@ -17,6 +17,8 @@ my @wanted_files = sort qw(
   t/is_file_tidy.t
   t/list_files.t
   t/perltidy.t
+  t/test_files/cpanfile
+  t/test_files/test_app.psgi
 );
 
 @wanted_files = map { my $ret = $_; $ret =~ s/\//\\/g; $ret } @wanted_files
@@ -29,4 +31,4 @@ my @found_files = Test::PerlTidy::list_files(
 );
 
 # TEST
-is_deeply( \@wanted_files, \@found_files );
+is_deeply( [ sort @found_files ], \@wanted_files );

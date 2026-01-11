@@ -39,4 +39,21 @@ like($stderr, qr/^\s*\z/, 'no warnings emitted when using -c');
 my $exit = $? >> 8;
 is($exit, 0, 'process exits successfully');
 
+my $array_json = "[10]\n";
+my $array_err  = gensym;
+my $array_pid  = open3(my $array_in, my $array_out, $array_err, $^X, 'bin/jq-lite', '-c', '.[0]');
+print {$array_in} $array_json;
+close $array_in;
+
+my $array_stdout = do { local $/; <$array_out> } // '';
+my $array_stderr = do { local $/; <$array_err> } // '';
+
+waitpid($array_pid, 0);
+
+is($array_stdout, "10\n", 'array indexing emits the indexed element in compact output');
+like($array_stderr, qr/^\s*\z/, 'no warnings emitted when indexing arrays with -c');
+
+my $array_exit = $? >> 8;
+is($array_exit, 0, 'array indexing process exits successfully');
+
 done_testing;

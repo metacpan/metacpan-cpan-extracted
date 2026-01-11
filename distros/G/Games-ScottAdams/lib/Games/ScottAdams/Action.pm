@@ -1,4 +1,4 @@
-# $Id: Action.pm,v 1.5 2006/11/04 10:11:11 mike Exp $
+# $Id: Action.pm,v 1.5 2006-11-04 10:11:11 mike Exp $
 
 # Action.pm - an action in a Scott Adams game.
 

@@ -1,0 +1,8 @@
+{
+  "action": {
+    "id": 8888,
+    "command": "add_target",
+    "status": "success",
+    "progress": 100
+  }
+}

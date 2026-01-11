@@ -1,0 +1,14 @@
+Revision history for Hax-Alg-RollingWindow
+
+0.001  2026-01-10
+  - Initial release: fixed-capacity rolling window (overwrite-oldest)
+  - O(1) add/get/peek and immediate ref release on eviction/clear
+
+0.002  2026-01-10
+  - Add MetaCPAN repository and issue tracker links
+
+0.900  2026-01-10
+  - Remove sealed dependency for broader Perl compatibility
+
+0.910  2026-01-10
+  - Updated README.md

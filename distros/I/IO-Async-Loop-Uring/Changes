@@ -1,5 +1,8 @@
 Revision history for IO-Async-Loop-Uring
 
+0.003     2026-01-09 13:35:49+01:00 Europe/Brussels
+          - Fix copy-paste error in tests
+
 0.002     2026-01-09 02:00:13+01:00 Europe/Brussels
           - Correctly scope watch reference to avoid descriptor reuse confusion
           - Correctly advertize abilities

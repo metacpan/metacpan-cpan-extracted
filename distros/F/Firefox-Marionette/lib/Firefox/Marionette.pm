@@ -73,7 +73,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.68';
+our $VERSION = '1.70';
 
 sub _ANYPROCESS                     { return -1 }
 sub _PROCESS_GROUP                  { return -1 }
@@ -4336,6 +4336,13 @@ sub _launch_and_connect {
             $parameters{capabilities} =
               $self->_setup_shortcut_proxy( $proxy_parameter,
                 $parameters{capabilities} );
+        }
+        if ( my $insecure = delete $parameters{insecure} ) {
+            if ( !$parameters{capabilities} ) {
+                $parameters{capabilities} =
+                  Firefox::Marionette::Capabilities->new();
+            }
+            $parameters{capabilities}{accept_insecure_certs} = 1;
         }
         ( $session_id, $capabilities ) =
           $self->_initial_socket_setup( $socket, $parameters{capabilities} );
@@ -9738,9 +9745,10 @@ sub delete_element {
       )
     {
         Firefox::Marionette::Exception->throw(
-            'delete_element method requires a Firefox::Marionette::Element parameter');
+'delete_element method requires a Firefox::Marionette::Element parameter'
+        );
     }
-    $self->script('arguments[0].remove()', args => [ $element ]);
+    $self->script( 'arguments[0].remove()', args => [$element] );
     return $self;
 }
 
@@ -12340,7 +12348,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.68
+Version 1.70
 
 =head1 SYNOPSIS
 
@@ -14095,6 +14103,8 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 =item * implicit - a shortcut to allow directly providing the L<implicit|Firefox::Marionette::Timeout#implicit> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
 
 =item * index - a parameter to allow the user to specify a specific firefox instance to survive and reconnect to.  It does not do anything else at the moment.  See the survive parameter.
+
+=item * insecure - this is a shortcut method for setting the accept_insecure_certs option in the L<capabilities|Firefox::Marionette::Capabilities> parameter above.
 
 =item * kiosk - start the browser in L<kiosk|https://support.mozilla.org/en-US/kb/firefox-enterprise-kiosk-mode> mode.
 

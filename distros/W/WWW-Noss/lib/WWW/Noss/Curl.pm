@@ -2,7 +2,7 @@ package WWW::Noss::Curl;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(curl curl_error http_status_string parse_http_header);
@@ -199,6 +199,7 @@ sub curl {
     my $proxy        = $param{ proxy        } // undef;
     my $proxy_user   = $param{ proxy_user   } // undef;
     my $redirect     = $param{ redirect     } // 0;
+    my $compressed   = $param{ compressed   } // 0;
 
     my $tmp = do {
         my ($h, $p) = tempfile(UNLINK => 1);
@@ -258,6 +259,10 @@ sub curl {
 
     if (defined $redirect) {
         push @cmd, '-L';
+    }
+
+    if ($compressed) {
+        push @cmd, '--compressed';
     }
 
     push @cmd, $link;
@@ -433,6 +438,12 @@ Corresponds to L<curl(1)>'s C<--proxy-user> option. Defaults to none.
 Boolean determining whether to following redirections. Corresponds to
 L<curl(1)>'s C<--location> option. Defaults to false.
 
+=item compressed
+
+Boolean determining whether to request compressed content and automatically
+decompress it. Corresponds to L<curl(1)>'s C<--compressed> option. Defaults to
+false.
+
 =back
 
 =item $desc = curl_error($rt)
@@ -475,7 +486,7 @@ requests are welcome!
 
 =head1 COPYRIGHT
 
-Copyright (C) 2025 Samuel Young
+Copyright (C) 2025-2026 Samuel Young
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

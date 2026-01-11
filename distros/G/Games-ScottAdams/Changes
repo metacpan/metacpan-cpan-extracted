@@ -1,5 +1,25 @@
 Revision history for Perl extension Games::ScottAdams.
 
+0.05  Sat Jan 10 17:23:53 GMT 2026
+	- Nearly 20 years after the last release, I have to make a new
+	  one because new versions of Perl idiotically changed the
+	  language by making it illegal to use GOTO to jump into code
+	  controlled by an IF. You may argue that this is bad style,
+	  but to "fix" it by breaking a program that has been running
+	  for 20 years is, to say the least, extraordinarily
+	  impolite. See https://www.cpantesters.org/cpan/report/7e3e9642-df43-11f0-ba4c-94b2d3ebcae0
+	  The new release changes the code to avoid this perfectly
+	  harmless construct.
+	- At some point during these 20 years, the order of playing
+	  out the keys of a hash became random rather than merely
+	  unspecified. As a result, we were no longer getting
+	  consistent builds of a game. So I have modified the
+	  code-generator to sort the vocabularies -- not because I
+	  want them sorted, but because I need them consistent in
+	  order for the code-generation tests to pass.
+	- Include the generated file lib/Games/ScottAdams/Tutorial.pod
+	  (created by make in in ./tutorial) in version control.
+
 0.04  Sat Nov  4 11:32:08 GMT 2006
 	- Add bin/sad, the Scott Adams decompiler.
 	- Fix an important bug: messages above #50 were compiled into

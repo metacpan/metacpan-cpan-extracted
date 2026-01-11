@@ -1,0 +1,28 @@
+[
+  {
+    "server": {
+      "server_number": 123456,
+      "server_name": "omnicorp-dedicated-1",
+      "server_ip": "203.0.113.50",
+      "product": "AX41-NVMe",
+      "dc": "FSN1-DC14",
+      "traffic": "unlimited",
+      "status": "ready",
+      "cancelled": false,
+      "paid_until": "2026-02-01"
+    }
+  },
+  {
+    "server": {
+      "server_number": 123457,
+      "server_name": "omnicorp-dedicated-2",
+      "server_ip": "203.0.113.51",
+      "product": "AX61-NVMe",
+      "dc": "HEL1-DC2",
+      "traffic": "unlimited",
+      "status": "ready",
+      "cancelled": false,
+      "paid_until": "2026-02-01"
+    }
+  }
+]

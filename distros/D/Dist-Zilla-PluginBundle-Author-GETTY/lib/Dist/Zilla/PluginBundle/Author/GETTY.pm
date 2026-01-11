@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.204';
+our $VERSION = '0.301';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -50,7 +50,7 @@ has release_branch => (
   is      => 'ro',
   isa     => 'Str',
   lazy    => 1,
-  default => sub { $_[0]->payload->{release_branch} || 'master' },
+  default => sub { $_[0]->payload->{release_branch} || 'main' },
 );
 
 has deprecated => (
@@ -128,6 +128,20 @@ has weaver_config => (
   isa     => 'Str',
   lazy    => 1,
   default => sub { $_[0]->payload->{weaver_config} || '@Author::GETTY' },
+);
+
+has irc => (
+  is      => 'ro',
+  isa     => 'Str',
+  lazy    => 1,
+  default => sub { $_[0]->payload->{irc} || '' },
+);
+
+has irc_server => (
+  is      => 'ro',
+  isa     => 'Str',
+  lazy    => 1,
+  default => sub { $_[0]->payload->{irc_server} || 'irc.perl.org' },
 );
 
 my @gather_array_options = qw( exclude_filename exclude_match );
@@ -272,7 +286,19 @@ sub configure {
     PodSyntaxTests
   ));
 
-  $self->add_plugins($self->no_github ? 'Repository' : 'GithubMeta');
+  $self->add_plugins($self->no_github ? 'Repository' : [ 'GithubMeta' => { issues => 1 } ]);
+
+  # Add IRC metadata if configured
+  if ($self->irc) {
+    my $channel = $self->irc;
+    $channel = '#' . $channel unless $channel =~ /^#/;
+    my $irc_url = 'irc://' . $self->irc_server . '/' . $channel;
+    $self->add_plugins([
+      'MetaResources' => {
+        'x_IRC' => $irc_url,
+      }
+    ]);
+  }
 
   if ($self->is_alien) {
     my %alien_values;
@@ -364,7 +390,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.204
+version 0.301
 
 =head1 SYNOPSIS
 
@@ -385,7 +411,7 @@ are default):
   [@Author::GETTY]
   author = GETTY
   deprecated = 0
-  release_branch = master
+  release_branch = main
   weaver_config = @Author::GETTY
   no_cpan = 0
   no_install = 0
@@ -422,7 +448,7 @@ In default configuration it is equivalent to:
   [Repository]
 
   [Git::CheckFor::CorrectBranch]
-  release_branch = master
+  release_branch = main
 
   [@Git::VersionManager]
   ; handles versioning, changelog (NextRelease), commits, tags, and push
@@ -545,6 +571,24 @@ If you don't like the usage of L<App::cpanminus> to install your distribution
 after install, you can set another command here. See B<install_command> on
 L<Dist::Zilla::Plugin::InstallRelease>.
 
+=head2 irc
+
+Specify an IRC channel for support. This will be added to the distribution
+metadata and displayed in the SUPPORT section of the generated POD.
+
+  [@Author::GETTY]
+  irc = #perl
+
+The channel name can be specified with or without the leading C<#>.
+
+=head2 irc_server
+
+Specify the IRC server. Defaults to C<irc.perl.org>.
+
+  [@Author::GETTY]
+  irc = #mychannel
+  irc_server = irc.libera.chat
+
 =head1 SEE ALSO
 
 L<Dist::Zilla::Plugin::Alien>
@@ -571,19 +615,20 @@ L<Dist::Zilla::Plugin::Run>
 
 L<Dist::Zilla::Plugin::TaskWeaver>
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
-
 =head1 SUPPORT
 
-=head2 Source Code
+=head2 Issues
 
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/issues>.
 
-L<https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty>
+=head2 IRC
 
-  git clone https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty.git
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 

@@ -995,8 +995,8 @@ jq-lite - minimal jq-style JSON filter (pure Perl)
 
 =head1 DESCRIPTION
 
-B<jq-lite> is a jq-compatible JSON processor written entirely in
-pure Perl.
+B<jq-lite> is a lightweight, jq-compatible alternative JSON processor written
+in pure Perl.
 
 It is intended for use on systems where B<jq> is unavailable but Perl
 is present, providing awk/sed-like convenience for processing JSON

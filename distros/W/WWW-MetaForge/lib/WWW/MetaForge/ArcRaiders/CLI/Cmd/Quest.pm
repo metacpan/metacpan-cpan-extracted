@@ -1,8 +1,7 @@
 package WWW::MetaForge::ArcRaiders::CLI::Cmd::Quest;
-our $VERSION = '0.001';
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Show details for a single quest
-
+our $VERSION = '0.002';
 use Moo;
 use MooX::Cmd;
 use MooX::Options;
@@ -136,7 +135,7 @@ WWW::MetaForge::ArcRaiders::CLI::Cmd::Quest - Show details for a single quest
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -183,19 +182,20 @@ Quest details displayed include:
 When the C<--json> flag is used, the raw quest data is output as JSON instead
 of the formatted display.
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
-
 =head1 SUPPORT
 
-=head2 Source Code
+=head2 Issues
 
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-metaforge/issues>.
 
-L<https://github.com/Getty/p5-www-metaforge>
+=head2 IRC
 
-  git clone https://github.com/Getty/p5-www-metaforge.git
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 

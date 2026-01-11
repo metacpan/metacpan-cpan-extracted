@@ -1,0 +1,44 @@
+{
+  "rrsets": [
+    {
+      "name": "@",
+      "type": "A",
+      "ttl": 300,
+      "records": [
+        { "value": "203.0.113.10" }
+      ]
+    },
+    {
+      "name": "@",
+      "type": "AAAA",
+      "ttl": 300,
+      "records": [
+        { "value": "2001:db8::1" }
+      ]
+    },
+    {
+      "name": "www",
+      "type": "A",
+      "ttl": 300,
+      "records": [
+        { "value": "203.0.113.10" }
+      ]
+    },
+    {
+      "name": "@",
+      "type": "MX",
+      "ttl": 3600,
+      "records": [
+        { "value": "10 mail.example.com." }
+      ]
+    },
+    {
+      "name": "@",
+      "type": "TXT",
+      "ttl": 3600,
+      "records": [
+        { "value": "v=spf1 include:_spf.example.com ~all" }
+      ]
+    }
+  ]
+}

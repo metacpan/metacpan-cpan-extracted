@@ -5,11 +5,12 @@ use warnings;
 
 use Test::More;
 use IO::Async::OS;
-use IO::Async::Loop::Epoll;
+use IO::Async::Loop::Uring;
 
+plan skip_all => 'Not yet implemented'; # 
 plan skip_all => "Cannot fork" unless IO::Async::OS->HAVE_POSIX_FORK;
 
-my $loop = IO::Async::Loop::Epoll->new;
+my $loop = IO::Async::Loop::Uring->new;
 
 my @kids = map {
    defined( my $pid = fork ) or die "Cannot fork() - $!";

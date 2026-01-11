@@ -3,6 +3,13 @@ use experimental 'signatures';
 
 push @Local::Example::ALL, 'Local::Example::Mouse';
 
+package Local::Example::Mouse::Simple {
+	use Mouse;
+	use MouseX::StrictConstructor;
+	has foo => qw( is ro );
+	has bar => qw( is ro );
+}
+
 package Local::Example::Mouse::NamedThing {
 	use Mouse;
 	use MouseX::StrictConstructor;

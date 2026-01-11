@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 
 # Can be invoked as:
-#   ./bench.PL          # generates FU/Benchmarks.pod, running new benchmarks as necessary
-#   ./bench.PL id x y   # invalidate cache for the (regex-)matching benchmark IDs, x and y and re-run them
+#   ./bench.PL              # generates FU/Benchmarks.pod, running new benchmarks as necessary
+#   ./bench.PL id x y       # invalidate cache for the (regex-)matching benchmark IDs, x and y and re-run them
+#   ./bench.PL exec id x y  # Run just the given benchmark and exit
 #
 # This script obviously has more dependencies than the FU distribution itself.
 # It's supposed to be used by maintainers, not users.
@@ -30,30 +31,69 @@ my %modules = map +($_, eval "require $_; \$${_}::VERSION"), qw/
 /;
 use FU::Pg;
 
-my %data; # "id x y" => { id x y rate exists }
-my %oldmodules;
-{ if (open my $F, '<', 'FU/Benchmarks.pod') {
-    my $indata;
-    while (<$F>) {
-        chomp;
-        $oldmodules{$1} = $2 if /^=item L<([a-zA-Z0-9:]+)> ([0-9.]+)/;
-        $indata = 1 if /^# Cached data used by bench\.PL/;
-        next if !$indata || !$_ || /^#/;
-        my %d;
-        @d{qw/id x y rate/} = split /\t/;
-        $data{"$d{id} $d{x} $d{y}"} = \%d;
-    }
-} }
+my @exec = $ARGV[0] && $ARGV[0] eq 'exec' ? @ARGV[1..3] : ();
+my @run = !@exec && @ARGV && (qr/$ARGV[0]/i, $ARGV[1] ? qr/$ARGV[1]/i : qr/.*/, $ARGV[2] ? qr/$ARGV[2]/i : qr/.*/);
 
-if (@ARGV) {
-    my $idre = qr/$ARGV[0]/i;
-    my $xre = $ARGV[1] ? qr/$ARGV[1]/i : qr/.*/;
-    my $yre = $ARGV[2] ? qr/$ARGV[2]/i : qr/.*/;
-    delete $_->{rate} for grep $_->{id} =~ /$idre/ && $_->{x} =~ /$xre/ && $_->{y} =~ /$yre/, values %data;
+my %data; # "id x y" => { id x y rate exists }
+my @bench; # [ id, text, [ x_1, .. ], [ [ y_1, mod_1, sub_1, .. ], .. ] ]
+my %oldmodules;
+if (!@exec) {
+    if (open my $F, '<', 'FU/Benchmarks.pod') {
+        my $indata;
+        while (<$F>) {
+            chomp;
+            $oldmodules{$1} = $2 if /^=item L<([a-zA-Z0-9:]+)> ([0-9.]+)/;
+            $indata = 1 if /^# Cached data used by bench\.PL/;
+            next if !$indata || !$_ || /^#/;
+            my %d;
+            @d{qw/id x y rate/} = split /\t/;
+            $data{"$d{id} $d{x} $d{y}"} = \%d;
+        }
+    }
 }
 
 
-my @bench; # [ id, text, [ x_1, .. ], [ [ y_1, mod_1, sub_1, .. ], .. ] ]
+sub fmtbench($id, $text, $xs, $ys) {
+    my $r = "$text\n\n";
+    if (@$xs > 1) {
+        $r .= sprintf '%18s', '';
+        $r .= sprintf '%12s', $_ for @$xs;
+        $r .= "\n";
+    }
+    for my ($n, $yr) (builtin::indexed @$ys) {
+        my $x = $xs->[$n];
+        my ($y, $m, @ys) = @$yr;
+        $m ||= $y;
+        $r .= sprintf '%18s', $y;
+        for my $i (0..$#$xs) {
+            my $d = $data{"$id $xs->[$i] $y"};
+            $r .= $d && $d->{rate} ? sprintf '%10d/s', $d->{rate} : sprintf '%12s', '-';
+        }
+        $r .= "\n";
+    }
+    "$r\n"
+}
+
+$SIG{INT} = $SIG{HUP} = sub { exit };
+END {
+    exit if @exec;
+
+    open my $F, '>FU/Benchmarks.pod' or die $!;
+    select $F;
+    while (<DATA>) {
+        s/^%/=/;
+        s#^:modules#join '', map sprintf("=item L<%s> %s\n\n", $_, $modules{$_}), sort keys %modules#e;
+        s#^:benches (.+)#join '', map fmtbench(@$_), grep $_->[0] =~ /$1/, @bench#e;
+        print;
+    }
+    for (sort keys %data) {
+        my $b = $data{$_};
+        print join("\t", map $_//'', @{$b}{qw/ id x y rate /})."\n";
+    }
+}
+
+
+
 sub def($id, $text, $xs, @ys) {
     for my ($ya) (@ys) {
         my($y, $m, @sub) = @$ya;
@@ -64,12 +104,6 @@ sub def($id, $text, $xs, @ys) {
             $data{$d} ||= { id => $id, x => $x, y => $y };
             $d = $data{$d};
             $d->{exists} = 1;
-            delete $d->{rate} if !$oldmodules{$m} || $modules{$m} ne $oldmodules{$m};
-            if (!exists $d->{rate}) {
-                my $o = timethis -5, $sub[$i], 0, 'none';
-                $d->{rate} = sprintf '%.0f', $o->iters/$o->real;
-                printf "%-20s%-12s%-20s%10d/s\n", $id, $x, $y, $d->{rate};
-            }
         }
     }
     push @bench, [ $id, $text, $xs, \@ys ];
@@ -200,19 +234,19 @@ def 'xml/a', 'HTML fragment', [ 'Rate' ],
 
 
 {
-    die "FU_TEST_DB not set.\n" if !$ENV{FU_TEST_DB};
-    my $pq = Pg::PQ::Conn->new($ENV{FU_TEST_DB});
-    my $fu = FU::Pg->connect($ENV{FU_TEST_DB});
+    die "FU_TEST_DB not set.\n" if @exec && !$ENV{FU_TEST_DB};
+    my $pq = @exec && Pg::PQ::Conn->new($ENV{FU_TEST_DB});
+    my $fu = @exec && FU::Pg->connect($ENV{FU_TEST_DB});
     # XXX: Doesn't support all connection params this way
-    my $dbi = DBI->connect("dbi:Pg:dbname=".$pq->db, $pq->user, $pq->pass, {RaiseError => 1, PrintError => 0});
+    my $dbi = @exec && DBI->connect("dbi:Pg:dbname=".$pq->db, $pq->user, $pq->pass, {RaiseError => 1, PrintError => 0});
 
     my $small = 'SELECT x, x+1, x+2, x+3, x+4, x+5, x+6, x+7, x+8, x+9 FROM generate_series(-10000::smallint, 9999, 10) x(x)';
     my $big = 'SELECT x<<5, x<<10, x<<15, x<<20, x<<25, x<<30, x<<35, x<<40, x<<45, x<<50 FROM generate_series(1::bigint, 20000, 1) x(x)';
 
     my sub dbi { my $sum = 0; my $st = $dbi->prepare_cached($_[0]); for my $row ($dbi->selectall_arrayref($st)->@*) { $sum ^= $_ for @$row; } }
     my sub pq  { my $sum = 0; $pq->prepare('' => $_[0]); for my $row ($pq->execQueryPrepared('')->rows) { $sum ^= $_ for @$row; } }
-    my sub fub { my $sum = 0; for my $row ($fu->q($_[0])->alla->@*) { $sum ^= $_ for @$row; } }
-    my sub fut { my $sum = 0; for my $row ($fu->q($_[0])->text->alla->@*) { $sum ^= $_ for @$row; } }
+    my sub fub { my $sum = 0; for my $row ($fu->sql($_[0])->alla->@*) { $sum ^= $_ for @$row; } }
+    my sub fut { my $sum = 0; for my $row ($fu->sql($_[0])->text->alla->@*) { $sum ^= $_ for @$row; } }
 
     def 'pg/ints', 'Fetch and bitwise-or 20k integers', [ 'Smallint', 'Bigint' ],
         [ 'DBD::Pg', undef, sub { dbi($small) }, sub { dbi($big) } ],
@@ -227,41 +261,48 @@ def 'xml/a', 'HTML fragment', [ 'Rate' ],
 
 delete @data{ grep !$data{$_}{exists}, keys %data };
 
-sub fmtbench($id, $text, $xs, $ys) {
-    my $r = "$text\n\n";
-    if (@$xs > 1) {
-        $r .= sprintf '%18s', '';
-        $r .= sprintf '%12s', $_ for @$xs;
-        $r .= "\n";
-    }
-    for my ($n, $yr) (builtin::indexed @$ys) {
-        my $x = $xs->[$n];
-        my ($y, $m, @ys) = @$yr;
-        $m ||= $y;
-        $r .= sprintf '%18s', $y;
-        for my $i (0..$#$xs) {
-            my $d = $data{"$id $xs->[$i] $y"};
-            $r .= $d ? sprintf '%10d/s', $d->{rate} : sprintf '%12s', '-';
-        }
-        $r .= "\n";
-    }
-    "$r\n"
+
+sub runbench($sub) {
+    my $o = timethis -1, $sub, 0, 'none';
+    printf "%.2f\n", $o->iters/$o->real;
+    exit;
 }
 
-{
-    open my $F, '>FU/Benchmarks.pod' or die $!;
-    select $F;
-    while (<DATA>) {
-        s/^%/=/;
-        s#^:modules#join '', map sprintf("=item L<%s> %s\n\n", $_, $modules{$_}), sort keys %modules#e;
-        s#^:benches (.+)#join '', map fmtbench(@$_), grep $_->[0] =~ /$1/, @bench#e;
-        print;
+sub execbench($d) {
+    my $sum = 0;
+    my $num = 1;
+    local $| = 1;
+    printf "%-20s%-12s%-20s", $d->{id}, $d->{x}, $d->{y};
+    for (1..$num) {
+        open my $P, '-|', $^X, (map "-I$_", @INC), $0, 'exec', $d->{id}, $d->{x}, $d->{y};
+        chomp(my $rate = <$P>);
+        printf "%10d", $rate;
+        $sum += $rate;
     }
-    for (sort keys %data) {
-        my $b = $data{$_};
-        print join("\t", @{$b}{qw/ id x y rate /})."\n";
+    printf " ->%10d\n", $sum/$num;
+    $d->{rate} = sprintf '%.0f', $sum/$num;
+}
+
+for my $b (@bench) {
+    my ($id, $text, $xs, $ys) = @$b;
+    for my ($ya) (@$ys) {
+        my($y, $m, @sub) = @$ya;
+        $m ||= $y;
+        for my($i, $x) (builtin::indexed @$xs) {
+            next if !$sub[$i];
+            if (@exec) {
+                runbench $sub[$i] if $exec[0] eq $id && $exec[1] eq $x && $exec[2] eq $y;
+            } else {
+                my $d = $data{"$id $x $y"};
+                execbench $d if !$oldmodules{$m} || $modules{$m} ne $oldmodules{$m}
+                    || (@run && $id =~ /$run[0]/ && $x =~ /$run[1]/ && $y =~ /$run[2]/);
+            }
+        }
     }
 }
+
+die if @exec;
+
 
 # s/^=/%/  to prevent tools from interpreting the below as POD
 __DATA__

@@ -86,14 +86,56 @@ sub apply {
 
             my ($try_expr, $catch_expr) = ($body, '');
 
-            my $depth       = 0;
+            my %pairs = (
+                '(' => ')',
+                '[' => ']',
+                '{' => '}',
+            );
+            my %closing = reverse %pairs;
+
+            my @stack;
+            my $string;
+            my $escape = 0;
             my $catch_index = undef;
             for (my $i = 0; $i < length $body; $i++) {
                 my $ch = substr($body, $i, 1);
-                $depth++ if $ch eq '(';
-                $depth-- if $ch eq ')';
 
-                next if $depth != 0;
+                if (defined $string) {
+                    if ($escape) {
+                        $escape = 0;
+                        next;
+                    }
+
+                    if ($ch eq '\\') {
+                        $escape = 1;
+                        next;
+                    }
+
+                    if ($ch eq $string) {
+                        undef $string;
+                    }
+
+                    next;
+                }
+
+                if ($ch eq "'" || $ch eq '"') {
+                    $string = $ch;
+                    next;
+                }
+
+                if (exists $pairs{$ch}) {
+                    push @stack, $ch;
+                    next;
+                }
+
+                if (exists $closing{$ch}) {
+                    last unless @stack;
+                    my $open = pop @stack;
+                    last unless $pairs{$open} eq $ch;
+                    next;
+                }
+
+                next if @stack;
                 if (substr($body, $i) =~ /^catch\s+/) {
                     $catch_index = $i;
                     last;
@@ -150,7 +192,7 @@ sub apply {
                             push @next_results, undef;
                         }
                         else {
-                            push @next_results, @catch_outputs ? @catch_outputs : (undef);
+                            push @next_results, @catch_outputs;
                         }
                     }
 

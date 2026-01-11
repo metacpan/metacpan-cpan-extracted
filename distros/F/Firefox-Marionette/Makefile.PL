@@ -393,7 +393,7 @@ WriteMakefile(
     EXE_FILES => [
         'ssh-auth-cmd-marionette',               'ca-bundle-for-firefox',
         'check-firefox-certificate-authorities', 'firefox-passwords',
-        'setup-for-firefox-marionette-build.sh',
+        'setup-for-firefox-marionette-build.sh', 'build-bcd-for-firefox',
     ],
     BUILD_REQUIRES => {
         'Compress::Zlib'  => 0,
@@ -427,6 +427,7 @@ WriteMakefile(
         'Fcntl'               => 0,
         'FileHandle'          => 0,
         'File::Find'          => 0,
+        'File::HomeDir'       => 0,
         'File::Path'          => 2.08,
         'File::Spec'          => 0,
         'File::Temp'          => 0,

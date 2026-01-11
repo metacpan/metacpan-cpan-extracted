@@ -9,7 +9,7 @@ use JQ::Lite::Filters;
 use JQ::Lite::Parser;
 use JQ::Lite::Util ();
 
-our $VERSION = '1.98';
+our $VERSION = '2.10';
 
 sub new {
     my ($class, %opts) = @_;
@@ -60,7 +60,7 @@ JQ::Lite - jq-compatible JSON query engine in pure Perl (no external binaries)
 
 =head1 VERSION
 
-Version 1.98
+Version 2.09
 
 =head1 SYNOPSIS
 
@@ -75,7 +75,7 @@ Version 1.98
 
 =head1 DESCRIPTION
 
-B<JQ::Lite> is a lightweight, jq-compatible JSON query engine written entirely
+B<JQ::Lite> is a lightweight, jq-compatible alternative JSON processor written 
 in pure Perl.
 
 It is designed for environments where the L<jq|https://stedolan.github.io/jq/>

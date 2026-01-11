@@ -127,13 +127,25 @@ sub post_initialize {
     $mm_or->{'PM'}{'LICENSE'}='$(INST_LIBDIR)/$(BASEEXT)/LICENSE' if -e 'LICENSE';
 
 
+    #  Add git ref if needed
+    #
+    if (grep {$mm_or->{'VERSION_FROM'} eq $_} @{$mm_or->{'EXE_FILES'}}) {
+        push @{$mm_or->{'EXE_FILES'}}, $mm_or->{'VERSION_FROM'}.'.sha';
+    }
+    
+    
+    #  Don't install docs/tmp files etc.
+    #
+    my %pm=map { $_=>$mm_or->{'PM'}{$_} } grep { !/\.(?:md|xml|pod|bak|tmp|0)$/ } keys %{$mm_or->{'PM'}};
+    $mm_or->{'PM'}=\%pm;
+    
+
     #  Update Git Ref in file if needed/available
     #
     my $devnull=File::Spec->devnull();
-    if (my $git_version=qx(git rev-parse HEAD 2>$devnull)) {
+    if (my $git_version=qx(git rev-parse --short HEAD 2>$devnull)) {
         chomp $git_version;
-        $git_version=substr($git_version, 0, 10);
-        tie my @lines, 'Tie::File', $mm_or->{'VERSION_FROM'} . '.ref' || die "error on Tie::File, $!";
+        tie my @lines, 'Tie::File', $mm_or->{'VERSION_FROM'} . '.sha' || die "error on Tie::File, $!";
         $lines[0]=$git_version;
     }
     $mm_or->SUPER::post_initialize;
@@ -167,6 +179,12 @@ filter_scripts :
 	done
 
 pure_all :: filter_scripts
+
+git_version_increment0 ::
+	cd docker && $(PERL) build.pl
+
+docker_update ::
+	cd docker && $(PERL) build.pl
 
 END
     return $postamble;

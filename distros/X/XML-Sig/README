@@ -3,7 +3,7 @@ NAME
     Signatures
 
 VERSION
-    version 0.68
+    version 0.69
 
 SYNOPSIS
        my $xml = '<foo ID="abc">123</foo>';
@@ -40,9 +40,9 @@ PREREQUISITES
 
     *   Crypt::OpenSSL::Bignum
 
-    *   Crypt::OpenSSL::RSA
+    *   Crypt::PK::RSA
 
-    *   Crypt::OpenSSL::DSA
+    *   Crypt::OpenSSL::DSA (Optional - required for DSA signatures)
 
     *   Crypt::PK::ECC
 
@@ -304,7 +304,7 @@ AUTHOR
     Timothy Legge <timlegge@gmail.com>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2025 by Byrne Reese, Chris Andrews and
+    This software is copyright (c) 2026 by Byrne Reese, Chris Andrews and
     Others; in detail:
 
       Copyright 2009       Byrne, Michael Hendricks
@@ -316,7 +316,7 @@ COPYRIGHT AND LICENSE
                 2017       Mike Wisener, xmikew
                 2019-2021  Timothy Legge
                 2022-2023  Timothy Legge, Wesley Schwengle
-                2025       Timothy Legge
+                2025-2026  Timothy Legge
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

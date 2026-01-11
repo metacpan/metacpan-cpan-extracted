@@ -4,7 +4,7 @@ StreamFinder::Youtube - Fetch actual raw streamable URLs from YouTube and others
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2025 by
+This module is Copyright (C) 2017-2026 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -436,7 +436,7 @@ L<http://search.cpan.org/dist/StreamFinder-Youtube/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2025 Jim Turner.
+Copyright 2017-2026 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -725,7 +725,7 @@ RETRYIT:
 	@ytdldata = split /\r?\n/s;
 	unless ($try || scalar(@ytdldata) > 0) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
 		$try++;
-		if (defined $self->{'format-fallback'}) {
+		if (defined $self->{'format-fallback'} && $self->{'format-fallback'}) {
 			print STDERR "..1:No ($ytformat) streams found, try again with ($$self{'formatonly'})...\n"  if ($DEBUG);
 			goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"[^\"]+\"/\-f \"$$self{'format-fallback'}\"/);
 		}
@@ -759,27 +759,27 @@ RETRYIT:
 		$self->{'title'} ||= $_;
 	}
 	$self->{'_ytID'} = '';
-	if ($ytdlArgs =~ /\-\-get\-id\b/ && $ytdldata[0] !~ /^https?\:/) {  #SHOULD HAVE AN "ID":
+	if ($ytdlArgs =~ /\-\-get\-id\b/ && $ytdldata[0] !~ /^https?\:/) {  #GET ID (IF YOUTUBE-ID):
 		my $get_id = shift(@ytdldata);
 		$self->{'_ytID'} = $get_id  if ($get_id =~ /^[a-z0-9\-\_]{11}$/i);
 	}
 	my $fmtline = ($ytdldata[$#ytdldata] =~ m#^https?\:\/\/#) ? '-none' : pop(@ytdldata);  #LAST LINE IS (USUALLY) THE LIST OF FORMATS RETURNED.
 	my @fmtsfound = split(/\+/, $fmtline);
+	for (my $i=0;$i<=$#fmtsfound;$i++) {  #GET STREAM URLS:
+		$_ = shift @ytdldata;
+		push @ytStreams, $_  unless ($self->{'secure'} && $_ !~ /^https/o);
+	}
+	if ($ytdlArgs =~ /get-thumbnail/o) {  #GET THUMBNAIL URL:
+		$_ = shift @ytdldata;
+		$self->{'iconurl'} = $_  if (m#^https?\:\/\/#);
+	}
+	#GET ANY YOUTUBE-URL (LAST LINE BEFORE FORMAT (OF DESCRIPTION)) IN MANY ODYSEE VIDEOS:
+	#(THIS CAN BE USED BY StreamFinder::Odysee!)
+	$self->{'_odysee_yturl'} = pop(@ytdldata)  if ($ytdldata[$#ytdldata] =~ m#^https?\:\/\/#);
+	#GET DESCRIPTION (EVERYTHING ELSE):
 	$self->{'description'} = '';
 	while (@ytdldata) {
-		$_ = shift @ytdldata;
-		if ($urlcount <= $#fmtsfound) {
-			push @ytStreams, $_  unless ($self->{'secure'} && $_ !~ /^https/o);
-		} elsif (m#^https?\:\/\/#o && $ytdlArgs =~ /get-thumbnail/o) {
-			if (m#\.(jpe?g|png|gif|com|webp|svg)\b#io) {
-				$self->{'iconurl'} = $_;  #WILL ALWAYS BE THE LAST URL!
-			} else {
-				$self->{'iconurl'} ||= $_;  #(LAST RESORT, AS SOME YOUTUBE IMAGE URLS DON'T HAVE EXTENSIONS!:
-			}
-		} else {
-			$self->{'description'} .= $_ . ' ';
-		}
-		$urlcount++;
+		$self->{'description'} .= shift(@ytdldata) . "\n";
 	}
 	push @{$self->{'streams'}}, @ytStreams;
 	$self->{'cnt'} = scalar @{$self->{'streams'}};

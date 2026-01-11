@@ -22,7 +22,6 @@ my %WriteMakefileArgs = (
     "Crypt::Digest::RIPEMD160" => 0,
     "Crypt::Mac::HMAC" => 0,
     "Crypt::OpenSSL::Bignum" => 0,
-    "Crypt::OpenSSL::DSA" => "0.20",
     "Crypt::OpenSSL::X509" => 0,
     "Crypt::PK::RSA" => 0,
     "CryptX" => "0.036",
@@ -48,7 +47,7 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.68",
+  "VERSION" => "0.69",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,7 +60,6 @@ my %FallbackPrereqs = (
   "Crypt::Digest::RIPEMD160" => 0,
   "Crypt::Mac::HMAC" => 0,
   "Crypt::OpenSSL::Bignum" => 0,
-  "Crypt::OpenSSL::DSA" => "0.20",
   "Crypt::OpenSSL::Guess" => 0,
   "Crypt::OpenSSL::X509" => 0,
   "Crypt::PK::RSA" => 0,

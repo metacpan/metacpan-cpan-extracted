@@ -4,13 +4,13 @@
       "Gabor Szabo <szabgab@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.08, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-CircularDependencies",
    "no_index" : {
@@ -21,7 +21,11 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "Test::Code::TidyAll" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Version" : "0"
+         }
       },
       "configure" : {
          "requires" : {
@@ -33,10 +37,11 @@
             "Carp" : "0",
             "Data::Dumper" : "0",
             "Exporter" : "0",
-            "Module::CoreList" : "0",
+            "Module::CoreList" : "5.2015092",
             "Module::Path" : "0",
+            "Path::Iterator::Rule" : "0",
             "Perl::PrereqScanner" : "0",
-            "Test::Builder" : "0.01"
+            "Test::Builder" : "1.001"
          }
       },
       "test" : {
@@ -49,18 +54,18 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/szabgab/Test-CircularDependencies"
+         "web" : "https://github.com/szabgab/Test-CircularDependencies"
       },
       "repository" : {
          "type" : "git",
-         "url" : "http://github.com/szabgab/Test-CircularDependencies.git",
-         "web" : "http://github.com/szabgab/Test-CircularDependencies",
-         "x_license" : "http://dev.perl.org/licenses/"
+         "url" : "https://github.com/szabgab/Test-CircularDependencies.git",
+         "web" : "https://github.com/szabgab/Test-CircularDependencies",
+         "x_license" : "https://dev.perl.org/licenses/"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [
       "Gabor Szabo <szabgab@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

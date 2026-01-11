@@ -1,0 +1,54 @@
+{
+  "volumes": [
+    {
+      "id": 555,
+      "name": "my-data",
+      "status": "available",
+      "size": 50,
+      "server": null,
+      "created": "2024-06-01T10:00:00+00:00",
+      "linux_device": "/dev/disk/by-id/scsi-0HC_Volume_555",
+      "format": "ext4",
+      "labels": {
+        "env": "test"
+      },
+      "location": {
+        "id": 1,
+        "name": "fsn1",
+        "description": "Falkenstein DC Park 1",
+        "country": "DE",
+        "city": "Falkenstein",
+        "latitude": 50.47612,
+        "longitude": 12.370071,
+        "network_zone": "eu-central"
+      },
+      "protection": {
+        "delete": false
+      }
+    },
+    {
+      "id": 556,
+      "name": "database-vol",
+      "status": "available",
+      "size": 100,
+      "server": 12345,
+      "created": "2024-07-01T14:30:00+00:00",
+      "linux_device": "/dev/disk/by-id/scsi-0HC_Volume_556",
+      "format": "xfs",
+      "labels": {},
+      "location": {
+        "id": 2,
+        "name": "nbg1",
+        "description": "Nuremberg DC Park 1",
+        "country": "DE",
+        "city": "Nuremberg",
+        "latitude": 49.452102,
+        "longitude": 11.076665,
+        "network_zone": "eu-central"
+      },
+      "protection": {
+        "delete": false
+      }
+    }
+  ]
+}

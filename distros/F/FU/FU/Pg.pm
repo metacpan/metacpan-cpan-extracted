@@ -1,4 +1,4 @@
-package FU::Pg 1.3;
+package FU::Pg 1.4;
 use v5.36;
 use FU::XS;
 
@@ -7,7 +7,7 @@ _load_libpq();
 package FU::Pg::conn {
     sub lib_version { FU::Pg::lib_version() }
 
-    sub Q {
+    sub SQL {
         require FU::SQL;
         my $s = shift;
         my($sql, $params) = FU::SQL::SQL(@_)->compile(
@@ -15,7 +15,7 @@ package FU::Pg::conn {
             in_style          => 'pg',
             quote_identifier  => sub { $s->conn->escape_identifier(@_) },
         );
-        $s->q($sql, @$params);
+        $s->sql($sql, @$params);
     }
 
     sub set_type($s, $n, @arg) {
@@ -26,7 +26,13 @@ package FU::Pg::conn {
     }
 };
 
-*FU::Pg::txn::Q = \*FU::Pg::conn::Q;
+*FU::Pg::txn::SQL = \*FU::Pg::conn::SQL;
+
+# Compat
+*FU::Pg::conn::q = \*FU::Pg::conn::sql;
+*FU::Pg::txn::q = \*FU::Pg::txn::sql;
+*FU::Pg::conn::Q = \*FU::Pg::conn::SQL;
+*FU::Pg::txn::Q = \*FU::Pg::txn::SQL;
 
 package FU::Pg::error {
     use overload '""' => sub($e, @) { $e->{full_message} };
@@ -47,10 +53,10 @@ FU::Pg - The Ultimate (synchronous) Interface to PostgreSQL
 
   $conn->exec('CREATE TABLE books (id SERIAL, title text, read bool)');
 
-  $conn->q('INSERT INTO books (title) VALUES ($1)', 'Revelation Space')->exec;
-  $conn->q('INSERT INTO books (title) VALUES ($1)', 'The Invincible')->exec;
+  $conn->sql('INSERT INTO books (title) VALUES ($1)', 'Revelation Space')->exec;
+  $conn->sql('INSERT INTO books (title) VALUES ($1)', 'The Invincible')->exec;
 
-  for my ($id, $title) ($conn->q('SELECT * FROM books')->flat->@*) {
+  for my ($id, $title) ($conn->sql('SELECT * FROM books')->flat->@*) {
       print "$id:  $title\n";
   }
 
@@ -71,7 +77,7 @@ C<$string> can either be in key=value format or a URI, refer to L<the
 PostgreSQL
 documentation|https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING>
 for the full list of supported formats and options. You may also pass an empty
-string and leave the configuration up L<environment
+string and leave the configuration up to L<environment
 variables|https://www.postgresql.org/docs/current/libpq-envars.html>.
 
 =item $conn->server_version
@@ -141,7 +147,7 @@ a table, column, function, etc) in an SQL statement.
 
 =item $conn->text($enable)
 
-Set the default settings for new statements created with B<< $conn->q() >>.
+Set the default settings for new statements created with B<< $conn->sql() >>.
 
 =item $conn->cache_size($num)
 
@@ -169,7 +175,7 @@ Also worth noting that the subroutine is called from the context of the code
 executing the query, but I<before> the query results have been returned.
 
 The subroutine is (currently) only called for queries executed through C<<
-$conn->exec >>, C<< $conn->q >>, C<< $conn->Q >> and their C<$txn> variants;
+$conn->exec >>, C<< $conn->sql >>, C<< $conn->SQL >> and their C<$txn> variants;
 C<< $conn->copy >> statements and internal queries performed by this module
 (such as for transaction management, querying type information, etc) do not
 trigger the callback. Statements that result in an error being thrown during or
@@ -193,7 +199,7 @@ Execute one or more SQL commands, separated by a semicolon. Returns the number
 of rows affected by the last statement or I<undef> if that information is not
 available for the given command (like with C<CREATE TABLE>).
 
-=item $conn->q($sql, @params)
+=item $conn->sql($sql, @params)
 
 Create a new SQL statement with the given C<$sql> string and an optional list
 of bind parameters. C<$sql> can only hold a single statement.
@@ -209,15 +215,15 @@ Note that this method just creates a statement object, the query is not
 prepared or executed until the appropriate statement methods (see below) are
 used.
 
-=item $conn->Q(@args)
+=item $conn->SQL(@args)
 
-Same as C<< $conn->q() >> but uses L<FU::SQL> to construct the query and bind
+Same as C<< $conn->sql() >> but uses L<FU::SQL> to construct the query and bind
 parameters. Uses the 'pg' C<in_style> and C<< $conn->escape_identifier() >> for
 identifier quoting.
 
 =back
 
-Statement objects returned by C<< $conn->q() >> support the following
+Statement objects returned by C<< $conn->sql() >> support the following
 configuration parameters, which can be set before the statement is executed:
 
 =over
@@ -252,7 +258,7 @@ depending on how you'd like to obtain the results:
 Execute the query and return the number of rows affected. Similar to C<<
 $conn->exec >>.
 
-  my $v = $conn->q('UPDATE books SET read = true WHERE id = 1')->exec;
+  my $v = $conn->sql('UPDATE books SET read = true WHERE id = 1')->exec;
   # $v = 1
 
 =item $st->val
@@ -261,7 +267,7 @@ Return the first column of the first row. Throws an error if the query does not
 return exactly one column, or if multiple rows are returned. Returns I<undef>
 if no rows are returned or if its value is I<NULL>.
 
-  my $v = $conn->q('SELECT COUNT(*) FROM books')->val;
+  my $v = $conn->sql('SELECT COUNT(*) FROM books')->val;
   # $v = 2
 
 =item $st->rowl
@@ -269,7 +275,7 @@ if no rows are returned or if its value is I<NULL>.
 Return the first row as a list, or an empty list if no rows are returned.
 Throws an error if the query returned more than one row.
 
-  my($id, $title) = $conn->q('SELECT id, title FROM books LIMIT 1')->rowl;
+  my($id, $title) = $conn->sql('SELECT id, title FROM books LIMIT 1')->rowl;
   # ($id, $title) = (1, 'Revelation Space');
 
 =item $st->rowa
@@ -278,7 +284,7 @@ Return the first row as an arrayref, equivalent to C<< [$st->rowl] >> but might
 be slightly more efficient. Returns C<undef> if the query did not generate any
 rows.
 
-  my $row = $conn->q('SELECT id, title FROM books LIMIT 1')->rowa;
+  my $row = $conn->sql('SELECT id, title FROM books LIMIT 1')->rowa;
   # $row = [1, 'Revelation Space'];
 
 =item $st->rowh
@@ -287,14 +293,14 @@ Return the first row as a hashref. Returns C<undef> if the query did not
 generate any rows. Throws an error if the query returns multiple columns with
 the same name.
 
-  my $row = $conn->q('SELECT id, title FROM books LIMIT 1')->rowh;
+  my $row = $conn->sql('SELECT id, title FROM books LIMIT 1')->rowh;
   # $row = { id => 1, title => 'Revelation Space' };
 
 =item $st->alla
 
 Return all rows as an arrayref of arrayrefs.
 
-  my $data = $conn->q('SELECT id, title FROM books')->alla;
+  my $data = $conn->sql('SELECT id, title FROM books')->alla;
   # $data = [
   #   [ 1, 'Revelation Space' ],
   #   [ 2, 'The Invincible' ],
@@ -305,7 +311,7 @@ Return all rows as an arrayref of arrayrefs.
 Return all rows as an arrayref of hashrefs. Throws an error if the query
 returns multiple columns with the same name.
 
-  my $data = $conn->q('SELECT id, title FROM books')->allh;
+  my $data = $conn->sql('SELECT id, title FROM books')->allh;
   # $data = [
   #   { id => 1, title => 'Revelation Space' },
   #   { id => 2, title => 'The Invincible' },
@@ -315,7 +321,7 @@ returns multiple columns with the same name.
 
 Return an arrayref with all rows flattened.
 
-  my $data = $conn->q('SELECT id, title FROM books')->flat;
+  my $data = $conn->sql('SELECT id, title FROM books')->flat;
   # $data = [
   #   1, 'Revelation Space',
   #   2, 'The Invincible',
@@ -327,7 +333,7 @@ Return a hashref where the first result column is used as key and the second
 column as value. If the query only returns a single column, C<true> is used as
 value instead. An error is thrown if the query returns 3 or more columns.
 
-  my $data = $conn->q('SELECT id, title FROM books')->kvv;
+  my $data = $conn->sql('SELECT id, title FROM books')->kvv;
   # $data = {
   #   1 => 'Revelation Space',
   #   2 => 'The Invincible',
@@ -338,7 +344,7 @@ value instead. An error is thrown if the query returns 3 or more columns.
 Return a hashref where the first result column is used as key and the remaining
 columns are stored as arrayref.
 
-  my $data = $conn->q('SELECT id, title, read FROM books')->kva;
+  my $data = $conn->sql('SELECT id, title, read FROM books')->kva;
   # $data = {
   #   1 => [ 'Revelation Space', true ],
   #   2 => [ 'The Invincible', false ],
@@ -349,7 +355,7 @@ columns are stored as arrayref.
 Return a hashref where the first result column is used as key and the remaining
 columns are stored as hashref.
 
-  my $data = $conn->q('SELECT id, title, read FROM books')->kvh;
+  my $data = $conn->sql('SELECT id, title, read FROM books')->kvh;
   # $data = {
   #   1 => { title => 'Revelation Space', read => true },
   #   2 => { title => 'The Invincible', read => false },
@@ -361,7 +367,7 @@ The only time you actually need to assign a statement object to a variable is
 when you want to inspect the statement using one of the methods below, in all
 other cases you can chain the methods for more concise code. For example:
 
-  my $data = $conn->q('SELECT a, b FROM table')->cache(0)->text->alla;
+  my $data = $conn->sql('SELECT a, b FROM table')->cache(0)->text->alla;
 
 Statement objects can be inspected with the following methods (many of which
 only make sense after the query has been executed):
@@ -381,10 +387,10 @@ Returns the provided bind parameters as an arrayref.
 Returns an arrayref of integers indicating the type (as I<oid>) of each
 parameter in the given C<$sql> string. Example:
 
-  my $oids = $conn->q('SELECT id FROM books WHERE id = $1 AND title = $2')->param_types;
+  my $oids = $conn->sql('SELECT id FROM books WHERE id = $1 AND title = $2')->param_types;
   # $oids = [23,25]
 
-  my $oids = $conn->q('SELECT id FROM books')->params;
+  my $oids = $conn->sql('SELECT id FROM books')->params;
   # $oids = []
 
 This method can be called before the query has been executed, but will then
@@ -397,7 +403,7 @@ prepared statement caching is disabled and C<text_params> is enabled.
 Returns an arrayref of hashrefs describing each column that the statement
 returns.
 
-  my $cols = $conn->q('SELECT id, title FROM books')->columns;
+  my $cols = $conn->sql('SELECT id, title FROM books')->columns;
   # $cols = [
   #   { name => 'id', oid => 23 },
   #   { name => 'title', oid => 25 },
@@ -446,7 +452,7 @@ fail while a transaction object is alive.
     my $txn = $conn->txn;
 
     # run queries
-    $txn->q('DELETE FROM books WHERE id = $1', 1)->exec;
+    $txn->sql('DELETE FROM books WHERE id = $1', 1)->exec;
 
     # run commands in a subtransaction
     {
@@ -467,9 +473,9 @@ Transaction methods:
 
 =item $txn->exec(..)
 
-=item $txn->q(..)
+=item $txn->sql(..)
 
-=item $txn->Q(..)
+=item $txn->SQL(..)
 
 Run a query inside the transaction. These work the same as the respective
 methods on the parent C<$conn> object.
@@ -492,7 +498,7 @@ when the object goes out of scope.
 
 =item $txn->text($enable)
 
-Set the default settings for new statements created with B<< $txn->q() >>.
+Set the default settings for new statements created with B<< $txn->sql() >>.
 
 These settings are inherited from the main connection when the transaction is
 created. Subtransactions inherit these settings from their parent transaction.
@@ -702,7 +708,7 @@ While C<null> is a valid JSON value, there's currently no way to distinguish
 that from SQL C<NULL>. When sending C<undef> as bind parameter, it is sent as
 SQL C<NULL>.
 
-If you prefer to work with JSON are raw text values instead, use:
+If you prefer to work with JSON as raw text values instead, use:
 
   $conn->set_type(json => 'text');
 

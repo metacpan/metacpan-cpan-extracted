@@ -61,7 +61,24 @@ that continues to work across time and platforms.
 
 ---
 
-## 4. Open and Reproducible Workflows
+## 4. Type Semantics and Numeric Coercion
+
+`jq-lite` currently distinguishes JSON types using Perl scalar flags, so
+`type()` reports `"number"` only for true numeric values (including scientific
+notation) and reports `"string"` for numeric-looking strings.
+
+Arithmetic operators, however, follow Perl-style numeric coercion and will
+implicitly coerce numeric-looking strings into numbers (for example, `"1e3" + 1`
+evaluates to `1001`). This means type classification and arithmetic behavior
+are not strictly aligned today.
+
+This behavior is an explicit design discussion item: we may keep the permissive
+coercion for compatibility, or move toward stricter jq-style runtime errors for
+string arithmetic in a future breaking change.
+
+---
+
+## 5. Open and Reproducible Workflows
 
 Modern data pipelines often depend on proprietary platforms or tightly coupled
 ecosystems.
@@ -78,7 +95,7 @@ that can be versioned, audited, and shared.
 
 ---
 
-## 5. Structured Data as Text
+## 6. Structured Data as Text
 
 As infrastructure, observability, and automation increasingly rely on structured data,
 text-based workflows remain essential.
@@ -93,7 +110,7 @@ This keeps data processing transparent, reviewable, and automatable.
 
 ---
 
-## 6. Ecosystem Compatibility
+## 7. Ecosystem Compatibility
 
 `JQ::Lite` is designed to integrate naturally with other tools and workflows.
 

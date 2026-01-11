@@ -1,0 +1,19 @@
+{
+  "server": {
+    "id": 123456,
+    "name": "renamed-server",
+    "status": "running",
+    "server_type": {
+      "id": 1,
+      "name": "cx23"
+    },
+    "public_net": {
+      "ipv4": {
+        "ip": "203.0.113.10"
+      }
+    },
+    "labels": {
+      "env": "production"
+    }
+  }
+}

@@ -17,6 +17,11 @@ t/07-parse_headers.t
 t/08-jwrightecs.t
 t/09-get_line.t
 t/10-subset.t
+t/11-analyse.t
+t/12-accessors.t
+t/13-multi-object-line.t
+t/14-multi-object-methods.t
+t/15-embedded-code.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

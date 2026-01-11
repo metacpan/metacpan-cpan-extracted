@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01720cmm a2200373 a 4500</leader>
+  <controlfield tag="001">cpe19970208289</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20040611160924.0</controlfield>
+  <controlfield tag="007">co cga</controlfield>
+  <controlfield tag="008">971107s1997    xr         m        cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000208289</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="d">ABA001</subfield>
+  </datafield>
+  <datafield tag="043" ind1=" " ind2=" ">
+    <subfield code="a">e-xr---</subfield>
+  </datafield>
+  <datafield tag="045" ind1=" " ind2=" ">
+    <subfield code="a">x4x9</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">821.162.3.09</subfield>
+    <subfield code="x">Česká literatura (o ní)</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">11</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">82.0</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">821.162.3.09</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(0.034.4)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="245" ind1="0" ind2="0">
+    <subfield code="a">Česká literatura od roku 1945</subfield>
+    <subfield code="h">[elektronický zdroj] /</subfield>
+    <subfield code="c">Infinity Praha ; odborná spolupráce Ústav pro českou literaturu AV ČR</subfield>
+  </datafield>
+  <datafield tag="256" ind1=" " ind2=" ">
+    <subfield code="a">Interaktivní multimédium</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Infinity,</subfield>
+    <subfield code="c">c1997</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">2 elektronické optické disky (CD-ROM) :</subfield>
+    <subfield code="b">zvuk., barev. ;</subfield>
+    <subfield code="c">12 cm</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">CD-ROMy uloženy v obalu v podobě knihy</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Název z titulní obrazovky</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">Interaktivní multimediální encyklopedie shrnující poznatky literární vědy od roku 1945</subfield>
+  </datafield>
+  <datafield tag="538" ind1=" " ind2=" ">
+    <subfield code="a">Požadavky na systém: PC 486SX/25 MHz (doporučeno PC 486DX/50 MHz a vyšší); min. 8 MB RAM; 10 MB volného místa na disku (doporučeno 14 MB); Windows 3.1 a vyšší nebo Windows 95 nebo Windows NT; mechanika CD-ROM 2x; monitor s rozlišením 800x600 (min. 256 barev SVGA, doporučeno High Color); klávesnice; myš; zvuková karta; reproduktory</subfield>
+  </datafield>
+  <datafield tag="648" ind1=" " ind2="7">
+    <subfield code="a">od 1945</subfield>
+    <subfield code="7">ch601408</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">dějiny české literatury</subfield>
+    <subfield code="7">ph483973</subfield>
+    <subfield code="y">1945-</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">CD-ROM</subfield>
+    <subfield code="7">fd133955</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">encyklopedie</subfield>
+    <subfield code="7">fd132201</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="710" ind1="2" ind2=" ">
+    <subfield code="a">Ústav pro českou literaturu (Akademie věd ČR)</subfield>
+    <subfield code="7">kn20010709013</subfield>
+  </datafield>
+  <datafield tag="710" ind1="2" ind2=" ">
+    <subfield code="a">Infinity (Praha, Česko)</subfield>
+    <subfield code="4">prg</subfield>
+    <subfield code="4">cph</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000208289</subfield>
+  </datafield>
+</record>
+
+</collection>

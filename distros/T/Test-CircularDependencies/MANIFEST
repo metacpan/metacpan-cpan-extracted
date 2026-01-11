@@ -1,3 +1,6 @@
+.perlcriticrc
+.perltidyrc
+.tidyallrc
 Changes
 lib/Test/CircularDependencies.pm
 Makefile.PL
@@ -7,9 +10,19 @@ README
 script/find-circular-dependencies.pl
 t/00-test.t
 t/01-test-loop.t
+t/95-tidyall.t
+t/96-perl-critic.t
 t/circular_dependency/my_exe.pl
 t/circular_dependency/MyA.pm
 t/circular_dependency/MyB.pm
 t/circular_dependency/MyC.pm
+t/deep/ModuleA.pm
+t/deep/ModuleD.pm
+t/deep/My/ModuleB.pm
+t/deep/My/ModuleC.pm
+t/deep/my_exe.pl
+t/modules_only/MyA.pm
+t/modules_only/MyB.pm
+t/modules_only/MyC.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

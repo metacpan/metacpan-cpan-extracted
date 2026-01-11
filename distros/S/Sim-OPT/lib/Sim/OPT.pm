@@ -3,6 +3,8 @@ package Sim::OPT;
 # Sim::OPT is distributed under a dual licence, open-source (GPL v3) and proprietary.
 # Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
+our $opt = bless( {}, "Sim::OPT" );
+
 use Exporter;
 use parent 'Exporter';
 
@@ -71,13 +73,12 @@ $target %dowhat readsweeps $max_processes $computype $calcprocedure %specularrat
 toil genstar solvestar integratebox filterbox__ clean %dowhat @weighttransforms
 );
 
-$VERSION = '0.859';
+$VERSION = '0.865';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented toward problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches, as well of searches more complely structured in graphs.';
 
 #################################################################################
 # Sim::OPT
 #################################################################################
-
 
 
 our %cryptc;

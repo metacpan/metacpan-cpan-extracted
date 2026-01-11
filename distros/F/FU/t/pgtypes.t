@@ -22,7 +22,7 @@ sub v($type, $p_in, @args) {
     my $oid;
     utf8::encode($test);
     {
-        my $st = $conn->q("SELECT \$1::$type", $s_in)->text_params;
+        my $st = $conn->sql("SELECT \$1::$type", $s_in)->text_params;
         $oid = $st->param_types->[0];
         my $array = $st->flat;
         my $res = $array->[0];
@@ -32,11 +32,11 @@ sub v($type, $p_in, @args) {
         $array->[0] = 0; # Must be writable
     }
     {
-        my $res = $conn->q("SELECT \$1::$type", $p_in)->text_results->val;
+        my $res = $conn->sql("SELECT \$1::$type", $p_in)->text_results->val;
         is $res, $s_out, "$test bin->text";
     }
     {
-        my $res = $conn->q("SELECT \$1::$type", $p_in)->val;
+        my $res = $conn->sql("SELECT \$1::$type", $p_in)->val;
         is_deeply $res, $p_out, "$test bin->bin";
     }
     {
@@ -52,11 +52,11 @@ sub v($type, $p_in, @args) {
 sub f($type, $p_in) {
     my $test = "$type $p_in" =~ s/\n/\\n/rg;
     utf8::encode($test);
-    ok !eval { $conn->q("SELECT \$1::$type", $p_in)->val; 1 }, "$test fail";
+    ok !eval { $conn->sql("SELECT \$1::$type", $p_in)->val; 1 }, "$test fail";
 }
 
 { # void
-    my $array = $conn->q('SELECT pg_sleep(0)')->flat;
+    my $array = $conn->sql('SELECT pg_sleep(0)')->flat;
     ok !defined $array->[0];
     $array->[0] = 0;
 }
@@ -187,11 +187,11 @@ f 'oidvector', [undef];
 
 # Example from https://www.postgresql.org/docs/17/arrays.html#ARRAYS-IO
 # Lower bounds are discarded.
-is_deeply $conn->q("SELECT '[1:1][-2:-1][3:5]={{{1,2,3},{4,5,6}}}'::int[]")->val, [[[1,2,3],[4,5,6]]];
+is_deeply $conn->sql("SELECT '[1:1][-2:-1][3:5]={{{1,2,3},{4,5,6}}}'::int[]")->val, [[[1,2,3],[4,5,6]]];
 
-is $conn->q('SELECT ($1::int2[])[2]', [1,2,3,4])->val, 2;
-is $conn->q('SELECT ($1::int2vector)[1]', [1,2,3,4])->val, 2;
-is $conn->q('SELECT ($1::oidvector)[1]', [1,2,3,4])->val, 2;
+is $conn->sql('SELECT ($1::int2[])[2]', [1,2,3,4])->val, 2;
+is $conn->sql('SELECT ($1::int2vector)[1]', [1,2,3,4])->val, 2;
+is $conn->sql('SELECT ($1::oidvector)[1]', [1,2,3,4])->val, 2;
 
 is_deeply [$conn->bin2text(
     16, $conn->perl2bin(16, 1),
@@ -207,7 +207,7 @@ is_deeply [$conn->bin2text(
 }
 
 {
-    my $v = $conn->q("SELECT '{t,f,NULL}'::bool[]")->val;
+    my $v = $conn->sql("SELECT '{t,f,NULL}'::bool[]")->val;
     is_deeply $v, [true, false, undef];
     $_ = 0 for @$v;
 }

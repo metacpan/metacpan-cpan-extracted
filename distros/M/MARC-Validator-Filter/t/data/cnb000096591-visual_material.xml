@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01229nkm a2200313 a 4500</leader>
+  <controlfield tag="001">cpg20030096591</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20100802150449.0</controlfield>
+  <controlfield tag="007">kf co </controlfield>
+  <controlfield tag="008">040123s1994    xr     j            cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000096591</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">80-85635-23-2</subfield>
+    <subfield code="q">(v knize neuvedeno ;</subfield>
+    <subfield code="q">volné listy v přebalu)</subfield>
+    <subfield code="z">80-85635-24-0</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+  </datafield>
+  <datafield tag="043" ind1=" " ind2=" ">
+    <subfield code="a">e-xr---</subfield>
+  </datafield>
+  <datafield tag="045" ind1=" " ind2=" ">
+    <subfield code="a">x9x9</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(072)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Delevová, Inka,</subfield>
+    <subfield code="d">1948-2022</subfield>
+    <subfield code="7">jo20010084318</subfield>
+    <subfield code="4">ill</subfield>
+    <subfield code="4">art</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Čtení - to je pro nás pobavení</subfield>
+    <subfield code="h">[grafika] /</subfield>
+    <subfield code="c">výtvarnice Inka Delévová ; autorky Jaroslava Ocmanová, Jaroslava Bukáčková</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">2. vyd.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Blug,</subfield>
+    <subfield code="c">[1994]</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">20 listů :</subfield>
+    <subfield code="b">barev. ;</subfield>
+    <subfield code="c">v přebalu (15 x 11 cm)</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Učíme se - Poznáváme</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">učební pomůcky</subfield>
+    <subfield code="7">fd133775</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Bukáčková, Jaroslava</subfield>
+    <subfield code="7">xx0033175</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Ocmanová, Jaroslava,</subfield>
+    <subfield code="d">1931-1994</subfield>
+    <subfield code="7">mzk2002144009</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">Učíme se - Poznáváme</subfield>
+  </datafield>
+  <datafield tag="901" ind1=" " ind2=" ">
+    <subfield code="a">ISBN 80-85635-24-0</subfield>
+    <subfield code="f">2. vyd.</subfield>
+    <subfield code="g">ISBN neplatné - duplicitní; platné ISBN náleží publikaci: PERNÍKOVÁ chaloupka</subfield>
+    <subfield code="g">Správné ISBN v publikaci není uvedeno</subfield>
+    <subfield code="o">19951012</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000096591</subfield>
+  </datafield>
+</record>
+
+</collection>

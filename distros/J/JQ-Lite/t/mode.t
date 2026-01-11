@@ -10,6 +10,11 @@ my $json_objects = q([
   { "id": 1, "value": "x" },
   { "id": 2, "value": "y" }
 ]);
+my $json_nested = q([
+  { "id": 1, "tags": [1, 2] },
+  { "id": 2, "tags": [3, 4] },
+  { "id": 2, "tags": [3, 4] }
+]);
 my $json_sparse = q([null, "keep", "keep", null]);
 my $json_empty  = q([]);
 
@@ -23,6 +28,9 @@ is($mode_tie, 'apple', 'mode resolves ties using first occurrence');
 
 my ($mode_objects) = $jq->run_query($json_objects, 'mode | .id');
 is($mode_objects, 1, 'mode returns first matching object when structures repeat');
+
+my ($mode_nested) = $jq->run_query($json_nested, 'mode | .id');
+is($mode_nested, 2, 'mode respects nested values when selecting a repeated object');
 
 my ($mode_sparse) = $jq->run_query($json_sparse, 'mode');
 is($mode_sparse, 'keep', 'mode skips undefined/null values');

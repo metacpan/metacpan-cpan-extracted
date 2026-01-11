@@ -34,11 +34,12 @@ $Data::Dumper::Deparse       = TRUE;
 use Graphics::Framebuffer;
 
 BEGIN {
-    our $VERSION = '3.00';
+    our $VERSION = '3.01';
 }
 
 our $fb = Graphics::Framebuffer->new('SHOW_ERRORS' => FALSE, 'RESET' => FALSE, 'SPLASH' => FALSE);
 $fb->_screen_close();
+delete($fb->{'START_SCREEN'}) if (exists($fb->{'START_SCREEN'}));
 my $d = Dumper($fb);
 undef($fb);
 system('reset');
@@ -63,6 +64,10 @@ sub process {
 	my $green = colored(['green'],'green');
 	my $blue  = colored(['blue'],'blue');
 	my $alpha = colored(['bright_yellow'],'alpha');
+	my $RED   = colored(['red'],'RED');
+	my $GREEN = colored(['green'],'GREEN');
+	my $BLUE  = colored(['blue'],'BLUE');
+	my $ALPHA = colored(['bright_yellow'],'ALPHA');
 	my $fbd   = colored(['cyan'],'FB_DEVICE');
 	$d =~ s/RGB/$rgb/g;
 	$d =~ s/RBG/$rbg/g;
@@ -74,6 +79,10 @@ sub process {
 	$d =~ s/green/$green/g;
 	$d =~ s/blue/$blue/g;
 	$d =~ s/alpha/$alpha/g;
+	$d =~ s/RED/$RED/g;
+	$d =~ s/GREEN/$GREEN/g;
+	$d =~ s/BLUE/$BLUE/g;
+	$d =~ s/ALPHA/$ALPHA/g;
 	$d =~ s/FB_DEVICE/$fbd/g;
 	return($d);
 }

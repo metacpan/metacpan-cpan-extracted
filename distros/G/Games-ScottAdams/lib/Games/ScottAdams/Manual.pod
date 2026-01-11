@@ -1,4 +1,4 @@
-# $Id: Manual.pod,v 1.3 2006/11/02 09:19:20 mike Exp $
+# $Id: Manual.pod,v 1.3 2006-11-02 09:19:20 mike Exp $
 
 # Manual.pm - reference manual for the Scott Adams adventure compiler
 

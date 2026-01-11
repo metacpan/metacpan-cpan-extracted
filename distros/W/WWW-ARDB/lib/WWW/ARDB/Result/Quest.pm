@@ -7,7 +7,8 @@ use Moo;
 use Types::Standard qw( Str Int Num ArrayRef HashRef Maybe );
 use namespace::clean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
+
 
 has id => (
     is       => 'ro',
@@ -15,11 +16,13 @@ has id => (
     required => 1,
 );
 
+
 has title => (
     is       => 'ro',
     isa      => Str,
     required => 1,
 );
+
 
 has description => (
     is      => 'ro',
@@ -27,11 +30,13 @@ has description => (
     default => sub { undef },
 );
 
+
 has maps => (
     is      => 'ro',
     isa     => ArrayRef,
     default => sub { [] },
 );
+
 
 has steps => (
     is      => 'ro',
@@ -39,11 +44,13 @@ has steps => (
     default => sub { [] },
 );
 
+
 has trader => (
     is      => 'ro',
     isa     => Maybe[HashRef],
     default => sub { undef },
 );
+
 
 has required_items => (
     is      => 'ro',
@@ -51,11 +58,13 @@ has required_items => (
     default => sub { [] },
 );
 
+
 has rewards => (
     is      => 'ro',
     isa     => ArrayRef,
     default => sub { [] },
 );
+
 
 has xp_reward => (
     is      => 'ro',
@@ -63,11 +72,13 @@ has xp_reward => (
     default => sub { undef },
 );
 
+
 has updated_at => (
     is      => 'ro',
     isa     => Maybe[Str],
     default => sub { undef },
 );
+
 
 has _raw => (
     is      => 'ro',
@@ -93,11 +104,13 @@ sub from_hashref {
     );
 }
 
+
 sub trader_name {
     my $self = shift;
     return unless $self->trader;
     return $self->trader->{name};
 }
+
 
 sub trader_type {
     my $self = shift;
@@ -105,10 +118,12 @@ sub trader_type {
     return $self->trader->{type};
 }
 
+
 sub map_names {
     my $self = shift;
     return [ map { $_->{name} } @{$self->maps} ];
 }
+
 
 1;
 
@@ -124,7 +139,7 @@ WWW::ARDB::Result::Quest - Quest result object for WWW::ARDB
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -138,15 +153,14 @@ version 0.001
         printf "- %s (x%d)\n", $step->{title}, $step->{amount};
     }
 
-=head1 NAME
+=head1 DESCRIPTION
 
-WWW::ARDB::Result::Quest - Quest result object for WWW::ARDB
-
-=head1 ATTRIBUTES
+Result object representing a quest from the ARC Raiders Database. Created via
+L<WWW::ARDB> methods like C<quests()> and C<quest()>.
 
 =head2 id
 
-String. Unique identifier.
+String. Unique identifier for the quest (e.g., C<picking_up_the_pieces>).
 
 =head2 title
 
@@ -154,68 +168,77 @@ String. Quest title.
 
 =head2 description
 
-String or undef. Quest description/narrative.
+String or undef. Quest description or narrative text.
 
 =head2 maps
 
-ArrayRef. Available maps/locations for the quest.
+ArrayRef of HashRefs. Available maps/locations for this quest.
 
 =head2 steps
 
-ArrayRef of HashRefs. Quest objectives with C<title> and C<amount>.
+ArrayRef of HashRefs. Quest objectives, each with C<title> and C<amount>.
 
 =head2 trader
 
-HashRef or undef. Quest giver information with C<id>, C<name>, C<type>,
+HashRef or undef. Quest giver information including C<id>, C<name>, C<type>,
 C<description>, C<image>, C<icon>.
 
 =head2 required_items
 
-ArrayRef. Items needed to complete the quest.
+ArrayRef of HashRefs. Items needed to complete the quest.
 
 =head2 rewards
 
-ArrayRef. Quest completion rewards (detail endpoint only).
+ArrayRef of HashRefs. Quest completion rewards.
+Only populated for detail endpoint (C<quest($id)>).
 
 =head2 xp_reward
 
-Number or undef. Experience points awarded.
+Number or undef. Experience points awarded for completing the quest.
 
 =head2 updated_at
 
 String or undef. ISO 8601 timestamp of last update.
 
-=head1 METHODS
+=head2 from_hashref
 
-=head2 from_hashref($data)
+    my $quest = WWW::ARDB::Result::Quest->from_hashref($data);
 
-Class method. Creates a Quest object from API response data.
+Class method. Constructs a Quest object from API response data (HashRef).
 
 =head2 trader_name
 
-Returns the quest giver's name, or undef.
+    my $name = $quest->trader_name;
+
+Returns the quest giver's name, or undef if no trader is set.
 
 =head2 trader_type
 
-Returns the quest giver's type/profession, or undef.
+    my $type = $quest->trader_type;
+
+Returns the quest giver's type/profession (e.g., C<Security>), or undef if no
+trader is set.
 
 =head2 map_names
 
-Returns an ArrayRef of map names where the quest is available.
+    my $names = $quest->map_names;
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+Returns an ArrayRef of map names where the quest is available.
 
 =head1 SUPPORT
 
-=head2 Source Code
+=head2 Issues
 
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-ardb/issues>.
 
-L<https://github.com/Getty/p5-www-ardb>
+=head2 IRC
 
-  git clone https://github.com/Getty/p5-www-ardb.git
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 

@@ -6,6 +6,14 @@ Home page:    <https://metacpan.org/release/Lexical-Accessor>
 Bug tracker:  <https://github.com/tobyink/p5-lexical-accessor/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.000003	2026-01-09
+
+ [ Bug Fixes ]
+ - Fix for accessors which a method name which is only one character long.
+ - Fix for canonicalizing builder=>CODEREF.
+ - Fix for lazy defaults/builders running triggers (triggers shouldn't run
+   for defaults and builders).
+
 1.000002	2025-12-18
 
  - Major improvements to trigger implementation.

@@ -6,7 +6,6 @@ requires "Class::Accessor" => "0";
 requires "Crypt::Digest::RIPEMD160" => "0";
 requires "Crypt::Mac::HMAC" => "0";
 requires "Crypt::OpenSSL::Bignum" => "0";
-requires "Crypt::OpenSSL::DSA" => "0.20";
 requires "Crypt::OpenSSL::X509" => "0";
 requires "Crypt::PK::RSA" => "0";
 requires "CryptX" => "0.036";
@@ -21,6 +20,7 @@ requires "perl" => "5.008";
 requires "strict" => "0";
 requires "vars" => "0";
 requires "warnings" => "0";
+recommends "Crypt::OpenSSL::DSA" => "0.20";
 
 on 'test' => sub {
   requires "Crypt::OpenSSL::Guess" => "0";

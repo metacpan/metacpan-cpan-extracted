@@ -8,39 +8,46 @@ use HTTP::Request;
 use URI;
 use namespace::clean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use constant BASE_URL => 'https://ardb.app/api';
+
 
 sub items {
     my ($self, %params) = @_;
     return $self->_build_request('items', %params);
 }
 
+
 sub item {
     my ($self, $id, %params) = @_;
     return $self->_build_request("items/$id", %params);
 }
+
 
 sub quests {
     my ($self, %params) = @_;
     return $self->_build_request('quests', %params);
 }
 
+
 sub quest {
     my ($self, $id, %params) = @_;
     return $self->_build_request("quests/$id", %params);
 }
+
 
 sub arc_enemies {
     my ($self, %params) = @_;
     return $self->_build_request('arc-enemies', %params);
 }
 
+
 sub arc_enemy {
     my ($self, $id, %params) = @_;
     return $self->_build_request("arc-enemies/$id", %params);
 }
+
 
 sub _build_request {
     my ($self, $endpoint, %params) = @_;
@@ -70,7 +77,7 @@ WWW::ARDB::Request - HTTP request factory for WWW::ARDB
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -91,49 +98,58 @@ version 0.001
 This module creates L<HTTP::Request> objects for the ardb.app API endpoints.
 It can be used standalone for async HTTP clients like L<WWW::Chain>.
 
-=head1 NAME
-
-WWW::ARDB::Request - HTTP request factory for WWW::ARDB
-
-=head1 METHODS
+The base URL is C<https://ardb.app/api>.
 
 =head2 items
 
-Returns an HTTP::Request for GET /items.
+    my $request = $factory->items;
 
-=head2 item($id)
+Returns an L<HTTP::Request> for C<GET /items>.
 
-Returns an HTTP::Request for GET /items/{id}.
+=head2 item
+
+    my $request = $factory->item('acoustic_guitar');
+
+Returns an L<HTTP::Request> for C<GET /items/{id}>.
 
 =head2 quests
 
-Returns an HTTP::Request for GET /quests.
+    my $request = $factory->quests;
 
-=head2 quest($id)
+Returns an L<HTTP::Request> for C<GET /quests>.
 
-Returns an HTTP::Request for GET /quests/{id}.
+=head2 quest
+
+    my $request = $factory->quest('picking_up_the_pieces');
+
+Returns an L<HTTP::Request> for C<GET /quests/{id}>.
 
 =head2 arc_enemies
 
-Returns an HTTP::Request for GET /arc-enemies.
+    my $request = $factory->arc_enemies;
 
-=head2 arc_enemy($id)
+Returns an L<HTTP::Request> for C<GET /arc-enemies>.
 
-Returns an HTTP::Request for GET /arc-enemies/{id}.
+=head2 arc_enemy
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+    my $request = $factory->arc_enemy('wasp');
+
+Returns an L<HTTP::Request> for C<GET /arc-enemies/{id}>.
 
 =head1 SUPPORT
 
-=head2 Source Code
+=head2 Issues
 
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-ardb/issues>.
 
-L<https://github.com/Getty/p5-www-ardb>
+=head2 IRC
 
-  git clone https://github.com/Getty/p5-www-ardb.git
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 

@@ -1,0 +1,49 @@
+{
+   "abstract" : "Fixed-capacity rolling window (overwrite-oldest)",
+   "author" : [
+      "Joshua S. Day"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Hax-Alg-RollingWindow",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      },
+      "test" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/haxmeister/Hax-Alg-RollingWindow"
+   },
+   "version" : "0.910",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

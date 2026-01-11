@@ -34,7 +34,7 @@ $Data::Dumper::Indent=1;
 
 #  Version info
 #
-$VERSION='2.046';
+$VERSION='2.060';
 
 
 #  Get command line options, add them to environment so picked up
@@ -97,12 +97,14 @@ require WebDyne::Install::Apache;
 #
 my $prefix_dn=realpath(File::Spec->rel2abs(File::Spec->updir(), $RealBin));
 debug("about to call install/uninstall with prefix_dn: $prefix_dn, RealBin: $RealBin, opt: %s", Dumper(\%opt));
+my $rc;
 if ($opt{'uninstall'}) {
-    exit ${WebDyne::Install::Apache->uninstall($prefix_dn, $RealBin, \%opt) || die errstr()}
+    $rc=${WebDyne::Install::Apache->uninstall($prefix_dn, $RealBin, \%opt) || die errstr()} || 0;
 }
 else {
-    exit ${WebDyne::Install::Apache->install($prefix_dn, $RealBin, \%opt) || die errstr()}
+    $rc=${WebDyne::Install::Apache->install($prefix_dn, $RealBin, \%opt) || die errstr()} || 0;
 }
+exit $rc;
 
 __END__
 
@@ -209,7 +211,6 @@ the same terms as the Perl 5 programming language system itself.
 Full license text is available at:
 
 <http://dev.perl.org/licenses/>
-
 
 =end markdown
 

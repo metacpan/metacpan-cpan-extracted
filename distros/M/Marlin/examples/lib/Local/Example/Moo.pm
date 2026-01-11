@@ -4,6 +4,13 @@ use Types::Common -lexical, -types;
 
 push @Local::Example::ALL, 'Local::Example::Moo';
 
+package Local::Example::Moo::Simple {
+	use Moo;
+	use MooX::StrictConstructor -late;
+	has foo => qw( is ro );
+	has bar => qw( is ro );
+}
+
 package Local::Example::Moo::NamedThing {
 	use Moo;
 	use MooX::StrictConstructor -late;

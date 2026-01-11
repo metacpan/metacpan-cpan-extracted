@@ -1,13 +1,14 @@
 package WWW::MetaForge::Cache;
-our $VERSION = '0.001';
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: File-based caching for MetaForge APIs
+our $VERSION = '0.002';
 
 use Moo;
 use Path::Tiny;
 use JSON::MaybeXS;
 use Digest::MD5 qw(md5_hex);
 use namespace::clean;
+
 
 # Default: 0 = never expire (cache forever until manually cleared)
 our %DEFAULT_TTL = ();
@@ -17,6 +18,7 @@ has namespace => (
   default => 'metaforge',
 );
 
+
 has cache_dir => (
   is      => 'ro',
   lazy    => 1,
@@ -24,16 +26,19 @@ has cache_dir => (
   coerce  => sub { ref $_[0] ? $_[0] : path($_[0]) },
 );
 
+
 has ttl => (
   is      => 'ro',
   default => sub { +{ %DEFAULT_TTL } },
 );
+
 
 has json => (
   is      => 'ro',
   lazy    => 1,
   default => sub { JSON::MaybeXS->new(utf8 => 1, canonical => 1) },
 );
+
 
 sub _build_cache_dir {
   my ($self) = @_;
@@ -80,6 +85,7 @@ sub get {
   return $cached->{data};
 }
 
+
 sub set {
   my ($self, $endpoint, $params, $data) = @_;
 
@@ -95,6 +101,7 @@ sub set {
   return $data;
 }
 
+
 sub clear {
   my ($self, $endpoint) = @_;
 
@@ -107,10 +114,12 @@ sub clear {
   }
 }
 
+
 sub clear_all {
   my ($self) = @_;
   $self->clear();
 }
+
 
 1;
 
@@ -126,25 +135,23 @@ WWW::MetaForge::Cache - File-based caching for MetaForge APIs
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
-  use WWW::MetaForge::Cache;
+    use WWW::MetaForge::Cache;
 
-  my $cache = WWW::MetaForge::Cache->new;
+    my $cache = WWW::MetaForge::Cache->new;
 
-  my $data = $cache->get('items', { search => 'Ferro' });
-  $cache->set('items', { search => 'Ferro' }, $response_data);
-  $cache->clear('items');
+    my $data = $cache->get('items', { search => 'Ferro' });
+    $cache->set('items', { search => 'Ferro' }, $response_data);
+    $cache->clear('items');
 
 =head1 DESCRIPTION
 
 File-based caching for MetaForge API responses. Cache files are stored following
 XDG Base Directory Specification on Unix (C<~/.cache/metaforge/>) and
 LOCALAPPDATA on Windows.
-
-=head1 ATTRIBUTES
 
 =head2 namespace
 
@@ -162,32 +169,30 @@ Default is empty (cache never expires). Use 0 or undef for infinite TTL.
 
 Example with expiration:
 
-  my $cache = WWW::MetaForge::Cache->new(
-    ttl => { event_timers => 300 }  # 5 minutes for events only
-  );
+    my $cache = WWW::MetaForge::Cache->new(
+      ttl => { event_timers => 300 }  # 5 minutes for events only
+    );
 
 =head2 json
 
 L<JSON::MaybeXS> instance for serialization.
 
-=head1 METHODS
-
 =head2 get
 
-  my $data = $cache->get($endpoint, \%params);
+    my $data = $cache->get($endpoint, \%params);
 
 Returns cached data or undef if missing/expired.
 
 =head2 set
 
-  $cache->set($endpoint, \%params, $data);
+    $cache->set($endpoint, \%params, $data);
 
 Store data in cache with timestamp.
 
 =head2 clear
 
-  $cache->clear('items');  # Clear specific endpoint
-  $cache->clear;           # Clear all
+    $cache->clear('items');  # Clear specific endpoint
+    $cache->clear;           # Clear all
 
 Remove cached files.
 
@@ -195,19 +200,20 @@ Remove cached files.
 
 Alias for C<< $cache->clear >>.
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
-
 =head1 SUPPORT
 
-=head2 Source Code
+=head2 Issues
 
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-metaforge/issues>.
 
-L<https://github.com/Getty/p5-www-metaforge>
+=head2 IRC
 
-  git clone https://github.com/Getty/p5-www-metaforge.git
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 

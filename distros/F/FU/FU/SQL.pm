@@ -1,4 +1,4 @@
-package FU::SQL 1.3;
+package FU::SQL 1.4;
 use v5.36;
 use Exporter 'import';
 use Carp 'confess';
@@ -121,7 +121,7 @@ FU::SQL - Small and Safe SQL Query Builder
 
   my $sel = SQL 'SELECT id, name FROM table', WHERE { id => IN([1,2,3]) };
 
-  my($sql, @params) = $sel->compile;
+  my($sql, $params) = $sel->compile;
 
 =head1 DESCRIPTION
 

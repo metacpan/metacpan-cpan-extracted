@@ -1,0 +1,55 @@
+{
+   "abstract" : "A simple and lite JSON-RPC client.",
+   "author" : [
+      "Scott Baker <bakerscot@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "JSON-RPC-Simple-Lite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Time::Local" : "1.26",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/scottchiefbaker/perl-JSON-RPC-Simple-Lite.git",
+         "web" : "https://github.com/scottchiefbaker/perl-JSON-RPC-Simple-Lite"
+      }
+   },
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

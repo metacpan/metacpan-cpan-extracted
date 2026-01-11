@@ -1,5 +1,11 @@
 Revision history for noss (WWW::Noss)
 
+2.02  Jan 10 2026
+  - noss can now read compressed feeds.
+  - Default timeout is now 45 seconds.
+  - noss can now correctly strip HTML when closing ">" brackets are quoted in
+    element attributes.
+
 2.01  Nov 28 2025
   - Add "discover" command: Discover feed URLs associated with a given web
     page.

@@ -1,4 +1,4 @@
-package FU::Util 1.3;
+package FU::Util 1.4;
 
 use v5.36;
 use FU::XS;

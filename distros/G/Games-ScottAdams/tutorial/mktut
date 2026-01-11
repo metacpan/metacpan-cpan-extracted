@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: mktut,v 1.1.1.1 2002/12/20 01:37:30 mike Exp $
+# $Id: mktut,v 1.1 2002-12-20 01:37:30 mike Exp $
 
 # mktut - create "sac" tutorial as a POD from specified stages
 

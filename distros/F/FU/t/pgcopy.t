@@ -82,9 +82,9 @@ is $conn->status, 'idle';
     $c->write($bin);
     $c->close;
 
-    is $txn->q('SELECT sum(v) FROM fupg_copy_test')->val, 1+1+2+2+3+3;
+    is $txn->sql('SELECT sum(v) FROM fupg_copy_test')->val, 1+1+2+2+3+3;
     $txn->rollback;
 }
-is $conn->q('SELECT sum(v) FROM fupg_copy_test')->val, 1+2+3;
+is $conn->sql('SELECT sum(v) FROM fupg_copy_test')->val, 1+2+3;
 
 done_testing;

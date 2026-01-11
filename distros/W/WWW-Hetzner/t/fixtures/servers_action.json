@@ -1,0 +1,20 @@
+{
+  "action": {
+    "id": 13343,
+    "command": "poweron",
+    "status": "running",
+    "progress": 0,
+    "started": "2025-01-05T12:00:00+00:00",
+    "finished": null,
+    "resources": [
+      {
+        "id": 123456,
+        "type": "server"
+      }
+    ],
+    "error": {
+      "code": "",
+      "message": ""
+    }
+  }
+}

@@ -2,7 +2,7 @@ package WWW::Noss;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use Cwd;
 use Getopt::Long qw(GetOptionsFromArray);
@@ -33,6 +33,8 @@ my $PRGVER = $VERSION;
 
 # TODO: Command aliases?
 # TODO: "open" feed setting? (command to use for opening post URLs)
+
+# TODO: Have list --limit ... only show the latest posts rather than earliest
 
 my %COMMANDS = (
     'update'   => \&update,
@@ -258,7 +260,7 @@ sub _VER {
     print { $fh } <<"HERE";
 $PRGNAM - $PRGVER
 
-Copyright (C) 2025 Samuel Young
+Copyright (C) 2025-2026 Samuel Young
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -988,6 +990,7 @@ sub _get_feed {
                 : ()
             ),
             redirect => 1,
+            compressed => 1,
         );
 
         if (defined $resp and $resp->[1] eq '429') {
@@ -2188,6 +2191,10 @@ sub init {
         $self->{ UseColor } = 0;
     }
 
+    if (not defined $self->{ Timeout }) {
+        $self->{ Timeout } = 45;
+    }
+
     return $self;
 
 }
@@ -2327,7 +2334,7 @@ requests are welcome!
 
 =head1 COPYRIGHT
 
-Copyright (C) 2025 Samuel Young
+Copyright (C) 2025-2026 Samuel Young
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

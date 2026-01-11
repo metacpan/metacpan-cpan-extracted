@@ -10,7 +10,8 @@ use Digest::MD5 qw( md5_hex );
 use JSON::MaybeXS qw( encode_json decode_json );
 use namespace::clean;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
+
 
 has cache_dir => (
     is      => 'lazy',
@@ -18,6 +19,7 @@ has cache_dir => (
     coerce  => sub { ref $_[0] ? $_[0] : path($_[0]) },
     builder => '_build_cache_dir',
 );
+
 
 sub _build_cache_dir {
     my $self = shift;
@@ -41,6 +43,7 @@ has namespace => (
     default => 'default',
 );
 
+
 sub get {
     my ($self, $endpoint, $params) = @_;
 
@@ -52,6 +55,7 @@ sub get {
 
     return $cached->{data};
 }
+
 
 sub set {
     my ($self, $endpoint, $params, $data) = @_;
@@ -67,6 +71,7 @@ sub set {
 
     $file->spew_utf8(encode_json($cache_data));
 }
+
 
 sub clear {
     my ($self, $endpoint) = @_;
@@ -85,6 +90,7 @@ sub clear {
         }
     }
 }
+
 
 sub _cache_key {
     my ($self, $endpoint, $params) = @_;
@@ -121,7 +127,7 @@ WWW::ARDB::Cache - File-based cache for WWW::ARDB
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -144,51 +150,54 @@ version 0.001
 =head1 DESCRIPTION
 
 This module provides file-based caching for API responses. Cache files are
-stored in the XDG cache directory on Unix systems or LOCALAPPDATA on Windows.
-
-=head1 NAME
-
-WWW::ARDB::Cache - File-based cache for WWW::ARDB
-
-=head1 ATTRIBUTES
+stored in the XDG cache directory on Unix systems (C<~/.cache/ardb>) or
+C<LOCALAPPDATA> on Windows (C<%LOCALAPPDATA%\ardb>).
 
 =head2 cache_dir
 
-Path::Tiny object for the cache directory. Defaults to C<~/.cache/ardb> on
-Unix or C<%LOCALAPPDATA%/ardb> on Windows.
+L<Path::Tiny> object for the cache directory. Defaults to platform-specific
+location: C<~/.cache/ardb> on Unix or C<%LOCALAPPDATA%/ardb> on Windows.
 
 =head2 namespace
 
-String prefix for cache keys. Defaults to C<default>.
+String prefix for cache keys. Defaults to C<default>. Can be used to segregate
+caches for different purposes.
 
-=head1 METHODS
+=head2 get
 
-=head2 get($endpoint, \%params)
+    my $cached = $cache->get($endpoint, \%params);
 
-Retrieve cached data for an endpoint. Returns undef if not cached.
+Retrieve cached data for an endpoint with the given parameters. Returns the
+cached data or undef if not found.
 
-=head2 set($endpoint, \%params, $data)
+=head2 set
 
-Store data in cache.
+    $cache->set($endpoint, \%params, $data);
 
-=head2 clear($endpoint)
+Store data in cache for an endpoint with the given parameters.
 
-Clear cached data. If C<$endpoint> is provided, only clears that endpoint.
-Otherwise clears all cached data.
+=head2 clear
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+    $cache->clear($endpoint);  # Clear specific endpoint
+    $cache->clear;             # Clear all cached data
+
+Clear cached data. If C<$endpoint> is provided, only clears cache files for
+that endpoint. Otherwise clears all cache files.
 
 =head1 SUPPORT
 
-=head2 Source Code
+=head2 Issues
 
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-ardb/issues>.
 
-L<https://github.com/Getty/p5-www-ardb>
+=head2 IRC
 
-  git clone https://github.com/Getty/p5-www-ardb.git
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 

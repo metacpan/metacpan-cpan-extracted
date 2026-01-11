@@ -474,12 +474,12 @@ BEGIN {
 
 sub DESTROY {    # Always clean up after yourself before exiting
     my $self = shift;
+    substr($self->{'SCREEN'}, 0, length($self->{'START_SCREEN'})) = $self->{'START_SCREEN'};
+	delete($self->{'START_SCREEN'});
     $self->text_mode();
     $self->_screen_close();
     unlink('/tmp/output.gif') if (-e '/tmp/output.gif');
     _reset()                  if ($self->{'RESET'});       # Exit by calling 'reset' first
-                                                           # Restore the original screen before run
-    substr($self->{'SCREEN'}, 0, length($self->{'START_SCREEN'})) = $self->{'START_SCREEN'};
 } ## end sub DESTROY
 
 # use Inline 'info', 'noclean', 'noisy'; # Only needed for debugging

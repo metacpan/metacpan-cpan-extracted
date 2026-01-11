@@ -1,5 +1,5 @@
 package IO::Async::Loop::Uring;
-$IO::Async::Loop::Uring::VERSION = '0.002';
+$IO::Async::Loop::Uring::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -275,7 +275,7 @@ IO::Async::Loop::Uring - Use IO::Async with IO::Uring
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -294,7 +294,7 @@ version 0.002
 
 =head1 DESCRIPTION
 
-This subclass of L<IO::Async::Loop> uses L<IO::Uring> to perform its work.
+This subclass of L<IO::Async::Loop> uses L<IO::Uring> to perform its work. Because C<io_uring> is a quickly developing kernel subsystem, it requires a Linux 6.7 kernel or newer to function.
 
 =head1 AUTHOR
 

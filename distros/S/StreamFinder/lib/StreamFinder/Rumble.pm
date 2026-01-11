@@ -4,7 +4,7 @@ StreamFinder::Rumble - Fetch actual raw streamable URLs from Rumble.com.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2025 by
+This module is Copyright (C) 2017-2026 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -335,7 +335,7 @@ L<http://search.cpan.org/dist/StreamFinder-Rumble/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2025 Jim Turner.
+Copyright 2017-2026 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -503,15 +503,14 @@ sub new
 			$self->{'title'} = ($html =~ m#\<title\>([^\<]+)\<\/title\>#s) ? $1 : '';
 			$self->{'title'} ||= $1  if ($html =~ m#\<meta\s+property\=\"?og\:title\"?\s+content\=\"([^\"]+)\"#s);
 
-			$self->{'artist'} = $1  if ($html =~ m#class\=\"media-heading-name\"\>([^\<]+)\<#s);
+			$self->{'artist'} = $1  if ($html =~ m#class\=\"media-heading-name(?:\s+truncate)?\"\>([^\<]+)\<#s);
 			$self->{'artist'} ||= $1  if ($html =~ m#\<button data-title=\"([^\"]+)#s);
 			$self->{'artist'} =~ s/^\s+//s;
 			$self->{'artist'} =~ s/\s+$//s;
 
 			$self->{'albumartist'} = 'https://rumble.com' . $1  if ($html =~ m#href\=\"([^\"]+)\" rel=author#s);
 
-			$self->{'description'} = $1  if ($html =~ m#\<div\s+class\=\"container\s+content\s+media\-description\"\>(.+?)\<\/div\>#s);
-			$self->{'description'} ||= $1  if ($html =~ m#\</span\>\s+[\-\x{2014}]+\s+\<\/span\>(.+?)\<\/div\>#s);
+			$self->{'description'} = $1  if ($html =~ m#\<p\s+class\=\"media\-description\s+media\-description[^\>]*\>(.+?)\<\/p\>#s);
 			$self->{'description'} ||= $1  if ($html =~ m#\"description\"\:\"([^\"]+)#s);
 			$self->{'description'} ||= $1  if ($html =~ m#<meta\s+name\=description\"?\s+content\=\"\:\"([^\"]+)#s);
 			$self->{'description'} ||= $1  if ($html =~ m#<meta\s+property\=\"?og\:description\"?\s+content\=\"\:\"([^\"]+)#s);
@@ -532,7 +531,7 @@ sub new
 				$self->{'articonurl'} = $1  if ($stuff =~ m#url\(([^\)]+)#);
 			}
 
-			if ($html =~ m#Published(.+?)\<span#s) {   #JWT:NOTE: CAN'T USE $self->{'created'} HERE!:
+			if ($html =~ m#Published(.+?)\<span#s) {  #JWT:NOTE: CAN'T USE $self->{'created'} HERE!:
 				my $published = $1;
 				$self->{'year'} = $1  if ($published =~ /(\d\d\d\d)/);
 			}
@@ -577,9 +576,9 @@ sub new
 			while ($html =~ s#^.+?\"(\w+)\"\:\{\"url\"\:\"([^\"]+)\"##so) {
 				my ($quality, $stream) = ($1, $2);
 				my $bitrate = ($html =~ m#\"bitrate\"\:(\d+)#o) ? $1 : 0;
-				print STDERR "...quality=$quality= bitrate=$bitrate= stream=$stream=\n"  if ($DEBUG);
+				print STDERR "...quality=$quality= bitrate=$bitrate=(max=".$self->{'bitrate'}.") stream=$stream=\n"  if ($DEBUG);
 				next  if ($bitrate > $self->{'bitrate'});
-				next  if ($stream =~ /\.[A-Z]aa\.(?:mp4|webm)$/);
+				next  if ($stream =~ /\.[A-Z]aa\.rec\.(?:mp4|webm)$/o);  #THESE WON'T PLAY! (VIDEO-ONLY?)
 
 				for (my $i=0;$i<=$#okStreams;$i++) {
 					if ($stream =~ /\.$okStreams[$i]\b/) {
@@ -592,9 +591,9 @@ sub new
 					if ($quality =~ /audio/o) {
 						$quality = 1;
 					} elsif ($quality =~ /(?:hls|auto)/o) {
-						$quality = ($self->{'order'} =~ /ext/i) ? ($self->{'quality'}-1) : 10;
+						$quality = ($self->{'order'} =~ /ext/io) ? ($self->{'quality'}-1) : 10;
 					} else {
-						$quality = 5;
+						next;
 					}
 				}
 				next  if ($quality > $self->{'quality'});  #EXCLUDE ANY HIGHER-RES THAN SELECTED QUALITY.
@@ -604,7 +603,7 @@ sub new
 				$qualities{$quality} = 1;
 				push @streams, $stream;
 			}
-			print STDERR "--Max resolution=".$self->{'quality'}."= bitrate=".$self->{'bitrate'}."=\n"  if ($DEBUG);
+			print STDERR "--Max res(quality)=".$self->{'quality'}."= bitrate=".$self->{'bitrate'}."= order=".join(',',@okStreams)."=\n"  if ($DEBUG);
 
 			if ($self->{'order'} =~ /ext/i) {
 				print STDERR "--order streams by kept extensions:\n"  if ($DEBUG);
@@ -629,7 +628,7 @@ sub new
 					print STDERR "\n--keep quality=$quality:\n"  if ($DEBUG);
 					foreach my $ext (@okStreams) {
 						foreach my $stream (@streams) {
-							print STDERR "------found($ext) stream=$stream=\n"  if ($DEBUG);
+							print STDERR "------found($ext) ext=".$ext{$stream}."= stream=$stream=\n"  if ($DEBUG);
 							next  unless ($quality{$stream} == $quality && 
 									($ext =~ /any/io || $ext{$stream} =~ /$ext/));
 							unless (defined $streamHash{$stream}

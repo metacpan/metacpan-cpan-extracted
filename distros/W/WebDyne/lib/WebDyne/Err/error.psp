@@ -652,7 +652,7 @@ sub err_display {
     
     my %version=(
         VERSION         => $WebDyne::VERSION,
-        VERSION_GIT_REF => $WebDyne::VERSION_GIT_REF
+        VERSION_GIT_SHA => $WebDyne::VERSION_GIT_SHA
     );
     my $webdyne_version_dumper=Data::Dumper->Dump([\%version], ['WebDyne::VERSION']);
     $self->render_block('webdyne_version', webdyne_version=>$webdyne_version_dumper);

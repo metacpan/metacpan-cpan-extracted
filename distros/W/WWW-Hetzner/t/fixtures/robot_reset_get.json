@@ -1,0 +1,7 @@
+{
+  "reset": {
+    "server_number": 123456,
+    "type": ["sw", "hw", "man"],
+    "operating_status": "ready"
+  }
+}

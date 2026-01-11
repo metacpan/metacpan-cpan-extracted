@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01165cem a22003491a 4500</leader>
+  <controlfield tag="001">ck8302475</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20110314095203.0</controlfield>
+  <controlfield tag="007">ad canzn</controlfield>
+  <controlfield tag="008">830921s1983    xr z      e     1   cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000002494</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="q">(Váz.) :</subfield>
+    <subfield code="c">29 Kčs</subfield>
+  </datafield>
+  <datafield tag="034" ind1="1" ind2=" ">
+    <subfield code="a">a</subfield>
+    <subfield code="b">400000</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)39561754</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="d">ABA001</subfield>
+  </datafield>
+  <datafield tag="043" ind1=" " ind2=" ">
+    <subfield code="a">e-cs---</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">913(437)</subfield>
+    <subfield code="x">Geografie Česka a Slovenska, reálie, cestování</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">7</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">656.1</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">913(437)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">912.43:656.1</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(084.4)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="110" ind1="2" ind2=" ">
+    <subfield code="a">Geodetický a kartografický podnik Praha</subfield>
+    <subfield code="7">ko2003167949</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Autoatlas ČSSR</subfield>
+    <subfield code="h">[kartografický dokument] :</subfield>
+    <subfield code="b">1:400 000 /</subfield>
+    <subfield code="c">[zpracoval Geodetický a kartografický podnik v Praze]</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">16. čes. vyd.</subfield>
+  </datafield>
+  <datafield tag="255" ind1=" " ind2=" ">
+    <subfield code="a">Měřítko 1:400 000</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Geodetický a kartografický podnik,</subfield>
+    <subfield code="c">1983</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">1 atlas (130 s., 61 s. map) :</subfield>
+    <subfield code="b">barev. ;</subfield>
+    <subfield code="c">24 cm</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Obsahuje rejstřík</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">silniční doprava</subfield>
+    <subfield code="7">ph116143</subfield>
+    <subfield code="z">Československo</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">autoatlasy</subfield>
+    <subfield code="7">fd131844</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000002494</subfield>
+  </datafield>
+</record>
+
+</collection>

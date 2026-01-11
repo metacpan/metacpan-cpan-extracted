@@ -1,40 +1,73 @@
 package JSON::Lines;
-use 5.006; use strict; use warnings; our $VERSION = '1.09';
+use 5.006; use strict; use warnings; our $VERSION = '1.11';
 use Cpanel::JSON::XS; use base 'Import::Export';
-
-our ($JSON, $LINES, %EX);
+our ($JSON, $LINES, $STRING, %EX);
 BEGIN {
 	$JSON = Cpanel::JSON::XS->new;
-	$LINES = qr{ ([\[\{] (?: (?> [^\[\]\{\}]+ ) | (??{ $LINES }) )* [\]\}]) }x;
+	$STRING = qr{ " (?> (?: [^"\\]++ | \\. )*+ ) " }x;
+	$LINES = qr{ ( [\[\{] (?> (?: (?> [^\[\]\{\}"]++ ) | $STRING | (??{ $LINES }) )*+ ) [\]\}] ) }x;
 	%EX = (
 		jsonl => [qw/all/]
 	);
 }
-
 sub jsonl {
 	my %args = (scalar @_ == 1 ? %{$_[0]} : @_);
 	my $self = __PACKAGE__->new(%args);
-	return $args{file} 
-		? $self->encode_file($args{file}, $args{data}) 
-		: $self->encode($args{data}) 
+	return $args{file}
+		? $self->encode_file($args{file}, $args{data})
+		: $self->encode($args{data})
 	if ($args{encode});
 	return $args{file}
 		? $self->decode_file($args{file})
 		: $self->decode($args{data})
 	if ($args{decode});
 }
-
 sub new {
 	my ($pkg, %args) = (shift, scalar @_ == 1 ? %{$_[0]} : @_);
-	my $self = bless { headers => [] }, $pkg;
+	my $self = bless { headers => [], _buffer => '' }, $pkg;
 	exists $args{$_} && $JSON->$_($args{$_}) for qw/pretty canonical utf8/;
 	$self->{$_} = $args{$_} for qw/parse_headers error_cb success_cb/;
 	$self;
 }
-
+sub pretty {
+	my ($self, $val) = @_;
+	return $JSON->get_indent if @_ == 1;
+	$JSON->pretty($val);
+	return $self;
+}
+sub canonical {
+	my ($self, $val) = @_;
+	return $JSON->get_canonical if @_ == 1;
+	$JSON->canonical($val);
+	return $self;
+}
+sub utf8 {
+	my ($self, $val) = @_;
+	return $JSON->get_utf8 if @_ == 1;
+	$JSON->utf8($val);
+	return $self;
+}
+sub parse_headers {
+	my ($self, $val) = @_;
+	return $self->{parse_headers} if @_ == 1;
+	$self->{parse_headers} = $val;
+	return $self;
+}
+sub error_cb {
+	my ($self, $val) = @_;
+	return $self->{error_cb} if @_ == 1;
+	$self->{error_cb} = $val;
+	return $self;
+}
+sub success_cb {
+	my ($self, $val) = @_;
+	return $self->{success_cb} if @_ == 1;
+	$self->{success_cb} = $val;
+	return $self;
+}
 sub encode {
 	my ($self, @data) = (shift, scalar @_ == 1 ? @{$_[0]} : @_);
-	@data = $self->_parse_headers(@data) 
+	@data = $self->_parse_headers(@data)
 		if ($self->{parse_headers});
 	my $stream;
 	for (@data) {
@@ -52,7 +85,6 @@ sub encode {
 	}
 	return $self->{stream} = $stream;
 }
-
 sub encode_file {
 	my ($self, $file) = (shift, shift);
 	open my $fh, '>', $file;
@@ -60,17 +92,54 @@ sub encode_file {
 	close $fh;
 	return $file;
 }
-
 sub decode {
 	my ($self, $string) = @_;
+	if (defined $self->{_buffer} && length $self->{_buffer}) {
+		$string = $self->{_buffer} . $string;
+		$self->{_buffer} = '';
+	}
 	my @lines;
-	push @lines, $self->_decode_line($_) 
-		for ($string =~ m/$LINES/g);
+	my $pos = 0;
+	my $len = length($string);
+	while ($pos < $len) {
+		if ($string =~ m/\G[\s\n]+/gc) {
+			$pos = pos($string);
+			next;
+		}
+		my $remaining = substr($string, $pos);
+		my ($obj, $chars_consumed, $regex_matched) = $self->_decode_one($remaining);
+		if (defined $obj) {
+			push @lines, $obj;
+			$pos += $chars_consumed;
+		} elsif ($regex_matched) {
+			$pos += $chars_consumed if $chars_consumed > 0;
+			$pos++ if $chars_consumed == 0;
+		} else {
+			if ($remaining =~ /^[\[\{]/) {
+				$self->{_buffer} = $remaining;
+				last;
+			}
+			if ($string =~ m/\G[^\[\{]+/gc) {
+				$pos = pos($string);
+			} else {
+				$pos++;
+			}
+		}
+		pos($string) = $pos;
+	}
 	@lines = $self->_deparse_headers(@lines)
 		if ($self->{parse_headers});
 	return wantarray ? @lines : \@lines;
 }
-
+sub remaining {
+	my ($self) = @_;
+	return $self->{_buffer} // '';
+}
+sub clear_buffer {
+	my ($self) = @_;
+	$self->{_buffer} = '';
+	return $self;
+}
 sub decode_file {
 	my ($self, $file) = (shift, shift);
 	open my $fh, '<', $file;
@@ -78,7 +147,6 @@ sub decode_file {
 	close $fh;
 	return $self->decode($content);
 }
-
 sub add_line {
 	my ($self, $line, $fh) = @_;
 	if (defined $fh) {
@@ -90,11 +158,9 @@ sub add_line {
 		$self->{stream};
 	}
 }
-
 sub clear_stream {
 	$_[0]->{stream} = '';
 }
-
 sub get_lines {
 	my ($self, $fh, $lines) = @_;
 	my @lines;
@@ -105,18 +171,65 @@ sub get_lines {
 	}
 	return wantarray ? @lines : \@lines;
 }
-
 sub get_line {
 	my ($self, $fh) = @_;
+	$self->{_line_buffer} //= [];
+	if (@{$self->{_line_buffer}}) {
+		return shift @{$self->{_line_buffer}};
+	}
 	my $line = '';
 	$line .= <$fh> while ($line !~ m/^$LINES/ && !eof($fh));
 	return undef if $line eq '' && eof($fh);
-	return $self->_decode_line($line);
+	my @objects = $self->decode($line);
+	return undef unless @objects;
+	my $first = shift @objects;
+	push @{$self->{_line_buffer}}, @objects;
+	return $first;
 }
-
+sub get_line_at {
+	my ($self, $fh, $index, $seek) = @_;
+	my $fh_id = fileno($fh);
+	my ($target_line, $target_offset) = $index =~ /:/
+		? split(/:/, $index)
+		: ($index, 0);
+	$self->{_line_pos} //= {};
+	$self->{_parsed_lines} //= {};
+	if ($seek) {
+		seek $fh, 0, 0;
+		$self->{_line_pos}{$fh_id} = 0;
+		$self->{_parsed_lines}{$fh_id} = {};
+	}
+	$self->{_line_pos}{$fh_id} //= 0;
+	$self->{_parsed_lines}{$fh_id} //= {};
+	if ($target_line < $self->{_line_pos}{$fh_id}) {
+		seek $fh, 0, 0;
+		$self->{_line_pos}{$fh_id} = 0;
+		$self->{_parsed_lines}{$fh_id} = {};
+	}
+	while ($self->{_line_pos}{$fh_id} < $target_line && !eof($fh)) {
+		<$fh>;
+		$self->{_line_pos}{$fh_id}++;
+	}
+	return undef if eof($fh);
+	if (exists $self->{_parsed_lines}{$fh_id}{$target_line}) {
+		my $line_objects = $self->{_parsed_lines}{$fh_id}{$target_line};
+		return undef unless $line_objects && @$line_objects > $target_offset;
+		return $line_objects->[$target_offset];
+	}
+	my $line = '';
+	my $start_line = $self->{_line_pos}{$fh_id};
+	while ($line !~ m/^$LINES/ && !eof($fh)) {
+		$line .= <$fh>;
+		$self->{_line_pos}{$fh_id}++;
+	}
+	return undef unless $line =~ m/^$LINES/;
+	my @objects = $self->decode($line);
+	$self->{_parsed_lines}{$fh_id}{$start_line} = \@objects;
+	return undef unless @objects > $target_offset;
+	return $objects[$target_offset];
+}
 sub get_subset {
 	my ($self, $fh, $offset, $length, $out_file) = @_;
-
 	my $in_fh = 1;
 	if (ref $fh ne 'GLOB') {
 		my $file = $fh;
@@ -124,40 +237,72 @@ sub get_subset {
 		$fh = $ffh;
 		$in_fh = 0;
 	}
-
 	seek $fh, 0, 0;
-	if ($offset) {
-		<$fh> for ( 1 .. $offset );
-	}
-	my @lines;
+	my @all_objects;
 	my $line = '';
-	while ($offset <= $length) {
-		do { $offset++; $line .= <$fh> } 
-			while ($line !~ m/^$LINES/ && !eof($fh) && $offset <= $length);
+	while (!eof($fh)) {
+		do { $line .= <$fh> } while ($line !~ m/^$LINES/ && !eof($fh));
 		if ($line =~ m/^$LINES/) {
-			push @lines, $line;
+			push @all_objects, $self->decode($line);
 			$line = "";
 		}
 	}
-
 	if (!$in_fh) {
 		close $fh;
 	}
-
+	my $end = $length;
+	$end = $#all_objects if $end > $#all_objects;
+	my @subset = @all_objects[$offset .. $end];
 	if ($out_file) {
 		open my $cfh, '>', $out_file or die "cannot open file for writing: $!";
-		print $cfh join "", @lines;
+		print $cfh $self->encode(\@subset);
 		close $cfh;
 		return 1;
 	}
-
-	return [ 
-		map { 
-			$self->_decode_line($_);
-		} @lines
-	];
+	return \@subset;
 }
-
+sub group_lines {
+	my ($self, $fh, $key) = @_;
+	die "Key must be provided for grouping" unless defined $key;
+	seek $fh, 0, 0;
+	my (%groups, $line_num, $line);
+	($line_num, $line) = (0, '');
+	while (!eof($fh)) {
+		my $start_line = $line_num;
+		while ($line !~ m/^$LINES/ && !eof($fh)) {
+			$line .= <$fh>;
+			$line_num++;
+		}
+		last unless $line =~ m/^$LINES/;
+		my @objects = $self->decode($line);
+		$line = '';
+		my $obj_offset = 0;
+		for my $data (@objects) {
+			my $value = ref $key eq 'CODE'
+				? do { local $_ = $data; $key->($data) }
+				: $data->{$key};
+			my $index = @objects > 1 ? "$start_line:$obj_offset" : $start_line;
+			push @{ $groups{$value} }, $index;
+			$obj_offset++;
+		}
+	}
+	return \%groups;
+}
+sub _decode_one {
+	my ($self, $string) = @_;
+	return (undef, 0, 0) unless $string =~ /^[\[\{]/;
+	if ($string =~ m/^($LINES)/) {
+		my $json_str = $1;
+		my $chars_consumed = length($json_str);
+		my $struct = eval { $JSON->decode($json_str) };
+		if ($@) {
+			return (undef, $chars_consumed, 1);
+		}
+		$self->{success_cb}->('decode', $struct, $json_str) if $self->{success_cb};
+		return ($struct, $chars_consumed, 1);
+	}
+	return (undef, 0, 0);
+}
 sub _decode_line {
 	my ($self, $line) = @_;
 	my $struct = eval { $JSON->decode($line) };
@@ -171,7 +316,6 @@ sub _decode_line {
 	return $self->{success_cb}->('decode', $struct, $line) if $self->{success_cb};
 	return $struct;
 }
-
 sub _parse_headers {
 	my ($self, @data) = @_;
 	my @headers = @{ $self->{headers} };
@@ -196,13 +340,12 @@ sub _parse_headers {
 					$d->{$_}
 				} @headers
 			];
-	} 
+	}
 	return (
 		\@headers,
 		@body
 	);
 }
-
 sub _deparse_headers {
 	my ($self, @data) = @_;
 	return @data unless ref $data[0] eq 'ARRAY';
@@ -220,7 +363,6 @@ sub _deparse_headers {
 	}
  	return @body;
 }
-
 1;
 
 __END__
@@ -233,13 +375,11 @@ JSON::Lines - Parse JSONLines with perl.
 
 =head1 VERSION
 
-Version 1.09
+Version 1.11
 
 =cut
 
 =head1 SYNOPSIS
-
-Quick summary of what the module does.
 
 	use JSON::Lines;
 
@@ -256,12 +396,12 @@ Quick summary of what the module does.
 	my $string = $jsonl->encode(@data);
 
 	my $file = $jsonl->encode_file('score.jsonl', @data);
-	
+
 	# ["Name", "Session", "Score", "Completed"]
 	# ["Gilbert", "2013", 24, true]
 	# ["Alexa", "2013", 29, true]
 	# ["May", "2012B", 14, false]
-	# ["Deloise", "2012A", 19, true]  
+	# ["Deloise", "2012A", 19, true]
 
 	...
 
@@ -283,25 +423,25 @@ Quick summary of what the module does.
 
 	my $data = [
 		{
-			"name" => "Gilbert", 
+			"name" => "Gilbert",
 			"wins" => [
-				["straight", "7♣"], 
+				["straight", "7♣"],
 				["one pair", "10♥"]
 			]
 		},
 		{
-			"name" => "Alexa", 
+			"name" => "Alexa",
 			"wins" => [
-				["two pair", "4♠"], 
+				["two pair", "4♠"],
 				["two pair", "9♠"]
 			]
 		},
 		{
-			"name" => "May", 
+			"name" => "May",
 			"wins" => []
 		},
 		{
-			"name" => "Deloise", 
+			"name" => "Deloise",
 			"wins" => [
 				["three of a kind", "5♣"]
 			]
@@ -315,7 +455,7 @@ Quick summary of what the module does.
 	# {"name": "May", "wins": []}
 	# {"name": "Deloise", "wins": [["three of a kind", "5♣"]]}
 
-	
+
 =head1 DESCRIPTION
 
 JSON Lines is a convenient format for storing structured data that may be processed one record at a time. It works well with unix-style text processing tools and shell pipelines. It's a great format for log files. It's also a flexible format for passing messages between cooperating processes.
@@ -369,6 +509,18 @@ Pretty print.
 
 Parse the first line of the stream as headers.
 
+All of the above options can also be get/set dynamically via accessor methods:
+
+	# Get current value
+	my $is_pretty = $jsonl->pretty;
+
+	# Set value (returns $self for chaining)
+	$jsonl->pretty(1)->canonical(1);
+
+	# Set callbacks
+	$jsonl->error_cb(sub { warn "Error: $_[1]" });
+	$jsonl->success_cb(sub { print "Processed: $_[1]" });
+
 =head2 encode
 
 Encode a perl struct into a json lines string.
@@ -383,15 +535,49 @@ Encode a perl struct into a json lines file.
 
 =head2 decode
 
-Decode a json lines string into a perl struct.
+Decode a json lines string into a perl struct. Handles multiple JSON objects
+per line (e.g., from streaming output that concatenates objects without newlines).
+The decoder is string-aware, correctly handling unbalanced braces within JSON
+string values (e.g., code snippets containing C<{> or C<}>).
 
 	$jsonl->decode( $string );
+
+	# Handles multiple objects on one line:
+	my @data = $jsonl->decode('{"a":1}{"b":2}');
+	# Returns: ({ a => 1 }, { b => 2 })
+
+	# Handles code in strings:
+	my @data = $jsonl->decode('{"code":"sub foo { }"}');
+	# Correctly parses as single object
+
+Supports chunked/streaming input - incomplete JSON is buffered and combined
+with subsequent calls. Use C<remaining()> to check buffer state and
+C<clear_buffer()> to reset.
 
 =head2 decode_file
 
 Decode a json lines file into a perl struct.
 
 	$jsonl->decode_file( $file );
+
+=head2 remaining
+
+Returns any incomplete JSON data buffered from previous decode() calls.
+Useful for debugging chunked input scenarios.
+
+	my $buffered = $jsonl->remaining;
+	if (length $buffered) {
+		warn "Incomplete JSON in buffer: $buffered";
+	}
+
+=head2 clear_buffer
+
+Clears the internal buffer used for chunked input. Call this to reset
+state between unrelated decode operations on the same instance.
+
+	$jsonl->clear_buffer;
+	# Fresh state for new input
+	my @data = $jsonl->decode($new_input);
 
 =head2 add_line
 
@@ -403,10 +589,13 @@ Add a new line to the current JSON::Lines stream.
 
 =head2 get_line
 
-Decode a json lines file, one line at a time.
+Decode a json lines file, one object at a time. If a line contains multiple
+JSON objects, they are buffered and returned one at a time on subsequent calls.
 
 	open my $fh, "<", $file or die "$file: $!";
-	my $line = $jsonl->get_line($fh);
+	while (my $obj = $jsonl->get_line($fh)) {
+		print $obj->{id}, "\n";
+	}
 	close $fh;
 
 =head2 get_lines
@@ -430,6 +619,39 @@ Get a subset of JSON lines, optionally pass a file to write to.
 	my $lines = $jsonl->get_subset($file, $offset, $length);
 
 	$jsonl->get_subset($file, $offset, $length, $out_file);
+
+=head2 get_line_at
+
+Get a single record at a specific index. Supports both plain line numbers and
+"line:offset" format for accessing multiple objects on the same line.
+
+	my $record = $jsonl->get_line_at($fh, 5, 1);      # line 5, seek to beginning first
+	my $record = $jsonl->get_line_at($fh, 5);         # line 5, no seek
+	my $record = $jsonl->get_line_at($fh, '2:1', 1);  # line 2, second object on that line
+
+Returns undef if the index is beyond the end of the file. Works with indices
+returned by group_lines (which may return "line:offset" format for multi-object lines).
+
+=head2 group_lines
+
+Group objects in a JSONL file by a key value, returning a hash of indices.
+For lines with multiple objects, indices use "line:offset" format (e.g., "0:1"
+for the second object on line 0). Single-object lines use plain integers.
+
+	open my $fh, '<', $file or die $!;
+	my $groups = $jsonl->group_lines($fh, 'category');
+	# Returns: { 'cat1' => [0, '2:0', '2:1'], 'cat2' => [1, '3:0'] }
+
+	# With a coderef for complex grouping:
+	my $groups = $jsonl->group_lines($fh, sub { $_->{nested}{key} });
+	close $fh;
+
+	# Use returned indices with get_line_at:
+	for my $idx (@{$groups->{cat1}}) {
+		my $obj = $jsonl->get_line_at($fh, $idx, !$first++);
+	}
+
+The returned indices are compatible with get_line_at.
 
 =head1 AUTHOR
 
@@ -472,4 +694,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-

@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Attribute;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011001';
+our $VERSION   = '0.011002';
 
 use parent 'Sub::Accessor::Small';
 
@@ -149,18 +149,6 @@ sub canonicalize_storage {
 	}
 	else {
 		Carp::croak("Unknown storage: " . $me->{storage});
-	}
-}
-
-# Fix upstream bug!
-sub canonicalize_builder : method {
-	my $me = shift;
-	my $name = $me->{slot};
-	if ( ref $me->{builder} eq 'CODE' ) {
-		my $code = $me->{builder};
-		my $subname = sprintf [ qw/ _build_%s _build_%s / ]->[ $name =~ /\A_/ ? 1 : 0 ], $name;
-		$me->install_coderef( $subname, $code );
-		$me->{builder} = $subname;
 	}
 }
 

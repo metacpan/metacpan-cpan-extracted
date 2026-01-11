@@ -76,7 +76,7 @@ static SV *fupg_exec(pTHX_ fupg_conn *c, const char *sql) {
     return ret;
 }
 
-static SV *fupg_q(pTHX_ fupg_conn *c, int stflags, const char *query, I32 ax, I32 argc) {
+static SV *fupg_sql(pTHX_ fupg_conn *c, int stflags, const char *query, I32 ax, I32 argc) {
     fupg_st *st = safecalloc(1, sizeof(fupg_st));
     st->conn = c;
     st->cookie = c->cookie;

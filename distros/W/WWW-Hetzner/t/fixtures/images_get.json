@@ -1,0 +1,13 @@
+{
+  "image": {
+    "id": 2,
+    "name": "debian-13",
+    "description": "Debian 13",
+    "type": "system",
+    "status": "available",
+    "os_flavor": "debian",
+    "os_version": "13",
+    "architecture": "x86",
+    "rapid_deploy": true
+  }
+}

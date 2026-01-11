@@ -1,0 +1,11 @@
+{
+  "firewall": {
+    "id": 400,
+    "name": "new-firewall",
+    "rules": [],
+    "applied_to": [],
+    "labels": {},
+    "created": "2024-06-01T12:00:00+00:00"
+  },
+  "actions": []
+}

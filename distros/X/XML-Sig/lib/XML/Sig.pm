@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package XML::Sig;
-our $VERSION = '0.68';
+our $VERSION = '0.69';
 
 use Encode;
 # ABSTRACT: XML::Sig - A toolkit to help sign and verify XML Digital Signatures
@@ -1684,7 +1684,7 @@ XML::Sig - XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
 =head1 VERSION
 
-version 0.68
+version 0.69
 
 =head1 SYNOPSIS
 
@@ -1726,9 +1726,9 @@ XML::Sig - A toolkit to help sign and verify XML Digital Signatures.
 
 =item * L<Crypt::OpenSSL::Bignum>
 
-=item * L<Crypt::OpenSSL::RSA>
+=item * L<Crypt::PK::RSA>
 
-=item * L<Crypt::OpenSSL::DSA>
+=item * L<Crypt::OpenSSL::DSA> (Optional - required for DSA signatures)
 
 =item * L<Crypt::PK::ECC>
 
@@ -2032,7 +2032,7 @@ Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Byrne Reese, Chris Andrews and Others; in detail:
+This software is copyright (c) 2026 by Byrne Reese, Chris Andrews and Others; in detail:
 
   Copyright 2009       Byrne, Michael Hendricks
             2010       Chris Andrews
@@ -2043,7 +2043,7 @@ This software is copyright (c) 2025 by Byrne Reese, Chris Andrews and Others; in
             2017       Mike Wisener, xmikew
             2019-2021  Timothy Legge
             2022-2023  Timothy Legge, Wesley Schwengle
-            2025       Timothy Legge
+            2025-2026  Timothy Legge
 
 
 This is free software; you can redistribute it and/or modify it under

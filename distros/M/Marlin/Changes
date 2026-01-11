@@ -6,6 +6,20 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.011002	2026-01-09
+
+ [ Bug Fixes ]
+ - Certain setup steps were not running correctly for roles.
+ - The before/after/around keywords exported to roles were ones only
+   suitable for classes; they have been replaced with ones which work for
+   roles.
+
+ [ Documentation ]
+ - Update benchmark script; compare some more simple classes too.
+
+ [ Packaging ]
+ - Require Sub::Accessor::Small 1.000003.
+
 0.011001	2026-01-08
 
  [ Bug Fixes ]

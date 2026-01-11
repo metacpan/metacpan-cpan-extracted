@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1,
-#        XDR::Gen version 0.0.5 and LibVirt version v11.10.0
+#        XDR::Gen version 1.0.0 and LibVirt version v11.10.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -12,7 +12,7 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::KeepAlive v11.10.2;
+package Protocol::Sys::Virt::KeepAlive v11.10.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
@@ -103,7 +103,7 @@ Protocol::Sys::Virt::KeepAlive - Check transport link availability
 
 =head1 VERSION
 
-v11.10.2
+v11.10.3
 
 Based on LibVirt tag v11.10.0
 

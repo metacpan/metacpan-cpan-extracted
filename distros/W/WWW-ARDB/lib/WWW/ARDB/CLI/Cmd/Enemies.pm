@@ -7,7 +7,8 @@ use Moo;
 use MooX::Cmd;
 use MooX::Options;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
+
 
 option search => (
     is      => 'ro',
@@ -15,6 +16,7 @@ option search => (
     format  => 's',
     doc     => 'Search enemies by name',
 );
+
 
 sub execute {
     my ($self, $args, $chain) = @_;
@@ -64,21 +66,39 @@ WWW::ARDB::CLI::Cmd::Enemies - List ARC enemies command
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=head1 SYNOPSIS
+
+    ardb enemies
+    ardb enemies --search wasp
+
+=head1 DESCRIPTION
+
+CLI command to list all ARC enemies from the ARC Raiders Database with optional
+filtering by name.
+
+=head2 search
+
+    ardb enemies --search wasp
+    ardb enemies -s drone
+
+Case-insensitive substring search for enemies by name.
 
 =head1 SUPPORT
 
-=head2 Source Code
+=head2 Issues
 
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-ardb/issues>.
 
-L<https://github.com/Getty/p5-www-ardb>
+=head2 IRC
 
-  git clone https://github.com/Getty/p5-www-ardb.git
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 

@@ -1,7 +1,8 @@
+use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.059
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
@@ -37,7 +38,7 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'}.$str.q{'} }
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
             $^X, @switches, '-e', "require q[$lib]"))
         if $ENV{PERL_COMPILE_TEST_DEBUG};
 
@@ -62,15 +63,15 @@ foreach my $file (@scripts)
     open my $fh, '<', $file or warn("Unable to open $file: $!"), next;
     my $line = <$fh>;
 
-    close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*(?:env )?perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
+    close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
     @switches = (@switches, split(' ', $1)) if $1;
 
     close $fh and skip("$file uses -T; not testable with PERL5LIB", 1)
-        if grep $_ eq '-T', @switches and $ENV{PERL5LIB};
+        if grep { $_ eq '-T' } @switches and $ENV{PERL5LIB};
 
     my $stderr = IO::Handle->new;
 
-    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'}.$str.q{'} }
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
             $^X, @switches, '-c', $file))
         if $ENV{PERL_COMPILE_TEST_DEBUG};
 
@@ -84,7 +85,7 @@ foreach my $file (@scripts)
         and not eval { +require blib; blib->VERSION('1.01') };
 
     # in older perls, -c output is simply the file portion of the path being tested
-    if (@_warnings = grep !/\bsyntax OK$/,
+    if (@_warnings = grep { !/\bsyntax OK$/ }
         grep { chomp; $_ ne (File::Spec->splitpath($file))[2] } @_warnings)
     {
         warn @_warnings;
@@ -94,6 +95,7 @@ foreach my $file (@scripts)
 
 
 
-is(scalar(@warnings), 0, 'no warnings found') or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) );
+is(scalar(@warnings), 0, 'no warnings found')
+    or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) );
 
 

@@ -2,6 +2,7 @@ package Sim::OPT::Morph;
 # This is the module Sim::OPT::Morph of Sim::OPT, distributed under a dual licence, open-source (GPL v3) and proprietary.
 # Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
+our $morph = bless( {}, "Sim::OPT::Morph" );
 
 use Exporter;
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
@@ -1008,7 +1009,7 @@ sub setpickedinsts
         my @addinsts;
 
         my $missing = $origin;
-        my ( $box_ref, $countvrs_ref, $countsteps_ref  ) = Sim::OPT::getnear( $missing, \%mids, $countcase );
+        my ( $box_ref, $countvrs_ref, $countsteps_ref  ) = $opt->getnear( $missing, \%mids, $countcase );
         my @addinsts = @{ $box_ref };
         my @countvrs = @{ $countvrs_ref };
         my @countsteps = @{ $countsteps_ref };
@@ -1021,14 +1022,14 @@ sub setpickedinsts
                 my $countvar = $countvrs[$cn];
                 my $countstep = $countsteps[$cn];
                 $is = $addinst;
-                my %to = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $is, \%carrier, $file, \@blockelts, $mypath ) };
+                my %to = %{ $opt->extractcase( \%inst, \%dowhat, $is, \%carrier, $file, \@blockelts, $mypath ) };
 
                 my ( %orig, @whatto );
 
                 if ( $cn == 0 )
                 {
-                    $origin = Sim::OPT::giveback ( \%mids );
-                    %orig = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
+                    $origin = $opt->giveback ( \%mids );
+                    %orig = %{ $opt->extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
 
                     push ( @whatto, "begin" );
                 }
@@ -1037,13 +1038,13 @@ sub setpickedinsts
                 {
                     push ( @whatto, "transition" );
                     $origin = $addinsts[$cn-1];
-                    %orig = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
+                    %orig = %{ $opt->extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
                 }
 
                 if ( $cn == $#addinsts )
                 {
                     push ( @whatto, "end" );
-                    %orig = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
+                    %orig = %{ $opt->extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
                 }
 
                 my %i = %{ $inst_ref };
@@ -1057,13 +1058,13 @@ sub setpickedinsts
                 my ( $crypto, $cryptor );
                 if ( $dowhat{names} eq "short" )
                 { 
-                  $crypto = Sim::OPT::encrypt1( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
-                  $cryptor = Sim::OPT::encrypt1( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
+                  $crypto = $opt->encrypt1( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
+                  $cryptor = $opt->encrypt1( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
                 }
                 elsif ( $dowhat{names} eq "medium" )
                 { 
-                  $crypto = Sim::OPT::encrypt0( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
-                  $cryptor = Sim::OPT::encrypt0( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
+                  $crypto = $opt->encrypt0( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
+                  $cryptor = $opt->encrypt0( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
                 }
 
                 $to{to} = "$mypath/$file" . "_" . "$is";  say RELATE "A in setpickinst \$to{to} " .dump ( $to{to} );
@@ -1115,7 +1116,7 @@ sub setpickedinsts
     @instances = @newinstances; # REASSIGNMENT!!!!!!
     #say  "GOING TO GIVE INSTANCES: " .dump( @instances );
     #say  "AND HAD INST: " .dump( \%inst );
-    my (  $newinstnames_r, $newinst_r ) = Sim::OPT::filterinsts_winsts( \@instances, \%inst );
+    my (  $newinstnames_r, $newinst_r ) = $opt->filterinsts_winsts( \@instances, \%inst );
     %inst = %{ $newinst_r }; # REASSIGNMENT!!!!!!
     my @newinstnames = @{ $newinstnames_r };
     push( @{ $dirfiles{dones} }, @newinstnames );
@@ -1424,9 +1425,9 @@ sub morph
         
         my $laxmode = "n";
         my ( @countvars, @countsteps );
-        if ( Sim::OPT::checkOPTcue() )
+        if ( $opt->checkOPTcue() )
         {
-          my ( $countvars_r, $countsteps_r, $laxmod ) = Sim::OPTcue::relax ( $countvar, $countstep );
+          my ( $countvars_r, $countsteps_r, $laxmod ) = $optcue->relax ( $countvar, $countstep );
           @countvars = @$countvars_r;
           @countsteps = @$countsteps_r;
           $laxmode = $laxmod;
@@ -1456,7 +1457,7 @@ sub morph
 
 		my %varnums = %{ $d{varnums} };
 		my %mids = %{ $d{mids} };
-		my $rootname = Sim::OPT::getrootname( \@rootnames, $countcase );
+		my $rootname = $opt->getrootname( \@rootnames, $countcase );
 
 		my $varnumber = $countvar;
 		my $stepsvar = $varnums{$countvar};
@@ -1475,7 +1476,7 @@ sub morph
 		{
             #say  "IN MORPH FOREACH \$countvar: " . dump( $countvar ); say  " \$cntv: " . dump( $cntv );
 
-            if ( Sim::OPT::checkOPTcue() )
+            if ( $opt->checkOPTcue() )
             {
                $countstep = checkstep( $laxmode, $countstep, $cntv );
             }
@@ -1559,7 +1560,7 @@ sub morph
                 #my $target = $to{crypto};
                 #my $orig = $orig{crypto};
 
-                my $starttarget = Sim::OPT::giveback( \%mids );  #say  "STARTTARGET $starttarget";
+                my $starttarget = $opt->giveback( \%mids );  #say  "STARTTARGET $starttarget";
 				my $semph = 0;
 				unless ( ( $exeonfiles eq "n" ) or ( $semph > 0 ) )
 				{
@@ -1882,9 +1883,9 @@ sub morph
 										}
 										elsif ( $modtype eq "genmodnew" )
 										{
-                                            if ( Sim::OPT::checkOPTcue() )
+                                            if ( $opt->checkOPTcue() )
                                             {
-                                              ( $unsuited ) = Sim::OPTcue::genmodnew( $to, $stepsvar, $countop, $countstep, 
+                                              ( $unsuited ) = $opt->genmodnew( $to, $stepsvar, $countop, $countstep, 
                                                 \@applytype, \@genmodnew, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, 
                                                 $countinstance, \%dirfiles, $laxmode, \@blockelts, \%varnums, \%mids, $countp, \@{ $dirfiles{rebomb} }, \@instances,  );
                                                 @instances = @$instances_r;
@@ -2134,7 +2135,7 @@ sub morph
 												my $countvar = $d{countvar};
 												my $countstep = $d{countstep};
 
-												my $stepsvar = Sim::OPT::getstepsvar( $countvar, $countcase, \@varinumbers );
+												my $stepsvar = $opt->getstepsvar( $countvar, $countcase, \@varinumbers );
 
 												foreach my $todo ( @todolist )
 												{

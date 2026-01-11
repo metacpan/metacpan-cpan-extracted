@@ -10,9 +10,16 @@ my $xml = '<?xml version="1.0"?>'."\n".'<foo ID="XML-SIG_1">'."\n".'    <bar>123
 my $sig = XML::Sig->new( { key => 't/rsa.private.key', cert => 't/rsa.cert.pem' } );
 my $signed = $sig->sign($xml);
 ok($signed, "XML is signed");
-my $sig2 = XML::Sig->new( { key => 't/dsa.private.key' } );
-my $result = $sig2->verify($signed);
-ok($result, "XML verified" );
+
+SKIP: {
+    eval {
+        require Crypt::OpenSSL::DSA;
+    };
+    skip "Crypt::OpenSSL::DSA is not installed", 1 if ($@);
+    my $sig2 = XML::Sig->new( { key => 't/dsa.private.key' } );
+    my $result = $sig2->verify($signed);
+    ok($result, "XML verified with DSA key" );
+}
 
 SKIP: {
 

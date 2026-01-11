@@ -6,14 +6,14 @@ Module::Starter::App - the code behind the command line program
 
 =head1 VERSION
 
-version 1.80
+version 1.82
 
 =cut
 
 use warnings;
 use strict;
 
-our $VERSION = '1.80';
+our $VERSION = '1.82';
 
 use File::Spec;
 use Getopt::Long;
@@ -64,24 +64,26 @@ sub _config_multi_process {
 
             # Split author strings on whitespace or comma.
             # Spec: 'Author Name <author-email@domain.tld>'
-            $config{$key} = [
-                split /
-                    \b
-                    (?>
+            my @authors;
+            while ($config{$key} =~ s/
+                    ^\s*
+                    ((?>
                         (?:           # Author
                             [^\s<>]+
                             \s+
                         )+
                     )
-                    <[^<>]+>          # Email
-                    \K
+                    <[^<>]+>)         # Email
                     (?:               # Separators (or end of string)
                         \s*,\s*
                         | \s+
                         | \z
                     )
-                /x, $config{$key}
-            ];
+                //x) {
+                push @authors, $1;
+            }
+            push @authors, $config{$key} if length $config{$key};
+            $config{$key} = \@authors;
         }
         else {
             $config{$key} = [ split /(?:\s*,\s*|\s+)/, (ref $config{$key} ? join(',', @{$config{$key}}) : $config{$key}) ] if $config{$key};
@@ -111,6 +113,7 @@ sub _process_command_line {
         mi           => sub { push @{$config{builder}}, 'Module::Install' },
 
         'author=s@'  => \@{ $config{author} },
+        'email=s'    => \$config{email},
         'github=s'   => \$config{github},
         'license=s'  => \$config{license},
         genlicense   => \$config{genlicense},

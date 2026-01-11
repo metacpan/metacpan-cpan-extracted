@@ -2,6 +2,7 @@ package Sim::OPT::Sim;
 # This is the module Sim::OPT::Sim of Sim::OPT, distributed under a dual licence, open-source (GPL v3) and proprietary.
 # Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
+our $sim = bless( {}, "Sim::OPT::Sim" );
 
 use Exporter;
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
@@ -162,7 +163,7 @@ sub sim
   my @allinstances = @instances ;
   push( @allinstances, @precedents );
 
-  @allinstances = Sim::OPT::cleanbag( @allinstances );
+  @allinstances = $opt->cleanbag( @allinstances );
 
   #my $csim = 0;
   my @container;
@@ -304,7 +305,7 @@ sub sim
                     say  "IN SIM, FOR INSOLATION  \$dowhat{shadeupdate} $dowhat{shadeupdate}";
                     if ( $dowhat{shadeupdate} eq "y" )
                     {
-                      my $done = Sim::OPT::Morph::recalculateish( $is, $stepsvar, $countop, 
+                      my $done = $morph->recalculateish( $is, $stepsvar, $countop, 
                           $countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, 
                           \@menus, $countinstance, \%dowhat );
                     }
@@ -594,7 +595,7 @@ XXX
       {
         unless ( ( $postproc eq "y") )
         {
-          my ( $dirfiles_r ) = Sim::OPT::Report::newretrieve(
+          my ( $dirfiles_r ) = $reeport->newretrieve(
           {
             instance => $instance, dirfiles => \%dirfiles,
             resfile => $resfile, flfile => $flfile,
@@ -608,7 +609,7 @@ XXX
       my $dirfiles_r;
       if ( $dowhat{newreport} eq "y" )
       {
-        ( $dirfiles_r, $instant ) = Sim::OPT::Report::newreport(
+        ( $dirfiles_r, $instant ) = $report->newreport(
         {
           instance => $instance, dirfiles => \%dirfiles,
           resfile => $resfile, flfile => $flfile,
@@ -655,7 +656,7 @@ XXX
 
   if ( not ( $pierce eq "y" ) )
   {
-    $expected_r = Sim::OPT::enumerate( \%varnums, \@blockelts, $from ); say  "IN POSTSIM \@blockelts " . dump( @blockelts ) . " \$expected_r " . dump( $expected_r );
+    $expected_r = $opt->enumerate( \%varnums, \@blockelts, $from ); say  "IN POSTSIM \@blockelts " . dump( @blockelts ) . " \$expected_r " . dump( $expected_r );
     #say  "IN POSTSIM  \$from $from  \$expected_r  " . dump( $expected_r ) . " \%varnums " . dump( \%varnums ) . "\@blockelts " . dump( @blockelts );
 
 
@@ -669,7 +670,7 @@ XXX
       chomp $ln;
       next if $ln =~ /^\s*$/;
 
-      my $rid = Sim::OPT::instid( $ln, $file ); #say  "IN POSTSIM \$file $file \$ln $ln \$countblock $countblock \$rid " . dump( $rid );# NOT $repfile
+      my $rid = $opt->instid( $ln, $file ); #say  "IN POSTSIM \$file $file \$ln $ln \$countblock $countblock \$rid " . dump( $rid );# NOT $repfile
       if ( defined($rid) and $rid ne "" )
       {
         push( @newbowl , $ln );
@@ -752,7 +753,7 @@ XXX
         my @elts = split(/,/, $line); 
         my $touse = $elts[0];
 
-        $touse = Sim::OPT::clean( $touse, $mypath, $file );
+        $touse = $opt->clean( $touse, $mypath, $file );
 
         if ( ( ( $dowhat{names} eq "short" ) or ( $dowhat{names} eq "medium" ) ) and ( $touse =~ /^\d+$/ ) )
         {
@@ -856,7 +857,7 @@ XXX
       my $countcn = 0;
       foreach my $elt ( @elts )
       {
-        if ( Sim::OPT::Descend::odd( $countel ) )
+        if ( $descend->odd( $countel ) )
         {
           push ( @{ $containerone[ $countcol ] }, $elt );
           $countcol++;
@@ -1036,7 +1037,7 @@ XXX
   {
     foreach my $line ( @weightbag )
     {
-      my $rid = Sim::OPT::instid( $line, $file ); ## !!!! THIS IS THE INSTANCE ID
+      my $rid = $opt->instid( $line, $file ); ## !!!! THIS IS THE INSTANCE ID
       if ( defined($rid) and $rid ne "" )
       {
         $dirfiles{realreps}{$rid} = $line;

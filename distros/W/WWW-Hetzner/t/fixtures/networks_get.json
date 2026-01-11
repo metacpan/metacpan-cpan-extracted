@@ -1,0 +1,31 @@
+{
+  "network": {
+    "id": 100,
+    "name": "my-network",
+    "ip_range": "10.0.0.0/8",
+    "subnets": [
+      {
+        "ip_range": "10.0.1.0/24",
+        "network_zone": "eu-central",
+        "type": "cloud",
+        "gateway": "10.0.0.1"
+      }
+    ],
+    "routes": [
+      {
+        "destination": "10.100.1.0/24",
+        "gateway": "10.0.0.1"
+      }
+    ],
+    "servers": [123, 456],
+    "labels": {
+      "env": "prod"
+    },
+    "protection": {
+      "delete": false
+    },
+    "created": "2024-01-15T10:00:00+00:00",
+    "load_balancers": [],
+    "expose_routes_to_vswitch": false
+  }
+}

@@ -1,0 +1,81 @@
+#!/usr/bin/env perl
+# PODNAME: picnic-nl
+# ABSTRACT: Dutch Picnic CLI (wrapper for picnic with PICNIC_LANG=nl and PICNIC_COUNTRY=nl)
+
+use strict;
+use warnings;
+use FindBin;
+
+$ENV{PICNIC_LANG}    //= 'nl';
+$ENV{PICNIC_COUNTRY} //= 'nl';
+
+exec("$FindBin::Bin/picnic", @ARGV) or die "Cannot exec picnic: $!\n";
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+picnic-nl - Dutch Picnic CLI (wrapper for picnic with PICNIC_LANG=nl and PICNIC_COUNTRY=nl)
+
+=head1 VERSION
+
+version 0.100
+
+=head1 SYNOPSIS
+
+    picnic-nl [options] <command> [arguments]
+
+    picnic-nl slots           # Beschikbare bezorgmomenten
+    picnic-nl search appel    # Zoeken naar producten
+    picnic-nl add s1234567    # Product toevoegen
+
+=head1 DESCRIPTION
+
+This is a convenience wrapper for the C<picnic> command that sets
+C<PICNIC_LANG=nl> and C<PICNIC_COUNTRY=nl> by default.
+
+All options and commands are passed through to C<picnic>.
+See L<picnic> for full documentation.
+
+=head1 ENVIRONMENT VARIABLES
+
+    PICNIC_USER     Your Picnic account email
+    PICNIC_PASS     Your Picnic account password
+    PICNIC_COUNTRY  Country code (default: nl)
+    PICNIC_LANG     Language (default: nl)
+
+=head1 SEE ALSO
+
+L<picnic>, L<picnic-de>, L<WWW::Picnic>
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-picnic/issues>.
+
+=head2 IRC
+
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

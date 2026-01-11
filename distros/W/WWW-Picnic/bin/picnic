@@ -1,0 +1,722 @@
+#!/usr/bin/env perl
+# PODNAME: picnic
+# ABSTRACT: Command-line interface for Picnic Supermarket API
+
+use strict;
+use warnings;
+use utf8;
+use open ':std', ':encoding(UTF-8)';
+use WWW::Picnic;
+use Getopt::Long;
+use JSON::MaybeXS;
+use Pod::Usage;
+
+my $json = JSON::MaybeXS->new(pretty => 1, canonical => 1);
+
+use POSIX qw(strftime mktime);
+use Time::Local qw(timegm);
+
+my %I18N = (
+  en => {
+    weekdays => [qw(Sun Mon Tue Wed Thu Fri Sat)],
+    available_slots => "Available delivery slots",
+    search_results => "Search results for",
+    found => "Found",
+    added => "Added",
+    to_cart => "to cart",
+    cart_items => "Cart items",
+    multiple_found => "Multiple products found for",
+    no_product => "No product found for",
+    specify_name_or_id => "Please specify a more precise name or ID.",
+  },
+  de => {
+    weekdays => [qw(So Mo Di Mi Do Fr Sa)],
+    available_slots => "Verfügbare Lieferslots",
+    search_results => "Suchergebnisse für",
+    found => "Gefunden",
+    added => "Hinzugefügt",
+    to_cart => "in Warenkorb",
+    cart_items => "Warenkorb",
+    multiple_found => "Mehrere Produkte gefunden für",
+    no_product => "Kein Produkt gefunden für",
+    specify_name_or_id => "Bitte genaueren Namen oder ID angeben.",
+  },
+  nl => {
+    weekdays => [qw(zo ma di wo do vr za)],
+    available_slots => "Beschikbare bezorgmomenten",
+    search_results => "Zoekresultaten voor",
+    found => "Gevonden",
+    added => "Toegevoegd",
+    to_cart => "aan winkelwagen",
+    cart_items => "Winkelwagen",
+    multiple_found => "Meerdere producten gevonden voor",
+    no_product => "Geen product gevonden voor",
+    specify_name_or_id => "Geef een preciezere naam of ID op.",
+  },
+);
+
+my $lang = $ENV{PICNIC_LANG} // 'en';
+sub t { $I18N{$lang}{$_[0]} // $I18N{en}{$_[0]} // $_[0] }
+sub weekday { t('weekdays')->[$_[0]] }
+
+# UTF-8 aware string padding (with json->utf8 all strings are character strings)
+sub pad_right {
+  my ($str, $width) = @_;
+  $str //= '';
+  my $padding = $width - length($str);
+  $padding = 0 if $padding < 0;
+  return $str . (' ' x $padding);
+}
+
+sub pad_left {
+  my ($str, $width) = @_;
+  $str //= '';
+  my $padding = $width - length($str);
+  $padding = 0 if $padding < 0;
+  return (' ' x $padding) . $str;
+}
+
+# Parse ISO8601 and return epoch + components
+sub parse_iso8601 {
+  my ($iso_time) = @_;
+  return unless $iso_time;
+
+  if ($iso_time =~ /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/) {
+    my ($y, $m, $d, $h, $min, $s) = ($1, $2, $3, $4, $5, $6);
+    my $epoch = timegm($s, $min, $h, $d, $m - 1, $y);
+    # Convert to local time (CET/CEST)
+    if ($iso_time =~ /Z$/) {
+      $epoch += 3600;  # UTC -> CET (+1h, simplified)
+    }
+    return ($epoch, $y, $m, $d, $h, $min);
+  }
+  return;
+}
+
+sub format_time_only {
+  my ($iso_time) = @_;
+  my ($epoch) = parse_iso8601($iso_time);
+  return 'N/A' unless $epoch;
+  return strftime("%H:%M", localtime($epoch));
+}
+
+sub format_weekday_date {
+  my ($iso_time) = @_;
+  my ($epoch) = parse_iso8601($iso_time);
+  return ('N/A', 'N/A') unless $epoch;
+  my @t = localtime($epoch);
+  my $wday = weekday($t[6]);
+  my $date = strftime("%d.%m.", localtime($epoch));
+  return ($wday, $date);
+}
+
+# ENV variables (standard)
+my $user    = $ENV{PICNIC_USER};
+my $pass    = $ENV{PICNIC_PASS};
+my $country = $ENV{PICNIC_COUNTRY} // 'de';
+
+# Command-line options override ENV
+my $help    = 0;
+my $raw     = 0;
+
+GetOptions(
+  'user|u=s'    => \$user,
+  'pass|p=s'    => \$pass,
+  'country|c=s' => \$country,
+  'raw|r'       => \$raw,
+  'help|h'      => \$help,
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+
+my $command = shift @ARGV;
+pod2usage("No command specified") unless $command;
+
+unless ($user && $pass) {
+  die "Error: PICNIC_USER and PICNIC_PASS environment variables required\n"
+    . "       Or use --user and --pass options\n";
+}
+
+my $picnic = WWW::Picnic->new(
+  user    => $user,
+  pass    => $pass,
+  country => $country,
+);
+
+# Handle login with 2FA support
+sub do_login {
+  my $login = $picnic->login;
+  if ($login->requires_2fa) {
+    print STDERR "2FA required. Requesting SMS code...\n";
+    $picnic->generate_2fa_code;
+    print STDERR "Enter the SMS code: ";
+    my $code = <STDIN>;
+    chomp $code;
+    $picnic->verify_2fa_code($code);
+    print STDERR "2FA verified successfully!\n";
+  }
+  return $login;
+}
+
+sub output {
+  my ($result) = @_;
+  if ($raw && $result->can('raw')) {
+    print $json->encode($result->raw);
+  } elsif (ref $result eq 'HASH' || ref $result eq 'ARRAY') {
+    print $json->encode($result);
+  } elsif ($result->can('raw')) {
+    print $json->encode($result->raw);
+  } else {
+    print $json->encode($result);
+  }
+}
+
+my %commands = (
+  login => sub {
+    my $login = do_login();
+    print "Logged in successfully!\n";
+    print "User ID: ", $login->user_id // 'N/A', "\n";
+    print "Authenticated: ", $login->is_authenticated ? "yes" : "no", "\n";
+  },
+
+  user => sub {
+    do_login();
+    my $user = $picnic->get_user;
+    if ($raw) {
+      output($user);
+    } else {
+      print "Name: ", $user->firstname // '', " ", $user->lastname // '', "\n";
+      print "Email: ", $user->contact_email // '', "\n";
+      print "Phone: ", $user->phone // '', "\n";
+      print "Type: ", $user->customer_type // '', "\n";
+      if (my $addr = $user->address) {
+        print "Address: ", $addr->{street} // '', " ", $addr->{house_number} // '', "\n";
+        print "         ", $addr->{postcode} // '', " ", $addr->{city} // '', "\n";
+      }
+    }
+  },
+
+  cart => sub {
+    do_login();
+    my $cart = $picnic->get_cart;
+    if ($raw) {
+      output($cart);
+    } else {
+      print "Cart ID: ", $cart->id // '', "\n";
+      print "Items: ", $cart->total_count, "\n";
+      print "Total: ", sprintf("%.2f", ($cart->total_price // 0) / 100), " EUR\n";
+      if (@{$cart->items}) {
+        print "\nItems:\n";
+        for my $item (@{$cart->items}) {
+          my $name = $item->{name} // $item->{id} // 'Unknown';
+          my $count = $item->{count} // $item->{quantity} // 1;
+          print "  - $name (x$count)\n";
+        }
+      }
+    }
+  },
+
+  'clear-cart' => sub {
+    do_login();
+    my $cart = $picnic->clear_cart;
+    print "Cart cleared. Items remaining: ", $cart->total_count, "\n";
+  },
+
+  slots => sub {
+    do_login();
+    my $slots = $picnic->get_delivery_slots;
+    if ($raw) {
+      output($slots);
+    } else {
+      my @available = $slots->available_slots;
+      print t('available_slots'), ": ", scalar(@available), "\n\n";
+
+      # Group by day, then by start time
+      my %by_day;
+      for my $slot (@available) {
+        my ($wday, $date) = format_weekday_date($slot->window_start);
+        my $day_key = $date;
+        my $start = format_time_only($slot->window_start);
+        my $end = format_time_only($slot->window_end);
+        my $start_hour = (parse_iso8601($slot->window_start))[4] // 0;
+
+        push @{$by_day{$day_key}{slots}}, {
+          slot       => $slot,
+          wday       => $wday,
+          date       => $date,
+          start      => $start,
+          end        => $end,
+          start_hour => $start_hour,
+        };
+        $by_day{$day_key}{wday} //= $wday;
+        $by_day{$day_key}{date} //= $date;
+      }
+
+      # Display each day with dynamic rows based on max end times
+      for my $day (sort keys %by_day) {
+        my $info = $by_day{$day};
+        my @day_slots = sort { $a->{start_hour} <=> $b->{start_hour} } @{$info->{slots}};
+
+        my $prefix = sprintf("  %s %s  ", $info->{wday}, $info->{date});
+        my $indent = " " x length($prefix);
+
+        # Group by start time
+        my %by_start;
+        my $max_ends = 0;
+        for my $s (@day_slots) {
+          push @{$by_start{$s->{start}}}, $s->{end};
+        }
+        for my $start (keys %by_start) {
+          my $count = scalar @{$by_start{$start}};
+          $max_ends = $count if $count > $max_ends;
+        }
+
+        # Collect unique start times sorted
+        my @starts = sort keys %by_start;
+
+        # Build rows dynamically
+        my @rows;
+        push @rows, \@starts;  # First row is starts
+        for my $i (0 .. $max_ends - 1) {
+          my @row;
+          for my $start (@starts) {
+            my @ends = sort @{$by_start{$start}};
+            push @row, $ends[$i] // "     ";
+          }
+          push @rows, \@row;
+        }
+
+        # Print all rows
+        for my $i (0 .. $#rows) {
+          if ($i == 0) {
+            print $prefix, join("  ", @{$rows[$i]}), "\n";
+          } else {
+            # Add visual indicator for end times
+            my @ends_with_dash = map { $_ eq "     " ? "     " : "-$_" } @{$rows[$i]};
+            print $indent, join(" ", @ends_with_dash), "\n";
+          }
+        }
+      }
+      print "\n";
+    }
+  },
+
+  search => sub {
+    my $term = shift @ARGV;
+    die "Usage: picnic search <term>\n" unless $term;
+    do_login();
+    my $results = $picnic->search($term);
+    if ($raw) {
+      output($results);
+    } else {
+      my @items = $results->all_items;
+      print t('search_results'), " '$term': ", scalar(@items), "\n\n";
+      for my $item (@items) {
+        my $price = $item->display_price // $item->price // 0;
+        my $price_str = sprintf("%.2f", $price / 100);
+        my $id = $item->id // '?';
+        print "  ", pad_right($id, 12), " ", pad_right($item->name // 'Unknown', 35), " ",
+              pad_left($price_str, 6), " EUR  ", ($item->unit_quantity // ''), "\n";
+      }
+      print "\n";
+    }
+  },
+
+  article => sub {
+    my $id = shift @ARGV;
+    die "Usage: picnic article <product_id>\n" unless $id;
+    do_login();
+    my $article = $picnic->get_article($id);
+    if ($raw) {
+      output($article);
+    } else {
+      print "Name: ", $article->name // 'Unknown', "\n";
+      print "Description: ", $article->description // 'N/A', "\n";
+      print "Price: ", sprintf("%.2f", ($article->price // 0) / 100), " EUR\n";
+      print "Unit: ", $article->unit_quantity // 'N/A', "\n";
+      print "Max order: ", $article->max_order_quantity // 'N/A', "\n";
+    }
+  },
+
+  add => sub {
+    my $id_or_name = shift @ARGV;
+    my $count = shift @ARGV // 1;
+    die "Usage: picnic add <product_id|name> [count]\n" unless $id_or_name;
+    do_login();
+
+    my $id = $id_or_name;
+
+    # If it doesn't look like an ID (s followed by digits), search for it
+    if ($id_or_name !~ /^s\d+$/) {
+      my $results = $picnic->search($id_or_name);
+      my @items = $results->all_items;
+
+      if (@items == 0) {
+        die t('no_product') . " '$id_or_name'\n";
+      }
+      elsif (@items == 1) {
+        $id = $items[0]->id;
+        print t('found'), ": ", $items[0]->name, " ($id)\n";
+      }
+      else {
+        # Check for exact name match
+        my @exact = grep { lc($_->name) eq lc($id_or_name) } @items;
+        if (@exact == 1) {
+          $id = $exact[0]->id;
+          print t('found'), ": ", $exact[0]->name, " ($id)\n";
+        }
+        else {
+          print STDERR t('multiple_found'), " '$id_or_name':\n\n";
+          for my $item (@items[0..($#items > 9 ? 9 : $#items)]) {
+            print STDERR "  ", pad_right($item->id, 12), " ", ($item->name // ''), "\n";
+          }
+          print STDERR "  ...\n" if @items > 10;
+          print STDERR "\n", t('specify_name_or_id'), "\n";
+          exit 1;
+        }
+      }
+    }
+
+    my $cart = $picnic->add_to_cart($id, $count);
+    print t('added'), ": ${count}x $id. ", t('cart_items'), ": ", $cart->total_count, "\n";
+  },
+
+  remove => sub {
+    my $id = shift @ARGV;
+    my $count = shift @ARGV // 1;
+    die "Usage: picnic remove <product_id> [count]\n" unless $id;
+    do_login();
+    my $cart = $picnic->remove_from_cart($id, $count);
+    print "Removed $count x $id from cart. Total items: ", $cart->total_count, "\n";
+  },
+
+  categories => sub {
+    my $depth = shift @ARGV // 0;
+    do_login();
+    my $cats = $picnic->get_categories($depth);
+    print $json->encode($cats);
+  },
+
+  suggest => sub {
+    my $term = shift @ARGV;
+    die "Usage: picnic suggest <term>\n" unless $term;
+    do_login();
+    my $suggestions = $picnic->get_suggestions($term);
+    print $json->encode($suggestions);
+  },
+);
+
+if (my $cmd = $commands{$command}) {
+  $cmd->();
+} else {
+  die "Unknown command: $command\n"
+    . "Available commands: " . join(", ", sort keys %commands) . "\n";
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+picnic - Command-line interface for Picnic Supermarket API
+
+=head1 VERSION
+
+version 0.100
+
+=head1 SYNOPSIS
+
+    picnic [options] <command> [arguments]
+
+    # Using environment variables (recommended)
+    export PICNIC_USER='your@email.com'
+    export PICNIC_PASS='yourpassword'
+    export PICNIC_COUNTRY='de'  # optional, defaults to 'de'
+    export PICNIC_LANG='en'     # optional, defaults to 'en'
+
+    picnic user              # Show user info
+    picnic cart              # Show shopping cart
+    picnic search haribo     # Search for products
+    picnic add s1234567 2    # Add 2 of product to cart
+    picnic add "Haribo Cola" # Add by product name
+    picnic slots             # Show delivery slots
+
+    # Or with command-line options
+    picnic --user your@email.com --pass secret user
+
+=head1 DESCRIPTION
+
+B<picnic> is a command-line interface for the Picnic supermarket delivery
+service API. It allows you to search for products, manage your shopping cart,
+view delivery slots, and more.
+
+Picnic operates in Germany (de) and the Netherlands (nl). Use the
+C<PICNIC_COUNTRY> environment variable or C<--country> option to select
+your region.
+
+For convenience, language-specific wrappers are available:
+
+=over 4
+
+=item * C<picnic-de> - German defaults (PICNIC_LANG=de, PICNIC_COUNTRY=de)
+
+=item * C<picnic-nl> - Dutch defaults (PICNIC_LANG=nl, PICNIC_COUNTRY=nl)
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-u>, B<--user> I<email>
+
+Picnic account email address. Can also be set via C<PICNIC_USER> environment
+variable.
+
+=item B<-p>, B<--pass> I<password>
+
+Picnic account password. Can also be set via C<PICNIC_PASS> environment
+variable.
+
+=item B<-c>, B<--country> I<code>
+
+Two-letter country code: C<de> (Germany) or C<nl> (Netherlands).
+Defaults to C<de>. Can also be set via C<PICNIC_COUNTRY> environment variable.
+
+=item B<-r>, B<--raw>
+
+Output raw JSON response instead of formatted text. Useful for scripting
+or debugging.
+
+=item B<-h>, B<--help>
+
+Show help message and exit.
+
+=back
+
+=head1 COMMANDS
+
+=head2 login
+
+    picnic login
+
+Test authentication with the Picnic API. If two-factor authentication is
+required, you will be prompted to enter the SMS code sent to your phone.
+
+=head2 user
+
+    picnic user
+
+Display your Picnic account information including name, email, phone number,
+and delivery address.
+
+=head2 cart
+
+    picnic cart
+
+Display the contents of your shopping cart, including items, quantities,
+and total price.
+
+=head2 clear-cart
+
+    picnic clear-cart
+
+Remove all items from your shopping cart.
+
+=head2 slots
+
+    picnic slots
+
+Display available delivery time slots. The output shows each day with
+available time windows. Multiple end times for the same start time indicate
+different slot durations (e.g., 1-hour vs 2-hour delivery windows).
+
+Example output:
+
+    Available delivery slots: 12
+
+      Mon 13.01.  12:00  15:40  21:10
+                  -13:00 -16:40 -22:10
+                  -13:50 -17:30 -23:00
+
+=head2 search I<term>
+
+    picnic search haribo
+    picnic search "organic milk"
+
+Search for products by name or keyword. Results show product ID, name,
+price, and quantity.
+
+=head2 article I<product_id>
+
+    picnic article s1234567
+
+Display detailed information about a specific product including description,
+price, unit quantity, and maximum order quantity.
+
+=head2 add I<product_id_or_name> [I<count>]
+
+    picnic add s1234567
+    picnic add s1234567 3
+    picnic add "Haribo Tropifrutti"
+    picnic add "Haribo Tropifrutti" 2
+
+Add a product to your shopping cart. You can specify either:
+
+=over 4
+
+=item * A product ID (e.g., C<s1234567>)
+
+=item * A product name (will search and add if exactly one match is found)
+
+=back
+
+If the product name matches multiple products, a list of matches will be
+shown and you'll need to be more specific or use the product ID.
+
+The optional I<count> parameter specifies the quantity (default: 1).
+
+=head2 remove I<product_id> [I<count>]
+
+    picnic remove s1234567
+    picnic remove s1234567 2
+
+Remove a product from your shopping cart. The optional I<count> parameter
+specifies how many to remove (default: 1).
+
+=head2 categories [I<depth>]
+
+    picnic categories
+    picnic categories 2
+
+List product categories. The optional I<depth> parameter controls how many
+levels of subcategories to include (default: 0). Output is raw JSON.
+
+=head2 suggest I<term>
+
+    picnic suggest har
+
+Get search suggestions for a partial search term. Useful for autocomplete
+functionality. Output is raw JSON.
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item B<PICNIC_USER>
+
+Your Picnic account email address. Required.
+
+=item B<PICNIC_PASS>
+
+Your Picnic account password. Required.
+
+=item B<PICNIC_COUNTRY>
+
+Country code: C<de> (Germany) or C<nl> (Netherlands). Default: C<de>.
+
+=item B<PICNIC_LANG>
+
+Output language: C<en> (English), C<de> (German), or C<nl> (Dutch).
+Default: C<en>.
+
+=back
+
+=head1 LOCALIZATION
+
+The CLI supports three languages:
+
+=over 4
+
+=item * B<English> (en) - Default
+
+=item * B<German> (de) - Set C<PICNIC_LANG=de>
+
+=item * B<Dutch> (nl) - Set C<PICNIC_LANG=nl>
+
+=back
+
+For convenience, use C<picnic-de> or C<picnic-nl> which set both the
+language and country automatically.
+
+=head1 TWO-FACTOR AUTHENTICATION
+
+If your Picnic account requires two-factor authentication, the CLI will
+automatically:
+
+=over 4
+
+=item 1. Detect that 2FA is required
+
+=item 2. Request an SMS code to be sent to your phone
+
+=item 3. Prompt you to enter the code
+
+=item 4. Complete authentication
+
+=back
+
+This happens automatically when you run any command that requires
+authentication.
+
+=head1 EXAMPLES
+
+    # Set up credentials
+    export PICNIC_USER='max@example.com'
+    export PICNIC_PASS='secret123'
+
+    # Search for products
+    picnic search "Bio Milch"
+
+    # Add product to cart by ID
+    picnic add s1021517
+
+    # Add product to cart by name
+    picnic add "Haribo Goldbären" 2
+
+    # View cart
+    picnic cart
+
+    # Check delivery slots
+    picnic slots
+
+    # Use German interface
+    PICNIC_LANG=de picnic slots
+
+    # Or use the German wrapper
+    picnic-de slots
+
+=head1 SEE ALSO
+
+L<picnic-de>, L<picnic-nl>, L<WWW::Picnic>
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-picnic/issues>.
+
+=head2 IRC
+
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -52,6 +52,7 @@ lib/WebDyne/Install.pm
 lib/WebDyne.pm
 lib/WebDyne.pm.md                        
 lib/WebDyne.pm.xml                       
+lib/WebDyne.pm.sha
 lib/WebDyne/Request/Fake.pm
 lib/WebDyne/Request/PSGI/Constant.pm
 lib/WebDyne/Request/PSGI.pm
@@ -1318,6 +1319,6 @@ t/json_handler_array.psp
 t/json_handler_boolean.psp               
 t/json_handler_hash.psp                  
 t/json_handler_scalar.psp                
+docker/app.psp                           
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
-ChangeLog                                Module ChangeLog (added by ExtUtils::Git)

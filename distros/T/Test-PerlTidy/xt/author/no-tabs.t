@@ -17,6 +17,8 @@ my @files = (
     't/list_files.t',
     't/messy_file.txt',
     't/perltidy.t',
+    't/test_files/cpanfile',
+    't/test_files/test_app.psgi',
     't/tidy_file.txt'
 );
 

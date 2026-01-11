@@ -1,0 +1,16 @@
+{
+  "zone": {
+    "id": "zone789012",
+    "name": "newdomain.com",
+    "ttl": 3600,
+    "labels": {},
+    "created": "2026-01-05T15:00:00+00:00",
+    "modified": "2026-01-05T15:00:00+00:00",
+    "ns": [
+      "hydrogen.ns.hetzner.com",
+      "oxygen.ns.hetzner.com",
+      "helium.ns.hetzner.de"
+    ],
+    "status": "pending"
+  }
+}

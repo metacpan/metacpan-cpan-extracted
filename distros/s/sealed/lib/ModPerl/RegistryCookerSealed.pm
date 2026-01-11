@@ -2,7 +2,7 @@ package ModPerl::RegistryCookerSealed;
 use strict;
 use warnings;
 use version;
-our $VERSION = qv(1.3.2);
+our $VERSION = qv(1.3.3);
 
 use Apache2::Const -compile => qw(:common &OPT_EXECCGI);
 use ModPerl::RegistryCooker;
@@ -48,14 +48,14 @@ sub convert_script_to_compiled_handler {
   my $eval = join '',
     'package ',
     $self->{PACKAGE}, ";",
-    "use sealed 'all';",
+    "use base 'sealed';",
     "sub handler {",
     "local \$0 = '$script_name';",
     $nph,
     $shebang,
     $line,
     ${ $self->{CODE} },
-    "\nsealed::all();\n}"; # last line comment without newline?
+    "}\nsealed::all();1;"; # last line comment without newline?
 
   $rc = $self->compile(\$eval);
   return $rc unless $rc == Apache2::Const::OK;

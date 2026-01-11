@@ -1,0 +1,20 @@
+$ORIGIN example.com.
+$TTL 3600
+
+@    IN    SOA    hydrogen.ns.hetzner.com. dns.hetzner.com. (
+                  2025010501    ; serial
+                  86400         ; refresh
+                  7200          ; retry
+                  3600000       ; expire
+                  3600          ; minimum
+                  )
+
+@    IN    NS    hydrogen.ns.hetzner.com.
+@    IN    NS    oxygen.ns.hetzner.com.
+@    IN    NS    helium.ns.hetzner.de.
+
+@    IN    A     203.0.113.10
+@    IN    AAAA  2001:db8::1
+www  IN    A     203.0.113.10
+@    IN    MX    10 mail.example.com.
+@    IN    TXT   "v=spf1 include:_spf.example.com ~all"

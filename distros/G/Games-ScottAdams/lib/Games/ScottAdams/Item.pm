@@ -1,4 +1,4 @@
-# $Id: Item.pm,v 1.1 2006/10/31 20:31:21 mike Exp $
+# $Id: Item.pm,v 1.1 2006-10-31 20:31:21 mike Exp $
 
 # Item.pm - an item in a Scott Adams game.
 

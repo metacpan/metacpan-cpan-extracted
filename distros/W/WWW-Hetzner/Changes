@@ -1,0 +1,39 @@
+Revision history for WWW-Hetzner
+
+0.002     2026-01-11 01:22:45Z
+    - Refactor POD to use inline PodWeaver commands (=attr, =method)
+    - Fix ABSTRACT/VERSION order for PodWeaver compatibility
+    - Adapt to new dzil plugin structure
+
+0.001     2026-01-10 01:50:52Z
+    - Initial release
+    - WWW::Hetzner::Cloud API client:
+      - Servers (list, get, create, delete, power_on, power_off, shutdown,
+        reboot, reset, rebuild, rescue, enable/disable_backup, attach_iso)
+      - SSH Keys (list, get, get_by_name, create, update, delete, ensure)
+      - Volumes (list, get, create, delete, attach, detach, resize)
+      - Networks (list, get, create, update, delete, add/delete_subnet, add/delete_route)
+      - Firewalls (list, get, create, update, delete, set_rules, apply_to/remove_from)
+      - Floating IPs (list, get, create, delete, assign, unassign)
+      - Primary IPs (list, get, create, delete, assign, unassign)
+      - Load Balancers (list, get, create, delete, add_target, add_service)
+      - Certificates (list, get, create, delete)
+      - Placement Groups (list, get, create, update, delete)
+      - Server Types, Images, Locations, Datacenters (list, get, get_by_name)
+      - DNS Zones (list, get, create, update, delete, export)
+      - DNS RRSets with convenience methods (add_a, add_aaaa, add_cname, add_mx, add_txt)
+    - WWW::Hetzner::Robot API client:
+      - Servers (list, get, update)
+      - SSH Keys (list, get, create, delete)
+      - IPs (list, get)
+      - Reset (software, hardware, manual)
+      - Wake-on-LAN
+      - Traffic statistics
+    - WWW::Hetzner::Role::HTTP for shared HTTP client logic
+    - Entity classes with real attributes and methods (update, delete, etc.)
+    - Log::Any integration for flexible logging
+    - CLI tools:
+      - bin/hcloud.pl - Cloud CLI with all resources and hyphenated subcommands
+      - bin/hrobot.pl - Robot CLI for dedicated servers
+    - Integration tests for real API testing (HETZNER_TEST_TOKEN)
+    - Note: Uses Cloud API for DNS (old dns.hetzner.com API no longer exists)

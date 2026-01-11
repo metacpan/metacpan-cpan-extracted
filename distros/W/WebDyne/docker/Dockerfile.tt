@@ -243,6 +243,7 @@ WORKDIR /app
 # Copy CPAN modules from builder + example file
 #
 COPY --from=builder ${PERL_CARTON_PATH} ${PERL_CARTON_PATH}
+COPY docker/app.psp .
 
 
 # Expose port (default 8080)

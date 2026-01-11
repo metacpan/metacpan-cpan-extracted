@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1,
-#        XDR::Gen version 0.0.5 and LibVirt version v11.10.0
+#        XDR::Gen version 1.0.0 and LibVirt version v11.10.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -13,7 +13,7 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::Transport v11.10.2;
+package Protocol::Sys::Virt::Transport v11.10.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
@@ -342,7 +342,7 @@ Protocol::Sys::Virt::Transport - Low level Libvirt connection protocol
 
 =head1 VERSION
 
-v11.10.2
+v11.10.3
 
 Based on LibVirt tag v11.10.0
 
@@ -499,13 +499,15 @@ data of the C<*_msg> structure associated with C<$hdr->{proc}>.
 
 =item * on_stream
 
-  my $rv = $on_stream->(header => $hdr, data => $data);
-  my $rv = $on_stream->(header => $hdr, hole => $hole);
-  my $rv = $on_stream->(header => $hdr, error => $err);
+  my $rv = $on_stream->(header => $hdr, data => $data, eof => $eof);
+  my $rv = $on_stream->(header => $hdr, hole => $hole, eof => $eof);
+  my $rv = $on_stream->(header => $hdr, error => $err, eof => $eof);
 
 Called for messages of type C<STREAM> or C<STREAM_HOLE>.  C<$data> is the raw
 stream data to be written to the stream.  C<$hole> is the deserialized stream
 hole structure.  C<$err> is the deserialized error structure.
+
+The end-of-stream is indicated by the C<$eof> boolean value.
 
 =back
 

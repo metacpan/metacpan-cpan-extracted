@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Util;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011001';
+our $VERSION   = '0.011002';
 
 use parent 'Exporter::Tiny';
 

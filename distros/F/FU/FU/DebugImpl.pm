@@ -1,5 +1,5 @@
 # Internal module used by FU.pm
-package FU::DebugImpl 1.3;
+package FU::DebugImpl 1.4;
 use v5.36;
 use utf8;
 use experimental 'for_list';
@@ -283,7 +283,7 @@ my @sections = (
 
     pgst => sub {
         return () if !$FU::DB;
-        my $lst = eval { $FU::DB->q(
+        my $lst = eval { $FU::DB->sql(
             'SELECT generic_plans + custom_plans, statement FROM pg_prepared_statements ORDER BY generic_plans + custom_plans DESC, statement'
         )->cache(0)->alla } || do { warn "Unable to collect prepared statement list: $@"; return () };
         return () if !@$lst;

@@ -369,7 +369,9 @@ Can also be configured via the C<user_agent> configuration field.
 
 =item B<--timeout>=I<fractional second>
 
-Specify the maximum number of seconds a transfer is allowed to take.
+Specify the maximum number of seconds a transfer is allowed to take. By default,
+the timeout is C<45> seconds. This option can be set to C<0> to disable the
+timeout.
 
 Can also be configured via the C<timeout> configuration field.
 
@@ -1306,7 +1308,7 @@ requests are welcome!
 
 =head1 COPYRIGHT
 
-Copyright (C) 2025 Samuel Young
+Copyright (C) 2025-2026 Samuel Young
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

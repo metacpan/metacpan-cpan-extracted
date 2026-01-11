@@ -927,7 +927,7 @@ sub _uniq {
 sub _key {
     my ($val) = @_;
     if (ref $val eq 'HASH') {
-        return join(",", sort map { "$_=$val->{$_}" } keys %$val);
+        return join(",", sort map { "$_=" . _key($val->{$_}) } keys %$val);
     } elsif (ref $val eq 'ARRAY') {
         return join(",", map { _key($_) } @$val);
     } else {
@@ -937,15 +937,47 @@ sub _key {
 
 sub _group_by {
     my ($array_ref, $path) = @_;
-    return {} unless ref $array_ref eq 'ARRAY';
+    die 'group_by(): input must be an array' unless ref $array_ref eq 'ARRAY';
 
-    my %groups;
+    my ($key_path, $use_entire_item) = _normalize_path_argument($path);
+
+    my @entries;
+    my $index = 0;
     for my $item (@$array_ref) {
-        my @keys = _traverse($item, $path);
-        my $key = defined $keys[0] ? "$keys[0]" : 'null';
-        push @{ $groups{$key} }, $item;
+        my $key_value;
+        if ($use_entire_item) {
+            $key_value = $item;
+        } else {
+            my @values = _traverse($item, $key_path);
+            $key_value = @values ? $values[0] : undef;
+        }
+
+        my $signature = defined $key_value ? _key($key_value) : "\0__JQ_LITE_UNDEF__";
+        push @entries, {
+            item      => $item,
+            signature => $signature,
+            index     => $index++,
+        };
     }
-    return \%groups;
+
+    my $cmp = _smart_cmp();
+    my @sorted = sort {
+        my $order = $cmp->($a->{signature}, $b->{signature});
+        $order = $a->{index} <=> $b->{index} if $order == 0;
+        $order;
+    } @entries;
+
+    my @groups;
+    my $current_signature;
+    for my $entry (@sorted) {
+        if (!defined $current_signature || $entry->{signature} ne $current_signature) {
+            push @groups, [];
+            $current_signature = $entry->{signature};
+        }
+        push @{ $groups[-1] }, $entry->{item};
+    }
+
+    return \@groups;
 }
 
 sub _flatten_all {
@@ -1048,7 +1080,7 @@ sub _apply_match {
         die "match(): invalid regular expression - $error";
     }
 
-    return _test_against_regex($value, $regex);
+    return _match_against_regex($value, $regex);
 }
 
 sub _test_against_regex {
@@ -1069,6 +1101,57 @@ sub _test_against_regex {
     return $value =~ $regex ? JSON::PP::true : JSON::PP::false;
 }
 
+sub _match_against_regex {
+    my ($value, $regex) = @_;
+
+    if (ref $value eq 'ARRAY') {
+        return [ map { _match_against_regex($_, $regex) } @$value ];
+    }
+
+    return undef if !defined $value;
+
+    if (ref($value) eq 'JSON::PP::Boolean') {
+        $value = $value ? 'true' : 'false';
+    }
+
+    return undef if ref $value;
+
+    my $text = "$value";
+    return undef unless $text =~ $regex;
+
+    my $offset = $-[0];
+    my $length = $+[0] - $-[0];
+    my $string = substr($text, $offset, $length);
+
+    my @captures;
+    my $capture_count = $#-;
+    for my $index (1 .. $capture_count) {
+        if (defined $-[$index] && $-[$index] >= 0) {
+            my $capture_offset = $-[$index];
+            my $capture_length = $+[$index] - $-[$index];
+            my $capture_string = substr($text, $capture_offset, $capture_length);
+            push @captures, {
+                offset => $capture_offset,
+                length => $capture_length,
+                string => $capture_string,
+            };
+        } else {
+            push @captures, {
+                offset => undef,
+                length => undef,
+                string => undef,
+            };
+        }
+    }
+
+    return {
+        offset   => $offset,
+        length   => $length,
+        string   => $string,
+        captures => \@captures,
+    };
+}
+
 sub _build_regex {
     my ($pattern, $flags) = @_;
 
@@ -1078,7 +1161,7 @@ sub _build_regex {
     my %allowed = map { $_ => 1 } qw(i m s x);
     my $modifiers = '';
     for my $flag (split //, $flags) {
-        next unless $allowed{$flag};
+        return (undef, "unknown regex flag '$flag'") unless $allowed{$flag};
         next if index($modifiers, $flag) >= 0;
         $modifiers .= $flag;
     }
@@ -1926,10 +2009,11 @@ sub _scalar_contains {
     my ($value, $needle) = @_;
 
     return 0 if !defined $value;
+    return 0 if !defined $needle;
 
     if (!ref $value || ref($value) eq 'JSON::PP::Boolean') {
         my $haystack = "$value";
-        my $fragment = defined $needle ? "$needle" : '';
+        my $fragment = "$needle";
         return index($haystack, $fragment) >= 0 ? 1 : 0;
     }
 

@@ -3,6 +3,30 @@ use experimental 'signatures';
 
 push @Local::Example::ALL, 'Local::Example::Plain';
 
+package Local::Example::Plain::Simple {
+	sub new {
+		my $class = shift;
+		my %args  = ( @_ == 1 and ref($_[0]) == 'HASH' ) ? %{+shift} : @_;
+		my $self  = bless {}, $class;
+		my $used  = 0;
+		if ( exists $args{foo} ) {
+			$self->{foo} = $args{foo};
+			$used++;
+		}
+		if ( exists $args{bar} ) {
+			$self->{bar} = $args{bar};
+			$used++;
+		}
+		delete $args{__no_BUILD__};
+		if ( keys(%args) > $used ) {
+			die "Extra arguments passed to new";
+		}
+		return $self;
+	}
+	sub foo { shift->{foo} }
+	sub bar { shift->{bar} }
+}
+
 package Local::Example::Plain::NamedThing {
 	use mro 'c3';
 	

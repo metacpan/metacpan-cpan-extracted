@@ -1,0 +1,43 @@
+{
+  "server_types": [
+    {
+      "id": 1,
+      "name": "cx11",
+      "description": "CX11",
+      "cores": 1,
+      "memory": 2,
+      "disk": 20,
+      "deprecated": true,
+      "prices": [],
+      "storage_type": "local",
+      "cpu_type": "shared",
+      "architecture": "x86"
+    },
+    {
+      "id": 22,
+      "name": "cx23",
+      "description": "CX23",
+      "cores": 2,
+      "memory": 4,
+      "disk": 40,
+      "deprecated": false,
+      "prices": [],
+      "storage_type": "local",
+      "cpu_type": "shared",
+      "architecture": "x86"
+    },
+    {
+      "id": 33,
+      "name": "cx33",
+      "description": "CX33",
+      "cores": 4,
+      "memory": 8,
+      "disk": 80,
+      "deprecated": false,
+      "prices": [],
+      "storage_type": "local",
+      "cpu_type": "shared",
+      "architecture": "x86"
+    }
+  ]
+}

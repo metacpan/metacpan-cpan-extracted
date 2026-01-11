@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Id: sad,v 1.8 2006/11/04 11:30:12 mike Exp $
+# $Id: sad,v 1.8 2006-11-04 11:30:12 mike Exp $
 #
 # To test:
 #	cd /usr/local/src/mike/scott/Games-ScottAdams/bin && perl -I ../lib sad /usr/local/src/mike/games/adams/adv01.dat > advland.sac && perl -I ../lib sac advland.sac > advland.sao && xterm -e scottfree advland.sao

@@ -1,3 +1,18 @@
+0.301     2026-01-10 23:37:10Z
+
+ - Added missing changelog entries for 0.300
+
+0.300     2026-01-10 23:34:35Z
+
+ - Add Pod::Elemental::Transformer::Author::GETTY for inline POD commands
+ - New commands: =attr, =method, =func, =opt, =env, =event, =hook, =resource, =seealso, =example
+ - Commands transform to =head2 and stay inline with code (not collected into sections)
+ - SUPPORT section now shows GitHub Issues and IRC info
+ - Add separate CONTRIBUTING section
+ - Add irc and irc_server attributes for IRC metadata
+ - Enable GithubMeta issues => 1 for automatic bugtracker URLs
+ - Change default release_branch from master to main
+
 0.204     2025-12-25 22:30:43Z
 
  - Removing unnecessary Moose::Autobox include

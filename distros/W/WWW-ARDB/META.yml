@@ -27,9 +27,10 @@ requires:
   URI: '0'
   namespace::clean: '0'
 resources:
+  bugtracker: https://github.com/Getty/p5-www-ardb/issues
   homepage: https://github.com/Getty/p5-www-ardb
   repository: https://github.com/Getty/p5-www-ardb.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -187,18 +188,6 @@ x_Dist_Zilla:
               name: '@GETTY/Stability'
               version: '4.020'
             -
-              class: Pod::Weaver::Section::Collect
-              name: Attributes
-              version: '4.020'
-            -
-              class: Pod::Weaver::Section::Collect
-              name: Methods
-              version: '4.020'
-            -
-              class: Pod::Weaver::Section::Collect
-              name: Functions
-              version: '4.020'
-            -
               class: Pod::Weaver::Section::Leftovers
               name: '@GETTY/Leftovers'
               version: '4.020'
@@ -207,12 +196,12 @@ x_Dist_Zilla:
               name: '@GETTY/postlude'
               version: '4.020'
             -
-              class: Pod::Weaver::Section::Support
+              class: Pod::Weaver::Section::GenerateSection
               name: '@GETTY/Support'
-              version: '1.014'
+              version: '4.020'
             -
-              class: Pod::Weaver::Section::Bugs
-              name: '@GETTY/Bugs'
+              class: Pod::Weaver::Section::GenerateSection
+              name: '@GETTY/Contributing'
               version: '4.020'
             -
               class: Pod::Weaver::Section::Authors
@@ -225,6 +214,10 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@GETTY/List'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Plugin::Transformer
+              name: '@GETTY/GETTY'
               version: '4.020'
       name: '@Author::GETTY/PodWeaver'
       version: '4.010'
@@ -288,7 +281,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.002'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

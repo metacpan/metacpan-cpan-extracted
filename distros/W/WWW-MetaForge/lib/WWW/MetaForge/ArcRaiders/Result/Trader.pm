@@ -1,8 +1,7 @@
 package WWW::MetaForge::ArcRaiders::Result::Trader;
-our $VERSION = '0.001';
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Trader result object
-
+our $VERSION = '0.002';
 use Moo;
 use Types::Standard qw(Str Int ArrayRef HashRef Maybe);
 use namespace::clean;
@@ -78,7 +77,7 @@ WWW::MetaForge::ArcRaiders::Result::Trader - Trader result object
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -93,8 +92,6 @@ version 0.001
 =head1 DESCRIPTION
 
 Represents a trader NPC from the ARC Raiders game.
-
-=head1 ATTRIBUTES
 
 =head2 name
 
@@ -116,8 +113,6 @@ ArrayRef of items for sale: C<[{ item => "Name", price => 1000, stock => 5 }]>.
 
 ISO timestamp of last inventory refresh.
 
-=head1 METHODS
-
 =head2 from_hashref
 
   my $trader = WWW::MetaForge::ArcRaiders::Result::Trader->from_hashref(\%data);
@@ -136,19 +131,20 @@ Search inventory by name (case-insensitive). Returns inventory entry or undef.
 
 Returns true if trader sells the named item.
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
-
 =head1 SUPPORT
 
-=head2 Source Code
+=head2 Issues
 
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-metaforge/issues>.
 
-L<https://github.com/Getty/p5-www-metaforge>
+=head2 IRC
 
-  git clone https://github.com/Getty/p5-www-metaforge.git
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 

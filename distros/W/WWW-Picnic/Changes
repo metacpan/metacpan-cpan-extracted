@@ -1,23 +1,29 @@
-==================================================
-Changes from 1747-03-01 00:00:00 +0000 to present.
-==================================================
+0.100     2026-01-11 06:17:48Z
 
-------------------------------------------
-version 0.001 at 2020-12-13 20:47:24 +0000
-------------------------------------------
+ - Added Result classes for all API responses:
+   - WWW::Picnic::Result base class with raw data access
+   - WWW::Picnic::Result::Login for authentication responses
+   - WWW::Picnic::Result::User for user profile data
+   - WWW::Picnic::Result::Cart for shopping cart
+   - WWW::Picnic::Result::DeliverySlots and DeliverySlot
+   - WWW::Picnic::Result::Search and SearchResult
+   - WWW::Picnic::Result::Article for product details
+ - Added 2FA authentication support (generate_2fa_code, verify_2fa_code)
+ - Added CLI tools: picnic, picnic-de, picnic-nl
+ - Added localization support (en, de, nl) via PICNIC_LANG
+ - Added MockUA for offline testing
+ - Fixed API compatibility:
+   - Updated client_id to 30100
+   - Added required X-Picnic-Agent and X-Picnic-Did headers
+   - Updated search endpoint to pages/search-page-results
+   - Handle nested sellingUnit response format
+ - Fixed UTF-8 handling in CLI output formatting
 
-  Change: a133d425279178d9974faf6d4ab1d3e0b331fdc7
-  Author: Torsten Raudssus <torsten@raudss.us>
-  Date : 2020-12-13 21:47:07 +0000
+0.002     Repository migration
 
-    Hups 
+ - Repository migration to p5-www-picnic
+ - Update documentation and metadata
 
-  Change: daa0c95863465526d3cdd7b419ec4108ea69abef
-  Author: Torsten Raudssus <torsten@raudss.us>
-  Date : 2020-12-13 21:41:25 +0000
+0.001     2020-12-13
 
-    First setup with basic functionality 
-
-================
-End of releases.
-================
+ - First setup with basic functionality

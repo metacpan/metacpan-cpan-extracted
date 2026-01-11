@@ -2,7 +2,7 @@ package WWW::Noss::FeedReader::Atom;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use WWW::Noss::FeedReader::MediaRSS qw(parse_media_node);
 use WWW::Noss::TextToHtml qw(text2html unescape_html strip_tags);

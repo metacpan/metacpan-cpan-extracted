@@ -400,7 +400,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.82';
+    our $VERSION   = '6.83';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -472,12 +472,12 @@ BEGIN {
 
 sub DESTROY {    # Always clean up after yourself before exiting
     my $self = shift;
+    substr($self->{'SCREEN'}, 0, length($self->{'START_SCREEN'})) = $self->{'START_SCREEN'};
+	delete($self->{'START_SCREEN'});
     $self->text_mode();
     $self->_screen_close();
     unlink('/tmp/output.gif') if (-e '/tmp/output.gif');
     _reset()                  if ($self->{'RESET'});       # Exit by calling 'reset' first
-                                                           # Restore the original screen before run
-    substr($self->{'SCREEN'}, 0, length($self->{'START_SCREEN'})) = $self->{'START_SCREEN'};
 } ## end sub DESTROY
 
 # use Inline 'info', 'noclean', 'noisy'; # Only needed for debugging
@@ -487,7 +487,7 @@ use Inline C => <<'C_CODE', 'name' => 'Graphics::Framebuffer', 'VERSION' => $VER
 /* Copyright 2018-2026 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.82
+   Version:  6.83
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
@@ -9767,7 +9767,7 @@ Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONT
 
 =head1 VERSION
 
-Version 6.82 (Jan 04, 2026)
+Version 6.83 (Jan 09, 2026)
 
 =head1 THANKS
 

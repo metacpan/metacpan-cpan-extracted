@@ -56,6 +56,11 @@ record 1, 4, "";
 
 start;
 begin 3, 2, 1;
+$remote->close;
+iserr -8;
+
+start;
+begin 3, 2, 1;
 begin 1, 1, 1;
 begin 2, 1, 1;
 record 1, 4, "";
@@ -173,6 +178,8 @@ record 1, 4, "\x13\x01HTTP_CONTENT_LENGTH3\x0e\x01CONTENT_LENGTH0\x13\x01HTTP_CO
 record 1, 4, "";
 record 1, 5, "";
 isrec {'content-length','0'}, {body => ''};
+$remote->close;
+ok !eval { $f->flush; 1 };
 
 start;
 begin;

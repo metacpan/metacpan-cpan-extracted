@@ -51,7 +51,7 @@ local $SIG{__DIE__}=\&Carp::confess;
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='2.046';
+$VERSION='2.060';
 
 
 #  Run main
@@ -104,7 +104,7 @@ sub main {
     pod2usage(-verbose => 2)                                                  if $opt{'man'};
     $opt{'version'} && do {
         print "$Script version: $VERSION\n";
-        print "WebDyne version: $WebDyne::VERSION ($WebDyne::VERSION_GIT_REF)\n";
+        print "WebDyne version: $WebDyne::VERSION ($WebDyne::VERSION_GIT_SHA)\n";
         exit 0
     };
 

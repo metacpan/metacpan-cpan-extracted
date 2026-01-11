@@ -17,7 +17,7 @@ use Pod::Usage;
 # use Data::Dumper;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
 BEGIN {
-    our $VERSION = '6.09';
+    our $VERSION = '6.10';
 }
 
 our $F;
@@ -25,7 +25,6 @@ our $F;
 my $new_x;
 my $new_y;
 my $dev      = 0;     # Framebuffer device
-my $psize    = 1;     # Pixel size
 my $delay    = 3;     # Delay in seconds
 my $noaccel  = FALSE; # Turn on/off C acceleration
 my $nosplash = FALSE; # Turn on/off the splash screen
@@ -42,7 +41,6 @@ GetOptions(
     'x=i'              => \$new_x,
     'y=i'              => \$new_y,
     'dev=i'            => \$dev,
-    'pixel=i'          => \$psize,
     'noaccel'          => \$noaccel,
     'nosplash'         => \$nosplash,
     'delay=i'          => \$delay,
@@ -63,7 +61,7 @@ if ($small) { # force a centered 320x200 screen for core dump debugging
 
 my $images_path = (-e 'images/4KTest_Pattern.png') ? 'images' : 'examples/images';
 
-my $splash = ($nosplash) ? 0 : 2;
+my $splash = ($nosplash) ? 0 : 1;
 print "\n\nGathering images...\n";
 $| = 1;
 opendir(my $DIR, $images_path);
@@ -129,7 +127,7 @@ if ($rpi) {
 
 print_it($F, ' ', '00FFFFFF');
 $F->{'SPLASH'} = $splash;
-$F->splash($Graphics::Framebuffer::VERSION) unless ($nosplash);
+$F->splash($splash) unless ($nosplash);
 
 my $DORKSMILE;
 
@@ -279,7 +277,7 @@ if (defined($show_func)) { # If the "--func" option is used, the they are run on
         'Arcs',
         'Poly Arcs',
         'Beziers',
-		'Drop',
+#		'Drop',
         'Filled Boxes',
         'Filled Rounded Boxes',
         'Filled Circles',
@@ -338,11 +336,11 @@ if (defined($show_func)) { # If the "--func" option is used, the they are run on
 # Each demo is run with and without C acceleration
 foreach my $name (@order) {
     if (exists($func{$name})) {
-		unless ($name =~ /^(Color Mapping|ADD|SUBTRACT|Rotate TrueType Fonts|TrueType|Flipping)/) {
-			$F->cls();
-			$F->acceleration(PERL);
-			$func{$name}->($name . ' -> Pure-Perl');
-		}
+#		unless ($name =~ /^(Color Mapping|ADD|SUBTRACT|Rotate TrueType Fonts|TrueType|Flipping)/) {
+#			$F->cls();
+#			$F->acceleration(PERL);
+#			$func{$name}->($name . ' -> Pure-Perl');
+#		}
 		$F->cls();
 		$F->acceleration(SOFTWARE);
 		$func{$name}->($name . ' -> C Accelerated');
@@ -500,7 +498,6 @@ sub plotting {
 			{
 				'x'          => $x,
 				'y'          => $y,
-				'pixel_size' => $psize,
 			}
 		);
     }
@@ -528,7 +525,6 @@ sub lines {
 				'xx'          => int(rand($XX)),
 				'yy'          => int(rand($YY)),
 				'antialiased' => $aa,
-				'pixel_size'  => $psize,
 			}
 		);
     }
@@ -558,7 +554,6 @@ sub angle_lines {
 				'radius'      => int($F->{'H_CLIP'} / 2),
 				'angle'       => $angle,
 				'antialiased' => $aa,
-				'pixel_size'  => $psize,
 			}
 		);
         $angle = ($F->acceleration()) ? $angle + .5 : $angle + 1;
@@ -585,7 +580,6 @@ sub boxes {
 				'y'          => int(rand($YY)),
 				'xx'         => int(rand($XX)),
 				'yy'         => int(rand($YY)),
-				'pixel_size' => $psize,
 			}
 		);
     }
@@ -740,7 +734,6 @@ sub rounded_boxes {
 				'xx'         => int(rand($XX)),
 				'yy'         => int(rand($YY)),
 				'radius'     => 4 + rand($XX / 16),
-				'pixel_size' => $psize,
 			}
 		);
     }
@@ -887,7 +880,6 @@ sub circles {
 				'x'          => int(rand($XX)),
 				'y'          => int(rand($YY)),
 				'radius'     => rand($center_y),
-				'pixel_size' => $psize,
 			}
 		);
     }
@@ -1026,7 +1018,6 @@ sub arcs {
 				'radius'        => rand($center_y),
 				'start_degrees' => rand(360),
 				'end_degrees'   => rand(360),
-				'pixel_size'    => $psize,
 			}
 		);
     }
@@ -1053,7 +1044,6 @@ sub poly_arcs {
 				'radius'        => rand($center_y),
 				'start_degrees' => rand(360),
 				'end_degrees'   => rand(360),
-				'pixel_size'    => $psize,
 			}
 		);
     }
@@ -1199,7 +1189,6 @@ sub ellipses {
 				'y'          => int(rand($YY)),
 				'xradius'    => rand($center_x),
 				'yradius'    => rand($center_y),
-				'pixel_size' => $psize,
 			}
 		);
     }
@@ -1343,7 +1332,6 @@ sub polygons {
             {
                 'coordinates' => $coords,
                 'antialiased' => $aa,
-                'pixel_size'  => $psize
             }
         );
     }
@@ -1497,7 +1485,6 @@ sub beziers {
 			{
 				'coordinates' => \@coords,
 				'points'      => 100,
-				'pixel_size'  => $psize,
 			}
 		);
     }
@@ -1526,8 +1513,6 @@ sub truetype_fonts {
                 'font_path'    => $F->{'FONTS'}->{$font}->{'path'},
                 'face'         => $F->{'FONTS'}->{$font}->{'font'},
                 'bounding_box' => 1,
-
-                #                'center'       => 3
             }
         );
         if (defined($b)) {

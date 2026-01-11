@@ -1,4 +1,4 @@
-# $Id: Parse.pm,v 1.3 2006/11/03 21:00:13 mike Exp $
+# $Id: Parse.pm,v 1.3 2006-11-03 21:00:13 mike Exp $
 
 # Parse.pm - parsing functions for Scott Adams game files.
 

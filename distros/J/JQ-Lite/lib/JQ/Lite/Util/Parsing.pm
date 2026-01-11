@@ -918,16 +918,6 @@ sub _evaluate_value_expression {
         }
     }
 
-    if ($copy !~ /\bthen\b/i
-        && $copy !~ /\belse\b/i
-        && $copy !~ /\bend\b/i
-        && $copy =~ /(?:==|!=|>=|<=|>|<|\band\b|\bor\b|\bcontains\b|\bhas\b|\bmatch\b)/)
-    {
-        my $bool = _evaluate_condition($context, $copy);
-        my $json_bool = $bool ? JSON::PP::true : JSON::PP::false;
-        return ([ $json_bool ], 1);
-    }
-
     my $decoded = eval { _decode_json($copy) };
     if (!$@) {
         return ([ $decoded ], 1);
@@ -937,6 +927,16 @@ sub _evaluate_value_expression {
         my $text = $1;
         $text =~ s/\\'/'/g;
         return ([ $text ], 1);
+    }
+
+    if ($copy !~ /\bthen\b/i
+        && $copy !~ /\belse\b/i
+        && $copy !~ /\bend\b/i
+        && $copy =~ /(?:==|!=|>=|<=|>|<|\band\b|\bor\b|\bcontains\b|\bhas\b|\bmatch\b)/)
+    {
+        my $bool = _evaluate_condition($context, $copy);
+        my $json_bool = $bool ? JSON::PP::true : JSON::PP::false;
+        return ([ $json_bool ], 1);
     }
 
     return ([], 0);
@@ -957,20 +957,21 @@ sub _apply_addition {
     }
 
     if (!ref $left && !ref $right) {
+        my $left_is_string  = _is_string_scalar($left);
+        my $right_is_string = _is_string_scalar($right);
+
+        if ($left_is_string || $right_is_string) {
+            die 'addition operands must both be strings' if !$left_is_string || !$right_is_string;
+            $left  = '' unless defined $left;
+            $right = '' unless defined $right;
+            return "$left$right";
+        }
+
         if (looks_like_number($left) && looks_like_number($right)) {
             return 0 + $left + $right;
         }
 
-        my $left_is_num  = looks_like_number($left);
-        my $right_is_num = looks_like_number($right);
-
-        if ($left_is_num != $right_is_num) {
-            die 'addition operands must both be numbers or both be non-numeric';
-        }
-
-        $left  = '' unless defined $left;
-        $right = '' unless defined $right;
-        return "$left$right";
+        die 'addition operands must both be numbers or both be strings';
     }
 
     if (ref $left eq 'ARRAY' && ref $right eq 'ARRAY') {

@@ -107,6 +107,7 @@ t/percentile.t
 t/pick.t
 t/pipe_select_name.t
 t/pluck.t
+t/quoted_field_access.t
 t/range.t
 t/raw_input_cli.t
 t/rawfile_cli.t

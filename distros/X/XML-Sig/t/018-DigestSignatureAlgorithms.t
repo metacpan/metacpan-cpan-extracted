@@ -4,9 +4,16 @@ use Test::XML::Sig;
 my $xmlsec = get_xmlsec_features;
 my $openssl = get_openssl_features;
 
-my @hash = qw/sha1 sha224 sha256 sha384 sha512/;
+my @hash = qw/sha224 sha256 sha384 sha512/;
 push @hash, 'ripemd160' if $xmlsec->{ripemd160};
+push @hash, 'sha1' if $xmlsec->{sha1_support};
 
+SKIP: {
+    eval {
+        require Crypt::OpenSSL::DSA;
+    };
+    my $algs = scalar @hash;
+    skip "Crypt::OpenSSL::DSA not installed", 3 * $algs * 9 if ($@);
 # DSA key size determinst the signature length and therfore the signature hashing algorithm
 foreach my $key ('t/dsa.private.key', 't/dsa.private-2048.key', 't/dsa.private-3072.key') {
     # DSA Keys with noX509
@@ -89,7 +96,7 @@ foreach my $key ('t/dsa.private.key', 't/dsa.private-2048.key', 't/dsa.private-3
         }
     }
 }
-
+}
 foreach my $sigalg (@hash) {
     # RSA Keys with no X509
     foreach my $digalg (@hash) {

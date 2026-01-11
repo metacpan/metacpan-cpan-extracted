@@ -4,6 +4,11 @@ use Types::Common -lexical, -assert;
 
 push @Local::Example::ALL, 'Local::Example::Core';
 
+class Local::Example::Core::Simple {
+	field $foo :reader :param;
+	field $bar :reader :param;
+}
+
 class Local::Example::Core::NamedThing {
 	field $name :reader :param = die "Name is required";
 	

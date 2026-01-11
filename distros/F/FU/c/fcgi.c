@@ -18,6 +18,7 @@
 #define FUFE_CLEN  -5
 #define FUFE_ABORT -6  /* explicit abort or client-level EOF */
 #define FUFE_NOREQ -7  /* protocol-level EOF before we received anything */
+#define FUFE_SEND  -8  /* error in send() */
 
 #define FUFCGI_MAX_DATA 65535
 
@@ -177,8 +178,8 @@ static int fufcgi_write_record(fufcgi *ctx, fufcgi_rec *hdr, char *buf) {
     buf[7] = 0;
     int len = hdr->len + 8;
     while (len > 0) {
-        int r = write(ctx->fd, buf, len);
-        if (r <= 0) return r == 0 ? FUFE_EOF : FUFE_IO;
+        int r = send(ctx->fd, buf, len, MSG_NOSIGNAL);
+        if (r <= 0) return FUFE_SEND;
         buf += r;
         len -= r;
     }
@@ -409,18 +410,19 @@ static int fufcgi_read_req(pTHX_ fufcgi *ctx, SV *headers, SV *params) {
     }
 }
 
-static void fufcgi_flush(fufcgi *ctx) {
+static void fufcgi_flush(pTHX_ fufcgi *ctx) {
     fufcgi_rec hdr;
     if (ctx->len > 0) {
         hdr.len = ctx->len;
         hdr.type = FCGI_STDOUT;
         hdr.id = ctx->reqid;
-        fufcgi_write_record(ctx, &hdr, ctx->buf);
+        if (fufcgi_write_record(ctx, &hdr, ctx->buf) != FUFE_OK)
+            croak("%s\n", strerror(errno));
         ctx->len = 0;
     }
 }
 
-static void fufcgi_print(fufcgi *ctx, const char *buf, int len) {
+static void fufcgi_print(pTHX_ fufcgi *ctx, const char *buf, int len) {
     int r;
     while (len > 0) {
         r = len > FUFCGI_MAX_DATA - ctx->len ? FUFCGI_MAX_DATA - ctx->len : len;
@@ -428,23 +430,25 @@ static void fufcgi_print(fufcgi *ctx, const char *buf, int len) {
         ctx->len += r;
         len -= r;
         buf += r;
-        if (ctx->len >= FUFCGI_MAX_DATA) fufcgi_flush(ctx);
+        if (ctx->len >= FUFCGI_MAX_DATA) fufcgi_flush(aTHX_ ctx);
     }
 }
 
-static void fufcgi_done(fufcgi *ctx) {
+static void fufcgi_done(pTHX_ fufcgi *ctx) {
     fufcgi_rec hdr;
-    fufcgi_flush(ctx);
+    fufcgi_flush(aTHX_ ctx);
 
     hdr.len = 0;
     hdr.type = FCGI_STDOUT;
     hdr.id = ctx->reqid;
-    fufcgi_write_record(ctx, &hdr, ctx->buf);
+    if (fufcgi_write_record(ctx, &hdr, ctx->buf) != FUFE_OK)
+        croak("%s\n", strerror(errno));
 
     memcpy(ctx->buf+8, "\0\0\0\0\0\0\0\0", 8); /* FCGI_REQUEST_COMPLETE */
     hdr.type = FCGI_END_REQUEST;
     hdr.len = 8;
-    fufcgi_write_record(ctx, &hdr, ctx->buf);
+    if (fufcgi_write_record(ctx, &hdr, ctx->buf) != FUFE_OK)
+        croak("%s\n", strerror(errno));
 
     ctx->reqid = ctx->len = ctx->off = 0;
 }

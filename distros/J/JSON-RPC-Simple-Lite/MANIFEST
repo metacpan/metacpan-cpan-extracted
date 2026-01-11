@@ -1,0 +1,10 @@
+MYMETA.json
+MYMETA.yml
+jsonrpc-client.pl
+lib/JSON/RPC/Simple/Lite.pm
+Makefile.PL
+MANIFEST
+README.md
+t/01-general.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

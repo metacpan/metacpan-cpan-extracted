@@ -21,6 +21,11 @@ ok($ret, "RSA: Verifed Successfully");
 ok($sig->signer_cert);
 
 # Test signing with a DSA key
+SKIP: {
+    eval {
+        require Crypt::OpenSSL::DSA;
+    };
+    skip "Crypt::OpenSSL::DSA not installed", 1 if ($@);
 foreach my $key ('t/dsa.private-2048.key', 't/dsa.private-3072.key', 't/dsa.private.key') {
 
     my $dsasig = XML::Sig->new({ key => $key });
@@ -50,7 +55,6 @@ foreach my $key ('t/dsa.private-2048.key', 't/dsa.private-3072.key', 't/dsa.priv
 
     }
 }
-
 # Ensure xmlsec still verifies properly
 {
     # Test that XML::Sig can verify a xmlsec1 DSA signed xml
@@ -74,6 +78,7 @@ foreach my $key ('t/dsa.private-2048.key', 't/dsa.private-3072.key', 't/dsa.priv
     }
 }
 
+}
 # Test that XML::Sig can verify a xmlsec1 RSA signed xml
 $xml = slurp_file('t/signed/saml_request-xmlsec1-rsa-signed.xml');
 my $xmlsec1_rsasig = XML::Sig->new({ x509 => 1, cert => 't/rsa.cert.pem' });

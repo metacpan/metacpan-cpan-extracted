@@ -1,0 +1,29 @@
+{
+  "load_balancers": [
+    {
+      "id": 900,
+      "name": "web-lb",
+      "public_net": {
+        "enabled": true,
+        "ipv4": { "ip": "203.0.113.90" },
+        "ipv6": { "ip": "2001:db8::1" }
+      },
+      "private_net": [],
+      "location": { "id": 1, "name": "fsn1" },
+      "load_balancer_type": { "id": 1, "name": "lb11" },
+      "protection": { "delete": false },
+      "labels": { "env": "prod" },
+      "targets": [
+        { "type": "server", "server": { "id": 123 }, "use_private_ip": false }
+      ],
+      "services": [
+        { "protocol": "http", "listen_port": 80, "destination_port": 8080 }
+      ],
+      "algorithm": { "type": "round_robin" },
+      "created": "2024-01-10T10:00:00+00:00",
+      "outgoing_traffic": null,
+      "ingoing_traffic": null,
+      "included_traffic": 654321098765
+    }
+  ]
+}

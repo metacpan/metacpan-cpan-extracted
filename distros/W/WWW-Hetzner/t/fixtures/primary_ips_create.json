@@ -1,0 +1,27 @@
+{
+  "primary_ip": {
+    "id": 800,
+    "name": "new-primary-ip",
+    "ip": "203.0.113.80",
+    "type": "ipv4",
+    "assignee_id": null,
+    "assignee_type": "server",
+    "datacenter": {
+      "id": 1,
+      "name": "fsn1-dc14",
+      "description": "Falkenstein 1 DC14"
+    },
+    "dns_ptr": [],
+    "auto_delete": false,
+    "blocked": false,
+    "labels": {},
+    "protection": { "delete": false },
+    "created": "2024-06-01T12:00:00+00:00"
+  },
+  "action": {
+    "id": 7777,
+    "command": "create_primary_ip",
+    "status": "success",
+    "progress": 100
+  }
+}

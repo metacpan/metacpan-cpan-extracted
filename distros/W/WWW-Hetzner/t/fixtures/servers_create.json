@@ -1,0 +1,92 @@
+{
+  "server": {
+    "id": 12345678,
+    "name": "test-full-params",
+    "status": "initializing",
+    "server_type": {
+      "id": 96,
+      "name": "ccx13",
+      "description": "CCX13 Dedicated CPU",
+      "cores": 2,
+      "memory": 8,
+      "disk": 80,
+      "deprecated": false,
+      "architecture": "x86",
+      "cpu_type": "dedicated"
+    },
+    "datacenter": {
+      "id": 4,
+      "name": "fsn1-dc14",
+      "description": "Falkenstein 1 virtual DC 14",
+      "location": {
+        "id": 1,
+        "name": "fsn1",
+        "city": "Falkenstein",
+        "country": "DE"
+      }
+    },
+    "image": {
+      "id": 67890,
+      "name": "debian-12",
+      "description": "Debian 12",
+      "type": "system",
+      "os_flavor": "debian",
+      "os_version": "12",
+      "architecture": "x86"
+    },
+    "public_net": {
+      "ipv4": {
+        "id": 11111,
+        "ip": "203.0.113.1",
+        "blocked": false
+      },
+      "ipv6": {
+        "id": 22222,
+        "ip": "2001:db8:1234::/64",
+        "blocked": false
+      },
+      "firewalls": [],
+      "floating_ips": []
+    },
+    "private_net": [],
+    "labels": {
+      "env": "test",
+      "purpose": "api-testing",
+      "managed_by": "www-hetzner"
+    },
+    "volumes": [],
+    "load_balancers": [],
+    "placement_group": null,
+    "created": "2026-01-05T15:53:32Z",
+    "locked": false,
+    "rescue_enabled": false,
+    "protection": {
+      "delete": false,
+      "rebuild": false
+    }
+  },
+  "action": {
+    "id": 99999001,
+    "command": "create_server",
+    "status": "running",
+    "progress": 0,
+    "started": "2026-01-05T15:53:32Z",
+    "finished": null,
+    "error": null,
+    "resources": [
+      {"id": 12345678, "type": "server"}
+    ]
+  },
+  "next_actions": [
+    {
+      "id": 99999002,
+      "command": "start_server",
+      "status": "running",
+      "progress": 0,
+      "resources": [
+        {"id": 12345678, "type": "server"}
+      ]
+    }
+  ],
+  "root_password": null
+}

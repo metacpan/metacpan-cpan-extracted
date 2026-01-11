@@ -44,7 +44,7 @@ $Data::Dumper::Indent=1;
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='2.046';
+$VERSION='2.060';
 
 
 #  Run main
@@ -291,9 +291,9 @@ sub status {
 }
 
 __END__
-# Documentation in Markdown. Convert to POD using markpod from 
-#
-# https://github.com/aspeer/pl-markpod.git 
+
+
+
 
 
 =pod

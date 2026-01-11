@@ -79,12 +79,18 @@ my $signed2 = $sig2->sign($xml);
 my $is_valid2 = $sig2->verify( $signed2 );
 ok( $is_valid2 == 1 );
 
-my $sig3 = XML::Sig->new( { key => 't/dsa.private.key' } );
-isa_ok( $sig3, 'XML::Sig' );
-my $signed3 = $sig3->sign($xml);
-my $is_valid3 = $sig3->verify( $signed3 );
-ok( $is_valid3 == 1 );
 
+SKIP: {
+    eval {
+        require Crypt::OpenSSL::DSA;
+    };
+    skip "Crypt::OpenSSL::DSA not installed", 2 if ($@);
+    my $sig3 = XML::Sig->new( { key => 't/dsa.private.key' } );
+    isa_ok( $sig3, 'XML::Sig' );
+    my $signed3 = $sig3->sign($xml);
+    my $is_valid3 = $sig3->verify( $signed3 );
+    ok( $is_valid3 == 1 );
+}
 my $sig4 = XML::Sig->new( { key => 't/pkcs8.private.key' } );
 isa_ok( $sig4, 'XML::Sig' );
 my $signed4 = $sig4->sign($xml);

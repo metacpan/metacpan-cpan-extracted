@@ -84,6 +84,11 @@ subtest 'strip_tags ok' => sub {
         'TestText',
         'CDATA ok'
     );
+    is(
+        strip_tags(q{<p attr="\">"><b attr='\'>'>Text</b></p>}),
+        'Text',
+        '">" in attribute ok'
+    );
 };
 
 done_testing;

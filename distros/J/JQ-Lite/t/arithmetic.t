@@ -67,4 +67,16 @@ is(
     '(.q|@uri) inside addition behaves like jq'
 );
 
+my $strings = '{"s1":"1","s2":"2","t":"a","n":3}';
+my @string_concat = $jq->run_query($strings, '.s1 + .s2');
+is($string_concat[0], '12', 'string addition concatenates numeric-looking strings');
+
+my @string_mixed = $jq->run_query($strings, '.s1 + .t');
+is($string_mixed[0], '1a', 'string addition concatenates mixed string content');
+
+my $string_number_ok = eval { $jq->run_query($strings, '.s1 + .n'); 1 };
+my $string_number_error = $@;
+ok(!$string_number_ok, 'string plus number throws an error');
+like($string_number_error, qr/addition operands/i, 'string plus number error message');
+
 done_testing;

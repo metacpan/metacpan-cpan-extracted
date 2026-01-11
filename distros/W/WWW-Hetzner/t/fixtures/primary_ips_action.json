@@ -1,0 +1,14 @@
+{
+  "action": {
+    "id": 8888,
+    "command": "assign_primary_ip",
+    "status": "success",
+    "progress": 100,
+    "started": "2024-06-01T12:30:00+00:00",
+    "finished": "2024-06-01T12:30:01+00:00",
+    "resources": [
+      { "id": 700, "type": "primary_ip" }
+    ],
+    "error": { "code": null, "message": null }
+  }
+}

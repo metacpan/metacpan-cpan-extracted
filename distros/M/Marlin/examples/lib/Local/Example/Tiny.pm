@@ -4,6 +4,15 @@ use Types::Common -lexical, -types, -assert, 'signature_for';
 
 push @Local::Example::ALL, 'Local::Example::Tiny';
 
+package Local::Example::Tiny::Simple {
+	use Class::Tiny qw(foo bar);
+	sub BUILD ( $self, $args ) {
+		if ( my @extra = grep { not /^(?:foo|bar)$/ } sort keys %$args ) {
+			die "Extra arguments passed to new: @extra";
+		}
+	}
+}
+
 package Local::Example::Tiny::NamedThing {
 	use Class::Tiny { name => sub { die "Name is required" } };
 	

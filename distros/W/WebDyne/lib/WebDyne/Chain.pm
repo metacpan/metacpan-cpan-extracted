@@ -37,7 +37,7 @@ use Data::Dumper;
 #  Version information in a formate suitable for CPAN etc. Must be
 #  all on one line
 #
-$VERSION='2.046';
+$VERSION='2.060';
 
 
 #  Debug using WebDyne debug handler
@@ -502,7 +502,7 @@ WebDyne::Chain - WebDyne chaining module, allows extension of base WebDyne handl
 
 SYNOPSIS
 
-    #  Basic usage in a simple chain.psp file:
+    #  Basic usage. Save as file named chain.psp:
     #
     <start_html>
     Server local time is: <? localtime ?>

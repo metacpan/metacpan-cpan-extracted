@@ -4,7 +4,7 @@ package Sim::OPT::Interlinear;
 # Interliner is distributed under a dual licence, open-source (GPL v3) and proprietary.
 # Copyright Gian Luca Brunetti 2018-2025, gianluca.brunetti@gmail.com. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-
+our $interinear = bless( {}, "Sim::OPT::Interlinear" );
 
 use Math::Round;
 use List::Util qw( min max reduce shuffle any );
@@ -183,11 +183,11 @@ sub preparearr
 
       if ( $row[1] eq undef )
       {
-        push ( @arr, [ $row[0], [ @pars ], "", "", "missing" ] );
+        push ( @arr, [ $row[0], [ @pars ] ] );
       }
       else
       {
-        push ( @arr, [ $row[0], [ @pars ], $row[1], 1, "sampled" ] );
+        push ( @arr, [ $row[0], [ @pars ], $row[1], 1 ] );
       }
     }
   }
@@ -220,11 +220,11 @@ sub preparearr
 
       if ( scalar( @row ) < $maxnum )
       {
-        push ( @arr, [ $header, [ @pars ], "", "", "missing" ] );
+        push ( @arr, [ $header, [ @pars ] ] );
       }
       else
       {
-        push ( @arr, [ $header, [ @pars ], $row[-1], 1, "sampled" ] );
+        push ( @arr, [ $header, [ @pars ], $row[-1], 1 ] );
       }
     }
   } #say  "ARR: " . dump( @arr );
@@ -1448,7 +1448,7 @@ sub wei
 
     if ( ( $soughtval ne "" ) and ( $totstrength ne "" ) )
     {
-      push ( @limb0, [ $wand{$ke}{name}, $wand{$ke}{bulk}, $soughtval, $totstrength, "metamodelled" ] );
+      push ( @limb0, [ $wand{$ke}{name}, $wand{$ke}{bulk}, $soughtval, $totstrength ] );
     }
   }
 
@@ -1737,7 +1737,7 @@ sub purelin
     unless ( $eltnum <= ( $instconcurrencies - 1 ) )
     {
       my $avg = mean( values( %{ $wand{$ke} } ) );
-      push ( @limb0, [ $spell{$ke}[0], $spell{$ke}[1] , $avg, "", "metamodelled" ] );
+      push ( @limb0, [ $spell{$ke}[0], $spell{$ke}[1] , $avg ] );
     }
   }
   return( @limb0 );
@@ -1800,7 +1800,7 @@ sub near
         my $bagmean = mean( @bag );
         unless ( scalar( @bag ) == 0 )
         {
-          push ( @limb0, [ $el->[0], $el->[1], $bagmean, "", "metamodelled" ] );
+          push ( @limb0, [ $el->[0], $el->[1], $bagmean ] );
         }
       }
     }
@@ -2033,7 +2033,6 @@ sub interlinear
   }
 
 
-
   if ( $sourcef ne "" ){ $sourcefile = $sourcef; }
 
   if ( $metafile ne "" ){ $newfile = $metafile; }
@@ -2212,42 +2211,20 @@ sub interlinear
       {
         if ( $el->[0] eq $elt->[0] )
         {
-          my $update_val      = $el->[2];
-          my $update_strength = $el->[3];
-          my $update_status   = $el->[4];
-
-          if ( $update_status eq "" ) { $update_status = "metamodelled"; }
-          if ( $elt->[4] eq "" )      { $elt->[4] = "missing"; }
-
-          # Do not overwrite sampled points.
-          if ( $elt->[4] eq "sampled" )
-          {
-            next;
-          }
-
-          # If the incoming update is sampled, it dominates.
-          if ( $update_status eq "sampled" )
-          {
-            $elt->[2] = $update_val;
-            $elt->[3] = 1;
-            $elt->[4] = "sampled";
-            next;
-          }
-
           if ( $elt ->[2] eq "" )
           {
-            $elt->[2] = $update_val;
-            $elt->[3] = $update_strength;
-            $elt->[4] = $update_status;
+              push ( @{ $elt }, $el->[2], $el->[3] );
           }
           else
           {
-            my ( $soughtval, $totstrength ) = weightvals_merge( [ $elt->[2], $update_val ], [ $elt->[3], $update_strength ], $minreq_formerge, $maxdist  );
-            if ( ( $soughtval ne "" ) and ( $totstrength ne "" ) )
             {
-              $elt->[2] = $soughtval;
-              $elt->[3] = $totstrength;
-              $elt->[4] = "metamodelled";
+              my ( $soughtval, $totstrength ) = weightvals_merge( [ $elt->[2], $el->[2] ], [ $elt->[3], $el->[3] ], $minreq_formerge, $maxdist  );
+              if ( ( $soughtval ne "" ) and ( $totstrength ne "" ) )
+              {
+                pop @{ $elt };
+                pop @{ $elt };
+                push ( @{ $elt }, $soughtval, $totstrength );
+              }
             }
           }
         }

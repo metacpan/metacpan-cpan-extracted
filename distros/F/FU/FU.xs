@@ -3,7 +3,7 @@
 #include <time.h> /* struct timespec & clock_gettime() */
 #include <string.h> /* strerror() */
 #include <arpa/inet.h> /* inet_ntop(), inet_ntoa() */
-#include <sys/socket.h> /* fd passing */
+#include <sys/socket.h> /* send(), fd passing */
 #include <sys/un.h> /* fd passing */
 #include <dlfcn.h> /* dlopen() etc */
 
@@ -170,11 +170,11 @@ void print(fufcgi *ctx, SV *sv)
   CODE:
     STRLEN len;
     const char *buf = SvPVbyte(sv, len);
-    fufcgi_print(ctx, buf, len);
+    fufcgi_print(aTHX_ ctx, buf, len);
 
 void flush(fufcgi *ctx)
   CODE:
-    fufcgi_done(ctx);
+    fufcgi_done(aTHX_ ctx);
 
 void DESTROY(fufcgi *ctx)
   CODE:
@@ -277,10 +277,10 @@ void exec(fupg_conn *c, SV *sv)
     FUPG_CONN_COOKIE;
     ST(0) = fupg_exec(aTHX_ c, SvPVutf8_nolen(sv));
 
-void q(fupg_conn *c, SV *sv, ...)
+void sql(fupg_conn *c, SV *sv, ...)
   CODE:
     FUPG_CONN_COOKIE;
-    ST(0) = fupg_q(aTHX_ c, c->stflags, SvPVutf8_nolen(sv), ax, items);
+    ST(0) = fupg_sql(aTHX_ c, c->stflags, SvPVutf8_nolen(sv), ax, items);
 
 void copy(fupg_conn *c, SV *sv)
   CODE:
@@ -353,10 +353,10 @@ void exec(fupg_txn *t, SV *sv)
     FUPG_TXN_COOKIE;
     ST(0) = fupg_exec(aTHX_ t->conn, SvPVutf8_nolen(sv));
 
-void q(fupg_txn *t, SV *sv, ...)
+void sql(fupg_txn *t, SV *sv, ...)
   CODE:
     FUPG_TXN_COOKIE;
-    ST(0) = fupg_q(aTHX_ t->conn, t->stflags, SvPVutf8_nolen(sv), ax, items);
+    ST(0) = fupg_sql(aTHX_ t->conn, t->stflags, SvPVutf8_nolen(sv), ax, items);
 
 # XXX: The copy object should probably keep a ref on the transaction
 void copy(fupg_txn *t, SV *sv)

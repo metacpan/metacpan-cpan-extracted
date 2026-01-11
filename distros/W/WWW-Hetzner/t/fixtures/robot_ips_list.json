@@ -1,0 +1,28 @@
+[
+  {
+    "ip": {
+      "ip": "203.0.113.50",
+      "server_number": 123456,
+      "server_ip": "203.0.113.50",
+      "locked": false,
+      "separate_mac": null,
+      "traffic_warnings": true,
+      "traffic_hourly": 100,
+      "traffic_daily": 1000,
+      "traffic_monthly": 30000
+    }
+  },
+  {
+    "ip": {
+      "ip": "203.0.113.51",
+      "server_number": 123456,
+      "server_ip": "203.0.113.50",
+      "locked": false,
+      "separate_mac": "00:50:56:00:12:34",
+      "traffic_warnings": false,
+      "traffic_hourly": null,
+      "traffic_daily": null,
+      "traffic_monthly": null
+    }
+  }
+]

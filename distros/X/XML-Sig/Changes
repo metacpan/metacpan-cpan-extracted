@@ -1,5 +1,14 @@
 Revision history for XML-Sig
 
+0.69 -- Sat Jan 10 20:16:50 AST 2026
+
+  [Notable Changes since 0.67]
+  - Make Crypt::OpenSSL::DSA optional as newer distros disable DSA
+  - Make sha1 tests optional based on whether xmlsec1 has support
+
+  [Change Log]
+  - 7fded42 Make sha1 and DSA optional
+
 0.68 -- Wed Nov 26 18:27:44 AST 2025
 
   [Notable Changes since 0.67]

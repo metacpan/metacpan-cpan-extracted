@@ -1,0 +1,20 @@
+{
+  "action": {
+    "id": 9999,
+    "command": "add_subnet",
+    "status": "success",
+    "progress": 100,
+    "started": "2024-06-01T12:30:00+00:00",
+    "finished": "2024-06-01T12:30:01+00:00",
+    "resources": [
+      {
+        "id": 100,
+        "type": "network"
+      }
+    ],
+    "error": {
+      "code": null,
+      "message": null
+    }
+  }
+}

@@ -1,17 +1,19 @@
 package WWW::MetaForge::GameMapData::Request;
-our $VERSION = '0.001';
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: HTTP request builder for MetaForge Game Map Data API
+our $VERSION = '0.002';
 
 use Moo;
 use HTTP::Request;
 use URI;
 use namespace::clean;
 
+
 has base_url => (
   is      => 'ro',
   default => 'https://metaforge.app/api/game-map-data',
 );
+
 
 sub _build_request {
   my ($self, %params) = @_;
@@ -31,6 +33,7 @@ sub map_data {
   return $self->_build_request(%params);
 }
 
+
 1;
 
 __END__
@@ -45,52 +48,49 @@ WWW::MetaForge::GameMapData::Request - HTTP request builder for MetaForge Game M
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
-  use WWW::MetaForge::GameMapData::Request;
+    use WWW::MetaForge::GameMapData::Request;
 
-  my $req = WWW::MetaForge::GameMapData::Request->new;
+    my $req = WWW::MetaForge::GameMapData::Request->new;
 
-  # Build request for map data
-  my $http_req = $req->map_data(map => 'Dam');
+    # Build request for map data
+    my $http_req = $req->map_data(map => 'Dam');
 
-  # With type filter
-  my $http_req = $req->map_data(map => 'Dam', type => 'loot');
+    # With type filter
+    my $http_req = $req->map_data(map => 'Dam', type => 'loot');
 
 =head1 DESCRIPTION
 
 Builds L<HTTP::Request> objects for the MetaForge Game Map Data API.
 Useful for integrating with async HTTP frameworks.
 
-=head1 ATTRIBUTES
-
 =head2 base_url
 
 Base URL for the API. Defaults to C<https://metaforge.app/api/game-map-data>.
 
-=head1 METHODS
-
 =head2 map_data
 
-  my $http_req = $req->map_data(map => 'Dam');
+    my $http_req = $req->map_data(map => 'Dam');
 
 Returns L<HTTP::Request> for fetching map marker data.
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
-
 =head1 SUPPORT
 
-=head2 Source Code
+=head2 Issues
 
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-metaforge/issues>.
 
-L<https://github.com/Getty/p5-www-metaforge>
+=head2 IRC
 
-  git clone https://github.com/Getty/p5-www-metaforge.git
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 

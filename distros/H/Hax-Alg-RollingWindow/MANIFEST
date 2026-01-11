@@ -1,0 +1,11 @@
+Changes
+Hax-Alg-RollingWindow-0.001/META.json
+Hax-Alg-RollingWindow-0.001/META.yml
+lib/Hax/Alg/RollingWindow.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/basic.t
+t/refs.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

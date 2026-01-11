@@ -1,4 +1,4 @@
-# $Id: ScottAdams.pm,v 1.5 2006/11/02 18:04:37 mike Exp $
+# $Id: ScottAdams.pm,v 1.5 2006-11-02 18:04:37 mike Exp $
 
 # ScottAdams.pm - a compiler for Scott Adams adventures
 
@@ -6,7 +6,7 @@ package Games::ScottAdams;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 =head1 NAME
 

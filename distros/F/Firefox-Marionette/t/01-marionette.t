@@ -1576,7 +1576,7 @@ SKIP: {
 SKIP: {
 	diag("Starting new firefox for testing PDFs and script elements");
 	my $bookmarks_path = File::Spec->catfile(Cwd::cwd(), qw(t data bookmarks_chrome.html));
-	($skip_message, $firefox) = start_firefox(0, capabilities => Firefox::Marionette::Capabilities->new(accept_insecure_certs => 1, moz_headless => 1), bookmarks => $bookmarks_path, geo => 1, stealth => 1);
+	($skip_message, $firefox) = start_firefox(0, insecure => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 1), bookmarks => $bookmarks_path, geo => 1, stealth => 1);
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -1978,6 +1978,7 @@ SKIP: {
 				local $TODO = $TODO || ($major_version < 130 && $name =~ /^(?:CLEAR_ALL_CACHES|CLEAR_FORGET_ABOUT_SITE)$/) ? "Old firefox (less than 130) can have different values for Firefox::Marionette::Cache constants" : q[];
 				local $TODO = $TODO || ($major_version < 132 && $name =~ /^(?:CLEAR_SESSION_HISTORY|CLEAR_FORGET_ABOUT_SITE)$/) ? "Old firefox (less than 132) can have different values for Firefox::Marionette::Cache constants" : q[];
 				local $TODO = $TODO || ($major_version < 135 && $name =~ /^(?:CLEAR_COOKIES_AND_SITE_DATA|CLEAR_FORGET_ABOUT_SITE)$/) ? "Old firefox (less than 135) can have different values for Firefox::Marionette::Cache constants" : q[];
+				local $TODO = $TODO || ($major_version < 148 && $name =~ /^(?:CLEAR_PREDICTOR_NETWORK_DATA|CLEAR_FORGET_ABOUT_SITE)$/) ? "Old firefox (less than 148) can have different values for Firefox::Marionette::Cache constants" : q[];
 				my $result = $firefox->check_cache_key($name);
 				ok($result == &$name(), "\$firefox->check_cache_key($name) eq Firefox::Marionette::Cache::${name} which should be $result and is " . &$name());
 			}
@@ -4754,7 +4755,7 @@ SKIP: {
 	if ($major_version >= 135) {
 		skip("Skipping b/c proxy seems to cause hangs", 32);
 	}
-	($skip_message, $firefox) = start_firefox(1, import_profile_paths => [ 't/data/logins.json', 't/data/key4.db' ], manual_certificate_add => 1, console => 1, debug => 0, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, accept_insecure_certs => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0, proxy => Firefox::Marionette::Proxy->new(host => $proxy_host)), timeouts => Firefox::Marionette::Timeouts->new(page_load => 78_901, script => 76_543, implicit => 34_567));
+	($skip_message, $firefox) = start_firefox(1, insecure => 0, import_profile_paths => [ 't/data/logins.json', 't/data/key4.db' ], manual_certificate_add => 1, console => 1, debug => 0, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0, proxy => Firefox::Marionette::Proxy->new(host => $proxy_host)), timeouts => Firefox::Marionette::Timeouts->new(page_load => 78_901, script => 76_543, implicit => 34_567));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}

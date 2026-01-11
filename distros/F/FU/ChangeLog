@@ -1,3 +1,10 @@
+1.4 - 2026-01-10
+	- FU::Pg: rename q() and Q() to sql() and SQL() (old names still work)
+	- FU: Improve handling of EPIPE when writing FastCGI response
+	- FU: Log unclean worker process shutdown
+	- FU: Fix warning when parsing empty cookie values
+	- Misc doc fixes
+
 1.3 - 2025-09-04
 	- FU::Validate: Scalar validations now reject control characters by default
 	- FU::Validate: Add `allow_control` option to override above behavior

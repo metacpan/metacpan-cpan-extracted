@@ -4,7 +4,7 @@
       "Andrew Speer <andrew.speer@isolutions.com.au>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -62,16 +62,13 @@
    "release_status" : "stable",
    "resources" : {
       "homepage" : "https://github.com/aspeer/WebDyne",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/aspeer/WebDyne.git",
          "web" : "https://github.com/aspeer/WebDyne"
       }
    },
-   "version" : "2.046",
+   "version" : "2.060",
    "x_authority" : "cpan:ASPEER",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

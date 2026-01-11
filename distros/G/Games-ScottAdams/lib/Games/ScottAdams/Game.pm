@@ -1,4 +1,4 @@
-# $Id: Game.pm,v 1.1 2006/10/31 20:31:21 mike Exp $
+# $Id: Game.pm,v 1.1 2006-10-31 20:31:21 mike Exp $
 
 # Game.pm - class to represent an entire Scott Adams game.
 

@@ -6,7 +6,7 @@ no warnings qw( void once uninitialized );
 package Sub::Accessor::Small;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.000002';
+our $VERSION   = '1.000003';
 our @ISA       = qw/ Exporter::Tiny /;
 our @EXPORT_OK = qw/ has /;
 
@@ -167,7 +167,7 @@ sub install_coderef
 	
 	return unless defined $target;
 	
-	if (!ref $target and $target =~ /\A[^\W0-9]\w+\z/)
+	if (!ref $target and $target =~ /\A[^\W0-9]\w*\z/)
 	{
 		my $name = "$me->{package}\::$target";
 		no strict qw(refs);
@@ -186,7 +186,7 @@ sub install_coderef
 		return;
 	}
 	
-	croak "Expected installation target to be a reference to an undefined scalar; got $target";
+	croak "Expected installation target to be a method name or a reference to an undefined scalar; got $target";
 }
 
 sub expand_handles
@@ -239,26 +239,20 @@ sub expand_handles
 	{
 		my $me = shift;
 		my $name = $me->{slot};
+		
+		if ( ref $me->{builder} eq 'CODE' ) {
 			
-		if (ref $me->{builder} eq 'CODE')
-		{
 			croak "builder => CODE requires Sub::Util or Sub::Name to be installed"
 				if $set_subname_is_fake;
 			
-			my $code = $me->{builder};
 			defined($name) && defined($me->{package})
 				or croak("Invalid builder; expected method name as string");
 			
+			my $code = delete $me->{builder};
 			my $is_private = ($name =~ /\A_/) ? 1 : 0;
-			
-			my $subname    = sprintf($one{builder}[$is_private], $name);
-			my $fq_subname = "$me->{package}\::$name";
-			$me->_exporter_install_sub(
-				$subname,
-				{},
-				$me->{_export},
-				set_subname( $fq_subname, $code ),
-			);
+			my $subname = sprintf $one{builder}[$is_private], $name;
+			$me->install_coderef( $subname, $code );
+			$me->{builder} = $subname;
 		}
 	}
 }
@@ -678,6 +672,7 @@ sub inline_reader : method
 	if ( $me->{lazy} )
 	{
 		my $flag;
+		delete local $me->{trigger};
 		my $w = $me->inline_writer( $selfvar, $me->inline_default( $selfvar ), \$flag );
 		
 		if ( $flag )

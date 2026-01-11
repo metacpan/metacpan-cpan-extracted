@@ -1,0 +1,16 @@
+{
+  "certificate": {
+    "id": 1200,
+    "name": "new-cert",
+    "certificate": null,
+    "domain_names": ["test.example.com"],
+    "fingerprint": null,
+    "status": { "issuance": "pending" },
+    "type": "managed",
+    "labels": {},
+    "created": "2024-06-01T12:00:00+00:00",
+    "not_valid_before": null,
+    "not_valid_after": null
+  },
+  "action": { "id": 7777, "command": "create_certificate", "status": "running" }
+}

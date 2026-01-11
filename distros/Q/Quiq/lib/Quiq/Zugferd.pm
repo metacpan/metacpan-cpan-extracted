@@ -42,7 +42,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.233';
+our $VERSION = '1.234';
 
 use Quiq::PerlModule;
 use Quiq::Path;
@@ -196,6 +196,81 @@ sub new {
         version => $version,
         bgH => undef, # wird bei Bedarf geladen
     },$class;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 createTemplate() - Erzeuge XML-Template zu Schemadefinition
+
+=head4 Synopsis
+
+  $xml = $class->createTemplate($xsdDir);
+
+=head4 Returns
+
+(String) XML-Template
+
+=head4 Description
+
+Erzeuge auf Basis der XSD-Dateien in $xsdDir mit %CL<lt>XML::Compile::Schema>%
+ein XML Template ohne Werte und liefere dieses zurück.
+
+B<ACHTUNG:> Mit der originalen Version von XML::Compile werden erneut
+auftauchende Elemente ELEMENT abgekürzt mit <ELEMENT/>. Das Ergebnis ist
+dann als Template nicht wirklich brauchbar.
+
+=head4 Examples
+
+Profil EN16931 der ZUGFeRD-Version 2.4:
+
+  $ perl -MQuiq::Zugferd -E 'say Quiq::Zugferd->createTemplate("ZF24_DE/Schema/3_Factur-X_1.08_EN16931")' # 562 Zeilen
+
+Profil EXTENDED der ZUGFeRD-Version 2.4:
+
+  $ perl -MQuiq::Zugferd -E 'say Quiq::Zugferd->createTemplate("ZF24_DE/Schema/4_Factur-X_1.08_EXTENDED")' # 1690 Zeilen
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub createTemplate {
+    my ($this,$xsdDir) = @_;
+
+    # Ermittele .xsd-Dateien im XSD-Verzeichnis
+    my @xsdFiles = Quiq::Path->find($xsdDir,-pattern=>'\.xsd$');
+
+    # Instantiiere Schema-Objekt
+
+    my $sch = XML::Compile::Schema->new;
+    for my $file (@xsdFiles) {
+        $sch->importDefinitions($file);
+    }
+
+    my $ns = 'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100';
+    my $type = 'CrossIndustryInvoice';
+    my $rootType = "{$ns}$type";
+
+    my $xml = $sch->template(XML=>$rootType,
+        show_comments => 'NONE',
+        skip_header => 1,
+        show_all => 1,
+        prefixes => [
+            rsm => $ns,
+        ],
+    );
+
+    $xml =~ s|"token"|""|g;
+    $xml =~ s|>\s*token\s*<|><|g;
+    $xml =~ s|"example"|""|g;
+    $xml =~ s|>\s*example\s*<|><|g;
+    $xml =~ s|"example"|""|g;
+    $xml =~ s|>\s*example\s*<|><|g;
+    $xml =~ s|"3.1415"|""|g;
+    $xml =~ s|>\s*3.1415\s*<|><|g;
+    $xml =~ s|>\s*decoded bytes\s*<|><|g;
+    $xml =~ s|>\s*true\s*<|><|g;
+
+    return $xml;
 }
 
 # -----------------------------------------------------------------------------
@@ -1350,7 +1425,7 @@ Klassen:
 
 =head1 VERSION
 
-1.233
+1.234
 
 =head1 AUTHOR
 
@@ -1358,7 +1433,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2025 Frank Seitz
+Copyright (C) 2026 Frank Seitz
 
 =head1 LICENSE
 

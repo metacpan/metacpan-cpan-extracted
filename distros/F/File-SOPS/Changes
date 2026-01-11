@@ -1,0 +1,15 @@
+Revision history for File-SOPS
+
+0.001     2026-01-11 04:00:35Z
+  - Initial release
+  - Pure Perl implementation of Mozilla SOPS encrypted file format
+  - Full interoperability with sops CLI (tested with v3.9.4)
+  - age encryption backend via Crypt::Age
+  - AES-256-GCM value encryption with type preservation (str, int, float, bool)
+  - YAML and JSON format support
+  - MAC verification for tamper detection
+  - Multiple recipient support
+  - Key rotation support
+  - File encrypt/decrypt operations
+  - Single value extraction via path notation
+  - Comprehensive test suite including CLI interop tests

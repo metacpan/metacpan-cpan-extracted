@@ -1,0 +1,20 @@
+[
+  {
+    "key": {
+      "name": "omnicorp-deploy",
+      "fingerprint": "00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff",
+      "type": "ED25519",
+      "size": 256,
+      "data": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExample... deploy@omnicorp.com"
+    }
+  },
+  {
+    "key": {
+      "name": "omnicorp-admin",
+      "fingerprint": "ff:ee:dd:cc:bb:aa:99:88:77:66:55:44:33:22:11:00",
+      "type": "RSA",
+      "size": 4096,
+      "data": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQExample... admin@omnicorp.com"
+    }
+  }
+]

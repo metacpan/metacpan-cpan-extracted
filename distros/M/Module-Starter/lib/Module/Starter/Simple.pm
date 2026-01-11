@@ -18,11 +18,11 @@ Module::Starter::Simple - a simple, comprehensive Module::Starter plugin
 
 =head1 VERSION
 
-version 1.80
+version 1.82
 
 =cut
 
-our $VERSION = '1.80';
+our $VERSION = '1.82';
 
 =head1 SYNOPSIS
 
@@ -422,7 +422,7 @@ sub Makefile_PL_guts {
     my $main_pm_file = shift;
 
     my $author = '[' . 
-       join(',', map { "'" . s/'/\'/rg . "'" } @{$self->{author}}) 
+       join(',', map { (my $x = $_) =~ s/'/\'/g; "'$x'" } @{$self->{author}}) 
        . ']';
     
     my $slname = $self->{license_record} ? $self->{license_record}->meta2_name : $self->{license};
@@ -623,7 +623,7 @@ sub Build_PL_guts {
     my $main_pm_file = shift;
 
     my $author = '[' . 
-       join(',', map { "'" . s/'/\'/rg . "'" } @{$self->{author}}) 
+       join(',', map { (my $x = $_) =~ s/'/\'/g;  "'$x'" } @{$self->{author}}) 
        . ']';
 
     my $slname = $self->{license_record} ? $self->{license_record}->meta2_name : $self->{license};

@@ -21,6 +21,22 @@ is_deeply(
     'try returns expression result when no error occurs'
 );
 
+my $string_literal = run('null', 'try "catch me"');
+
+is_deeply(
+    $string_literal,
+    ['catch me'],
+    'try ignores catch keywords inside string literals'
+);
+
+my $array_literal = run('null', 'try ["catch me"]');
+
+is_deeply(
+    $array_literal,
+    [['catch me']],
+    'try ignores catch keywords inside array literals'
+);
+
 my $fail_json = '{"num": 1, "den": 0}';
 my $fallback = run($fail_json, 'try (.num / .den)');
 
@@ -60,6 +76,14 @@ is_deeply(
     $catch_filter,
     [0],
     'catch expression is evaluated as a filter on the original input'
+);
+
+my $empty_catch = run($fail_json, 'try (.num / .den) catch empty');
+
+is_deeply(
+    $empty_catch,
+    [],
+    'catch can return empty results without forcing null'
 );
 
 my $multi_value = run('[{"v": 0}, {"v": 2}]', 'map(try (1 /.v) catch 42)');

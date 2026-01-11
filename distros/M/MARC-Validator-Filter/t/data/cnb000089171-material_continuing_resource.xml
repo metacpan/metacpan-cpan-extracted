@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>02111nai a2200445 a 4500</leader>
+  <controlfield tag="001">nkc20050089171</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20201226180755.0</controlfield>
+  <controlfield tag="007">td</controlfield>
+  <controlfield tag="008">950124d19942006xr  x l       0   b2cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000089171</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">80-7050-187-1</subfield>
+    <subfield code="q">(volné l. v pořadači)</subfield>
+    <subfield code="z">80-7050-278-9</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)39601734</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+  </datafield>
+  <datafield tag="041" ind1="1" ind2=" ">
+    <subfield code="a">cze</subfield>
+    <subfield code="h">eng</subfield>
+  </datafield>
+  <datafield tag="045" ind1=" " ind2=" ">
+    <subfield code="a">x9x9</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">025.3/.4</subfield>
+    <subfield code="x">Katalogizace. Selekční jazyky</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">12</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">006</subfield>
+    <subfield code="2">undef</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">025.3</subfield>
+    <subfield code="2">undef</subfield>
+  </datafield>
+  <datafield tag="245" ind1="0" ind2="0">
+    <subfield code="a">Anglo-americká katalogizační pravidla :</subfield>
+    <subfield code="b">druhé vydání, revize 1988 /</subfield>
+    <subfield code="c">American Library Association ; [překlad Národní knihovna České republiky]</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">1. české vyd.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Národní knihovna České republiky,</subfield>
+    <subfield code="c">1994-2006</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">1 sv. (na volných l.) ;</subfield>
+    <subfield code="c">33 cm</subfield>
+  </datafield>
+  <datafield tag="310" ind1=" " ind2=" ">
+    <subfield code="a">Aktualizováno nepravidelně</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">1000 výt.</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">V tiráži r. vyd. 1994-1995</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Dodatky 2003-2005 vyšly zároveň v r. 2006, distribuovány společně v 1 obalu</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">U dodatků 1999 uvedeno na tit. s.: revize 1998</subfield>
+  </datafield>
+  <datafield tag="588" ind1=" " ind2=" ">
+    <subfield code="a">Popsáno podle: základní dílo vyd. 1994 včetně dodatků 2005, vyd. 2006</subfield>
+    <subfield code="5">CZ-PrNK</subfield>
+  </datafield>
+  <datafield tag="653" ind1="0" ind2=" ">
+    <subfield code="a">AACR2</subfield>
+    <subfield code="a">bibliografický popis</subfield>
+    <subfield code="a">jmenný záznam</subfield>
+    <subfield code="a">katalogizační záznam</subfield>
+    <subfield code="a">mezinárodní normativy</subfield>
+    <subfield code="a">popisné údaje</subfield>
+    <subfield code="a">selekční údaje</subfield>
+    <subfield code="a">standardizovaný záznam</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">příručky</subfield>
+    <subfield code="7">fd133209</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="710" ind1="2" ind2=" ">
+    <subfield code="a">American Library Association</subfield>
+    <subfield code="7">ko2002160123</subfield>
+  </datafield>
+  <datafield tag="710" ind1="2" ind2=" ">
+    <subfield code="a">Národní knihovna České republiky</subfield>
+    <subfield code="7">kn20010709069</subfield>
+  </datafield>
+  <datafield tag="765" ind1="0" ind2=" ">
+    <subfield code="t">Anglo-American cataloguing rules, second edition, 1988 revision</subfield>
+    <subfield code="9">Česky</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="1">
+    <subfield code="u">http://krameriusndk.nkp.cz/search/handle/uuid:e2ed45c0-63b4-11e2-9d9f-005056827e52</subfield>
+    <subfield code="y">Digitalizovaný dokument</subfield>
+  </datafield>
+  <datafield tag="902" ind1=" " ind2=" ">
+    <subfield code="a">80-7050-278-9</subfield>
+    <subfield code="q">(1993 dodatky ;</subfield>
+    <subfield code="q">vol. listy)</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="s">základní dílo, dodatky 1993, dodatky a revize 1992-1996, dodatky 1999, 2001, 2002, 2003, 2004, 2005</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">pravidla katalogizační anglo-americká - příručky</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">záznam jmenný - pravidla - příručky</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000089171</subfield>
+  </datafield>
+</record>
+
+</collection>

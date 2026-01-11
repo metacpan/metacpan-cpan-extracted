@@ -41,7 +41,7 @@ use WebDyne::Request::PSGI::Constant;
 
 #  Version information
 #
-$VERSION='2.046';
+$VERSION='2.060';
 
 
 #  API file name cache
@@ -572,7 +572,6 @@ the same terms as the Perl 5 programming language system itself.
 Full license text is available at:
 
 <http://dev.perl.org/licenses/>
-
 
 =end markdown
 

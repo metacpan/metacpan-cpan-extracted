@@ -1,0 +1,17 @@
+{
+  "network": {
+    "id": 200,
+    "name": "new-network",
+    "ip_range": "192.168.0.0/16",
+    "subnets": [],
+    "routes": [],
+    "servers": [],
+    "labels": {},
+    "protection": {
+      "delete": false
+    },
+    "created": "2024-06-01T12:00:00+00:00",
+    "load_balancers": [],
+    "expose_routes_to_vswitch": false
+  }
+}

@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1,
-#        XDR::Gen version 0.0.5 and LibVirt version v11.10.0
+#        XDR::Gen version 1.0.0 and LibVirt version v11.10.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -13,13 +13,13 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::Remote v11.10.2;
+package Protocol::Sys::Virt::Remote v11.10.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v11.10.2;
-use Protocol::Sys::Virt::Transport::XDR v11.10.2;
+use Protocol::Sys::Virt::Remote::XDR v11.10.3;
+use Protocol::Sys::Virt::Transport::XDR v11.10.3;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 my $transport = 'Protocol::Sys::Virt::Transport::XDR';
 
@@ -2849,11 +2849,12 @@ sub _dispatch_message {
 
 sub _dispatch_stream {
     my ($self, %args) = @_;
-    my $proc = $args{header}->{proc};
-    my $serial = $args{header}->{serial};
-    my $final = $args{header}->{status} != $transport->CONTINUE;
+    my $eof   = ((defined $args{data} and length($args{data}) == 0)
+                 or $args{header}->{status} == $transport->ERROR);
+    my $final = ($args{header}->{status} != $transport->CONTINUE);
 
     return $self->{on_stream}->(%args,
+                                eof => $eof,
                                 final => $final);
 }
 
@@ -3051,7 +3052,7 @@ Protocol::Sys::Virt::Remote - Connect to remote libvirt daemon
 
 =head1 VERSION
 
-v11.10.2
+v11.10.3
 
 Based on LibVirt tag v11.10.0
 
@@ -3124,14 +3125,15 @@ fact the C<data> has been decoded from XDR to the Perl representation.
 
 =head2 on_stream
 
-  $on_stream->(header => $hdr, data => $data);
-  $on_stream->(header => $hdr, hole => $hole);
-  $on_stream->(header => $hdr, error => $err);
-  $on_stream->(header => $hdr, final => $final);
+  $on_stream->(header => $hdr, data => $data,   eof => $eof);
+  $on_stream->(header => $hdr, hole => $hole,   eof => $eof);
+  $on_stream->(header => $hdr, error => $err,   eof => $eof);
+  $on_stream->(header => $hdr, final => $final, eof => $eof);
 
 Passthrough from the C<on_stream> event in C<Protocol::Sys::Virt::Transport>,
-with the exception of the C<final> argument which indicates a positive
-confirmation of the end of the stream.  This message comes after the last
+with the exception of the C<$eof> and C<final> arguments which indicate end
+of the stream and a confirmation of the stream finalization (after invoking
+C<stream_end>). This message comes after the last
 data message (which sends zero-length data); both ends send this message
 which serves as a synchronization point for the stream communication.
 

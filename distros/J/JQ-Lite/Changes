@@ -1,3 +1,85 @@
+2.10  2026-01-11
+
+  - Improve mode() handling for nested values by generating recursive keys.
+  - Add regression coverage for mode() with nested objects.
+
+2.09  2026-01-11
+
+  - Update contains() handling so null needles do not match non-null scalars.
+  - Expand contains()/contains_subset() tests for null handling on strings.
+
+2.08  2026-01-11
+
+  - Updated match() to return jq-compatible match objects instead of booleans.
+    The result now includes:
+      * offset   — start position of the match
+      * length   — length of the matched substring
+      * string   — the full matched text
+      * captures — array of capture group objects (offset, length, string)
+
+  - match() now returns null when the regular expression does not match,
+    aligning behavior with jq.
+
+  - This enables jq-style regex introspection such as accessing capture
+    groups (e.g. match("(...)(...)").captures[1].string).
+
+2.07  2026-01-11
+
+    - Enforced validation of regular expression flags for test() and match()
+      so unknown flags (e.g. "z") now raise a runtime error instead of being
+      silently ignored.
+
+    - Added regression coverage ensuring invalid regex flags are rejected
+      consistently in both test and match filters.
+
+2.06  2026-01-11
+
+    - Treat JSON string scalars as strings during addition and throw on
+      mixed string/number operands.
+
+2.05  2026-01-11
+
+    - Fix value parsing so string literals containing "contains" are not
+      misinterpreted as a contains condition.
+
+2.04  2026-01-11
+
+    - Fix try/catch parsing to ignore catch tokens inside literals.
+
+2.03  2026-01-11
+
+    - Ensure try/catch can return empty results without forcing null output.
+
+2.02  2026-01-10
+
+    - Fix bracketed array/index access parsing so expressions like .[0]
+      remain traversal expressions instead of array constructors.
+    - Add CLI regression coverage for compact output array indexing.
+
+2.01  2026-01-10
+
+    - Fixed quoted field access so expressions like ."k" and ."a b"
+      are correctly parsed as key paths instead of string literals.
+
+    - Added proper decoding and traversal support for quoted keys,
+      allowing access to object fields containing spaces or dots.
+
+    - Added regression tests covering quoted field access behavior.
+
+2.00  2026-01-10
+
+    - Fix group_by() to evaluate the key per element and form correct
+      groups instead of collapsing everything into one.
+    - Enforce array input for group_by() and add regression tests
+      covering scalar, array, and null keys.
+    - Note: quoted field access (."k") is still parsed as a string literal
+      and may affect expressions like group_by(."k") (tracked separately).
+
+1.99  2026-01-10
+
+    - Promote release to version 1.99 expanding test coverage for regex
+      flags in test() and match() and their default behaviors.
+
 1.98  2026-01-06
 
     - Promote release to version 1.98 capturing stricter join() input
@@ -1241,6 +1323,12 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
+
+
+
+
+
 
 
 

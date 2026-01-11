@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# TODO: If feeds/config file does not exist, create default stub file
+
 PRGNAM=nossui
 
 NOSSUI_CONFIG=

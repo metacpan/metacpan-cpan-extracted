@@ -1,4 +1,4 @@
-# $Id: File.pm,v 1.3 2006/11/03 20:59:19 mike Exp $
+# $Id: File.pm,v 1.3 2006-11-03 20:59:19 mike Exp $
 
 # File.pm - a cleverer IO::File-alike that does pushback
 
@@ -37,8 +37,8 @@ sub getline {
     my($trim) = @_;
 
     my $line = pop @{ $this->{pushback} };
+  AGAIN:
     if (!defined $line) {
-      AGAIN:
 	$this->{linenumber}++;
 	$line = $this->{f}->getline();
 	return undef if !defined $line;
@@ -47,7 +47,10 @@ sub getline {
     if ($trim) {
 	$line =~ s/#.*//;
 	$line =~ s/\s+$//;
-	goto AGAIN if $line =~ /^$/;
+	if ($line =~ /^$/) {
+	    undef $line;
+	    goto AGAIN;
+	}
     }
 
     return $line;

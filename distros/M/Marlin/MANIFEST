@@ -11,7 +11,6 @@ README
 SIGNATURE
 dist.ini
 doap.ttl
-examples/antlers.pl
 examples/benchmark.pl
 examples/can_haz_xs.pl
 examples/lib/Local/Example/Core.pm
@@ -57,6 +56,7 @@ t/integration/mouse-inherit.t
 t/integration/pad-inherit.skip
 t/integration/plugin.t
 t/integration/roles.t
+t/integration/roles2.t
 t/integration/storage.t
 t/integration/struct.t
 t/integration/triggers.t

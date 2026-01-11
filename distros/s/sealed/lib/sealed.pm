@@ -20,7 +20,7 @@ our $VERSION;
 our $DEBUG;
 
 BEGIN {
-  our $VERSION = qv(8.7.0);
+  our $VERSION = qv(8.7.1);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -142,9 +142,9 @@ sub all {
   my $pkg = caller;
   no strict 'refs';
   eval "BEGIN {
-  while (my (undef, \$v) = each %{$pkg\::}) {
-    MODIFY_CODE_ATTRIBUTES(\$pkg, *\$v{CODE}, \"sealed\") if ref(*\$v{CODE});
-  }
+    while (my (undef, \$v) = each %{$pkg\::}) {
+      MODIFY_CODE_ATTRIBUTES(\$pkg, *\$v{CODE}, \"sealed\") if ref(*\$v{CODE});
+    }
   }";
 }
 

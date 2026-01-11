@@ -1,4 +1,4 @@
-# $Id: Compile.pm,v 1.3 2006/11/01 23:57:42 mike Exp $
+# $Id: Compile.pm,v 1.3 2006-11-01 23:57:42 mike Exp $
 
 # Compile.pm - back-end compilation functions for Scott Adams game files.
 
@@ -308,7 +308,7 @@ sub _make_wordlist {
     # the various-sized synonym-sets into the available slots, but
     # let's not lose sleep over it.
     my $vocab = $this->{$type . 'vocab'};
-    foreach my $key (keys %$vocab) {
+    foreach my $key (sort keys %$vocab) {
 	my @list = ($key, @{ $vocab->{$key} });
 
 	# Find first area big enough to fit all the words in

@@ -2,7 +2,7 @@ package WWW::Noss::FeedReader::MediaRSS;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(parse_media_node);

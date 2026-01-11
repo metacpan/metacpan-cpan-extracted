@@ -16,7 +16,7 @@ StreamFinder - Fetch actual raw streamable URLs from various radio-station, vide
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2025 by
+This module is Copyright (C) 2017-2026 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -503,7 +503,7 @@ L<http://search.cpan.org/dist/StreamFinder/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2025 Jim Turner.
+Copyright 2017-2026 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -551,7 +551,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.46';
+our $VERSION = '2.47';
 our $DEBUG = 0;
 
 require Exporter;

@@ -6,7 +6,7 @@ use utf8;
 package Marlin::Role;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011001';
+our $VERSION   = '0.011002';
 
 use parent 'Marlin';
 
@@ -30,6 +30,8 @@ sub setup_steps {
 		canonicalize_attributes
 		setup_accessors
 		setup_imports
+		run_delayed
+		setup_compat
 	/;
 }
 
@@ -104,6 +106,20 @@ sub inject_moo_metadata {
 	for my $attr ( @{ $me->attributes } ) {
 		$attr->inject_moorole_metadata($makers) or next;
 	}
+}
+
+sub _make_modifier_imports {
+	my $me = shift;
+	my $info = $Role::Tiny::INFO{$me->this};
+	return map {
+		my $type = $_;
+		$type => sub {
+			my $code = pop;
+			my @names = ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_;
+			push @{ $info->{modifiers} ||= [] }, [ $type, @names, $code ];
+			return;
+		};
+	} qw( before after around );
 }
 
 1;

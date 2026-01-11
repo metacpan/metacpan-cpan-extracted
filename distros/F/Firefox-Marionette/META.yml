@@ -42,6 +42,7 @@ requires:
   Exporter: '0'
   Fcntl: '0'
   File::Find: '0'
+  File::HomeDir: '0'
   File::Path: '2.08'
   File::Spec: '0'
   File::Temp: '0'
@@ -69,5 +70,5 @@ requires:
 resources:
   bugtracker: https://github.com/david-dick/firefox-marionette/issues
   repository: https://github.com/david-dick/firefox-marionette
-version: '1.68'
+version: '1.70'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

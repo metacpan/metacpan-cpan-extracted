@@ -1,0 +1,12 @@
+{
+  "datacenter": {
+    "id": 1,
+    "name": "fsn1-dc14",
+    "description": "Falkenstein 1 DC14",
+    "location": {
+      "id": 1,
+      "name": "fsn1",
+      "city": "Falkenstein"
+    }
+  }
+}

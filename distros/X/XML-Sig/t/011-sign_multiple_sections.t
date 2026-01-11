@@ -44,6 +44,12 @@ SKIP: {
     );
 }
 
+
+SKIP: {
+    eval {
+        require Crypt::OpenSSL::DSA;
+    };
+    skip "Crypt::OpenSSL::DSA not installed", 3 if ($@);
 # Test signing with a DSA key
 my $dsasig = XML::Sig->new({ key => 't/dsa.private.key' });
 my $dsa_signed_xml = $dsasig->sign($xml);
@@ -71,7 +77,7 @@ SKIP: {
         )
     );
 }
-
+}
 # Test that XML::Sig can verify an xmlsec1 RSA signed xml
 $xml = slurp_file('t/signed/xmlsec1-signed-rsa-multiple.xml');
 my $xmlsec1_rsasig = XML::Sig->new({ x509 => 1, cert => 't/rsa.cert.pem' });

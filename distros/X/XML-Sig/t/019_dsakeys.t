@@ -5,6 +5,11 @@ use Test::XML::Sig;
 
 my $xmlsec  = get_xmlsec_features;
 
+SKIP: {
+    eval {
+        require Crypt::OpenSSL::DSA;
+    };
+    skip "Crypt::OpenSSL::DSA not installed", 5 if ($@);
 my $sig = XML::Sig->new(
     {
         x509 => 1,
@@ -36,5 +41,5 @@ SKIP: {
 $sig = XML::Sig->new();
 ok($sig->verify($signed),
     "XML::Sig signed Validated using DSA X509Certificate");
-
+}
 done_testing;

@@ -2,7 +2,7 @@ package WWW::Noss::TextToHtml;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(text2html escape_html unescape_html strip_tags);
@@ -12,6 +12,7 @@ use constant {
     STRIP_TAG     => 1,
     STRIP_COMMENT => 2,
     STRIP_CDATA   => 3,
+    STRIP_QUOTE   => 4,
 };
 
 # Copypasted from HTML::Parser's HTML::Entities
@@ -336,6 +337,7 @@ sub strip_tags {
     my $state = STRIP_TEXT;
     my $prev;
     my $start = 0;
+    my $quot;
 
     for (my $i = 0; $i < length($text); $i++) {
         my $c = substr $text, $i, 1;
@@ -364,6 +366,9 @@ sub strip_tags {
             } elsif ($c eq '>') {
                 $start = $i + 1;
                 $state = STRIP_TEXT;
+            } elsif ($c eq "'" or $c eq '"') {
+                $quot = $c;
+                $state = STRIP_QUOTE;
             }
         } elsif ($state == STRIP_COMMENT) {
             if (substr($text, $i, 3) eq '-->') {
@@ -378,6 +383,12 @@ sub strip_tags {
                 $state = STRIP_TEXT;
                 $start = $i + 3;
                 $i += 2;
+            }
+        } elsif ($state == STRIP_QUOTE) {
+            if ($c eq $quot) {
+                $state = STRIP_TAG;
+            } elsif ($c eq '\\') {
+                $i += 1;
             }
         }
     }
@@ -447,7 +458,7 @@ requests are welcome!
 
 =head1 COPYRIGHT
 
-Copyright (C) 2025 Samuel Young
+Copyright (C) 2025-2026 Samuel Young
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -160,9 +160,9 @@ LABEL org.opencontainers.image.source="https://github.com/aspeer/WebDyne.git"
 LABEL org.opencontainers.image.documentation="https://github.com/aspeer/WebDyne#readme"
 LABEL org.opencontainers.image.authors="Andrew Speer <andrew.speer@isolutions.com.au>"
 LABEL org.opencontainers.image.licenses="Artistic-1.0-Perl OR GPL-1.0-or-later"
-LABEL org.opencontainers.image.created="2026-01-03T03:00:34Z"
-LABEL org.opencontainers.image.version="2.042"
-LABEL org.opencontainers.image.revision="d99451a"
+LABEL org.opencontainers.image.created="2026-01-06T12:17:55Z"
+LABEL org.opencontainers.image.version="2.047"
+LABEL org.opencontainers.image.revision="deeafa0"
 LABEL org.opencontainers.image.base=${BASE}
 
 
@@ -196,6 +196,7 @@ WORKDIR /app
 # Copy CPAN modules from builder + example file
 #
 COPY --from=builder ${PERL_CARTON_PATH} ${PERL_CARTON_PATH}
+COPY docker/app.psp .
 
 
 # Expose port (default 8080)

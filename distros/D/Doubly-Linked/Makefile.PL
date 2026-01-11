@@ -24,6 +24,16 @@ my %WriteMakefileArgs = (
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Doubly-Linked-*' },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/ThisUsedToBeAnEmail/Doubly-Linked.git',
+                web  => 'https://github.com/ThisUsedToBeAnEmail/Doubly-Linked',
+            },
+        },
+    },
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

@@ -52,6 +52,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Getty/p5-www-metaforge/issues"
+      },
       "homepage" : "https://github.com/Getty/p5-www-metaforge",
       "repository" : {
          "type" : "git",
@@ -59,7 +62,7 @@
          "web" : "https://github.com/Getty/p5-www-metaforge"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -258,21 +261,6 @@
                         "version" : "4.020"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::Collect",
-                        "name" : "Attributes",
-                        "version" : "4.020"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Collect",
-                        "name" : "Methods",
-                        "version" : "4.020"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Collect",
-                        "name" : "Functions",
-                        "version" : "4.020"
-                     },
-                     {
                         "class" : "Pod::Weaver::Section::Leftovers",
                         "name" : "@GETTY/Leftovers",
                         "version" : "4.020"
@@ -283,13 +271,13 @@
                         "version" : "4.020"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::Support",
+                        "class" : "Pod::Weaver::Section::GenerateSection",
                         "name" : "@GETTY/Support",
-                        "version" : "1.014"
+                        "version" : "4.020"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::Bugs",
-                        "name" : "@GETTY/Bugs",
+                        "class" : "Pod::Weaver::Section::GenerateSection",
+                        "name" : "@GETTY/Contributing",
                         "version" : "4.020"
                      },
                      {
@@ -305,6 +293,11 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Transformer",
                         "name" : "@GETTY/List",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::Transformer",
+                        "name" : "@GETTY/GETTY",
                         "version" : "4.020"
                      }
                   ]
@@ -336,21 +329,7 @@
                   "global" : 0,
                   "skip_version_provider" : 0
                },
-               "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {
-                  "_fallback_version_provider_args" : {},
-                  "fallback_version_provider" : "Git::NextVersion"
-               },
-               "Git::NextVersion" : {
-                  "Dist::Zilla::Plugin::Git::NextVersion" : {
-                     "first_version" : "0.001",
-                     "version_by_branch" : 0,
-                     "version_regexp" : "(?^:^v(.+)$)"
-                  },
-                  "Dist::Zilla::Role::Git::Repo" : {
-                     "git_version" : "2.39.5",
-                     "repo_root" : "."
-                  }
-               }
+               "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {}
             },
             "name" : "@Author::GETTY/@Git::VersionManager/RewriteVersion::Transitional",
             "version" : "0.009"
@@ -406,7 +385,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.001",
+                  "tag" : "0.002",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

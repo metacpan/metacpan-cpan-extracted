@@ -1,5 +1,5 @@
-.cvsignore
-CVS
+.git
+.gitignore
 archive
 bin/.*\.sac
 bin/.*\.sao

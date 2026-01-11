@@ -1,5 +1,11 @@
 CHANGES
 
+20260110        2026-01-10
+
+            * Check .psgi and cpanfile files.
+                * https://github.com/shlomif/Test-PerlTidy/pull/11
+                    * Thanks to @dboehmer !
+
 20230226        2023-02-26
 
             * Cleanups and speedups

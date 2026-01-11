@@ -1,0 +1,37 @@
+{
+  "images": [
+    {
+      "id": 1,
+      "name": "debian-12",
+      "description": "Debian 12",
+      "type": "system",
+      "status": "available",
+      "os_flavor": "debian",
+      "os_version": "12",
+      "architecture": "x86",
+      "rapid_deploy": true
+    },
+    {
+      "id": 2,
+      "name": "debian-13",
+      "description": "Debian 13",
+      "type": "system",
+      "status": "available",
+      "os_flavor": "debian",
+      "os_version": "13",
+      "architecture": "x86",
+      "rapid_deploy": true
+    },
+    {
+      "id": 3,
+      "name": "ubuntu-24.04",
+      "description": "Ubuntu 24.04",
+      "type": "system",
+      "status": "available",
+      "os_flavor": "ubuntu",
+      "os_version": "24.04",
+      "architecture": "x86",
+      "rapid_deploy": true
+    }
+  ]
+}

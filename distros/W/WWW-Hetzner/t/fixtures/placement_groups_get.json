@@ -1,0 +1,10 @@
+{
+  "placement_group": {
+    "id": 1300,
+    "name": "web-spread",
+    "type": "spread",
+    "servers": [123, 456],
+    "labels": { "env": "prod" },
+    "created": "2024-01-10T10:00:00+00:00"
+  }
+}

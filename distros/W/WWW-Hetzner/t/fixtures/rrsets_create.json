@@ -1,0 +1,10 @@
+{
+  "rrset": {
+    "name": "api",
+    "type": "A",
+    "ttl": 300,
+    "records": [
+      { "value": "203.0.113.20" }
+    ]
+  }
+}

@@ -4,8 +4,15 @@ use File::Which;
 
 my $xmlsec = get_xmlsec_features;
 
-my @hash_alg = qw/sha1 sha224 sha256 sha384 sha512/;
+my @hash_alg = qw/sha224 sha256 sha384 sha512/;
+push @hash_alg, 'sha1' if $xmlsec->{sha1_support};
 
+SKIP: {
+    eval {
+        require Crypt::OpenSSL::DSA;
+    };
+    my $algs = scalar @hash_alg;
+    skip "Crypt::OpenSSL::DSA not installed", $algs * 4 if ($@);
 foreach my $alg (@hash_alg) {
 
     my $sig = XML::Sig->new(
@@ -35,7 +42,7 @@ foreach my $alg (@hash_alg) {
             $signed, qw(--verify --id-attr:ID "foo"));
     }
 }
-
+}
 foreach my $alg (@hash_alg) {
     my $sig = XML::Sig->new(
         {

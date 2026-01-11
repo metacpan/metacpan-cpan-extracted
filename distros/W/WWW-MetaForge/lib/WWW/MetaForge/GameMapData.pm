@@ -1,7 +1,7 @@
 package WWW::MetaForge::GameMapData;
-our $VERSION = '0.001';
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Perl client for the MetaForge Game Map Data API
+our $VERSION = '0.002';
 
 use Moo;
 use LWP::UserAgent;
@@ -15,17 +15,20 @@ use WWW::MetaForge::GameMapData::Result::MapMarker;
 
 our $DEBUG = $ENV{WWW_METAFORGE_GAMEMAPDATA_DEBUG};
 
+
 has ua => (
   is      => 'ro',
   lazy    => 1,
   builder => '_build_ua',
 );
 
+
 has request => (
   is      => 'ro',
   lazy    => 1,
   default => sub { WWW::MetaForge::GameMapData::Request->new },
 );
+
 
 has cache => (
   is        => 'ro',
@@ -34,14 +37,17 @@ has cache => (
   predicate => 'has_cache',
 );
 
+
 has use_cache => (
   is      => 'ro',
   default => 1,
 );
 
+
 has cache_dir => (
   is => 'ro',
 );
+
 
 has json => (
   is      => 'ro',
@@ -49,15 +55,18 @@ has json => (
   default => sub { JSON::MaybeXS->new(utf8 => 1) },
 );
 
+
 has debug => (
   is      => 'ro',
   default => sub { $DEBUG },
 );
 
+
 has marker_class => (
   is      => 'ro',
   default => 'WWW::MetaForge::GameMapData::Result::MapMarker',
 );
+
 
 sub _debug {
   my ($self, $msg) = @_;
@@ -162,16 +171,19 @@ sub map_data {
   return $self->_to_objects($markers);
 }
 
+
 sub map_data_raw {
   my ($self, %params) = @_;
   my $req = $self->request->map_data(%params);
   return $self->_fetch('map_data', $req, %params);
 }
 
+
 sub clear_cache {
   my ($self, $endpoint) = @_;
   $self->cache->clear($endpoint);
 }
+
 
 1;
 
@@ -187,22 +199,22 @@ WWW::MetaForge::GameMapData - Perl client for the MetaForge Game Map Data API
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
-  use WWW::MetaForge::GameMapData;
+    use WWW::MetaForge::GameMapData;
 
-  my $api = WWW::MetaForge::GameMapData->new;
+    my $api = WWW::MetaForge::GameMapData->new;
 
-  # Get map markers for a specific map
-  my $markers = $api->map_data(map => 'dam');
-  for my $marker (@$markers) {
-      say $marker->type . " at " . $marker->x . "," . $marker->y;
-  }
+    # Get map markers for a specific map
+    my $markers = $api->map_data(map => 'dam');
+    for my $marker (@$markers) {
+        say $marker->type . " at " . $marker->x . "," . $marker->y;
+    }
 
-  # Filter by marker type
-  my $loot = $api->map_data(map => 'dam', type => 'loot');
+    # Filter by marker type
+    my $loot = $api->map_data(map => 'dam', type => 'loot');
 
 =head1 DESCRIPTION
 
@@ -213,8 +225,6 @@ supported by MetaForge.
 This is a generic base module. Game-specific distributions (like
 L<WWW::MetaForge::ArcRaiders>) can use this module and extend the
 result classes with game-specific attributes.
-
-=head1 ATTRIBUTES
 
 =head2 ua
 
@@ -238,23 +248,25 @@ Boolean, default true. Set to false to disable caching.
 Optional L<Path::Tiny> path for cache directory. Defaults to
 XDG cache dir on Unix, LOCALAPPDATA on Windows.
 
-=head2 marker_class
+=head2 json
 
-Class to use for map marker objects. Defaults to
-L<WWW::MetaForge::GameMapData::Result::MapMarker>. Override this
-to use a subclass with game-specific attributes.
+L<JSON::MaybeXS> instance for encoding/decoding JSON.
 
 =head2 debug
 
 Boolean. Enable debug output. Also settable via
 C<$ENV{WWW_METAFORGE_GAMEMAPDATA_DEBUG}>.
 
-=head1 METHODS
+=head2 marker_class
+
+Class to use for map marker objects. Defaults to
+L<WWW::MetaForge::GameMapData::Result::MapMarker>. Override this
+to use a subclass with game-specific attributes.
 
 =head2 map_data
 
-  my $markers = $api->map_data(map => 'dam');
-  my $markers = $api->map_data(map => 'dam', type => 'loot');
+    my $markers = $api->map_data(map => 'dam');
+    my $markers = $api->map_data(map => 'dam', type => 'loot');
 
 Returns ArrayRef of L<WWW::MetaForge::GameMapData::Result::MapMarker>
 (or subclass specified by C<marker_class>).
@@ -268,8 +280,8 @@ Same as C<map_data> but returns raw HashRef/ArrayRef instead of objects.
 
 =head2 clear_cache
 
-  $api->clear_cache('map_data');  # Clear specific endpoint
-  $api->clear_cache;              # Clear all
+    $api->clear_cache('map_data');  # Clear specific endpoint
+    $api->clear_cache;              # Clear all
 
 Clear cached responses.
 
@@ -277,19 +289,20 @@ Clear cached responses.
 
 This module uses the MetaForge API: L<https://metaforge.app>
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
-
 =head1 SUPPORT
 
-=head2 Source Code
+=head2 Issues
 
-The code is open to the world, and available for you to hack on. Please feel free to browse it and play
-with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
-from your repository :)
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-metaforge/issues>.
 
-L<https://github.com/Getty/p5-www-metaforge>
+=head2 IRC
 
-  git clone https://github.com/Getty/p5-www-metaforge.git
+You can reach Getty on C<irc.perl.org> for questions and support.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 

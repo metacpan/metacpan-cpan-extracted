@@ -3,6 +3,14 @@ use experimental 'signatures';
 
 push @Local::Example::ALL, 'Local::Example::Moose';
 
+package Local::Example::Moose::Simple {
+	use Moose;
+	use MooseX::StrictConstructor;
+	has foo => qw( is ro );
+	has bar => qw( is ro );
+	__PACKAGE__->meta->make_immutable;
+}
+
 package Local::Example::Moose::NamedThing {
 	use Moose;
 	use MooseX::StrictConstructor;

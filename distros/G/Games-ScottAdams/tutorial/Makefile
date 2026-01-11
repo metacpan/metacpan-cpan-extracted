@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 2006/11/04 11:18:15 mike Exp $
+# $Id: Makefile,v 1.6 2006-11-04 11:18:15 mike Exp $
 
 STAGES = 1 2 3 4 5
 INTRO = $(STAGES:%=t%.intro)

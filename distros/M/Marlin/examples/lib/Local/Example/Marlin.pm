@@ -5,6 +5,10 @@ use Types::Common -lexical, -types;
 
 push @Local::Example::ALL, 'Local::Example::Marlin';
 
+package Local::Example::Marlin::Simple {
+	use Marlin qw(foo bar);
+}
+
 package Local::Example::Marlin::NamedThing {
 	use Marlin 'name!' => Str;
 }

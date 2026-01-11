@@ -14,7 +14,7 @@ INSTALLATION
             make install
 
 AUTHOR
-    This module is Copyright (C) 2017-2025 by
+    This module is Copyright (C) 2017-2026 by
 
     Jim Turner, "<turnerjw784 at yahoo.com>"
 
@@ -480,7 +480,7 @@ SEE ALSO
         <http://search.cpan.org/dist/StreamFinder/>
 
 LICENSE AND COPYRIGHT
-    Copyright 2017-2025 Jim Turner.
+    Copyright 2017-2026 Jim Turner.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the the Artistic License (2.0). You may obtain a copy

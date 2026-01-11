@@ -1,0 +1,15 @@
+{
+  "certificate": {
+    "id": 1100,
+    "name": "my-cert",
+    "certificate": "-----BEGIN CERTIFICATE-----...",
+    "domain_names": ["example.com", "www.example.com"],
+    "fingerprint": "03:c7:55:9b:2a:d1:04:17:09:f6",
+    "status": { "issuance": "completed", "renewal": "scheduled" },
+    "type": "managed",
+    "labels": {},
+    "created": "2024-01-10T10:00:00+00:00",
+    "not_valid_before": "2024-01-10T00:00:00+00:00",
+    "not_valid_after": "2024-04-10T00:00:00+00:00"
+  }
+}

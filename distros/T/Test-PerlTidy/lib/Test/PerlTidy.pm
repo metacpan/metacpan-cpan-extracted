@@ -1,5 +1,5 @@
 package Test::PerlTidy;
-$Test::PerlTidy::VERSION = '20230226';
+$Test::PerlTidy::VERSION = '20260110';
 use 5.014;
 use strict;
 use warnings;
@@ -156,7 +156,15 @@ sub list_files {
                   if $exclude_me;    # no need to check more exclusions...
             }
             return if $exclude_me;
-            if ( $fn->is_file && ( $fn =~ /\.(?:pl|pm|PL|t)\z/ ) ) {
+            if (
+                $fn->is_file
+                and (
+                    $fn =~
+                    m{(\A|[\\/])cpanfile\z} # cpanfile or ...\cpanfile or .../cpanfile
+                    or $fn =~ /\.(?:PL|pl|pm|psgi|t)\z/    # known extensions
+                )
+              )
+            {
                 push @filenames, $fn;
             }
         },
@@ -201,7 +209,7 @@ Test::PerlTidy - check that all your files are tidy.
 
 =head1 VERSION
 
-version 20230226
+version 20260110
 
 =head1 SYNOPSIS
 
@@ -479,7 +487,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Edmund von der Burg.
+This software is copyright (c) 2026 by Edmund von der Burg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

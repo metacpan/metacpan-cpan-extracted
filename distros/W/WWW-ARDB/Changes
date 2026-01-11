@@ -1,5 +1,9 @@
 Revision history for WWW-ARDB
 
+0.002     2026-01-11 04:38:16Z
+  - Complete inline POD documentation for all modules
+  - Using PodWeaver conventions (=attr, =method, =opt)
+
 0.001     2026-01-05 04:56:22Z
   - Initial release
   - Items, Quests, ARC Enemies API endpoints
