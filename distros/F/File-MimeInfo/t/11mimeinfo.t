@@ -33,7 +33,7 @@ for my $test (sort keys %tests) {
             "$test (stdin)");
     };
     # with empty mimetype dirs, should exit non-zero
-    `$^X $mimetype_file --database "$empty_dir" --noalign $test`;
+    `$^X $mimetype_file --database "$empty_dir" --noalign $test 2>&1`;
     cmp_ok($?, '>', 0);
 }
 

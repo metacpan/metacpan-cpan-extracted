@@ -2,9 +2,10 @@
 #NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE ERASED OR TURNED INTO A COMMENT.
 # Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is proprietary. The open-source, GPL version of it can be found at https://metacpan.org/dist/Sim-OPT.
 
-use Switch::Back;
 
-$VERSION = '0.4.4';
+use Exporter;
+our @ISA = qw(Exporter);
+our @EXPORT = qw( modish );
 
 
 # In version 0.287: added the possibility to decouple the diffuse resolution from the direct resolution.
@@ -24,7 +25,6 @@ $VERSION = '0.4.4';
 print "I AM DOING\n";
 
 # use v5.14;
-use Exporter;
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
 use Math::Trig;
 use List::Util qw[ min max reduce shuffle any];
@@ -42,10 +42,8 @@ no strict;
 no warnings;
 use Switch::Back;
 
-our @ISA = qw(Exporter);
-our @EXPORT = qw( modish );
-
 $ABSTRACT = 'Modish is a program for modifying the shading factors in the ISH (shading and insolation) files of the ESP-r building performance simulation suite in order to make it take into account the reflections from obstructions.';
+$VERSION = '0.4.4';
 
 # Modish is a program for modifying the shading factors in the ISH (shading and insolation) files of the ESP-r building performance simulation suite in order to make it take into account the solar reflections from obstructions.
 # The program, more precisely, brings into account the reflective effect of solar obstructions on solar gains in the ESP-r building models on the basis of irradiance ratios. Those ratios are obtained combining the direct radiation on a surface, calculated by the means of ESP-r and by the means of a raytracer (Radiance), and the total radiation on the same surface calculated by the means of the raytracer. Using proportions, the values of the total radiation to be input to ESP-r, and from it, the modifications to the shading coefficients needed to obtain that, are calculated.

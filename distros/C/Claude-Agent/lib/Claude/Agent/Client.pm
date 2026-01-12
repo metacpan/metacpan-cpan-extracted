@@ -86,6 +86,8 @@ sub connect {
 
     Claude::Agent::Error->throw(message => 'Already connected') if $self->_connected;
 
+    $log->debug("Client: Connecting to Claude API");
+
     $self->_query(
         Claude::Agent::Query->new(
             prompt  => $prompt,
@@ -95,6 +97,7 @@ sub connect {
     );
 
     $self->_connected(1);
+    $log->debug("Client: Connected, session started");
     return $self;
 }
 
@@ -181,27 +184,58 @@ sub receive_until_result {
     my ($self) = @_;
 
     my @messages;
+    my $estimated_memory = 0;
+    my $max_memory_bytes = $ENV{CLAUDE_AGENT_MAX_MEMORY_MB} ? $ENV{CLAUDE_AGENT_MAX_MEMORY_MB} * 1024 * 1024 : 500 * 1024 * 1024;  # Default 500MB
     # Default to 1000 messages - generous for typical use but prevents runaway loops.
-    # For very long-running operations, set CLAUDE_AGENT_MAX_MESSAGES higher (max 100000).
+    # For very long-running operations, set CLAUDE_AGENT_MAX_MESSAGES higher (max 5000).
     # Typical queries produce 10-100 messages; 1000 allows for complex multi-tool operations.
+    #
+    # MEMORY WARNING: Each message object may be 1-100KB depending on content.
+    # At max (5000 messages), memory usage could reach 50MB-500MB.
+    # For long-running operations, consider processing messages incrementally
+    # using receive() in a loop rather than receive_until_result().
+    # Set CLAUDE_AGENT_MAX_MEMORY_MB to limit memory usage (default 500MB).
     my $max_iterations = 1000;
-    my $max_allowed = 100_000;  # Hard cap to prevent unbounded resource consumption
-    if (defined $ENV{CLAUDE_AGENT_MAX_MESSAGES} && $ENV{CLAUDE_AGENT_MAX_MESSAGES} =~ /^\d+$/ && $ENV{CLAUDE_AGENT_MAX_MESSAGES} > 0) {
-        $max_iterations = $ENV{CLAUDE_AGENT_MAX_MESSAGES};
+    my $max_allowed = 5_000;  # Reduced to prevent memory exhaustion (each message ~1-100KB)
+    my $max_msg_env = $ENV{CLAUDE_AGENT_MAX_MESSAGES};
+    $max_msg_env =~ s/^\s+|\s+$//g if defined $max_msg_env;  # trim whitespace
+    # Validate after trimming - must be positive integer > 0 (rejects 0 and leading zeros)
+    if (defined $max_msg_env && $max_msg_env =~ /^[1-9]\d*$/) {
+        $max_iterations = $max_msg_env;
         if ($max_iterations > $max_allowed) {
-            $log->warning("CLAUDE_AGENT_MAX_MESSAGES=%d exceeds maximum (%d), using %d",
-                $max_iterations, $max_allowed, $max_allowed);
+            $log->warning(sprintf("CLAUDE_AGENT_MAX_MESSAGES=%d exceeds maximum (%d), using %d. "
+                . "WARNING: High message counts risk memory exhaustion (estimated %dMB-%dMB at max). "
+                . "Set CLAUDE_AGENT_MAX_MEMORY_MB to limit memory, or use receive() for incremental processing.",
+                $max_iterations, $max_allowed, $max_allowed, $max_allowed / 10, $max_allowed / 1));
             $max_iterations = $max_allowed;
+        }
+        elsif ($max_iterations > 2500) {
+            $log->warning(sprintf("CLAUDE_AGENT_MAX_MESSAGES=%d may cause high memory usage (estimated %dMB-%dMB). "
+                . "Consider using receive() with incremental processing or set CLAUDE_AGENT_MAX_MEMORY_MB.",
+                $max_iterations, $max_iterations / 10, $max_iterations / 1));
         }
     }
     my $iterations = 0;
+    # Create JSON::Lines instance once outside the loop for better performance
+    require JSON::Lines;
+    my $jsonl = JSON::Lines->new;
     while (my $msg = $self->receive) {
         $iterations++;
         push @messages, $msg;
+        # Estimate memory usage (rough heuristic based on message content)
+        # Estimate size based on raw data structure - use JSON::Lines for encoding
+        my $json_str = eval { $jsonl->encode([$msg->message // {}]) } // '{}';
+        $estimated_memory += length($json_str) + 500;  # Add overhead estimate
         last if $msg->isa('Claude::Agent::Message::Result');
+        if ($estimated_memory >= $max_memory_bytes) {
+            $log->warning(sprintf("receive_until_result: estimated memory usage (%d bytes) exceeds limit (%d bytes), breaking loop. "
+                . "Set CLAUDE_AGENT_MAX_MEMORY_MB to increase limit or use incremental processing.",
+                $estimated_memory, $max_memory_bytes));
+            last;
+        }
         if ($iterations >= $max_iterations) {
-            $log->warning("receive_until_result: processed max messages (%d), breaking loop. "
-                . "Set CLAUDE_AGENT_MAX_MESSAGES to increase limit.", $max_iterations);
+            $log->warning(sprintf("receive_until_result: processed max messages (%d), breaking loop. "
+                . "Set CLAUDE_AGENT_MAX_MESSAGES to increase limit.", $max_iterations));
             last;
         }
     }
@@ -225,40 +259,41 @@ sub send {
     my ($self, $content) = @_;
 
     Claude::Agent::Error->throw(message => 'Not connected') unless $self->_connected;
-    Claude::Agent::Error->throw(message => 'No active query') unless $self->_query;
-    # Note: We intentionally do NOT pre-check is_finished here due to race conditions.
-    # The try/catch block below handles the case where query finishes between any
-    # check and the actual write operation, providing robust error handling.
 
-    # Attempt to send the message, catching write errors gracefully
-    require Try::Tiny;
-    my $write_error;
-    my $original_exception;
-    Try::Tiny::try {
-        $self->_query->send_user_message($content);
-    }
-    Try::Tiny::catch {
-        $original_exception = $_;
-        # Stringify for logging but preserve original for re-throw
-        $write_error = ref($_) ? "$_" : $_;
-        $log->debug("Client::send write error: %s", $write_error);
-    };
+    # Get session_id from previous query or stored value
+    my $session_id = $self->_session_id // ($self->_query ? $self->_query->session_id : undef);
+    Claude::Agent::Error->throw(message => 'No session_id available for send') unless $session_id;
 
-    # If write failed and query is now finished, throw appropriate error
-    if ($write_error) {
-        if ($self->_query->is_finished) {
-            Claude::Agent::Error->throw(message => 'Query finished during send');
-        }
-        # Re-throw original exception if it's an object to preserve stack trace and type
-        # Otherwise create a new error with the message
-        if (ref($original_exception) && $original_exception->can('throw')) {
-            $original_exception->throw();
-        }
-        Claude::Agent::Error->throw(
-            message => "Send failed: $write_error",
-            ($original_exception ? (cause => $original_exception) : ()),
-        );
+    # Cleanup previous query if it exists
+    if ($self->_query) {
+        $self->_query->cleanup();
     }
+
+    $log->debug(sprintf("Client: Sending follow-up, resuming session id=%s", $session_id));
+
+    # Create new options with resume
+    my $opts = $self->options;
+    my $resume_opts = Claude::Agent::Options->new(
+        ($opts->has_allowed_tools ? (allowed_tools => $opts->allowed_tools) : ()),
+        ($opts->has_disallowed_tools ? (disallowed_tools => $opts->disallowed_tools) : ()),
+        ($opts->has_model ? (model => $opts->model) : ()),
+        ($opts->has_permission_mode ? (permission_mode => $opts->permission_mode) : ()),
+        ($opts->has_mcp_servers ? (mcp_servers => $opts->mcp_servers) : ()),
+        ($opts->has_hooks ? (hooks => $opts->hooks) : ()),
+        ($opts->has_agents ? (agents => $opts->agents) : ()),
+        ($opts->has_max_turns ? (max_turns => $opts->max_turns) : ()),
+        ($opts->has_system_prompt ? (system_prompt => $opts->system_prompt) : ()),
+        resume => $session_id,
+    );
+
+    # Create new query with resume
+    $self->_query(
+        Claude::Agent::Query->new(
+            prompt  => $content,
+            options => $resume_opts,
+            ($self->has_loop ? (loop => $self->loop) : ()),
+        )
+    );
 
     return $self;
 }
@@ -290,6 +325,7 @@ End the current session.
 sub disconnect {
     my ($self) = @_;
 
+    $log->debug("Client: Disconnected");
     $self->_query(undef);
     $self->_session_id(undef);
     $self->_connected(0);
@@ -323,6 +359,8 @@ sub resume {
         resume => $session_id,
     );
 
+    $log->debug(sprintf("Client: Resuming session id=%s", $session_id));
+
     $self->_query(
         Claude::Agent::Query->new(
             prompt  => $prompt,
@@ -333,6 +371,7 @@ sub resume {
 
     $self->_session_id($session_id);
     $self->_connected(1);
+    $log->debug(sprintf("Client: Session resumed id=%s", $session_id));
     return $self;
 }
 

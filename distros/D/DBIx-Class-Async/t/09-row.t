@@ -200,10 +200,11 @@ subtest 'Row errors' => sub {
         $user->related_resultset('nonexistent');
     } qr/No such relationship/, 'Invalid relationship throws error';
 
-    # Update without data
-    throws_ok {
-        $user->update();
-    } qr/Usage/, 'Update without data dies';
+    # Update without data - NOW VALID (uses dirty columns)
+    # Changed: update() without args is now valid, it just returns immediately if no dirty columns
+    lives_ok {
+        $user->update()->get;
+    } 'Update without data succeeds (no-op when no dirty columns)';
 
     # Update deleted row
     my $temp_user = $rs->create({
@@ -215,8 +216,8 @@ subtest 'Row errors' => sub {
     $temp_user->delete->get;
 
     throws_ok {
-        $temp_user->update({ name => 'Updated' });
-    } qr/not in storage/, 'Update deleted row fails';
+        $temp_user->update({ name => 'Updated' })->get;  # Add ->get to actually execute
+    } qr/not in storage|Cannot update/, 'Update deleted row fails';
 
     # Delete already deleted row
     my $delete_again = $temp_user->delete;

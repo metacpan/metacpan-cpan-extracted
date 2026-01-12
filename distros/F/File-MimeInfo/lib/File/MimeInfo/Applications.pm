@@ -9,7 +9,7 @@ use File::MimeInfo qw/mimetype_canon mimetype_isa/;
 use File::DesktopEntry;
 require Exporter;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
@@ -103,6 +103,7 @@ sub _default {
     $Carp::CarpLevel++;
     my @paths = grep defined, ($mimetype, $user, $system, $deprecated, $distro, $legacy);
     my @list = _read_list(@paths);
+    return undef if @list == 0;
     my $desktop_file = _find_file(reverse @list);
     $Carp::CarpLevel--;
 

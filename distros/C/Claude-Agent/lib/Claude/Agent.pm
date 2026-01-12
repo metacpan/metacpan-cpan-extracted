@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our @EXPORT_OK = qw(query tool create_sdk_mcp_server);
+our @EXPORT_OK = qw(query tool create_sdk_mcp_server session);
 
 use Claude::Agent::Query;
 use Claude::Agent::Options;
@@ -19,11 +19,11 @@ Claude::Agent - Perl SDK for the Claude Agent SDK
 
 =head1 VERSION
 
-Version 0.07
+Version 0.13
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -316,6 +316,66 @@ sub create_sdk_mcp_server {
 
     require Claude::Agent::MCP;
     return Claude::Agent::MCP::Server->new(%args);
+}
+
+=head2 session
+
+    use Claude::Agent qw(session);
+
+    my $client = session(
+        options => Claude::Agent::Options->new(...),
+    );
+
+    # Blocking usage
+    $client->connect("First prompt");
+    while (my $msg = $client->receive) { ... }
+
+    $client->send("Follow-up");
+    while (my $msg = $client->receive) { ... }
+
+    $client->disconnect;
+
+    # Async usage with IO::Async
+    use IO::Async::Loop;
+    use Future::AsyncAwait;
+
+    my $loop = IO::Async::Loop->new;
+    my $client = session(
+        options => Claude::Agent::Options->new(...),
+        loop    => $loop,
+    );
+
+    $client->connect("First prompt");
+    while (my $msg = await $client->receive_async) { ... }
+
+    $client->send("Follow-up");
+    while (my $msg = await $client->receive_async) { ... }
+
+    $client->disconnect;
+
+=head3 Arguments
+
+=over 4
+
+=item * options - A L<Claude::Agent::Options> object (optional)
+
+=item * loop - An L<IO::Async::Loop> object (optional, for async integration)
+
+=back
+
+Returns a L<Claude::Agent::Client> for multi-turn conversations.
+Unlike C<query()> which spawns a new process per call, C<session()>
+maintains state across multiple send/receive cycles.
+
+Methods: C<connect>, C<send>, C<receive> (blocking), C<receive_async>,
+C<session_id>, C<disconnect>.
+
+=cut
+
+sub session {
+    my (%args) = @_;
+    require Claude::Agent::Client;
+    return Claude::Agent::Client->new(%args);
 }
 
 =head1 MESSAGE TYPES

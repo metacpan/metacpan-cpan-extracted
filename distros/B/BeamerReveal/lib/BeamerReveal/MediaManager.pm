@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::MediaManager;
-our $VERSION = '20260101.1937'; # VERSION
+our $VERSION = '20260111.1557'; # VERSION
 
 use strict;
 use warnings;
@@ -115,7 +115,7 @@ sub new {
   # We sell things, before we make the, so we need to keep a backorder list
 
   $self->{copyBackOrders}  = [];
-  $self->{constructionBackOrders}  = [];
+  $self->{constructionBackOrders} = {};
 
   return $self;
 }
@@ -172,13 +172,12 @@ sub animationFromStore {
       $nofCores = ceil( $nofCores / 2 );
     }
 
-    push @{$self->{constructionBackOrders}},
+    $self->{constructionBackOrders}->{$animid} = 
       {
        animation   => $animation,
        fileContent => $fileContent,
        nofFrames   => $nofFrames,
        nofCores    => $nofCores,
-       animid      => $animid,
       };
   }
   return $fullpathid;
@@ -191,18 +190,17 @@ sub processConstructionBackOrders {
   
   my $logger = $BeamerReveal::Log::logger;
   
-  my $totalNofBackOrders = @{$self->{constructionBackOrders}};
+  my $totalNofBackOrders = scalar keys %{$self->{constructionBackOrders}};
 
   $logger->progress( $progressId, 1, 'reusing cached data', 1 ) unless $totalNofBackOrders;
-  
-  for( my $i = 0; $i < $totalNofBackOrders; ++$i ) {
-    my $bo = $self->{constructionBackOrders}->[$i];
 
+  my $i = -1;
+  while( my ( $animid, $bo ) = each %{$self->{constructionBackOrders}} ) {
+    ++$i;
     my $animation   = $bo->{animation};
     my $fileContent = $bo->{fileContent};
     my $nofFrames   = $bo->{nofFrames};
     my $nofCores    = $bo->{nofCores};
-    my $animid      = $bo->{animid};
     my $animdir     = "$self->{animations}/$animid";
     
     # I cannot get multithreading/multiprocessing to work reliably on MS-Windows
@@ -519,7 +517,7 @@ BeamerReveal::MediaManager - MediaManager
 
 =head1 VERSION
 
-version 20260101.1937
+version 20260111.1557
 
 =head1 SYNOPSIS
 

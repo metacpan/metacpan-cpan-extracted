@@ -7,10 +7,10 @@ use Test::More;
 use Wordsmith::Claude::Mode;
 
 # Test mode existence
-ok(Wordsmith::Claude::Mode->exists('eli5'), 'eli5 mode exists');
-ok(Wordsmith::Claude::Mode->exists('pirate'), 'pirate mode exists');
-ok(Wordsmith::Claude::Mode->exists('formal'), 'formal mode exists');
-ok(!Wordsmith::Claude::Mode->exists('nonexistent'), 'nonexistent mode does not exist');
+ok(Wordsmith::Claude::Mode->mode_exists('eli5'), 'eli5 mode exists');
+ok(Wordsmith::Claude::Mode->mode_exists('pirate'), 'pirate mode exists');
+ok(Wordsmith::Claude::Mode->mode_exists('formal'), 'formal mode exists');
+ok(!Wordsmith::Claude::Mode->mode_exists('nonexistent'), 'nonexistent mode does not exist');
 
 # Test get_instruction
 my $eli5 = Wordsmith::Claude::Mode->get_instruction('eli5');

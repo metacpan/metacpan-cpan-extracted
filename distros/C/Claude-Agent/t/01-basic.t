@@ -46,8 +46,10 @@ isa_ok($calc, 'Claude::Agent::MCP::ToolDefinition', 'tool() returns ToolDefiniti
 is($calc->name, 'calculate', 'tool name is correct');
 is($calc->description, 'Perform calculations', 'tool description is correct');
 
-# Test tool execution
-my $result = $calc->execute({ expression => '21 * 2' });
+# Test tool execution (execute returns a Future now)
+my $future = $calc->execute({ expression => '21 * 2' });
+isa_ok($future, 'Future', 'execute returns a Future');
+my $result = $future->get;
 is($result->{content}[0]{text}, 'Result: 42', 'tool handler executes correctly');
 
 # Test create_sdk_mcp_server()

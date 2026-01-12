@@ -560,3 +560,8 @@ Version 0.47 2025-10-01
 - ECS.pm:  fix typo in embedded documentation
 - ecstool:  add jsondump operation to --nodedata command
 - Makefile.PL:  add JSON::PP dependency
+
+Version 0.48 2026-01-11
+=======================
+- ECS.pm:  in pgp2_decrypt and pgp2_encrypt subroutines, pipe passphrase
+  to command being executed, to support usage of gpg1 in place of pgp2

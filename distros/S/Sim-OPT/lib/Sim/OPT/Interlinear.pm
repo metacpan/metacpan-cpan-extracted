@@ -4,7 +4,9 @@ package Sim::OPT::Interlinear;
 # Interliner is distributed under a dual licence, open-source (GPL v3) and proprietary.
 # Copyright Gian Luca Brunetti 2018-2025, gianluca.brunetti@gmail.com. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-our $interinear = bless( {}, "Sim::OPT::Interlinear" );
+use Exporter;
+our @ISA = qw( Exporter );
+our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
 
 use Math::Round;
 use List::Util qw( min max reduce shuffle any );
@@ -26,23 +28,32 @@ use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Sim::OPT::Parcoord3d;
-use Sim::OPT::Interlinear;
 use Sim::OPT::Stats;
-eval { use Sim::OPTcue; 1 };
-eval { use Sim::OPTcue::Patternsearch; 1 };
+eval { use Sim::OPTcue::OPTcue; 1 };
+eval { use Sim::OPTcue::Metabridge; 1 };
+eval { use Sim::OPTcue::Exogen::PatternSearch; 1 };
+eval { use Sim::OPTcue::Exogen::NelderMead; 1 };
+eval { use Sim::OPTcue::Exogen::Armijo; 1 };
+eval { use Sim::OPTcue::Exogen::NSGAII; 1 };
+eval { use Sim::OPTcue::Exogen::ParticleSwarm; 1 };
+eval { use Sim::OPTcue::Exogen::SimulatedAnnealing; 1 };
+eval { use Sim::OPTcue::Exogen::NSGAIII; 1 };
+eval { use Sim::OPTcue::Exogen::MOEAD; 1 };
+eval { use Sim::OPTcue::Exogen::SPEA2; 1 };
+eval { use Sim::OPTcue::Exogen::ParticleSwarm; 1 };
+eval { use Sim::OPTcue::Exogen::RadialBasis; 1 };
+eval { use Sim::OPTcue::NeuralBoltzmann; 1 };
+eval { use Sim::OPTcue::Exogen::Kriging; 1 };
+eval { use Sim::OPTcue::Exogen::DecisionTree; 1 };
 
 # NOTE: TO USE THE PROGRAM AS A SCRIPT, THE ABOVE "use Sim::OPT..." lines should be deleted or commented.
 
-our @ISA = qw( Exporter );
-our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
 $VERSION = '0.197';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete multivariate discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
 # Interlinear
 #######################################################################
-
-
 
 
 sub odd
@@ -412,7 +423,7 @@ sub calcdist
       my @elts = split( "-", $el );
       push( @da2, $elts[0] );
       push( @da2par, $elts[1] );
-    } # say  "YES, Sim::OPTcueIM.";
+    }
 
     my $c = 0;
     foreach my $e ( @da1par )
@@ -1952,9 +1963,15 @@ my @arr;
 
 sub interlinear
 {
-  my ( $sourcef, $configf, $metafile, $blockelts_r, $reportf, $countblock ) = @_;
+  my ( $sourcefile, $configf, $metafile, $blockelts_r, $reportf, $countblock, 
+      $dowhat_r, $dirfiles_r, $lines_r ) = @_;
 
-  #say "DOING";
+  my @lines = @$lines_r; say "!!!!! IN INTERLINEAR, RECEIVED LINES " . dump( [lines] );
+  my %dowhat = %$dowhat_r;
+  my %dirfiles = %$dirfiles_r;
+  my $precomputed = $dirfiles{precomputed};
+  $sourcefile = $precomputed;
+
   my ( %bank, %nears );
 
   if ( $reportf ne "" ){ $report = $reportf; }
@@ -1973,50 +1990,265 @@ sub interlinear
 
 
   ########## AN EXAMPLE OF SETTINGS TO BE PUT IN A CONFIGURATION FILE FOLLOWS.
-  $maxloops= 1000;
-  $sourcefile = "./caravantrials.csv"; # Name of the source file. It is specified at launch, the value here specified is going to be overridden.
-  $newfile = $sourcefile . "_meta.csv";
-  $report = $newfile . "_tofile.txt";
-  @mode = ( "wei" ); # #"wei" is weighted gradient linear interpolation of the nearest neighbours.
+  if ( $dowhat{maxloops} )
+  {
+    $maxloops = $dowhat{maxloops};
+  }
+  else 
+  {
+    $maxloops= 1000;
+  }
+  
+
+  my $newfile = $sourcefile . "_meta.csv";
+
+  my @mode;
+  if ( $dowhat{mode} )
+  {
+    @mode = $dowhat{mode};
+  }
+  else 
+  {
+    @mode = ( "wei" );
+  } # #"wei" is weighted gradient linear interpolation of the nearest neighbours.
   #my @mode = ( "near" ); # "nea" means "nearest neighbour"
   #@mode = ( ""mix" ); # "mix" means sequentially mixed in each loop.
   #my @mode = ( "wei", "near", "near", "purelin" ); # a sequence
-  @weights = (  ); #my @weights = ( 0.7, 0.3 ); # THE FIRST IS THE WEIGHT FOR linear interpolation, THE SECOND FOR nearest neighbour.
+
+  my @weights;
+  if ( $dowhat{weights} )
+  {
+    @weights = $dowhat{weights};
+  }
+  else 
+  {
+    @weights = (  );
+  } #my @weights = ( 0.7, 0.3 ); # THE FIRST IS THE WEIGHT FOR linear interpolation, THE SECOND FOR nearest neighbour.
   # THEY ARE FRACTIONS OF 1 AND MUST GIVE 1 IN TOTAL. IF THE VALUES ARE UNSPECIFIED (IE. IF THE ARRAY IS EMPTY), THE VALUES ARE UNWEIGHTED.
-  $linearprecedence = "n"; # PRECEDENCE TO LINEAR INTERPOLATES. IF "y", THE VALUES DERIVED FROM LINEAR INTERPOLATION, WHERE PRESENT, WILL SUPERSEDE THE VALUES DERIVED FROM THE NEAREST NEIGHBUR STRATEGY. IF "n", THE OPPOSITE. IT CAN BE ACTIVE ONLY IF LOGARITHMIC IS OFF. IT WORKS WITH "LINEAR" AND "EXPONENTIAL"
-  $relaxmethod = "logarithmic"; #It is relative to the "linnear" method. Options: "logarithmic", "linear" or "exponential". THE FARTHER NEIGHBOURS ARE WEIGHT LESS THAN THE NEAREST ONES: INDEED, LOGARITHMICALLY, LINEARLY OR EXPONENTIALLY. THE LOGARITHM BASE IS $relaxlimit OR $nearrelaxlimit, DEPENDING FROM THE CONTEXT. THE LINEAR MULTIPLICATOR OR THE EXPONENT IS DEFINED BY $overwerightnearest.
-  $relaxlimit = 1; #THIS IS THE CEILING FOR THE RELAXATION OF THE RELATIONS OF PURE LINEAR INTERPOLATION. For greatest precision: 0, or a negative number near 0. IF > = 0, THE PROGRAM INTERPOLATES ALSO NEAREST NEIGHBOURS. THE HIGHER THE NUMBER, THE FARTHER THE NEIGHBOURS.
-  $overweightnearest = 1; #A NUMBER. IT IS MADE NULL BY THE $logarithmicrelax "y". THE HIGHER THE NUMBER, THE GREATER THE OVERWEIGHT GIVEN TO THE NEAREST. IN THIS MANNER, THE OVERWEIGHT IS NOT LOGARITHMIC, LIKE IT WHERE OTHERWISE, BUT LINEAR. THIS SLOWS DOWN THE COMPUTATIONS. UNLESS THE OVERWEIGHT IS 1, WHICH MAKES THE OVERWEIGHTING NULL.
-  $nearrelaxlimit = 0; #THIS IS THE CEILING FOR THE RELAXATION OF THE RELATIONS OF THE NEAREST NEIGHBOUR STRATEGY. For greatest precision: 0, or a negative number near 0. IF > = 0, THE PROGRAM INCREASES THE DISTANCE OF THE NEAREST NEIGHBOURS INCLUDED. THE HIGHER THE NUMBER, THE FARTHER THE NEIGHBOURS. ONE IS NOT LIKELY TO WANT TO USE THIS OPTION.
-  $nearconcurrencies = 1; #Requested minimum number of concurrencies for the nearest neighbour method. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
-  $parconcurrencies = 1; #Requested minimum number of concurrencies for the linear interpolations for each parameter of each instance. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
-  $instconcurrencies = 1; #Requested minimum number of concurrencies for the linear interpolations for each instance. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
+  
+  my $linearprecedence;
+  if ( $dowhat{linearprecedence} )
+  {
+   $linearprecedence = $dowhat{linearprecedence};
+  }
+  else 
+  {
+    $linearprecedence = "n";
+  }  # PRECEDENCE TO LINEAR INTERPOLATES. IF "y", THE VALUES DERIVED FROM LINEAR INTERPOLATION, WHERE PRESENT, WILL SUPERSEDE THE VALUES DERIVED FROM THE NEAREST NEIGHBUR STRATEGY. IF "n", THE OPPOSITE. IT CAN BE ACTIVE ONLY IF LOGARITHMIC IS OFF. IT WORKS WITH "LINEAR" AND "EXPONENTIAL"
+
+  my $relaxmethod;
+  if ( $dowhat{relaxmethod} )
+  {
+   $relaxmethod = $dowhat{relaxmethod};
+  }
+  else 
+  {
+    $relaxmethod = "logarithmic";
+  } #It is relative to the "linnear" method. Options: "logarithmic", "linear" or "exponential". THE FARTHER NEIGHBOURS ARE WEIGHT LESS THAN THE NEAREST ONES: INDEED, LOGARITHMICALLY, LINEARLY OR EXPONENTIALLY. THE LOGARITHM BASE IS $relaxlimit OR $nearrelaxlimit, DEPENDING FROM THE CONTEXT. THE LINEAR MULTIPLICATOR OR THE EXPONENT IS DEFINED BY $overwerightnearest.
+  
+  my $relaxlimit;
+  if ( $dowhat{relaxlimit} )
+  {
+   $relaxlimit = $dowhat{relaxlimit};
+  }
+  else 
+  {
+    $relaxlimit = 1; 
+  } #THIS IS THE CEILING FOR THE RELAXATION OF THE RELATIONS OF PURE LINEAR INTERPOLATION. For greatest precision: 0, or a negative number near 0. IF > = 0, THE PROGRAM INTERPOLATES ALSO NEAREST NEIGHBOURS. THE HIGHER THE NUMBER, THE FARTHER THE NEIGHBOURS.
+  
+  my $overweightnearest;
+  if ( $dowhat{overweightnearest} )
+  {
+   $overweightnearest = $dowhat{overweightnearest};
+  }
+  else 
+  {
+    $overweightnearest = 1; 
+  } #A NUMBER. IT IS MADE NULL BY THE $logarithmicrelax "y". THE HIGHER THE NUMBER, THE GREATER THE OVERWEIGHT GIVEN TO THE NEAREST. IN THIS MANNER, THE OVERWEIGHT IS NOT LOGARITHMIC, LIKE IT WHERE OTHERWISE, BUT LINEAR. THIS SLOWS DOWN THE COMPUTATIONS. UNLESS THE OVERWEIGHT IS 1, WHICH MAKES THE OVERWEIGHTING NULL.
+  
+  my $nearrelaxlimit;
+  if ( $dowhat{nearrelaxlimit} )
+  {
+   $nearrelaxlimit = $dowhat{nearrelaxlimit};
+  }
+  else 
+  {
+    $nearrelaxlimit = 0; 
+  } #THIS IS THE CEILING FOR THE RELAXATION OF THE RELATIONS OF THE NEAREST NEIGHBOUR STRATEGY. For greatest precision: 0, or a negative number near 0. IF > = 0, THE PROGRAM INCREASES THE DISTANCE OF THE NEAREST NEIGHBOURS INCLUDED. THE HIGHER THE NUMBER, THE FARTHER THE NEIGHBOURS. ONE IS NOT LIKELY TO WANT TO USE THIS OPTION.
+  
+  my $nearconcurrencies;
+  if ( $dowhat{nearconcurrencies} )
+  {
+   $nearconcurrencies = $dowhat{nearconcurrencies};
+  }
+  else 
+  {
+    $nearconcurrencies = 1;
+  } #Requested minimum number of concurrencies for the nearest neighbour method. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
+  
+  my $parconcurrencies;
+  if ( $dowhat{parconcurrencies} )
+  {
+   $parconcurrencies = $dowhat{parconcurrencies};
+  }
+  else 
+  {
+    $parconcurrencies = 1;
+  } #Requested minimum number of concurrencies for the linear interpolations for each parameter of each instance. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
+  
+  my $instconcurrencies;
+  if ( $dowhat{instconcurrencies} )
+  {
+   $instconcurrencies = $dowhat{instconcurrencies};
+  }
+  else 
+  {
+    $instconcurrencies = 1; 
+  } #Requested minimum number of concurrencies for the linear interpolations for each instance. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
+  
   # my %factlevels = ( pairs => { 1=>3, 2=>3, 3=>3, 4=>3, 5=>3 } ); #The keys are the factor numbers and the values are the number of levels in the data series. OBSOLETE.
-  $minreq_forgrad = [1, 1, 1 ]; #THIS VALUES SPECIFY THE NUMBER OF PARAMETER DIFFERENCES (INTEGER NUMBERS) TELLING HOW WELL-ROOTED IN SIMULATED REALITY (I.E, NEAR FROM IT) A POINT MUST BE TO SELECT IT FOR CALCULATING THE GRADIENTS FOR THE METAMODEL. THEY ARE INTEGERS STARTING FROM 1 OR GREATER.
+  
+  my $minreq_forgrad;
+  if ( $dowhat{minreq_forgrad} )
+  {
+   $minreq_forgrad = $dowhat{minreq_forgrad};
+  }
+  else 
+  {
+    $minreq_forgrad = [1, 1, 1 ];
+  } #THESE VALUES SPECIFY THE NUMBER OF PARAMETER DIFFERENCES (INTEGER NUMBERS) TELLING HOW WELL-ROOTED IN SIMULATED REALITY (I.E, NEAR FROM IT) A POINT MUST BE TO SELECT IT FOR CALCULATING THE GRADIENTS FOR THE METAMODEL. THEY ARE INTEGERS STARTING FROM 1 OR GREATER.
   # THE FIRST VALUE IS RELATIVE TO THE FACTORS AND TELLS HOW RELAXED A SEARCH IS.
   # THE SECOND VALUE IS RELATIVE TO THE LEVELS. ONE MAY WANT TO KEEP IT TO 1: THE GRADIENTS ARE CALCULATED USING ONLY ADJACENT INSTANCES.
   # ONE MAY WANT TO KEEP IT TO 1: THE GRADIENTS ARE CALCULATED USING ONLY ADJACENT INSTANCES.
   # THE THIRD VALUE HOW DIFFERENT (FAR, IN TERMS OF PARAMETER DIFFERENCES) MAY AN INSTANCE BE TO BE CALCULATED THROUGH THE GRADIENT IN QUESTION.
   # ONE MAY WANT TO SET TO THE NUMBER OF PARAMETERS.
   # A LARGE NUMBER, WEAK ENTRY BARRIER. NEVER LESS THAN 1.
-  $minreq_forinclusion = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT (META-POINT) MUST BE FOR INCLUDING IT IN THE SET OF POINTS USED FOR THE METAMODEL.If 0, no entry barrier.
-  $minreq_forcalc = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT MUST BE FOR INCLUDING IT IN THE CALCULATIONS FOR CREATING NEW META-POINTS.  A VALUE BETWEEN 1 (JUST SIMULATED POINT) AND 0. If 0, no entry barrier.
-  $minreq_formerge = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT MUST BE FOR MERGING IT IN THE CALCULATIONS FOR MERGING IT IN THE METAMODEL. A VALUE BETWEEN 1 (JUST SIMULATED POINT) AND 0 (SIMULATED POINTS AND "META"POINTS WITH THE SAME RIGHT ) MUST BE SPECIFIED. If 0, no entry barrier.
-  $minimumcertain = 0; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED TO USE A DATUM TO BUILD UPON IT. IT DEPENDS ON THE DISTANCE FROM THE ORIGINS OF THE DATUM. THE LONGER THE DISTANCE, THE SMALLER THE STRENGTH (WHICH IS INDEED INVERSELY PROPORTIONAL). A STENGTH VALUE OF 1 IS OF A SIMULATED DATUM, NOT OF A DERIVED DATUM. If 0, no entry barrier.
-  $minimumhold = 1; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED FOR NOT AVERAGING A DATUM WITH ANOTHER, DERIVED DATUM. USUALLY IT HAS TO BE KEPT EQUAL TO $minimimcertain.  If 1, ONLY THE MODEL DATA ARE NOT SUBSTITUTABLE IN THE METAMODEL.
-  $condweight = "y"; # THIS CONDITIONS TELLS IF THE STRENGTH (LEVEL OF RELIABILITY) OF THE GRADIENTS HAS TO BE CUMULATIVELY TAKEN INTO ACCOUNT IN THE WEIGHTING CALCULATIONS.
-  $nfiltergrads = ""; # DO NOT USE. do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
-  $limit_checkdistgrads = ""; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF GRADIENTS. IF NULL, NO BARRIER. AS A NUMBER, 1/5 OR 1/10 OF THE TOTAL INSTANCES SHOULD BE A GOOD PLACE TO START AS A COMPROMISE BETWEEN SPEED AND RELIABILITY.
-  $limit_checkdistpoints = ""; # DO NOT USE. LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF POINTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
-  $fulldo = "n"; # TO SEARCH FOR MAXIMUM PRECISION AT THE EXPENSES OF SPEED. "y" MAKES THE GRADIENTS BE RECALCULATED AT EACH COMPUTATION CYCLE.
-  $lvconversion = "";
-  $limitgrads = "";
+  
+  my $minreq_forinclusion;
+  if ( $dowhat{minreq_forinclusion} )
+  {
+   $minreq_forinclusion = $dowhat{minreq_forinclusion};
+  }
+  else 
+  {
+    $minreq_forinclusion = 0; 
+  } # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT (META-POINT) MUST BE FOR INCLUDING IT IN THE SET OF POINTS USED FOR THE METAMODEL.If 0, no entry barrier.
+  
+  my $minreq_forcalc;
+  if ( $dowhat{minreq_forcalc} )
+  {
+   $minreq_forcalc = $dowhat{minreq_forcalc};
+  }
+  else 
+  {
+    $minreq_forcalc = 0;
+  } # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT MUST BE FOR INCLUDING IT IN THE CALCULATIONS FOR CREATING NEW META-POINTS.  A VALUE BETWEEN 1 (JUST SIMULATED POINT) AND 0. If 0, no entry barrier.
+  
+  my $minreq_formerge;
+  if ( $dowhat{minreq_formerge} )
+  {
+   $minreq_formerge = $dowhat{minreq_formerge};
+  }
+  else 
+  {
+    $minreq_formerge = 0;
+  } # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT MUST BE FOR MERGING IT IN THE CALCULATIONS FOR MERGING IT IN THE METAMODEL. A VALUE BETWEEN 1 (JUST SIMULATED POINT) AND 0 (SIMULATED POINTS AND "META"POINTS WITH THE SAME RIGHT ) MUST BE SPECIFIED. If 0, no entry barrier.
+  
+  my $minimumcertain;
+  if ( $dowhat{minimumcertain} )
+  {
+   $minimumcertain = $dowhat{minimumcertain};
+  }
+  else 
+  {
+    $minimumcertain = 0; 
+  } # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED TO USE A DATUM TO BUILD UPON IT. IT DEPENDS ON THE DISTANCE FROM THE ORIGINS OF THE DATUM. THE LONGER THE DISTANCE, THE SMALLER THE STRENGTH (WHICH IS INDEED INVERSELY PROPORTIONAL). A STENGTH VALUE OF 1 IS OF A SIMULATED DATUM, NOT OF A DERIVED DATUM. If 0, no entry barrier.
+  
+  my $minimumhold;
+  if ( $dowhat{minimumhold} )
+  {
+   $minimumhold = $dowhat{minimumhold};
+  }
+  else 
+  {
+    $minimumhold = 1; 
+  } # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED FOR NOT AVERAGING A DATUM WITH ANOTHER, DERIVED DATUM. USUALLY IT HAS TO BE KEPT EQUAL TO $minimimcertain.  If 1, ONLY THE MODEL DATA ARE NOT SUBSTITUTABLE IN THE METAMODEL.
+  
+  my $minimumhold;
+  if ( $dowhat{condweight} )
+  {
+    $condweight = $dowhat{condweight};
+  }
+  else 
+  {
+    $condweight = "y"; 
+  } # THIS CONDITIONS TELLS IF THE STRENGTH (LEVEL OF RELIABILITY) OF THE GRADIENTS HAS TO BE CUMULATIVELY TAKEN INTO ACCOUNT IN THE WEIGHTING CALCULATIONS.
+  
+  my $nfiltergrads;
+  if ( $dowhat{nfiltergrads} )
+  {
+    $nfiltergrads = $dowhat{nfiltergrads};
+  }
+  else 
+  {
+    $nfiltergrads = "";
+  }  # DO NOT USE. do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
+  
+  my $limit_checkdistgrads;
+  if ( $dowhat{limit_checkdistgrads} )
+  {
+    $limit_checkdistgrads = $dowhat{limit_checkdistgrads};
+  }
+  else 
+  {
+    $limit_checkdistgrads = ""; 
+  } # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF GRADIENTS. IF NULL, NO BARRIER. AS A NUMBER, 1/5 OR 1/10 OF THE TOTAL INSTANCES SHOULD BE A GOOD PLACE TO START AS A COMPROMISE BETWEEN SPEED AND RELIABILITY.
+  
+  my $limit_checkdistpoints;
+  if ( $dowhat{limit_checkdistpoints} )
+  {
+    $limit_checkdistpoints = $dowhat{limit_checkdistpoints};
+  }
+  else 
+  {
+    $limit_checkdistpoints = ""; 
+  } # DO NOT USE. LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF POINTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
+  
+  my $fulldo;
+  if ( $dowhat{fulldo} )
+  {
+    $fulldo = $dowhat{fulldo};
+  }
+  else 
+  {
+    $fulldo = "n"; 
+  } # TO SEARCH FOR MAXIMUM PRECISION AT THE EXPENSES OF SPEED. "y" MAKES THE GRADIENTS BE RECALCULATED AT EACH COMPUTATION CYCLE.
+  
+  my $lvconversion;
+  if ( $dowhat{lvconversion} )
+  {
+    $lvconversion = $dowhat{lvconversion};
+  }
+  else 
+  {
+    $lvconversion = "";
+  }
+  
+  my $limitgrads;
+  if ( $dowhat{limitgrads} )
+  {
+    $limitgrads = $dowhat{limitgrads};
+  }
+  else 
+  {
+    $limitgrads = "";
+  }
+
   #@weldsprepared = ( "/home/luca/ffexpexps_full/minmissionsprep.csv" );
   #@parswelds = ( [ 1, 4 ] );
   #@recedes = ( 1, 4 );
   ############# END OF THE EXAMPLE SETTINGS TO BE PUT IN A CONFIGURATION FILE.
 
-  print "CONFIG FILE: " . $confile;
   if ( -e $confile )
   {
     #eval $confile; ############## TRULY FIX THIS!!!!!
@@ -2027,11 +2259,6 @@ sub interlinear
   {
     require "./confinterlinear.pl";
   }
-  else
-  {
-    die;
-  }
-
 
   if ( $sourcef ne "" ){ $sourcefile = $sourcef; }
 
@@ -2040,12 +2267,29 @@ sub interlinear
   my @blockelts;
   if ( $blockelts_r ne "" ){ @blockelts = @{ $blockelts_r }; }
 
-  my @mode = adjustmode( $maxloops, \@mode );
-  say  "Opening $sourcefile";
-  open( SOURCEFILE, "$sourcefile" ) or die;
-  my @lines = <SOURCEFILE>;
-  close SOURCEFILE;
-  #print "THIS ";
+  @mode = adjustmode( $maxloops, \@mode );
+
+  
+  if ( @lines)
+  {
+    say "!!!!! IN INTERLINEAR HAD \@lines ";
+  }
+  elsif ( ref($sourcefile) eq 'ARRAY' ) 
+  {
+      say "Reading from memory (Array Reference)...";
+      @lines = @$sourcefile; 
+  } 
+  else 
+  {
+      say  "Opening $sourcefile";
+      open( SOURCEFILE, "$sourcefile" ) or die;
+      @lines = <SOURCEFILE>;
+      close SOURCEFILE;
+  }
+  chomp @lines; 
+  say "LINES! " . dump ( @lines );
+  
+  
   say  "Preparing the dataseries, IN INTERLINEAR: \$countblock $countblock";
   #say "nfiltergrads: $nfiltergrads";
   #say "limit_checkdistgrads: $limit_checkdistgrads";
@@ -2230,11 +2474,19 @@ sub interlinear
         }
       }
     }
-    @arr2 = @arr ;
+    #@arr2 = @arr ;
     say  "INSERTING THE ARRAY UPDATES " . ( $count + 1 ) . " for $sourcefile";
     $count++;
   }
-  return( @arr );
+
+  my @newarr;
+  foreach my $lin ( @arr )
+  {
+    my @elts = @$lin;
+    my $bit = join( ",", ( $elts[0], $elts[-2] ) );
+    push( @newarr, $bit );
+  }
+  return( \@arr, \@newarr );
 }
 
 

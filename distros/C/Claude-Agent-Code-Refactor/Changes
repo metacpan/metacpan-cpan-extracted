@@ -1,5 +1,10 @@
 Revision history for Claude-Agent-Code-Refactor
 
-0.01    Date/time
+0.02    2026-01-11
+        - Call Query->cleanup() after iteration to release SDK server sockets
+        - Fixes socket accumulation in refactor_until_clean loops
+        - Requires Claude::Agent 0.09+
+
+0.01    2026-01-10
         First version, released on an unsuspecting world.
 

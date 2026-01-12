@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
         'Test::Exception' => '0.43',
     },
     PREREQ_PM => {
-        'Claude::Agent'               => '0.05',
+        'Claude::Agent'               => '0.10',
         'Claude::Agent::Code::Review' => '0.01',
         'Marlin'                      => '0.007000',
         'Types::Common'               => '2.0',

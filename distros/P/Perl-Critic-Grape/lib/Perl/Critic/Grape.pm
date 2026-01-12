@@ -3,7 +3,7 @@ package Perl::Critic::Grape;
 use strict;
 use warnings;
 
-our $VERSION='0.0.6';
+our $VERSION='0.0.7';
 
 1;
 

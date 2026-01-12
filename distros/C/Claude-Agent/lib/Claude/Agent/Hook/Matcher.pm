@@ -5,7 +5,9 @@ use strict;
 use warnings;
 
 use Claude::Agent::Logger '$log';
+use Scalar::Util qw(blessed);
 use Try::Tiny;
+use Future;
 use Types::Common -types;
 use Marlin
     'matcher',                    # Regex pattern for tool names (optional)
@@ -34,8 +36,12 @@ Defines a hook matcher that triggers callbacks for specific tools.
 
 =head2 CALLBACK SIGNATURE
 
+Hooks receive input data, tool use ID, context, and an optional IO::Async::Loop.
+They can return either a hashref (synchronous) or a Future (asynchronous).
+
+    # Synchronous hook (backward compatible)
     sub callback {
-        my ($input_data, $tool_use_id, $context) = @_;
+        my ($input_data, $tool_use_id, $context, $loop) = @_;
 
         # $input_data contains:
         # - tool_name: Name of the tool
@@ -45,6 +51,8 @@ Defines a hook matcher that triggers callbacks for specific tools.
         # - session_id: Current session ID
         # - cwd: Current working directory
 
+        # $loop is the IO::Async::Loop (optional, may be undef)
+
         # Return hashref with decision:
         return {
             decision => 'continue',  # or 'allow', 'deny'
@@ -52,6 +60,19 @@ Defines a hook matcher that triggers callbacks for specific tools.
             # For 'allow', can include:
             updated_input => { ... },
         };
+    }
+
+    # Asynchronous hook (returns Future)
+    sub async_callback {
+        my ($input_data, $tool_use_id, $context, $loop) = @_;
+
+        # Use loop for async operations (e.g., HTTP requests)
+        return $loop->delay_future(after => 0.1)->then(sub {
+            # Perform async validation...
+            return Future->done({
+                decision => 'allow',
+            });
+        });
     }
 
 =head2 METHODS
@@ -63,14 +84,15 @@ Defines a hook matcher that triggers callbacks for specific tools.
 Check if this matcher matches the given tool name.
 
 B<IMPORTANT - Platform Limitation:> Regex timeout protection uses alarm()
-which only works on Unix-like systems. B<On Windows (MSWin32, cygwin),
-malicious regex patterns will NOT be interrupted and could cause the
-process to hang indefinitely.> Pattern length is limited to 1000 characters
-and basic nested quantifier detection is performed to provide additional
-ReDoS protection, but sophisticated ReDoS attacks with shorter patterns
-may still be possible. Consider using pre-validated patterns or a regex
-library with built-in timeout support (e.g., re::engine::PCRE2) for
-security-critical applications on Windows.
+which only works on Unix-like systems. On Windows (MSWin32, cygwin), a
+post-execution time check is performed, but B<this cannot interrupt a
+regex that hangs indefinitely> - it only detects slow patterns after
+completion. Pattern length is limited to 1000 characters and basic nested
+quantifier detection is performed to provide additional ReDoS protection,
+but sophisticated ReDoS attacks with shorter patterns may still be possible.
+For security-critical applications, especially on Windows, consider using
+re::engine::PCRE2 or Regexp::Timeout for proper cross-platform timeout
+support, or use pre-validated patterns only.
 
 =cut
 
@@ -107,15 +129,30 @@ sub matches {
             die "Potentially dangerous nested quantifier pattern\n";
         }
 
-        # alarm() only works on Unix-like systems, skip on Windows
+        # Cross-platform timeout mechanism using Time::HiRes
+        # Note: alarm() only works on Unix-like systems (skipped on Windows)
+        # For true cross-platform ReDoS protection, consider re::engine::PCRE2
+        # or Regexp::Timeout. This implementation provides best-effort protection.
         my $use_alarm = $^O ne 'MSWin32' && $^O ne 'cygwin';
+        my $timeout_seconds = 1;
+
         if ($use_alarm) {
             local $SIG{ALRM} = sub { die "Regex timeout\n" };
-            alarm(1);
+            alarm($timeout_seconds);
         }
+
+        # For Windows, use Time::HiRes-based polling timeout as fallback
+        # This is not as precise as alarm() but provides some protection
+        require Time::HiRes;
+        my $start_time = Time::HiRes::time();
 
         my $compiled = qr/$pattern/;
         $result = $tool_name =~ $compiled ? 1 : 0;
+
+        # Check if we exceeded timeout on Windows (post-facto detection)
+        if (!$use_alarm && (Time::HiRes::time() - $start_time) > $timeout_seconds) {
+            die "Regex timeout (Windows)\n";
+        }
 
         alarm(0) if $use_alarm;
     } catch {
@@ -128,43 +165,93 @@ sub matches {
 
 =head3 run_hooks
 
-    my $results = $matcher->run_hooks($input_data, $tool_use_id, $context);
+    my $future = $matcher->run_hooks($input_data, $tool_use_id, $context, $loop);
 
-Run all hooks and return their results.
+Run all hooks and return a Future that resolves to an arrayref of results.
+Hooks may return either a hashref (synchronous) or a Future (asynchronous).
 
 =cut
 
 sub run_hooks {
-    my ($self, $input_data, $tool_use_id, $context) = @_;
+    my ($self, $input_data, $tool_use_id, $context, $loop) = @_;
 
-    my @results;
+    my @hooks = @{$self->hooks};
+    return Future->done([]) unless @hooks;
 
-    for my $hook (@{$self->hooks}) {
-        my ($result, $hook_error);
-        try {
-            $result = $hook->($input_data, $tool_use_id, $context);
-        } catch {
-            $hook_error = $_;
+    # Process hooks sequentially, stopping on definitive decisions
+    return $self->_run_hooks_sequentially(\@hooks, $input_data, $tool_use_id, $context, $loop, []);
+}
+
+# Internal: run hooks one at a time, chaining Futures
+sub _run_hooks_sequentially {
+    my ($self, $hooks, $input_data, $tool_use_id, $context, $loop, $results) = @_;
+
+    return Future->done($results) unless @$hooks;
+
+    my $hook = shift @$hooks;
+    my $hook_num = scalar(@{$results}) + 1;
+    my $total_hooks = $hook_num + scalar(@$hooks);
+
+    $log->trace(sprintf("Hook: Running hook %d/%d", $hook_num, $total_hooks));
+
+    # Execute the hook
+    my ($result, $hook_error);
+    try {
+        $result = $hook->($input_data, $tool_use_id, $context, $loop);
+    } catch {
+        $hook_error = $_;
+    };
+
+    # Handle sync errors
+    if ($hook_error) {
+        $log->debug(sprintf("Hook error: %s", $hook_error));
+        push @$results, {
+            decision => 'error',
+            error    => 'Hook execution failed',
         };
+        # Continue to next hook after error
+        return $self->_run_hooks_sequentially($hooks, $input_data, $tool_use_id, $context, $loop, $results);
+    }
 
-        if ($hook_error) {
-            # Log full error for debugging, return sanitized message
-            $log->debug("Hook error: %s", $hook_error);
-            push @results, {
+    # If result is a Future, chain to it
+    if (blessed($result) && $result->isa('Future')) {
+        return $result->then(sub {
+            my ($async_result) = @_;
+            push @$results, $async_result // { decision => 'continue' };
+
+            # Stop if we got a definitive decision
+            if ($async_result && ref($async_result) eq 'HASH' && $async_result->{decision}
+                && $async_result->{decision} =~ /^(allow|deny)$/) {
+                return Future->done($results);
+            }
+
+            # Continue to next hook
+            return $self->_run_hooks_sequentially($hooks, $input_data, $tool_use_id, $context, $loop, $results);
+        })->else(sub {
+            my ($error) = @_;
+            $log->debug(sprintf("Async hook error: %s", $error));
+            push @$results, {
                 decision => 'error',
                 error    => 'Hook execution failed',
             };
-        }
-        else {
-            push @results, $result // { decision => 'continue' };
-        }
-
-        # Stop if we got a definitive decision
-        last if $result && ref($result) eq 'HASH' && $result->{decision}
-            && $result->{decision} =~ /^(allow|deny)$/;
+            # Continue to next hook after error
+            return $self->_run_hooks_sequentially($hooks, $input_data, $tool_use_id, $context, $loop, $results);
+        });
     }
 
-    return \@results;
+    # Synchronous result
+    my $decision = ref($result) eq 'HASH' ? ($result->{decision} // 'continue') : 'continue';
+    $log->trace(sprintf("Hook: Hook returned decision=%s", $decision));
+    push @$results, $result // { decision => 'continue' };
+
+    # Stop if we got a definitive decision
+    if ($result && ref($result) eq 'HASH' && $result->{decision}
+        && $result->{decision} =~ /^(allow|deny)$/) {
+        return Future->done($results);
+    }
+
+    # Continue to next hook
+    return $self->_run_hooks_sequentially($hooks, $input_data, $tool_use_id, $context, $loop, $results);
 }
 
 =head1 AUTHOR

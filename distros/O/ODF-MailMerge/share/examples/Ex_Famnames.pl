@@ -14,7 +14,7 @@ use DateTime::Format::Strptime ();
 use Getopt::Long qw/GetOptions/;
 
 use Spreadsheet::Edit qw/read_spreadsheet alias apply sort_rows %crow/;
-use Data::Dumper::Interp 6.005 qw/dvis qsh qshlist/;
+use Data::Dumper::Interp 7.013 qw/dvis qsh qshlist/;
 Data::Dumper::Interp::addrvis_digits(5); # for Author's debugging :-)
 
 use ODF::lpOD;

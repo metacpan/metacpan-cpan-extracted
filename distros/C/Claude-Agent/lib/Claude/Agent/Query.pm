@@ -22,6 +22,8 @@ use Marlin
     '_sdk_servers==.' => sub { {} },               # SDK server wrappers (name => SDKServer)
     '_hook_executor==.',                            # Hook executor for Perl callbacks
     '_pending_tool_uses==.' => sub { {} },          # Track tool uses awaiting results
+    '_processing_message==.' => sub { 0 },           # Guard against concurrent message processing
+    '_cleaned_up==.' => sub { 0 },                     # Track if cleanup() has been called
     '_jsonl==.' => sub {
         JSON::Lines->new(
             utf8     => 1,
@@ -101,7 +103,7 @@ If not provided, a new loop is created internally.
 
 =back
 
-B<Important:> For proper async behavior, pass your application's event loop.
+For proper async behavior, pass your application's event loop.
 This allows C<next_async> to be truly event-driven instead of polling.
 
 =cut
@@ -111,6 +113,20 @@ sub BUILD {
     # Use provided loop or create a new one
     # For proper async, callers should pass their own loop
     $self->_loop($self->loop // IO::Async::Loop->new);
+
+    # Log the prompt
+    if (!ref($self->prompt)) {
+        my $prompt_len = length($self->prompt);
+        if ($log->is_debug) {
+            my $preview = $prompt_len > 100
+                ? substr($self->prompt, 0, 100) . '...'
+                : $self->prompt;
+            $log->debug(sprintf("Query: Prompt (%d chars): \"%s\"", $prompt_len, $preview));
+        }
+        $log->trace(sprintf("Query: Full prompt: %s", $self->prompt));
+    } else {
+        $log->debug("Query: Streaming prompt (async generator)");
+    }
 
     # Merge hooks: user-provided hooks + dry-run hooks if enabled
     my %all_hooks;
@@ -143,11 +159,12 @@ sub BUILD {
         $self->_hook_executor(
             Claude::Agent::Hook::Executor->new(
                 hooks => \%all_hooks,
+                loop  => $self->_loop,
                 ($self->options->has_cwd ? (cwd => $self->options->cwd) : ()),
             )
         );
-        $log->debug("Hook executor initialized with hooks for: %s",
-            join(', ', keys %all_hooks));
+        $log->debug(sprintf("Hook executor initialized with hooks for: %s",
+            join(', ', keys %all_hooks)));
     }
 
     # Create SDKServer wrappers for SDK MCP servers
@@ -163,8 +180,8 @@ sub BUILD {
                 );
                 $sdk_server->start();
                 $self->_sdk_servers->{$name} = $sdk_server;
-                $log->debug("Started SDK server '%s' on socket: %s",
-                    $name, $sdk_server->socket_path);
+                $log->debug(sprintf("Started SDK server '%s' on socket: %s",
+                    $name, $sdk_server->socket_path));
             }
         }
     }
@@ -328,16 +345,41 @@ sub _build_command {
     # For string prompts, use --print mode with -- separator
     # For async generators, use stream-json input format
     if (!ref($self->prompt)) {
-        # Sanitize control characters from prompt to prevent injection
-        # Preserve tabs (\t), newlines (\n, \r) which are common in code snippets
+        # Sanitize terminal escape sequences from prompt to prevent injection attacks.
+        # This uses a comprehensive allowlist approach after stripping known escapes.
+        # See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         my $sanitized_prompt = $self->prompt;
-        $sanitized_prompt =~ s/\x1b\[[0-9;]*[a-zA-Z]//g;  # Strip ANSI escape codes
-        $sanitized_prompt =~ s/\x1b\][^\x07]*\x07//g;     # Strip OSC sequences (title changes, etc.)
-        $sanitized_prompt =~ s/\x1b[PX^_].*?(?:\x1b\\|\x07)//gs;    # Strip DCS/SOS/PM/APC sequences (both terminators)
+
+        # Strip ANSI CSI sequences: ESC [ ... <letter>
+        $sanitized_prompt =~ s/\x1b\[[0-9;:?]*[a-zA-Z]//g;
+
+        # Strip OSC sequences: ESC ] ... (BEL or ST) - title changes, hyperlinks, etc.
+        $sanitized_prompt =~ s/\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)//gs;
+
+        # Strip DCS/SOS/PM/APC sequences: ESC P/X/^/_ ... ST
+        $sanitized_prompt =~ s/\x1b[PX^_][^\x1b]*(?:\x1b\\|\x07)//gs;
+
+        # Strip SS2/SS3 single shift: ESC N, ESC O followed by character
+        $sanitized_prompt =~ s/\x1b[NO].//g;
+
+        # Strip VT52 mode sequences: ESC <letter>
+        $sanitized_prompt =~ s/\x1b[a-zA-Z]//g;
+
+        # Strip C1 control codes (8-bit escape equivalents: 0x80-0x9F)
+        # These can be used to bypass ESC-based filtering in some terminals
+        $sanitized_prompt =~ s/[\x80-\x9f]//g;
+
         # Remove dangerous control chars but preserve tab (\x09), newline (\x0a), carriage return (\x0d)
         $sanitized_prompt =~ s/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/ /g;
-        # Final safety check: remove any remaining escape sequences that may have been malformed
-        $sanitized_prompt =~ s/\x1b[^a-zA-Z]*[a-zA-Z]?//g;
+
+        # Final safety: remove any remaining ESC followed by anything
+        # This catches any escape sequences not matched above
+        $sanitized_prompt =~ s/\x1b.//g;
+
+        # Ultimate safety: strip any remaining bare ESC (0x1B) bytes entirely
+        # This handles edge cases with multi-byte sequences in exotic terminal emulators
+        $sanitized_prompt =~ s/\x1b//g;
+
         push @cmd, '--print', '--', $sanitized_prompt;
     }
     else {
@@ -353,11 +395,8 @@ sub _start_process {
 
     my @cmd = $self->_build_command();
 
-    if ($log->is_debug) {
-        my @safe_cmd = map { $_ =~ /^--/ ? $_ : '[REDACTED]' } @cmd[0..2];
-        push @safe_cmd, '...' if @cmd > 3;
-        $log->debug("Running command: %s (full args redacted)", "@safe_cmd");
-    }
+    $log->debug("Query: Starting Claude CLI process");
+    $log->trace(sprintf("Query: Command: %s with %d arguments", $cmd[0], scalar(@cmd) - 1));
 
     my $process = IO::Async::Process->new(
         command => \@cmd,
@@ -377,7 +416,7 @@ sub _start_process {
                 my ($stream, $buffref) = @_;
                 # Log stderr but don't treat as fatal
                 while ($$buffref =~ s/^([^\n]+)\n//) {
-                    $log->debug("Claude CLI stderr: %s", $1);
+                    $log->debug(sprintf("Claude CLI stderr: %s", $1));
                 }
                 return 0;
             },
@@ -387,6 +426,7 @@ sub _start_process {
             $self->_finished(1);
             # Extract actual exit status (WEXITSTATUS equivalent)
             my $exit_status = $exitcode >> 8;
+            $log->debug(sprintf("Query: Process finished with exit code %d", $exit_status));
             if ($exit_status != 0) {
                 $self->_error("Claude CLI exited with code $exit_status");
             }
@@ -396,6 +436,7 @@ sub _start_process {
         on_exception => sub {
             my ($proc, $exception, $errno, $exitcode) = @_;
             $self->_finished(1);
+            $log->debug(sprintf("Query: Process exception: %s", $exception));
             $self->_error("Claude CLI exception: $exception");
             # Resolve any pending async futures
             $self->_resolve_pending_futures_on_finish();
@@ -409,8 +450,9 @@ sub _start_process {
 
     # For --print mode, prompt is in argv, stdin can be closed
     if (!ref($self->prompt)) {
-        # Schedule close after a brief delay to allow process startup
-        $self->_loop->later(sub { $self->_stdin->close_when_empty if $self->_stdin });
+        $self->_loop->later(sub {
+            $self->_stdin->close_when_empty if $self->_stdin;
+        });
     }
     # For ref prompts (streaming input), caller will send messages via send_user_message
     return;
@@ -424,49 +466,54 @@ sub _handle_line {
     # Use JSON::Lines decode method for single line
     my @decoded = $self->_jsonl->decode($line);
     if ($log->is_trace) {
-        $log->trace("Raw line length: %d", length($line));
-        $log->trace("Raw line: %s", $line);
-        $log->trace("Decoded %d objects", scalar(@decoded));
-        $log->trace("JSON::Lines buffer remaining: %d chars", length($self->_jsonl->remaining));
+        $log->trace(sprintf("Raw line length: %d", length($line)));
+        $log->trace(sprintf("Raw line: %s", $line));
+        $log->trace(sprintf("Decoded %d objects", scalar(@decoded)));
+        $log->trace(sprintf("JSON::Lines buffer remaining: %d chars", length($self->_jsonl->remaining)));
         if ($self->_jsonl->remaining) {
-            $log->trace("Buffer content (first 200): %s", substr($self->_jsonl->remaining, 0, 200));
+            $log->trace(sprintf("Buffer content (first 200): %s", substr($self->_jsonl->remaining, 0, 200)));
         }
     }
 
     # Guard against buffer overflow from accumulated malformed data
-    # Configurable threshold via environment variable, default 100KB, max 10MB
-    # Note: Typical JSON messages from Claude CLI are 1-50KB; tool results may be larger.
+    # Configurable threshold via environment variable, default 1MB, max 10MB
+    # Note: Typical JSON messages from Claude CLI are 1-50KB; tool results (especially
+    # large file reads or grep outputs) may be 100KB-1MB. The minimum of 100KB ensures
+    # legitimate large tool results are not prematurely truncated.
     # Set CLAUDE_AGENT_JSONL_BUFFER_MAX to at least 2x your largest expected message size.
-    my $buffer_threshold = $ENV{CLAUDE_AGENT_JSONL_BUFFER_MAX} // 100_000;
-    my $min_threshold = 10_000;  # Minimum 10KB to accommodate larger legitimate messages
+    my $buffer_threshold = $ENV{CLAUDE_AGENT_JSONL_BUFFER_MAX} // 1_000_000;
+    my $min_threshold = 100_000;  # Minimum 100KB to accommodate large tool results
     my $max_threshold = 10_000_000;  # Hard cap at 10MB
     if (!defined $buffer_threshold || $buffer_threshold !~ /^\d+$/) {
-        $log->warning("CLAUDE_AGENT_JSONL_BUFFER_MAX='%s' is not a valid integer, using default 100000",
-            $ENV{CLAUDE_AGENT_JSONL_BUFFER_MAX} // '')
-            if defined $ENV{CLAUDE_AGENT_JSONL_BUFFER_MAX};
-        $buffer_threshold = 100_000;
+        if (defined $ENV{CLAUDE_AGENT_JSONL_BUFFER_MAX}) {
+            # Sanitize env var value to prevent log injection (remove control characters)
+            my $safe_val = $ENV{CLAUDE_AGENT_JSONL_BUFFER_MAX} // '';
+            $safe_val =~ s/[[:cntrl:]]//g;
+            $log->warning(sprintf("CLAUDE_AGENT_JSONL_BUFFER_MAX='%s' is not a valid integer, using default 1000000", $safe_val));
+        }
+        $buffer_threshold = 1_000_000;
     }
     elsif ($buffer_threshold < $min_threshold) {
-        $log->warning("CLAUDE_AGENT_JSONL_BUFFER_MAX=%d is below minimum (%d), using %d. "
+        $log->warning(sprintf("CLAUDE_AGENT_JSONL_BUFFER_MAX=%d is below minimum (%d), using %d. "
             . "Very small values may truncate legitimate large tool results.",
-            $buffer_threshold, $min_threshold, $min_threshold);
+            $buffer_threshold, $min_threshold, $min_threshold));
         $buffer_threshold = $min_threshold;
     }
     elsif ($buffer_threshold > $max_threshold) {
-        $log->debug("CLAUDE_AGENT_JSONL_BUFFER_MAX=%d exceeds maximum (%d), using %d",
-            $buffer_threshold, $max_threshold, $max_threshold);
+        $log->debug(sprintf("CLAUDE_AGENT_JSONL_BUFFER_MAX=%d exceeds maximum (%d), using %d",
+            $buffer_threshold, $max_threshold, $max_threshold));
         $buffer_threshold = $max_threshold;
     }
 
     # Check buffer size regardless of decode success to prevent unbounded growth
     if ($self->_jsonl->remaining && length($self->_jsonl->remaining) > $buffer_threshold) {
-        $log->debug("JSON::Lines buffer overflow detected (size: %d, threshold: %d), reinitializing",
-            length($self->_jsonl->remaining), $buffer_threshold);
+        $log->debug(sprintf("JSON::Lines buffer overflow detected (size: %d, threshold: %d), reinitializing",
+            length($self->_jsonl->remaining), $buffer_threshold));
         $self->_jsonl(JSON::Lines->new(
             utf8     => 1,
             error_cb => sub {
                 my ($action, $error, $data) = @_;
-                $log->trace("JSON::Lines %s error: %s", $action, $error);
+                $log->trace(sprintf("JSON::Lines %s error: %s", $action, $error));
                 return;
             },
         ));
@@ -476,22 +523,30 @@ sub _handle_line {
 
     for my $data (@decoded) {
         if ($log->is_trace) {
-            $log->trace("Decoded item ref type: %s", ref($data) // "not a ref");
+            $log->trace(sprintf("Decoded item ref type: %s", ref($data) // "not a ref"));
             if (ref $data eq 'HASH') {
-                $log->trace("Hash keys: %s", join(", ", keys %$data));
+                $log->trace(sprintf("Hash keys: %s", join(", ", keys %$data)));
             }
         }
         next unless defined $data && ref $data eq 'HASH';
-        $log->trace("Message type in data: %s", $data->{type} // "undef")
+        $log->trace(sprintf("Message type in data: %s", $data->{type} // "undef"))
             if $log->is_trace;
         next unless exists $data->{type};  # Skip malformed/partial JSON data
 
+        $log->debug(sprintf("Query: Received message type=%s", $data->{type}));
+
         my $msg = Claude::Agent::Message->from_json($data);
+
+        # Log message subtype for more detail
+        if ($msg->can('subtype') && $msg->subtype) {
+            $log->debug(sprintf("Query: Message subtype=%s", $msg->subtype));
+        }
 
         # Capture session_id from init message
         if ($msg->isa('Claude::Agent::Message::System')
             && $msg->subtype eq 'init') {
             $self->_session_id($msg->get_session_id);
+            $log->debug(sprintf("Query: Session ID captured: %s", $self->_session_id // 'none'));
             # Update hook executor with session_id
             if ($self->_hook_executor) {
                 $self->_hook_executor->session_id($self->_session_id);
@@ -502,24 +557,35 @@ sub _handle_line {
         $msg = $self->_execute_hooks_for_message($msg);
 
         # Skip if message was blocked by hooks
-        next unless defined $msg;
+        if (!defined $msg) {
+            $log->debug(sprintf("Query: Message type=%s blocked by hooks", $data->{type}));
+            next;
+        }
 
-        # If there's a pending future waiting for a message, resolve it directly
-        # NOTE: This code assumes single-threaded, single-loop access.
-        # Concurrent calls to next()/next_async() from different contexts
-        # WILL cause message loss or duplication. No synchronization is provided.
+        # Re-entrancy guard: if already processing, queue for later
+        if ($self->_processing_message) {
+            push @{$self->_messages}, $msg;
+            next;
+        }
+        $self->_processing_message(1);
+
         if (@{$self->_pending_futures}) {
             my $future = shift @{$self->_pending_futures};
+            $log->debug(sprintf("Query: Delivering message type=%s to waiting future", $data->{type}));
             $future->done($msg);
         }
         else {
+            $log->debug(sprintf("Query: Queuing message type=%s (queue size=%d)", $data->{type}, scalar(@{$self->_messages}) + 1));
             push @{$self->_messages}, $msg;
         }
+
+        $self->_processing_message(0);
     }
     return;
 }
 
 # Execute hooks for messages containing tool use/result blocks
+# PreToolUse hooks are awaited (blocking), PostToolUse hooks are fire-and-forget
 sub _execute_hooks_for_message {
     my ($self, $msg) = @_;
 
@@ -529,6 +595,7 @@ sub _execute_hooks_for_message {
     if ($msg->isa('Claude::Agent::Message::Assistant')) {
         my $tool_uses = $msg->tool_uses;
         if ($tool_uses && @$tool_uses) {
+            $log->debug(sprintf("Query: Processing %d tool_use block(s)", scalar(@$tool_uses)));
             for my $tool_use (@$tool_uses) {
                 my $tool_name = $tool_use->can('name') ? $tool_use->name : $tool_use->{name};
                 my $tool_input = $tool_use->can('input') ? $tool_use->input : $tool_use->{input};
@@ -536,21 +603,26 @@ sub _execute_hooks_for_message {
 
                 next unless $tool_name && $tool_use_id;
 
+                $log->trace(sprintf("Query: Tool use: name=%s id=%s", $tool_name, $tool_use_id));
+
                 # Track this tool use for PostToolUse hooks
                 $self->_pending_tool_uses->{$tool_use_id} = {
                     tool_name  => $tool_name,
                     tool_input => $tool_input,
                 };
 
-                # Run PreToolUse hooks
+                # Run PreToolUse hooks (must await result for decision)
                 if ($self->_hook_executor->has_hooks_for('PreToolUse')) {
-                    my $result = $self->_hook_executor->run_pre_tool_use(
+                    my $result_future = $self->_hook_executor->run_pre_tool_use(
                         $tool_name, $tool_input, $tool_use_id
                     );
 
+                    # Await the Future - hooks may be async
+                    my $result = $self->_await_hook_result($result_future);
+
                     if ($result->{decision} eq 'deny') {
-                        $log->info("[HOOK] Blocked tool: %s - %s",
-                            $tool_name, $result->{reason} // 'denied by hook');
+                        $log->info(sprintf("[HOOK] Blocked tool: %s - %s",
+                            $tool_name, $result->{reason} // 'denied by hook'));
 
                         # Send permission denial to CLI
                         $self->respond_to_permission($tool_use_id, {
@@ -562,7 +634,7 @@ sub _execute_hooks_for_message {
                         delete $self->_pending_tool_uses->{$tool_use_id};
                     }
                     elsif ($result->{decision} eq 'allow' && $result->{updated_input}) {
-                        $log->debug("[HOOK] Modified tool input for: %s", $tool_name);
+                        $log->debug(sprintf("[HOOK] Modified tool input for: %s", $tool_name));
 
                         # Send permission with modified input
                         $self->respond_to_permission($tool_use_id, {
@@ -595,20 +667,26 @@ sub _execute_hooks_for_message {
 
                 # Determine if success or failure
                 my $is_error = $msg->can('is_error') ? $msg->is_error : 0;
+                $log->debug(sprintf("Query: Tool result received: name=%s id=%s %s",
+                    $tool_name, $tool_use_id, $is_error ? '(error)' : '(success)'));
                 my $tool_result = $msg->can('content') ? $msg->content : undef;
 
                 if ($is_error) {
                     if ($self->_hook_executor->has_hooks_for('PostToolUseFailure')) {
-                        $self->_hook_executor->run_post_tool_use_failure(
+                        # Fire and forget - don't block on PostToolUseFailure
+                        my $future = $self->_hook_executor->run_post_tool_use_failure(
                             $tool_name, $tool_input, $tool_use_id, $tool_result
                         );
+                        $self->_retain_hook_future($future);
                     }
                 }
                 else {
                     if ($self->_hook_executor->has_hooks_for('PostToolUse')) {
-                        $self->_hook_executor->run_post_tool_use(
+                        # Fire and forget - don't block on PostToolUse
+                        my $future = $self->_hook_executor->run_post_tool_use(
                             $tool_name, $tool_input, $tool_use_id, $tool_result
                         );
+                        $self->_retain_hook_future($future);
                     }
                 }
             }
@@ -618,6 +696,42 @@ sub _execute_hooks_for_message {
     return $msg;
 }
 
+# Await a hook result Future by running the event loop
+sub _await_hook_result {
+    my ($self, $future) = @_;
+
+    # If Future is already done, return immediately
+    return $future->get if $future->is_done;
+
+    # Run event loop until Future resolves
+    until ($future->is_done || $future->is_failed) {
+        $self->_loop->loop_once(0.01);
+    }
+
+    if ($future->is_failed) {
+        $log->warning(sprintf("Hook execution failed: %s", $future->failure));
+        return { decision => 'continue' };
+    }
+
+    return $future->get;
+}
+
+# Retain async hook futures to prevent GC
+sub _retain_hook_future {
+    my ($self, $future) = @_;
+
+    # Store in pending futures list, remove when done
+    $self->{_hook_futures} //= {};
+    my $id = "$future";
+    $self->{_hook_futures}{$id} = $future;
+
+    $future->on_ready(sub {
+        delete $self->{_hook_futures}{$id};
+    });
+
+    return;
+}
+
 sub _resolve_pending_futures_on_finish {
     my ($self) = @_;
     # Resolve any pending futures with undef when process finishes
@@ -625,14 +739,35 @@ sub _resolve_pending_futures_on_finish {
         $future->done(undef);
     }
 
-    # Stop SDK servers
+    # Delegate socket cleanup to cleanup()
+    $self->cleanup();
+    return;
+}
+
+=head2 cleanup
+
+    $query->cleanup;
+
+Explicitly clean up SDK server sockets. Call this when you're done
+iterating through messages but before the Query goes out of scope.
+This is especially important in loops that create multiple queries.
+
+=cut
+
+sub cleanup {
+    my ($self) = @_;
+    return if $self->_cleaned_up;
+    $self->_cleaned_up(1);
+
+    # Stop SDK servers immediately
     for my $sdk_server (values %{$self->_sdk_servers}) {
         try {
             $sdk_server->stop();
         } catch {
-            $log->debug("Failed to stop SDK server: %s", $_);
+            $log->debug(sprintf("Failed to stop SDK server during cleanup: %s", $_));
         };
     }
+    $log->debug("Query: Cleanup complete, SDK servers stopped");
     return;
 }
 
@@ -647,10 +782,20 @@ which may cause unnecessary CPU wake-ups and latency for long-running queries.
 For better efficiency in async applications, use C<next_async()> with
 C<< Future->wait() >> or integrate with your event loop directly.
 
-B<Timeout Note:> The actual timeout may exceed the configured C<query_timeout>
-value by up to the polling interval (0.1 seconds), as the timeout check occurs
-after each polling cycle completes. For applications requiring precise timeout
-behavior, consider using C<next_async()> with explicit timeout handling.
+B<TIMEOUT BOUNDARY WARNING:> The actual timeout may exceed the configured
+C<query_timeout> value by up to 0.1 seconds (the polling interval), as the
+timeout check occurs after each loop_once() call completes. This is inherent
+to the polling design. For applications requiring B<precise timeout behavior>:
+
+=over 4
+
+=item * Use C<next_async()> with C<< Future->wait_until($deadline) >> for precise control
+
+=item * Set query_timeout slightly lower than your hard deadline to account for skew
+
+=item * Integrate with your own event loop for microsecond-precision timing
+
+=back
 
 =cut
 
@@ -659,7 +804,11 @@ sub next {
     my ($self) = @_;
 
     # Return queued messages first
-    return shift @{$self->_messages} if @{$self->_messages};
+    if (@{$self->_messages}) {
+        my $msg = shift @{$self->_messages};
+        $log->trace(sprintf("Query: next() returning queued message (remaining=%d)", scalar(@{$self->_messages})));
+        return $msg;
+    }
 
     # Wait for more messages or process to finish
     # Configurable timeout with 10 minute default, max 1 hour
@@ -667,25 +816,31 @@ sub next {
     my $timeout = $self->options->query_timeout // 600;
     my $max_timeout = 3600;  # 1 hour maximum
     if (!defined $timeout || $timeout <= 0 || $timeout > $max_timeout) {
-        $log->debug("Invalid query_timeout value (%s), using default 600 seconds", $timeout // 'undef')
+        $log->debug(sprintf("Invalid query_timeout value (%s), using default 600 seconds", $timeout // 'undef'))
             if $has_timeout && defined $timeout && $timeout != 600;
         $timeout = 600;
     }
     my $start_time = Time::HiRes::time();
     # Use epsilon tolerance (0.001s) to handle floating-point boundary conditions
+    # Applied consistently in both loop and final check for predictable timeout behavior
+    # NOTE: epsilon (0.001s) handles FP comparison edge cases, NOT the ~100ms loop imprecision
     my $epsilon = 0.001;
     # Poll interval (0.1s) trade-off: balances responsiveness vs CPU usage.
-    # NOTE: Actual timeout may exceed the configured value by up to the polling
-    # interval (0.1s) since the timeout check occurs after each loop_once() call.
-    # For time-sensitive applications requiring precise timeout behavior, consider
-    # using next_async() with Future->wait() for event-driven blocking.
+    # TIMEOUT PRECISION WARNING: Actual timeout may exceed the configured value by up to
+    # the polling interval (~0.1s) since the timeout check occurs after each loop_once() call.
+    # This is a fundamental limitation of polling-based blocking.
+    # FOR TIME-CRITICAL APPLICATIONS requiring precise timeout control:
+    #   - Use next_async() which returns a Future immediately
+    #   - Apply timeout via Future->wait_until($deadline) for event-driven blocking
+    #   - This avoids the polling interval imprecision entirely
+    # NOTE: Both loop and final check use epsilon for consistent timeout precision (~0.1s).
     while (!@{$self->_messages} && !$self->_finished && !$self->_error
            && (Time::HiRes::time() - $start_time) < ($timeout - $epsilon)) {
         $self->_loop->loop_once(0.1);
     }
 
     # Check if we timed out waiting for messages
-    # Use consistent comparison with epsilon tolerance to avoid boundary race
+    # Use consistent epsilon tolerance in both loop condition and final check
     if ((Time::HiRes::time() - $start_time) >= ($timeout - $epsilon)
         && !$self->_finished) {
         # Final check for messages that may have arrived at timeout boundary
@@ -693,10 +848,17 @@ sub next {
         return shift @{$self->_messages} if @{$self->_messages};
         $self->_finished(1);
         $self->_error("Query timed out after $timeout seconds");
+        $log->debug(sprintf("Query: Timed out after %d seconds", $timeout));
         return;  # Return immediately on timeout
     }
 
-    return shift @{$self->_messages};
+    my $msg = shift @{$self->_messages};
+    if ($msg) {
+        $log->trace("Query: next() returning message from event loop");
+    } elsif ($self->_finished) {
+        $log->debug("Query: next() returning undef (process finished)");
+    }
+    return $msg;
 }
 
 =head2 next_async
@@ -713,15 +875,18 @@ sub next_async {
 
     # Return queued messages first (as an immediately-resolved Future)
     if (@{$self->_messages}) {
+        $log->trace(sprintf("Query: next_async() returning queued message (remaining=%d)", scalar(@{$self->_messages}) - 1));
         return Future->done(shift @{$self->_messages});
     }
 
     # If already finished, return undef
     if ($self->_finished) {
+        $log->debug("Query: next_async() returning undef (process finished)");
         return Future->done(undef);
     }
 
     # Create a Future that will be resolved when next message arrives
+    $log->trace(sprintf("Query: next_async() creating pending future (waiting=%d)", scalar(@{$self->_pending_futures}) + 1));
     my $future = $self->_loop->new_future;
     push @{$self->_pending_futures}, $future;
     return $future;
@@ -809,7 +974,7 @@ sub send_user_message {
     try {
         $result = $self->_stdin->write($msg);
     } catch {
-        $log->debug("send_user_message write error: %s", $_);
+        $log->debug(sprintf("send_user_message write error: %s", $_));
         $result = 0;
     };
     return $result;
@@ -835,7 +1000,7 @@ sub set_permission_mode {
     try {
         $self->_stdin->write($msg);
     } catch {
-        $log->debug("set_permission_mode write error: %s", $_);
+        $log->debug(sprintf("set_permission_mode write error: %s", $_));
     };
     return;
 }

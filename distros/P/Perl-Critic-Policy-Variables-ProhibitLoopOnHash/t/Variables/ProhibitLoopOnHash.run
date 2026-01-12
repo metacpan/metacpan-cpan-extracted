@@ -120,3 +120,8 @@ foreach \my %hash (@array_of_hash_references) {}
 ## failures 0
 ## cut
 for Class->method($foo);
+
+## name syntax error
+## failures 0
+## cut
+for my $foo @list {

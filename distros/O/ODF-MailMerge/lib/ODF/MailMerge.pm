@@ -17,8 +17,8 @@ package ODF::MailMerge;
 # ...but don't let CPAN or test harnes scanners see this as defining $VERSION
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 999.999; }
 
-our $VERSION = '1.010'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-08-25'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1.011'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2026-01-11'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 our @CARP_NOT = ("ODF::lpOD_Helper", "ODF::lpOD");
@@ -28,7 +28,7 @@ use List::Util qw/first any none all max min sum0/;
 use List::MoreUtils qw/before after uniq/;
 use Data::Dumper::Interp 6.004
        qw/visnew ivis dvis dvisq ivisq vis visq avis avisq addrvis u/;
-use Spreadsheet::Edit::Log 1000.005 'oops', ':btw=MME${lno}:' ;
+use Spreadsheet::Edit::Log 1000.005 'oops', ':btw' ;
 use Clone ();
 
 use ODF::lpOD;
@@ -62,7 +62,7 @@ our %EXPORT_TAGS = ('all' => [@EXPORT, @EXPORT_OK]);
 our $debug;
 
 use File::ShareDir qw/dist_dir/; # module_dir
-use Path::Tiny qw/path/;
+use Path::Tiny 0.146 qw/path/;
 sub odfmm_example_path() {
   my $p = path(__FILE__)->parent->parent->parent->child('share','examples');
   unless ($p->exists) {
@@ -809,7 +809,7 @@ use constant MM_SUBST     => ODF::MailMerge::MM_SUBST;
 use ODF::lpOD;
 use ODF::lpOD_Helper;
 use Data::Dumper::Interp;
-use Spreadsheet::Edit::Log 1000.005 'oops', ':btw=MME${lno}:' ;
+use Spreadsheet::Edit::Log 1000.005 'oops', ':btw' ;
 use Carp;
 our @CARP_NOT = ("ODF::MailMerge", "ODF::lpOD_Helper", "ODF::lpOD");
 
@@ -1202,15 +1202,15 @@ empty values ("") substituted in later rows.  For example, given
 if the {Phone} token had four values and {Email} had two,
 the result would be four copies of the row, looking like this:
 
-  ┌──────────────┬────────────────┬───────────────────────┐
-  │John Hancock  │ (415) 555-1212 │ j.hancock@gmail.com   │
-  ├──────────────┼────────────────┼───────────────────────┤
-  │              │ (650) 555-1212 │ j.hancock@hotmail.com │
-  ├──────────────┼────────────────┼───────────────────────┤
-  │              │ (800) 555-1212 │                       │
-  ├──────────────┼────────────────┼───────────────────────┤
-  │              │ (900) 888-7777 │                       │
-  └──────────────┴────────────────┴───────────────────────┘
+  ┌──────────────┬────────────────┬─────────────────────┐
+  │John Hancock  │ (415) 555-1212 │ j.hancock@gmail.com │
+  ├──────────────┼────────────────┼─────────────────────┤
+  │              │ (650) 555-1212 │ johnnyh@hotmail.com │
+  ├──────────────┼────────────────┼─────────────────────┤
+  │              │ (800) 555-1212 │                     │
+  ├──────────────┼────────────────┼─────────────────────┤
+  │              │ (900) 888-7777 │                     │
+  └──────────────┴────────────────┴─────────────────────┘
 
 A C<:rmsb> modifier causes shared borders between replicated rows to
 be eliminated in the current cell.

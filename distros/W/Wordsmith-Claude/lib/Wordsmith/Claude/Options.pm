@@ -9,7 +9,8 @@ use Marlin
     'model?' => Str,              # Claude model to use
     'max_length?' => Int,         # Maximum output length hint
     'preserve_formatting?' => Bool,  # Try to preserve original formatting
-    'language?' => Str;           # Output language (for translation)
+    'language?' => Str,           # Output language (for translation)
+    'permission_mode?' => Str;    # Claude Agent permission mode (default: bypassPermissions)
 
 =head1 NAME
 
@@ -54,6 +55,14 @@ Boolean. If true, attempt to preserve the original formatting
 
 Output language for translation. If set, the rewritten text will
 be in this language regardless of the input language.
+
+=head2 permission_mode
+
+Claude Agent permission mode. Defaults to 'bypassPermissions' which
+disables the Claude Agent SDK's permission system. This is required
+for text rewriting operations where no file system or tool access
+is needed. Advanced users can set this to other values if integrating
+with systems that require permission prompts.
 
 =head1 AUTHOR
 

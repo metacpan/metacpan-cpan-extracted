@@ -78,8 +78,7 @@ environment variables:
 my $_adapter_configured = 0;
 
 sub import {
-    my $class = shift;
-    my @args = @_;
+    my ($class, @args) = @_;
     my $caller = caller;
 
     # Configure adapter once
@@ -121,19 +120,42 @@ sub _setup_default_adapter {
 
     if ($output && $output ne 'stderr') {
         if ($output eq 'stdout') {
-            Log::Any::Adapter->set('Stdout', log_level => $effective_level);
+            Log::Any::Adapter->set(
+                { formatter => \&_format_message },
+                'Stdout',
+                log_level => $effective_level,
+            );
         }
         else {
             # File path
-            Log::Any::Adapter->set('File', $output, log_level => $effective_level);
+            Log::Any::Adapter->set(
+                { formatter => \&_format_message },
+                'File',
+                $output,
+                log_level => $effective_level,
+            );
         }
     }
     else {
         # Default: stderr
-        Log::Any::Adapter->set('Stderr', log_level => $effective_level);
+        Log::Any::Adapter->set(
+            { formatter => \&_format_message },
+            'Stderr',
+            log_level => $effective_level,
+        );
     }
 
     return;
+}
+
+# Format message with sprintf-style placeholders
+sub _format_message {
+    my ($category, $level, $message, @args) = @_;
+    # Apply sprintf if there are format arguments
+    if (@args) {
+        $message = sprintf($message, @args);
+    }
+    return $message;
 }
 
 =head1 FUNCTIONS

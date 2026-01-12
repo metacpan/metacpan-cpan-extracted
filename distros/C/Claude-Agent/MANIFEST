@@ -10,8 +10,12 @@ examples/08-structured-output.pl
 examples/09-error-handling.pl
 examples/10-mcp-servers.pl
 examples/11-dry-run.pl
+examples/12-async-tool.pl
+examples/13-async-hook.pl
+examples/14-session.pl
 ignore.txt
 lib/Claude/Agent.pm
+lib/Claude/Agent/CLI.pm
 lib/Claude/Agent/Client.pm
 lib/Claude/Agent/Content.pm
 lib/Claude/Agent/Content/Text.pm
@@ -73,6 +77,7 @@ t/10-errors.t
 t/11-extended-coverage.t
 t/12-sdk-validation.t
 t/13-logger.t
+t/14-session.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

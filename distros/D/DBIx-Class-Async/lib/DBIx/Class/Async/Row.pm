@@ -15,11 +15,11 @@ DBIx::Class::Async::Row - Asynchronous row object for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.22
+Version 0.25
 
 =cut
 
-our $VERSION = '0.22';
+our $VERSION = '0.25';
 
 =head1 SYNOPSIS
 
@@ -34,7 +34,7 @@ our $VERSION = '0.22';
     );
 
     # Access columns
-    my $name = $row->name;  # Returns 'John'
+    my $name  = $row->name;                 # Returns 'John'
     my $email = $row->get_column('email');  # Returns 'john@example.com'
 
     # Get all columns
@@ -145,6 +145,146 @@ sub new {
 
 =head1 METHODS
 
+=head2 create_related
+
+  my $post_future = $user->create_related('posts', {
+      title   => 'My First Post',
+      content => 'Hello World!'
+  });
+
+  my $post = await $post_future;
+
+A convenience method that creates a new record in the specified relationship.
+
+It internally calls C<related_resultset> to identify the correct foreign key
+mapping (e.g., setting C<user_id> to the current user's ID) and then invokes
+C<create> on the resulting ResultSet.
+
+This method returns a L<Future> that resolves to a new Row object of the
+related type.
+
+B<Note:> Just like L<DBIx::Class::Async::ResultSet/create>, this method
+automatically merges the relationship's foreign key constraints into the
+provided hashref, ensuring that C<NOT NULL> constraints on the foreign key
+columns are satisfied.
+
+=cut
+
+sub create_related {
+    my ($self, $rel_name, $col_data) = @_;
+
+    return $self->related_resultset($rel_name)->create($col_data);
+}
+
+=head2 delete
+
+    $row->delete
+        ->then(sub {
+            my ($success) = @_;
+            if ($success) {
+                say "Row deleted successfully";
+            }
+        })
+        ->catch(sub {
+            my ($error) = @_;
+            # Handle error
+        });
+
+Asynchronously deletes the row from the database.
+
+=over 4
+
+=item B<Returns>
+
+A L<Future> that resolves to true if the row was deleted, false otherwise.
+
+=item B<Throws>
+
+Croaks if the row doesn't have a primary key.
+
+=back
+
+=cut
+
+sub delete {
+    my ($self) = @_;
+
+    # If already deleted (not in storage), return false immediately
+    unless ($self->in_storage) {
+        return Future->done(0);
+    }
+
+    my $pk_info = $self->_get_primary_key_info;
+    my $pk      = $pk_info->{columns}[0];
+    my $id      = $self->get_column($pk);
+
+    croak "Cannot delete row without a primary key"
+        unless defined $id;
+
+    return $self->{async_db}->delete($self->{source_name}, $id)->then(sub {
+        my ($success) = @_;
+
+        # Mark as not in storage
+        $self->{_in_storage} = 0;
+
+        # Return the success value (1 or 0), not $self
+        return Future->done($success);
+    });
+}
+
+=head2 discard_changes
+
+  $row->discard_changes->then(sub {
+      my ($refreshed_row) = @_;
+      # Row data reloaded from database
+  });
+
+Reloads the row data from the database, discarding any changes.
+
+=over 4
+
+=item B<Returns>
+
+A L<Future> that resolves to the refreshed row object.
+
+=item B<Notes>
+
+This refetches the row from the database and clears the dirty columns hash.
+
+=back
+
+=cut
+
+sub discard_changes {
+    my $self = shift;
+
+    # Get primary key
+    my @pk = $self->_get_source->primary_columns;
+
+    croak("Cannot discard changes on row without primary key") unless @pk;
+    croak("Composite primary keys not yet supported") if @pk > 1;
+
+    my $pk_col = $pk[0];
+    my $id = $self->get_column($pk_col);
+
+    croak("Cannot discard changes: primary key value is undefined")
+        unless defined $id;
+
+    # Fetch fresh data from database
+    return $self->{async_db}->find(
+        $self->{source_name},
+        $id
+    )->then(sub {
+        my ($fresh_data) = @_;
+
+        # Update our data
+        $self->{_data} = $fresh_data;
+        $self->{_dirty} = {};
+
+        return Future->done($self);
+    });
+}
+
 =head2 get_column
 
     my $value = $row->get_column($column_name);
@@ -231,6 +371,47 @@ sub get_columns {
     return %{$self->{_data}};
 }
 
+=head2 get_dirty_columns
+
+  my %dirty = $row->get_dirty_columns;
+  my $dirty_ref = $row->get_dirty_columns;
+
+Returns columns that have been modified but not yet saved.
+
+=over 4
+
+=item B<Returns>
+
+In list context: Hash of column-value pairs for dirty columns.
+
+In scalar context: Hashref of column-value pairs for dirty columns.
+
+=item B<Examples>
+
+  $row->set_column('name' => 'Alice');
+  $row->set_column('email' => 'alice@example.com');
+
+  my %dirty = $row->get_dirty_columns;
+  # %dirty = (name => 'Alice', email => 'alice@example.com')
+
+  my @dirty_cols = keys %dirty;
+  say "Modified: " . join(', ', @dirty_cols);
+
+=back
+
+=cut
+
+sub get_dirty_columns {
+    my $self = shift;
+
+    my %dirty_values;
+    foreach my $column (keys %{$self->{_dirty}}) {
+        $dirty_values{$column} = $self->{_data}{$column};
+    }
+
+    return wantarray ? %dirty_values : \%dirty_values;
+}
+
 =head2 get_inflated_columns
 
     my %inflated_columns = $row->get_inflated_columns;
@@ -258,199 +439,88 @@ sub get_inflated_columns {
     return %inflated;
 }
 
-=head2 update
+=head2 id
 
-    $row->update({ column1 => $value1, column2 => $value2 })
-        ->then(sub {
-            my ($updated_row) = @_;
-            # Handle updated row
-        })
-        ->catch(sub {
-            my ($error) = @_;
-            # Handle error
-        });
+  my $id  = $row->id;          # Single primary key
+  my @ids = $row->id;          # Composite primary key (multiple values)
 
-Asynchronously updates the row in the database.
+Returns the primary key value(s) for a row.
 
 =over 4
 
-=item B<Parameters>
+=item B<Arguments>
 
-=over 8
-
-=item C<$data>
-
-Hash reference containing column-value pairs to update.
-
-=back
+None
 
 =item B<Returns>
 
-A L<Future> that resolves to the updated row object.
+In list context: List of primary key values.
+
+In scalar context: Single primary key value (for single-column primary keys) or
+arrayref of values (for composite primary keys).
 
 =item B<Throws>
 
-=over 4
+Dies if:
+- Called as a class method
+- No primary key defined for the source
+- Row is not in storage and primary key value is undefined
 
-=item *
+=item B<Examples>
 
-Croaks if C<$data> is not a hash reference.
+  # Single primary key
+  my $user = $rs->find(1)->get;
+  my $id = $user->id;  # Returns: 1
 
-=item *
+  # Composite primary key
+  my $record = $rs->find({ key1 => 1, key2 => 2 })->get;
+  my @ids = $record->id;  # Returns: (1, 2)
 
-Croaks if the row is not in storage.
-
-=back
+  # Arrayref in scalar context (composite key)
+  my $ids = $record->id;  # Returns: [1, 2]
 
 =back
 
 =cut
 
-sub update {
-    my ($self, $data) = @_;
+sub id {
+    my $self = shift;
 
-    croak("Usage: update({ col => val })")    unless ref $data eq 'HASH';
-    croak("Cannot update row not in storage") unless $self->in_storage;
+    croak("id() cannot be called as a class method")
+        unless ref $self;
 
-    # Get primary key dynamically
-    my $pk_info = $self->_get_primary_key_info;
-    my $pk_col  = $pk_info->{columns}[0];
-    my $id      = $self->get_column($pk_col);
+    my @pk_columns = $self->_get_source->primary_columns;
 
-    return $self->{async_db}->update($self->{source_name}, $id, $data)->then(sub {
-        my ($result) = @_;
+    croak("No primary key defined for " . $self->{source_name})
+        unless @pk_columns;
 
-        # Update local object with the returned data
-        if (ref $result eq 'HASH' && %$result) {
-            # Merge the result into our local data
-            $self->{_data} = { %{$self->{_data}}, %$result };
-        } else {
-            # If result is empty, use what we sent
-            while (my ($col, $val) = each %$data) {
-                $self->{_data}{$col} = $val;
-            }
+    my @pk_values;
+    foreach my $col (@pk_columns) {
+        my $val = $self->get_column($col);
+
+        # Warn if primary key is undefined (usually means row not in storage)
+        unless (defined $val) {
+            carp("Primary key column '$col' is undefined for " .
+                 $self->{source_name});
         }
 
-        $self->{_dirty_columns} = {};
-        $self->{_inflated} = {};
-
-        return Future->done($self);
-    });
-}
-
-=head2 delete
-
-    $row->delete
-        ->then(sub {
-            my ($success) = @_;
-            if ($success) {
-                say "Row deleted successfully";
-            }
-        })
-        ->catch(sub {
-            my ($error) = @_;
-            # Handle error
-        });
-
-Asynchronously deletes the row from the database.
-
-=over 4
-
-=item B<Returns>
-
-A L<Future> that resolves to true if the row was deleted, false otherwise.
-
-=item B<Throws>
-
-Croaks if the row doesn't have a primary key.
-
-=back
-
-=cut
-
-sub delete {
-    my ($self) = @_;
-
-    # If already deleted (not in storage), return false immediately
-    unless ($self->in_storage) {
-        return Future->done(0);
+        push @pk_values, $val;
     }
 
-    my $pk_info = $self->_get_primary_key_info;
-    my $pk      = $pk_info->{columns}[0];
-    my $id      = $self->get_column($pk);
-
-    croak "Cannot delete row without a primary key"
-        unless defined $id;
-
-    return $self->{async_db}->delete($self->{source_name}, $id)->then(sub {
-        my ($success) = @_;
-
-        # Mark as not in storage
-        $self->{_in_storage} = 0;
-
-        # Return the success value (1 or 0), not $self
-        return Future->done($success);
-    });
-}
-
-=head2 discard_changes
-
-    $row->discard_changes
-        ->then(sub {
-            my ($fresh_row) = @_;
-            # Row now contains latest data from database
-        })
-        ->catch(sub {
-            my ($error) = @_;
-            # Handle error
-        });
-
-Discards any local changes and refetches the row from the database.
-
-=over 4
-
-=item B<Returns>
-
-A L<Future> that resolves to the row object with fresh data.
-
-=item B<Throws>
-
-=over 4
-
-=item *
-
-Croaks if the row doesn't have a primary key.
-
-=back
-
-=back
-
-=cut
-
-sub discard_changes {
-    my ($self) = @_;
-
-    my $pk_info = $self->_get_primary_key_info;
-    my $pk      = $pk_info->{columns}[0];
-    my $id      = $self->get_column($pk);
-
-    croak "Cannot discard_changes on a row without a primary key"
-        unless defined $id;
-
-    # Re-fetch the row from the database using async_db->find()
-    return $self->{async_db}->find($self->{source_name}, $id)->then(sub {
-        my ($fresh_data) = @_;
-
-        if ($fresh_data && ref $fresh_data eq 'HASH') {
-            # Sync internal data with the freshly fetched data
-            $self->{_data} = { %$fresh_data };
-            $self->{_inflated} = {};
-            $self->{_dirty_columns} = {};
+    # Return based on context
+    if (wantarray) {
+        # List context: return list
+        return @pk_values;
+    } else {
+        # Scalar context
+        if (@pk_values == 1) {
+            # Single primary key: return the value
+            return $pk_values[0];
+        } else {
+            # Composite primary key: return arrayref
+            return \@pk_values;
         }
-
-        return Future->done($self);
-    });
+    }
 }
 
 =head2 in_storage
@@ -490,25 +560,105 @@ sub in_storage {
     return defined $id ? 1 : 0;
 }
 
-=head2 result_source
+=head2 insert
 
-    my $source = $row->result_source;
+    $row->insert
+        ->then(sub {
+            my ($inserted_row) = @_;
+            # Row has been inserted
+        });
 
-Returns the L<DBIx::Class::ResultSource> for this row.
+Asynchronously inserts the row into the database.
+
+Note: This method is typically called automatically by L<DBIx::Class::Async/create>.
+For existing rows, it returns an already-resolved Future.
 
 =over 4
 
 =item B<Returns>
 
-The result source object, or undef if not available.
+A L<Future> that resolves to the row object.
 
 =back
 
 =cut
 
-sub result_source {
+sub insert {
     my $self = shift;
-    return $self->_get_source;
+    # Already inserted via create()
+    return Future->done($self);
+}
+
+=head2 is_column_changed
+
+  if ($row->is_column_changed('name')) {
+      say "Name was modified";
+  }
+
+Checks if a specific column has been modified but not yet saved.
+
+=over 4
+
+=item B<Arguments>
+
+=over 8
+
+=item C<$column>
+
+The column name to check.
+
+=back
+
+=item B<Returns>
+
+True if the column is dirty (modified), false otherwise.
+
+=back
+
+=cut
+
+sub is_column_changed {
+    my ($self, $column) = @_;
+
+    croak("column name required") unless defined $column;
+
+    return exists $self->{_dirty}{$column} ? 1 : 0;
+}
+
+=head2 make_column_dirty
+
+  $row->make_column_dirty('name');
+
+Marks a column as dirty even if its value hasn't changed.
+
+=over 4
+
+=item B<Arguments>
+
+=over 8
+
+=item C<$column>
+
+The column name to mark as dirty.
+
+=back
+
+=item B<Returns>
+
+The row object itself (for chaining).
+
+=back
+
+=cut
+
+sub make_column_dirty {
+    my ($self, $column) = @_;
+
+    croak("column name required") unless defined $column;
+
+    $self->{_dirty}{$column} = 1;
+
+    return $self;
 }
 
 =head2 related_resultset
@@ -605,64 +755,249 @@ sub related_resultset {
     return $self->{schema}->resultset($moniker)->search($search_cond);
 }
 
-=head2 insert
+=head2 result_source
 
-    $row->insert
-        ->then(sub {
-            my ($inserted_row) = @_;
-            # Row has been inserted
-        });
+    my $source = $row->result_source;
 
-Asynchronously inserts the row into the database.
-
-Note: This method is typically called automatically by L<DBIx::Class::Async/create>.
-For existing rows, it returns an already-resolved Future.
+Returns the L<DBIx::Class::ResultSource> for this row.
 
 =over 4
 
 =item B<Returns>
 
-A L<Future> that resolves to the row object.
+The result source object, or undef if not available.
 
 =back
 
 =cut
 
-sub insert {
+sub result_source {
     my $self = shift;
-    # Already inserted via create()
-    return Future->done($self);
+    return $self->_get_source;
 }
 
-=head2 create_related
+=head2 set_column
 
-  my $post_future = $user->create_related('posts', {
-      title   => 'My First Post',
-      content => 'Hello World!'
-  });
+  $row->set_column('name' => 'Alice');
+  $row->set_column('email' => 'alice@example.com');
 
-  my $post = await $post_future;
+Sets a raw column value. If the new value is different from the old one,
+the column is marked as dirty for when you next call C<update>.
 
-A convenience method that creates a new record in the specified relationship.
+=over 4
 
-It internally calls C<related_resultset> to identify the correct foreign key
-mapping (e.g., setting C<user_id> to the current user's ID) and then invokes
-C<create> on the resulting ResultSet.
+=item B<Arguments>
 
-This method returns a L<Future> that resolves to a new Row object of the
-related type.
+=over 8
 
-B<Note:> Just like L<DBIx::Class::Async::ResultSet/create>, this method
-automatically merges the relationship's foreign key constraints into the
-provided hashref, ensuring that NOT NULL constraints on the foreign key
-columns are satisfied.
+=item C<$columnname>
+
+The name of the column to set.
+
+=item C<$value>
+
+The value to set. Can be a scalar, object, or reference.
+
+=back
+
+=item B<Returns>
+
+The value that was set.
+
+=item B<Notes>
+
+- If the new value differs from the old value, the column is marked as dirty
+- If passed an object or reference, it will be stored as-is
+- Use C<set_inflated_columns> for proper inflation/deflation
+- Better yet, use column accessors: C<< $row->name('Alice') >>
+
+=item B<Examples>
+
+  # Set a simple value
+  $row->set_column('name' => 'Bob');
+
+  # Set to undef
+  $row->set_column('email' => undef);
+
+  # Mark as dirty and update
+  $row->set_column('active' => 0);
+  $row->update->get;
+
+=back
 
 =cut
 
-sub create_related {
-    my ($self, $rel_name, $col_data) = @_;
+sub set_column {
+    my ($self, $column, $value) = @_;
 
-    return $self->related_resultset($rel_name)->create($col_data);
+    croak("column name required") unless defined $column;
+
+    # Get the current value
+    my $old_value = exists $self->{_data}{$column}
+        ? $self->{_data}{$column}
+        : undef;
+
+    # Set the new value
+    $self->{_data}{$column} = $value;
+
+    # Mark as dirty if value changed
+    # Handle undef comparison carefully
+    my $changed = 0;
+    if (!defined $old_value && !defined $value) {
+        # Both undef, no change
+        $changed = 0;
+    } elsif (!defined $old_value || !defined $value) {
+        # One is undef, other isn't
+        $changed = 1;
+    } elsif (ref $old_value || ref $value) {
+        # If either is a reference, assume changed
+        # (we can't reliably compare references for equality)
+        $changed = 1;
+    } else {
+        # Both are defined scalars
+        $changed = ($old_value ne $value);
+    }
+
+    # Mark as dirty if changed
+    if ($changed) {
+        $self->{_dirty}{$column} = 1;
+    }
+
+    return $value;
+}
+
+=head2 set_columns
+
+  $row->set_columns({
+      name   => 'Alice',
+      email  => 'alice@example.com',
+      active => 1,
+  });
+
+Sets multiple column, raw value pairs at once.
+
+=over 4
+
+=item B<Arguments>
+
+=over 8
+
+=item C<\%columndata>
+
+A hashref of column-value pairs.
+
+=back
+
+=item B<Returns>
+
+The row object itself (for chaining).
+
+=item B<Examples>
+
+  # Set multiple columns
+  $row->set_columns({
+      name   => 'Bob',
+      email  => 'bob@example.com',
+      active => 1,
+  });
+
+  # Chain with update
+  $row->set_columns({ name => 'Carol' })->update->get;
+
+=back
+
+=cut
+
+sub set_columns {
+    my ($self, $values) = @_;
+
+    croak("hashref of column-value pairs required")
+        unless defined $values && ref $values eq 'HASH';
+
+    while (my ($column, $value) = each %$values) {
+        $self->set_column($column, $value);
+    }
+
+    return $self;
+}
+
+=head2 update
+
+  # Update with explicit values
+  $row->update({ name => 'Bob', email => 'bob@example.com' })->get;
+
+  # Update using dirty columns (after set_column/set_columns)
+  $row->set_column('name', 'Bob');
+  $row->update()->get;  # Updates only dirty columns
+
+Updates the row in the database.
+
+=over 4
+
+=item B<Arguments>
+
+=over 8
+
+=item C<\%values> (optional)
+
+A hashref of column-value pairs to update. If not provided, uses dirty columns.
+
+=back
+
+=item B<Returns>
+
+A L<Future> that resolves to the updated row object.
+
+=back
+
+=cut
+
+sub update {
+    my ($self, $values) = @_;
+
+    # Check if row is in storage
+    unless ($self->in_storage) {
+        return Future->fail("Cannot update row: not in storage");
+    }
+
+    # If no values provided, use dirty columns
+    unless (defined $values) {
+        my %dirty = $self->get_dirty_columns;
+
+        # If no dirty columns, nothing to update
+        return Future->done($self) unless %dirty;
+
+        $values = \%dirty;
+    }
+
+    croak("Usage: update({ col => val })")
+        unless ref $values eq 'HASH';
+
+    # Merge values into current data
+    while (my ($col, $val) = each %$values) {
+        $self->{_data}{$col} = $val;
+    }
+
+    # Get primary key for the update
+    my $pk_info = $self->_get_primary_key_info;
+    my $pk      = $pk_info->{columns}[0];
+    my $id      = $self->get_column($pk);
+
+    croak("Cannot update row without a primary key")
+        unless defined $id;
+
+    return $self->{async_db}->update(
+        $self->{source_name},
+        $id,
+        $values
+    )->then(sub {
+        my ($result) = @_;
+
+        # Clear dirty columns after successful update
+        $self->{_dirty} = {};
+
+        return Future->done($self);
+    });
 }
 
 =head1 AUTOLOAD METHODS

@@ -12,7 +12,7 @@ my $metadata = path('t/idp-metadata.xml')->slurp;
 
 my $idp = Net::SAML2::IdP->new_from_xml(
     xml    => $metadata,
-    cacert => 't/cacert.pem'
+    cacert => 't/net-saml2-cacert.pem'
 );
 
 my $authn = $sp->authn_request(

@@ -65,8 +65,8 @@
       </tbody>
     </table>
   </div>
-  <pre class="expected">| Column 1 | Column 2 |
-| --- | --- |
+  <pre class="expected">| Column 1        | Column 2        |
+| ---             | ---             |
 | Row 1, Column 1 | Row 1, Column 2 |
 | Row 2, Column 1 | Row 2, Column 2 |</pre>
 </div>
@@ -89,8 +89,8 @@ Column 2 with newline</td>
       </tbody>
     </table>
   </div>
-  <pre class="expected">| Column 1 | Column 2 |
-| --- | --- |
+  <pre class="expected">| Column 1              | Column 2                     |
+| ---                   | ---                          |
 | Row 1,  &lt;br/&gt;Column 1 | Row 1, Column 2 with newline |</pre>
 </div>
 
@@ -121,8 +121,8 @@ Column 2 with newline</td>
       </tbody>
     </table>
   </div>
-  <pre class="expected">| Column 1 | Column 2 | Column 3 | Column 4 |
-| :-- | :-: | --: | --- |
+  <pre class="expected">| Column 1        | Column 2        | Column 3        | Column 4        |
+| :--             | :-:             | --:             | ---             |
 | Row 1, Column 1 | Row 1, Column 2 | Row 1, Column 3 | Row 1, Column 4 |
 | Row 2, Column 1 | Row 2, Column 2 | Row 2, Column 3 | Row 2, Column 4 |</pre>
 </div>
@@ -172,13 +172,13 @@ Column 2 with newline</td>
       </tbody>
     </table>
 </div>
-<pre class="expected">| Column 1 | Column 2 | Column 3 | Column 4 |
-| :-- | :-: | --: | --- |
-|  | Row 1, Column 2 | Row 1, Column 3 | Row 1, Column 4 |
-| Row 2, Column 1 |  | Row 2, Column 3 | Row 2, Column 4 |
-| Row 3, Column 1 | Row 3, Column 2 |  | Row 3, Column 4 |
-| Row 4, Column 1 | Row 4, Column 2 | Row 4, Column 3 |  |
-|  |  |  | Row 5, Column 4 |</pre>
+<pre class="expected">| Column 1        | Column 2        | Column 3        | Column 4        |
+| :--             | :-:             | --:             | ---             |
+|                 | Row 1, Column 2 | Row 1, Column 3 | Row 1, Column 4 |
+| Row 2, Column 1 |                 | Row 2, Column 3 | Row 2, Column 4 |
+| Row 3, Column 1 | Row 3, Column 2 |                 | Row 3, Column 4 |
+| Row 4, Column 1 | Row 4, Column 2 | Row 4, Column 3 |                 |
+|                 |                 |                 | Row 5, Column 4 |</pre>
 </div>
 
 <div class="case" data-name="empty rows">
@@ -205,9 +205,9 @@ Column 2 with newline</td>
     </table>
 </div>
 <pre class="expected">| Heading 1 | Heading 2 |
-| --- | --- |
-| Row 1 | Row 1 |
-| Row 3 | Row 3 |</pre>
+| ---       | ---       |
+| Row 1     | Row 1     |
+| Row 3     | Row 3     |</pre>
 </div>
 
 <div class="case" data-name="th in first row">
@@ -222,7 +222,7 @@ Column 2 with newline</td>
     </table>
   </div>
   <pre class="expected">| Heading |
-| --- |
+| ---     |
 | Content |</pre>
 </div>
 
@@ -240,7 +240,7 @@ Column 2 with newline</td>
     </table>
   </div>
   <pre class="expected">| Heading |
-| --- |
+| ---     |
 | Content |</pre>
 </div>
 
@@ -266,7 +266,7 @@ Column 2 with newline</td>
     </table>
   </div>
   <pre class="expected">| Heading |
-| --- |
+| ---     |
 | Content |
 | Heading |
 | Content |</pre>
@@ -280,8 +280,8 @@ Column 2 with newline</td>
     </table>
   </div>
   <pre class="expected">| Heading |
-| --- |
-| Cell |</pre>
+| ---     |
+| Cell    |</pre>
 </div>
 
 <div class="case" data-name="empty head">
@@ -292,7 +292,7 @@ Column 2 with newline</td>
     </table>
   </div>
   <pre class="expected">| Heading |
-| --- |</pre>
+| ---     |</pre>
 </div>
 
 <div class="case" data-name="non-definitive heading row (converted but with empty header)">
@@ -370,10 +370,10 @@ Column 2 with newline</td>
       </tbody>
     </table>
   </div>
-  <pre class="expected">| Column 1 | Column 2 |
-| --- | --- |
+  <pre class="expected">| Column 1                               | Column 2        |
+| ---                                    | ---             |
 | [Row 1, Column 1](https://example.com) | Row 1, Column 2 |
-| Row 2, Column 1 | Row 2, Column 2 |</pre>
+| Row 2, Column 1                        | Row 2, Column 2 |</pre>
 </div>
 
 

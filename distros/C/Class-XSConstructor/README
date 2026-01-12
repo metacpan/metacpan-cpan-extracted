@@ -19,8 +19,9 @@ DESCRIPTION
         bless { @_ }, ref($class)||$class;
       }
 
-    Class::XSConstructor goes a little further towards Moose-like
-    constructors, adding the following features:
+    Class::XSConstructor goes a little further and supports all Moose's
+    constructor features plus a few more. (That doesn't mean it supports Moose
+    features unrelated to constructors!)
 
     *   Supports initialization from a hashref as well as a list of key-value
         pairs.
@@ -47,15 +48,15 @@ DESCRIPTION
 
         For example:
 
-          use Class::XSAccessor name => { default => '__ANON__' };
+          use Class::XSConstructor name => { default => '__ANON__' };
 
         Or:
 
-          use Class::XSAccessor name => { default => sub { return '__ANON__' } };
+          use Class::XSConstructor name => { default => sub { return '__ANON__' } };
 
         Or:
 
-          use Class::XSAccessor name => { builder => '__fallback_name' };
+          use Class::XSConstructor name => { builder => '__fallback_name' };
           sub __fallback_name {
             return '__ANON__';
           }
@@ -63,7 +64,7 @@ DESCRIPTION
         You can alternatively provide a string of Perl code that will be
         evaluated to generate the default:
 
-          use Class::XSAccessor name => { default => \'sprintf("__%s__", uc "anon")' };
+          use Class::XSConstructor name => { default => \'sprintf("__%s__", uc "anon")' };
 
         If you expect subclasses to need to override defaults, use a builder.
         Subclasses can simply provide a method of the same name.
@@ -83,7 +84,7 @@ DESCRIPTION
         If an attribute has a default or builder, its "required" status is
         ignored.
 
-        Builders and coderef defaults are likely to siginificantly slow down
+        Builders and coderef defaults are likely to significantly slow down
         your constructor.
 
     *   Provides support for type constraints.
@@ -139,7 +140,7 @@ DESCRIPTION
         If your type constraint is a Type::Tiny object which provides a
         coercion:
 
-          coercion => 1
+          coerce => 1
 
         Otherwise:
 
@@ -203,6 +204,26 @@ DESCRIPTION
 
         Obviously your accessors will also need to be written to be able to
         access the value from wherever you've stored it.
+
+        Custom slot initializers are likely to siginificantly slow down your
+        constructor.
+
+    *   Undef-tolerant attributes.
+
+          package My::Class {
+            use Class::XSConstructor foo => { undef_tolerant => 1 };
+          }
+  
+          my $thing1 = My::Class->new( foo => 42 );
+          exists $thing1->{foo};   # true
+  
+          my $thing2 = My::Class->new( foo => undef );
+          exists $thing2->{foo};   # false
+
+        If an attribute is undef-tolerant, it means that setting it to `undef`
+        in the constructor is equivalent to not setting it at all. If it has a
+        default, it will be used. Otherwise, if it was a required attribute,
+        this will throw an error.
 
     *   Supports Moose/Moo/Class::Tiny-style `BUILD`, `BUILDALL`, `BUILDARGS`,
         and `FOREIGNBUILDARGS` methods.
@@ -335,7 +356,10 @@ CAVEATS
     *   Type constraints (except for the specially optimized ones) and type
         coercions.
 
-    *   Defining any `BUILD` methods or inheriting from classes which do.
+    *   Custom slot initializers.
+
+    *   Defining any `BUILD` or `BUILDARGS` methods or inheriting from classes
+        which do.
 
     These can all be useful features of course, but if speed is critical,
     consider looking at ways to eliminate them.

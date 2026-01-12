@@ -44,6 +44,6 @@ requires:
 resources:
   homepage: https://github.com/aspeer/WebDyne
   repository: https://github.com/aspeer/WebDyne.git
-version: '2.060'
+version: '2.065'
 x_authority: cpan:ASPEER
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

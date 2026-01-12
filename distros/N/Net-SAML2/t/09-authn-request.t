@@ -57,8 +57,8 @@ $override->override('Net::SAML2::Protocol::AuthnRequest::_build_id' =>
     ### TODO: Does this really belong here?
     my $signer = Net::SAML2::XML::Sig->new(
         {
-            key  => 't/sign-nopw-cert.pem',
-            cert => 't/sign-nopw-cert.pem',
+            key  => 't/net-saml2-key.pem',
+            cert => 't/net-saml2-cert.pem',
         }
     );
 

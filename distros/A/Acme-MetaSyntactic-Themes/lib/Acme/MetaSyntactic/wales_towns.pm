@@ -2,16 +2,15 @@ package Acme::MetaSyntactic::wales_towns;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.014';
+our $VERSION = '1.015';
 __PACKAGE__->init();
 
 our %Remote = (
     source  => 'http://en.wikipedia.org/wiki/List_of_towns_in_Wales',
     extract => sub {
         my $list = shift;
-        $list =~ s{\A.*<span class="mw-headline" id="A">A</span>}{}s;
-        $list =~ s{<span [^>]*>Notes</span>.*}{}s;
-        $list =~ s{<span [^>]*>See also</span>.*}{}s;
+        $list =~ s{\A.* id="A">A<}{}s;
+        $list =~ s{ id="See_also">See also<.*\z}{}ms;
         return map { s/_+/_/g; s/^_|_$//g; $_ }
             map { Acme::MetaSyntactic::RemoteList::tr_nonword($_) }
             $list =~ m{<a href="/wiki/[^"]*" title="[^"]*"[^>]*>([^<]+)</a>}g;
@@ -41,6 +40,12 @@ Abigail, Philippe Bruhat (BooK).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2026-01-12 - v1.015
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.056.
 
 =item *
 
@@ -156,11 +161,11 @@ Abercarn
 Aberdare
 Abergavenny
 Abergele
+Abersychan
 Abertillery
 Aberystwyth
 Amlwch
 Ammanford
-Bagillt
 Bala
 Bangor
 Bargoed
@@ -184,7 +189,6 @@ Caerleon
 Caernarfon
 Caerphilly
 Caerwys
-Caldicot
 Cardiff
 Cardigan
 Carmarthen
@@ -199,6 +203,7 @@ Criccieth
 Crickhowell
 Crumlin
 Cwmbran
+Deganwy
 Denbigh
 Dolgellau
 Ebbw_Vale
@@ -253,6 +258,7 @@ Newport
 Newport_Pembrokeshire
 New_Quay
 Newtown
+New_Tredegar
 Neyland
 Overton_on_Dee
 Pembroke
@@ -261,8 +267,10 @@ Penarth
 Pencoed
 Penmaenmawr
 Penrhyn_Bay
+Penrhyndeudraeth
 Pontardawe
 Pontarddulais
+Pontyclun
 Pontypool
 Pontypridd
 Porth
@@ -280,7 +288,6 @@ Rhymney
 Risca
 Ruthin
 Saltney
-Senghenydd
 Shotton
 St_Asaph
 St_Clears
@@ -292,6 +299,7 @@ Tonypandy
 Tredegar
 Tregaron
 Treharris
+Treorchy
 Tywyn
 Usk
 Welshpool

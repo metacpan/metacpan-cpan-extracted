@@ -1,5 +1,13 @@
 Revision history for Business-Stripe-Webhook
 
+1.14    11th Jan 2026
+     Added tests for optional signature verification and error callbacks
+     Updated license from Perl to MIT
+     Prefer PR submissions over RT for issues and patches
+
+1.13    7th Jan 2025
+     Updated examples in documentation
+
 1.12    1st July 2023
 	 Modified tests to prevent failure when Test::Warn is not installed
 	 Added new author test for VERSION in module and POD
@@ -17,4 +25,5 @@ Revision history for Business-Stripe-Webhook
 
 0.1     10th June 2023 
          First version, released on an unsuspecting world.
+
 

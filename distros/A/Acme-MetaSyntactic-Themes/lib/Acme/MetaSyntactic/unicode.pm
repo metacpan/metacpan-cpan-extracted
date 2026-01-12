@@ -2,35 +2,29 @@ package Acme::MetaSyntactic::unicode;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 {
-    # a very basic list
-    my $data = join "\n",
-        map { ( "\t\tLATIN CAPITAL LETTER $_", "\t\tLATIN SMALL LETTER $_" ) }
-        'A' .. 'Z';
+    my $data = do(
+        $] < 5.007003
+        ? 'unicode/Name.pl'
+        : 'unicore/Name.pl'
+    );
+    use feature 'say';
 
-    # try to find better
-    if ( $] >= 5.006 && $] < 5.007003  ) {
-        eval { $data = require 'unicode/Name.pl'; };
-    }
-    elsif ( $] >= 5.007003 ) {
-        eval { $data = require 'unicore/Name.pl'; };
-
-        # since v5.11.3, unicore/Name.pl creates subroutines
-        # they end up in our namespace, so get rid of them
-        undef *code_point_to_name_special;
-        undef *name_to_code_point_special;
-    }
+    # the format of unicore/Name.pl changed in v5.39.10
+    my ( $record_sep, $field_sep) =
+      $] > 5.031009
+      ? ( qr/\n\n/, qr/\n+/ )
+      : ( qr/\n/, qr/\t+/ );
 
     # clean up the list
     my %seen;
-    $data = join ' ',
-        grep !$seen{$_}++,            # we might have aliases/duplicates
-        map  { s/ \(.*\)//; y/- /_/; $_ }
-        grep { $_ ne '<control>' }    # what's this for a character name?
-        map  { my @F = split /\t+/; @F > 2 ? () : $F[1] }   # remove blocks
-        split /\n/, $data;
+    $data = join ' ', grep !$seen{$_}++,    # we might have aliases/duplicates
+      map  { s/ \(.*\)//; y/- /_/; $_ }
+      grep { $_ ne '<control>' }            # what's this for a character name?
+      map { my @F = split /$field_sep/; @F > 2 ? () : $F[1] }    # remove blocks
+      split /$record_sep/, $data;
 
     __PACKAGE__->init( { names => $data } );
 }
@@ -64,6 +58,13 @@ F<unicore/Name.pl>.
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2026-01-12 - v1.002
+
+Updated to support the new format of F<unicore/Name.pl> since Perl 5.39.10
+in Acme-MetaSyntactic-Themes version 1.002.
 
 =item *
 

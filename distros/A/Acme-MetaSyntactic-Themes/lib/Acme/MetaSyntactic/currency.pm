@@ -2,15 +2,15 @@ package Acme::MetaSyntactic::currency;
 use strict;
 use Acme::MetaSyntactic::MultiList;
 our @ISA = qw( Acme::MetaSyntactic::MultiList );
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 __PACKAGE__->init();
 
 our %Remote = (
     source => {
-        current  => 'http://www.currency-iso.org/dam/downloads/lists/list_one.xml',
-        historic => 'http://www.currency-iso.org/dam/downloads/lists/list_three.xml',
+        current  => 'https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml',
+        historic => 'https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-three.xml',
     },
-    extract => sub { $_[0] =~ m{<ALPHABETIC_CODE>(\S+)</ALPHABETIC_CODE>}mig },
+    extract => sub { $_[0] =~ m{<Ccy>(\S+)</Ccy>}mig },
 );
 
 1;
@@ -32,6 +32,13 @@ Philippe "BooK" Bruhat.
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2026-01-12 - v1.006
+
+Updated the source URL, and
+published in Acme-MetaSyntactic-Themes version 1.056.
 
 =item *
 
@@ -95,7 +102,6 @@ AED
 AFN
 ALL
 AMD
-ANG
 AOA
 ARS
 AUD
@@ -104,7 +110,6 @@ AZN
 BAM
 BBD
 BDT
-BGN
 BHD
 BIF
 BMD
@@ -115,7 +120,7 @@ BRL
 BSD
 BTN
 BWP
-BYR
+BYN
 BZD
 CAD
 CDF
@@ -128,7 +133,6 @@ CNY
 COP
 COU
 CRC
-CUC
 CUP
 CVE
 CZK
@@ -152,7 +156,6 @@ GTQ
 GYD
 HKD
 HNL
-HRK
 HTG
 HUF
 IDR
@@ -178,8 +181,6 @@ LBP
 LKR
 LRD
 LSL
-LTL
-LVL
 LYD
 MAD
 MDL
@@ -188,7 +189,7 @@ MKD
 MMK
 MNT
 MOP
-MRO
+MRU
 MUR
 MVR
 MWK
@@ -222,11 +223,11 @@ SDG
 SEK
 SGD
 SHP
-SLL
+SLE
 SOS
 SRD
 SSP
-STD
+STN
 SVC
 SYP
 SZL
@@ -243,14 +244,16 @@ UAH
 UGX
 USD
 USN
-USS
 UYI
 UYU
+UYW
 UZS
-VEF
+VED
+VES
 VND
 VUV
 WST
+XAD
 XAF
 XAG
 XAU
@@ -259,8 +262,8 @@ XBB
 XBC
 XBD
 XCD
+XCG
 XDR
-XFU
 XOF
 XPD
 XPF
@@ -272,7 +275,7 @@ XXX
 YER
 ZAR
 ZMW
-ZWL
+ZWG
 # names historic
 ADP
 AFA
@@ -294,6 +297,7 @@ BEL
 BGJ
 BGK
 BGL
+BGN
 BOP
 BRB
 BRC
@@ -302,20 +306,22 @@ BRN
 BRR
 BUK
 BYB
+BYR
 CHC
-CNX
 CSD
 CSJ
 CSK
+CUC
 CYP
 DDM
 DEM
 ECS
 ECV
-EQE
+EEK
 ESA
 ESB
 ESP
+EUR
 FIM
 FRF
 GEK
@@ -328,6 +334,7 @@ GRD
 GWE
 GWP
 HRD
+HRK
 IDR
 IEP
 ILP
@@ -336,17 +343,20 @@ ISJ
 ITL
 LAJ
 LSM
+LTL
 LTT
 LUC
 LUF
 LUL
+LVL
 LVR
-MAF
 MGF
 MLF
+MRO
 MTL
 MTP
 MVQ
+MWK
 MXP
 MZE
 MZM
@@ -354,20 +364,25 @@ NIC
 NLG
 PEH
 PEI
+PEN
 PES
 PLZ
 PTE
 RHD
 ROK
 ROL
+RON
 RUR
 SDD
 SDG
 SDP
 SIT
 SKK
+SLL
 SRG
+STD
 SUR
+SZL
 TJR
 TMM
 TPE
@@ -376,12 +391,15 @@ TRY
 UAK
 UGS
 UGW
+USS
 UYN
 UYP
 VEB
 VEF
 VNC
+XEU
 XFO
+XFU
 XRE
 YDD
 YUD
@@ -393,5 +411,6 @@ ZRN
 ZRZ
 ZWC
 ZWD
+ZWL
 ZWN
 ZWR

@@ -16,7 +16,7 @@ Wordsmith::Claude::Mode - Built-in rewriting mode definitions
     my $instruction = Wordsmith::Claude::Mode->get_instruction('eli5');
 
     # Check if mode exists
-    if (Wordsmith::Claude::Mode->exists('pirate')) { ... }
+    if (Wordsmith::Claude::Mode->mode_exists('pirate')) { ... }
 
     # List all modes
     my @modes = Wordsmith::Claude::Mode->all_modes;
@@ -169,21 +169,21 @@ Returns the instruction text for a mode, or undef if mode doesn't exist.
 
 sub get_instruction {
     my ($class, $mode) = @_;
-    return unless exists $MODES{$mode};
+    return unless defined $mode && exists $MODES{$mode};
     return $MODES{$mode}{instruction};
 }
 
-=head2 exists
+=head2 mode_exists
 
-    if (Wordsmith::Claude::Mode->exists('pirate')) { ... }
+    if (Wordsmith::Claude::Mode->mode_exists('pirate')) { ... }
 
 Returns true if the mode exists.
 
 =cut
 
-sub exists {
+sub mode_exists {
     my ($class, $mode) = @_;
-    return exists $MODES{$mode};
+    return defined $mode && exists $MODES{$mode};
 }
 
 =head2 all_modes
@@ -195,7 +195,8 @@ Returns list of all mode names.
 =cut
 
 sub all_modes {
-    return sort keys %MODES;
+    my @sorted = sort keys %MODES;
+    return @sorted;
 }
 
 =head2 get_description
@@ -208,7 +209,7 @@ Returns the description for a mode.
 
 sub get_description {
     my ($class, $mode) = @_;
-    return unless exists $MODES{$mode};
+    return unless defined $mode && exists $MODES{$mode};
     return $MODES{$mode}{description};
 }
 
@@ -222,7 +223,7 @@ Returns the category for a mode.
 
 sub get_category {
     my ($class, $mode) = @_;
-    return unless exists $MODES{$mode};
+    return unless defined $mode && exists $MODES{$mode};
     return $MODES{$mode}{category};
 }
 
@@ -236,7 +237,9 @@ Returns all modes in a category.
 
 sub modes_in_category {
     my ($class, $category) = @_;
-    return sort grep { $MODES{$_}{category} eq $category } keys %MODES;
+    return () unless defined $category;
+    my @sorted = sort grep { $MODES{$_}{category} eq $category } keys %MODES;
+    return @sorted;
 }
 
 =head2 all_categories
@@ -249,7 +252,8 @@ Returns list of all category names.
 
 sub all_categories {
     my %cats = map { $MODES{$_}{category} => 1 } keys %MODES;
-    return sort keys %cats;
+    my @sorted = sort keys %cats;
+    return @sorted;
 }
 
 =head2 mode_info
@@ -263,7 +267,7 @@ Returns full info hashref for a mode.
 
 sub mode_info {
     my ($class, $mode) = @_;
-    return unless exists $MODES{$mode};
+    return unless defined $mode && exists $MODES{$mode};
     return { %{$MODES{$mode}} };
 }
 

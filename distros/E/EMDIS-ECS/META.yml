@@ -36,5 +36,5 @@ requires:
   Net::SMTP: '2.13'
   SDBM_File: '1.03'
   Text::ParseWords: '3.2'
-version: '0.47'
+version: '0.48'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 24c5b08537878cbc957ab65276c900ae1f82f76036d692eb036521d0328275c6 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 792ac5cf547f34e8dd2323fa8fb6193f6ec935001786ff4dbd405c531c8c56a3 Changes
+SHA256 071d13c516240ef730369b23ada17773c95a0fc9f0d49c12c500ba4b7544ad4e INSTALL
+SHA256 ca1cc40b3da7bebb1b0368764650ad38ac603b31a25fbc5b6f9fb217cc6fa1e8 LICENSE
+SHA256 029f8f9d0bc569258d37d4c8f99de6a13d7dddb597c9139e81bb44a260de5fcd MANIFEST
+SHA256 b905b221d76f762ef70688108b0321f770d0c9ce8dbf4800592b4b982324dfff META.json
+SHA256 16a6752d6de7f3281d52f822c56b397d1568251db3fffeadf061ac108ecf4e8e META.yml
+SHA256 193911a2aaa26bacf3cd67f1748a2c0ec9fd286706bdd95343cdc9be7da1bbcf Makefile.PL
+SHA256 b53d0a15bb81d6d1193e53c9243ae331ca5244be0ee0b6999893fa7327c019bd README
+SHA256 e3d8aeef6a2ed977e962711c75956c59a5f1e78d0b3d51e3fed0e7231bb032fd dist.ini
+SHA256 9e1d84afcd520278d75034e96a9c407a42e37ea7c0946da29b865638228280d2 doap.ttl
+SHA256 05996b7d8389ba7d8ab9077c2a8cd256a9ec8851e44bdb10d52713e57eb96e18 examples/Basics/BankAccount_MethodModifiersAndSubclassing.pl
+SHA256 868ed5770ddd788b59da9883de763e84545fab72ff9f8696737c1a581ebf2852 examples/Basics/BinaryTree_AttributeFeatures.pl
+SHA256 c06cffaa9f49a06386bea12d38e22771b529b510ebb121d959a547092fc00966 examples/Basics/Company_Subtypes.pl
+SHA256 baeea25e409b78240732f7ac566941b69a37b411bcf7809ada85b1cbc69437c0 examples/Basics/Genome_OverloadingSubtypesAndCoercion.pl
+SHA256 03282d687c670c22056d97b9adb1731d98c69c961c80e2d61720eb2acf1ead4c examples/Basics/HTTP_SubtypesAndCoercion.pl
+SHA256 667490786d556a35eefba265a02fc1ee522f55149d4141e6b593c7ff18c77638 examples/Basics/HttpTiny_ExtendingNonMooseParent.pl
+SHA256 ee5a852c2b17251dc864f4a78b68df70958b91477fc7d8be6baa35209f34dcdb examples/Basics/Point_AttributesAndSubclassing.pl
+SHA256 4380a68806fed5d5500d5b2b0eac936e93803fd5d44d253a9c8001c83c65e689 lib/Marlin/Antlers.pm
+SHA256 d306aee21c412480968820061938924e8cae37595da5af587e5185d5eae23351 lib/Marlin/Role/Antlers.pm
+SHA256 ae00d9332819976b13b7f6f1a5dc69d87dd0212890dae23f5467b032953c0244 t/00start.t
+SHA256 b69454f409a2a1fe0cd1399a3af0df197e4034f20efade8e34b5fdf68fc8fc94 t/01basic.t
+SHA256 8828d08d101c7f16dad5442446a025a3adfbb52d2590aa65bb99d681e94e3628 t/integration/exception/import-into-existing.t
+SHA256 4349aaa77d761734adade30a0c48255fa99c6f95d101c709435c8e6040c9ffa4 t/integration/feature/plugins.t
+SHA256 362a5c5c3175dd3c9d5134061de4ac664933392589118103081466b52de6e7f9 t/integration/synopsis/Marlin-Antlers.t
+SHA256 43b8bac80f7842d9f5d2a867309a653a636a9b27e1cabbe148ea18e62c56752a t/integration/synopsis/Marlin-Role-Antlers.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCaWOVegAKCRDOv4Eoaip9
+OXIeAKCPN8WSyQkuCcof//FTiqwC7xcdGACfdDM4fxmnjh1ErsI2ugyA07NnayQ=
+=xabM
+-----END PGP SIGNATURE-----

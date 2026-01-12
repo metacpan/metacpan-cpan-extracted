@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '2.10'; # VERSION
+our $VERSION = '2.11'; # VERSION
 
 # Platypus-Man,
 # Platypus-Man,
@@ -598,7 +598,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 2.10
+version 2.11
 
 =head1 SYNOPSIS
 
@@ -3188,10 +3188,10 @@ its use may require development packages to be installed.
 
 =over 4
 
-=item L<Dyn>
+=item L<Affix>
 
-A wrapper around L<dyncall|https://dyncall.org>, which is itself an alternative to
-L<libffi|https://sourceware.org/libffi/>.
+A wrapper around L<infix|https://github.com/sanko/infix>, an FFI-focused
+just-in-time (JIT) compiler.
 
 =item L<NativeCall>
 

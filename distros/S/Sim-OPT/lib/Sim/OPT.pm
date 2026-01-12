@@ -3,12 +3,30 @@ package Sim::OPT;
 # Sim::OPT is distributed under a dual licence, open-source (GPL v3) and proprietary.
 # Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-our $opt = bless( {}, "Sim::OPT" );
 
 use Exporter;
 use parent 'Exporter';
+our @ISA = qw( Exporter );
 
+our @EXPORT = qw( opt $checkoptcue 
+odd even _mean_ flattenvariables count_variables fromopt_tosweep fromsweep_toopt convcaseseed
+convchanceseed makeflatvarnsnum calcoverlaps calcmiditers definerootcases
+callcase callblock deffiles makefilename extractcase setlaunch exe start
+_clean_ getblocks getblockelts getrootname definerootcases populatewinners
+getitem getline getlines getstepsvar tell wash flattenbox enrichbox filterbox givesize
+$configfile $mypath $exeonfiles $generatechance $file $preventsim $fileconfig $outfile $tofile $report
+$simnetwork @themereports %simtitles %reporttitles %retrievedata
+@keepcolumns @weights @weightsaim @varthemes_report @varthemes_variations @varthemes_steps
+@rankdata @rankcolumn @reporttempsdata @reportcomfortdata %reportdata
+@report_loadsortemps @files_to_filter @filter_reports @base_columns @maketabledata @filter_columns
+@files_to_filter @filter_reports @base_columns @maketabledata @filter_columns %vals
+@sweeps @miditers @varnumbers @caseseed @chanceseed @chancedata $dimchance  @pars_tocheck retrieve
+report newretrieve newreport washn
+$target %dowhat readsweeps $max_processes $computype $calcprocedure %specularratios @totalcases @winneritems
+toil genstar solvestar integratebox filterbox__ clean %dowhat @weighttransforms takechance 
+);
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
+
 use Math::Trig;
 use Math::Round;
 use List::Util qw[ min max reduce shuffle];
@@ -39,41 +57,24 @@ use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
 use Sim::OPT::Parcoord3d;
 use Sim::OPT::Stats;
-eval { use Sim::OPTcue; 1 };
-eval { use Sim::OPTcue::Patternsearch; 1 };
-eval { use Sim::OPTcue::NelderMead; 1 };
-eval { use Sim::OPTcue::Armijo; 1 };
-eval { use Sim::OPTcue::NSGAII; 1 };
-eval { use Sim::OPTcue::ParticleSwarm; 1 };
-eval { use Sim::OPTcue::SimulatedAnnealing; 1 };
-eval { use Sim::OPTcue::NSGAIII; 1 };
-eval { use Sim::OPTcue::MOEAD; 1 };
-eval { use Sim::OPTcue::SPEA2; 1 };
+eval { use Sim::OPTcue::OPTcue; 1 };
+eval { use Sim::OPTcue::Metabridge; 1 };
+eval { use Sim::OPTcue::NeuralBoltzmann; 1 };
+eval { use Sim::OPTcue::Exogen::PatternSearch; 1 };
+eval { use Sim::OPTcue::Exogen::NelderMead; 1 };
+eval { use Sim::OPTcue::Exogen::Armijo; 1 };
+eval { use Sim::OPTcue::Exogen::NSGAII; 1 };
+eval { use Sim::OPTcue::Exogen::ParticleSwarm; 1 };
+eval { use Sim::OPTcue::Exogen::SimulatedAnnealing; 1 };
+eval { use Sim::OPTcue::Exogen::NSGAIII; 1 };
+eval { use Sim::OPTcue::Exogen::MOEAD; 1 };
+eval { use Sim::OPTcue::Exogen::SPEA2; 1 };
+eval { use Sim::OPTcue::Exogen::ParticleSwarm; 1 };
+eval { use Sim::OPTcue::Exogen::RadialBasis; 1 };
+eval { use Sim::OPTcue::Exogen::Kriging; 1 };
+eval { use Sim::OPTcue::Exogen::DecisionTree; 1 };
 
-our @ISA = qw( Exporter );
-#%EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
-#@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw(
-opt takechance
-odd even _mean_ flattenvariables count_variables fromopt_tosweep fromsweep_toopt convcaseseed
-convchanceseed makeflatvarnsnum calcoverlaps calcmiditers definerootcases
-callcase callblock deffiles makefilename extractcase setlaunch exe start
-_clean_ getblocks getblockelts getrootname definerootcases populatewinners
-getitem getline getlines getstepsvar tell wash flattenbox enrichbox filterbox givesize
-$configfile $mypath $exeonfiles $generatechance $file $preventsim $fileconfig $outfile $tofile $report
-$simnetwork @themereports %simtitles %reporttitles %retrievedata
-@keepcolumns @weights @weightsaim @varthemes_report @varthemes_variations @varthemes_steps
-@rankdata @rankcolumn @reporttempsdata @reportcomfortdata %reportdata
-@report_loadsortemps @files_to_filter @filter_reports @base_columns @maketabledata @filter_columns
-@files_to_filter @filter_reports @base_columns @maketabledata @filter_columns %vals
-@sweeps @miditers @varnumbers @caseseed @chanceseed @chancedata $dimchance  @pars_tocheck retrieve
-report newretrieve newreport washn
-$target %dowhat readsweeps $max_processes $computype $calcprocedure %specularratios @totalcases @winneritems
-toil genstar solvestar integratebox filterbox__ clean %dowhat @weighttransforms
-);
-
-$VERSION = '0.865';
+$VERSION = '0.875';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented toward problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches, as well of searches more complely structured in graphs.';
 
 #################################################################################
@@ -82,7 +83,7 @@ $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program orie
 
 
 our %cryptc;
-our $globcount = 0;   # global counter, starts at 0
+our $globcount = 0; 
 
 
 
@@ -169,9 +170,9 @@ sub washblockelts
   my @bag;
   foreach my $elt ( @blockelts )
   {  my ( @bin, $newelt );
-     if ( $elt =~ /(>|<|£|§|ì|à|ò|è|ß|ð|æ|đ|ŋ|ħ|ſ|ł|€|°|§|ù)/ )
+     if ( $elt =~ /(>|<|£|§|ì|à|ò|è|ß|ð|æ|đ|ŋ|ħ|ſ|ł|€|°|ø|ŧ|ù)/ )
      {
-       @bin = split( ">|<|£|§|ì|à|ò|è|ß|ð|æ|đ|ŋ|ħ|̉ſ|ł|€|°|§|ù", $elt );
+       @bin = split( ">|<|£|§|ì|à|ò|è|ß|ð|æ|đ|ŋ|ħ|̉ſ|ł|à|°|ø|ŧ|ù", $elt );
        $newelt = $bin[1];
        $newelt =~ s/(ù|ç|ł)// ;
        push( @bag, $newelt );
@@ -189,7 +190,7 @@ sub wash_sourcesweeps
 {
   my ($sweeps_r) = @_;
 
-  my $sep = qr/[><£§ìàòèßðæđŋħſł€°ùéç]/u;
+  my $sep = qr/[><£§ìàòèßðæđŋħſł€ø°ŧùéç]/u;
   my $wash; $wash = sub
   {
     my ($x) = @_;
@@ -252,7 +253,7 @@ sub makeinstance
   my @blockelts = @{ $b{blockelts} };
   my %varnums = %{ $b{varnums} };
   my %carrier = %{ $b{carrier} };
-  my $countvar = $b{countvar};  # you can fill these if you want to track which var/step moved
+  my $countvar = $b{countvar};  
   my $countstep = $b{countstep};
   my %inst = %{ $b{inst} };
 
@@ -289,7 +290,6 @@ sub makeinstance
   my $varstring = join( "-", @vars ); say  "IN makeinstance, \$varstring: " . dump( $varstring );
   my $levstring = join( "-", @levs ); say  "IN makeinstance, \$varstring: " . dump( $varstring );
 
-  # Origin = current configuration; in setpickinst this is usually giveback(%mids)
   my $origin = giveback( \%mids );
 
   my ( %to, %orig );
@@ -1606,7 +1606,7 @@ sub getrootname
 	my ( $rootnames_r, $countcase ) = @_;
 	my @rootnames = @{ $rootnames_r };
 	my $rootname = $rootnames[$countcase];
-	return ($rootname);
+	return ( $rootname );
 }
 
 
@@ -1941,6 +1941,25 @@ sub cleansweeps
 				$elt =~ s/^(\d*)§// ;
 				$elt =~ s/^(\d*)\|// ;
 				$elt =~ s/^(\d*)ù// ;
+
+        $elt =~ s/^(\d*)ì// ; #
+        $elt =~ s/^(\d*)à// ;
+        $elt =~ s/^(\d*)ò// ;
+        $elt =~ s/^(\d*)è// ;
+        $elt =~ s/^(\d*)ß// ;
+        $elt =~ s/^(\d*)ð// ;
+        $elt =~ s/^(\d*)æ// ;
+        $elt =~ s/^(\d*)ŧ// ;
+
+        $elt =~ s/^(\d*)đ// ; #
+        $elt =~ s/^(\d*)ŋ// ;
+        $elt =~ s/^(\d*)ħ// ;
+        $elt =~ s/^(\d*)ſ// ;
+        $elt =~ s/^(\d*)ł// ;
+        $elt =~ s/^(\d*)€// ;
+        $elt =~ s/^(\d*)ø// ;
+
+
 				$elt =~ s/[A-za-z]*//g ;
 				$elt =~ s/^(\d*)ç// ; # ç: push supercycle
 				$elt =~ s/^ç// ; # ç: push supercycle
@@ -2289,6 +2308,13 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
   }
   elsif ( !$checkOPTcue )
   {
+    if ( $sourceblockelts[0] =~ /ø/ )
+    {
+      $dirfiles{metamodel} = "y";
+      $dowhat{metamodel} = "y";
+      $sourceblockelts[0] =~ s/ø//;
+    }
+
     if ( $sourceblockelts[0] =~ />/ )
     {
       $dirfiles{starsign} = "y";
@@ -2309,6 +2335,54 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
       $dirfiles{starsign} = "n";
       $dirfiles{stardivisions} = "";
     }
+
+
+    if ( $sourceblockelts[0] =~ /</ )
+    {
+      $dirfiles{factorial} = "y";
+
+      if ( $sourceblockelts[0] =~ /ç/ )
+      {
+        $sourceblockelts[0] =~ /^(\d+)<(\d+)ç/ ;
+        $dirfiles{slicenum} = $2;
+        $dirfiles{pushsupercycle} = "y";
+        $dirfiles{nestclock} = $dirfiles{nestclock} + 1;
+        push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
+      }
+    }
+    else
+    {
+      $dirfiles{factorial} = "n";
+    }
+
+
+    if ( $sourceblockelts[0] =~ /£/ )
+    {
+      $dirfiles{facecentered} = "y";
+      $dirfiles{factorial} = "y";
+      $dirfiles{random} = "y";
+      $dirfiles{starsign} = "y";
+      $sourceblockelts[0] =~ /^(\d+)£/ ;
+      $dirfiles{facecenterednum} = $1;
+      $dowhat{starpositions} = "";
+      $dirfiles{starpositions} = "";
+      $dowhat{stardivisions} = 1;
+      $dirfiles{stardivisions} = 1;
+
+      if ( $sourceblockelts[0] =~ /ç/ )
+      {
+        $sourceblockelts[0] =~ /^(\d+)£(\d+)ç/ ;
+        $dirfiles{slicenum} = $2;
+        $dirfiles{pushsupercycle} = "y";
+        $dirfiles{nestclock} = $dirfiles{nestclock} + 1;
+        push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
+      }
+    }
+    else
+    {
+      $dirfiles{facecentered} = "n";
+    }
+
   }
 
   ###...
@@ -2578,7 +2652,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			@bag =( $bit );
 			@fills = @{ Sim::OPT::Descend::prepareblank( \%varnums, $tmpblankfile, \@blockelts, \@bag, $file, \%carrier ) };
 			@fulls = uniq( map { $_->[0] } @fills );
-		}
+		}##### UPDATE!!!!!
 
 		if ( $dirfiles{random} eq "y" )
 		{
@@ -2987,20 +3061,30 @@ sub exe
       @unsuiteds = @$unsuiteds_r;
 			#%inst = %{ $result[2] };
 		}
-
-    my ( $packet_r, $dirfiles_r ); say  "IN DESCENT FROM DIRFILES, \$countblock $countblock, \$repfile $repfile";
+    
+    my $postlast = "y";
+    my ( $packet_r, $dirfiles_r, $csim, $instant ); say  "IN DESCENT FROM DIRFILES, \$countblock $countblock, \$repfile $repfile";
 		if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
 		{
-
 			say  "#Calling simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 			( $packet_r, $dirfiles_r, $csim,  ) = Sim::OPT::Sim::sim(
 					{ instances => \@instances, dowhat => \%dowhat, dirfiles => \%dirfiles,
-					  vehicles => \%vehicles, inst => \%inst, precedents => \@precedents, onlyrep => "y" } );
-
+					  vehicles => \%vehicles, inst => \%inst, precedents => \@precedents, 
+            #bomb => \@instances,
+            last => $last, 
+            postlast => $postlast,
+             #onlyrep => "y" ,
+            precious => $precious, 
+          } );
       @packet = uniq( @$packet_r ); say  "RECEIVED PACKET " . dump( @packet );
       %dirfiles = %$dirfiles_r;
 			say  "#Performed simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 		}
+
+    
+    say "!!!!!NOW EXITEDIN EXE FROM SIM WITH \@packet: " . dump( @packet );
+ 
+
 
     my $cryptolinks;
     unless ( $dirfiles{ga} eq "y" )
@@ -3117,7 +3201,9 @@ sub opt
 	my $configfile = start;
 	#eval `cat $configfile`; # The file where the program data are
 	my ( @miditers, @varnumbers, %dirfiles );
-	require $configfile;
+
+  require $configfile;
+	
 
 	my $instn = 1;
   our %inst;
@@ -3144,7 +3230,7 @@ sub opt
     return( $checkOPTcue );
   }
 
-
+  our $checkoptcue = checkOPTcue();
 
 
 	if ( scalar( @miditers == 0 ) )
@@ -3539,7 +3625,7 @@ By default the behaviour of the program is sequential.
 
 OPT can perform star searches (Jacoby method of course, but also Gauss-Seidel) within blocks in place of multilevel full-factorial searches. To ask for that in a configuration file, the first number in a block has to be preceded by a ">" sign, which in its turn has to be preceded by a number specifying how many star points there have to be in the block. A block, in that case, should be declared with something like this: ( "2>1", 2, 3). When operating with pre-simulated dataseries or metamodels, OPT can also perform: factorial searches (to set that, the first number in the concerned block of @sweeps in the configuration file has to be preceded by a "<" sign); and face-centered composite design searches of the DOE type (in that case, that first number has to be preceded by a "£").
 
-For specifying in a Sim::OPT configuration file that a certain block has to be searched by the means of a metamodel derived from star searches or other "positions" instead of a multilevel full-factorial search, it is necessary to assign the value "y" to the variable $dowhat{metamodel}.
+For specifying in a Sim::OPT configuration file that a certain block has to be searched by the means of a metamodel derived from star searches or other "positions" instead of a multilevel full-factorial search, it is necessary to assign the value "y" to the variable $dowhat{metamodel}, or to precede the first iteam of a block with the letter "ø".
 
 Sim::OPT is dual-licensed: open-source and proprietary, with the exception of Modish, which is only open-source (GPL v3). The open-source distribution is available on CPAN (https://metacpan.org/dist/Sim-OPT ). The closed-source distribution, including additional modules (OPTcue and related), is available from the author’s website (https://sites.google.com/view/bioclimatic-design/home/software).
 Sim::OPT works under Linux. 

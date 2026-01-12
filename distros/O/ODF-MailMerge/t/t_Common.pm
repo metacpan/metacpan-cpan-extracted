@@ -152,12 +152,12 @@ sub import {
     no_upwards file_name_is_absolute tmpdir splitpath splitdir
     abs2rel rel2abs case_tolerant/);
 
-  require Path::Tiny;
+  use Path::Tiny 0.146 ();
   Path::Tiny->import::into($target, qw/path/);
 
-  require List::Util;
-  List::Util->import::into($target, qw/reduce min max first any all none sum0/);
-
+  require List::AllUtils;
+  List::AllUtils->import::into($target,
+    qw/reduce min max first firstidx any all none sum0/);
 
 
   require Scalar::Util;
@@ -170,7 +170,15 @@ sub import {
   require Guard;
   Guard->import::into($target, qw(scope_guard guard));
 
-  use Data::Dumper::Interp 6.006 ();
+  use Data::Dumper::Interp 7.012 ();
+#OTOH, we _do_ want show stringified value of things like Path::Tiny
+#  unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
+#    # Unless we are testing DDI
+#    no warnings 'once';
+#    # Don't follow overloads e.g. stringify
+#    $Data::Dumper::Interp::Objects = {overloads => "ignore"};
+#  }
+
   unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
     # unless we are testing DDI
     Data::Dumper::Interp->import::into($target,

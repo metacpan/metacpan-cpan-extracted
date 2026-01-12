@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "a super-fast (but limited) constructor in XS",
+  "abstract"       => "a super-fast constructor in XS",
   "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
   "dynamic_config" => 1,
   "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
@@ -41,9 +41,9 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Class::XSConstructor" => { file => "lib/Class/XSConstructor.pm", version => 0.018001 },
-                        "Class::XSDelegation"  => { file => "lib/Class/XSDelegation.pm", version => 0.018001 },
-                        "Class::XSDestructor"  => { file => "lib/Class/XSDestructor.pm", version => 0.018001 },
+                        "Class::XSConstructor" => { file => "lib/Class/XSConstructor.pm", version => "0.019000" },
+                        "Class::XSDelegation"  => { file => "lib/Class/XSDelegation.pm", version => "0.019000" },
+                        "Class::XSDestructor"  => { file => "lib/Class/XSDestructor.pm", version => "0.019000" },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -59,7 +59,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/project",
                       },
-  "version"        => 0.018001,
+  "version"        => "0.019000",
 };
 
 my %dynamic_config;

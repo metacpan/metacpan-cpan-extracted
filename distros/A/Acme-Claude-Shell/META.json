@@ -1,0 +1,64 @@
+{
+   "abstract" : "AI-powered interactive shell using Claude Agent SDK",
+   "author" : [
+      "LNATION <email@lnation.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Acme-Claude-Shell",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Claude::Agent" : "0.13",
+            "Future::AsyncAwait" : "0.60",
+            "IO::Async" : "0.80",
+            "Marlin" : "0.007000",
+            "Term::ANSIColor" : "0",
+            "Term::Choose" : "0",
+            "Term::ProgressSpinner" : "0",
+            "Term::ReadKey" : "0",
+            "Term::ReadLine" : "0",
+            "Types::Standard" : "2.0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/Acme-Claude-Shell.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/Acme-Claude-Shell"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

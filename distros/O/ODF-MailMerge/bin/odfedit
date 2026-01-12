@@ -6,8 +6,8 @@
 use strict; use warnings FATAL => 'all';
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = "dev"; }
-our $VERSION = '1.010'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-08-25'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1.011'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2026-01-11'; # DATE from Dist::Zilla::Plugin::OurDate
 
 #use 5.12; # for unicode_strings
 use v5.18; # for lexical_subs

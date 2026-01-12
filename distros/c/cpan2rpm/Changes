@@ -1,49 +1,76 @@
 Revision history for cpan2rpm
 
+2.048 01/11/2026 22:00:00
+ - Allow author subfolder CPAN url.
+ - Use standard "source<UNIQUENUM>" header.
+ - Keep whole {url} in Source header
+ - Use ->VERSION instead of "use" for prereq test.
+ - Fix RegEx bug in --define=macro=val syntax.
+ - Allow arbitrary --find-* macros.
+ - Instead of only [.], allow building from any directory.
+ - Get rid of untaint suExec dance.
+ - Honor ~ for --source or --find-* specifications.
+ - Don't require File::Find to build spec.
+ - Search harder for {author} or {version} from sources.
+ - Minor Style formatting changes.
+ - Optimization: avoid string eval.
+[ up to commit d793cbc7 ]
+
 2.047 01/02/2026 07:00:00
  - Display which URL is being downloaded.
  - Fallback to "curl" to download a URL.
  - Don't return content from error pages.
  - Remove cpan2rpm.pm stub module.
+[ up to commit c9e53981 ]
 
 2.046 01/01/2026 23:00:00
  - If --upgrade fails, show exact errors.
  - Now upgrade works with the new dist name.
+[ up to commit 69731420 ]
 
 2.045 12/31/2025 23:00:00
  - Update --shadow-pure to reduce conflicts.
  - Add BuildRequires perl-generators package.
  - Clean up spec.PL
+[ up to commit 8534a3b6 ]
 
 2.044 09/26/2025 02:00:00
  - Fix dist module for CPAN Index.
  - Update README.
+[ up to commit 1b0ff072 ]
 
 2.043 09/26/2025 01:00:00
  - Update DISTNAME for fastapi
+[ up to commit 21e1194a ]
 
 2.042 09/23/2025 23:30:00
  - Rename back to cpan2rpm
  - Sort %doc section files
+[ up to commit 36e74fe6 ]
 
 2.041 09/23/2025 23:00:00
  - Adjust VERSION format for compatibility.
+[ up to commit 25a41400 ]
 
 2.040 09/16/2025 02:00:00
  - Fix --upgrade to use general URL from CPAN.
+[ up to commit 069d9984 ]
 
 2.039 09/15/2025 19:00:00
  - Whoops! For simplicity and compatibility,
    move $VERSION back into the cpan2rpm script.
+[ up to commit 4681d85e ]
 
 2.038 09/15/2025 18:00:00
  - More robust running version detection.
  - Rename RPM for myself back to cpan2rpm.
+[ up to commit 8724f2a7 ]
 
 2.037 09/15/2025 02:00:00
  - Migrate to CPAN::RPM stub
  - Avoid using dangerous https
  - Get latest version from fastapi CPAN instead of github.
+[ up to commit 8d4e4f45 ]
 
 2.036 08/06/2025 21:00:00
  - Update module query for the new cpan.org host.

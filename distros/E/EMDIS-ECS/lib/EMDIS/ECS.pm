@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2025 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2026 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this module, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc EMDIS::ECS).
@@ -35,7 +35,7 @@ BEGIN
 }
 
 # module/package version
-$VERSION = '0.47';
+$VERSION = '0.48';
 
 # file creation mode (octal, a la chmod)
 $FILEMODE = 0660;
@@ -1090,11 +1090,12 @@ sub pgp2_decrypt
 
     # set PGPPATH and PGPPASS environment variables
     $ENV{PGPPATH} = $cfg->PGP_HOMEDIR;
-    $ENV{PGPPASS} = (defined $encr_out_passphrase and 0 < length $encr_out_passphrase) ?
+    my $passphrase = (defined $encr_out_passphrase and 0 < length $encr_out_passphrase) ?
         $encr_out_passphrase : $cfg->PGP_PASSPHRASE;
+    $ENV{PGPPASS} = $passphrase;
 
-    # attempt to execute command
-    my $result = timelimit_cmd($cfg->T_MSG_PROC, $cmd);
+    # attempt to execute command - pipe passphrase to cmd, to support usage of gpg1 in place of pgp2
+    my $result = timelimit_cmd($cfg->T_MSG_PROC, $cmd, $passphrase);
     $result = '' if($result =~ /^Status 0x0100/);  # ignore exit value = 1
     $result = "EMDIS::ECS::pgp2_decrypt(): $result" if $result;
 
@@ -1138,11 +1139,12 @@ sub pgp2_encrypt
 
     # set PGPPATH and PGPPASS environment variables
     $ENV{PGPPATH} = $cfg->PGP_HOMEDIR;
-    $ENV{PGPPASS} = (defined $encr_out_passphrase and 0 < length $encr_out_passphrase) ?
+    my $passphrase = (defined $encr_out_passphrase and 0 < length $encr_out_passphrase) ?
         $encr_out_passphrase : $cfg->PGP_PASSPHRASE;
+    $ENV{PGPPASS} = $passphrase;
     
-    # attempt to execute command
-    my $result = timelimit_cmd($cfg->T_MSG_PROC, $cmd);
+    # attempt to execute command - pipe passphrase to cmd, to support usage of gpg1 in place of pgp2
+    my $result = timelimit_cmd($cfg->T_MSG_PROC, $cmd, $passphrase);
     $result = "EMDIS::ECS::pgp2_encrypt(): $result" if $result;
     return $result;
 }

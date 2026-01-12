@@ -61,7 +61,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='2.060';
+$VERSION='2.065';
 chomp($VERSION_GIT_SHA=do { local (@ARGV, $/) = ($_=__FILE__.'.sha'); <> if -f $_ });
 
 
@@ -257,10 +257,12 @@ sub handler : method {    # no subsort
         #  Don't error out if not a WebDyne error (i.e. if eval{} block was in module called from
         #  user code
         #
-        if ($eval_nest[0][0]!~/^WebDyne::/) {
+        #if ($eval_nest[0][0]!~/^WebDyne::/) {
+        if ($eval_nest[0][0] !~ /^WebDyne(?:::|$)/) {
         
             #  Not us, clear eval stack
             #
+            debug("eval_nest: $eval_nest[0][0] did not match WebDyne module, clearning eval error");
             eval {};
             return;
             
@@ -3057,6 +3059,7 @@ sub eval_cr {
         "#line $_[2] WebDyne::$_[0]",
         "sub{${$_[1]}}"
     );
+    #debug("eval_cr: $eval");
     return eval($eval);
 
 

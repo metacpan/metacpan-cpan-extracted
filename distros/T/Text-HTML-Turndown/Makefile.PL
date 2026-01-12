@@ -63,6 +63,7 @@ my %module = (
         'XML::LibXML'         => 0,
         'Text::CleanFragment' => 0,
         'Text::FrontMatter::YAML' => 0,
+        'Text::Table'         => 0,
 
     },
     TEST_REQUIRES => {

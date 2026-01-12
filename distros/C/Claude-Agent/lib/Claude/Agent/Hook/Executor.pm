@@ -8,6 +8,7 @@ use Claude::Agent::Logger '$log';
 use Types::Common -types;
 use Scalar::Util qw(blessed);
 use Try::Tiny;
+use Future;
 
 use Claude::Agent::Hook;
 use Claude::Agent::Hook::Context;
@@ -16,7 +17,8 @@ use Claude::Agent::Hook::Result;
 use Marlin
     'hooks'       => sub { {} },      # Event name => arrayref of matchers
     'session_id==.',                  # Read-write, set after init message
-    'cwd?';
+    'cwd?',
+    'loop?';                          # Optional IO::Async::Loop for async hooks
 
 =head1 NAME
 
@@ -73,13 +75,17 @@ Current session ID (set after init message).
 
 Current working directory.
 
+=head2 loop
+
+Optional IO::Async::Loop for async hook execution.
+
 =head1 METHODS
 
 =head2 run_pre_tool_use
 
-    my $result = $executor->run_pre_tool_use($tool_name, $tool_input, $tool_use_id);
+    my $future = $executor->run_pre_tool_use($tool_name, $tool_input, $tool_use_id);
 
-Execute PreToolUse hooks for a tool call. Returns a hashref with:
+Execute PreToolUse hooks for a tool call. Returns a Future that resolves to a hashref with:
 
     {
         decision      => 'continue' | 'allow' | 'deny',
@@ -143,9 +149,9 @@ sub run_post_tool_use_failure {
 
 =head2 run_notification
 
-    $executor->run_notification($notification_type, $data);
+    my $future = $executor->run_notification($notification_type, $data);
 
-Execute Notification hooks.
+Execute Notification hooks. Returns a Future.
 
 =cut
 
@@ -153,7 +159,7 @@ sub run_notification {
     my ($self, $notification_type, $data) = @_;
 
     my $matchers = $self->hooks->{$Claude::Agent::Hook::NOTIFICATION} // [];
-    return { decision => 'continue' } unless @$matchers;
+    return Future->done({ decision => 'continue' }) unless @$matchers;
 
     my $context = Claude::Agent::Hook::Context->new(
         session_id => $self->session_id,
@@ -165,20 +171,25 @@ sub run_notification {
         data              => $data,
     };
 
+    my $loop = $self->has_loop ? $self->loop : undef;
+
+    # Run all notification hooks (fire and forget, but wait for completion)
+    my @futures;
     for my $matcher (@$matchers) {
         next unless blessed($matcher) && $matcher->can('run_hooks');
-        my $results = $matcher->run_hooks($input_data, undef, $context);
-        # Notifications don't typically return decisions
+        push @futures, $matcher->run_hooks($input_data, undef, $context, $loop);
     }
 
-    return { decision => 'continue' };
+    return Future->needs_all(@futures)->then(sub {
+        return Future->done({ decision => 'continue' });
+    });
 }
 
 =head2 run_stop
 
-    $executor->run_stop($reason);
+    my $future = $executor->run_stop($reason);
 
-Execute Stop hooks when the agent stops.
+Execute Stop hooks when the agent stops. Returns a Future.
 
 =cut
 
@@ -186,7 +197,7 @@ sub run_stop {
     my ($self, $reason) = @_;
 
     my $matchers = $self->hooks->{$Claude::Agent::Hook::STOP} // [];
-    return { decision => 'continue' } unless @$matchers;
+    return Future->done({ decision => 'continue' }) unless @$matchers;
 
     my $context = Claude::Agent::Hook::Context->new(
         session_id => $self->session_id,
@@ -194,13 +205,18 @@ sub run_stop {
     );
 
     my $input_data = { reason => $reason };
+    my $loop = $self->has_loop ? $self->loop : undef;
 
+    # Run all stop hooks
+    my @futures;
     for my $matcher (@$matchers) {
         next unless blessed($matcher) && $matcher->can('run_hooks');
-        $matcher->run_hooks($input_data, undef, $context);
+        push @futures, $matcher->run_hooks($input_data, undef, $context, $loop);
     }
 
-    return { decision => 'continue' };
+    return Future->needs_all(@futures)->then(sub {
+        return Future->done({ decision => 'continue' });
+    });
 }
 
 =head2 has_hooks_for
@@ -219,12 +235,14 @@ sub has_hooks_for {
     return scalar(@$matchers) > 0;
 }
 
-# Internal method to run hooks for a given event
+# Internal method to run hooks for a given event - returns a Future
 sub _run_hooks {
     my ($self, $event, $tool_name, $tool_input, $tool_use_id, $tool_result, $error) = @_;
 
+    $log->debug(sprintf("Hook: Running %s hooks for tool=%s", $event, $tool_name // 'unknown'));
+
     my $matchers = $self->hooks->{$event} // [];
-    return { decision => 'continue' } unless @$matchers;
+    return Future->done({ decision => 'continue' }) unless @$matchers;
 
     # Build context - only include defined values
     my %context_args = (
@@ -243,43 +261,62 @@ sub _run_hooks {
     $input_data->{tool_result} = $tool_result if defined $tool_result;
     $input_data->{error} = $error if defined $error;
 
-    # Run matching hooks
-    my $final_result = { decision => 'continue' };
-
+    # Filter to matching matchers
+    my @matching_matchers;
     for my $matcher (@$matchers) {
-        # Skip non-matcher objects
         next unless blessed($matcher) && $matcher->can('matches');
-
-        # Check if this matcher applies to this tool
         next unless $matcher->matches($tool_name);
+        push @matching_matchers, $matcher;
+    }
 
-        # Run the hooks
-        my $results = $matcher->run_hooks($input_data, $tool_use_id, $context);
+    $log->debug(sprintf("Hook: Found %d matching matchers for tool=%s", scalar(@matching_matchers), $tool_name // 'unknown'));
+
+    return Future->done({ decision => 'continue' }) unless @matching_matchers;
+
+    # Run matchers sequentially (each may have async hooks)
+    return $self->_run_matchers_sequentially(
+        \@matching_matchers, $input_data, $tool_use_id, $context, $tool_name
+    );
+}
+
+# Internal: run matchers one at a time, chaining Futures
+sub _run_matchers_sequentially {
+    my ($self, $matchers, $input_data, $tool_use_id, $context, $tool_name) = @_;
+
+    return Future->done({ decision => 'continue' }) unless @$matchers;
+
+    my $matcher = shift @$matchers;
+    my $loop = $self->has_loop ? $self->loop : undef;
+
+    # run_hooks now returns a Future
+    return $matcher->run_hooks($input_data, $tool_use_id, $context, $loop)->then(sub {
+        my ($results) = @_;
 
         # Process results - first definitive decision wins
         for my $result (@{$results // []}) {
             next unless ref($result) eq 'HASH' && $result->{decision};
 
             if ($result->{decision} eq 'deny') {
-                $log->info("[HOOK] PreToolUse: DENIED %s - %s",
-                    $tool_name, $result->{reason} // 'no reason');
-                return $result;
+                $log->info(sprintf("[HOOK] PreToolUse: DENIED %s - %s",
+                    $tool_name, $result->{reason} // 'no reason'));
+                return Future->done($result);
             }
             elsif ($result->{decision} eq 'allow') {
-                $log->debug("[HOOK] PreToolUse: ALLOWED %s%s",
-                    $tool_name, $result->{updated_input} ? ' (with modifications)' : '');
-                return $result;
+                $log->debug(sprintf("[HOOK] PreToolUse: ALLOWED %s%s",
+                    $tool_name, $result->{updated_input} ? ' (with modifications)' : ''));
+                return Future->done($result);
             }
             elsif ($result->{decision} eq 'error') {
-                $log->warning("[HOOK] PreToolUse: ERROR in hook for %s - %s",
-                    $tool_name, $result->{error} // 'unknown error');
+                $log->warning(sprintf("[HOOK] PreToolUse: ERROR in hook for %s - %s",
+                    $tool_name, $result->{error} // 'unknown error'));
                 # Continue on error, don't block
             }
             # 'continue' - keep checking other matchers
         }
-    }
 
-    return $final_result;
+        # Continue to next matcher
+        return $self->_run_matchers_sequentially($matchers, $input_data, $tool_use_id, $context, $tool_name);
+    });
 }
 
 =head1 AUTHOR

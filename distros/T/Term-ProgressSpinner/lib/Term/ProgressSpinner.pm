@@ -1,7 +1,8 @@
-package Term::ProgressSpinner; 
-our $VERSION = '1.01';
+package Term::ProgressSpinner;
+our $VERSION = '1.02';
 use 5.006; use strict; use warnings;
 use IO::Handle; use Term::ANSIColor; use Time::HiRes qw//;
+use utf8;
 use Term::Size::Any qw/chars/;
 if ($^O eq 'MSWin32') { eval "use Win32::Console::ANSI; use Win32::Console;"; }
 our (%SPINNERS, %PROGRESS, %VALIDATE);
@@ -457,6 +458,9 @@ sub new {
 	$args{$_} and ($VALIDATE{colours}{$args{$_}} or die "Invalid color for $_")
 		for qw/text_color total_color counter_color percent_color percentage_color percentages_color percents_color spinner_color progress_color elapsed_color last_elapsed_color estimate_color last_advance_epoch_color start_epoch_color epoch_color/;
 	$args{precision} ||= 3;
+	# Set UTF-8 encoding on output handle for Unicode spinner characters
+	my $output = $args{output} // \*STDERR;
+	binmode($output, ':encoding(UTF-8)') unless ref($output) eq 'GLOB' && tied(*$output);
 	return bless {
 		text_color => 'white',
 		total_color => 'white',
@@ -477,7 +481,7 @@ sub new {
 		progress_color => 'white',
 		progress_width => 20,
 		progress_options => $PROGRESS{ $args{progress} || 'default' },
-		output => \*STDERR,
+		output => $output,
 		progress_spinner_index => 0,
 		progress_spinners => [],
 		message => "{progress} {spinner} processed {percents} of {counter}/{total} {elapsed}/{estimate}",
@@ -1001,6 +1005,66 @@ sub sleep {
 	select(undef, undef, undef, $_[1]);
 }
 
+sub start_async {
+	my ($self, $loop, %opts) = @_;
+	my $interval = $opts{interval} // 0.1;
+
+	# Initialize for async mode - use a pseudo progress spinner
+	my $ps = $self->start(1);  # Total of 1, we won't actually advance counter
+	$ps->counter(0);  # Keep at 0 so we don't auto-finish
+
+	# Create and store the timer
+	require IO::Async::Timer::Periodic;
+	my $timer = IO::Async::Timer::Periodic->new(
+		interval => $interval,
+		on_tick => sub {
+			return if $self->finished;
+			# Advance the spinner animation without incrementing counter
+			my $spinner = $ps->spinner;
+			for (1 .. $spinner->{width}) {
+				my $index = $spinner->{index}->[$_ - 1];
+				$spinner->{index}->[$_ - 1] = ($index + 1) % scalar @{$spinner->{chars}};
+			}
+			$self->draw($ps);
+		},
+	);
+	$timer->start;
+	$loop->add($timer);
+	$self->{_async_timer} = $timer;
+	$self->{_async_loop} = $loop;
+	$self->{_async_ps} = $ps;
+
+	# Initial draw
+	$self->draw($ps);
+
+	return $self;
+}
+
+sub stop_async {
+	my ($self, $message) = @_;
+
+	if ($self->{_async_timer}) {
+		$self->{_async_timer}->stop;
+		$self->{_async_loop}->remove($self->{_async_timer}) if $self->{_async_loop};
+		delete $self->{_async_timer};
+		delete $self->{_async_loop};
+	}
+
+	# Finish the progress spinner
+	if ($self->{_async_ps}) {
+		$self->finish($self->{_async_ps});
+		delete $self->{_async_ps};
+	}
+	$self->finish();
+
+	# Print completion message if provided
+	if ($message) {
+		$self->output->print(Term::ANSIColor::colored(['green'], "✓ ") . "$message\n");
+	}
+
+	return $self;
+}
+
 1;
 
 __END__; 
@@ -1013,7 +1077,7 @@ Term::ProgressSpinner - Terminal Progress bars!
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 
@@ -1671,6 +1735,44 @@ Get or Set the per second color.
 Sleep the programe for milliseconds.
 
 	$ps->sleep(0.05);
+
+=head2 start_async
+
+Start an async spinner that animates automatically via IO::Async event loop.
+This is useful when performing async operations where you can't call advance()
+in a loop. Uses the existing message template and draw infrastructure.
+
+	use IO::Async::Loop;
+	my $loop = IO::Async::Loop->new;
+
+	my $spinner = Term::ProgressSpinner->new(
+		spinner => 'dots',
+		spinner_color => 'cyan',
+		message => '{spinner} Processing...',
+	);
+	$spinner->start_async($loop, interval => 0.1);
+
+	# Do async work...
+	my $result = await $some_async_operation;
+
+	$spinner->stop_async("Done!");
+
+Options:
+
+=over 4
+
+=item interval
+
+The interval in seconds between spinner animation frames. Default is 0.1 seconds.
+
+=back
+
+=head2 stop_async
+
+Stop an async spinner and optionally display a completion message.
+
+	$spinner->stop_async("Task complete");  # Shows: ✓ Task complete
+	$spinner->stop_async();                 # Just clears the spinner
 
 =head1 COLORS
 

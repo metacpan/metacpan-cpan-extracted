@@ -57,9 +57,9 @@ Popup Menu (multiple option, orange and green selected, blue and indigo disabled
 <popup_menu multiple name="popup_menu_multiple" values="%{ red=>'Red', orange=>'Orange', yellow=>'Yellow', green=>'Green', blue=>'Blue', indigo=>'Indigo', violet=>'Violet'}" default="@{qw(orange green)}" disabled="@{qw(blue indigo)}" multiple />
 <hr>
 
-Scrolling List (orange, violet disabled):
+Scrolling List (orange selected, violet disabled):
 <p>
-<scrolling_list name="scrolling_list" size=4 values="%{ red=>'Red', orange=>'Orange', yellow=>'Yellow', green=>'Green', blue=>'Blue', indigo=>'Indigo', violet=>'Violet'}" default="@{qw(orange green)}" disabled="violet"/>
+<scrolling_list name="scrolling_list" size=4 values="%{ red=>'Red', orange=>'Orange', yellow=>'Yellow', green=>'Green', blue=>'Blue', indigo=>'Indigo', violet=>'Violet'}" default="orange" disabled="violet"/>
 <hr>
 
 Image Button:

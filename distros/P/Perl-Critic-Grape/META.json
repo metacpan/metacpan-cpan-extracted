@@ -1,5 +1,5 @@
 {
-	"version" : "0.0.6",
+	"version" : "0.0.7",
 	"name"    : "Perl-Critic-Grape",
 	"author"  : ["Brian Blackmore <BBLACKM@cpan.org>"],
 	"abstract": "Additional Perl::Critic policies",
@@ -7,7 +7,7 @@
 	"prereqs" : {
 		"configure": {
 			"requires": {
-				"Module::Build::Tiny": "0.044"
+				"Module::Build::Tiny": "0.052"
 			}
 		},
 		"runtime": {

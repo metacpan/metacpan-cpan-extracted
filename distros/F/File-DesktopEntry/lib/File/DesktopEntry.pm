@@ -10,7 +10,7 @@ use File::Spec;
 use File::BaseDir 0.03 qw/data_files data_home/;
 use URI::Escape;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 our $VERBOSE = 0;
 
 if ($^O eq 'MSWin32') {

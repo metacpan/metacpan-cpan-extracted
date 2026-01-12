@@ -11,12 +11,12 @@
 #
 # 2) Build a "perlecs/rockylinux" Docker image based on the Dockerfile.
 #
-#    docker build -t perlecs/rockylinux:0.47-1 .
+#    docker build -t perlecs/rockylinux:0.48-1 .
 #
 # 3) Generate a Docker container based on the image, and run an interactive
 #    bash shell within the container.
 #
-#    docker run --rm -it --name=perlecs_rockylinux  perlecs/rockylinux:0.47-1 /bin/bash
+#    docker run --rm -it --name=perlecs_rockylinux  perlecs/rockylinux:0.48-1 /bin/bash
 #
 # 4) Configure Perl ECS within the docker container.  For example, use
 #    "ecs_setup" to generate an ecs.cfg configuration file, "ecstool" to
@@ -34,7 +34,7 @@
 FROM rockylinux:9
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>"
 LABEL Description="EMDIS::ECS (Perl ECS) on Rocky Linux"
-LABEL Version="0.47"
+LABEL Version="0.48"
 
 # update installed packages
 RUN yum -y update

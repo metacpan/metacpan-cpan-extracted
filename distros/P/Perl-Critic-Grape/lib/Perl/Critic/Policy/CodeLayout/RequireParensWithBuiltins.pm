@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw/ :severities :data_conversion :classification :language /;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.0.6';
+our $VERSION = '0.0.7';
 
 Readonly::Scalar my $DESC  => q{Builtin function called without parentheses};
 Readonly::Scalar my $EXPL  => [ 13 ];

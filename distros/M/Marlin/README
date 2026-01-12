@@ -43,9 +43,10 @@ DESCRIPTION
     *slightly* faster though. Especially if you keep things simple and don't
     use features that force Marlin to fall back to using Pure Perl.
 
-    It may not be as fast as classes built with the Perl builtin `class`
-    syntax introduced in Perl v5.38.0, but has more features and supports Perl
-    versions as old as v5.8.8. (Some features require v5.12.0+.)
+    It may not be as sleek as classes built with the Perl builtin `class`
+    syntax introduced in Perl v5.38.0, but has more features, is often faster,
+    and it supports Perl versions as old as v5.8.8. (Some features require
+    v5.12.0+.)
 
     Marlin was created by the developer of Type::Tiny and Sub::HandlesVia and
     integrates with them.
@@ -646,18 +647,97 @@ DESCRIPTION
     Marlin::Attribute object that is used to generate accessors, etc.
 
    Other Features
-    `BUILD` and `DEMOLISH` are supported.
+    `BUILDARGS`, `BUILD`, `FOREIGNBUILDARGS`, and `DEMOLISH` are supported.
+    These are methods you can define in your class to influence how the
+    constructor and destructor work.
 
-   Major Missing Features
-    Here are some features found in Moo and Moose which are missing from
-    Marlin:
+    If you define a `BUILDARGS` method, then it will be passed the
+    constructor's @_ and expected to return a hashref mapping attribute names
+    to values. The default is something like this:
 
-    *   Support for `BUILDARGS`.
+      sub BUILDARGS {
+        my $class = shift;
+        if ( @_ == 1 and is_HashRef $_[0] ) {
+          return $_[0];
+        }
+        my %args = @_;
+        return \%args;
+      }
 
-        You can work around this by naming your constructor something other
-        than `new`, then wrapping it.
+    It is usually a good idea to *not* provide a `BUILDARGS` method as the
+    default behaviour is coded in fast C. However, you may sometimes need this
+    flexibility/
 
-    *   The metaobject protocol.
+    If you define a `BUILD` method, it will be called after your object has
+    been created but before the constructor returns it. It is passed a copy of
+    the hashref returned by `BUILDARGS`. In an inheritance heirarchy, the
+    constructor will call `BUILD` for all the parent classes too, starting at
+    the very base class.
+
+    Because `BUILD` is called before the strict constructor check, it has an
+    opportunity to remove particular keys from the args hashref if they are
+    likely to trigger the strict constructor to die.
+
+    You can also call `$object->BUILDALL( \%args )` at any time to run all the
+    `BUILD` methods on an existing object, though quite why you'd want to is
+    beyond my comprehension. Maybe some kind of inflate/deflate situation?
+
+    If you define a `DEMOLISH` method, this is treated like `BUILD`, but for
+    the constructor. The inheritance heirarchy is traversed in reverse.
+
+    When you are inheriting from a non-Marlin, non-Class::XSConstructor class
+    (a "foreign class"), Marlin will want to call the base class's
+    constructor. It has two different techniques, depending on whether it
+    appears to be a "friendly foreign class" (built by Class::Tiny, Moo, or
+    Moose) or a "difficult foreign class".
+
+    *   Marlin decides a parent class is a friendly foreign class if the
+        parent class has a `BUILDALL` method. Marlin will never call that
+        method, but its presence indicates that it was built by a sensible OO
+        framework.
+
+        It will do roughly this:
+
+          my $foreign_constructor = $foreignclass->can( 'new' );
+          my $foreign_buildargs   = $foreignclass->can( 'BUILDARGS' )
+                                   || $default_buildargs;
+  
+          my $args = $ourclass->$foreign_buildargs( @_ );
+          my $object = do {
+            local $args->{__no_BUILD__} = true;
+            $ourclass->$foreign_constructor( $args );
+          };
+  
+          # ... then initialize our attributes from $args
+          # ... then call BUILD methods, passing them $args
+          # ... then do the strict constructor check on $args
+          # ... then return $object
+
+        The friendly foreign class is supposed to honour `__no_BUILD__` and
+        skip calling `BUILD` methods. Marlin is going to call them and they
+        shouldn't be called twice. Moose, Moo, and Class::Tiny all honour that
+        parameter.
+
+    *   If it's a difficult foreign class, Marlin will do this instead:
+
+          my $foreign_constructor = $foreignclass->can( 'new' );
+  
+          my @foreign_args = $ourclass->can('FOREIGNBUILDARGS')
+            ? $ourclass->FOREIGNBUILDARGS( @_ )
+            : @_;
+          my $args = $ourclass->can('BUILDARGS')
+            ? $ourclass->BUILDARGS( @_ )
+            : $outclass->$default_buildargs( @_ );
+  
+          my $object = $ourclass->$foreign_constructor( @foreign_args );
+  
+          # ... then initialize our attributes from $args
+          # ... then call BUILD methods, passing them $args
+          # ... then do the strict constructor check on $args
+          # ... then return $object
+
+        We just hope that the foreign class does not try to call `BUILD`. (It
+        probably won't.)
 
   API
     Marlin provides an API of sorts.
@@ -757,7 +837,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2025 by Toby Inkster.
+    This software is copyright (c) 2025-2026 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

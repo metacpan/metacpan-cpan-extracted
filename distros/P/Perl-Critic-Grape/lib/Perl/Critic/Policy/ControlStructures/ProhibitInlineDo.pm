@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw/:severities :classification/;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.0.6';
+our $VERSION = '0.0.7';
 
 Readonly::Scalar my $DESC  => q{Do not use inline do-blocks};
 Readonly::Scalar my $EXPL  => undef; # [ ];

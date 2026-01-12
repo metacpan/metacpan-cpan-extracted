@@ -8,6 +8,13 @@ use Path::Tiny;
 
 use_ok('Claude::Agent::Code::Review::Tools');
 
+# Helper to execute tool and get result (execute() returns Future since 0.08)
+sub execute_tool {
+    my ($tool, $args) = @_;
+    my $future = $tool->execute($args);
+    return $future->get;
+}
+
 # Test server creation
 subtest 'Create Server' => sub {
     my $server = Claude::Agent::Code::Review::Tools->create_server();
@@ -46,7 +53,7 @@ subtest 'get_file_context tool' => sub {
     is($tool->name, 'get_file_context', 'tool name');
 
     # Test with non-existent file
-    my $result = $tool->execute({ file => '/nonexistent/file.pm', line => 1 });
+    my $result = execute_tool($tool,{ file => '/nonexistent/file.pm', line => 1 });
     ok($result->{is_error}, 'error for missing file');
     like($result->{content}[0]{text}, qr/File not found/, 'error message');
 
@@ -58,13 +65,13 @@ subtest 'get_file_context tool' => sub {
     my $orig_dir = path('.')->realpath;
     chdir($tempdir);
 
-    $result = $tool->execute({ file => 'test.pm', line => 10 });
+    $result = execute_tool($tool,{ file => 'test.pm', line => 10 });
     ok(!$result->{is_error}, 'no error for existing file');
     like($result->{content}[0]{text}, qr/>>>.*10:/, 'highlights target line');
     like($result->{content}[0]{text}, qr/line 10/, 'contains line content');
 
     # Test with custom context
-    $result = $tool->execute({ file => 'test.pm', line => 10, before => 2, after => 2 });
+    $result = execute_tool($tool,{ file => 'test.pm', line => 10, before => 2, after => 2 });
     my @lines = split /\n/, $result->{content}[0]{text};
     is(scalar @lines, 5, 'custom context size');
 
@@ -86,38 +93,38 @@ subtest 'search_codebase tool' => sub {
     chdir($tempdir);
 
     # Test basic search
-    my $result = $tool->execute({ pattern => 'strict' });
+    my $result = execute_tool($tool,{ pattern => 'strict' });
     ok(!$result->{is_error}, 'no error');
     like($result->{content}[0]{text}, qr/strict/, 'found pattern');
 
     # Test with no matches
-    $result = $tool->execute({ pattern => 'nonexistent_pattern_xyz' });
+    $result = execute_tool($tool,{ pattern => 'nonexistent_pattern_xyz' });
     like($result->{content}[0]{text}, qr/No matches found/, 'no matches message');
 
     # Test pattern length limit (only applies in regex mode)
     my $long_pattern = 'a' x 600;
-    $result = $tool->execute({ pattern => $long_pattern, literal => 0 });
+    $result = execute_tool($tool,{ pattern => $long_pattern, literal => 0 });
     ok($result->{is_error}, 'error for long pattern in regex mode');
     like($result->{content}[0]{text}, qr/too long/, 'pattern too long message');
 
     # Test invalid regex (only errors in regex mode)
-    $result = $tool->execute({ pattern => '[invalid', literal => 0 });
+    $result = execute_tool($tool,{ pattern => '[invalid', literal => 0 });
     ok($result->{is_error}, 'error for invalid regex in regex mode');
 
     # Test nested quantifier rejection (ReDoS protection)
-    $result = $tool->execute({ pattern => '(a+)+', literal => 0 });
+    $result = execute_tool($tool,{ pattern => '(a+)+', literal => 0 });
     ok($result->{is_error}, 'error for nested quantifiers');
     like($result->{content}[0]{text}, qr/nested quantifiers/, 'ReDoS protection message');
 
     # Test literal mode (default) - long patterns and special chars are safe
-    $result = $tool->execute({ pattern => 'a' x 600 });  # literal mode
+    $result = execute_tool($tool,{ pattern => 'a' x 600 });  # literal mode
     ok(!$result->{is_error}, 'long pattern OK in literal mode');
 
-    $result = $tool->execute({ pattern => '[special*chars+' });  # literal mode
+    $result = execute_tool($tool,{ pattern => '[special*chars+' });  # literal mode
     ok(!$result->{is_error}, 'special chars OK in literal mode');
 
     # Test directory traversal protection
-    $result = $tool->execute({ pattern => 'test', file_pattern => '../../../etc/*' });
+    $result = execute_tool($tool,{ pattern => 'test', file_pattern => '../../../etc/*' });
     ok($result->{is_error}, 'error for path traversal');
 
     chdir($orig_dir);
@@ -141,16 +148,16 @@ subtest 'check_tests tool' => sub {
     chdir($tempdir);
 
     # Test finding tests
-    my $result = $tool->execute({ module => 'My::Module' });
+    my $result = execute_tool($tool,{ module => 'My::Module' });
     ok(!$result->{is_error}, 'no error');
     like($result->{content}[0]{text}, qr/Found test files/, 'found test files');
 
     # Test with function check
-    $result = $tool->execute({ module => 'My::Module', function => 'my_function' });
+    $result = execute_tool($tool,{ module => 'My::Module', function => 'my_function' });
     like($result->{content}[0]{text}, qr/mentions 'my_function'/, 'function mentioned');
 
     # Test with non-existent module
-    $result = $tool->execute({ module => 'Non::Existent::Module' });
+    $result = execute_tool($tool,{ module => 'Non::Existent::Module' });
     like($result->{content}[0]{text}, qr/No test files found/, 'no tests found');
 
     chdir($orig_dir);
@@ -164,7 +171,7 @@ subtest 'get_dependencies tool' => sub {
     ok($tool, 'tool exists');
 
     # Test with non-existent file
-    my $result = $tool->execute({ file => '/nonexistent/file.pm' });
+    my $result = execute_tool($tool,{ file => '/nonexistent/file.pm' });
     ok($result->{is_error}, 'error for missing file');
 
     # Create a test file with dependencies
@@ -182,7 +189,7 @@ END
     my $orig_dir = path('.')->realpath;
     chdir($tempdir);
 
-    $result = $tool->execute({ file => 'deps.pm' });
+    $result = execute_tool($tool,{ file => 'deps.pm' });
     ok(!$result->{is_error}, 'no error');
     like($result->{content}[0]{text}, qr/Path::Tiny/, 'found Path::Tiny');
     like($result->{content}[0]{text}, qr/Cpanel::JSON::XS/, 'found JSON::XS');
@@ -200,7 +207,7 @@ subtest 'analyze_complexity tool' => sub {
     ok($tool, 'tool exists');
 
     # Test with non-existent file
-    my $result = $tool->execute({ file => '/nonexistent/file.pm', function => 'foo' });
+    my $result = execute_tool($tool,{ file => '/nonexistent/file.pm', function => 'foo' });
     ok($result->{is_error}, 'error for missing file');
 
     # Create a test file with functions
@@ -256,21 +263,21 @@ END
     chdir($tempdir);
 
     # Test simple function
-    $result = $tool->execute({ file => 'complex.pm', function => 'simple' });
+    $result = execute_tool($tool,{ file => 'complex.pm', function => 'simple' });
     ok(!$result->{is_error}, 'no error');
     like($result->{content}[0]{text}, qr/Cyclomatic complexity: \d+/, 'has complexity');
     like($result->{content}[0]{text}, qr/Low complexity/, 'simple is low');
 
     # Test moderate function
-    $result = $tool->execute({ file => 'complex.pm', function => 'moderate' });
+    $result = execute_tool($tool,{ file => 'complex.pm', function => 'moderate' });
     like($result->{content}[0]{text}, qr/complexity/, 'has complexity');
 
     # Test complex function
-    $result = $tool->execute({ file => 'complex.pm', function => 'complex' });
+    $result = execute_tool($tool,{ file => 'complex.pm', function => 'complex' });
     like($result->{content}[0]{text}, qr/complexity/, 'has complexity');
 
     # Test non-existent function
-    $result = $tool->execute({ file => 'complex.pm', function => 'nonexistent' });
+    $result = execute_tool($tool,{ file => 'complex.pm', function => 'nonexistent' });
     like($result->{content}[0]{text}, qr/not found/, 'function not found');
 
     chdir($orig_dir);
@@ -282,17 +289,17 @@ subtest 'Path traversal protection' => sub {
 
     # Test get_file_context with path traversal
     my $tool = $server->get_tool('get_file_context');
-    my $result = $tool->execute({ file => '../../../etc/passwd', line => 1 });
+    my $result = execute_tool($tool,{ file => '../../../etc/passwd', line => 1 });
     ok($result->{is_error}, 'blocked path traversal in get_file_context');
 
     # Test get_dependencies with path traversal
     $tool = $server->get_tool('get_dependencies');
-    $result = $tool->execute({ file => '../../../etc/passwd' });
+    $result = execute_tool($tool,{ file => '../../../etc/passwd' });
     ok($result->{is_error}, 'blocked path traversal in get_dependencies');
 
     # Test analyze_complexity with path traversal
     $tool = $server->get_tool('analyze_complexity');
-    $result = $tool->execute({ file => '../../../etc/passwd', function => 'test' });
+    $result = execute_tool($tool,{ file => '../../../etc/passwd', function => 'test' });
     ok($result->{is_error}, 'blocked path traversal in analyze_complexity');
 };
 

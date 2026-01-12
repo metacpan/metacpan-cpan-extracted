@@ -1,6 +1,6 @@
 package Net::SAML2::Protocol::Artifact;
 use Moose;
-our $VERSION = '0.83'; # VERSION
+our $VERSION = '0.84'; # VERSION
 
 use MooseX::Types::DateTime qw/ DateTime /;
 use DateTime::Format::XSD;
@@ -102,7 +102,7 @@ Net::SAML2::Protocol::Artifact - SAML2 artifact object
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 SYNOPSIS
 
@@ -153,23 +153,13 @@ Returns the logoutresponse
 
 Returns the LogoutResponse or Response depending on which is defined
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
-
-Chris Andrews  <chrisa@cpan.org>
-
-=item *
+=head1 AUTHOR
 
 Timothy Legge <timlegge@gmail.com>
 
-=back
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Venda Ltd, see the CONTRIBUTORS file for others.
+This software is copyright (c) 2026 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

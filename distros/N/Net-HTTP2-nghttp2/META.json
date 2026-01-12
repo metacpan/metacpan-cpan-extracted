@@ -1,0 +1,61 @@
+{
+   "abstract" : "Perl XS bindings for nghttp2 HTTP/2 library",
+   "author" : [
+      "John Napiorkowski <jjnapiork@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-HTTP2-nghttp2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::nghttp2" : "0",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jjn1056/Net-HTTP2-nghttp2/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jjn1056/Net-HTTP2-nghttp2.git",
+         "web" : "https://github.com/jjn1056/Net-HTTP2-nghttp2"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

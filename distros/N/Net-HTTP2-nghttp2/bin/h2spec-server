@@ -1,0 +1,224 @@
+#!/usr/bin/env perl
+# PODNAME: h2spec-server
+# ABSTRACT: Minimal HTTP/2 server for conformance testing
+use strict;
+use warnings;
+use IO::Socket::INET;
+use Net::HTTP2::nghttp2;
+use Net::HTTP2::nghttp2::Session;
+
+$| = 1;  # Autoflush
+
+die "nghttp2 not available\n" unless Net::HTTP2::nghttp2->available;
+
+my $port = $ARGV[0] || 8080;
+
+my $server = IO::Socket::INET->new(
+    LocalPort => $port,
+    Listen    => 128,
+    ReuseAddr => 1,
+    Proto     => 'tcp',
+) or die "Cannot create server: $!";
+
+print STDERR "Listening on port $port (h2c)...\n";
+print STDERR "Run: h2spec -h localhost -p $port\n\n";
+
+while (my $client = $server->accept) {
+    # Fork to handle each connection
+    my $pid = fork();
+
+    if (!defined $pid) {
+        warn "Fork failed: $!";
+        close $client;
+        next;
+    }
+
+    if ($pid) {
+        # Parent - close client and continue accepting
+        close $client;
+        # Reap any dead children
+        while (waitpid(-1, 1) > 0) {}
+        next;
+    }
+
+    # Child process - handle this connection
+    close $server;  # Child doesn't need listening socket
+
+    eval {
+        handle_connection($client);
+    };
+    if ($@) {
+        # Silently ignore errors - h2spec sends intentionally bad data
+    }
+
+    close $client;
+    exit 0;  # Child exits
+}
+
+sub handle_connection {
+    my ($client) = @_;
+
+    $client->autoflush(1);
+    $client->blocking(1);
+
+    # Track pending responses
+    my %pending_streams;
+
+    my $session;
+    my $session_ref = \$session;
+
+    $session = Net::HTTP2::nghttp2::Session->new_server(
+        callbacks => {
+            on_begin_headers => sub {
+                my ($stream_id) = @_;
+                $pending_streams{$stream_id} = {};
+                return 0;
+            },
+            on_header => sub {
+                my ($stream_id, $name, $value) = @_;
+                $pending_streams{$stream_id}{$name} = $value;
+                return 0;
+            },
+            on_frame_recv => sub {
+                my ($frame) = @_;
+
+                # Respond to completed requests (HEADERS with END_HEADERS and END_STREAM)
+                if ($frame->{type} == 1) {  # HEADERS
+                    my $stream_id = $frame->{stream_id};
+                    my $end_stream = $frame->{flags} & 0x1;
+                    my $end_headers = $frame->{flags} & 0x4;
+
+                    if ($end_headers && $end_stream && $$session_ref) {
+                        # This is a complete request without body
+                        eval {
+                            $$session_ref->submit_response($stream_id,
+                                status  => 200,
+                                headers => [['content-type', 'text/plain']],
+                                body    => "OK\n",
+                            );
+                        };
+                    }
+                }
+                # Handle DATA with END_STREAM (request body complete)
+                elsif ($frame->{type} == 0 && ($frame->{flags} & 0x1)) {
+                    my $stream_id = $frame->{stream_id};
+                    if ($$session_ref && exists $pending_streams{$stream_id}) {
+                        eval {
+                            $$session_ref->submit_response($stream_id,
+                                status  => 200,
+                                headers => [['content-type', 'text/plain']],
+                                body    => "OK\n",
+                            );
+                        };
+                    }
+                }
+                return 0;
+            },
+            on_data_chunk_recv => sub { return 0; },
+            on_stream_close => sub {
+                my ($stream_id) = @_;
+                delete $pending_streams{$stream_id};
+                return 0;
+            },
+        },
+    );
+
+    # Send server preface
+    $session->send_connection_preface();
+
+    # Main I/O loop
+    my $timeout = 5;  # 5 second timeout
+
+    while (1) {
+        # Send any pending data
+        my $out = eval { $session->mem_send() };
+        last if $@;
+
+        if (defined $out && length $out) {
+            my $written = syswrite($client, $out);
+            last unless defined $written;
+        }
+
+        # Check if we should continue
+        my $want_read = eval { $session->want_read() };
+        my $want_write = eval { $session->want_write() };
+        last unless ($want_read || $want_write);
+
+        # Use select for timeout
+        my $rin = '';
+        vec($rin, fileno($client), 1) = 1;
+        my $ready = select($rin, undef, undef, $timeout);
+
+        if ($ready > 0) {
+            my $buf;
+            my $n = sysread($client, $buf, 16384);
+
+            last if !defined $n || $n == 0;  # Error or EOF
+
+            # Feed data to session
+            eval { $session->mem_recv($buf) };
+            # Ignore errors - nghttp2 handles protocol violations
+
+            # Immediately flush any response data (including error frames)
+            while (1) {
+                my $out2 = eval { $session->mem_send() };
+                last if $@ || !defined $out2 || !length $out2;
+                my $w2 = syswrite($client, $out2);
+                last unless defined $w2;
+            }
+        } elsif ($ready == 0) {
+            # Timeout
+            last;
+        } else {
+            # Select error
+            last;
+        }
+    }
+}
+
+__END__
+
+=head1 NAME
+
+h2spec-server - Minimal HTTP/2 server for conformance testing
+
+=head1 SYNOPSIS
+
+    h2spec-server [port]
+
+    # Default port 8080
+    h2spec-server
+
+    # Custom port
+    h2spec-server 9000
+
+    # Run h2spec against it
+    h2spec -h localhost -p 9000
+
+=head1 DESCRIPTION
+
+A minimal HTTP/2 cleartext (h2c) server designed for testing with h2spec,
+the HTTP/2 conformance testing tool.
+
+The server responds with "200 OK" to all valid requests. It uses a
+fork-per-connection model to handle h2spec's rapid test connections.
+
+=head1 FEATURES
+
+=over 4
+
+=item * HTTP/2 cleartext (h2c) - no TLS required
+
+=item * Fork-per-connection for concurrent test handling
+
+=item * Responds to GET, HEAD, POST requests
+
+=item * Handles requests with and without body
+
+=back
+
+=head1 SEE ALSO
+
+L<Net::HTTP2::nghttp2>, L<https://github.com/summerwind/h2spec>
+
+=cut

@@ -1,0 +1,24 @@
+Revision history for Acme-Claude-Shell
+
+0.01    2026-01-11
+        First version - AI-powered interactive shell showcasing Claude::Agent SDK
+
+        [Features]
+        - shell() for interactive multi-turn sessions using session()
+        - run() for single-shot commands using query()
+        - SDK MCP tools: execute_command, list_files, read_file
+        - Safety hooks with dangerous command detection
+        - Colorful terminal UI with spinners and menus
+        - Dry-run mode for previewing commands
+        - Command history tracking
+
+        [SDK Features Demonstrated]
+        - query() - Single-shot commands via run()
+        - session() - Multi-turn context via shell()
+        - SDK MCP Tools - Custom shell execution tools
+        - Hooks (PreToolUse) - Safety confirmation menus
+        - Hooks (PostToolUse) - Command logging
+        - Dry-run mode - Preview without executing
+        - IO::Async - Non-blocking spinners
+        - CLI utilities - Colored output, menus, status messages
+

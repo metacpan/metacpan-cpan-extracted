@@ -2,11 +2,12 @@ package Sim::OPT::Report;
 # This is the module Sim::OPT::Retrieve of Sim::OPT, a program for detailed metadesign managing parametric explorations, distributed under a dual licence, open-source (GPL v3) and proprietary.
 # Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-our $report = bless( {}, "Sim::OPT::Report" );
 
-# use v5.20;
 use Exporter;
+@ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
+our @EXPORT = qw( newretrieve newreport get_files );
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
+
 use Math::Trig;
 use Math::Round;
 use List::Util qw[ min max reduce shuffle];
@@ -23,8 +24,24 @@ use Sim::OPT::Sim;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
+use Sim::OPT::Parcoord3d;
 use Sim::OPT::Stats;
-eval { use Sim::OPTcue; 1 };
+eval { use Sim::OPTcue::OPTcue; 1 };
+eval { use Sim::OPTcue::Metabridge; 1 };
+eval { use Sim::OPTcue::Exogen::PatternSearch; 1 };
+eval { use Sim::OPTcue::Exogen::NelderMead; 1 };
+eval { use Sim::OPTcue::Exogen::Armijo; 1 };
+eval { use Sim::OPTcue::Exogen::NSGAII; 1 };
+eval { use Sim::OPTcue::Exogen::ParticleSwarm; 1 };
+eval { use Sim::OPTcue::Exogen::SimulatedAnnealing; 1 };
+eval { use Sim::OPTcue::Exogen::NSGAIII; 1 };
+eval { use Sim::OPTcue::Exogen::MOEAD; 1 };
+eval { use Sim::OPTcue::Exogen::SPEA2; 1 };
+eval { use Sim::OPTcue::Exogen::ParticleSwarm; 1 };
+eval { use Sim::OPTcue::Exogen::RadialBasis; 1 };
+eval { use Sim::OPTcue::NeuralBoltzmann; 1 };
+eval { use Sim::OPTcue::Exogen::Kriging; 1 };
+eval { use Sim::OPTcue::Exogen::DecisionTree; 1 };
 
 
 use Data::Dumper;
@@ -36,13 +53,6 @@ use feature 'say';
 no strict;
 no warnings;
 use Switch::Back;
-
-#use warnings::unused;
-@ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
-#%EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
-#@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw( newretrieve newreport get_files );
 
 $VERSION = '0.125';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
@@ -109,8 +119,8 @@ sub newretrieve
   #my $csim = $dt{csim};
 
   @{ $dirfiles{dones} } = uniq( @{ $dirfiles{dones} } );
-  #%inst = %{ $opt->washhash( \%inst ) }; say  "3 HERE IN OPT SUB CALLBLOCK \%onst: " . dump( \%onst );
-  $inst_ref = $opt->filterinsts_wnames( \@{ $dirfiles{dones} } , \%inst );
+  #%inst = %{ Sim::OPT::>washhash( \%inst ) }; say  "3 HERE IN OPT SUB CALLBLOCK \%onst: " . dump( \%onst );
+  $inst_ref = Sim::OPT::filterinsts_wnames( \@{ $dirfiles{dones} } , \%inst );
   %inst = %{ $inst_ref }; # REASSIGNMENT!!!!!!
 
 
@@ -122,9 +132,9 @@ sub newretrieve
   my $countblock = $d{countblock}; #say  "HERE IN NEWRETRIEVE \$countblock: " . dump( $countblock );
   my %incumbents = %{ $d{incumbents} }; #say  "HERE IN NEWRETRIEVE \%incumbents: " . dump( \%incumbents );
   my @varnumbers = @{ $d{varnumbers} };
-  @varnumbers = $opt->washn( @varnumbers ); #say  "HERE IN NEWRETRIEVE \@varnumbers: " . dump( @varnumbers );
+  @varnumbers = Sim::OPT::washn( @varnumbers ); #say  "HERE IN NEWRETRIEVE \@varnumbers: " . dump( @varnumbers );
   my @miditers = @{ $d{miditers} };
-  @miditers = $opt->washn( @miditers ); #say  "HERE IN NEWRETRIEVE \@miditers: " . dump( @miditers );
+  @miditers = Sim::OPT::washn( @miditers ); #say  "HERE IN NEWRETRIEVE \@miditers: " . dump( @miditers );
   my @sweeps = @{ $d{sweeps} }; #say  "HERE IN NEWRETRIEVE \@sweeps: " . dump( @sweeps );
 
   my $direction = ${$dowhat{direction}}[$countcase][$countblock]; #say  "HERE IN NEWRETRIEVE \$direction: " . dump( $direction );
@@ -780,7 +790,7 @@ TTT
                   {
                     push ( @{ $dirfiles{retcases} }, $retfile );
                     #say RETLIST "$retfile";
-                  }  @miditers = $opt->washn( @miditers );
+                  }  @miditers = Sim::OPT::washn( @miditers );
                   
                   
                   say  "IN RETRIEVE3 \$countinstance $countinstance";
@@ -1050,9 +1060,9 @@ sub newreport # This function retrieves the results of interest from the texts f
   my $stamp = $d{stamp};
 
   my @varnumbers = @{ $d{varnumbers} };
-  @varnumbers = $opt->washn( @varnumbers );
+  @varnumbers = Sim::OPT::washn( @varnumbers );
   my @miditers = @{ $d{miditers} };
-  @miditers = $opt->washn( @miditers );
+  @miditers = Sim::OPT::washn( @miditers );
   my @sweeps = @{ $d{sweeps} };
 
   my @winneritems = @{ $d{winneritems} };
@@ -1629,7 +1639,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   }
   my $newln = join( ",", @bag );
   
-  my $rid = $opt->instid( $newln, $file ); say  "IN REPORT \$countblock $countblock \$rid " . dump( $rid );# NOT $repfile
+  my $rid = Sim::OPT::instid( $newln, $file ); say  "IN REPORT \$countblock $countblock \$rid " . dump( $rid );# NOT $repfile
   if ( defined($rid) and $rid ne "" )
   {
     $dirfiles{reps}{$rid} = $newln; say  "IN REPORT  \$dirfiles{reps}{\$rid} \$dirfiles{reps}{$rid} " . dump( $dirfiles{reps2}{$rid} );# NOT $repfile

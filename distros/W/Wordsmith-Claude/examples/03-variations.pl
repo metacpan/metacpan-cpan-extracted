@@ -11,7 +11,7 @@ use IO::Async::Loop;
 
 my $loop = IO::Async::Loop->new;
 
-my $text = "I apologize for the inconvenience. We are working to resolve this issue as quickly as possible.";
+my $text = "This led to some other ideas but essentially, claude has prompted claude, into claude into refactoring in a async loop of claudes.";
 
 print "Original: $text\n\n";
 print "Getting 3 casual variations...\n";

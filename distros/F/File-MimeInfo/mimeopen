@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 $|++;
 
 # ########## #
@@ -11,6 +11,13 @@ $|++;
 use Encode::Locale;
 use Encode;
 @ARGV = map { decode(locale => $_, 1) } @ARGV;
+
+
+if (-t) {
+    binmode(STDIN, ":encoding(console_in)");
+    binmode(STDOUT, ":encoding(console_out)");
+    binmode(STDERR, ":encoding(console_out)");
+}
 
 my %args = ();
 my %opts = (
@@ -347,7 +354,7 @@ Ignored silently.
 =head1 BUGS
 
 If you find bugs, please file them in our Github
-issue tracker at L<https://github.com/mbeijen/File-MimeInfo/issues>.
+issue tracker at L<https://codeberg.org/michielb/File-MimeInfo/issues>.
 
 See File::MimeInfo::Applications(3) and File::DesktopEntry(3)
 for some limitations.

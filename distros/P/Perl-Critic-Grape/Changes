@@ -1,5 +1,8 @@
 Revision history for Perl::Critic::Grape
 
+0.0.7 - 2026-01-11
+	- fixes/attempts
+
 0.0.6 - 2026-01-08
 	- viv RequireSigils
 

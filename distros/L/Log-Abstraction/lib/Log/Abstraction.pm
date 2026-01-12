@@ -22,11 +22,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.26
+0.27
 
 =cut
 
-our $VERSION = 0.26;
+our $VERSION = 0.27;
 
 =head1 SYNOPSIS
 
@@ -589,14 +589,14 @@ sub _log {
 	}
 }
 
-=head2 level
+=head2 level($self, $level)
 
 Get/set the minimum level to log at.
 Returns the current level, as an integer.
 
 =cut
 
-sub level
+sub level()
 {
 	my ($self, $level) = @_;
 
@@ -682,11 +682,25 @@ sub notice {
 
 Logs an error message. This method also supports logging to syslog if configured.
 If not logging mechanism is set,
-falls back to C<Carp>.
+falls back to C<Croak>.
 
 =cut
 
 sub error {
+	my $self = shift;
+
+	$self->_high_priority('error', @_);
+}
+
+=head2 fatal
+
+    $logger->fatal(@messages);
+
+Synonym of error.
+
+=cut
+
+sub fatal {
 	my $self = shift;
 
 	$self->_high_priority('error', @_);
@@ -757,7 +771,7 @@ sub _high_priority
 
 	if($self eq __PACKAGE__) {
 		# If called from a class method, use Croak/Carp to warn
-		if($syslog_values{$level} <= $syslog_values{'error'}) {
+		if($syslog_values{$level} <= $ERROR) {
 			Carp::croak($warning);
 		}
 		Carp::carp($warning);
@@ -767,8 +781,8 @@ sub _high_priority
 	# Log the warning message
 	$self->_log($level, $warning);
 
-	if($syslog_values{$level} <= $syslog_values{'error'}) {
-		# Fallback to Croak if no logger or syslog is defined
+	if($syslog_values{$level} <= $ERROR) {
+		# Fall back to Croak if no logger or syslog is defined
 		if($self->{'croak_on_error'} || !defined($self->{logger})) {
 			Carp::croak($warning);
 		}
@@ -840,7 +854,7 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2025 Nigel Horne
+Copyright (C) 2025-2026 Nigel Horne
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

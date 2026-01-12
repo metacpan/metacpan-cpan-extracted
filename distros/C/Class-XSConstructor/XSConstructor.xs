@@ -39,6 +39,7 @@ enum {
     XSCON_FLAG_WEAKEN               =  128,
     XSCON_FLAG_HAS_ALIASES          =  256,
     XSCON_FLAG_HAS_SLOT_INITIALIZER =  512,
+    XSCON_FLAG_UNDEF_TOLERANT       = 1024,
 
     XSCON_BITSHIFT_DEFAULTS         =   16,
     XSCON_BITSHIFT_TYPES            =   24,
@@ -1166,6 +1167,11 @@ xscon_initialize_object(const xscon_constructor_t* sig, const char* klass, SV* c
             }
         }
 
+        if ( value_was_from_args && ( flags & XSCON_FLAG_UNDEF_TOLERANT ) && !SvOK(val) ) {
+            has_value = FALSE;
+            val = NULL;
+        }
+
         if ( !has_value && flags & XSCON_FLAG_HAS_DEFAULT ) {
             // There is a default/builder
             // Some very common defaults are worth hardcoding into the flags
@@ -1177,49 +1183,46 @@ xscon_initialize_object(const xscon_constructor_t* sig, const char* klass, SV* c
             value_was_from_args = FALSE;
         }
 
-        if ( has_value ) {
-            /* there exists an isa check */
-            if ( flags & XSCON_FLAG_HAS_TYPE_CONSTRAINT ) {
-                int type_flags = flags >> XSCON_BITSHIFT_TYPES;
-                bool result = xscon_check_type(keyname, newSVsv(val), type_flags, param->check_cv);
-            
-                /* we failed type check */
-                if ( !result ) {
-                    if ( flags & XSCON_FLAG_HAS_TYPE_COERCION && param->coercion_cv ) {
-                        SV* newval;
-                        dSP;
-                        int count;
-                        ENTER;
-                        SAVETMPS;
-                        PUSHMARK(SP);
-                        EXTEND(SP, 1);
-                        PUSHs(val);
-                        PUTBACK;
-                        count  = call_sv((SV *)param->coercion_cv, G_SCALAR);
-                        SPAGAIN;
-                        SV* tmpval = POPs;
-                        newval = newSVsv(tmpval);
-                        FREETMPS;
-                        LEAVE;
-                        
-                        bool result = xscon_check_type(keyname, newSVsv(newval), type_flags, param->check_cv);
-                        if ( result ) {
-                            val = newSVsv(newval);
-                        }
-                        else {
-                            croak("Coercion result '%s' failed type constraint for '%s'", SvPV_nolen(newval), keyname);
-                        }
+        /* Type checks and coercions */
+        if ( has_value && ( flags & XSCON_FLAG_HAS_TYPE_CONSTRAINT ) ) {
+            int type_flags = flags >> XSCON_BITSHIFT_TYPES;
+            bool failed = !xscon_check_type(keyname, newSVsv(val), type_flags, param->check_cv);
+        
+            /* we failed type check */
+            if ( failed ) {
+                if ( flags & XSCON_FLAG_HAS_TYPE_COERCION && param->coercion_cv ) {
+                    SV* newval;
+                    dSP;
+                    int count;
+                    ENTER;
+                    SAVETMPS;
+                    PUSHMARK(SP);
+                    EXTEND(SP, 1);
+                    PUSHs(val);
+                    PUTBACK;
+                    count  = call_sv((SV *)param->coercion_cv, G_SCALAR);
+                    SPAGAIN;
+                    SV* tmpval = POPs;
+                    newval = newSVsv(tmpval);
+                    FREETMPS;
+                    LEAVE;
+                    
+                    bool passed_this_time = xscon_check_type(keyname, newSVsv(newval), type_flags, param->check_cv);
+                    if ( passed_this_time ) {
+                        val = newSVsv(newval);
                     }
                     else {
-                        croak("Value '%s' failed type constraint for '%s'", SvPV_nolen(val), keyname);
+                        croak("Coercion result '%s' failed type constraint for '%s'", SvPV_nolen(newval), keyname);
                     }
                 }
+                else {
+                    croak("Value '%s' failed type constraint for '%s'", SvPV_nolen(val), keyname);
+                }
             }
-            
-            if ( param->slot_initializer_cv == NULL ) {
-                (void)hv_store((HV*)SvRV(object), keyname, keylen, val, 0);
-            }
-            else {
+        }
+        
+        if ( has_value ) {
+            if ( ( flags & XSCON_FLAG_HAS_SLOT_INITIALIZER ) && param->slot_initializer_cv ) {
                 int count;
                 dSP;
                 ENTER;
@@ -1233,6 +1236,9 @@ xscon_initialize_object(const xscon_constructor_t* sig, const char* klass, SV* c
                 SPAGAIN;
                 FREETMPS;
                 LEAVE;
+            }
+            else {
+                (void)hv_store((HV*)SvRV(object), keyname, keylen, val, 0);
             }
             
             if ( value_was_from_args && ( flags & XSCON_FLAG_HAS_TRIGGER ) ) {
@@ -1519,6 +1525,7 @@ BOOT:
     newCONSTSUB(stash, "XSCON_FLAG_WEAKEN",               newSViv(XSCON_FLAG_WEAKEN));
     newCONSTSUB(stash, "XSCON_FLAG_HAS_ALIASES",          newSViv(XSCON_FLAG_HAS_ALIASES));
     newCONSTSUB(stash, "XSCON_FLAG_HAS_SLOT_INITIALIZER", newSViv(XSCON_FLAG_HAS_SLOT_INITIALIZER));
+    newCONSTSUB(stash, "XSCON_FLAG_UNDEF_TOLERANT",       newSViv(XSCON_FLAG_UNDEF_TOLERANT));
 
     newCONSTSUB(stash, "XSCON_BITSHIFT_DEFAULTS",         newSViv(XSCON_BITSHIFT_DEFAULTS));
     newCONSTSUB(stash, "XSCON_BITSHIFT_TYPES",            newSViv(XSCON_BITSHIFT_TYPES));

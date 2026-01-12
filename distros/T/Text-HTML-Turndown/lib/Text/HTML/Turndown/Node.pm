@@ -1,4 +1,4 @@
-package Text::HTML::Turndown::Node 0.09;
+package Text::HTML::Turndown::Node 0.10;
 use 5.020;
 use Moo;
 use experimental 'signatures';
@@ -93,6 +93,10 @@ sub _has( $self, $nodeNames ) {
     for my $tag (sort keys $nodeNames->%*) {
         return 1 if $self->getElementsByTagName($tag)
     }
+}
+
+sub firstNonBlankChild( $self ) {
+    return ([$self->_node->nonBlankChildNodes]->[0]);
 }
 
 sub isBlank( $self ) {

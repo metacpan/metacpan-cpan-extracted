@@ -6,7 +6,7 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011002';
+our $VERSION   = '0.012001';
 
 use constant _ATTRS => qw( caller this parents roles attributes strict constructor modifiers inhaled_from short_name is_struct plugins setup_steps_with_plugins delayed );
 use B::Hooks::AtRuntime   ();
@@ -93,7 +93,8 @@ sub try_inhale {
 	
 	# Inhale Class::XSConstructor
 	if ( $INC{'Class/XSConstructor.pm'} and my $xscon_meta = do {
-		Class::XSConstructor::get_metadata($k);
+		my $m = Class::XSConstructor::get_metadata($k);
+		$m && defined $m->{package} ? $m : undef;
 	} ) {
 		my @attrs = map {
 			my $attr = $_;
@@ -715,17 +716,43 @@ sub canonicalize_attributes {
 sub setup_constructor {
 	my $me = shift;
 	
-	my $attr = $me->attributes_with_inheritance;
-	if ( any { $_->requires_pp_constructor } @$attr ) {
-		my $code = $me->build_pp_constructor( $attr );
-		$me->export( $me->constructor, $code->finalize->compile );
-	}
-	else {
-		my @dfn = map { $_->xs_constructor_args } @$attr;
-		push @dfn, '!!' if $me->strict;
-		Class::XSConstructor->import( [ $me->this, $me->constructor ], @dfn );
-	}
+	Class::XSConstructor->import(
+		[ $me->this, $me->constructor ],
+		$me->strict ? '!!' : (),
+		map( $_->xs_constructor_args, @{ $me->attributes_with_inheritance } ),
+	);
 	
+	# XSConstructor's idea of "foreign" classes is more limited than ours,
+	# so find the real foreign parent, if any. We accept Moo, Moose, Mouse,
+	# etc (anything find_meta can find) as being friendly.
+	no strict 'refs';
+	$me->delay( sub {
+		my $me = shift;
+		my @isa = @{ mro::get_linear_isa($me->this) };
+		shift @isa;  # discard $package itself
+		return unless @isa;
+		
+		my $xscon_meta = Class::XSConstructor::get_metadata($me->this);
+		return unless $xscon_meta->{foreignclass};
+		
+		delete $xscon_meta->{foreignclass};
+		delete $xscon_meta->{foreignconstructor};
+		delete $xscon_meta->{foreignbuildall};
+		delete $xscon_meta->{foreignbuildargs};
+		
+		for my $parent ( @isa ) {
+			next if $me->find_meta( $parent );
+			next if !defined &{"${parent}::new"};
+			$xscon_meta->{foreignclass}         = $parent;
+			$xscon_meta->{foreignconstructor}   = \&{"${parent}::new"};
+			$xscon_meta->{foreignbuildall}      = $parent->can('BUILDALL');
+			$xscon_meta->{foreignbuildargs}     = $parent->can('BUILDARGS');
+			last;
+		}
+		
+		$me->this->XSCON_CLEAR_CONSTRUCTOR_CACHE;
+	} );
+
 	return $me;
 }
 
@@ -866,52 +893,6 @@ sub attributes_with_inheritance {
 		map  { my $m = $me->find_meta($_); $m ? reverse( @{ $m->canonicalize_attributes->attributes } ) : () }
 		@isa
 	];
-}
-
-sub build_pp_constructor {
-	my $me   = shift;
-	my $attr = shift;
-	
-	require Eval::TypeTiny::CodeAccumulator;
-	my $code = Eval::TypeTiny::CodeAccumulator->new;
-	$code->add_line( 'sub {' );
-	$code->increase_indent;
-	$code->add_line( 'my $class    = ref( $_[0] ) ? ref( shift ) : shift;' );
-	$code->add_line( 'my $self     = bless( {}, $class );' );
-	$code->addf( 'my %%args     = ( @_ == 1 and %s ) ? %%{+shift} : @_;', Types::Common::HashRef->inline_check('$_[0]') );
-	$code->add_line( 'my $no_build = delete $args{__no_BUILD__};' );
-	$code->add_gap;
-	for my $at ( @$attr ) {
-		$at->{_locally_compiling_class} = $me->this;
-		$at->add_code_for_initialization( $code );
-		delete $at->{_locally_compiling_class};
-	}
-	$code->add_gap;
-	$code->addf( '$%s::BUILD_CACHE{$class} ||= do {', __PACKAGE__ );
-	$code->increase_indent;
-	$code->add_line( 'no strict "refs";' );
-	$code->add_line( 'my $linear_isa = mro::get_linear_isa($class);' );
-	$code->add_line( '[ map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () } map { "$_\::BUILD" } reverse @$linear_isa ];' );
-	$code->decrease_indent;
-	$code->add_line( '};' );
-	$code->addf( '$_->( $self, \%%args ) for @{ $%s::BUILD_CACHE{$class} };', __PACKAGE__ );
-	if ( $me->strict ) {
-		$code->add_gap;
-		my @allowed = map { $_->allowed_constructor_parameters } @$attr;
-		my $check = do {
-			my $enum = Types::Common::Enum->of( @allowed );
-			$enum->can( '_regexp' )
-				? sprintf( '/\\A%s\\z/', $enum->_regexp )
-				: $enum->inline_check( '$_' );
-		};
-		$code->addf( 'my @unknown = grep not( %s ), keys %%args;', $check );
-		$code->addf( '%s("Unexpected keys in constructor: " . join( q[, ], sort @unknown ) ) if @unknown;', $me->_croaker );
-	}
-	$code->add_gap;
-	$code->add_line( 'return $self;' );
-	$code->decrease_indent;
-	$code->add_line( '}' );
-	return $code;
 }
 
 sub make_type_constraint {
@@ -1162,9 +1143,9 @@ L<Class::XSAccessor>, L<Class::XSConstructor>, and L<Type::Tiny::XS>, it
 is usually I<slightly> faster though. Especially if you keep things simple
 and don't use features that force Marlin to fall back to using Pure Perl.
 
-It may not be as fast as classes built with the Perl builtin C<class> syntax
-introduced in Perl v5.38.0, but has more features and supports Perl versions
-as old as v5.8.8. (Some features require v5.12.0+.)
+It may not be as sleek as classes built with the Perl builtin C<class> syntax
+introduced in Perl v5.38.0, but has more features, is often faster, and it
+supports Perl versions as old as v5.8.8. (Some features require v5.12.0+.)
 
 Marlin was created by the developer of L<Type::Tiny> and L<Sub::HandlesVia>
 and integrates with them.
@@ -1797,25 +1778,102 @@ L<Marlin::Attribute> object that is used to generate accessors, etc.
 
 =head3 Other Features
 
-C<BUILD> and C<DEMOLISH> are supported.
+C<BUILDARGS>, C<BUILD>, C<FOREIGNBUILDARGS>, and C<DEMOLISH> are supported.
+These are methods you can define in your class to influence how the constructor
+and destructor work.
 
-=head3 Major Missing Features
+If you define a C<BUILDARGS> method, then it will be passed the constructor's
+C<< @_ >> and expected to return a hashref mapping attribute names to values.
+The default is something like this:
 
-Here are some features found in L<Moo> and L<Moose> which are missing from
-L<Marlin>:
+  sub BUILDARGS {
+    my $class = shift;
+    if ( @_ == 1 and is_HashRef $_[0] ) {
+      return $_[0];
+    }
+    my %args = @_;
+    return \%args;
+  }
+
+It is usually a good idea to I<not> provide a C<BUILDARGS> method as the
+default behaviour is coded in fast C. However, you may sometimes need this
+flexibility/
+
+If you define a C<BUILD> method, it will be called after your object has
+been created but before the constructor returns it. It is passed a copy
+of the hashref returned by C<BUILDARGS>. In an inheritance heirarchy,
+the constructor will call C<BUILD> for B<all> the parent classes too,
+starting at the very base class.
+
+Because C<BUILD> is called before the strict constructor check, it has
+an opportunity to remove particular keys from the args hashref if they
+are likely to trigger the strict constructor to die.
+
+You can also call C<< $object->BUILDALL( \%args ) >> at any time to
+run all the C<BUILD> methods on an existing object, though quite why
+you'd want to is beyond my comprehension. Maybe some kind of
+inflate/deflate situation?
+
+If you define a C<DEMOLISH> method, this is treated like C<BUILD>, but
+for the constructor. The inheritance heirarchy is traversed in reverse.
+
+When you are inheriting from a non-Marlin, non-Class::XSConstructor class
+(a "foreign class"), Marlin will want to call the base class's constructor.
+It has two different techniques, depending on whether it appears to be a
+"friendly foreign class" (built by Class::Tiny, Moo, or Moose) or a
+"difficult foreign class".
 
 =over
 
 =item *
 
-Support for C<BUILDARGS>.
+Marlin decides a parent class is a B<< friendly foreign class >> if the
+parent class has a C<BUILDALL> method. Marlin will never call that method,
+but its presence indicates that it was built by a sensible OO framework.
 
-You can work around this by naming your constructor something other than
-C<new>, then wrapping it.
+It will do roughly this:
+
+  my $foreign_constructor = $foreignclass->can( 'new' );
+  my $foreign_buildargs   = $foreignclass->can( 'BUILDARGS' )
+                           || $default_buildargs;
+  
+  my $args = $ourclass->$foreign_buildargs( @_ );
+  my $object = do {
+    local $args->{__no_BUILD__} = true;
+    $ourclass->$foreign_constructor( $args );
+  };
+  
+  # ... then initialize our attributes from $args
+  # ... then call BUILD methods, passing them $args
+  # ... then do the strict constructor check on $args
+  # ... then return $object
+
+The friendly foreign class is supposed to honour C<__no_BUILD__> and skip
+calling C<BUILD> methods. Marlin is going to call them and they shouldn't
+be called twice. Moose, Moo, and Class::Tiny all honour that parameter.
 
 =item *
 
-The metaobject protocol.
+If it's a B<< difficult foreign class >>, Marlin will do this instead:
+
+  my $foreign_constructor = $foreignclass->can( 'new' );
+  
+  my @foreign_args = $ourclass->can('FOREIGNBUILDARGS')
+    ? $ourclass->FOREIGNBUILDARGS( @_ )
+    : @_;
+  my $args = $ourclass->can('BUILDARGS')
+    ? $ourclass->BUILDARGS( @_ )
+    : $outclass->$default_buildargs( @_ );
+  
+  my $object = $ourclass->$foreign_constructor( @foreign_args );
+  
+  # ... then initialize our attributes from $args
+  # ... then call BUILD methods, passing them $args
+  # ... then do the strict constructor check on $args
+  # ... then return $object
+
+We just hope that the foreign class does not try to call C<BUILD>.
+(It probably won't.)
 
 =back
 
@@ -1951,7 +2009,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2025 by Toby Inkster.
+This software is copyright (c) 2025-2026 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

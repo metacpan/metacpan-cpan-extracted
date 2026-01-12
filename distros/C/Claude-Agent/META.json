@@ -40,6 +40,9 @@
             "JSON::Lines" : "1.10",
             "Log::Any" : "1.710",
             "Marlin" : "0.007000",
+            "Term::Choose" : "1.7",
+            "Term::ProgressSpinner" : "1.02",
+            "Term::ReadKey" : "2.38",
             "Try::Tiny" : "0.30",
             "Type::Tiny" : "2.0",
             "Types::Common" : "2.0",
@@ -63,6 +66,6 @@
          "web" : "https://github.com/lnation/Claude-Agent"
       }
    },
-   "version" : "0.07",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

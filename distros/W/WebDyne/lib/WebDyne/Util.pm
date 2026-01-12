@@ -42,7 +42,7 @@ require Exporter;
 
 #  Version information
 #
-$VERSION='2.060';
+$VERSION='2.065';
 
 
 #  Var to hold package wide hash, for data shared across package, and error stack
@@ -254,7 +254,7 @@ sub debug {
                 #  Print debug after checking for any regexp wanted
                 #
                 if (my $regexp=$ENV{'WEBDYNE_DEBUG_FILTER'}) {
-                    next unless $debug=~qr/$regexp/;
+                    next unless $debug=~qr/$regexp/m;
                 }
                 CORE::print $debug_fh "[$timestamp $class ($subroutine)] ", $debug, $/;
             }

@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::simpsons;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -44,6 +44,12 @@ Philippe "BooK" Bruhat.
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2026-01-12 - v1.003
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.056.
 
 =item *
 
@@ -101,12 +107,10 @@ L<Acme::MetaSyntactic>, L<Acme::MetaSyntactic::List>.
 __DATA__
 # names
 Abraham_Simpson_I
-Abraham_Simpson_II
 Addem_up_Spuckler
 Adrian_Belew
-Agnes_Flanders
+African_American_Teacher
 Agnes_Skinner
-Akira
 Alaska_Nebraska
 Alcatraaz
 Alex_Whitney
@@ -136,22 +140,20 @@ Arthur_Crandall
 Arthur_Student
 Artie_Ziff
 Art_teacher
-Ashley
 Audrey_McConnell
 Augusta_Flanders
 Babysitting_Lady
 Ballet_Teacher
 Bambi_Petitbois
+Barbara_Van_Horne
 Barking_Dog
 Barney_Gumble
 Barrow_Spuckler
 Bart_Simpson
-Bart_Simpson_Jr
 Bashir_bin_Laden
 Baz
 Bear_Robot
 Beggar_Relative
-Benjamin_nerd
 Benzine_girl
 Bernice_Hibbert
 Bestimus_Muchos
@@ -160,8 +162,6 @@ Billy_actor
 Birch_Barlow
 Birthday_Spuckler
 Bitey
-Black_hole_aliens
-Black_Teacher
 Black_Weasel
 Bleeding_Gums_Murphy
 Blinky
@@ -186,6 +186,7 @@ Buck_McCoy
 Buck_Mitchell
 Buck_toothed_boy
 Buck_toothed_girl
+Bumblebee_Man
 Butterfly
 Buzzkill
 Calliope_Juniper
@@ -193,8 +194,8 @@ Canadian_Flanders
 Canary_M_Burns
 Cannibal
 Capital_City_Goofball
+Capri_Flanders
 Captain_Jack
-Captain_Lance_Murdock
 Caribbean_Boy
 Carl_Carlson
 Carnage_Destructicus
@@ -218,22 +219,17 @@ Christmas_Tree_Farm_Hounds
 Chuck_Berger
 Chuck_Muntz
 CHUM
-Clancy_Bouvier
 Clancy_Wiggum
 Claretta_Simpson
 Cleatus_the_Football_Robot
 Cleo_Bouvier
 Cletus_Spuckler
 Clifford_Burns
-Clowta_Stillman
 Coach_Krupt
 Cody_Spuckler
 Colin
 Coltrane
 Comic_Book_Guy
-Congressman_1
-Congressman_2
-Congressman_3
 Connie_Flanders
 Cookie_Kwan
 Cora
@@ -244,18 +240,17 @@ Corporal_Punishment
 Cosine_Tangent
 Coward
 Cowboy_Bob
+Crazy_Cat_Lady
 Cregg_Demon
 Cremo_Bot
 Crystal_Meth_Spuckler
 Curious_Bear_Cub
 Cute_Lamb
 Cyrus_Simpson
-Dame_Judith_Terwilliger
 Daphne_Burns
 Dark_Stanley
 Darryl
 Dash_Dingo
-Database
 Dave_Shutton
 Declan_Desmond
 Defunct_Robots
@@ -275,13 +270,10 @@ Dolph_Starbeam
 Don_Brodka
 Donna
 Donny_The_Debarted
-Don_Vittorio_DiMaggio
 Doreena_Burns
-Doris_Freedman
 Doug_nerd
 Drederick_Tatum
 Dr_Egoyan
-Dr_Hector_von_Colossus
 Dr_Hillbilly
 Dr_Simpson
 Dr_Velimirovic
@@ -290,7 +282,6 @@ Duff_Cowboy
 Duffman
 Duff_McShark
 Dulcine_Simpson
-Duncan
 Dwight_Diddlehopper
 Dylan_Spuckler
 Eartha_Kitt_character
@@ -299,7 +290,6 @@ Eddie
 Eddie_Muntz
 Edna_Krabappel
 El_Divo
-Eleanor_Abernathy
 Elizabeth_Hoover
 Eliza_Simpson
 E_mail
@@ -313,15 +303,13 @@ Ernst
 Esquilax
 Estonian_Dwarf
 Eunice_Bouvier
-Evelyn_Graycomb
 Evelyn_Trunch
 Evil_Homer
 Faceless_Man
 Fallout_Boy
+Fat_Tony
 FBI_Agent_2_Homerland
-Female_Mail_Carrier
 Female_Twin
-Femme_Fatale
 Feral_Things
 Fernando_Vidal
 Fido
@@ -333,7 +321,6 @@ Four_H_leader
 Francesca_Terwilliger
 Francine_Rhenquist
 Frank_Grimes
-Frank_Grimes_Jr
 Frankie_the_Squealer
 Franklin_Jefferson_Burns
 Freddy
@@ -344,7 +331,6 @@ French_Chef
 Frog_Prince
 Furious_George
 Gabbo
-Gabby_Crouse
 Garwood_Simpson
 Gary_Chalmers
 Gary_nerd
@@ -354,7 +340,6 @@ Gay_Colonel
 Geech
 General_Sherman
 Gentle_Ben
-George_Burns_character
 Gerald_Samson
 German_Santa_Girl
 Gheet_Nahasapeemapetilon
@@ -372,7 +357,6 @@ Gloria_White_Christmas_Blues
 God
 Goosius
 Gorilla_the_Conqueror
-Grady
 Grandma_Flanders
 Grandma_Van_Houten
 Grandpa_Van_Houten
@@ -381,10 +365,12 @@ Greta_Wolfcastle
 Gretchen
 Greyhound_Puppies
 Grief_Counselor
+Groundskeeper_Willie
 Guard_Dog
 Gummy_Sue_Spuckler
 Gunter
 Gus_Huebner
+Gwyneth_Poultry
 Gym_Teacher
 Ham
 Hamster_Number_1
@@ -397,7 +383,6 @@ Headmaster_Greystash
 Heather_Spuckler
 Helen_Lovejoy
 Henry_the_Canary
-Herbert_Powell
 Hercules
 Herman_Hermann
 Hippie
@@ -409,7 +394,6 @@ Homer_the_Thief
 Honore_Bouvier
 Horatio_McCallister
 Hortense_Simpson
-Howard
 Howland_Simpson
 Hubert_Simpson
 Hugo_Simpson_I
@@ -417,7 +401,6 @@ Hugo_Simpson_II
 Humanologist
 Humphrey_Little_Goat
 Hungry_Spuckler_Baby
-Hurt_Leg_Simpson_Relative
 Ian_Very_Tall_Man
 Ice_Cream_Lady
 Iggy_Wiggum
@@ -430,7 +413,6 @@ Itchy
 Itchy_and_Scratchy_robots
 Ivy_Simpson
 Jack_Crowley
-Jack_Deforest
 Jack_Lassen
 Jack_Marley
 Jacqueline_Bouvier
@@ -444,8 +426,6 @@ Jay_G
 Jay_Sherman
 Jebediah_Springfield
 Jehoshaphat_Flanders
-Jenny
-Jeremy_Freedman
 Jeremy_Jailbird
 Jericho
 Jessica_Lovejoy
@@ -456,24 +436,20 @@ J_Loren_Pryor
 Joe_Puffing_Goat
 Joe_Quimby
 Joey_Crusher
-Joey_mafia
+John_Adams
 Johnny_Tightlips
 JoJo_Bouvier
 Jonathan_Frink
 Jordan_Spuckler
 Jose_Flanders
-Judge_Constance_Harm
 Judge_Muntz
 Jug_Band_Manager
 Juliet_Hobbes
-Julio
 Julius_Hibbert
 Just_Stamp_the_Ticket_Man
 Kamala
-Kang
 Kavi_Nahasapeemapetilon
 Kearney_Zzyzwicz
-Kearney_Zzyzwicz_Jr
 Kent_Brockman
 Kevin_Stealing_First_Base
 Khlav_Kalash_vendor
@@ -481,8 +457,6 @@ Killhammad_Aieee
 King_Snorky
 Kirk_Van_Houten
 Kissing_Fish
-Kodos
-Krusty_the_Clown
 Kumiko_Albertson
 Kwik_E_Mart_President
 Kyle_3rd_Grader
@@ -495,7 +469,6 @@ Lambert_Simpson
 Laney_Fontaine
 Langdon_Alger
 Lard_Lad
-Larry_barfly
 Larry_Burns
 Legs
 Lem
@@ -520,7 +493,7 @@ Lord_Nose
 Lord_Thistlewick_Flanders
 Lord_Thistlewick_of_Flanders
 Lou
-Louie_mafia
+Louie
 Lowblow
 Luann_Van_Houten
 Lucas_Bortner
@@ -542,19 +515,15 @@ Malicious_Krubb
 Manjula_Nahasapeemapetilon
 Marcel_Bouvier
 Marge_Simpson
-Martha_Prince
 Martha_Quimby
 Martin_Prince
-Martin_Prince_Sr
 Marty_KBBL_DJ
 Marvin_Monroe
 Mary_Bailey
-Mary_Frowning_Cloud
 Mary_Spuckler
 Master_Sushi_Chef
 Mathemagician
 Maude_Flanders
-Maude_Flanders_ghost
 Maurice
 Maw_Spuckler
 Maxine_Lombard
@@ -566,7 +535,6 @@ Megan
 Melanie_Upfoot
 Melody
 Melody_Juniper
-Melvin_Van_Horne
 Melvis_Spuckler
 Meredith_Milgram
 Merl
@@ -584,14 +552,12 @@ Mindy_Simmons
 Minimum_Wade_Spuckler
 Miss_Springfield
 Moe_Szyslak
-Mojo_the_Helper_Monkey
 Molloy
 Mona_Simpson
 Moshe_Bernstein
 Mr_Becker
 Mr_Costington
 Mr_Glascock
-Mr_Johansen
 Mr_Johnson
 Mr_Kupferberg
 Mr_McGreg
@@ -620,7 +586,6 @@ Nediana_Flanders
 Nedmond_Flanders
 Nedna_Flanders
 Neduchadnezzar_Flanders
-Nedward_Flanders_Sr
 Nedwynn_Flanders
 Neil_Terwilliger
 Nelson_Muntz
@@ -643,16 +608,15 @@ Otto_Mann
 Oxycontin_Spuckler
 Ozmodiar
 Pahusacheta_Nahasapeemapetilon
+Paolo_Paoletti
 Parkfield_Servant_1
 Parkfield_Servant_2
 Patches
 Patty_Bouvier
 Pediculus_Spuckler
 Pepe_Bouvier
-Pepita_Hernandez
 Pete_Spuckler
 Phillips
-Photo_Girl
 Pigeon_Rat
 Ping_Ping
 Pippa_Simpson
@@ -669,15 +633,12 @@ Popular_Girl_Four
 Portuguese_Boy
 Pria_Nahasapeemapetilon
 Princess_Kashmir
-Princess_Penelope
 Probe_Alien
-Professor_Lombardo
 Professor_Werner_von_Brawn
 Prudence_Simpson
 Prune_Juice_Nerd
 Pyro
 Q_Bert_Spuckler
-Queenie
 Quinn_Hopper
 Rachel_Jordan
 Rachel_Krustofsky
@@ -689,24 +650,23 @@ Ramrod
 Rangemaster
 Raphael
 Rasputin_the_Friendly_Russian
+Rayshelle_Peyton
 Reilly_Muntz
 Report_Card
 Rest_Stop_Spuckler
 Rex_Banner
 Rex_I_Love_Lisa
-Richard
 Rigel_7_Taxi_Driver
 Rigellian_Queen
 Rigellian_Resistance_Leader
 Rigellian_Security_Guard
 Robber_Homer_and_Apu
 Robby_the_Automaton
-Robert_Terwilliger
 Robopet
 Robot_Librarian
 Robot_Workers
 Rod_Flanders
-Roger_Meyers_Sr
+Roger_Sherman
 Rosa_Barks
 Ross
 Rover_Hendrix
@@ -718,8 +678,8 @@ Rupert_Simpson
 Russ_Cargill
 Ruth_Powers
 Sailor_Kid
-Samantha_Stankey
 Sam_barfly
+Samuel_Chase
 Sandeep_Nahasapeemapetilon
 Sandwich_Delivery_Guy
 Sanjay_Nahasapeemapetilon
@@ -738,7 +698,6 @@ Serak_the_Preparer
 Sex_Toy
 Sexy_Assistant
 Seymour_Skinner
-Seymour_Skinner_real
 Shary_Bobbins
 Shauna_Chalmers
 She_Biscuit
@@ -766,6 +725,7 @@ Springfield_bears
 Springfield_Nuclear_Power_Plant_employee
 Springfield_Pet_Shop_owner
 Squawky
+Squeaky_Voiced_Teen
 Stabbed_in_Jail_Spuckler
 Stampy
 Stanley_Simpson
@@ -780,7 +740,6 @@ Sylvia_Winfield
 Tabitha_Vixx
 Taffy
 Talking_Dog
-Tanya
 Taquito
 Tattoo_Annie
 Taylor_Spuckler
@@ -790,12 +749,11 @@ The_Great_Raymondo
 The_Human_Fly
 The_Iron_Yuppie
 The_Leader
-The_Rich_Texan
 The_Warden
-The_Yes_Guy
 Three_Unnamed_Spuckler_Babies
 Three_Way
 Tiffany_Spuckler
+Timothy_Lovejoy_Jr
 Tina_Ballerina
 Titania
 Todd_Flanders
@@ -803,7 +761,6 @@ Tommy
 Toot_Toot
 Toshiro
 Tripod_Spuckler
-Trixie_Simpson
 Troy_McClure
 Truckasaurus
 Tumi
@@ -845,13 +802,11 @@ White_Haired_Girl
 White_Kid
 Whitney_Spuckler
 Wilhelmina_Dumperdorf
-Winifred_Running_Goat
 Winifred_Trout
 Woody_Allen
 Worm_eating_boy
 Xylem
 Yellow_Weasel
-Yuma_Hickman
 Yves_Bouvier
 Zachary_Vaughn
 Zeke_Simpson
@@ -859,4 +814,3 @@ Zeph_Burns
 Zia_Simpson
 Zip_Boys
 Zoe_Spuckler
-Zorina_Ovadia

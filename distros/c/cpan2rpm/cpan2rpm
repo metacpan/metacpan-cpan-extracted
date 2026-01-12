@@ -23,11 +23,13 @@
 
 use strict;
 use warnings;
+BEGIN { eval { require File::Temp; } }
 use File::Basename qw(dirname);
-use Getopt::Long;
+use Cwd qw(cwd abs_path);
+use Getopt::Long qw(GetOptions);
 use Sys::Hostname;
 use vars qw($VERSION);
-$VERSION = "2.047";
+$VERSION = "2.048";
 
 my ($ME, $RPM, $TMPDIR, %RPMDIR, $CWD, %info, %meta, $ARGS, $VX);
 my $tarRE = q/\.(tar\.(g?z|bz2)|tgz|zip)$/;
@@ -55,6 +57,8 @@ for (@ARGV) {
 END {
     return print "$VERSION\n" if $VX;
     print "-- Done --\n";
+    # return to user's directory
+    chdir $CWD if $CWD;
     }
 
 # Stub routine required to prevent destruction of fresh Makefile
@@ -64,9 +68,7 @@ sub init {
     $|++;    # good for system()
     ($ME = $0) =~ s|.*/||;
 
-    $ENV{PATH} = "/bin:/usr/bin";       # makes suexec happy
-    chomp($CWD = untaint(qx/pwd/));     # remember where we start
-
+    $CWD = cwd;
     $RPM = inpath("rpmbuild");
     $RPM = inpath("rpm") unless $RPM;
     die "Cannot find rpmbuild/rpm in PATH" unless $RPM;
@@ -152,7 +154,7 @@ sub init {
 
     my $cfg = "$ENV{HOME}/.$ME";
     if (-r $cfg) {
-        eval "use Getopt::ArgvFile qw/argvFile/";
+        eval { require Getopt::ArgvFile; };
         if ($@) {
             print "\n-- cpan2rpm - Ver: $VERSION --\n";
             my $msg = "A configuration file [$cfg] is present\n";
@@ -160,7 +162,7 @@ sub init {
             $msg .= "Either install the module or remove the config file.\n";
             die $msg;
             }
-        argvFile(home=> 1);
+        Getopt::ArgvFile::argvFile(home=> 1);
         }
 
     # get user options from command line
@@ -212,7 +214,7 @@ sub init {
     else {
         my $msg = "Cannot run without File::Temp, please install ";
         $msg .= "or use the --tempdir option.\n";
-        eval "use File::Temp qw/tempdir/";
+        eval { import File::Temp qw/tempdir/ };
         $msg = "$@\n$msg" if $info{debug};
         die $msg if $@;
 
@@ -314,6 +316,12 @@ sub init {
 
     syntax(\%desc, "No distribution specified!")
         unless @ARGV;
+
+    foreach my $path (@{ $info{source}||=[] }) {
+        defined $path or next;
+        $path = abs_path $path if -e $path;
+        cp($path, $RPMDIR{SOURCES}) or die "$path: Unable to copy\n";
+        }
     }
 
 #
@@ -334,7 +342,7 @@ sub get_mod {
     if (isurl($ret{dist})) {
         $ret{tarball} = write_url($RPMDIR{SOURCES}, $ret{dist})
             || die "Unable to retrieve tarball";
-        push @{$ret{source}}, $ret{dist};
+        unshift @{$ret{source}}, $ret{dist};
         }
 
     #
@@ -346,6 +354,7 @@ sub get_mod {
             || die "get_mod(): cp [$ret{dist}] - $!"
             ;
         ($ret{tarball} = $ret{dist}) =~ s|.*/||;
+        unshift @{$ret{source}}, $ret{tarball};
         }
 
     #
@@ -353,7 +362,7 @@ sub get_mod {
     #
 
     elsif (-d $ret{dist}) {
-        chdir $ret{dist};
+        $ret{dist} = abs_path $ret{dist};
         }
 
     #
@@ -362,6 +371,7 @@ sub get_mod {
 
     else {
         $ret{tarball} = $ret{get_mod}(\%ret);
+        unshift @{$ret{source}}, $ret{f} || $ret{tarball};
         }
 
     local $_ if defined wantarray();
@@ -399,12 +409,34 @@ sub get_meta {
 
     #   handle aggregate options
 
-    push @{ $info->{"buildrequires"} }, ($info->{"find-requires"} || "/usr/lib/rpm/perl.req");
-    push @{ $info->{"buildrequires"} }, ($info->{"find-provides"} || "/usr/lib/rpm/perl.prov");
+    my $sources = scalar @{ $info->{source} } + (-d $info->{dist} ? 1 : 0);
+    foreach my $opt (qw[find-provides find-requires]) {
+        (my $macro = "__$opt") =~ y/-/_/;
+        my $prog = $info->{$opt} or next;
+        my $source = $prog =~ /\// ? $prog : inpath($prog);
+        die "--$opt $prog: NOT EXECUTABLE" if !-x $source;
+        if (0 == system "rpm -qf $source 2>/dev/null") {
+            push @{ $info->{"buildrequires"} }, $source;
+            $info->{$opt} = "";
+            }
+        else {
+            my $copy = cp($source, $RPMDIR{SOURCES});
+            die "$copy: NOT EXECUTABLE" if !-x $copy;
+            $info->{$opt} = "";
+            push @{ $info->{source} }, $source;
+            $source = "%{SOURCE$sources}";
+            $sources++;
+            }
+        push @{ $info->{define} }, "_use_internal_dependency_generator 0" if !grep { /^_use_internal_dependency_generator/ } @{$info->{define}};
+        push @{ $info->{define} }, "$macro $source";
+        }
+
+    push @{ $info->{"buildrequires"} }, "/usr/lib/rpm/perl.req" if !$info->{"find-requires"};
+    push @{ $info->{"buildrequires"} }, "/usr/lib/rpm/perl.prov"if !$info->{"find-provides"};
     $info->{"$_-list"} = optagg($info) for @{$info->{"opts-agg"}};
     $info->{"define-list"} .= "";
     foreach (@{$info->{"define"}}) {
-        if (/^(\w)=(.*)/) {
+        if (/^(\w+)=(.*)/) {
             $info->{"define-list"} .= "%define $1 $2\n";
             }
         else {
@@ -421,29 +453,15 @@ sub get_meta {
         if ($patch_ret != 0) {
             print "";
             exit;
-        }
-    }
-
-    eval "use File::Find";
-    if ($@) {
-        local $_ = "Cannot automatically determine architecture for\n";
-        $_ .= "package - defaulting to %_arch macro (this value\n";
-        $_ .= "may be overridden with the --buildarch parameter.\n";
-        $_ .= "Please install File::Find to allow for automatic\n";
-        $_ .= "arch selection.";
-        $_ .= "\n$@" if $info->{debug};
-        print;
-        }
-    else {
-        my $xs = 0;
-        find(sub { $xs = 1 if /\.(xs|c)$/i }, $info->{evaldir});
-        $info->{buildarch} = "noarch" if $xs == 0;
+            }
         }
 
     $info->{evaldir} = dirname($info->{evaldir})
         unless -d $info->{evaldir};
 
     chdir $info->{evaldir} || die "get_meta(): $!";
+
+    $info->{buildarch} = "noarch" unless $_ = readfile("MANIFEST") and /\.(xs|c)$/im;
 
     $_ = "$info->{evaldir}/Build.PL";
     $_ = "$info->{evaldir}/Makefile.PL" unless -e;
@@ -489,7 +507,7 @@ sub get_meta {
         die "SAFETY ABORT!" if \$ENV{_DEEP_RECURSION}++ > 10;
 
         # when the function is called as a method e.g.
-        # Module::Build->new(), first arg iis module name
+        # Module::Build->new(), first arg is module name
 
         shift \@_ if \@_ % 2;
         
@@ -502,7 +520,7 @@ sub get_meta {
 
     local @ARGV = ();
     local $0 = $t;
-	my @listargs = split(' ', $info->{"make-maker"});
+    my @listargs = split(' ', $info->{"make-maker"});
     push @ARGV, @listargs if @listargs;
     # execute the makefile
     my $ok = 0;
@@ -535,8 +553,8 @@ sub get_meta {
     my @deps;
     my $deps = $meta{PREREQ_PM};
     for (grep { $_ ne "perl" } keys %$deps) {
-        my $use = "use $_";
-        $use .= " $deps->{$_}" if $deps->{$_};
+        my $use = "require $_";
+        $use .= "; $_->VERSION($deps->{$_})" if $deps->{$_};
 
         local $^W = 0;
         $@ = ""; eval $use;
@@ -557,10 +575,10 @@ sub get_meta {
         if (-d $info->{dist}) {
             ($info->{tarball} = $info->{dist}) =~ s|.*/||;
             # a source directory may include a version #
-            $info->{tarver} = $info->{tarball} =~ s/-(\d+\.?\d*)$// ? $1 : "";
+            $info->{tarver} = $info->{tarball} =~ s/-(\d+\.?[0-9_]*)$// ? $1 : "";
             }
         $info->{module} = $info->{tarball};
-        $info->{module} =~ s/-(\d+\.?\d*)$tarRE$//i;
+        $info->{module} =~ s/-(\d+\.?[0-9_]*)$tarRE$//i;
         $info->{module} =~ s/-/::/g;
         }
 
@@ -596,15 +614,14 @@ sub get_meta {
 
     if (!$info->{author} && $from =~ /=head\d\s+AUTHORS?\s+(.*?)=/is) {
         local $_ = $1;
-        my ($em) = /(\S+(@|\sat\s)\S+)/is;
-        $em ||= "";
+        my $em = /(\S+@\S+)/ || /(\S+\s+at\s+\S+)/ ? $1 : "";
         $em =~ s/\.$//;             # e.g. Erick Calder e@arix.com.
-        ($_) = /((?:\S+\s+){1,3})\Q$em\E/is;
+        ($_) = /((?:\S+[\ \t]+){0,2}\S+)\s+\Q$em\E/i;
         $_ ||= "";
-        s/[^a-zA-Z ]+//g;           # Peter Behroozi, behroozi@www.pls.uni.edu
+        s/[^a-zA-Z\-\s]+//g;        # Peter Behroozi, behroozi@www.pls.uni.edu
         trim(); s/\s+/ /g;
         $em =~ s/\s+at\s+/@/g;
-        $em =~ s/[()<>]//g;           # Eryq (eryq@zeegee.com)
+        $em =~ s/[()<>]//g;         # Eryq (eryq@zeegee.com)
         $_ .= " <$em>";
         s/E<(lt|gt)>//ig;           # Erick Calder E<lt>e@arix.comE<gt>
         $info->{author} = $_;
@@ -613,8 +630,8 @@ sub get_meta {
     if (!$info->{author}) {
         # Extract generic author from any of the urls
         for (@{$info->{source}}) {
-            if (isurl() && m%author.*/([A-Z\-]+)/[^/]+$%) {
-                $info->{author} = (lc $1).'@cpan.org';
+            if (m{author.*/([A-Z])/(\1[A-Z])/(\2[A-Z]+)/}) {
+                $info->{author} = lc "$3\@cpan.org";
                 last;
                 }
             }
@@ -633,6 +650,16 @@ sub get_meta {
         }
     $info->{version} ||= $info->{tarver};
 
+    if (!$info->{version}) {
+        # Extract generic version from any of the sources
+        for (@{$info->{source}}) {
+            if (/-(\d+\.?[0-9_]*)$tarRE$/i) {
+                $info->{version} = $1;
+                last;
+                }
+            }
+        }
+
     die "No version found, please use --version option.  Stopped"
         unless $info->{version};
 
@@ -648,8 +675,9 @@ sub get_meta {
     if (-d $info->{dist}) {
         ($info->{tardir} = $info->{module}) =~ s|::|-|g;
         $info->{tardir} .= "-$info->{version}"
-            unless $info->{tardir} =~ /-(\d+.*)$/;
+            unless $info->{tardir} =~ /-\d+/;
         $info->{tarball} = "$info->{tardir}.tar.gz";
+        unshift @{$info->{source}}, $info->{tarball};
         }
 
     #   tarballs without a subdir need one created
@@ -683,18 +711,7 @@ EOF
 
     $info->{summary} = "$info->{name} - " . ($meta{ABSTRACT} || "Perl module");
     $info->{description} ||= $meta{DESCRIPTION} || "None.";
-    if (!@{ $info->{source}||=[] }) {
-        push @{$info->{source}}, $info->{tarball};
-        $info->{"source-list"} = optagg($info, "source");
-        }
     $info->{changelog} = changelog();
-
-    $info->{"find-provides"}
-        &&= qq/%define __find_provides $info->{"find-provides"}/;
-    $info->{"find-requires"} &&= qq/
-        %define __find_requires $info->{"find-requires"}\n
-        %define __perl_requires $info->{"find-requires"}
-        /;
 
     #   section handlers
 
@@ -807,9 +824,6 @@ EOF
         $i++;
         }
 
-    # return to user's directory
-
-    chdir $CWD;
     }
 
 #
@@ -833,10 +847,11 @@ sub mk_spec {
 
     # generalise whenever possible
 
-    for (qw/tardir source/) {
-        $info->{$_} =~ s/$info->{name}/%{pkgname}/;
-        $info->{$_} =~ s/$info->{version}/%{version}/;
+    for ($info->{tardir}, @{ $info->{source} }) {
+        s/$info->{name}/%{pkgname}/;
+        s/$info->{version}/%{version}/;
         }
+    $info->{"source-list"} = optagg($info, "source");
 
     $info->{description} =~ s/\s+$//;
     $info->{maketest} = $info->{"make-no-test"} ? 0 : 1;
@@ -1166,7 +1181,7 @@ sub inst_rpm {
 sub get_cpan_api {
     my $info = shift;
     local $_ = http_get("$LATEST_MOD/$info->{dist}");
-    if (m{download_url.*?((\w)/(\2\w)/(\3\w*)/[\w\-\.\:\+]+)}) {
+    if (m{download_url.*?((\w)/(\2\w)/(\3\w*)/[\w\-\.\:\+/]+)}) {
         $info->{f} = "$CPAN_BASE/authors/id/$1";
         $info->{version} = $1 if /"version"\s*:\s*"?([\d\.\_\-]+)"?/;
         if (/"distribution"\s*:\s*"([\w\-\.\:\+]+)"/) {
@@ -1297,7 +1312,7 @@ sub get_cpan_old {
         );
 
     debug("ff=$ff");
-    system("cp", $ff, $RPMDIR{SOURCES}) if -r $ff;
+    cp($ff, $RPMDIR{SOURCES}) if -r $ff;
     $ff =~ s|.*/||;
     $info->{tarball} = $ff;
     }
@@ -1394,16 +1409,15 @@ sub untar($) {
     my $zip = /\.zip$/i;
 
     my $z = /\.tar\.bz2$/i ? "j" : "z";
-    my @cmd = (qw/tar -x --directory/, $dst, "-$z", "-f", $_);
-    @cmd = (qw/unzip -d/, $dst, $_) if $zip;
+    my @cmd = $zip
+        ? ("unzip", "-d", $dst, $_)
+        : ("tar", "-C", $dst, "-x$z", "-f", $_);
     system(@cmd) == 0 || die "system @cmd failed: $?";
     system("chmod", "-R", "u+w", $dst);
 
     my $cmd = $zip
-        ? "unzip -l $_ | grep -P -o '\\S+/\$' |tail -1"
-        : "tar -t${z}f $_ |head -n 1"
-        ;
-
+        ? "unzip -l $_ | grep -P -o '\\S+/\$' | tail -1"
+        : "tar -t$z -f $_ | head -n 1";
     chomp($_ = qx/$cmd/);
     $_ = (split)[0] unless $zip;
     if ($_ =~ m|/|) {
@@ -1454,11 +1468,11 @@ sub writefile($@) {
 
 sub cp {
     my ($f, $d, $ff) = @_;
-    $f =~ s/~/$ENV{HOME}/;
-    return 1 unless -r $f;
+    $f =~ s%^~/%$ENV{HOME}/%;
+    return "" unless -r $f;
     ($ff = $f) =~ s|.*/||;
-    return 1 if finode($f) eq finode("$d/$ff");
-    system("cp", "-u", $f, $d) == 0;
+    return "$d/$ff" if finode($f) eq finode("$d/$ff");
+    return system("cp", "-u", "-p", $f, $d) == 0 ? "$d/$ff" : "";
     }
 
 #    0: dev, 1: inode, the combination guarantees
@@ -1600,12 +1614,12 @@ sub chkdirs {
 sub mk_rpm_dirs {
     local $_ = "$ENV{HOME}/.rpmmacros";
     my $topdir = `echo -n $info{"mk-rpm-dirs"}`;
-	my $txt = <<EOF;
-		%_topdir $topdir
+    my $txt = <<EOF;
+	%_topdir $topdir
 
-		%_smp_mflags -j3
-		%__arch_install_post /usr/lib/rpm/check-rpaths /usr/lib/rpm/check-buildroot
-		%debug_package %{nil}
+	%_smp_mflags -j3
+	%__arch_install_post /usr/lib/rpm/check-rpaths /usr/lib/rpm/check-buildroot
+	%debug_package %{nil}
 EOF
 
     if (!-e) {
@@ -1694,7 +1708,8 @@ sub optagg {
     my $nm = shift || $_;
     my @opt; push @opt, split /,/ for @{$info->{$nm}};
     my $ret = "";
-    $ret .= sprintf("%-*s %s\n", $SPECCOL, "$nm:", $_) for @opt;
+    $nm .= 0 if $nm eq "source";
+    $ret .= sprintf("%-*s %s\n", $SPECCOL, "$nm:", $_), $nm =~ s/(\d+)$/$1+1/e for @opt;
     $ret;
     }
 
@@ -1799,14 +1814,6 @@ sub trim {
         $_ ||= ""; s/^\s+//; s/\s+$//;
         }
     $_[0] if @_ == 1;
-    }
-
-# dirty way to untaint stuff to make suExec happy
-
-sub untaint {
-    my $k = shift;
-    my %x; $x{$k} = 1;
-    return (keys %x)[0];
     }
 
 sub debug {
@@ -2027,7 +2034,7 @@ Allows for specifying patch files to be inserted into the spec file and applied 
 
 =item B<--define=C<name body>>
 
-Works much like the rpm --define syntax to define rpm macro initializations.  A comma-delimited list of macro definitions is not supported, but ut may be used multiple times to define more than one macro.
+Works much like the rpm --define syntax to define rpm macro initializations.  A comma-delimited list of macro definitions is not supported, but it may be used multiple times to define more than one macro.
 
 I<exempli gratia>
 

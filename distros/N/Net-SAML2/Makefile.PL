@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "SAML bindings and protocol implementation",
-  "AUTHOR" => "Chris Andrews  <chrisa\@cpan.org>, Timothy Legge <timlegge\@gmail.com>",
+  "AUTHOR" => "Timothy Legge <timlegge\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -71,7 +71,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.14",
     "Test::Pod::Coverage" => "1.04"
   },
-  "VERSION" => "0.83",
+  "VERSION" => "0.84",
   "test" => {
     "TESTS" => "t/*.t t/author/*.t"
   }

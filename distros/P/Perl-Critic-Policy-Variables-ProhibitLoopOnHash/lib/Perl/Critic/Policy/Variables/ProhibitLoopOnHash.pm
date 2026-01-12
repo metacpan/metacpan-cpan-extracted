@@ -1,7 +1,7 @@
 package Perl::Critic::Policy::Variables::ProhibitLoopOnHash;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Don't write loops on hashes, only on keys and values of hashes
-$Perl::Critic::Policy::Variables::ProhibitLoopOnHash::VERSION = '0.008';
+$Perl::Critic::Policy::Variables::ProhibitLoopOnHash::VERSION = '0.009';
 use strict;
 use warnings;
 use parent 'Perl::Critic::Policy';
@@ -120,13 +120,18 @@ sub violates {
         }
     }
 
+    my $topical = $elem->snext_sibling
+        or return ();
+
     # for $foo (%hash)
     # we simply skip the "$foo"
-    if ( ( my $topical = $elem->snext_sibling )->isa('PPI::Token::Symbol') ) {
+    if ( $topical->isa('PPI::Token::Symbol') ) {
         if (   $topical->snext_sibling
             && $topical->snext_sibling->isa('PPI::Structure::List') )
         {
             $elem = $topical;
+            $topical = $elem->snext_sibling
+                or return ();
         } else {
             # for $foo (%hash);
         }
@@ -134,14 +139,14 @@ sub violates {
 
     # for %hash
     # (postfix without parens)
-    _check_symbol_or_cast( $elem->snext_sibling )
+    _check_symbol_or_cast( $topical )
         and return $self->violation( DESC(), EXPL(), $elem );
 
     # for (%hash)
-    if ( ( my $list = $elem->snext_sibling )->isa('PPI::Structure::List') ) {
-        my @children = $list->schildren;
+    if ( $topical->isa('PPI::Structure::List') ) {
+        my @children = $topical->schildren;
         @children > 1
-            and croak "List has multiple significant children ($list)";
+            and croak "List has multiple significant children ($topical)";
 
         if ( ( my $statement = $children[0] )->isa('PPI::Statement') ) {
             my @statement_args = $statement->schildren;
@@ -193,7 +198,7 @@ Perl::Critic::Policy::Variables::ProhibitLoopOnHash - Don't write loops on hashe
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 
@@ -235,9 +240,10 @@ Sawyer X
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Sawyer X.
+This software is Copyright (c) 2026 by Sawyer X.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

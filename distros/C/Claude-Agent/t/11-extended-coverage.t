@@ -312,7 +312,10 @@ subtest 'ToolDefinition error handling' => sub {
         handler      => sub { die "Intentional test error\n" },
     );
 
-    my $result = $err_tool->execute({});
+    # execute() now returns a Future
+    my $future = $err_tool->execute({});
+    isa_ok($future, 'Future', 'execute returns a Future');
+    my $result = $future->get;
     ok($result->{is_error}, 'error tool sets is_error');
     like($result->{content}[0]{text}, qr/Error executing tool/, 'error message present');
     like($result->{content}[0]{text}, qr/error_tool/, 'error message includes tool name');
@@ -330,7 +333,8 @@ subtest 'ToolDefinition error handling' => sub {
         },
     );
 
-    $result = $explicit_err->execute({});
+    $future = $explicit_err->execute({});
+    $result = $future->get;
     ok($result->{is_error}, 'explicit is_error preserved');
     is($result->{content}[0]{text}, 'Custom error message', 'custom error message preserved');
 
@@ -346,7 +350,8 @@ subtest 'ToolDefinition error handling' => sub {
         },
     );
 
-    $result = $success_tool->execute({});
+    $future = $success_tool->execute({});
+    $result = $future->get;
     ok(!$result->{is_error}, 'success tool no is_error');
     is($result->{content}[0]{text}, 'Success!', 'success content returned');
 };

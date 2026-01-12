@@ -1,0 +1,240 @@
+#!/usr/bin/env perl
+
+use 5.020;
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Acme::Claude::Shell qw(shell run);
+use Getopt::Long;
+use Term::ANSIColor qw(colored);
+use Pod::Usage;
+
+our $VERSION = '0.01';
+
+my %opts = (
+    'dry-run'   => 0,
+    'safe-mode' => 1,
+    'color'     => -t STDOUT ? 1 : 0,
+    'dir'       => '.',
+);
+
+GetOptions(
+    'dry-run|n'     => \$opts{'dry-run'},
+    'unsafe|u'      => sub { $opts{'safe-mode'} = 0 },
+    'no-color'      => sub { $opts{'color'} = 0 },
+    'color!'        => \$opts{'color'},
+    'directory|d=s' => \$opts{'dir'},
+    'command|c=s'   => \$opts{'command'},
+    'model|m=s'     => \$opts{'model'},
+    'help|h'        => \$opts{'help'},
+    'version|v'     => \$opts{'version'},
+) or pod2usage(2);
+
+if ($opts{'help'}) {
+    show_help();
+    exit 0;
+}
+
+if ($opts{'version'}) {
+    show_version();
+    exit 0;
+}
+
+# Check for piped input: acme_claude_shell -c - reads from stdin
+my $command = $opts{'command'};
+if (defined $command && $command eq '-') {
+    # Read command from stdin (for piping: echo "list files" | acme_claude_shell -c -)
+    local $/;
+    $command = <STDIN>;
+    chomp $command if defined $command;
+}
+
+# Single command mode or interactive
+if (defined $command && length $command) {
+    run($command,
+        dry_run     => $opts{'dry-run'},
+        safe_mode   => $opts{'safe-mode'},
+        working_dir => $opts{'dir'},
+        colorful    => $opts{'color'},
+        ($opts{'model'} ? (model => $opts{'model'}) : ()),
+    );
+} else {
+    shell(
+        dry_run     => $opts{'dry-run'},
+        safe_mode   => $opts{'safe-mode'},
+        working_dir => $opts{'dir'},
+        colorful    => $opts{'color'},
+        ($opts{'model'} ? (model => $opts{'model'}) : ()),
+    );
+}
+
+sub show_help {
+    my $c = $opts{'color'};
+
+    if ($c) {
+        print colored(['bold', 'cyan'], "\n  Acme::Claude::Shell"), " - AI-powered interactive shell\n\n";
+    } else {
+        print "\n  Acme::Claude::Shell - AI-powered interactive shell\n\n";
+    }
+
+    print_section("Usage", $c);
+    print "    acme_claude_shell [options]\n";
+    print "    acme_claude_shell -c \"find all large log files\"\n\n";
+
+    print_section("Options", $c);
+    print_opt("-n, --dry-run", "Preview mode - show commands without executing", $c);
+    print_opt("-u, --unsafe", "Disable safety confirmations for dangerous commands", $c);
+    print_opt("--no-color", "Disable colored output", $c);
+    print_opt("-d, --directory DIR", "Set working directory (default: current)", $c);
+    print_opt("-c, --command CMD", "Run single command and exit (use '-' for stdin)", $c);
+    print_opt("-m, --model MODEL", "Claude model to use (e.g., claude-opus-4-5)", $c);
+    print_opt("-h, --help", "Show this help", $c);
+    print_opt("-v, --version", "Show version", $c);
+    print "\n";
+
+    print_section("Examples", $c);
+    print "    acme_claude_shell                         # Start interactive shell\n";
+    print "    acme_claude_shell --dry-run               # Preview mode\n";
+    print "    acme_claude_shell -d /var/log             # Start in specific directory\n";
+    print "    acme_claude_shell -c \"list perl files\"    # Single command\n";
+    print "    acme_claude_shell -m claude-opus-4-5      # Use a specific model\n";
+    print "    echo \"list files\" | acme_claude_shell -c - # Piped input\n\n";
+
+    print_section("Interactive Commands", $c);
+    print "    help      Show help inside the shell\n";
+    print "    history   Show executed command history\n";
+    print "    clear     Clear the screen\n";
+    print "    exit      Exit the shell (or 'quit')\n\n";
+
+    print_section("Example Session", $c);
+    if ($c) {
+        print colored(['green'], "    acme_claude_shell> "), "find all perl files larger than 10k\n";
+        print colored(['cyan'], "    Thinking...\n");
+        print "    I'll find .pl and .pm files over 10KB:\n\n";
+        print colored(['cyan'], "    i "), "Command: find . -name '*.p[lm]' -size +10k\n\n";
+        print "    Action:\n";
+        print "      [", colored(['cyan'], "a"), "] Approve and run\n";
+        print "      [", colored(['cyan'], "d"), "] Dry-run (show only)\n";
+        print "      [", colored(['cyan'], "e"), "] Edit command\n";
+        print "      [", colored(['cyan'], "x"), "] Cancel\n";
+        print "    > a\n\n";
+        print "    ./lib/Acme/Claude/Shell.pm\n";
+        print "    ./lib/Acme/Claude/Shell/Session.pm\n\n";
+        print colored(['green'], "    Done\n\n");
+        print colored(['green'], "    acme_claude_shell> "), "now show their sizes\n";
+        print "    (Claude remembers the previous files...)\n\n";
+    } else {
+        print "    acme_claude_shell> find all perl files larger than 10k\n";
+        print "    Thinking...\n";
+        print "    I'll find .pl and .pm files over 10KB:\n";
+        print "    Command: find . -name '*.p[lm]' -size +10k\n";
+        print "    > a\n";
+        print "    ./lib/Acme/Claude/Shell.pm\n\n";
+    }
+
+    print_section("SDK Features Demonstrated", $c);
+    print "    This module showcases all Claude::Agent SDK features:\n";
+    print "    - query()     Single-shot commands (-c option)\n";
+    print "    - session()   Multi-turn context (interactive mode)\n";
+    print "    - MCP tools   Custom shell execution tools\n";
+    print "    - Hooks       Safety confirmation before running\n";
+    print "    - Dry-run     Preview without executing\n";
+    print "    - IO::Async   Non-blocking spinners\n";
+    print "    - CLI utils   Colored output, menus, spinners\n\n";
+}
+
+sub show_version {
+    my $c = $opts{'color'};
+    if ($c) {
+        print colored(['bold', 'cyan'], "Acme::Claude::Shell"), " version $VERSION\n";
+    } else {
+        print "Acme::Claude::Shell version $VERSION\n";
+    }
+}
+
+sub print_section {
+    my ($title, $color) = @_;
+    if ($color) {
+        print colored(['bold', 'yellow'], "$title:\n");
+    } else {
+        print "$title:\n";
+    }
+}
+
+sub print_opt {
+    my ($opt, $desc, $color) = @_;
+    if ($color) {
+        printf "    %-25s %s\n", colored(['green'], $opt), $desc;
+    } else {
+        printf "    %-25s %s\n", $opt, $desc;
+    }
+}
+
+__END__
+
+=head1 NAME
+
+acme_claude_shell - AI-powered interactive shell
+
+=head1 SYNOPSIS
+
+    acme_claude_shell [options]
+    acme_claude_shell -c "find all large log files"
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-n, --dry-run>
+
+Preview mode - show commands without executing them.
+
+=item B<-u, --unsafe>
+
+Disable safety confirmations for dangerous commands.
+
+=item B<--no-color>
+
+Disable colored output.
+
+=item B<-d, --directory> DIR
+
+Set working directory (default: current directory).
+
+=item B<-c, --command> CMD
+
+Run a single command and exit instead of starting interactive mode.
+Use '-' to read the command from stdin for piping.
+
+=item B<-m, --model> MODEL
+
+Specify the Claude model to use (e.g., claude-opus-4-5, claude-sonnet-4-5).
+
+=item B<-h, --help>
+
+Show help message.
+
+=item B<-v, --version>
+
+Show version.
+
+=back
+
+=head1 DESCRIPTION
+
+An AI-enhanced interactive shell where you describe what you want in
+natural language, and Claude figures out the shell commands, explains
+them, and executes them with your approval.
+
+=head1 AUTHOR
+
+LNATION, C<< <email at lnation.org> >>
+
+=head1 LICENSE
+
+This software is licensed under the Artistic License 2.0.
+
+=cut

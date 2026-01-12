@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Acme::MetaSyntactic::MultiList;
 our @ISA = qw( Acme::MetaSyntactic::MultiList );
-our $VERSION = '1.009';
+our $VERSION = '1.010';
 
 =encoding iso-8859-1
 
@@ -1109,6 +1109,75 @@ The winners are:
  2020   Physics     Reinhard Genzel
  2020   Physics     Andrea Ghez
 
+ 2021   Chemistry   Benjamin List
+ 2021   Chemistry   David W.C. MacMillan
+ 2021   Economics   David Card
+ 2021   Economics   Joshua D. Angrist
+ 2021   Economics   Guido W. Imbens
+ 2021   Literature  Abdulrazak Gurnah
+ 2021   Medicine    David Julius
+ 2021   Medicine    Ardem Patapoutian
+ 2021   Peace       Maria Ressa
+ 2021   Peace       Dmitry Andreyevich Muratov
+ 2021   Physics     Syukuro Manabe
+ 2021   Physics     Klaus Hasselmann
+ 2021   Physics     Giorgio Parisi
+
+ 2022   Chemistry   Carolyn R. Bertozzi
+ 2022   Chemistry   Morten Meldal
+ 2022   Chemistry   K. Barry Sharpless
+ 2022   Economics   Ben S. Bernanke
+ 2022   Economics   Douglas W. Diamond
+ 2022   Economics   Philip H. Dybvig
+ 2022   Literature  Annie Ernaux
+ 2022   Medicine    Svante Pääbo
+ 2022   Peace       Ales Bialiatski
+ 2022   Peace       Memorial
+ 2022   Peace       Center for Civil Liberties
+ 2022   Physics     Alain Aspect
+ 2022   Physics     John F. Clauser
+ 2022   Physics     Anton Zeilinger
+
+ 2023   Chemistry   Moungi G. Bawendi
+ 2023   Chemistry   Louis E. Brus
+ 2023   Chemistry   Aleksey Yekimov
+ 2023   Economics   Claudia Goldin
+ 2023   Literature  Jon Fosse
+ 2023   Medicine    Katalin Karikó
+ 2023   Medicine    Drew Weissman
+ 2023   Peace       Narges Mohammadi
+ 2023   Physics     Pierre Agostini
+ 2023   Physics     Ferenc Krausz
+ 2023   Physics     Anne L'Huillier
+
+ 2024   Chemistry   David Baker
+ 2024   Chemistry   Demis Hassabis
+ 2024   Chemistry   John Jumper
+ 2024   Economics   Daron Acemoglu
+ 2024   Economics   Simon Henry Roberts Johnson
+ 2024   Economics   James A. Robinson
+ 2024   Literature  Han Kang
+ 2024   Medicine    Victor Ambros
+ 2024   Medicine    Gary Ruvkun
+ 2024   Peace       Nihon Hidankyo
+ 2024   Physics     John J. Hopfield
+ 2024   Physics     Geoffrey Hinton
+
+ 2025   Chemistry   Susumu Kitagawa
+ 2025   Chemistry   Richard Robson
+ 2025   Chemistry   Omar M. Yaghi
+ 2025   Economics   Joel Mokyr
+ 2025   Economics   Philippe Aghion
+ 2025   Economics   Peter Howitt
+ 2025   Literature  László Krasznahorkai
+ 2025   Medicine    Mary E. Brunkow
+ 2025   Medicine    Frederick J. Ramsdell
+ 2025   Medicine    Shimon Sakaguchi
+ 2025   Peace       Maria Corina Machado
+ 2025   Physics     John Clarke
+ 2025   Physics     Michel H. Devoret
+ 2025   Physics     John M. Martinis
+
 =cut
 
         next unless $line =~ /^\s+(\d+)\s+(\w+)\s+(.*)/;
@@ -1140,6 +1209,13 @@ Abigail
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2026-01-12 - v1.010
+
+Updated with the Nobel prizes for 2021, 2022, 2023, 2024 and 2025, and
+published in Acme-MetaSyntactic-Themes version 1.056.
 
 =item *
 

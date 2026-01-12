@@ -8,21 +8,27 @@ my %WriteMakefileArgs = (
     AUTHOR           => q{Ian Boddison <bod@cpan.org>},
     VERSION_FROM     => 'lib/Business/Stripe/Webhook.pm',
     ABSTRACT_FROM    => 'lib/Business/Stripe/Webhook.pm',
-    LICENSE          => 'Perl',
+    LICENSE          => 'mit',
     MIN_PERL_VERSION => '5.010',
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::MakeMaker' 	=> '0',
     },
     TEST_REQUIRES => {
-        'Test::More' => '0',
+        'Test::More' 		=> '0',
+        'Test::MockModule'	=> '0',
     },
     PREREQ_PM => {
-        'JSON::PP'       => '2.00',
-        'HTTP::Tiny'     => '0.014',
-        'Digest::SHA'    => '5.94',
-        'Time::Piece'    => '1.20',
+        'JSON::PP'       	=> '2.00',
+        'HTTP::Tiny'    	=> '0.014',
+        'Digest::SHA'   	=> '5.94',
+        'Time::Piece'    	=> '1.20',
     },
-    dist  => { COMPRESS => q{perl -MIO::Compress::Gzip=gzip,:constants -e"my $$in = $$ARGV[0]; gzip($$in => qq($$in.gz), q(Level) => Z_BEST_COMPRESSION, q(BinModeIn) => 1) or die q(gzip failed); unlink $$in;"}, SUFFIX => 'gz', },
+    dist => {
+        COMPRESS => 'gzip -9vf',
+        SUFFIX   => 'gz',
+    },
+
+#    dist  => { COMPRESS => q{perl -MIO::Compress::Gzip=gzip,:constants -e "my $$in = $$ARGV[0]; gzip($$in => qq($$in.gz), q(Level) => Z_BEST_COMPRESSION, q(BinModeIn) => 1) or die q(gzip failed); unlink $$in;"}, SUFFIX => 'gz', },
     clean => { FILES => 'Business-Stripe-Webhook-*' },
 );
 
@@ -45,3 +51,6 @@ delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
+
+
+

@@ -2,29 +2,8 @@ package Acme::MetaSyntactic::pornstars;
 use strict;
 use Acme::MetaSyntactic::MultiList;
 our @ISA = qw( Acme::MetaSyntactic::MultiList );
-our $VERSION = '1.034';
+our $VERSION = '1.036';
 __PACKAGE__->init();
-
-our %Remote = (
-    source => 'https://en.wikipedia.org/wiki/List_of_pornographic_performers_by_decade',
-    extract => sub {
-        $_[0] =~ s/<h2>(?:<[^>]*>)?References<.*//s;    # drop everything after references
-        my @items =
-            map { Acme::MetaSyntactic::RemoteList::tr_accent($_) }
-            map { Acme::MetaSyntactic::RemoteList::tr_utf8_basic($_) }
-            grep { ! /^List_|_Groups$/ }
-            map { s/[-\s'\x{2019}]/_/g; s/[."]//g; $_ }
-	    grep $_,
-            $_[0] =~ m{^<h3><span[^>]*>((?:Fem|M)ale)</span>|^(?:<ul>)?<li>(?:<a [^>]*>)?(.*?)(?:(?: ?[-,(<]| aka | see ).*)?</li>}mig;
-        my ( $category, @list );
-        for (@items) {
-            if (/^(?:Fem|M)ale$/) { $category = lc; next; }
-            push @list, $_ if $category eq $_[1];
-        }
-	return @list;
-    },
-    ,
-);
 
 1;
 
@@ -50,11 +29,24 @@ L<http://en.wikipedia.org/wiki/List_of_pornographic_actresses_by_decade>
 as a source for female actresses, but no source for male performers.
 The data for the C<male> category is therefore B<obsolete>.
 
+On August 2, 2014 the I<List of pornographic actresses by decade>
+Wikipedia page was heavily trimmed (removal of 857 names, with only
+I<Candy Barr> remaining) following the official I<Biographies of living
+persons> Wikipedia policy.
+
 In October 2018, that source was removed from this theme, making it static.
 
 In May 2018, the link above was redirected to
 L<https://en.wikipedia.org/wiki/List_of_pornographic_performers_by_decade>,
 which became the new source of data for both categories as of July 2019.
+
+On January 13, 2025, the Wikipedia "List of pornographic performers by
+decade" was turned in a redirection to "Category:Pornographic actors"
+due to "pervasive I<Biographies of Living Persons> violations that have
+persisted for over a decade since the consensus to remove them."
+
+Since I have little interest in continuing to update this list, it is
+now completely static (unless some future contributor sends me updates).
 
 =head1 CONTRIBUTORS
 
@@ -67,6 +59,13 @@ Sébastien Aperghis-Tramoni, Philippe Bruhat, Rafaël Garcia-Suarez.
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2026-01-12 - v1.035
+
+No update. This theme is now static, starting
+in Acme-MetaSyntactic-Themes version 1.056.
 
 =item *
 

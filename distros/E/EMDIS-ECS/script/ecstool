@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2025 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this program, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc ecstool).
@@ -1233,9 +1233,10 @@ meta-messages are sent, covering the range I<seq_num> through I<seq2>
 
 Modify existing ECS node in node_tbl.
 
-=item --nodedata I<import|export> I<filename> [I<node>]
+=item --nodedata I<import|export|jsondump> I<filename> [I<node>]
 
-Import or export node_tbl data, using Data::Dumper format.
+Import or export node_tbl data using Data::Dumper format, or export
+using JSON format.
 
 =item --overview
 

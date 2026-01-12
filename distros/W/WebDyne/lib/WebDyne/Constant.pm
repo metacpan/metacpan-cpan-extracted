@@ -32,7 +32,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='2.060';
+$VERSION='2.065';
 
 
 #  Get mod_perl version taking intio account legacy strings. Clear $@ after evals
@@ -579,11 +579,12 @@ sub local_constant_load {
 
     #  Now from environment vars - override anything in config file
     #
-    foreach my $key (keys %{$constant_hr}) {
+    my %constant_class=%{"${class}::Constant"};
+    foreach my $key (keys %constant_class) {
         if (defined $ENV{$key}) {
             my $val=$ENV{$key};
             debug("using environment value $val for key: $key");
-            $constant_hr->{$key}=$val;
+            $constant_hr->{$class}{$key}=$val;
         }
     }
 
@@ -594,7 +595,7 @@ sub local_constant_load {
         my $table_or=$server_or->dir_config();
         while (my ($key, $val)=each %{$table_or}) {
             debug("installing value $val for Apache directive: $key");
-            $constant_hr->{$key}=$val if exists $constant_hr->{$key};
+            $constant_hr->{$class}{$key}=$val if exists $constant_class{$key}
         }
     }
 
@@ -780,14 +781,20 @@ sub import {
             debug("importing for caller: $caller");
             
             
-            #  Don't load hash ref into caller if already done
+            #  Don't load hash ref into caller if already done. This probably needs to be reworked ..
             #
-            if ($Package{'caller'}{$caller}{$constant_hr}++) {
-                debug("skip, already applied $constant_hr to caller: $caller");
-                next;
+            if (my $var_test= (keys(%{$constant_hr}))[0] ) {
+                debug("picking var: $var_test as test, exists *{${caller}::${var_test}}: %s", defined(*{"${caller}::${var_test}"}));
+                if ($Package{'caller'}{$caller}{$constant_hr}++ && defined(*{"${caller}::${var_test}"})) {
+                    debug("skip, already applied $constant_hr to caller: $caller");
+                    next;
+                }
+                else {
+                    debug('continue');
+                }
             }
             else {
-                debug('continue');
+                debug('no test var found in constant_hr: %s', Dumper($constant_hr));
             }
             
             

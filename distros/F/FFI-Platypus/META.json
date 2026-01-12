@@ -112,7 +112,7 @@
             "File::chdir" : "0",
             "FindBin" : "0",
             "HTTP::Tiny::Mech" : "0",
-            "Path::Tiny" : "0",
+            "Path::Tiny" : "0.130",
             "Perl::Critic" : "0",
             "Test2::Require::EnvVar" : "0.000121",
             "Test2::Require::Module" : "0.000121",
@@ -170,7 +170,7 @@
       "x_IRC" : "irc://irc.perl.org/#native",
       "x_twitter" : "https://fosstodon.org/@PerlFFI"
    },
-   "version" : "2.10",
+   "version" : "2.11",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",

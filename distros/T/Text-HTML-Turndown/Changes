@@ -1,3 +1,7 @@
+0.10 2026-01-11
+    * Nicely indent generated Markdown tables
+    * Simplify handling of <table> tags
+
 0.09 2025-10-28
     * Allow markup in table cells
 

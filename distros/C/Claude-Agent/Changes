@@ -1,5 +1,54 @@
 Revision history for Claude-Agent
 
+0.13    2026-01-11
+	- fix progress spinner
+
+0.12    2026-01-11
+	- fix utf8 print bug
+
+0.11    2026-01-11
+        [Session Support]
+        - Added session() export for multi-turn conversations
+        - Client::send() now properly resumes sessions (creates new Query with --resume)
+        - Fixed multi-turn async sessions (CLI exits after each turn, resume required)
+        - Added loop parameter documentation to session()
+        - New examples/14-session.pl demonstrating async multi-turn sessions
+        - New t/14-session.t test file
+
+        [CLI Utilities]
+        - New Claude::Agent::CLI module for interactive terminal UI
+        - Spinners: with_spinner, start_spinner, stop_spinner (IO::Async support)
+        - Prompts: prompt, ask_yn, menu, select_option, choose_from, choose_multiple
+        - Display: header, divider, status (colored output)
+        - Terminal control: clear_line, move_up
+        - Uses Term::Choose for keyboard-navigable menus
+        - Uses Term::ProgressSpinner for async-compatible spinners
+
+0.10    2026-01-11
+        [Socket Lifecycle]
+        - Added cleanup() method to Query for explicit socket cleanup
+        - Fixes socket accumulation in iteration loops (e.g., refactor_until_clean)
+        - SDK server sockets now cleaned up after each query iteration
+        - _resolve_pending_futures_on_finish now delegates to cleanup()
+
+0.08    2026-01-11
+        [Async Support]
+        - Async tool handlers: return Futures for non-blocking I/O
+        - Async hooks: callbacks can return Futures for async validation
+        - IO::Async::Loop passed to handlers/hooks for event-driven operations
+        - Backward compatible: sync handlers/hooks still work unchanged
+
+        [Debug Logging]
+        - Comprehensive operational logging (set CLAUDE_AGENT_DEBUG=1)
+        - Message lifecycle: receive, queue, deliver, process
+        - Socket lifecycle: connect, accept, close
+        - Tool execution: start, complete, results
+        - Hook execution: matchers, decisions, blocked tools
+
+        [Examples]
+        - examples/12-async-tool.pl: async tool patterns
+        - examples/13-async-hook.pl: async hook patterns
+
 0.07    2026-01-11
         - Added configurable logging system via Log::Any
         - New Claude::Agent::Logger module for default adapter setup

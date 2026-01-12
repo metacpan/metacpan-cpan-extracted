@@ -4,13 +4,13 @@
       "Jaap Karssenberg <pardus@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "File-DesktopEntry",
    "no_index" : {
@@ -45,12 +45,12 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/mbeijen/File-DesktopEntry/issues"
+         "web" : "https://codeberg.org/michielb/File-DesktopEntry/issues"
       },
       "repository" : {
-         "url" : "https://github.com/mbeijen/File-DesktopEntry"
+         "url" : "https://codeberg.org/michielb/File-DesktopEntry"
       }
    },
-   "version" : "0.22",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.23",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

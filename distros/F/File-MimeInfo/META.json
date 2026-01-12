@@ -4,7 +4,7 @@
       "Jaap Karssenberg <pardus@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -51,13 +51,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/mbeijen/File-MimeInfo/issues"
+         "web" : "https://codeberg.org/michielb/File-MimeInfo/issues"
       },
       "repository" : {
-         "url" : "https://github.com/mbeijen/File-MimeInfo"
+         "url" : "https://codeberg.org/michielb/File-MimeInfo"
       }
    },
-   "version" : "0.35",
+   "version" : "0.36",
    "x_contributors" : [
       "Bernhard RosenkrÃ¤nzer <bero@lindev.ch>",
       "Christian Ludwig <chrissicool@gmail.com>",
@@ -78,7 +78,8 @@
       "Stefan Seifert <nine@detonation.org>",
       "brian m. carlson <sandals@crustytoothpaste.net>",
       "gregor herrmann <gregoa@debian.org>",
-      "mazunki <rolferen@gmail.com>"
+      "mazunki <rolferen@gmail.com>",
+      "zhumengu <m.zhumeng@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

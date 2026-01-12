@@ -31,5 +31,13 @@ my $json_scalar = encode_json({ value => 42 });
 @result = $jq->run_query($json_scalar, '.value | slice(1, 2)');
 is($result[0], 42, 'slice leaves scalar values unchanged');
 
+my $non_numeric_start_ok = eval { $jq->run_query($json, '.numbers | slice("nope", 2)') };
+ok(!$non_numeric_start_ok && $@ =~ /slice\(\): start must be numeric/,
+    'slice() rejects non-numeric start values');
+
+my $non_numeric_length_ok = eval { $jq->run_query($json, '.numbers | slice(1, "nope")') };
+ok(!$non_numeric_length_ok && $@ =~ /slice\(\): length must be numeric/,
+    'slice() rejects non-numeric length values');
+
 
 done_testing();

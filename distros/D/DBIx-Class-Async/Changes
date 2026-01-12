@@ -1,5 +1,20 @@
 Revision history for DBIx::Class::Async
 
+0.25  2026-01-12
+      - Added sub DBIx::Class::Async::Row::id().
+
+0.24  2026-01-11
+      - Added the following methods to DBIx::Class::Async::Row
+        - is_column_changed
+        - make_columm_dirty
+        - get_dirty_columns
+        - set_column
+        - set_columns
+
+0.23  2026-01-11
+      - Improved DBIx::Class::Async::Schema::clone().
+      - Added dedicated unit test to cover the clone().
+
 0.22  2026-01-11
       - Added sub class() and populate() to DBIx::Class::Async::Schema.
 

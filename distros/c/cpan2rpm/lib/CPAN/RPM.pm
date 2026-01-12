@@ -3,7 +3,7 @@ package CPAN::RPM;
 use strict;
 use warnings;
 
-our $VERSION = "2.047";
+our $VERSION = "2.048";
 
 1;
 

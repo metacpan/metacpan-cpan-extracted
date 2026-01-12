@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Attribute;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011002';
+our $VERSION   = '0.012001';
 
 use parent 'Sub::Accessor::Small';
 
@@ -180,12 +180,6 @@ sub inline_access_w {
 	}
 	
 	return $me->SUPER::inline_access_w( $selfvar, $val );
-}
-
-sub requires_pp_constructor {
-	my $me = shift;
-	return !!1 unless $me->{storage} eq 'NONE' || $me->{storage} eq 'HASH';
-	return !!0;
 }
 
 my %cxsa_map = (
@@ -397,96 +391,6 @@ sub install_coderef {
 	return $me->SUPER::install_coderef( @_ );
 }
 
-# Mostly cribbed from Mite
-sub add_code_for_initialization {
-	my $me = shift;
-	my $code = shift;
-	
-	my $init_arg = defined($me->{init_arg}) ? $me->{init_arg} : $me->{slot};
-
-	my $D = do {
-		my $var = ref($me->{default}) eq 'CODE'
-			? $code->add_variable( '$default_for_' . $me->{slot}, \$me->{default} )
-			: 'DUMMY';
-		$me->inline_default( '$self', $var );
-	};
-	
-	if ( defined $me->{init_arg} or not exists $me->{init_arg} ) {
-		my ( $C, $P ) = ( '', '' );
-		my $V = sprintf '$args{%s}', B::perlstring($init_arg);
-		my $T = do {
-			if ( $me->{trigger} ) {
-				sub {
-					$code->add_variable( $me->make_var_name('trigger'), \$me->{trigger} );
-					$me->inline_trigger('$self');
-				},
-			}
-			else {
-				sub { '' };
-			}
-		};
-		my $N = 1;
-		
-		if ( ( exists $me->{default} or exists $me->{builder} ) and not $me->{lazy} ) {
-			if ( $me->{isa} ) {
-				$C = sprintf 'do { my $value = exists( %s ) ? %s : %s; ', $V, $V, $D;
-				$V = '$value';
-				$P = "}; $P";
-			}
-			else {
-				$V = sprintf '( exists( %s ) ? %s : %s )', $V, $V, $D;
-			}
-			$P = $T->() . $P;
-		}
-		elsif ( $me->{required} and not $me->{lazy} ) {
-			$code->addf( '%s("Missing key in constructor: %s") unless exists %s;', $me->_croaker, $init_arg, $V);
-		}
-		else {
-			$C .= sprintf 'if ( exists %s ) { ', $V;
-			$P = $T->() . '}' . $P;
-		}
-		
-		if ( $N and my $type = $me->{isa} ) {
-			if ( $me->{coerce} ) {
-				if ( $type->can('coercion') and $type->coercion->can('can_be_inlined') and $type->coercion->can_be_inlined ) {
-					$C .= sprintf 'do { my $to_coerce = %s; my $coerced_value = do { %s }; ', $V, $type->coercion->inline_coercion( '$to_coerce' );
-				}
-				elsif ( $type->can('coerce') ) {
-					my $var = $code->add_variable( '$type_for_' . $me->{slot}, \$type );
-					$C .= sprintf 'do { my $coerced_value = %s->coerce( %s ); ', $var, $V;
-				}
-				$V = '$coerced_value';
-				$P = "}; $P";
-			}
-			$C .= sprintf '%s or %s("Type check failed in constructor: %%s should be %%s", %s, %s); ',
-				do {
-					if ( $type->can_be_inlined ) {
-						$type->inline_check($V);
-					}
-					elsif ( $type->can('compiled_check') ) {
-						my $var = $code->add_variable( '$check_for_' . $me->{slot}, \$type->compiled_check );
-						sprintf '%s->( %s )', $var, $V;
-					}
-					else {
-						my $var = $code->add_variable( '$type_for_' . $me->{slot}, \$type );
-						sprintf '%s->check( %s )', $var, $V;
-					}
-				},
-				$me->_croaker,
-				B::perlstring($init_arg),
-				B::perlstring($type->display_name);
-		}
-		$C .= sprintf '%s; ', $me->inline_access_w('$self', $V);
-	
-		$code->add_line( $C . $P );
-	}
-	elsif ( ( exists $me->{default} or exists $me->{builder} ) and not $me->{lazy} ) {
-		$code->add_line( $me->inline_access_w( '$self', $D ) . ';' );
-	}
-	
-	$code->add_line( $me->inline_weaken('$self') ) if $me->{weak_ref};
-}
-
 sub allowed_constructor_parameters {
 	my $me = shift;
 	if ( exists $me->{init_arg} ) {
@@ -499,7 +403,7 @@ sub allowed_constructor_parameters {
 sub xs_constructor_args {
 	my $me = shift;
 	
-	return unless $me->{storage} eq 'HASH';
+	return if $me->{storage} eq 'NONE';
 	
 	my $name = $me->{slot};
 	my $req  = $me->{required} ? '!' : '';
@@ -513,6 +417,9 @@ sub xs_constructor_args {
 	$opt->{init_arg} = $me->{init_arg}  if exists $me->{init_arg};
 	$opt->{trigger}  = $me->{trigger}   if $me->{trigger};
 	$opt->{weak_ref} = $me->{weak_ref}  if $me->{weak_ref};
+	
+	$opt->{slot_initializer} = $me->writer if $me->{storage} ne 'HASH';
+	$opt->{slot_initializer} = $me->{slot_initializer} if $me->{slot_initializer};
 	
 	return ( $name . $req => $opt );
 }

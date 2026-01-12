@@ -1,8 +1,10 @@
-package Text::HTML::Turndown::Tables 0.09;
+package Text::HTML::Turndown::Tables 0.10;
 use 5.020;
 use experimental 'signatures';
 use stable 'postderef';
 use List::MoreUtils 'all';
+use List::Util 'max';
+use Text::Table;
 
 =head1 NAME
 
@@ -63,20 +65,35 @@ our %RULES = (
     },
 
     table => {
-        # Only convert tables with a heading row.
-        # Tables with no heading row are kept using `keep` (see below).
-        filter => sub ($rule, $node, $options) {
-            my $firstRow = $node->find('.//td/..', $node)->shift;
-            return    uc $node->nodeName eq 'TABLE'
-                   && $firstRow
-                   && isHeadingRow($firstRow)
-        },
+        filter => ['table'],
 
         replacement => sub( $content, $node, $options, $context ) {
             # Ensure there are no blank lines
-            $content =~ s/\n\n/\n/;
-            return "\n\n" . $content . "\n\n"
-        }
+            $content =~ s/\n\n/\n/g;
+            $content =~ s/^\s*//;
+            # Re-parse and re-layout the table:
+            my @table = split /\r?\n/, $content;
+            my @new_table;
+            my @column_width;
+            for my $row (@table) {
+                $row =~ s!^\|\s*!!;
+                $row =~ s!\s+\|\s*\z!!;
+                my @cols = map {s!^\s+!!; s!\s+\z!!r; } split /\|/, $row;
+                push @new_table, \@cols;
+            };
+            my $h = shift @new_table;
+            $h = [map { $_, \" | " } $h->@*];
+            pop $h->@*;
+            unshift $h->@*, \"| ";
+            push  $h->@*, \" |";
+            my $table = Text::Table->new(
+                $h->@*,
+            );
+            #shift @new_table;
+            $table->load( @new_table );
+            $content = "\n\n" . $table . "\n\n";
+        },
+
     },
 
     tableSection => {

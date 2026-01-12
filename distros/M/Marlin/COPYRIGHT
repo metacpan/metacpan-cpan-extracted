@@ -3,18 +3,7 @@ Upstream-Name: Marlin
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Marlin
 
-Files: README
- lib/Marlin.pm
- lib/Marlin/Manual/Comparison.pod
- lib/Marlin/Manual/Principles.pod
- lib/Marlin/Role.pm
- lib/Marlin/Struct.pm
- lib/Marlin/Util.pm
- lib/Marlin/X/Clone.pm
- lib/Marlin/XAttribute/Alias.pm
- lib/Marlin/XAttribute/LocalWriter.pm
- lib/Marlin/XAttribute/Lvalue.pm
- t/00start.t
+Files: t/00start.t
  t/01basic.t
  t/integration/alias.t
  t/integration/comparison-example.t
@@ -67,6 +56,20 @@ Files: Changes
  t/lib/Local/Mitey/MOP.pm
  t/lib/Local/Mitey/Mite.pm
 Copyright: Copyright 2026 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ lib/Marlin.pm
+ lib/Marlin/Manual/Comparison.pod
+ lib/Marlin/Manual/Principles.pod
+ lib/Marlin/Role.pm
+ lib/Marlin/Struct.pm
+ lib/Marlin/Util.pm
+ lib/Marlin/X/Clone.pm
+ lib/Marlin/XAttribute/Alias.pm
+ lib/Marlin/XAttribute/LocalWriter.pm
+ lib/Marlin/XAttribute/Lvalue.pm
+Copyright: This software is copyright (c) 2025-2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/MooX/Marlin.pm

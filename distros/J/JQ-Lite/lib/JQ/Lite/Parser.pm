@@ -42,7 +42,7 @@ sub parse_query {
                 my $trimmed = $rest;
                 $trimmed =~ s/^\s+|\s+$//g;
                 if ($trimmed =~ /^"(?:[^"\\]|\\.)*"$/s) {
-                    my $decoded = eval { JSON::PP::decode_json($trimmed) };
+                    my $decoded = eval { JQ::Lite::Util::_decode_json($trimmed) };
                     return $decoded if defined $decoded && !$@;
                 }
                 $rest;

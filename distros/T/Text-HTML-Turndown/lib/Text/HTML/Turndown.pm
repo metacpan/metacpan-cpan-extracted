@@ -1,4 +1,4 @@
-package Text::HTML::Turndown 0.09;
+package Text::HTML::Turndown 0.10;
 use 5.020;
 use Moo 2;
 use experimental 'signatures';
@@ -100,9 +100,6 @@ our %COMMONMARK_RULES = (
       filter => 'li',
 
         replacement => sub( $content, $node, $options, $context ) {
-        $content =~ s/^\n+//;       # remove leading newlines
-        $content =~ s/\n+$/\n/;     # replace trailing newlines with just a single one
-        $content =~ s/\n/\n    /gm; # indent
         my $prefix = $options->{bulletListMarker} . '   ';
         my $parent = $node->parentNode;
         if (uc $parent->nodeName eq 'OL') {
@@ -112,6 +109,9 @@ our %COMMONMARK_RULES = (
           my $index = first_index { $_->isEqual($node->_node) } @ch;
           $prefix = ($start ? $start + $index : $index + 1) . '.  '
         }
+        $content =~ s/^\n+//;       # remove leading newlines
+        $content =~ s/\n+$/\n/;     # replace trailing newlines with just a single one
+        $content =~ s/\n/"\n" . (' ' x length($prefix))/gem; # indent
         return (
           $prefix . $content . ($node->nextSibling && $content !~ /\n$/ ? "\n" : '')
         )
@@ -123,14 +123,14 @@ our %COMMONMARK_RULES = (
             return (
               $options->{codeBlockStyle} eq 'indented' &&
               uc $node->nodeName eq 'PRE' &&
-              $node->firstChild &&
-              uc $node->firstChild->nodeName eq 'CODE'
+              $node->firstNonBlankChild &&
+              uc $node->firstNonBlankChild->nodeName eq 'CODE'
             )
         },
         replacement => sub( $content, $node, $options, $context ) {
             return (
                 "\n\n    " .
-                ($node->firstChild->textContent =~ s/\n/\n    /gr) .
+                ($node->firstNonBlankChild->textContent =~ s/\n/\n    /gr) .
                 "\n\n"
             )
         },
@@ -141,8 +141,8 @@ our %COMMONMARK_RULES = (
             return (
               $options->{codeBlockStyle} eq 'fenced' &&
               uc $node->nodeName eq 'PRE' &&
-              $node->firstChild &&
-              uc $node->firstChild->nodeName eq 'CODE'
+              $node->firstNonBlankChild &&
+              uc $node->firstNonBlankChild->nodeName eq 'CODE'
             )
         },
 
@@ -151,7 +151,6 @@ our %COMMONMARK_RULES = (
             (my $language) = ($className =~ /language-(\S+)/);
             $language //= '';
             my $code = $node->firstChild->textContent;
-
             my $fenceChar = substr( $options->{fence}, 0, 1 );
             my $fenceSize = 3;
             my $fenceInCodeRegex = qr{^${fenceChar}{$fenceSize,}};

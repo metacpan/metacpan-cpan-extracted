@@ -17,11 +17,11 @@ DBIx::Class::Async::ResultSet - Asynchronous resultset for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.22
+Version 0.25
 
 =cut
 
-our $VERSION = '0.22';
+our $VERSION = '0.25';
 
 =head1 SYNOPSIS
 

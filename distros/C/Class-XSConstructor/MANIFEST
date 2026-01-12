@@ -31,6 +31,7 @@ t/10triggers.t
 t/11weaken.t
 t/12aliases.t
 t/13slotinit.t
+t/14undeftolerant.t
 t/30buildargs.t
 t/31foreignconstructor.t
 t/32foreignbuildargs.t

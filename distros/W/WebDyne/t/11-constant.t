@@ -11,6 +11,7 @@ use vars   qw($VERSION);
 #
 BEGIN {
     $ENV{'WEBDYNE_CONF'}='t/webdyne_constant.conf.pl';
+    $ENV{'WEBDYNE_ERROR_SHOW_EXTENDED'}=5;
 }
 
 
@@ -57,6 +58,10 @@ ok($WebDyne::WEBDYNE_DUMP_FLAG == 3);
 #  Expect constrant folded WEBDYNE_DUMP_FLAG not to changed, but 
 #  subroutine evaluated one should
 #
-ok(WEBDYNE_DUMP_FLAG==1);
+ok(WEBDYNE_DUMP_FLAG == 1);
 ok(&WEBDYNE_DUMP_FLAG == 3);
 
+
+#  Check environment setting OK and overrides default
+#
+ok(WEBDYNE_ERROR_SHOW_EXTENDED == 5);

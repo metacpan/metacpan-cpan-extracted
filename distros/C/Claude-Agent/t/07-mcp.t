@@ -38,11 +38,14 @@ is($hash->{name}, 'calculate', 'to_hash name');
 is($hash->{description}, 'Perform mathematical calculations', 'to_hash description');
 is($hash->{inputSchema}{type}, 'object', 'to_hash inputSchema');
 
-# Test execute
-my $result = $tool->execute({ expression => '2 + 2' });
+# Test execute (sync handler - returns Future wrapping hashref)
+my $future = $tool->execute({ expression => '2 + 2' });
+isa_ok($future, 'Future', 'execute returns a Future');
+ok($future->is_done, 'sync handler Future resolves immediately');
+my $result = $future->get;
 is($result->{content}[0]{text}, 'Result: 4', 'tool execution');
 
-# Test execute with error
+# Test execute with error (sync handler that dies)
 my $error_tool = Claude::Agent::MCP::ToolDefinition->new(
     name         => 'failing',
     description  => 'Always fails',
@@ -50,9 +53,75 @@ my $error_tool = Claude::Agent::MCP::ToolDefinition->new(
     handler      => sub { die "Intentional error" },
 );
 
-$result = $error_tool->execute({});
+$future = $error_tool->execute({});
+isa_ok($future, 'Future', 'error execute returns a Future');
+ok($future->is_done, 'error Future resolves immediately');
+$result = $future->get;
 ok($result->{is_error}, 'error tool returns is_error');
 like($result->{content}[0]{text}, qr/Error executing tool: failing/, 'error message includes tool name');
+
+# Test async handler (returns Future directly)
+use Future;
+my $async_tool = Claude::Agent::MCP::ToolDefinition->new(
+    name         => 'async_calc',
+    description  => 'Async calculation',
+    input_schema => {},
+    handler      => sub {
+        my ($args, $loop) = @_;
+        # Return an already-done Future (simulating async completion)
+        return Future->done({
+            content => [{ type => 'text', text => 'Async result: ' . ($args->{value} // 42) }],
+        });
+    },
+);
+
+$future = $async_tool->execute({ value => 100 });
+isa_ok($future, 'Future', 'async handler returns Future');
+ok($future->is_done, 'immediate async Future resolves');
+$result = $future->get;
+is($result->{content}[0]{text}, 'Async result: 100', 'async tool execution');
+
+# Test async handler with error
+my $async_error_tool = Claude::Agent::MCP::ToolDefinition->new(
+    name         => 'async_fail',
+    description  => 'Async failure',
+    input_schema => {},
+    handler      => sub {
+        return Future->fail("Async intentional error");
+    },
+);
+
+$future = $async_error_tool->execute({});
+isa_ok($future, 'Future', 'async error returns Future');
+ok($future->is_done, 'failed async Future wrapped with else resolves');
+$result = $future->get;
+ok($result->{is_error}, 'async error tool returns is_error');
+like($result->{content}[0]{text}, qr/Error executing tool: async_fail/, 'async error message includes tool name');
+
+# Test handler receives loop parameter
+my $loop_check_tool = Claude::Agent::MCP::ToolDefinition->new(
+    name         => 'loop_check',
+    description  => 'Checks loop parameter',
+    input_schema => {},
+    handler      => sub {
+        my ($args, $loop) = @_;
+        my $has_loop = defined $loop ? 'yes' : 'no';
+        return {
+            content => [{ type => 'text', text => "Has loop: $has_loop" }],
+        };
+    },
+);
+
+# Without loop
+$future = $loop_check_tool->execute({});
+$result = $future->get;
+is($result->{content}[0]{text}, 'Has loop: no', 'handler receives undef loop when not provided');
+
+# With loop (mock object)
+my $mock_loop = bless {}, 'IO::Async::Loop';
+$future = $loop_check_tool->execute({}, $mock_loop);
+$result = $future->get;
+is($result->{content}[0]{text}, 'Has loop: yes', 'handler receives loop when provided');
 
 # Test MCP::Server (SDK type)
 my $server = Claude::Agent::MCP::Server->new(

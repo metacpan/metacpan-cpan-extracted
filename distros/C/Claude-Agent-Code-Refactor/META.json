@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Claude::Agent" : "0.05",
+            "Claude::Agent" : "0.10",
             "Claude::Agent::Code::Review" : "0.01",
             "Future::AsyncAwait" : "0.60",
             "IO::Async" : "0.80",
@@ -61,6 +61,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Claude-Agent"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

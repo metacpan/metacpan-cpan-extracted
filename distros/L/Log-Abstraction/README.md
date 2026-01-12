@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 # VERSION
 
-0.26
+0.27
 
 # SYNOPSIS
 
@@ -169,7 +169,7 @@ If the input is defined, the result is a defined string with CR and LF character
         -------------------------------------------------
         sanitized! = [ c : raw? | c ≠ CR ∧ c ≠ LF ]
 
-## level
+## level($self, $level)
 
 Get/set the minimum level to log at.
 Returns the current level, as an integer.
@@ -207,7 +207,13 @@ Logs a notice message.
 
 Logs an error message. This method also supports logging to syslog if configured.
 If not logging mechanism is set,
-falls back to `Carp`.
+falls back to `Croak`.
+
+## fatal
+
+    $logger->fatal(@messages);
+
+Synonym of error.
 
 ## trace
 
@@ -271,7 +277,7 @@ You can also look for information at:
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2025 Nigel Horne
+Copyright (C) 2025-2026 Nigel Horne
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

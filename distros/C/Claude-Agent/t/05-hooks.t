@@ -77,7 +77,10 @@ my $logging_matcher = Claude::Agent::Hook::Matcher->new(
 );
 
 my $input_data = { tool_name => 'Test', tool_input => { arg => 'value' } };
-my $results = $logging_matcher->run_hooks($input_data, 'tool-id-123', {});
+# run_hooks now returns a Future
+my $future = $logging_matcher->run_hooks($input_data, 'tool-id-123', {});
+isa_ok($future, 'Future', 'run_hooks returns a Future');
+my $results = $future->get;
 
 is(scalar @$results, 2, 'both hooks ran');
 is(scalar @call_log, 2, 'both hooks logged');
@@ -106,7 +109,8 @@ $deny_matcher = Claude::Agent::Hook::Matcher->new(
     ],
 );
 
-$results = $deny_matcher->run_hooks({}, 'id', {});
+$future = $deny_matcher->run_hooks({}, 'id', {});
+$results = $future->get;
 is(scalar @deny_log, 1, 'second hook did not run after deny');
 is($results->[0]{decision}, 'deny', 'deny result returned');
 
@@ -117,9 +121,42 @@ my $error_matcher = Claude::Agent::Hook::Matcher->new(
     ],
 );
 
-$results = $error_matcher->run_hooks({}, 'id', {});
+$future = $error_matcher->run_hooks({}, 'id', {});
+$results = $future->get;
 is($results->[0]{decision}, 'error', 'error caught and reported');
 is($results->[0]{error}, 'Hook execution failed', 'error message sanitized');
+
+# Test async hooks (returning Future)
+use Future;
+my $async_matcher = Claude::Agent::Hook::Matcher->new(
+    hooks => [
+        sub {
+            my ($input, $tool_use_id, $context, $loop) = @_;
+            # Return an immediate Future
+            return Future->done({ decision => 'allow', reason => 'Async allowed' });
+        },
+    ],
+);
+
+$future = $async_matcher->run_hooks({}, 'id', {});
+isa_ok($future, 'Future', 'async hook returns Future');
+$results = $future->get;
+is($results->[0]{decision}, 'allow', 'async hook decision returned');
+is($results->[0]{reason}, 'Async allowed', 'async hook reason returned');
+
+# Test async hook with failure
+my $async_fail_matcher = Claude::Agent::Hook::Matcher->new(
+    hooks => [
+        sub {
+            return Future->fail("Async hook failed");
+        },
+    ],
+);
+
+$future = $async_fail_matcher->run_hooks({}, 'id', {});
+$results = $future->get;
+is($results->[0]{decision}, 'error', 'async failure caught');
+is($results->[0]{error}, 'Hook execution failed', 'async error message sanitized');
 
 # Test Hook::Result factory methods
 my $continue_result = Claude::Agent::Hook::Result->proceed();

@@ -753,7 +753,9 @@ sub apply {
         # support for reverse
         if ($part eq 'reverse') {
             @next_results = map {
-                ref $_ eq 'ARRAY' ? [ reverse @$_ ] : $_
+                ref $_ eq 'ARRAY' ? [ reverse @$_ ]
+                : JQ::Lite::Util::_is_string_scalar($_) ? scalar reverse $_
+                : $_
             } @results;
             @$out_ref = @next_results;
             return 1;
@@ -1586,8 +1588,7 @@ sub apply {
 
         # support for join(", ")
         if ($part =~ /^join\((.*?)\)$/) {
-            my $sep = $1;
-            $sep =~ s/^['"](.*?)['"]$/$1/;  # remove quotes around separator
+            my $sep = JQ::Lite::Util::_parse_string_argument($1);
 
             @next_results = map {
                 die 'join(): input must be an array' if ref($_) ne 'ARRAY';

@@ -64,6 +64,16 @@ BEGIN{
   # Disable buffering
   STDERR->autoflush(1);
   STDOUT->autoflush(1);
+
+  # NO!  Momentarily I thought it would be a Good Thing to set a standard
+  # terminal width in COLUMNS ignoring the actual terminal.  But some
+  # modules test term width autodetect by unsetting COLUMNS and would
+  # then get a (possibly) different result.
+  #
+  # So it is necessary for *every* package which probes for terminal width
+  # use robust code which won't fail even if there is no terminal
+  # (which is gross -- see Data::Dumper::Interp::_get_terminal_width)
+  ##$ENV{COLUMNS} = 80;
 }
 use POSIX ();
 use utf8;
@@ -80,6 +90,7 @@ our @EXPORT = qw/silent
                  fmt_codestring
                  verif_no_internals_mentioned
                  insert_loc_in_evalstr verif_eval_err
+                 tdir
                  timed_run
                  mycheckeq_literal expect1 mycheck _mycheck_end
                  arrays_eq hash_subset
@@ -94,12 +105,6 @@ our @EXPORT_OK = qw/$savepath $debug $silent $verbose %dvs dprint dprintf/;
 use Import::Into;
 use Data::Dumper;
 
-unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
-  # unless we are testing DDI
-  #$Data::Dumper::Interp::Foldwidth = undef; # use terminal width
-  $Data::Dumper::Interp::Useqq = "controlpics:unicode";
-}
-
 use Cwd qw/getcwd abs_path/;
 use POSIX qw/INT_MAX/;
 use File::Basename qw/dirname/;
@@ -107,11 +112,20 @@ use Capture::Tiny qw/capture capture_merged tee_merged/;
 use Env qw/@PATH @PERL5LIB/;  # ties @PATH, @PERL5LIB
 use Config;
 
+BEGIN {
+  unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
+    # Unless we are testing DDI
+    #$Data::Dumper::Interp::Foldwidth = undef; # use terminal width
+    $Data::Dumper::Interp::Useqq = "controlpics:unicode";
+  }
+}
+
 sub bug(@) { @_=("BUG FOUND:",@_); goto &Carp::confess }
 
 # Parse manual-testing args from @ARGV
 my @orig_ARGV = @ARGV;
-our ($debug, $verbose, $silent, $savepath, $nobail, $nonrandom, %dvs);
+our ($debug, $verbose, $silent, $savepath, $nobail, $nonrandom,
+     $workdir, %dvs);
 use Getopt::Long qw(GetOptions);
 Getopt::Long::Configure("pass_through");
 GetOptions(
@@ -121,6 +135,7 @@ GetOptions(
   "nobail"            => \$nobail,
   "n|nonrandom"       => \$nonrandom,
   "v|verbose"         => \$verbose,
+  "workdir=s"         => \$workdir,
 ) or die "bad args";
 Getopt::Long::Configure("default");
 say "> ARGV PASSED THROUGH: ",join(",",map{ "'${_}'" } @ARGV)
@@ -152,6 +167,25 @@ if ($nonrandom) {
   }
 }
 
+# Return a Path::Tiny object to a temporary directory, which may be
+# specified with the --workdir command-line arg.
+sub tdir() {
+  state $tdir;
+  if (! $tdir) {
+    if ($workdir) {
+      $workdir = path($workdir);
+      if ($workdir->exists) {
+        warn("# Removing old workdir ", qsh($workdir),"\n");
+        $workdir->remove_tree;
+      }
+      $tdir = $workdir->mkdir;
+    } else {
+      $tdir = Path::Tiny->tempdir();
+    }
+  };
+  $tdir
+}
+
 sub import {
   my $target = caller;
 
@@ -174,8 +208,12 @@ sub import {
   #  Do not inport 1- and 2- or 3- character upper-case names, which are
   #  likely to clash with user variables and/or spreadsheet column letters
   #  (when using Spreadsheet::Edit).
+  #
+  #  The :no-Test2 tag is used by subtest .pl scripts which must not
+  #  generate any Test2 events!
   unless (delete $tags{":no-Test2"}) {
-    require Test2::V0; # a huge collection of tools
+    require Test2::V0; # a huge collection of tools (n.b. version is in dist.ini)
+    Test2::V0->VERSION(1.302214);  # AutoPrereqs *does* see this!
     Test2::V0->import::into($target,
       -no_warnings => 1,
       (map{ "!$_" } "A".."AAZ")
@@ -278,7 +316,7 @@ warn "============= DUMP OF -$1$2 FILE ===========\n", "".scalar($tf->slurp_utf8
     }
     for (my $ix=0; $ix <= $#perlargs; $ix++) {
       for ($perlargs[$ix]) {
-        if (/^-\*[Ee]/) { oops "unhandled perl arg" }
+        if (/^-[eE]/ or /^-[^-CIM].*[Ee]/) { oops "unhandled perl arg '$_'" }
         s/"/\\"/g;
         if (/[\s\/"']/) {
           $_ = '"' . $_ . '"';
@@ -417,7 +455,7 @@ my $testee_top_module;
 for (my $path=path(__FILE__);
              $path ne Path::Tiny->rootdir; $path=$path->parent) {
   if (-e (my $p = $path->child("dist.ini"))) {
-    $p->slurp_utf8() =~ /^ *name *= *(\S+)/i or oops;
+    $p->slurp_utf8() =~ /^ *name *= *(\S+)/im or oops;
     ($testee_top_module = $1) =~ s/-/::/g;
     last
   }
@@ -452,13 +490,19 @@ sub verif_no_internals_mentioned($) { # croaks if references found
   s#\b(\bt_\w+).pm(\W|$)#<$1 .pm>$2#gs;
 
   my $msg;
-  if (/\b(?<hit>${testee_top_module}::[\w:]*)/) {
-    $msg = "ERROR: Log msg or traceback mentions internal package '$+{hit}'"
+  if (/\b(?<hit>${testee_top_module}::)/) {
+    $msg = "ERROR: Log msg or traceback mentions internal sub '$+{hit}'"
+      ###TEMP
+      #.dvis('\n($testee_top_module)\n')
+      #."(IN:$_)\n"
+      ;
   }
   elsif (/(?<hit>[-.\w\/]+\.pm\b)/s) {
     $msg = "ERROR: Log msg or traceback mentions non-test .pm file '$+{hit}'"
   }
   if ($msg) {
+    ###TEMP
+    #die "---XXX---\n$msg\n$_\n---YYY---\n";
     my $start = $-[1]; # offset of start of item
     my $end   = $+[1]; # offset of end+1
     substr($_,$start,0) = "HERE>>>";
@@ -810,15 +854,21 @@ sub clean_capture_output($) {
 
 sub my_capture(&) {
   my ($out, $err, @results) = &capture($_[0]);
-  return( clean_capture_output($out), clean_capture_output($err), @results );
+  $out = clean_capture_output($out);
+  $err = clean_capture_output($err);
+  confess "my_capture: Must be called in list context to receive both stdout & err"
+    unless wantarray;
+  return( $out, $err, @results );
 }
 sub my_capture_merged(&) {
   my ($merged, @results) = &capture_merged($_[0]);
-  return( clean_capture_output($merged), @results );
+  $merged = clean_capture_output($merged);
+  return( wantarray ? ($merged, @results) : $merged );
 }
 sub my_tee_merged(&) {
   my ($merged, @results) = &tee_merged($_[0]);
-  return( clean_capture_output($merged), @results );
+  $merged = clean_capture_output($merged);
+  return( wantarray ? ($merged, @results) : $merged );
 }
 
 1;

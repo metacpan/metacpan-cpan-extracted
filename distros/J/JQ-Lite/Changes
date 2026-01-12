@@ -1,3 +1,27 @@
+2.14  2026-01-12
+
+  - Validate slice() start/length arguments and raise clear errors when
+    non-numeric values are provided.
+  - Expand slice() tests to cover invalid argument errors.
+
+2.13  2026-01-12
+
+  - Parse join() separators with the shared string argument decoder so
+    escape sequences (like "\t" and "\n") are honored.
+  - Expand join() tests to cover escaped separators.
+
+2.12  2026-01-12
+
+  - Add string scalar support to reverse() so it reverses plain strings while
+    leaving non-string scalars unchanged.
+  - Expand reverse() coverage for string and numeric-string inputs.
+
+2.11  2026-01-12
+
+  - Decode quoted field names with the shared JSON decoder for consistent
+    behavior on older Perl versions.
+  - Bump module version and documentation to 2.11.
+
 2.10  2026-01-11
 
   - Improve mode() handling for nested values by generating recursive keys.
@@ -1323,6 +1347,7 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
 
 
 

@@ -58,7 +58,7 @@ my %Package;
 
 #  Version information
 #
-$VERSION='2.060';
+$VERSION='2.065';
 
 
 #  Debug load
@@ -796,6 +796,12 @@ sub _radio_checkbox_group {
     #
     my $param_hr=($self->{'_Vars'} ||= $self->Vars()) ||
         return err('unable able to CGI::Simple Vars');
+        
+        
+    #  And CGI object
+    #
+    my $cgi_or=$self->CGI() ||
+        return err('unable to get CGI object');
 
 
     #  Hold generated HTML in array until end
@@ -810,6 +816,7 @@ sub _radio_checkbox_group {
         map {$attr_group{$attr}{$_}=1} @{(ref($attr{$attr}) eq 'ARRAY') ? $attr{$attr} : [$attr{$attr}]}
             if $attr{$attr};
     }
+    debug('attr_group: %s', Dumper(\%attr_group));
 
 
     #  If values is a hash not an array then convert to array and use hash as values
@@ -827,12 +834,18 @@ sub _radio_checkbox_group {
 
     #  Make sure checked values persist by default unless "force" attribute used to override
     #
-    if ($attr_hr->{'name'} && (my $checked=$param_hr->{$attr_hr->{'name'}}) && !$attr_hr->{'force'}) {
+    #if ($attr_hr->{'name'} && (my $checked=$param_hr->{$attr_hr->{'name'}}) && !$attr_hr->{'force'}) {
+    if ($attr_hr->{'name'} && (my @checked=$cgi_or->param($attr_hr->{'name'})) && !$attr_hr->{'force'}) {
 
         #  The tag has a name, and has some selected (checked) values from a form submision. Map the submitted values 
         #  into the checked attribute, splitting on \0 as per spec
         #
-        $attr_group{'checked'} = { map { $_=>1 } (split(/\0/, $checked)) }
+        #  UPDATE: changed to accommodate use of Hash::Multivalue params now
+        #
+        my @checked=$cgi_or->param($attr_hr->{'name'});
+        debug('checked: %s', Dumper(\@checked));
+        #$attr_group{'checked'} = { map { $_=>1 } (split(/\0/, $checked)) }
+        $attr_group{'checked'} = { map { $_=>1 } @checked }
 
     }
     else {
@@ -912,6 +925,17 @@ sub checkbox {
     #
     my $param_hr=($self->{'_Vars'} ||= $self->Vars()) ||
         return err('unable able to CGI::Simple Vars');
+        
+
+    #  And CGI object
+    #
+    my $cgi_or=$self->CGI() ||
+        return err('unable to get CGI object');
+    
+
+    #  Var to hold hidden tag
+    #
+    my $hidden='';
 
     
     #  Massage to set default value of "1" for checkboxes if no value
@@ -923,7 +947,8 @@ sub checkbox {
             #  Add hidden field with same name but 0 value
             #
             debug("using hidden field for checkbox: $name, setting checked value to 1 if selected");
-            push @html, $self->hidden({ name=>$name, value=>0, force=>1 });
+            #push @html, $self->hidden({ name=>$name, value=>0, force=>1 });
+            $hidden=$self->hidden({ name=>$name, value=>0, force=>1 });
             
             
             #  Set value of this checkbox (if checked) to 1
@@ -933,9 +958,14 @@ sub checkbox {
             
             #  Add up all values for this checkbox now.
             #
+            #  UPDATE: Changed to accommodate use of Hash::Multivalue params now.            
+            #
             my $checked;
-            if (my $value=$param_hr->{$name}) {
-                map { $checked+=int($_) } split(/\0/, $value);
+            #if (my $value=$param_hr->{$name}) {
+            #    map { $checked+=int($_) } split(/\0/, $value);
+            #}
+            if (my @value=$cgi_or->param($name)) {
+                map { $checked+=int($_) } @value;
             }
             
             
@@ -979,7 +1009,7 @@ sub checkbox {
     #return shift()->_radio_checkbox('checkbox', @_)
     #return $self->_radio_checkbox('checkbox', grep {$_} $attr_hr, @_) . join(undef, grep {$_} @html);
     debug('calling radio_checkbox');
-    return $self->_radio_checkbox('checkbox', \%attr, join('', @html))
+    return $hidden.$self->_radio_checkbox('checkbox', \%attr, join('', @html))
 }
 
 
@@ -999,6 +1029,12 @@ sub popup_menu {
     #
     my $param_hr=($self->{'_Vars'} ||= $self->Vars()) ||
         return err('unable able to CGI::Simple Vars');
+
+
+    #  And CGI object
+    #
+    my $cgi_or=$self->CGI() ||
+        return err('unable to get CGI object');
 
 
     #  Hold generated HTML in array until end
@@ -1069,12 +1105,16 @@ sub popup_menu {
     
     #  Make sure selected values persist by default unless "force" attribute used to override
     #
-    if ($attr_hr->{'name'} && (my $selected=$param_hr->{$attr_hr->{'name'}}) && !$attr_hr->{'force'}) {
+    #if ($attr_hr->{'name'} && (my $selected=$param_hr->{$attr_hr->{'name'}}) && !$attr_hr->{'force'}) {
+    if ($attr_hr->{'name'} && (my @selected=$cgi_or->param($attr_hr->{'name'})) && !$attr_hr->{'force'}) {
 
         #  The tag has a name, and has some selected (checked) values from a form submision. Map the submitted values 
         #  into the selected field, splitting on \0 as per spec
         #
-        $attr_option{'selected'} = { map { $_=>1 } (split(/\0/, $selected)) }
+        #  UPDATE: changed to accommodate use of Hash::Multivalue params now
+        #
+        #$attr_option{'selected'} = { map { $_=>1 } (split(/\0/, $selected)) }
+        $attr_option{'selected'} = { map { $_=>1 } @selected }
 
     }
     else {

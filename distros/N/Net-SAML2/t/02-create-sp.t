@@ -76,7 +76,7 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
         'dsig:Signature', "First node is the signature");
 
     is(
-        'e73560b0e23602121aedc55bcb1ca637',
+        '44e55d658c4b8bdf740cae7a0b200488',
         $sp->key_name('signing'),
         "Got a key name for the signing key"
     );
@@ -260,7 +260,7 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
 }
 
 {
-    my $sp = net_saml2_sp( ( encryption_key => 't/sign-nopw-cert.pem' ) );
+    my $sp = net_saml2_sp( ( encryption_key => 't/net-saml2-cert.pem' ) );
 
     my $xpath = get_xpath(
         $sp->metadata,
@@ -283,12 +283,12 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
         "encryption", "Key descriptor is there for encryption");
 
     is(
-        'e73560b0e23602121aedc55bcb1ca637',
+        '44e55d658c4b8bdf740cae7a0b200488',
         $sp->key_name('signing'),
         "Got a key name for the signing key"
     );
     is(
-        'e73560b0e23602121aedc55bcb1ca637',
+        '44e55d658c4b8bdf740cae7a0b200488',
         $sp->key_name('encryption'),
         "... and we also have a encryption key name"
     );

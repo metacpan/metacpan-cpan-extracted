@@ -11,4 +11,6 @@
 #  <http://dev.perl.org/licenses/>
 #
 <start_html>
+<h1>WebDyne Test File</h1>
+<p>
 The local server time is: <? localtime() ?>

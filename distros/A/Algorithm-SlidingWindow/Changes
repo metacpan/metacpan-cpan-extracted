@@ -1,0 +1,7 @@
+Revision history for Algorithm::SlidingWindow
+
+1.000 2026-1-11
+  - production ready
+
+1.001 2026-1-11
+  - Corrections to POD

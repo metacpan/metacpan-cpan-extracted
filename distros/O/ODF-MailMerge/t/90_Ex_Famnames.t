@@ -42,8 +42,6 @@ my $lopath = openlibreoffice_path();
 skip_all("LibreOffice is not avaialble") unless $lopath;
 note "Using ", $lopath;
 
-my $tdir = Path::Tiny->tempdir();
-
 my $scriptpath     = path($Bin)->child("../share/examples/Ex_Famnames.pl");
 my $ref_txt_gzpath = path($Bin)->child("../tlib/Ex_Famnames_output.txt.gz");
 
@@ -63,16 +61,16 @@ my $ref_octets;
 gunzip $ref_txt_gzpath->canonpath => \$ref_octets or die "gunzip: $GunzipError";
 my $ref_text = decode("UTF-8", $ref_octets);
 
-my $odt_outpath = path($tdir)->child("output.odt");
-my $txt_outpath = path($tdir)->child("output.txt");
+my $odt_outpath = tdir()->child("output.odt");
+my $txt_outpath = tdir()->child("output.txt");
 
 run_perlscript($scriptpath->canonpath,"--quiet","-o",$odt_outpath->canonpath);
 
 { my $saved_cwd = Path::Tiny->cwd;
   scope_guard { chdir $saved_cwd or die; note "chdir back to $saved_cwd"; };
 
-  note "chdir $tdir";
-  chdir $tdir or die "$tdir : $!";
+  note "chdir ${\tdir()}";
+  chdir tdir() or oops tdir();
 
   my @cmd = ($lopath, "--convert-to", "txt:Text (encoded):UTF8", $odt_outpath);
   note "> system @cmd";

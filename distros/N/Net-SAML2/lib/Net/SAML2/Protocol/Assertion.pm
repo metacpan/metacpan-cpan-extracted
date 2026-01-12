@@ -1,7 +1,7 @@
 package Net::SAML2::Protocol::Assertion;
 use Moose;
 
-our $VERSION = '0.83'; # VERSION
+our $VERSION = '0.84'; # VERSION
 
 use MooseX::Types::DateTime qw/ DateTime /;
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
@@ -380,7 +380,7 @@ Net::SAML2::Protocol::Assertion - SAML2 assertion object
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 SYNOPSIS
 
@@ -503,23 +503,13 @@ Assertions validity period as specified in its Conditions element.
 Returns true if the response status is a success, returns false otherwise.
 In case the assertion isn't successfull, the L</response_status> and L</response_substatus> calls can be use to see why the assertion wasn't successful.
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
-
-Chris Andrews  <chrisa@cpan.org>
-
-=item *
+=head1 AUTHOR
 
 Timothy Legge <timlegge@gmail.com>
 
-=back
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Venda Ltd, see the CONTRIBUTORS file for others.
+This software is copyright (c) 2026 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

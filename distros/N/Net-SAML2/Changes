@@ -1,5 +1,29 @@
 Revision history for Perl extension Net::SAML2.
 
+0.84 -- Sun Jan 11 21:53:44 AST 2026
+
+    [Significant Changes]
+    - none
+    - testsuite: Replaced old keys and certs that caused test failures
+    - We no longer test sha1 based signatures although they are supported
+    - XML::Sig made Crypt::OpenSSL::DSA optional - should cause no issues
+
+    [Compatibility Deprecation Warning]
+    As of Release 0.79 the following have been changed and the old version may be
+    removed in an upcoming release.
+
+    - Net::SAML2::Protocol::Artifact
+        - response_to changed to in_response_to
+    - Net::SAML2::Protocol::LogoutResponse
+        - response_to changed to in_response_to
+
+    [Detailed Change Log]
+    - b1e0005 Increment Year and Version for a release
+    - c79ebab Add a Security Policy
+    - 931b77c replace all old cert, key and cacert references with newer versions
+    - 21c9d3e swap "got" and "expected" to put them in the correct order
+    - f38ad6d v0.83
+
 0.83 -- Fri Nov 07 22:39:52 AST 2025
 
     [Significant Changes]

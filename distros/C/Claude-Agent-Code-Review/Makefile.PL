@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
         'Test::Deep'      => '1.0',
     },
     PREREQ_PM => {
-        'Claude::Agent'      => '0.05',
+        'Claude::Agent'      => '0.10',
         'Marlin'             => '0.007000',
         'Cpanel::JSON::XS'   => '4.0',
         'Path::Tiny'         => '0.100',

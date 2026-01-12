@@ -5,6 +5,7 @@ use JQ::Lite;
 
 my $json = q({
   "title": "  Hello World  ",
+  "whitespace": " \n\t  ",
   "tags": [" perl ", "json ", "cli"],
   "score": 5,
   "mixed": [" spaced ", null, {"keep": "  untouched  "}]
@@ -30,6 +31,9 @@ is_deeply(
 );
 
 like($trimmed_title[0], qr/^\S.*\S$/, 'result has no surrounding whitespace');
+
+my @trimmed_whitespace = $jq->run_query($json, '.whitespace | trim');
+is($trimmed_whitespace[0], '', 'trim converts whitespace-only strings to empty');
 
 note('ensure undef input stays undef');
 my @defaulted = $jq->run_query($json, '.missing? | trim | default("fallback")');

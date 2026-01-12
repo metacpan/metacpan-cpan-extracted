@@ -6,3 +6,9 @@ Revision history for Term-ProgressSpinner
 0.05    2020/10/20
         - Update Makefile dependencies with latest versions (<=(tests)=>)
 	- Adds precision feature that allows you to limit times/durations to n decimal places (<-(milliseconds)->)
+
+1.02    2026/01/11
+        - Add IO::Async integration for async spinner animation
+        - New start_async($loop, %opts) method to animate spinners via IO::Async::Timer::Periodic
+        - New stop_async($message) method to stop async spinners with optional completion message
+        - Uses existing message template and draw infrastructure

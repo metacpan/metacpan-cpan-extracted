@@ -21,6 +21,7 @@ do { my $x = {
                                       'CPAN' => '0',
                                       'CPAN::FirstTime' => '0',
                                       'Opcode' => '0',
+                                      'feature' => '0',
                                       'strict' => '0',
                                       'utf8' => '0',
                                       'warnings' => '0'

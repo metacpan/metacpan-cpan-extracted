@@ -19,11 +19,12 @@ no_index:
     - t
     - inc
 requires:
-  Claude::Agent: '0'
-  Future::AsyncAwait: '0'
-  IO::Async::Loop: '0'
-  Marlin: '0'
+  Claude::Agent: '0.11'
+  Future::AsyncAwait: '0.60'
+  IO::Async: '0.80'
+  Marlin: '0.007000'
   Scalar::Util: '0'
+  Types::Standard: '2.0'
   perl: '5.020'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

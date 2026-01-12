@@ -1532,6 +1532,10 @@ sub _apply_slice {
         my $raw_start = @args ? $args[0] : 0;
         my $start     = 0;
 
+        if (defined $raw_start && !looks_like_number($raw_start)) {
+            die 'slice(): start must be numeric';
+        }
+
         if (defined $raw_start && looks_like_number($raw_start)) {
             $start = int($raw_start);
         }
@@ -1541,6 +1545,10 @@ sub _apply_slice {
         return []        if $start >= $size;
 
         my $length;
+        if (@args > 1 && defined $args[1] && !looks_like_number($args[1])) {
+            die 'slice(): length must be numeric';
+        }
+
         if (@args > 1 && defined $args[1] && looks_like_number($args[1])) {
             $length = int($args[1]);
         }

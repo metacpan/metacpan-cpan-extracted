@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README
+SECURITY.md
 SIGNATURE
 TUTORIAL.md
 cpanfile
@@ -73,7 +74,6 @@ t/author/01-confirm-schema.t
 t/author/notabs.t
 t/author/pod.t
 t/author/podcoverage.t
-t/cacert.pem
 t/data/cacert-azure.pem
 t/data/cacert-google.pem
 t/data/cacert-samlid.pem
@@ -103,4 +103,3 @@ t/net-saml2-cert.pem
 t/net-saml2-idp-metadata.xml
 t/net-saml2-key.pem
 t/net-saml2-metadata.xml
-t/sign-nopw-cert.pem

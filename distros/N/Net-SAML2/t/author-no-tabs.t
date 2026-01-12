@@ -76,7 +76,6 @@ my @files = (
     't/author/notabs.t',
     't/author/pod.t',
     't/author/podcoverage.t',
-    't/cacert.pem',
     't/data/cacert-azure.pem',
     't/data/cacert-google.pem',
     't/data/cacert-samlid.pem',
@@ -105,8 +104,7 @@ my @files = (
     't/net-saml2-cert.pem',
     't/net-saml2-idp-metadata.xml',
     't/net-saml2-key.pem',
-    't/net-saml2-metadata.xml',
-    't/sign-nopw-cert.pem'
+    't/net-saml2-metadata.xml'
 );
 
 notabs_ok($_) foreach @files;

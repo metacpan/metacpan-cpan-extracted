@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.10
+    version 2.11
 
 SYNOPSIS
 
@@ -2520,10 +2520,10 @@ SEE ALSO
 
  Other Foreign Function Interfaces
 
-    Dyn
+    Affix
 
-      A wrapper around dyncall <https://dyncall.org>, which is itself an
-      alternative to libffi <https://sourceware.org/libffi/>.
+      A wrapper around infix <https://github.com/sanko/infix>, an
+      FFI-focused just-in-time (JIT) compiler.
 
     NativeCall
 

@@ -9,7 +9,7 @@ use List::Util 1.45 qw( uniq );
 
 BEGIN {
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.018001';
+	our $VERSION   = '0.019000';
 	
 	if ( eval { require Types::Standard; 1 } ) {
 		Types::Standard->import(
@@ -123,9 +123,9 @@ sub import {
 			_croak("Required attribute $name cannot have undef init_arg");
 		}
 		
-		my @unknown_keys = sort grep !/\A(isa|required|is|default|builder|coerce|init_arg|trigger|weak_ref|alias|slot_initializer)\z/, keys %spec;
+		my @unknown_keys = grep !/\A(isa|required|is|default|builder|coerce|init_arg|trigger|weak_ref|alias|slot_initializer|undef_tolerant)\z/, keys %spec;
 		if ( @unknown_keys ) {
-			_croak("Unknown keys in spec: %d", join ", ", @unknown_keys);
+			_croak("Unknown keys in spec: %s", join ", ", sort @unknown_keys);
 		}
 		
 		my %meta_attribute = (
@@ -168,6 +168,10 @@ sub import {
 		
 		if ( is_CodeRef $spec{slot_initializer} ) {
 			$meta_attribute{slot_initializer} = $spec{slot_initializer};
+		}
+		
+		if ( exists $spec{undef_tolerant} ) {
+			$meta_attribute{undef_tolerant} = !!$spec{undef_tolerant};
 		}
 		
 		# Add new attribute
@@ -332,6 +336,7 @@ sub _build_flags {
 	$flags |= XSCON_FLAG_WEAKEN                if $spec->{weak_ref};
 	$flags |= XSCON_FLAG_HAS_ALIASES           if $spec->{alias};
 	$flags |= XSCON_FLAG_HAS_SLOT_INITIALIZER  if $spec->{slot_initializer};
+	$flags |= XSCON_FLAG_UNDEF_TOLERANT        if $spec->{undef_tolerant};
 	
 	my $has_common_default = 0;
 	if ( exists $spec->{default} and !defined $spec->{default} ) {
@@ -506,8 +511,9 @@ but it's fairly limited. It basically just does:
     bless { @_ }, ref($class)||$class;
   }
 
-Class::XSConstructor goes a little further towards Moose-like constructors,
-adding the following features:
+Class::XSConstructor goes a little further and supports all Moose's
+constructor features plus a few more. (That doesn't mean it supports
+Moose features unrelated to constructors!)
 
 =over
 
@@ -542,15 +548,15 @@ Supports defaults and builders.
 
 For example:
 
-  use Class::XSAccessor name => { default => '__ANON__' };
+  use Class::XSConstructor name => { default => '__ANON__' };
 
 Or:
 
-  use Class::XSAccessor name => { default => sub { return '__ANON__' } };
+  use Class::XSConstructor name => { default => sub { return '__ANON__' } };
 
 Or:
 
-  use Class::XSAccessor name => { builder => '__fallback_name' };
+  use Class::XSConstructor name => { builder => '__fallback_name' };
   sub __fallback_name {
     return '__ANON__';
   }
@@ -558,7 +564,7 @@ Or:
 You can alternatively provide a string of Perl code that will be evaluated
 to generate the default:
 
-  use Class::XSAccessor name => { default => \'sprintf("__%s__", uc "anon")' };
+  use Class::XSConstructor name => { default => \'sprintf("__%s__", uc "anon")' };
 
 If you expect subclasses to need to override defaults, use a builder.
 Subclasses can simply provide a method of the same name.
@@ -577,7 +583,7 @@ are all very common values to choose as defaults:
 
 If an attribute has a default or builder, its "required" status is ignored.
 
-Builders and coderef defaults are likely to siginificantly slow down your
+Builders and coderef defaults are likely to significantly slow down your
 constructor.
 
 =item *
@@ -646,7 +652,7 @@ Type coercions.
 
 If your type constraint is a Type::Tiny object which provides a coercion:
 
-  coercion => 1
+  coerce => 1
 
 Otherwise:
 
@@ -719,6 +725,28 @@ object techniques, or encrypt before storing.
 
 Obviously your accessors will also need to be written to be able to access
 the value from wherever you've stored it.
+
+Custom slot initializers are likely to siginificantly slow down your
+constructor.
+
+=item *
+
+Undef-tolerant attributes.
+
+  package My::Class {
+    use Class::XSConstructor foo => { undef_tolerant => 1 };
+  }
+  
+  my $thing1 = My::Class->new( foo => 42 );
+  exists $thing1->{foo};   # true
+  
+  my $thing2 = My::Class->new( foo => undef );
+  exists $thing2->{foo};   # false
+
+If an attribute is undef-tolerant, it means that setting it to C<undef>
+in the constructor is equivalent to not setting it at all. If it has a
+default, it will be used. Otherwise, if it was a required attribute,
+this will throw an error.
 
 =item * 
 
@@ -873,7 +901,12 @@ Type constraints (except for the specially optimized ones) and type coercions.
 
 =item *
 
-Defining any C<BUILD> methods or inheriting from classes which do.
+Custom slot initializers.
+
+=item *
+
+Defining any C<BUILD> or C<BUILDARGS> methods or inheriting from classes which
+do.
 
 =back
 

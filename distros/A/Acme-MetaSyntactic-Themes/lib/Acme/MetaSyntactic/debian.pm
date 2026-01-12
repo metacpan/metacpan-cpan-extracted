@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::debian;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 __PACKAGE__->init();
 1;
 
@@ -24,6 +24,13 @@ Philippe Bruhat (Book).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2026-01-12 - v1.006
+
+Added C<trixie> to the list of Debiam codenames.
+Published in Acme-MetaSyntactic-Themes version 1.055.
 
 =item *
 
@@ -88,5 +95,5 @@ hamm slink potato
 woody sarge etch
 lenny squeeze wheezy
 jessie stretch buster
-bullseye bookworm
+bullseye bookworm trixie
 sid

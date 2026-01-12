@@ -1,3 +1,8 @@
+0.009     2026-01-12 09:57:39+01:00 Europe/Amsterdam
+
+    * Don't crash on `for my $foo @bar {...}`. (Graham @haarg Knop)
+    * License is now MIT.
+
 0.008     2019-04-22 16:44:54+03:00 Asia/Jerusalem
 
     * GH #3: Some typo fixed. (Jakub Wilk)

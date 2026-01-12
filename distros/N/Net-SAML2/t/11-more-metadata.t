@@ -8,7 +8,7 @@ my $xml = path('t/idp-metadata2.xml')->slurp;
 
 my $idp = Net::SAML2::IdP->new_from_xml(
     xml => $xml,
-    cacert => 't/cacert.pem',
+    cacert => 't/net-saml2-cacert.pem',
 );
 isa_ok($idp, 'Net::SAML2::IdP');
 

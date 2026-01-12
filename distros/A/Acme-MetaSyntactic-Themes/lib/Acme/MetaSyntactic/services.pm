@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::services;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -55,6 +55,12 @@ Philippe "BooK" Bruhat.
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2026-01-12 - v1.009
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.056.
 
 =item *
 
@@ -284,11 +290,13 @@ agcat
 agentsease_db
 agentview
 agentx
+agma
 agpolicy
 agps_port
 agri_gateway
 agriserver
 agslb
+ag_swim
 ah_esp_encap
 aiagent
 aibkup
@@ -539,6 +547,7 @@ asi
 asihpi
 asipregistry
 asip_webadmin
+asmgcs
 asmp
 asmps
 asnaacceler8db
@@ -576,12 +585,14 @@ atm_uhas
 atm_zip_office
 at_nbp
 at_rtmp
+a_trust_rpc
 ats
 atsc_mh_ssc
 attachmate_g32
 attachmate_s2s
 attachmate_uts
 att_mt_sms
+attune
 atul
 at_zis
 audio_activmail
@@ -608,6 +619,7 @@ autodesk_lm
 autodesk_nlm
 autonoc
 autopac
+autopassdaemon
 autotrac_acp
 availant_mgr
 avantageb2b
@@ -631,6 +643,7 @@ avt_profile_1
 avt_profile_2
 awacs_ice
 awg_proxy
+aws_as2
 aws_brf
 aws_wsp
 axio_disc
@@ -713,6 +726,7 @@ bhfhs
 bhmds
 biap_mp
 biff
+bif_p2p
 bigbrother
 biimenu
 bilobit
@@ -940,6 +954,7 @@ capwap_control
 capwap_data
 car
 CarbonCopy
+carb_repl_ctrl
 cardax
 cardbox
 cardbox_http
@@ -1041,6 +1056,7 @@ chimera_hwm
 chip_lm
 chipper
 c_h_it_port
+chlenix
 chmd
 choiceview_agt
 choiceview_clt
@@ -1065,6 +1081,7 @@ cirrossp
 cis
 cisco_aqos
 cisco_avp
+cisco_cloudsec
 ciscocsdb
 cisco_fna
 cisco_ipsla
@@ -1251,6 +1268,7 @@ crip
 crmsbits
 cronus
 crs
+crtech_nlm
 cruise_config
 cruise_diags
 cruise_enum
@@ -1262,7 +1280,7 @@ cryptoadmin
 crystalenterprise
 crystalreports
 cs_auth_svr
-csbphonemaster
+csbphone
 csccfirewall
 csccredir
 cscp
@@ -1326,6 +1344,7 @@ cuelink_disc
 cuillamartin
 cumulus
 cumulus_admin
+curiosity
 cuseeme
 custix
 cvc
@@ -1363,6 +1382,7 @@ daap
 dab_sti_c
 dai_shell
 daishi
+dali
 dali_port
 damewaremobgtwy
 dandv_tester
@@ -1388,6 +1408,7 @@ dayliteserver
 daylitetouch
 dayna
 daytime
+db2c_tls
 dbabble
 dbase
 dbbrowse
@@ -1615,6 +1636,7 @@ dpkeyserv
 dpm
 dpm_acm
 dpm_agent
+dpp
 dproxy
 dpserve
 dpserveadmin
@@ -1633,6 +1655,7 @@ ds_admin
 dsatp
 dsc
 ds_clnt
+dsd
 dsdn
 dserver
 dsETOS
@@ -1823,6 +1846,7 @@ e_net
 enfs
 enguity_xccetp
 enl
+enlabel_dpl
 enl_name
 enpc
 enpp
@@ -1962,6 +1986,7 @@ fac_restore
 facsys_ntp
 facsys_router
 fagordnc
+faircom_db
 fairview
 famdc
 farenet
@@ -2096,6 +2121,7 @@ foresyte_sec
 fortisphere_vm
 fotogcad
 found
+fox_skytale
 fpitp
 fpo_fns
 fprams
@@ -2256,6 +2282,7 @@ grcp
 gre_in_udp
 gre_udp_dtls
 grf_port
+gribi
 grid
 grid_alt
 gridgen_elmd
@@ -2735,6 +2762,7 @@ invokator
 ioc_sea_lm
 io_dist_data
 io_dist_group
+iona_data
 ionixnetmon
 iop
 ipass
@@ -2761,6 +2789,8 @@ ipp
 ip_provision
 ip_qsig
 ipr_dglt
+ipsdtls
+ipsma
 ipt_anri_anri
 ipulse_ics
 ipx
@@ -2954,6 +2984,7 @@ k3software_cli
 k3software_svr
 ka0wuc
 kademlia
+kadmin
 kali
 kana
 kar2ouche
@@ -2968,7 +2999,6 @@ kdnet
 kentrox_prot
 kerberos
 kerberos_adm
-kerberos_master
 kerberos_sec
 kermit
 keyserver
@@ -3242,6 +3272,7 @@ masqdialer
 matahari
 matip_type_a
 matip_type_b
+matrix_fed
 matrix_vnet
 max
 maxim_asics
@@ -3287,6 +3318,7 @@ mdap_port
 mdbs_daemon
 md_cg_http
 mdc_portmapper
+mdcs_scheduler
 mdm
 mdns
 mdnsresponder
@@ -3649,6 +3681,7 @@ ncp
 ncpm_ft
 ncpm_hip
 ncpm_pm
+ncpu
 ncr_ccl
 ncu_1
 ncu_2
@@ -3865,6 +3898,7 @@ nicetec_mgmt
 nicetec_nmsvc
 ni_ftp
 nifty_hmi
+nikatron_dev
 nilinkanalyst
 nim
 ni_mail
@@ -4118,6 +4152,7 @@ openqueue
 openremote_ctrl
 openstack_id
 opentable
+opentelemetry
 opentrac
 openvms_sysipc
 openvpn
@@ -4223,6 +4258,7 @@ p2pgroup
 p2pq
 p2p_sip
 p4p_portal
+p4runtime
 p6ssmc
 pace_licensed
 pacerforum
@@ -4249,6 +4285,7 @@ panasas
 pando_pub
 pando_sec
 pangolin_laser
+papachi_p2p_srv
 paradym_31
 paragent
 parallel
@@ -4344,6 +4381,7 @@ personnel
 pfcp
 pftp
 pfu_prcallback
+pgbackrest
 pgbouncer
 pgps
 ph
@@ -4548,7 +4586,9 @@ pslserver
 psmond
 psprserver
 pspserver
+psqlmws
 psrserver
+psrt
 pss
 pssc
 PS_Server
@@ -4604,6 +4644,7 @@ qdb2service
 qencp
 qfp
 qft
+qftest_licserve
 qftest_lookup
 qip_audup
 qip_login
@@ -4615,6 +4656,7 @@ qmtps
 qmvideo
 qnts_orb
 qnxnetman
+qolyester
 qo_secure
 qotd
 qotps
@@ -4782,6 +4824,7 @@ responsenet
 res_sap
 restconf_ch_tls
 resvc
+rethinkdb
 retp
 retrospect
 rets
@@ -4804,6 +4847,8 @@ rich_cp
 rid
 ridgeway1
 ridgeway2
+rift_lies
+rift_ties
 rightbrain
 rimf_ps
 rimsl
@@ -4830,6 +4875,7 @@ rmonitor
 rmonitor_secure
 rmopagt
 rmpp
+rms_agent
 rmt
 rmtserver
 rna
@@ -4855,6 +4901,7 @@ rothaga
 route
 routematch
 roverlog
+rpas_c2
 rpasswd
 rpc2portmap
 rpcbind
@@ -4949,6 +4996,7 @@ sagxtsds
 sah_lm
 saiseh
 sai_sentlm
+sal
 salient_dtasrv
 salient_mux
 salient_usrmgr
@@ -5173,6 +5221,7 @@ shivasound
 shockwave
 shockwave2
 shofarplayer
+showcockpit_net
 shrewd_control
 shrinkwrap
 sia_ctrl_plane
@@ -5244,11 +5293,11 @@ slinkysearch
 slinterbase
 slmap
 slm_api
+sl_mon
 slnp
 slp
 slp_notify
 slscc
-slslavemon
 slush
 smaclmgr
 smakynet
@@ -5308,10 +5357,11 @@ sncp
 s_net
 snet_sensor_mgmt
 snews
+snif
 snifferclient
 snifferdata
 snifferserver
-snip_slave
+snip
 snmp
 snmpdtls
 snmpdtls_trap
@@ -5399,11 +5449,14 @@ sossd_collect
 sossd_disc
 sossecollector
 soundsvirtual
+sovd
 spamassassin
 spamtrap
 spandataport
+spartan
 spc
 spcsdlobby
+spdm
 spdp
 spdy
 spearway
@@ -5714,6 +5767,7 @@ tapestry
 tapeware
 tappi_boxnet
 tarantella
+tarantool
 targus_getdata
 targus_getdata1
 targus_getdata2
@@ -5780,6 +5834,7 @@ tgp
 thermo_calc
 theta_lm
 thingkit
+thor_engine
 thrp
 thrtx
 tht_treasure
@@ -6001,6 +6056,7 @@ unicall
 unicontrol
 unidata_ldm
 unieng
+unified_bus
 unify
 unify_adapter
 unifyadmin
@@ -6037,6 +6093,7 @@ upstriggervsw
 urbisnet
 urld_port
 urm
+urp
 us_cli
 user_manager
 us_gv
@@ -6184,6 +6241,7 @@ vrace
 vrcommerce
 vrmg_ip
 vrml_multi_use
+vroa
 vrpn
 vrt
 vrtl_vmf_ds
@@ -6217,7 +6275,6 @@ vts_rpc
 vt_ssl
 vtu_comms
 vulture
-vunknown
 vvr_control
 vvr_data
 vx_auth_port
@@ -6308,6 +6365,7 @@ willy
 wimaxasncp
 wimd
 wimsic
+winbox
 wincim
 windb
 winddlb
@@ -6380,6 +6438,7 @@ wsscomfrmwk
 wsynch
 wta_wsp_s
 wta_wsp_wtp_s
+wtmi_panel
 wusage
 wv_csp_sms
 wv_csp_sms_cir
@@ -6419,6 +6478,7 @@ x_bone_ctl
 xbox
 xcap_control
 xcap_portal
+xcompute
 xdas
 xdmcp
 xds
@@ -6499,6 +6559,7 @@ xw_control
 xxnetserver
 xybrid_cloud
 xybrid_rt
+xycstatus
 xyplex_mux
 yak_chat
 yawn

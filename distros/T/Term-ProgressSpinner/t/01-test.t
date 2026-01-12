@@ -1,6 +1,7 @@
 use Test::More;
 use strict;
 use warnings;
+use utf8;
 use Term::ProgressSpinner;
 
 my $line = 1;

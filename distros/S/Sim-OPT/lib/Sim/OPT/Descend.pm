@@ -2,8 +2,6 @@ package Sim::OPT::Descend;
 # This is the module Sim::OPT::Descend of Sim::OPT, a program for detailed metadesign managing parametric explorations, distributed under a dual licence, open-source (GPL v3) and proprietary.
 # Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-our $descend = bless( {}, "Sim::OPT::Descend" );
-
 use Math::Trig;
 use Math::Round;
 use List::Util qw[ min max reduce shuffle];
@@ -14,6 +12,7 @@ use Set::Intersection;
 use Storable qw(lock_store lock_nstore lock_retrieve dclone);
 use Data::Dump qw(dump);
 use Data::Dumper;
+use IO::Tee;
 use feature 'say';
 use Switch::Back;
 
@@ -39,7 +38,7 @@ no warnings;
 %EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our @EXPORT = qw( descend prepareblank  ); # our @EXPORT = qw( );
+our @EXPORT = qw( descend prepareblank tee ); # our @EXPORT = qw( );
 
 $VERSION = '0.179'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
@@ -173,9 +172,9 @@ sub descend
   my $countblock = $d{countblock}; say  "HERE IN DESCEND \$countblock: " . dump( $countblock );
   my %incumbents = %{ $d{incumbents} }; #say  "HERE IN DESCEND \%incumbents: " . dump( \%incumbents );
   my @varnumbers = @{ $d{varnumbers} };
-  @varnumbers = $opt->washn( @varnumbers ); #say  "HERE IN DESCEND \@varnumbers: " . dump( @varnumbers );
+  @varnumbers = Sim::OPT::washn( @varnumbers ); #say  "HERE IN DESCEND \@varnumbers: " . dump( @varnumbers );
   my @miditers = @{ $d{miditers} };
-  @miditers = $opt->washn( @miditers ); #say  "HERE IN DESCEND \@miditers: " . dump( @miditers );
+  @miditers = Sim::OPT::washn( @miditers ); #say  "HERE IN DESCEND \@miditers: " . dump( @miditers );
   my @sweeps = @{ $d{sweeps} }; #say  "HERE IN DESCEND \@sweeps: " . dump( @sweeps );
   my @sourcesweeps = @{ $d{sourcesweeps} }; #say  "HERE IN DESCEND \@sourcesweeps: " . dump( @sourcesweeps );
   my @rootnames = @{ $d{rootnames} }; #say  "HERE IN DESCEND \@rootnames: " . dump( @rootnames );
@@ -191,8 +190,8 @@ sub descend
 	my @blockelts = @{ $d{blockelts} };
 
 	my @blocks = @{ $d{blocks} };
-  my $rootname = $opt->getrootname(\@rootnames, $countcase);
-  $rootname = $opt->clean( $rootname, $mypath, $file );
+  my $rootname = Sim::OPT::getrootname(\@rootnames, $countcase);
+  $rootname = Sim::OPT::clean( $rootname, $mypath, $file );
   my %varnums = %{ $d{varnums} };
   my %mids = %{ $d{mids} };
   my %carrier = %{ $d{carrier} };
@@ -309,7 +308,7 @@ sub descend
 
   if ( ( not ( $fire eq "y" ) ) and ( ( $dowhat{ga} eq "y" ) or ( $dowhat{randompick} eq "y" ) ) )
   {
-    $opt->washduplicates( $repfile );
+    Sim::OPT::washduplicates( $repfile );
   }
   
 
@@ -355,7 +354,7 @@ sub descend
 
   #if ( $winning ne "" )
   #{
-  #  $opt->callblock( { countcase => $countcase, countblock => $countblock,
+  #  Sim::OPT::callblock( { countcase => $countcase, countblock => $countblock,
   #  miditers => \@miditers,  winneritems => \@winneritems,
   #  dirfiles => \%dirfiles, varnumbers => \@varnumbers,
   #  sweeps => \@sweeps, incumbents => \%incumbents, dowhat => \%dowhat ,
@@ -410,7 +409,7 @@ sub descend
 
     #say  "IN DESCENT \@blockelts " . dump( @blockelts );
     ####HERE!!!
-    my $expected_r = $opt->enumerate(\%varnums, \@blockelts, $from); say  "IN DESCENT \$countblock $countblock \$expected_r " . dump( $expected_r );
+    my $expected_r = Sim::OPT::enumerate(\%varnums, \@blockelts, $from); say  "IN DESCENT \$countblock $countblock \$expected_r " . dump( $expected_r );
     
     
     my %present;
@@ -425,7 +424,7 @@ sub descend
       chomp $ln;
       next if $ln =~ /^\s*$/;
       ####HERE!!!
-      my $rid = $opt->instid( $ln, $file ); say  "IN DESCEND \$countblock $countblock \$rid " . dump( $rid );# NOT $repfile
+      my $rid = Sim::OPT::instid( $ln, $file ); say  "IN DESCEND \$countblock $countblock \$rid " . dump( $rid );# NOT $repfile
       if ( defined($rid) and $rid ne "" )
       {
         #$dirfiles{reps}{$rid} = $ln; say  "IN DESCEND WRITING \$dirfiles{reps}{\$rid} \$dirfiles{reps}{$rid} " . dump( $dirfiles{reps}{$rid} );# NOT $repfile
@@ -456,20 +455,111 @@ sub descend
     {
       if ( ( $line ne "" ) and ( $line ne " " ) and ( $line ne "\n" ) )
       {
+
+
+
+# -------------------------
+# DEBUG: inspect prepfile lines before/after trimming
+# -------------------------
+
+my $n = scalar(@prepfile_lines);
+say  "META DEBUG: prepfile_lines count = $n";
+
+my $max = $n < 5 ? $n : 5;
+
+# BEFORE trimming
+for ( my $i = 0 ; $i < $max ; $i++ )
+{
+    my $ln = $prepfile_lines[$i];
+    $ln = "<undef>" unless defined $ln;
+    chomp $ln;
+    say  "META DEBUG: BEFORE[$i] = <$ln>";
+}
+
+# Apply your trimming to a COPY (do not alter original yet)
+my @trimmed = @prepfile_lines;
+for ( my $i = 0 ; $i < @trimmed ; $i++ )
+{
+    next unless defined $trimmed[$i];
+    chomp $trimmed[$i];
+    $trimmed[$i] =~ s/,+$//;   # your trailing-comma strip
+}
+
+# AFTER trimming
+for ( my $i = 0 ; $i < $max ; $i++ )
+{
+    my $ln = $trimmed[$i];
+    $ln = "<undef>" unless defined $ln;
+    say  "META DEBUG: AFTER[$i]  = <$ln>";
+}
+
+# -------------------------
+# END DEBUG
+# -------------------------
+
+
+
+
         chomp $line;
         $line =~ s/\n/°/g;
         $line =~ s/°/\n/g;
         $line =~ s/[()%]//g;
-        $line =~ s/,?//;
-        $line =~ s/,?//;
-        $line =~ s/,?//;
+        $line =~ s/,$//;
+        $line =~ s/,$//;
+        $line =~ s/,$//;
         $line =~ s/ ?//;
         $line =~ s/ ?//;
+
+
+
+
+
+        # -------------------------
+# DEBUG: inspect prepfile lines before/after trimming
+# -------------------------
+
+my $n = scalar(@prepfile_lines);
+say  "META DEBUG: prepfile_lines count = $n";
+
+my $max = $n < 5 ? $n : 5;
+
+# BEFORE trimming
+for ( my $i = 0 ; $i < $max ; $i++ )
+{
+    my $ln = $prepfile_lines[$i];
+    $ln = "<undef>" unless defined $ln;
+    chomp $ln;
+    say  "META DEBUG: BEFORE[$i] = <$ln>";
+}
+
+# Apply your trimming to a COPY (do not alter original yet)
+my @trimmed = @prepfile_lines;
+for ( my $i = 0 ; $i < @trimmed ; $i++ )
+{
+    next unless defined $trimmed[$i];
+    chomp $trimmed[$i];
+    $trimmed[$i] =~ s/,+$//;   # your trailing-comma strip
+}
+
+# AFTER trimming
+for ( my $i = 0 ; $i < $max ; $i++ )
+{
+    my $ln = $trimmed[$i];
+    $ln = "<undef>" unless defined $ln;
+    say  "META DEBUG: AFTER[$i]  = <$ln>";
+}
+
+# -------------------------
+# END DEBUG
+# -------------------------
+
+
+
 
         my @elts = split(/,/, $line); #say  "ELTS: " . dump( @elts );
         my $touse = $elts[0];
 
-        $touse = $opt->clean( $touse, $mypath, $file );
+        $touse = Sim::OPT::clean( $touse, $mypath, $file );
 
         if ( ( ( $dowhat{names} eq "short" ) or ( $dowhat{names} eq "medium" ) ) and ( $touse =~ /^\d+$/ ) )
         {
@@ -858,13 +948,102 @@ sub descend
       my @splitteds;
       foreach my $line ( @lines )
       {
+
+
+
+        # -------------------------
+# DEBUG: inspect prepfile lines before/after trimming
+# -------------------------
+
+my $n = scalar(@prepfile_lines);
+say  "META DEBUG: prepfile_lines count = $n";
+
+my $max = $n < 5 ? $n : 5;
+
+# BEFORE trimming
+for ( my $i = 0 ; $i < $max ; $i++ )
+{
+    my $ln = $prepfile_lines[$i];
+    $ln = "<undef>" unless defined $ln;
+    chomp $ln;
+    say  "META DEBUG: BEFORE[$i] = <$ln>";
+}
+
+# Apply your trimming to a COPY (do not alter original yet)
+my @trimmed = @prepfile_lines;
+for ( my $i = 0 ; $i < @trimmed ; $i++ )
+{
+    next unless defined $trimmed[$i];
+    chomp $trimmed[$i];
+    $trimmed[$i] =~ s/,+$//;   # your trailing-comma strip
+}
+
+# AFTER trimming
+for ( my $i = 0 ; $i < $max ; $i++ )
+{
+    my $ln = $trimmed[$i];
+    $ln = "<undef>" unless defined $ln;
+    say  "META DEBUG: AFTER[$i]  = <$ln>";
+}
+
+# -------------------------
+# END DEBUG
+# -------------------------
+
+
+
         chomp $line;
         $line =~ s/ $// ;
-        $line =~ s/,?// ;
+        $line =~ s/,$// ;
         $line =~ s/ $// ;
-        $line =~ s/,?// ;
+        $line =~ s/,$// ;
         my @elts = split( "," , $line );
         push( @splitteds, [ @elts ] );
+
+
+
+
+        # -------------------------
+# DEBUG: inspect prepfile lines before/after trimming
+# -------------------------
+
+my $n = scalar(@prepfile_lines);
+say  "META DEBUG: prepfile_lines count = $n";
+
+my $max = $n < 5 ? $n : 5;
+
+# BEFORE trimming
+for ( my $i = 0 ; $i < $max ; $i++ )
+{
+    my $ln = $prepfile_lines[$i];
+    $ln = "<undef>" unless defined $ln;
+    chomp $ln;
+    say  "META DEBUG: BEFORE[$i] = <$ln>";
+}
+
+# Apply your trimming to a COPY (do not alter original yet)
+my @trimmed = @prepfile_lines;
+for ( my $i = 0 ; $i < @trimmed ; $i++ )
+{
+    next unless defined $trimmed[$i];
+    chomp $trimmed[$i];
+    $trimmed[$i] =~ s/,+$//;   # your trailing-comma strip
+}
+
+# AFTER trimming
+for ( my $i = 0 ; $i < $max ; $i++ )
+{
+    my $ln = $trimmed[$i];
+    $ln = "<undef>" unless defined $ln;
+    say  "META DEBUG: AFTER[$i]  = <$ln>";
+}
+
+# -------------------------
+# END DEBUG
+# -------------------------
+
+
+
       }
 
       say  "\$direction $direction, \$starorder $starorder, \$objectivecolumn: $objectivecolumn, LINES! " . dump( @lines );
@@ -1027,13 +1206,100 @@ sub descend
       my @splitteds;
       foreach my $line ( @lines )
       {
+
+
+        # -------------------------
+# DEBUG: inspect prepfile lines before/after trimming
+# -------------------------
+
+my $n = scalar(@prepfile_lines);
+say  "META DEBUG: prepfile_lines count = $n";
+
+my $max = $n < 5 ? $n : 5;
+
+# BEFORE trimming
+for ( my $i = 0 ; $i < $max ; $i++ )
+{
+    my $ln = $prepfile_lines[$i];
+    $ln = "<undef>" unless defined $ln;
+    chomp $ln;
+    say  "META DEBUG: BEFORE[$i] = <$ln>";
+}
+
+# Apply your trimming to a COPY (do not alter original yet)
+my @trimmed = @prepfile_lines;
+for ( my $i = 0 ; $i < @trimmed ; $i++ )
+{
+    next unless defined $trimmed[$i];
+    chomp $trimmed[$i];
+    $trimmed[$i] =~ s/,+$//;   # your trailing-comma strip
+}
+
+# AFTER trimming
+for ( my $i = 0 ; $i < $max ; $i++ )
+{
+    my $ln = $trimmed[$i];
+    $ln = "<undef>" unless defined $ln;
+    say  "META DEBUG: AFTER[$i]  = <$ln>";
+}
+
+# -------------------------
+# END DEBUG
+# -------------------------
+
+
+
         chomp $line;
         $line =~ s/ $// ;
-        $line =~ s/,?// ;
+        $line =~ s/,$// ;
         $line =~ s/ $// ;
-        $line =~ s/,?// ;
+        $line =~ s/,$// ;
         #my @elts = split( "," , $line );
         #push( @splitteds, [ @elts ] );
+
+
+
+        # -------------------------
+# DEBUG: inspect prepfile lines before/after trimming
+# -------------------------
+
+my $n = scalar(@prepfile_lines);
+say  "META DEBUG: prepfile_lines count = $n";
+
+my $max = $n < 5 ? $n : 5;
+
+# BEFORE trimming
+for ( my $i = 0 ; $i < $max ; $i++ )
+{
+    my $ln = $prepfile_lines[$i];
+    $ln = "<undef>" unless defined $ln;
+    chomp $ln;
+    say  "META DEBUG: BEFORE[$i] = <$ln>";
+}
+
+# Apply your trimming to a COPY (do not alter original yet)
+my @trimmed = @prepfile_lines;
+for ( my $i = 0 ; $i < @trimmed ; $i++ )
+{
+    next unless defined $trimmed[$i];
+    chomp $trimmed[$i];
+    $trimmed[$i] =~ s/,+$//;   # your trailing-comma strip
+}
+
+# AFTER trimming
+for ( my $i = 0 ; $i < $max ; $i++ )
+{
+    my $ln = $trimmed[$i];
+    $ln = "<undef>" unless defined $ln;
+    say  "META DEBUG: AFTER[$i]  = <$ln>";
+}
+
+# -------------------------
+# END DEBUG
+# -------------------------
+
+
+
       }
 
       my @sorted;
@@ -1359,45 +1625,312 @@ sub descend
 
 #################################################################################
 
-# ------------------------------------------------------------
-# metamodel() dispatcher
-# - default (open): DWGN/Interlinear implementation
-# - optional (closed treaty): delegated to Sim::OPTcue when enabled
-# ------------------------------------------------------------
-sub metamodel
-{
-  my ( $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
-    $direction, $starorder, $ordmeta, $varnums_r, $countblock ) = @_;
 
-  my %dowhat = %{ $dowhat_r };
-
-  return unless ( defined($dowhat{metamodel}) && $dowhat{metamodel} eq "y" );
-
-  my $treaty;
-  if ( $dowhat{gometamodel} )
+  sub metamodel
   {
-    $treaty = $dowhat{gometamodel} ;
-  }
+    my ( $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
+      $direction, $starorder, $ordmeta, $varnums_r, $countblock, $lines_r ) = @_;
 
-  if ( defined( $treaty ) and ( $treaty eq "cue" ) )
-  {
-    require( Sim::OPTcue );
-    return( $optcue->gometamodel(
+    
+    my %dowhat = %$dowhat_r;
+
+    return unless ( defined($dowhat{metamodel}) && $dowhat{metamodel} eq "y" );
+
+    my $treaty = "";
+    $treaty = $dowhat{metamodeltreaty} if defined $dowhat{metamodeltreaty};
+    $treaty = $dowhat{altmetamodel} if ( $treaty eq "" && defined $dowhat{altmetamodel} );
+
+    if ( defined($treaty) && $treaty eq "cue" )
+    {
+      require Sim::OPTcue;
+      return Sim::OPTcue::altmetamodel(
+        $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
+        $direction, $starorder, $ordmeta, $varnums_r, $countblock, $lines_r
+      );
+    }
+    else 
+    {
+      return dwgn(
       $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
-      $direction, $starorder, $ordmeta, $varnums_r, $countblock
-    ) );
+      $direction, $starorder, $ordmeta, $varnums_r, $countblock, $lines_r
+    );
+    }
   }
 
-  return( $optcue->changemetachannel(
-    $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
-    $direction, $starorder, $ordmeta, $varnums_r, $countblock
-  ) );
-}
 
 
+  sub dwgn
+  {
+    my ( $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
+      $direction, $starorder, $ordmeta, $varnums_r, $countblock, $lines_r ) = @_;
+
+    my %dowhat = %$dowhat_r;
+    my %dirfiles = %$dirfiles_r;
+    my @blockelts = @$blockelts_r;
+    my %carrier = %$carrier_r;
+    my %varnums = %$varnums_r;
+    my @raw_full = @$lines_r;
+
+    return unless ( $dowhat{metamodel} eq "y" );
+
+    # Optional override of the entrance file (for debugging / staging)
+    if ( defined( $dowhat{preprep} ) and ( $dowhat{preprep} ne "" ) )
+    {
+      $sortmixed = $dowhat{preprep};
+      die "PREPREP file not found: $sortmixed\n" unless ( -e $sortmixed );
+    }
+
+    my $mypath = $main::mypath;
+    my $tofile = $main::tofile;
+
+    # Interlinear config path (same intent as in descend())
+    my $confinterlinear = $dowhat{confinterlinear};
+    if ( defined( $confinterlinear ) and ( $confinterlinear ne "" ) and defined( $mypath ) and ( $mypath ne "" ) )
+    {
+      $confinterlinear = "$mypath/$confinterlinear";
+    }
 
 
-  
+    my $is_num = sub
+    {
+      my ( $v ) = @_;
+      return 0 unless defined $v;
+      return ( $v =~ /^\s*[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?\s*$/ ) ? 1 : 0;
+    };
+
+    my $canon_id = sub
+    {
+      my ( $id ) = @_;
+      return "" unless defined $id;
+      $id =~ s/\r?\n$//;
+
+      if ( defined( $mypath ) and ( $mypath ne "" ) and defined( $file ) and ( $file ne "" ) )
+      {
+        $id =~ s/^\Q$mypath\/$file\E//;
+      }
+
+      $id =~ s/^_+//;
+
+      if ( defined( $file ) and ( $file ne "" ) )
+      {
+        $id =~ s/^\Q$file\_\E//;
+      }
+      return $id;
+    };
+
+    my $compound_from_fields = sub
+    {
+      my ( $fields_r ) = @_;
+      my @f = @{ $fields_r };
+
+      # last numeric field is the safest definition across both full and short formats
+      for ( my $i = $#f; $i >= 0; $i-- )
+      {
+        if ( $is_num->( $f[$i] ) )
+        {
+          my $v = $f[$i];
+          $v =~ s/^\s+|\s+$//g;
+          return $v;
+        }
+      }
+      return ""; # should never happen for valid formats
+    };
+
+    #open( my $IN, "<", $sortmixed ) or die "Cannot open $sortmixed: $!\n";
+    #my @raw_full = <$IN>;
+    #close $IN;
+
+    my @clean_full;
+    foreach my $ln ( @raw_full )
+    {
+      next unless defined $ln;
+      $ln =~ s/\r?\n$//;
+
+      # preserve the entire row, but canonicalize the ID field reliably
+      my @f = split( /,/, $ln, -1 );
+      next unless scalar( @f ) > 0;
+      $f[0] = $canon_id->( $f[0] );
+
+      my $rebuilt = join( ",", @f );
+      push( @clean_full, $rebuilt );
+    }
+
+    if ( defined( $dowhat{dumpfiles} ) and ( $dowhat{dumpfiles} eq "y" ) )
+    {
+      my $cleanordres = $sortmixed . "_tmp_cleaned.csv";
+      open( my $CLEAN, ">", $cleanordres ) or die "Cannot write $cleanordres: $!\n";
+      foreach my $ln ( @clean_full ) { print $CLEAN $ln . "\n"; }
+      close $CLEAN;
+    }
+
+    my %varns = %varnums;
+    foreach my $key ( keys %varns )
+    {
+      if ( not( $key ~~ @blockelts ) )
+      {
+        $varns{$key} = 1;
+      }
+    }
+
+    my $bit = $file . "_";
+    my @bag = ( $bit );
+
+    my @box_refs = @{ Sim::OPT::toil( \@blockelts, \%varns, \@bag ) };
+    my @box      = @{ $box_refs[-1] };
+    my $integrated_r = Sim::OPT::integratebox( \@box, \%carrier, $file, \@blockelts );
+
+    my @blank_ids;
+    foreach my $el ( @{ $integrated_r } )
+    {
+      push( @blank_ids, $canon_id->( $el->[0] ) );
+    }
+    @blank_ids = uniq( @blank_ids );
+
+    if ( defined( $dowhat{dumpfiles} ) and ( $dowhat{dumpfiles} eq "y" ) )
+    {
+      my $blankfile = $sortmixed . "_tmp_blank.csv";
+      open( my $BL, ">", $blankfile ) or die "Cannot write $blankfile: $!\n";
+      foreach my $id ( @blank_ids ) { print $BL $id . "\n"; }
+      close $BL;
+    }
+
+    my %modhs;
+    my %torecovers;
+
+    foreach my $key ( sort keys %varnums )
+    {
+      if ( not( $key ~~ @blockelts ) )
+      {
+        $modhs{$key} = $varnums{$key};
+        $torecovers{$key} = $carrier{$key};
+      }
+    }
+
+    my @prep_blanks = @blank_ids;
+    if ( scalar( keys %modhs ) > 0 )
+    {
+      foreach my $id ( @prep_blanks )
+      {
+        foreach my $key ( keys %modhs )
+        {
+          $id =~ s/$key-\d+/$key-$modhs{$key}/;
+        }
+      }
+    }
+
+    my @prep_results = @clean_full;
+    if ( scalar( keys %modhs ) > 0 )
+    {
+      foreach my $ln ( @prep_results )
+      {
+        foreach my $key ( keys %modhs )
+        {
+          $ln =~ s/$key-\d+/$key-$modhs{$key}/;
+        }
+      }
+    }
+
+    if ( defined( $dowhat{dumpfiles} ) and ( $dowhat{dumpfiles} eq "y" ) )
+    {
+      my $prepblank = $sortmixed . "_tmp_prepblank.csv";
+      my $prepsort  = $sortmixed . "_tmp_prepsort.csv";
+      open( my $PB, ">", $prepblank ) or die "Cannot write $prepblank: $!\n";
+      foreach my $id ( @prep_blanks ) { print $PB $id . "\n"; }
+      close $PB;
+      open( my $PS, ">", $prepsort ) or die "Cannot write $prepsort: $!\n";
+      foreach my $ln ( @prep_results ) { print $PS $ln . "\n"; }
+      close $PS;
+    }
+
+    # ---------- join blanks + known values (FULL -> SHORT) in memory ----------
+
+    # Map: id -> compound (from FULL results; compound is last numeric field)
+    my %id2compound;
+    foreach my $ln ( @prep_results )
+    {
+      my @f = split( /,/, $ln, -1 );
+      next unless scalar( @f ) > 1;
+      my $id = $canon_id->( $f[0] );
+      my $compound = $compound_from_fields->( \@f );
+      next if ( $id eq "" );
+      next if ( $compound eq "" );
+      $id2compound{$id} = $compound;
+    }
+
+    my @prepfile_lines;
+    foreach my $id ( @prep_blanks )
+    {
+      my $cid = $canon_id->( $id );
+      if ( exists( $id2compound{$cid} ) )
+      {
+        push( @prepfile_lines, $cid . "," . $id2compound{$cid} );
+      }
+      else
+      {
+        push( @prepfile_lines, $cid );
+        #push( @prepfile_lines, $cid . "," );
+      }
+    }
+
+    if ( defined( $dowhat{dumpfiles} ) and ( $dowhat{dumpfiles} eq "y" ) )
+    {
+      my $prepfile = $sortmixed . "_tmp_prepfile.csv";
+      open( my $PF, ">", $prepfile ) or die "Cannot write $prepfile: $!\n";
+      foreach my $ln ( @prepfile_lines ) { print $PF $ln . "\n"; }
+      close $PF;
+    }
+
+    say "!!!!!ABOUT TO CALL INTERLINEAR WITH " . dump( @prepfile_lines );
+    my $rawmetafile = $metafile . "_tmp_raw.csv";
+    my ( $arr_r, $newarr_r ) = Sim::OPT::Interlinear::interlinear( $sortmixed, $confinterlinear, 
+      $rawmetafile, \@blockelts, $tofile, $countblock, 
+      $dowhat_r, $dirfiles_r, \@prepfile_lines );
+    my @rawlines = @$newarr_r;
+
+    say "!!!!! FROM INTERLINEAR IN DESCEND RETURNED NOT USED \@ARR " . dump( $arr_r );
+    say "!!!!! AND RETURNED NEWARR " . dump( @rawlines );
+    #open( my $RM, "<", $rawmetafile ) or die "Cannot open $rawmetafile: $!\n";
+    #my @rawlines = <$RM>;
+    #close $RM;
+
+    my @metalines;
+    foreach my $ln ( @rawlines )
+    {
+      next unless defined $ln;
+      $ln =~ s/\r?\n$//;
+
+      foreach my $key ( keys %torecovers )
+      {
+        $ln =~ s/$key-\d+/$key-$torecovers{$key}/;
+      }
+      push( @metalines, $ln );
+    }
+
+    @metalines = uniq( @metalines );
+
+    #open( my $MF, ">", $metafile ) or die "Cannot write $metafile: $!\n";
+    #foreach my $ln ( @metalines ) 
+    #{ 
+    #  print $MF $ln . "\n"; 
+    #}
+    #close $MF;
+
+    # Sort and write ORDMETA (overwrite, not append)
+    my @sorted;
+    if ( ( defined( $direction ) and ( $direction eq "<" ) ) or ( defined( $starorder ) and ( $starorder eq "<" ) ) )
+    {
+      @sorted = sort { (split( /,/, $a, -1 ))[1] <=> ( split( /,/, $b, -1 ))[1] } @metalines;
+    }
+    else
+    {
+      @sorted = sort { (split( /,/, $b, -1 ))[1] <=> ( split( /,/, $a, -1 ))[1] } @metalines;
+    }
+
+    open( my $OM, ">", $ordmeta ) or die "Cannot write $ordmeta: $!\n";
+    foreach my $ln ( @sorted ) { print $OM $ln . "\n"; }
+    close $OM;
+  }  # END SUB DWGN
+
 
   sub takeoptima
   {
@@ -1422,13 +1955,17 @@ sub metamodel
       open( SORTMIXED, $sortmixed ) or die( "$!" );
       @lines = <SORTMIXED>;
       close SORTMIXED;
+      say "!!!!!IN TAKEOPTINA OPENED \$sortmixed $sortmixed: " . dump ( @lines );
     }
     elsif ( $searchname eq "y" )
     {
       open( ORDEREDFILE, $orderedfile ) or die( "$!" );
       @lines = <ORDEREDFILE>;
       close ORDEREDFILE;
+      say "!!!!!IN TAKEOPTINA OPENED \$sortmixed $orderedfile: " . dump ( @lines );
     }
+
+
 
     if ( $slicenum eq "" )
     {
@@ -1468,7 +2005,7 @@ sub metamodel
     my $winneritem = $winnerelms[0]; #say  "!!! \$winneritem: $winneritem";
 
     #say  "HERE WINNERITEM BEFORE CLEANING: $winneritem.";
-    $winneritem = $opt->clean( $winneritem, $mypath, $file );
+    $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
     #say  "HERE WINNERITEM AFTER CLEANING: $winneritem.";
     push ( @{ $incumbents{$closingelt} }, $winneritem );
 
@@ -1516,6 +2053,16 @@ sub metamodel
 
       if ( ( $dirfiles{starsign} eq "y" ) or
     			( ( $dirfiles{random} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+          ( ( $dirfiles{newrandompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+          ( ( $dirfiles{newenumerate} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+          ( ( $dirfiles{neldermead} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+          ( ( $dirfiles{simulatedannealing} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+          ( ( $dirfiles{particleswarm} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+          ( ( $dirfiles{armijo} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+          ( ( $dirfiles{nsgaii} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+          ( ( $dirfiles{nsgaiii} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+          ( ( $dirfiles{moead} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+          ( ( $dirfiles{spea2} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
           ( ( $dirfiles{randompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
     			( ( $dirfiles{latinhypercube} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
     			( ( $dirfiles{factorial} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
@@ -1682,10 +2229,13 @@ sub metamodel
         my $metafile = $sortmixed . "_meta.csv";
         my $ordmeta = $sortmixed . "_ordmeta.csv";
 
-        my @blockelts = @{ $opt->getblockelts( \@sweeps, $countcase, $countblock ) }; #say  "IN callblock \@blockelts " . dump( @blockelts );
+        my @blockelts = @{ Sim::OPT::getblockelts( \@sweeps, $countcase, $countblock ) }; #say  "IN callblock \@blockelts " . dump( @blockelts );
+ 
 
+
+        say "!!!!! CALL METAMODEL 1 ";
         metamodel( \%dowhat, $sortmixed, $file, \%dirfiles, \@blockelts, \%carrier, $metafile,
-          $direction, $starorder, $ordmeta, \%varnums, $countblock );
+          $direction, $starorder, $ordmeta, \%varnums, $countblock, \@lines );
 
         my @lines;
         if ( $dirfiles{metamodel} eq "y" )
@@ -1767,14 +2317,14 @@ sub metamodel
               if ( $dowhat{morph} eq "y" )
               {
                 say  "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-                my @result = $morph->morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles, \%inst );
+                my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles, \%inst );
               }
  
               my( $packet_r, $dirfiles_r );
               if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
               {
                 say  "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-                ( $packet_r, $dirfiles_r, $csim ) = $sim->sim(
+                ( $packet_r, $dirfiles_r, $csim ) = Sim::OPT::Sim::sim(
                     { instances => \@instancees, dirfiles => \%dirfiles, dowhat => \%dowhat, vehicles => \%vehicles, inst => \%inst } );
                 @packet = uniq( @$packet_r ); say  "RECEIVED PACKET " . dump( @packet );
                 %dirfiles = %$dirfiles;
@@ -1799,7 +2349,7 @@ sub metamodel
 
 
         ###DDDTHIS
-        $winneritem = $opt->clean( $winneritem, $mypath, $file );
+        $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
 
 
 
@@ -1830,7 +2380,7 @@ sub metamodel
         @varnumbers = @{ dclone( $dirfiles{varnumbershold} ) };
         @miditers = @{ dclone( $dirfiles{miditershold} ) };
         say  "WINNERITEMS: " . dump( @winneritems );
-        $opt->callblock( { countcase => $countcase, countblock => $countblock,
+        Sim::OPT::callblock( { countcase => $countcase, countblock => $countblock,
         miditers => \@miditers,  winneritems => \@winneritems,
         dirfiles => \%dirfiles, varnumbers => \@varnumbers,
         sweeps => \@sweeps, incumbents => \%incumbents, dowhat => \%dowhat ,
@@ -1844,11 +2394,11 @@ sub metamodel
 
         $countstring++;
         $dirfiles{countstring} = $countstring;
-        $winneritem = $opt->clean( $winneritem, $mypath, $file );
+        $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
         say  "\$winneritem: " . dump( $winneritem );
         push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem );
         say  "WINNERITEMS: " . dump( @winneritems );
-        $opt->callblock( { countcase => $countcase, countblock => $countblock,
+        Sim::OPT::callblock( { countcase => $countcase, countblock => $countblock,
         miditers => \@miditers,  winneritems => \@winneritems,
         dirfiles => \%dirfiles, varnumbers => \@varnumbers,
         sweeps => \@sweeps, incumbents => \%incumbents, dowhat => \%dowhat ,
@@ -1867,10 +2417,11 @@ sub metamodel
         my $metafile = $sortmixed . "_tmp_meta.csv";
         my $ordmeta = $sortmixed . "_ordmeta.csv";
 
-        my @blockelts = @{ $opt->getblockelts( \@sweeps, $countcase, $countblock ) };
-
+        my @blockelts = @{ Sim::OPT::getblockelts( \@sweeps, $countcase, $countblock ) };
+        
+        say "!!!!! CALL METAMODEL 1 ";
         metamodel( \%dowhat, $sortmixed, $file, \%dirfiles, \@blockelts, \%carrier, $metafile,
-          $direction, $starorder, $ordmeta, \%varnums, $countblock );
+          $direction, $starorder, $ordmeta, \%varnums, $countblock, \@lines );
 
         my @lines;
         if ( $dirfiles{metamodel} eq "y" )
@@ -1946,14 +2497,14 @@ sub metamodel
               if ( $dowhat{morph} eq "y" )
               {
                 say  "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-                my @result = $morph->morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles, \%inst );
+                my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles, \%inst );
               }
 
               my( $packet_r, $dirfiles_r );
               if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
               {
                 #say  "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-                ( $packet_r, $dirfiles_r, $csim ) = $sim->sim(
+                ( $packet_r, $dirfiles_r, $csim ) = Sim::OPT::Sim::sim(
                     { instances => \@instancees, dirfiles => \%dirfiles, dowhat => \%dowhat, vehicles => \%vehicles, inst => \%inst } );
                     @packet = uniq( @$packet_r ); say  "RECEIVED PACKET " . dump( @packet );
                     %dirfiles = %$dirfiles;
@@ -1972,7 +2523,7 @@ sub metamodel
         my @winnerelms = split( /,/, $winnerentry );
         my $winneritem = $winnerelms[0];
 
-        $winneritem = $opt->clean( $winneritem, $mypath, $file );
+        $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
 
         push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem );
 
@@ -1981,7 +2532,7 @@ sub metamodel
 
         $countblock++; ### !!!        push ( @{ $winneritems[$countcase][$countblock + 1] }, $winneritem );
         say  "WINNERITEMS: " . dump( @winneritems );
-        $opt->callblock( { countcase => $countcase, countblock => $countblock,
+        Sim::OPT::callblock( { countcase => $countcase, countblock => $countblock,
         miditers => \@miditers,  winneritems => \@winneritems,
         dirfiles => \%dirfiles, varnumbers => \@varnumbers,
         sweeps => \@sweeps, incumbents => \%incumbents, dowhat => \%dowhat,
@@ -1989,13 +2540,13 @@ sub metamodel
       } ### END OF THE PART ABOUT STAR CONFIGURATIONS
       else
       { #say  "!!!! RELAUNCHING WITH INST " . dump( %inst ); 
-        $winneritem = $opt->clean( $winneritem, $mypath, $file );
+        $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
         say  "!!!! \winneritem: " . dump( @winneritem );
         push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem );
         say  "!!!! WINNERITEMS: " . dump( @winneritems );
         $countblock++; ### !!!
 
-        $opt->callblock( { countcase => $countcase, countblock => $countblock,
+        Sim::OPT::callblock( { countcase => $countcase, countblock => $countblock,
         miditers => \@miditers,  winneritems => \@winneritems,
         dirfiles => \%dirfiles, varnumbers => \@varnumbers,
         sweeps => \@sweeps, incumbents => \%incumbents, dowhat => \%dowhat,

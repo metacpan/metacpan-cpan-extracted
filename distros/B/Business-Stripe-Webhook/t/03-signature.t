@@ -52,11 +52,55 @@ $webhook_pass->process();
 
 ok( $webhook_pass->success, "Signature pass" );
 
+my $webhook_missing_v1 = Business::Stripe::Webhook->new(
+    signing_secret  => $signing_secret,
+    'payload'       => $payload_pass,
+    'invoice-paid'  => \&pay_invoice,
+);
+
+$ENV{'HTTP_STRIPE_SIGNATURE'} = 't=1685897094';
+
+$webhook_missing_v1->process();
+
+ok( !$webhook_missing_v1->success, "Signature missing v1 fails" );
+is( $webhook_missing_v1->error, 'No v1 Parameter', "Missing v1 error message" );
+
+my $webhook_missing_t = Business::Stripe::Webhook->new(
+    signing_secret  => $signing_secret,
+    'payload'       => $payload_pass,
+    'invoice-paid'  => \&pay_invoice,
+);
+
+$ENV{'HTTP_STRIPE_SIGNATURE'} = 'v1=54e5192b196409f1ee7098db99bb4f6243fa1d069160b9c3b813ec96cc220658';
+
+$webhook_missing_t->process();
+
+ok( !$webhook_missing_t->success, "Signature missing t fails" );
+is( $webhook_missing_t->error, 'No t Parameter', "Missing t error message" );
+
+my $old_timestamp = 946684800;
+my $old_signed_payload = $old_timestamp . '.' . $payload_pass;
+my $old_signature = hmac_sha256_hex($old_signed_payload, $signing_secret);
+
+$ENV{'HTTP_STRIPE_SIGNATURE'} = "t=$old_timestamp,v1=$old_signature";
+
+my $webhook_stale = Business::Stripe::Webhook->new(
+    signing_secret  => $signing_secret,
+    tolerance       => 300,
+    'payload'       => $payload_pass,
+    'invoice-paid'  => \&pay_invoice,
+);
+
+$webhook_stale->process();
+
+ok( !$webhook_stale->success, "Signature outside tolerance fails" );
+is( $webhook_stale->error, 'Timestamp outside tolerance', "Stale timestamp error message" );
+
 sub pay_invoice {
     is( $_[0]->{'object'}, 'event', "pay.invoice handled - " . ++$count );
 }
 
-done_testing($count + 3);
+done_testing($count + 9);
 
 __DATA__
 {

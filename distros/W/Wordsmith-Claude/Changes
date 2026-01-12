@@ -1,5 +1,10 @@
 Revision history for Wordsmith-Claude
 
+0.02    2026-01-11
+	- Blogs...
+        - Use Claude::Agent::CLI for terminal UI utilities
+        - Requires Claude::Agent 0.11+
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

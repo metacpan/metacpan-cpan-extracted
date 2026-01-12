@@ -6,6 +6,28 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.012001	2026-01-11
+
+ [ Bug Fixes ]
+ - Better detection if parent classes use Class::XSConstructor directly.
+
+0.012000	2026-01-11
+
+ [ Documentation ]
+ - Marlin now has improved inheritance from foreign classes thanks to
+   latest Class::XSConstructor.
+ - Marlin now supports BUILDARGS thanks to latest Class::XSConstructor.
+ - Update copyright years.
+
+ [ Packaging ]
+ - Require Class::XSConstructor 0.018001.
+
+ [ Other ]
+ - Updated: Improvements to Class::XSConstructor mean we should never need
+   to generate pure Perl constructors, so stripped out all the code to do
+   that and replaced with a few shims to send the right options to
+   Class::XSConstructor.
+
 0.011002	2026-01-09
 
  [ Bug Fixes ]

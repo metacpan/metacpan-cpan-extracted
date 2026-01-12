@@ -236,7 +236,7 @@ beamer-reveal.pl - converts the .rvl file and the corresponding pdf file to a fu
 
 =head1 VERSION
 
-version 20260101.1937
+version 20260111.1557
 
 =head1 SYNOPSIS
 

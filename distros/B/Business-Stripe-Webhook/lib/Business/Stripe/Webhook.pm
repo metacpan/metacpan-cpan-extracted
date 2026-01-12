@@ -8,13 +8,16 @@ use HTTP::Tiny;
 use strict;
 use warnings;
 
-our $VERSION = '1.12';
+our $VERSION = '1.14';
 $VERSION = eval $VERSION;
 
 sub new {
     my $class = shift;
     my %vars = @_;
 
+    if (exists $vars{'error'} && ref $vars{'error'} eq 'CODE') {
+        $vars{'error_callback'} = $vars{'error'};
+    }
     $vars{'error'}      = '';
 
     $vars{'reply'}      =  {
@@ -66,12 +69,11 @@ sub process {
         return undef;
     }
 
-    if (!$ENV{'HTTP_STRIPE_SIGNATURE'}) {
-        $self->_warning('Stripe-Signature HTTP heading missing - the request is not from Stripe');
-        return undef;        
-    }
-    
     if ($self->{'signing_secret'}) {
+        if (!$ENV{'HTTP_STRIPE_SIGNATURE'}) {
+            $self->_error('Stripe-Signature HTTP heading missing - the request is not from Stripe');
+            return undef;
+        }
         my $sig = $self->check_signature;
         return undef unless defined $sig;
         if (!$sig) {
@@ -89,13 +91,13 @@ sub process {
     
     $hook_type =~ s/\./-/g;
     if (exists $self->{$hook_type}) {
-        $self->{'reply'}->{'status'} = 'success';
         push @{$self->{'reply'}->{'sent_to'}}, $hook_type; 
         &{$self->{$hook_type}}($self->{'webhook'});
     }
    
     if (exists $self->{'all-webhooks'}) {
         $self->{'reply'}->{'sent_to_all'} = 'true';
+        push @{$self->{'reply'}->{'sent_to'}}, 'all-webhooks';
         &{$self->{'all-webhooks'}}($self->{'webhook'});
     }
 
@@ -120,10 +122,21 @@ sub check_signature {
     }
     
     my %sig_head = ($ENV{'HTTP_STRIPE_SIGNATURE'} . ',') =~ /(\S+?)=(\S+?),/g;
+
+    if (!defined $sig_head{'t'}) {
+        $self->_error("No t Parameter");
+        return undef;
+    }
+
     my $signed_payload = $sig_head{'t'} . '.' . $self->{'payload'};
-    
+
     if (!defined $sig_head{'v1'}) {
-        $self->_error("No v1");
+        $self->_error("No v1 Parameter");
+        return undef;
+    }
+
+    if (defined $self->{'tolerance'} && abs(time - $sig_head{'t'}) > $self->{'tolerance'}) {
+        $self->_error("Timestamp outside tolerance");
         return undef;
     }
     
@@ -157,6 +170,8 @@ sub reply {
 sub get_subscription {
     my ($self, $subscription, $secret) = @_;
     
+    $self->{'error'} = '';
+
     if (!$subscription) {
         $self->{'error'} = 'Subscription missing';
         $self->_error('Subscription missing');
@@ -186,8 +201,8 @@ sub _error {
     my ($self, $message) = @_;
     
     $self->{'error'} = $message;
-    if (defined &{$self->{'error'}}) {
-        &{$self->{'error'}}($message);
+    if (defined $self->{'error_callback'}) {
+        &{$self->{'error_callback'}}($message);
     } else {
         STDERR->print("Stripe Webhook Error: $message\n");
     }
@@ -219,16 +234,16 @@ Business::Stripe::Webhook - A Perl module for handling webhooks sent by Stripe
 
 =head1 VERSION
 
-Version 1.12
+Version 1.14
 
 =head1 SYNOPSIS
 
-  use Stripe::Webhook;
+  use Business::Stripe::Webhook;
   
   my $payload;
   read(STDIN, $payload, $ENV{'CONTENT_LENGTH'});
 
-  my $webhook = Stripe::Webhook->new(
+  my $webhook = Business::Stripe::Webhook->new(
       signing_secret                => 'whsec_...',
       api_secret                    => 'sk_test_...',
       payload                       => $payload,
@@ -264,9 +279,9 @@ This module is designed to run on a webserver as that is where Stripe webhooks w
 
 =head2 Workflow
 
-The typical workflow for L<Business::Stripe::Webhook> is to initally create an instance of the module and to define one or more Stripe events to listen for.  This is done by providing references to your subroutines as part of the C<new> method.  Note that the webhook events you want to listen for need to be enabled in the Stripe Dashboard.
+The typical workflow for L<Business::Stripe::Webhook> is to initially create an instance of the module and to define one or more Stripe events to listen for.  This is done by providing references to your subroutines as part of the C<new> method.  Note that the webhook events you want to listen for need to be enabled in the Stripe Dashboard.
 
-  my $webhook = Stripe::Webhook->new(
+  my $webhook = Business::Stripe::Webhook->new(
       invoice-paid => \&sub_to_handle_paid_invoice,
   );
 
@@ -280,7 +295,7 @@ This will call the subroutines that were defined when the module was created and
 
 Finally, a reply is sent back to L<Stripe|https://stripe.com/>.
 
-  print reply(status => 'OK');
+  print $webhook->reply(status => 'OK');
 
 This produces a fully formed HTTP Response complete with headers as required by Stripe.
 
@@ -288,9 +303,9 @@ This produces a fully formed HTTP Response complete with headers as required by 
 
 Stripe requires a timely reply to webhook calls.  Therefore, if you need to carry out any lengthy processing after the webhook has been sent, this should be done B<after> calling the C<reply> method and flushing C<STDOUT>
 
-  use Stripe::Webhook;
+  use Business::Stripe::Webhook;
   
-  my $webhook = Stripe::Webhook->new(
+  my $webhook = Business::Stripe::Webhook->new(
       signing_secret    => 'whsec_...',
       payload           => $payload,
       invoice-paid      => \&update_invoice,
@@ -316,7 +331,7 @@ Stripe requires a timely reply to webhook calls.  Therefore, if you need to carr
 
 By default, any errors or warnings are sent to C<STDERR>.  These can be altered to instead go to your own subroutine to handle errors and/or warnings by defining these when create the object.
 
-  my $webhook = Stripe::Webhook->new(
+  my $webhook = Business::Stripe::Webhook->new(
       invoice-paid => \&sub_to_handle_paid_invoice,
       error        => \&my_error_handler,
       warning      => \&my_warning_handler,
@@ -328,9 +343,9 @@ Additionally, warnings can be turned off by setting the C<warning> parameter to 
 
 =head2 new
 
-Creates a new Stripe::Webhook object.
+Creates a new Business::Stripe::Webhook object.
 
-  my $webhook = Stripe::Webhook->new(
+  my $webhook = Business::Stripe::Webhook->new(
       signing_secret => 'whsec_...',
       payload        => $payload,
   );
@@ -375,7 +390,7 @@ B<warning>: A callback subroutine to handle warnings.  If not defined, warnings 
 
 =back
 
-Previous versions on L<Business::Stripe::Webhook> allowed the B<payload> parameter to be omitted.  In this case, the module would read C<STDIN> to obtain the JSON string.  This continues to work for backward compatability only but will be removed from furture versions.
+Previous versions on L<Business::Stripe::Webhook> allowed the B<payload> parameter to be omitted.  In this case, the module would read C<STDIN> to obtain the JSON string.  This continues to work for backward compatibility only but will be removed from future versions.
 
 =head2 success
 
@@ -401,6 +416,8 @@ This method takes no parameters.
 
 Normally, the return value can be ignored.  Returns C<undef> if there was an error or warning.
 
+If the C<v1> parameter is missing an C<error> is set and the method returns C<undef>.  Otherwise it returns true if the signature has been verified or false if not.
+
 =head2 check_signature
 
 Checks the signature of the webhook to verify that it was sent by Stripe.
@@ -415,7 +432,7 @@ Normally, this method does not need to be called.  It is called by the C<process
 
 Sends a reply to Stripe.
 
-  print reply(status => 'OK');
+  print $webhook->reply(status => 'OK');
 
 It takes one or more optional parameters.
 
@@ -461,7 +478,7 @@ B<$subscription_id>: The ID of the subscription to retrieve. Required.
 
 B<$secret_key>: The secret API key to use to retrieve the subscription. Optional.
 
-This is usually supplied when the object is created but can be supplied when calling this method.  If the API Key has alreay been supplied, this paramter will override the previous key.
+This is usually supplied when the object is created but can be supplied when calling this method.  If the API Key has already been supplied, this parameter will override the previous key.
 
 =back
 
@@ -529,9 +546,8 @@ Ian Boddison <ian at boddison.com>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-business-stripe-webhook at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=bug-business-stripe-webhook>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report bugs or feature requests by opening a GitHub pull request in the repository where you found this module. GitHub PRs are the preferred workflow. If that is not possible, you can use RT (CPAN's request tracker) via
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=bug-business-stripe-webhook>.
 
 =head1 SUPPORT
 
@@ -543,7 +559,11 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * GitHub pull requests (preferred)
+
+Open a PR in the repository where you found this module.
+
+=item * RT: CPAN's request tracker (legacy option)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-Stripe-Webhook>
 
@@ -559,10 +579,10 @@ Thanks to the help and support provided by members of Perl Monks L<https://perlm
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ian Boddison.
+This software is copyright (c) 2023-2026 by Ian Boddison.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This software is released under the MIT (Expat) license.
 
 =cut
+
 

@@ -6,11 +6,12 @@ package Sim::OPT::Takechance;
 # Sim::OPT::Takechance is distributed under a dual licence, open-source (GPL v3) and proprietary.
 # Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-
 use Exporter;
 use parent 'Exporter'; # imports and subclasses Exporter
-
+our @ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
+@EXPORT = qw( takechance ); # our @EXPORT = qw( );
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
+
 use Math::Trig;
 use Math::Round;
 use List::Util qw[ min max reduce shuffle];
@@ -41,15 +42,26 @@ use Sim::OPT::Sim;
 use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Interlinear;
+use Sim::OPT::Parcoord3d;
 use Sim::OPT::Stats;
-eval { use Sim::OPTcue; 1 };
+eval { use Sim::OPTcue::OPTcue; 1 };
+eval { use Sim::OPTcue::Metabridge; 1 };
+eval { use Sim::OPTcue::Exogen::PatternSearch; 1 };
+eval { use Sim::OPTcue::Exogen::NelderMead; 1 };
+eval { use Sim::OPTcue::Exogen::Armijo; 1 };
+eval { use Sim::OPTcue::Exogen::NSGAII; 1 };
+eval { use Sim::OPTcue::Exogen::ParticleSwarm; 1 };
+eval { use Sim::OPTcue::Exogen::SimulatedAnnealing; 1 };
+eval { use Sim::OPTcue::Exogen::NSGAIII; 1 };
+eval { use Sim::OPTcue::Exogen::MOEAD; 1 };
+eval { use Sim::OPTcue::Exogen::SPEA2; 1 };
+eval { use Sim::OPTcue::Exogen::ParticleSwarm; 1 };
+eval { use Sim::OPTcue::Exogen::RadialBasis; 1 };
+eval { use Sim::OPTcue::NeuralBoltzmann; 1 };
+eval { use Sim::OPTcue::Exogen::Kriging; 1 };
+eval { use Sim::OPTcue::Exogen::DecisionTree; 1 };
 
 
-our @ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
-#%EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
-#@EXPORT_OK   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-@EXPORT = qw( takechance ); # our @EXPORT = qw( );
 $VERSION = '0.06';
 $ABSTRACT = 'The "Sim::OPT::Takechance" module can produce efficient block coordinate search structures given some initialization blocks.';
 

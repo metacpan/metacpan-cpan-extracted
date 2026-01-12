@@ -16,7 +16,7 @@ use IO::Async::Loop;
 use Future::AsyncAwait;
 use Time::HiRes qw(time);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ Claude::Agent::Code::Refactor - Automated code refactoring with review-fix loops
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -342,6 +342,10 @@ async sub _fix_issues {
             }
         }
     };
+
+    # Cleanup SDK server sockets before returning
+    $iter->cleanup();
+
     return $timeout_result if $timeout_result;
     my $error = $@;  # Capture $@ immediately to prevent clobbering
     if ($error) {

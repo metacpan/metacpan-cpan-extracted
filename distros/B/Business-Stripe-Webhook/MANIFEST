@@ -2,15 +2,21 @@ Changes
 lib/Business/Stripe/Webhook.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+README.md
 t/00-load.t
 t/01-stdin.t
 t/02-payload.t
 t/03-signature.t
+t/04-reply.t
+t/05-all-webhooks.t
+t/07-error-warning.t
+t/08-get-subscription.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 t/version.t
+
+
 
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

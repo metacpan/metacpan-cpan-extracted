@@ -41,6 +41,7 @@ sub _make_state_class {
             socket_stream   => undef,
             request_id      => 0,
             pending_requests => {},
+            pending_responses => {},  # Initialize alongside other state variables
             jsonl           => undef,
             loop            => undef,
             response_buffer => '',
@@ -53,6 +54,7 @@ sub _make_state_class {
         $self->{socket_stream} = undef;
         $self->{request_id} = 0;
         $self->{pending_requests} = {};
+        $self->{pending_responses} = {};  # Initialize alongside other state variables
         $self->{jsonl} = JSON::Lines->new;
         $self->{loop} = undef;
         $self->{response_buffer} = '';
@@ -90,8 +92,70 @@ sub run {
         die "Usage: SDKRunner <socket_path> <server_name> <version> <tools_json>\n";
     }
 
-    # Validate socket path - must be absolute
+    # Validate socket path - must be absolute and within a known temp directory
+    # This prevents attackers from pointing to attacker-controlled sockets outside
+    # the expected secure locations.
     die "Invalid socket path: must be absolute\n" unless $socket_path =~ m{^/};
+
+    # Validate socket is in a known temporary directory pattern
+    # Security: Accept common temp directory patterns and user home directories
+    # where File::Temp would create sockets
+    my $valid_socket_path = 0;
+    my @allowed_prefixes = (
+        '/tmp/',
+        '/var/tmp/',
+        '/private/tmp/',          # macOS
+        '/var/folders/',          # macOS sandbox temp
+        '/run/user/',             # systemd user runtime
+    );
+    # Also allow user home directory temp locations
+    if ($ENV{HOME} && $ENV{HOME} =~ m{^/}) {
+        push @allowed_prefixes, "$ENV{HOME}/tmp/";
+        push @allowed_prefixes, "$ENV{HOME}/.tmp/";
+    }
+    # Allow TMPDIR if set (File::Temp respects this)
+    # *** SECURITY WARNING ***
+    # TMPDIR is user-controllable and NOT validated for trust.
+    # KNOWN RISK: An attacker who can set TMPDIR before process startup
+    # could influence which socket paths are allowed, potentially enabling
+    # connections to attacker-controlled sockets.
+    #
+    # FOR HIGH-SECURITY DEPLOYMENTS: Set CLAUDE_AGENT_IGNORE_TMPDIR=1
+    #
+    # Additional mitigations:
+    #   1. Set CLAUDE_AGENT_IGNORE_TMPDIR=1 to ignore TMPDIR entirely (RECOMMENDED)
+    #   2. Validate socket ownership with stat() before connecting
+    #   3. Use only fixed prefixes by not setting TMPDIR
+    #   4. Run in a restricted environment where TMPDIR cannot be manipulated
+    #   5. Set TMPDIR to a trusted directory (e.g., /tmp) before process startup
+    # Only allow TMPDIR when explicitly enabled via CLAUDE_AGENT_ALLOW_TMPDIR=1
+    # This is opt-in for stricter security - TMPDIR could be attacker-controlled
+    # SECURITY WARNING: NEVER set CLAUDE_AGENT_ALLOW_TMPDIR=1 in untrusted environments
+    # or when an attacker could control environment variables before process startup.
+    # An attacker could set both CLAUDE_AGENT_ALLOW_TMPDIR=1 and a malicious TMPDIR
+    # to redirect socket connections to attacker-controlled locations.
+    if ($ENV{TMPDIR} && $ENV{TMPDIR} =~ m{^/} && $ENV{CLAUDE_AGENT_ALLOW_TMPDIR}) {
+        # SECURITY: Log warning when TMPDIR override is used
+        warn "[SECURITY WARNING] TMPDIR-based socket path allowed via CLAUDE_AGENT_ALLOW_TMPDIR. "
+            . "This is insecure if an attacker can control environment variables.\n"
+            unless $ENV{CLAUDE_AGENT_QUIET_SECURITY_WARNINGS};
+        push @allowed_prefixes, $ENV{TMPDIR};
+        push @allowed_prefixes, "$ENV{TMPDIR}/" unless $ENV{TMPDIR} =~ m{/$};
+    }
+
+    require Cwd;
+    my $resolved_path = Cwd::abs_path($socket_path);
+    die "Invalid socket path: cannot resolve\n" unless defined $resolved_path;
+    for my $prefix (@allowed_prefixes) {
+        my $resolved_prefix = Cwd::abs_path($prefix);
+        next unless defined $resolved_prefix;
+        if (index($resolved_path, $resolved_prefix) == 0) {
+            $valid_socket_path = 1;
+            last;
+        }
+    }
+    die "Invalid socket path: must be within a temporary directory (/tmp, /var/tmp, TMPDIR, etc.)\n"
+        unless $valid_socket_path;
 
     # Validate server_name - alphanumeric with hyphens/underscores only
     die "Invalid server name: must be alphanumeric with hyphens/underscores\n"
@@ -116,6 +180,19 @@ sub run {
     # Build tool lookup
     my %tool_by_name = map { $_->{name} => $_ } @$tools;
 
+    # Validate socket ownership before connecting (defense-in-depth)
+    # This helps detect if an attacker has replaced the socket with one they control
+    {
+        my @stat_info = stat($socket_path);
+        if (@stat_info) {
+            my $socket_uid = $stat_info[4];
+            if ($socket_uid != $<) {
+                die "Security error: socket '$socket_path' is owned by uid $socket_uid, expected uid $< (current user)\n";
+            }
+        }
+        # If stat fails, the socket may not exist yet - let the connect() call handle it
+    }
+
     # Connect to parent socket
     $state->{socket} = IO::Socket::UNIX->new(
         Type => SOCK_STREAM,
@@ -124,7 +201,8 @@ sub run {
 
     $state->{socket}->autoflush(1);
 
-    $log->debug("SDKRunner: Connected to %s", $socket_path);
+    $log->debug(sprintf("SDKRunner: Initializing with socket: %s", $socket_path));
+    $log->debug("SDKRunner: Connected to parent socket");
 
     # Create IO::Async event loop
     $state->{loop} = IO::Async::Loop->new;
@@ -153,7 +231,7 @@ sub run {
                 my $line = $1;
                 next unless length $line;
 
-                $log->trace("SDKRunner: Received: %s", $line);
+                $log->trace(sprintf("SDKRunner: Received: %s", $line));
 
                 my @requests;
                 my $parse_error;
@@ -163,7 +241,7 @@ sub run {
                     $parse_error = $_;
                 };
                 if ($parse_error) {
-                    $log->warning("SDKRunner: Failed to parse JSON: %s", $parse_error);
+                    $log->warning(sprintf("SDKRunner: Failed to parse JSON: %s", $parse_error));
                     next;
                 }
 
@@ -174,7 +252,7 @@ sub run {
 
                     if ($response) {
                         my $json = $state->{jsonl}->encode([$response]);
-                        $log->trace("SDKRunner: Sending: %s", $json);
+                        $log->trace(sprintf("SDKRunner: Sending: %s", $json));
                         print $json;
                         STDOUT->flush();
                     }
@@ -188,7 +266,7 @@ sub run {
         },
         on_read_error => sub {
             my ($stream, $errno) = @_;
-            $log->debug("SDKRunner: STDIN read error: %s", $errno);
+            $log->debug(sprintf("SDKRunner: STDIN read error: %s", $errno));
             $shutdown->();
         },
     );
@@ -216,7 +294,7 @@ sub run {
         },
         on_read_error => sub {
             my ($stream, $errno) = @_;
-            $log->debug("SDKRunner: Socket error: %s", $errno);
+            $log->debug(sprintf("SDKRunner: Socket error: %s", $errno));
             $shutdown->();
         },
     );
@@ -224,10 +302,15 @@ sub run {
     $state->{loop}->add($stdin_stream);
     $state->{loop}->add($state->{socket_stream});
 
+    $log->debug("SDKRunner: Starting event loop");
+
     # Run the event loop
     $state->{loop}->run;
 
+    $log->debug("SDKRunner: Event loop stopped");
+
     # Cleanup
+    $log->debug("SDKRunner: Closing socket connection");
     $state->{loop}->remove($stdin_stream) if $stdin_stream;
     $state->{loop}->remove($state->{socket_stream}) if $state->{socket_stream};
     $state->{socket}->close() if $state->{socket};
@@ -240,6 +323,8 @@ sub handle_mcp_request {
     my $method = $request->{method} // '';
     my $id     = $request->{id};
     my $params = $request->{params} // {};
+
+    $log->debug(sprintf("SDKRunner: Handling MCP request method=%s id=%s", $method, $id // 'none'));
 
     # Handle MCP protocol methods
     if ($method eq 'initialize') {
@@ -282,6 +367,8 @@ sub handle_mcp_request {
     elsif ($method eq 'tools/call') {
         my $tool_name = $params->{name};
         my $arguments = $params->{arguments} // {};
+
+        $log->debug(sprintf("SDKRunner: Forwarding tools/call for tool=%s", $tool_name // 'none'));
 
         my $tool = $tool_by_name->{$tool_name};
         unless ($tool) {
@@ -355,7 +442,8 @@ sub call_parent_handler {
         args => $args,
     }]);
 
-    $log->trace("SDKRunner: Sending to parent: %s", $request);
+    $log->debug(sprintf("SDKRunner: Sending request to parent id=%s", $request_id));
+    $log->trace(sprintf("SDKRunner: Request payload: %s", $request));
 
     $state->{socket_stream}->write($request);
 
@@ -365,12 +453,17 @@ sub call_parent_handler {
     # Wait for response with configurable timeout using actual elapsed time
     require Time::HiRes;
     my $timeout = $ENV{CLAUDE_AGENT_TOOL_TIMEOUT} // 60;
+    my $max_timeout = 300;
     # Ensure numeric value between 1-300 seconds (1 sec to 5 minutes)
     # Non-numeric, empty, zero, or out-of-range values fall back to 60s default
     # Security note: Lower maximum (300s) prevents resource exhaustion attacks.
     # For operations requiring longer timeouts, consider breaking them into smaller steps.
-    if (!defined $timeout || $timeout !~ /^\d+$/ || $timeout < 1 || $timeout > 300) {
+    if (!defined $timeout || $timeout !~ /^\d+$/ || $timeout < 1) {
         $timeout = 60;
+    } elsif ($timeout > $max_timeout) {
+        $log->warning(sprintf("CLAUDE_AGENT_TOOL_TIMEOUT=%d exceeds maximum (%d seconds), capping to %d seconds",
+            $timeout, $max_timeout, $max_timeout));
+        $timeout = $max_timeout;
     }
     my $start_time = Time::HiRes::time();
     my $backoff = 0.1;
@@ -387,17 +480,26 @@ sub call_parent_handler {
         $backoff = $backoff * 1.5 if $backoff < 1.0;  # Exponential backoff up to 1 second
 
         # Detect buffer growth without complete JSON lines (malformed/incomplete data)
+        # Use tiered limits to detect issues early before memory spikes
         my $current_buffer_size = length($state->{response_buffer});
-        my $max_buffer_size = 10_000_000;  # 10MB hard limit
+        my $warn_buffer_size = 5_000_000;   # 5MB warning threshold
+        my $max_buffer_size = 10_000_000;   # 10MB hard limit
         if ($current_buffer_size > $max_buffer_size) {
-            $log->debug("SDKRunner: Buffer overflow (size: %d), aborting", $current_buffer_size);
+            $log->debug(sprintf("SDKRunner: Buffer overflow (size: %d bytes), aborting", $current_buffer_size));
+            # Clear buffer to reclaim memory before returning error
+            $state->{response_buffer} = '';
             last;
+        }
+        elsif ($current_buffer_size > $warn_buffer_size) {
+            # Log warning at 5MB to alert before hitting hard limit
+            $log->debug(sprintf("SDKRunner: Buffer approaching limit (size: %d bytes, limit: %d)",
+                $current_buffer_size, $max_buffer_size));
         }
         if ($current_buffer_size > 0 && $current_buffer_size == $last_buffer_size) {
             $stall_count++;
             if ($stall_count >= $max_stall_iterations) {
-                $log->debug("SDKRunner: Buffer stalled with incomplete data (size: %d)",
-                    $current_buffer_size);
+                $log->debug(sprintf("SDKRunner: Buffer stalled with incomplete data (size: %d)",
+                    $current_buffer_size));
                 last;
             }
         } elsif ($current_buffer_size != $last_buffer_size) {
@@ -412,45 +514,59 @@ sub call_parent_handler {
 
     # Extract the response line from buffer, matching by request ID
     my $response_line;
-    # Parse all complete lines and find matching response by ID
-    # Buffer unmatched responses for other pending requests
-    my @unmatched_lines;
-    while ($state->{response_buffer} =~ s/^(.+)\n//) {
-        my $line = $1;
-        my ($resp, $parse_err);
-        try {
-            ($resp) = $state->{jsonl}->decode($line);
-        } catch {
-            $parse_err = $_;
-        };
-        if ($parse_err || !$resp) {
-            # Keep unparseable lines for debugging, but don't block
-            $log->trace("SDKRunner: Failed to parse buffered line: %s", $line);
-            next;
-        }
-        if ($resp->{id} && $resp->{id} eq $request_id) {
-            $response_line = $line;
-            last;
-        }
-        # Buffer unmatched responses for other pending requests
-        push @unmatched_lines, $line;
+    # First check if we have a pending response for this request ID (from previous calls)
+    # NOTE: pending_responses is initialized in reset_state() which is called at start of run().
+    # Always verify initialization to catch bugs early - uninitialized state indicates
+    # reset_state() was not called properly, which is a programming error.
+    if (!defined $state->{pending_responses}) {
+        require Carp;
+        Carp::croak("BUG: pending_responses not initialized - reset_state() was not called properly. "
+            . "This is a programming error that must be fixed.");
     }
-    # Restore unmatched lines to buffer (prepend so they're processed first next time)
-    if (@unmatched_lines) {
-        $state->{response_buffer} = join("\n", @unmatched_lines) . "\n" . $state->{response_buffer};
+    if (exists $state->{pending_responses}{$request_id}) {
+        my $pending = delete $state->{pending_responses}{$request_id};
+        $response_line = $pending->{line};
+    }
+    else {
+        # Parse all complete lines and find matching response by ID
+        # Store unmatched responses in a hash keyed by request ID for efficient lookup
+        while ($state->{response_buffer} =~ s/^(.+)\n//) {
+            my $line = $1;
+            my ($resp, $parse_err);
+            try {
+                ($resp) = $state->{jsonl}->decode($line);
+            } catch {
+                $parse_err = $_;
+            };
+            if ($parse_err || !$resp) {
+                # Log unparseable lines at debug level to aid troubleshooting
+                $log->debug(sprintf("SDKRunner: Failed to parse buffered line (discarding): %s", $line));
+                next;
+            }
+            if ($resp->{id} && $resp->{id} eq $request_id) {
+                $response_line = $line;
+                last;
+            }
+            # Store unmatched responses in hash keyed by ID for later retrieval
+            # This avoids buffer corruption from re-joining partial data
+            if ($resp->{id}) {
+                $state->{pending_responses}{$resp->{id}} = { line => $line, resp => $resp };
+            }
+        }
     }
     # Reset flag if no more complete lines
     $state->{got_response} = 0 unless $state->{response_buffer} =~ /\n/;
 
     unless ($response_line) {
-        $log->debug("SDKRunner: No response from parent (timeout)");
+        $log->debug(sprintf("SDKRunner: Request timeout for id=%s after %ds", $request_id, $timeout));
         return {
             content => [{ type => 'text', text => 'No response from handler (timeout)' }],
             isError => \1,
         };
     }
 
-    $log->trace("SDKRunner: Received from parent: %s", $response_line);
+    $log->debug(sprintf("SDKRunner: Received response for id=%s", $request_id));
+    $log->trace(sprintf("SDKRunner: Response payload: %s", $response_line));
 
     my ($response, $parse_error);
     try {
@@ -459,7 +575,7 @@ sub call_parent_handler {
         $parse_error = $_;
     };
     if ($parse_error) {
-        $log->debug("SDKRunner: Failed to parse response: %s", $parse_error);
+        $log->debug(sprintf("SDKRunner: Failed to parse response: %s", $parse_error));
         return {
             content => [{ type => 'text', text => 'Failed to parse handler response' }],
             isError => \1,

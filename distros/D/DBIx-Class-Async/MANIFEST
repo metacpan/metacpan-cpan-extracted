@@ -45,6 +45,9 @@ t/30-delete-all.t
 t/31-search-related.t
 t/32-schema-class.t
 t/33-schema-populate.t
+t/34-schema-clone.t
+t/35-row-set-column.t
+t/36-row-id.t
 t/manifest.t
 t/pod.t
 t/test.db

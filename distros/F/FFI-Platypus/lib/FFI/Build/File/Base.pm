@@ -11,7 +11,7 @@ use FFI::Build::PluginData;
 use overload '""' => sub { $_[0]->path }, bool => sub { 1 }, fallback => 1;
 
 # ABSTRACT: Base class for File::Build files
-our $VERSION = '2.10'; # VERSION
+our $VERSION = '2.11'; # VERSION
 
 
 sub new
@@ -159,7 +159,7 @@ FFI::Build::File::Base - Base class for File::Build files
 
 =head1 VERSION
 
-version 2.10
+version 2.11
 
 =head1 SYNOPSIS
 

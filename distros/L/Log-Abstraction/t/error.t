@@ -25,7 +25,7 @@ does_carp_that_matches(sub { $logger_no_output->warn({ warning => 'No logger set
 does_carp_that_matches(sub { $logger_no_output->error({ warning => 'No logger set' }) }, qr/No logger set/);
 
 $logger_no_output = Log::Abstraction->new(carp_on_warn => 1, croak_on_error => 1);
-does_croak_that_matches(sub { $logger_no_output->error({ warning => 'No logger set' }) }, qr/No logger set/);
+does_croak_that_matches(sub { $logger_no_output->fatal({ warning => 'No logger set' }) }, qr/No logger set/);
 
 # Done testing
 done_testing();

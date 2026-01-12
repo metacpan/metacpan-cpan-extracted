@@ -2,10 +2,23 @@ package Sim::OPT::Morph;
 # This is the module Sim::OPT::Morph of Sim::OPT, distributed under a dual licence, open-source (GPL v3) and proprietary.
 # Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-our $morph = bless( {}, "Sim::OPT::Morph" );
-
 use Exporter;
+@ISA = qw( Exporter );
+our $morph = bless( {}, "Sim::OPT::Morph" );
+our @EXPORT = qw( 
+morph translate translate_surface_simple translate_surface rotate_surface translate_vertices shift_vertices rotate
+rotatez make_generic_change reassign_construction change_thickness
+recalculateish daylightcalc daylightcalc_other change_config checkfile change_climate recalculatenet apply_constraints
+reshape_windows warp use_modish export_toenergyplus genchange genprop change_groundreflectance constrain_geometry
+read_geometry read_geo_constraints apply_geo_constraints vary_controls
+calc_newctl checkfile constrain_controls read_controls read_control_constraints apply_loopcontrol_changes
+apply_flowcontrol_changes constrain_obstructions read_obstructions read_obs_constraints apply_obs_constraints
+vary_net read_net apply_node_changes readobsfile obs_modify
+decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rotate3d fixlength purifydata
+gatherseparators supercleanarray modish $max_processes @weighttransforms rebuildconstr 
+); # our @EXPORT = qw( );
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
+
 use Math::Trig;
 use Math::Round;
 use List::Util qw[ min max reduce shuffle];
@@ -25,30 +38,32 @@ use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
+use Sim::OPT::Parcoord3d;
 use Sim::OPT::Stats;
-eval { use Sim::OPTcue; 1 };
-eval { use Sim::OPTcue::Patternsearch; 1 };
+eval { use Sim::OPTcue::OPTcue; 1 };
+eval { use Sim::OPTcue::Metabridge; 1 };
+eval { use Sim::OPTcue::Exogen::PatternSearch; 1 };
+eval { use Sim::OPTcue::Exogen::NelderMead; 1 };
+eval { use Sim::OPTcue::Exogen::Armijo; 1 };
+eval { use Sim::OPTcue::Exogen::NSGAII; 1 };
+eval { use Sim::OPTcue::Exogen::ParticleSwarm; 1 };
+eval { use Sim::OPTcue::Exogen::SimulatedAnnealing; 1 };
+eval { use Sim::OPTcue::Exogen::NSGAIII; 1 };
+eval { use Sim::OPTcue::Exogen::MOEAD; 1 };
+eval { use Sim::OPTcue::Exogen::SPEA2; 1 };
+eval { use Sim::OPTcue::Exogen::ParticleSwarm; 1 };
+eval { use Sim::OPTcue::Exogen::RadialBasis; 1 };
+eval { use Sim::OPTcue::NeuralBoltzmann; 1 };
+eval { use Sim::OPTcue::Exogen::Kriging; 1 };
+eval { use Sim::OPTcue::Exogen::DecisionTree; 1 };
 
 use Data::Dump qw(dump);
+
 use feature 'say';
 
 no strict;
 no warnings;
-@ISA = qw( Exporter );
 
-
-our @EXPORT = qw(
-morph translate translate_surface_simple translate_surface rotate_surface translate_vertices shift_vertices rotate
-rotatez make_generic_change reassign_construction change_thickness
-recalculateish daylightcalc daylightcalc_other change_config checkfile change_climate recalculatenet apply_constraints
-reshape_windows warp use_modish export_toenergyplus genchange genprop change_groundreflectance constrain_geometry
-read_geometry read_geo_constraints apply_geo_constraints vary_controls
-calc_newctl checkfile constrain_controls read_controls read_control_constraints apply_loopcontrol_changes
-apply_flowcontrol_changes constrain_obstructions read_obstructions read_obs_constraints apply_obs_constraints
-vary_net read_net apply_node_changes readobsfile obs_modify
-decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rotate3d fixlength purifydata
-gatherseparators supercleanarray modish $max_processes @weighttransforms rebuildconstr 
-); # our @EXPORT = qw( );
 
 $VERSION = '0.175'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model for simulation programs.';
@@ -56,19 +71,14 @@ $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric var
 ################################################# MORPH
 
 
-
-
-
-
-#DDD 
 sub getcrossing 
 { # THIS RETURNS THE INTERSECTION POINT BETWEEN TWO LINES COINTANING ONE SEGMENT EACH, DESCRIBED WITH TWO POINTS.
-    my ($x1, $y1, $z1,   # point A of segment 1
-        $x2, $y2, $z2,   # point B of segment 1
-        $x3, $y3, $z3,   # point C of segment 2
-        $x4, $y4, $z4) = @_;  # point D of segment 2
+    my ($x1, $y1, $z1, # point of segment a
+        $x2, $y2, $z2,  # point of segment a
+        $x3, $y3, $z3,  # point of segment b
+        $x4, $y4, $z4) = @_; # point of segment b
 
-    my $tolerance = 0.000000001; #tolerance
+    my $tolerance = 0.000000001; # tolerance!
 
     # Points
     my @A = ($x1, $y1, $z1);
@@ -76,30 +86,24 @@ sub getcrossing
     my @C = ($x3, $y3, $z3);
     my @D = ($x4, $y4, $z4);
 
-    # Direction vectors r = B - A, s = D - C
     my @r = ($B[0]-$A[0], $B[1]-$A[1], $B[2]-$A[2]);
     my @s = ($D[0]-$C[0], $D[1]-$C[1], $D[2]-$C[2]);
 
-    # w0 = A - C
     my @w0 = ($A[0]-$C[0], $A[1]-$C[1], $A[2]-$C[2]);
 
-    # Dot products
-    my $a = $r[0]*$r[0] + $r[1]*$r[1] + $r[2]*$r[2];         # r·r
-    my $b = $r[0]*$s[0] + $r[1]*$s[1] + $r[2]*$s[2];         # r·s
-    my $c = $s[0]*$s[0] + $s[1]*$s[1] + $s[2]*$s[2];         # s·s
-    my $d = $r[0]*$w0[0] + $r[1]*$w0[1] + $r[2]*$w0[2];      # r·w0
-    my $e = $s[0]*$w0[0] + $s[1]*$w0[1] + $s[2]*$w0[2];      # s·w0
+    my $a = $r[0]*$r[0] + $r[1]*$r[1] + $r[2]*$r[2];  
+    my $b = $r[0]*$s[0] + $r[1]*$s[1] + $r[2]*$s[2];  
+    my $c = $s[0]*$s[0] + $s[1]*$s[1] + $s[2]*$s[2];  
+    my $d = $r[0]*$w0[0] + $r[1]*$w0[1] + $r[2]*$w0[2]; 
+    my $e = $s[0]*$w0[0] + $s[1]*$w0[1] + $s[2]*$w0[2]; 
 
-    my $den = $a*$c - $b*$b; # determinant of the 2×2 linear system that solves for the parameters 𝑡 t and 𝑢 u in the line–line closest‐point equations. It is the key value that tells you whether the two lines are: parallel or collinear intersecting skew.
+    my $den = $a*$c - $b*$b; 
 
-    # Case 1: parallel or collinear -> undef
     return undef if abs($den) < $tolerance;
 
-    # Solve for parameters t, u on the infinite lines
     my $t = ($b*$e - $c*$d) / $den;
     my $u = ($a*$e - $b*$d) / $den;
 
-    # Points on each line
     my @P = ( $A[0] + $t*$r[0],
               $A[1] + $t*$r[1],
               $A[2] + $t*$r[2] );
@@ -108,7 +112,6 @@ sub getcrossing
               $C[1] + $u*$s[1],
               $C[2] + $u*$s[2] );
 
-    # Distance between P and Q
     my $dx = $P[0] - $Q[0];
     my $dy = $P[1] - $Q[1];
     my $dz = $P[2] - $Q[2];
@@ -116,43 +119,40 @@ sub getcrossing
 
     if ($dist2 <= $tolerance*$tolerance) 
     {
-        # Case 2: lines intersect (maybe outside segments) -> return intersection
-        return [ @P ];  # P and Q are (numerically) the same
+        return [ @P ]; 
     } 
     else 
     {
-        # Case 3: skew lines -> return closest point (midpoint between P and Q)
-        return [
-            ($P[0] + $Q[0]) / 2,
+        return( [ ($P[0] + $Q[0]) / 2,
             ($P[1] + $Q[1]) / 2,
-            ($P[2] + $Q[2]) / 2,
-        ];
+            ($P[2] + $Q[2]) / 2, ] );
     }
 }
 
 
 sub rotateabout
 {
-  my ($x, $y, $z,        # point to rotate (P)
-  $x4, $y4, $z4,     # point D on axis
-  $x5, $y5, $z5,     # point E on axis
-  $deg) = @_;        # angle in DEGREES
+  my ($x, $y, $z, # point to rotate
+  $x4, $y4, $z4, # point on axis
+  $x5, $y5, $z5, # point on axis
+  $deg) = @_; # angle, degrees
 
-  # convert degrees -> radians
   my $theta = $deg * pi / 180;
 
-  # Vector v = P - D
   my $vx = $x  - $x4;
   my $vy = $y  - $y4;
   my $vz = $z  - $z4;
 
-  # Axis direction k = (E - D) normalized
   my $ux = $x5 - $x4;
   my $uy = $y5 - $y4;
   my $uz = $z5 - $z4;
 
   my $len = sqrt( ($ux * $ux) + ($uy * $uy) + ($uz * $uz) );
-  die "Axis points D and E coincide\n" if $len == 0;
+
+  if ( $len == 0 )
+  {
+    die "Axis points D and E coincide\n" ;
+  }
 
   $ux = ($ux / $len);
   $uy = ($uy / $len);
@@ -161,73 +161,55 @@ sub rotateabout
   my $ct = cos($theta);
   my $st = sin($theta);
 
-  # k·v
   my $dot = ( ($ux * $vx) + ($uy * $vy) + ($uz * $vz) );
 
-  # k × v
   my $cx = ( ($uy * $vz) - ($uz * $vy) );
   my $cy = ( ($uz * $vx) - ($ux * $vz) );
   my $cz = ( ($ux * $vy) - ($uy * $vx) );
 
-  # Rodrigues formula
   my $rx = ( ($vx * $ct) + ($cx * $st) + ($ux * $dot * (1 - $ct) ) );
   my $ry = ( ($vy * $ct) + ($cy * $st) + ($uy * $dot * (1 - $ct) ) );
   my $rz = ( ($vz * $ct) + ($cz * $st) + ($uz * $dot * (1 - $ct) ) );
 
-  # Shift back by D
   $rx = $rx + $x4;
   $ry = $ry + $y4;
   $rz = $rz + $z4;
 
-  return ($rx, $ry, $rz);
+  return( $rx, $ry, $rz );
 }
-
 
 
 sub closest_point_on_segment_3d 
 {
-    my ($x1, $y1, $z1,   # A
-        $x2, $y2, $z2,   # B
-        $x3, $y3, $z3) = @_;  # C
+    my ( $x1, $y1, $z1,
+        $x2, $y2, $z2, 
+        $x3, $y3, $z3 ) = @_;  
 
-    # Vector v = B - A (segment direction)
     my $vx = $x2 - $x1;
     my $vy = $y2 - $y1;
     my $vz = $z2 - $z1;
 
-    # Handle degenerate segment (A == B)
     my $len2 = $vx*$vx + $vy*$vy + $vz*$vz;
     if ( $len2 == 0 ) 
     {
-        # Segment is a point: closest point is A itself
         return ($x1, $y1, $z1, 0.0);
     }
 
-    # Vector w = C - A
     my $wx = $x3 - $x1;
     my $wy = $y3 - $y1;
     my $wz = $z3 - $z1;
 
-    # Projection parameter t on infinite line
     my $t = ($wx*$vx + $wy*$vy + $wz*$vz) / $len2;
 
-    # Clamp t to [0, 1] to stay on the segment
     if    ($t < 0) { $t = 0; }
     elsif ($t > 1) { $t = 1; }
 
-    # Closest point P = A + t * v
     my $px = $x1 + $t * $vx;
     my $py = $y1 + $t * $vy;
     my $pz = $z1 + $t * $vz;
 
-    # Return closest point and the parameter t
-    return ($px, $py, $pz, $t);
-
-    # USAGE EXAMPLE
-    # my ($px, $py, $pz, $t) =
-    # closest_point_on_segment_3d($x1, $y1, $z1,
-    #                             $x2, $y2, $z2,
-    #                             $x3, $y3, $z3);
+    return( $px, $py, $pz, $t );
+    # my ($px, $py, $pz, $t) = closest_point_on_segment_3d($x1, $y1, $z1, $x2, $y2, $z2, $x3, $y3, $z3);
 }
 
 
@@ -235,19 +217,16 @@ sub closest_point_on_segment_3d
 
 sub plane_quad_intersection 
 {
-    my (
-        $x1,$y1,$z1,   # A - point on plane
-        $x2,$y2,$z2,   # B - point on plane
-        $x3,$y3,$z3,   # C - point on plane
-        $px0,$py0,$pz0,  # P0 - quad vertices
-        $px1,$py1,$pz1,  # P1
-        $px2,$py2,$pz2,  # P2
-        $px3,$py3,$pz3   # P3
-    ) = @_;
+    my ( $x1,$y1,$z1, # point on plane
+         $x2,$y2,$z2, # point on plane
+         $x3,$y3,$z3, # point on plane
+         $px0,$py0,$pz0, # quad vertex
+         $px1,$py1,$pz1, # quad vertex
+         $px2,$py2,$pz2,  # quad vertex
+         $px3,$py3,$pz3 ) = @_; # quad vertex
 
     my $EPS = 1e-9;
 
-    # Build normal vector n = (B-A) x (C-A)
     my $abx = $x2 - $x1;
     my $aby = $y2 - $y1;
     my $abz = $z2 - $z1;
@@ -260,68 +239,70 @@ sub plane_quad_intersection
     my $ny = $abz * $acx - $abx * $acz;
     my $nz = $abx * $acy - $aby * $acx;
 
-    # If normal is near zero, A,B,C are collinear -> degenerate plane
     my $nlen2 = $nx*$nx + $ny*$ny + $nz*$nz;
     if ( $nlen2 < $EPS*$EPS )
     {
-        return () ;
+        return( ) ;
     }
 
-    # Quad vertices as arrays for convenience
-    my @P = (
-        [ $px0, $py0, $pz0 ],
-        [ $px1, $py1, $pz1 ],
-        [ $px2, $py2, $pz2 ],
-        [ $px3, $py3, $pz3 ],
-    );
+    my @P = ( [ $px0, $py0, $pz0 ],
+              [ $px1, $py1, $pz1 ],
+              [ $px2, $py2, $pz2 ],
+              [ $px3, $py3, $pz3 ] );
 
-    # Signed distances di = n·(Pi - A)
     my @d;
-    for my $i (0..3) {
+    for my $i ( 0..3 ) 
+    {
         my $dx = $P[$i][0] - $x1;
         my $dy = $P[$i][1] - $y1;
         my $dz = $P[$i][2] - $z1;
         $d[$i] = $nx*$dx + $ny*$dy + $nz*$dz;
     }
 
-    my @ints;  # intersection points
+    my @ints;
 
-    # Helper to push a point, avoiding duplicates (within tolerance)
     my $push_unique = sub 
     {
         my ($x,$y,$z) = @_;
-        for my $q (@ints) 
+        for my $q ( @ints ) 
         {
             my $dx = $q->[0] - $x;
             my $dy = $q->[1] - $y;
             my $dz = $q->[2] - $z;
             my $dist2 = $dx*$dx + $dy*$dy + $dz*$dz;
-            return if $dist2 < $EPS*$EPS;
+            if ( $dist2 < $EPS*$EPS )
+            {
+              return;
+            }
         }
         push ( @ints, [ $x, $y, $z ] );
     };
 
-    # Check each of the 4 edges: (0-1), (1-2), (2-3), (3-0)
-    for my $i (0..3) {
-        my $j = ($i + 1) % 4;
+    for my $i (0..3) 
+    {
+        my $j = $i + 1;
+        while ($j >= 4) 
+        { 
+            $j -= 4;
+        }
+
+        while ($j < 0)  
+        { 
+            $j += 4
+        } #MODULO, EQUIVALENT TO: $j = (($i + 1) % 4)
 
         my $di = $d[$i];
         my $dj = $d[$j];
-
         my $Pi = $P[$i];
         my $Pj = $P[$j];
 
-        # Both vertices exactly on plane -> whole edge in plane (special case)
         if ( ( abs($di) < $EPS ) and ( abs($dj) < $EPS ) )
         {
-            # Here you might choose to treat the whole edge as intersection.
-            # For the purpose of returning just points, we can add both endpoints.
             $push_unique->($Pi->[0], $Pi->[1], $Pi->[2]);
             $push_unique->($Pj->[0], $Pj->[1], $Pj->[2]);
             next;
         }
 
-        # One endpoint exactly on the plane: add that vertex
         if ( abs($di) < $EPS ) 
         {
             $push_unique->($Pi->[0], $Pi->[1], $Pi->[2]);
@@ -334,11 +315,9 @@ sub plane_quad_intersection
             next;
         }
 
-        # If signs differ, edge crosses the plane
         if ($di * $dj < 0) 
         {
-            # Linear interpolation factor along Pi->Pj
-            my $t = $di / ($di - $dj);  # between 0 and 1
+            my $t = $di / ($di - $dj);
             my $x = $Pi->[0] + $t * ($Pj->[0] - $Pi->[0]);
             my $y = $Pi->[1] + $t * ($Pj->[1] - $Pi->[1]);
             my $z = $Pi->[2] + $t * ($Pj->[2] - $Pi->[2]);
@@ -346,30 +325,25 @@ sub plane_quad_intersection
         }
     }
 
-    # @ints now contains 0,1,2 or (degenerate cases) more points
-    return( @ints );   # list of arrayrefs [x,y,z]
-
-    # Example usage
-		# my @pts = plane_quad_intersection(
-		#     # Plane points A,B,C
-		#     $x1, $y1, $z1,
-		#     $x2, $y2, $z2,
-		#     $x3, $y3, $z3,
-		#     # Quad P0..P3
-		#     $qx0, $qy0, $qz0,
-		#     $qx1, $qy1, $qz1,
-		#     $qx2, $qy2, $qz2,
-		#     $qx3, $qy3, $qz3,
-		# );
+    return( @ints ); 
+	# my @pts = plane_quad_intersection (
+	## Plane points A,B,C
+	# $x1, $y1, $z1,
+	# $x2, $y2, $z2,
+	# $x3, $y3, $z3,
+	## Quad P0..P3
+	# $qx0, $qy0, $qz0,
+	# $qx1, $qy1, $qz1,
+	# $qx2, $qy2, $qz2,
+	# $qx3, $qy3, $qz3 );
 }
-
 
 
 
 sub distance_3d 
 {
-    my ($x1, $y1, $z1,   # Point 1
-        $x2, $y2, $z2) = @_;  # Point 2
+    my ($x1, $y1, $z1, 
+        $x2, $y2, $z2) = @_;  
 
     my $dx = $x2 - $x1;
     my $dy = $y2 - $y1;
@@ -380,20 +354,16 @@ sub distance_3d
 
 
 
-
 sub line_plane_intersection 
 {
-    my (
-        $x1, $y1, $z1,   # P0: point on plane
-        $x2, $y2, $z2,   # P1: point on plane
-        $x3, $y3, $z3,   # P2: point on plane
-        $x4, $y4, $z4,   # A: first point of segment/line
-        $x5, $y5, $z5    # B: second point of segment/line
-    ) = @_;
+    my ( $x1, $y1, $z1, # point on plane
+         $x2, $y2, $z2, # point on plane
+         $x3, $y3, $z3, # point on plane
+         $x4, $y4, $z4, # 1st point of segment/line
+         $x5, $y5, $z5 ) = @_; # 2nd point of segment/line
 
     my $EPS = 1e-9;
 
-    # Plane normal n = (P1 - P0) x (P2 - P0)
     my $u1 = $x2 - $x1;
     my $u2 = $y2 - $y1;
     my $u3 = $z2 - $z1;
@@ -406,51 +376,45 @@ sub line_plane_intersection
     my $ny = $u3 * $v1 - $u1 * $v3;
     my $nz = $u1 * $v2 - $u2 * $v1;
 
-    # Degenerate plane (points collinear)
     my $nlen2 = $nx*$nx + $ny*$ny + $nz*$nz;
-    return undef if $nlen2 < $EPS * $EPS;
+    if ( $nlen2 < ( $EPS * $EPS ) )
+    {
+        return( undef );
+    }
 
-    # Line direction d = B - A
     my $dx = $x5 - $x4;
     my $dy = $y5 - $y4;
     my $dz = $z5 - $z4;
 
-    # w = A - P0
     my $wx = $x4 - $x1;
     my $wy = $y4 - $y1;
     my $wz = $z4 - $z1;
 
-    # Denominator: n · d
-    my $den = $nx*$dx + $ny*$dy + $nz*$dz;
+    my $den = ( $nx * $dx ) + ( $ny * $dy ) + ( $nz * $dz );
 
-    # If den ~ 0, line is parallel to plane (or lies in it)
     if ( abs($den) < $EPS ) 
     {
-        # Check if line lies in plane: n · w ≈ 0
         my $num = $nx*$wx + $ny*$wy + $nz*$wz;
-        return undef;  # either parallel disjoint or infinite solutions; we treat as "no single point"
+        return undef;
     }
 
-    # t = - (n · w) / (n · d)
     my $num = $nx*$wx + $ny*$wy + $nz*$wz;
     my $t   = - $num / $den;
 
-    # Intersection point: A + t * d
     my $ix = $x4 + $t * $dx;
     my $iy = $y4 + $t * $dy;
     my $iz = $z4 + $t * $dz;
 
     return ($ix, $iy, $iz, $t);
 
-    # Usage example:
-		# my ($ix, $iy, $iz, $t) =
-		#     line_plane_intersection_3d(
-		#         $px1, $py1, $pz1,   # plane point 1
-		#         $px2, $py2, $pz2,   # plane point 2
-		#         $px3, $py3, $pz3,   # plane point 3
-		#         $sx1, $sy1, $sz1,   # segment point A
-		#         $sx2, $sy2, $sz2    # segment point B
-		#     );
+	# my ($ix, $iy, $iz, $t) =
+	# line_plane_intersection_3d(
+	# $px1, $py1, $pz1,   # plane point 1
+	# $px2, $py2, $pz2,   # plane point 2
+	# $px3, $py3, $pz3,   # plane point 3
+	# $sx1, $sy1, $sz1,   # segment point A
+	# $sx2, $sy2, $sz2    # segment point B
+	#     );
 }
 
 
@@ -459,15 +423,14 @@ sub line_plane_intersection
 sub closest_point_on_plane 
 {
     my (
-        $x1, $y1, $z1,   # A - point on plane
-        $x2, $y2, $z2,   # B - point on plane
-        $x3, $y3, $z3,   # C - point on plane
-        $xp, $yp, $zp    # P - external point
+        $x1, $y1, $z1, # point on plane
+        $x2, $y2, $z2, # point on plane
+        $x3, $y3, $z3, #  point on plane
+        $xp, $yp, $zp  # external point
     ) = @_;
 
     my $EPS = 1e-9;
 
-    # Vectors AB and AC
     my $abx = $x2 - $x1;
     my $aby = $y2 - $y1;
     my $abz = $z2 - $z1;
@@ -476,39 +439,33 @@ sub closest_point_on_plane
     my $acy = $y3 - $y1;
     my $acz = $z3 - $z1;
 
-    # Plane normal n = AB x AC
     my $nx = $aby * $acz - $abz * $acy;
     my $ny = $abz * $acx - $abx * $acz;
     my $nz = $abx * $acy - $aby * $acx;
 
-    # Check degenerate plane (three points almost collinear)
     my $nlen2 = $nx*$nx + $ny*$ny + $nz*$nz;
     return undef if $nlen2 < $EPS * $EPS;
 
-    # w = P - A
     my $wx = $xp - $x1;
     my $wy = $yp - $y1;
     my $wz = $zp - $z1;
 
-    # t = (n·w) / (n·n)
     my $dot = $nx*$wx + $ny*$wy + $nz*$wz;
     my $t   = $dot / $nlen2;
 
-    # Projection: P_proj = P - t * n
     my $xq = $xp - $t * $nx;
     my $yq = $yp - $t * $ny;
     my $zq = $zp - $t * $nz;
 
     return ($xq, $yq, $zq);
 
-    # Usage:
-		# my ($xq, $yq, $zq) =
-		#     closest_point_on_plane_3d(
-		#         $x1, $y1, $z1,
-		#         $x2, $y2, $z2,
-		#         $x3, $y3, $z3,
-		#         $xp, $yp, $zp
-    # );
+	# my ($xq, $yq, $zq) =
+	#     closest_point_on_plane_3d(
+	#         $x1, $y1, $z1,
+	#         $x2, $y2, $z2,
+	#         $x3, $y3, $z3,
+	#         $xp, $yp, $zp
+# );
 }
 
 
@@ -517,22 +474,20 @@ sub closest_point_on_plane
 sub line_perp_to_line_and_plane 
 {
     my (
-        $x1, $y1, $z1,     # Line point A
-        $x2, $y2, $z2,     # Line point B
-        $xp, $yp, $zp,     # Point P on the line, through which new line passes
-        $xa, $ya, $za,     # Plane point P0
-        $xb, $yb, $zb,     # Plane point P1
-        $xc, $yc, $zc      # Plane point P2
+        $x1, $y1, $z1,  # line point A
+        $x2, $y2, $z2,  # line point B
+        $xp, $yp, $zp,  # point P on the line, through which new line passes
+        $xa, $ya, $za,  # plane point P0
+        $xb, $yb, $zb, # plane point P1
+        $xc, $yc, $zc # plane point P2
     ) = @_;
 
     my $EPS = 1e-9;
 
-    # Direction of given line v = B - A
     my $vx = $x2 - $x1;
     my $vy = $y2 - $y1;
     my $vz = $z2 - $z1;
 
-    # Plane normal n = (P1-P0) x (P2-P0)
     my $u1 = $xb - $xa;
     my $u2 = $yb - $ya;
     my $u3 = $zb - $za;
@@ -545,30 +500,29 @@ sub line_perp_to_line_and_plane
     my $ny = $u3*$v1 - $u1*$v3;
     my $nz = $u1*$v2 - $u2*$v1;
 
-    # Check degenerate plane (three points almost collinear)
     my $nlen2 = $nx*$nx + $ny*$ny + $nz*$nz;
-    return undef if $nlen2 < $EPS * $EPS;
+    if( $nlen2 < ( $EPS * $EPS ) )
+    {
+        return( undef );
+    }
 
-    # For the new line to be perpendicular to the plane,
-    # its direction must be parallel to n.
-    # For it to be perpendicular to the original line,
-    # we need v · n = 0 (line parallel to plane).
-    my $vdotn = $vx*$nx + $vy*$ny + $vz*$nz;
-    return undef if abs($vdotn) > $EPS;  # no solution if not ~0
 
-    # Direction of new line: just use the plane normal n
+    my $vdotn = ( ( $vx * $nx ) + ( $vy * $ny ) + ( $vz * $nz ) );
+    if ( abs($vdotn) > $EPS )
+    {
+        return( undef );
+    }
+
     my $dx = $nx;
     my $dy = $ny;
     my $dz = $nz;
 
-    # Optionally normalize (not strictly necessary):
-    my $dlen = sqrt( $dx*$dx + $dy*$dy + $dz*$dz );
-    $dx /= $dlen;
-    $dy /= $dlen;
-    $dz /= $dlen;
+    my $dlen = sqrt( ( $dx * $dx ) + ( $dy * $dy ) + ( $dz * $dz ) );
+    $dx = $dx / $dlen;
+    $dy = $dy / $dlen;
+    $dz = $dz / $dlen;
 
-    # Return the new line as P + t * d
-    return ($xp, $yp, $zp, $dx, $dy, $dz);
+    return( $xp, $yp, $zp, $dx, $dy, $dz );
 }
 
 
@@ -576,119 +530,99 @@ sub line_perp_to_line_and_plane
 sub line_perp_to_line_and_parallel_to_line 
 {
     my (
-        $x1, $y1, $z1,     # Line 1 point A
-        $x2, $y2, $z2,     # Line 1 point B
-        $xp, $yp, $zp,     # Point P through which new line passes
-        $x3, $y3, $z3,     # Line 2 point C
-        $x4, $y4, $z4      # Line 2 point D
+        $x1, $y1, $z1, # poiny line 1
+        $x2, $y2, $z2, # point line 1
+        $xp, $yp, $zp, # point P through which new line passes
+        $x3, $y3, $z3, # point line 2
+        $x4, $y4, $z4 # point line 2
     ) = @_;
 
     my $EPS = 1e-9;
 
-    # Direction of first line v1 = B - A
     my $v1x = $x2 - $x1;
     my $v1y = $y2 - $y1;
     my $v1z = $z2 - $z1;
 
-    # Direction of second line v2 = D - C
     my $v2x = $x4 - $x3;
     my $v2y = $y4 - $y3;
     my $v2z = $z4 - $z3;
 
-    # Check second line is not degenerate
     my $v2len2 = $v2x*$v2x + $v2y*$v2y + $v2z*$v2z;
-    return undef if $v2len2 < $EPS * $EPS;
+    if ( $v2len2 < ( $EPS * $EPS ) )
+    {
+        return( undef );
+    }
 
-    # For new line to be:
-    # - parallel to line 2: direction = v2
-    # - perpendicular to line 1: v1 · v2 = 0
-    my $dot = $v1x*$v2x + $v1y*$v2y + $v1z*$v2z;
-    return undef if abs($dot) > $EPS;   # no solution if not perpendicular
+    my $dot = ( ( $v1x * $v2x ) + ( $v1y * $v2y ) + ( $v1z * $v2z ) );
+    return undef if abs($dot) > $EPS; 
 
-    # Optionally normalize v2 (not strictly necessary for a direction vector)
     my $v2len = sqrt($v2len2);
     my $dx = $v2x / $v2len;
     my $dy = $v2y / $v2len;
     my $dz = $v2z / $v2len;
 
-    # New line: passes through P with direction (dx,dy,dz)
-    # L(t) = (xp,yp,zp) + t * (dx,dy,dz)
-    return ($xp, $yp, $zp, $dx, $dy, $dz);
+    return( $xp, $yp, $zp, $dx, $dy, $dz );
 }
 
 
 sub closest_point_on_line 
 {
     my (
-        $x1, $y1, $z1,   # A - first point on line
-        $x2, $y2, $z2,   # B - second point on line
-        $xp, $yp, $zp    # P - external point
+        $x1, $y1, $z1, # point on line
+        $x2, $y2, $z2, # point on line
+        $xp, $yp, $zp # xternal point
     ) = @_;
 
     my $EPS = 1e-9;
 
-    # Line direction v = B - A
     my $vx = $x2 - $x1;
     my $vy = $y2 - $y1;
     my $vz = $z2 - $z1;
 
     my $vlen2 = $vx*$vx + $vy*$vy + $vz*$vz;
 
-    # Degenerate case: A and B are the same point → line collapses
-    return undef if $vlen2 < $EPS * $EPS;
+    if ( $vlen2 < ( $EPS * $EPS ) )
+    {
+        return( undef ); 
+    }
 
-    # w = P - A
     my $wx = $xp - $x1;
     my $wy = $yp - $y1;
     my $wz = $zp - $z1;
 
-    # t = (w·v) / (v·v)
-    my $t = ($wx*$vx + $wy*$vy + $wz*$vz) / $vlen2;
+    my $t = ( ( ( $wx * $vx ) + ( $wy * $vy ) + ( $wz * $vz ) ) / $vlen2 );
 
-    # Closest point Q = A + t*v
     my $qx = $x1 + $t * $vx;
     my $qy = $y1 + $t * $vy;
     my $qz = $z1 + $t * $vz;
 
     return ($qx, $qy, $qz, $t);
 
-    # Example usage
-		# my ($qx, $qy, $qz, $t) =
-		#     closest_point_on_line_3d(
-		#         $x1, $y1, $z1,
-		#         $x2, $y2, $z2,
-		#         $xp, $yp, $zp
-		#     );
-    # 
-		# If one wants the closest point on the segment AB, this should be checked:
-		# if ($t < 0) {
-		#     # closest point is A
-		# } elsif ($t > 1) {
-		#     # closest point is B
-		# }
+	# my ($qx, $qy, $qz, $t) =
+	# closest_point_on_line_3d(
+	# $x1, $y1, $z1,
+	# $x2, $y2, $z2,
+	# $xp, $yp, $zp );
 }
 
 
 
 sub perpendicular_line_parallel_to_plane 
 {
-    my (
-        $x1, $y1, $z1,     # Line point A
-        $x2, $y2, $z2,     # Line point B
-        $xp, $yp, $zp,     # Point through which new line must pass
-        $xa, $ya, $za,     # Plane point P0
-        $xb, $yb, $zb,     # Plane point P1
-        $xc, $yc, $zc      # Plane point P2
+    my ( $x1, $y1, $z1, # line point
+         $x2, $y2, $z2, # line point B
+         $xp, $yp, $zp, # point through which new line must pass
+         $xa, $ya, $za, # plane point
+         $xb, $yb, $zb, # plane point
+         $xc, $yc, $zc # plane point
     ) = @_;
 
     my $EPS = 1e-9;
 
-    # Direction of given line v = B - A
     my $vx = $x2 - $x1;
     my $vy = $y2 - $y1;
     my $vz = $z2 - $z1;
 
-    # Plane normal n = (P1-P0) x (P2-P0)
     my $u1 = $xb - $xa;
     my $u2 = $yb - $ya;
     my $u3 = $zb - $za;
@@ -701,36 +635,23 @@ sub perpendicular_line_parallel_to_plane
     my $ny = $u3*$v1 - $u1*$v3;
     my $nz = $u1*$v2 - $u2*$v1;
 
-    # Check that line and plane are not parallel
-    # If v is parallel to plane => v ⋅ n == 0 => no perpendicular line exists
     my $vdotn = $vx*$nx + $vy*$ny + $vz*$nz;
     if ( abs( $vdotn ) < $EPS )
     {
         return( undef );
     }
 
-    # Direction of new line is perpendicular to both v and n:
-    # d = v × n
     my $dx = $vy*$nz - $vz*$ny;
     my $dy = $vz*$nx - $vx*$nz;
     my $dz = $vx*$ny - $vy*$nx;
 
-    # Ensure non-zero direction
     my $dlen2 = $dx*$dx + $dy*$dy + $dz*$dz;
     if ( $dlen2 < ( $EPS * $EPS ) )
     {
         return( undef );
     }
 
-    # Return the new line as: point (xp,yp,zp) and direction (dx,dy,dz)
     return( $xp, $yp, $zp, $dx, $dy, $dz );
-
-    # Usage example
-		# my @line = perpendicular_line_parallel_to_plane(
-		#     0,0,0,   1,0,0,       # line through (0,0,0)->(1,0,0)
-		#     0,1,0,                 # pass through point (0,1,0)
-		#     0,0,0,  0,0,1,  0,1,0  # plane z=0-1 defined by 3 points
-		# );
 }
 
 
@@ -739,112 +660,108 @@ sub perpendicular_line_parallel_to_plane
 sub line_perp_to_two_lines 
 {
     my (
-        $x1, $y1, $z1,     # Line 1 point A
-        $x2, $y2, $z2,     # Line 1 point B
-        $xp, $yp, $zp,     # Point P through which new line passes
-        $x3, $y3, $z3,     # Line 2 point C
-        $x4, $y4, $z4      # Line 2 point D
+        $x1, $y1, $z1, # line a point
+        $x2, $y2, $z2, # line a point B
+        $xp, $yp, $zp, # point through which new line passes
+        $x3, $y3, $z3, # line b point
+        $x4, $y4, $z4  # line b point
     ) = @_;
 
     my $EPS = 1e-9;
 
-    # Direction of first line v1 = B - A
     my $v1x = $x2 - $x1;
     my $v1y = $y2 - $y1;
     my $v1z = $z2 - $z1;
 
-    # Direction of second line v2 = D - C
     my $v2x = $x4 - $x3;
     my $v2y = $y4 - $y3;
     my $v2z = $z4 - $z3;
 
-    # Check for degenerate lines
     my $v1len2 = $v1x*$v1x + $v1y*$v1y + $v1z*$v1z;
     my $v2len2 = $v2x*$v2x + $v2y*$v2y + $v2z*$v2z;
-    return undef if $v1len2 < $EPS*$EPS;
-    return undef if $v2len2 < $EPS*$EPS;
 
-    # Direction of new line must be perpendicular to both:
-    # d = v1 × v2
-    my $dx = $v1y*$v2z - $v1z*$v2y;
-    my $dy = $v1z*$v2x - $v1x*$v2z;
-    my $dz = $v1x*$v2y - $v1y*$v2x;
+    if ( $v1len2 < ( $EPS * $EPS ) )
+    {
+        return( undef ); 
+    }
 
-    my $dlen2 = $dx*$dx + $dy*$dy + $dz*$dz;
+    if ( $v2len2 < ( $EPS * $EPS ) )
+    {
+        return( undef ); 
+    }
 
-    # If cross product is (near) zero, the lines are parallel or collinear:
-    # then there is no unique direction perpendicular to both.
-    return undef if $dlen2 < $EPS*$EPS;
 
-    # Normalize direction (optional, but convenient)
-    my $dlen = sqrt($dlen2);
-    $dx /= $dlen;
-    $dy /= $dlen;
-    $dz /= $dlen;
+    my $dx = ( ( $v1y * $v2z ) - ( $v1z * $v2y ) );
+    my $dy =  ( ( $v1z * $v2x ) - ( $v1x * $v2z ) );
+    my $dz = ( ( $v1x * $v2y ) - ( $v1y * $v2x ) );
 
-    # New line: L(t) = P + t * d
-    return ($xp, $yp, $zp, $dx, $dy, $dz);
+    my $dlen2 = ( ( $dx * $dx ) + ( $dy * $dy ) + ($dz * $dz ) );
+
+    if ( $dlen2 < ( $EPS * $EPS ) )
+    {
+        return( undef ); 
+    }
+
+    my $dlen = sqrt( $dlen2 );
+    $dx = $dx / $dlen;
+    $dy = $dy / $dlen;
+    $dz = $dz / $dlen;
+
+    return( $xp, $yp, $zp, $dx, $dy, $dz );
 }
 
 
 sub line_perp_to_line_and_parallel_to_line 
 {
-    my (
-        $x1, $y1, $z1,     # Line 1 point A
-        $x2, $y2, $z2,     # Line 1 point B
-        $xp, $yp, $zp,     # Point P through which new line passes
-        $x3, $y3, $z3,     # Line 2 point C
-        $x4, $y4, $z4      # Line 2 point D
+    my ( $x1, $y1, $z1,  # line a point
+         $x2, $y2, $z2,   # line a point
+         $xp, $yp, $zp,  # point through which new line passes
+         $x3, $y3, $z3,  # line b point
+         $x4, $y4, $z4    # line b point
     ) = @_;
 
     my $EPS = 1e-9;
 
-    # Direction of first line v1 = B - A
     my $v1x = $x2 - $x1;
     my $v1y = $y2 - $y1;
     my $v1z = $z2 - $z1;
 
-    # Direction of second line v2 = D - C
     my $v2x = $x4 - $x3;
     my $v2y = $y4 - $y3;
     my $v2z = $z4 - $z3;
 
-    # Check second line is not degenerate
-    my $v2len2 = $v2x*$v2x + $v2y*$v2y + $v2z*$v2z;
-    return undef if $v2len2 < $EPS * $EPS;
+    my $v2len2 = ( ( $v2x * $v2x ) + ( $v2y * $v2y ) + ( $v2z * $v2z ) );
 
-    # For the new line to be:
-    # - parallel to line 2: direction = v2
-    # - perpendicular to line 1: v1 · v2 = 0
+    if ( $v2len2 < ( $EPS * $EPS ) )
+    {
+        return( undef ); 
+    }
+
     my $dot = $v1x*$v2x + $v1y*$v2y + $v1z*$v2z;
-    return undef if abs($dot) > $EPS;   # no solution if not perpendicular
+    if ( abs($dot) > $EPS )
+    {
+        return( undef ); 
+    } 
 
-    # Optionally normalize v2 (not required, but convenient)
     my $v2len = sqrt($v2len2);
     my $dx = $v2x / $v2len;
     my $dy = $v2y / $v2len;
     my $dz = $v2z / $v2len;
 
-    # New line: L(t) = P + t * d
-    return ($xp, $yp, $zp, $dx, $dy, $dz);
-
-    # On failure (undef).
+    return( $xp, $yp, $zp, $dx, $dy, $dz );
 }
-
 
 
 sub angle_between_lines 
 {
-    my (
-        $x1, $y1, $z1,   # Line 1 point A1
-        $x2, $y2, $z2,   # Line 1 point B1
-        $x3, $y3, $z3,   # Line 2 point A2
-        $x4, $y4, $z4    # Line 2 point B2
+    my ( $x1, $y1, $z1, # point line a
+        $x2, $y2, $z2, # point line a
+        $x3, $y3, $z3, # point line b
+        $x4, $y4, $z4 # point line b
     ) = @_;
 
     my $EPS = 1e-12;
 
-    # Direction vectors
     my $v1x = $x2 - $x1;
     my $v1y = $y2 - $y1;
     my $v1z = $z2 - $z1;
@@ -853,109 +770,81 @@ sub angle_between_lines
     my $v2y = $y4 - $y3;
     my $v2z = $z4 - $z3;
 
-    # Lengths
     my $len1 = sqrt( $v1x*$v1x + $v1y*$v1y + $v1z*$v1z );
     my $len2 = sqrt( $v2x*$v2x + $v2y*$v2y + $v2z*$v2z );
 
-    # Degenerate line(s)
     if ( ( $len1 < $EPS ) or ( $len2 < $EPS ) )
     {
         return( undef );
     }
     
-    # Dot product
     my $dot = $v1x*$v2x + $v1y*$v2y + $v1z*$v2z;
 
-    # Cosine of angle
     my $cos_theta = $dot / ($len1 * $len2);
 
-    # Clamp for numerical safety
     $cos_theta =  1 if $cos_theta > 1;
     $cos_theta = -1 if $cos_theta < -1;
 
-    # Angle in radians
     my $theta_rad = acos($cos_theta);
 
-    # Convert to degrees
     my $theta_deg = $theta_rad * 180 / pi;
 
-    return $theta_deg;   # in [0, 180]
-
-    # Usage example:
-		# my $angle = angle_between_lines_deg(
-		#     0,0,0,  1,0,0,    # line 1: x-axis
-		#     0,0,0,  0,1,0     # line 2: y-axis
-		# );
-		# On failure (undef).
+    return( $theta_deg );  # in [0, 180], undef on failure
 }
-
-
 
 
 sub angle_between_xy_projections 
 {
-    my (
-        $x1, $y1, $z1,   # Line 1 point A
-        $x2, $y2, $z2,   # Line 1 point B
-        $x3, $y3, $z3,   # Line 2 point C
-        $x4, $y4, $z4    # Line 2 point D
+    my ( $x1, $y1, $z1, # point line a
+        $x2, $y2, $z2, # point line a
+        $x3, $y3, $z3, # point line b
+        $x4, $y4, $z4  # point line b
     ) = @_;
 
     my $EPS = 1e-12;
 
-    # Direction vectors projected onto xy
     my $v1x = $x2 - $x1;
     my $v1y = $y2 - $y1;
 
     my $v2x = $x4 - $x3;
     my $v2y = $y4 - $y3;
 
-    # Lengths
-    my $len1 = sqrt( $v1x*$v1x + $v1y*$v1y );
-    my $len2 = sqrt( $v2x*$v2x + $v2y*$v2y );
+    my $len1 = sqrt( ( $v1x * $v1x ) + ( $v1y * $v1y ) );
+    my $len2 = sqrt( ( $v2x * $v2x ) + ( $v2y * $v2y ) );
 
     if ( ( $len1 < $EPS ) or ( $len2 < $EPS ) )  
     {
         return( undef );
-    }    # degenerate
+    }   
 
-    # Normalize
-    $v1x /= $len1; $v1y /= $len1;
-    $v2x /= $len2; $v2y /= $len2;
+    $v1x = $v1x / $len1;
+    $v1y = $v1y / $len1;
+    $v2x = $v2x / $len2;
+    $v2y = $v2y / $len2;
 
-    # Dot and cross in 2D
-    my $dot   = $v1x*$v2x + $v1y*$v2y;
-    my $cross = $v1x*$v2y - $v1y*$v2x;  # z-component of v1 × v2
+    my $dot   = ( ( $v1x * $v2x ) + ( $v1y * $v2y ) );
+    my $cross = ( ( $v1x * $v2y ) - ( $v1y * $v2x ) );  
 
-    # Signed angle in radians, range (-pi, pi]
     my $theta_rad = atan2($cross, $dot);
 
-    # Convert to degrees
     my $theta_deg = $theta_rad * 180 / pi;
 
-    # Already in (-180, 180], so return as is
     return( $theta_deg );   # in [0, 180)
-
-    # Example use:
-		# my $angle = angle_between_xy_projections_deg(
-		#     0,0,0,  1,1,0,    # line 1
-		#     0,0,0,  1,0,0     # line 2
-		# );
 }
 
 
 
 sub getazimuth
 {
-    my (
-        $x3, $y3, $z3,   # Line 2 point C
-        $x4, $y4, $z4    # Line 2 point D
-        ) = @_;
+    my ( $x3, $y3, $z3, 
+         $x4, $y4, $z4 
+       ) = @_;
+
     my $angle = angle_between_xy_projections (
-        0, 0, 0,   # Line 1 point A
-        1, 0, 0,   # Line 1 point B
-        $x3, $y3, $z3,   # Line 2 point C
-        $x4, $y4, $z4    # Line 2 point D
+        0, 0, 0, 
+        1, 0, 0, 
+        $x3, $y3, $z3,  
+        $x4, $y4, $z4 
         );
 
     my $az = ( $angle + 180 );
@@ -1009,7 +898,7 @@ sub setpickedinsts
         my @addinsts;
 
         my $missing = $origin;
-        my ( $box_ref, $countvrs_ref, $countsteps_ref  ) = $opt->getnear( $missing, \%mids, $countcase );
+        my ( $box_ref, $countvrs_ref, $countsteps_ref  ) = Sim::OPT::getnear( $missing, \%mids, $countcase );
         my @addinsts = @{ $box_ref };
         my @countvrs = @{ $countvrs_ref };
         my @countsteps = @{ $countsteps_ref };
@@ -1022,14 +911,14 @@ sub setpickedinsts
                 my $countvar = $countvrs[$cn];
                 my $countstep = $countsteps[$cn];
                 $is = $addinst;
-                my %to = %{ $opt->extractcase( \%inst, \%dowhat, $is, \%carrier, $file, \@blockelts, $mypath ) };
+                my %to = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $is, \%carrier, $file, \@blockelts, $mypath ) };
 
                 my ( %orig, @whatto );
 
                 if ( $cn == 0 )
                 {
-                    $origin = $opt->giveback ( \%mids );
-                    %orig = %{ $opt->extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
+                    $origin = Sim::OPT::giveback ( \%mids );
+                    %orig = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
 
                     push ( @whatto, "begin" );
                 }
@@ -1038,13 +927,13 @@ sub setpickedinsts
                 {
                     push ( @whatto, "transition" );
                     $origin = $addinsts[$cn-1];
-                    %orig = %{ $opt->extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
+                    %orig = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
                 }
 
                 if ( $cn == $#addinsts )
                 {
                     push ( @whatto, "end" );
-                    %orig = %{ $opt->extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
+                    %orig = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
                 }
 
                 my %i = %{ $inst_ref };
@@ -1058,13 +947,13 @@ sub setpickedinsts
                 my ( $crypto, $cryptor );
                 if ( $dowhat{names} eq "short" )
                 { 
-                  $crypto = $opt->encrypt1( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
-                  $cryptor = $opt->encrypt1( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
+                  $crypto = Sim::OPT::encrypt1( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
+                  $cryptor = Sim::OPT::encrypt1( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
                 }
                 elsif ( $dowhat{names} eq "medium" )
                 { 
-                  $crypto = $opt->encrypt0( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
-                  $cryptor = $opt->encrypt0( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
+                  $crypto = Sim::OPT::encrypt0( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
+                  $cryptor = Sim::OPT::encrypt0( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
                 }
 
                 $to{to} = "$mypath/$file" . "_" . "$is";  say RELATE "A in setpickinst \$to{to} " .dump ( $to{to} );
@@ -1116,7 +1005,7 @@ sub setpickedinsts
     @instances = @newinstances; # REASSIGNMENT!!!!!!
     #say  "GOING TO GIVE INSTANCES: " .dump( @instances );
     #say  "AND HAD INST: " .dump( \%inst );
-    my (  $newinstnames_r, $newinst_r ) = $opt->filterinsts_winsts( \@instances, \%inst );
+    my (  $newinstnames_r, $newinst_r ) = Sim::OPT::filterinsts_winsts( \@instances, \%inst );
     %inst = %{ $newinst_r }; # REASSIGNMENT!!!!!!
     my @newinstnames = @{ $newinstnames_r };
     push( @{ $dirfiles{dones} }, @newinstnames );
@@ -1423,11 +1312,12 @@ sub morph
 		};
 		#say  "ARRIVED IN MORPH 1";
         
+        say "\$opt: $opt";
         my $laxmode = "n";
         my ( @countvars, @countsteps );
-        if ( $opt->checkOPTcue() )
+        if ( Sim::OPT::checkOPTcue )
         {
-          my ( $countvars_r, $countsteps_r, $laxmod ) = $optcue->relax ( $countvar, $countstep );
+          my ( $countvars_r, $countsteps_r, $laxmod ) = Sim::OPTcue::relax ( $countvar, $countstep );
           @countvars = @$countvars_r;
           @countsteps = @$countsteps_r;
           $laxmode = $laxmod;
@@ -1457,7 +1347,7 @@ sub morph
 
 		my %varnums = %{ $d{varnums} };
 		my %mids = %{ $d{mids} };
-		my $rootname = $opt->getrootname( \@rootnames, $countcase );
+		my $rootname = Sim::OPT::getrootname( \@rootnames, $countcase );
 
 		my $varnumber = $countvar;
 		my $stepsvar = $varnums{$countvar};
@@ -1476,7 +1366,7 @@ sub morph
 		{
             #say  "IN MORPH FOREACH \$countvar: " . dump( $countvar ); say  " \$cntv: " . dump( $cntv );
 
-            if ( $opt->checkOPTcue() )
+            if ( Sim::OPT::checkOPTcue() )
             {
                $countstep = checkstep( $laxmode, $countstep, $cntv );
             }
@@ -1560,7 +1450,7 @@ sub morph
                 #my $target = $to{crypto};
                 #my $orig = $orig{crypto};
 
-                my $starttarget = $opt->giveback( \%mids );  #say  "STARTTARGET $starttarget";
+                my $starttarget = Sim::OPT::giveback( \%mids );  #say  "STARTTARGET $starttarget";
 				my $semph = 0;
 				unless ( ( $exeonfiles eq "n" ) or ( $semph > 0 ) )
 				{
@@ -1883,9 +1773,9 @@ sub morph
 										}
 										elsif ( $modtype eq "genmodnew" )
 										{
-                                            if ( $opt->checkOPTcue() )
+                                            if ( Sim::OPT::checkOPTcue() )
                                             {
-                                              ( $unsuited ) = $opt->genmodnew( $to, $stepsvar, $countop, $countstep, 
+                                              ( $unsuited ) = Sim::OPT::genmodnew( $to, $stepsvar, $countop, $countstep, 
                                                 \@applytype, \@genmodnew, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, 
                                                 $countinstance, \%dirfiles, $laxmode, \@blockelts, \%varnums, \%mids, $countp, \@{ $dirfiles{rebomb} }, \@instances,  );
                                                 @instances = @$instances_r;
@@ -2135,7 +2025,7 @@ sub morph
 												my $countvar = $d{countvar};
 												my $countstep = $d{countstep};
 
-												my $stepsvar = $opt->getstepsvar( $countvar, $countcase, \@varinumbers );
+												my $stepsvar = Sim::OPT::getstepsvar( $countvar, $countcase, \@varinumbers );
 
 												foreach my $todo ( @todolist )
 												{

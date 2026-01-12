@@ -6,6 +6,22 @@ Home page:    <https://metacpan.org/release/Class-XSConstructor>
 Bug tracker:  <https://github.com/tobyink/p5-class-xsconstructor/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.019000	2026-01-11
+
+ [ Documentation ]
+ - Small documentation improvements.
+
+ [ Packaging ]
+ - Change the distribution abstract.
+
+ [ Other ]
+ - Added: New undef_tolerant option.
+
+0.018002	2026-01-11
+
+ [ Documentation ]
+ - Use the right name for the Class::XSConstructor module in pod examples!
+
 0.018001	2026-01-11
 
  [ Bug Fixes ]

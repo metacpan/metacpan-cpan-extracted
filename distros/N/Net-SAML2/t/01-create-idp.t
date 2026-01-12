@@ -18,23 +18,38 @@ my $xml = <<XML;
             <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
                 <ds:X509Data>
                     <ds:X509Certificate>
-MIIDFTCCAf2gAwIBAgIBATANBgkqhkiG9w0BAQUFADA3MQswCQYDVQQGEwJVUzEO
-MAwGA1UECgwFbG9jYWwxCzAJBgNVBAsMAmN0MQswCQYDVQQDDAJDQTAeFw0xMDEw
-MDYxMjM4MTRaFw0xMTEwMDYxMjM4MTRaMFcxCzAJBgNVBAYTAlVTMQ4wDAYDVQQK
-DAVsb2NhbDELMAkGA1UECwwCY3QxDTALBgNVBAMMBHNhbWwxHDAaBgkqhkiG9w0B
-CQEWDXNhbWxAY3QubG9jYWwwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAMhu
-pJZpvu1m6ys+IrWrm3pK+onwRAYCyrgQ0RyK2cHbVLFbjBqTjKnt+PiVbnZPZUTs
-tkV9oijZGQvaMy9ingJursICUQzmOfYRDm4s9gFJJOHUGYnItRhp4uj3EoWWyX8I
-6Mr+g3/vNgNFvD5S9L7Hk1mSw8SnPlblZAWlFUwXAgMBAAGjgY8wgYwwDAYDVR0T
-AQH/BAIwADAxBglghkgBhvhCAQ0EJBYiUnVieS9PcGVuU1NMIEdlbmVyYXRlZCBD
-ZXJ0aWZpY2F0ZTAdBgNVHQ4EFgQUGy/iPd7PVObrF+lK4+ZShcbStLYwCwYDVR0P
-BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0B
-AQUFAAOCAQEAYoYq3Rc6jC7f8DnKxDHntHxH91F5mfp8Y3j7ALcRG/mrzkMhvxU2
-O2qmh4aHzZBoY1EU9VjrVgyPJPAjFQVC+OjIE46Gavh5wobzYmVGeFLOa9NhPv50
-h3EOw1eCda3VwcvStWw1OhT8cpEGqgJJVAcjwcm4VBtWjodxRn3E4zBr/xxzR1HU
-ISvnu1/xomsSS+aenG5toWmhoJIKFbfhQkpnBlgGD5+12Cxn2jHpgv15262ZZIJS
-WPp/0bQqdAAUzkJZPpUGUN1sTXPJexYT6na7XvLd6mvO1g+WDk6aZnW/zcT3T9tL
-Iavyic/p4gZtXckweq+VTn9CdZp6ZTQtVw==
+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
                     </ds:X509Certificate>
                 </ds:X509Data>
             </ds:KeyInfo>
@@ -65,7 +80,7 @@ XML
 
 my $idp = Net::SAML2::IdP->new_from_xml(
     xml    => $xml,
-    cacert => 't/cacert.pem'
+    cacert => 't/net-saml2-cacert.pem'
 );
 
 isa_ok($idp, "Net::SAML2::IdP");
@@ -127,7 +142,7 @@ is(
     my $xml = path('t/idp-metadata2.xml')->slurp;
     my $idp = Net::SAML2::IdP->new_from_xml(
         xml    => $xml,
-        cacert => 't/cacert.pem'
+        cacert => 't/net-saml2-cacert.pem'
     );
     isa_ok($idp, "Net::SAML2::IdP");
 
@@ -193,23 +208,38 @@ is(
             <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
                 <ds:X509Data>
                     <ds:X509Certificate>
-MIIDFTCCAf2gAwIBAgIBATANBgkqhkiG9w0BAQUFADA3MQswCQYDVQQGEwJVUzEO
-MAwGA1UECgwFbG9jYWwxCzAJBgNVBAsMAmN0MQswCQYDVQQDDAJDQTAeFw0xMDEw
-MDYxMjM4MTRaFw0xMTEwMDYxMjM4MTRaMFcxCzAJBgNVBAYTAlVTMQ4wDAYDVQQK
-DAVsb2NhbDELMAkGA1UECwwCY3QxDTALBgNVBAMMBHNhbWwxHDAaBgkqhkiG9w0B
-CQEWDXNhbWxAY3QubG9jYWwwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAMhu
-pJZpvu1m6ys+IrWrm3pK+onwRAYCyrgQ0RyK2cHbVLFbjBqTjKnt+PiVbnZPZUTs
-tkV9oijZGQvaMy9ingJursICUQzmOfYRDm4s9gFJJOHUGYnItRhp4uj3EoWWyX8I
-6Mr+g3/vNgNFvD5S9L7Hk1mSw8SnPlblZAWlFUwXAgMBAAGjgY8wgYwwDAYDVR0T
-AQH/BAIwADAxBglghkgBhvhCAQ0EJBYiUnVieS9PcGVuU1NMIEdlbmVyYXRlZCBD
-ZXJ0aWZpY2F0ZTAdBgNVHQ4EFgQUGy/iPd7PVObrF+lK4+ZShcbStLYwCwYDVR0P
-BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0B
-AQUFAAOCAQEAYoYq3Rc6jC7f8DnKxDHntHxH91F5mfp8Y3j7ALcRG/mrzkMhvxU2
-O2qmh4aHzZBoY1EU9VjrVgyPJPAjFQVC+OjIE46Gavh5wobzYmVGeFLOa9NhPv50
-h3EOw1eCda3VwcvStWw1OhT8cpEGqgJJVAcjwcm4VBtWjodxRn3E4zBr/xxzR1HU
-ISvnu1/xomsSS+aenG5toWmhoJIKFbfhQkpnBlgGD5+12Cxn2jHpgv15262ZZIJS
-WPp/0bQqdAAUzkJZPpUGUN1sTXPJexYT6na7XvLd6mvO1g+WDk6aZnW/zcT3T9tL
-Iavyic/p4gZtXckweq+VTn9CdZp6ZTQtVw==
+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
                     </ds:X509Certificate>
                 </ds:X509Data>
             </ds:KeyInfo>
@@ -233,7 +263,7 @@ XML
 
     my $idp = Net::SAML2::IdP->new_from_xml(
         xml    => $xml,
-        cacert => 't/cacert.pem'
+        cacert => 't/net-saml2-cacert.pem'
     );
 
     is($idp->format, undef, "No default format thus no format set");
@@ -253,7 +283,7 @@ XML
 
     my $idp = Net::SAML2::IdP->new_from_url(
         url    => 'https://foo.example.com/auth/saml',
-        cacert => 't/cacert.pem'
+        cacert => 't/net-saml2-cacert.pem'
     );
 
     isa_ok($idp, "Net::SAML2::IdP");
@@ -328,14 +358,14 @@ XML
 
     Net::SAML2::IdP->new_from_url(
         url    => 'https://foo.example.com/auth/saml',
-        cacert => 't/cacert.pem'
+        cacert => 't/net-saml2-cacert.pem'
     );
 
     like($ua->agent, qr/^libwww-perl\/\d+\.\d+/, "Is the default user agent");
 
     Net::SAML2::IdP->new_from_url(
         url    => 'https://foo.example.com/auth/saml',
-        cacert => 't/cacert.pem',
+        cacert => 't/net-saml2-cacert.pem',
         ssl_opts => { verify_hostname => 1, SSL_ca_file => '/path/to/ca' },
     );
     like($ua->agent, qr/^libwww-perl\/\d+\.\d+/, "Is the default user agent");
@@ -350,7 +380,7 @@ XML
 
     Net::SAML2::IdP->new_from_url(
         url    => 'https://foo.example.com/auth/saml',
-        cacert => 't/cacert.pem',
+        cacert => 't/net-saml2-cacert.pem',
         ua => LWP::UserAgent->new(
             agent    => "Foo",
             ssl_opts => { verify_hostname => 0 }
@@ -384,7 +414,7 @@ XML
         sub {
             Net::SAML2::IdP->new_from_url(
                 url    => 'https://foo.example.com/auth/saml',
-                cacert => 't/cacert.pem',
+                cacert => 't/net-saml2-cacert.pem',
             );
         },
         qr/Error retrieving metadata: I'm a teapot \(418\)/,

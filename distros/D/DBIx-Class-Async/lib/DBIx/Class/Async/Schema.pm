@@ -13,7 +13,7 @@ use DBIx::Class::Async::Storage;
 use DBIx::Class::Async::TxnGuard;
 use DBIx::Class::Async::ResultSet;
 
-our $VERSION = '0.22';
+our $VERSION = '0.25';
 
 =head1 NAME
 
@@ -21,7 +21,7 @@ DBIx::Class::Async::Schema - Asynchronous schema for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.22
+Version 0.25
 
 =cut
 
@@ -276,14 +276,21 @@ worker processes and source cache.
 
 sub clone {
     my $self = shift;
+    my %args = @_;
+
+    my $worker_count = $args{workers}
+        || $self->{async_db}->{workers_config}{count}
+        || $self->{async_db}->workers  # If there's a method
+        || 2;                          # Sensible default
 
     return bless {
         %$self,
         # Clone with fresh worker pool
         async_db => DBIx::Class::Async->new(
             schema_class => $self->{schema_class},
-            connect_info => $self->{connect_info},
-            workers      => $self->{async_db}->{workers_config}{count},
+            connect_info => [@{$self->{connect_info}}],
+            workers      => $worker_count,
+            (defined $self->{loop} ? (loop => $self->{loop}) : ()),
         ),
         sources_cache => {},  # Fresh cache
     }, ref $self;

@@ -1,5 +1,9 @@
 Revision history for Log-Abstraction
 
+0.27	Sun Jan 11 09:52:54 EST 2026
+	Easier to read tests
+	Added fatal as a synonym for error
+
 0.26	Wed Oct 15 17:03:58 EDT 2025
 	Added testing dashboard on GitHub Pages
 	Added croak_on_error

@@ -103,12 +103,13 @@ Get a specific variation by index (0-based).
 
 sub variation {
     my ($self, $index) = @_;
+    return unless defined $index && $index >= 0;
 
     if ($self->has_variations && @{$self->variations}) {
-        return $self->variations->[$index];
+        return $index < @{$self->variations} ? $self->variations->[$index] : ();
     }
 
-    return $index == 0 ? $self->text : undef;
+    return $index == 0 ? $self->text : ();
 }
 
 =head2 variation_count

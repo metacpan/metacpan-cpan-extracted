@@ -36,8 +36,8 @@ WriteMakefile
   },
   META_MERGE => {
     resources => {
-      repository => 'https://github.com/mbeijen/File-DesktopEntry',
-      bugtracker => 'https://github.com/mbeijen/File-DesktopEntry/issues',
+      repository => 'https://codeberg.org/michielb/File-DesktopEntry',
+      bugtracker => 'https://codeberg.org/michielb/File-DesktopEntry/issues',
     },
   },
 );

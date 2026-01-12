@@ -42,9 +42,9 @@ our %EXPORT_TAGS = (
 sub net_saml2_sp {
     return Net::SAML2::SP->new(
         issuer => 'Some entity ID',
-        cert   => 't/sign-nopw-cert.pem',
-        key    => 't/sign-nopw-cert.pem',
-        cacert => 't/cacert.pem',
+        cert   => 't/net-saml2-cert.pem',
+        key    => 't/net-saml2-key.pem',
+        cacert => 't/net-saml2-cacert.pem',
 
         org_name         => 'Net::SAML2::SP',
         org_display_name => 'Net::SAML2::SP testsuite',

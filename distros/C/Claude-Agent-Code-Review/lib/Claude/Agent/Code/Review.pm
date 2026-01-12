@@ -26,7 +26,7 @@ use Future::AsyncAwait;
 use Path::Tiny;
 use Cpanel::JSON::XS qw(decode_json);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -386,12 +386,16 @@ async sub _run_review {
             last;
         }
         if ($iterations >= $max_iterations) {
+            $iter->cleanup();  # Cleanup SDK server sockets
             return Claude::Agent::Code::Review::Report->new(
                 summary => 'Review timed out: exceeded maximum iterations',
                 issues  => [],
             );
         }
     }
+
+    # Cleanup SDK server sockets before returning
+    $iter->cleanup();
 
     # Handle case where loop exits without finding a Result message
     unless (defined $result) {

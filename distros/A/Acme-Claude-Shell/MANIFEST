@@ -1,0 +1,25 @@
+bin/acme_claude_shell
+Changes
+ignore.txt
+lib/Acme/Claude/Shell.pm
+lib/Acme/Claude/Shell/Hooks.pm
+lib/Acme/Claude/Shell/Query.pm
+lib/Acme/Claude/Shell/Session.pm
+lib/Acme/Claude/Shell/Tools.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-tools.t
+t/02-hooks.t
+t/03-dangerous-patterns.t
+t/04-session.t
+t/05-query.t
+t/06-main-module.t
+t/07-cli-bin.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

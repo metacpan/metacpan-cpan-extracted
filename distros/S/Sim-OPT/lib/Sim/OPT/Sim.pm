@@ -2,9 +2,11 @@ package Sim::OPT::Sim;
 # This is the module Sim::OPT::Sim of Sim::OPT, distributed under a dual licence, open-source (GPL v3) and proprietary.
 # Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-our $sim = bless( {}, "Sim::OPT::Sim" );
 
 use Exporter;
+@ISA = qw( $sim Exporter ); # our @adamkISA = qw(Exporter);
+our @EXPORT = qw( sim ); # our @EXPORT = qw( );
+
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
 use Math::Trig;
 use Math::Round;
@@ -29,18 +31,28 @@ use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
+use Sim::OPT::Parcoord3d;
 use Sim::OPT::Stats;
-eval { use Sim::OPTcue; 1 };
-eval { use Sim::OPTcue::Patternsearch; 1 };
+eval { use Sim::OPTcue::OPTcue; 1 };
+eval { use Sim::OPTcue::Metabridge; 1 };
+eval { use Sim::OPTcue::Exogen::PatternSearch; 1 };
+eval { use Sim::OPTcue::Exogen::NelderMead; 1 };
+eval { use Sim::OPTcue::Exogen::Armijo; 1 };
+eval { use Sim::OPTcue::Exogen::NSGAII; 1 };
+eval { use Sim::OPTcue::Exogen::ParticleSwarm; 1 };
+eval { use Sim::OPTcue::Exogen::SimulatedAnnealing; 1 };
+eval { use Sim::OPTcue::Exogen::NSGAIII; 1 };
+eval { use Sim::OPTcue::Exogen::MOEAD; 1 };
+eval { use Sim::OPTcue::Exogen::SPEA2; 1 };
+eval { use Sim::OPTcue::Exogen::ParticleSwarm; 1 };
+eval { use Sim::OPTcue::Exogen::RadialBasis; 1 };
+eval { use Sim::OPTcue::NeuralBoltzmann; 1 };
+eval { use Sim::OPTcue::Exogen::Kriging; 1 };
+eval { use Sim::OPTcue::Exogen::DecisionTree; 1 };
 
 no strict;
 no warnings;
 use warnings::unused;
-@ISA = qw( Exporter ); # our @adamkISA = qw(Exporter);
-#%EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
-#@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw( sim ); # our @EXPORT = qw( );
 
 $VERSION = '0.103'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Sim is the module used by Sim::OPT to launch simulations once the models have been built.';
@@ -163,7 +175,7 @@ sub sim
   my @allinstances = @instances ;
   push( @allinstances, @precedents );
 
-  @allinstances = $opt->cleanbag( @allinstances );
+  @allinstances = Sim::OPT::cleanbag( @allinstances );
 
   #my $csim = 0;
   my @container;
@@ -305,7 +317,7 @@ sub sim
                     say  "IN SIM, FOR INSOLATION  \$dowhat{shadeupdate} $dowhat{shadeupdate}";
                     if ( $dowhat{shadeupdate} eq "y" )
                     {
-                      my $done = $morph->recalculateish( $is, $stepsvar, $countop, 
+                      my $done = Sim::OPT::Morph::recalculateish( $is, $stepsvar, $countop, 
                           $countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, 
                           \@menus, $countinstance, \%dowhat );
                     }
@@ -595,7 +607,7 @@ XXX
       {
         unless ( ( $postproc eq "y") )
         {
-          my ( $dirfiles_r ) = $reeport->newretrieve(
+          my ( $dirfiles_r ) = Sim::OPT::Report::newretrieve(
           {
             instance => $instance, dirfiles => \%dirfiles,
             resfile => $resfile, flfile => $flfile,
@@ -609,7 +621,7 @@ XXX
       my $dirfiles_r;
       if ( $dowhat{newreport} eq "y" )
       {
-        ( $dirfiles_r, $instant ) = $report->newreport(
+        ( $dirfiles_r, $instant ) = Sim::OPT::Report::newreport(
         {
           instance => $instance, dirfiles => \%dirfiles,
           resfile => $resfile, flfile => $flfile,
@@ -656,7 +668,7 @@ XXX
 
   if ( not ( $pierce eq "y" ) )
   {
-    $expected_r = $opt->enumerate( \%varnums, \@blockelts, $from ); say  "IN POSTSIM \@blockelts " . dump( @blockelts ) . " \$expected_r " . dump( $expected_r );
+    $expected_r = Sim::OPT::enumerate( \%varnums, \@blockelts, $from ); say  "IN POSTSIM \@blockelts " . dump( @blockelts ) . " \$expected_r " . dump( $expected_r );
     #say  "IN POSTSIM  \$from $from  \$expected_r  " . dump( $expected_r ) . " \%varnums " . dump( \%varnums ) . "\@blockelts " . dump( @blockelts );
 
 
@@ -670,7 +682,7 @@ XXX
       chomp $ln;
       next if $ln =~ /^\s*$/;
 
-      my $rid = $opt->instid( $ln, $file ); #say  "IN POSTSIM \$file $file \$ln $ln \$countblock $countblock \$rid " . dump( $rid );# NOT $repfile
+      my $rid = Sim::OPT::instid( $ln, $file ); #say  "IN POSTSIM \$file $file \$ln $ln \$countblock $countblock \$rid " . dump( $rid );# NOT $repfile
       if ( defined($rid) and $rid ne "" )
       {
         push( @newbowl , $ln );
@@ -753,7 +765,7 @@ XXX
         my @elts = split(/,/, $line); 
         my $touse = $elts[0];
 
-        $touse = $opt->clean( $touse, $mypath, $file );
+        $touse = Sim::OPT::clean( $touse, $mypath, $file );
 
         if ( ( ( $dowhat{names} eq "short" ) or ( $dowhat{names} eq "medium" ) ) and ( $touse =~ /^\d+$/ ) )
         {
@@ -857,7 +869,7 @@ XXX
       my $countcn = 0;
       foreach my $elt ( @elts )
       {
-        if ( $descend->odd( $countel ) )
+        if ( Sim::OPT::odd( $countel ) )
         {
           push ( @{ $containerone[ $countcol ] }, $elt );
           $countcol++;
@@ -1037,7 +1049,7 @@ XXX
   {
     foreach my $line ( @weightbag )
     {
-      my $rid = $opt->instid( $line, $file ); ## !!!! THIS IS THE INSTANCE ID
+      my $rid = Sim::OPT::instid( $line, $file ); ## !!!! THIS IS THE INSTANCE ID
       if ( defined($rid) and $rid ne "" )
       {
         $dirfiles{realreps}{$rid} = $line;

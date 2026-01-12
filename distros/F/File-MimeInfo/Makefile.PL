@@ -39,8 +39,8 @@ WriteMakefile (
   },
   META_MERGE => {
     resources => {
-      repository => 'https://github.com/mbeijen/File-MimeInfo',
-      bugtracker => 'https://github.com/mbeijen/File-MimeInfo/issues',
+      repository => 'https://codeberg.org/michielb/File-MimeInfo',
+      bugtracker => 'https://codeberg.org/michielb/File-MimeInfo/issues',
     },
     # a list of our awesome contributors generated from git
     # using the command:
@@ -66,6 +66,7 @@ WriteMakefile (
         'brian m. carlson <sandals@crustytoothpaste.net>',
         'gregor herrmann <gregoa@debian.org>',
         'mazunki <rolferen@gmail.com>',
+        'zhumengu <m.zhumeng@gmail.com>',
     ],
   },
 );

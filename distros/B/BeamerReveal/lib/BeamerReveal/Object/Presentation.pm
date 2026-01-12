@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::Object::Presentation;
-our $VERSION = '20260101.1937'; # VERSION
+our $VERSION = '20260111.1557'; # VERSION
 
 use parent 'BeamerReveal::Object';
 use Carp;
@@ -53,7 +53,7 @@ BeamerReveal::Object::Presentation - Presentation object
 
 =head1 VERSION
 
-version 20260101.1937
+version 20260111.1557
 
 =head1 SYNOPSIS
 

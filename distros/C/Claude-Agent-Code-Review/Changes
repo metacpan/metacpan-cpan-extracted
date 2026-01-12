@@ -1,5 +1,10 @@
 Revision history for Claude-Code-Review
 
+0.02    2026-01-11
+        - Call Query->cleanup() after iteration to release SDK server sockets
+        - Fixes socket accumulation when running multiple reviews in a loop
+        - Requires Claude::Agent 0.09+
+
 0.01    2026-01-10
         First version, released on an unsuspecting world.
         - AI-powered code review using Claude Agent SDK
