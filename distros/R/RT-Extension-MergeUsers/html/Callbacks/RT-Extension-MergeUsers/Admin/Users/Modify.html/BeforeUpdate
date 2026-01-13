@@ -1,0 +1,34 @@
+<%INIT>
+my ( $id, $result );
+if ( $MergeUser ) {
+    ( $id, $result ) = $User->MergeInto($MergeUser);
+
+    if ( $id ) {
+        MaybeRedirectForResults(
+            Actions   => [ $result, 'Redirecting ' . $User->Name . " to $MergeUser" ],
+            Path      => '/Admin/Users/Modify.html',
+            Arguments => { id => $id },
+        );
+    }
+}
+elsif ( $Unmerge ) {
+    ( $id, $result ) = $User->UnMerge;
+}
+push @$Results, $result if $result;
+
+foreach my $key (keys %ARGS) {
+    if ( $key =~ /Unmerge(\d+)/ ) {
+        my $merged_user = RT::User->new( $session{'CurrentUser'} );
+        $merged_user->LoadOriginal( id => $1 );
+        ( $id, $result ) = $merged_user->UnMerge;
+        push @$Results, $result;
+    }
+}
+</%INIT>
+<%ARGS>
+$User
+$ARGSRef
+$Results
+$MergeUser => undef
+$Unmerge => undef
+</%ARGS>

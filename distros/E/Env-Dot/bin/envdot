@@ -3,13 +3,14 @@
 ## no critic (ValuesAndExpressions::ProhibitConstantPragma)
 use strict;
 use warnings;
+use 5.010;
 use open ':std', IO => ':encoding(UTF-8)';
 
 # ABSTRACT: Read .env file and turn its content into environment variables for different shells.
 
 # PODNAME: envdot
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 use English      qw( -no_match_vars );                   # Avoids regex performance penalty in perl 5.18 and earlier
 use Getopt::Long qw( :config auto_version auto_help );
@@ -108,7 +109,7 @@ envdot - Read .env file and turn its content into environment variables for diff
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -163,6 +164,8 @@ If you have set the variable ENVDOT_FILEPATHS, then B<envdot> will use that.
 Otherwise, it uses the command line parameter.
 If no parameter, then default value is used. Default is the file
 F<.env> in the current directory.
+
+=for stopwords dotenv env envdot shdotenv subshells
 
 =head1 NAME
 
@@ -223,10 +226,14 @@ No external dependencies outside Perl's standard distribution.
 
 L<Env::Assert> will verify that you certainly have those environmental
 variables you need. It also has an executable which can, for example,
-be used to perform the check in the beginning of a B<docker> container run.
+perform the check in the beginning of a B<docker> container run.
 
-L<Dotenv> is another package which implements functionality to use
+L<Dotenv> and L<ENV::Util|https://metacpan.org/pod/ENV::Util>
+are packages which also implement functionality to use
 F<.env> files in Perl.
+
+L<Config::ENV> and L<Config::Layered::Source::ENV> provide other means
+to configure application with the help of environment variables.
 
 L<shdotenv|https://github.com/ko1nksm/shdotenv> is a project to provide dotenv
 for shells with support for POSIX-compliant and multiple .env file syntax.

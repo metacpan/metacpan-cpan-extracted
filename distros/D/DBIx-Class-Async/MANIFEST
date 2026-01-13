@@ -1,10 +1,11 @@
 Changes
 lib/DBIx/Class/Async.pm
-lib/DBIx/Class/Async/Cursor.pm
 lib/DBIx/Class/Async/ResultSet.pm
 lib/DBIx/Class/Async/Row.pm
 lib/DBIx/Class/Async/Schema.pm
 lib/DBIx/Class/Async/Storage.pm
+lib/DBIx/Class/Async/Storage/DBI.pm
+lib/DBIx/Class/Async/Storage/DBI/Cursor.pm
 lib/DBIx/Class/Async/TxnGuard.pm
 LICENSE
 Makefile.PL

@@ -49,10 +49,6 @@ WriteMakefile(
                 file    => 'lib/DBIx/Class/Async.pm',
                 version => MM->parse_version('lib/DBIx/Class/Async.pm')
             },
-            'DBIx::Class::Async::Cursor' => {
-                file    => 'lib/DBIx/Class/Async/Cursor.pm',
-                version => MM->parse_version('lib/DBIx/Class/Async/Cursor.pm')
-            },
             'DBIx::Class::Async::ResultSet' => {
                 file    => 'lib/DBIx/Class/Async/ResultSet.pm',
                 version => MM->parse_version('lib/DBIx/Class/Async/ResultSet.pm')
@@ -68,6 +64,14 @@ WriteMakefile(
             'DBIx::Class::Async::Storage' => {
                 file    => 'lib/DBIx/Class/Async/Storage.pm',
                 version => MM->parse_version('lib/DBIx/Class/Async/Storage.pm')
+            },
+            'DBIx::Class::Async::Storage::DBI' => {
+                file    => 'lib/DBIx/Class/Async/Storage/DBI.pm',
+                version => MM->parse_version('lib/DBIx/Class/Async/Storage/DBI.pm')
+            },
+            'DBIx::Class::Async::Storage::DBI::Cursor' => {
+                file    => 'lib/DBIx/Class/Async/Storage/DBI/Cursor.pm',
+                version => MM->parse_version('lib/DBIx/Class/Async/Storage/DBI/Cursor.pm')
             },
             'DBIx::Class::Async::TxnGuard' => {
                 file    => 'lib/DBIx/Class/Async/TxnGuard.pm',

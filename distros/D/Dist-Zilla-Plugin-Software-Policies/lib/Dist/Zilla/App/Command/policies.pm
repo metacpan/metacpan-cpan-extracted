@@ -10,7 +10,7 @@ use feature qw( say );
 
 # ABSTRACT: Create project policy files
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp    qw( carp croak );
 use English qw( -no_match_vars );    # Avoids regex performance
@@ -241,7 +241,7 @@ Dist::Zilla::App::Command::policies - Create project policy files
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

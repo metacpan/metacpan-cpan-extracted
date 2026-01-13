@@ -3,7 +3,8 @@ NAME
     user
 
 RT VERSION
-    Works with RT 4.0, 4.2, 4.4, 5.0, 6.0.
+    Works with RT 5.0 (5.0.8 and newer), RT 6.0. For RT 4.0, 4.2, 4.4, 5.0
+    (up to 5.0.7) download version 1.11.
 
 DESCRIPTION
     This RT extension adds a "Merge Users" box to the User Administration
@@ -17,6 +18,86 @@ DESCRIPTION
     It also provides a version of CanonicalizeEmailAddress, which means that
     all e-mail sent from secondary users is displayed as coming from the
     primary user.
+
+INSTALLATION
+    Be sure to also read "UPGRADING" if you are upgrading.
+
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin('RT::Extension::MergeUsers');
+
+    Clear your mason cache
+            rm -rf /opt/rt6/var/mason_data/obj
+
+    Restart your webserver
+
+UPGRADING
+    If you are upgrading from 0.03_01 or earlier, you must run
+    bin/rt-update-merged-users. This script will create MergedUsers
+    Attributes so RT can know when you're looking at a user that other users
+    have been merged into. If you don't run this script, you'll have issues
+    unmerging users. It can be safely run multiple times, it will only
+    create Attributes as needed.
+
+UTILITIES
+  rt-clean-merged-users
+    When a user with another user merged into it is shredded, the attributes
+    on that user are also shredded, but the merged user will remain, along
+    with attributes that may point to the now missing user id. This script
+    cleans up attributes if the merged-into user record is now gone. These
+    users will then be converted back to regular unmerged users.
+
+  rt-merge-users
+    A command-line tool to merge one user into another
+
+CAVEATS
+  RT::Shredder and Merged Users
+    Merging a user effectively makes it impossible to load the merged user
+    directly. Attempting to access the old user resolves to the merged-into
+    user. Because of this, MergeUsers has some extra code to help
+    RT::Shredder clean up these merged records to avoid leaving merged user
+    records in the DB while removing the user they were merged into.
+
+    When running RT::Shredder on a user record with other users merged into
+    it, the merged users are Unmerged before the initial user record is
+    shredded. There are two options to handle these newly unmerged users:
+
+    1.  Re-run your shredder command with the same or similar options. The
+        unmerged user records will now be accessible and, depending on your
+        shredder options, they will likely be shredded on the second run. If
+        you have multiple layers of merged users, you may need to run
+        shredder multiple times.
+
+    2.  MergeUsers will log the unmerged users at the info level so you can
+        pull the user ids from the log and shred them manually. This is most
+        likely to be useful if you are shredding one specific user (and all
+        merged accounts).
+
+  rt-serializer
+    MergeUsers is not compatible with rt-seralizer, you need to disable the
+    extension before running rt-serializer.
+
+  Single level of merged users
+    A user can only be merged into a single user.
+
+    A user can have multiple users merged into themselves.
+
+    A user that has been merged into one user cannot be merged into a
+    different user. You must first unmerge the user and then merge them into
+    the different user.
+
+    A user that has one or more users merged into themselves cannot be
+    merged into another user. You must first unmerge all the merged users
+    and then merge them all into the other user. Previous versions would
+    allow multiple levels of merging when calling MergeInto from a command
+    line script but some searching functionality does not work correctly in
+    such cases and so it has been disallowed.
 
 REST2 API
     RT::Extension::MergeUsers provides REST2 API endpoints for
@@ -157,76 +238,6 @@ REST2 API
             "message": "User is a required field"
         }
 
-INSTALLATION
-    Be sure to also read "UPGRADING" if you are upgrading.
-
-    perl Makefile.PL
-    make
-    make install
-        May need root permissions
-
-    Edit your /opt/rt6/etc/RT_SiteConfig.pm
-        If you are using RT 4.2 or greater, add this line:
-
-            Plugin('RT::Extension::MergeUsers');
-
-        For RT 4.0, add this line:
-
-            Set(@Plugins, qw(RT::Extension::MergeUsers));
-
-        or add RT::Extension::MergeUsers to your existing @Plugins line.
-
-    Clear your mason cache
-            rm -rf /opt/rt6/var/mason_data/obj
-
-    Restart your webserver
-
-UPGRADING
-    If you are upgrading from 0.03_01 or earlier, you must run
-    bin/rt-update-merged-users. This script will create MergedUsers
-    Attributes so RT can know when you're looking at a user that other users
-    have been merged into. If you don't run this script, you'll have issues
-    unmerging users. It can be safely run multiple times, it will only
-    create Attributes as needed.
-
-UTILITIES
-  rt-clean-merged-users
-    When a user with another user merged into it is shredded, the attributes
-    on that user are also shredded, but the merged user will remain, along
-    with attributes that may point to the now missing user id. This script
-    cleans up attributes if the merged-into user record is now gone. These
-    users will then be converted back to regular unmerged users.
-
-  rt-merge-users
-    A command-line tool to merge one user into another
-
-CAVEATS
-  RT::Shredder and Merged Users
-    Merging a user effectively makes it impossible to load the merged user
-    directly. Attempting to access the old user resolves to the merged-into
-    user. Because of this, MergeUsers has some extra code to help
-    RT::Shredder clean up these merged records to avoid leaving merged user
-    records in the DB while removing the user they were merged into.
-
-    When running RT::Shredder on a user record with other users merged into
-    it, the merged users are Unmerged before the initial user record is
-    shredded. There are two options to handle these newly unmerged users:
-
-    1.  Re-run your shredder command with the same or similar options. The
-        unmerged user records will now be accessible and, depending on your
-        shredder options, they will likely be shredded on the second run. If
-        you have multiple layers of merged users, you may need to run
-        shredder multiple times.
-
-    2.  MergeUsers will log the unmerged users at the info level so you can
-        pull the user ids from the log and shred them manually. This is most
-        likely to be useful if you are shredding one specific user (and all
-        merged accounts).
-
-  rt-serializer
-    MergeUsers is not compatible with rt-seralizer, you need to disable the
-    extension before running rt-serializer.
-
 AUTHOR
     Best Practical Solutions, LLC <modules@bestpractical.com>
 
@@ -240,7 +251,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-MergeUsers>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014-2025 by Best Practical Solutions
+    This software is Copyright (c) 2014-2026 by Best Practical Solutions
 
     This is free software, licensed under:
 

@@ -40,6 +40,7 @@ Files: INSTALL
  examples/test.pl
  t/.mite/config
  t/integration/pad-inherit.skip
+ t/integration/undef-tolerant.pl
 Copyright: Unknown
 License: Unknown
 
@@ -50,6 +51,7 @@ Files: Changes
  doap.ttl
  lib/Marlin/Attribute.pm
  lib/Marlin/TypeConstraint.pm
+ t/integration/foreign-inherit.t
  t/integration/xsdelegation.t
  t/lib/Local/Mitey.pm
  t/lib/Local/Mitey.pm.mite.pm
@@ -72,9 +74,12 @@ Files: README
 Copyright: This software is copyright (c) 2025-2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: lib/MooX/Marlin.pm
+Files: lib/Marlin/X/UndefTolerant.pm
+ lib/MooX/Marlin.pm
  lib/MooseX/Marlin.pm
+ t/integration/alias-moose.t
  t/integration/ct-inherit.t
+ t/integration/lvalues-moose.t
  t/integration/mite-inherit.t
  t/integration/mouse-inherit.t
  t/integration/roles2.t

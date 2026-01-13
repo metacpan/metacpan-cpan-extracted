@@ -12,8 +12,9 @@ use DBIx::Class::Async;
 use DBIx::Class::Async::Storage;
 use DBIx::Class::Async::TxnGuard;
 use DBIx::Class::Async::ResultSet;
+use DBIx::Class::Async::Storage::DBI;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 =head1 NAME
 
@@ -21,7 +22,7 @@ DBIx::Class::Async::Schema - Asynchronous schema for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.25
+Version 0.27
 
 =cut
 
@@ -183,6 +184,13 @@ sub connect {
         connect_info  => \@args,
         sources_cache => {},  # Cache for source lookups
     }, $class;
+
+    my $storage = DBIx::Class::Async::Storage::DBI->new(
+        schema   => $self,
+        async_db => $async_db,
+    );
+
+    $self->{_storage} = $storage;
 
     return $self;
 }
@@ -566,12 +574,7 @@ since operations are performed asynchronously by worker processes.
 
 sub storage {
     my $self = shift;
-
-    # Return a mock storage object
-    return DBIx::Class::Async::Storage->new(
-        _schema => $self,
-        dbh     => undef,
-    );
+    return $self->{_storage};
 }
 
 =head2 txn_do

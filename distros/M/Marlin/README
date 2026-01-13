@@ -186,6 +186,17 @@ DESCRIPTION
         Setting to an explicit `undef` prevents the constructor from
         initializing the attribute from the arguments passed to it.
 
+    `undef_tolerant`
+        If you set an attribute to `undef_tolerant => true`, and then try to
+        initialized it to `undef` in the constructor, it will be treated as if
+        you hadn't passed it to the constructor at all. See
+        MooseX::UndefTolerant.
+
+        This has no affect on writers/accessors.
+
+        To make all attributes in your class or role undef tolerant, see
+        Marlin::X::UndefTolerant.
+
     `reader`
         You can specify the name for a reader method:
 

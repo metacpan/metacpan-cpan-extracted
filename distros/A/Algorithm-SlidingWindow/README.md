@@ -2,7 +2,7 @@
 
 # Algorithm::SlidingWindow
 
-A **fixed-capacity rolling window** (overwrite-oldest) implemented with an **array-backed circular buffer**.
+A **fixed-capacity sliding window** (overwrite-oldest) implemented with an **array-backed circular buffer**.
 
 When the window is full and you add new items, the **oldest** items are automatically evicted. This is designed for streaming, metrics, logging, and sliding-window workloads where you want to keep only the most recent *N* values.
 
@@ -73,7 +73,7 @@ $w->add(qw(a b c d e));   # evicts a, then b
 
 #### `new(capacity => INT, on_evict => CODEREF?)`
 
-Creates a new rolling window.
+Creates a new sliding window.
 
 - `capacity` (required): positive integer greater than zero
 - `on_evict` (optional): called as `on_evict->($old_value)` on eviction

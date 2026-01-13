@@ -1,6 +1,7 @@
 Changes
 html/Callbacks/RT-Extension-CommentOnCreate/Ticket/Create.html/AfterMessageBox
 html/Callbacks/RT-Extension-CommentOnCreate/Ticket/Display.html/BeforeDisplay
+html/Callbacks/RT-Extension-CommentOnCreate/Ticket/Widgets/Create/Message/AfterMessageBox
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm

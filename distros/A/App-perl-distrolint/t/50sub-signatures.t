@@ -43,9 +43,11 @@ is( [ diags_from_treesitter( $check, <<'EOPERL' ) ],
 use v5.36;
 sub ok1 ($) { }
 sub ok2 ( $ ) { }
+sub ok3 (@) { }
+sub ok4 (%) { }
 EOPERL
    [],
-   'Single ($) counts as a signature' );
+   'Single ($), (@) or (%) counts as a signature' );
 
 is( [ diags_from_treesitter( $check, <<'EOPERL' ) ],
 use v5.36;
@@ -64,5 +66,19 @@ EOPERL
    [ "lib/FILE.pm line 2 declares a sub without signature",
      "lib/FILE.pm line 3 declares a sub without signature" ],
    'diag from nonsig sub in use-feature-signatures scope' );
+
+is( [ diags_from_treesitter( $check, <<'EOPERL' ) ],
+use feature 'signatures';
+{
+   no feature 'signatures';
+   sub inner1 {}
+}
+sub outer {
+   no feature 'signatures';
+   sub inner2 {}
+}
+EOPERL
+   [ "lib/FILE.pm line 6 declares a sub without signature" ],
+   'SubSignatures understands nested scopes' );
 
 done_testing;

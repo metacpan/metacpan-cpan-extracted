@@ -18,6 +18,8 @@ where `wsgetmail.json` looks like:
     "username": "rt-comment@example.com",
     "folder": "Inbox",
     "stripcr": 0,
+    "size_limit": 10485760,
+    "body_size_limit": 1048576,
     "command": "/opt/rt5/bin/rt-mailgate",
     "command_args": "--url=http://rt.example.com/ --queue=General --action=comment",
     "command_timeout": 30,
@@ -135,14 +137,10 @@ and how to obtain it.
     quickstart](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis#application-permission-to-microsoft-graph),
     under the section "Add permissions to access Microsoft Graph." When selecting
     the type of permissions, select "Application permissions." When prompted to
-    select permissions, select all of the following:
+    select permissions, select the following items:
 
     - Mail.Read
-    - Mail.Read.Shared
     - Mail.ReadWrite
-    - Mail.ReadWrite.Shared
-    - openid
-    - User.Read
 
 ### Configuring client secret authentication
 
@@ -215,6 +213,25 @@ configuration file.
     This option is helpful if you are forwarding email to a Linux
     utility that doesn't work with CRLF line-endings.
 
+- size\_limit
+
+    Set this to the max size in bytes. Messages bigger than it will be skipped.
+    Absence or 0 means to not limit size.
+
+    E.g. to skip messages bigger than `10MiB`, you can set it to `10485760`.
+
+- body\_size\_limit
+
+    Set this to the max body size in bytes. Messages with body bigger than it will
+    be skipped. Absence or 0 means to not limit body size.
+
+    E.g. to skip messages with body bigger than `1MiB`, you can set it to
+    `1048576`.
+
+    The difference between `size_limit` and `body_size_limit` is the former
+    limits the size of the whole message, while the latter parses messages, skips
+    attachments and only checks text/plain and text/html parts.
+
 - command
 
     Set this to an executable command. You can specify an absolute path,
@@ -249,6 +266,19 @@ configuration file.
     Set this to 1 to preserve the temporary files after processing.
 
     When `"debug"` is also set the filenames will be reported on STDERR.
+
+- debug
+
+    Set this to enable additional diagnostic and status messages.
+
+- quiet
+
+    Set this to put wsgetmail into `quiet` mode. This mode intended for use in cron
+    or other automation.
+
+    When in `quiet` mode wsgetmail produces no output unless there is an error, in
+    which case the configuration filename and error messages will be printed to
+    STDERR.
 
 # TESTING AND DEPLOYMENT
 
@@ -305,8 +335,22 @@ configuration, just run wsgetmail with different configurations:
 
 Microsoft applies some limits to the amount of API requests allowed as
 documented in their [Microsoft Graph throttling guidance](https://docs.microsoft.com/en-us/graph/throttling).
-If you reach a limit, requests to the API will start failing for a period
-of time.
+If you reach a limit, requests to the API will start failing with HTTP
+status code 429 for a period of time.
+
+## Office 365 API Errors
+
+Best Practical Solutions has observed that very rarely the Microsoft Graph API
+will return a 5xx error code when attempting to list mail folder details,
+retrieve the message list, fetch message details, or delete a message. The
+cause for this is currently unknown, except that it is not related to the API
+limits mentioned above.
+
+Despite the relative rarity, if you run wsgetmail often enough you can see this
+multiple times in a typical day.
+
+Therefore, by default wsgetmail now ignores `5xx` response codes on all API
+calls, instead treating them as logically empty success response.
 
 # SEE ALSO
 
@@ -321,7 +365,7 @@ Best Practical Solutions, LLC <modules@bestpractical.com>
 
 # LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2015-2022 by Best Practical Solutions, LLC.
+This software is Copyright (c) 2015-2026 by Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 

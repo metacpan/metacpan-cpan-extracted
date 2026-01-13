@@ -1,5 +1,23 @@
 Revision history for Env-Dot
 
+0.019     2026-01-12 18:17:15+01:00 Europe/Stockholm
+            * Fix version in Windows test.
+            * Deactivate .github/workflows/perltest.yml.
+            * Allow using any dotenv filepath.
+            * Add test utils.
+            * Include dot files in t/ in the build. Needed for testing.
+            * Rename dir script/ to bin/ to match with Dist::Zilla::Plugin::ExecDir defaults.
+            * Add contributor gregor herrmann <gregoa@debian.org>
+            * Add Repology link to README.md.
+            * Available as a Debian package. (gregor herrmann <gregoa@debian.org>)
+            * Harmonize SEE ALSO chapters in Env::Dot and script/envdot.
+                * Thank you, Sven Willenbuecher <sven.willenbuecher@gmx.de>
+                * https://github.com/mikkoi/env-dot/issues/2
+            * Clean dist.ini.
+            * Correct naming of Dist::Zilla::app::Command::podpreview in dist.ini.
+            * Fix the LICENSE-GPL-3 file.
+            * Update Bump version commit message.
+
 0.018     2024-11-17 22:07:21+01:00 Europe/Stockholm
             * Use Dzil plugin Git::Commit to commit instead of Run::AfterRelease.
             * Reorder AfterRelease activity in dist.ini.

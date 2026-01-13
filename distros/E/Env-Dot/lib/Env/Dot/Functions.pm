@@ -2,11 +2,7 @@
 package Env::Dot::Functions;
 use strict;
 use warnings;
-
-use Cwd     qw( abs_path );
-use English qw( -no_match_vars );
-use File::Spec;
-use IO::File;
+use 5.010;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -28,12 +24,15 @@ our %EXPORT_TAGS = (
     ],
 );
 
+use Cwd     qw( abs_path );
 use English qw( -no_match_vars );    # Avoids regex performance penalty in perl 5.18 and earlier
+use File::Spec;
+use IO::File;
 use Carp;
 
-# ABSTRACT: Read environment variables from .env file
+# ABSTRACT: Read environment variables from a .env file
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 use constant {
     OPTION_FILE_TYPE                         => q{file:type},
@@ -215,7 +214,7 @@ sub _interpret_dotenv {
                 }
             }
             elsif ( $options{'file:type'} eq OPTION_FILE_TYPE_PLAIN ) {
-                1;
+                1;    # document no-operation
             }
             my %opts = ( allow_interpolate => $options{'var:allow_interpolate'}, );
             push @vars, { name => $name, value => $value, opts => \%opts, };
@@ -248,8 +247,8 @@ sub _interpret_opts {
 sub _read_dotenv_file {
     my ($filepath) = @_;
     my $fh = IO::File->new();
-    $fh->binmode(':encoding(UTF-8)');
     $fh->open(qq{< $filepath}) or croak "Error: Cannot open file '$filepath'";
+    $fh->binmode(':encoding(UTF-8)');
     my @dotenv_rows = <$fh>;
     chomp @dotenv_rows;
     $fh->close or croak "Error: Cannot close file '$filepath'";
@@ -292,11 +291,11 @@ __END__
 
 =head1 NAME
 
-Env::Dot::Functions - Read environment variables from .env file
+Env::Dot::Functions - Read environment variables from a .env file
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -306,22 +305,26 @@ version 0.018
 
 =head1 DESCRIPTION
 
-This package just contains functions for use
-in the main package L<Env::Dot> and in
-the command line tool B<envdot>.
-
-=for stopwords envdot env filepath filepaths
+=for :stopwords env dotenv filepath filepaths
 
 =head1 STATUS
 
 This module is currently being developed so changes in the API are possible,
 though not likely.
 
+=for stopwords envdot
+
+This package just contains functions for use
+in the main package L<Env::Dot> and in
+the command line tool B<envdot>.
+
 =head1 FUNCTIONS
 
 No functions are automatically exported to the calling namespace.
 
 =head2 get_dotenv_vars(@)
+
+=for stopwords env
 
 Return all variables from the F<.env> file
 as a list of hashes (name/value pairs).
@@ -347,6 +350,8 @@ If a file does not exist, we break the execution.
 Return a list of file paths.
 
 =head2 get_envdot_filepaths_var_name
+
+=for stopwords env
 
 Return the name of the environment variable
 which user can use to specify the paths of .env files.

@@ -5,7 +5,7 @@ use warnings;
 package Marlin::X::Clone;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012001';
+our $VERSION   = '0.013001';
 
 use Carp 'croak';
 use Clone;
@@ -131,6 +131,7 @@ sub _make_clone_method {
 			$code->addf( '}' );
 			$code->addf( '( $value, $has_value ) = ( $args{$found[0]}, !!1 );' );
 			$code->addf( '$used++;' ) if $plugin->strict_args;
+			$code->addf( 'undef $has_value unless defined $value;' ) if $attr->{undef_tolerant};
 			$code->decrease_indent;
 			$code->addf( '}' );
 			$if = 'elsif';
@@ -141,6 +142,7 @@ sub _make_clone_method {
 			$code->increase_indent;
 			$code->addf( '( $value, $has_value ) = ( $args{%s}, !!1 );', B::perlstring($init_arg) );
 			$code->addf( '$used++;' ) if $plugin->strict_args;
+			$code->addf( 'undef $has_value unless defined $value;' ) if $attr->{undef_tolerant};
 			$code->decrease_indent;
 			$code->addf( '}' );
 			$if = 'elsif';
@@ -222,6 +224,13 @@ sub _make_clone_method {
 			$code->addf( '$value = %s;', $attr->inline_default('$clone', $var) );
 			delete local $attr->{trigger};
 			$code->add_line( $attr->inline_writer( '$clone', '$value' ) );
+			$code->decrease_indent;
+			$code->addf( '}' );
+		}
+		elsif ( $attr->{required} ) {
+			$code->addf( 'else {' );
+			$code->increase_indent;
+			$code->addf( '%s("Missing required attribute \'%%s\'" , %s );', $attr->_croaker, B::perlstring($attr->{slot}) );
 			$code->decrease_indent;
 			$code->addf( '}' );
 		}

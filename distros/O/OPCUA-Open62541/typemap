@@ -15,6 +15,7 @@ UA_Double				T_PACKED
 UA_StatusCode				T_PACKED
 UA_Guid					T_PACKED
 enum UA_NodeIdType			T_ENUM
+UA_RuleHandling				T_ENUM
 UA_SecureChannelState			T_ENUM
 UA_SessionState				T_ENUM
 UA_TimestampsToReturn			T_ENUM
@@ -96,7 +97,7 @@ T_PTROBJ_PACKED
 		if (!(${(my $ntt=$ntype)=~s/_/::/g;
 		    # isself will be 1 for self pointer, 0 for other parameter
 		    # a self pointer of wrong type will cause C syntax error
-		    my $isself = $ntt eq $Package ? 1 : \"bad self\";
+		    my $isself = $ntt eq $Package ? 1 : 'bad self';
 		    $isself = 0 if $argoff != 0;
 		    \$isself}) ||
 		    (!(SvOK($arg) && SvROK($arg) &&
@@ -197,7 +198,7 @@ T_PTROBJ_SPECIAL
 		if (!(${(my $ntt=$ntype)=~s/_/::/g;
 		    # isself will be 1 for self pointer, 0 for other parameter
 		    # a self pointer of wrong type will cause C syntax error
-		    my $isself = $ntt eq $Package ? 1 : \"bad self\";
+		    my $isself = $ntt eq $Package ? 1 : 'bad self';
 		    $isself = 0 if $argoff != 0;
 		    \$isself}) ||
 		    (!(SvOK($arg) && SvROK($arg) &&

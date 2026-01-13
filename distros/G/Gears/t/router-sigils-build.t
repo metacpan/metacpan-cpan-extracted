@@ -71,6 +71,20 @@ _build(
 	'/abc/',
 );
 
+_build(
+	'reserved uri characters',
+	'/:a/*b',
+	{a => 'a- /a', b => 'b- /b'},
+	'/a-%20%2Fa/b-%20/b',
+);
+
+_build(
+	'unicode characters',
+	'/:a',
+	{a => 'zażółć gęślą jaźń'},
+	'/za%C5%BC%C3%B3%C5%82%C4%87%20g%C4%99%C5%9Bl%C4%85%20ja%C5%BA%C5%84',
+);
+
 done_testing;
 
 sub _build ($name, $pattern, $params, $expected, %args)

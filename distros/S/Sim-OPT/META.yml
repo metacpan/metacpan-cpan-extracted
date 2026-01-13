@@ -39,5 +39,5 @@ requires:
   Switch::Back: '0'
   Vector::Object3D::Polygon: '0'
   warnings::unused: '0'
-version: '0.875'
+version: '0.879'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

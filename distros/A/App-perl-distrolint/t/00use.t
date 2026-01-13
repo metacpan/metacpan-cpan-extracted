@@ -12,6 +12,7 @@ require App::perl::distrolint::Check::FilePaths;
 require App::perl::distrolint::Check::HardTabs;
 require App::perl::distrolint::Check::NoStrictRefs;
 require App::perl::distrolint::Check::Pod;
+require App::perl::distrolint::Check::PostfixDeref;
 require App::perl::distrolint::Check::StrictAndWarnings;
 require App::perl::distrolint::Check::SubSignatures;
 require App::perl::distrolint::Check::Unimport;

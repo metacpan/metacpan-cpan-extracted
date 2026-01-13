@@ -18,6 +18,7 @@ requires 'JSON';
 requires 'LWP::UserAgent' => '6.42';
 requires 'Module::Load';
 requires 'Moo';
+requires 'MIME::Parser';
 requires 'Pod::Usage';
 requires 'strict';
 requires 'Test::LWP::UserAgent';

@@ -2,6 +2,7 @@ bin/demo_extractor.pl
 bin/extract-schemas
 bin/fuzz-harness-generator
 Changes
+cpanfile
 doc/getting-started-blog.md
 doc/SchemaExtractor.pm
 lib/App/Test/Generator.pm
@@ -19,6 +20,8 @@ t/30-basics.t
 t/40-more.t
 t/abs.t
 t/advanced_types.t
+t/cli-extract-schemas.t
+t/cli-fuzz-harness-generator.t
 t/conf-corpus.t
 t/conf-fuzz.t
 t/conf/abs.yml
@@ -38,6 +41,7 @@ t/error_constraints.t
 t/errors.t
 t/fuzz.t
 t/generate.t
+t/generator-regression.t
 t/html_genealogy_map.t
 t/modern.t
 t/moosex_params_validate.t
@@ -52,6 +56,7 @@ t/pod.t
 t/relationship_tests.t
 t/return.t
 t/schema_input.t
+t/strict_pod.t
 t/test_extractor.t
 t/test_hints.t
 t/type_params.t

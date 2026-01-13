@@ -61,4 +61,6 @@
 ^x?t/tmp/
 ^bin/rt-merge-users$
 ^bin/rt-update-merged-users$
+^bin/rt-clean-merged-users$
+^lib/RT/Extension/MergeUsers/Test.pm
 \.tar\.gz$

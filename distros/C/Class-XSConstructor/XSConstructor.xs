@@ -67,6 +67,17 @@ enum {
     XSCON_TYPE_HASHREF              =   32,
 };
 
+enum {
+    XSCON_DEFAULT_UNDEF             = 1,
+    XSCON_DEFAULT_ZERO              = 2,
+    XSCON_DEFAULT_ONE               = 3,
+    XSCON_DEFAULT_FALSE             = 4,
+    XSCON_DEFAULT_TRUE              = 5,
+    XSCON_DEFAULT_EMPTY_STR         = 6,
+    XSCON_DEFAULT_EMPTY_ARRAY       = 7,
+    XSCON_DEFAULT_EMPTY_HASH        = 8,
+};
+
 typedef struct {
     char   *name;
     I32     flags;
@@ -949,41 +960,24 @@ xscon_run_default(SV *object, char* keyname, int has_common_default, SV *default
     dTHX;
 
     switch ( has_common_default ) {
-
-        // Undef
-        case 1:
+        case XSCON_DEFAULT_UNDEF:
             return newSV(0);
-
-        // Number 0
-        case 2:
+        case XSCON_DEFAULT_ZERO:
             return newSViv(0);
-
-        // We're number 1
-        case 3:
+        case XSCON_DEFAULT_ONE:
             return newSViv(1);
-
-        // False
-        case 4:
+        case XSCON_DEFAULT_FALSE:
             return &PL_sv_no;
-
-        // True
-        case 5:
+        case XSCON_DEFAULT_TRUE:
             return &PL_sv_yes;
-
-        // Empty string
-        case 6:
+        case XSCON_DEFAULT_EMPTY_STR:
             return newSVpvs("");
-
-        // Empty arrayref
-        case 7:
+        case XSCON_DEFAULT_EMPTY_ARRAY:
             AV *av = newAV();
             return newRV_noinc((SV*)av);
-
-        // Empty hashref
-        case 8:
+        case XSCON_DEFAULT_EMPTY_HASH:
             HV *hv = newHV();
             return newRV_noinc((SV*)hv);
-
     }
 
     if ( !default_sv ) {
@@ -1530,6 +1524,15 @@ BOOT:
     newCONSTSUB(stash, "XSCON_BITSHIFT_DEFAULTS",         newSViv(XSCON_BITSHIFT_DEFAULTS));
     newCONSTSUB(stash, "XSCON_BITSHIFT_TYPES",            newSViv(XSCON_BITSHIFT_TYPES));
 
+    newCONSTSUB(stash, "XSCON_DEFAULT_UNDEF",             newSViv(XSCON_DEFAULT_UNDEF));
+    newCONSTSUB(stash, "XSCON_DEFAULT_ZERO",              newSViv(XSCON_DEFAULT_ZERO));
+    newCONSTSUB(stash, "XSCON_DEFAULT_ONE",               newSViv(XSCON_DEFAULT_ONE));
+    newCONSTSUB(stash, "XSCON_DEFAULT_FALSE",             newSViv(XSCON_DEFAULT_FALSE));
+    newCONSTSUB(stash, "XSCON_DEFAULT_TRUE",              newSViv(XSCON_DEFAULT_TRUE));
+    newCONSTSUB(stash, "XSCON_DEFAULT_EMPTY_STR",         newSViv(XSCON_DEFAULT_EMPTY_STR));
+    newCONSTSUB(stash, "XSCON_DEFAULT_EMPTY_ARRAY",       newSViv(XSCON_DEFAULT_EMPTY_ARRAY));
+    newCONSTSUB(stash, "XSCON_DEFAULT_EMPTY_HASH",        newSViv(XSCON_DEFAULT_EMPTY_HASH));
+
     newCONSTSUB(stash, "XSCON_TYPE_BASE_ANY",             newSViv(XSCON_TYPE_BASE_ANY));
     newCONSTSUB(stash, "XSCON_TYPE_BASE_DEFINED",         newSViv(XSCON_TYPE_BASE_DEFINED));
     newCONSTSUB(stash, "XSCON_TYPE_BASE_REF",             newSViv(XSCON_TYPE_BASE_REF));
@@ -1961,7 +1964,7 @@ CODE:
     CV *cv = newXS(name, XS_Class__XSConstructor_reader, (char*)__FILE__);
     if (cv == NULL)
         croak("ARG! Something went really wrong while installing a new XSUB!");
-    
+
     xscon_reader_t *sig;
     Newxz(sig, 1, xscon_reader_t);
     sig->slot           = savepv(slot);

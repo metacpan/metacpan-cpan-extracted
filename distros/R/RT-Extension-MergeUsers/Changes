@@ -1,5 +1,16 @@
 Revision history for RT-Extension-MergeUsers
 
+1.13 2026-01-12
+ - Refresh attributes of user obj to pick up changes
+ - Move merge logic into BeforeUpdate callback
+ - Change MergeInto to return id of user merged into
+ - Remove obsolete code
+ - Update POD
+ - Do not merge users if their Privileged values are different
+ - Clear EFFECTIVE_ID_CACHE when it needs an update
+ - Do not allow multiple levels of merged users
+ - Remove call to GetMergedUsers from admin UI
+
 1.12 2025-10-22
  - Add REST2 endpoints for merge and unmerge
 

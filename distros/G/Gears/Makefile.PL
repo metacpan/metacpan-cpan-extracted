@@ -20,12 +20,13 @@ my %WriteMakefileArgs = (
     "Devel::StrictMode" => 0,
     "Mooish::Base" => "1.001",
     "Path::Tiny" => 0,
+    "URI" => 0,
     "Value::Diff" => 0
   },
   "TEST_REQUIRES" => {
     "Test2::V1" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.100",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,6 +38,7 @@ my %FallbackPrereqs = (
   "Mooish::Base" => "1.001",
   "Path::Tiny" => 0,
   "Test2::V1" => 0,
+  "URI" => 0,
   "Value::Diff" => 0
 );
 

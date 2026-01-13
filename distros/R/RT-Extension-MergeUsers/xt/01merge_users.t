@@ -60,18 +60,18 @@ ok(!$id, "Recognizes secondary as child? $message");
 ($id, $message) = $primary_user->MergeInto($secondary_user);
 ok(!$id, "Recognizes primary as parent? $message");
 
-# DTRT with multiple inheritance
+# do not allow multiple inheritance
 $quaternary_user->MergeInto($tertiary_user);
 ($id, $message) = $tertiary_user->MergeInto($primary_user);
-ok($id, "Merges users with children? $message");
+ok(!$id, "Does not merge users with children? $message");
 
 # recognizes siblings
 ($id, $message) = $tertiary_user->MergeInto($secondary_user);
 ok(!$id, "Recognizes siblings? $message");
 
-# recognizes children of children as children of the primary
+# do not alllow a merged user to be merged into a different user
 ($id, $message) = $quaternary_user->MergeInto($primary_user);
-ok(!$id, "Recognizes children of children? $message");
+ok(!$id, "Does not merge a user that has already been merged? $message");
 
 # Associates tickets from a secondary address with the primary address
 my $ticket = RT::Ticket->new($RT::SystemUser);

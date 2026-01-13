@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.807;
 
-class App::perl::distrolint::Check::SubSignatures 0.08;
+class App::perl::distrolint::Check::SubSignatures 0.09;
 
 apply App::perl::distrolint::CheckRole::EachFile;
 apply App::perl::distrolint::CheckRole::TreeSitterPerl;
@@ -76,7 +76,8 @@ my sub proto_looks_like_signature ( $proto )
    return 1 if $proto eq '';
 
    # A single '$' would count as a single-arg unnamed signature param
-   return 1 if $proto eq '$';
+   # A single '@' or '%' would count as a single slurpy unnamed signature param
+   return 1 if $proto eq '$' or $proto eq '@' or $proto eq '%';
 
    return 0;
 }
@@ -85,52 +86,43 @@ method check_file ( $file )
 {
    my $tree = $self->parse_perl_file( $file );
 
-   # First build up a flat list of the query matches
-   my @captures;
-   $self->walk_each_query_match( $QUERY, $tree->root_node, method ( $captures ) {
-      push @captures, $captures;
-   } );
-
    my $ok = 1;
-   my $use_feature_signatures = 0;
-
-   # Then walk the list of matches tracking state as we go
-   # TODO: Block nesting
-   while( @captures ) {
-      my $c = shift @captures;
+   $self->walk_each_scoped_query_match( $QUERY, $tree->root_node, method ( $capture, $context ) {
       my $node;
-
-      if( $node = $c->{use_version} ) {
+      if( $node = $capture->{use_version} ) {
          my $version = version->new( $node->child_by_field_name( 'version' )->text );
-         $use_feature_signatures = ( $version ge v5.36 );
+         $context->{use_feature_signatures} = ( $version ge v5.36 );
       }
-      elsif( $node = $c->{use_module} ) {
+      elsif( $node = $capture->{use_module} ) {
          my $sense = ( $node->child_nodes )[0]->type eq "use";
          my @features = $self->extract_use_module_imports( $node );
 
-         $use_feature_signatures = $sense if any { $_ eq "signatures" } @features;
+         $context->{use_feature_signatures} = $sense
+            if any { $_ eq "signatures" } @features;
       }
-      elsif( $node = $c->{sub} or $node = $c->{method} ) {
-         my $kw = ( $c->{sub} ) ? "sub" : "method";
-         my $has_signature = defined $c->{signature};
+      elsif( $node = $capture->{sub} or $node = $capture->{method} ) {
+         my $kw = ( $capture->{sub} ) ? "sub" : "method";
+         my $has_signature = defined $capture->{signature};
          # tree-sitter-perl can't tell the difference between prototypes
          # and signatures
-         if( $use_feature_signatures and not $has_signature ) {
+         if( $context->{use_feature_signatures} and not $has_signature ) {
             my $proto_node = first { $_->type eq "prototype" } $node->child_nodes;
 
             $has_signature = proto_looks_like_signature( $proto_node->text ) if $proto_node;
          }
 
-         if( $use_feature_signatures and !$has_signature ) {
+         if( $context->{use_feature_signatures} and !$has_signature ) {
             App->diag( App->format_file( $file, $node->start_row + 1 ), " declares a $kw without signature" );
             $ok = 0;
          }
       }
       else {
-         my @names = sort keys %$c;
+         my @names = sort keys %$capture;
          die "TODO: Unsure how to handle captures <@names>\n";
       }
-   }
+
+      return 1; # check all of them
+   } );
 
    return $ok;
 }

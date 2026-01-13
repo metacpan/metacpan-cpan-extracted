@@ -1,5 +1,10 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+2.09 2026-01-12
+  * Make XS compatible with Perl 5.42.0 and ExtUtils::ParseXS 3.57.
+  * Add ServerConfig allowEmptyVariables accessors.
+  * Rename opcua-dump tool.
+
 2.08 2025-07-04
   * Actually ship opcua-dump script with the distribution.
 

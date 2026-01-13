@@ -5,6 +5,7 @@ use warnings;
 
 use Data::Dumper;
 use Getopt::Long;
+use File::Path qw(make_path);
 use Pod::Usage;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
@@ -21,6 +22,7 @@ extract-schemas - Extract test schemas from Perl modules
 
     Options:
       --output-dir DIR    Output directory for schema files (default: schemas/)
+      --strict-pod=off|warn|fatal
       --verbose           Show detailed analysis
       --help              Show this help message
       --man               Show full documentation
@@ -59,22 +61,31 @@ on how much information it could infer.
 =cut
 
 # Parse command line options
-my %opts = (
-    output_dir => 'schemas',
-    verbose    => 0,
-    help       => 0,
-    man        => 0,
+my %cli_opts = (
+	help => 0,
+	man => 0,
+);
+
+my %extractor_opts = (
+	output_dir => 'schemas',
+	strict_pod => 'warn',
+	verbose => 0,
 );
 
 GetOptions(
-    'output-dir|o=s' => \$opts{output_dir},
-    'verbose|v'      => \$opts{verbose},
-    'help|h'         => \$opts{help},
-    'man|m'          => \$opts{man},
+	'output-dir|o=s' => \$extractor_opts{output_dir},
+	'strict-pod|s=s' => \$extractor_opts{strict_pod},
+	'verbose|v' => \$extractor_opts{verbose},
+	'help|h' => \$cli_opts{help},
+	'man|m' => \$cli_opts{man},
 ) or pod2usage(2);
 
-pod2usage(1) if $opts{help};
-pod2usage(-exitval => 0, -verbose => 2) if $opts{man};
+pod2usage(-exitval => 0, -verbose => 1) if($cli_opts{help});
+pod2usage(-exitval => 0, -verbose => 2) if $cli_opts{man};
+
+if($extractor_opts{strict_pod} !~ /^(off|warn|fatal)$/) {
+	die "Invalid --strict-pod value '$extractor_opts{strict_pod}'. Expected off, warn, or fatal";
+}
 
 # Get input file
 my $input_file = shift @ARGV or pod2usage('Error: No input file specified');
@@ -83,32 +94,39 @@ die "Error: File not found: $input_file" unless -f $input_file;
 
 # Run the extractor
 print "Extracting schemas from: $input_file\n";
-print "Output directory: $opts{output_dir}\n\n";
+print "Output directory: $extractor_opts{output_dir}\n\n";
+
+make_path($extractor_opts{output_dir}) unless -d $extractor_opts{output_dir};
 
 my $extractor = App::Test::Generator::SchemaExtractor->new(
 	input_file => $input_file,
-	output_dir => $opts{output_dir},
-	verbose    => $opts{verbose},
+	# output_dir => $opts{output_dir},
+	# verbose => $opts{verbose},
+	# strict_pod	=> $opts{strict_pod},
+	%extractor_opts,
 );
 
 my $schemas = $extractor->extract_all();
 
 # Summary report
-print "\n", '=' x 70, "\n";
-print "EXTRACTION SUMMARY\n";
-print '=' x 70, "\n\n";
+print "\n", '=' x 70, "\n",
+	"EXTRACTION SUMMARY\n",
+	'=' x 70, "\n\n";
 
-my %iconfidence_counts = (high => 0, medium => 0, low => 0);
-my %oconfidence_counts = (high => 0, medium => 0, low => 0);
+my %input_confidence_counts = (high => 0, medium => 0, low => 0);
+my %output_confidence_counts = (high => 0, medium => 0, low => 0);
 
 foreach my $method (sort keys %$schemas) {
 	my $schema = $schemas->{$method};
-	my $iconf = $schema->{_confidence}{input}->{level};
-	$iconfidence_counts{$iconf}++;
-	my $oconf = $schema->{_confidence}{output}->{level};
-	$oconfidence_counts{$oconf}++;
+	my $iconf = $schema->{_confidence}{input}{level} // 'low';
+	$input_confidence_counts{$iconf}++;
+	my $oconf = $schema->{_confidence}{output}{level} // 'low';
+	$output_confidence_counts{$oconf}++;
 
-	my $param_count = scalar keys %{$schema->{input}};
+	# my $param_count = scalar keys %{$schema->{input}};
+
+	# Filter out underscore keys which could be used in the future for metadata
+	my $param_count = scalar grep { $_ !~ /^_/ } keys %{ $schema->{input} };
 
 	printf "%-30s %d params  [%s input confidence] [%s output confidence]\n",
 		$method, $param_count, uc($iconf), uc($oconf);
@@ -117,26 +135,26 @@ foreach my $method (sort keys %$schemas) {
 print "\n";
 print 'Total methods: ', (scalar keys %$schemas), "\n";
 print "  Input:\n";
-print "    High confidence:   $iconfidence_counts{high}\n";
-print "    Medium confidence: $iconfidence_counts{medium}\n";
-print "    Low confidence:    $iconfidence_counts{low}\n";
+print "    High confidence:   $input_confidence_counts{high}\n";
+print "    Medium confidence: $input_confidence_counts{medium}\n";
+print "    Low confidence:    $input_confidence_counts{low}\n";
 print "  Output:\n";
-print "    High confidence:   $oconfidence_counts{high}\n";
-print "    Medium confidence: $oconfidence_counts{medium}\n";
-print "    Low confidence:    $oconfidence_counts{low}\n";
+print "    High confidence:   $output_confidence_counts{high}\n";
+print "    Medium confidence: $output_confidence_counts{medium}\n";
+print "    Low confidence:    $output_confidence_counts{low}\n";
 print "\n";
 
-if ($iconfidence_counts{low} > 0 || $iconfidence_counts{medium} > 0) {
+if ($input_confidence_counts{low} > 0 || $input_confidence_counts{medium} > 0) {
 	print "RECOMMENDATION:\n",
-		"Review the generated schemas in $opts{output_dir}/\n",
+		"Review the generated schemas in $extractor_opts{output_dir}/\n",
 		"Focus on methods with medium/low confidence ratings.\n\n";
 }
 
-if($opts{'verbose'}) {
+if($extractor_opts{'verbose'}) {
 	print "Schemas:\n\t", Dumper($schemas);
 }
 
-print "Schema files written to: $opts{output_dir}/\n";
+print "Schema files written to: $extractor_opts{output_dir}/\n";
 
 __END__
 
@@ -191,6 +209,15 @@ Extracts schemas to ./schemas/ directory.
     extract-schemas --verbose lib/MyModule.pm
 
 Shows detailed analysis of each method.
+
+=head2 Pod Checking
+
+  --strict-pod=LEVEL
+    Enforce POD/code consistency.
+    LEVEL may be:
+      off    - do not validate POD
+      warn   - warn on mismatches (default)
+      fatal  - abort on mismatches
 
 =head1 NEXT STEPS
 

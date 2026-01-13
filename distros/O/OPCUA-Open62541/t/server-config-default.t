@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-use OPCUA::Open62541;
+use OPCUA::Open62541 qw(:RULEHANDLING);
 
-use Test::More tests => 94;
+use Test::More tests => 99;
 use Test::Deep;
 use Test::Exception;
 use Test::LeakTrace;
@@ -224,3 +224,13 @@ ok(my $maxretransmissionqueuesize = $config->getMaxRetransmissionQueueSize(),
 no_leaks_ok { $config->getMaxRetransmissionQueueSize() }
     "get max retransmission queue size leak";
 is($maxretransmissionqueuesize, 42, "custom max retransmission queue size");
+
+lives_ok { $config->setAllowEmptyVariables(RULEHANDLING_ACCEPT) }
+    "set allow empty variables";
+no_leaks_ok { $config->setAllowEmptyVariables(RULEHANDLING_ACCEPT) }
+    "set allow empty variables leak";
+ok(my $allowemptyvariables = $config->getAllowEmptyVariables(),
+    "get allow empty variables");
+no_leaks_ok { $config->getAllowEmptyVariables() }
+    "get allow empty variables leak";
+is($allowemptyvariables, 3, "custom allow empty variables");

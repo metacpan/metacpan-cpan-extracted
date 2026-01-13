@@ -1,7 +1,7 @@
 use strict;
 use Test::More 0.98;
 use Mojo::URL;
-use lib '../lib';
+use lib 'lib';
 
 my $username = 'U53rN4m3';
 my $password = 'p455w0rd#';

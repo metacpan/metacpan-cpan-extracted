@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.807;
 
-class App::perl::distrolint::Check::StrictAndWarnings 0.08;
+class App::perl::distrolint::Check::StrictAndWarnings 0.09;
 
 apply App::perl::distrolint::CheckRole::EachFile;
 apply App::perl::distrolint::CheckRole::TreeSitterPerl;

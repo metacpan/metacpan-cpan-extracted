@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.807;
 
-class App::perl::distrolint::Check::UseVERSION 0.08;
+class App::perl::distrolint::Check::UseVERSION 0.09;
 
 apply App::perl::distrolint::CheckRole::EachFile;
 apply App::perl::distrolint::CheckRole::TreeSitterPerl;
@@ -29,6 +29,8 @@ declaration as its first significant statement. A C<package> statement is
 permitted before this, but no other code is allowed.
 
 =head1 CONFIGURATION
+
+=for highlighter language=ini
 
 The following extra configuration may be added to the C<[check UseVERSION]>
 section of F<distrolint.ini>:

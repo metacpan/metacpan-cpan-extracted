@@ -5,7 +5,7 @@ use warnings;
 package Marlin::XAttribute::Alias;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012001';
+our $VERSION   = '0.013001';
 
 use Eval::TypeTiny ();
 use Role::Tiny;
@@ -64,6 +64,48 @@ around xs_constructor_args => sub {
 		$args[-1]{alias} = [ @{ $me->{':Alias'}{alias} } ];
 	}
 	return @args;
+};
+
+my $missing_mxa_warning;
+after injected_metadata => sub {
+	my ( $me, $framework, $meta_attr ) = @_;
+	
+	return unless $me->{':Alias'} && @{ $me->{':Alias'}{alias} or [] };
+	
+	if ( $framework eq 'Moose' ) {
+	
+		if ( not eval { require MooseX::Aliases; 1 } ) {
+			if ( not $missing_mxa_warning++ ) {
+				require Carp;
+				Carp::carp('MooseX::Aliases is not installed');
+			}
+			return;
+		}
+		
+		require Moose::Util;
+		if ( $meta_attr->can('associated_role') ) {
+			Moose::Util::ensure_all_roles(
+				Moose::Util::find_meta($meta_attr->associated_role),
+				'MooseX::Aliases::Meta::Trait::Role',
+			);
+		}
+		else {
+			my $meta = Moose::Util::find_meta($meta_attr->associated_class);
+			$meta->make_mutable;
+			Moose::Util::ensure_all_roles(
+				$meta,
+				'MooseX::Aliases::Meta::Trait::Class',
+			);
+			$meta->make_immutable;
+		}
+		
+		Moose::Util::ensure_all_roles(
+			$meta_attr,
+			'MooseX::Aliases::Meta::Trait::Attribute',
+		);
+		
+		$meta_attr->{alias} = [ @{ $me->{':Alias'}{alias} } ];
+	}
 };
 
 1;

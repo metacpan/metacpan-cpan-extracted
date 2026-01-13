@@ -486,7 +486,7 @@ END_MODULE
 	my $configure_input = $configure_schema->{input};
 
 	is(
-		$configure_input->{host}{default},
+		$configure_input->{host}{_default},
 		'localhost',
 		'Schema includes host default from code and POD'
 	);
@@ -498,7 +498,7 @@ END_MODULE
 	);
 
 	is(
-		$configure_input->{port}{default},
+		$configure_input->{port}{_default},
 		8080,
 		'Schema includes port default'
 	);
@@ -510,7 +510,7 @@ END_MODULE
 	);
 
 	is(
-		$configure_input->{ssl}{default},
+		$configure_input->{ssl}{_default},
 		0,
 		'Schema includes ssl default'
 	);
@@ -522,7 +522,7 @@ END_MODULE
 	);
 
 	is(
-		$configure_input->{timeout}{default},
+		$configure_input->{timeout}{_default},
 		30.0,
 		'Schema includes timeout default'
 	);
@@ -538,7 +538,7 @@ END_MODULE
 	my $process_input = $process_schema->{input};
 
 	is_deeply(
-		$process_input->{items}{default},
+		$process_input->{items}{_default},
 		[],
 		'Schema includes empty arrayref default'
 	);
@@ -550,7 +550,7 @@ END_MODULE
 	);
 
 	is_deeply(
-		$process_input->{options}{default},
+		$process_input->{options}{_default},
 		{},
 		'Schema includes empty hashref default'
 	);
@@ -617,36 +617,36 @@ END_MODULE
 
 	# Check specific edge cases
 	is(
-		$code_params->{param1}{default},
+		$code_params->{param1}{_default},
 		"it's complicated",
 		'Handles quotes inside string default'
 	);
 
 is(
-	$code_params->{param2}{default},
+	$code_params->{param2}{_default},
 	"line1\\nline2\\ttab",
 	'Preserves escaped characters in default'
 );
 	is(
-		$code_params->{param2}{default},
+		$code_params->{param2}{_default},
 		"line1\\nline2\\ttab",
 		'Preserves escaped characters in default'
 	);
 
 	# Note: param3 returns expression "(10 + 20)" which we can't evaluate
 	ok(
-		$code_params->{param3}{default},
+		$code_params->{param3}{_default},
 		'Extracts expression default (even if unevaluatable)'
 	);
 
 	is(
-		$code_params->{param4}{default},
+		$code_params->{param4}{_default},
 		'default',
 		'Ignores trailing comments in default extraction'
 	);
 
 	is(
-		$code_params->{param5}{default},
+		$code_params->{param5}{_default},
 		'default value',
 		'Extracts default from q{} operator'
 	);
@@ -662,7 +662,7 @@ is(
 	);
 
 	ok(
-		!exists $no_defaults_params->{required}{default},
+		!exists $no_defaults_params->{required}{_default},
 		'Required parameter has no default value'
 	);
 
@@ -742,25 +742,25 @@ END_MODULE
 	my $db_input = $db_schema->{input};
 
 	is(
-		$db_input->{host}{default},
+		$db_input->{host}{_default},
 		'localhost',
 		'Real-world: Database host default'
 	);
 
 	is(
-		$db_input->{port}{default},
+		$db_input->{port}{_default},
 		3306,
 		'Real-world: Database port default'
 	);
 
 	is(
-		$db_input->{user}{default},
+		$db_input->{user}{_default},
 		'app_user',
 		'Real-world: Database user default'
 	);
 
 	is(
-		$db_input->{password}{default},
+		$db_input->{password}{_default},
 		undef,
 		'Real-world: Database password defaults to undef'
 	);
@@ -772,13 +772,13 @@ END_MODULE
 	);
 
 	is(
-		$db_input->{ssl}{default},
+		$db_input->{ssl}{_default},
 		0,
 		'Real-world: SSL defaults to false'
 	);
 
 	is(
-		$db_input->{timeout}{default},
+		$db_input->{timeout}{_default},
 		10,
 		'Real-world: Timeout default'
 	);
@@ -788,19 +788,19 @@ END_MODULE
 	my $email_input = $email_schema->{input};
 
 	is(
-		$email_input->{subject}{default},
+		$email_input->{subject}{_default},
 		'No subject',
 		'Real-world: Email subject default'
 	);
 
 	is(
-		$email_input->{body}{default},
+		$email_input->{body}{_default},
 		'',
 		'Real-world: Email body defaults to empty string'
 	);
 
 	# Note: $options default is a hashref with from and cc keys
-	my $options_default = $email_input->{options}{default};
+	my $options_default = $email_input->{options}{_default};
 	ok(ref $options_default eq 'HASH', 'Real-world: Options defaults to hashref');
 
 	done_testing();

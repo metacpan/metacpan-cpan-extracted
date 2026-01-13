@@ -6,7 +6,7 @@ use warnings;
 use Carp 'croak';
 
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 sub new {
     my ($class, %args) = @_;
@@ -183,7 +183,7 @@ __END__
 
 =head1 NAME
 
-Algorithm::SlidingWindow - Fixed-capacity rolling window (overwrite-oldest)
+Algorithm::SlidingWindow - Fixed-capacity sliding window (overwrite-oldest)
 
 =head1 SYNOPSIS
 
@@ -211,7 +211,7 @@ Algorithm::SlidingWindow - Fixed-capacity rolling window (overwrite-oldest)
 
 =head1 DESCRIPTION
 
-C<Algorithm::SlidingWindow> implements a fixed-capacity rolling window
+C<Algorithm::SlidingWindow> implements a fixed-capacity sliding window
 using an array-backed circular buffer.
 
 When the window reaches capacity and new elements are added, the oldest
@@ -246,7 +246,7 @@ Provide predictable O(1) insertion and access behavior
 
     my $w = Algorithm::SlidingWindow->new(%args);
 
-Creates a new rolling window.
+Creates a new sliding window.
 
 =head3 Arguments
 

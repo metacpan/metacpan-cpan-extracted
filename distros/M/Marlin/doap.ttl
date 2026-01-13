@@ -26,7 +26,7 @@
 	], [
 		doap-deps:on "Class::XSAccessor 1.19"^^doap-deps:CpanId;
 	], [
-		doap-deps:on "Class::XSConstructor 0.018001"^^doap-deps:CpanId;
+		doap-deps:on "Class::XSConstructor 0.020000"^^doap-deps:CpanId;
 	], [ doap-deps:on "Clone"^^doap-deps:CpanId ], [
 		doap-deps:on "Exporter::Tiny 1.006002"^^doap-deps:CpanId;
 	], [ doap-deps:on "List::Util 1.45"^^doap-deps:CpanId ], [ doap-deps:on "LV"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ];
@@ -47,7 +47,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Marlin";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002003>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002004>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002005>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-004000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-005000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-008000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-009000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-010000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-012000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-012001>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002003>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002004>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002005>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-004000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-005000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-008000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-009000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-010000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-012000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-012001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-013000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-013001>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-marlin>;
@@ -507,6 +507,52 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.012001.tar.gz>;
 	doap:revision        "0.012001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Marlin/v_0-013000>
+	a                    doap:Version;
+	dc:identifier        "Marlin-0.013000"^^xsd:string;
+	dc:issued            "2026-01-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Moved a lot of the code for Moo/Moose compatibility into MooX::Marlin and MooseX::Marlin, so it clutters up the main Marlin modules less.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "If you try to inherit from a class that uses Marlin::XAttribute::Alias in Moose, it will try to load MooseX::Aliases and use that, issuing a warning if the module is missing.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "If you try to inherit from a class that uses Marlin::XAttribute::Lvalue in Moose, it will try to load MooseX::LvalueAttribute and use that, issuing a warning if the module is missing.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Attributes now support an undef_tolerant option.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Marlin::X::UndefTolerant plugin to automatically apply undef_tolerant option to all attributes in a class or role (except those that don't make sense).";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add a test for foreign inheritance.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Marlin::X::Clone understands about required attributes and undef_tolerant attributes.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.013000.tar.gz>;
+	doap:revision        "0.013000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Marlin/v_0-013001>
+	a                    doap:Version;
+	dc:identifier        "Marlin-0.013001"^^xsd:string;
+	dc:issued            "2026-01-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Bump version of Class::XSConstructor dependency.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.013001.tar.gz>;
+	doap:revision        "0.013001"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

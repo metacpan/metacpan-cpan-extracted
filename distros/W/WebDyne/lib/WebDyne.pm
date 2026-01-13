@@ -61,7 +61,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='2.065';
+$VERSION='2.066';
 chomp($VERSION_GIT_SHA=do { local (@ARGV, $/) = ($_=__FILE__.'.sha'); <> if -f $_ });
 
 
@@ -542,10 +542,14 @@ sub handler : method {    # no subsort
         #
         #  delete $self->{'_CGI'} if $WEBDYNE_CGI_PARAM_EXPAND;
         #
-        if ((my $cgi_or=$self->{'_CGI'}) && WEBDYNE_CGI_PARAM_EXPAND) {
-            $cgi_or->delete_all();  # Added this after cache code issues so don't get two instances of param. Keep and eye for problems with WebDyne::State
-            $cgi_or->_initialize();
-        }
+        
+        #  More problems with this. Caused CGI params to disappear when cache subroutine from WebDyne::Cache
+        #  triggered loop. Do I need to do it anymore ? Commenting out but retaining for ref
+        #
+        ##if ((my $cgi_or=$self->{'_CGI'}) && WEBDYNE_CGI_PARAM_EXPAND) {
+        ##    $cgi_or->delete_all();  # Added this after cache code issues so don't get two instances of param. Keep and eye for problems with WebDyne::State
+        ##    $cgi_or->_initialize();
+        ##}
 
 
     }
@@ -4303,10 +4307,11 @@ sub inode {
     #  Return or set inode name
     #
     my $self=shift();
+    debug("self: $self, inode: %s", Dumper(\@_));
     my $r=$self->r() ||
         return err('unable to get request handler');
     if (@_) {
-        $self->{'_inode'}=md5_hex(ref($self), $r->location, $r->filename(), shift());
+        $self->{'_inode'}=md5_hex(ref($self), $r->location, $r->filename(), @_);
     }
     else {
         $self->{'_inode'} ||=

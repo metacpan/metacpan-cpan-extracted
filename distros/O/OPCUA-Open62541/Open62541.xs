@@ -4369,6 +4369,22 @@ UA_ServerConfig_disableHistoryUpdateDeleteRawModified(config, disable);
 
 #endif /* UA_ENABLE_HISTORIZING */
 
+UA_RuleHandling
+UA_ServerConfig_getAllowEmptyVariables(config)
+	OPCUA_Open62541_ServerConfig	config
+    CODE:
+	RETVAL = config->svc_serverconfig->allowEmptyVariables;
+    OUTPUT:
+	RETVAL
+
+void
+UA_ServerConfig_setAllowEmptyVariables(config, allowEmptyVariables)
+	OPCUA_Open62541_ServerConfig	config
+	UA_RuleHandling			allowEmptyVariables
+    CODE:
+	config->svc_serverconfig->allowEmptyVariables =
+	    allowEmptyVariables;
+
 #############################################################################
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::Client		PREFIX = UA_Client_
 

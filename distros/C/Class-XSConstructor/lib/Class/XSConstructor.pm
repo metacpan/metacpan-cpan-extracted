@@ -9,7 +9,7 @@ use List::Util 1.45 qw( uniq );
 
 BEGIN {
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.019000';
+	our $VERSION   = '0.020000';
 	
 	if ( eval { require Types::Standard; 1 } ) {
 		Types::Standard->import(
@@ -123,7 +123,7 @@ sub import {
 			_croak("Required attribute $name cannot have undef init_arg");
 		}
 		
-		my @unknown_keys = grep !/\A(isa|required|is|default|builder|coerce|init_arg|trigger|weak_ref|alias|slot_initializer|undef_tolerant)\z/, keys %spec;
+		my @unknown_keys = grep !/\A(isa|required|is|lazy|default|builder|coerce|init_arg|trigger|weak_ref|alias|slot_initializer|undef_tolerant|reader)\z/, keys %spec;
 		if ( @unknown_keys ) {
 			_croak("Unknown keys in spec: %s", join ", ", sort @unknown_keys);
 		}
@@ -152,7 +152,8 @@ sub import {
 		}
 		
 		if ( exists $spec{default} or defined $spec{builder} ) {
-			$meta_attribute{default} = $class->_canonicalize_defaults( \%spec );
+			$meta_attribute{default} = $class->_canonicalize_defaults( \%spec )
+				unless $spec{lazy};
 		}
 		
 		if ( is_Object $type and $type->isa('Type::Tiny') ) {
@@ -254,7 +255,7 @@ sub _created_as_string ($) {
 sub _type_to_number {
 	my ( $type, $no_recurse ) = @_;
 	
-	if ( $type and $type->isa('Type::Tiny') ) {
+	if ( is_Object $type and $type->isa('Type::Tiny') ) {
 		require Types::Common;
 		if ( $type == Types::Common::Any() or $type == Types::Common::Item() ) {
 			return XSCON_TYPE_BASE_ANY;
@@ -329,7 +330,6 @@ sub _build_flags {
 	$flags |= XSCON_FLAG_REQUIRED              if $spec->{required};
 	$flags |= XSCON_FLAG_HAS_TYPE_CONSTRAINT   if is_CodeRef $spec->{isa};
 	$flags |= XSCON_FLAG_HAS_TYPE_COERCION     if is_CodeRef $spec->{coerce};
-	$flags |= XSCON_FLAG_HAS_DEFAULT           if exists($spec->{default}) || defined($spec->{builder});
 	$flags |= XSCON_FLAG_NO_INIT_ARG           if exists($spec->{init_arg}) && !defined($spec->{init_arg});
 	$flags |= XSCON_FLAG_HAS_INIT_ARG          if defined($spec->{init_arg}) && ( $spec->{init_arg} ne $name );
 	$flags |= XSCON_FLAG_HAS_TRIGGER           if $spec->{trigger};
@@ -338,33 +338,13 @@ sub _build_flags {
 	$flags |= XSCON_FLAG_HAS_SLOT_INITIALIZER  if $spec->{slot_initializer};
 	$flags |= XSCON_FLAG_UNDEF_TOLERANT        if $spec->{undef_tolerant};
 	
-	my $has_common_default = 0;
-	if ( exists $spec->{default} and !defined $spec->{default} ) {
-		$has_common_default = 1;
+	unless ( $spec->{lazy} ) {
+		$flags |= XSCON_FLAG_HAS_DEFAULT
+			if exists($spec->{default})
+			|| defined($spec->{builder});
+		$flags |= ( _common_default($spec->{default}) << +XSCON_BITSHIFT_DEFAULTS )
+			if exists($spec->{default});
 	}
-	elsif ( exists $spec->{default} and _created_as_number $spec->{default} and $spec->{default} == 0 ) {
-		$has_common_default = 2;
-	}
-	elsif ( exists $spec->{default} and _created_as_number $spec->{default} and $spec->{default} == 1 ) {
-		$has_common_default = 3;
-	}
-	elsif ( exists $spec->{default} and _is_bool $spec->{default} and !$spec->{default} ) {
-		$has_common_default = 4;
-	}
-	elsif ( exists $spec->{default} and _is_bool $spec->{default} and $spec->{default} ) {
-		$has_common_default = 5;
-	}
-	elsif ( exists $spec->{default} and _created_as_string $spec->{default} and $spec->{default} eq '' ) {
-		$has_common_default = 6;
-	}
-	elsif ( exists $spec->{default} and is_ScalarRef $spec->{default} and ${$spec->{default}} eq '[]' ) {
-		$has_common_default = 7;
-	}
-	elsif ( exists $spec->{default} and is_ScalarRef $spec->{default} and ${$spec->{default}} eq '{}' ) {
-		$has_common_default = 8;
-	}
-	
-	$flags |= ( $has_common_default << +XSCON_BITSHIFT_DEFAULTS );
 	
 	if ( $type ) {
 		my $has_common_type = _type_to_number( $type );
@@ -375,6 +355,22 @@ sub _build_flags {
 	}
 	
 	return $flags;
+}
+
+sub _common_default {
+	die unless @_ == 1;
+	my $default = shift;
+	
+	return XSCON_DEFAULT_UNDEF        if ( not defined $default );
+	return XSCON_DEFAULT_ZERO         if ( _created_as_number $default and $default == 0 );
+	return XSCON_DEFAULT_ONE          if ( _created_as_number $default and $default == 1 );
+	return XSCON_DEFAULT_FALSE        if ( _is_bool $default and not $default );
+	return XSCON_DEFAULT_TRUE         if ( _is_bool $default and $default );
+	return XSCON_DEFAULT_EMPTY_STR    if ( _created_as_string $default and $default eq '' );
+	return XSCON_DEFAULT_EMPTY_ARRAY  if ( is_ScalarRef $default and $$default eq '[]' );
+	return XSCON_DEFAULT_EMPTY_HASH   if ( is_ScalarRef $default and $$default eq '{}' );
+	
+	return 0;
 }
 
 sub inheritance_stuff {
@@ -915,7 +911,11 @@ looking at ways to eliminate them.
 
 =head1 SEE ALSO
 
-L<Class::Tiny>, L<Class::XSAccessor>, L<Class::XSDestructor>, L<Class::XSDelegation>.
+L<Class::Tiny>, L<Class::XSAccessor>, L<Class::XSReader>,
+L<Class::XSDestructor>, L<Class::XSDelegation>.
+
+A user-friendly wrapper for all the Class::XS* modules:
+L<Marlin>.
 
 =head1 AUTHOR
 

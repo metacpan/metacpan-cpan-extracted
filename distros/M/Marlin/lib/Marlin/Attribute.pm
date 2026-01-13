@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Attribute;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012001';
+our $VERSION   = '0.013001';
 
 use parent 'Sub::Accessor::Small';
 
@@ -14,20 +14,6 @@ use Class::XSAccessor ();
 use Marlin ();
 use Scalar::Util ();
 use Types::Common ();
-
-BEGIN {
-	eval {
-		require PerlX::Maybe;
-		*_maybe = \&PerlX::Maybe::maybe;
-	} or eval q{
-		sub _maybe ($$@) {
-			if ( defined $_[0] and defined $_[1] ) {
-				return @_;
-			}
-			(scalar @_ > 1) ? @_[2 .. $#_] : qw();
-		}
-	};
-};
 
 sub new {
 	my $class = shift;
@@ -268,48 +254,25 @@ sub xs_reader {
 	return if $me->{auto_deref};
 
 	return if $me->{storage} ne 'HASH';
-	my $slot = $me->{slot};
 	
 	require Class::XSConstructor;
-	
-	my $has_common_default = 0;
-	do {
-		my $spec = $me;
-		if ( exists $spec->{default} and !defined $spec->{default} ) {
-			$has_common_default = 1;
-		}
-		elsif ( exists $spec->{default} and Class::XSConstructor::_created_as_number( $spec->{default} ) and $spec->{default} == 0 ) {
-			$has_common_default = 2;
-		}
-		elsif ( exists $spec->{default} and Class::XSConstructor::_created_as_number( $spec->{default} ) and $spec->{default} == 1 ) {
-			$has_common_default = 3;
-		}
-		elsif ( exists $spec->{default} and Class::XSConstructor::_is_bool( $spec->{default} ) and !$spec->{default} ) {
-			$has_common_default = 4;
-		}
-		elsif ( exists $spec->{default} and Class::XSConstructor::_is_bool( $spec->{default} ) and $spec->{default} ) {
-			$has_common_default = 5;
-		}
-		elsif ( exists $spec->{default} and Class::XSConstructor::_created_as_string( $spec->{default} ) and $spec->{default} eq '' ) {
-			$has_common_default = 6;
-		}
-		elsif ( exists $spec->{default} and Class::XSConstructor::is_ScalarRef( $spec->{default} ) and ${$spec->{default}} eq '[]' ) {
-			$has_common_default = 7;
-		}
-		elsif ( exists $spec->{default} and Class::XSConstructor::is_ScalarRef( $spec->{default} ) and ${$spec->{default}} eq '{}' ) {
-			$has_common_default = 8;
-		}
-	};
-	
 	Class::XSConstructor::install_reader(
 		$me->{package} . "::" . $target,
 		$me->{slot},
 		( exists $me->{default} or defined $me->{builder} ),
-		$has_common_default,
+		exists( $me->{default} )
+			? Class::XSConstructor::_common_default( $me->{default} )
+			: 0,
 		Class::XSConstructor->_canonicalize_defaults( $me ),
-		Types::Common::is_TypeTiny($me->{isa}) ? Class::XSConstructor->_type_to_number($me->{isa}) : Class::XSConstructor::XSCON_TYPE_OTHER(),
-		ref($me->{isa}) eq 'CODE' ? $me->{isa} : Types::Common::is_TypeTiny($me->{isa}) ? $me->{isa}->compiled_check : undef,
-		ref($me->{coerce}) eq 'CODE' ? $me->{coerce} : $me->{coerce} ? $me->{isa}->coercion->compiled_coercion : undef,
+		Types::Common::is_TypeTiny( $me->{isa} )
+			? Class::XSConstructor->_type_to_number( $me->{isa} )
+			: Class::XSConstructor::XSCON_TYPE_OTHER(),
+		ref( $me->{isa} ) eq 'CODE'
+			? $me->{isa}
+			: Types::Common::is_TypeTiny( $me->{isa} ) ? $me->{isa}->compiled_check : undef,
+		ref( $me->{coerce} ) eq 'CODE'
+			? $me->{coerce}
+			: $me->{coerce} ? $me->{isa}->coercion->compiled_coercion : undef,
 	);
 	return 1;
 }
@@ -418,8 +381,9 @@ sub xs_constructor_args {
 	$opt->{trigger}  = $me->{trigger}   if $me->{trigger};
 	$opt->{weak_ref} = $me->{weak_ref}  if $me->{weak_ref};
 	
-	$opt->{slot_initializer} = $me->writer if $me->{storage} ne 'HASH';
 	$opt->{slot_initializer} = $me->{slot_initializer} if $me->{slot_initializer};
+	$opt->{slot_initializer} = $me->writer if $me->{storage} ne 'HASH';
+	$opt->{undef_tolerant}   = !!1 if $me->{undef_tolerant};
 	
 	return ( $name . $req => $opt );
 }
@@ -441,163 +405,19 @@ sub _moose_safe_default {
 	return $me->{default};
 }
 
-sub inject_moose_metadata {
-	my $me = shift;
-	my $metaclass = shift;
-	
-	my $tc = $me->{isa} ? Types::Common::to_TypeTiny( $me->{isa} ) : Types::Common::Any();
-	if ( Types::Common::is_CodeRef( $me->{coerce} ) and Types::Common::is_TypeTiny( $tc ) ) {
-		$tc = $tc->plus_coercions( Types::Common::Any(), $me->{coerce} );
-	}
-	
-	require Moose;
-	require Moose::Meta::Attribute;
-	require Moose::Meta::Method::Accessor;
-	
-	my $attr = Moose::Meta::Attribute->new(
-		$me->{slot},
-		__hack_no_process_options => !!1,
-		associated_class    => $me->{package},
-		definition_context  => { context => "Marlin import", package => $me->{package}, toolkit => ref($me->{_marlin}), type => 'class' },
-		is                  => $me->{is} || 'bare',
-		init_arg            => exists( $me->{init_arg} ) ? $me->{init_arg} : $me->{slot},
-		required            => !!$me->{required},
-		type_constraint     => $tc,
-		coerce              => !!$me->{coerce},
-		_maybe reader       => $me->{reader},
-		_maybe writer       => $me->{writer},
-		_maybe accessor     => $me->{accessor},
-		_maybe predicate    => $me->{predicate},
-		_maybe clearer      => $me->{clearer},
-		_maybe trigger      => $me->{trigger},
-		_maybe builder      => $me->{builder},
-		exists( $me->{default} ) ? ( default => $me->_moose_safe_default ) : (),
-		lazy                => !!$me->{lazy},
-		weak_ref            => !!$me->{weak_ref},
-	);
-	
-	for my $kind ( qw/ reader writer accessor predicate clearer / ) {
-		no strict 'refs';
-		my $method = $me->{$kind} or next;
-		my $accessor = Moose::Meta::Method::Accessor->_new(
-			accessor_type => $kind,
-			attribute => $attr,
-			name => $me->{slot},
-			body => defined( &{ $me->{package} . "::$method" } ) ? \&{ $me->{package} . "::$method" } : $me->$kind,
-			package_name => $me->{package},
-			definition_context => +{ %{ $attr->{definition_context} } },
-		);
-		Scalar::Util::weaken( $accessor->{attribute} );
-		$attr->associate_method( $accessor );
-		$metaclass->add_method( $accessor->name, $accessor );
-	}
-	
-	do {
-		no warnings 'redefine';
-		local *Moose::Meta::Attribute::install_accessors = sub {};
-		$metaclass->add_attribute( $attr );
-	};
-	
-	return $attr;
+# This method does nothing, but is a hook for extensions.
+# It is safer to wrap this (using CMM) than to wrap
+# inject_moose(role?)_metadata or inject_moo(role?)_metadata
+# which might not be loaded yet!
+sub injected_metadata {
+	my ( $me, $framework, $metadata ) = @_;
+	return $metadata;
 }
 
-sub inject_mooserole_metadata {
-	my $me = shift;
-	my $metarole = shift;
-
-	my $tc = $me->{isa} ? Types::Common::to_TypeTiny( $me->{isa} ) : Types::Common::Any();
-	if ( Types::Common::is_CodeRef( $me->{coerce} ) and Types::Common::is_TypeTiny( $tc ) ) {
-		$tc = $tc->plus_coercions( Types::Common::Any(), $me->{coerce} );
-	}
-	
-	require Moose;
-	require Moose::Meta::Role::Attribute;
-	require Moose::Meta::Method::Accessor;
-	
-	my $attr = Moose::Meta::Role::Attribute->new(
-		$me->{slot},
-		__hack_no_process_options => !!1,
-		associated_class    => $me->{package},
-		definition_context  => { context => "Marlin import", package => $me->{package}, toolkit => ref($me->{_marlin}), type => 'role' },
-		is                  => $me->{is} || 'bare',
-		init_arg            => exists( $me->{init_arg} ) ? $me->{init_arg} : $me->{slot},
-		required            => !!$me->{required},
-		isa                 => $tc,
-		coerce              => !!$me->{coerce},
-		_maybe reader       => $me->{reader},
-		_maybe writer       => $me->{writer},
-		_maybe accessor     => $me->{accessor},
-		_maybe predicate    => $me->{predicate},
-		_maybe clearer      => $me->{clearer},
-		_maybe trigger      => $me->{trigger},
-		_maybe builder      => $me->{builder},
-		exists( $me->{default} ) ? ( default => $me->_moose_safe_default ) : (),
-		lazy                => !!$me->{lazy},
-		weak_ref            => !!$me->{weak_ref},
-	);
-	
-	for my $kind ( qw/ reader writer accessor predicate clearer / ) {
-		no strict 'refs';
-		my $method = $me->{$kind} or next;
-		my $accessor = Moose::Meta::Method::Accessor->_new(
-			accessor_type => $kind,
-			attribute => $attr,
-			name => $me->{slot},
-			body => defined( &{ $me->{package} . "::$method" } ) ? \&{ $me->{package} . "::$method" } : $me->$kind,
-			package_name => $me->{package},
-			definition_context => +{ %{ $attr->{definition_context} } },
-		);
-		Scalar::Util::weaken( $accessor->{attribute} );
-		$metarole->add_method( $accessor->name, $accessor );
-	}
-	
-	$metarole->add_attribute( $attr );
-	
-	return $attr;
-}
-
-sub inject_moo_metadata {
-	my ( $me, $makers ) = @_;
-	
-	my $tc = $me->{isa} ? Types::Common::to_TypeTiny( $me->{isa} ) : Types::Common::Any();
-	if ( Types::Common::is_CodeRef( $me->{coerce} ) and Types::Common::is_TypeTiny( $tc ) ) {
-		$tc = $tc->plus_coercions( Types::Common::Any(), $me->{coerce} );
-	}
-
-	my %spec = (
-		definition_context  => { context => "Marlin import", package => $me->{package}, toolkit => ref($me->{_marlin}), type => $makers->{is_role} ? 'role' : 'class' },
-		is                  => $me->{is} || 'bare',
-		init_arg            => exists( $me->{init_arg} ) ? $me->{init_arg} : $me->{slot},
-		required            => !!$me->{required},
-		type_constraint     => $tc,
-		coerce              => !!$me->{coerce},
-		_maybe reader       => $me->{reader},
-		_maybe writer       => $me->{writer},
-		_maybe accessor     => $me->{accessor},
-		_maybe predicate    => $me->{predicate},
-		_maybe clearer      => $me->{clearer},
-		_maybe trigger      => $me->{trigger},
-		_maybe builder      => $me->{builder},
-		exists( $me->{default} ) ? ( default => $me->_moose_safe_default ) : (),
-		lazy                => !!$me->{lazy},
-		weak_ref            => !!$me->{weak_ref},
-	);
-	
-	if ( $makers->{constructor} ) {
-		no warnings 'redefine';
-		local *Method::Generate::Constructor::assert_constructor = sub {};
-		$makers->{constructor}->register_attribute_specs( $me->{slot}, \%spec );
-	}
-	
-	if ( $makers->{is_role} ) {
-		push @{ $makers->{attributes} ||= [] }, $me->{slot}, \%spec;
-	}
-	
-	return \%spec;
-}
-
-sub inject_moorole_metadata {
-	shift->inject_moo_metadata( @_ );
+# Ditto
+sub injected_accessor_metadata {
+	my ( $me, $framework, $metadata ) = @_;
+	return $metadata;
 }
 
 1;

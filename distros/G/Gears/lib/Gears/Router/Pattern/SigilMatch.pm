@@ -1,9 +1,10 @@
 package Gears::Router::Pattern::SigilMatch;
-$Gears::Router::Pattern::SigilMatch::VERSION = '0.001';
+$Gears::Router::Pattern::SigilMatch::VERSION = '0.100';
 use v5.40;
 use Mooish::Base -standard;
 
 use Gears::X;
+use URI::Escape;
 
 extends 'Gears::Router::Pattern';
 
@@ -162,10 +163,15 @@ sub build ($self, %args)
 
 	foreach my $token ($self->tokens->@*) {
 		my $value = $args{$token->{label}};
-		my $optional = optional $token->{sigil};
 
 		Gears::X->raise("no value for placeholder $token->{sigil}$token->{label}")
-			unless defined $value || $optional;
+			unless defined $value || optional $token->{sigil};
+
+		if (defined $value) {
+			my $safe = '^A-Za-z0-9\-\._~';
+			$safe .= '/' unless noslash $token->{sigil};
+			$value = uri_escape_utf8 $value, "^$safe";
+		}
 
 		my $to_replace = qr{
 			\Q$token->{sigil}\E
@@ -266,4 +272,8 @@ Builds a URL by substituting placeholders in the pattern with provided
 parameter values. Default values are used for parameters not provided. Throws
 an exception if required parameters are missing or if parameter values don't
 pass their checks.
+
+Passed params will be URI-encoded properly. Two types of sigils which allow
+slashes in them, C<*wildcard> and C<< >slurpy >>, will not URI-encode slashes.
+If you need to do that, it should be done manually with L<URI::Encode>.
 

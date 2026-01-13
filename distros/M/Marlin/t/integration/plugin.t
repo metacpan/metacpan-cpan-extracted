@@ -24,7 +24,7 @@ use Data::Dumper;
 
 {
 	package Local::Foo;
-	use Marlin qw( foo quux :Clone );
+	use Marlin qw( foo! quux :Clone );
 }
 
 {
@@ -56,6 +56,15 @@ is( $bar3, bless( { foo => 1, quux => 2, bar => 4 }, 'Local::Bar' ) ) or diag Du
 		$@;
 	};
 	like $e, qr/Superfluous/;
+}
+
+{
+	my $e = do {
+		local $@;
+		eval { bless( {}, 'Local::Foo' )->clone() };
+		$@;
+	};
+	like $e, qr/Missing required attribute 'foo'/;
 }
 
 done_testing;

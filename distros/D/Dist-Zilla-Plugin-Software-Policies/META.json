@@ -4,7 +4,7 @@
       "Mikko Koivunalho <mikkoi@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "dist",
       "zilla"
@@ -76,6 +76,7 @@
             "Path::Tiny" : "0",
             "Software::Policies" : "0",
             "Sub::Exporter::ForMethods" : "0",
+            "Test::Perl::Critic" : "0",
             "feature" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.013002",
@@ -109,7 +110,7 @@
          "web" : "https://github.com/mikkoi//dist-zilla-plugin-software-policies"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_generated_by_perl" : "v5.34.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

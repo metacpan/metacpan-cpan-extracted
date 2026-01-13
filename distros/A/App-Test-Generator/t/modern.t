@@ -88,11 +88,11 @@ END_MODULE
 
     is($connect->{input}{port}{position}, 1, 'port is second parameter');
     is($connect->{input}{port}{optional}, 1, 'port is optional');
-    is($connect->{input}{port}{default}, 3306, 'port default is 3306');
+    is($connect->{input}{port}{_default}, 3306, 'port default is 3306');
 
     is($connect->{input}{database}{position}, 2, 'database is third parameter');
     is($connect->{input}{database}{optional}, 1, 'database is optional');
-    is($connect->{input}{database}{default}, undef, 'database default is undef');
+    is($connect->{input}{database}{_default}, undef, 'database default is undef');
 
     # Test process_data with slurpy hash
     my $process = $schemas->{process_data};
@@ -105,7 +105,7 @@ END_MODULE
     my $calc = $schemas->{simple_calc};
     is($calc->{input}{x}{position}, 0, 'x is first parameter');
     is($calc->{input}{y}{optional}, 1, 'y is optional');
-    is($calc->{input}{y}{default}, 0, 'y default is 0');
+    is($calc->{input}{y}{_default}, 0, 'y default is 0');
 
     done_testing();
 };
@@ -139,7 +139,7 @@ END_MODULE
     is($calc->{input}{x}{type}, 'integer', 'x has integer type from :Int');
     is($calc->{input}{y}{type}, 'number', 'y has number type from :Num');
     is($calc->{input}{name}{type}, 'string', 'name has string type from :Str');
-    is($calc->{input}{name}{default}, 'result', 'name has default value');
+    is($calc->{input}{name}{_default}, 'result', 'name has default value');
 
     my $validate = $schemas->{validate};
     is($validate->{input}{flag}{type}, 'boolean', 'flag has boolean type');
@@ -289,10 +289,10 @@ END_MODULE
     # Check field -> parameter mapping
     ok($connect->{_fields}{host}, 'host field found');
     ok($connect->{_fields}{host}{is_param}, 'host is a parameter');
-    is($connect->{_fields}{host}{default}, 'localhost', 'host default is localhost');
+    is($connect->{_fields}{host}{_default}, 'localhost', 'host default is localhost');
 
     ok($connect->{_fields}{port}, 'port field found');
-    is($connect->{_fields}{port}{default}, 3306, 'port default is 3306');
+    is($connect->{_fields}{port}{_default}, 3306, 'port default is 3306');
 
     # Check renamed parameter
     is($connect->{_fields}{username}{param_name}, 'user',
@@ -303,7 +303,7 @@ END_MODULE
        'logger has type constraint');
 
     # Check merged parameter info
-    is($connect->{input}{host}{default}, 'localhost',
+    is($connect->{input}{host}{_default}, 'localhost',
        'Field default merged into parameter');
     is($connect->{input}{host}{optional}, 1,
        'Parameter with default is optional');
@@ -348,11 +348,11 @@ END_MODULE
     my $modern = $schemas->{modern};
     is($modern->{input}{x}{optional}, 0, 'Modern: x is required');
     is($modern->{input}{y}{optional}, 1, 'Modern: y is optional');
-    is($modern->{input}{y}{default}, 5, 'Modern: y default is 5');
+    is($modern->{input}{y}{_default}, 5, 'Modern: y default is 5');
 
     my $trad = $schemas->{traditional};
     is($trad->{input}{y}{optional}, 1, 'Traditional: y has default in code');
-    is($trad->{input}{y}{default}, 5, 'Traditional: default extracted from code');
+    is($trad->{input}{y}{_default}, 5, 'Traditional: default extracted from code');
 
     my $hybrid = $schemas->{hybrid};
     is($hybrid->{input}{data}{position}, 0, 'Hybrid: parameter from signature');
@@ -403,11 +403,11 @@ END_MODULE
 
     # Check optional with default
     is($complex->{input}{optional}{type}, 'integer', 'optional has integer type');
-    is($complex->{input}{optional}{default}, 10, 'optional default is 10');
+    is($complex->{input}{optional}{_default}, 10, 'optional default is 10');
 
     # Check nullable with undef default
     is($complex->{input}{nullable}{type}, 'number', 'nullable has number type');
-    is($complex->{input}{nullable}{default}, undef, 'nullable default is undef');
+    is($complex->{input}{nullable}{_default}, undef, 'nullable default is undef');
 
     # Check slurpy array
     is($complex->{input}{extra}{type}, 'array', 'extra is array');

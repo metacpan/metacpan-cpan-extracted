@@ -6,7 +6,7 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012001';
+our $VERSION   = '0.013001';
 
 use constant _ATTRS => qw( caller this parents roles attributes strict constructor modifiers inhaled_from short_name is_struct plugins setup_steps_with_plugins delayed );
 use B::Hooks::AtRuntime   ();
@@ -1014,77 +1014,22 @@ sub to_string {
 
 sub setup_compat {
 	my $me = shift;
-	$me->inject_moose_metadata if $INC{'MooseX/Marlin.pm'};
-	$me->inject_moo_metadata if $INC{'MooX/Marlin.pm'};
+	if ( $me->can('inject_moose_metadata') ) {
+		$me->inject_moose_metadata;
+	}
+	if ( $me->can('inject_moo_metadata') ) {
+		$me->inject_moo_metadata;
+	}
 	return $me;
 }
 
-my $made_shim = 0;
-sub inject_moose_metadata {
-	my $me = shift;
-	
-	# Recurse to any parents or roles
-	for my $pkg ( @{ $me->parents }, @{ $me->roles } ) {
-		use_package_optimistically( $pkg->[0] );
-		Marlin->find_meta( $pkg->[0] )->inject_moose_metadata;
-	}
-	
-	require Moose::Util;
-	return if Moose::Util::find_meta( $me->this );
-	
-	eval q{
-		package Marlin::Meta::Class;
-		use Moose;
-		extends 'Moose::Meta::Class';
-		around _immutable_options => sub {
-			my ( $next, $self, @args ) = ( shift, shift, @_ );
-			return $self->$next( replace_constructor => 1, @args );
-		};
-		__PACKAGE__->meta->make_immutable;
-		1;
-	} unless $made_shim++;
-	
-	
-	my $metaclass = Marlin::Meta::Class->initialize( $me->this, package => $me->this );
-	
-	require Class::MOP;
-	Class::MOP::store_metaclass_by_name( $me->this, $metaclass );
-	
-	for my $attr ( @{ $me->attributes } ) {
-		$attr->inject_moose_metadata($metaclass) or next;
-	}
-	
-	$metaclass->superclasses( map $_->[0], @{ $me->parents } );
-	
-	require Moose::Util::TypeConstraints;
-	my $tc = Moose::Util::TypeConstraints::find_or_create_isa_type_constraint( $me->this );
-	my $tt = $me->make_type_constraint( $me->short_name );
-	$tc->{coercion} = $tt->coercion->moose_coercion if $tt->has_coercion;
-}
-
-sub inject_moo_metadata {
-	my $me = shift;
-	
-	# Recurse to any parents or roles
-	for my $pkg ( @{ $me->parents }, @{ $me->roles } ) {
-		use_package_optimistically( $pkg->[0] );
-		Marlin->find_meta( $pkg->[0] )->inject_moo_metadata;
-	}
-	
-	require Moo;
-	require Method::Generate::Accessor;
-	require Method::Generate::Constructor;
-	my $makers = ( $Moo::MAKERS{$me->this} ||= {} );
-	$makers->{is_class} = 1;
-	$makers->{accessor} = Method::Generate::Accessor->new;
-	$makers->{constructor} = Method::Generate::Constructor->new(
-		package              => $me->this,
-		accessor_generator   => $makers->{accessor},
-	);
-	
-	for my $attr ( @{ $me->attributes } ) {
-		$attr->inject_moo_metadata($makers) or next;
-	}
+# This method does nothing, but is a hook for extensions.
+# It is safer to wrap this (using CMM) than to wrap
+# inject_moose_metadata or inject_moo_metadata which
+# might not be loaded yet!
+sub injected_metadata {
+	my ( $me, $framework, $metadata ) = @_;
+	return $metadata;
 }
 
 1;
@@ -1293,6 +1238,17 @@ to populate this attribute.
 
 Setting to an explicit C<undef> prevents the constructor from initializing
 the attribute from the arguments passed to it.
+
+=item C<< undef_tolerant >>
+
+If you set an attribute to C<< undef_tolerant => true >>, and then try to
+initialized it to C<undef> in the constructor, it will be treated as if
+you hadn't passed it to the constructor at all. See L<MooseX::UndefTolerant>.
+
+This has no affect on writers/accessors.
+
+To make all attributes in your class or role undef tolerant, see
+L<Marlin::X::UndefTolerant>.
 
 =item C<< reader >>
 

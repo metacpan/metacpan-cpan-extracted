@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.800;
 
-role App::perl::distrolint::CheckRole::EachFile 0.01;
+role App::perl::distrolint::CheckRole::EachFile 0.09;
 
 use File::Find ();
 use File::Basename qw( basename );

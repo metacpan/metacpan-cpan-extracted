@@ -365,7 +365,10 @@ CAVEATS
     consider looking at ways to eliminate them.
 
 SEE ALSO
-    Class::Tiny, Class::XSAccessor, Class::XSDestructor, Class::XSDelegation.
+    Class::Tiny, Class::XSAccessor, Class::XSReader, Class::XSDestructor,
+    Class::XSDelegation.
+
+    A user-friendly wrapper for all the Class::XS* modules: Marlin.
 
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.

@@ -2,6 +2,7 @@ use lib '.';
 use inc::Module::Install;
 
 RTx 'RT-Extension-MergeUsers';
+requires_rt '5.0.8';
 
 repository('https://github.com/bestpractical/rt-extension-mergeusers');
 

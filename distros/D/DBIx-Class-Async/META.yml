@@ -29,25 +29,28 @@ no_index:
 provides:
   DBIx::Class::Async:
     file: lib/DBIx/Class/Async.pm
-    version: '0.25'
-  DBIx::Class::Async::Cursor:
-    file: lib/DBIx/Class/Async/Cursor.pm
-    version: '0.25'
+    version: '0.27'
   DBIx::Class::Async::ResultSet:
     file: lib/DBIx/Class/Async/ResultSet.pm
-    version: '0.25'
+    version: '0.27'
   DBIx::Class::Async::Row:
     file: lib/DBIx/Class/Async/Row.pm
-    version: '0.25'
+    version: '0.27'
   DBIx::Class::Async::Schema:
     file: lib/DBIx/Class/Async/Schema.pm
-    version: '0.25'
+    version: '0.27'
   DBIx::Class::Async::Storage:
     file: lib/DBIx/Class/Async/Storage.pm
-    version: '0.25'
+    version: '0.27'
+  DBIx::Class::Async::Storage::DBI:
+    file: lib/DBIx/Class/Async/Storage/DBI.pm
+    version: '0.27'
+  DBIx::Class::Async::Storage::DBI::Cursor:
+    file: lib/DBIx/Class/Async/Storage/DBI/Cursor.pm
+    version: '0.27'
   DBIx::Class::Async::TxnGuard:
     file: lib/DBIx/Class/Async/TxnGuard.pm
-    version: '0.25'
+    version: '0.27'
 requires:
   CHI: '0'
   Carp: '0'
@@ -65,5 +68,5 @@ requires:
 resources:
   bugtracker: https://github.com/manwar/DBIx-Class-Async/issues
   repository: https://github.com/manwar/DBIx-Class-Async.git
-version: '0.25'
+version: '0.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package Gears::Router::Proto;
-$Gears::Router::Proto::VERSION = '0.001';
+$Gears::Router::Proto::VERSION = '0.100';
 use v5.40;
 use Mooish::Base -standard, -role;
 

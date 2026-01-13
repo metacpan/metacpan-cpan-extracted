@@ -9,11 +9,11 @@ DBIx::Class::Async::TxnGuard - Transaction guard for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.25
+Version 0.27
 
 =cut
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 =head1 SYNOPSIS
 

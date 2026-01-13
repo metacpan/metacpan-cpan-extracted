@@ -5,3 +5,6 @@ Revision history for Algorithm::SlidingWindow
 
 1.001 2026-1-11
   - Corrections to POD
+
+1.002 2026-1-12
+  - Corrections to POD and README.md

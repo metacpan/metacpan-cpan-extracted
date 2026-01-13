@@ -7,10 +7,10 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
+    'bin/envdot',
     'lib/Env/Dot.pm',
     'lib/Env/Dot/Functions.pm',
     'lib/Env/Dot/ScriptFunctions.pm',
-    'script/envdot',
     't/env-dot-functions-private.t',
     't/env-dot-functions-public-unix.t',
     't/env-dot-functions-public-win32.t',
@@ -28,9 +28,12 @@ my @files = (
     't/file-read-order/dummy.env-second',
     't/file-read-order/dummy.env-static',
     't/file-read-order/dummy.env-third',
+    't/lib/Env/Dot/Test/Utils.pm',
     't/lib/Test2/Deny/Platform/DOSOrDerivative.pm',
     't/lib/Test2/Require/Platform/DOSOrDerivative.pm',
     't/lib/Test2/Require/Platform/Unix.pm',
+    't/other/read-from-this-deeper-file.t',
+    't/other/read-from-this-file.t',
     't/recursive-read.t'
 );
 

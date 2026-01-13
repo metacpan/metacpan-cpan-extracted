@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.807;
 
-class App::perl::distrolint::Check::Test2 0.08;
+class App::perl::distrolint::Check::Test2 0.09;
 
 apply App::perl::distrolint::CheckRole::EachFile;
 apply App::perl::distrolint::CheckRole::TreeSitterPerl;
@@ -26,6 +26,8 @@ line.
 Additionally, this checks for several older modules, that have more modern
 replacements within the C<Test2> system, to ensure that none of these modules
 are found in C<use> statements:
+
+=for highlighter
 
    Test::More
 

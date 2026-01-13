@@ -9,7 +9,6 @@ use Carp;
 use Future;
 use Scalar::Util 'blessed';
 use DBIx::Class::Async::Row;
-use DBIx::Class::Async::Cursor;
 
 =head1 NAME
 
@@ -17,11 +16,11 @@ DBIx::Class::Async::ResultSet - Asynchronous resultset for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.25
+Version 0.27
 
 =cut
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 =head1 SYNOPSIS
 
@@ -473,19 +472,40 @@ sub create {
 
   my $cursor = $rs->cursor;
 
-Returns a L<DBIx::Class::Async::Cursor> object for the current resultset.
-This is used to stream through large data sets asynchronously without
-loading all records into memory at once.
+Returns a L<DBIx::Class::Async::Storage::DBI::Cursor> object for iterating
+through the ResultSet's rows asynchronously.
+
+The cursor provides a low-level interface for fetching rows one at a time
+using Futures, which is useful for processing large result sets without
+loading all rows into memory at once.
+
+  use Future::AsyncAwait;
+
+  my $rs = $schema->resultset('User');
+  my $cursor = $rs->cursor;
+
+  my $iter = async sub {
+      while (my $row = await $cursor->next) {
+          # Process each row asynchronously
+          say $row->name;
+      }
+  };
+
+  $iter->get;  # Wait for iteration to complete
+
+The cursor respects the ResultSet's C<rows> attribute for batch fetching:
+
+  my $rs = $schema->resultset('User')->search(undef, { rows => 50 });
+  my $cursor = $rs->cursor;  # Will fetch 50 rows at a time
+
+See L<DBIx::Class::Async::Storage::DBI::Cursor> for available cursor methods
+including C<next()> and C<reset()>.
 
 =cut
 
 sub cursor {
-    my ($self) = @_;
-
-    # We return a specialised Cursor object
-    return DBIx::Class::Async::Cursor->new(
-        rs => $self,
-    );
+    my $self = shift;
+    return $self->schema->storage->cursor($self);
 }
 
 =head2 delete
@@ -1271,6 +1291,39 @@ A L<DBIx::Class::ResultSource> object.
 sub result_source {
     my $self = shift;
     return $self->_get_source;
+}
+
+=head2 schema
+
+  my $schema = $rs->schema;
+
+Returns the L<DBIx::Class::Async::Schema> object that this ResultSet belongs to.
+
+This provides access to the parent schema, allowing you to access other
+ResultSources, the storage layer, or schema-level operations from within
+a ResultSet context.
+
+  my $rs = $schema->resultset('User');
+  my $parent_schema = $rs->schema;
+
+  # Access other result sources
+  my $orders_rs = $parent_schema->resultset('Order');
+
+  # Access storage
+  my $storage = $parent_schema->storage;
+
+  # Perform schema-level operations
+  $parent_schema->txn_do(sub { ... });
+
+This method is particularly useful in ResultSet method chains or custom
+ResultSet classes where you need to access the schema without passing it
+as a parameter.
+
+=cut
+
+sub schema {
+    my $self = shift;
+    return $self->{_schema};
 }
 
 =head2 search

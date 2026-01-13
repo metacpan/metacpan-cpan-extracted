@@ -1,3 +1,4 @@
+use v5.40;
 use Test2::V1 -ipP;
 use Gears::Config;
 
@@ -14,7 +15,7 @@ subtest 'should add perl vars' => sub {
 subtest 'should add file contents' => sub {
 	my $c = Gears::Config->new;
 	$c->add(file => 't/config/good2.pl');
-	is $c->config, {c => 42}, 'config ok';
+	is $c->config, {c => 42, bools => [true, false]}, 'config ok';
 };
 
 subtest 'should add file contents with perl config vars' => sub {
@@ -29,7 +30,7 @@ subtest 'should add file contents with perl config vars' => sub {
 	);
 
 	$c->add(file => 't/config/good1.pl');
-	is $c->config, {a => 1, b => 'test var', c => {c => 42}}, 'config ok';
+	is $c->config, {a => 1, b => 'test var', c => {c => 42, bools => [true, false]}}, 'config ok';
 };
 
 subtest 'should not load bad perl script configs' => sub {

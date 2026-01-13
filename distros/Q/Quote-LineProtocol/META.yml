@@ -1,0 +1,40 @@
+---
+abstract: 'Helper module for Lineprotocol quoting'
+author:
+  - 'vague <vague@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Quote-LineProtocol
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Quote::LineProtocol:
+    file: lib/Quote/LineProtocol.pm
+    version: v0.1.0
+requires:
+  Syntax::Keyword::Match: '0.08'
+  Time::Moment: '0.13'
+  perl: v5.26.0
+resources:
+  bugtracker: https://github.com/vague666/Quote-LineProtocol/issues
+  homepage: https://github.com/vague666/Quote-LineProtocol
+  repository: https://github.com/vague666/Quote-LineProtocol.git
+version: 0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

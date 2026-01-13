@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 
 # ABSTRACT: Tests to check your code against best practices
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moose;
 
 use Moose::Util::TypeConstraints qw(
@@ -291,7 +291,7 @@ Dist::Zilla::Plugin::Test::Software::Policies - Tests to check your code against
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -368,16 +368,18 @@ use Path::Tiny qw( path );
 ok(path('{{ $filepath }}')->is_file(), 'Policy file {{ $filepath }} exists');
 
 # Read file and remove whitespace from the end.
-my $policy = path('{{ $filepath }}')->slurp_utf8 =~ s/[[:space:]]+$//r;
+my $policy = path('{{ $filepath }}')->slurp_utf8 =~ s/[[:space:]]+$//rmsx;
 
+my (@policy_lines, @wanted_lines);
+foreach (split qr{\R}msx, $policy) { push @policy_lines, $_; }
 do {
     local $INPUT_RECORD_SEPARATOR = undef;
     my $wanted = <DATA>;
     # Remove whitespace from the end.
-    $wanted =~ s/[[:space:]]+$//;
-
-    is($policy, $wanted, 'Policy file {{ $filepath }} is current');
+    $wanted =~ s/[[:space:]]+$//msx;
+    foreach (split qr{\R}msx, $wanted) { push @wanted_lines, $_; }
 };
+    is(\@policy_lines, \@wanted_lines, 'Policy file {{ $filepath }} is current');
 
 done_testing;
 

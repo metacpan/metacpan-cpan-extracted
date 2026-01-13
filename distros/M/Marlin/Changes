@@ -6,6 +6,32 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.013001	2026-01-12
+
+ [ Packaging ]
+ - Bump version of Class::XSConstructor dependency.
+
+0.013000	2026-01-12
+
+ [ Test Suite ]
+ - Add a test for foreign inheritance.
+
+ [ Other ]
+ - Added: Attributes now support an undef_tolerant option.
+ - Added: Marlin::X::UndefTolerant plugin to automatically apply
+   undef_tolerant option to all attributes in a class or role (except those
+   that don't make sense).
+ - If you try to inherit from a class that uses Marlin::XAttribute::Alias
+   in Moose, it will try to load MooseX::Aliases and use that, issuing a
+   warning if the module is missing.
+ - If you try to inherit from a class that uses Marlin::XAttribute::Lvalue
+   in Moose, it will try to load MooseX::LvalueAttribute and use that,
+   issuing a warning if the module is missing.
+ - Marlin::X::Clone understands about required attributes and
+   undef_tolerant attributes.
+ - Moved a lot of the code for Moo/Moose compatibility into MooX::Marlin
+   and MooseX::Marlin, so it clutters up the main Marlin modules less.
+
 0.012001	2026-01-11
 
  [ Bug Fixes ]

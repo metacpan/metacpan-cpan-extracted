@@ -24,10 +24,10 @@ no_index:
     - RT::Users
     - RT::Principal
 requires:
-  perl: 5.8.3
+  perl: 5.10.1
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/bestpractical/rt-extension-mergeusers
-version: '1.12'
+version: '1.13'
 x_module_install_rtx_version: '0.44'
-x_requires_rt: 4.0.0
+x_requires_rt: 5.0.8

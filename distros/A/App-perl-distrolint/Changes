@@ -1,5 +1,19 @@
 Revision history for App-perl-distrolint
 
+0.09    2026-01-12
+        [CHANGES]
+         * Added check for correct use of postfix deref, similar to the sub
+           signatures check
+         * Improved SubSignatures check - understand lexical scoping of
+           features
+         * Don't complain about verbatim Pod paragraphs after an empty
+           `=for highlighter` directive, as that still counts
+         * Configuration option on whether `=head1 NAME` Pod section requires
+           `C<...>` wrapping of the module name
+
+        [BUGFIXES]
+         * Remember that `(@)` and `(%)` are also valid subroutine signatures
+
 0.08    2026-01-04
         [CHANGES]
          * Added the beginnings of a config system, allowing users to disable

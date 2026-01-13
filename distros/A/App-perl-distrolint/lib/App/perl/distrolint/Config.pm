@@ -5,7 +5,7 @@
 
 use v5.36;
 
-package App::perl::distrolint::Config 0.08;
+package App::perl::distrolint::Config 0.09;
 
 =head1 NAME
 

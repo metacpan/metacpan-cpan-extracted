@@ -6,6 +6,13 @@ Home page:    <https://metacpan.org/release/Class-XSConstructor>
 Bug tracker:  <https://github.com/tobyink/p5-class-xsconstructor/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.020000	2026-01-12
+
+ - Added: Class::XSReader exposing an XS function which has existed
+   internally since 0.016000.
+ - Added: Some internal refactoring, especially of how built-in defaults
+   are handled.
+
 0.019000	2026-01-11
 
  [ Documentation ]

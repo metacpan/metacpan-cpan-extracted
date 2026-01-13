@@ -16,6 +16,7 @@ examples/benchmarks.pl
 lib/Class/XSConstructor.pm
 lib/Class/XSDelegation.pm
 lib/Class/XSDestructor.pm
+lib/Class/XSReader.pm
 ppport.h
 t/01basic.t
 t/02types.t

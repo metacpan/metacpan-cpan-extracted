@@ -1,0 +1,43 @@
+<&| /Elements/LabeledValue,
+  Label => loc("Include an optional Comment below"),
+  LabelFor => 'CommentContent',
+&>
+<div class="messagebox-container action-private comment-content">
+% if (exists $ARGS{CommentContent}) {
+<& /Elements/MessageBox, Name => 'CommentContent',
+                         Default => $ARGS{CommentContent},
+                         IncludeSignature => 0,
+                         IncludeArticle => 0,
+                         Placeholder => loc('Type your comment here'),
+                         ($height ? (Height => $height) : ())
+&>
+% } else {
+<& /Elements/MessageBox, Name => 'CommentContent',
+                         Placeholder => loc('Type your comment here'),
+                         ($height ? (Height => $height) : ())
+&>
+% }
+</div>
+
+% if ( my $ckeditor_height = RT->Config->Get('CommentOnCreateRichTextHeight') ) {
+<script type="text/javascript">
+jQuery( function() {
+    let interval;
+    interval = setInterval(function () {
+        if (RT && RT.CKEditor && RT.CKEditor.instances['CommentContent']) {
+            RT.CKEditor.instances['CommentContent'].ui.view.editable.element.parentNode.style.height = <% $ckeditor_height . 'px' |j %>;
+            clearInterval(interval);
+        }
+    }, 50);
+});
+</script>
+% }
+
+</&>
+
+<%ARGS>
+$QueueObj => undef
+</%ARGS>
+<%INIT>
+my $height = RT->Config->Get('CommentOnCreateHeight');
+</%INIT>

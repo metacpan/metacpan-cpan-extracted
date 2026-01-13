@@ -28,7 +28,7 @@ if((-d $dirname) && opendir(my $dh, $dirname)) {
 			if($? == 0) {
 				ok($stdout =~ /^Result: PASS/ms);
 				if($stdout =~ /Files=1, Tests=(\d+)/ms) {
-					diag("$1 tests run");
+					diag("$filepath: $1 tests run");
 				}
 			} else {
 				diag("$filepath: STDOUT:\n$stdout");

@@ -30,10 +30,10 @@ subtest 'should stringify correctly (HTTP)' => sub {
 };
 
 subtest 'should build and raise correctly (HTTP)' => sub {
-	my $ex = dies { Gears::X::HTTP->raise(300 => 'https://bbrtj.eu') };
+	my $ex = dies { Gears::X::HTTP->raise(403 => 'not allowed here') };
 	isa_ok $ex, 'Gears::X::HTTP';
-	is $ex->code, 300, 'code ok';
-	is $ex->message, 'https://bbrtj.eu', 'message ok';
+	is $ex->code, 403, 'code ok';
+	is $ex->message, 'not allowed here', 'message ok';
 };
 
 subtest 'should show a trace' => sub {

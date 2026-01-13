@@ -1,5 +1,14 @@
 Revision history for DBIx::Class::Async
 
+0.27  2026-01-12
+      - Tidied up pod in general.
+
+0.26  2026-01-12
+      - Re-organise Cursor package in sync with DBIx::Class.
+        Before: DBIx::Class::Async::Cursor
+        After: DBIx::Class::Async::Storage::DBI::Cursor
+      - Added new package DBIx::Class::Async::Storage::DBI.
+
 0.25  2026-01-12
       - Added sub DBIx::Class::Async::Row::id().
 

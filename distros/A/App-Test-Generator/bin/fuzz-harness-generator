@@ -15,7 +15,9 @@ fuzz-harness-generator - Generate fuzzing + corpus-based test harnesses from tes
 
 =head1 SYNOPSIS
 
-  fuzz-harness-generator [-r] [-o outputile] input_file
+  fuzz-harness-generator [-r] [-o output_file] input_file
+
+  fuzz-harness-generator --dry-run input.yaml
 
 =head1 DESCRIPTION
 
@@ -39,6 +41,10 @@ The input configuration file
 
 The (optional) output file.
 
+=item B<--dry-run>
+
+Validate the input configuration and schema extraction without writing any output files or running tests.
+
 =item B<--run>
 
 Call C<prove> on the output file.
@@ -57,39 +63,79 @@ my $infile;
 my $outfile;
 my $help;
 my $run;
+my $verbose;
 my $version;
+my $dry_run;
+
+Getopt::Long::Configure('bundling');
+
 GetOptions(
 	'help|h' => \$help,
 	'input|i=s' => \$infile,
+	'dry-run|n' => \$dry_run,
 	'output|o=s' => \$outfile,
 	'run|r' => \$run,
+	'verbose|v' => \$verbose,
 	'version|V' => \$version,
 ) or pod2usage(2);
 
-pod2usage(1) if $help;
+pod2usage(-exitval => 0, -verbose => 1) if($help);
 
 if($version) {
 	print $App::Test::Generator::VERSION, "\n";
 	exit 0;
 }
 
+if($infile && @ARGV) {
+	pod2usage('Specify input file either as argument or via --input, not both');
+}
+
 $infile ||= shift @ARGV or pod2usage('No config file given');
+
+if($dry_run && $run) {
+	pod2usage('--dry-run cannot be used with --run');
+}
+
+if ($dry_run && $outfile) {
+	warn '--dry-run specified; --output will be ignored';
+}
+
+if($verbose) {
+	$ENV{'TEST_VERBOSE'} = 1;
+}
 
 if($run && !$outfile) {
 	my $fh;
 	($fh, $outfile) = File::Temp::tempfile();
+	close $fh;
 
 	App::Test::Generator::generate($infile, $outfile);
 
-	system("prove -l $outfile");
+	exit system('prove', '-l', $outfile) >> 8;
+}
 
-	exit $?;
+if ($dry_run) {
+	my ($fh, $tmp) = File::Temp::tempfile();
+	close $fh;
+
+	eval {
+		App::Test::Generator::generate($infile, $tmp);
+		1;
+	} or do {
+		die "Dry-run failed for $infile: $@";
+	};
+
+	unlink $tmp;
+	print "Dry-run OK: $infile parsed and validated successfully\n";
+	exit 0;
+} elsif($outfile && -e $outfile && !$run) {
+	warn "Overwriting existing file: $outfile";
 }
 
 App::Test::Generator::generate($infile, $outfile);
 
 if($outfile) {
-	chmod 0755, $outfile;
+	chmod 0755, $outfile if($outfile =~ /\.(pl|cgi)$/);
 	if($run) {
 		system("prove -l $outfile");
 	}

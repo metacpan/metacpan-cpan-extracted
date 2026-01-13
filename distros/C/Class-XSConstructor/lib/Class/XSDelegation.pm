@@ -6,7 +6,7 @@ use Class::XSConstructor ();
 package Class::XSDelegation;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.019000';
+our $VERSION   = '0.020000';
 
 sub import {
 	my $class = shift;
@@ -118,7 +118,8 @@ but you can override it using:
 
 =head1 SEE ALSO
 
-L<Class::XSConstructor>, L<Class::XSDestructor>, L<Class::XSAccessor>.
+L<Class::XSConstructor>, L<Class::XSDestructor>, L<Class::XSReader>,
+L<Class::XSAccessor>.
 
 =head1 AUTHOR
 

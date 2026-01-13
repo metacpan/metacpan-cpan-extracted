@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2026 -- leonerd@leonerd.org.uk
 
 use v5.36;
 use Object::Pad 0.807;
 
-class App::perl::distrolint::Check::Pod 0.08;
+class App::perl::distrolint::Check::Pod 0.09;
 
 apply App::perl::distrolint::CheckRole::EachFile;
 apply App::perl::distrolint::CheckRole::TreeSitterPerl;
@@ -31,13 +31,19 @@ exempt from this check. Files in the F<examples/> directory are also skipped.
 
 Additionally checks that each of the following C<=head1> sections appear:
 
+=for highlighter language=pod
+
    =head1 NAME
    =head1 DESCRIPTION
    =head1 AUTHOR
 
+=for highlighter
+
 Additional checks are applied to the contents of various C<=head> sections.
 
 =head1 CONFIGURATION
+
+=for highlighter language=ini
 
 The following extra configuration may be added to the C<[check Pod]>
 section of F<distrolint.ini>:
@@ -48,6 +54,14 @@ section of F<distrolint.ini>:
 
 If true, prints a note (not a failure) if any verbatim paragraphs are found
 before a C<=for highlighter language=...> directive. Defaults to false.
+
+=head2 require_name_code_wrapped
+
+   require_name_code_wrapped = false
+
+If true, the C<=head1 NAME> section must name the module wrapped in a
+C<CE<gt>...E<lt>> wrapping. If false, this is optional (but still permitted).
+Defaults to true.
 
 =cut
 
@@ -144,11 +158,12 @@ method check_file ( $file )
             $ok &= $meth->( $self, $file, $contentnode );
          }
 
-         if( ( $command // "" ) eq "=for" and $content =~ s/^highlighter\s+// ) {
+         if( ( $command // "" ) eq "=for" and $content =~ s/^highlighter// ) {
+            $content =~ s/^\s+//;
             my @args = split m/\s+/, $content;
             $args[0] = "language=$args[0]" if @args and $args[0] !~ m/=/;
 
-            undef $highlighter;
+            $highlighter = "";  # empty string is still defined
             m/^language=(.*)$/ and $highlighter = $1, last
                for @args;
          }
@@ -194,18 +209,25 @@ method check_nodes_NAME ( $file, @nodes )
    }
 
    my $content = $nodes[0]->text =~ s/\n/ /gr;
+   my $line = $nodes[0]->start_row + 1;
 
-   unless( $content =~ m/^C<(.*)> - (.*)$/ ) {
-      App->diag( App->format_file( $file ), " =head1 NAME section does not look like C<Package::Name> - description" );
+   unless( $content =~ m/^(.*) - (.*)$/ ) {
+      App->diag( App->format_file( $file, $line ), " =head1 NAME section does not look like Package::Name - description" );
       return 0;
    }
    my ( $pkgname, $description ) = ( $1, $2 );
+   unless( $pkgname =~ s/^C<(.*)>$/$1/ ) {
+      if( App::perl::distrolint::Config->check_config( $self, "require_name_code_wrapped", 1 ) ) {
+         App->diag( App->format_file( $file, $line ), " =head1 NAME is not wrapped in C<...> tag" );
+         return 0;
+      }
+   }
 
    $file =~ m{^lib/(.*).pm$} or return 1;
    my $pkgname_from_file = $1 =~ s{/}{::}gr;
 
    unless( $pkgname eq $pkgname_from_file ) {
-      App->diag( App->format_file( $file ), " =head1 NAME section should start C<$pkgname_from_file> - ..." );
+      App->diag( App->format_file( $file, $line ), " =head1 NAME section should start C<$pkgname_from_file> - ..." );
       return 0;
    }
 
@@ -298,6 +320,11 @@ method _check_nodes_func ( $file, $head1_title, @nodes )
 
          my $minisynopsis = $node->text;
          $minisynopsis =~ s/^\s+//gm;
+
+         # Trim trailing comments
+         $minisynopsis =~ s/\s*#.*$//gm;
+         # Trim leading blank lines
+         $minisynopsis =~ s/^\n+//;
 
          my $VAR = qr/[\$\@\%]\w+/;
          my $VARS = qr/\(\s*$VAR(?:,\s*$VAR)*(?:,\s*\.\.\.)?\s*\)/;

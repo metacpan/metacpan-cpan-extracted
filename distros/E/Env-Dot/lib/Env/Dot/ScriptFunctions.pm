@@ -2,6 +2,7 @@
 package Env::Dot::ScriptFunctions;
 use strict;
 use warnings;
+use 5.010;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -12,9 +13,9 @@ our %EXPORT_TAGS = ( 'all' => [qw( convert_variables_into_commands )], );
 use English qw( -no_match_vars );    # Avoids regex performance penalty in perl 5.18 and earlier
 use Carp;
 
-# ABSTRACT: Read environment variables from .env file
+# ABSTRACT: Read environment variables from a .env file
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 use constant {
     OPTION_FILE_TYPE         => q{file:type},
@@ -100,11 +101,11 @@ __END__
 
 =head1 NAME
 
-Env::Dot::ScriptFunctions - Read environment variables from .env file
+Env::Dot::ScriptFunctions - Read environment variables from a .env file
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -112,16 +113,18 @@ version 0.018
 
 =head1 DESCRIPTION
 
-This package just contains functions for use
-in the main package L<Env::Dot> and in
-the command line tool B<envdot>.
-
 =for stopwords envdot env
 
 =head1 STATUS
 
 This module is currently being developed so changes in the API are possible,
 though not likely.
+
+=for stopwords envdot
+
+This package just contains functions for use
+in the main package L<Env::Dot> and in
+the command line tool B<envdot>.
 
 =head1 FUNCTIONS
 

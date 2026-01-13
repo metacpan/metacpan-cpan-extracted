@@ -20,11 +20,11 @@ use Sim::OPT;
 use Sim::OPT::Morph;
 use Sim::OPT::Sim;
 use Sim::OPT::Report;
-use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
+use Sim::OPT::Takechance;
+use Sim::OPT::Parcoord3d;
 use Sim::OPT::Stats;
-eval { use Sim::OPTcue; 1 };
-eval { use Sim::OPTcue::Patternsearch; 1 };
+eval { use Sim::OPTcue::OPTcue; 1 };
 
 
 $Data::Dumper::Indent = 0;
@@ -40,7 +40,7 @@ no warnings;
 
 our @EXPORT = qw( descend prepareblank tee ); # our @EXPORT = qw( );
 
-$VERSION = '0.179'; # our $VERSION = '';
+$VERSION = '0.181'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -1956,6 +1956,7 @@ for ( my $i = 0 ; $i < $max ; $i++ )
       @lines = <SORTMIXED>;
       close SORTMIXED;
       say "!!!!!IN TAKEOPTINA OPENED \$sortmixed $sortmixed: " . dump ( @lines );
+      say "!!!!!IN TAKEOPTINA \$dirfiles{newrandompick}: $dowhat{newrandompick}" ;
     }
     elsif ( $searchname eq "y" )
     {
@@ -2051,22 +2052,24 @@ for ( my $i = 0 ; $i < $max ; $i++ )
       #  $dirfiles{starsign} = "y";
       #}
 
-      if ( ( $dirfiles{starsign} eq "y" ) or
-    			( ( $dirfiles{random} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-          ( ( $dirfiles{newrandompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-          ( ( $dirfiles{newenumerate} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-          ( ( $dirfiles{neldermead} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-          ( ( $dirfiles{simulatedannealing} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-          ( ( $dirfiles{particleswarm} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-          ( ( $dirfiles{armijo} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-          ( ( $dirfiles{nsgaii} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-          ( ( $dirfiles{nsgaiii} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-          ( ( $dirfiles{moead} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-          ( ( $dirfiles{spea2} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-          ( ( $dirfiles{randompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-    			( ( $dirfiles{latinhypercube} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-    			( ( $dirfiles{factorial} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
-    			( ( $dirfiles{facecentered} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) ) ### BEGINNING OF THE PART ON STAR CONFIGURATIONS
+      
+      #if ( ( $dirfiles{starsign} eq "y" ) or
+    	#		( ( $dirfiles{random} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+      #    ( ( $dirfiles{newrandompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+      #    ( ( $dirfiles{newenumerate} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+      #    ( ( $dirfiles{neldermead} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+      #    ( ( $dirfiles{simulatedannealing} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+      #    ( ( $dirfiles{particleswarm} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+      #    ( ( $dirfiles{armijo} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+      #    ( ( $dirfiles{nsgaii} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+      #    ( ( $dirfiles{nsgaiii} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+      #    ( ( $dirfiles{moead} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+      #    ( ( $dirfiles{spea2} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+      #    ( ( $dirfiles{randompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+    	#		( ( $dirfiles{latinhypercube} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+    	#		( ( $dirfiles{factorial} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+    	#		( ( $dirfiles{facecentered} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) ) ### BEGINNING OF THE PART ON STAR CONFIGURATIONS
+      if ( $dirfiles{metamodel} eq "y" )
       {
         open( TOTRES, "<$totres" ) or die;
         my @lins = <TOTRES>;
@@ -2180,7 +2183,6 @@ for ( my $i = 0 ; $i < $max ; $i++ )
           }
         }
 
-        #my @morphcases = grep -d, <$mypath/$file_*>;
         unless ( $direction eq "star" )
         {
           say  "#Optimal option for case " . ( $countcase + 1 ) . ": $newtarget.";

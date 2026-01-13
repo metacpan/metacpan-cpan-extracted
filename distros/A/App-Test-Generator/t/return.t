@@ -239,14 +239,14 @@ sub validate {
 }
 
 sub get_items {
-	my ($self) = @_;
+	my $self = $_[0];
 
 	return () unless $self->{items};
 	return @{$self->{items}};
 }
 
 sub safe_operation {
-	my ($self) = @_;
+	my $self = $_[0];
 
 	eval {
 		$self->risky_thing();
@@ -266,12 +266,12 @@ END_MODULE
 
 	# Explicit undef on error
 	is($schemas->{fetch_user}{output}{error_return}, 'undef', 'Returns undef on error');
-	ok($schemas->{fetch_user}{output}{error_handling}{undef_on_error}, 'Detected explicit undef returns');
+	ok($schemas->{fetch_user}{output}{_error_handling}{undef_on_error}, 'Detected explicit undef returns');
 	ok($schemas->{fetch_user}{output}{success_failure_pattern}, 'Has success/failure pattern');
 
 	# Implicit undef (bare return)
 	is($schemas->{process_data}{output}{error_return}, 'undef', 'Returns implicit undef');
-	ok($schemas->{process_data}{output}{error_handling}{implicit_undef}, 'Detected bare returns');
+	ok($schemas->{process_data}{output}{_error_handling}{implicit_undef}, 'Detected bare returns');
 
 	# Boolean return (0/1)
 	is($schemas->{validate}{output}{type}, 'boolean', 'Validation returns boolean');
@@ -279,10 +279,10 @@ END_MODULE
 
 	# Empty list on error
 	is($schemas->{get_items}{output}{error_return}, 'empty_list', 'Returns empty list on error');
-	ok($schemas->{get_items}{output}{error_handling}{empty_list}, 'Detected empty list return');
+	ok($schemas->{get_items}{output}{_error_handling}{empty_list}, 'Detected empty list return');
 
 	# Exception handling
-	ok($schemas->{safe_operation}{output}{error_handling}{exception_handling}, 'Detected exception handling');
+	ok($schemas->{safe_operation}{output}{_error_handling}{exception_handling}, 'Detected exception handling');
 
 	done_testing();
 };
@@ -337,7 +337,7 @@ END_MODULE
 	ok(!$schemas->{builder_method}{output}{returns_self}, 'Getter/setter not marked returns_self');
 
 	# Conditional list returns
-	ok($schemas->{conditional_list}{output}{error_handling}{empty_list}, 'Can return empty list');
+	ok($schemas->{conditional_list}{output}{_error_handling}{empty_list}, 'Can return empty list');
 
 	done_testing();
 };
@@ -351,7 +351,8 @@ use warnings;
 
 =head2 connect
 
-Connects to the server. Returns connection object on success, undef on failure.
+Connects to the server.
+Returns a connection object on success, undef on failure.
 
 =cut
 

@@ -7,7 +7,7 @@ require Exporter;
 use parent 'Exporter';
 use OPCUA::Open62541::Constant;
 
-our $VERSION = '2.08';
+our $VERSION = '2.09';
 
 our @EXPORT_OK = @OPCUA::Open62541::Constant::EXPORT_OK;
 our %EXPORT_TAGS = %OPCUA::Open62541::Constant::EXPORT_TAGS;
@@ -304,6 +304,10 @@ in the callback.
 =item $limit = $server_config->getMaxEventsPerNode()
 
 =item $server_config->setMaxEventsPerNode($maxEventsPerNode)
+
+=item $rulehandling = $server_config->getAllowEmptyVariables()
+
+=item $server_config->setAllowEmptyVariables($rulehandling)
 
 =item $server_config->setUserRightsMaskReadonly($readonly)
 

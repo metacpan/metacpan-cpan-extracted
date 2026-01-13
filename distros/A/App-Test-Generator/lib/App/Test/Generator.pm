@@ -27,6 +27,7 @@ use Module::Load::Conditional qw(check_install can_load);
 use Params::Get;
 use Params::Validate::Strict;
 use Scalar::Util qw(looks_like_number);
+use re 'regexp_pattern';
 use Template;
 use YAML::XS qw(LoadFile);
 
@@ -34,14 +35,14 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use constant {
 	DEFAULT_ITERATIONS => 50,
 	DEFAULT_PROPERTY_TRIALS => 1000
 };
 
-use constant CONFIG_TYPES => ('test_nuls', 'test_undef', 'test_empty', 'test_non_ascii', 'dedup', 'properties');
+use constant CONFIG_TYPES => ('test_nuls', 'test_undef', 'test_empty', 'test_non_ascii', 'dedup', 'properties', 'close_stdin');
 
 =head1 NAME
 
@@ -49,7 +50,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses from test 
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =head1 SYNOPSIS
 
@@ -216,6 +217,11 @@ The current supported variables are
 
 =over 4
 
+=item * C<close_stdin>
+
+Tests should not attempt to read from STDIN (default: 1).
+This is ignored on Windows, when never closes STDIN.
+
 =item * C<test_nuls>, inject NUL bytes into strings (default: 1)
 
 With this test enabled, the function is expected to die when a NUL byte is passed in.
@@ -225,6 +231,10 @@ With this test enabled, the function is expected to die when a NUL byte is passe
 =item * C<test_empty>, test with empty strings (default: 1)
 
 =item * C<test_non_ascii>, test with strings that contain non ascii characters (default: 1)
+
+=item * C<timeout>, ensure tests don't hang (default: 10)
+
+Setting this to 0 disables timeout testing.
 
 =item * C<dedup>, fuzzing can create duplicate tests, go some way to remove duplicates (default: 1)
 
@@ -1023,6 +1033,7 @@ portion with a message.
     properties:
       enable: true
       trials: 200
+    close_stdin: true
     test_undef: no
     test_empty: no
     test_nuls: no
@@ -1208,6 +1219,8 @@ The generated test:
 
 =head1 METHODS
 
+=head2 generate
+
   generate($schema_file, $test_file)
 
 Takes a schema file and produces a test file (or STDOUT).
@@ -1224,11 +1237,8 @@ sub generate
 
 	my ($schema_file, $test_file, $schema);
 	# Globals loaded from the user's conf (all optional except function maybe)
-	my (%input, %output, %config, $module, $function, $new, %cases, $yaml_cases, %transforms);
+	my (%config, $module, $function, $new, $yaml_cases);
 	my ($seed, $iterations);
-	my (%edge_cases, @edge_case_array, %type_edge_cases);
-
-	@edge_case_array = ();
 
 	if(ref($args) || defined($_[2])) {
 		# Modern API
@@ -1263,15 +1273,15 @@ sub generate
 	}
 
 	# Parse the schema file and load into our structures
-	%input = %{_load_schema_section($schema, 'input', $schema_file)};
-	%output = %{_load_schema_section($schema, 'output', $schema_file)};
-	%transforms = %{_load_schema_section($schema, 'transforms', $schema_file)};
+	my %input = %{_load_schema_section($schema, 'input', $schema_file)};
+	my %output = %{_load_schema_section($schema, 'output', $schema_file)};
+	my %transforms = %{_load_schema_section($schema, 'transforms', $schema_file)};
 
-	%cases = %{$schema->{cases}} if(exists($schema->{cases}));
-	%edge_cases = %{$schema->{edge_cases}} if(exists($schema->{edge_cases}));
-	%type_edge_cases = %{$schema->{type_edge_cases}} if(exists($schema->{type_edge_cases}));
+	my %cases = %{$schema->{cases}} if(exists($schema->{cases}));
+	my %edge_cases = %{$schema->{edge_cases}} if(exists($schema->{edge_cases}));
+	my %type_edge_cases = %{$schema->{type_edge_cases}} if(exists($schema->{type_edge_cases}));
 
-	$module = $schema->{module} if(exists($schema->{module}));
+	$module = $schema->{module} if(exists($schema->{module}) && length($schema->{module}));
 	$function = $schema->{function} if(exists($schema->{function}));
 	if(exists($schema->{new})) {
 		$new = defined($schema->{'new'}) ? $schema->{new} : '_UNDEF';
@@ -1280,25 +1290,12 @@ sub generate
 	$seed = $schema->{seed} if(exists($schema->{seed}));
 	$iterations = $schema->{iterations} if(exists($schema->{iterations}));
 
-	@edge_case_array = @{$schema->{edge_case_array}} if(exists($schema->{edge_case_array}));
+	my @edge_case_array = @{$schema->{edge_case_array}} if(exists($schema->{edge_case_array}));
 	_validate_config($schema);
 
 	%config = %{$schema->{config}} if(exists($schema->{config}));
 
-	# Handle the various possible boolean settings for config values
-	# Note that the default for everything is true
-	foreach my $field (CONFIG_TYPES) {
-		next if($field eq 'properties');	# Not a boolean
-		if(exists($config{$field})) {
-			if(($config{$field} eq 'false') || ($config{$field} eq 'off') || ($config{$field} eq 'no')) {
-				$config{$field} = 0;
-			} elsif(($config{$field} eq 'true') || ($config{$field} eq 'on') || ($config{$field} eq 'yes')) {
-				$config{$field} = 1;
-			}
-		} else {
-			$config{$field} = 1;
-		}
-	}
+	_normalize_config(\%config);
 
 	# Guess module name from config file if not set
 	if(!$module) {
@@ -1310,8 +1307,8 @@ sub generate
 		undef $module;
 	}
 
-	if($module && ($module ne 'builtin')) {
-		_validate_module($module, $schema_file)
+	if($module && length($module) && ($module ne 'builtin')) {
+		_validate_module($module, $schema_file);
 	}
 
 	# sensible defaults
@@ -1443,6 +1440,8 @@ sub generate
 	my $transforms_code;
 	if(keys %transforms) {
 		foreach my $transform(keys %transforms) {
+			my $properties = render_fallback($transforms{$transform}->{'properties'});
+
 			if($transforms_code) {
 				$transforms_code .= "},\n";
 			}
@@ -1450,8 +1449,9 @@ sub generate
 				"\t'input' => { " .
 				render_args_hash($transforms{$transform}->{'input'}) .
 				"\t}, 'output' => { " .
-			render_args_hash($transforms{$transform}->{'output'}) .
-			"\t},\n";
+				render_args_hash($transforms{$transform}->{'output'}) .
+				"\t}, 'properties' => $properties\n" .
+				"\t,\n";
 		}
 		$transforms_code .= "}\n";
 	}
@@ -1480,6 +1480,7 @@ sub generate
 	my $setup_code = ($module) ? "BEGIN { use_ok('$module') }" : '';
 	my $call_code;	# Code to call the function being test when used with named arguments
 	my $position_code;	# Code to call the function being test when used with position arguments
+	my $has_positions = _has_positions(\%input);
 	if(defined($new)) {
 		# keep use_ok regardless (user found earlier issue)
 		if($new_code eq '') {
@@ -1487,22 +1488,34 @@ sub generate
 		} else {
 			$setup_code .= "\nmy \$obj = new_ok('$module' => [ { $new_code } ] );";
 		}
-		$call_code = "\$result = \$obj->$function(\$input);";
-		if($output{'returns_self'}) {
-			$call_code .= "ok(\$result eq \$obj, \"$function returns self\")";
+		if($has_positions) {
+			$position_code = "(\$result = scalar(\@alist) == 1) ? \$obj->$function(\$alist[0]) : (scalar(\@alist) == 0) ? \$obj->$function() : \$obj->$function(\@alist);";
+		} else {
+			$call_code = "\$result = \$obj->$function(\$input);";
+			if($output{'returns_self'}) {
+				$call_code .= "ok(\$result eq \$obj, \"$function returns self\")";
+			}
 		}
-		$position_code = "(\$result = scalar(\@alist) == 1) ? \$obj->$function(\$alist[0]) : (scalar(\@alist) == 0) ? \$obj->$function() : \$obj->$function(\@alist);";
 	} elsif(defined($module) && length($module)) {
 		if($function eq 'new') {
-			$call_code = "\$result = ${module}\->$function(\$input);";
-			$position_code = "(\$result = scalar(\@alist) == 1) ? ${module}\->$function(\$alist[0]) : (scalar(\@alist) == 0) ? ${module}\->$function() : ${module}\->$function(\@alist);";
+			if($has_positions) {
+				$position_code = "(\$result = scalar(\@alist) == 1) ? ${module}\->$function(\$alist[0]) : (scalar(\@alist) == 0) ? ${module}\->$function() : ${module}\->$function(\@alist);";
+			} else {
+				$call_code = "\$result = ${module}\->$function(\$input);";
+			}
 		} else {
-			$call_code = "\$result = ${module}::$function(\$input);";
-			$position_code = "(\$result = scalar(\@alist) == 1) ? ${module}::$function(\$alist[0]) : (scalar(\@alist) == 0) ? ${module}::$function() : ${module}::$function(\@alist);";
+			if($has_positions) {
+				$position_code = "(\$result = scalar(\@alist) == 1) ? ${module}::$function(\$alist[0]) : (scalar(\@alist) == 0) ? ${module}::$function() : ${module}::$function(\@alist);";
+			} else {
+				$call_code = "\$result = ${module}::$function(\$input);";
+			}
 		}
 	} else {
-		$call_code = "\$result = $function(\$input);";
-		$position_code = "\$result = $function(\@alist);";
+		if($has_positions) {
+			$position_code = "\$result = $function(\@alist);";
+		} else {
+			$call_code = "\$result = $function(\$input);";
+		}
 	}
 
 	# Build static corpus code
@@ -1537,10 +1550,10 @@ sub generate
 			} else {
 				$input_str = $inputs;
 			}
-			if(($input_str eq 'undef') && (!$config{'test_undefs'})) {
-				carp('corpus case set to undef, yet test_undefs is not set in config');
+			if(($input_str eq 'undef') && (!$config{'test_undef'})) {
+				carp('corpus case set to undef, yet test_undef is not set in config');
 			}
-			if ($new) {
+			if($new) {
 				if($status eq 'DIES') {
 					$corpus_code .= "dies_ok { \$obj->$function($input_str) } " .
 							"'$function(" . join(', ', map { $_ // '' } @$inputs ) . ") dies';\n";
@@ -1566,11 +1579,21 @@ sub generate
 				}
 			} else {
 				if($status eq 'DIES') {
-					$corpus_code .= "dies_ok { $module\::$function($input_str) } " .
-						"'Corpus $expected dies';\n";
+					if($module) {
+						$corpus_code .= "dies_ok { $module\::$function($input_str) } " .
+							"'Corpus $expected dies';\n";
+					} else {
+						$corpus_code .= "dies_ok { ::$function($input_str) } " .
+							"'Corpus $expected dies';\n";
+					}
 				} elsif($status eq 'WARNS') {
-					$corpus_code .= "warnings_exist { $module\::$function($input_str) } qr/./, " .
-						"'Corpus $expected warns';\n";
+					if($module) {
+						$corpus_code .= "warnings_exist { $module\::$function($input_str) } qr/./, " .
+							"'Corpus $expected warns';\n";
+					} else {
+						$corpus_code .= "warnings_exist { ::$function($input_str) } qr/./, " .
+							"'Corpus $expected warns';\n";
+					}
 				} else {
 					my $desc = sprintf("$function(%s) returns %s",
 						perl_quote((ref $inputs eq 'ARRAY') ? (join(', ', map { $_ // '' } @{$inputs})) : $inputs),
@@ -1599,6 +1622,12 @@ sub generate
 		$seed = int($seed);
 		$seed_code = "srand($seed);\n";
 	}
+
+	my $determinism_code = 'my $result2;' .
+		'eval { $result2 = do { ' . (defined($position_code) ? $position_code : $call_code) . " }; };\n" .
+		'is_deeply($result2, $result, "deterministic result for same input");' .
+		"\n";
+	
 	# Generate the test content
 	my $tt = Template->new({ ENCODING => 'utf8', TRIM => 1 });
 
@@ -1619,6 +1648,7 @@ sub generate
 		corpus_code => $corpus_code,
 		call_code => $call_code,
 		position_code => $position_code,
+		determinism_code => $determinism_code,
 		function => $function,
 		iterations_code => int($iterations),
 		use_properties => $use_properties,
@@ -1628,7 +1658,7 @@ sub generate
 	};
 
 	my $test;
-	$tt->process($template, $vars, \$test) or die $tt->error();
+	$tt->process($template, $vars, \$test) or croak($tt->error());
 
 	if ($test_file) {
 		open my $fh, '>:encoding(UTF-8)', $test_file or die "Cannot open $test_file: $!";
@@ -1659,12 +1689,14 @@ sub _load_schema {
 	# $abs = "./$abs" unless $abs =~ m{^/};
 	# require $abs;
 
-	if(my $config = Config::Abstraction->new(config_dirs => ['.', ''], config_file => $schema_file)) {
-		$config = $config->all();
-		if(defined($config->{'$module'}) || defined($config->{'our $module'}) || !defined($config->{'module'})) {
-			croak("$schema_file: Loading perl files as configs is no longer supported");
+	if(my $schema = Config::Abstraction->new(config_dirs => ['.', ''], config_file => $schema_file)) {
+		if($schema = $schema->all()) {
+			if(defined($schema->{'$module'}) || defined($schema->{'our $module'}) || !defined($schema->{'module'})) {
+				croak("$schema_file: Loading perl files as configs is no longer supported");
+			}
+			$schema->{'_source'} = $schema_file;
+			return $schema;
 		}
-		return $config;
 	}
 }
 
@@ -1708,69 +1740,80 @@ sub _validate_config {
 		}
 	}
 
-	# Validate types, constraints, etc.
-	for my $param (keys %{$config->{input}}) {
-		my $spec = $config->{input}{$param};
-		if(ref($spec)) {
-			croak "Invalid type '$spec->{type}' for parameter '$param'" unless _valid_type($spec->{type});
-		} else {
-			croak "Invalid type '$spec' for parameter '$param'" unless _valid_type($spec);
+	if($config->{input}) {
+		# Validate types, constraints, etc.
+		for my $param (keys %{$config->{input}}) {
+			if(!length($param)) {
+				croak 'Empty input parameter name';
+			}
+			my $spec = $config->{input}{$param};
+			if(ref($spec)) {
+				croak("Missing type for parameter '$param'") unless(defined $spec->{type});
+				croak("Invalid type '$spec->{type}' for parameter '$param'") unless _valid_type($spec->{type});
+			} else {
+				croak "Invalid type '$spec' for parameter '$param'" unless _valid_type($spec);
+			}
 		}
-	}
 
-	# Check if using positional arguments
-	my $has_positions = 0;
-	my %positions;
+		# Check if using positional arguments
+		my $has_positions = 0;
+		my %positions;
 
-	for my $param (keys %{$config->{input}}) {
-		my $spec = $config->{input}{$param};
-		if (ref($spec) eq 'HASH' && defined($spec->{position})) {
-			$has_positions = 1;
-			my $pos = $spec->{position};
-
-			# Validate position is non-negative integer
-			croak "Position for '$param' must be a non-negative integer" unless $pos =~ /^\d+$/;
-
-			# Check for duplicate positions
-			croak "Duplicate position $pos for parameters '$positions{$pos}' and '$param'" if exists $positions{$pos};
-
-			$positions{$pos} = $param;
-		}
-	}
-
-	# If using positions, all params must have positions
-	if ($has_positions) {
 		for my $param (keys %{$config->{input}}) {
 			my $spec = $config->{input}{$param};
-			unless (ref($spec) eq 'HASH' && defined($spec->{position})) {
-				croak "Parameter '$param' missing position (all params must have positions if any do)";
+			if (ref($spec) eq 'HASH' && defined($spec->{position})) {
+				$has_positions = 1;
+				my $pos = $spec->{position};
+
+				# Validate position is non-negative integer
+				croak "Position for '$param' must be a non-negative integer" unless $pos =~ /^\d+$/;
+
+				# Check for duplicate positions
+				croak "Duplicate position $pos for parameters '$positions{$pos}' and '$param'" if exists $positions{$pos};
+
+				$positions{$pos} = $param;
 			}
 		}
 
-		# Check for gaps in positions (0, 1, 3 - missing 2)
-		my @sorted = sort { $a <=> $b } keys %positions;
-		for my $i (0..$#sorted) {
-			if ($sorted[$i] != $i) {
-				carp "Warning: Position sequence has gaps (positions: @sorted)";
-				last;
-			}
-		}
-	}
-
-	# Validate input types
-	my $semantic_generators = _get_semantic_generators();
-	for my $param (keys %{$config->{input}}) {
-		my $spec = $config->{input}{$param};
-		if(ref($spec) eq 'HASH') {
-			if(defined($spec->{semantic})) {
-				my $semantic = $spec->{semantic};
-				unless (exists $semantic_generators->{$semantic}) {
-					carp "Warning: Unknown semantic type '$semantic' for parameter '$param'. Available types: ",
-						join(', ', sort keys %$semantic_generators);
+		# If using positions, all params must have positions
+		if ($has_positions) {
+			for my $param (keys %{$config->{input}}) {
+				my $spec = $config->{input}{$param};
+				unless (ref($spec) eq 'HASH' && defined($spec->{position})) {
+					croak "Parameter '$param' missing position (all params must have positions if any do)";
 				}
 			}
-			if($spec->{'enum'} && $spec->{'memberof'}) {
-				croak "$param: has both enum and memberof";
+
+			# Check for gaps in positions (0, 1, 3 - missing 2)
+			my @sorted = sort { $a <=> $b } keys %positions;
+			for my $i (0..$#sorted) {
+				if ($sorted[$i] != $i) {
+					carp "Warning: Position sequence has gaps (positions: @sorted)";
+					last;
+				}
+			}
+		}
+
+		# Validate input types
+		my $semantic_generators = _get_semantic_generators();
+		for my $param (keys %{$config->{input}}) {
+			my $spec = $config->{input}{$param};
+			if(ref($spec) eq 'HASH') {
+				if(defined($spec->{semantic})) {
+					my $semantic = $spec->{semantic};
+					unless (exists $semantic_generators->{$semantic}) {
+						carp "Warning: $config->{_source}: Unknown semantic type '$semantic' for parameter '$param'. Available types: ",
+							join(', ', sort keys %$semantic_generators);
+					}
+				}
+				if($spec->{'enum'} && $spec->{'memberof'}) {
+					croak "$param: has both enum and memberof";
+				}
+				for my $type('enum', 'memberof') {
+					if(exists $spec->{$type}) {
+						croak "$type must be arrayref" unless(ref($spec->{$type}) eq 'ARRAY');
+					}
+				}
 			}
 		}
 	}
@@ -1809,26 +1852,48 @@ sub _validate_config {
 		}
 	}
 
-	# Validate the config variables, checking that they are ones we know
-	foreach my ($k, $v) (%{$config->{'config'}}) {
-		if(!grep { $_ eq $k } (CONFIG_TYPES) ) {
-			croak "unknown config setting $k";
+	if(ref($config->{config}) eq 'HASH') {
+		# Validate the config variables, checking that they are ones we know
+		foreach my $k (keys %{$config->{'config'}}) {
+			if(!grep { $_ eq $k } (CONFIG_TYPES) ) {
+				croak "unknown config setting $k";
+			}
 		}
 	}
+}
+
+# Handle the various possible boolean settings for config values
+# Note that the default for everything is true
+sub _normalize_config
+{
+	my $config = $_[0];
+
+	foreach my $field (CONFIG_TYPES) {
+		next if($field eq 'properties');	# Not a boolean
+		if(exists($config->{$field})) {
+			if(($config->{$field} eq 'false') || ($config->{$field} eq 'off') || ($config->{$field} eq 'no')) {
+				$config->{$field} = 0;
+			} elsif(($config->{$field} eq 'true') || ($config->{$field} eq 'on') || ($config->{$field} eq 'yes')) {
+				$config->{$field} = 1;
+			}
+		} else {
+			$config->{$field} = 1;
+		}
+	}
+
+	$config->{properties} = { enable => 0 } unless ref $config->{properties} eq 'HASH';
 }
 
 sub _valid_type
 {
 	my $type = $_[0];
 
-	return(($type eq 'string') ||
-		($type eq 'boolean') ||
-		($type eq 'integer') ||
-		($type eq 'number') ||
-		($type eq 'float') ||
-		($type eq 'hashref') ||
-		($type eq 'arrayref') ||
-		($type eq 'object'));
+	return 0 if(!defined($type));
+
+	state %VALID = map { $_ => 1 } qw(
+		string boolean integer number float hashref arrayref object int bool
+	);
+	return $VALID{$type};
 }
 
 sub _validate_module {
@@ -1851,22 +1916,23 @@ sub _validate_module {
 	}
 
 	# Module was found
-	if ($ENV{TEST_VERBOSE} || $ENV{GENERATOR_VERBOSE}) {
+	if($ENV{TEST_VERBOSE} || $ENV{GENERATOR_VERBOSE}) {
 		print STDERR "Found module '$module' at: $mod_info->{file}\n",
 			'  Version: ', ($mod_info->{version} || 'unknown'), "\n";
 	}
 
 	# Optionally try to load it (disabled by default since it can have side effects)
-	if ($ENV{GENERATOR_VALIDATE_LOAD}) {
+	if($ENV{GENERATOR_VALIDATE_LOAD}) {
 		my $loaded = can_load(modules => { $module => undef }, verbose => 0);
 
-		if (!$loaded) {
-			carp("Warning: Module '$module' found but failed to load: $Module::Load::Conditional::ERROR");
+		if(!$loaded) {
+			my $err = $Module::Load::Conditional::ERROR || 'unknown error';
+			carp("Warning: Module '$module' found but failed to load: $err");
 			carp('  This might indicate a broken installation or missing dependencies.');
 			return 0;
 		}
 
-		if ($ENV{TEST_VERBOSE} || $ENV{GENERATOR_VERBOSE}) {
+		if($ENV{TEST_VERBOSE} || $ENV{GENERATOR_VERBOSE}) {
 			print STDERR "Successfully loaded module '$module'\n";
 		}
 	}
@@ -1876,39 +1942,53 @@ sub _validate_module {
 
 sub perl_sq {
 	my $s = $_[0];
-	$s =~ s/\\/\\\\/g; $s =~ s/'/\\'/g; $s =~ s/\n/\\n/g; $s =~ s/\r/\\r/g; $s =~ s/\t/\\t/g;
+
+	return '' unless defined $s;
+
+	$s =~ s/\\/\\\\/g;
+	$s =~ s/'/\\'/g;
+	$s =~ s/\n/\\n/g;
+	$s =~ s/\r/\\r/g;
+	$s =~ s/\t/\\t/g;
+	$s =~ s/\f/\\f/g;
+	# $s =~ s/\b/\\b/g;
+	$s =~ s/\0/\\0/g;
 	return $s;
 }
 
 sub perl_quote {
 	my $v = $_[0];
 	return 'undef' unless defined $v;
+	return '!!1' if $v eq 'true';
 	if(ref($v)) {
 		if(ref($v) eq 'ARRAY') {
 			my @quoted_v = map { perl_quote($_) } @{$v};
 			return '[ ' . join(', ', @quoted_v) . ' ]';
 		}
 		if(ref($v) eq 'Regexp') {
-			my $s = "$v";
+			my ($pat, $mods) = regexp_pattern($v);
 
-			# default to qr{...}
-			return "qr{$s}" unless $s =~ /[{}]/;
-
-			# fallback: quote with slash if no slash inside
-			return "qr/$s/" unless $s =~ m{/};
-
-			# fallback: quote with # if slash inside
-			return "qr#$s#";
+			my $re = "qr{$pat}";
+			$re .= $mods if $mods;
+			return $re;
 		}
 		# Generic fallback
-		$v = Dumper($v);
-		$v =~ s/\$VAR1 =//;
-		$v =~ s/;//;
-		return $v;
+		return render_fallback($v);
 	}
 	$v =~ s/\\/\\\\/g;
-	# return $v =~ /^-?\d+(\.\d+)?$/ ? $v : "'" . ( $v =~ s/'/\\'/gr ) . "'";
-	return $v =~ /^-?\d+(\.\d+)?$/ ? $v : "'" . perl_sq($v) . "'";
+	# return $v =~ /^-?\d+(\.\d+)?$/ ? $v : "'" . perl_sq($v) . "'";
+	return looks_like_number($v) ? $v : "'" . perl_sq($v) . "'";
+}
+
+sub render_fallback
+{
+	my $v = $_[0];
+
+	local $Data::Dumper::Terse = 1;
+	local $Data::Dumper::Indent = 0;
+	my $s = Dumper($v);
+	chomp $s;
+	return $s;
 }
 
 sub render_hash {
@@ -1927,7 +2007,8 @@ sub render_hash {
 				}
 			}
 			if(($subk eq 'matches') || ($subk eq 'nomatch')) {
-				push @pairs, "$subk => qr/$def->{$subk}/";
+				# push @pairs, "$subk => qr/$def->{$subk}/";
+				push @pairs, "$subk => " . perl_quote(qr/$def->{$subk}/);
 			} else {
 				push @pairs, "$subk => " . perl_quote($def->{$subk});
 			}
@@ -2023,6 +2104,8 @@ sub _generate_transform_properties {
 		# Skip if no properties detected or defined
 		next unless @all_props;
 
+		next unless ref($input_spec) eq 'HASH';
+
 		# Build LectroTest generator specification
 		my @generators;
 		my @var_names;
@@ -2031,18 +2114,24 @@ sub _generate_transform_properties {
 			my $spec = $input_spec->{$field};
 			next unless ref($spec) eq 'HASH';
 
-			my $gen = _schema_to_lectrotest_generator($field, $spec);
-			push @generators, $gen;
-			push @var_names, $field;
+			if(defined(my $gen = _schema_to_lectrotest_generator($field, $spec))) {
+				if(length($gen)) {
+					push @generators, $gen;
+					push @var_names, $field;
+				}
+			}
 		}
 
 		my $gen_spec = join(', ', @generators);
 
 		# Build the call code
 		my $call_code;
-		if ($module) {
-			# $call_code = "$module\::$function";
-			$call_code = "$module->$function";
+		if($module && defined($new)) {
+			$call_code = "my \$obj = new_ok('$module');";
+			$call_code .= "\$obj->$function";	# Method call
+		} elsif($module && $module ne 'builtin') {
+			# $call_code = "$module->$function";
+			$call_code = "$module\::$function";
 		} else {
 			$call_code = $function;
 		}
@@ -2065,6 +2154,7 @@ sub _generate_transform_properties {
 
 		# Handle _STATUS in output
 		my $should_die = ($output_spec->{_STATUS} // '') eq 'DIES';
+		my $should_warn = ($output_spec->{_STATUS} // '') eq 'WARN';
 
 		push @properties, {
 			name => $transform_name,
@@ -2072,6 +2162,7 @@ sub _generate_transform_properties {
 			call_code => "$call_code($args_str)",
 			property_checks => $property_checks,
 			should_die => $should_die,
+			should_warn => $should_warn,
 			trials => $config->{properties}{trials} // DEFAULT_PROPERTY_TRIALS,
 		};
 	}
@@ -2107,6 +2198,17 @@ sub _process_custom_properties {
 				# Get input variable names
 				my @var_names = sort keys %$input_spec;
 
+				# Build args
+				my @args;
+				if (_has_positions($input_spec)) {
+					my @sorted = sort {
+						$input_spec->{$a}{position} <=> $input_spec->{$b}{position}
+					} @var_names;
+					@args = map { "\$$_" } @sorted;
+				} else {
+					@args = map { "\$$_" } @var_names;
+				}
+
 				# Build call code
 				my $call_code;
 				# Check if this is OO mode
@@ -2117,17 +2219,6 @@ sub _process_custom_properties {
 					$call_code = "$module\::$function";	# Function call
 				} else {
 					$call_code = $function;	# Builtin
-				}
-
-				# Build args
-				my @args;
-				if (_has_positions($input_spec)) {
-					my @sorted = sort {
-						$input_spec->{$a}{position} <=> $input_spec->{$b}{position}
-					} @var_names;
-					@args = map { "\$$_" } @sorted;
-				} else {
-					@args = map { "\$$_" } @var_names;
 				}
 				$call_code .= '(' . join(', ', @args) . ')';
 
@@ -2190,7 +2281,8 @@ sub _detect_transform_properties {
 			my $min = $output_spec->{min};
 			push @properties, {
 				name => 'min_constraint',
-				code => "\$result >= $min"
+				# code => "\$result >= $min"
+				code => "defined(\$result) && looks_like_number(\$result) && \$result >= $min"
 			};
 		}
 
@@ -2198,16 +2290,18 @@ sub _detect_transform_properties {
 			my $max = $output_spec->{max};
 			push @properties, {
 				name => 'max_constraint',
-				code => "\$result <= $max"
+				# code => "\$result <= $max"
+				code => "defined(\$result) && looks_like_number(\$result) && \$result <= $max"
 			};
 		}
 
-		# For transforms, add idempotence check where appropriate
+		# For transforms, add an idempotence check where appropriate
 		# e.g., abs(abs(x)) == abs(x)
 		if ($transform_name =~ /positive/i) {
 			push @properties, {
 				name => 'non_negative',
-				code => "\$result >= 0"
+				# code => "\$result >= 0"
+				code => "defined(\$result) && looks_like_number(\$result) && \$result >= 0"
 			};
 		}
 	}
@@ -2217,7 +2311,10 @@ sub _detect_transform_properties {
 		my $expected = $output_spec->{value};
 		push @properties, {
 			name => 'exact_value',
-			code => "\$result == $expected"
+			# code => "\$result == $expected"
+			(ref($expected))
+			? "\$result == $expected"  # maybe
+			: "\$result eq " . perl_quote($expected)
 		};
 	}
 
@@ -2809,11 +2906,11 @@ sub _get_dominant_type {
 }
 
 sub _has_positions {
-	my $spec = $_[0];
+	my $input_spec = $_[0];
 
-	for my $field (keys %$spec) {
-		next unless ref($spec->{$field}) eq 'HASH';
-		return 1 if defined $spec->{$field}{position};
+	for my $field (keys %$input_spec) {
+		next unless ref($input_spec->{$field}) eq 'HASH';
+		return 1 if defined $input_spec->{$field}{position};
 	}
 
 	return 0;
@@ -2896,4 +2993,24 @@ assistance of AI.
 
 =cut
 
-__END__
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2025-2026 Nigel Horne.
+
+Usage is subject to licence terms.
+
+The licence terms of this software are as follows:
+
+=over 4
+
+=item * Personal single user, single computer use: GPL2
+
+=item * All other users (including Commercial, Charity, Educational, Government)
+  must apply in writing for a licence for use from Nigel Horne at the
+  above e-mail.
+
+=back
+
+=cut
+
+1;

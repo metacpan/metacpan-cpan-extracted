@@ -73,6 +73,7 @@ use File::Temp;
       folder => "Inbox",
       post_fetch_action => "mark_message_as_read",
       debug => 0,
+      response_matrix => hash,
     })
 
 =head1 DESCRIPTION
@@ -159,6 +160,33 @@ has global_access => (
     default => sub { return 0 }
 );
 
+=head2 size_limit
+
+An integer. Messages with size in bytes bigger than it will be skipped.
+
+Default is 0, which means no limit.
+
+=cut
+
+has size_limit => (
+    is => 'ro',
+    default => sub { return 0 }
+);
+
+=head2 body_size_limit
+
+An integer. Messages with body size in bytes bigger than it will be skipped.
+
+Default is 0, which means no limit.
+
+=cut
+
+has body_size_limit => (
+    is => 'ro',
+    default => sub { return 0 }
+);
+
+
 =head2 secret
 
 A string with the client secret to use for global authentication. This
@@ -210,6 +238,70 @@ has debug => (
     default => sub { return 0 }
 );
 
+=head2 response_matrix
+
+A hash describing special handling for combinations of API calls and
+non-success HTTP response codes.
+
+The recognized API call labels, based on the Perl internal method names, are:
+
+=over 4
+
+=item get_message_mime_content
+
+=item delete_message
+
+=item mark_message_as_read
+
+=item get_folder_details
+
+=item _fetch_messages
+
+=item _get_message_list
+
+=back
+
+Instead of one of these API call labels C<default> can be used to specify the
+behavior for all labels without a value specified for that code.
+
+In addition to specific response codes it is also valid to use C<xx> as the
+last two digits of the code to match all codes with the same first digit,
+except where a specific code has its own value.
+
+The lookup priority order is:
+
+=over 4
+
+=item exact method / exact code
+
+=item default / exact code
+
+=item exact method / Nxx code
+
+=item default / Nxx code
+
+=back
+
+The only value with defined behavior is C<ignore>, which indicates that
+nothing should be logged and that the code should be treated as success
+as closely as possible.
+
+The defaults in L<App::wsgetmail> could be represented as:
+
+  $example_response_matrix = {
+    delete_message => { '400' => 'ignore', '404' => 'ignore' },
+
+    default => { '5xx' => 'ignore' },
+  };
+
+
+=cut
+
+has response_matrix => (
+    is => 'ro',
+    default => sub { return {} },
+);
+
 ###
 
 has _client => (
@@ -250,7 +342,7 @@ around BUILDARGS => sub {
         grep {
             defined $config->{$_}
         }
-        qw(client_id tenant_id username user_password global_access secret folder post_fetch_action stripcr debug)
+        qw(client_id tenant_id username user_password global_access secret folder post_fetch_action stripcr size_limit body_size_limit debug response_matrix)
     };
 
     return $class->$orig($attributes);
@@ -301,9 +393,62 @@ sub get_message_mime_content {
 
     my $response = $self->_client->get_request([@path_parts]);
     unless ($response->is_success) {
+        if ($self->_check_matrix('get_message_mime_content', $response->code) eq 'ignore') {
+            return '';
+        }
+
         warn "failed to fetch message $message_id " . $response->status_line;
         warn "response from server : " . $response->content if $self->debug;
         return undef;
+    }
+
+    if ( $self->size_limit > 0 && length $response->content > $self->size_limit ) {
+        warn sprintf( "message $message_id exceeds size limit: %d > %d", length $response->content, $self->size_limit )
+            if $self->debug;
+        return ''; # Silently skip it.
+    }
+
+    if ( $self->body_size_limit > 0 && length $response->content > $self->body_size_limit ) {
+        require MIME::Parser;
+        my $parser = MIME::Parser->new();
+        $parser->extract_nested_messages(0);
+        my $entity;
+        eval { $entity = $parser->parse_data( $response->content ) };
+        if ($@) {
+            warn "couldn't parse message $message_id: $@";
+            $parser->filer->purge;
+            return;
+        }
+
+        my $exceeded_size;
+        if ( $entity->parts ) {
+            # Expand multiplart/alternative which usually contains text/plain and text/html
+            my @parts = map { ( $_->mime_type // '' ) =~ m{^multipart/alternative$}i ? $_->parts : $_ } $entity->parts;
+            for my $part ( @parts ) {
+                next unless ( $part->mime_type // '' ) =~ m{^text/(?:plain|html)$}i;
+                next if ( $part->head->get('Content-Disposition') // '' ) =~ /attachment/i;
+                if ( length $part->stringify_body > $self->body_size_limit ) {
+                    $exceeded_size = length $part->stringify_body;
+                    last;
+                }
+            }
+        }
+        elsif ( ( $entity->mime_type // '' ) =~ m{^text/(?:plain|html)$}i
+            && length $entity->stringify_body > $self->body_size_limit )
+        {
+            $exceeded_size = length $entity->stringify_body;
+        }
+
+        $parser->filer->purge;
+
+        if ($exceeded_size) {
+            warn sprintf(
+                "message $message_id exceeds body size limit: %d > %d",
+                $exceeded_size,
+                $self->body_size_limit
+            ) if $self->debug;
+            return '';    # Silently skip it.
+        }
     }
 
     # can we just write straight to file from response?
@@ -325,8 +470,13 @@ sub delete_message {
     my @path_parts = ($self->global_access) ? ('users', $self->username, 'messages', $message_id) : ('me', 'messages', $message_id);
     my $response = $self->_client->delete_request([@path_parts]);
     unless ($response->is_success) {
-        warn "failed to delete message " . $response->status_line;
-        warn "response from server : " . $response->content if $self->debug;
+        if ($self->_check_matrix('delete_message', $response->code) eq 'ignore') {
+            $response->code( 200 );
+        }
+        else {
+            warn "failed to delete message " . $response->status_line;
+            warn "response from server : " . $response->content if $self->debug;
+        }
     }
 
     return $response;
@@ -345,8 +495,13 @@ sub mark_message_as_read {
                                                  {'Content-type'=> 'application/json',
                                                   Content => encode_json({isRead => $JSON::true }) });
     unless ($response->is_success) {
-        warn "failed to mark message as read " . $response->status_line;
-        warn "response from server : " . $response->content if $self->debug;
+        if ($self->_check_matrix('mark_message_as_read', $response->code) eq 'ignore') {
+            $response->code( 200 );
+        }
+        else {
+            warn "failed to mark message as read " . $response->status_line;
+            warn "response from server : " . $response->content if $self->debug;
+        }
     }
 
     return $response;
@@ -367,6 +522,10 @@ sub get_folder_details {
         [@path_parts], { '$filter' => "DisplayName eq '$folder_name'" }
     );
     unless ($response->is_success) {
+        if ($self->_check_matrix('get_folder_details', $response->code) eq 'ignore') {
+            return { totalItemCount => 0 };
+        }
+
         warn "failed to fetch folder detail " . $response->status_line;
         warn "response from server : " . $response->content if $self->debug;
         return undef;
@@ -379,6 +538,30 @@ sub get_folder_details {
 
 ##############
 
+sub _check_matrix {
+    my ($self, $label, $code) = @_;
+
+    my $matrix = $self->response_matrix;
+
+    my $code_category = $code;
+    $code_category =~ s/^(\d)\d\d$/${1}xx/;
+
+    if (exists $matrix->{$label} and exists $matrix->{$label}{$code}) {
+        return $matrix->{$label}{$code};
+    }
+    elsif (exists $matrix->{default} and exists $matrix->{default}{$code}) {
+        return $matrix->{default}{$code};
+    }
+    elsif (exists $matrix->{$label} and exists $matrix->{$label}{$code_category}) {
+        return $matrix->{$label}{$code_category};
+    }
+    elsif (exists $matrix->{default} and exists $matrix->{default}{$code_category}) {
+        return $matrix->{default}{$code_category};
+    }
+
+    return 'log';
+}
+
 sub _fetch_messages {
     my ($self, $filter) = @_;
     my $messages = [ ];
@@ -388,8 +571,11 @@ sub _fetch_messages {
     if ($self->_next_fetch_url) {
         my $response = $self->_client->get_request_by_url($self->_next_fetch_url);
         unless ($response->is_success) {
-            warn "failed to fetch messages " . $response->status_line;
-            warn "response from server : " . $response->content if $self->debug;
+            if ($self->_check_matrix('_fetch_messages', $response->code) ne 'ignore') {
+                warn "failed to fetch messages " . $response->status_line;
+                warn "response from server : " . $response->content if $self->debug;
+            }
+
             $self->_have_messages_to_fetch(0);
             return 0;
         }
@@ -438,8 +624,10 @@ sub _get_message_list {
     );
 
     unless ($response->is_success) {
-        warn "failed to fetch messages " . $response->status_line;
-        warn "response from server : " . $response->content if $self->debug;
+        if ($self->_check_matrix('_get_message_list', $response->code) ne 'ignore') {
+            warn "failed to fetch messages " . $response->status_line;
+            warn "response from server : " . $response->content if $self->debug;
+        }
         return { value => [ ] };
     }
 

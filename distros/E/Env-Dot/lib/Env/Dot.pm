@@ -2,6 +2,14 @@
 package Env::Dot;
 use strict;
 use warnings;
+use 5.010;
+
+use English qw( -no_match_vars );    # Avoids regex performance penalty in perl 5.18 and earlier
+use Carp;
+
+# ABSTRACT: Read environment variables from .env file
+
+our $VERSION = '0.019';
 
 # We define our own import routine because
 # this is the point (when `use Env::Dot` is called)
@@ -11,17 +19,17 @@ use warnings;
     no warnings 'redefine';    ## no critic [TestingAndDebugging::ProhibitNoWarnings]
 
     sub import {
-        load_vars();
+        my ( $class, $cmd, $args ) = @_;
+
+        # We also allow only: 'use Env::Dot;'
+        croak "Unknown argument '$cmd'" if ( $cmd && $cmd ne 'read' );
+
+        if ( !load_vars( %{ $args // {} } ) ) {
+            croak 'Errors in environment detected.';
+        }
         return;
     }
 }
-
-use English qw( -no_match_vars );    # Avoids regex performance penalty in perl 5.18 and earlier
-use Carp;
-
-# ABSTRACT: Read environment variables from .env file
-
-our $VERSION = '0.018';
 
 use Env::Dot::Functions qw(
   get_dotenv_vars
@@ -41,8 +49,16 @@ use constant {
 };
 
 sub load_vars {
+    my (%args) = @_;
+    my %allowed_args = ( 'dotenv_file' => 1, );
+    foreach my $arg ( keys %args ) {
+        croak "Illegal argument '$arg'" if ( !exists $allowed_args{$arg} );
+    }
     my @dotenv_filepaths;
-    if ( exists $ENV{ get_envdot_filepaths_var_name() } ) {
+    if ( $args{'dotenv_file'} ) {
+        @dotenv_filepaths = ( $args{'dotenv_file'} );
+    }
+    elsif ( exists $ENV{ get_envdot_filepaths_var_name() } ) {
         @dotenv_filepaths = interpret_dotenv_filepath_var( $ENV{ get_envdot_filepaths_var_name() } );
     }
     else {
@@ -87,17 +103,34 @@ Env::Dot - Read environment variables from .env file
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
-
-    use Env::Dot;
-
-    print $ENV{'VAR_DEFINED_IN_DOTENV_FILE'};
 
 =head1 DESCRIPTION
 
 More flexibility in how you manage and use your F<.env> file.
+
+=head1 STATUS
+
+This module is currently being developed so changes in the API are possible,
+though not likely.
+
+=for test_synopsis BEGIN { die 'SKIP: no .env file here' }
+
+    # If your dotenv file is `.env`:
+    use Env::Dot;
+    # or
+    use Env::Dot 'read';
+
+    print $ENV{'VAR_DEFINED_IN_DOTENV_FILE'};
+
+    # If you have a dotenv file in a different filepath:
+    use Env::Dot read => {
+        dotenv_file => '/other/path/my_environment.env',
+    };
+
+=for stopwords dotenv
 
 B<Attn. Existing environment variables always take precedence to dotenv variables!>
 A dotenv variable (variable from a file) does not overwrite
@@ -158,20 +191,30 @@ N.B. The ordering has changed in version 0.0.9.
 
 =item Support different types of .env files
 
+=for stopwords dotenv
+
 Unix Shell I<source> command compatible dotenv files use double or single quotation marks
 (B<"> or B<'>) to define a variable which has spaces. But, for instance,
 Docker compatible F<.env> files do not use quotation marks. The variable's
 value begins with B<=> sign and ends with linefeed.
 
+=for stopwords dotenv
+
 You can specify in the dotenv file itself - by using meta commands -
 which type of file it is.
+
+=for stopwords envdot
 
 =item Use executable B<envdot> to bring the variables into your shell
 
 The executable is distributed together with Env::Dot package.
 It is in the directory I<script>.
 
+=for stopwords envdot
+
 The executable I<script/envdot> is not Windows compatible!
+
+=for stopwords Powershell envdot
 
 A Windows (MS Command and Powershell compatible) version, I<script\envdot.bat>, is possible
 in a future release. Please contact the author if you are interested in it.
@@ -185,6 +228,8 @@ B<Env::Dot> does not do any interpolating. It cannot because that would involve
 running the variable in the shell context.
 
 =back
+
+=for stopwords DotEnv Powershell dotenv env envdot shdotenv
 
 =head2 DotEnv File Meta Commands
 
@@ -253,13 +298,6 @@ to create variable definitions for B<eval> command to read.
 
 =back
 
-=for stopwords dotenv env envdot
-
-=head1 STATUS
-
-This module is currently being developed so changes in the API are possible,
-though not likely.
-
 =head1 DEPENDENCIES
 
 No external dependencies outside Perl's standard distribution.
@@ -276,8 +314,8 @@ B<ENVDOT_FILEPATHS>.
 =head1 SEE ALSO
 
 L<Env::Assert> will verify that you certainly have those environmental
-variables you need. It also has an executable which can perform the check
-in the beginning of a B<docker> container run.
+variables you need. It also has an executable which can, for example,
+perform the check in the beginning of a B<docker> container run.
 
 L<Dotenv> and L<ENV::Util|https://metacpan.org/pod/ENV::Util>
 are packages which also implement functionality to use
@@ -285,6 +323,11 @@ F<.env> files in Perl.
 
 L<Config::ENV> and L<Config::Layered::Source::ENV> provide other means
 to configure application with the help of environment variables.
+
+=for stopwords dotenv shdotenv
+
+L<shdotenv|https://github.com/ko1nksm/shdotenv> is a project to provide dotenv
+for shells with support for POSIX-compliant and multiple .env file syntax.
 
 =head1 AUTHOR
 

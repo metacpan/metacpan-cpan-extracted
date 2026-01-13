@@ -1,6 +1,6 @@
 package RT::Extension::CommentOnCreate;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use warnings;
 use strict;
@@ -24,7 +24,7 @@ RT::Extension::CommentOnCreate - Adds an optional Comment box to Ticket Creation
 
 May need root permissions
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -38,7 +38,7 @@ or add C<RT::Extension::CommentOnCreate> to your existing C<@Plugins> line.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -73,7 +73,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014-2022 by Best Practical Solutions
+This software is Copyright (c) 2014-2026 by Best Practical Solutions
 
 This is free software, licensed under:
 

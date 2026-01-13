@@ -1,16 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2026 -- leonerd@leonerd.org.uk
 
 use v5.36;
 use Object::Pad 0.800;
 
-role App::perl::distrolint::CheckRole::TreeSitterPerl 0.01;
+role App::perl::distrolint::CheckRole::TreeSitterPerl 0.09;
 
 use Syntax::Keyword::Match 0.13; # case if
 
 use File::Slurper qw( read_text );
+use List::Util 1.29 qw( min );
+
 use Text::Treesitter;
 use Text::Treesitter::Query;
 use Text::Treesitter::QueryCursor 0.10;
@@ -180,6 +182,74 @@ method walk_each_query_match ( $src, $node, $method, @args )
    }
 
    return 1;
+}
+
+=head2 walk_each_scoped_query_match
+
+   $ok = $check->walk_each_scoped_query_match( $src, $node, $method, $context = {}, @args );
+
+      $ok = $self->$method( \%captures, $context, @args );
+
+I<Since version 0.09.>
+
+A trampoline method that invokes the method on the given arguments on every
+match of the given query source against the node passed in. Similar to
+L</walk_each_query_match> except that this version understands the block
+nesting scope of Perl source code, and maintains a "context" hash scoped
+alongside it.
+
+Stops and returns false the first time the invoked method returns false, or
+returns true if the invoked method returns true for every call.
+
+The invoked method is passed a reference to a hash, containing mappings from
+capture names to the nodes of the tree that were captured by them, and another
+reference to a different hash, containing the current context items.
+
+Each time a new scope is entered, a shallow-clone of the C<$context> hash is
+taken, and it is this copy passed into the method for calls within that scope.
+The method may freely inspect or modify that hash, knowing that any (shallow)
+modifications made will be undone at the end of the current Perl scope. This
+makes it useful for tracking state related to Perl parsing.
+
+The query given in C<$src> is not permitted to use the capture name C<@scope>,
+as this method will use that for its own purposes.
+
+=cut
+
+method walk_each_scoped_query_match ( $query, $root, $method, $root_context = {}, @args )
+{
+   $query = "[(block_statement) (block)] \@scope\n\n" . $query;
+
+   # First build up a flat list of the query matches and note their start points
+   my @captures;
+   $self->walk_each_query_match( $query, $root, sub ( $, $captures ) {
+      my $min_start_byte = min map { $_->start_byte } values %$captures;
+      $captures->{min_start_byte} = $min_start_byte;
+      push @captures, $captures;
+   } );
+
+   # Then walk the list of matches tracking state as we go
+   # Use __SUB__ recursion to enter nested scopes
+   (sub ( $end_byte, $context ) {
+      CAPTURE: while( @captures ) {
+         last CAPTURE if defined $end_byte and $captures[0]->{min_start_byte} > $end_byte;
+
+         my $c = shift @captures;
+         delete $c->{min_start_byte};
+         my $node;
+
+         if( $c->{scope} ) {
+            __SUB__->( $c->{scope}->end_byte, { %$context } ) or
+               return 0;
+         }
+         else {
+            $self->$method( $c, $context, @args ) or
+               return 0;
+         }
+      }
+
+      return 1;
+   })->( undef, $root_context );
 }
 
 =head2 extract_use_module_imports

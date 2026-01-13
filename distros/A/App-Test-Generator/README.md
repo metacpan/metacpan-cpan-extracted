@@ -4,7 +4,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses from test 
 
 # VERSION
 
-Version 0.25
+Version 0.26
 
 # SYNOPSIS
 
@@ -154,6 +154,11 @@ The keyword `undef` is used to indicate that the `function` returns nothing.
 
 The current supported variables are
 
+- `close_stdin`
+
+    Tests should not attempt to read from STDIN (default: 1).
+    This is ignored on Windows, when never closes STDIN.
+
 - `test_nuls`, inject NUL bytes into strings (default: 1)
 
     With this test enabled, the function is expected to die when a NUL byte is passed in.
@@ -161,6 +166,10 @@ The current supported variables are
 - `test_undef`, test with undefined value (default: 1)
 - `test_empty`, test with empty strings (default: 1)
 - `test_non_ascii`, test with strings that contain non ascii characters (default: 1)
+- `timeout`, ensure tests don't hang (default: 10)
+
+    Setting this to 0 disables timeout testing.
+
 - `dedup`, fuzzing can create duplicate tests, go some way to remove duplicates (default: 1)
 - `properties`, enable [Test::LectroTest](https://metacpan.org/pod/Test%3A%3ALectroTest) Property tests (default: 0)
 
@@ -883,6 +892,7 @@ portion with a message.
       properties:
         enable: true
         trials: 200
+      close_stdin: true
       test_undef: no
       test_empty: no
       test_nuls: no
@@ -1029,6 +1039,8 @@ The generated test:
 
 # METHODS
 
+## generate
+
     generate($schema_file, $test_file)
 
 Takes a schema file and produces a test file (or STDOUT).
@@ -1085,3 +1097,16 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
 Portions of this module's initial design and documentation were created with the
 assistance of AI.
+
+# LICENCE AND COPYRIGHT
+
+Copyright 2025-2026 Nigel Horne.
+
+Usage is subject to licence terms.
+
+The licence terms of this software are as follows:
+
+- Personal single user, single computer use: GPL2
+- All other users (including Commercial, Charity, Educational, Government)
+  must apply in writing for a licence for use from Nigel Horne at the
+  above e-mail.

@@ -1,5 +1,23 @@
 Revision history for App-Test-Generator
 
+0.26	Mon Jan 12 07:57:54 EST 2026
+	Added strict_pod mode to SchemaExtractor, which croaks if it finds discrepancies between the POD and code
+	Improved detection of optional/required arguments
+	Improved detection of integer output types
+	Improved POD parser of parameters
+	Added --dry-run
+	Improved config validation
+	Better call of object methods in transforms
+	Test the sanity of Unicode outputs
+	Idempotent tests
+	Prevent silent duplicate method overwrites
+	Implement confidence_threshold
+	Refactor _detect_accessor_methods
+	Only generate one of call_code and position_code
+	Check for global side effects
+	Sanity test on DIES
+	Added timeout tests to ensure the test doesn't hang
+
 0.25	Thu Jan  1 15:41:06 EST 2026
 	Ternary ? 1 : 0 return is taken to be an indicator of boolean returns
 	Now parses this pod to know that it's supposed to return a string:

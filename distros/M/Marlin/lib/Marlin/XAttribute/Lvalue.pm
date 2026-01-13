@@ -5,7 +5,7 @@ use warnings;
 package Marlin::XAttribute::Lvalue;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012001';
+our $VERSION   = '0.013001';
 
 use attributes ();
 use Class::XSAccessor ();
@@ -33,6 +33,15 @@ after canonicalize_is => sub {
 	for my $thing ( qw/ reader accessor / ) {
 		delete $me->{$thing} if defined $me->{$thing} && $me->{$thing} eq $method_name;
 	}
+	
+	# We might have removed the reader and/or accessor, leaving this attribute
+	# without any reader, writer, accessor, predicate, or clearer, making it
+	# technically bare. That doesn't really matter to us, but if inflating to
+	# Moose, it will whine about a non-bare attribute which has no methods
+	# associated with it.
+	unless ( grep { defined $me->{$_} } qw/ reader writer accessor predicate clearer / ) {
+		$me->{is} = 'bare';
+	}
 };
 
 after install_accessors => sub {
@@ -49,6 +58,12 @@ after install_accessors => sub {
 		return;
 	}
 	
+	$me->install_coderef( $method_name, $me->Lvalue );
+};
+
+sub Lvalue {
+	my $me = shift;
+	
 	# inline_to_coderef doesn't actually expect any "sub{" and "}" to wrap
 	# the code and will add that itself, but we need to include that to add
 	# the ":lvalue" attribute. So we need to do this little trick afterwards
@@ -62,7 +77,55 @@ after install_accessors => sub {
 		}
 	} );
 	$coderef = $coderef->(); # Little trick
-	$me->install_coderef( $method_name, $coderef );
+}
+
+my $missing_mxlva_warning;
+after injected_metadata => sub {
+	my ( $me, $framework, $meta_attr ) = @_;
+	
+	return unless my $method = $me->{':Lvalue'}{method_name};
+	
+	if ( $framework eq 'Moose' ) {
+	
+		if ( not eval { require MooseX::LvalueAttribute; 1 } ) {
+			if ( not $missing_mxlva_warning++ ) {
+				require Carp;
+				Carp::carp('MooseX::LvalueAttribute is not installed');
+			}
+			return;
+		}
+		
+		require Moose::Util;
+		require MooseX::LvalueAttribute::Trait::Accessor;
+		require MooseX::LvalueAttribute::Trait::Attribute;
+		
+		Moose::Util::ensure_all_roles(
+			$meta_attr,
+			'MooseX::LvalueAttribute::Trait::Attribute',
+		);
+		
+		my $accessor = Moose::Meta::Method::Accessor->_new(
+			accessor_type => 'accessor',
+			attribute => $meta_attr,
+			name => $me->{slot},
+			body => defined( &{ $me->{package} . "::$method" } ) ? \&{ $me->{package} . "::$method" } : $me->Lvalue,
+			package_name => $me->{package},
+			definition_context => +{ %{ $meta_attr->{definition_context} } },
+		);
+		Moose::Util::ensure_all_roles(
+			$accessor,
+			'MooseX::LvalueAttribute::Trait::Accessor',
+		);
+		Scalar::Util::weaken( $accessor->{attribute} );
+		$meta_attr->associate_method( $accessor );
+		
+		my $meta_class = Moose::Util::find_meta($meta_attr->associated_class);
+		$meta_class->make_mutable;
+		$meta_class->add_method( $accessor->name, $accessor );
+		$meta_class->make_immutable;
+		
+		$me->injected_accessor_metadata( Moose => $accessor );
+	}
 };
 
 1;

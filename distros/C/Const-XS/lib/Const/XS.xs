@@ -91,16 +91,16 @@ int _is_readonly (SV * val) {
 	return SvREADONLY(val) ? 1 : 0;
 }
 
-void export (CV * cb, char * pkg, int pkg_len, char * method, int method_len) {
+void export (XSUBADDR_t cb, char * pkg, int pkg_len, char * method, int method_len) {
 	dTHX;
 	int name_len = pkg_len + method_len + 3;
 	char *name = (char *)malloc(name_len);
 	snprintf(name, name_len, "%s::%s", pkg, method);
-	newXS(name, cb, __FILE__); 
+	newXS(name, cb, __FILE__);
 	free(name);
 }
 
-void export_proto (CV * cb, char * pkg, int pkg_len, char * method, int method_len, char * proto) {
+void export_proto (XSUBADDR_t cb, char * pkg, int pkg_len, char * method, int method_len, char * proto) {
 	dTHX;
 	int name_len = pkg_len + method_len + 3;
 	char *name = (char *)malloc(name_len);

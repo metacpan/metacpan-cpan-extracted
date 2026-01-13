@@ -28,13 +28,14 @@ no_index:
 provides:
   Mojo::URL::Role::Auth:
     file: lib/Mojo/URL/Role/Auth.pm
-    version: v0.1.0
+    version: v0.1.2
 requires:
-  perl: '5.008001'
+  Mojolicious: '9.11'
+  perl: '5.026000'
 resources:
   bugtracker: https://github.com/vague666/Mojo-URL-Role-Auth/issues
   homepage: https://github.com/vague666/Mojo-URL-Role-Auth
   repository: https://github.com/vague666/Mojo-URL-Role-Auth.git
-version: 0.1.0
+version: 0.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

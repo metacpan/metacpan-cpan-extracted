@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.800;
 
-package App::perl::distrolint 0.08;
+package App::perl::distrolint 0.09;
 class App::perl::distrolint;
 
 use List::Util qw( max );

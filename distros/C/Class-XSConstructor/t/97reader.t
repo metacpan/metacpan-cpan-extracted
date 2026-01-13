@@ -5,18 +5,9 @@ use Test::Requires { 'Types::Standard' => '1.000000' };
 
 BEGIN {
 	package Local::Foo;
+	use Types::Standard 'Int';
 	use Class::XSConstructor 'foo';
-	use Types::Standard;
-	Class::XSConstructor::install_reader(
-		__PACKAGE__ . '::get_foo',
-		'foo',
-		1,
-		0,
-		sub { 42 },
-		15,
-		\&Types::Standard::is_Int,
-		undef,
-	);
+	use Class::XSReader foo => { reader => 'get_foo', isa => Int, default => sub { 42 } };
 };
 
 my $x = Local::Foo->new;
@@ -26,18 +17,9 @@ is_deeply( $x, bless({foo=>42}, 'Local::Foo') );
 
 BEGIN {
 	package Local::Foo2;
+	use Types::Standard 'Int';
 	use Class::XSConstructor 'foo';
-	use Types::Standard;
-	Class::XSConstructor::install_reader(
-		__PACKAGE__ . '::get_foo',
-		'foo',
-		1,
-		0,
-		sub { "Bad" },
-		15,
-		\&Types::Standard::is_Int,
-		undef,
-	);
+	use Class::XSReader foo => { reader => 'get_foo', isa => Int, default => sub { 'Bad' } };
 };
 
 my $y = Local::Foo2->new;

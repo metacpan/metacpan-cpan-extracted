@@ -56,8 +56,8 @@ my %config;
 my $have_yaml = eval { require YAML::XS; };
 
 my $config_file = $opt{C};
-$config_file = '.opcua_dump'
-    if not defined $opt{C} and -r '.opcua_dump';
+$config_file = '.opcua-dump'
+    if not defined $opt{C} and -r '.opcua-dump';
 
 if (not $have_yaml and defined $config_file) {
     die "missing YAML support for config file\n";
@@ -225,15 +225,15 @@ __END__
 
 =head1 NAME
 
-B<opcua_dump> - dump data from an OPC UA server
+B<opcua-dump> - dump data from an OPC UA server
 
 =head1 SYNOPSIS
 
-B<opcua_dump> [-C configfile] [URL]
+B<opcua-dump> [-C configfile] [URL]
 
 =head1 DESCRIPTION
 
-B<opcua_dump> connects to an OPC UA server and recursively browses the OPC UA
+B<opcua-dump> connects to an OPC UA server and recursively browses the OPC UA
 address space starting from the root folder (i=84).
 Read requests are made for the nodes for each attribute depending on the
 nodeclass.
@@ -253,7 +253,7 @@ The options are as follows:
 =item B<-C configfile>
 
 Read a config file from the specified path.
-If no config file was specified and a readable I<.opcua_dump> file is found in the
+If no config file was specified and a readable I<.opcua-dump> file is found in the
 current directory, that will be used.
 
 =back

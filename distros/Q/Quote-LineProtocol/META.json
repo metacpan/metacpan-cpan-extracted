@@ -1,0 +1,77 @@
+{
+   "abstract" : "Helper module for Lineprotocol quoting",
+   "author" : [
+      "vague <vague@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.28",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Quote-LineProtocol",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Syntax::Keyword::Match" : "0.08",
+            "Time::Moment" : "0.13",
+            "perl" : "v5.26.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Quote::LineProtocol" : {
+         "file" : "lib/Quote/LineProtocol.pm",
+         "version" : "v0.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vague666/Quote-LineProtocol/issues"
+      },
+      "homepage" : "https://github.com/vague666/Quote-LineProtocol",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vague666/Quote-LineProtocol.git",
+         "web" : "https://github.com/vague666/Quote-LineProtocol"
+      }
+   },
+   "version" : "0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

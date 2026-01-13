@@ -3,7 +3,7 @@ package Mojo::URL::Role::Auth;
 use Mojo::Base -role, -signatures;
 has [qw(username password)];
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.2';
 
 sub auth {
   my ($self, $user, $pass)  = @_;

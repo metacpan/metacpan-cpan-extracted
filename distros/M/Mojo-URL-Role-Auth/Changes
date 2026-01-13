@@ -1,5 +1,10 @@
 Revision history for Perl extension Mojo-URL-Role-Auth
 
+0.1.2 2026-01-12T22:15:32Z
+    Update cpanfile runtime dependencies
+0.1.1 2026-01-12T16:53:12Z
+    - Fixed library path in test
+
 0.1.0 2025-11-26T14:03:19Z
 
     - original version

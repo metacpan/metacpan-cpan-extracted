@@ -27,6 +27,7 @@ WriteMakefile(
 		'Config::Abstraction' => 0.36,
 		'Data::Dumper' => 0,
 		'Data::Section::Simple' => 0,
+		'File::Path' => 0,
 		'File::Spec' => 0,
 		'Getopt::Long' => 0,
 		'Module::Load::Conditional' => 0,
@@ -36,6 +37,7 @@ WriteMakefile(
 		'Pod::Simple' => 0,
 		'Pod::Usage' => 0,
 		'Return::Set' => 0.03,
+		're' => 0,
 		'Safe' => 0,
 		'Template' => 0,
 		'YAML::XS' => 0
@@ -46,6 +48,7 @@ WriteMakefile(
 		'Data::Random::String::Matches' => 0.02,
 		'Data::Random::Structure' => 0,
 		'Encode' => 0,
+		'FindBin' => 0,
 		'File::Temp' => 0,
 		'IPC::Run3' => 0,
 		'IPC::System::Simple' => 0,
@@ -58,6 +61,7 @@ WriteMakefile(
 		'Test::Returns' => 0.02,
 		'Unicode::Normalize' => 0,
 		'Unicode::GCString' => 0,
+		'Symbol' => 0,
 	}, dist => $dist,
 	clean	 => { FILES => 'App-Test-Generator-*' },
 	META_MERGE => {

@@ -34,7 +34,7 @@ $Data::Dumper::Indent=1;
 
 #  Version info
 #
-$VERSION='2.065';
+$VERSION='2.066';
 
 
 #  Get command line options, add them to environment so picked up

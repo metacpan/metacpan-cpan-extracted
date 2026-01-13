@@ -65,11 +65,13 @@
                          Default => $ARGS{CommentContent},
                          IncludeSignature => 0,
                          IncludeArticle => 0,
+                         Placeholder => loc('Type your comment here'),
                          ($width ? (Width => $width) : ()),
                          ($height ? (Height => $height) : ())
 &>
 % } else {
 <& /Elements/MessageBox, Name => 'CommentContent',
+                         Placeholder => loc('Type your comment here'),
                          ($width ? (Width => $width) : ()),
                          ($height ? (Height => $height) : ())
 &>

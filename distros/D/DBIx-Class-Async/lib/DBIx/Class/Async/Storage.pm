@@ -2,6 +2,7 @@ package DBIx::Class::Async::Storage;
 
 use strict;
 use warnings;
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -9,11 +10,11 @@ DBIx::Class::Async::Storage - Storage Layer for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.25
+Version 0.27
 
 =cut
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 =head1 SYNOPSIS
 
@@ -73,58 +74,120 @@ A new C<DBIx::Class::Async::Storage> object.
 
 sub new {
     my ($class, %args) = @_;
-    return bless \%args, $class;
+
+    # Standard DBIC storage expects a reference to the schema
+    my $self = bless {
+        _schema  => $args{schema},
+        async_db => $args{async_db}, # The worker pool engine
+    }, $class;
+
+    # WEAKEN the schema reference to prevent circular memory leaks
+    # that caused your "5 vs 2 processes" test failure.
+    weaken($self->{_schema}) if $self->{_schema};
+
+    return $self;
 }
 
 =head1 METHODS
 
-=head2 schema
+=head2 cursor
 
-    my $schema = $storage->schema;
+  my $cursor = $storage->cursor($resultset);
 
-Returns the associated schema object.
+Creates and returns a cursor object for iterating through a ResultSet's rows.
+
+This is an abstract method that must be implemented by storage subclasses
+(such as L<DBIx::Class::Async::Storage::DBI>). Calling this method directly
+on the base storage class will throw an error.
+
+B<Arguments>
 
 =over 4
 
-=item B<Returns>
-
-The L<DBIx::Class::Async::Schema> instance associated with this storage.
+=item * C<$resultset> - A L<DBIx::Class::Async::ResultSet> object
 
 =back
+
+B<Returns>
+
+A cursor object appropriate for the storage type. For DBI-based storage,
+this returns a L<DBIx::Class::Async::Storage::DBI::Cursor> object.
+
+  # Don't call on base class directly
+  my $cursor = $storage->cursor($rs);  # Dies!
+
+  # Use through a DBI storage subclass
+  my $dbi_storage = DBIx::Class::Async::Storage::DBI->new(...);
+  my $cursor = $dbi_storage->cursor($rs);  # Works!
+
+Subclasses should override this method to return storage-specific cursor
+implementations.
+
+=cut
+
+sub cursor {
+    my $self = shift;
+    die "Method 'cursor' must be implemented by a subclass of " . ref($self);
+}
+
+=head2 dbh
+
+  my $dbh = $storage->dbh;
+
+Returns C<undef> in async storage mode.
+
+Unlike traditional L<DBIx::Class::Storage>, the async storage layer does not
+maintain a database handle in the parent process. Instead, database handles
+are held by worker processes in the background worker pool, which execute
+queries asynchronously.
+
+This method exists for API compatibility with standard DBIx::Class storage
+objects, but always returns C<undef> to indicate that direct database handle
+access is not available in async mode.
+
+  my $storage = $schema->storage;
+  my $dbh = $storage->dbh;  # Always undef in async mode
+
+  if (!defined $dbh) {
+      say "Running in async mode - no direct DBH access";
+  }
+
+If you need to perform database operations, use the ResultSet and Row
+methods which handle async execution transparently through the worker pool.
+
+=cut
+
+sub dbh {
+    my $self = shift;
+    # In Async mode, the parent process doesn't hold a DBH.
+    return undef;
+}
+
+=head2 schema
+
+  my $schema = $storage->schema;
+
+Returns the L<DBIx::Class::Async::Schema> object that this storage layer
+is associated with.
+
+This provides a back-reference from the storage to its parent schema,
+allowing storage components to access schema-level information and other
+ResultSources when needed.
+
+Note: The schema reference is weakened internally to prevent circular
+reference memory leaks between the schema and storage objects.
+
+  my $storage = $schema->storage;
+  my $parent_schema = $storage->schema;
+
+  # Access schema configuration
+  my $source = $parent_schema->source('User');
 
 =cut
 
 sub schema {
     my $self = shift;
     return $self->{_schema};
-}
-
-=head2 dbh
-
-    my $dbh = $storage->dbh;
-
-Returns the database handle.
-
-=over 4
-
-=item B<Returns>
-
-Always returns C<undef> since C<DBIx::Class::Async> does not provide direct
-database handle access in the asynchronous architecture.
-
-=item B<Notes>
-
-This method exists for compatibility with L<DBIx::Class> but returns C<undef>
-because database operations are handled by a separate worker process.
-
-=back
-
-=cut
-
-sub dbh {
-    my $self = shift;
-    # Return undef since we don't have direct DB handle access
-    return undef;
 }
 
 =head2 disconnect
@@ -149,46 +212,11 @@ This method calls C<disconnect> on the associated schema object if it exists.
 
 sub disconnect {
     my $self = shift;
-    $self->{_schema}->disconnect if $self->{_schema};
+    # Delegate cleanup to the async engine
+    if ($self->{async_db} && $self->{async_db}->can('disconnect')) {
+        $self->{async_db}->disconnect;
+    }
     return 1;
-}
-
-=head2 debug
-
-    $storage->debug(1);
-    my $level = $storage->debug;
-
-Gets or sets the debug level.
-
-=over 4
-
-=item B<Parameters>
-
-=over 8
-
-=item C<$level>
-
-Optional debug level to set.
-
-=back
-
-=item B<Returns>
-
-The current debug level (defaults to 0).
-
-=item B<Notes>
-
-This is a no-op method provided for compatibility. Debugging in asynchronous
-contexts is typically handled differently.
-
-=back
-
-=cut
-
-sub debug {
-    my ($self, $level) = @_;
-    # No-op for compatibility
-    return $level || 0;
 }
 
 =head1 INTERNAL NOTES

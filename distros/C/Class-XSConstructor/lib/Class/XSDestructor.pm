@@ -6,7 +6,7 @@ use Class::XSConstructor ();
 package Class::XSDestructor;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.019000';
+our $VERSION   = '0.020000';
 
 sub import {
 	my $class = shift;
@@ -60,7 +60,8 @@ methods at every level of the inheritance hierarchy.
 
 =head1 SEE ALSO
 
-L<Class::XSConstructor>, L<Class::XSDelegation>, L<Class::XSAccessor>.
+L<Class::XSConstructor>, L<Class::XSDelegation>, L<Class::XSReader>,
+L<Class::XSAccessor>.
 
 =head1 AUTHOR
 

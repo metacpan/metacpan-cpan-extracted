@@ -1,5 +1,5 @@
 package Gears::Config;
-$Gears::Config::VERSION = '0.001';
+$Gears::Config::VERSION = '0.100';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -116,4 +116,167 @@ sub get ($self, $path, $default = undef)
 
 	return $current;
 }
+
+__END__
+
+=head1 NAME
+
+Gears::Config - Configuration management system
+
+=head1 SYNOPSIS
+
+	use Gears::Config;
+
+	my $config = Gears::Config->new(
+		readers => [Gears::Config::Reader::PerlScript->new],
+	);
+
+	# Add configuration from a file
+	$config->add(file => 'config.pl');
+
+	# Add configuration from a hash
+	$config->add(var => { database => { host => 'localhost' } });
+
+	# Get configuration values
+	my $host = $config->get('database.host');
+	my $port = $config->get('database.port', 3306);
+
+=head1 DESCRIPTION
+
+Gears::Config manages application configuration through a flexible merging
+system. It supports loading configuration from multiple sources using pluggable
+readers and provides a sophisticated merging mechanism with special operators
+for controlling how configuration is combined.
+
+Configuration is stored as nested hash structures and can be accessed using
+dot-separated paths. Multiple configuration sources can be merged together,
+with later sources modifying earlier ones according to merge rules.
+
+=head2 Merge operators
+
+Configuration keys can be prefixed with special operators to control merge
+behavior:
+
+=over
+
+=item * C<key> - Smart merges values
+
+Finds the what values are missing from the configuration and merges them.
+
+=item * C<+key> - Add to existing value
+
+For hashes, works the same as smart merging. For arrays, appends elements to
+the existing array regardless of them being present in the array.
+
+=item * C<-key> - Remove from existing value (arrays only)
+
+Removes matching elements from the array using deep comparison.
+
+=item * C<=key> - Replace existing value
+
+Forces replacement even if the types don't match. Without this operator, trying
+to merge mismatched types raises an exception.
+
+=back
+
+Examples:
+
+	# Original config
+	{ users => ['alice', 'bob'] }
+
+	# Smart merge
+	{ users => ['bob', 'charlie'] }
+	# Result: { users => ['alice', 'bob', 'charlie'] }
+
+	# Merge with +users (or just users)
+	{ '+users' => ['bob', 'charlie'] }
+	# Result: { users => ['alice', 'bob', 'bob', 'charlie'] }
+
+	# Merge with -users
+	{ '-users' => ['bob'] }
+	# Result: { users => ['alice'] }
+
+	# Merge with =users
+	{ '=users' => { admin => 'alice' } }
+	# Result: { users => { admin => 'alice' } }
+
+=head1 INTERFACE
+
+=head2 Attributes
+
+=head3 readers
+
+An array reference of L<Gears::Config::Reader> instances used to parse
+configuration files. By default, includes L<Gears::Config::Reader::PerlScript>.
+
+I<Available in constructor>
+
+=head3 config
+
+The internal hash reference containing the merged configuration data.
+
+I<Not available in constructor>
+
+=head2 Methods
+
+=head3 new
+
+	$object = $class->new(%args)
+
+A standard Mooish constructor. Consult L</Attributes> section to learn what
+keys can key passed in C<%args>.
+
+=head3 add
+
+	$config = $config->add($source_type, $source)
+
+Adds and merges configuration from a source. The C<$source_type> can be:
+
+=over
+
+=item * C<file> - Load from a file using an appropriate reader
+
+=item * C<var> - Use the provided hash reference directly
+
+=back
+
+Returns the configuration object for method chaining.
+
+Example:
+
+	$config->add(file => 'app.pl')
+		->add(var => { debug => true });
+
+=head3 parse
+
+	$hash_ref = $config->parse($source_type, $source)
+
+Parses a configuration source and returns the resulting hash reference without
+merging it into the current configuration. Uses the same C<$source_type> values
+as L</add>.
+
+Raises C<Gears::X::Config> if no reader can handle the file or if the source
+type is unknown.
+
+=head3 merge
+
+	$config->merge($hash_ref)
+
+Merges the provided hash reference into the current configuration. This is the
+core merging logic used by L</add>. The merge behavior can be controlled using
+special key prefixes (see L</Merge operators>).
+
+=head3 get
+
+	$value = $config->get($path, $default = undef)
+
+Retrieves a configuration value using a dot-separated path. If the path doesn't
+exist, returns C<$default>.
+
+Examples:
+
+	$config->get('database.host')
+	$config->get('cache.ttl', 3600)
+
+Raises C<Gears::X::Config> if the path traverses through a non-hash value.
 

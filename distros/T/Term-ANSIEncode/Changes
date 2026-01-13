@@ -79,7 +79,7 @@
 1.24    Aug 23, 2025
 
         Fixed issue not opening text files in binary mode for special unicode
-		letters.
+        letters.
 
 1.25    Aug 27, 2025
 
@@ -88,16 +88,16 @@
 1.26    Aug 28, 2025
 
         Apparently my new testing methodology ticked off some CPAN testers.
-		So I'll relax them a bit.
+        So I'll relax them a bit.
 
         Changed the license.
 
 1.27    Aug 10, 2025
 
         Fixed a runaway loop in "-t" output.
-		
-		Removed the "one character at a time" output left over from the
-		old BBS Universal code.  Output is much faster now.
+        
+        Removed the "one character at a time" output left over from the
+        old BBS Universal code.  Output is much faster now.
 
 1.28    Aug 10, 2025
 
@@ -134,16 +134,16 @@
 1.36    Oct 28, 2025
 
         Changed the tokens and help screen.  Added more descriptions including
-		Indication of original 16 colors for limited terminals.
+        Indication of original 16 colors for limited terminals.
 
 1.37    Oct 29, 2025
 
         Tokens output defaults to only the 16 colors and the new "expanded"
-		option will show all color tokens.
-		
-		Unicode output defaults to a squashed output and the new "expanded"
-		option will show dividers between each row to better discern symbol
-		output.
+        option will show all color tokens.
+        
+        Unicode output defaults to a squashed output and the new "expanded"
+        option will show dividers between each row to better discern symbol
+        output.
 
 1.38    Oct 30, 2025
 
@@ -156,27 +156,27 @@
 1.40    Nov 02, 2025
 
         The "expanded" option is removed.  It now depends on the COLORTERM
-		environment variable and the "truecolor" value.
+        environment variable and the "truecolor" value.
 
 1.41    Nov 02, 2025
 
         Version 1.40 removed from CPAN.  The "--expanded" option re-added.
-		However, the default is to respond to the "COLORTERM" enviroment
-		value.  The "--expanded" option reverses the default.
+        However, the default is to respond to the "COLORTERM" enviroment
+        value.  The "--expanded" option reverses the default.
 
-		Note:  "--expanded" only applies to the "--tokens" option.
+        Note:  "--expanded" only applies to the "--tokens" option.
 
 1.42    Nov 06, 2025
 
         Ok, I know it's frustrating, but I completely removed the "expanded"
-		option.  Full detection of 256 color and truecolor capability has been
-		implemented.
+        option.  Full detection of 256 color and truecolor capability has been
+        implemented.
 
 1.43    Nov 06, 2025
 
         The "tokens" option has a more informative output for all of the
-		various color types.  This had the side effect of more available
-		tokens.
+        various color types.  This had the side effect of more available
+        tokens.
 
 1.44    Nov 06, 2025
 
@@ -188,7 +188,7 @@
 
         Added "ansi-modes" option to show supported ANSI color support.
 
-		Changed version handling
+        Changed version handling
 
 1.46    Nov 14, 2025
 
@@ -206,7 +206,7 @@
 1.49    Dec 09, 2025
 
         Revamped the -t tokens table
-		Added "UNDERLINE COLOR" token for terminals that support it.
+        Added "UNDERLINE COLOR" token for terminals that support it.
 
 1.50    Dec 11, 2025
 
@@ -248,24 +248,24 @@
 
         More memory friendly.
 
-		THIS VERSION WAS REMOVED
+        THIS VERSION WAS REMOVED
 
 1.60    Dec 28, 2025
 
         Yikes!  1.59 had bugs.  I could swear it worked, but obviously it had issues.
-		There were also typos in the manual page.
+        There were also typos in the manual page.
 
         Hopefully all of the bugs, typos and other issues are fixed now.
 
         Note, in the "-t" or "--tokens" option of the "ansi-encode" executable,
-		the labeling of the colors are changed.
+        the labeling of the colors are changed.
 
 1.61    Dec 28, 2025
 
         Changed ANSI color description format in the tokens output of the
-		"ansi-encode" script.
+        "ansi-encode" script.
 
-		Updated the manual page.
+        Updated the manual page.
 
 1.62    Jan 03, 2026
 
@@ -274,5 +274,30 @@
 1.63    Jan 06, 2025
 
         Added "WRAP text ENDWRAP" and "JUSTIFIED text ENDJUSTIFIED" tokens.
-		Added a baud rate feature for showing animated ANSI screens at the
-		correct speed.
+        Added a baud rate feature for showing animated ANSI screens at the
+        correct speed.
+
+1.69    Jan 12, 2026
+
+        Moved the color list to the library and removed from the main script.
+        Improved the color list.
+
+1.70    Jan 13, 2026
+
+        Compacted color listing
+
+1.71    Jan 13, 2026
+
+        Color listing will fix on narrow screens.
+
+1.72    Jan 13, 2026
+
+        Made tokens option fit on narrow screens.
+
+1.73    Jan 13, 2026
+
+        Optimized the ansi_colors method.
+
+1.74    Jan 13, 2026
+
+        Whoops, I left the debug code enabled.

@@ -14,10 +14,7 @@ use File::Path qw(make_path);
 use Safe;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.25';
-
-# Configure YAML::XS to not quote numeric strings
-$YAML::XS::QuoteNumericStrings = 0;
+our $VERSION = '0.26';
 
 =head1 NAME
 
@@ -25,7 +22,7 @@ App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =head1 SYNOPSIS
 
@@ -49,7 +46,7 @@ method behaviors directly from your source code.
 
 =head2 Analysis Methods
 
-The extractor combines multiple analysis approaches for comprehensive schema generation:
+The extractor combines multiple analysis approaches for a comprehensive schema generation:
 
 =over 4
 
@@ -477,7 +474,7 @@ Extracts defaults from multiple Perl idioms:
 
 =item * Unless conditional: C<$param = 'default' unless defined $param>
 
-=item * Chained defaults: C<$param = $param || $self->{default} || 'fallback'>
+=item * Chained defaults: C<$param = $param || $self->{_default} || 'fallback'>
 
 =item * Multi-line patterns: C<$param = {} unless $param>
 
@@ -1152,6 +1149,7 @@ The extractor supports several configuration parameters:
         include_private     => 1,                  # Default: 0
         max_parameters      => 50,                 # Default: 20
         confidence_threshold => 0.7,               # Default: 0.5
+	strict_pod	=> 0|1|2,	# Default: 0 (off)
     );
 
 =cut
@@ -1159,13 +1157,16 @@ The extractor supports several configuration parameters:
 sub new {
 	my ($class, %args) = @_;
 
+	croak(__PACKAGE__, ': input_file required') unless exists $args{input_file};
+
 	my $self = {
-		input_file => ($args{input_file} || die 'input_file required'),
+		input_file => $args{input_file},
 		output_dir => $args{output_dir} || 'schemas',
-		verbose	=> $args{verbose} || 0,
-		confidence_threshold => $args{confidence_threshold} || 0.5,
-		include_private => $args{include_private} || 0,	# include _private methods
-		max_parameters => $args{max_parameters} || 20,	# safety limit
+		verbose	=> $args{verbose} // 0,
+		confidence_threshold => $args{confidence_threshold} // 0.5,
+		include_private => $args{include_private} // 0,	# include _private methods
+		max_parameters => $args{max_parameters} // 20,	# safety limit
+		strict_pod => _validate_strictness_level($args{strict_pod}),  # Enable strict POD checking
 	};
 
 	# Validate input file exists
@@ -1182,12 +1183,52 @@ Extract schemas for all methods in the module.
 
 Returns a hashref of method_name => schema.
 
+The extraction process performs comprehensive validation of the agreement between
+POD documentation and the actual code, controlled by the C<strict_pod> option
+specified in the constructor. This validation operates at three distinct levels:
+
+=over 4
+
+=item * C<0> (default, no validation)
+
+No POD/code validation is performed. Any disagreements between the documented
+parameters in POD and the actual parameters in the code are silently ignored.
+The extractor proceeds with schema generation regardless of inconsistencies.
+
+=item * C<1> (warning mode)
+
+Validation errors are collected and attached to each method's schema under the
+C<_pod_validation_errors> key. The extraction continues even when errors are found,
+allowing batch processing and comprehensive reporting. Errors include:
+  - Parameters documented in POD but not found in code signatures
+  - Parameters present in code but undocumented in POD
+  - Type mismatches (incompatible types flagged as "Type mismatch")
+  - Type differences (compatible but different types flagged as "Type difference")
+  - Optional/required status disagreements
+  - Constraint mismatches (min/max bounds, regex patterns)
+
+=item * C<2> (strict mode)
+
+The extraction immediately C<croak>s when the first validation error is encountered,
+providing a detailed error message. This mode is useful for enforcing documentation
+quality in development pipelines or CI/CD processes. Even compatible type differences
+(such as POD "integer" vs. code "number") will trigger failure in this mode.
+
+=back
+
+Validation checks encompass parameter existence, type compatibility, optional/required
+status, and constraint consistency. The system distinguishes between "compatible"
+type differences (e.g., "integer" and "number", "array" and "arrayref") which are
+tolerated in warning mode but still reported, and "incompatible" type mismatches
+(e.g., "string" vs. "hashref") which are always flagged as errors. A comprehensive
+validation report can be generated using the C<generate_pod_validation_report> method.
+
 =head3 Pseudo Code
 
   FOREACH method
   DO
-	analyze the method
-	write a schema file for that method
+    analyze the method
+    write a schema file for that method
   END
 
 =cut
@@ -1196,6 +1237,7 @@ sub extract_all {
 	my $self = $_[0];
 
 	$self->_log("Parsing $self->{input_file}...");
+	$self->_log("Strict POD mode: " . (qw(off warn fatal))[$self->{strict_pod}]);
 
 	my $document = PPI::Document->new($self->{input_file}) or die "Failed to parse $self->{input_file}: $!";
 
@@ -1206,7 +1248,7 @@ sub extract_all {
 	$self->_log("Package: $package_name");
 
 	my $methods = $self->_find_methods($document);
-	$self->_log("Found " . scalar(@$methods) . ' methods');
+	$self->_log('Found ' . scalar(@$methods) . ' methods (pre-dedup)');
 
 	my %schemas;
 	foreach my $method (@{$methods}) {
@@ -1235,8 +1277,13 @@ sub _extract_package_name {
 	if(!defined($document)) {
 		$document = $self->{_document};
 	}
-	my $package_stmt = $document->find_first('PPI::Statement::Package');
-	return $package_stmt ? $package_stmt->namespace : 'Unknown';
+	my $pkgs = $document->find('PPI::Statement::Package') || [];
+	if(@$pkgs == 0) {
+		my $package_stmt = $document->find_first('PPI::Statement::Package');
+		return $package_stmt ? $package_stmt->namespace() : '';
+	}
+	croak('More than one package declaration found') if @$pkgs > 1;
+	return $pkgs->[0]->namespace();
 }
 
 =head2 _find_methods
@@ -1252,11 +1299,13 @@ sub _find_methods {
 	my ($self, $document) = @_;
 
 	my $subs = $document->find('PPI::Statement::Sub') || [];
-	my $sub_decls = $document->find('PPI::Statement::Scheduled') || []; # for method modifiers
+	my $sub_decls = $document->find('PPI::Statement') || [];
 
 	my @methods;
 	foreach my $sub (@$subs) {
 		my $name = $sub->name();
+
+		next unless defined $name;	# Skip anonymous routines
 
 		# Skip private methods unless explicitly included, or they're special
 		if ($name =~ /^_/ && $name !~ /^_(new|init|build)/) {
@@ -1278,14 +1327,14 @@ sub _find_methods {
 	# Look for class { method } syntax (Perl 5.38+)
 	my $content = $document->content();
 	if ($content =~ /\bclass\b/) {
-		$self->_log("  Detecting class/method syntax...");
+		$self->_log('  Detecting class/method syntax...');
 		$self->_extract_class_methods($content, \@methods);
 	}
 
 	# Process method modifiers (Moose)
 	foreach my $decl (@$sub_decls) {
 		my $content = $decl->content;
-		if ($content =~ /^(before|after|around)\s+['"]?(\w+)['"]?\s*/) {
+		if ($content =~ /^\s*(before|after|around)\s+['"]?(\w+)['"]?\b/) {
 			my ($modifier, $method_name) = ($1, $2);
 			my $full_name = "${modifier}_$method_name";
 
@@ -1311,11 +1360,25 @@ sub _find_methods {
 		}
 	}
 
+	# Prevent silent duplicate method overwrites
+	my %seen;
+	@methods = grep {
+		my $n = $_->{name};
+		if ($seen{$n}++) {
+			$self->_log("  WARNING: duplicate method '$n' ignored");
+			0;
+		} else {
+			1;
+		}
+	} @methods;
+
 	return \@methods;
 }
 
 sub _extract_class_methods {
 	my ($self, $content, $methods) = @_;
+
+	# EXPERIMENTAL: regex-based parsing, may misbehave on complex code
 
 	# Simple pattern: find "class Name {" blocks
 	# This won't handle all edge cases but will work for simple classes
@@ -1333,6 +1396,8 @@ sub _extract_class_methods {
 			$depth-- if $char eq '}';
 			$class_end++;
 		}
+
+		next if $depth != 0;  # unbalanced braces, skip class
 
 		my $class_body = substr($content, $start_pos, $class_end - $start_pos - 1);
 
@@ -1361,7 +1426,8 @@ sub _extract_class_methods {
 			push @$methods, {
 				name => $method_name,
 				node => undef,
-				body => $fake_sub,  # Just the signature for now
+				body => $fake_sub,	# Just the signature for now
+				is_stub => 1,
 				pod => '',
 				type => 'method',
 				class => $class_name,
@@ -1384,25 +1450,29 @@ sub _extract_pod_before {
 
 	my $pod = '';
 	my $current = $sub->previous_sibling();
+	my $seen_code = 0;
+	my $steps = 0;
 
 	# Walk backwards collecting POD
-	while ($current) {
+	while ($current && $steps++ < 200) {
 		if ($current->isa('PPI::Token::Pod')) {
-			$pod = $current->content . $pod;
-					} elsif ($current->isa('PPI::Token::Comment')) {
+			$pod = $current->content() . $pod;
+		} elsif ($current->isa('PPI::Token::Comment')) {
 			# Include comments that might contain parameter info
-			my $comment = $current->content;
+			my $comment = $current->content();
 			if ($comment =~ /#\s*(?:param|arg|input)\s+\$(\w+)\s*:\s*(.+)/i) {
 				$pod .= "=item \$$1\n$2\n\n";
 			}
 		} elsif ($current->isa('PPI::Token::Whitespace') ||
 			 $current->isa('PPI::Token::Separator')) {
 			# Skip whitespace and separators
+		} elsif ($current->isa('PPI::Statement::Include')) {
+			# allow 'use strict', 'use warnings' between POD and sub
 		} else {
 			# Hit non-POD, non-whitespace - stop
 			last;
 		}
-		$current = $current->previous_sibling;
+		$current = $current->previous_sibling();
 	}
 
 	return $pod;
@@ -1446,6 +1516,37 @@ sub _analyze_method {
 	# Analyze different sources
 	my $pod_params = $self->_analyze_pod($pod);
 	my $code_params = $self->_analyze_code($code);
+
+	# Validate POD/code agreement if strict mode is enabled
+	if ($self->{strict_pod}) {
+		my @validation_errors = $self->_validate_pod_code_agreement(
+			$pod_params,
+			$code_params,
+			$method->{name},
+			{
+				ignore_self => 1,
+				allow_renames => 1,
+			}
+		);
+
+		if (@validation_errors) {
+			my $error_msg = "POD/Code disagreement in method '$method->{name}':\n  " .
+				join("\n  ", @validation_errors);
+
+			# Add to schema for reference even if we croak
+			$schema->{_pod_validation_errors} = \@validation_errors;
+
+			# Either croak immediately or log based on configuration
+			if ($self->{strict_pod} == 2) {  # 2 = fatal errors
+				croak("[POD STRICT] $error_msg");
+			} else {  # 1 = warnings
+				carp("[POD STRICT] $error_msg");
+				# Continue with analysis but mark as problematic
+				$schema->{_pod_disagreement} = 1;
+			}
+		}
+		$schema->{_strict_pod_level} = $self->{strict_pod};
+	}
 
 	my $validator_params = $self->_extract_validator_schema($code);
 
@@ -1493,14 +1594,12 @@ sub _analyze_method {
 	$schema->{_notes} = $self->_generate_notes($schema->{input});
 
 	# Add analytics
-	$schema->{_analysis} = {
-		input_confidence => $input_confidence->{level},
-		output_confidence => $output_confidence->{level},
-		confidence_factors => {
-			input => $input_confidence->{factors},
-			output => $output_confidence->{factors}
-		}
-	};
+	$schema->{_analysis} ||= {};
+	$schema->{_analysis}{input_confidence} = $input_confidence->{level};
+	$schema->{_analysis}{output_confidence} = $output_confidence->{level};
+	$schema->{_analysis}{confidence_factors} ||= {};
+	$schema->{_analysis}{confidence_factors}{input} ||= $input_confidence->{factors};
+	$schema->{_analysis}{confidence_factors}{output} ||= $output_confidence->{factors};
 
 	foreach my $mode('input', 'output') {
 		$self->_set_defaults($schema, $mode);
@@ -1524,6 +1623,8 @@ sub _analyze_method {
 	);
 
 	# Overall is the lower of input and output
+	$input_level //= 'none';
+	$output_level //= 'none';
 	my $overall = $level_rank{$input_level} < $level_rank{$output_level} ? $input_level : $output_level;
 
 	$schema->{_analysis}{overall_confidence} = $overall;
@@ -1565,11 +1666,15 @@ sub _analyze_method {
 		# Do not override existing hints
 		$schema->{_yamltest_hints}{boundary_values} ||= [];
 
-		my %seen = map { $_ => 1 } @{ $schema->{_yamltest_hints}{boundary_values} };
+		my %seen = map { (defined $_ ? $_ : '__undef__') => 1 }
+			@{ $schema->{_yamltest_hints}{boundary_values} };
 
 		foreach my $v (@{ $self->_numeric_boundary_values }) {
 			push @{ $schema->{_yamltest_hints}{boundary_values} }, $v
 			unless $seen{$v}++;
+
+			my $key = defined $v ? $v : '__undef__';
+			push @{ $schema->{_yamltest_hints}{boundary_values} }, $v unless $seen{$key}++;
 		}
 
 		$self->_log('  HINTS: Added numeric boundary values');
@@ -1583,6 +1688,11 @@ sub _analyze_method {
 		}
 	}
 
+	if(($level_rank{$overall} < $level_rank{medium}) &&
+	   ($level_rank{$overall} < ($self->{confidence_threshold} * 4))) {
+		$schema->{_low_confidence} = 1
+	}
+
 	return $schema;
 }
 
@@ -1594,6 +1704,7 @@ sub _method_has_numeric_intent {
 
 	# Numeric inputs
 	foreach my $p (values %{ $schema->{input} || {} }) {
+		next if $p->{optional};
 		return 1 if ($p->{type} && $p->{type} =~ /^(number|integer)$/);
 	}
 
@@ -1608,39 +1719,92 @@ sub _detect_accessor_methods {
 	my ($self, $method, $schema) = @_;
 
 	my $body = $method->{body};
-	# my $name = $method->{name};
 
-	# Simple getter: return $self->{field};
-	if ($body =~ /return\s+\$self\s*->\s*\{([^}]+)\}\s*;/) {
-		$schema->{_accessor} = { type => 'getter', field => $1 };
-		$self->_log("  Detected getter accessor for field: $1");
-	}
-	# Setter: $self->{field} = $value; return $self;
-	elsif ($body =~ /\$self\s*->\s*\{([^}]+)\}\s*=\s*\$(\w+)\s*;/ && $body =~ /return\s+\$self\s*;/) {
-		my ($field, $param) = ($1, $2);
-		if (defined $field && defined $param) {
-			$schema->{_accessor} = { type => 'setter', field => $field, param => $param };
-			$self->_log("  Detected setter accessor for field: $field");
-		}
-	}
-	# Getter/Setter combination
-	elsif ($body =~ /if\s*\(\s*\@_\s*>\s*1\s*\)/ &&
-	       $body =~ /\$self\s*->\s*\{([^}]+)\}\s*=\s*shift\s*;/ &&
-	       $body =~ /return\s+\$self\s*->\s*\{[^}]+\}\s*;/) {
+	# Normalize whitespace for regex sanity
+	my $code = $body;
+	$code =~ s/\s+/ /g;
+
+	# -------------------------------
+	# Getter
+	# -------------------------------
+	if ($code =~ /(?:return\s+)?\$self\s*->\s*\{\s*['"]?([^}'"]+)['"]?\s*\}\s*;/) {
 		my $field = $1;
-		if (defined $field) {
-			$schema->{_accessor} = { type => 'getset', field => $field };
-			$self->_log("  Detected getter/setter accessor for field: $field");
-		}
+
+		$schema->{_accessor} = {
+			type => 'getter',
+			field => $field,
+		};
+
+		$self->_log("  Detected getter accessor for field: $field");
+
+		$schema->{input} = {};
+		$schema->{input_style} = 'none';
+		$schema->{_confidence}{input} = {
+			level => 'high',
+			factors => ['Detected getter/accessor method'],
+		};
+
+		return; # hard stop
 	}
 
-	if ($schema->{_accessor}) {
-		if ($schema->{_accessor}{type} eq 'setter') {
-			my $param = $schema->{_accessor}{param};
-			if (defined $param) {
-				$schema->{input}{$param} ||= { type => 'scalar' };
-			}
-		}
+	# -------------------------------
+	# Setter
+	# -------------------------------
+	if (
+		$code =~ /\$self\s*->\s*\{\s*['"]?([^}'"]+)['"]?\s*\}\s*=\s*\$(\w+)\s*;/ &&
+		$code =~ /return\s+\$self\b/
+	) {
+		my ($field, $param) = ($1, $2);
+
+		$schema->{_accessor} = {
+			type => 'setter',
+			field => $field,
+			param => $param,
+		};
+
+		$self->_log("  Detected setter accessor for field: $field");
+
+		$schema->{input} = {
+			$param => { type => 'string' }, # safe default
+		};
+		$schema->{input_style} = 'hash';
+
+		$schema->{_confidence}{input} = {
+			level => 'high',
+			factors => ['Detected setter/accessor method'],
+		};
+
+		return;
+	}
+
+	# -------------------------------
+	# Getter/Setter combo
+	# -------------------------------
+	if (
+		$code =~ /if\s*\(\s*\@_\s*>\s*1\s*\)/ &&
+		$code =~ /\$self\s*->\s*\{\s*['"]?([^}'"]+)['"]?\s*\}\s*=\s*shift\s*;/ &&
+		$code =~ /return\s+\$self\s*->\s*\{/
+	) {
+		my $field = $1;
+
+		$schema->{_accessor} = {
+			type => 'getset',
+			field => $field,
+		};
+
+		$self->_log("  Detected getter/setter accessor for field: $field");
+
+		$schema->{input} = {
+			value => { type => 'string', optional => 1 },
+		};
+		$schema->{input_style} = 'hash';
+
+		$schema->{_confidence}{input} = {
+			level => 'high',
+			factors => ['Detected combined getter/setter accessor'],
+		};
+
+		return;
 	}
 }
 
@@ -1648,10 +1812,12 @@ sub _detect_accessor_methods {
 sub _extract_validator_schema {
 	my ($self, $code) = @_;
 
-	return $self->_extract_pvs_schema($code)
-		|| $self->_extract_pv_schema($code)
-		# || $self->_extract_type_params_schema($code)
-		|| $self->_extract_moosex_params_schema($code);
+	for my $extractor ('_extract_pvs_schema', '_extract_pv_schema', '_extract_moosex_params_schema') {
+		my $res = $self->$extractor($code);
+		return $res if ($res && ref($res) eq 'HASH' && keys %{ $res->{input} || {} });
+	}
+
+	return;
 }
 
 sub _parse_schema_hash {
@@ -1661,50 +1827,56 @@ sub _parse_schema_hash {
 
 	for my $child ($hash->children) {
 		# skip whitespace and operators
-		next if $child->isa('PPI::Token::Whitespace') || $child->isa('PPI::Token::Operator');
-
 		if ($child->isa('PPI::Statement') || $child->isa('PPI::Statement::Expression')) {
-			my $key;
-			my $val;
+			my ($key, $val);
 
-			my @tokens = $child->children;
+			my @tokens = grep {
+				!$_->isa('PPI::Token::Whitespace') &&
+				!$_->isa('PPI::Token::Operator')
+			} $child->children;
 
-			# find key => value
-			for (my $i = 0; $i < @tokens; $i++) {
-				my $t = $tokens[$i];
-				if ($t->isa('PPI::Token::Word') || $t->isa('PPI::Token::Symbol')) {
-					$key = $t->content;
-				}
-				if ($t->isa('PPI::Structure::Constructor')) {
-					$val = $t;
+			for (my $i = 0; $i < @tokens - 1; $i++) {
+				if(($tokens[$i]->isa('PPI::Token::Word') || $tokens[$i]->isa('PPI::Token::Quote')) &&
+				   $tokens[$i+1]->isa('PPI::Structure::Constructor')) {
+					$key = $tokens[$i]->content;
+					$key =~ s/^['"]|['"]$//g;
+					$val = $tokens[$i+1];
 					last;
 				}
 			}
 
-			if ($key && $val) {
-				# process inner hash (type, optional)
-				my %param;
-				for my $inner ($val->children) {
-					next if $inner->isa('PPI::Token::Whitespace') || $inner->isa('PPI::Token::Operator');
-					if ($inner->isa('PPI::Statement') || $inner->isa('PPI::Statement::Expression')) {
-						my ($k_token, $op, $v_token) = $inner->children;
-						my $k = $k_token->content;
-						my $v = $v_token->isa('PPI::Token::Word') ? $v_token->content : undef;
+			next unless $key && $val;
 
-						if ($k eq 'type') {
-							$param{type} = lc($v // 'string'); # Str -> string
-						} elsif ($k eq 'optional') {
-							$param{optional} = $v eq '1' ? 1 : 0;
-						}
-					}
+			my %param;
+			for my $inner ($val->children) {
+				next unless $inner->isa('PPI::Statement') || $inner->isa('PPI::Statement::Expression');
+
+				my ($k, undef, $v) = grep {
+					!$_->isa('PPI::Token::Whitespace') &&
+					!$_->isa('PPI::Token::Operator')
+				} $inner->children;
+
+				next unless $k && $v;
+
+				my $keyname = $k->content;
+				my $value   = $v->can('content') ? $v->content : undef;
+				$value =~ s/^['"]|['"]$//g if defined $value;
+
+				if ($keyname eq 'type') {
+					$param{type} = lc($value);
+				} elsif ($keyname eq 'optional') {
+					$param{optional} = $value ? 1 : 0;
+				} elsif ($keyname =~ /^(min|max)$/ && looks_like_number($value)) {
+					$param{$keyname} = 0 + $value;
+				} elsif ($keyname eq 'matches') {
+					$param{matches} = qr/$value/;
 				}
-
-				# defaults
-				$param{type}     //= 'string';
-				$param{optional} //= 0;
-
-				$result{$key} = \%param;
 			}
+
+			$param{type}     //= 'string';
+			$param{optional} //= 0;
+
+			$result{$key} = \%param;
 		}
 	}
 
@@ -1725,9 +1897,11 @@ sub _ppi {
 	my ($self, $code) = @_;
 
 	return $code if ref($code) && $code->can('find');
-	return PPI::Document->new(\$code);
-}
 
+	$self->{_ppi_cache} ||= {};
+	return $self->{_ppi_cache}{$code} //= PPI::Document->new(\$code);
+}
+		
 # Params::Validate::Strict
 sub _extract_pvs_schema {
 	my ($self, $code) = @_;
@@ -1846,7 +2020,7 @@ sub _extract_pv_schema
 		return $self->_normalize_validator_schema($schema) if $schema;
 	}
 
-	if($code =~ /validate_strict\s*\(\s*(\{.*?\})\s*\)/s) {
+	if($code =~ /validate\s*\(\s*(\{.*?\})\s*\)/s) {
 		my $schema_text = $1;
 		my $schema = $self->_parse_schema_hash($schema_text);
 		return {
@@ -1884,6 +2058,7 @@ sub _parse_pv_call {
 			$depth++;
 		} elsif ($char eq '}') {
 			$depth--;
+			return if $depth < 0;	# Broken source code
 		} elsif ($char eq ',' && $depth == 0) {
 			$comma_pos = $i;
 			last;
@@ -1997,7 +2172,7 @@ sub _extract_moosex_params_schema
 		return $self->_normalize_validator_schema($schema) if $schema;
 	}
 
-	if($code =~ /validate_strict\s*\(\s*(\{.*?\})\s*\)/s) {
+	if($code =~ /validated_hash\s*\(\s*(\{.*?\})\s*\)/s) {
 		my $schema_text = $1;
 		my $schema = $self->_parse_schema_hash($schema_text);
 		return {
@@ -2020,7 +2195,7 @@ sub _normalize_validator_schema {
 
 		$input{$name} = {
 			%$spec,
-			optional => $spec->{optional} // 0,
+			optional => exists $spec->{optional} ? $spec->{optional} : 0,
 			_source => 'validator',
 			_type_confidence => 'high',
 		};
@@ -2063,9 +2238,9 @@ sub _analyze_pod {
 
 		# Assign positions
 		foreach my $param (@sig_params) {
-			$params{$param}{position} = $position_counter unless(exists($params{$param}{position}));
-			$position_counter++;
+			$params{$param}{position} //= $position_counter;
 			$self->_log("  POD: $param has position $params{$param}{position}");
+			$position_counter++;
 		}
 	}
 
@@ -2074,7 +2249,7 @@ sub _analyze_pod {
 	# Pattern 1: Parse line-by-line in Parameters section
 	# First, extract the Parameters section
 	my $param_section;
-	if ($pod =~ /(?:Parameters?|Arguments?|Inputs?):?\s*\n(.*?)(?=\n\n|\n=[a-z]|$)/si) {
+	if($pod =~ /(?:Parameters?|Arguments?|Inputs?):?\s*\n((?:\s*\$.*\n)+)/si) {
 		$param_section = $1;
 	} elsif ($pod =~ /^=head\d+\s+(?:Parameters?|Arguments?|Inputs?)\b.*?\n(.*?)(?=^=head|\Z)/msi) {
 		$param_section = $1;
@@ -2195,10 +2370,14 @@ sub _analyze_pod {
 					($constraint ? " ($constraint)" : ''));
 	}
 
-	# Pattern 3: Parse =over /=item list
-	if ($pod =~ /=over\b.*?=item\s+\$(\w+)\s*\n(.*?)(?==item\s+\$|\=back)/sig) {
+	# Pattern 3: Parse =over /=item list (supports bullets and C<>)
+	while ($pod =~ /=item\s+(?:\*\s*)?(?:C<)?\$(\w+)\b(?:>)?\s*(?:-.*)?\n?(.*?)(?==item|\=back|\=head)/sig) {
 		my $name = $1;
 		my $desc = $2;
+
+		# Never allow empty or undefined parameter names
+		next unless defined $name && length $name;
+
 		$desc =~ s/^\s+|\s+$//g;
 
 		# Skip common non-parameters
@@ -2213,11 +2392,11 @@ sub _analyze_pod {
 			my $constraint = $2;
 
 			# Normalize type names
-			$type = 'integer'  if $type eq 'int';
-			$type = 'number'   if $type eq 'num' || $type eq 'float';
-			$type = 'boolean'  if $type eq 'bool';
+			$type = 'integer' if $type eq 'int';
+			$type = 'number' if $type eq 'num' || $type eq 'float';
+			$type = 'boolean' if $type eq 'bool';
 			$type = 'arrayref' if $type eq 'array';
-			$type = 'hashref'  if $type eq 'hash';
+			$type = 'hashref' if $type eq 'hash';
 
 			$params{$name}{type} = $type;
 
@@ -2258,12 +2437,25 @@ sub _analyze_pod {
 	my $pod_defaults = $self->_extract_defaults_from_pod($pod);
 	foreach my $param (keys %$pod_defaults) {
 		if (exists $params{$param}) {
-			$params{$param}{default} = $pod_defaults->{$param};
+			$params{$param}{_default} = $pod_defaults->{$param};
 			$params{$param}{optional} = 1 unless defined $params{$param}{optional};
 			$self->_log(sprintf("  POD: %s has default value: %s",
-			    $param,
-			    defined($pod_defaults->{$param}) ? $pod_defaults->{$param} : 'undef'));
+				$param,
+				defined($pod_defaults->{$param}) ? $pod_defaults->{$param} : 'undef'
+			));
 		}
+	}
+
+	# Default undocumented optionality: documented params are REQUIRED unless stated otherwise
+	for my $name (keys %params) {
+		next if $name =~ /^(self|class)$/i;
+
+		# FIXME: not for now, it's sensible but breaks things
+		# If optionality was never explicitly set, assume required
+		# if (!exists $params{$name}{optional}) {
+			# $params{$name}{optional} = 0;
+			# $self->_log("  POD: $name assumed required (no optional/default specified)");
+		# }
 	}
 
 	return \%params;
@@ -2303,10 +2495,13 @@ sub _analyze_output {
 # Analyze POD for Returns section
 sub _analyze_output_from_pod {
 	my ($self, $output, $pod) = @_;
+	my %VALID_OUTPUT_TYPES = map { $_ => 1 }
+		qw(string integer number float boolean arrayref hashref object coderef void undef);
 
 	if ($pod) {
 		# Pattern 1: Returns: section
-		if ($pod =~ /Returns?:\s+(.+?)(?=\n\n|\n=[a-z]|$)/si) {
+		# Up to 3 lines
+		if ($pod =~ /Returns?:\s+([^\n]+(?:\n[^\n]+){0,2})/si) {
 			my $returns_desc = $1;
 			$returns_desc =~ s/^\s+|\s+$//g;
 
@@ -2315,7 +2510,7 @@ sub _analyze_output_from_pod {
 			# Try to infer type from description
 			if ($returns_desc =~ /\b(string|text)\b/i) {
 				$output->{type} = 'string';
-			} elsif ($returns_desc =~ /\b(integer|int|number|count)\b/i) {
+			} elsif ($returns_desc =~ /\b(integer|int|count)\b/i) {
 				$output->{type} = 'integer';
 			} elsif ($returns_desc =~ /\b(float|decimal|number)\b/i) {
 				$output->{type} = 'number';
@@ -2346,6 +2541,12 @@ sub _analyze_output_from_pod {
 				$output->{_STATUS} = 'LIVES';
 				$self->_log('  OUTPUT: Should not die on success');
 			}
+			if ($returns_desc =~ /\b(true|false)\b/i) {
+				$output->{type} ||= 'boolean';
+			}
+			if ($returns_desc =~ /\bundef\b/i) {
+				$output->{nullable} = 1;
+			}
 		}
 
 		# Pattern 2: Inline "returns X"
@@ -2353,11 +2554,9 @@ sub _analyze_output_from_pod {
 			my $type = lc($1);
 
 			$type = 'boolean' if $type =~ /^(true|false|bool)$/;
-
 			# Skip if it's just a number (like "returns 1")
 			$type = 'integer' if $type eq 'int';
 			$type = 'number' if $type =~ /^(num|float)$/;
-			$type = 'boolean' if $type eq 'bool';
 			$type = 'arrayref' if $type eq 'array';
 			$type = 'hashref' if $type eq 'hash';
 
@@ -2377,11 +2576,15 @@ sub _analyze_output_from_pod {
 			}
 
 			$type = 'arrayref' if !$type && $pod =~ /returns?\s+.+\slist\b/i;
-			$output->{type} = $type if $type && $type !~ /^\d+$/;
-			$self->_log("  OUTPUT: Inferred type from POD: $type");
+			# $output->{type} = $type if $type && $type !~ /^\d+$/;
+			if ($VALID_OUTPUT_TYPES{$type}) {
+				$output->{type} = $type;
+				$self->_log("  OUTPUT: Inferred type from POD: $type");
+			} else {
+				$self->_log("  OUTPUT: POD return type '$type' is not a valid type, ignoring");
+			}
 		}
 	}
-
 }
 
 =head2 _extract_defaults_from_pod
@@ -2517,8 +2720,7 @@ sub _analyze_output_from_code
 			if ($content =~ /,/) {	# Has comma = multiple values
 				$output->{type} = 'array';
 			}
-		}
-		elsif ($code =~ /return\s+\$self\s*;/ && $code =~ /\$self\s*->\s*\{[^}]+\}\s*=/) {
+		} elsif ($code =~ /return\s+\$self\s*;/ && $code =~ /\$self\s*->\s*\{[^}]+\}\s*=/) {
 			# Returns $self for chaining
 			$output->{type} = 'object';
 			if ($self->{_document}) {
@@ -2557,9 +2759,8 @@ sub _analyze_output_from_code
 					$return_types{number}++;
 				} elsif ($ret eq 'undef') {
 					$return_types{undef}++;
-				}
+				} elsif ($ret =~ /^\[/) {
 				# Data structures
-				elsif ($ret =~ /^\[/) {
 					$return_types{arrayref}++;
 				} elsif ($ret =~ /^\{/) {
 					$return_types{hashref}++;
@@ -2571,6 +2772,19 @@ sub _analyze_output_from_code
 				    )
 				}x) {
 					$return_types{number} += 2;
+				} elsif ($ret =~ /\|\|\s*\d+\b/) {
+					# Logical-or fallback with numeric literal (e.g. $x || 200)
+					$return_types{integer} += 2;
+					$self->_log("  OUTPUT: Numeric fallback expression detected");
+				} elsif ($ret =~ /=/ && $ret =~ /\$\w+/) {
+					# Assignment returning a value (e.g. $self->{status} = $status)
+					# If assignment involves a numeric literal or variable, assume numeric intent
+					if ($ret =~ /\b\d+\b/) {
+						$return_types{integer} += 2;
+						$self->_log("  OUTPUT: Assignment with numeric value detected");
+					} else {
+						$return_types{scalar}++;
+					}
 				}
 				# Variables/expressions
 				elsif ($ret =~ /\$\w+/) {
@@ -2593,6 +2807,13 @@ sub _analyze_output_from_code
 			# Determine most common return type
 			if (keys %return_types) {
 				my ($most_common) = sort { $return_types{$b} <=> $return_types{$a} } keys %return_types;
+				# Prefer integer over scalar if numeric returns dominate
+				if ($return_types{integer} && (!$return_types{string})) {
+					if (!$output->{type} || $output->{type} eq 'scalar') {
+						$output->{type} = 'integer';
+						$self->_log("  OUTPUT: Numeric returns dominate, forcing integer");
+					}
+				}
 				unless ($output->{type}) {
 					$output->{type} = $most_common;
 
@@ -2622,6 +2843,8 @@ sub _enhance_boolean_detection {
 	my ($self, $output, $pod, $code, $method_name) = @_;
 
 	my $boolean_score = 0;	# Track evidence for boolean return
+
+	return unless !$output->{type} || $output->{type} eq 'unknown';
 
 	# Look for stronger boolean indicators
 	if ($pod && !$output->{type}) {
@@ -2864,17 +3087,18 @@ sub _detect_chaining_pattern {
 # Detect error return conventions
 sub _detect_error_conventions {
 	my ($self, $output, $code) = @_;
+
 	return unless $code;
 
 	$self->_log('  DEBUG _detect_error_conventions called');
 
 	my %error_patterns;
 
-    # Pattern 1: return undef if/unless condition
-    while ($code =~ /return\s+undef\s+(?:if|unless)\s+([^;]+);/g) {
-        push @{$error_patterns{undef_on_error}}, $1;
-        $self->_log("  DEBUG Found 'return undef' pattern");
-    }
+	# Pattern 1: return undef if/unless condition
+	while ($code =~ /return\s+undef\s+(?:if|unless)\s+([^;]+);/g) {
+		push @{$error_patterns{undef_on_error}}, $1;
+		$self->_log("  DEBUG Found 'return undef' pattern");
+	}
 
 	# Pattern 2: return if/unless (implicit undef)
 	while ($code =~ /return\s+(?:if|unless)\s+([^;]+);/g) {
@@ -2882,36 +3106,37 @@ sub _detect_error_conventions {
 		$self->_log("  DEBUG Found implicit undef pattern");
 	}
 
-    # Pattern 3: return () - matches with or without conditions
-    if ($code =~ /return\s*\(\s*\)\s*(?:if|unless|;)/) {
-        $error_patterns{empty_list} = 1;
-        $self->_log("  DEBUG Found empty list return");
-    }
+	# Pattern 3: return () - matches with or without conditions
+	if ($code =~ /return\s*\(\s*\)\s*(?:if|unless|;)/) {
+		$error_patterns{empty_list} = 1;
+		$self->_log("  DEBUG Found empty list return");
+	}
 
-    # Pattern 4: return 0/1 pattern (indicates boolean with error handling)
-my $zero_returns = 0;
-my $one_returns = 0;
-# Match "return 0" or "return 1" followed by anything (condition or semicolon)
-while ($code =~ /return\s+(0|1)\s*(?:;|if|unless)/g) {
-    if ($1 eq '0') {
-        $zero_returns++;
-    } else {
-        $one_returns++;
-    }
-}
-if ($zero_returns > 0 && $one_returns > 0) {
-    $error_patterns{zero_on_error} = 1;
-    $self->_log("  DEBUG Found 0/1 return pattern ($zero_returns zeros, $one_returns ones)");
-}
+	# Pattern 4: return 0/1 pattern (indicates boolean with error handling)
+	my $zero_returns = 0;
+	my $one_returns = 0;
+	# Match "return 0" or "return 1" followed by anything (condition or semicolon)
+	while ($code =~ /return\s+(0|1)\s*(?:;|if|unless)/g) {
+		if ($1 eq '0') {
+			$zero_returns++;
+		} else {
+			$one_returns++;
+		}
+	}
 
-    # Pattern 5: Exception handling with eval
-    if ($code =~ /eval\s*\{/) {
-        # Check if there's error handling after eval
-        if ($code =~ /eval\s*\{.*?\}[^}]*(?:if\s*\(\s*\$\@|catch|return\s+undef)/s) {
-            $error_patterns{exception_handling} = 1;
-            $self->_log("  DEBUG Found exception handling with eval");
-        }
-    }
+	if ($zero_returns > 0 && $one_returns > 0) {
+		$error_patterns{zero_on_error} = 1;
+		$self->_log("  DEBUG Found 0/1 return pattern ($zero_returns zeros, $one_returns ones)");
+	}
+
+	# Pattern 5: Exception handling with eval
+	if ($code =~ /eval\s*\{/) {
+		# Check if there's error handling after eval
+		if ($code =~ /eval\s*\{.*?\}[^}]*(?:if\s*\(\s*\$\@|catch|return\s+undef)/s) {
+			$error_patterns{exception_handling} = 1;
+			$self->_log('  DEBUG Found exception handling with eval');
+		}
+	}
 
 	# Detect success/failure return pattern
 	my @all_returns = $code =~ /return\s+([^;]+);/g;
@@ -2923,29 +3148,29 @@ if ($zero_returns > 0 && $one_returns > 0) {
 		$self->_log("  OUTPUT: Uses success/failure return pattern");
 	}
 
-    # Store error conventions in output
-    if (keys %error_patterns) {
-        $output->{error_handling} = \%error_patterns;
+	# Store error conventions in output
+	if (keys %error_patterns) {
+		$output->{_error_handling} = \%error_patterns;
 
-        # Determine primary error convention
-        if ($error_patterns{undef_on_error}) {
-            $output->{error_return} = 'undef';
-            $self->_log("  OUTPUT: Returns undef on error");
-        } elsif ($error_patterns{implicit_undef}) {
-            $output->{error_return} = 'undef';
-            $self->_log("  OUTPUT: Returns implicit undef on error");
-        } elsif ($error_patterns{empty_list}) {
-            $output->{error_return} = 'empty_list';
-            $self->_log("  OUTPUT: Returns empty list on error");
-        } elsif ($error_patterns{zero_on_error}) {
-            $output->{error_return} = 'false';
-            $self->_log("  OUTPUT: Returns 0/false on error");
-        }
+		# Determine primary error convention
+		if ($error_patterns{undef_on_error}) {
+			$output->{error_return} = 'undef';
+			$self->_log("  OUTPUT: Returns undef on error");
+		} elsif ($error_patterns{implicit_undef}) {
+			$output->{error_return} = 'undef';
+			$self->_log("  OUTPUT: Returns implicit undef on error");
+		} elsif ($error_patterns{empty_list}) {
+			$output->{error_return} = 'empty_list';
+			$self->_log("  OUTPUT: Returns empty list on error");
+		} elsif ($error_patterns{zero_on_error}) {
+			$output->{error_return} = 'false';
+			$self->_log("  OUTPUT: Returns 0/false on error");
+		}
 
-        if ($error_patterns{exception_handling}) {
-            $self->_log("  OUTPUT: Has exception handling");
-        }
-    }
+		if ($error_patterns{exception_handling}) {
+			$self->_log("  OUTPUT: Has exception handling");
+		}
+	}
 }
 
 # Helper method: Infer type from an expression
@@ -2981,10 +3206,10 @@ sub _infer_type_from_expression {
 		return { type => 'integer' };
 	}
 
-    # Check for array reference
-    if ($expr =~ /^\[/ || $expr =~ /^\\\@/) {
-        return { type => 'arrayref' };
-    }
+	# Check for array reference
+	if ($expr =~ /^\[/ || $expr =~ /^\\\@/) {
+		return { type => 'arrayref' };
+	}
 
     # Check for hash reference
     if ($expr =~ /^\{/ || $expr =~ /^\\\%/) {
@@ -3146,8 +3371,8 @@ sub _analyze_code {
 
 	# Infer types from defaults
 	foreach my $param (keys %params) {
-		if ($params{$param}{default} && !$params{$param}{type}) {
-			my $default = $params{$param}{default};
+		if ($params{$param}{_default} && !$params{$param}{type}) {
+			my $default = $params{$param}{_default};
 			if (ref($default) eq 'HASH') {
 				$params{$param}{type} = 'hashref';
 				$self->_log("  CODE: $param type inferred as hashref from default");
@@ -3168,7 +3393,7 @@ sub _analyze_code {
 	} elsif ($code =~ /(croak|die)\(.*\)\s+if\s*\(\s*scalar\(\@_\)\s*==\s*(0)\s*\)/s) {
 		foreach my $param (keys %params) {
 			$params{$param}{optional} = 0;
-			$self->_log("  CODE: $param: all parameters are required to so scalar check against 0");
+			$self->_log("  CODE: $param: all parameters are required due to 'scalar(@_) == 0' check");
 		}
 	}
 
@@ -3190,6 +3415,41 @@ sub _analyze_code {
 		if ($code =~ /defined\s*\(\s*\$$param\s*\)/) {
 			$$p->{optional} = 0;
 			$self->_log("  CODE: $param is required (defined check)");
+		}
+
+		# Determine optional/required and numeric type from code
+		if ($code =~ /\s*\$$param\s*(?:\/\/|\|\|)=/) {
+			# e.g. $var //= 5; or $var ||= 5;
+			$$p->{optional} = 1;
+			$self->_log("  CODE: $param is optional (default value assigned in code)");
+		} elsif ($code =~ /\s*\$$param\s*(?:[\+\-\*\/%]|(?:\+\+)|(?:--)|(?:[\+\-\*\/%]=)|\+\$|\$[+-])/ ) {
+			# Covers arithmetic usage:
+			# $x + $param, $param++, $param--, $x += $param, $x -= $param, etc.
+			$$p->{optional} = 0;
+			$$p->{type} //= 'number';
+			$self->_log("  CODE: $param is required (used in arithmetic context)");
+		} elsif ($code =~ /\$\b$param\b\s*(?:\+0|\*1)/) {
+			# Forces numeric context, e.g., "$param + 0" or "$param * 1"
+			$$p->{optional} = 0;
+			$$p->{type} //= 'number';
+			$self->_log("  CODE: $param is required (numeric context)");
+		}
+
+		# Required parameter checks (undef causes error)
+
+		# Style 1: block form
+		if ($code =~ /if\s*\(\s*!\s*defined\s*\(\s*\$$param\s*\)\s*\)\s*\{([^}]+)\}/s) {
+			my $block = $1;
+			if ($block =~ /\b(croak|die|confess)\b/) {
+				$$p->{optional} = 0;
+				$self->_log("  CODE: $param is required (undef causes error)");
+			}
+		}
+
+		# Style 2: postfix unless
+		if ($code =~ /\b(croak|die|confess)\b[^;]*\bunless\s+defined\s*\(\s*\$$param\s*\)/) {
+			$$p->{optional} = 0;
+			$self->_log("  CODE: $param is required (postfix undef check)");
 		}
 
 		# Exists checks for hash keys
@@ -3243,8 +3503,8 @@ sub _analyze_parameter_type {
 	}
 
 	# Infer type from the default value if type is unknown
-	if (!$p->{type} && exists $p->{default}) {
-		my $default = $p->{default};
+	if (!$p->{type} && exists $p->{_default}) {
+		my $default = $p->{_default};
 		if (ref($default) eq 'HASH') {
 			$p->{type} = 'hashref';
 			$self->_log("  CODE: $param type inferred as hashref from default");
@@ -3428,7 +3688,7 @@ sub _detect_filehandle_type {
 
 	# Path validation patterns
 	# Only match a literal path assigned or defaulted to this variable
-	if(defined $p->{default} && $p->{default} =~ m{^([A-Za-z]:\\|/|\./|\.\./)}) {
+	if(defined $p->{_default} && $p->{_default} =~ m{^([A-Za-z]:\\|/|\./|\.\./)}) {
 		$p->{type} = 'string';
 		$p->{semantic} = 'filepath';
 		$self->_log("  ADVANCED: $param default looks like a path");
@@ -3650,7 +3910,7 @@ sub _extract_error_constraints {
 
 		# Store results
 		push @{ $$p->{_invalid} }, $constraint if $constraint;
-		push @{ $$p->{_errors}  }, $message   if defined $message;
+		push @{ $$p->{_errors}  }, $message if defined $message;
 
 		$self->_log(
 			"  ERROR: $param invalid when [$condition]" .
@@ -3812,7 +4072,7 @@ sub _parse_modern_signature {
 			$params->{$name} = $param_info;
 			$self->_log("  SIG: $name has position $position" .
 				($param_info->{optional} ? " (optional)" : '') .
-				($param_info->{default} ? ", default: $param_info->{default}" : ''));
+				($param_info->{_default} ? ", default: $param_info->{_default}" : ''));
 			$position++;
 		}
 	}
@@ -3835,7 +4095,7 @@ sub _parse_signature_parameter {
 
 		$info{name} = $name;
 		$info{optional} = 1;
-		$info{default} = $self->_clean_default_value($default, 1);
+		$info{_default} = $self->_clean_default_value($default, 1);
 
 		# Apply type constraint
 		if ($constraint =~ /^(Int|Integer)$/i) {
@@ -3888,8 +4148,8 @@ sub _parse_signature_parameter {
 
 	$info{name} = $name;
 	$info{optional} = 1;
-	$info{default} = $self->_clean_default_value($default, 1);
-	$info{type} = $self->_infer_type_from_default($info{default}) if $self->can('_infer_type_from_default');
+	$info{_default} = $self->_clean_default_value($default, 1);
+	$info{type} = $self->_infer_type_from_default($info{_default}) if $self->can('_infer_type_from_default');
 
 	return \%info;
 	}
@@ -4001,17 +4261,17 @@ sub _analyze_postfix_dereferencing {
 
 	my %derefs;
 
-    # Array dereference: $ref->@*
-    if ($code =~ /\$\w+\s*->\s*\@\*/) {
-        $derefs{array_deref} = 1;
-        $self->_log("  MODERN: Uses postfix array dereferencing (->@*)");
-    }
+	# Array dereference: $ref->@*
+	if ($code =~ /\$\w+\s*->\s*\@\*/) {
+		$derefs{array_deref} = 1;
+		$self->_log("  MODERN: Uses postfix array dereferencing (->@*)");
+	}
 
-    # Hash dereference: $ref->%*
-    if ($code =~ /\$\w+\s*->\s*\%\*/) {
-        $derefs{hash_deref} = 1;
-        $self->_log("  MODERN: Uses postfix hash dereferencing (->%*)");
-    }
+	# Hash dereference: $ref->%*
+	if ($code =~ /\$\w+\s*->\s*\%\*/) {
+		$derefs{hash_deref} = 1;
+		$self->_log("  MODERN: Uses postfix hash dereferencing (->%*)");
+	}
 
     # Scalar dereference: $ref->$*
     if ($code =~ /\$\w+\s*->\s*\$\*/) {
@@ -4060,28 +4320,28 @@ sub _extract_field_declarations {
 			_source => 'field'
 		);
 
-        # Check for :param attribute
-        if ($modifiers =~ /:param(?:\(([^)]+)\))?/) {
-            $field_info{is_param} = 1;
+		# Check for :param attribute
+		if ($modifiers =~ /:param(?:\(([^)]+)\))?/) {
+			$field_info{is_param} = 1;
 
-            if (defined $1) {
-                # Explicit parameter name
-                $field_info{param_name} = $1;
-            } else {
-                # Implicit - field name is param name
-                $field_info{param_name} = $name;
-            }
+			if (defined $1) {
+				# Explicit parameter name
+				$field_info{param_name} = $1;
+			} else {
+				# Implicit - field name is param name
+				$field_info{param_name} = $name;
+			}
 
-            $self->_log("  FIELD: $name maps to parameter: $field_info{param_name}");
-        }
+			$self->_log("  FIELD: $name maps to parameter: $field_info{param_name}");
+		}
 
         # Check for default value - must come before type constraint check
-        if ($modifiers =~ /=\s*([^:;]+)(?::|;|$)/) {
+	if ($modifiers =~ /=\s*([^:;]+)(?::|;|$)/) {
 		my $default = $1;
 		$default =~ s/\s+$//;
-		$field_info{default} = $self->_clean_default_value($default, 1);
+		$field_info{_default} = $self->_clean_default_value($default, 1);
 		$field_info{optional} = 1;
-		$self->_log("  FIELD: $name has default: " .  (defined $field_info{default} ? $field_info{default} : 'undef'));
+		$self->_log("  FIELD: $name has default: " . (defined $field_info{_default} ? $field_info{_default} : 'undef'));
 	}
 
 	# Check for type constraints
@@ -4107,28 +4367,28 @@ sub _merge_field_declarations {
 		# Only process fields that are parameters
 		next unless $field->{is_param};
 
-	my $param_name = $field->{param_name};
+		my $param_name = $field->{param_name};
 
-	# Create or update parameter info
-        $params->{$param_name} ||= {};
-	my $p = $params->{$param_name};
+		# Create or update parameter info
+		$params->{$param_name} ||= {};
+		my $p = $params->{$param_name};
 
-        # Merge field information into parameter
-        $p->{_source} = 'field' unless $p->{_source};
-        $p->{field_name} = $field_name if $field_name ne $param_name;
+		# Merge field information into parameter
+		$p->{_source} = 'field' unless $p->{_source};
+		$p->{field_name} = $field_name if $field_name ne $param_name;
 
-        if ($field->{default}) {
-            $p->{default} = $field->{default};
-            $p->{optional} = 1;
-        }
+		if ($field->{_default}) {
+			$p->{_default} = $field->{_default};
+			$p->{optional} = 1;
+		}
 
-        if ($field->{isa}) {
-            $p->{isa} = $field->{isa};
-            $p->{type} = 'object';
-        }
+		if ($field->{isa}) {
+			$p->{isa} = $field->{isa};
+			$p->{type} = 'object';
+		}
 
-        $self->_log("  MERGED: Field $field_name -> parameter $param_name");
-    }
+		$self->_log("  MERGED: Field $field_name -> parameter $param_name");
+	}
 }
 
 sub _extract_defaults_from_code {
@@ -4139,9 +4399,9 @@ sub _extract_defaults_from_code {
 		my ($param, $value) = ($1, $2);
 		next unless exists $params->{$param};
 
-		$params->{$param}{default} = $self->_clean_default_value($value, 1);
+		$params->{$param}{_default} = $self->_clean_default_value($value, 1);
 		$params->{$param}{optional} = 1;
-	$self->_log("  CODE: $param has default: " . $self->_format_default($params->{$param}{default}));
+	$self->_log("  CODE: $param has default: " . $self->_format_default($params->{$param}{_default}));
 	}
 
 	# Pattern 2: $param = value unless defined $param;
@@ -4149,9 +4409,9 @@ sub _extract_defaults_from_code {
 		my ($param, $value) = ($1, $2);
 		next unless exists $params->{$param};
 
-		$params->{$param}{default} = $self->_clean_default_value($value, 1);
+		$params->{$param}{_default} = $self->_clean_default_value($value, 1);
 		$params->{$param}{optional} = 1;
-		$self->_log("  CODE: $param has default (unless): " . $self->_format_default($params->{$param}{default}));
+		$self->_log("  CODE: $param has default (unless): " . $self->_format_default($params->{$param}{_default}));
 	}
 
 	# Pattern 3: $param = value unless $param;
@@ -4159,9 +4419,9 @@ sub _extract_defaults_from_code {
 		my ($param, $value) = ($1, $2);
 		next unless exists $params->{$param};
 
-		$params->{$param}{default} = $self->_clean_default_value($value, 1);
+		$params->{$param}{_default} = $self->_clean_default_value($value, 1);
 		$params->{$param}{optional} = 1;
-		$self->_log("  CODE: $param has default (unless): " . $self->_format_default($params->{$param}{default}));
+		$self->_log("  CODE: $param has default (unless): " . $self->_format_default($params->{$param}{_default}));
 	}
 
 	# Pattern 4: $param = $param || 'default';
@@ -4169,9 +4429,9 @@ sub _extract_defaults_from_code {
 		my ($param, $value) = ($1, $2);
 		next unless exists $params->{$param};
 
-		$params->{$param}{default} = $self->_clean_default_value($value, 1);
+		$params->{$param}{_default} = $self->_clean_default_value($value, 1);
 		$params->{$param}{optional} = 1;
-		$self->_log("  CODE: $param has default (||): " . $self->_format_default($params->{$param}{default}));
+		$self->_log("  CODE: $param has default (||): " . $self->_format_default($params->{$param}{_default}));
 	}
 
 	# Pattern 5: $param ||= 'default';
@@ -4179,9 +4439,9 @@ sub _extract_defaults_from_code {
 		my ($param, $value) = ($1, $2);
 		next unless exists $params->{$param};
 
-		$params->{$param}{default} = $self->_clean_default_value($value, 1);
+		$params->{$param}{_default} = $self->_clean_default_value($value, 1);
 		$params->{$param}{optional} = 1;
-		$self->_log("  CODE: $param has default (||=): " . $self->_format_default($params->{$param}{default}));
+		$self->_log("  CODE: $param has default (||=): " . $self->_format_default($params->{$param}{_default}));
 	}
 
 	# Pattern 6: $param //= 'default';
@@ -4189,10 +4449,10 @@ sub _extract_defaults_from_code {
 		my ($param, $value) = ($1, $2);
 		next unless exists $params->{$param};  # Using -> because $params is a reference
 
-		$params->{$param}{default} = $self->_clean_default_value($value, 1);
+		$params->{$param}{_default} = $self->_clean_default_value($value, 1);
 
 		$params->{$param}{optional} = 1;
-		$self->_log("  CODE: $param has default (//=): " . $self->_format_default($params->{$param}{default}));
+		$self->_log("  CODE: $param has default (//=): " . $self->_format_default($params->{$param}{_default}));
 	}
 
 	# Pattern 7: $param = defined $param ? $param : 'default';
@@ -4204,9 +4464,9 @@ sub _extract_defaults_from_code {
 
 		my $cleaned = $self->_clean_default_value($value, 1);
 
-		$params->{$param}{default} = $cleaned;
+		$params->{$param}{_default} = $cleaned;
 		$params->{$param}{optional} = 1;
-		$self->_log("  CODE: $param has default (ternary): " . $self->_format_default($params->{$param}{default}));
+		$self->_log("  CODE: $param has default (ternary): " . $self->_format_default($params->{$param}{_default}));
 	}
 
 	# Pattern 8: $param = $args{param} || 'default';
@@ -4214,9 +4474,9 @@ sub _extract_defaults_from_code {
 		my ($param, $value) = ($1, $2);
 		next unless exists $params->{$param};
 
-		$params->{$param}{default} = $self->_clean_default_value($value, 1);
+		$params->{$param}{_default} = $self->_clean_default_value($value, 1);
 		$params->{$param}{optional} = 1;
-		$self->_log("  CODE: $param has default (from args): " . $self->_format_default($params->{$param}{default}));
+		$self->_log("  CODE: $param has default (from args): " . $self->_format_default($params->{$param}{_default}));
 	}
 
 	# Pattern for non-empty hashref
@@ -4225,7 +4485,7 @@ sub _extract_defaults_from_code {
 		next unless exists $params->{$param};
 
 		# Return empty hashref as placeholder (can't evaluate complex hashrefs)
-		$params->{$param}{default} = {};
+		$params->{$param}{_default} = {};
 		$params->{$param}{optional} = 1;
 		$self->_log("  CODE: $param has hashref default (||=)");
 	}
@@ -4311,9 +4571,9 @@ sub _analyze_parameter_validation {
 
 	# Extract default values with the new method
 	my $default_value = $self->_extract_default_value($param, $code);
-	if (defined $default_value && !exists $p->{default}) {
+	if (defined $default_value && !exists $p->{_default}) {
 		$p->{optional} = 1;
-		$p->{default} = $default_value;
+		$p->{_default} = $default_value;
 
 		# Try to infer type from default value if not already set
 		unless ($p->{type}) {
@@ -4336,7 +4596,7 @@ sub _analyze_parameter_validation {
 
 	# Also check for simple default assignment without condition
 	# Pattern: $param = 'value';
-	if (!$default_value && !exists $p->{default} && $code =~ /\$$param\s*=\s*([^;{}]+?)(?:\s*[;}])/s) {
+	if (!$default_value && !exists $p->{_default} && $code =~ /\$$param\s*=\s*([^;{}]+?)(?:\s*[;}])/s) {
 		my $assignment = $1;
 		# Make sure it's not part of a larger expression
 		if ($assignment !~ /\$$param/ && $assignment !~ /^shift/) {
@@ -4344,7 +4604,7 @@ sub _analyze_parameter_validation {
 			$possible_default =~ s/\s*;\s*$//;
 			$possible_default = $self->_clean_default_value($possible_default);
 			if (defined $possible_default) {
-				$p->{default} = $possible_default;
+				$p->{_default} = $possible_default;
 				$p->{optional} = 1;
 				$self->_log("  CODE: $param has unconditional default: $possible_default");
 			}
@@ -4354,7 +4614,7 @@ sub _analyze_parameter_validation {
 	# Explicit required check overrides default detection
 	if ($is_required) {
 		$p->{optional} = 0;
-		delete $p->{default} if exists $p->{default};
+		delete $p->{_default} if exists $p->{_default};
 		$self->_log("  CODE: $param is required (validation check)");
 	}
 }
@@ -4435,7 +4695,7 @@ sub _merge_parameter_analyses {
 		foreach my $param (sort { ($merged{$a}{position} || 999) <=> ($merged{$b}{position} || 999) } keys %merged) {
 			my $p = $merged{$param};
 			$self->_log("  MERGED $param: " .
-					"pos=" . ($p->{position} || 'none') .
+					'pos=' . ($p->{position} || 'none') .
 					", type=" . ($p->{type} || 'none') .
 					", optional=" . (defined($p->{optional}) ? $p->{optional} : 'undef'));
 		}
@@ -4523,7 +4783,7 @@ sub _calculate_input_confidence {
 		}
 		if ($p->{matches}) {
 			$score += 20;
-			push @param_factors, "Has regex pattern constraint (+20)";
+			push @param_factors, 'Has regex pattern constraint (+20)';
 		}
 		if ($p->{isa}) {
 			$score += 25;
@@ -4537,7 +4797,7 @@ sub _calculate_input_confidence {
 		}
 
 		# Default value
-		if (exists $p->{default}) {
+		if (exists $p->{_default}) {
 			$score += 10;
 			push @param_factors, "Has default value (+10)";
 		}
@@ -4631,36 +4891,36 @@ sub _calculate_output_confidence {
 		push @factors, "Returns specific class: $output->{isa} (+30)";
 	}
 
-    # Context-aware returns
-    if ($output->{context_aware}) {
-        $score += 20;
-        push @factors, "Context-aware return (wantarray) (+20)";
+	# Context-aware returns
+	if ($output->{context_aware}) {
+		$score += 20;
+		push @factors, "Context-aware return (wantarray) (+20)";
 
-        if ($output->{list_context}) {
-            push @factors, "  List context: $output->{list_context}{type}";
-        }
-        if ($output->{scalar_context}) {
-            push @factors, "  Scalar context: $output->{scalar_context}{type}";
-        }
-    }
+		if ($output->{list_context}) {
+			push @factors, "  List context: $output->{list_context}{type}";
+		}
+		if ($output->{scalar_context}) {
+			push @factors, "  Scalar context: $output->{scalar_context}{type}";
+		}
+	}
 
-    # Error handling information
-    if ($output->{error_return}) {
-        $score += 15;
-        push @factors, "Error return convention documented: $output->{error_return} (+15)";
-    }
+	# Error handling information
+	if ($output->{error_return}) {
+		$score += 15;
+		push @factors, "Error return convention documented: $output->{error_return} (+15)";
+	}
 
-    # Success/failure pattern
-    if ($output->{success_failure_pattern}) {
-        $score += 10;
-        push @factors, "Success/failure pattern detected (+10)";
-    }
+	# Success/failure pattern
+	if ($output->{success_failure_pattern}) {
+		$score += 10;
+		push @factors, 'Success/failure pattern detected (+10)';
+	}
 
-    # Chainable methods
-    if ($output->{returns_self}) {
-        $score += 15;
-        push @factors, "Chainable method (fluent interface) (+15)";
-    }
+	# Chainable methods
+	if ($output->{returns_self}) {
+		$score += 15;
+		push @factors, "Chainable method (fluent interface) (+15)";
+	}
 
 	# Void context
 	if ($output->{void_context}) {
@@ -4669,7 +4929,7 @@ sub _calculate_output_confidence {
 	}
 
 	# Exception handling
-	if ($output->{error_handling} && $output->{error_handling}{exception_handling}) {
+	if ($output->{_error_handling} && $output->{_error_handling}{exception_handling}) {
 		$score += 10;
 		push @factors, 'Exception handling present (+10)';
 	}
@@ -5220,6 +5480,9 @@ sub _write_schema {
 	make_path($self->{output_dir}) unless -d $self->{output_dir};
 
 	my $filename = "$self->{output_dir}/${method_name}.yml";
+
+	# Configure YAML::XS to not quote numeric strings
+	local $YAML::XS::QuoteNumericStrings = 0;
 
 	# Extract package name for module field
 	my $package_name = '';
@@ -6368,6 +6631,10 @@ sub _extract_pod_examples {
 		$self->_log("  POD: extracted " . scalar(@examples) . " example call(s)");
 	}
 
+	for my $k (qw(boundary_values invalid_inputs valid_inputs equivalence_classes)) {
+		$hints->{$k} //= [];
+	}
+
 	return $hints;
 }
 
@@ -6494,6 +6761,130 @@ sub _clean_default_value
 	}
 
 	return $value;
+}
+
+sub _validate_pod_code_agreement {
+	my ($self, $pod_params, $code_params, $method_name) = @_;
+
+	my @errors;
+
+	# Get all parameter names from both sources
+	my %all_params = map { $_ => 1 } (keys %$pod_params, keys %$code_params);
+
+	foreach my $param (sort keys %all_params) {
+		my $pod = $pod_params->{$param} || {};
+		my $code = $code_params->{$param} || {};
+
+		# Check if parameter exists in both
+		if (exists $pod_params->{$param} && !exists $code_params->{$param}) {
+			push @errors, "Parameter '\$$param' documented in POD but not found in code signature";
+			next;
+		}
+
+		if (!exists $pod_params->{$param} && exists $code_params->{$param}) {
+			push @errors, "Parameter '\$$param' found in code but not documented in POD";
+			next;
+		}
+
+		# Compare types if both exist
+		if ($pod->{type} && $code->{type} && $pod->{type} ne $code->{type}) {
+			if (!$self->_types_are_compatible($pod->{type}, $code->{type})) {
+				push @errors, "Type mismatch for '\$$param': POD says '$pod->{type}', code suggests '$code->{type}' (incompatible)";
+			} else {
+				push @errors, "Type difference for '\$$param': POD says '$pod->{type}', code suggests '$code->{type}' (compatible)";
+			}
+		}
+
+		# Compare optional status if both exist
+		if (exists $pod->{optional} && exists $code->{optional} &&
+			$pod->{optional} != $code->{optional}) {
+			my $pod_status = $pod->{optional} ? 'optional' : 'required';
+			my $code_status = $code->{optional} ? 'optional' : 'required';
+			push @errors, "Optional status mismatch for '\$$param': POD says '$pod_status', code suggests '$code_status'";
+		}
+
+		# Check constraints (min/max)
+		if (defined $pod->{min} && defined $code->{min} && $pod->{min} != $code->{min}) {
+			push @errors, "Min constraint mismatch for '\$$param': POD says '$pod->{min}', code suggests '$code->{min}'";
+		}
+
+		if (defined $pod->{max} && defined $code->{max} && $pod->{max} != $code->{max}) {
+			push @errors, "Max constraint mismatch for '\$$param': POD says '$pod->{max}', code suggests '$code->{max}'";
+		}
+
+		# Check regex patterns
+		if ($pod->{matches} && $code->{matches} && $pod->{matches} ne $code->{matches}) {
+			push @errors, "Pattern mismatch for '\$$param': POD says '$pod->{matches}', code suggests '$code->{matches}'";
+		}
+	}
+
+	# Return errors (empty array if no errors)
+	return @errors;
+}
+
+sub _validate_strictness_level {
+	my $val = $_[0];
+
+	return 0 unless defined $val;
+
+	# Numeric
+	return 0 if $val =~ /^(0|off|none)$/i;
+	return 1 if $val =~ /^(1|warn|warning)$/i;
+	return 2 if $val =~ /^(2|fatal|die|error)$/i;
+
+	croak "Invalid value for --strict-pod: '$val' (use off|warn|fatal)";
+}
+
+sub _types_are_compatible {
+	my ($self, $pod_type, $code_type) = @_;
+
+	# Exact match is always compatible
+	return 1 if $pod_type eq $code_type;
+
+	# Define compatibility matrix
+	my %compatible_types = (
+		'integer' => ['number', 'scalar'],
+		'number'  => ['scalar'],
+		'string'  => ['scalar'],
+		'scalar'  => ['string', 'integer', 'number'],
+		'arrayref' => ['array'],
+		'hashref'  => ['hash'],
+	);
+
+	# Check if code_type is compatible with pod_type
+	if (my $allowed = $compatible_types{$pod_type}) {
+		return grep { $_ eq $code_type } @$allowed;
+	}
+
+	# Check if pod_type is compatible with code_type
+	if (my $allowed = $compatible_types{$code_type}) {
+		return grep { $_ eq $pod_type } @$allowed;
+	}
+
+	return 0;  # Not compatible
+}
+
+sub generate_pod_validation_report {
+	my ($self, $schemas) = @_;
+
+	my @reports;
+	foreach my $method_name (sort keys %$schemas) {
+		my $schema = $schemas->{$method_name};
+
+		if (my $errors = $schema->{_pod_validation_errors}) {
+			push @reports, "Method: $method_name";
+			push @reports, "  Severity: " . ($schema->{_pod_disagreement} ? 'warning' : 'fatal');
+			push @reports, "  Errors:";
+			push @reports, map { "    - $_" } @$errors;
+			push @reports, '';
+		}
+	}
+
+	if (@reports) {
+		return join("\n", "POD/Code Validation Report:", '=' x 40, '', @reports);
+	} else {
+		return "POD/Code Validation: All methods passed consistency checks.";
+	}
 }
 
 =head2 _log
