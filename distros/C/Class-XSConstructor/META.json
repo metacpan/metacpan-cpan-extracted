@@ -64,19 +64,19 @@
    "provides" : {
       "Class::XSConstructor" : {
          "file" : "lib/Class/XSConstructor.pm",
-         "version" : "0.020000"
+         "version" : "0.021000"
       },
       "Class::XSDelegation" : {
          "file" : "lib/Class/XSDelegation.pm",
-         "version" : "0.020000"
+         "version" : "0.021000"
       },
       "Class::XSDestructor" : {
          "file" : "lib/Class/XSDestructor.pm",
-         "version" : "0.020000"
+         "version" : "0.021000"
       },
       "Class::XSReader" : {
          "file" : "lib/Class/XSReader.pm",
-         "version" : "0.020000"
+         "version" : "0.021000"
       }
    },
    "release_status" : "stable",
@@ -95,6 +95,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/project"
    },
-   "version" : "0.020000",
+   "version" : "0.021000",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

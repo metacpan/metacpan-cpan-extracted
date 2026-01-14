@@ -116,6 +116,14 @@ no_growth {
 } 'Future::XS->catch immediate does not leak';
 
 no_growth {
+   my $e = defined eval {
+      Future::XS->fail( "oopsie", category => 1,2,3 )->get;
+      1;
+   } ? undef : $@;
+   undef $e;
+} 'Future::XS->get on failed future does not leak';
+
+no_growth {
    Future::XS->wait_all(
       Future::XS->new, Future::XS->new, Future::XS->new,
    )->cancel;

@@ -4,7 +4,7 @@ package Alien::GtkNodes;
 
 # ABSTRACT: Find or install GtkNodes
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use parent qw/ Alien::Base /;
 use Role::Tiny::With qw/ with /;
@@ -26,7 +26,7 @@ sub init {
     my $c = shift;
     unshift @GI_TYPELIB_PATH, $c->gi_typelib_path;
     push @DynaLoader::dl_library_path, $c->rpath;
-    my @files = DynaLoader::dl_findfile( '-lgtknodes-0.1' );
+    my @files = DynaLoader::dl_findfile( $^O eq 'cygwin' ? 'cyggtknodes-0.1-0.dll' : '-lgtknodes-0.1' );
     DynaLoader::dl_load_file($files[0]) if @files;
 }
 
@@ -54,7 +54,7 @@ Alien::GtkNodes - Find or install GtkNodes
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

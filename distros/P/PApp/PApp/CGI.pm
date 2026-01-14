@@ -49,7 +49,7 @@ use Exporter;
 BEGIN {
    our @ISA = (PApp::Base::);
    unshift @PApp::ISA, __PACKAGE__;
-   our $VERSION = 2.3;
+   our $VERSION = 2.4;
 }
 
 =head2 Functions
@@ -75,7 +75,8 @@ sub config_error {
    my $self = shift;
    my $exc = shift;
    $PApp::request ||= new PApp::CGI::Request;
-   PApp::handle_error($exc);
+   PApp::handle_error ($exc);
+   PApp::flush_cvt;
    PApp::flush_snd_length;
 
    kill_self; # going on with processing is not safe
@@ -334,7 +335,7 @@ sub content {
    my $self = shift;
    if ($self->{headers_in}{"Content-Type"} eq "application/x-www-form-urlencoded") {
       my $buf;
-      $self->read($buf, $self->{headers_in}{"Content-Length"}, 0);
+      $self->read ($buf, $self->{headers_in}{"Content-Length"}, 0);
       $buf;
    } else {
       ();
@@ -389,7 +390,6 @@ sub send_http_header {
 }
 
 sub print {
-   use bytes;
    my $self = shift;
    syswrite $self->{stdout}, join "", @_
 }

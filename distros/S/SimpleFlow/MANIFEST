@@ -5,6 +5,7 @@ META.yml
 Makefile.PL
 README
 README.md
+change.log.txt
 dist.ini
 lib/SimpleFlow.pm
 md2pod.pl

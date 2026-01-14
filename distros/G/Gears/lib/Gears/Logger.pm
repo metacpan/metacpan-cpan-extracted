@@ -1,5 +1,5 @@
 package Gears::Logger;
-$Gears::Logger::VERSION = '0.100';
+$Gears::Logger::VERSION = '0.101';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -19,7 +19,7 @@ has param 'log_format' => (
 );
 
 # implements actual logging of a single message
-# must be reimelemented
+# must be reimplemented
 sub _log_message ($self, $level, $message)
 {
 	...;

@@ -81,7 +81,7 @@ LIST: {
 		delta_within($location->{geometry}{location}{lat}, 38.99, 1e-1);
 		delta_within($location->{geometry}{location}{lng}, -77.03, 1e-1);
 		is(ref($location->{'geocoder'}), 'Geo::Coder::CA', 'Verify CA encoder is used');
-		sleep(1);	# play nicely
+		sleep(2);	# play nicely
 
 		$location = $geocoderlist->geocode('Reading, Berkshire, England');
 		delta_within($location->{geometry}{location}{lat}, 51.46, 1e-2);
@@ -95,7 +95,7 @@ LIST: {
 		delta_within($location->{geometry}{location}{lat}, 38.99, 1e-1);
 		delta_within($location->{geometry}{location}{lng}, -77.03, 1e-1);
 		is(ref($location->{'geocoder'}), 'Geo::Coder::CA', 'Verify CA encoder is used');
-		sleep(1);	# play nicely
+		sleep(2);	# play nicely
 
 		$location = $geocoderlist->geocode({ location => 'Rochester, Kent, United Kingdom' });
 		ok(defined($location));
@@ -151,7 +151,7 @@ LIST: {
 		delta_within($location->{geometry}{location}{lng}, 1.42, 1e-2);
 		is(ref($location->{'geocoder'}), 'Geo::Coder::Postcodes', 'Verify Postcodes encoder is used');
 
-		ok(!defined($geocoderlist->geocode()));
+		throws_ok( sub { $geocoderlist->geocode() }, qr/^Usage: /, 'No arguments gets usage message');
 		ok(!defined($geocoderlist->geocode('')));
 
 		my $log = $geocoderlist->log();

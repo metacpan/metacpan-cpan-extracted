@@ -1,5 +1,5 @@
 package Gears::Template;
-$Gears::Template::VERSION = '0.100';
+$Gears::Template::VERSION = '0.101';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -17,7 +17,7 @@ has param 'paths' => (
 );
 
 # implements actual rendering of a template
-# must be reimelemented
+# must be reimplemented
 sub _render_template ($self, $template_content, $vars)
 {
 	...;

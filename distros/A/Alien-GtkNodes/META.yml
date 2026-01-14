@@ -36,7 +36,7 @@ resources:
   bugtracker: https://codeberg.org/jbarrett/Alien-GtkNodes/issues
   homepage: https://codeberg.org/jbarrett/Alien-GtkNodes/
   repository: https://codeberg.org/jbarrett/Alien-GtkNodes.git
-version: '0.004'
+version: '0.005'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.33'
   requires:

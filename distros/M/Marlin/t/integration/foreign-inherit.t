@@ -15,4 +15,11 @@ isa_ok($ua, 'HTTP::Tiny');
 is( $ua->max_redirect, 3 );
 is( $ua->flibble, 42 );
 
+sub is_xs  {
+	require B;
+	!! B::svref_2object( shift )->XSUB;
+}
+
+ok is_xs(\&My::HTTP::new);
+
 done_testing;

@@ -6,6 +6,10 @@ Home page:    <https://metacpan.org/release/Class-XSConstructor>
 Bug tracker:  <https://github.com/tobyink/p5-class-xsconstructor/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.021000	2026-01-13
+
+ - Added: Class::XSDestructor now also installs a DEMOLISHALL method.
+
 0.020000	2026-01-12
 
  - Added: Class::XSReader exposing an XS function which has existed

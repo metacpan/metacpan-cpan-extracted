@@ -60,7 +60,7 @@ GOOGLE: {
 			$location = $geocoderlist->geocode('Xyzzy Lane, Minster, Thanet, Kent, England');
 			ok(!defined($location));
 
-			ok(!defined($geocoderlist->geocode()));
+			throws_ok( sub { $geocoderlist->geocode() }, qr/^Usage: /, 'No arguments gets usage message');
 			ok(!defined($geocoderlist->geocode('')));
 		} else {
 			diag('Set GEONAMES_USER to enable more tests');

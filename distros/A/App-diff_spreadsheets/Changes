@@ -1,3 +1,4 @@
+v1.028 - Spreadsheet::Edit::Log ':btw' api change; t_TestCommon update
 v1.027 - Suppress warnings about ABC letter codes clashing with Titles.
          Require Spreadsheet::Edit::IO 1000.019 (fixes BOM-releated issues)
 v1.026 - Un-do 1.025 changes and use robust term width detector code.

@@ -1,5 +1,12 @@
 Revision history for WebService-Ollama
 
+0.08    2026-01-13
+        - Added functional API: ollama() export for both sync and async modules
+        - Added tool registration and chat_with_tools support
+        - Added fallback tool call parsing from content text
+        - Made async dependencies required (IO::Async::Loop, Net::Async::HTTP, Future)
+        - Fixed JSON::Lines array wrapping for encode/decode
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

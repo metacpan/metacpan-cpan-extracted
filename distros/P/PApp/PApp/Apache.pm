@@ -62,7 +62,7 @@ use PApp::Exception;
 BEGIN {
    @ISA = PApp::Base::;
    unshift @PApp::ISA, __PACKAGE__;
-   $VERSION = 2.3;
+   $VERSION = 2.4;
 }
 
 *PApp::OK = \&Apache::Constants::OK;

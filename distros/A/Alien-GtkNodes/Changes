@@ -1,3 +1,7 @@
+0.005 2026-01-13
+
+  - Add cygwin support
+
 0.004 2026-01-09
 
   - Fixed some prereq dependecies

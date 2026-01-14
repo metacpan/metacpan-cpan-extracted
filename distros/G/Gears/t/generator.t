@@ -72,8 +72,8 @@ done_testing;
 
 sub check_paths ($got, $wanted, $name)
 {
-	my @got_copy = map { $_->stringify } $got->@*;
-	my @wanted_copy = map { $_->stringify } $wanted->@*;
+	my @got_copy = sort map { $_->stringify } $got->@*;
+	my @wanted_copy = sort map { $_->stringify } $wanted->@*;
 
 	is \@got_copy, \@wanted_copy, $name;
 }

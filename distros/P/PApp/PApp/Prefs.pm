@@ -34,8 +34,8 @@ use PApp::Config qw(DBH $DBH); DBH;
 
 use base Exporter;
 
-$VERSION = 2.3;
-@EXPORT = qw( 
+$VERSION = 2.4;
+@EXPORT = qw(
    lockprefs
 );
 
@@ -137,7 +137,7 @@ sub user_ref($$$) {
 
    \(new PApp::DataRef 'DB_row',
          database => $PApp::Config::Database,
-         table    => "prefs", 
+         table    => "prefs",
          key      => [qw(uid path name)],
          id       => [$_[1], ${$_[0]{path}}, $_[2]],
          utf8     => 1,

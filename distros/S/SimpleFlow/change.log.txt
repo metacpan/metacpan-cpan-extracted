@@ -1,0 +1,6 @@
+0.11
+-----
+max string length now corresponds to max of output strings, no more truncated output
+added List::Util dependency for string length maxes
+memory size now shows when output
+directory is now output during dry runs

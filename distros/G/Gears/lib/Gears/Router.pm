@@ -1,5 +1,5 @@
 package Gears::Router;
-$Gears::Router::VERSION = '0.100';
+$Gears::Router::VERSION = '0.101';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -22,14 +22,14 @@ sub pattern ($self)
 # builds a new location - see Gears::Router::Proto
 # - must create a new subclass of Gears::Router::Location, where %args are
 #   constructor arguments
-# - must be reimelemented
+# - must be reimplemented
 sub _build_location ($self, %args)
 {
 	...;
 }
 
 # builds a new match
-# can be reimelemented
+# can be reimplemented
 sub _build_match ($self, %args)
 {
 	return Gears::Router::Match->new(%args);

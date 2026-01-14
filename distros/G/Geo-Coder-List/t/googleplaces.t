@@ -54,7 +54,7 @@ GOOGLEPLACES: {
 			delta_within($location->{geometry}{location}{lat}, 51.330, 1e-1);
 			delta_within($location->{geometry}{location}{lng}, 1.316, 1e-1);
 
-			ok(!defined($geocoderlist->geocode()));
+			throws_ok( sub { $geocoderlist->geocode() }, qr/^Usage: /, 'No arguments gets usage message');
 			ok(!defined($geocoderlist->geocode('')));
 		} else {
 			diag('Set GMAP_KEY to enable more tests');

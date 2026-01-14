@@ -421,6 +421,20 @@ x64_enc (uchar *dst, uchar *src, STRLEN len)
     }
 }
 
+/* when switching to ecb.h, use that */
+static void
+pack64_be (uchar *buf, UV val)
+{
+  buf[0] = val >> 56;
+  buf[1] = val >> 48;
+  buf[2] = val >> 40;
+  buf[3] = val >> 32;
+  buf[4] = val >> 24;
+  buf[5] = val >> 16;
+  buf[6] = val >>  8;
+  buf[7] = val      ;
+}
+
 /* 0 host, 1 le, 2 be */
 static void
 pack64 (uchar *buf, const char *str, int mode)
@@ -1306,50 +1320,7 @@ andnot64 (UV a, UV b)
 
 #else
 
-char *
-not64 (char *a)
-        PROTOTYPE: $
-        ALIAS:
-           bit64 = 1
-        CODE:
-        unsigned long long a_, c_;
-        char c[64];
-
-        a_ = strtoull (a, 0, 0);
-
-        c_ = ix == 0 ? ~a_
-           : ix == 1 ? 1 << a_
-           :           -1;
-
-        sprintf (c, "%llu", c_);
-        
-        RETVAL = c;
-        OUTPUT:
-	RETVAL
-
-char *
-and64 (char *a, char *b)
-        PROTOTYPE: $$
-        ALIAS:
-           or64     = 1
-           andnot64 = 2
-        CODE:
-        unsigned long long a_, b_, c_;
-        char c[64];
-
-        a_ = strtoull (a, 0, 0);
-        b_ = strtoull (b, 0, 0);
-
-        c_ = ix == 0 ? a_ & b_
-           : ix == 1 ? a_ | b_
-           : ix == 2 ? a_ & ~b_
-           :           -1;
-
-        sprintf (c, "%llu", c_);
-        
-        RETVAL = c;
-        OUTPUT:
-	RETVAL
+#error 64 bit perl required
 
 #endif
 
@@ -1485,7 +1456,7 @@ _data_special_key (SV *self, SV *obj)
             HV *shv = (HV *)SvRV (self);
 
             SvRMAGICAL_off (shv);
-            pack64 (k, SvPV_nolen (HeVAL (hv_fetch_ent (shv, GIDs, 0, GIDh))), 2);
+            pack64_be (k, SvUV (HeVAL (hv_fetch_ent (shv, GIDs, 0, GIDh))));
             SvRMAGICAL_on (shv);
 
             if (SvTRUE (HeVAL (hv_fetch_ent (shv, INSTANCEs, 0, INSTANCEh))))
@@ -1493,7 +1464,7 @@ _data_special_key (SV *self, SV *obj)
                 HV *ohv = (HV *)SvRV (obj);
                 
                 SvRMAGICAL_off (ohv);
-                pack64 (k + 8, SvPV_nolen (HeVAL (hv_fetch_ent (ohv, GIDs, 0, GIDh))), 2);
+                pack64_be (k + 8, SvUV (HeVAL (hv_fetch_ent (ohv, GIDs, 0, GIDh))));
                 SvRMAGICAL_on (ohv);
 
                 RETVAL = newSVpvn (k, 16);

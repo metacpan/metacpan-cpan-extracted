@@ -57,6 +57,7 @@ my %WriteMakefile=(
         'Capture::Tiny'     => 0,
         'Test::Deep'        => 0,
         'Test::Exception'   => 0,
+        'Text::Diff'        => 0
     },
     META_MERGE => {
         'meta-spec' => {

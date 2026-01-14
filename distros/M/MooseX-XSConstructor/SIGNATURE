@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 20a39fc38c08bc6fb33c4ef5e7582af1da1c6deb8c82bcd456c66fb306de0904 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 3c30dd34b1b6e63a210585e3a3468118f78f9d8ec326a059d8f6f03a0761f955 Changes
+SHA256 a07bf869d9058f5c732dab57cdbe0d84c8646bdf966236f210f0c4b22132ea91 INSTALL
+SHA256 ca1cc40b3da7bebb1b0368764650ad38ac603b31a25fbc5b6f9fb217cc6fa1e8 LICENSE
+SHA256 a43a431a6d963957c7338265d9266fd71148eec627496abb1ae501f3f5d3ffe3 MANIFEST
+SHA256 0ea8ad4fd40dbad875ad1e637abc1c1db5d9c7d061e4a2c672515798873dec6a META.json
+SHA256 b543637184bd0b323d31530dfa4d7b13951af2d03deadeebce6ab9b99baf4fba META.yml
+SHA256 12af018370f4136b2c0375066cf825a732302f0543d3911a61a64641581a15e5 Makefile.PL
+SHA256 b0148e12ae49d4e5b4f28a09d12d0d85fb961825df826475c1b963e87ac75c08 README
+SHA256 642ef7aac7f8c34cab7af71bce8502d463a831495407ec19766dad768d08827c dist.ini
+SHA256 3b44693eef10bf5c2e596633ea4ea0a125efb74a0bd119ced186f4f123fd304a doap.ttl
+SHA256 996e27df3c6c48d436be6544aa6062940b442ed754721f098da040af83d1746c lib/MooseX/XSConstructor.pm
+SHA256 aa64aae088e68e531cfdbe2bf45a84da754bdc0d69f59c09b8ac33067c2648af t/01basic.t
+SHA256 0b97af2eb120a7a252729adb8a89402367e2d09f8c76b4b89609c6690ee6ae0a t/02strict.t
+SHA256 410f6dce547b535148d4c605bed0c5da9feb0225feba423cf22278bc00973d03 t/03aliases.t
+SHA256 c8e1401a5e62dc57128dfb2fa7ead38d476ec4f68b955dde62d11456a29a9f5a t/04undef.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCaWZ+TAAKCRDOv4Eoaip9
+OQ0NAKChTRG1Fxkiakn09gk1pPoM7IgNUwCfTNaEmJJax4QKluC4l4bDQrEU9Ho=
+=+gdK
+-----END PGP SIGNATURE-----

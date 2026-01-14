@@ -1,3 +1,4 @@
 <start_html>
 <pre>
 WebDyne::VERSION <? $WebDyne::VERSION ?>
+WebDyne::VERSION_GIT_SHA <? $WebDyne::VERSION_GIT_SHA ?>

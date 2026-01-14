@@ -1,4 +1,4 @@
-package Debug::Easy 2.20;
+package Debug::Easy 2.21;
 
 use strict;
 # use warnings;
@@ -33,9 +33,6 @@ BEGIN {
     # Functions and variables which can be optionally exported
     our @EXPORT_OK = qw(fileparse @Levels);
 } ## end BEGIN
-
-# Version for tooling consistency
-our $VERSION = '2.19';
 
 # This can be optionally exported for whatever
 our @Levels = qw( ERR WARN NOTICE INFO VERBOSE DEBUG DEBUGMAX );

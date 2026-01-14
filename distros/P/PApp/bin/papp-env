@@ -1,9 +1,12 @@
 #!/opt/bin/perl
 
+use common::sense;
+
 use Getopt::Long;
 use PApp::Env;
 
-$unset = 0;
+my $unset = 0;
+my $eval  = 0;
 
 sub printval {
    my $val = shift;

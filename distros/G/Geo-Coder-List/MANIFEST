@@ -8,8 +8,10 @@ MANIFEST
 MANIFEST.SKIP
 README
 README.md
+scripts/generate_index.pl
 t/00-load.t
 t/10-new.t
+t/30-basics.t
 t/bing.t
 t/boiler.t
 t/cache.t
@@ -18,7 +20,6 @@ t/carp.t
 t/census.t
 t/changes.t
 t/comment-spelling.t
-t/coverage.t
 t/critic.t
 t/cv.t
 t/dist.t
@@ -35,12 +36,14 @@ t/kwalitee.t
 t/list.t
 t/manifest.t
 t/mapbox.t
+t/mock.t
 t/no404s.t
 t/noplan.t
 t/opencage.t
 t/osm.t
 t/ovi.t
 t/pod-cm.t
+t/pod-coverage.t
 t/pod-links.t
 t/pod-snippets.t
 t/pod-spelling.t

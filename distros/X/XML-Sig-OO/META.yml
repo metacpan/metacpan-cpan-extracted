@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,7 +38,7 @@ requires:
   XML::LibXML: '2.0200'
   XML::LibXML::XPathContext: '2.0200'
   namespace::clean: '0.27'
-version: '0.010'
+version: '0.011'
 x_repository:
   type: git
   url: https://github.com/akalinux/xml-sig-oo.git

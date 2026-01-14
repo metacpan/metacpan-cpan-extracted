@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
-package Future::XS 0.14;
+package Future::XS 0.15;
 
 use v5.14;
 use warnings;

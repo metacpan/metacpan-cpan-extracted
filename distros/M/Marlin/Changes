@@ -6,6 +6,16 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.014000	2026-01-13
+
+ [ Packaging ]
+ - Bump version of Class::XSConstructor dependency.
+
+ [ Other ]
+ - Only bother creating a DESTROY method in classes which have (or inherit)
+   a DEMOLISH method. Otherwise, there's no point as it just makes the
+   object lifecycle slower even when implemented in XS.
+
 0.013001	2026-01-12
 
  [ Packaging ]

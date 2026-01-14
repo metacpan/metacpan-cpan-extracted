@@ -1,5 +1,16 @@
 Revision history for Geo-Coder-List
 
+0.36	Tue Jan 13 08:17:40 EST 2026
+	Invalid option now throws error rather than returning undef
+	Added t/mock.t
+	Use Params::Get and Object::Configure
+	Clean up NO_NETWORK_TESTING setting
+	Move the L1 cache into per-object
+	Don't try to store an object in the cache
+	Also set lon in the results
+	Check that the argument is given to push()
+	Added the test dashboard
+
 0.35	Mon Feb 17 20:27:10 EST 2025
 	GeoApify doesn't give an error if a location is not found
 	geocode(): croak when input is just a set of numbers

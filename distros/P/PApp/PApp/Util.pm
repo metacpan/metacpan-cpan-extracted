@@ -34,7 +34,7 @@ use JSON::XS;
 use base 'Exporter';
 
 BEGIN {
-   $VERSION = 2.3;
+   $VERSION = 2.4;
    @EXPORT = qw(dumpval uniq);
    @EXPORT_OK = qw(
          format_source sv_peek sv_dump
@@ -46,7 +46,7 @@ BEGIN {
 
    # I was lazy, all the util xs functions are in PApp.xs
    require XSLoader;
-   XSLoader::load PApp, $VERSION unless defined &PApp::bootstrap;
+   XSLoader::load PApp, $VERSION unless defined &PApp::surl;
 }
 
 =item format_source $source

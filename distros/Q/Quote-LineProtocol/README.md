@@ -20,6 +20,22 @@ Quote::LineProtocol - Helper module for Lineprotocol quoting
     meant to be sent over the InfluxDB lineprotocol following the rules specified
     on L<https://docs.influxdata.com/influxdb/v2/reference/syntax/line-protocol/>
 
+# CONFIGURATION
+
+Telegraf requires special consideration of spaces in strings. If using this module with telegraf set the env var QUOTE\_TELEGRAF before calling the script or use the following BEGIN block
+
+    BEGIN {
+      $ENV{QUOTE_TELEGRAF} = 1;
+      require Quote::LineProtocol;
+      Quote::LineProtocol->import(qw(measurement tags fields timestamp));
+    }
+
+With Strawberry perl you can set the env var in the portableshell.bat by adding
+
+    set QUOTE_TELEGRAF=1
+
+to the file
+
 # METHODS
 
 ## measurement($str)

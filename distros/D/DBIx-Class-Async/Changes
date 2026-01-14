@@ -1,5 +1,9 @@
 Revision history for DBIx::Class::Async
 
+0.28  2026-01-13
+      - Added sub copy() to DBIx::Class::Async::Row.
+      - Added sub register_[class|source] to DBIx::Class::Async::Schema.
+
 0.27  2026-01-12
       - Tidied up pod in general.
 

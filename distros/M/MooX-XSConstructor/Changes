@@ -6,6 +6,13 @@ Home page:    <https://metacpan.org/release/MooX-XSConstructor>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-XSConstructor>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.003000	2026-01-13
+
+ - Updated: Also create an XS DESTROY method.
+ - Updated: Use more recent version of Class::XSConstructor which supports
+   more features of Moo, so should be able to provide XS constructors
+   almost always.
+
 0.002	2020-02-19
 
  [ Bug Fixes ]

@@ -1,5 +1,8 @@
 Revision history for Gears
 
+0.101 - 2026-01-14
+	- Fix failing generator tests
+
 0.100 - 2026-01-12
 	- Start of the beta phase
 

@@ -64,44 +64,56 @@ sub show_methods {
 print "=" x 74, "\n";
 printf "%-15s %-7s %-7s %-7s %-7s %-7s %-7s %-7s\n", qw( Method Moo Moose Mouse Tiny Core Plain Marlin );
 print "=" x 74, "\n";
-show_class('NamedThing');           show_methods qw/ new name /;
-show_class('Person');               show_methods qw/ new name age has_age introduction /;
-show_class('Employee');             show_methods qw/ new name age has_age employee_id introduction /;
-show_class('Employee::Developer');  show_methods qw/ new name age has_age employee_id introduction get_languages all_languages add_language /;
+show_class('NamedThing');           show_methods qw/ new name BUILDALL DEMOLISHALL DESTROY /;
+show_class('Person');               show_methods qw/ new name age has_age introduction BUILDALL DEMOLISHALL DESTROY /;
+show_class('Employee');             show_methods qw/ new name age has_age employee_id introduction BUILDALL DEMOLISHALL DESTROY /;
+show_class('Employee::Developer');  show_methods qw/ new name age has_age employee_id introduction get_languages all_languages add_language BUILDALL DEMOLISHALL DESTROY /;
 print "=" x 74, "\n";
 print "Key: XS = XSUB, PP = Pure Perl, lowercase = via inheritance.\n";
 print "=" x 74, "\n";
 
 __END__
-==================================================================
-Method          Moo     Moose   Tiny    Core    Plain   Marlin 
-==================================================================
+==========================================================================
+Method          Moo     Moose   Mouse   Tiny    Core    Plain   Marlin 
+==========================================================================
 [ NamedThing ]
-new             PP      PP      pp      XS      PP      XS     
-name            XS      PP      PP      PP      PP      XS     
+new             PP      PP      XS      pp      XS      PP      XS     
+name            XS      PP      XS      PP      PP      PP      XS     
+BUILDALL        pp      pp      xs      pp      --      --      XS     
+DEMOLISHALL     pp      pp      xs      --      --      --      --     
+DESTROY         --      PP      XS      pp      --      --      --     
 [ Person ]
-new             PP      PP      pp      XS      PP      XS     
-name            xs      pp      pp      pp      pp      XS     
-age             XS      PP      PP      PP      PP      XS     
-has_age         XS      PP      PP      PP      PP      XS     
-introduction    PP      PP      PP      PP      PP      PP     
+new             PP      PP      XS      pp      XS      PP      XS     
+name            xs      pp      xs      pp      pp      pp      XS     
+age             XS      PP      XS      PP      PP      PP      XS     
+has_age         XS      PP      XS      PP      PP      PP      XS     
+introduction    PP      PP      PP      PP      PP      PP      PP     
+BUILDALL        pp      pp      xs      pp      --      --      XS     
+DEMOLISHALL     pp      pp      xs      --      --      --      --     
+DESTROY         --      PP      XS      pp      --      --      --     
 [ Employee ]
-new             PP      PP      pp      XS      PP      XS     
-name            xs      pp      pp      pp      pp      XS     
-age             xs      pp      pp      pp      pp      XS     
-has_age         xs      pp      pp      pp      pp      XS     
-employee_id     XS      PP      PP      PP      PP      XS     
-introduction    pp      pp      pp      pp      pp      PP     
+new             PP      PP      XS      pp      XS      PP      XS     
+name            xs      pp      xs      pp      pp      pp      XS     
+age             xs      pp      xs      pp      pp      pp      XS     
+has_age         xs      pp      xs      pp      pp      pp      XS     
+employee_id     XS      PP      XS      PP      PP      PP      XS     
+introduction    pp      pp      pp      pp      pp      pp      PP     
+BUILDALL        pp      pp      xs      pp      --      --      XS     
+DEMOLISHALL     pp      pp      xs      --      --      --      --     
+DESTROY         --      PP      XS      pp      --      --      --     
 [ Employee::Developer ]
-new             PP      PP      pp      XS      PP      XS     
-name            xs      pp      pp      pp      pp      XS     
-age             xs      pp      pp      pp      pp      XS     
-has_age         xs      pp      pp      pp      pp      XS     
-employee_id     xs      pp      pp      pp      pp      XS     
-introduction    PP      PP      PP      PP      PP      PP     
-get_languages   PP      PP      PP      PP      PP      PP     
-all_languages   PP      PP      PP      PP      PP      PP     
-add_language    PP      PP      PP      PP      PP      PP     
-==================================================================
+new             PP      PP      XS      pp      XS      PP      XS     
+name            xs      pp      xs      pp      pp      pp      XS     
+age             xs      pp      xs      pp      pp      pp      XS     
+has_age         xs      pp      xs      pp      pp      pp      XS     
+employee_id     xs      pp      xs      pp      pp      pp      XS     
+introduction    PP      PP      PP      PP      PP      PP      PP     
+get_languages   PP      PP      XS      PP      PP      PP      XS     
+all_languages   PP      PP      PP      PP      PP      PP      PP     
+add_language    PP      PP      PP      PP      PP      PP      PP     
+BUILDALL        pp      pp      xs      pp      --      --      XS     
+DEMOLISHALL     pp      pp      xs      --      --      --      --     
+DESTROY         --      PP      XS      pp      --      --      --     
+==========================================================================
 Key: XS = XSUB, PP = Pure Perl, lowercase = via inheritance.
-==================================================================
+==========================================================================

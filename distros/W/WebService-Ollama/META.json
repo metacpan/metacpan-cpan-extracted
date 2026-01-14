@@ -4,7 +4,7 @@
       "LNATION <email@lnation.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -32,10 +32,15 @@
       },
       "runtime" : {
          "requires" : {
+            "Exporter" : "0",
+            "Future" : "0",
+            "IO::Async::Loop" : "0",
             "JSON::Lines" : "0",
             "LWP::UserAgent" : "0",
             "MIME::Base64" : "0",
             "Moo" : "0",
+            "Net::Async::HTTP" : "0",
+            "URI" : "0",
             "perl" : "5.006"
          }
       },
@@ -46,6 +51,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -74,6 +74,8 @@ EOF
 
 usage unless @ARGV;
 
+my (@calls, @clean);
+
 sub call(&@) {
    my ($sub, @args) = @_;
    push @calls, sub { $sub->(@args) };
@@ -93,13 +95,15 @@ $PApp::SQL::Database = new PApp::SQL::Database "",
 
 $PApp::SQL::DBH = $PApp::SQL::Database->dbh;
 
-$keepuser    = parsetime($PApp::Config{KEEPUSER}    || getenv "PAPP_KEEPUSER"    || "60d");
-$keepreguser = parsetime($PApp::Config{KEEPREGUSER} || getenv "PAPP_KEEPREGUSER" || "1y");
-$keepstate   = parsetime($PApp::Config{KEEPSTATE}   || getenv "PAPP_KEEPSTATE"   || "14d");
+my $keepuser    = parsetime($PApp::Config{KEEPUSER}    || getenv "PAPP_KEEPUSER"    || "60d");
+my $keepreguser = parsetime($PApp::Config{KEEPREGUSER} || getenv "PAPP_KEEPREGUSER" || "1y");
+my $keepstate   = parsetime($PApp::Config{KEEPSTATE}   || getenv "PAPP_KEEPSTATE"   || "14d");
+
+my $class;
 
 Getopt::Long::Configure ("bundling", "no_ignore_case");
 {
-   my($obj, $class);
+   my($obj, $class, $verbose);
    GetOptions(
       "initdb" => sub {
          call { initdb() };
@@ -146,7 +150,7 @@ Getopt::Long::Configure ("bundling", "no_ignore_case");
       },
 
       "group|g=s" => sub {
-         $class = Group;
+         $class = "Group";
          $obj = new PApp::DataRef 'DB_row',
                     table => "grp",
                     where => [id => sql_fetch "select id from grp where name = ?", $_[1]],
@@ -162,7 +166,7 @@ Getopt::Long::Configure ("bundling", "no_ignore_case");
       },
 
       "app|a=s" => sub {
-         $class = App;
+         $class = "App";
          $obj = new PApp::DataRef 'DB_row',
                     table => "app",
                     where => [id => sql_fetch "select id from app where name = ?", $_[1]],
@@ -206,7 +210,7 @@ Getopt::Long::Configure ("bundling", "no_ignore_case");
       },
 
       "user|u=s" => sub {
-         $class = User;
+         $class = "User";
          $obj = userid $_[1] || user_create;
       },
       "password=s" => sub {
@@ -267,7 +271,7 @@ Getopt::Long::Configure ("bundling", "no_ignore_case");
       },
 
       "domain=s" => sub {
-         $class = Domain;
+         $class = "Domain";
          $obj = $_[1];
       },
       "export-po=s" => sub {
@@ -317,7 +321,7 @@ Getopt::Long::Configure ("bundling", "no_ignore_case");
 &{pop @clean} while @clean;
 
 sub upgrade_apps {
-   my $st = sql_exec 
+   my $st = sql_exec
                \my($name),
                "select name from app
                 where appset is not null

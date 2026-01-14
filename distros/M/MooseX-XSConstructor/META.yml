@@ -1,0 +1,45 @@
+---
+abstract: 'glue between Moose and Class::XSConstructor'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  Test::Requires: '0'
+  Test::Warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-XSConstructor
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  MooseX::XSConstructor:
+    file: lib/MooseX/XSConstructor.pm
+    version: '0.001000'
+requires:
+  Class::XSConstructor: '0.018001'
+  Hook::AfterRuntime: '0'
+  Moose: '2.2200'
+  perl: '5.008008'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/MooseX-XSConstructor/project
+  bugtracker: https://github.com/tobyink/p5-moosex-xsconstructor/issues
+  homepage: https://metacpan.org/release/MooseX-XSConstructor
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-moosex-xsconstructor.git
+version: '0.001000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

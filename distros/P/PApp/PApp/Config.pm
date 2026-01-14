@@ -15,7 +15,7 @@ use PApp::SQL;
 use Compress::LZF qw(:compress :freeze);
 BEGIN { Compress::LZF::set_serializer "PApp::Storable", "PApp::Storable::net_mstore", "PApp::Storable::mretrieve" }
 
-$VERSION = 2.3;
+$VERSION = 2.4;
 
 require Exporter;
 
@@ -115,6 +115,8 @@ our %prepare_papp_dbh;
 sub _prepare_DBH {
    my $dbh = shift;
 
+   $dbh->do ("set names latin1 collate latin1_nopad_bin");
+
    $PApp::st_fetchstate  = $dbh->prepare ("select count, state, userid, previd, sessid from event_count left join state on (id = ?)");
    $PApp::st_newstateids = $dbh->prepare ("update state_seq set seq = last_insert_id(seq) + ?");
    $PApp::st_insertstate = $dbh->prepare ("replace into state (id, state, userid, previd, sessid, alternative) values (?,?,?,?,?,?)");
@@ -128,19 +130,28 @@ sub _prepare_DBH {
 }
 
 sub new_dbh {
-   PApp::SQL::connect_cached ("papp_1", $PApp::statedb, $PApp::statedb_user, $PApp::statedb_pass, {
-      AutoCommit => 1,
-      RaiseError => 1,
-      PrintError => 0,
-   }, \&_prepare_DBH) or die "error connecting to papp database: $DBI::errstr";
+   my $id = shift || "papp_1";
+
+   PApp::SQL::connect_cached (
+      $id,
+      $PApp::statedb,
+      $PApp::statedb_user,
+      $PApp::statedb_pass,
+      {
+         AutoCommit => 1,
+         RaiseError => 1,
+         PrintError => 0,
+         @_,
+      },
+      \&_prepare_DBH
+   ) or die "error connecting to papp database: $DBI::errstr"
 }
 
 sub DBH() {
-   $DBH = new_dbh
+   $DBH ||= new_dbh
 }
 
-DBH
-   unless $PApp::Config::NO_AUTOCONNECT;
+DBH;
 
 1;
 

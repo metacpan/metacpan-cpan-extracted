@@ -10,38 +10,64 @@ SYNOPSIS
 
 DESCRIPTION
     MooX::XSConstructor will look at your class attributes, and see if it
-    could be built using the simple constructor that Class::XSConstructor is
-    able to provide.
+    could be built using Class::XSConstructor. If your class seems too
+    complicated, it is a no-op. If your class is simple enough, you will
+    hopefully get a faster constructor.
 
-    If your class is too complicated, it is a no-op.
+    Which features are too complicated for MooX::XSConstructor to handle?
 
-    If your class is simple enough, you will hopefully get a faster
-    constructor.
+    *   Any MooX extensions which cause your constructor generator to be
+        changed from the default of Method::Generate::Constructor.
 
-    Things that are deemed too complicated if they appear in *any* attributes
-    (even an inherited one):
+        Luckily hardly any extensions exist which do that.
+        MooX::StrictConstructor is one fairly popular extension that does, and
+        we support that as a special case, but only if you use it with the
+        `-late` option.
 
-    *   Eager builders and defaults. (Lazy builders and defaults are fine.)
+    *   Any MooX extensions which cause your accessor generator to be changed
+        in such a way that it generates the "core set" to be different from
+        the standard one.
 
-    *   Type constraints. (Except Type::Tiny, which is fine.)
+        Basically what this means is that by standard, Moo attributes can be
+        set using `$object->{"attribute_name"} = VALUE`, but if you've got a
+        MooX extension that changes that, MooX::StrictConstructor will bail
+        out.
 
-    *   Type coercions.
+        This includes: MooX::InsideOut and MooX::AttributeFilter.
 
-    *   Triggers.
+    *   If any of your attributes, including inherited ones, are defined using
+        options other than: `is`, `reader`, `writer`, `accessor`, `predicate`,
+        `clearer`, `handles`, `handles_via`, `init_arg`, `required`, `isa`,
+        `coerce`, `builder`, `default`, `lazy`, `trigger`, `weak_ref`, and
+        `documentation`.
 
-    *   Use of `init_arg`.
+        Certain extensions like MooX::Should or MooX::Aliases do define other
+        options for attributes, but also clean up after themselves, deleting
+        the additional options from the attribute spec before
+        MooX::StrictConstructor can see them. So they are okay!
 
-    *   Use of `weak_ref`.
+  API
+    Normal usage is just to `use MooX::XSConstructor` in your Moo class.
+    However, an API is provided.
 
-    Also if your class has a `BUILDARGS` or `FOREIGNBUIDARGS` method, it will
-    be too complicated. (The default `BUILDARGS` inherited from Moo::Object is
-    fine.)
+    `MooX::XSConstructor->setup_for( $class )`
+        Run setup for the given class, replacing its constructor with a faster
+        XS constructor. Do not call the `setup_for` method until you are sure
+        the class has finished compiling, with all attributes already having
+        been added (using `has` or role composition).
 
-    So what Moo features are okay?
+        Returns the class's name if it successfully replaced the constructor.
+        Returns undef otherwise.
 
-    Required versus optional attributes, Type::Tiny type constraints (but not
-    coercions), reader/writer/predicate/clearer, lazy defaults/builders, and
-    delegation (`handles`).
+    `MooX::XSConstructor->is_suitable_class( $class )`
+        Checks that the class is a suitable Moo class for replacing the
+        constructor of. `setup_for` calls this, so you don't actually need to
+        do this check yourself too.
+
+    MooX::XSConstructor::is_xs( $coderef )
+        Returns true if the coderef is implemented with XS. Can be used to
+        double-check `setup_for` was successful if you don't trust it for some
+        reason.
 
 BUGS
     Please report any bugs to
@@ -58,7 +84,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2018 by Toby Inkster.
+    This software is copyright (c) 2018, 2026 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

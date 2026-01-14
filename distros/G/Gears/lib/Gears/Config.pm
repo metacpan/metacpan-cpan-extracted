@@ -1,5 +1,5 @@
 package Gears::Config;
-$Gears::Config::VERSION = '0.100';
+$Gears::Config::VERSION = '0.101';
 use v5.40;
 use Mooish::Base -standard;
 

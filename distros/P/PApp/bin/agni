@@ -1,5 +1,7 @@
 #!/opt/bin/perl
 
+use common::sense;
+
 =head1 NAME
 
 agni - commandline access to the I<PApp!Agni System>.
@@ -25,7 +27,7 @@ agni - commandline access to the I<PApp!Agni System>.
 
       --paths                       show paths
       --newpath <path>              creates a new path
-      
+ 
       -e | --exec-cmd path command  executes a command as defined in util::cmdline
                                     path specifies the path to the object.
 
@@ -246,7 +248,7 @@ sub print_attr {
                        : ($encode
                           ? "\n" . (encode_base64 $data) . "    "
                           : quote_attr $data)
-                    : (null => yes, undef));
+                    : (null => "yes", undef));
 }
 
 my %import_ignore_type;
@@ -294,8 +296,8 @@ sub parse_objects {
                   $o->{paths} = $map_path{$o{paths}} ||= do {
                      my $paths = "0";
                      for (split /,/, $o{paths}) {
-                        defined $map_path[$_] or die "object (gid $gid, paths $o{paths}) references undeclared path $_";
-                        $paths = Agni::or64 $paths, Agni::bit64 $map_path[$_];
+                        defined $map_path[$_] or die "object (gid $o{gid}, paths $o{paths}) references undeclared path $_";
+                        $paths |= 1 << $map_path[$_];
                      }
                      $paths;
                   };
@@ -308,18 +310,18 @@ sub parse_objects {
             } elsif ($_[0] eq "a" or $_[0] eq "m") {
                shift;
                @data = ();
-               %m = @_;
+               my %m = @_;
                sub {
                   my $data = join "", @data;
                   $data =~ s/^\n//; $data =~ s/\n?    $//; $data =~ s/^\t//gm;
                   undef $data if exists $m{null};
-                  $data = decode_base64($data) if exists $m{base64};
+                  $data = decode_base64 ($data) if exists $m{base64};
                   $data = $m{value} if exists $m{value};
                   $o->{attr}{$m{type}} = $data
                      unless exists $import_ignore_type{$m{type}};
                }
             } else {
-               $parser->xpcroak("$file illegal element <$_[0]> found");
+               $parser->xpcroak ("$file illegal element <$_[0]> found");
             }
          }
       },
@@ -331,7 +333,11 @@ sub parse_objects {
       },
    );
    eval {
-      $parser->parsefile($file);
+      if (SCALAR:: eq ref $file) {
+         $parser->parsestring ($$file);
+      } else {
+         $parser->parsefile ($file);
+      }
    };
    $parser->release;
    $@ and die;
@@ -343,7 +349,7 @@ sub save_image {
    my ($file) = @_;
    my $fh;
    defined $file and do { open $fh, ">", $file or die "can't create '$file': $!" };
-   $fh ||= \*STDOUT; 
+   $fh ||= \*STDOUT;
 
    print $fh xml_tag("image", version => '1'),
              "\n\n";
@@ -376,7 +382,7 @@ sub save_image {
             ||= join ",",
                sort { $a <=> $b }
                   map $map_path[$_],
-                     grep { Agni::and64 $paths, Agni::bit64 $_ } sort @pathids;
+                     grep { $paths & (1 << $_) } sort @pathids;
 
       print $fh "<o gid=\"$gid\" paths=\"$paths\">";
       for my $table (@Agni::sqlcol) {
@@ -398,8 +404,8 @@ sub save_image {
 
 sub clear_database {
    for my $table ("obj", "obj_path", @Agni::sqlcol) {
-      sql_exec "delete from $table";
-      sql_exec "alter table $table disable keys"; # mysql
+      #sql_exec "delete from $table";
+      sql_exec "truncate table $table"; # mysql
    }
    sql_exec "alter table obj auto_increment=1"; # mysql
 }
@@ -429,6 +435,10 @@ sub load_image {
 
    clear_database;
 
+   for my $table ("obj", "obj_path", @Agni::sqlcol) {
+      sql_exec "alter table $table disable keys";
+   }
+
    # create paths
    for my $id (0 .. $#$paths) {
       sql_exec "insert into obj_path (id, path) values (?, ?)", $id, $paths->[$id];
@@ -443,15 +453,15 @@ sub load_image {
       }
    }
 
-   PApp::Event::broadcast agni_update => [&Agni::UPDATE_PATHS];
-   PApp::Event::broadcast agni_update => [&Agni::UPDATE_ALL];
-
    for my $table ("obj", "obj_path", @Agni::sqlcol) {
       sql_exec "alter table $table enable keys";
-      sql_exec "optimize table $table";
+      sql_exec "analyze table $table";
    }
 
    Agni::check_gidseq $opt_force;
+
+   PApp::Event::broadcast agni_update => [&Agni::UPDATE_PATHS];
+   PApp::Event::broadcast agni_update => [&Agni::UPDATE_ALL];
 
    sql_exec "unlock tables";
 }
@@ -460,7 +470,7 @@ sub export_path {
    my ($path,$file) = @_;
    my $fh;
    defined $file and do { open($fh, ">", $file) or die "can't create '$file': $!" };
-   $fh ||= \*STDOUT; 
+   $fh ||= \*STDOUT;
 
    die "no such path '$path'" unless sql_exists "obj_path where path = ?", $path;
    
@@ -492,7 +502,7 @@ sub export_path {
       print $fh "\n</o>\n\n\n";
    }
    print $fh "</database>\n\n";
-   sql_exec "unlock tables"; 
+   sql_exec "unlock tables";
 }
 
 sub import_path {
@@ -548,7 +558,7 @@ sub usage {
 Usage: $0 ...
 
    --file <file>                 write output to file or read input from file
-   --daemon            	         go into daemon mode
+   --daemon                      go into daemon mode
    -i | --interval <seconds>     sleep interval for daemon mode
    --export-path path            write path to file (or stdout)
    --import-path path            import path from file
@@ -579,17 +589,6 @@ my $fn;
 GetOptions(
    "file=s" => sub { $fn = $_[1] },
    "force"  => \$opt_force,
-   "interval|i=i" => sub {
-      $interval = shift;
-   },
-   "daemon" => sub {
-      push @exec, sub {
-         do {
-            runq;
-            sleep $interval;
-         } while $interval;
-      };
-   },
    "save-image=s" => sub {
       my $path = $_[1]; push @exec, sub { save_image $path };
    },

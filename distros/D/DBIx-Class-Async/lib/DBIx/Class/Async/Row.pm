@@ -15,11 +15,11 @@ DBIx::Class::Async::Row - Asynchronous row object for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =cut
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 =head1 SYNOPSIS
 
@@ -144,6 +144,127 @@ sub new {
 }
 
 =head1 METHODS
+
+=head2 copy
+
+    my $future = $row->copy(\%changes);
+    $future->then(sub {
+        my ($new_row) = @_;
+        # use $new_row
+    });
+
+Creates a copy of the current row object with optional modifications.
+
+This method performs an asynchronous copy operation that:
+
+=over 4
+
+=item * Creates a new database record with the same column values as the current row
+
+=item * Automatically excludes auto-increment columns (primary keys) from the copy
+
+=item * Allows overriding specific column values through the C<\%changes> parameter
+
+=item * Returns a L<Future> that resolves to a new row object of the same class
+
+=back
+
+B<Parameters:>
+
+=over 4
+
+=item C<$changes>
+
+Optional hash reference containing column-value pairs to override in the copied row.
+The changes are applied I<after> excluding auto-increment columns, so you can use this
+to set a different primary key if needed.
+
+If not provided or C<undef>, an empty hash reference will be used.
+
+=back
+
+B<Returns:> L<Future> that resolves to a new L<DBIx::Class::Async::Row> object (or subclass)
+representing the copied database record.
+
+B<Example:>
+
+    # Simple copy
+    $product->copy->then(sub {
+        my ($copy) = @_;
+        say "Copied product ID: " . $copy->id;
+    });
+
+    # Copy with modifications
+    $product->copy({
+        name => $product->name . ' (Copy)',
+        sku  => 'NEW-SKU-123'
+    })->then(sub {
+        my ($modified_copy) = @_;
+        # New row with changed name and SKU
+    });
+
+B<Notes:>
+
+=over 4
+
+=item * Auto-increment columns are automatically detected and excluded from the copy
+
+=item * The method performs the copy at the database level, not just object duplication
+
+=item * The returned row object will be of the appropriate subclass if one exists
+(e.g., C<DBIx::Class::Async::Row::Product> for a Product source)
+
+=item * All database constraints and triggers will apply during the copy operation
+
+=item * The original row object remains unchanged
+
+=back
+
+B<Throws:> Exceptions from the underlying database operations will be propagated
+through the returned L<Future>.
+
+=cut
+
+sub copy {
+    my ($self, $changes) = @_;
+
+    $changes ||= {};
+
+    my $source_name   = $self->{source_name};
+    my $result_source = $self->result_source;
+    my $columns_info  = $result_source->columns_info;
+    my %all_data      = $self->get_columns;
+
+    # Build copy data, excluding auto-increment columns
+    my %copy_data;
+    for my $col (keys %all_data) {
+        next if $columns_info->{$col} && $columns_info->{$col}{is_auto_increment};
+        $copy_data{$col} = $all_data{$col};
+    }
+
+    # Apply changes (replacement data takes precedence)
+    %copy_data = (%copy_data, %$changes);
+
+    return $self->{async_db}->create($source_name, \%copy_data)->then(sub {
+        my ($result_data) = @_;
+
+        my $row_class = ref($self);
+
+        # If somehow we got the base class, construct the proper class name
+        if ($row_class eq 'DBIx::Class::Async::Row') {
+            $row_class = "DBIx::Class::Async::Row::$source_name";
+        }
+
+        my $async_row = $row_class->new(
+            source_name => $source_name,
+            row_data    => $result_data,
+            async_db    => $self->{async_db},
+            schema      => $result_source->schema,
+        );
+
+        return Future->done($async_row);
+    });
+}
 
 =head2 create_related
 

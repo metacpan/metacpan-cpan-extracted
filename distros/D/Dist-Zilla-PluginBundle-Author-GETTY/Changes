@@ -1,3 +1,8 @@
+0.303     2026-01-13 23:01:57Z
+
+ - Add authority attribute to override x_authority metadata
+ - Fix Git::Push not being added after @Git::VersionManager
+
 0.301     2026-01-10 23:37:10Z
 
  - Added missing changelog entries for 0.300

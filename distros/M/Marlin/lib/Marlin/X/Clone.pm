@@ -5,7 +5,7 @@ use warnings;
 package Marlin::X::Clone;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.013001';
+our $VERSION   = '0.014000';
 
 use Carp 'croak';
 use Clone;

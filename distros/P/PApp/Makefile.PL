@@ -133,7 +133,7 @@ update: secure all
 EOF
 
    if ($ENV{PAPP_INSTALL_SKIP_CONFIG}) {
-      $postamble .= <<'EOF';
+      $postamble .= <<'EOF' if 0;
 
 install :: all
 	$(PERL) ./papp-install --install --skipconfig

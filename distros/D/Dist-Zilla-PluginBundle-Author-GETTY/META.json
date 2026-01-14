@@ -70,7 +70,7 @@
          "web" : "https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty"
       }
    },
-   "version" : "0.301",
+   "version" : "0.303",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -407,7 +407,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.301",
+                  "tag" : "0.303",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -471,6 +471,23 @@
                }
             },
             "name" : "@Author::GETTY/@Git::VersionManager/post-release commit",
+            "version" : "2.048"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Push" : {
+                  "push_to" : [
+                     "origin"
+                  ],
+                  "remotes_must_exist" : 1
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.39.5",
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Author::GETTY/Git::Push",
             "version" : "2.048"
          },
          {

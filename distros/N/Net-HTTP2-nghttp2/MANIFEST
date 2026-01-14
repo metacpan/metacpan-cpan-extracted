@@ -1,11 +1,13 @@
 bin/h2spec-server
-docs/plans/2025-01-09-alien-nghttp2.md
+Changes
 lib/Net/HTTP2/nghttp2.pm
 lib/Net/HTTP2/nghttp2/Session.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+nghttp2.c
 nghttp2.xs
+README.md
 t/00-load.t
 t/01-session.t
 t/02-streaming.t
@@ -18,6 +20,7 @@ t/15-continuation.t
 t/16-priority.t
 t/17-client.t
 t/18-tls-client.t
+t/19-extended-connect.t
 t/lib/Test/HTTP2/Frame.pm
 t/lib/Test/HTTP2/HPACK.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

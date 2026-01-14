@@ -37,4 +37,11 @@ my $thing = Local::Bar->new( foo => 1, bar => 2 );
 is( $thing->foo, 1 );
 is( $thing->bar, 2 );
 
+sub is_xs  {
+	require B;
+	!! B::svref_2object( shift )->XSUB;
+}
+
+ok is_xs(\&Local::Bar::new);
+
 done_testing;

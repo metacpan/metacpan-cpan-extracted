@@ -2,7 +2,7 @@ package WebService::Ollama::Response;
 
 use Moo;
 
-use JSON::Lines qw/jsonl/;
+use JSON::Lines;
 
 has [qw/
 	done
@@ -29,9 +29,48 @@ has [qw/
 	is => 'ro',
 );
 
+sub has_tool_calls {
+	my ($self) = @_;
+	my $calls = $self->extract_tool_calls;
+	return scalar @$calls > 0;
+}
+
+sub extract_tool_calls {
+	my ($self) = @_;
+	my @calls;
+	
+	# Ollama returns tool_calls in the message
+	if ($self->message && ref($self->message) eq 'HASH') {
+		if (my $tc = $self->message->{tool_calls}) {
+			push @calls, @$tc;
+		}
+		
+		# Fallback: some models output tool calls as JSON in content
+		if (!@calls && $self->message->{content}) {
+			my $content = $self->message->{content};
+			
+			# Look for JSON tool call patterns - handle both "arguments" and "parameters"
+			while ($content =~ /\{\s*"name"\s*:\s*"([^"]+)"\s*,\s*"(?:arguments|parameters)"\s*:\s*(\{[^}]*\})\s*\}/g) {
+				my ($name, $args_json) = ($1, $2);
+				my $args = eval { 
+					JSON::Lines->new->decode($args_json)->[0];
+				} // {};
+				push @calls, {
+					function => {
+						name      => $name,
+						arguments => $args,
+					},
+				};
+			}
+		}
+	}
+	
+	return \@calls;
+}
+
 sub json_response {
 	my ($self) = shift;
-	my $aoa = jsonl( decode => 1, data => $self->response ? $self->response : $self->message->{content} );
+	my $aoa = JSON::Lines->new->decode($self->response ? $self->response : $self->message->{content});
 	return scalar @{$aoa} == 1 ? $aoa->[0] : $aoa;
 }
 
@@ -45,7 +84,7 @@ WebService::Ollama::Response - ollama response
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
@@ -99,6 +138,25 @@ Version 0.07
 
 =head1 SUBROUNTINES/METHODS
 
+=head2 has_tool_calls
+
+Returns true if the response contains tool calls.
+
+    if ($response->has_tool_calls) {
+        my $calls = $response->extract_tool_calls;
+    }
+
+=head2 extract_tool_calls
+
+Extract tool calls from the response. Returns an arrayref of tool call structures.
+Handles both native Ollama tool_calls and fallback parsing from content text.
+
+    my $calls = $response->extract_tool_calls;
+    for my $call (@$calls) {
+        my $name = $call->{function}{name};
+        my $args = $call->{function}{arguments};
+    }
+
 =head2 json_response
 
 JSON decode the response.
@@ -146,7 +204,7 @@ L<https://metacpan.org/release/WebService-Ollama>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2025 by LNATION.
+This software is Copyright (c) 2026 by LNATION.
 
 This is free software, licensed under:
 

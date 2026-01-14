@@ -9,14 +9,18 @@ BEGIN {
     use_ok('Debug::Easy') || print "Bail out! Can't load Debug::Easy!\n";
 }
 
-diag("\n" . colored(['cyan on_black'], q{ _______        _   _              }));
-diag(colored(['cyan on_black'], q{|__   __|      | | (_)             }));
-diag(colored(['cyan on_black'], q{   | | ___  ___| |_ _ _ __   __ _  }));
-diag(colored(['cyan on_black'], q{   | |/ _ \/ __| __| | '_ \ / _` | }));
-diag(colored(['cyan on_black'], q{   | |  __/\__ \ |_| | | | | (_| | }));
-diag(colored(['cyan on_black'], q{   |_|\___||___/\__|_|_| |_|\__, | }));
-diag(colored(['cyan on_black'], q{                             __/ | }));
-diag(colored(['cyan on_black'], q{                            |___/  }));
+diag("\n\r" . colored(['yellow'], "\e[4m                                    "));
+diag("\r" . colored(['yellow'], '▏') . colored(['cyan on_black'], q{ _______        _   _              }) . colored(['yellow'], '◣'));
+diag("\r" . colored(['yellow'], '▏') . colored(['cyan on_black'], q{|__   __|      | | (_)             }) . colored(['yellow'], '█'));
+diag("\r" . colored(['yellow'], '▏') . colored(['cyan on_black'], q{   | | ___  ___| |_ _ _ __   __ _  }) . colored(['yellow'], '█'));
+diag("\r" . colored(['yellow'], '▏') . colored(['cyan on_black'], q{   | |/ _ \/ __| __| | '_ \ / _` | }) . colored(['yellow'], '█'));
+diag("\r" . colored(['yellow'], '▏') . colored(['cyan on_black'], q{   | |  __/\__ \ |_| | | | | (_| | }) . colored(['yellow'], '█'));
+diag("\r" . colored(['yellow'], '▏') . colored(['cyan on_black'], q{   |_|\___||___/\__|_|_| |_|\__, | }) . colored(['yellow'], '█'));
+diag("\r" . colored(['yellow'], '▏') . colored(['cyan on_black'], q{                             __/ | }) . colored(['yellow'], '█'));
+diag("\r" . colored(['yellow'], '▏') . colored(['cyan on_black'], q{ Debug::Easy                |___/  }) . colored(['yellow'], '█'));
+diag("\r" . colored(['yellow'], '▏                                   ') . colored(['yellow'], '█'));
+diag("\r" . colored(['yellow'],        '◥' . '█' x 36));
+diag("\r  \r");
 
 my @LogLevel = qw( ERR WARN NOTICE INFO DEBUG DEBUGMAX );
 my @CodeLevel = ('[ ERROR ]', '[WARNING]', '[NOTICE ]', '[ INFO  ]', '[ DEBUG ]', '[-DEBUG-]');
@@ -35,6 +39,7 @@ SKIP: {
         isa_ok($debug, 'Debug::Easy');
 
         foreach my $count (0 .. 5) {
+#            diag(colored(['bright_white'],$LogLevel[$LEVEL] . ' ' . $LogLevel[$count]));
             $stderr = '';
             if ($count <= $LEVEL) {
                 $debug->debug( $LogLevel[$count], $LogLevel[$count] . ' Single Line Message Test');

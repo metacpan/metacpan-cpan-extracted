@@ -1,15 +1,25 @@
 Changes
+examples/01-basic-chat.pl
+examples/02-async-chat.pl
+examples/03-sync-tools.pl
+examples/04-async-tools.pl
 ignore.txt
 lib/WebService/Ollama.pm
+lib/WebService/Ollama/Async.pm
 lib/WebService/Ollama/Response.pm
 lib/WebService/Ollama/UA.pm
+lib/WebService/Ollama/UA/Async.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
+t/01-tools.t
+t/02-async.t
+t/03-response.t
+t/04-functional-api.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

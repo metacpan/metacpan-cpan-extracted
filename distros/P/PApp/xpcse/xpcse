@@ -261,11 +261,10 @@ sub upload {
       <$fh>
    };
 
-   # stat just before uploading, so we don't miss changes also change
-   # filetime to a somewhat earlier point in time, so we really don't miss
-   # any changes.
-   $MTIME = (stat $TEMP)[9] - 1;
-   utime $MTIME, $MTIME, $TEMP;
+   # stat just before uploading, so we don't miss changes we make sure
+   # mtime is not the current time.
+   $MTIME = (stat $TEMP)[9];
+   select undef, undef, undef, 0.1 while time == $MTIME;
 
    $http_headers->content_type ($hdr{'content-type'});
    $http_headers->content_length (length $file);

@@ -37,7 +37,7 @@ use Convert::Scalar ();
 
 use common::sense;
 
-our $VERSION = 2.3;
+our $VERSION = 2.4;
 
 =item $papp = new PApp::Application args...
 

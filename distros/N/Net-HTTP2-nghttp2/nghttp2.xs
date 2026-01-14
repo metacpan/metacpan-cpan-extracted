@@ -544,6 +544,13 @@ NGHTTP2_SETTINGS_ENABLE_PUSH()
         RETVAL
 
 int
+NGHTTP2_SETTINGS_ENABLE_CONNECT_PROTOCOL()
+    CODE:
+        RETVAL = NGHTTP2_SETTINGS_ENABLE_CONNECT_PROTOCOL;
+    OUTPUT:
+        RETVAL
+
+int
 NGHTTP2_DATA_FLAG_NONE()
     CODE:
         RETVAL = NGHTTP2_DATA_FLAG_NONE;
@@ -822,6 +829,11 @@ submit_settings(self, settings_hv)
         }
         if ((svp = hv_fetch(settings_hv, "enable_push", 11, 0))) {
             iv[niv].settings_id = NGHTTP2_SETTINGS_ENABLE_PUSH;
+            iv[niv].value = SvTRUE(*svp) ? 1 : 0;
+            niv++;
+        }
+        if ((svp = hv_fetch(settings_hv, "enable_connect_protocol", 23, 0))) {
+            iv[niv].settings_id = NGHTTP2_SETTINGS_ENABLE_CONNECT_PROTOCOL;
             iv[niv].value = SvTRUE(*svp) ? 1 : 0;
             niv++;
         }

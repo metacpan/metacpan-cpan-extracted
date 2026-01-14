@@ -10,6 +10,7 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/WebService/Ollama.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.006',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
@@ -17,10 +18,16 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-	'Moo' => 0,
-	'LWP::UserAgent' => 0,
-	'JSON::Lines' => 0,
-	'MIME::Base64' => 0,
+        'Moo'              => 0,
+        'LWP::UserAgent'   => 0,
+        'JSON::Lines'      => 0,
+        'MIME::Base64'     => 0,
+        'URI'              => 0,
+        'Exporter'         => 0,
+        # Async deps
+        'Future'           => 0,
+        'IO::Async::Loop'  => 0,
+        'Net::Async::HTTP' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'WebService-Ollama-*' },

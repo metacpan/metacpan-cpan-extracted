@@ -1,5 +1,10 @@
 Revision history for Future-XS
 
+0.15    2026-01-13
+        [BUGFIXES]
+         * Fix a memory leak when `->result` or `->get` on a failed future
+           needs to create a full `Future::Exception` instance
+
 0.14    2025-07-11
         [CHANGES]
          * Make sure to bump refcount of self before calling Future_cancel()

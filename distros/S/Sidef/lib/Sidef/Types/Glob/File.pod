@@ -1,18 +1,40 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Glob::File
+Sidef::Types::Glob::File - File manipulation and information retrieval
 
 =head1 DESCRIPTION
 
-This class implements ...
+The File class provides a comprehensive interface for file operations in Sidef, including reading, writing, metadata retrieval, and file system manipulation. It inherits string manipulation capabilities and adds file-specific functionality.
 
 =head1 SYNOPSIS
 
-var obj = File(...)
-
+    var file = File("example.txt")
+    
+    # Create and write to a file
+    file.write("Hello, World!")
+    
+    # Read file contents
+    say file.read
+    
+    # Check file properties
+    if (file.exists && file.is_readable) {
+        say "File exists and is readable"
+    }
+    
+    # Get file information
+    say "Size: #{file.size} bytes"
+    say "Directory: #{file.dir}"
+    say "Basename: #{file.base}"
+    
+    # Copy and move files
+    file.copy("backup.txt")
+    file.move("new_location.txt")
+    
+    # Work with paths
+    var abs_path = file.abs_path
+    say "Absolute path: #{abs_path}"
 
 =head1 INHERITS
 
@@ -24,9 +46,13 @@ Inherits methods from:
 
 =head2 abs
 
-    self.abs(base)
+    file.abs(base)
 
-Returns the
+Returns the absolute pathname of the file. If C<base> is provided, it is used as the base directory for relative path resolution. Otherwise, the current working directory is used.
+
+    var file = File("docs/readme.txt")
+    say file.abs                    # /home/user/docs/readme.txt
+    say file.abs("/var/www")        # /var/www/docs/readme.txt
 
 Aliases: I<abs_name>, I<absname>, I<rel2abs>
 
@@ -34,9 +60,12 @@ Aliases: I<abs_name>, I<absname>, I<rel2abs>
 
 =head2 abs_path
 
-    self.abs_path
+    file.abs_path
 
-Returns the
+Returns the canonicalized absolute pathname by resolving all symbolic links and relative path components (C<.> and C<..>). This is the real, physical path to the file on the filesystem.
+
+    var file = File("../project/link_to_file")
+    say file.abs_path               # /home/user/project/actual_file
 
 Aliases: I<realpath>
 
@@ -44,25 +73,37 @@ Aliases: I<realpath>
 
 =head2 access_time_days_diff
 
-    self.access_time_days_diff
+    file.access_time_days_diff
 
-Returns the
+Returns the number of days since the file was last accessed, relative to the current time. The access time (atime) is updated when the file is read.
+
+    var file = File("log.txt")
+    say "Last accessed #{file.access_time_days_diff} days ago"
 
 =cut
 
 =head2 append
 
-    self.append(string, mode)
+    file.append(string, mode=':utf8')
 
-Returns the
+Appends the given string to the file. If the file doesn't exist, it will be created. The optional C<mode> parameter specifies the encoding layer (default is UTF-8).
+
+    var file = File("log.txt")
+    file.append("New log entry\n")
+    file.append("Binary data", ':raw')
+
+Returns the File object for method chaining.
 
 =cut
 
 =head2 base
 
-    self.base
+    file.base
 
-Returns the
+Returns the basename of the file (the filename without the directory path), similar to the Unix shell command C<basename>.
+
+    var file = File("/home/user/document.txt")
+    say file.base                   # document.txt
 
 Aliases: I<base_name>, I<basename>
 
@@ -70,41 +111,71 @@ Aliases: I<base_name>, I<basename>
 
 =head2 change_time_days_diff
 
-    self.change_time_days_diff
+    file.change_time_days_diff
 
-Returns the
+Returns the number of days since the file's inode change time (ctime), relative to the current time. The change time is updated when file metadata (permissions, ownership, etc.) or content changes.
+
+    var file = File("config.ini")
+    say "Last changed #{file.change_time_days_diff} days ago"
 
 =cut
 
 =head2 chmod
 
-    self.chmod(permission)
+    file.chmod(permission)
 
-Returns the
+Changes the file's permission bits. The permission can be specified as an octal number or a string.
+
+    var file = File("script.sh")
+    file.chmod(0755)                # rwxr-xr-x
+    file.chmod("644")               # rw-r--r--
+
+Returns C<true> on success, C<false> otherwise.
 
 =cut
 
 =head2 chown
 
-    self.chown(uid, gid)
+    file.chown(uid, gid)
 
-Returns the
+Changes the owner and group of the file. Both C<uid> (user ID) and C<gid> (group ID) must be provided as numeric values.
+
+    var file = File("data.txt")
+    file.chown(1000, 1000)          # Change owner and group
+
+Returns C<true> on success, C<false> otherwise. May require elevated privileges.
 
 =cut
 
 =head2 compare
 
-    self.compare(file)
+    file.compare(other_file)
 
-Returns the
+Compares the contents of two files byte-by-byte. Returns C<0> if files are identical, C<-1> if the first file is less than the second, C<1> if greater, or C<nil> on error.
+
+    var file1 = File("original.txt")
+    var file2 = File("copy.txt")
+    
+    given (file1.compare(file2)) {
+        when (0)  { say "Files are identical" }
+        when (-1) { say "file1 < file2" }
+        when (1)  { say "file1 > file2" }
+        default   { say "Error comparing files" }
+    }
 
 =cut
 
 =head2 cp
 
-    self.cp(file)
+    file.cp(destination)
 
-Returns the
+Copies the file to the specified destination. The destination can be either a filename or a File object. If the destination is a directory, the file is copied into that directory with the same basename.
+
+    var file = File("source.txt")
+    file.cp("backup.txt")           # Copy to backup.txt
+    file.cp(Dir("backups"))         # Copy into backups directory
+
+Returns C<true> on success, C<false> otherwise.
 
 Aliases: I<copy>
 
@@ -114,9 +185,10 @@ Aliases: I<copy>
 
     file.delete
 
-Deletes a file and return C<true> on success.
+Deletes the file from the filesystem and returns C<true> on success, C<false> otherwise. This method will not attempt to delete directories; use C<Dir.remove> for directories instead.
 
-Will not attempt to delete directories.
+    var file = File("temporary.txt")
+    file.delete && say "File deleted successfully"
 
 Aliases: I<remove>
 
@@ -126,7 +198,10 @@ Aliases: I<remove>
 
     file.dir
 
-Returns the directory of the filename, similar to the Unix shell command C<dirname>.
+Returns the directory portion of the filename as a String, similar to the Unix shell command C<dirname>. This is the parent directory containing the file.
+
+    var file = File("/home/user/documents/file.txt")
+    say file.dir                    # /home/user/documents
 
 Aliases: I<dir_name>, I<dirname>
 
@@ -136,15 +211,25 @@ Aliases: I<dir_name>, I<dirname>
 
     file.dump
 
-Returns a String representation of the File object.
+Returns a String representation of the File object, suitable for debugging. The representation includes the class name and the file path.
+
+    var file = File("example.txt")
+    say file.dump                   # File("example.txt")
 
 =cut
 
 =head2 edit
 
-    self.edit(code)
+    file.edit(code)
 
-Returns the
+Reads the file's contents, passes them to the provided code block, and writes the result back to the file. This is useful for in-place file editing.
+
+    var file = File("config.txt")
+    file.edit { |content|
+        content.gsub(/old/, 'new')
+    }
+
+Returns the File object for method chaining.
 
 =cut
 
@@ -152,7 +237,10 @@ Returns the
 
     file.exists
 
-Returns C<true> if file exists.
+Returns C<true> if the file exists on the filesystem, C<false> otherwise. This checks for existence of any filesystem entity at the path, including regular files, directories, symlinks, etc.
+
+    var file = File("data.txt")
+    file.exists || die "File not found"
 
 =cut
 
@@ -160,7 +248,10 @@ Returns C<true> if file exists.
 
     file.has_setgid_bit
 
-Returns C<true> if file has setgid bit set.
+Returns C<true> if the file has the setgid (set group ID) bit set in its permissions. When set on an executable, the process runs with the group privileges of the file rather than the user.
+
+    var file = File("/usr/bin/wall")
+    file.has_setgid_bit && say "Has setgid bit"
 
 =cut
 
@@ -168,7 +259,10 @@ Returns C<true> if file has setgid bit set.
 
     file.has_setuid_bit
 
-Returns C<true> if file has setuid bit set.
+Returns C<true> if the file has the setuid (set user ID) bit set in its permissions. When set on an executable, the process runs with the user privileges of the file owner rather than the executor.
+
+    var file = File("/usr/bin/sudo")
+    file.has_setuid_bit && say "Has setuid bit"
 
 =cut
 
@@ -176,7 +270,10 @@ Returns C<true> if file has setuid bit set.
 
     file.has_sticky_bit
 
-Returns C<true> if file has sticky bit set.
+Returns C<true> if the file has the sticky bit set in its permissions. On directories, this restricts deletion of files to their owners. On some systems, this affects executables in memory.
+
+    var dir = File("/tmp")
+    dir.has_sticky_bit && say "Has sticky bit"
 
 =cut
 
@@ -184,7 +281,10 @@ Returns C<true> if file has sticky bit set.
 
     file.is_abs
 
-Returns C<true> if file name is absolute.
+Returns C<true> if the file path is absolute (starts from the root directory), C<false> if it's relative.
+
+    File("/home/user/file.txt").is_abs    # true
+    File("relative/path.txt").is_abs      # false
 
 Aliases: I<is_absolute>
 
@@ -194,7 +294,10 @@ Aliases: I<is_absolute>
 
     file.is_binary
 
-Returns C<true> if file looks like a binary file (heuristic guess).
+Returns C<true> if the file appears to be a binary file based on heuristic analysis of its contents. This checks for non-text characters in the file's initial bytes.
+
+    var file = File("image.png")
+    file.is_binary && say "Binary file detected"
 
 =cut
 
@@ -202,7 +305,10 @@ Returns C<true> if file looks like a binary file (heuristic guess).
 
     file.is_block
 
-Returns C<true> if file is a block special file.
+Returns C<true> if the file is a block special file (block device), such as a disk partition.
+
+    var device = File("/dev/sda1")
+    device.is_block && say "Block device"
 
 =cut
 
@@ -210,7 +316,10 @@ Returns C<true> if file is a block special file.
 
     file.is_char_device
 
-Returns C<true> if file is a character special file.
+Returns C<true> if the file is a character special file (character device), such as a terminal or serial port.
+
+    var terminal = File("/dev/tty")
+    terminal.is_char_device && say "Character device"
 
 =cut
 
@@ -218,7 +327,10 @@ Returns C<true> if file is a character special file.
 
     file.is_dir
 
-Returns C<true> if file is a directory.
+Returns C<true> if the file is a directory, C<false> otherwise.
+
+    var path = File("/home/user")
+    path.is_dir && say "This is a directory"
 
 Aliases: I<is_directory>
 
@@ -228,7 +340,10 @@ Aliases: I<is_directory>
 
     file.is_empty
 
-Returns C<true> if file has zero size (i.e.: is empty).
+Returns C<true> if the file has zero size (i.e., is empty), C<false> otherwise.
+
+    var file = File("empty.txt")
+    file.is_empty && say "File is empty"
 
 =cut
 
@@ -236,7 +351,10 @@ Returns C<true> if file has zero size (i.e.: is empty).
 
     file.is_executable
 
-Returns C<true> if file is executable by effective uid/gid.
+Returns C<true> if the file is executable by the effective user ID and group ID of the current process.
+
+    var script = File("run.sh")
+    script.is_executable || die "Script is not executable"
 
 =cut
 
@@ -244,7 +362,10 @@ Returns C<true> if file is executable by effective uid/gid.
 
     file.is_file
 
-Returns C<true> if file is a plain file.
+Returns C<true> if the file is a plain (regular) file, as opposed to a directory, symlink, or special file.
+
+    var file = File("document.txt")
+    file.is_file && say "Regular file"
 
 =cut
 
@@ -252,9 +373,10 @@ Returns C<true> if file is a plain file.
 
     file.is_link
 
-Returns C<true> if file is a symbolic link.
+Returns C<true> if the file is a symbolic link. Returns C<false> if symbolic links aren't supported by the filesystem.
 
-Returns C<false> if symlinks aren't supported by the file system.
+    var link = File("shortcut")
+    link.is_link && say "This is a symlink"
 
 =cut
 
@@ -262,7 +384,10 @@ Returns C<false> if symlinks aren't supported by the file system.
 
     file.is_owned
 
-Returns C<true> if file is owned by effective uid.
+Returns C<true> if the file is owned by the effective user ID of the current process.
+
+    var file = File("myfile.txt")
+    file.is_owned && say "You own this file"
 
 =cut
 
@@ -270,7 +395,10 @@ Returns C<true> if file is owned by effective uid.
 
     file.is_readable
 
-Returns C<true> if file is readable by effective uid/gid.
+Returns C<true> if the file is readable by the effective user ID and group ID of the current process.
+
+    var file = File("data.txt")
+    file.is_readable || die "Cannot read file"
 
 =cut
 
@@ -278,7 +406,10 @@ Returns C<true> if file is readable by effective uid/gid.
 
     file.is_real_executable
 
-Returns C<true> if file is executable by real uid/gid.
+Returns C<true> if the file is executable by the real user ID and group ID of the current process (not the effective IDs).
+
+    var script = File("check.sh")
+    script.is_real_executable && say "Really executable"
 
 =cut
 
@@ -286,7 +417,10 @@ Returns C<true> if file is executable by real uid/gid.
 
     file.is_real_owned
 
-Returns C<true> if file is owned by real uid.
+Returns C<true> if the file is owned by the real user ID of the current process (not the effective UID).
+
+    var file = File("data.txt")
+    file.is_real_owned && say "Really owned by you"
 
 =cut
 
@@ -294,7 +428,10 @@ Returns C<true> if file is owned by real uid.
 
     file.is_real_readable
 
-Returns C<true> if file is readable by real uid/gid.
+Returns C<true> if the file is readable by the real user ID and group ID of the current process (not the effective IDs).
+
+    var file = File("protected.txt")
+    file.is_real_readable || say "Not readable with real UID"
 
 =cut
 
@@ -302,7 +439,10 @@ Returns C<true> if file is readable by real uid/gid.
 
     file.is_real_writeable
 
-Returns C<true> if file is writable by real uid/gid.
+Returns C<true> if the file is writable by the real user ID and group ID of the current process (not the effective IDs).
+
+    var file = File("data.txt")
+    file.is_real_writeable && say "Really writable"
 
 =cut
 
@@ -310,7 +450,10 @@ Returns C<true> if file is writable by real uid/gid.
 
     file.is_socket
 
-Returns C<true> if file is a socket.
+Returns C<true> if the file is a Unix domain socket.
+
+    var sock = File("/var/run/socket")
+    sock.is_socket && say "This is a socket"
 
 =cut
 
@@ -318,7 +461,10 @@ Returns C<true> if file is a socket.
 
     file.is_text
 
-Returns C<true> if file is an ASCII or UTF-8 text file (heuristic guess).
+Returns C<true> if the file appears to be an ASCII or UTF-8 text file based on heuristic analysis of its contents.
+
+    var file = File("readme.txt")
+    file.is_text && say "Text file detected"
 
 =cut
 
@@ -326,7 +472,10 @@ Returns C<true> if file is an ASCII or UTF-8 text file (heuristic guess).
 
     file.is_writeable
 
-Returns C<true> if file is writable by effective uid/gid.
+Returns C<true> if the file is writable by the effective user ID and group ID of the current process.
+
+    var file = File("output.log")
+    file.is_writeable || die "Cannot write to file"
 
 =cut
 
@@ -334,25 +483,38 @@ Returns C<true> if file is writable by effective uid/gid.
 
     oldfile.link(newfile)
 
-Creates a new filename linked to the old filename.
+Creates a hard link from C<newfile> to C<oldfile>. Both names will point to the same inode on the filesystem. Changes to either file affect both names.
 
-Returns C<true> for success, C<false> otherwise.
+    var original = File("source.txt")
+    original.link("hardlink.txt")
+
+Returns C<true> on success, C<false> otherwise.
 
 =cut
 
 =head2 lstat
 
-    self.lstat
+    file.lstat
 
-Returns the
+Returns a Stat object containing information about the file. Unlike C<stat>, if the file is a symbolic link, C<lstat> returns information about the link itself rather than the target file.
+
+    var link = File("symlink")
+    var info = link.lstat
+    say "Link size: #{info.size}"
 
 =cut
 
 =head2 make
 
-    self.make(*args)
+    file.make(*args)
 
-Returns the
+Creates an empty file if it doesn't exist, or updates the modification and access times if it does exist (like the Unix C<touch> command). Optional arguments can specify permissions or other creation parameters.
+
+    var file = File("newfile.txt")
+    file.make                       # Create empty file
+    file.make(0644)                 # Create with specific permissions
+
+Returns C<true> on success, C<false> otherwise.
 
 Aliases: I<touch>, I<create>, I<mkfile>
 
@@ -360,17 +522,26 @@ Aliases: I<touch>, I<create>, I<mkfile>
 
 =head2 md5
 
-    self.md5
+    file.md5
 
-Returns the
+Computes and returns the MD5 hash digest of the file's contents as a hexadecimal string.
+
+    var file = File("data.bin")
+    var hash = file.md5
+    say "MD5: #{hash}"              # MD5: 5d41402abc4b2a76b9719d911017c592
 
 =cut
 
 =head2 mktemp
 
-    self.mktemp(:opts)
+    File.mktemp(template => "tempXXXXXX", dir => "/tmp")
 
-Returns the
+Creates a temporary file with a unique name based on the provided template. The template should contain a sequence of X characters that will be replaced with random characters. Returns a File object for the created temporary file.
+
+    var tmpfile = File.mktemp
+    tmpfile.write("temporary data")
+    
+    var custom = File.mktemp(template => "myapp_XXXX", dir => "/var/tmp")
 
 Aliases: I<make_tmp>, I<make_temp>
 
@@ -378,17 +549,26 @@ Aliases: I<make_tmp>, I<make_temp>
 
 =head2 modification_time_days_diff
 
-    self.modification_time_days_diff
+    file.modification_time_days_diff
 
-Returns the
+Returns the number of days since the file was last modified (content changed), relative to the current time.
+
+    var file = File("document.txt")
+    say "Last modified #{file.modification_time_days_diff} days ago"
 
 =cut
 
 =head2 mv
 
-    self.mv(file)
+    file.mv(destination)
 
-Returns the
+Moves (renames) the file to the specified destination. The destination can be either a filename or a File object. If the destination is a directory, the file is moved into that directory with the same basename.
+
+    var file = File("old_name.txt")
+    file.mv("new_name.txt")         # Rename file
+    file.mv(Dir("archive"))         # Move to archive directory
+
+Returns C<true> on success, C<false> otherwise.
 
 Aliases: I<move>
 
@@ -396,17 +576,24 @@ Aliases: I<move>
 
 =head2 name
 
-    self.name
+    file.name
 
-Returns the
+Returns the complete pathname of the file as a String.
+
+    var file = File("/home/user/file.txt")
+    say file.name                   # /home/user/file.txt
 
 =cut
 
 =head2 new
 
-    self.new
+    File.new(path)
 
-Returns the
+Creates a new File object for the specified path. This is the constructor method, typically called implicitly when using C<File(path)> syntax.
+
+    var file = File.new("/path/to/file.txt")
+    # Equivalent to:
+    var file = File("/path/to/file.txt")
 
 Aliases: I<call>
 
@@ -414,17 +601,40 @@ Aliases: I<call>
 
 =head2 open
 
-    self.open(mode, fh_ref, err_ref)
+    file.open(mode, fh_ref, err_ref)
 
-Returns the
+Opens the file with the specified mode and stores the filehandle reference in C<fh_ref>. If an error occurs, the error message is stored in C<err_ref>. Common modes include:
+
+    '<'  - read
+    '>'  - write (truncate)
+    '>>' - append
+    '+<' - read/write
+
+    var file = File("data.txt")
+    var fh = nil
+    var err = nil
+    
+    if (file.open('<', \fh, \err)) {
+        # Read from fh
+        fh.close
+    } else {
+        die err
+    }
+
+Returns C<true> on success, C<false> otherwise.
 
 =cut
 
 =head2 open_a
 
-    self.open_a(*args)
+    file.open_a(*args)
 
-Returns the
+Opens the file in append mode and returns a filehandle. If the file doesn't exist, it will be created.
+
+    var file = File("log.txt")
+    var fh = file.open_a
+    fh.say("Log entry")
+    fh.close
 
 Aliases: I<open_append>
 
@@ -432,9 +642,14 @@ Aliases: I<open_append>
 
 =head2 open_arw
 
-    self.open_arw(*args)
+    file.open_arw(*args)
 
-Returns the
+Opens the file in append-read-write mode and returns a filehandle. This allows reading the entire file and appending to it.
+
+    var file = File("data.txt")
+    var fh = file.open_arw
+    # Can read and append
+    fh.close
 
 Aliases: I<open_append_read_write>
 
@@ -442,17 +657,27 @@ Aliases: I<open_append_read_write>
 
 =head2 opendir
 
-    self.opendir(*args)
+    dir.opendir(*args)
 
-Returns the
+Opens a directory and returns a dirhandle for reading directory entries. This is typically used with directory paths.
+
+    var dir = File("/home/user")
+    var dh = dir.opendir
+    dh.each { |entry| say entry }
+    dh.close
 
 =cut
 
 =head2 open_r
 
-    self.open_r(*args)
+    file.open_r(*args)
 
-Returns the
+Opens the file in read-only mode and returns a filehandle.
+
+    var file = File("input.txt")
+    var fh = file.open_r
+    var content = fh.slurp
+    fh.close
 
 Aliases: I<open_read>
 
@@ -460,9 +685,14 @@ Aliases: I<open_read>
 
 =head2 open_rw
 
-    self.open_rw(*args)
+    file.open_rw(*args)
 
-Returns the
+Opens the file in read-write mode and returns a filehandle. The file must already exist.
+
+    var file = File("data.txt")
+    var fh = file.open_rw
+    # Can read and write
+    fh.close
 
 Aliases: I<open_read_write>
 
@@ -470,9 +700,14 @@ Aliases: I<open_read_write>
 
 =head2 open_w
 
-    self.open_w(*args)
+    file.open_w(*args)
 
-Returns the
+Opens the file in write mode (truncating if it exists) and returns a filehandle.
+
+    var file = File("output.txt")
+    var fh = file.open_w
+    fh.say("Hello, World!")
+    fh.close
 
 Aliases: I<open_write>
 
@@ -480,17 +715,25 @@ Aliases: I<open_write>
 
 =head2 read
 
-    self.read(mode)
+    file.read(mode=':utf8')
 
-Returns the
+Reads and returns the entire contents of the file as a String. The optional C<mode> parameter specifies the encoding layer (default is UTF-8).
+
+    var file = File("data.txt")
+    var content = file.read          # Read as UTF-8 text
+    var binary = file.read(':raw')   # Read as raw bytes
 
 =cut
 
 =head2 read_link
 
-    self.read_link
+    link.read_link
 
-Returns the
+Reads and returns the target path of a symbolic link. If the file is not a symbolic link, returns C<nil>.
+
+    var link = File("shortcut")
+    var target = link.read_link
+    say "Link points to: #{target}"
 
 Aliases: I<readlink>
 
@@ -498,9 +741,13 @@ Aliases: I<readlink>
 
 =head2 rel
 
-    self.rel(base)
+    file.rel(base=Dir.cwd)
 
-Returns the
+Returns the relative pathname of the file with respect to the base directory. If no base is provided, the current working directory is used.
+
+    var file = File("/home/user/docs/file.txt")
+    say file.rel("/home/user")      # docs/file.txt
+    say file.rel                     # relative to current directory
 
 Aliases: I<abs2rel>, I<rel_name>, I<relname>
 
@@ -508,99 +755,148 @@ Aliases: I<abs2rel>, I<rel_name>, I<relname>
 
 =head2 rename
 
-    self.rename(file)
+    file.rename(new_name)
 
-Returns the
+Renames the file to the specified new name. This is a lower-level operation than C<mv> and works within the same filesystem.
+
+    var file = File("old.txt")
+    file.rename("new.txt")
+
+Returns C<true> on success, C<false> otherwise.
 
 =cut
 
 =head2 sha1
 
-    self.sha1
+    file.sha1
 
-Returns the
+Computes and returns the SHA-1 hash digest of the file's contents as a hexadecimal string.
+
+    var file = File("data.bin")
+    var hash = file.sha1
+    say "SHA-1: #{hash}"
 
 =cut
 
 =head2 sha256
 
-    self.sha256
+    file.sha256
 
-Returns the
+Computes and returns the SHA-256 hash digest of the file's contents as a hexadecimal string.
+
+    var file = File("data.bin")
+    var hash = file.sha256
+    say "SHA-256: #{hash}"
 
 =cut
 
 =head2 sha512
 
-    self.sha512
+    file.sha512
 
-Returns the
+Computes and returns the SHA-512 hash digest of the file's contents as a hexadecimal string.
+
+    var file = File("data.bin")
+    var hash = file.sha512
+    say "SHA-512: #{hash}"
 
 =cut
 
 =head2 size
 
-    self.size
+    file.size
 
-Returns the
+Returns the size of the file in bytes. Returns C<0> for empty files or if the file doesn't exist.
+
+    var file = File("document.txt")
+    say "File size: #{file.size} bytes"
 
 =cut
 
 =head2 split
 
-    self.split
+    file.split
 
-Returns the
+Splits the file path into its constituent parts and returns them as an Array. This typically includes the volume (on Windows), directory components, and filename.
+
+    var file = File("/home/user/docs/file.txt")
+    var parts = file.split
+    # ['', 'home', 'user', 'docs', 'file.txt']
 
 =cut
 
 =head2 splitpath
 
-    self.splitpath
+    file.splitpath
 
-Returns the
+Splits the file path into volume, directory, and filename components. Returns an Array with three elements: [volume, directory, filename].
+
+    var file = File("/home/user/file.txt")
+    var (vol, dir, name) = file.splitpath...
+    # vol: '', dir: '/home/user/', name: 'file.txt'
 
 =cut
 
 =head2 stat
 
-    self.stat
+    file.stat
 
-Returns the
+Returns a Stat object containing detailed information about the file, including size, permissions, timestamps, inode number, and more. If the file is a symbolic link, returns information about the target file (use C<lstat> for link info).
+
+    var file = File("data.txt")
+    var info = file.stat
+    say "Size: #{info.size}"
+    say "Mode: #{info.mode}"
+    say "Mtime: #{info.mtime}"
 
 =cut
 
 =head2 symlink
 
-    oldfile.symlink(newfile)
+    target.symlink(link_name)
 
-Creates a new filename symbolically linked to the old filename.
+Creates a symbolic link named C<link_name> that points to C<target>. The target doesn't need to exist at the time of creation.
 
-Returns C<true> for success, C<false> otherwise.
+    var target = File("original.txt")
+    target.symlink("link_to_original")
+
+Returns C<true> on success, C<false> otherwise.
 
 =cut
 
 =head2 sysopen
 
-    self.sysopen(var_ref, mode, perm)
+    file.sysopen(var_ref, mode, perm)
 
-Returns the
+Opens the file using low-level system call interface with specified mode and permissions. The filehandle is stored in the reference C<var_ref>. Mode flags are numeric (e.g., O_RDONLY, O_WRONLY, O_RDWR).
+
+    var file = File("data.bin")
+    var fh = nil
+    file.sysopen(\fh, O_RDWR | O_CREAT, 0644)
+
+Returns C<true> on success, C<false> otherwise.
 
 =cut
 
 =head2 to_file
 
-    self.to_file
+    file.to_file
 
-Returns the
+Returns the File object itself. This is useful for polymorphic code that might receive either a String or File object.
+
+    var obj = File("test.txt")
+    var file = obj.to_file           # Returns same File object
 
 =cut
 
 =head2 to_s
 
-    self.to_s
+    file.to_s
 
-Returns the
+Returns the file path as a String.
+
+    var file = File("/home/user/file.txt")
+    say file.to_s                    # /home/user/file.txt
 
 Aliases: I<to_str>
 
@@ -608,32 +904,194 @@ Aliases: I<to_str>
 
 =head2 truncate
 
-    self.truncate(length)
+    file.truncate(length)
 
-Returns the
+Truncates the file to the specified length in bytes. If the file is larger than length, the extra data is lost. If shorter, it is extended with null bytes.
+
+    var file = File("data.txt")
+    file.truncate(100)               # Truncate to 100 bytes
+
+Returns C<true> on success, C<false> otherwise.
 
 =cut
 
 =head2 unlink
 
-    self.unlink(*args)
+    file.unlink(*args)
 
-Returns the
+Deletes one or more files. If called without arguments, deletes the file object itself. If called with arguments, deletes the specified files.
+
+    var file = File("temp.txt")
+    file.unlink                      # Delete this file
+    
+    File.unlink("file1.txt", "file2.txt")  # Delete multiple files
+
+Returns the number of files successfully deleted.
 
 =cut
 
 =head2 utime
 
-    self.utime(atime, mtime)
+    file.utime(atime, mtime)
 
-Returns the
+Sets the access time and modification time of the file. Times are specified as Unix timestamps (seconds since epoch).
+
+    var file = File("data.txt")
+    var now = Time.now.to_i
+    file.utime(now, now)             # Update both times to now
+
+Returns C<true> on success, C<false> otherwise.
 
 =cut
 
 =head2 write
 
-    self.write(string, mode)
+    file.write(string, mode=':utf8')
 
-Returns the
+Writes the given string to the file, replacing any existing content. If the file doesn't exist, it will be created. The optional C<mode> parameter specifies the encoding layer (default is UTF-8).
+
+    var file = File("output.txt")
+    file.write("Hello, World!")
+    file.write(binary_data, ':raw')
+
+Returns the File object for method chaining.
 
 =cut
+
+=head1 EXAMPLES
+
+=head2 Basic File Operations
+
+    # Create a file and write content
+    var file = File("example.txt")
+    file.write("Line 1\nLine 2\nLine 3\n")
+    
+    # Read and print contents
+    say file.read
+    
+    # Append more content
+    file.append("Line 4\n")
+    
+    # Check file properties
+    say "Size: #{file.size} bytes"
+    say "Readable: #{file.is_readable}"
+    say "Writable: #{file.is_writeable}"
+
+=head2 File Information and Metadata
+
+    var file = File("/etc/passwd")
+    
+    # Get path components
+    say "Directory: #{file.dir}"
+    say "Basename: #{file.base}"
+    say "Absolute path: #{file.abs_path}"
+    
+    # Get file statistics
+    var stat = file.stat
+    say "Inode: #{stat.ino}"
+    say "Permissions: #{stat.mode.as_oct}"
+    say "Owner UID: #{stat.uid}"
+    
+    # Check age
+    say "Modified #{file.modification_time_days_diff} days ago"
+
+=head2 Working with Checksums
+
+    var file = File("download.iso")
+    
+    # Compute various hash digests
+    say "MD5:    #{file.md5}"
+    say "SHA1:   #{file.sha1}"
+    say "SHA256: #{file.sha256}"
+    say "SHA512: #{file.sha512}"
+
+=head2 File Copying and Moving
+
+    var source = File("original.txt")
+    
+    # Create a backup copy
+    source.copy("backup.txt")
+    
+    # Move to archive directory
+    source.move("archive/original.txt")
+    
+    # Create hard and symbolic links
+    File("data.txt").link("hardlink.txt")
+    File("data.txt").symlink("symlink.txt")
+
+=head2 In-Place File Editing
+
+    # Convert file to uppercase
+    File("text.txt").edit { |content|
+        content.uc
+    }
+    
+    # Replace all occurrences of a pattern
+    File("config.ini").edit { |content|
+        content.gsub(/old_value/, 'new_value')
+    }
+    
+    # Process line by line
+    File("data.csv").edit { |content|
+        content.lines.map { |line|
+            line.split(',').map { .trim }.join(',')
+        }.join("\n")
+    }
+
+=head2 Working with File Handles
+
+    # Read line by line
+    var file = File("large.txt")
+    var fh = file.open_r
+    fh.each_line { |line|
+        say line.trim
+    }
+    fh.close
+    
+    # Write with explicit handle
+    var output = File("output.txt")
+    var fh = output.open_w
+    fh.say("Header")
+    10.times { |i|
+        fh.say("Line #{i}")
+    }
+    fh.close
+
+=head2 Temporary Files
+
+    # Create a temporary file
+    var tmp = File.mktemp
+    tmp.write("temporary data")
+    
+    # Use custom template
+    var tmp2 = File.mktemp(
+        template => "myapp_XXXXXX",
+        dir => "/var/tmp"
+    )
+    
+    # Cleanup
+    tmp.delete
+    tmp2.delete
+
+=head2 File Type Checking
+
+    var path = File(ARGV[0])
+    
+    given (path) {
+        when { .is_file }      { say "Regular file" }
+        when { .is_dir }       { say "Directory" }
+        when { .is_link }      { say "Symbolic link → #{.read_link}" }
+        when { .is_socket }    { say "Unix socket" }
+        when { .is_block }     { say "Block device" }
+        default                { say "Unknown file type" }
+    }
+    
+    # Check content type
+    if (path.is_file) {
+        path.is_text   && say "Text file"
+        path.is_binary && say "Binary file"
+    }
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Glob::Dir>, L<Sidef::Types::Glob::FileHandle>, L<Sidef::Types::String::String>

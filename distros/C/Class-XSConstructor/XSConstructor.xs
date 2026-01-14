@@ -143,7 +143,7 @@ typedef struct {
 } xscon_delegation_t;
 
 xscon_constructor_t*
-xscon_constructor_create(SV *sig_sv, xscon_constructor_t* sig) {
+xscon_constructor_get_metadata(SV *sig_sv, xscon_constructor_t* sig) {
 
     dTHX;
     dSP;
@@ -426,14 +426,26 @@ xscon_constructor_create(SV *sig_sv, xscon_constructor_t* sig) {
 }
 
 xscon_destructor_t*
-xscon_destructor_create(char *packagename) {
+xscon_destructor_get_metadata(char *packagename, xscon_destructor_t* sig) {
 
     dTHX;
     dSP;
 
     /* Allocate the signature struct */
-    xscon_destructor_t *sig;
-    Newxz(sig, 1, xscon_destructor_t);
+    if ( sig == NULL ) {
+        xscon_destructor_t *sig;
+        Newxz(sig, 1, xscon_destructor_t);
+    }
+    else {
+        if (sig->demolish_methods) {
+            for (I32 i = 0; i < sig->num_demolish_methods; i++) {
+                if (sig->demolish_methods[i]) {
+                    SvREFCNT_dec(sig->demolish_methods[i]);
+                }
+            }
+            Safefree(sig->demolish_methods);
+        }
+    }
 
     /* This is not a placeholder. */
     sig->is_placeholder = FALSE;
@@ -470,22 +482,6 @@ xscon_destructor_create(char *packagename) {
     }
 
     return sig;
-}
-
-void
-xscon_destructor_free(xscon_destructor_t *sig)
-{
-    dTHX;
-
-    if (sig->demolish_methods) {
-        for (I32 i = 0; i < sig->num_demolish_methods; i++) {
-            if (sig->demolish_methods[i]) {
-                SvREFCNT_dec(sig->demolish_methods[i]);
-            }
-        }
-        Safefree(sig->demolish_methods);
-    }
-    Safefree(sig);
 }
 
 SV*
@@ -1361,7 +1357,7 @@ xscon_buildall(const xscon_constructor_t* sig, const char* klass, SV* const obje
 }
 
 static void
-xscon_demolishall(const xscon_destructor_t* sig, const char* klass, SV* const object, I32 in_global_destruction) {
+xscon_demolishall(const xscon_destructor_t* sig, const char* klass, SV* object, bool use_eval, AV* args) {
     dTHX;
     dSP;
 
@@ -1380,9 +1376,14 @@ xscon_demolishall(const xscon_destructor_t* sig, const char* klass, SV* const ob
             PUSHMARK(SP);
             EXTEND(SP, 2);
             PUSHs(object);
-            XPUSHs(sv_2mortal(newSViv((IV)in_global_destruction)));
+            I32 i;
+            I32 n = av_len(args);
+            for (i = 0; i <= n; i++) {
+                SV **svp = av_fetch(args, i, 0);
+                XPUSHs(svp ? *svp : &PL_sv_undef);
+            }
             PUTBACK;
-            call_sv((SV *)cv, G_VOID);
+            call_sv((SV *)cv, use_eval ? ( G_VOID | G_EVAL ) : G_VOID);
             FREETMPS;
             LEAVE;
         }
@@ -1446,9 +1447,14 @@ xscon_demolishall(const xscon_destructor_t* sig, const char* klass, SV* const ob
         PUSHMARK(SP);
         EXTEND(SP, 2);
         PUSHs(object);
-        XPUSHs(sv_2mortal(newSViv((IV)in_global_destruction)));
+        I32 i;
+        I32 n = av_len(args);
+        for (i = 0; i <= n; i++) {
+            SV **svp = av_fetch(args, i, 0);
+            XPUSHs(svp ? *svp : &PL_sv_undef);
+        }
         PUTBACK;
-        count = call_sv(demolish, G_VOID);
+        count = call_sv(demolish, use_eval ? ( G_VOID | G_EVAL ) : G_VOID);
         PUTBACK;
         FREETMPS;
         LEAVE;
@@ -1566,7 +1572,7 @@ CODE:
     SV* object;
 
     xscon_constructor_t *sig = (xscon_constructor_t *) CvXSUBANY(cv).any_ptr;
-    if (sig->is_placeholder) xscon_constructor_create(NULL, sig);
+    if (sig->is_placeholder) xscon_constructor_get_metadata(NULL, sig);
 
     /* $klassname = shift */
     klassname = SvROK(klass) ? sv_reftype(SvRV(klass), 1) : SvPV_nolen_const(klass);
@@ -1655,7 +1661,7 @@ CODE:
     dTHX;
 
     xscon_constructor_t *sig = (xscon_constructor_t *) CvXSUBANY(cv).any_ptr;
-    if (sig->is_placeholder) xscon_constructor_create(NULL, sig);
+    if (sig->is_placeholder) xscon_constructor_get_metadata(NULL, sig);
 
     const char *klassname = NULL;
     HV *stash = SvSTASH(SvRV(object));
@@ -1685,21 +1691,34 @@ CODE:
 }
 
 void
+DEMOLISHALL(SV* object, ...)
+CODE:
+{
+    dTHX;
+    xscon_destructor_t *sig = (xscon_destructor_t *) CvXSUBANY(cv).any_ptr;
+    if (sig->is_placeholder) xscon_destructor_get_metadata(sig->package, sig);
+    
+    const char* klassname = SvROK(object) ? sv_reftype(SvRV(object), 1) : SvPV_nolen_const(object);
+    AV* args = newAV();
+    for (I32 i = 1; i < items; i++) {
+        av_push(args, newSVsv(ST(i)));
+    }
+    xscon_demolishall(sig, klassname, object, FALSE, args);
+    XSRETURN(0);
+}
+
+void
 destroy(SV* object, ...)
 CODE:
 {
     dTHX;
     xscon_destructor_t *sig = (xscon_destructor_t *) CvXSUBANY(cv).any_ptr;
-    if (sig->is_placeholder) {
-        char* pkg = sig->package;
-        xscon_destructor_free(sig);
-        sig = xscon_destructor_create(pkg);
-        sig->is_placeholder = FALSE;
-        CvXSUBANY(cv).any_ptr = sig;
-    }
+    if (sig->is_placeholder) xscon_destructor_get_metadata(sig->package, sig);
+    
     const char* klassname = SvROK(object) ? sv_reftype(SvRV(object), 1) : SvPV_nolen_const(object);
-    I32 in_global_destruction = PL_dirty;
-    xscon_demolishall(sig, klassname, object, in_global_destruction);
+    AV* args = newAV();
+    av_push( args, newSViv(PL_dirty) );
+    xscon_demolishall(sig, klassname, object, FALSE, args);
     XSRETURN(0);
 }
 
@@ -1897,12 +1916,16 @@ CODE:
 }
 
 void
-install_destructor(char* name)
+install_destructor(char* name, char* name2)
 CODE:
 {
     dTHX;
     CV *cv = newXS(name, XS_Class__XSConstructor_destroy, (char*)__FILE__);
     if (cv == NULL)
+        croak("ARG! Something went really wrong while installing a new XSUB!");
+    
+    CV *cv2 = newXS(name2, XS_Class__XSConstructor_DEMOLISHALL, (char*)__FILE__);
+    if (cv2 == NULL)
         croak("ARG! Something went really wrong while installing a new XSUB!");
     
     char *full = savepv(name);
@@ -1925,6 +1948,7 @@ CODE:
     sig->package = savepv(pkg);
     sig->is_placeholder = TRUE;
     CvXSUBANY(cv).any_ptr = sig;
+    CvXSUBANY(cv2).any_ptr = sig;
 }
 
 void

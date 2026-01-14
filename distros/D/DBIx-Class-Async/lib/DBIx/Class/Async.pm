@@ -1,6 +1,6 @@
 package DBIx::Class::Async;
 
-$DBIx::Class::Async::VERSION   = '0.27';
+$DBIx::Class::Async::VERSION   = '0.28';
 $DBIx::Class::Async::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ DBIx::Class::Async - Asynchronous database operations for DBIx::Class
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =cut
 
@@ -1651,6 +1651,12 @@ Transactions execute on a single worker only.
 All rows are loaded into memory. Use pagination for large datasets.
 
 =back
+
+=head1 DEDICATION
+
+This module is dedicated to the memory of B<Matt S. Trout (mst)>,
+a brilliant contributor to the Perl community, L<DBIx::Class> core developer,
+and friend who is deeply missed.
 
 =head1 AUTHOR
 

@@ -1,11 +1,19 @@
 {
-   "abstract" : "The Sidef Programming Language",
+   "abstract" : "The Sidef Programming Language - A modern, high-level programming language",
    "author" : [
-      "Daniel Șuteu (<trizen@cpan.org>)",
-      "Ioana Fălcușan (<ioanaflavia@gmail.com>)"
+      "Daniel Șuteu <trizen@cpan.org>",
+      "Ioana Fălcușan <ioanaflavia@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Module::Build version 0.4234",
+   "keywords" : [
+      "sidef",
+      "programming language",
+      "scripting",
+      "interpreter",
+      "dynamic language",
+      "high-level language"
+   ],
    "license" : [
       "artistic_2"
    ],
@@ -14,64 +22,93 @@
       "version" : 2
    },
    "name" : "Sidef",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples",
+         "share"
+      ],
+      "file" : [
+         "README.md"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "1.0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0"
+            "Module::Build" : "0.4224"
          }
       },
       "runtime" : {
          "recommends" : {
-            "Digest::MD5" : "0",
-            "Digest::SHA" : "0",
+            "Digest::MD5" : "2.0",
+            "Digest::SHA" : "5.0",
             "File::Find" : "0",
-            "MIME::Base64" : "0",
+            "MIME::Base64" : "3.00",
             "Math::Prime::Util" : "0.73",
-            "Term::ReadLine::Gnu" : "0",
-            "Text::Balanced" : "0",
-            "Text::ParseWords" : "0",
-            "forks" : "0"
+            "Term::ReadLine::Gnu" : "1.36",
+            "Text::Balanced" : "2.00",
+            "Text::ParseWords" : "3.00",
+            "forks" : "0.36"
          },
          "requires" : {
-            "Algorithm::Combinatorics" : "0",
-            "Algorithm::Loops" : "0",
+            "Algorithm::Combinatorics" : "0.27",
+            "Algorithm::Loops" : "1.032",
             "Cwd" : "0",
-            "Data::Dump" : "0",
+            "Data::Dump" : "1.00",
             "Data::Dump::Filtered" : "0",
             "Encode" : "0",
             "Fcntl" : "0",
             "File::Basename" : "0",
             "File::Copy" : "0",
-            "File::Path" : "0",
+            "File::Path" : "2.09",
             "File::Spec" : "0",
             "Getopt::Std" : "0",
             "List::Util" : "1.45",
             "Math::GMPq" : "0.45",
             "Math::GMPz" : "0.48",
-            "Math::MPC" : "0",
+            "Math::MPC" : "1.09",
             "Math::MPFR" : "3.36",
             "Math::Prime::Util::GMP" : "0.52",
             "Memoize" : "0",
-            "Scalar::Util" : "0",
+            "Scalar::Util" : "1.45",
             "Socket" : "0",
             "Term::ReadLine" : "0",
             "Time::HiRes" : "0",
             "Time::Piece" : "0",
             "parent" : "0",
-            "perl" : "v5.18.0",
-            "utf8" : "0"
+            "perl" : "5.018000",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         },
+         "suggests" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "DateTime" : "0",
+            "File::Slurp" : "0",
+            "HTTP::Tiny" : "0",
+            "IO::Compress::Gzip" : "0",
+            "JSON::PP" : "0",
+            "LWP::UserAgent" : "0",
+            "Regexp::Common" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.0"
          }
       }
    },
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "25.12"
+         "version" : "26.01"
       },
       "Sidef::Deparse::Perl" : {
          "file" : "lib/Sidef/Deparse/Perl.pm"
@@ -249,9 +286,16 @@
          "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
-         "url" : "https://github.com/trizen/sidef"
+         "type" : "git",
+         "url" : "https://github.com/trizen/sidef.git",
+         "web" : "https://github.com/trizen/sidef"
       }
    },
-   "version" : "25.12",
+   "version" : "26.01",
+   "x_authority" : "cpan:TRIZEN",
+   "x_contributors" : [
+      "Daniel Șuteu <trizen@cpan.org>",
+      "Ioana Fălcușan <ioanaflavia@gmail.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

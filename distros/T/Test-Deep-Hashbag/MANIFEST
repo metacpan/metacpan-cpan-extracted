@@ -10,6 +10,8 @@ dist.ini
 lib/Test/Deep/Hashbag.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
-t/all.t
+t/hashbag.t
+t/lib/TDHTester.pm
+t/superhashbagof.t
 xt/author/pod-syntax.t
 xt/release/changes_has_content.t

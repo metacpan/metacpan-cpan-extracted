@@ -23,13 +23,15 @@ my %WriteMakefileArgs = (
     "Devel::Confess" => 0,
     "Devel::Size" => 0,
     "File::Temp" => 0,
+    "List::Util" => 0,
     "Scalar::Util" => 0,
-    "Term::ANSIColor" => 0,
+    "Term::ANSIColor" => "4.06",
     "Test::Exception" => 0,
     "Test::More" => 0,
-    "Time::HiRes" => 0
+    "Time::HiRes" => 0,
+    "autodie" => 0
   },
-  "VERSION" => "0.09",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,11 +45,13 @@ my %FallbackPrereqs = (
   "Devel::Confess" => 0,
   "Devel::Size" => 0,
   "File::Temp" => 0,
+  "List::Util" => 0,
   "Scalar::Util" => 0,
-  "Term::ANSIColor" => 0,
+  "Term::ANSIColor" => "4.06",
   "Test::Exception" => 0,
   "Test::More" => 0,
-  "Time::HiRes" => 0
+  "Time::HiRes" => 0,
+  "autodie" => 0
 );
 
 

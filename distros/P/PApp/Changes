@@ -2,6 +2,36 @@ Revision history for Perl extension PApp
 
 TODO: more xs for _obj_member_add
 
+2.4  Tue 13 Jan 2026 23:28:56 CET
+        - the strict monster was here and fixed some bugs.
+        - remove all "use bytes".
+        - new function PApp::flush_state.
+        - remove uses of and64, or64 and so on, as well as 32-bit support.
+          64 bit perls are now required everywhere,, every time.
+        - fix a bunch of encoding problems now that us ebytes is gone.
+        - support charset in content-type in PApp::content_type.
+	- PApp::Config::DBH now caches the datasbase handle.
+        - papp-install now tries harder to not connect to the database unless requested.
+        - use more robust method to detect if PApp.xs has already been initialised.
+        - (internal) PApp::Config::new_dbh allows specifying the cache id and extra attributes.
+        - papp-scgid gained the --socket-umask option.
+        - take advantage of EV::Child::reinit in PApp::SCGI::Worker.
+        - force "set names latin1" on connections, for compatibility with existing code.
+        - agni --load-image broadcasts update events only after the import is fully done.
+        - XML::LibXSLT no longer supports strings directly, need to parse to XML::DOM object
+          first.
+        - papp-scgid now also supports plain http requests, mainly for testing.
+        - xpcse no longer updates mtime to the previous second but instead
+          waits up to one second to ensure mtime is nmot the current time. This slightly
+          increases the delay before an upload is done but avoids editor5s (vim) from
+          freaking out.
+        - change default connection charset to latin1 collate latin1_nopad_bin.
+        - bump maximum editform field length to 1GB (from 128kB) and make it configurable.
+        - fix endless loop on client EOF in PApp::SCGI.
+        - agni --clear-database no longer disables keys, instead, --load-image disables,
+          then reenables keys.
+        - new functions PApp::abort_with_output and PApp::abort_with_json.
+
 2.3  Thu 03 Aug 2023 00:27:34 CEST
 	- Agni::agni_exec would local'ize $PApp::NOW, which would incorrectly
           disassociate from any imported versions.

@@ -6,7 +6,7 @@ use Class::XSConstructor ();
 package Class::XSDestructor;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020000';
+our $VERSION   = '0.021000';
 
 sub import {
 	my $class = shift;
@@ -19,14 +19,11 @@ sub import {
 	
 	if (our $REDEFINE) {
 		no warnings 'redefine';
-		Class::XSConstructor::install_destructor("$package\::$methodname");
+		Class::XSConstructor::install_destructor("$package\::$methodname", "$package\::DEMOLISHALL");
 	}
 	else {
-		Class::XSConstructor::install_destructor("$package\::$methodname");
+		Class::XSConstructor::install_destructor("$package\::$methodname", "$package\::DEMOLISHALL");
 	}
-	
-	no strict 'refs';
-	%{"$package\::__XSCON_DEMOLISH"} = ( $package => undef );
 }
 
 1;
@@ -58,10 +55,18 @@ Importing this class gives you a C<DESTROY> method which acts similarly
 to the C<DESTROY> method provided by L<Moose> and L<Moo>, calling C<DEMOLISH>
 methods at every level of the inheritance hierarchy.
 
+It also installs a C<DEMOLISHALL> method which does the same but accepts
+additional arguments which it passes on to the C<DEMOLISH> methods, while
+C<DESTROY> ignores any parameters and passes the C<DEMOLISH> methods a
+single boolean parameter indicating whether the Perl process is in global
+destruction or not.
+
 =head1 SEE ALSO
 
 L<Class::XSConstructor>, L<Class::XSDelegation>, L<Class::XSReader>,
 L<Class::XSAccessor>.
+
+L<Devel::GlobalDestruction>.
 
 =head1 AUTHOR
 

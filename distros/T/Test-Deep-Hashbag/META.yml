@@ -9,6 +9,7 @@ build_requires:
   Test::Fatal: '0'
   Test::More: '0.96'
   Test::Tester: '0'
+  lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.78'
 dynamic_config: 0
@@ -32,7 +33,7 @@ resources:
   bugtracker: https://github.com/wolfsage/p5-Test-Deep-Hashbag/issues
   homepage: https://github.com/wolfsage/p5-Test-Deep-Hashbag
   repository: https://github.com/wolfsage/p5-Test-Deep-Hashbag.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -331,7 +332,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.002'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

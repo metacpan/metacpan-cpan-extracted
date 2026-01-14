@@ -1,0 +1,73 @@
+{
+   "abstract" : "Asynchronous DBIx::Class::Async plugin for Dancer2",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Plugin-DBIC-Async",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "DBIx::Class" : "0",
+            "DBIx::Class::Async" : "0",
+            "Dancer2" : "0",
+            "Dancer2::Plugin" : "0",
+            "Module::Runtime" : "0",
+            "Promises" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Plugin::DBIC::Async" : {
+         "file" : "lib/Dancer2/Plugin/DBIC/Async.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/manwar/Dancer2-Plugin-DBIC-Async/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Dancer2-Plugin-DBIC-Async.git",
+         "web" : "https://github.com/manwar/Dancer2-Plugin-DBIC-Async"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

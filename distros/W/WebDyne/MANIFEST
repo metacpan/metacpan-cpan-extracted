@@ -1320,5 +1320,7 @@ t/json_handler_boolean.psp
 t/json_handler_hash.psp                  
 t/json_handler_scalar.psp                
 docker/app.psp                           
+docker/Dockerfile.alpine-development     
+t.other/grid.psp                         
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

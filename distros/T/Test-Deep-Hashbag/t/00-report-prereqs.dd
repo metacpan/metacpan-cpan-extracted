@@ -34,7 +34,8 @@ do { my $x = {
                                    'Test::Deep' => '0',
                                    'Test::Fatal' => '0',
                                    'Test::More' => '0.96',
-                                   'Test::Tester' => '0'
+                                   'Test::Tester' => '0',
+                                   'lib' => '0'
                                  }
                  }
      };

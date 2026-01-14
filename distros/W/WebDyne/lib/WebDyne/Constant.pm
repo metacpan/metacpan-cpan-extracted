@@ -32,7 +32,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='2.066';
+$VERSION='2.069';
 
 
 #  Get mod_perl version taking intio account legacy strings. Clear $@ after evals
@@ -374,9 +374,10 @@ my %constant_temp;
     WEBDYNE_RELOAD => 0,
 
 
-    #  Use JSON canonical mode ?
+    #  Use JSON canonical. pretty mode ?
     #
     WEBDYNE_JSON_CANONICAL => 1,
+    WEBDYNE_JSON_PRETTY => 0,
     
     
     #  Enable the API mode ?
@@ -396,6 +397,11 @@ my %constant_temp;
         x-alpine-request
     )]}},
     WEBDYNE_HTTP_HEADER_AJAX_AR => $_,
+    
+    
+    #  Force run of <htmx> tag even if no hx-request header
+    #
+    WEBDYNE_HTMX_FORCE => 0,
 
 
     #  Headers

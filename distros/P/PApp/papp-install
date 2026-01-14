@@ -18,7 +18,7 @@ for (@ARGV) {
 
 BEGIN {
    $ENV{PAPP_ETCDIR} = ".";
-   local $PApp::Config::NO_AUTOCONNECT = 1;
+   $PApp::Config::DBH = 1; # prevent database connections
    local @INC = (".", @INC);
    require PApp::Config;
 }

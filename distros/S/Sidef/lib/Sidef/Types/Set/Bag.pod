@@ -1,13 +1,14 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Set::Bag
+Sidef::Types::Set::Bag - A multiset (bag) data structure for Sidef
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements a multiset (also known as a bag), which is a collection that allows duplicate elements and tracks the frequency of each unique element. Unlike a regular Set where each element appears at most once, a Bag maintains a count for each element, making it useful for frequency analysis and operations that need to preserve multiplicity.
+
+A Bag is essentially a mapping from elements to their frequencies, where the frequency represents how many times each element appears in the collection.
 
 =head1 SYNOPSIS
 
@@ -39,7 +40,11 @@ Inherits methods from:
 
     a & b
 
-Returns the
+Returns the intersection of two bags. The resulting bag contains elements that appear in both bags, with the frequency being the minimum of the frequencies in the two bags.
+
+Example:
+
+    Bag(1, 1, 2, 3) & Bag(1, 2, 2, 4)  #=> Bag(1, 2)
 
 Aliases: I<∩>, I<and>, I<intersection>
 
@@ -49,7 +54,11 @@ Aliases: I<∩>, I<and>, I<intersection>
 
     a + b
 
-Returns the
+Returns the sum (concatenation) of two bags. The resulting bag contains all elements from both bags, with frequencies added together.
+
+Example:
+
+    Bag(1, 2) + Bag(2, 3)  #=> Bag(1, 2, 2, 3)
 
 Aliases: I<concat>
 
@@ -59,7 +68,11 @@ Aliases: I<concat>
 
     a - b
 
-Returns the
+Returns the difference of two bags. The resulting bag contains elements from the first bag with their frequencies reduced by the frequencies in the second bag. Elements are removed entirely if their frequency becomes zero or negative.
+
+Example:
+
+    Bag(1, 1, 2, 3) - Bag(1, 3)  #=> Bag(1, 2)
 
 Aliases: I<∖>, I<sub>, I<diff>, I<difference>
 
@@ -69,7 +82,7 @@ Aliases: I<∖>, I<sub>, I<diff>, I<difference>
 
     a ... b
 
-Returns the
+Returns an array containing all elements from the bag expanded according to their frequencies, up to the range specified.
 
 Aliases: I<to_list>
 
@@ -79,7 +92,12 @@ Aliases: I<to_list>
 
     a << b
 
-Returns the
+Adds an element to the bag, incrementing its frequency by 1. Returns the modified bag.
+
+Example:
+
+    var bag = Bag(1, 2)
+    bag << 2              #=> Bag(1, 2, 2)
 
 Aliases: I<add>, I<push>, I<append>
 
@@ -89,7 +107,11 @@ Aliases: I<add>, I<push>, I<append>
 
     a ^ b
 
-Returns the
+Returns the symmetric difference of two bags. The resulting bag contains elements that appear in either bag but not in both (with equal frequency). Frequencies are calculated as the absolute difference.
+
+Example:
+
+    Bag(1, 1, 2) ^ Bag(1, 3)  #=> Bag(1, 2, 3)
 
 Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
@@ -99,7 +121,11 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
     a | b
 
-Returns the
+Returns the union of two bags. The resulting bag contains all elements from both bags, with the frequency being the maximum of the frequencies in the two bags.
+
+Example:
+
+    Bag(1, 1, 2) | Bag(1, 3, 3)  #=> Bag(1, 1, 2, 3, 3)
 
 Aliases: I<∪>, I<or>, I<union>
 
@@ -109,7 +135,12 @@ Aliases: I<∪>, I<or>, I<union>
 
     a ∋ b
 
-Returns the
+Returns true if the bag contains the specified element (at least once), false otherwise.
+
+Example:
+
+    Bag(1, 2, 3) ∋ 2  #=> true
+    Bag(1, 2, 3) ∋ 5  #=> false
 
 Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
 
@@ -119,7 +150,12 @@ Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<con
 
     a ∌ b
 
-Returns the
+Returns true if the bag does not contain the specified element, false otherwise. This is the negation of the ∋ operator.
+
+Example:
+
+    Bag(1, 2, 3) ∌ 5  #=> true
+    Bag(1, 2, 3) ∌ 2  #=> false
 
 =cut
 
@@ -127,7 +163,11 @@ Returns the
 
     a ≠ b
 
-Returns the
+Returns true if two bags are not equal (contain different elements or different frequencies), false otherwise.
+
+Example:
+
+    Bag(1, 2) ≠ Bag(1, 2, 2)  #=> true
 
 Aliases: I<!=>, I<ne>
 
@@ -137,7 +177,11 @@ Aliases: I<!=>, I<ne>
 
     a ≡ b
 
-Returns the
+Returns true if two bags are equal (contain the same elements with the same frequencies), false otherwise.
+
+Example:
+
+    Bag(1, 2, 2) ≡ Bag(2, 1, 2)  #=> true
 
 Aliases: I<==>, I<eq>
 
@@ -147,7 +191,11 @@ Aliases: I<==>, I<eq>
 
     a ≤ b
 
-Returns the
+Returns true if bag 'a' is a subset of bag 'b' (every element in 'a' appears in 'b' with at least the same frequency), false otherwise.
+
+Example:
+
+    Bag(1, 2) ≤ Bag(1, 2, 2, 3)  #=> true
 
 Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
 
@@ -157,7 +205,11 @@ Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
 
     a ≥ b
 
-Returns the
+Returns true if bag 'a' is a superset of bag 'b' (every element in 'b' appears in 'a' with at least the same frequency), false otherwise.
+
+Example:
+
+    Bag(1, 2, 2, 3) ≥ Bag(1, 2)  #=> true
 
 Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
 
@@ -167,7 +219,12 @@ Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
 
     self.add_kv(obj, n)
 
-Returns the
+Adds an element to the bag with a specific frequency increment. Increases the frequency of 'obj' by 'n'. Returns the modified bag.
+
+Example:
+
+    var bag = Bag(1, 2)
+    bag.add_kv(2, 3)  #=> Bag(1, 2, 2, 2, 2)
 
 Aliases: I<push_kv>, I<add_pair>, I<append_kv>, I<push_pair>, I<append_pair>
 
@@ -177,7 +234,12 @@ Aliases: I<push_kv>, I<add_pair>, I<append_kv>, I<push_pair>, I<append_pair>
 
     self.add_kvs(*pairs)
 
-Returns the
+Adds multiple elements with their frequencies to the bag. Accepts pairs of [element, frequency] as arguments. Returns the modified bag.
+
+Example:
+
+    var bag = Bag(1)
+    bag.add_kvs([2, 3], [3, 2])  #=> Bag(1, 2, 2, 2, 3, 3)
 
 Aliases: I<push_kvs>, I<add_pairs>, I<append_kvs>, I<push_pairs>, I<append_pairs>
 
@@ -187,7 +249,15 @@ Aliases: I<push_kvs>, I<add_pairs>, I<append_kvs>, I<push_pairs>, I<append_pairs
 
     self.clone
 
-Returns the
+Returns a shallow copy of the bag with the same elements and frequencies.
+
+Example:
+
+    var a = Bag(1, 2, 3)
+    var b = a.clone
+    b << 4
+    say a  #=> Bag(1, 2, 3)
+    say b  #=> Bag(1, 2, 3, 4)
 
 =cut
 
@@ -195,7 +265,11 @@ Returns the
 
     self.collect(block)
 
-Returns the
+Applies a transformation block to each element in the bag (respecting multiplicity) and returns a new bag with the transformed elements.
+
+Example:
+
+    Bag(1, 2, 2).collect { _ * 2 }  #=> Bag(2, 4, 4)
 
 =cut
 
@@ -203,7 +277,12 @@ Returns the
 
     self.contains_all(*objects)
 
-Returns the
+Returns true if the bag contains all of the specified objects (at least once each), false otherwise.
+
+Example:
+
+    Bag(1, 2, 3, 3).contains_all(1, 3)  #=> true
+    Bag(1, 2, 3).contains_all(1, 4)     #=> false
 
 =cut
 
@@ -211,7 +290,11 @@ Returns the
 
     self.count_by(block)
 
-Returns the
+Groups elements by the result of applying the block to each element (respecting multiplicity) and returns a new bag where keys are the block results and frequencies are the counts.
+
+Example:
+
+    Bag(1, 2, 3, 4).count_by { _ % 2 }  #=> Bag(0, 0, 1, 1)
 
 =cut
 
@@ -219,7 +302,11 @@ Returns the
 
     self.delete(*objects)
 
-Returns the
+Removes one occurrence of each specified object from the bag. Decrements the frequency by 1 for each object. Returns the modified bag.
+
+Example:
+
+    Bag(1, 1, 2, 3).delete(1, 2)  #=> Bag(1, 3)
 
 Aliases: I<remove>, I<discard>
 
@@ -229,7 +316,11 @@ Aliases: I<remove>, I<discard>
 
     self.delete_all(*objects)
 
-Returns the
+Removes all occurrences of each specified object from the bag. Returns the modified bag.
+
+Example:
+
+    Bag(1, 1, 2, 3).delete_all(1, 2)  #=> Bag(3)
 
 Aliases: I<remove_all>, I<discard_all>
 
@@ -239,7 +330,11 @@ Aliases: I<remove_all>, I<discard_all>
 
     self.delete_first_if(block)
 
-Returns the
+Removes the first element (according to iteration order) that satisfies the condition in the block. Decrements its frequency by 1. Returns the modified bag.
+
+Example:
+
+    Bag(1, 2, 3, 4).delete_first_if { _ > 2 }  #=> Bag(1, 2, 4)
 
 =cut
 
@@ -247,7 +342,11 @@ Returns the
 
     self.delete_if(block)
 
-Returns the
+Removes all elements that satisfy the condition in the block. Removes all occurrences of matching elements. Returns the modified bag.
+
+Example:
+
+    Bag(1, 2, 2, 3, 4).delete_if { _ % 2 == 0 }  #=> Bag(1, 3)
 
 =cut
 
@@ -255,7 +354,11 @@ Returns the
 
     self.delete_key(obj)
 
-Returns the
+Completely removes the specified key (element) from the bag along with all its occurrences. Returns the modified bag.
+
+Example:
+
+    Bag(1, 1, 2, 3).delete_key(1)  #=> Bag(2, 3)
 
 Aliases: I<remove_key>, I<discard_key>
 
@@ -265,7 +368,11 @@ Aliases: I<remove_key>, I<discard_key>
 
     self.dump
 
-Returns the
+Returns a string representation of the bag suitable for debugging or serialization, showing the internal structure.
+
+Example:
+
+    Bag(1, 2, 2).dump  #=> "Bag(1, 2, 2)"
 
 =cut
 
@@ -273,7 +380,12 @@ Returns the
 
     self.each(block)
 
-Returns the
+Iterates over each element in the bag (respecting multiplicity) and executes the block for each occurrence. Returns the bag.
+
+Example:
+
+    Bag(1, 2, 2).each { say _ }
+    # Prints: 1, 2, 2
 
 =cut
 
@@ -281,7 +393,12 @@ Returns the
 
     self.each_2d(block)
 
-Returns the
+Iterates over the bag as a 2D structure, passing pairs of [element, frequency] to the block. Returns the bag.
+
+Example:
+
+    Bag(1, 2, 2).each_2d { |k, v| say "#{k}: #{v}" }
+    # Prints: 1: 1, 2: 2
 
 =cut
 
@@ -289,7 +406,11 @@ Returns the
 
     self.each_kv(block)
 
-Returns the
+Iterates over key-value pairs in the bag, passing the element and its frequency to the block. Returns the bag.
+
+Example:
+
+    Bag(1, 2, 2, 3).each_kv { |k, v| say "#{k} appears #{v} times" }
 
 =cut
 
@@ -297,7 +418,11 @@ Returns the
 
     self.elems
 
-Returns the
+Returns the number of unique elements (distinct keys) in the bag.
+
+Example:
+
+    Bag(1, 1, 2, 3).elems  #=> 3
 
 Aliases: I<keys_len>
 
@@ -307,7 +432,11 @@ Aliases: I<keys_len>
 
     self.freq
 
-Returns the
+Returns an array of [element, frequency] pairs for all elements in the bag.
+
+Example:
+
+    Bag(1, 1, 2, 3).freq  #=> [[1, 2], [2, 1], [3, 1]]
 
 =cut
 
@@ -315,7 +444,12 @@ Returns the
 
     self.get(obj)
 
-Returns the
+Returns the frequency (count) of the specified element in the bag. Returns 0 if the element is not present.
+
+Example:
+
+    Bag(1, 1, 2, 3).get(1)  #=> 2
+    Bag(1, 1, 2, 3).get(5)  #=> 0
 
 Aliases: I<count>
 
@@ -325,7 +459,11 @@ Aliases: I<count>
 
     self.grep(block)
 
-Returns the
+Returns a new bag containing only the elements (with their frequencies) that satisfy the condition in the block.
+
+Example:
+
+    Bag(1, 2, 2, 3, 4).grep { _ % 2 == 0 }  #=> Bag(2, 2, 4)
 
 Aliases: I<select>
 
@@ -335,7 +473,11 @@ Aliases: I<select>
 
     self.grep_2d(block)
 
-Returns the
+Filters the bag by applying the block to [element, frequency] pairs. Returns a new bag with pairs that satisfy the condition.
+
+Example:
+
+    Bag(1, 2, 2, 3).grep_2d { |k, v| v > 1 }  #=> Bag(2, 2)
 
 =cut
 
@@ -343,7 +485,11 @@ Returns the
 
     self.grep_kv(block)
 
-Returns the
+Filters the bag by applying the block to element-frequency pairs. Returns a new bag with elements whose key-value pairs satisfy the condition.
+
+Example:
+
+    Bag(1, 2, 2, 3, 3, 3).grep_kv { |k, v| k == v }  #=> Bag(3, 3, 3)
 
 =cut
 
@@ -351,7 +497,14 @@ Returns the
 
     self.iter
 
-Returns the
+Returns an iterator object that can be used to iterate over the elements in the bag (respecting multiplicity).
+
+Example:
+
+    var iter = Bag(1, 2, 2).iter
+    say iter.next  #=> 1
+    say iter.next  #=> 2
+    say iter.next  #=> 2
 
 =cut
 
@@ -359,7 +512,11 @@ Returns the
 
     self.join(*rest)
 
-Returns the
+Converts the bag elements to strings and joins them using the specified separator. Multiple arguments are treated as additional separators for nested structures.
+
+Example:
+
+    Bag(1, 2, 2, 3).join(", ")  #=> "1, 2, 2, 3"
 
 =cut
 
@@ -367,7 +524,11 @@ Returns the
 
     self.keys
 
-Returns the
+Returns an array of unique elements (keys) in the bag, without their frequencies.
+
+Example:
+
+    Bag(1, 1, 2, 3).keys  #=> [1, 2, 3]
 
 =cut
 
@@ -375,7 +536,11 @@ Returns the
 
     self.kv
 
-Returns the
+Returns an array of [element, frequency] pairs for all elements in the bag. Similar to freq().
+
+Example:
+
+    Bag(1, 1, 2).kv  #=> [[1, 2], [2, 1]]
 
 Aliases: I<pairs>
 
@@ -385,7 +550,11 @@ Aliases: I<pairs>
 
     self.len
 
-Returns the
+Returns the total number of elements in the bag, counting multiplicities (sum of all frequencies).
+
+Example:
+
+    Bag(1, 1, 2, 3).len  #=> 4
 
 Aliases: I<size>, I<length>
 
@@ -395,7 +564,11 @@ Aliases: I<size>, I<length>
 
     self.map(block)
 
-Returns the
+Applies the block to each element in the bag (respecting multiplicity) and returns a new bag with the results.
+
+Example:
+
+    Bag(1, 2, 2).map { _ * 2 }  #=> Bag(2, 4, 4)
 
 =cut
 
@@ -403,7 +576,11 @@ Returns the
 
     self.map_2d(block)
 
-Returns the
+Applies the block to [element, frequency] pairs and returns a new bag constructed from the results.
+
+Example:
+
+    Bag(1, 2, 2).map_2d { |k, v| [k * 2, v] }  #=> Bag(2, 4, 4)
 
 =cut
 
@@ -411,7 +588,11 @@ Returns the
 
     self.map_kv(block)
 
-Returns the
+Applies the block to element-frequency pairs and returns a new bag constructed from the results.
+
+Example:
+
+    Bag(1, 2).map_kv { |k, v| [k + 1, v * 2] }  #=> Bag(2, 2, 3, 3)
 
 =cut
 
@@ -419,7 +600,11 @@ Returns the
 
     self.max
 
-Returns the
+Returns the maximum element in the bag (ignoring frequencies).
+
+Example:
+
+    Bag(1, 5, 3, 3).max  #=> 5
 
 =cut
 
@@ -427,7 +612,11 @@ Returns the
 
     self.max_by(block)
 
-Returns the
+Returns the element for which the block returns the maximum value (ignoring frequencies).
+
+Example:
+
+    Bag(1, 2, 3).max_by { _ * -1 }  #=> 1
 
 =cut
 
@@ -435,7 +624,11 @@ Returns the
 
     self.min
 
-Returns the
+Returns the minimum element in the bag (ignoring frequencies).
+
+Example:
+
+    Bag(5, 1, 3, 3).min  #=> 1
 
 =cut
 
@@ -443,7 +636,11 @@ Returns the
 
     self.min_by(block)
 
-Returns the
+Returns the element for which the block returns the minimum value (ignoring frequencies).
+
+Example:
+
+    Bag(1, 2, 3).min_by { _ * -1 }  #=> 3
 
 =cut
 
@@ -451,7 +648,12 @@ Returns the
 
     self.new
 
-Returns the
+Creates a new empty bag, or a bag initialized with the provided elements.
+
+Example:
+
+    var bag = Bag.new
+    var bag2 = Bag.new(1, 2, 2, 3)  #=> Bag(1, 2, 2, 3)
 
 Aliases: I<call>
 
@@ -461,7 +663,12 @@ Aliases: I<call>
 
     self.pop
 
-Returns the
+Removes and returns an arbitrary element from the bag. Decrements its frequency by 1. The bag must not be empty.
+
+Example:
+
+    var bag = Bag(1, 2, 2)
+    bag.pop  #=> returns one element, e.g., 1
 
 =cut
 
@@ -469,7 +676,12 @@ Returns the
 
     self.set_kv(obj, n)
 
-Returns the
+Sets the frequency of an element to a specific value. If n is 0 or negative, the element is removed. Returns the modified bag.
+
+Example:
+
+    var bag = Bag(1, 2, 2)
+    bag.set_kv(2, 5)  #=> Bag(1, 2, 2, 2, 2, 2)
 
 Aliases: I<update_kv>, I<update_pair>, I<replace_pair>
 
@@ -479,7 +691,12 @@ Aliases: I<update_kv>, I<update_pair>, I<replace_pair>
 
     self.set_kvs(*pairs)
 
-Returns the
+Sets the frequencies of multiple elements. Accepts pairs of [element, frequency]. Returns the modified bag.
+
+Example:
+
+    var bag = Bag(1)
+    bag.set_kvs([1, 3], [2, 2])  #=> Bag(1, 1, 1, 2, 2)
 
 Aliases: I<update_kvs>, I<update_pairs>, I<replace_pairs>
 
@@ -489,7 +706,12 @@ Aliases: I<update_kvs>, I<update_pairs>, I<replace_pairs>
 
     self.shift
 
-Returns the
+Removes and returns an arbitrary element from the bag (typically the first in iteration order). Decrements its frequency by 1. The bag must not be empty.
+
+Example:
+
+    var bag = Bag(1, 2, 2)
+    bag.shift  #=> returns one element, e.g., 1
 
 =cut
 
@@ -497,7 +719,12 @@ Returns the
 
     self.sort(block)
 
-Returns the
+Returns an array of elements sorted according to the optional comparison block. Elements are expanded according to their frequencies.
+
+Example:
+
+    Bag(3, 1, 2, 2).sort  #=> [1, 2, 2, 3]
+    Bag(3, 1, 2).sort { |a, b| b <=> a }  #=> [3, 2, 1]
 
 =cut
 
@@ -505,7 +732,11 @@ Returns the
 
     self.sort_by(block)
 
-Returns the
+Returns an array of elements sorted by the result of applying the block to each element. Elements are expanded according to their frequencies.
+
+Example:
+
+    Bag(1, 2, 3, 3).sort_by { _ * -1 }  #=> [3, 3, 2, 1]
 
 =cut
 
@@ -513,7 +744,11 @@ Returns the
 
     self.to_a
 
-Returns the
+Converts the bag to an array, expanding all elements according to their frequencies.
+
+Example:
+
+    Bag(1, 2, 2, 3).to_a  #=> [1, 2, 2, 3]
 
 Aliases: I<expand>, I<to_array>
 
@@ -523,7 +758,12 @@ Aliases: I<expand>, I<to_array>
 
     self.to_bag
 
-Returns the
+Returns the bag itself (identity operation).
+
+Example:
+
+    var bag = Bag(1, 2, 3)
+    bag.to_bag  #=> Bag(1, 2, 3)
 
 =cut
 
@@ -531,7 +771,11 @@ Returns the
 
     self.top(n)
 
-Returns the
+Returns an array of the top n most common elements with their frequencies, as [element, frequency] pairs, sorted by frequency in descending order.
+
+Example:
+
+    Bag(1, 2, 2, 3, 3, 3).top(2)  #=> [[3, 3], [2, 2]]
 
 Aliases: I<most_common>
 
@@ -541,7 +785,11 @@ Aliases: I<most_common>
 
     self.to_set
 
-Returns the
+Converts the bag to a set, discarding frequency information and keeping only unique elements.
+
+Example:
+
+    Bag(1, 1, 2, 3).to_set  #=> Set(1, 2, 3)
 
 =cut
 
@@ -549,7 +797,11 @@ Returns the
 
     self.uniq
 
-Returns the
+Returns a new bag with all elements having a frequency of 1 (effectively converting it to behave like a set while maintaining bag type).
+
+Example:
+
+    Bag(1, 1, 2, 3, 3).uniq  #=> Bag(1, 2, 3)
 
 Aliases: I<unique>
 
@@ -559,6 +811,25 @@ Aliases: I<unique>
 
     self.values
 
-Returns the
+Returns an array of all frequency values in the bag.
+
+Example:
+
+    Bag(1, 1, 2, 3).values  #=> [2, 1, 1]
+
+=cut
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Set::Set>
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Sidef itself.
 
 =cut

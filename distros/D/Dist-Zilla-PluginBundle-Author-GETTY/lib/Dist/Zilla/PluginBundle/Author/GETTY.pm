@@ -1,7 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
-our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.301';
+our $VERSION = '0.303';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -30,6 +29,17 @@ has author => (
   isa     => 'Str',
   lazy    => 1,
   default => sub { $_[0]->payload->{author} || 'GETTY' },
+);
+
+has authority => (
+  is      => 'ro',
+  isa     => 'Str',
+  lazy    => 1,
+  default => sub {
+    my $self = shift;
+    return 'cpan:'.$self->payload->{authority} if $self->payload->{authority};
+    return 'cpan:'.$self->author;
+  },
 );
 
 has installrelease_command => (
@@ -333,7 +343,9 @@ sub configure {
   unless ($self->no_cpan) {
     $self->add_plugins([
       'Authority' => {
-        authority => 'cpan:'.$self->author,
+        ':version'  => '1.009',
+        authority   => $self->authority,
+        do_munging  => 0,
         do_metadata => 1,
       }
     ]);
@@ -363,9 +375,11 @@ sub configure {
     $self->add_bundle('@Git::VersionManager' => {
       'RewriteVersion::Transitional.fallback_version_provider' => 'Git::NextVersion',
       'Git::Tag.tag_format' => '%v',
-      'Git::Push.push_to' => 'origin',
       $self->no_changes ? ( 'NextRelease.format' => '' ) : (),
     });
+    $self->add_plugins([
+      'Git::Push' => { push_to => 'origin' }
+    ]);
   } else {
     $self->add_bundle('@Git' => {
       tag_format => '%v',
@@ -390,7 +404,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.301
+version 0.303
 
 =head1 SYNOPSIS
 
@@ -410,6 +424,7 @@ are default):
 
   [@Author::GETTY]
   author = GETTY
+  authority = ; optional, overrides author
   deprecated = 0
   release_branch = main
   weaver_config = @Author::GETTY
@@ -439,7 +454,9 @@ In default configuration it is equivalent to:
   install_command = cpanm .
 
   [Authority]
-  authority = cpan:GETTY
+  :version = 1.009
+  authority = cpan:GETTY ; or cpan:$authority if set
+  do_munging = 0
   do_metadata = 1
 
   [PodWeaver]
@@ -505,7 +522,18 @@ only required parameter here is C<alien_repo>:
 =head2 author
 
 This is used to name the L<CPAN|http://www.cpan.org/> author of the
-distribution. See L<Dist::Zilla::Plugin::Authority/authority>.
+distribution for the authority. See L<Dist::Zilla::Plugin::Authority/authority>.
+
+=head2 authority
+
+Override the authority used in metadata. Use this when uploading modules
+originally owned by another CPAN author. For example, to upload modules
+with ETHER as the authority:
+
+  [@Author::GETTY]
+  authority = ETHER
+
+If not set, defaults to the C<author> value.
 
 =head2 deprecated
 

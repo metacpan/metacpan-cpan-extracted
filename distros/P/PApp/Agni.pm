@@ -72,12 +72,6 @@ BEGIN {
       unless defined &DEVEL_TRACE;
 }
 
-BEGIN {
-   # I was lazy, all the util xs functions are in PApp.xs
-   require XSLoader;
-   XSLoader::load PApp, $PApp::VERSION unless defined &PApp::bootstrap;
-}
-
 our @EXPORT = qw(
       require_path new_objectid
 
@@ -191,7 +185,7 @@ sub init_paths {
 sub top_path {
    my $paths = $_[0];
    for (sort { (length $a) <=> (length $b) } keys %pathid) {
-      return $pathid{$_} if and64 $paths, $pathmask[$pathid{$_}];
+      return $pathid{$_} if $paths & $pathmask[$pathid{$_}];
    }
    croak "top_path called with illegal paths mask ($paths)";
 }
@@ -1007,7 +1001,7 @@ sub split_obj {
 
    my $newid = eval {
       local $SIG{__DIE__};
-      insert_obj undef, $gid, and64 $paths, $subpathmask[$target];
+      insert_obj undef, $gid, $paths & $subpathmask[$target];
    };
    if ($newid) {
       sql_exec "update obj set paths = paths &~ ? where id = ?", $subpathmask[$target], $id;
@@ -1037,9 +1031,9 @@ sub agni::object::copy_to_path {
 
    defined $target or $target = $self->{_path};
 
-   if (and64 $self->{_paths}, $pathmask[$target]) {
+   if ($self->{_paths} & $pathmask[$target]) {
       # object is from the target path
-      if (and64 $self->{_paths}, $parpathmask[$target]) {
+      if ($self->{_paths} & $parpathmask[$target]) {
          split_obj $self->{_paths}, $self->{_gid}, $self->{_id}, $target
             || sql_fetch "select id from obj where gid = ? and paths & (1 << ?) <> 0", $self->{_gid}, $target;
       } else {
@@ -1195,7 +1189,7 @@ sub commit_objs {
                :><b><?escape_html Convert::Scalar::utf8_on $name:></b>...<:
             }
 
-            if (and64 $parpathmask[$src], $obj_paths) {
+            if ($parpathmask[$src] & $obj_paths) {
                :><?"already committed ...":><:
                # croak "commit_objs: src_path $src not the highest path of object $obj_gid";
             } else {
@@ -1216,7 +1210,7 @@ sub commit_objs {
 
                   if ($id) {
                      # remove it from the target path
-                     if (andnot64 $paths, $subpathmask[$dst]) {
+                     if ($paths & ~$subpathmask[$dst]) {
                         :><?"splitting $id...":><:
                         sql_exec "update obj set paths = paths &~ ? where id = ?",
                                   $subpathmask[$dst], $id;
@@ -1227,19 +1221,19 @@ sub commit_objs {
                      push @event, [UPDATE_PATHID, $paths, $obj_gid];
 
                      # move the commit object into the target path
-                     $dst_paths = and64 $paths, $subpathmask[$dst];
+                     $dst_paths = $paths & $subpathmask[$dst];
                   } else {
                      :><?"created ...":><:
                      # calculcate all mask bits sans the obj_paths, use sum
                      $dst_paths = sql_fetch "select sum(paths) from obj where id != ? and gid = ?", $obj_id, $obj_gid;
 
                      # now move the object into the target path
-                     $dst_paths = andnot64 $subpathmask[$dst], $dst_paths;
+                     $dst_paths = $subpathmask[$dst] & ~$dst_paths;
                   }
 
                   sql_exec "update obj set paths = ? where id = ?", $dst_paths, $obj_id;
                   update_commitinfo commit => $obj_id;
-                  push @event, [UPDATE_CLASS, (or64 $dst_paths, $obj_paths), $obj_gid];
+                  push @event, [UPDATE_CLASS, $dst_paths | $obj_paths, $obj_gid];
                } else {
                   :><?"removing $obj_id...":><:
 
@@ -1485,7 +1479,7 @@ sub find_dead_objects {
 
                   # do it for every single path. this is not very efficient, but very correct
                   for my $path (values %pathid) {
-                     next unless and64 $paths, $pathmask[$path];
+                     next unless $paths & $pathmask[$path];
 
                      my $tobj = path_obj_by_gid $path, $tgid
                         or croak "FATAL: garbage_collect cannot load type object ({$paths}/$tgid)";
@@ -1600,7 +1594,7 @@ PApp::Event::on agni_update => sub {
          $todo |= $type;
       } else {
          $todo{$gid}[0] |= $type;
-         $todo{$gid}[1] = or64 $todo{$gid}[1], $paths;
+         $todo{$gid}[1] = $todo{$gid}[1] | $paths;
          $todo{$gid}[2]{$attr}++ if $attr;
       }
    }
@@ -1627,7 +1621,7 @@ PApp::Event::on agni_update => sub {
       if ($type & UPDATE_CLASS) {
          for (grep $_, @{$obj_cache{$gid}}) {
             my $refcnt = Convert::Scalar::refcnt_rv $_; # we use a temporary value since ->{_paths} incs the refcnt
-            if (and64 $paths, $_->{_paths}) {
+            if ($paths & $_->{_paths}) {
                if (1 >= $refcnt and !$BOOTSTRAP_LEVEL{$gid} && 0) {
                   $_ = undef;
                } else {
@@ -1637,7 +1631,7 @@ PApp::Event::on agni_update => sub {
          }
       } else {
          if ($type & UPDATE_PATHID) {
-            for (grep { $_ and and64 $paths, $_->{_paths} } @{$obj_cache{$gid}}) {
+            for (grep { $_ and $paths & $_->{_paths} } @{$obj_cache{$gid}}) {
                ($_->{_paths}, $_->{_id}) =
                   sql_fetch "select paths, id from obj
                              where paths & (1 << ?) <> 0 and gid = ?",
@@ -1646,7 +1640,7 @@ PApp::Event::on agni_update => sub {
          }
 
          if ($type & UPDATE_ATTR) {
-            for my $obj (grep { $_ and and64 $paths, $_->{_paths} } @{$obj_cache{$gid}}) {
+            for my $obj (grep { $_ and $paths & $_->{_paths} } @{$obj_cache{$gid}}) {
                for (map { path_obj_by_gid $obj->{_path}, $_ } keys %{$v->[2]}) {
                   if ($_) {
                      $_->update ($obj, $_->fetch ($obj));

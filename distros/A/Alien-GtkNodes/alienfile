@@ -17,7 +17,7 @@ share {
     build [
         'sh autogen.sh',
         '%{configure}', # --enable-static --enable-shared',
-        '%{make}',
+        '%{make} LDFLAGS=-no-undefined',
         '%{make} install',
     ];
 

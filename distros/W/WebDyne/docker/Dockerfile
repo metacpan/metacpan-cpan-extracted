@@ -1,5 +1,5 @@
 #  
-# WebDyne docker image for Fedora
+# WebDyne docker image
 #
 # ====
 #
@@ -8,21 +8,6 @@
 ARG BASE=debian:bookworm
 ARG PORT=8080
 ARG WORKERS=8
-
-
-# Metadata - maintainer
-#
-#ARG LABEL_MAINTAINER="Andrew Speer <andrew.speer@isolutions.com.au>"
-#ARG LABEL_TITLE="WebDyne"
-#ARG LABEL_DESCRIPTION="PSGI web service for generating dynamic HTML pages with embedded Perl"
-#ARG LABEL_URL="https://github.com/aspeer/WebDyne"
-#ARG LABEL_SOURCE="https://github.com/aspeer/WebDyne.git"
-#ARG LABEL_DOCUMENTATION="https://github.com/aspeer/WebDyne#readme"
-#ARG LABEL_AUTHORS="Andrew Speer <andrew.speer@isolutions.com.au>"
-#ARG LABEL_LICENSES="Perl"
-#ARG LABEL_CREATED="2025-05-21T10:00:00Z"
-#ARG LABEL_VERSION="2.005_225"
-#ARG LABEL_REVISION="079c3e1"
 
 
 # Default paths
@@ -37,7 +22,7 @@ ARG DOCUMENT_ROOT="/app"
 #
 
 
-# Using Fedora as base
+# Use arg base builder
 #
 FROM ${BASE} AS builder
 
@@ -105,19 +90,30 @@ RUN carton install --deployment
 # Now install main WebDyne module
 #
 WORKDIR ..
-#RUN carton exec -- cpanm --local-lib-contained=${PERL_CARTON_PATH} .
-#RUN carton exec -- cpanm .
-RUN set -e; carton exec -- cpanm . || { rc=$?; echo "Build failed:"; find /root/.cpanm/work -name build.log -exec cat {} \;; exit $rc; }
+RUN carton exec -- cpanm --local-lib-contained=${PERL_CARTON_PATH} .
+
+
+# Load in digest file. Should be done by carton when Makefile.PL run but doesn't work
+# for some reason so create manually as a backup
+#
+RUN git rev-parse --short HEAD > $PERL5LIB/WebDyne.pm.sha
+
+
+# Debug
+#
+RUN find ${PERL_CARTON_PATH} | grep WebDyne.pm
+
 
 # Clean carton cache and create empty webdyne cache dir
-RUN rm -rf ${PERL_CARTON_PATH}/cache
-RUN mkdir ${PERL_CARTON_PATH}/cache
+#
+RUN rm -rf ${PERL_CARTON_PATH}/cache &&  mkdir ${PERL_CARTON_PATH}/cache
+
 
 # ====================================================================================================
 #
 # Now generate main image from builder image
 #
-FROM ${BASE}
+FROM ${BASE} as runtime
 
 
 # Republish args
@@ -125,58 +121,41 @@ FROM ${BASE}
 ARG PERL_CARTON_PATH
 ARG PORT
 ARG DOCUMENT_ROOT
+ARG BASE
 
 
 #  Republish labels
 #
-ARG LABEL_MAINTAINER
-ARG LABEL_TITLE
-ARG LABEL_DESCRIPTION
-ARG LABEL_URL
-ARG LABEL_SOURCE
-ARG LABEL_DOCUMENTATION
-ARG LABEL_AUTHORS
-ARG LABEL_LICENSES
+ARG LABEL_MAINTAINER="Andrew Speer <andrew.speer@isolutions.com.au>"
+ARG LABEL_TITLE="WebDyne"
+ARG LABEL_DESCRIPTION="PSGI web service for generating dynamic HTML pages with embedded Perl"
+ARG LABEL_URL="https://github.com/aspeer/WebDyne"
+ARG LABEL_SOURCE="https://github.com/aspeer/WebDyne.git"
+ARG LABEL_DOCUMENTATION="https://webdyne.org/"
+ARG LABEL_AUTHORS="Andrew Speer <andrew.speer@isolutions.com.au>"
+ARG LABEL_LICENSES="Artistic-1.0-Perl OR GPL-1.0-or-later"
 ARG LABEL_CREATED
 ARG LABEL_VERSION
 ARG LABEL_REVISION
-ARG BASE
+ARG BASE=${BASE}
 
 
 # Add Labels into meta for image
 #
-#LABEL maintainer=${LABEL_MAINTAINER}
-#LABEL org.opencontainers.image.title=${LABEL_TITLE}
-#LABEL org.opencontainers.image.description=${LABEL_DESCRIPTION}
-#LABEL org.opencontainers.image.url=${LABEL_URL}
-#LABEL org.opencontainers.image.source=${LABEL_SOURCE}
-#LABEL org.opencontainers.image.documentation=${LABEL_DOCUMENTATION}
-#LABEL org.opencontainers.image.authors=${LABEL_AUTHORS}
-#LABEL org.opencontainers.image.licenses=${LABEL_LICENSES}
-#LABEL org.opencontainers.image.created=${LABEL_CREATED}
-#LABEL org.opencontainers.image.version=${LABEL_VERSION}
-#LABEL org.opencontainers.image.revision=${LABEL_REVISION}
-#LABEL org.opencontainers.image.base=${BASE}
+LABEL maintainer=${LABEL_MAINTAINER} \
+    org.opencontainers.image.title=${LABEL_TITLE} \
+    org.opencontainers.image.description=${LABEL_DESCRIPTION} \
+    org.opencontainers.image.url=${LABEL_URL} \
+    org.opencontainers.image.source=${LABEL_SOURCE} \
+    org.opencontainers.image.documentation=${LABEL_DOCUMENTATION} \
+    org.opencontainers.image.authors=${LABEL_AUTHORS} \
+    org.opencontainers.image.licenses=${LABEL_LICENSES} \
+    org.opencontainers.image.created=${LABEL_CREATED} \
+    org.opencontainers.image.version=${LABEL_VERSION} \
+    org.opencontainers.image.revision=${LABEL_REVISION} \
+    org.opencontainers.image.base=${BASE}
 
 
-# Add Labels into meta for image
-#
-LABEL maintainer="Andrew Speer <andrew.speer@isolutions.com.au>"
-LABEL org.opencontainers.image.title="WebDyne"
-LABEL org.opencontainers.image.description="PSGI web service for generating dynamic HTML pages with embedded Perl"
-LABEL org.opencontainers.image.url="https://github.com/aspeer/WebDyne"
-LABEL org.opencontainers.image.source="https://github.com/aspeer/WebDyne.git"
-LABEL org.opencontainers.image.documentation="https://github.com/aspeer/WebDyne#readme"
-LABEL org.opencontainers.image.authors="Andrew Speer <andrew.speer@isolutions.com.au>"
-LABEL org.opencontainers.image.licenses="Artistic-1.0-Perl OR GPL-1.0-or-later"
-LABEL org.opencontainers.image.created="2026-01-06T12:17:55Z"
-LABEL org.opencontainers.image.version="2.047"
-LABEL org.opencontainers.image.revision="deeafa0"
-LABEL org.opencontainers.image.base=${BASE}
-
-
-# Base perl
-#
 # Install build tools and core Perl modules
 #
 
@@ -200,7 +179,7 @@ ENV PERL5LIB=${PERL_CARTON_PATH}/lib/perl5
 ENV PATH=${PERL_CARTON_PATH}/bin:$PATH
 
 
-# Only examples go into /app, WebDyne perl modules installed into $PERL_CARTONPATH (/opt/webdyne) 
+# Only psp files go into /app, WebDyne perl modules installed into $PERL_CARTONPATH (/opt/webdyne) 
 # by default
 #
 WORKDIR /app

@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Dancer2/Plugin/DBIC/Async.pm
+t/00-load.t
+t/01-plugin.t
+t/02-plugin-multiple-connections.t
+t/03-plugin-error-handling.t
+t/04-plugin-async-operations.t
+t/lib/Test/Schema.pm
+t/lib/Test/Schema/Result/User.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

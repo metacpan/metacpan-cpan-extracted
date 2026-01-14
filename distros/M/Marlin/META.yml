@@ -29,47 +29,47 @@ optional_features: {}
 provides:
   Marlin:
     file: lib/Marlin.pm
-    version: '0.013001'
+    version: '0.014000'
   Marlin::Attribute:
     file: lib/Marlin/Attribute.pm
-    version: '0.013001'
+    version: '0.014000'
   Marlin::Meta::Class:
     file: lib/MooseX/Marlin.pm
   Marlin::Role:
     file: lib/Marlin/Role.pm
-    version: '0.013001'
+    version: '0.014000'
   Marlin::Struct:
     file: lib/Marlin/Struct.pm
-    version: '0.013001'
+    version: '0.014000'
   Marlin::TypeConstraint:
     file: lib/Marlin/TypeConstraint.pm
-    version: '0.013001'
+    version: '0.014000'
   Marlin::Util:
     file: lib/Marlin/Util.pm
-    version: '0.013001'
+    version: '0.014000'
   Marlin::X::Clone:
     file: lib/Marlin/X/Clone.pm
-    version: '0.013001'
+    version: '0.014000'
   Marlin::X::UndefTolerant:
     file: lib/Marlin/X/UndefTolerant.pm
-    version: '0.013001'
+    version: '0.014000'
   Marlin::XAttribute::Alias:
     file: lib/Marlin/XAttribute/Alias.pm
-    version: '0.013001'
+    version: '0.014000'
   Marlin::XAttribute::LocalWriter:
     file: lib/Marlin/XAttribute/LocalWriter.pm
-    version: '0.013001'
+    version: '0.014000'
   Marlin::XAttribute::Lvalue:
     file: lib/Marlin/XAttribute/Lvalue.pm
-    version: '0.013001'
+    version: '0.014000'
   MooseX::Marlin:
     file: lib/MooseX/Marlin.pm
-    version: '0.013001'
+    version: '0.014000'
 requires:
   B::Hooks::AtRuntime: '0'
   Class::Method::Modifiers: '0'
   Class::XSAccessor: '1.19'
-  Class::XSConstructor: '0.020000'
+  Class::XSConstructor: '0.021000'
   Clone: '0'
   Exporter::Tiny: '1.006002'
   LV: '0'
@@ -87,5 +87,5 @@ resources:
   homepage: https://metacpan.org/release/Marlin
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-marlin.git
-version: '0.013001'
+version: '0.014000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

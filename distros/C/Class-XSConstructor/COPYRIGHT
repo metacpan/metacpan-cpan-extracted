@@ -16,17 +16,8 @@ Files: Changes
  t/90clearer.t
  t/97reader.t
  t/98delegation.t
+ t/99destroy.t
 Copyright: Copyright 2026 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/05strictconstructor.t
- t/06inherit-from.t
- t/07coercion.t
- t/08defaults.t
- t/09initarg.t
- t/10triggers.t
- t/11weaken.t
-Copyright: This software is copyright (c) 2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: INSTALL
@@ -39,11 +30,14 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
-Files: lib/Class/XSDelegation.pm
- lib/Class/XSReader.pm
- t/12aliases.t
- t/14undeftolerant.t
-Copyright: This software is copyright (c) 2026 by Toby Inkster.
+Files: t/05strictconstructor.t
+ t/06inherit-from.t
+ t/07coercion.t
+ t/08defaults.t
+ t/09initarg.t
+ t/10triggers.t
+ t/11weaken.t
+Copyright: This software is copyright (c) 2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/01basic.t
@@ -51,6 +45,13 @@ Files: t/01basic.t
  t/03typetiny.t
  t/04build.t
 Copyright: This software is copyright (c) 2018-2019 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/Class/XSDelegation.pm
+ lib/Class/XSReader.pm
+ t/12aliases.t
+ t/14undeftolerant.t
+Copyright: This software is copyright (c) 2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -64,20 +65,16 @@ Files: README
 Copyright: This software is copyright (c) 2018-2019, 2025-2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/99destroy.t
-Copyright: Copyright 2025 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: dist.ini
 Copyright: Copyright 2018 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: lib/Class/XSDestructor.pm
-Copyright: This software is copyright (c) 2025-2026 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: t/03typenano.t
 Copyright: This software is copyright (c) 2019 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/Class/XSDestructor.pm
+Copyright: This software is copyright (c) 2025-2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

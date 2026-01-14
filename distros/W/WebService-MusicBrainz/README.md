@@ -28,6 +28,8 @@ This module requires these other modules and libraries:
 
 * Mojolicious
 
+* Mojo::UserAgent::Role::Retry
+
 COPYRIGHT AND LICENSE
 
 Copyright (C) 2007-2017 by Bob Faist ( bob.faist at gmail.com )

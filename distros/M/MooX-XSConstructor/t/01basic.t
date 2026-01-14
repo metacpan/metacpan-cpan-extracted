@@ -26,25 +26,11 @@ use Test::More;
 use Test::Fatal;
 use Test::Warnings;
 
-# stolen from MooseX::XSAccessor
-sub is_xs  {
-	require Scalar::Util;
-	my $sub = shift;
-	if (Scalar::Util::blessed($sub) and $sub->isa("Class::MOP::Method")) {
-	$sub = $sub->body;
-	}
-	elsif (not ref $sub) {
-		no strict "refs";
-		$sub = \&{$sub};
-	}
-	require B;
-	!! B::svref_2object($sub)->XSUB;
-}
-
-
 {
 	package Foo;
-	use Moo; has xyz => (is => "ro", required => 1);
+	use Moo;
+	has xyz => (is => "ro", required => 1);
+	sub DEMOLISH { 0 }
 }
 
 {
@@ -52,15 +38,50 @@ sub is_xs  {
 	use Moo;
 	use MooX::XSConstructor;
 	extends "Foo";
-	has abc => (is => "lazy", builder => sub { 123 });
+	has abc => (
+		is      => "ro",
+		isa     => sub { $_[0] =~ /^[0-9]+$/ or die "not an integer" },
+		lazy    => 0,
+		builder => sub { 123 },
+	);
 }
 
-ok !is_xs('Foo::new') => 'Foo::new not redefined';
-ok is_xs('Bar::new') => 'Bar::new redefined';
+ok(
+	!MooX::XSConstructor::is_xs(\&Foo::new),
+	'Foo::new is not XS'
+);
 
-is_deeply(Bar->new(xyz => 123), bless({ xyz => 123 } => "Bar"), "is deeply");
+ok(
+	!MooX::XSConstructor::is_xs(\&Foo::DESTROY),
+	'Foo::DESTROY is not XS'
+);
 
-my $e = exception { Bar->new };
-like($e, qr/required/, 'required stuff works');
+ok(
+	MooX::XSConstructor::is_xs(\&Bar::new),
+	'Bar::new is XS'
+);
+
+ok(
+	MooX::XSConstructor::is_xs(\&Bar::DESTROY),
+	'Bar::DESTROY is XS'
+);
+
+is_deeply(
+	Bar->new(xyz => 123),
+	bless( { xyz => 123, abc => 123 }, "Bar" ),
+	"is deeply"
+);
+
+like(
+	exception { Bar->new },
+	qr/required/,
+	'required stuff works'
+);
+
+like(
+	exception { Bar->new(abc => "x", xyz => 123) },
+	qr/not an integer/,
+	'type constraint works'
+);
 
 done_testing;

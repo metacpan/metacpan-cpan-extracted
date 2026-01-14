@@ -14,7 +14,7 @@ use DBIx::Class::Async::TxnGuard;
 use DBIx::Class::Async::ResultSet;
 use DBIx::Class::Async::Storage::DBI;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 =head1 NAME
 
@@ -22,7 +22,7 @@ DBIx::Class::Async::Schema - Asynchronous schema for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =cut
 
@@ -407,6 +407,94 @@ sub populate {
 
     # Delegate to resultset->populate
     return $self->resultset($source_name)->populate($data);
+}
+
+=head2 register_class
+
+  $schema->register_class($source_name => $result_class);
+
+Registers a new Result class with the schema. This is a convenience method
+that loads the Result class, gets its result source, and registers it.
+
+B<Arguments>
+
+=over 4
+
+=item * C<$source_name> - String name for the source (e.g., 'User', 'Product')
+
+=item * C<$result_class> - Fully qualified Result class name
+
+=back
+
+  # Register a Result class
+  $schema->register_class('Product' => 'MyApp::Schema::Result::Product');
+
+  # Now you can use it
+  my $rs = $schema->resultset('Product');
+
+This method will load the Result class if it hasn't been loaded yet.
+
+=cut
+
+sub register_class {
+    my ($self, $source_name, $result_class) = @_;
+
+    # Load the class if not already loaded
+    eval "require $result_class";
+    if ($@) {
+        croak "Failed to load Result class '$result_class': $@";
+    }
+
+    # Get the result source instance
+    my $source = $result_class->result_source_instance;
+
+    # Register it
+    return $self->register_source($source_name, $source);
+}
+
+=head2 register_source
+
+  $schema->register_source($source_name => $source);
+
+Registers a new result source with the schema. This is used to add new tables
+or views to the schema at runtime.
+
+B<Arguments>
+
+=over 4
+
+=item * C<$source_name> - String name for the source (e.g., 'User', 'Product')
+
+=item * C<$source> - A L<DBIx::Class::ResultSource> instance
+
+=back
+
+  # Define a new Result class
+  package MyApp::Schema::Result::Product;
+  use base 'DBIx::Class::Core';
+
+  __PACKAGE__->table('products');
+  __PACKAGE__->add_columns(
+      id => { data_type => 'integer', is_auto_increment => 1 },
+      name => { data_type => 'text' },
+  );
+  __PACKAGE__->set_primary_key('id');
+
+  # Register it with the schema
+  $schema->register_source('Product',
+      MyApp::Schema::Result::Product->result_source_instance
+  );
+
+=cut
+
+sub register_source {
+    my ($self, $source_name, $source) = @_;
+
+    # Delegate to the underlying sync schema class
+    my $schema_class = $self->{_schema_class};
+
+    # Register with the class, not the instance
+    return $schema_class->register_source($source_name, $source);
 }
 
 =head2 resultset

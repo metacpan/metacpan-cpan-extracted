@@ -38,6 +38,11 @@ BEGIN {
 	sub DEMOLISH  { push @DEMOLISH, __PACKAGE__ };
 };
 
+BEGIN {
+	package Local::Quux;
+	use Marlin;
+}
+
 do {
 	my $x = Local::Foo::Bar->new;
 
@@ -48,5 +53,7 @@ do {
 
 is( \@BUILD, [ 'Local::Foo', 'Local::Foo::Bar' ] ) or diag Dumper \@BUILD;
 is( \@DEMOLISH, [ 'Local::Foo::Bar', 'Local::Foo' ] ) or diag Dumper \@DEMOLISH;
+
+ok( !Local::Quux->can('DESTROY') );
 
 done_testing;

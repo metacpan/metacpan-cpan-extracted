@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use XSLoader;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 XSLoader::load('Net::HTTP2::nghttp2', $VERSION);
 
@@ -33,6 +33,7 @@ our @EXPORT_OK = qw(
     NGHTTP2_SETTINGS_INITIAL_WINDOW_SIZE
     NGHTTP2_SETTINGS_MAX_FRAME_SIZE
     NGHTTP2_SETTINGS_ENABLE_PUSH
+    NGHTTP2_SETTINGS_ENABLE_CONNECT_PROTOCOL
 );
 
 our %EXPORT_TAGS = (
@@ -43,7 +44,8 @@ our %EXPORT_TAGS = (
     data      => [qw(NGHTTP2_DATA_FLAG_NONE NGHTTP2_DATA_FLAG_EOF
                      NGHTTP2_DATA_FLAG_NO_END_STREAM NGHTTP2_DATA_FLAG_NO_COPY)],
     settings  => [qw(NGHTTP2_SETTINGS_MAX_CONCURRENT_STREAMS NGHTTP2_SETTINGS_INITIAL_WINDOW_SIZE
-                     NGHTTP2_SETTINGS_MAX_FRAME_SIZE NGHTTP2_SETTINGS_ENABLE_PUSH)],
+                     NGHTTP2_SETTINGS_MAX_FRAME_SIZE NGHTTP2_SETTINGS_ENABLE_PUSH
+                     NGHTTP2_SETTINGS_ENABLE_CONNECT_PROTOCOL)],
 );
 
 1;
@@ -111,6 +113,34 @@ End of stream flag.
 =item NGHTTP2_FLAG_END_HEADERS
 
 End of headers flag.
+
+=back
+
+=head2 Settings Constants
+
+=over 4
+
+=item NGHTTP2_SETTINGS_MAX_CONCURRENT_STREAMS
+
+Maximum number of concurrent streams.
+
+=item NGHTTP2_SETTINGS_INITIAL_WINDOW_SIZE
+
+Initial flow control window size.
+
+=item NGHTTP2_SETTINGS_MAX_FRAME_SIZE
+
+Maximum frame size.
+
+=item NGHTTP2_SETTINGS_ENABLE_PUSH
+
+Enable/disable server push.
+
+=item NGHTTP2_SETTINGS_ENABLE_CONNECT_PROTOCOL
+
+Enable extended CONNECT protocol (RFC 8441). When enabled, allows
+WebSocket bootstrapping over HTTP/2 using the extended CONNECT method
+with a C<:protocol> pseudo-header.
 
 =back
 
@@ -318,6 +348,8 @@ L<Alien::nghttp2> - Alien module for automatic nghttp2 installation
 L<https://nghttp2.org/> - nghttp2 project homepage
 
 L<https://datatracker.ietf.org/doc/html/rfc9113> - HTTP/2 RFC
+
+L<https://datatracker.ietf.org/doc/html/rfc8441> - Bootstrapping WebSockets with HTTP/2
 
 L<https://github.com/summerwind/h2spec> - HTTP/2 conformance testing tool
 

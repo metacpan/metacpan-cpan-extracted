@@ -23,7 +23,7 @@ package PApp::SCGI::Worker;
 
 use common::sense;
 use AnyEvent;
-use EV;
+use EV 4.34;
 use PApp ();
 use PApp::SCGI;
 use Coro ();
@@ -40,9 +40,11 @@ our $WORKER_EXIT = sub {
 our ($VERBOSE, $REFRESH, $MAX_REQUESTS, $LISTEN);
 
 sub init {
-   ($VERBOSE, $REFRESH, $MAX_REQUESTS) = @_;
+   ($VERBOSE, $REFRESH, $MAX_REQUESTS, $PApp::SCGI::DOCROOT) = @_;
 
    print "[$$] master init @_.\n" if $VERBOSE;
+
+   srand; # some modules do not randomise their random numbers enough, so we do it here
 
    ($LISTEN) = AnyEvent::Fork::Serve::run_args;
 
@@ -139,10 +141,9 @@ sub run {
       and die "PApp::SCGI::Worker: error: anyevent already initialised\n";
 
    # our SIGCHLD (and AnyEvent::Fork) likely destroyed any SIGCHLD
-   # handler EV installed, and there is no way tof ix this in pure perl,
-   # so we destroy and recreate the default loop here.
-   EV::default_destroy;
-   EV::default_loop;
+   # handler EV installed, and there is no way to fix this in pure perl,
+   # so we call reinit.
+   EV::Child::reinit;
 
    AnyEvent::detect;
    AE::now_update;

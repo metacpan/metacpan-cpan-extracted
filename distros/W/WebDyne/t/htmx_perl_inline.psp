@@ -1,4 +1,4 @@
-<htmx bare=1 perl>
+<htmx bare force perl>
 return <<'END';
 Hello world
 END

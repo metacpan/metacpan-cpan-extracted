@@ -11,7 +11,7 @@ Geo::Coder::List - Call many Geo-Coders
 
 # VERSION
 
-Version 0.35
+Version 0.36
 
 # SYNOPSIS
 
@@ -19,30 +19,42 @@ Version 0.35
 and
 [Geo::Coder::Many](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AMany)
 are great routines but neither quite does what I want.
-This module's primary use is to allow many backends to be used by
-[HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML%3A%3AGoogleMaps%3A%3AV3)
+
+`Geo::Coder::List` is designed to simplify geocoding tasks by aggregating multiple geocoding services into a single, unified interface.
+It allows developers to chain and prioritize various geocoding backends (such as Google Places, OpenStreetMap, and GeoNames)
+based on specific conditions,
+such as location or usage limits.
+The module features built-in caching mechanisms to optimize performance and reduce redundant API calls,
+while also normalizing responses from different providers into a consistent format for easier integration with mapping systems such as [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM) and <[HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML%3A%3AGoogleMaps%3A%3AV3).
 
 # SUBROUTINES/METHODS
 
 ## new
 
-Creates a Geo::Coder::List object.
+Creates a `Geo::Coder::List` object.
 
-Takes an optional argument 'cache' which is a reference to a HASH or an object that supports `get()` and `set()` methods.
-Takes an optional argument 'debug',
-the higher the number,
-the more debugging.
+Takes an optional argument `cache` which is a reference to a HASH or an object that supports `get()` and `set()` methods.
 The licences of some geo coders,
 such as Google,
 specifically prohibit caching API calls,
 so be careful to only use those services that allow it.
+
+Takes an optional argument `debug`,
+the higher the number,
+the more debugging.
 
     use Geo::Coder::List;
     use CHI;
 
     my $geocoder->new(cache => CHI->new(driver => 'Memory', global => 1));
 
-## push
+The class can be configured at runtime using environments and configuration files,
+for example,
+setting `$ENV{'GEO__CODER__LIST__carp_on_warn'}` causes warnings to use [Carp](https://metacpan.org/pod/Carp).
+For more information about configuring object constructors at runtime,
+see [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
+
+## push($self, $geocoder)
 
 Add an encoder to the list of encoders.
 
@@ -59,7 +71,7 @@ and OpenStreetMap for other places:
         ->push({ regex => qr/(Canada|USA|United States)$/, geocoder => Geo::Coder::CA->new() })
         ->push(Geo::Coder::OSM->new());
 
-    # Uses Geo::Coder::CA, and if that fails uses Geo::Coder::OSM
+    # Uses Geo::Coder::CA, and if that fails, uses Geo::Coder::OSM
     my $location = $geo_coderlist->geocode(location => '1600 Pennsylvania Ave NW, Washington DC, USA');
     # Only uses Geo::Coder::OSM
     if($location = $geo_coderlist->geocode('10 Downing St, London, UK')) {
@@ -70,6 +82,12 @@ and OpenStreetMap for other places:
 
     # It is also possible to limit the number of enquires used by a particular encoder
     $geo_coderlist->push({ geocoder => Geo::Coder::GooglePlaces->new(key => '1234', limit => 100) });
+
+### Parameters
+
+- `$geocoder` hashref (required)
+
+    Hashref containing a regex and a geocoding object.
 
 ## geocode
 
@@ -84,7 +102,7 @@ if the value was retrieved from the cache the value will be undefined.
         print 'Location information retrieved using ', $location->{'geocoder'}, "\n";
     }
 
-## ua
+## ua($self, $ua)
 
 Accessor method to set the UserAgent object used internally by each of the Geo-Coders.
 You can call _env\_proxy_,
@@ -98,6 +116,12 @@ to set the proxy information from environment variables:
 
 Note that unlike Geo::Coders,
 there is no read method since that would be pointless.
+
+### Parameters
+
+- `$ua` object (optional)
+
+    Useragent object.
 
 ## reverse\_geocode
 
@@ -133,11 +157,15 @@ reverse\_geocode() should support [Geo::Location::Point](https://metacpan.org/po
 
 # SEE ALSO
 
-[Geo::Coder::All](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AAll)
-[Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGooglePlaces)
-[Geo::Coder::Many](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AMany)
+- Test coverage report: [https://nigelhorne.github.io/Geo-Coder-List/coverage/](https://nigelhorne.github.io/Geo-Coder-List/coverage/)
+- [Geo::Coder::All](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AAll)
+- [Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGooglePlaces)
+- [Geo::Coder::Many](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AMany)
+- [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure)
 
 # SUPPORT
+
+This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 
@@ -155,6 +183,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2016-2025 Nigel Horne.
+Copyright 2016-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2

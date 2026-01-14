@@ -4,7 +4,7 @@
       "Mike Shipper <AKALINUX@CPAN.ORG>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -60,11 +60,11 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.010",
+   "version" : "0.011",
    "x_repository" : {
       "type" : "git",
       "url" : "https://github.com/akalinux/xml-sig-oo.git",
       "web" : "https://github.com/akalinux/xml-sig-oo"
    },
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

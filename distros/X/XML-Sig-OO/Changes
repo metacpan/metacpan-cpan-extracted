@@ -22,3 +22,5 @@
   - Added boolean flag to skip cacert checking
 0.010
   - resolved issue that left the library open to  marvin attacks
+0.011
+  - Disabled several tests becase the keys and certs are no longer conform to the RSA standard

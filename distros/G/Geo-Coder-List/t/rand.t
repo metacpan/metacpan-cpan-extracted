@@ -2,17 +2,19 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 7;
+use Test::Most;
+use Test::RequiresInternet('a2ageo.rmservers.com' => 'https');
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
 BEGIN {
 	use_ok('Geo::Coder::List');
+	$ENV{'NO_NETWORK_TESTING'} = 1 unless(-e 't/online.enabled')
 }
 
 RAND: {
 	SKIP: {
-		skip('Test requires Internet access', 6) unless(-e 't/online.enabled');
+		skip('Test requires Internet access') unless(-e 't/online.enabled');
 
 		eval {
 			require Geo::Coder::RandMcnally;
@@ -26,7 +28,6 @@ RAND: {
 
 		if($@) {
 			diag('Geo::Coder::RandMcnally not installed - skipping tests');
-			skip('Geo::Coder::RandMcnally not installed', 6);
 		} else {
 			diag("Using Geo::Coder::RandMcnally $Geo::Coder::RandMcnally::VERSION");
 
@@ -52,4 +53,5 @@ RAND: {
 			ok(!defined($geocoderlist->geocode('')));
 		}
 	}
+	done_testing();
 }

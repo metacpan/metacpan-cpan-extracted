@@ -56,7 +56,7 @@
    "provides" : {
       "Quote::LineProtocol" : {
          "file" : "lib/Quote/LineProtocol.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.3"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,10 @@
          "web" : "https://github.com/vague666/Quote-LineProtocol"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.1.3",
+   "x_contributors" : [
+      "Jari Matilainen <vague666@users.noreply.github.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

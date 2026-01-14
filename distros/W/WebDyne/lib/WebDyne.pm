@@ -61,7 +61,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='2.066';
+$VERSION='2.069';
 chomp($VERSION_GIT_SHA=do { local (@ARGV, $/) = ($_=__FILE__.'.sha'); <> if -f $_ });
 
 
@@ -2529,7 +2529,8 @@ sub json {
     my $json_or=JSON->new() ||
         return err('unable to create new JSON object');
     debug("json_or: $json_or");
-    $json_or->canonical(defined($attr_hr->{'canonical'}) ? $attr_hr->{'canonical'} : WEBDYNE_JSON_CANONICAL);
+    $json_or->canonical(defined($attr_hr->{'canonical'}) ? ($attr_hr->{'canonical'} ? 1 : 0) : WEBDYNE_JSON_CANONICAL);
+    $json_or->pretty(defined($attr_hr->{'pretty'}) ? ($attr_hr->{'pretty'} ? 1 : 0)  : WEBDYNE_JSON_PRETTY);
     my $json=eval {$json_or->encode($json_xr)} ||
         return err('error %s on json_encode of %s', $@, Dumper($json_xr));
     debug("json %s", Dumper($json));
@@ -2542,8 +2543,9 @@ sub json {
     my %attr=(
         type => 'application/json',
         %{$attr_hr}
+        
     );
-    delete @attr{qw(perl package method handler)};
+    delete @attr{qw(perl package method handler pretty canonical)};
 
 
     #  Render and return
@@ -2575,12 +2577,26 @@ sub htmx {
     debug("hx_request header: $hx_request");
     
     
+    #  If not HTMX request don't display unless forced
+    #
+    unless($hx_request || $attr_hr->{'force'} || WEBDYNE_HTMX_FORCE) {
+    
+
+        #  Not HTMX request, bail
+        #
+        debug('not htmx request and no force attribute or flag, bailing');
+        return \undef;
+        
+    }
+    
+    
     #  Check if we want to fire on match
     #
     if (exists ($attr_hr->{'display'})) {
         unless ($attr_hr->{'display'}) {
             #  Defined but no match. Bail
             #
+            debug('display attribute present but no match, bailing');
             return \undef;
         }
     }
@@ -4009,8 +4025,9 @@ sub dump {
                 my $wv=${"WebDyne::${k}"};
                 $constant{$k}=($cv eq $wv) ? $wv : "$wv [$cv]";
             }
-            push @html, Data::Dumper->Dump([\%constant], ['WebDyne::Constant']);
-
+            my $constant_dumper=Data::Dumper->Dump([\%constant], ['WebDyne::Constant']);
+            $constant_dumper=$cgi_or->escapeHTML($constant_dumper);
+            push @html, $constant_dumper;
             
         }
         

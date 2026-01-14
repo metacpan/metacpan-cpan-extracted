@@ -63,7 +63,7 @@ $r = task({
 if (
 	($r->{'dry.run'})	        &&
 	($r->{duration} == 0)	  &&
-	((defined $r->{'will.do'}) && ($r->{'will.do'} eq 'no'))
+	((defined $r->{'will.do'}) && ($r->{'will.do'} eq 'no: dry run'))
 	) {
 	$dry_run = 1;
 } else {

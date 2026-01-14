@@ -49,6 +49,7 @@ t/33-schema-populate.t
 t/34-schema-clone.t
 t/35-row-set-column.t
 t/36-row-id.t
+t/37-row-copy.t
 t/manifest.t
 t/pod.t
 t/test.db
@@ -56,6 +57,7 @@ t/lib/TestDB.pm
 t/lib/TestSchema.pm
 t/lib/TestSchema/Result/User.pm
 t/lib/TestSchema/Result/Order.pm
+t/lib/TestSchema/Result/Product.pm
 t/create_test_db.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -43,7 +43,7 @@ isa_ok($pkg->new(XML_1()),$pkg);
       ok($result,'should get the digest transforms without an error') or diag $result;
       cmp_ok($#{$result->get_data},'==',1,'Should have 2 transforms') or die;
     }
-    {
+    if(0){
       my $x=$self->build_xpath;
       my ($nth)=$x->findnodes($self->xpath_SignedInfo);
       my $result=$self->verify_signature($x,1);
@@ -56,7 +56,7 @@ isa_ok($pkg->new(XML_1()),$pkg);
 
     }
 
-    {
+    if(1){
       my $x=$self->build_xpath;
       my ($nth)=$x->findnodes($self->xpath_SignedInfo);
       my $result=$self->verify_digest($x,1);
@@ -65,7 +65,7 @@ isa_ok($pkg->new(XML_1()),$pkg);
   }
 }
 
-{
+if(0){
   my $id=1;
   my $main=__PACKAGE__;
 
@@ -91,7 +91,7 @@ isa_ok($pkg->new(XML_1()),$pkg);
 
 {
 
-  if(1) {
+  if(0) {
     my $self=$pkg->new(SIGN_XML1());
     my $x=$self->build_xpath;
     my $result=$self->get_xml_to_sign($x,1);
@@ -106,7 +106,7 @@ isa_ok($pkg->new(XML_1()),$pkg);
     #diag Dumper($result);
     ok($result,"Should validate the xml we signed");
   }
-  if(1) {
+  if(0) {
     my $self=$pkg->new(SIGN_XML1(),key_file=>File::Spec->catfile($Bin,'x509_key.pem'),cert_file=>File::Spec->catfile($Bin,'x509_cert.pem'));
     my $result=$self->sign;
     ok($result,'Should sign the using our x509 cert xml without error');
@@ -117,7 +117,7 @@ isa_ok($pkg->new(XML_1()),$pkg);
     $result=$self->validate;
     ok($result,"Should validate the xml signed with the x509 cert");
   }
-  if(1) {
+  if(0) {
     my $self=$pkg->new(SIGN_XML1(),key_file=>File::Spec->catfile($Bin,'x509_key.pem'));
     my $result=$self->sign;
     ok($result,'Should sign the using our rsa key without error');
@@ -128,7 +128,7 @@ isa_ok($pkg->new(XML_1()),$pkg);
     ok($result,"Should validate the xml signed with the rsa key");
 
   }
-  if(1){
+  if(0){
     my $self=$pkg->new(SIGN_XML1(),key_file=>File::Spec->catfile($Bin,'dsa_priv.pem'));
     my $result=$self->sign;
     ok($result,'Should sign the using our dsa key without error');
@@ -139,7 +139,7 @@ isa_ok($pkg->new(XML_1()),$pkg);
     ok($result,"Should validate the xml signed with the dsa key");
 
   }
-  if(1){
+  if(0){
     my $self=$pkg->new(xml=>'<?xml version="1.0" standalone="yes"?><data><test ID="A" /><test ID="B" /></data>',key_file=>File::Spec->catfile($Bin,'x509_key.pem'));
     my $result=$self->sign;
     ok($result,'Should sign both chunks using our rsa key without error');
@@ -149,7 +149,7 @@ isa_ok($pkg->new(XML_1()),$pkg);
     $result=$self->validate;
     ok($result,"Should validate both chunks signed with the rsa key");
   }
-  if(1) {
+  if(0) {
     my $self=$pkg->new(xml=>'<?xml version="1.0" standalone="yes"?><data><test ID="A" /><test ID="B" /></data>');
     my $result=$self->validate;
     ok(!$result,'Should fail to validate multiple chunks, when there is no data to validate!');

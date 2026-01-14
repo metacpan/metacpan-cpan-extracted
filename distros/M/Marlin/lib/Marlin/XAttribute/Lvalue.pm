@@ -5,7 +5,7 @@ use warnings;
 package Marlin::XAttribute::Lvalue;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.013001';
+our $VERSION   = '0.014000';
 
 use attributes ();
 use Class::XSAccessor ();

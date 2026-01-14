@@ -1,7 +1,7 @@
 #!/opt/bin/perl
 
 ##########################################################################
-## All portions of this code are copyright (c) 2015,2016 nethype GmbH   ##
+## All portions of this code are copyright (c) 2015-2023 nethype GmbH   ##
 ##########################################################################
 ## Using, reading, modifying or copying this code requires a LICENSE    ##
 ## from nethype GmbH, Franz-Werfel-Str. 11, 74078 Heilbronn,            ##
@@ -42,6 +42,7 @@ Usage: $0 [opts...]
 
        -l | --listen /unix/domain/socket
        -l | --listen ip:port        bind on given port
+       --socket-umask octal         temporarily use this umask when creating socket
 
        --preload-mod module         preload a perl module
        --preload-bag PATH/GID       preload objects from container
@@ -56,6 +57,8 @@ Usage: $0 [opts...]
 
        --mount PATH/GID /LOCATION   mount an agni application
 
+       --docroot /path              fallback docroot for static files in http mode
+
 EOF
    exit $_[0];
 }
@@ -65,6 +68,8 @@ EOF
 our @PRELOAD_MOD;
 our @PRELOAD_OBJ;
 our @PRELOAD_BAG;
+our $SOCKET_UMASK;
+our $DOCROOT;
 
 Getopt::Long::Configure "no_ignore_case";
 Getopt::Long::GetOptions
@@ -74,6 +79,7 @@ Getopt::Long::GetOptions
       "version|V"  => sub { print "$VERSION\n"; exit 0 },
 
       "listen|l=s"      => \$LISTEN,
+      "socket-umask=s"  => \$SOCKET_UMASK,
       "preload-mod=s"   => \@PRELOAD_MOD,
       "preload-bag=s"   => \@PRELOAD_BAG,
       "preload-obj=s"   => \@PRELOAD_OBJ,
@@ -83,6 +89,7 @@ Getopt::Long::GetOptions
       "max-requests=i"  => \$MAX_REQUESTS,
       "restart=i"       => \$RESTART,
       "mount=s{2}"      => \@MOUNT,
+      "docroot=s"       => \$DOCROOT,
 ;
 
 my $listenguard;
@@ -91,7 +98,10 @@ my $listenguard;
    my ($host, $port) = AnyEvent::Socket::parse_hostport $LISTEN
       or die "$LISTEN: cannot parse bind specification (try host:port or /unix/socket)\n";
 
+   $SOCKET_UMASK = oct   $SOCKET_UMASK if defined $SOCKET_UMASK;
+   $SOCKET_UMASK = umask $SOCKET_UMASK if defined $SOCKET_UMASK;
    $listenguard = AnyEvent::Socket::tcp_bind $host, $port, my $cv = AE::cv;
+   $SOCKET_UMASK = umask $SOCKET_UMASK if defined $SOCKET_UMASK;
 
    $LISTEN = $cv->recv;
 }
@@ -106,7 +116,7 @@ sub new_template {
          ->new
          ->require ("PApp::SCGI::Worker")
          ->send_fh ($LISTEN)
-         ->eval ("&PApp::SCGI::Worker::init", $VERBOSE, $REFRESH, $MAX_REQUESTS)
+         ->eval ("&PApp::SCGI::Worker::init", $VERBOSE, $REFRESH, $MAX_REQUESTS, $DOCROOT)
          ->eval ("&PApp::SCGI::Worker::preload_mod", @PRELOAD_MOD)
          ->eval ("&PApp::SCGI::Worker::preload_bag", @PRELOAD_BAG)
          ->eval ("&PApp::SCGI::Worker::preload_obj", @PRELOAD_OBJ)

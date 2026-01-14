@@ -31,7 +31,7 @@ runtime, should be moderately easy to add XML::Transformiix or XML::XSLT).
 
 package PApp::XSLT;
 
-$VERSION = 2.3;
+$VERSION = 2.4;
 
 no bytes;
 

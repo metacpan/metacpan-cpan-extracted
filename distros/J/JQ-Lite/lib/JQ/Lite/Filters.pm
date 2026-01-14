@@ -2050,10 +2050,15 @@ sub apply {
                     defined $found ? $found : undef;
                 }
                 elsif (!ref $_ || ref($_) eq 'JSON::PP::Boolean') {
-                    my $haystack = defined $_ ? "$_" : '';
-                    my $fragment = defined $needle ? "$needle" : '';
-                    my $pos      = index($haystack, $fragment);
-                    $pos >= 0 ? $pos : undef;
+                    if (!defined $_ || !defined $needle) {
+                        undef;
+                    }
+                    else {
+                        my $haystack = "$_";
+                        my $fragment = "$needle";
+                        my $pos      = index($haystack, $fragment);
+                        $pos >= 0 ? $pos : undef;
+                    }
                 }
                 else {
                     undef;
@@ -2082,10 +2087,15 @@ sub apply {
                     defined $found ? $found : undef;
                 }
                 elsif (!ref $_ || ref($_) eq 'JSON::PP::Boolean') {
-                    my $haystack = defined $_ ? "$_" : '';
-                    my $fragment = defined $needle ? "$needle" : '';
-                    my $pos      = rindex($haystack, $fragment);
-                    $pos >= 0 ? $pos : undef;
+                    if (!defined $_ || !defined $needle) {
+                        undef;
+                    }
+                    else {
+                        my $haystack = "$_";
+                        my $fragment = "$needle";
+                        my $pos      = rindex($haystack, $fragment);
+                        $pos >= 0 ? $pos : undef;
+                    }
                 }
                 else {
                     undef;

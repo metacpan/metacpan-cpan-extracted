@@ -1,4 +1,4 @@
-package Term::ANSIEncode 1.74;
+package Term::ANSIEncode 1.75;
 
 #######################################################################
 #            _   _  _____ _____   ______                     _        #
@@ -93,6 +93,7 @@ sub ansi_description {
     return ($self->{'ansi_meta'}->{$code}->{$name}->{'desc'});
 }
 
+# Returns in a string, a color map
 sub ansi_colors {
     my $self = shift;
 
@@ -460,6 +461,8 @@ sub _global_ansi_meta {    # prefills the hash cache
             'SCREEN 1'      => { 'out' => $csi . '?1049l',   'desc' => 'Set display to screen 1' },
             'SCREEN 2'      => { 'out' => $csi . '?1049h',   'desc' => 'Set display to screen 2' },
             'UP'            => { 'out' => $csi . 'A',        'desc' => 'Move cursor up one line' },
+#           SCROLL UP count
+#           SCROLL DOWN count
         },
 
         'attributes' => {
@@ -1387,6 +1390,7 @@ sub _global_ansi_meta {    # prefills the hash cache
     };
 ###
 
+	# Generate background colors from foreground
     foreach my $name (keys %{ $tmp->{'foreground'} }) {
         $tmp->{'background'}->{"B_$name"}->{'desc'} = $tmp->{'foreground'}->{$name}->{'desc'};
         $tmp->{'background'}->{"B_$name"}->{'out'}  = $csi . '4' . substr($tmp->{'foreground'}->{$name}->{'out'}, 3);
@@ -1398,7 +1402,9 @@ sub _global_ansi_meta {    # prefills the hash cache
             'desc' => "ANSI Font $count",
             'out'  => $csi . ($count + 10) . 'm',
         };
-    } ## end foreach my $count (1 .. 9)
+    }
+	
+	# Generate 8 bit colors
     foreach my $count (16 .. 231) {
         $tmp->{'foreground'}->{ 'COLOR ' . $count } = {
             'desc' => "ANSI 8 Bit Color $count",
@@ -1408,7 +1414,9 @@ sub _global_ansi_meta {    # prefills the hash cache
             'desc' => "ANSI 8 Bit Color $count",
             'out'  => $csi . "48;5;$count" . 'm',
         };
-    } ## end foreach my $count (16 .. 231)
+    }
+
+	# Generate Gray colors
     foreach my $count (232 .. 255) {
         $tmp->{'foreground'}->{ 'GRAY ' . ($count - 232) } = {
             'desc' => "ANSI 8 Bit Gray level " . ($count - 232),
@@ -1418,7 +1426,7 @@ sub _global_ansi_meta {    # prefills the hash cache
             'desc' => "ANSI 8 Bit Gray level " . ($count - 232),
             'out'  => $csi . "48;5;$count" . 'm',
         };
-    } ## end foreach my $count (232 .. 255)
+    }
 
     return ($tmp);
 } ## end sub _global_ansi_meta
@@ -1427,7 +1435,7 @@ sub _global_ansi_meta {    # prefills the hash cache
 
 =head1 NAME
 
-Term;;ANSIEncode
+Term::ANSIEncode
 
 =head1 SYNOPSIS
 
@@ -1438,6 +1446,12 @@ A markup language to generate basic ANSI text.  A terminal that supports UTF-8 i
  my $ansi = Term::ANSIEncode->new;
 
  my $string = '[% CLS %]Some markup encoded string';
+ $string .= "\n" . '[% RED     %]Red foreground[% RESET %]' . "\n";
+ $string .= "\n" . '[% YELLOW  %]Yellow foreground[% RESET %]' . "\n";
+ $string .= "\n" . '[% GREEN   %]Green foreground[% RESET %]' . "\n";
+ $string .= "\n" . '[% CYAN    %]Cyan foreground[% RESET %]' . "\n";
+ $string .= "\n" . '[% BLUE    %]Blue foreground[% RESET %]' . "\n";
+ $string .= "\n" . '[% MAGENTA %]Magenta foreground[% RESET %]' . "\n";
 
  $ansi->ansi_output($string);
 
@@ -1597,39 +1611,41 @@ There are many more foreground colors available than the sixteen below.  However
 
 =over 4
 
-=item BLACK          = Black
+=item BLACK              = Black
 
-=item RED            = Red
+=item RED                = Red
 
-=item GREEN          = Green
+=item GREEN              = Green
 
-=item YELLOW         = Yellow
+=item YELLOW             = Yellow
 
-=item BLUE           = Blue
+=item BLUE               = Blue
 
-=item MAGENTA        = Magenta
+=item MAGENTA            = Magenta
 
-=item CYAN           = Cyan
+=item CYAN               = Cyan
 
-=item WHITE          = White
+=item WHITE              = White
 
-=item DEFAULT        = Default foreground color
+=item DEFAULT            = Default foreground color
 
-=item BRIGHT BLACK   = Bright black (dim grey)
+=item BRIGHT BLACK       = Bright black (dim grey)
 
-=item BRIGHT RED     = Bright red
+=item BRIGHT RED         = Bright red
 
-=item BRIGHT GREEN   = Lime
+=item BRIGHT GREEN       = Lime
 
-=item BRIGHT YELLOW  = Bright Yellow
+=item BRIGHT YELLOW      = Bright Yellow
 
-=item BRIGHT BLUE    = Bright blue
+=item BRIGHT BLUE        = Bright blue
 
-=item BRIGHT MAGENTA = Bright magenta
+=item BRIGHT MAGENTA     = Bright magenta
 
-=item BRIGHT CYAN    = Bright cyan
+=item BRIGHT CYAN        = Bright cyan
 
-=item BRIGHT WHITE   = Bright white
+=item BRIGHT WHITE       = Bright white
+
+=item RGB red,green,blue = 24 bit color
 
 =back
 
@@ -1657,21 +1673,23 @@ There are many more background colors available than the sixteen below.  However
 
 =item B_DEFAULT        = Default background color
 
-=item BRIGHT B_BLACK   = Bright black (grey)
+=item B_BRIGHT BLACK   = Bright black (grey)
 
-=item BRIGHT B_RED     = Bright red
+=item B_BRIGHT RED     = Bright red
 
-=item BRIGHT B_GREEN   = Lime
+=item B_BRIGHT GREEN   = Lime
 
-=item BRIGHT B_YELLOW  = Bright yellow
+=item B_BRIGHT YELLOW  = Bright yellow
 
-=item BRIGHT B_BLUE    = Bright blue
+=item B_BRIGHT BLUE    = Bright blue
 
-=item BRIGHT B_MAGENTA = Bright magenta
+=item B_BRIGHT MAGENTA = Bright magenta
 
-=item BRIGHT B_CYAN    = Bright cyan
+=item B_BRIGHT CYAN    = Bright cyan
 
-=item BRIGHT B_WHITE   = Bright white
+=item B_BRIGHT WHITE   = Bright white
+
+=item B_RGB red,green,blue = 24 bit color definition
 
 =back
 
@@ -1681,7 +1699,7 @@ Makes a solid blank line, the full width of the screen with the selected color
 
 For example, for a color of blue, use the following
 
-  [% HORIZONTAL RULE BLUE %]
+ [% HORIZONTAL RULE BLUE %]
 
 =over 4
 
@@ -1704,6 +1722,28 @@ Begins the frame definition
 =item ENDBOX
 
 Ends the frame definition
+
+=back
+
+=head2 TEXT WRAP
+
+=over 4
+
+=item WRAP
+
+Begins text block to be word-wrapped
+
+=item ENDWRAP
+
+Ends text block to be word-wrapped
+
+=item JUSTIFIED
+
+Begins text block to be word-wrapped and justified
+
+=item ENDJUSTIFIED
+
+Ends text block to be word-wrapped and justified
 
 =back
 

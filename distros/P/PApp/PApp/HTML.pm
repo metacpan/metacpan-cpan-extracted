@@ -36,7 +36,7 @@ no bytes;
 
 use common::sense;
 
-our $VERSION = 2.3;
+our $VERSION = 2.4;
 our @EXPORT = qw(
 
       errbox
@@ -114,9 +114,7 @@ $HTML_ESCAPE[159] = "&#x0178;";
 our $HTML_ESCAPE = qr<([${\(join "", map { sprintf "\\x%02x", $_ } grep defined $HTML_ESCAPE[$_], 0..$#HTML_ESCAPE)}])>;
 
 sub escape_html($) {
-   my $str = shift;
-   $str =~ s/$HTML_ESCAPE/$HTML_ESCAPE[ord $1]/g;
-   $str
+   shift =~ s/$HTML_ESCAPE/$HTML_ESCAPE[ord $1]/gr
 }
 
 sub escape_uri($) {
@@ -128,7 +126,7 @@ sub escape_uri($) {
 
 sub escape_attr($) {
    my $str = shift;
-   utf8::upgrade $str;
+   utf8::upgrade $str; # TODO: remove?
    $str =~ s/(['<>&\x00-\x1f\x80-\x9f])/sprintf "&#%d;", ord $1/ge;
    "'$str'"
 }

@@ -1047,6 +1047,8 @@ AV *Future_get_result_av(pTHX_ SV *f, bool await)
       PUTBACK;
       FREETMPS;
       LEAVE;
+
+      sv_2mortal(exception);
     }
 
     if(SvROK(exception) || SvPV_nolen(exception)[SvCUR(exception)-1] == '\n')

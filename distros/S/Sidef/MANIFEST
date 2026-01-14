@@ -113,6 +113,7 @@ Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
+NUMBER_THEORY_REFERENCE.md
 NUMBER_THEORY_TUTORIAL.md
 README.md
 scripts/absolute_string.sf
@@ -873,8 +874,10 @@ scripts/Tests/interactive_mode_bug.sf
 scripts/Tests/inverse_of_factorial.sf
 scripts/Tests/inverted_syntax.sf
 scripts/Tests/irootrem.sf
+scripts/Tests/is_almost_prime.sf
 scripts/Tests/is_even_perfect.sf
 scripts/Tests/is_even_perfect_2.sf
+scripts/Tests/is_omega_prime.sf
 scripts/Tests/is_power.sf
 scripts/Tests/is_prime.sf
 scripts/Tests/karatsuba_multiplication.sf
@@ -960,6 +963,7 @@ scripts/Tests/nth_number.sf
 scripts/Tests/nth_prime.sf
 scripts/Tests/number_binary_search.sf
 scripts/Tests/number_methods.sf
+scripts/Tests/number_methods_edge_cases.sf
 scripts/Tests/object_copy.sf
 scripts/Tests/object_methods_reflection.sf
 scripts/Tests/objects_init.sf
@@ -985,6 +989,7 @@ scripts/Tests/pipeline_operator.sf
 scripts/Tests/pipeline_zip_operator.sf
 scripts/Tests/polymod.sf
 scripts/Tests/polynomial.sf
+scripts/Tests/polynomial_edge_cases.sf
 scripts/Tests/polynomial_regression.sf
 scripts/Tests/postfix_exclamation_mark.sf
 scripts/Tests/power_numbers.sf

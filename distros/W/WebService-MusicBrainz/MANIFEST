@@ -9,6 +9,7 @@ META.yml
 README.md
 t/Area.t
 t/Artist.t
+t/DiscID.t
 t/Label.t
 t/Recording.t
 t/Release.t

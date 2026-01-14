@@ -38,7 +38,7 @@ OSM: {
 		my $geocoder = new_ok('Geo::Coder::OSM');
 		$geocoderlist->push($geocoder);
 
-		ok(!defined($geocoderlist->geocode()));
+		throws_ok( sub { $geocoderlist->geocode() }, qr/^Usage: /, 'No arguments gets usage message');
 
 		check($geocoderlist, 'Silver Spring, MD, USA', 38.99, -77.02);
 
@@ -65,7 +65,7 @@ OSM: {
 		ok($location->{address}{country_code} eq 'us');
 		like($location->{address}{country}, qr/^United States/, 'check USA');
 
-		like($geocoderlist->reverse_geocode('39.00,-77.10'), qr/Bethesda/i, 'test reverse geocode');
+		like($geocoderlist->reverse_geocode('39.00,-77.10'), qr/National Institutes of Health/i, 'test reverse geocode');
 
 		my @locations = $geocoderlist->geocode('Vessels, Misc Ships at Sea or Abroad, England');
 		my $count = scalar(@locations);

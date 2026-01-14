@@ -26,7 +26,8 @@
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
-            "Test::Simple" : "0.44"
+            "Test::Simple" : "0.44",
+            "Text::Diff" : "0"
          }
       },
       "configure" : {
@@ -68,7 +69,7 @@
          "web" : "https://github.com/aspeer/WebDyne"
       }
    },
-   "version" : "2.066",
+   "version" : "2.069",
    "x_authority" : "cpan:ASPEER",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

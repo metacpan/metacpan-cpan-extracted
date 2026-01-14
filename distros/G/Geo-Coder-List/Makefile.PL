@@ -23,11 +23,15 @@ if($ENV{AUTHOR_TESTING}) {
 my $test_requires = {
 	'Test::Deep' => 0,
 	'Test::DescribeMe' => 0,
+	'Test::Mockingbird' => 0,
 	'Test::MockModule' => 0,
+	'Test::MockObject' => 0,
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
 	'Test::Number::Delta' => 0,	# Always needed since used in free.t
+	'Test::RequiresInternet' => 0,
+	'Test::Without::Module' => 0,
 };
 
 if($online_tests) {
@@ -59,10 +63,10 @@ if($^O eq 'darwin') {
 }
 
 WriteMakefile(
-    NAME		=> 'Geo::Coder::List',
-    AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
-    VERSION_FROM	=> 'lib/Geo/Coder/List.pm',
-    ABSTRACT_FROM	=> 'lib/Geo/Coder/List.pm',
+	NAME		=> 'Geo::Coder::List',
+	AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
+	VERSION_FROM	=> 'lib/Geo/Coder/List.pm',
+	ABSTRACT_FROM	=> 'lib/Geo/Coder/List.pm',
     ((defined($ExtUtils::MakeMaker::VERSION) &&
      ($ExtUtils::MakeMaker::VERSION >= 6.3002))
       ? ('LICENSE'=> 'GPL')
@@ -73,10 +77,12 @@ WriteMakefile(
 	'Carp' => 0,
 	'HTML::Entities' => 0,
 	'LWP::Protocol::https' => 0,
+	'Object::Configure' => 0.13,
+	'Params::Get' => 0.04,
 	'Scalar::Util' => 0,
 	'Time::HiRes' => 0
     }, dist => $dist,
-    clean		=> { FILES => 'Geo::Coder::List-*' },
+    clean		=> { FILES => 'Geo-Coder-List-*' },
     META_MERGE		=> {
 	'meta-spec' => { version => 2 },
 	resources => {

@@ -8,10 +8,11 @@ use Syntax::Keyword::Match;
 use Exporter 'import';
 our @EXPORT_OK = qw(measurement tags fields timestamp);
 
-our $VERSION = "0.1.0";
+our $VERSION = "0.1.3";
+our $TELEGRAF = $ENV{QUOTE_TELEGRAF} // 0; # Telegraf requires special quoting
 
 my $qr = qr{([,=\s])};    # Match tag and field keys, and tag values
-my $qs = qr{(["\\,=\s])}; # Match field string values
+my $qs = $TELEGRAF ? qr{(["\\,=])} : qr{(["\\,=\s])}; # Match field string values
 
 sub measurement {
   my $str = shift;
@@ -24,6 +25,7 @@ sub tags {
 
   for my $key (keys %tags) {
     my $val = $tags{$key};
+    next if $val eq '';
     push @r, sprintf(qq(%s=%s), $key =~ s{$qr}{\Q$1\E}gr, $val =~ s{$qr}{\Q$1\E}gr);
   }
 
@@ -36,6 +38,7 @@ sub fields {
 
   for my $key (sort keys %fields) {
     my $val = $fields{$key};
+    next if $val eq '';
     my $type;
 
     if(ref $val) {
@@ -85,6 +88,8 @@ sub fields {
 
 sub timestamp {
   my ($unit, $utc) = @_;
+  $utc //= 0;
+  $unit //= '';
   my $now = $utc ? Time::Moment->now_utc : Time::Moment->now;
   return sprintf("%d", sprintf("%d%d", $now->epoch, $unit eq 'ns' ? $now->nanosecond
                                                   : $unit eq 'us' ? $now->microsecond
@@ -117,6 +122,22 @@ Quote::LineProtocol - Helper module for Lineprotocol quoting
     This module provides helper functions to quote key/value pairs of datapoints
     meant to be sent over the InfluxDB lineprotocol following the rules specified
     on L<https://docs.influxdata.com/influxdb/v2/reference/syntax/line-protocol/>
+
+=head1 CONFIGURATION
+
+Telegraf requires special consideration of spaces in strings. If using this module with telegraf set the env var QUOTE_TELEGRAF before calling the script or use the following BEGIN block
+
+    BEGIN {
+      $ENV{QUOTE_TELEGRAF} = 1;
+      require Quote::LineProtocol;
+      Quote::LineProtocol->import(qw(measurement tags fields timestamp));
+    }
+
+With Strawberry perl you can set the env var in the portableshell.bat by adding
+
+    set QUOTE_TELEGRAF=1
+
+to the file
 
 =head1 METHODS
 

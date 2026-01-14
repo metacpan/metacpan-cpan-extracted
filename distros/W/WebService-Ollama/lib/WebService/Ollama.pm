@@ -4,11 +4,44 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Moo;
+use Exporter 'import';
 
 use WebService::Ollama::UA;
+use JSON::Lines;
+
+our @EXPORT_OK = qw(ollama);
+
+# Singleton instance for functional API
+my $_instance;
+
+sub ollama {
+	my ($method, @args) = @_;
+	
+	# Initialize singleton on first call
+	$_instance //= __PACKAGE__->new(
+		base_url => $ENV{OLLAMA_URL} // 'http://localhost:11434',
+		model    => $ENV{OLLAMA_MODEL} // 'llama3.2',
+	);
+	
+	# If first arg is a hashref, it's options for new instance
+	if (ref($method) eq 'HASH') {
+		$_instance = __PACKAGE__->new(%$method);
+		return $_instance;
+	}
+	
+	# Call method on singleton
+	return $_instance->$method(@args);
+}
+
+has json => (
+	is => 'ro',
+	default => sub {
+		JSON::Lines->new( utf8 => 1 );
+	}
+);
 
 has base_url => (
 	is => 'ro',
@@ -22,12 +55,56 @@ has model => (
 
 has ua => (
 	is => 'ro',
+	lazy => 1,
 	default => sub {
 		return WebService::Ollama::UA->new(
 			base_url => $_[0]->base_url
 		);
 	}
 );
+
+has tools => (
+	is => 'ro',
+	default => sub { {} },
+);
+
+sub register_tool {
+	my ($self, %args) = @_;
+
+	my $name = $args{name} or die "Tool name required";
+	my $description = $args{description} // '';
+	my $parameters = $args{parameters} // { type => 'object', properties => {} };
+	my $handler = $args{handler} or die "Tool handler required";
+
+	$self->tools->{$name} = {
+		name        => $name,
+		description => $description,
+		parameters  => $parameters,
+		handler     => $handler,
+	};
+
+	return $self;
+}
+
+sub _format_tools_for_api {
+	my ($self, $tools) = @_;
+
+	$tools //= $self->tools;
+	return [] unless keys %$tools;
+
+	return [
+		map {
+			{
+				type     => 'function',
+				function => {
+					name        => $_->{name},
+					description => $_->{description},
+					parameters  => $_->{parameters},
+				},
+			}
+		} values %$tools
+	];
+}
 
 sub version {
 	my ($self, %args) = @_;
@@ -228,6 +305,89 @@ sub embed {
 	);
 }
 
+# ============================================
+# TOOL EXECUTION
+# ============================================
+
+sub chat_with_tools {
+	my ($self, %args) = @_;
+
+	$args{model} //= $self->model;
+
+	if (! $args{model}) {
+		die "No model defined for chat_with_tools";
+	}
+
+	if (! $args{messages}) {
+		die "No messages defined for chat_with_tools";
+	}
+
+	my $max_iterations = $args{max_iterations} // 10;
+	my @messages = @{$args{messages}};
+	my @all_responses;
+
+	# Add tools to request
+	my $tools = $args{tools} // $self->_format_tools_for_api;
+
+	for my $iteration (1 .. $max_iterations) {
+		my $response = $self->chat(
+			model    => $args{model},
+			messages => \@messages,
+			tools    => $tools,
+			stream   => 0,
+		);
+
+		push @all_responses, $response;
+
+		# Check if model wants to call tools
+		my $tool_calls = $response->extract_tool_calls;
+
+		if (!@$tool_calls) {
+			# No tool calls - return final response
+			last;
+		}
+
+		# Add assistant message with tool calls
+		push @messages, {
+			role       => 'assistant',
+			content    => $response->message->{content} // '',
+			tool_calls => $tool_calls,
+		};
+
+		# Execute each tool and add results
+		for my $tool_call (@$tool_calls) {
+			my $function = $tool_call->{function};
+			my $tool_name = $function->{name};
+			my $tool_args = $function->{arguments};
+
+			# Parse arguments if string
+			if (!ref($tool_args)) {
+				$tool_args = eval { $self->json->decode($tool_args)->[0] } // {};
+			}
+
+			my $result;
+			if (my $handler = $self->tools->{$tool_name}{handler}) {
+				$result = eval { $handler->($tool_args) };
+				if ($@) {
+					$result = "Error executing tool: $@";
+				}
+			} else {
+				$result = "Unknown tool: $tool_name";
+			}
+
+			# Add tool result message
+			push @messages, {
+				role         => 'tool',
+				content      => ref($result) ? $self->json->encode([$result]) : "$result",
+				tool_call_id => $tool_call->{id} // $tool_name,
+			};
+		}
+	}
+
+	# Return last response (or all if needed)
+	return wantarray ? @all_responses : $all_responses[-1];
+}
+
 1;
 
 __END__
@@ -238,33 +398,78 @@ WebService::Ollama - ollama client
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
 =head1 SYNOPSIS
 
+	# Object-oriented interface
 	my $ollama = WebService::Ollama->new(
 		base_url => 'http://localhost:11434',
 		model => 'llama3.2'
 	);
 
-	$ollama->load_completion_model;
+	my $response = $ollama->chat(
+		messages => [
+			{ role => 'user', content => 'Hello!' }
+		]
+	);
+	print $response->message->{content};
 
+	# Functional interface
+	use WebService::Ollama qw(ollama);
+
+	# Configure (optional - uses OLLAMA_URL and OLLAMA_MODEL env vars by default)
+	ollama({ base_url => 'http://localhost:11434', model => 'llama3.2' });
+
+	# Call methods
+	my $models = ollama('available_models');
+	my $response = ollama('chat', messages => [{ role => 'user', content => 'Hi' }]);
+
+	# With streaming
 	my $string = "";
-
-	my $why = $ollama->completion(
+	$ollama->completion(
 		prompt => 'Why is the sky blue?',
 		stream => 1,
 		stream_cb => sub {
 			my ($res) = @_;
 			$string .= $res->response;
 		}
-	); # returns all chunked responses as an array
+	);
 
-	$ollama->unload_completion_model;
+=head1 DESCRIPTION
+
+WebService::Ollama is a Perl client for the Ollama API, allowing you to run
+large language models locally. It supports chat, completion, embeddings,
+and function/tool calling.
+
+=head1 EXPORTS
+
+=head2 ollama
+
+Functional interface to Ollama. Exported on request.
+
+	use WebService::Ollama qw(ollama);
+
+	# Configure
+	ollama({ base_url => 'http://localhost:11434', model => 'llama3.2' });
+
+	# Or use environment variables OLLAMA_URL and OLLAMA_MODEL
+
+	# Call any method
+	my $response = ollama('chat', messages => \@messages);
 
 =head1 SUBROUTINES/METHODS
+
+=head2 new
+
+Create a new Ollama client.
+
+	my $ollama = WebService::Ollama->new(
+		base_url => 'http://localhost:11434',  # required
+		model    => 'llama3.2',                # optional default model
+	);
 
 =head2 version
 
@@ -682,6 +887,43 @@ text or list of text to generate embeddings for
 		input => "Why is the sky blue?"
 	);
 
+=head2 register_tool
+
+Register a tool for function calling.
+
+	$ollama->register_tool(
+		name        => 'get_weather',
+		description => 'Get current weather for a location',
+		parameters  => {
+			type       => 'object',
+			properties => {
+				location => {
+					type        => 'string',
+					description => 'City name, e.g. "Seattle, WA"',
+				},
+			},
+			required => ['location'],
+		},
+		handler => sub {
+			my ($args) = @_;
+			return { temperature => 72, location => $args->{location} };
+		},
+	);
+
+=head2 chat_with_tools
+
+Chat with automatic tool execution. The model will call registered tools
+as needed and receive results until it provides a final response.
+
+	my $response = $ollama->chat_with_tools(
+		messages       => [
+			{ role => 'user', content => 'What is the weather in Seattle?' }
+		],
+		max_iterations => 10,  # optional, default 10
+	);
+
+	print $response->message->{content};
+
 =head1 AUTHOR
 
 LNATION, C<< <email at lnation.org> >>
@@ -723,7 +965,7 @@ L<https://metacpan.org/release/WebService-Ollama>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2025 by LNATION.
+This software is Copyright (c) 2026 by LNATION.
 
 This is free software, licensed under:
 

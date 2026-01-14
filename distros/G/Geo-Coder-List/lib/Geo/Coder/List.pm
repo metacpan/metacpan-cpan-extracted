@@ -6,6 +6,8 @@ use warnings;
 use strict;
 use Carp;
 use HTML::Entities;
+use Params::Get 0.04;
+use Object::Configure 0.13;
 use Time::HiRes;
 use Scalar::Util;
 
@@ -20,12 +22,11 @@ Geo::Coder::List - Call many Geo-Coders
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =cut
 
-our $VERSION = '0.35';
-our %locations;	# L1 cache, always used
+our $VERSION = '0.36';
 
 =head1 SYNOPSIS
 
@@ -33,53 +34,70 @@ L<Geo::Coder::All>
 and
 L<Geo::Coder::Many>
 are great routines but neither quite does what I want.
-This module's primary use is to allow many backends to be used by
-L<HTML::GoogleMaps::V3>
+
+C<Geo::Coder::List> is designed to simplify geocoding tasks by aggregating multiple geocoding services into a single, unified interface.
+It allows developers to chain and prioritize various geocoding backends (such as Google Places, OpenStreetMap, and GeoNames)
+based on specific conditions,
+such as location or usage limits.
+The module features built-in caching mechanisms to optimize performance and reduce redundant API calls,
+while also normalizing responses from different providers into a consistent format for easier integration with mapping systems such as L<HTML::OSM> and <L<HTML::GoogleMaps::V3>.
 
 =head1 SUBROUTINES/METHODS
 
 =head2 new
 
-Creates a Geo::Coder::List object.
+Creates a C<Geo::Coder::List> object.
 
-Takes an optional argument 'cache' which is a reference to a HASH or an object that supports C<get()> and C<set()> methods.
-Takes an optional argument 'debug',
-the higher the number,
-the more debugging.
+Takes an optional argument C<cache> which is a reference to a HASH or an object that supports C<get()> and C<set()> methods.
 The licences of some geo coders,
 such as Google,
 specifically prohibit caching API calls,
 so be careful to only use those services that allow it.
+
+Takes an optional argument C<debug>,
+the higher the number,
+the more debugging.
 
     use Geo::Coder::List;
     use CHI;
 
     my $geocoder->new(cache => CHI->new(driver => 'Memory', global => 1));
 
+The class can be configured at runtime using environments and configuration files,
+for example,
+setting C<$ENV{'GEO__CODER__LIST__carp_on_warn'}> causes warnings to use L<Carp>.
+For more information about configuring object constructors at runtime,
+see L<Object::Configure>.
+
 =cut
 
 sub new
 {
 	my $class = shift;
-
-	# Handle hash or hashref arguments
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my $params = Params::Get::get_params(undef, @_) || {};
 
 	if(!defined($class)) {
-		# Using Geo::Coder::List::new(), not Geo::Coder::List->new()
-		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		# return;
+		if((scalar keys %{$params}) > 0) {
+			# Using Geo::Coder::List::new(), not Geo::Coder::List->new()
+			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			return;
+		}
+
+		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		return bless { %{$class}, %args }, ref($class);
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
+	$params = Object::Configure::configure($class, $params);
+
 	# Return the blessed object
-	return bless { debug => DEBUG, geo_coders => [], %args }, $class;
+	# Locations is an L1 cache that is always used
+	return bless { debug => DEBUG, locations => {}, geocoders => [], log => [], %{$params} }, $class;
 }
 
-=head2 push
+=head2 push($self, $geocoder)
 
 Add an encoder to the list of encoders.
 
@@ -96,7 +114,7 @@ and OpenStreetMap for other places:
         ->push({ regex => qr/(Canada|USA|United States)$/, geocoder => Geo::Coder::CA->new() })
         ->push(Geo::Coder::OSM->new());
 
-    # Uses Geo::Coder::CA, and if that fails uses Geo::Coder::OSM
+    # Uses Geo::Coder::CA, and if that fails, uses Geo::Coder::OSM
     my $location = $geo_coderlist->geocode(location => '1600 Pennsylvania Ave NW, Washington DC, USA');
     # Only uses Geo::Coder::OSM
     if($location = $geo_coderlist->geocode('10 Downing St, London, UK')) {
@@ -108,10 +126,23 @@ and OpenStreetMap for other places:
     # It is also possible to limit the number of enquires used by a particular encoder
     $geo_coderlist->push({ geocoder => Geo::Coder::GooglePlaces->new(key => '1234', limit => 100) });
 
+=head3 Parameters
+
+=over 4
+
+=item * C<$geocoder> hashref (required)
+
+Hashref containing a regex and a geocoding object.
+
+=back
+
 =cut
 
-sub push {
-	my($self, $geocoder) = @_;
+sub push
+{
+	my($self, $geocoder) = @_;	# Don't use Params::Get or else the regex will be lost
+
+	croak(__PACKAGE__, '::push: Usage: ($geocoder)') unless(defined($geocoder));
 
 	push @{$self->{geocoders}}, $geocoder;
 
@@ -135,7 +166,7 @@ if the value was retrieved from the cache the value will be undefined.
 
 sub geocode {
 	my $self = shift;
-	my $params = $self->_get_params('location', @_);
+	my $params = Params::Get::get_params('location', @_);
 
 	my $location = $params->{'location'};
 
@@ -443,7 +474,6 @@ sub geocode {
 					CORE::push @{$self->{'log'}}, $log;
 					last POSSIBLE_LOCATION;
 				}
-						print __LINE__, "\n";
 			}
 		}
 
@@ -454,6 +484,9 @@ sub geocode {
 			if(defined($rc[0])) {	# check it's not an empty hash
 				if(defined($rc[0]->{'long'}) && !defined($rc[0]->{'lng'})) {
 					$rc[0]->{'lng'} = $rc[0]->{'long'};
+				}
+				if(defined($rc[0]->{'long'}) && !defined($rc[0]->{'lon'})) {
+					$rc[0]->{'lon'} = $rc[0]->{'long'};
 				}
 				if((!defined($rc[0]->{lat})) || (!defined($rc[0]->{lng}))) {
 					# ::diag(Data::Dumper->new([\@rc])->Dump());
@@ -481,7 +514,7 @@ sub geocode {
 	$self->_cache($location, undef);
 }
 
-=head2 ua
+=head2 ua($self, $ua)
 
 Accessor method to set the UserAgent object used internally by each of the Geo-Coders.
 You can call I<env_proxy>,
@@ -495,6 +528,16 @@ to set the proxy information from environment variables:
 
 Note that unlike Geo::Coders,
 there is no read method since that would be pointless.
+
+=head3 Parameters
+
+=over 4
+
+=item * C<$ua> object (optional)
+
+Useragent object.
+
+=back
 
 =cut
 
@@ -522,12 +565,12 @@ Similar to geocode except it expects a latitude/longitude parameter.
 
 sub reverse_geocode {
 	my $self = shift;
-	my $params = $self->_get_params('latlng', @_);
+	my $params = Params::Get::get_params('latlng', @_);
 
 	my $latlng = $params->{'latlng'}
 		or Carp::croak('Usage: reverse_geocode(latlng => $location)');
 
-	my ($latitude, $longitude) = split(/,/, $latlng);
+	my ($latitude, $longitude);
 	if($latlng) {
 		($latitude, $longitude) = split(/,/, $latlng);
 		$params->{'lat'} //= $latitude;
@@ -693,7 +736,7 @@ sub _cache {
 
 	if(my $value = shift) {
 		# Put something into the cache
-		$locations{$key} = $value;
+		$self->{locations}->{$key} = $value;
 		my $rc = $value;
 		if($self->{'cache'}) {
 			my $duration;
@@ -748,7 +791,7 @@ sub _cache {
 			print Data::Dumper->new([$value])->Dump() if($self->{'debug'});
 			if(ref($self->{'cache'}) eq 'HASH') {
 				$self->{'cache'}->{$key} = $value;
-			} else {
+			} elsif(!ref($value)) {
 				$self->{'cache'}->set($key, $value, $duration);
 			}
 		}
@@ -756,7 +799,7 @@ sub _cache {
 	}
 
 	# Retrieve from the cache
-	my $rc = $locations{$key};	# In the L1 cache?
+	my $rc = $self->{'locations'}->{$key};	# In the L1 cache?
 	if((!defined($rc)) && $self->{'cache'}) {	# In the L2 cache?
 		if(ref($self->{'cache'}) eq 'HASH') {
 			$rc = $self->{'cache'}->{$key};
@@ -777,45 +820,9 @@ sub _cache {
 	return $rc;
 }
 
-# Helper routine to parse the arguments given to a function.
-# Processes arguments passed to methods and ensures they are in a usable format,
-#	allowing the caller to call the function in anyway that they want
-#	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
-#	when called _get_params('arg', @_);
-sub _get_params
-{
-	shift;  # Discard the first argument (typically $self)
-	my $default = shift;
-
-	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if(ref $_[0] eq 'HASH');
-
-	my %rc;
-	my $num_args = scalar @_;
-
-	# Populate %rc based on the number and type of arguments
-	if(($num_args == 1) && (defined $default)) {
-		# %rc = ($default => shift);
-		return { $default => shift };
-	} elsif($num_args == 1) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	} elsif(($num_args == 0) && (defined($default))) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
-	} elsif(($num_args % 2) == 0) {
-		%rc = @_;
-	} elsif($num_args == 0) {
-		return;
-	} else {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	}
-
-	return \%rc;
-}
-
-
 =head1 AUTHOR
 
-Nigel Horne, C<< <njh at bandsman.co.uk> >>
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
 
@@ -830,11 +837,25 @@ reverse_geocode() should support L<Geo::Location::Point> objects.
 
 =head1 SEE ALSO
 
-L<Geo::Coder::All>
-L<Geo::Coder::GooglePlaces>
-L<Geo::Coder::Many>
+=over 4
+
+=item * Test coverage report: L<https://nigelhorne.github.io/Geo-Coder-List/coverage/>
+
+=item * L<Geo::Coder::All>
+
+=item * L<Geo::Coder::GooglePlaces>
+
+=item * L<Geo::Coder::Many>
+
+=item * L<Object::Configure>
+
+=back
+
+=cut
 
 =head1 SUPPORT
+
+This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 
@@ -856,7 +877,7 @@ L<https://metacpan.org/release/Geo-Coder-List>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2025 Nigel Horne.
+Copyright 2016-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

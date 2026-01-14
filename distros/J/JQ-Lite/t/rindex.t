@@ -11,7 +11,8 @@ my $json = q({
   ],
   "tags": ["perl", "json", "perl", "cli"],
   "phrase": "banana",
-  "flags": [false, true, true]
+  "flags": [false, true, true],
+  "nothing": null
 });
 
 my $jq = JQ::Lite->new;
@@ -34,5 +35,14 @@ is($bool_rindex[0], 2, 'rindex handles JSON::PP::Boolean values correctly');
 
 my @missing = $jq->run_query($json, '.tags | rindex("python")');
 ok(!defined $missing[0], 'missing value yields undef (null)');
+
+my @null_haystack = $jq->run_query($json, '.nothing | rindex("an")');
+ok(!defined $null_haystack[0], 'null input yields undef (null)');
+
+my @null_needle = $jq->run_query($json, '.phrase | rindex(null)');
+ok(!defined $null_needle[0], 'null needle yields undef (null) for strings');
+
+my @null_both = $jq->run_query($json, '.nothing | rindex(null)');
+ok(!defined $null_both[0], 'null input and needle yield undef (null)');
 
 done_testing;

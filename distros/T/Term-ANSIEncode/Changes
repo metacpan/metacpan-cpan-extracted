@@ -301,3 +301,9 @@
 1.74    Jan 13, 2026
 
         Whoops, I left the debug code enabled.
+
+1.75    Jan 14, 2026
+
+        Added more tokens to the tokens option
+
+		Fixed the man page errors

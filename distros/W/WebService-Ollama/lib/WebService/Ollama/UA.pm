@@ -1,9 +1,16 @@
 package WebService::Ollama::UA;
 
+use 5.006;
+use strict;
+use warnings;
+
+our $VERSION = '0.08';
+
 use Moo;
 use LWP::UserAgent;
 use JSON::Lines;
 use MIME::Base64 qw/encode_base64/;
+use URI;
 
 use WebService::Ollama::Response;
 
@@ -111,3 +118,75 @@ sub base64_images {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+WebService::Ollama::UA - HTTP client for Ollama
+
+=head1 VERSION
+
+Version 0.08
+
+=head1 SYNOPSIS
+
+    use WebService::Ollama::UA;
+
+    my $ua = WebService::Ollama::UA->new(
+        base_url => 'http://localhost:11434',
+    );
+
+    my $response = $ua->get(url => '/api/version');
+    my $response = $ua->post(url => '/api/chat', data => \%args);
+
+=head1 DESCRIPTION
+
+HTTP user agent for WebService::Ollama using LWP::UserAgent.
+Handles JSON encoding/decoding and response parsing.
+
+=head1 METHODS
+
+=head2 new
+
+    my $ua = WebService::Ollama::UA->new(
+        base_url => 'http://localhost:11434',
+    );
+
+=head2 get
+
+    my $response = $ua->get(url => '/api/version');
+
+Perform a GET request.
+
+=head2 post
+
+    my $response = $ua->post(url => '/api/chat', data => \%args);
+
+Perform a POST request with JSON body.
+
+=head2 delete
+
+    my $response = $ua->delete(url => '/api/delete', data => \%args);
+
+Perform a DELETE request.
+
+=head2 base64_images
+
+    my $images = $ua->base64_images(['path/to/image.png']);
+
+Convert image files to base64 encoding for multimodal models.
+
+=head1 AUTHOR
+
+LNATION, C<< <email at lnation.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

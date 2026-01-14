@@ -22,18 +22,23 @@ my $meta = {
                           runtime   => {
                                          recommends => { "Type::Tiny::XS" => 0, "Types::Standard" => "1.000000" },
                                          requires   => {
-                                                         "Class::XSConstructor" => 0.007,
+                                                         "Class::XSConstructor" => 0.018001,
                                                          "Hook::AfterRuntime" => 0,
-                                                         "Moo" => "1.0060000",
+                                                         "Moo" => "2.004000",
                                                          "perl" => 5.008001,
                                                        },
                                        },
                           test      => {
-                                         requires => { "Test::Fatal" => 0, "Test::More" => 0.96, "Test::Warnings" => 0 },
+                                         requires => {
+                                           "Test::Fatal"    => 0,
+                                           "Test::More"     => 0.96,
+                                           "Test::Requires" => 0,
+                                           "Test::Warnings" => 0,
+                                         },
                                        },
                         },
   "provides"         => {
-                          "MooX::XSConstructor" => { file => "lib/MooX/XSConstructor.pm", version => 0.002 },
+                          "MooX::XSConstructor" => { file => "lib/MooX/XSConstructor.pm", version => "0.003000" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -49,7 +54,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-XSConstructor/project",
                         },
-  "version"          => 0.002,
+  "version"          => "0.003000",
   "x_static_install" => 1,
 };
 
@@ -124,28 +129,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

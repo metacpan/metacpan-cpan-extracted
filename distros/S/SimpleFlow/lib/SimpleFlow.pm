@@ -1,20 +1,21 @@
 use strict;
+use warnings FATAL => 'all';
 require 5.010;
 use feature 'say';
-use DDP {output => 'STDOUT', array_max => 10, show_memsize => 0};
+use DDP {output => 'STDOUT', array_max => 10, show_memsize => 1};
 use Devel::Confess 'color';
 use Cwd 'getcwd';
-use warnings FATAL => 'all';
 package SimpleFlow;
-our $VERSION = 0.09;
+our $VERSION = 0.11;
 use Time::HiRes;
 use Term::ANSIColor;
 use Scalar::Util 'openhandle';
-use DDP {output => 'STDOUT', array_max => 10, show_memsize => 0};
+use DDP {output => 'STDOUT', array_max => 10, show_memsize => 1};
 use Devel::Confess 'color';
 use Cwd 'getcwd';
 use warnings FATAL => 'all';
 use Capture::Tiny 'capture';
+use List::Util 'max';
 use Exporter 'import';
 our @EXPORT = qw(say2 task);
 our @EXPORT_OK = @EXPORT;
@@ -29,6 +30,7 @@ sub say2 { # say to both command line and log file
 	$msg = "\@ $c[1] line $c[2] $msg";
 	say $msg;
 	say $fh $msg;
+	return $msg;
 }
 
 sub task {
@@ -88,7 +90,6 @@ sub task {
 		if (scalar @missing_files > 0) {
 			say STDERR 'this list of arguments:';
 			p $args;
-			my $dir = getcwd();
 			say STDERR 'Cannot run because these files are either missing or unreadable in: ' . getcwd();
 			p @missing_files;
 			die 'the above files are missing or are not readable';
@@ -132,27 +133,31 @@ sub task {
 	$r{note}      = $args->{note}      // '';# by default, false
 	$r{overwrite} = $args->{overwrite} // 0; # by default, false
 	$r{'will.do'} = 'yes';
-	$r{'will.do'} = 'no'  if $args->{'dry.run'};
+	$r{'will.do'} = 'no: dry run'  if $args->{'dry.run'};
+	my $string_max = 0;
 	if (defined $args->{'input.files'}) {
 		$r{'input.files'} = $args->{'input.files'};
 		$r{'input.file.size'} = \%input_file_size;
 	}
 	my %output_file_size = map {$_ => -s $_} @output_files;
+	foreach my $val (grep {ref $r{$_} eq ''} keys %r) {
+		$string_max = max($string_max, length $r{$val});
+	}
 	if ((!$args->{overwrite}) && (scalar @output_files > 0) && (scalar @existing_files == scalar @output_files)) { # this has been done before
 		$r{done} = 'before';
 		$r{'will.do'} = 'no';
 		say colored(['black on_green'], "\"$args->{cmd}\"\n") . ' has been done before';
 		$r{done} = 'before';
 		$r{'output.file.size'} = \%output_file_size;
-		p(%r, output => $args->{'log.fh'}) if defined $args->{'log.fh'};
+		p(%r, output => $args->{'log.fh'}, string_max => $string_max) if defined $args->{'log.fh'};
 		$r{duration} = 0;
-		p %r;
+		p %r, string_max => $string_max;
 		return \%r;
 	} else {
 		$r{done} = 'not yet';
 	}
 	if ($r{'dry.run'}) {
-		say "\@ $c[1] line $c[2] the command was going to be:";
+		say "\@ $c[1] line $c[2] in $r{dir} the command was going to be:";
 		say colored(['red on_black'], "\"$args->{cmd}\"");
 		say 'But this is a dry run';
 		say '-------------';
@@ -167,22 +172,27 @@ sub task {
 	$r{duration} = $t1-$t0;
 	foreach my $std ('stderr', 'stdout') {
 		$r{$std} =~ s/\s+$//; # remove trailing whitespace/newline
+		$string_max = max($string_max, length $r{$std});
 	}
 	$r{done} = 'now';
 	$r{'will.do'} = 'done';
 	my @missing_output_files = grep {not -f -r $_} @output_files;
 	if (scalar @missing_output_files > 0) {
+		$r{'will.do'} = 'FAILED';
 		say STDERR "this input to $current_sub:";
 		p $args;
 		say {$args->{'log.fh'}} "this input to $current_sub:" if defined $args->{'log.fh'};
-		p($args, output => $args->{'log.fh'}) if defined $args->{'log.fh'};
+		p($args, output => $args->{'log.fh'}, string_max => $string_max) if defined $args->{'log.fh'};
 		say STDERR 'has these output files missing:';
 		say {$args->{'log.fh'}} 'has these output files missing:' if defined $args->{'log.fh'};
 		p @missing_output_files;
-		p(@missing_output_files, output => $args->{'log.fh'}) if defined $args->{'log.fh'};
+		p(@missing_output_files, output => $args->{'log.fh'}, string_max => $string_max) if defined $args->{'log.fh'};
+		p %r, string_max => $string_max;
+		p(%r, output => $args->{'log.fh'}, string_max => $string_max) if defined $args->{'log.fh'};
 		die 'those above files should have been made but are missing';
 	}
 	%output_file_size = map {$_ => -s $_} @output_files;
+	$r{'output.file.size'} = \%output_file_size;
 #	p %output_file_size;
 	my @files_with_zero_size = grep { $output_file_size{$_} == 0} @output_files;
 	if (scalar @files_with_zero_size > 0) {
@@ -191,10 +201,11 @@ sub task {
 	}
 	p(%r, output => $args->{'log.fh'}) if defined $args->{'log.fh'};
 	if (($r{'die'}) && ($r{'exit'} != 0)) {
-		p %r;
+		$r{'will.do'} = 'FAILED';
+		p %r, string_max => $string_max;
 		die "\"$args->{cmd}\" failed from $c[1] line $c[2]"
 	}
-	p %r;
+	p %r, string_max => $string_max;
 	return \%r;
 }
 1;

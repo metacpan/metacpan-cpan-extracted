@@ -11,7 +11,8 @@ my $json = q({
   ],
   "tags": ["perl", "json", "cli"],
   "title": "jq-lite in perl",
-  "flags": [true, false, true]
+  "flags": [true, false, true],
+  "nothing": null
 });
 
 my $jq = JQ::Lite->new;
@@ -31,5 +32,14 @@ is($boolean_index[0], 0, 'boolean search matches JSON::PP::Boolean values');
 
 my @missing = $jq->run_query($json, '.tags | index("python")');
 ok(!defined $missing[0], 'missing values yield undef (null)');
+
+my @null_haystack = $jq->run_query($json, '.nothing | index("perl")');
+ok(!defined $null_haystack[0], 'null input yields undef (null)');
+
+my @null_needle = $jq->run_query($json, '.title | index(null)');
+ok(!defined $null_needle[0], 'null needle yields undef (null) for strings');
+
+my @null_both = $jq->run_query($json, '.nothing | index(null)');
+ok(!defined $null_both[0], 'null input and needle yield undef (null)');
 
 done_testing;

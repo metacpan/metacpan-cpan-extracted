@@ -1,0 +1,51 @@
+NAME
+    MooseX::XSConstructor - glue between Moose and Class::XSConstructor
+
+SYNOPSIS
+      package Foo;
+  
+      use Moose;
+      use MooseX::XSConstructor;
+  
+      ...; # Normal Moose stuff
+  
+      __PACKAGE__->meta->make_immutable(
+        inline_constructor => 0,
+        inline_destructor  => 0,
+      );
+
+DESCRIPTION
+    This module speeds up all your Mooses. (Meese?)
+
+    It does this by replacing the normal Perl constructor that Moose generates
+    for your class with a faster one written in XS.
+
+    If it detects that your class cannot be accellerated, then it will bail
+    out and do nothing.
+
+    Most built-in Moose features are supported though, as are a few
+    extensions. Namely: MooseX::Aliases, MooseX::StrictConstructor, and
+    MooseX::UndefTolerant. If you're using other MooseX modules, you probably
+    won't get a speedup.
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-moosex-xsconstructor/issues>.
+
+SEE ALSO
+    MooX::XSConstructor, Class::XSConstructor.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2026 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

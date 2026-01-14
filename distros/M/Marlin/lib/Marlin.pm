@@ -6,7 +6,7 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.013001';
+our $VERSION   = '0.014000';
 
 use constant _ATTRS => qw( caller this parents roles attributes strict constructor modifiers inhaled_from short_name is_struct plugins setup_steps_with_plugins delayed );
 use B::Hooks::AtRuntime   ();
@@ -552,11 +552,11 @@ sub setup_steps {
 		setup_roles
 		canonicalize_attributes
 		setup_constructor
-		setup_destructor
 		setup_accessors
 		setup_imports
 		optimize_methods
 		run_delayed
+		setup_destructor
 		setup_compat
 	/;
 }
@@ -759,7 +759,8 @@ sub setup_constructor {
 sub setup_destructor {
 	my $me = shift;
 	
-	Class::XSDestructor->import( [ $me->this, 'DESTROY' ] );
+	Class::XSDestructor->import( [ $me->this, 'DESTROY' ] )
+		if $me->this->can('DEMOLISH');
 	
 	return $me;
 }

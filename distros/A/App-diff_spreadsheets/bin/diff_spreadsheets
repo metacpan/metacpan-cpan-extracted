@@ -5,8 +5,8 @@
 # related or neighboring rights.  Attribution is requested but is not required.
 use strict; use warnings FATAL => 'all';
 
-our $VERSION = '1.027'; # VERSION
-our $DATE = '2024-10-17'; # DATE
+our $VERSION = '1.028'; # VERSION
+our $DATE = '2026-01-13'; # DATE
 
 #use 5.12; # for unicode_strings
 use v5.18; # for lexical_subs
@@ -36,7 +36,7 @@ use Pod::Usage qw/pod2usage/;
 use Spreadsheet::Edit 1000.020 qw(title2ident);
 use Spreadsheet::Edit::IO 1000.020 qw/convert_spreadsheet
              sheetname_from_spec filepath_from_spec form_spec_with_sheetname/;
-use Spreadsheet::Edit::Log ':btw=DS ${lno}:';
+use Spreadsheet::Edit::Log ':btw';
 use Term::ReadKey ();
 use Encode 3.00 qw/decode/; # for ONLY_PRAGMA_WARNINGS
 require PerlIO;
@@ -519,7 +519,7 @@ use List::Util qw(min max any first);
 use Guard qw(guard scope_guard);
 use Spreadsheet::Edit 1000.006 qw(:DEFAULT logmsg cx2let let2cx);
 use Data::Dumper::Interp 6.007;
-use Spreadsheet::Edit::Log ':btw=DS ${lno}:';
+use Spreadsheet::Edit::Log ':btw';
 
 sub _visualize($);
 sub _title_or_origABC($$);
@@ -774,7 +774,9 @@ sub new {
     }
 
     # Change newline etc. and non-printing to visible escapes
-    $sh->apply_all(sub{
+    # (except in titles)
+    #$sh->apply_all(sub{
+    $sh->apply(sub{
       foreach (@{ $sh->crow }) {
         $_ = __visualize($_);
       }

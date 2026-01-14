@@ -62,6 +62,8 @@ our @EXPORT = qw(
 sub __     ($) { $_[0] } #TODO: HACK
 sub gettext($) { $_[0] } #TODO: HACK
 
+our $MAX_FORM_FIELD = 1 << 30;
+
 my $EF_KEY;  # key within forms
 my $EF_FORM; # key among forms
 my $ef_args;
@@ -140,9 +142,9 @@ sub _ef_parse_end($) {
       } elsif (exists $field->{checkbox}) {
          if ($field->{checkbox}) {
             if (delete $field->{value}) {
-               ${$field->{ref}} = Agni::or64     ${$field->{ref}}, $field->{checkbox};
+               ${$field->{ref}} = ${$field->{ref}} |  $field->{checkbox};
             } else {
-               ${$field->{ref}} = Agni::andnot64 ${$field->{ref}}, $field->{checkbox};
+               ${$field->{ref}} = ${$field->{ref}} & ~$field->{checkbox};
             }
          } else {
             ${$field->{ref}} = ! ! delete $field->{value};
@@ -241,7 +243,7 @@ my $ef_parse_c = register_callback {
 my $ef_parse_m = register_callback {
    my $ef = shift;
 
-   _ef_parse_begin($ef);
+   _ef_parse_begin ($ef);
    
    parse_multipart_form {
       my ($fh, $name, $ct, $cta, $cd) = @_;
@@ -265,7 +267,7 @@ my $ef_parse_m = register_callback {
             }
             my $size = 0;
             my $data;
-            while ($fh->read($data, 64*1024) > 0) {
+            while ($fh->read ($data, 256*1024) > 0) {
                $size += syswrite $dest, $data;
             }
             close $dest;
@@ -278,12 +280,12 @@ my $ef_parse_m = register_callback {
             }
          } else {
             my $data;
-            $fh->read($data, 1024*128);
+            $fh->read ($data, $MAX_FORM_FIELD);
             $data =~ s/\r\n$//;
 
             my $charset = $ct =~ /^text\// ? $cta->{charset} : undef;
 
-            _ef_parse_field($field, $data, $charset);
+            _ef_parse_field ($field, $data, $charset);
          }
       } else {
          fancydie "form data rejected", "data received for illegal field '$name'";
@@ -292,7 +294,7 @@ my $ef_parse_m = register_callback {
       return 1;
    } or fancydie "missing form data: multipart/form-data expected, but none posted";
 
-   _ef_parse_end($ef);
+   _ef_parse_end ($ef);
 } name => "papp_ef_m";
 
 sub _ef_begin {
@@ -422,7 +424,7 @@ This can be used to implement custom input elements:
  my $name = ef_field \$self->{value};
  echo tag "input", { name => $name };
 
-=item $name = ef_mutli_field fieldref [, name]
+=item $name = ef_multi_field fieldref [, name]
 
 Same as C<ef_field> but creates a field that allows multiple
 selections, in case you want to create a selectbox.
@@ -519,7 +521,7 @@ sub ef_text {
 
 sub ef_checkbox {
    my $attr = ref $_[0] eq "HASH" ? shift : {};
-   $attr->{checked} = "checked" if $_[1] ? Agni::and64 ${$_[0]}, $_[1] : ${$_[0]};
+   $attr->{checked} = "checked" if $_[1] ? ${$_[0]} & $_[1] : ${$_[0]};
    my $id = ef_nextid($_[0], $attr);
    $ef_args->{"/"}{$id}{checkbox} = $_[1];
    checkbox $attr, $id;

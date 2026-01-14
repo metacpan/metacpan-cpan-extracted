@@ -57,4 +57,12 @@ my $thing2 = Local::Baz->new( quux => 3, baz => 4 );
 is( $thing2->quux, 3 );
 is( $thing2->baz, 4 );
 
+sub is_xs  {
+	require B;
+	!! B::svref_2object( shift )->XSUB;
+}
+
+ok is_xs(\&Local::Bar::new);
+ok is_xs(\&Local::Baz::new);
+
 done_testing;

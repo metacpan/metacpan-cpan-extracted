@@ -65,7 +65,7 @@ use PApp::Config;
 BEGIN {
    use base 'Exporter';
 
-   $VERSION = 2.3;
+   $VERSION = 2.4;
    @EXPORT = qw();
    @EXPORT_OK = qw(
          open_translator
@@ -129,7 +129,6 @@ my $locale_regex = qr/^
 $/ix;
 
 sub normalize_langid($) {
-   use bytes;
    $nlid_cache{$_[0]} ||= do {
       local $_ = lc $_[0];
       if ($_ =~ $locale_regex) {
@@ -179,9 +178,8 @@ sub translate_langid($;$) {
    $tlid_cache{"$_[0]\x00$_[1]"} ||= do {
       my $langid = normalize_langid $_[0];
       my $dest = $_[1];
-      use bytes;
+
       if ($langid =~ $locale_regex) {
-         no bytes;
          my ($l, $c) = ($1, $2);
          $l = iso639_a3_name $l;
          if (@_) {
@@ -191,7 +189,6 @@ sub translate_langid($;$) {
          if ($c) {
             $c = iso3166_a3_name $c;
             if (@_) {
-               no bytes;
                $tlid_iso3166 ||= open_translator ("iso3166", "en");
                $c = _ucfirst $tlid_iso3166->get_table ($_[0])->gettext ($c);
             }

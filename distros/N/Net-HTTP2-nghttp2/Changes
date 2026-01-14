@@ -1,0 +1,26 @@
+Revision history for Net-HTTP2-nghttp2
+
+0.002   2025-01-14
+        - Add RFC 8441 (Bootstrapping WebSockets with HTTP/2) support
+        - Add NGHTTP2_SETTINGS_ENABLE_CONNECT_PROTOCOL constant (0x8)
+        - Add enable_connect_protocol setting to send_connection_preface()
+        - Export new constant via :settings tag
+        - Add comprehensive RFC 8441 extended CONNECT protocol tests
+        - Add SETTINGS_ENABLE_CONNECT_PROTOCOL to Test::HTTP2::Frame helper
+        - Test coverage for extended CONNECT vs regular CONNECT distinction
+
+0.001   2025-01-09
+        - Initial release
+        - XS bindings for nghttp2 HTTP/2 library
+        - Server and client session support
+        - Full HTTP/2 frame handling (DATA, HEADERS, PRIORITY, RST_STREAM,
+          SETTINGS, PUSH_PROMISE, PING, GOAWAY, WINDOW_UPDATE, CONTINUATION)
+        - HPACK header compression
+        - Flow control support
+        - Stream state management
+        - Streaming response support with data providers
+        - h2spec conformance: 137/146 tests passing (94%)
+        - Comprehensive test suite (110+ tests)
+        - TLS integration test support
+        - bin/h2spec-server for conformance testing
+        - Uses Alien::nghttp2 for automatic library installation

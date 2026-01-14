@@ -82,6 +82,7 @@ sub _apply($$;@) {
    }
 
    my $result = eval {
+      unshift @_, XML::LibXML->load_xml (string => shift);
       $ss->output_string($ss->transform(@_));
    };
    if ($@) {

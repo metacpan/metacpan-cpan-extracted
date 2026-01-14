@@ -1,3 +1,9 @@
+2.15  2026-01-14
+
+  - Treat null haystacks or needles in index()/rindex() string searches as
+    null results.
+  - Expand index()/rindex() tests for null input handling.
+
 2.14  2026-01-12
 
   - Validate slice() start/length arguments and raise clear errors when
@@ -1347,6 +1353,7 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
 
 
 

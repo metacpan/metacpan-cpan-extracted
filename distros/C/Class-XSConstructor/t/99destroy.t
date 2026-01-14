@@ -8,15 +8,15 @@ BEGIN {
 	package Local::Foo;
 	use Class::XSConstructor;
 	use Class::XSDestructor;
-	sub BUILD     { push @BUILD, __PACKAGE__ };
-	sub DEMOLISH  { push @DEMOLISH, __PACKAGE__ };
+	sub BUILD     { shift; push @BUILD, __PACKAGE__ };
+	sub DEMOLISH  { shift; push @DEMOLISH, __PACKAGE__, @_ };
 };
 
 BEGIN {
 	package Local::Foo::Bar;
 	our @ISA = 'Local::Foo';
-	sub BUILD     { push @BUILD, __PACKAGE__ };
-	sub DEMOLISH  { push @DEMOLISH, __PACKAGE__ };
+	sub BUILD     { shift; push @BUILD, __PACKAGE__ };
+	sub DEMOLISH  { shift; push @DEMOLISH, __PACKAGE__, @_ };
 };
 
 do {
@@ -25,9 +25,17 @@ do {
 	is_deeply( \@BUILD, [ 'Local::Foo', 'Local::Foo::Bar' ] ) or diag explain \@BUILD;
 	is_deeply( \@DEMOLISH, [] ) or diag explain \@DEMOLISH;
 	is_deeply( +{%$x}, {} );
+	
+	@DEMOLISH = ();
+	
+	$x->DEMOLISHALL( qw/ foo bar/ );
+	
+	is_deeply( \@DEMOLISH, [ 'Local::Foo::Bar' => qw/ foo bar /, 'Local::Foo' => qw/ foo bar / ] ) or diag explain \@DEMOLISH;
+	
+	@DEMOLISH = ();
 };
 
 is_deeply( \@BUILD, [ 'Local::Foo', 'Local::Foo::Bar' ] ) or diag explain \@BUILD;
-is_deeply( \@DEMOLISH, [ 'Local::Foo::Bar', 'Local::Foo' ] ) or diag explain \@DEMOLISH;
+is_deeply( \@DEMOLISH, [ 'Local::Foo::Bar' => 0, 'Local::Foo' => 0 ] ) or diag explain \@DEMOLISH;
 
 done_testing;

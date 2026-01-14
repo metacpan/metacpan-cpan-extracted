@@ -6,9 +6,7 @@ use Test::Most tests => 23;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
-BEGIN {
-	use_ok('Geo::Coder::List');
-}
+BEGIN { use_ok('Geo::Coder::List') }
 
 GEOCODEFARM: {
 	SKIP: {

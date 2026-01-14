@@ -36,7 +36,7 @@ use PApp::Exception qw(fancydie);
 
 use base 'Exporter';
 
-$VERSION = 2.3;
+$VERSION = 2.4;
 @EXPORT_OK = qw(
       xml_quote xml_attr xml_unquote xml_tag xml_cdata
       xml_check xml_encoding xml2utf8 pod2xml
@@ -354,7 +354,7 @@ sub xml_errorparser {
 
 =item xml_encoding xml-string [DEPRECATED]
 
-Convinience function to detect the encoding used by the given xml
+Convenience function to detect the encoding used by the given xml
 string. It uses a variety of heuristics (mainly as given in appendix F
 of the XML specification). UCS4 and UTF-16 are ignored, mainly because
 I don't want to get into the byte-swapping business (maybe write an
@@ -364,9 +364,6 @@ ignored.
 =cut
 
 sub xml_encoding($) {
-   use bytes;
-   no utf8;
-
    #      00 00 00 3C: UCS-4, big-endian machine (1234 order) 
    #      3C 00 00 00: UCS-4, little-endian machine (4321 order) 
    #      00 00 3C 00: UCS-4, unusual octet order (2143) 
@@ -380,12 +377,12 @@ sub xml_encoding($) {
    # 4C 6F A7 94: EBCDIC (in some flavor; the full encoding declaration must be read to tell which
 
    # this is rather borken
-   substr($_[0], 0, 4) eq "\x00\x00\x00\x3c" and return "ucs-4"; # BE
-   substr($_[0], 0, 4) eq "\x3c\x00\x00\x00" and return "ucs-4"; # LE
-   substr($_[0], 0, 2) eq "\xfe\xff" and return "utf-16"; # BE
-   substr($_[0], 0, 2) eq "\xff\xfe" and return "utf-16"; # LE
-   substr($_[0], 0, 4) eq "\x00\x3c\x00\x3f" and return "utf-16"; # BE
-   substr($_[0], 0, 4) eq "\x3c\x00\x3f\x00" and return "utf-16"; # LE
+   substr ($_[0], 0, 4) eq "\x00\x00\x00\x3c" and return "ucs-4"; # BE
+   substr ($_[0], 0, 4) eq "\x3c\x00\x00\x00" and return "ucs-4"; # LE
+   substr ($_[0], 0, 2) eq "\xfe\xff"         and return "utf-16"; # BE
+   substr ($_[0], 0, 2) eq "\xff\xfe"         and return "utf-16"; # LE
+   substr ($_[0], 0, 4) eq "\x00\x3c\x00\x3f" and return "utf-16"; # BE
+   substr ($_[0], 0, 4) eq "\x3c\x00\x3f\x00" and return "utf-16"; # LE
    return utf8_valid $_[0] ? "utf-8" : "iso-8859-1";
 }
 
@@ -404,9 +401,6 @@ xml_encoding(), "yes")> is returned.
 =cut
 
 sub xml_remove_decl($;$) {
-   use bytes;
-   no utf8;
-
    if ($_[0] =~ s/^\s*<\? xml
       \s+ version \s*=\s* ["']([a-zA-Z0-9.:\-]+)["']
       (?:\s+ encoding \s*=\s* ["']([A-Za-z][A-Za-z0-9._\-]*)["'] )?
@@ -431,20 +425,18 @@ utf-8). The xml declaration itself will be removed from the string.
 =cut
 
 sub xml2utf8($;$) {
-   use bytes;
-   no utf8;
-
    my ($version, $encoding, $standalone) = &xml_remove_decl;
 
    if ($encoding =~ /^utf-?8$/i) {
-      utf8_on $_[0];
+      #
    } elsif ($encoding =~ /^iso-?8859-?1$/i) {
-      utf8_off $_[0]; # just to be sure ;)
-      utf8_upgrade $_[0];
+      utf8::encode $_[0];
    } else {
       # use expat!
       die "xml encoding '$encoding' not yet supported by PApp::XML::xml2utf8";
    }
+
+   utf8::downgrade $_[0];
 
    ($version, "utf-8", $standalone);
 }

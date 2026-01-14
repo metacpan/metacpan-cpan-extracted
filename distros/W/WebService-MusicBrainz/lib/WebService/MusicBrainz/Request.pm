@@ -6,7 +6,15 @@ use Mojo::URL;
 use Mojo::Util qw/dumper/;
 
 has url_base => 'https://musicbrainz.org/ws/2';
-has ua => sub { Mojo::UserAgent->new() };
+has ua => sub
+{
+    Mojo::UserAgent->with_roles('+Retry')->new(
+        retries         => 4,           # try up to 4 times (total 5 attempts)
+        retry_wait_min  => 1,           # seconds
+        retry_wait_max  => 15,          # exponential backoff up to 15s
+        # Optional: custom policy (default retries on connection errors + 429/503)
+        # retry_policy    => sub { ... }
+        )};
 has 'format' => 'json';
 has 'search_resource';
 has 'mbid';
@@ -16,7 +24,7 @@ has 'query_params';
 has offset => 0;
 has debug => sub { $ENV{MUSICBRAINZ_DEBUG} || 0 };;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 binmode STDOUT, ":encoding(UTF-8)";
 

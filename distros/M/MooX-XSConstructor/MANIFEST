@@ -13,3 +13,5 @@ dist.ini
 doap.ttl
 lib/MooX/XSConstructor.pm
 t/01basic.t
+t/02strict-early.t
+t/02strict.t

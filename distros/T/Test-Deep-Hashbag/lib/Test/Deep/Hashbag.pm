@@ -1,4 +1,4 @@
-package Test::Deep::Hashbag 0.001;
+package Test::Deep::Hashbag 0.002;
 # ABSTRACT: A Test::Deep hash comparator ignoring hash keys
 
 use strict;
@@ -11,11 +11,17 @@ use Scalar::Util qw(blessed reftype);
 use Test::Deep::Hash ();
 
 use Exporter 'import';
-our @EXPORT = qw(hashbag);
+our @EXPORT = qw(hashbag superhashbagof);
 
 sub init {
   my $self = shift;
+  my $style = shift;
   my @want = @_;
+
+  unless ($style eq 'hashbag' || $style eq 'superhashbag') {
+    require Carp;
+    Carp::confess("Unknown style '$style' requested. How even?!");
+  }
 
   unless (@want % 2 == 0) {
     require Carp;
@@ -46,6 +52,9 @@ sub init {
   }
 
   $self->{val} = \@want;
+  $self->{style} = $style;
+
+  return;
 }
 
 sub descend {
@@ -102,7 +111,13 @@ EOM
     }
   } grep { ! exists $required{$_} } keys %$have;
 
-  if (@tocheck != @unkeyed) {
+  if ($self->{style} eq 'hashbag' && @tocheck == 0) {
+    # hashbag() and no input keys left? We're good!
+    return 1;
+
+  } elsif ($self->{style} eq 'hashbag' && @tocheck != @unkeyed) {
+    # With hashbag(), we must have as many items left over as we have unkeyed
+    # matchers to check against
     my $ecount = 0+@unkeyed;
     my $gcount = 0+@tocheck;
 
@@ -123,9 +138,9 @@ Remaining keys: $tocheck_desc
 EOM
 
     return 0;
-  }
 
-  if (@tocheck == 0) {
+  } elsif ($self->{style} eq 'superhashbag' && @unkeyed == 0) {
+    # superhashbagof() and no matchers left? We're good
     return 1;
   }
 
@@ -224,6 +239,10 @@ EOM
       }
     }
 
+    # With hashbag() there are as many items to check as there are @unkeyed.
+    # With superhashbagof(), @unkeyed is the matchers we need to match, and
+    # there may be many more items to check against, but max flow can only
+    # go up to @unkeyed. In both cases, if max flow == unkeyed, we're good.
     return 1 if $max_flow_found == @unkeyed;
   }
 
@@ -273,7 +292,11 @@ sub diagnostics {
 }
 
 sub hashbag {
-  return Test::Deep::Hashbag->new(@_);
+  return Test::Deep::Hashbag->new('hashbag', @_);
+}
+
+sub superhashbagof {
+  return Test::Deep::Hashbag->new('superhashbag', @_);
 }
 
 # Adapted https://en.wikipedia.org/wiki/Ford%E2%80%93Fulkerson_algorithm#Python_implementation_of_the_Edmonds%E2%80%93Karp_algorithm
@@ -351,7 +374,7 @@ Test::Deep::Hashbag - A Test::Deep hash comparator ignoring hash keys
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -380,8 +403,8 @@ version 0.001
 
 =head1 DESCRIPTION
 
-This module provides C<hashbag>, which is like L<Test::Deep>'s C<bag()> but
-for B<hashes>.
+This module provides C<hashbag> and C<superhashbagof>, which are like
+L<Test::Deep>'s C<bag()> and C<superbagof()>, but for B<hashes>.
 
 The idea is it lets you test that a hash has certain B<values>, but you don't
 know or care what the keys are for those specific values.
@@ -404,7 +427,16 @@ match, and how many did match in the best possible case. Any keys that
 matches could not be found for will be printed out, as will any matchers that
 were not used in this best case.
 
-B<NOTE:>
+=head2 superhashbagof
+
+  cmp_deeply(\%got, superhashbagof(k => 'v', ignore() => 'v2', ...), $desc);
+
+Like C<hashbag> above, but C<%got> may have extra keys/values in it that we
+don't care about.
+
+=head1 NOTES
+
+B<Diagnostic output variability>
 
 With complex matches, the printed information may seem misleading; it can
 provide different lists of keys or matchers that didn't match on reruns of
@@ -412,7 +444,7 @@ the test. This indicates that some of the matchers can match multiple keys,
 and during different test runs they did so in the best case scenario as the
 matching order is not deterministic.
 
-B<NOTE:>
+B<Performance on large data sets>
 
 With larger and larger amounts of values to test, matching will get slower
 and slower, due to how this module works (testing every expected element
@@ -473,8 +505,8 @@ __END__
 #pod
 #pod =head1 DESCRIPTION
 #pod
-#pod This module provides C<hashbag>, which is like L<Test::Deep>'s C<bag()> but
-#pod for B<hashes>.
+#pod This module provides C<hashbag> and C<superhashbagof>, which are like
+#pod L<Test::Deep>'s C<bag()> and C<superbagof()>, but for B<hashes>.
 #pod
 #pod The idea is it lets you test that a hash has certain B<values>, but you don't
 #pod know or care what the keys are for those specific values.
@@ -497,7 +529,16 @@ __END__
 #pod matches could not be found for will be printed out, as will any matchers that
 #pod were not used in this best case.
 #pod
-#pod B<NOTE:>
+#pod =head2 superhashbagof
+#pod
+#pod   cmp_deeply(\%got, superhashbagof(k => 'v', ignore() => 'v2', ...), $desc);
+#pod
+#pod Like C<hashbag> above, but C<%got> may have extra keys/values in it that we
+#pod don't care about.
+#pod
+#pod =head1 NOTES
+#pod
+#pod B<Diagnostic output variability>
 #pod
 #pod With complex matches, the printed information may seem misleading; it can
 #pod provide different lists of keys or matchers that didn't match on reruns of
@@ -505,7 +546,7 @@ __END__
 #pod and during different test runs they did so in the best case scenario as the
 #pod matching order is not deterministic.
 #pod
-#pod B<NOTE:>
+#pod B<Performance on large data sets>
 #pod
 #pod With larger and larger amounts of values to test, matching will get slower
 #pod and slower, due to how this module works (testing every expected element

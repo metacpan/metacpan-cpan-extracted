@@ -1,5 +1,5 @@
 This archive contains the distribution Test-Deep-Hashbag,
-version 0.001:
+version 0.002:
 
   A Test::Deep hash comparator ignoring hash keys
 

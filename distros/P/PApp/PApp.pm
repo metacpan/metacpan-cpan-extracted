@@ -118,7 +118,7 @@ use PApp::DataRef ();
 use Convert::Scalar qw(:utf8 weaken);
 
 BEGIN {
-   our $VERSION = 2.3;
+   our $VERSION = 2.4;
 
    use base Exporter::;
 
@@ -150,7 +150,7 @@ BEGIN {
 
    # might also get loaded in PApp::Util
    require XSLoader;
-   XSLoader::load PApp, $VERSION unless defined &PApp::bootstrap;
+   XSLoader::load PApp, $VERSION unless defined &PApp::surl;
 
    our @ISA;
    unshift @ISA, "PApp::Base";
@@ -634,6 +634,13 @@ or the name of a registered character set (STD 2). The special value
 C<undef> suppresses output character conversion entirely. If not given,
 the previous value will be unchanged (the default; currently "*").
 
+PApp will convert the unicode output to the desired encoding at output
+time. This requires the output to be in unicode. If another encoding is
+desired, you can specify the encoding as par tof the C<$type> and pass
+C<undef> as C<$charset> to disable charset negotiation and encoding:
+
+   PApp::content_type "applicxation/json; charset=utf-8", undef;
+
 Charset-negotiation is not yet implemented, but when it is implemented it
 will work like this:
 
@@ -926,8 +933,6 @@ sub parse_mime_header {
    my $line = $_[0];
    $line =~ /([^ ()<>@,;:\\".[\]=]+)/g; # the tspecials from rfc1521, except /
    my @r = $1;
-   no utf8; # devel7 has no polymorphic regexes
-   use bytes; # these are octets!
    while ($line =~ /
             \G\s*;\s*
             (\w+)=
@@ -1032,38 +1037,28 @@ sub flush_cvt {
    }
 
    # charset conversion
-   if ($output_charset eq "*") {
-      #d##FIXME#
-      # do "output charset" negotiation, at the moment this is truely pathetic
-#      if (utf8_downgrade $$routput, 1) {
-#         $output_charset = "iso-8859-1";
-#      } else {
-         utf8_upgrade $$routput; # must be utf8 here, but why?
-         $output_charset = "utf-8";
-#      }
+   if ($output_charset eq "*" or $output_charset eq "utf-8") {
+      utf8::encode $$routput;
+      $output_charset = "utf-8";
    } elsif ($output_charset) {
       # convert to destination charset
-      if ($output_charset ne "iso-8859-1" || !utf8_downgrade $$routput, 1) {
-         utf8_upgrade $$routput; # wether here or in pconv doesn't make much difference
-         if ($output_charset ne "utf-8") {
-            my $pconv = PApp::Recode::Pconv::open $output_charset, CHARSET, \&_unicode_to_entity
-                           or fancydie "charset conversion to $output_charset not available";
-            $$routput = PApp::Recode::Pconv::convert($pconv, $$routput);
-         } # else utf-8 == transparent
+      if ($output_charset ne "iso-8859-1") {
+         utf8::encode $$routput;
+         my $pconv = PApp::Recode::Pconv::open $output_charset, CHARSET, \&_unicode_to_entity
+                        or fancydie "charset conversion to $output_charset not available";
+         $$routput = PApp::Recode::Pconv::convert ($pconv, $$routput);
       } # else iso-8859-1 == transparent
    } else {
-      utf8_downgrade $$routput;
+      utf8::downgrade $$routput;
    }
 
    $state{papp_lcs} = $output_charset;
-   $request->content_type($output_charset
-                          ? "$content_type; charset=$output_charset"
-                          : $content_type);
+   $request->content_type ($output_charset
+                           ? "$content_type; charset=$output_charset"
+                           : $content_type);
 }
 
 sub flush_snd {
-   use bytes;
-
    $request->send_http_header unless $output_p++;
    # $routput should suffice in the next line, but it sometimes doesn't,
    # so just COPY THAT DAMNED THING UNTIL MODPERL WORKS. #d##FIXME#TODO#
@@ -1079,9 +1074,6 @@ sub flush {
 }
 
 sub flush_snd_length {
-   use bytes;
-
-   flush_cvt;
    $request->header_out('Content-Length', length $$routput);
    flush_snd;
 }
@@ -1242,6 +1234,33 @@ sub abort_with_file($;$) {
       _send_file ($fh, $ct, 0);
       return &OK;
    }
+}
+
+=item PApp::abort_with_output output[, content-type[, encoding]]
+
+Combination of PApp::abort_with, PApp::content_type and
+PApp::set_output, for convenience. content-type and encoding
+default to C<text/html> and C<*>, respectively.
+
+=item PApp::abort_with_json $value
+
+Encodes the given value as JSON and aborts with content type
+"application/json".
+
+Essentially equivalent to:
+
+   abort_with_output JSON::XS->new->utf8->allow_nonref ($_[0]), "application/json", undef;
+
+=cut
+
+sub abort_with_output($;$$) {
+   PApp::set_output $_[0];
+   PApp::content_type $_[1] // "text/html", @_ < 3 ? "*" : $_[2];
+   PApp::abort_with { };
+}
+
+sub abort_with_json($) {
+   abort_with_output +JSON::XS->new->utf8->allow_nonref->encode ($_[0]), "application/json", undef;
 }
 
 =item PApp::cookie $name
@@ -1553,14 +1572,23 @@ sub getuid() {
    }
 }
 
-sub update_state {
-   %arguments = ();
+=item PApp::flush_state
 
-   $st_insertstate->execute($stateid,
-                            compress PApp::Storable::mstore(\%state),
-                            $userid, $prevstateid, $sessionid, $alternative)
+Save state to disk. USeful when using C<PApp::flush> to create the page
+incrementally, to make links valid. Even when the end of page has not been reached.
+
+=cut
+
+sub flush_state() {
+   $st_insertstate->execute ($stateid,
+                             compress PApp::Storable::mstore (\%state),
+                             $userid, $prevstateid, $sessionid, $alternative)
       if @{$state{papp_alternative}};
+}
 
+sub update_state() {
+   %arguments = ();
+   flush_state;
    &_destroy_state; # %P = %state = (), but in a safe way
    undef $stateid;
 }

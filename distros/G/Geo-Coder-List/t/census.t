@@ -39,7 +39,7 @@ US: {
 		delta_within($location->{result}{addressMatches}[0]->{coordinates}{y}, 38.90, 1e-1);	# Lat
 		delta_within($location->{result}{addressMatches}[0]->{coordinates}{x}, -77.04, 1e-1);	# Long
 
-		ok(!defined($geocoderlist->geocode()));
+		throws_ok( sub { $geocoderlist->geocode() }, qr/^Usage: /, 'No arguments gets usage message');
 		ok(!defined($geocoderlist->geocode('')));
 	}
 }
