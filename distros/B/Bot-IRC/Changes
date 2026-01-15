@@ -1,5 +1,11 @@
 Revision history for Bot::IRC
 
+1.46      2026-01-14 16:56:31-08:00 America/Los_Angeles
+        - Removed debug lines in past release because I was an idiot
+
+1.45      2026-01-14 16:37:35-08:00 America/Los_Angeles
+        - Move dbh creation to children instead of at init
+
 1.44      2026-01-02 15:53:36-08:00 America/Los_Angeles
         - Set minimum Perl version to 5.16
 

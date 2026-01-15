@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Test-Kwalitee
 
+2.13      2026-01-14 17:36:42Z
+    - a decade of tooling updates
+
 2.12      2015-09-30 03:59:46Z
     - use TODO around tests that fail on perl 5.8.x due to the buggy handling
       of qr/...$/m

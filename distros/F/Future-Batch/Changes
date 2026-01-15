@@ -1,0 +1,10 @@
+Revision history for Future-Batch
+
+0.01    2026-01-15
+        First version.
+        - Batch processing with concurrency control
+        - fail_fast mode for early abort on errors
+        - Progress callback support
+        - Functional (batch) and OO interfaces
+        - Ordered results matching input order
+

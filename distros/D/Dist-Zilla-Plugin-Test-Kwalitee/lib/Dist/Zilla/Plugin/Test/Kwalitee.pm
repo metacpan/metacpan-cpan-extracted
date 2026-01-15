@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::Test::Kwalitee; # git description: v2.11-22-g5782daa
+package Dist::Zilla::Plugin::Test::Kwalitee; # git description: v2.12-14-gd99ceea
 # ABSTRACT: Author tests for kwalitee
 # KEYWORDS: plugin testing tests distribution kwalitee CPANTS quality lint errors critic
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+# vim: set ts=8 sts=2 sw=2 tw=115 et :
 
-our $VERSION = '2.12';
+our $VERSION = '2.13';
 
 use Moose;
 use Sub::Exporter::ForMethods 'method_installer'; # method_installer returns a sub.
@@ -56,8 +56,8 @@ sub register_prereqs
     my $self = shift;
     $self->zilla->register_prereqs(
         {
-            type  => 'requires',
             phase => 'develop',
+            type  => 'requires',
         },
         'Test::Kwalitee' => $self->_tk_prereq,
     );
@@ -70,7 +70,7 @@ sub gather_files {
 
   my @skiptests = $self->skiptest;
   if (@skiptests > 0) {
-    my $skip = join ' ', map { "-$_" } @skiptests;
+    my $skip = join ' ', map "-$_", @skiptests;
     $test_options = qq{ qw( $skip ) };
   }
 
@@ -151,7 +151,7 @@ Dist::Zilla::Plugin::Test::Kwalitee - Author tests for kwalitee
 
 =head1 VERSION
 
-version 2.12
+version 2.13
 
 =head1 SYNOPSIS
 
@@ -212,6 +212,14 @@ L<Dist::Zilla::Plugin::Test::Kwalitee::Extra>
 
 =back
 
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/Dist-Zilla-Plugin-Test-Kwalitee>
+and a star in L<GitHub|https://github.com/karenetheridge/Dist-Zilla-Plugin-Test-Kwalitee>.
+
 =head1 SUPPORT
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-Kwalitee>
@@ -221,7 +229,7 @@ There is also a mailing list available for users of this distribution, at
 L<http://dzil.org/#mailing-list>.
 
 There is also an irc channel available for users of this distribution, at
-irc://irc.perl.org/#distzilla.
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
 =head1 AUTHORS
 
@@ -280,7 +288,7 @@ the same terms as the Perl 5 programming language system itself.
 
 __DATA__
 ___[ __TEST__ ]___
-# this test was generated with {{ ref($plugin) . ' ' . $plugin->VERSION }}
+# this test was generated with {{ ref $plugin }} {{ $plugin->VERSION }}
 use strict;
 use warnings;
 use Test::More 0.88;

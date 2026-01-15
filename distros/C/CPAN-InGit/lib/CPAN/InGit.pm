@@ -1,6 +1,6 @@
 package CPAN::InGit;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 # ABSTRACT: Manage custom CPAN trees to pin versions for your projects
 
 use Git::Raw::Repository;
@@ -266,6 +266,79 @@ sub process_distfile($self, %opts) {
    }
 }
 
+#=method parse_cpanfile_snapshot
+#
+#  $distribution_spec= $cpan_repo->parse_cpanfile_snapshot($file_contents);
+#
+#Given a scalar with the content of a cpanfile.snapshot from L<Carton>, this returns the data of
+#that file as a hierarchial structure:
+#
+#  {
+#    "Distribution-Name-1.002003" => {
+#      "pathname" => "A/AU/AUTHOR/Distribution-Name-1.002003.tar.gz",
+#      "provides" => {
+#        "Distribution::Name" => '1.002003',
+#        ...
+#      },
+#      "requirements" => {
+#        "Dependency" => "2.05",
+#        ...
+#      }
+#    }
+#  }
+#
+#=cut
+
+sub _context {
+   my $context= substr($_, pos($_), $_[0]);
+   $context =~ s/\r/\\r/g;
+   $context =~ s/\n/\\n/g;
+   return $context;
+}
+sub _parse_cpanfile_snapshot($self, $text) {
+   # TODO: use official module if available, else fall back to this:
+   my %distributions;
+   local $_= $text;
+   unless (eval {
+      /^# carton snapshot format: version 1.0\r?\n/mgc
+         or die "Unsupported cpanfile.snapshot version\n";
+      /\GDISTRIBUTIONS\r?\n/gc
+         or die "expected DISTRIBUTIONS\n";
+      while (length > pos) {
+         my ($dist_name)= /\G  (\S+)\r?\n/gc
+            or die "expected dist name\n";
+         my $dist= $distributions{$dist_name}= {};
+         while (/\G    (\w[^\r\n:]*): *(.*?)\r?\n/gc) {
+            my ($attr, $val)= ($1, $2);
+            if (length $val) {
+               $dist->{$attr}= $val;
+            } else {
+               while (/\G      (.*)\r?\n/gc) {
+                  push @{ $dist->{$attr} }, $1;
+               }
+            }
+            die "Unexpected sub-element of $dist_name $attr\n"
+               if /\G      /gc;
+         }
+         die "Unexpected sub-element of $dist_name\n"
+            if /\G    /gc;
+         # convert 'provides' and 'requirements' to hashrefs of versions
+         for (qw( provides requirements )) {
+            if (ref $dist->{$_} eq 'ARRAY') {
+               $dist->{$_}= { map +((split ' ')[0,1]), @{$dist->{$_}} };
+            }
+         }
+      }
+      1;
+   }) {
+      chomp $@;
+      my $context= _context(20);
+      croak "syntax error: $@, near \"$context\"";
+   }
+   \%distributions;
+}
+
+
 1;
 
 __END__
@@ -468,9 +541,42 @@ L</upstream_mirrors>.
     untar     => $bool,   # whether to extract tar file into the tree
   );
 
+=head1 SEE ALSO
+
+=over
+
+=item L<App::opan>
+
+App::opan is quite similar in spirit, and stores the mirror as files that can be simply checked
+into version control.  It manages a list of pre-defined "PANs" like "upstream", "pinset",
+"custom"... each of which plays a role in managing modules for one app.
+There doesn't appear to be any concept for managing multiple apps or letting the server serve
+branches or an older snapshot of the combined 'PANs.
+
+=item L<CPAN::Mini::Inject>
+
+This builds on L<CPAN::Mini> to add inject custom files into a local tree that is mirroring
+public CPAN.
+
+=item L<Pinto>
+
+Pinto is the same idea (with larger scope) but implemented on a SQL Database.
+This necessitates a custom system of push/pull, user accounts, permissions, and so on.
+It's also fairly heavy on dependencies (Moose, DBIx::Class)
+
+=item L<Carton>
+
+Carton is a system for installing perl modules and tracking all their versions and dependencies
+and storing that in a C<cpanfile.snapshot> so that the exact same modules can be installed on
+future runs.  Carton requires that all modules get installed into the local-lib directory (so it
+can't utilize system-installed perl libraries) and doesn't provide any way to patch CPAN modules
+before installing them.
+
+=back
+
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 
@@ -478,7 +584,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Michael Conrad, and IntelliTree Solutions.
+This software is copyright (c) 2026 by Michael Conrad, and IntelliTree Solutions.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

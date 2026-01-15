@@ -4,7 +4,7 @@
       "Michael Conrad <mike@nrdvana.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,6 +32,7 @@
             "Archive::Tar" : "0",
             "Archive::Tar::Constant" : "0",
             "CPAN::Meta" : "2.150010",
+            "CPAN::Meta::Requirements" : "0",
             "Carp" : "0",
             "Fcntl" : "0",
             "FindBin" : "0",
@@ -44,6 +45,7 @@
             "JSON::PP" : "0",
             "Log::Any" : "0",
             "Log::Any::Adapter" : "0",
+            "Module::CPANfile" : "0",
             "Module::CoreList" : "0",
             "Module::Metadata" : "0",
             "Mojo::Base" : "0",
@@ -86,9 +88,9 @@
          "web" : "https://github.com/nrdvana/perl-CPAN-InGit"
       }
    },
-   "version" : "0.002",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
+   "version" : "0.003",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

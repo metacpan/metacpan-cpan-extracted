@@ -3,12 +3,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
-#define PERL_DECIMAL_VERSION \
-	PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
-#define PERL_VERSION_GE(r,v,s) \
-	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
-
 #if PERL_VERSION_GE(5,19,4)
 typedef SSize_t array_ix_t;
 #else /* <5.19.4 */

@@ -1,0 +1,20 @@
+Revision history for Perl extension Command-Run
+
+0.9901 2026-01-15T10:32:46Z
+
+    - Add with() method for fluent parameter setting
+    - Add stdout/stderr capture via scalar references
+    - run() parameters are now temporary (don't modify object state)
+    - Remove setstdin from public API (use with(stdin => ...) instead)
+    - Add PARAMETERS section to documentation
+
+0.99 2026-01-15T05:49:39Z
+
+    - Initial release
+    - Execute external commands or Perl code references
+    - Capture stdout with flexible stderr handling
+      (pass-through, redirect to stdout, or separate capture)
+    - Output accessible via /dev/fd/N path for external commands
+    - Method chaining support
+    - Derived from App::cdif::Command
+

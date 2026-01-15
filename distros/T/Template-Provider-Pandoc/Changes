@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.1.1] - 2026-01-14
+
+### Fixed
+
+- STRIP_FRONT_MATTER hasn't worked for ever a year!
+
 ## [0.1.0] - 2024-11-27
 
 ### Added
@@ -17,7 +23,7 @@
 
 ### Added
 
-- Details of the bugracker
+- Details of the bugtracker
 
 ### Fixed
 

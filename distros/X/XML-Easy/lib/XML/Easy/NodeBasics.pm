@@ -77,7 +77,7 @@ it in encapsulated form as an L<XML::Easy::Content> object.
 
 package XML::Easy::NodeBasics;
 
-{ use 5.008; }
+{ use 5.010001; }
 use warnings;
 use strict;
 
@@ -101,7 +101,7 @@ BEGIN {
 	}
 }
 
-our $VERSION = "0.011";
+our $VERSION = "0.012";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(

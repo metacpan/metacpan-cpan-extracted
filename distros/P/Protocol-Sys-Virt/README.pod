@@ -2,7 +2,7 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt v11.10.3;
+package Protocol::Sys::Virt v12.0.0;
 
 1;
 
@@ -12,9 +12,9 @@ Protocol::Sys::Virt - Abstract LibVirt protocol implementation
 
 =head1 VERSION
 
-v11.10.3
+v12.0.0
 
-Based on LibVirt tag v11.10.0
+Based on LibVirt tag v12.0.0
 
 =head2 Version numbering
 

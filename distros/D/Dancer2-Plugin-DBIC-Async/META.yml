@@ -24,7 +24,7 @@ no_index:
 provides:
   Dancer2::Plugin::DBIC::Async:
     file: lib/Dancer2/Plugin/DBIC/Async.pm
-    version: '0.01'
+    version: '0.03'
 requires:
   AnyEvent: '0'
   DBIx::Class: '0'
@@ -37,5 +37,5 @@ requires:
 resources:
   bugtracker: https://github.com/manwar/Dancer2-Plugin-DBIC-Async/issues
   repository: https://github.com/manwar/Dancer2-Plugin-DBIC-Async.git
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

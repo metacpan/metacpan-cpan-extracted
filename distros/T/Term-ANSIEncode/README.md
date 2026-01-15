@@ -157,7 +157,7 @@ Please use the "-t" option to see all of the tokens.  This is only a partial lis
 | BRIGHT MAGENTA | Bright magenta |
 | BRIGHT CYAN | Bright cyan |
 | BRIGHT WHITE | Bright white |
-| ANSI0 - ANSI231 | Term256 colors (use -c to see these) |
+| COLOR 16 - COLOR 231 | Term256 colors (use -c to see these) |
 | GREY0 - GREY23  | Levels of grey |
 
 #### BACKGROUND
@@ -176,16 +176,16 @@ Please use the "-t" option to see all of the tokens.  This is only a partial lis
 | B_PINK | Hot pink (requires 256 color terminal) |
 | B_ORANGE | Orange (requires 256 color terminal) |
 | B_NAVY | Deep blue (requires 256 color terminal) |
-| BRIGHT B_BLACK | Bright black (grey) |
-| BRIGHT B_RED | Bright red |
-| BRIGHT B_GREEN | Lime |
-| BRIGHT B_YELLOW | Bright yellow |
-| BRIGHT B_BLUE | Bright blue |
-| BRIGHT B_MAGENTA | Bright magenta |
-| BRIGHT B_CYAN | Bright cyan |
-| BRIGHT B_WHITE | Bright white |
-| B_ANSI0 - B_ANSI231 | Term256 background colors (use -c to see these) |
-| B_GREY0 - B_GREY23 | Levels of grey |
+| B_BRIGHT BLACK | Bright black (grey) |
+| B_BRIGHT RED | Bright red |
+| B_BRIGHT GREEN | Lime |
+| B_BRIGHT YELLOW | Bright yellow |
+| B_BRIGHT BLUE | Bright blue |
+| B_BRIGHT MAGENTA | Bright magenta |
+| B_BRIGHT CYAN | Bright cyan |
+| B_BRIGHT WHITE | Bright white |
+| B_COLOR 16 - B_COLOR 231 | Term256 background colors (use -c to see these) |
+| B_GREY 0 - B_GREY 23 | Levels of grey |
 
 ### HORIZONTAL RULES
 

@@ -1,66 +1,34 @@
 ---
 abstract: 'XML processing with a clean interface'
 author:
-  - 'Andrew Main (Zefram) <zefram@fysh.org>'
+  - 'James E Keenan (jkeenan@cpan.org)'
 build_requires:
-  Encode: '0'
+  ExtUtils::MakeMaker: '0'
   IO::File: '0'
-  Module::Build: '0'
-  Params::Classify: '0'
   Scalar::Util: '0'
-  Test::More: '0'
-  if: '0'
-  perl: '5.008'
-  strict: '0'
+  Test::Simple: '0.44'
   utf8: '0'
-  warnings: '0'
 configure_requires:
-  Module::Build: '0'
-  perl: '5.008'
-  strict: '0'
-  warnings: '0'
-dynamic_config: 0
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
-license: perl
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: XML-Easy
-provides:
-  XML::Easy:
-    file: lib/XML/Easy.pm
-    version: '0.011'
-  XML::Easy::Classify:
-    file: lib/XML/Easy/Classify.pm
-    version: '0.011'
-  XML::Easy::Content:
-    file: lib/XML/Easy/Content.pm
-    version: '0.011'
-  XML::Easy::Element:
-    file: lib/XML/Easy/Element.pm
-    version: '0.011'
-  XML::Easy::NodeBasics:
-    file: lib/XML/Easy/NodeBasics.pm
-    version: '0.011'
-  XML::Easy::Syntax:
-    file: lib/XML/Easy/Syntax.pm
-    version: '0.011'
-  XML::Easy::Text:
-    file: lib/XML/Easy/Text.pm
-    version: '0.011'
-recommends:
-  Internals: '0'
-  XSLoader: '0'
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Exporter: '0'
+  Encode: '0'
+  Internals: '0'
   Params::Classify: '0'
-  if: '0'
+  XSLoader: '0'
   parent: '0'
-  perl: '5.008'
+  perl: '5.010001'
   strict: '0'
   warnings: '0'
-resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=XML-Easy
-  license: http://dev.perl.org/licenses/
-version: '0.011'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

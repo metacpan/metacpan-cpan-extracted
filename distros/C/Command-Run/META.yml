@@ -1,0 +1,43 @@
+---
+abstract: 'Execute external command or code reference'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Command-Run
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Command::Run:
+    file: lib/Command/Run.pm
+    version: '0.9901'
+  Command::Run::Tmpfile:
+    file: lib/Command/Run/Tmpfile.pm
+requires:
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/tecolicom/Command-Run/issues
+  homepage: https://github.com/tecolicom/Command-Run
+  repository: https://github.com/tecolicom/Command-Run.git
+version: '0.9901'
+x_authority: cpan:UTASHIRO
+x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -23,7 +23,7 @@ requires:
   Path::Tiny: '0.125'
   Sys::Hostname: '0'
   Template: '0'
-  Template::Provider::Pandoc: v0.1.0
+  Template::Provider::Pandoc: v0.1.1
   Text::FrontMatter::YAML: '0'
   URI: '0'
   YAML::XS: '0'
@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/davorg-cpan/app-aphra/issues
   repository: https://github.com/davorg-cpan/app-aphra.git
-version: v0.2.7
+version: v0.2.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

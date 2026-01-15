@@ -39,11 +39,11 @@ L<XML::Easy::NodeBasics> than using the methods of this class.
 
 package XML::Easy::Content;
 
-{ use 5.008; }
+{ use 5.010001; }
 use warnings;
 use strict;
 
-our $VERSION = "0.011";
+our $VERSION = "0.012";
 
 eval { local $SIG{__DIE__};
 	require XSLoader;

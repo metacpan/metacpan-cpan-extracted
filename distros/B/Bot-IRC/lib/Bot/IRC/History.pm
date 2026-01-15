@@ -10,7 +10,7 @@ use Email::Mailer;
 use Email::Valid;
 use File::Grep 'fgrep';
 
-our $VERSION = '1.44'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 sub init {
     my ($bot)       = @_;
@@ -151,7 +151,7 @@ Bot::IRC::History - Bot::IRC selected channel history dumped to email
 
 =head1 VERSION
 
-version 1.44
+version 1.46
 
 =head1 SYNOPSIS
 

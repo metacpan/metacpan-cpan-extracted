@@ -26,5 +26,5 @@ requires:
 resources:
   bugtracker: https://github.com/davorg-cpan/template-provider-pandoc/issues
   repository: https://github.com/davorg-cpan/template-provider-pandoc.git
-version: v0.1.0
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

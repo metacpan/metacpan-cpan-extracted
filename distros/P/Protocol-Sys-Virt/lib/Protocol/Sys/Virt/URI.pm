@@ -1,7 +1,7 @@
 ####################################################################
 #
-#     This file was generated using XDR::Parse version v0.3.1,
-#        XDR::Gen version 1.0.0 and LibVirt version v11.10.0
+#     This file was generated using XDR::Parse version v1.0.1,
+#        XDR::Gen version 1.0.0 and LibVirt version v12.0.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -13,7 +13,7 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::URI v11.10.3;
+package Protocol::Sys::Virt::URI v12.0.0;
 
 use parent qw(Exporter);
 
@@ -79,7 +79,7 @@ Protocol::Sys::Virt::URI - Helper routines for parsing LibVirt URIs
 
 =head1 VERSION
 
-v11.10.3
+v12.0.0
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@ use DBI;
 use DBD::SQLite;
 use JSON::XS;
 
-our $VERSION = '1.44'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -23,9 +23,16 @@ sub new {
     my $self = bless( {}, $class );
 
     $self->{file} = $bot->vars('store') || 'store.sqlite';
+    $self->{json} = JSON::XS->new->ascii;
+
+    return $self;
+}
+
+sub _dbh {
+    my ($self) = @_;
     my $pre_exists = ( -f $self->{file} ) ? 1 : 0;
 
-    $self->{dbh} = DBI->connect(
+    my $dbh = DBI->connect(
         'dbi:SQLite:dbname=' . $self->{file},
         undef,
         undef,
@@ -42,7 +49,7 @@ sub new {
         },
     ) or die "$@\n";
 
-    $self->{dbh}->do("PRAGMA $_->[0] = $_->[1]") for (
+    $dbh->do("PRAGMA $_->[0] = $_->[1]") for (
         [ encoding           => '"UTF-8"'  ],
         [ foreign_keys       => 'ON'       ],
         [ journal_mode       => 'WAL'      ],
@@ -50,7 +57,7 @@ sub new {
         [ temp_store         => 'MEMORY'   ],
     );
 
-    $self->{dbh}->do(q{
+    $dbh->do(q{
         CREATE TABLE IF NOT EXISTS bot_store (
             bot_store_id INTEGER PRIMARY KEY,
             namespace    TEXT,
@@ -60,15 +67,15 @@ sub new {
         )
     }) unless ($pre_exists);
 
-    $self->{json} = JSON::XS->new->ascii;
-
-    return $self;
+    return $dbh;
 }
 
 sub get {
     my ( $self, $key ) = @_;
     my $namespace = ( caller() )[0];
     my $value;
+
+    $self->{dbh} //= $self->_dbh;
 
     try {
         my $sth = $self->{dbh}->prepare_cached(q{
@@ -94,6 +101,8 @@ sub set {
     my ( $self, $key, $value ) = @_;
     my $namespace = ( caller() )[0];
 
+    $self->{dbh} //= $self->_dbh;
+
     try {
         $self->{dbh}->begin_work;
 
@@ -113,7 +122,6 @@ sub set {
     }
     catch ($e) {
         $self->{dbh}->rollback;
-        my $e = $_ || $@;
         warn "Store set error with $namespace (likely an IRC::Store::SQLite issue); key = $key; error = $e\n";
     }
 
@@ -134,7 +142,7 @@ Bot::IRC::Store::SQLite - Bot::IRC persistent data storage with SQLite
 
 =head1 VERSION
 
-version 1.44
+version 1.46
 
 =head1 SYNOPSIS
 

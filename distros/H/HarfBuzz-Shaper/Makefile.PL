@@ -66,12 +66,13 @@ my $hb_src = "hb_src.tar.gz";
 my $got_hb = $ENV{INCHS} ? -1 : 0;
 
 # First, try pkg-config.
-my $res = `pkg-config --version`;
+my $pkg_config = $ENV{'PKG_CONFIG'} // "pkg-config";
+my $res = `$pkg_config --version`;
 if ( !$got_hb && $res =~ /\d+\.\d+/ ) {
-    $res = `pkg-config --libs harfbuzz`;
+    $res = `$pkg_config --libs harfbuzz`;
     if ( $res =~ /(?:(-L.+)\s+)?(-l.+)/ ) {
 	$args{LIBS} = [ $res ];
-	$res = `pkg-config --cflags harfbuzz`;
+	$res = `$pkg_config --cflags harfbuzz`;
 	if ( $res =~ /-I.+/ ) {
 	    $args{INC} = $res;
 	}

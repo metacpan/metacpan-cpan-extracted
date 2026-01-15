@@ -143,7 +143,7 @@ sub process {
     $self->app->template->process($template, {
       page => $front_matter_hashref,
       file => $self,
-    }, $out)
+    }, $out, binmode => ':utf8')
       or croak $self->app->template->error;
 
     $orig_layout and $self->app->template->{SERVICE}{WRAPPER} = $orig_layout;
@@ -164,7 +164,7 @@ sub process {
 }
 
 sub debug {
-  carp @_ if $ENV{APHRA_DEBUG};
+  warn "@_\n" if $ENV{APHRA_DEBUG};
 }
 
 __PACKAGE__->meta->make_immutable;

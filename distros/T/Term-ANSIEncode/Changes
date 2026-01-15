@@ -307,3 +307,20 @@
         Added more tokens to the tokens option
 
 		Fixed the man page errors
+
+1.76    Jan 14, 2026
+
+        Improved ansi_colors and color format detection improvements.
+
+1.77    Jan 14, 2026
+
+        Corrected terminal type color capability and added a new method.
+
+1.78    Jan 14, 2026
+
+        Further hardening of ANSI capablity detection with bnetter Windows
+		compatibility.
+
+1.79    Jan 14, 2026
+
+        Minor documentation fixes

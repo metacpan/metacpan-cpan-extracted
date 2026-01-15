@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Command/Run.pm
+lib/Command/Run/Tmpfile.pm
+minil.toml
+t/00_compile.t
+t/01_tmpfile.t
+t/02_run.t
+t/03_coderef.t
+t/04_with.t
+META.yml
+MANIFEST

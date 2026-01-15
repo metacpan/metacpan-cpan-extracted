@@ -40,6 +40,13 @@ The interfaces here, too, are functional in nature.
 
 There are other modules for some ancillary aspects of XML processing.
 
+=head2 Minimum Perl Version
+
+While the code in this library's modules was originally written to accommodate
+perl-5.8, its prerequisites are in large part no longer working on that
+version of F<perl>.  So as of XML-Easy-0.012 we will set perl-5.10.1 as our
+recommended minimum Perl version.
+
 =head1 MODULES
 
 The modules in the L<XML::Easy> distribution are:
@@ -120,11 +127,11 @@ and L<XML::Easy::Content> nodes.
 
 package XML::Easy;
 
-{ use 5.008; }
+{ use 5.010001; }
 use warnings;
 use strict;
 
-our $VERSION = "0.011";
+our $VERSION = "0.012";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -148,7 +155,11 @@ L<http://www.w3.org/TR/REC-xml/>
 
 =head1 AUTHOR
 
-Andrew Main (Zefram) <zefram@fysh.org>
+Andrew Main (Zefram) <zefram@fysh.org> (deceased March 10 2025)
+
+=head2 Maintainer
+
+James E Keenan (jkeenan@cpan.org), beginning with version 0.012
 
 =head1 COPYRIGHT
 

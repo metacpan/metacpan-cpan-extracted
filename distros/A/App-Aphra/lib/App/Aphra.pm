@@ -39,7 +39,7 @@ use URI;
 
 use App::Aphra::File;
 
-our $VERSION = '0.2.7';
+our $VERSION = '0.2.8';
 
 has commands => (
   isa => 'HashRef',
@@ -149,6 +149,7 @@ sub _build_template {
   delete $exts->{tt};
 
   return Template->new(
+    ENCODING     => 'utf8',
     LOAD_TEMPLATES => [
       Template::Provider::Pandoc->new(
         INCLUDE_PATH       => $self->include_path,
@@ -208,6 +209,9 @@ sub build {
   my $self = shift;
 
   my $src = $self->config->{source};
+
+  path($self->config->{target})->remove_tree;
+  path($self->config->{target})->mkpath;
 
   -e $src or die "Cannot find $src\n";
   -d $src or die "$src is not a directory\n";

@@ -1,5 +1,5 @@
 package CPAN::InGit::ArchiveTree;
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 # ABSTRACT: An object managing a CPAN file structure in a Git Tree
 
 
@@ -254,17 +254,10 @@ sub _merge_prereqs($self, $reqs, $new_reqs) {
 }
 
 sub import_modules($self, $reqs, %options) {
-   # Determine what module versions were available for the app's version of perl.
-   require Module::CoreList;
-   my $perl_v= $options{corelist_perl_version} // $self->corelist_perl_version;
-   $perl_v= version->parse($perl_v)->numify;
-   my $corelist= Module::CoreList::find_version($perl_v)
-      or carp "No corelist for $perl_v";
+   my %imported_dists;
 
+   # Build list of source trees
    my $sources= $options{sources} // $self->default_import_sources;
-   my $prereq_phases= [qw( configure build runtime test )];
-   my $prereq_types=  [qw( requires )];
-   my $log_recommends= !grep $_ eq 'recommends', @$prereq_types;
    $sources && @$sources
       or croak "No import sources specified";
    # coerce every source name to an ArchiveTree object
@@ -279,10 +272,26 @@ sub import_modules($self, $reqs, %options) {
          $_= $t;
       }
    }
+
+   # Coerce the argument to a Requirements object
+   require CPAN::Meta::Requirements;
+   my $prereq_phases= [qw( configure build runtime test )];
+   my $prereq_types=  [qw( requires )];
+   my $log_recommends= !grep $_ eq 'recommends', @$prereq_types;
    my $recommended= CPAN::Meta::Requirements->new;
    # coerce the requirements into a CPAN::Meta::Requirements object
-   $reqs= CPAN::Meta::Requirements->from_string_hash($reqs)
-      if ref $reqs eq 'HASH';
+   $reqs= ref $reqs eq 'HASH'? CPAN::Meta::Requirements->from_string_hash($reqs)
+        : blessed($reqs) && $reqs->isa('CPAN::Meta::Requirements')? $reqs
+        : blessed($reqs) && $reqs->isa('CPAN::Meta::Prereqs')? $reqs->merged_requirements($prereq_phases, $prereq_types)
+        : croak "Expected CPAN::Meta::Requirements object, ::Prereqs object, or HASH ref";
+
+   # Determine what module versions were available for the app's version of perl.
+   require Module::CoreList;
+   my $perl_v= $options{corelist_perl_version} // $self->corelist_perl_version;
+   $perl_v= version->parse($perl_v)->numify;
+   my $corelist= Module::CoreList::find_version($perl_v)
+      or carp "No corelist for $perl_v";
+
    # Filter out the prereqs we already have, or which are in the corelist
    $log->tracef('todo reqs: %s', $reqs->as_string_hash);
    $self->_filter_prereqs($reqs, $corelist);
@@ -308,6 +317,7 @@ sub import_modules($self, $reqs, %options) {
             $self->import_dist($peer, $author_path);
             my $meta= $self->get_dist_meta($author_path);
             $prereqs= $meta->effective_prereqs if $meta;
+            $imported_dists{$author_path}= $peer;
             last;
          }
       }
@@ -350,6 +360,77 @@ sub import_modules($self, $reqs, %options) {
          '';
       $mirror->commit($message);
    }
+   return \%imported_dists;
+}
+
+
+sub import_cpanfile_snapshot($self, $snapshot_spec, %options) {
+   my %imported_dists;
+
+   my $sources= $options{sources} // $self->default_import_sources;
+   $sources && @$sources
+      or croak "No import sources specified";
+   # coerce every source name to an ArchiveTree object
+   my @autocommit;
+   for (@$sources) {
+      unless (ref $_ and $_->can('package_details')) {
+         my $t= $self->parent->get_archive_tree($_)
+            or croak "No such archive tree $_";
+         # If we've created new objects for MirrorTree and the MirrorTree has autofetch
+         # enabled, then we also need to commit those changes before returning.
+         push @autocommit, $t if $t->can('autofetch') && $t->autofetch;
+         $_= $t;
+      }
+   }
+
+   dist: for my $dist_name (sort keys %$snapshot_spec) {
+      my $dist_info= $snapshot_spec->{$dist_name};
+      # Locate 'pathname'
+      my $author_path= $dist_info->{pathname};
+      unless ($author_path) {
+         my $msg= "Dist $dist_name lacks 'pathname' attribute";
+         $options{partial}? $log->notice($msg) : croak $msg;
+         next;
+      }
+      # Which source has this file?
+      for my $source (@$sources) {
+         $log->debugf("check %s for %s", $source->name, $author_path);
+         my $distfile_ent= $source->get_path("authors/id/$author_path")
+            or next;
+         $self->import_dist($source, $author_path);
+         $imported_dists{$author_path}= $source;
+         # Update index with the modules provided by this distribution if it wasn't imported
+         # from $source by import_dist.
+         if (!$source->package_details->{by_dist}{$author_path}) {
+            # Fall back to the 'provides' from the cpanfile.snapshot
+            if (ref $dist_info->{provides} eq 'HASH') {
+               my @mod_index= map [ $_, $dist_info->{provides}{$_}, $author_path ],
+                  keys %{$dist_info->{provides}};
+               $self->package_details->{by_dist}{$author_path}= \@mod_index;
+               $self->package_details->{by_module}{$_->[0]}= $_
+                  for @mod_index;
+               $self->write_package_details;
+            } else {
+               my $msg= "Snapshot lacks 'provides' for $dist_name, and not indexed in ".$source->name." either";
+               $options{partial}? $log->notice($msg) : croak $msg;
+            }
+         }
+         next dist;
+      }
+      my $msg= "No source contains file $author_path";
+      $options{partial}? $log->notice($msg) : croak $msg;
+   }
+   # If any sources are 'autofetch' and caller didn't supply the MirrorTree object,
+   # commit the changes before returning.
+   for my $mirror (grep $_->has_changes, @autocommit) {
+      my $message= join "\n",
+         'Auto-commit packages fetched for branch '.$self->name,
+         '',
+         'For $archive_tree->import_cpanfile_snapshot',
+         '';
+      $mirror->commit($message);
+   }
+   return \%imported_dists;
 }
 
 1;
@@ -465,7 +546,7 @@ This adds it to the pending changes to the tree, but does not commit it.
 
 =head2 meta_path_for_dist
 
-  $author_path= $atree->meta_path_for_dist($author_path);
+  $author_path= $archive_tree->meta_path_for_dist($author_path);
 
 Return the author path for the .meta file corresponding with the distribution at an author path.
 This is just a simple replacement of file extension that accounts for some special cases.
@@ -486,10 +567,14 @@ Return the CPAN::Meta for the distribution, or C<undef> if unknown.
 
 =head2 import_modules
 
-  $snapshot->import_modules(\%module_version_spec);
   # {
   #   'Example::Module' => '>=0.011',
   #   'Some::Module'    => '',   # any version
+  # }
+  my $imported= $archive_tree->import_modules(\%module_version_spec);
+  # {
+  #   'A/AU/AUTHOR/Example-Module-1.2.3.tar.gz' => $from_source,
+  #   ...
   # }
 
 This method processes a list of module requirements to pull in matching modules and only as many
@@ -508,9 +593,20 @@ reviewing public modules.
 All changes will be pulled into this MutableTree object, but not committed.  If this is the
 working branch, the index also gets updated.
 
+=head2 import_cpanfile_snapshot
+
+  $archive_tree->import_cpanfile_snapshot(\%distribution_spec);
+
+This function takes a data structure from a cpanfile.snapshot (parsed via
+L<CPAN::InGit/parse_cpanfile_snapshot> ) and fetches the exact distribution files listed, and
+writes all the "provides" information into the L</package_details>.
+
+This does not check any of the 'requires', on the assumption that the snapshot represents a
+complete package collection.
+
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 
@@ -518,7 +614,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Michael Conrad, and IntelliTree Solutions.
+This software is copyright (c) 2026 by Michael Conrad, and IntelliTree Solutions.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

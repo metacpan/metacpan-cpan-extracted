@@ -1,10 +1,4 @@
-.gitignore
-Build.PL
 Changes
-MANIFEST
-META.json
-META.yml
-README
 lib/XML/Easy.pm
 lib/XML/Easy.xs
 lib/XML/Easy/Classify.pm
@@ -14,19 +8,21 @@ lib/XML/Easy/NodeBasics.pm
 lib/XML/Easy/Syntax.pm
 lib/XML/Easy/Text.pm
 lib/XML/Easy/Transform.pod
+Makefile.PL
+MANIFEST			This list of files
+README
 t/classify.t
 t/classify_pp.t
+t/DataSets.pm
 t/easy_module.t
 t/easy_module_pp.t
+t/ErrorCases.pm
 t/lib/t/DataSets.pm
 t/lib/t/ErrorCases.pm
 t/node_basics.t
 t/node_basics_pp.t
 t/node_object.t
 t/node_object_pp.t
-t/pod_cvg.t
-t/pod_cvg_pp.t
-t/pod_syn.t
 t/read.data
 t/read.t
 t/read_pp.t
@@ -36,4 +32,8 @@ t/version_synch.t
 t/write.data
 t/write.t
 t/write_pp.t
-SIGNATURE    Added here by Module::Build
+xt/pod_cvg.t
+xt/pod_cvg_pp.t
+xt/pod_syn.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

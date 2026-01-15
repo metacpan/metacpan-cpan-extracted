@@ -1,5 +1,9 @@
 -----
 
+12.0.0    2026-01-15
+    [Changed]
+       * Updated to libvirt tag v12.0.0 (from v11.10.0 - no actual changes)
+
 11.10.3   2026-01-10
     [Added]
        * Callback 'on_stream' extended with 'eof' named argument

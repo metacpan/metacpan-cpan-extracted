@@ -58,7 +58,7 @@ my %Package;
 
 #  Version information
 #
-$VERSION='2.069';
+$VERSION='2.070';
 
 
 #  Debug load
@@ -314,7 +314,7 @@ sub _start_html {
 
     #  Pull out meta attributes leaving rest presumably native html tag attribs
     #
-    my %attr_page=map {$_ => delete $attr{$_}}  grep { exists($attr{$_}) } qw(
+    my %attr_page=map {$_ => delete $attr{$_}}  grep { exists($attr{$_}) } (qw(
         title
         meta
         style
@@ -328,7 +328,7 @@ sub _start_html {
         static
         cache
         handler
-    );
+    ), keys %{$WEBDYNE_START_HTML_SHORTCUT_HR});
     debug('start_html %s', Dumper(\%attr_page));
 
 
@@ -345,6 +345,29 @@ sub _start_html {
             debug("found attr: $attr, setting to value: $value");
             $self->{"_${attr}"}=$value;
             $self->{'_static'} ||=1 if ($attr eq 'cache');
+        }
+    }
+    
+    
+    #  Shortcuts ? Add to relevant attributes
+    #
+    foreach my $shortcut (grep {$attr_page{$_}} keys %{$WEBDYNE_START_HTML_SHORTCUT_HR}) {
+        my $shortcut_hr=$WEBDYNE_START_HTML_SHORTCUT_HR->{$shortcut};
+        debug("found shortcut tag: $shortcut, content: %s", Dumper($shortcut_hr));
+        while (my($type, $href_ar)=each %{$shortcut_hr}) {
+            unless (ref($href_ar) eq 'ARRAY') { $href_ar=[$href_ar] }
+            debug("processing type: $type, href: %s", Dumper($href_ar));
+            if (my $type_attr_value_ar=$attr_page{$type}) {
+                 unless (ref($type_attr_value_ar) eq 'ARRAY') { $type_attr_value_ar=[$type_attr_value_ar] }
+                 debug("found existing start_html attr type: $type, content: %s", Dumper($type_attr_value_ar));
+                 push @{$type_attr_value_ar}, @{$href_ar};
+                 $attr_page{$type}=$type_attr_value_ar;
+                 debug("updated start_html attr type: $type to: %s", Dumper($type_attr_value_ar));
+            }
+            else {
+                debug("no start_hrml attr type: $type found, creating with content: %s", Dumper($href_ar));
+                $attr_page{$type}=$href_ar
+            }
         }
     }
 

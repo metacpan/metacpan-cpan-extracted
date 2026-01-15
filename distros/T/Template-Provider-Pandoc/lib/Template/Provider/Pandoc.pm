@@ -103,7 +103,7 @@ extends 'Template::Provider';
 
 use Pandoc ();
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 has pandoc => (
   isa => 'Pandoc',
@@ -165,7 +165,7 @@ around _template_content => sub {
   my ($data, $error, $mod_date) = $self->$orig(@_);
 
   if ($self->{STRIP_FRONT_MATTER}) {
-    $data =~ s/\A---\n.+?\n---\n//;
+    $data =~ s/\A---\n.+?\n---\n//s;
   }
 
   my $done = 0;

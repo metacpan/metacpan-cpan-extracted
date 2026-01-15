@@ -1,5 +1,19 @@
 # Change Log
 
+## [0.2.8] - 2026-01-14
+
+### Fixed
+
+- Handling of front matter
+- UTF8-encoded templates
+- warn() instead of carp()
+
+## [0.2.7] - 2026-01-03
+
+### Fixed
+
+- Version number
+
 ## [0.2.6] - 2026-01-02
 
 ### Fixed

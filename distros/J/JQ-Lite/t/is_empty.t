@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More;
 use JSON::PP;
 use JQ::Lite;
 
@@ -26,3 +26,29 @@ my $json4 = '{"key":"value"}';
 my @result4 = $jq->run_query($json4, 'is_empty');
 ok(!$result4[0], 'is_empty() returns false for non-empty hash');
 
+subtest 'non-collection values return false' => sub {
+    my @string = $jq->run_query('" "', 'is_empty');
+    ok(!$string[0], 'is_empty() returns false for strings');
+
+    my @number = $jq->run_query('42', 'is_empty');
+    ok(!$number[0], 'is_empty() returns false for numbers');
+
+    my @bool = $jq->run_query('true', 'is_empty');
+    ok(!$bool[0], 'is_empty() returns false for booleans');
+
+    my @null_value = $jq->run_query('null', 'is_empty');
+    ok(!$null_value[0], 'is_empty() returns false for null');
+};
+
+subtest 'collections with contents are not empty' => sub {
+    my @nested_array = $jq->run_query('[[]]', 'is_empty');
+    ok(!$nested_array[0], 'is_empty() treats arrays with elements as non-empty');
+
+    my @empty_string_array = $jq->run_query('[""]', 'is_empty');
+    ok(!$empty_string_array[0], 'is_empty() treats arrays with empty strings as non-empty');
+
+    my @empty_object_value = $jq->run_query('{"key":{}}', 'is_empty');
+    ok(!$empty_object_value[0], 'is_empty() treats objects with keys as non-empty');
+};
+
+done_testing;

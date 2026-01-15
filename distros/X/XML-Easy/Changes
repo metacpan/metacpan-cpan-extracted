@@ -1,3 +1,20 @@
+version 0.012; 2026-01-14
+
+  * No substantive changes in code in .pm files.
+
+  * In lib/XML/Easy.xs, customized definition of PERL_VERSION_GE proved no
+    longer necessary for building or testing; removing it enabled elimination of
+    build-time warning.
+
+  * To simplify maintenance going forward, extension is built using
+    Makefile.PL rather than Build.PL.
+
+  * Accepted patch to t/syntax_main.t from Dave Mitchell.
+
+  * Tests of POD and POD coverage now run only when envvar is set.
+
+  * Code is now maintained in GitHub repository.
+
 version 0.011; 2017-07-25
 
   * port to Perl 5.23.6, where applying a regexp to codepoints in the

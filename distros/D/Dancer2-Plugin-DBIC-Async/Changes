@@ -1,4 +1,11 @@
 Revision history for Dancer2::Plugin::DBIC::Async
 
+0.03  2026-01-14
+      - Tidied up pod further.
+      - Added standard unit test: t/pod.t and t/manifest.t
+
+0.02  2026-01-14
+      - Updated pod w.r.t the benefits of async operations.
+
 0.01  2026-01-13
       - Module Created.

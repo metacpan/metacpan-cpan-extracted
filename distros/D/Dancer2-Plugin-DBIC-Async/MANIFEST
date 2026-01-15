@@ -12,5 +12,7 @@ t/03-plugin-error-handling.t
 t/04-plugin-async-operations.t
 t/lib/Test/Schema.pm
 t/lib/Test/Schema/Result/User.pm
+t/manifest.t
+t/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,16 @@
 Revision history for HarfBuzz::Shaper.
 
+0.032 2026-01-14
+
+   - Upgrade embedded harfbuzz to 12.3.0 to fix CVE-2026-22693.
+
+   - Make pkg-config configurable in Makefile.PL.
+     Thanks to Helmut Grohe and Roland Rosenfeld.
+
+0.031 2025-01-31
+
+   - Some more fixes in harfbuzz lib detection.
+
 0.030 2025-01-30
 
    - Some more fixes in harfbuzz lib detection.

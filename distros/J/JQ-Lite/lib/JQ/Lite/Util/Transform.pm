@@ -2053,10 +2053,20 @@ sub _group_count {
     my ($array_ref, $path) = @_;
     return {} unless ref $array_ref eq 'ARRAY';
 
+    my ($key_path, $use_entire_item) = _normalize_path_argument($path);
+
     my %counts;
     for my $item (@$array_ref) {
-        my @keys = _traverse($item, $path);
-        my $key = defined $keys[0] ? "$keys[0]" : 'null';
+        my $key_value;
+        if ($use_entire_item) {
+            $key_value = $item;
+        }
+        else {
+            my @values = _traverse($item, $key_path);
+            $key_value = @values ? $values[0] : undef;
+        }
+
+        my $key = defined $key_value ? _key($key_value) : 'null';
         $counts{$key}++;
     }
 

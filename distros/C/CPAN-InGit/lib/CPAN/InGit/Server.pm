@@ -1,5 +1,5 @@
 package CPAN::InGit::Server;
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 # ABSTRACT: A Mojolicious::Controller that serves the ArchiveTrees from a git repo
 
 
@@ -256,7 +256,7 @@ selector portion of the paths.
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 
@@ -264,7 +264,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Michael Conrad, and IntelliTree Solutions.
+This software is copyright (c) 2026 by Michael Conrad, and IntelliTree Solutions.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

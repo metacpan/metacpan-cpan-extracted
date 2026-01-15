@@ -378,12 +378,12 @@ static void write_private_sv(FILE *fh, const SV *sv)
 {
   size_t size = 0;
   switch(SvTYPE(sv)) {
-    case SVt_IV: break;
     case SVt_NV:   size += sizeof(NV); break;
     case SVt_PV:   size += sizeof(XPV) - STRUCT_OFFSET(XPV, xpv_cur); break;
     case SVt_PVIV: size += sizeof(XPVIV) - STRUCT_OFFSET(XPV, xpv_cur); break;
     case SVt_PVNV: size += sizeof(XPVNV) - STRUCT_OFFSET(XPV, xpv_cur); break;
     case SVt_PVMG: size += sizeof(XPVMG); break;
+    default: break;
   }
 
   if(SvPOK(sv))
@@ -822,7 +822,7 @@ static void write_private_class(FILE *fh, const HV *cls)
   {
     PADNAMELIST *fields = HvAUX(cls)->xhv_class_fields;
 
-    int nfields = PadnamelistMAX(fields)+1;
+    int nfields = fields ? PadnamelistMAX(fields)+1 : 0;
     for(int i = 0; i < nfields; i++) {
       PADNAME *pn = PadnamelistARRAY(fields)[i];
 
@@ -1374,10 +1374,8 @@ static void dumpfh(FILE *fh)
       if(sv == tmpsv)
         continue;
 
-      switch(SvTYPE(sv)) {
-        case 0xff:
-          continue;
-      }
+      if(SvTYPE(sv) == 0xff)
+        continue;
 
       write_sv(&ctx, sv);
 

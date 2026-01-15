@@ -1,3 +1,8 @@
+0.003 - 2026-01-14
+  - cpangit-add can now process cpanfile or cpanfile.snapshot
+  - New method ArchiveTree->import_cpanfile_snapshot
+  - Support for backpan via MirrorTree->upstream_backup_url
+
 0.002 - 2025-12-19
   - Sort 02packages.details.txt case-insensitive so that it works with
     binary search required by CPAN::02Packages::Search used by App::cpm

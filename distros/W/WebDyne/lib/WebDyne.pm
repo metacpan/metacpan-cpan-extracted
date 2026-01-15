@@ -61,7 +61,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='2.069';
+$VERSION='2.070';
 chomp($VERSION_GIT_SHA=do { local (@ARGV, $/) = ($_=__FILE__.'.sha'); <> if -f $_ });
 
 
@@ -3501,6 +3501,18 @@ sub include {
             #$self->data_ar_err_pop();
             my $block_data_ar=$container_ar->[1];
             debug('compiled to data_ar %s', Dumper($block_data_ar));
+            
+            
+            #  Any perl code in content ? Initialize it
+            #
+            if (my $meta_hr=$container_ar->[0]) {
+                if (my $perl_ar=$meta_hr->{'perl'}) {
+                    my $perl_debug_ar=$meta_hr->{'perl_debug'} ||
+                        return err('unable to load perl_debug array reference');
+                    $self->perl_init($perl_ar, $perl_debug_ar) || return $self->err_html();
+                }
+            }
+
 
             #  Find the head or body tag
             #

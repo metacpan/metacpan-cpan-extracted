@@ -32,7 +32,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='2.069';
+$VERSION='2.070';
 
 
 #  Get mod_perl version taking intio account legacy strings. Clear $@ after evals
@@ -130,7 +130,7 @@ my %constant_temp;
     #  exists with a HTML page that the calling perl code (a) supplies a
     #  "varname" hash parm, and (b) that param is not undef
     #
-    WEBDYNE_STRICT_VARS         => 1,
+    WEBDYNE_STRICT_VARS => 1,
 
 
     #  When a perl method loaded by a user calls another method within
@@ -238,6 +238,30 @@ my %constant_temp;
     #  time and they never change. Make undef to force re-include every page load
     #
     WEBDYNE_START_HTML_PARAM_STATIC => 1,
+    
+    
+    #  Shortcut attributes for start_html
+    #
+    WEBDYNE_START_HTML_SHORTCUT_HR => {
+    
+        pico    => { style  => 'https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css' },
+        htmx    => { script => 'https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js' }
+        
+        #  Commented out for now, left as syntax examples
+        #
+
+        #bootstrap	=> { 
+        #    style => 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css', 
+        #    script => 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js' 
+        #},
+        #alpine		=> { script => 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js#defer' },
+        #tailwind	=> { style => 'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4' },
+        #alpine_ajax	=> { script => [
+        #    'https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.12.6/dist/cdn.min.js#defer',
+        #    'https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js#defer'
+        #]}
+        
+    },
     
     
     #  Anything that should be added in <head> section. Will be inserted verbatim before
