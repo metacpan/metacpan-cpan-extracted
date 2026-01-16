@@ -5,10 +5,15 @@ use warnings;
 package Marlin::TypeConstraint;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014000';
+our $VERSION   = '0.015000';
 
-use parent 'Type::Tiny::Class';
-use Types::Common qw( signature ArrayRef HashRef is_ArrayRef is_HashRef to_TypeTiny );
+use B                     ();
+use Eval::TypeTiny        ();
+use Scalar::Util          ();
+use Type::Tiny::Class     ();
+use Types::Common         qw( signature ArrayRef HashRef Any is_ArrayRef is_HashRef is_TypeTiny to_TypeTiny );
+
+our @ISA = 'Type::Tiny::Class';
 
 sub exportables {
 	my $me = shift;
@@ -31,7 +36,7 @@ sub _cool_sig {
 			map {
 				my $attr = $_;
 				my $name = exists($attr->{init_arg}) ? $attr->{init_arg} : $attr->{slot};
-				my $type = $attr->{isa} ? to_TypeTiny( $attr->{isa} ) : 1;
+				my $type = is_TypeTiny($attr->{isa}) ? $attr->{isa} : $attr->{isa} ? to_TypeTiny( $attr->{isa} ) : Any;
 				my $opts = { optional => !$attr->{required} };
 				$opts->{alias} = $attr->{':Alias'}{alias} if $attr->{':Alias'};
 				defined( $name ) ? ( $name, $type, $opts ) : ();
@@ -53,7 +58,7 @@ sub coderef_but_cooler {
 		wantarray ? ( $r, @_ ) : $r;
 	};
 	
-	require Scalar::Util && &Scalar::Util::set_prototype( $coderef, ';$' )
+	&Scalar::Util::set_prototype( $coderef, ';$' )
 		if Eval::TypeTiny::NICE_PROTOTYPES;
 	
 	return $coderef;
@@ -80,4 +85,5 @@ sub _build_coercion {
 		->freeze;
 }
 
-1;
+__PACKAGE__
+__END__

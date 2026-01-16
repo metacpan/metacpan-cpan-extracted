@@ -1,7 +1,8 @@
-[![Actions Status](https://github.com/youpong/Data-Gimei/workflows/test/badge.svg)](https://github.com/youpong/Data-Gimei/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Data-Gimei.svg)](https://metacpan.org/release/Data-Gimei)
+[![Actions Status](https://github.com/youpong/Data-Gimei/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/youpong/Data-Gimei/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/Data-Gimei.svg)](https://metacpan.org/release/Data-Gimei)
 # NAME
 
-Data::Gimei - a Perl port of Ruby's gimei generates fake data in Japanese.
+Data::Gimei - A Perl module ported from Ruby's gimei that randomly generates
+Japanese names and addresses.
 
 # SYNOPSIS
 
@@ -50,8 +51,13 @@ Data::Gimei - a Perl port of Ruby's gimei generates fake data in Japanese.
 
 # DESCRIPTION
 
-This module generates fake data that people's name in Japanese and
-supports furigana, phonetic renderings of kanji.
+Data::Gimei generates fake Japanese names and addresses. 
+Generated names include a first name, a last name, and their associated gender.
+Names are available in kanji, hiragana, katakana, and romanized forms, where
+hiragana, katakana, and romanized forms are phonetic renderings for kanji. 
+Addresses include a prefecture, city, and town, and can be generated in kanji,
+hiragana or katakana. The output format can be customized using specific options.
+Note that the gender notation cannot be changed.
 
 The project name comes from Japanese '偽名' means a false name.
 
@@ -95,9 +101,18 @@ You can also look for information at:
     Search CPAN
         https://metacpan.org/dist/Data-Gimei
 
+# SEE ALSO
+
+- [App::Gimei](https://metacpan.org/pod/App%3A%3AGimei)
+
+    A command-line tool for this module.
+
 # LICENSE
 
-MIT License
+Copyright (c) 2021-2026 Yusaku Nakajima.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the MIT License.
 
 Dictionary YAML file is generated from naist-jdic.
 

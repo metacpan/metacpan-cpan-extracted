@@ -233,7 +233,7 @@ sub as_code {
     }
   
     # whitespace-tidy the type
-    $type = ExtUtils::Typemaps::tidy_type($type);
+    $type = XS::Install::FrozenShit::Typemaps::tidy_type($type);
   
     # Specify the environment for when the initialiser template is evaled.
     # Only the common ones are specified here. Other fields may be added
@@ -311,7 +311,7 @@ sub as_code {
             return;
         }
   
-        # Get the ExtUtils::Typemaps::InputMap object associated with the
+        # Get the XS::Install::FrozenShit::Typemaps::InputMap object associated with the
         # xstype. This contains the template of the code to be embedded,
         # e.g. 'SvPV_nolen($arg)'
         my $inputmap = $typemaps->get_inputmap(xstype => $xstype);
@@ -579,7 +579,7 @@ sub as_output_code {
   (my $subtype = $ntype) =~ s/(?:Array)?(?:Ptr)?$//;
 
   # whitespace-tidy the type
-  $type = ExtUtils::Typemaps::tidy_type($type);
+  $type = XS::Install::FrozenShit::Typemaps::tidy_type($type);
 
   # The type as supplied to the eval is Foo__Bar rather than Foo::Bar
   my $eval_type = $type;
@@ -912,7 +912,7 @@ sub as_output_code {
     #               ? PAD_SV(PL_op->op_targ) : sv_newmortal()
 
     if (   $pxs->{config_optimize}
-        && ExtUtils::Typemaps::OutputMap->targetable($evalexpr)
+        && XS::Install::FrozenShit::Typemaps::OutputMap->targetable($evalexpr)
         && !$pxs->{xsub_targ_used})
     {
       # So TARG is available for use.

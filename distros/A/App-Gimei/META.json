@@ -1,10 +1,10 @@
 {
-   "abstract" : "a CLI for Data::Gimei",
+   "abstract" : "A CLI app for Data::Gimei, a module generating fake Japanese names and addresses.",
    "author" : [
       "NAKAJIMA Yusaku <youpong@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "mit"
    ],
@@ -28,15 +28,15 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.048"
+            "Module::Build::Tiny" : "0.052"
          }
       },
       "develop" : {
          "requires" : {
             "CPAN::Uploader" : "0.103018",
-            "Minilla" : "v3.1.23",
-            "Perl::Tidy" : "20240511",
-            "Software::License" : "0.104006",
+            "Minilla" : "v3.1.29",
+            "Perl::Tidy" : "20260109",
+            "Software::License" : "0.104007",
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
             "Test::PAUSE::Permissions" : "0.07",
@@ -48,18 +48,18 @@
       "runtime" : {
          "requires" : {
             "Class::Tiny" : "1.008",
-            "Data::Gimei" : "v0.4.2",
+            "Data::Gimei" : "v0.4.3",
             "Getopt::Long" : "2.58",
             "Pod::Find" : "1.67",
-            "Pod::Text" : "v6.0.0",
-            "Pod::Usage" : "2.03",
-            "perl" : "v5.36.0"
+            "Pod::Text" : "v6.0.2",
+            "Pod::Usage" : "2.05",
+            "perl" : "v5.40.0"
          }
       },
       "test" : {
          "requires" : {
-            "Capture::Tiny" : "0.48",
-            "Test2::Bundle::More" : "0.000163",
+            "Capture::Tiny" : "0.50",
+            "Test2::Bundle::More" : "1.302219",
             "Unicode::GCString" : "2013.10"
          }
       }
@@ -67,7 +67,7 @@
    "provides" : {
       "App::Gimei" : {
          "file" : "lib/App/Gimei.pm",
-         "version" : "v0.2.8"
+         "version" : "v0.2.9"
       },
       "App::Gimei::Generator" : {
          "file" : "lib/App/Gimei/Generator.pm"
@@ -94,7 +94,7 @@
          "web" : "https://github.com/youpong/App-Gimei"
       }
    },
-   "version" : "v0.2.8",
+   "version" : "v0.2.9",
    "x_authority" : "cpan:YOUPONG",
    "x_contributors" : [
       "NAKAJIMA Yusaku <yupong7@gmail.com>",

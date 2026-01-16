@@ -12,7 +12,7 @@ use SBOM::CycloneDX::Util qw(file_read);
 
 use Exporter 'import';
 
-our @EXPORT_OK = qw(bom_1_6 bom_1_5 bom_1_4 bom_1_3 bom_1_2 bom_test_data);
+our @EXPORT_OK = qw(bom_1_7 bom_1_6 bom_1_5 bom_1_4 bom_1_3 bom_1_2 bom_test_data);
 
 use SBOM::CycloneDX;
 
@@ -32,6 +32,7 @@ sub bom_test_data {
 
 }
 
+sub bom_1_7 { SBOM::CycloneDX->new(spec_version => 1.7, serial_number => $SERIAL_NUMBER) }
 sub bom_1_6 { SBOM::CycloneDX->new(spec_version => 1.6, serial_number => $SERIAL_NUMBER) }
 sub bom_1_5 { SBOM::CycloneDX->new(spec_version => 1.5, serial_number => $SERIAL_NUMBER) }
 sub bom_1_4 { SBOM::CycloneDX->new(spec_version => 1.4, serial_number => $SERIAL_NUMBER) }

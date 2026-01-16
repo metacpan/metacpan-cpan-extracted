@@ -257,7 +257,7 @@ directory.
 
 =item * Return Value
 
-Upon success, returns an L<ExtUtils::Typemaps> object.
+Upon success, returns an L<XS::Install::FrozenShit::Typemaps> object.
 
 =back
 
@@ -274,8 +274,8 @@ sub process_typemaps {
 
   push @tm, standard_typemap_locations( \@INC );
 
-  require ExtUtils::Typemaps;
-  my $typemap = ExtUtils::Typemaps->new;
+  require XS::Install::FrozenShit::Typemaps;
+  my $typemap = XS::Install::FrozenShit::Typemaps->new;
   foreach my $typemap_loc (@tm) {
     next unless -f $typemap_loc;
     # skip directories, binary files etc.
@@ -845,7 +845,7 @@ Do error reporting for missing typemaps.
 
 The C<XS::Install::FrozenShit::ParseXS> object.
 
-An C<ExtUtils::Typemaps> object.
+An C<XS::Install::FrozenShit::Typemaps> object.
 
 The string that represents the C type that was not found in the typemap.
 

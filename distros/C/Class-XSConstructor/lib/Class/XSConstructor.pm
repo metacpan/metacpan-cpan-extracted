@@ -9,7 +9,7 @@ use List::Util 1.45 qw( uniq );
 
 BEGIN {
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.021000';
+	our $VERSION   = '0.022000';
 	
 	if ( eval { require Types::Standard; 1 } ) {
 		Types::Standard->import(
@@ -44,23 +44,20 @@ sub import {
 	
 	$META{$package} ||= { package => $package };
 	
+	my @XS_args = (
+		"$package\::$methodname",
+		"$package\::BUILDALL",
+		"$package\::XSCON_CLEAR_CONSTRUCTOR_CACHE",
+	);
 	if (our $REDEFINE) {
 		no warnings 'redefine';
-		install_constructor(
-			"$package\::$methodname",
-			"$package\::BUILDALL",
-			"$package\::XSCON_CLEAR_CONSTRUCTOR_CACHE",
-		);
+		install_constructor( @XS_args );
 	}
 	else {
-		install_constructor(
-			"$package\::$methodname",
-			"$package\::BUILDALL",
-			"$package\::XSCON_CLEAR_CONSTRUCTOR_CACHE",
-		);
+		install_constructor( @XS_args );
 	}
 
-	inheritance_stuff($package);
+	inheritance_stuff( $package );
 	
 	for my $pair (@{ mkopt \@_ }) {
 		my ($name, $thing) = @$pair;
@@ -384,6 +381,7 @@ sub inheritance_stuff {
 	
 	for my $parent ( @isa ) {
 		no strict 'refs';
+		no warnings 'once';
 		# Moo will sometimes not have a constructor in &{"${parent}::new"}
 		# when by all that is good and holy, it should.
 		if ( $INC{'Moo.pm'} and $Moo::MAKERS{$parent} ) {
@@ -422,6 +420,7 @@ sub populate_demolish {
 	
 	require( $] >= 5.010 ? "mro.pm" : "MRO/Compat.pm" );
 	no strict 'refs';
+	no warnings 'once';
 	
 	$DEMOLISH_CACHE{$klass} = [
 		reverse
@@ -444,6 +443,7 @@ sub populate_build {
 	
 	require( $] >= 5.010 ? "mro.pm" : "MRO/Compat.pm" );
 	no strict 'refs';
+	no warnings 'once';
 	
 	$BUILD_CACHE{$klass} = [
 		map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
@@ -475,8 +475,7 @@ sub get_demolish_methods {
 	return @{ $DEMOLISH_CACHE{$klass} or [] };
 }
 
-1;
-
+__PACKAGE__
 __END__
 
 =pod
@@ -852,16 +851,61 @@ Returns nothing.
 =item C<< Class::XSConstructor::get_metadata( $package ) >>
 
 Get a copy of the metadata that Class::XSConstructor holds for the
-package.
-
-If you tamper with the metadata (which you probably shouldn't as it's inviting
-segfaults), you should call C<< Your::Class->XSCON_CLEAR_CONSTRUCTOR_CACHE >>
-afterwards. You may also need to clear
-C<< $Class::XSConstructor::BUILD_CACHE{$package} >> and
-C<< $Class::XSConstructor::DEMOLISH_CACHE{$package} >> as those are
-separate caches.
+package. It is probably not wise to tamper with it too much, as it
+is a recipe for segfaults.
 
 =back
+
+=head2 Clearing Cached Data
+
+The constructor and destructor methods created by Class::XSConstructor
+and L<Class::XSDestructor> cache a lot of data the first time they get
+called.
+
+If you do any of the following after an object has already been constructed,
+you will need to clear those caches.
+
+=over
+
+=item *
+
+Changing C<< @ISA >>, including the C<< @ISA >> for any ancestor
+packages.
+
+=item *
+
+Changing the metadata returned by C<get_metadata>.
+
+=item *
+
+Defining a new C<BUILD> or C<DEMOLISH> method, or redefining an existing one,
+in either your class or any ancestor or descendent class.
+
+=back
+
+To clear all cached data:
+
+  # Clear the data cached in C structs by the constructor,
+  # including details of any attributes, plus the list of
+  # BUILD methods for Your::Class itself.
+  Your::Class->XSCON_CLEAR_CONSTRUCTOR_CACHE;
+  
+  # Clear the data cached in Perl data structures by the
+  # constructor. This is mostly used when `new` is called
+  # on a non-Class::XSConstructor class that inherits from
+  # a Class::XSConstructor class without overriding `new`.
+  %Class::XSAccessor::BUILD_CACHE = ();
+  
+  # Clear the data cached in C structs by the destructor. This
+  # is just the list of DEMOLISH methods for your class itself.
+  Your::Class->XSCON_CLEAR_DESTRUCTOR_CACHE
+    if Your::Class->can('XSCON_CLEAR_DESTRUCTOR_CACHE');
+  
+  # Clear the data cached in Perl data structures by the
+  # destructor. This is mostly used when `DESTROY` is called
+  # on a non-Class::XSConstructor class that inherits from
+  # a Class::XSConstructor class without overriding `DESTROY`.
+  %Class::XSAccessor::DEMOLISH_CACHE = ();
 
 =head1 CAVEATS
 

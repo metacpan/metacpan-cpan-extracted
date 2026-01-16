@@ -6,9 +6,11 @@ use utf8;
 package Marlin::Struct;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014000';
+our $VERSION   = '0.015000';
 
-use Marlin ();
+use Eval::TypeTiny        ();
+use Marlin                ();
+use Type::Tiny            ();
 
 my $uniq_id = 0;
 
@@ -17,23 +19,29 @@ sub import {
 	my $caller = caller;
 	
 	my %defs;
+	my @defs;
 	
 	while ( @_ ) {
 		my ( $name, $definition ) = splice @_, 0, 2;
 		my $class_name = sprintf '%s::__ANON__::_%06d', $me, ++$uniq_id;
 		
 		my $marlin = Marlin->new(
-			'-caller' => [ $caller ],
-			'-this'   => [ $class_name ],
+			'-caller'     => [ $caller ],
+			'-this'       => [ $class_name ],
+			'-short_name' => $name,
+			'-is_struct'  => !!1,
 			@$definition,
 		);
-		$defs{$name} = $marlin;
 		@{ $marlin->parents } = map {
 			$defs{$_->[0]} ? [ $defs{$_->[0]}->this ] : $_
 		} @{ $marlin->parents };
-		$marlin->{short_name} = $name;
-		$marlin->{is_struct}  = !!1;
 		$marlin->store_meta;
+		
+		push @defs, $marlin;
+		$defs{$name} = $marlin;
+	}
+	
+	for my $marlin ( @defs ) {
 		$marlin->do_setup;
 		
 		Type::Tiny::_install_overloads(
@@ -43,7 +51,7 @@ sub import {
 			q(bool)  => sub { !!1 },
 		);
 		
-		my $type = $marlin->make_type_constraint( $name );
+		my $type = $marlin->make_type_constraint( $marlin->short_name );
 		my @exportables = @{ $type->exportables };
 		for my $e ( @exportables ) {
 			Eval::TypeTiny::set_subname( $me . '::' . $e->{name}, $e->{code} );
@@ -52,8 +60,7 @@ sub import {
 	}
 }
 
-1;
-
+__PACKAGE__
 __END__
 
 =pod

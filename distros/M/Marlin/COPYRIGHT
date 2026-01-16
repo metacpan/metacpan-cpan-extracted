@@ -60,6 +60,20 @@ Files: Changes
 Copyright: Copyright 2026 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: lib/Marlin/X.pm
+ lib/Marlin/X/UndefTolerant.pm
+ lib/MooX/Marlin.pm
+ lib/MooseX/Marlin.pm
+ t/integration/alias-moose.t
+ t/integration/ct-inherit.t
+ t/integration/lvalues-moose.t
+ t/integration/mite-inherit.t
+ t/integration/mouse-inherit.t
+ t/integration/roles2.t
+ t/integration/xscon-inherit.t
+Copyright: This software is copyright (c) 2026 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: README
  lib/Marlin.pm
  lib/Marlin/Manual/Comparison.pod
@@ -72,19 +86,6 @@ Files: README
  lib/Marlin/XAttribute/LocalWriter.pm
  lib/Marlin/XAttribute/Lvalue.pm
 Copyright: This software is copyright (c) 2025-2026 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: lib/Marlin/X/UndefTolerant.pm
- lib/MooX/Marlin.pm
- lib/MooseX/Marlin.pm
- t/integration/alias-moose.t
- t/integration/ct-inherit.t
- t/integration/lvalues-moose.t
- t/integration/mite-inherit.t
- t/integration/mouse-inherit.t
- t/integration/roles2.t
- t/integration/xscon-inherit.t
-Copyright: This software is copyright (c) 2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT

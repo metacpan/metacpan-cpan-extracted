@@ -6,7 +6,7 @@ use Class::XSConstructor ();
 package Class::XSDestructor;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.021000';
+our $VERSION   = '0.022000';
 
 sub import {
 	my $class = shift;
@@ -17,12 +17,18 @@ sub import {
 	$package    ||= our($SETUP_FOR) || caller;
 	$methodname ||= 'DESTROY';
 	
+	my @XS_args = (
+		"$package\::$methodname",
+		"$package\::DEMOLISHALL",
+		"$package\::XSCON_CLEAR_DESTRUCTOR_CACHE",
+	);
+	
 	if (our $REDEFINE) {
 		no warnings 'redefine';
-		Class::XSConstructor::install_destructor("$package\::$methodname", "$package\::DEMOLISHALL");
+		Class::XSConstructor::install_destructor( @XS_args );
 	}
 	else {
-		Class::XSConstructor::install_destructor("$package\::$methodname", "$package\::DEMOLISHALL");
+		Class::XSConstructor::install_destructor( @XS_args );
 	}
 }
 

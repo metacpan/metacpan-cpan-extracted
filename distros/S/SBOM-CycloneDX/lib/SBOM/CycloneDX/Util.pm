@@ -6,7 +6,6 @@ use warnings;
 use utf8;
 
 use Carp;
-use URI::PackageURL;
 use UUID::Tiny ':std';
 
 use Exporter qw(import);
@@ -74,13 +73,6 @@ sub urn_cdx  { sprintf 'urn:cdx:%s',  create_uuid_as_string(UUID_V4) }
 
 sub cyclonedx_component {
 
-    my $purl = URI::PackageURL->new(
-        type      => 'cpan',
-        namespace => 'GDT',
-        name      => 'SBOM-CycloneDX',
-        version   => $SBOM::CycloneDX::VERSION
-    );
-
     my $component = SBOM::CycloneDX::Component->new(
         type                => 'library',
         group               => 'CPAN',
@@ -88,8 +80,7 @@ sub cyclonedx_component {
         version             => sprintf('%s', $SBOM::CycloneDX::VERSION),
         description         => 'Perl distribution for CycloneDX',
         licenses            => [SBOM::CycloneDX::License->new(id => cpan_meta_to_spdx_license('artistic_2'))],
-        purl                => $purl,
-        bom_ref             => $purl->to_string,
+        bom_ref             => sprintf('%s@%s', 'SBOM-CycloneDX', $SBOM::CycloneDX::VERSION),
         external_references => _cyclonedx_external_references()
     );
 
@@ -250,7 +241,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

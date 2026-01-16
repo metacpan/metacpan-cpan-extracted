@@ -20,16 +20,6 @@ Files: Changes
 Copyright: Copyright 2026 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: INSTALL
- LICENSE
- Makefile.PL
- XSConstructor.xs
- examples/benchmarks.pl
- ppport.h
- xshelper.h
-Copyright: Unknown
-License: Unknown
-
 Files: t/05strictconstructor.t
  t/06inherit-from.t
  t/07coercion.t
@@ -39,6 +29,16 @@ Files: t/05strictconstructor.t
  t/11weaken.t
 Copyright: This software is copyright (c) 2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ Makefile.PL
+ XSConstructor.xs
+ examples/benchmarks.pl
+ ppport.h
+ xshelper.h
+Copyright: Unknown
+License: Unknown
 
 Files: t/01basic.t
  t/02types.t
@@ -65,16 +65,16 @@ Files: README
 Copyright: This software is copyright (c) 2018-2019, 2025-2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: lib/Class/XSDestructor.pm
+Copyright: This software is copyright (c) 2025-2026 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: dist.ini
 Copyright: Copyright 2018 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/03typenano.t
 Copyright: This software is copyright (c) 2019 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: lib/Class/XSDestructor.pm
-Copyright: This software is copyright (c) 2025-2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

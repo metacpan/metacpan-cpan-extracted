@@ -8,7 +8,7 @@ use Test::More;
 
 use SBOM::CycloneDX;
 
-my @SPEC_VERSIONS = qw(1.2 1.3 1.4 1.5 1.6);
+my @SPEC_VERSIONS = qw(1.2 1.3 1.4 1.5 1.6 1.7);
 
 for my $spec_version (@SPEC_VERSIONS) {
 

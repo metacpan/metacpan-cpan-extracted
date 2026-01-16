@@ -8,7 +8,7 @@ binmode STDOUT, ":utf8";
 
 use Data::Gimei;
 my $name = Data::Gimei::Name->new();
-                                   # for example
+# <<<                              output example
 say $name->kanji;                # "斎藤 陽菜"
 say $name->hiragana;             # "さいとう はるな"
 say $name->katakana;             # "サイトウ ハルナ"
@@ -42,3 +42,4 @@ say $addr->city->katakana;       # "サッポロシチュウオウク"
 say $addr->town->kanji;          # "モエレ沼公園"
 say $addr->town->hiragana;       # "もえれぬまこうえん"
 say $addr->town->katakana;       # "モエレヌマコウエン"
+#>>>

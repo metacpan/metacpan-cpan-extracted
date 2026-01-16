@@ -6,6 +6,16 @@ Home page:    <https://metacpan.org/release/Class-XSConstructor>
 Bug tracker:  <https://github.com/tobyink/p5-class-xsconstructor/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.022000	2026-01-15
+
+ [ Bug Fixes ]
+ - Suppress a few potential 'used only once' warnings.
+
+ [ Other ]
+ - Added: Document clearing internal data, when it might be useful, etc.
+ - Added: Somewhat supported way to clear internal caches for the
+   destructor too.
+
 0.021000	2026-01-13
 
  - Added: Class::XSDestructor now also installs a DEMOLISHALL method.

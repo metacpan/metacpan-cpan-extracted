@@ -19,8 +19,17 @@ sub BUILD {
 }
 
 has version => (is => 'rw', isa => Str);
-has range   => (is => 'rw', isa => InstanceOf ['URI::VersionRange']);
+has range   => (is => 'rw', isa => InstanceOf ['URI::VersionRange'], coerce => sub { _vers_parse($_[0]) });
 has status  => (is => 'rw', isa => Enum [qw(affected unaffected unknown)]);
+
+sub _vers_parse {
+
+    my $vers = shift;
+
+    return $vers if (ref $vers eq 'URI::VersionRange');
+    return URI::VersionRange->from_string($vers);
+
+}
 
 sub TO_JSON {
 
@@ -115,7 +124,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

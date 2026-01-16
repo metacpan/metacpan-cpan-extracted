@@ -9,9 +9,11 @@ use SBOM::CycloneDX::BomRef;
 use SBOM::CycloneDX::List;
 use SBOM::CycloneDX::Enum;
 
+use JSON::PP;
 use Types::Standard qw(Str StrMatch Bool Enum InstanceOf HashRef);
 use Types::TypeTiny qw(ArrayLike);
 use URI::PackageURL;
+use URI::VersionRange;
 
 use Moo;
 use namespace::autoclean;
@@ -42,11 +44,14 @@ has authors => (
     default => sub { SBOM::CycloneDX::List->new }
 );
 
-has author      => (is => 'rw', isa => Str);                                      # Deprecated in 1.6
-has publisher   => (is => 'rw', isa => Str);
-has group       => (is => 'rw', isa => Str);
-has name        => (is => 'rw', isa => Str, required => 1);
-has version     => (is => 'rw', isa => Str);                                      # Required in 1.2 and 1.3
+has author    => (is => 'rw', isa => Str);    # Deprecated in 1.6
+has publisher => (is => 'rw', isa => Str);
+has group     => (is => 'rw', isa => Str);
+has name      => (is => 'rw', isa => Str, required => 1);
+has version   => (is => 'rw', isa => Str);    # Required in 1.2 and 1.3
+has version_range => (is => 'rw', isa => InstanceOf ['URI::VersionRange'], coerce => sub { _vers_parse($_[0]) })
+    ;                                         # Added in 1.7
+has is_external => (is => 'rw', isa => Bool);                                     # Added in 1.7
 has description => (is => 'rw', isa => Str);
 has scope       => (is => 'rw', isa => Enum [qw(required optional excluded)]);    # Default required
 
@@ -62,7 +67,14 @@ has licenses => (
     default => sub { SBOM::CycloneDX::List->new }
 );
 
-has copyright  => (is => 'rw', isa => Str);
+has copyright => (is => 'rw', isa => Str);
+
+has patent_assertions => (
+    is      => 'rw',
+    isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::PatentAssertions']],
+    default => sub { SBOM::CycloneDX::List->new }
+);
+
 has cpe        => (is => 'rw', isa => Str);
 has purl       => (is => 'rw', isa => InstanceOf ['URI::PackageURL'], coerce => sub { _purl_parse($_[0]) });
 has omnibor_id => (is => 'rw', isa => ArrayLike [Str], default => sub { SBOM::CycloneDX::List->new });
@@ -109,6 +121,15 @@ sub _purl_parse {
 
 }
 
+sub _vers_parse {
+
+    my $vers = shift;
+
+    return $vers if (ref $vers eq 'URI::VersionRange');
+    return URI::VersionRange->from_string($vers);
+
+}
+
 sub TO_JSON {
 
     my $self = shift;
@@ -116,37 +137,40 @@ sub TO_JSON {
     my $json = {type => $self->type, name => $self->name};
 
 
-    $json->{'mime-type'}        = $self->mime_type           if $self->mime_type;
-    $json->{'bom-ref'}          = $self->bom_ref             if $self->bom_ref;
-    $json->{supplier}           = $self->supplier            if $self->supplier;
-    $json->{manufacturer}       = $self->manufacturer        if $self->manufacturer;
-    $json->{authors}            = $self->authors             if @{$self->authors};
-    $json->{author}             = $self->author              if $self->author;
-    $json->{publisher}          = $self->publisher           if $self->publisher;
-    $json->{group}              = $self->group               if $self->group;
-    $json->{version}            = $self->version             if $self->version;
-    $json->{description}        = $self->description         if $self->description;
-    $json->{scope}              = $self->scope               if $self->scope;
-    $json->{hashes}             = $self->hashes              if @{$self->hashes};
-    $json->{licenses}           = $self->licenses            if @{$self->licenses};
-    $json->{copyright}          = $self->copyright           if $self->copyright;
-    $json->{cpe}                = $self->cpe                 if $self->cpe;
-    $json->{purl}               = $self->purl->to_string     if $self->purl;
-    $json->{omniborId}          = $self->omnibor_id          if @{$self->omnibor_id};
-    $json->{swhid}              = $self->swhid               if @{$self->swhid};
-    $json->{swid}               = $self->swid                if $self->swid;
-    $json->{modified}           = $self->modified            if $self->modified;
-    $json->{pedigree}           = $self->pedigree            if $self->pedigree;
-    $json->{externalReferences} = $self->external_references if @{$self->external_references};
-    $json->{components}         = $self->components          if @{$self->components};
-    $json->{evidence}           = $self->evidence            if $self->evidence;
-    $json->{releaseNotes}       = $self->release_notes       if $self->release_notes;
-    $json->{modelCard}          = $self->model_card          if $self->model_card;
-    $json->{data}               = $self->data                if @{$self->data};
-    $json->{cryptoProperties}   = $self->crypto_properties   if $self->crypto_properties;
-    $json->{properties}         = $self->properties          if @{$self->properties};
-    $json->{tags}               = $self->tags                if @{$self->tags};
-    $json->{signature}          = $self->signature           if $self->signature;
+    $json->{'mime-type'}        = $self->mime_type                if $self->mime_type;
+    $json->{'bom-ref'}          = $self->bom_ref                  if $self->bom_ref;
+    $json->{supplier}           = $self->supplier                 if $self->supplier;
+    $json->{manufacturer}       = $self->manufacturer             if $self->manufacturer;
+    $json->{authors}            = $self->authors                  if @{$self->authors};
+    $json->{author}             = $self->author                   if $self->author;
+    $json->{publisher}          = $self->publisher                if $self->publisher;
+    $json->{group}              = $self->group                    if $self->group;
+    $json->{version}            = $self->version                  if $self->version;
+    $json->{versionRange}       = $self->version_range->to_string if $self->version_range;
+    $json->{isExternal}         = $self->is_external              if JSON::PP::is_bool($self->is_external);
+    $json->{description}        = $self->description              if $self->description;
+    $json->{scope}              = $self->scope                    if $self->scope;
+    $json->{hashes}             = $self->hashes                   if @{$self->hashes};
+    $json->{licenses}           = $self->licenses                 if @{$self->licenses};
+    $json->{copyright}          = $self->copyright                if $self->copyright;
+    $json->{patentAssertions}   = $self->patent_assertions        if @{$self->patent_assertions};
+    $json->{cpe}                = $self->cpe                      if $self->cpe;
+    $json->{purl}               = $self->purl->to_string          if $self->purl;
+    $json->{omniborId}          = $self->omnibor_id               if @{$self->omnibor_id};
+    $json->{swhid}              = $self->swhid                    if @{$self->swhid};
+    $json->{swid}               = $self->swid                     if $self->swid;
+    $json->{modified}           = $self->modified                 if JSON::PP::is_bool($self->modified);
+    $json->{pedigree}           = $self->pedigree                 if $self->pedigree;
+    $json->{externalReferences} = $self->external_references      if @{$self->external_references};
+    $json->{components}         = $self->components               if @{$self->components};
+    $json->{evidence}           = $self->evidence                 if $self->evidence;
+    $json->{releaseNotes}       = $self->release_notes            if $self->release_notes;
+    $json->{modelCard}          = $self->model_card               if $self->model_card;
+    $json->{data}               = $self->data                     if @{$self->data};
+    $json->{cryptoProperties}   = $self->crypto_properties        if $self->crypto_properties;
+    $json->{properties}         = $self->properties               if @{$self->properties};
+    $json->{tags}               = $self->tags                     if @{$self->tags};
+    $json->{signature}          = $self->signature                if $self->signature;
 
     return $json;
 
@@ -191,11 +215,10 @@ Authors are common in components created through manual processes.
 Components created through automated means may have "manufacturer" method
 instead.
 
-=item C<bom_ref>, An optional identifier which can be used to reference the
-component elsewhere in the BOM. Every bom-ref must be unique within the
-BOM.
-Value SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid
-conflicts with BOM-Links.
+=item C<bom_ref>, An identifier which can be used to reference the component 
+elsewhere in the BOM. Every bom-ref must be unique within the BOM.
+Value SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts 
+with BOM-Links.
 
 =item C<components>, A list of software and hardware components included in
 the parent component. This is not a dependency tree. It provides a way to
@@ -233,16 +256,25 @@ and apache.org.
 
 =item C<hashes>, The hashes of the component.
 
+=item C<is_external>, Determine whether this component is external.
+An external component is one that is not part of an assembly, but is expected 
+to be provided by the environment, regardless of the component's C<scope>. This 
+setting can be useful for distinguishing which components are bundled with the 
+product and which can be relied upon to be present in the deployment 
+environment.
+This may be set to C<true> for runtime components only.
+For L<SBOM::CycloneDX::Metadata> C<component>, it must be set to C<false>.
+
 =item C<licenses>, Component License(s)
 
 =item C<manufacturer>, The organization that created the component.
 Manufacturer is common in components created through automated processes.
 Components created through manual means may have `@.authors` instead.
 
-=item C<mime_type>, The optional mime-type of the component. When used on
-file components, the mime-type can provide additional context about the kind
-of file being represented, such as an image, font, or executable. Some library
-or framework components may also have an associated mime-type.
+=item C<mime_type>, The mime-type of the component. When used on file 
+components, the mime-type can provide additional context about the kind of file 
+being represented, such as an image, font, or executable. Some library or 
+framework components may also have an associated mime-type.
 
 =item C<model_card>, AI/ML Model Card
 
@@ -254,13 +286,21 @@ a derivative of the original. A value of false indicates the component has
 not been modified from the original.
 
 =item C<name>, The name of the component. This will often be a shortened,
-single name of the component. Examples: commons-lang3 and jquery
+single name of the component.
+
+Examples: commons-lang3 and jquery
 
 =item C<omnibor_id>, Asserts the identity of the component using the
 OmniBOR Artifact ID. The OmniBOR, if specified, must be valid and conform
 to the specification defined at: L<https://www.iana.org/assignments/uri-schemes/prov/gitoid>.
 Refer to "evidence->identity" method to optionally provide evidence that
 substantiates the assertion of the component's identity.
+
+=item C<patent_assertions>, Component Patent(s).
+
+Patent Assertions. A list of assertions made regarding patents associated
+with this component or service. Assertions distinguish between ownership,
+licensing, and other relevant interactions with patents.
 
 =item C<pedigree>, Component pedigree is a way to document complex supply
 chain scenarios where components are created, distributed, modified,
@@ -287,7 +327,7 @@ specification defined at L<https://github.com/package-url/purl-spec>).
 Refer to "evidence->identity" method to optionally provide evidence
 that substantiates the assertion of the component's identity.
 
-=item C<release_notes>, Specifies optional release notes.
+=item C<release_notes>, Specifies release notes.
 
 =item C<scope>, Specifies the scope of the component. If scope is not
 specified, 'required' scope SHOULD be assumed by the consumer of the BOM.
@@ -302,8 +342,8 @@ repackager.
 =item C<swhid>, Asserts the identity of the component using the Software
 Heritage persistent identifier (SWHID). The SWHID, if specified, must be
 valid and conform to the specification defined at:
-L<https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.h
-tml>]. Refer to "evidence->identity" method to optionally provide evidence
+L<https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html>.
+Refer to "evidence->identity" method to optionally provide evidence
 that substantiates the assertion of the component's identity.
 
 =item C<swid>, Asserts the identity of the component using ISO-IEC 19770-2
@@ -319,6 +359,13 @@ available or cannot be determined for the component.
 
 =item C<version>, The component version. The version should ideally comply
 with semantic versioning but is not enforced.
+
+=item C<version_range>, Component Version Range. For an external component, 
+this specifies the accepted version range.
+The value must adhere to the Package URL Version Range syntax (vers), as 
+defined at L<https://github.com/package-url/vers-spec>
+May only be used if C<is_external> is set to C<true>.
+Must be used exclusively, either C<version> or C<version_range>, but not both.
 
 =back
 
@@ -346,6 +393,8 @@ with semantic versioning but is not enforced.
 
 =item $component->group
 
+=item $component->is_external
+
 =item $component->hashes
 
 =item $component->licenses
@@ -361,6 +410,8 @@ with semantic versioning but is not enforced.
 =item $component->name
 
 =item $component->omnibor_id
+
+=item $component->patent_assertions
 
 =item $component->pedigree
 
@@ -387,6 +438,8 @@ with semantic versioning but is not enforced.
 =item $component->type
 
 =item $component->version
+
+=item $component->version_range
 
 =back
 
@@ -420,7 +473,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

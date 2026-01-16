@@ -322,14 +322,46 @@ API
 
     Class::XSConstructor::get_metadata( $package )
         Get a copy of the metadata that Class::XSConstructor holds for the
-        package.
+        package. It is probably not wise to tamper with it too much, as it is
+        a recipe for segfaults.
 
-        If you tamper with the metadata (which you probably shouldn't as it's
-        inviting segfaults), you should call
-        `Your::Class->XSCON_CLEAR_CONSTRUCTOR_CACHE` afterwards. You may also
-        need to clear $Class::XSConstructor::BUILD_CACHE{$package} and
-        $Class::XSConstructor::DEMOLISH_CACHE{$package} as those are separate
-        caches.
+  Clearing Cached Data
+    The constructor and destructor methods created by Class::XSConstructor and
+    Class::XSDestructor cache a lot of data the first time they get called.
+
+    If you do any of the following after an object has already been
+    constructed, you will need to clear those caches.
+
+    *   Changing @ISA, including the @ISA for any ancestor packages.
+
+    *   Changing the metadata returned by `get_metadata`.
+
+    *   Defining a new `BUILD` or `DEMOLISH` method, or redefining an existing
+        one, in either your class or any ancestor or descendent class.
+
+    To clear all cached data:
+
+      # Clear the data cached in C structs by the constructor,
+      # including details of any attributes, plus the list of
+      # BUILD methods for Your::Class itself.
+      Your::Class->XSCON_CLEAR_CONSTRUCTOR_CACHE;
+  
+      # Clear the data cached in Perl data structures by the
+      # constructor. This is mostly used when `new` is called
+      # on a non-Class::XSConstructor class that inherits from
+      # a Class::XSConstructor class without overriding `new`.
+      %Class::XSAccessor::BUILD_CACHE = ();
+  
+      # Clear the data cached in C structs by the destructor. This
+      # is just the list of DEMOLISH methods for your class itself.
+      Your::Class->XSCON_CLEAR_DESTRUCTOR_CACHE
+        if Your::Class->can('XSCON_CLEAR_DESTRUCTOR_CACHE');
+  
+      # Clear the data cached in Perl data structures by the
+      # destructor. This is mostly used when `DESTROY` is called
+      # on a non-Class::XSConstructor class that inherits from
+      # a Class::XSConstructor class without overriding `DESTROY`.
+      %Class::XSAccessor::DEMOLISH_CACHE = ();
 
 CAVEATS
     Inheritance will automatically work if you are inheriting from another

@@ -6,31 +6,49 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014000';
+our $VERSION   = '0.015000';
 
-use constant _ATTRS => qw( caller this parents roles attributes strict constructor modifiers inhaled_from short_name is_struct plugins setup_steps_with_plugins delayed );
-use B::Hooks::AtRuntime   ();
-use Class::XSAccessor     { getters => [ _ATTRS ] };
-use Class::XSConstructor  [ undef, '_new' ], _ATTRS;
+use constant { true => !!1, false => !!0 };
+use Types::Common qw( -is -types to_TypeTiny );
+
+my $PackageTuple;
+BEGIN { $PackageTuple = Tuple[NonEmptyStr,Optional[Str]] };
+
+use constant _ATTRS => (
+	this                      => { isa => NonEmptyStr,              required => true },
+	attributes                => { isa => ArrayRef[HashRef|Object], default => [] },
+	caller                    => { isa => Maybe[NonEmptyStr],       default => undef },
+	constructor               => { isa => NonEmptyStr,              default => 'new' },
+	delayed                   => { isa => Maybe[ArrayRef[CodeRef]], default => [] },
+	inhaled_from              => { isa => Maybe[NonEmptyStr],       default => undef },
+	is_struct                 => { isa => Bool,                     default => false },
+	modifiers                 => { isa => Bool,                     default => false },
+	parents                   => { isa => ArrayRef[$PackageTuple],  default => [] },
+	plugins                   => { isa => ArrayRef[Tuple[Str,Any]], default => [] },
+	roles                     => { isa => ArrayRef[$PackageTuple],  default => [] },
+	setup_steps_with_plugins  => { isa => ArrayRef[NonEmptyStr],    default => [] },
+	strict                    => { isa => Bool,                     default => true },
+	short_name                => { isa => NonEmptyStr,              builder => '_build_short_name' },
+);
+
+use Class::XSReader       _ATTRS;
+use Class::XSConstructor  _ATTRS, '!!';
 use Class::XSDestructor;
-use Exporter::Tiny        qw( _croak );
-use List::Util 1.45       qw( any uniqstr );
-use Module::Runtime       qw( use_package_optimistically module_notional_filename require_module );
-use Scalar::Util          qw( blessed weaken );
-use Types::Common         qw( -is );
 
-BEGIN {
-	require MRO::Compat if $] < 5.010;
+use B                     ();
+use B::Hooks::AtRuntime   ();
+use List::Util 1.45       qw( uniqstr );
+use Marlin::Util          ();
+use Scalar::Util          ();
+use Sub::Accessor::Small  ();
+
+use constant {
+	_HAS_NATIVE_LEXICAL_SUB => !!( "$]" >= 5.037002 ),
+	_HAS_MODULE_LEXICAL_SUB => !!( "$]" >= 5.011002 and eval('require Lexical::Sub; 1') ),
+	_NEEDS_MRO_COMPAT       => !!( "$]" < 5.010 ),
 };
 
-BEGIN {
-	*_HAS_NATIVE_LEXICAL_SUB = ( "$]" >= 5.037002 )
-		? sub () { !!1 }
-		: sub () { !!0 };
-	*_HAS_MODULE_LEXICAL_SUB = ( "$]" >= 5.011002 and eval('require Lexical::Sub; 1') )
-		? sub () { !!1 }
-		: sub () { !!0 };
-};
+require MRO::Compat if _NEEDS_MRO_COMPAT;
 
 {
 	our %META;
@@ -38,8 +56,8 @@ BEGIN {
 	sub find_meta {
 		my $me   = shift;
 		my $for  = shift;
-		if ( my $class = blessed $for ) {
-			$for = $class;
+		if ( is_Object $for ) {
+			$for = ref $for;
 		}
 		if ( not exists $META{$for} ) {
 			$me->try_inhale( $for );
@@ -49,7 +67,7 @@ BEGIN {
 
 	sub store_meta {
 		my $me = shift;
-		if ( blessed $me ) {
+		if ( is_Object $me ) {
 			$META{$me->this} = $me;
 		}
 		else {
@@ -72,15 +90,12 @@ sub try_inhale {
 	# Native or already inhaled 
 	{
 		our %META;
-		return !!1 if $META{$k};
+		return true if $META{$k};
 	}
 	
 	# If class or role uses Mite, force Moose to be loaded
 	if ( my $mite = ${"${k}::USES_MITE"} ) {
-		if ( not $k->can('meta') ) {
-			require Carp;
-			Carp::carp("Marlin inhaled a non-MOP-enabled $mite: $k");
-		}
+		Marlin::Util::_carp "Marlin inhaled a non-MOP-enabled $mite: $k" unless $k->can('meta');
 		my $meta = $k->meta;
 		if ( $meta and $meta->isa('Moose::Meta::Class') ) {
 			$meta->make_immutable(
@@ -97,30 +112,27 @@ sub try_inhale {
 		$m && defined $m->{package} ? $m : undef;
 	} ) {
 		my @attrs = map {
-			my $attr = $_;
 			my %spec = (
 				is       => 'bare',
 				package  => $k,
-				slot     => $attr->{name},
-				%{ $attr->{spec} },
+				slot     => $_->{name},
+				%{ $_->{spec} },
+				isa      => $_->{type},
 			);
 			# minor hack
-			if ( exists $spec{alias} ) {
-				$spec{':Alias'} = delete $spec{alias};
-			}
+			$spec{':Alias'} = delete $spec{alias} if exists $spec{alias};
 			\%spec;
 		} @{ $xscon_meta->{params} or [] };
 		
-		__PACKAGE__->_new(
+		__PACKAGE__->new( {
 			this         => $k,
 			attributes   => \@attrs,
-			parents      => [ @{"$k\::ISA"} ],
-			roles        => [],
+			parents      => [ map [ $_ ], @{"$k\::ISA"} ],
 			strict       => $xscon_meta->{strict_params},
 			constructor  => "__Marlin_${k_short}_new", # ???
 			inhaled_from => 'Class::XSConstructor',
 			short_name   => $k_short,
-		)->store_meta;
+		} )->store_meta;
 		return 'Class::XSConstructor';
 	}
 	
@@ -132,8 +144,7 @@ sub try_inhale {
 		# Moose classes
 		if ( $moose_meta->isa('Moose::Meta::Class') ) {
 			if ( $moose_meta->is_mutable and $k ne 'Moose::Object' ) {
-				require Carp;
-				Carp::carp("Marlin inhaled a mutable Moose class: $k");
+				Marlin::Util::_carp "Marlin inhaled a mutable Moose class: $k";
 			}
 			
 			my @attrs = map {
@@ -142,7 +153,7 @@ sub try_inhale {
 					is       => $attr->{is} || 'bare',
 					package  => $attr->definition_context->{package} || $k,
 					slot     => $attr->name,
-					$attr->has_type_constraint ? ( isa => Types::Common::to_TypeTiny($attr->type_constraint) ) : (),
+					$attr->has_type_constraint ? ( isa => to_TypeTiny($attr->type_constraint) ) : (),
 					$attr->should_coerce ? ( coerce => 1 ) : (),
 					$attr->has_trigger ? ( trigger => $attr->trigger ) : (),
 					init_arg => $attr->init_arg,
@@ -153,16 +164,16 @@ sub try_inhale {
 				};
 			} $moose_meta->get_all_attributes;
 			
-			__PACKAGE__->_new(
+			__PACKAGE__->new( {
 				this         => $k,
 				attributes   => \@attrs,
-				parents      => [ @{"$k\::ISA"} ],
-				roles        => [ uniqstr( map { $_->name } @{ $moose_meta->roles } ) ],
+				parents      => [ map [ $_ ], @{"$k\::ISA"} ],
+				roles        => [ map [ $_ ], uniqstr( map { $_->name } @{ $moose_meta->roles } ) ],
 				strict       => !!Moose::Util::does_role($moose_meta, 'MooseX::StrictConstructor::Trait::Class'),
 				constructor  => $moose_meta->constructor_name,
 				inhaled_from => 'Moose',
 				short_name   => $k_short,
-			)->store_meta;
+			} )->store_meta;
 			
 			return 'Moose';
 		}
@@ -176,17 +187,17 @@ sub try_inhale {
 					package  => $attr->{definition_context}{package} || $k,
 					slot     => $name,
 					%$attr,
-					defined $attr->{isa} ? ( isa => Types::Common::to_TypeTiny($attr->{isa}) ) : (),
+					defined $attr->{isa} ? ( isa => to_TypeTiny $attr->{isa} ) : (),
 				};
 			} $moose_meta->get_attribute_list;
 			
 			require Marlin::Role;
-			'Marlin::Role'->_new(
+			'Marlin::Role'->new( {
 				this         => $k,
 				attributes   => \@attrs,
-				roles        => [ uniqstr( map { $_->name } @{ $moose_meta->get_roles } ) ],
+				roles        => [ map [ $_ ], uniqstr( map { $_->name } @{ $moose_meta->get_roles } ) ],
 				inhaled_from => 'Moose::Role',
-			)->store_meta;
+			} )->store_meta;
 			
 			return 'Moose::Role';
 		}
@@ -202,16 +213,16 @@ sub try_inhale {
 			map  { +{ slot => $_, package => $k, %{ $specs->{$_} } }; }
 			keys %$specs;
 		
-		__PACKAGE__->_new(
+		require Moo::Role;
+		__PACKAGE__->new( {
 			this         => $k,
 			attributes   => \@attr,
-			parents      => [ @{"$k\::ISA"} ],
-			roles        => [ keys %{ $Role::Tiny::APPLIED_TO{$k} } ],
+			parents      => [ map [ $_ ], @{"$k\::ISA"} ],
+			roles        => [ map [ $_ ], keys %{ $Role::Tiny::APPLIED_TO{$k} } ],
 			strict       => Moo::Role::does_role($maker, 'MooX::StrictConstructor::Role::Constructor::Base'),
-			constructor  => 'new',
 			inhaled_from => 'Moo',
 			short_name   => $k_short,
-		)->store_meta;
+		} )->store_meta;
 		
 		return 'Moo';
 	}
@@ -225,12 +236,12 @@ sub try_inhale {
 		}
 		
 		require Marlin::Role;
-		'Marlin::Role'->_new(
+		'Marlin::Role'->new( {
 			this         => $k,
 			attributes   => \@attr,
-			roles        => [ keys %{ $Role::Tiny::APPLIED_TO{$k} } ],
+			roles        => [ map [ $_ ], keys %{ $Role::Tiny::APPLIED_TO{$k} } ],
 			inhaled_from => 'Moo::Role',
-		)->store_meta;
+		} )->store_meta;
 		
 		return 'Moo::Role';
 	}
@@ -248,8 +259,8 @@ sub try_inhale {
 					is       => $attr->{is} || 'bare',
 					package  => eval { $attr->associated_class->name } || $k,
 					slot     => $attr->name,
-					defined $attr->{does} ? ( isa => Types::Common::ConsumerOf()->of($attr->{does}) ) : (),
-					defined $attr->{isa} ? ( isa => Types::Common::to_TypeTiny($attr->{isa}) ) : (),
+					defined $attr->{does} ? ( isa => ConsumerOf[ $attr->{does} ] ) : (),
+					defined $attr->{isa} ? ( isa => to_TypeTiny $attr->{isa} ) : (),
 					$attr->{coerce} ? ( coerce => 1 ) : (),
 					defined $attr->{trigger} ? ( trigger => $attr->{trigger} ) : (),
 					exists $attr->{init_arg} ? ( init_arg => $attr->{init_arg} ) : (),
@@ -260,16 +271,16 @@ sub try_inhale {
 				};
 			} $mouse_meta->get_all_attributes;
 			
-			__PACKAGE__->_new(
+			__PACKAGE__->new( {
 				this         => $k,
 				attributes   => \@attrs,
-				parents      => [ @{"$k\::ISA"} ],
-				roles        => [ uniqstr( map { $_->name } @{ $mouse_meta->roles } ) ],
+				parents      => [ map [ $_ ], @{"$k\::ISA"} ],
+				roles        => [ map [ $_ ], uniqstr( map { $_->name } @{ $mouse_meta->roles } ) ],
 				strict       => !!eval { $mouse_meta->strict_constructor },
 				constructor  => $mouse_meta->{constructor_name} || 'new',
 				inhaled_from => 'Mouse',
 				short_name   => $k_short,
-			)->store_meta;
+			} )->store_meta;
 			
 			return 'Mouse';
 		}
@@ -283,18 +294,18 @@ sub try_inhale {
 					package  => $k,
 					slot     => $name,
 					%$attr,
-					defined $attr->{does} ? ( isa => Types::Common::ConsumerOf->of($attr->{does}) ) : (),
-					defined $attr->{isa} ? ( isa => Types::Common::to_TypeTiny($attr->{isa}) ) : (),
+					defined $attr->{does} ? ( isa => ConsumerOf[ $attr->{does} ] ) : (),
+					defined $attr->{isa} ? ( isa => to_TypeTiny $attr->{isa} ) : (),
 				};
 			} $mouse_meta->get_attribute_list;
 			
 			require Marlin::Role;
-			'Marlin::Role'->_new(
+			'Marlin::Role'->new( {
 				this         => $k,
 				attributes   => \@attrs,
-				roles        => [ uniqstr( map { $_->name } @{ $mouse_meta->get_roles } ) ],
+				roles        => [ map [ $_ ], uniqstr( map { $_->name } @{ $mouse_meta->get_roles } ) ],
 				inhaled_from => 'Mouse::Role',
-			)->store_meta;
+			} )->store_meta;
 			
 			return 'Mouse::Role';
 		}
@@ -312,21 +323,24 @@ sub try_inhale {
 			};
 		} Class::Tiny->get_all_attributes_for( $k );
 		
-		__PACKAGE__->_new(
+		__PACKAGE__->new( {
 			this         => $k,
 			attributes   => \@attrs,
-			parents      => [ @{"$k\::ISA"} ],
-			roles        => [],
-			strict       => !!0,
-			constructor  => 'new',
+			parents      => [ map [ $_ ], @{"$k\::ISA"} ],
 			inhaled_from => 'Class::Tiny',
 			short_name   => $k_short,
-		)->store_meta;
+			strict       => false,
+		} )->store_meta;
 		
 		return 'Class::Tiny';
 	}
 	
-	return !!0;
+	return false;
+}
+
+sub _build_short_name {
+	( my $s = shift->this ) =~ s/(?:'|::)//g;
+	return $s;
 }
 
 sub can_lexical {
@@ -334,7 +348,7 @@ sub can_lexical {
 }
 
 sub _croaker {
-	return __PACKAGE__ . "::_croak";
+	return "Marlin::Util::_croak";
 }
 
 sub import {
@@ -344,7 +358,7 @@ sub import {
 	$me->do_setup;
 }
 
-my $_parse_package_list = sub {
+sub _parse_package_list {
 	my ( $class, $v ) = @_;
 	
 	my @r;
@@ -367,13 +381,13 @@ my $_parse_package_list = sub {
 	}
 	
 	return @r;
-};
+}
 
-my $_parse_attribute = sub {
+sub _parse_attribute {
 	my ( $class, $name, $ref ) = @_;
 	$ref ||= {};
 	
-	if ( blessed($ref) and $ref->DOES('Type::API::Constraint') ) {
+	if ( is_Object $ref and $ref->DOES('Type::API::Constraint') ) {
 		my $tc = $ref;
 		$ref = {
 			isa      => $tc,
@@ -383,13 +397,13 @@ my $_parse_attribute = sub {
 	elsif ( is_CodeRef $ref ) {
 		my $builder = $ref;
 		$ref = {
-			lazy     => !!1,
+			lazy     => true,
 			builder  => $builder,
 		};
 	}
 	
 	if ( $name =~ /^(.+)\!(\W*)$/ ) {
-		$ref->{required} = !!1;
+		$ref->{required} = true;
 		$name = $1 . $2;
 	}
 	elsif ( $name =~ /^(.+)\.(\W*)$/ ) {
@@ -402,7 +416,7 @@ my $_parse_attribute = sub {
 	}
 	
 	if ( $name =~ /^(.+)\?(\W*)$/ ) {
-		$ref->{predicate} = !!1;
+		$ref->{predicate} = true;
 		$name = $1 . $2;
 	}
 
@@ -415,80 +429,76 @@ my $_parse_attribute = sub {
 		$name = $1 . $2;
 	}
 	
-	_croak("Bad attribute name: $name") unless $name =~ /\A[^\W0-9]\w*\z/;
+	Marlin::Util::_croak("Bad attribute name: $name") unless $name =~ /\A[^\W0-9]\w*\z/;
 	
 	my $default_init_arg = exists( $ref->{constant} ) ? undef : $name;
 	return { is => 'ro', init_arg => $default_init_arg, %$ref, slot => $name };
-};
+}
 
-sub new {
-	my $class   = shift;
+sub BUILDARGS {
+	my $class = shift;
+	return $_[0] if ( @_ == 1 and is_HashRef $_[0] );
 	
-	my %arg = (
-		parents      => [],
-		roles        => [],
-		attributes   => [],
-		strict       => !!1,
-		modifiers    => !!0,
-		constructor  => 'new',
-		plugins      => [],
-		delayed      => [],
-	);
+	my %arg;
 	
 	while ( @_ ) {
 		my ( $k, $v, $has_v ) = ( shift );
 		if ( ref $_[0] or not defined $_[0] ) {
-			( $v, $has_v ) = ( shift, !!1 );
+			( $v, $has_v ) = ( shift, true );
 		}
 		
 		if ( $k =~ /^-(?:base|isa|parent|parents|extends)$/ ) {
-			( $v, $has_v ) = ( shift, !!1 ) unless $has_v;
-			_croak("Expected arrayref or hashref of parent classes") unless $v;
-			push @{ $arg{parents} }, $class->$_parse_package_list( $v );
+			( $v, $has_v ) = ( shift, true ) unless $has_v;
+			Marlin::Util::_croak("Expected arrayref or hashref of parent classes") unless $v;
+			push @{ $arg{parents} ||= [] }, $class->_parse_package_list( $v );
 		}
 		elsif ( $k =~ /^-(?:with|does|role|roles)$/ ) {
-			( $v, $has_v ) = ( shift, !!1 ) unless $has_v;
-			_croak("Expected arrayref or hashref of roles") unless $v;
-			push @{ $arg{roles} }, $class->$_parse_package_list( $v );
+			( $v, $has_v ) = ( shift, true ) unless $has_v;
+			Marlin::Util::_croak("Expected arrayref or hashref of roles") unless $v;
+			push @{ $arg{roles} ||= [] }, $class->_parse_package_list( $v );
 		}
 		elsif ( $k =~ /^-(?:class|self|this)$/ ) {
-			( $v, $has_v ) = ( shift, !!1 ) unless $has_v;
-			_croak("Expected scalarref to this class name") unless $v;
-			my @got = $class->$_parse_package_list( $v );
-			_croak("This class must have exactly one name") if @got != 1 || exists $arg{this};
+			( $v, $has_v ) = ( shift, true ) unless $has_v;
+			Marlin::Util::_croak("Expected scalarref to this class name") unless $v;
+			my @got = $class->_parse_package_list( $v );
+			Marlin::Util::_croak("This class must have exactly one name") if @got != 1 || exists $arg{this};
 			$arg{this} = $got[0][0];
 		}
 		elsif ( $k =~ /^-(?:caller)$/ ) {
-			( $v, $has_v ) = ( shift, !!1 ) unless $has_v;
-			my @got = $class->$_parse_package_list( $v );
-			_croak("Can be only one caller") if @got != 1 || exists $arg{caller};
+			( $v, $has_v ) = ( shift, true ) unless $has_v;
+			my @got = $class->_parse_package_list( $v );
+			Marlin::Util::_croak("Can be only one caller") if @got != 1 || exists $arg{caller};
 			$arg{caller} = $got[0][0];
 		}
 		elsif ( $k =~ /^-(?:constructor)$/ ) {
-			( $v, $has_v ) = ( shift, !!1 ) unless $has_v;
-			my @got = $class->$_parse_package_list( $v );
+			( $v, $has_v ) = ( shift, true ) unless $has_v;
+			my @got = $class->_parse_package_list( $v );
 			$arg{constructor} = $got[0][0];
 		}
 		elsif ( $k =~ /^-(?:(?:loose|sloppy)(?:_?constructor)?)$/ ) {
-			$arg{strict} = !!0;
+			$arg{strict} = false;
 		}
 		elsif ( $k =~ /^-(?:(?:strict)(?:_?constructor)?)$/ or $k eq '!!' ) {
-			$arg{strict} = !!1;
+			$arg{strict} = true;
 		}
 		elsif ( $k =~ /^-(?:modifiers?|mods?)$/ ) {
-			$arg{modifiers} = !!1;
+			$arg{modifiers} = true;
 		}
 		elsif ( $k =~ /^-(?:requires?)$/ ) {
-			( $v, $has_v ) = ( shift, !!1 ) unless $has_v;
-			_croak("Expected arrayref of required method names") unless is_ArrayRef $v;
+			( $v, $has_v ) = ( shift, true ) unless $has_v;
+			Marlin::Util::_croak("Expected arrayref of required method names") unless is_ArrayRef $v;
 			$arg{requires} = $v;
+		}
+		elsif ( $k =~ /^-/ ) {
+			( $v, $has_v ) = ( shift, true ) unless $has_v;
+			$arg{ substr( $k, 1 ) } = $v;
 		}
 		elsif ( $k =~ /^:(.+)$/ ) {
 			my $plugin = "Marlin::X::$1";
-			push @{ $arg{plugins} }, [ $plugin, $v ];
+			push @{ $arg{plugins} ||= [] }, [ $plugin, $v ];
 		}
 		else {
-			push @{ $arg{attributes} }, $class->$_parse_attribute( $k, $v );
+			push @{ $arg{attributes} ||= [] }, $class->_parse_attribute( $k, $v );
 		}
 	}
 	
@@ -496,11 +506,9 @@ sub new {
 		$arg{this} ||= $caller;
 	}
 	
-	_croak "Not sure what class to create" unless $arg{this};
+	Marlin::Util::_croak "Not sure what class to create" unless $arg{this};
 	
-	( $arg{short_name} = $arg{this} ) =~ s/(::|')//g;
-	
-	return $class->_new( \%arg );
+	return \%arg;
 }
 
 sub do_setup {
@@ -513,7 +521,7 @@ sub do_setup {
 		my ( $plugin, $opts ) = @$pair;
 		$handled{$plugin} ? next : ( $handled{$plugin} = $pair );
 		if ( is_HashRef $opts and $opts->{try} ) {
-			use_package_optimistically( $plugin );
+			Marlin::Util::_maybe_load_module( $plugin );
 			$pair->[2] = undef;
 			if ( $plugin->can('new') ) {
 				$pair->[2] = $plugin->new( %$opts, marlin => $me );
@@ -521,7 +529,7 @@ sub do_setup {
 			}
 		}
 		else {
-			require_module( $plugin );
+			Marlin::Util::_load_module( $plugin );
 			$pair->[2] = $plugin->new(
 				is_HashRef($opts) ? ( %$opts ) : (),
 				marlin => $me,
@@ -531,12 +539,14 @@ sub do_setup {
 	}
 	
 	for my $step ( @$steps ) {
-		my @args;
 		if ( $step =~ /^(.+)::(\w+)$/ ) {
 			my $plugin = $1;
-			push @args, $handled{$plugin}[2];
+			my $invocant = $handled{$plugin}[2] || $plugin;
+			$invocant->$step( $me );
 		}
-		$me->$step( @args );
+		else {
+			$me->$step;
+		}
 	}
 	
 	return $me;
@@ -564,7 +574,7 @@ sub setup_steps {
 sub mark_inc {
 	my $me = shift;
 	
-	my $file = module_notional_filename($me->this);
+	my $file = Marlin::Util::_module_notional_filename( $me->this );
 	$INC{$file} = __FILE__ unless defined $file;
 	
 	return $me;
@@ -583,7 +593,7 @@ sub setup_inheritance {
 	
 	my @parents = map {
 		my ( $pkg, $ver ) = @$_;
-		&use_package_optimistically( $pkg, defined($ver) ? $ver : () );
+		&Marlin::Util::_use_package_optimistically( $pkg, defined($ver) ? $ver : () );
 	} @{ $me->parents } or return $me;
 	my $ISA = do {
 		no strict 'refs';
@@ -600,7 +610,7 @@ sub setup_roles {
 	my @roles = uniqstr(
 		map {
 			my ( $pkg, $ver ) = @$_;
-			&use_package_optimistically( $pkg, defined($ver) ? $ver : () );
+			&Marlin::Util::_use_package_optimistically( $pkg, defined($ver) ? $ver : () );
 		} @{ $me->roles }
 	) or return $me;
 	
@@ -636,7 +646,7 @@ sub setup_roles {
 	my $existing;
 	for my $r ( @roles ) {
 		my $r_meta = $me->find_meta( $r );
-		if ( blessed $r_meta and $r_meta->isa('Marlin::Role') ) {
+		if ( is_Object $r_meta and $r_meta->isa('Marlin::Role') ) {
 			$existing ||= do {
 				my %e;
 				for my $attr ( @{ $me->attributes } ) {
@@ -705,7 +715,7 @@ sub canonicalize_attributes {
 	
 	require Marlin::Attribute;
 	@{ $me->attributes } = map {
-		blessed( $_ )
+		is_Object( $_ )
 			? $_
 			: Marlin::Attribute->new( %$_, package => $me->this, marlin => $me );
 	} @{ $me->attributes };
@@ -759,8 +769,12 @@ sub setup_constructor {
 sub setup_destructor {
 	my $me = shift;
 	
-	Class::XSDestructor->import( [ $me->this, 'DESTROY' ] )
-		if $me->this->can('DEMOLISH');
+	$me->delay( sub {
+		my $me = shift;
+		local $Class::XSDestructor::REDEFINE = 1;
+		Class::XSDestructor->import( [ $me->this, 'DESTROY' ] )
+			if $me->this->can('DEMOLISH');
+	} );
 	
 	return $me;
 }
@@ -947,17 +961,17 @@ sub _stringify_value {
 		return '...';
 	}
 	
-	my $isa = ( $attr and is_TypeTiny $attr->{isa} ) ? $attr->{isa} : Types::Common::Any;
+	my $isa = ( $attr and is_TypeTiny $attr->{isa} ) ? $attr->{isa} : Any;
 	
-	if ( $isa and $isa->is_a_type_of(Types::Common::Bool) and is_Bool $value ) {
+	if ( $isa and $isa->is_a_type_of(Bool) and is_Bool $value ) {
 		return $value ? 'true' : 'false';
 	}
 	
-	if ( $isa and $isa->is_a_type_of(Types::Common::Num) and is_Num $value ) {
+	if ( $isa and $isa->is_a_type_of(Num) and is_Num $value ) {
 		return 0 + $value;
 	}
 	
-	if ( $isa and $isa->is_a_type_of(Types::Common::Str) and is_Str $value ) {
+	if ( $isa and $isa->is_a_type_of(Str) and is_Str $value ) {
 		return is_SimpleStr( $value ) ? B::perlstring( $value ) : q{"..."};
 	}
 	
@@ -1033,8 +1047,7 @@ sub injected_metadata {
 	return $metadata;
 }
 
-1;
-
+__PACKAGE__
 __END__
 
 =pod

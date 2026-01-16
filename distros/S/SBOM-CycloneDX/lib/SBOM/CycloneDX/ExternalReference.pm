@@ -26,14 +26,21 @@ has hashes => (
     default => sub { SBOM::CycloneDX::List->new }
 );
 
+has properties => (
+    is      => 'rw',
+    isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::Property']],
+    default => sub { SBOM::CycloneDX::List->new }
+);
+
 sub TO_JSON {
 
     my $self = shift;
 
     my $json = {url => $self->url, type => $self->type};
 
-    $json->{comment} = $self->comment if $self->comment;
-    $json->{hashes}  = $self->hashes  if @{$self->hashes};
+    $json->{comment}    = $self->comment    if $self->comment;
+    $json->{hashes}     = $self->hashes     if @{$self->hashes};
+    $json->{properties} = $self->properties if @{$self->properties};
 
     return $json;
 
@@ -72,9 +79,17 @@ Properties:
 
 =over
 
-=item C<comment>, An optional comment describing the external reference
+=item C<comment>, A comment describing the external reference
 
 =item C<hashes>, The hashes of the external reference (if applicable).
+
+=item * C<properties>, Provides the ability to document properties in a name-value
+store. This provides flexibility to include data not officially supported in the
+standard without having to use additional namespaces or create extensions.
+Unlike key-value stores, properties support duplicate names, each potentially
+having different values. Property names of interest to the general public are
+encouraged to be registered in the CycloneDX Property Taxonomy. Formal
+registration is optional. See L<SBOM::CycloneDX::Property>
 
 =item C<type>, Specifies the type of external reference.
 
@@ -95,6 +110,8 @@ across BOMs.
 =item $external_reference->comment
 
 =item $external_reference->hashes
+
+=item $external_reference->properties
 
 =item $external_reference->type
 
@@ -132,7 +149,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

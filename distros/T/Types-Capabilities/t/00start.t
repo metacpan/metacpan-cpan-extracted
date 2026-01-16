@@ -27,12 +27,15 @@ my @modules = qw(
 	Carp
 	Class::Method::Modifiers
 	Module::Runtime
+	Path::Tiny
 	Sub::HandlesVia::CodeGenerator
 	Sub::HandlesVia::Handler
 	Test2::V0
 	Type::Library
 	Type::Tiny::Duck
 	Types::Common
+	Types::Path::Tiny
+	Types::TypeTiny
 );
 
 diag "\n####";

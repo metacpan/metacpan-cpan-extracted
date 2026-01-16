@@ -25,7 +25,7 @@ use Data::Dumper;
 BEGIN {
 	package Local::Foo;
 	use Class::XSConstructor qw( foo !! );
-	use Class::XSAccessor getters => [ qw( foo ) ];
+	use Class::XSReader qw( foo );
 };
 
 BEGIN {

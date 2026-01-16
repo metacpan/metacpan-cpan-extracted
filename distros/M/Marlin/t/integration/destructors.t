@@ -44,6 +44,20 @@ BEGIN {
 }
 
 do {
+	my $x = Local::Foo->new;
+
+	is( \@BUILD, [ 'Local::Foo' ] ) or diag Dumper \@BUILD;
+	is( \@DEMOLISH, [] ) or diag Dumper \@DEMOLISH;
+	is( +{%$x}, {} );
+};
+
+is( \@BUILD, [ 'Local::Foo' ] ) or diag Dumper \@BUILD;
+is( \@DEMOLISH, [ 'Local::Foo' ] ) or diag Dumper \@DEMOLISH;
+
+@BUILD = ();
+@DEMOLISH = ();
+
+do {
 	my $x = Local::Foo::Bar->new;
 
 	is( \@BUILD, [ 'Local::Foo', 'Local::Foo::Bar' ] ) or diag Dumper \@BUILD;

@@ -5,20 +5,31 @@ use warnings;
 package Marlin::Attribute;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014000';
+our $VERSION   = '0.015000';
 
-use parent 'Sub::Accessor::Small';
+BEGIN { our @ISA = 'Sub::Accessor::Small' };
 
-use B ();
-use Class::XSAccessor ();
-use Marlin ();
-use Scalar::Util ();
-use Types::Common ();
+use constant HAS_CXSA => eval {
+	require Class::XSAccessor;
+	Class::XSAccessor->VERSION( 1.19 );
+	1;
+};
+
+use B                     ();
+use Marlin                ();
+use Marlin::Util          qw( true false );
+use Scalar::Util          ();
+use Sub::Accessor::Small  ();
+use Types::Common         ();
 
 sub new {
 	my $class = shift;
-	my $me = $class->SUPER::new( @_ );
+	my $me = do {
+		local *canonicalize_opts = sub {};
+		$class->SUPER::new( @_ );
+	};
 	$me->_auto_apply_roles;
+	$me->canonicalize_opts;
 	Scalar::Util::weaken( $me->{marlin} );
 	return $me;
 }
@@ -28,7 +39,6 @@ sub _auto_apply_roles {
 	
 	my @roles = grep { /\A:/ } sort keys %$me or return;
 	
-	require Module::Runtime;
 	require Role::Tiny;
 	
 	my @with;
@@ -37,18 +47,17 @@ sub _auto_apply_roles {
 		my $opts = $me->{$role};
 		
 		if ( Types::Common::is_HashRef( $opts ) and $opts->{try} ) {
-			Module::Runtime::use_package_optimistically( $pkg );
+			Marlin::Util::_maybe_load_module( $pkg );
 			push @with, $pkg if Role::Tiny->is_role( $pkg );
 		}
 		else {
-			Module::Runtime::require_module( $pkg );
+			Marlin::Util::_load_module( $pkg );
 			push @with, $pkg;
 		}
 	}
 	
 	if ( @with ) {
 		Role::Tiny->apply_roles_to_object( $me, @with );
-		$me->canonicalize_opts;
 	}
 }
 
@@ -59,7 +68,7 @@ sub _croaker {
 
 sub accessor_kind  {
 	my $me = shift;
-	return 'Marlin';
+	$me->{_marlin} ? ref( $me->{_marlin} ) : 'Marlin';
 }
 
 sub canonicalize_opts {
@@ -77,7 +86,7 @@ sub canonicalize_constant {
 	if ( exists $me->{constant} ) {
 		
 		for my $opt ( qw/ writer predicate clearer builder default lazy trigger / ) {
-			Carp::croak("Option '$opt' does not make sense for a constant") if exists $me->{$opt};
+			Marlin::Util::_croak("Option '$opt' does not make sense for a constant") if exists $me->{$opt};
 		}
 		
 		# Quickly do coercions and check type constraint if provided.
@@ -91,24 +100,24 @@ sub canonicalize_constant {
 				$me->{constant} = $new_value;
 			}
 			else {
-				Carp::croak("Coercion result for constant value does not pass its own type constraint");
+				Marlin::Util::_croak("Coercion result for constant value does not pass its own type constraint");
 			}
 		}
 		
 		if ( ref $me->{constant} ) {
-			Carp::croak("Constant values must be non-references");
+			Marlin::Util::_croak("Constant values must be non-references");
 		}
 		elsif ( not $me->$check($me->{constant}) ) {
-			Carp::croak("Constant value fails its own type constraint");
+			Marlin::Util::_croak("Constant value fails its own type constraint");
 		}
 		
 		if ( defined $me->{init_arg} ) {
-			Carp::croak("Constants cannot have an init_arg defined");
+			Marlin::Util::_croak("Constants cannot have an init_arg defined");
 		}
 		$me->{init_arg} = undef;
 		
 		if ( defined $me->{storage} and $me->{storage} ne 'NONE' ) {
-			Carp::croak("Storage for constants must be NONE");
+			Marlin::Util::_croak("Storage for constants must be NONE");
 		}
 		
 		$me->{storage} = 'NONE';
@@ -127,14 +136,14 @@ sub canonicalize_storage {
 	}
 	
 	if ( $me->{storage} eq 'NONE' ) {
-		Carp::croak("Attribute storage NONE only applies to constants")
+		Marlin::Util::_croak("Attribute storage NONE only applies to constants")
 			unless exists $me->{constant};
 	}
 	elsif ( $me->{storage} eq 'HASH' or $me->{storage} eq 'PRIVATE' ) {
 		# These are fine
 	}
 	else {
-		Carp::croak("Unknown storage: " . $me->{storage});
+		Marlin::Util::_croak("Unknown storage: " . $me->{storage});
 	}
 }
 
@@ -162,10 +171,21 @@ sub inline_access_w {
 	my $val     = shift || '$_[1]';
 	
 	if ( $me->{storage} eq 'NONE' ) {
-		Carp::croak("Failed to inline writer code for constant " . $me->{slot});
+		Marlin::Util::_croak("Failed to inline writer code for constant " . $me->{slot});
 	}
 	
 	return $me->SUPER::inline_access_w( $selfvar, $val );
+}
+
+for my $type ( qw/accessor reader writer predicate clearer/ ) {
+	my $m = "has_simple_$type";
+	my $orig = Sub::Accessor::Small->can($m);
+	my $new = sub {
+		my $me = shift;
+		return false if $me->{storage} ne 'HASH';
+		return $me->$orig( @_ );
+	};
+	no strict 'refs'; *$m = $new;
 }
 
 my %cxsa_map = (
@@ -174,17 +194,6 @@ my %cxsa_map = (
 	writer     => 'setters',
 	predicate  => 'exists_predicates',
 );
-
-for my $type ( qw/accessor reader writer predicate clearer/ ) {
-	my $m = "has_simple_$type";
-	my $orig = Sub::Accessor::Small->can($m);
-	my $new = sub {
-		my $me = shift;
-		return !!0 if $me->{storage} ne 'HASH';
-		return $me->$orig( @_ );
-	};
-	no strict 'refs'; *$m = $new;
-}
 
 sub install_accessors {
 	my $me = shift;
@@ -197,16 +206,19 @@ sub install_accessors {
 		for my $type (qw( accessor reader writer predicate clearer )) {
 			next unless defined $me->{$type};
 			if ( $type eq 'reader' and !$me->${\"has_simple_$type"} and $me->xs_reader ) {
+				$me->{_implementation}{$me->{$type}} = 'CXSR';
 				next;
 			}
-			elsif ( exists $cxsa_map{$type} and $me->${\"has_simple_$type"} and !ref $me->{$type} and $me->{$type} !~ /^my\s+/ ) {
+			elsif ( HAS_CXSA and exists $cxsa_map{$type} and $me->${\"has_simple_$type"} and !ref $me->{$type} and $me->{$type} !~ /^my\s+/ ) {
 				$args_for_cxsa{$cxsa_map{$type}}{$me->{$type}} = $me->{slot};
+				$me->{_implementation}{$me->{$type}} = 'CXSA';
 			}
 			else {
 				$me->install_coderef($me->{$type}, $me->$type);
+				$me->{_implementation}{$me->{$type}} = 'Marlin';
 			}
 		}
-		Class::XSAccessor->import( class => $me->{package}, %args_for_cxsa ) if keys %args_for_cxsa;
+		Class::XSAccessor->import( class => $me->{package}, replace => 1, %args_for_cxsa ) if keys %args_for_cxsa;
 	}
 
 	if (defined $me->{handles}) {
@@ -240,6 +252,7 @@ sub install_accessors {
 				my ($target, $method) = splice(@pairs, 0, 2);
 				$me->xs_delegation( $target, $method )
 					or $me->install_coderef($target, $me->handles($method));
+				$me->{_implementation}{$target} ||= 'Marlin';
 			}
 		}
 	}
@@ -285,7 +298,7 @@ sub xs_delegation {
 	return if $target =~ /^my\s/;
 	
 	my ( $local_method, $handler_slot, $handler_method, $curried, $is_accessor ) =
-		( $target, $me->{slot}, undef, undef, !!0 );
+		( $target, $me->{slot}, undef, undef, false );
 	
 	if ( ref $method eq 'ARRAY' ) {
 		( $handler_method, my @c ) = @$method;
@@ -305,10 +318,11 @@ sub xs_delegation {
 		return if !defined $reader;
 		return if ref $reader;
 		return if $reader =~ /^my\s/;
-		( $handler_slot, $is_accessor ) = ( $reader, !!1 );
+		( $handler_slot, $is_accessor ) = ( $reader, true );
 	}
 	
 	require Class::XSDelegation;
+	$me->{_implementation}{$local_method} = 'CXSD';
 	Class::XSDelegation->import( \$me->{package}, [
 		$local_method,
 		$handler_slot,
@@ -322,11 +336,13 @@ sub install_constant {
 	my $me = shift;
 	my $val = $me->{constant};
 	
-	if ( Sub::Accessor::Small::_is_bool($val) ) {
+	if ( HAS_CXSA and Sub::Accessor::Small::_is_bool($val) ) {
 		Class::XSAccessor->import( class => $me->{package}, $val ? 'true' : 'false', [ $me->{reader} ] );
+		$me->{_implementation}{$me->{reader}} = 'CSXA';
 		return;
 	}
 	
+	$me->{_implementation}{$me->{reader}} = 'Marlin';
 	my $code = $me->inline_constant;
 	$me->install_coderef( $me->{reader}, eval "sub () { $code }" );
 }
@@ -383,7 +399,7 @@ sub xs_constructor_args {
 	
 	$opt->{slot_initializer} = $me->{slot_initializer} if $me->{slot_initializer};
 	$opt->{slot_initializer} = $me->writer if $me->{storage} ne 'HASH';
-	$opt->{undef_tolerant}   = !!1 if $me->{undef_tolerant};
+	$opt->{undef_tolerant}   = true if $me->{undef_tolerant};
 	
 	return ( $name . $req => $opt );
 }
@@ -420,4 +436,5 @@ sub injected_accessor_metadata {
 	return $metadata;
 }
 
-1;
+__PACKAGE__
+__END__

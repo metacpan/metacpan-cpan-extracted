@@ -91,7 +91,7 @@ sub eval_input_typemap_code {
 =head1 TODO
 
 Eventually, with better documentation and possible some cleanup,
-this could be part of C<ExtUtils::Typemaps>.
+this could be part of C<XS::Install::FrozenShit::Typemaps>.
 
 =cut
 

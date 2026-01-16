@@ -119,7 +119,7 @@ root component.
 =item C<notes>, Notes, observations, and other non-structured commentary
 describing the components pedigree.
 
-=item C<patches>, >A list of zero or more patches describing how the
+=item C<patches>, A list of zero or more patches describing how the
 component deviates from an ancestor, descendant, or variant. Patches may be
 complementary to commits or may be used in place of commits.
 
@@ -175,7 +175,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -7,7 +7,7 @@ package Class::XSReader;
 
 BEGIN {
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.021000';
+	our $VERSION   = '0.022000';
 	
 	if ( eval { require Types::Standard; 1 } ) {
 		Types::Standard->import(
@@ -95,7 +95,7 @@ sub import {
 		my $has_default = ( exists $spec{default} or defined $spec{builder} ) ? !!$spec{lazy} : 0;
 		my $has_type    = exists $spec{isa};
 		
-		my @args = (
+		my @XS_args = (
 			sprintf( '%s::%s', $package, exists($spec{reader}) ? $spec{reader} : $slot ),
 			$slot,
 			$has_default,
@@ -108,10 +108,10 @@ sub import {
 		
 		if (our $REDEFINE) {
 			no warnings 'redefine';
-			Class::XSConstructor::install_reader(@args);
+			Class::XSConstructor::install_reader( @XS_args );
 		}
 		else {
-			Class::XSConstructor::install_reader(@args);
+			Class::XSConstructor::install_reader( @XS_args );
 		}
 	}
 }

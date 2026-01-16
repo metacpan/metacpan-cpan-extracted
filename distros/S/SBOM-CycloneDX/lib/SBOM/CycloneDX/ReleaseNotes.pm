@@ -76,7 +76,7 @@ sub TO_JSON {
 
 =head1 NAME
 
-SBOM::CycloneDX::ReleaseNotes - Specifies optional release notes
+SBOM::CycloneDX::ReleaseNotes - Specifies release notes
 
 =head1 SYNOPSIS
 
@@ -87,7 +87,7 @@ SBOM::CycloneDX::ReleaseNotes - Specifies optional release notes
 
 =head1 DESCRIPTION
 
-L<SBOM::CycloneDX::ReleaseNotes> provides the optional release notes.
+L<SBOM::CycloneDX::ReleaseNotes> provides the release notes.
 
 =head2 METHODS
 
@@ -196,7 +196,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -249,6 +249,8 @@ sub _from_entries {
     die 'from_entries(): argument must be an array' unless ref $value eq 'ARRAY';
 
     my %result;
+    my @numeric_keys;
+    my $saw_non_numeric_key = 0;
     for my $entry (@$value) {
         my ($key, $val);
 
@@ -265,9 +267,36 @@ sub _from_entries {
             die 'from_entries(): entry must be an object or [key, value] tuple';
         }
 
+        if (!defined $key || ref $key) {
+            die 'from_entries(): key must be a string';
+        }
+
+        $key = "$key";
+
         die 'from_entries(): key must be a string' if !_is_string_scalar($key);
 
         $result{$key} = $val;
+
+        if ($key =~ /^\d+$/) {
+            push @numeric_keys, 0 + $key;
+        }
+        else {
+            $saw_non_numeric_key = 1;
+        }
+    }
+
+    if (@numeric_keys && !$saw_non_numeric_key) {
+        my %seen;
+        my $max_index = -1;
+        for my $index (@numeric_keys) {
+            next if $seen{$index}++;
+            $max_index = $index if $index > $max_index;
+        }
+
+        if ($max_index + 1 == scalar(keys %result) && $max_index + 1 == scalar(@numeric_keys)) {
+            my @array = map { $result{$_} } 0 .. $max_index;
+            return \@array;
+        }
     }
 
     return \%result;

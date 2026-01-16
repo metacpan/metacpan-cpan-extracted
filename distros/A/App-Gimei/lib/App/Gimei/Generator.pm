@@ -1,4 +1,4 @@
-use v5.36;
+use v5.40;
 
 package App::Gimei::Generator;
 
@@ -44,5 +44,3 @@ sub execute ( $self, $cache ) {
 
     return $word;
 }
-
-1;

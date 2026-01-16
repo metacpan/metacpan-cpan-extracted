@@ -12,8 +12,6 @@ use Class::Tiny qw (
 );
 
 sub BUILDARGS {
-    #my $class = shift;
-    #my %args = @_;
     my ( $class, %args ) = @_;
 
     $args{'seed'} //= time();
@@ -23,14 +21,14 @@ sub BUILDARGS {
 
 sub set_seed {
     my ( $self, $seed ) = @_;
-    $self->seed( $seed );
+    $self->seed($seed);
 }
 
 sub next_int {
     my ( $self, $size ) = @_;
 
-    my $rnum = (48_271 * $self->seed) % (2 << 31 -1);
-    $self->seed( $rnum );
+    my $rnum = ( 48_271 * $self->seed ) % ( 2 << 31 - 1 );
+    $self->seed($rnum);
 
     return $rnum % $size;
 }
@@ -38,7 +36,7 @@ sub next_int {
 sub sample {
     my ( $self, $aref ) = @_;
 
-    my $index = $self->next_int($#$aref + 1);
+    my $index = $self->next_int( $#$aref + 1 );
 
     return $aref->[$index];
 }

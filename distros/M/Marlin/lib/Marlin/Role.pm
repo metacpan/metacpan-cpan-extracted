@@ -6,15 +6,16 @@ use utf8;
 package Marlin::Role;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014000';
+our $VERSION   = '0.015000';
 
-use parent 'Marlin';
+# Marlin::Role is itself a Marlin class!
+use Marlin qw( requires ), -base => 'Marlin';
 
-use Exporter::Tiny qw( _croak );
-use Class::XSAccessor { getters => [ 'requires' ] };
-use Class::XSConstructor [ undef, '_new' ], 'requires';
-use Role::Tiny ();
-use Scalar::Util qw( blessed );
+use B                     ();
+use Exporter::Tiny        ();
+use Marlin::Util          ();
+use Role::Tiny            ();
+use Scalar::Util          qw( blessed );
 
 sub setup_steps {
 	my $me = shift;
@@ -38,7 +39,7 @@ sub setup_steps {
 sub sanity_check {
 	my $me = shift;
 	
-	_croak("Roles cannot have parent classes") if @{ $me->parents };
+	Marlin::Util::_croak("Roles cannot have parent classes") if @{ $me->parents };
 	
 	return $me;
 }
@@ -78,8 +79,7 @@ sub _make_modifier_imports {
 	} qw( before after around );
 }
 
-1;
-
+__PACKAGE__
 __END__
 
 =pod

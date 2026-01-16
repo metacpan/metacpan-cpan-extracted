@@ -27,7 +27,7 @@ Nothing is exported.  Use fully qualified variable names.
 =cut
 
 # Note that to reduce maintenance, $PrototypeRegexp is used
-# by ExtUtils::Typemaps, too!
+# by XS::Install::FrozenShit::Typemaps, too!
 our $PrototypeRegexp = "[" . quotemeta('\$%&*@;[]_') . "]";
 
 # These are all the line-based keywords which can appear in an XS file,

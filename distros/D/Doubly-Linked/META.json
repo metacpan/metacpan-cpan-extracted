@@ -49,6 +49,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Doubly-Linked"
       }
    },
-   "version" : "0.11",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

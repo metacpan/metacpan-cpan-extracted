@@ -5,12 +5,15 @@ use warnings;
 package MooseX::Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014000';
+our $VERSION   = '0.015000';
 
-use Marlin ();
-use Moose 2.2004 ();
-use Moose::Object ();
-use Moose::Util ();
+use Marlin                ();
+use Marlin::Util          ();
+use Moose 2.2004          ();
+use Moose::Object         ();
+use Moose::Util           ();
+use Scalar::Util          ();
+use Types::Common         ();
 
 BEGIN {
 	eval {
@@ -34,7 +37,7 @@ sub import {
 	my $caller = caller;
 	
 	my $caller_meta = Moose::Util::find_meta($caller)
-		or Marlin::_croak("Package '$caller' does not use Moose");
+		or Marlin::Util::_croak("Package '$caller' does not use Moose");
 	
 	if ( $caller_meta->isa('Class::MOP::Class') ) {
 		for my $method ( qw/ new does BUILDARGS BUILDALL DEMOLISHALL DESTROY / ) {	
@@ -49,13 +52,16 @@ my $made_shim = 0;
 sub Marlin::inject_moose_metadata {
 	my $me = shift;
 	
+	if ( $me->this eq 'Marlin' or $me->this eq 'Marlin::Role' ) {
+		# return;
+	}
+	
 	# Recurse to any parents or roles
 	for my $pkg ( @{ $me->parents }, @{ $me->roles } ) {
-		Module::Runtime::use_package_optimistically( $pkg->[0] );
+		Marlin::Util::_maybe_load_module( $pkg->[0] );
 		Marlin->find_meta( $pkg->[0] )->inject_moose_metadata;
 	}
 	
-	require Moose::Util;
 	return if Moose::Util::find_meta( $me->this );
 	
 	eval q{{{
@@ -94,11 +100,10 @@ sub Marlin::Role::inject_moose_metadata {
 	
 	# Recurse to other roles
 	for my $pkg ( @{ $me->roles } ) {
-		Module::Runtime::use_package_optimistically( $pkg->[0] );
+		Marlin::Util::_maybe_load_module( $pkg->[0] );
 		Marlin->find_meta( $pkg->[0] )->inject_moose_metadata;
 	}
 	
-	require Moose::Util;
 	return if Moose::Util::find_meta( $me->this );
 	
 	require Moose::Meta::Role;
@@ -127,7 +132,6 @@ sub Marlin::Attribute::inject_moose_metadata {
 		$tc = $tc->plus_coercions( Types::Common::Any(), $me->{coerce} );
 	}
 	
-	require Moose;
 	require Moose::Meta::Attribute;
 	require Moose::Meta::Method::Accessor;
 	
@@ -188,7 +192,6 @@ sub Marlin::Attribute::inject_mooserole_metadata {
 		$tc = $tc->plus_coercions( Types::Common::Any(), $me->{coerce} );
 	}
 	
-	require Moose;
 	require Moose::Meta::Role::Attribute;
 	require Moose::Meta::Method::Accessor;
 	
@@ -235,8 +238,7 @@ sub Marlin::Attribute::inject_mooserole_metadata {
 	return $me->injected_metadata( Moose => $attr );
 }
 
-1;
-
+__PACKAGE__
 __END__
 
 =pod

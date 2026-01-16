@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from glpk.pd! Don't modify!
 #
 package PDL::Opt::GLPK;
 
@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.07';
+   our $VERSION = '0.08';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Opt::GLPK $VERSION;
@@ -22,7 +22,8 @@ use DynaLoader;
 
 
 
-#line 61 "glpk.pd"
+
+#line 62 "glpk.pd"
 
 use strict;
 use warnings;
@@ -96,7 +97,7 @@ BEGIN {
 	btrack presol rtest tmlim outdly tolbnd toldj tolpiv objll objul
 	tolint tolobj scale lpsolver save_pb save_fn);
 }
-#line 100 "GLPK.pm"
+#line 101 "GLPK.pm"
 
 		sub PDL::Opt::GLPK::glpk {
 			my $parms = ref($_[-1]) eq 'HASH' ? pop @_ : {};

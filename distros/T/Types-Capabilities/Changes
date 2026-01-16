@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/Types-Capabilities>
 Bug tracker:  <https://github.com/tobyink/p5-types-capabilities/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.003000	2026-01-15
+
+ - Add coercions from FileHandle, File, and CodeRef.
+ - Change internal structure of coerced objects to allow them to point back
+   to (and thus alter when necessary) the arrayref they were coerced from.
+
 0.002001	2025-11-15
 
  - Bugfixes for some stack/queue methods.

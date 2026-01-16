@@ -6,7 +6,7 @@ use Class::XSConstructor ();
 package Class::XSDelegation;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.021000';
+our $VERSION   = '0.022000';
 
 sub import {
 	my $class = shift;
@@ -21,7 +21,7 @@ sub import {
 		my ( $methodname, $handler_slot, $handler_method, $opts ) = @$delegation;
 		$opts ||= {};
 		
-		my @args = (
+		my @XS_args = (
 			"$package\::$methodname",
 			$handler_slot,
 			$handler_method,
@@ -32,10 +32,10 @@ sub import {
 		
 		if (our $REDEFINE) {
 			no warnings 'redefine';
-			Class::XSConstructor::install_delegation(@args);
+			Class::XSConstructor::install_delegation( @XS_args );
 		}
 		else {
-			Class::XSConstructor::install_delegation(@args);
+			Class::XSConstructor::install_delegation( @XS_args );
 		}
 	}
 }

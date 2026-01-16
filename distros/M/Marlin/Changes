@@ -6,6 +6,30 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.015000	2026-01-15
+
+ [ Bug Fixes ]
+ - Constructing a new Marlin::Attribute object with added traits won't
+   cause canonicalize_opts to be called twice.
+ - Delay installation of DESTROY until after class has finished compiling;
+   otherwise DEMOLISH methods might still not be defined yet.
+
+ [ Test Suite ]
+ - Improved tests for DESTROY.
+
+ [ Other ]
+
+ - Eliminated dependency on Class::XSAccessor, though it is still listed as
+   a dependency in META.json because it improves runtime speed when
+   installed. In the future, when Class::XSConstructor is able to provide
+   more accessor-like methods, Class::XSAccessor may be listed as a
+   recommendation rather than a requirement.
+ - Eliminated dependency on Module::Runtime.
+ - Factor out common parts of Marlin extensions into Marlin::X, a role for
+   use by people writing Marlin extensions.
+ - Significant internal refactoring and code tidying, including dogfooding
+   a lot of the modules.
+
 0.014000	2026-01-13
 
  [ Packaging ]

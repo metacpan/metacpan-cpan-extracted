@@ -1,5 +1,9 @@
 Revision history for Doubly
 
+0.11    2026-01-15
+	- Finally Fix memory leaks!!
+	- Add benchmark <-- you should use this version
+
 0.01    2025-05-13
 	Test release to see OS support for a basic example
 

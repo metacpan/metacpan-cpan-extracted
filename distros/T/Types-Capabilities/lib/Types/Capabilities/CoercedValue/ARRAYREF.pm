@@ -5,14 +5,15 @@ use warnings;
 package Types::Capabilities::CoercedValue::ARRAYREF;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002001';
+our $VERSION   = '0.003000';
 
-use Types::Common qw( ArrayRef ArrayLike HasMethods );
+use Types::Common qw( ArrayRef ArrayLike assert_ArrayLike HasMethods );
 
 sub new {
-	my $class = shift;
-	my $new = bless [ @{+shift} ], $class;
-	&Internals::SvREADONLY($new, 1);
+	my ( $class, $data ) = @_;
+	assert_ArrayLike( $data );
+	my $new = bless \$data, $class;
+	Internals::SvREADONLY( $new, 1 );
 	return $new;
 }
 
@@ -27,8 +28,12 @@ sub _coercions {
 	);
 }
 
+sub __TO_ARRAYREF__ {
+	my ( $self ) = @_;
+	return $$self;
+}
+
 no Types::Common;
 
-1;
-
+__PACKAGE__
 __END__

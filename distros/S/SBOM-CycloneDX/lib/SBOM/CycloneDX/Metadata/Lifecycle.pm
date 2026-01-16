@@ -20,7 +20,7 @@ sub BUILD {
     Carp::croak('"description" without "name"') if exists $args->{phase} && exists $args->{description};
 }
 
-has phase       => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->LIFECYCLE_PHASE()]);
+has phase       => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->LIFECYCLE_PHASES()]);
 has name        => (is => 'rw', isa => Str);
 has description => (is => 'rw', isa => Str);
 
@@ -115,7 +115,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

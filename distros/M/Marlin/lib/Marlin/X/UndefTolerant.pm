@@ -5,14 +5,12 @@ use warnings;
 package Marlin::X::UndefTolerant;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014000';
+our $VERSION   = '0.015000';
 
-use Types::Common -types;
-use Marlin
-	# All Marlin::X::* plugins need to accept these attributes
-	marlin      => { isa => Object,  required => !!1, },
-	try         => { isa => Bool,    default => !!0, },
-	;
+use Marlin::Util          qw( true false );
+use Types::Common         qw( -types );
+
+use Marlin -with => 'Marlin::X';
 
 sub adjust_setup_steps {
 	my $plugin = shift;
@@ -20,8 +18,10 @@ sub adjust_setup_steps {
 	
 	my $callback = __PACKAGE__ . '::setup_for_undef_tolerant';
 	
-	# Insert the step 'setup_for_undef_tolerant' directly
-	# after 'canonicalize_attributes'.
+	# Insert the 'setup_for_undef_tolerant' step directly
+	# after 'canonicalize_attributes'. We want the attributes
+	# to be in a predicatable format, but we don't want them
+	# to have been used for anything yet!
 	@$steps = map {
 		( $_ eq 'canonicalize_attributes' )
 			? ( 'canonicalize_attributes', $callback )
@@ -30,14 +30,14 @@ sub adjust_setup_steps {
 };
 
 sub setup_for_undef_tolerant {
-	my $marlin = shift;
 	my $plugin = shift;
+	my $marlin = shift;
 	
 	# Loop through attributes...
 	for my $attr ( @{ $marlin->attributes } ) {
 		
 		# Skip attributes which have it explicitly set to true or false.
-		next if exists($attr->{undef_tolerant});
+		next if exists $attr->{undef_tolerant};
 		
 		# Skip attributes which aren't initialized in the constructor.
 		next if exists($attr->{init_arg}) && !defined($attr->{init_arg});
@@ -50,13 +50,14 @@ sub setup_for_undef_tolerant {
 		next if $type && $type->check(undef);
 		
 		# If we got this far, default the attribute to be undef-tolerant.
-		$attr->{undef_tolerant} = !!1;
+		$attr->{undef_tolerant} = true;
 	}
 	
 	return $marlin;
 }
 
-1;
+__PACKAGE__
+__END__
 
 =pod
 

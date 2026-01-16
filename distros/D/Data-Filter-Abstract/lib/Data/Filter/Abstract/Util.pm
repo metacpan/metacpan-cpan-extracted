@@ -52,7 +52,7 @@ sub simple_sub {
     elsif (0 == (scalar @_ % 2) && scalar @_ > 2) {
 	my @args = @_; my @r;
 	while (@args) { push @r, simple_sub((shift @args), shift(@args)) }
-	return sprintf "%s", join " && ", @r;
+	return sprintf "(%s)", join " && ", @r;
     }
 
     unless ($v) { $v = $k; $k = undef }
@@ -64,7 +64,7 @@ sub simple_sub {
 	    return equality_op($k, $v)
 	};
 	/^HASH$/ && do {
-	    return join " && ", map { is_equality_op({ $_, $v->{$_} }) ? simple_sub($k => { $_, $v->{$_} }) : simple_sub($_ => $v->{$_}) } sort keys $v->%*;
+	    return sprintf "(%s)", join " && ", map { is_equality_op({ $_, $v->{$_} }) ? simple_sub($k => { $_, $v->{$_} }) : simple_sub($_ => $v->{$_}) } sort keys $v->%*;
 	};
 	/^ARRAY$/ && ($r = (logical_array($k, $v))) && do {
 	    return $r
@@ -85,17 +85,23 @@ sub simple_sub {
 
 sub simple_hash {
     my ($v) = @_;
-    return join " && ", map { simple_sub($_, $v->{$_}) } sort keys $v->%*
+    return ((scalar keys $v->%*) > 1) ?
+	sprintf "(%s)", join " && ", map { simple_sub($_, $v->{$_}) } sort keys $v->%* :
+	sprintf  "%s",  join " && ", map { simple_sub($_, $v->{$_}) } sort keys $v->%*;
 }
 
 sub simple_array {
     my ($k, $v) = @_;
-    return join " || ", map { simple_sub($k, $_) } $v->@*
+    return ((scalar $v->@*) > 1) ?
+	sprintf "(%s)", join " || ", map { simple_sub($k, $_) } $v->@* :
+	sprintf  "%s",  join " || ", map { simple_sub($k, $_) } $v->@* ;
 }
 
 sub simple_function_hash {
     my ($k, $v) = @_;
-    return join " && ", map { simple_sub($k, { $_, $v->{$_} }) } sort keys $v->%*;
+    return ((scalar keys $v->%*) > 1) ?
+	sprintf "(%s)", join " && ", map { simple_sub($k, { $_, $v->{$_} }) } sort keys $v->%* :
+	sprintf  "%s",  join " && ", map { simple_sub($k, { $_, $v->{$_} }) } sort keys $v->%* ;
 }
 
 sub logical_array {
@@ -105,47 +111,71 @@ sub logical_array {
     return unless $ops->{$v[0]};
     my $l = $ops->{(shift @v)};
     die sprintf "Using array as arg with logical op is not permitted\n", $k if ref $v[0] eq "ARRAY";
-    return join $l, map { simple_sub($k, $_) } @v;
+    return sprintf "(%s)", join $l, map { simple_sub($k, $_) } @v;
 }
+
+# ------------------------------------------------------------
+# Equality ops
+# ------------------------------------------------------------
+
+sub equality_op_string {
+    my ($k, $v) = @_;
+    my $values = (values $v->%*)[0];
+    if (ref($values) eq "ARRAY") {
+	return simple_array($k, (values $v->%*))
+    }
+    elsif (!defined ((values $v->%*)[0]) ) {
+	my ($o, $d) = $v->%*;
+	croak "Use of %s and undef in filter is not allowed", $o unless $o eq 'ne' or $o eq 'eq';
+	return sprintf '(%sdefined $_->{%s})', ($o eq 'ne' ? '' : '!'), key_q($k);
+    }
+    else {
+	return sprintf "(%s)", join " && ", map { sprintf '($_->{%s} %s %s)', key_q($k), $_, var_q($v->{$_}) } keys $v->%*
+    }
+}
+
+sub equality_op_numeric {
+    my ($k, $v) = @_;
+    my $values = (values $v->%*)[0];
+    if (ref($values) eq "ARRAY") {
+	return simple_array($k, (values $v->%*))
+    }
+    elsif (!defined ((values $v->%*)[0]) ) {
+	my ($o, $d) = $v->%*;
+	croak "Use of %s and undef in filter is not allowed", $o unless $o eq '!=' or $o eq '==';
+	return sprintf "(%s)", sprintf '(%sdefined $_->{%s})', ($o eq '!=' ? '' : '!'), key_q($k);
+    }
+    else {
+	return sprintf "(%s)", join " && ", map { sprintf '($_->{%s} %s %s)', key_q($k), $_, $v->{$_} } keys $v->%*
+    }
+}
+
+sub equality_op_regex {
+    my ($k, $v) = @_;
+    my $values = (values $v->%*)[0];
+
+    if (ref($values) eq "ARRAY") {
+	return simple_array($k, [ map { ref $_ eq "Regexp" ? $_ : qr/$_/ } $values->@* ])
+    }
+    else {
+	return join " && ", map {
+	    my $re = ref ($v->{$_}) eq "Regexp" ? $v->{$_} : qr/$v->{$_}/;
+	    sprintf '($_->{%s} %s qr/%s/%s)', key_q($k), $_, regexp_pattern($re)} keys $v->%*;
+    }
+}
+
 
 sub equality_op {
     my ($k, $v) = @_;
     my $values = (values $v->%*)[0];
     if (is_equality_op($v) eq 'string') {
-	if (ref($values) eq "ARRAY") {
-	    return simple_array($k, (values $v->%*))
-	}
-	elsif (!defined ((values $v->%*)[0]) ) {
-	    my ($o, $d) = $v->%*;
-	    croak "Use of %s and undef in filter is not allowed", $o unless $o eq 'ne' or $o eq 'eq';
-	    return sprintf '(%sdefined $_->{%s})', ($o eq 'ne' ? '' : '!'), key_q($k);
-	}
-	else {
-	    return join " && ", map { sprintf '($_->{%s} %s %s)', key_q($k), $_, var_q($v->{$_}) } keys $v->%*
-	}
+	return equality_op_string($k, $v);
     }
     elsif (is_equality_op($v) eq 'numeric') {
-	if (ref($values) eq "ARRAY") {
-	    return simple_array($k, (values $v->%*))
-	}
-	elsif (!defined ((values $v->%*)[0]) ) {
-	    my ($o, $d) = $v->%*;
-	    croak "Use of %s and undef in filter is not allowed", $o unless $o eq '!=' or $o eq '==';
-	    return sprintf '(%sdefined $_->{%s})', ($o eq '!=' ? '' : '!'), key_q($k);
-	}
-	else {
-	    return join " && ", map { sprintf '($_->{%s} %s %s)', key_q($k), $_, $v->{$_} } keys $v->%*
-	}
+	return equality_op_numeric($k, $v)
     }
     elsif (is_equality_op($v) eq 'regexp') {
-	if (ref($values) eq "ARRAY") {
-	    return simple_array($k, [ map { ref $_ eq "Regexp" ? $_ : qr/$_/ } $values->@* ])
-	}
-	else {
-	    return join " && ", map {
-		my $re = ref ($v->{$_}) eq "Regexp" ? $v->{$_} : qr/$v->{$_}/;
-		sprintf '($_->{%s} %s qr/%s/%s)', key_q($k), $_, regexp_pattern($re)} keys $v->%*;
-	}
+	return equality_op_regex($k, $v)
     }
     else {
 	croak "Unhandled operator %s", keys $v->%*;

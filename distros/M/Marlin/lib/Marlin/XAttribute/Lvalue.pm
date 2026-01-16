@@ -5,14 +5,16 @@ use warnings;
 package Marlin::XAttribute::Lvalue;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014000';
+our $VERSION   = '0.015000';
 
-use attributes ();
-use Class::XSAccessor ();
-use Eval::TypeTiny ();
-use LV ();
+use B                     ();
+use Eval::TypeTiny        ();
+use LV                    ();
+use Marlin::Attribute     ();
+use Scalar::Util          ();
 
-use Role::Tiny;
+# This is just a Marlin::Role which will be applied to Marlin::Attribute
+use Marlin::Role;
 
 after canonicalize_is => sub {
 	my $me = shift;
@@ -50,7 +52,7 @@ after install_accessors => sub {
 	my $pkg = $me->{package};
 	my $method_name = $me->{':Lvalue'}{method_name};
 	
-	if ( $me->has_simple_accessor ) {
+	if ( Marlin::Attribute::HAS_CXSA and $me->has_simple_accessor ) {
 		Class::XSAccessor->import(
 			class            => $pkg,
 			lvalue_accessors => { $method_name => $me->{slot} },
@@ -89,8 +91,7 @@ after injected_metadata => sub {
 	
 		if ( not eval { require MooseX::LvalueAttribute; 1 } ) {
 			if ( not $missing_mxlva_warning++ ) {
-				require Carp;
-				Carp::carp('MooseX::LvalueAttribute is not installed');
+				Marlin::Util::_carp 'MooseX::LvalueAttribute is not installed';
 			}
 			return;
 		}
@@ -128,8 +129,7 @@ after injected_metadata => sub {
 	}
 };
 
-1;
-
+__PACKAGE__
 __END__
 
 =pod

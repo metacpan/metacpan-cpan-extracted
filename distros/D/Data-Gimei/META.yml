@@ -1,5 +1,5 @@
 ---
-abstract: "a Perl port of Ruby's gimei generates fake data in Japanese."
+abstract: "A Perl module ported from Ruby's gimei that randomly generates Japanese names and addresses."
 author:
   - 'NAKAJIMA Yusaku < youpong@cpan.org >'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Data::Gimei:
     file: lib/Data/Gimei.pm
-    version: v0.4.3
+    version: v0.4.5
   Data::Gimei::Address:
     file: lib/Data/Gimei/Address.pm
   Data::Gimei::Name:
@@ -45,10 +45,10 @@ resources:
   bugtracker: https://github.com/youpong/Data-Gimei/issues
   homepage: https://github.com/youpong/Data-Gimei
   repository: https://github.com/youpong/Data-Gimei.git
-version: v0.4.3
+version: v0.4.5
 x_authority: cpan:YOUPONG
 x_contributors:
   - 'NAKAJIMA Yusaku <yupong7@gmail.com>'
   - 'youpong <43817652+youpong@users.noreply.github.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

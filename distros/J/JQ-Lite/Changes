@@ -1,3 +1,15 @@
+2.18  2026-01-16
+
+  - Improve from_entries() to handle numeric keys by normalizing them to strings,
+    allowing array indexes and numeric object keys to be processed correctly.
+
+  - Add round-trip coverage for arrays via to_entries | from_entries, ensuring
+    sequential numeric keys (0..n-1) are reconstructed as arrays rather than
+    plain objects.
+
+  - Add regression tests for numeric key handling in from_entries(), including
+    non-sequential keys and collisions between "0" and 0 (last-write-wins).
+
 2.17  2026-01-16
 
   - Normalize group_count() path handling to accept dotted paths and full-item
@@ -1363,6 +1375,7 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
 
 
 

@@ -5,17 +5,20 @@ use warnings;
 package Marlin::XAttribute::LocalWriter;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014000';
+our $VERSION   = '0.015000';
 
-use Eval::TypeTiny ();
-use Role::Tiny;
+use Eval::TypeTiny        ();
+use Marlin::Util          qw( true false );
+
+# This is just a Marlin::Role which will be applied to Marlin::Attribute
+use Marlin::Role;
 
 after canonicalize_is => sub {
 	my $me = shift;
 	
 	if ( not ref $me->{':LocalWriter'} ) {
 		my $method_name = $me->{':LocalWriter'};
-		$me->{':LocalWriter'} = { method_name => $method_name, try => !!0 };
+		$me->{':LocalWriter'} = { method_name => $method_name, try => false };
 	}
 
 	if ( $me->{':LocalWriter'}{method_name} eq 1 ) {
@@ -68,8 +71,7 @@ after install_accessors => sub {
 	$me->install_coderef( $method_name, $coderef );
 };
 
-1;
-
+__PACKAGE__
 __END__
 
 =pod

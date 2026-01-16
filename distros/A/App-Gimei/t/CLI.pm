@@ -1,4 +1,4 @@
-use v5.36;
+use v5.40;
 
 package t::CLI;
 
@@ -19,5 +19,3 @@ sub run ( $class, @args ) {
 
     return $self;
 }
-
-1;

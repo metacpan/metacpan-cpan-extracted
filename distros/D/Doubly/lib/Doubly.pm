@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 require XSLoader;
 XSLoader::load('Doubly', $VERSION);
@@ -19,7 +19,7 @@ Doubly - Doubly linked lists
 
 =head1 VERSION
 
-Version 0.10
+Version 0.09
 
 =cut
 
@@ -186,7 +186,52 @@ Itterate the list from the start until a match is found for the cb.
 	$list = $list->find(sub { (ref $_[0] || "") eq 'HASH' && $_[0]->{a} == 1 ? 1 : 0 });
 
 
-=head1 SUBROUTINES/METHODS
+=head1 BENCHMARKS
+
+	my $r = timethese(100000, {
+		'Doubly::Linked' => sub {
+			my $linked = Doubly::Linked->new(123);
+			$linked->bulk_add(0..1000);
+			$linked = $linked->end;
+			$linked->is_end;
+			$linked = $linked->start;
+			$linked->is_start;
+			$linked->add(789);
+			$linked->destroy; # important
+		},
+		'Doubly::Linked::PP' => sub {
+			my $linked = Doubly::Linked::PP->new(123);
+			$linked->bulk_add(0..1000);
+			$linked = $linked->end;
+			$linked->is_end;
+			$linked = $linked->start;
+			$linked->is_start;
+			$linked->add(789);
+			$linked->destroy;
+		},
+		'Doubly' => sub {
+			my $linked = Doubly->new(123);
+			$linked->bulk_add(0..1000);
+			$linked = $linked->end;
+			$linked->is_end;
+			$linked = $linked->start;
+			$linked->is_start;
+			$linked->add(789);
+			$linked->destroy; # important
+		}
+	});
+
+	cmpthese $r;
+
+	Benchmark: timing 100000 iterations of Doubly, Doubly::Linked, Doubly::Linked::PP...
+	    Doubly: 2.70105 wallclock secs ( 2.43 usr +  0.23 sys =  2.66 CPU) @ 37593.98/s (n=100000)
+	Doubly::Linked: 25.6334 wallclock secs (23.54 usr +  1.88 sys = 25.42 CPU) @ 3933.91/s (n=100000)
+	Doubly::Linked::PP: 190.169 wallclock secs (189.59 usr +  0.19 sys = 189.78 CPU) @ 526.93/s (n=100000)
+			      Rate Doubly::Linked::PP   Doubly::Linked            Doubly
+	Doubly::Linked::PP   527/s                 --             -87%              -99%
+	Doubly::Linked      3934/s               647%               --              -90%
+	Doubly             37594/s              7035%             856%                --
+
 
 =head1 AUTHOR
 

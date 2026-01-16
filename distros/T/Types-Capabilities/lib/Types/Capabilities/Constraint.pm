@@ -5,7 +5,7 @@ use warnings;
 package Types::Capabilities::Constraint;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002001';
+our $VERSION   = '0.003000';
 
 use parent 'Type::Tiny::Duck';
 use Carp ();
@@ -14,6 +14,7 @@ use Module::Runtime ();
 my $bc = sub {
 	my $c = shift;
 	my $t = $c->type_constraint;
+	
 	my @c = $t->{autobox}->_coercions;
 	while ( @c ) {
 		my $from_type = shift @c;
@@ -22,6 +23,33 @@ my $bc = sub {
 			$c->add_type_coercions( $from_type, $code );
 		}
 	}
+	
+	{
+		my $fh_class = q{Types::Capabilities::CoercedValue::FILEHANDLE};
+		Module::Runtime::require_module( $fh_class );
+		my @missing_methods = grep { not $fh_class->can($_) } @{ $t->methods };
+		if ( not @missing_methods ) {
+			require Types::Common;
+			require Types::Path::Tiny;
+			$c->add_type_coercions(
+				Types::Common::FileHandle(), qq{"$fh_class"->new(\$_)},
+				Types::Path::Tiny::File(),   qq{"$fh_class"->new(\$_)},
+			);
+		}
+	}
+
+	{
+		my $code_class = q{Types::Capabilities::CoercedValue::CODEREF};
+		Module::Runtime::require_module( $code_class );
+		my @missing_methods = grep { not $code_class->can($_) } @{ $t->methods };
+		if ( not @missing_methods ) {
+			require Types::Common;
+			$c->add_type_coercions(
+				Types::Common::CodeRef(), qq{"$code_class"->new(\$_)},
+			);
+		}
+	}
+	
 	return $c;
 };
 
@@ -87,6 +115,5 @@ sub _resolve_autobox_class {
 	return;
 }
 
-1;
-
+__PACKAGE__
 __END__

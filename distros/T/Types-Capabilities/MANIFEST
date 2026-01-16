@@ -11,14 +11,18 @@ README
 SIGNATURE
 dist.ini
 doap.ttl
+examples/types.pl
 lib/Types/Capabilities.pm
 lib/Types/Capabilities/CoercedValue/ARRAYREF.pm
+lib/Types/Capabilities/CoercedValue/CODEREF.pm
+lib/Types/Capabilities/CoercedValue/FILEHANDLE.pm
 lib/Types/Capabilities/CoercedValue/QUEUE.pm
 lib/Types/Capabilities/CoercedValue/STACK.pm
 lib/Types/Capabilities/Constraint.pm
 t/00start.t
 t/01basic.t
 t/integration/intercoercion.t
+t/integration/queues.t
 t/integration/simple-test.t
 t/lib/Local/Example/Countable.pm
 t/lib/Local/Example/Dequeueable.pm
@@ -32,4 +36,5 @@ t/lib/Local/Example/Poppable.pm
 t/lib/Local/Example/Pushable.pm
 t/lib/Local/Example/Reversible.pm
 t/lib/Local/Example/Sortable.pm
+t/share/file.txt
 t/unit/Types/Capabilities.t

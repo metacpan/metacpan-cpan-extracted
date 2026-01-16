@@ -1,5 +1,11 @@
 Revision history for Perl extension Data-Gimei
 
+v0.4.5 2026-01-16T03:28:49Z
+    - update license
+
+v0.4.4 2026-01-16T02:43:29Z
+    - update Perl version in GitHub Actions
+
 v0.4.3 2024-07-12T07:10:34Z
     - update cpanfile
     - update Perl version in GitHub Actions

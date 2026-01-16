@@ -9,6 +9,7 @@ use SBOM::CycloneDX::CryptoProperties::AlgorithmProperties;
 use SBOM::CycloneDX::CryptoProperties::CertificateProperties;
 use SBOM::CycloneDX::CryptoProperties::RelatedCryptoMaterialProperties;
 use SBOM::CycloneDX::CryptoProperties::ProtocolProperties;
+use SBOM::CycloneDX::Enum;
 
 use Types::Standard qw(Str Enum InstanceOf);
 
@@ -17,7 +18,7 @@ use namespace::autoclean;
 
 extends 'SBOM::CycloneDX::Base';
 
-has asset_type => (is => 'rw', isa => Enum [qw(algorithm certificate protocol related-crypto-material)], required => 1);
+has asset_type => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->CRYPTO_ASSET_TYPES()], required => 1);
 
 has algorithm_properties => (
     is      => 'rw',
@@ -170,7 +171,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

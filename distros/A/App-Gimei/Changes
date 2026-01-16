@@ -1,5 +1,8 @@
 Revision history for Perl extension App-Gimei
 
+v0.2.9 2026-01-16T04:40:28Z
+    - bump perl v5.38
+
 v0.2.8 2024-07-12T05:04:22Z
     - support Getopt::Long-2.58
 

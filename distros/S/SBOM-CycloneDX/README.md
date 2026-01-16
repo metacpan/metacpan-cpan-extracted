@@ -82,4 +82,4 @@ Using `App::cpanminus`:
 
 ## Copyright
 
-- Copyright 2025 © Giuseppe Di Terlizzi
+- Copyright 2025-2026 © Giuseppe Di Terlizzi

@@ -38,6 +38,8 @@ has lifecycles => (
     default => sub { SBOM::CycloneDX::List->new }
 );
 
+# TODO: metadata.tools[] array is DEPRECATED
+
 has tools => (
     is      => 'rw',
     isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::Tool']] | InstanceOf ['SBOM::CycloneDX::Tools'],
@@ -68,15 +70,24 @@ has properties => (
     default => sub { SBOM::CycloneDX::List->new }
 );
 
+has distribution_constraints => (
+    is      => 'rw',
+    isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::Metadata::DistributionConstraint']],
+    default => sub { SBOM::CycloneDX::List->new }
+);
+
 sub TO_JSON {
 
     my $self = shift;
 
     my $json = {};
 
+    if (ref ($self->tools) =~ /List/ && @{$self->tools} || ref($self->tools) =~ /Tools/) {
+        $json->{tools} = $self->tools;
+    }
+
     $json->{timestamp}   = $self->timestamp   if $self->timestamp;
     $json->{lifecycles}  = $self->lifecycles  if @{$self->lifecycles};
-    $json->{tools}       = $self->tools       if @{$self->tools};
     $json->{authors}     = $self->authors     if @{$self->authors};
     $json->{component}   = $self->component   if $self->component;
     $json->{manufacture} = $self->manufacture if $self->manufacture;
@@ -218,7 +229,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

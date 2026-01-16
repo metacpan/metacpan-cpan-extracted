@@ -30,11 +30,14 @@ my $meta = {
                                            "Sub::HandlesVia::Handler" => 0.050006,
                                            "Type::Library" => "2.000000",
                                            "Type::Tiny::Duck" => "2.000000",
+                                           "Types::Common" => 0,
+                                           "Types::Path::Tiny" => 0,
                                            "Types::TypeTiny" => "2.000000",
                                          },
                                        },
                           test      => {
                                          requires => {
+                                           "Path::Tiny"                    => 0.066,
                                            "Test2::Plugin::BailOnFail"     => 0,
                                            "Test2::Require::AuthorTesting" => 0,
                                            "Test2::Require::Module"        => 0,
@@ -45,20 +48,31 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "Types::Capabilities"                         => { file => "lib/Types/Capabilities.pm", version => 0.002001 },
-                          "Types::Capabilities::CoercedValue::ARRAYREF" => {
-                                                                             file => "lib/Types/Capabilities/CoercedValue/ARRAYREF.pm",
-                                                                             version => 0.002001,
-                                                                           },
-                          "Types::Capabilities::CoercedValue::QUEUE"    => {
-                                                                             file => "lib/Types/Capabilities/CoercedValue/QUEUE.pm",
-                                                                             version => 0.002001,
-                                                                           },
-                          "Types::Capabilities::CoercedValue::STACK"    => {
-                                                                             file => "lib/Types/Capabilities/CoercedValue/STACK.pm",
-                                                                             version => 0.002001,
-                                                                           },
-                          "Types::Capabilities::Constraint"             => { file => "lib/Types/Capabilities/Constraint.pm", version => 0.002001 },
+                          "Types::Capabilities"                           => { file => "lib/Types/Capabilities.pm", version => "0.003000" },
+                          "Types::Capabilities::CoercedValue::ARRAYREF"   => {
+                                                                               file => "lib/Types/Capabilities/CoercedValue/ARRAYREF.pm",
+                                                                               version => "0.003000",
+                                                                             },
+                          "Types::Capabilities::CoercedValue::CODEREF"    => {
+                                                                               file => "lib/Types/Capabilities/CoercedValue/CODEREF.pm",
+                                                                               version => "0.003000",
+                                                                             },
+                          "Types::Capabilities::CoercedValue::FILEHANDLE" => {
+                                                                               file => "lib/Types/Capabilities/CoercedValue/FILEHANDLE.pm",
+                                                                               version => "0.003000",
+                                                                             },
+                          "Types::Capabilities::CoercedValue::QUEUE"      => {
+                                                                               file => "lib/Types/Capabilities/CoercedValue/QUEUE.pm",
+                                                                               version => "0.003000",
+                                                                             },
+                          "Types::Capabilities::CoercedValue::STACK"      => {
+                                                                               file => "lib/Types/Capabilities/CoercedValue/STACK.pm",
+                                                                               version => "0.003000",
+                                                                             },
+                          "Types::Capabilities::Constraint"               => {
+                                                                               file => "lib/Types/Capabilities/Constraint.pm",
+                                                                               version => "0.003000",
+                                                                             },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -74,7 +88,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Types-Capabilities/project",
                         },
-  "version"          => 0.002001,
+  "version"          => "0.003000",
   "x_static_install" => 1,
 };
 

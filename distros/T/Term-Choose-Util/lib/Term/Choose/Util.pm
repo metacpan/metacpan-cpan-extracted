@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.1;
 
-our $VERSION = '0.146';
+our $VERSION = '0.147';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -236,7 +236,7 @@ sub __prepare_path {
             choose(
                 [ 'Press ENTER to continue' ],
                 { prompt => $prompt, hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse}, page => $self->{page},
-                footer => $self->{footer}, keep => $self->{keep} }
+                footer => $self->{footer}, keep => $self->{keep}, margin => $self->{margin} }
             );
             $init_dir_fs = File::HomeDir->my_home();
         }
@@ -376,7 +376,7 @@ sub choose_a_file {
     my ( $self, $opt ) = @_;
     $self->__prepare_opt( $opt );
     my $init_dir = $self->__prepare_path();
-    my $prompt_fmt = "File Directory: %s";
+    my $prompt_fmt = "Source directory: %s";
     if ( length $self->{prompt} ) {
         $prompt_fmt .= "\n" . $self->{prompt};
     }
@@ -514,7 +514,7 @@ sub __a_file {
             next if -d catdir $dir_fs, $file_fs;
             push @files, decode( 'locale_fs', $file_fs );
         }
-        my $chosen_dir = "Directory: $dir";
+        my $chosen_dir = "Source directory: $dir";
         my @tmp_prompt;
         push @tmp_prompt, $chosen_dir;
         push @tmp_prompt, ( $self->{cs_label} // 'File: ' ) . ( length $prev_dir ? $prev_dir : '' );
@@ -713,13 +713,16 @@ sub choose_a_subset {
         return $ob->choose_a_subset( @_ );
     }
     my ( $self, $available, $opt ) = @_;
-    #my $subseq_tab = length( $opt->{cs_label} // '.' ) ? 2 : 0; # width a default cs_label set
-    my $subseq_tab = length $opt->{cs_label} ? 2 : 0;
+    my $subseq_tab = length $opt->{cs_label} && $opt->{cs_label} !~ /\R\z/ ? 2 : 0; ##
     $self->__prepare_opt( $opt, $subseq_tab );
     my $new_idx = [];
     my $curr_avail = [ @$available ];
     my $bu = [];
     my @pre = ( undef, $self->{confirm} );
+    my $mark;
+    if ( defined $self->{mark} && @{$self->{mark}} ) {
+        $mark = [ map { $_ + @pre } @{$self->{mark}} ];
+    }
 
     while ( 1 ) {
         my @tmp_prompt;
@@ -739,10 +742,6 @@ sub choose_a_subset {
         if ( length $self->{prompt} ) {
             push @tmp_prompt, $self->{prompt};
         }
-        my $mark;
-        if ( defined $self->{mark} && @{$self->{mark}} ) {
-            $mark = [ map { $_ + @pre } @{$self->{mark}} ];
-        }
         my $meta_items = [ 0 .. $#pre ];
         my $prompt = join "\n", @tmp_prompt;
         # Choose
@@ -756,7 +755,7 @@ sub choose_a_subset {
               page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => $self->{back},
               busy_string => $self->{busy_string}, margin => $self->{margin} }
         );
-        $self->{mark} = $mark = undef;
+        $mark = undef;
         if ( ! defined $idx[0] || $idx[0] == 0 ) {
             if ( @$bu ) {
                 ( $curr_avail, $new_idx ) = @{pop @$bu};
@@ -1002,7 +1001,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.146
+Version 0.147
 
 =cut
 
@@ -1704,7 +1703,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2025 Matthäus Kiem.
+Copyright 2014-2026 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

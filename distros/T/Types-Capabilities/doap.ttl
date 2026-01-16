@@ -15,7 +15,7 @@
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ], [
 		doap-deps:on "Type::Tiny::Duck 2.000000"^^doap-deps:CpanId;
-	], [ doap-deps:on "Carp"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "parent"^^doap-deps:CpanId ], [
+	], [ doap-deps:on "Types::Common"^^doap-deps:CpanId ], [ doap-deps:on "Types::Path::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Carp"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "parent"^^doap-deps:CpanId ], [
 		doap-deps:on "Sub::HandlesVia::CodeGenerator 0.050006"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Sub::HandlesVia::Handler 0.050006"^^doap-deps:CpanId;
@@ -32,7 +32,7 @@
 		doap-deps:on "Test2::Require::Module"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Test2::Plugin::BailOnFail"^^doap-deps:CpanId;
-	], [ doap-deps:on "Types::Common"^^doap-deps:CpanId ];
+	], [ doap-deps:on "Types::Common"^^doap-deps:CpanId ], [ doap-deps:on "Path::Tiny 0.066"^^doap-deps:CpanId ];
 	doap:bug-database    <https://github.com/tobyink/p5-types-capabilities/issues>;
 	doap:created         "2025-11-14"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -42,7 +42,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Types-Capabilities";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-Capabilities/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Types-Capabilities/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/Types-Capabilities/v_0-002001>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-Capabilities/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Types-Capabilities/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/Types-Capabilities/v_0-002001>, <http://purl.org/NET/cpan-uri/dist/Types-Capabilities/v_0-003000>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-types-capabilities>;
@@ -83,6 +83,21 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-Capabilities-0.002001.tar.gz>;
 	doap:revision        "0.002001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-Capabilities/v_0-003000>
+	a                    doap:Version;
+	dc:identifier        "Types-Capabilities-0.003000"^^xsd:string;
+	dc:issued            "2026-01-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Change internal structure of coerced objects to allow them to point back to (and thus alter when necessary) the arrayref they were coerced from.";
+		], [
+			rdfs:label "Add coercions from FileHandle, File, and CodeRef.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-Capabilities-0.003000.tar.gz>;
+	doap:revision        "0.003000"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

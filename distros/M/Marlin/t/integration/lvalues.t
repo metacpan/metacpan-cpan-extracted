@@ -58,7 +58,7 @@ sub is_xs {
 	$x->foo++;
 	is( $x->foo, 101 );
 
-	is( is_xs("${class}::foo"), 'XS' );
+	is( is_xs("${class}::foo"), 'XS' ) if Marlin::Attribute::HAS_CXSA;
 }
 
 {
@@ -78,8 +78,6 @@ sub is_xs {
 	$x->foo++;
 	is( $x->foo, 101 );
 
-	is( is_xs("${class}::foo"), 'PP' );
-	
 	like( dies { $x->foo = "BAD" }, qr/did not pass type constraint/ );
 }
 

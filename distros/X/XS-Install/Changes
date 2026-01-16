@@ -1,3 +1,7 @@
+1.5.2    15.01.2026
+           - hide frozen modules from pause
+1.5.1    15.01.2026
+           - freeze ExtUtils::Typemaps as well
 1.5.0    12.27.2025
            - freeze ExtUtils::ParseXS inside as that ancient piece of shit will never stop breaking this module
            - while not having any interface to override and extend its functionality

@@ -1,15 +1,15 @@
 ---
-abstract: 'a CLI for Data::Gimei'
+abstract: 'A CLI app for Data::Gimei, a module generating fake Japanese names and addresses.'
 author:
   - 'NAKAJIMA Yusaku <youpong@cpan.org>'
 build_requires:
-  Capture::Tiny: '0.48'
-  Test2::Bundle::More: '0.000163'
+  Capture::Tiny: '0.50'
+  Test2::Bundle::More: '1.302219'
   Unicode::GCString: '2013.10'
 configure_requires:
-  Module::Build::Tiny: '0.048'
+  Module::Build::Tiny: '0.052'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 provides:
   App::Gimei:
     file: lib/App/Gimei.pm
-    version: v0.2.8
+    version: v0.2.9
   App::Gimei::Generator:
     file: lib/App/Gimei/Generator.pm
   App::Gimei::Generators:
@@ -39,20 +39,20 @@ provides:
     file: lib/App/Gimei/Runner.pm
 requires:
   Class::Tiny: '1.008'
-  Data::Gimei: v0.4.2
+  Data::Gimei: v0.4.3
   Getopt::Long: '2.58'
   Pod::Find: '1.67'
-  Pod::Text: v6.0.0
-  Pod::Usage: '2.03'
-  perl: v5.36.0
+  Pod::Text: v6.0.2
+  Pod::Usage: '2.05'
+  perl: v5.40.0
 resources:
   bugtracker: https://github.com/youpong/App-Gimei/issues
   homepage: https://github.com/youpong/App-Gimei
   repository: https://github.com/youpong/App-Gimei.git
-version: v0.2.8
+version: v0.2.9
 x_authority: cpan:YOUPONG
 x_contributors:
   - 'NAKAJIMA Yusaku <yupong7@gmail.com>'
   - 'youpong <43817652+youpong@users.noreply.github.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

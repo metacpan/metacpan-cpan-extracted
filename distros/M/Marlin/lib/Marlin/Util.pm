@@ -5,10 +5,14 @@ use warnings;
 package Marlin::Util;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014000';
+our $VERSION   = '0.015000';
 
-use parent 'Exporter::Tiny';
+use B                     ();
+use Exporter::Tiny        qw( _croak _carp );
 
+require Marlin;
+
+our @ISA = 'Exporter::Tiny';
 our ( %EXPORT_TAGS, @EXPORT_OK );
 
 use constant do {
@@ -23,8 +27,97 @@ use constant do {
 	+{ %attr, %bool };
 };
 
-1;
+# Things below this point are not exportable.
+# It is a replacement for Module::Runtime.
 
+{
+	no strict 'refs';
+	no warnings 'once';
+	sub _getglob { \*{shift()} }
+	sub _getstash { \%{shift()."::"} }
+}
+
+use constant {
+	_WORK_AROUND_BROKEN_MODULE_STATE  => !!( "$]" < 5.009 ),
+	_WORK_AROUND_HINT_LEAKAGE         => !!( "$]" < 5.011 && !( "$]" >= 5.009004 and "$]" < 5.010001 ) ),
+	_MODULE_NAME_RX                   => qr/\A(?!\d)\w+(?:::\w+)*\z/,
+};
+
+sub Marlin::Util::__GUARD__::DESTROY {
+	delete $INC{$_[0]->[0]} if @{$_[0]};
+}
+
+sub _require {
+	my ( $file ) = @_;
+	my $guard = _WORK_AROUND_BROKEN_MODULE_STATE && bless([ $file ], 'Marlin::Util::__GUARD__');
+	local %^H if _WORK_AROUND_HINT_LEAKAGE;
+	if ( not eval { require $file; 1 } ) {
+		my $e = $@ || "Can't locate $file";
+		my $me = __FILE__;
+		$e =~ s{ at \Q$me\E line \d+\.\n\z}{};
+		return $e;
+	}
+	pop @$guard if _WORK_AROUND_BROKEN_MODULE_STATE;
+	return undef;
+}
+
+sub _module_notional_filename {
+	my ( $module ) = @_;
+	(my $file = "$module.pm") =~ s{::}{/}g;
+	return $file;
+}
+
+sub _load_module {
+	my ( $module ) = @_;
+	_croak( qq{%s is not a module name!}, B::perlstring($module) )
+		unless $module =~ _MODULE_NAME_RX;
+	
+	my $file = _module_notional_filename $module;
+	return 1 if $INC{$file};
+
+	my $e = _require $file;
+	return 1 if !defined $e;
+
+	_croak( $e ) if $e !~ /\ACan't locate \Q$file\E /;
+
+	# can't just ->can('can') because a sub-package Foo::Bar::Baz
+	# creates a 'Baz::' key in Foo::Bar's symbol table
+	my $stash = _getstash( $module ) || {};
+	no strict 'refs';
+	return 1 if grep +exists &{"${module}::$_"}, grep !/::\z/, keys %$stash;
+	return 1
+		if $INC{"Moose.pm"} && Class::MOP::class_of($module)
+		or Mouse::Util->can('find_meta') && Mouse::Util::find_meta($module);
+	
+	_croak( $e );
+}
+
+our %MAYBE_LOADED;
+sub _maybe_load_module {
+	my ( $module ) = @_;
+	return $MAYBE_LOADED{$module} if exists $MAYBE_LOADED{$module};
+	
+	my $file = _module_notional_filename $module;
+	my $e = _require $file;
+	if ( not defined $e ) {
+		return $MAYBE_LOADED{$module} = 1;
+	}
+	elsif ( $e !~ /\ACan't locate \Q$file\E / ) {
+		warn "$module exists but failed to load with error: $e";
+	}
+	return $MAYBE_LOADED{$module} = 0;
+}
+
+sub _use_package_optimistically {
+	my ( $module, $ver ) = @_;
+	_maybe_load_module $module;
+	if ( defined $ver && $module->can( 'VERSION' ) ) {
+		$module->VERSION( $ver );
+	}
+	return $module;
+}
+
+__PACKAGE__
 __END__
 
 =pod

@@ -16,7 +16,7 @@ use namespace::autoclean;
 
 extends 'SBOM::CycloneDX::Base';
 
-has type    => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->PROTOCOL_PROPERTIES_TYPES()]);
+has type    => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->PROTOCOL_TYPES()]);
 has version => (is => 'rw', isa => Str);
 
 has cipher_suites => (
@@ -25,9 +25,15 @@ has cipher_suites => (
     default => sub { SBOM::CycloneDX::List->new }
 );
 
+has related_cryptographic_assets => (
+    is      => 'rw',
+    isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::CryptoProperties::RelatedCryptographicAsset']],
+    default => sub { SBOM::CycloneDX::List->new }
+);
+
 has ikev2_transform_types => (is => 'rw', isa => InstanceOf ['SBOM::CycloneDX::CryptoProperties::Ikev2TransformType']);
 
-# Bom-ref like
+# [DEPRECATED 1.7] Bom-ref like
 has crypto_ref_array => (is => 'rw', isa => ArrayLike [Str], default => sub { SBOM::CycloneDX::List->new });
 
 sub TO_JSON {
@@ -36,11 +42,12 @@ sub TO_JSON {
 
     my $json = {};
 
-    $json->{type}                = $self->type                  if $self->type;
-    $json->{version}             = $self->version               if $self->version;
-    $json->{cipherSuites}        = $self->cipher_suites         if @{$self->cipher_suites};
-    $json->{ikev2TransformTypes} = $self->ikev2_transform_types if $self->ikev2_transform_types;
-    $json->{cryptoRefArray}      = $self->crypto_ref_array      if @{$self->crypto_ref_array};
+    $json->{type}                       = $self->type                         if $self->type;
+    $json->{version}                    = $self->version                      if $self->version;
+    $json->{cipherSuites}               = $self->cipher_suites                if @{$self->cipher_suites};
+    $json->{ikev2TransformTypes}        = $self->ikev2_transform_types        if $self->ikev2_transform_types;
+    $json->{cryptoRefArray}             = $self->crypto_ref_array             if @{$self->crypto_ref_array};
+    $json->{relatedCryptographicAssets} = $self->related_cryptographic_assets if @{$self->related_cryptographic_assets};
 
     return $json;
 
@@ -79,11 +86,17 @@ Properties:
 
 =item C<cipher_suites>, A list of cipher suites related to the protocol.
 
-=item C<crypto_ref_array>, A list of protocol-related cryptographic assets
+=item C<crypto_ref_array>, [DEPRECATED] Use C<related_cryptographic_assets> instead.
+A list of protocol-related cryptographic assets.
 
 =item C<ikev2_transform_types>, The IKEv2 transform types supported (types
 1-4), defined in RFC 7296 section 3.3.2 (L<https://www.ietf.org/rfc/rfc7296.html#section-3.3.2>),
 and additional properties.
+
+=item C<related_cryptographic_assets>, A list of cryptographic assets related
+to this component.
+
+See L<SBOM::CycloneDX::CryptoProperties::RelatedCryptographicAsset>
 
 =item C<type>, The concrete protocol type.
 
@@ -96,6 +109,8 @@ and additional properties.
 =item $protocol_properties->crypto_ref_array
 
 =item $protocol_properties->ikev2_transform_types
+
+=item $protocol_properties->related_cryptographic_assets
 
 =item $protocol_properties->type
 
@@ -134,7 +149,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

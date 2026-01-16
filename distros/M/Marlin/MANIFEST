@@ -30,6 +30,7 @@ lib/Marlin/Role.pm
 lib/Marlin/Struct.pm
 lib/Marlin/TypeConstraint.pm
 lib/Marlin/Util.pm
+lib/Marlin/X.pm
 lib/Marlin/X/Clone.pm
 lib/Marlin/X/UndefTolerant.pm
 lib/Marlin/XAttribute/Alias.pm

@@ -1691,6 +1691,21 @@ CODE:
 }
 
 void
+destroy(SV* object, ...)
+CODE:
+{
+    dTHX;
+    xscon_destructor_t *sig = (xscon_destructor_t *) CvXSUBANY(cv).any_ptr;
+    if (sig->is_placeholder) xscon_destructor_get_metadata(sig->package, sig);
+    
+    const char* klassname = SvROK(object) ? sv_reftype(SvRV(object), 1) : SvPV_nolen_const(object);
+    AV* args = newAV();
+    av_push( args, newSViv(PL_dirty) );
+    xscon_demolishall(sig, klassname, object, FALSE, args);
+    XSRETURN(0);
+}
+
+void
 DEMOLISHALL(SV* object, ...)
 CODE:
 {
@@ -1708,18 +1723,17 @@ CODE:
 }
 
 void
-destroy(SV* object, ...)
+XSCON_CLEAR_DESTRUCTOR_CACHE(SV* proto)
 CODE:
 {
     dTHX;
+
     xscon_destructor_t *sig = (xscon_destructor_t *) CvXSUBANY(cv).any_ptr;
-    if (sig->is_placeholder) xscon_destructor_get_metadata(sig->package, sig);
-    
-    const char* klassname = SvROK(object) ? sv_reftype(SvRV(object), 1) : SvPV_nolen_const(object);
-    AV* args = newAV();
-    av_push( args, newSViv(PL_dirty) );
-    xscon_demolishall(sig, klassname, object, FALSE, args);
-    XSRETURN(0);
+    sig->is_placeholder = TRUE;
+
+    /* return $proto */
+    ST(0) = proto;
+    XSRETURN(1);
 }
 
 void
@@ -1916,7 +1930,7 @@ CODE:
 }
 
 void
-install_destructor(char* name, char* name2)
+install_destructor(char* name, char* name2, char* name3)
 CODE:
 {
     dTHX;
@@ -1928,6 +1942,10 @@ CODE:
     if (cv2 == NULL)
         croak("ARG! Something went really wrong while installing a new XSUB!");
     
+    CV *cv3 = newXS(name3, XS_Class__XSConstructor_XSCON_CLEAR_DESTRUCTOR_CACHE, (char*)__FILE__);
+    if (cv3 == NULL)
+        croak("ARG! Something went really wrong while installing a new XSUB!");
+
     char *full = savepv(name);
     const char *last = NULL;
     for (const char *p = full; (p = strstr(p, "::")); p += 2) {
@@ -1949,6 +1967,7 @@ CODE:
     sig->is_placeholder = TRUE;
     CvXSUBANY(cv).any_ptr = sig;
     CvXSUBANY(cv2).any_ptr = sig;
+    CvXSUBANY(cv3).any_ptr = sig;
 }
 
 void

@@ -5,6 +5,7 @@ META.yml
 Makefile.PL
 README
 dist.ini
+fix_tests.pl
 lib/Data/Filter/Abstract.pm
 lib/Data/Filter/Abstract/Util.pm
 t/01_util.t

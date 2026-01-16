@@ -8,9 +8,9 @@ use ExtUtils::ParseXS;
 use XS::Install::FrozenShit::ParseXS;
 use XS::Install::FrozenShit::ParseXS::Eval;
 use XS::Install::FrozenShit::ParseXS::Utilities;
-use ExtUtils::Typemaps;
-use ExtUtils::Typemaps::InputMap;
-use ExtUtils::Typemaps::OutputMap;
+use XS::Install::FrozenShit::Typemaps;
+use XS::Install::FrozenShit::Typemaps::InputMap;
+use XS::Install::FrozenShit::Typemaps::OutputMap;
 
 *ExtUtils::ParseXS::new = *XS::Install::FrozenShit::ParseXS::new;
 
@@ -107,7 +107,6 @@ sub get_mode {
 my $orig_fetch_para = \&XS::Install::FrozenShit::ParseXS::fetch_para;
 *XS::Install::FrozenShit::ParseXS::fetch_para = sub {
     my $self = shift;
-    $DB::single=1;
     my $ret = $orig_fetch_para->($self, @_);
     my $lines = $self->{line};
     my $linno = $self->{line_no};
@@ -350,23 +349,23 @@ sub default_constructor {
 }
 
 {
-    my $orig_merge = \&ExtUtils::Typemaps::merge;
-    my $orig_parse = \&ExtUtils::Typemaps::_parse;
-    my $orig_get   = \&ExtUtils::Typemaps::get_typemap;
+    my $orig_merge = \&XS::Install::FrozenShit::Typemaps::merge;
+    my $orig_parse = \&XS::Install::FrozenShit::Typemaps::_parse;
+    my $orig_get   = \&XS::Install::FrozenShit::Typemaps::get_typemap;
     
-    *ExtUtils::Typemaps::get_typemap = sub {
+    *XS::Install::FrozenShit::Typemaps::get_typemap = sub {
         my $ret = $orig_get->(@_);
         return $ret if $ret;
         call(\@no_typemap_callbacks, @_);
         return $orig_get->(@_);
     };
     
-    *ExtUtils::Typemaps::merge = sub {
+    *XS::Install::FrozenShit::Typemaps::merge = sub {
         $top_typemaps = $_[0];
         return $orig_merge->(@_);
     };
     
-    *ExtUtils::Typemaps::_parse = sub {
+    *XS::Install::FrozenShit::Typemaps::_parse = sub {
         local $cur_typemaps = $_[0];
         return $orig_parse->(@_);
     };

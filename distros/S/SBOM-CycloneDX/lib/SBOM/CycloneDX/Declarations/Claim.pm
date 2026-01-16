@@ -96,8 +96,8 @@ Properties:
 
 =over
 
-=item C<bom_ref>, An optional identifier which can be used to reference the
-object elsewhere in the BOM. Every bom-ref must be unique within the BOM.
+=item C<bom_ref>, An identifier which can be used to reference the object
+elsewhere in the BOM. Every C<bom_ref> must be unique within the BOM.
 
 =item C<counter_evidence>, The list of `bom-ref` to counterEvidence that
 supports this claim.
@@ -179,7 +179,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

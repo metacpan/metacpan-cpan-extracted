@@ -5,11 +5,14 @@ use warnings;
 package MooseX::Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014000';
+our $VERSION   = '0.015000';
 
-use Marlin ();
-use Moo 2.004000;
-use Moo::Role ();
+use Marlin                ();
+use Marlin::Util          ();
+use Moo 2.004000          ();
+use Moo::Role             ();
+use Scalar::Util          ();
+use Types::Common         ();
 
 BEGIN {
 	eval {
@@ -34,7 +37,7 @@ sub import {
 	
 	Moo->is_class( $caller )
 		or Moo::Role->is_role( $caller )
-		or Marlin::_croak("Package '$caller' does not use Moo");
+		or Marlin::Util::_croak("Package '$caller' does not use Moo");
 }
 
 sub Marlin::inject_moo_metadata {
@@ -42,11 +45,10 @@ sub Marlin::inject_moo_metadata {
 	
 	# Recurse to any parents or roles
 	for my $pkg ( @{ $me->parents }, @{ $me->roles } ) {
-		Module::Runtime::use_package_optimistically( $pkg->[0] );
+		Marlin::Util::_maybe_load_module( $pkg->[0] );
 		Marlin->find_meta( $pkg->[0] )->inject_moo_metadata;
 	}
 	
-	require Moo;
 	require Method::Generate::Accessor;
 	require Method::Generate::Constructor;
 	my $makers = ( $Moo::MAKERS{$me->this} ||= {} );
@@ -69,11 +71,10 @@ sub Marlin::Role::inject_moo_metadata {
 	
 	# Recurse to any parents or roles
 	for my $pkg ( @{ $me->parents }, @{ $me->roles } ) {
-		Module::Runtime::use_package_optimistically( $pkg->[0] );
+		Marlin::Util::_maybe_load_module( $pkg->[0] );
 		Marlin->find_meta( $pkg->[0] )->inject_moo_metadata;
 	}
 	
-	require Moo::Role;
 	require Method::Generate::Accessor;
 	my $makers = ( $Moo::Role::INFO{$me->this} ||= {} );
 	$makers->{is_role} = 1;
@@ -130,8 +131,7 @@ sub Marlin::Attribute::inject_moorole_metadata {
 	shift->inject_moo_metadata( @_ );
 }
 
-1;
-
+__PACKAGE__
 __END__
 
 =pod

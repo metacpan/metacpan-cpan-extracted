@@ -1,10 +1,10 @@
 {
-   "abstract" : "a Perl port of Ruby's gimei generates fake data in Japanese.",
+   "abstract" : "A Perl module ported from Ruby's gimei that randomly generates Japanese names and addresses.",
    "author" : [
       "NAKAJIMA Yusaku < youpong@cpan.org >"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "mit"
    ],
@@ -33,12 +33,15 @@
       },
       "develop" : {
          "requires" : {
+            "CPAN::Uploader" : "0",
             "Perl::Tidy" : "0",
+            "Software::License::MIT" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
             "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
-            "Test::Spellunker" : "v0.2.7"
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
          }
       },
       "runtime" : {
@@ -59,7 +62,7 @@
    "provides" : {
       "Data::Gimei" : {
          "file" : "lib/Data/Gimei.pm",
-         "version" : "v0.4.3"
+         "version" : "v0.4.5"
       },
       "Data::Gimei::Address" : {
          "file" : "lib/Data/Gimei/Address.pm"
@@ -86,7 +89,7 @@
          "web" : "https://github.com/youpong/Data-Gimei"
       }
    },
-   "version" : "v0.4.3",
+   "version" : "v0.4.5",
    "x_authority" : "cpan:YOUPONG",
    "x_contributors" : [
       "NAKAJIMA Yusaku <yupong7@gmail.com>",

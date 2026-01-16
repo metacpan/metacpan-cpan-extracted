@@ -39,6 +39,12 @@ has licenses => (
     default => sub { SBOM::CycloneDX::List->new }
 );
 
+has patent_assertions => (
+    is      => 'rw',
+    isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::PatentAssertions']],
+    default => sub { SBOM::CycloneDX::List->new }
+);
+
 has external_references => (
     is      => 'rw',
     isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::ExternalReference']],
@@ -79,6 +85,7 @@ sub TO_JSON {
     $json->{'x-trust-boundary'} = $self->x_trust_boundary    if $self->x_trust_boundary;
     $json->{trustZone}          = $self->trust_zone          if $self->trust_zone;
     $json->{data}               = $self->data                if @{$self->data};
+    $json->{patentAssertions}   = $self->patent_assertions   if @{$self->patent_assertions};
     $json->{licenses}           = $self->licenses            if @{$self->licenses};
     $json->{externalReferences} = $self->external_references if @{$self->external_references};
     $json->{services}           = $self->services            if @{$self->services};
@@ -128,7 +135,7 @@ authentication. A value of true indicates the service requires
 authentication prior to use. A value of false indicates the service does
 not require authentication.
 
-=item C<bom_ref>, An optional identifier which can be used to reference the
+=item C<bom_ref>, An identifier which can be used to reference the
 service elsewhere in the BOM. Every bom-ref must be unique within the BOM.
 Value SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid
 conflicts with BOM-Links.
@@ -156,6 +163,12 @@ avoided.
 =item C<name>, The name of the service. This will often be a shortened,
 single name of the service.
 
+=item C<patent_assertions>, Service Patent(s).
+
+Patent Assertions. A list of assertions made regarding patents associated
+with this component or service. Assertions distinguish between ownership,
+licensing, and other relevant interactions with patents.
+
 =item C<properties>, Provides the ability to document properties in a
 name-value store. This provides flexibility to include data not officially
 supported in the standard without having to use additional namespaces or
@@ -167,7 +180,7 @@ Formal registration is optional.
 
 =item C<provider>, The organization that provides the service.
 
-=item C<release_notes>, Specifies optional release notes.
+=item C<release_notes>, Specifies release notes.
 
 =item C<services>, A list of services included or deployed behind the
 parent service. This is not a dependency tree. It provides a way to specify
@@ -206,6 +219,8 @@ using the service, a trust boundary is not crossed.
 =item $service->licenses
 
 =item $service->name
+
+=item $service->patent_assertions
 
 =item $service->properties
 
@@ -257,7 +272,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

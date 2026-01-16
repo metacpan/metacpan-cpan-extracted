@@ -6,10 +6,13 @@ use warnings;
 use utf8;
 
 use SBOM::CycloneDX::Enum;
+use SBOM::CycloneDX::Hash;
+use SBOM::CycloneDX::List;
 use SBOM::CycloneDX::Timestamp;
 use SBOM::CycloneDX::CryptoProperties::SecuredBy;
 
 use Types::Standard qw(Str Enum Num InstanceOf);
+use Types::TypeTiny qw(ArrayLike);
 
 use Moo;
 use namespace::autoclean;
@@ -20,7 +23,11 @@ has type  => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->RELATED_CRYPTO_MAT
 has id    => (is => 'rw', isa => Str);
 has state => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->RELATED_CRYPTO_MATERIAL_STATES()]);
 
-has algorithm_ref => (is => 'rw', isa => Str);    # Bom-ref like
+has algorithm_ref => (
+    is     => 'rw',
+    isa    => InstanceOf ['SBOM::CycloneDX::BomRef'],
+    coerce => sub { ref($_[0]) ? $_[0] : SBOM::CycloneDX::BomRef->new($_[0]) }
+);
 
 has creation_date => (
     is     => 'rw',
@@ -56,24 +63,34 @@ has secured_by => (
     default => sub { SBOM::CycloneDX::CryptoProperties::SecuredBy->new }
 );
 
+has fingerprint => (is => 'rw', isa => InstanceOf ['SBOM::CycloneDX::Hash']);
+
+has related_cryptographic_assets => (
+    is      => 'rw',
+    isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::CryptoProperties::RelatedCryptographicAsset']],
+    default => sub { SBOM::CycloneDX::List->new }
+);
+
 sub TO_JSON {
 
     my $self = shift;
 
     my $json = {};
 
-    $json->{type}           = $self->type            if $self->type;
-    $json->{id}             = $self->id              if $self->id;
-    $json->{state}          = $self->state           if $self->state;
-    $json->{algorithmRef}   = $self->algorithm_ref   if $self->algorithm_ref;
-    $json->{creationDate}   = $self->creation_date   if $self->creation_date;
-    $json->{activationDate} = $self->activation_date if $self->activation_date;
-    $json->{updateDate}     = $self->update_date     if $self->update_date;
-    $json->{expirationDate} = $self->expiration_date if $self->expiration_date;
-    $json->{value}          = $self->value           if $self->value;
-    $json->{size}           = $self->size            if $self->size;
-    $json->{format}         = $self->format          if $self->format;
-    $json->{securedBy}      = $self->secured_by      if %{$self->secured_by->TO_JSON};
+    $json->{type}                       = $self->type                         if $self->type;
+    $json->{id}                         = $self->id                           if $self->id;
+    $json->{state}                      = $self->state                        if $self->state;
+    $json->{algorithmRef}               = $self->algorithm_ref                if $self->algorithm_ref;
+    $json->{creationDate}               = $self->creation_date                if $self->creation_date;
+    $json->{activationDate}             = $self->activation_date              if $self->activation_date;
+    $json->{updateDate}                 = $self->update_date                  if $self->update_date;
+    $json->{expirationDate}             = $self->expiration_date              if $self->expiration_date;
+    $json->{value}                      = $self->value                        if $self->value;
+    $json->{size}                       = $self->size                         if $self->size;
+    $json->{format}                     = $self->format                       if $self->format;
+    $json->{securedBy}                  = $self->secured_by                   if %{$self->secured_by->TO_JSON};
+    $json->{fingerprint}                = $self->fingerprint                  if $self->fingerprint;
+    $json->{relatedCryptographicAssets} = $self->related_cryptographic_assets if @{$self->related_cryptographic_assets};
 
     return $json;
 
@@ -122,11 +139,20 @@ cryptographic material was created.
 =item C<expiration_date>, The date and time (timestamp) when the related
 cryptographic material expires.
 
+=item C<fingerprint>, The fingerprint is a cryptographic hash of the asset.
+
+See L<SBOM::CycloneDX::Hash>
+
 =item C<format>, The format of the related cryptographic material (e.g. P8,
 PEM, DER).
 
-=item C<id>, The optional unique identifier for the related cryptographic
+=item C<id>, The unique identifier for the related cryptographic
 material.
+
+=item C<related_cryptographic_assets>, A list of cryptographic assets related
+to this component.
+
+See L<SBOM::CycloneDX::CryptoProperties::RelatedCryptographicAsset>
 
 =item C<secured_by>, The mechanism by which the cryptographic asset is
 secured by.
@@ -201,7 +227,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

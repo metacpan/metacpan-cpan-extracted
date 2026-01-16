@@ -1,6 +1,10 @@
 Revision history for Term::Choose::Util
 
 
+0.147   2026-01-15
+        - Do not alter the value of the option 'mark'.
+        - Update year copyright.
+
 0.146   2025-06-11
         - Makefile.PL: added back the 'dist' section.
         - Improved error checking.

@@ -21,11 +21,20 @@ has standards => (
     default => sub { SBOM::CycloneDX::List->new }
 );
 
+has patents => (
+    is      => 'rw',
+    isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::Patents']],
+    default => sub { SBOM::CycloneDX::List->new }
+);
+
 sub TO_JSON {
 
     my $self = shift;
 
-    my $json = {standards => $self->standards};
+    my $json = {};
+
+    $json->{standards} = $self->standards if @{$self->standards};
+    $json->{patents}   = $self->patents   if @{$self->patents};
 
     return $json;
 
@@ -67,9 +76,13 @@ industry or organizational-specific standards, maturity models, best
 practices, or any other requirements which can be evaluated against or
 attested to.
 
+=item C<patents>, The list of patents which may be referenced elsewhere
+
 =back
 
 =item $definitions->standards
+
+=item $definitions->patents
 
 =back
 
@@ -103,7 +116,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

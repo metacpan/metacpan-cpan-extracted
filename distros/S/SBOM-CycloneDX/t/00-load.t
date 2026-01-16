@@ -13,6 +13,7 @@ my @modules = (qw[
     SBOM::CycloneDX::Attachment
     SBOM::CycloneDX::Base
     SBOM::CycloneDX::BomRef
+    SBOM::CycloneDX::Citation
     SBOM::CycloneDX::Component
     SBOM::CycloneDX::Component::Commit
     SBOM::CycloneDX::Component::ConfidenceInterval
@@ -27,10 +28,12 @@ my @modules = (qw[
     SBOM::CycloneDX::Component::SWID
     SBOM::CycloneDX::CryptoProperties
     SBOM::CycloneDX::CryptoProperties::AlgorithmProperties
+    SBOM::CycloneDX::CryptoProperties::CertificateExtension
     SBOM::CycloneDX::CryptoProperties::CertificateProperties
     SBOM::CycloneDX::CryptoProperties::CipherSuite
     SBOM::CycloneDX::CryptoProperties::Ikev2TransformType
     SBOM::CycloneDX::CryptoProperties::ProtocolProperties
+    SBOM::CycloneDX::CryptoProperties::RelatedCryptographicAsset
     SBOM::CycloneDX::CryptoProperties::RelatedCryptoMaterialProperties
     SBOM::CycloneDX::CryptoProperties::SecuredBy
     SBOM::CycloneDX::DataGovernance
@@ -51,6 +54,23 @@ my @modules = (qw[
     SBOM::CycloneDX::Definitions
     SBOM::CycloneDX::Dependency
     SBOM::CycloneDX::Enum
+    SBOM::CycloneDX::Enum::CommonExtensionName
+    SBOM::CycloneDX::Enum::ComponentType
+    SBOM::CycloneDX::Enum::CryptoAssetType
+    SBOM::CycloneDX::Enum::CryptoCertificationLevel
+    SBOM::CycloneDX::Enum::CryptoFunction
+    SBOM::CycloneDX::Enum::CryptoImplementationPlatform
+    SBOM::CycloneDX::Enum::CryptoMode
+    SBOM::CycloneDX::Enum::CryptoPadding
+    SBOM::CycloneDX::Enum::CryptoPrimitive
+    SBOM::CycloneDX::Enum::ExternalReferenceType
+    SBOM::CycloneDX::Enum::HashAlgorithm
+    SBOM::CycloneDX::Enum::LicenseType
+    SBOM::CycloneDX::Enum::LifecyclePhase
+    SBOM::CycloneDX::Enum::ProtocolType
+    SBOM::CycloneDX::Enum::RelatedCryptoMaterialState
+    SBOM::CycloneDX::Enum::RelatedCryptoMaterialType
+    SBOM::CycloneDX::Enum::TlpClassification
     SBOM::CycloneDX::ExternalReference
     SBOM::CycloneDX::Formulation
     SBOM::CycloneDX::Hash
@@ -58,12 +78,15 @@ my @modules = (qw[
     SBOM::CycloneDX::Issue
     SBOM::CycloneDX::Issue::Source
     SBOM::CycloneDX::License
+    SBOM::CycloneDX::License::ExpressionDetail
     SBOM::CycloneDX::License::Licensee
     SBOM::CycloneDX::License::Licensing
     SBOM::CycloneDX::License::Licensor
     SBOM::CycloneDX::License::Purchaser
     SBOM::CycloneDX::List
+    SBOM::CycloneDX::Lite
     SBOM::CycloneDX::Metadata
+    SBOM::CycloneDX::Metadata::DistributionConstraint
     SBOM::CycloneDX::Metadata::Lifecycle
     SBOM::CycloneDX::Note
     SBOM::CycloneDX::OrganizationalContact

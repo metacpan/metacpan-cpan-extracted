@@ -28,8 +28,9 @@ use constant JSON_SCHEMA_1_3 => 'http://cyclonedx.org/schema/bom-1.3a.schema.jso
 use constant JSON_SCHEMA_1_4 => 'http://cyclonedx.org/schema/bom-1.4.schema.json';
 use constant JSON_SCHEMA_1_5 => 'http://cyclonedx.org/schema/bom-1.5.schema.json';
 use constant JSON_SCHEMA_1_6 => 'http://cyclonedx.org/schema/bom-1.6.schema.json';
+use constant JSON_SCHEMA_1_7 => 'http://cyclonedx.org/schema/bom-1.7.schema.json';
 
-our $VERSION = 1.05;
+our $VERSION = 1.06;
 
 our %JSON_SCHEMA = (
     '1.2' => JSON_SCHEMA_1_2,
@@ -37,10 +38,12 @@ our %JSON_SCHEMA = (
     '1.4' => JSON_SCHEMA_1_4,
     '1.5' => JSON_SCHEMA_1_5,
     '1.6' => JSON_SCHEMA_1_6,
+    '1.7' => JSON_SCHEMA_1_7
 );
 
 has bom_format => (is => 'ro', isa => Str, required => 1, default => 'CycloneDX');
-has spec_version => (is => 'rw', isa => Num->where(sub { defined $JSON_SCHEMA{$_} }), required => 1, default => 1.6);
+
+has spec_version => (is => 'rw', isa => Num->where(sub { defined $JSON_SCHEMA{$_} }), required => 1, default => 1.7);
 
 has serial_number => (
     is      => 'rw',
@@ -111,6 +114,12 @@ has definitions => (
     is      => 'rw',
     isa     => InstanceOf ['SBOM::CycloneDX::Definitions'],
     default => sub { SBOM::CycloneDX::Definitions->new }
+);
+
+has citations => (
+    is      => 'rw',
+    isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::Citation']],
+    default => sub { SBOM::CycloneDX::List->new }
 );
 
 has properties => (
@@ -234,7 +243,8 @@ sub TO_JSON {
     $json->{annotations}        = $self->annotations         if @{$self->annotations};
     $json->{formulation}        = $self->formulation         if @{$self->formulation};
     $json->{declarations}       = $self->declarations        if %{$self->declarations->TO_JSON};
-    $json->{definitions}        = $self->definitions         if @{$self->definitions->standards};
+    $json->{definitions}        = $self->definitions         if %{$self->definitions->TO_JSON};
+    $json->{citations}          = $self->citations           if @{$self->citations};
     $json->{properties}         = $self->properties          if @{$self->properties};
     $json->{signature}          = $self->signature           if %{$self->signature};
 
@@ -255,10 +265,13 @@ SBOM::CycloneDX - CycloneDX Perl Library
 
 =head1 SYNOPSIS
 
+    use SBOM::CycloneDX;
+    use SBOM::CycloneDX::Enum qw(COMPONENT_TYPE);
+
     my $bom = SBOM::CycloneDX->new;
 
     my $root_component = SBOM::CycloneDX::Component->new(
-        type     => 'application',
+        type     => COMPONENT_TYPE->APPLICATION,
         name     => 'MyApp',
         licenses => [SBOM::CycloneDX::License->new('Artistic-2.0')],
         bom_ref  => 'MyApp'
@@ -271,7 +284,7 @@ SBOM::CycloneDX - CycloneDX Perl Library
     $metadata->component($root_component);
 
     my $component1 = SBOM::CycloneDX::Component->new(
-        type     => 'library',
+        type     => COMPONENT_TYPE->LIBRARY,
         name     => 'some-component',
         group    => 'acme',
         version  => '1.33.7-beta.1',
@@ -289,7 +302,7 @@ SBOM::CycloneDX - CycloneDX Perl Library
     $bom->add_dependency($root_component, [$component1]);
 
     my $component2 = SBOM::CycloneDX::Component->new(
-        type     => 'library',
+        type     => COMPONENT_TYPE->LIBRARY,
         name     => 'some-library',
         licenses => [SBOM::CycloneDX::License->new(expression => 'GPL-3.0-only WITH Classpath-exception-2.0')],
         bom_ref  => 'some-lib',
@@ -312,7 +325,7 @@ SBOM::CycloneDX - CycloneDX Perl Library
 
 L<SBOM::CycloneDX> is a library for generate valid CycloneDX BOM file.
 
-CycloneDX is a modern standard for the software supply chain. At its core,
+CycloneDX (ECMA-424) is a modern standard for the software supply chain. At its core,
 CycloneDX is a general-purpose Bill of Materials (BOM) standard capable of
 representing software, hardware, services, and other types of inventory.
 The CycloneDX standard began in 2017 in the Open Worldwide Application Security
@@ -356,194 +369,267 @@ CycloneDX provides advanced supply chain capabilities for cyber risk reduction. 
 
 L<https://www.cyclonedx.org>
 
+L<https://ecma-international.org/publications-and-standards/standards/ecma-424/>
+
+
+L<SBOM::CycloneDX> implements the following versions of the CycloneDX specification:
+
+=over
+
+=item * L<1.7|https://cyclonedx.org/docs/1.7/json/>
+
+=item * L<1.6|https://cyclonedx.org/docs/1.6/json/>
+
+=item * L<1.5|https://cyclonedx.org/docs/1.5/json/>
+
+=item * L<1.4|https://cyclonedx.org/docs/1.4/json/>
+
+=item * L<1.3|https://cyclonedx.org/docs/1.3/json/>
+
+=item * L<1.2|https://cyclonedx.org/docs/1.2/json/>
+
+=back
+
 
 =head2 MODELS
 
-=over
-
-=item L<SBOM::CycloneDX>
-
-=item L<SBOM::CycloneDX::Advisory>
-
-=item L<SBOM::CycloneDX::Annotation>
+This is the class hierarchy of the L<SBOM::CycloneDX> distribution.
 
 =over
 
-=item L<SBOM::CycloneDX::Annotation::Annotator>
+=item * L<SBOM::CycloneDX>
+
+=item * L<SBOM::CycloneDX::Advisory>
+
+=item * L<SBOM::CycloneDX::Annotation>
+
+=over
+
+=item * L<SBOM::CycloneDX::Annotation::Annotator>
 
 =back
 
-=item L<SBOM::CycloneDX::Attachment>
+=item * L<SBOM::CycloneDX::Attachment>
 
-=item L<SBOM::CycloneDX::Component>
+=item * L<SBOM::CycloneDX::Citations>
+
+=item * L<SBOM::CycloneDX::Component>
 
 =over
 
-=item L<SBOM::CycloneDX::Component::Commit>
+=item * L<SBOM::CycloneDX::Component::Commit>
 
-=item L<SBOM::CycloneDX::Component::ConfidenceInterval>
+=item * L<SBOM::CycloneDX::Component::ConfidenceInterval>
 
-=item L<SBOM::CycloneDX::Component::Diff>
+=item * L<SBOM::CycloneDX::Component::Diff>
 
-=item L<SBOM::CycloneDX::Component::Graphic>
+=item * L<SBOM::CycloneDX::Component::Graphic>
 
-=item L<SBOM::CycloneDX::Component::GraphicsCollection>
+=item * L<SBOM::CycloneDX::Component::GraphicsCollection>
 
-=item L<SBOM::CycloneDX::Component::ModelCard>
+=item * L<SBOM::CycloneDX::Component::ModelCard>
 
-=item L<SBOM::CycloneDX::Component::Patch>
+=item * L<SBOM::CycloneDX::Component::Patch>
 
-=item L<SBOM::CycloneDX::Component::Pedigree>
+=item * L<SBOM::CycloneDX::Component::Pedigree>
 
-=item L<SBOM::CycloneDX::Component::PerformanceMetric>
+=item * L<SBOM::CycloneDX::Component::PerformanceMetric>
 
-=item L<SBOM::CycloneDX::Component::QuantitativeAnalysis>
+=item * L<SBOM::CycloneDX::Component::QuantitativeAnalysis>
 
-=item L<SBOM::CycloneDX::Component::SWID>
+=item * L<SBOM::CycloneDX::Component::SWID>
 
 =back
 
-=item L<SBOM::CycloneDX::CryptoProperties>
+=item * L<SBOM::CycloneDX::CryptoProperties>
 
 =over
 
-=item L<SBOM::CycloneDX::CryptoProperties::AlgorithmProperties>
+=item * L<SBOM::CycloneDX::CryptoProperties::AlgorithmProperties>
 
-=item L<SBOM::CycloneDX::CryptoProperties::CertificateProperties>
+=item * L<SBOM::CycloneDX::CryptoProperties::CertificateProperties>
 
-=item L<SBOM::CycloneDX::CryptoProperties::CipherSuite>
+=item * L<SBOM::CycloneDX::CryptoProperties::CipherSuite>
 
-=item L<SBOM::CycloneDX::CryptoProperties::Ikev2TransformType>
+=item * L<SBOM::CycloneDX::CryptoProperties::Ikev2TransformType>
 
-=item L<SBOM::CycloneDX::CryptoProperties::ProtocolProperties>
+=item * L<SBOM::CycloneDX::CryptoProperties::ProtocolProperties>
 
-=item L<SBOM::CycloneDX::CryptoProperties::RelatedCryptoMaterialProperties>
+=item * L<SBOM::CycloneDX::CryptoProperties::RelatedCryptographicAsset>
 
-=item L<SBOM::CycloneDX::CryptoProperties::SecuredBy>
+=item * L<SBOM::CycloneDX::CryptoProperties::RelatedCryptoMaterialProperties>
+
+=item * L<SBOM::CycloneDX::CryptoProperties::SecuredBy>
 
 =back
 
-=item L<SBOM::CycloneDX::DataGovernance>
+=item * L<SBOM::CycloneDX::DataGovernance>
 
-=item L<SBOM::CycloneDX::DataGovernanceResponsibleParty>
+=item * L<SBOM::CycloneDX::DataGovernanceResponsibleParty>
 
-=item L<SBOM::CycloneDX::Declarations>
+=item * L<SBOM::CycloneDX::Declarations>
 
 =over
 
-=item L<SBOM::CycloneDX::Declarations::Affirmation>
+=item * L<SBOM::CycloneDX::Declarations::Affirmation>
 
-=item L<SBOM::CycloneDX::Declarations::Assessor>
+=item * L<SBOM::CycloneDX::Declarations::Assessor>
 
-=item L<SBOM::CycloneDX::Declarations::Attestation>
+=item * L<SBOM::CycloneDX::Declarations::Attestation>
 
-=item L<SBOM::CycloneDX::Declarations::Claim>
+=item * L<SBOM::CycloneDX::Declarations::Claim>
 
-=item L<SBOM::CycloneDX::Declarations::Confidence>
+=item * L<SBOM::CycloneDX::Declarations::Confidence>
 
-=item L<SBOM::CycloneDX::Declarations::Conformance>
+=item * L<SBOM::CycloneDX::Declarations::Conformance>
 
-=item L<SBOM::CycloneDX::Declarations::Contents>
+=item * L<SBOM::CycloneDX::Declarations::Contents>
 
-=item L<SBOM::CycloneDX::Declarations::Data>
+=item * L<SBOM::CycloneDX::Declarations::Data>
 
-=item L<SBOM::CycloneDX::Declarations::Evidence>
+=item * L<SBOM::CycloneDX::Declarations::Evidence>
 
-=item L<SBOM::CycloneDX::Declarations::Map>
+=item * L<SBOM::CycloneDX::Declarations::Map>
 
-=item L<SBOM::CycloneDX::Declarations::Signatory>
+=item * L<SBOM::CycloneDX::Declarations::Signatory>
 
-=item L<SBOM::CycloneDX::Declarations::Targets>
+=item * L<SBOM::CycloneDX::Declarations::Targets>
 
 =back
 
-=item L<SBOM::CycloneDX::Definitions>
+=item * L<SBOM::CycloneDX::Definitions>
 
-=item L<SBOM::CycloneDX::Dependency>
+=item * L<SBOM::CycloneDX::Dependency>
 
-=item L<SBOM::CycloneDX::ExternalReference>
-
-=item L<SBOM::CycloneDX::Formulation>
-
-=item L<SBOM::CycloneDX::Hash>
-
-=item L<SBOM::CycloneDX::IdentifiableAction>
-
-=item L<SBOM::CycloneDX::Issue>
+=item * L<SBOM::CycloneDX::Enum>
 
 =over
 
-=item L<SBOM::CycloneDX::Issue::Source>
+=item * L<SBOM::CycloneDX::Enum::CommonExtensionName>
+
+=item * L<SBOM::CycloneDX::Enum::ComponentType>
+
+=item * L<SBOM::CycloneDX::Enum::CryptoAssetType>
+
+=item * L<SBOM::CycloneDX::Enum::CryptoCertificationLevel>
+
+=item * L<SBOM::CycloneDX::Enum::CryptoFunction>
+
+=item * L<SBOM::CycloneDX::Enum::CryptoImplementationPlatform>
+
+=item * L<SBOM::CycloneDX::Enum::CryptoMode>
+
+=item * L<SBOM::CycloneDX::Enum::CryptoPadding>
+
+=item * L<SBOM::CycloneDX::Enum::CryptoPrimitive>
+
+=item * L<SBOM::CycloneDX::Enum::ExternalReferenceType>
+
+=item * L<SBOM::CycloneDX::Enum::HashAlgorithm>
+
+=item * L<SBOM::CycloneDX::Enum::LicenseType>
+
+=item * L<SBOM::CycloneDX::Enum::LifecyclePhase>
+
+=item * L<SBOM::CycloneDX::Enum::ProtocolType>
+
+=item * L<SBOM::CycloneDX::Enum::RelatedCryptoMaterialState>
+
+=item * L<SBOM::CycloneDX::Enum::RelatedCryptoMaterialType>
+
+=item * L<SBOM::CycloneDX::Enum::TlpClassification>
 
 =back
 
-=item L<SBOM::CycloneDX::License>
+=item * L<SBOM::CycloneDX::ExternalReference>
+
+=item * L<SBOM::CycloneDX::Formulation>
+
+=item * L<SBOM::CycloneDX::Hash>
+
+=item * L<SBOM::CycloneDX::IdentifiableAction>
+
+=item * L<SBOM::CycloneDX::Issue>
 
 =over
 
-=item L<SBOM::CycloneDX::License::Licensee>
-
-=item L<SBOM::CycloneDX::License::Licensing>
-
-=item L<SBOM::CycloneDX::License::Licensor>
-
-=item L<SBOM::CycloneDX::License::Purchaser>
+=item * L<SBOM::CycloneDX::Issue::Source>
 
 =back
 
-=item L<SBOM::CycloneDX::Metadata>
-
-=item L<SBOM::CycloneDX::Metadata::Lifecycle>
-
-=item L<SBOM::CycloneDX::Note>
-
-=item L<SBOM::CycloneDX::OrganizationalContact>
-
-=item L<SBOM::CycloneDX::OrganizationalEntity>
-
-=item L<SBOM::CycloneDX::PostalAddress>
-
-=item L<SBOM::CycloneDX::Property>
-
-=item L<SBOM::CycloneDX::ReleaseNotes>
-
-=item L<SBOM::CycloneDX::Schema>
-
-=item L<SBOM::CycloneDX::Service>
-
-=item L<SBOM::CycloneDX::Standard>
+=item * L<SBOM::CycloneDX::License>
 
 =over
 
-=item L<SBOM::CycloneDX::Standard::Level>
+=item * L<SBOM::CycloneDX::License::ExpressionDetail>
 
-=item L<SBOM::CycloneDX::Standard::Requirement>
+=item * L<SBOM::CycloneDX::License::Licensee>
+
+=item * L<SBOM::CycloneDX::License::Licensing>
+
+=item * L<SBOM::CycloneDX::License::Licensor>
+
+=item * L<SBOM::CycloneDX::License::Purchaser>
 
 =back
 
-=item L<SBOM::CycloneDX::Tool>
+=item * L<SBOM::CycloneDX::Metadata>
 
-=item L<SBOM::CycloneDX::Tools>
+=item * L<SBOM::CycloneDX::Metadata::DistributionConstraint>
 
-=item L<SBOM::CycloneDX::Version>
+=item * L<SBOM::CycloneDX::Metadata::Lifecycle>
 
-=item L<SBOM::CycloneDX::Vulnerability>
+=item * L<SBOM::CycloneDX::Note>
+
+=item * L<SBOM::CycloneDX::OrganizationalContact>
+
+=item * L<SBOM::CycloneDX::OrganizationalEntity>
+
+=item * L<SBOM::CycloneDX::PatentAssertions>
+
+=item * L<SBOM::CycloneDX::PostalAddress>
+
+=item * L<SBOM::CycloneDX::Property>
+
+=item * L<SBOM::CycloneDX::ReleaseNotes>
+
+=item * L<SBOM::CycloneDX::Schema>
+
+=item * L<SBOM::CycloneDX::Service>
+
+=item * L<SBOM::CycloneDX::Standard>
 
 =over
 
-=item L<SBOM::CycloneDX::Vulnerability::Affect>
+=item * L<SBOM::CycloneDX::Standard::Level>
 
-=item L<SBOM::CycloneDX::Vulnerability::Analysis>
+=item * L<SBOM::CycloneDX::Standard::Requirement>
 
-=item L<SBOM::CycloneDX::Vulnerability::Credits>
+=back
 
-=item L<SBOM::CycloneDX::Vulnerability::ProofOfConcept>
+=item * L<SBOM::CycloneDX::Tool>
 
-=item L<SBOM::CycloneDX::Vulnerability::Rating>
+=item * L<SBOM::CycloneDX::Tools>
 
-=item L<SBOM::CycloneDX::Vulnerability::Reference>
+=item * L<SBOM::CycloneDX::Version>
 
-=item L<SBOM::CycloneDX::Vulnerability::Source>
+=item * L<SBOM::CycloneDX::Vulnerability>
+
+=over
+
+=item * L<SBOM::CycloneDX::Vulnerability::Affect>
+
+=item * L<SBOM::CycloneDX::Vulnerability::Analysis>
+
+=item * L<SBOM::CycloneDX::Vulnerability::Credits>
+
+=item * L<SBOM::CycloneDX::Vulnerability::ProofOfConcept>
+
+=item * L<SBOM::CycloneDX::Vulnerability::Rating>
+
+=item * L<SBOM::CycloneDX::Vulnerability::Reference>
+
+=item * L<SBOM::CycloneDX::Vulnerability::Source>
 
 =back
 
@@ -553,15 +639,13 @@ L<https://www.cyclonedx.org>
 
 =over
 
-=item L<SBOM::CycloneDX::BomRef>
+=item * L<SBOM::CycloneDX::BomRef>
 
-=item L<SBOM::CycloneDX::Enum>
+=item * L<SBOM::CycloneDX::List>
 
-=item L<SBOM::CycloneDX::List>
+=item * L<SBOM::CycloneDX::Timestamp>
 
-=item L<SBOM::CycloneDX::Timestamp>
-
-=item L<SBOM::CycloneDX::Util>
+=item * L<SBOM::CycloneDX::Util>
 
 =back
 
@@ -689,6 +773,15 @@ elsewhere in the BOM.
 
 See L<SBOM::CycloneDX::Definition>.
 
+=item $bom->citations
+
+A collection of attributions indicating which entity supplied
+information for specific fields within the BOM.
+
+    $bom->citations->add($citation);
+
+See L<SBOM::CycloneDX::Definition>.
+
 =item $bom->properties
 
 Provides the ability to document properties in a name-value store. This
@@ -809,7 +902,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

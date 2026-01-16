@@ -180,7 +180,7 @@ BEGIN {
 
   # File-scoped parsing state:
 
-  'typemaps_object',    # An ExtUtils::Typemaps object: the result of
+  'typemaps_object',    # An XS::Install::FrozenShit::Typemaps object: the result of
                         # reading in the standard (or other) typemap.
 
   'error_count',        # Num: count of number of errors seen so far.
@@ -720,7 +720,7 @@ EOM
     # the function name and arguments too (The latter was probably an
     # unintended side-effect of later allowing the return type and
     # function to be on the same line.)
-    ($self->{xsub_return_type}) = ExtUtils::Typemaps::tidy_type($_);
+    ($self->{xsub_return_type}) = XS::Install::FrozenShit::Typemaps::tidy_type($_);
 
     $self->{xsub_seen_NO_OUTPUT} = 1
       if $self->{xsub_return_type} =~ s/^NO_OUTPUT\s+//;
@@ -2912,7 +2912,7 @@ sub _maybe_parse_typemap_block {
       push @tmaplines, $self->{lastline};
     }
 
-    my $tmap = ExtUtils::Typemaps->new(
+    my $tmap = XS::Install::FrozenShit::Typemaps->new(
       string        => join("", @tmaplines),
       lineno_offset => 1 + ($self->current_line_number() || 0),
       fake_filename => $self->{in_filename},

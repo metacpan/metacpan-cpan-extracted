@@ -1,4 +1,4 @@
-use v5.36;
+use v5.40;
 
 use App::Gimei::Generator;
 use Test2::Bundle::More;

@@ -15,18 +15,20 @@ use namespace::autoclean;
 extends 'SBOM::CycloneDX::Base';
 
 my %ALGO_LENGTH = (
-    'MD5'         => 32,
-    'SHA-1'       => 40,
-    'SHA-256'     => 64,
-    'SHA-384'     => 96,
-    'SHA-512'     => 128,
-    'SHA3-256'    => 64,
-    'SHA3-384'    => 96,
-    'SHA3-512'    => 128,
-    'BLAKE2b-256' => 64,
-    'BLAKE2b-384' => 96,
-    'BLAKE2b-512' => 128,
-    'BLAKE3'      => 64,
+    'MD5'          => 32,
+    'SHA-1'        => 40,
+    'SHA-256'      => 64,
+    'SHA-384'      => 96,
+    'SHA-512'      => 128,
+    'SHA3-256'     => 64,
+    'SHA3-384'     => 96,
+    'SHA3-512'     => 128,
+    'BLAKE2b-256'  => 64,
+    'BLAKE2b-384'  => 96,
+    'BLAKE2b-512'  => 128,
+    'BLAKE3'       => 64,
+    'Streebog-256' => 64,
+    'Streebog-512' => 128,
 );
 
 has alg =>
@@ -127,7 +129,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

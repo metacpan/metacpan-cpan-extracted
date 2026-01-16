@@ -1,4 +1,5 @@
 name = "App-Gimei"
+license = "mit"
 badges = ['github-actions/test', 'metacpan']
 authority="cpan:YOUPONG"
 

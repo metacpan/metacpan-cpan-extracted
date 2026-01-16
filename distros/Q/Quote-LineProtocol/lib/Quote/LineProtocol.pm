@@ -3,12 +3,13 @@ package Quote::LineProtocol;
 use v5.26;
 use warnings;
 use Time::Moment;
+use Scalar::Util 'blessed';
 use Syntax::Keyword::Match;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(measurement tags fields timestamp);
 
-our $VERSION = "0.1.3";
+our $VERSION = "0.1.4";
 our $TELEGRAF = $ENV{QUOTE_TELEGRAF} // 0; # Telegraf requires special quoting
 
 my $qr = qr{([,=\s])};    # Match tag and field keys, and tag values
@@ -25,6 +26,7 @@ sub tags {
 
   for my $key (keys %tags) {
     my $val = $tags{$key};
+    $val = "$val" if blessed($val);
     next if $val eq '';
     push @r, sprintf(qq(%s=%s), $key =~ s{$qr}{\Q$1\E}gr, $val =~ s{$qr}{\Q$1\E}gr);
   }
@@ -38,6 +40,7 @@ sub fields {
 
   for my $key (sort keys %fields) {
     my $val = $fields{$key};
+    $val = "$val" if blessed($val);
     next if $val eq '';
     my $type;
 

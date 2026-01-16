@@ -5,28 +5,28 @@ use warnings;
 package Marlin::X::Clone;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014000';
+our $VERSION   = '0.015000';
 
-use Carp 'croak';
-use Clone;
-use Eval::TypeTiny::CodeAccumulator;
-use Types::Common -types;
+use Marlin::Util          qw( true false );
+use Types::Common         qw( -types );
 
-use Marlin
-	# All Marlin::X::* plugins need to accept these attributes
-	marlin      => { isa => Object,  required => !!1, },
-	try         => { isa => Bool,    default => !!0, },
-	# These are specific to Marlin::X::Clone
+use Marlin (
+	-with       => 'Marlin::X',
 	method_name => { isa => Str,     default => 'clone' },
-	call_build  => { isa => Bool,    default => !!1 },
-	strict_args => { isa => Bool,    default => !!1 },
-	;
+	call_build  => { isa => Bool,    default => true },
+	strict_args => { isa => Bool,    default => true },
+);
+
+use B                     ();
+use Clone                 ();
+use Eval::TypeTiny::CodeAccumulator;
+use Scalar::Util          ();
 
 # Is possible to do some sanity checking here.
 sub BUILD {
 	my $plugin = shift;
 	if ( $plugin->marlin->isa('Marlin::Role') ) {
-		croak "Marlin::X::Clone cannot be applied to roles";
+		Marlin::Util::_croak "Marlin::X::Clone cannot be applied to roles";
 	}
 }
 
@@ -36,18 +36,22 @@ sub BUILD {
 sub adjust_setup_steps {
 	my $plugin = shift;
 	my $steps  = shift;
-
+	
 	# Add an extra step called "Marlin::X::Clone::setup_clone_method".
+	# The callback needs to be fully qualified and start with this
+	# package's class name so that Marlin knows which plugin added it.
+	#
 	# In our case, it doesn't really matter where we add the step, so
 	# we'll just add it at the end.
-	push @$steps, sprintf '%s::%s', __PACKAGE__, 'setup_clone_method';
+	my $callback = sprintf '%s::%s', __PACKAGE__, 'setup_clone_method';
+	push @$steps, $callback;
 }
 
-# When our step is called, it is passed the Marlin object and the plugin
-# object. Note the Marlin object is the FIRST parameter!
+# When our step is called, it is passed the plugin object and the Marlin
+# object.
 sub setup_clone_method {
-	my $marlin = shift;
 	my $plugin = shift;
+	my $marlin = shift;
 	
 	# All we're doing here is creating a method called "clone" and
 	# then telling Marlin to export it.
@@ -293,8 +297,7 @@ sub _make_clone_method_for_child {
 	return $coderef;
 }
 
-1;
-
+__PACKAGE__
 __END__
 
 =pod

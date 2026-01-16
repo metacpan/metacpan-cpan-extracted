@@ -100,8 +100,8 @@ Properties:
 
 =item C<author>, The author of the evidence.
 
-=item C<bom_ref>, An optional identifier which can be used to reference the
-object elsewhere in the BOM. Every bom-ref must be unique within the BOM.
+=item C<bom_ref>, An identifier which can be used to reference the object
+elsewhere in the BOM. Every C<bom_ref> must be unique within the BOM.
 
 =item C<created>, The date and time (timestamp) when the evidence was
 created.
@@ -111,8 +111,8 @@ created.
 =item C<description>, The written description of what this evidence is and
 how it was created.
 
-=item C<expires>, The optional date and time (timestamp) when the evidence
-is no longer valid.
+=item C<expires>, The date and time (timestamp) when the evidence is no
+longer valid.
 
 =item C<property_name>, The reference to the property name as defined in
 the CycloneDX Property Taxonomy (L<https://github.com/CycloneDX/cyclonedx-property-taxonomy/>).
@@ -174,7 +174,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

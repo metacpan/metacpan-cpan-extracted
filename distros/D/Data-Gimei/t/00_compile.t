@@ -5,6 +5,6 @@ use Test2::Bundle::More;
 
 use Data::Gimei;
 
-ok 1; # dummy
+ok 1;    # dummy
 
 done_testing;

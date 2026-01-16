@@ -1,4 +1,4 @@
-use v5.36;
+use v5.40;
 
 package App::Gimei::Generators;
 
@@ -27,4 +27,3 @@ sub execute ($self) {
 sub to_list ($self) {
     return @{ $self->body };
 }
-1;

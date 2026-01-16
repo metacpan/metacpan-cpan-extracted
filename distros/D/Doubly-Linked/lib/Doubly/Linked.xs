@@ -12,7 +12,7 @@ int _defined (HV * hash, char * key, int len) {
 int _is_undef (SV * self) {
 	dTHX;
 	HV * hash = (HV*)SvRV(self);
-	
+
 	if (SvOK(*hv_fetch(hash, "data", 4, 0))) {
 		return 0;
 	}
@@ -24,7 +24,7 @@ int _is_undef (SV * self) {
 	if (SvOK(*hv_fetch(hash, "next", 4, 0))) {
 		return 0;
 	}
-	
+
 	return 1;
 }
 
@@ -95,10 +95,10 @@ SV * _is_end ( SV * self ) {
 }
 
 SV * _length (SV * self) {
-	dTHX;	
+	dTHX;
 	self = _goto_start(self);
 	HV * hash = (HV*)SvRV(self);
-	
+
 	int len = _defined(hash, "next", 4) ? 1 : _defined(hash, "data", 4) ? 1 : 0;;
 
 	while (_defined(hash, "next", 4)) {
@@ -120,13 +120,13 @@ SV * _find ( SV * self, SV * cb ) {
 	dSP;
 	PUSHMARK(SP);
 	XPUSHs(data);
-	PUTBACK;	
+	PUTBACK;
 	call_sv(cb, G_SCALAR);
 	if (SvTRUEx(*PL_stack_sp)) {
 		return newSVsv(self);
 	}
 	POPs;
-	
+
 	while (_defined(hash, "next", 4)) {
 		self = *hv_fetch(hash, "next", 4, 0);
 		hash = (HV*)SvRV(self);
@@ -146,18 +146,18 @@ SV * _find ( SV * self, SV * cb ) {
 }
 
 SV * _insert_before (SV * self, SV * data) {
-	dTHX;	
+	dTHX;
 	if (_is_undef(self)) {
 		return _set_data(self, data);
 	}
 
 	HV * hash = (HV*)SvRV(self);
-	
+
 	SV * node = _new(self, data);
 	HV * hash_node = (HV*)SvRV(node);
 
 	hv_store(hash_node, "next", 4, newSVsv(self), 0);
-	
+
 	SV * prev = newSVsv(*hv_fetch(hash, "prev", 4, 0));
 
 	if (SvOK(prev) && SvROK(prev)) {
@@ -183,7 +183,7 @@ SV * _insert_after (SV * self, SV * data) {
 	HV * hash_node = (HV*)SvRV(node);
 
 	hv_store(hash_node, "prev", 4, newSVsv(self), 0);
-	
+
 	SV * next = newSVsv(*hv_fetch(hash, "next", 4, 0));
 
 	if (SvOK(next) && SvROK(next)) {
@@ -208,7 +208,7 @@ SV * _insert_find (SV * self, SV * cb, SV * data) {
 	if (!SvOK(self)) {
 		croak("No match found for insert cb");
 	}
-	
+
 	return _insert_before(self, data);
 }
 
@@ -240,7 +240,7 @@ SV * _insert_at_start (SV * self, SV * data) {
 
 	self = _goto_start(self);
 	HV * hash = (HV*)SvRV(self);
-	
+
 	SV * node = _new(self, data);
 	HV * hash_node = (HV*)SvRV(node);
 
@@ -288,7 +288,7 @@ SV * _remove (SV * self) {
 				sv_setsv(self, next);
 				HV * nexting = (HV*)SvRV(next);
 				hv_store(previous, "next", 4, newSVsv(next), 0);
-				hv_store(nexting, "prev", 4, newSVsv(prev), 0);	
+				hv_store(nexting, "prev", 4, newSVsv(prev), 0);
 			} else {
 				sv_setsv(self, prev);
 				hv_store(previous, "next", 4, undef, 0);
@@ -318,7 +318,7 @@ SV * _remove_from_start(SV * self) {
 
 SV * _remove_from_end(SV * self) {
 	dTHX;
-	
+
 	if (_is_undef(self)) {
 		return &PL_sv_undef;
 	}
@@ -330,7 +330,7 @@ SV * _remove_from_end(SV * self) {
 
 SV * _remove_from_pos (SV * self, int pos) {
 	dTHX;
-	
+
 	if (_is_undef(self)) {
 		return &PL_sv_undef;
 	}
@@ -349,13 +349,48 @@ SV * _remove_from_pos (SV * self, int pos) {
 	return _remove(self);
 }
 
+void _destroy (SV * self) {
+	dTHX;
+
+	if (_is_undef(self)) {
+		return;
+	}
+
+	/* Collect all nodes first, incrementing refcounts to keep them alive */
+	AV * nodes = newAV();
+	self = _goto_start(self);
+	HV * hash = (HV*)SvRV(self);
+
+	av_push(nodes, SvREFCNT_inc(self));
+	while (_defined(hash, "next", 4)) {
+		self = *hv_fetch(hash, "next", 4, 0);
+		av_push(nodes, SvREFCNT_inc(self));
+		hash = (HV*)SvRV(self);
+	}
+
+	/* Now clear all links in all nodes */
+	int i;
+	for (i = 0; i <= av_len(nodes); i++) {
+		SV ** node_ptr = av_fetch(nodes, i, 0);
+		if (node_ptr && SvROK(*node_ptr)) {
+			HV * h = (HV*)SvRV(*node_ptr);
+			hv_store(h, "prev", 4, newSV(0), 0);
+			hv_store(h, "next", 4, newSV(0), 0);
+			hv_store(h, "data", 4, newSV(0), 0);
+		}
+	}
+
+	/* Free the nodes array (and decrement all the refcounts we incremented) */
+	SvREFCNT_dec((SV*)nodes);
+}
+
 
 MODULE = Doubly::Linked  PACKAGE = Doubly::Linked
 PROTOTYPES: DISABLE
 
 SV *
 new(...)
-	CODE: 
+	CODE:
 		RETVAL = _new(ST(0), items > 1 ? newSVsv(ST(1)) : &PL_sv_undef);
 	OUTPUT:
 		RETVAL
@@ -441,11 +476,12 @@ bulk_add(self, ...)
 		if (items > 1) {
 			int i = 1;
 			for (i = 1; i < items; i++) {
-				RETVAL = _insert_at_end(self, newSVsv(ST(i)));
+				self = _insert_after(self, newSVsv(ST(i)));
 			}
 		}
+		RETVAL = self;
 	OUTPUT:
-		RETVAL 
+		RETVAL
 
 SV *
 add(self, ...)
@@ -464,7 +500,7 @@ insert(self, cb, ...)
 	OUTPUT:
 		RETVAL
 
-SV * 
+SV *
 insert_before(self, ...)
 	SV * self
 	CODE:
@@ -472,7 +508,7 @@ insert_before(self, ...)
 	OUTPUT:
 		RETVAL
 
-SV * 
+SV *
 insert_after(self, ...)
 	SV * self
 	CODE:
@@ -540,4 +576,10 @@ find(self, cb)
 		RETVAL = _find(self, cb);
 	OUTPUT:
 		RETVAL
+
+void
+destroy(self)
+	SV * self
+	CODE:
+		_destroy(self);
 

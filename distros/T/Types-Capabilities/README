@@ -3,6 +3,10 @@ NAME
     what you can do with it
 
 SYNOPSIS
+    Using Greppable in a method signature:
+
+      use experimental qw( signatures );
+  
       package LineFilter {
         use Moo;
         use Type::Params 'signature_for';
@@ -26,6 +30,43 @@ SYNOPSIS
   
       my $greetings = LineFilter->new( regexp => qr/Hello/ );
       $greetings->print_matching_lines( [ 'Hello world', 'Goodbye' ] );
+
+    Using Enqueueable and Dequeueable in an attribute type constraint:
+
+      use experimental qw( signatures try );
+  
+      package TaskQueue {
+        use Moose;
+        use Types::Capabilities qw( +Enqueueable +Dequeueable );
+        use Types::Common qw( +CodeRef );
+    
+        has queue => (
+          is        => 'ro',
+          isa       => Enqueueable & Dequeueable,
+          default   => sub { [] },
+          handles   => [ qw/ enqueue dequeue / ],
+        );
+    
+        sub run_next ( $self ) {
+      
+          my $task = assert_CodeRef( $self->dequeue or return $self );
+      
+          try {
+            $task->();
+          }
+          catch ( $e ) {
+            warn "Error running task: $e, sending to back of queue";
+            $self->enqueue( $task );
+          }
+      
+          return $self;
+        }
+      }
+  
+      my $q = TaskQueue->new;
+      $q->enqueue( sub { ... } );
+      $q->enqueue( sub { ... } );
+      $q->run_next->run_next->run_next;
 
 DESCRIPTION
     This module allows you to indicate when you are designing your API that
@@ -59,7 +100,8 @@ CONSTRAINTS
         specified, but it may return another collection-like object which
         further operations can be carried out on.
 
-        Can be coerced from ArrayRef, Greppable, Eachable, or ArrayLike.
+        Can be coerced from ArrayRef, Greppable, Eachable, ArrayLike, CodeRef,
+        FileHandle, or File. (Files are read by line.)
 
     Greppable
         An object which provides a `grep` method.
@@ -71,7 +113,8 @@ CONSTRAINTS
         specified, but it may return another collection-like object which
         further operations can be carried out on.
 
-        Can be coerced from ArrayRef, Mappable, Eachable, or ArrayLike.
+        Can be coerced from ArrayRef, Mappable, Eachable, ArrayLike, CodeRef,
+        FileHandle, or File. (Files are read by line.)
 
     Sortable
         An object which provides a `sort` method.
@@ -85,8 +128,8 @@ CONSTRAINTS
         return another collection-like object which further operations can be
         carried out on.
 
-        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
-        ArrayLike.
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, CodeRef,
+        FileHandle, or File. (Files are read by line.)
 
     Reversible
         An object which provides a `reverse` method.
@@ -97,8 +140,8 @@ CONSTRAINTS
         it may return another collection-like object which further operations
         can be carried out on.
 
-        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
-        ArrayLike.
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable,
+        ArrayLike, FileHandle, or File. (Files are read by line.)
 
     Countable
         An object which provides a `count` method.
@@ -106,8 +149,8 @@ CONSTRAINTS
         The expectation is that when the method is called in scalar context,
         it should return the number of items in the collection.
 
-        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
-        ArrayLike.
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable,
+        ArrayLike, FileHandle, or File. (Files are read by line.)
 
     Joinable
         An object which provides a `join` method.
@@ -119,8 +162,8 @@ CONSTRAINTS
         given, the method may use a default separator, typically something
         like "," or the empty string.
 
-        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
-        ArrayLike.
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable,
+        ArrayLike, FileHandle, or File. (Files are read by line.)
 
     Eachable
         An object which provides an `each` method.
@@ -129,7 +172,8 @@ CONSTRAINTS
         passed a coderef, it should call the coderef for each item in the
         collection.
 
-        Can be coerced from ArrayRef, Mappable, Greppable, or ArrayLike.
+        Can be coerced from ArrayRef, Mappable, Greppable, ArrayLike, CodeRef,
+        FileHandle, or File. (Files are read by line.).
 
    Constraints for Queue-Like Objects
     Enqueueable
@@ -138,8 +182,13 @@ CONSTRAINTS
         The expectation is that the method can be called with a single item to
         add that item to the end of the collection.
 
-        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
-        ArrayLike.
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable,
+        ArrayLike, or CodeRef.
+
+        Note that if you coerce a Enqueueable object from a ArrayRef, then
+        pushing onto the coerced object will also push onto the original
+        array. In theory this should work for ArrayLike too, though it depends
+        on how the original array-like object implemented overloading.
 
     Dequeueable
         An object which provides a `dequeue` method.
@@ -147,8 +196,13 @@ CONSTRAINTS
         The expectation is that when the method is called in a scalar context,
         it will remove an item from the front of the collection and return it.
 
-        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
-        ArrayLike.
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable,
+        ArrayLike, or CodeRef.
+
+        Note that if you coerce a Dequeueable object from a ArrayRef, then
+        shifting from the coerced object will also shift from the original
+        array. In theory this should work for ArrayLike too, though it depends
+        on how the original array-like object implemented overloading.
 
     Peekable
         An object which provides a `peek` method.
@@ -175,8 +229,13 @@ CONSTRAINTS
         add that item to the end of the collection. (This behaviour is
         essentially the same as `enqueue`.)
 
-        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
-        ArrayLike.
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable,
+        ArrayLike, or CodeRef.
+
+        Note that if you coerce a Pushable object from a ArrayRef, then
+        pushing onto the coerced object will also push onto the original
+        array. In theory this should work for ArrayLike too, though it depends
+        on how the original array-like object implemented overloading.
 
     Poppable
         An object which provides a `pop` method.
@@ -184,8 +243,13 @@ CONSTRAINTS
         The expectation is that when the method is called in a scalar context,
         it will remove an item from the end of the collection and return it.
 
-        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
-        ArrayLike.
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable,
+        ArrayLike, or CodeRef.
+
+        Note that if you coerce a Pushable object from a ArrayRef, then
+        popping from the coerced object will also pop from the original array.
+        In theory this should work for ArrayLike too, though it depends on how
+        the original array-like object implemented overloading.
 
     Peekable
         See description above.
@@ -215,6 +279,90 @@ CONSTRAINTS
         coerce  => 1,
       );
 
+  Coercion from CodeRef
+    Coderefs can be used as iterators to be coerced into Eachable, Mappable,
+    and Greppable objects. The `each`, `map`, and `grep` methods will call the
+    coderef in list context to return one or more items. The empty list should
+    be returned to indicate that the iterator has been exhausted.
+
+    Coderefs can also be coerced to `Dequeueable` objects. The coderef will be
+    is expected to dequeue and return a single item.
+
+    Coderefs can also be coerced to `Enqueueable` objects. The coderef will be
+    called with a single item to enqueue.
+
+    Coderefs can also be coerced to `Poppable` objects. The coderef will be is
+    expected to pop and return a single item.
+
+    Coderefs can also be coerced to `Pushable` objects. The coderef will be
+    called with a single item to push.
+
+    Here is a simple implementation of a FIFO queue.
+
+      use v5.10;
+  
+      # If an item is on @_, then enqueue it.
+      # Otherwise, it's a dequeue operation.
+      my $q = ( Enqueueable & Dequeueable )->coerce( sub {
+        state $list = [];
+        return push @$list, $_[0] if @_;
+        return if !@$list;
+        shift @$list;
+      } );
+  
+      $q->enqueue( 'first' );
+      $q->enqueue( 'second' );
+      say $q->dequeue;   # first
+      $q->enqueue( 'third' );
+      say $q->dequeue;   # second
+      say $q->dequeue;   # third
+
+  Coercion from FileHandle and File
+    File handles opened for input can be coerced into Mappable, Greppable,
+    Sortable, Reversible, Countable, Joinable, and Eachable objects.
+
+    Files are treated as lists of lines using "\n" as the line separator.
+    Lines are chomped to remove the trailing "\n". `seek($fh, 0, 0)` at the
+    start of each method.
+
+    Path::Tiny objects representing files will also work. They will be opened
+    in UTF-8 mode.
+
+    The following variables can tweak how this coercion works, though be wary
+    of changing them as it can have global effects.
+
+    $Types::Capabilities::CoercedValue::FILEHANDLE::INPUT_RECORD_SEPARATOR
+        Defaults to "\n".
+
+    $Types::Capabilities::CoercedValue::FILEHANDLE::AUTO_SEEK
+        Defaults to true.
+
+    $Types::Capabilities::CoercedValue::FILEHANDLE::AUTO_CHOMP
+        Defaults to true.
+
+    $Types::Capabilities::CoercedValue::FILEHANDLE::PATHTINY_FH_OPTIONS
+        Defaults to `{ locked => 1 }`.
+
+    $Types::Capabilities::CoercedValue::FILEHANDLE::PATHTINY_FH_BINMODE
+        Defaults to ":utf8".
+
+    Note that the values of these variables at the time of coercion are what
+    is important.
+
+      use Types::Capabilities qw( to_Eachable );
+  
+      my $eachable = do {
+        local $Types::Capabilities::CoercedValue::FILEHANDLE::INPUT_RECORD_SEPARATOR = "\r\n";
+        to_Eachable( $fh );
+      };
+  
+      $Types::Capabilities::CoercedValue::FILEHANDLE::INPUT_RECORD_SEPARATOR = "something else";
+  
+      # Iterates through file using "\r\n" as the line ending.
+      $eachable->each( sub {
+        ...;
+      } );
+
 BUGS
     Please report any bugs to
     <https://github.com/tobyink/p5-types-capabilities/issues>.
@@ -224,11 +372,17 @@ SEE ALSO
 
     Sub::HandlesVia, Hydrogen::Autobox.
 
+    ArrayRef, CodeRef, and FileHandle are defined in Types::Standard.
+
+    ArrayLike is defined in Types::TypeTiny.
+
+    File is defined in Types::Path::Tiny.
+
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2025 by Toby Inkster.
+    This software is copyright (c) 2025-2026 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

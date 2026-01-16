@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
+use SBOM::CycloneDX::Hash;
 use SBOM::CycloneDX::List;
 use SBOM::CycloneDX::Enum;
 
@@ -17,6 +18,7 @@ use namespace::autoclean;
 extends 'SBOM::CycloneDX::Base';
 
 has primitive                => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->CRYPTO_PRIMITIVES()]);
+has algorithm_family         => (is => 'rw', isa => Str);
 has parameter_set_identifier => (is => 'rw', isa => Str);
 has curve                    => (is => 'rw', isa => Str);
 has execution_environment    => (is => 'rw', isa => Str);
@@ -47,6 +49,7 @@ sub TO_JSON {
     my $json = {};
 
     $json->{primitive}                = $self->primitive                   if $self->primitive;
+    $json->{algorithmFamily}          = $self->algorithm_family            if $self->algorithm_family;
     $json->{parameterSetIdentifier}   = $self->parameter_set_identifier    if $self->parameter_set_identifier;
     $json->{curve}                    = $self->curve                       if $self->curve;
     $json->{executionEnvironment}     = $self->execution_environment       if $self->execution_environment;
@@ -94,6 +97,10 @@ Properties:
 
 =over
 
+=item C<algorithm_family>, A valid algorithm family identifier. If specified,
+this value must be one of the enumeration of valid algorithm Family identifiers
+defined in the C<cryptography-defs.schema.json> subschema.
+
 =item C<certification_level>, The certification that the implementation of
 the cryptographic algorithm has received, if any. Certifications include
 revisions and levels of FIPS 140 or Common Criteria of different Extended
@@ -105,7 +112,7 @@ cryptographic algorithm provides (in bits).
 =item C<crypto_functions>, The cryptographic functions implemented by the
 cryptographic algorithm.
 
-=item C<curve>, The specific underlying Elliptic Curve (EC) definition
+=item C<curve>, [Deprecated] The specific underlying Elliptic Curve (EC) definition
 employed which is an indicator of the level of security strength,
 performance and complexity. Absent an authoritative source of curve names,
 CycloneDX recommends using curve names as defined at
@@ -150,6 +157,8 @@ encryption (ae, e.g. AES-GCM) and the combination of multiple algorithms
 (combiner, e.g. SP800-56Cr2).
 
 =back
+
+=item $algorithm_properties->algorithm_family
 
 =item $algorithm_properties->certification_level
 
@@ -204,7 +213,7 @@ L<https://github.com/giterlizzi/perl-SBOM-CycloneDX>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2025-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

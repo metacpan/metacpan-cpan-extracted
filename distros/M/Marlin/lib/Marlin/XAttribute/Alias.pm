@@ -5,17 +5,20 @@ use warnings;
 package Marlin::XAttribute::Alias;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014000';
+our $VERSION   = '0.015000';
 
-use Eval::TypeTiny ();
-use Role::Tiny;
+use Eval::TypeTiny        ();
+use Marlin::Util          qw( true false );
+
+# This is just a Marlin::Role which will be applied to Marlin::Attribute
+use Marlin::Role;
 
 after canonicalize_is => sub {
 	my $me = shift;
 	
 	if ( 'HASH' ne ref $me->{':Alias'} ) {
 		my $aliases = $me->{':Alias'};
-		$me->{':Alias'} = { alias => $aliases, try => !!0 };
+		$me->{':Alias'} = { alias => $aliases, try => false };
 	}
 
 	if ( 'ARRAY' ne ref $me->{':Alias'}{alias} ) {
@@ -108,8 +111,7 @@ after injected_metadata => sub {
 	}
 };
 
-1;
-
+__PACKAGE__
 __END__
 
 =pod

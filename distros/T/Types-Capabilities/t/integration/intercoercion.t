@@ -13,6 +13,6 @@ my $list2 = to_Greppable( $list );
 
 ok is_Greppable( $list2 );
 
-is $list2->grep(sub { length($_) == 4 }), ['quux'];
+is [ $list2->grep( sub { length($_) == 4 } ) ], [ 'quux' ];
 
 done_testing;

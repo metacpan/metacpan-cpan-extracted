@@ -212,7 +212,46 @@ Doubly _insert_at_end(Doubly self, SV * data) {
 	return newNode;
 }
 
+/* Helper function for destroy() - doesn't allocate return value */
+void _destroy_node (SV * var, Doubly self) {
+	dTHX;
+	if (_is_undef(self)) {
+		return;
+	}
+
+	Doubly prev = self->prev;
+	Doubly next = self->next;
+	if (prev != NULL) {
+		if (next != NULL) {
+			sv_setref_pv(var, "Doubly", next);
+			next->prev = prev;
+			prev->next = next;
+		} else {
+			sv_setref_pv(var, "Doubly", prev);
+			prev->next = NULL;
+		}
+		self->prev = NULL;
+		self->next = NULL;
+		SvREFCNT_dec(self->data);
+		free(self);
+	} else if (next != NULL) {
+		sv_setref_pv(var, "Doubly", next);
+		next->prev = NULL;
+		self->prev = NULL;
+		self->next = NULL;
+		SvREFCNT_dec(self->data);
+		free(self);
+	} else {
+		/* Last node - free the data but keep the empty node */
+		if (self->data != &PL_sv_undef) {
+			SvREFCNT_dec(self->data);
+		}
+		self->data = &PL_sv_undef;
+	}
+}
+
 SV * _remove (SV * var, Doubly self) {
+	dTHX;
 	if (_is_undef(self)) {
 		return &PL_sv_undef;
 	}
@@ -232,14 +271,20 @@ SV * _remove (SV * var, Doubly self) {
 		}
 		self->prev = NULL;
 		self->next = NULL;
+		SvREFCNT_dec(self->data);
 		free(self);
 	} else if (next != NULL) {
 		sv_setref_pv(var, "Doubly", next);
 		next->prev = NULL;
 		self->prev = NULL;
 		self->next = NULL;
+		SvREFCNT_dec(self->data);
 		free(self);
 	} else {
+		/* Last node - free the data but keep the empty node */
+		if (self->data != &PL_sv_undef) {
+			SvREFCNT_dec(self->data);
+		}
 		self->data = &PL_sv_undef;
 	}
 
@@ -446,7 +491,15 @@ SV *
 remove_from_start(self, ...)
 	Doubly self
 	CODE:
-		RETVAL = _remove_from_start(self->prev != NULL ? newSVsv(ST(0)) : ST(0), self);
+		if (self->prev != NULL) {
+			/* Not at start - use a temporary SV to track the start, don't modify self */
+			SV * tmp = newSVsv(ST(0));
+			RETVAL = _remove_from_start(tmp, self);
+			SvREFCNT_dec(tmp);
+		} else {
+			/* At start - modify self to point to next node */
+			RETVAL = _remove_from_start(ST(0), self);
+		}
 	OUTPUT:
 		RETVAL
 
@@ -454,7 +507,15 @@ SV *
 remove_from_end(self, ...)
 	Doubly self
 	CODE:
-		RETVAL = _remove_from_end(self->next != NULL ? newSVsv(ST(0)) : ST(0), self);
+		if (self->next != NULL) {
+			/* Not at end - use a temporary SV to track the end, don't modify self */
+			SV * tmp = newSVsv(ST(0));
+			RETVAL = _remove_from_end(tmp, self);
+			SvREFCNT_dec(tmp);
+		} else {
+			/* At end - modify self to point to prev node */
+			RETVAL = _remove_from_end(ST(0), self);
+		}
 	OUTPUT:
 		RETVAL
 
@@ -481,10 +542,14 @@ destroy(self, ...)
 	Doubly self
 	CODE:
 		Doubly next;
-		self = _goto_end(self);
+		/* First go to start of the list */
 		while ( self->prev != NULL ) {
-			next = self->prev;
-			_remove(ST(0), self);
+			self = self->prev;
+		}
+		/* Now destroy all nodes going forward */
+		while ( self->next != NULL ) {
+			next = self->next;
+			_destroy_node(ST(0), self);
 			self = next;
 		}
-		_remove(ST(0), self);
+		_destroy_node(ST(0), self);

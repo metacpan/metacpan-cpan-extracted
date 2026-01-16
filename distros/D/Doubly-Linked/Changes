@@ -1,5 +1,10 @@
 Revision history for Doubly-Linked
 
+0.13    2026-01-15
+        - speed up bulk_add
+
+0.02    2026-01-15
+        - Fix memory leaks
+
 0.01    Date/time
         First version, released on an unsuspecting world.
-

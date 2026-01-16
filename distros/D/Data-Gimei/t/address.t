@@ -23,7 +23,7 @@ use Test2::Bundle::More;
     is $addr->kanji,          '北海道札幌市中央区モエレ沼公園';
     is $addr->hiragana,       'ほっかいどうさっぽろしちゅうおうくもえれぬまこうえん';
     is $addr->katakana,       'ホッカイドウサッポロシチュウオウクモエレヌマコウエン';
-    ok !$addr->can('romaji'), "Address doesn't define method romaji().";
+    ok !$addr->can('romaji'), 'Address doesn\'t define method romaji().';
 
     is $addr->prefecture->kanji,    '北海道';
     is $addr->prefecture->hiragana, 'ほっかいどう';
