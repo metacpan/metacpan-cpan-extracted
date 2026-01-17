@@ -1,5 +1,9 @@
 Revision history for Perl extension Command-Run
 
+0.9902 2026-01-16T11:24:17Z
+
+    - Remove new(@command) style; use command => [...] or ->command() instead
+
 0.9901 2026-01-15T10:32:46Z
 
     - Add with() method for fluent parameter setting

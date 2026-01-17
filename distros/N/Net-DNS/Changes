@@ -1,4 +1,12 @@
-$Id: Changes 2041 2025-08-29 12:11:41Z willem $                       -*-text-*-
+$Id: Changes 2045 2026-01-16 12:30:12Z willem $                       -*-text-*-
+
+
+**** 1.54 Jan 16, 2026
+
+	Resync with IANA DNS parameters registry.
+	Resync with IANA DNSSEC algorithms registry.
+	Implement DELEGI as derived subtype of DELEG RR.
+	Backport DELEG parser to SVCB.
 
 
 **** 1.53 Aug 29, 2025

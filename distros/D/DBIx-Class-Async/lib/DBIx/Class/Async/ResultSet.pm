@@ -16,11 +16,11 @@ DBIx::Class::Async::ResultSet - Asynchronous resultset for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.28
+Version 0.31
 
 =cut
 
-our $VERSION = '0.28';
+our $VERSION = '0.31';
 
 =head1 SYNOPSIS
 
@@ -163,24 +163,47 @@ Returns C<undef> if the provided data is empty or undefined.
 
 sub new_result {
     my ($self, $data) = @_;
-    return undef unless $data;
 
-    # Create a unique class for this specific table to avoid namespace pollution
     my $row_class = "DBIx::Class::Async::Row::" . $self->{source_name};
 
+    # 1. Setup inheritance and dynamic accessors
     {
         no strict 'refs';
         unless (@{"${row_class}::ISA"}) {
             @{"${row_class}::ISA"} = ('DBIx::Class::Async::Row');
+            my $source = $self->result_source;
+            foreach my $col ($source->columns) {
+                *{"${row_class}::$col"} = sub {
+                    my $inner = shift;
+                    return @_ ? $inner->set_column($col, shift) : $inner->get_column($col);
+                };
+            }
         }
     }
 
-    return $row_class->new(
+    $data    //= {};
+    my $source = $self->result_source;
+    my ($pk)   = $source->primary_columns;
+
+    my $is_in_storage = 0;
+    if (exists $data->{_in_storage}) {
+        $is_in_storage = delete $data->{_in_storage};
+    } elsif ($pk && defined $data->{$pk}) {
+        $is_in_storage = 1;
+    }
+
+    my $row = $row_class->new(
         schema      => $self->{schema},
         async_db    => $self->{async_db},
         source_name => $self->{source_name},
         row_data    => $data,
+        in_storage  => $is_in_storage,
     );
+
+    # If it's from storage, it shouldn't be dirty
+    $row->{_dirty} = {} if $is_in_storage;
+
+    return $row;
 }
 
 =head2 new_result_set
@@ -204,6 +227,9 @@ Accepts a hashref of attributes to override in the new instance.
 
 sub new_result_set {
     my ($self, $args) = @_;
+
+    $args //= {};
+
     return (ref $self)->new(
         schema      => $self->{schema},
         async_db    => $self->{async_db},
@@ -242,18 +268,16 @@ Results are cached internally for use with C<next> and C<reset> methods.
 sub all {
     my $self = shift;
 
-    # 1. If this is a prefetched ResultSet, return the data immediately as a Future
+    # 1. Handle prefetched ResultSet
     if ($self->{is_prefetched} && $self->{entries}) {
         my @rows       = map { $self->new_result($_) } @{$self->{entries}};
         $self->{_rows} = \@rows;
         return Future->done(\@rows);
     }
 
-    # 2. Standard Async Fetch with Prefetch Support
-    my $source_name = $self->{source_name};
-
+    # 2. Standard Async Fetch
     return $self->{async_db}->search(
-        $source_name,
+        $self->{source_name},
         $self->{_cond},
         $self->{_attrs}
     )->then(sub {
@@ -261,9 +285,10 @@ sub all {
 
         my @rows = map {
             my $row_data = $_;
+            # new_result now handles in_storage and _dirty correctly
             my $row = $self->new_result($row_data);
 
-            # If the hash contains nested hashes or arrays, it's prefetched data
+            # If the hash contains nested data, it's prefetched
             if (grep { ref($row_data->{$_}) } keys %$row_data) {
                 $self->_inflate_prefetch($row, $row_data, $self->{_attrs}{prefetch});
             }
@@ -441,8 +466,8 @@ the newly created row.
 sub create {
     my ($self, $data) = @_;
 
-    # Combine the ResultSet's current search condition (which contains the foreign key)
-    # with the new data provided by the user.
+    # Combine the ResultSet's current search condition, which contains
+    # the foreign key) with the new data provided by the user.
     my %to_insert = ( %{$self->{_cond} || {}}, %$data );
 
     # Clean up prefixes: DBIC sometimes stores conditions as 'foreign.user_id'
@@ -460,11 +485,13 @@ sub create {
     )->then(sub {
         my ($result) = @_;
 
-        if (ref $result eq 'HASH' && $result->{__error}) {
-            return Future->fail($result->{__error}, 'db_error');
+        if (ref $result eq 'HASH'
+            && ($result->{error} || $result->{__error})) {
+            my $err = $result->{error} // $result->{__error};
+            return Future->fail($err, 'db_error');
         }
 
-        return Future->done($self->new_result($result));
+        return Future->done($self->new_result($result, { in_storage => 1 }));
     });
 }
 
@@ -894,12 +921,10 @@ A L<Future> that resolves to an array reference of column values.
 sub get_column {
     my ($self, $column) = @_;
 
-    return $self->all->then(sub {
-        my (@rows) = @_;
+    # Don't die if column doesn't exist, just return undef or check _data
+    return $self->{_data}{$column} if exists $self->{_data}{$column};
 
-        my @values = map { $_->get_column($column) } @rows;
-        return Future->done(\@values);
-    });
+    return undef;
 }
 
 =head2 next
@@ -1124,7 +1149,6 @@ sub populate_bulk {
         return Future->done(1);
     });
 }
-
 
 =head2 prefetch
 

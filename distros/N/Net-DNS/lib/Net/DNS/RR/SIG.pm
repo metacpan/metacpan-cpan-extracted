@@ -2,7 +2,7 @@ package Net::DNS::RR::SIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SIG.pm 2003 2025-01-21 12:06:06Z willem $)[2];
+our $VERSION = (qw$Id: SIG.pm 2042 2025-12-24 10:23:11Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -29,17 +29,19 @@ eval { require MIME::Base64 };
 ## IMPORTANT: MUST NOT include crypto packages in metadata (strong crypto prohibited in many territories)
 use constant DNSSEC => defined $INC{'Net/DNS/SEC.pm'};	## Discover how we got here, without exposing any crypto
 
-my @index;
+my @algorithms;
+my @deprecated;
 if (DNSSEC) {
-	foreach my $class ( map {"Net::DNS::SEC::$_"} qw(Private RSA DSA ECDSA EdDSA Digest SM2) ) {
-		my @algorithms = eval join '', qw(r e q u i r e), " $class; ${class}::_index()";	## no critic
-		push @index, map { ( $_ => $class ) } @algorithms;
+	foreach my $class ( map {"Net::DNS::SEC::$_"} qw(Private DSA RSA ECDSA EdDSA Digest SM2) ) {
+		my @index = eval join '', qw(r e q u i r e), " $class; ${class}::_index()";	## no critic
+		push @algorithms, map { ( $_ => $class ) } @index;
+		push @deprecated, eval "${class}::_deprecate()";			   	## no critic
 	}
-	croak 'Net::DNS::SEC version not supported' unless scalar(@index);
+	croak 'Net::DNS::SEC version not supported' unless scalar(@algorithms);
 }
 
-my %DNSSEC_verify = @index;
-my %DNSSEC_siggen = @index;
+my %DNSSEC_verify = @algorithms;
+my %DNSSEC_siggen = @algorithms;
 
 my @field = qw(typecovered algorithm labels orgttl sigexpiration siginception keytag);
 
@@ -349,8 +351,8 @@ sub vrfyerrstr {
 		'ECDSAP384SHA384'    => 14,			# [RFC6605]
 		'ED25519'	     => 15,			# [RFC8080]
 		'ED448'		     => 16,			# [RFC8080]
-		'SM2SM3'	     => 17,			# [RFC-cuiling-dnsop-sm2-alg-15]
-		'ECC-GOST12'	     => 23,			# [RFC-makarenko-gost2012-dnssec-05]
+		'SM2SM3'	     => 17,			# [RFC9563]
+		'ECC-GOST12'	     => 23,			# [RFC9558]
 
 		'INDIRECT'   => 252,				# [RFC4034]
 		'PRIVATEDNS' => 253,				# [RFC4034]
@@ -676,8 +678,8 @@ that comes with the ISC BIND distribution.
 The optional remaining arguments consist of ( name => value ) pairs
 as follows:
 
-	sigin  => 20241201010101,	# signature inception
-	sigex  => 20241201011101,	# signature expiration
+	sigin  => 20251201010101,	# signature inception
+	sigex  => 20251201011101,	# signature expiration
 	sigval => 10,			# validity window (minutes)
 
 The sigin and sigex values may be specified as Perl time values or as
@@ -748,6 +750,8 @@ on the development of the SIG package.
 Andy Vaskys (Network Associates Laboratories) supplied code for RSA.
 
 T.J. Mather provided support for the DSA algorithm.
+
+Dick Franks added support for elliptic curve and Edwards curve algorithms.
 
 
 =head1 COPYRIGHT

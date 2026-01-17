@@ -7,7 +7,7 @@ package Class::XSReader;
 
 BEGIN {
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.022000';
+	our $VERSION   = '0.022001';
 	
 	if ( eval { require Types::Standard; 1 } ) {
 		Types::Standard->import(

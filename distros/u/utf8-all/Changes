@@ -1,5 +1,9 @@
 Revision history for Perl module utf8-all
 
+0.025     2026-01-16
+  * Force use of archive-tar to prevent issues on MacOs
+  * Adpated to use gmake instead of dmake
+
 0.024     2018-01-05
   * Adapted force_global test to work when the perl unicode flag is active
                                                               [gh-48; HayoBaan]

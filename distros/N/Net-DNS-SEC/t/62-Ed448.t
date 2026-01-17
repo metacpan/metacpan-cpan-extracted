@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 62-Ed448.t 1937 2023-09-11 09:27:16Z willem $	-*-perl-*-
+# $Id: 62-Ed448.t 2003 2025-01-21 12:06:06Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -23,7 +23,7 @@ plan skip_all => "disabled EdDSA"
 		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_EdDSA') };
 
 Net::DNS::SEC::libcrypto->VERSION =~ /(BoringSSL|LibreSSL)/i;
-plan skip_all => "ED448 not yet supported by $1"
+plan skip_all => "ED448 not supported by $1"
 		unless grep { $_ == 16 } Net::DNS::SEC::EdDSA->_index;
 
 plan tests => 8;

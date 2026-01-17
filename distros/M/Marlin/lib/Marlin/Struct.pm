@@ -6,7 +6,7 @@ use utf8;
 package Marlin::Struct;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015000';
+our $VERSION   = '0.016000';
 
 use Eval::TypeTiny        ();
 use Marlin                ();

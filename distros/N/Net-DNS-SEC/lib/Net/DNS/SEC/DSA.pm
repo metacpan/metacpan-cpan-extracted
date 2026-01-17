@@ -3,7 +3,7 @@ package Net::DNS::SEC::DSA;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: DSA.pm 1940 2023-10-30 15:59:20Z willem $)[2];
+our $VERSION = (qw$Id: DSA.pm 2042 2025-12-24 10:23:11Z willem $)[2];
 
 
 =head1 NAME
@@ -13,11 +13,11 @@ Net::DNS::SEC::DSA - DNSSEC DSA digital signature algorithm
 
 =head1 SYNOPSIS
 
-    require Net::DNS::SEC::DSA;
+	require Net::DNS::SEC::DSA;
 
-    $signature = Net::DNS::SEC::DSA->sign( $sigdata, $private );
+	$signature = Net::DNS::SEC::DSA->sign( $sigdata, $private );
 
-    $validated = Net::DNS::SEC::DSA->verify( $sigdata, $keyrr, $sigbin );
+	$validated = Net::DNS::SEC::DSA->verify( $sigdata, $keyrr, $sigbin );
 
 
 =head1 DESCRIPTION
@@ -27,14 +27,14 @@ generation and verification procedures.
 
 =head2 sign
 
-    $signature = Net::DNS::SEC::DSA->sign( $sigdata, $private );
+	$signature = Net::DNS::SEC::DSA->sign( $sigdata, $private );
 
 Generates the wire-format signature from the sigdata octet string
 and the appropriate private key object.
 
 =head2 verify
 
-    $validated = Net::DNS::SEC::DSA->verify( $sigdata, $keyrr, $sigbin );
+	$validated = Net::DNS::SEC::DSA->verify( $sigdata, $keyrr, $sigbin );
 
 Verifies the signature over the sigdata octet string using the specified
 public key resource record.
@@ -56,6 +56,8 @@ my %parameters = (
 	);
 
 sub _index { return keys %parameters }
+
+sub _deprecate { return _index() }	## deprecate for DNSSEC sign/validate
 
 
 sub sign {

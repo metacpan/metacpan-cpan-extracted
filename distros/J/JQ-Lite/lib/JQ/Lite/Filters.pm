@@ -137,6 +137,10 @@ sub apply {
 
                 next if @stack;
                 if (substr($body, $i) =~ /^catch\s+/) {
+                    if ($i > 0) {
+                        my $prev = substr($body, $i - 1, 1);
+                        next unless $prev =~ /[\s\)\]\}\|,]/;
+                    }
                     $catch_index = $i;
                     last;
                 }

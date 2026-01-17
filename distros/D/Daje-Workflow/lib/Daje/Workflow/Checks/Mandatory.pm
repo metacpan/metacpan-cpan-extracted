@@ -12,7 +12,23 @@ use v5.42;
 #
 #    check($self)
 #
-#    Assumed format $self->context->{context}->{payload}->{field to be checked for existence)
+#    Checks can either come from the workflow checks tag as a comma separated string of fields
+#
+#               {
+#                 "name": "Mandatory fields",
+#                 "class": "Daje::Workflow::Checks::Mandatory",
+#                 "checks": "name,tools_object_types_fkey,active"
+#               }
+#
+#    or a database model class containing a mandatory method containing a comma separated list of fields
+#
+#               {
+#                 "name": "Mandatory fields",
+#                 "class": "Daje::Workflow::Checks::Mandatory",
+#                 "checks": "Daje::Database::Model::SentinelStatus"
+#               }
+#
+#    Assumed format of data $self->context->{context}->{payload}->{field to be checked for existence)
 #
 #
 # DESCRIPTION
@@ -34,12 +50,25 @@ use v5.42;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
+use Mojo::Loader qw(load_class);
 use Data::Dumper;
 
 sub check($self) {
     my $result = 1;
+    my @fields = ();
     if (length($self->checks()) > 0) {
-        my @fields = split(',', $self->checks());
+        my $checks = $self->checks();
+        if ($checks =~ /\Q::\E/) {
+            if (my $e = load_class $checks) {
+                $self->error->add_error($e);
+            }
+            if ($self->error->has_error() == 0) {
+                my $mandatory = $checks->new()->mandatory();
+                @fields = split(',', $mandatory);
+            }
+        } else {
+            @fields = split(',', $self->checks());
+        }
         my $length = scalar @fields;
         for (my $i = 0; $i < $length; $i++) {
             my $temp = $self->context();
@@ -53,6 +82,7 @@ sub check($self) {
 }
 
 1;
+
 
 
 
@@ -79,7 +109,23 @@ Daje::Workflow::Checks::Mandatory  - Checks for mandatory fields
 
    check($self)
 
-   Assumed format $self->context->{context}->{payload}->{field to be checked for existence)
+   Checks can either come from the workflow checks tag as a comma separated string of fields
+
+              {
+                "name": "Mandatory fields",
+                "class": "Daje::Workflow::Checks::Mandatory",
+                "checks": "name,tools_object_types_fkey,active"
+              }
+
+   or a database model class containing a mandatory method containing a comma separated list of fields
+
+              {
+                "name": "Mandatory fields",
+                "class": "Daje::Workflow::Checks::Mandatory",
+                "checks": "Daje::Database::Model::SentinelStatus"
+              }
+
+   Assumed format of data $self->context->{context}->{payload}->{field to be checked for existence)
 
 
 
@@ -95,6 +141,10 @@ mandatory fields are included in the context
 =head1 REQUIRES
 
 L<Data::Dumper> 
+
+L<Mojo::Loader> 
+
+L<v5.42> 
 
 L<Mojo::Base> 
 

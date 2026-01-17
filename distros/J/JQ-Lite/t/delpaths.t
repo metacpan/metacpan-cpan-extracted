@@ -52,6 +52,38 @@ is_deeply(
     'delpaths removes array elements by index'
 );
 
+my $json_boolean_paths = <<'JSON';
+{
+  "true": "yes",
+  "false": "no",
+  "items": ["zero", "one", "two"]
+}
+JSON
+
+my @result_boolean_keys = $jq->run_query(
+    $json_boolean_paths,
+    '. | delpaths([[true], [false]])'
+);
+
+is_deeply(
+    $result_boolean_keys[0],
+    {
+        items => ["zero", "one", "two"],
+    },
+    'delpaths removes boolean-keyed object entries'
+);
+
+my @result_boolean_indices = $jq->run_query(
+    $json_boolean_paths,
+    '.items | delpaths([[false], [true]])'
+);
+
+is_deeply(
+    $result_boolean_indices[0],
+    ['two'],
+    'delpaths treats boolean segments as array indices'
+);
+
 # --- 3. Removing the root path yields null
 my $json_scalar = '{"keep": true}';
 my @result_null = $jq->run_query($json_scalar, '. | delpaths([[]])');
@@ -97,4 +129,3 @@ like(
 );
 
 done_testing;
-

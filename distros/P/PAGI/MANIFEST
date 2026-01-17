@@ -7,6 +7,7 @@ META.json
 META.yml
 Makefile.PL
 README
+SECURITY.md
 bin/pagi-server
 cpanfile
 dist.ini

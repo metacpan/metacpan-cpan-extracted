@@ -1,5 +1,5 @@
 package Thunderhorse::Router;
-$Thunderhorse::Router::VERSION = '0.001';
+$Thunderhorse::Router::VERSION = '0.100';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -17,6 +17,7 @@ has field 'controller' => (
 # to location objects
 has option 'cache' => (
 	isa => HasMethods ['get', 'set', 'clear'],
+	writer => 1,
 	trigger => 1,
 );
 
@@ -116,4 +117,71 @@ sub find ($self, $name)
 {
 	return $self->_registered->{$name};
 }
+
+__END__
+
+=head1 NAME
+
+Thunderhorse::Router - Router for Thunderhorse
+
+=head1 SYNOPSIS
+
+	my $router_obj = $app->router;
+
+=head1 DESCRIPTION
+
+Thunderhorse router is a class which allows adding new locations (using
+L<Gears::Router/add>), finding locations (using L</find>) and matching them
+(using L<Gears::Router/match>). It uses L<Thunderhorse::Router::Location> as
+the location implementation.
+
+=head1 INTERFACE
+
+Inherits all interface from L<Gears::Router>, and adds the interface
+documented below.
+
+=head2 Attributes
+
+=head3 controller
+
+Current controller. It is set automatically when calling the C<router> method
+in an app or in a controller. All locations built will use this attribute as
+their controller.
+
+B<writer:> C<set_controller>
+
+=head3 cache
+
+Cache object - must have at least C<get>, C<set> and C<clear> methods. If
+specified, all matching will be cached in that object. For best results,
+C<Thunderhorse::Router::SpecializedCache> role should be mixed into the cache.
+This role makes sure that L<Gears::Router::Match/location> will be stored as a
+location name in cache, not as a full L<Gears::Router::Location> object. This
+way less data will be held in the cache, and if the cache is stored outside of
+perl memory, it will be easily mapped in a way that allows multiple servers
+workers to use the same cached values.
+
+I<Available in constructor>
+
+B<writer:> C<set_cache>
+
+=head2 Methods
+
+=head3 new
+
+	$object = $class->new(%args)
+
+Standard Mooish constructor. Consult L</Attributes> section for available
+constructor arguments.
+
+=head3 find
+
+	$location = $object->find($name)
+
+Returns the location with the given C<$name>. If no such location exists,
+returns C<undef>.
+
+=head1 SEE ALSO
+
+L<Gears::Router>
 

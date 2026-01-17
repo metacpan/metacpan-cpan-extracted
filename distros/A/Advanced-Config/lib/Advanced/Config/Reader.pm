@@ -1,5 +1,5 @@
 ###
-###  Copyright (c) 2007 - 2025 Curtis Leach.  All rights reserved.
+###  Copyright (c) 2007 - 2026 Curtis Leach.  All rights reserved.
 ###
 ###  Module: Advanced::Config::Reader
 
@@ -28,8 +28,8 @@ sequences with special meaning to this module.
 
 So to avoid confusion, when I talk about a feature, I'll talk about it's default
 appearance and let it be safely assumed that the same will hold true if you've
-overriden it's default character sequence with something else.  Such as when
-discussing comments as 'B<#>', even though you could have overriden it as
+overridden it's default character sequence with something else.  Such as when
+discussing comments as 'B<#>', even though you could have overridden it as
 'B<;*;>'.  See L<Advanced::Config::Options> for a list of symbols you can
 overrides.
 
@@ -41,7 +41,7 @@ tag's value, the entire value must be surrounded by quotes! Finally, unbalanced
 quotes can behave very strangly and are not stripped off.
 
 So in general white space in your config file is basically ignored unless it's
-surrounded by printible chars or quotes.
+surrounded by printable chars or quotes.
 
 Sorry you can't use a comment symbol as part of your tag's name.
 
@@ -70,7 +70,7 @@ use Fred::Fish::DBUG 2.09 qw / on_if_set  ADVANCED_CONFIG_FISH /;
 
 use File::Basename;
 
-$VERSION = "1.12";
+$VERSION = "1.14";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( read_config  source_file  make_new_section  parse_line
@@ -724,7 +724,7 @@ sub parse_line
                      $line       =~ m/${has_no_cmt}/ );
    }
    if ( $has_no_cmt eq "@"x10 ) {
-      warn ("May be having variable substitiution issues in parse_line()!\n");
+      warn ("May be having variable substitution issues in parse_line()!\n");
    }
 
    # Strip out all the variables from the value ...
@@ -841,10 +841,10 @@ sensitive information.
 
 The optional I<$trim> tells if you may trim the results before it's returned.
 
-It returns the new value $v, once all the variable substitition(s) have occured.
-And optionally a second return value $h that tells if B<fish> was paused during
-the expansion of that value due to something being sensitive.  This 2nd return
-value $h is meaningless in most situations, so don't ask for it.
+It returns the new value $v, once all the variable substitution(s) have
+occurred.  And optionally a second return value $h that tells if B<fish> was
+paused during the expansion of that value due to something being sensitive.
+This 2nd return value $h is meaningless in most situations, so don't ask for it.
 
 All variables are defined as B<${>I<...>B<}>, where I<...> is the variable you
 wish to substitute.  If something isn't surrounded by a B<${> + B<}> pair, it's
@@ -1028,7 +1028,7 @@ the I<$value> with assistance from the I<$sub_rule>.
 
 It returns the edited I<value> and whether applying the modifier made it
 I<sensitive>. (-1 means it's an encrypted value.  -2 means it's the variable
-name that resolves to an encrypted value.  0 - Non-senitive, 1 - Sensitive.)
+name that resolves to an encrypted value.  0 - Non-sensitive, 1 - Sensitive.)
 
 See L<https://web.archive.org/web/20200309072646/https://wiki.bash-hackers.org/syntax/pe>
 for information on how this can work.  This module supports most of the
@@ -1220,7 +1220,7 @@ and returns the information about it.  If there is more than one variable
 present in the I<$value>, only the 1st variable/tag to evaluate is returned.
 
 By default, a variable is the tag in the I<$value> between B<${> and B<}>, which
-can be overriden with other anchor patterns.  See L<Advanced::Config::Options>
+can be overridden with other anchor patterns.  See L<Advanced::Config::Options>
 for more details on this.
 
 If you've configured the module to ignore variables, it will never find any.
@@ -1250,7 +1250,7 @@ See I<apply_modifier> for applying these rules against the returned I<$tag>.
 Other modifier rules may be added upon request.
 
 These 3 B<sub_*> return values will always be I<undef> should the variable
-left/right anchors be overriden with the same value.  Or if no modifiers
+left/right anchors be overridden with the same value.  Or if no modifiers
 are detected in the tag's name.
 
 If you've configured the module to be case insensitive (option B<tag_case>),
@@ -1570,7 +1570,7 @@ sub format_encrypt_cmt
 
 =item $status = encrypt_config_file_details ( $file, $writeFile, \%rOpts )
 
-This function encrypts all tag values inside the specified confg file that are
+This function encrypts all tag values inside the specified config file that are
 marked as ready for encryption and generates a new config file with everything
 encrypted.  If a tag/value pair isn't marked as ready for encryption it is left
 alone.  By default this label is B<ENCRYPT>.
@@ -1584,7 +1584,7 @@ I<%rOpts> as the last time.  Otherwise you won't be able to decrypt all
 encrypted values.
 
 This method ignores any request to source in other config files.  You must
-encryt each file individually.
+encrypt each file individually.
 
 It writes the results of the encryption process to I<$writeFile>.
 
@@ -1750,8 +1750,8 @@ sub encrypt_config_file_details
 
 =item $status = decrypt_config_file_details ( $file, $writeFile, \%rOpts )
 
-This function decrypts all tag values inside the specified confg file that are
-marked as encrypted and generates a new file with everyting decrypted.  If a
+This function decrypts all tag values inside the specified config file that are
+marked as encrypted and generates a new file with everything decrypted.  If a
 tag/value pair isn't marked as being encrypted it is left alone.  By default
 this label is B<DECRYPT>.
 
@@ -1991,7 +1991,7 @@ sub encrypt_value
 Takes the I<$value> and decrypts it using the other B<3> args as part of the
 decryption key.  To successfully decrypt it the values for these B<3> args
 must match what was passed to I<encryption_value()> when the value was
-originially encrypted.
+originally encrypted.
 
 See L<Advanced::Config::Options> for some caveats about this process.
 
@@ -2223,7 +2223,7 @@ sub _make_key
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007 - 2025 Curtis Leach.  All rights reserved.
+Copyright (c) 2007 - 2026 Curtis Leach.  All rights reserved.
 
 This program is free software.  You can redistribute it and/or modify it under
 the same terms as Perl itself.

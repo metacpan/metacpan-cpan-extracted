@@ -7,16 +7,18 @@ use warnings;
 package Marlin::Antlers;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001000';
+our $VERSION   = '0.002000';
 
 use B::Hooks::AtRuntime qw( at_runtime after_runtime );
 use Class::Method::Modifiers qw( install_modifier );
-use Exporter::Tiny qw( _croak );
+use Exporter::Tiny;
 use Import::Into;
 use Marlin ();
 use Marlin::Role ();
 use Marlin::Util -lexical, qw( true false );
 use Types::Common -lexical, -all;
+
+use namespace::autoclean;
 
 our @ISA    = qw( Exporter::Tiny );
 our @EXPORT = qw( has extends with before after around fresh __FINALIZE__ );
@@ -28,10 +30,10 @@ sub _exporter_validate_opts ( $me, $globals ) {
 	my $pkg  = $globals->{into};
 	my $kind = $globals->{__role} ? 'Marlin::Role' : 'Marlin';
 	if ( $PACKAGES{$pkg} ) {
-		_croak "$pkg already uses $kind\::Antlers";
+		Marlin::Util::_croak "$pkg already uses $kind\::Antlers";
 	}
 	elsif ( my $meta = Marlin->find_meta($pkg) ) {
-		_croak "$pkg already uses " . ( $meta->inhaled_from // ref $meta );
+		Marlin::Util::_croak "$pkg already uses " . ( $meta->inhaled_from // ref $meta );
 	}
 	else {
 		$PACKAGES{$pkg} = $kind;
@@ -45,12 +47,13 @@ sub _exporter_validate_opts ( $me, $globals ) {
 	warnings->import::into( $pkg );
 	Marlin::Util->import::into( $pkg, -lexical, -all );
 	Types::Common->import::into( $pkg, -lexical, -all );
+	namespace::autoclean->import::into( $pkg );
 	
 	my @plugins = do {
 		my $tmp = Exporter::Tiny::mkopt(
 			is_ArrayRef( $globals->{x} ) ? $globals->{x} :
 			is_Str( $globals->{x} )      ? [ $globals->{x} ] :
-			is_Defined( $globals->{x} )  ? _croak("Invalid value for 'x'") : []
+			is_Defined( $globals->{x} )  ? Marlin::Util::_croak("Invalid value for 'x'") : []
 		);
 		$_->[0] =~ s/^:/Marlin::X::/s for $tmp->@*;
 		$tmp->@*;
@@ -73,7 +76,7 @@ sub _exporter_validate_opts ( $me, $globals ) {
 	my $finalize = $globals->{FINALIZE} = sub () {
 		state $finalized = 0;
 		return if $finalized++;
-		my $marlin = $kind->_new( $args );
+		my $marlin = $kind->new( $args );
 		$marlin->store_meta;
 		$marlin->do_setup;
 		install_modifier( $pkg, @$_ ) for $mods->@*;
@@ -216,6 +219,8 @@ This will give you C<true>, C<false>, C<ro>, C<rw>, C<rwp>, etc for
 free, plus a whole bunch of type constraints, C<signature_for>, etc.
 
 Everything is exported lexically.
+
+Marlin::Antlers imports L<namespace::autoclean> for you.
 
 Marlin::Antlers also enables L<strict> and L<warnings>, plus switches
 on the following Perl features: signatures, postderef, lexical_subs,

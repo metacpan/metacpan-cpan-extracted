@@ -1,7 +1,12 @@
 Revision history for Perl module File-Find-utf8
 
+0.015     2026-01-16
+  * Force use of archive-tar to prevent issues on MacOs
+  * Create a temporary directory with File::Temp
+
 0.014     2022-02-16
   * Fixes for File::Find no longer using exporter [gh-3]
+  * Adpated to use gmake instead of dmake
 
 0.013     2017-05-18
   * Requiring File::Path 2.06_06 for remove_tree

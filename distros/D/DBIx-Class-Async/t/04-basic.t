@@ -51,7 +51,7 @@ subtest 'Basic schema connection' => sub {
     my $schema;
     lives_ok {
         $schema = DBIx::Class::Async::Schema->connect(
-            "dbi:SQLite:dbname=$db_file",  # Use FILE, not :memory:
+            "dbi:SQLite:dbname=$db_file",
             undef,
             undef,
             {},

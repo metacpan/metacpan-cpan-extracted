@@ -542,6 +542,19 @@ END
     assert_output --partial "Callback invoked with value: action hiho"
 }
 
+@test "getoptlong: callback type option with hyphen" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        list_themes() { echo "Callback invoked: $*"; }
+        declare -A OPTS=([list-themes!]=)
+        getoptlong init OPTS
+        getoptlong parse --list-themes
+        eval "$(getoptlong set)"
+    '
+    assert_success
+    assert_output --partial "Callback invoked: list-themes 1"
+}
+
 # Test: PREFIX option
 @test "getoptlong: configuration - PREFIX=test_" {
     run $BASH -c '

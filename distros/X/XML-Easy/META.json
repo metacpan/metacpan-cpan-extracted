@@ -52,6 +52,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.012",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jkeenan/p5-XML-Easy/issues"
+      },
+      "homepage" : "http://thenceforward.net/perl/modules/XML-Easy/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jkeenan/p5-XML-Easy.git",
+         "web" : "https://github.com/jkeenan/p5-XML-Easy"
+      }
+   },
+   "version" : "0.013",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

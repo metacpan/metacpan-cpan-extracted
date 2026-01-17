@@ -4,7 +4,7 @@ File::Basename::Extra - Extension to File::Basename, adds named access to file p
 
 # VERSION
 
-version 0.004
+version 0.005
 
 # SYNOPSIS
 
@@ -59,7 +59,7 @@ file name extensions).
 ## fileparse\_set\_fstype FSTYPE
 
 These functions are exactly the same as the corresponding ones from
-[File::Basename](https://metacpan.org/pod/File::Basename) except that they aren't exported by default.
+[File::Basename](https://metacpan.org/pod/File%3A%3ABasename) except that they aren't exported by default.
 
 ## basename\_suffix FILEPATH
 
@@ -75,7 +75,7 @@ are treated as if they do not have a suffix. So, using the default
 suffix pattern, `basename_suffix('/Users/home/.profile')` would
 return an empty string.
 
-Note: Like the original `basename` function from [File::Basename](https://metacpan.org/pod/File::Basename),
+Note: Like the original `basename` function from [File::Basename](https://metacpan.org/pod/File%3A%3ABasename),
 suffix patterns are automatically escaped so pattern `.bar` only
 matches `.bar` and not e.g., `_bar` (this is **not** done for the
 default suffix patterns, nor for patterns provided to the non-basename
@@ -94,7 +94,7 @@ are treated as if they do not have a suffix. So, using the default
 suffix pattern, `basename_nosuffix('/Users/home/.profile')` would
 return `.profile`.
 
-Note: Like the original `basename` function from [File::Basename](https://metacpan.org/pod/File::Basename),
+Note: Like the original `basename` function from [File::Basename](https://metacpan.org/pod/File%3A%3ABasename),
 suffix patterns are automatically escaped so pattern `.bar` only
 matches `.bar` and not e.g., `_bar` (this is **not** done for the
 default suffix patterns, nor for patterns provided to the non-basename
@@ -153,7 +153,7 @@ default suffix patterns are used when none are provided.
 ## default\_suffix\_patterns NEW\_PATTERN\_LIST
 
 The default suffix pattern list (see the `fileparse` function in
-[File::Basename](https://metacpan.org/pod/File::Basename) for details) is `qr/\.[^.]*/`. Meaning that this
+[File::Basename](https://metacpan.org/pod/File%3A%3ABasename) for details) is `qr/\.[^.]*/`. Meaning that this
 defines the suffix as the part of the filename from (and including)
 the last dot. In other words, the part of a filename that is popularly
 known as the file extension.
@@ -175,7 +175,7 @@ feature.
 
 # SEE ALSO
 
-[File::Basename](https://metacpan.org/pod/File::Basename) for the suffix matching and platform specific details.
+[File::Basename](https://metacpan.org/pod/File%3A%3ABasename) for the suffix matching and platform specific details.
 
 # AUTHOR
 

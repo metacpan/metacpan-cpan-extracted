@@ -6,6 +6,28 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.016000	2026-01-16
+
+ [ Bug Fixes ]
+ - Marlin::Attribute sometimes thought its link back to the package it was
+   defined in was called `marlin` and sometimes `_marlin`; fix it to always
+   be the former.
+
+ [ Documentation ]
+ - Minor changes and reformatting of extended examples to make things
+   cleaner.
+
+ [ Other ]
+ - An attribute that creates lexical accessors in a parent class won't
+   automatically create matching ones in child classes.
+ - In Perl versions too old to support lexical subs, use namespace::clean
+   to clean away any non-lexical ones we wanted to be lexical.
+ - Marlin now checks for conflicts between methods and init_args used by
+   different attributes, so you can't (for example) have two attributes
+   that have the same-named reader method.
+ - Use attr=>{extends=>true} or Moose-like +attr to extend an inherited
+   attribute.
+
 0.015000	2026-01-15
 
  [ Bug Fixes ]

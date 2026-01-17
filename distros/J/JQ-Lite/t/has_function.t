@@ -21,11 +21,15 @@ my ($missing_key) = $jq->run_query($object_json, '.meta | has("missing")');
 my ($has_index)   = $jq->run_query($array_json, '.items | has(1)');
 my ($bad_index)   = $jq->run_query($array_json, '.items | has(5)');
 my ($non_numeric) = $jq->run_query($array_json, '.items | has("value")');
+my ($numeric_string) = $jq->run_query($array_json, '.items | has("1")');
+my ($float_index)    = $jq->run_query($array_json, '.items | has(1.1)');
 
 ok($has_version, 'hash has the requested key');
 ok(!$missing_key, 'hash missing key returns false');
 ok($has_index, 'array reports existing index');
 ok(!$bad_index, 'array reports missing index as false');
 ok(!$non_numeric, 'array returns false for non-numeric argument');
+ok(!$numeric_string, 'array treats numeric strings as non-numeric');
+ok($float_index, 'array truncates fractional indices like jq');
 
 done_testing;

@@ -4,7 +4,7 @@ use warnings;
 use 5.010; # state
 
 # ABSTRACT: turn on Unicode - all of it
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 #pod =head1 SYNOPSIS
 #pod
@@ -325,7 +325,7 @@ utf8::all - turn on Unicode - all of it
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 

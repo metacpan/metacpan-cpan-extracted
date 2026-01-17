@@ -50,6 +50,9 @@ t/34-schema-clone.t
 t/35-row-set-column.t
 t/36-row-id.t
 t/37-row-copy.t
+t/38-row-update-or-insert.t
+t/39-schema-version-and-unregister.t
+t/40-schema-deploy.t
 t/manifest.t
 t/pod.t
 t/test.db

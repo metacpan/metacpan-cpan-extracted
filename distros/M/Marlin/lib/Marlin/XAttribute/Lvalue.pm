@@ -5,7 +5,7 @@ use warnings;
 package Marlin::XAttribute::Lvalue;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015000';
+our $VERSION   = '0.016000';
 
 use B                     ();
 use Eval::TypeTiny        ();
@@ -61,6 +61,16 @@ after install_accessors => sub {
 	}
 	
 	$me->install_coderef( $method_name, $me->Lvalue );
+};
+
+around provides_accessors => sub {
+	my $next = shift;
+	my $me   = shift;
+	
+	my @list = $me->$next( @_ );
+	push @list, [ $me->{':Lvalue'}{method_name}, 'lvalue accessor', $me ];
+	
+	return @list;
 };
 
 sub Lvalue {

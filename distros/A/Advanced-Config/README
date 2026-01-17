@@ -2,7 +2,7 @@
 
 # This module is a powerful config file manager that treats your config files
 # as objects to access.  It provides many different features that make it
-# more useful than many of the compeating config file modules.  And most of its
+# more useful than many of the competing config file modules.  And most of its
 # features are very configurable to meet your individual needs.
 
 # It's main goal is to be able to take config files from various sources and
@@ -19,13 +19,13 @@
 # this module.
 
 # Run "perldoc Advanced::Config::Examples"  for more details & examples
-# in using Advaned::Config once this module has been installed.
+# in using Advanced::Config once this module has been installed.
 
 
 INSTALLATION
 =====================================================================
 
-To install this module in the default loation type the following:
+To install this module in the default location type the following:
 
    perl Makefile.PL
    make
@@ -52,7 +52,7 @@ bug/issue you are hitting.
  1) A sample config file.
  2) A sample program that uses the config file and demonstrates the bug.
  3) The fish log generated.  (optional)  But I'll request one if the issue
-    isn't reproducable on my end with what you gave me.
+    isn't reproducible on my end with what you gave me.
 
 If it's a true bug, I'll probably use your sample program as the basis for a
 new test case in a future release.
@@ -83,7 +83,7 @@ to trace your own code!
 
 So here's a list of steps needed to turn this tracing on.
 
-1) Set this special environment varible to 1. (tells my module to enable fish.)
+1) Set this special environment variable to 1. (tells my module to enable fish.)
    a) Unix:    export ADVANCED_CONFIG_FISH=1
    b) Windows: set ADVANCED_CONFIG_FISH=1
    c) You can also set this variable in your test program's BEGIN block:

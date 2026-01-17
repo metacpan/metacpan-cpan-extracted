@@ -1,5 +1,9 @@
 Revision history for Getopt-Long-Bash
 
+0.7.1 2026-01-17T02:19:55Z
+
+    - Fix callback function naming for hyphenated options (list-themes calls list_themes)
+
 0.7.0 2025-12-30T12:52:21Z
 
     - Fix passthru negation with short option aliases (--no-v was becoming -v)

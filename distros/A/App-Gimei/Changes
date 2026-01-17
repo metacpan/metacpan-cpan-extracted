@@ -1,5 +1,15 @@
 Revision history for Perl extension App-Gimei
 
+v0.2.11 2026-01-17T07:59:58Z
+    - Add module dependencies
+
+v0.2.10 2026-01-17T07:23:08Z
+    - Support Strawberry Perl for Windows
+    - Bump up actions-setup-perl
+    - Switch to Carmel from Carton for managing module dependencies
+    - Add DEVELOPMENT.md
+    - Changed to fix module versions in cpanfile      
+
 v0.2.9 2026-01-16T04:40:28Z
     - bump perl v5.38
 

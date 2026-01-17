@@ -1,5 +1,9 @@
 Revision history for Perl module Cwd-utf8
 
+0.012     2026-01-16
+  * Force use of archive-tar to prevent issues on MacOs
+  * Adpated to use gmake instead of dmake
+
 0.011     2017-05-18
   * Requiring File::Path 2.06_06 for remove_tree
 

@@ -45,9 +45,13 @@ t/integration/alias-moose.t
 t/integration/alias.t
 t/integration/comparison-example.t
 t/integration/complex-constructor.t
+t/integration/conflicts.t
 t/integration/constant.t
 t/integration/ct-inherit.t
 t/integration/destructors.t
+t/integration/extend-attr.t
+t/integration/extend-eg.t
+t/integration/extend-lex.t
 t/integration/foreign-inherit.t
 t/integration/localwriter.t
 t/integration/lvalues-moose.t

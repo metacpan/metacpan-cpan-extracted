@@ -1,6 +1,6 @@
 package DBIx::Class::Async;
 
-$DBIx::Class::Async::VERSION   = '0.28';
+$DBIx::Class::Async::VERSION   = '0.31';
 $DBIx::Class::Async::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ DBIx::Class::Async - Asynchronous database operations for DBIx::Class
 
 =head1 VERSION
 
-Version 0.28
+Version 0.31
 
 =cut
 
@@ -620,6 +620,54 @@ sub count {
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
         return Future->done($result);
     });
+}
+
+=head2 deploy
+
+    my $future = $schema->deploy(\%sqlt_args?, $dir?);
+
+    $future->on_done(sub {
+        my $self = shift;
+        print "Database schema deployed successfully.\n";
+    });
+
+=over 4
+
+=item Arguments: C<\%sqlt_args?>, C<$dir?>
+
+=item Return Value: L<Future> resolving to C<$self>
+
+=back
+
+Asynchronously deploys the schema to the database.
+
+This method dispatches the deployment task to a background worker process via
+the internal worker pool. This ensures that the often-slow process of
+generating SQL (via L<SQL::Translator>) and executing DDL statements does
+not block the main application thread or event loop.
+
+The arguments are passed directly to the underlying L<DBIx::Class::Schema/deploy>
+method in the worker. Common C<%sqlt_args> include:
+
+=over 4
+
+=item * C<add_drop_table> - Add a C<DROP TABLE> before each C<CREATE>.
+
+=item * C<quote_identifiers> - Toggle database-specific identifier quoting.
+
+=back
+
+If the deployment fails (e.g., due to permission issues or missing dependencies
+like L<SQL::Translator>), the returned L<Future> will fail with the error
+string returned by the worker.
+
+=cut
+
+sub deploy {
+    my ($self, $sqlt_args, $dir) = @_;
+
+    # Use the internal bridge discovered in your search method
+    return $self->_call_worker('deploy', $sqlt_args, $dir);
 }
 
 =head2 raw_query
@@ -1249,6 +1297,9 @@ sub _execute_operation {
         try {
             my $rs  = $schema->resultset($source_name);
             my $row = $rs->create($data);
+
+            $row->discard_changes;
+
             return { $row->get_columns };
         }
         catch {
@@ -1418,12 +1469,24 @@ sub _execute_operation {
         return [ map { _inflate_row_with_prefetch($_, $prefetch) } $rs->all ];
     }
     elsif ($operation eq 'health_check') {
-        # Simple health check query
         eval {
             $schema->storage->dbh->ping;
             $schema->storage->dbh->do('SELECT 1');
         };
         return $@ ? 0 : 1;
+    }
+    elsif ($operation eq 'deploy') {
+        my ($sqlt_args, $dir) = @args;
+
+        eval {
+            $schema->deploy($sqlt_args || {}, $dir);
+        };
+
+        if ($@) {
+            return { __error => "Deploy operation failed: $@" };
+        }
+
+        return { success => 1 };
     }
     else {
         die "Unknown operation: $operation";

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1986 2024-07-29 10:45:40Z willem $	-*-perl-*-
+# $Id: Makefile.PL 2003 2025-01-21 12:06:06Z willem $	-*-perl-*-
 #
 
 use 5.008009;
@@ -36,6 +36,7 @@ my %metadata = (
 		'File::Find'	      => 1.13,
 		'File::Spec'	      => 3.29,
 		'IO::File'	      => 1.14,
+		'Test::Builder'	      => 0.80,
 		'Test::More'	      => 0.80,
 		} );
 
@@ -54,7 +55,7 @@ my %prerequisite = (
 my @debris = qw(*.gcov *.gcda *.gcno *.lock);
 
 
-my $def = DSA ? '' : '-DNO_DSA',
+my $def = DSA ? '' : '-DNO_DSA';
 my $inc = '';
 my $lib = '-lcrypto';
 my $nul = MSWin32 ? 'nul' : '/dev/null';

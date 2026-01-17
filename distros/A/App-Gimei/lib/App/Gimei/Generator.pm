@@ -44,3 +44,5 @@ sub execute ( $self, $cache ) {
 
     return $word;
 }
+
+1;

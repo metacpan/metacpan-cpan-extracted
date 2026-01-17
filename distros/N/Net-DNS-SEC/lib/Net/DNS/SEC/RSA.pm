@@ -3,7 +3,7 @@ package Net::DNS::SEC::RSA;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RSA.pm 1983 2024-07-25 06:23:28Z willem $)[2];
+our $VERSION = (qw$Id: RSA.pm 2042 2025-12-24 10:23:11Z willem $)[2];
 
 
 =head1 NAME
@@ -13,11 +13,11 @@ Net::DNS::SEC::RSA - DNSSEC RSA digital signature algorithm
 
 =head1 SYNOPSIS
 
-    require Net::DNS::SEC::RSA;
+	require Net::DNS::SEC::RSA;
 
-    $signature = Net::DNS::SEC::RSA->sign( $sigdata, $private );
+	$signature = Net::DNS::SEC::RSA->sign( $sigdata, $private );
 
-    $validated = Net::DNS::SEC::RSA->verify( $sigdata, $keyrr, $sigbin );
+	$validated = Net::DNS::SEC::RSA->verify( $sigdata, $keyrr, $sigbin );
 
 
 =head1 DESCRIPTION
@@ -27,14 +27,14 @@ generation and verification procedures.
 
 =head2 sign
 
-    $signature = Net::DNS::SEC::RSA->sign( $sigdata, $private );
+	$signature = Net::DNS::SEC::RSA->sign( $sigdata, $private );
 
 Generates the wire-format signature from the sigdata octet string
 and the appropriate private key object.
 
 =head2 verify
 
-    $validated = Net::DNS::SEC::RSA->verify( $sigdata, $keyrr, $sigbin );
+	$validated = Net::DNS::SEC::RSA->verify( $sigdata, $keyrr, $sigbin );
 
 Verifies the signature over the sigdata octet string using the specified
 public key resource record.
@@ -50,14 +50,16 @@ BEGIN { die 'RSA disabled or application has no "use Net::DNS::SEC"' unless RSA_
 
 
 my %parameters = (
-	1  => scalar eval { Net::DNS::SEC::libcrypto::EVP_md5() },
-	5  => scalar eval { Net::DNS::SEC::libcrypto::EVP_sha1() },
-	7  => scalar eval { Net::DNS::SEC::libcrypto::EVP_sha1() },
+	1  => scalar eval { Net::DNS::SEC::libcrypto::EVP_md5() },	## deprecate DNSSEC entirely
+	5  => scalar eval { Net::DNS::SEC::libcrypto::EVP_sha1() },	## MUST NOT DNSSEC sign
+	7  => scalar eval { Net::DNS::SEC::libcrypto::EVP_sha1() },	## MUST NOT DNSSEC sign
 	8  => scalar eval { Net::DNS::SEC::libcrypto::EVP_sha256() },
 	10 => scalar eval { Net::DNS::SEC::libcrypto::EVP_sha512() },
 	);
 
 sub _index { return keys %parameters }
+
+sub _deprecate { return ( 1, -5, -7 ) }
 
 
 sub sign {

@@ -1,5 +1,5 @@
 package Thunderhorse::Router::SpecializedCache;
-$Thunderhorse::Router::SpecializedCache::VERSION = '0.001';
+$Thunderhorse::Router::SpecializedCache::VERSION = '0.100';
 use v5.40;
 use Mooish::Base -standard, -role;
 

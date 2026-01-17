@@ -43,11 +43,27 @@ package ControllersApp::Controller::Test {
 				to => 'test',
 			}
 		);
+
+		$self->router->add(
+			'/handles' => {
+				to => 'test_handles',
+			}
+		);
 	}
 
 	sub test ($self, $ctx)
 	{
 		return 'internal: ' . ref $self;
+	}
+
+	sub test_handles ($self, $ctx)
+	{
+		# check if these methods exist (delegated from app)
+		# will crash the program if not
+		$self->loop;
+		$self->config;
+
+		return 'ok';
 	}
 }
 
@@ -86,6 +102,12 @@ subtest 'should route to a valid location' => sub {
 	http $app, GET '/external';
 	http_status_is 200;
 	http_text_is 'external: TestC2';
+};
+
+subtest 'should contain handles from app' => sub {
+	http $app, GET '/handles';
+	http_status_is 200;
+	http_text_is 'ok';
 };
 
 done_testing;

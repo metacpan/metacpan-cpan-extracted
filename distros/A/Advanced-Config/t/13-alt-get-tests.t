@@ -89,12 +89,13 @@ my $all_ok;    # Tells if any get_list_values() tests failed or not.
    # If the above "list" tests all pass, the tests below should be good!
    # Now let's hope they all pass!
    # --------------------------------------------------------------------------
-   dbug_ok (run_hash_test ( $cfg ),     "-"x24 . " All Hash Tests Passed "           . "-"x24);
-   dbug_ok (run_numeric_tests ( $cfg ), "-"x22 . " All Numeric Tests Passed "        . "-"x22);
-   dbug_ok (run_boolean_tests ( $cfg ), "-"x22 . " All Boolean Tests Passed  "       . "-"x22);
-   dbug_ok (run_date_tests ( $cfg ),    "-"x19 . " All Date Tests Passed (English) " . "-"x19);
-   dbug_ok (run_file_tests ( $cfg ),    "-"x22 . " All Filename Tests Passed "       . "-"x22);
-   dbug_ok (run_dir_tests ( $cfg ),     "-"x21 . " All Directory Tests Passed "      . "-"x22);
+   dbug_ok (run_hash_test ( $cfg ),     "-"x24 . " All Hash Tests Passed "               . "-"x24);
+   dbug_ok (run_numeric_tests ( $cfg ), "-"x22 . " All Numeric Tests Passed "            . "-"x22);
+   dbug_ok (run_boolean_tests ( $cfg ), "-"x22 . " All Boolean Tests Passed  "           . "-"x22);
+   dbug_ok (run_date_tests ( $cfg ),    "-"x19 . " All Date Tests Passed (English) "     . "-"x19);
+   dbug_ok (run_alt_date_tests ( ),     "-"x17 . " All Alt Date Tests Passed (English) " . "-"x17);
+   dbug_ok (run_file_tests ( $cfg ),    "-"x22 . " All Filename Tests Passed "           . "-"x22);
+   dbug_ok (run_dir_tests ( $cfg ),     "-"x21 . " All Directory Tests Passed "          . "-"x22);
 
    # Keep last so we don't have to add a separator test.
    # Also must be kept after the file & dir tests!
@@ -562,6 +563,106 @@ sub run_boolean_tests
    $res = join (", ", @answers);
    $r = dbug_ok ( compare_arrays ( 0, \@answers, $lst ), "Second boolean array test works out! ($res)");
    $ok = 0  unless ( $r );
+
+   DBUG_RETURN ( $ok );
+}
+
+# ====================================================================
+# Assumes run_date_tests() passes it's get_test() tests.
+# Also assumes the extensive tests in t/09-basic_date.t passes.
+# So it's OK to perform minimal testing here!
+sub run_alt_date_tests
+{
+   DBUG_ENTER_FUNC ( @_ );
+
+   my $cfg =  Advanced::Config->new (undef, undef, { "required" => 0, "date_language" => "English" }, undef );
+
+   $cfg->set_value ("2024-01-01", "Jan 1, 1900");
+   $cfg->set_value ("2024-01-02", "not  date");
+   $cfg->set_value ("10", "Jan 1, 1900");
+   $cfg->set_value ("11", "not a date");
+   $cfg->set_value ("one", "Jan 1, 1900");
+   $cfg->set_value ("two", "not a date");
+
+   my $ok = 1;    # assumes all tests pass.
+   my ($ans, $sts, $tag);
+
+   # All tags reference the same date ...
+   foreach $tag ( "2024-01-01", "10", "one" ) {
+      $ans = $cfg->get_hyd_date ($tag);
+      $sts = dbug_cmp_ok ($ans, "==", 1, "hyd test for tag $tag");
+      $ok = 0  unless ($sts);
+
+      $ans = $cfg->get_dow_date ($tag);
+      $sts = dbug_cmp_ok ($ans, "==", 1, "dow test for tag $tag (Monday)");
+      $ok = 0  unless ($sts);
+
+      $ans = $cfg->get_doy_date ($tag);
+      $sts = dbug_cmp_ok ($ans, "==", 1, "doy test for tag $tag");
+      $ok = 0  unless ($sts);
+
+      $ans = $cfg->get_adjusted_date ($tag, 1, 2);
+      $sts = dbug_cmp_ok ($ans, "eq", "1901-03-01", "adjusted test for tag $tag");
+      $ok = 0  unless ($sts);
+   }
+
+   # All tags reference the same non-date value ...
+   foreach $tag ( "2024-01-02", "11", "two" ) {
+      $ans = $cfg->get_hyd_date ($tag);
+      $sts = dbug_is ($ans, undef, "hyd test for non-date tag $tag");
+      $ok = 0  unless ($sts);
+
+      $ans = $cfg->get_dow_date ($tag);
+      $sts = dbug_is ($ans, undef, "dow test for non-date tag $tag (n/a)");
+      $ok = 0  unless ($sts);
+
+      $ans = $cfg->get_doy_date ($tag);
+      $sts = dbug_is ($ans, undef, "doy test for non-date tag $tag");
+      $ok = 0  unless ($sts);
+
+      $ans = $cfg->get_adjusted_date ($tag, 1, 2);
+      $sts = dbug_is ($ans, undef, "adjusted test for non-date tag $tag");
+      $ok = 0  unless ($sts);
+   }
+
+   # The given date doesn't exist as a tag ...
+   $tag = "1900-01-03";
+
+   $ans = $cfg->get_hyd_date ($tag);
+   $sts = dbug_cmp_ok ($ans, "==", 3, "hyd test for non-tag $tag");
+   $ok = 0  unless ($sts);
+
+   $ans = $cfg->get_dow_date ($tag);
+   $sts = dbug_cmp_ok ($ans, "==", 3, "dow test for non-tag $tag (Wednsday)");
+   $ok = 0  unless ($sts);
+
+   $ans = $cfg->get_doy_date ($tag);
+   $sts = dbug_cmp_ok ($ans, "==", 3, "doy test for non-tag $tag");
+   $ok = 0  unless ($sts);
+
+   $ans = $cfg->get_adjusted_date ($tag, 1, 2);
+   $sts = dbug_cmp_ok ($ans, "eq", "1901-03-03", "adjusted test for non-tag $tag");
+   $ok = 0  unless ($sts);
+
+   # The given hyd doesn't exist as a tag ...
+   $tag = "3";        # 1900-01-03
+
+   $ans = $cfg->get_hyd_date ($tag);
+   $sts = dbug_is ($ans, undef, "hyd test for HYD $tag");
+   $ok = 0  unless ($sts);
+
+   $ans = $cfg->get_dow_date ($tag);
+   $sts = dbug_cmp_ok ($ans, "==", 3, "dow test for HYD $tag (Wednsday)");
+   $ok = 0  unless ($sts);
+
+   $ans = $cfg->get_doy_date ($tag);
+   $sts = dbug_is ($ans, undef, "doy test for HYD $tag");
+   $ok = 0  unless ($sts);
+
+   $ans = $cfg->get_adjusted_date ($tag, 1, 2);
+   $sts = dbug_cmp_ok ($ans, "eq", "1901-03-03", "adjusted test for HYD $tag");
+   $ok = 0  unless ($sts);
+
 
    DBUG_RETURN ( $ok );
 }

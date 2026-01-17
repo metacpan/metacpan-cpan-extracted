@@ -9,7 +9,7 @@ getoptlong - Option parsing that does what you mean, for Bash
 
     declare -A OPTS=(
         [ &USAGE ]="command [options] file..."
-        [ flag     | f                   # Boolean  ]=
+        [ flag     | f                   # Flag     ]=
         [ counter  | c +                 # Counter  ]=0
         [ required | r :                 # Required ]=/dev/stdout
         [ optional | o ?                 # Optional ]=
@@ -35,7 +35,7 @@ getoptlong - Option parsing that does what you mean, for Bash
 
 # VERSION
 
-0.6.0
+0.7.0
 
 # DESCRIPTION
 
@@ -53,9 +53,9 @@ with array name and arguments), and **multi-step** for advanced control
 
 Supports short (`-v`) and long (`--verbose`) options with bundling
 (`-vvv`). **Option types**: _flag_, _required argument_, _optional
-argument_, _array_, _hash_, _callback_. **Validation**: _integer_,
-_float_, _regex_. **Help message** generation. **Pass-through** for
-wrapper scripts. **Multiple invocations** for subcommand support.
+argument_, _array_, _hash_. **Modifiers**: _callback_, _pass-through_.
+**Validation**: _integer_, _float_, _regex_. **Help message** generation.
+**Multiple invocations** for subcommand support.
 
 For a gentle introduction, see [Getopt::Long::Bash::Tutorial](https://metacpan.org/pod/Getopt%3A%3ALong%3A%3ABash%3A%3ATutorial).
 
@@ -147,10 +147,10 @@ The key format is:
 
 Each option type determines how arguments are handled and stored.
 
-## FLAG (`+` or none)
+## COUNTER FLAG (`+` or none)
 
 A flag takes no argument. First use sets to `1`, subsequent uses
-increment (useful for verbosity levels). Use `--no-X` to reset to
+increment (useful for verbosity levels). Use `--no-<name>` to reset to
 empty string. Bundling supported: `-vvv` equals `-v -v -v`.
 
     [verbose|v]=        # $verbose: 1 when specified
@@ -164,7 +164,7 @@ non-empty, false when empty.
 
 ## REQUIRED ARGUMENT (`:`)
 
-The option requires an argument; error if missing. Use `--no-X` to
+The option requires an argument; error if missing. Use `--no-<name>` to
 reset to empty string (useful for disabling defaults).
 
     [output|o:]=        # --output=file, --output file, -ofile, -o file
@@ -180,11 +180,9 @@ was specified.
 
     [config|c?]=        # --config=file or --config (sets to "")
 
-**Syntax:**
-
-- `--config=value`: variable set to `value`
-- `--config`: variable set to empty string `""`
-- `-c`: sets to empty string; `-cvalue` form is **not** supported
+`--config=value` sets to `value`, `--config` without value sets to
+empty string. Short form `-c` sets to empty string; `-cvalue` form
+is **not** supported.
 
 ## ARRAY (`@`)
 
@@ -211,78 +209,20 @@ To reset existing values: use `--no-define` on the command line
 (e.g., `--no-define --define KEY=val`), or use `callback --before`
 to automatically reset before each new value.
 
-## CALLBACK (`!`)
-
-Calls a function when the option is parsed. Default function name is the
-option name with hyphens converted to underscores; use `getoptlong callback`
-to specify a custom function. Can combine with any type (`+!`, `:!`,
-`?!`, `@!`, `%!`). See ["CALLBACKS"](#callbacks) for registration and timing details.
-
-    [action|a!]=        # Calls action() when specified
-    [file|f:!]=         # Calls file() with argument
-
-# VALIDATION
-
-Option values can be validated using type specifiers or regex patterns:
-`=i` for integers, `=f` for floats, `=(` ... `)` for regex.
-
-    [count:=i]=1            # Integer (positive/negative)
-    [ratio:=f]=0.5          # Float (e.g., 123.45)
-    [mode:=(^(a|b|c)$)]=a   # Regex: exactly a, b, or c
-
-**Note:** For regex, the pattern extends to the last `)` in the
-definition, including any `)` in the description. Avoid using `)`
-in comments when using regex validation.
-
-Validation occurs before the value is stored or callbacks are invoked.
-For array options, each element is validated; for hash options, each
-`key=value` pair is matched as a whole. Error on validation failure
-(see [EXIT\_ON\_ERROR](#configuration)).
-
-# DESTINATION VARIABLE
-
-By default, values are stored in variables named after the option.
-A custom destination can be specified by adding the variable name after
-TYPE/MODIFIER and before VALIDATE: `[NAME|ALIAS:!DEST=(REGEX)]`.
-`PREFIX` setting applies to custom names too (see ["getoptlong init"](#getoptlong-init)).
-
-    [count|c:COUNT]=1       # Store in $COUNT instead of $count
-    [debug|d+DBG]=0         # Store in $DBG
-
-# HELP MESSAGE
-
-By default, `--help` and `-h` options are automatically available.
-They display a help message generated from option definitions and exit.
-No configuration is required.
-
-To customize or disable, use one of these methods (in order of precedence):
-
-    [&HELP]="usage|u#Show usage"            # 1. &HELP key in OPTS
-    getoptlong init OPTS HELP="manual|m"    # 2. HELP parameter in init
-    [help|h # Custom help text]=            # 3. Explicit option definition
-    getoptlong init OPTS HELP=""            # Disable help option
-
-## SYNOPSIS (USAGE)
-
-Set the usage line displayed at the top of help output:
-
-    [&USAGE]="Usage: cmd [options] <file>"  # In OPTS array
-    getoptlong init OPTS USAGE="..."        # Or via init parameter
-
-## OPTION DESCRIPTIONS
-
-Text after `#` in the option definition becomes the help description.
-If omitted, a description is auto-generated. Default values are shown
-as `(default: value)`.
-
-    [output|o: # Output file path]=/dev/stdout
-
 # CALLBACKS
 
 Callback functions are called when an option is parsed. The value is
 stored in the variable as usual, and the callback is invoked for
 additional processing such as validation or side effects. Callbacks
 work the same way with pass-through options.
+
+Calls a function when the option is parsed. Default function name is the
+option name with hyphens converted to underscores; use `getoptlong callback`
+to specify a custom function. Can combine with any type (`+!`, `:!`,
+`?!`, `@!`, `%!`).
+
+    [action|a!]=        # Calls action() when specified
+    [file|f:!]=         # Calls file() with argument
 
 ## REGISTRATION
 
@@ -325,6 +265,62 @@ after `>`, uses the option name. Can combine with callback:
     [pass|p:>collected]=    # Option and value added to collected array
 
 After `--pass foo`: `collected=("--pass" "foo")`
+
+# DESTINATION VARIABLE
+
+By default, values are stored in variables named after the option.
+A custom destination can be specified by adding the variable name after
+TYPE/MODIFIER and before VALIDATE: `[NAME|ALIAS:!DEST=(REGEX)]`.
+`PREFIX` setting applies to custom names too (see ["getoptlong init"](#getoptlong-init)).
+
+    [count|c:COUNT]=1       # Store in $COUNT instead of $count
+    [debug|d+DBG]=0         # Store in $DBG
+
+# VALIDATION
+
+Option values can be validated using type specifiers or regex patterns:
+`=i` for integers, `=f` for floats, `=(` ... `)` for regex.
+
+    [count:=i]=1            # Integer (positive/negative)
+    [ratio:=f]=0.5          # Float (e.g., 123.45)
+    [mode:=(^(a|b|c)$)]=a   # Regex: exactly a, b, or c
+
+**Note:** For regex, the pattern extends to the last `)` in the
+definition, including any `)` in the description. Avoid using `)`
+in comments when using regex validation.
+
+Validation occurs before the value is stored or callbacks are invoked.
+For array options, each element is validated; for hash options, each
+`key=value` pair is matched as a whole. Error on validation failure
+(see [EXIT\_ON\_ERROR](#configuration)).
+
+# HELP MESSAGE
+
+By default, `--help` and `-h` options are automatically available.
+They display a help message generated from option definitions and exit.
+No configuration is required.
+
+To customize or disable, use one of these methods (in order of precedence):
+
+    [&HELP]="usage|u#Show usage"            # 1. &HELP key in OPTS
+    getoptlong init OPTS HELP="manual|m"    # 2. HELP parameter in init
+    [help|h # Custom help text]=            # 3. Explicit option definition
+    getoptlong init OPTS HELP=""            # Disable help option
+
+## SYNOPSIS (USAGE)
+
+Set the usage line displayed at the top of help output:
+
+    [&USAGE]="Usage: cmd [options] <file>"  # In OPTS array
+    getoptlong init OPTS USAGE="..."        # Or via init parameter
+
+## OPTION DESCRIPTIONS
+
+Text after `#` in the option definition becomes the help description.
+If omitted, a description is auto-generated. Default values are shown
+as `(default: value)`.
+
+    [output|o: # Output file path]=/dev/stdout
 
 # COMMANDS
 
@@ -487,7 +483,7 @@ Kazumasa Utashiro
 
 # COPYRIGHT
 
-Copyright 2025 Kazumasa Utashiro
+Copyright 2025-2026 Kazumasa Utashiro
 
 # LICENSE
 

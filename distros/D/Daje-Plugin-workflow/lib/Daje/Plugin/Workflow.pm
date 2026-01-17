@@ -40,15 +40,29 @@ use v5.40;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.15";
+our $VERSION = "0.20";
 
 use Daje::Workflow::Database;
 use Daje::Workflow::Loader;
 use Daje::Workflow;
+use Daje::Database::Migrator;
 
 sub register ($self, $app, $config) {
 
     $app->log->debug("Daje::Plugin::Workflow::register starts");
+
+    my $migrations->{class} = 'Daje::Workflow::Database';
+    $migrations->{name} = 'workflow';
+    $migrations->{migration} = 4;
+    try {
+        Daje::Database::Migrator->new(
+            pg         => $app->pg,
+            migrations => $migrations,
+        )->migrate();
+    } catch ($e) {
+        $app->log->error($e);
+    };
+
     my $loader;
     try { # '/home/jan/Project/Daje-Workflow-Workflows/Workflows'
         $loader = Daje::Workflow::Loader->new(
@@ -69,7 +83,7 @@ sub register ($self, $app, $config) {
     } catch ($e) {
         $app->log->error($e);
     };
-
+    push @{$app->routes->namespaces}, 'Daje::Controller::Workflow';
     $app->helper(workflow => sub {$workflow});
 
     my $r = $app->routes;
@@ -85,6 +99,7 @@ sub register ($self, $app, $config) {
 1;
 
 __END__
+
 
 
 
@@ -127,7 +142,7 @@ Daje::Plugin::Workflow is the Mojolicious plugin for Daje::Workflow
 
 =head1 REQUIRES
 
-L<Daje::Plugin::workflow> 
+L<Daje::Database::Migrator> 
 
 L<Daje::Workflow> 
 

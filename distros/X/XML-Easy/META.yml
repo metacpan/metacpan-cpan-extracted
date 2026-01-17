@@ -30,5 +30,9 @@ requires:
   perl: '5.010001'
   strict: '0'
   warnings: '0'
-version: '0.012'
+resources:
+  bugtracker: https://github.com/jkeenan/p5-XML-Easy/issues
+  homepage: http://thenceforward.net/perl/modules/XML-Easy/
+  repository: https://github.com/jkeenan/p5-XML-Easy.git
+version: '0.013'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

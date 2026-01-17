@@ -3,7 +3,7 @@ package Net::DNS::SEC::ECDSA;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: ECDSA.pm 1940 2023-10-30 15:59:20Z willem $)[2];
+our $VERSION = (qw$Id: ECDSA.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 
 =head1 NAME
@@ -13,11 +13,11 @@ Net::DNS::SEC::ECDSA - DNSSEC ECDSA digital signature algorithm
 
 =head1 SYNOPSIS
 
-    require Net::DNS::SEC::ECDSA;
+	require Net::DNS::SEC::ECDSA;
 
-    $signature = Net::DNS::SEC::ECDSA->sign( $sigdata, $private );
+	$signature = Net::DNS::SEC::ECDSA->sign( $sigdata, $private );
 
-    $validated = Net::DNS::SEC::ECDSA->verify( $sigdata, $keyrr, $sigbin );
+	$validated = Net::DNS::SEC::ECDSA->verify( $sigdata, $keyrr, $sigbin );
 
 
 =head1 DESCRIPTION
@@ -27,14 +27,14 @@ generation and verification procedures.
 
 =head2 sign
 
-    $signature = Net::DNS::SEC::ECDSA->sign( $sigdata, $private );
+	$signature = Net::DNS::SEC::ECDSA->sign( $sigdata, $private );
 
 Generates the wire-format signature from the sigdata octet string
 and the appropriate private key object.
 
 =head2 verify
 
-    $validated = Net::DNS::SEC::ECDSA->verify( $sigdata, $keyrr, $sigbin );
+	$validated = Net::DNS::SEC::ECDSA->verify( $sigdata, $keyrr, $sigbin );
 
 Verifies the signature over the sigdata octet string using the specified
 public key resource record.

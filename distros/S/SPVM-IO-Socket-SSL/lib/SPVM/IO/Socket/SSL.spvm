@@ -2,7 +2,7 @@
 # MIT License
 
 class IO::Socket::SSL extends IO::Socket::IP {
-  version "0.015";
+  version "0.016";
   
   use IO::Socket::SSL::Callback::BeforeConnectSSL;
   use IO::Socket::SSL::Callback::BeforeAcceptSSL;
@@ -412,11 +412,11 @@ class IO::Socket::SSL extends IO::Socket::IP {
         my $again_write = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
         
         if ($again_read) {
-          Go->gosched_io_read($fd, $timeout);
+          Go->gosched_io_read_sec($fd, $timeout);
           next;
         }
         elsif ($again_write) {
-          Go->gosched_io_write($fd, $timeout);
+          Go->gosched_io_write_sec($fd, $timeout);
           next;
         }
         else {
@@ -460,11 +460,11 @@ class IO::Socket::SSL extends IO::Socket::IP {
         my $again_write = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
         
         if ($again_read) {
-          Go->gosched_io_read($fd, $timeout);
+          Go->gosched_io_read_sec($fd, $timeout);
           next;
         }
         elsif ($again_write) {
-          Go->gosched_io_write($fd, $timeout);
+          Go->gosched_io_write_sec($fd, $timeout);
           next;
         }
         else {
@@ -512,11 +512,11 @@ class IO::Socket::SSL extends IO::Socket::IP {
         my $again_write = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
         
         if ($again_read) {
-          Go->gosched_io_read($fd, $timeout);
+          Go->gosched_io_read_sec($fd, $timeout);
           next;
         }
         elsif ($again_write) {
-          Go->gosched_io_write($fd, $timeout);
+          Go->gosched_io_write_sec($fd, $timeout);
           next;
         }
         else {
@@ -557,11 +557,11 @@ class IO::Socket::SSL extends IO::Socket::IP {
         my $again_write = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
         
         if ($again_read) {
-          Go->gosched_io_read($fd, $timeout);
+          Go->gosched_io_read_sec($fd, $timeout);
           next;
         }
         elsif ($again_write) {
-          Go->gosched_io_write($fd, $timeout);
+          Go->gosched_io_write_sec($fd, $timeout);
           next;
         }
         else {
@@ -602,11 +602,11 @@ class IO::Socket::SSL extends IO::Socket::IP {
         my $again_write = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
         
         if ($again_read) {
-          Go->gosched_io_read($fd, $timeout);
+          Go->gosched_io_read_sec($fd, $timeout);
           next;
         }
         elsif ($again_write) {
-          Go->gosched_io_write($fd, $timeout);
+          Go->gosched_io_write_sec($fd, $timeout);
           next;
         }
         else {

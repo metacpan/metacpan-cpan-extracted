@@ -51,22 +51,22 @@ package TemplateApp {
 	sub test ($self, $ctx, $ex)
 	{
 		$ex = defined $ex ? ".$ex" : '';
-		return $self->render("test$ex", {name => 'World'});
+		return $self->template("test$ex", {name => 'World'});
 	}
 
 	sub test_inline ($self, $ctx)
 	{
-		return $self->render(\'Hello [% name %]!', {name => 'Inline'});
+		return $self->template(\'Hello [% name %]!', {name => 'Inline'});
 	}
 
 	sub test_data ($self, $ctx)
 	{
-		return $self->render(\*main::DATA);
+		return $self->template(\*main::DATA);
 	}
 
 	sub test_bad ($self, $ctx)
 	{
-		return $self->render('bad_template');
+		return $self->template('bad_template');
 	}
 }
 
@@ -103,13 +103,8 @@ subtest 'should render DATA template' => sub {
 };
 
 subtest 'should not render bad template' => sub {
-	my $err = dies {
-		http $app, GET '/test-bad';
-		diag http->text;
-	};
-
-	note $err;
-	isa_ok $err, ['Gears::X'], 'bad template ok';
+	http $app, GET '/test-bad';
+	like http->text, qr{\Q[Template] file error - bad_template.tt: not found\E}, 'text ok';
 };
 
 done_testing;

@@ -3,7 +3,7 @@ package Net::DNS::SEC::Keyset;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Keyset.pm 1868 2022-08-31 20:13:35Z willem $)[2];
+our $VERSION = (qw$Id: Keyset.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 
 =head1 NAME
@@ -13,7 +13,7 @@ Net::DNS::SEC::Keyset - DNSSEC Keyset object class
 
 =head1 SYNOPSIS
 
-    use Net::DNS::SEC::Keyset;
+	use Net::DNS::SEC::Keyset;
 
 
 =head1 DESCRIPTION
@@ -55,9 +55,9 @@ sub new {
 
 =head2 new (from file)
 
-    $keyset = Net::DNS::SEC::Keyset->new( $filename );
-    $keyset = Net::DNS::SEC::Keyset->new( $filename, $directory );
-    die Net::DNS::SEC::Keyset->keyset_err unless $keyset;
+	$keyset = Net::DNS::SEC::Keyset->new( $filename );
+	$keyset = Net::DNS::SEC::Keyset->new( $filename, $directory );
+	die Net::DNS::SEC::Keyset->keyset_err unless $keyset;
 
 Constructor method which reads the specified keyset file and returns a
 keyset object.
@@ -81,8 +81,8 @@ sub _new_from_file {
 
 =head2 new (by signing keys)
 
-    $keyset = Net::DNS::SEC::Keyset->new( [@keyrr], $privatekeypath );
-    die Net::DNS::SEC::Keyset->keyset_err unless $keyset;
+	$keyset = Net::DNS::SEC::Keyset->new( [@keyrr], $privatekeypath );
+	die Net::DNS::SEC::Keyset->keyset_err unless $keyset;
 
 Creates a keyset object from the keys provided through the reference to an
 array of Net::DNS::RR::DNSKEY objects.
@@ -112,8 +112,8 @@ sub _new_from_keys {
 
 =head2 new (from key and sig RRsets)
 
-    $keyset = Net::DNS::Keyset->new( [@keyrr], [@sigrr] );
-    die Net::DNS::SEC::Keyset->keyset_err unless $keyset;
+	$keyset = Net::DNS::Keyset->new( [@keyrr], [@sigrr] );
+	die Net::DNS::SEC::Keyset->keyset_err unless $keyset;
 
 Creates a keyset object from the keys provided through the references
 to arrays of Net::DNS::RR::DNSKEY and Net::DNS::RR::RRSIG objects.
@@ -136,13 +136,13 @@ sub _new_from_keys_sigs {
 
 =head2 new (from Packet)
 
-    $resolver = Net::DNS::Resolver->new;
-    $resolver->dnssec(1);
-   
-    $reply = $res->send ( "example.com", "DNSKEY" );
+	$resolver = Net::DNS::Resolver->new;
+	$resolver->dnssec(1);
+	
+	$reply = $res->send ( "example.com", "DNSKEY" );
 
-    $keyset = Net::DNS::SEC::Keyset->new( $reply );
-    die Net::DNS::SEC::Keyset->keyset_err unless $keyset;
+	$keyset = Net::DNS::SEC::Keyset->new( $reply );
+	die Net::DNS::SEC::Keyset->keyset_err unless $keyset;
 
 Creates a keyset object from a Net::DNS::Packet that contains the answer
 to a query for key records at the zone apex.
@@ -162,7 +162,7 @@ sub _new_from_packet {
 
 =head2 keys
 
-    @keyrr = $keyset->keys;
+	@keyrr = $keyset->keys;
 
 Returns an array of Net::DNS::RR::DNSKEY objects.
 
@@ -177,7 +177,7 @@ sub keys {
 
 =head2 sigs
 
-    @sigrr = $keyset->sigs;
+	@sigrr = $keyset->sigs;
 
 Returns an array of Net::DNS::RR::RRSIG objects.
 
@@ -192,9 +192,9 @@ sub sigs {
 
 =head2 extract_ds
 
-    @ds = $keyset->extract_ds();	# default SHA-1
-    @ds = $keyset->extract_ds( digtype => 'SHA-256' );
-    die Net::DNS::SEC::Keyset->keyset_err unless @ds;
+	@ds = $keyset->extract_ds();	# default SHA-1
+	@ds = $keyset->extract_ds( digtype => 'SHA-256' );
+	die Net::DNS::SEC::Keyset->keyset_err unless @ds;
 
 Extracts DS records from the keyset. Note that the keyset will be verified
 during extraction. All keys will need to have a valid self-signature.
@@ -213,10 +213,10 @@ sub extract_ds {
 
 =head2 verify
 
-    @keytags = $keyset->verify();
-    die Net::DNS::SEC::Keyset->keyset_err unless @keytags;
+	@keytags = $keyset->verify();
+	die Net::DNS::SEC::Keyset->keyset_err unless @keytags;
 
-    $keyset->verify( $keytag ) || die $keyset->keyset_err;
+	$keyset->verify( $keytag ) || die $keyset->keyset_err;
 
 If no arguments are given:
 
@@ -288,8 +288,8 @@ sub verify {
 
 
 =head2 keyset_err
-    
-    $keyset_err = Net::DNS::SEC::Keyset->keyset_err;
+	
+	$keyset_err = Net::DNS::SEC::Keyset->keyset_err;
 
 Returns the keyset error string.
 
@@ -301,8 +301,8 @@ sub keyset_err {
 
 
 =head2 string
-    
-    $string = $keyset->string;
+	
+	$string = $keyset->string;
 
 Returns a string representation of the keyset.
 
@@ -316,7 +316,7 @@ sub string {
 
 =head2 print
 
-    $keyset->print;		# similar to print( $keyset->string )
+	$keyset->print;		# similar to print( $keyset->string )
 
 Prints the keyset.
 
@@ -331,10 +331,10 @@ sub print {
 
 =head2 writekeyset
 
-    $keyset->writekeyset;
-    $keyset->writekeyset( $path );
-    $keyset->writekeyset( $prefix );
-    $keyset->writekeyset( $prefix, $path );
+	$keyset->writekeyset;
+	$keyset->writekeyset( $path );
+	$keyset->writekeyset( $prefix );
+	$keyset->writekeyset( $prefix, $path );
 
 Writes the keyset to a file named "keyset-<domain>." in the current
 working directory or directory defined by the optional $path argument.

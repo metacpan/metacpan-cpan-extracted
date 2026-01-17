@@ -22,7 +22,7 @@ Daje::Plugin::Workflow is the Mojolicious plugin for Daje::Workflow
 
 # REQUIRES
 
-[Daje::Plugin::workflow](https://metacpan.org/pod/Daje%3A%3APlugin%3A%3Aworkflow) 
+[Daje::Database::Migrator](https://metacpan.org/pod/Daje%3A%3ADatabase%3A%3AMigrator) 
 
 [Daje::Workflow](https://metacpan.org/pod/Daje%3A%3AWorkflow) 
 

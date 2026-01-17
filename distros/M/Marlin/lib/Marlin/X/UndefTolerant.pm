@@ -5,7 +5,7 @@ use warnings;
 package Marlin::X::UndefTolerant;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015000';
+our $VERSION   = '0.016000';
 
 use Marlin::Util          qw( true false );
 use Types::Common         qw( -types );

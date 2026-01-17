@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/Class-XSConstructor>
 Bug tracker:  <https://github.com/tobyink/p5-class-xsconstructor/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.022001	2026-01-16
+
+ [ Bug Fixes ]
+ - Fix an issue calling parent constructors where the parent class has a
+   BUILDARGS method. (We need to ignore the parent BUILDARGS.)
+
 0.022000	2026-01-15
 
  [ Bug Fixes ]

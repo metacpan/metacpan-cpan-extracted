@@ -3,13 +3,13 @@ package Net::DNS::Parameters;
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2025-07-01)
+##	(last updated 2025-12-29)
 ##
 ################################################
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Parameters.pm 2021 2025-07-04 13:00:27Z willem $)[2];
+our $VERSION = (qw$Id: Parameters.pm 2043 2026-01-14 13:35:59Z willem $)[2];
 
 use integer;
 use Carp;
@@ -50,7 +50,9 @@ our %classbyname = ( '*' => 255, @classbyname );
 
 # Registry: Resource Record (RR) TYPEs
 my @typebyname = (
-	DELEG	   => 65432,					# draft-ietf-deleg
+	DELEG	   => 65432,					# draft-ietf-deleg-02
+	DELEG	   => 61440,					# draft-ietf-deleg-03
+	DELEGI	   => 65433,					# draft-ietf-deleg-03
 	A	   => 1,					# RFC1035
 	NS	   => 2,					# RFC1035
 	MD	   => 3,					# RFC1035
@@ -115,9 +117,9 @@ my @typebyname = (
 	ZONEMD	   => 63,					# RFC8976
 	SVCB	   => 64,					# RFC9460
 	HTTPS	   => 65,					# RFC9460
-	DSYNC	   => 66,					# RFC-ietf-dnsop-generalized-notify-09
-	HHIT	   => 67,					# draft-ietf-drip-registries-28
-	BRID	   => 68,					# draft-ietf-drip-registries-28
+	DSYNC	   => 66,					# RFC9859
+	HHIT	   => 67,					# RFC9886
+	BRID	   => 68,					# RFC9886
 	SPF	   => 99,					# RFC7208
 	UINFO	   => 100,					# IANA-Reserved
 	UID	   => 101,					# IANA-Reserved
@@ -129,7 +131,7 @@ my @typebyname = (
 	LP	   => 107,					# RFC6742
 	EUI48	   => 108,					# RFC7043
 	EUI64	   => 109,					# RFC7043
-	NXNAME	   => 128,					# RFC-ietf-dnsop-compact-denial-of-existence-07
+	NXNAME	   => 128,					# RFC9824
 	TKEY	   => 249,					# RFC2930
 	TSIG	   => 250,					# RFC8945
 	IXFR	   => 251,					# RFC1995
@@ -244,7 +246,7 @@ our %dnsflagbyname = @dnsflagbyname;
 # Registry: EDNS Header Flags (16 bits)
 my @ednsflagbyname = (
 	DO => 0x8000,						# RFC4035 RFC3225 RFC6840
-	CO => 0x4000,						# RFC-ietf-dnsop-compact-denial-of-existence-07
+	CO => 0x4000,						# RFC9824
 	);
 push @ednsflagbyname, map { /^\d/ ? $_ : lc($_) } @ednsflagbyname;
 our %ednsflagbyname = @ednsflagbyname;
@@ -297,7 +299,7 @@ my @dnserrorbyval = (
 	27 => 'Unsupported NSEC3 Iterations Value',		# RFC9276
 	28 => 'Unable to conform to policy',			# draft-homburg-dnsop-codcp-00
 	29 => 'Synthesized',					# https://github.com/PowerDNS/pdns/pull/12334
-	30 => 'Invalid Query Type',				# RFC-ietf-dnsop-compact-denial-of-existence-07
+	30 => 'Invalid Query Type',				# RFC9824
 	);
 our %dnserrorbyval = @dnserrorbyval;
 
@@ -416,8 +418,8 @@ use constant EXTLANG => defined eval { require Net::DNS::Extlang };
 sub _typespec {
 	my $generate = defined wantarray;
 	return EXTLANG ? eval <<'END' : '';	## no critic
-	my ($node) = @_;		## draft-levine-dnsextlang
-	my $instance = Net::DNS::Extlang->new();
+	my ($node) = @_;
+	my $instance = Net::DNS::Extlang->new();	## draft-levine-dnsextlang
 	my $basename = $instance->domain || return '';
 
 	require Net::DNS::Resolver;

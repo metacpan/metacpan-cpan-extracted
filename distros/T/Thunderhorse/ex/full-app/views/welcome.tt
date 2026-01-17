@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>[% title || 'Welcome to Thunderhorse' %]</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: Roboto, Arial, sans-serif;
+			background: #fff;
+			min-height: 100vh;
+			color: #2c3e50;
+			padding: 20px;
+		}
+
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			background: white;
+			border-radius: 12px;
+			box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+			overflow: hidden;
+		}
+
+		header {
+			background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+			padding: 40px;
+			text-align: center;
+			position: relative;
+			overflow: hidden;
+		}
+
+		header::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: radial-gradient(circle at 30% 50%, rgba(52, 152, 219, 0.1) 0%, transparent 50%);
+		}
+
+		header.with-logo {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		header.with-logo .logo {
+			margin: 0 35px 0 0;
+		}
+
+		header.with-logo .caption {
+			text-align: left;
+		}
+
+		.logo img {
+			width: 120px;
+			height: 120px;
+			display: block;
+			padding: 10px;
+			border-radius: 8px;
+			background: #fff;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+		}
+
+		h1 {
+			color: white;
+			font-size: 2.5em;
+			font-weight: 300;
+			letter-spacing: 1px;
+			position: relative;
+		}
+
+		.subtitle {
+			color: #bdc3c7;
+			font-size: 1.1em;
+			margin-top: 10px;
+			font-weight: 300;
+		}
+
+		main {
+			padding: 40px;
+		}
+
+		article {
+			text-align: center;
+			padding: 40px 100px;
+		}
+
+		.section {
+			margin-bottom: 40px;
+		}
+
+		.section h2 {
+			color: #2c3e50;
+			font-size: 1.8em;
+			font-weight: 400;
+			margin-bottom: 20px;
+			border-bottom: 2px solid #3498db;
+			padding-bottom: 10px;
+		}
+
+		.loading {
+			text-align: center;
+			padding: 30px;
+			color: #7f8c8d;
+			font-style: italic;
+		}
+
+		.loading::after {
+			content: '...';
+			animation: dots 1.5s steps(4, end) infinite;
+		}
+
+		@keyframes dots {
+			0%, 20% { content: '.'; }
+			40% { content: '..'; }
+			60%, 100% { content: '...'; }
+		}
+
+		.locations-list {
+			display: grid;
+			gap: 15px;
+		}
+
+		.location-item {
+			background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+			border: 1px solid #e0e6ed;
+			border-radius: 8px;
+			padding: 20px;
+			transition: all 0.3s ease;
+		}
+
+		.location-item:hover {
+			border-color: #3498db;
+			box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+			transform: translateY(-2px);
+		}
+
+		.location-header {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			margin-bottom: 10px;
+		}
+
+		.location-action {
+			display: inline-block;
+			padding: 4px 12px;
+			background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+			color: white;
+			border-radius: 4px;
+			font-size: 0.85em;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+
+		.location-pattern {
+			font-family: 'Courier New', monospace;
+			font-size: 1.1em;
+			color: #2c3e50;
+			font-weight: 500;
+		}
+
+		.location-details {
+			display: grid;
+			grid-template-columns: auto 1fr;
+			gap: 8px 16px;
+			font-size: 0.9em;
+			color: #7f8c8d;
+			margin-top: 10px;
+		}
+
+		.location-label {
+			font-weight: 600;
+			color: #5a6c7d;
+		}
+
+		.location-value {
+			font-family: 'Courier New', monospace;
+			color: #34495e;
+		}
+
+		pre {
+			background: #2c3e50;
+			color: #ecf0f1;
+			padding: 20px;
+			border-radius: 8px;
+			overflow-x: auto;
+			font-size: 0.9em;
+			line-height: 1.6;
+			box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+		}
+
+		footer {
+			background: #f8f9fa;
+			padding: 20px;
+			text-align: center;
+			color: #7f8c8d;
+			font-size: 0.9em;
+			border-top: 1px solid #e0e6ed;
+		}
+
+		footer a {
+			color: #3498db;
+			text-decoration: none;
+			transition: color 0.3s ease;
+		}
+
+		footer a:hover {
+			color: #2980b9;
+		}
+
+		.error {
+			background: #ffe6e6;
+			border: 1px solid #ffcccc;
+			color: #c0392b;
+			padding: 15px;
+			border-radius: 8px;
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header class="with-logo">
+			<div class="logo">
+				<img src="https://github.com/Thunderhorse-Framework/Art/blob/master/logo/logo.png?raw=true" alt="Thunderhorse Logo">
+			</div>
+			<div class="caption">
+				<h1>Thunderhorse</h1>
+				<p class="subtitle">Asynchronous Web Framework for Perl</p>
+			</div>
+		</header>
+
+		<main>
+			<article>
+				Welcome to Thunderhorse. Your web application appears to be operational.
+				You can find details about this instance below.
+			</article>
+
+			<div class="section">
+				<h2>Router Locations</h2>
+				<div id="locations-container">
+					<div class="loading">Loading locations</div>
+				</div>
+			</div>
+
+			<div class="section">
+				<h2>Configuration</h2>
+				<pre>[% USE dumper(indent=1); dumper.dump(config) %]</pre>
+			</div>
+		</main>
+
+		<footer>
+			<p>Powered by <strong>Thunderhorse</strong> &bull; Built with PAGI &amp; Gears</p>
+			<p>Visit <a href="https://github.com/Thunderhorse-Framework" target="_blank">github.com/Thunderhorse-Framework</a></p>
+		</footer>
+
+		<script>
+		(function() {
+			const apiUrl = '[% api_url %]';
+			const container = document.getElementById('locations-container');
+
+			fetch(apiUrl)
+				.then(response => {
+					if (!response.ok) {
+						throw new Error('Failed to fetch locations');
+					}
+					return response.json();
+				})
+				.then(locations => {
+					if (!locations || locations.length === 0) {
+						container.innerHTML = '<div class="locations-list">No locations in the system</div>';
+						return;
+					}
+
+					const html = '<div class="locations-list">' +
+						locations.map(location => {
+							let details = '';
+							if (location.name) {
+								details += '<div class="location-label">Name:</div><div class="location-value">' + location.name + '</div>';
+							}
+							if (location.controller) {
+								details += '<div class="location-label">Controller:</div><div class="location-value">' + location.controller + '</div>';
+							}
+							if (location.handler) {
+								details += '<div class="location-label">Handler:</div><div class="location-value">' + location.handler + '</div>';
+							}
+
+							return '<div class="location-item">' +
+								'<div class="location-header">' +
+								'<span class="location-action">' + (location.action || 'any') + '</span>' +
+								'<span class="location-pattern">' + location.pattern + '</span>' +
+								'</div>' +
+								(details ? '<div class="location-details">' + details + '</div>' : '') +
+								'</div>';
+						}).join('') +
+						'</div>';
+
+					container.innerHTML = html;
+				})
+				.catch(error => {
+					container.innerHTML = '<div class="error">Error loading locations: ' + error.message + '</div>';
+				});
+		})();
+		</script>
+	</div>
+</body>
+</html>
+

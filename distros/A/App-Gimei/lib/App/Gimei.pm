@@ -2,7 +2,9 @@ use v5.40;
 
 package App::Gimei;
 
-use version; our $VERSION = version->declare("v0.2.9");
+use version; our $VERSION = version->declare("v0.2.11");
+
+1;
 
 __END__
 
@@ -67,7 +69,7 @@ WORD_SUBTYPE('name') 'sex' ignore RENDERING.
 App::Gimei is a command-line tool for Data::Gimei, a module that generates fake
 Japanese names and addresses.
 Generated names include a first name, a last name, and their associated gender. Names
-are available in kanji, hiragana, katakana, and romanized forms, where hiragana, 
+are available in kanji, hiragana, katakana, and romanized forms, where hiragana,
 katakana, and romanized forms are phonetic renderings for kanji.
 Addresses include a prefecture, city, and town, and can be generated in kanji,
 hiragana or katakana.

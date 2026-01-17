@@ -4,7 +4,7 @@ use warnings;
 use 5.010; # state
 
 # ABSTRACT: Fully UTF-8 aware Cwd
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 #pod =begin :prelude
 #pod
@@ -173,7 +173,7 @@ Cwd::utf8 - Fully UTF-8 aware Cwd
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =for test_synopsis my $file;
 

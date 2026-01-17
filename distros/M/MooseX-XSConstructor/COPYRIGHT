@@ -28,6 +28,7 @@ License: public-domain
 
 Files: INSTALL
  LICENSE
+ examples/bench.pl
 Copyright: Unknown
 License: Unknown
 

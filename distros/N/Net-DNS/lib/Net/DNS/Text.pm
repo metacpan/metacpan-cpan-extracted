@@ -3,7 +3,7 @@ package Net::DNS::Text;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Text.pm 2002 2025-01-07 09:57:46Z willem $)[2];
+our $VERSION = (qw$Id: Text.pm 2043 2026-01-14 13:35:59Z willem $)[2];
 
 
 =head1 NAME
@@ -185,7 +185,7 @@ sub string {
 
 	my @s = map { split '', $_ } @$self;			# escape special and ASCII non-printable
 	my $s = _decode_utf8( join '', map { $escape{$_} } @s );
-	return $s =~ /[ \t\n\r\f(),;]|^$/ ? qq("$s") : $s;	# quote special characters and empty string
+	return $s =~ /[ \t\n\r\f();]|^$/ ? qq("$s") : $s;	# quote special characters and empty string
 }
 
 

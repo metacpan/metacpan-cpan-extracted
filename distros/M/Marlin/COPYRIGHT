@@ -24,6 +24,26 @@ Files: t/00start.t
 Copyright: This software is copyright (c) 2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ lib/Marlin/Attribute.pm
+ lib/Marlin/TypeConstraint.pm
+ t/integration/conflicts.t
+ t/integration/extend-attr.t
+ t/integration/extend-eg.t
+ t/integration/extend-lex.t
+ t/integration/foreign-inherit.t
+ t/integration/xsdelegation.t
+ t/lib/Local/Mitey.pm
+ t/lib/Local/Mitey.pm.mite.pm
+ t/lib/Local/Mitey/MOP.pm
+ t/lib/Local/Mitey/Mite.pm
+Copyright: Copyright 2026 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: INSTALL
  LICENSE
  Makefile.PL
@@ -43,22 +63,6 @@ Files: INSTALL
  t/integration/undef-tolerant.pl
 Copyright: Unknown
 License: Unknown
-
-Files: Changes
- META.json
- META.yml
- dist.ini
- doap.ttl
- lib/Marlin/Attribute.pm
- lib/Marlin/TypeConstraint.pm
- t/integration/foreign-inherit.t
- t/integration/xsdelegation.t
- t/lib/Local/Mitey.pm
- t/lib/Local/Mitey.pm.mite.pm
- t/lib/Local/Mitey/MOP.pm
- t/lib/Local/Mitey/Mite.pm
-Copyright: Copyright 2026 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/Marlin/X.pm
  lib/Marlin/X/UndefTolerant.pm

@@ -1,5 +1,19 @@
 Revision history for DBIx::Class::Async
 
+0.31  2026-01-16
+      - Added deploy() to DBIx::Class::Async and DBIx::Class::Async::Schema.
+
+0.30  2026-01-16
+      - Added the following methods to DBIx::Class::Async::Schema
+        - schema_version
+        - unregister_source
+
+0.29  2026-01-16
+      - Added the following methods to DBIx::Class::Async::Row
+        - is_column_dirty
+        - update_or_insert
+        - insert_or_update (alias for update_or_insert)
+
 0.28  2026-01-13
       - Added sub copy() to DBIx::Class::Async::Row.
       - Added sub register_[class|source] to DBIx::Class::Async::Schema.

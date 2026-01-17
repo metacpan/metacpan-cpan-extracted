@@ -58,7 +58,7 @@ package TestApp {
 		# Test multiple routes on same path with different actions
 		$router->add(
 			'/multi' => {
-				action => 'http.get',
+				action => 'HTTP.GET',
 			}
 		);
 
@@ -88,6 +88,11 @@ subtest 'should match exact scope and method' => sub {
 
 	$no_match = _get_match($router, '/exact', 'ws.get');
 	is $no_match, undef, 'ws.get did not match';
+};
+
+subtest 'should match head with get' => sub {
+	my $match = _get_match($router, '/exact', 'http.head');
+	ok $match, 'route matched';
 };
 
 subtest 'should match wildcard method' => sub {
@@ -156,7 +161,10 @@ subtest 'should match no action (matches anything)' => sub {
 
 subtest 'should match correct action on same path' => sub {
 	my $match = _get_match($router, '/multi', 'http.get');
-	is $match->location->action, 'http.get', 'http.get matched';
+	is $match->location->action, 'HTTP.GET', 'http.get matched';
+
+	$match = _get_match($router, '/multi', 'http.head');
+	is $match->location->action, 'HTTP.GET', 'http.head matched';
 
 	$match = _get_match($router, '/multi', 'http.post');
 	is $match->location->action, 'http.post', 'http.post matched';

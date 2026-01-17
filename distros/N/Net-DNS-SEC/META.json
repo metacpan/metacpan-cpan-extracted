@@ -50,11 +50,12 @@
             "File::Find" : "1.13",
             "File::Spec" : "3.29",
             "IO::File" : "1.14",
+            "Test::Builder" : "0.8",
             "Test::More" : "0.8"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.26",
+   "version" : "1.27",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

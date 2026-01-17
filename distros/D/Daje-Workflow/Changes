@@ -1,11 +1,13 @@
 Revision history for Perl extension Daje-Workflow
 
-0.50 2026-01-04T16:29:29Z
+0.55 2026-01-17T03:25:41Z
+
+    - 2026-01-16 Improved mandatory check to also take a model class as argument
     - 2025-12-12 Bugfixes
     - 2025-11-02 Beta 1
     - 2025-10-24 Activity pre and post checks added
     - 2025-10-21 Daje::Workflow::Loader and Daje::Workflow::Config merged.
-    - 2025-10-04 Model bugfixed
+    - 2025-10-04 Model bug fixed
     - 2025-10-04 Improved documentation
     - Save workflow_pkey for next activity
     - original version

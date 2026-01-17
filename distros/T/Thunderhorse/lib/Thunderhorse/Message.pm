@@ -1,5 +1,5 @@
 package Thunderhorse::Message;
-$Thunderhorse::Message::VERSION = '0.001';
+$Thunderhorse::Message::VERSION = '0.100';
 use v5.40;
 use Mooish::Base -standard, -role;
 
@@ -10,7 +10,7 @@ has param 'context' => (
 	weak_ref => 1,
 );
 
-sub update ($self)
+sub update ($self, $scope, $receive, $send)
 {
 	...;
 }

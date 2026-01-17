@@ -13,24 +13,30 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Thunderhorse",
+  "EXE_FILES" => [
+    "bin/thunderhorse"
+  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.040",
   "NAME" => "Thunderhorse",
   "PREREQ_PM" => {
+    "Devel::StrictMode" => 0,
     "Future::AsyncAwait" => 0,
-    "Gears" => 0,
+    "Gears" => "0.100",
     "HTTP::Message" => 0,
     "IO::Async" => 0,
     "JSON::MaybeXS" => 0,
     "Log::Handler" => 0,
     "Mooish::Base" => "1.001",
-    "PAGI" => "0.001012",
-    "Template::Toolkit" => 0
+    "PAGI" => "0.001014",
+    "Path::Tiny" => 0,
+    "Template::Toolkit" => 0,
+    "URI" => 0
   },
   "TEST_REQUIRES" => {
     "Test2::V1" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.100",
   "test" => {
     "TESTS" => "t/*.t t/location/*.t t/module/*.t"
   }
@@ -38,16 +44,19 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Devel::StrictMode" => 0,
   "Future::AsyncAwait" => 0,
-  "Gears" => 0,
+  "Gears" => "0.100",
   "HTTP::Message" => 0,
   "IO::Async" => 0,
   "JSON::MaybeXS" => 0,
   "Log::Handler" => 0,
   "Mooish::Base" => "1.001",
-  "PAGI" => "0.001012",
+  "PAGI" => "0.001014",
+  "Path::Tiny" => 0,
   "Template::Toolkit" => 0,
-  "Test2::V1" => 0
+  "Test2::V1" => 0,
+  "URI" => 0
 );
 
 

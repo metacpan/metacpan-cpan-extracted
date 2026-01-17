@@ -104,5 +104,15 @@ subtest 'should handle action-specific routing' => sub {
 	http_text_is 'POST';
 };
 
+subtest 'should not allow multiple routes with the same name' => sub {
+	$app->router->add('/_test1' => {name => '_test'});
+	my $ex = dies {
+		$app->router->add('/_test2' => {name => '_test'});
+	};
+
+	isa_ok $ex, 'Gears::X::Thunderhorse';
+	like $ex, qr{must be unique}, 'exception ok';
+};
+
 done_testing;
 

@@ -3,7 +3,7 @@ package Net::DNS::SEC::Digest;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Digest.pm 1971 2024-04-17 09:35:43Z willem $)[2];
+our $VERSION = (qw$Id: Digest.pm 2002 2025-01-07 09:57:46Z willem $)[2];
 
 
 =head1 NAME
@@ -13,12 +13,12 @@ Net::DNS::SEC::Digest - Message Digest Algorithms
 
 =head1 SYNOPSIS
 
-    require Net::DNS::SEC::Digest;
+	require Net::DNS::SEC::Digest;
 
-    $object = Net::DNS::SEC::Digest::SHA->new(256);
-    $object->add($text);
-    $object->add($more);
-    $digest = $object->digest;
+	$object = Net::DNS::SEC::Digest::SHA->new(256);
+	$object->add($text);
+	$object->add($more);
+	$digest = $object->digest;
 
 
 =head1 DESCRIPTION
@@ -105,8 +105,8 @@ __END__
 
 =head2 new
 
-    require Net::DNS::SEC::Digest;
-    $object = Net::DNS::SEC::Digest::SHA->new(256);
+	require Net::DNS::SEC::Digest;
+	$object = Net::DNS::SEC::Digest::SHA->new(256);
 
 Creates and initialises a new digest object instance for the specified
 algorithm class.
@@ -114,15 +114,15 @@ algorithm class.
 
 =head2 add
 
-    $object->add($data);
-    $object->add($more);
+	$object->add($data);
+	$object->add($more);
 
 Append specified data to the digest stream.
 
 
 =head2 digest
 
-    $digest = $object->digest;
+	$digest = $object->digest;
 
 Returns an octet string containing the calculated digest.
 

@@ -44,29 +44,31 @@ my $bob = Local::User->new(
 	password => 'zi1ch',
 );
 
-is( $bob->username, 'bd' );
+is( $bob->username, 'bd', 'username' );
 
 my $e = dies { $bob->password };
-like( $e, qr/locate object method/ );
+like( $e, qr/locate object method/, 'no password reader' );
 
-ok( !$bob->check_password( 'monk33' ) );
+ok( !$bob->check_password( 'monk33' ), 'password check correctly fails' );
 
-ok( $bob->check_password( 'zi1ch' ) );
+ok( $bob->check_password( 'zi1ch' ), 'password check correctly passes' );
 
 is(
 	$bob,
 	bless( { username => 'bd' }, 'Local::User' ),
+	'expected HASH',
 );
 
 $bob->change_password( 'monk33' );
 
-ok( $bob->check_password( 'monk33' ) );
+ok( $bob->check_password( 'monk33' ), 'new password check correctly passes' );
 
-ok( !$bob->check_password( 'zi1ch' ) );
+ok( !$bob->check_password( 'zi1ch' ), 'new password check correctly fails' );
 
 is(
 	$bob,
 	bless( { username => 'bd' }, 'Local::User' ),
+	'expected HASH still',
 );
 
 is(

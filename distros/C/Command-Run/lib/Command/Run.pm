@@ -1,6 +1,6 @@
 package Command::Run;
 
-our $VERSION = "0.9901";
+our $VERSION = "0.9902";
 
 use v5.14;
 use warnings;
@@ -34,13 +34,7 @@ sub new {
     my $obj = $class->SUPER::new;
     $obj->{OPTION} = { %default_option };
     $obj->{RESULT} = {};
-    if (@_ == 1 or @_ > 1 && $_[0] !~ /^(command|stdin|stderr)$/) {
-	# Command::new(@command) style
-	$obj->command(@_);
-    } else {
-	# Command::new(command => [...]) style
-	$obj->configure(@_);
-    }
+    $obj->configure(@_) if @_;
     $obj;
 }
 
@@ -279,7 +273,7 @@ Command::Run - Execute external command or code reference
     print "error: ", $result->{error};
 
     # Access output via file descriptor path
-    my $cmd = Command::Run->new('date');
+    my $cmd = Command::Run->new(command => ['date']);
     $cmd->update;
     system("cat", $cmd->path);  # /dev/fd/N
 
@@ -291,13 +285,13 @@ Command::Run - Execute external command or code reference
 
     # Using with() method
     my ($out, $err);
-    Command::Run->new("command", @args)
+    Command::Run->new->command("command", @args)
         ->with(stdin => $input, stdout => \$out, stderr => \$err)
         ->run;
 
 =head1 VERSION
 
-Version 0.9901
+Version 0.9902
 
 =head1 DESCRIPTION
 
@@ -320,21 +314,17 @@ which can be used as a file argument to external commands.
 
 =item B<new>(%parameters)
 
-=item B<new>(@command)
+Create a new Command::Run object.  Parameters are passed as
+key-value pairs (see L</PARAMETERS>):
 
-Create a new Command::Run object.  Parameters can be passed as
-key-value pairs (see L</PARAMETERS>), or a command can be passed
-directly:
-
-    # Parameters style
     my $runner = Command::Run->new(
         command => \@command,
         stdin   => $input_data,
         stderr  => 'redirect',
     );
 
-    # Direct command style
-    my $runner = Command::Run->new('ls', '-l');
+    # Or use method chaining
+    my $runner = Command::Run->new->command('ls', '-l');
 
 =back
 

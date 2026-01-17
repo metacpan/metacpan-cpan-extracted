@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 23-RSA-SHA256.t 1937 2023-09-11 09:27:16Z willem $	-*-perl-*-
+# $Id: 23-RSA-SHA256.t 2042 2025-12-24 10:23:11Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -23,7 +23,7 @@ foreach my $package ( sort keys %prerequisite ) {
 plan skip_all => 'disabled RSA'
 		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_RSA') };
 
-plan tests => 17;
+plan tests => 19;
 
 
 my %filename;
@@ -38,6 +38,10 @@ END {
 use_ok('Net::DNS::SEC');
 use_ok('Net::DNS::SEC::Private');
 use_ok( my $class = 'Net::DNS::SEC::RSA' );
+
+ok( scalar( $class->_index() ), "algorithm index for $class" );
+
+ok( scalar( $class->_deprecate() ), "deprecation list for $class" );
 
 
 my $key = Net::DNS::RR->new( <<'END' );

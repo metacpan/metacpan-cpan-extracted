@@ -1,0 +1,4 @@
+Revision history for Algorithm-SlidingWindow-Dynamic
+
+0.900  2026-01-16
+    - GitHub-ready packaging (CI, README, metadata); API: push/shift/pop/slide

@@ -4,7 +4,7 @@ Cwd::utf8 - Fully UTF-8 aware Cwd
 
 # VERSION
 
-version 0.011
+version 0.012
 
 # SYNOPSIS
 
@@ -73,8 +73,8 @@ systems.
 # SEE ALSO
 
 - [Cwd](https://metacpan.org/pod/Cwd) -- The original module
-- [File::Find::utf8](https://metacpan.org/pod/File::Find::utf8) -- Fully utf-8 aware versions of the [File::Find](https://metacpan.org/pod/File::Find) functions.
-- [utf8::all](https://metacpan.org/pod/utf8::all) -- Turn on utf-8, all of it. This was also the module I first added the utf-8 aware versions of [Cwd](https://metacpan.org/pod/Cwd) and [File::Find](https://metacpan.org/pod/File::Find) to before moving them to their own package.
+- [File::Find::utf8](https://metacpan.org/pod/File%3A%3AFind%3A%3Autf8) -- Fully utf-8 aware versions of the [File::Find](https://metacpan.org/pod/File%3A%3AFind) functions.
+- [utf8::all](https://metacpan.org/pod/utf8%3A%3Aall) -- Turn on utf-8, all of it. This was also the module I first added the utf-8 aware versions of [Cwd](https://metacpan.org/pod/Cwd) and [File::Find](https://metacpan.org/pod/File%3A%3AFind) to before moving them to their own package.
 
 # AUTHOR
 

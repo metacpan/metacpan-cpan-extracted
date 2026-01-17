@@ -1,14 +1,14 @@
 
-#define XS_Id "$Id: SEC.xs 1986 2024-07-29 10:45:40Z willem $"
+#define XS_Id "$Id: SEC.xs 2042 2025-12-24 10:23:11Z willem $"
 
 
 =head1 NAME
 
-Net::DNS::SEC::libcrypto - Perl interface to OpenSSL libcrypto
+Net::DNS::SEC::libcrypto - Perl bindings for OpenSSL libcrypto
 
 =head1 DESCRIPTION
 
-Perl XS extension providing bindings to the OpenSSL libcrypto library
+Perl XS extension providing bindings for the OpenSSL libcrypto library
 upon which the Net::DNS::SEC cryptographic components are built.
 
 =head1 COPYRIGHT
@@ -105,16 +105,20 @@ static OSSL_LIB_CTX *libctx = NULL;
 #define EOL 20230911
 #elif (OPENSSL_RELEASE < 0x03010000)
 #define EOL 20260907
-#elif (OPENSSL_RELEASE < 0x03020000)
-#define EOL 20250314
 #elif (OPENSSL_RELEASE < 0x03030000)
 #define EOL 20251123
 #elif (OPENSSL_RELEASE < 0x03040000)
 #define EOL 20260409
+#elif (OPENSSL_RELEASE < 0x03050000)
+#define EOL 20261022
+#elif (OPENSSL_RELEASE < 0x03060000)
+#define EOL 20300408
+#elif (OPENSSL_RELEASE < 0x03070000)
+#define EOL 20261101
 #endif
 
 
-#if (OPENSSL_RELEASE < 0x03000000)
+#ifdef API_1_1_1
 #ifndef NID_ED25519
 #define NO_EdDSA
 #endif
@@ -452,7 +456,7 @@ EVP_PKEY_new_EdDSA(SV *curve, SV *public, SV *private=NULL)
 	RETVAL = NULL;
 #ifdef API_1_1_1
 	if ( strcmp(name,"ED25519") == 0 ) nid = NID_ED25519;
-#ifdef NID_ED448		/* not yet implemented in BoringSSL & LibreSSL */
+#ifdef NID_ED448		/* not implemented in BoringSSL & LibreSSL */
 	if ( strcmp(name,"ED448") == 0 )   nid = NID_ED448;
 #endif
 	if ( private == NULL ) {

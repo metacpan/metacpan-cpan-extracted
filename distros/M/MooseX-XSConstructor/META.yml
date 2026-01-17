@@ -28,7 +28,7 @@ optional_features: {}
 provides:
   MooseX::XSConstructor:
     file: lib/MooseX/XSConstructor.pm
-    version: '0.001000'
+    version: '0.001001'
 requires:
   Class::XSConstructor: '0.018001'
   Hook::AfterRuntime: '0'
@@ -40,6 +40,6 @@ resources:
   homepage: https://metacpan.org/release/MooseX-XSConstructor
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-moosex-xsconstructor.git
-version: '0.001000'
+version: '0.001001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

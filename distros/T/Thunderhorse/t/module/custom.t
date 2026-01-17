@@ -14,7 +14,7 @@ package TestModule {
 
 	sub build ($self)
 	{
-		$self->register(
+		$self->add_method(
 			controller => custom_method => sub ($controller, $text) {
 				return "custom: $text";
 			}

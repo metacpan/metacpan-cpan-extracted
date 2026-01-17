@@ -2,7 +2,7 @@ package Net::DNS::RR::DS;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DS.pm 2003 2025-01-21 12:06:06Z willem $)[2];
+our $VERSION = (qw$Id: DS.pm 2042 2025-12-24 10:23:11Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -174,8 +174,8 @@ sub verify {
 		'SHA-256'	    => 2,			# [RFC4509]
 		'GOST-R-34.11-94'   => 3,			# [RFC5933]
 		'SHA-384'	    => 4,			# [RFC6605]
-		'GOST-R-34.11-2012' => 5,			# [RFC-makarenko-gost2012-dnssec-05]
-		'SM3'		    => 6,			# [RFC-cuiling-dnsop-sm2-alg-15]
+		'GOST-R-34.11-2012' => 5,			# [RFC9558]
+		'SM3'		    => 6,			# [RFC9563]
 		);
 
 	my @digestalias = ( 'SHA' => 1 );
@@ -221,8 +221,8 @@ sub verify {
 		'ECDSAP384SHA384'    => 14,			# [RFC6605]
 		'ED25519'	     => 15,			# [RFC8080]
 		'ED448'		     => 16,			# [RFC8080]
-		'SM2SM3'	     => 17,			# [RFC-cuiling-dnsop-sm2-alg-15]
-		'ECC-GOST12'	     => 23,			# [RFC-makarenko-gost2012-dnssec-05]
+		'SM2SM3'	     => 17,			# [RFC9563]
+		'ECC-GOST12'	     => 23,			# [RFC9558]
 
 		'INDIRECT'   => 252,				# [RFC4034]
 		'PRIVATEDNS' => 253,				# [RFC4034]

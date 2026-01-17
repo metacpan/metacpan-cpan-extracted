@@ -1,3 +1,9 @@
+version 0.013; 2026-01-16
+
+  * No change in functionality
+
+  * Small correction in Makefile.PL to generate better module metadata.
+
 version 0.012; 2026-01-14
 
   * No substantive changes in code in .pm files.

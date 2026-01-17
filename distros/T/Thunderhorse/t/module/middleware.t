@@ -12,6 +12,7 @@ my @execution_order;
 
 package TestMiddleware::First {
 	use Mooish::Base -standard;
+	extends 'PAGI::Middleware';
 
 	has param 'marker' => (
 		isa => Str,
@@ -31,6 +32,7 @@ package TestMiddleware::First {
 
 package TestMiddleware::Second {
 	use Mooish::Base -standard;
+	extends 'PAGI::Middleware';
 
 	has param 'marker' => (
 		isa => Str,
@@ -50,6 +52,7 @@ package TestMiddleware::Second {
 
 package TestMiddleware::Third {
 	use Mooish::Base -standard;
+	extends 'PAGI::Middleware';
 
 	has param 'marker' => (
 		isa => Str,

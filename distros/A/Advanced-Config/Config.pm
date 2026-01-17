@@ -1,11 +1,11 @@
 ###
-### Copyright (c) 2007 - 2025 Curtis Leach.  All rights reserved.
+### Copyright (c) 2007 - 2026 Curtis Leach.  All rights reserved.
 ###
 ### Module:  Advanced::Config
 
 =head1 NAME
 
-Advanced::Config - Perl module reads configuation files from various sources.
+Advanced::Config - Perl module reads configuration files from various sources.
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,7 @@ against stale configuration data.
 
 This module supports config file features such as variable substitution,
 sourcing in other config files, comments, breaking your configuration data
-up into sections, encryping/decrypting individual tag values, and even more ...
+up into sections, encrypting/decrypting individual tag values, and even more ...
 
 So feel free to experiment with this module on the best way to access your
 data in your config files.  And never have to worry about having multiple
@@ -46,7 +46,7 @@ the first return value.  The other return values are tossed.  Not the count of
 return values as some might expect.
 
 This is because in most cases these secondary return values only have meaning
-in specical cases.  So usually there's no need to grab them unless you plan on
+in special cases.  So usually there's no need to grab them unless you plan on
 using them.
 
 For a list of the related helper modules see the B<SEE ALSO> section at the
@@ -62,7 +62,7 @@ use strict;
 use warnings;
 
 # The version of this module!
-our $VERSION = "1.12";
+our $VERSION = "1.14";
 
 use File::Basename;
 use File::Copy;
@@ -71,6 +71,7 @@ use File::Spec;
 use Perl::OSType ':all';
 use Cwd 'abs_path';
 
+use Advanced::Config::Date;
 use Advanced::Config::Options;
 use Advanced::Config::Reader;
 use Fred::Fish::DBUG 2.09 qw / on_if_set  ADVANCED_CONFIG_FISH /;
@@ -246,31 +247,31 @@ even do a mixure of both!
 
 =over
 
-=item $cfg = Advanced::Config->new( [$filename[, \%read_opts[, \%get_opts[, \%date_opts]]]] );
+=item $cfg = Advanced::Config->new( [$filename[, \%read_opts[, \%get_opts[, \%date_var_opts]]]] );
 
 It takes four arguments, any of which can be omitted or B<undef> during object
 creation!
 
 F<$filename> is the optional name of the config file to read in.  It can be a
-relative path.  The absolute path to it will be calcuated for you if a relative
+relative path.  The absolute path to it will be calculated for you if a relative
 path was given.
 
 F<\%read_opts> is an optional hash reference that controls the default parsing
 of the config file as it's being read into memory.  Feel free to leave as
-B<undef> if you're satisfied with this module's default behaviour.
+B<undef> if you're satisfied with this module's default behavior.
 
-F<\%get_opts> is an optional hash reference that defines the default behaviour
+F<\%get_opts> is an optional hash reference that defines the default behavior
 when this module looks something up in the config file.  Feel free to leave as
-B<undef> if you're satisfied with this module's default behaviour.
+B<undef> if you're satisfied with this module's default behavior.
 
-F<\%date_opts> is an optional hash reference that defines the default formatting
-of the special date variables.  Feel free to leave as B<undef> if you're
-satisfied with the default formatting rules.
+F<\%date_var_opts> is an optional hash reference that defines the default
+formatting of the special predefined date variables.  Feel free to leave as
+B<undef> if you're satisfied with the default formatting rules.
 
 See the POD under L<Advanced::Config::Options> for more details on what options
-these hash references support!  Look under the S<I<The Read Options>>,
-S<I<The Get Options>>, and S<I<The Date Formatting Options>> sections of the
-POD.
+these three hash references support!  Look under the S<I<The Read Options>>,
+S<I<The Get Options>>, and S<I<The Special Date Variable Formatting Options>>
+sections of the POD.
 
 It returns the I<Advanced::Config> object created.
 
@@ -284,9 +285,9 @@ Here's a few examples:
 
   # Overrides some of the default featurs of the module ...
   $cfg = Advanced::Config->new("MyFile.cfg",
-                               { "assign" => ":=", "comment" => ";" },
-                               { "required" => 1 },
-                               { "date_language" => "German" } );
+                          { "assign" => ":=", "comment" => ";" },
+                          { "required" => 1, "date_language" => "German" },
+                          { "month_type" => 2, "month_language" => "German" } );
 
 =cut
 
@@ -342,7 +343,7 @@ sub new
    # Or inside the config file itself.
    $control{ALLOW_UTF8} = 0;
 
-   # Controls the behaviour of this module.
+   # Controls the behavior of this module.
    # Only exists in the parent object.
    $self->{CONTROL} = \%control;
 
@@ -488,8 +489,8 @@ sub new_section
 =head1 THE METHODS
 
 Once you have your B<Advanced::Config> object initialized, you can manipulate
-your obect in many ways.  You can access individual components of your config
-file, modify it's contents, refresh it's contents and even organize it in
+your object in many ways.  You can access individual components of your config
+file, modify its contents, refresh its contents and even organize it in
 different ways.
 
 Here are your exposed methods to help with this manipulation.
@@ -504,7 +505,7 @@ object.
 =item $cfg = $cfg->load_config ( [$filename[, %override_read_opts]] );
 
 This method reads the current I<$filename> into memory and converts it into an
-object so that you may refrence it's contents.  The I<$filename> must be defined
+object so that you may reference its contents.  The I<$filename> must be defined
 either here or in the call to B<new()>.
 
 Each time you call this method, it wipes the contents of the object and starts
@@ -808,7 +809,7 @@ sub merge_string
 
 =item $boolean = $cfg->refresh_config ( %refresh_opts );
 
-This boolean function detects if your config file or one of it's dependancies
+This boolean function detects if your config file or one of it's dependencies
 has been updated.  If your config file sources in other config files, those
 config files are checked for changes as well.
 
@@ -970,12 +971,14 @@ sub _recursion_check
 # Private method ...
 # Gets the requested tag from the current section.
 # And then apply the required rules against the returned value.
+# The {required} option isn't reliable until in this method!
 # Returns:  The tag hash ... (undef if it doesn't exist)
 sub _base_get
 {
    my $self = shift;
    my $tag  = shift;
    my $opts = shift;
+   my $disable_req = shift;
 
    # Get the main/parent section to work against!
    my $pcfg = $self->{PARENT} || $self;
@@ -987,30 +990,88 @@ sub _base_get
    # Check if a case insensitive lookup was requested ...
    my $t = ( $pcfg->{CONTROL}->{read_opts}->{tag_case} && $tag ) ? lc ($tag) : $tag;
 
+   # Check if we're overriding the required flag ...
+   my $req = $get_opts->{required};
+   local $get_opts->{required} = $disable_req ? 0 : $req;
+
    # Returns a hash reference to a local copy of the tag's data ... (or undef)
    # Handles the inherit option if used.
-   return ( apply_get_rules ( $tag, $self->{SECTION_NAME},
+   my $data_ref =apply_get_rules ( $tag, $self->{SECTION_NAME},
                               $self->{DATA}->{$t}, $pcfg->{DATA}->{$t},
                               $pcfg->{CONTROL}->{ALLOW_UTF8},
-                              $get_opts ) );
+                              $get_opts );
+
+   return ( wantarray ? ($data_ref, $req) : $data_ref );
 }
 
 
 # Private method ...
 # Gets the requested tag value from the current section.
-# Returns: All 5 of the hash members individually ...
+# Returns: All 5 of the hash members individually ... + required flag setting.
 sub _base_get2
 {
    my $self = shift;
    my $tag  = shift;
    my $opts = shift;
 
-   my $data = $self->_base_get ( $tag, $opts );
+   my ($data, $req) = $self->_base_get ( $tag, $opts, 0 );
 
    if ( defined $data ) {
-      return ( $data->{VALUE}, $data->{MASK_IN_FISH}, $data->{FILE}, $data->{ENCRYPTED}, $data->{VARIABLE} );
+      return ( $data->{VALUE}, $data->{MASK_IN_FISH}, $data->{FILE}, $data->{ENCRYPTED}, $data->{VARIABLE}, $req );
    } else {
-      return ( undef, 0, "", 0, 0 );    # No such tag ...
+      return ( undef, 0, "", 0, 0, $req );    # No such tag ...
+   }
+}
+
+
+# Private method ...
+# Gets the requested tag date value from the current section.
+# or treat the tag name as the date if the tag doesn't exist!
+# Returns: All 5 of the hash members individually ... + required flag setting.
+sub _base_get3_date_str
+{
+   my $self        = shift;
+   my $tag         = shift;
+   my $opts        = shift;
+   my $hyd_flg     = shift;         # Is it OK to return a HYD as HYD?
+   my $cvt_hyd_flg = shift;         # Is it OK to convert a HYD into a date str?
+
+   if ($hyd_flg && $cvt_hyd_flg) {
+      local $opts->{required} = 1;
+      croak_helper ($opts, "Programming error!  Can't set both hyd flags to true.", undef);
+   }
+
+   my ($data, $req);
+   {
+      local $opts->{date_active} = 0;
+      ($data, $req) = $self->_base_get ( $tag, $opts, 1 );     # Does tag exist?
+   }
+
+   # If the tag doesn't exist, use $tag as a date string instead.
+   unless ( defined $data ) {
+      my $yr = _validate_date_str ($tag);
+      if ( defined $yr ) {
+          return ( $tag, 0, "", 0, 0, $req );     # We have a valid date string!
+      } elsif ( $hyd_flg && $tag =~ m/^[-]?\d+$/ ) {
+          return ( $tag, 0, "", 0, 0, $req );     # We have a valid HYD string!
+      } elsif ( $cvt_hyd_flg && $tag =~ m/^[-]?\d+$/ ) {
+          my $dt = convert_hyd_to_date_str ($tag);
+          return ( $dt, 0, "", 0, 0, $req );      # We have a valid date string!
+      } else {
+          local $opts->{required} = $req;
+	  croak_helper ($opts, "No such tag ($tag), nor is it a date string.", undef);
+          return ( undef, 0, "", 0, 0, $req );    # No such tag/date ...
+      }
+   }
+
+   # The tag exists, then it must reference a date!
+   local $opts->{date_active} = 1;
+   ($data, $req) = $self->_base_get ( $tag, $opts, 0 );
+
+   if ( defined $data ) {
+      return ( $data->{VALUE}, $data->{MASK_IN_FISH}, $data->{FILE}, $data->{ENCRYPTED}, $data->{VARIABLE}, $req );
+   } else {
+      return ( undef, 0, "", 0, 0, $req );    # Not a date ...
    }
 }
 
@@ -1045,7 +1106,7 @@ details on what options you may override.
 Only the B<L<get_value>> function was truly needed.  But the other I<get>
 methods were added for a couple of reasons.  First to make it clear in your code
 what type of value is being returned and provide the ability to do validation of
-the B<tag>'s value without having to validate it yourself!  Another benifit was
+the B<tag>'s value without having to validate it yourself!  Another benefit was
 that it drastically reduced the number of exposed I<Get Options> needed for this
 module.  Making it easier to use.
 
@@ -1205,8 +1266,8 @@ Treats the B<tag>'s value as a boolean value and returns I<undef>,
 B<0> or B<1>.
 
 Sometimes you just want to allow for basically a true/false answer
-without having to force a particualar usage in the config file.
-This function converts the B<tag>'s value accoringly.
+without having to force a particular usage in the config file.
+This function converts the B<tag>'s value accordingly.
 
 So it handles pairs like: Yes/No, True/False, Good/Bad, Y/N, T/F, G/B, 1/0,
 On/Off, etc. and converts them into a boolean value.  This test is case
@@ -1247,13 +1308,13 @@ unless it's been marked as I<required>.  In that case B<die> may be called
 instead.
 
 If I<$language> is undefined, it will use the default language defined in the
-call to I<new> for parsing the date. (B<English> if not overriden.) Otherwise
+call to I<new> for parsing the date. (B<English> if not overridden.) Otherwise
 it must be a valid language defined by B<Date::Language>.  If it's a wrong or
 bad language, your date might not be recognized as valid.
 
 Unlike most other B<get> options, when parsing the B<tag>'s value, it's not
 looking to match the entire string.  It's looking for a date portion inside the
-value and ignores any miscellanious information.  There was just too many
+value and ignores any miscellaneous information.  There was just too many
 semi-valid potential surrounding data to worry about parsing that info as well.
 
 So B<Tues "January 3rd, 2017" at 6:00 PM> returns "2017-01-03".
@@ -1285,6 +1346,182 @@ sub get_date
 
 #######################################
 
+=item $hyd = $cfg->get_hyd_date ( $tag[, $language[, %override_get_opts]] );
+
+Behaves the same as B<get_date> except that it returns the date in the Hundred
+Year Date (I<hyd>) format.  Which is defined as the number of days since
+B<Jan 1, 1900>.  Which has the I<$hyd> of B<1>.
+
+But if the tag B<$tag> doesn't exist in the config file, and it's name is in the
+format of I<YYYY-MM-DD>, it will return the I<hyd> for that date instead.
+
+This date format makes it very easy to do math against dates,
+
+See L<Advanced::Config::Date> for more details.
+
+=cut
+
+sub get_hyd_date
+{
+   DBUG_ENTER_FUNC ( @_ );
+   my $self     = shift;       # Reference to the current section.
+   my $tag      = shift;       # The tag to look up ...
+   my $language = shift;       # The language the date appears in ...
+   my $opt_ref  = $self->_get_opt_args ( @_ );   # The override options ...
+
+   local $opt_ref->{date_active} = 1;
+   local $opt_ref->{date_language} = $language  if ( defined $language );
+
+   my ( $value, $sensitive, $required ) = ($self->_base_get3_date_str ( $tag, $opt_ref, 0, 0 ))[0,1,5];
+   if ( $sensitive ) {
+      DBUG_MASK (0);
+      DBUG_MASK_NEXT_FUNC_CALL (-1);
+   }
+   return DBUG_RETURN (undef)  unless (defined $value);
+
+   $value = calc_hundred_year_date ( $value );
+
+   DBUG_RETURN ( $value );
+}
+
+
+#######################################
+
+=item $dow = $cfg->get_dow_date ( $tag[, $language[, %override_get_opts]] );
+
+Behaves the same as B<get_date> except that it returns the Day of Week (I<dow>)
+that the date falls on.  It returns the I<dow> as a number between B<0> and
+B<6>.   For Sunday to Saturday.
+
+But if the tag B<$tag> doesn't exist in the config file, and it's name is in the
+format of I<YYYY-MM-DD>, it will return the I<dow> for that date instead.
+
+Finally if B<$tag> still didn't match it checks if it's an integer and it
+assumes you want the I<dow> for a I<hyd> date.
+
+See L<Advanced::Config::Date> for more details.
+
+=cut
+
+sub get_dow_date
+{
+   DBUG_ENTER_FUNC ( @_ );
+   my $self     = shift;       # Reference to the current section.
+   my $tag      = shift;       # The tag to look up ...
+   my $language = shift;       # The language the date appears in ...
+   my $opt_ref  = $self->_get_opt_args ( @_ );   # The override options ...
+
+   local $opt_ref->{date_active} = 1;
+   local $opt_ref->{date_language} = $language  if ( defined $language );
+
+   my ( $value, $sensitive, $required ) = ($self->_base_get3_date_str ( $tag, $opt_ref, 1, 0 ))[0,1,5];
+   if ( $sensitive ) {
+      DBUG_MASK (0);
+      DBUG_MASK_NEXT_FUNC_CALL (-1);
+   }
+   return DBUG_RETURN (undef)  unless (defined $value);
+
+   $value = calc_day_of_week ( $value );
+
+   DBUG_RETURN ( $value );
+}
+
+#######################################
+
+=item $doy = $cfg->get_doy_date ( $tag[, $language[, %override_get_opts]] );
+
+Behaves the same as B<get_date> except that it returns the Day of Year (I<doy>)
+that the date falls on.  It returns the I<doy> as a number between B<1> and
+B<366>.  With Jan 1st being B<1> and Dec 31st being B<365> or B<366>.
+
+But if the tag B<$tag> doesn't exist in the config file, and it's name is in the
+format of I<YYYY-MM-DD>, it will return the I<doy> for that date instead.
+
+See L<Advanced::Config::Date> for more details.
+
+=cut
+
+sub get_doy_date
+{
+   DBUG_ENTER_FUNC ( @_ );
+   my $self     = shift;       # Reference to the current section.
+   my $tag      = shift;       # The tag to look up ...
+   my $language = shift;       # The language the date appears in ...
+   my $opt_ref  = $self->_get_opt_args ( @_ );   # The override options ...
+
+   local $opt_ref->{date_active} = 1;
+   local $opt_ref->{date_language} = $language  if ( defined $language );
+
+   my ( $value, $sensitive, $required ) = ($self->_base_get3_date_str ( $tag, $opt_ref, 0, 0 ))[0,1,5];
+   if ( $sensitive ) {
+      DBUG_MASK (0);
+      DBUG_MASK_NEXT_FUNC_CALL (-1);
+   }
+   return DBUG_RETURN (undef)  unless (defined $value);
+
+   $value = calc_day_of_year ( $value );
+
+   DBUG_RETURN ( $value );
+}
+
+
+#######################################
+
+=item $newDate = $cfg->get_adjusted_date ( $tag, $adjYr, $adjMon[, $language[, %override_get_opts]] );
+
+Behaves the same as B<get_date> except that it returns an offsetted date.
+Where both I<$adjYr> & I<$adjMon> are integers.
+It correctly handles leap years and the proper number of days per month.
+
+But if the tag B<$tag> doesn't exist in the config file, and it's name is in the
+format of I<YYYY-MM-DD>, it will return the offset to that date instead.
+
+Example:
+
+   B<2020-02-15> = get_adjusted_date ("2024-01-15", -4, 1);
+
+Finally if B<$tag> still didn't match it checks if it's an integer and it
+assumes you want the offset to be against the I<hyd> instead.  You can use this
+option to convert a I<hyd> into a I<date string> as follows:
+
+   B<$date_str> = get_adjusted_date (I<$hyd>, 0, 0);
+
+See L<Advanced::Config::Date> for more details.
+
+=cut
+
+sub get_adjusted_date
+{
+   DBUG_ENTER_FUNC ( @_ );
+   my $self     = shift;       # Reference to the current section.
+   my $tag      = shift;       # The tag to look up ...
+   my $adjYrs   = shift;       # Number of years to adjust.
+   my $adjMons  = shift;       # Number of months to adjust.
+   my $language = shift;       # The language the date appears in ...
+   my $opt_ref  = $self->_get_opt_args ( @_ );   # The override options ...
+
+   local $opt_ref->{date_active} = 1;
+   local $opt_ref->{date_language} = $language  if ( defined $language );
+
+   my ( $value, $sensitive, $required ) = ($self->_base_get3_date_str ( $tag, $opt_ref, 0, 1 ))[0,1,5];
+   if ( $sensitive ) {
+      DBUG_MASK (0);
+      DBUG_MASK_NEXT_FUNC_CALL (-1);
+   }
+   return DBUG_RETURN (undef)  unless (defined $value);
+
+   $value = adjust_date_str ( $value, $adjYrs, $adjMons );
+   unless (defined $value)  {
+      local $opt_ref->{required} = $required;
+      croak_helper ($opt_ref, "usage errror", undef);
+   }
+
+   DBUG_RETURN ( $value );
+}
+
+
+#######################################
+
 =item $value = $cfg->get_filename ( $tag[, $access[, %override_get_opts]] );
 
 Treats the B<tag>'s value as a filename.  If the referenced file doesn't exist
@@ -1292,7 +1529,7 @@ it returns I<undef> instead, as if the B<tag> didn't exist.
 
 B<access> defines the minimum access required.  If that minimum access isn't
 met it returns I<undef> instead, as if the B<tag> didn't exist.  B<access>
-may be I<undef> to just check for existance.
+may be I<undef> to just check for existence.
 
 The B<access> levels are B<r> for read, B<w> for write and B<x> for execute.
 You may also combine them if you wish in any order.
@@ -1332,7 +1569,7 @@ exist it returns I<undef> instead, as if the B<tag> didn't exist.
 
 B<access> defines the minimum access required.  If that minimum access isn't met
 it returns I<undef> instead, as if the B<tag> didn't exist.  B<access> may be
-I<undef> to just check for existance.
+I<undef> to just check for existence.
 
 The B<access> levels are B<r> for read and B<w> for write.  You may also combine
 them if you wish in any order.  Ex: B<rw> or B<wr>.
@@ -1378,8 +1615,8 @@ I<split_pattern> specified during he call to F<new()>.  Otherwise it can be
 either a string or a RegEx.  See Perl's I<split> function for more details.
 After the value has been split, it will perform any requested validation and
 most functions will return B<undef> if even one element in the list fails it's
-edits.  It was added as its own arguement, instad of just relying on the
-override option hash, since this option is probably the one that gets overidden
+edits.  It was added as its own argument, instead of just relying on the
+override option hash, since this option is probably the one that gets overridden
 most often.
 
 They also support the same I<inherit> and I<required> options described for the
@@ -1759,7 +1996,7 @@ made by these B<4> methods.
 Adds the requested I<$tag> and it's I<$value> to the current section in the
 I<Advanced::Config> object.
 
-If the I<$tag> already exists, it will be overriden with it's new I<$value>.
+If the I<$tag> already exists, it will be overridden with its new I<$value>.
 
 It returns B<1> on success or B<0> if your request was rejected!
 It will also print a warning if it was rejected.
@@ -1789,7 +2026,7 @@ sub set_value
 =item $bool = $cfg->rename_tag ( $old_tag, $new_tag );
 
 Renames the tag found in the current section to it's new name.  If the
-I<$new_tag> already exists it is overwritting by I<$old_tag>.  If I<$old_tag>
+I<$new_tag> already exists it is overwriting by I<$old_tag>.  If I<$old_tag>
 doesn't exist the rename fails.
 
 Returns B<1> on success, B<0> on failure.
@@ -1933,7 +2170,7 @@ sub delete_tag
 =head2 Breaking your Advanced::Config object into Sections.
 
 Defining sections allow you to break up your configuration files into multiple
-independent parts.  Or in advanced configuations using sections to override
+independent parts.  Or in advanced configurations using sections to override
 default values defined in the main/unlabled section.
 
 =over
@@ -2039,7 +2276,7 @@ your B<Advanced::Config> object.
 It returns a list of all tags whose name contains the passed pattern.
 
 If the pattern is B<undef> or the empty string, it will return all tags in
-the curent section.  Otherwise it does a case insensitive comparison of the
+the current section.  Otherwise it does a case insensitive comparison of the
 pattern against each tag to see if it should be returned or not.
 
 If I<override_inherit> is provided it overrides the current I<inherit> option's
@@ -2145,7 +2382,7 @@ sub _find_variables
 It returns a list of all tags whose values contains the passed pattern.
 
 If the pattern is B<undef> or the empty string, it will return all tags in
-the curent section.  Otherwise it does a case insensitive comparison of the
+the current section.  Otherwise it does a case insensitive comparison of the
 pattern against each tag's value to see if it should be returned or not.
 
 If I<override_inherit> is provided it overrides the current I<inherit> option's
@@ -2274,7 +2511,7 @@ sub filename
 
 This method returns references to copies of the current options used to
 manipulate the config file.  It returns copies of these hashes so feel free to
-modify them without fear of affecting the behaviour of this module.
+modify them without fear of affecting the behavior of this module.
 
 =cut
 
@@ -2333,7 +2570,7 @@ sub export_tag_value_to_ENV
 =item $sensitive = $cfg->chk_if_sensitive ( $tag[, $override_inherit] );
 
 This function looks up the requested tag in the current section of the config
-file and returns if this module thinks the existing value is senitive (B<1>)
+file and returns if this module thinks the existing value is sensitive (B<1>)
 or not (B<0>).
 
 If the tag doesn't exist, it will always return that it isn't sensitive. (B<0>)
@@ -2341,7 +2578,7 @@ If the tag doesn't exist, it will always return that it isn't sensitive. (B<0>)
 An existing tag references sensitive data if one of the following is true.
    1) Advanced::Config::Options::should_we_hide_sensitive_data() says it is
       or it says the section the tag was found in was sensitive.
-   2) The config file marked the tag in it's comment to HIDE it.
+   2) The config file marked the tag in its comment to HIDE it.
    3) The config file marked it as being encrypted.
    4) It referenced a variable that was marked as sensitive.
 
@@ -2454,7 +2691,7 @@ sub chk_if_still_uses_variables
 
 =item $string = $cfg->toString ( [$addEncryptFlags[, \%override_read_opts] );
 
-This function converts the current object into a string that is the equivalant
+This function converts the current object into a string that is the equivalent
 of the config file loaded into memory without any comments.
 
 If I<$addEncryptFlags> is set to a non-zero value, it will add the needed
@@ -2511,7 +2748,7 @@ sub toString
 =item $hashRef = $cfg->toHash ( [$dropIfSensitive] );
 
 This function converts the current object into a hash reference that is the
-equivalant of the config file loaded into memory.  Modifying the returned
+equivalent of the config file loaded into memory.  Modifying the returned
 hash reference will not modify this object's content.
 
 If a section has no members, it will not appear in the hash.
@@ -2569,7 +2806,7 @@ of your config files more secure.
 
 =item $status = $cfg->encrypt_config_file ( [$file[, $encryptFile[, \%rOpts]]] );
 
-This function encrypts all tag values inside the specified confg file that are
+This function encrypts all tag values inside the specified config file that are
 marked as ready for encryption and generates a new config file with everything
 encrypted.  If a tag/value pair isn't marked as ready for encryption it is left
 alone.  By default this label is B<ENCRYPT>.
@@ -2669,7 +2906,7 @@ sub encrypt_config_file
 
 =item $status = $cfg->decrypt_config_file ( [$file[, $decryptFile[, \%rOpts]]] );
 
-This function decrypts all tag values inside the specified confg file that are
+This function decrypts all tag values inside the specified config file that are
 marked as ready for decryption and generates a new config file with everything
 decrypted.  If a tag/value pair isn't marked as ready for decryption it is left
 alone.  By default this label is B<DECRYPT>.
@@ -2765,13 +3002,13 @@ sub decrypt_config_file
 
 =item $out_str = $cfg->encrypt_string ( $string, $alias[, \%rOpts] );
 
-This method takes the passed I<$string> and treats it's value as the contents of
+This method takes the passed I<$string> and treats its value as the contents of
 a config file, comments and all.  Modifying the I<$string> afterwards will not 
 affect things.
 
 Since there is no filename to work with, it requires the I<$alias> to assist
 with the encryption.  And since it's required its passed as a separate argument
-instead of being burried in the optional I<%rOpts> hash.
+instead of being buried in the optional I<%rOpts> hash.
 
 It takes the I<$string> and encrypts all tag/value pairs per the rules defined
 by C<encrypt_config_file>.  Once the contents of I$<string> has been encrypted,
@@ -2825,13 +3062,13 @@ sub encrypt_string
 
 =item $out_str = $cfg->decrypt_string ( $string, $alias[, \%rOpts] );
 
-This method takes the passed I<$string> and treats it's value as the contents of
+This method takes the passed I<$string> and treats its value as the contents of
 an encrypted config file, comments and all.  Modifying the I<$string> afterwards
 will not affect things.
 
 Since there is no filename to work with, it requires the I<$alias> to assist
 with the decryption.  And since it's required its passed as a separate argument
-instead of being burried in the optional I<%rOpts> hash.
+instead of being buried in the optional I<%rOpts> hash.
 
 It takes the I<$string> and decrypts all tag/value pairs per the rules defined
 by C<decrypt_config_file>.  Once the contents of I$<string> has been decrypted,
@@ -2895,7 +3132,7 @@ except as an explanation on how variables work.
 
 =item ($value, $status) = $cfg->lookup_one_variable ( $variable_name );
 
-This method takes the given I<$variable_name> and returns it's value.
+This method takes the given I<$variable_name> and returns its value.
 
 It returns I<undef> if the given variable doesn't exist.  And the optional 2nd
 return value tells us about the B<status> of the 1st return value.
@@ -2912,7 +3149,7 @@ But it's passed as B<name> without any anchors when this method is called.
 
 The precedence for looking up a variable's value to return is as follows:
 
-  0. Is it the special "shft3" variable or one of it's variants?
+  0. Is it the special "shft3" variable or one of its variants?
   1. Look for a tag of that same name previously defined in the current section.
   2. If not defined there, look for the tag in the "main" section.
   3. Special Case, see note below about periods in the variable name.
@@ -2928,7 +3165,7 @@ file has been loaded into memory, it uses the final value for that tag.
 
 The special B<${>shft3B<}> variable is a way to insert comment chars into a
 tag's value in the config file when you can't surround it with quotes.  This
-variable is always case insensive and if you repeat the B<3> in the name, you
+variable is always case insensitive and if you repeat the B<3> in the name, you
 repeat the comment chars in the substitution.
 
    * a = ${shft3}    - Returns "#" for a.
@@ -3088,14 +3325,14 @@ sub lookup_one_variable
 
 =item ($value, $sens, $encrypt) = $cfg->rule_3_section_lookup ( $variable_name );
 
-When a variable has a period (B<.>) in it's name, it could mean that this
+When a variable has a period (B<.>) in its name, it could mean that this
 variable is referencing a tag from another section of the config file.  So this
 helper method to F<lookup_one_variable> exists to perform this complex check.
 
 For example, a variable called B<${>xxx.extraB<}> would look in Section "xxx"
 for tag "extra".
 
-Here's another example with multiple B<.>'s in it's name this time.  It would
+Here's another example with multiple B<.>'s in its name this time.  It would
 look up variable B<${>one.two.threeB<}> in Section "one.two" for tag "three".
 And if it didn't find it, it would next try Section "one" for tag "two.three".
 
@@ -3226,7 +3463,7 @@ sub print_special_vars
       print STDERR "   \${shft33}  = ##\n";
       print STDERR "   \${shft333} = ###\n";
    } else {
-      # Works since Rule # 0 and can't be overriden.
+      # Works since Rule # 0 and can't be overridden.
       foreach ( "shft3", "shft33", "shft333" ) {
          my $v = $self->lookup_one_variable ($_);
          print STDERR "   ${la}$_${ra} ${asgn} ${v}\n";
@@ -3234,7 +3471,7 @@ sub print_special_vars
    }
    print STDERR "   ...\n\n";
 
-   print STDERR "${cmt} Any of the variables below can be overriden by putting them\n";
+   print STDERR "${cmt} Any of the variables below can be overridden by putting them\n";
    print STDERR "${cmt} into %ENV or predefining them inside your config files!\n\n";
 
    print STDERR "${cmt} The Special Predefined Variables ... (OS/Environment dependant)\n";
@@ -3284,7 +3521,7 @@ installed in Perl's default location.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007 - 2025 Curtis Leach.  All rights reserved.
+Copyright (c) 2007 - 2026 Curtis Leach.  All rights reserved.
 
 This program is free software.  You can redistribute it and/or modify it under
 the same terms as Perl itself.

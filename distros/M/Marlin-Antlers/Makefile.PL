@@ -25,7 +25,8 @@ my $meta = {
                                            "Class::Method::Modifiers" => 0,
                                            "Exporter::Tiny" => 0,
                                            "Import::Into" => 0,
-                                           "Marlin" => 0.012001,
+                                           "Marlin" => "0.016000",
+                                           "namespace::autoclean" => 0,
                                            "perl" => "5.020000",
                                            "Role::Tiny" => 0,
                                            "Types::Common" => 0,
@@ -42,8 +43,8 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "Marlin::Antlers"       => { file => "lib/Marlin/Antlers.pm", version => "0.001000" },
-                          "Marlin::Role::Antlers" => { file => "lib/Marlin/Role/Antlers.pm", version => "0.001000" },
+                          "Marlin::Antlers"       => { file => "lib/Marlin/Antlers.pm", version => "0.002000" },
+                          "Marlin::Role::Antlers" => { file => "lib/Marlin/Role/Antlers.pm", version => "0.002000" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -57,7 +58,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Marlin-Antlers/project",
                         },
-  "version"          => "0.001000",
+  "version"          => "0.002000",
   "x_static_install" => 1,
 };
 

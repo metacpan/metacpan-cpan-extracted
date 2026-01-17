@@ -179,6 +179,78 @@ sub assert_err_contract {
     );
 }
 
+# Usage error: invalid variable name for --arg
+{
+    my $res = run_cmd(
+        cmd => [$BIN, '--arg', '1bad', 'value', '.'],
+    );
+    assert_err_contract(
+        res    => $res,
+        rc     => 5,
+        prefix => '[USAGE]',
+        name   => 'usage error: invalid --arg variable name',
+    );
+    like(
+        $res->{err},
+        qr/\[USAGE\]Invalid variable name '1bad' for --arg\b/,
+        'usage error: --arg invalid variable name message',
+    );
+}
+
+# Usage error: missing value for --arg
+{
+    my $res = run_cmd(
+        cmd => [$BIN, '--arg', 'name'],
+    );
+    assert_err_contract(
+        res    => $res,
+        rc     => 5,
+        prefix => '[USAGE]',
+        name   => 'usage error: missing --arg value',
+    );
+    like(
+        $res->{err},
+        qr/\[USAGE\]--arg requires a value\b/,
+        'usage error: --arg missing value message',
+    );
+}
+
+# Usage error: invalid variable name for --argjson
+{
+    my $res = run_cmd(
+        cmd => [$BIN, '--argjson', '1bad', '1', '.'],
+    );
+    assert_err_contract(
+        res    => $res,
+        rc     => 5,
+        prefix => '[USAGE]',
+        name   => 'usage error: invalid --argjson variable name',
+    );
+    like(
+        $res->{err},
+        qr/\[USAGE\]Invalid variable name '1bad' for --argjson\b/,
+        'usage error: --argjson invalid variable name message',
+    );
+}
+
+# Usage error: missing value for --argjson
+{
+    my $res = run_cmd(
+        cmd => [$BIN, '--argjson', 'name'],
+    );
+    assert_err_contract(
+        res    => $res,
+        rc     => 5,
+        prefix => '[USAGE]',
+        name   => 'usage error: missing --argjson value',
+    );
+    like(
+        $res->{err},
+        qr/\[USAGE\]--argjson requires a value\b/,
+        'usage error: --argjson missing value message',
+    );
+}
+
 # Usage error: unknown option
 {
     my $res = run_cmd(cmd => [$BIN, '--bogus-option']);
@@ -259,11 +331,9 @@ sub assert_err_contract {
 }
 
 # --argjson allows scalar JSON
-# NOTE(TODO): stdin is provided to avoid premature INPUT error
 {
     my $res = run_cmd(
-        cmd   => [$BIN, '--argjson', 'x', '1', '$x'],
-        stdin => "null\n",
+        cmd => [$BIN, '--argjson', 'x', '1', '-n', '$x'],
     );
     is($res->{rc}, 0, '--argjson scalar => exit 0');
     like($res->{out}, qr/^1\b/m, '--argjson scalar => output 1');

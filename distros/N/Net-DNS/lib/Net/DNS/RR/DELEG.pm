@@ -2,7 +2,7 @@ package Net::DNS::RR::DELEG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DELEG.pm 2039 2025-08-26 09:01:09Z willem $)[2];
+our $VERSION = (qw$Id: DELEG.pm 2043 2026-01-14 13:35:59Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -18,13 +18,16 @@ use integer;
 use Net::DNS::RR::A;
 use Net::DNS::RR::AAAA;
 use Net::DNS::DomainName;
+use Net::DNS::Text;
 
-my %keyname = (
-	1 => 'server-ip4',
-	2 => 'server-ip6',
+my %keybycode = (
+	0 => 'mandatory',
+	1 => 'server-ipv4',
+	2 => 'server-ipv6',
 	3 => 'server-name',
-	4 => 'include-name',
+	4 => 'include-delegi',
 	);
+my %keybyname = reverse %keybycode;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
@@ -69,13 +72,13 @@ sub _format_rdata {			## format rdata portion of RR string.
 	while (@parameters) {
 		my $key = shift @parameters;
 		my $val = shift @parameters;
-		if ( my $name = $keyname{$key} ) {
+		if ( my $name = $keybycode{$key} ) {
 			my @val = grep {length} $self->$name;
 			my @rhs = grep {length} join ',', @val;
 			push @rdata, join '=', $name, @rhs;
 		} else {
-			my @hex = unpack 'H*', $val;
-			$self->_annotation(qq[unexpected key$key="@hex"]);
+			my $txt = Net::DNS::Text->decode( \$val, 0, length $val );
+			push @rdata, join '=', "key$key", $txt->string;
 		}
 	}
 
@@ -87,16 +90,17 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	my ( $self, @argument ) = @_;
 
 	while ( local $_ = shift @argument ) {
-		my @value;
-		m/^[^=]+=?(.*)$/;
-		for ( my $rhs = /=$/ ? shift @argument : $1 ) {
-			s/^"(.*)"$/$1/;				# strip enclosing quotes
+		m/^([^=]+)(=?)(.*)$/;
+		my $key = $1;
+		my $val = length($3) ? $3 : $2 ? shift @argument : '';
+		if (/^key\d+/) {
+			$self->$key($val);
+		} else {
+			local $_ = $val;
+			s/^"([^"]*)"$/$1/s;			# strip enclosing quotes
 			s/\\,/\\044/g;				# disguise escaped comma
-			push @value, length() ? split /,/ : ();
+			$self->$key( split /,/ );
 		}
-
-		m/^([^=]+)/;					# extract identifier
-		$self->$1(@value);
 	}
 	return;
 }
@@ -106,50 +110,72 @@ sub _post_parse {			## parser post processing
 	my $self = shift;
 
 	my ($paramref) = grep {defined} $self->{parameters}, [];
-	my %paramhash  = @$paramref;
-	if ( defined $paramhash{3} ) {
-		die( $self->type . qq[: invalid $keyname{3}] )
-				unless unpack 'xa*', $paramhash{3};
+	my %parameter  = @$paramref;
+
+	if ( defined $parameter{0} ) {
+		my %unique;
+		foreach ( grep { !$unique{$_}++ } unpack 'n*', $parameter{0} ) {
+			die( $self->type . qq[: unexpected "key0" in mandatory list] ) if $unique{0};
+			die( $self->type . qq[: duplicate "key$_" in mandatory list] ) if --$unique{$_};
+			die( $self->type . qq[: mandatory "key$_" not present] ) unless defined $parameter{$_};
+		}
 	}
 
-	if ( defined $paramhash{4} ) {
-		die( $self->type . qq[: invalid $keyname{4}] )
-				unless unpack 'xa*', delete $paramhash{4};
-		die( $self->type . qq[: parameter conflicts with $keyname{4}] )
-				if scalar keys %paramhash;
+	foreach ( 3, 4 ) {
+		next unless defined $parameter{$_};
+		next if length( $parameter{$_} ) > 1;
+		die( $self->type . qq[: invalid $keybycode{$_}] );
+	}
+
+	if ( defined $parameter{4} ) {
+		die( $self->type . qq[: parameter conflicts with $keybycode{4}] )
+				if scalar( keys %parameter ) > 1;
 	}
 	return;
 }
 
 
-sub server_ip4 {			## server-ip4=192.0.2.53
+sub mandatory {				## mandatory=key1,server-name,...
+	my ( $self, @value ) = @_;				# uncoverable pod
+	my @list = map { $keybyname{lc $_} || $_ } @value;
+	my @keys = map { /(\d+)$/ ? $1 : die( $self->type . qq[: unexpected "$_"] ) } @list;
+	return $self->_parameter( 0, _integer16( sort { $a <=> $b } @keys ) ) if @keys;
+	my $packed = $self->_parameter(0);
+	return _list( defined($packed) ? map {"key$_"} unpack 'n*', $packed : return );
+}
+
+sub server_ipv4 {			## server-ipv4=192.0.2.53
 	my ( $self, @value ) = @_;
 	return $self->_parameter( 1, _address4(@value) ) if @value;
 	my $packed = $self->_parameter(1) || return;
 	my @iplist = unpack 'a4' x ( length($packed) / 4 ), $packed;
-	return map { Net::DNS::RR::A::address( {address => $_} ) } @iplist;
+	return _list( map { Net::DNS::RR::A::address( {address => $_} ) } @iplist );
 }
 
-sub server_ip6 {			## server-ip6=2001:DB8::53
+sub server_ipv6 {			## server-ipv6=2001:DB8::53
 	my ( $self, @value ) = @_;
 	return $self->_parameter( 2, _address6(@value) ) if @value;
 	my $packed = $self->_parameter(2) || return;
 	my @iplist = unpack 'a16' x ( length($packed) / 16 ), $packed;
-	return map { Net::DNS::RR::AAAA::address_short( {address => $_} ) } @iplist;
+	return _list( map { Net::DNS::RR::AAAA::address_short( {address => $_} ) } @iplist );
 }
 
 sub server_name {			## server-name=nameserver.example
 	my ( $self, @value ) = @_;
 	return $self->_parameter( 3, _domain(@value) ) if @value;
 	my $packed = $self->_parameter(3) || return;
-	return Net::DNS::DomainName->decode( \$packed )->fqdn;
+	my $index  = 0;
+	( $value[++$#value], $index ) = Net::DNS::DomainName->decode( \$packed, $index ) while $index < length $packed;
+	return _list( map { $_->fqdn } @value );
 }
 
-sub include_name {			## include-name=devolved.example
+sub include_delegi {			## include-delegi=devolved.example
 	my ( $self, @value ) = @_;
 	return $self->_parameter( 4, _domain(@value) ) if @value;
 	my $packed = $self->_parameter(4) || return;
-	return Net::DNS::DomainName->decode( \$packed )->fqdn;
+	my $index  = 0;
+	( $value[++$#value], $index ) = Net::DNS::DomainName->decode( \$packed, $index ) while $index < length $packed;
+	return _list( map { $_->fqdn } @value );
 }
 
 
@@ -170,8 +196,11 @@ sub AUTOLOAD {				## Dynamic constructor/accessor methods
 
 	my $super = "SUPER::$method";
 	return $self->$super(@argument) unless $method =~ /^key[0]*(\d+)$/i;
-	die( $self->type . qq[: unsupported $method(...)] ) if @argument;
-	return $self->_parameter($1);
+	my $key = $1;
+	return $self->_parameter($key) unless @argument;
+	my $first = shift @argument;
+	my $value = defined $first ? Net::DNS::Text->new($first)->raw : $first;
+	return $self->_parameter( $key, $value, @argument );
 }
 
 
@@ -183,10 +212,9 @@ sub _parameter {
 
 	if ( scalar @argument ) {
 		my $arg = shift @argument;			# key($value);
-		my $tag = $keyname{$key} || '';
 		delete $parameter{$key} unless defined $arg;
-		die( $self->type . qq[: duplicate parameter $tag] ) if defined $parameter{$key};
-		die( $self->type . qq[: unexpected $tag value] )    if scalar @argument;
+		die( $self->type . qq[: duplicate parameter key$key] ) if defined $parameter{$key};
+		die( $self->type . qq[: unexpected key$key value] )    if scalar @argument;
 		delete $self->{rdata};
 		$parameter{$key} = $arg if defined $arg;
 		$self->{parameters} = [map { ( $_, $parameter{$_} ) } sort { $a <=> $b } keys %parameter];
@@ -201,6 +229,11 @@ sub _concatenate {			## concatenate octet string(s)
 	return scalar(@arg) > 1 ? join( '', @arg ) : @arg;
 }
 
+sub _list {				## context-dependent list or single value
+	my @arg = @_;
+	return wantarray ? @arg : shift @arg;
+}
+
 sub _address4 {
 	my @arg = @_;
 	return _concatenate( map { Net::DNS::RR::A::address( {}, $_ ) } @arg );
@@ -213,7 +246,12 @@ sub _address6 {
 
 sub _domain {
 	my @arg = @_;
-	return map { Net::DNS::DomainName->new($_)->encode() } @arg;
+	return _concatenate( map { Net::DNS::DomainName->new($_)->encode() } @arg );
+}
+
+sub _integer16 {
+	my @arg = @_;
+	return _concatenate( map { pack( 'n', $_ ) } @arg );
 }
 
 
@@ -247,14 +285,14 @@ __END__
 =head1 SYNOPSIS
 
 	use Net::DNS;
-	$rr = Net::DNS::RR->new('zone DELEG server-ip4=192.0.2.1 ...');
-	$rr = Net::DNS::RR->new('zone DELEG server-ip6=2001:db8::53 ...');
+	$rr = Net::DNS::RR->new('zone DELEG server-ipv4=192.0.2.1 ...');
+	$rr = Net::DNS::RR->new('zone DELEG server-ipv6=2001:db8::53 ...');
 	$rr = Net::DNS::RR->new('zone DELEG server-name=nameserver.example ...');
-	$rr = Net::DNS::RR->new('zone DELEG include-name=devolved.example');
+	$rr = Net::DNS::RR->new('zone DELEG include-delegi=devolved.example');
 
 =head1 DESCRIPTION
 
-The DNS DELEG resource record set, wherever it appears, advertises the
+The DNS DELEG resource record set, wherever it appears, designates the
 authoritative nameservers and transport parameters to be used to resolve
 queries for data at the owner name or any subordinate thereof.
 
@@ -271,18 +309,18 @@ structures is discouraged and could result in program termination or
 other unpredictable behaviour.
 
 
-=head2 server_ip4
+=head2 server_ipv4
 
-	eg.example. DELEG server-ip4=192.0.2.1,...
-	@ip = $rr->server_ip4;
+	eg.example. DELEG server-ipv4=192.0.2.1,...
+	@ip = $rr->server_ipv4;
 
 Sets or gets a list of IP addresses.
 
 
-=head2 server_ip6
+=head2 server_ipv6
 
-	eg.example. DELEG server-ip6=2001:db8::53,...
-	@ip = $rr->server_ip6;
+	eg.example. DELEG server-ipv6=2001:db8::53,...
+	@ip = $rr->server_ipv6;
 
 Sets or gets a list of IP addresses.
 
@@ -297,10 +335,10 @@ Specifies the domain name of the nameserver.
 Returns the nameserver domain name or the undefined value if not specified.
 
 
-=head2 include_name
+=head2 include_delegi
 
-	eg.example. DELEG include-name=devolved.example.
-	$destination = $rr->include_name;
+	eg.example. DELEG include-delegi=devolved.example.
+	$destination = $rr->include_delegi;
 
 Specifies the location of a devolved nameserver configuration.
 
@@ -338,6 +376,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-draft-ietf-deleg-02
+draft-ietf-deleg-06
 
 =cut

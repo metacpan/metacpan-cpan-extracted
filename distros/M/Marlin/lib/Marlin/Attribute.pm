@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Attribute;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015000';
+our $VERSION   = '0.016000';
 
 BEGIN { our @ISA = 'Sub::Accessor::Small' };
 
@@ -16,11 +16,30 @@ use constant HAS_CXSA => eval {
 };
 
 use B                     ();
+use List::Util 1.29       ();
 use Marlin                ();
 use Marlin::Util          qw( true false );
 use Scalar::Util          ();
 use Sub::Accessor::Small  ();
 use Types::Common         ();
+
+my @ACCESSOR_KINDS = qw/ reader writer accessor clearer predicate /;
+
+our $NONE = do {
+	my $x = 'NONE';
+	my $o = bless( \$x, 'Marlin::Attribute::NONE' );
+	{
+		package Marlin::Attribute::NONE;
+		__PACKAGE__->Type::Tiny::_install_overloads(
+			q("")    => sub { '(NONE)' },
+			q(0+)    => sub { Scalar::Util::refaddr(shift) },
+			q(bool)  => sub { 0 },
+		);
+	}
+	Internals::SvREADONLY( $x, 1 );
+	Internals::SvREADONLY( $o, 1 );
+	$o;
+};
 
 sub new {
 	my $class = shift;
@@ -32,6 +51,169 @@ sub new {
 	$me->canonicalize_opts;
 	Scalar::Util::weaken( $me->{marlin} );
 	return $me;
+}
+
+sub make_clone {
+	my $me = shift;
+	
+	defined &Clone::clone or require Clone;
+	my $clone = Clone::clone( $me );
+	
+	# Clone shouldn't clone anything lexical!
+	for my $kind ( @ACCESSOR_KINDS ) {
+		exists $clone->{$kind} or next;
+		delete $clone->{$kind} if ref $clone->{$kind};
+		delete $clone->{$kind} if $clone->{$kind} =~ /^my\s/;
+	}
+	if ( $clone->{handles} ) {
+		$clone->{handles} = {
+			map  { @$_ }
+			grep { not( ref $_->[0] or $_->[0] =~ /^my\s/ ) }
+			List::Util::pairs( $clone->expand_handles )
+		};
+	}
+	
+	delete $clone->{_implementation};
+	delete $clone->{inline_environment};
+	
+	return $clone;
+}
+
+sub make_clone_for_consuming_class {
+	my ( $me, $marlin ) = @_;
+	my $clone = $me->make_clone;
+	$clone->{package} = $marlin->this;
+	$clone->{marlin}  = $marlin;
+	Scalar::Util::weaken( $clone->{marlin} );
+	return $clone;
+}
+
+sub make_extended {
+	my ( $me, $opts ) = @_;
+	
+	delete $opts->{slot};
+	
+	my $clone = $me->make_clone;
+	$clone->{marlin}  = delete( $opts->{marlin} );
+	$clone->{package} = delete( $opts->{package} ) || $clone->{marlin}->this;
+	Scalar::Util::weaken( $clone->{marlin} );
+	
+	# Allow accessors to be ADDED but not changed.
+	for my $kind ( @ACCESSOR_KINDS ) {
+		next unless exists $opts->{$kind};
+		if ( not defined $opts->{$kind} ) {
+			delete $opts->{$kind};
+			next;
+		}
+		if ( defined $clone->{$kind} and $clone->{$kind} ne $opts->{$kind} ) {
+			Marlin::Util::_croak( "Attribute '%s' already has a %s: '%s'", $clone->{slot}, $kind, $clone->{$kind} );
+		}
+		$clone->{$kind} = delete $opts->{$kind};
+	}
+	
+	# Handles needs to be merged.
+	if ( ref $clone->{handles} and ref $opts->{handles} ) {
+		my @pairs = List::Util::pairs( $clone->expand_handles );
+		push @pairs, do {
+			local $clone->{handles} = delete $opts->{handles};
+			List::Util::pairs( $clone->expand_handles );
+		};
+		
+		# Keep deduped list
+		my %seen;
+		$clone->{handles} = {
+			map  { @$_ }
+			reverse
+			grep { not $seen{ $_->[0] }++  }
+			reverse @pairs
+		};
+	}
+	elsif ( ref $opts->{handles} ) {
+		$clone->{handles} = delete $opts->{handles};
+	}
+	
+	# Handles_via needs to be merged
+	if ( $opts->{handles_via} ) {
+		my $new = delete $opts->{handles_via};
+		if ( not $clone->{handles_via} ) {
+			$clone->{handles_via} = $new;
+		}
+		elsif ( ref $clone->{handles_via} ) {
+			push @{ $clone->{handles_via} }, $new
+				unless grep { $new eq $_ } @{ $clone->{handles_via} };
+		}
+		else {
+			$clone->{handles_via} = [ $clone->{handles_via}, $new ]
+				unless $new eq $clone->{handles_via};
+		}
+	}
+	
+	# These things can just always be straight-up changed.
+	for my $option ( qw/ init_arg default builder trigger weak_ref undef_tolerant lazy documentation constant / ) {
+		next unless exists $opts->{$option};
+		$clone->{$option} = delete $opts->{$option};
+	}
+	
+	# Can make an optional attribute required, but cannot make a required
+	# attribute optional unless there's a default or builder.
+	if ( $opts->{required} ) {
+		$clone->{required} = delete $opts->{required};
+	}
+	elsif ( $clone->{required} and exists $opts->{required} ) {
+		if ( exists $clone->{default} or defined $clone->{builder} ) {
+			$clone->{required} = false;
+		}
+		else {
+			Marlin::Util::_croak( "Attribute '%s' must have a default or builder if no longer required", $clone->{slot} );
+		}
+	}
+	else {
+		delete $opts->{required};
+	}
+	
+	if ( $opts->{isa} ) {
+		my $new_type = Types::Common::to_TypeTiny( delete $opts->{isa} );
+		if ( $clone->{isa} and not $clone->{isa} == Types::Common::Any ) {
+			if ( $new_type->is_a_type_of( $clone->{isa} ) ) {
+				$clone->{isa} = $new_type;
+			}
+			else {
+				$clone->{isa} = ( $clone->{isa} &+ $new_type );
+			}
+		}
+		else {
+			$clone->{isa} = $new_type;
+		}
+	}
+
+	if ( $opts->{coerce} ) {
+		$clone->{coerce} = delete $opts->{coerce};
+	}
+	elsif ( $clone->{coerce} and exists $opts->{coerce} ) {
+		Marlin::Util::_croak( "Attribute '%s' cannot have coercion disabled", $clone->{slot} );
+	}
+	else {
+		delete $opts->{coerce};
+	}
+	
+	if ( my @bad = sort keys %$opts ) {
+		Marlin::Util::_croak( "Attribute '%s' cannot change: %s", $clone->{slot}, join( q[, ], @bad ) );
+	}
+	
+	for my $k ( keys %$clone ) {
+		Scalar::Util::blessed( $clone->{$k} ) or next;
+		delete $clone->{$k} if $clone->{$k} == $NONE;
+	}
+	
+	do {
+		# The original has already canonicalized 'is'.
+		# If we do it again, we might end up adding
+		# accessors that we don't want.
+		local $clone->{is} = 'bare';
+		$clone->canonicalize_opts;
+	};
+	$clone->{extended_from} = $me;
+	return $clone;
 }
 
 sub _auto_apply_roles {
@@ -63,12 +245,12 @@ sub _auto_apply_roles {
 
 sub _croaker {
 	my $me = shift;
-	$me->{_marlin} ? $me->{_marlin}->_croaker( @_ ) : Marlin->_croaker( @_ );
+	$me->{marlin} ? $me->{marlin}->_croaker( @_ ) : Marlin->_croaker( @_ );
 }
 
 sub accessor_kind  {
 	my $me = shift;
-	$me->{_marlin} ? ref( $me->{_marlin} ) : 'Marlin';
+	$me->{marlin} ? ref( $me->{marlin} ) : 'Marlin';
 }
 
 sub canonicalize_opts {
@@ -140,7 +322,7 @@ sub canonicalize_storage {
 			unless exists $me->{constant};
 	}
 	elsif ( $me->{storage} eq 'HASH' or $me->{storage} eq 'PRIVATE' ) {
-		# These are fine
+		# This is fine
 	}
 	else {
 		Marlin::Util::_croak("Unknown storage: " . $me->{storage});
@@ -177,7 +359,7 @@ sub inline_access_w {
 	return $me->SUPER::inline_access_w( $selfvar, $val );
 }
 
-for my $type ( qw/accessor reader writer predicate clearer/ ) {
+for my $type ( @ACCESSOR_KINDS ) {
 	my $m = "has_simple_$type";
 	my $orig = Sub::Accessor::Small->can($m);
 	my $new = sub {
@@ -203,7 +385,7 @@ sub install_accessors {
 	}
 	else {
 		my %args_for_cxsa;
-		for my $type (qw( accessor reader writer predicate clearer )) {
+		for my $type ( @ACCESSOR_KINDS ) {
 			next unless defined $me->{$type};
 			if ( $type eq 'reader' and !$me->${\"has_simple_$type"} and $me->xs_reader ) {
 				$me->{_implementation}{$me->{$type}} = 'CXSR';
@@ -256,6 +438,33 @@ sub install_accessors {
 			}
 		}
 	}
+}
+
+sub provides_accessors {
+	my $me = shift;
+	
+	my @list;
+	
+	if ( exists $me->{constant} ) {
+		for my $kind ( 'reader' ) {
+			push @list, [ $me->{$kind}, $kind, $me ] if $me->{$kind};
+		}
+	}
+	else {
+		for my $kind ( @ACCESSOR_KINDS ) {
+			push @list, [ $me->{$kind}, $kind, $me ] if $me->{$kind};
+		}
+	}
+	
+	if ( defined $me->{handles} ) {
+		my @pairs = $me->expand_handles;
+		while ( @pairs ) {
+			my ( $name ) = splice( @pairs, 0, 2 );
+			push @list, [ $name, 'delegated method', $me ];
+		}
+	}
+	
+	return @list;
 }
 
 sub xs_reader {
@@ -364,7 +573,7 @@ sub install_coderef {
 	
 	if ( $target =~ /^my\s+(.+)$/ ) {
 		my $lexname = $1;
-		$me->{_marlin}->lexport( $lexname, $coderef );
+		return $me->{marlin}->lexport( $lexname, $coderef );
 	}
 	
 	return $me->SUPER::install_coderef( @_ );

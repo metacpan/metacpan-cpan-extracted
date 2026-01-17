@@ -18,6 +18,9 @@ package ParamsApp {
 	{
 		my $router = $self->router;
 
+		$router->add('/path1/:abc/:def' => {to => 'dump_path'});
+		$router->add('/path2/:abc/:def' => {to => 'dump_path'})->add('/test');
+
 		$router->add(
 			'/get' => {
 				to => sub ($self, $ctx) {
@@ -59,11 +62,33 @@ package ParamsApp {
 				}
 			}
 		);
+	}
 
+	sub dump_path ($self, $ctx, @)
+	{
+		my $path = $ctx->req->path_params;
+		my @response;
+		foreach my $key (sort keys $path->%*) {
+			push @response, "${key}: " . $ctx->req->path_param($key);
+		}
+
+		return join "\n", @response;
 	}
 };
 
 my $app = ParamsApp->new;
+
+subtest 'should handle path parameters' => sub {
+	http $app, GET '/path1/one/two';
+	http_status_is 200;
+	like http->text, qr/^abc: one$/m, 'first param ok';
+	like http->text, qr/^def: two$/m, 'second param ok';
+
+	http $app, GET '/path2/three/four';
+	http_status_is 200;
+	like http->text, qr/^abc: three$/m, 'bridge first param ok';
+	like http->text, qr/^def: four$/m, 'bridge second param ok';
+};
 
 subtest 'should handle single query parameter' => sub {
 	http $app, GET '/get?foo=bar';

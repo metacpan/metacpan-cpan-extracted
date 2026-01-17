@@ -26,15 +26,18 @@
       },
       "runtime" : {
          "requires" : {
+            "Devel::StrictMode" : "0",
             "Future::AsyncAwait" : "0",
-            "Gears" : "0",
+            "Gears" : "0.100",
             "HTTP::Message" : "0",
             "IO::Async" : "0",
             "JSON::MaybeXS" : "0",
             "Log::Handler" : "0",
             "Mooish::Base" : "1.001",
-            "PAGI" : "0.001012",
+            "PAGI" : "0.001014",
+            "Path::Tiny" : "0",
             "Template::Toolkit" : "0",
+            "URI" : "0",
             "perl" : "5.040"
          }
       },
@@ -47,15 +50,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/bbrtj/Thunderhorse/issues"
+         "web" : "https://github.com/Thunderhorse-Framework/Thunderhorse/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/bbrtj/Thunderhorse.git",
-         "web" : "https://github.com/bbrtj/Thunderhorse"
+         "url" : "git://github.com/Thunderhorse-Framework/Thunderhorse.git",
+         "web" : "https://github.com/Thunderhorse-Framework/Thunderhorse"
       }
    },
-   "version" : "0.001",
+   "version" : "0.100",
    "x_generated_by_perl" : "v5.42.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

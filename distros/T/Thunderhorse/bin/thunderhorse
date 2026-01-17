@@ -1,0 +1,198 @@
+#!/usr/bin/env perl
+
+use v5.40;
+use Gears::Generator;
+
+use Getopt::Long;
+use Pod::Usage;
+use Path::Tiny qw(path);
+use List::Util qw(first);
+use File::Spec;
+use Data::Dumper;
+
+use constant EX_DIR => path(__FILE__)->parent->parent->child('ex');
+
+# try loading app from '.' and 'lib' directories. Dot is required for "do
+# 'app.pl'" to work.
+use lib '.', 'lib';
+
+# autoflush stdout
+$|++;
+
+# prettier Data::Dumper output
+$Data::Dumper::Sortkeys = true;
+$Data::Dumper::Indent = 1;
+
+my $generate;
+my $config = false;
+my $locations = false;
+my $tabs = false;
+my $help = false;
+my $error = false;
+
+GetOptions(
+	'g|generate=s' => \$generate,
+	'c|show-config' => \$config,
+	'l|show-locations' => \$locations,
+	't|tabs' => \$tabs,
+	'h|help' => \$help,
+) or $error = true;
+
+my $target = shift
+	or $help
+	or do { warn "no target specified\n"; $error = true };
+
+# handle actions
+if ($help || $error) {
+	pod2usage($error ? 1 : 0);
+}
+
+elsif (defined $generate) {
+	print "Generating project from template $generate... ";
+
+	my $generator = Gears::Generator->new(base_dir => EX_DIR);
+	my $namespace = get_template_namespace($generator, $generate);
+
+	if (defined $namespace) {
+		my $file = File::Spec->join(split /::/, $namespace);
+		my $target_file = File::Spec->join(split /::/, $target);
+
+		push $generator->name_filters->@*, sub ($name) {
+			return $name =~ s{\b\Q$file\E}{$target_file}r;
+		};
+
+		push $generator->content_filters->@*, sub ($content) {
+			return $content =~ s{\b\Q$namespace\E}{$target}rg;
+		};
+	}
+
+	if (!$tabs) {
+		push $generator->content_filters->@*, sub ($content) {
+			return $content =~ s{\t}{    }rg;
+		};
+	}
+
+	$generator->generate($generate, '.');
+	say 'done.';
+}
+
+elsif ($config) {
+	my $app = load_app($target);
+	print Data::Dumper->Dump([$app->config->config], ['*config']);
+}
+
+elsif ($locations) {
+	my $app = load_app($target);
+	print Data::Dumper->Dump([get_readable_locations($app)], ['*locations']);
+}
+
+else {
+	warn "No action specified\n";
+	pod2usage(1);
+}
+
+sub load_app ($target)
+{
+	local $ENV{THUNDERHORSE_SCRIPT} = true;
+	local $0 = $target;
+	return do $target;
+}
+
+sub get_template_namespace ($generator, $template)
+{
+	my $files = $generator->get_template($template);
+	my $app_file = first { $_ =~ /app\.pl$/ } $files->@*;
+
+	return undef unless defined $app_file;
+	my $app_file_content = $app_file->slurp;
+
+	return $1
+		if $app_file_content =~ /^package ([\w:]+)/m;
+
+	return $1
+		if $app_file_content =~ /^\s*([\w:]+)->new/m;
+
+	return undef;
+}
+
+sub _recurse_locations ($level)
+{
+	my @out;
+	foreach my $loc (sort { $a->order <=> $b->order } $level->@*) {
+		my $this_location = {
+			pattern => $loc->pattern,
+			name => $loc->name,
+			controller => ref $loc->controller,
+			handler => $loc->to,
+			action => $loc->action,
+		};
+
+		if ($loc->is_bridge) {
+			push @out, [$this_location, _recurse_locations($loc->locations)];
+		}
+		else {
+			push @out, $this_location;
+		}
+	}
+
+	return @out;
+}
+
+sub get_readable_locations ($app)
+{
+	return [_recurse_locations $app->router->locations];
+}
+
+__END__
+
+=head1 NAME
+
+thunderhorse - manage Thunderhorse projects
+
+=head1 SYNOPSIS
+
+	thunderhorse [OPTIONS] TARGET
+
+=head1 OPTIONS
+
+=over
+
+=item -g EXAMPLE, --generate=EXAMPLE
+
+Copies one of the Thunderhorse examples into C<TARGET>.
+
+	thunderhorse -g full-app My::App
+
+=item -t, --tabs
+
+When paired with C<--generate>, causes the generated application to use tabs
+for indenting instead of spaces.
+
+=item -c, --show-conig
+
+Dumps app configuration. By default, shows production configuration. Modify
+C<PAGI_ENV> environmental variable to change that.
+
+	thunderhorse -c app.pl
+
+=item -l, --show-locations
+
+Dumps all installed router locations.
+
+	thunderhorse -l app.pl
+
+=item -h, --help
+
+Shows this help message.
+
+=back
+
+=head1 DESCRIPTION
+
+This program manages Thunderhorse projects. It must be used in a directory which
+contains (or will contain) a Thunderhorse application.
+
+The meaning of C<TARGET> depends on the used flags. When generating a new
+application, it is a Perl namespace of the application class. When inspecting a
+Thunderhorse application, it is the path to the PAGI starter script.
+

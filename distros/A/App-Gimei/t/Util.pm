@@ -42,3 +42,5 @@ sub run (@tests) {
 
     done_testing;
 }
+
+1;

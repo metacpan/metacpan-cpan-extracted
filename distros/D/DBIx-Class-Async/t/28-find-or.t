@@ -37,12 +37,9 @@ $schema->resultset('User')->create({
 
 my $rs = $async_schema->resultset('User');
 
-# TEST: find_or_new
-
 subtest 'find_or_new logic' => sub {
     my $user_a = $rs->find_or_new({ name => 'ExistingUser' })->get;
 
-    # FIX: Use the class name returned by the system or a more generic check
     isa_ok($user_a, 'DBIx::Class::Async::Row::User');
     is($user_a->email, 'existing@example.com', 'Found existing record data');
     ok($user_a->in_storage, 'Existing record is flagged as in_storage');
@@ -51,8 +48,6 @@ subtest 'find_or_new logic' => sub {
     is($user_b->name, 'BrandNew', 'Instantiated new object');
     ok(!$user_b->in_storage, 'New object is NOT in storage');
 };
-
-# TEST: Unique Constraint handling
 
 subtest 'Unique Constraint handling' => sub {
     $schema->resultset('User')->delete_all;

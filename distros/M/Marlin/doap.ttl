@@ -47,7 +47,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Marlin";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002003>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002004>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002005>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-004000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-005000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-008000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-009000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-010000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-012000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-012001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-013000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-013001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-014000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-015000>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002003>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002004>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002005>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-004000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-005000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-008000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-009000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-010000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-012000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-012001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-013000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-013001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-014000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-015000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-016000>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-marlin>;
@@ -602,6 +602,35 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.015000.tar.gz>;
 	doap:revision        "0.015000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Marlin/v_0-016000>
+	a                    doap:Version;
+	dc:identifier        "Marlin-0.016000"^^xsd:string;
+	dc:issued            "2026-01-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Use attr=>{extends=>true} or Moose-like +attr to extend an inherited attribute.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Marlin now checks for conflicts between methods and init_args used by different attributes, so you can't (for example) have two attributes that have the same-named reader method.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "An attribute that creates lexical accessors in a parent class won't automatically create matching ones in child classes.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor changes and reformatting of extended examples to make things cleaner.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "In Perl versions too old to support lexical subs, use namespace::clean to clean away any non-lexical ones we wanted to be lexical.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Marlin::Attribute sometimes thought its link back to the package it was defined in was called `marlin` and sometimes `_marlin`; fix it to always be the former.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.016000.tar.gz>;
+	doap:revision        "0.016000"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

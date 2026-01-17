@@ -11,6 +11,7 @@ README
 SIGNATURE
 dist.ini
 doap.ttl
+examples/bench.pl
 lib/MooseX/XSConstructor.pm
 t/01basic.t
 t/02strict.t

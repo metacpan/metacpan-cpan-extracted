@@ -76,3 +76,5 @@ sub semantic_analysis ($generators) {
         }
     }
 }
+
+1;

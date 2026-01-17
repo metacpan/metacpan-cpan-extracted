@@ -1,5 +1,9 @@
 Revision history for Perl module File-Basename-Extra
 
+0.005     2026-01-16
+  * Force use of archive-tar to prevent issues on MacOs
+  * Adpated to use gmake instead of dmake
+
 0.004     2017-05-19
   * Added Travis and AppVeyor testing
 

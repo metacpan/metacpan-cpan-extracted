@@ -1,2 +1,14 @@
 TYPEMAP
-Doubly	T_PTROBJ
+DoublyPointer	T_PTROBJ_LESS
+
+INPUT
+T_PTROBJ_LESS
+	if (SvROK($arg) && sv_derived_from($arg, \"Doubly::Pointer\")) {
+	    $var = INT2PTR($type, SvIV((SV*)SvRV($arg)));
+	} else {
+	    croak(\"$var is not of type Doubly::Pointer\");
+	}
+
+OUTPUT
+T_PTROBJ_LESS
+	sv_setref_pv($arg, \"Doubly::Pointer\", (void*)$var);

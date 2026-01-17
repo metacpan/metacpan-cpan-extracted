@@ -1,14 +1,26 @@
 Revision history for Perl extension Data-Gimei
 
+v0.4.7 2026-01-17T08:17:33Z
+    - Add module dependencies
+
+v0.4.6 2026-01-17T03:32:19Z
+    - Add development note
+    - Add module to cpanfile
+    - Bump up GitHub Actions
+    - Support Strawberry Perl for Windows
+
 v0.4.5 2026-01-16T03:28:49Z
-    - update license
+    - Update license
+    - Format source code
 
 v0.4.4 2026-01-16T02:43:29Z
-    - update Perl version in GitHub Actions
+    - Add description to README
+    - Bump up Perl version in GitHub Actions
+    - Add modules to cpanfile
 
 v0.4.3 2024-07-12T07:10:34Z
-    - update cpanfile
-    - update Perl version in GitHub Actions
+    - Switch to Test2::Bundle::More from Test::More 
+    - Bump up Perl version in GitHub Actions
 
 v0.4.2 2024-01-04T06:43:57Z
     - update pod

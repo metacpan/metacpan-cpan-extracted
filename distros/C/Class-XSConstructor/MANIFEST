@@ -42,4 +42,5 @@ t/90clearer.t
 t/97reader.t
 t/98delegation.t
 t/99destroy.t
+t/bug-moosex.t
 xshelper.h

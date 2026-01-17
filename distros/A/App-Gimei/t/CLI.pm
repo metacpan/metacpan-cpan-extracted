@@ -19,3 +19,5 @@ sub run ( $class, @args ) {
 
     return $self;
 }
+
+1;

@@ -1,15 +1,15 @@
 #
-# $Id: libcrypto.pod 1853 2021-10-11 10:40:59Z willem $
+# $Id: libcrypto.pod 2003 2025-01-21 12:06:06Z willem $
 #
 
 =head1 NAME
 
-Net::DNS::SEC::libcrypto - Perl interface to OpenSSL libcrypto
+Net::DNS::SEC::libcrypto - Perl bindings for OpenSSL libcrypto
 
 
 =head1 DESCRIPTION
 
-Perl XS extension providing access to the OpenSSL libcrypto library
+Perl XS extension providing bindings for to the OpenSSL libcrypto library
 upon which the Net::DNS::SEC cryptographic components are built.
 
 

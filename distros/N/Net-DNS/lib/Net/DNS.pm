@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.53';
+$VERSION = '1.54';
 $VERSION = eval {$VERSION};
-our $SVNVERSION = (qw$Id: DNS.pm 2041 2025-08-29 12:11:41Z willem $)[2];
+our $SVNVERSION = (qw$Id: DNS.pm 2045 2026-01-16 12:30:12Z willem $)[2];
 
 
 =head1 NAME
@@ -320,7 +320,7 @@ dynamic DNS update requests.
 	$update = Net::DNS::Update->new( 'example.com' );
 
 	$update->push( prereq => nxrrset('example.com. AAAA') );
-	$update->push( update => rr_add('example.com. 86400 AAAA 2001::DB8::F00') );
+	$update->push( update => rr_add('example.com. 86400 AAAA 2001:DB8::F00') );
 
 =head2 yxrrset
 

@@ -18,6 +18,30 @@
 
 Version - YYYY/MM/DD
 ---------------------
+1.14 2026-01-16 08:30:00
+  - Updated copyright dates in LICENCE file.
+  - Fixed several typos in the README file.
+  - Added the following functions to Date.pm
+        * is_leap_year ()
+        * calc_hundred_year_date ()
+        * calc_day_of_week ()
+        * convert_hyd_to_date_str ()
+        * calc_day_of_year ()
+        * adjust_date_str ()
+  - Added test cases to t/09-basic_date.t for this.
+  - Added the following methods to Config.pm
+        * get_hyd_date ()
+        * get_dow_date ()
+        * get_doy_date ()
+        * get_adjusted_date ()
+  - Added test cases to t/13-alt-get-tests.t for this.
+  - Corrected POD usage for new() in Cofig.pm.
+    date_language was listed in wrong hash.
+  - Fixed tons of typos in the POD for all *.pm files.
+
+1.13 2025-02-13 08:30:00
+  - Skipped unlucky release 13.
+
 1.12 2025-02-06 08:30:00
   - Fixed typo in POD link in Date.pm.
   - Fixed t/70-validate_date_vars.t to handle timestamp test on even slower

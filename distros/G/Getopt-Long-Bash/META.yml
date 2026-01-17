@@ -26,14 +26,14 @@ no_index:
 provides:
   Getopt::Long::Bash:
     file: lib/Getopt/Long/Bash.pm
-    version: v0.7.0
+    version: v0.7.1
 requires:
   perl: '5.014'
 resources:
   bugtracker: https://github.com/tecolicom/getoptlong/issues
   homepage: https://github.com/tecolicom/getoptlong
   repository: https://github.com/tecolicom/getoptlong.git
-version: 0.7.0
+version: 0.7.1
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
   - 'google-labs-jules[bot] <161369871+google-labs-jules[bot]@users.noreply.github.com>'

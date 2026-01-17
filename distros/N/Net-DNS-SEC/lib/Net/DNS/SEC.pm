@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use Carp;
 
-our $SVNVERSION = (qw$Id: SEC.pm 1986 2024-07-29 10:45:40Z willem $)[2];
+our $SVNVERSION = (qw$Id: SEC.pm 2045 2026-01-16 12:30:12Z willem $)[2];
 our $VERSION;
-$VERSION = '1.26';
+$VERSION = '1.27';
 
 use base qw(Exporter DynaLoader);
 
@@ -24,7 +24,7 @@ Net::DNS::SEC - DNSSEC extensions to Net::DNS
 
 =head1 SYNOPSIS
 
-    use Net::DNS::SEC;
+	use Net::DNS::SEC;
 
 =head1 DESCRIPTION
 
@@ -47,10 +47,10 @@ Net::DNS::SEC in the use declaration.
 
 =head2 algorithm
 
-    $mnemonic = algorithm( 5 );
-    $numeric  = algorithm( 'RSA-SHA1' );
-    print "algorithm mnemonic\t", $mnemonic, "\n";
-    print "algorithm number:\t",  $numeric,  "\n";
+	$mnemonic = algorithm( 5 );
+	$numeric  = algorithm( 'RSA-SHA1' );
+	print "algorithm mnemonic\t", $mnemonic, "\n";
+	print "algorithm number:\t",  $numeric,  "\n";
 
 algorithm() provides conversions between an algorithm code number and
 the corresponding mnemonic.
@@ -62,10 +62,10 @@ sub algorithm { return &Net::DNS::RR::DS::algorithm; }
 
 =head2 digtype
 
-    $mnemonic = digtype( 2 );
-    $numeric  = digtype( 'SHA-256' );
-    print "digest type mnemonic\t", $mnemonic, "\n";
-    print "digest type number:\t",  $numeric,  "\n";
+	$mnemonic = digtype( 2 );
+	$numeric  = digtype( 'SHA-256' );
+	print "digest type mnemonic\t", $mnemonic, "\n";
+	print "digest type number:\t",  $numeric,  "\n";
 
 digtype() provides conversions between a digest type number and the
 corresponding mnemonic.
@@ -77,7 +77,7 @@ sub digtype { return &Net::DNS::RR::DS::digtype; }
 
 =head2 key_difference
 
-    @result = key_difference( \@a, \@b );
+	@result = key_difference( \@a, \@b );
 
 Fills @result with all keys in array @a that are not in array @b.
 

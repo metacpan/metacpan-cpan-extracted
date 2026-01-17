@@ -78,6 +78,14 @@ is_deeply(
     'catch expression is evaluated as a filter on the original input'
 );
 
+my $field_access = run('{"catch": 5}', 'try .catch + 1 catch 0');
+
+is_deeply(
+    $field_access,
+    [6],
+    'try ignores catch when used as a field name'
+);
+
 my $empty_catch = run($fail_json, 'try (.num / .den) catch empty');
 
 is_deeply(

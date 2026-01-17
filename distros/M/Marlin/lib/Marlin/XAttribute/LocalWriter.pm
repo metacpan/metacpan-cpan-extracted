@@ -5,7 +5,7 @@ use warnings;
 package Marlin::XAttribute::LocalWriter;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015000';
+our $VERSION   = '0.016000';
 
 use Eval::TypeTiny        ();
 use Marlin::Util          qw( true false );
@@ -69,6 +69,16 @@ after install_accessors => sub {
 	} );
 	
 	$me->install_coderef( $method_name, $coderef );
+};
+
+around provides_accessors => sub {
+	my $next = shift;
+	my $me   = shift;
+	
+	my @list = $me->$next( @_ );
+	push @list, [ $me->{':LocalWriter'}{method_name}, 'local writer', $me ];
+	
+	return @list;
 };
 
 __PACKAGE__

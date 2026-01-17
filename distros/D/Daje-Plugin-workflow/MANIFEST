@@ -4,7 +4,7 @@ LICENSE
 README.md
 conf/config.conf
 cpanfile
-lib/Daje/Controller/Workflow.pm
+lib/Daje/Controller/Workflow/Workflow.pm
 lib/Daje/Plugin/Workflow.pm
 minil.toml
 t/00_compile.t

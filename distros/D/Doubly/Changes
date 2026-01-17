@@ -1,5 +1,10 @@
 Revision history for Doubly
 
+0.12    2026-01-17
+	- Refactor Doubly with a new approach to be thread safe
+	- Old pointer based implementation now Doubly::Pointer
+	- Doubly is faster than Doubly::Pointer in both (non-)threaded environments
+
 0.11    2026-01-15
 	- Finally Fix memory leaks!!
 	- Add benchmark <-- you should use this version

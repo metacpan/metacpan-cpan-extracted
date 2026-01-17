@@ -13,7 +13,7 @@ fi
 cat <<EOF
 # declare -A $1=(
 #     [ &USAGE ]="command [options] file..."
-#     [ flag     | f                   # Boolean  ]=
+#     [ flag     | f                   # Flag     ]=
 #     [ counter  | c +                 # Counter  ]=0
 #     [ required | r :                 # Required ]=/dev/stdout
 #     [ optional | o ?                 # Optional ]=
@@ -44,7 +44,7 @@ B<Option definition:>
 
     declare -A OPTS=(
         [ &USAGE ]="command [options] file..."
-        [ flag     | f                   # Boolean  ]=
+        [ flag     | f                   # Flag     ]=
         [ counter  | c +                 # Counter  ]=0
         [ required | r :                 # Required ]=/dev/stdout
         [ optional | o ?                 # Optional ]=
@@ -70,7 +70,7 @@ B<Or:>
 
 =head1 VERSION
 
-0.7.0
+0.7.1
 
 =head1 DESCRIPTION
 
@@ -88,9 +88,9 @@ with array name and arguments), and B<multi-step> for advanced control
 
 Supports short (C<-v>) and long (C<--verbose>) options with bundling
 (C<-vvv>). B<Option types>: I<flag>, I<required argument>, I<optional
-argument>, I<array>, I<hash>, I<callback>. B<Validation>: I<integer>,
-I<float>, I<regex>. B<Help message> generation. B<Pass-through> for
-wrapper scripts. B<Multiple invocations> for subcommand support.
+argument>, I<array>, I<hash>. B<Modifiers>: I<callback>, I<pass-through>.
+B<Validation>: I<integer>, I<float>, I<regex>. B<Help message> generation.
+B<Multiple invocations> for subcommand support.
 
 For a gentle introduction, see L<Getopt::Long::Bash::Tutorial>.
 
@@ -186,10 +186,10 @@ Help message text (everything after C<#>).
 
 Each option type determines how arguments are handled and stored.
 
-=head2 FLAG (C<+> or none)
+=head2 COUNTER FLAG (C<+> or none)
 
 A flag takes no argument. First use sets to C<1>, subsequent uses
-increment (useful for verbosity levels). Use C<--no-X> to reset to
+increment (useful for verbosity levels). Use C<< --no-<name> >> to reset to
 empty string. Bundling supported: C<-vvv> equals C<-v -v -v>.
 
     [verbose|v]=        # $verbose: 1 when specified
@@ -203,7 +203,7 @@ non-empty, false when empty.
 
 =head2 REQUIRED ARGUMENT (C<:>)
 
-The option requires an argument; error if missing. Use C<--no-X> to
+The option requires an argument; error if missing. Use C<< --no-<name> >> to
 reset to empty string (useful for disabling defaults).
 
     [output|o:]=        # --output=file, --output file, -ofile, -o file
@@ -219,17 +219,9 @@ was specified.
 
     [config|c?]=        # --config=file or --config (sets to "")
 
-B<Syntax:>
-
-=over 2
-
-=item * C<--config=value>: variable set to C<value>
-
-=item * C<--config>: variable set to empty string C<"">
-
-=item * C<-c>: sets to empty string; C<-cvalue> form is B<not> supported
-
-=back
+C<--config=value> sets to C<value>, C<--config> without value sets to
+empty string. Short form C<-c> sets to empty string; C<-cvalue> form
+is B<not> supported.
 
 =head2 ARRAY (C<@>)
 
@@ -256,78 +248,20 @@ To reset existing values: use C<--no-define> on the command line
 (e.g., C<--no-define --define KEY=val>), or use C<callback --before>
 to automatically reset before each new value.
 
-=head2 CALLBACK (C<!>)
-
-Calls a function when the option is parsed. Default function name is the
-option name with hyphens converted to underscores; use C<getoptlong callback>
-to specify a custom function. Can combine with any type (C<+!>, C<:!>,
-C<?!>, C<@!>, C<%!>). See L</CALLBACKS> for registration and timing details.
-
-    [action|a!]=        # Calls action() when specified
-    [file|f:!]=         # Calls file() with argument
-
-=head1 VALIDATION
-
-Option values can be validated using type specifiers or regex patterns:
-C<=i> for integers, C<=f> for floats, C<=(> ... C<)> for regex.
-
-    [count:=i]=1            # Integer (positive/negative)
-    [ratio:=f]=0.5          # Float (e.g., 123.45)
-    [mode:=(^(a|b|c)$)]=a   # Regex: exactly a, b, or c
-
-B<Note:> For regex, the pattern extends to the last C<)> in the
-definition, including any C<)> in the description. Avoid using C<)>
-in comments when using regex validation.
-
-Validation occurs before the value is stored or callbacks are invoked.
-For array options, each element is validated; for hash options, each
-C<key=value> pair is matched as a whole. Error on validation failure
-(see L<EXIT_ON_ERROR|/CONFIGURATION>).
-
-=head1 DESTINATION VARIABLE
-
-By default, values are stored in variables named after the option.
-A custom destination can be specified by adding the variable name after
-TYPE/MODIFIER and before VALIDATE: C<[NAME|ALIAS:!DEST=(REGEX)]>.
-C<PREFIX> setting applies to custom names too (see L</getoptlong init>).
-
-    [count|c:COUNT]=1       # Store in $COUNT instead of $count
-    [debug|d+DBG]=0         # Store in $DBG
-
-=head1 HELP MESSAGE
-
-By default, C<--help> and C<-h> options are automatically available.
-They display a help message generated from option definitions and exit.
-No configuration is required.
-
-To customize or disable, use one of these methods (in order of precedence):
-
-    [&HELP]="usage|u#Show usage"            # 1. &HELP key in OPTS
-    getoptlong init OPTS HELP="manual|m"    # 2. HELP parameter in init
-    [help|h # Custom help text]=            # 3. Explicit option definition
-    getoptlong init OPTS HELP=""            # Disable help option
-
-=head2 SYNOPSIS (USAGE)
-
-Set the usage line displayed at the top of help output:
-
-    [&USAGE]="Usage: cmd [options] <file>"  # In OPTS array
-    getoptlong init OPTS USAGE="..."        # Or via init parameter
-
-=head2 OPTION DESCRIPTIONS
-
-Text after C<#> in the option definition becomes the help description.
-If omitted, a description is auto-generated. Default values are shown
-as C<(default: value)>.
-
-    [output|o: # Output file path]=/dev/stdout
-
 =head1 CALLBACKS
 
 Callback functions are called when an option is parsed. The value is
 stored in the variable as usual, and the callback is invoked for
 additional processing such as validation or side effects. Callbacks
 work the same way with pass-through options.
+
+Calls a function when the option is parsed. Default function name is the
+option name with hyphens converted to underscores; use C<getoptlong callback>
+to specify a custom function. Can combine with any type (C<+!>, C<:!>,
+C<?!>, C<@!>, C<%!>).
+
+    [action|a!]=        # Calls action() when specified
+    [file|f:!]=         # Calls file() with argument
 
 =head2 REGISTRATION
 
@@ -370,6 +304,62 @@ C<[opt|o:!E<gt>array]>.
     [pass|p:>collected]=    # Option and value added to collected array
 
 After C<--pass foo>: C<collected=("--pass" "foo")>
+
+=head1 DESTINATION VARIABLE
+
+By default, values are stored in variables named after the option.
+A custom destination can be specified by adding the variable name after
+TYPE/MODIFIER and before VALIDATE: C<[NAME|ALIAS:!DEST=(REGEX)]>.
+C<PREFIX> setting applies to custom names too (see L</getoptlong init>).
+
+    [count|c:COUNT]=1       # Store in $COUNT instead of $count
+    [debug|d+DBG]=0         # Store in $DBG
+
+=head1 VALIDATION
+
+Option values can be validated using type specifiers or regex patterns:
+C<=i> for integers, C<=f> for floats, C<=(> ... C<)> for regex.
+
+    [count:=i]=1            # Integer (positive/negative)
+    [ratio:=f]=0.5          # Float (e.g., 123.45)
+    [mode:=(^(a|b|c)$)]=a   # Regex: exactly a, b, or c
+
+B<Note:> For regex, the pattern extends to the last C<)> in the
+definition, including any C<)> in the description. Avoid using C<)>
+in comments when using regex validation.
+
+Validation occurs before the value is stored or callbacks are invoked.
+For array options, each element is validated; for hash options, each
+C<key=value> pair is matched as a whole. Error on validation failure
+(see L<EXIT_ON_ERROR|/CONFIGURATION>).
+
+=head1 HELP MESSAGE
+
+By default, C<--help> and C<-h> options are automatically available.
+They display a help message generated from option definitions and exit.
+No configuration is required.
+
+To customize or disable, use one of these methods (in order of precedence):
+
+    [&HELP]="usage|u#Show usage"            # 1. &HELP key in OPTS
+    getoptlong init OPTS HELP="manual|m"    # 2. HELP parameter in init
+    [help|h # Custom help text]=            # 3. Explicit option definition
+    getoptlong init OPTS HELP=""            # Disable help option
+
+=head2 SYNOPSIS (USAGE)
+
+Set the usage line displayed at the top of help output:
+
+    [&USAGE]="Usage: cmd [options] <file>"  # In OPTS array
+    getoptlong init OPTS USAGE="..."        # Or via init parameter
+
+=head2 OPTION DESCRIPTIONS
+
+Text after C<#> in the option definition becomes the help description.
+If omitted, a description is auto-generated. Default values are shown
+as C<(default: value)>.
+
+    [output|o: # Output file path]=/dev/stdout
 
 =head1 COMMANDS
 
@@ -552,7 +542,7 @@ Kazumasa Utashiro
 
 =head1 COPYRIGHT
 
-Copyright 2025 Kazumasa Utashiro
+Copyright 2025-2026 Kazumasa Utashiro
 
 =head1 LICENSE
 

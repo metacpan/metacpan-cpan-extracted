@@ -6,7 +6,7 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015000';
+our $VERSION   = '0.016000';
 
 use constant { true => !!1, false => !!0 };
 use Types::Common qw( -is -types to_TypeTiny );
@@ -18,6 +18,7 @@ use constant _ATTRS => (
 	this                      => { isa => NonEmptyStr,              required => true },
 	attributes                => { isa => ArrayRef[HashRef|Object], default => [] },
 	caller                    => { isa => Maybe[NonEmptyStr],       default => undef },
+	cleanups                  => { isa => ArrayRef,                 default => [] },
 	constructor               => { isa => NonEmptyStr,              default => 'new' },
 	delayed                   => { isa => Maybe[ArrayRef[CodeRef]], default => [] },
 	inhaled_from              => { isa => Maybe[NonEmptyStr],       default => undef },
@@ -43,12 +44,13 @@ use Scalar::Util          ();
 use Sub::Accessor::Small  ();
 
 use constant {
-	_HAS_NATIVE_LEXICAL_SUB => !!( "$]" >= 5.037002 ),
-	_HAS_MODULE_LEXICAL_SUB => !!( "$]" >= 5.011002 and eval('require Lexical::Sub; 1') ),
-	_NEEDS_MRO_COMPAT       => !!( "$]" < 5.010 ),
+	_HAS_NATIVE_LEXICAL_SUB  => !!( "$]" >= 5.037002 ),
+	_HAS_MODULE_LEXICAL_SUB  => !!( "$]" >= 5.011002 and eval('require Lexical::Sub; 1') ),
+	_NEEDS_MRO_COMPAT        => !!( "$]" < 5.010 ),
 };
 
 require MRO::Compat if _NEEDS_MRO_COMPAT;
+require namespace::clean unless _HAS_NATIVE_LEXICAL_SUB || _HAS_MODULE_LEXICAL_SUB;
 
 {
 	our %META;
@@ -429,10 +431,18 @@ sub _parse_attribute {
 		$name = $1 . $2;
 	}
 	
-	Marlin::Util::_croak("Bad attribute name: $name") unless $name =~ /\A[^\W0-9]\w*\z/;
+	Marlin::Util::_croak("Bad attribute name: $name") unless $name =~ /\A\+?[^\W0-9]\w*\z/;
 	
 	my $default_init_arg = exists( $ref->{constant} ) ? undef : $name;
-	return { is => 'ro', init_arg => $default_init_arg, %$ref, slot => $name };
+	
+	return {
+		( $name =~ /^\+/ or $ref->{extends} ) ? () : (
+			is       => 'ro',
+			init_arg => $default_init_arg,
+		),
+		%$ref,
+		slot => $name,
+	};
 }
 
 sub BUILDARGS {
@@ -561,6 +571,8 @@ sub setup_steps {
 		setup_inheritance
 		setup_roles
 		canonicalize_attributes
+		check_argument_conflicts
+		check_accessor_conflicts
 		setup_constructor
 		setup_accessors
 		setup_imports
@@ -568,6 +580,7 @@ sub setup_steps {
 		run_delayed
 		setup_destructor
 		setup_compat
+		setup_cleanups
 	/;
 }
 
@@ -654,10 +667,9 @@ sub setup_roles {
 				}
 				\%e;
 			};
+			$r_meta->canonicalize_attributes;
 			for my $attr ( @{ $r_meta->attributes } ) {
-				require Clone;
-				my $copy = Clone::clone( $attr );
-				$copy->{package} = $me->this;
+				my $copy = $attr->make_clone_for_consuming_class( $me );
 				push @{ $me->attributes }, $copy;
 			}
 		}
@@ -713,14 +725,109 @@ sub run_delayed {
 sub canonicalize_attributes {
 	my $me = shift;
 	
-	require Marlin::Attribute;
-	@{ $me->attributes } = map {
-		is_Object( $_ )
-			? $_
-			: Marlin::Attribute->new( %$_, package => $me->this, marlin => $me );
-	} @{ $me->attributes };
+	defined &Marlin::Attribute::new or require Marlin::Attribute;
+	
+	my ( @extensions, @attributes, %seen );
+	for my $proto ( @{ $me->attributes } ) {
+		
+		if ( delete $proto->{extends} ) {
+			$proto->{slot} = '+' . $proto->{slot}
+				unless $proto->{slot} =~ /^\+/;
+		}
+		
+		my $slot = $proto->{slot};
+		if ( $slot =~ /^\+/ ) {
+			push @extensions, $proto;
+			next;
+		}
+		
+		#Marlin::Util::_croak( "Attribute '%s' declared more than once in package '%s'", $slot, $me->this )
+		#	if $seen{$slot}++;
+		
+		if ( is_Object $proto ) {
+			push @attributes, $proto;
+		}
+		else {
+			push @attributes, Marlin::Attribute->new(
+				%$proto,
+				package => $me->this,
+				marlin  => $me,
+			);
+		}
+	}
+	
+	@{ $me->attributes } = @attributes;
+	
+	if ( @extensions ) {
+	
+		my %lookup =
+			map { $_->{slot} => $_ }
+			@{ $me->attributes_with_inheritance };
+		
+		for my $extension ( @extensions ) {
+			
+			my ( $slot ) = ( $extension->{slot} =~ /^\+([^\W0-9]\w*)$/ )
+				or Marlin::Util::_croak( "Cannot extend badly named attribute '%s' in package '%s'", $1, $me->this );
+			
+			my $old_attr = $lookup{$slot}
+				or Marlin::Util::_croak( "Cannot extend non-existant attribute '%s' in package '%s'", $slot, $me->this );
+			
+			my $new_attr = $old_attr->make_extended( { %$extension, marlin => $me } );
+			
+			my $replaced = false;
+			@{ $me->attributes } =
+				map {
+					( $_->{slot} eq $slot )
+						? ( $replaced = $new_attr )
+						: $_;
+				}
+				@{ $me->attributes };
+			push @{ $me->attributes }, $new_attr unless $replaced;
+			$lookup{$slot} = $new_attr;
+		}
+	}
 	
 	return $me;
+}
+
+sub check_accessor_conflicts {
+	my $me = shift;
+	
+	my %method_names;
+	for my $attr ( @{ $me->attributes_with_inheritance } ) {
+		for my $accessor ( $attr->provides_accessors ) {
+			push @{ $method_names{ $accessor->[0] } ||= [] }, $accessor;
+		}
+	}
+	
+	for my $name ( sort keys %method_names ) {
+		my @got = @{ $method_names{$name} };
+		Marlin::Util::_croak(
+			"Method '%s' conflict: %s",
+			$name,
+			join( q[, ], map { sprintf q{%s for attribute '%s'}, $_->[1], $_->[2]{slot} } @got )
+		) if @got > 1;
+	}
+}
+
+sub check_argument_conflicts {
+	my $me = shift;
+	
+	my %arg_names;
+	for my $attr ( @{ $me->attributes_with_inheritance } ) {
+		for my $arg ( $attr->allowed_constructor_parameters ) {
+			push @{ $arg_names{$arg} ||= [] }, $attr;
+		}
+	}
+	
+	for my $name ( sort keys %arg_names ) {
+		my @got = @{ $arg_names{$name} };
+		Marlin::Util::_croak(
+			"Initialization argument '%s' conflict: %s",
+			$name,
+			join( q[, ], map { sprintf q{attribute '%s'}, $_->{slot} } @got )
+		) if @got > 1;
+	}
 }
 
 sub setup_constructor {
@@ -849,6 +956,7 @@ sub lexport {
 			no strict 'refs';
 			$caller ||= $me->caller;
 			*{"$caller\::$lexname"} = $coderef;
+			push @{ $me->{cleanups} }, $lexname;
 		}
 	}
 	
@@ -1045,6 +1153,13 @@ sub setup_compat {
 sub injected_metadata {
 	my ( $me, $framework, $metadata ) = @_;
 	return $metadata;
+}
+
+sub setup_cleanups {
+	my $me = shift;
+	if ( $INC{'namespace/clean.pm'} and my @subs = @{ $me->cleanups } ) {
+		namespace::clean->import( -cleanee => $me->caller, @subs );
+	}
 }
 
 __PACKAGE__
@@ -1298,7 +1413,8 @@ From Perl v5.42.0 onwards, the following is also supported:
 If you use the C<< 'my get_name' >> syntax on Perl versions too old to support
 lexical subs, they will be installed as a normal sub in the caller package.
 (Note that the caller package might differ from the class currently being
-built, especially in the case of L<Marlin::Struct> classes.)
+built, especially in the case of L<Marlin::Struct> classes.) Marlin will
+attempt to clean them later with L<namespace::clean>.
 
 =item C<< writer >>
 
@@ -1416,22 +1532,32 @@ the trigger.
     
     use Marlin
       first_name => {
-        is      => 'rw',
+        is      => rw,
         isa     => Str,
-        trigger => sub ($me) { $self->clear_full_name }
+        trigger => sub ($me) { $me->clear_full_name },
       },
       last_name => {
-        is      => 'rw',
+        is      => rw,
         isa     => Str,
-        trigger => sub ($me) { $self->clear_full_name }
+        trigger => sub ($me) { $me->clear_full_name },
       },
       full_name => {
-        is      => 'lazy',
+        is      => lazy,
         isa     => Str,
         clearer => true,
-        builder => sub ($me) { join q[ ], $me->first_name, $me->last_name }
+        builder => sub ($me) {
+          join q[ ], $me->first_name, $me->last_name;
+        },
       };
   }
+  
+  my $person = Person->new(
+    first_name  => 'Alice',
+    last_name   => 'Smith',
+  );
+  say $person->full_name;  # Alice Smith
+  $person->last_name( 'Jones' );
+  say $person->full_name;  # Alice Jones
 
 Currently if your class has any triggers, this will force any writers/accessors
 for the affected attributes to be implemented in Perl instead of XS. This is
@@ -1449,33 +1575,49 @@ triggers.
     
     use Marlin
       first_name => {
-        is      => 'ro',
+        is      => ro,
         isa     => Str,
         writer  => 'my set_first_name',
       },
       last_name => {
-        is      => 'ro',
+        is      => ro,
         isa     => Str,
         writer  => 'my set_last_name',
       },
       full_name => {
-        is      => 'lazy',
+        is      => lazy,
         isa     => Str,
-        clearer => true,
-        builder => sub ($me) { join q[ ], $me->first_name, $me->last_name }
+        clearer => 'my clear_full_name',
+        builder => sub ($me) {
+          join q[ ], $me->first_name, $me->last_name;
+        },
       };
     
     signature_for rename => (
       method  => true,
-      named   => [ first_name => Optional[Str], last_name => Optional[Str] ],
+      named   => [
+        first_name => Optional[Str],
+        last_name  => Optional[Str],
+      ],
     );
     
     sub rename ( $self, $arg ) {
-      $self->&set_first_name($arg->first_name) if $arg->has_first_name;
-      $self->&set_last_name($arg->last_name) if $arg->has_last_name;
+      $self->&set_first_name( $arg->first_name )
+        if $arg->has_first_name;
+      $self->&set_last_name( $arg->last_name )
+        if $arg->has_last_name;
+      $self->&clear_full_name;
       return $self;
     }
   }
+  
+  my $person = Person->new(
+    first_name  => 'Alice',
+    last_name   => 'Smith',
+  );
+  say $person->full_name;  # Alice Smith
+  $person->rename( last_name => 'Jones' );
+  say $person->full_name;  # Alice Jones
 
 =item C<< handles >> and C<< handles_via >>.
 
@@ -1557,7 +1699,10 @@ It is possible to give a hint to Marlin about how to store an attribute.
       };
   }
   
-  my $bob = Local::User->new( username => 'bd', password => 'zi1ch' );
+  my $bob = Local::User->new(
+    username => 'bd',
+    password => 'zi1ch',
+  );
   
   die if exists $bob->{password};   # will not die
   die if $bob->can('password');     # will not die
@@ -1583,6 +1728,96 @@ shouldn't be relied on in place of proper security.)
 
 Marlin supports three storage methods for attributes: "HASH" (the default),
 "PRIVATE" (as above), and "NONE" (only used for constants).
+
+=item C<< extends >>
+
+Indicates that this attribute extends or modifies an attribute inherited
+from a parent class or role.
+
+  package Local::Person {
+    use Types::Common -types;
+    use Marlin
+      name => NonEmptyStr,
+      age  => PositiveOrZeroNum;
+  }
+  
+  package Local::Employee {
+    use Types::Common -types;
+    use Marlin::Util qw( true false );
+    
+    use Marlin
+      -base => 'Local::Person',
+      # Require name for employees.
+      name => {
+        extends  => true,
+        required => true,
+      },
+      # We only employ adults.
+      age => {
+        extends  => true,
+        required => true,
+        isa      => NumRange[ 18, undef ]
+      };
+  }
+
+A shortcut for C<extends> is a leading plus sign.
+
+  package Local::Employee {
+    use Types::Common -types;
+    use Marlin -base => 'Local::Person',
+      '+name!',                          # Required
+      '+age!' => NumRange[ 18, undef ];  # Adults only
+  }
+
+Marlin limits what changes child classes are allowed to make to the API they
+inherited from their parents. Some of the limitations:
+
+=over
+
+=item *
+
+Optional attributes can be made required, but required attributes cannot
+be made optional unless you also provide a default/builder.
+
+=item *
+
+Type constraints can be made more strict, but not looser. Type coercions
+can be enabled by child classes but not disabled if they're already enabled
+in the parent class.
+
+=item *
+
+Accessor-like methods (reader, writer, accessor, clearer, predicate)
+can be added, but accessors defined in parent classes cannot be replaced
+or removed.
+
+=item *
+
+Attribute storage type cannot be changed.
+
+=item *
+
+The auto_deref status cannot be changed.
+
+=back
+
+In the rare case where an attribute has an option which you wish to
+delete, you can use C<< $Marlin::Attribute::NONE >>.
+
+  package Local::ChildClass {
+  
+    use Marlin::Attribute ();
+    use Marlin::Util -all;
+    
+    use Marlin
+      -base => "Local::ParentClass",
+      # Parent class defined a default for this attribute
+      someattr => {
+        extends  => true,
+        required => true,
+        default  => $Marlin::Attribute::NONE,
+      };
+  }
 
 =item C<< documentation >>
 

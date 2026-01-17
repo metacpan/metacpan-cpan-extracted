@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-SVCB.t 2035 2025-08-14 11:49:15Z willem $	-*-perl-*-
+# $Id: 05-SVCB.t 2043 2026-01-14 13:35:59Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -25,8 +25,8 @@ my $typecode = unpack 'xn', Net::DNS::RR->new( type => $type )->encode;
 ok( $typecode, "$type RR type code = $typecode" );
 
 
-for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB' ) ) {
-	ok( $rr, "new DELEG RR:	$record" );
+for my $rr ( Net::DNS::RR->new( my $record = "example. $type" ) ) {
+	ok( $rr, "parse RR:	$record" );
 	foreach my $parameter ( qw(SvcPriority TargetName), @keys, @also ) {
 		is( $rr->$parameter, undef, "$parameter undefined" );
 	}
@@ -34,77 +34,77 @@ for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB' ) ) {
 	ok( $rr->string, 'presentation format string' );
 }
 
-for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 0 target.example.' ) ) {
-	ok( $rr,	     "new DELEG RR:	$record" );
+for my $rr ( Net::DNS::RR->new( my $record = "example. $type 0 target.example." ) ) {
+	ok( $rr,	     "parse RR:	$record" );
 	ok( $rr->TargetName, 'TargetName defined' );
 	is( $rr->SvcPriority, 0, 'SvcPriority zero' );
 	ok( $rr->string, 'presentation format string' );
 }
 
 
-for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 target.example.' ) ) {
-	ok( $rr,	     "new DELEG RR:	$record" );
+for my $rr ( Net::DNS::RR->new( my $record = "example. $type 1 target.example." ) ) {
+	ok( $rr,	     "parse RR:	$record" );
 	ok( $rr->TargetName, 'TargetName defined' );
 	is( $rr->SvcPriority, 1, 'SvcPriority non-zero' );
 	ok( $rr->string, 'presentation format string' );
 }
 
-for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 .' ) ) {
-	ok( $rr, "new DELEG RR:	$record" );
+for my $rr ( Net::DNS::RR->new( my $record = "example. $type 1 ." ) ) {
+	ok( $rr, "parse RR:	$record" );
 	is( $rr->TargetName, $rr->owner, 'TargetName defined' );
 	ok( $rr->string, 'presentation format string' );
 }
 
 
-for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . mandatory=alpn alpn=h2,h3' ) ) {
-	ok( $rr,		 "new DELEG RR:	$record" );
+for my $rr ( Net::DNS::RR->new( my $record = "example. $type 1 . mandatory=alpn alpn=h2,h3" ) ) {
+	ok( $rr,		 "parse RR:	$record" );
 	ok( defined $rr->key0(), 'correct SvcParameter key defined' );
 }
 
-for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . alpn=h2,h3 no-default-alpn' ) ) {
-	ok( $rr,			  "new DELEG RR:	$record" );
+for my $rr ( Net::DNS::RR->new( my $record = "example. $type 1 . alpn=h2,h3 no-default-alpn" ) ) {
+	ok( $rr,			  "parse RR:	$record" );
 	ok( defined $rr->key1(),	  'correct SvcParameter key defined' );
 	ok( defined $rr->no_default_alpn, '$rr->no_default_alpn true' );
 }
 
-for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . port=53' ) ) {
-	ok( $rr,		 "new DELEG RR:	$record" );
+for my $rr ( Net::DNS::RR->new( my $record = "example. $type 1 . port=53" ) ) {
+	ok( $rr,		 "parse RR:	$record" );
 	ok( defined $rr->key3(), 'correct SvcParameter key defined' );
 }
 
-for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . ipv4hint=192.0.2.1' ) ) {
-	ok( $rr,		 "new DELEG RR:	$record" );
+for my $rr ( Net::DNS::RR->new( my $record = "example. $type 1 . ipv4hint=192.0.2.1" ) ) {
+	ok( $rr,		 "parse RR:	$record" );
 	ok( defined $rr->key4(), 'correct SvcParameter key defined' );
 }
 
-for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . ech=Base64format' ) ) {
-	ok( $rr,		 "new DELEG RR:	$record" );
+for my $rr ( Net::DNS::RR->new( my $record = "example. $type 1 . ech=Base64format" ) ) {
+	ok( $rr,		 "parse RR:	$record" );
 	ok( defined $rr->key5(), 'correct SvcParameter key defined' );
 }
 
-for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . ipv6hint=192.0.2.1' ) ) {
-	ok( $rr,		 "new DELEG RR:	$record" );
+for my $rr ( Net::DNS::RR->new( my $record = "example. $type 1 . ipv6hint=192.0.2.1" ) ) {
+	ok( $rr,		 "parse RR:	$record" );
 	ok( defined $rr->key6(), 'correct SvcParameter key defined' );
 }
 
-for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . dohpath=/dns-query{?dns}' ) ) {
-	ok( $rr,		 "new DELEG RR:	$record" );
+for my $rr ( Net::DNS::RR->new( my $record = "example. $type 1 . dohpath=/dns-query{?dns}" ) ) {
+	ok( $rr,		 "parse RR:	$record" );
 	ok( defined $rr->key7(), 'correct SvcParameter key defined' );
 }
 
-for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . ohttp=0 ohttp=1' ) ) {
-	ok( $rr,		 "new DELEG RR:	$record" );
+for my $rr ( Net::DNS::RR->new( my $record = "example. $type 1 . ohttp=0 ohttp=1" ) ) {
+	ok( $rr,		 "parse RR:	$record" );
 	ok( defined $rr->key8(), 'correct SvcParameter key defined' );
 }
 
-for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . tls-supported-groups=29,23' ) ) {
-	ok( $rr,		 "new DELEG RR:	$record" );
+for my $rr ( Net::DNS::RR->new( my $record = "example. $type 1 . tls-supported-groups=29,23" ) ) {
+	ok( $rr,		 "parse RR:	$record" );
 	ok( defined $rr->key9(), 'correct SvcParameter key defined' );
 }
 
 
-Net::DNS::RR->new(<<'END')->print;
-example.com.	SVCB	16 foo.example.org.	( mandatory=alpn alpn=h2,h3-19
+Net::DNS::RR->new(<<"END")->print;
+example.com.	$type	16 foo.example.org.	( mandatory=alpn alpn=h2,h3-19
 			no-default-alpn port=1234 ipv4hint=192.0.2.1
 			ech=AEP+DQA/BAAgACCW2/dfOBZAtQU55/py/BlhdRdaauPAkrERAUwppoeSEgAEAAEAAQAQY2QxLnRlc3QuZGVmby5pZQAA
 			ipv6hint=2001:db8::1
@@ -115,7 +115,7 @@ example.com.	SVCB	16 foo.example.org.	( mandatory=alpn alpn=h2,h3-19
 END
 
 
-for my $rr ( Net::DNS::RR->new('example. SVCB 1 . ') ) {
+for my $rr ( Net::DNS::RR->new("example. $type 1 . ") ) {
 	my $l0 = length $rr->encode;
 	$rr->port(53);
 	is( length( $rr->encode ), $l0 + 6, 'insert SvcParams key' );

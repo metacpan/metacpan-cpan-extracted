@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 03-parameters.t 1921 2023-05-08 18:39:59Z willem $	-*-perl-*-
+# $Id: 03-parameters.t 2042 2025-12-24 10:23:11Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -26,8 +26,8 @@ foreach ( sort { $a <=> $b } 32767, keys %Net::DNS::Parameters::classbyval ) {
 
 foreach ( sort { $a <=> $b } 65535, keys %Net::DNS::Parameters::typebyval ) {
 	my $name = typebyval($_);	## check type conversion functions
-	my $code = eval { typebyname($name) };
-	is( $code, $_, "typebyname($name)" );
+	my $code = eval { typebyname($name) };	## NB: codes may be aliased
+	is( typebyval($code), $name, "typebyname($name)" );
 }
 is( typebyname('*'), typebyname('ANY'), "typebyname(*)" );
 

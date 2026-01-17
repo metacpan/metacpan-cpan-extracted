@@ -6,7 +6,7 @@
       "Hayo Baan <info@hayobaan.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -29,16 +29,18 @@
       },
       "develop" : {
          "requires" : {
-            "English" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
             "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::DistManifest" : "0",
             "Test::EOL" : "0",
             "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Pod::LinkCheck" : "0",
@@ -76,7 +78,6 @@
             "Test::More" : "0.96",
             "Test::Warn" : "0",
             "autodie" : "0",
-            "blib" : "1.01",
             "constant" : "0",
             "perl" : "5.010",
             "threads" : "0",
@@ -88,7 +89,7 @@
    "provides" : {
       "utf8::all" : {
          "file" : "lib/utf8/all.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       }
    },
    "release_status" : "stable",
@@ -103,7 +104,9 @@
          "web" : "https://github.com/doherty/utf8-all"
       }
    },
-   "version" : "0.024",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "0.025",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

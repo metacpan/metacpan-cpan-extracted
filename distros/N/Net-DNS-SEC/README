@@ -62,7 +62,7 @@ Please note that the SVN version at any given moment may be broken.
 3. PREREQUISITES
    -------------
 
-This package relies on Net-DNS version 1.01 or later which has
+This package relies on Net-DNS version 1.08 or later which has
 features specifically designed to support Net::DNS::SEC.
 
 The availability of prerequisites for Net::DNS::SEC is tested at
@@ -181,4 +181,4 @@ DEALINGS IN THE SOFTWARE.
 
 
 ------------------------------------------------------------------------------
-$Id: README 1849 2021-08-19 08:25:20Z willem $
+$Id: README 2042 2025-12-24 10:23:11Z willem $

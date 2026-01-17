@@ -231,7 +231,8 @@ DESCRIPTION
         support lexical subs, they will be installed as a normal sub in the
         caller package. (Note that the caller package might differ from the
         class currently being built, especially in the case of Marlin::Struct
-        classes.)
+        classes.) Marlin will attempt to clean them later with
+        namespace::clean.
 
     `writer`
         Like `reader`, but a writer method.
@@ -344,22 +345,32 @@ DESCRIPTION
     
             use Marlin
               first_name => {
-                is      => 'rw',
+                is      => rw,
                 isa     => Str,
-                trigger => sub ($me) { $self->clear_full_name }
+                trigger => sub ($me) { $me->clear_full_name },
               },
               last_name => {
-                is      => 'rw',
+                is      => rw,
                 isa     => Str,
-                trigger => sub ($me) { $self->clear_full_name }
+                trigger => sub ($me) { $me->clear_full_name },
               },
               full_name => {
-                is      => 'lazy',
+                is      => lazy,
                 isa     => Str,
                 clearer => true,
-                builder => sub ($me) { join q[ ], $me->first_name, $me->last_name }
+                builder => sub ($me) {
+                  join q[ ], $me->first_name, $me->last_name;
+                },
               };
           }
+  
+          my $person = Person->new(
+            first_name  => 'Alice',
+            last_name   => 'Smith',
+          );
+          say $person->full_name;  # Alice Smith
+          $person->last_name( 'Jones' );
+          say $person->full_name;  # Alice Jones
 
         Currently if your class has any triggers, this will force any
         writers/accessors for the affected attributes to be implemented in
@@ -377,33 +388,49 @@ DESCRIPTION
     
             use Marlin
               first_name => {
-                is      => 'ro',
+                is      => ro,
                 isa     => Str,
                 writer  => 'my set_first_name',
               },
               last_name => {
-                is      => 'ro',
+                is      => ro,
                 isa     => Str,
                 writer  => 'my set_last_name',
               },
               full_name => {
-                is      => 'lazy',
+                is      => lazy,
                 isa     => Str,
-                clearer => true,
-                builder => sub ($me) { join q[ ], $me->first_name, $me->last_name }
+                clearer => 'my clear_full_name',
+                builder => sub ($me) {
+                  join q[ ], $me->first_name, $me->last_name;
+                },
               };
     
             signature_for rename => (
               method  => true,
-              named   => [ first_name => Optional[Str], last_name => Optional[Str] ],
+              named   => [
+                first_name => Optional[Str],
+                last_name  => Optional[Str],
+              ],
             );
     
             sub rename ( $self, $arg ) {
-              $self->&set_first_name($arg->first_name) if $arg->has_first_name;
-              $self->&set_last_name($arg->last_name) if $arg->has_last_name;
+              $self->&set_first_name( $arg->first_name )
+                if $arg->has_first_name;
+              $self->&set_last_name( $arg->last_name )
+                if $arg->has_last_name;
+              $self->&clear_full_name;
               return $self;
             }
           }
+  
+          my $person = Person->new(
+            first_name  => 'Alice',
+            last_name   => 'Smith',
+          );
+          say $person->full_name;  # Alice Smith
+          $person->rename( last_name => 'Jones' );
+          say $person->full_name;  # Alice Jones
 
     `handles` and `handles_via`.
         Method delegation.
@@ -481,7 +508,10 @@ DESCRIPTION
               };
           }
   
-          my $bob = Local::User->new( username => 'bd', password => 'zi1ch' );
+          my $bob = Local::User->new(
+            username => 'bd',
+            password => 'zi1ch',
+          );
   
           die if exists $bob->{password};   # will not die
           die if $bob->can('password');     # will not die
@@ -509,6 +539,81 @@ DESCRIPTION
 
         Marlin supports three storage methods for attributes: "HASH" (the
         default), "PRIVATE" (as above), and "NONE" (only used for constants).
+
+    `extends`
+        Indicates that this attribute extends or modifies an attribute
+        inherited from a parent class or role.
+
+          package Local::Person {
+            use Types::Common -types;
+            use Marlin
+              name => NonEmptyStr,
+              age  => PositiveOrZeroNum;
+          }
+  
+          package Local::Employee {
+            use Types::Common -types;
+            use Marlin::Util qw( true false );
+    
+            use Marlin
+              -base => 'Local::Person',
+              # Require name for employees.
+              name => {
+                extends  => true,
+                required => true,
+              },
+              # We only employ adults.
+              age => {
+                extends  => true,
+                required => true,
+                isa      => NumRange[ 18, undef ]
+              };
+          }
+
+        A shortcut for `extends` is a leading plus sign.
+
+          package Local::Employee {
+            use Types::Common -types;
+            use Marlin -base => 'Local::Person',
+              '+name!',                          # Required
+              '+age!' => NumRange[ 18, undef ];  # Adults only
+          }
+
+        Marlin limits what changes child classes are allowed to make to the
+        API they inherited from their parents. Some of the limitations:
+
+        *   Optional attributes can be made required, but required attributes
+            cannot be made optional unless you also provide a default/builder.
+
+        *   Type constraints can be made more strict, but not looser. Type
+            coercions can be enabled by child classes but not disabled if
+            they're already enabled in the parent class.
+
+        *   Accessor-like methods (reader, writer, accessor, clearer,
+            predicate) can be added, but accessors defined in parent classes
+            cannot be replaced or removed.
+
+        *   Attribute storage type cannot be changed.
+
+        *   The auto_deref status cannot be changed.
+
+        In the rare case where an attribute has an option which you wish to
+        delete, you can use $Marlin::Attribute::NONE.
+
+          package Local::ChildClass {
+  
+            use Marlin::Attribute ();
+            use Marlin::Util -all;
+    
+            use Marlin
+              -base => "Local::ParentClass",
+              # Parent class defined a default for this attribute
+              someattr => {
+                extends  => true,
+                required => true,
+                default  => $Marlin::Attribute::NONE,
+              };
+          }
 
     `documentation`
         Does nothing, but you can put a string of documentation for an

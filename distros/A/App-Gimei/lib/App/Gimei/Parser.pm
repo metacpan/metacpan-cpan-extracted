@@ -108,3 +108,5 @@ sub rendering ( $self, $tokens_ref ) {
 
     return $rendering;
 }
+
+1;

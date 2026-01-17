@@ -78,7 +78,7 @@ subtest 'should have access to log method' => sub {
 subtest 'should catch and log errors' => sub {
 	$logged = '';    # Clear buffer
 
-	http [$app, raise_app_exceptions => false], GET '/test-error';
+	http $app, GET '/test-error';
 	http_status_is 500;
 
 	like $logged, qr/^\[.+\] \[ERROR\] Test error$/m, 'error message captured';

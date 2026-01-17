@@ -1,3 +1,18 @@
+2.21  2026-01-17
+
+  - Fix delpaths handling for boolean-keyed segments and stable deletion
+    ordering, with added test coverage for boolean paths.
+
+2.20  2026-01-17
+
+  - Validate has() array indices to require numeric scalar integers and add
+    regression coverage for numeric-string and fractional inputs.
+
+2.19  2026-01-17
+
+  - Ensure try/catch parsing does not treat field names like .catch as a catch
+    clause, and add regression coverage.
+
 2.18  2026-01-16
 
   - Improve from_entries() to handle numeric keys by normalizing them to strings,

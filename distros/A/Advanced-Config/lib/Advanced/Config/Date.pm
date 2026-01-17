@@ -1,5 +1,5 @@
 ###
-###  Copyright (c) 2018 - 2025 Curtis Leach.  All rights reserved.
+###  Copyright (c) 2018 - 2026 Curtis Leach.  All rights reserved.
 ###
 ###  Module: Advanced::Config::Date
 
@@ -21,7 +21,7 @@ it's perfectly OK to use this module directly if you wish.
 
 It's main job is to handle parsing dates passed in various formats and languages
 while returning it in the standardized format of: S<YYYY-MM-DD>.  Hiding all the
-messy logic of how to interprit any given date string.
+messy logic of how to interpret any given date string.
 
 =head1 MULTI-LANGUAGE SUPPORT
 
@@ -35,13 +35,13 @@ You have to explicitly allow languages that require the use of I<Wide Chars>.
 Otherwise they are not supported.
 
 If a language is defined in both modules, it will merge the data together.
-Since both modules sometimes give extra information that can be usefull in
+Since both modules sometimes give extra information that can be useful in
 parsing a date..
 
 =head1 FOUR-DIGIT VS TWO-DIGIT YEARS IN A DATE
 
 This module will accept both 4-digit and 2-digit years in the dates it parses.
-But two-digit years are inheritly ambiguous if you aren't given the expected
+But two-digit years are inherently ambiguous if you aren't given the expected
 format up front.  So 2-digit years generate more unreliability in the parsing
 of any dates by this module.
 
@@ -82,7 +82,7 @@ use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
 use Fred::Fish::DBUG 2.09 qw / on_if_set  ADVANCED_CONFIG_FISH /;
-$VERSION = "1.12";
+$VERSION = "1.14";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( get_languages
@@ -95,6 +95,13 @@ $VERSION = "1.12";
               init_special_date_arrays
               _date_language_installed
               _date_manip_installed
+              _validate_date_str
+              is_leap_year
+              calc_hundred_year_date
+              calc_day_of_week
+              convert_hyd_to_date_str
+              calc_day_of_year
+              adjust_date_str
             );
 
 @EXPORT_OK = qw( );
@@ -669,7 +676,7 @@ sub _select_language
 
 This method allows you to change the I<$language> used when this module parses
 a date string if you have modules L<Date::Language> and/or L<Date::Manip>
-installled.  But if neiher are installed, only dates in B<English> are
+installed.  But if neither are installed, only dates in B<English> are
 supported.  If a language is defined in both places the results are merged.
 
 It always returns the active language.  So if I<$language> is B<undef> or
@@ -679,13 +686,14 @@ language was successfully changed, it will return the new I<$language> instead.
 Should the change fail and I<$give_warning> is set to a non-zero value, it will
 write a warning to your screen telling you why it failed.
 
-So assuming one of the language modules are intalled, it asks it for the list of
-months in the requested language.  And once that list is retrieved only months
-in that language are supported when parsing a date string.
+So assuming one of the language modules are installed, it asks it for the list
+of months in the requested language.  And once that list is retrieved only
+months in that language are supported when parsing a date string.
 
-Languages like 'Greek' that rely on I<Wide Chars> require the I<$wide> flag set to
-true.   Otherwise that language is disabled.  Using the I<use_ut8> option when
-creating the Advanced::Config object causes the I<$wide> flag to be set to B<1>.
+Languages like 'Greek' that rely on I<Wide Chars> require the I<$wide> flag set
+to true.   Otherwise that language is disabled.  Using the I<use_ut8> option
+when creating the Advanced::Config object causes the I<$wide> flag to be set to
+B<1>.
 
 =cut
 
@@ -1438,7 +1446,7 @@ sub _check_if_good_date
       if ( 1 <= $day && $day <= $days_in_months[$month] ) {
          ;  # It's a good date ...
       } elsif ( $month == 2 && $day == 29 ) {
-         my $leap = ($year % 4 == 0) && ($year % 100 != 0 || $year % 400 == 0);
+         my $leap = _is_leap_year ($year);
          $year = undef  unless ( $leap );
       } else {
          $year = undef;
@@ -1573,7 +1581,7 @@ Used whenever this module needs to convert a two-digit year into a four-digit
 year.
 
 When it converts YY into YYYY, it will assume 20YY unless the
-resulting date is more that B<30> years in the future.  Then it's 19YY.
+resulting date is more than B<30> years in the future.  Then it's 19YY.
 
 If you don't like this rule, use B<adjust_future_cutoff> to change
 this limit!
@@ -1612,7 +1620,7 @@ valid date.
    (3) DDMMYYYY - European
 
 The I<$order> argument helps deal with ambiguities in the date.  Its a comma
-seperated list of numbers specifying to order to try out.  Ex: 3,2,1 means
+separated list of numbers specifying to order to try out.  Ex: 3,2,1 means
 try out the European date format 1st, then the American date format 2nd, and
 finally the ISO format 3rd.  You could also just say I<$order> is B<3> and
 only accept European dates.
@@ -1662,7 +1670,7 @@ sub parse_8_digit_date
          DBUG_PRINT ("INFO", "Validating if using %s format.", $lbls[$id]);
           my $max = $days_in_months[$m];
           if ( $m == 2 ) {
-             my $leap = ($y % 4 == 0) && ($y % 100 != 0 || $y % 400 == 0);
+             my $leap = _is_leap_year ($y);
              ++$max  if ( $leap );
           }
 
@@ -1690,7 +1698,7 @@ valid date.
    (3) DDMMYY - European
 
 The I<$order> argument helps deal with ambiguities in the date.  Its a comma
-seperated list of numbers specifying to order to try out.  Ex: 2,3,1 means
+separated list of numbers specifying to order to try out.  Ex: 2,3,1 means
 try out the American date format 1st, then the European date format 2nd, and
 finally the ISO format 3rd.  You could also just say I<$order> is B<2> and
 only accept European dates.
@@ -1748,7 +1756,7 @@ sub parse_6_digit_date
 
             my $max = $days_in_months[$m];
             if ( $m == 2 ) {
-               my $leap = ($y % 4 == 0) && ($y % 100 != 0 || $y % 400 == 0);
+               my $leap = _is_leap_year ($y);
                ++$max  if ( $leap );
             }
 
@@ -1771,7 +1779,7 @@ sub parse_6_digit_date
 Prefers getting the date names from I<Date::Manip::Lang::${lang}> for the
 I<Advanced::Config> special date variables.  But if the language isn't supported
 by that module it tries I<Date::Language::${lang}> instead.  This is because
-the 1st module is more consistant.
+the 1st module is more consistent.
 
 If the I<$lang> doesn't exist, then it returns the arrays for the last valid
 language.
@@ -1781,7 +1789,7 @@ there were issues in changing the language used.
 
 I<$mode> tells how to return the various arrays:
 
-   1 - Abreviated month/weekday names in the requested language.
+   1 - Abbreviated month/weekday names in the requested language.
    2 - Full month/weekday names in the requested language.
    Any other value and it will return the numeric values. (default)
 
@@ -1881,6 +1889,336 @@ sub init_special_date_arrays
 
 # ==============================================================
 
+sub _is_leap_year
+{
+   my $year = shift;
+   my $leap = ($year % 4 == 0) && ($year % 100 != 0 || $year % 400 == 0);
+   return ($leap ? 1 : 0);
+}
+
+# ==============================================================
+
+# Validate the input date.
+sub _validate_date_str
+{
+   DBUG_ENTER_FUNC ( @_ );
+   my $date_str = shift;
+
+   my ($year, $mon, $day);
+   if ( defined $date_str && $date_str =~ m/^(\d+)-(\d+)-(\d+)$/ ) {
+      ($year, $mon, $day) = ($1, $2, $3);
+      my $leap = _is_leap_year ($year);
+      local $days_in_months[2] = $leap ? 29 : 28;
+      unless ( 1 <= $mon && $mon <= 12 &&
+	       1 <= $day && $day <= $days_in_months[$mon] ) {
+         return DBUG_RETURN ( undef, undef, undef );
+      }
+   } else {
+      return DBUG_RETURN ( undef, undef, undef );
+   }
+
+   DBUG_RETURN ( $year, $mon, $day );
+}
+
+# ==============================================================
+
+=item $bool = is_leap_year ( $year );
+
+Returns B<1> if I<$year> is a Leap Year, else B<0> if it isn't.
+
+=cut
+
+sub is_leap_year
+{
+   DBUG_ENTER_FUNC ( @_ );
+   DBUG_RETURN ( _is_leap_year (@_) );
+}
+
+# ==============================================================
+
+=item $hyd = calc_hundred_year_date ( $date_str );
+
+Takes a date string in B<YYYY-MM-DD> format and returns the number of days since
+B<1899-12-31>.  (Which is HYD B<0>.)   It should be compatible with DB2's data
+type of the same name.  Something like this function is needed if you wish to be
+able to do date math.
+
+For example:
+
+   1 : 2026-01-01 - 2025-12-30 = 2 days.
+   2 : 2025-12-31 + 10 = 2026-01-10.
+   2 : 2025-12-31 - 2 = 2025-12-29.
+
+If the given date string is invalid it will return B<undef>.
+
+=cut
+
+sub calc_hundred_year_date
+{
+   DBUG_ENTER_FUNC ( @_ );
+   my $date_str = shift;
+
+   # Validate the input date.
+   my ($end_year, $month, $day) = _validate_date_str ($date_str);
+   unless (defined $end_year) {
+      return DBUG_RETURN ( undef );
+   }
+
+   my $hyd = 0;
+   my $start_year = 1899;
+
+   if ( $end_year >  $start_year ) {
+      for (my $year = $start_year + 1; $year < $end_year; ++$year) {
+         my $leap = _is_leap_year ($year);
+	 $hyd += $leap ? 366 : 365;
+      }
+      $hyd += calc_day_of_year ($date_str, 0);
+
+   } else {        # $hyd <= 0 ...
+      for (my $year = $start_year; $year > $end_year; --$year) {
+         my $leap = _is_leap_year ($year);
+	 $hyd -= $leap ? 366 : 365;
+      }
+      $hyd -= calc_day_of_year ($date_str, 1);
+   }
+
+   DBUG_RETURN ($hyd);
+}
+
+# ==============================================================
+
+=item $dow = calc_day_of_week ( $date_str );
+
+Takes a date string in B<YYYY-MM-DD> format and returns the day of the week it
+falls on.  It returns a value between B<0> and B<6> for Sunday to Saturday.
+
+If the given date is invalid it will return B<undef>.
+
+=item $dow = calc_day_of_week ( $hyd );
+
+It takes an integer as a Hundred Year Date and returns the day of the week it
+falls on.  It returns a value between B<0> and B<6> for Sunday to Saturday.
+
+If the given hyd is not an integer it will return B<undef>.
+
+=cut
+
+sub calc_day_of_week
+{
+   DBUG_ENTER_FUNC ( @_ );
+   my $date_str = shift;     # or a HYD ...
+
+   my $hyd;
+   if ( defined $date_str && $date_str =~ m/^[-]?\d+$/ ) {
+      $hyd = $date_str;
+   } else {
+      $hyd = calc_hundred_year_date ( $date_str );
+   }
+
+   unless (defined $hyd) {
+      return DBUG_RETURN ( undef );
+   }
+
+   my $start_dow = 0;    # $hyd 0, 1899-12-31, falls on a Sunday.
+
+   my $dow = ($hyd + $start_dow) % 7;
+
+   DBUG_RETURN ($dow);
+}
+
+# ==============================================================
+
+=item $date_str = convert_hyd_to_date_str ( $hyd );
+
+It takes an integer as a Hundred Year Date and converts it into a date string
+in the format of B<YYYY-MM-DD> and returns it.
+
+If the given hyd is not an integer it will return B<undef>.
+
+=cut
+
+sub convert_hyd_to_date_str
+{
+   DBUG_ENTER_FUNC ( @_ );
+   my $target_hyd = shift;
+
+   unless ( defined $target_hyd && $target_hyd =~ m/^[-]?\d+$/ ) {
+      return DBUG_RETURN ( undef );
+   }
+
+   my $date_str;
+   my $start_year = 1899;          # HYD of 0 is 1899-12-31
+   my $hyd_total = 0;
+   my $days = 0;
+   my ($leap, $year);
+
+   if ( $target_hyd > 0 ) {
+      for ($year = $start_year + 1; 1==1; ++$year) {
+         $leap = _is_leap_year ($year);
+	 $days = $leap ? 366 : 365;
+	 if ( ($hyd_total + $days) >= $target_hyd ) {
+	    last;
+	 }
+	 $hyd_total += $days;
+      }
+      local $days_in_months[2] = $leap ? 29 : 28;
+      for (1..12) {
+	 $days = $days_in_months[$_];
+	 if ( ($hyd_total + $days) >= $target_hyd ) {
+	    my $diff = $target_hyd - $hyd_total;
+	    $date_str = sprintf ("%04d-%02d-%02d", $year, $_, $diff);
+	    last;
+	 }
+	 $hyd_total += $days;
+      }
+
+   } else {        # $target_hyd <= 0.
+      for ($year = $start_year; 1==1; --$year) {
+         $leap = _is_leap_year ($year);
+	 $days = $leap ? 366 : 365;
+	 if ( ($hyd_total - $days) <= $target_hyd ) {
+	    last;
+	 }
+	 $hyd_total -= $days;
+      }
+      local $days_in_months[2] = $leap ? 29 : 28;
+      for (reverse 1..12) {
+	 $days = $days_in_months[$_];
+	 if ( ($hyd_total - $days) <= $target_hyd ) {
+	    my $diff = $target_hyd - $hyd_total;
+	    my $ans = $diff +  $days;
+
+DBUG_PRINT("-FINAL-", "Target: %d, Current: %d, Diff: %d, Year: %d/%02d, Day: %02d", $target_hyd, $hyd_total, $diff, $year, $_,  $ans);
+
+	    if ($ans) {
+	       $date_str = sprintf ("%04d-%02d-%02d", $year, $_, $ans);
+	    } elsif ( $_ == 1 ) {
+	       $ans = $days_in_months[12];
+	       $date_str = sprintf ("%04d-%02d-%02d", $year - 1, 12, $ans);
+	    } else {
+	       $ans = $days_in_months[$_ - 1];
+	       $date_str = sprintf ("%04d-%02d-%02d", $year, $_ - 1, $ans);
+	    }
+	    last;
+	 }
+	 $hyd_total -= $days;
+
+DBUG_PRINT("MONTHLY", "Target: %d, Current: %d, Year: %d/%02d", $target_hyd, $hyd_total, $year, $_);
+      }
+   }
+
+   DBUG_RETURN ($date_str);
+}
+
+# ==============================================================
+
+=item $doy = calc_day_of_year ( $date_str[, $remainder_flag] );
+
+Takes a date string in B<YYYY-MM-DD> format and returns the number of days since
+the begining of the year.  With January 1st being day B<1>.
+
+If the remainder_flag is set to a no-zero value, it returns the number of days
+left in the year.  With December 31st being B<0>.
+
+If the given date is invalid it will return B<undef>.
+
+=cut
+
+sub calc_day_of_year
+{
+   DBUG_ENTER_FUNC ( @_ );
+   my $date_str       = shift;
+   my $remainder_flag = shift || 0;
+
+   # Validate the input date.
+   my ($year, $month, $day) = _validate_date_str ($date_str);
+   unless (defined $year) {
+      return DBUG_RETURN ( undef );
+   }
+
+   my $leap = _is_leap_year ($year);
+   local $days_in_months[2] = $leap ? 29 : 28;
+
+   my $doy = 0;
+   for (my $m = 0; $m < $month; ++$m) {
+      $doy += $days_in_months[$m];
+   }
+   $doy += $day;
+
+   if ($remainder_flag) {
+      my $total_days_in_year = $leap ? 366 : 365;
+      $doy = $total_days_in_year - $doy;
+   }
+
+   DBUG_RETURN ($doy);
+}
+
+# ==============================================================
+
+=item $date_str = adjust_date_str ( $date_str, $years, $months );
+
+Takes a date string in B<YYYY-MM-DD> format and adjusts it by the given number
+of months and years.  It returns the new date in B<YYYY-MM-Dd> format.
+
+It does its best to preserve the day of month, but if it would exceed the number
+of days in a month, it will truncate to the end of month.  Not round to the next
+month.
+
+Returns I<undef> if passed bad arguments.
+
+=cut
+
+sub adjust_date_str
+{
+   DBUG_ENTER_FUNC ( @_ );
+   my $date_str   = shift;
+   my $adj_years  = shift || 0;
+   my $adj_months = shift || 0;
+
+   # Validate the input date.
+   my ($year, $month, $day) = _validate_date_str ($date_str);
+   unless (defined $year &&
+	   $adj_years =~ m/^[-]?\d+$/ && $adj_months =~ m/^[-]?\d+$/) {
+      return DBUG_RETURN ( undef );
+   }
+
+   # Adjust by month ...
+   if ( $adj_months >= 0 ) {
+      foreach (1..${adj_months}) {
+         if ( $month == 12 ) {
+            $month = 1;
+	    ++$adj_years;
+	 } else {
+            ++$month;
+	 }
+      }
+   } else {
+      foreach (1..-${adj_months}) {
+         if ( $month == 1 ) {
+            $month = 12;
+	    --$adj_years;
+	 } else {
+            --$month;
+	 }
+      }
+   }
+
+   # Adjust the years ...
+   $year += $adj_years;
+
+   # Build the returned date ...
+   my $leap = _is_leap_year ($year);
+   local $days_in_months[2] = $leap ? 29 : 28;
+   my $d = $days_in_months[$month];
+
+   $date_str = sprintf ("%04d-%02d-%02d", $year, $month,
+                                          ($day <= $d) ? $day : $d);
+
+   DBUG_RETURN ($date_str);
+}
+
+# ==============================================================
+
 =back
 
 =head1 SOME EXAMPLE DATES
@@ -1888,7 +2226,7 @@ sub init_special_date_arrays
 Here are some sample date strings in B<English> that this module can parse.
 All for Christmas 2017.  This is not a complete list of available date formats
 supported.  But should hopefully give you a starting point of what is possible.
-Remember that if a date string contains extra info arround the date part of it,
+Remember that if a date string contains extra info around the date part of it,
 that extra information is thrown away.
 
 S<12/25/2017>, B<S<Mon Dec 25th 2017 at 09:00>>, S<Mon 2017/12/25>, B<S<2017-12-25>>,
@@ -1910,7 +2248,7 @@ B<S<Lun Diciembre 25to 2017 18:05>>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2018 - 2025 Curtis Leach.  All rights reserved.
+Copyright (c) 2018 - 2026 Curtis Leach.  All rights reserved.
 
 This program is free software.  You can redistribute it and/or modify it under
 the same terms as Perl itself.

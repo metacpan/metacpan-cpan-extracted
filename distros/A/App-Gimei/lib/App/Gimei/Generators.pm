@@ -27,3 +27,5 @@ sub execute ($self) {
 sub to_list ($self) {
     return @{ $self->body };
 }
+
+1;

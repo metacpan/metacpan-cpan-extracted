@@ -9,7 +9,7 @@ use List::Util 1.45 qw( uniq );
 
 BEGIN {
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.022000';
+	our $VERSION   = '0.022001';
 	
 	if ( eval { require Types::Standard; 1 } ) {
 		Types::Standard->import(
@@ -394,7 +394,6 @@ sub inheritance_stuff {
 				$META{$package}{foreignclass}         = $parent;
 				$META{$package}{foreignconstructor}   = \&{"${parent}::new"};
 				$META{$package}{foreignbuildall}      = $parent->can('BUILDALL');
-				$META{$package}{foreignbuildargs}     = $parent->can('BUILDARGS');
 			}
 			last;
 		}

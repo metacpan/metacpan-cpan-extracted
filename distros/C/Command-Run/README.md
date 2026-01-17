@@ -28,7 +28,7 @@ Command::Run - Execute external command or code reference
     print "error: ", $result->{error};
 
     # Access output via file descriptor path
-    my $cmd = Command::Run->new('date');
+    my $cmd = Command::Run->new(command => ['date']);
     $cmd->update;
     system("cat", $cmd->path);  # /dev/fd/N
 
@@ -40,13 +40,13 @@ Command::Run - Execute external command or code reference
 
     # Using with() method
     my ($out, $err);
-    Command::Run->new("command", @args)
+    Command::Run->new->command("command", @args)
         ->with(stdin => $input, stdout => \$out, stderr => \$err)
         ->run;
 
 # VERSION
 
-Version 0.9901
+Version 0.9902
 
 # DESCRIPTION
 
@@ -66,21 +66,18 @@ which can be used as a file argument to external commands.
 # CONSTRUCTOR
 
 - **new**(%parameters)
-- **new**(@command)
 
-    Create a new Command::Run object.  Parameters can be passed as
-    key-value pairs (see ["PARAMETERS"](#parameters)), or a command can be passed
-    directly:
+    Create a new Command::Run object.  Parameters are passed as
+    key-value pairs (see ["PARAMETERS"](#parameters)):
 
-        # Parameters style
         my $runner = Command::Run->new(
             command => \@command,
             stdin   => $input_data,
             stderr  => 'redirect',
         );
 
-        # Direct command style
-        my $runner = Command::Run->new('ls', '-l');
+        # Or use method chaining
+        my $runner = Command::Run->new->command('ls', '-l');
 
 # PARAMETERS
 

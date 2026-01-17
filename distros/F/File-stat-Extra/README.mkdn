@@ -4,7 +4,7 @@ File::stat::Extra - An extension of the File::stat module, provides additional m
 
 # VERSION
 
-version 0.008
+version 0.009
 
 # SYNOPSIS
 
@@ -37,7 +37,7 @@ functions, replacing them with versions that return
 context the same 13 item list is returned as with the original `stat`
 and `lstat` functions.
 
-`File::stat::Extra` is an extension of the [File::stat](https://metacpan.org/pod/File::stat)
+`File::stat::Extra` is an extension of the [File::stat](https://metacpan.org/pod/File%3A%3Astat)
 module.
 
 - Returns non-object result in list context.
@@ -95,7 +95,7 @@ returned with the methods as outlined below.
 ## blocks
 
 These methods provide named acced to the same fields in the original
-`stat` result. Just like the original [File::stat](https://metacpan.org/pod/File::stat).
+`stat` result. Just like the original [File::stat](https://metacpan.org/pod/File%3A%3Astat).
 
 ## cando( _ACCESS_, _EFFECTIVE_ )
 
@@ -246,17 +246,17 @@ feature.
 
 # COMPATIBILITY
 
-As with [File::stat](https://metacpan.org/pod/File::stat), you can no longer use the implicit `$_` or the
+As with [File::stat](https://metacpan.org/pod/File%3A%3Astat), you can no longer use the implicit `$_` or the
 special filehandle `_` with this module's versions of `stat` and
 `lstat`.
 
 Currently `File::stat::Extra` only provides an object interface, the
-[File::stat](https://metacpan.org/pod/File::stat) `$st_*` variables and `st_cando` funtion are not
+[File::stat](https://metacpan.org/pod/File%3A%3Astat) `$st_*` variables and `st_cando` funtion are not
 available. This may change in a future version of this module.
 
 # SEE ALSO
 
-- [File::stat](https://metacpan.org/pod/File::stat) for the module for which `File::stat::Extra` is the extension.
+- [File::stat](https://metacpan.org/pod/File%3A%3Astat) for the module for which `File::stat::Extra` is the extension.
 - [stat](https://metacpan.org/pod/stat) and [lstat](https://metacpan.org/pod/lstat) for the original `stat` and `lstat` functions.
 
 # AUTHOR

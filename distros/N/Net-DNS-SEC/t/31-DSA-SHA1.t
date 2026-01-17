@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 31-DSA-SHA1.t 1937 2023-09-11 09:27:16Z willem $	-*-perl-*-
+# $Id: 31-DSA-SHA1.t 2042 2025-12-24 10:23:11Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -26,7 +26,7 @@ plan skip_all => "disabled DSA"
 plan skip_all => "disabled SHA1"
 		unless eval { Net::DNS::SEC::libcrypto->can('EVP_sha1') };
 
-plan tests => 13;
+plan tests => 15;
 
 
 my %filename;
@@ -41,6 +41,10 @@ END {
 use_ok('Net::DNS::SEC');
 use_ok('Net::DNS::SEC::Private');
 use_ok( my $class = 'Net::DNS::SEC::DSA' );
+
+ok( scalar( $class->_index() ), "algorithm index for $class" );
+
+ok( scalar( $class->_deprecate() ), "deprecation list for $class" );
 
 
 my $key = Net::DNS::RR->new( <<'END' );

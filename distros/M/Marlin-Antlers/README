@@ -37,6 +37,8 @@ DESCRIPTION
 
     Everything is exported lexically.
 
+    Marlin::Antlers imports namespace::autoclean for you.
+
     Marlin::Antlers also enables strict and warnings, plus switches on the
     following Perl features: signatures, postderef, lexical_subs, current_sub,
     evalbytes, fc, say, state, unicode_eval, and unicode_strings. It requires

@@ -448,14 +448,70 @@ sub _apply_delpaths {
     }
 
     my $clone = _deep_clone($value);
+    my @ordered = _sort_paths_for_deletion(@paths);
 
-    for my $path (@paths) {
+    for my $path (@ordered) {
         next unless ref $path eq 'ARRAY';
         next unless @$path;
         _delete_path_inplace($clone, [@$path]);
     }
 
     return $clone;
+}
+
+sub _sort_paths_for_deletion {
+    my (@paths) = @_;
+
+    return sort {
+        my $depth_cmp = @$b <=> @$a;
+        return $depth_cmp if $depth_cmp;
+
+        my $prefix_cmp = _path_prefix_key($a) cmp _path_prefix_key($b);
+        return $prefix_cmp if $prefix_cmp;
+
+        return _compare_path_segments($b->[-1], $a->[-1]);
+    } @paths;
+}
+
+sub _path_prefix_key {
+    my ($path) = @_;
+
+    return '' if !$path || @$path < 2;
+
+    my @segments = @$path[0 .. $#$path - 1];
+    return join "\x1f", map { _path_segment_key($_) } @segments;
+}
+
+sub _path_segment_key {
+    my ($segment) = @_;
+
+    return 'undef' if !defined $segment;
+
+    if (ref($segment) eq 'JSON::PP::Boolean') {
+        return $segment ? 'bool:true' : 'bool:false';
+    }
+
+    return ref $segment ? 'ref:' . ref($segment) : "scalar:$segment";
+}
+
+sub _compare_path_segments {
+    my ($left, $right) = @_;
+
+    if (_is_numeric_segment($left) && _is_numeric_segment($right)) {
+        return _numeric_segment_value($left) <=> _numeric_segment_value($right);
+    }
+
+    return _path_segment_key($left) cmp _path_segment_key($right);
+}
+
+sub _numeric_segment_value {
+    my ($segment) = @_;
+
+    if (ref($segment) eq 'JSON::PP::Boolean') {
+        return $segment ? 1 : 0;
+    }
+
+    return int($segment);
 }
 
 sub _deep_clone {
@@ -481,7 +537,8 @@ sub _delete_path_inplace {
     my $cursor = $value;
     for my $segment (@segments) {
         if (ref $cursor eq 'HASH') {
-            my $key = defined $segment ? "$segment" : return;
+            my $key = _coerce_hash_key($segment);
+            return unless defined $key;
             return unless exists $cursor->{$key};
             $cursor = $cursor->{$key};
             next;
@@ -498,7 +555,8 @@ sub _delete_path_inplace {
     }
 
     if (ref $cursor eq 'HASH') {
-        my $key = defined $last ? "$last" : return;
+        my $key = _coerce_hash_key($last);
+        return unless defined $key;
         delete $cursor->{$key};
         return;
     }
@@ -1931,7 +1989,11 @@ sub _apply_has {
     }
 
     if (ref $value eq 'ARRAY') {
-        return JSON::PP::false unless looks_like_number($needle);
+        return JSON::PP::false if ref $needle;
+
+        my $sv = B::svref_2object(\$needle);
+        my $flags = $sv->FLAGS;
+        return JSON::PP::false unless ($flags & (B::SVp_IOK() | B::SVp_NOK()));
 
         my $index = int($needle);
         return ($index >= 0 && $index < @$value)

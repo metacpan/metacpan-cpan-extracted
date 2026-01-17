@@ -8,6 +8,8 @@ use HTTP::Request::Common;
 # to the "configure" logic
 ################################################################################
 
+my @build_order;
+
 package LoadingTestController {
 	use Mooish::Base -standard;
 
@@ -20,6 +22,8 @@ package LoadingTestController {
 				to => 'test',
 			}
 		);
+
+		push @build_order, __PACKAGE__;
 	}
 
 	sub test ($self, $ctx)
@@ -37,11 +41,13 @@ package LoadingTestModule {
 	{
 		weaken $self;
 
-		$self->register(
+		$self->add_method(
 			controller => module_method => sub ($controller) {
 				return 'module: ' . ($self->config->{test_option} // 'default');
 			}
 		);
+
+		push @build_order, __PACKAGE__;
 	}
 }
 
@@ -57,6 +63,8 @@ package ConfigApp {
 				to => 'test',
 			}
 		);
+
+		push @build_order, __PACKAGE__;
 	}
 
 	sub test ($self, $ctx)
@@ -101,6 +109,8 @@ subtest 'should load modules from config' => sub {
 };
 
 subtest 'should load both controllers and modules from config' => sub {
+	@build_order = ();
+
 	my $app = ConfigApp->new(
 		initial_config => {
 			controllers => [
@@ -113,6 +123,8 @@ subtest 'should load both controllers and modules from config' => sub {
 			},
 		},
 	);
+
+	is \@build_order, ['LoadingTestModule', 'ConfigApp', 'LoadingTestController'], 'load order ok';
 
 	http $app, GET '/from-config';
 	http_status_is 200;

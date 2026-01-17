@@ -98,9 +98,9 @@ subtest 'should not render /consumed' => sub {
 };
 
 subtest 'should not render /bad' => sub {
-	http [$app, raise_app_exceptions => false], GET '/bad';
+	http $app, GET '/bad';
 	http_status_is 500;
-	like http->exception, qr/\Qforgot await?\E/, 'exception ok';
+	like http->text, qr/\Qforgot await?\E/, 'exception ok';
 };
 
 done_testing;

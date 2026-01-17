@@ -101,7 +101,7 @@ BEGIN {
 	}
 }
 
-our $VERSION = "0.012";
+our $VERSION = "0.013";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(

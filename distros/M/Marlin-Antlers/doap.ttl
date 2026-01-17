@@ -17,14 +17,16 @@
 		doap-deps:on "B::Hooks::AtRuntime"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Class::Method::Modifiers"^^doap-deps:CpanId;
-	], [ doap-deps:on "Exporter::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "Marlin 0.012001"^^doap-deps:CpanId ], [ doap-deps:on "Role::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Types::Common"^^doap-deps:CpanId ];
-	doap-deps:test-requirement [
+	], [ doap-deps:on "Exporter::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "Marlin 0.016000"^^doap-deps:CpanId ], [
+		doap-deps:on "namespace::autoclean"^^doap-deps:CpanId;
+	], [ doap-deps:on "Role::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Types::Common"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test2::Tools::Spec"^^doap-deps:CpanId ], [
 		doap-deps:on "Test2::Require::AuthorTesting"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Test2::Require::Module"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Test2::Plugin::BailOnFail"^^doap-deps:CpanId;
-	], [ doap-deps:on "Test2::V0"^^doap-deps:CpanId ], [ doap-deps:on "Test2::Tools::Spec"^^doap-deps:CpanId ];
+	], [ doap-deps:on "Test2::V0"^^doap-deps:CpanId ];
 	doap:bug-database    <https://github.com/tobyink/p5-marlin-antlers/issues>;
 	doap:created         "2026-01-09"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -34,7 +36,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Marlin-Antlers";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Marlin-Antlers/v_0-001000>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Marlin-Antlers/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Marlin-Antlers/v_0-002000>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-marlin-antlers>;
@@ -49,6 +51,14 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-Antlers-0.001000.tar.gz>;
 	doap:revision        "0.001000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Marlin-Antlers/v_0-002000>
+	a                    doap:Version;
+	dc:identifier        "Marlin-Antlers-0.002000"^^xsd:string;
+	dc:issued            "2026-01-16"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-Antlers-0.002000.tar.gz>;
+	doap:revision        "0.002000"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

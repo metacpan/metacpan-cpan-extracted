@@ -1,5 +1,5 @@
 ###
-###  Copyright (c) 2007 - 2025 Curtis Leach.  All rights reserved.
+###  Copyright (c) 2007 - 2026 Curtis Leach.  All rights reserved.
 ###
 ###  Module: Advanced::Config::Options
 
@@ -25,11 +25,11 @@ module.  So you are not expected to ever call any of these methods yourself.
 It's here mainly as an FYI.
 
 If you don't specify the options below, this module will assume you wish to use
-the default behaviour for that option.  So only override what you need to.
+the default behavior for that option.  So only override what you need to.
 Also all options are in lower case.  But you may provide them in mixed case if
 you wish.  This module will auto downshift them for you.
 
-If an option is mispelled, or you don't provide a valid value, a warning will
+If an option is misspelled, or you don't provide a valid value, a warning will
 be written to the screen and that option will be ignored.
 
 =head1 ==================================================================
@@ -108,8 +108,8 @@ variable expansion in your config files when they are loaded into memory.
 B<disable_variable_modifiers> - Defaults to B<0>.  Set to B<1> if you want to
 disable this feature.  See L<http://wiki.bash-hackers.org/syntax/pe> for more
 details.  This feature allows you to put logic into your config files via
-your variable definitions.  Automtaically disabled when variables are
-disabled.  Usefull when you put a lot of special chars into your variable
+your variable definitions.  Automatically disabled when variables are
+disabled.  Useful when you put a lot of special chars into your variable
 names.
 
 B<disable_decryption> - Defaults to B<0>.  Set to B<1> if you want to disable
@@ -132,7 +132,7 @@ ignores the recursion request to prevent infinite loops.
 B<source_cb_opts> - A work area for holding values between calls to the
 callback function.  This is expected to be a hash reference to provide any
 needed configuration values needed to parse the next config file.  This way
-you can avoid global varibles.  Defaults to an empty hash reference.
+you can avoid global variables.  Defaults to an empty hash reference.
 
 B<source_cb> - An optional callback routine called each time your config file
 sources in another config file.  It's main use is when the I<Read Options>
@@ -152,7 +152,7 @@ Here is the callback function's expected definition:
   $cbOpts --> A hash reference containing values needed by your callback
               function to decide what options are required to source in the
               requested file.  You may update the contents of this hash to
-              perserve info between calls.  This module will "never" examine
+              preserve info between calls.  This module will "never" examine
               the contents of this hash!
 
   $rOpts --> A reference to the "Read Options" hash used to parse the file
@@ -179,7 +179,7 @@ characters that will never match anything in your config files.  Such as
 =over 4
 
 B<assign> - Defaults to B<=>.  You may use this option to override what string
-of characters make up the assignemnt operator.  It's used to split a line
+of characters make up the assignment operator.  It's used to split a line
 into a tag/value pair.  If you want the special case of no separator, IE the
 first space separates a tag/value pair, try setting it to B<\\s> since the
 interface doesn't allow whitespace as a value.
@@ -195,7 +195,7 @@ instruction to source in another config file (similar to how it works in a
 I<Unix> shell script.)  Another common setting for this option is "include".
 
 B<section_left> & B<section_right> - This pair is used to anchor breaking
-your config file into multiple independant sections.  The defaults are B<[>
+your config file into multiple independent sections.  The defaults are B<[>
 and B<]>.
 
 B<variable_left> & B<variable_right> - This pair is used to anchor a variable
@@ -233,7 +233,7 @@ it will match "B<# Please EXPORT me.>", but won't match "B<# EXPORTED>".  This
 allows you to put multiple labels in a single comment if needed.
 
 As long as the text is surrounded by white space or punctuation a match will
-be found.  It is strongly recomended that you don't use punctuation in your
+be found.  It is strongly recommended that you don't use punctuation in your
 label when you override one with values of your own.
 
 Here are the labels you may override.
@@ -299,21 +299,21 @@ the config file just by writing a perl program that uses this module.
 But by using the options below, you gain additional security even without using
 true encryption.  Since if you don't know the options used, you can't easily
 decode each tag's value even by examining the code.  Just be aware that using
-too many keys with too similar values could cancel each other out and weeken
+too many keys with too similar values could cancel each other out and weaken
 the results.
 
 These options are ignored if you've disabled decryption.
 
-When you source in another file in your config files, the currrent values
+When you source in another file in your config files, the current values
 for B<alias>, B<pass_phrase> and B<encrypt_by_user> are not inherited.  But the
 remaining options are.  See option B<source_cb> if you need to set them in this
-caes.
+case.
 
 =over 4
 
 B<alias> - Defaults to the empty string.  (Meaning no alias provided.)  This
 option is used to override using the file's I<basename> as one of the
-encrytion/decryption keys with the I<basename> of the value you provide here.
+encryption/decryption keys with the I<basename> of the value you provide here.
 
 If you encrypt a file with no I<alias>, and then rename the config file, you
 must set the I<alias> to the original filename to be able to decrypt anything.
@@ -333,7 +333,7 @@ same B<pass_pharase> when you source in a sub-file in your config files.
 
 B<encrypt_by_user> - Defaults to 0 (no).  Set to 1 if you want use the user
 name you are running the program under as part of the encryption key.  So only
-the user who encryted the file can decrypt it.
+the user who encrypted the file can decrypt it.
 
 B<encrypt_cb_opts> - A work area for holding values between calls to the
 callback function.  This is expected to be a hash reference to provide any
@@ -362,7 +362,7 @@ Here is the callback function's expected definition:
 
      $cbOpts ==> A hash reference containing values needed by your function to
                  do it's custom encrypt/decrypt duties.  You may update the
-                 contents of this hash to perserve info between calls.  This
+                 contents of this hash to preserve info between calls.  This
                  module will "never" examine the contents of this hash!
 
 =back
@@ -383,8 +383,8 @@ These options can be set as global defaults via the call to the constructor,
 B<new()>, or for individual B<get_...> calls if you don't like the defaults
 for individual calls.
 
-But it is strongly recomended that the B<inherit> option only be set in the
-constructor and not changed elsewhere.  Changing it's value beween calls can
+But it is strongly recommended that the B<inherit> option only be set in the
+constructor and not changed elsewhere.  Changing its value between calls can
 cause strange behavior if you do so.  Since it globally affects how this
 module locates the requested tag and affects variable lookups when the
 config file is parsed.
@@ -485,7 +485,7 @@ gmtime.  The default is B<0>.
 =head1 FUNCTIONS
 
 As a reminder, there is no need to directly call any of the following functions.
-They are documented mostly for the benifit of the developer who uses them to
+They are documented mostly for the benefit of the developer who uses them to
 implement the internals to L<Advanced::Config>.
 
 Most of them are too specialized to be of much use to you.
@@ -502,7 +502,7 @@ use warnings;
 use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-$VERSION = "1.12";
+$VERSION = "1.14";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( get_read_opts  get_get_opts  get_date_opts
@@ -823,7 +823,7 @@ sub _get_opt_base
 
 =item $ropts = get_read_opts ( [\%user_opts[, \%current_opts]] )
 
-This method takes the I<user's> options that override the behaviour for reading
+This method takes the I<user's> options that override the behavior for reading
 in your config file by this module and merges it into the I<current> options.
 If no I<current> options hash reference is given, it will use the module's
 defaults instead.
@@ -862,7 +862,7 @@ sub get_read_opts
 
 =item $gopts = get_get_opts ( [\%user_opts[, \%current_opts]] )
 
-This method takes the I<user's> options that override the behaviour of I<get>
+This method takes the I<user's> options that override the behavior of I<get>
 methods for this module and merges it into the I<current> options.  If no
 I<current> options hash reference is given, it will use the module's defaults
 instead.
@@ -899,8 +899,8 @@ sub get_get_opts
 
 =item $dopts = get_date_opts ( [\%user_opts[, \%current_opts]] )
 
-This method takes the I<user's> options that override the behaviour of I<date>
-foramtting for this module and merges it into the I<current> options.  If no
+This method takes the I<user's> options that override the behavior of I<date>
+formatting for this module and merges it into the I<current> options.  If no
 I<current> options hash reference is given, it will use the module's defaults
 instead.
 
@@ -1329,7 +1329,7 @@ sub sensitive_cnt
 
 =item @ret = croak_helper ($opts, $croak_message, @croak_return_vals)
 
-This helper method helps standardises what to do on fatal errors when reading
+This helper method helps standardizes what to do on fatal errors when reading
 the config file or what to do if you can't find the tag on lookups.
 
 It knows I<\%opts> is a "Read" option hash if B<croak> is a member and it's
@@ -1620,7 +1620,7 @@ sub _fmt_period
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007 - 2025 Curtis Leach.  All rights reserved.
+Copyright (c) 2007 - 2026 Curtis Leach.  All rights reserved.
 
 This program is free software.  You can redistribute it and/or modify it under
 the same terms as Perl itself.

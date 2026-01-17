@@ -1,3 +1,7 @@
+0.016 2026-01-17
+  [Internal Changes]
+    * Catch up with latest Go.
+    
 0.015 2026-01-07
   [Test Chanes]
     * Catch up with latest SPVM::Go.

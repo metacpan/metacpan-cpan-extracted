@@ -4,7 +4,7 @@ use warnings;
 use 5.010; # state
 
 # ABSTRACT: Fully UTF-8 aware File::Find
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 #pod =begin :prelude
 #pod
@@ -250,7 +250,7 @@ File::Find::utf8 - Fully UTF-8 aware File::Find
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =for test_synopsis my @directories_to_search;
 

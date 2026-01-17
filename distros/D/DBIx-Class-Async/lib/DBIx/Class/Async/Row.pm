@@ -15,11 +15,11 @@ DBIx::Class::Async::Row - Asynchronous row object for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.28
+Version 0.31
 
 =cut
 
-our $VERSION = '0.28';
+our $VERSION = '0.31';
 
 =head1 SYNOPSIS
 
@@ -128,14 +128,18 @@ sub new {
     croak "Missing required argument: source_name" unless $args{source_name};
     croak "Missing required argument: row_data"    unless $args{row_data};
 
+    my $in_storage = delete $args{in_storage} // 0;
+
     my $self = bless {
         schema      => $args{schema},
         async_db    => $args{async_db},
         source_name => $args{source_name},
-        _source     => undef,  # Lazy-loaded
-        _data       => $args{row_data},
+        _source     => $args{_source}  // undef,
+        _data       => $args{row_data} // {},
+        _dirty      => {},
         _inflated   => {},
         _related    => {},
+        _in_storage => $in_storage,
     }, $class;
 
     $self->_ensure_accessors;
@@ -227,43 +231,29 @@ through the returned L<Future>.
 
 sub copy {
     my ($self, $changes) = @_;
+    $changes //= {};
 
-    $changes ||= {};
+    # 1. Get all current data from the row
+    my %data = %{ $self->{_data} || {} };
 
-    my $source_name   = $self->{source_name};
-    my $result_source = $self->result_source;
-    my $columns_info  = $result_source->columns_info;
-    my %all_data      = $self->get_columns;
-
-    # Build copy data, excluding auto-increment columns
-    my %copy_data;
-    for my $col (keys %all_data) {
-        next if $columns_info->{$col} && $columns_info->{$col}{is_auto_increment};
-        $copy_data{$col} = $all_data{$col};
+    # 2. Remove Primary Key columns so the DB creates a new record
+    # (or uses the replacement PK if provided in $changes)
+    my $source = $self->_get_source;
+    my @pk     = $source->primary_columns;
+    foreach my $col (@pk) {
+        delete $data{$col} unless exists $changes->{$col};
     }
 
-    # Apply changes (replacement data takes precedence)
-    %copy_data = (%copy_data, %$changes);
+    # 3. Apply replacement data
+    foreach my $col (keys %$changes) {
+        $data{$col} = $changes->{$col};
+    }
 
-    return $self->{async_db}->create($source_name, \%copy_data)->then(sub {
-        my ($result_data) = @_;
-
-        my $row_class = ref($self);
-
-        # If somehow we got the base class, construct the proper class name
-        if ($row_class eq 'DBIx::Class::Async::Row') {
-            $row_class = "DBIx::Class::Async::Row::$source_name";
-        }
-
-        my $async_row = $row_class->new(
-            source_name => $source_name,
-            row_data    => $result_data,
-            async_db    => $self->{async_db},
-            schema      => $result_source->schema,
-        );
-
-        return Future->done($async_row);
-    });
+    # 4. Use the ResultSet to create the new record.
+    # This triggers new_result() which installs dynamic accessors
+    # and handles the async DB insert.
+    my $rs = $self->{schema}->resultset($self->{source_name});
+    return $rs->create(\%data);
 }
 
 =head2 create_related
@@ -468,6 +458,13 @@ sub get_column {
         }
     }
 
+    # If the column exists in the Source, but not in our local data yet,
+    # return undef instead of dying. This is common for auto-inc PKs
+    # or default values not yet fetched.
+    if ($source && $source->has_column($col)) {
+        return undef;
+    }
+
     croak "No such column '$col' in " . ($self->{source_name} || 'Row');
 }
 
@@ -489,7 +486,12 @@ Hash containing all column names and values.
 
 sub get_columns {
     my $self = shift;
-    return %{$self->{_data}};
+
+    # Return the hash if called in list context
+    return %{ $self->{_data} || {} } if wantarray;
+
+    # Return the hashref if called in scalar context
+    return $self->{_data} || {};
 }
 
 =head2 get_dirty_columns
@@ -664,21 +666,23 @@ false otherwise.
 =cut
 
 sub in_storage {
-    my ($self) = @_;
+    my ($self, $val) = @_;
 
-    # Check if explicitly marked as not in storage (after delete)
-    return 0 if exists $self->{_in_storage} && !$self->{_in_storage};
+    if (defined $val) {
+        $self->{_in_storage} = $val ? 1 : 0;
+        return $self->{_in_storage};
+    }
 
-    # Check if we have primary key data
-    my $pk_info = eval { $self->_get_primary_key_info };
-    return 0 unless $pk_info;
+    return $self->{_in_storage} if exists $self->{_in_storage};
 
-    my $pk = $pk_info->{columns}[0];
-    my $id = eval { $self->get_column($pk) };
+    # Fallback: Does the object have a primary key value?
+    my $source = eval { $self->result_source };
+    if ($source) {
+        my ($pk) = $source->primary_columns;
+        return 1 if $pk && defined $self->{_data}{$pk};
+    }
 
-    # If we have a primary key value and haven't been explicitly marked as deleted,
-    # we're in storage
-    return defined $id ? 1 : 0;
+    return 0;
 }
 
 =head2 insert
@@ -706,8 +710,15 @@ A L<Future> that resolves to the row object.
 
 sub insert {
     my $self = shift;
-    # Already inserted via create()
-    return Future->done($self);
+
+    # If the row is already in the database, DBIC behavior is to throw an error
+    # or no-op. Here we follow the safer path.
+    if ($self->in_storage) {
+        return Future->fail("Check failed: count of objects to be inserted is 0 (already in storage)");
+    }
+
+    # update_or_insert handles the actual DB communication and state flipping
+    return $self->update_or_insert;
 }
 
 =head2 is_column_changed
@@ -743,6 +754,25 @@ sub is_column_changed {
 
     croak("column name required") unless defined $column;
 
+    return exists $self->{_dirty}{$column} ? 1 : 0;
+}
+
+=head2 is_column_dirty
+
+  if ($row->is_column_dirty('email')) {
+      print "Email has been changed but not saved yet!";
+  }
+
+Arguments: $column_name
+Return Value: 1|0
+
+Returns a boolean value indicating whether the specified column has been modified
+since the row was last fetched from or saved to the database.
+
+=cut
+
+sub is_column_dirty {
+    my ($self, $column) = @_;
     return exists $self->{_dirty}{$column} ? 1 : 0;
 }
 
@@ -951,32 +981,26 @@ The value that was set.
 sub set_column {
     my ($self, $column, $value) = @_;
 
-    croak("column name required") unless defined $column;
+    unless (defined $column && length $column) {
+        croak("Column name required for set_column");
+    }
 
-    # Get the current value
-    my $old_value = exists $self->{_data}{$column}
-        ? $self->{_data}{$column}
-        : undef;
+    $self->{_data}  //= {};
+    $self->{_dirty} //= {};
 
-    # Set the new value
+    my $existed = exists $self->{_data}{$column};
+    my $old     = $self->{_data}{$column};
+
     $self->{_data}{$column} = $value;
 
-    # Mark as dirty if value changed
-    # Handle undef comparison carefully
+    # Determine if a real change occurred
     my $changed = 0;
-    if (!defined $old_value && !defined $value) {
-        # Both undef, no change
-        $changed = 0;
-    } elsif (!defined $old_value || !defined $value) {
-        # One is undef, other isn't
+    if (!$existed) {
         $changed = 1;
-    } elsif (ref $old_value || ref $value) {
-        # If either is a reference, assume changed
-        # (we can't reliably compare references for equality)
-        $changed = 1;
-    } else {
-        # Both are defined scalars
-        $changed = ($old_value ne $value);
+    } elsif (defined($old) != defined($value)) {
+        $changed = 1; # Transition from/to undef
+    } elsif (defined($old) && defined($value) && $old ne $value) {
+        $changed = 1; # Value mismatch
     }
 
     # Mark as dirty if changed
@@ -1076,49 +1100,144 @@ A L<Future> that resolves to the updated row object.
 sub update {
     my ($self, $values) = @_;
 
-    # Check if row is in storage
+    # 1. Validation
     unless ($self->in_storage) {
-        return Future->fail("Cannot update row: not in storage");
+        return Future->fail("Cannot update row: not in storage. Did you mean to call insert or update_or_insert?");
     }
 
-    # If no values provided, use dirty columns
-    unless (defined $values) {
-        my %dirty = $self->get_dirty_columns;
-
-        # If no dirty columns, nothing to update
-        return Future->done($self) unless %dirty;
-
-        $values = \%dirty;
+    # 2. If values are passed, update internal state via set_column first
+    if ($values) {
+        croak("Usage: update({ col => val })") unless ref $values eq 'HASH';
+        foreach my $col (keys %$values) {
+            $self->set_column($col, $values->{$col});
+        }
     }
 
-    croak("Usage: update({ col => val })")
-        unless ref $values eq 'HASH';
+    # 3. Delegate to update_or_insert
+    # Since in_storage is true, update_or_insert will correctly
+    # run the UPDATE logic and clear dirty flags on success.
+    return $self->update_or_insert;
+}
 
-    # Merge values into current data
-    while (my ($col, $val) = each %$values) {
-        $self->{_data}{$col} = $val;
+=head2 update_or_insert
+
+  my $future = $row->update_or_insert({ name => 'New Name' });
+
+  $future->on_done(sub {
+      my $row = shift;
+      print "Row saved successfully";
+  });
+
+Arguments: \%fallback_data?
+Return Value: L<Future> resolving to $row
+
+Provides a "save" mechanism that intelligently decides whether to perform an
+C<INSERT> or an C<UPDATE> based on the current state of the row object.
+
+=over 4
+
+=item 1
+
+If the row is already C<in_storage>, it performs an C<update>. Only columns
+marked as "dirty" (changed) will be sent to the database. If no columns are
+dirty, the Future resolves immediately with the current row object.
+
+=item 2
+
+If the row is not in storage, it performs a C<create>. The entire contents
+of the row's data are sent to the database.
+
+=back
+
+You may optionally pass a hashref of data to this method. These values will be
+passed to C<set_column> before the save operation begins, effectively merging
+ad-hoc changes into the row.
+
+Upon success, the row's internal "dirty" tracking is reset, C<in_storage> is
+set to true, and any database-generated values (like auto-increment IDs) are
+synchronized back into the object.
+
+=cut
+
+sub update_or_insert {
+    my ($self, $data) = @_;
+
+    my $async_db    = $self->{async_db};
+    my $source_name = $self->{source_name};
+    my $source      = $self->result_source;
+    my ($pk_col)    = $source->primary_columns;
+
+    # 1. Update internal data with ad-hoc changes
+    if ($data && ref $data eq 'HASH') {
+        foreach my $col (keys %$data) {
+            $self->set_column($col, $data->{$col});
+        }
     }
 
-    # Get primary key for the update
-    my $pk_info = $self->_get_primary_key_info;
-    my $pk      = $pk_info->{columns}[0];
-    my $id      = $self->get_column($pk);
+    # 2. Determine path: UPDATE if in storage, otherwise INSERT
+    my $is_update = $self->in_storage;
 
-    croak("Cannot update row without a primary key")
-        unless defined $id;
+    # 3. Collect payload
+    my %to_save;
+    if ($is_update) {
+        %to_save = $self->get_dirty_columns;
+        # If nothing changed, return self immediately
+        return Future->done($self) unless keys %to_save;
+    } else {
+        %to_save = %{ $self->{_data} // {} };
+    }
 
-    return $self->{async_db}->update(
-        $self->{source_name},
-        $id,
-        $values
-    )->then(sub {
-        my ($result) = @_;
+    # 4. Success handler to align internal state
+    my $on_success = sub {
+        my ($res) = @_;
 
-        # Clear dirty columns after successful update
-        $self->{_dirty} = {};
+        if (ref $res eq 'HASH'
+            && ($res->{error} || $res->{__error})) {
+            my $err = $res->{error} // $res->{__error};
+            return Future->fail($err, 'db_error');
+        }
+
+        # Sync results (like auto-increment IDs) back into the object
+        my $final_data = (ref $res eq 'HASH') ? $res : \%to_save;
+        if (!$is_update && !ref $res && defined $res && $pk_col) {
+            $final_data->{$pk_col} = $res;
+        }
+
+        # Sync internal _data hash
+        foreach my $col (keys %$final_data) {
+            $self->{_data}{$col} = $final_data->{$col};
+        }
+
+        $self->{_dirty} = {};     # Reset change tracking
+        $self->in_storage(1);     # Mark as persisted in DB
 
         return Future->done($self);
-    });
+    };
+
+    # 5. Dispatch to Worker
+    if ($is_update) {
+        my $id_val = $self->get_column($pk_col);
+        return $async_db->update($source_name, $id_val, \%to_save)->then($on_success);
+    } else {
+        return $async_db->create($source_name, \%to_save)->then($on_success);
+    }
+}
+
+=head2 insert_or_update
+
+  await $row->insert_or_update;
+
+Arguments: \%fallback_data?
+Return Value: L<Future> resolving to $row
+
+An alias for L</update_or_insert>. Provided for compatibility with
+standard L<DBIx::Class::Row> method naming.
+
+=cut
+
+sub insert_or_update {
+    my $self = shift;
+    return $self->update_or_insert(@_);
 }
 
 =head1 AUTOLOAD METHODS
@@ -1150,51 +1269,64 @@ Relationship results are cached in the object after first access.
 
 sub AUTOLOAD {
     my $self = shift;
+
     our $AUTOLOAD;
     my ($method) = $AUTOLOAD =~ /([^:]+)$/;
 
-    # 1. Skip DESTROY
+    # 1. Immediate exit for DESTROY
     return if $method eq 'DESTROY';
 
     my $source = $self->_get_source;
 
-    # 2. Check if this is a Relationship
-    # Relationships MUST be handled by the accessor factory to ensure
-    # they return objects (ResultSets or Futures) rather than raw data.
+    # 2. Handle Relationships
     my $rel_info;
     if ($source && $source->can('relationship_info')) {
         $rel_info = $source->relationship_info($method);
     }
-
     if ($rel_info) {
-        # Build the proper accessor (handles prefetch logic internally)
         my $accessor = $self->_build_relationship_accessor($method, $rel_info);
-
-        # Memoize the accessor into the package so AUTOLOAD isn't called next time
         {
             no strict 'refs';
+            no warnings 'redefine';
             *{ref($self) . "::$method"} = $accessor;
         }
-
-        # Execute and return (will return a Future for single, ResultSet for multi)
-        return $accessor->($self);
+        return $accessor->($self, @_);
     }
 
-    # 3. Fast Path: Direct Column Access
-    # If it's in the data hash and NOT a relationship, return the value immediately.
-    if (exists $self->{_data}{$method}) {
+    # 3. Handle Columns (Ensuring dirty tracking is triggered)
+    if ($source && $source->has_column($method)) {
+        my $accessor = sub {
+            my $inner_self = shift;
+            if (@_) {
+                # This ensures update_or_insert() knows there is work to do.
+                return $inner_self->set_column($method, @_);
+            }
+
+            return $inner_self->get_column($method);
+        };
+
+        {
+            no strict 'refs';
+            no warnings 'redefine';
+            # Install the accessor into the specific result class (e.g., Schema::Result::User)
+            # so AUTOLOAD doesn't have to run for this method next time.
+            *{ref($self) . "::$method"} = $accessor;
+        }
+        return $accessor->($self, @_);
+    }
+
+    # 4. Fallback for non-column data already in the buffer
+    if (exists $self->{_data}{$method} && !@_) {
         return $self->{_data}{$method};
     }
 
-    # 4. Lazy Column Guard
-    # If it's a valid column but hasn't been loaded into { _data } yet.
-    if ($source && $source->has_column($method)) {
-        return $self->get_column($method);
-    }
-
-    # 5. Error Fallback
-    require Carp;
-    Carp::croak("Method '$method' not found in row object of type " . ref($self));
+    # 5. Exception handling
+    croak(sprintf(
+        "Method '%s' not found in package '%s'. " .
+        "(Can't locate object method via AUTOLOAD. " .
+        "Is it a missing column or relationship in your ResultSource?)",
+        $method, ref($self)
+    ));
 }
 
 =head1 DESTROY
@@ -1339,21 +1471,26 @@ Creates accessor methods for all columns in the result source.
 
 sub _ensure_accessors {
     my $self   = shift;
-    my $source = $self->_get_source;
+    my $source = $self->_get_source or return;
+    my $class  = ref($self);
 
-    foreach my $col (keys %{$self->{_data}}) {
+    # Use the source columns to ensure we cover all valid fields
+    foreach my $col ($source->columns) {
         # SKIP if it's a relationship - let AUTOLOAD/Builder handle it
-        next if $source->relationship_info($col);
+        next if $source->can('relationship_info') && $source->relationship_info($col);
 
-        # Only create the accessor if it doesn't exist yet
         no strict 'refs';
-        my $method = ref($self) . "::$col";
-        unless (defined &$method) {
-            *$method = sub {
-                my $self = shift;
-                return $self->{_data}{$col};
-            };
-        }
+        no warnings 'redefine';
+
+        # Install/Overwrite the accessor
+        *{"${class}::$col"} = sub {
+            my $inner = shift;
+            if (@_) {
+                # This is the "Magic" that makes $user->name('...') work
+                return $inner->set_column($col, shift);
+            }
+            return $inner->get_column($col);
+        };
     }
 }
 

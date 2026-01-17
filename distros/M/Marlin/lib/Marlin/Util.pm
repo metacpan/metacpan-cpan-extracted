@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Util;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015000';
+our $VERSION   = '0.016000';
 
 use B                     ();
 use Exporter::Tiny        qw( _croak _carp );

@@ -1,6 +1,11 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.27 Jan 16, 2026
+
+	Provide deprecation status for RSA and DSA (per RFC9904)
+
+
 **** 1.26 Jul 29, 2024
 
 	Avoid test failure on RedHat by requiring DSA-SHA1 opt-in.
@@ -706,4 +711,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1986 2024-07-29 10:45:40Z willem $
+$Id: Changes 2045 2026-01-16 12:30:12Z willem $

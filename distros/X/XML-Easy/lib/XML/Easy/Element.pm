@@ -52,7 +52,7 @@ use strict;
 
 use XML::Easy::Content 0.007 ();
 
-our $VERSION = "0.012";
+our $VERSION = "0.013";
 
 eval { local $SIG{__DIE__};
 	require XSLoader;

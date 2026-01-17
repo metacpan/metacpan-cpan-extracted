@@ -5,7 +5,7 @@ use warnings;
 package Marlin::XAttribute::Alias;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015000';
+our $VERSION   = '0.016000';
 
 use Eval::TypeTiny        ();
 use Marlin::Util          qw( true false );
@@ -48,6 +48,16 @@ after install_accessors => sub {
 	}
 	
 	$me->install_coderef( $_, $coderef ) for @aliases;
+};
+
+around provides_accessors => sub {
+	my $next = shift;
+	my $me   = shift;
+	
+	my @list = $me->$next( @_ );
+	push @list, map [ $_, 'alias', $me ], @{ $me->{':Alias'}{alias} };
+	
+	return @list;
 };
 
 around allowed_constructor_parameters => sub {

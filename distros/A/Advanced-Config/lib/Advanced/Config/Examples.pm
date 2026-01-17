@@ -1,5 +1,5 @@
 ###
-###  Copyright (c) 2015 - 2025 Curtis Leach.  All rights reserved.
+###  Copyright (c) 2015 - 2026 Curtis Leach.  All rights reserved.
 ###
 ###  Module: Advanced::Config::Examples
 
@@ -13,7 +13,7 @@ use Exporter;
 
 use Fred::Fish::DBUG 2.09  qw / on_if_set  ADVANCED_CONFIG_FISH /;
 
-$VERSION   = "1.12";
+$VERSION   = "1.14";
 @ISA       = qw ( Exporter );
 @EXPORT    = qw ();
 @EXPORT_OK = qw ();
@@ -49,12 +49,12 @@ support of shell script variables, quotes and the sourcing in of sub-files.
 Allowing for limited logic in your config files.
 
 From there it just grew to support non-unix features such as windows batch
-files and more generic configuation features.  Such as being able handle various
-formating of config files and the ability to obscure or encrypt values from
-casual snooping.  Or the addition of sections to allow the same config file to
-be used on multiple servers and OS.
+files and more generic configuration features.  Such as being able handle
+various formatting of config files and the ability to obscure or encrypt values
+from casual snooping.  Or the addition of sections to allow the same config
+file to be used on multiple servers and OS.
 
-So today it's a powerfull tool that turns your config files into objects your
+So today it's a powerful tool that turns your config files into objects your
 perl code can reference and manipulate.
 
 =head1 SURROUNDING A VALUE WITH QUOTES IN YOUR CONFIG FILE
@@ -139,7 +139,7 @@ details on how to do this.
    tag1 = abc       # A simple assignment.
 
    # The balanced quotes will automatically be removed from the value ...
-      tag2="efg"    # See we put surrounding quotes arround the value.
+      tag2="efg"    # See we put surrounding quotes around the value.
 
    tag3 = 'l m n'   # The alternate quotes.
 
@@ -147,7 +147,7 @@ details on how to do this.
 
    tag5 = ${tag1}   # Performs variable substitution, same as: tag5 = "abc".
 
-   tag1     =     xyz  # See I've overriden tag1's original value to "xyz".
+   tag1     =     xyz  # See I've overridden tag1's original value to "xyz".
    TAG1 = 123       # tag1 is still xyz, tags are case sensitive.
 
 To load it into memory do:
@@ -233,7 +233,7 @@ To load it into memory do:
 Please note that section names are case insensitive and the tag abc's value
 depends on what section of the config file you are currently looking at.  This
 way you may repeat tags between sections and know that each section is
-independant of each other.  As if each section was in it's own config file.
+independent of each other.  As if each section was in its own config file.
 
 Or you can interpret each section as overrides to tags in the main section
 using the B<inherit> option.  Where if a tag isn't defined in the current
@@ -243,7 +243,7 @@ this.  When you look up the pwd, you find it in host 1, but when you try to
 look up the user, it can't find it in the current section, so it looks in the
 main section for it instead.  In effect all 4 sections have all variables from
 main included in each section.  With the local tags overriding what's in main.
-A neet way to handle minor differences that would otherwise require you to
+A neat way to handle minor differences that would otherwise require you to
 have multiple config files you'd need to keep in sync.
 
 To load it into memory do:
@@ -268,10 +268,10 @@ is B<DEFAULT>.
     . simple.cfg   # All variables appear in the main section.
 
     [ section 1 ]
-    . simple.cfg   # All varibles appear in the main section as well.
+    . simple.cfg   # All variables appear in the main section as well.
 
     [ section 2 ]
-    . simple.cfg   # DEFAULT - all varibles from this config file will apear as members of "section 2".
+    . simple.cfg   # DEFAULT - all variables from this config file will appear as members of "section 2".
 
     [ section 3 ]
     . section.cfg  # DEFAULT - tags abc, user & pwd are now in 'section 3', while everything else stays in it's defined section.
@@ -327,11 +327,11 @@ appropriate label in the comment after the tag/value pair.
    my_username_1 = "anonymous"                   # ENCRYPT
    my_password_1 = "This is too much fun!"       # ENCRYPT me ...
 
-   # They've already been encypted!
+   # They've already been encrypted!
    my_username_2 = '4aka54D3eZ4aea5'             # DECRYPT
    my_password_2 = '^M^Mn1\pmeaq>n\q?Z[x537z3A'  # DECRYPT me ...
 
-   # This value will never be encrytped/decrypted ...
+   # This value will never be encrypted/decrypted ...
    dummy = "Just some strange value that is always in clear text."
 
 The encrypted value is automatically decrypted for you when the config file
@@ -352,7 +352,7 @@ many more examples from the build under:  I<t/config/*.cfg>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2015 - 2025 Curtis Leach.  All rights reserved.
+Copyright (c) 2015 - 2026 Curtis Leach.  All rights reserved.
 
 This program is free software.  You can redistribute it and/or modify it under
 the same terms as Perl itself.

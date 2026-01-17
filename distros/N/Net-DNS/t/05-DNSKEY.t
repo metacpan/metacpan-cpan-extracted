@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-DNSKEY.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
+# $Id: 05-DNSKEY.t 2042 2025-12-24 10:23:11Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -19,7 +19,7 @@ foreach my $package (@prerequisite) {
 	exit;
 }
 
-plan tests => 49;
+plan tests => 53;
 
 
 my $name = 'DNSKEY.example';
@@ -87,6 +87,7 @@ for my $rr ( Net::DNS::RR->new(". $type") ) {
 
 	toggle( $rr, 'zone',   1, 0, 1, 0 );
 	toggle( $rr, 'revoke', 0, 1, 0, 1 );
+	toggle( $rr, 'adt',    1, 0, 1, 0 );
 	toggle( $rr, 'sep',    1, 0, 1, 0 );
 
 	my $class = ref($rr);
