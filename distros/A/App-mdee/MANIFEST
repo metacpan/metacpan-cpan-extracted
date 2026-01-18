@@ -1,0 +1,15 @@
+Build.PL
+CLAUDE.md
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/App/mdee.pm
+minil.toml
+script/mdee
+t/00_compile.t
+t/01_mdee.t
+t/test.md
+META.yml
+MANIFEST

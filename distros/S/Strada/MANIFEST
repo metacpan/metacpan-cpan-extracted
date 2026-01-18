@@ -1,0 +1,14 @@
+example/build.sh
+example/libmath.so
+example/math_lib.c
+example/math_lib.strada
+Makefile.PL
+MANIFEST			This list of files
+README.md
+Strada-0.01/META.json
+Strada-0.01/META.yml
+Strada.pm
+Strada.xs
+t/01_basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

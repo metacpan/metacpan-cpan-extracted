@@ -1,0 +1,7 @@
+<start_html title="Test of popup_menu tag with labels">
+<start_form>
+<popup_menu name="menu1" values="@{qw(red green blue)}" label="Popup Menu 1">
+<submit name="submit">
+<end_form>
+<dump force="+{submit}">
+<end_html>

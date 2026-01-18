@@ -16,6 +16,11 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: README
+ lib/MooX/XSConstructor.pm
+Copyright: This software is copyright (c) 2018, 2026 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: t/02strict-early.t
  t/02strict.t
 Copyright: This software is copyright (c) 2026 by Toby Inkster.
@@ -26,21 +31,16 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
-Files: README
- lib/MooX/XSConstructor.pm
-Copyright: This software is copyright (c) 2018, 2026 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/01basic.t
-Copyright: This software is copyright (c) 2018 by Toby Inkster.
+Files: Makefile.PL
+Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini
 Copyright: Copyright 2018 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Makefile.PL
-Copyright: Copyright 2020 Toby Inkster.
+Files: t/01basic.t
+Copyright: This software is copyright (c) 2018 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

@@ -5,10 +5,10 @@ WebDyne is a Perl based dynamic HTML engine. It works with web servers
 code.
 
 Once WebDyne is installed and initialised any file with a `.psp`
-extension is treated as a WebDyne source file. It is parsed for WebDyne
-pseudo-tags (such as `<perl>` and `<block>`) which are interpreted and
-executed on the server. The resulting output is then sent to the
-browser.
+extension (designated a PSP file) is treated as a WebDyne source file.
+It is parsed for WebDyne pseudo-tags (such as `<perl>` and `<block>`)
+which are interpreted and executed on the server. The resulting output
+is then sent to the browser.
 
 WebDyne works with common web server persistent Perl interpreters - such
 as Apache `mod_perl` and `PSGI` - to provide fast dynamic content. It
@@ -42,7 +42,7 @@ The local server time is:
 </html>
 ```
 
-[Run](https://demo.webdyne.org/introduction1.psp)
+[Run](https://demo.webdyne.org/example/introduction1.psp)
 
 This can be abbreviated with some WebDyne shortcut tags such as
 `<start_html>`. This does exactly the same thing and still renders
@@ -53,7 +53,7 @@ compliant HTML to the browser:
 The local server time is: <? localtime() ?>
 ```
 
-[Run](https://demo.webdyne.org/introduction2.psp)
+[Run](https://demo.webdyne.org/example/introduction2.psp)
 
 Don't like the co-mingling code and HTML but still want things in one
 file ?
@@ -69,7 +69,7 @@ sub print_time {
     
 ```
 
-[Run](https://demo.webdyne.org/introduction3.psp)
+[Run](https://demo.webdyne.org/example/introduction3.psp)
 
 Want further code and HTML separation ? You can import methods from any
 external Perl module. Example from a core module below, but could be any
@@ -81,7 +81,7 @@ Server Time::HiRes time:
 <perl require="Time::HiRes" import="time">time()</perl>
 ```
 
-[Run](https://demo.webdyne.org/introduction4.psp)
+[Run](https://demo.webdyne.org/example/introduction4.psp)
 
 Same concepts implemented in slightly different ways:
 
@@ -94,7 +94,7 @@ use Time::HiRes qw(time);
 1;
 ```
 
-[Run](https://demo.webdyne.org/introduction5.psp)
+[Run](https://demo.webdyne.org/example/introduction5.psp)
 
 ``` html
 <start_html title="Server Time">
@@ -102,10 +102,10 @@ use Time::HiRes qw(time);
 The local server time (hires) is: <? time() ?>
 ```
 
-[Run](https://demo.webdyne.org/introduction6.psp)
+[Run](https://demo.webdyne.org/example/introduction6.psp)
 
 Using an editor that doesn't like custom tags ? Use of the <div\> tag
-with a `data-*` attribute is legal HTML syntax and can be used to embed
+with a `data-*` attribute is valid HTML syntax and can be used to embed
 Perl:
 
 ``` html
@@ -113,7 +113,7 @@ Perl:
 The local server time is: <div data-webdyne-perl> localtime() </div>
 ```
 
-[Run](https://demo.webdyne.org/introduction7.psp)
+[Run](https://demo.webdyne.org/example/introduction7.psp)
 
 Don't like <div\> style syntax ? Put the code in a <script\> block -
 it will be interpreted on the server, not the client:
@@ -126,7 +126,7 @@ Server local time is:
 </script>
 ```
 
-[Run](https://demo.webdyne.org/introduction7.psp)
+[Run](https://demo.webdyne.org/example/introduction7.psp)
 
 Template blocks and variable replacement is supported also:
 
@@ -173,7 +173,7 @@ sub server_time {
 }
 ```
 
-[Run](https://demo.webdyne.org/introduction9.psp)
+[Run](https://demo.webdyne.org/example/introduction9.psp)
 
 # Installation and Quickstart
 
@@ -181,16 +181,16 @@ sub server_time {
 
 WebDyne will install and run on any modern Linux system that has a
 recent version of Perl installed and is capable of installing Perl
-module via CPAN. Installation via Docker is also supported.
+modules via CPAN. Installation via Docker is also supported.
 
 When installing WebDyne there are two components which are required
-before you can begin serving .psp files:
+before you can begin serving PSP files:
 
 -   The core WebDyne Perl modules
 
--   A web server configured to use WebDyne
+-   A web server or application configured to use WebDyne.
 
-WebDyne will work with Apache mod_perl or PSGI compatible web servers
+WebDyne will work with Apache mod_perl, or PSGI compatible web servers
 (such as Plack, Starman etc.).
 
 Docker containers with pre-built versions of WebDyne are also available.
@@ -227,10 +227,22 @@ below.
 
 ## Quickstart
 
-If using PSGI you can start a quick web server with:
+If using PSGI you can start a quick web server by creating a simple
+app.psp file:
+
+    #  Save this as app.psp
+    #
+    <start_html>
+    My first WebDyne page. Server time: <? localtime ?>
+
+Then test install:
 
 ``` bash
-#  Render a file to STDOUT to see the HTML
+#  Install WebDyne
+#
+$ cpanm WebDyne
+
+#  Render the file to STDOUT to see the HTML and check basic installation
 #
 $ wdrender app.psp
 
@@ -246,7 +258,8 @@ $ webdyne.psgi --test
 #
 $ webdyne.psgi app.psp
 
-# Start serving any file in the current directory, using app.psp as the default
+# Start serving any file in the current directory. If app.psp exists it will be served by
+# default, otherwise an index page will be presented
 #
 $ webdyne.psgi .
 
@@ -255,7 +268,20 @@ $ webdyne.psgi .
 $ webdyne.psgi --port=5001 --host=127.0.0.1
 ```
 
-Connect your browser to the host and you should see the WebDyne output
+Connect your browser to the host and you should see the WebDyne output.
+
+You can shortcut install of Plack/Starman versions via:
+
+    #  Install WebDyne Plack (PSGI)
+    #
+    $ cpanm Task::WebDyne::Plack
+
+
+    #  Or Starman. Note if Starman install fails you may need to force install of Net::Server via
+    #  cpanm --force Net::Server
+    #  and try again
+    #
+    $ cpanm Task::WebDyne::Starman
 
 ## Apache mod_perl
 
@@ -297,14 +323,14 @@ restarted. Use a method appropriate for your Linux distribution.
 ### Manual configuration of Apache
 
 If the `wdapacheinit` command does not work as expected on your system
-then the Apache config files can be modified manually.
+then the Apache configuration files can be modified manually.
 
-Include the following section in the Apache httpd.conf file (or create a
-webdyne.conf file if you distribution supports conf.d style
-configuration files). These following config files are written with
+Include the following section in the Apache `httpd.conf` file (or create
+a `webdyne.conf` file if you distribution supports `conf.d` style
+configuration files). The following configuration files are written with
 Apache 2.4 syntax - adjust path and syntax as required:
 
-    #  Need mod_perl, load up if not already done
+    #  Need mod_perl, load up if not already done. Adjust path according to your distro.
     #
     <IfModule !mod_perl.c>
     LoadModule perl_module "/etc/httpd/modules/mod_perl.so"
@@ -365,9 +391,11 @@ Restart Apache and check for any errors.
 
 ## PSGI
 
-Ensure that Plack is installed on your system via CPAN:
+Ensure that Plack is installed on your system via CPAN after installing
+WebDyne:
 
     # Via CPAN
+    #
     perl -MCPAN -e 'install Plack'
 
     # Modern systems
@@ -375,10 +403,21 @@ Ensure that Plack is installed on your system via CPAN:
     cpan Plack
 
     # Or better via CPANM
+    #
     cpanm Plack
 
-You can start a basic WebDyne server by running the webdyne.psgi command
-with the --test parameter
+    # Or just do the whole lot in one hit. For WebDyne + Plack
+    #
+    cpanm Task::WebDyne::Plack
+
+    # Or WebDyne + Plack + Starman. Note if Starman install fails you may need to force install of
+    # Net::Server via :
+    # cpanm --force Net::Server
+    #
+    cpanm Task::WebDyne::Starman
+
+you can then start a basic WebDyne server by running the webdyne.psgi
+command with the --test parameter
 
     webdyne.psgi --test
 
@@ -390,22 +429,41 @@ and validate the WebDyne is working correctly:
 Once verified as working correctly you can serve WebDyne content from a
 particular directory - or from a single file - using the syntax:
 
-    #  To serve up all files in a directory:
+    #  To serve up all files in a directory. If app.psp exists in the directory it will be 
+    #  served by default. If it does not exist a file index will be displayed
     #
     $ webdyne.psgi <directory>
 
     #  E.g serve files in /var/www/html. By default WebDyne will serve app.psp if no filename
-    #  is specified
+    #  is specified. If app.psp does not exist a file index will be displayed.
     #
     $ webdyne.psgi /var/www/html
-
-    #  Allow static files such as css, jpg files etc. to be served also
-    #
-    $ webdyne.psgi --static /var/www/html/app.psp
 
     #  Or just a single app.psp file. Only this file will be served regardless of URL
     #
     $ webdyne.psgi /var/www/html/time.psp
+
+!!! tip
+
+    Starting WebDyne this way will enable "developer" mode such that a
+    directory index will be displayed if an app.psp file does not exist, and
+    full error messages with code backtraces are displayed if any errors are
+    encounterd.
+
+To start with `plackup`:
+
+    #  Start WebDyne via plackup in the current directory. A file named app.psp must exist,
+    #  directory indexing will not be performed.
+    #
+    DOCUMENT_ROOT=. plackup `which webdyne.psgi`
+
+    #  Start serving a single file
+    #
+    DOCUMENT_ROOT=./time.psp plackup /opt/perl5/bin/webdyne.psgi
+
+    #  Start with some Plack middleware added
+    #
+    DOCUMENT_ROOT=./time.psp  plackup -e 'enable Plack::Middleware::Debug' `which webdyne.psgi`
 
 The above starts a single-threaded web server using Plack. To start the
 more performant Starman server (assuming installed):
@@ -417,14 +475,19 @@ more performant Starman server (assuming installed):
 
 !!! note
 
-    Starman does not support options such as --test and --static. If you
-    want to server static files from starman you should do so using best
-    practice via a traditional web server front end.
+    Plack (via `webdyne.psgi` or `plackup`) and Starman versions of WebDyne
+    serve basic static files such as css, js, jpg etc. If you want more
+    control over non PSP files you should us best practices for service such
+    files via a traditional web server front end. Also note the Starman and
+    plackup instances of WebDyne do not support the --test option or
+    indexing - it assumes you are running in a production environment and
+    have checked everything with the Plack implementation of `webdyne.psgi`
+    first.
 
 Numerous options can be set from the command line via environment
 variables, including Webdyne configuration. See relevant section for all
-WebDyne configuration options but assuming in a local file
-webdyne.conf.pl:
+WebDyne configuration options but assuming a local file
+`webdyne.conf.pl`:
 
     #  Start instance webdyne.psgi using local config file
     #
@@ -432,7 +495,8 @@ webdyne.conf.pl:
 
 ## Docker
 
-Docker containers are available from the Github Container Registry.
+Docker containers are available from the [Github Container
+Registry](https://github.com/aspeer/WebDyne/pkgs/container/webdyne).
 Install the default Docker container (based on Debian) via:
 
     #  Default debian version
@@ -441,9 +505,8 @@ Install the default Docker container (based on Debian) via:
 
     #  Or Alpine/Fedora/Perl versions
     #
-    # docker pull ghcr.io/aspeer/webdyne-alpine:latest
-    # docker pull ghcr.io/aspeer/webdyne-fedora:latest
-    # docker pull ghcr.io/aspeer/webdyne-perl:latest
+    # docker pull ghcr.io/aspeer/webdyne:alpine
+    # docker pull ghcr.io/aspeer/webdyne:fedora
 
 Start the docker container with the command:
 
@@ -455,11 +518,11 @@ that location should show the server *localtime* test page
 To mount a local page and serve it through the docker container use the
 command:
 
-    docker run --mount <local_dir>:/app:ro -e PORT=5011 -e DOCUMENT_ROOT=/app -p 5011:5011 --name=webdyne webdyne
+    docker run -v $(pwd):/app:ro -e PORT=5011 -e DOCUMENT_ROOT=/app -p 5011:5011 --name webdyne webdyne:latest
 
 This will tell docker to mount the local directory into the docker
-container. If there is a default file named app.psp in the location it
-will be displayed. if there is a `cpanfile` in the mount directory any
+container. If there is a default file named `app.psp` in the location it
+will be displayed. If there is a `cpanfile` in the mount directory any
 modules will be installed into the docker container automatically.
 
 ### Deploying WebDyne apps with Docker
@@ -546,10 +609,12 @@ Hello World <perl> localtime() </perl>
 </html>
 ```
 
-[Run](https://demo.webdyne.org/hello1.psp)
+[Run](https://demo.webdyne.org/example/hello1.psp)
 
 So far not too exciting - after all we are mixing code and content. Lets
-try again:
+try again - the <perl\> tag can take a handler attribute which
+references (calls) a perl subroutine - in this case embedded in the PSP
+file under the \_\_PERL\_\_ token.
 
 ``` html
 <html>
@@ -559,7 +624,7 @@ try again:
 
 <!-- Empty perl tag this time, but with method name as attribute -->
 
-Hello World <perl method="hello"/>
+Hello World <perl handler="hello"/>
 
 </body>
 </html>
@@ -569,7 +634,13 @@ __PERL__
 sub hello { return localtime }
 ```
 
-[Run](https://demo.webdyne.org/hello2.psp)
+[Run](https://demo.webdyne.org/example/hello2.psp)
+
+!!! note
+
+    In this case the <perl\> tag is implicitly closed (contains no content)
+    as it is assumed all content will be returned by the handler (i.e. the
+    "hello" routine).
 
 Better - at least code and content are distinctly separated. Note that
 whatever the Perl code returns at the end of the routine is what is
@@ -593,34 +664,10 @@ sub greeting { my $var="Hello World"; return $var }
 sub greeting { my $var="Hello World"; return \$var }
 
 
-# This will cause an error
-#
-sub greeting { return undef }
-
-
 # If you don't want to display anything return \undef,
 #
 sub greeting { return \undef }
-
-
-# This will fail also
-#
-sub greeting { return 0 }
-
-
-#  If you want "0" to be displayed ..
-#
-sub greeting { return \0 }
 ```
-
-Perl code in WebDyne pages must always return a
-non-undef/non-0/non-empty string value (i.e. it must return something
-that evals as "true"). If the code returns a non-true value (e.g. 0,
-undef, '') then WebDyne assumes an error has occurred in the routine. If
-you actually want to run some Perl code, but not display anything, you
-should return a reference to undef, (`\undef)`, e.g.:
-
-    sub log { &dosomething; return \undef }
 
 Up until now all the Perl code has been contained within the WebDyne
 file. The following example shows an instance where the code is
@@ -641,15 +688,38 @@ Hello World <perl handler="Digest::MD5::md5_hex"/>
 </html>
 ```
 
-[Run](https://demo.webdyne.org/hello3.psp)
+[Run](https://demo.webdyne.org/example/hello3.psp)
 
-If not already resident the module (in this case "Digest::MD5") will be
+If not already resident the module (in this case `Digest::MD5`) will be
 loaded by WebDyne, so it must be available somewhere in the `@INC` path.
+Alternate syntaxes are supported - these all work in the same way:
+
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
+<pre>
+
+<!-- Perl tag with call to external module method -->
+
+<perl require="Digest::MD5" import="md5_hex">
+
+printf ("MD5_HEX: %s", md5_hex());
+
+</perl>
+
+</pre>
+</body>
+</html>
+```
+
+[Run](https://demo.webdyne.org/example/hello3a.psp)
 
 ### Use of the <perl\> tag for in-line code.
 
 The above examples show several variations of the <perl\> tag in use.
-Perl code that is enclosed by <perl\>..</perl\> tags is called
+Perl code that is enclosed by <perl\>..</perl\> tags is designated as
 *in-line* code:
 
 ``` html
@@ -667,8 +737,7 @@ for (0..3) {
     print "Hello World\n"
 }
 
-#  Must return a positive value, but don't want anything
-#  else displayed, so use \undef
+#  Don't want anthing else displayed so return \undef
 #
 return \undef;
 
@@ -680,7 +749,7 @@ return \undef;
 </html>
 ```
 
-[Run](https://demo.webdyne.org/inline1.psp)
+[Run](https://demo.webdyne.org/example/inline1.psp)
 
 This is the most straight-forward use of Perl within a HTML document,
 but does not really make for easy reading - the Perl code and HTML are
@@ -689,29 +758,45 @@ quickly become hard to read if there is a lot of in-line Perl code
 interspersed between the HTML.
 
 in-line Perl can be useful if you want a "quick" computation, e.g.
-insertion of the current year:
+insertion of the current year. Note the ability to require external
+modules via the require attribute, and import functions via the import
+attribute
 
 ``` html
 <html>
 <head><title>Hello World</title></head>
 <body>
 <p>
+<pre>
 
 <!-- Very quick and dirty block of perl code -->
 
-Copyright (C) <perl>(localtime())[5]+1900</perl> Foobar Gherkin corp.
+Copyright (C) <perl>(localtime())[5] + 1900</perl> Foobar Gherkin corp.
 
+<!-- Or -->
+
+Copyright (C) <perl require="Time::Piece" import="localtime"> localtime->year() </perl> Foobar Gherkin corp.
+
+<!-- Or -->
+
+Copyright (C) <perl require="POSIX"> POSIX::strftime("%Y", localtime) </perl> Foobar Gherkin corp.
+
+<!-- Or -->
+
+Copyright (C) <perl require="POSIX" import="strftime"> POSIX::strftime("%Y", localtime) </perl> Foobar Gherkin corp.
+
+</pre>
 </body>
 </html>
 ```
 
-[Run](https://demo.webdyne.org/inline2.psp)
+[Run](https://demo.webdyne.org/example/inline2.psp)
 
 Which can be pretty handy, but looks a bit cumbersome - the tags
 interfere with the flow of the text, making it harder to read. For this
 reason in-line perl can also be flagged in a WebDyne page using the
-shortcuts !{! .. !}, or by the use of processing instructions (**<? ..
-?\>**) e.g.:
+shortcuts !*{! .. !}*, or by the use of processing instructions (*<? ..
+?\>*) e.g.:
 
 ``` html
 <html>
@@ -731,10 +816,10 @@ The time is:  <? localtime() ?>
 </html>
 ```
 
-[Run](https://demo.webdyne.org/inline3.psp)
+[Run](https://demo.webdyne.org/example/inline3.psp)
 
-The !{! .. !} denotation can also be used in tag attributes (processing
-instructions, and <perl\> tags cannot):
+The *!{! .. !}* denotation can also be used in tag attributes
+(processing instructions, and <perl\> tags cannot):
 
 ``` html
 <html>
@@ -753,15 +838,15 @@ Hello World
 </html>
 ```
 
-[Run](https://demo.webdyne.org/inline4.psp)
+[Run](https://demo.webdyne.org/example/inline4.psp)
 
 ### Use of the <perl\> tag for non-inline code.
 
 Any code that is not co-mingled with the HTML of a document is
 *non-inline* code. It can be segmented from the content HTML using the
-\_\_PERL\_\_ delimiter, or by being kept in a completely different
-package and referenced as an external Perl subroutine call. An example
-of non-inline code:
+\_\_PERL\_\_ token, or by being kept in a completely different package
+and referenced as an external Perl subroutine call. An example of
+non-inline code:
 
 ``` html
 <html>
@@ -771,7 +856,7 @@ of non-inline code:
 
 <!-- Empty perl tag this time, but with method name as attribute -->
 
-Hello World <perl method="hello"/>
+Hello World <perl handler="hello"/>
 
 </body>
 </html>
@@ -781,7 +866,7 @@ __PERL__
 sub hello { return localtime }
 ```
 
-[Run](https://demo.webdyne.org/hello2.psp)
+[Run](https://demo.webdyne.org/example/hello2.psp)
 
 Note that the <perl\> tag in the above example is explicitly closed and
 does not contain any content. However non-inline code can enclose HTML
@@ -795,7 +880,7 @@ or text within the tags:
 
 <!-- The perl method will be called, but "Hello World" will not be displayed ! -->
 
-<perl method="hello">
+<perl handler="hello">
 Hello World 
 </perl>
 
@@ -807,7 +892,7 @@ __PERL__
 sub hello { return localtime() }
 ```
 
-[Run](https://demo.webdyne.org/noninline1.psp)
+[Run](https://demo.webdyne.org/example/noninline1.psp)
 
 But this is not very interesting so far - the "Hello World" text is not
 displayed when the example is run !
@@ -825,7 +910,7 @@ again:
 
 <!-- The perl method will be called, and this time the "Hello World" will be displayed-->
 
-<perl method="hello">
+<perl handler="hello">
 Hello World 
 </perl>
 
@@ -837,12 +922,12 @@ __PERL__
 sub hello {
     
     my $self=shift();
-    $self->render();
+    return $self->render();
 
 }
 ```
 
-[Run](https://demo.webdyne.org/noninline2.psp)
+[Run](https://demo.webdyne.org/example/noninline2.psp)
 
 And again, this time showing how to render the text block multiple
 times. Note that an array reference is returned by the Perl routine -
@@ -856,7 +941,7 @@ concatenated and send to the browser.
 
 <!-- The "Hello World" text will be rendered multiple times -->
 
-<perl method="hello">
+<perl handler="hello">
 <p>
 Hello World 
 </perl>
@@ -875,7 +960,7 @@ sub hello {
 }
 ```
 
-[Run](https://demo.webdyne.org/noninline3.psp)
+[Run](https://demo.webdyne.org/example/noninline3.psp)
 
 Same output using the \$self-\>print() method:
 
@@ -886,7 +971,7 @@ Same output using the \$self-\>print() method:
 
 <!-- The "Hello World" text will be rendered multiple times -->
 
-<perl method="hello">
+<perl handler="hello">
 <p>
 Hello World 
 </perl>
@@ -906,11 +991,126 @@ sub hello {
 }
 ```
 
-[Run](https://demo.webdyne.org/noninline3.psp)
+[Run](https://demo.webdyne.org/example/noninline3.psp)
+
+Note that there is a syntactic shortcut available if you have a single
+handler - just call the subroutine "handler" and it will be invoked by
+default:
+
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+
+<!-- Note shortcut via handler attribute with no value -->
+
+<perl handler>
+Hello World 
+</perl>
+
+</body>
+</html>
+
+__PERL__
+
+
+#  Subroutine called "handler" is invoked by default
+#
+sub handler {
+    
+    my $self=shift();
+    return $self->render()
+
+}
+```
+
+[Run](https://demo.webdyne.org/example/noninline_handler1.psp)
+
+### Requiring external modules and importing methods
+
+As noted above inline perl code can import external modules (including
+any Perl core modules, any module installed via CPAN and/or any module
+in the normal Perl \@INC path or any filesystem file). Syntax is as
+follows:
+
+``` perl
+#  Require single module and import single method
+#
+<perl require="Digest::MD5" import="md5_hex"/>
+
+#  Require single module and import multiple methods
+#
+<perl require="Digest::MD5" import="md5_hex md5_base64"/>
+
+#  Alternate syntax using array attribute - see later section
+#
+<perl require="Digest::MD5" import="@{qw(md5_hex md5_base64)}"/>
+
+#  You can also require a file. No import is available in this usage
+#
+<perl require="mymodule.pm">
+```
+
+!!! warning
+
+    The import functionality is very basic - it only maps to the function in
+    the module, it does not call the actual module import() facility. If the
+    module you are importing does something sophisticated in its import()
+    function (such as auto-creating methods) this will not work.
+    Additionally nothing is imported by default, even if automatically
+    exported by a module.
+
+A very basic demo of the above would look as follows:
+
+``` html
+<start_html>
+<pre>
+
+<!-- Basic require of Digest::MD5 module and import of functions -->
+
+<perl require="Digest::MD5" import="md5_hex md5_base64">
+
+printf("MD5_HEX: %s, MD5_BASE64: %s", md5_hex(), md5_base64());
+
+</perl>
+
+<pre>
+<end_html>
+```
+
+[Run](https://demo.webdyne.org/example/require1.psp)
+
+If your module usage and import requirements are more sophisticated they
+should be put in a \_\_PERL\_\_ section as "normal" code. Anything used
+or imported will be available to any code within the page:
+
+``` html
+<start_html>
+<pre>
+
+<!-- No require or import attribute, done in __PERL__ section -->
+
+<perl>
+
+printf("MD5_HEX: %s, MD5_BASE64: %s", md5_hex(), md5_base64());
+
+</perl>
+
+<pre>
+<end_html>
+
+__PERL__
+
+#  Use modules here if more complex needs
+#
+use Digest::MD5 qw(md5_hex md5_base64);
+```
+
+[Run](https://demo.webdyne.org/example/require2.psp)
 
 ### Alternate output methods from Perl handlers
 
-When calling a perl handler from a .psp file at some stage you will want
+When calling a perl handler from a PSP file at some stage you will want
 your code to deliver output to the browser. Various examples have been
 given throughout this document, here is a summary of various output
 options:
@@ -919,13 +1119,25 @@ options:
 <start_html>
 <pre>
 <perl handler="handler1" />
+
 <perl handler="handler2" />
+
 <perl handler="handler3" />
+
 <perl handler="handler4" />
+
 <perl handler="handler5" />
+
 <perl handler="handler6" chomp />
+
 <perl handler="handler7" />
-<perl handler="handler8" />
+
+<perl handler="handler8" chomp />
+
+<perl handler="handler9" chomp />
+
+<perl handler="handler9" autonewline/>
+
 __PERL__
 
 #  Different ways of sending output to the browser
@@ -979,7 +1191,6 @@ sub handler4 {
     print \$text;
     
 }
-
 
 sub handler5 {
 
@@ -1085,9 +1296,25 @@ sub handler8 {
     #
     $self->say($text, $text);
 }
+
+sub handler9 {
+
+    #  The autonewline directive is supported as a <perl> attribute
+    #
+    my $self=shift();
+    my $text='Hello World 9';
+    
+    
+    #  These will print, but won't send newline unless the autonewline attribute is specified
+    #
+    $self->print($text);
+    $self->print($text);
+    $self->print("\n");
+    
+}    
 ```
 
-[Run](https://demo.webdyne.org/output1.psp)
+[Run](https://demo.webdyne.org/example/output1.psp)
 
 ### Passing parameters to subroutines
 
@@ -1101,14 +1328,14 @@ passing parameters which it can act on:
 
 <!-- The "Hello World" text will be rendered with the param name -->
 
-<perl method="hello" param="Alice"/>
+<perl handler="hello" param="Alice"/>
 <p>
-<perl method="hello" param="Bob"/>
+<perl handler="hello" param="Bob"/>
 <p>
 
 <!-- We can pass an array or hashref also - see variables section for more info on this syntax -->
 
-<perl method="hello_again" param="%{ firstname=>'Alice', lastname=>'Smith' }"/>
+<perl handler="hello_again" param="%{ firstname=>'Alice', lastname=>'Smith' }"/>
 
 </body>
 </html>
@@ -1131,19 +1358,19 @@ sub hello_again {
 }
 ```
 
-[Run](https://demo.webdyne.org/noninline7.psp)
+[Run](https://demo.webdyne.org/example/noninline7.psp)
 
 ### Parameter inheritance
 
 In-line code can inherit parameters passed from a perl handler/method.
-In-line code gets two parameters supplied - the first (`$_[0)`) is the
+In-line code gets two parameters supplied - the first (`$_[0])`) is the
 self reference (e.g. `$self`), the second (`$_[1]`) is any inherited
-parameters as a hash reference. This can be useful for quick "in-line"
-formatting, e.g:
+parameters, passed as a hash reference. This can be useful for quick
+"in-line" formatting, e.g:
 
 ``` html
 <start_html>
-<perl method="inherit">
+<perl handler="inherit">
 <pre>
 Time - Unix epoch format: ${time}
 Time - local time format: <? strftime('%X', localtime($_[1]->{'time'})) ?>
@@ -1159,7 +1386,7 @@ sub inherit {
 }
 ```
 
-[Run](https://demo.webdyne.org/inherit1.psp)
+[Run](https://demo.webdyne.org/example/inherit1.psp)
 
 ### Notes about \_\_PERL\_\_ sections
 
@@ -1175,9 +1402,9 @@ will always be 1:
 <head><title>Hello World</title></head>
 <body>
 
-<perl method="hello"/>
+<perl handler="hello"/>
 <p>
-<perl method="hello"/>
+<perl handler="hello"/>
 
 </body>
 </html>
@@ -1198,7 +1425,7 @@ sub hello {
 }
 ```
 
-[Run](https://demo.webdyne.org/noninline4.psp)
+[Run](https://demo.webdyne.org/example/noninline4.psp)
 
 Lexical variables are not accessible outside of the \_\_PERL\_\_ section
 due to the way perl's eval() function works. The following example will
@@ -1219,7 +1446,7 @@ __PERL__
 my $i=5;
 ```
 
-[Run](https://demo.webdyne.org/noninline5.psp)
+[Run](https://demo.webdyne.org/example/noninline5.psp)
 
 Package defined vars declared in a \_\_PERL\_\_ section do work, with
 caveats:
@@ -1242,7 +1469,7 @@ The value of $i is !{! &get_i() !}
 <p>
 
 <!-- Or this - see variable substitution section  -->
-<perl method="render_i">
+<perl handler="render_i">
 The value of $i is ${i}
 </perl>
 
@@ -1258,7 +1485,7 @@ sub get_i { \$i }
 sub render_i { shift()->render(i=>$i) }
 ```
 
-[Run](https://demo.webdyne.org/noninline6.psp)
+[Run](https://demo.webdyne.org/example/noninline6.psp)
 
 See the Variables/Substitution section for clean ways to insert variable
 contents into the page.
@@ -1276,7 +1503,7 @@ content of a rendered text block. A simple example:
 
 <!-- The var ${time} will be substituted for the correspondingly named render parameter -->
 
-<perl method="hello">
+<perl handler="hello">
 Hello World ${time}
 </perl>
 
@@ -1292,7 +1519,7 @@ sub hello {
 }
 ```
 
-[Run](https://demo.webdyne.org/var1.psp)
+[Run](https://demo.webdyne.org/example/var1.psp)
 
 Note the passing of the `time` value as a parameter to be substituted
 when the text is rendered.
@@ -1307,7 +1534,7 @@ dynamic data:
 
 <!-- Multiple variables can be supplied at once as render parameters -->
 
-<perl method="hello0">
+<perl handler="hello0">
 <p>
 Hello World ${time}, loop iteration ${i}.
 </perl>
@@ -1315,7 +1542,7 @@ Hello World ${time}, loop iteration ${i}.
 <br>
 <br>
 
-<perl method="hello1">
+<perl handler="hello1">
 <p>
 Hello World ${time}, loop iteration ${i}.
 </perl>
@@ -1349,7 +1576,7 @@ sub hello1 {
 }
 ```
 
-[Run](https://demo.webdyne.org/var2.psp)
+[Run](https://demo.webdyne.org/example/var2.psp)
 
 Variables can also be used to modify tag attributes:
 
@@ -1360,7 +1587,7 @@ Variables can also be used to modify tag attributes:
 
 <!-- Render paramaters also work in tag attributes -->
 
-<perl method="hello">
+<perl handler="hello">
 <p>
 <font color="${color}">
 Hello World
@@ -1385,7 +1612,7 @@ sub hello {
 }
 ```
 
-[Run](https://demo.webdyne.org/var3.psp)
+[Run](https://demo.webdyne.org/example/var3.psp)
 
 Other variable types are available also, including:
 
@@ -1415,11 +1642,11 @@ should provide an example of potential variable usage:
 
 <p>
 <!-- Short Way -->
-Mod Perl Version: *{MOD_PERL}
+Request Method: *{REQUEST_METHOD}
 <br>
 <!-- Same as Perl code -->
-Mod Perl Version: 
-<perl> \$ENV{'MOD_PERL'} </perl>
+Request Method: 
+<perl> $ENV{'REQUEST_METHOD'} </perl>
 
 
 <!-- Apache request record methods. Only methods that return a scalar result are usable -->
@@ -1430,7 +1657,7 @@ Request Protocol: ^{protocol}
 <br>
 <!-- Same as Perl code -->
 Request Protocol: 
-<perl> my $self=shift(); my $r=$self->r(); \$r->protocol() </perl>
+<perl> my $self=shift(); my $r=$self->r(); return $r->protocol() </perl>
 
 
 <!-- CGI params -->
@@ -1446,14 +1673,14 @@ You Entered: +{name}
 <br>
 <!-- Same as Perl code -->
 You Entered: 
-<perl> my $self=shift(); my $cgi_or=$self->CGI(); \$cgi_or->param('name') </perl>
+<perl> my $self=shift(); my $cgi_or=$self->CGI(); return $cgi_or->param('name') </perl>
 <br>
 <!-- CGI vars are also loaded into the %_ global var, so the above is the same as -->
 You Entered: 
 <perl> $_{'name'} </perl>
 
 
-<!-- Arrays -->
+<!-- Array Syntax -->
 
 <form>
 <p>
@@ -1461,7 +1688,7 @@ Favourite colour 1:
 <p><popup_menu name="popup_menu" values="@{qw(red green blue)}">
 
 
-<!-- Hashes -->
+<!-- Hashe Syntax -->
 
 <p>
 Favourite colour 2:
@@ -1474,7 +1701,7 @@ Favourite colour 2:
 </html>
 ```
 
-[Run](https://demo.webdyne.org/var4.psp)
+[Run](https://demo.webdyne.org/example/var4.psp)
 
 ## Shortcut Tags
 
@@ -1497,7 +1724,15 @@ The time is: !{! localtime() !}
 <end_html>
 ```
 
-[Run](https://demo.webdyne.org/cgi6.psp)
+[Run](https://demo.webdyne.org/example/cgi6.psp)
+
+!!! tip
+
+    The <end_html\> tag can be omitted if desired, the HTML parser will
+    auto close any dangling tags at the end of the document, including
+    adding any omitted </body\> or </html\> tags. So even if omitted from
+    the PSP file WebDyne should still generate valid HTML to be served to
+    the browser.
 
 The <start_html\> tag generates all the <html\>, <head\>, <title\>
 tags etc needed for a valid HTML page plus an opening body tag. Just
@@ -1526,7 +1761,7 @@ and stylesheets:
 
 <script>
   new Typed('#typed', {
-    strings: ["Lorem", "Ipsum", "!{! localtime !}"],
+    strings: ["Lorem", "Ipsum", "Dictum"],
     typeSpeed: 50,
     backSpeed: 25,
     loop: true
@@ -1534,12 +1769,12 @@ and stylesheets:
 </script>
 ```
 
-[Run](https://demo.webdyne.org/start_html1.psp)
+[Run](https://demo.webdyne.org/example/start_html1.psp)
 
 !!! caution
 
-    If make sure any attributes using the `@{..}` or `%{..}` convention are
-    on one line - the parser will not interpret them correctly if spanning
+    Make sure any attributes using the `@{..}` or `%{..}` convention are on
+    one line - the parser may not interpret them correctly if spanning
     multiple lines.
 
 If using the <start_html\> shortcut tag you can optionally insert
@@ -1580,7 +1815,7 @@ following:
         }
     }
 
-Then any `.psp` file with a <start_html\> tag will have the following
+Then any `PSP` file with a <start_html\> tag will have the following
 content:
 
     <!DOCTYPE html><html lang="de">
@@ -1651,7 +1886,7 @@ What's your favourite color ?
 
 <!-- This section only rendered when form submitted -->
 
-<perl method="answers">
+<perl handler="answers">
 <p>
 Your name is: <em>+{name}</em>
 <p>
@@ -1677,7 +1912,7 @@ sub answers {
 }
 ```
 
-[Run](https://demo.webdyne.org/cgi1.psp)
+[Run](https://demo.webdyne.org/example/cgi1.psp)
 
 !!! note
 
@@ -1692,7 +1927,7 @@ Tags such as <popup_menu\> output traditional HTML form tags such as
 <select\><option\>...</select\>, but they have the advantage of
 allowing Perl data types as attributes. Take the following example:
 
-    <popup_menu value="%{red=>Red, green=>Green, blue=>Blue}"/>
+    <popup_menu values="%{red=>Red, green=>Green, blue=>Blue}"/>
 
 it is arguably easier to read than:
 
@@ -1716,7 +1951,7 @@ when we consider the next example:
 <form>
 
 Your Country ?
-<perl method="countries">
+<perl handler="countries">
 <popup_menu values="${countries_ar}" default="Australia">
 </perl>
 
@@ -1737,7 +1972,7 @@ sub countries {
 }
 ```
 
-[Run](https://demo.webdyne.org/cgi5.psp)
+[Run](https://demo.webdyne.org/example/cgi5.psp)
 
 All values for the menu item were pre-populated from one WebDyne
 variable - which saves a significant amount of time populating a
@@ -1767,7 +2002,7 @@ Enter your name:
 
 <!-- And print out name if we have it -->
 
-<perl method="hello">
+<perl handler="hello" run="+{name}">
 Hello ${name}, pleased to meet you.
 </perl>
 
@@ -1792,11 +2027,18 @@ sub hello {
 }
 ```
 
-[Run](https://demo.webdyne.org/cgi3.psp)
+[Run](https://demo.webdyne.org/example/cgi3.psp)
 
 From there you can all any method supported by the CGI::Simple module -
 see the CGI::Simple manual page (`man CGI::Simple`) or review on CPAN:
 [CGI::Simple](https://metacpan.org/pod/CGI::Simple)
+
+!!! note
+
+    WebDyne actually wraps the CGI::Simple object to emulate aspects of a
+    Plack::Request handler, including supporting Hash::MultiValue
+    parameters. For the most part this is transparent but something to be
+    aware of if working with parameters which may have multiple values.
 
 Since one of the most common code tasks is to access query parameters,
 WebDyne stores them in the special `%_` global variable before any user
@@ -1827,7 +2069,7 @@ Hello +{name}, pleased to meet you.
 <!-- Traditional, using the CGI::Simple param() call in the hello1 sub -->
 
 <p>
-<perl method="hello1">
+<perl handler="hello1">
 Hello ${name}, pleased to meet you.
 </perl>
 
@@ -1835,7 +2077,7 @@ Hello ${name}, pleased to meet you.
 <!-- Quicker method using %_ global var in the hello2 sub -->
 
 <p>
-<perl method="hello2">
+<perl handler="hello2">
 Hello ${name}, pleased to meet you.
 </perl>
 
@@ -1869,7 +2111,14 @@ sub hello2 {
 }
 ```
 
-[Run](https://demo.webdyne.org/cgi4.psp)
+[Run](https://demo.webdyne.org/example/cgi4.psp)
+
+!!! note
+
+    Values stored in the `%_` variable are single value only, and reflect
+    the "last" value of any multivalue parameter supplied. The `%_` variable
+    is a convenience for simple access - if more complex operations are
+    required use the `CGI()` object.
 
 # Advanced Usage
 
@@ -1898,7 +2147,7 @@ output generated within Perl code. An example:
 </form>
 
 <p>
-<perl method="check">
+<perl handler="check">
 
 
 <!-- Each block below is only rendered if specifically requested by the Perl code -->
@@ -1947,7 +2196,7 @@ sub check {
         
 ```
 
-[Run](https://demo.webdyne.org/block1.psp)
+[Run](https://demo.webdyne.org/example/block1.psp)
 
 There can be more than one block with the same name - any block with the
 target name will be rendered:
@@ -1963,7 +2212,7 @@ Enter your name:
 <p><submit>
 </form>
 
-<perl method="hello">
+<perl handler="hello">
 
 
 <!-- The following block is only rendered if we get a name - see the perl 
@@ -2011,7 +2260,7 @@ sub hello {
 }
 ```
 
-[Run](https://demo.webdyne.org/block2.psp)
+[Run](https://demo.webdyne.org/example/block2.psp)
 
 Like any other text or HTML between <perl\> tags, blocks can take
 parameters to substitute into the text:
@@ -2027,7 +2276,7 @@ Enter your name: <textfield name="name">
 <submit>
 </form>
 
-<perl method="hello">
+<perl handler="hello">
 
 
 <!-- This block will be rendered multiple times, the output changing depending
@@ -2064,7 +2313,7 @@ sub hello {
 }
 ```
 
-[Run](https://demo.webdyne.org/block3.psp)
+[Run](https://demo.webdyne.org/example/block3.psp)
 
 Blocks have a non-intuitive feature - they still display even if they
 are outside of the <perl\> tags that made the call to render them. e.g.
@@ -2077,7 +2326,7 @@ the following is OK:
 <body>
 
 <!-- Perl block with no content -->
-<perl method="hello">
+<perl handler="hello">
 </perl>
 
 <p>
@@ -2107,7 +2356,7 @@ sub hello {
 }
 ```
 
-[Run](https://demo.webdyne.org/block4.psp)
+[Run](https://demo.webdyne.org/example/block4.psp)
 
 You can mix the two styles:
 
@@ -2116,7 +2365,7 @@ You can mix the two styles:
 <head><title>Hello World</title></head>
 
 <body>
-<perl method="hello">
+<perl handler="hello">
 
 <!-- This block is rendered -->
 <block name="hello">
@@ -2145,7 +2394,7 @@ sub hello {
 }
 ```
 
-[Run](https://demo.webdyne.org/block5.psp)
+[Run](https://demo.webdyne.org/example/block5.psp)
 
 You can use the <block\> tag display attribute to hide or show a block,
 or use a CGI parameter to determine visibility (e.g for a status update
@@ -2177,7 +2426,7 @@ Goodbye world
 </block>
 ```
 
-[Run](https://demo.webdyne.org/block_toggle1.psp)
+[Run](https://demo.webdyne.org/example/block_toggle1.psp)
 
 ## File inclusion
 
@@ -2197,10 +2446,10 @@ The protocols file on this machine:
 </html>
 ```
 
-[Run](https://demo.webdyne.org/include1.psp)
+[Run](https://demo.webdyne.org/example/include1.psp)
 
 If the file name is not an absolute path name is will be loaded relative
-to the directory of the parent file. For example if file "bar.psp"
+to the directory of the parent file. For example if file "`bar.psp`"
 incorporates the tag <include file="foo.psp"\> it will be expected that
 "`foo.psp`" is in the same directory as "`bar.psp`".
 
@@ -2211,10 +2460,10 @@ incorporates the tag <include file="foo.psp"\> it will be expected that
     compilation) are not reflected in subsequent output unless the `nocache`
     attribute is set. Thus the include tag should not be seen as a shortcut
     to a pseudo Content Management System. For example <include
-    file="latest_news.txt"\> will probably not behave in the way you expect.
-    The first time you run it the latest news is displayed. However updating
-    the "latest_news.txt" file will not result in changes to the output (it
-    will be stale).
+    file="latest_news.txt"\> may not behave in the way you expect. The first
+    time you run it the latest news is displayed. However updating the
+    "latest_news.txt" file will not result in changes to the output (it will
+    be stale).
 
     If you do use the `nocache` attribute the included page will be loaded
     and parsed every time, significantly slowing down page display. There
@@ -2223,15 +2472,17 @@ incorporates the tag <include file="foo.psp"\> it will be expected that
 
 You can include just the head or body section of a HTML or PSP file by
 using the head or body attributes. Here is the reference file (file to
-be included). It does not have to be a .psp file - a standard HTML file
+be included). It does not have to be a PSP file - a standard HTML file
 can be supplied :
 
 ``` html
+#  This file is named include2.psp and used in the next example
+#
 <start_html title="Include Head Title">
-Include Body
+Body from include2.psp file
 ```
 
-[Run](https://demo.webdyne.org/include2.psp)
+[Run](https://demo.webdyne.org/example/include2.psp)
 
 And here is the generating file (the file that includes sections from
 the reference file).
@@ -2243,13 +2494,14 @@ the reference file).
 </head>
 <body>
 <include body file="./include2.psp">
+Body from include3.psp file
 ```
 
-[Run](https://demo.webdyne.org/include3.psp)
+[Run](https://demo.webdyne.org/example/include3.psp)
 
-You can also include block sections from `.psp` files. If this is the
+You can also include block sections from `PSP` files. If this is the
 reference file (the file to be included) containing two blocks. This is
-a renderable `.psp` file in it's own right. The blocks use the `display`
+a renderable `PSP` file in it's own right. The blocks use the `display`
 attribute to demonstrate that they will produce output, but it's not
 required:
 
@@ -2266,7 +2518,7 @@ This is block 2
 </block>
 ```
 
-[Run](https://demo.webdyne.org/include4.psp)
+[Run](https://demo.webdyne.org/example/include4.psp)
 
 And here is the file that brings in the blocks from the reference file
 and incorporates them into the output:
@@ -2284,13 +2536,13 @@ And another different block from the same file with caching disabled:
 <include file="include4.psp" block="block2" nocache>
 ```
 
-[Run](https://demo.webdyne.org/include5.psp)
+[Run](https://demo.webdyne.org/example/include5.psp)
 
 ## Static Sections {#static_sections}
 
-Sometimes you want to generate dynamic output in a page once only (e.g.
-a last modified date, a sidebar menu etc.) Using WebDyne this can be
-done with Perl or CGI code flagged with the "static" attribute. Any
+Sometimes it is desirable to generate dynamic output in a page once only
+(e.g. a last modified date, a sidebar menu etc.) Using WebDyne this can
+be done with Perl or CGI code flagged with the "static" attribute. Any
 dynamic tag so flagged will be rendered at compile time, and the
 resulting output will become part of the compiled page - it will not
 change on subsequent page views, or have to be re-run each time the page
@@ -2307,7 +2559,7 @@ Hello World
 
 <!-- Note the static attribute -->
 
-<perl method="mtime" static="1">
+<perl handler="mtime" static="1">
 <em>Last Modified: </em>${mtime}
 </perl>
 
@@ -2330,14 +2582,14 @@ sub mtime {
 }
 ```
 
-[Run](https://demo.webdyne.org/static1.psp)
+[Run](https://demo.webdyne.org/example/static1.psp)
 
 In fact the above page will render very quickly because it has no
 dynamic content at all once the <perl\> content is flagged as static.
 The WebDyne engine will recognise this and store the page as a static
 HTML file in its cache. Whenever it is called WebDyne will use the
-Apache lookup_file() function to return the page as if it was just
-serving up static content.
+Apache lookup_file() or equivalent Plack function to return the page as
+if it was just serving up static content.
 
 You can check this by looking at the content of the WebDyne cache
 directory (usually /var/webdyne/cache). Any file with a ".html"
@@ -2355,14 +2607,14 @@ Hello World
 
 <!-- A normal dynamic section - code is run each time page is loaded -->
 
-<perl method="localtime">
+<perl handler="localtime">
 Current time: ${time} 
 </perl>
 <hr>
 
 <!-- Note the static attribute - code is run only once at compile time -->
 
-<perl method="mtime" static="1">
+<perl handler="mtime" static="1">
 <em>Last Modified: </em>${mtime}
 </perl>
 
@@ -2394,7 +2646,7 @@ sub mtime {
 }
 ```
 
-[Run](https://demo.webdyne.org/static2.psp)
+[Run](https://demo.webdyne.org/example/static2.psp)
 
 If you want the whole pages to be static, then flagging everything with
 the "static" attribute can be cumbersome. There is a special meta tag
@@ -2418,7 +2670,7 @@ Hello World
 <!-- A normal dynamic section, but because of the meta tag it will be frozen 
     at compile time -->
 
-<perl method="localtime">
+<perl handler="localtime">
 Current time: ${time} 
 </perl>
 
@@ -2426,7 +2678,7 @@ Current time: ${time}
     as static - it could be removed safely. -->
 
 <p>
-<perl method="mtime" static="1">
+<perl handler="mtime" static="1">
 <em>Last Modified: </em>${mtime}
 </perl>
 
@@ -2458,7 +2710,7 @@ sub mtime {
 }
 ```
 
-[Run](https://demo.webdyne.org/static3.psp)
+[Run](https://demo.webdyne.org/example/static3.psp)
 
 If you don't like the idea of setting the static flag in meta data, then
 "using" the special package "WebDyne::Static" will have exactly the same
@@ -2474,13 +2726,13 @@ effect:
 Hello World
 <hr>
 
-<perl method="localtime">
+<perl handler="localtime">
 Current time: ${time} 
 </perl>
 
 <p>
 
-<perl method="mtime">
+<perl handler="mtime">
 <em>Last Modified: </em>${mtime}
 </perl>
 
@@ -2516,7 +2768,7 @@ sub mtime {
 }
 ```
 
-[Run](https://demo.webdyne.org/static3a.psp)
+[Run](https://demo.webdyne.org/example/static3a.psp)
 
 If the static tag seems trivial consider the example that displayed
 country codes:
@@ -2532,7 +2784,7 @@ country codes:
 <form>
 
 Your Country ?
-<perl method="countries">
+<perl handler="countries">
 <popup_menu values="${countries_ar}" default="Australia">
 </perl>
 
@@ -2553,7 +2805,7 @@ sub countries {
 }
 ```
 
-[Run](https://demo.webdyne.org/cgi5.psp)
+[Run](https://demo.webdyne.org/example/cgi5.psp)
 
 Every time the above example is viewed the Country Name list is
 generated dynamically via the Locale::Country module. This is a waste of
@@ -2571,7 +2823,7 @@ code neat but gain a lot of speed by adding the `static` tag attribute:
 <form>
 
 Your Country ?
-<perl method="countries" static="1">
+<perl handler="countries" static="1">
 
 <!-- Note the addition of the static attribute -->
 
@@ -2595,7 +2847,7 @@ sub countries {
 }
 ```
 
-[Run](https://demo.webdyne.org/static4.psp)
+[Run](https://demo.webdyne.org/example/static4.psp)
 
 By simply adding the "static" attribute output on a sample machine
 resulted in a 4x speedup in page loads. Judicious use of the static tag
@@ -2610,10 +2862,10 @@ that are flagged as static this presents some powerful possibilities.
 
 !!! important
 
-    Caching will only work if `$WEBDYNE_CACHE_DN` is defined and set to a
-    directory that the web server has write access to. If caching does not
-    work check that \$`WEBDYNE_CACHE_DN` is defined and permissions set
-    correctly for your web server.
+    Caching will only work effectively if `$WEBDYNE_CACHE_DN` is defined and
+    set to a directory that the web server has write access to. If caching
+    does not work check that \$`WEBDYNE_CACHE_DN` is defined and permissions
+    set correctly for your web server.
 
 There are many potential examples, but consider this one: you have a
 page that generates output by making a complex query to a database,
@@ -2644,18 +2896,16 @@ over a 20 second interval
 <head>
 <title>Caching</title>
 <!-- Set static and cache meta parameters -->
-<meta name="WebDyne" content="cache=&cache;static=1">
+<meta name="WebDyne" content="cache=&cache">
 </head>
 
 <body>
 <p>
-
-This page will update once every 10 seconds.
-
+This page will only update the time once every 10 seconds. Click refresh to test.
 <p>
-
 Hello World !{! localtime() !}
-
+<p>
+<button onclick="location.reload()">Refresh</button>
 </body>
 </html>
 
@@ -2664,7 +2914,6 @@ __PERL__
 
 #  The following would work in place of the meta tags
 #
-#use WebDyne::Static;
 #use WebDyne::Cache (\&cache);
 
 
@@ -2690,21 +2939,16 @@ sub cache {
 }
 ```
 
-[Run](https://demo.webdyne.org/cache1.psp)
-
-WebDyne uses the return value of the nominated cache routine to
-determine what UID (unique ID) to assign to the page. In the above
-example we returned \\undef, which signifies that the UID will remain
-unchanged.
+[Run](https://demo.webdyne.org/example/cache1.psp)
 
 You can start to get more advanced in your handling of cached pages by
-returning a different UID based on some arbitrary criteria. To extend
+manipulating the page UUID based on some arbitrary criteria. To extend
 our example above: say we have a page that generated sales figures for a
 given month. The SQL code to do this takes a long time, and we do not
 want to hit the database every time someone loads up the page. However
 we cannot just cache the output, as it will vary depending on the month
-the user chooses. We can tell the cache code to generate a different UID
-based on the month selected, then cache the resulting output.
+the user chooses. We can tell the cache code to generate a different
+UUID based on the month selected, then cache the resulting output.
 
 The following example simulates such a scenario:
 
@@ -2712,12 +2956,13 @@ The following example simulates such a scenario:
 <!-- Start to cheat by using start/end_html tags to save space -->
 
 <start_html>
-<form method="GET">
+<start_form>
 Get sales results for:&nbsp;<popup_menu name="month" values="@{qw(January February March)}">
+<p>
 <submit>
-</form>
+<end_form>
 
-<perl method="results">
+<perl handler="results">
 Sales results for +{month}: $${results}
 </perl>
 
@@ -2727,7 +2972,6 @@ This page generated: !{! localtime() !}
 
 __PERL__
 
-use WebDyne::Static;
 use WebDyne::Cache (\&cache);
 
 my %results=(
@@ -2737,19 +2981,36 @@ my %results=(
     March       => 40
 );
 
+
 sub cache {
 
-    #  Return UID based on month
+
+    #  Get self ref
     #
-    my $uid=undef;
+    my $self=shift();
+
+
+    #  Change page UUID based on month to cache
+    #  reults for that month to static HTML
+    #
     if (my $month=$_{'month'}) {
 
         #  Make sure month is valid
         #
-        $uid=$month if defined $results{$month}
+        if (defined(my $uid=$results{$month})) {
+        
+            #   It is. Change page UUID (inode) using month as a seed
+            #
+            $self->inode($uid)
+            
+        }
 
     }
-    return \$uid;
+    
+    
+    #  Done
+    #
+    return \undef;
 
 }
 
@@ -2775,7 +3036,7 @@ sub results {
 }
 ```
 
-[Run](https://demo.webdyne.org/cache2.psp)
+[Run](https://demo.webdyne.org/example/cache2.psp)
 
 !!! important
 
@@ -2833,18 +3094,84 @@ sub chart_data {
         
 ```
 
-[Run](https://demo.webdyne.org/chart1.psp)
+[Run](https://demo.webdyne.org/example/chart1.psp)
 
 If you run it and review the source HTML you will see the JSON data
 rendered into the page as <script\></script\> block of type
 application/json with an id of "chartData". Any data returned by the
 perl routine nominated by the json tag is presented as JSON within that
 tag block, and available to Javascript libraries within the page. JSON
-data is kept in canononical order by default, which can be adjusted with
+data is kept in canonical order by default, which can be adjusted with
 the WEBDYNE_JSON_CANONICAL variable if not desired/needed for a very
 small speed-up.
 
-## API Tags
+Another example demonstrating a table constructed with the Grid.js
+library
+
+``` html
+<start_html style="@{qw(https://cdn.jsdelivr.net/npm/water.css@2/out/water.css https://unpkg.com/gridjs/dist/theme/mermaid.min.css)}">
+
+  <h1>User Sales Dashboard</h1>
+
+  <!-- Grid container for rendered table -->
+  <div id="table"></div>
+
+  <!-- JSON dataset generated by server  -->
+  <json id="data" handler="data" pretty>
+
+  <!-- Grid.js table render -->
+  <script type=module>
+
+    import { Grid, html } from "https://unpkg.com/gridjs?module";
+    
+    // Parse JSON from script tag
+    const json = JSON.parse(document.getElementById("data").textContent);
+
+    // Initialize Grid.js
+    new Grid({
+      columns: [
+        { id: "id", name: "ID" },
+        { id: "name", name: "Name" },
+        { id: "email", name: "Email" },
+        { id: "sales", name: "Sales ($)", formatter: cell => `$${cell}` }
+      ],
+      data: json,
+      search: true,
+      sort: true,
+      pagination: {
+        enabled: true,
+        limit: 3,
+      },
+      style: {
+        table: { "font-size": "14px" },
+        th: { "background-color": "#f5f5f5" },
+      },
+    }).render(document.getElementById("table"));
+  </script>
+
+__PERL__
+
+sub data {
+
+    #  Build dummy data for display by grid.js
+    #
+    my @rows=(qw(id name email sales));
+    my @data=(
+        [qw(1 Alice alice@example.com 320)],
+        [qw(2 Bob bob@example.com 150)],
+        [qw(3 Charles charles@example.com 470)],
+        [qw(4 Diana diana@example.com 290)],
+        [qw(6 Evan evan@example.com 510)],
+    );
+    my @json=map {my %data; @data{@rows}=@{$data[$_]}; \%data} (0..$#data);
+    return \@json;
+    
+}
+```
+
+[Run](https://demo.webdyne.org/example/grid1.psp)
+
+## API
 
 WebDyne has the ability to make available a basic REST API facility
 using the <api\> tag in conjunction with the Router::Simple CPAN
@@ -2855,14 +3182,14 @@ that:
     <api\> tag. All other tags are ignored - in fact they are
     discarded.
 
--   Any .psp file file an <api\> tag will only emit JSON data with a
+-   Any PSP file file an <api\> tag will only emit JSON data with a
     content type of "`application/json`"
 
--   The REST api path must correspond .psp file at some path level, e.g.
-    if your path is `/api/user/42` you must have a file called either
-    "`api.psp`" or "`api/user.psp`" in your path.
+-   The REST api path must correspond to a PSP file at some path level,
+    e.g. if your path is `/api/user/42` you must have a file called
+    either "`api.psp`" or "`api/user.psp`" in your path.
 
--   A .psp file can contain multiple <api\> tags corresponding to
+-   A PSP file can contain multiple <api\> tags corresponding to
     different `Router::Simple` routes
 
 Here is a very simple example. Note the format of the URL in the Run
@@ -2898,25 +3225,36 @@ sub doublecase {
 ```
 
 [Run uppercase API
-example](https://demo.webdyne.org/api/uppercase/bob/42)
+example](https://demo.webdyne.org/example/api/uppercase/bob/42)
 
 [Run doublecase API
-example](https://demo.webdyne.org/api/doublecase/bob/42)
+example](https://demo.webdyne.org/example/api/doublecase/bob/42)
 
 !!! caution
 
-    The <api\> tag is still somewhat experimental. Use with caution
+    The <api\> tag is still somewhat experimental and is not intended to
+    replace a full service API handler. Use with caution
 
 ## HTMX
 
 WebDyne has support for <htmx\> tags to supply fragmented HTML to pages
-using the [HTMX Javascript Library](https://htmx.org). WebDyne can
-support just supplying HTML snippet to pages in response to htmx calls.
-HTMX and WebDyne are complementary libraries which can be combined
-together to support dynamic pages with in-place updates from WebDybe
-Perl backends. Here is a simple HTML file (`htmx_demo1.psp`)
-incorporating HTMX calls to a backend file called `htmx_time1.psp`. Here
-is the display file, `htmx_demo1.psp`
+using the [HTMX Javascript Library](https://htmx.org) and similar
+libraries such as [Alpine Ajax](https://alpine-ajax.js.org). WebDyne can
+support just supplying HTML snippet to pages in response to htmx or
+similar calls. HTMX/Alpine Ajax and WebDyne are complementary libraries
+which can be combined together to support dynamic pages with in-place
+updates from a WebDyne Perl backend.
+
+!!! important
+
+    The htmx javascript library must be activated in any file that utilises
+    htmx calls (initiates a `hx-get` or similar operation). The javascript
+    can be loaded in any convenient way, via a <start_html\> script
+    attribute, traditional <script\> tags etc.
+
+Here is a simple HTML file (`htmx_demo1.psp`) incorporating HTMX calls
+to a backend file called `htmx_time1.psp`. Here is the display file,
+`htmx_demo1.psp`
 
 ``` html
 <start_html script="https://unpkg.com/htmx.org@1.9.10">
@@ -2939,17 +3277,17 @@ Get Time
 </div>
 ```
 
-[Run](https://demo.webdyne.org/htmx_demo1.psp)
+[Run](https://demo.webdyne.org/example/htmx_demo1.psp)
 
 And the backend file which generates the HTMX data for the above page
 (`htmx_time1.psp`):
 
 ``` html
 <start_html>
-<htmx>Server local time: <? localtime() ?> </htmx>
+<htmx force=1>Server local time: <? localtime() ?> </htmx>
 ```
 
-[Run](https://demo.webdyne.org/htmx_time1.psp)
+[Run](https://demo.webdyne.org/example/htmx_time1.psp)
 
 Note the <htmx\> tags. You can run the above htmx resource file and it
 will render correctly as a full HTML page - however if WebDyne detects a
@@ -2958,11 +3296,17 @@ will render correctly as a full HTML page - however if WebDyne detects a
 !!! important
 
     Only one <htmx\> section from a file will ever be rendered. You can
-    have multiple <htmx\> sections in a .psp file however only one can be
+    have multiple <htmx\> sections in a PSP file however only one can be
     rendered at any time. You can use the display attribute with dynamic
-    matching (see later) do render different <htmx\> sections in a .psp
+    matching (see later) to render different <htmx\> sections in a PSP
     file, or you can keep them all in different files (e.g. one <htmx\>
-    section per .psp file
+    section per PSP file
+
+!!! important
+
+    Content in <htmx\> tags will not be rendered unless a hx-request HTTP
+    header is detected, or (as in the above example) the force attribute is
+    nominated.
 
 ### Using Perl within <htmx\> tags
 
@@ -2991,9 +3335,10 @@ Get Time
 </div>
 ```
 
-[Run](https://demo.webdyne.org/htmx_demo2.psp)
+[Run](https://demo.webdyne.org/example/htmx_demo2.psp)
 
-And the backend file which generates the HTMX data for the above page:
+And the backend file which generates the HTMX data for the above page -
+now with the HTML fragment generated by Perl:
 
 ``` html
 <start_html>
@@ -3014,12 +3359,12 @@ sub server_time {
 }
 ```
 
-[Run](https://demo.webdyne.org/htmx_time2.psp)
+[Run](https://demo.webdyne.org/example/htmx_time2.psp)
 
-### Using multiple <htmx\> tags in one .psp file
+### Using multiple <htmx\> tags in one PSP file
 
 As is mentioned above only one <htmx\> fragment can be returned by a
-.psp page at a time - but you can use techniques to select which tag
+PSP page at a time - but you can use techniques to select which tag
 should be rendered. The <htmx\> tag supports the display attribute. If
 this attribute exists and is a "true" value then the <htmx\> fragment
 will be returned. At first this doesn't seem very useful - but when
@@ -3039,7 +3384,7 @@ Click the button below to load time data from the server.</p>
   hx-get="/htmx_time3.psp"
   hx-target="#time-container"
   hx-swap="innerHTML"
-  hx-vals="js:{ time_local: 1 }"
+  hx-vals="js:{ 'time_local': 1 }"
 >
 Get Local Time
 </button>
@@ -3052,7 +3397,7 @@ Get Local Time
   hx-get="/htmx_time3.psp"
   hx-target="#time-container"
   hx-swap="innerHTML"
-  hx-vals="js:{ time_utc: 1 }"
+  hx-vals="js:{ 'time_utc': 1 }"
 >
 Get UTC Time
 </button>
@@ -3064,17 +3409,31 @@ Get UTC Time
 </div>
 ```
 
-[Run](https://demo.webdyne.org/htmx_demo3.psp)
+[Run](https://demo.webdyne.org/example/htmx_demo3.psp)
+
+!!! important
+
+    WebDyne does not support single quoted tags - you can use them in PSP
+    files, but the rendered HTML will always emit tag attributes as double
+    quoted. For attributes such as hx-vals it is not possible to supply JSON
+    strings within single quotes, i.e. this will not work: <button
+    hx-vals='{ "foo" : "bar" }'\> - the single quotes will be emitted as
+    double quotes, causing the browser to misinterpret the tag. If you need
+    to supply quoted keys uses the `js:{}` syntax above.
+
+Here is the HTML page used by the above example to fetch the requested
+time. You can run it, however nothing will be emitted unless you supply
+a `?time_local=1` or `?time_utc=1` query parameter in your browser.
 
 ``` html
 <htmx display="+{time_local}"> Time Local: <? localtime() ?></htmx>
 <htmx display="+{time_utc}"> Time UTC: <? gmtime() ?></htmx>
 ```
 
-[Run](https://demo.webdyne.org/htmx_time3.psp)
+[Run](https://demo.webdyne.org/example/htmx_time3.psp)
 
 Normally you would expect to have the hx-get attribute for each button
-go to a different .psp page. But in this instance they refer to the same
+go to a different PSP page. But in this instance they refer to the same
 page. So how do we discriminate ? The key is in the supply of the
 hx-vals attribute, which allows us to send query strings to the htmx
 resource page. We can then use them to select which <htmx\> block is
@@ -3086,6 +3445,68 @@ returned.
     attribute. It allows for easier supply of JSON data without needed to
     manipulate/escape double-quotes in raw JSON data. You'll also note there
     is no <start_html\> tag. It's not necessary for <htmx\> pages.
+
+### Putting everything in one file
+
+Because <htmx\> tag does not render unless a hx-request header is
+received we can serve htmx content from the same PSP file that calls it.
+Here is an example that brings everything into one file:
+
+``` html
+<start_html script="https://unpkg.com/htmx.org@1.9.10">
+Click button for current server time:
+<button hx-get="#" hx-target="#time">Refresh</button>
+<p>
+<div id="time"><em>Time Not Loaded Yet</div>
+<htmx perl>
+return localtime
+</htmx>
+```
+
+[Run](https://demo.webdyne.org/example/htmx_time4.psp)
+
+Or the local/UTC time example converted to run everything from one file:
+
+``` html
+<start_html script="https://unpkg.com/htmx.org@1.9.10">
+<h2>HTMX Demo</h2>
+<p>
+Click the button below to load time data from the server.</p>
+
+<!-- HTMX Trigger Button for Local Time -->
+<button 
+  style="width:180px"
+  hx-get="#"
+  hx-target="#time"
+  hx-vals="js:{ 'time_local': 1 }"
+>
+Get Local Time
+</button>
+
+<p>
+
+<!-- HTMX Trigger Button for UTC Time -->
+<button 
+  style="width:180px"
+  hx-get="#"
+  hx-target="#time"
+  hx-vals="js:{ 'time_utc': 1 }"
+>
+Get UTC Time
+</button>
+
+<!-- Where the fetched HTML fragment will go -->
+<p>
+<div id="time">
+<em>Time data not loaded yet.</em>
+</div>
+
+<!-- HTMX fragments -->
+<htmx display="+{time_local}"> Time Local: <? localtime() ?></htmx>
+<htmx display="+{time_utc}"> Time UTC: <? gmtime() ?></htmx>
+```
+
+[Run](https://demo.webdyne.org/example/htmx_demo4.psp)
 
 ## Dump
 
@@ -3112,7 +3533,7 @@ Your Name: <textfield name="name">
 <dump all force>
 ```
 
-[Run](https://demo.webdyne.org/dump1.psp)
+[Run](https://demo.webdyne.org/example/dump1.psp)
 
 Dump display/hide can be controlled by form parameters or run URI query
 strings. In the example below ticking the checkbox or simply appending
@@ -3131,7 +3552,7 @@ Show Dump: <checkbox name="dump_enable">
 <dump all force="!{! $_{'dump_enable'} !}">
 ```
 
-[Run](https://demo.webdyne.org/dump2.psp)
+[Run](https://demo.webdyne.org/example/dump2.psp)
 
 # Error Handling
 
@@ -3148,7 +3569,7 @@ Let's divide by zero: !{! my $z=0; return 5/$z !}
 <end_html>
 ```
 
-[Run](https://demo.webdyne.org/err1.psp)
+[Run](https://demo.webdyne.org/example/err1.psp)
 
 If you run the above example an error message will be displayed
 
@@ -3162,7 +3583,7 @@ If we have a look at another example:
 
 ``` html
 <start_html title="Error">
-<perl method="hello"/>
+<perl handler="hello"/>
 <end_html>
 
 __PERL__
@@ -3174,7 +3595,7 @@ sub hello {
 }
 ```
 
-[Run](https://demo.webdyne.org/err2.psp)
+[Run](https://demo.webdyne.org/example/err2.psp)
 
 And the corresponding screen shot:
 
@@ -3227,7 +3648,7 @@ should be checked for after every call in a best practice scenario.
 
 ``` html
 <start_html title="Error">
-<perl method="hello">
+<perl handler="hello">
 
 Hello World ${foo}
 
@@ -3245,7 +3666,7 @@ sub hello {
 }
 ```
 
-[Run](https://demo.webdyne.org/err3.psp)
+[Run](https://demo.webdyne.org/example/err3.psp)
 
 You can use the err() function to check for errors in WebDyne Perl code
 associated with a page, e.g.:
@@ -3255,7 +3676,7 @@ associated with a page, e.g.:
 <form>
 <submit name="Error" value="Click here for error !">
 </form>
-<perl method="foo"/><end_html>
+<perl handler="foo"/><end_html>
 
 __PERL__
 
@@ -3273,12 +3694,12 @@ sub bar {
 }
 ```
 
-[Run](https://demo.webdyne.org/err4.psp)
+[Run](https://demo.webdyne.org/example/err4.psp)
 
-Note that the backtrace in this example shows clearly where the error
-was triggered from.
+Note that the backtrace in this example shows where the error was
+triggered from.
 
-# WebDyne API
+# Reference
 
 ## WebDyne tags
 
@@ -3287,115 +3708,285 @@ Reference of WebDyne tags and supported attributes
 <perl\>
 
 :   Run Perl code either in-line (between the <perl\>..</perl\>) tags,
-    or non-inline via the method attribute
+    or non-inline via the subroutine/method nominated by the handler
+    attribute. If this tag is invoked without a handler attribute, text
+    between the tags will be interpreted as perl code and executed. If
+    invoked with a handler attribute, text between the tags will be
+    interpreted as a template - which can be output by a call to the
+    WebDyne render() method within the handler.
 
-    method\|handler=method
+        <perl
+          [handler=METHOD]
+          [require=MODULE | FILE]
+          [import=FUNCTION [, FUNCTION ...]]
+          [param=SCALAR | HASHREF]
+          [run]
+          [file]
+          [hidden]
+          [chomp]
+          [autonewline]
+        >
 
-    :   Call an external Perl subroutine in from a module, or a
-        subroutine in a \_\_PERL\_\_ block at the of the .psp file. If
-        the handler is specified a module call (e.g.
-        Digest::MD5::md5_hex()) then a require call will be load the
-        module (Digest::MD5 in this example.
+    handler=METHOD
 
-    package\|require=\[Module::Name\] \| \[Path/Filename.pm\]
+    :   Call an external Perl method from a module, or a subroutine in
+        the \_\_PERL\_\_ block at the end of the PSP file. If the
+        handler is specified as "fully qualified" module call (e.g.
+        `Digest::MD5::md5_hex()`) then a require will be made
+        automatically to load the module (`Digest::MD5` in this example)
+
+            #  Call method in the same file
+            #
+            <perl handler="hello">
+            __PERL__
+            sub hello {
+            ...
+            }
+
+            #  Call method in another class
+            #
+            <perl handler="Digest::MD5::md5_hex()">
+
+    require=MODULE \| FILE
 
     :   Load a Perl module or file needed to support a method call. E.g.
-        <perl require=Digest::MD5/\> to load the Digest::MD5 module.
-        Anything with a \[./\\\] character is treated as file patch to a
-        Perl file (e.g. "/home/user/module.pm"), otherwise it is treated
-        as module name ("Digest::MD5")
+        <perl require="Digest::MD5"/\> to load the `Digest::MD5`
+        module. Anything with a \[./\\\] character is treated as file
+        patch to a Perl file (e.g. "`/home/user/module.pm`"), otherwise
+        it is treated as module name ("`Digest::MD5`")
 
-    import=\[function\], <function\>, <function\> ..
+            #  Load a module
+            #
+            <perl require="Digest::MD5">
+
+            #  Load a file
+            #
+            <perl require="module.pm">
+
+    import=FUNCTION \[, FUNCTION …\]
 
     :   Import a single or multiple functions into the file namespace.
-        Use "import=name" for a single function, or pass an array ref
-        (import="@{name1, name2}" for multiple functions. E.g. <perl
-        require="Digest::SHA" import="@{qw(sha1 sha1_hex)}"/\>.
-        Functions are then available anywhere in the file namespace.
+        Use a single SCALAR for importing one function, or pass an ARRAY
+        reference for multiple functions.
 
-    param=scalar\|array\|hash
+            # Import single function
+            #
+            <perl require="Digest::MD5" import="md5_hex">
 
-    :   Parameters to be supplied to perl routine. Supply array and hash
-        using "@{1,2}" and "%{a=\>1, b=\>2}" conventions respectively,
-        e.g. <perl method="sum2num" param="@{2,2}"/\>
+            # Import multiple functions
+            #
+            <perl require="Digest::MD5" import="@{'md5_hex', 'md5_base64'}">
+            <perl require="Digest::MD5" import="@{qw(md5_hex md5_base64)}">
 
-    static=1
+        Imported methods available anywhere in the namespace of that
+        page.
 
-    :   This Perl code to be run once only and the output cached for all
-        subsequent requests.
+    param=SCALAR \| HASHREF
 
-    file=1
+    :   Parameters to be supplied to perl routine, can be a single
+        SCALAR value (string, numeric etc.) or a HASH reference.
 
-    :   Force package\|require attribute to be treated as a file, even
-        if it appears to "look like" a module name to the loader. Rarely
-        needed, use case would be a Perl module in the current directory
-        without an extension.
+            #  Pass parameters to a handler. Single parameter
+            #
+            <perl handler="hello" param="Bob">
 
-    hidden=1
+            #  Pass hash ref
+            #
+            <perl handler="hello" param="%{ name=> 'Bob', age => 42 }">
 
-    :   The output from the Perl module will be hidden.
+    static
+
+    :   Boolean flag. The Perl code to be run once only and the output
+        cached for all subsequent requests. If omitted the code is not
+        cached (i.e. it is run each time). If omitted the page is
+
+    run
+
+    :   Boolean flag. If evaluated to a true value exists the code is
+        run, if not the code is skipped. If omitted the code is run by
+        default. Useful for conditional running of code when a form has
+        been submitted or a particular logic threshold reached.
+
+            #  Run code only at 4am
+            #
+            <perl handler="banner" run="(localtime)[2] == 4">
+
+            #  Run code only if a "name" form parameter supplied, all below equivalent
+            #
+            <perl handler="hello" run="+{name}"> ...
+            <perl handler="hello" run="!{! exists $_{'name'} !}"> ...
+            <perl handler="hello" run="!{! defined shift()->CGI->param('name') !}
+
+    file
+
+    :   Boolean flag. Force package\|require attribute value to be
+        treated as a file, even if it appears to "look like" a module
+        name to the loader. Rarely needed, use case would be a Perl
+        module in the current directory without an extension.
+
+    hidden
+
+    :   Boolean flag. The output from the Perl module will be hidden and
+        no rendered to the page.
+
+    display=0
+
+    :   Equivalent to setting hidden attribute.
+
+    chomp
+
+    :   Boolean flag. Any new lines at the end of the output will be
+        truncated.
+
+    autonewline
+
+    :   Boolean flag. A newline character will be inserted between each
+        print statement.
 
 <json\>
 
-:   Run Perl code similar to <perl\> tag but expect code to return a
-    HASH or ARRAY ref and encode into JSON, outputting in a <script\>
-    tag with type="application/json". When supplied with an id attribute
-    this data can be used by any Javascript function in the page. All
-    attributes are the same as the <perl\> tag with the following extra
-    attribute
+:   Run Perl code similar to <perl\> tag but expects code to return a
+    HASH, ARRAY ref or plain scalar, which is encoded into JSON,
+    outputting within a <script\> tag with type="application/json".
+    When supplied with an id attribute this data can be used by any
+    Javascript function in the page. Takes the same options as the
+    <perl\> tag and behaves similarly - if a handler attribute is given
+    it is called, if the perl attribute is given text between the
+    <json\> tags in treated as in-line perl code and executed.
 
-    id=\[name\]
+        <json
+          [id=NAME]
+          [handler=METHOD]
+          [pretty]
+          [canonical]
+          [perl]
+        >
 
-    :   ID this <script\> tag will be given, e.g. <script id="mydata"
-        type="application/json"\>\[{"foo":1}\]</script\>
+    id=NAME
+
+    :   the DOM ID the <script\> tag output from the tag will be given,
+        e.g.
+        `<script id="mydata" type="application/json">{"foo":1}</script>`
+
+    pretty
+
+    :   Boolean flag. Use the JSON pretty() method to format the output
+        data into something more human readable. Not enabled by default.
+        Enable with pretty=1 attribute or globally via
+        `$WEBDYNE_JSON_PRETTY=1` configuration setting.
+
+    canonical
+
+    :   Boolean flah. Use the JSON canonical() method to sort JSON data.
+        Enabled by default, disable using canonical=0 attribute value or
+        via `$WEBDYNE_JSON_CANONICAL=0` configuration setting.
+
+    perl
+
+    :   Interpret content between starting and ending <json\> tag as
+        perl code and run it. The code should return a HASH, ARRAY or
+        BOOLEAN value which will then be encoded to JSON data.
+
+    handler=METHOD
+
+    :   Call the perl method nominated. The code should return a HASH,
+        ARRAY or BOOLEAN value which will then be encoded to JSON data.
+
+    !!! note
+
+        If returning JSON boolean values in code you should use the JSON::true
+        and JSON::false values rather than 0 or 1, e.g.
+
+            <start_html>
+            <json handler/>
+            ...
+            __PERL__
+            use JSON:
+            sub handler {
+                return { enabled => JSON::true }
+            }
 
 <block\>
 
 :   Block of HTML code to be optionally rendered if desired by call to
-    render_block Webdyne method:
+    render_block() Webdyne method:
 
-    name=identifier
+        <block
+          name=NAME
+          [display]
+          [static]
+        >
 
-    :   *Mandatory.* The name for this block of HTML. Referenced when
-        rendering a particular block in perl code, e.g. return
-        \$self-\>render_block("foo");
+    name=NAME
 
-    display=1
+    :   *Mandatory.* The name for this block of PSP or HTML. Referenced
+        when rendering a particular block within perl code, e.g.
+        `return $self->render_block("foo")`
 
-    :   Force display of this block even if not invoked by render_block
-        WebDyne method. Useful for prototyping.
+    display
 
-    static=1
+    :   Boolean flag. Force display of this block even if not invoked by
+        render_block() method in handler. Useful for prototyping or
+        conditional display. Any true value will force display, so this
+        can be coupled with a form parameter to only show a block when a
+        form has been submitted in a similar form to the <perl\> tag
+        run attribute.
 
-    :   This block rendered once only and the output cached for all
-        subsequent requests
+            #  Only show a block if a name parameter has been supplied 
+            #
+            <block name="showname" display="+{name}">
+            Thank you for registering +{name} !
+            </block>
+
+    static
+
+    :   Boolean flag. This block is rendered once only and the output
+        cached for all subsequent requests
 
 <include\>
 
-:   Include HTML or text from an external file. This includes pulling in
-    the <head\> or <body\> section from another HTML or .psp file. If
-    pulled in from a .psp file it will compiled and interpreted in the
-    context of the current page.
+:   Include HTML, PSP or text from an external file. Capable of just
+    pulling in just the <head\>,<body\> or a <block\> section from
+    another HTML or PSP file. If pulled in from a PSP file it will
+    compiled and interpreted in the context of the current page.
 
-    file=filename
+        <include
+          file=PATH
+          [block=NAME]
+          [wrap=TAG]
+          [head]
+          [body]
+          [nocache]
+        >
+
+    file=PATH
 
     :   *Mandatory*. Name of file we want to include. Can be relative to
         current directory or absolute path.
 
-    head=1
+    head
 
-    :   File is an HTML or `.psp` file and we want to include just the
-        <head\> section
+    :   Boolean flag. File is an HTML or PSP file and we want to include
+        just the <head\> section
 
-    body=1
+    body
 
-    :   File is an HTML or `.psp` file and we want to include just the
-        <body\> section.
+    :   Boolean flag/ File is an HTML or PSP file and we want to include
+        just the <body\> section.
 
-    block=blockname
+    block=NAME
 
-    :   File is a `.psp` file and we want to include a <block\> section
-        from that file.
+    :   File is a PSP file and we want to include a <block\> section
+        from that file with the nominated name.
+
+    wrap=TAG
+
+    :   Wrap the text from the included file in the nominated tag. Do
+        not use <\> symbols, just the plain tag name:
+
+            #  Include the protocols file and wrap in <pre>
+            #
+            <include="/etc/protocols" wrap="pre">
 
     nocache
 
@@ -3404,79 +3995,587 @@ Reference of WebDyne tags and supported attributes
 
 <api\>
 
-:   Respond to a JSON request made from a client.
+:   Respond to a JSON request made from a client. Takes the same options
+    as the <perl\> tag and behaves similarly - if a handler attribute
+    is given it is called, if the perl attribute is given text between
+    the <api\> tags in treated as in-line perl code and executed.
+    Responses from perl code are encoded as JSON and returned.
 
-    pattern=string
+        <api
+          pattern=ROUTE
+          [destination=HASHREF | dest=HASHREF | data=HASHREF]
+          [option=HASHREF]
+        >
 
-    :   *Mandatory*. Name of `Route::Simple` pattern we want to serve,
+    pattern=ROUTE
+
+    :   *Mandatory*. Name of `Router::Simple` pattern we want to serve,
         e.g. /api/{user}/:id
 
-    destination \| dest \| data=hash ref
+    destination=HASHREF
 
     :   Hash we want to supply to perl routine if match made. See
         `Route::Simple`
 
-    option=hash ref
+    option=HASHREF
 
-    :   Match options, GET, PUT etc. `Route::Simple`
+    :   Match options, GET, PUT etc. `Router::Simple`
 
 <htmx\>
 
-:   Serve HTML snippets. Takes exactly the same parameters as the
-    <perl\> tag with one addition
+:   Serve HTML fragments in response to [htmx](https://htmx.org) type
+    requests (or similar clients). Takes the same options as the
+    <perl\> tag and behaves similarly - if a handler attribute is given
+    it is called, if the perl attribute is given text between the
+    <api\> tags in treated as in-line perl code and executed.
 
-    display=boolean
+        <htmx
+          [handler=METHOD]
+          [perl]
+          [display]
+          [force]
+        >
 
-    :   *Optional*. If evaluates to true then this <htmx\> snippet
-        fires. Only tag can respond per page. Use this attribute in
-        conjunction with dynamic evaluation (e.g. display="!{!
-        \$\_{name} eq 'Bob' !}")
+    display
+
+    :   Boolean. If evaluates to true then this <htmx\> snippet fires.
+        You can have multiple htmx tag sections in a page, but only one
+        can fire at a time. Use this attribute in conjunction with
+        dynamic evaluation
+
+            #  Fire htmx tag only if a name parameter matches
+            #
+            <htmx display="!{! $_{name} eq 'Bob' !}">
+            Hello Bob
+            </htmx>
+
+
+            #  Or Alice. Both tags can live in same document as only one will ever fire
+            #
+            <htmx display="!{! $_{name} eq 'Alice' !}">
+            Hello Alice
+            </htmx>
+
+    force
+
+    :   Boolean. Force the code referenced by a <htmx\> tag to run, and
+        content be returned/displayed even if the request is not
+        triggered by the htmx javascript module (which is determined by
+        looking for a `hx-request` HTTP header). Useful for
+        troubleshooting/debugging and/or showing what the generated HTML
+        snippet will look like. Can be dynamic and be triggered by GET
+        parameter:
+
+            <htmx force="+{debug}">
+            This is my output
+            </htmx>
+
+    perl
+
+    :   Boolean. Interpret content between starting and ending <htmx\>
+        tags as perl code and run it. Anything returned by the perl code
+        will be sent as the HTML fragment.
+
+    handler=METHOD
+
+    :   Call the perl method nominated. Whatever is returned or rendered
+        by the handler will be returned as the HTML fragment.
 
 <dump\>
 
-:   Display CGI parameters in dump format via CGI::Simple-\>Dump call.
+:   Display CGI and other parameters in `Data::Dumper` dump format.
     Useful for debugging. Only rendered if `$WEBDYNE_DUMP_FLAG` global
-    set to 1 in WebDyne constants of the display\|force attribute
+    set to 1 in WebDyne constants or the display\|force attribute
     specified (see below). Useful while troubleshooting or debugging
     pages.
 
-    display\|force=1
+        <dump
+          [display]
+          [force]
+          [all]
+          [cgi]
+          [env]
+          [constant]
+          [version]
+        >
 
-    :   *Optional.* Force display even if `$WEBDYNE_DUMP_FLAG` global
-        not set
+    display\|force
+
+    :   Boolean. Force display even if `$WEBDYNE_DUMP_FLAG` global not
+        set
 
     all
 
-    :   Display all diagnostic blocks
+    :   Boolean. Display all diagnostic blocks
 
     cgi
 
-    :   Display CGI parameters and query strings
+    :   Boolean. Display CGI parameters and query strings
 
     env
 
-    :   Display environment variables
+    :   Boolean. Display environment variables
 
     constant
 
-    :   Display Webdyne constants
+    :   Boolean. Display Webdyne configurationconstants
 
     version
 
-    :   Display version strings
+    :   Boolean. Display version strings
+
+<start_html\>
+
+:   Start a HTML page with all conventional tags. This will produce the
+    output:
+
+        <html><head><title></title><meta></head><body>
+
+    with appropriate content attributes as output.
+
+        <start_html
+          [title=TEXT]
+          [meta=HASHREF]
+          [style=URL | ARRAYREF]
+          [script=URL | ARRAYREF]
+          [base=URL]
+          [target=TARGET]
+          [include=PATH | ARRAYREF]
+          [include_script=PATH | ARRAYREF]
+          [include_style=PATH | ARRAYREF]
+          [static]
+          [cache=METHOD]
+        >
+
+    title=TEXT
+
+    :   Content to be inserted into the <title\> section tag.
+
+    meta=HASHREF
+
+    :   Meta section content, supplied as a hash reference. Processing
+        is nuanced. Standard *key*=\>*value* hash pairs are displayed as
+        <meta name=key content=value\> meta tags. Pairs of the type
+        *"property=name"=\>value* are displayed as <meta property=name
+        content=value\>.
+
+            <start_html meta="%{ author => 'Bob Smith', 'http-equiv=refresh' => '5; url=https://www.example.com' }">
+
+        Will produce:
+
+            <meta name="author" content="Bob Smith">
+            <meta http-equiv="refresh" content="5; url=https://www.example.com" >
+
+    style=URL \| ARRAYREF
+
+    :   Stylesheets to load. Values to this attribute will be output as
+        href attributes of type rel=stylesheet in a <link\> tag.
+
+            <start_html style="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4">
+
+        Will produce:
+
+            <link href="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" rel="stylesheet">
+
+        Array types are supported as values to the style property to
+        allow multiple style sheet <link\> tags to be created at once,
+        e.g.
+
+            <start_html style="@{
+                'https://cdn.jsdelivr.net/npm/water.css@2/out/water.css',
+                'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css'
+            }">
+
+        Will produce:
+
+            <link href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css" rel="stylesheet">
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+
+    script=URL \| ARRAYREF
+
+    :   Similar facility to the style attribute. Any values supplied to
+        this attribute will be output as src attributes to a <script\>
+        tag.
+
+            <start_html script="https://cdn.jsdelivr.net/npm/chart.js">
+
+        Will produce:
+
+            <script src="https://cdn.jsdelivr.net/npm/chart.js">
+
+        Anything supplied after the URL section as an anchor will be
+        used in the script tag as an attribute, e.g.
+
+            <start_html script="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js#defer&integrity=sha..">
+
+        Will produce:
+
+            <script defer integrity=sha.. src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js">
+
+        As per the style attribute you can supply an array of resources
+        to load using the same syntax.
+
+    base, target = URL, TARGET
+
+    :   Generate a <base\> tag within the <head\> section containing
+        attributes equivalent to href=value of the base attribute,
+        target=value of the target attribute
+
+            <start_html base="https://example.com" target="_blank">
+
+        Will produce:
+
+            <base href="https://example.com/" target="_blank">
+
+    include=PATH \| ARRAYREF
+
+    :   Will include the raw text from the nominated file (supplied as
+        the value) within the <head\> section. No processing is done,
+        the file contents are inserted verbatim.
+
+    include_script=PATH \| ARRAYREF
+
+    :   As per above include attribute, raw text from the nominated file
+        is inserted into the <head\> section, however it is wrapped in
+        a <script\> tag.
+
+    include_style=PATH \| ARRAYREF
+
+    :   As per standard include attribute raw text from the nominated
+        file is inserted into the <head\> section, however it is
+        wrapped in a <style\> tag.
+
+    static
+
+    :   Boolean. If the static attribute is present in the
+        <start_html\> tag the entire page is designated static. It will
+        be compiled and generated once (at first load) and the resulting
+        HTML will be cached and served on subsequent loads.
+
+    cache=METHOD
+
+    :   Use a cache handler to determine how often the page should be
+        recompiled. See the [Caching](#caching_section) section. Sample:
+
+            <start_html cache="&cache">
+
+<end_html\>
+
+:   End a HTML page. This will produce the </body\></html\> tags. It
+    is not strictly necessary as the parser will automatically close
+    dangling tags if it gets to the end of the file without seeing them,
+    however is provided for completeness.
+
+<popup_menu\>
+
+:   Provided a drop-down menu of options for user to select from.
+
+        <popup_menu
+          name=NAME
+          values=ARRAYREF | HASHREF
+          [labels=HASHREF]
+          [multiple]
+          [disabled=VALUE | ARRAYREF]
+          [selected|defaults|default=VALUE | ARRAYREF]
+        >
+
+    name=NAME
+
+    :   The name associated with this form component. This is the CGI
+        parameter to be interrogated for value(s) once the form is
+        submitted.
+
+    values=ARRAYREF \| HASHREF
+
+    :   List of items to be presented in the drop down. If an array ref
+        labels will be the same as values. If a hash ref the value will
+        be the hash key, the label the hash label.
+
+    labels=HASHREF
+
+    :   If values is presented as an array ref, a hash ref of labels to
+        be associated with each value can be supplied.
+
+    multiple
+
+    :   Boolean. If enabled allows multiple options to be selected. If
+        not present (disabled) only one option can be selected.
+
+    disabled=VALUE \| ARRAYREF
+
+    :   Single (string scalar) item or multiple (array ref) items which
+        should be greyed out (not selectable) in menu options.
+
+    selected \| defaults \| default=VALUE \| ARRAYREF
+
+    :   Single (string scalar) item or multiple (array ref) items which
+        should be pre-selected in menu options.
+
+<radio_group\>
+
+:   Provide a grouped list of radio buttons for a user to choose from.
+    Only one radio button item can be selected.
+
+        <radio_group
+          name=NAME
+          values=ARRAYREF | HASHREF
+          [labels=HASHREF]
+          [disabled=VALUE | ARRAYREF]
+          [checked|defaults|default=VALUE | ARRAYREF]
+        >
+
+    name=NAME
+
+    :   The name associated with this form component. This is the CGI
+        parameter to be interrogated for value(s) once the form is
+        submitted.
+
+    values=ARRAYREF \| HASHREF
+
+    :   List of items to be presented. If an array reference, labels
+        will be the same as values. If a hash refence the value will be
+        the hash key, the label the hash value.
+
+    labels=HASHREF
+
+    :   If values is presented as an array ref a hash ref of labels to
+        be associated with each value can be supplied.
+
+    disabled=VALUE \| ARRAYREF
+
+    :   Single (string) or multiple (array ref) of items which should be
+        greyed out (not selectable) in radio group items.
+
+    checked \| defaults \| default=VALUE \| ARRAYREF
+
+    :   Single (string) or multiple (array ref) items which shoul be
+        pre-selected in radio group items.
+
+<checkbox_group\>
+
+:   Provide a grouped list of checkbox items for a user to choose form.
+    Multiple checkboxes can be selected.
+
+        <checkbox_group
+          name=NAME
+          values=ARRAYREF | HASHREF
+          [labels=HASHREF]
+          [disabled=VALUE | ARRAYREF]
+          [checked|defaults|default=VALUE | ARRAYREF]
+        >
+
+    name=NAME
+
+    :   The name associated with this form component. This is the
+        `$self->CGI()` parameter to be interrogated for value(s) once
+        the form is submitted.
+
+    values=ARRAYREF \| HASHREF
+
+    :   List of items to be presented. If an array ref labels will be
+        the same as values. If a hash ref the value will be the hash
+        key, the label the hash label.
+
+    labels=HASHREF
+
+    :   If values is presented as an array ref a hash ref of labels to
+        be associated with each value can be supplied.
+
+    disabled=VALUE \| ARRAYREF
+
+    :   Single (string) or multiple (array ref) items which should be
+        greyed out (not selectable) in checkbox group items.
+
+    checked\|defaults\|default=VALUE \| ARRAYREF
+
+    :   Single (scalar) or multiple (array ref) items which should be
+        pre-selected in checkbox group items.
+
+<checkbox\>
+
+:   Single checkbox for a user to select or clear.
+
+        <checkbox
+          name=NAME
+          [value=VALUE | BOOLEAN]
+          [disabled]
+        >
+
+    name=NAME
+
+    :   The name associated with this form component. This is the CGI
+        parameter to be interrogated for value(s) once the form is
+        submitted.
+
+    value=VALUE \| BOOLEAN
+
+    :   The value to be returned in the CGI parameter if this checkbox
+        is ticked (selected). If not supplied defaults to 1.
+
+    disabled
+
+    :   If present the checkbox will be displayed but cannot be
+        selected.
+
+    !!! note
+
+        In order to retain state all checkbox form items will present a hidden
+        parameter with the same name as the checkbox. This is notable because
+        querying the parameter associated with a checkbox component will always
+        return a `Hash::MultiValue` object with two items, the last of which is
+        the checkbox value. When using `$self->CGI->param(<checkbox name>)` form
+        of query, or `$_{<checkbox name>}` the user selected checkbox value will
+        always be returned as a boolean or scalar value.
+
+<scrolling_list\>
+
+:   Presents a scrolling list of options for a user to choose from.
+    Attributes are identical to those of the <popup_menu\> tag with the
+    addition of a size attribute.
+
+        <scrolling_list
+          name=NAME
+          size=ROWS
+          values=ARRAYREF | HASHREF
+          [labels=HASHREF]
+          [multiple]
+          [disabled=VALUE | ARRAYREF]
+          [selected|defaults|default=VALUE | ARRAYREF]
+        >
+
+    name=NAME
+
+    :   The name associated with this form component. This is the CGI
+        parameter to be interrogated for value(s) once the form is
+        submitted.
+
+    size=ROWS
+
+    :   Number of rows to make visible in user interface for the
+        scrolling list.
+
+    The following attributes behave identically to <popup_menu\>:
+
+    -   values=ARRAYREF \| HASHREF
+
+    -   labels=HASHREF
+
+    -   multiple
+
+    -   disabled=VALUE \| ARRAYREF
+
+    -   selected\|defaults\|default=VALUE \| ARRAYREF
+
+<textarea\>
+
+:   A text box for freeform text entry. All attributes are the same as
+    the HTML standard <textarea\> tag with attributes:
+
+        <textarea
+          name=NAME
+          [default=TEXT]
+          [force]
+          (all standard HTML <textarea> attributes)
+        >
+
+    name=NAME
+
+    :   The name associated with this form component. This is the CGI
+        parameter to be interrogated for value(s) once the form is
+        submitted.
+
+    default=TEXT
+
+    :   The default content to be pre-filled out in the <textarea\>
+        component
+
+    force
+
+    :   By default the component is stateful, and user entered text will
+        persist after form submission. Setting the force attribute will
+        always present the default content regardless of user input.
+
+<textfield\>
+
+:   The standard <input type="text"\> tag type. User input with this
+    tag is persistent. All standard <input\> tag attributes are
+    supported. The name and force attributes are supported as per other
+    tags.
+
+<password_field\>
+
+:   The standard <input type="password"\> tag type. User input with
+    this tag is persistent. The name and force attributes are supported
+    as per other tags.
+
+<filefield\>
+
+:   The standard <input type="file"\> tag type. User input with this
+    tag is persistent. When querying this parameter after form
+    submission responses will be in the form of a Plack::Request::Upload
+    object. User input with this tag is persistent.
+
+        <start_html title="File Upload">
+        <start_multipart_form>
+        <filefield name="file" multiple required>
+        <p>
+        <submit name=Upload>
+        <end_form>
+
+        <pre>
+        <perl handler/>
+        </pre>
+
+        __PERL__
+
+        use Data::Dumper;
+        sub handler {
+
+            my $self=shift();
+            my $cgi_or=$self->CGI();
+            return Dumper($cgi_or->uploads()->flatten);
+            
+        }
+
+<image_button\>
+
+:   The standard <input type="image"\> tag type.
+
+<button\>
+
+:   The standard <input type="button"\> tag type.
+
+<submit\>
+
+:   The standard <input type="submit"\> tag type to initiate form
+    submission.
+
+<hidden\>
+
+:   The standard <input type="button"\> tag type.
+
+<start_form\>
+
+:   Start a form with method=POST and encoding type
+    enctype="application/x-www-form-urlencoded" (implicit)
+
+<start_multipart_form\>
+
+:   Start a form with method=POST and encoding type
+    enctype="multipart/form-data"
 
 ## WebDyne methods
 
 When running Perl code within a WebDyne page the very first parameter
 passed to any routine (in-line or in a \_\_PERL\_\_ block) is an
 instance of the WebDyne page object (referred to as `$self` in most of
-the examples). All methods return undef on failure, and raise an error
-using the `err()` function. The following methods are available to any
-instance of the WebDyne object:
+the examples, e.g. `$self->print("Hello World")`). All methods return
+undef on failure, and raise an error using the `err()` function. The
+following methods are available to any instance of the WebDyne object:
 
 CGI()
 
-:   Returns an instance of the CGI::Simple object for the current
+:   Returns an instance of a CGI::Simple type object for the current
     request.
 
 r(), request()
@@ -3501,7 +4600,7 @@ render( <key=\>value, key=\>value\>, .. )
     per the variable section. Returns a scalar ref of the resulting
     HTML.
 
-render_block( blockname, <key=\>value, key=\>value, ..\>).
+render_block( blockname, <key=\>value, key=\>valufge, ..\>).
 
 :   Called to render a block of text or HTML between
     <block\>..</block\> tags. Optional key and value pairs will be
@@ -3510,24 +4609,32 @@ render_block( blockname, <key=\>value, key=\>value, ..\>).
     section containing the block to be rendered, or true (\\undef) if
     the block is not within the <perl\>..</perl\> section (e.g.
     further into the document, see the block section for an example).
+    Rendered blocks must be "published' if visibility required via
+    return as array, or return of \$self-\>render().
 
 render_reset()
 
 :   Erase anything previously set to render - it will not be sent to the
-    browser.
+    browser. Limited use, may be helpful in error handling to "pull"
+    anything previously published and replace with error message.
 
 redirect( uri=\>uri \| file=\>filename \| html=\>\\html_text \| json=\>\\json_text \| text=\>\\plain_text)
 
 :   Will redirect to URI or file nominated, or display only nominated
     text. Any rendering done to prior to this method is abandoned. If
     supplying HTML text to be rendered supply as a SCALAR reference.
+    Content type header will be automatically adjusted to MIME type
+    appropriate for type if redirecting to html, json or plain text
+    content.
 
-cache_inode( <seed\> )
+inode( <seed\>, <seed\> )
 
 :   Returns the page unique ID (UID). Called inode for legacy reasons,
     as that is what the UID used to be based on. If a seed value is
-    supplied a new UID will be generated based on an MD5 of the seed.
-    Seed only needs to be supplied if using advanced cache handlers.
+    supplied a new UID will be generated based on an MD5 of the seed(s)
+    combined with other information (such as \$r-\>location) to generate
+    a unique UUID. Seed only needs to be supplied if using cache
+    handlers, see the "[Caching](#caching_section)" section
 
 cache_mtime( <uid\> )
 
@@ -3538,7 +4645,7 @@ cache_mtime( <uid\> )
 
 source_mtime()
 
-:   Returns the mtime (modification time) of the source .psp file
+:   Returns the mtime (modification time) of the source PSP file
     currently being rendered.
 
 cache_compile()
@@ -3573,18 +4680,29 @@ meta()
     across Apache requests (although not across different Apache
     processes)
 
-print(), printf(), say()
+print( <output\> ), printf( <output\> ), say( <output\> )
 
 :   Render the output of the print(), printf() or say() routines into
     the current HTML stream. The print() and printf() methods emulate
-    their Perl functions in not appending a new line into the output,
-    where as say() does.
+    their Perl functions in not appending a new line into the output
+    (unless autonewline() is set), where as say() does.
+
+autonewline()
+
+:   Get or set the autonewline flag. If set will add a new line
+    automatically when using print() or \$self-\>print(), essentially
+    emulating say(). Supply undef or 0 to clear.
 
 render_time()
 
 :   Return the elapsed time since the WebDyne hander started rendering
     this page. Obviously only meaningful if called at the end of a page,
     just before final output to browser.
+
+err( <message\> )
+
+:   Return and/or raise an error to the WebDyne handler. Supply the
+    actual error message as text.
 
 ## WebDyne Constants {#webdyne_constants}
 
@@ -3707,7 +4825,8 @@ use a <Perl\>..</Perl\> section in the `httpd.conf` file, e.g.:
 ### Constants Reference
 
 The following constants can be altered to change the behaviour of the
-WebDyne package. All these constants reside in the `WebDyne::Constant`
+WebDyne package. All these constants reside in the
+[`WebDyne::Constant`](https://github.com/aspeer/WebDyne/blob/main/lib/WebDyne/Constant.pm)
 package namespace.
 
 `$WEBDYNE_CACHE_DN`
@@ -3790,7 +4909,7 @@ package namespace.
 `$WEBDYNE_HEAD_INSERT`
 
 :   Any HTML you want inserted before the closing </head\> tag, e.g.
-    stylesheet or script includes to be added to every `.psp` page. Must
+    stylesheet or script includes to be added to every `PSP` page. Must
     be valid HTML <head\> directives, not interpreted or compiled by
     WebDyne, incorporated as-is
 
@@ -3808,11 +4927,6 @@ package namespace.
 
 :   By default comments are not rendered. Set to 1 to store and display
     comments from source files. Defaults to 0
-
-`$WEBDYNE_NO_CACHE`
-
-:   WebDyne should send no-cache HTTP headers. Set to 0 to not send such
-    headers. Defaults to 1
 
 `$WEBDYNE_DELAYED_BLOCK_RENDER`
 
@@ -3855,7 +4969,7 @@ package namespace.
 
 `$WEBDYNE_ERROR_SOURCE_CONTEXT_SHOW`
 
-:   Display a fragment of the `.psp` source file around where the error
+:   Display a fragment of the `PSP` source file around where the error
     occurred to give some context of where the error happened. Set to 0
     to not display context.
 
@@ -3895,8 +5009,133 @@ package namespace.
     environments - and even then only in some cases - it can result is
     faster throughput. Off by default, set to 1 to enable.
 
+\$WEBDYNE_ALPINE_VUE_ATTRIBUTE_HACK_ENABLE
+
+:   The HTML parser use by WebDyne does not recognise the @ symbol as a
+    valid attribute character, thus if using Alpine JS or Vue shortcuts
+    in attributes such as <button \@click="open = true"\> the \@click
+    attribute won't be parsed corrected. The \@click attribute is a
+    shortcut to x-on, and thus the full attribute is <button
+    x-on:click="open = true"\>. This config item defaults to converting
+    the "@" symbol in attributes to "x-on:". If using Vue change to
+    "v-on:"
+
+\$WEBDYNE_HTTP_HEADER_AJAX_HR
+
+:   A HASH reference of HTTP header names used to determine if a request
+    is interpreted as a [htmx](https://htmx.org) or[ Alpine
+    Ajax](https://alpine-ajax.js.org) type request, triggering only
+    partial HTML return (either the body only of a normal PSP page, or a
+    <htmx\> tag fragment). Defaults to
+    `{qw(hx-request x-alpine-request)}`.
+
+\$WEBDYNE_HTMX_FORCE
+
+:   Under normal conditions a <htmx\> tag isn't rendered unless the
+    request contains a HTTP header name designating it as an AJAX type
+    request from htmx or Alpine Ajax style libraries. Setting this
+    config item will force rendering of a <htmx\> tags even if the
+    request doesn't contain a header designating it as a htmx style
+    request. Equivalent to setting the force=1 attribute on all <htmx\>
+    tags. Defaults to 0 (do not render).
+
+\$WEBDYNE_PSGI_STATIC
+
+:   Allow the `webdyne.psgi` Plack instance to serve static pages (non
+    PSP pages) such as style sheets, javascript, images etc. Allowed
+    static file extensions are designated by the `$WEBDYNE_MIME_TYPE_HR`
+    config item - only files with extensions in that config item will be
+    served. Defaults to 1 (allow static pages to be served)
+
+\$WEBDYNE_MIME_TYPE_HR
+
+:   Hash reference of file extensions and MIME types which will be
+    allowed to be served if `$WEBDYNE_PSGI_STATIC` is enabled. See
+    source code of
+    [`WebDyne/Constant.pm`](https://github.com/aspeer/WebDyne/blob/main/lib/WebDyne/Constant.pm)
+    for defaults.
+
+\$WEBDYNE_HTTP_HEADER
+
+:   Hash reference of default HTTP headers name and values to be sent in
+    response to all WebDyne requests. See source code of
+    [`WebDyne/Constant.pm`](https://github.com/aspeer/WebDyne/blob/main/lib/WebDyne/Constant.pm)
+    for defaults.
+
+!!! tip
+
+    Configuration items can be overridden by setting of environment
+    variables of the same name with the desired value.
+
 Extension modules (e.g., WebDyne::Session) have their own constants -
 see each package for details.
+
+### Environment Variables
+
+All WebDyne configuration items can be overridden by setting an
+environment variable of the same same when starting the PSGI version, or
+via an Apache SetEnv directive, e.g:
+
+    #  Start webdyne plack instance with extended error display for this run.
+    #
+    $ WEBDYNE_ERROR_SHOW_EXTENDED=1 plackup `which webdyne.psgi`
+
+In addition to the configuration overrides the following environment
+variables are available:
+
+WEBDYNE_CONF
+
+:   Location of the WebDyne configuration file to load. Loading of an
+    alternate configuration file will bypass loading of any/all other
+    configuration files (e.g. /etc/webdyne.conf.pl). They are not
+    additive - only configuration directives in the nominated by this
+    environment variable will be processed. e.g.
+
+        #  Start webdyne with an alternate config file
+        #
+        WEBDYNE_CONF=./myconf.pl webdyne.psgi
+
+    !!! caution
+
+        Your config file must be valid Perl syntax and in the format expected.
+        Always check it with `perl -c -w myconf.pl` to ensure it is correct.
+
+DOCUMENT_ROOT
+
+:   Plack and Starman instances only - the starting home directory or
+    file name (if file rather than directory) for the PSGI server to
+    use. Defaults to the current working directory if none specified.
+
+DOCUMENT_DEFAULT
+
+:   Plack and Starman instances only - the default files to look for in
+    a directory if none given via browser URL. Defaults to "app.psp".
+
+WEBDYNE_DEBUG
+
+:   When debugging enabled in modules only (see Troubleshooting). Set to
+    1 to enable all debugging (extremely verbose), or set to
+    module/subroutine name to filter down to that area. e.g.
+
+        #  Debug the internal perl routine in WebDyne
+        #
+        $ WEBDYNE_DEBUG=perl perl -Ilib bin/wdrender time.psp
+        [23:28:24.699358 WebDyne (perl)] WebDyne=HASH(0x561d4a271a28) rendering perl tag in block ARRAY(0x561d4aaace20), attr $VAR1 = {
+          'inline' => 1,
+          'perl' => ' localtime() '
+        };
+
+        [23:28:24.699490 WebDyne (perl)] found inline perl code $VAR1 = \' localtime() ';
+        , param $VAR2 = undef;
+
+        <!DOCTYPE html><html lang="en"><head><title>Untitled Document</title><meta charset="UTF-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css" rel="stylesheet"><link href="/style.css" rel="stylesheet"></head>
+        <body><h1>Example File</h1><p> The current server time is: Sun Jan 11 23:28:24 2026</p></body></html>
+
+WEBDYNE_DEBUG_FILTER
+
+:   When debugging enabled only output debug information that matches
+    the regex given by this environment variable. Useful to further
+    filter down to areas of interest.
 
 ## WebDyne Directives
 
@@ -3947,7 +5186,7 @@ especially if you have nominated a `PREFIX` option when using CPAN.
 
 `wdcompile`
 
-:   Usage: `wdcompile filename.psp`. Will compile a .psp file and use
+:   Usage: `wdcompile filename.psp`. Will compile a PSP file and use
     Data::Dumper to display the WebDyne internal representation of the
     page tree structure. Useful as a troubleshooting tool to see how
     HTML::TreeBuilder has parsed your source file, and to show up any
@@ -3968,7 +5207,10 @@ especially if you have nominated a `PREFIX` option when using CPAN.
 `wddebug`
 
 :   Usage: `wddebug --status|--enable|--disable`. Enable/disable
-    debugging in the WebDyne code.
+    debugging in the WebDyne code. This uses some pretty ugly methods to
+    enable debugging in already installed modules by editing the code
+    on-disk to re-enable debug calls - do not use in a production
+    environment !
 
 `webdyne.psgi`
 
@@ -3976,14 +5218,16 @@ especially if you have nominated a `PREFIX` option when using CPAN.
     plackup or starman, but can be run directly for development
     purposes.
 
-wdlint
+`wdlint`
 
-:   Run perl -c -w over code in \_\_PERL\_\_ sections on any .psp file
-    to check for syntax errors.
+:   Run `perl -c -w` over code in \_\_PERL\_\_ sections on any PSP file
+    to check for syntax errors. Will automatically skip HTML code. It
+    only checks code in the \_\_PERL\_\_ area, and won't check syntax in
+    in-line perl, dynamic attributes etc.
 
 ## Other files referenced by WebDyne
 
-`/etc/webdyne.conf.pl`
+`/etc/webdyne.conf.pl, ~/.webdyne.conf.pl, $DOCUMENT_ROOT/.webdyne.conf.pl, $DOCUMENT_ROOT/webdyne.conf.pl`
 
 :   Used for storage of local constants that override WebDyne defaults.
     See the [WebDyne::Constant](#webdyne_constants) section for details
@@ -4036,7 +5280,7 @@ Multiple modules can be chained at once:
     </Location>
 
 The above example would place all pages within the named template, and
-make session information to all pages via \$self-\>session_id(). A good
+make session information to all pages via `$self->session_id()`. A good
 start to a rudimentary CMS.
 
 WebDyneChain
@@ -4132,7 +5376,7 @@ Example:
     use WebDyne::Session;
     1;
 
-[Run](https://demo.webdyne.org/session1.psp)
+[Run](https://demo.webdyne.org/example/session1.psp)
 
 WebDyne::Session can also be used in conjunction with the
 [WebDyne::Chain](#webdyne_chain) module to make session information
@@ -4179,103 +5423,82 @@ template ( filename )
 WebDyneTemplate
 
 :   Directive. Can be used to supply the template file name in a Apache
-    or lighttpd/FastCGI configuration file.
+    Dir_Config section, or a the WEBDYNE_DIR_CONFIG section of a
+    webdyne.conf.pl file for PSGI
 
 Example:
 
 The template:
 
 ``` html
-<html>
+<start_html title="Template" style="@{qw(https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css template1.css https://unpkg.com/gridjs/dist/theme/mermaid.min.css)}">
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="home.psp">
+          <div class="logo" aria-hidden="true">WS</div>
+          <span>Web Site</span>
+        </a>
+        <nav aria-label="Top">
+          <ul style="margin:0; padding:0; display:flex; gap:0.75rem; list-style:none;">
+            <li><a href="#" class="secondary" role="button" style="padding:0.45rem 0.75rem;">Sign in</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
 
-<head>
-<block name="head" display="1">
-<title>Template</title>
-</block>
-</head>
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="sidebar-inner">
+        <h6 style="margin-bottom:0.75rem;">Menu</h6>
+        <ul class="navlist">
+          <li><a href="template_home1.psp" aria-current="page">Home</a></li>
+          <li><a href="template_content1.psp">Content</a></li>
+          <li><a href="template_about1.psp">About</a></li>
+          <li><a href="template_dump1.psp">Dump</a></li>
+        </ul>
+      </div>
+    </aside>
 
-<body>
+    <main id="home" tabindex="-1">
+      <div class="main-inner">
+    <block name="body">
+    Template Content
+    </block>
+      </div>
+    </main>
 
-<table width="100%">
-
-<tr>
-<td colspan=2 bgcolor="green">
-<span style="color:white;font-size:20px">Site Name</span>
-</td>
-</tr>
-
-<tr>
-<td bgcolor="green" width="100px">
-<p>
-Left
-<p>
-Menu
-<p>
-Here
-</td>
-
-<td bgcolor="white">
-
-<!-- Content goes here -->
-<block name="body" display="1">
-This is where the content will go
-</block>
-
-</td>
-</tr>
-
-<tr>
-<td colspan=2 bgcolor="green">
-<span style="color:white">
-<perl method="copyright">
-Copyright (C) ${year} Foobar corp.
-</perl>
-</span>
-</td>
-</tr>
-
-
-</table>
-
-</body>
-</html>
-
-__PERL__
-    
-sub copyright {
-
-    shift()->render(year=>((localtime)[5]+1900));
-
-}
+    <footer>
+      <div class="footer-inner">
+        <small>Copyright 2025 Some Web Site. Built with WebDyne using pico.css</small>
+      </div>
+    </footer>
+  </div>
+<end_html>
 ```
 
-[Run](https://demo.webdyne.org/template1.psp)
+[Run](https://demo.webdyne.org/example/template1.psp)
 
 The content, run to view resulting merge:
 
-    <html>
-    <head><title>Content 1</title></head>
-
-    <body>
-    This is my super content !
-    </body>
-
-    </html>
-
+    <start_html title="Home">
+    <h1>Home Content</h1>
+    <p>
+    Home Page: <? localtime ?>
+    <p>
+    Click the content menu item to display demo data from the JSON example using an &lt;include&gt; tag
     __PERL__
-
     use WebDyne::Template qw(template1.psp);
 
-[Run](https://demo.webdyne.org/content1.psp)
+[Run](https://demo.webdyne.org/example/template_home1.psp)
 
 In real life it is not desirable to put the template name into every
 content file (as was done in the above example), nor would we want to
 have to "use WebDyne::Template" in every content file.
 
 To overcome this WebDyne::Template can read the template file name using
-the Apache dir_config function, and assign a template on a per location
-basis using the WebDyneTemplate directive. Here is a sample `httpd.conf`
-file:
+the Apache `dir_config` function, and assign a template on a per
+location basis using the WebDyneTemplate directive. Here is a sample
+`httpd.conf` file:
 
     <Location />
 
@@ -4285,23 +5508,71 @@ file:
 
     </Location>
 
+Alternatively in a PSGI environment you can create a .webdyne.conf.pl
+file in the directory with the template directives as follows:
+
+    $_={
+        'WebDyne::Constant' => {
+            WEBDYNE_DIR_CONFIG => {
+                '' => {
+                    'WebDyneHandler'    => 'WebDyne::Chain',
+                    'WebDyneChain'      => 'WebDyne::Template',
+                    'WebDyneTemplate'   => 'template.psp'
+                },
+            },
+        }
+    }
+
+# Troubleshooting
+
+At some stage a PSP file is not going to output what you expect. This
+could be for many reasons:
+
+-   Incorrectly closed or matched HTML tags in the source
+
+-   Mismatched quotation symbols for attributes
+
+-   Incorrect syntax in WebDyne tags, code or attributes
+
+-   Failure by the HTML Parser to read complex or unusual HTML
+
+-   A bug in the WebDyne code at runtime
+
+There are several troubleshooting steps:
+
+1.  Does the file render from the command line using `wdrender` ? Are
+    there any additional warnings or error messages generated from the
+    command line ?
+
+2.  Is the file validly constructed and balanced HTML when read by the
+    WebDyne parser ? Use `wdcompile` to check the parsed HTML and check
+    for any errors in attributes or tags
+
+3.  Use the `wddebug --enable` and `WEBDYNE_DEBUG=1` environment
+    variable to elicit more information
+
+If nothing obvious jumps out put a bug report on the [WebDyne
+Github](https://github.com/aspeer/WebDyne) page for the author to
+review.
+
 # Credits
 
 WebDyne relies heavily on modules and code developed and open-sourced by
-other authors. Without Perl, and Perl modules such as mod_perl/PSGI,
-HTML::Tiny, HTML::TreeBuilder, Storable and many other, WebDyne would
-not be possible. To the authors of those modules - and all the other
-modules used to a lesser extent by WebDyne - I convey my thanks.
+other authors. Without Perl, and Perl modules such as `mod_perl/PSGI`,
+`HTML::Tiny`, `HTML::TreeBuilder`, `Storable` and many others, WebDyne
+would not be possible. To the authors of those modules - and all the
+other modules used to a lesser extent by WebDyne - I convey my thanks.
 
 # Miscellaneous
 
-Things to note or information not otherwise contained elsewhere
+Things to note or information not otherwise contained elsewhere:
 
-How to check syntax on a PSP file
+How to check syntax of a PSP file
 
-:   To check the syntax of a PSP file, specifically any Perl code in the
-    \_\_PERL\_\_ section make sure you have a #!perl shebang after the
-    \_\_PERL\_\_ delimiter as here:
+:   To check the syntax of a PSP file - or more specifically any Perl
+    code in the \_\_PERL\_\_ section - you can use the `wdlint` command.
+    Take this file with an assignment syntax error in the server_time()
+    routine:
 
     ``` html
     <start_html>
@@ -4314,19 +5585,19 @@ How to check syntax on a PSP file
     }
     ```
 
-    Then run the command `perl -x -c -w <filename.psp>`. This will check
-    the file for syntax error and report back:
+    Run the command`wdlint <filename.psp>` to check for syntax error and
+    report back:
 
-        $ perl -c -w -x check.psp 
-        syntax error at check.psp line 4, near "my 2"
+        $ wdlint check.psp 
+        syntax error at check.psp line 8, near "my 2"
         check.psp had compilation errors.
 
 How to pass \$self ref if using processing instructions
 
 :   If you use the processing instruction form of calling a perl method
-    it will not pass the WebDyne object ref through to your perl code.
-    You can pass it by supplying \@\_ as a param, or just shift() and
-    your parameters:
+    it will not pass the WebDyne object ref through to your code. You
+    can pass it by supplying \@\_ as a parameter, or just shift() and
+    your own parameters:
 
     ``` html
     <start_html>
@@ -4338,17 +5609,19 @@ How to pass \$self ref if using processing instructions
     sub server_time {
         #  Now we can get self ref
         my ($self, $timezone)=@_;
+
         #  Do something and return
+        $self->do_something()
     }
     ```
 
-Use of hash characters for comments in .psp files
+Use of hash characters for comments in PSP files
 
 :   Any \# characters at the very start of a PSP file before a <html\>
     or <start_html\> tag are treated as comments and discarded - they
     will not be stored or displayed (they are **not** translated into
     HTML comments). This allows easy to read comments at the start of
-    .psp files. Any \# characters after the first valid tag are not
+    PSP files. Any \# characters after the first valid tag are not
     treated specially - they will be rendered as normal HTML:
 
     ``` html
@@ -4371,6 +5644,15 @@ The <checkbox\> tag will always set a hidden form field
     the first value returned. So the code
     `if ($_{'checkbox_name'}) { .. do_something }` will work as
     expected - but just be careful if using in an array context.
+
+About this documentation
+
+:   This documentation is written with the [XMLMind XML
+    Editor](https://www.xmlmind.com/xmleditor/), then converted to
+    Markdown with [pandoc](https://pandoc.org) and displayed using
+    [MKdocs](https://www.mkdocs.org). The documentation for WebDyne is
+    maintained on a [Github
+    repository](https://github.com/aspeer/mkdocs-WebDyne-Doc).
 
 # Legal Information - Licensing and Copyright
 

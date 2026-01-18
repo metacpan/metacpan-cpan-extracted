@@ -30,8 +30,10 @@ docs/tee.gpt5-JA.md
 docs/tee.gpt5-KO.md
 docs/tee.gpt5-ZH.md
 lib/App/Greple/tee.pm
+lib/App/Greple/tee/Autoload.pm
 minil.toml
 t/00_compile.t
+t/01_autoload.t
 t/02_run.sh
 t/02_run.t
 t/SAMPLE.txt

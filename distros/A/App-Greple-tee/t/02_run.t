@@ -372,3 +372,45 @@ Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich.
 我が世誰そ常ならむ
 有為の奥山今日越えて
 浅き夢見じ酔ひもせず.
+@@ greple -Mtee '&ansifold' -w 20 -- '^([A-Z].*\n)(.+\n)*' t/SAMPLE.txt --all --discrete
+The quick brown fox
+jumps over the lazy 
+dog.
+1234567890
+
+いろはにほへとちりぬるを
+わかよたれそつねならむ
+うゐのおくやまけふこえて
+あさきゆめみしゑひもせすん
+
+色は匂へど散りぬるを
+我が世誰そ常ならむ
+有為の奥山今日越えて
+浅き夢見じ酔ひもせず.
+
+Ma la volpe col suo 
+balzo ha raggiunto i
+l quieto Fido.
+
+Sylvia wagt quick de
+n Jux bei Pforzheim.
+
+Victor jagt zwölf Bo
+xkämpfer quer über d
+en großen Sylter Dei
+ch.
+
+Le cœur déçu mais l'
+âme plutôt naïve,
+Louÿs rêva de crapaü
+ter en canoë au delà
+ des îles,
+près du mälströn où 
+brûlent les novæ.
+
+El veloz murciélago 
+hindú comía feliz ca
+rdillo y kiwi.
+La cigüeña tocaba el
+ saxofón detrás del 
+palenque de paja.

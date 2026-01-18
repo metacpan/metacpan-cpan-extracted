@@ -1,6 +1,6 @@
 package Map::Tube::Sydney::Line::M1;
 
-$Map::Tube::Sydney::Line::Central::VERSION   = '1.00';
+$Map::Tube::Sydney::Line::Central::VERSION   = '1.01';
 $Map::Tube::Sydney::Line::Central::AUTHORITY = 'cpan:EARLYBEAN';
 
 use 5.006;
@@ -8,11 +8,11 @@ use strict; use warnings;
 
 =head1 NAME
 
-Map::Tube::Sydney::Line::M1 - Sydney Rail Map: Sydney M1 Line.
+Map::Tube::Sydney::Line::M1 - Sydney Rail Map: M1 Line.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =encoding utf8
 

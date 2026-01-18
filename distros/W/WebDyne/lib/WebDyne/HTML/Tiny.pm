@@ -58,7 +58,7 @@ my %Package;
 
 #  Version information
 #
-$VERSION='2.070';
+$VERSION='2.071';
 
 
 #  Debug load
@@ -182,6 +182,7 @@ sub _init {
             if (defined($attr_hr)) {
                 #  Copy attr so don't pollute ref
                 my %attr=%{$attr_hr};
+                my $label=delete $attr{'label'};
                 #my $param_hr=$self->Vars();
                 my $param_hr=$self->CGI->Vars();
                 if ($persist{$tag}) {
@@ -189,15 +190,21 @@ sub _init {
                         $attr{'value'}=$value;
                     }
                 }
-                return $self->input({type => $type{$tag} || $tag, %attr}, @param);
+                
+                #  Wrap in label if needed
+                #
+                if ($label) {
+                    return $self->label(join('', grep {$_} @param, $label) . $self->input({type => $type{tag}, %attr}));
+                }
+                else {
+                    return $self->input({type => $type{$tag} || $tag, %attr}, @param);
+                }
             }
             else {
                 return $self->input({type => $type{$tag} || $tag}, @param)
             }
 
-            }
-            unless UNIVERSAL::can(__PACKAGE__, $tag);
-
+        } unless UNIVERSAL::can(__PACKAGE__, $tag);
     }
 
 
@@ -304,7 +311,6 @@ sub _start_html {
         %{$attr_hr}
     );
     debug('attr: %s', Dumper(\%attr));
-    #die Dumper(\%attr);
 
 
     #  If no attributes passed used defaults from constants file
@@ -401,6 +407,17 @@ sub _start_html {
     #  Now this
     ##push @meta, $self->meta({ content => $WEBDYNE_META }) unless 
 
+
+    #  Base and/or target
+    #
+    my @base;
+    if ($attr_page{'base'} || $attr_page{'target'}) {
+        my %attr_base;
+        $attr_base{'href'} = $attr_page{'base'} if $attr_page{'base'};
+        $attr_base{'target'} = $attr_page{'target'} if $attr_page{'target'};
+        push @base, $self->base(\%attr_base);
+    }
+    
 
     #  Add any stylesheets
     #
@@ -524,6 +541,7 @@ sub _start_html {
             grep {$_} (
                 $title,
                 @meta,
+                @base,
                 @link,
                 @script,
                 @include
@@ -560,7 +578,7 @@ sub _start_html_tag {
 }
         
 
-sub _end_html {
+sub _end_html0 { # No longer needed
 
     #  Stub for WebDyne UNIVERSAL::can to find
     #
@@ -620,7 +638,8 @@ sub _start_form {
     debug("$self _start_form, attr_hr:%s param:%s", Dumper($attr_hr, \@param));
     my %default=(
         method  => 'post',
-        enctype => +URL_ENCODED
+        # Redundant
+        # enctype => +URL_ENCODED
     );
     map {$attr_hr->{$_} ||= $default{$_}}
         keys %default;
@@ -637,7 +656,7 @@ sub _start_multipart_form {
 }
 
 
-sub _end_multipart_form {
+sub end_multipart_form {
     debug("$_[0] _end_multipart_form");
     return shift()->end_form(@_);
 }
@@ -649,7 +668,12 @@ sub _comment {
 
     my ($self, $attr_hr)=@_;
     debug("$self comment, attr:%s", Dumper($attr_hr));
-    return sprintf('<!-- %s -->', $attr_hr->{'text'});
+    #return sprintf("\n<!-- %s -->\n", $attr_hr->{'text'});
+    my $html=sprintf('<!-- %s -->', $attr_hr->{'text'});
+    if (WEBDYNE_HTML_NEWLINE) {
+        $html="\n${html}\n";
+    }
+    return $html;
 
 }
 
@@ -1063,6 +1087,11 @@ sub popup_menu {
     #  Hold generated HTML in array until end
     #
     my @html;
+    
+    
+    #  Pull off any label
+    #
+    my $label=delete $attr_select{'label'};    
 
 
     #  If values is a hash not an array then convert to array and use hash as values
@@ -1174,7 +1203,6 @@ sub popup_menu {
     #  Fix multiple tag if true
     #
     $attr_select{'multiple'}=[] if $attr_select{'multiple'};
-
     #map { delete $attr_select{$_} } (qw(default selected disabled));
     debug('in popup_menu attr_select: %s', Dumper(\%attr_select));
 
@@ -1193,6 +1221,7 @@ sub popup_menu {
         $attr_tag{'selected'}=[] if $attr_option{'selected'}{$value};
         $attr_tag{'disabled'}=[] if $attr_option{'disabled'}{$value};
         my $label=$attr_option{'labels'}{$value} ? $attr_option{'labels'}{$value} : $value;
+        #debug("attr_option label: %s, value: $value, label: $label", Dumper($attr_option{'labels'}));
 
         #if ($label) {
         #    push @html, $self->label($self->option(\%attr_tag) . $label);
@@ -1203,12 +1232,22 @@ sub popup_menu {
 
         #}
     }
-
+    
+    
+    #  Now wrap in label if needed
+    #
+    debug('creating select group with attr: %s, options:%s, label: %s', Dumper(\%attr_select, \@html), $label);
+    if ($label) {
+        return $self->label($label . $self->select(\%attr_select, join($/, @html)));
+    }
+    else {
+        return $self->select(\%attr_select, join($/, @html));
+    }
+    
 
     #  Return
     #
-    debug('creating select group with attr: %s, options:%s', Dumper(\%attr_select, \@html));
-    return $self->select(\%attr_select, join($/, @html));
+    #return $self->select(\%attr_select, join($/, @html));
 
 }
 
@@ -1244,6 +1283,11 @@ sub textarea {
     #  Copy attr_hr so don't mangle original
     #
     my %attr=%{$attr_hr};
+    
+    
+    #  Label ?
+    #
+    my $label=delete $attr{'label'};
         
 
     #  Make sure entered text persists unless force in effect
@@ -1258,9 +1302,16 @@ sub textarea {
     }
     
     
-    #  Have enough to build now
+    #  Wrap in label if needed
     #
-    return $self->SUPER::textarea(grep {$_} \%attr, $content);
+    if ($label) {
+        return $self->label( $label . $self->SUPER::textarea(grep {$_} \%attr, $content));
+    }
+    else {
+        #  Have enough to build now
+        #
+        return $self->SUPER::textarea(grep {$_} \%attr, $content);
+    }
     
 }
 

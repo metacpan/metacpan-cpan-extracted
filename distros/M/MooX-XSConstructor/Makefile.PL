@@ -22,7 +22,7 @@ my $meta = {
                           runtime   => {
                                          recommends => { "Type::Tiny::XS" => 0, "Types::Standard" => "1.000000" },
                                          requires   => {
-                                                         "Class::XSConstructor" => 0.018001,
+                                                         "Class::XSConstructor" => "0.020000",
                                                          "Hook::AfterRuntime" => 0,
                                                          "Moo" => "2.004000",
                                                          "perl" => 5.008001,
@@ -38,7 +38,7 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "MooX::XSConstructor" => { file => "lib/MooX/XSConstructor.pm", version => "0.003000" },
+                          "MooX::XSConstructor" => { file => "lib/MooX/XSConstructor.pm", version => 0.003001 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -54,7 +54,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-XSConstructor/project",
                         },
-  "version"          => "0.003000",
+  "version"          => 0.003001,
   "x_static_install" => 1,
 };
 

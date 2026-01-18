@@ -10,7 +10,7 @@ App::Greple::tee - module to replace matched text by the external command result
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 DESCRIPTION
 
@@ -106,6 +106,60 @@ This is useful when combined with shell aliases or module files.
 
 Available parameters are: B<discrete>, B<bulkmode>, B<crmode>,
 B<fillup>, B<squeeze>, B<blocks>.
+
+=head1 FUNCTION CALL
+
+Instead of an external command, you can call a Perl function by
+prefixing the command name with C<&>.
+
+    greple -Mtee '&App::ansifold::ansifold' -w40 -- ...
+
+The function is executed in a forked child process, so it must follow
+these requirements:
+
+=over 4
+
+=item *
+
+Read matched text from B<STDIN>
+
+=item *
+
+Print converted result to B<STDOUT>
+
+=item *
+
+Arguments are passed via both C<@ARGV> and C<@_>
+
+=back
+
+Any fully qualified function name can be used:
+
+    greple -Mtee '&Your::Module::function' -- ...
+
+The module is automatically loaded if not already loaded.
+
+For convenience, the following short aliases are available:
+
+=over 4
+
+=item B<&ansicolumn>
+
+Calls C<App::ansicolumn::ansicolumn>.
+
+=item B<&ansifold>
+
+Calls C<App::ansifold::ansifold>.
+
+=item B<&cat-v>
+
+Calls C<App::cat::v-E<gt>new-E<gt>run(@_)>.
+
+=back
+
+Using a function call avoids the overhead of forking an external
+process for each invocation, which can significantly improve
+performance when used with the B<--discrete> option.
 
 =head1 LEGACIES
 

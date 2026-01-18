@@ -34,6 +34,7 @@ paths:
       in: path
       required: true
       schema:
+        type: string
         pattern: ^[a-z]+$
     post:
       requestBody:
@@ -41,6 +42,7 @@ paths:
         content:
           application/json:
             schema:
+              type: object
               additionalProperties:
                 type: integer
                 minimum: 3

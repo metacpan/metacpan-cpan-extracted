@@ -449,7 +449,8 @@ auto_read_pixel : {
         if (rxp < lx) continue; /* nothing to fill on this line */
 
         /* fill the span from lx to rxp inclusive using c_plot */
-        for (short fx = lx; fx <= rxp; ++fx) {
+        short fx;
+        for (fx = lx; fx <= rxp; ++fx) {
             c_plot(framebuffer,
                    fx,
                    sy,
@@ -1611,9 +1612,10 @@ void c_flip_horizontal(char *pixels,
     /* allocate a single temporary buffer once (VLA) */
     unsigned char tmp[bytes_per_pixel];
 
-    for (short y = 0; y < height; y++) {
+    short x, y;
+    for (y = 0; y < height; y++) {
         unsigned char *row = (unsigned char *)pixels + (unsigned int)y * bpl;
-        for (short x = 0; x < hwidth; x++) {
+        for (x = 0; x < hwidth; x++) {
             unsigned char *left = row + ((unsigned int)x * bytes_per_pixel);
             unsigned char *right =
                 row + ((unsigned int)(width - 1 - x) * bytes_per_pixel);
@@ -1639,7 +1641,8 @@ void c_flip_vertical(char *pixels,
     unsigned char *tmp = malloc(bufsize);  /* Allocate a temporary buffer once */
     if (!tmp) return;                      /* allocation failed */
 
-    for (size_t i = 0; i < half; ++i) {
+    size_t i;
+    for (i = 0; i < half; ++i) {
         unsigned char *low = (unsigned char *)pixels + i * bufsize;
         unsigned char *high =
             (unsigned char *)pixels + ((size_t)(height - 1 - i)) * bufsize;

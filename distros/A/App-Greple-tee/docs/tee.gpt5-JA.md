@@ -8,7 +8,7 @@ App::Greple::tee - マッチしたテキストを外部コマンドの結果で�
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # DESCRIPTION
 
@@ -73,6 +73,40 @@ Greple の **-Mtee** モジュールは、マッチしたテキスト部分を�
 これはシェルのエイリアスやモジュールファイルと組み合わせると便利です。
 
 利用可能なパラメータは **discrete**, **bulkmode**, **crmode**, **fillup**, **squeeze**, **blocks** です。
+
+# FUNCTION CALL
+
+外部コマンドの代わりに、コマンド名の前に`&`を付けることでPerl関数を呼び出せます。
+
+    greple -Mtee '&App::ansifold::ansifold' -w40 -- ...
+
+関数はフォークされた子プロセスで実行されるため、次の要件に従う必要があります:
+
+- 一致したテキストを**STDIN**から読み込む
+- 変換結果を**STDOUT**へ出力する
+- 引数は`@ARGV`および`@_`の両方で渡される
+
+任意の完全修飾関数名を使用できます:
+
+    greple -Mtee '&Your::Module::function' -- ...
+
+モジュールは未ロードの場合、自動的にロードされます。
+
+便宜のため、以下の短いエイリアスが利用可能です:
+
+- **&ansicolumn**
+
+    `App::ansicolumn::ansicolumn`を呼び出します。
+
+- **&ansifold**
+
+    `App::ansifold::ansifold`を呼び出します。
+
+- **&cat-v**
+
+    `App::cat::v->new->run(@_)`を呼び出します。
+
+関数呼び出しを使用すると、呼び出しごとに外部プロセスをフォークするオーバーヘッドを回避でき、**--discrete**オプションと併用した場合にパフォーマンスを大幅に向上させることができます。
 
 # LEGACIES
 

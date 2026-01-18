@@ -10,7 +10,7 @@ App::Greple::tee - 외부 명령 결과로 일치한 텍스트를 대체하는 �
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 DESCRIPTION
 
@@ -79,6 +79,56 @@ B<-ML> 모듈을 사용하여 다음과 같이 짝수 줄만 처리할 수도 �
 셸 별칭이나 모듈 파일과 함께 사용하면 유용합니다.
 
 사용 가능한 매개변수: B<discrete>, B<bulkmode>, B<crmode>, B<fillup>, B<squeeze>, B<blocks>.
+
+=head1 FUNCTION CALL
+
+외부 명령 대신, 명령 이름 앞에 C<&>를 붙여 Perl 함수를 호출할 수 있습니다.
+
+    greple -Mtee '&App::ansifold::ansifold' -w40 -- ...
+
+함수는 fork된 자식 프로세스에서 실행되므로 다음 요구 사항을 따라야 합니다:
+
+=over 4
+
+=item *
+
+일치한 텍스트를 B<STDIN>에서 읽습니다
+
+=item *
+
+변환된 결과를 B<STDOUT>에 출력합니다
+
+=item *
+
+인수는 C<@ARGV>와 C<@_>를 통해 모두 전달됩니다
+
+=back
+
+완전히 한정된 함수 이름이라면 어떤 것이든 사용할 수 있습니다:
+
+    greple -Mtee '&Your::Module::function' -- ...
+
+모듈이 아직 로드되지 않았다면 자동으로 로드됩니다.
+
+편의를 위해 다음의 짧은 별칭을 사용할 수 있습니다:
+
+=over 4
+
+=item B<&ansicolumn>
+
+C<App::ansicolumn::ansicolumn>를 호출합니다.
+
+=item B<&ansifold>
+
+C<App::ansifold::ansifold>를 호출합니다.
+
+=item B<&cat-v>
+
+C<App::cat::v-E<gt>new-E<gt>run(@_)>를 호출합니다.
+
+=back
+
+함수 호출을 사용하면 각 호출마다 외부 프로세스를 fork하는 오버헤드를 피할 수 있으므로, B<--discrete> 옵션과 함께 사용할 때 성능을 크게 향상시킬 수 있습니다.
 
 =head1 LEGACIES
 

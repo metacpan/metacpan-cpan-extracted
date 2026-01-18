@@ -4,7 +4,7 @@
       "Hayo Baan <info@hayobaan.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -69,7 +69,7 @@
    "provides" : {
       "File::Basename::Extra" : {
          "file" : "lib/File/Basename/Extra.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -84,9 +84,9 @@
          "web" : "https://github.com/HayoBaan/File-Basename-Extra"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_generated_by_perl" : "v5.42.0",
-   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -32,7 +32,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='2.070';
+$VERSION='2.071';
 
 
 #  Get mod_perl version taking intio account legacy strings. Clear $@ after evals
@@ -499,6 +499,34 @@ my %constant_temp;
     #  Config file name
     #
     WEBDYNE_CONF_FN => 'webdyne.conf.pl',
+    
+    
+    #  Tidy output ? Will require HTML::Tidy5 and all dependencies to be installed
+    #
+    WEBDYNE_HTML_TIDY => 0,
+    
+    
+    #  HTML::Tidy5 config
+    #
+    WEBDYNE_HTML_TIDY_CONFIG_HR => {
+
+        'indent'            => 0,      # enable indentation
+        'indent-spaces'     => 2,     # 2 spaces per indent level
+        'wrap'              => 0,      # don't wrap lines
+        'tidy-mark'         => 'no',   # don't add a tidy comment
+        'clean'             => 'no',   # don't clean embedded styles
+        'drop-empty-elements' => 'no',  # don't remove empty elements
+        'hide-comments'     => 'no',        # keep HTML comments
+        'fix-uri'           => 'no',        # don't alter URIs
+        'output-html'       => 'yes',       # output as HTML
+        'show-warnings'     => 'no',        # suppress warnings
+
+    },
+    
+    
+    #  Add some linefeeds via "\n" to output
+    #
+    WEBDYNE_HTML_NEWLINE => 0,
 
 
     #  Mod_perl level. Do not change unless you know what you are
@@ -838,7 +866,7 @@ sub import {
                 
                     #  Yes
                     #
-                    debug("override constant_hr $k value: $v with file value: %s", $constant_hr->{$k});
+                    debug('override constant_hr $k value: %s with file value: %s', $v, $constant_hr->{$k});
                     $v=$class_constant_hr->{$k}=$constant_hr->{$k};
 
                 }

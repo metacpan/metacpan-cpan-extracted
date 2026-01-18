@@ -1,0 +1,35 @@
+Changes
+examples/01-model-info.pl
+examples/download-model.pl
+lib/Lugh.pm
+lib/Lugh.xs
+lib/Lugh/Context.pm
+lib/Lugh/Graph.pm
+lib/Lugh/Inference.pm
+lib/Lugh/KVCache.pm
+lib/Lugh/Model.pm
+lib/Lugh/Ops.pm
+lib/Lugh/Tensor.pm
+lib/Lugh/Tokenizer.pm
+lib/ppport.h
+lib/typemap
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-tensor.t
+t/02-model.t
+t/03-tokenizer.t
+t/04-inference.t
+t/05-tensor-ops.t
+t/06-integration.t
+t/07-generate.t
+t/08-kvcache.t
+t/09-performance.t
+t/data/test-model.gguf
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

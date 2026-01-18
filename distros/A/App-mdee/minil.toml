@@ -1,0 +1,17 @@
+name           = "App-mdee"
+readme_from    = "script/mdee"
+authors_from   = "script/mdee"
+script_files   = [ "script/mdee" ]
+badges         = [ "github-actions/test", "metacpan" ]
+module_maker   = "ModuleBuildTiny"
+static_install = "auto"
+
+[release]
+branch = "main"
+hooks = [
+    "perl -Ilib -MApp::mdee -i -pE 's/^\\s*Version \\K(\\d+(\\.\\d+)*)$/$App::mdee::VERSION/i' script/mdee",
+    "sed -i '' '/^1;$/q' lib/App/mdee.pm && greple -Mperl -h --nocolor :pod script/mdee >> lib/App/mdee.pm",
+]
+
+[unsupported]
+os = [ "MSWin32" ]

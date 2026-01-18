@@ -24,8 +24,6 @@ use constant {
     NO    => 0,
 };
 
-use Term::ANSIScreen qw( :cursor :screen );
-use Term::ANSIColor;
 use Time::HiRes qw( sleep );
 use Term::ANSIEncode qw( ansi_colors );
 use Getopt::Long;

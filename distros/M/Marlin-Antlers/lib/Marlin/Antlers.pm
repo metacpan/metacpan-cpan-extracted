@@ -7,7 +7,7 @@ use warnings;
 package Marlin::Antlers;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002000';
+our $VERSION   = '0.002001';
 
 use B::Hooks::AtRuntime qw( at_runtime after_runtime );
 use Class::Method::Modifiers qw( install_modifier );
@@ -242,7 +242,7 @@ so you don't get repetitive strain injury typing that out each time.
 Example:
 
   has foo => (
-    is           => 'rw',
+    is           => rw,
     isa          => Int,
     clearer      => true,
     predicate    => true,
@@ -254,7 +254,7 @@ Note that it's possible to declare multiple attributes at the same time,
 as long as they share a spec.
 
   has [ 'foo', 'bar', 'baz' ] => (
-    is           => 'rw',
+    is           => rw,
     isa          => Int,
   );
 

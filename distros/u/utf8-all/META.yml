@@ -23,7 +23,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,7 +35,7 @@ no_index:
 provides:
   utf8::all:
     file: lib/utf8/all.pm
-    version: '0.025'
+    version: '0.026'
 requires:
   Carp: '0'
   Encode: '0'
@@ -54,7 +54,7 @@ resources:
   bugtracker: https://github.com/doherty/utf8-all/issues
   homepage: http://metacpan.org/release/utf8-all/
   repository: git://github.com/doherty/utf8-all.git
-version: '0.025'
+version: '0.026'
 x_generated_by_perl: v5.42.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

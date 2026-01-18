@@ -1,2 +1,2 @@
-# 6.83:Jan 09, 2026:Richard Kelsch <rich@rk-internet.com>
+# 6.84:Jan 17, 2026:Richard Kelsch <rich@rk-internet.com>
 # Version:Date:Email

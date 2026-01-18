@@ -35,7 +35,7 @@ components:
   schemas:
     basic_subschema:
       type: string
-      enum: [ 20 ]
+      enum: [ '20' ]
 paths:
   /foo:
     post:

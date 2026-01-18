@@ -512,6 +512,7 @@ components:
       in: header
       required: true
       schema:
+        type: string
         pattern: ^[0-9]+$
     bar-header-ref:
       $ref: '#/components/parameters/bar-header'
@@ -520,6 +521,7 @@ components:
       in: header
       required: true
       schema:
+        type: string
         pattern: ^[0-9]+$
 paths:
   /foo:
@@ -540,7 +542,7 @@ paths:
         in: query
         required: false
         schema:
-          not: true
+          const: 123
       - name: gamma
         in: query
         required: false
@@ -693,9 +695,9 @@ YAML
         },
         {
           instanceLocation => '/request/uri/query/beta',
-          keywordLocation => jsonp(qw(/paths /foo post parameters 2 schema not)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 2 schema not)))->to_string,
-          error => 'subschema is true',
+          keywordLocation => jsonp(qw(/paths /foo post parameters 2 schema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 2 schema const)))->to_string,
+          error => 'value does not match',
         },
       ],
     },
@@ -719,6 +721,7 @@ paths:
       required: true
       schema:
         type: boolean
+        const: true
     get:
       parameters:
       - name: null_query
@@ -745,40 +748,60 @@ paths:
           const: true
 YAML
 
-  $request = request('GET', 'http://example.com/foo/bar/baz?null_query=&boolean_query=0',
-    [ NullHeader => '', BooleanHeader => 0 ]);
+  $request = request('GET', 'http://example.com/foo/bar/baz?null_query=foo&boolean_query=no',
+    [ NullHeader => 'foo', BooleanHeader => 'no' ]);
   cmp_result(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
       errors => [
         {
+          instanceLocation => '/request/uri/query/null_query',
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 0)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 0)))->to_string,
+          error => 'cannot deserialize to requested type',
+        },
+        {
           instanceLocation => '/request/uri/query/boolean_query',
-          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 1 schema const)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 1 schema const)))->to_string,
-          error => 'value does not match',
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 1)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 1)))->to_string,
+          error => 'cannot deserialize to requested type',
+        },
+        {
+          instanceLocation => '/request/header/NullHeader',
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 2)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 2)))->to_string,
+          error => 'cannot deserialize to requested type',
         },
         {
           instanceLocation => '/request/header/BooleanHeader',
-          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 3 schema const)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 3 schema const)))->to_string,
-          error => 'value does not match',
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 3)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 3)))->to_string,
+          error => 'cannot deserialize to requested type',
         },
         {
           instanceLocation => '/request/uri/path/null_path',
-          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 0 schema type)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 0 schema type)))->to_string,
-          error => 'got string, not null',
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 0)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 0)))->to_string,
+          error => 'cannot deserialize to requested type',
         },
         {
           instanceLocation => '/request/uri/path/boolean_path',
-          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 1 schema type)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 1 schema type)))->to_string,
-          error => 'got string, not boolean',
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 1)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 1)))->to_string,
+          error => 'cannot deserialize to requested type',
         },
       ],
     },
-    'query and header parameters are evaluated against their schemas',
+    'query and header parameters are attempted to be parsed to their requested types',
+  );
+
+  $request = request('GET', 'http://example.com/foo//true?null_query=&boolean_query=1',
+    [ NullHeader => '', BooleanHeader => 1 ]);
+  cmp_result(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'query and header parameters are successfully parsed to their requested types',
   );
 
 
@@ -1094,21 +1117,25 @@ paths:
       in: query
       required: true
       schema:
+        type: string
         pattern: ^[0-9]+$
     - name: beta
       in: query
       required: true
       schema:
+        type: string
         pattern: ^[0-9]+$
     - name: alpha
       in: header
       required: true
       schema:
+        type: string
         pattern: ^[0-9]+$
     - name: beta
       in: header
       required: true
       schema:
+        type: string
         pattern: ^[0-9]+$
     get:
       parameters:
@@ -1116,11 +1143,13 @@ paths:
         in: query
         required: true
         schema:
+          type: string
           maxLength: 1
       - name: alpha
         in: header
         required: true
         schema:
+          type: string
           maxLength: 1
 YAML
 
@@ -1778,29 +1807,31 @@ paths:
       in: path
       required: true
       schema:
+        type: [integer, string]
         maximum: 10
-        pattern: ^[a-z]$
+        pattern: ^[a-z]+$
     post:
       parameters:
       - name: bar
         in: query
-        required: false
         schema:
+          type: [integer, string]
           maximum: 10
-          pattern: ^[a-z]$
+          pattern: ^[a-z]+$
       - name: Foo-Bar
         in: header
-        required: false
         schema:
+          type: [integer, string]
           maximum: 10
-          pattern: ^[a-z]$
+          pattern: ^[a-z]+$
       requestBody:
         required: true
         content:
           text/plain:
             schema:
+              type: [integer, string]
               maximum: 10
-              pattern: ^[a-z]$
+              pattern: ^[a-z]+$
 YAML
 
   my $request = request('POST', 'http://example.com/foo/123?bar=456',
@@ -1816,47 +1847,31 @@ YAML
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post parameters 0 schema maximum)))->to_string,
           error => 'value is greater than 10',
         },
-        {
-          instanceLocation => '/request/uri/query/bar',
-          keywordLocation => jsonp(qw(/paths /foo/{foo_id} post parameters 0 schema pattern)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post parameters 0 schema pattern)))->to_string,
-          error => 'pattern does not match',
-        },
+        # no error from pattern - query value is a number
         {
           instanceLocation => '/request/header/Foo-Bar',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} post parameters 1 schema maximum)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post parameters 1 schema maximum)))->to_string,
           error => 'value is greater than 10',
         },
-        {
-          instanceLocation => '/request/header/Foo-Bar',
-          keywordLocation => jsonp(qw(/paths /foo/{foo_id} post parameters 1 schema pattern)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post parameters 1 schema pattern)))->to_string,
-          error => 'pattern does not match',
-        },
+        # no error from pattern - header value is a number
         {
           instanceLocation => '/request/uri/path/foo_id',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} parameters 0 schema maximum)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} parameters 0 schema maximum)))->to_string,
           error => 'value is greater than 10',
         },
-        # at least for now, passed-in numbers are validated as numbers...
-        {
-          instanceLocation => '/request/uri/path/foo_id',
-          keywordLocation => jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)))->to_string,
-          error => 'pattern does not match',
-        },
-        # maximum is ignored -- types are not loose in bodies
+        # no error from pattern - path value is a number
         {
           instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} post requestBody content text/plain schema pattern)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post requestBody content text/plain schema pattern)))->to_string,
           error => 'pattern does not match',
         },
+        # no error from maximum - text/plain request body is a string
       ],
     },
-    'numeric values are treated as both strings and numbers, when no explicit type is requested',
+    'numeric values are correctly deserialized when type=number or type=integer is specified',
   );
   is(get_type($options->{path_captures}{foo_id}), 'integer', 'passed-in path value is preserved as a number');
 
@@ -2129,7 +2144,7 @@ paths:
       - name: MultipleValuesAsString
         in: header
         schema:
-          const: 'one, two, three'
+          const: 'one,two,three'
       - name: MultipleValuesAsArray
         in: header
         schema:
@@ -2147,36 +2162,26 @@ paths:
           maxProperties: 3
           properties:
             R:
-              const: '100'
+              const: 100
             G:
               type: integer
             B:
               maximum: 300
-              minimum: 300
+              minimum: 300    # "number" is an acceptable type therefore it is used
       - name: MultipleValuesAsObjectExplodeTrue
         in: header
         explode: true
         schema:
-          type: object
-          minProperties: 3
-          maxProperties: 3
-          properties:
-            R:
-              const: '100'
-            G:
-              type: integer
-            B:
-              maximum: 300
-              minimum: 300
+          $ref: '#/paths/~1foo/get/parameters/3/schema' # MultipleValuesAsObjectExplodeFalse
       - name: ArrayWithRef
         in: header
         schema:
-          $ref: '#/paths/~1foo/get/parameters/2/schema'
+          $ref: '#/paths/~1foo/get/parameters/2/schema' # MultipleValuesAsArray
       - name: ArrayWithRefAndOtherKeywords
         in: header
         schema:
-          $ref: '#/paths/~1foo/get/parameters/2/schema'
-          not: true
+          $ref: '#/paths/~1foo/get/parameters/2/schema' # MultipleValuesAsArray
+          type: [ array, string ]
       - name: MultipleValuesAsRawString
         in: header
         schema:
@@ -2184,15 +2189,14 @@ paths:
       - name: ArrayWithLocalTypeAndRef
         in: header
         schema:
-          type: array   # if detected, this will be used first to determine the parsing
-          $ref: '#/paths/~1foo/get/parameters/3/schema' # this provides  type: object
-          not: true
+          type: array
+          $ref: '#/paths/~1foo/get/parameters/3/schema' # MultipleValuesAsObjectExplodeFalse
       - name: ArrayWithAllOfAndRef
         in: header
         schema:
           allOf:
-            - $ref: '#/paths/~1foo/get/parameters/2/schema'
-            - not: true
+            - $ref: '#/paths/~1foo/get/parameters/2/schema' # MultipleValuesAsArray
+            - true
       # must be evaluated last, as broken $refs abort all validation
       - name: ArrayWithBrokenRef
         in: header
@@ -2260,13 +2264,41 @@ YAML
 
   $request = request('GET', 'http://example.com/foo', [
       MultipleValuesAsObjectExplodeFalse => ' R, 100 ',
-      MultipleValuesAsObjectExplodeFalse => ' B, 300,  G , 200 ',
-      MultipleValuesAsObjectExplodeTrue => ' R=100  , B=300 ',
+      MultipleValuesAsObjectExplodeFalse => ' B, 150,  G , 200 ',
+      MultipleValuesAsObjectExplodeTrue => ' R=100  , B=150 ',
       MultipleValuesAsObjectExplodeTrue => '  G=200 ',
     ]);
   cmp_result(
     $openapi->validate_request($request)->TO_JSON,
-    { valid => true },
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/header/MultipleValuesAsObjectExplodeFalse/B',
+          keywordLocation => jsonp(qw(/paths /foo get parameters 3 schema properties B minimum)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 3 schema properties B minimum)))->to_string,
+          error => 'value is less than 300',
+        },
+        {
+          instanceLocation => '/request/header/MultipleValuesAsObjectExplodeFalse',
+          keywordLocation => jsonp(qw(/paths /foo get parameters 3 schema properties)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 3 schema properties)))->to_string,
+          error => 'not all properties are valid',
+        },
+        {
+          instanceLocation => '/request/header/MultipleValuesAsObjectExplodeTrue/B',
+          keywordLocation => jsonp(qw(/paths /foo get parameters 4 schema $ref properties B minimum)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 3 schema properties B minimum)))->to_string,
+          error => 'value is less than 300',
+        },
+        {
+          instanceLocation => '/request/header/MultipleValuesAsObjectExplodeTrue',
+          keywordLocation => jsonp(qw(/paths /foo get parameters 4 schema $ref properties)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 3 schema properties)))->to_string,
+          error => 'not all properties are valid',
+        },
+      ],
+    },
     'headers can be parsed into an object, represented in two ways depending on explode value',
   );
 
@@ -2295,22 +2327,10 @@ YAML
           error => 'items at indices 0 and 1 are not unique',
         },
         {
-          instanceLocation => '/request/header/ArrayWithRefAndOtherKeywords',
-          keywordLocation => jsonp(qw(/paths /foo get parameters 6 schema not)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 6 schema not)))->to_string,
-          error => 'subschema is true',
-        },
-        {
           instanceLocation => '/request/header/ArrayWithLocalTypeAndRef',
-          keywordLocation => jsonp(qw(/paths /foo get parameters 8 schema $ref type)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 3 schema type)))->to_string,
-          error => 'got array, not object',
-        },
-        {
-          instanceLocation => '/request/header/ArrayWithLocalTypeAndRef',
-          keywordLocation => jsonp(qw(/paths /foo get parameters 8 schema not)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 8 schema not)))->to_string,
-          error => 'subschema is true',
+          keywordLocation => jsonp(qw(/paths /foo get parameters 8)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 8)))->to_string,
+          error => 'cannot deserialize to any type',
         },
         {
           instanceLocation => '/request/header/ArrayWithAllOfAndRef',
@@ -2320,15 +2340,9 @@ YAML
         },
         {
           instanceLocation => '/request/header/ArrayWithAllOfAndRef',
-          keywordLocation => jsonp(qw(/paths /foo get parameters 9 schema allOf 1 not)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 9 schema allOf 1 not)))->to_string,
-          error => 'subschema is true',
-        },
-        {
-          instanceLocation => '/request/header/ArrayWithAllOfAndRef',
           keywordLocation => jsonp(qw(/paths /foo get parameters 9 schema allOf)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 9 schema allOf)))->to_string,
-          error => 'subschemas 0, 1 are not valid',
+          error => 'subschema 0 is not valid',
         },
         {
           instanceLocation => '/request/header/ArrayWithBrokenRef',
@@ -2661,6 +2675,7 @@ paths:
         in: path
         required: true
         schema:
+          type: number
           minimum: 4
           $ref: https://otherdoc.com#my_schema
 YAML

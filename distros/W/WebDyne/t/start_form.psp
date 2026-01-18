@@ -1,0 +1,28 @@
+<start_html>
+
+<!-- Variation 1. Straight <form></form> -->
+<form>
+<p>
+<submit name="submit0" value="Submit">
+</form>
+
+
+<!-- Variation 2. <start_form>,</end_form> -->
+<start_form>
+<p>
+<submit name="submit0" value="Submit">
+<end_form>
+
+
+<!-- Variation 3. <start_form>,</form> -->
+<start_form>
+<p>
+<submit name="submit0" value="Submit">
+</form>
+
+
+<!-- Variation 4. <form>,</end form> -->
+<form>
+<p>
+<submit name="submit0" value="Submit">
+<end_form>

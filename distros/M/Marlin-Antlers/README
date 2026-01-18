@@ -55,7 +55,7 @@ DESCRIPTION
         Example:
 
           has foo => (
-            is           => 'rw',
+            is           => rw,
             isa          => Int,
             clearer      => true,
             predicate    => true,
@@ -67,7 +67,7 @@ DESCRIPTION
         time, as long as they share a spec.
 
           has [ 'foo', 'bar', 'baz' ] => (
-            is           => 'rw',
+            is           => rw,
             isa          => Int,
           );
 

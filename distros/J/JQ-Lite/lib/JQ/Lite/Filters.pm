@@ -1596,7 +1596,26 @@ sub apply {
 
             @next_results = map {
                 die 'join(): input must be an array' if ref($_) ne 'ARRAY';
-                join($sep, map { defined $_ ? $_ : '' } @$_)
+                my @parts;
+                for my $item (@$_) {
+                    if (!defined $item) {
+                        push @parts, '';
+                        next;
+                    }
+
+                    if (ref($item) eq 'JSON::PP::Boolean') {
+                        push @parts, $item ? 'true' : 'false';
+                        next;
+                    }
+
+                    if (ref $item) {
+                        die 'join(): array elements must be scalars';
+                    }
+
+                    push @parts, "$item";
+                }
+
+                join($sep, @parts)
             } @results;
             @$out_ref = @next_results;
             return 1;

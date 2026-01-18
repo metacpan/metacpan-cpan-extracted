@@ -8,7 +8,7 @@ App::Greple::tee - 用外部命令结果替换匹配文本的模块
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # DESCRIPTION
 
@@ -73,6 +73,40 @@ Greple 的 **-Mtee** 模块将匹配到的文本片段发送给指定的过滤�
 这在与 shell 别名或模块文件结合时很有用。
 
 可用的参数有：**discrete**、**bulkmode**、**crmode**、**fillup**、**squeeze**、**blocks**。
+
+# FUNCTION CALL
+
+您可以通过在命令名前加上 `&` 来调用 Perl 函数，而不是外部命令。
+
+    greple -Mtee '&App::ansifold::ansifold' -w40 -- ...
+
+该函数在派生的子进程中执行，因此必须遵循以下要求：
+
+- 从 **STDIN** 读取匹配的文本
+- 将转换后的结果打印到 **STDOUT**
+- 参数通过 `@ARGV` 和 `@_` 同时传递
+
+可以使用任何完全限定的函数名：
+
+    greple -Mtee '&Your::Module::function' -- ...
+
+如果模块尚未加载，将自动加载。
+
+为方便起见，提供以下简短别名：
+
+- **&ansicolumn**
+
+    调用 `App::ansicolumn::ansicolumn`。
+
+- **&ansifold**
+
+    调用 `App::ansifold::ansifold`。
+
+- **&cat-v**
+
+    调用 `App::cat::v->new->run(@_)`。
+
+使用函数调用可避免每次调用都为外部进程派生所带来的开销，当与 **--discrete** 选项一起使用时，可显著提升性能。
 
 # LEGACIES
 

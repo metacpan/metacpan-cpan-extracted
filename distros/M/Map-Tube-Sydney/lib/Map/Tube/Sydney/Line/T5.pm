@@ -1,6 +1,6 @@
 package Map::Tube::Sydney::Line::T5;
 
-$Map::Tube::Sydney::Line::T5::VERSION   = '1.00';
+$Map::Tube::Sydney::Line::T5::VERSION   = '1.01';
 $Map::Tube::Sydney::Line::T5::AUTHORITY = 'cpan:EARLYBEAN';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::Sydney::Line::T5 - Sydney Rail Map: T5 Line.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 DESCRIPTION
 

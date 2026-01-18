@@ -39,7 +39,7 @@ use WebDyne::Util;
 
 #  Version information
 #
-$VERSION='2.070';
+$VERSION='2.071';
 
 
 #  Debug load
@@ -768,9 +768,11 @@ sub optimise_one {
                 my $html=eval {
                     $attr_hr=undef unless keys %{$attr_hr};
                     if ($html_tiny_or->can($html_tag)) {
+                        debug("calling HTML::Tiny->$html_tag directly to render");
                         $html_tiny_or->$html_tag(grep {$_} $attr_hr, join(undef, @data_child))
                     }
                     else {
+                        debug("calling HTML::Tiny->tag($html_tag) to render");
                         $html_tiny_or->tag($html_tag, grep {$_} $attr_hr, join(undef, @data_child))
                     }
 
@@ -994,9 +996,11 @@ sub optimise_two {
 
                 #  Splice start and end tags for this HTML into appropriate place
                 #
-                splice @{$data_uppr_ar->[WEBDYNE_NODE_CHLD_IX]}, $data_chld_ix, 1,
+                splice @{$data_uppr_ar->[WEBDYNE_NODE_CHLD_IX]}, $data_chld_ix, 1, grep {$_}
                     $html_start,
+                    (WEBDYNE_HTML_NEWLINE && "\n"),
                     @{$data_ar->[WEBDYNE_NODE_CHLD_IX]},
+                    (WEBDYNE_HTML_NEWLINE && "\n"),
                     $html_end;
 
                 #  Done, no need to iterate any more
@@ -1113,9 +1117,11 @@ sub optimise_two {
 
             #  Place start and end tags for this HTML into appropriate place
             #
-            my @data=(
+            my @data=( grep {$_}
                 $html_start,
+                (WEBDYNE_HTML_NEWLINE && "\n"),
                 @data_child_ar,
+                (WEBDYNE_HTML_NEWLINE && "\n"),
                 $html_end
             );
 

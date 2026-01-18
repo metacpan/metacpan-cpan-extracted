@@ -1,5 +1,11 @@
 Change log for Graphics::Framebuffer
 
+6.84   January 17, 2026
+
+       Github user "snakpak" made changes to the C code for better
+	   compatability.  I have merged the code and sent it to pause for
+	   indexing.
+
 6.83   January 09, 2026
 
        Corrected the DESTROY bug.

@@ -10,7 +10,7 @@ App::Greple::tee - module to replace matched text by the external command result
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 DESCRIPTION
 
@@ -106,6 +106,60 @@ This is useful when combined with shell aliases or module files.
 
 Available parameters are: B<discrete>, B<bulkmode>, B<crmode>,
 B<fillup>, B<squeeze>, B<blocks>.
+
+=head1 FUNCTION CALL
+
+Instead of an external command, you can call a Perl function by
+prefixing the command name with C<&>.
+
+    greple -Mtee '&App::ansifold::ansifold' -w40 -- ...
+
+The function is executed in a forked child process, so it must follow
+these requirements:
+
+=over 4
+
+=item *
+
+Read matched text from B<STDIN>
+
+=item *
+
+Print converted result to B<STDOUT>
+
+=item *
+
+Arguments are passed via both C<@ARGV> and C<@_>
+
+=back
+
+Any fully qualified function name can be used:
+
+    greple -Mtee '&Your::Module::function' -- ...
+
+The module is automatically loaded if not already loaded.
+
+For convenience, the following short aliases are available:
+
+=over 4
+
+=item B<&ansicolumn>
+
+Calls C<App::ansicolumn::ansicolumn>.
+
+=item B<&ansifold>
+
+Calls C<App::ansifold::ansifold>.
+
+=item B<&cat-v>
+
+Calls C<App::cat::v-E<gt>new-E<gt>run(@_)>.
+
+=back
+
+Using a function call avoids the overhead of forking an external
+process for each invocation, which can significantly improve
+performance when used with the B<--discrete> option.
 
 =head1 LEGACIES
 
@@ -261,7 +315,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::tee;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 use v5.24;
 use warnings;
@@ -269,9 +323,10 @@ use experimental 'refaliasing';
 use Carp;
 use List::Util qw(sum first);
 use Text::ParseWords qw(shellwords);
-use App::cdif::Command;
+use Command::Run;
 use Data::Dumper;
 use Getopt::EX::Config;
+use App::Greple::tee::Autoload qw(resolve);
 
 my $config = Getopt::EX::Config->new(
     debug => 0,
@@ -281,6 +336,7 @@ my $config = Getopt::EX::Config->new(
     squeeze => 0,
     bulkmode => 0,
     crmode => 0,
+    use => '',
 );
 
 our $command;
@@ -304,6 +360,14 @@ sub initialize {
     }
 }
 
+sub finalize {
+    ($mod, $argv) = @_;
+    for my $mod (grep length, split /,/, $config->{use}) {
+	eval "require $mod; $mod->import()";
+	die $@ if $@;
+    }
+}
+
 use Unicode::EastAsianWidth;
 
 sub InConcatScript {
@@ -324,7 +388,7 @@ sub fillup_block {
     (my $s1, local $_, my $s2) = $_[0] =~ /\A(\s*)(.*?)(\s*)\z/s or die;
     s/(?<=\p{InFullwidthPunctuation})\n//g;
     s/(?<=\p{InConcatScript})\n(?=\p{InConcatScript})//g;
-    s/\s+/ /g;
+    s/[ ]*\n[ ]*/ /g;
     $s1 . $_ . $s2;
 }
 
@@ -336,14 +400,20 @@ sub fillup_paragraphs {
 sub call {
     my $data = shift;
     $command // return $data;
-    my $exec = App::cdif::Command->new;
+    my $exec = Command::Run->new;
     if ($discrete and $fillup) {
 	fillup_paragraphs $data;
     }
     if (ref $command ne 'ARRAY') {
 	$command = [ shellwords $command ];
     }
-    my $out = $exec->command($command)->setstdin($data)->update->data // '';
+    my @command = @$command;
+    # Resolve &function to code reference
+    if (@command and $command[0] =~ /^&(.+)/) {
+	shift @command;
+	unshift @command, resolve($1);
+    }
+    my $out = $exec->command(@command)->with(stdin => $data)->update->data // '';
     if ($squeeze) {
 	$out =~ s/\n\n+/\n/g;
     }

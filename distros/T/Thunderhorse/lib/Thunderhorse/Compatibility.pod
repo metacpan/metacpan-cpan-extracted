@@ -1,6 +1,6 @@
 =head1 NAME
 
-Thunderhorse::Compatibility - past and future compatibility notices
+Thunderhorse::Compatibility - Past and future compatibility notices
 
 =head1 DESCRIPTION
 
@@ -8,9 +8,9 @@ Thunderhorse is B<currently in beta>. This page is a stub for compatibility
 notices, which may start appearing after version C<1.000>. Until then, no
 breaking of compatibility will be documented here.
 
-Thunderhorse has a 2-year period policy on keeping compatibility, excluding
-serious security fixes. Below are documented all future and past breaking
-changes in the interface.
+Thunderhorse has a 2-year deprecation period policy on keeping compatibility,
+excluding serious security fixes. Below are documented all future and past
+breaking changes in the interface.
 
 =head2 Current deprecations
 
@@ -19,4 +19,8 @@ None yet.
 =head2 Past changes
 
 None yet.
+
+=head1 SEE ALSO
+
+L<Thunderhorse::Manual> - table of contents
 

@@ -1,5 +1,10 @@
 Revision history for Perl module File-stat-Extra
 
+0.010     2026-01-18
+  * Fixed tests on Windows
+  * Skipping tests when installing dependencies in AppVeyor build
+  * Removed travis-ci
+
 0.009     2026-01-16
   * Force use of archive-tar to prevent issues on MacOs
   * Adpated to use gmake instead of dmake

@@ -80,7 +80,7 @@ subtest 'slice - scalar context returns ResultSet' => sub {
         'Scalar context returns ResultSet');
 
     # Verify the ResultSet has correct attributes
-    my ($cond, $attrs) = $sliced_rs->as_query;
+    my $attrs = $sliced_rs->_resolved_attrs;
     is($attrs->{offset}, 0, 'Offset is correct');
     is($attrs->{rows}, 5, 'Rows is correct (5 records: 0-4)');
 

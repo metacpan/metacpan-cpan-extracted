@@ -84,7 +84,7 @@
             "JSON::Schema::Modern::Result" : "0.630",
             "JSON::Schema::Modern::Utilities" : "0.628",
             "JSON::Schema::Modern::Vocabulary" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.45",
             "Math::BigInt" : "1.999701",
             "Mojo::File" : "0",
             "Mojo::Message::Request" : "0",
@@ -243,23 +243,23 @@
    "provides" : {
       "JSON::Schema::Modern::Document::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Document/OpenAPI.pm",
-         "version" : "0.120"
+         "version" : "0.121"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm",
-         "version" : "0.120"
+         "version" : "0.121"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI_3_0" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI_3_0.pm",
-         "version" : "0.120"
+         "version" : "0.121"
       },
       "OpenAPI::Modern" : {
          "file" : "lib/OpenAPI/Modern.pm",
-         "version" : "0.120"
+         "version" : "0.121"
       },
       "OpenAPI::Modern::Utilities" : {
          "file" : "lib/OpenAPI/Modern/Utilities.pm",
-         "version" : "0.120"
+         "version" : "0.121"
       }
    },
    "release_status" : "stable",
@@ -274,7 +274,7 @@
          "web" : "https://github.com/karenetheridge/OpenAPI-Modern"
       }
    },
-   "version" : "0.120",
+   "version" : "0.121",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.043006"
@@ -551,7 +551,7 @@
                }
             },
             "name" : "@Author::ETHER/Test::Kwalitee",
-            "version" : "2.12"
+            "version" : "2.13"
          },
          {
             "class" : "Dist::Zilla::Plugin::MojibakeTests",
@@ -1175,7 +1175,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.120",
+                  "tag" : "v0.121",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

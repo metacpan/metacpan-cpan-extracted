@@ -4,7 +4,7 @@ use warnings;
 
 # ABSTRACT: Adapted version of the Dist::Zilla::Plugin::Test::Pod::LinkCheck
 # plugin to set the cpan backend to CPAN instead of the deprecated CPANPLUS.
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use Moose;
 extends 'Dist::Zilla::Plugin::InlineFiles';
@@ -76,7 +76,7 @@ Dist::Zilla::Plugin::Author::HAYOBAAN::LinkCheck - Adapted version of the Dist::
 
 =head1 VERSION
 
-version 0.014
+version 0.016
 
 =head1 USAGE
 

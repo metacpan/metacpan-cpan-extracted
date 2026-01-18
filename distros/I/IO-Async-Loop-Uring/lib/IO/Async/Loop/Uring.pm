@@ -1,5 +1,5 @@
 package IO::Async::Loop::Uring;
-$IO::Async::Loop::Uring::VERSION = '0.003';
+$IO::Async::Loop::Uring::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ sub new {
 	my ($class, %params) = @_;
 
 	my $self = $class->__new(%params);
-	$self->{ring} = IO::Uring->new(128);
+	$self->{ring} = $params{ring} // IO::Uring->new(128);
 	return $self;
 }
 
@@ -47,19 +47,19 @@ sub loop_once {
 
 	return undef if !defined $ret and $! != ETIME;
 
-	if( WATCHDOG_ENABLE and !$self->{alarmed} ) {
-		alarm( IO::Async::Loop->WATCHDOG_INTERVAL );
+	if (WATCHDOG_ENABLE and !$self->{alarmed}) {
+		alarm IO::Async::Loop->WATCHDOG_INTERVAL;
 		$self->{alarmed}++;
 
 		$self->_manage_queues;
 
-		alarm(0);
+		alarm 0;
 		undef $self->{alarmed};
 	} else {
 		$self->_manage_queues;
 	}
 
-	return 1;
+	return defined $ret;
 }
 
 sub is_running {
@@ -90,17 +90,17 @@ sub watch_io {
 	weaken $this;
 
 	if (my $id = $self->{poll_id}{$fileno}) {
-		$self->{ring}->poll_update($id, undef, $mask | POLLHUP | POLLERR, IORING_POLL_UPDATE_EVENTS, 0);
+		$self->{ring}->poll_update($id, undef, $mask, IORING_POLL_UPDATE_EVENTS, 0);
 		return $id;
 	} else {
 		my $watch = $this->{iowatches}{$fileno};
 
-		my $id = $self->{ring}->poll_multishot($handle, $mask | POLLHUP | POLLERR, 0, sub {
+		my $id = $self->{ring}->poll_multishot($handle, $mask, 0, sub {
 			my ($res, $flags) = @_;
 
 			if ($res > 0) {
-				if( WATCHDOG_ENABLE and !$$alarmed ) {
-					alarm( IO::Async::Loop->WATCHDOG_INTERVAL );
+				if (WATCHDOG_ENABLE and !$$alarmed) {
+					alarm IO::Async::Loop->WATCHDOG_INTERVAL;
 					$$alarmed = 1;
 				}
 
@@ -147,7 +147,7 @@ sub unwatch_io {
 		delete $self->{poll_id}{$fileno};
 	} else {
 		$self->{pollmask}{$fileno} = $mask;
-		$self->{ring}->poll_update($id, undef, $mask | POLLHUP | POLLERR, 0, IORING_POLL_UPDATE_EVENTS);
+		$self->{ring}->poll_update($id, undef, $mask, 0, IORING_POLL_UPDATE_EVENTS);
 	}
 }
 
@@ -194,7 +194,7 @@ sub watch_time {
 	my $code = $params{code} or croak "Expected 'code' as CODE ref";
 
 	my $fh;
-	if( defined $params{after} ) {
+	if (defined $params{after}) {
 		my $after = $params{after} >= 0 ? $params{after} : 0;
 		my $flags = IORING_TIMEOUT_ETIME_SUCCESS;
 		$flags |= $flag_for_clock{$params{clock}} if defined $params{clock};
@@ -275,7 +275,7 @@ IO::Async::Loop::Uring - Use IO::Async with IO::Uring
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -283,18 +283,24 @@ version 0.003
 
  my $loop = IO::Async::Loop::Uring->new();
 
- $loop->add( ... );
+ $loop->add(...);
 
- $loop->add( IO::Async::Signal->new(
+ $loop->add(IO::Async::Signal->new(
        name => 'HUP',
        on_receipt => sub { ... },
- ) );
+ ));
 
  $loop->loop_forever();
 
 =head1 DESCRIPTION
 
 This subclass of L<IO::Async::Loop> uses L<IO::Uring> to perform its work. Because C<io_uring> is a quickly developing kernel subsystem, it requires a Linux 6.7 kernel or newer to function.
+
+=head1 METHODS
+
+=head2 new(%options)
+
+This constructs a new C<IO::Async::Loop::Uring> object. It optionally takes a signle named argument, C<ring>, which would be the L<IO::Uring> ring used for the loop.
 
 =head1 AUTHOR
 

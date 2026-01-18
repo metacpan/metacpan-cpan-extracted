@@ -53,6 +53,10 @@ t/37-row-copy.t
 t/38-row-update-or-insert.t
 t/39-schema-version-and-unregister.t
 t/40-schema-deploy.t
+t/41-resultset-count-literal.t
+t/42-resultset-cache.t
+t/43-result-class.t
+t/44-txn-batch.t
 t/manifest.t
 t/pod.t
 t/test.db

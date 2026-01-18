@@ -1,0 +1,133 @@
+=head1 NAME
+
+Thunderhorse::Manual - Table of contents
+
+=head1 DESCRIPTION
+
+This page provides links for all significant pages of the Thunderhorse
+documentation. Important related documentation pages are linked in parentheses
+for quick access.
+
+=head2 References and tutorials
+
+These pages contain general information about the framework.
+
+=over
+
+=item * L<Thunderhorse>
+
+Setting up, configuration, common usage, extending, credits.
+
+=item * L<Thunderhorse::Cookbook>
+
+Reusable coding patterns.
+
+=item * L<Thunderhorse::Compatibility>
+
+Past and future deprecations.
+
+=back
+
+=head2 Main component documentation
+
+These pages list all the methods available for each of the framework's
+significant components.
+
+=over
+
+=item * L<Thunderhorse::App> (L<Gears::App>)
+
+Main instance of the application.
+
+=item * L<Thunderhorse::Controller> (L<Gears::Controller>)
+
+Base controller class.
+
+=item * L<Thunderhorse::Config> (L<Gears::Config>)
+
+Configuration manager class.
+
+=item * L<Thunderhorse::Router> (L<Gears::Router>)
+
+Base router class.
+
+=item * L<Thunderhorse::Router::Location> (L<Gears::Router::Location>)
+
+Location implementation for the router.
+
+=item * L<Thunderhorse::Context> (L<Gears::Context>)
+
+Client transaction class.
+
+=item * L<Thunderhorse::Request> (L<PAGI::Request>)
+
+Request class.
+
+=item * L<Thunderhorse::Response> (L<PAGI::Response>)
+
+Response class.
+
+=item * L<Thunderhorse::WebSocket> (L<PAGI::WebSocket>)
+
+Websocket handling class.
+
+=item * L<Thunderhorse::SSE> (L<PAGI::SSE>)
+
+SSE handling class.
+
+=back
+
+=head2 Core module documentation
+
+These pages list built in modules of Thunderhorse.
+
+=over
+
+=item * L<Thunderhorse::Module>
+
+Base module class.
+
+=item * L<Thunderhorse::Module::Logger> (L<Log::Handler>)
+
+Logger module.
+
+=item * L<Thunderhorse::Module::Template> (L<Template::Toolkit>)
+
+Template rendering module
+
+=item * L<Thunderhorse::Module::Middleware>
+
+Configurable middleware module.
+
+=back
+
+=head2 Other useful documentation
+
+=over
+
+=item * L<thunderhorse>
+
+Script for generating and inspecting Thunderhorse applications.
+
+=item * L<Test2::Thunderhorse> (L<PAGI::Test::Client>)
+
+Helpers for testing with L<Test2>.
+
+=item * L<Gears::X> (L<Gears::X::HTTP>)
+
+Main exception class.
+
+=item * L<Gears::Router::Location::SigilMatch> (L<Gears::Router::Pattern::SigilMatch>)
+
+Routing placeholder syntax implementation.
+
+=item * L<Gears::Config::Reader::PerlScript> (L<Gears::Config::Reader>)
+
+Perl script configuration reader implementation.
+
+=item * L<PAGI::Tutorial>
+
+Tutorial of L<PAGI>.
+
+=back
+

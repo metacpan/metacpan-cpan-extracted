@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.014
+    version 0.016
 
 DESCRIPTION
 
@@ -426,8 +426,7 @@ ATTRIBUTES
 BUGS
 
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/HayoBaan/Dist-Zilla-PluginBundle-Author-HAYOBAAN/is
-    sues>.
+    <https://github.com/HayoBaan/Dist-Zilla-PluginBundle-Author-HAYOBAAN/issues>.
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

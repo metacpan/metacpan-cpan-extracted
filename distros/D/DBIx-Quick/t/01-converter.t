@@ -9,18 +9,37 @@ use Test::More tests => 2;
 use Test::Exception;
 use Test::MockObject;
 use Data::Dumper;
+use Test::MockModule;
 
 {
-    my $dbh = Test::MockObject->new;
+    my $dbh       = Test::MockObject->new;
+    my $sqla_mock = Test::MockModule->new('SQL::Abstract::More');
     my %queries;
+    $sqla_mock->mock( bind_params => sub { 
+        shift;
+        my $sth = shift;
+        $queries{$sth->query} = [@_];
+    } );
     $dbh->mock(
-        do => sub {
+        prepare => sub {
             shift;
             my $query = shift;
             my $undef = shift;
-            $queries{$query} = [@_];
 
             #            print Data::Dumper::Dumper \%queries;
+            my $sth = Test::MockObject->new;
+            $sth->mock(
+                isa => sub {
+                    return 1;
+                },
+                execute => sub {
+                    shift;
+                },
+                query => sub {
+                    $query;
+                }
+            );
+            return $sth;
         }
     );
     $dbh->mock(
@@ -36,7 +55,8 @@ use Data::Dumper;
             {
                 push @return, { id => 5, parody => 'hele mende' };
             }
-	    #            print Data::Dumper::Dumper \%queries;
+
+            #            print Data::Dumper::Dumper \%queries;
             return [@return];
         }
     );
@@ -88,6 +108,7 @@ use Data::Dumper;
         DBIx::Quick::Test::Users::Instance->new( parody => 'hola mundo' ) );
     is $queries{'INSERT INTO users ( parody) VALUES ( ? )'}[0], 'hele mende',
       'Transforming data to database format works';
-    my ($user) = @{DBIx::Quick::Test::Users->search( id => 5, )};
-    is $user->parody, 'hili mindi', 'Transforming data from database format works';
+    my ($user) = @{ DBIx::Quick::Test::Users->search( id => 5, ) };
+    is $user->parody, 'hili mindi',
+      'Transforming data from database format works';
 }

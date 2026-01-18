@@ -45,8 +45,6 @@ WriteMakefile(
     PREREQ_PM    => {
         'charnames'         => '0',
         'List::Util'        => '1.20',
-        'Term::ANSIColor'   => '0',
-        'Term::ANSIScreen'  => '0',
         'Time::HiRes'       => '0',
         'Getopt::Long'      => '0',
         'Text::Wrap::Smart' => '0',

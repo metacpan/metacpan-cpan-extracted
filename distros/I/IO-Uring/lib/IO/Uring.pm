@@ -1,5 +1,5 @@
 package IO::Uring;
-$IO::Uring::VERSION = '0.009';
+$IO::Uring::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ IO::Uring - io_uring for Perl
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -76,21 +76,33 @@ This enables sqpoll mode, starting a kernel thread to poll for submissions so no
 
 =back
 
-=head2 run_once($min_events = 1)
+=head2 run_once($min_events = 1, $timeout = undef, $signal_mask = undef)
 
-Submit all pending requests, and process at least C<$min_events> completed (but up to C<$queue_size>) events.
+Submit all pending requests, and process at least C<$min_events> completed (but up to C<$queue_size>) events, or if $timeout (a Time::Spec object) is defined until that much time has passed. If C<$signal_mask> (a POSIX::SigSet object) is defined, the signal mask will temporalily and atomicly set to it during the waiting.
+
+=head2 submit()
+
+This submits the next events to the submission queue without processing completion events.
 
 =head2 probe()
 
 This probes for which features are supported on this system. It returns a hash of feature-name to true/false. Generally speaking feature names map directly to method names but note that for filesystem operations you should check for the C<*at> version (e.g. C<'openat'> not C<'open'>).
 
-=head2 ensure_sqes($count)
+=head2 sq_space_left($count)
 
-This ensures the availability of a certain number of sqes. This is useful when creating linked chains.
+Return the available space on the submission queue.
+
+=head2 add_buffer_group($size, $count, $id = 0)
+
+This adds a L<buffer group|IO::Uring::BufferGroup> to the ring, and returns it. It will have C<$count> buffers each C<$size> bytes; both numbers must be powers-of-two.
 
 =head2 accept($sock, $flags, $s_flags, $callback)
 
 Accept a new socket from listening socket C<$sock>.
+
+=head2 accept_multishot($sock, $flags, $s_flags, $callback)
+
+Accept a new socket from listening socket C<$sock>. Unlike C<accept> this will trigger more than once. For each completion event posted on behalf of this request, the flags argument will have IORING_CQE_F_MORE set if the application should expect more completions from this request. If this flag isn't set, then that signifies termination of the multishot accept.
 
 =head2 bind($sock, $sockaddr, $s_flags, $callback)
 
@@ -197,9 +209,21 @@ Synchronize the given range to disk. C<$flags> must currently be C<0>.
 
 Equivalent to C<pread($fh, $buffer, $offset)>. The buffer must be preallocated to the desired size, the callback received the number of bytes in it that are actually written to. The buffer must be kept alive, typically by enclosing over it in the callback.
 
+=head2 read_multishot($fh, $nbytes, $offset, $buffer_group, $s_flags, $callback)
+
+This reads like C<read> does, but will repeatedly trigger whenever data becomes available. Because of that, this type of request can only be used with a file type that is pollable. It must be used with provided buffers, the appropriate buffer group is passed in C<$buffer_group>. C<nbytes> must currently always be C<0>.
+
+A multishot request will persist as long as no errors are encountered doing handling of the request. For each completion event posted on behalf of this request, the flags argument will have IORING_CQE_F_MORE set if the application should expect more completions from this request. If this flag isn't set, then that signifies termination of the multishot read request.
+
 =head2 recv($sock, $buffer, $flags, $pflags, $s_flags, $callback)
 
 Equivalent to C<recv($fh, $buffer, $flags)>. The buffer must be preallocated to the desired size, the callback received the number of bytes in it that are actually written to. The buffer must be kept alive, typically by enclosing over it in the callback.
+
+=head2 recv_multishot($sock, $flags, $pflags, $s_flags, $callback)
+
+This receives like C<recv> does, but will repeatedly trigger whenever data becomes available. It must be used with provided buffers, the appropriate buffer group is passed in C<$buffer_group>.
+
+A multishot request will persist as long as no errors are encountered doing handling of the request. For each completion event posted on behalf of this request, the flags argument will have IORING_CQE_F_MORE set if the application should expect more completions from this request. If this flag isn't set, then that signifies termination of the multishot recv request.
 
 =head2 rename($old_path, $new_path, $flags, $s_flags, $callback)
 
@@ -240,11 +264,11 @@ Remove a timeout identified by C<$id>. C<$flags> is currently unused and must be
 
 Update the timer identifiers by C<$id>. C<timespec> and C<flags> have the same meaning as in C<timeout>.
 
-=head2 unlink($path, $mode, $s_flags, $callback)
+=head2 unlink($path, $flags, $s_flags, $callback)
 
 Remove a file or directory at C<$path> with flags C<$flags>.
 
-=head2 unlinkat($dirhandle, $path, $mode, $s_flags, $callback)
+=head2 unlinkat($dirhandle, $path, $flags, $s_flags, $callback)
 
 Remove a file or directory at C<$path> under C<$dirhandle> with flags C<$flags>.
 

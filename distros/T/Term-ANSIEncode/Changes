@@ -324,3 +324,19 @@
 1.79    Jan 14, 2026
 
         Minor documentation fixes
+
+1.80    Jan 17, 2026
+
+        Fixed the bright color bug
+
+1.81    Jan 17, 2026
+
+        Color list handles 3,4,8 and 24 bit recognition correctly
+
+1.82    Jan 17, 2026
+
+        Removed the need for Term::ANSIColor in the module.
+
+1.83    Jan 18, 2026
+
+        Removed the need for Term::ANSIScreen.

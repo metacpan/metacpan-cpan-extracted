@@ -40,12 +40,18 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Greple" : "9.22",
+            "App::Greple" : "10.02",
             "App::Greple::L" : "1.01",
-            "App::sdif" : "4.35",
-            "Getopt::EX" : "v2.2.1",
+            "Command::Run" : "0.9902",
+            "Getopt::EX" : "3.03",
             "Getopt::EX::Config" : "0",
+            "Unicode::EastAsianWidth" : "0",
             "perl" : "v5.24.0"
+         },
+         "suggests" : {
+            "App::ansicolumn" : "1.50",
+            "App::ansifold" : "1.34",
+            "App::cat::v" : "1.05"
          }
       },
       "test" : {
@@ -60,7 +66,10 @@
    "provides" : {
       "App::Greple::tee" : {
          "file" : "lib/App/Greple/tee.pm",
-         "version" : "1.03"
+         "version" : "1.04"
+      },
+      "App::Greple::tee::Autoload" : {
+         "file" : "lib/App/Greple/tee/Autoload.pm"
       }
    },
    "release_status" : "stable",
@@ -75,7 +84,7 @@
          "web" : "https://github.com/kaz-utashiro/App-Greple-tee"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

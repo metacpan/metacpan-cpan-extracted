@@ -1,0 +1,49 @@
+---
+abstract: 'Markdown, Easy on the Eyes'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-mdee
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::mdee:
+    file: lib/App/mdee.pm
+    version: '0.03'
+requires:
+  App::Greple: '10.02'
+  App::Greple::tee: '1.04'
+  App::ansicolumn: '1.48'
+  App::ansiecho: '0'
+  App::ansifold: '1.34'
+  App::nup: '0.9906'
+  Getopt::EX::termcolor: '0'
+  Getopt::Long::Bash: v0.7.1
+  Text::ANSI::Fold: '2.32'
+  perl: '5.024'
+resources:
+  bugtracker: https://github.com/tecolicom/App-mdee/issues
+  homepage: https://github.com/tecolicom/App-mdee
+  repository: https://github.com/tecolicom/App-mdee.git
+version: '0.03'
+x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

@@ -278,7 +278,7 @@ sub document_result ($document) {
   );
 }
 
-my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
+our $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
   ->allow_nonref(1)
   ->utf8(0)
   ->allow_bignum(1)
@@ -287,6 +287,14 @@ my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
   ->canonical(1)
   ->pretty(1)
   ->indent_length(2);
+
+our $dumper = JSON::Schema::Modern::_JSON_BACKEND()->new
+  ->allow_nonref(1)
+  ->utf8(0)
+  ->allow_bignum(1)
+  ->allow_blessed(1)
+  ->convert_blessed(1)
+  ->canonical(1);
 
 *UNIVERSAL::TO_JSON = sub ($obj) { $obj.'' };
 *Mojo::Message::Request::TO_JSON = sub ($obj) { $obj->to_string };

@@ -1,0 +1,43 @@
+Revision history for Lugh
+
+0.05    2026-01-18
+        Performance Optimizations
+        - GPU backend activation
+          - Multi-backend support: Metal, BLAS, CUDA, Vulkan, CPU
+        - New backend discovery API:
+          - Lugh::available_backends() - List all available backends
+          - Lugh::backend_count() - Get backend count
+          - Lugh::backend_info($name) - Get backend metadata
+          - Lugh::backend_available($name) - Check availability
+          - Lugh::best_backend() - Get recommended backend
+          - Lugh::has_metal() / Lugh::metal_available() - Metal support
+        - Backend selection parameter for Lugh::Inference->new(backend => $name)
+        - Memory pools for efficient repeated inference:
+          - create_memory_pool() - Create reusable compute resources
+          - forward_with_pool($pool, \@tokens) - Forward pass with pooled resources
+          - Lugh::MemoryPool class with reset() and backend() methods
+        - Batch processing for multiple sequences:
+          - forward_batch(\@sequences) - Process multiple token sequences
+        - New comprehensive performance test file t/09-performance.t
+        - Full documentation for new APIs Lugh/Lugh::Inference
+
+0.04    2026-01-18
+        - Added KV Cache support for efficient incremental decoding - Lugh::KVCache
+        - Lugh::Inference - New create_kvcache() and forward_with_cache() methods
+        - New test file t/08-kvcache.t
+
+0.03    2026-01-18
+        - Added generate() method for multi-token autoregressive generation
+        - Added sample_top_k() method for top-k sampling
+        - Generation supports: greedy, top_p, top_k, temperature, streaming callbacks
+        - Added EOS token stopping and callback-based early stopping
+        - New test suite t/07-generate.t with 22 tests including exact output validation
+
+0.02    2026-01-17
+        - Added Flash Attention support via ggml_flash_attn_ext()
+        - Added support for tied embeddings (output.weight = token_embd.weight)
+        - Bundled TinyStories-656K test model (749KB) for self-contained tests
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

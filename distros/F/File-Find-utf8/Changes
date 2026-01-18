@@ -1,5 +1,9 @@
 Revision history for Perl module File-Find-utf8
 
+0.016     2026-01-18
+  * Skipping tests when installing dependencies in AppVeyor build
+  * Removed travis-ci
+
 0.015     2026-01-16
   * Force use of archive-tar to prevent issues on MacOs
   * Create a temporary directory with File::Temp

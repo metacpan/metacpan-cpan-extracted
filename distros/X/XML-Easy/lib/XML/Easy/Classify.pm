@@ -58,7 +58,7 @@ use Params::Classify 0.000 qw(is_string is_ref is_strictly_blessed);
 use XML::Easy::Syntax 0.000
 	qw($xml10_char_rx $xml10_name_rx $xml10_encname_rx);
 
-our $VERSION = "0.013";
+our $VERSION = "0.014";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(

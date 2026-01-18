@@ -1,0 +1,35 @@
+Revision history for Perl extension App-mdee
+
+0.03 2026-01-18T08:47:55Z
+
+    - Add OSC 8 terminal hyperlinks for links, images, and image links
+    - Fix italic patterns to not match across multiple lines
+    - Restrict comment pattern to line-start only (avoid inline code conflicts)
+    - Fix link patterns to not span multiple lines
+    - Refactor theme: dark theme inherits undefined keys from light theme
+    - Add LIMITATIONS section to documentation
+    - Require Text::ANSI::Fold 2.32 for OSC 8 hyperlink support
+
+0.02 2026-01-18T02:51:12Z
+
+    - Replace --enable/--disable with --show option for field visibility control
+    - Rename underline to italic field, enable by default
+    - Support both *text* and _text_ for italic
+    - Support both **text** and __text__ for bold
+    - Add backslash escape handling for emphasis patterns
+    - Use word boundaries for underscore emphasis (CommonMark compliant)
+    - Add h6 color definition
+    - Add --color=always to greple for consistent output in non-terminal environments
+    - Require App::Greple::tee 1.04
+    - Add tee module execution tests
+
+0.01 2026-01-17T16:39:57Z
+
+    - Initial release
+    - Multi-column Markdown viewer with syntax highlighting
+    - Support for headers, bold, strikethrough, inline code, code blocks,
+      HTML comments, tables, and list items
+    - Light/dark theme with automatic terminal detection
+    - Filter mode (-f) for highlight-only output
+    - --enable/--disable options for field control
+    - CommonMark-compliant code block detection (``` and ~~~)

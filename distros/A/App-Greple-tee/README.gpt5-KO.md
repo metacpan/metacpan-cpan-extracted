@@ -8,7 +8,7 @@ App::Greple::tee - 외부 명령 결과로 일치한 텍스트를 대체하는 �
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # DESCRIPTION
 
@@ -73,6 +73,40 @@ Greple의 **-Mtee** 모듈은 일치한 텍스트 부분을 지정한 필터 명
 셸 별칭이나 모듈 파일과 함께 사용하면 유용합니다.
 
 사용 가능한 매개변수: **discrete**, **bulkmode**, **crmode**, **fillup**, **squeeze**, **blocks**.
+
+# FUNCTION CALL
+
+외부 명령 대신, 명령 이름 앞에 `&`를 붙여 Perl 함수를 호출할 수 있습니다.
+
+    greple -Mtee '&App::ansifold::ansifold' -w40 -- ...
+
+함수는 fork된 자식 프로세스에서 실행되므로 다음 요구 사항을 따라야 합니다:
+
+- 일치한 텍스트를 **STDIN**에서 읽습니다
+- 변환된 결과를 **STDOUT**에 출력합니다
+- 인수는 `@ARGV`와 `@_`를 통해 모두 전달됩니다
+
+완전히 한정된 함수 이름이라면 어떤 것이든 사용할 수 있습니다:
+
+    greple -Mtee '&Your::Module::function' -- ...
+
+모듈이 아직 로드되지 않았다면 자동으로 로드됩니다.
+
+편의를 위해 다음의 짧은 별칭을 사용할 수 있습니다:
+
+- **&ansicolumn**
+
+    `App::ansicolumn::ansicolumn`를 호출합니다.
+
+- **&ansifold**
+
+    `App::ansifold::ansifold`를 호출합니다.
+
+- **&cat-v**
+
+    `App::cat::v->new->run(@_)`를 호출합니다.
+
+함수 호출을 사용하면 각 호출마다 외부 프로세스를 fork하는 오버헤드를 피할 수 있으므로, **--discrete** 옵션과 함께 사용할 때 성능을 크게 향상시킬 수 있습니다.
 
 # LEGACIES
 

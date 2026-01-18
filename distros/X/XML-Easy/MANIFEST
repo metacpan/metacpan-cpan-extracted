@@ -1,6 +1,6 @@
 Changes
+Easy.xs
 lib/XML/Easy.pm
-lib/XML/Easy.xs
 lib/XML/Easy/Classify.pm
 lib/XML/Easy/Content.pm
 lib/XML/Easy/Element.pm

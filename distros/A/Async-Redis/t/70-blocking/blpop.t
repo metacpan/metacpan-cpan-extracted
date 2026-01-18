@@ -5,6 +5,7 @@ use Test::Lib;
 use Test::Async::Redis ':redis';
 use Test2::V0;
 use Async::Redis;
+use Future::AsyncAwait;
 use Time::HiRes qw(time);
 
 SKIP: {
@@ -41,8 +42,8 @@ SKIP: {
         my $pusher = Async::Redis->new(host => $ENV{REDIS_HOST} // 'localhost');
         run { $pusher->connect };
 
-        my $push_f = get_loop()->delay_future(after => 0.3)->then(sub {
-            $pusher->rpush('blpop:queue', 'delayed_item');
+        my $push_f = get_loop()->delay_future(after => 0.3)->then(async sub {
+            await $pusher->rpush('blpop:queue', 'delayed_item');
         });
 
         my $start = time();
@@ -51,6 +52,9 @@ SKIP: {
 
         is($result, ['blpop:queue', 'delayed_item'], 'got delayed item');
         ok($elapsed >= 0.2 && $elapsed < 1.0, "waited for item (${elapsed}s)");
+
+        # Ensure push completed
+        run { $push_f };
 
         # Cleanup
         run { $redis->del('blpop:queue') };

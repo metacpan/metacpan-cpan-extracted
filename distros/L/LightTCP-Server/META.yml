@@ -1,0 +1,31 @@
+---
+abstract: 'A configurable TCP server with HTTP, CGI, and threading support (Pure Perl OOP)'
+author:
+  - 'Hans Harder <hans@atbas.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LightTCP-Server
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Temp: '0'
+  IO::Socket::INET: '0'
+  IPC::Open3: '0'
+  perl: '5.008'
+  threads: '0'
+  threads::shared: '0'
+resources:
+  bugtracker: https://github.com/HansH111/LightTCP-Server.pm/issues
+  repository: https://github.com/HansH111/LightTCP-Server.pm.git
+version: '2.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

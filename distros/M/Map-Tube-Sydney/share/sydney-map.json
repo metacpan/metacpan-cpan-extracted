@@ -14,12 +14,7 @@
       { "id": "L1", "name": "L1", "color": "#be1622" },
       { "id": "L2", "name": "L2", "color": "#dd1e25" },
       { "id": "L3", "name": "L3", "color": "#781140" },
-      { "id": "L4", "name": "L4", "color": "#e4022d" },
-      { "id": "Walk1", "name": "Walk1", "color": "#000000" },
-      { "id": "Walk2", "name": "Walk2", "color": "#000000" },
-      { "id": "Walk3", "name": "Walk3", "color": "#000000" },
-      { "id": "Walk4", "name": "Walk4", "color": "#000000" },
-      { "id": "Walk5", "name": "Walk5", "color": "#000000" }
+      { "id": "L4", "name": "L4", "color": "#e4022d" }
     ]
   },
   "name": "Sydney Rail Network",
@@ -28,14 +23,16 @@
       {
         "id": "L101",
         "name": "Central Grand Concourse",
-        "line": "L1,Walk1",
-        "link": "L102,T124"
+        "line": "L1",
+        "link": "L102",
+        "other_link": "Walk1:T124"
       },
       {
         "id": "L102",
         "name": "Capitol Square",
-        "line": "L1,Walk2",
-        "link": "L101,L103,L203"
+        "line": "L1",
+        "link": "L101,L103",
+        "other_link": "Walk2:L203"
       },
       {
         "id": "L103",
@@ -70,7 +67,7 @@
       },
       {
         "id": "L109",
-        "name": "Fish Market",
+        "name": "Bank Street",
         "line": "L1",
         "link": "L108,L110"
       },
@@ -111,8 +108,9 @@
       {
         "id": "L119",
         "name": "Lewisham West",
-        "line": "L1,Walk3",
-        "link": "L118,L120,T208"
+        "line": "L1",
+        "link": "L118,L120",
+        "other_link": "Walk3:T208"
       },
       {
         "id": "L120",
@@ -137,8 +135,9 @@
       {
         "id": "L203",
         "name": "Chinatown",
-        "line": "L2,L3,Walk2",
-        "link": "T123,L204,L102"
+        "line": "L2,L3",
+        "link": "T123,L204",
+        "other_link": "Walk2:L102"
       },
       {
         "id": "L204",
@@ -149,8 +148,9 @@
       {
         "id": "L205",
         "name": "Central Chalmers Street",
-        "line": "L2,L3,Walk4",
-        "link": "L204,L206,T124"
+        "line": "L2,L3",
+        "link": "L204,L206",
+        "other_link": "Walk4:T124"
       },
       {
         "id": "L206",
@@ -238,8 +238,9 @@
       {
         "id": "L408",
         "name": "Parramatta Square",
-        "line": "L4,Walk5",
-        "link": "L407,L409,T128"
+        "line": "L4",
+        "link": "L407,L409",
+        "other_link": "Walk5:T128"
       },
       {
         "id": "L409",
@@ -411,8 +412,9 @@
       {
         "id": "T124",
         "name": "Central",
-        "line": "T1,T2,T3,T4,T8,T9,M1,Walk1,Walk4",
-        "link": "T123,T125,T201,T803,M115,M116,L101,L205"
+        "line": "T1,T2,T3,T4,T8,T9,M1",
+        "link": "T123,T125,T201,T803,M115,M116",
+        "other_link": "Walk1:L101,Walk4:L205"
       },
       {
         "id": "T125",
@@ -435,8 +437,9 @@
       {
         "id": "T128",
         "name": "Parramatta",
-        "line": "T1,T2,T5,Walk5",
-        "link": "T218,T129,L408"
+        "line": "T1,T2,T5",
+        "link": "T218,T129",
+        "other_link": "Walk5:L408"
       },
       {
         "id": "T129",
@@ -577,8 +580,9 @@
       {
         "id": "T208",
         "name": "Lewisham",
-        "line": "T2,T3,Walk3",
-        "link": "T207,T209,L119"
+        "line": "T2,T3",
+        "link": "T207,T209",
+        "other_link": "Walk3:L119"
       },
       {
         "id": "T209",

@@ -14,3 +14,5 @@
     - Adding missing converter role to manifest.
 0.8 Sat Jan  3 03:52:31 AM CET 2026
     - Fixes in Converter docs in style and allowing undef in the DateTime example converter.
+0.9 Sat Jan 17 07:54:03 PM CET 2026
+    - Allowing to send SQL::Abstract::More bind_params compatible arrayrefs as params.

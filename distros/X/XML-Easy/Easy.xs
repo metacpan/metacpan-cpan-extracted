@@ -3,6 +3,18 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef PERL_VERSION_DECIMAL
+#  define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
+#endif
+#ifndef PERL_DECIMAL_VERSION
+#  define PERL_DECIMAL_VERSION \
+        PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
+#endif
+#ifndef PERL_VERSION_GE
+#  define PERL_VERSION_GE(r,v,s) \
+        (PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+#endif
+
 #if PERL_VERSION_GE(5,19,4)
 typedef SSize_t array_ix_t;
 #else /* <5.19.4 */
@@ -43,6 +55,10 @@ static SV *empty_contentobject;
 #define sv_is_string(sv) \
 	(!sv_is_glob(sv) && !sv_is_regexp(sv) && \
 	 (SvFLAGS(sv) & (SVf_IOK|SVf_NOK|SVf_POK|SVp_IOK|SVp_NOK|SVp_POK)))
+
+#ifndef uvchr_to_utf8_flags
+#define uvchr_to_utf8_flags(d, uv, flags) uvuni_to_utf8_flags(d, uv, flags);
+#endif
 
 /* exceptions */
 
@@ -1145,7 +1161,7 @@ static U8 *THX_parse_chars(pTHX_ U8 *p, SV *value, U8 endc, U32 flags)
 				vlen = SvCUR(value);
 				vstart = (U8*)SvGROW(value, vlen+4+1);
 				voldend = vstart + vlen;
-				vnewend = uvuni_to_utf8_flags(voldend, val,
+				vnewend = uvchr_to_utf8_flags(voldend, val,
 						UNICODE_ALLOW_ANY);
 				*vnewend = 0;
 				SvCUR_set(value, vnewend - vstart);

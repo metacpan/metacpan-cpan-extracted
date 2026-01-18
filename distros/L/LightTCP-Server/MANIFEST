@@ -1,0 +1,14 @@
+AGENTS.md
+CHANGES
+examples/demo.pl
+lib/LightTCP/Server.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+t/00_config_validation.t
+t/01_path_traversal.t
+t/02_oo_validation.t
+t/03_upload.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

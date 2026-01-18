@@ -3,18 +3,6 @@ Upstream-Name: Marlin-Antlers
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Marlin-Antlers
 
-Files: Changes
- META.json
- META.yml
- dist.ini
- doap.ttl
- t/integration/exception/import-into-existing.t
- t/integration/feature/plugins.t
- t/integration/synopsis/Marlin-Antlers.t
- t/integration/synopsis/Marlin-Role-Antlers.t
-Copyright: Copyright 2026 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: INSTALL
  LICENSE
  examples/Basics/BankAccount_MethodModifiersAndSubclassing.pl
@@ -26,6 +14,18 @@ Files: INSTALL
  examples/Basics/Point_AttributesAndSubclassing.pl
 Copyright: Unknown
 License: Unknown
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ t/integration/exception/import-into-existing.t
+ t/integration/feature/plugins.t
+ t/integration/synopsis/Marlin-Antlers.t
+ t/integration/synopsis/Marlin-Role-Antlers.t
+Copyright: Copyright 2026 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: README
  lib/Marlin/Antlers.pm

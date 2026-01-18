@@ -39,23 +39,30 @@ my $async_db = DBIx::Class::Async->new(
     workers => 2,
 );
 
-# Test search_with_prefetch - currently has issues with relationship serialisation
-# Skip for now as core functionality is working
-SKIP: {
-    skip "search_with_prefetch needs debugging", 1;
+my $users_with_orders = $async_db->search_with_prefetch(
+    'User',
+    { 'me.id' => 1 },
+    'orders',
+)->get;
 
-    my $users_with_orders = $async_db->search_with_prefetch(
-        'User',
-        { id => 1 },
-        'orders',
-    )->get;
-
-    is(scalar @$users_with_orders, 1, 'prefetch returns results');
-}
+is(scalar @$users_with_orders, 1, 'prefetch returns results');
 
 # Test that basic search still works
 my $users = $async_db->search('User', { id => 1 })->get;
 is(scalar @$users, 1, 'basic search works');
+
+subtest 'result_class HashRefInflator works' => sub {
+    my $results = $async_db->search_with_prefetch(
+        'User',
+        { 'me.id' => 1 },
+        'orders',
+        { result_class => 'DBIx::Class::ResultClass::HashRefInflator' }
+    )->get;
+
+    ok(ref $results eq 'ARRAY', 'Got array of results');
+    ok(ref $results->[0] eq 'HASH', 'Result is a plain hash');
+    ok(exists $results->[0]{orders}, 'Prefetched data is included in hash');
+};
 
 $async_db->disconnect;
 

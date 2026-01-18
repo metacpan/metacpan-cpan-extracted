@@ -1,5 +1,13 @@
 Revision history for Perl module Dist-Zilla-PluginBundle-Author-HAYOBAAN
 
+0.016     2026-01-18
+  * Skipping tests when installing dependencies in AppVeyor build
+
+0.015     2026-01-17
+  * Adapted command-line option processing to newer Dist::Zilla
+  * Removed travis-ci
+  * Force use of archive-tar to prevent issues on MacOs
+
 0.014     2019-09-02
   * Updated Travis' perl versions
   * No longer using Dist::Zilla::Plugin::SchwartzRatio since it requires a

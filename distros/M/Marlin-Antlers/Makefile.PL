@@ -43,8 +43,8 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "Marlin::Antlers"       => { file => "lib/Marlin/Antlers.pm", version => "0.002000" },
-                          "Marlin::Role::Antlers" => { file => "lib/Marlin/Role/Antlers.pm", version => "0.002000" },
+                          "Marlin::Antlers"       => { file => "lib/Marlin/Antlers.pm", version => 0.002001 },
+                          "Marlin::Role::Antlers" => { file => "lib/Marlin/Role/Antlers.pm", version => 0.002001 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -58,7 +58,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Marlin-Antlers/project",
                         },
-  "version"          => "0.002000",
+  "version"          => 0.002001,
   "x_static_install" => 1,
 };
 

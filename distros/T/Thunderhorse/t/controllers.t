@@ -14,6 +14,13 @@ package ControllersApp {
 
 	sub build ($self)
 	{
+		$self->router->add(
+			'' => {
+				name => 'global_bridge',
+				to => 'test_bridge',
+			}
+		);
+
 		$self->load_controller('Test')
 			->load_controller('^TestC2');
 
@@ -22,6 +29,12 @@ package ControllersApp {
 				to => 'test',
 			}
 		);
+	}
+
+	sub test_bridge ($self, $ctx)
+	{
+		$ctx->stash->{global_bridge} = true;
+		return undef;
 	}
 
 	sub test ($self, $ctx)
@@ -39,20 +52,22 @@ package ControllersApp::Controller::Test {
 	sub build ($self)
 	{
 		$self->router->add(
-			'/internal' => {
-				to => 'test',
+			'/handles' => {
+				to => 'test_handles',
+				order => -1,    # order makes sure it is run before bridge
 			}
 		);
 
-		$self->router->add(
-			'/handles' => {
-				to => 'test_handles',
+		$self->router->find('global_bridge')->add(
+			'/internal' => {
+				to => 'test',
 			}
 		);
 	}
 
 	sub test ($self, $ctx)
 	{
+		die 'no bridge?' unless $ctx->stash->{global_bridge};
 		return 'internal: ' . ref $self;
 	}
 
@@ -62,6 +77,8 @@ package ControllersApp::Controller::Test {
 		# will crash the program if not
 		$self->loop;
 		$self->config;
+
+		die 'bridge?' if $ctx->stash->{global_bridge};
 
 		return 'ok';
 	}

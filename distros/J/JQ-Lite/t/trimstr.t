@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use JSON::PP;
 use JQ::Lite;
 
 my $json = q({
@@ -8,7 +9,9 @@ my $json = q({
   "short": "bar",
   "exact": "foo",
   "blank": "",
-  "array": ["foobar", "barfoo", null, ["foo", "foobar"]],
+  "number": 123,
+  "boolean": true,
+  "array": ["foobar", "barfoo", null, ["foo", "foobar"], 123, true],
   "object": {"keep": "foobar"}
 });
 
@@ -47,18 +50,30 @@ is($blank_left[0], '', 'ltrimstr leaves empty strings untouched');
 my @blank_right = $jq->run_query($json, '.blank | rtrimstr("foo")');
 is($blank_right[0], '', 'rtrimstr leaves empty strings untouched');
 
+my @number_left = $jq->run_query($json, '.number | ltrimstr("1")');
+is($number_left[0], 123, 'ltrimstr leaves numeric scalars untouched');
+
+my @number_right = $jq->run_query($json, '.number | rtrimstr("3")');
+is($number_right[0], 123, 'rtrimstr leaves numeric scalars untouched');
+
+my @bool_left = $jq->run_query($json, '.boolean | ltrimstr("t")');
+is_deeply($bool_left[0], JSON::PP::true, 'ltrimstr leaves booleans untouched');
+
+my @bool_right = $jq->run_query($json, '.boolean | rtrimstr("e")');
+is_deeply($bool_right[0], JSON::PP::true, 'rtrimstr leaves booleans untouched');
+
 my @array_left = $jq->run_query($json, '.array | ltrimstr("foo")');
 is_deeply(
     $array_left[0],
-    ['bar', 'barfoo', undef, ['', 'bar']],
-    'ltrimstr recurses into arrays and nested arrays'
+    ['bar', 'barfoo', undef, ['', 'bar'], 123, JSON::PP::true],
+    'ltrimstr recurses into arrays and nested arrays while keeping non-strings intact'
 );
 
 my @array_right = $jq->run_query($json, '.array | rtrimstr("bar")');
 is_deeply(
     $array_right[0],
-    ['foo', 'barfoo', undef, ['foo', 'foo']],
-    'rtrimstr recurses into arrays and nested arrays'
+    ['foo', 'barfoo', undef, ['foo', 'foo'], 123, JSON::PP::true],
+    'rtrimstr recurses into arrays and nested arrays while keeping non-strings intact'
 );
 
 my @object = $jq->run_query($json, '.object | ltrimstr("foo")');

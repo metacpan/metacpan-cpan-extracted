@@ -7,7 +7,7 @@ use warnings;
 package Marlin::Role::Antlers;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002000';
+our $VERSION   = '0.002001';
 
 use Exporter::Tiny ();
 use Marlin::Antlers ();

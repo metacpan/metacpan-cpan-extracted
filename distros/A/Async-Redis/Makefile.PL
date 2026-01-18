@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::Lib" => 0
   },
-  "VERSION" => "0.001001",
+  "VERSION" => "0.001002",
   "test" => {
     "TESTS" => "t/*.t t/01-unit/*.t t/10-connection/*.t t/20-commands/*.t t/30-pipeline/*.t t/40-transactions/*.t t/50-pubsub/*.t t/60-scripting/*.t t/70-blocking/*.t t/80-scan/*.t t/90-pool/*.t t/91-reliability/*.t t/92-concurrency/*.t t/93-binary/*.t t/94-observability/*.t t/99-integration/*.t"
   }

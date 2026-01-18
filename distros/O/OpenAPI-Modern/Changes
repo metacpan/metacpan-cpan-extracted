@@ -1,5 +1,10 @@
 Revision history for OpenAPI-Modern
 
+0.121     2026-01-18 01:00:15Z
+          - type coercion for parameter data is now more
+            specification-compliant, using the schema to infer the intended
+            type for base types, object properties and array items
+
 0.120     2026-01-06 20:00:01Z
           - now checking for references that target an unknown or incorrect
             location when OpenAPI documents are parsed

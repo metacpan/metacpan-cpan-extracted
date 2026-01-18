@@ -74,7 +74,7 @@ BUGS
     <http://rt.cpan.org/Dist/Display.html?Queue=MooX-XSConstructor>.
 
 SEE ALSO
-    Moo, Class::XSConstructor.
+    Moo, Class::XSConstructor, MooseX::XSConstructor, Marlin.
 
     You may also be interested in Class::XSAccessor. Moo already includes all
     the glue to interface with that, so a MooX module like this one isn't

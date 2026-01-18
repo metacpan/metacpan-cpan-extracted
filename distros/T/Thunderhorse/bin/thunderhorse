@@ -196,3 +196,5 @@ The meaning of C<TARGET> depends on the used flags. When generating a new
 application, it is a Perl namespace of the application class. When inspecting a
 Thunderhorse application, it is the path to the PAGI starter script.
 
+See L<Thunderhorse> for a guide on using the framework.
+

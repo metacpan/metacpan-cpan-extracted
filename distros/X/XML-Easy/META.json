@@ -63,6 +63,6 @@
          "web" : "https://github.com/jkeenan/p5-XML-Easy"
       }
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

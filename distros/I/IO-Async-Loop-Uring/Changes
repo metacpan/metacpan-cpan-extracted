@@ -1,5 +1,11 @@
 Revision history for IO-Async-Loop-Uring
 
+0.004     2026-01-17 21:23:12+01:00 Europe/Brussels
+          - Remove superfluous poll masks
+          - Make tests work on perl < 5.14
+          - Return 0 on run_once timeout
+          - Add ring parameter to loop constructor
+
 0.003     2026-01-09 13:35:49+01:00 Europe/Brussels
           - Fix copy-paste error in tests
 

@@ -37,6 +37,8 @@ lib/Thunderhorse/Config.pm
 lib/Thunderhorse/Context.pm
 lib/Thunderhorse/Context/Facade.pm
 lib/Thunderhorse/Controller.pm
+lib/Thunderhorse/Cookbook.pod
+lib/Thunderhorse/Manual.pod
 lib/Thunderhorse/Message.pm
 lib/Thunderhorse/Module.pm
 lib/Thunderhorse/Module/Logger.pm

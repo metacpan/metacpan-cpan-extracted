@@ -98,6 +98,7 @@ t/90-pool/with-pattern.t
 t/91-reliability/queue-overflow.t
 t/91-reliability/retry.t
 t/92-concurrency/parallel-commands.t
+t/92-concurrency/response-ordering.t
 t/93-binary/binary-values.t
 t/93-binary/utf8.t
 t/94-observability/debug.t

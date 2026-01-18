@@ -46,7 +46,7 @@ use Data::Dumper;
 
 #  Version information
 #
-$VERSION='2.070';
+$VERSION='2.071';
 
 
 #  Debug load
@@ -80,10 +80,6 @@ debug("Loading %s version $VERSION", __PACKAGE__);
         reset
         defaults
         image_button
-        start_form
-        end_form
-        start_multipart_form
-        end_multipart_form
         isindex
         dump
         include
@@ -120,6 +116,10 @@ map {$CGI_TAG_SPECIAL{$_}++} qw(
     style
     start_html
     end_html
+    start_form
+    end_form
+    start_multipart_form
+    end_multipart_form
     include
     div
     api
@@ -431,14 +431,12 @@ sub tag_parse {
         #  Yes, is WebDyne tag
         #
         debug("webdyne tag start|end ($tag) dispatch, method $method");
-        if ($modifier=~/end_/) {
-            debug('end tag so changing method to SUPER::end');
-            $method='SUPER::end'
-        }
+        #if ($modifier=~/end_/) {
+        #    debug('end tag so changing method to SUPER::end');
+        #    $method='SUPER::end'
+        #}
 
-        #if (UNIVERSAL::can('WebDyne::HTML::Tiny', $tag) {
         $html_or=$self->tag_parse($method, $tag_actual, $attr_hr);
-
 
     }
 
@@ -1125,6 +1123,9 @@ sub comment {
 
 sub start_html {
 
+
+    #  Handle this specially, inject into parser after rendering
+    #
     my ($self, $method, $tag, $attr_hr)=@_;
     debug("self: $self, method: $method, tag: $tag, attr_hr: %s", Dumper($attr_hr));
     push @{$self->{'_html_wedge_ar'}}, (my $html=$self->{'_html_tiny_or'}->$tag($attr_hr));
@@ -1134,6 +1135,26 @@ sub start_html {
 
 
 sub end_html {
+    &start_html(@_);
+}
+
+
+sub start_form {
+    &start_html(@_);
+}
+
+
+sub end_form {
+    &start_html(@_);
+}
+
+
+sub start_multipart_form {
+    &start_html(@_);
+}
+
+
+sub end_multipart_form {
     &start_html(@_);
 }
 

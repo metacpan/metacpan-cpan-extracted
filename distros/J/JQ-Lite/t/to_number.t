@@ -8,6 +8,7 @@ my $json = q({
   "raw": "n/a",
   "flag": true,
   "nested": [["10", "oops"], [false, "0"]],
+  "profile": { "count": "7", "name": "Ada", "active": false },
   "maybe": null
 });
 
@@ -28,6 +29,23 @@ is_deeply(
     $array[0],
     [[10, 'oops'], [0, 0]],
     'to_number recurses through arrays preserving non-numeric entries'
+);
+
+my @object = $jq->run_query($json, '.profile | to_number');
+is_deeply(
+    $object[0],
+    { count => '7', name => 'Ada', active => JSON::PP::false },
+    'to_number leaves objects untouched and preserves boolean values'
+);
+
+my @nested_object = $jq->run_query(
+    $json,
+    '[.nested[0] | .[0], .nested[0] | .[1], .profile] | to_number'
+);
+is_deeply(
+    $nested_object[0],
+    [10, 'oops', { count => '7', name => 'Ada', active => JSON::PP::false }],
+    'to_number only recurses through arrays and leaves embedded objects unchanged'
 );
 
 my @maybe = $jq->run_query($json, '.maybe | to_number');

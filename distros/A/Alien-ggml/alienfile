@@ -1,0 +1,175 @@
+use alienfile;
+
+# ggml version - using a known stable commit
+my $ggml_version = 'b4658';  # Short commit hash for reproducibility
+my $ggml_url = 'https://github.com/ggerganov/ggml/archive/refs/heads/master.zip';
+
+# Probe for system-installed ggml
+plugin 'Probe::CommandLine' => (
+    command   => 'pkg-config',
+    args      => ['--exists', 'ggml'],
+    match     => qr//,
+    secondary => 1,
+);
+
+probe sub {
+    my ($build) = @_;
+    
+    # Check environment variable to force share install
+    return 'share' if $ENV{ALIEN_GGML_SHARE};
+    
+    # Common library paths to check
+    my @lib_paths = (
+        '/usr/local/lib',
+        '/usr/lib',
+        '/opt/homebrew/lib',           # macOS ARM Homebrew
+        '/opt/local/lib',              # MacPorts
+        '/usr/lib/x86_64-linux-gnu',   # Debian/Ubuntu x86_64
+        '/usr/lib/aarch64-linux-gnu',  # Debian/Ubuntu ARM64
+    );
+    
+    # Also check LD_LIBRARY_PATH and DYLD_LIBRARY_PATH
+    if ($ENV{LD_LIBRARY_PATH}) {
+        unshift @lib_paths, split /:/, $ENV{LD_LIBRARY_PATH};
+    }
+    if ($ENV{DYLD_LIBRARY_PATH}) {
+        unshift @lib_paths, split /:/, $ENV{DYLD_LIBRARY_PATH};
+    }
+    
+    for my $lib_path (@lib_paths) {
+        next unless -d $lib_path;
+        
+        my $has_lib = (
+            -f "$lib_path/libggml.dylib" ||
+            -f "$lib_path/libggml.so" ||
+            -f "$lib_path/libggml.a"
+        );
+        
+        if ($has_lib) {
+            # Derive include path
+            my $inc_path = $lib_path;
+            $inc_path =~ s{/lib(?:/|$)}{/include};
+            
+            # Verify header exists
+            if (-f "$inc_path/ggml.h") {
+                $build->hook_prop->{sys_lib_path} = $lib_path;
+                $build->hook_prop->{sys_inc_path} = $inc_path;
+                $build->log("Found system ggml: lib=$lib_path inc=$inc_path");
+                return 'system';
+            }
+        }
+    }
+    
+    $build->log("No system ggml found, will build from source");
+    return 'share';
+};
+
+sys {
+    gather sub {
+        my ($build) = @_;
+        
+        my $lib_path = $build->hook_prop->{sys_lib_path} || '/usr/local/lib';
+        my $inc_path = $build->hook_prop->{sys_inc_path} || '/usr/local/include';
+        
+        # Determine which libraries are available
+        my @libs = ('-lggml');
+        push @libs, '-lggml-base' if -f "$lib_path/libggml-base.dylib" || -f "$lib_path/libggml-base.so";
+        push @libs, '-lggml-cpu'  if -f "$lib_path/libggml-cpu.dylib"  || -f "$lib_path/libggml-cpu.so";
+        
+        $build->runtime_prop->{cflags}        = "-I$inc_path";
+        $build->runtime_prop->{cflags_static} = "-I$inc_path";
+        $build->runtime_prop->{libs}          = "-L$lib_path " . join(' ', @libs);
+        $build->runtime_prop->{libs_static}   = "-L$lib_path " . join(' ', @libs);
+    };
+};
+
+share {
+    # Download ggml source
+    start_url $ggml_url;
+    
+    plugin 'Download';
+    plugin 'Extract' => 'zip';
+
+    # Determine platform-specific build options
+    my @cmake_args = (
+        '-DBUILD_SHARED_LIBS=ON',
+        '-DGGML_BUILD_EXAMPLES=OFF',
+        '-DGGML_BUILD_TESTS=OFF',
+    );
+
+    # Platform-specific optimizations
+    if ($^O eq 'darwin') {
+        push @cmake_args, (
+            '-DGGML_METAL=ON',
+            '-DGGML_ACCELERATE=ON',
+            '-DGGML_BLAS=ON',
+            '-DGGML_BLAS_VENDOR=Apple',
+            # Fix install names for macOS dylibs
+            '-DCMAKE_INSTALL_NAME_DIR=@rpath',
+            '-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON',
+            '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON',
+        );
+    } elsif ($^O eq 'linux') {
+        # Try to detect OpenBLAS
+        my $has_openblas = (
+            -f '/usr/lib/x86_64-linux-gnu/libopenblas.so' ||
+            -f '/usr/lib/aarch64-linux-gnu/libopenblas.so' ||
+            -f '/usr/local/lib/libopenblas.so' ||
+            -f '/usr/lib/libopenblas.so'
+        );
+
+        if ($has_openblas) {
+            push @cmake_args, (
+                '-DGGML_BLAS=ON',
+                '-DGGML_BLAS_VENDOR=OpenBLAS',
+            );
+        }
+    }
+
+    # Use system cmake directly instead of plugin
+    build [
+        sub {
+            my ($build) = @_;
+            my $prefix = $build->install_prop->{prefix};
+
+            # On macOS, set absolute install name instead of @rpath
+            my @extra_args;
+            if ($^O eq 'darwin') {
+                push @extra_args, "-DCMAKE_INSTALL_NAME_DIR=$prefix/lib";
+            }
+
+            $build->system('cmake', @cmake_args, @extra_args,
+                "-DCMAKE_INSTALL_PREFIX=$prefix",
+                '-S', '.', '-B', 'build');
+        },
+        # Build (use all CPU cores)
+        ['cmake', '--build', 'build', '--parallel'],
+        # Install
+        ['cmake', '--install', 'build'],
+    ];
+
+    gather sub {
+        my ($build) = @_;
+        my $prefix = $build->runtime_prop->{prefix};
+
+        # Use File::Find to locate libraries in lib or lib64
+        require File::Find;
+        my @lib_dirs;
+        File::Find::find(
+            sub {
+                return unless -f && /^libggml\.(so|dylib|a)$/;
+                my $dir = $File::Find::dir;
+                push @lib_dirs, $dir unless grep { $_ eq $dir } @lib_dirs;
+            },
+            $prefix
+        );
+
+        my $lib_dir = @lib_dirs ? $lib_dirs[0] : "$prefix/lib";
+        $lib_dir =~ s/^\Q$prefix\E\/?//;  # Make relative to prefix
+
+        $build->runtime_prop->{cflags}        = "-I$prefix/include";
+        $build->runtime_prop->{cflags_static} = "-I$prefix/include";
+        $build->runtime_prop->{libs}          = "-L$prefix/$lib_dir -lggml -lggml-base -lggml-cpu";
+        $build->runtime_prop->{libs_static}   = "-L$prefix/$lib_dir -lggml -lggml-base -lggml-cpu";
+    };
+};

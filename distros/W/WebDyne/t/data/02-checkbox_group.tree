@@ -12,5 +12,4 @@
     <p> @0.1.4
       "Checkbox Group 5:"
     <p> @0.1.5
-    <p> @0.1.6
-      <dump force="+{submit}"> @0.1.6.0
+      <dump force="+{submit}"> @0.1.5.0

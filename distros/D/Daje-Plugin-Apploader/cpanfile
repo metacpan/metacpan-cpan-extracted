@@ -1,6 +1,6 @@
 requires 'perl', '5.042000';
 requires 'Mojo::Loader', '0';
-requires 'Daje::Database::Migrator', '0.01';
+requires 'Daje::Database::Migrator', '1.00';
 requires 'List::Util', '0';
 requires 'CPAN', '0';
 

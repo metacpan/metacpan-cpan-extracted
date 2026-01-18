@@ -16,7 +16,7 @@ my %FIXED;
 my %PRIMARY_KEYS;
 my %CONVERTERS;
 
-our $VERSION = "0.8";
+our $VERSION = "0.9";
 
 sub import {
     my $caller          = caller;
@@ -125,7 +125,9 @@ sub _insert {
         -into   => $TABLES{$caller},
         -values => _filter_undef( _values_from_instance( $caller, $instance ) ),
     );
-    return $dbh->do( $sql, undef, @bind );
+    my $sth = $dbh->prepare($sql);
+    $sqla->bind_params($sth, @bind);
+    return $sth->execute;
 }
 
 sub _filter_undef {
@@ -155,7 +157,9 @@ sub _update {
             $pk_col => $instance->can($pk_field)->($instance),
         }
     );
-    return $dbh->do( $sql, undef, @bind );
+    my $sth = $dbh->prepare($sql);
+    $sqla->bind_params($sth, @bind);
+    return $sth->execute;
 }
 
 sub _filter_values {

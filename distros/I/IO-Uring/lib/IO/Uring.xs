@@ -5,6 +5,7 @@
 
 #include <liburing.h>
 #include <linux/wait.h>
+#include <sys/mman.h>
 
 
 typedef struct ring {
@@ -124,6 +125,35 @@ static void* S_set_callback(pTHX_ struct io_uring_sqe* sqe, SV* callback) {
 }
 #define set_callback(sqe, callback) S_set_callback(aTHX_ sqe, callback)
 
+typedef struct io_uring_buffergroup {
+	struct ring* ring;
+	struct io_uring_buf_ring* buf_ring;
+	char *buffer_base;
+	unsigned buffer_count;
+	size_t buffer_size;
+	size_t buf_ring_size;
+	int id;
+} *IO__Uring__BufferGroup;
+
+static int buffergroup_free(pTHX_ SV* sv, MAGIC* magic) {
+	struct io_uring_buffergroup* self = (struct io_uring_buffergroup*)magic->mg_ptr;
+	int ret = io_uring_free_buf_ring(&self->ring->uring, self->buf_ring, self->buffer_count, self->id);
+	if (ret < 0)
+		warn("Could not remove buffer group %d", self->id);
+
+	if (munmap(self->buf_ring, self->buf_ring_size) < 0)
+		warn("Could not unmap buffer group");
+	safefree(self);
+
+	return 0;
+}
+
+static const MGVTBL IO__Uring__BufferGroup_magic = {
+	.svt_free = buffergroup_free,
+};
+
+#define CLONE_SKIP(sv) 1
+
 #undef SvPV
 #define SvPV(sv, len) SvPVbyte(sv, len)
 #undef SvPV_nolen
@@ -141,6 +171,7 @@ PROTOTYPES: DISABLE
 
 TYPEMAP: <<END
 	IO::Uring	T_MAGICEXT
+	IO::Uring::BufferGroup	T_MAGICEXT
 	Signal::Info	T_OPAQUEOBJ
 	Time::Spec	T_OPAQUEOBJ
 	FileDescriptor	T_FILE_DESCRIPTOR
@@ -226,15 +257,23 @@ CODE:
 		} else
 			warn("Unknown named argument '%s'", key);
 	}
-	io_uring_queue_init_params(entries, &RETVAL->uring, &params);
+	int ret = io_uring_queue_init_params(entries, &RETVAL->uring, &params);
+
+	if (ret) {
+		safefree(RETVAL);
+		Perl_croak(aTHX_ "Could not create ring: %s", strerror(-ret));
+	}
 OUTPUT:
 	RETVAL
 
 
-void run_once(IO::Uring self, unsigned min_events = 1, Time::Spec timeout = NULL)
+IV CLONE_SKIP(sv)
+
+
+void run_once(IO::Uring self, unsigned min_events = 1, Time::Spec timeout = NULL, sigset_t* sigmask = NULL)
 PPCODE:
 	struct io_uring_cqe *cqe;
-	int result = io_uring_submit_and_wait_timeout(&self->uring, &cqe, min_events, timeout, NULL);
+	int result = io_uring_submit_and_wait_timeout(&self->uring, &cqe, min_events, timeout, sigmask);
 
 	if (result == -1 && errno == EINTR)
 		PERL_ASYNC_CHECK();
@@ -272,6 +311,19 @@ PPCODE:
 	}
 
 
+SV* submit(IO::Uring self)
+CODE:
+	int result = io_uring_submit(&self->uring);
+	if (result >= 0)
+		RETVAL = newSViv(result);
+	else {
+		errno = -result;
+		RETVAL = &PL_sv_undef;
+	}
+OUTPUT:
+	RETVAL
+
+
 SV* probe(IO::Uring self)
 CODE:
 	struct io_uring_probe* probe = io_uring_get_probe_ring(&self->uring);
@@ -289,17 +341,27 @@ OUTPUT:
 	RETVAL
 
 
-void ensure_sqes(IO::Uring ring, UV wanted)
+UV sq_space_left(IO::Uring ring)
 CODE:
-	unsigned space_left = io_uring_sq_space_left(&ring->uring);
-	if (space_left < wanted)
-		io_uring_submit(&ring->uring);
+	RETVAL = io_uring_sq_space_left(&ring->uring);
+OUTPUT:
+	RETVAL
 
 
 UV accept(IO::Uring self, FileDescriptor fd, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_accept(sqe, fd, NULL, NULL, SOCK_CLOEXEC);
+	io_uring_sqe_set_flags(sqe, iflags);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
+OUTPUT:
+	RETVAL
+
+
+UV accept_multishot(IO::Uring self, FileDescriptor fd, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_multishot_accept(sqe, fd, NULL, NULL, SOCK_CLOEXEC);
 	io_uring_sqe_set_flags(sqe, iflags);
 	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
@@ -489,7 +551,7 @@ OUTPUT:
 	RETVAL
 
 
-UV poll_update(IO::Uring self, UV old_userdata, SV* new_userdata, UV poll_mask, UV flags, UV iflags, SV* callback = undef)
+UV poll_update(IO::Uring self, UV old_userdata, new_userdata, UV poll_mask, UV flags, UV iflags, SV* callback = undef)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_poll_update(sqe, old_userdata, 0, poll_mask, flags);
@@ -521,11 +583,33 @@ OUTPUT:
 	RETVAL
 
 
+UV read_multishot(IO::Uring self, FileDescriptor fd, UV nbytes, UV offset, IV buffergroup, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_read_multishot(sqe, fd, nbytes, offset, buffergroup);
+	io_uring_sqe_set_flags(sqe, iflags | IOSQE_BUFFER_SELECT);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
+OUTPUT:
+	RETVAL
+
+
 UV recv(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV rflags, UV pflags, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_recv(sqe, fd, buffer, XSauto_length_of_buffer, rflags);
 	io_uring_sqe_set_flags(sqe, iflags);
+	sqe->ioprio |= pflags;
+	RETVAL = PTR2UV(set_callback(sqe, callback));
+OUTPUT:
+	RETVAL
+
+
+UV recv_multishot(IO::Uring self, FileDescriptor fd, IV rflags, IV pflags, UV buffergroup, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_recv_multishot(sqe, fd, NULL, 0, rflags);
+	sqe->buf_group = buffergroup;
+	io_uring_sqe_set_flags(sqe, iflags | IOSQE_BUFFER_SELECT);
 	sqe->ioprio |= pflags;
 	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
@@ -692,5 +776,87 @@ CODE:
 	io_uring_prep_write(sqe, fd, buffer, XSauto_length_of_buffer, offset);
 	io_uring_sqe_set_flags(sqe, iflags);
 	RETVAL = PTR2UV(set_callback(sqe, callback));
+OUTPUT:
+	RETVAL
+
+
+IO::Uring::BufferGroup add_buffer_group(IO::Uring ring, UV size, UV count, int id = 0, unsigned flags = 0)
+CODE:
+	RETVAL = safecalloc(1, sizeof(struct io_uring_buffergroup));
+	RETVAL->ring = ring;
+	RETVAL->buffer_size = size;
+	RETVAL->buffer_count = count;
+	RETVAL->id = id;
+	SV* ring_object = ST(0);
+
+	RETVAL->buf_ring_size = count * (sizeof(struct io_uring_buf) + size);
+	void* mapped = mmap(NULL, RETVAL->buf_ring_size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, 0, 0);
+	if (mapped == MAP_FAILED) {
+		safefree(RETVAL);
+		die("buf_ring mmap: %s\n", strerror(errno));
+	}
+	RETVAL->buf_ring = (struct io_uring_buf_ring *)mapped;
+	io_uring_buf_ring_init(RETVAL->buf_ring);
+
+	struct io_uring_buf_reg reg = { 0 };
+	reg.ring_addr = (unsigned long)mapped;
+	reg.ring_entries = count;
+	reg.bgid = id;
+	int ret = io_uring_register_buf_ring(&ring->uring, &reg, flags);
+	if (ret) {
+		munmap(mapped, RETVAL->buf_ring_size);
+		safefree(RETVAL);
+		croak("buf_ring init failed: %s\n", strerror(-ret));
+	}
+
+	RETVAL->buffer_base = (char *)RETVAL->buf_ring + count * sizeof(struct io_uring_buf);
+	for (int i = 0; i < count; i++)
+		io_uring_buf_ring_add(RETVAL->buf_ring, RETVAL->buffer_base + i * size, size, i, io_uring_buf_ring_mask(count), i);
+	io_uring_buf_ring_advance(RETVAL->buf_ring, count);
+OUTPUT:
+	RETVAL
+CLEANUP:
+	MAGIC* magic = mg_findext(SvRV(ST(0)), PERL_MAGIC_ext, &IO__Uring__BufferGroup_magic);
+	magic->mg_obj = SvREFCNT_inc(ring_object);
+	magic->mg_flags |= MGf_REFCOUNTED;
+
+
+MODULE = IO::Uring				PACKAGE = IO::Uring::BufferGroup
+
+
+IV CLONE_SKIP(sv)
+
+
+SV* get(IO::Uring::BufferGroup self, UV index, size_t size)
+CODE:
+	if (index >= self->buffer_count || size > self->buffer_size)
+		XSRETURN_UNDEF;
+
+	char* ptr = self->buffer_base + index * self->buffer_size;
+	RETVAL = newSV_type(SVt_PV);
+	SvPVX(RETVAL) = ptr;
+	SvCUR(RETVAL) = size;
+	SvLEN(RETVAL) = 0;
+	SvPOK_only(RETVAL);
+OUTPUT:
+	RETVAL
+
+
+void release(IO::Uring::BufferGroup self, UV index)
+CODE:
+	char* ptr = self->buffer_base + index * self->buffer_size;
+	io_uring_buf_ring_add(self->buf_ring, ptr, self->buffer_size, index, io_uring_buf_ring_mask(self->buffer_count), 0);
+	io_uring_buf_ring_advance(self->buf_ring, 1);
+
+
+SV* consume(IO::Uring::BufferGroup self, UV index, size_t size)
+CODE:
+	if (index >= self->buffer_count || size > self->buffer_size)
+		XSRETURN_UNDEF;
+
+	char* ptr = self->buffer_base + index * self->buffer_size;
+	RETVAL = newSVpvn(ptr, size);
+	io_uring_buf_ring_add(self->buf_ring, ptr, self->buffer_size, index, io_uring_buf_ring_mask(self->buffer_count), 0);
+	io_uring_buf_ring_advance(self->buf_ring, 1);
 OUTPUT:
 	RETVAL

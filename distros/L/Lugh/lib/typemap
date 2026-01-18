@@ -1,0 +1,6 @@
+TYPEMAP
+int64_t             T_IV
+size_t              T_UV
+LughContext *       T_PTROBJ
+struct ggml_tensor *    T_PTROBJ
+struct ggml_cgraph *    T_PTROBJ

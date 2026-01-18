@@ -1,5 +1,24 @@
 Revision history for Future-IO-Redis
 
+0.002  2026-01-17
+    - Bug Fix: Concurrent command response matching
+        - Fixed race condition where multiple async commands on a single
+          connection could receive mismatched responses
+        - Implemented Response Queue pattern with FIFO ordering
+        - Commands now register in inflight queue before sending
+        - Single reader coroutine processes responses in order
+    - New Features:
+        - Added inflight_count() method to check pending commands
+        - Added _wait_for_inflight_drain() for pipeline/PubSub synchronization
+    - Documentation:
+        - Added CONCURRENT COMMANDS section to POD
+        - Documented Response Queue pattern and best practices
+    - Testing:
+        - Added t/92-concurrency/response-ordering.t test suite
+        - Tests for concurrent SET, GET, mixed command types
+        - Stress test with 100 concurrent commands
+        - Inflight tracking verification
+
 0.001  2026-01-03
     - Initial release
     - Core Features:

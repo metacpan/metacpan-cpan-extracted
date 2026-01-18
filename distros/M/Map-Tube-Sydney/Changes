@@ -1,4 +1,8 @@
 Revision history for Map::Tube::Sydney
 
+1.01  2026-01-18
+      - L1 station Fish Market is now Bank Street.
+      - Use other_link for walks.
+
 1.00  2025-12-26
       - First version, released.

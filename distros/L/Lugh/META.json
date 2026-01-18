@@ -1,0 +1,62 @@
+{
+   "abstract" : "Pure C LLM Inference Engine for Perl (built on ggml)",
+   "author" : [
+      "lnation <email@lnation.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Lugh",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::ggml" : "0.01"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::ggml" : "0.01",
+            "ExtUtils::MakeMaker" : "7.12"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "threads" : "0"
+         },
+         "requires" : {
+            "Alien::ggml" : "0.01",
+            "perl" : "5.008003"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lnation/Lugh/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/lnation/Lugh.git",
+         "web" : "https://github.com/lnation/Lugh"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

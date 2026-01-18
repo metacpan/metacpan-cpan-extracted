@@ -39,8 +39,6 @@
          "requires" : {
             "Getopt::Long" : "0",
             "List::Util" : "1.20",
-            "Term::ANSIColor" : "0",
-            "Term::ANSIScreen" : "0",
             "Text::Format" : "0",
             "Text::Wrap::Smart" : "0",
             "Time::HiRes" : "0",
@@ -50,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.79",
+   "version" : "1.83",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

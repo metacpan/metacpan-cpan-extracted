@@ -61,7 +61,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='2.070';
+$VERSION='2.071';
 chomp($VERSION_GIT_SHA=do { local (@ARGV, $/) = ($_=__FILE__.'.sha'); <> if -f $_ });
 
 
@@ -860,6 +860,18 @@ sub handler : method {    # no subsort
     #
     $r->status(HTTP_OK) unless $r->status();
     debug('r status set, %s', $r->status());
+    
+    
+    #  Tidy ? Run under eval in case module not installed/working, considerd non-fatal
+    #
+    if (WEBDYNE_HTML_TIDY) { 
+        eval {
+            require HTML::Tidy5;
+            my $html=HTML::Tidy5->new($WEBDYNE_HTML_TIDY_CONFIG_HR)->clean(${$html_sr});
+            $html_sr=\$html;
+        };
+        $@ && eval {};
+    }
 
 
     #  Formulate header, calc length of return.
@@ -2953,7 +2965,21 @@ sub perl {
     
     #  Return whatever was generated unless hidden attr set
     #
-    return $attr_hr->{'hidden'} ? \undef : $html_sr;
+    unless ( $attr_hr->{'hidden'} || (defined $attr_hr->{'display'} && ($attr_hr->{'display'}==0))) {
+    
+        #  Not hidden return
+        #
+        return $html_sr;
+        
+    }
+    else {
+    
+        #  No display wanted
+        #
+        return \undef;
+        
+    }
+    #return $attr_hr->{'hidden'} ? \undef : $html_sr;
 
 }
 

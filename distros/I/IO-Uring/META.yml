@@ -26,11 +26,12 @@ name: IO-Uring
 provides:
   IO::Uring:
     file: lib/IO/Uring.pm
-    version: '0.009'
-requires:
-  Exporter: '0'
+    version: '0.010'
+recommends:
   Signal::Info: '0'
   Time::Spec: '0'
+requires:
+  Exporter: '0'
   XSLoader: '0'
   perl: '5.006'
   strict: '0'
@@ -38,7 +39,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/io-uring/issues
   repository: git://github.com/Leont/io-uring.git
-version: '0.009'
+version: '0.010'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

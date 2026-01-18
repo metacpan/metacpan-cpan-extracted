@@ -1,0 +1,20 @@
+<start_html>
+
+<!-- Variation 1. <start_multipart_form>,</end_form> -->
+<start_multipart_form>
+<p>
+<submit name="submit0" value="Submit">
+<end_form>
+
+<!-- Variation 2. <start_multipart_form>,</end_multipart_form> -->
+<start_multipart_form>
+<p>
+<submit name="submit0" value="Submit">
+<end_multipart_form>
+
+
+<!-- Variation 3. <start_multipart_form>,</form> -->
+<start_multipart_form>
+<p>
+<submit name="submit0" value="Submit">
+</form>

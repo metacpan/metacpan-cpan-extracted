@@ -1,0 +1,500 @@
+package App::mdee;
+
+our $VERSION = "0.03";
+
+1;
+=encoding utf-8
+
+=head1 NAME
+
+mdee - Markdown, Easy on the Eyes
+
+=head1 SYNOPSIS
+
+    mdee [ options ] file ...
+
+     -h  --help             show help
+         --version          show version
+     -d  --debug            debug level (repeatable)
+     -n  --dryrun           dry-run mode
+     -f  --filter           filter mode (highlight only)
+         --[no-]fold        line folding (default: on)
+         --[no-]table       table formatting (default: on)
+         --[no-]nup         nup paged output (default: on)
+     -w  --width=#          fold width (default: 80)
+     -t  --theme=#          color theme
+     -m  --mode=#           light or dark (default: light)
+     -B  --base-color=#     override theme's base color
+                            (e.g., <Red>, #FF5733, hsl(0,100,50))
+         --list-themes      list built-in themes
+         --show=#           set field visibility (e.g., italic=1)
+     -C  --pane=#           number of columns
+     -R  --row=#            number of rows
+     -G  --grid=#           grid layout (e.g., 2x3)
+     -P  --page=#           page height in lines
+     -S  --pane-width=#     pane width (default: 85)
+    --bs --border-style=#   border style
+         --[no-]pager[=#]   pager command
+
+=head1 VERSION
+
+Version 0.03
+
+=cut
+=head1 DESCRIPTION
+
+B<mdee> is a multi-column Markdown viewer with syntax highlighting,
+combining L<greple(1)> for colorization and L<nup(1)> for paged output.
+
+Supported elements: headers (h1-h6), bold, italic, strikethrough,
+inline code, code blocks, HTML comments, tables, and list items.
+
+This tool is designed for viewing Markdown not constrained by display
+formatting, such as output from LLMs (Large Language Models).  It applies
+syntax highlighting with line folding and table alignment, but does not
+reflow paragraphs with hard line breaks.  For full Markdown rendering,
+many other viewers are available.  Combine them with L<nup(1)> for
+similar paged output (e.g., C<nup glow README.md>).
+
+=head1 OPTIONS
+
+=head2 General Options
+
+=over 4
+
+=item B<-h>, B<--help>
+
+Show help message.
+
+=item B<--version>
+
+Show version.
+
+=item B<-d>, B<--debug>
+
+Set debug level.  Can be repeated (C<-d>, C<-dd>, C<-ddd>) for
+increasing verbosity.
+
+=item B<-n>, B<--dryrun>
+
+Dry-run mode. Show the command without executing.
+
+=item B<-f>, B<--filter>
+
+Filter mode.  Reads from stdin (or files) and outputs highlighted
+Markdown to stdout.  Disables line folding, table formatting, and
+nup paged output.  Useful for piping Markdown content through mdee
+for syntax highlighting only.
+
+=back
+
+=head2 Processing Options
+
+=over 4
+
+=item B<--[no-]fold>
+
+Enable or disable line folding for list items.  When enabled, long
+lines in list items are wrapped with proper indentation using
+L<ansifold(1)>.  Default is enabled.
+
+=item B<--[no-]table>
+
+Enable or disable table formatting.  When enabled, Markdown tables
+are formatted using L<ansicolumn(1)> for aligned column display.
+Default is enabled.
+
+=item B<--[no-]nup>
+
+Enable or disable L<nup(1)> for multi-column paged output.  When
+disabled, output goes directly to stdout without formatting.
+Default is enabled.
+
+=item B<-w> I<N>, B<--width>=I<N>
+
+Set the fold width for text wrapping. Default is 80.
+Only effective when C<--fold> is enabled.
+
+=back
+
+=head2 Theme Options
+
+B<mdee> supports color themes for customizing syntax highlighting.
+Themes define colors for various Markdown elements (headers, code blocks,
+bold text, etc.).
+
+=over 4
+
+=item B<-t> I<NAME>, B<--theme>=I<NAME>
+
+Select a color theme.  Default is C<default>.
+
+=item B<-m> I<MODE>, B<--mode>=I<MODE>
+
+Select light or dark mode.  Default is C<light>.
+
+If the terminal supports background color detection (via
+L<Getopt::EX::termcolor>), the mode is automatically selected based on
+terminal luminance.
+
+Each theme has light and dark variants optimized for different terminal
+backgrounds.  The built-in C<default> theme provides:
+
+=over 4
+
+=item C<light> - Navy blue base color for light backgrounds
+
+=item C<dark> - Light blue (#CCCDFF) base color for dark backgrounds
+
+=back
+
+User configuration is loaded from:
+
+    ${XDG_CONFIG_HOME:-~/.config}/mdee/config.sh
+
+This is a shell script that can set defaults and override colors:
+
+    # ~/.config/mdee/config.sh
+    default_mode='dark'              # set default mode
+    colors[base]='<DarkCyan>'        # override base color
+    colors[h1]='L25DE/${base}'       # header with base background
+
+Color specifications use L<Term::ANSIColor::Concise> format.
+The C<FG/BG> notation specifies foreground and background colors
+(e.g., C<L25DE/${base}> means gray foreground on base-colored background).
+The C<${base}> string is expanded to the base color value after loading.
+
+=item B<-B> I<COLOR>, B<--base-color>=I<COLOR>
+
+Override the theme's base color.  This is useful for quickly adjusting
+the color scheme without creating a custom theme.
+Accepts L<Term::ANSIColor::Concise> color specifications:
+
+=over 4
+
+=item * Color names: C<E<lt>RedE<gt>>, C<E<lt>NavyBlueE<gt>>
+
+=item * RGB hex: C<#FF5733>
+
+=item * RGB decimal: C<rgb(255,87,51)>
+
+=item * HSL: C<hsl(0,100,50)>
+
+=back
+
+B<Note:> Basic ANSI color codes (C<R>, C<G>, C<B>, etc.) are not supported
+because the highlighting variations are created by adjusting lightness
+of the base color, which requires full color specifications.
+
+=item B<--list-themes>
+
+List built-in themes with color samples and exit.
+
+=back
+
+=head2 Highlight Options
+
+=over 4
+
+=item B<--show>=I<FIELD>[=I<VALUE>],...
+
+Control field visibility for highlighting.  Empty value or C<0> disables
+the field; any other value (including C<1>) enables it.
+
+    --show italic           # enable italic
+    --show bold=0           # disable bold
+    --show all              # enable all fields
+    --show all= --show bold # disable all, then enable only bold
+
+Multiple fields can be specified with commas or by repeating the option.
+The special field C<all> affects all fields and is processed first.
+
+Available fields: C<comment>, C<bold>, C<italic>, C<strike>, C<h1>,
+C<h2>, C<h3>, C<h4>, C<h5>, C<h6>, C<inline_code>, C<code_block>.
+
+All fields are enabled by default.
+
+=back
+
+=head2 Layout Options (passed to nup)
+
+=over 4
+
+=item B<-C> I<N>, B<--pane>=I<N>
+
+Set the number of columns (panes).
+
+=item B<-R> I<N>, B<--row>=I<N>
+
+Set the number of rows.
+
+=item B<-G> I<CxR>, B<--grid>=I<CxR>
+
+Set grid layout. For example, C<-G2x3> creates 2 columns and 3 rows.
+
+=item B<-P> I<N>, B<--page>=I<N>
+
+Set the page height in lines.
+
+=item B<-S> I<N>, B<--pane-width>=I<N>
+
+Set the pane width in characters. Default is 85.
+
+=item B<--bs>=I<STYLE>, B<--border-style>=I<STYLE>
+
+Set the border style.
+
+=back
+
+=head2 Pager Options
+
+=over 4
+
+=item B<--[no-]pager>[=I<COMMAND>]
+
+Set the pager command.  Use C<--pager=less> to specify a pager,
+or C<--no-pager> to disable paging.
+
+=back
+
+=head1 EXAMPLES
+
+    mdee README.md              # view markdown file
+    mdee -C2 document.md        # 2-column view
+    mdee -G2x2 manual.md        # 2x2 grid (4-up)
+    mdee -w60 narrow.md         # narrower text width
+    mdee --no-pager file.md     # without pager
+    mdee --no-nup file.md       # output to stdout without nup
+    mdee --no-fold file.md      # disable line folding
+    mdee --no-table file.md     # disable table formatting
+
+    # Filter mode
+    cat file.md | mdee -f       # highlight stdin
+    mdee -f file.md             # highlight only (no paging)
+
+    # Theme examples
+    mdee --mode=dark file.md             # use dark mode
+    mdee --mode=light file.md            # use light mode
+    mdee -B '<Red>' file.md              # override base color
+    mdee --mode=dark -B '<Cyan>' file.md # dark mode with cyan base
+    mdee --list-themes                   # list available themes
+
+=head1 DEPENDENCIES
+
+This command requires the following:
+
+=over 4
+
+=item * L<App::Greple> - pattern matching and highlighting
+
+=item * L<App::Greple::tee> - filter integration
+
+=item * L<App::ansifold> - ANSI-aware text folding
+
+=item * L<App::ansicolumn> - ANSI-aware column formatting
+
+=item * L<App::nup> - N-up multi-column paged output
+
+=item * L<App::ansiecho> - ANSI color output
+
+=item * L<Getopt::Long::Bash> - bash option parsing
+
+=item * L<Getopt::EX::termcolor> - terminal background detection
+
+=back
+
+=head1 IMPLEMENTATION
+
+B<mdee> is implemented as a Bash script that orchestrates multiple
+specialized tools into a unified pipeline.  The architecture follows
+Unix philosophy: each tool does one thing well, and they communicate
+through standard streams.
+
+The overall data flow is:
+
+    Input File
+        |
+        v
+    [greple] --- Syntax Highlighting
+        |
+        v
+    [ansifold] --- Text Folding (optional)
+        |
+        v
+    [ansicolumn] --- Table Formatting (optional)
+        |
+        v
+    [nup] --- Paged Output (optional)
+        |
+        v
+    Terminal/Pager
+
+=head2 Pipeline Architecture
+
+B<mdee> dynamically constructs a pipeline based on enabled options.
+Each stage is represented as a Bash array containing the command and
+its arguments.  The C<--dryrun> option displays the constructed pipeline
+without execution.
+
+=head3 Processing Stages
+
+The pipeline consists of four configurable stages.  Each stage can be
+enabled or disabled independently using C<--[no-]fold>, C<--[no-]table>,
+and C<--[no-]nup> options.
+
+=head4 Syntax Highlighting
+
+The first stage uses L<greple(1)> with the C<-G> (grep mode) and
+C<--ci=G> (capture index) options to apply different colors to each
+captured group in regular expressions.
+
+Supported Markdown elements:
+
+=over 4
+
+=item * Headers (C<# h1> through C<###### h6>)
+
+=item * Bold text (C<**bold**> or C<__bold__>)
+
+=item * Italic text (C<*italic*> or C<_italic_>)
+
+=item * Inline code (C<`code`>)
+
+=item * Code blocks (fenced with C<```> or C<~~~>)
+
+=item * HTML comments (C<< <!-- comment --> >>)
+
+=back
+
+Code block detection follows the CommonMark specification:
+
+=over 4
+
+=item * Opening fence: 0-3 spaces indentation, then 3+ backticks or tildes
+
+=item * Closing fence: 0-3 spaces indentation, same character, same or more count
+
+=item * Backticks and tildes cannot be mixed (C<```> must close with C<```>)
+
+=back
+
+B<Color Specifications>
+
+Colors are specified using L<Term::ANSIColor::Concise> format.
+The C<--cm> option maps colors to captured groups.  For example,
+C<L00DE/${base}> specifies gray foreground on base-colored background.
+
+The color specification supports modifiers:
+
+=over 4
+
+=item * C<+l10> / C<-l10>: Adjust lightness by percentage
+
+=item * C<=l50>: Set absolute lightness
+
+=item * C<D>: Bold, C<U>: Underline, C<E>: Erase line
+
+=back
+
+Example greple invocation:
+
+    greple -G --ci=G --all --need=0 \
+        --cm 'L00DE/${base}' -E '^#\h+.*' \
+        --cm '${base}D' -E '\*\*.*?\*\*' \
+        file.md
+
+=head4 Text Folding
+
+The second stage wraps long lines in list items using L<ansifold(1)>
+via L<Greple::tee>.  It preserves ANSI escape sequences and maintains
+proper indentation for nested lists.
+
+The folding width is controlled by C<--width> option (default: 80).
+
+=head4 Table Formatting
+
+The third stage formats Markdown tables using L<ansicolumn(1)>.
+Tables are detected by the pattern C<^(\|.+\|\n){3,}> and formatted
+with aligned columns while preserving ANSI colors.
+
+=head3 Output Stage
+
+The final stage uses L<nup(1)> to provide multi-column paged output.
+Layout options (C<--pane>, C<--row>, C<--grid>, C<--page>) are passed
+directly to nup.
+
+=head2 Theme System
+
+B<mdee> implements a theme system with light and dark mode variants.
+
+=head3 Theme Structure
+
+Each theme is defined as a Bash associative array with color
+definitions for each Markdown element:
+
+    declare -A theme_default_dark=(
+        [base]='#CCCDFF'
+        [h1]='L00DE/${base}'
+        [h2]='L00DE/${base}-l10'
+        ...
+    )
+
+=head4 Base Color Expansion
+
+The C<${base}> placeholder in color values is expanded after theme
+loading.  This allows derived colors to be calculated from a single
+base color, making theme customization easier.
+
+=head4 Terminal Mode Detection
+
+B<mdee> uses L<Getopt::EX::termcolor> to detect terminal background
+luminance.  If luminance is below 50%, dark mode is automatically
+selected.
+
+=head1 LIMITATIONS
+
+=head2 HTML Comments
+
+Only HTML comments starting at the beginning of a line are highlighted.
+Inline comments are not matched to avoid conflicts with inline code
+containing comment-like text (e.g., C<< `<!-->` >>).
+
+=head2 Emphasis
+
+Emphasis patterns (bold and italic) do not span multiple lines.
+Multi-line emphasis text is not supported.
+
+=head2 Links
+
+Link patterns do not span multiple lines.  The link text and URL must
+be on the same line.
+
+Reference-style links (C<[text][ref]> with C<[ref]: url> elsewhere)
+are not supported.
+
+=head2 OSC 8 Hyperlinks
+
+Links are converted to OSC 8 terminal hyperlinks for clickable URLs.
+This requires terminal support.  Compatible terminals include iTerm2,
+Kitty, WezTerm, Ghostty, and recent versions of GNOME Terminal.
+Apple's default Terminal.app does not support OSC 8.
+
+When using C<less> as pager, version 566 or later is required with
+C<-R> option.
+
+=head1 SEE ALSO
+
+L<nup(1)>, L<greple(1)>, L<ansifold(1)>, L<ansicolumn(1)>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright 2026 Kazumasa Utashiro.
+
+This software is released under the MIT License.
+L<https://opensource.org/licenses/MIT>
+
+=cut

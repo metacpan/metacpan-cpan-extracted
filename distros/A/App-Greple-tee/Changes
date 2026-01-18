@@ -1,5 +1,13 @@
 Revision history for Perl extension App-Greple-tee
 
+1.04 2026-01-18T02:30:38Z
+
+    - Migrate from App::cdif::Command to Command::Run
+    - Add &function syntax to call Perl functions instead of external commands
+    - Add Autoload.pm with aliases: ansifold, ansicolumn, cat-v
+    - Add FUNCTION CALL section to documentation
+    - Fix fillup to only replace newlines with spaces
+
 1.03 2026-01-09T03:53:24Z
 
     - Migrate to Getopt::EX::Config for option handling

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Hayo Baan's Dist::Zilla configuration
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 #pod =head1 DESCRIPTION
 #pod
@@ -642,9 +642,16 @@ sub _add_test {
     return grep { ! $self->_is_disabled(ref $_ ? $_->[0] : $_) } @_;
 }
 
-#pod =for Pod::Coverage configure
+#pod =for Pod::Coverage configure getBooleanCommandlineOption
 #pod
 #pod =cut
+
+# Returns the value of a boolean command-line option
+sub getBooleanCommandlineOption {
+    my $option = $_[0];
+    my @result = grep { /^--?(no-)?$option$/ } @ARGV;
+    return @result ? $result[-1] !~ /^--?no-/ : undef;
+}
 
 sub configure {
     my $self = shift;
@@ -653,23 +660,19 @@ sub configure {
         # Command-line argument processing
 
         # Local-relase-only
-        my $local;
-        GetOptions('local|local-only|local-release|local-release-only!' => \$local);
+        my $local = getBooleanCommandlineOption('local|local-only|local-release|local-release-only');
         $self->local_release_only($local) if defined $local;
 
         # Make-minor-release
-        my $minor;
-        GetOptions('minor|minor-relase|make-minor|make-minor-release!' => \$minor);
+        my $minor = getBooleanCommandlineOption('minor|minor-relase|make-minor|make-minor-release');
         $self->make_minor_release($minor) if defined $minor;
 
         # Make-major-release
-        my $major;
-        GetOptions('major|major-relase|make-major|make-major-release!' => \$major);
+        my $major = getBooleanCommandlineOption('major|major-relase|make-major|make-major-release');
         $self->make_major_release($major) if defined $major;
 
         # Keep-version
-        my $keep;
-        GetOptions('keep|keep-version!' => \$keep);
+        my $keep = getBooleanCommandlineOption('keep|keep-version');
         $self->keep_version($keep) if defined $keep;
     }
 
@@ -774,7 +777,7 @@ sub configure {
 
         $self->is_github_hosted && $self->is_cpan ? (
             # Add status badges to README.mkdn
-            [ 'GitHubREADME::Badge' => { ':version' => '0.16', badges => [ qw(travis cpants) ] } ],
+            [ 'GitHubREADME::Badge' => { ':version' => '0.16', badges => [ qw(cpants) ] } ],
         ) : (),
 
         #### Before Release Tests ####
@@ -919,7 +922,7 @@ Dist::Zilla::PluginBundle::Author::HAYOBAAN - Hayo Baan's Dist::Zilla configurat
 
 =head1 VERSION
 
-version 0.014
+version 0.016
 
 =head1 DESCRIPTION
 
@@ -1539,7 +1542,7 @@ non-git version controlled repositories).
 
 =for Pod::Coverage mvp_multivalue_args mvp_aliases
 
-=for Pod::Coverage configure
+=for Pod::Coverage configure getBooleanCommandlineOption
 
 =head1 BUGS
 

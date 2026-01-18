@@ -1,0 +1,22 @@
+Revision history for LightTCP::Server
+
+2.00 2026-01-16
+  - Renamed from tcpserver to LightTCP::Server
+  - Added file upload support with multipart parsing
+  - Added rate limiting with configurable limits and whitelisting
+  - Added atomic file uploads with temp file + rename
+  - Added filename sanitization for security
+  - Added MIME type validation for uploads
+  - Improved thread safety with shared lock for rate limiting
+  - Moved to lib/LightTCP/Server.pm directory structure
+  - Added Makefile.PL for installation
+  - Comprehensive test suite with 94 tests
+
+1.00 2026-01-15
+  - Initial release as tcpserver
+  - Basic TCP server with HTTP support
+  - Single, fork, and thread server modes
+  - CGI support
+  - Token-based authentication
+  - IP allow/deny access control
+  - Configurable logging with rotation

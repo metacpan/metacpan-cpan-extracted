@@ -1,0 +1,66 @@
+=head1 NAME
+
+Thunderhorse::Cookbook - Reusable coding patterns
+
+=head1 RECIPES
+
+=head2 Custom error pages
+
+Making prettier app-wide error pages is easy by overriding
+L<Thunderhorse::App/render_error>:
+
+	async sub render_error ($self, $controller, $ctx, $code, $message = undef)
+	{
+		$controller //= $self->controller;
+		my $html;
+
+		try {
+			$html = $controller->template("error/$code");
+		}
+		catch ($ex) {
+			$html = $controller->template('error/error', {title => status_message($code)});
+		}
+
+		await $ctx->res->status($code)->html($html);
+	}
+
+For example for error 404, code above will try to render C<error/404.tt>
+template. If it is not found, it will render more generic C<error/error.tt>
+instead.
+
+Same can be done on controller level, which means different parts of the system
+can use different error pages without any issue.
+
+=head2 Reusing common bridge across controllers
+
+If you need to make a common bridge that will be used across the system, it is
+best to define it in the base application and give it a name:
+
+	# in MyApp.pm
+	sub build ($self)
+	{
+		$self->router->add(
+			'/admin' => {
+				name => 'admin_auth',
+				to => 'check_auth',
+			}
+		);
+
+		# make sure the controller is loaded after the bridge is added
+		# (done automatically if loading from configuration)
+		$self->load_controller('ReusesBridge');
+	}
+
+Then you can fetch it in any of the controller to add more locations as its children:
+
+	# in MyApp/Controller/ReusesBridge.pm
+	sub build ($self)
+	{
+		my $bridge = $self->router->find('admin_auth')
+		$bridge->add(...);
+	}
+
+=head1 SEE ALSO
+
+L<Thunderhorse::Manual> - table of contents
+

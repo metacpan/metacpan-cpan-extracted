@@ -10,7 +10,7 @@ App::Greple::tee - マッチしたテキストを外部コマンドの結果で�
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 DESCRIPTION
 
@@ -79,6 +79,56 @@ B<-ML> モジュールを使って、次のように偶数行のみを処理す�
 これはシェルのエイリアスやモジュールファイルと組み合わせると便利です。
 
 利用可能なパラメータは B<discrete>, B<bulkmode>, B<crmode>, B<fillup>, B<squeeze>, B<blocks> です。
+
+=head1 FUNCTION CALL
+
+外部コマンドの代わりに、コマンド名の前にC<&>を付けることでPerl関数を呼び出せます。
+
+    greple -Mtee '&App::ansifold::ansifold' -w40 -- ...
+
+関数はフォークされた子プロセスで実行されるため、次の要件に従う必要があります:
+
+=over 4
+
+=item *
+
+一致したテキストをB<STDIN>から読み込む
+
+=item *
+
+変換結果をB<STDOUT>へ出力する
+
+=item *
+
+引数はC<@ARGV>およびC<@_>の両方で渡される
+
+=back
+
+任意の完全修飾関数名を使用できます:
+
+    greple -Mtee '&Your::Module::function' -- ...
+
+モジュールは未ロードの場合、自動的にロードされます。
+
+便宜のため、以下の短いエイリアスが利用可能です:
+
+=over 4
+
+=item B<&ansicolumn>
+
+C<App::ansicolumn::ansicolumn>を呼び出します。
+
+=item B<&ansifold>
+
+C<App::ansifold::ansifold>を呼び出します。
+
+=item B<&cat-v>
+
+C<App::cat::v-E<gt>new-E<gt>run(@_)>を呼び出します。
+
+=back
+
+関数呼び出しを使用すると、呼び出しごとに外部プロセスをフォークするオーバーヘッドを回避でき、B<--discrete>オプションと併用した場合にパフォーマンスを大幅に向上させることができます。
 
 =head1 LEGACIES
 

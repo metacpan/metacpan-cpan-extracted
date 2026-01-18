@@ -37,9 +37,10 @@ subtest 'ResultSet basics' => sub {
     is($source->source_name, 'User', 'Source name matches');
 
     # Test as_query
-    my ($cond, $attrs) = $rs->as_query;
-    is_deeply($cond, {}, 'Empty conditions by default');
-    is_deeply($attrs, {}, 'Empty attributes by default');
+    my $query = $rs->as_query;
+    isa_ok($query, 'REF', 'as_query returns a reference (SQL structure)');
+    is(ref($$query), 'ARRAY', 'as_query contains an array of [SQL, BIND]');
+    like($$query->[0], qr/SELECT/i, 'Generated SQL contains SELECT');
 
     # Test search returns new resultset
     my $rs2 = $rs->search({ active => 1 });

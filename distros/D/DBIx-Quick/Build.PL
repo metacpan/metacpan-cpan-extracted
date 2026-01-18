@@ -15,6 +15,7 @@ my $build = Module::Build->new(
     },
     test_requires => {
         'Test::MockObject' => 0,
+        'Test::MockModule' => 0,
         'Test::Exception'  => 0,
         'Test::More'       => 0,
     },

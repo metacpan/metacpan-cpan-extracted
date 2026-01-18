@@ -1,5 +1,5 @@
 package Thunderhorse::SSE;
-$Thunderhorse::SSE::VERSION = '0.100';
+$Thunderhorse::SSE::VERSION = '0.101';
 use v5.40;
 use Mooish::Base -standard;
 

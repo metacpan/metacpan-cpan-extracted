@@ -6,6 +6,14 @@ Home page:    <https://metacpan.org/release/MooX-XSConstructor>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-XSConstructor>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.003001	2026-01-17
+
+ [ Documentation ]
+ - Include more SEE ALSO links.
+
+ [ Packaging ]
+ - Bump Class::XSConstructor dependency.
+
 0.003000	2026-01-13
 
  - Updated: Also create an XS DESTROY method.

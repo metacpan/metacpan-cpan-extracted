@@ -1,6 +1,6 @@
 package Map::Tube::Sydney::Line::L1;
 
-$Map::Tube::Sydney::Line::L1::VERSION   = '1.00';
+$Map::Tube::Sydney::Line::L1::VERSION   = '1.01';
 $Map::Tube::Sydney::Line::L1::AUTHORITY = 'cpan:EARLYBEAN';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::Sydney::Line::L1 - Sydney Rail Map: L1 Line.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 DESCRIPTION
 
@@ -28,9 +28,9 @@ Sydney Light Rail Map: L1 Line.
     | Convention Centre       | Exhibition Centre, Pyrmont Bay           |
     | Pyrmont Bay             | Convention Centre, The Star              |
     | The Star                | Pyrmont Bay, John Street Square          |
-    | John Street Square      | The Star, Fish Market                    |
-    | Fish Market             | John Street Square, Wentworth Park       |
-    | Wentworth Park          | Fish Market, Glebe                       |
+    | John Street Square      | The Star, Bank Street                    |
+    | Bank Street             | John Street Square, Wentworth Park       |
+    | Wentworth Park          | Bank Street, Glebe                       |
     | Glebe                   | Wentworth Park, Jubilee Park             |
     | Jubilee Park            | Glebe, Rozelle Bay                       |
     | Rozelle Bay             | Jubilee Park, Lilyfield                  |

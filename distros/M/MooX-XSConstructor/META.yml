@@ -28,12 +28,12 @@ optional_features: {}
 provides:
   MooX::XSConstructor:
     file: lib/MooX/XSConstructor.pm
-    version: '0.003000'
+    version: '0.003001'
 recommends:
   Type::Tiny::XS: '0'
   Types::Standard: '1.000000'
 requires:
-  Class::XSConstructor: '0.018001'
+  Class::XSConstructor: '0.020000'
   Hook::AfterRuntime: '0'
   Moo: '2.004000'
   perl: '5.008001'
@@ -43,6 +43,6 @@ resources:
   homepage: https://metacpan.org/release/MooX-XSConstructor
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-moox-xsconstructor.git
-version: '0.003000'
+version: '0.003001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -1,5 +1,5 @@
 package Thunderhorse;
-$Thunderhorse::VERSION = '0.100';
+$Thunderhorse::VERSION = '0.101';
 ##################################
 # ~~~~~~~~~~~~ Ride ~~~~~~~~~~~~ #
 # ~~~~~~~~~~~~ Ride ~~~~~~~~~~~~ #
@@ -649,6 +649,132 @@ in the middlewares, but any valid method of doing that can be used. PAGI
 middlewares are always run just before the destination handler is fired, as one
 would expect.
 
+=head3 Consuming, matching and order of execution
+
+One unique feature of Thunderhorse is that it does not stop searching for
+matches once it finds a match. Instead, it gathers a list of matching locations
+and then proceeds to execute them in order. It stops once one of the handlers
+consumes the context, which is usually done by sending a response. If no
+handlers consumed the context, a I<404 Not Found> error page is rendered.
+
+This allows for superb flexibility, but has a couple of interesting side
+effects which may become visible once the rendering gets complex:
+
+=over
+
+=item * Route handlers may skip rendering response
+
+A route handler may be coded in such a way that skips consuming the context in
+certain scenarios. Take this as an example:
+
+	sub build ($self)
+	{
+		$router->add('/incoming_data' => { to => 'handle_json' });
+		$router->add('/incoming_data' => { to => 'handle_form' });
+	}
+
+	sub handle_json ($self, $ctx)
+	{
+		return unless $ctx->req->is_json;
+
+		...; # handle json data
+	}
+
+	sub handle_form ($self, $ctx)
+	{
+		return unless $ctx->req->is_form;
+
+		...; # handle form data
+	}
+
+We have two handlers for the same pattern. First C<handle_json> will run and
+check if request has proper C<Content-Type> header for a JSON request. If not,
+it will return an empty list, which will cause the execution chain to continue.
+C<handle_form> will run next, doing the same check for form data. If that match
+fails too, the application will try to continue execution, but there are no
+more matched locations. This will cause it to render I<404 Not Found>.
+
+=item * Bridges are allowed to act like normal routes
+
+Thunderhorse bridges are just B<locations which happen to have children>, the
+only difference being that they do not require a path to end where their
+pattern ends. They can render responses normally, which will simply stop any
+further handlers from being executed. The following bridge handler will
+randomly stop execution with a slightly annoying message:
+
+	sub bridge_handler ($self, $ctx)
+	{
+		return 'Sorry to interrupt' if rand() > 0.5;
+		return undef;
+	}
+
+=item * Normal routes can act like bridges
+
+Albeit unconventional, there is nothing stopping a normal route from acting
+like a bridge. While it won't normally match a path if it continues beyond its
+pattern, it can be bypassed using the slurpy placeholder:
+
+	sub build ($self)
+	{
+		$router->add('/path1/>rest' => { to => 'bridge_wannabe' });
+		$router->add('/path1/path2' => { to => 'normal_route' });
+	}
+
+	sub bridge_wannabe ($self, $ctx, $rest)
+	{
+		return undef;
+	}
+
+	sub normal_route ($self, $ctx)
+	{
+		return 'rendering from normal_route';
+	}
+
+Returning C<undef> explicitly makes sure that the context will not be consumed
+and the execution will continue to C<normal_route>. The important thing here is
+order of execution. Normally, locations are matched in the order of
+declaration, but it can be modified by specifying C<order>. For a normal route
+to act like a bridge, it must be declared before or with a lower order than a
+second route. Normal bridges don't follow this ordering logic in relation to
+their children - they make a tree-like structure in router which is sorted only
+on one level, bridge itself always being the first one in order of execution.
+
+=back
+
+It can sometimes be hard to understand why router is working in a given way.
+For example, only locations defined as children of a bridge are sure to go
+through it during request handling:
+
+	my $admin_bridge = $router->add(
+		'/admin' => {
+			to => 'important_auth',
+		}
+	);
+
+	# some admin route
+	$admin_bridge->add(...);
+
+	# note - this one does not use $admin_bridge
+	my $loc = $router->add(
+		'/admin/login' => {
+			to => 'login_page',
+			order => -1,
+		}
+	);
+
+Even though C</admin/login> path is nested under C</admin> path, the location
+for C<login_page> will completely bypass C<important_auth>. This is by design,
+as it prevents bridges from taking over a given path completely.
+
+This happens because C<order> in C<$loc> is defined as C<-1>, which is lower
+than the default C<0> in C<$admin_bridge>. If C<$loc> was created by calling
+C<< $admin_bridge->add >>, order would not matter and C<login_page> would
+always go through C<important_auth>. But since bridges are just normal
+locations, they can match on their own even if none of their children are
+matching. If we let C<important_auth> run before C<login_page>, for example by
+setting its order to C<-2>, it will effectively become a bridge for
+C<login_page>.
+
 =head2 Controllers
 
 By default, all routes defined in the application's C<build> method belong to
@@ -1095,7 +1221,7 @@ event handling on the controller level.
 
 =item * Hook notifications
 
-	$app->hook(error => sub ($controller, $ctx, $error) {
+	$app->add_hook(error => sub ($controller, $ctx, $error) {
 		warn "error occured: $error";
 	});
 
@@ -1118,7 +1244,7 @@ Thunderhorse defines a closed set of supported hooks:
 
 =head4 startup
 
-	$app->hook(startup => sub ($state) { ... });
+	$app->add_hook(startup => sub ($state) { ... });
 
 	async sub on_startup ($self, $state) { ... }
 
@@ -1133,7 +1259,7 @@ This hook's method B<cannot be declared on a controller level>.
 
 =head4 shutdown
 
-	$app->hook(shutdown => sub ($state) { ... });
+	$app->add_hook(shutdown => sub ($state) { ... });
 
 	async sub on_shutdown ($self, $state) { ... }
 
@@ -1148,7 +1274,7 @@ This hook's method B<cannot be declared on a controller level>.
 
 =head4 error
 
-	$app->hook(error => sub ($controller, $ctx, error) { ... });
+	$app->add_hook(error => sub ($controller, $ctx, error) { ... });
 
 	async sub on_error ($self, $ctx, $error) { ... }
 	async sub on_error ($self, $controller, $ctx, $error) { ... }
@@ -1259,7 +1385,7 @@ L<PAGI>, L<Gears>, L<Kelp>
 
 Bartosz Jarzyna E<lt>bbrtj.pro@gmail.comE<gt>
 
-Consider supporting my effort: https://bbrtj.eu/support
+Consider supporting my effort: L<https://bbrtj.eu/support>
 
 =head2 Contributors
 

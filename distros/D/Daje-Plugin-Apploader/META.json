@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "CPAN" : "0",
-            "Daje::Database::Migrator" : "0.01",
+            "Daje::Database::Migrator" : "1.00",
             "List::Util" : "0",
             "Mojo::Loader" : "0",
             "perl" : "v5.42.0"
@@ -58,7 +58,7 @@
    "provides" : {
       "Daje::Plugin::Apploader" : {
          "file" : "lib/Daje/Plugin/Apploader.pm",
-         "version" : "0.20"
+         "version" : "0.25"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Plugin-Apploader"
       }
    },
-   "version" : "0.20",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

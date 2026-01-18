@@ -8,6 +8,8 @@ my $json = q({
   "title": "Hello World",
   "tags": ["perl", "json", "cli"],
   "mixed": ["abc123", null, 42, {"kind": "object"}],
+  "bools": [true, false],
+  "nested": [["foo"], ["bar"]],
   "multiline": "alpha\nbeta",
   "dots": "a\nb",
   "spaced": "ab"
@@ -45,6 +47,20 @@ is_deeply(
     $mixed_values[0],
     [JSON::PP::true, JSON::PP::false, JSON::PP::true, JSON::PP::false],
     'test() coerces scalars and treats non-strings as false'
+);
+
+my @boolean_values = $jq->run_query($json, '.bools | test("^true$")');
+is_deeply(
+    $boolean_values[0],
+    [JSON::PP::true, JSON::PP::false],
+    'test() coerces booleans to true/false strings'
+);
+
+my @nested_values = $jq->run_query($json, '.nested | test("a")');
+is_deeply(
+    $nested_values[0],
+    [[JSON::PP::false], [JSON::PP::true]],
+    'test() maps recursively over nested arrays'
 );
 
 my $invalid_ok = eval { $jq->run_query($json, '.title | test("(")'); 1 };

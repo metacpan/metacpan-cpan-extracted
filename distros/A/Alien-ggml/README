@@ -1,0 +1,71 @@
+Alien-ggml
+
+Find or build the ggml tensor library for Perl XS modules.
+
+ggml is the tensor library that powers llama.cpp and other LLM inference
+engines. This Alien module either finds a system-installed ggml or builds
+it from source automatically.
+
+SYNOPSIS
+
+In your Makefile.PL:
+
+    use Alien::ggml;
+    use ExtUtils::MakeMaker;
+    
+    WriteMakefile(
+        NAME => 'MyModule',
+        CONFIGURE_REQUIRES => {
+            'Alien::ggml' => 0,
+        },
+        LIBS => [ Alien::ggml->libs ],
+        INC  => Alien::ggml->cflags,
+    );
+
+BUILD REQUIREMENTS
+
+If building ggml from source (when no system ggml is found):
+
+    * C compiler (gcc, clang)
+    * CMake 3.14+
+    * Make or Ninja
+
+Optional for optimizations:
+
+    * macOS: Metal framework, Accelerate (included with Xcode)
+    * Linux: OpenBLAS
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+To force building from source even if system ggml exists:
+
+    ALIEN_GGML_SHARE=1 perl Makefile.PL
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Alien::ggml
+
+SEE ALSO
+
+    Lugh - LLM inference engine using ggml
+    https://github.com/ggerganov/ggml - ggml source code
+    https://github.com/ggerganov/llama.cpp - llama.cpp
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+    The Artistic License 2.0 (GPL Compatible)
+

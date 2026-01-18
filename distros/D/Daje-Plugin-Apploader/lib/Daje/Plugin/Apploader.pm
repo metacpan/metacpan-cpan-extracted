@@ -81,13 +81,14 @@ use CPAN;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.20";
+our $VERSION = "0.25";
 
 sub register ($self, $app, $config) {
 
     my $modules;
     $app->log->debug("Daje::Plugin::Apploader::register start");
     $self->_setup_database($app);
+
     $app->log->debug("_setup_database done");
 
     try {
@@ -118,7 +119,6 @@ sub register ($self, $app, $config) {
             my $length = scalar @{$loadables->{plugin}};
             my @install = ();
             for(my $i = 0; $i < $length; $i++) {
-
                 $self->_find_missing_modules(@{$loadables->{plugin}}[$i]->{name}, $modules, \@install);
             }
             for(my $i = 0; $i < $length; $i++) {
@@ -203,7 +203,7 @@ sub _setup_database($self, $app) {
             pg         => $app->pg,
             migrations => $app->config('migrations'),
         )->migrate();
-    } catch ($e) {
+    } catch($e) {
         $app->log->error($e);
     };
 }

@@ -17,7 +17,6 @@ Checkbox Group 5:
 <checkbox_group name="group5" values="%{(eenie=>'Eenie', meenie=>'Meenie', minie=>'', moe=>'')}" defaults="@{qw(eenie minie)}"/>
 <p>
 <submit name="submit">
-<p>
 <end_form>
 <dump force="+{submit}">
 <end_html>

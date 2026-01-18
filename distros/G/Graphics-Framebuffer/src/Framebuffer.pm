@@ -1,7 +1,7 @@
 package Graphics::Framebuffer;
 
 ## TEMP COPYRIGHT ##
-#  Copyright 2017 - 2025 Richard Kelsch
+#  Copyright 2017 - 2026 Richard Kelsch
 ## TEMPCOPYRIGHT ##
 
 # Only POD is utf-8.  The module code CANNOT be UTF-8
@@ -35,6 +35,8 @@ Drawing is this simple
  $fb->cls('ON'); # Clear screen and turn on the console cursor
 
 Methods requiring parameters require a hash (or anonymous hash) reference passed to the method (for speed).  All parameters have easy to understand english names, all lower case, to understand exactly what the method is doing.
+
+While reading this man page will describe how each method works, looking at the source code of "examples/primitives.pl" will demonstrate how each works.
 
 =head1 DESCRIPTION
 
@@ -96,11 +98,11 @@ Contains a hash of every font found in the system in the format:
 
 =over 6
 
-# 'FaceName' => {
-#     'path' => 'Path To Font',
-#     'font' => 'File Name of Font'
-# },
-# ...
+ # 'FaceName' => {
+ #     'path' => 'Path To Font',
+ #     'font' => 'File Name of Font'
+ # },
+ # ...
 
 =back
 
@@ -354,8 +356,8 @@ use constant {
     VT_GETSTATE         => 0x5603,
     KDSETMODE           => 0x4B3A,
 
-    KD_GRAPHICS         => 1,
-    KD_TEXT             => 0,
+    KD_GRAPHICS => 1,
+    KD_TEXT     => 0,
 
     # FLAGS
     FBINFO_HWACCEL_NONE      => 0x0000,    # These come from "fb.h" in the kernel source
@@ -475,7 +477,7 @@ BEGIN {
 sub DESTROY {    # Always clean up after yourself before exiting
     my $self = shift;
     substr($self->{'SCREEN'}, 0, length($self->{'START_SCREEN'})) = $self->{'START_SCREEN'};
-	delete($self->{'START_SCREEN'});
+    delete($self->{'START_SCREEN'});
     $self->text_mode();
     $self->_screen_close();
     unlink('/tmp/output.gif') if (-e '/tmp/output.gif');
@@ -566,10 +568,6 @@ Framebuffer device name.  If this is not defined, then it tries the following de
 
       *  /dev/fb0 - 31
       *  /dev/graphics/fb0 - 31
-
-    FreeBSD
-
-      *  /dev/ttyv0 - F
 
 If none of these work, then the module goes into emulation mode.
 
@@ -886,8 +884,7 @@ sub new {
         @_                                    # Pull in the overrides
     };
     if ($self->{'GARBAGE'}) {                 # This is for weird framebuffer formats (like an Atari ST).  The module doesn't support these
-        my $garbage = {
-
+        my $garbage = {                       # Not used in the module, and only populated if the GARBAGE key is TRUE
             'PIXEL_TYPES'     => ['Packed Pixels', 'Planes', 'Interleaved Planes', 'Text', 'VGA Planes',],
             'PIXEL_TYPES_AUX' => {
                 'Packed Pixels'      => ['',],
@@ -979,66 +976,53 @@ sub new {
             ],
 
             # Unfortunately, these are not IOCTLs.  Gee, that would be nice if they were.  Not Used
-            'FBinfo_hwaccel_fillrect'  => 'L6',      # dx(32),dy(32),width(32),height(32),color(32),rop(32)?
-            'FBinfo_hwaccel_copyarea'  => 'L6',      # dx(32),dy(32),width(32),height(32),sx(32),sy(32)
-            'FBinfo_hwaccel_fillrect'  => 'L6',      # dx(32),dy(32),width(32),height(32),color(32),rop(32)
-            'FBinfo_hwaccel_imageblit' => 'L6CL',    # dx(32),dy(32),width(32),height(32),fg_color(32),bg_color(32),depth(8),image pointer(32),color map pointer(32)
-                                                     # COLOR MAP:
-                                                     #   start(32),length(32),red(16),green(16),blue(16),alpha(16)
-                                                     # FLAGS
-            'FBINFO_HWACCEL_NONE'      => FBINFO_HWACCEL_NONE,      # 0x0000,    # These come from "fb.h" in the kernel source.  Not Used
-            'FBINFO_HWACCEL_COPYAREA'  => FBINFO_HWACCEL_COPYAREA,  # 0x0100,
-            'FBINFO_HWACCEL_FILLRECT'  => FBINFO_HWACCEL_FILLRECT,  # 0x0200,
-            'FBINFO_HWACCEL_IMAGEBLIT' => FBINFO_HWACCEL_IMAGEBLIT, # 0x0400,
-            'FBINFO_HWACCEL_ROTATE'    => FBINFO_HWACCEL_ROTATE,    # 0x0800,
-            'FBINFO_HWACCEL_XPAN'      => FBINFO_HWACCEL_XPAN,      # 0x1000,
-            'FBINFO_HWACCEL_YPAN'      => FBINFO_HWACCEL_YPAN,      # 0x2000,
-            'FBINFO_HWACCEL_YWRAP'     => FBINFO_HWACCEL_YWRAP,     # 0x4000,
-            'VT_GETSTATE'              => VT_GETSTATE,              # 0x5603,
-            'KDSETMODE'                => KDSETMODE,                # 0x4B3A,
+            'FBinfo_hwaccel_fillrect'  => 'L6',                        # dx(32),dy(32),width(32),height(32),color(32),rop(32)?
+            'FBinfo_hwaccel_copyarea'  => 'L6',                        # dx(32),dy(32),width(32),height(32),sx(32),sy(32)
+            'FBinfo_hwaccel_fillrect'  => 'L6',                        # dx(32),dy(32),width(32),height(32),color(32),rop(32)
+            'FBinfo_hwaccel_imageblit' => 'L6CL',                      # dx(32),dy(32),width(32),height(32),fg_color(32),bg_color(32),depth(8),image pointer(32),color map pointer(32)
+                                                                       # COLOR MAP:
+                                                                       #   start(32),length(32),red(16),green(16),blue(16),alpha(16)
+                                                                       # FLAGS
+            'FBINFO_HWACCEL_NONE'      => FBINFO_HWACCEL_NONE,         # 0x0000,    # These come from "fb.h" in the kernel source.  Not Used
+            'FBINFO_HWACCEL_COPYAREA'  => FBINFO_HWACCEL_COPYAREA,     # 0x0100,
+            'FBINFO_HWACCEL_FILLRECT'  => FBINFO_HWACCEL_FILLRECT,     # 0x0200,
+            'FBINFO_HWACCEL_IMAGEBLIT' => FBINFO_HWACCEL_IMAGEBLIT,    # 0x0400,
+            'FBINFO_HWACCEL_ROTATE'    => FBINFO_HWACCEL_ROTATE,       # 0x0800,
+            'FBINFO_HWACCEL_XPAN'      => FBINFO_HWACCEL_XPAN,         # 0x1000,
+            'FBINFO_HWACCEL_YPAN'      => FBINFO_HWACCEL_YPAN,         # 0x2000,
+            'FBINFO_HWACCEL_YWRAP'     => FBINFO_HWACCEL_YWRAP,        # 0x4000,
+            'VT_GETSTATE'              => VT_GETSTATE,                 # 0x5603,
+            'KDSETMODE'                => KDSETMODE,                   # 0x4B3A,
 
             ## Set up the Framebuffer driver "constants" defaults
             # Commands
-            'FBIOPUT_VSCREENINFO' => FBIOPUT_VSCREENINFO, # 0x4601,
-            'FBIOGETCMAP'         => FBIOGETCMAP,         # 0x4604,
-            'FBIOPUTCMAP'         => FBIOPUTCMAP,         # 0x4605,
-            'FBIOPAN_DISPLAY'     => FBIOPAN_DISPLAY,     # 0x4606,
-            'FBIO_CURSOR'         => FBIO_CURSOR,         # 0x4608,
-            'FBIOGET_CON2FBMAP'   => FBIOGET_CON2FBMAP,   # 0x460F,
-            'FBIOPUT_CON2FBMAP'   => FBIOPUT_CON2FBMAP,   # 0x4610,
-            'FBIOBLANK'           => FBIOBLANK,           # 0x4611,
-            'FBIOGET_VBLANK'      => FBIOGET_VBLANK,      # 0x4612,
-            'FBIOGET_GLYPH'       => FBIOGET_GLYPH,       # 0x4615,
-            'FBIOGET_HWCINFO'     => FBIOGET_HWCINFO,     # 0x4616,
-            'FBIOPUT_MODEINFO'    => FBIOPUT_MODEINFO,    # 0x4617,
-            'FBIOGET_DISPINFO'    => FBIOGET_DISPINFO,    # 0x4618,
+            'FBIOPUT_VSCREENINFO' => FBIOPUT_VSCREENINFO,    # 0x4601,
+            'FBIOGETCMAP'         => FBIOGETCMAP,            # 0x4604,
+            'FBIOPUTCMAP'         => FBIOPUTCMAP,            # 0x4605,
+            'FBIOPAN_DISPLAY'     => FBIOPAN_DISPLAY,        # 0x4606,
+            'FBIO_CURSOR'         => FBIO_CURSOR,            # 0x4608,
+            'FBIOGET_CON2FBMAP'   => FBIOGET_CON2FBMAP,      # 0x460F,
+            'FBIOPUT_CON2FBMAP'   => FBIOPUT_CON2FBMAP,      # 0x4610,
+            'FBIOBLANK'           => FBIOBLANK,              # 0x4611,
+            'FBIOGET_VBLANK'      => FBIOGET_VBLANK,         # 0x4612,
+            'FBIOGET_GLYPH'       => FBIOGET_GLYPH,          # 0x4615,
+            'FBIOGET_HWCINFO'     => FBIOGET_HWCINFO,        # 0x4616,
+            'FBIOPUT_MODEINFO'    => FBIOPUT_MODEINFO,       # 0x4617,
+            'FBIOGET_DISPINFO'    => FBIOGET_DISPINFO,       # 0x4618,
         };
         $self = { %{$self}, %{$garbage} };
     } ## end if ($self->{'GARBAGE'})
-    if ($os =~ /FreeBSD/i) {    # MAYBE this will eventually work on FreeBSD if I can figure this monster out.
-        unless (defined($self->{'FB_DEVICE'})) {    # We scan for all 16 possible devices at both possible locations
-            my $prefix = 'dev/ttyv';
-            foreach my $dev (0 .. 15) {
-                my $device = hex($dev);
-                if (-e "$prefix$device") {
-                    $self->{'FB_DEVICE'} = "$prefix$device";
+    unless (defined($self->{'FB_DEVICE'})) {                 # We scan for all 32 possible devices at both possible locations
+        foreach my $dev (0 .. 31) {
+            foreach my $prefix (qw(/dev/fb /dev/fb/ /dev/graphics/fb)) {
+                if (-e "$prefix$dev") {
+                    $self->{'FB_DEVICE'} = "$prefix$dev";
                     last;
                 }
-            } ## end foreach my $dev (0 .. 15)
-        } ## end unless (defined($self->{'FB_DEVICE'...}))
-    } elsif ($os =~ /Linux/i) {
-        unless (defined($self->{'FB_DEVICE'})) {    # We scan for all 32 possible devices at both possible locations
-            foreach my $dev (0 .. 31) {
-                foreach my $prefix (qw(/dev/fb /dev/fb/ /dev/graphics/fb)) {
-                    if (-e "$prefix$dev") {
-                        $self->{'FB_DEVICE'} = "$prefix$dev";
-                        last;
-                    }
-                } ## end foreach my $prefix (qw(/dev/fb /dev/fb/ /dev/graphics/fb))
-                last if (defined($self->{'FB_DEVICE'}));
-            } ## end foreach my $dev (0 .. 31)
-        } ## end unless (defined($self->{'FB_DEVICE'...}))
-    } ## end elsif ($os =~ /Linux/i)
+            } ## end foreach my $prefix (qw(/dev/fb /dev/fb/ /dev/graphics/fb))
+            last if (defined($self->{'FB_DEVICE'}));
+        } ## end foreach my $dev (0 .. 31)
+    } ## end unless (defined($self->{'FB_DEVICE'...}))
     $self->{'CONSOLE'} = 1;
     eval {
         $self->{'CONSOLE'} = _slurp('/sys/class/tty/tty0/active');
@@ -1394,8 +1378,8 @@ to F9.  One of them is set aside for X-Windows/Wayland.
     $self->graphics_mode();
     $self->splash($self->{'SPLASH'});
     $self->attribute_reset();
-    if (wantarray) {    # For the temporarily supported (but no longer) double buffering mode
-        return ($self, $self);    # For those that coded for double buffering
+    if (wantarray) {                                         # For the temporarily supported (but no longer) double buffering mode
+        return ($self, $self);                               # For those that coded for double buffering
     }
     return ($self);
 } ## end sub new
@@ -1421,6 +1405,7 @@ sub _fix_mapping {    # File::Map SHOULD make this obsolete
 } ## end sub _fix_mapping
 
 sub _color_order {
+
     # Determine the color order the video card uses
     my $self = shift;
 
@@ -1428,9 +1413,7 @@ sub _color_order {
     my $go = $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'};
     my $bo = $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'};
 
-    if ($ro < $go && $go < $bo) {
-        $self->{'COLOR_ORDER'} = RGB;
-    } elsif ($bo < $go && $go < $ro) {
+    if ($bo < $go && $go < $ro) {
         $self->{'COLOR_ORDER'} = BGR;
     } elsif ($go < $ro && $ro < $bo) {
         $self->{'COLOR_ORDER'} = GRB;
@@ -1441,8 +1424,6 @@ sub _color_order {
     } elsif ($ro < $bo && $bo < $go) {
         $self->{'COLOR_ORDER'} = RBG;
     } else {
-
-        # UNKNOWN - default to RGB
         $self->{'COLOR_ORDER'} = RGB;
     }
 } ## end sub _color_order
@@ -1466,7 +1447,7 @@ Sets the TTY into text mode, where text can interfere with the display
 sub text_mode {
     my $self = shift;
     c_text_mode($self->{'this_tty'}) if ($self->acceleration());
-} ## end sub text_mode
+}
 
 =head2 graphics_mode
 
@@ -1477,7 +1458,7 @@ Sets the TTY in exclusive graphics mode, where text and cursor cannot interfere 
 sub graphics_mode {
     my $self = shift;
     c_graphics_mode($self->{'this_tty'}) if ($self->acceleration());
-} ## end sub graphics_mode
+}
 
 =head2 screen_dimensions
 
@@ -1551,6 +1532,7 @@ This is automatically displayed when this module is initialized, and the variabl
  $fb->splash();
 
 =back
+
 =cut
 
 =head2 get_font_list
@@ -1669,6 +1651,7 @@ Sets or returns the drawing mode, depending on how it is called.
                                    # useful, but here for completeness)
 
 =back
+
 =cut
 
 sub draw_mode {
@@ -1698,7 +1681,7 @@ This is an alias to draw_mode(NORMAL_MODE)
 sub normal_mode {
     my $self = shift;
     $self->draw_mode(NORMAL_MODE);
-} ## end sub normal_mode
+}
 
 =head2 xor_mode
 
@@ -1715,7 +1698,7 @@ This is an alias to draw_mode(XOR_MODE)
 sub xor_mode {
     my $self = shift;
     $self->draw_mode(XOR_MODE);
-} ## end sub xor_mode
+}
 
 =head2 or_mode
 
@@ -1732,7 +1715,7 @@ This is an alias to draw_mode(OR_MODE)
 sub or_mode {
     my $self = shift;
     $self->draw_mode(OR_MODE);
-} ## end sub or_mode
+}
 
 =head2 alpha_mode
 
@@ -1749,7 +1732,7 @@ This is an alias to draw_mode(ALPHA_MODE)
 sub alpha_mode {
     my $self = shift;
     $self->draw_mode(ALPHA_MODE);
-} ## end sub alpha_mode
+}
 
 =head2 and_mode
 
@@ -1766,7 +1749,7 @@ This is an alias to draw_mode(AND_MODE)
 sub and_mode {
     my $self = shift;
     $self->draw_mode(AND_MODE);
-} ## end sub and_mode
+}
 
 =head2 mask_mode
 
@@ -1783,7 +1766,7 @@ This is an alias to draw_mode(MASK_MODE)
 sub mask_mode {
     my $self = shift;
     $self->draw_mode(MASK_MODE);    # 16 bit mode may have issues with this
-} ## end sub mask_mode
+}
 
 =head2 unmask_mode
 
@@ -1800,7 +1783,7 @@ This is an alias to draw_mode(UNMASK_MODE)
 sub unmask_mode {
     my $self = shift;
     $self->draw_mode(UNMASK_MODE);
-} ## end sub unmask_mode
+}
 
 =head2 add_mode
 
@@ -1817,7 +1800,7 @@ This is an alias to draw_mode(ADD_MODE)
 sub add_mode {
     my $self = shift;
     $self->draw_mode(ADD_MODE);
-} ## end sub add_mode
+}
 
 =head2 subtract_mode
 
@@ -1834,7 +1817,7 @@ This is an alias to draw_mode(SUBTRACT_MODE)
 sub subtract_mode {
     my $self = shift;
     $self->draw_mode(SUBTRACT_MODE);
-} ## end sub subtract_mode
+}
 
 =head2 multiply_mode
 
@@ -1851,7 +1834,7 @@ This is an alias to draw_mode(MULTIPLY_MODE)
 sub multiply_mode {    # I see no use for this, but it's here for use
     my $self = shift;
     $self->draw_mode(MULTIPLY_MODE);
-} ## end sub multiply_mode
+}
 
 =head2 divide_mode
 
@@ -1868,7 +1851,7 @@ This is an alias to draw_mode(DIVIDE_MODE)
 sub divide_mode {    # I see no use for this, but it's here for use
     my $self = shift;
     $self->draw_mode(DIVIDE_MODE);
-} ## end sub divide_mode
+}
 
 =head2 clear_screen
 
@@ -1887,6 +1870,7 @@ You can add an optional parameter to turn the console cursor on or off too.
 =cut
 
 sub clear_screen {
+
     # Fills the entire screen with the background color fast #
     my ($self, $cursor) = @_;
     $cursor ||= '';
@@ -1919,7 +1903,7 @@ This is an alias to 'clear_screen'
 sub cls {
     my $self = shift;
     $self->clear_screen(@_);
-} ## end sub cls
+}
 
 =head2 attribute_reset
 
@@ -1980,11 +1964,13 @@ sub plot {
 
         # Only plot if the pixel is within the clipping region
         unless (($x > $xx_clip) || ($y > $yy_clip) || ($x < $x_clip) || ($y < $y_clip)) {
+
             # The 'history' is a 'draw_arc' optimization and beautifier for xor mode.  It only draws pixels not in
             # the history buffer.
             unless (exists($self->{'history'}) && defined($self->{'history'}->{$y}->{$x})) {
                 $index = ($self->{'BYTES_PER_LINE'} * ($y + $self->{'YOFFSET'})) + (($self->{'XOFFSET'} + $x) * $bytes);
                 if ($index >= 0 && $index <= ($self->{'fscreeninfo'}->{'smem_len'} - $bytes)) {
+
                     # Assumes the following lexicals are already computed above:
                     #   my ($x, $y, $index, $color_alpha, $color_alpha_int);
                     # And raw color bytes:
@@ -2004,6 +1990,7 @@ sub plot {
                     if ($draw_mode == NORMAL_MODE) {
                         substr($$screenref, $index, $bytes) = $raw_foreground_color;
                     } else {
+
                         # Read the current pixel once and reuse
                         my $cur = substr($$screenref, $index, $bytes) || chr(0) x $bytes;
                         my $c;
@@ -2016,6 +2003,7 @@ sub plot {
                             $c = ($cur & $raw_foreground_color);
                         } elsif ($draw_mode == MASK_MODE) {
                             if ($bits == 32) {
+
                                 # Compare RGB only
                                 my $fg3 = substr($raw_foreground_color, 0, 3);
                                 my $bg3 = substr($raw_background_color, 0, 3);
@@ -2032,6 +2020,7 @@ sub plot {
                                 $c = $raw_foreground_color if ($cur eq $raw_background_color);
                             }
                         } elsif ($draw_mode == ALPHA_MODE) {
+
                             # Prefer integer math for speed and to avoid float overhead
                             # color_alpha_int should be 0..255 (if you currently have 0..1, convert once: my $color_alpha_int = int(255 * $color_alpha + 0.5);)
                             my $A    = defined $color_alpha_int ? $color_alpha_int : int(255 * $color_alpha + 0.5);
@@ -2053,6 +2042,7 @@ sub plot {
                                 my $b = (($b2 * $A) + ($b1 * $invA)) >> 8;
                                 $c = pack('C3', $r, $g, $b);
                             } else {
+
                                 # 16-bit RGB565 path (optional): do channel-wise integer blend
                                 # Example skeleton using 5/6-bit channels; you can replace with existing helpers:
                                 my $p1 = unpack('v', $cur);
@@ -2096,6 +2086,7 @@ sub plot {
                                 $b = 255 if $b > 255;
                                 $c = pack('C3', $r, $g, $b);
                             } else {
+
                                 # 16-bit RGB565 add (saturate)
                                 my $p1 = unpack('v', $cur);
                                 my $p2 = unpack('v', $raw_foreground_color);
@@ -2156,6 +2147,7 @@ sub plot {
                                 $c = pack('v', $p);
                             } ## end else [ if ($bytes == 4) ]
                         } elsif ($draw_mode == MULTIPLY_MODE) {
+
                             # Per-channel multiply scaled back to 0..255
                             if ($bytes == 4) {
                                 my ($r1, $g1, $b1, $a1) = unpack('C4', $cur);
@@ -2173,6 +2165,7 @@ sub plot {
                                 my $b = ($b1 * $b2) >> 8;
                                 $c = pack('C3', $r, $g, $b);
                             } else {
+
                                 # 16-bit approximate multiply: expand to 8-bit, multiply, compress back
                                 my $p1 = unpack('v', $cur);
                                 my $p2 = unpack('v', $raw_foreground_color);
@@ -2239,6 +2232,7 @@ sub plot {
                                 $c = pack('v', $p);
                             } ## end else [ if ($bytes == 4) ]
                         } ## end elsif ($draw_mode == DIVIDE_MODE)
+
                         # If no branch set $c (e.g., MASK condition not met), keep current pixel
                         substr($$screenref, $index, $bytes) = defined $c ? $c : $cur;
                     } ## end else [ if ($draw_mode == NORMAL_MODE)]
@@ -2260,7 +2254,7 @@ An alias to plot.
 sub setpixel {
     my $self = shift;
     $self->plot(shift);
-} ## end sub setpixel
+}
 
 =head2 set_pixel
 
@@ -2271,7 +2265,7 @@ An alias to plot.
 sub set_pixel {
     my $self = shift;
     $self->plot(shift);
-} ## end sub set_pixel
+}
 
 =head2 pixel
 
@@ -2293,6 +2287,7 @@ $pixel is a hash reference in the form:
  }
 
 =back
+
 =cut
 
 sub pixel {
@@ -2368,7 +2363,7 @@ Alias for 'pixel'.
 sub getpixel {
     my $self = shift;
     return ($self->pixel(shift));
-} ## end sub getpixel
+}
 
 =head2 get_pixel
 
@@ -2379,7 +2374,7 @@ Alias for 'pixel'.
 sub get_pixel {
     my $self = shift;
     return ($self->pixel(shift));
-} ## end sub get_pixel
+}
 
 =head2 last_plot
 
@@ -2657,6 +2652,7 @@ sub drawto {
 } ## end sub drawto
 
 sub _flush_screen {
+
     # Since the framebuffer is mappeed as a string device, Perl buffers the output, and this must be flushed.
     my $self = shift;
 
@@ -2669,6 +2665,7 @@ sub _flush_screen {
 } ## end sub _flush_screen
 
 sub _adj_plot {
+
     # Part of antialiased drawing
     my ($self, $x, $y, $c, $s) = @_;
 
@@ -2792,7 +2789,7 @@ DISCONTINUED, use 'bezier' instead (now just an alias to 'bezier')
 sub cubic_bezier {    # obsolete
     my $self = shift;
     $self->bezier(shift);
-} ## end sub cubic_bezier
+}
 
 =head2 draw_arc
 
@@ -2843,6 +2840,7 @@ Draws an arc/pie/poly arc of a circle at point x,y.
 =cut
 
 sub draw_arc {
+
     # This isn't exactly the fastest routine out there, hence the "granularity" parameter, but it is pretty neat.  Drawing lines between points smooths and compensates for high granularity settings.
     my ($self, $params) = @_;
 
@@ -3271,6 +3269,7 @@ Draw an ellipse at center position x,y with XRadius, YRadius.  Either a filled e
 =cut
 
 sub ellipse {
+
     # The routine even works properly for XOR mode when filled ellipses are drawn as well.  This was solved by drawing only if the X or Y position changed.
     my ($self, $params) = @_;
 
@@ -3509,7 +3508,7 @@ Draws a circle at point x,y, with radius 'radius'.  It can be an outline, solid 
 
 =cut
 
-    # This also doubles as the rounded box routine.
+# This also doubles as the rounded box routine.
 
 sub circle {
     my ($self, $params) = @_;
@@ -3628,6 +3627,7 @@ sub circle {
                     $self->blit_write($params);
                 }
             } elsif ($gradient) {
+
                 # Top
                 if ($ymy != $lymy && $ymy != $lymx && $ymy != $lypx && $ymy != $lypy) {
                     $self->set_color({ 'red' => $rc[$ymy_i], 'green' => $gc[$ymy_i], 'blue' => $bc[$ymy_i] });
@@ -3652,6 +3652,7 @@ sub circle {
                     $self->line($params);
                 }
             } else {
+
                 # Top
                 if ($ymy != $lymy && $ymy != $lymx && $ymy != $lypx && $ymy != $lypy) {
                     ($params->{'x'}, $params->{'y'}, $params->{'xx'}, $params->{'yy'}) = ($xmx, $ymy, $xpx, $ymy);
@@ -3677,6 +3678,7 @@ sub circle {
             $lypy = $ypy;
             $lypx = $ypx;
         } else {
+
             # Top left
             ($params->{'x'}, $params->{'y'}) = ($xmx, $ymy);
             $self->plot($params);
@@ -3735,6 +3737,7 @@ sub circle {
                 $self->box({ 'x' => $_x, 'y' => $y0, 'xx' => $_xx, 'yy' => $y1, 'filled' => 1 });
             }
         } else {
+
             # top
             $self->line({ 'x' => $x0, 'y' => $_y, 'xx' => $x1, 'yy' => $_y });
 
@@ -3827,6 +3830,7 @@ sub polygon {
 } ## end sub polygon
 
 sub _point_in_polygon {
+
     # Does point x,y fall inside the polygon described in coordinates?  Not yet used.
     my ($self, $params) = @_;
 
@@ -4267,7 +4271,7 @@ This is an alias to rbox
 sub rounded_box {
     my $self = shift;
     $self->rbox(shift);
-} ## end sub rounded_box
+}
 
 =head2 set_color
 
@@ -4285,6 +4289,7 @@ Even if you are in 16 bit color mode, use 8 bit values.  They will be automatica
  });
 
 =back
+
 =cut
 
 sub set_color {
@@ -4353,7 +4358,7 @@ This is an alias to 'set_color'
 sub setcolor {
     my $self = shift;
     $self->set_color(shift);
-} ## end sub setcolor
+}
 
 =head2 set_foreground_color
 
@@ -4364,7 +4369,7 @@ This is an alias to 'set_color'
 sub set_foreground_color {
     my $self = shift;
     $self->set_color(shift);
-} ## end sub set_foreground_color
+}
 
 =head2 set_b_color
 
@@ -4382,12 +4387,13 @@ The same rules as set_color apply.
  });
 
 =back
+
 =cut
 
 sub set_b_color {
     my $self = shift;
     $self->set_color(shift, 'RAW_BACKGROUND_COLOR');
-} ## end sub set_b_color
+}
 
 =head2 setbcolor
 
@@ -4398,7 +4404,7 @@ This is an alias to 'set_b_color'
 sub setbcolor {
     my $self = shift;
     $self->set_color(shift, 'RAW_BACKGROUND_COLOR');
-} ## end sub setbcolor
+}
 
 =head2 set_background_color
 
@@ -4409,7 +4415,7 @@ This is an alias to 'set_b_color'
 sub set_background_color {
     my $self = shift;
     $self->set_color(shift, 'RAW_BACKGROUND_COLOR');
-} ## end sub set_background_color
+}
 
 =head2 fill
 
@@ -4448,6 +4454,7 @@ sub fill {
 
     return if ($back eq $self->{'RAW_FOREGROUND_COLOR'});
     unless ($self->{'ACCELERATED'}) {
+
         # This doesn't over-use the system stack.  While flood fill algorithms are famous being a stack memory hog, this one goes easy on it.
         # Optimized: avoid repeated shift() (O(n)), reduce method-call overhead by
         # caching small helpers, and use a queue with head index.
@@ -4660,7 +4667,7 @@ sub replace_color {
     my ($old, $new);
     unless (exists($params->{'old'}->{'raw'}) && exists($params->{'new'}->{'raw'})) {
         if ($self->{'BITS'} == 32) {
-            if ($color_order == BGR) {
+            if ($color_order == BGR) {    # Most modern cards are BGR so this is first for speed
                 $old = (defined($old_a)) ? chr($old_b) . chr($old_g) . chr($old_r) . chr($old_a) : chr($old_b) . chr($old_g) . chr($old_r);
                 $new = chr($new_b) . chr($new_g) . chr($new_r) . chr($new_a);
             } elsif ($color_order == BRG) {
@@ -4761,7 +4768,7 @@ sub blit_copy {
     my ($self, $params) = @_;
 
     $self->blit_write({ %{ $self->blit_read({ 'x' => int($params->{'x'}), 'y' => int($params->{'y'}), 'width' => int($params->{'width'}), 'height' => int($params->{'height'}) }) }, 'x' => int($params->{'x_dest'}), 'y' => int($params->{'y_dest'}) });
-} ## end sub blit_copy
+}
 
 =head2 blit_move
 
@@ -4907,7 +4914,7 @@ This is an alias to "acceleration(PERL)"
 sub perl {
     my $self = shift;
     $self->acceleration(PERL);
-} ## end sub perl
+}
 
 =head2 software
 
@@ -4918,7 +4925,7 @@ This is an alias to "acceleration(SOFTWARE)"
 sub software {
     my $self = shift;
     $self->acceleration(SOFTWARE);
-} ## end sub software
+}
 
 =head2 hardware
 
@@ -4929,7 +4936,7 @@ This is an alias to "acceleration(HARDWARE)"
 sub hardware {
     my $self = shift;
     $self->acceleration(HARDWARE);
-} ## end sub hardware
+}
 
 =head2 blit_read
 
@@ -5172,6 +5179,7 @@ sub blit_write {
 } ## end sub blit_write
 
 sub _blit_adjust_for_clipping {
+
     # Chops up the blit image to stay within the clipping (and screen) boundaries
     # This prevents nasty crashes
     my ($self, $pparams) = @_;
@@ -5601,9 +5609,11 @@ Turns off clipping, and resets the clipping values to the full size of the scree
  $fb->clip_reset();
 
 =back
+
 =cut
 
 sub clip_reset {
+
     # Clipping is not really turned off.  It's just set to the screen borders.  To turn off clipping for real is asking for crashes.
     my $self = shift;
 
@@ -5626,7 +5636,7 @@ This is an alias to 'clip_reset'
 sub clip_off {
     my $self = shift;
     $self->clip_reset();
-} ## end sub clip_off
+}
 
 =head2 clip_set
 
@@ -5642,6 +5652,7 @@ Sets the clipping rectangle starting at the top left point x,y and ending at bot
  });
 
 =back
+
 =cut
 
 sub clip_set {
@@ -5675,6 +5686,7 @@ Sets the clipping rectangle to point x,y,width,height
  });
 
 =back
+
 =cut
 
 sub clip_rset {
@@ -7005,7 +7017,7 @@ sub RGB565_to_RGB888 {
         ($r, $g, $b) = ($g, $r, $b);
     } elsif ($color_order == GBR) {
         ($r, $g, $b) = ($g, $b, $r);
-    } # No changes needed for RGB
+    }    # No changes needed for RGB
     $color = pack('CCC', $r, $g, $b);
     return ({ 'color' => $color });
 } ## end sub RGB565_to_RGB888
@@ -7244,7 +7256,7 @@ Waits for the vertical blank before returning
 sub vsync {
     my $self = shift;
     _set_ioctl(FBIO_WAITFORVSYNC, 'I', $self->{'FB'}, 0);
-} ## end sub vsync
+}
 
 =head2 which_console
 

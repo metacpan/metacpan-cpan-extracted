@@ -6,7 +6,7 @@
       "Hayo Baan <info@hayobaan.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -89,7 +89,7 @@
    "provides" : {
       "utf8::all" : {
          "file" : "lib/utf8/all.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       }
    },
    "release_status" : "stable",
@@ -104,9 +104,9 @@
          "web" : "https://github.com/doherty/utf8-all"
       }
    },
-   "version" : "0.025",
+   "version" : "0.026",
    "x_generated_by_perl" : "v5.42.0",
-   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

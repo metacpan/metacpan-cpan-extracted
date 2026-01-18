@@ -37,63 +37,63 @@
   "provides": {
     "Map::Tube::Sydney": {
       "file": "lib/Map/Tube/Sydney.pm",
-      "version": "1.00"
+      "version": "1.01"
     },
     "Map::Tube::Sydney::Line::L1": {
       "file": "lib/Map/Tube/Sydney/Line/L1.pm",
-      "version": "1.00"
+      "version": "1.01"
     },
     "Map::Tube::Sydney::Line::L2": {
       "file": "lib/Map/Tube/Sydney/Line/L2.pm",
-      "version": "1.00"
+      "version": "1.01"
     },
     "Map::Tube::Sydney::Line::L3": {
       "file": "lib/Map/Tube/Sydney/Line/L3.pm",
-      "version": "1.00"
+      "version": "1.01"
     },
     "Map::Tube::Sydney::Line::L4": {
       "file": "lib/Map/Tube/Sydney/Line/L4.pm",
-      "version": "1.00"
+      "version": "1.01"
     },
     "Map::Tube::Sydney::Line::M1": {
       "file": "lib/Map/Tube/Sydney/Line/M1.pm",
-      "version": "1.00"
+      "version": "1.01"
     },
     "Map::Tube::Sydney::Line::T1": {
       "file": "lib/Map/Tube/Sydney/Line/T1.pm",
-      "version": "1.00"
+      "version": "1.01"
     },
     "Map::Tube::Sydney::Line::T2": {
       "file": "lib/Map/Tube/Sydney/Line/T2.pm",
-      "version": "1.00"
+      "version": "1.01"
     },
     "Map::Tube::Sydney::Line::T3": {
       "file": "lib/Map/Tube/Sydney/Line/T3.pm",
-      "version": "1.00"
+      "version": "1.01"
     },
     "Map::Tube::Sydney::Line::T4": {
       "file": "lib/Map/Tube/Sydney/Line/T4.pm",
-      "version": "1.00"
+      "version": "1.01"
     },
     "Map::Tube::Sydney::Line::T5": {
       "file": "lib/Map/Tube/Sydney/Line/T5.pm",
-      "version": "1.00"
+      "version": "1.01"
     },
     "Map::Tube::Sydney::Line::T6": {
       "file": "lib/Map/Tube/Sydney/Line/T6.pm",
-      "version": "1.00"
+      "version": "1.01"
     },
     "Map::Tube::Sydney::Line::T7": {
       "file": "lib/Map/Tube/Sydney/Line/T7.pm",
-      "version": "1.00"
+      "version": "1.01"
     },
     "Map::Tube::Sydney::Line::T8": {
       "file": "lib/Map/Tube/Sydney/Line/T8.pm",
-      "version": "1.00"
+      "version": "1.01"
     },
     "Map::Tube::Sydney::Line::T9": {
       "file": "lib/Map/Tube/Sydney/Line/T9.pm",
-      "version": "1.00"
+      "version": "1.01"
     }
   },
   "release_status": "stable",
@@ -104,6 +104,6 @@
       "web": "https://github.com/earlybean4/Map-Tube-Sydney"
     }
   },
-  "version": "1.00",
+  "version": "1.01",
   "x_serialization_backend": "JSON::PP version 4.16"
 }

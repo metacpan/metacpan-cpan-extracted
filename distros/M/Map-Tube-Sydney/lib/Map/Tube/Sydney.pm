@@ -1,6 +1,6 @@
 package Map::Tube::Sydney;
 
-$Map::Tube::Sydney::VERSION   = '1.00';
+$Map::Tube::Sydney::VERSION   = '1.01';
 $Map::Tube::Sydney::AUTHORITY = 'cpan:EARLYBEAN';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Sydney - Interface to the Sydney Rail Network.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -106,7 +106,7 @@ given nodes. It covers the following rail lines:
 
 =head1 CONSTRUCTOR
 
-The constructor DOES NOT expects parameters.This setup the default node definitions.
+The constructor DOES NOT expect parameters. This sets up the default node definitions.
 
     use strict; use warnings;
     use Map::Tube::Sydney;

@@ -1,3 +1,14 @@
+version 0.014; 2026-01-17
+
+  * Corrected errors made in version 0.012 transition from using Build.PL to
+    Makefile.PL.  Tim Legge reported that XS code was not being processed into
+    C code.  As side effect, build-time warnings and errors that had been
+    observed over the years in CPANtesters reports were not being observed.
+    Within directory tree Easy.xs was moved to a more typical location (for
+    MakeMaker) on the top level, after which build-time errors were fixed with
+    approaches borrowed from other CPAN distributions.  Both XS-based and
+    pure-Perl compilations should now work.  No other change in functionality.
+
 version 0.013; 2026-01-16
 
   * No change in functionality

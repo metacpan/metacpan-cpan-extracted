@@ -428,6 +428,8 @@ sub _apply_trimstr {
         return $value;
     }
 
+    return $value if !_is_string_scalar($value);
+
     $needle = '' unless defined $needle;
     my $target = "$value";
     my $pattern = "$needle";

@@ -1,5 +1,5 @@
 This archive contains the distribution IO-Async-Loop-Uring,
-version 0.003:
+version 0.004:
 
   Use IO::Async with IO::Uring
 

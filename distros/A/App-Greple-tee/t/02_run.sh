@@ -11,3 +11,4 @@ greple -Mtee cat -n -- '^(.+\n)+' t/SAMPLE.txt --all --fillup
 greple -Mtee cat -n -- '^(.+\n)+' t/SAMPLE.txt --all --fillup --discrete
 greple -Mtee cat -n -- '^(.+\n)+' t/SAMPLE.txt --all --fillup --discrete --bulkmode
 greple -Mtee perl -CSAD -E 'print sort <>' -- '^(.+\n)+' t/SAMPLE.txt --all --crmode
+greple -Mtee '&ansifold' -w 20 -- '^([A-Z].*\n)(.+\n)*' t/SAMPLE.txt --all --discrete

@@ -4,6 +4,7 @@ author:
   - 'Sergio Iglesias <sergioxz@cpan.org>'
 build_requires:
   Test::Exception: '0'
+  Test::MockModule: '0'
   Test::MockObject: '0'
   Test::More: '0'
 configure_requires:
@@ -18,7 +19,7 @@ name: DBIx-Quick
 provides:
   DBIx::Quick:
     file: lib/DBIx/Quick.pm
-    version: '0.8'
+    version: '0.9'
   DBIx::Quick::Converter:
     file: lib/DBIx/Quick/Converter.pm
   DBIx::Quick::Role:
@@ -31,5 +32,5 @@ requires:
 resources:
   bugtracker: https://github.com/sergiotarxz/Perl-DBIx-Quick/issues
   repository: https://github.com/sergiotarxz/Perl-DBIx-Quick
-version: '0.8'
+version: '0.9'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

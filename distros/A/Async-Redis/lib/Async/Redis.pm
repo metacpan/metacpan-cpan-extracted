@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.018;
 
-our $VERSION = '0.001001';
+our $VERSION = '0.001002';
 
 use Future;
 use Future::AsyncAwait;
@@ -105,7 +105,11 @@ sub new {
         blocking_timeout_buffer => $args{blocking_timeout_buffer} // 2,
 
         # Inflight tracking with deadlines
+        # Entry: { future => $f, cmd => $cmd, args => \@args, deadline => $t, sent_at => $t }
         inflight => [],
+
+        # Response reader synchronization
+        _reading_responses => 0,
 
         # Reconnection settings
         reconnect           => $args{reconnect} // 0,
@@ -254,6 +258,7 @@ async sub connect {
     $self->{parser} = _parser_class()->new(api => 1);
     $self->{connected} = 1;
     $self->{inflight} = [];
+    $self->{_reading_responses} = 0;
     $self->{_pid} = $$;  # Track PID for fork safety
 
     # Run Redis protocol handshake (AUTH, SELECT, CLIENT SETNAME)
@@ -361,6 +366,7 @@ sub disconnect {
     }
     $self->{connected} = 0;
     $self->{parser} = undef;
+    $self->{_reading_responses} = 0;
 
     if ($was_connected && $self->{on_disconnect}) {
         $self->{on_disconnect}->($self, $reason);
@@ -434,7 +440,8 @@ sub _check_fork {
         $self->{socket} = undef;
         $self->{parser} = undef;
         $self->{inflight} = [];
-
+        $self->{_reading_responses} = 0;
+    
         my $old_pid = $self->{_pid};
         $self->{_pid} = $$;
 
@@ -467,6 +474,90 @@ async sub _send {
     my ($self, $data) = @_;
     await Future::IO->write_exactly($self->{socket}, $data);
     return length($data);
+}
+
+# Add command to inflight queue - returns queue depth
+sub _add_inflight {
+    my ($self, $future, $cmd, $args, $deadline) = @_;
+    push @{$self->{inflight}}, {
+        future   => $future,
+        cmd      => $cmd,
+        args     => $args,
+        deadline => $deadline,
+        sent_at  => Time::HiRes::time(),
+    };
+    return scalar @{$self->{inflight}};
+}
+
+# Shift first entry from inflight queue
+sub _shift_inflight {
+    my ($self) = @_;
+    return shift @{$self->{inflight}};
+}
+
+# Fail all pending inflight futures with given error
+sub _fail_all_inflight {
+    my ($self, $error) = @_;
+    while (my $entry = $self->_shift_inflight) {
+        if ($entry->{future} && !$entry->{future}->is_ready) {
+            $entry->{future}->fail($error);
+        }
+    }
+}
+
+# Ensure response reader is running - the core response queue mechanism
+# Only one reader should be active at a time, processing responses in FIFO order
+async sub _ensure_response_reader {
+    my ($self) = @_;
+
+    # Already reading - don't start another reader
+    return if $self->{_reading_responses};
+
+    $self->{_reading_responses} = 1;
+
+    while (@{$self->{inflight}} && $self->{connected}) {
+        my $entry = $self->{inflight}[0];
+
+        # Read response with deadline from the entry
+        my $response;
+        my $read_ok = eval {
+            $response = await $self->_read_response_with_deadline(
+                $entry->{deadline},
+                $entry->{args}
+            );
+            1;
+        };
+
+        if (!$read_ok) {
+            my $read_error = $@;
+            # Connection/timeout error - fail all inflight and abort
+            $self->_fail_all_inflight($read_error);
+            $self->{_reading_responses} = 0;
+            return;
+        }
+
+        # Remove this entry from the queue now that we have its response
+        $self->_shift_inflight;
+
+        # Decode response (sync operation, eval works fine here)
+        my $result;
+        my $decode_ok = eval {
+            $result = $self->_decode_response($response);
+            1;
+        };
+
+        # Complete the future
+        if (!$decode_ok) {
+            my $decode_error = $@;
+            # Redis error (like WRONGTYPE) - fail just this future
+            $entry->{future}->fail($decode_error) unless $entry->{future}->is_ready;
+        } else {
+            # Success - complete the future with result
+            $entry->{future}->done($result) unless $entry->{future}->is_ready;
+        }
+    }
+
+    $self->{_reading_responses} = 0;
 }
 
 # Read and parse one response
@@ -704,18 +795,39 @@ async sub command {
     # Calculate deadline based on command type
     my $deadline = $self->_calculate_deadline($cmd, @args);
 
+    # Create response future and register in inflight queue BEFORE sending
+    # This ensures responses are matched in order
+    my $response_future = Future->new;
+    $self->_add_inflight($response_future, $cmd, \@args, $deadline);
+
     my $result;
     my $error;
 
-    eval {
+    my $send_ok = eval {
         # Send command
         await $self->_send($raw_cmd);
-
-        # Read response with timeout
-        my $response = await $self->_read_response_with_deadline($deadline, \@args);
-        $result = $self->_decode_response($response);
+        1;
     };
-    $error = $@;
+
+    if (!$send_ok) {
+        $error = $@;
+        # Send failed - remove from inflight and fail
+        $self->_shift_inflight;  # Remove the entry we just added
+        $response_future->fail($error) unless $response_future->is_ready;
+    } else {
+        # Trigger the response reader (fire and forget - it runs in background)
+        $self->_ensure_response_reader->retain;
+
+        # Wait for our response future to be completed by the reader
+        my $await_ok = eval {
+            $result = await $response_future;
+            1;
+        };
+
+        if (!$await_ok) {
+            $error = $@;
+        }
+    }
 
     # Telemetry: log result and end span
     if ($self->{_telemetry}) {
@@ -824,6 +936,7 @@ sub _reset_connection {
 
     $self->{connected} = 0;
     $self->{parser} = undef;
+    $self->{_reading_responses} = 0;
 
     if ($was_connected && $self->{on_disconnect}) {
         $self->{on_disconnect}->($self, $reason);
@@ -1219,6 +1332,24 @@ async sub watch_multi {
 # PUB/SUB
 # ============================================================================
 
+# Wait for inflight commands to complete before mode change
+async sub _wait_for_inflight_drain {
+    my ($self, $timeout) = @_;
+    $timeout //= 30;
+
+    return unless @{$self->{inflight}};
+
+    my $deadline = Time::HiRes::time() + $timeout;
+
+    while (@{$self->{inflight}} && Time::HiRes::time() < $deadline) {
+        await Future::IO->sleep(0.001);
+    }
+
+    if (@{$self->{inflight}}) {
+        $self->_fail_all_inflight("Timeout waiting for inflight commands");
+    }
+}
+
 async sub publish {
     my ($self, $channel, $message) = @_;
     return await $self->command('PUBLISH', $channel, $message);
@@ -1236,6 +1367,9 @@ async sub subscribe {
     die Async::Redis::Error::Disconnected->new(
         message => "Not connected",
     ) unless $self->{connected};
+
+    # Wait for pending commands before entering PubSub mode
+    await $self->_wait_for_inflight_drain;
 
     # Create or reuse subscription
     my $sub = $self->{_subscription} //= Async::Redis::Subscription->new(redis => $self);
@@ -1263,6 +1397,9 @@ async sub psubscribe {
         message => "Not connected",
     ) unless $self->{connected};
 
+    # Wait for pending commands before entering PubSub mode
+    await $self->_wait_for_inflight_drain;
+
     my $sub = $self->{_subscription} //= Async::Redis::Subscription->new(redis => $self);
 
     await $self->_send_command('PSUBSCRIBE', @patterns);
@@ -1284,6 +1421,9 @@ async sub ssubscribe {
     die Async::Redis::Error::Disconnected->new(
         message => "Not connected",
     ) unless $self->{connected};
+
+    # Wait for pending commands before entering PubSub mode
+    await $self->_wait_for_inflight_drain;
 
     my $sub = $self->{_subscription} //= Async::Redis::Subscription->new(redis => $self);
 
@@ -1346,32 +1486,51 @@ async sub _execute_pipeline {
 
     return [] unless @$commands;
 
+    # Wait for any inflight regular commands to complete before pipeline
+    # This prevents interleaving pipeline responses with regular command responses
+    await $self->_wait_for_inflight_drain;
+
+    # Take over reading - prevent response reader from running
+    $self->{_reading_responses} = 1;
+
     my $start_time = Time::HiRes::time();
-
-    # Send all commands
-    my $data = '';
-    for my $cmd (@$commands) {
-        $data .= $self->_build_command(@$cmd);
-    }
-    await $self->_send($data);
-
-    # Read all responses, capturing per-slot Redis errors
     my @responses;
     my $count = scalar @$commands;
-    for my $i (1 .. $count) {
-        my $msg = await $self->_read_response();
 
-        # Capture Redis errors inline rather than dying
-        my $result;
-        eval {
-            $result = $self->_decode_response($msg);
-        };
-        if ($@) {
-            # Capture the error as a string in the results
-            $result = $@;
-            chomp $result if defined $result;
+    my $ok = eval {
+        # Send all commands
+        my $data = '';
+        for my $cmd (@$commands) {
+            $data .= $self->_build_command(@$cmd);
         }
-        push @responses, $result;
+        await $self->_send($data);
+
+        # Read all responses, capturing per-slot Redis errors
+        for my $i (1 .. $count) {
+            my $msg = await $self->_read_response();
+
+            # Capture Redis errors inline rather than dying
+            my $result;
+            eval {
+                $result = $self->_decode_response($msg);
+            };
+            if ($@) {
+                # Capture the error as a string in the results
+                $result = $@;
+                chomp $result if defined $result;
+            }
+            push @responses, $result;
+        }
+        1;
+    };
+
+    my $error = $@;
+
+    # Release reading lock
+    $self->{_reading_responses} = 0;
+
+    if (!$ok) {
+        die $error;
     }
 
     # Telemetry: record pipeline metrics
@@ -1464,6 +1623,41 @@ Key features:
 =item * Fork-safe for pre-fork servers (Starman, etc.)
 
 =item * Full RESP2 protocol support
+
+=item * Safe concurrent commands on single connection
+
+=back
+
+=head1 CONCURRENT COMMANDS
+
+Async::Redis safely handles multiple concurrent commands on a single
+connection using a response queue pattern. When you fire multiple async
+commands without explicitly awaiting them:
+
+    my @futures = (
+        $redis->set('k1', 'v1'),
+        $redis->set('k2', 'v2'),
+        $redis->get('k1'),
+    );
+    my @results = await Future->needs_all(@futures);
+
+Each command is registered in an inflight queue before being sent to Redis.
+A single reader coroutine processes responses in FIFO order, matching each
+response to the correct waiting future. This prevents response mismatch bugs
+that can occur when multiple coroutines race to read from the socket.
+
+For high-throughput scenarios, consider using:
+
+=over 4
+
+=item * B<Explicit pipelines> - C<< $redis->pipeline >> batches commands
+for a single network round-trip
+
+=item * B<Auto-pipeline> - C<< auto_pipeline => 1 >> automatically batches
+commands within an event loop tick
+
+=item * B<Connection pools> - L<Async::Redis::Pool> for parallel execution
+across multiple connections
 
 =back
 

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Adapted version of the Git::NextVersion plugin to allow influencing version bumping.
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 #pod =head1 DESCRIPTION
 #pod
@@ -171,7 +171,7 @@ Dist::Zilla::Plugin::Author::HAYOBAAN::NextVersion - Adapted version of the Git:
 
 =head1 VERSION
 
-version 0.014
+version 0.016
 
 =head1 DESCRIPTION
 

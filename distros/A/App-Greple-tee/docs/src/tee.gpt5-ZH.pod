@@ -10,7 +10,7 @@ App::Greple::tee - 用外部命令结果替换匹配文本的模块
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 DESCRIPTION
 
@@ -79,6 +79,56 @@ L<teip(1)> 的 B<--offload> 选项在不同的模块 L<App::Greple::L>（B<-ML>�
 这在与 shell 别名或模块文件结合时很有用。
 
 可用的参数有：B<discrete>、B<bulkmode>、B<crmode>、B<fillup>、B<squeeze>、B<blocks>。
+
+=head1 FUNCTION CALL
+
+您可以通过在命令名前加上 C<&> 来调用 Perl 函数，而不是外部命令。
+
+    greple -Mtee '&App::ansifold::ansifold' -w40 -- ...
+
+该函数在派生的子进程中执行，因此必须遵循以下要求：
+
+=over 4
+
+=item *
+
+从 B<STDIN> 读取匹配的文本
+
+=item *
+
+将转换后的结果打印到 B<STDOUT>
+
+=item *
+
+参数通过 C<@ARGV> 和 C<@_> 同时传递
+
+=back
+
+可以使用任何完全限定的函数名：
+
+    greple -Mtee '&Your::Module::function' -- ...
+
+如果模块尚未加载，将自动加载。
+
+为方便起见，提供以下简短别名：
+
+=over 4
+
+=item B<&ansicolumn>
+
+调用 C<App::ansicolumn::ansicolumn>。
+
+=item B<&ansifold>
+
+调用 C<App::ansifold::ansifold>。
+
+=item B<&cat-v>
+
+调用 C<App::cat::v-E<gt>new-E<gt>run(@_)>。
+
+=back
+
+使用函数调用可避免每次调用都为外部进程派生所带来的开销，当与 B<--discrete> 选项一起使用时，可显著提升性能。
 
 =head1 LEGACIES
 

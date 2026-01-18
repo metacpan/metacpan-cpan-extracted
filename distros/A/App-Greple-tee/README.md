@@ -9,7 +9,7 @@ App::Greple::tee - module to replace matched text by the external command result
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # DESCRIPTION
 
@@ -101,6 +101,44 @@ This is useful when combined with shell aliases or module files.
 
 Available parameters are: **discrete**, **bulkmode**, **crmode**,
 **fillup**, **squeeze**, **blocks**.
+
+# FUNCTION CALL
+
+Instead of an external command, you can call a Perl function by
+prefixing the command name with `&`.
+
+    greple -Mtee '&App::ansifold::ansifold' -w40 -- ...
+
+The function is executed in a forked child process, so it must follow
+these requirements:
+
+- Read matched text from **STDIN**
+- Print converted result to **STDOUT**
+- Arguments are passed via both `@ARGV` and `@_`
+
+Any fully qualified function name can be used:
+
+    greple -Mtee '&Your::Module::function' -- ...
+
+The module is automatically loaded if not already loaded.
+
+For convenience, the following short aliases are available:
+
+- **&ansicolumn**
+
+    Calls `App::ansicolumn::ansicolumn`.
+
+- **&ansifold**
+
+    Calls `App::ansifold::ansifold`.
+
+- **&cat-v**
+
+    Calls `App::cat::v->new->run(@_)`.
+
+Using a function call avoids the overhead of forking an external
+process for each invocation, which can significantly improve
+performance when used with the **--discrete** option.
 
 # LEGACIES
 

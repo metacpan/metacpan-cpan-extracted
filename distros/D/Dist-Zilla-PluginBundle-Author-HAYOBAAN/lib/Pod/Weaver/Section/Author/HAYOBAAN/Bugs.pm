@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Improved version of Pod::Weaver::Section::Bugs, adds proper links to the BUGS pod section
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use Moose;
 use namespace::autoclean;
@@ -101,7 +101,7 @@ Pod::Weaver::Section::Author::HAYOBAAN::Bugs - Improved version of Pod::Weaver::
 
 =head1 VERSION
 
-version 0.014
+version 0.016
 
 =head1 OVERVIEW
 

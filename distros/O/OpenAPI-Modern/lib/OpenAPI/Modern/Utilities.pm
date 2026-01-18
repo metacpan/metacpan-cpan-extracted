@@ -3,7 +3,7 @@ package OpenAPI::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities and common definitions for OpenAPI::Modern
 
-our $VERSION = '0.120';
+our $VERSION = '0.121';
 
 use 5.020;
 use strictures 2;
@@ -17,7 +17,11 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use File::ShareDir 'dist_dir';
-use JSON::Schema::Modern::Utilities 0.625 qw(register_schema load_cached_document);
+use List::Util 1.45 'uniqstr';
+use Scalar::Util 'looks_like_number';
+use if "$]" < 5.041010, 'List::Util' => 'any';
+use if "$]" >= 5.041010, experimental => 'keyword_any';
+use JSON::Schema::Modern::Utilities 0.625 qw(register_schema load_cached_document true false);
 use namespace::clean;
 
 use Exporter 'import';
@@ -36,6 +40,8 @@ our @EXPORT = qw(
 our @EXPORT_OK = qw(
   OAS_SCHEMAS
   add_vocab_and_default_schemas
+  intersect_types
+  coerce_primitive
 );
 
 our %EXPORT_TAGS = (
@@ -157,6 +163,38 @@ sub add_vocab_and_default_schemas ($evaluator, $version = OAS_VERSIONS->[-1]) {
   }
 }
 
+# find the intersection of all the lists, number and integer as equivalent
+sub intersect_types (@lol) {
+  my $count = @lol;
+  my %vals;
+  while (my $list = shift @lol) {
+    ++$vals{$_} foreach uniqstr map +($_ eq 'integer' ? 'number' : $_), @$list;
+  }
+
+  return grep $vals{$_} == $count, keys %vals;
+}
+
+# Given a reference to a string, coerce it to the best-matching primitive in the allowed list
+# other than object and array (which must be deserialized according to style rules first)
+# The core types are: (array, object, null, boolean, string, number)
+# Returns validity status, allowing the caller to fall back to the string value or generate an error.
+sub coerce_primitive ($dataref, $types = []) {
+  return if not @$types;            # no type specified; indicate failure
+  return if not defined $$dataref;  # null is an error
+  return if ref $$dataref;          # booleans, arrays, objects are errors
+
+  $$dataref = undef, return 1 if $$dataref eq '' and any { $_ eq 'null' } @$types;
+
+  if (any { $_ eq 'boolean' } @$types) {
+    $$dataref = false, return 1 if $$dataref eq '0' or $$dataref eq 'false' or $$dataref eq '';
+    $$dataref = true, return 1 if $$dataref eq '1' or $$dataref eq 'true';
+  }
+
+  $$dataref = 0+$$dataref, return 1 if any { $_ eq 'number' } @$types and looks_like_number($$dataref);
+
+  return 1 if any { $_ eq 'string' } @$types;
+}
+
 {
   # make all bundled schemas available via JSON::Schema::Modern::load_cached_document
   my $share_dir = dist_dir('OpenAPI-Modern');
@@ -179,7 +217,7 @@ OpenAPI::Modern::Utilities - Internal utilities and common definitions for OpenA
 
 =head1 VERSION
 
-version 0.120
+version 0.121
 
 =head1 SYNOPSIS
 
@@ -199,6 +237,8 @@ STRICT_DIALECT
 STRICT_METASCHEMA
 SUPPORTED_OAD_VERSIONS
 add_vocab_and_default_schemas
+intersect_types
+coerce_primitive
 
 The constant values are updated automatically by C<update-schemas>, in the root of this distribution.
 
