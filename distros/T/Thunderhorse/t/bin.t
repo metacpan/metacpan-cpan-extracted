@@ -105,9 +105,10 @@ subtest 'should pass tests of generated app' => sub {
 
 	run_command($^X, $bin, '-g', 'full-app', 'TestApp');
 
-	my ($exit) = run_command($^X, '-Ilib', 't/base.t');
+	my ($exit, $out, $err) = run_command($^X, '-Ilib', 't/base.t');
 
 	is $exit, 0, 'test exit code ok';
+	diag "$out\n$err" unless $exit == 0;
 
 	chdir $orig_dir;
 };

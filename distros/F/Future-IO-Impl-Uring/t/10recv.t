@@ -10,5 +10,6 @@ use Future::IO;
 use Future::IO::Impl::Uring;
 
 run_tests 'recv';
+run_tests 'recvfrom';
 
 done_testing;

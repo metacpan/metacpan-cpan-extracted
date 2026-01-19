@@ -1,0 +1,17 @@
+Revision history for Datafile-Hash
+
+1.05 2025-01-18
+    - Added search filtering with regex/string/array patterns
+    - Added verbose messaging for debugging
+    - Added atomic writes with temp file + rename
+    - Added INI-style config files with nested sections
+    - Added flat key-value file support
+    - Added configurable delimiters
+    - Added header detection and explicit field names
+    - Added trimming of whitespace from values
+    - Added comment handling and top-comment insertion on write
+    - Added file permissions control
+    - Added backup option for writes
+    - Fixed consistent error handling (return instead of die)
+    - Fixed UTF-8 encoding support
+    - Improved test coverage

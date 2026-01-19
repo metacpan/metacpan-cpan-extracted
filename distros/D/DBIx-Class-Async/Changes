@@ -1,5 +1,27 @@
 Revision history for DBIx::Class::Async
 
+0.40  2026-01-19
+      - Added test to cover the use of CHI with DBIx::Class::Async.
+
+0.39  2026-01-18
+      - Added sub is_ordered() to DBIx::Class::Async::ResultSet.
+
+0.38  2026-01-18
+      - Added new package DBIx::Class::Async::ResultSet::Pager.
+      - Added the following subs to DBIx::Class::Async::ResultSet.
+        - count_total
+        - is_paged
+        - page
+        - pager
+        - search_with_pager
+
+0.37  2026-01-18
+      - Documented the removal of support for txn_scope_guard() in DBIx::Class::Async::Schema.
+
+0.36  2026-01-18
+      - Added sub txn_batch() to DBIx::Class::Async::Schema.
+      - Updated DBIx::Class::Async::Schema::deploy() to return Future.
+
 0.35  2026-01-18
       - Updated pod for txn_batch() and added unit test.
 

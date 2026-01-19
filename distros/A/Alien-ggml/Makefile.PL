@@ -30,16 +30,6 @@ my %WriteMakefileArgs = (
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },
-        resources => {
-            repository => {
-                type => 'git',
-                url  => 'https://github.com/lnation/Alien-ggml.git',
-                web  => 'https://github.com/lnation/Alien-ggml',
-            },
-            bugtracker => {
-                web => 'https://github.com/lnation/Alien-ggml/issues',
-            },
-        },
         x_contributors => [
             'LNATION <email@lnation.org>',
         ],

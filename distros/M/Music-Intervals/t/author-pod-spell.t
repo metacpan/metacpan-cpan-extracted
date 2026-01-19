@@ -18,12 +18,17 @@ set_spell_cmd('aspell list');
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+Agreeability
 Boggs
 Gene
+Gradus
 Intervals
 Music
 Numeric
 Ratios
+Suavitatis
+Tenney
+dyad
 dyads
 equalt
 freqs
@@ -31,3 +36,5 @@ gene
 justin
 lib
 midikey
+suavitatis
+tenney

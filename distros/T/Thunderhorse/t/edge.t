@@ -42,6 +42,8 @@ package EdgeApp {
 		# to specify a single action in router too
 		$r->add('/any_action' => {to => 'print_method'});
 		$r->add('/only_post' => {to => 'print_method', action => 'http.post'});
+
+		$r->add('/future' => {to => 'return_future'});
 	}
 
 	sub stash_and_return ($self, $ctx, $msg)
@@ -58,6 +60,11 @@ package EdgeApp {
 	sub print_method ($self, $ctx)
 	{
 		return $ctx->req->method;
+	}
+
+	sub return_future ($self, $ctx)
+	{
+		return $ctx->res->text('return text without await');
 	}
 };
 
@@ -112,6 +119,13 @@ subtest 'should not allow multiple routes with the same name' => sub {
 
 	isa_ok $ex, 'Gears::X::Thunderhorse';
 	like $ex, qr{must be unique}, 'exception ok';
+};
+
+subtest 'returning future from handler should work' => sub {
+	http $app, GET '/future';
+	http_status_is 200;
+	http_header_is 'content-type', 'text/plain; charset=utf-8';
+	http_text_is 'return text without await';
 };
 
 done_testing;

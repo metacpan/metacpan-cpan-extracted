@@ -208,7 +208,7 @@ sub do_extract {
         if ($tarfile =~ m/\.orig\.tar\.gz$/) {
             # We only need to warn on this branch, because of the $native reset
             # below, otherwise the V3::Native module will handle the warning.
-            if (! $v->__is_native()) {
+            if ($v->has_revision()) {
                 warning(g_('native package version may not have a revision'));
             }
 
@@ -217,7 +217,7 @@ sub do_extract {
             $native = 0;
         }
     } else {
-        if ($v->__is_native()) {
+        if (! $v->has_revision()) {
             warning(g_('non-native package version does not contain a revision'))
         }
     }
@@ -277,6 +277,20 @@ sub do_extract {
                     sort keys %{$analysis->{filepatched}};
         info(g_('upstream files that have been modified: %s'),
              "\n " . join("\n ", @files)) if scalar @files;
+
+        # As the diff might not represent executable permissions, we need to
+        # make sure debian/rules is executable if it exists. Otherwise the
+        # debian-rules build driver will take care of the warnings.
+        my $rules = File::Spec->catfile($newdirectory, 'debian', 'rules');
+        my @s = lstat $rules;
+        if (not scalar @s) {
+            syserr(g_('cannot stat %s'), $rules) if $! != ENOENT;
+        } elsif (-f _) {
+            chmod $s[2] | 0o111, $rules
+                or syserr(g_('cannot make %s executable'), $rules);
+        } else {
+            warning(g_('%s is not a plain file'), $rules);
+        }
     }
 }
 
@@ -385,9 +399,9 @@ sub do_build {
     my $v = Dpkg::Version->new($self->{fields}->{'Version'});
     if ($sourcestyle =~ m/[kpursKPUR]/) {
         error(g_('non-native package version does not contain a revision'))
-            if $v->__is_native();
+            if ! $v->has_revision();
     } else {
-        if (! $v->__is_native) {
+        if ($v->has_revision()) {
             if (run_vendor_hook('has-fuzzy-native-source')) {
                 warning(g_('native package version may not have a revision'));
             } else {

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 # Shared storage for refs that need to survive across threads
 our %_ref_storage;
@@ -45,7 +45,7 @@ Doubly - Thread-safe doubly linked list
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =head1 SYNOPSIS
 
@@ -111,12 +111,16 @@ B<Doubly> uses an B<ID-based registry>:
 	└─────────────────────────────────────────────────┘
 	            ↑                    ↑
 	       Perl $list1           Perl $list2
-	       holds ID = 0          holds ID = 1
+	       { _id=0, _node_id=5 }   { _id=1, _node_id=1 }
 
-Perl objects store an B<integer ID>, not a pointer. All lists live in a global
-C registry. Every operation does: C<LOCK → lookup by ID → operate → UNLOCK>.
-When Perl clones an SV across threads, it just copies the integer - the actual
-list data stays in place and remains accessible from any thread.
+Perl objects store an B<integer ID> and a B<stable node ID>, not pointers.
+All lists live in a global C registry. Every operation does:
+C<LOCK → lookup by ID → find node by _node_id → operate → UNLOCK>.
+When Perl clones an SV across threads, it copies the integers - the actual
+list data stays in place and remains accessible from any thread. Each thread
+gets its own C<_node_id> reference, so threads can navigate the same list independently.
+Unlike position-based cursors, node IDs remain valid even after insertions or deletions
+elsewhere in the list.
 
 B<Doubly::Pointer> uses B<raw pointers>:
 
@@ -362,8 +366,7 @@ All operations are protected by a mutex.
 
 =head1 NESTED LISTS
 
-You can store Doubly lists inside other Doubly lists. When you navigate a nested
-list via chained method calls, the inner list's current position is updated:
+You can store Doubly lists inside other Doubly lists. 
 
 	my $outer = Doubly->new();
 	my $inner = Doubly->new();
@@ -383,47 +386,8 @@ list via chained method calls, the inner list's current position is updated:
 	is($outer->next->data->data, 1);          # inner2's first item
 	is($outer->next->data->end->data->start->data, 'a');  # deeply nested!
 
-B<Important:> Chained navigation calls like C<< $list->data->next >> modify the
-nested list's position. The C<< ->next >> call operates on and updates the inner
-list object itself. This is intentional - it allows natural traversal of nested
-structures.
 
-B<Difference from Doubly::Pointer:> In L<Doubly::Pointer>, when you retrieve a nested
-list via C<< ->data >>, you get a fresh copy each time - so chained navigation
-doesn't affect subsequent retrievals. In Doubly, you get the B<same shared object>,
-so navigation state persists:
-
-	# Doubly::Pointer - each ->data returns a fresh copy
-	$list->data->next->data;              # Moves a temporary copy
-	$list->data->data;                    # Still 'a' - fresh copy, at start
-	
-	# Doubly - ->data returns the same shared object  
-	$list->data->next->data;              # Moves the actual nested list
-	$list->data->data;                    # Now 'b' - position was updated!
-	$list->data->start->data;             # Need ->start to get back to 'a'
-
-This is why in the test files, Doubly needs C<< ->start >> to reset position:
-
-	# 71-pointer-nested.t (Doubly::Pointer)
-	is($list->next->data->end->data->data, 'a');        # No reset needed
-	
-	# 18-nested.t (Doubly)  
-	is($list->next->data->end->data->start->data, 'a'); # Needs ->start
-
-If you need copy-on-access behaviour, use Doubly::Pointer. If you prefer stateful
-shared access to nested structures, use Doubly.
-
-B<Note for threaded Perl:> When threads are enabled, nested Doubly lists stored
-as data use C<threads::shared::shared_clone> to make them accessible across
-threads. However, deeply nested access patterns with multiple lock acquisitions
-can potentially cause deadlocks in complex scenarios. For simpler, safer usage
-in threaded code, retrieve the nested list into a variable before navigating:
-
-	my $nested = $list->data;    # Get the nested list
-	$nested->start;              # Navigate it separately
-	my $value = $nested->data;
-
-=HEAD1 BENCHMARKS
+=head1 BENCHMARKS
 	
 	my $r = timethese(10000, {
 		'Doubly::Linked' => sub {

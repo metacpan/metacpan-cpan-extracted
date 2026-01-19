@@ -10,11 +10,11 @@ Lugh - Pure C LLM Inference Engine for Perl (built on ggml)
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Lugh', $VERSION);
@@ -109,23 +109,52 @@ exactly how transformers work under the hood.
 
 =back
 
-=head2 Supported Models
+=head2 Supported Model Architectures
 
-Lugh can run any GGUF model with the LLaMA architecture:
+Lugh automatically detects model architecture from GGUF metadata and adapts
+inference accordingly. Supported architectures include:
 
 =over 4
 
-=item * TinyLlama (1.1B)
+=item * B<LLaMA Family> - LLaMA, LLaMA 2, LLaMA 3, TinyLlama, OpenLLaMA, Mistral, Mixtral
 
-=item * LLaMA / LLaMA 2 (7B, 13B, 70B)
+=item * B<Qwen Family> - Qwen, Qwen2 (combined QKV projections)
 
-=item * Mistral / Mixtral
+=item * B<Phi Family> - Phi-2, Phi-3 (combined QKV, GELU activation)
 
-=item * OpenLLaMA
+=item * B<Gemma Family> - Gemma, Gemma2 (post-normalization support)
 
-=item * Phi-2 (with minor adjustments)
+=item * B<GPT Family> - GPT-2, GPT-J, GPT-NeoX
+
+=item * B<Other Architectures> - Falcon, BLOOM, MPT, StarCoder, StableLM, 
+InternLM, DeepSeek, Command-R, BERT, T5
 
 =back
+
+The architecture is detected from the C<general.architecture> key in the GGUF
+file, and appropriate handling is applied for:
+
+=over 4
+
+=item * B<Combined QKV> - Phi, Qwen, BLOOM, GPT-2, GPT-J use a single QKV tensor
+
+=item * B<FFN Activation> - SiLU/GELU based on architecture (no gate for GPT-2, Phi)
+
+=item * B<Post-Normalization> - Gemma2 applies additional layer norms
+
+=item * B<Recurrent Models> - MAMBA, RWKV identified (inference WIP)
+
+=back
+
+Query architecture information at runtime:
+
+    my $model = Lugh::Model->new(model => 'model.gguf');
+    
+    print "Architecture: ", $model->architecture, "\n";
+    print "Arch type: ", $model->arch_type, "\n";
+    print "Has combined QKV: ", $model->arch_has_combined_qkv, "\n";
+    print "Has FFN gate: ", $model->arch_has_ffn_gate, "\n";
+    print "Has post-norm: ", $model->arch_has_post_norm, "\n";
 
 =head1 PACKAGES
 

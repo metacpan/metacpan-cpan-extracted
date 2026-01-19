@@ -2,7 +2,7 @@
 # vim: filetype=bash :  -*- mode: sh; sh-shell: bash; -*-
 ###############################################################################
 # GetOptLong: Getopt Library for Bash Script
-# Copyright 2025 Office TECOLI, LLC <https://github.com/tecolicom/getoptlong>
+# Copyright 2025 Office TECOLI, LLC <https://github.com/tecolicom/getoptlong#readme>
 # MIT License: See <https://opensource.org/licenses/MIT>
 : ${GOL_VERSION:=0.01}
 ###############################################################################

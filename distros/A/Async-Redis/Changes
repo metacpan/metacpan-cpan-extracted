@@ -1,6 +1,30 @@
 Revision history for Future-IO-Redis
 
-0.002  2026-01-17
+0.001003  2026-01-18
+    - New Feature: Enhanced Lua Script Helper API
+        - define_command() for registering named scripts with metadata
+        - run_script() for executing registered scripts by name
+        - get_script(), list_scripts() for registry access
+        - preload_scripts() for pipeline optimization
+        - Automatic EVALSHA with EVAL fallback (NOSCRIPT handling)
+        - Pipeline integration via $pipe->run_script()
+        - Optional method installation (install => 1)
+        - Support for fixed or dynamic key counts
+    - Script.pm Enhancements:
+        - New run() method with explicit keys/args arrays
+        - New run_on() method for explicit connection targeting
+        - Metadata fields: name, num_keys, description
+    - Documentation:
+        - New LUA SCRIPTING section in Async::Redis POD
+        - Comprehensive examples for all script methods
+        - Pipeline integration examples
+    - Testing:
+        - t/60-scripting/define-command.t (18 tests)
+        - t/60-scripting/script-registry.t (17 tests)
+        - t/60-scripting/pipeline-scripts.t (16 tests)
+        - t/60-scripting/pagi-channels.t (16 tests) - realistic channel layer scenarios
+
+0.001002  2026-01-17
     - Bug Fix: Concurrent command response matching
         - Fixed race condition where multiple async commands on a single
           connection could receive mismatched responses
@@ -19,7 +43,7 @@ Revision history for Future-IO-Redis
         - Stress test with 100 concurrent commands
         - Inflight tracking verification
 
-0.001  2026-01-03
+0.001001  2026-01-03
     - Initial release
     - Core Features:
         - Full async/await support via Future::IO

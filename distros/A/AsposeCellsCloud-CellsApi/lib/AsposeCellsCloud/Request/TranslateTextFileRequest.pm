@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2025 Aspose.Cells Cloud
+Copyright (c) 2026 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -86,7 +86,7 @@ sub run_http_request {
     my $client = $args{'client'};
 
     # parse inputs
-    my $_resource_path = 'v4.0/cells/translate/text';
+    my $_resource_path = 'v4.0/cells/ai/translate/text';
 
     my $_method = 'PUT';
     my $query_params = {};

@@ -1631,30 +1631,41 @@ for ( my $i = 0 ; $i < $max ; $i++ )
     my ( $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
       $direction, $starorder, $ordmeta, $varnums_r, $countblock, $lines_r ) = @_;
 
-    
     my %dowhat = %$dowhat_r;
 
     return unless ( defined($dowhat{metamodel}) && $dowhat{metamodel} eq "y" );
 
-    my $treaty = "";
-    $treaty = $dowhat{metamodeltreaty} if defined $dowhat{metamodeltreaty};
-    $treaty = $dowhat{altmetamodel} if ( $treaty eq "" && defined $dowhat{altmetamodel} );
+    # -----------------------------------------------------------------
+    # Metamodel dispatch (new semantics)
+    #
+    #  $dowhat{altmetamodel} = "" (or undef)  => OPTcue not present, Interlinear only (dwgn)
+    #  $dowhat{altmetamodel} = "cue"          => OPTcue + Metabridge available (notify)
+    #
+    # Method selection is by $dowhat{canon}:
+    #  $dowhat{canon} = "" (or undef)         => Interlinear (dwgn)
+    #  $dowhat{canon} = "NeuralBoltzmann" ... => Metabridge dispatch
+    #
+    # Backward compatibility:
+    #  * $dowhat{altmetamodel} = "y" is treated as "cue".
+    #  * $dowhat{metamodeltreaty} overrides altmetamodel if set.
+    # -----------------------------------------------------------------
+    my $treaty = defined($dowhat{altmetamodel}) ? $dowhat{altmetamodel} : "";
+    $treaty = $dowhat{metamodeltreaty} if defined($dowhat{metamodeltreaty}) && $dowhat{metamodeltreaty} ne "";
+    $treaty = "cue" if defined($treaty) && lc($treaty) eq "y";
 
-    if ( defined($treaty) && $treaty eq "cue" )
+    if ( defined($treaty) && lc($treaty) eq "cue" )
     {
-      require Sim::OPTcue;
-      return Sim::OPTcue::altmetamodel(
+      require Sim::OPTcue::OPTcue;
+      return Sim::OPTcue::OPTcue::notify(
         $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
         $direction, $starorder, $ordmeta, $varnums_r, $countblock, $lines_r
       );
     }
-    else 
-    {
-      return dwgn(
+
+    return dwgn(
       $dowhat_r, $sortmixed, $file, $dirfiles_r, $blockelts_r, $carrier_r, $metafile,
       $direction, $starorder, $ordmeta, $varnums_r, $countblock, $lines_r
     );
-    }
   }
 
 
@@ -1882,19 +1893,19 @@ for ( my $i = 0 ; $i < $max ; $i++ )
 
     say "!!!!!ABOUT TO CALL INTERLINEAR WITH " . dump( @prepfile_lines );
     my $rawmetafile = $metafile . "_tmp_raw.csv";
-    my ( $arr_r, $newarr_r ) = Sim::OPT::Interlinear::interlinear( $sortmixed, $confinterlinear, 
+    my ( $arr_r, $fulls_r ) = Sim::OPT::Interlinear::interlinear( $sortmixed, $confinterlinear, 
       $rawmetafile, \@blockelts, $tofile, $countblock, 
       $dowhat_r, $dirfiles_r, \@prepfile_lines );
-    my @rawlines = @$newarr_r;
+    my @fulls = @$fulls_r;
 
     say "!!!!! FROM INTERLINEAR IN DESCEND RETURNED NOT USED \@ARR " . dump( $arr_r );
-    say "!!!!! AND RETURNED NEWARR " . dump( @rawlines );
+    say "!!!!! AND RETURNED NEWARR " . dump( @fulls );
     #open( my $RM, "<", $rawmetafile ) or die "Cannot open $rawmetafile: $!\n";
-    #my @rawlines = <$RM>;
+    #my @fulls = <$RM>;
     #close $RM;
 
     my @metalines;
-    foreach my $ln ( @rawlines )
+    foreach my $ln ( @fulls )
     {
       next unless defined $ln;
       $ln =~ s/\r?\n$//;

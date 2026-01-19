@@ -1,5 +1,9 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+2.04 2026-01-19
+ - Update copyright year to 2026
+ - Prepend Ajax url with WebPath (thx RA12322)
+
 2.03 2025-12-06
  - Fix support for Article and Transaction CFs
  - Fix crash in CF admin. Thanks to PinkFreud

@@ -1,5 +1,12 @@
 Revision history for Future-IO
 
+0.19    2026-01-18
+        [CHANGES]
+         * Added new `->poll` method as a neater and standardised way of doing
+           what used to informally use ->ready_for_read or ->ready_for_write
+         * Clarify in documentation the limits of guarantees around what
+           happens when filehandle IO futures are cancelled
+
 0.18    2026-01-08
         [CHANGES]
          * Added `->load_best_impl`

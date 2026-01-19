@@ -1,5 +1,5 @@
 package Marky::DbTable;
-$Marky::DbTable::VERSION = '0.035';
+$Marky::DbTable::VERSION = '0.0602';
 #ABSTRACT: Marky::DbTable - querying one database table
 
 use common::sense;
@@ -11,6 +11,7 @@ use Text::NeatTemplate;
 use YAML::Any;
 use POSIX qw(ceil);
 use HTML::TagCloud;
+use List::Util qw(shuffle);
 use Mojo::URL;
 
 
@@ -181,27 +182,32 @@ EOT
     }
     if (!defined $self->{searchform})
     {
+        # Note that this is a single-quotes here-document
+        # because I don't want to have to wrangle with escaping
+        # all the quotes and $ stuff.
+        # Therefore I'm putting an explicit placemarker for WHERE
+
         $self->{searchform} =<<'EOT';
 <div class="searchform">
 <form class="searcher" action="{$action}">
-<span class="textin"><label class="fa fa-question">Any:</label> <input type="text" name="q" value="{$q}"/></span>
-<span class="textin"><label class="fa fa-tags">Tags:</label> <input type="text" name="tags" value="{$tags}"></span>
+<span class="tagsin"><label class="fa fa-tags">Tags:</label> <input type="text" name="tags" value="{$tags}"></span>
+<span class="anyin"><label class="fa fa-question">Any:</label> <input type="text" name="q" value="{$q}"/></span>
 <span class="selector"><label>Pg:</label> {$selectP}</span>
-<input type="submit" value="Search">
-</form>
-<form class="setter" action="{$opt_url}">
+WHERE
 <span class="selector"><label>N:</label> {$selectN}</span>
 <span class="selector"><label>Sort:</label> {$sorting}</span>
-<input type="submit" value="Set">
+<input type="submit" value="Search">
 </form></div>
 EOT
+        # Replace the WHERE placemarker
+        my $whereness = '';
         if ($self->{use_where})
         {
-            my $whereness =<<'EOW';
+            $whereness =<<'EOW';
 <div class="where"><label>Where:</label><textarea name="where" rows="3" cols="80">{$where}</textarea></div>
 EOW
-            $self->{searchform} =~ s/(<input type="submit" value="Search">)/${whereness}$1/;
         }
+        $self->{searchform} =~ s/WHERE/${whereness}/;
     }
     return $self;
 
@@ -631,8 +637,21 @@ sub _query_to_sql {
     my $p = $args{p};
     my $items_per_page = $args{n};
     my $total = ($args{total} ? $args{total} : 0);
+    # RANDOM sort overrides all other sorts (because it doesn't make sense otherwise)
+    # RANDOM also overrides the default sort.
     my $order_by = '';
-    if ($args{sort_by} and $args{sort_by2} and $args{sort_by3})
+    if (($args{sort_by} and $args{sort_by} eq 'RANDOM')
+            or ($args{sort_by2} and $args{sort_by2} eq 'RANDOM')
+            or ($args{sort_by3} and $args{sort_by3} eq 'RANDOM')
+            or ($args{sort_by4} and $args{sort_by4} eq 'RANDOM'))
+    {
+        $order_by = 'RANDOM()';
+    }
+    elsif ($args{sort_by} and $args{sort_by2} and $args{sort_by3} and $args{sort_by4})
+    {
+        $order_by = join(', ', $args{sort_by}, $args{sort_by2}, $args{sort_by3}, $args{sort_by4});
+    }
+    elsif ($args{sort_by} and $args{sort_by2} and $args{sort_by3})
     {
         $order_by = join(', ', $args{sort_by}, $args{sort_by2}, $args{sort_by3});
     }
@@ -773,7 +792,7 @@ sub _format_searchform {
     my $db = $args{db};
     my $sorting = '';
     @os = ();
-    foreach my $sf (qw(sort_by sort_by2 sort_by3))
+    foreach my $sf (qw(sort_by sort_by2 sort_by3 sort_by4))
     {
         push @os, "<select name='${db}_$sf'>";
         push @os, "<option value=''> </option>";
@@ -787,14 +806,18 @@ sub _format_searchform {
             {
                 push @os, "<option value='$s'>$s</option>";
             }
-            my $s_desc = "${s} DESC";
-            if ($s_desc eq $args{$sf})
+            # sert DESCending makes no sense for RANDOM
+            if ($s ne 'RANDOM')
             {
-                push @os, "<option value='$s_desc' selected>$s_desc</option>";
-            }
-            else
-            {
-                push @os, "<option value='$s_desc'>$s_desc</option>";
+                my $s_desc = "${s} DESC";
+                if ($s_desc eq $args{$sf})
+                {
+                    push @os, "<option value='$s_desc' selected>$s_desc</option>";
+                }
+                else
+                {
+                    push @os, "<option value='$s_desc'>$s_desc</option>";
+                }
             }
         }
         push @os, '</select>';
@@ -1120,7 +1143,7 @@ Marky::DbTable - Marky::DbTable - querying one database table
 
 =head1 VERSION
 
-version 0.035
+version 0.0602
 
 =head1 SYNOPSIS
 
@@ -1137,7 +1160,7 @@ Marky::DbTable - querying one database table
 
 =head1 VERSION
 
-version 0.035
+version 0.0602
 
 =head1 METHODS
 
@@ -1202,6 +1225,9 @@ tags=>$tags,
 p=>$p,
 n=>$items_per_page,
 sort_by=>$order_by,
+sort_by2=>$order_by2,
+sort_by3=>$order_by3,
+sort_by4=>$order_by4,
 );
 
 =head2 _process_request
@@ -1254,6 +1280,7 @@ n=>$items_per_page,
 sort_by=>$order_by,
 sort_by2=>$order_by2,
 sort_by3=>$order_by3,
+sort_by4=>$order_by4,
 );
 
 =head2 _format_searchform

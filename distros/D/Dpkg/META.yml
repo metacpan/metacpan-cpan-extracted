@@ -99,7 +99,7 @@ provides:
     version: '1.00'
   Dpkg::Control::FieldsCore:
     file: lib/Dpkg/Control/FieldsCore.pm
-    version: '1.04'
+    version: '1.05'
   Dpkg::Control::Hash:
     file: lib/Dpkg/Control/Hash.pm
     version: '1.00'
@@ -144,6 +144,12 @@ provides:
     version: '1.00'
   Dpkg::Dist::Files:
     file: lib/Dpkg/Dist/Files.pm
+    version: '0.01'
+  Dpkg::Email::Address:
+    file: lib/Dpkg/Email/Address.pm
+    version: '0.01'
+  Dpkg::Email::AddressList:
+    file: lib/Dpkg/Email/AddressList.pm
     version: '0.01'
   Dpkg::ErrorHandling:
     file: lib/Dpkg/ErrorHandling.pm
@@ -285,7 +291,7 @@ provides:
     version: '0.01'
   Dpkg::Version:
     file: lib/Dpkg/Version.pm
-    version: '1.04'
+    version: '1.05'
   Test::Dpkg:
     file: lib/Test/Dpkg.pm
 recommends:
@@ -299,5 +305,5 @@ resources:
   homepage: https://wiki.debian.org/Teams/Dpkg
   license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
   repository: https://git.dpkg.org/git/dpkg/dpkg.git
-version: v1.23.1
+version: v1.23.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

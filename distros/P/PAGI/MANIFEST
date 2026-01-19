@@ -338,6 +338,7 @@ t/tutorial.t
 t/utf8/01-raw-utf8.t
 t/utils-lifespan.t
 t/websocket-heartbeat.t
+t/websocket-query-params.t
 t/websocket-state.t
 t/websocket/01-constructor.t
 t/websocket/02-state.t

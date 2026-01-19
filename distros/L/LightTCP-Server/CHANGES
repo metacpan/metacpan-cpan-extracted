@@ -1,5 +1,26 @@
 Revision history for LightTCP::Server
 
+2.04 2026-01-18
+  - Fixed version mismatch between POD and $VERSION for kwalitee compliance
+
+2.03 2026-01-18
+  - Added META.yml for kwalitee compliance
+  - All kwalitee tests now pass
+
+2.02 2026-01-18
+  - Added missing AUTHOR POD section for kwalitee compliance
+  - Added COPYRIGHT AND LICENSE POD section
+
+2.01 2026-01-18
+  - Improved POD documentation with comprehensive attribute descriptions
+  - Added upload endpoint documentation
+  - Added rate limiting headers documentation
+  - Added CGI environment variables documentation
+  - Added security features documentation
+  - Expanded SYNOPSIS with upload and rate limiting examples
+  - Added METHODS section with all public methods
+  - Added DEPENDENCIES, BUGS AND LIMITATIONS sections
+
 2.00 2026-01-16
   - Renamed from tcpserver to LightTCP::Server
   - Added file upload support with multipart parsing

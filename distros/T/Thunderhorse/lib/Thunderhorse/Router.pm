@@ -1,5 +1,5 @@
 package Thunderhorse::Router;
-$Thunderhorse::Router::VERSION = '0.101';
+$Thunderhorse::Router::VERSION = '0.102';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -79,7 +79,7 @@ sub _maybe_cache ($self, $type, $path, $method)
 
 sub match ($self, $path, $method //= '')
 {
-	return $self->_maybe_cache('SUPER::match', $path, $method);
+	return ($self->_maybe_cache('SUPER::match', $path, $method))[0];
 }
 
 sub flat_match ($self, $path, $method //= '')

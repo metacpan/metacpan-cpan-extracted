@@ -1,5 +1,28 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS10.
 
+0.37 -- Sun Jan 18 19:55:23 AST 2026
+
+    [Significant updates since 0.35]
+    - Fix add_custom_ext_raw that was inadvertently broken in 0.36
+
+    [Change Log]
+    - 2de27bb Increment version for a release
+    - 152c326 Fix add_custom_ext_raw broken in 0.36
+    - 6bad393 v0.36
+
+0.36 -- Sun Jan 18 12:18:41 AST 2026
+
+    [Significant updates since 0.35]
+    - Fix a LIBRESSL issue (OpenBSD)
+    - Converted the tabs in PKCS10.xs to 4 spaces
+
+    [Change Log]
+    - fba2e8f Increment version
+    - 70f1648 Minor updates to generated files
+    - ad580fc Convert tabs to spaces
+    - d7c1798 Remove duplicate code and fix LIBRESSL issue
+    - 835e0f8 v0.35
+
 0.35 -- Tue Feb 04 22:59:04 AST 2025
     [Significant updates since 0.34]
     - Minor update to test lib

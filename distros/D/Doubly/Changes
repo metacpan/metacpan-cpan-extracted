@@ -1,5 +1,11 @@
 Revision history for Doubly
 
+0.14    2026-01-19
+	- Move from _pos (which is basically an array index) to _node_id which keeps the pos after insertion correctly
+
+0.13    2026-01-17
+	- Fixes to align behaviour
+
 0.12    2026-01-17
 	- Refactor Doubly with a new approach to be thread safe
 	- Old pointer based implementation now Doubly::Pointer

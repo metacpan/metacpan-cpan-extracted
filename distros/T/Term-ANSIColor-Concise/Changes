@@ -1,5 +1,11 @@
 Revision history for Perl extension Term-ANSIColor-Concise
 
+3.02 2026-01-19T10:11:49Z
+
+    - Fix luminance setting to reduce chroma when out of RGB gamut
+    - Fix typo in luv method (as_Lab -> as_Luv)
+    - Improve documentation for effect codes
+
 3.01 2025-09-05T09:44:27Z
 
     - Add support for color adjustment modifiers: luminance (y), lightness (l), saturation (s), hue (h)

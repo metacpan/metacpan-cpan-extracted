@@ -15,7 +15,7 @@
 
 use v5.36;
 
-use Test::More tests => 2606;
+use Test::More tests => 2629;
 use Test::Dpkg qw(:paths);
 
 use ok 'Dpkg::Control::Types';
@@ -540,3 +540,129 @@ delete $ctrl->{Source};
 ($source, $version) = field_parse_binary_source($ctrl);
 is($source, 'test-binary', 'Source package from binary w/o Source field');
 is($version, '2.0-1', 'Source version from binary w/o Source field');
+
+my $maint;
+
+$ctrl->{Maintainer} = 'Some Name <email@example.org>';
+$maint = field_parse_maintainer($ctrl);
+is($maint->as_string, 'Some Name <email@example.org>',
+    'Parse address correctly');
+is($maint->{name}, 'Some Name', 'Parse bare name from address correctly');
+is($maint->{email}, 'email@example.org', 'Parse bare name from address correctly');
+
+$ctrl->{Maintainer} = 'Some "Alias" Name <email@example.org>';
+$maint = field_parse_maintainer($ctrl);
+is($maint->as_string, 'Some "Alias" Name <email@example.org>',
+    'Parse address with alias correctly');
+is($maint->{name}, 'Some "Alias" Name', 'Parse name from address with alias correctly');
+is($maint->{email}, 'email@example.org', 'Parse email from address with alias correctly');
+
+$ctrl->{Maintainer} = '"Some Name, Comma" <email@example.org>';
+$maint = field_parse_maintainer($ctrl);
+is($maint->as_string, '"Some Name, Comma" <email@example.org>',
+    'Parse address with quoted comma correctly');
+is($maint->{name}, '"Some Name, Comma"', 'Parse name from address with quoted comma correctly');
+is($maint->{email}, 'email@example.org', 'Parse email from address with quoted comma correctly');
+
+my @uploaders_exp = (
+    {
+        desc => 'bare single address',
+        value => 'Some Name <email@example.org>',
+        parsed => [
+            {
+                name => 'Some Name',
+                email => 'email@example.org',
+            },
+        ],
+    },
+    {
+        desc => 'single bare address with trailing comma',
+        value => 'Some Name <email@example.org> , ',
+        normalized => 'Some Name <email@example.org>',
+        parsed => [
+            {
+                name => 'Some Name',
+                email => 'email@example.org',
+            },
+        ],
+    },
+    {
+        desc => 'single address with alias',
+        value => 'Some "Alias" Name <email@example.org>',
+        parsed => [
+            {
+                name => 'Some "Alias" Name',
+                email => 'email@example.org',
+            },
+        ],
+    },
+    {
+        desc => 'single address with quoted comma',
+        value => '"Some Name, Comma" <email@example.org>',
+        parsed => [
+            {
+                name => '"Some Name, Comma"',
+                email => 'email@example.org',
+            },
+        ],
+    },
+    {
+        desc => 'two bare addresses',
+        value => 'Some Name <some@example.org> , Other Name <other@example.org>',
+        normalized => 'Some Name <some@example.org>, Other Name <other@example.org>',
+        parsed => [
+            {
+                name => 'Some Name',
+                email => 'some@example.org',
+            },
+            {
+                name => 'Other Name',
+                email => 'other@example.org',
+            },
+        ],
+    },
+    {
+        desc => 'two bare addresses with trailing comma',
+        value => 'Some Name <some@example.org> , Other Name <other@example.org> , ',
+        normalized => 'Some Name <some@example.org>, Other Name <other@example.org>',
+        parsed => [
+            {
+                name => 'Some Name',
+                email => 'some@example.org',
+            },
+            {
+                name => 'Other Name',
+                email => 'other@example.org',
+            },
+        ],
+    },
+    {
+        desc => 'two addresses with quoted comma and trailing comma',
+        value => 'Some "Alias" Name <some@example.org> , "Other Name, Comma" <other@example.org> , ',
+        normalized => 'Some "Alias" Name <some@example.org>, "Other Name, Comma" <other@example.org>',
+        parsed => [
+            {
+                name => 'Some "Alias" Name',
+                email => 'some@example.org',
+            },
+            {
+                name => '"Other Name, Comma"',
+                email => 'other@example.org',
+            },
+        ],
+    },
+);
+
+foreach my $uploader (@uploaders_exp) {
+    $ctrl->{Uploaders} = $uploader->{value};
+
+    my $res = field_parse_uploaders($ctrl);
+    my @res = map {
+        $_->as_struct()
+    } $res->addrlist();
+
+    is_deeply(\@res, $uploader->{parsed},
+        "Parse uploader from $uploader->{desc}");
+    is($res->as_string(), $uploader->{normalized} // $uploader->{value},
+        "Parse uploader from $uploader->{desc}, and stringified back");
+}

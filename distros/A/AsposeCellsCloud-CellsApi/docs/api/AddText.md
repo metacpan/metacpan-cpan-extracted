@@ -25,7 +25,7 @@ Bulk-inserts the supplied string into every cell of the chosen range at the exac
 | :- | :- | :- |:- | 
 |Spreadsheet|File|FormData|Upload spreadsheet file.|
 |text|String|Query|Specify the added text content.|
-|position|String|Query|Indicates the specific location for adding text content.None, AtTheBeginning, AtTheEnd, BeforeText, AfterText.  |
+|position|String|Query|Indicates the specific location for adding text content.None, AtTheBeginning, AtTheEnd, BeforeText, AfterText.|
 |selectText|String|Query|Indicates selecting the specific position to add text based on the content of the text.|
 |skipEmptyCells|Boolean|Query|Indicates skip empty cells.|
 |worksheet|String|Query|Specify the worksheet of spreadsheet.|

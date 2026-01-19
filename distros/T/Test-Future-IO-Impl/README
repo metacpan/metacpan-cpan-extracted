@@ -43,6 +43,12 @@ TEST SUITES
 
     Tests the Future::IO->connect method.
 
+ poll
+
+    Since version 0.17.
+
+    Tests the Future::IO->poll method.
+
  recv, recvfrom
 
     Since version 0.15.
@@ -57,7 +63,10 @@ TEST SUITES
 
  sleep
 
-    Tests the Future::IO->sleep method.
+    Tests the Future::IO->sleep and Future::IO->alarm methods.
+
+    The two methods are combined in one test suite as they are very
+    similar, and neither is long or complicated.
 
  read, sysread
 

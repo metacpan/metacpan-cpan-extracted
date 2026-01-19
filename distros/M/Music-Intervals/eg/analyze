@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Data::Dumper::Compact qw(ddc);
-use Music::Intervals;
+use Music::Intervals ();
 
 use constant OPT => { max_width => 256 };
 

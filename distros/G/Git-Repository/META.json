@@ -4,7 +4,7 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "git",
       "wrapper"
@@ -14,7 +14,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Git-Repository",
    "prereqs" : {
@@ -80,8 +80,10 @@
          "web" : "https://github.com/book/Git-Repository"
       }
    },
-   "version" : "1.325",
+   "version" : "1.326",
    "x_contributors" : [
+      "Petr P\u00edsa\u0159 <ppisar@cpan.org>",
+      "H\u00e5kon H\u00e6gland <hakonh@cpan.org>",
       "H.Merijn Brand <hmbrand@cpan.org>",
       "Jan Pazdziora <janpaz@cpan.org>",
       "Ron Savage <rsavage@cpan.org>",
@@ -109,7 +111,8 @@
       "Alessandro Ghedini <alexbio@cpan.org>",
       "Gustavo Leite de Mendon\u00e7a Chaves <gnustavo@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

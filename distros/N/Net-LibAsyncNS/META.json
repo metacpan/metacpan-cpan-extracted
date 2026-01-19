@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -29,25 +29,24 @@
       },
       "runtime" : {
          "requires" : {
-            "Exporter" : "5.57"
+            "Exporter" : "5.57",
+            "perl" : "5.020"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Identity" : "0",
-            "Test::More" : "0.88",
-            "Test::Refcount" : "0"
+            "Test2::V0" : "0.000149"
          }
       }
    },
    "provides" : {
       "Net::LibAsyncNS" : {
          "file" : "lib/Net/LibAsyncNS.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Net::LibAsyncNS::Constants" : {
          "file" : "lib/Net/LibAsyncNS/Constants.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -56,6 +55,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

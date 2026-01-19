@@ -27,7 +27,7 @@ METHODS
 
  set_tickit
 
-       Future::IO::Impl::Tickit->set_tickit( $tickit )
+       Future::IO::Impl::Tickit->set_tickit( $tickit );
 
     Sets the toplevel Tickit instance to use for the event watching used to
     implement this module.

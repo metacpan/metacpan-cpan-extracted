@@ -849,10 +849,13 @@ sub getazimuth
 
 sub setpickedinsts
 {
-    my ( $instances_ref, $inst_ref, $dirfiles_ref ) = @_;
+
+
+    my ( $instances_ref, $inst_ref, $dirfiles_ref, $dowhat_ref, $file, $mypath ) = @_;
     my @instances = @{ $instances_ref };
-    my %inst = %{ $inst_ref };
+    my %inst     = %{ $inst_ref };
     my %dirfiles = %{ $dirfiles_ref };
+    my %dowhat   = %{ $dowhat_ref };
 
     my @newinstances;
 
@@ -992,6 +995,15 @@ sub setpickedinsts
     #say  "AND HAD INST: " .dump( \%inst );
     my (  $newinstnames_r, $newinst_r ) = Sim::OPT::filterinsts_winsts( \@instances, \%inst );
     %inst = %{ $newinst_r }; # REASSIGNMENT!!!!!!
+
+    say "MORPH inst keys now: " . scalar(keys %inst);
+
+    my $seed = $dirfiles{from} // "";
+    say "MORPH seed(from)='$seed'";
+    if ($seed ne "") {
+      say "MORPH inst{seed} = " . ( defined($inst{$seed}) ? $inst{$seed} : "undef" );
+    }
+
     my @newinstnames = @{ $newinstnames_r };
     push( @{ $dirfiles{dones} }, @newinstnames );
     @{ $dirfiles{dones} } = uniq ( @{ $dirfiles{dones} } );
@@ -1256,7 +1268,7 @@ sub morph
 	#if ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{latinhypercube} eq "y" ) )
     if ( $dirfiles{latinhypercube} eq "y" )
 	{
-		my ( $instances_ref, $inst_ref, $dirfiles_ref ) = setpickedinsts( \@instances, \%inst, \%dirfiles );
+		my ( $instances_ref, $inst_ref, $dirfiles_ref  ) = setpickedinsts( \@instances, \%inst, \%dirfiles, \%dowhat );
 	  @instances = @{ $instances_ref };
 		%inst = %{ $inst_ref };
 		%dirfiles = %{ $dirfiles_ref };
@@ -1442,8 +1454,16 @@ sub morph
 					$starttarget = "$mypath/$file" . "_" . "$starttarget"; say  "\$starttarget $starttarget";
 					if ( not ( -e $starttarget ) )
 					{
-						`cp -R $mypath/$file $starttarget`;
-						say  "LEVEL 0a: cp -R $mypath/$file $starttarget\n";
+                        if ( !defined($dowhat{names}) || $dowhat{names} ne "short" )
+                        {
+                          my $starttarget = Sim::OPT::giveback( \%mids );
+                          $starttarget = "$mypath/$file" . "_" . "$starttarget";
+                          if ( not ( -e $starttarget ) )
+                          {
+                            `cp -R $mypath/$file $starttarget`;
+                            say "LEVEL 0a: cp -R $mypath/$file $starttarget\n";
+                          }
+                        }
 					}
 					$semph++;
 				}
@@ -1485,7 +1505,7 @@ sub morph
 									if ( not ( -e $target ) )
 									{
 										`cp -R $orig $target`;
-										print  "LEVEL 1a: cp -R $orig $target\n\n";
+										say "LEVEL 1a: cp -R $orig $target\n";
 									}
 								}
 								elsif ( ( "begin" ~~ @whatto )  and ( not ( "end" ~~ @whatto ) ) and ( not ( $dowhat{jumpinst} eq "y" ) ) )
@@ -1501,8 +1521,7 @@ sub morph
 									if ( not ( -e $target ) )
 									{
 										`cp -R $orig $target`;
-										print  "LEVEL 1b: cp -R $orig $target\n\n";
-										print "LEVEL 1b: cp -R $orig $target\n\n";
+										say  "LEVEL 1b: cp -R $orig $target\n";
 									}
 								}
 
@@ -1520,8 +1539,7 @@ sub morph
 									if ( not ( -e $target ) )
 									{
 										`mv -f $orig $target`;
-										print  "LEVEL 1c: cp -R $orig $target\n\n";
-										print  "LEVEL 1c: cp -R $orig $target\n\n";
+										say "LEVEL 1c: cp -R $orig $target\n";
 									}
 								}
 								elsif ( ( "transition" ~~ @whatto ) and ( not ( "begin" ~~ @whatto) ) and
@@ -1538,8 +1556,7 @@ sub morph
 									if ( not ( -e $target ) )
 									{
 										`cp -R $orig $target`;
-										print  "LEVEL 1d: cp -R $orig $target\n\n";
-										print  "LEVEL 1d: cp -R $orig $target\n\n";
+										say "LEVEL 1d: cp -R $orig $target\n";
 									}
 								}
 
@@ -1556,8 +1573,7 @@ sub morph
 									if ( not ( -e $target ) )
 									{
 										`mv -f $orig $target`;
-										print  "LEVEL 1e1: cp -R $orig $target\n\n";
-										print  "LEVEL 1e1: cp -R $orig $target\n\n";
+										say "LEVEL 1e1: cp -R $orig $target\n";
 									}
 								}
                                 elsif ( ( "end" ~~ @whatto ) and ( not ( $dowhat{jumpinst} eq "y" ) ) )
@@ -1573,8 +1589,7 @@ sub morph
 									if ( not ( -e $target ) )
 									{
 										`cp -R $orig $target`;
-										print  "LEVEL 1e2: cp -R $orig $target\n\n";
-										print  "LEVEL 1e2: cp -R $orig $target\n\n";
+										say "LEVEL 1e2: cp -R $orig $target\n";
 									}
 								}
 
@@ -1591,8 +1606,7 @@ sub morph
 									if ( not ( -e $target ) )
 									{
 										`cp -R $orig $target`;
-										print  "LEVEL 1e2: cp -R $orig $target\n\n";
-										print  "LEVEL 1e2: cp -R $orig $target\n\n";
+										say "LEVEL 1e2: cp -R $orig $target\n";
 									}
 								}
 
@@ -1624,9 +1638,7 @@ sub morph
 								if ( not ( -e $target ) )
 								{
 									`cp -R $orig $target`;
-									#say  "HERE 3 COUNTBLOCK: $countblock, \$countstep: $countstep, \$orig: $orig, \$target: $target, \$to{cleanto}: $to{cleanto}, \$to{thisto}: $to{thisto},  ";
-									print  "LEVEL 1g: cp -R $orig $target \n\n";
-									#print  "LEVEL 1g: cp -R $orig $target \n\n";
+									say "LEVEL 1g: cp -R $orig $target \n";
                                 }
 							}
 						}
@@ -1647,7 +1659,7 @@ sub morph
 
 								my $skip = $skipop->[ $countop ]	;
 								my $modification_type = $applytype[$countop][0];
-								if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and ( $modification_type ne "changeconfig" ) )
+								if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and $applytype[$countop][2] and ( $modification_type ne "changeconfig" ) )
 								{
 
 									unless ($exeonfiles eq "n")
@@ -1656,22 +1668,20 @@ sub morph
 
 											say  `cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
 									}
-									#if ( $d{treated} eq "treated" ){ print  "TREATED: $d{treated} "; }; say  "ARRIVED IN MORPH 8 "; print  "LEVEL 2:cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n\n";
-									print  "LEVEL 2: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
+									say  "LEVEL 2: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
 								}
 
-								if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and ( $modification_type eq "changeconfig" ) )
+								if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and $applytype[$countop][2] and ( $modification_type eq "changeconfig" ) )
 								{
 									unless ($exeonfiles eq "n")
 									{
 										say  `cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
 									}
-									print  "LEVEL 2b: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
+									say  "LEVEL 2b: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
 								}
 
 								`cd $to`;
 								say  "cd $to\n";
-                                #if ( $d{treated} eq "treated" ){ print  "TREATED: $d{treated} "; }; say  "ARRIVED IN MORPH 9 ";
 								my $launchline = "cd $to/cfg/ \n prj -file $fileconfig -mode script"; #say  "SO, LAUNCHLINE! " . dump( $launchline );
 
 								#if ( ( ( ( $stepsvar > 1 ) and ( not ( eval ( $skip ) ) ) ) and ( not( $wascountvar =~ /-/ ) ) ) and 

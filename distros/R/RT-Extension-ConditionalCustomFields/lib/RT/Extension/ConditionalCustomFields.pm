@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::ConditionalCustomFields;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 =encoding utf8
 
@@ -509,7 +509,7 @@ L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Cond
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2017-2025 by Gérald Sédrati, Easter-Eggs
+This software is Copyright (c) 2017-2026 by Gérald Sédrati, Easter-Eggs
 
 This is free software, licensed under:
 

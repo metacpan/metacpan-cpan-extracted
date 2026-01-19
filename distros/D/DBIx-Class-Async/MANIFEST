@@ -1,12 +1,12 @@
 Changes
 lib/DBIx/Class/Async.pm
 lib/DBIx/Class/Async/ResultSet.pm
+lib/DBIx/Class/Async/ResultSet/Pager.pm
 lib/DBIx/Class/Async/Row.pm
 lib/DBIx/Class/Async/Schema.pm
 lib/DBIx/Class/Async/Storage.pm
 lib/DBIx/Class/Async/Storage/DBI.pm
 lib/DBIx/Class/Async/Storage/DBI/Cursor.pm
-lib/DBIx/Class/Async/TxnGuard.pm
 LICENSE
 Makefile.PL
 MANIFEST
@@ -57,6 +57,8 @@ t/41-resultset-count-literal.t
 t/42-resultset-cache.t
 t/43-result-class.t
 t/44-txn-batch.t
+t/45-pager.t
+t/46-using-chi.t
 t/manifest.t
 t/pod.t
 t/test.db

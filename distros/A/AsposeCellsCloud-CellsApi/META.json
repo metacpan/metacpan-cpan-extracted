@@ -63,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "25.12"
+         "version" : "26.1"
       },    
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -1418,6 +1418,9 @@
       "AsposeCellsCloud::Object::WorksheetDataStatistics" : {
          "file" : "lib/AsposeCellsCloud/Object/WorksheetDataStatistics.pm"
       },
+      "AsposeCellsCloud::Request::DecomposeUserTaskRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DecomposeUserTaskRequest.pm"
+      },
       "AsposeCellsCloud::Request::TranslationSpreadsheetRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/TranslationSpreadsheetRequest.pm"
       },
@@ -1471,6 +1474,12 @@
       },
       "AsposeCellsCloud::Request::ConvertWorksheetToPdfRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/ConvertWorksheetToPdfRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertWorksheetToHtmlRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertWorksheetToHtmlRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertWorksheetToHtmlTableRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertWorksheetToHtmlTableRequest.pm"
       },
       "AsposeCellsCloud::Request::ConvertTableToImageRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/ConvertTableToImageRequest.pm"
@@ -1531,6 +1540,15 @@
       },
       "AsposeCellsCloud::Request::ImportDataIntoSpreadsheetRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/ImportDataIntoSpreadsheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ImportJSONDataIntoSpreadsheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ImportJSONDataIntoSpreadsheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ImportXMLDataIntoSpreadsheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ImportXMLDataIntoSpreadsheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ImportCSVDataIntoSpreadsheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ImportCSVDataIntoSpreadsheetRequest.pm"
       },
       "AsposeCellsCloud::Request::GetPublicKeyRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/GetPublicKeyRequest.pm"
@@ -1648,6 +1666,9 @@
       },
       "AsposeCellsCloud::Request::SwapRangeRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/SwapRangeRequest.pm"
+      },
+      "AsposeCellsCloud::Request::FlipDataRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/FlipDataRequest.pm"
       },
       "AsposeCellsCloud::Request::DownloadFileRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/DownloadFileRequest.pm"
@@ -2719,6 +2740,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "25.12",
+   "version" : "26.1",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

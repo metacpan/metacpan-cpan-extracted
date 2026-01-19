@@ -1,7 +1,7 @@
 ---
-abstract: 'A configurable TCP server with HTTP, CGI, and threading support (Pure Perl OOP)'
+abstract: 'A configurable TCP/HTTP server with file uploads, rate limiting, and threading support (Pure Perl OOP)'
 author:
-  - 'Hans Harder <hans@atbas.org>'
+  - 'Hans Harder'
 build_requires:
   Test::More: '0'
 configure_requires:
@@ -27,5 +27,5 @@ requires:
 resources:
   bugtracker: https://github.com/HansH111/LightTCP-Server.pm/issues
   repository: https://github.com/HansH111/LightTCP-Server.pm.git
-version: '2.00'
+version: '2.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -58,7 +58,7 @@ my %Package;
 
 #  Version information
 #
-$VERSION='2.071';
+$VERSION='2.072';
 
 
 #  Debug load
@@ -334,6 +334,13 @@ sub _start_html {
         static
         cache
         handler
+        h1
+        h2
+        h3
+        h4
+        h5
+        h6
+        hr
     ), keys %{$WEBDYNE_START_HTML_SHORTCUT_HR});
     debug('start_html %s', Dumper(\%attr_page));
 
@@ -509,13 +516,13 @@ sub _start_html {
     
     #  Build title
     #
-    my $title;
+    my ($title, $title_html);
     unless (@include && (grep {/<title>.*?<\/title>/i} @include)) {
         if (defined($attr_page{'title'})) {
             #  Title is defined (presumably some string)
             #
             debug('title attr defined, using: %s', $attr_page{'title'});
-            $title=$self->title($attr_page{'title'});
+            $title_html=$self->title($title=$attr_page{'title'});
         }
         elsif (exists($attr_page{'title'})) {
             #  Exists but undefined, leave title undef also
@@ -527,10 +534,21 @@ sub _start_html {
             #  No title attr at all, use default
             #
             debug('title attr not present, using default title');
-            $title=$self->title($WEBDYNE_HTML_DEFAULT_TITLE);
+            $title_html=$self->title($title=$WEBDYNE_HTML_DEFAULT_TITLE);
         }
     }
     debug('title: %s', $title || '*undef*');
+    
+    
+    #  Add title as introductory heading if wanted
+    #
+    my $heading_html='';
+    if (my ($heading_tag)=grep {$attr_page{$_}} qw(h1 h2 h3 h4 h5 h6)) {
+        $heading_html=$self->$heading_tag($title) if $title;
+        if ($attr_page{'hr'}) {
+            $heading_html.=$self->hr();
+        }
+    }
         
 
     #  Build head, adding a title section, empty if none specified
@@ -539,7 +557,7 @@ sub _start_html {
         join(
             $/,
             grep {$_} (
-                $title,
+                $title_html,
                 @meta,
                 @base,
                 @link,
@@ -552,7 +570,7 @@ sub _start_html {
     #  Put all together and return
     #
     #push @html, $self->open('html', $attr_hr), $head . $self->open('body');
-    push @html, $self->open('html', \%attr), $head . $self->open('body');
+    push @html, $self->open('html', \%attr), $head . $self->open('body') . $heading_html;
     debug('html: %s', Dumper(\@html));
     return join($/, @html);
 

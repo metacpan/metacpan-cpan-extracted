@@ -61,7 +61,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='2.071';
+$VERSION='2.072';
 chomp($VERSION_GIT_SHA=do { local (@ARGV, $/) = ($_=__FILE__.'.sha'); <> if -f $_ });
 
 
@@ -2965,7 +2965,8 @@ sub perl {
     
     #  Return whatever was generated unless hidden attr set
     #
-    unless ( $attr_hr->{'hidden'} || (defined $attr_hr->{'display'} && ($attr_hr->{'display'}==0))) {
+    #unless ( $attr_hr->{'hidden'} || (defined $attr_hr->{'display'} && ($attr_hr->{'display'}==0))) {
+    unless ( $attr_hr->{'hidden'} ) {
     
         #  Not hidden return
         #

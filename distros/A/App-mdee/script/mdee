@@ -23,7 +23,7 @@ mdee - Markdown, Easy on the Eyes
          --version          show version
      -d  --debug            debug level (repeatable)
      -n  --dryrun           dry-run mode
-     -f  --filter           filter mode (highlight only)
+     -f  --filter           filter mode (--no-fold --no-nup)
          --[no-]fold        line folding (default: on)
          --[no-]table       table formatting (default: on)
          --[no-]nup         nup paged output (default: on)
@@ -44,7 +44,7 @@ mdee - Markdown, Easy on the Eyes
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
@@ -77,11 +77,13 @@ END
 declare -a nup_opts=(--document --no-filename)
 declare -A show=()
 
+declare -A adjust=([light]='=l25' [dark]='=l80')
+
 declare -A OPTS=(
     [&REQUIRE]=0.7.1 [&USAGE]="$USAGE"
     [         help | h   !         # show help         ]=
     [      version |     !         # show version      ]=
-    [        debug | d   +         # debug level       ]=0
+    [        debug | d  +          # debug level       ]=0
     [       dryrun | n             # dry-run mode      ]=
     [       filter | f   !         # filter mode       ]=
     [         fold |               # line folding      ]=1
@@ -91,8 +93,9 @@ declare -A OPTS=(
     [        theme | t  :          # color theme       ]=default
     [         mode | m  :          # light or dark     ]=
     [   base-color | B  :          # base color        ]=
+    [       adjust |    %          # color adjustment  ]=
     [  list-themes |     !         # list themes       ]=
-    [         show |   %!          # field visibility   ]=
+    [         show |    %!         # field visibility  ]=
     [        pager |    ?!         # pager command     ]=
     [         grid | G  :>nup_opts # grid layout       ]=
     [         pane | C  :>nup_opts # number of columns ]=
@@ -107,28 +110,28 @@ declare -A OPTS=(
 ##############################################################################
 
 # Common color functions
-osc8_prologue='sub{ sub osc8 { sprintf "\e]8;;%2\$s\e\\%1\$s\e]8;;\e\\", @_ } }'
-link_func='sub{ s/\[(?<text>.+?)\]\((?<url>.+?)\)/osc8("[$+{text}]",$+{url})/er }'
-image_func='sub{ s/!\[(?<alt>.+?)\]\((?<url>.+?)\)/osc8("![$+{alt}]",$+{url})/er }'
-image_link_func='sub{ s/\[!\[(?<alt>.+?)\]\(.+?\)\]\((?<url>.+?)\)/osc8("![$+{alt}]",$+{url})/er }'
+  osc8_prologue='sub{ sub osc8 { sprintf "\e]8;;%s\e\\%s\e]8;;\e\\", @_ } }'
+      link_func='sub{ s/   \[(?<txt>.+?)\]         \((?<url>.+?)\)/osc8($+{url},  "[$+{txt}]")/xer }'
+     image_func='sub{ s/  !\[(?<alt>.+?)\]         \((?<url>.+?)\)/osc8($+{url}, "![$+{alt}]")/xer }'
+image_link_func='sub{ s/\[!\[(?<alt>.+?)\]\(.+?\)\]\((?<url>.+?)\)/osc8($+{url}, "![$+{alt}]")/xer }'
 
 declare -A theme_default_light=(
-    [base]='<NavyBlue>'
-    [comment]='${base}+r60'
-    [bold]='${base}D'
-    [strike]='X'
-    [italic]='I'
-    [link]="$link_func"
-    [image]="$image_func"
-    [image_link]="$image_link_func"
-    [h1]='L25DE/${base}'
-    [h2]='L25DE/${base}+l10'
-    [h3]='L00DN/${base}=l93'
-    [h4]='${base}UD'
-    [h5]='${base}+l20;U'
-    [h6]='${base}+l20'
+           [base]='<NavyBlue>'
+        [comment]='${base}+r60'
+           [bold]='${base}D'
+         [strike]='X'
+         [italic]='I'
+           [link]="$link_func"
+          [image]="$image_func"
+     [image_link]="$image_link_func"
+             [h1]='L25DE/${base}'
+             [h2]='L25DE/${base}+l10'
+             [h3]='L00DN/${base}=l93'
+             [h4]='${base}UD'
+             [h5]='${base}+l20;U'
+             [h6]='${base}+l20'
     [inline_code]='L15/L23,/L23,L15/L23'
-    [code_block]='L20 , L18 , /L23;E , L20'
+     [code_block]='L20 , L18 , /L23;E , L20'
 )
 declare -a show_fields=()
 for k in "${!theme_default_light[@]}"; do
@@ -136,12 +139,12 @@ for k in "${!theme_default_light[@]}"; do
 done
 
 declare -A theme_default_dark=(
-    [base]='<NavyBlue>=l80'
-    [h1]='L00DE/${base}'
-    [h2]='L00DE/${base}-l05'
-    [h3]='L00DN/${base}-l10'
+           [base]='<NavyBlue>=l80'
+             [h1]='L00DE/${base}'
+             [h2]='L00DE/${base}-l05'
+             [h3]='L00DN/${base}-l10'
     [inline_code]='L12/L05,/L05,L12/L05'
-    [code_block]='L10 , L12 , /L05;E , L10'
+     [code_block]='L10 , L12 , /L05;E , L10'
 )
 for k in "${!theme_default_light[@]}"; do
     [[ -v theme_default_dark[$k] ]] || theme_default_dark[$k]=${theme_default_light[$k]}
@@ -232,7 +235,6 @@ pager() {
 
 filter() {
     fold=
-    table=
     nup=
 }
 
@@ -298,23 +300,23 @@ show_theme_sample() {
     if [[ "$theme_mode" == "dark" ]]; then
         # Dark mode: show on dark background
         ansiecho -i 555/000E -f "  %-16s" "$label" \
-                 " " -i "$h1" "# H1" -a 555/000 \
-                 " " -i "$h2" "## H2" -a 555/000 \
-                 " " -i "$h3" "### H3" -a 555/000 \
-                 " " -i "${sample_colors[h4]}" "#### H4" -a 555/000 \
-                 " " -i "${sample_colors[h5]}" "##### H5" -a 555/000 \
-                 " " -i "${sample_colors[bold]}" "**bold**" -a 555/000 \
-                 " " -i "${code_color}" '`code`' -a Z
+                 -i "$h1" "# H1" -a 555/000 \
+                 -i "$h2" "## H2" -a 555/000 \
+                 -i "$h3" "### H3" -a 555/000 \
+                 -i "${sample_colors[h4]}" "#### H4" -a 555/000 \
+                 -i "${sample_colors[h5]}" "##### H5" -a 555/000 \
+                 -i "${sample_colors[bold]}" "**bold**" -a 555/000 \
+                 -i "${code_color}" '`code`' -a Z
     else
         # Light mode: show on light background
         ansiecho -i 000/555E -f "  %-16s" "$label" \
-                 " " -i "$h1" "# H1" -a 000/555 \
-                 " " -i "$h2" "## H2" -a 000/555 \
-                 " " -i "$h3" "### H3" -a 000/555 \
-                 " " -i "${sample_colors[h4]}" "#### H4" -a 000/555 \
-                 " " -i "${sample_colors[h5]}" "##### H5" -a 000/555 \
-                 " " -i "${sample_colors[bold]}" "**bold**" -a 000/555 \
-                 " " -i "${code_color}" '`code`' -a Z
+                 -i "$h1" "# H1" -a 000/555 \
+                 -i "$h2" "## H2" -a 000/555 \
+                 -i "$h3" "### H3" -a 000/555 \
+                 -i "${sample_colors[h4]}" "#### H4" -a 000/555 \
+                 -i "${sample_colors[h5]}" "##### H5" -a 000/555 \
+                 -i "${sample_colors[bold]}" "**bold**" -a 000/555 \
+                 -i "${code_color}" '`code`' -a Z
     fi
 }
 
@@ -365,7 +367,14 @@ load_theme "$theme" "$mode"
 load_config
 
 # Override base color if specified
-[[ $base_color ]] && colors[base]=$base_color
+# Color names (e.g., Red, NavyBlue) get automatic adjustment
+if [[ $base_color ]]; then
+    if [[ $base_color =~ ^[A-Za-z][A-Za-z0-9_]*$ ]]; then
+        colors[base]="<${base_color}>${adjust[$mode]}"
+    else
+        colors[base]="$base_color"
+    fi
+fi
 
 # Expand ${base} references in color values
 expand_theme
@@ -402,8 +411,8 @@ add_pattern() {
 
 add_pattern comment   '^<!--(?![->])(?s:.+?)-->'
 add_pattern bold      '(?<!\\)\*\*.*?(?<!\\)\*\*'
-add_pattern bold      '(?<!\\)(?<!\w)__.*?(?<!\\)__(?!\w)'
-add_pattern italic    '(?<!\\)(?<!\w)_(?:(?!_).)+(?<!\\)_(?!\w)'
+add_pattern bold      '(?<!\\)(?<![`\w])__.*?(?<!\\)__(?!\w)'
+add_pattern italic    '(?<!\\)(?<![`\w])_(?:(?!_).)+(?<!\\)_(?!\w)'
 add_pattern italic    '(?<!\\)(?<!\*)\*(?:(?!\*).)+(?<!\\)\*(?!\*)'
 add_pattern strike    '~~.+?~~'
 add_pattern h1        '^#\h+.*'
@@ -443,7 +452,7 @@ declare -a cmd_fold=(
 
 declare -a cmd_table=(
     greple
-    -Mtee::config=discrete "&ansicolumn" -s '|' -o '|' -t --cu=1 --
+    -Mtee::config=discrete,bulkmode "&ansicolumn" -s '|' -o '|' -t --cu=1 --
     -E '^(\|.+\|\n){3,}' --all --need=0 --no-color
 )
 
@@ -455,9 +464,9 @@ declare -a cmd_nup=(nup "${nup_opts[@]}")
 
 # Collect pipeline stages
 declare -a stages=(cmd_greple)
-[[ $fold == 1 ]]  && stages+=(cmd_fold)
-[[ $table == 1 ]] && stages+=(cmd_table cmd_table_fix)
-[[ $nup == 1 ]]   && stages+=(cmd_nup)
+[[ $fold  ]] && stages+=(cmd_fold)
+[[ $table ]] && stages+=(cmd_table cmd_table_fix)
+[[ $nup   ]] && stages+=(cmd_nup)
 
 # Build pipeline string from stages
 pipeline=""
@@ -512,18 +521,18 @@ increasing verbosity.
 
 Dry-run mode. Show the command without executing.
 
-=item B<-f>, B<--filter>
-
-Filter mode.  Reads from stdin (or files) and outputs highlighted
-Markdown to stdout.  Disables line folding, table formatting, and
-nup paged output.  Useful for piping Markdown content through mdee
-for syntax highlighting only.
-
 =back
 
 =head2 Processing Options
 
 =over 4
+
+=item B<-f>, B<--filter>
+
+Filter mode.  Reads from stdin (or files) and outputs highlighted
+Markdown to stdout.  Disables line folding and nup paged output,
+but keeps table formatting enabled.  Useful for piping Markdown
+content through mdee for syntax highlighting.
 
 =item B<--[no-]fold>
 
@@ -711,6 +720,17 @@ or C<--no-pager> to disable paging.
     mdee -B '<Red>' file.md              # override base color
     mdee --mode=dark -B '<Cyan>' file.md # dark mode with cyan base
     mdee --list-themes                   # list available themes
+
+=head1 INSTALLATION
+
+=head2 Homebrew (macOS)
+
+    brew tap tecolicom/tap
+    brew install app-mdee
+
+=head2 CPAN
+
+    cpanm -n App::mdee
 
 =head1 DEPENDENCIES
 

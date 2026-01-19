@@ -1,14 +1,20 @@
+.editorconfig
 Build.PL
 Changes
 lib/Future/IO/Impl/Glib.pm
-MANIFEST			This list of files
-t/00use.t
-t/01sleep.t
-t/02sysread.t
-t/04syswrite.t
-t/06waitpid.t
-t/99pod.t
-README
 LICENSE
-META.yml
+MANIFEST			This list of files
 META.json
+META.yml
+README
+t/00use,t
+t/01sleep.t
+t/02poll.t
+t/10read.t
+t/11write.t
+t/12connect.t
+t/13accept.t
+t/14send.t
+t/15recv.t
+t/16waitpid.t
+t/99pod.t

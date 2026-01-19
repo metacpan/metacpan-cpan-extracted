@@ -16,11 +16,11 @@ DBIx::Class::Async::ResultSet - Asynchronous resultset for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.35
+Version 0.40
 
 =cut
 
-our $VERSION = '0.35';
+our $VERSION = '0.40';
 
 =head1 SYNOPSIS
 
@@ -180,7 +180,7 @@ A core inflation method that transforms a raw hash of database results into a
 fully-functional row object. Unlike standard inflation, this method is
 architected for the asynchronous, disconnected nature of background workers.
 
-=head3 Features
+B<Features>
 
 =over 4
 
@@ -643,6 +643,43 @@ sub count_rs {
         select => [ { count => '*' } ],
         as     => [ 'count' ],
     });
+}
+
+=head2 count_total
+
+    my $future = $rs->count_total;
+    my $total  = $future->get;
+
+Returns a L<Future> that resolves to the total number of records matching the
+ResultSet's conditions, specifically ignoring any pagination attributes
+(C<rows>, C<offset>, or C<page>).
+
+This is distinct from the standard C<count> method, which in an asynchronous
+context often reflects the size of the current page (the "slice") rather than
+the total dataset. This method is used internally by the L<pager|/pager>
+to calculate the last page number and total entries.
+
+You can optionally pass additional conditions or attributes to be merged:
+
+    my $total = $rs->count_total({ status => 'active' })->get;
+
+=cut
+
+sub count_total {
+    my ($self, $cond, $attrs) = @_;
+
+    my $merged_cond  = { %{ $self->{_cond}  || {} }, %{ $cond  || {} } };
+    my $merged_attrs = { %{ $self->{_attrs} || {} }, %{ $attrs || {} } };
+
+    delete $merged_attrs->{rows};
+    delete $merged_attrs->{offset};
+    delete $merged_attrs->{page};
+
+    return $self->{async_db}->count(
+        $self->{source_name},
+        $merged_cond,
+        $merged_attrs,
+    );
 }
 
 =head2 create
@@ -1160,6 +1197,36 @@ sub get_column {
     return undef;
 }
 
+=head2 is_paged
+
+    if ($rs->is_paged) { ... }
+
+Returns a boolean (1 or 0) indicating whether the ResultSet has pagination
+attributes (specifically the C<page> key) defined.
+
+=cut
+
+sub is_paged {
+    my $self = shift;
+    return exists $self->{_attrs}->{page} ? 1 : 0;
+}
+
+=head2 is_ordered
+
+    my $bool = $rs->is_ordered;
+
+Returns B<true> (1) if the ResultSet has an C<order_by> attribute set, B<false> (0)
+otherwise. It is highly recommended to ensure a ResultSet B<is_ordered> before
+performing pagination to ensure consistent results across pages.
+
+=cut
+
+sub is_ordered {
+    my $self = shift;
+
+    return exists $self->{_attrs}->{order_by} ? 1 : 0;
+}
+
 =head2 next
 
     while (my $row = $rs->next) {
@@ -1197,6 +1264,61 @@ sub next {
     return undef if $self->{_pos} >= @{$self->{_rows}};
 
     return $self->{_rows}[$self->{_pos}++];
+}
+
+=head2 page
+
+    my $paged_rs = $rs->page(3);
+
+Returns a new ResultSet clone with the C<page> and C<rows> attributes set. If
+C<rows> (entries per page) has not been previously set on the ResultSet, it
+defaults to 10.
+
+This method is chainable and does not execute a query immediately.
+
+=cut
+
+sub page {
+    my ($self, $page_number) = @_;
+
+    # We use the existing search() method to handle the cloning.
+    # This avoids calling new() directly and hitting those validation croaks.
+    return $self->search(undef, {
+        page => $page_number || 1,
+        rows => $self->{_attrs}->{rows} || 10
+    });
+}
+
+=head2 pager
+
+    my $pager = $rs->page(1)->pager;
+
+Returns a L<DBIx::Class::Async::ResultSet::Pager> object for the current
+ResultSet. This object provides methods to calculate the total number of pages,
+next/previous page numbers, and entry counts.
+
+B<Note:> This method will C<die> if called on a ResultSet that has not been
+paged via the L</page> method.
+
+B<PRO-TIP>: Warn the user if they are paginating unordered data.
+
+=cut
+
+sub pager {
+    my $self = shift;
+
+    unless ($self->is_paged) {
+        die "Cannot call ->pager on a non-paged resultset. Call ->page(\$n) first.";
+    }
+
+    # Warn only if unordered AND not running in a test suite
+    if (!$self->is_ordered && !$ENV{HARNESS_ACTIVE}) {
+        warn "DBIx::Class::Async Warning: Calling ->pager on an unordered ResultSet. " .
+             "Results may be inconsistent across pages.\n";
+    }
+
+    require DBIx::Class::Async::ResultSet::Pager;
+    return DBIx::Class::Async::ResultSet::Pager->new(resultset => $self);
 }
 
 =head2 populate
@@ -1790,6 +1912,54 @@ This is a synchronous metadata operation and does not hit the database.
 sub search_related_rs {
     my $self = shift;
     return $self->_do_search_related(@_);
+}
+
+=head2 search_with_pager
+
+    my $future = $rs->search_with_pager({ status => 'active' }, { rows => 20 });
+
+    $future->then(sub {
+        my ($rows, $pager) = @_;
+        print "Displaying page " . $pager->current_page;
+        return Future->done;
+    })->get;
+
+This is a convenience method that performs a search and initializes a pager
+simultaneously. It returns a L<Future> which, when resolved, provides two values:
+an arrayref of result objects (C<$rows>) and a L<DBIx::Class::Async::ResultSet::Pager>
+object (C<$pager>).
+
+B<Performance Note>
+
+Unlike standard synchronous pagination where you must first fetch the data and
+then fetch the count (or vice versa), C<search_with_pager> fires both the
+C<SELECT> and the C<COUNT> queries to the database worker pool in parallel using
+L<Future/needs_all>. This can significantly reduce latency in web applications.
+
+If the ResultSet is not already paged when this method is called, it
+automatically applies C<< ->page(1) >>.
+
+=cut
+
+sub search_with_pager {
+    my ($self, $cond, $attrs) = @_;
+
+    # 1. Create the paged resultset
+    my $paged_rs = $self->search($cond, $attrs);
+    if (!$paged_rs->is_paged) {
+        $paged_rs = $paged_rs->page(1);
+    }
+
+    # 2. Fire both requests in parallel
+    my $data_f  = $paged_rs->all;
+    my $pager   = $paged_rs->pager;
+    my $total_f = $pager->total_entries;
+
+    # 3. Return a combined Future
+    return Future->needs_all($data_f, $total_f)->then(sub {
+        my ($rows, $total) = @_;
+        return Future->done($rows, $pager);
+    });
 }
 
 =head2 set_cache
@@ -2553,7 +2723,7 @@ sub _resolved_attrs {
 }
 
 # Chainable modifiers
-foreach my $method (qw(rows page order_by columns group_by having distinct)) {
+foreach my $method (qw(rows order_by columns group_by having distinct)) {
     no strict 'refs';
     *{$method} = sub {
         my ($self, $value) = @_;

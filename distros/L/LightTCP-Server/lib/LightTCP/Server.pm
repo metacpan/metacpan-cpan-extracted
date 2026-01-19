@@ -3,13 +3,31 @@ package LightTCP::Server;
 use strict;
 use warnings;
 
+use Carp qw(croak);
 use IO::Socket::INET;
 use IPC::Open3;
 use threads;
 use threads::shared;
 use File::Temp;
 
-our $VERSION = '2.00';
+our $VERSION = '2.04';
+
+use constant {
+    DEFAULT_ADDR        => '0.0.0.0:8881',
+    DEFAULT_NAME        => 'tcpsrv',
+    DEFAULT_TYPE        => 'single',
+    DEFAULT_THREADS     => 10,
+    DEFAULT_TIMEOUT     => -1,
+    DEFAULT_DIR         => '/var/www',
+    DEFAULT_ETC         => '.',
+    DEFAULT_FNEXT       => 'html css js ico gif jpg png',
+    DEFAULT_CGIEXT      => 'cgi php',
+    DEFAULT_UPLOAD_DIR  => '/var/www/uploads',
+    UPLOAD_MAX_SIZE     => 10 * 1024 * 1024,
+    RATE_LIMIT_REQUESTS => 100,
+    RATE_LIMIT_WINDOW   => 60,
+    RATE_LIMIT_BLOCK    => 300,
+};
 
 sub new {
     my ($class, @args) = @_;
@@ -19,13 +37,13 @@ sub new {
         @args = %{$args[0]};
     }
 
-    $self->{server_addr} = '0.0.0.0:8881';
-    $self->{server_name} = 'tcpsrv';
-    $self->{server_type} = 'single';
-    $self->{max_threads} = 10;
-    $self->{server_timeout} = -1;
-    $self->{server_dir} = '/var/www';
-    $self->{server_etc} = '.';
+    $self->{server_addr} = DEFAULT_ADDR;
+    $self->{server_name} = DEFAULT_NAME;
+    $self->{server_type} = DEFAULT_TYPE;
+    $self->{max_threads} = DEFAULT_THREADS;
+    $self->{server_timeout} = DEFAULT_TIMEOUT;
+    $self->{server_dir} = DEFAULT_DIR;
+    $self->{server_etc} = DEFAULT_ETC;
     $self->{server_autostop} = 0;
     $self->{server_deny} = 0;
     $self->{server_secure} = 0;
@@ -35,9 +53,9 @@ sub new {
     $self->{runas_group} = '';
     $self->{server_http} = 1;
     $self->{server_perlonly} = 1;
-    $self->{server_fnext} = 'html css js ico gif jpg png';
+    $self->{server_fnext} = DEFAULT_FNEXT;
     $self->{server_cgi} = 0;
-    $self->{server_cgiext} = 'cgi php';
+    $self->{server_cgiext} = DEFAULT_CGIEXT;
     $self->{http_postlimit} = 0;
     $self->{func_timeout} = undef;
     $self->{func_perl} = undef;
@@ -50,8 +68,8 @@ sub new {
     $self->{_serverloop} = 1;
     $self->{_threads} = [];
     $self->{_log_lock} = do { my $lock :shared; \$lock; };
-    $self->{upload_dir} = '/var/www/uploads';
-    $self->{upload_max_size} = 10 * 1024 * 1024;
+    $self->{upload_dir} = DEFAULT_UPLOAD_DIR;
+    $self->{upload_max_size} = UPLOAD_MAX_SIZE;
     $self->{upload_allowed_types} = [qw(
         image/jpeg image/png image/gif image/webp
         application/pdf text/plain text/csv text/html
@@ -62,9 +80,9 @@ sub new {
         application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
     )];
     $self->{rate_limit_enabled} = 0;
-    $self->{rate_limit_requests} = 100;
-    $self->{rate_limit_window} = 60;
-    $self->{rate_limit_block_duration} = 300;
+    $self->{rate_limit_requests} = RATE_LIMIT_REQUESTS;
+    $self->{rate_limit_window} = RATE_LIMIT_WINDOW;
+    $self->{rate_limit_block_duration} = RATE_LIMIT_BLOCK;
     $self->{rate_limit_whitelist} = [qw(127.0.0.1 ::1 localhost)];
     $self->{_rate_limit_lock} = do { my $lock :shared; \$lock; };
     $self->{_rate_limit_data} = {};
@@ -82,7 +100,7 @@ sub new {
 sub server_addr {
     my ($self, $value) = @_;
     if (@_ > 1) {
-        die "server_addr is required" unless defined $value && $value ne '';
+        croak "server_addr is required" unless defined $value && $value ne '';
         $self->{server_addr} = $value;
     }
     return $self->{server_addr};
@@ -91,7 +109,7 @@ sub server_addr {
 sub server_name {
     my ($self, $value) = @_;
     if (@_ > 1) {
-        die "server_name must be a string" if defined $value && ref $value;
+        croak "server_name must be a string" if defined $value && ref $value;
         $self->{server_name} = $value;
     }
     return $self->{server_name};
@@ -100,7 +118,7 @@ sub server_name {
 sub server_type {
     my ($self, $value) = @_;
     if (@_ > 1) {
-        die "server_type must be single, fork, or thread" unless $value =~ /^(?:single|fork|thread)$/;
+        croak "server_type must be single, fork, or thread" unless $value =~ /^(?:single|fork|thread)$/x;
         $self->{server_type} = $value;
     }
     return $self->{server_type};
@@ -109,7 +127,7 @@ sub server_type {
 sub max_threads {
     my ($self, $value) = @_;
     if (@_ > 1) {
-        die "max_threads must be a positive integer" if defined $value && $value !~ /^\d+$/;
+        croak "max_threads must be a positive integer" if defined $value && $value !~ /^\d+$/x;
         $self->{max_threads} = $value;
     }
     return $self->{max_threads};
@@ -118,7 +136,7 @@ sub max_threads {
 sub server_timeout {
     my ($self, $value) = @_;
     if (@_ > 1) {
-        die "server_timeout must be >= -1" if defined $value && $value < -1;
+        croak "server_timeout must be >= -1" if defined $value && $value < -1;
         $self->{server_timeout} = $value;
     }
     return $self->{server_timeout};
@@ -175,7 +193,7 @@ sub server_auth {
 sub server_keys {
     my ($self, $value) = @_;
     if (@_ > 1) {
-        die "server_keys must be an arrayref" if defined $value && ref $value ne 'ARRAY';
+        croak "server_keys must be an arrayref" if defined $value && ref $value ne 'ARRAY';
         $self->{server_keys} = $value;
     }
     return $self->{server_keys};
@@ -288,7 +306,7 @@ sub logfn {
 sub verbose {
     my ($self, $value) = @_;
     if (@_ > 1) {
-        die "verbose must be 0-3" if defined $value && ($value < 0 || $value > 3);
+        croak "verbose must be 0-3" if defined $value && ($value < 0 || $value > 3);
         $self->{verbose} = $value;
     }
     return $self->{verbose};
@@ -329,7 +347,7 @@ sub _log_lock {
 sub upload_dir {
     my ($self, $value) = @_;
     if (@_ > 1) {
-        die "upload_dir must be a non-empty string" unless defined $value && $value ne '' && !ref $value;
+        croak "upload_dir must be a non-empty string" unless defined $value && $value ne '' && !ref $value;
         $self->{upload_dir} = $value;
     }
     return $self->{upload_dir};
@@ -338,7 +356,7 @@ sub upload_dir {
 sub upload_max_size {
     my ($self, $value) = @_;
     if (@_ > 1) {
-        die "upload_max_size must be positive" if defined $value && $value <= 0;
+        croak "upload_max_size must be positive" if defined $value && $value <= 0;
         $self->{upload_max_size} = $value;
     }
     return $self->{upload_max_size};
@@ -347,7 +365,7 @@ sub upload_max_size {
 sub upload_allowed_types {
     my ($self, $value) = @_;
     if (@_ > 1) {
-        die "upload_allowed_types must be an arrayref" if defined $value && ref $value ne 'ARRAY';
+        croak "upload_allowed_types must be an arrayref" if defined $value && ref $value ne 'ARRAY';
         $self->{upload_allowed_types} = $value;
     }
     return $self->{upload_allowed_types};
@@ -372,7 +390,7 @@ sub rate_limit_enabled {
 sub rate_limit_requests {
     my ($self, $value) = @_;
     if (@_ > 1) {
-        die "rate_limit_requests must be positive" if defined $value && $value <= 0;
+        croak "rate_limit_requests must be positive" if defined $value && $value <= 0;
         $self->{rate_limit_requests} = $value;
     }
     return $self->{rate_limit_requests};
@@ -381,7 +399,7 @@ sub rate_limit_requests {
 sub rate_limit_window {
     my ($self, $value) = @_;
     if (@_ > 1) {
-        die "rate_limit_window must be positive" if defined $value && $value <= 0;
+        croak "rate_limit_window must be positive" if defined $value && $value <= 0;
         $self->{rate_limit_window} = $value;
     }
     return $self->{rate_limit_window};
@@ -390,7 +408,7 @@ sub rate_limit_window {
 sub rate_limit_block_duration {
     my ($self, $value) = @_;
     if (@_ > 1) {
-        die "rate_limit_block_duration must be non-negative" if defined $value && $value < 0;
+        croak "rate_limit_block_duration must be non-negative" if defined $value && $value < 0;
         $self->{rate_limit_block_duration} = $value;
     }
     return $self->{rate_limit_block_duration};
@@ -399,7 +417,7 @@ sub rate_limit_block_duration {
 sub rate_limit_whitelist {
     my ($self, $value) = @_;
     if (@_ > 1) {
-        die "rate_limit_whitelist must be an arrayref" if defined $value && ref $value ne 'ARRAY';
+        croak "rate_limit_whitelist must be an arrayref" if defined $value && ref $value ne 'ARRAY';
         $self->{rate_limit_whitelist} = $value;
     }
     return $self->{rate_limit_whitelist};
@@ -1558,13 +1576,13 @@ sub _send_rate_limit_response {
 
 =head1 NAME
 
-LightTCP::Server - A configurable TCP server with HTTP, CGI, and threading support (Pure Perl OOP)
+LightTCP::Server - A configurable TCP/HTTP server with file uploads, rate limiting, and threading support (Pure Perl OOP)
 
 =head1 SYNOPSIS
 
     use LightTCP::Server;
 
-    # Basic OOP usage
+    # Basic HTTP server
     my $server = LightTCP::Server->new(
         server_addr => '0.0.0.0:8080',
         server_name => 'MyServer',
@@ -1572,56 +1590,243 @@ LightTCP::Server - A configurable TCP server with HTTP, CGI, and threading suppo
     );
     $server->start();
 
-    # With custom request handler
+    # Threaded server with custom handler
     my $server = LightTCP::Server->new(
         server_addr => '127.0.0.1:8881',
         server_type => 'thread',
         max_threads => 5,
         func_perl   => sub {
             my ($self, $client, $preq) = @_;
-            print $client "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello!";
-            return (200, 6);
+            print $client "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 5\r\n\r\nHello";
+            return (200, 5);
         },
     );
     $server->start();
 
+    # Server with file uploads and rate limiting
+    my $server = LightTCP::Server->new(
+        server_addr            => '0.0.0.0:8080',
+        upload_dir             => '/var/www/uploads',
+        upload_max_size        => 10 * 1024 * 1024,  # 10MB
+        upload_allowed_types   => [qw(image/jpeg image/png application/pdf)],
+        rate_limit_enabled     => 1,
+        rate_limit_requests    => 100,
+        rate_limit_window      => 60,
+        rate_limit_block_duration => 300,
+        func_upload            => \&handle_upload,
+    );
+    $server->start();
+
+    sub handle_upload {
+        my ($server, $results) = @_;
+        # $results is arrayref of upload info
+        return (201, 'Upload successful');
+    }
+
 =head1 DESCRIPTION
 
-C<LightTCP::Server> is a Perl module that implements a flexible TCP server using pure Perl OOP.
+C<LightTCP::Server> is a pure Perl OOP module implementing a flexible TCP/HTTP server.
 It handles HTTP requests, serves static files, executes CGI scripts, and supports
-custom logic via callbacks. Features single-threaded, forked, or threaded operation.
-
-=head1 ATTRIBUTES
+custom logic via callbacks. Features include:
 
 =over 4
 
-=item C<server_addr> (default: '0.0.0.0:8881')
+=item * Single-threaded, forked, or threaded operation modes
 
-IP address and port to listen on.
+=item * File upload handling with size limits and type validation
+
+=item * Configurable rate limiting with IP blocking
+
+=item * HTTP authentication (API keys and Basic Auth)
+
+=item * Host-based access control (allow/deny lists)
+
+=item * CGI script execution
+
+=item * Comprehensive logging and verbose output levels
+
+=back
+
+=head1 ATTRIBUTES
+
+=head2 Server Configuration
+
+=over 4
+
+=item C<server_addr> (required, default: '0.0.0.0:8881')
+
+IP address and port to listen on. Must be in format C<IP:port> (e.g., C<'0.0.0.0:8080'>).
+
+=item C<server_name> (default: 'tcpsname')
+
+Server name used in HTTP headers and logging.
 
 =item C<server_type> (default: 'single')
 
-Execution mode: C<'single'>, C<'fork'>, or C<'thread'>.
+Execution mode: C<'single'> (single process), C<'fork'> (fork per connection), or C<'thread'> (threaded).
 
 =item C<max_threads> (default: 10)
 
-Maximum concurrent threads for threaded mode.
+Maximum concurrent threads when C<server_type> is C<'thread'>.
+
+=item C<server_timeout> (default: -1)
+
+Connection timeout in seconds. C<-1> means no timeout, C<0> means daily timeout check, C<1+> sets explicit timeout.
 
 =item C<verbose> (default: 0)
 
-Verbosity level 0-3.
+Verbosity level: C<0> (minimal), C<1> (important), C<2> (info), C<3> (debug).
+
+=item C<logfn> (default: '')
+
+Path to log file. If empty, logs go to stderr.
+
+=item C<server_autostop> (default: 0)
+
+If set to C<1>, server stops after first request.
+
+=back
+
+=head2 Directory and File Handling
+
+=over 4
+
+=item C<server_dir> (default: '/var/www')
+
+Root directory for serving static files.
+
+=item C<server_etc> (default: '.')
+
+Directory for configuration files (allow/deny lists).
+
+=item C<server_fnext> (default: 'html css js ico gif jpg png')
+
+Space-separated list of file extensions to serve statically.
+
+=item C<server_perlonly> (default: 1)
+
+If C<1>, only custom handlers serve content; static files are disabled.
+
+=item C<server_cgi> (default: 0)
+
+Enable CGI script execution.
+
+=item C<server_cgiext> (default: 'cgi php')
+
+Space-separated list of CGI file extensions.
+
+=item C<http_postlimit> (default: 0)
+
+Maximum POST body size in bytes. C<0> means unlimited.
+
+=back
+
+=head2 Security and Authentication
+
+=over 4
+
+=item C<server_deny> (default: 0)
+
+Enable host-based access control using allow/deny files.
+
+=item C<server_secure> (default: 0)
+
+If C<1>, deny by default and require explicit allow files.
 
 =item C<server_auth> (default: 0)
 
-Enable authentication.
+Enable authentication via API key or Basic Auth.
 
-=item C<server_keys>
+=item C<server_keys> (default: [])
 
-Arrayref of valid authentication keys.
+Arrayref of valid lowercase API key strings.
+
+=item C<runas_user> (default: '')
+
+Run server as this user (after binding to privileged port).
+
+=item C<runas_group> (default: '')
+
+Run server as this group.
+
+=back
+
+=head2 File Upload Configuration
+
+=over 4
+
+=item C<upload_dir> (default: '/var/www/uploads')
+
+Directory for storing uploaded files. Must be writable.
+
+=item C<upload_max_size> (default: 10MB)
+
+Maximum file size in bytes for uploads.
+
+=item C<upload_allowed_types> (default: see below)
+
+Arrayref of allowed MIME types. Defaults include: image/jpeg, image/png, image/gif,
+image/webp, application/pdf, text/plain, text/csv, text/html, application/zip,
+application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.
+
+=item C<func_upload>
+
+Optional callback coderef invoked after successful uploads.
+Signature: C<sub($server, $upload_results)> where C<$upload_results> is an arrayref of:
+  C<{ filename, size, mime_type, saved_path, success, error }>.
+Should return C<($status, $message)>.
+
+=back
+
+=head2 Rate Limiting Configuration
+
+=over 4
+
+=item C<rate_limit_enabled> (default: 0)
+
+Enable rate limiting.
+
+=item C<rate_limit_requests> (default: 100)
+
+Maximum requests per time window.
+
+=item C<rate_limit_window> (default: 60)
+
+Time window in seconds.
+
+=item C<rate_limit_block_duration> (default: 300)
+
+Duration in seconds to block IPs that exceed rate limit.
+
+=item C<rate_limit_whitelist> (default: [127.0.0.1, ::1, localhost])
+
+Arrayref of IP addresses exempt from rate limiting.
+
+=back
+
+=head2 Callback Functions
+
+=over 4
 
 =item C<func_perl>
 
-Coderef for custom request handling.
+Custom request handler. Signature: C<sub($self, $client, $preq)>.
+C<$preq> contains: METHOD, URI, URI_FN, URI_EXT, URI_VALID, QUERY_STRING,
+CONTENT_LENGTH, CONTENT_DATA, clip, clport, and HTTP headers.
+Should return C<($status_code, $content_length)>.
+
+=item C<func_timeout>
+
+Called on connection timeout. Signature: C<sub($self)>.
+
+=item C<func_done>
+
+Called after request processing. Signature: C<sub($self, $preq)>.
+
+=item C<func_log>
+
+Custom logging handler. Signature: C<sub($self, $message, $level)>.
 
 =back
 
@@ -1631,36 +1836,197 @@ Coderef for custom request handling.
 
 =item C<new(%config)>
 
-Create a new server instance.
+Create a new server instance. Accepts either a hash or hashref of configuration.
 
 =item C<start()>
 
-Start the server and block until shutdown.
+Start the server and block until shutdown. Returns C<1> on clean shutdown, C<0> on error.
 
 =item C<stop()>
 
 Stop the server gracefully.
 
-=item C<logit($msg, $lvl)>
-
-Log a message at the given level.
-
 =item C<is_running()>
 
 Returns true if server is running.
 
+=item C<logit($message, $level)>
+
+Log a message at the specified level (0-3). Higher levels are more verbose.
+
 =item C<validate_config(\%config)>
 
-Class method to validate configuration. Returns undef on success, error message on failure.
+Class method to validate configuration. Returns C<undef> on success, error message string on failure.
+
+=item C<server_addr([$value])>
+
+Getter/setter for server address.
+
+=item C<server_name([$value])>
+
+Getter/setter for server name.
+
+=item C<server_type([$value])>
+
+Getter/setter for server type.
+
+=item C<max_threads([$value])>
+
+Getter/setter for max threads.
+
+=item C<verbose([$value])>
+
+Getter/setter for verbosity level.
+
+=item C<upload_dir([$value])>
+
+Getter/setter for upload directory.
+
+=item C<upload_max_size([$value])>
+
+Getter/setter for max upload size.
+
+=item C<rate_limit_enabled([$value])>
+
+Getter/setter for rate limit enabled flag.
+
+=item C<rate_limit_requests([$value])>
+
+Getter/setter for rate limit requests.
 
 =back
 
+=head1 UPLOAD ENDPOINTS
+
+The server provides built-in upload handling at these endpoints:
+
+=over 4
+
+=item C<GET /upload> or C<GET /upload/>
+
+Returns an HTML form for file uploads.
+
+=item C<POST /upload>
+
+Handles multipart/form-data file uploads.
+
+=item C<POST /api/upload>
+
+Alternative endpoint for API-based uploads.
+
+=back
+
+Upon successful upload, the C<func_upload> callback is invoked if defined.
+File names are sanitized to prevent path traversal attacks.
+
+=head1 RATE LIMITING
+
+When rate limiting is enabled, the server tracks requests per IP address.
+Responses include these HTTP headers:
+
+=over 4
+
+=item C<X-RateLimit-Limit> - Maximum requests allowed
+
+=item C<X-RateLimit-Remaining> - Remaining requests in window
+
+=item C<X-RateLimit-Reset> - Seconds until window resets
+
+=item C<Retry-After> - Seconds until unblocked (on 429 responses)
+
+=back
+
+When rate limit is exceeded, the server returns HTTP 429 Too Many Requests
+and closes the connection.
+
+=head1 SECURITY
+
+=over 4
+
+=item Path Traversal Protection
+
+The server blocks requests containing C<..> or suspicious characters in URIs.
+
+=item Upload Security
+
+Uploaded filenames are sanitized: C<..>, C</>, C<\>, and special characters are removed.
+Files are written atomically using temp files then renamed.
+
+=item Access Control
+
+Host-based access control uses files in C<server_etc> directory:
+C<${server_name}_${IP}.allow> and C<${server_name}_${IP}.deny>.
+
+=item Authentication
+
+Supports X-API-Key header and Basic Auth. Keys are compared case-insensitively.
+
+=back
+
+=head1 CGI SUPPORT
+
+When C<server_cgi> is enabled, files with extensions in C<server_cgiext> are
+executed as CGI scripts. The following environment variables are set:
+
+C<REQUEST_METHOD>, C<QUERY_STRING>, C<CONTENT_LENGTH>, C<SERVER_PROTOCOL>,
+C<SCRIPT_NAME>, C<PATH_INFO>, and HTTP headers are passed as C<HTTP_*> variables.
+
+CGI scripts should output headers followed by a blank line, then the body.
+
 =head1 EXAMPLES
 
-See L<examples/demo.pl> for a complete example.
+See L<examples/demo.pl> for a complete demonstration server.
 
-=head1 DATE
+=head1 DEPENDENCIES
 
-Last updated: January 2026
+=over 4
+
+=item * C<IO::Socket::INET>
+
+=item * C<IPC::Open3>
+
+=item * C<threads>
+
+=item * C<threads::shared>
+
+=item * C<File::Temp>
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+=over 4
+
+=item * No HTTPS/TLS support (plain TCP only)
+
+=item * No WebSocket support
+
+=item * CGI scripts must be executable and use shebang lines
+
+=item * Rate limiting uses in-memory storage (resets on restart)
+
+=item * Large file uploads are held in memory
+
+=back
+
+=head1 AUTHOR
+
+Hans Harder E<lt>hans.harder@atbas.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Hans Harder.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 LICENSE
+
+This module is free software. You may redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 VERSION
+
+Version 2.04
 
 =cut

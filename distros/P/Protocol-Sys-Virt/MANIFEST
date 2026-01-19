@@ -8,6 +8,7 @@ lib/Protocol/Sys/Virt/Remote.pm
 lib/Protocol/Sys/Virt/Remote/XDR.pm
 lib/Protocol/Sys/Virt/Transport.pm
 lib/Protocol/Sys/Virt/Transport/XDR.pm
+lib/Protocol/Sys/Virt/TypedParams.pm
 lib/Protocol/Sys/Virt/UNIXSocket.pm
 lib/Protocol/Sys/Virt/URI.pm
 Makefile.PL
@@ -16,5 +17,6 @@ README.pod
 t/01-load.t
 t/02-parse-url.t
 t/03-socket-path.t
+t/04-typed-params.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

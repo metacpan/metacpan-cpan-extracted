@@ -1,11 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
-use Test::Identity;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use Net::LibAsyncNS;
 
@@ -23,7 +21,7 @@ my $query = $asyncns->getaddrinfo( "localhost", "12345", \%hints );
 is( $asyncns->getnqueries, 1, '$asyncns->getnqueries now 1' );
 is_refcount( $asyncns, 2, '$asyncns has refcount 2 after ->getaddrinfo' );
 
-identical( $asyncns->getuserdata( $query ), undef, '$asyncns->getuserdata( $q ) initially returns undef' );
+is( $asyncns->getuserdata( $query ), undef, '$asyncns->getuserdata( $q ) initially returns undef' );
 
 my $data = [ "Some data here" ];
 
@@ -31,8 +29,8 @@ $asyncns->setuserdata( $query, $data );
 
 is_refcount( $data, 2, '$data has refcount 2 after ->setuserdata' );
 
-identical( $asyncns->getuserdata( $query ), $data, '$asyncns->getuserdata( $q ) returns identical ref' );
-identical( $query->getuserdata, $data, '$query->getuserdata returns identical ref' );
+ref_is( $asyncns->getuserdata( $query ), $data, '$asyncns->getuserdata( $q ) returns identical ref' );
+ref_is( $query->getuserdata, $data, '$query->getuserdata returns identical ref' );
 
 $query->setuserdata( "A simple string now" );
 

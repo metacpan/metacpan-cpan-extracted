@@ -6,11 +6,9 @@ use warnings;
 use parent 'WWW::Crawl';
 
 use Carp qw(croak);
-use IPC::Open3 qw(open3);
-use Symbol qw(gensym);
-use IO::Select;
+use IPC::Run qw(start timeout);
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 # $VERSION = eval $VERSION;
 
 sub _fetch_page {
@@ -21,18 +19,24 @@ sub _fetch_page {
         || $self->{'chromium'}
         || 'chromium';
     my $timeout = $self->{'chromium_timeout'} // 120;
-    my $virtual_time_budget = $self->{'chromium_time_budget'} // 10000;
+    my $virtual_time_budget = $self->{'chromium_time_budget'} // 20000;
     my $proxy = $self->{'proxy'} // 'direct://';
 
-    my @command = (
+    my $chrome_ua = $self->{'agent'} // "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36";
+    my $retry_count = $self->{'retry_count'} // 0;
+    
+    my @base_command = (
         $chromium_path,
-        '--headless',
+        '--headless=new',
         qq{--proxy-server=$proxy},
+        qq{--user-agent=$chrome_ua},
+        '--window-size=1920,1080',
         '--no-sandbox',
         '--disable-gpu',
         '--disable-dev-shm-usage',
         '--disable-software-rasterizer',
         '--disable-features=VaapiVideoDecoder',
+        '--disable-site-isolation-trials',
         '--password-store=basic',
         '--use-mock-keychain',
         '--log-level=3',
@@ -44,67 +48,56 @@ sub _fetch_page {
         $url,
     );
 
-    my ($stdin, $stdout, $stderr);
-    $stderr = gensym;
-
-    my $pid = eval {
-        open3($stdin, $stdout, $stderr, @command);
-    };
-    if ($@) {
-        return {
-            'success' => 0,
-            'status'  => 599,
-            'reason'  => "Chromium launch failed: $@",
-            'content' => '',
-        };
+    my $result;
+    for my $attempt (0 .. $retry_count) {
+        if ($attempt > 0) {
+            print STDERR "DEBUG: Retry attempt $attempt for $url\n" if $self->{'debug'};
+            sleep 1; 
+        }
+        
+        $result = $self->_execute_chromium(\@base_command, $timeout);
+        last if $result->{'success'};
     }
+    
+    return $result;
+}
 
-    close $stdin;
-
-    my $sel = IO::Select->new();
-    $sel->add($stdout, $stderr);
+sub _execute_chromium {
+    my ($self, $command, $timeout) = @_;
+    my @command = @$command;
 
     my $content = '';
     my $error_output = '';
     my $timed_out = 0;
+    my $launch_error = '';
 
-    eval {
-        local $SIG{'ALRM'} = sub { die "Chromium timeout\n"; };
-        alarm $timeout;
-
-        while (my @ready = $sel->can_read) {
-            foreach my $fh (@ready) {
-                my $buf;
-                my $len = sysread($fh, $buf, 4096);
-                if (!defined $len) {
-                    $sel->remove($fh);
-                    next;
-                }
-                if ($len == 0) {
-                    $sel->remove($fh);
-                    next;
-                }
-                
-                if ($fh == $stdout) {
-                    $content .= $buf;
-                } else {
-                    $error_output .= $buf;
-                }
-            }
-        }
-        waitpid($pid, 0);
-        alarm 0;
+    my $exit_code = 0;
+    my $harness = eval {
+        start \@command, '<', \undef, '>', \$content, '2>', \$error_output, timeout($timeout);
     };
-
     if ($@) {
-        if ($@ eq "Chromium timeout\n") {
-            $timed_out = 1;
+        $launch_error = $@;
+    } elsif (!$harness) {
+        $launch_error = 'Unknown failure starting Chromium';
+    } else {
+        eval { $harness->finish; 1 };
+        if ($@) {
+            if ($@ =~ /timeout/i) {
+                $timed_out = 1;
+                $harness->kill_kill;
+            } else {
+                $launch_error = $@;
+                $harness->kill_kill;
+            }
+        } else {
+            $exit_code = $? >> 8;
+            if ($exit_code != 0) {
+                $launch_error = "Chromium exited with status $exit_code";
+            }
         }
     }
 
     if ($timed_out) {
-        kill 'TERM', $pid;
-        waitpid($pid, 0);
         return {
             'success' => 0,
             'status'  => 599,
@@ -113,10 +106,9 @@ sub _fetch_page {
         };
     }
 
-    my $exit_code = $? >> 8;
-    if ($exit_code != 0) {
-        my $reason = $error_output || "Chromium exited with status $exit_code";
-        $reason =~ s/\s+$//;
+    if ($launch_error ne '') {
+        $launch_error =~ s/\s+$//;
+        my $reason = $error_output || $launch_error;
         return {
             'success' => 0,
             'status'  => 599,
@@ -152,7 +144,7 @@ WWW::Crawl::Chromium - Crawl JavaScript-rendered pages with Chromium
 
 =head1 VERSION
 
-This documentation refers to WWW::Crawl::Chromium version 0.4.
+This documentation refers to WWW::Crawl::Chromium version 0.5.
 
 =head1 SYNOPSIS
 
@@ -203,6 +195,14 @@ allow JavaScript to settle. Defaults to 10000.
 =item *
 
 C<proxy>: Proxy server to use (e.g. C<direct://> or C<http://proxy.example.com:8080>). Defaults to C<direct://>.
+
+=item *
+
+C<retry_count>: Number of times to retry Chromium fetches before giving up. Defaults to 0.
+
+=item *
+
+C<debug>: Enable debug logging to STDERR when set to a true value.
 
 =back
 
@@ -263,4 +263,3 @@ This program is released under the following license:
 =cut
 
 1; # End of WWW::Crawl::Chromium
-

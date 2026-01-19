@@ -6,15 +6,20 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0905';
+our $VERSION = '0.1101';
 
+use strictures 2;
 use Algorithm::Combinatorics qw( combinations );
+use Data::Dumper::Compact qw(ddc);
+use List::Util qw(first);
+use Math::Prime::Util qw(factor lcm);
 use Math::Factor::XS qw( prime_factors );
 use MIDI::Pitch qw( name2freq );
 use Moo;
 use Music::Intervals::Ratios;
+use Music::Tension::Cope ();
 use Number::Fraction ();
-use strictures 2;
+use POSIX qw(log2);
 use namespace::clean;
 
 
@@ -224,10 +229,9 @@ sub dyads {
         # Calculate both natural and equal temperament values for our ratio.
         $dyads{"@$i"} = {
             natural => $str,
-            # The value is either the known pitch ratio or ...
+            # The value is either the known pitch ratio or a calculation
             eq_tempered =>
-              ( name2freq( $i->[1] . $self->_octave ) || ( $self->_concert * $self->_note_index->{ $i->[1] } ) )
-                /
+              ( name2freq( $i->[1] . $self->_octave ) || ( $self->_concert * $self->_note_index->{ $i->[1] } ) ) /
               ( name2freq( $i->[0] . $self->_octave ) || ( $self->_concert * $self->_note_index->{ $i->[0] } ) ),
         };
     }
@@ -274,6 +278,66 @@ sub by_description {
     return \%matches;
 }
 
+
+sub cope {
+    my ($self) = @_;
+    my $dyads = $self->_dyads;
+    my $midi = $self->integer_notation;
+    my %cope;
+    my $tension = Music::Tension::Cope->new;
+    for my $d (keys %$dyads) {
+        my ($i, $j) = split / /, $d;
+        $cope{$d} = $tension->vertical([ $midi->{$i}, $midi->{$j} ]);
+    }
+    return \%cope;
+}
+
+
+sub tenney {
+    my ($self) = @_;
+    my $dyads = $self->_dyads;
+    my %interval;
+    for my $d (keys %$dyads) {
+        my $first = first { $Music::Intervals::Ratios::ratio->{$_}{ratio} eq $dyads->{$d}{natural} } keys %$Music::Intervals::Ratios::ratio;
+        $first = 0 unless $first;
+        $interval{$first} = {
+            ratio => $first ? $Music::Intervals::Ratios::ratio->{$first}{ratio} : '0/0',
+            dyad  => $d,
+        };
+    }
+    my %tenney;
+    for my $int (keys %interval) {
+        my ($i, $j) = split /\//, $interval{$int}{ratio};
+        $tenney{ $interval{$int}{dyad} } = !($i && $j) ? 0 : log2($i * $j);
+    }
+    return \%tenney;
+}
+
+
+sub suavitatis {
+    my ($self) = @_;
+    my $dyads = $self->_dyads;
+    my %interval;
+    for my $d (keys %$dyads) {
+        my $first = first { $Music::Intervals::Ratios::ratio->{$_}{ratio} eq $dyads->{$d}{natural} } keys %$Music::Intervals::Ratios::ratio;
+        $first = 0 unless $first;
+        $interval{$first} = {
+            ratio => $first ? $Music::Intervals::Ratios::ratio->{$first}{ratio} : '0/0',
+            dyad  => $d,
+        };
+    }
+    my %suavitatis;
+    for my $int (keys %interval) {
+        my ($i, $j) = split /\//, $interval{$int}{ratio};
+        my $lcm = lcm($i, $j);
+        my @factors = factor($lcm);
+        my $sum = 0;
+        $sum += $_ - 1 for @factors;
+        $suavitatis{ $interval{$int}{dyad} } = 1 + $sum;
+    }
+    return \%suavitatis;
+}
+
 1;
 
 __END__
@@ -288,11 +352,11 @@ Music::Intervals - Breakdown of musical intervals
 
 =head1 VERSION
 
-version 0.0905
+version 0.1101
 
 =head1 SYNOPSIS
 
-  use Music::Intervals;
+  use Music::Intervals ();
 
   my $m = Music::Intervals->new(notes => [qw/C Eb G B/]);
 
@@ -306,6 +370,9 @@ version 0.0905
     $m->eq_tempered_intervals,
     $m->eq_tempered_cents,
     $m->integer_notation,
+    $m->cope,
+    $m->tenney,
+    $m->suavitatis,
   );
 
   # Find known intervals
@@ -433,6 +500,24 @@ Return a known ratio name or undef.
 
 Search the description of every ratio for the given string.
 
+=head2 cope
+
+  $tension = $m->cope;
+
+Return the L<Music::Tension::Cope> C<vertical> measure for each dyad.
+
+=head2 tenney
+
+  $tension = $m->tenney;
+
+Compute the Tenney dissonance metric for the intervals.
+
+=head2 suavitatis
+
+  $tension = $m->suavitatis;
+
+Euler's Gradus Suavitatis ("Degree of Agreeability").
+
 =head1 SEE ALSO
 
 The F<t/*> tests and F<eg/*> examples in this distribution
@@ -470,7 +555,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2022-2026 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -60,6 +60,168 @@ static int mutex_initialized = 0;
 #endif
 
 /* ============================================================================
+ * Architecture Types
+ * Based on llama.cpp architecture support - used for inference path selection
+ * ============================================================================ */
+
+typedef enum {
+    LUGH_ARCH_UNKNOWN = 0,
+    /* Llama-family: standard transformer with SwiGLU FFN */
+    LUGH_ARCH_LLAMA,        /* llama, llama4, deci, mistral3 */
+    /* Qwen-family: combined QKV for some variants */
+    LUGH_ARCH_QWEN,         /* qwen (combined QKV) */
+    LUGH_ARCH_QWEN2,        /* qwen2, qwen3 (separate Q/K/V) */
+    /* Phi-family: no FFN gate, uses GELU */
+    LUGH_ARCH_PHI,          /* phi2, phi3 */
+    /* Gemma-family: post-normalization layers */
+    LUGH_ARCH_GEMMA,        /* gemma */
+    LUGH_ARCH_GEMMA2,       /* gemma2, gemma3 (with post-norm) */
+    /* GPT-family: LayerNorm with bias, GELU */
+    LUGH_ARCH_GPT2,         /* gpt2 */
+    LUGH_ARCH_GPTJ,         /* gptj */
+    LUGH_ARCH_GPTNEOX,      /* gptneox */
+    /* Other common architectures */
+    LUGH_ARCH_FALCON,       /* falcon */
+    LUGH_ARCH_BLOOM,        /* bloom */
+    LUGH_ARCH_MPT,          /* mpt */
+    LUGH_ARCH_STARCODER,    /* starcoder, starcoder2 */
+    LUGH_ARCH_STABLELM,     /* stablelm */
+    LUGH_ARCH_INTERNLM,     /* internlm2 */
+    LUGH_ARCH_DEEPSEEK,     /* deepseek, deepseek2 */
+    LUGH_ARCH_COMMAND_R,    /* command-r, cohere2 */
+    /* Recurrent architectures (not transformer-based) */
+    LUGH_ARCH_MAMBA,        /* mamba, mamba2 */
+    LUGH_ARCH_RWKV,         /* rwkv6, rwkv7 */
+    /* Encoder-only (BERT-style) */
+    LUGH_ARCH_BERT,         /* bert, modern-bert, nomic-bert */
+    /* Encoder-decoder */
+    LUGH_ARCH_T5,           /* t5, t5encoder */
+} LughArchType;
+
+/* Map architecture string to type enum */
+static LughArchType get_arch_type(const char *arch) {
+    if (!arch) return LUGH_ARCH_UNKNOWN;
+    
+    /* Llama-family */
+    if (strcmp(arch, "llama") == 0 || strcmp(arch, "llama4") == 0 ||
+        strcmp(arch, "deci") == 0 || strcmp(arch, "mistral3") == 0 ||
+        strcmp(arch, "llama-embed") == 0)
+        return LUGH_ARCH_LLAMA;
+    
+    /* Qwen-family */
+    if (strcmp(arch, "qwen") == 0)
+        return LUGH_ARCH_QWEN;
+    if (strcmp(arch, "qwen2") == 0 || strcmp(arch, "qwen2vl") == 0 ||
+        strcmp(arch, "qwen3") == 0 || strcmp(arch, "qwen3moe") == 0)
+        return LUGH_ARCH_QWEN2;
+    
+    /* Phi-family */
+    if (strcmp(arch, "phi2") == 0 || strcmp(arch, "phi3") == 0 ||
+        strcmp(arch, "phimoe") == 0)
+        return LUGH_ARCH_PHI;
+    
+    /* Gemma-family */
+    if (strcmp(arch, "gemma") == 0)
+        return LUGH_ARCH_GEMMA;
+    if (strcmp(arch, "gemma2") == 0 || strcmp(arch, "gemma3") == 0 ||
+        strcmp(arch, "gemma3n") == 0)
+        return LUGH_ARCH_GEMMA2;
+    
+    /* GPT-family */
+    if (strcmp(arch, "gpt2") == 0)
+        return LUGH_ARCH_GPT2;
+    if (strcmp(arch, "gptj") == 0)
+        return LUGH_ARCH_GPTJ;
+    if (strcmp(arch, "gptneox") == 0)
+        return LUGH_ARCH_GPTNEOX;
+    
+    /* Other architectures */
+    if (strcmp(arch, "falcon") == 0 || strcmp(arch, "falcon-h1") == 0)
+        return LUGH_ARCH_FALCON;
+    if (strcmp(arch, "bloom") == 0)
+        return LUGH_ARCH_BLOOM;
+    if (strcmp(arch, "mpt") == 0)
+        return LUGH_ARCH_MPT;
+    if (strcmp(arch, "starcoder") == 0 || strcmp(arch, "starcoder2") == 0)
+        return LUGH_ARCH_STARCODER;
+    if (strcmp(arch, "stablelm") == 0)
+        return LUGH_ARCH_STABLELM;
+    if (strcmp(arch, "internlm2") == 0)
+        return LUGH_ARCH_INTERNLM;
+    if (strcmp(arch, "deepseek") == 0 || strcmp(arch, "deepseek2") == 0)
+        return LUGH_ARCH_DEEPSEEK;
+    if (strcmp(arch, "command-r") == 0 || strcmp(arch, "cohere2") == 0)
+        return LUGH_ARCH_COMMAND_R;
+    
+    /* Recurrent */
+    if (strcmp(arch, "mamba") == 0 || strcmp(arch, "mamba2") == 0 ||
+        strcmp(arch, "jamba") == 0)
+        return LUGH_ARCH_MAMBA;
+    if (strcmp(arch, "rwkv6") == 0 || strcmp(arch, "rwkv7") == 0 ||
+        strcmp(arch, "arwkv7") == 0)
+        return LUGH_ARCH_RWKV;
+    
+    /* Encoder models */
+    if (strcmp(arch, "bert") == 0 || strcmp(arch, "modern-bert") == 0 ||
+        strcmp(arch, "nomic-bert") == 0 || strcmp(arch, "neo-bert") == 0)
+        return LUGH_ARCH_BERT;
+    if (strcmp(arch, "t5") == 0 || strcmp(arch, "t5encoder") == 0)
+        return LUGH_ARCH_T5;
+    
+    return LUGH_ARCH_UNKNOWN;
+}
+
+/* Check if architecture uses combined QKV tensor */
+/* Based on llama.cpp's LLM_TENSOR_ATTN_QKV usage */
+static int arch_has_combined_qkv(LughArchType arch_type) {
+    switch (arch_type) {
+        case LUGH_ARCH_QWEN:
+        case LUGH_ARCH_QWEN2:
+        case LUGH_ARCH_PHI:
+        case LUGH_ARCH_FALCON:
+        case LUGH_ARCH_GPT2:
+        case LUGH_ARCH_GPTJ:
+        case LUGH_ARCH_GPTNEOX:
+        case LUGH_ARCH_BLOOM:
+        case LUGH_ARCH_MPT:
+        case LUGH_ARCH_STARCODER:
+        case LUGH_ARCH_STABLELM:
+        case LUGH_ARCH_BERT:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+/* Check if architecture uses FFN gate (SwiGLU) */
+static int arch_has_ffn_gate(LughArchType arch_type) {
+    switch (arch_type) {
+        case LUGH_ARCH_LLAMA:
+        case LUGH_ARCH_QWEN:
+        case LUGH_ARCH_QWEN2:
+        case LUGH_ARCH_GEMMA:
+        case LUGH_ARCH_GEMMA2:
+        case LUGH_ARCH_STABLELM:
+        case LUGH_ARCH_INTERNLM:
+        case LUGH_ARCH_DEEPSEEK:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+/* Check if architecture uses post-normalization */
+static int arch_has_post_norm(LughArchType arch_type) {
+    return (arch_type == LUGH_ARCH_GEMMA2);
+}
+
+/* Check if architecture is recurrent (not transformer) */
+static int arch_is_recurrent(LughArchType arch_type) {
+    return (arch_type == LUGH_ARCH_MAMBA ||
+            arch_type == LUGH_ARCH_RWKV);
+}
+
+/* ============================================================================
  * State structures
  * ============================================================================ */
 
@@ -524,30 +686,51 @@ typedef struct {
     float rope_freq_base;
     float rope_freq_scale;
     char backend_name[32];  /* Backend name: "cpu", "metal", "cuda", "auto", etc. */
+    char architecture[32];  /* Model architecture: "llama", "qwen2", "phi3", "gemma2", etc. */
+    LughArchType arch_type; /* Architecture type enum for inference path selection */
 } LughHyperparams;
 
 /* Layer weights structure */
 typedef struct {
+    /* Attention */
     struct ggml_tensor *attn_norm;
-    struct ggml_tensor *wq;
-    struct ggml_tensor *wk;
-    struct ggml_tensor *wv;
+    struct ggml_tensor *wq;          /* Separate Q weight (most architectures) */
+    struct ggml_tensor *wk;          /* Separate K weight */
+    struct ggml_tensor *wv;          /* Separate V weight */
+    struct ggml_tensor *wqkv;        /* Combined QKV weight (phi, qwen, bloom, gpt2) */
     struct ggml_tensor *wo;
+    struct ggml_tensor *attn_post_norm;  /* Post-attention norm (gemma2) */
+    /* FFN */
     struct ggml_tensor *ffn_norm;
-    struct ggml_tensor *ffn_gate;
+    struct ggml_tensor *ffn_gate;    /* SwiGLU gate (llama, qwen, gemma) - NULL for GELU models */
     struct ggml_tensor *ffn_up;
     struct ggml_tensor *ffn_down;
+    struct ggml_tensor *ffn_post_norm;   /* Post-FFN norm (gemma2) */
+    /* Flags */
+    int has_combined_qkv;            /* 1 if using wqkv instead of wq/wk/wv */
+    int has_ffn_gate;                /* 1 if using SwiGLU, 0 for GELU */
+    int has_post_norm;               /* 1 if architecture uses post-normalization */
 } LughLayerWeights;
 
 /* Extract hyperparameters from Perl HV and model */
 static void extract_hyperparams(pTHX_ HV *hv, LughModel *model, LughHyperparams *hp) {
     SV **svp;
     int64_t key_id;
+    char key[128];
+    const char *arch;
     
     /* Defaults */
     hp->rms_norm_eps = 1e-5f;
     hp->rope_freq_base = 10000.0f;
     hp->rope_freq_scale = 1.0f;
+    strcpy(hp->architecture, "llama");  /* Default architecture */
+    
+    /* Get architecture from model metadata (set during model load) */
+    if (model->architecture && strlen(model->architecture) > 0) {
+        strncpy(hp->architecture, model->architecture, sizeof(hp->architecture) - 1);
+        hp->architecture[sizeof(hp->architecture) - 1] = '\0';
+    }
+    arch = hp->architecture;
     
     /* Get from Perl hash */
     svp = hv_fetch(hv, "n_embd", 6, 0);
@@ -584,54 +767,122 @@ static void extract_hyperparams(pTHX_ HV *hv, LughModel *model, LughHyperparams 
         strcpy(hp->backend_name, "cpu");  /* Default to CPU for compatibility */
     }
     
-    /* Get from model metadata */
-    key_id = gguf_find_key(model->gguf, "llama.attention.layer_norm_rms_epsilon");
+    /* Get from model metadata using dynamic architecture prefix */
+    snprintf(key, sizeof(key), "%s.attention.layer_norm_rms_epsilon", arch);
+    key_id = gguf_find_key(model->gguf, key);
     if (key_id >= 0) hp->rms_norm_eps = gguf_get_val_f32(model->gguf, key_id);
     
-    key_id = gguf_find_key(model->gguf, "llama.rope.freq_base");
+    snprintf(key, sizeof(key), "%s.rope.freq_base", arch);
+    key_id = gguf_find_key(model->gguf, key);
     if (key_id >= 0) hp->rope_freq_base = gguf_get_val_f32(model->gguf, key_id);
     
-    key_id = gguf_find_key(model->gguf, "llama.rope.dimension_count");
+    snprintf(key, sizeof(key), "%s.rope.dimension_count", arch);
+    key_id = gguf_find_key(model->gguf, key);
     hp->n_rot = (key_id >= 0) ? gguf_get_val_u32(model->gguf, key_id) : hp->head_dim;
     
-    key_id = gguf_find_key(model->gguf, "llama.context_length");
+    snprintf(key, sizeof(key), "%s.context_length", arch);
+    key_id = gguf_find_key(model->gguf, key);
     hp->n_ctx = (key_id >= 0) ? gguf_get_val_u32(model->gguf, key_id) : 2048;
+    
+    /* Set architecture type for inference path selection */
+    hp->arch_type = get_arch_type(arch);
 }
 
 /* Get layer weights from model context */
-static int get_layer_weights(struct ggml_context *ctx_w, int layer, LughLayerWeights *lw) {
+/* Get layer weights from model context - architecture aware */
+static int get_layer_weights_for_arch(struct ggml_context *ctx_w, int layer, 
+                                       LughLayerWeights *lw, LughArchType arch_type) {
     char name[64];
+    int valid = 1;
     
+    /* Initialize all pointers to NULL */
+    memset(lw, 0, sizeof(LughLayerWeights));
+    
+    /* Set flags based on architecture */
+    lw->has_combined_qkv = arch_has_combined_qkv(arch_type);
+    lw->has_ffn_gate = arch_has_ffn_gate(arch_type);
+    lw->has_post_norm = arch_has_post_norm(arch_type);
+    
+    /* Attention norm (all architectures have this) */
     snprintf(name, sizeof(name), "blk.%d.attn_norm.weight", layer);
     lw->attn_norm = ggml_get_tensor(ctx_w, name);
+    if (!lw->attn_norm) valid = 0;
     
-    snprintf(name, sizeof(name), "blk.%d.attn_q.weight", layer);
-    lw->wq = ggml_get_tensor(ctx_w, name);
+    /* Q/K/V weights - check combined first, then separate */
+    if (lw->has_combined_qkv) {
+        /* Try combined QKV tensor */
+        snprintf(name, sizeof(name), "blk.%d.attn_qkv.weight", layer);
+        lw->wqkv = ggml_get_tensor(ctx_w, name);
+        if (!lw->wqkv) {
+            /* Fallback to separate Q/K/V if combined not found */
+            lw->has_combined_qkv = 0;
+        }
+    }
     
-    snprintf(name, sizeof(name), "blk.%d.attn_k.weight", layer);
-    lw->wk = ggml_get_tensor(ctx_w, name);
+    if (!lw->has_combined_qkv) {
+        /* Separate Q, K, V tensors */
+        snprintf(name, sizeof(name), "blk.%d.attn_q.weight", layer);
+        lw->wq = ggml_get_tensor(ctx_w, name);
+        
+        snprintf(name, sizeof(name), "blk.%d.attn_k.weight", layer);
+        lw->wk = ggml_get_tensor(ctx_w, name);
+        
+        snprintf(name, sizeof(name), "blk.%d.attn_v.weight", layer);
+        lw->wv = ggml_get_tensor(ctx_w, name);
+        
+        if (!lw->wq || !lw->wk || !lw->wv) valid = 0;
+    }
     
-    snprintf(name, sizeof(name), "blk.%d.attn_v.weight", layer);
-    lw->wv = ggml_get_tensor(ctx_w, name);
-    
+    /* Attention output */
     snprintf(name, sizeof(name), "blk.%d.attn_output.weight", layer);
     lw->wo = ggml_get_tensor(ctx_w, name);
+    if (!lw->wo) valid = 0;
     
+    /* Post-attention norm (gemma2, etc.) */
+    if (lw->has_post_norm) {
+        snprintf(name, sizeof(name), "blk.%d.post_attention_norm.weight", layer);
+        lw->attn_post_norm = ggml_get_tensor(ctx_w, name);
+        /* Not critical if missing - some models don't have it */
+    }
+    
+    /* FFN norm */
     snprintf(name, sizeof(name), "blk.%d.ffn_norm.weight", layer);
     lw->ffn_norm = ggml_get_tensor(ctx_w, name);
+    if (!lw->ffn_norm) valid = 0;
     
-    snprintf(name, sizeof(name), "blk.%d.ffn_gate.weight", layer);
-    lw->ffn_gate = ggml_get_tensor(ctx_w, name);
+    /* FFN gate (SwiGLU models only) */
+    if (lw->has_ffn_gate) {
+        snprintf(name, sizeof(name), "blk.%d.ffn_gate.weight", layer);
+        lw->ffn_gate = ggml_get_tensor(ctx_w, name);
+        if (!lw->ffn_gate) {
+            /* Model doesn't have gate - switch to GELU path */
+            lw->has_ffn_gate = 0;
+        }
+    }
     
+    /* FFN up/down (all architectures) */
     snprintf(name, sizeof(name), "blk.%d.ffn_up.weight", layer);
     lw->ffn_up = ggml_get_tensor(ctx_w, name);
+    if (!lw->ffn_up) valid = 0;
     
     snprintf(name, sizeof(name), "blk.%d.ffn_down.weight", layer);
     lw->ffn_down = ggml_get_tensor(ctx_w, name);
+    if (!lw->ffn_down) valid = 0;
     
-    /* Return 1 if all weights found, 0 otherwise */
-    return (lw->attn_norm && lw->wq && lw->wk && lw->wv && lw->wo &&
-            lw->ffn_norm && lw->ffn_gate && lw->ffn_up && lw->ffn_down);
+    /* Post-FFN norm (gemma2, etc.) */
+    if (lw->has_post_norm) {
+        snprintf(name, sizeof(name), "blk.%d.post_ffw_norm.weight", layer);
+        lw->ffn_post_norm = ggml_get_tensor(ctx_w, name);
+        /* Not critical if missing */
+    }
+    
+    return valid;
+}
+
+/* Legacy wrapper for backward compatibility */
+static int get_layer_weights(struct ggml_context *ctx_w, int layer, LughLayerWeights *lw) {
+    /* Default to LLAMA architecture for backward compatibility */
+    return get_layer_weights_for_arch(ctx_w, layer, lw, LUGH_ARCH_LLAMA);
 }
 
 /* ============================================================================
@@ -910,17 +1161,189 @@ static struct ggml_context* create_compute_context(size_t mem_size) {
     return ggml_init(params);
 }
 
-/* Build FFN (Feed-Forward Network) for a layer */
+/* ============================================================================
+ * Architecture-Aware Tensor Builders
+ * Reusable functions for building computation graphs across different model types
+ * ============================================================================ */
+
+/* Forward declarations for helper functions */
+static struct ggml_tensor* build_ffn(struct ggml_context *ctx, struct ggml_tensor *cur, LughLayerWeights *lw);
+static struct ggml_tensor* apply_rms_norm(struct ggml_context *ctx, struct ggml_tensor *cur, struct ggml_tensor *norm_weight, float eps);
+static struct ggml_tensor* build_standard_attention(struct ggml_context *ctx, struct ggml_tensor *q, struct ggml_tensor *k, struct ggml_tensor *v, int head_dim, int n_past);
+
+/* Q/K/V projection results structure */
+typedef struct {
+    struct ggml_tensor *q;   /* [head_dim, n_head, n_tokens] */
+    struct ggml_tensor *k;   /* [head_dim, n_head_kv, n_tokens] */
+    struct ggml_tensor *v;   /* [head_dim, n_head_kv, n_tokens] */
+} LughQKV;
+
+/* Build Q, K, V projections - handles both combined and separate QKV tensors
+ * Returns reshaped tensors ready for attention computation
+ */
+static LughQKV build_qkv_projections(
+    struct ggml_context *ctx,
+    struct ggml_tensor *cur,       /* Input tensor [n_embd, n_tokens] */
+    LughLayerWeights *lw,          /* Layer weights */
+    LughHyperparams *hp            /* Model hyperparameters */
+) {
+    LughQKV qkv;
+    int n_tokens = cur->ne[1];
+    
+    if (lw->has_combined_qkv && lw->wqkv) {
+        /* Combined QKV: split into Q, K, V */
+        struct ggml_tensor *combined = ggml_mul_mat(ctx, lw->wqkv, cur);
+        int qkv_dim = hp->n_embd + 2 * (hp->n_head_kv * hp->head_dim);
+        
+        qkv.q = ggml_view_2d(ctx, combined, hp->n_embd, n_tokens,
+                             qkv_dim * sizeof(float), 0);
+        qkv.k = ggml_view_2d(ctx, combined, hp->n_head_kv * hp->head_dim, n_tokens,
+                             qkv_dim * sizeof(float), hp->n_embd * sizeof(float));
+        qkv.v = ggml_view_2d(ctx, combined, hp->n_head_kv * hp->head_dim, n_tokens,
+                             qkv_dim * sizeof(float), (hp->n_embd + hp->n_head_kv * hp->head_dim) * sizeof(float));
+    } else {
+        /* Separate Q, K, V projections */
+        qkv.q = ggml_mul_mat(ctx, lw->wq, cur);
+        qkv.k = ggml_mul_mat(ctx, lw->wk, cur);
+        qkv.v = ggml_mul_mat(ctx, lw->wv, cur);
+    }
+    
+    /* Reshape for attention heads */
+    qkv.q = ggml_reshape_3d(ctx, qkv.q, hp->head_dim, hp->n_head, n_tokens);
+    qkv.k = ggml_reshape_3d(ctx, qkv.k, hp->head_dim, hp->n_head_kv, n_tokens);
+    qkv.v = ggml_reshape_3d(ctx, qkv.v, hp->head_dim, hp->n_head_kv, n_tokens);
+    
+    return qkv;
+}
+
+/* Apply RoPE (Rotary Positional Embeddings) to Q and K tensors */
+static void apply_rope_to_qkv(
+    struct ggml_context *ctx,
+    LughQKV *qkv,                  /* Q/K/V tensors (modified in place) */
+    struct ggml_tensor *pos,       /* Position tensor */
+    LughHyperparams *hp            /* Hyperparameters with RoPE config */
+) {
+    qkv->q = ggml_rope_ext(ctx, qkv->q, pos, NULL, hp->n_rot, 0, hp->n_ctx,
+                           hp->rope_freq_base, hp->rope_freq_scale, 0.0f, 1.0f, 0.0f, 0.0f);
+    qkv->k = ggml_rope_ext(ctx, qkv->k, pos, NULL, hp->n_rot, 0, hp->n_ctx,
+                           hp->rope_freq_base, hp->rope_freq_scale, 0.0f, 1.0f, 0.0f, 0.0f);
+}
+
+/* Build complete self-attention block
+ * Handles: QKV projection, RoPE, attention computation, output projection, post-norm
+ */
+static struct ggml_tensor* build_self_attention(
+    struct ggml_context *ctx,
+    struct ggml_tensor *cur,       /* Input (after attention norm) */
+    struct ggml_tensor *pos,       /* Position tensor */
+    LughLayerWeights *lw,
+    LughHyperparams *hp,
+    int use_flash_attn             /* 1 to use flash attention */
+) {
+    LughQKV qkv;
+    struct ggml_tensor *attn_out;
+    int n_tokens = cur->ne[1];
+    
+    /* Build Q, K, V projections */
+    qkv = build_qkv_projections(ctx, cur, lw, hp);
+    
+    /* Apply RoPE */
+    apply_rope_to_qkv(ctx, &qkv, pos, hp);
+    
+    /* Compute attention */
+    if (use_flash_attn) {
+        float scale = 1.0f / sqrtf((float)hp->head_dim);
+        struct ggml_tensor *q_fa = ggml_cont(ctx, ggml_permute(ctx, qkv.q, 0, 2, 1, 3));
+        struct ggml_tensor *k_fa = ggml_cont(ctx, ggml_permute(ctx, qkv.k, 0, 2, 1, 3));
+        struct ggml_tensor *v_fa = ggml_cont(ctx, ggml_permute(ctx, qkv.v, 0, 2, 1, 3));
+        attn_out = ggml_flash_attn_ext(ctx, q_fa, k_fa, v_fa, NULL, scale, 0.0f, 0.0f);
+        attn_out = ggml_reshape_3d(ctx, attn_out, hp->head_dim, hp->n_head, n_tokens);
+    } else {
+        attn_out = build_standard_attention(ctx, qkv.q, qkv.k, qkv.v, hp->head_dim, 0);
+    }
+    
+    /* Reshape and output projection */
+    attn_out = ggml_reshape_2d(ctx, attn_out, hp->n_embd, n_tokens);
+    cur = ggml_mul_mat(ctx, lw->wo, attn_out);
+    
+    return cur;
+}
+
+/* Build complete FFN block with pre-norm and optional post-norm */
+static struct ggml_tensor* build_ffn_block(
+    struct ggml_context *ctx,
+    struct ggml_tensor *cur,       /* Input tensor */
+    LughLayerWeights *lw,
+    float rms_norm_eps
+) {
+    /* FFN: norm -> gate/up -> activation -> down */
+    cur = apply_rms_norm(ctx, cur, lw->ffn_norm, rms_norm_eps);
+    cur = build_ffn(ctx, cur, lw);
+    
+    /* Post-FFN normalization (Gemma2, etc.) */
+    if (lw->has_post_norm && lw->ffn_post_norm) {
+        cur = apply_rms_norm(ctx, cur, lw->ffn_post_norm, rms_norm_eps);
+    }
+    
+    return cur;
+}
+
+/* Build complete transformer layer (attention + FFN with residuals)
+ * This is the highest-level abstraction for a single transformer block
+ */
+static struct ggml_tensor* build_transformer_layer(
+    struct ggml_context *ctx,
+    struct ggml_tensor *cur,       /* Input tensor */
+    struct ggml_tensor *pos,       /* Position tensor */
+    LughLayerWeights *lw,
+    LughHyperparams *hp,
+    int use_flash_attn
+) {
+    struct ggml_tensor *residual = cur;
+    
+    /* Attention block */
+    cur = apply_rms_norm(ctx, cur, lw->attn_norm, hp->rms_norm_eps);
+    cur = build_self_attention(ctx, cur, pos, lw, hp, use_flash_attn);
+    
+    /* Post-attention normalization (Gemma2, etc.) */
+    if (lw->has_post_norm && lw->attn_post_norm) {
+        cur = apply_rms_norm(ctx, cur, lw->attn_post_norm, hp->rms_norm_eps);
+    }
+    
+    /* Residual connection */
+    cur = ggml_add(ctx, cur, residual);
+    residual = cur;
+    
+    /* FFN block */
+    cur = build_ffn_block(ctx, cur, lw, hp->rms_norm_eps);
+    
+    /* Residual connection */
+    cur = ggml_add(ctx, cur, residual);
+    
+    return cur;
+}
+
+/* Build FFN (Feed-Forward Network) for a layer
+ * Supports both SwiGLU (with gate) and GELU (without gate) architectures
+ */
 static struct ggml_tensor* build_ffn(
     struct ggml_context *ctx,
     struct ggml_tensor *cur,
     LughLayerWeights *lw
 ) {
-    struct ggml_tensor *gate = ggml_mul_mat(ctx, lw->ffn_gate, cur);
-    struct ggml_tensor *up = ggml_mul_mat(ctx, lw->ffn_up, cur);
-    gate = ggml_silu(ctx, gate);
-    cur = ggml_mul(ctx, gate, up);
-    cur = ggml_mul_mat(ctx, lw->ffn_down, cur);
+    if (lw->has_ffn_gate && lw->ffn_gate) {
+        /* SwiGLU: gate * silu(up) -> down (llama, qwen, gemma) */
+        struct ggml_tensor *gate = ggml_mul_mat(ctx, lw->ffn_gate, cur);
+        struct ggml_tensor *up = ggml_mul_mat(ctx, lw->ffn_up, cur);
+        gate = ggml_silu(ctx, gate);
+        cur = ggml_mul(ctx, gate, up);
+        cur = ggml_mul_mat(ctx, lw->ffn_down, cur);
+    } else {
+        /* GELU: gelu(up) -> down (phi, gpt2, bert) */
+        struct ggml_tensor *up = ggml_mul_mat(ctx, lw->ffn_up, cur);
+        cur = ggml_gelu(ctx, up);
+        cur = ggml_mul_mat(ctx, lw->ffn_down, cur);
+    }
     return cur;
 }
 
@@ -1540,8 +1963,8 @@ PPCODE:
             LughLayerWeights lw;
             struct ggml_tensor *residual;
             
-            /* Get layer weights using helper */
-            if (!get_layer_weights(ctx_w, layer, &lw)) {
+            /* Get layer weights using architecture-aware helper */
+            if (!get_layer_weights_for_arch(ctx_w, layer, &lw, hp.arch_type)) {
                 continue;  /* Skip layers with missing weights */
             }
             
@@ -1555,10 +1978,22 @@ PPCODE:
                 struct ggml_tensor *q, *k, *v;
                 struct ggml_tensor *attn_out;
                 
-                /* Q, K, V projections */
-                q = ggml_mul_mat(ctx_c, lw.wq, cur);
-                k = ggml_mul_mat(ctx_c, lw.wk, cur);
-                v = ggml_mul_mat(ctx_c, lw.wv, cur);
+                /* Q, K, V projections - handle combined or separate */
+                if (lw.has_combined_qkv) {
+                    /* Split combined QKV tensor */
+                    struct ggml_tensor *qkv = ggml_mul_mat(ctx_c, lw.wqkv, cur);
+                    int qkv_dim = hp.n_embd + 2 * (hp.n_head_kv * hp.head_dim);
+                    q = ggml_view_2d(ctx_c, qkv, hp.n_embd, n_tokens, 
+                                     qkv_dim * sizeof(float), 0);
+                    k = ggml_view_2d(ctx_c, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
+                                     qkv_dim * sizeof(float), hp.n_embd * sizeof(float));
+                    v = ggml_view_2d(ctx_c, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
+                                     qkv_dim * sizeof(float), (hp.n_embd + hp.n_head_kv * hp.head_dim) * sizeof(float));
+                } else {
+                    q = ggml_mul_mat(ctx_c, lw.wq, cur);
+                    k = ggml_mul_mat(ctx_c, lw.wk, cur);
+                    v = ggml_mul_mat(ctx_c, lw.wv, cur);
+                }
                 
                 /* Reshape for attention heads */
                 q = ggml_reshape_3d(ctx_c, q, hp.head_dim, hp.n_head, n_tokens);
@@ -1595,13 +2030,23 @@ PPCODE:
                 cur = ggml_mul_mat(ctx_c, lw.wo, attn_out);
             }
             
+            /* Post-attention normalization (gemma2, etc.) */
+            if (lw.has_post_norm && lw.attn_post_norm) {
+                cur = apply_rms_norm(ctx_c, cur, lw.attn_post_norm, hp.rms_norm_eps);
+            }
+            
             /* Residual connection after attention */
             cur = ggml_add(ctx_c, cur, residual);
             residual = cur;
             
-            /* FFN: RMS norm -> SwiGLU -> down projection */
+            /* FFN: RMS norm -> SwiGLU/GELU -> down projection */
             cur = apply_rms_norm(ctx_c, cur, lw.ffn_norm, hp.rms_norm_eps);
             cur = build_ffn(ctx_c, cur, &lw);
+            
+            /* Post-FFN normalization (gemma2, etc.) */
+            if (lw.has_post_norm && lw.ffn_post_norm) {
+                cur = apply_rms_norm(ctx_c, cur, lw.ffn_post_norm, hp.rms_norm_eps);
+            }
             
             /* Residual connection after FFN */
             cur = ggml_add(ctx_c, cur, residual);
@@ -2443,8 +2888,8 @@ PPCODE:
             LughLayerWeights lw;
             struct ggml_tensor *residual;
             
-            /* Get layer weights using helper */
-            if (!get_layer_weights(ctx_w, layer, &lw)) {
+            /* Get layer weights using architecture-aware helper */
+            if (!get_layer_weights_for_arch(ctx_w, layer, &lw, hp.arch_type)) {
                 continue;
             }
             
@@ -2459,15 +2904,31 @@ PPCODE:
                 struct ggml_tensor *k_full, *v_full;
                 struct ggml_tensor *attn_out;
                 
-                /* Compute Q, K, V for new tokens */
-                q = ggml_mul_mat(ctx_c, lw.wq, cur);
-                k_new = ggml_mul_mat(ctx_c, lw.wk, cur);
-                v_new = ggml_mul_mat(ctx_c, lw.wv, cur);
-                
-                /* Reshape for attention */
-                q = ggml_reshape_3d(ctx_c, q, hp.head_dim, hp.n_head, n_tokens);
-                k_new = ggml_reshape_3d(ctx_c, k_new, hp.head_dim, hp.n_head_kv, n_tokens);
-                v_new = ggml_reshape_3d(ctx_c, v_new, hp.head_dim, hp.n_head_kv, n_tokens);
+                /* Compute Q, K, V for new tokens - handle combined or separate */
+                if (lw.has_combined_qkv) {
+                    /* Split combined QKV tensor */
+                    struct ggml_tensor *qkv = ggml_mul_mat(ctx_c, lw.wqkv, cur);
+                    int qkv_dim = hp.n_embd + 2 * (hp.n_head_kv * hp.head_dim);
+                    q = ggml_view_2d(ctx_c, qkv, hp.n_embd, n_tokens, 
+                                     qkv_dim * sizeof(float), 0);
+                    k_new = ggml_view_2d(ctx_c, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
+                                     qkv_dim * sizeof(float), hp.n_embd * sizeof(float));
+                    v_new = ggml_view_2d(ctx_c, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
+                                     qkv_dim * sizeof(float), (hp.n_embd + hp.n_head_kv * hp.head_dim) * sizeof(float));
+                    /* Need to reshape for attention */
+                    q = ggml_reshape_3d(ctx_c, q, hp.head_dim, hp.n_head, n_tokens);
+                    k_new = ggml_reshape_3d(ctx_c, k_new, hp.head_dim, hp.n_head_kv, n_tokens);
+                    v_new = ggml_reshape_3d(ctx_c, v_new, hp.head_dim, hp.n_head_kv, n_tokens);
+                } else {
+                    q = ggml_mul_mat(ctx_c, lw.wq, cur);
+                    k_new = ggml_mul_mat(ctx_c, lw.wk, cur);
+                    v_new = ggml_mul_mat(ctx_c, lw.wv, cur);
+                    
+                    /* Reshape for attention */
+                    q = ggml_reshape_3d(ctx_c, q, hp.head_dim, hp.n_head, n_tokens);
+                    k_new = ggml_reshape_3d(ctx_c, k_new, hp.head_dim, hp.n_head_kv, n_tokens);
+                    v_new = ggml_reshape_3d(ctx_c, v_new, hp.head_dim, hp.n_head_kv, n_tokens);
+                }
                 
                 /* Apply RoPE with position offset */
                 q = ggml_rope_ext(ctx_c, q, pos, NULL, hp.n_rot, 0, hp.n_ctx,
@@ -2558,12 +3019,22 @@ PPCODE:
                 cur = ggml_mul_mat(ctx_c, lw.wo, attn_out);
             }
             
+            /* Post-attention normalization (gemma2, etc.) */
+            if (lw.has_post_norm && lw.attn_post_norm) {
+                cur = apply_rms_norm(ctx_c, cur, lw.attn_post_norm, hp.rms_norm_eps);
+            }
+            
             /* Residual + FFN using helpers */
             cur = ggml_add(ctx_c, cur, residual);
             residual = cur;
             
             cur = apply_rms_norm(ctx_c, cur, lw.ffn_norm, hp.rms_norm_eps);
             cur = build_ffn(ctx_c, cur, &lw);
+            
+            /* Post-FFN normalization (gemma2, etc.) */
+            if (lw.has_post_norm && lw.ffn_post_norm) {
+                cur = apply_rms_norm(ctx_c, cur, lw.ffn_post_norm, hp.rms_norm_eps);
+            }
             
             cur = ggml_add(ctx_c, cur, residual);
         }
@@ -2854,17 +3325,31 @@ PPCODE:
             LughLayerWeights lw;
             struct ggml_tensor *residual;
             
-            if (!get_layer_weights(ctx_w, layer, &lw)) continue;
+            if (!get_layer_weights_for_arch(ctx_w, layer, &lw, hp.arch_type)) continue;
             
             residual = cur;
             cur = apply_rms_norm(pool->ctx_compute, cur, lw.attn_norm, hp.rms_norm_eps);
             
             /* Self-attention */
             {
-                struct ggml_tensor *q = ggml_mul_mat(pool->ctx_compute, lw.wq, cur);
-                struct ggml_tensor *k = ggml_mul_mat(pool->ctx_compute, lw.wk, cur);
-                struct ggml_tensor *v = ggml_mul_mat(pool->ctx_compute, lw.wv, cur);
+                struct ggml_tensor *q, *k, *v;
                 struct ggml_tensor *attn_out;
+                
+                if (lw.has_combined_qkv) {
+                    /* Split combined QKV tensor */
+                    struct ggml_tensor *qkv = ggml_mul_mat(pool->ctx_compute, lw.wqkv, cur);
+                    int qkv_dim = hp.n_embd + 2 * (hp.n_head_kv * hp.head_dim);
+                    q = ggml_view_2d(pool->ctx_compute, qkv, hp.n_embd, n_tokens, 
+                                     qkv_dim * sizeof(float), 0);
+                    k = ggml_view_2d(pool->ctx_compute, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
+                                     qkv_dim * sizeof(float), hp.n_embd * sizeof(float));
+                    v = ggml_view_2d(pool->ctx_compute, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
+                                     qkv_dim * sizeof(float), (hp.n_embd + hp.n_head_kv * hp.head_dim) * sizeof(float));
+                } else {
+                    q = ggml_mul_mat(pool->ctx_compute, lw.wq, cur);
+                    k = ggml_mul_mat(pool->ctx_compute, lw.wk, cur);
+                    v = ggml_mul_mat(pool->ctx_compute, lw.wv, cur);
+                }
                 
                 q = ggml_reshape_3d(pool->ctx_compute, q, hp.head_dim, hp.n_head, n_tokens);
                 k = ggml_reshape_3d(pool->ctx_compute, k, hp.head_dim, hp.n_head_kv, n_tokens);
@@ -2878,6 +3363,12 @@ PPCODE:
                 attn_out = build_standard_attention(pool->ctx_compute, q, k, v, hp.head_dim, 0);
                 attn_out = ggml_reshape_2d(pool->ctx_compute, attn_out, hp.n_embd, n_tokens);
                 attn_out = ggml_mul_mat(pool->ctx_compute, lw.wo, attn_out);
+                
+                /* Post-attention norm (Gemma2, etc.) */
+                if (lw.has_post_norm && lw.attn_post_norm) {
+                    attn_out = apply_rms_norm(pool->ctx_compute, attn_out, lw.attn_post_norm, hp.rms_norm_eps);
+                }
+                
                 cur = ggml_add(pool->ctx_compute, residual, attn_out);
             }
             
@@ -2885,6 +3376,12 @@ PPCODE:
             residual = cur;
             cur = apply_rms_norm(pool->ctx_compute, cur, lw.ffn_norm, hp.rms_norm_eps);
             cur = build_ffn(pool->ctx_compute, cur, &lw);
+            
+            /* Post-FFN norm (Gemma2, etc.) */
+            if (lw.has_post_norm && lw.ffn_post_norm) {
+                cur = apply_rms_norm(pool->ctx_compute, cur, lw.ffn_post_norm, hp.rms_norm_eps);
+            }
+            
             cur = ggml_add(pool->ctx_compute, residual, cur);
         }
         
@@ -3079,16 +3576,30 @@ PPCODE:
                 LughLayerWeights lw;
                 struct ggml_tensor *residual;
                 
-                if (!get_layer_weights(ctx_w, layer, &lw)) continue;
+                if (!get_layer_weights_for_arch(ctx_w, layer, &lw, hp.arch_type)) continue;
                 
                 residual = cur;
                 cur = apply_rms_norm(seq_ctx, cur, lw.attn_norm, hp.rms_norm_eps);
                 
                 {
-                    struct ggml_tensor *q = ggml_mul_mat(seq_ctx, lw.wq, cur);
-                    struct ggml_tensor *k = ggml_mul_mat(seq_ctx, lw.wk, cur);
-                    struct ggml_tensor *v = ggml_mul_mat(seq_ctx, lw.wv, cur);
+                    struct ggml_tensor *q, *k, *v;
                     struct ggml_tensor *attn_out;
+                    
+                    if (lw.has_combined_qkv) {
+                        /* Split combined QKV tensor */
+                        struct ggml_tensor *qkv = ggml_mul_mat(seq_ctx, lw.wqkv, cur);
+                        int qkv_dim = hp.n_embd + 2 * (hp.n_head_kv * hp.head_dim);
+                        q = ggml_view_2d(seq_ctx, qkv, hp.n_embd, n_tokens, 
+                                         qkv_dim * sizeof(float), 0);
+                        k = ggml_view_2d(seq_ctx, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
+                                         qkv_dim * sizeof(float), hp.n_embd * sizeof(float));
+                        v = ggml_view_2d(seq_ctx, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
+                                         qkv_dim * sizeof(float), (hp.n_embd + hp.n_head_kv * hp.head_dim) * sizeof(float));
+                    } else {
+                        q = ggml_mul_mat(seq_ctx, lw.wq, cur);
+                        k = ggml_mul_mat(seq_ctx, lw.wk, cur);
+                        v = ggml_mul_mat(seq_ctx, lw.wv, cur);
+                    }
                     
                     q = ggml_reshape_3d(seq_ctx, q, hp.head_dim, hp.n_head, n_tokens);
                     k = ggml_reshape_3d(seq_ctx, k, hp.head_dim, hp.n_head_kv, n_tokens);
@@ -3102,12 +3613,24 @@ PPCODE:
                     attn_out = build_standard_attention(seq_ctx, q, k, v, hp.head_dim, 0);
                     attn_out = ggml_reshape_2d(seq_ctx, attn_out, hp.n_embd, n_tokens);
                     attn_out = ggml_mul_mat(seq_ctx, lw.wo, attn_out);
+                    
+                    /* Post-attention norm (Gemma2, etc.) */
+                    if (lw.has_post_norm && lw.attn_post_norm) {
+                        attn_out = apply_rms_norm(seq_ctx, attn_out, lw.attn_post_norm, hp.rms_norm_eps);
+                    }
+                    
                     cur = ggml_add(seq_ctx, residual, attn_out);
                 }
                 
                 residual = cur;
                 cur = apply_rms_norm(seq_ctx, cur, lw.ffn_norm, hp.rms_norm_eps);
                 cur = build_ffn(seq_ctx, cur, &lw);
+                
+                /* Post-FFN norm (Gemma2, etc.) */
+                if (lw.has_post_norm && lw.ffn_post_norm) {
+                    cur = apply_rms_norm(seq_ctx, cur, lw.ffn_post_norm, hp.rms_norm_eps);
+                }
+                
                 cur = ggml_add(seq_ctx, residual, cur);
             }
             
@@ -4096,6 +4619,79 @@ architecture(self)
 CODE:
     LughModel *lm = get_lugh_model(aTHX_ self);
     RETVAL = lm->architecture ? lm->architecture : "unknown";
+OUTPUT:
+    RETVAL
+
+const char *
+arch_type(self)
+    SV *self
+CODE:
+    LughModel *lm = get_lugh_model(aTHX_ self);
+    LughArchType at = get_arch_type(lm->architecture);
+    switch (at) {
+        case LUGH_ARCH_LLAMA:     RETVAL = "llama"; break;
+        case LUGH_ARCH_QWEN:      RETVAL = "qwen"; break;
+        case LUGH_ARCH_QWEN2:     RETVAL = "qwen2"; break;
+        case LUGH_ARCH_PHI:       RETVAL = "phi"; break;
+        case LUGH_ARCH_GEMMA:     RETVAL = "gemma"; break;
+        case LUGH_ARCH_GEMMA2:    RETVAL = "gemma2"; break;
+        case LUGH_ARCH_GPT2:      RETVAL = "gpt2"; break;
+        case LUGH_ARCH_GPTJ:      RETVAL = "gptj"; break;
+        case LUGH_ARCH_GPTNEOX:   RETVAL = "gptneox"; break;
+        case LUGH_ARCH_FALCON:    RETVAL = "falcon"; break;
+        case LUGH_ARCH_BLOOM:     RETVAL = "bloom"; break;
+        case LUGH_ARCH_MPT:       RETVAL = "mpt"; break;
+        case LUGH_ARCH_STARCODER: RETVAL = "starcoder"; break;
+        case LUGH_ARCH_STABLELM:  RETVAL = "stablelm"; break;
+        case LUGH_ARCH_INTERNLM:  RETVAL = "internlm"; break;
+        case LUGH_ARCH_DEEPSEEK:  RETVAL = "deepseek"; break;
+        case LUGH_ARCH_COMMAND_R: RETVAL = "command_r"; break;
+        case LUGH_ARCH_MAMBA:     RETVAL = "mamba"; break;
+        case LUGH_ARCH_RWKV:      RETVAL = "rwkv"; break;
+        case LUGH_ARCH_BERT:      RETVAL = "bert"; break;
+        case LUGH_ARCH_T5:        RETVAL = "t5"; break;
+        default:                  RETVAL = "unknown"; break;
+    }
+OUTPUT:
+    RETVAL
+
+int
+arch_has_combined_qkv(self)
+    SV *self
+CODE:
+    LughModel *lm = get_lugh_model(aTHX_ self);
+    LughArchType at = get_arch_type(lm->architecture);
+    RETVAL = arch_has_combined_qkv(at);
+OUTPUT:
+    RETVAL
+
+int
+arch_has_ffn_gate(self)
+    SV *self
+CODE:
+    LughModel *lm = get_lugh_model(aTHX_ self);
+    LughArchType at = get_arch_type(lm->architecture);
+    RETVAL = arch_has_ffn_gate(at);
+OUTPUT:
+    RETVAL
+
+int
+arch_has_post_norm(self)
+    SV *self
+CODE:
+    LughModel *lm = get_lugh_model(aTHX_ self);
+    LughArchType at = get_arch_type(lm->architecture);
+    RETVAL = arch_has_post_norm(at);
+OUTPUT:
+    RETVAL
+
+int
+arch_is_recurrent(self)
+    SV *self
+CODE:
+    LughModel *lm = get_lugh_model(aTHX_ self);
+    LughArchType at = get_arch_type(lm->architecture);
+    RETVAL = arch_is_recurrent(at);
 OUTPUT:
     RETVAL
 

@@ -1,5 +1,5 @@
 # Copyright © 2007-2009 Raphaël Hertzog <hertzog@debian.org>
-# Copyright © 2012-2024 Guillem Jover <guillem@debian.org>
+# Copyright © 2012-2025 Guillem Jover <guillem@debian.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ CTRL_* constants exported by L<Dpkg::Control>.
 
 =cut
 
-package Dpkg::Control::FieldsCore 1.04;
+package Dpkg::Control::FieldsCore 1.05;
 
 use v5.36;
 
@@ -38,6 +38,8 @@ our @EXPORT = qw(
     field_is_allowed_in
     field_transfer_single
     field_transfer_all
+    field_parse_maintainer
+    field_parse_uploaders
     field_parse_binary_source
     field_list_src_dep
     field_list_pkg_dep
@@ -1194,6 +1196,43 @@ sub field_ordered_list {
     return ();
 }
 
+=item $email = field_parse_maintainer($ctrl)
+
+Parses the C<Maintainer> field from the Dpkg::Control $ctrl object, and
+returns a Dpkg::Email::Address object.
+
+=cut
+
+sub field_parse_maintainer($ctrl)
+{
+    my $maint = $ctrl->{'Maintainer'};
+
+    # XXX: Catch and remove bogus trailing comma for a transitory period.
+    if ($maint =~ s{,\s*$}{}) {
+         warning(g_('unexpected trailing comma in %s field with value "%s"'),
+                 'Maintainer', $maint);
+    }
+
+    require Dpkg::Email::Address;
+    return Dpkg::Email::Address->new($maint);
+}
+
+=item $email_list = field_parse_uploaders($ctrl)
+
+Parses the C<Uploaders> field from the Dpkg::Control $ctrl object, and
+returns a Dpkg::Email::AddressList object, containing the list of
+Dpkg::Email::Address for each uploader.
+
+=cut
+
+sub field_parse_uploaders($ctrl)
+{
+    my $uploaders = $ctrl->{'Uploaders'};
+
+    require Dpkg::Email::AddressList;
+    return Dpkg::Email::AddressList->new($uploaders);
+}
+
 =item ($source, $version) = field_parse_binary_source($ctrl)
 
 Parse the B<Source> field in a binary package control stanza. The field
@@ -1393,6 +1432,10 @@ sub field_insert_before {
 =back
 
 =head1 CHANGES
+
+=head2 Version 1.05 (dpkg 1.23.4)
+
+New functions: field_parse_maintainer(), field_parse_uploaders().
 
 =head2 Version 1.04 (dpkg 1.23.0)
 

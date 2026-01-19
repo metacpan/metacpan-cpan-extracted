@@ -8,6 +8,9 @@ use open IO => ':utf8';
 use lib './t';
 use Util;
 
+# Check for optional modules
+my $has_ansifold = eval { require App::ansifold; 1 };
+
 use Text::ParseWords qw(shellwords);
 use Getopt::Long 'Configure';
 Configure qw(bundling no_getopt_compat no_ignore_case);
@@ -42,6 +45,13 @@ if (defined(my $n = $opt{number})) {
 }
 
 for (@command) {
+    # Skip tests requiring optional modules
+    if (/&ansifold/ && !$has_ansifold) {
+	SKIP: {
+	    skip "App::ansifold not installed", 1;
+	}
+	next;
+    }
     my @command = shellwords $_;
     shift @command if $command[0] eq 'greple';
     my $result = run(@command)->stdout;

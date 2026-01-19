@@ -22,10 +22,12 @@ use Config;
 use Cwd;
 use IPC::Cmd qw(can_run);
 
+use Dpkg::ErrorHandling;
+
 if (! defined $Config{bin_ELF} || $Config{bin_ELF} ne 'define') {
     plan skip_all => 'only ELF is currently supported';
 }
-plan tests => 150;
+plan tests => 152;
 
 use_ok('Dpkg::Shlibs');
 use_ok('Dpkg::Shlibs::Objdump');
@@ -217,6 +219,7 @@ is_deeply(\%tmp,
 );
 
 # Wildcard test.
+report_options(quiet_warnings => 1);
 my $pat = $sym_file_old->create_symbol('*@GLIBC_PRIVATE 2.3.6.wildcard');
 $sym_file_old->add_symbol($pat, 'libc.so.6');
 $sym_file_old->merge_symbols($obj, '2.6-1');
@@ -239,6 +242,7 @@ is_deeply($sym,
     ),
     'wildcarded symbol',
 );
+report_options(quiet_warnings => 0);
 
 # Save -> Load test.
 use File::Temp;
@@ -511,6 +515,36 @@ is($io_data,
  symbol2_fake2@Base 1.0
  symbol3_fake2@Base 1.1
 ', "Dump of $datadir/symbols.include-2");
+
+
+$sym_file = Dpkg::Shlibs::SymbolFile->new(
+    filename => "$datadir/symbols.fake-4",
+);
+
+$sym = $sym_file->lookup_symbol('symbol1_fake2@Base', 'libfake.so.1');
+is_deeply($sym,
+    Dpkg::Shlibs::Symbol->new(
+        symbol => 'symbol1_fake2@Base',
+        minver => '1.0',
+        dep_id => 1,
+        deprecated => 0,
+    ),
+    'symbol definition with alternative dep id using #CURVER#',
+);
+
+# Check dump output.
+open $io, '>', \$io_data or die "cannot open io string\n";
+$sym_file->output($io,
+    package => 'libfake1',
+    version => '4.0-1',
+);
+is($io_data,
+'libfake.so.1 libfake1 #MINVER#
+| libfake1 (= 4.0-1)
+ symbol1_fake2@Base 1.0 1
+ symbol2_fake2@Base 1.0
+ symbol3_fake2@Base 1.1
+', "Dump of $datadir/symbols.fake-4");
 
 
 # Check parsing of objdump output on ia64 (local symbols without versions
@@ -992,10 +1026,12 @@ ok($sym->get_pattern()->equals($sym_file->create_symbol('(c++|symver)SYMVER_1 1.
 
 # Test old style wildcard support.
 load_patterns_symbols();
+report_options(quiet_warnings => 1);
 $sym = $sym_file->create_symbol('*@SYMVEROPT_2 2');
 ok($sym->is_optional(), 'Old style wildcard is optional');
 is($sym->get_alias_type(), 'symver', 'old style wildcard is a symver pattern');
 is($sym->get_symbolname(), 'SYMVEROPT_2', 'wildcard pattern got renamed');
+report_options(quiet_warnings => 0);
 
 $pat = $sym_file->lookup_pattern('(symver|optional)SYMVEROPT_2', 'libpatterns.so.1');
 $sym->{symbol_templ} = $pat->{symbol_templ};

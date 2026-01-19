@@ -5,6 +5,9 @@ authority = "cpan:UTASHIRO"
 module_maker = "ModuleBuildTiny"
 static_install = "auto"
 
+[FileGatherer]
+exclude_match = ['^CLAUDE\.md$']
+
 [release]
 branch = "main"
 do_not_upload_to_cpan = 0

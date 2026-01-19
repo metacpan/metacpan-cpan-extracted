@@ -41,6 +41,7 @@ my @cppcheck_opts = (qw(
 ),
     "-I$builddir",
 qw(
+    -U_LIBC
     -D__GNUC__=12
     -D__GNUC_MINOR__=0
     -D_DIRENT_HAVE_D_TYPE=1

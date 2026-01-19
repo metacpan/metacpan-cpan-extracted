@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.120-7-g9957158f
+package OpenAPI::Modern; # git description: v0.121-4-g20f82302
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.121';
+our $VERSION = '0.122';
 
 use 5.020;
 use utf8;
@@ -1169,7 +1169,6 @@ sub _type_in_schema ($self, $schema, $state) {
   if (exists $schema->{not}) {
     my %not_types; @not_types{qw(array object boolean string number null)} = ()x6;
 
-    # now splice out all those that are members of @not_types.
     delete $not_types{$_} foreach $self->_type_in_schema($schema->{not},
       { %$state, keyword_path => $state->{keyword_path}.'/not' });
 
@@ -1210,8 +1209,8 @@ sub _coerce_object_elements ($self, $data, $schema, $state) {
     }
   }
 
-  # we do not support anyOf, oneOf here, as the work involved in resolving ambiguities for each
-  # subschema as its own dataset is too great.
+  # we do not support anyOf, oneOf etc here to combine the sets of property constraints, as the work
+  # involved in resolving ambiguities for each subschema as its own dataset is too great.
 
   my $property_coercions = {};
   foreach my $property (sort keys $data->%*) {
@@ -1239,8 +1238,7 @@ sub _coerce_object_elements ($self, $data, $schema, $state) {
   push @object_coercions, $property_coercions;
 
   # combine hashes together by performing an intersection of types for each individual property
-  # consider unevaluatedProperties now  for each property - that doesn't have representation
-  # already.
+  # consider unevaluatedProperties now for each property that doesn't have representation already.
   my %final_object_coercions;
   foreach my $property (sort keys $data->%*) {
     next if ref $data->{$property};
@@ -1293,8 +1291,8 @@ sub _coerce_array_elements ($self, $data, $schema, $state) {
     }
   }
 
-  # we do not support anyOf, oneOf here, as the work involved in resolving ambiguities for each
-  # subschema as its own dataset is too great.
+  # we do not support anyOf, oneOf etc here to combine the sets of property constraints, as the work
+  # involved in resolving ambiguities for each subschema as its own dataset is too great.
 
   my $item_coercions = [];
   foreach my $idx (0..$data->$#*) {
@@ -1322,8 +1320,7 @@ sub _coerce_array_elements ($self, $data, $schema, $state) {
   push @array_coercions, $item_coercions;
 
   # combine arrayrefs together by performing an intersection of types for each individual item
-  # consider unevaluatedItems now for each property - that doesn't have representation
-  # already.
+  # consider unevaluatedItems now for each property that doesn't have representation already.
   my @final_array_coercions;
   foreach my $idx (0..$data->$#*) {
     next if ref $data->[$idx];
@@ -1497,7 +1494,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.121
+version 0.122
 
 =head1 SYNOPSIS
 

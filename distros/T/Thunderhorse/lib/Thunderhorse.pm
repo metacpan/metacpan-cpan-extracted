@@ -1,5 +1,5 @@
 package Thunderhorse;
-$Thunderhorse::VERSION = '0.101';
+$Thunderhorse::VERSION = '0.102';
 ##################################
 # ~~~~~~~~~~~~ Ride ~~~~~~~~~~~~ #
 # ~~~~~~~~~~~~ Ride ~~~~~~~~~~~~ #
@@ -123,7 +123,7 @@ __END__
 
 =head1 NAME
 
-Thunderhorse - A no-compromises brutally-good web framework
+Thunderhorse - A no-compromises, brutally-good web framework
 
 =head1 SYNOPSIS
 

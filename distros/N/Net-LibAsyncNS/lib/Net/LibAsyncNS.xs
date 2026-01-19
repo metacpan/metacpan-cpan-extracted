@@ -1,8 +1,10 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2010 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2010-2026 -- leonerd@leonerd.org.uk
  */
+
+#define PERL_NO_GET_CONTEXT
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -19,13 +21,15 @@ typedef struct Query {
   SV *userdata;
 } *Net__LibAsyncNS__Query;
 
-static Net__LibAsyncNS__Query query_from_sv(SV *sv)
+#define query_from_sv(sv)  S_query_from_sv(aTHX_ sv)
+static Net__LibAsyncNS__Query S_query_from_sv(pTHX_ SV *sv)
 {
   IV tmp = SvIV((SV*)SvRV(sv));
   return INT2PTR(Net__LibAsyncNS__Query, tmp);
 }
 
-static Net__LibAsyncNS__Query query_new(SV *asyncnssv, asyncns_t *asyncns, asyncns_query_t *q)
+#define query_new(asyncnssv, asyncns, q)  S_query_new(aTHX_ asyncnssv, asyncns, q)
+static Net__LibAsyncNS__Query S_query_new(pTHX_ SV *asyncnssv, asyncns_t *asyncns, asyncns_query_t *q)
 {
   Net__LibAsyncNS__Query query;
   SV *sv;
@@ -48,7 +52,8 @@ typedef int SysRet;
 
 /* Much of this interface code stolen^Winspired by Socket::GetAddrInfo */
 
-static SV *gai_err_to_SV(int err)
+#define gai_err_to_SV(err)  S_gai_err_to_SV(aTHX_ err)
+static SV *S_gai_err_to_SV(pTHX_ int err)
 {
   SV *ret = sv_newmortal();
   SvUPGRADE(ret, SVt_PVNV);
@@ -66,7 +71,8 @@ static SV *gai_err_to_SV(int err)
   return ret;
 }
 
-static void setup_constants(void)
+#define setup_constants()  S_setup_constants(aTHX)
+static void S_setup_constants(pTHX)
 {
   HV *stash;
   AV *export;

@@ -16,7 +16,7 @@ SKIP: {
     ll_set_max_abi_version($PINNED_VERSION);
     my $abi_version = ll_get_abi_version();
     diag("pinned ABI version: $abi_version");
-    is(scalar ll_all_fs_access_supported(), Math::BigInt->bone()->blsft(13) - 1, "correct list");
+    is(ll_all_fs_access_supported(), $LANDLOCK_ACCESS_FS{REFER} - 1, "correct list");
     my $ruleset_fd = ll_create_ruleset()
       or die "ruleset creation failed: $!\n";
     opendir my $dir, '/tmp';

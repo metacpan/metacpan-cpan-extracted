@@ -6,7 +6,7 @@ jQuery(function() {
         if (cf_id) {
             jQuery.ajax({
                 dataType: "json",
-                url: '/Helpers/SelectCondition',
+                url: RT.Config.WebPath + '/Helpers/SelectCondition',
                 async: false,
                 data:  {CustomFieldId: cf_id},
                 success: function(res) {

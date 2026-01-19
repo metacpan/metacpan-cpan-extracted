@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 
-# Fork tests for Doubly module
+# Fork tests for Doubly::Pointer module
 # Forks don't share memory, so each process gets its own copy
 
 BEGIN {

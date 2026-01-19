@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::Impl::Tickit 0.01;
+package Future::IO::Impl::Tickit 0.02;
 
 use v5.14;
 use warnings;
@@ -13,6 +13,7 @@ use Carp;
 
 __PACKAGE__->APPLY;
 
+use Future::IO qw( POLLIN POLLOUT POLLHUP POLLERR );
 use Tickit;
 my $tickit;
 
@@ -21,6 +22,8 @@ my $tickit;
 C<Future::IO::Impl::Tickit> - implement C<Future::IO> with C<Tickit>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Future::IO;
    use Future::IO::Impl::Tickit;
@@ -48,7 +51,7 @@ the C<Future::IO> interface will work.
 
 =head2 set_tickit
 
-   Future::IO::Impl::Tickit->set_tickit( $tickit )
+   Future::IO::Impl::Tickit->set_tickit( $tickit );
 
 Sets the toplevel C<Tickit> instance to use for the event watching used to
 implement this module.
@@ -83,74 +86,78 @@ sub sleep
    return $f;
 }
 
+# for POLLIN or POLLHUP
 my %read_watch_by_fileno;   # {fileno} => $watch
 my %read_futures_by_fileno; # {fileno} => [@futures]
 
-sub ready_for_read
-{
-   shift;
-   my ( $fh ) = @_;
-   my $fd = $fh->fileno;
-
-   $tickit or
-      croak "Need a Tickit instance with ->set_tickit before calling Future::IO->ready_for_read";
-
-   my $futures = $read_futures_by_fileno{ $fd } //= [];
-
-   my $f = Future::IO::Impl::Tickit::_Future->new;
-
-   my $was = scalar @$futures;
-   push @$futures, $f;
-
-   return $f if $was;
-
-   $read_watch_by_fileno{ $fd } = $tickit->watch_io( $fh, Tickit::IO_IN|Tickit::IO_HUP,
-      sub {
-         $futures->[0]->done;
-         shift @$futures;
-
-         return 1 if scalar @$futures;
-
-         $tickit->watch_cancel( delete $read_watch_by_fileno{ $fd } );
-         return 0;
-      }
-   );
-
-   return $f;
-}
-
+# for POLLOUT
 my %write_watch_by_fileno;   # {fileno} => $watch
 my %write_futures_by_fileno; # {fileno} => [@futures]
 
-sub ready_for_write
+sub poll
 {
    shift;
-   my ( $fh ) = @_;
+   my ( $fh, $events ) = @_;
    my $fd = $fh->fileno;
 
    $tickit or
-      croak "Need a Tickit instance with ->set_tickit before calling Future::IO->ready_for_write";
-
-   my $futures = $write_futures_by_fileno{ $fd } //= [];
+      croak "Need a Tickit instance with ->set_tickit before calling Future::IO->poll";
 
    my $f = Future::IO::Impl::Tickit::_Future->new;
 
-   my $was = scalar @$futures;
-   push @$futures, $f;
+   if( $events & (POLLIN|POLLHUP) ) {
+      my $futures = $read_futures_by_fileno{ $fd } //= [];
 
-   return $f if $was;
+      my $was = scalar @$futures;
+      push @$futures, $f;
 
-   $write_watch_by_fileno{ $fd } = $tickit->watch_io( $fh, Tickit::IO_OUT|Tickit::IO_HUP,
-      sub {
-         $futures->[0]->done;
-         shift @$futures;
+      my $cond = 0;
+      $cond |= Tickit::IO_IN  if $events & POLLIN;
+      $cond |= Tickit::IO_HUP if $events & POLLHUP;
 
-         return 1 if scalar @$futures;
+      $read_watch_by_fileno{ $fd } = $tickit->watch_io( $fh, $cond,
+         sub {
+            my ( $info ) = @_;
 
-         $tickit->watch_cancel( delete $write_watch_by_fileno{ $fd } );
-         return 0;
-      }
-   );
+            my $revents = 0;
+            $revents |= POLLIN  if $info->cond & Tickit::IO_IN;
+            $revents |= POLLHUP if $info->cond & Tickit::IO_HUP;
+            $revents |= POLLERR if $info->cond & Tickit::IO_ERR;
+            $futures->[0]->done( $revents );
+            shift @$futures;
+
+            return 1 if scalar @$futures;
+
+            $tickit->watch_cancel( delete $read_watch_by_fileno{ $fd } );
+            return 0;
+         }
+      ) if !$was;
+   }
+
+   if( $events & POLLOUT ) {
+      my $futures = $write_futures_by_fileno{ $fd } //= [];
+
+      my $was = scalar @$futures;
+      push @$futures, $f;
+
+      $write_watch_by_fileno{ $fd } = $tickit->watch_io( $fh, Tickit::IO_OUT|Tickit::IO_HUP,
+         sub {
+            my ( $info ) = @_;
+
+            my $revents = 0;
+            $revents |= POLLOUT if $info->cond & Tickit::IO_OUT;
+            $revents |= POLLHUP if $info->cond & Tickit::IO_HUP;
+            $revents |= POLLERR if $info->cond & Tickit::IO_ERR;
+            $futures->[0]->done( $revents );
+            shift @$futures;
+
+            return 1 if scalar @$futures;
+
+            $tickit->watch_cancel( delete $write_watch_by_fileno{ $fd } );
+            return 0;
+         }
+      ) if !$was;
+   }
 
    return $f;
 }

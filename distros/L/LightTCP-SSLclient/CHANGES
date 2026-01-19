@@ -1,0 +1,86 @@
+Revision history for LightTCP::SSLclient
+
+1.06  2026-01-18
+
+BUG FIXES:
+  - Fixed IPv6 port handling bug in _resolve_redirect() that incorrectly
+    prepended port number to path instead of storing in Host header
+  - Sanitized proxy credentials from verbose debug output to prevent leakage
+  - Replaced hardcoded 8192 buffer size with configurable buffer_size option
+
+FEATURES:
+  - Added is_keep_alive() accessor method for boolean keep-alive check
+  - Added set_buffer_size() method to configure read buffer at runtime
+
+1.05  2026-01-18
+
+FEATURES:
+  - Added redirect following support via request_with_redirects() method
+  - Added max_redirects option (default: 5)
+  - Added follow_redirects option (default: 1)
+  - Added redirect history tracking with get_redirect_history()
+  - Added get_redirect_count() to track redirects in last request
+  - Added accessor methods: get_max_redirects(), get_follow_redirects(),
+    set_max_redirects(), set_follow_redirects()
+  - POST-to-GET conversion on 301/302 redirects (RFC-compliant)
+  - Method preservation on 307/308 redirects
+  - Support for absolute and relative redirect URLs
+
+INTERNAL:
+  - Added _resolve_redirect() for URL resolution
+  - Added _resolve_relative_path() for relative path handling
+  - Added _do_request_with_redirects() recursive redirect handler
+  - Added _redirect_count and _redirect_history fields
+  - Added t/05_redirects.t for redirect tests
+
+EXAMPLE:
+  my ($code, $state, $headers, $body, $errors, $debug, $resp_code, $history)
+      = $client->request_with_redirects('POST', '/submit', host => 'example.com');
+
+  foreach my $r (@$history) {
+      print "$r->{code}: $r->{from} -> $r->{to}\n";
+  }
+
+1.04  2026-01-18
+
+SECURITY FIXES:
+  - Added SSL_protocols option to restrict to TLSv1.2+ only
+  - Added SSL_cipher_list option for configurable cipher suites
+  - Fixed IPv6 proxy address parsing vulnerability
+  - Fixed byte-by-byte chunk reading that caused severe performance issues
+  - Filtered sensitive data (SSL_key_file, SSL_cert_file) from debug output
+
+BUG FIXES:
+  - Fixed mixed buffered/unbuffered I/O conflict by replacing <$socket> with sysread
+  - Fixed ignored sysread return values that could corrupt subsequent reads
+  - Added verification of trailing CRLF after chunk data
+  - Added timeout protection to request() method
+
+FEATURES:
+  - Made User-Agent configurable via user_agent option
+  - Added accessor methods: get_cert(), get_insecure(), get_ssl_protocols(),
+    get_ssl_ciphers(), get_keep_alive(), get_buffer_size()
+  - Added setter methods: set_timeout(), set_insecure(), set_keep_alive(), set_cert()
+  - Added keep-alive support via keep_alive option
+  - Added DESTROY() method for automatic cleanup
+  - Added reconnect() method to re-establish connection
+  - Added buffer_size option for configurable read buffer
+
+API CHANGES (BREAKING):
+  - All methods now return 4 values: (ok, errors, debug, error_code)
+  - response() returns: (code, state, headers, body, errors, debug, error_code)
+  - Error codes exported: ECONNECT, EREQUEST, ERESPONSE, ETIMEOUT, ESSL
+
+PERFORMANCE:
+  - Replaced byte-by-byte chunk line reading with buffered _read_until_delimiter()
+  - _read_line_from_socket() now uses buffered reading
+
+INTERNAL:
+  - Added _parse_proxy_address() for robust IPv6 support
+  - Added _buffer field for persistent read buffer
+  - Added _target_host, _target_port, _proxy, _proxy_auth for reconnect
+  - Added t/04_helpers.t for helper tests
+
+1.03  2025-12-20
+  - Original release
+

@@ -6,7 +6,7 @@ WriteMakefile(
     NAME              => 'LightTCP::Server',
     VERSION_FROM      => 'lib/LightTCP/Server.pm',
     ABSTRACT_FROM     => 'lib/LightTCP/Server.pm',
-    AUTHOR            => 'Hans Harder <hans@atbas.org>',
+    AUTHOR            => 'Hans Harder',
     LICENSE           => 'perl',
     PL_FILES          => {},
     MIN_PERL_VERSION  => '5.008',

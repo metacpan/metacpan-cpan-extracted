@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Marky::DbTableSet;
-$Mojolicious::Plugin::Marky::DbTableSet::VERSION = '0.035';
+$Mojolicious::Plugin::Marky::DbTableSet::VERSION = '0.0602';
 #ABSTRACT: Mojolicious::Plugin::Marky::DbTableSet - querying one database table
 
 use Mojo::Base 'Mojolicious::Plugin';
@@ -71,18 +71,6 @@ sub register {
         return $self->_tagcloud($c,%args);
     } );
 
-    $app->helper( 'marky_set_options' => sub {
-        my $c        = shift;
-        my %args = @_;
-
-        return $self->_set_options($c,%args);
-    } );
-    $app->helper( 'marky_settings' => sub {
-        my $c        = shift;
-        my %args = @_;
-
-        return $self->_settings($c,%args);
-    } );
     $app->helper( 'marky_add_bookmark_form' => sub {
         my $c        = shift;
         my %args = @_;
@@ -142,11 +130,11 @@ sub _do_query {
     my $q = $c->param('q');
     my $p = $c->param('p');
     my $where = $c->param('where');
-
-    my $n = $c->session('n');
-    my $sort_by = $c->session("${db}_sort_by");
-    my $sort_by2 = $c->session("${db}_sort_by2");
-    my $sort_by3 = $c->session("${db}_sort_by3");
+    my $n = $c->param('n');
+    my $sort_by = $c->param("${db}_sort_by");
+    my $sort_by2 = $c->param("${db}_sort_by2");
+    my $sort_by3 = $c->param("${db}_sort_by3");
+    my $sort_by4 = $c->param("${db}_sort_by4");
 
     my $delterm = $c->param('delterm');
     if ($delterm && $q)
@@ -166,10 +154,8 @@ sub _do_query {
         $c->param('tags'=>$tags);
         $c->param(deltag=>undef);
     }
-    my $opt_url = $c->url_for("/db/$db/opt");
     my $location = $c->url_for("/db/$db");
     my $res = $self->{dbtables}->{$db}->query(location=>$location,
-        opt_url=>$opt_url,
         db=>$db,
         q=>$q,
         tags=>$tags,
@@ -179,6 +165,7 @@ sub _do_query {
         sort_by=>$sort_by,
         sort_by2=>$sort_by2,
         sort_by3=>$sort_by3,
+        sort_by4=>$sort_by4,
         show_sql=>$app->config->{tables}->{$db}->{show_sql},
     );
     if (!defined $res)
@@ -255,10 +242,8 @@ sub _taglist {
     my $c  = shift;
 
     my $db = $c->param('db');
-    my $opt_url = $c->url_for("/db/$db/opt");
     my $location = $c->url_for("/db/$db");
     my $res = $self->{dbtables}->{$db}->taglist(location=>$location,
-        opt_url=>$opt_url,
         db=>$db,
         n=>0,
     );
@@ -277,10 +262,8 @@ sub _tagcloud {
     my $c  = shift;
 
     my $db = $c->param('db');
-    my $opt_url = $c->url_for("/db/$db/opt");
     my $location = $c->url_for("/db/$db");
     my $res = $self->{dbtables}->{$db}->tagcloud(location=>$location,
-        opt_url=>$opt_url,
         db=>$db,
         n=>0,
     );
@@ -292,76 +275,6 @@ sub _tagcloud {
     }
     return $res->{results};
 } # _tagcloud
-
-
-sub _set_options {
-    my $self  = shift;
-    my $c  = shift;
-    my %args = @_;
-
-    # Set options for things like n
-    my @db = (sort keys %{$self->{dbtables}});
-
-    my @fields = (qw(n));
-    foreach my $db (@db)
-    {
-        push @fields, "${db}_sort_by";
-        push @fields, "${db}_sort_by2";
-        push @fields, "${db}_sort_by3";
-    }
-    my %fields_set = ();
-    foreach my $field (@fields)
-    {
-        my $val = $c->param($field);
-        if ($val)
-        {
-            $c->session->{$field} = $val;
-            $fields_set{$field} = 1;
-        }
-        else
-        {
-            if ($field =~ /(\w+)_sort_by./)
-            {
-                # We want to delete later sort-by values
-                # if they are blank and the first one was set,
-                # because we want to be able to sort by just
-                # one or two fields if we want.
-                my $db = $1;
-                if ($fields_set{"${db}_sort_by"})
-                {
-                    delete $c->session->{$field};
-                }
-            }
-        }
-    }
-    my $referrer = $c->req->headers->referrer;
-} # _set_options
-
-
-sub _settings {
-    my $self  = shift;
-    my $c  = shift;
-    my %args = @_;
-
-    my $db = $c->param('db');
-
-    my @fields = (qw(n));
-    push @fields, "${db}_sort_by";
-    push @fields, "${db}_sort_by2";
-    push @fields, "${db}_sort_by3";
-    
-    my @out = ();
-    foreach my $field (@fields)
-    {
-        my $val = $c->session->{$field};
-        push @out, "<p><b>$field:</b> $val</p>";
-    }
-    my $referrer = $c->req->headers->referrer;
-    print STDERR "_settings referrer=$referrer\n";
-    push @out, "<p>Back: <a href='$referrer'>$referrer</a></p>";
-
-    return join("\n", @out);
-} # _settings
 
 
 sub _add_bookmark_form {
@@ -467,7 +380,7 @@ Mojolicious::Plugin::Marky::DbTableSet - Mojolicious::Plugin::Marky::DbTableSet 
 
 =head1 VERSION
 
-version 0.035
+version 0.0602
 
 =head1 SYNOPSIS
 
@@ -484,7 +397,7 @@ Mojolicious::Plugin::Marky::DbTableSet - querying one database table
 
 =head1 VERSION
 
-version 0.035
+version 0.0602
 
 =head1 REGISTER
 
@@ -498,7 +411,7 @@ Initialize.
 
 =head2 _do_query
 
-Do a query, looking at the params and session.
+Do a query, looking at the params
 
 =head2 _total_records
 
@@ -519,14 +432,6 @@ Make a taglist for a db
 =head2 _tagcloud
 
 Make a tagcloud for a db
-
-=head2 _set_options
-
-Set options in the session
-
-=head2 _settings
-
-Show the current settings
 
 =head2 _add_bookmark_form
 

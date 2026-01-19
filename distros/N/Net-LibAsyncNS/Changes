@@ -1,5 +1,9 @@
 Revision history for Net-LibAsyncNS
 
+0.05    2026-01-18
+        [CHANGES]
+         * General module refresh to current style
+
 0.04    2020-11-21
         [CHANGES]
          * Fix version dependency on Module::Build

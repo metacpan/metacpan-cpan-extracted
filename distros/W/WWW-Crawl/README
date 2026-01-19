@@ -25,6 +25,8 @@ Crawling JavaScript-rendered pages with Chromium:
     my $crawler = WWW::Crawl::Chromium->new(
         chromium_path    => '/usr/bin/chromium',
         chromium_timeout => 30,
+        retry_count      => 2,
+        debug            => 1,
     );
 
     my @visited = $crawler->crawl('https://example.com', \&process_page);
@@ -33,6 +35,10 @@ Crawling JavaScript-rendered pages with Chromium:
         my $url = shift;
         print "Visited: $url\n";
     }
+
+Notes:
+
+    The retry_count and debug options are also supported by WWW::Crawl::Auto.
 
 INSTALLATION & TESTING
 

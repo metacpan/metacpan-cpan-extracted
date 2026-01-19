@@ -1,5 +1,14 @@
 -----
 
+12.0.2    2026-01-18
+   [Fixed]
+       * MANIFEST excluded Protocol::Sys::Virt::TypedParams and tests
+
+12.0.1    2026-01-18
+    [Added]
+       * Module Protocol::Sys::Virt::TypedParams implementing helper functions
+         to operate on virTypedParameterType arrays
+
 12.0.0    2026-01-15
     [Changed]
        * Updated to libvirt tag v12.0.0 (from v11.10.0 - no actual changes)

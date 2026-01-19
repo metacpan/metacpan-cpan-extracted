@@ -1,0 +1,29 @@
+---
+abstract: 'Lightweight pure-Perl data file handlers for array/tabular/csv data'
+author:
+  - 'Hans Harder'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Datafile-Array
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Datafile::Array:
+    file: lib/Datafile/Array.pm
+requires:
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/HansH111/Datafile-Array.pm/issues
+  repository: https://github.com/HansH111/Datafile-Array.pm.git
+version: '1.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

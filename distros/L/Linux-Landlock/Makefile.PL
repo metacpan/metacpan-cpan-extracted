@@ -18,7 +18,7 @@ WriteMakefile(
         'Config'       => 0,
         'Math::BigInt' => 0,
     },
-    VERSION       => '0.9.2',
+    VERSION_FROM => 'lib/Linux/Landlock.pm',
     TEST_REQUIRES => {
         'Test::Exception'  => 0,
         'Test::More'       => 0,

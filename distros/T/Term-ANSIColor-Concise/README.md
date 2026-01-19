@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/tecolicom/Term-ANSIColor-Concise/workflows/test/badge.svg)](https://github.com/tecolicom/Term-ANSIColor-Concise/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Term-ANSIColor-Concise.svg)](https://metacpan.org/release/Term-ANSIColor-Concise)
+[![Actions Status](https://github.com/tecolicom/Term-ANSIColor-Concise/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/tecolicom/Term-ANSIColor-Concise/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/Term-ANSIColor-Concise.svg)](https://metacpan.org/release/Term-ANSIColor-Concise)
 # NAME
 
 Term::ANSIColor::Concise - Produce ANSI terminal sequence by concise notation
@@ -25,7 +25,7 @@ Term::ANSIColor::Concise - Produce ANSI terminal sequence by concise notation
 
 # VERSION
 
-Version 3.01
+Version 3.02
 
 # DESCRIPTION
 
@@ -190,19 +190,20 @@ Single uppercase character representing 8 colors, and alternative
 
 ## EFFECTS and CONTROLS
 
-Single case-insensitive character for special effects :
+Single case-insensitive character for special effects.  Numbers
+indicate SGR (Select Graphic Rendition) parameter values:
 
     N    None
     Z  0 Zero (reset)
-    D  1 Double strike (boldface)
-    P  2 Pale (dark)
+    D  1 Double-struck (boldface)
+    P  2 Pale (faint/dim)
     I  3 Italic
     U  4 Underline
     F  5 Flash (blink: slow)
     Q  6 Quick (blink: rapid)
-    S  7 Stand out (reverse video)
-    H  8 Hide (conceal)
-    X  9 Cross out
+    S  7 Stand-out (reverse video)
+    H  8 Hide (concealed)
+    X  9 Cross-out (strikethrough)
 
     E    Erase Line (fill by background color)
 
@@ -340,9 +341,14 @@ VT100 compatible terminals usually support these, and do not support
 
 # COLOR ADJUSTMENT
 
-Colors can be dynamically adjusted using modifier characters appended after 
-color specifications. These modifiers allow you to adjust various color 
+Colors can be dynamically adjusted using modifier characters appended after
+color specifications. These modifiers allow you to adjust various color
 properties such as luminance, lightness, saturation, and hue.
+
+**Note:** Modifiers can only be used with full color specifications:
+hex (`#FF0000`), RGB (`rgb(255,0,0)`), HSL, LCH, Lab, or named colors
+(`<red>`).  Basic 8+8 colors (`R`, `G`, `B`, etc.) and 6x6x6 216
+colors (`555`, etc.) do not support modifiers.
 
 ## MODIFIER SYNTAX
 

@@ -1,11 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
-use Test::Identity;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use Net::LibAsyncNS;
 
@@ -25,7 +23,7 @@ is_refcount( $asyncns, 2, '$asyncns has refcount 2 after ->res_query' );
 
 is( $asyncns->getnqueries, 1, '$asyncns->getnqueries now 1' );
 
-identical( $query->asyncns, $asyncns, '$asyncns->query is $asyncns' );
+ref_is( $query->asyncns, $asyncns, '$asyncns->query is $asyncns' );
 
 $asyncns->wait( 1 ) while !$asyncns->isdone( $query );
 

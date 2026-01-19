@@ -184,7 +184,8 @@ use Linux::Landlock::Direct qw(
   ll_set_max_abi_version
   set_no_new_privs
 );
-our $VERSION = '0.9.2';
+
+our $VERSION = '0.009003';
 
 sub new {
     my ($class, %args) = @_;
@@ -259,9 +260,9 @@ sub add_path_beneath_rule {
 }
 
 sub __reduce_path_beneath_rules {
-    if (defined $_[0] && $_[0]->@*) {
+    if (defined $_[0] && @{$_[0]}) {
         return reduce { $a | $b } Math::BigInt->bzero,
-          map { $LANDLOCK_ACCESS_FS{ uc $_ } // die "invalid filesystem access right: '$_'\n" } $_[0]->@*;
+          map { $LANDLOCK_ACCESS_FS{ uc $_ } // die "invalid filesystem access right: '$_'\n" } @{$_[0]};
     } elsif (defined $_[0]) {
         return Math::BigInt->bzero;
     } else {
@@ -270,9 +271,9 @@ sub __reduce_path_beneath_rules {
 }
 
 sub __reduce_net_port_rules {
-    if (defined $_[0] && $_[0]->@*) {
+    if (defined $_[0] && @{$_[0]}) {
         return reduce { $a | $b } Math::BigInt->bzero,
-          map { $LANDLOCK_ACCESS_NET{ uc $_ } // die "invalid network access right: '$_'\n" } $_[0]->@*;
+          map { $LANDLOCK_ACCESS_NET{ uc $_ } // die "invalid network access right: '$_'\n" } @{$_[0]};
     } elsif (defined $_[0]) {
         return Math::BigInt->bzero;
     } else {
@@ -281,9 +282,9 @@ sub __reduce_net_port_rules {
 }
 
 sub __reduce_ipc_scopes {
-    if (defined $_[0] && $_[0]->@*) {
+    if (defined $_[0] && @{$_[0]}) {
         return reduce { $a | $b } Math::BigInt->bzero,
-          map { $LANDLOCK_SCOPED{ uc $_ } // die "invalid IPC mechanism: '$_'\n" } $_[0]->@*;
+          map { $LANDLOCK_SCOPED{ uc $_ } // die "invalid IPC mechanism: '$_'\n" } @{$_[0]};
     } elsif (defined $_[0]) {
         return Math::BigInt->bzero;
     } else {

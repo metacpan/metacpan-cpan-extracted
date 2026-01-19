@@ -11,10 +11,11 @@ my $build = Module::Build->new(
 
       'Future' => 0,
       'Future::IO::ImplBase' => '0.17',
+      'Struct::Dumb' => 0,
       'UV' => "1.900",
    },
    test_requires => {
-      'Test::Future::IO::Impl' => '0.15',
+      'Test::Future::IO::Impl' => '0.17',
       'Test2::V0' => 0,
    },
    configure_requires => {

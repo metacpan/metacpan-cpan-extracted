@@ -1,11 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
-use Test::Identity;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use Net::LibAsyncNS;
 
@@ -27,7 +25,7 @@ is_refcount( $asyncns, 2, '$asyncns has refcount 2 after ->getaddrinfo' );
 
 is( $asyncns->getnqueries, 1, '$asyncns->getnqueries now 1' );
 
-identical( $query->asyncns, $asyncns, '$asyncns->query is $asyncns' );
+ref_is( $query->asyncns, $asyncns, '$asyncns->query is $asyncns' );
 
 $asyncns->wait( 1 ) while !$asyncns->isdone( $query );
 
@@ -46,9 +44,9 @@ cmp_ok( scalar @res, '>=', 1, '@res contains 1 result' );
 is( $res[0]->{family},   AF_INET,     '$res[0]->{family} is AF_INET' );
 is( $res[0]->{socktype}, SOCK_STREAM, '$res[0]->{socktype} is SOCK_STREAM' );
 
-is_deeply( [ unpack_sockaddr_in $res[0]->{addr} ],
-           [ 12345, inet_aton("127.0.0.1") ],
-           '$res[0]->{addr} is { 12345, inet_aton("127.0.0.1") }' );
+is( [ unpack_sockaddr_in $res[0]->{addr} ],
+    [ 12345, inet_aton("127.0.0.1") ],
+    '$res[0]->{addr} is { 12345, inet_aton("127.0.0.1") }' );
 
 is( $asyncns->getnqueries, 0, '$asyncns->getnqueries 0 at EOF' );
 

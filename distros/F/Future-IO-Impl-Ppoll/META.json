@@ -31,14 +31,14 @@
       "test" : {
          "requires" : {
             "Test2::V0" : "0",
-            "Test::Future::IO::Impl" : "0.15"
+            "Test::Future::IO::Impl" : "0.17"
          }
       }
    },
    "provides" : {
       "Future::IO::Impl::Ppoll" : {
          "file" : "lib/Future/IO/Impl/Ppoll.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

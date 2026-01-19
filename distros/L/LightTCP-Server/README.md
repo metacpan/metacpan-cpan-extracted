@@ -301,6 +301,10 @@ sub custom_log {
 }
 ```
 
+## Version
+
+2.04
+
 ## License
 
 This software is licensed under the same terms as Perl itself.
@@ -309,3 +313,4 @@ This software is licensed under the same terms as Perl itself.
 
 - [IO::Socket::INET](https://metacpan.org/pod/IO::Socket::INET) - TCP socket handling
 - [threads](https://metacpan.org/pod/threads) - Threading support
+

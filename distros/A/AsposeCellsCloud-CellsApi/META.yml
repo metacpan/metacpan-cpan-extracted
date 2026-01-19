@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 25.12
+    version: 26.1
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Role:
@@ -927,6 +927,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/ExcelDataStatistics.pm
   AsposeCellsCloud::Object::WorksheetDataStatistics:
     file: lib/AsposeCellsCloud/Object/WorksheetDataStatistics.pm
+  AsposeCellsCloud::Request::DecomposeUserTaskRequest:
+    file: lib/AsposeCellsCloud/Request/DecomposeUserTaskRequest.pm
   AsposeCellsCloud::Request::TranslationSpreadsheetRequest:
     file: lib/AsposeCellsCloud/Request/TranslationSpreadsheetRequest.pm
   AsposeCellsCloud::Request::TranslateTextFileRequest:
@@ -963,6 +965,10 @@ provides:
     file: lib/AsposeCellsCloud/Request/ConvertWorksheetToImageRequest.pm
   AsposeCellsCloud::Request::ConvertWorksheetToPdfRequest:
     file: lib/AsposeCellsCloud/Request/ConvertWorksheetToPdfRequest.pm
+  AsposeCellsCloud::Request::ConvertWorksheetToHtmlRequest:
+    file: lib/AsposeCellsCloud/Request/ConvertWorksheetToHtmlRequest.pm
+  AsposeCellsCloud::Request::ConvertWorksheetToHtmlTableRequest:
+    file: lib/AsposeCellsCloud/Request/ConvertWorksheetToHtmlTableRequest.pm
   AsposeCellsCloud::Request::ConvertTableToImageRequest:
     file: lib/AsposeCellsCloud/Request/ConvertTableToImageRequest.pm
   AsposeCellsCloud::Request::ConvertTableToPdfRequest:
@@ -1003,6 +1009,12 @@ provides:
     file: lib/AsposeCellsCloud/Request/SplitRemoteSpreadsheetRequest.pm
   AsposeCellsCloud::Request::ImportDataIntoSpreadsheetRequest:
     file: lib/AsposeCellsCloud/Request/ImportDataIntoSpreadsheetRequest.pm
+  AsposeCellsCloud::Request::ImportJSONDataIntoSpreadsheetRequest:
+    file: lib/AsposeCellsCloud/Request/ImportJSONDataIntoSpreadsheetRequest.pm
+  AsposeCellsCloud::Request::ImportXMLDataIntoSpreadsheetRequest:
+    file: lib/AsposeCellsCloud/Request/ImportXMLDataIntoSpreadsheetRequest.pm
+  AsposeCellsCloud::Request::ImportCSVDataIntoSpreadsheetRequest:
+    file: lib/AsposeCellsCloud/Request/ImportCSVDataIntoSpreadsheetRequest.pm
   AsposeCellsCloud::Request::GetPublicKeyRequest:
     file: lib/AsposeCellsCloud/Request/GetPublicKeyRequest.pm
   AsposeCellsCloud::Request::CreateSpreadsheetRequest:
@@ -1081,6 +1093,8 @@ provides:
     file: lib/AsposeCellsCloud/Request/RemoveDuplicatesRequest.pm
   AsposeCellsCloud::Request::SwapRangeRequest:
     file: lib/AsposeCellsCloud/Request/SwapRangeRequest.pm
+  AsposeCellsCloud::Request::FlipDataRequest:
+    file: lib/AsposeCellsCloud/Request/FlipDataRequest.pm
   AsposeCellsCloud::Request::DownloadFileRequest:
     file: lib/AsposeCellsCloud/Request/DownloadFileRequest.pm
   AsposeCellsCloud::Request::UploadFileRequest:
@@ -1814,5 +1828,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 25.12
+version: 26.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

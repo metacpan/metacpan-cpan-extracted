@@ -1,5 +1,5 @@
 package Test2::Thunderhorse;
-$Test2::Thunderhorse::VERSION = '0.101';
+$Test2::Thunderhorse::VERSION = '0.102';
 use v5.40;
 
 use Test2::API qw(context);

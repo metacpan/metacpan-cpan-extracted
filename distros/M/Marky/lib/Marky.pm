@@ -1,5 +1,5 @@
 package Marky;
-$Marky::VERSION = '0.035';
+$Marky::VERSION = '0.0602';
 # ABSTRACT: web application for bookmark databases
 
 use Mojo::Base 'Mojolicious';
@@ -32,7 +32,7 @@ sub startup {
     {
         $conf_file = $ENV{MARKY_CONFIG};
     }
-    print STDERR "CONFIG: $conf_file\n";
+    print STDERR "Marky::VERSION=$Marky::VERSION CONFIG: $conf_file\n";
     my $mojo_config = $self->plugin('Config' => { file => $conf_file });
 
     # -------------------------------------------
@@ -93,11 +93,11 @@ sub startup {
     push @{$self->renderer->classes}, __PACKAGE__;
 
     # -------------------------------------------
-    # secrets, cookies and defaults
+    # secrets, and defaults
     # -------------------------------------------
-    $self->secrets([qw(etunAvIlyiejUnnodwyk supernumary55)]);
-    $self->sessions->cookie_name('marky');
-    $self->sessions->default_expiration(60 * 60 * 24 * 3); # 3 days
+    $self->secrets([qw(AUygaywzatNJ9maaN3XY etunAvIlyiejUnnodwyk supernumary55)]);
+    #$self->sessions->cookie_name('marky');
+    #$self->sessions->default_expiration(60 * 60 * 24 * 3); # 3 days
     foreach my $key (keys %{$self->config->{defaults}})
     {
         $self->defaults($key, $self->config->{defaults}->{$key});
@@ -111,8 +111,7 @@ sub startup {
     my $r = $self->routes;
 
     $r->get('/')->to('db#tables');
-    $r->get('/opt')->to('db#options');
-    $r->get('/db/:db/opt')->to('db#options');
+    $r->get('/db/')->to('db#tables');
 
     $r->get('/db/:db/taglist')->to('db#taglist');
     $r->get('/db/:db/tagcloud')->to('db#tagcloud');
@@ -138,7 +137,7 @@ Marky - web application for bookmark databases
 
 =head1 VERSION
 
-version 0.035
+version 0.0602
 
 =head1 SYNOPSIS
 
@@ -159,7 +158,7 @@ Marky - web application for bookmark databases
 
 =head1 VERSION
 
-version 0.035
+version 0.0602
 
 =head1 AUTHOR
 

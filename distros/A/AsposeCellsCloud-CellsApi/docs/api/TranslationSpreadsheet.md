@@ -12,7 +12,7 @@ Translates the entire spreadsheet to the specified target language.
 ### **Endpoint** 
 
 ```
-PUT http://api.aspose.cloud/v4.0/cells/translate/spreadsheet
+PUT http://api.aspose.cloud/v4.0/cells/ai/translate/spreadsheet
 ```
 ### **Function Description**
 This method reads all text content from the spreadsheet workbook, translates it to the target language using AI translation services,and returns the translated spreadsheet file. The translation process preserves the original spreadsheet structure and formatting.## **Error Handling**- **400 Bad Request**: Invalid target language parameter.- **401 Unauthorized**: Authentication failed for translation service.- **500 Server Error**: Translation service unavailable or spreadsheet processing error.## **Key Features and Benefits**- **AI-Powered Translation**: Uses advanced AI for accurate translations.- **Structure Preservation**: Maintains original spreadsheet layout and formulas.- **Multi-Sheet Support**: Translates content across all worksheets automatically.
@@ -36,4 +36,4 @@ File
 
 ## OpenAPI Specification
 
-The [OpenAPI Specification](https://reference.aspose.cloud/cells/#/AiTranslationController/TranslationSpreadsheet) defines a publicly accessible programming interface and lets you carry out REST interactions directly from a web browser.
+The [OpenAPI Specification](https://reference.aspose.cloud/cells/#/AIController/TranslationSpreadsheet) defines a publicly accessible programming interface and lets you carry out REST interactions directly from a web browser.

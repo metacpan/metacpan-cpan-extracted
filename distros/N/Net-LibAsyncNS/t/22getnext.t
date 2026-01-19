@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use Net::LibAsyncNS;
 use Net::LibAsyncNS::Constants qw( NI_NUMERICHOST NI_NUMERICSERV );
@@ -41,10 +40,10 @@ while( notall @done ) {
    }
 }
 
-is_deeply( \@done,
-           [ [ "127.0.0.1", 12345 ],
-             [ "127.0.0.1", 12346 ],
-             [ "127.0.0.1", 12347 ] ],
-           'Queries gave the right answers' );
+is( \@done,
+    [ [ "127.0.0.1", 12345 ],
+      [ "127.0.0.1", 12346 ],
+      [ "127.0.0.1", 12347 ] ],
+    'Queries gave the right answers' );
 
 done_testing;

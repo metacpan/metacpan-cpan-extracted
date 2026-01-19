@@ -15,8 +15,10 @@ Revision history for WWW-Crawl
 0.4     7th January 2026
         Added extra callback parameter containing the body of the page 
         Increased default timeout to 120 seconds
-        
 
+0.5     18th January 2026
+        Added WWW::Crawl::Auto
+        An alternative Crawl module to Auto-detect whether to use HTTP or Chromium.
 
-
-
+        Added retry_count/debug options.
+        Made the Chromium module more robust.

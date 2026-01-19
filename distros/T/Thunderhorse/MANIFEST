@@ -82,6 +82,7 @@ t/module/middleware.t
 t/module/template.t
 t/params.t
 t/router-actions.t
+t/router-cache.t
 t/sse.t
 t/templates/layout.tt
 t/templates/test.tpl

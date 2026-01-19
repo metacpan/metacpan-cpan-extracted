@@ -1,5 +1,5 @@
 package Git::Repository;
-$Git::Repository::VERSION = '1.325';
+$Git::Repository::VERSION = '1.326';
 use warnings;
 use strict;
 use 5.006;

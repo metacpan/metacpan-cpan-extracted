@@ -20,7 +20,7 @@ jQuery(function() {
     var cf_condition_vals;
     jQuery.ajax({
         dataType: "json",
-        url: '<% $ajax_url %>',
+        url: RT.Config.WebPath + '<% $ajax_url %>',
         async: false,
         data:  {ObjectType: '<% ref($Object) %>', ObjectId: <% $Object->id %>, CustomFieldId: <% $condition_cf->id %>},
         success: function(res) {
@@ -67,7 +67,7 @@ jQuery(function() {
         var cf_condition_vals;
         jQuery.ajax({
             dataType: "json",
-            url: '<% $ajax_url %>',
+            url: RT.Config.WebPath + '<% $ajax_url %>',
             async: false,
             data:  {ObjectId: <% $Object->id %>, CustomFieldId: <% $condition_cf->id %>},
             success: function(res) {

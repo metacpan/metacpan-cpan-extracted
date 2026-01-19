@@ -1,21 +1,29 @@
 Revision History for Marky
 ==========================
 
-v0.035 2017-10-12
------------------
+v0.0602 2026-01-18
+------------------
 
-* 2017-10-12 07:40:54 +1100
-  version bump
-* 2017-10-12 07:40:26 +1100
-  commented out NYTProf
-
-v0.034 2017-10-12
------------------
-
-* 2017-10-12 06:31:55 +1100
-  Use YAML::Any instead of File::Serializer
-* 2017-10-12 05:40:54 +1100
-  tweaked gitignore
+* 2026-01-18 23:23:41 +1100
+  Removed all the cookies.
+* 2024-01-11 19:42:11 +1100
+  tweaking the search form
+* 2024-01-11 19:34:22 +1100
+  Merge branch 'master' of github.com:rubykat/Marky
+* 2024-01-11 19:34:09 +1100
+  tweaking the search form
+* 2023-05-23 02:06:19 +1000
+  adding MANIFEST.SKIP
+* 2022-02-08 09:19:38 +1100
+  forgot settings
+* 2022-02-08 09:15:28 +1100
+  Added a fourth sort-field.
+* 2021-06-18 10:38:18 +1000
+  print message on startup
+* 2021-06-18 10:30:58 +1000
+  display version on startup
+* 2018-01-21 20:51:35 +1100
+  added random sort
 
 ===================================
 End of changes in the last 365 days

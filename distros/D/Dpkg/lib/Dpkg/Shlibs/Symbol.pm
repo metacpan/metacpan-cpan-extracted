@@ -168,6 +168,8 @@ sub initialize {
     # Support old style wildcard syntax. That is basically a symver with an
     # optional tag.
     if ($self->get_symbolname() =~ /^\*@(.*)$/) {
+        warning(g_('deprecated wildcard syntax in "%s"; use "%s" instead'),
+                $self->get_symbolname(), "(symver|optional)$1");
         $self->add_tag('symver') unless $self->has_tag('symver');
         $self->add_tag('optional') unless $self->has_tag('optional');
         $self->{symbol} = $1;

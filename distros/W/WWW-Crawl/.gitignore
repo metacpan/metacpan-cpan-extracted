@@ -1,0 +1,11 @@
+# Build artefacts
+Makefile
+Makefile.old
+blib/
+pm_to_blib
+MYMETA.*
+*.tar.gz
+
+# Editor / OS noise
+*~
+.DS_Store

@@ -1,23 +1,23 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2026 -- leonerd@leonerd.org.uk
 
-package Net::LibAsyncNS;
+package Net::LibAsyncNS 0.05;
 
-use strict;
+use v5.20;
 use warnings;
 
-our $VERSION = '0.04';
-
 require XSLoader;
-XSLoader::load( __PACKAGE__, $VERSION );
+XSLoader::load( __PACKAGE__, our $VERSION );
 
 =head1 NAME
 
 C<Net::LibAsyncNS> - a Perl wrapper around F<libasyncns>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Net::LibAsyncNS;
    use Socket qw( SOCK_RAW );
@@ -65,7 +65,7 @@ not demonstrate this; see the EXAMPLES section below for one that does.
 
 =head2 new
 
-   $asyncns = Net::LibAsyncNS->new( $n_proc )
+   $asyncns = Net::LibAsyncNS->new( $n_proc );
 
 Construct a new C<Net::LibAsyncNS> object. It will be initialised with
 C<$n_proc> processes or threads to handle nameserver lookups.
@@ -81,7 +81,7 @@ C<$n_proc> processes or threads to handle nameserver lookups.
 
 =head2 fd
 
-   $fd = $asyncns->fd
+   $fd = $asyncns->fd;
 
 Returns a file descriptor number to poll for readability on.
 
@@ -89,7 +89,7 @@ Returns a file descriptor number to poll for readability on.
 
 =head2 new_handle_for_fd
 
-   $handle = $asyncns->new_handle_for_fd
+   $handle = $asyncns->new_handle_for_fd;
 
 Returns a new C<IO::Handle> object wrapping the underlying file descriptor.
 Note that the handle is I<not> cached; a new object is created each time this
@@ -106,7 +106,7 @@ sub new_handle_for_fd
 
 =head2 wait
 
-   $success = $asyncns->wait( $block )
+   $success = $asyncns->wait( $block );
 
 Wait for more queries to be ready. If C<$block> is true, this method will
 block until at least one query is ready, if false it will process any pending
@@ -117,7 +117,7 @@ if an IO error happened; C<$!> will be set in this case.
 
 =head2 getnqueries
 
-   $n = $asyncns->getnqueries
+   $n = $asyncns->getnqueries;
 
 Return the number of outstanding queries.
 
@@ -125,7 +125,7 @@ Return the number of outstanding queries.
 
 =head2 getaddrinfo
 
-   $q = $asyncns->getaddrinfo( $host, $service, $hints )
+   $q = $asyncns->getaddrinfo( $host, $service, $hints );
 
 Starts an asynchronous C<getaddrinfo> resolution on the given C<$host> and
 C<$service> names. If provided, C<$hints> should be a HASH reference where the
@@ -147,7 +147,7 @@ following keys are recognised:
 
 =head2 getaddrinfo_done
 
-   ( $err, @res ) = $asyncns->getaddrinfo_done( $q )
+   ( $err, @res ) = $asyncns->getaddrinfo_done( $q );
 
 Finishes a C<getaddrinfo> resolution, returning an error code, and a list of
 results. Each result will be a HASH reference containing the following keys:
@@ -176,7 +176,7 @@ If requested, the canonical hostname for this address
 
 =head2 getnameinfo
 
-   $q = $asyncns->getnameinfo( $addr, $flags, $wanthost, $wantserv )
+   $q = $asyncns->getnameinfo( $addr, $flags, $wanthost, $wantserv );
 
 Starts an asynchronous C<getnameinfo> resolution on the given address. The
 C<$wanthost> and C<$wantserv> booleans indicate if the hostname or service
@@ -186,7 +186,7 @@ name are required.
 
 =head2 getnameinfo_done
 
-   ( $err, $host, $service ) = $asyncns->getnameinfo_done( $q )
+   ( $err, $host, $service ) = $asyncns->getnameinfo_done( $q );
 
 Finishes a C<getnameinfo> resolution, returning an error code, the hostname
 and service name, if requested.
@@ -197,16 +197,16 @@ and service name, if requested.
 
 =head2 res_search
 
-   $q = $asyncns->res_query( $dname, $class, $type )
+   $q = $asyncns->res_query( $dname, $class, $type );
 
-   $q = $asyncns->res_search( $dname, $class, $type )
+   $q = $asyncns->res_search( $dname, $class, $type );
 
 Starts an asynchronous C<res_query> or C<res_search> resolution on the given
 domain name, class and type.
 
 =head2 res_done
 
-   $answer = $asyncns->res_done( $q )
+   $answer = $asyncns->res_done( $q );
 
 Finishes a C<res_query> or C<res_search> resolution, returning the answer in a
 packed string, or C<undef> if it fails. If it fails C<$!> will contain the
@@ -214,7 +214,7 @@ error details.
 
 =head2 isdone
 
-   $done = $asyncns->isdone( $q )
+   $done = $asyncns->isdone( $q );
 
 Returns true if the given query is ready.
 
@@ -222,7 +222,7 @@ Returns true if the given query is ready.
 
 =head2 getnext
 
-   $q = $asyncns->getnext
+   $q = $asyncns->getnext;
 
 Returns the next query object that is completed, or C<undef> if none are ready
 yet. This will only yet be valid after calling the C<wait> method at least
@@ -230,7 +230,7 @@ once.
 
 =head2 cancel
 
-   $asyncns->cancel( $q )
+   $asyncns->cancel( $q );
 
 Cancels a currently outstanding query. After this is called, the query in
 C<$q> should not be further accessed, as memory associated with it will have
@@ -240,7 +240,7 @@ been reclaimed.
 
 =head2 setuserdata
 
-   $asyncns->setuserdata( $q, $data )
+   $asyncns->setuserdata( $q, $data );
 
 Stores an arbitrary Perl scalar with the query. It can later be retrieved
 using C<getuserdata>.
@@ -249,7 +249,7 @@ using C<getuserdata>.
 
 =head2 getuserdata
 
-   $data = $asyncns->getuserdata( $q )
+   $data = $asyncns->getuserdata( $q );
 
 Returns the Perl scalar previously stored with the query, or C<undef> if no
 value has yet been set.

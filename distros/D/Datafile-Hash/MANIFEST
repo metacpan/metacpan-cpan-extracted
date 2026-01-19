@@ -1,0 +1,13 @@
+AGENTS.md
+CHANGES
+lib/Datafile/Hash.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+t/00-load.t
+t/01-hash-flat.t
+t/02-hash-ini.t
+t/03-hash-nested.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

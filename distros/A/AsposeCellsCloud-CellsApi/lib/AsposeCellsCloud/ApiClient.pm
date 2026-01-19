@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2025 Aspose.Cells Cloud
+Copyright (c) 2026 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -203,7 +203,7 @@ sub call_api {
     # build header
 
     $header_params->{'x-aspose-client'} = 'perl sdk';
-    $header_params->{'x-aspose-client-version'} = '25.12';  
+    $header_params->{'x-aspose-client-version'} = '26.1';  
     # build query 
     if (%$query_params) {
         $_url = ($_url . '?' . eval { URI::Query->new($query_params)->stringify });

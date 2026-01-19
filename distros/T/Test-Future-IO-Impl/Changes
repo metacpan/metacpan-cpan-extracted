@@ -1,5 +1,15 @@
 Revision history for Test-Future-IO-Impl
 
+0.17    2026-01-18
+        [CHANGES]
+         * Added tests for `poll` method
+
+        [BUGFIXES]
+         * Account for the fact that read or write IO operations may have
+           already happened before they are cancelled
+         * Clear the EAGAIN error from `$wr` filehandle in EAGAIN write test
+           to stop perl writing annoying warnings during test
+
 0.16    2026-01-07
         [BUGFIXES]
          * Be less sensitive to `->send` failure in peer-closed case, as OS

@@ -1,0 +1,98 @@
+{
+   "abstract" : "Future-returning io_uring functions",
+   "author" : [
+      "Leon Timmermans <fawaka@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Future-Uring",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034",
+            "perl" : "5.020"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "strict" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Fcntl" : "0",
+            "Future" : "0",
+            "IO::File" : "0",
+            "IO::Poll" : "0",
+            "IO::Socket" : "0",
+            "IO::Uring" : "0",
+            "Signal::Info" : "0",
+            "Socket" : "0",
+            "Time::Spec" : "0",
+            "experimental" : "0",
+            "overload" : "0",
+            "parent" : "0",
+            "perl" : "5.020",
+            "subs" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IO::Socket::INET" : "0",
+            "IO::Socket::UNIX" : "0",
+            "IPC::Open3" : "0",
+            "POSIX" : "0",
+            "Test2::V1" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.020",
+            "strict" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Future::Uring" : {
+         "file" : "lib/Future/Uring.pm",
+         "version" : "0.001"
+      },
+      "Future::Uring::Exception" : {
+         "file" : "lib/Future/Uring/Exception.pm",
+         "version" : "0.001"
+      },
+      "Future::Uring::Handle" : {
+         "file" : "lib/Future/Uring/Handle.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Leont/future-uring/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/future-uring.git",
+         "web" : "https://github.com/Leont/future-uring"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

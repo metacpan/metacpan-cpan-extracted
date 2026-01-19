@@ -1,0 +1,14 @@
+AGENTS.md
+CHANGES
+lib/Datafile/Array.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+t/00-load.t
+t/01-array-basic.t
+t/02-array-csv.t
+t/03-array-prefix.t
+t/04-csv-parser.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,8 @@
 Revision history for OpenAPI-Modern
 
+0.122     2026-01-19 01:30:30Z
+          - fix bug with number <-> string coercion on older perls
+
 0.121     2026-01-18 01:00:15Z
           - type coercion for parameter data is now more
             specification-compliant, using the schema to infer the intended

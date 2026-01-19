@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2025 Aspose.Cells Cloud
+Copyright (c) 2026 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -62,7 +62,7 @@ sub new {
 # Run Operation Request
 # AddTextRequest.Spreadsheet : Upload spreadsheet file.  ,
 # AddTextRequest.text : Specify the added text content.  ,
-# AddTextRequest.position : Indicates the specific location for adding text content.None, AtTheBeginning, AtTheEnd, BeforeText, AfterText.    ,
+# AddTextRequest.position : Indicates the specific location for adding text content.None, AtTheBeginning, AtTheEnd, BeforeText, AfterText.  ,
 # AddTextRequest.selectText : Indicates selecting the specific position to add text based on the content of the text.  ,
 # AddTextRequest.skipEmptyCells : Indicates skip empty cells.  ,
 # AddTextRequest.worksheet : Specify the worksheet of spreadsheet.  ,
@@ -181,7 +181,7 @@ __PACKAGE__->method_documentation({
      'position' => {
      	datatype => 'string',
      	base_name => 'position',
-     	description => 'Indicates the specific location for adding text content.None, AtTheBeginning, AtTheEnd, BeforeText, AfterText.  ',
+     	description => 'Indicates the specific location for adding text content.None, AtTheBeginning, AtTheEnd, BeforeText, AfterText.',
      	format => '',
      	read_only => '',
      		},

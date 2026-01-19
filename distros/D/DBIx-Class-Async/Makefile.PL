@@ -19,6 +19,7 @@ WriteMakefile(
         'CHI'                 => 0,
         'Carp'                => 0,
         'Try::Tiny'           => 0,
+        'Data::Page'          => 0,
         'Metrics::Any'        => 0,
         'Future'              => 0,
         'IO::Async::Loop'     => 0,
@@ -53,6 +54,10 @@ WriteMakefile(
                 file    => 'lib/DBIx/Class/Async/ResultSet.pm',
                 version => MM->parse_version('lib/DBIx/Class/Async/ResultSet.pm')
             },
+            'DBIx::Class::Async::ResultSet::Pager' => {
+                file    => 'lib/DBIx/Class/Async/ResultSet/Pager.pm',
+                version => MM->parse_version('lib/DBIx/Class/Async/ResultSet/Pager.pm')
+            },
             'DBIx::Class::Async::Row' => {
                 file    => 'lib/DBIx/Class/Async/Row.pm',
                 version => MM->parse_version('lib/DBIx/Class/Async/Row.pm')
@@ -72,10 +77,6 @@ WriteMakefile(
             'DBIx::Class::Async::Storage::DBI::Cursor' => {
                 file    => 'lib/DBIx/Class/Async/Storage/DBI/Cursor.pm',
                 version => MM->parse_version('lib/DBIx/Class/Async/Storage/DBI/Cursor.pm')
-            },
-            'DBIx::Class::Async::TxnGuard' => {
-                file    => 'lib/DBIx/Class/Async/TxnGuard.pm',
-                version => MM->parse_version('lib/DBIx/Class/Async/TxnGuard.pm')
             },
         },
         resources => {

@@ -6,7 +6,7 @@ use Benchmark;
 use Music::Intervals;
 use Music::Note::Frequency;
 
-my $i = 1_000_000;
+my $i = 10_000_000;
 
 timethese($i, {
     Frequency => \&sub_freqs,

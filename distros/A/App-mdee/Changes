@@ -1,5 +1,19 @@
 Revision history for Perl extension App-mdee
 
+0.05 2026-01-19T09:08:47Z
+
+    - Fix underscore emphasis inside inline code (e.g., `__PERL__`)
+    - Add --adjust option for base color normalization by mode
+    - Color names (Red, brown3, etc.) auto-wrapped with lightness adjustment
+
+0.04 2026-01-19T04:27:03Z
+
+    - Keep table formatting enabled in filter mode (-f)
+    - Move -f option documentation to Processing Options section
+    - Add INSTALLATION section (Homebrew and CPAN)
+    - Add bulkmode to table processing for better performance
+    - Add "do not edit" comment to lib/App/mdee.pm
+
 0.03 2026-01-18T08:47:55Z
 
     - Add OSC 8 terminal hyperlinks for links, images, and image links

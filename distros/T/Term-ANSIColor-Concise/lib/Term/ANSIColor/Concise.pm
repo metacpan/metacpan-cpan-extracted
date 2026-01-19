@@ -2,7 +2,7 @@
 
 package Term::ANSIColor::Concise;
 
-our $VERSION = "3.01";
+our $VERSION = "3.02";
 
 use v5.14;
 use warnings;
@@ -503,7 +503,7 @@ Term::ANSIColor::Concise - Produce ANSI terminal sequence by concise notation
 
 =head1 VERSION
 
-Version 3.01
+Version 3.02
 
 
 =head1 DESCRIPTION
@@ -684,19 +684,20 @@ Single uppercase character representing 8 colors, and alternative
 
 =head2 EFFECTS and CONTROLS
 
-Single case-insensitive character for special effects :
+Single case-insensitive character for special effects.  Numbers
+indicate SGR (Select Graphic Rendition) parameter values:
 
     N    None
     Z  0 Zero (reset)
-    D  1 Double strike (boldface)
-    P  2 Pale (dark)
+    D  1 Double-struck (boldface)
+    P  2 Pale (faint/dim)
     I  3 Italic
     U  4 Underline
     F  5 Flash (blink: slow)
     Q  6 Quick (blink: rapid)
-    S  7 Stand out (reverse video)
-    H  8 Hide (conceal)
-    X  9 Cross out
+    S  7 Stand-out (reverse video)
+    H  8 Hide (concealed)
+    X  9 Cross-out (strikethrough)
 
     E    Erase Line (fill by background color)
 
@@ -839,9 +840,14 @@ C<SCP> and C<RCP> CSI codes.
 
 =head1 COLOR ADJUSTMENT
 
-Colors can be dynamically adjusted using modifier characters appended after 
-color specifications. These modifiers allow you to adjust various color 
+Colors can be dynamically adjusted using modifier characters appended after
+color specifications. These modifiers allow you to adjust various color
 properties such as luminance, lightness, saturation, and hue.
+
+B<Note:> Modifiers can only be used with full color specifications:
+hex (C<#FF0000>), RGB (C<rgb(255,0,0)>), HSL, LCH, Lab, or named colors
+(C<< <red> >>).  Basic 8+8 colors (C<R>, C<G>, C<B>, etc.) and 6x6x6 216
+colors (C<555>, etc.) do not support modifiers.
 
 =head2 MODIFIER SYNTAX
 

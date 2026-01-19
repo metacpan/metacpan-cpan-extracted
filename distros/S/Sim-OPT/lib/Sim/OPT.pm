@@ -59,7 +59,7 @@ use Sim::OPT::Parcoord3d;
 use Sim::OPT::Stats;
 eval { use Sim::OPTcue::OPTcue; 1 };
 
-$VERSION = '0.879';
+$VERSION = '0.885';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented toward problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches, as well of searches more complely structured in graphs.';
 
 #################################################################################
@@ -738,6 +738,7 @@ sub filterinsts_winsts
 	my @fewerinsts = @{ $fewerinsts_r };
 	my %inst = %{ $inst_r };
 	my @fewerinstnames;
+
 	foreach my $instance ( @fewerinsts )
 	{
 		my %d = %{ $instance };
@@ -753,20 +754,29 @@ sub filterinsts_winsts
 	{
 		foreach $name ( @fewerinstnames )
 		{
-			if ( $key =~ /$name/ )
+      #if ( $key =~ /$name/ )
+			if ( $key =~ /\Q$name\E/ ) 
 			{
 				$newinst{$key} = $inst{$key};
 			}
 		}
 	} #say  "NEWINST1" . dump( \%newinst );
 
-	foreach my $value ( values %newinst )
-	{
-		if ( $value ~~ ( keys %newinst ) )
-		{
-			$newinst{$value} = $value{$value};
-		}
-	} #say  "NEWINST2" . dump( \%newinst );
+	#foreach my $value ( values %newinst )
+	#{
+	#	if ( $value ~~ ( keys %newinst ) )
+	#	{
+	#		$newinst{$value} = $value{$value};
+	#	}
+	#} #say  "NEWINST2" . dump( \%newinst );
+
+  foreach my $value ( values %newinst )
+  {
+    if ( exists $newinst{$value} )
+    {
+      $newinst{$value} = $inst{$value};
+    }
+  }
 
 	return( \@fewerinstnames, \%newinst );
 }
@@ -790,13 +800,21 @@ sub filterinsts_wnames
 		#say  "NEWINST3" . dump( \%newinst );
 	}
 
-	foreach my $value ( values %newinst )
-	{
-		if ( $value ~~ ( keys %newinst ) )
-		{
-			$newinst{$value} = $value{$value};
-		}
-	} #say  "NEWINST4" . dump( \%newinst );
+	#foreach my $value ( values %newinst )
+	#{
+	#	if ( $value ~~ ( keys %newinst ) )
+	#	{
+	#		$newinst{$value} = $value{$value};
+	#	}
+	#} #say  "NEWINST4" . dump( \%newinst );
+
+  foreach my $value ( values %newinst )
+  {
+    if ( exists $newinst{$value} )
+    {
+      $newinst{$value} = $inst{$value};
+    }
+  }
 
 	return( \%newinst );
 }
@@ -2585,17 +2603,17 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			or ( ( $dirfiles{latinhypercube} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) 
 			or ( ( $dirfiles{factorial} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) 
       or ( ( $dirfiles{facecentered} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) 
-			or ( ( $dirfiles{randompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{newrandompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{patternsearch} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{neldermead} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{armijo} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{NSGAII} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{NSGAIII} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{pso} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{simulatedannealing} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{MOEAD} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{SPEA2} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) 
+			#or ( ( $dirfiles{randompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{newrandompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{patternsearch} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{neldermead} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{armijo} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{NSGAII} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{NSGAIII} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{pso} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{simulatedannealing} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{MOEAD} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{SPEA2} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) 
     )
 	{
 		if ( $dirfiles{starsign} eq "y" )
@@ -2619,17 +2637,17 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			or ( ( $dirfiles{factorial} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
 			or ( ( $dirfiles{facecentered} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )	
       or ( ( $dirfiles{factorial} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) 
-      or ( ( $dirfiles{randompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{newrandompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{patternsearch} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{neldermead} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{armijo} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{NSGAII} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{NSGAIII} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{pso} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{simulatedannealing} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{MOEAD} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
-      or ( ( $dirfiles{SPEA2} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{randompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{newrandompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{patternsearch} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{neldermead} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{armijo} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{NSGAII} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{NSGAIII} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{pso} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{simulatedannealing} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{MOEAD} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+      #or ( ( $dirfiles{SPEA2} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
     )
 		{
 			$tmpblankfile = "$mypath/$file" . "_tmp_gen_blank.csv";
@@ -3003,7 +3021,7 @@ sub exe
 	{
     if ( checkOPTcue() )
     {
-      ( $fulls_r, $inst_r, $instances_r ) = Sim::OPTcue::expand(
+      ( $inst_r, $instances_r ) = Sim::OPTcue::expand(
       {
         configfile => $configfile,
         precious   => $precious,
@@ -3027,7 +3045,6 @@ sub exe
         countcase  => $countcase,
         countblock => $countblock,
       }, \%inst );
-      @fulls = @$fulls_r;
       @instances = @$instances_r;
     }
     else 

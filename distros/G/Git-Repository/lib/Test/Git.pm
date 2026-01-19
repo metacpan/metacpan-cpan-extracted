@@ -1,5 +1,5 @@
 package Test::Git;
-$Test::Git::VERSION = '1.325';
+$Test::Git::VERSION = '1.326';
 use strict;
 use warnings;
 

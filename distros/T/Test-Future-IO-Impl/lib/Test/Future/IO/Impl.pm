@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2026 -- leonerd@leonerd.org.uk
 
-package Test::Future::IO::Impl 0.16;
+package Test::Future::IO::Impl 0.17;
 
 use v5.14;
 use warnings;
@@ -13,6 +13,7 @@ use Test2::API ();
 
 use Errno qw( EINVAL EPIPE );
 use IO::Handle;
+use IO::Poll qw( POLLIN POLLOUT POLLHUP POLLERR );
 use Socket qw(
    pack_sockaddr_in sockaddr_family INADDR_LOOPBACK
    AF_INET AF_UNIX SOCK_DGRAM SOCK_STREAM PF_UNSPEC
@@ -205,6 +206,107 @@ sub run_connect_test
    }
 }
 
+=head2 poll
+
+I<Since version 0.17.>
+
+Tests the C<< Future::IO->poll >> method.
+
+=cut
+
+# because the Future::IO default impl cannot handle HUP
+sub run_poll_no_hup_test
+{
+   # POLLIN
+   {
+      pipe my ( $rd, $wr ) or die "Cannot pipe() - $!";
+
+      $wr->autoflush();
+      $wr->print( "BYTES" );
+
+      my $f = Future::IO->poll( $rd, POLLIN );
+
+      is( scalar $f->get, POLLIN, "Future::IO->poll yields POLLIN on readable filehandle" );
+
+      my $f1 = Future::IO->poll( $rd, POLLIN );
+      my $f2 = Future::IO->poll( $rd, POLLIN );
+
+      is( [ scalar $f1->get, scalar $f2->get ], [ POLLIN, POLLIN ],
+         'Future::IO->poll can enqueue two POLLIN tests' );
+   }
+
+   # POLLOUT
+   {
+      pipe my ( $rd, $wr ) or die "Cannot pipe() - $!";
+
+      my $f = Future::IO->poll( $wr, POLLOUT );
+
+      is( scalar $f->get, POLLOUT, "Future::IO->poll yields POLLOUT on writable filehandle" );
+
+      my $f1 = Future::IO->poll( $wr, POLLOUT );
+      my $f2 = Future::IO->poll( $wr, POLLOUT );
+
+      is( [ scalar $f1->get, scalar $f2->get ], [ POLLOUT, POLLOUT ],
+         'Future::IO->poll can enqueue two POLLOUT tests' );
+   }
+
+   # POLLIN+POLLOUT at once
+   {
+      pipe my ( $rd, $wr ) or die "Cannot pipe() - $!";
+
+      $wr->autoflush();
+      $wr->print( "BYTES" );
+
+      my ( $frd, $fwr );
+
+      # IN+OUT on reading end
+      $frd = Future::IO->poll( $rd, POLLIN );
+      $fwr = Future::IO->poll( $rd, POLLOUT );
+
+      is( scalar $frd->get, POLLIN, "Future::IO->poll yields POLLIN on readable with simultaneous POLLOUT" );
+      # Don't assert on what $fwr saw here, as OSes/impls might differ
+      $fwr->cancel;
+
+      # IN+OUT on writing end
+      $frd = Future::IO->poll( $wr, POLLIN );
+      $fwr = Future::IO->poll( $wr, POLLOUT );
+
+      is( scalar $fwr->get, POLLOUT, "Future::IO->poll yields POLLOUT on writable with simultaneous POLLIN" );
+      # Don't assert on what $frd saw here, as OSes/impls might differ
+      $frd->cancel;
+   }
+}
+
+sub run_poll_test
+{
+   run_poll_no_hup_test();
+
+   # POLLHUP
+   {
+      # closing the writing end of a pipe puts the reading end at hangup condition
+      pipe my ( $rd, $wr ) or die "Cannot pipe() - $!";
+      close $wr;
+
+      my $f = Future::IO->poll( $rd, POLLHUP );
+
+      is( scalar $f->get, POLLHUP, "Future::IO->poll yields POLLHUP on hangup-in filehandle" );
+   }
+
+   # POLLERR
+   {
+      # closing the reading end of a pipe puts the writing end at error condition, because EPIPE
+      pipe my ( $rd, $wr ) or die "Cannot pipe() - $!";
+      close $rd;
+
+      my $f = Future::IO->poll( $wr, POLLOUT );
+
+      # We expect at least POLLERR, we might also see POLLOUT or POLLHUP as
+      # well but lets not care about that
+      my $got_revents = $f->get;
+      is( $got_revents & POLLERR, POLLERR, "Future::IO->poll yields at-least POLLERR on hangup-out filehandle" );
+   }
+}
+
 =head2 recv, recvfrom
 
 I<Since version 0.15.>
@@ -293,7 +395,11 @@ sub _run_recv_test
 
       $f1->cancel;
 
-      is( scalar $f2->get, "BYT", "Future::IO->$method can be cancelled" );
+      # At this point we don't know if $f1 performed its recv or not. There's
+      # two possible things we might see from $f2.
+
+      like( scalar $f2->get, qr/^(?:BYT|ES)$/,
+         "Result of second Future::IO->$method after first is cancelled" );
    }
 }
 
@@ -384,13 +490,22 @@ sub run_send_test
       is( scalar $f2->get, 3, 'Future::IO->send after cancelled one still works' );
 
       $rd->read( my $buf, 3 );
-      is( $buf, "TES", 'Cancelled Future::IO->send method did no write bytes' );
+
+      # At this point we don't know if $f1 performed its send or not. There's
+      # two possible things we might see from the buffer. Either way, the
+      # presence of a 'T' means that $f2 ran.
+
+      like( $buf, qr/^(?:BYT|TES)$/,
+         "A second Future::IO->send takes place after first is cancelled" );
    }
 }
 
 =head2 sleep
 
-Tests the C<< Future::IO->sleep >> method.
+Tests the C<< Future::IO->sleep >> and C<< Future::IO->alarm >> methods.
+
+The two methods are combined in one test suite as they are very similar, and
+neither is long or complicated.
 
 =cut
 
@@ -473,7 +588,11 @@ sub _run_read_test
 
       $f1->cancel;
 
-      is( scalar $f2->get, "BYT", "Future::IO->$method can be cancelled" );
+      # At this point we don't know if $f1 performed its read or not. There's
+      # two possible things we might see from $f2.
+
+      like( scalar $f2->get, qr/^(?:BYT|ES)$/,
+         "Result of second Future::IO->$method after first is cancelled" );
    }
 }
 
@@ -514,6 +633,8 @@ sub _run_write_test
 
       # Attempt to fill the pipe
       $wr->$method( "X" x 4096 ) for 1..256;
+      # clear the error on the filehandle to stop perl printing a warning
+      $wr->clearerr;
 
       my $f = Future::IO->$method( $wr, "more" );
 
@@ -553,7 +674,13 @@ sub _run_write_test
       is( scalar $f2->get, 3, "Future::IO->$method after cancelled one still works" );
 
       $rd->read( my $buf, 3 );
-      is( $buf, "TES", "Cancelled Future::IO->$method did not write bytes" );
+
+      # At this point we don't know if $f1 performed its write or not. There's
+      # two possible things we might see from the buffer. Either way, the
+      # presence of a 'T' means that $f2 ran.
+
+      like( $buf, qr/^(?:BYT|TES)$/,
+         "A second Future::IO->$method takes place after first is cancelled" );
    }
 }
 

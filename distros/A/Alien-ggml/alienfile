@@ -86,9 +86,10 @@ sys {
 share {
     # Download ggml source
     start_url $ggml_url;
-    
+
     plugin 'Download';
     plugin 'Extract' => 'zip';
+    plugin 'Build::CMake';
 
     # Determine platform-specific build options
     my @cmake_args = (
@@ -104,10 +105,6 @@ share {
             '-DGGML_ACCELERATE=ON',
             '-DGGML_BLAS=ON',
             '-DGGML_BLAS_VENDOR=Apple',
-            # Fix install names for macOS dylibs
-            '-DCMAKE_INSTALL_NAME_DIR=@rpath',
-            '-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON',
-            '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON',
         );
     } elsif ($^O eq 'linux') {
         # Try to detect OpenBLAS
@@ -126,50 +123,37 @@ share {
         }
     }
 
-    # Use system cmake directly instead of plugin
-    build [
-        sub {
-            my ($build) = @_;
-            my $prefix = $build->install_prop->{prefix};
+    # Let the CMake plugin handle the build with our custom args
+    meta->around_hook(build => sub {
+        my ($orig, $build) = @_;
+        # Add our cmake args to the plugin's default args
+        my $meta_prop = $build->meta_prop;
+        push @{$meta_prop->{plugin_build_cmake}{args}}, @cmake_args;
+        $orig->($build);
+    });
 
-            # On macOS, set absolute install name instead of @rpath
-            my @extra_args;
-            if ($^O eq 'darwin') {
-                push @extra_args, "-DCMAKE_INSTALL_NAME_DIR=$prefix/lib";
-            }
-
-            $build->system('cmake', @cmake_args, @extra_args,
-                "-DCMAKE_INSTALL_PREFIX=$prefix",
-                '-S', '.', '-B', 'build');
-        },
-        # Build (use all CPU cores)
-        ['cmake', '--build', 'build', '--parallel'],
-        # Install
-        ['cmake', '--install', 'build'],
-    ];
+    plugin 'Gather::IsolateDynamic';
 
     gather sub {
         my ($build) = @_;
         my $prefix = $build->runtime_prop->{prefix};
 
-        # Use File::Find to locate libraries in lib or lib64
-        require File::Find;
-        my @lib_dirs;
-        File::Find::find(
-            sub {
-                return unless -f && /^libggml\.(so|dylib|a)$/;
-                my $dir = $File::Find::dir;
-                push @lib_dirs, $dir unless grep { $_ eq $dir } @lib_dirs;
-            },
-            $prefix
-        );
+        # Gather::IsolateDynamic moves .so/.dylib files to 'dynamic/' subdirectory
+        my $lib_path = "$prefix/dynamic";
 
-        my $lib_dir = @lib_dirs ? $lib_dirs[0] : "$prefix/lib";
-        $lib_dir =~ s/^\Q$prefix\E\/?//;  # Make relative to prefix
+        # Detect which libraries were actually built
+        my @libs = ('-lggml');  # Core library always exists
+
+        # Check for additional ggml component libraries
+        for my $lib (qw(ggml-base ggml-cpu)) {
+            if (-f "$lib_path/lib${lib}.so" || -f "$lib_path/lib${lib}.dylib") {
+                push @libs, "-l$lib";
+            }
+        }
 
         $build->runtime_prop->{cflags}        = "-I$prefix/include";
         $build->runtime_prop->{cflags_static} = "-I$prefix/include";
-        $build->runtime_prop->{libs}          = "-L$prefix/$lib_dir -lggml -lggml-base -lggml-cpu";
-        $build->runtime_prop->{libs_static}   = "-L$prefix/$lib_dir -lggml -lggml-base -lggml-cpu";
+        $build->runtime_prop->{libs}          = "-L$lib_path " . join(' ', @libs);
+        $build->runtime_prop->{libs_static}   = "-L$lib_path " . join(' ', @libs);
     };
 };

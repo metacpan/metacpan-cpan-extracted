@@ -12,7 +12,7 @@
 ### **Endpoint** 
 
 ```
-PUT http://api.aspose.cloud/v4.0/cells/translate/text
+PUT http://api.aspose.cloud/v4.0/cells/ai/translate/text
 ```
 ### **Function Description**
 
@@ -35,4 +35,4 @@ File
 
 ## OpenAPI Specification
 
-The [OpenAPI Specification](https://reference.aspose.cloud/cells/#/AiTranslationController/TranslateTextFile) defines a publicly accessible programming interface and lets you carry out REST interactions directly from a web browser.
+The [OpenAPI Specification](https://reference.aspose.cloud/cells/#/AIController/TranslateTextFile) defines a publicly accessible programming interface and lets you carry out REST interactions directly from a web browser.

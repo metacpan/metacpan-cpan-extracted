@@ -449,6 +449,7 @@ docs/DiscoverChart.md
 docs/DiscoverPivotTable.md
 docs/ExcelDataStatistics.md
 docs/WorksheetDataStatistics.md
+docs/DecomposeUserTaskRequest.md
 docs/TranslationSpreadsheetRequest.md
 docs/TranslateTextFileRequest.md
 docs/AggregateCellsByColorRequest.md
@@ -467,6 +468,8 @@ docs/ConvertSpreadsheetToJsonRequest.md
 docs/ConvertSpreadsheetToCsvRequest.md
 docs/ConvertWorksheetToImageRequest.md
 docs/ConvertWorksheetToPdfRequest.md
+docs/ConvertWorksheetToHtmlRequest.md
+docs/ConvertWorksheetToHtmlTableRequest.md
 docs/ConvertTableToImageRequest.md
 docs/ConvertTableToPdfRequest.md
 docs/ConvertTableToCsvRequest.md
@@ -487,6 +490,9 @@ docs/SplitSpreadsheetRequest.md
 docs/SplitTableRequest.md
 docs/SplitRemoteSpreadsheetRequest.md
 docs/ImportDataIntoSpreadsheetRequest.md
+docs/ImportJSONDataIntoSpreadsheetRequest.md
+docs/ImportXMLDataIntoSpreadsheetRequest.md
+docs/ImportCSVDataIntoSpreadsheetRequest.md
 docs/GetPublicKeyRequest.md
 docs/CreateSpreadsheetRequest.md
 docs/AddWorksheetToSpreadsheetRequest.md
@@ -526,6 +532,7 @@ docs/RemoveSpreadsheetBlankColumnsRequest.md
 docs/RemoveSpreadsheetBlankWorksheetsRequest.md
 docs/RemoveDuplicatesRequest.md
 docs/SwapRangeRequest.md
+docs/FlipDataRequest.md
 docs/DownloadFileRequest.md
 docs/UploadFileRequest.md
 docs/CopyFileRequest.md
@@ -1334,6 +1341,7 @@ lib/AsposeCellsCloud/Object/DiscoverChart.pm
 lib/AsposeCellsCloud/Object/DiscoverPivotTable.pm
 lib/AsposeCellsCloud/Object/ExcelDataStatistics.pm
 lib/AsposeCellsCloud/Object/WorksheetDataStatistics.pm
+lib/AsposeCellsCloud/Request/DecomposeUserTaskRequest.pm
 lib/AsposeCellsCloud/Request/TranslationSpreadsheetRequest.pm
 lib/AsposeCellsCloud/Request/TranslateTextFileRequest.pm
 lib/AsposeCellsCloud/Request/AggregateCellsByColorRequest.pm
@@ -1352,6 +1360,8 @@ lib/AsposeCellsCloud/Request/ConvertSpreadsheetToJsonRequest.pm
 lib/AsposeCellsCloud/Request/ConvertSpreadsheetToCsvRequest.pm
 lib/AsposeCellsCloud/Request/ConvertWorksheetToImageRequest.pm
 lib/AsposeCellsCloud/Request/ConvertWorksheetToPdfRequest.pm
+lib/AsposeCellsCloud/Request/ConvertWorksheetToHtmlRequest.pm
+lib/AsposeCellsCloud/Request/ConvertWorksheetToHtmlTableRequest.pm
 lib/AsposeCellsCloud/Request/ConvertTableToImageRequest.pm
 lib/AsposeCellsCloud/Request/ConvertTableToPdfRequest.pm
 lib/AsposeCellsCloud/Request/ConvertTableToCsvRequest.pm
@@ -1372,6 +1382,9 @@ lib/AsposeCellsCloud/Request/SplitSpreadsheetRequest.pm
 lib/AsposeCellsCloud/Request/SplitTableRequest.pm
 lib/AsposeCellsCloud/Request/SplitRemoteSpreadsheetRequest.pm
 lib/AsposeCellsCloud/Request/ImportDataIntoSpreadsheetRequest.pm
+lib/AsposeCellsCloud/Request/ImportJSONDataIntoSpreadsheetRequest.pm
+lib/AsposeCellsCloud/Request/ImportXMLDataIntoSpreadsheetRequest.pm
+lib/AsposeCellsCloud/Request/ImportCSVDataIntoSpreadsheetRequest.pm
 lib/AsposeCellsCloud/Request/GetPublicKeyRequest.pm
 lib/AsposeCellsCloud/Request/CreateSpreadsheetRequest.pm
 lib/AsposeCellsCloud/Request/AddWorksheetToSpreadsheetRequest.pm
@@ -1411,6 +1424,7 @@ lib/AsposeCellsCloud/Request/RemoveSpreadsheetBlankColumnsRequest.pm
 lib/AsposeCellsCloud/Request/RemoveSpreadsheetBlankWorksheetsRequest.pm
 lib/AsposeCellsCloud/Request/RemoveDuplicatesRequest.pm
 lib/AsposeCellsCloud/Request/SwapRangeRequest.pm
+lib/AsposeCellsCloud/Request/FlipDataRequest.pm
 lib/AsposeCellsCloud/Request/DownloadFileRequest.pm
 lib/AsposeCellsCloud/Request/UploadFileRequest.pm
 lib/AsposeCellsCloud/Request/CopyFileRequest.pm

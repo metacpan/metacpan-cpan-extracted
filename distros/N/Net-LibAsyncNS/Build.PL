@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -12,12 +13,11 @@ my $build = Module::Build::Using::PkgConfig->new(
       'Module::Build::Using::PkgConfig' => 0,
    },
    requires => {
+      'perl' => '5.020',
       'Exporter' => '5.57',
    },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
-      'Test::Identity' => 0,
-      'Test::Refcount' => 0,
+      'Test2::V0' => '0.000149',
    },
    auto_configure_requires => 0, # Don't add M::B to configure_requires
    license => 'perl',

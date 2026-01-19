@@ -8,6 +8,7 @@ my $build = Module::Build->new(
    module_name => 'Future::IO',
    requires => {
       'Future' => 0,
+      'IO::Poll' => 0,
       'Struct::Dumb' => 0,
       'Time::HiRes' => 0,
 
@@ -15,7 +16,7 @@ my $build = Module::Build->new(
    },
    test_requires => {
       'Test::ExpectAndCheck' => '0.06',
-      'Test::Future::IO::Impl' => '0.16',
+      'Test::Future::IO::Impl' => '0.17',
       'Test2::V0' => 0,
    },
    configure_requires => {

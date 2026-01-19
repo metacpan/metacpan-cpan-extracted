@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -22,22 +22,22 @@
       "runtime" : {
          "requires" : {
             "Future" : "0",
-            "Future::IO::ImplBase" : "0",
+            "Future::IO::ImplBase" : "0.19",
             "Tickit" : "0.72",
             "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Future::IO::Impl" : "0",
-            "Test::More" : "0.88"
+            "Test2::V0" : "0",
+            "Test::Future::IO::Impl" : "0.17"
          }
       }
    },
    "provides" : {
       "Future::IO::Impl::Tickit" : {
          "file" : "lib/Future/IO/Impl/Tickit.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

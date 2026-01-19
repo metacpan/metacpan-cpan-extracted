@@ -13,7 +13,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -133,8 +133,95 @@ Returns the path to the loaded GGUF file.
 
     my $arch = $model->architecture;
 
-Returns the model architecture string (e.g., "llama", "gpt2", "falcon").
+Returns the model architecture string (e.g., "llama", "qwen2", "phi3", "gemma2").
 Returns "unknown" if the architecture is not specified in the model.
+
+=head2 arch_type
+
+    my $type = $model->arch_type;
+
+Returns the numeric architecture type code for optimized dispatch.
+This is used internally to determine which inference path to use.
+
+Architecture type codes include:
+
+    0  - UNKNOWN      11 - MPT
+    1  - LLAMA        12 - STARCODER  
+    2  - QWEN         13 - STABLELM
+    3  - QWEN2        14 - INTERNLM
+    4  - PHI          15 - DEEPSEEK
+    5  - GEMMA        16 - COMMAND_R
+    6  - GEMMA2       17 - MAMBA
+    7  - GPT2         18 - RWKV
+    8  - GPTJ         19 - BERT
+    9  - GPTNEOX      20 - T5
+    10 - FALCON       21 - BLOOM
+
+B<Example:>
+
+    if ($model->arch_type == 4) {
+        print "This is a Phi model\n";
+    }
+
+=head2 arch_has_combined_qkv
+
+    my $has_combined = $model->arch_has_combined_qkv;
+
+Returns true (1) if the model architecture uses combined Q/K/V projection
+weights in a single tensor, false (0) otherwise.
+
+Models with combined QKV: Phi, Qwen, Qwen2, BLOOM, GPT-2, GPT-J
+
+B<Example:>
+
+    if ($model->arch_has_combined_qkv) {
+        print "Model uses combined QKV projections\n";
+    }
+
+=head2 arch_has_ffn_gate
+
+    my $has_gate = $model->arch_has_ffn_gate;
+
+Returns true (1) if the model architecture uses a gated FFN (SwiGLU),
+false (0) if it uses a standard 2-layer FFN with GELU activation.
+
+Models without FFN gate (use GELU): GPT-2, GPT-J, GPT-NeoX, BLOOM, Falcon, MPT, Phi
+
+B<Example:>
+
+    if (!$model->arch_has_ffn_gate) {
+        print "Model uses GELU FFN (no gate)\n";
+    }
+
+=head2 arch_has_post_norm
+
+    my $has_post = $model->arch_has_post_norm;
+
+Returns true (1) if the model architecture applies post-normalization
+after attention and FFN blocks, false (0) otherwise.
+
+Currently only Gemma2 uses post-normalization.
+
+B<Example:>
+
+    if ($model->arch_has_post_norm) {
+        print "Model uses post-normalization (Gemma2-style)\n";
+    }
+
+=head2 arch_is_recurrent
+
+    my $is_recurrent = $model->arch_is_recurrent;
+
+Returns true (1) if the model is a recurrent architecture (MAMBA, RWKV),
+false (0) for standard transformer architectures.
+
+Note: Recurrent model inference is identified but not yet fully implemented.
+
+B<Example:>
+
+    if ($model->arch_is_recurrent) {
+        warn "Recurrent models not yet fully supported\n";
+    }
 
 =head2 n_tensors
 
@@ -233,7 +320,7 @@ B<Example:>
 
 =over 4
 
-=item * C<general.architecture> - Model architecture (e.g., "llama")
+=item * C<general.architecture> - Model architecture (e.g., "llama", "qwen2", "phi3")
 
 =item * C<general.name> - Model name
 
@@ -241,31 +328,53 @@ B<Example:>
 
 =back
 
-=head2 Architecture-specific (llama)
+=head2 Architecture-specific Keys
+
+Metadata keys are prefixed with the architecture name. The architecture is
+auto-detected from C<general.architecture> and used to lookup parameters:
+
+B<LLaMA-style (llama, mistral, etc.):>
 
 =over 4
 
-=item * C<llama.block_count> - Number of transformer layers
+=item * C<{arch}.block_count> - Number of transformer layers
 
-=item * C<llama.embedding_length> - Hidden dimension (n_embd)
+=item * C<{arch}.embedding_length> - Hidden dimension (n_embd)
 
-=item * C<llama.attention.head_count> - Number of attention heads
+=item * C<{arch}.attention.head_count> - Number of attention heads
 
-=item * C<llama.attention.head_count_kv> - Number of KV heads (for GQA)
+=item * C<{arch}.attention.head_count_kv> - Number of KV heads (for GQA)
 
-=item * C<llama.attention.layer_norm_rms_epsilon> - RMSNorm epsilon
+=item * C<{arch}.attention.layer_norm_rms_epsilon> - RMSNorm epsilon
 
-=item * C<llama.context_length> - Maximum context length
+=item * C<{arch}.context_length> - Maximum context length
 
-=item * C<llama.feed_forward_length> - FFN intermediate dimension
+=item * C<{arch}.feed_forward_length> - FFN intermediate dimension
 
-=item * C<llama.vocab_size> - Vocabulary size
+=item * C<{arch}.vocab_size> - Vocabulary size
 
-=item * C<llama.rope.dimension_count> - RoPE rotation dimensions
+=item * C<{arch}.rope.dimension_count> - RoPE rotation dimensions
 
-=item * C<llama.rope.freq_base> - RoPE frequency base (10000 for llama)
+=item * C<{arch}.rope.freq_base> - RoPE frequency base (10000 for llama)
 
 =back
+
+Where C<{arch}> is the architecture name (e.g., "llama", "qwen2", "phi3", "gemma2").
+
+B<Example for different architectures:>
+
+    # LLaMA model
+    my $layers = $model->get_kv('llama.block_count');
+    
+    # Qwen2 model  
+    my $layers = $model->get_kv('qwen2.block_count');
+    
+    # Phi-3 model
+    my $layers = $model->get_kv('phi3.block_count');
+    
+    # Or use architecture() to build the key dynamically
+    my $arch = $model->architecture;
+    my $layers = $model->get_kv("$arch.block_count");
 
 =head2 Tokenizer
 
@@ -293,6 +402,8 @@ B<Example:>
 
 Tensor names follow a standard convention:
 
+=head2 Embedding and Output
+
 =over 4
 
 =item * C<token_embd.weight> - Token embedding matrix [n_embd, n_vocab]
@@ -301,21 +412,65 @@ Tensor names follow a standard convention:
 
 =item * C<output_norm.weight> - Final layer norm
 
-=item * C<blk.N.attn_norm.weight> - Attention layer norm for layer N
+=back
 
-=item * C<blk.N.attn_q.weight> - Query projection for layer N
+=head2 Attention Tensors (per layer N)
 
-=item * C<blk.N.attn_k.weight> - Key projection for layer N
+B<Separate Q/K/V (LLaMA, Mistral, Gemma, etc.):>
 
-=item * C<blk.N.attn_v.weight> - Value projection for layer N
+=over 4
+
+=item * C<blk.N.attn_norm.weight> - Attention layer norm
+
+=item * C<blk.N.attn_q.weight> - Query projection
+
+=item * C<blk.N.attn_k.weight> - Key projection
+
+=item * C<blk.N.attn_v.weight> - Value projection
 
 =item * C<blk.N.attn_output.weight> - Attention output projection
+
+=back
+
+B<Combined QKV (Phi, Qwen, BLOOM, GPT-2, GPT-J):>
+
+=over 4
+
+=item * C<blk.N.attn_qkv.weight> - Combined Q/K/V projection [3*n_embd, n_embd]
+
+=back
+
+B<Post-normalization (Gemma2):>
+
+=over 4
+
+=item * C<blk.N.attn_post_norm.weight> - Post-attention layer norm
+
+=item * C<blk.N.ffn_post_norm.weight> - Post-FFN layer norm
+
+=back
+
+=head2 FFN Tensors (per layer N)
+
+B<Gated FFN / SwiGLU (LLaMA, Mistral, Qwen, Gemma):>
+
+=over 4
 
 =item * C<blk.N.ffn_norm.weight> - FFN layer norm
 
 =item * C<blk.N.ffn_gate.weight> - FFN gate projection (SwiGLU)
 
 =item * C<blk.N.ffn_up.weight> - FFN up projection
+
+=item * C<blk.N.ffn_down.weight> - FFN down projection
+
+=back
+
+B<Standard FFN / GELU (GPT-2, Falcon, BLOOM, Phi):>
+
+=over 4
+
+=item * C<blk.N.ffn_up.weight> - FFN up projection (no gate)
 
 =item * C<blk.N.ffn_down.weight> - FFN down projection
 

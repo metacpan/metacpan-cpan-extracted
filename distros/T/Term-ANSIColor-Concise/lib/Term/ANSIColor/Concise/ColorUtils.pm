@@ -10,7 +10,7 @@ L(<https://qiita.com/yoya/items/96c36b069e74398796f3>
 
 package Term::ANSIColor::Concise::ColorUtils;
 
-our $VERSION = "3.01";
+our $VERSION = "3.02";
 
 use v5.14;
 use warnings;

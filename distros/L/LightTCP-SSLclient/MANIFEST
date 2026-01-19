@@ -1,0 +1,20 @@
+examples/ssltest.pl
+examples/simple_get.pl
+examples/simple_post.pl
+examples/simple_redirect.pl
+examples/simple_verbose.pl
+examples/simple_keepalive.pl
+lib/LightTCP/SSLclient.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+CHANGES
+t/00_load.t
+t/01_constructor.t
+t/02_fingerprint.t
+t/03_response.t
+t/04_helpers.t
+t/05_redirects.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -7,8 +7,9 @@ use HTTP::Tiny;
 use URI;
 use JSON::PP;
 use Carp qw(croak);
+use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 # $VERSION = eval $VERSION;
 
 # TODO:
@@ -51,7 +52,8 @@ sub crawl {
         my $resp = $self->_fetch_page($url);
         next if $resp->{'status'} == 404;
         if (!$resp->{'success'}) {
-            croak "WWW::Crawl: HTTP Response " . $resp->{'status'} . " - " . $resp->{'reason'} . "\n" . $resp->{'content'};
+            warn "WWW::Crawl: HTTP Response " . $resp->{'status'} . " - " . $resp->{'reason'} . "\n";
+            next;
         }
 
         $page = $resp->{'content'};
@@ -109,7 +111,17 @@ sub crawl {
 sub _fetch_page {
     my ($self, $url) = @_;
 
-    return $self->{'http'}->request('GET', $url);
+    my $resp = $self->{'http'}->request('GET', $url);
+    if ($resp->{'success'} && $resp->{'headers'}{'content-encoding'} && $resp->{'headers'}{'content-encoding'} =~ /gzip/i) {
+        my $content = $resp->{'content'};
+        my $uncompressed;
+        if (gunzip \$content => \$uncompressed) {
+            $resp->{'content'} = $uncompressed;
+        } else {
+            warn "Gunzip failed: $GunzipError\n";
+        }
+    }
+    return $resp;
 }
 
 1;
@@ -121,7 +133,7 @@ WWW::Crawl - A simple web crawler for extracting links and more from web pages
 
 =head1 VERSION
 
-This documentation refers to WWW::Crawl version 0.4.
+This documentation refers to WWW::Crawl version 0.5.
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@
       "Ian Boddison <bod@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,6 +34,7 @@
          "requires" : {
             "Carp" : "0",
             "HTTP::Tiny" : "0.083",
+            "IPC::Run" : "0",
             "JSON::PP" : "2.00",
             "URI" : "5.05",
             "perl" : "5.016"
@@ -46,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.4",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.5",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

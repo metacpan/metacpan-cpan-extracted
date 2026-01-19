@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::Impl::Ppoll 0.02;
+package Future::IO::Impl::Ppoll 0.03;
 
 use v5.20;
 use warnings;
@@ -14,7 +14,7 @@ no warnings qw( experimental::postderef experimental::signatures );
 
 use Carp;
 
-use IO::Ppoll qw( POLLIN POLLOUT POLLHUP );
+use IO::Ppoll qw( POLLIN POLLOUT POLLHUP POLLERR POLLNVAL );
 use POSIX qw( SIG_BLOCK sigprocmask );
 use Struct::Dumb qw( readonly_struct );
 use Time::HiRes qw( time );
@@ -28,6 +28,12 @@ BEGIN {
       require Scalar::Util;
       Scalar::Util->import(qw( refaddr ));
    }
+}
+
+BEGIN {
+   # Just check for sanity
+   IO::Ppoll->$_ == Future::IO->$_ or die "This implementation relies on the Future::IO $_ constant being the same as system\n"
+      for qw( POLLIN POLLOUT POLLHUP POLLERR POLLNVAL );
 }
 
 __PACKAGE__->APPLY;
@@ -59,9 +65,9 @@ else the C<waitpid> futures will stop working.
 
 =cut
 
+readonly_struct Poller => [qw( events f )];
 my %fh_by_refaddr;
-my %read_futures_by_refaddr;
-my %write_futures_by_refaddr;
+my %pollers_by_refaddr;
 
 readonly_struct Alarm => [qw( time f )];
 my @alarms;
@@ -76,8 +82,7 @@ sub _update_poll ( $fh )
       carp "Filehandle $fh lost its fileno (was closed?) during poll";
 
    my $mask = 0;
-   $mask |= POLLIN  if scalar ( $read_futures_by_refaddr{$refaddr}  // [] )->@*;
-   $mask |= POLLOUT if scalar ( $write_futures_by_refaddr{$refaddr} // [] )->@*;
+   $mask |= $_->events for ( $pollers_by_refaddr{$refaddr} // [] )->@*;
 
    ppoll()->mask( $fh => $mask );
    if( $mask ) {
@@ -85,8 +90,7 @@ sub _update_poll ( $fh )
    }
    else {
       delete $fh_by_refaddr{$refaddr};
-      delete $read_futures_by_refaddr{$refaddr};
-      delete $write_futures_by_refaddr{$refaddr};
+      delete $pollers_by_refaddr{$refaddr};
    }
 }
 
@@ -105,15 +109,20 @@ sub _tick ( $ )
 
    foreach my $refaddr ( keys %fh_by_refaddr ) {
       my $fh = $fh_by_refaddr{$refaddr};
-      my $events = $ppoll->events( $fh ) or next;
+      my $revents = $ppoll->events( $fh ) or next;
 
-      if( $events & (POLLIN|POLLHUP) ) {
-         my $f = shift $read_futures_by_refaddr{$refaddr}->@*;
-         $f and $f->done;
-      }
-      if( $events & (POLLOUT|POLLHUP) ) {
-         my $f = shift $write_futures_by_refaddr{$refaddr}->@*;
-         $f and $f->done;
+      my $pollers = $pollers_by_refaddr{$refaddr} or next;
+      # TODO: if nobody cared, maybe we should remove it?
+
+      # Find the next poller which cares about at least one of these events
+      foreach my $idx ( 0 .. $#$pollers ) {
+         $pollers->[$idx]->events & $revents or       # This poller cares about this event
+         ( $revents & (POLLHUP|POLLERR|POLLNVAL) ) or # All pollers should receive this
+            next;
+
+         my ( $poller ) = splice @$pollers, $idx, 1, ();
+         $poller and $poller->f and $poller->f->done( $revents );
+         last;
       }
 
       _update_poll( $fh );
@@ -150,41 +159,19 @@ sub sleep ( $class, $secs )
    $class->alarm( time() + $secs );
 }
 
-sub ready_for_read ( $, $fh )
+sub poll ( $, $fh, $events )
 {
    defined $fh or
-      croak "Expected a defined filehandle for ->ready_for_read";
+      croak "Expected a defined filehandle for ->poll";
 
    my $refaddr = refaddr $fh;
 
-   my $futures = $read_futures_by_refaddr{$refaddr} //= [];
+   my $pollers = $pollers_by_refaddr{$refaddr} //= [];
 
    my $f = Future::IO::Impl::Ppoll::_Future->new;
+   my $poller = Poller( $events, $f );
 
-   my $was = scalar @$futures;
-   push @$futures, $f;
-
-   return $f if $was;
-
-   _update_poll( $fh );
-   return $f;
-}
-
-sub ready_for_write ( $, $fh )
-{
-   defined $fh or
-      croak "Expected a defined filehandle for ->ready_for_write";
-
-   my $refaddr = refaddr $fh;
-
-   my $futures = $write_futures_by_refaddr{$refaddr} //= [];
-
-   my $f = Future::IO::Impl::Ppoll::_Future->new;
-
-   my $was = scalar @$futures;
-   push @$futures, $f;
-
-   return $f if $was;
+   push @$pollers, $poller;
 
    _update_poll( $fh );
    return $f;

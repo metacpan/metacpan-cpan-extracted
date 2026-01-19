@@ -12,6 +12,9 @@ constVariablePointer
 constParameterCallback
 constParameterPointer
 
+// Ignore, false positives on empty methods or with only local variables.
+functionStatic
+
 // Ignore, this is an imported module.
 cstyleCast:lib/compat/gettext.h
 unusedStructMember:lib/compat/obstack.c
@@ -26,4 +29,5 @@ unreachableCode:lib/dpkg/t/t-ehandle.c
 
 // Ignore, the code is testing the macros.
 duplicateExpression:lib/dpkg/t/t-macros.c
+duplicateExpressionTernary:lib/dpkg/t/t-macros.c
 duplicateValueTernary:lib/dpkg/t/t-macros.c

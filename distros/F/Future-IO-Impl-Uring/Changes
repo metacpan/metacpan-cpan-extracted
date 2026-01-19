@@ -1,5 +1,18 @@
 Revision history for Future-IO-Impl-Uring
 
+0.005     2026-01-18 23:32:06+01:00 Europe/Brussels
+          - Eliminate IOSQE_ASYNC
+          - Add poll method
+          - Reuse ring from Future::Uring if available
+
+0.004     2026-01-18 16:17:51+01:00 Europe/Brussels
+          - Allow non-positive inputs to waitpid
+          - Fix failure arguments of ready_for_read/ready_for_write
+          - Adopt listener class for new connection in accept
+          - Remove custom implementations of sysread_exactly and syswrite_exactly
+          - Add dependency on Future::IO 0.17
+          - Increase default ringsize to 128
+
 0.003     2026-01-02 22:33:44+01:00 Europe/Brussels
           - Implement send and recv
           - Implement ready_for_read and ready_for_write

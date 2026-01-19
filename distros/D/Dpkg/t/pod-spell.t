@@ -109,4 +109,5 @@ substvar
 substvars
 unparsed
 update-buildflags
+uploader
 xz

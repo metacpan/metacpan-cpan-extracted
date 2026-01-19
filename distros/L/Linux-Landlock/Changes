@@ -1,3 +1,7 @@
+0.009003 2026-01-18
+     - drop deprecated ll_create_fs_ruleset/ll_create_net_ruleset
+     - fix version number
+
 0.9.1 2025-08-31
      - fix tests for old ABI versions
      - fix tests for environments where NO_NEW_PRIVS is already set

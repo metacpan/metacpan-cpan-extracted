@@ -13,7 +13,8 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use lib 't/lib';
 use Helper;
-use JSON::Schema::Modern::Utilities qw(is_bool get_type);
+use JSON::Schema::Modern::Utilities qw(is_bool get_type is_type);
+use OpenAPI::Modern::Utilities 'coerce_primitive';
 
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
@@ -524,7 +525,10 @@ subtest 'header parameters' => sub {
       content => $test->[1],
     } if ref $test eq 'ARRAY';
 
-    subtest 'header '.$test->{name} => sub {
+    subtest 'header '
+        .($test->{header_obj}{content} ? 'encoded with media-type' : 'style=simple')
+        .', '.$test->{name}.': '
+        .(defined $test->{values} ? $::dumper->encode($test->{values}) : '<missing>') => sub {
       my $param_obj = +{
         exists $test->{header_obj}{content} ? () : (schema => { type => 'string' }),
         $test->{header_obj}->%*,
@@ -858,13 +862,69 @@ YAML
     }
   };
 
-  subtest 'type coercion object properties and array items' => sub {
+  subtest 'type coercion for primitives' => sub {
+    foreach my $test (
+      # ineligible data
+      [ undef,    [qw(null boolean number string object array)] ],
+      [ {},       [qw(null boolean number string object array)] ],
+      [ [],       [qw(null boolean number string object array)] ],
+      [ \'0',     [qw(null boolean number string object array)] ],
+      [ \'1',     [qw(null boolean number string object array)] ],
+      [ false,    [qw(null boolean number string object array)] ],
+      [ true,     [qw(null boolean number string object array)] ],
+
+      # valid coercions
+      [ '',       [qw(null boolean number string object array)], 'null', undef ],
+      [ '',       [qw(boolean number string object array)], 'boolean', false ],
+      [ '0',      [qw(boolean number string object array)], 'boolean', false ],
+      [ '1',      [qw(boolean number string object array)], 'boolean', true ],
+      [ 0,        [qw(boolean number string object array)], 'boolean', false ],
+      [ 1,        [qw(boolean number string object array)], 'boolean', true ],
+      [ 'false',  [qw(boolean number string object array)], 'boolean', false ],
+      [ 'true',   [qw(boolean number string object array)], 'boolean', true ],
+      [ '0',      [qw(null number string object array)], 'number', 0 ],
+      [ '1',      [qw(null number string object array)], 'number', 1 ],
+      [ '-42',    [qw(null boolean number string object array)], 'number', -42 ],
+      [ '4e2',    [qw(null boolean number string object array)], 'number', 400 ],
+      [ 20,       [qw(null boolean string object array)], 'string', '20' ],
+
+      # no change
+      [ 20,       ['boolean', 'number'], 'number', 20 ],
+      [ 20,       [qw(null boolean number string object array)], 'number', 20 ],
+      [ '20',     [qw(null boolean string object array)], 'string', '20' ],
+      [ '',       [qw(number string object array)], 'string', '' ],
+      [ 'hi',     ['string'], 'string', 'hi' ],
+      [ 'hi',     [qw(null boolean number string object array)], 'string', 'hi' ],
+
+    ) {
+      my ($data, $types, $expected_type, $expected_data) = @$test;
+
+      subtest $expected_type ? 'coerce '.$::dumper->encode($data).' to ' .join(', ', @$types).'; want '.$expected_type
+          : 'cannot coerce '.$::dumper->encode($data) => sub {
+        my $valid = coerce_primitive(\$data, $types);
+
+        if (defined $expected_type) {
+          ok($valid, 'coercion was successful');
+          ok(is_type($expected_type, $data), 'data was coerced to the correct type')
+            or note 'got type: ', get_type($data);
+          is($data, $expected_data, 'coerced data is perlishly correct');
+          is_equal($data, $expected_data, 'coerced data is also more strictly correct')
+            or note 'got type: ', get_type($data);
+        }
+        else {
+          ok(!$valid, 'coercion was not successful');
+        }
+      };
+    }
+  };
+
+  subtest 'type coercion for object properties and array items' => sub {
     my $idx = -1;
     foreach my $test (
       [ 'foo', {}, 'foo' ],
       [ 'foo', false, 'foo' ],
       [ 'foo', true, 'foo' ],
-      [ { a => { b => 1 }, c => 2 }, { '$ref' => '#/components/schemas/object_of_mixed' }, { a => { b => 1 }, c => 2 } ],
+      [ { a => { b => 1 }, c => 2 }, { '$ref' => '#/components/schemas/object_of_mixed' }, { a => { b => 1 }, c => '2' } ],
       [ { a => '1', b => '2', c => '1', d => '', e => '5' }, { '$ref' => '#/components/schemas/object_of_mixed' },
         { a => '1', b => 2, c => true, d => undef, e => 5 } ],
       [ { a => '1', b => '2', c => '1', d => '', e => '5' }, { '$ref' => '#/components/schemas/object_with_overlap' },

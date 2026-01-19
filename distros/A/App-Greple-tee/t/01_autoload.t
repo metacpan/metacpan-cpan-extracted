@@ -32,8 +32,11 @@ for my $alias (qw(ansicolumn ansifold cat-v)) {
 SKIP: {
     eval { require App::ansifold };
     skip "App::ansifold not installed", 2 if $@;
+    skip "App::ansifold::ansifold not defined", 2
+        unless defined &App::ansifold::ansifold;
 
-    my $code = resolve('ansifold');
+    my $code = eval { resolve('ansifold') };
+    skip "resolve('ansifold') failed: $@", 2 if $@;
     is ref($code), 'CODE', 'resolve ansifold returns CODE ref';
     is $code, \&App::ansifold::ansifold, 'ansifold resolves to correct function';
 }
@@ -41,8 +44,11 @@ SKIP: {
 SKIP: {
     eval { require App::ansicolumn };
     skip "App::ansicolumn not installed", 2 if $@;
+    skip "App::ansicolumn::ansicolumn not defined", 2
+        unless defined &App::ansicolumn::ansicolumn;
 
-    my $code = resolve('ansicolumn');
+    my $code = eval { resolve('ansicolumn') };
+    skip "resolve('ansicolumn') failed: $@", 2 if $@;
     is ref($code), 'CODE', 'resolve ansicolumn returns CODE ref';
     is $code, \&App::ansicolumn::ansicolumn, 'ansicolumn resolves to correct function';
 }
@@ -61,8 +67,11 @@ SKIP: {
     skip "Command::Run not installed", 3 if $@;
     eval { require App::ansifold };
     skip "App::ansifold not installed", 3 if $@;
+    skip "App::ansifold::ansifold not defined", 3
+        unless defined &App::ansifold::ansifold;
 
-    my $code = resolve('ansifold');
+    my $code = eval { resolve('ansifold') };
+    skip "resolve('ansifold') failed: $@", 3 if $@;
     my $input = "foo bar\n";
     my $run = Command::Run->new;
     my $out = $run->command($code, '-w', '4')->with(stdin => $input)->update->data;

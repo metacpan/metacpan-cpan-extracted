@@ -6,10 +6,12 @@ mdee (Markdown, Easy on the Eyes) is a Markdown viewer command implemented as a 
 
 ## Project Structure
 
-- `script/mdee` - Main script (Bash)
-- `lib/App/mdee.pm` - Perl module (version info only)
+- `script/mdee` - Main script (Bash) with POD documentation
+- `lib/App/mdee.pm` - Perl module (version info only, generated from script/mdee)
 - `t/` - Test files
 - `t/test.md` - Color test file
+
+**Important:** Documentation (POD) must be written in `script/mdee`. At release time, `minil release` hooks append the POD from `script/mdee` to `lib/App/mdee.pm` (see `minil.toml`).
 
 ## Development
 
@@ -92,9 +94,9 @@ Each stage is optional (`--[no-]fold`, `--[no-]table`, `--[no-]nup`).
 The `-f` / `--filter` option enables filter mode for simple highlighting:
 
 ```bash
-mdee -f file.md           # highlight only (no fold, table, nup)
+mdee -f file.md           # highlight + table (no fold, nup)
 cat file.md | mdee -f     # highlight stdin
-mdee -f --fold file.md    # highlight + fold
+mdee -f --fold file.md    # highlight + table + fold
 ```
 
 Implementation uses a callback function:
@@ -104,13 +106,12 @@ Implementation uses a callback function:
 
 filter() {
     fold=
-    table=
     nup=
 }
 ```
 
 - The `!` marker triggers the callback when option is parsed
-- Callback sets fold, table, nup to empty (disabled)
+- Callback sets fold and nup to empty (disabled), table remains enabled
 - Subsequent options (`--fold`, `--table`, `--nup`) can override
 - Order matters: `-f --fold` enables fold, `--fold -f` disables it
 

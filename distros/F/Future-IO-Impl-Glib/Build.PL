@@ -10,12 +10,12 @@ my $build = Module::Build->new(
       'perl' => '5.014',
 
       'Future' => 0,
-      'Future::IO::ImplBase' => 0,
+      'Future::IO::ImplBase' => '0.19',
       'Glib' => 0,
    },
    test_requires => {
-      'Test::Future::IO::Impl' => 0,
-      'Test::More' => '0.88', # done_testing
+      'Test::Future::IO::Impl' => '0.17',
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

@@ -87,7 +87,7 @@ subtest 'no-table option' => sub {
 subtest 'filter option' => sub {
     my $out = `$mdee --dryrun -f $test_md 2>&1`;
     unlike($out, qr/ansifold/, '-f disables fold');
-    unlike($out, qr/ansicolumn/, '-f disables table');
+    like($out, qr/ansicolumn/, '-f keeps table enabled');
     unlike($out, qr/\|\s*nup/, '-f disables nup');
 };
 

@@ -54,21 +54,6 @@ This should be set to the highest version you tested with.
 If this is not used, or called with an undef argument, the maximum supported ABI
 version will be used. This means future kernels could break your application.
 
-=item ll_create_fs_ruleset(@actions)
-
-Int (file descriptor), creates a new Landlock ruleset that covers the specified file system
-actions.
-
-If no actions are specified, all supported actions are covered.
-
-Returns the file descriptor of the new ruleset on success, or undef on error.
-
-=item ll_create_net_ruleset(@actions)
-
-Int (file descriptor), like L</ll_create_fs_ruleset(@actions)>, but for network actions.
-
-This requires an ABI version of at least 4. Returns undef on error.
-
 =item ll_create_scoped_ruleset(@actions)
 
 Int (file descriptor), creates a new Landlock ruleset that covers "scoped" actions.
@@ -206,7 +191,6 @@ use POSIX                     qw();
 use Linux::Landlock::Syscalls qw(NR Q_pack);
 use Math::BigInt;
 
-our $VERSION         = '0.9.2';
 our $MAX_ABI_VERSION = 6;
 
 # adapted from linux/landlock.ph, architecture independent consts
@@ -251,8 +235,6 @@ our @EXPORT_OK = qw(
   get_no_new_privs
   ll_get_abi_version
   ll_create_ruleset
-  ll_create_fs_ruleset
-  ll_create_net_ruleset
   ll_add_path_beneath_rule
   ll_add_net_port_rule
   ll_all_fs_access_supported
@@ -331,18 +313,6 @@ sub ll_get_abi_version {
         }
     }
     return $abi_version;
-}
-
-#@deprecated
-sub ll_create_fs_ruleset {
-    my ($actions) = @_;
-    return ll_create_ruleset($actions, Math::BigInt->bzero);
-}
-
-#@deprecated
-sub ll_create_net_ruleset {
-    my ($actions) = @_;
-    return ll_create_ruleset(Math::BigInt->bzero, $actions);
 }
 
 sub ll_create_ruleset {

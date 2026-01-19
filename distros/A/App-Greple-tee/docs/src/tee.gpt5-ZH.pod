@@ -10,7 +10,7 @@ App::Greple::tee - 用外部命令结果替换匹配文本的模块
 
 =head1 VERSION
 
-Version 1.04
+Version 1.0401
 
 =head1 DESCRIPTION
 

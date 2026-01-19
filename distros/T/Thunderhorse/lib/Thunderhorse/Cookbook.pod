@@ -34,7 +34,7 @@ can use different error pages without any issue.
 =head2 Reusing common bridge across controllers
 
 If you need to make a common bridge that will be used across the system, it is
-best to define it in the base application and give it a name:
+best to define it in the base application class and give it a name:
 
 	# in MyApp.pm
 	sub build ($self)
@@ -51,7 +51,8 @@ best to define it in the base application and give it a name:
 		$self->load_controller('ReusesBridge');
 	}
 
-Then you can fetch it in any of the controller to add more locations as its children:
+Then you can fetch it in one of the controllers, which allows adding more
+children locations:
 
 	# in MyApp/Controller/ReusesBridge.pm
 	sub build ($self)

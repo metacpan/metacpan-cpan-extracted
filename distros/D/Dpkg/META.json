@@ -164,7 +164,7 @@
       },
       "Dpkg::Control::FieldsCore" : {
          "file" : "lib/Dpkg/Control/FieldsCore.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Dpkg::Control::Hash" : {
          "file" : "lib/Dpkg/Control/Hash.pm",
@@ -224,6 +224,14 @@
       },
       "Dpkg::Dist::Files" : {
          "file" : "lib/Dpkg/Dist/Files.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Email::Address" : {
+         "file" : "lib/Dpkg/Email/Address.pm",
+         "version" : "0.01"
+      },
+      "Dpkg::Email::AddressList" : {
+         "file" : "lib/Dpkg/Email/AddressList.pm",
          "version" : "0.01"
       },
       "Dpkg::ErrorHandling" : {
@@ -412,7 +420,7 @@
       },
       "Dpkg::Version" : {
          "file" : "lib/Dpkg/Version.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Test::Dpkg" : {
          "file" : "lib/Test/Dpkg.pm"
@@ -433,6 +441,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.23.1",
+   "version" : "v1.23.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

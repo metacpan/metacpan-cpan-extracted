@@ -8,7 +8,7 @@ App::Greple::tee - 외부 명령 결과로 일치한 텍스트를 대체하는 �
 
 # VERSION
 
-Version 1.04
+Version 1.0401
 
 # DESCRIPTION
 

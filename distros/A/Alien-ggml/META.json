@@ -24,7 +24,10 @@
          "requires" : {
             "Alien::Build" : "2.38",
             "Alien::Build::MM" : "0.25",
+            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
+            "Alien::cmake3" : "0.02",
             "Archive::Zip" : "0",
+            "Config" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "Mozilla::CA" : "0",
@@ -55,22 +58,15 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/lnation/Alien-ggml/issues"
-      },
-      "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/lnation/Alien-ggml.git",
-         "web" : "https://github.com/lnation/Alien-ggml"
-      }
-   },
-   "version" : "0.03",
+   "version" : "0.06",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.84",
       "requires" : {
          "share" : {
+            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
+            "Alien::cmake3" : "0.02",
             "Archive::Zip" : "0",
+            "Config" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "Mozilla::CA" : "0",

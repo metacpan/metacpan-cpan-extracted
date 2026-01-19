@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.018;
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001003';
 
 use Future;
 use Future::AsyncAwait;
@@ -150,6 +150,9 @@ sub new {
 
         # Fork safety
         _pid => $$,
+
+        # Script registry
+        _scripts => {},
 
         # Telemetry options
         debug              => $args{debug},
@@ -1101,6 +1104,104 @@ sub script {
     );
 }
 
+# Define a named script command
+# Usage: $redis->define_command(name => { keys => N, lua => '...' })
+sub define_command {
+    my ($self, $name, $def) = @_;
+
+    die "Command name required" unless defined $name && length $name;
+    die "Command definition required" unless ref $def eq 'HASH';
+    die "Lua script required (lua => '...')" unless defined $def->{lua};
+
+    # Validate name (alphanumeric and underscore only)
+    die "Invalid command name '$name' - use only alphanumeric and underscore"
+        unless $name =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
+    my $script = Async::Redis::Script->new(
+        redis       => $self,
+        script      => $def->{lua},
+        name        => $name,
+        num_keys    => $def->{keys} // 'dynamic',
+        description => $def->{description},
+    );
+
+    $self->{_scripts}{$name} = $script;
+
+    # Optional: install as method on this instance
+    if ($def->{install}) {
+        $self->_install_script_method($name);
+    }
+
+    return $script;
+}
+
+# Run a registered script by name
+# Usage: $redis->run_script('name', @keys_then_args)
+# If num_keys is 'dynamic', first arg is the key count
+async sub run_script {
+    my ($self, $name, @args) = @_;
+
+    my $script = $self->{_scripts}{$name}
+        or die "Unknown script: '$name' - use define_command() first";
+
+    my $num_keys = $script->num_keys;
+
+    # Handle dynamic key count
+    if ($num_keys eq 'dynamic') {
+        $num_keys = shift @args;
+        die "Key count required as first argument for dynamic script '$name'"
+            unless defined $num_keys;
+    }
+
+    # Split args into keys and argv
+    my @keys = splice(@args, 0, $num_keys);
+    return await $script->run(\@keys, \@args);
+}
+
+# Get a registered script by name
+sub get_script {
+    my ($self, $name) = @_;
+    return $self->{_scripts}{$name};
+}
+
+# List all registered script names
+sub list_scripts {
+    my ($self) = @_;
+    return CORE::keys %{$self->{_scripts}};
+}
+
+# Preload all registered scripts to Redis
+# Useful before pipeline execution
+async sub preload_scripts {
+    my ($self) = @_;
+
+    my @names = $self->list_scripts;
+    return 0 unless @names;
+
+    for my $name (@names) {
+        my $script = $self->{_scripts}{$name};
+        await $self->script_load($script->script);
+    }
+
+    return scalar @names;
+}
+
+# Install a script as a method (internal)
+sub _install_script_method {
+    my ($self, $name) = @_;
+
+    # Create closure that captures $name
+    my $method = sub {
+        my ($self, @args) = @_;
+        return $self->run_script($name, @args);
+    };
+
+    # Install on the class (affects all instances)
+    no strict 'refs';
+    no warnings 'redefine';
+    *{"Async::Redis::$name"} = $method;
+}
+
 # ============================================================================
 # SCAN Iterators
 # ============================================================================
@@ -1904,6 +2005,118 @@ watched keys were modified by another client.
     my $result = await $script->run(['mykey']);
 
 Create a Lua script object with automatic EVALSHA optimization.
+See L<Async::Redis::Script> for details.
+
+=head2 define_command
+
+    $redis->define_command(my_command => {
+        keys        => 1,               # Number of KEYS (or 'dynamic')
+        lua         => 'return ...',    # Lua script code
+        description => 'Does X',        # Optional documentation
+        install     => 1,               # Optional: install as method
+    });
+
+Register a named Lua script for reuse. The script is automatically cached
+and uses EVALSHA for efficiency.
+
+Options:
+
+=over 4
+
+=item * C<keys> - Number of KEYS the script expects. Use C<'dynamic'> if
+variable (first arg to run_script will be the key count).
+
+=item * C<lua> - The Lua script source code.
+
+=item * C<description> - Optional description for documentation.
+
+=item * C<install> - If true, install as a method on the Async::Redis class.
+
+=back
+
+=head2 run_script
+
+    my $result = await $redis->run_script('my_command', @keys, @args);
+
+Execute a registered script by name. For scripts with fixed key count,
+pass keys then args. For dynamic scripts, pass key count first:
+
+    # Fixed keys (keys => 2)
+    await $redis->run_script('two_key_script', 'key1', 'key2', 'arg1');
+
+    # Dynamic keys
+    await $redis->run_script('dynamic_script', 2, 'key1', 'key2', 'arg1');
+
+=head2 get_script
+
+    my $script = $redis->get_script('my_command');
+
+Get a registered script object by name. Returns undef if not found.
+
+=head2 list_scripts
+
+    my @names = $redis->list_scripts;
+
+List all registered script names.
+
+=head2 preload_scripts
+
+    my $count = await $redis->preload_scripts;
+
+Load all registered scripts to Redis server. Useful before pipeline
+execution to ensure EVALSHA will succeed.
+
+=head1 LUA SCRIPTING
+
+Async::Redis provides comprehensive support for Redis Lua scripting with
+automatic EVALSHA optimization.
+
+=head2 Quick Start
+
+    # Define a reusable script
+    $redis->define_command(atomic_incr => {
+        keys => 1,
+        lua  => <<'LUA',
+            local current = tonumber(redis.call('GET', KEYS[1]) or 0)
+            local result = current + tonumber(ARGV[1])
+            redis.call('SET', KEYS[1], result)
+            return result
+LUA
+    });
+
+    # Use it
+    my $result = await $redis->run_script('atomic_incr', 'counter', 5);
+
+=head2 Pipeline Integration
+
+Registered scripts work in pipelines:
+
+    my $pipe = $redis->pipeline;
+    $pipe->run_script('atomic_incr', 'counter:a', 1);
+    $pipe->run_script('atomic_incr', 'counter:b', 1);
+    $pipe->set('other:key', 'value');
+    my $results = await $pipe->execute;
+
+Scripts are automatically preloaded before pipeline execution.
+
+=head2 Method Installation
+
+For frequently used scripts, install as methods:
+
+    $redis->define_command(cache_get => {
+        keys    => 1,
+        lua     => 'return redis.call("GET", KEYS[1])',
+        install => 1,
+    });
+
+    # Now call directly
+    my $value = await $redis->cache_get('my:key');
+
+=head2 EVALSHA Optimization
+
+Scripts automatically use EVALSHA (by SHA1 hash) for efficiency.
+If the script isn't cached on the server, it falls back to EVAL
+and caches for future calls. This is transparent to your code.
 
 =head2 scan_iter
 

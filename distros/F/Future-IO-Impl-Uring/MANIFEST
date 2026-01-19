@@ -19,4 +19,5 @@ t/07accept.t
 t/08waitpid.t
 t/09send.t
 t/10recv.t
+t/11poll.t
 xt/author/pod-syntax.t

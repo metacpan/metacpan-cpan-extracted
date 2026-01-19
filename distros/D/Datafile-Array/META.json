@@ -1,0 +1,57 @@
+{
+   "abstract" : "Lightweight pure-Perl data file handlers for array/tabular/csv data",
+   "author" : [
+      "Hans Harder"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Datafile-Array",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.014"
+         }
+      }
+   },
+   "provides" : {
+      "Datafile::Array" : {
+         "file" : "lib/Datafile/Array.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/HansH111/Datafile-Array.pm/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/HansH111/Datafile-Array.pm.git",
+         "web" : "https://github.com/HansH111/Datafile-Array.pm"
+      }
+   },
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

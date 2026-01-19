@@ -10,11 +10,11 @@ DBIx::Class::Async::Storage::DBI::Cursor - Asynchronous cursor for DBIx::Class R
 
 =head1 VERSION
 
-Version 0.35
+Version 0.40
 
 =cut
 
-our $VERSION = '0.35';
+our $VERSION = '0.40';
 
 =head1 SYNOPSIS
 

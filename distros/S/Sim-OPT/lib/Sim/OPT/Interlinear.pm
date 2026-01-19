@@ -588,6 +588,7 @@ sub isnear
   my @bits = split( "_", $this );
   my @firstbits = split( "_", $first );
   my @lastbits = split( "_", $last );
+  my @newels;
 
   my $c = 0;
   foreach my $bit ( @bits)
@@ -1991,11 +1992,11 @@ sub interlinear
   my @mode;
   if ( $dowhat{mode} )
   {
-    @mode = $dowhat{mode};
+    push( @mode, $dowhat{mode} );
   }
   else 
   {
-    @mode = ( "wei" );
+    push( @mode, "wei" );
   } # #"wei" is weighted gradient linear interpolation of the nearest neighbours.
   #my @mode = ( "near" ); # "nea" means "nearest neighbour"
   #@mode = ( ""mix" ); # "mix" means sequentially mixed in each loop.
@@ -2460,7 +2461,8 @@ sub interlinear
         }
       }
     }
-    #@arr2 = @arr ;
+    
+    @arr2 = @arr ;
     say  "INSERTING THE ARRAY UPDATES " . ( $count + 1 ) . " for $sourcefile";
     $count++;
   }

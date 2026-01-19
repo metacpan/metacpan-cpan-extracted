@@ -21,15 +21,18 @@ typedef struct DoublyNode {
 	int is_number;              /* Flag if original was numeric */
 	int is_frozen;              /* Flag if data was frozen with Storable */
 	NV num_value;               /* Numeric value if applicable */
+	long node_id;               /* Unique node ID for stable references */
 	struct DoublyNode* next;
 	struct DoublyNode* prev;
 } DoublyNode;
 
-/* List header - tracks the list and current position */
+/* Global node ID counter */
+static long next_node_id = 1;
+
+/* List header - tracks the list (position is stored per-object in Perl) */
 typedef struct DoublyList {
 	DoublyNode* head;           /* First node */
 	DoublyNode* tail;           /* Last node */
-	DoublyNode* current;        /* Current position */
 	int length;
 	int refcount;               /* Number of Perl references */
 	int destroyed;              /* Flag to mark as destroyed */
@@ -268,6 +271,7 @@ static DoublyNode* _new_node(pTHX_ SV* sv) {
 	node->data_len = 0;
 	node->is_number = 0;
 	node->num_value = 0.0;
+	node->node_id = next_node_id++;
 	
 	if (sv && SvOK(sv)) {
 	    if (SvROK(sv)) {
@@ -343,9 +347,10 @@ static SV* _node_to_sv(pTHX_ DoublyNode* node) {
 	}
 	
 	if (node->is_number == 3) {
-	    /* It's a direct SV* - return a copy */
+	    /* It's a direct SV* reference - increment refcount and return it */
 	    SV* sv = (SV*)node->data;
-	    return newSVsv(sv);
+	    SvREFCNT_inc(sv);
+	    return sv;
 	}
 	
 	if (node->is_number == 1) {
@@ -363,27 +368,26 @@ static SV* _node_to_sv(pTHX_ DoublyNode* node) {
 static int _new_list(pTHX_ SV* data) {
 	DoublyList* list;
 	int id;
-	
+
 	SHARED_LOCK();
-	
+
 	id = _alloc_list_id();
 	if (id < 0) {
 	    SHARED_UNLOCK();
 	    croak("Too many shared lists");
 	}
-	
+
 	list = (DoublyList*)malloc(sizeof(DoublyList));
 	list->head = _new_node(aTHX_ data);
 	list->tail = list->head;
-	list->current = list->head;
 	list->length = SvOK(data) ? 1 : 0;
 	list->refcount = 1;
 	list->destroyed = 0;
-	
+
 	list_registry[id] = list;
-	
+
 	SHARED_UNLOCK();
-	
+
 	return id;
 }
 
@@ -404,17 +408,51 @@ static void _decref(pTHX_ int id) {
 	DoublyList* list;
 	DoublyNode* node;
 	DoublyNode* next;
+	/* Collect SVs that need decrementing after we release the lock */
+	SV** sv_to_dec = NULL;
+	IV* ref_ids_to_clear = NULL;
+	int sv_count = 0;
+	int ref_count = 0;
+	int i;
 	
 	SHARED_LOCK();
 	list = _get_list(id);
 	if (list) {
 	    list->refcount--;
 	    if (list->refcount <= 0) {
-	        /* Free all nodes */
+	        /* First pass: count nodes that need special cleanup */
+	        int total_nodes = 0;
+	        node = list->head;
+	        while (node) {
+	            if (node->is_number == 3 && !PL_dirty && node->data) {
+	                total_nodes++;
+	            } else if (node->is_number == 2 && !PL_dirty) {
+	                total_nodes++;
+	            }
+	            node = node->next;
+	        }
+	        
+	        /* Allocate arrays if needed */
+	        if (total_nodes > 0) {
+	            sv_to_dec = (SV**)malloc(total_nodes * sizeof(SV*));
+	            ref_ids_to_clear = (IV*)malloc(total_nodes * sizeof(IV));
+	        }
+	        
+	        /* Second pass: collect refs and free nodes */
 	        node = list->head;
 	        while (node) {
 	            next = node->next;
-	            _free_node(aTHX_ node);
+	            if (node->is_number == 2 && !PL_dirty) {
+	                /* Collect ref ID for later clearing */
+	                ref_ids_to_clear[ref_count++] = (IV)node->num_value;
+	            } else if (node->is_number == 3 && !PL_dirty && node->data) {
+	                /* Collect SV* for later decrement */
+	                sv_to_dec[sv_count++] = (SV*)node->data;
+	                node->data = NULL;  /* Prevent _free_node from freeing it */
+	            } else if (node->is_number != 2 && node->is_number != 3 && node->data) {
+	                free(node->data);
+	            }
+	            free(node);
 	            node = next;
 	        }
 	        free(list);
@@ -422,6 +460,18 @@ static void _decref(pTHX_ int id) {
 	    }
 	}
 	SHARED_UNLOCK();
+	
+	/* Now safely decrement SVs without holding the lock */
+	for (i = 0; i < sv_count; i++) {
+	    SvREFCNT_dec(sv_to_dec[i]);
+	}
+	if (sv_to_dec) free(sv_to_dec);
+	
+	/* And clear ref IDs */
+	for (i = 0; i < ref_count; i++) {
+	    _clear_ref_in_perl(aTHX_ ref_ids_to_clear[i]);
+	}
+	if (ref_ids_to_clear) free(ref_ids_to_clear);
 }
 
 /* Get length */
@@ -439,167 +489,500 @@ static int _list_length(int id) {
 	return len;
 }
 
-/* Get data at current position */
-static SV* _list_data(pTHX_ int id) {
+/* Get node at position - must be called with lock held */
+static DoublyNode* _get_node_at_pos(DoublyList* list, int pos) {
+	DoublyNode* node;
+	int i;
+
+	if (!list || list->destroyed || !list->head) {
+	    return NULL;
+	}
+
+	node = list->head;
+	for (i = 0; i < pos && node && node->next; i++) {
+	    node = node->next;
+	}
+
+	return node;
+}
+
+/* Get node by ID - must be called with lock held */
+static DoublyNode* _get_node_by_id(DoublyList* list, long node_id) {
+	DoublyNode* node;
+
+	if (!list || list->destroyed || !list->head) {
+	    return NULL;
+	}
+
+	node = list->head;
+	while (node) {
+	    if (node->node_id == node_id) {
+	        return node;
+	    }
+	    node = node->next;
+	}
+
+	return NULL;
+}
+
+/* Get position of node by ID - must be called with lock held */
+static int _get_pos_by_node_id(DoublyList* list, long node_id) {
+	DoublyNode* node;
+	int pos = 0;
+
+	if (!list || list->destroyed || !list->head) {
+	    return 0;
+	}
+
+	node = list->head;
+	while (node) {
+	    if (node->node_id == node_id) {
+	        return pos;
+	    }
+	    node = node->next;
+	    pos++;
+	}
+
+	return 0;
+}
+
+/* Get data at position */
+static SV* _list_data_at_pos(pTHX_ int id, int pos) {
 	DoublyList* list;
+	DoublyNode* node;
 	SV* result = &PL_sv_undef;
-	
+
 	SHARED_LOCK();
 	list = _get_list(id);
-	if (list && !list->destroyed && list->current) {
-	    result = _node_to_sv(aTHX_ list->current);
+	if (list && !list->destroyed) {
+	    node = _get_node_at_pos(list, pos);
+	    if (node) {
+	        result = _node_to_sv(aTHX_ node);
+	    }
 	}
 	SHARED_UNLOCK();
-	
+
 	return result;
 }
 
-/* Set data at current position */
-static void _list_set_data(pTHX_ int id, SV* sv) {
+/* Set data at position */
+static void _list_set_data_at_pos(pTHX_ int id, int pos, SV* sv) {
 	DoublyList* list;
-	
+	DoublyNode* node;
+
 	SHARED_LOCK();
 	list = _get_list(id);
-	if (list && !list->destroyed && list->current) {
-	    /* Free old data */
-	    if (list->current->is_number == 2) {
-	        /* Clear old ref from Perl storage */
-	        IV old_id = (IV)list->current->num_value;
-	        _clear_ref_in_perl(aTHX_ old_id);
-	    } else if (list->current->is_number == 3) {
-	        /* Decrement old direct SV* refcount */
-	        if (list->current->data) {
-	            SV* old_sv = (SV*)list->current->data;
-	            SvREFCNT_dec(old_sv);
-	        }
-	    } else if (list->current->data) {
-	        free(list->current->data);
-	    }
-	    list->current->data = NULL;
-	    
-	    /* Store new data */
-	    list->current->data_len = 0;
-	    list->current->is_number = 0;
-	    list->current->num_value = 0.0;
-	    
-	    if (sv && SvOK(sv)) {
-	        if (SvROK(sv)) {
-	            /* Reference - try shared storage first */
-	            IV ref_id = _store_ref_in_perl(aTHX_ sv);
-	            if (ref_id >= 0) {
-	                list->current->num_value = (NV)ref_id;
-	                list->current->is_number = 2;
-	            } else {
-	                /* Not threaded - store SV* directly */
-	                SvREFCNT_inc(sv);
-	                list->current->data = (char*)sv;
-	                list->current->is_number = 3;
+	if (list && !list->destroyed) {
+	    node = _get_node_at_pos(list, pos);
+	    if (node) {
+	        /* Free old data */
+	        if (node->is_number == 2) {
+	            IV old_id = (IV)node->num_value;
+	            _clear_ref_in_perl(aTHX_ old_id);
+	        } else if (node->is_number == 3) {
+	            if (node->data) {
+	                SV* old_sv = (SV*)node->data;
+	                SvREFCNT_dec(old_sv);
 	            }
-	        } else if (SvNOK(sv) || SvIOK(sv)) {
-	            list->current->is_number = 1;
-	            list->current->num_value = SvNV(sv);
-	            STRLEN len;
-	            const char* str = SvPV(sv, len);
-	            list->current->data = (char*)malloc(len + 1);
-	            Copy(str, list->current->data, len, char);
-	            list->current->data[len] = '\0';
-	            list->current->data_len = len;
-	        } else {
-	            STRLEN len;
-	            const char* str = SvPV(sv, len);
-	            list->current->data = (char*)malloc(len + 1);
-	            Copy(str, list->current->data, len, char);
-	            list->current->data[len] = '\0';
-	            list->current->data_len = len;
+	        } else if (node->data) {
+	            free(node->data);
+	        }
+	        node->data = NULL;
+
+	        /* Store new data */
+	        node->data_len = 0;
+	        node->is_number = 0;
+	        node->num_value = 0.0;
+
+	        if (sv && SvOK(sv)) {
+	            if (SvROK(sv)) {
+	                IV ref_id = _store_ref_in_perl(aTHX_ sv);
+	                if (ref_id >= 0) {
+	                    node->num_value = (NV)ref_id;
+	                    node->is_number = 2;
+	                } else {
+	                    SvREFCNT_inc(sv);
+	                    node->data = (char*)sv;
+	                    node->is_number = 3;
+	                }
+	            } else if (SvNOK(sv) || SvIOK(sv)) {
+	                node->is_number = 1;
+	                node->num_value = SvNV(sv);
+	                STRLEN len;
+	                const char* str = SvPV(sv, len);
+	                node->data = (char*)malloc(len + 1);
+	                Copy(str, node->data, len, char);
+	                node->data[len] = '\0';
+	                node->data_len = len;
+	            } else {
+	                STRLEN len;
+	                const char* str = SvPV(sv, len);
+	                node->data = (char*)malloc(len + 1);
+	                Copy(str, node->data, len, char);
+	                node->data[len] = '\0';
+	                node->data_len = len;
+	            }
 	        }
 	    }
 	}
 	SHARED_UNLOCK();
 }
 
-/* Go to start */
-static void _list_start(int id) {
+/* Forward declarations */
+static void _list_add(pTHX_ int id, SV* data);
+
+/* Get end position (length - 1, or 0 for empty) */
+static int _list_end_pos(int id) {
 	DoublyList* list;
-	
+	int pos = 0;
+
+	SHARED_LOCK();
+	list = _get_list(id);
+	if (list && !list->destroyed && list->length > 0) {
+	    pos = list->length - 1;
+	}
+	SHARED_UNLOCK();
+
+	return pos;
+}
+
+/* Get head node ID */
+static long _list_head_node_id(int id) {
+	DoublyList* list;
+	long node_id = 0;
+
+	SHARED_LOCK();
+	list = _get_list(id);
+	if (list && !list->destroyed && list->head) {
+	    node_id = list->head->node_id;
+	}
+	SHARED_UNLOCK();
+
+	return node_id;
+}
+
+/* Get tail node ID */
+static long _list_tail_node_id(int id) {
+	DoublyList* list;
+	long node_id = 0;
+
+	SHARED_LOCK();
+	list = _get_list(id);
+	if (list && !list->destroyed && list->tail) {
+	    node_id = list->tail->node_id;
+	}
+	SHARED_UNLOCK();
+
+	return node_id;
+}
+
+/* Get next node ID */
+static long _list_next_node_id(int id, long current_node_id) {
+	DoublyList* list;
+	DoublyNode* node;
+	long next_id = 0;
+
 	SHARED_LOCK();
 	list = _get_list(id);
 	if (list && !list->destroyed) {
-	    list->current = list->head;
+	    node = _get_node_by_id(list, current_node_id);
+	    if (node && node->next) {
+	        next_id = node->next->node_id;
+	    }
 	}
 	SHARED_UNLOCK();
+
+	return next_id;
 }
 
-/* Go to end */
-static void _list_end(int id) {
+/* Get prev node ID */
+static long _list_prev_node_id(int id, long current_node_id) {
 	DoublyList* list;
-	
+	DoublyNode* node;
+	long prev_id = 0;
+
 	SHARED_LOCK();
 	list = _get_list(id);
 	if (list && !list->destroyed) {
-	    list->current = list->tail;
+	    node = _get_node_by_id(list, current_node_id);
+	    if (node && node->prev) {
+	        prev_id = node->prev->node_id;
+	    }
 	}
 	SHARED_UNLOCK();
+
+	return prev_id;
 }
 
-/* Go to next */
-static int _list_next(int id) {
+/* Get data by node ID */
+static SV* _list_data_by_node_id(pTHX_ int id, long node_id) {
 	DoublyList* list;
-	int ok = 0;
-	
+	DoublyNode* node;
+	SV* result = &PL_sv_undef;
+
 	SHARED_LOCK();
 	list = _get_list(id);
-	if (list && !list->destroyed && list->current && list->current->next) {
-	    list->current = list->current->next;
-	    ok = 1;
+	if (list && !list->destroyed) {
+	    node = _get_node_by_id(list, node_id);
+	    if (node) {
+	        result = _node_to_sv(aTHX_ node);
+	    }
 	}
 	SHARED_UNLOCK();
-	
-	return ok;
+
+	return result;
 }
 
-/* Go to prev */
-static int _list_prev(int id) {
+/* Set data by node ID */
+static void _list_set_data_by_node_id(pTHX_ int id, long node_id, SV* sv) {
 	DoublyList* list;
-	int ok = 0;
-	
+	DoublyNode* node;
+
 	SHARED_LOCK();
 	list = _get_list(id);
-	if (list && !list->destroyed && list->current && list->current->prev) {
-	    list->current = list->current->prev;
-	    ok = 1;
+	if (list && !list->destroyed) {
+	    node = _get_node_by_id(list, node_id);
+	    if (node) {
+	        /* Free old data */
+	        if (node->is_number == 2) {
+	            IV old_id = (IV)node->num_value;
+	            _clear_ref_in_perl(aTHX_ old_id);
+	        } else if (node->is_number == 3) {
+	            if (node->data) {
+	                SV* old_sv = (SV*)node->data;
+	                SvREFCNT_dec(old_sv);
+	            }
+	        } else if (node->data) {
+	            free(node->data);
+	        }
+	        node->data = NULL;
+
+	        /* Store new data */
+	        node->data_len = 0;
+	        node->is_number = 0;
+	        node->num_value = 0.0;
+
+	        if (sv && SvOK(sv)) {
+	            if (SvROK(sv)) {
+	                IV ref_id = _store_ref_in_perl(aTHX_ sv);
+	                if (ref_id >= 0) {
+	                    node->num_value = (NV)ref_id;
+	                    node->is_number = 2;
+	                } else {
+	                    SvREFCNT_inc(sv);
+	                    node->data = (char*)sv;
+	                    node->is_number = 3;
+	                }
+	            } else if (SvNOK(sv) || SvIOK(sv)) {
+	                node->is_number = 1;
+	                node->num_value = SvNV(sv);
+	                STRLEN len;
+	                const char* str = SvPV(sv, len);
+	                node->data = (char*)malloc(len + 1);
+	                Copy(str, node->data, len, char);
+	                node->data[len] = '\0';
+	                node->data_len = len;
+	            } else {
+	                STRLEN len;
+	                const char* str = SvPV(sv, len);
+	                node->data = (char*)malloc(len + 1);
+	                Copy(str, node->data, len, char);
+	                node->data[len] = '\0';
+	                node->data_len = len;
+	            }
+	        }
+	    }
 	}
 	SHARED_UNLOCK();
-	
-	return ok;
 }
 
-/* Check if at start */
-static int _list_is_start(int id) {
+/* Check if node_id is at start */
+static int _list_is_start_node(int id, long node_id) {
 	DoublyList* list;
 	int is = 0;
-	
+
 	SHARED_LOCK();
 	list = _get_list(id);
-	if (list && !list->destroyed && list->current) {
-	    is = (list->current->prev == NULL) ? 1 : 0;
+	if (list && !list->destroyed && list->head) {
+	    is = (list->head->node_id == node_id) ? 1 : 0;
 	}
 	SHARED_UNLOCK();
-	
+
 	return is;
 }
 
-/* Check if at end */
-static int _list_is_end(int id) {
+/* Check if node_id is at end */
+static int _list_is_end_node(int id, long node_id) {
 	DoublyList* list;
 	int is = 0;
-	
+
 	SHARED_LOCK();
 	list = _get_list(id);
-	if (list && !list->destroyed && list->current) {
-	    is = (list->current->next == NULL) ? 1 : 0;
+	if (list && !list->destroyed && list->tail) {
+	    is = (list->tail->node_id == node_id) ? 1 : 0;
 	}
 	SHARED_UNLOCK();
-	
+
+	return is;
+}
+
+/* Insert before node ID - returns new node's ID */
+static long _list_insert_before_node_id(pTHX_ int id, long node_id, SV* data) {
+	DoublyList* list;
+	DoublyNode* new_node;
+	DoublyNode* node;
+	long new_id = 0;
+
+	SHARED_LOCK();
+	list = _get_list(id);
+	if (list && !list->destroyed) {
+	    if (list->length == 0) {
+	        SHARED_UNLOCK();
+	        _list_add(aTHX_ id, data);
+	        return _list_head_node_id(id);
+	    }
+	    node = _get_node_by_id(list, node_id);
+	    if (node) {
+	        new_node = _new_node(aTHX_ data);
+	        new_id = new_node->node_id;
+
+	        if (node->prev) {
+	            node->prev->next = new_node;
+	            new_node->prev = node->prev;
+	        } else {
+	            list->head = new_node;
+	        }
+	        new_node->next = node;
+	        node->prev = new_node;
+	        list->length++;
+	    }
+	}
+	SHARED_UNLOCK();
+
+	return new_id;
+}
+
+/* Insert after node ID - returns new node's ID */
+static long _list_insert_after_node_id(pTHX_ int id, long node_id, SV* data) {
+	DoublyList* list;
+	DoublyNode* new_node;
+	DoublyNode* node;
+	long new_id = 0;
+
+	SHARED_LOCK();
+	list = _get_list(id);
+	if (list && !list->destroyed) {
+	    if (list->length == 0) {
+	        SHARED_UNLOCK();
+	        _list_add(aTHX_ id, data);
+	        return _list_head_node_id(id);
+	    }
+	    node = _get_node_by_id(list, node_id);
+	    if (node) {
+	        new_node = _new_node(aTHX_ data);
+	        new_id = new_node->node_id;
+
+	        if (node->next) {
+	            node->next->prev = new_node;
+	            new_node->next = node->next;
+	        } else {
+	            list->tail = new_node;
+	        }
+	        new_node->prev = node;
+	        node->next = new_node;
+	        list->length++;
+	    }
+	}
+	SHARED_UNLOCK();
+
+	return new_id;
+}
+
+/* Remove by node ID - also returns the next node's ID (or 0) */
+typedef struct {
+    SV* data;
+    long next_node_id;
+} RemoveResult;
+
+static RemoveResult _list_remove_by_node_id_ex(pTHX_ int id, long node_id) {
+	DoublyList* list;
+	DoublyNode* node;
+	RemoveResult result = { &PL_sv_undef, 0 };
+
+	SHARED_LOCK();
+	list = _get_list(id);
+	if (list && !list->destroyed && list->length > 0) {
+	    node = _get_node_by_id(list, node_id);
+	    if (node) {
+	        result.data = _node_to_sv(aTHX_ node);
+	        
+	        /* Get next node ID before we free it */
+	        if (node->next) {
+	            result.next_node_id = node->next->node_id;
+	        } else if (node->prev) {
+	            result.next_node_id = node->prev->node_id;
+	        }
+
+	        if (node->prev && node->next) {
+	            /* Middle node */
+	            node->prev->next = node->next;
+	            node->next->prev = node->prev;
+	            _free_node(aTHX_ node);
+	            list->length--;
+	        } else if (node->prev) {
+	            /* Tail node */
+	            list->tail = node->prev;
+	            list->tail->next = NULL;
+	            _free_node(aTHX_ node);
+	            list->length--;
+	        } else if (node->next) {
+	            /* Head node */
+	            list->head = node->next;
+	            list->head->prev = NULL;
+	            _free_node(aTHX_ node);
+	            list->length--;
+	        } else {
+	            /* Last node - just clear data */
+	            if (node->data) {
+	                free(node->data);
+	                node->data = NULL;
+	            }
+	            node->data_len = 0;
+	            node->is_number = 0;
+	            list->length = 0;
+	            result.next_node_id = 0;
+	        }
+	    }
+	}
+	SHARED_UNLOCK();
+
+	return result;
+}
+
+/* Wrapper for backward compatibility */
+static SV* _list_remove_by_node_id(pTHX_ int id, long node_id) {
+	RemoveResult res = _list_remove_by_node_id_ex(aTHX_ id, node_id);
+	return res.data;
+}
+
+/* Check if position is at start */
+static int _list_is_start_pos(int id, int pos) {
+	(void)id;  /* Position 0 is always start */
+	return (pos == 0) ? 1 : 0;
+}
+
+/* Check if position is at end */
+static int _list_is_end_pos(int id, int pos) {
+	DoublyList* list;
+	int is = 0;
+
+	SHARED_LOCK();
+	list = _get_list(id);
+	if (list && !list->destroyed) {
+	    is = (pos >= list->length - 1) ? 1 : 0;
+	}
+	SHARED_UNLOCK();
+
 	return is;
 }
 
@@ -682,23 +1065,16 @@ static SV* _list_remove_from_start(pTHX_ int id) {
 	DoublyList* list;
 	DoublyNode* old_head;
 	SV* result = &PL_sv_undef;
-	
+
 	SHARED_LOCK();
 	list = _get_list(id);
 	if (list && !list->destroyed && list->head && list->length > 0) {
 	    old_head = list->head;
-	    /* Convert C string data to SV for return */
 	    result = _node_to_sv(aTHX_ old_head);
-	    
+
 	    if (old_head->next) {
 	        list->head = old_head->next;
 	        list->head->prev = NULL;
-	        
-	        /* Update current if it was pointing to removed node */
-	        if (list->current == old_head) {
-	            list->current = list->head;
-	        }
-	        
 	        _free_node(aTHX_ old_head);
 	        list->length--;
 	    } else {
@@ -713,7 +1089,7 @@ static SV* _list_remove_from_start(pTHX_ int id) {
 	    }
 	}
 	SHARED_UNLOCK();
-	
+
 	return result;
 }
 
@@ -722,23 +1098,16 @@ static SV* _list_remove_from_end(pTHX_ int id) {
 	DoublyList* list;
 	DoublyNode* old_tail;
 	SV* result = &PL_sv_undef;
-	
+
 	SHARED_LOCK();
 	list = _get_list(id);
 	if (list && !list->destroyed && list->tail && list->length > 0) {
 	    old_tail = list->tail;
-	    /* Convert C string data to SV for return */
 	    result = _node_to_sv(aTHX_ old_tail);
-	    
+
 	    if (old_tail->prev) {
 	        list->tail = old_tail->prev;
 	        list->tail->next = NULL;
-	        
-	        /* Update current if it was pointing to removed node */
-	        if (list->current == old_tail) {
-	            list->current = list->tail;
-	        }
-	        
 	        _free_node(aTHX_ old_tail);
 	        list->length--;
 	    } else {
@@ -753,207 +1122,118 @@ static SV* _list_remove_from_end(pTHX_ int id) {
 	    }
 	}
 	SHARED_UNLOCK();
-	
+
 	return result;
 }
 
-/* Remove current node */
-static SV* _list_remove(pTHX_ int id) {
-	DoublyList* list;
-	DoublyNode* old_node;
-	SV* result = &PL_sv_undef;
-	
-	SHARED_LOCK();
-	list = _get_list(id);
-	if (list && !list->destroyed && list->current && list->length > 0) {
-	    old_node = list->current;
-	    result = _node_to_sv(aTHX_ old_node);
-	    
-	    if (old_node->prev && old_node->next) {
-	        /* Middle node */
-	        old_node->prev->next = old_node->next;
-	        old_node->next->prev = old_node->prev;
-	        list->current = old_node->next;
-	        _free_node(aTHX_ old_node);
-	        list->length--;
-	    } else if (old_node->prev) {
-	        /* Tail node */
-	        list->tail = old_node->prev;
-	        list->tail->next = NULL;
-	        list->current = list->tail;
-	        _free_node(aTHX_ old_node);
-	        list->length--;
-	    } else if (old_node->next) {
-	        /* Head node */
-	        list->head = old_node->next;
-	        list->head->prev = NULL;
-	        list->current = list->head;
-	        _free_node(aTHX_ old_node);
-	        list->length--;
-	    } else {
-	        /* Last node - just clear data */
-	        if (old_node->data) {
-	            free(old_node->data);
-	            old_node->data = NULL;
-	        }
-	        old_node->data_len = 0;
-	        old_node->is_number = 0;
-	        list->length = 0;
-	    }
-	}
-	SHARED_UNLOCK();
-	
-	return result;
-}
-
-/* Remove from position */
-static SV* _list_remove_from_pos(pTHX_ int id, int pos) {
+/* Remove node at position */
+static SV* _list_remove_at_pos(pTHX_ int id, int pos) {
 	DoublyList* list;
 	DoublyNode* node;
 	SV* result = &PL_sv_undef;
-	int i;
-	
+
 	SHARED_LOCK();
 	list = _get_list(id);
-	if (list && !list->destroyed && list->head && list->length > 0) {
-	    node = list->head;
-	    for (i = 0; i < pos && node->next; i++) {
-	        node = node->next;
-	    }
-	    
-	    result = _node_to_sv(aTHX_ node);
-	    
-	    if (node->prev && node->next) {
-	        /* Middle node */
-	        node->prev->next = node->next;
-	        node->next->prev = node->prev;
-	        if (list->current == node) {
-	            list->current = node->next;
+	if (list && !list->destroyed && list->length > 0) {
+	    node = _get_node_at_pos(list, pos);
+	    if (node) {
+	        result = _node_to_sv(aTHX_ node);
+
+	        if (node->prev && node->next) {
+	            /* Middle node */
+	            node->prev->next = node->next;
+	            node->next->prev = node->prev;
+	            _free_node(aTHX_ node);
+	            list->length--;
+	        } else if (node->prev) {
+	            /* Tail node */
+	            list->tail = node->prev;
+	            list->tail->next = NULL;
+	            _free_node(aTHX_ node);
+	            list->length--;
+	        } else if (node->next) {
+	            /* Head node */
+	            list->head = node->next;
+	            list->head->prev = NULL;
+	            _free_node(aTHX_ node);
+	            list->length--;
+	        } else {
+	            /* Last node - just clear data */
+	            if (node->data) {
+	                free(node->data);
+	                node->data = NULL;
+	            }
+	            node->data_len = 0;
+	            node->is_number = 0;
+	            list->length = 0;
 	        }
-	        _free_node(aTHX_ node);
-	        list->length--;
-	    } else if (node->prev) {
-	        /* Tail node */
-	        list->tail = node->prev;
-	        list->tail->next = NULL;
-	        if (list->current == node) {
-	            list->current = list->tail;
-	        }
-	        _free_node(aTHX_ node);
-	        list->length--;
-	    } else if (node->next) {
-	        /* Head node */
-	        list->head = node->next;
-	        list->head->prev = NULL;
-	        if (list->current == node) {
-	            list->current = list->head;
-	        }
-	        _free_node(aTHX_ node);
-	        list->length--;
-	    } else {
-	        /* Last node - just clear data */
-	        if (node->data) {
-	            free(node->data);
-	            node->data = NULL;
-	        }
-	        node->data_len = 0;
-	        node->is_number = 0;
-	        list->length = 0;
 	    }
 	}
 	SHARED_UNLOCK();
-	
+
 	return result;
 }
 
-/* Insert before current */
-static void _list_insert_before(pTHX_ int id, SV* data) {
+/* Insert before position */
+static void _list_insert_before_pos(pTHX_ int id, int pos, SV* data) {
 	DoublyList* list;
 	DoublyNode* new_node;
-	
+	DoublyNode* node;
+
 	SHARED_LOCK();
 	list = _get_list(id);
 	if (list && !list->destroyed) {
 	    if (list->length == 0) {
-	        /* Empty list - just set data */
-	        if (list->head->data) {
-	            free(list->head->data);
-	            list->head->data = NULL;
-	        }
-	        if (data && SvOK(data)) {
-	            STRLEN len;
-	            const char* str = SvPV(data, len);
-	            list->head->data = (char*)malloc(len + 1);
-	            Copy(str, list->head->data, len, char);
-	            list->head->data[len] = '\0';
-	            list->head->data_len = len;
-	            if (SvNOK(data) || SvIOK(data)) {
-	                list->head->is_number = 1;
-	                list->head->num_value = SvNV(data);
-	            } else {
-	                list->head->is_number = 0;
-	            }
-	        }
-	        list->length = 1;
-	    } else if (list->current) {
+	        /* Empty list - use _list_add */
+	        SHARED_UNLOCK();
+	        _list_add(aTHX_ id, data);
+	        return;
+	    }
+	    node = _get_node_at_pos(list, pos);
+	    if (node) {
 	        new_node = _new_node(aTHX_ data);
-	        
-	        if (list->current->prev) {
-	            list->current->prev->next = new_node;
-	            new_node->prev = list->current->prev;
+
+	        if (node->prev) {
+	            node->prev->next = new_node;
+	            new_node->prev = node->prev;
 	        } else {
 	            list->head = new_node;
 	        }
-	        new_node->next = list->current;
-	        list->current->prev = new_node;
-	        list->current = new_node;
+	        new_node->next = node;
+	        node->prev = new_node;
 	        list->length++;
 	    }
 	}
 	SHARED_UNLOCK();
 }
 
-/* Insert after current */
-static void _list_insert_after(pTHX_ int id, SV* data) {
+/* Insert after position */
+static void _list_insert_after_pos(pTHX_ int id, int pos, SV* data) {
 	DoublyList* list;
 	DoublyNode* new_node;
-	
+	DoublyNode* node;
+
 	SHARED_LOCK();
 	list = _get_list(id);
 	if (list && !list->destroyed) {
 	    if (list->length == 0) {
-	        /* Empty list - just set data */
-	        if (list->head->data) {
-	            free(list->head->data);
-	            list->head->data = NULL;
-	        }
-	        if (data && SvOK(data)) {
-	            STRLEN len;
-	            const char* str = SvPV(data, len);
-	            list->head->data = (char*)malloc(len + 1);
-	            Copy(str, list->head->data, len, char);
-	            list->head->data[len] = '\0';
-	            list->head->data_len = len;
-	            if (SvNOK(data) || SvIOK(data)) {
-	                list->head->is_number = 1;
-	                list->head->num_value = SvNV(data);
-	            } else {
-	                list->head->is_number = 0;
-	            }
-	        }
-	        list->length = 1;
-	    } else if (list->current) {
+	        /* Empty list - use _list_add */
+	        SHARED_UNLOCK();
+	        _list_add(aTHX_ id, data);
+	        return;
+	    }
+	    node = _get_node_at_pos(list, pos);
+	    if (node) {
 	        new_node = _new_node(aTHX_ data);
-	        
-	        if (list->current->next) {
-	            list->current->next->prev = new_node;
-	            new_node->next = list->current->next;
+
+	        if (node->next) {
+	            node->next->prev = new_node;
+	            new_node->next = node->next;
 	        } else {
 	            list->tail = new_node;
 	        }
-	        new_node->prev = list->current;
-	        list->current->next = new_node;
-	        list->current = new_node;
+	        new_node->prev = node;
+	        node->next = new_node;
 	        list->length++;
 	    }
 	}
@@ -969,23 +1249,53 @@ static void _list_insert_at_start(pTHX_ int id, SV* data) {
 	list = _get_list(id);
 	if (list && !list->destroyed) {
 	    if (list->length == 0) {
-	        /* Empty list - just set data */
-	        if (list->head->data) {
+	        /* Empty list - use node initialization logic for proper ref handling */
+	        /* Free old head data if any */
+	        if (list->head->is_number == 2) {
+	            IV old_id = (IV)list->head->num_value;
+	            _clear_ref_in_perl(aTHX_ old_id);
+	        } else if (list->head->is_number == 3) {
+	            if (list->head->data) {
+	                SV* old_sv = (SV*)list->head->data;
+	                SvREFCNT_dec(old_sv);
+	            }
+	        } else if (list->head->data) {
 	            free(list->head->data);
-	            list->head->data = NULL;
 	        }
+	        /* Reset and store new data properly */
+	        list->head->data = NULL;
+	        list->head->data_len = 0;
+	        list->head->is_number = 0;
+	        list->head->num_value = 0.0;
 	        if (data && SvOK(data)) {
-	            STRLEN len;
-	            const char* str = SvPV(data, len);
-	            list->head->data = (char*)malloc(len + 1);
-	            Copy(str, list->head->data, len, char);
-	            list->head->data[len] = '\0';
-	            list->head->data_len = len;
-	            if (SvNOK(data) || SvIOK(data)) {
+	            if (SvROK(data)) {
+	                /* Reference - try shared storage first */
+	                IV ref_id = _store_ref_in_perl(aTHX_ data);
+	                if (ref_id >= 0) {
+	                    list->head->num_value = (NV)ref_id;
+	                    list->head->is_number = 2;
+	                } else {
+	                    /* Not threaded - store SV* directly */
+	                    SvREFCNT_inc(data);
+	                    list->head->data = (char*)data;
+	                    list->head->is_number = 3;
+	                }
+	            } else if (SvNOK(data) || SvIOK(data)) {
 	                list->head->is_number = 1;
 	                list->head->num_value = SvNV(data);
+	                STRLEN len;
+	                const char* str = SvPV(data, len);
+	                list->head->data = (char*)malloc(len + 1);
+	                Copy(str, list->head->data, len, char);
+	                list->head->data[len] = '\0';
+	                list->head->data_len = len;
 	            } else {
-	                list->head->is_number = 0;
+	                STRLEN len;
+	                const char* str = SvPV(data, len);
+	                list->head->data = (char*)malloc(len + 1);
+	                Copy(str, list->head->data, len, char);
+	                list->head->data[len] = '\0';
+	                list->head->data_len = len;
 	            }
 	        }
 	        list->length = 1;
@@ -1016,28 +1326,12 @@ static void _list_insert_at_pos(pTHX_ int id, int pos, SV* data) {
 	list = _get_list(id);
 	if (list && !list->destroyed) {
 	    if (list->length == 0) {
-	        /* Empty list - just set data */
-	        if (list->head->data) {
-	            free(list->head->data);
-	            list->head->data = NULL;
-	        }
-	        if (data && SvOK(data)) {
-	            STRLEN len;
-	            const char* str = SvPV(data, len);
-	            list->head->data = (char*)malloc(len + 1);
-	            Copy(str, list->head->data, len, char);
-	            list->head->data[len] = '\0';
-	            list->head->data_len = len;
-	            if (SvNOK(data) || SvIOK(data)) {
-	                list->head->is_number = 1;
-	                list->head->num_value = SvNV(data);
-	            } else {
-	                list->head->is_number = 0;
-	            }
-	        }
-	        list->length = 1;
+	        /* Empty list - delegate to _list_add for proper ref handling */
+	        SHARED_UNLOCK();
+	        _list_add(aTHX_ id, data);
+	        return;
 	    } else {
-	        /* Find the position */
+	        /* Find the position (navigate pos steps from head) */
 	        node = list->head;
 	        for (i = 0; i < pos && node->next; i++) {
 	            node = node->next;
@@ -1045,62 +1339,19 @@ static void _list_insert_at_pos(pTHX_ int id, int pos, SV* data) {
 	        
 	        new_node = _new_node(aTHX_ data);
 	        
-	        /* Insert before node */
-	        if (node->prev) {
-	            node->prev->next = new_node;
-	            new_node->prev = node->prev;
+	        /* Insert AFTER node (like Pointer's _insert_after) */
+	        new_node->next = node->next;
+	        new_node->prev = node;
+	        if (node->next) {
+	            node->next->prev = new_node;
 	        } else {
-	            list->head = new_node;
+	            list->tail = new_node;
 	        }
-	        new_node->next = node;
-	        node->prev = new_node;
+	        node->next = new_node;
 	        list->length++;
 	    }
 	}
 	SHARED_UNLOCK();
-}
-
-/* Get node position for find - returns position or -1 if not found
- * Note: This moves current position to start, caller should save/restore if needed */
-static int _list_get_node_position(int id, DoublyNode* target) {
-	DoublyList* list;
-	DoublyNode* node;
-	int pos = 0;
-	
-	list = _get_list(id);
-	if (!list || list->destroyed || !target) {
-	    return -1;
-	}
-	
-	node = list->head;
-	while (node) {
-	    if (node == target) {
-	        return pos;
-	    }
-	    node = node->next;
-	    pos++;
-	}
-	return -1;
-}
-
-/* Set current to node at position */
-static void _list_set_current_pos(int id, int pos) {
-	DoublyList* list;
-	DoublyNode* node;
-	int i;
-	
-	list = _get_list(id);
-	if (!list || list->destroyed) {
-	    return;
-	}
-	
-	node = list->head;
-	for (i = 0; i < pos && node && node->next; i++) {
-	    node = node->next;
-	}
-	if (node) {
-	    list->current = node;
-	}
 }
 
 /* Destroy list */
@@ -1108,12 +1359,12 @@ static void _list_destroy(pTHX_ int id) {
 	DoublyList* list;
 	DoublyNode* node;
 	DoublyNode* next;
-	
+
 	SHARED_LOCK();
 	list = _get_list(id);
 	if (list && !list->destroyed) {
 	    list->destroyed = 1;
-	    
+
 	    /* Free all nodes */
 	    node = list->head;
 	    while (node) {
@@ -1121,10 +1372,9 @@ static void _list_destroy(pTHX_ int id) {
 	        _free_node(aTHX_ node);
 	        node = next;
 	    }
-	    
+
 	    list->head = NULL;
 	    list->tail = NULL;
-	    list->current = NULL;
 	    list->length = 0;
 	}
 	SHARED_UNLOCK();
@@ -1144,22 +1394,24 @@ new(pkg, ...)
 	    int id;
 	    HV* self;
 	    SV* data;
+	    long node_id;
 #ifdef USE_ITHREADS
 	    UV owner_tid;
 #endif
 	CODE:
 	    data = (items > 1) ? ST(1) : &PL_sv_undef;
-	    
+
 	    id = _new_list(aTHX_ data);
-	    
+	    node_id = _list_head_node_id(id);
+
 	    self = newHV();
 	    hv_store(self, "_id", 3, newSViv(id), 0);
+	    hv_store(self, "_node_id", 8, newSViv(node_id), 0);  /* Node ID stored per-object */
 #ifdef USE_ITHREADS
-	    /* Get current thread ID for ownership tracking */
 	    owner_tid = PTR2UV(PERL_GET_THX);
-	    hv_store(self, "_owner_tid", 10, newSVuv(owner_tid), 0);  /* Track owner thread */
+	    hv_store(self, "_owner_tid", 10, newSVuv(owner_tid), 0);
 #endif
-	    
+
 	    RETVAL = sv_bless(newRV_noinc((SV*)self), gv_stashpv("Doubly", GV_ADD));
 	OUTPUT:
 	    RETVAL
@@ -1181,61 +1433,169 @@ data(self, ...)
 	CODE:
 	    HV* hash = (HV*)SvRV(self);
 	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
+	    SV** node_id_sv = hv_fetch(hash, "_node_id", 8, 0);
 	    int id = id_sv ? SvIV(*id_sv) : -1;
-	    
+	    long node_id = node_id_sv ? SvIV(*node_id_sv) : 0;
+
 	    if (items > 1) {
-	        _list_set_data(aTHX_ id, ST(1));
+	        _list_set_data_by_node_id(aTHX_ id, node_id, ST(1));
 	    }
-	    
-	    RETVAL = _list_data(aTHX_ id);
+
+	    RETVAL = _list_data_by_node_id(aTHX_ id, node_id);
 	OUTPUT:
 	    RETVAL
 
 SV*
 start(self)
 	SV* self
+	PREINIT:
+	    HV* hash;
+	    HV* new_hash;
+	    SV** id_sv;
+	    int id;
+	    long node_id;
+#ifdef USE_ITHREADS
+	    SV** owner_tid_sv;
+#endif
 	CODE:
-	    HV* hash = (HV*)SvRV(self);
-	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
-	    int id = id_sv ? SvIV(*id_sv) : -1;
-	    _list_start(id);
-	    RETVAL = newSVsv(self);
+	    hash = (HV*)SvRV(self);
+	    id_sv = hv_fetch(hash, "_id", 3, 0);
+	    id = id_sv ? SvIV(*id_sv) : -1;
+	    node_id = _list_head_node_id(id);
+
+	    /* Create new object with head node_id */
+	    new_hash = newHV();
+	    hv_store(new_hash, "_id", 3, newSViv(id), 0);
+	    hv_store(new_hash, "_node_id", 8, newSViv(node_id), 0);
+#ifdef USE_ITHREADS
+	    owner_tid_sv = hv_fetch(hash, "_owner_tid", 10, 0);
+	    if (owner_tid_sv) {
+	        hv_store(new_hash, "_owner_tid", 10, newSVsv(*owner_tid_sv), 0);
+	    }
+#endif
+	    _incref(id);
+
+	    RETVAL = sv_bless(newRV_noinc((SV*)new_hash), gv_stashpv("Doubly", GV_ADD));
 	OUTPUT:
 	    RETVAL
 
 SV*
 end(self)
 	SV* self
+	PREINIT:
+	    HV* hash;
+	    HV* new_hash;
+	    SV** id_sv;
+	    int id;
+	    long node_id;
+#ifdef USE_ITHREADS
+	    SV** owner_tid_sv;
+#endif
 	CODE:
-	    HV* hash = (HV*)SvRV(self);
-	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
-	    int id = id_sv ? SvIV(*id_sv) : -1;
-	    _list_end(id);
-	    RETVAL = newSVsv(self);
+	    hash = (HV*)SvRV(self);
+	    id_sv = hv_fetch(hash, "_id", 3, 0);
+	    id = id_sv ? SvIV(*id_sv) : -1;
+	    node_id = _list_tail_node_id(id);
+
+	    /* Create new object with tail node_id */
+	    new_hash = newHV();
+	    hv_store(new_hash, "_id", 3, newSViv(id), 0);
+	    hv_store(new_hash, "_node_id", 8, newSViv(node_id), 0);
+#ifdef USE_ITHREADS
+	    owner_tid_sv = hv_fetch(hash, "_owner_tid", 10, 0);
+	    if (owner_tid_sv) {
+	        hv_store(new_hash, "_owner_tid", 10, newSVsv(*owner_tid_sv), 0);
+	    }
+#endif
+	    _incref(id);
+
+	    RETVAL = sv_bless(newRV_noinc((SV*)new_hash), gv_stashpv("Doubly", GV_ADD));
 	OUTPUT:
 	    RETVAL
 
 SV*
 next(self)
 	SV* self
+	PREINIT:
+	    HV* hash;
+	    HV* new_hash;
+	    SV** id_sv;
+	    SV** node_id_sv;
+	    int id;
+	    long node_id;
+	    long next_node_id;
+#ifdef USE_ITHREADS
+	    SV** owner_tid_sv;
+#endif
 	CODE:
-	    HV* hash = (HV*)SvRV(self);
-	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
-	    int id = id_sv ? SvIV(*id_sv) : -1;
-	    _list_next(id);
-	    RETVAL = newSVsv(self);
+	    hash = (HV*)SvRV(self);
+	    id_sv = hv_fetch(hash, "_id", 3, 0);
+	    node_id_sv = hv_fetch(hash, "_node_id", 8, 0);
+	    id = id_sv ? SvIV(*id_sv) : -1;
+	    node_id = node_id_sv ? SvIV(*node_id_sv) : 0;
+	    next_node_id = _list_next_node_id(id, node_id);
+
+	    /* Return undef if no next node */
+	    if (next_node_id == 0) {
+	        RETVAL = &PL_sv_undef;
+	    } else {
+	        /* Create new object with next node_id */
+	        new_hash = newHV();
+	        hv_store(new_hash, "_id", 3, newSViv(id), 0);
+	        hv_store(new_hash, "_node_id", 8, newSViv(next_node_id), 0);
+#ifdef USE_ITHREADS
+	        owner_tid_sv = hv_fetch(hash, "_owner_tid", 10, 0);
+	        if (owner_tid_sv) {
+	            hv_store(new_hash, "_owner_tid", 10, newSVsv(*owner_tid_sv), 0);
+	        }
+#endif
+	        _incref(id);
+
+	        RETVAL = sv_bless(newRV_noinc((SV*)new_hash), gv_stashpv("Doubly", GV_ADD));
+	    }
 	OUTPUT:
 	    RETVAL
 
 SV*
 prev(self)
 	SV* self
+	PREINIT:
+	    HV* hash;
+	    HV* new_hash;
+	    SV** id_sv;
+	    SV** node_id_sv;
+	    int id;
+	    long node_id;
+	    long prev_node_id;
+#ifdef USE_ITHREADS
+	    SV** owner_tid_sv;
+#endif
 	CODE:
-	    HV* hash = (HV*)SvRV(self);
-	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
-	    int id = id_sv ? SvIV(*id_sv) : -1;
-	    _list_prev(id);
-	    RETVAL = newSVsv(self);
+	    hash = (HV*)SvRV(self);
+	    id_sv = hv_fetch(hash, "_id", 3, 0);
+	    node_id_sv = hv_fetch(hash, "_node_id", 8, 0);
+	    id = id_sv ? SvIV(*id_sv) : -1;
+	    node_id = node_id_sv ? SvIV(*node_id_sv) : 0;
+	    prev_node_id = _list_prev_node_id(id, node_id);
+
+	    /* Return undef if no prev node (at start) */
+	    if (prev_node_id == 0) {
+	        RETVAL = &PL_sv_undef;
+	    } else {
+	        /* Create new object with prev node_id */
+	        new_hash = newHV();
+	        hv_store(new_hash, "_id", 3, newSViv(id), 0);
+	        hv_store(new_hash, "_node_id", 8, newSViv(prev_node_id), 0);
+#ifdef USE_ITHREADS
+	        owner_tid_sv = hv_fetch(hash, "_owner_tid", 10, 0);
+	        if (owner_tid_sv) {
+	            hv_store(new_hash, "_owner_tid", 10, newSVsv(*owner_tid_sv), 0);
+	        }
+#endif
+	        _incref(id);
+
+	        RETVAL = sv_bless(newRV_noinc((SV*)new_hash), gv_stashpv("Doubly", GV_ADD));
+	    }
 	OUTPUT:
 	    RETVAL
 
@@ -1245,8 +1605,10 @@ is_start(self)
 	CODE:
 	    HV* hash = (HV*)SvRV(self);
 	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
+	    SV** node_id_sv = hv_fetch(hash, "_node_id", 8, 0);
 	    int id = id_sv ? SvIV(*id_sv) : -1;
-	    RETVAL = _list_is_start(id);
+	    long node_id = node_id_sv ? SvIV(*node_id_sv) : 0;
+	    RETVAL = _list_is_start_node(id, node_id);
 	OUTPUT:
 	    RETVAL
 
@@ -1256,8 +1618,10 @@ is_end(self)
 	CODE:
 	    HV* hash = (HV*)SvRV(self);
 	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
+	    SV** node_id_sv = hv_fetch(hash, "_node_id", 8, 0);
 	    int id = id_sv ? SvIV(*id_sv) : -1;
-	    RETVAL = _list_is_end(id);
+	    long node_id = node_id_sv ? SvIV(*node_id_sv) : 0;
+	    RETVAL = _list_is_end_node(id, node_id);
 	OUTPUT:
 	    RETVAL
 
@@ -1265,11 +1629,23 @@ SV*
 add(self, data)
 	SV* self
 	SV* data
+	PREINIT:
+	    HV* hash;
+	    SV** id_sv;
+	    SV** node_id_sv;
+	    int id;
+	    long node_id;
 	CODE:
-	    HV* hash = (HV*)SvRV(self);
-	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
-	    int id = id_sv ? SvIV(*id_sv) : -1;
+	    hash = (HV*)SvRV(self);
+	    id_sv = hv_fetch(hash, "_id", 3, 0);
+	    node_id_sv = hv_fetch(hash, "_node_id", 8, 0);
+	    id = id_sv ? SvIV(*id_sv) : -1;
+	    node_id = node_id_sv ? SvIV(*node_id_sv) : 0;
 	    _list_add(aTHX_ id, data);
+	    /* If current node_id is 0 (invalid/empty), update to tail */
+	    if (node_id == 0) {
+	        hv_store(hash, "_node_id", 8, newSViv(_list_tail_node_id(id)), 0);
+	    }
 	    RETVAL = newSVsv(self);
 	OUTPUT:
 	    RETVAL
@@ -1292,33 +1668,77 @@ bulk_add(self, ...)
 SV*
 remove_from_start(self)
 	SV* self
+	PREINIT:
+	    HV* hash;
+	    SV** id_sv;
+	    SV** node_id_sv;
+	    int id;
+	    long node_id;
+	    long old_head_id;
+	    long new_head_id;
 	CODE:
-	    HV* hash = (HV*)SvRV(self);
-	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
-	    int id = id_sv ? SvIV(*id_sv) : -1;
+	    hash = (HV*)SvRV(self);
+	    id_sv = hv_fetch(hash, "_id", 3, 0);
+	    node_id_sv = hv_fetch(hash, "_node_id", 8, 0);
+	    id = id_sv ? SvIV(*id_sv) : -1;
+	    node_id = node_id_sv ? SvIV(*node_id_sv) : 0;
+	    old_head_id = _list_head_node_id(id);
 	    RETVAL = _list_remove_from_start(aTHX_ id);
+	    /* If we were pointing to the old head, update to new head */
+	    if (node_id == old_head_id) {
+	        new_head_id = _list_head_node_id(id);
+	        hv_store(hash, "_node_id", 8, newSViv(new_head_id), 0);
+	    }
 	OUTPUT:
 	    RETVAL
 
 SV*
 remove_from_end(self)
 	SV* self
+	PREINIT:
+	    HV* hash;
+	    SV** id_sv;
+	    SV** node_id_sv;
+	    int id;
+	    long node_id;
+	    long old_tail_id;
+	    long new_tail_id;
 	CODE:
-	    HV* hash = (HV*)SvRV(self);
-	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
-	    int id = id_sv ? SvIV(*id_sv) : -1;
+	    hash = (HV*)SvRV(self);
+	    id_sv = hv_fetch(hash, "_id", 3, 0);
+	    node_id_sv = hv_fetch(hash, "_node_id", 8, 0);
+	    id = id_sv ? SvIV(*id_sv) : -1;
+	    node_id = node_id_sv ? SvIV(*node_id_sv) : 0;
+	    old_tail_id = _list_tail_node_id(id);
 	    RETVAL = _list_remove_from_end(aTHX_ id);
+	    /* If we were pointing to the old tail, update to new tail */
+	    if (node_id == old_tail_id) {
+	        new_tail_id = _list_tail_node_id(id);
+	        hv_store(hash, "_node_id", 8, newSViv(new_tail_id), 0);
+	    }
 	OUTPUT:
 	    RETVAL
 
 SV*
 remove(self)
 	SV* self
+	PREINIT:
+	    HV* hash;
+	    SV** id_sv;
+	    SV** node_id_sv;
+	    int id;
+	    long node_id;
+	    RemoveResult result;
 	CODE:
-	    HV* hash = (HV*)SvRV(self);
-	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
-	    int id = id_sv ? SvIV(*id_sv) : -1;
-	    RETVAL = _list_remove(aTHX_ id);
+	    hash = (HV*)SvRV(self);
+	    id_sv = hv_fetch(hash, "_id", 3, 0);
+	    node_id_sv = hv_fetch(hash, "_node_id", 8, 0);
+	    id = id_sv ? SvIV(*id_sv) : -1;
+	    node_id = node_id_sv ? SvIV(*node_id_sv) : 0;
+	    result = _list_remove_by_node_id_ex(aTHX_ id, node_id);
+	    /* Update _node_id to next node */
+	    hv_store(hash, "_node_id", 8, newSViv(result.next_node_id), 0);
+	    RETVAL = result.data;
 	OUTPUT:
 	    RETVAL
 
@@ -1330,7 +1750,7 @@ remove_from_pos(self, pos)
 	    HV* hash = (HV*)SvRV(self);
 	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
 	    int id = id_sv ? SvIV(*id_sv) : -1;
-	    RETVAL = _list_remove_from_pos(aTHX_ id, pos);
+	    RETVAL = _list_remove_at_pos(aTHX_ id, pos);
 	OUTPUT:
 	    RETVAL
 
@@ -1338,12 +1758,37 @@ SV*
 insert_before(self, data)
 	SV* self
 	SV* data
+	PREINIT:
+	    HV* hash;
+	    HV* new_hash;
+	    SV** id_sv;
+	    SV** node_id_sv;
+	    int id;
+	    long node_id;
+	    long new_node_id;
+#ifdef USE_ITHREADS
+	    SV** owner_tid_sv;
+#endif
 	CODE:
-	    HV* hash = (HV*)SvRV(self);
-	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
-	    int id = id_sv ? SvIV(*id_sv) : -1;
-	    _list_insert_before(aTHX_ id, data);
-	    RETVAL = newSVsv(self);
+	    hash = (HV*)SvRV(self);
+	    id_sv = hv_fetch(hash, "_id", 3, 0);
+	    node_id_sv = hv_fetch(hash, "_node_id", 8, 0);
+	    id = id_sv ? SvIV(*id_sv) : -1;
+	    node_id = node_id_sv ? SvIV(*node_id_sv) : 0;
+	    new_node_id = _list_insert_before_node_id(aTHX_ id, node_id, data);
+
+	    /* Return new object pointing to newly inserted node */
+	    new_hash = newHV();
+	    hv_store(new_hash, "_id", 3, newSViv(id), 0);
+	    hv_store(new_hash, "_node_id", 8, newSViv(new_node_id), 0);
+#ifdef USE_ITHREADS
+	    owner_tid_sv = hv_fetch(hash, "_owner_tid", 10, 0);
+	    if (owner_tid_sv) {
+	        hv_store(new_hash, "_owner_tid", 10, newSVsv(*owner_tid_sv), 0);
+	    }
+#endif
+	    _incref(id);
+	    RETVAL = sv_bless(newRV_noinc((SV*)new_hash), gv_stashpv("Doubly", GV_ADD));
 	OUTPUT:
 	    RETVAL
 
@@ -1351,12 +1796,37 @@ SV*
 insert_after(self, data)
 	SV* self
 	SV* data
+	PREINIT:
+	    HV* hash;
+	    HV* new_hash;
+	    SV** id_sv;
+	    SV** node_id_sv;
+	    int id;
+	    long node_id;
+	    long new_node_id;
+#ifdef USE_ITHREADS
+	    SV** owner_tid_sv;
+#endif
 	CODE:
-	    HV* hash = (HV*)SvRV(self);
-	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
-	    int id = id_sv ? SvIV(*id_sv) : -1;
-	    _list_insert_after(aTHX_ id, data);
-	    RETVAL = newSVsv(self);
+	    hash = (HV*)SvRV(self);
+	    id_sv = hv_fetch(hash, "_id", 3, 0);
+	    node_id_sv = hv_fetch(hash, "_node_id", 8, 0);
+	    id = id_sv ? SvIV(*id_sv) : -1;
+	    node_id = node_id_sv ? SvIV(*node_id_sv) : 0;
+	    new_node_id = _list_insert_after_node_id(aTHX_ id, node_id, data);
+
+	    /* Return new object pointing to newly inserted node */
+	    new_hash = newHV();
+	    hv_store(new_hash, "_id", 3, newSViv(id), 0);
+	    hv_store(new_hash, "_node_id", 8, newSViv(new_node_id), 0);
+#ifdef USE_ITHREADS
+	    owner_tid_sv = hv_fetch(hash, "_owner_tid", 10, 0);
+	    if (owner_tid_sv) {
+	        hv_store(new_hash, "_owner_tid", 10, newSVsv(*owner_tid_sv), 0);
+	    }
+#endif
+	    _incref(id);
+	    RETVAL = sv_bless(newRV_noinc((SV*)new_hash), gv_stashpv("Doubly", GV_ADD));
 	OUTPUT:
 	    RETVAL
 
@@ -1364,12 +1834,34 @@ SV*
 insert_at_start(self, data)
 	SV* self
 	SV* data
+	PREINIT:
+	    HV* hash;
+	    HV* new_hash;
+	    SV** id_sv;
+	    int id;
+	    long new_node_id;
+#ifdef USE_ITHREADS
+	    SV** owner_tid_sv;
+#endif
 	CODE:
-	    HV* hash = (HV*)SvRV(self);
-	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
-	    int id = id_sv ? SvIV(*id_sv) : -1;
+	    hash = (HV*)SvRV(self);
+	    id_sv = hv_fetch(hash, "_id", 3, 0);
+	    id = id_sv ? SvIV(*id_sv) : -1;
 	    _list_insert_at_start(aTHX_ id, data);
-	    RETVAL = newSVsv(self);
+	    new_node_id = _list_head_node_id(id);
+
+	    /* Return new object pointing to new start */
+	    new_hash = newHV();
+	    hv_store(new_hash, "_id", 3, newSViv(id), 0);
+	    hv_store(new_hash, "_node_id", 8, newSViv(new_node_id), 0);
+#ifdef USE_ITHREADS
+	    owner_tid_sv = hv_fetch(hash, "_owner_tid", 10, 0);
+	    if (owner_tid_sv) {
+	        hv_store(new_hash, "_owner_tid", 10, newSVsv(*owner_tid_sv), 0);
+	    }
+#endif
+	    _incref(id);
+	    RETVAL = sv_bless(newRV_noinc((SV*)new_hash), gv_stashpv("Doubly", GV_ADD));
 	OUTPUT:
 	    RETVAL
 
@@ -1377,12 +1869,34 @@ SV*
 insert_at_end(self, data)
 	SV* self
 	SV* data
+	PREINIT:
+	    HV* hash;
+	    HV* new_hash;
+	    SV** id_sv;
+	    int id;
+	    long new_node_id;
+#ifdef USE_ITHREADS
+	    SV** owner_tid_sv;
+#endif
 	CODE:
-	    HV* hash = (HV*)SvRV(self);
-	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
-	    int id = id_sv ? SvIV(*id_sv) : -1;
+	    hash = (HV*)SvRV(self);
+	    id_sv = hv_fetch(hash, "_id", 3, 0);
+	    id = id_sv ? SvIV(*id_sv) : -1;
 	    _list_insert_at_end(aTHX_ id, data);
-	    RETVAL = newSVsv(self);
+	    new_node_id = _list_tail_node_id(id);
+
+	    /* Return new object pointing to new end */
+	    new_hash = newHV();
+	    hv_store(new_hash, "_id", 3, newSViv(id), 0);
+	    hv_store(new_hash, "_node_id", 8, newSViv(new_node_id), 0);
+#ifdef USE_ITHREADS
+	    owner_tid_sv = hv_fetch(hash, "_owner_tid", 10, 0);
+	    if (owner_tid_sv) {
+	        hv_store(new_hash, "_owner_tid", 10, newSVsv(*owner_tid_sv), 0);
+	    }
+#endif
+	    _incref(id);
+	    RETVAL = sv_bless(newRV_noinc((SV*)new_hash), gv_stashpv("Doubly", GV_ADD));
 	OUTPUT:
 	    RETVAL
 
@@ -1391,12 +1905,47 @@ insert_at_pos(self, pos, data)
 	SV* self
 	int pos
 	SV* data
+	PREINIT:
+	    HV* hash;
+	    HV* new_hash;
+	    SV** id_sv;
+	    int id;
+	    DoublyList* list;
+	    DoublyNode* node;
+	    long new_node_id;
+#ifdef USE_ITHREADS
+	    SV** owner_tid_sv;
+#endif
 	CODE:
-	    HV* hash = (HV*)SvRV(self);
-	    SV** id_sv = hv_fetch(hash, "_id", 3, 0);
-	    int id = id_sv ? SvIV(*id_sv) : -1;
+	    hash = (HV*)SvRV(self);
+	    id_sv = hv_fetch(hash, "_id", 3, 0);
+	    id = id_sv ? SvIV(*id_sv) : -1;
 	    _list_insert_at_pos(aTHX_ id, pos, data);
-	    RETVAL = newSVsv(self);
+	    
+	    /* Get the node_id of the inserted node (at pos+1 since insert_at_pos inserts after) */
+	    SHARED_LOCK();
+	    list = _get_list(id);
+	    new_node_id = 0;
+	    if (list && !list->destroyed) {
+	        node = _get_node_at_pos(list, pos + 1);
+	        if (node) {
+	            new_node_id = node->node_id;
+	        }
+	    }
+	    SHARED_UNLOCK();
+
+	    /* Return new object pointing to inserted node */
+	    new_hash = newHV();
+	    hv_store(new_hash, "_id", 3, newSViv(id), 0);
+	    hv_store(new_hash, "_node_id", 8, newSViv(new_node_id), 0);
+#ifdef USE_ITHREADS
+	    owner_tid_sv = hv_fetch(hash, "_owner_tid", 10, 0);
+	    if (owner_tid_sv) {
+	        hv_store(new_hash, "_owner_tid", 10, newSVsv(*owner_tid_sv), 0);
+	    }
+#endif
+	    _incref(id);
+	    RETVAL = sv_bless(newRV_noinc((SV*)new_hash), gv_stashpv("Doubly", GV_ADD));
 	OUTPUT:
 	    RETVAL
 
@@ -1406,36 +1955,36 @@ find(self, cb)
 	SV* cb
 	PREINIT:
 	    HV* hash;
+	    HV* new_hash;
 	    SV** id_sv;
 	    int id;
 	    DoublyList* list;
 	    DoublyNode* node;
 	    SV* node_data;
 	    int found;
-	    int pos;
-	    int current_pos;
+	    long found_node_id;
+#ifdef USE_ITHREADS
+	    SV** owner_tid_sv;
+#endif
 	CODE:
 	    hash = (HV*)SvRV(self);
 	    id_sv = hv_fetch(hash, "_id", 3, 0);
 	    id = id_sv ? SvIV(*id_sv) : -1;
-	    
+
 	    found = 0;
-	    pos = 0;
-	    current_pos = 0;
-	    
+	    found_node_id = 0;
+
 	    /* Iterate through list, calling callback for each node */
 	    SHARED_LOCK();
 	    list = _get_list(id);
 	    if (list && !list->destroyed && list->length > 0) {
 	        node = list->head;
 	        while (node && !found) {
-	            /* Get node data as SV */
+	            long current_node_id = node->node_id;
 	            node_data = _node_to_sv(aTHX_ node);
-	            
-	            /* Release lock before calling Perl */
+
 	            SHARED_UNLOCK();
-	            
-	            /* Call the callback - simpler approach matching Less.xs */
+
 	            {
 	                dSP;
 	                PUSHMARK(SP);
@@ -1445,33 +1994,37 @@ find(self, cb)
 	                SPAGAIN;
 	                if (SvTRUE(*PL_stack_sp)) {
 	                    found = 1;
-	                    current_pos = pos;
+	                    found_node_id = current_node_id;
 	                }
 	                POPs;
 	            }
-	            
-	            /* Re-acquire lock */
+
 	            SHARED_LOCK();
 	            list = _get_list(id);
 	            if (!list || list->destroyed) {
 	                break;
 	            }
-	            
+
 	            if (!found) {
 	                node = node->next;
-	                pos++;
 	            }
-	        }
-	        
-	        /* If found, set current to that position */
-	        if (found && list && !list->destroyed) {
-	            _list_set_current_pos(id, current_pos);
 	        }
 	    }
 	    SHARED_UNLOCK();
-	    
+
 	    if (found) {
-	        RETVAL = newSVsv(self);
+	        /* Create new object with found node_id */
+	        new_hash = newHV();
+	        hv_store(new_hash, "_id", 3, newSViv(id), 0);
+	        hv_store(new_hash, "_node_id", 8, newSViv(found_node_id), 0);
+#ifdef USE_ITHREADS
+	        owner_tid_sv = hv_fetch(hash, "_owner_tid", 10, 0);
+	        if (owner_tid_sv) {
+	            hv_store(new_hash, "_owner_tid", 10, newSVsv(*owner_tid_sv), 0);
+	        }
+#endif
+	        _incref(id);
+	        RETVAL = sv_bless(newRV_noinc((SV*)new_hash), gv_stashpv("Doubly", GV_ADD));
 	    } else {
 	        RETVAL = &PL_sv_undef;
 	    }

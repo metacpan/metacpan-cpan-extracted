@@ -23,6 +23,7 @@
          "requires" : {
             "Future" : "0",
             "Future::IO::ImplBase" : "0.17",
+            "Struct::Dumb" : "0",
             "UV" : "1.900",
             "perl" : "5.020"
          }
@@ -30,14 +31,14 @@
       "test" : {
          "requires" : {
             "Test2::V0" : "0",
-            "Test::Future::IO::Impl" : "0.15"
+            "Test::Future::IO::Impl" : "0.17"
          }
       }
    },
    "provides" : {
       "Future::IO::Impl::UV" : {
          "file" : "lib/Future/IO/Impl/UV.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -46,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

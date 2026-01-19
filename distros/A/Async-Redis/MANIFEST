@@ -78,9 +78,13 @@ t/50-pubsub/psubscribe.t
 t/50-pubsub/subscribe.t
 t/50-pubsub/unsubscribe.t
 t/60-scripting/auto-fallback.t
+t/60-scripting/define-command.t
 t/60-scripting/eval.t
 t/60-scripting/evalsha.t
+t/60-scripting/pagi-channels.t
+t/60-scripting/pipeline-scripts.t
 t/60-scripting/script-object.t
+t/60-scripting/script-registry.t
 t/70-blocking/blmove.t
 t/70-blocking/blpop.t
 t/70-blocking/brpop.t

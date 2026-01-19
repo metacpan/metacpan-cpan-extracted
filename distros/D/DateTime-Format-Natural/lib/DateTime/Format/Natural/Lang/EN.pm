@@ -14,7 +14,7 @@ use constant milli_to_nano => 1_000_000;
 
 use DateTime::Format::Natural::Helpers qw(%flag);
 
-our $VERSION = '1.73';
+our $VERSION = '1.74';
 
 our (%init,
      %timespan,
@@ -5146,6 +5146,12 @@ also parsable with precision in (milli)seconds):
  +2d
  20111018000000
  2016-06-19T12:12:11
+ 2016-06-19T12:12:11Z
+ 2016-06-19T12:12:11-05
+ 2016-06-19T12:12:11-0500
+ 2016-06-19T12:12:11-05:00
+ 2016-06-19T12:12:11+05:00
+ 2016-06-19T12:12+05:00
 
 =head2 Aliases
 

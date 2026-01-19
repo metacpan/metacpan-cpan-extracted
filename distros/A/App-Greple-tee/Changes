@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-tee
 
+1.0401 2026-01-19T01:07:38Z
+
+    - Skip tests when optional modules (App::ansifold, App::ansicolumn) are not installed
+
 1.04 2026-01-18T02:30:38Z
 
     - Migrate from App::cdif::Command to Command::Run

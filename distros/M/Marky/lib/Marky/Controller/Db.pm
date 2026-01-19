@@ -1,5 +1,5 @@
 package Marky::Controller::Db;
-$Marky::Controller::Db::VERSION = '0.035';
+$Marky::Controller::Db::VERSION = '0.0602';
 #ABSTRACT: Marky::Controller::Db - Database controller for Marky
 
 use Mojo::Base 'Mojolicious::Controller';
@@ -7,12 +7,6 @@ use Mojo::Base 'Mojolicious::Controller';
 sub tables {
     my $c  = shift;
     $c->render(template=>'tables');
-}
-
-sub options {
-    my $c  = shift;
-    $c->marky_set_options();
-    $c->render(template => 'settings');
 }
 
 sub taglist {
@@ -61,7 +55,7 @@ Marky::Controller::Db - Marky::Controller::Db - Database controller for Marky
 
 =head1 VERSION
 
-version 0.035
+version 0.0602
 
 =head1 SYNOPSIS
 
@@ -74,10 +68,6 @@ Database controller for Marky
 =head2 tables
 
 Display the tables
-
-=head2 options
-
-For setting the options of the app.
 
 =head2 taglist
 
@@ -109,7 +99,7 @@ Marky::Controller::Db - Database controller for Marky
 
 =head1 VERSION
 
-version 0.035
+version 0.0602
 
 =head1 AUTHOR
 

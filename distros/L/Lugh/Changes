@@ -1,5 +1,30 @@
 Revision history for Lugh
 
+0.06    2026-01-18
+        Extended Model Support (Multi-Architecture) and Chat Template / Prompt Formatting
+        - Dynamic architecture detection from GGUF general.architecture
+        - Architecture-prefixed metadata keys (e.g., qwen2.context_length, phi3.context_length)
+        - New Lugh::Prompt module for chat template formatting with 9 built-in formats: chatml, llama2, llama3, mistral, gemma, zephyr, alpaca, vicuna, raw
+        - Automatic format detection from model architecture (17 architectures mapped)
+        - New Lugh::Model API methods:
+          - arch_type() - Get architecture type string
+          - arch_has_qkv_combined() - Check for combined QKV tensors
+          - arch_has_ffn_gate() - Check for gated FFN
+          - arch_has_post_norm() - Check for post-normalization
+          - arch_is_llama() / arch_is_qwen() / arch_is_phi() / etc.
+        - New Lugh::Prompt
+          - apply() method for formatting message arrays with options:
+            - add_generation_prompt - append assistant prompt for generation
+            - system_to_user - prepend system message to first user message
+          - Utility methods:
+            - format_name() - Get current format name
+            - format_message($role, $content) - Format single message
+            - available_formats() - List all format names
+            - format_for_architecture($arch) - Auto-detect format
+            - has_format($name) - Check format exists
+            - get_format($name) - Get format details as hashref
+        - New test files: t/10-multi-arch.t, t/11-prompt.t, t/12-prompt-integration.t
+
 0.05    2026-01-18
         Performance Optimizations
         - GPU backend activation
@@ -18,7 +43,7 @@ Revision history for Lugh
           - Lugh::MemoryPool class with reset() and backend() methods
         - Batch processing for multiple sequences:
           - forward_batch(\@sequences) - Process multiple token sequences
-        - New comprehensive performance test file t/09-performance.t
+        - New performance test file t/09-performance.t
         - Full documentation for new APIs Lugh/Lugh::Inference
 
 0.04    2026-01-18

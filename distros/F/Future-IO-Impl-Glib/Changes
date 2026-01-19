@@ -1,5 +1,9 @@
 Revision history for Future-IO-Impl-Glib
 
+0.03    2026-01-18
+        [CHANGES]
+         * Implement the new `->poll` method of Future::IO v0.19
+
 0.02    2021-08-24
         [CHANGES]
          * Implement the ->waitpid method

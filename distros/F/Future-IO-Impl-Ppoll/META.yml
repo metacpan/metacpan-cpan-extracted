@@ -4,7 +4,7 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   Test2::V0: '0'
-  Test::Future::IO::Impl: '0.15'
+  Test::Future::IO::Impl: '0.17'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -17,7 +17,7 @@ name: Future-IO-Impl-Ppoll
 provides:
   Future::IO::Impl::Ppoll:
     file: lib/Future/IO/Impl/Ppoll.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Future: '0'
   Future::IO::ImplBase: '0.17'
@@ -26,5 +26,5 @@ requires:
   perl: '5.020'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

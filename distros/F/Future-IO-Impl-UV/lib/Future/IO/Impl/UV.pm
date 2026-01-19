@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::Impl::UV 0.06;
+package Future::IO::Impl::UV 0.07;
 
 use v5.20;
 use warnings;
@@ -12,12 +12,16 @@ use base qw( Future::IO::ImplBase );
 use feature qw( postderef signatures );
 no warnings qw( experimental::postderef experimental::signatures );
 
+use Future::IO qw( POLLIN POLLOUT POLLHUP POLLERR );
+
 use UV;
 use UV::Poll;
 use UV::Timer;
 use UV::Signal;
 
 use POSIX ();
+
+use Struct::Dumb qw( readonly_struct );
 
 BEGIN {
    if( $^V ge v5.36 ) {
@@ -67,25 +71,33 @@ sub sleep ( $, $secs )
 # libuv doesn't like having more than one uv_poll_t instance per filehandle,
 # so we'll have to combine reads and writes
 
-my %read_futures_by_refaddr;  # {refaddr} => [@futures]
-my %write_futures_by_refaddr; # {refaddr} => [@futures]
-my %poll_by_refaddr;
+readonly_struct Poller => [qw( events f )];
+my %pollers_by_refaddr;
+my %uvpoll_by_refaddr;
 
 sub _update_poll ( $fh )
 {
    my $refaddr = refaddr $fh;
 
-   my $poll = $poll_by_refaddr{$refaddr} //=
+   my $poll = $uvpoll_by_refaddr{$refaddr} //=
       UV::Poll->new(
          fh => $fh,
          on_poll => sub ( $poll, $status, $events ) {
-            if( $status or $events & UV::Poll::UV_READABLE ) {
-               my $f = shift $read_futures_by_refaddr{$refaddr}->@*;
-               $f and $f->done;
-            }
-            if( $status or $events & UV::Poll::UV_WRITABLE ) {
-               my $f = shift $write_futures_by_refaddr{$refaddr}->@*;
-               $f and $f->done;
+            my $revents = 0;
+            $revents |= POLLIN  if $events & UV::Poll::UV_READABLE;
+            $revents |= POLLOUT if $events & UV::Poll::UV_WRITABLE;
+            $revents |= POLLHUP if $events & UV::Poll::UV_DISCONNECT;
+            $revents |= POLLERR if $status;
+
+            my $pollers = $pollers_by_refaddr{$refaddr};
+            foreach my $idx ( 0 .. $#$pollers ) {
+               $pollers->[$idx]->events & $revents or $revents & (POLLHUP|POLLERR) or
+                  next;
+
+               my ( $p ) = splice @$pollers, $idx, 1, ();
+
+               $p and $p->f and $p->f->done( $revents );
+               last;
             }
 
             _update_poll( $fh );
@@ -93,51 +105,29 @@ sub _update_poll ( $fh )
       );
 
    my $want = 0;
-   $want |= UV::Poll::UV_READABLE if scalar ( $read_futures_by_refaddr{$refaddr}  // [] )->@*;
-   $want |= UV::Poll::UV_WRITABLE if scalar ( $write_futures_by_refaddr{$refaddr} // [] )->@*;
+   foreach my $poller ( $pollers_by_refaddr{$refaddr}->@* ) {
+      $want |= UV::Poll::UV_READABLE   if $poller->events & POLLIN;
+      $want |= UV::Poll::UV_WRITABLE   if $poller->events & POLLOUT;
+      $want |= UV::Poll::UV_DISCONNECT if $poller->events & POLLHUP;
+   }
 
    if( $want ) {
       $poll->start( $want );
    }
    else {
       $poll->stop;
-      delete $poll_by_refaddr{$refaddr};
-      delete $read_futures_by_refaddr{$refaddr};
-      delete $write_futures_by_refaddr{$refaddr};
+      delete $uvpoll_by_refaddr{$refaddr};
+      delete $pollers_by_refaddr{$refaddr};
    }
 }
 
-sub ready_for_read ( $, $fh )
+sub poll ( $, $fh, $events )
 {
    my $refaddr = refaddr $fh;
 
-   my $futures = $read_futures_by_refaddr{$refaddr} //= [];
-
    my $f = Future::IO::Impl::UV::_Future->new;
 
-   my $was = scalar @$futures;
-   push @$futures, $f;
-
-   return $f if $was;
-
-   _update_poll( $fh );
-   return $f;
-}
-
-my %poll_write_by_refaddr;
-
-sub ready_for_write ( $, $fh )
-{
-   my $refaddr = refaddr $fh;
-
-   my $futures = $write_futures_by_refaddr{$refaddr} //= [];
-
-   my $f = Future::IO::Impl::UV::_Future->new;
-
-   my $was = scalar @$futures;
-   push @$futures, $f;
-
-   return $f if $was;
+   push $pollers_by_refaddr{$refaddr}->@*, Poller( $events, $f );
 
    _update_poll( $fh );
    return $f;

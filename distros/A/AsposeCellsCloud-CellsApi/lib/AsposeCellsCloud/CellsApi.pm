@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2025 Aspose.Cells Cloud
+Copyright (c) 2026 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -56,6 +56,43 @@ sub new {
 
     bless { api_client => $api_client }, $class;
 
+}
+
+#
+# DecomposeUserTaskRequest
+#
+# Translates the entire spreadsheet to the specified target language.
+# 
+# @TaskDescription  string (required)    
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DecomposeUserTaskRequest',
+            description => 'DecomposeUserTask Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'decompose_user_task' } = { 
+    	summary => 'Translates the entire spreadsheet to the specified target language.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub decompose_user_task{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
 }
 
 #
@@ -777,6 +814,85 @@ sub convert_worksheet_to_image{
 # @return string
 #
 sub convert_worksheet_to_pdf{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# ConvertWorksheetToHtmlRequest
+#
+# Converts a worksheet of spreadsheet on a local drive to the html file.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @worksheet  string (required)  worksheet name of spreadsheet.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ConvertWorksheetToHtmlRequest',
+            description => 'ConvertWorksheetToHtml Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'convert_worksheet_to_html' } = { 
+    	summary => 'Converts a worksheet of spreadsheet on a local drive to the html file.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub convert_worksheet_to_html{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# ConvertWorksheetToHtmlTableRequest
+#
+# 
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @worksheet  string (required)    
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ConvertWorksheetToHtmlTableRequest',
+            description => 'ConvertWorksheetToHtmlTable Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'convert_worksheet_to_html_table' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub convert_worksheet_to_html_table{
     my ($self, %args) = @_;
     my $request = $args{'request'};
     my $response = $request->run_http_request('client' => $self->{api_client} );
@@ -1640,6 +1756,140 @@ sub split_remote_spreadsheet{
 # @return string
 #
 sub import_data_into_spreadsheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# ImportJSONDataIntoSpreadsheetRequest
+#
+# 
+# 
+# @datafile  string (required)  Upload data file.  
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @worksheet  string (required)    
+# @startcell  string (required)    
+# @insert  boolean     
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ImportJSONDataIntoSpreadsheetRequest',
+            description => 'ImportJSONDataIntoSpreadsheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'import_json_data_into_spreadsheet' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub import_json_data_into_spreadsheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# ImportXMLDataIntoSpreadsheetRequest
+#
+# 
+# 
+# @datafile  string (required)  Upload data file.  
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @worksheet  string (required)    
+# @startcell  string (required)    
+# @insert  boolean     
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ImportXMLDataIntoSpreadsheetRequest',
+            description => 'ImportXMLDataIntoSpreadsheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'import_xml_data_into_spreadsheet' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub import_xml_data_into_spreadsheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# ImportCSVDataIntoSpreadsheetRequest
+#
+# 
+# 
+# @datafile  string (required)  Upload data file.  
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @worksheet  string (required)    
+# @startcell  string (required)    
+# @insert  boolean     
+# @convertNumericData  boolean     
+# @splitter  string     
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ImportCSVDataIntoSpreadsheetRequest',
+            description => 'ImportCSVDataIntoSpreadsheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'import_csv_data_into_spreadsheet' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub import_csv_data_into_spreadsheet{
     my ($self, %args) = @_;
     my $request = $args{'request'};
     my $response = $request->run_http_request('client' => $self->{api_client} );
@@ -2887,7 +3137,7 @@ sub remove_duplicate_substrings{
 # 
 # @Spreadsheet  string (required)  Upload spreadsheet file.  
 # @text  string (required)  Specify the added text content.  
-# @position  string (required)  Indicates the specific location for adding text content.None, AtTheBeginning, AtTheEnd, BeforeText, AfterText.    
+# @position  string (required)  Indicates the specific location for adding text content.None, AtTheBeginning, AtTheEnd, BeforeText, AfterText.  
 # @selectText  string   Indicates selecting the specific position to add text based on the content of the text.  
 # @skipEmptyCells  boolean   Indicates skip empty cells.  
 # @worksheet  string   Specify the worksheet of spreadsheet.  
@@ -3254,6 +3504,48 @@ sub remove_duplicates{
 # @return string
 #
 sub swap_range{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# FlipDataRequest
+#
+# 
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @worksheet  string (required)    
+# @cellArea  string (required)    
+# @Horizontal  boolean     
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'FlipDataRequest',
+            description => 'FlipData Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'flip_data' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub flip_data{
     my ($self, %args) = @_;
     my $request = $args{'request'};
     my $response = $request->run_http_request('client' => $self->{api_client} );

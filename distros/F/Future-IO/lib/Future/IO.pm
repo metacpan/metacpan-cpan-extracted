@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2025 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2026 -- leonerd@leonerd.org.uk
 
-package Future::IO 0.18;
+package Future::IO 0.19;
 
 use v5.14;
 use warnings;
@@ -19,6 +19,14 @@ our $IMPL;
 
 our $MAX_READLEN = 8192;
 our $MAX_WRITELEN = 8192;
+
+use IO::Poll qw( POLLIN POLLOUT POLLHUP POLLERR POLLNVAL );
+
+use Exporter 'import';
+BEGIN {
+   # This needs to happen at BEGIN time because stupid cyclic reasons
+   our @EXPORT_OK = qw( POLLIN POLLOUT POLLHUP POLLERR POLLNVAL );
+}
 
 =head1 NAME
 
@@ -82,6 +90,32 @@ mocking object, a unit test can check that the appropriate IO operations
 happen as part of the test.
 
 A testing module which does this is provided by L<Test::Future::IO>.
+
+=head2 Cancellation
+
+Any C<Future> returned by a C<Future::IO> method should support being
+cancelled by the L<Future/cancel> method. Doing so should not cause the
+program to break overall, nor will it upset the specific implementation being
+used.
+
+I<However>, the result of cancelling a future instance that performs some
+actual IO work is I<unspecified>. It may cause no work to be performed, or it
+may result in a partial (or even complete but as-yet unreported) IO operation
+to have already taken place. In particular, operations that write bytes to, or
+read bytes from filehandles may have already transferred some or all of those
+bytes before the future was cancelled, and there is now nothing that the
+program can do to "undo" those effects. In general it is likely that the only
+situation where you will cancel an IO operation on a filehandle is when an
+entire connection is being abandoned, filehandles closed, and so on.
+
+That said, it should be safe to cancel L</alarm> and L</sleep> futures, as
+each one will operate entirely independently, and not cause any change of
+state to any of the others. This typically allows you to wrap a "timeout"-like
+behaviour around any other sort of IO operation by using L<Future/needs_any>
+or similar. If the real IO operation was successful, the timeout can be safely
+cancelled. If the timeout happens, the IO operation will be cancelled, and at
+this point the application will have to discard the filehandle (or otherwise
+resynchronse in some application-specific manner).
 
 =cut
 
@@ -153,6 +187,50 @@ sub connect
    my ( $fh, $name ) = @_;
 
    return ( $IMPL //= "Future::IO::_DefaultImpl" )->connect( $fh, $name );
+}
+
+=head2 poll
+
+   $revents = await Future::IO->poll( $fh, $events );
+
+I<Since version 0.19.>
+
+Returns a L<Future> that will become done when the indicated IO operations
+can be performed on the given filehandle. I<$events> should be a bitfield of
+one or more of the POSIX C<POLL*> constants, such as C<POLLIN> or C<POLLOUT>.
+The result of the future will be a similar bitfield, indicating which
+operations may now take place. If the C<POLLHUP>, C<POLLERR> or C<POLLNVAL>
+events happen, they will always be reported; you do not need to request these
+specifically.
+
+Multiple outstanding futures may be enqueued for the same filehandle. When an
+event happens, only the first outstanding future that is interested in it is
+informed; the rest will remain pending for the next round of IO events, if the
+condition still prevails.
+
+Note that, as compared to the real C<poll(2)> system call, this method only
+operates on a single filehandle; all futures returned by it are independent
+and refer just to that one filehandle each.
+
+Also note that, in general, it is better to use one of the higher-level
+methods to perform whatver IO operation is required on the given filehandle.
+The C<poll> method is largely intended as a lowest-level fallback, for example
+if integrating with some other library or module that performs its own
+filehandle IO and just needs to be informed when such IO operations may be
+performed.
+
+For convenience, the C<POLL*> constants are exported by this module. They
+should be used in preference to the ones from C<IO::Poll>, in case a platform
+does not provide the latter module directly.
+
+=cut
+
+sub poll
+{
+   shift;
+   my ( $fh, $events ) = @_;
+
+   return ( $IMPL //= "Future::IO::_DefaultImpl" )->poll( $fh, $events );
 }
 
 =head2 read
@@ -611,8 +689,8 @@ sub load_best_impl
 
    # First, load a wrapper impl if the wrapped system is already loaded
    foreach ( @IMPLS_WRAPPER ) {
-      my ( $impl, $base ) = ref $_ ? @$_ : ( $_, $_ );
-      do { no strict 'refs'; %{"${base}::"} } or next;
+      my ( $impl, $package ) = ref $_ ? @$_ : ( $_, $_ );
+      eval { $package->VERSION(0) } or next;
 
       Future::IO->try_load_impl( $impl ) and return 1;
    }
@@ -652,6 +730,7 @@ package
 use base qw( Future::IO::ImplBase );
 use Carp;
 
+use IO::Poll qw( POLLIN POLLOUT );
 use Struct::Dumb qw( readonly_struct );
 use Time::HiRes qw( time );
 
@@ -674,48 +753,49 @@ sub sleep
    return $class->_done_at( time() + shift );
 }
 
-sub ready_for_read
+sub poll
 {
    my $class = shift;
-   my ( $fh ) = @_;
+   my ( $fh, $events ) = @_;
 
-   croak "This implementation can only cope with a single pending filehandle in ->syread"
-      if @readers and $readers[-1]->fh != $fh;
+   my $want_reader = $events & POLLIN;  $events &= ~POLLIN;
+   my $want_writer = $events & POLLOUT; $events &= ~POLLOUT;
 
-   my $f = Future::IO::_DefaultImpl::F->new;
-   push @readers, Reader( $fh, $f );
+   croak "This implementation can only recognise the POLLIN or POLLOUT flags"
+      if $events;
+   croak "This implementation cannot ->poll for POLLIN and POLLOUT at the same time"
+      if $want_reader and $want_writer;
 
-   $f->on_cancel( sub {
-      my $f = shift;
-
-      my $idx = 0;
-      $idx++ while $idx < @readers and $readers[$idx]->f != $f;
-
-      splice @readers, $idx, 1, ();
-   });
-
-   return $f;
-}
-
-sub ready_for_write
-{
-   my $class = shift;
-   my ( $fh ) = @_;
-
-   croak "This implementation can only cope with a single pending filehandle in ->write"
-      if @writers and $writers[-1]->fh != $fh;
+   croak "This implementation can only cope with a single pending filehandle in ->poll"
+      if @readers and $readers[-1]->fh != $fh or
+         @writers and $writers[-1]->fh != $fh;
 
    my $f = Future::IO::_DefaultImpl::F->new;
-   push @writers, Writer( $fh, $f );
 
-   $f->on_cancel( sub {
-      my $f = shift;
+   if( $want_reader ) {
+      push @readers, Reader( $fh, $f );
 
-      my $idx = 0;
-      $idx++ while $idx < @writers and $writers[$idx]->f != $f;
+      $f->on_cancel( sub {
+         my $f = shift;
 
-      splice @writers, $idx, 1, ();
-   });
+         my $idx = 0;
+         $idx++ while $idx < @readers and $readers[$idx]->f != $f;
+
+         splice @readers, $idx, 1, ();
+      });
+   }
+   if( $want_writer ) {
+      push @writers, Writer( $fh, $f );
+
+      $f->on_cancel( sub {
+         my $f = shift;
+
+         my $idx = 0;
+         $idx++ while $idx < @writers and $writers[$idx]->f != $f;
+
+         splice @writers, $idx, 1, ();
+      });
+   }
 
    return $f;
 }
@@ -753,6 +833,7 @@ sub _done_at
 package # hide
    Future::IO::_DefaultImpl::F;
 use base qw( Future );
+use IO::Poll qw( POLLIN POLLOUT );
 use Time::HiRes qw( time );
 
 sub _await_once
@@ -801,14 +882,14 @@ redo_select:
       my $rd = shift @readers;
 
       $was_blocking = $rd->fh->blocking(1) if !$do_select;
-      $rd->f->done;
+      $rd->f->done( POLLIN );
       $rd->fh->blocking(0) if !$do_select and !$was_blocking;
    }
    if( $wready ) {
       my $wr = shift @writers;
 
       $was_blocking = $wr->fh->blocking(1) if !$do_select;
-      $wr->f->done;
+      $wr->f->done( POLLOUT );
       $wr->fh->blocking(0) if !$do_select and !$was_blocking;
    }
 

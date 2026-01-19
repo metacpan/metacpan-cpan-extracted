@@ -11,7 +11,7 @@ mdee - Markdown, Easy on the Eyes
          --version          show version
      -d  --debug            debug level (repeatable)
      -n  --dryrun           dry-run mode
-     -f  --filter           filter mode (highlight only)
+     -f  --filter           filter mode (--no-fold --no-nup)
          --[no-]fold        line folding (default: on)
          --[no-]table       table formatting (default: on)
          --[no-]nup         nup paged output (default: on)
@@ -32,7 +32,7 @@ mdee - Markdown, Easy on the Eyes
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # DESCRIPTION
 
@@ -70,14 +70,14 @@ similar paged output (e.g., `nup glow README.md`).
 
     Dry-run mode. Show the command without executing.
 
+## Processing Options
+
 - **-f**, **--filter**
 
     Filter mode.  Reads from stdin (or files) and outputs highlighted
-    Markdown to stdout.  Disables line folding, table formatting, and
-    nup paged output.  Useful for piping Markdown content through mdee
-    for syntax highlighting only.
-
-## Processing Options
+    Markdown to stdout.  Disables line folding and nup paged output,
+    but keeps table formatting enabled.  Useful for piping Markdown
+    content through mdee for syntax highlighting.
 
 - **--\[no-\]fold**
 
@@ -235,6 +235,17 @@ bold text, etc.).
     mdee -B '<Red>' file.md              # override base color
     mdee --mode=dark -B '<Cyan>' file.md # dark mode with cyan base
     mdee --list-themes                   # list available themes
+
+# INSTALLATION
+
+## Homebrew (macOS)
+
+    brew tap tecolicom/tap
+    brew install app-mdee
+
+## CPAN
+
+    cpanm -n App::mdee
 
 # DEPENDENCIES
 

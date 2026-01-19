@@ -1,12 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2025 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::ImplBase 0.18;
+package Future::IO::ImplBase 0.19;
 
 use v5.14;
 use warnings;
+
+use Future::IO qw( POLLIN POLLOUT );
 
 use Errno qw( EAGAIN EWOULDBLOCK EINPROGRESS );
 use Socket qw( SOL_SOCKET SO_ERROR );
@@ -314,6 +316,46 @@ sub syswrite
 {
    my $self = shift;
    return $self->_syswrite1( undef, @_ );
+}
+
+=head1 LEGACY METHODS
+
+The following methods are not considered part of the official C<Future::IO>
+implementation API, and should not be relied upon when writing new code.
+However, existing code may still exist that uses them so for now they are
+provided as wrappers.
+
+=cut
+
+=head2 ready_for_read
+
+=head2 ready_for_write
+
+   $f = $class->ready_for_read( $fh );
+
+   $f = $class->ready_for_write( $fh );
+
+Implemented by wrapping C<poll> by passing in the C<POLLIN> or C<POLLOUT>
+flags respectively.
+
+=cut
+
+sub ready_for_read
+{
+   my $self = shift;
+   my ( $fh ) = @_;
+
+   return $self->poll( $fh, POLLIN );
+   # TODO: should we check the result before yielding?
+}
+
+sub ready_for_write
+{
+   my $self = shift;
+   my ( $fh ) = @_;
+
+   return $self->poll( $fh, POLLOUT );
+   # TODO: should we check the result before yielding?
 }
 
 =head1 AUTHOR

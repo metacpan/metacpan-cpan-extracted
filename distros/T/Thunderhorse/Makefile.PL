@@ -7,7 +7,7 @@ use 5.040;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "A no-compromises brutally-good web framework",
+  "ABSTRACT" => "A no-compromises, brutally-good web framework",
   "AUTHOR" => "Bartosz Jarzyna <bbrtj.pro\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V1" => 0
   },
-  "VERSION" => "0.101",
+  "VERSION" => "0.102",
   "test" => {
     "TESTS" => "t/*.t t/location/*.t t/module/*.t"
   }

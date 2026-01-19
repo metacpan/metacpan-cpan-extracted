@@ -1,5 +1,9 @@
 Revision history for Thunderhorse
 
+0.102 - 2026-01-18
+	[Fixes]
+	- Fix an error caused by setting up a cache for the router
+
 0.101 - 2026-01-17
 	[Documentation]
 	- Added Manual (table of contents)

@@ -66,7 +66,7 @@
    "provides" : {
       "App::Greple::tee" : {
          "file" : "lib/App/Greple/tee.pm",
-         "version" : "1.04"
+         "version" : "1.0401"
       },
       "App::Greple::tee::Autoload" : {
          "file" : "lib/App/Greple/tee/Autoload.pm"
@@ -84,7 +84,7 @@
          "web" : "https://github.com/kaz-utashiro/App-Greple-tee"
       }
    },
-   "version" : "1.04",
+   "version" : "1.0401",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
