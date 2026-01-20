@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -40,6 +41,7 @@ method: default
 method: exists
 method: get
 method: name
+method: new
 method: set
 method: unnamed
 
@@ -403,6 +405,91 @@ $test->for('example', 4, 'name', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result eq "USER";
+
+  $result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Vars)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Vars;
+
+  my $new = Venus::Vars->new;
+
+  # bless(..., "Venus::Vars")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Vars');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Vars;
+
+  my $new = Venus::Vars->new(
+    {USER => 'awncorp', HOME => '/home/awncorp'},
+  );
+
+  # bless(..., "Venus::Vars")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Vars');
+  is $result->value->{USER}, 'awncorp';
+  is $result->value->{HOME}, '/home/awncorp';
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Vars;
+
+  my $new = Venus::Vars->new(
+    value => {USER => 'awncorp', HOME => '/home/awncorp'},
+  );
+
+  # bless(..., "Venus::Vars")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Vars');
+  ok $result->isa('Venus::Vars');
+  is $result->value->{USER}, 'awncorp';
+  is $result->value->{HOME}, '/home/awncorp';
 
   $result
 });

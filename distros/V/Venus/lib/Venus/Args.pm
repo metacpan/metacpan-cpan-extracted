@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'attr', 'base', 'with';
 
+# INHERITS
+
 base 'Venus::Kind::Utility';
+
+# INTEGRATES
 
 with 'Venus::Role::Valuable';
 with 'Venus::Role::Buildable';
@@ -40,18 +46,6 @@ sub build_self {
 }
 
 # METHODS
-
-sub assertion {
-  my ($self) = @_;
-
-  my $assertion = $self->SUPER::assertion;
-
-  $assertion->match('arrayref')->format(sub{
-    (ref $self || $self)->new($_)
-  });
-
-  return $assertion;
-}
 
 sub default {
   my ($self) = @_;
@@ -371,6 +365,46 @@ I<Since C<0.01>>
   # given: synopsis;
 
   my $name = $args->name('flag');
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Args)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Args;
+
+  my $new = Venus::Args->new;
+
+  # bless(..., "Venus::Args")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Args;
+
+  my $new = Venus::Args->new(
+    value => ['--help', 'execute'],
+  );
+
+  # bless(..., "Venus::Args")
 
 =back
 

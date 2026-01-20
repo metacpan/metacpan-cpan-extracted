@@ -1,25 +1,30 @@
 Change log for Graphics::Framebuffer
 
+6.85   January 19, 2026
+
+       Minor blitting bugs fixed, thanks to snakpak.
+	   Documentation updated for Linux specificity.
+
 6.84   January 17, 2026
 
        Github user "snakpak" made changes to the C code for better
-	   compatability.  I have merged the code and sent it to pause for
-	   indexing.
+       compatability.  I have merged the code and sent it to pause for
+       indexing.
 
 6.83   January 09, 2026
 
        Corrected the DESTROY bug.
-	   Fixed "examples/dump.pl" to disregard "START_SCREEN" hash key.
+       Fixed "examples/dump.pl" to disregard "START_SCREEN" hash key.
 
 6.82   January 04, 2026
 
        Modify tests
-	   Change how splash acts.
+       Change how splash acts.
 
 6.81   December 25, 2025
 
        Minor documentation changes.
-	   Changes to testing.
+       Changes to testing.
 
 6.80   December 13, 2025
 
@@ -28,7 +33,7 @@ Change log for Graphics::Framebuffer
 6.79   December 04, 2025
 
        "pixel_size" removed.  Other optimizations.
-	   Added accelerated flood fill.  Works great.
+       Added accelerated flood fill.  Works great.
 
 6.78   November 28, 2025
 
@@ -45,7 +50,7 @@ Change log for Graphics::Framebuffer
 6.75   September 25, 2025
 
        Minor changes to POD documentation.
-	   Minor changes to Perl code.
+       Minor changes to Perl code.
 
 6.74   September 14, 2025
 
@@ -547,8 +552,8 @@ Change log for Graphics::Framebuffer
        *** DO NOT USE THIS VERSION.  IT'S BROKEN ***
 
        I consolidated a lot of Perl and C code to make things more efficient
-	   and to make more sense (in the source code).  Blitting and converting
-	   for example.
+       and to make more sense (in the source code).  Blitting and converting
+       for example.
 
        Modified the code to recognize pixel bit size instead of byte size.  I
        did this to make ready for adding single bit pixel sizes (for monochrome

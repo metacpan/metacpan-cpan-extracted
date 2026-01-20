@@ -2,13 +2,14 @@ package Schedule::Activity::Attributes;
 
 use strict;
 use warnings;
+use Ref::Util qw/is_ref/;
 use Schedule::Activity::Attribute;
 
-our $VERSION='0.2.9';
+our $VERSION='0.3.0';
 
 sub new {
 	my ($ref,%opt)=@_;
-	my $class=ref($ref)||$ref;
+	my $class=is_ref($ref)||$ref;
 	my %self=(
 		attr =>{},
 		stack=>[],
@@ -85,6 +86,6 @@ __END__
 
 =pod
 
-This module is the primary class to track and manage I<all> attributes during schedule configuration and building.  It handles collection of information during the build phase, creation of any specific attribute objects that will be used during schedule building, and (eventual) reporting of attribute statitics.  Not currently clear what responsibilities this module will have related to filtering.
+This module is the primary class to track and manage I<all> attributes during schedule configuration and building.  It handles collection of information during the build phase, creation of any specific attribute objects that will be used during schedule building, and (eventual) reporting of attribute statistics.  Not currently clear what responsibilities this module will have related to filtering.
 
 =cut

@@ -16,11 +16,11 @@ DBIx::Class::Async::ResultSet - Asynchronous resultset for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =cut
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 =head1 SYNOPSIS
 
@@ -1254,16 +1254,27 @@ to restart iteration.
 sub next {
     my $self = shift;
 
-    # If we haven't fetched yet, do a blocking fetch
-    unless ($self->{_rows}) {
-        $self->{_rows} = $self->all->get;
+    # 1. If we already have the rows in the buffer, return the next one via Future
+    if ($self->{_rows}) {
+        $self->{_pos} //= 0;
+        if ($self->{_pos} >= @{$self->{_rows}}) {
+            return Future->done(undef);
+        }
+        return Future->done($self->{_rows}[$self->{_pos}++]);
     }
 
-    $self->{_pos} //= 0;
+    # 2. If the buffer is empty, use the async 'all' method
+    return $self->all->then(sub {
+        my $rows = shift; # This is the \@rows from all()
 
-    return undef if $self->{_pos} >= @{$self->{_rows}};
+        # 'all' already sets {_rows} and {_pos}, but we'll be explicit
+        if (!$rows || !@$rows) {
+            return Future->done(undef);
+        }
 
-    return $self->{_rows}[$self->{_pos}++];
+        # Return the first row found
+        return Future->done($self->{_rows}[$self->{_pos}++]);
+    });
 }
 
 =head2 page
@@ -2477,7 +2488,7 @@ sub _inflate_prefetch {
     $row->{_prefetched} ||= {};
 
     # Handle both scalar and arrayref prefetch specs
-    my @prefetches =
+    my @prefetches = grep { defined }
         ref $prefetch_spec eq 'ARRAY' ? @$prefetch_spec : ($prefetch_spec);
 
     foreach my $prefetch (@prefetches) {

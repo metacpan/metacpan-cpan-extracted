@@ -2,7 +2,7 @@
 # -*- cperl -*-
 # PODNAME: beamer-reveal.pl
 # ABSTRACT: converts the .rvl file and the corresponding pdf file to a full reveal website
-#
+our $VERSION = '20260119.1636'; # VERSION
 
 
 use strict;
@@ -24,16 +24,24 @@ use BeamerReveal::FrameConverter;
 
 use BeamerReveal::Log;
 
+sub unixify;
+
 ######################################
 # Read command-line options/arguments
 ####################################
 
 my $opt_help;
 my $opt_man;
+my $output_dir;
+my $aux_dir;
+my $pdf_dir;
 
 my $result = 
-  GetOptions( "help"       => \$opt_help,
-	      "man"        => \$opt_man,
+  GetOptions( "help"               => \$opt_help,
+	      "man"                => \$opt_man,
+	      "output-directory=s" => \$output_dir,
+	      "aux-directory=s"    => \$aux_dir,
+	      "pdf-directory=s"    => \$pdf_dir,
 	    )
   || pod2usage( -exitval => 1,
 		-output  => \*STDERR );
@@ -62,11 +70,29 @@ my $openinglines =
    '-|-',
   ];
 my $closinglines = [ '-|-' ];
+
 my $logger = BeamerReveal::Log->new( opening       => $openinglines,
 				     closing       => $closinglines,
 				     logfilename   => "$jobname.brlog",
 				     labelsize     => 21,
 				     activitysize  => 25 );
+
+###############################
+# set defaults for directories
+$pdf_dir ||= '.';
+$aux_dir ||= $pdf_dir;
+$output_dir ||= '.';
+
+# unixify these directories
+foreach my $path ( \$pdf_dir, \$aux_dir, \$output_dir ) {
+  $$path = unixify( $$path );
+}
+
+
+$logger->log( 0, "- Using the following directories:" );
+$logger->log( 2, "aux-files    : '$aux_dir'" );
+$logger->log( 2, "pdf-files    : '$pdf_dir'" );
+$logger->log( 2, "output-files : '$output_dir'" );
 
 my $proc_id =
   $logger->registerTask( label    => "Slide processing",
@@ -91,12 +117,13 @@ my $overall_id =
 
 $logger->activate();
 
+
 ##################
 # Read input file
 $logger->progress( $overall_id, 0, 'reading driver file' );
 
 # fetch the reveal file
-my $rvlFileName = $jobname . ".rvl";
+my $rvlFileName = "$aux_dir/$jobname.rvl";
 $logger->log( 0, "- Reading driver file $rvlFileName" );
 my $rvlFile = IO::File->new();
 $rvlFile->open( "<$rvlFileName" )
@@ -148,6 +175,7 @@ $logger->progress( $overall_id, 2, 'processing driver file' );
 
 my $mediaManager =
   BeamerReveal::MediaManager->new( $jobname,
+				   $output_dir,
 				   "${jobname}_files",
 				   $presentation->{parameters} );
 
@@ -172,8 +200,8 @@ $logger->progress( $proc_id, $i );
 $logger->progress( $overall_id, 3, 'generating backgrounds' );
 
 $logger->log( 0, "- Generating the images" );
-my $convertor = BeamerReveal::FrameConverter->new( "${jobname}_files",
-						   "$jobname.pdf",
+my $convertor = BeamerReveal::FrameConverter->new( "$output_dir/${jobname}_files",
+						   "$pdf_dir/$jobname.pdf",
 						   $presentation->{parameters}->{canvaswidth},
 						   $presentation->{parameters}->{canvasheight},
 						   $fc_id );
@@ -198,7 +226,7 @@ $logger->log( 0, "- Producing presentation" );
 my $store = BeamerReveal::TemplateStore->new();
 my $mainTemplate = $store->fetch( 'html', 'main.html' );
 
-my $oFileName = "$jobname.html";
+my $oFileName = "$output_dir/$jobname.html";
 $logger->log( 2, "- Writing $oFileName" );
 my $oFile = IO::File->new();
 $oFile->open( ">$oFileName" )
@@ -214,13 +242,19 @@ $oFile->close();
 
 # finally let's create an index.html link
 $logger->log( 2, "- Creating index.html link" );
-link( "$oFileName", "index.html" );
+link( "$oFileName", "$output_dir/index.html" );
 $logger->progress( $overall_id, 5, 'done' );
 
 ########################
 # generate closing line
 ######################
 $logger->finalize();
+
+sub unixify {
+  $_[0] =~ s/\\/\//g;
+  $_[0] =~ s/\/$//;
+  return $_[0];
+}
 
 #########################################################
 
@@ -236,7 +270,7 @@ beamer-reveal.pl - converts the .rvl file and the corresponding pdf file to a fu
 
 =head1 VERSION
 
-version 20260111.1557
+version 20260119.1636
 
 =head1 SYNOPSIS
 
@@ -274,6 +308,19 @@ prints help message on standard output
 =item B<--man> | B<-m>
 
 prints manual page on standard output
+
+=item B<--output-directory> | B<-o>
+
+target directory where the reveal html files will end up in. Defaults to '.'.
+
+=item B<--aux-directory> | B<-a>
+
+directory where the rvl file (and other auxiliary files) will be read from.
+Defaults to the pdf-directory.
+
+=item B<--pdf-directory> | B<-p>
+
+directory where the PDF file of your beamer-presentation is stored. Defaults to '.'.
 
 =back
 

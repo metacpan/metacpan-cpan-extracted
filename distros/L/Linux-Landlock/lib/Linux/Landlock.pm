@@ -185,7 +185,7 @@ use Linux::Landlock::Direct qw(
   set_no_new_privs
 );
 
-our $VERSION = '0.009003';
+our $VERSION = '0.009004';
 
 sub new {
     my ($class, %args) = @_;

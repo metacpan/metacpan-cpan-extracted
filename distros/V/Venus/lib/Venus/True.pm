@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Scalar::Util ();
 
+# STATE
+
 state $true = Scalar::Util::dualvar(1, "1");
+
+# OVERLOADS
 
 use overload (
   '!' => sub{!$true},
@@ -63,6 +69,30 @@ the L<Venus/true> function.
 =head1 METHODS
 
 This package provides the following methods:
+
+=cut
+
+=head2 new
+
+  new() (Venus::True)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::True;
+
+  my $new = Venus::True->new;
+
+  # bless(..., "Venus::True")
+
+=back
 
 =cut
 

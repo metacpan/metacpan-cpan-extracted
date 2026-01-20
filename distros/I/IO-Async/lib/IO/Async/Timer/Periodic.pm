@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Timer::Periodic 0.804;
+package IO::Async::Timer::Periodic 0.805;
 
 use v5.14;
 use warnings;
@@ -16,6 +16,8 @@ use Carp;
 C<IO::Async::Timer::Periodic> - event callback at regular intervals
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use IO::Async::Timer::Periodic;
 

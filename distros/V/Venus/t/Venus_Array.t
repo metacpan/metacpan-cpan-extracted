@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -51,9 +52,11 @@ method: find
 method: first
 method: ge
 method: gele
+method: gets
 method: grep
 method: gt
 method: gtlt
+method: head
 method: iterator
 method: join
 method: keyed
@@ -66,6 +69,7 @@ method: lt
 method: map
 method: merge
 method: ne
+method: new
 method: none
 method: one
 method: order
@@ -80,10 +84,12 @@ method: range
 method: reverse
 method: rotate
 method: rsort
+method: sets
 method: shift
 method: shuffle
 method: slice
 method: sort
+method: tail
 method: tv
 method: unique
 method: unshift
@@ -1599,6 +1605,90 @@ $test->for('example', 1, 'first', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
+
+  $result
+});
+
+=method gets
+
+The gets method select values from within the underlying data structure using
+L<Venus::Array/path>, where each argument is a selector, returns all the values
+selected. Returns a list in list context.
+
+=signature gets
+
+  gets(string @args) (arrayref)
+
+=metadata gets
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 gets
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+
+  my $gets = $array->gets('3', '1.bar');
+
+  # [['baz'], 'baz']
+
+=cut
+
+$test->for('example', 1, 'gets', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [['baz'], 'baz'];
+
+  $result
+});
+
+=example-2 gets
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+
+  my ($baz, $one_bar) = $array->gets('3', '1.bar');
+
+  # (['baz'], 'baz')
+
+=cut
+
+$test->for('example', 2, 'gets', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply \@result, [['baz'], 'baz'];
+
+  @result
+});
+
+=example-3 gets
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+
+  my $gets = $array->gets('3', '1.bar', '1.bar.baz');
+
+  # [['baz'], 'baz', undef]
+
+=cut
+
+$test->for('example', 3, 'gets', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [['baz'], 'baz', undef];
 
   $result
 });
@@ -3351,6 +3441,85 @@ $test->for('example', 9, 'ne', sub {
   $result
 });
 
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Array)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Array;
+
+  my $new = Venus::Array->new;
+
+  # bless(..., "Venus::Array")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Array');
+  is_deeply $result->value, [];
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Array;
+
+  my $new = Venus::Array->new([1..9]);
+
+  # bless(..., "Venus::Array")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Array');
+  is_deeply $result->value, [1..9];
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Array;
+
+  my $new = Venus::Array->new(value => [1..9]);
+
+  # bless(..., "Venus::Array")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Array');
+  is_deeply $result->value, [1..9];
+
+  $result
+});
+
 =method none
 
 The none method returns true if none of the elements in the array meet the
@@ -3962,14 +4131,38 @@ $test->for('example', 3, 'puts', sub {
 
   my $puts = [$a, $b, $m, $x, $y];
 
-  # [1, 2, [3..18], 19, 20]
+  # [1, 2, [3..19], 19, 20]
 
 =cut
 
 $test->for('example', 4, 'puts', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is_deeply $result, [1, 2, [3..18], 19, 20];
+  is_deeply $result, [1, 2, [3..19], 19, 20];
+
+  $result
+});
+
+=example-5 puts
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([[{1..4}, {1..4}]]);
+
+  $array->puts(\my $a, '0');
+
+  my $puts = $a;
+
+  # [{1..4}, {1..4}]
+
+=cut
+
+$test->for('example', 5, 'puts', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [{1..4}, {1..4}];
 
   $result
 });
@@ -4214,14 +4407,14 @@ $test->for('example', 9, 'range', sub {
 
   my $range = $array->range('-1:8');
 
-  # [9,1..9]
+  # [9]
 
 =cut
 
 $test->for('example', 10, 'range', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is_deeply $result, [9,1..9];
+  is_deeply $result, [9];
 
   $result
 });
@@ -4254,14 +4447,14 @@ $test->for('example', 11, 'range', sub {
 
   my $range = $array->range('0:-2');
 
-  # [1..7]
+  # [1..8]
 
 =cut
 
 $test->for('example', 12, 'range', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is_deeply $result, [1..7];
+  is_deeply $result, [1..8];
 
   $result
 });
@@ -4502,6 +4695,125 @@ $test->for('example', 1, 'rsort', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, [9, 8, 7, 6, 5, 4, 3, 2, 1];
+
+  $result
+});
+
+=method sets
+
+The sets method find values from within the underlying data structure using
+L<Venus::Array/path>, where each argument pair is a selector and value, and
+returns all the values provided. Returns a list in list context. Note, nested
+data structures can be updated but not created.
+
+=signature sets
+
+  sets(string @args) (arrayref)
+
+=metadata sets
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 sets
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+
+  my $sets = $array->sets('3' => 'bar', '1.bar' => 'bar');
+
+  # ['bar', 'bar']
+
+=cut
+
+$test->for('example', 1, 'sets', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ['bar', 'bar'];
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+  $array->sets('3' => 'bar', '1.bar' => 'bar');
+  is_deeply $array->get, ['foo', {'bar' => 'bar'}, 'bar', 'bar'];
+
+  $result
+});
+
+=example-2 sets
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+
+  my ($baz, $one_bar) = $array->sets('3' => 'bar', '1.bar' => 'bar');
+
+  # ('bar', 'bar')
+
+=cut
+
+$test->for('example', 2, 'sets', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply \@result, ['bar', 'bar'];
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+  $array->sets('3' => 'bar', '1.bar' => 'bar');
+  is_deeply $array->get, ['foo', {'bar' => 'bar'}, 'bar', 'bar'];
+
+  @result
+});
+
+=example-3 sets
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+
+  my $sets = $array->sets('3' => 'bar', '1.bar' => 'bar', '1.baz' => 'box');
+
+  # ['bar', 'bar', 'box']
+
+=cut
+
+$test->for('example', 3, 'sets', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ['bar', 'bar', 'box'];
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+  $array->sets('3' => 'bar', '1.bar' => 'bar', '1.baz' => 'box');
+  is_deeply $array->get, ['foo', {'bar' => 'bar', 'baz' => 'box'}, 'bar', 'bar'];
+
+  $result
+});
+
+=example-4 sets
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+
+  my $sets = $array->sets('3' => 'bar', '1.bar' => 'bar', '1.bar.baz' => 'box');
+
+  # ['bar', 'bar', 'box']
+
+=cut
+
+$test->for('example', 4, 'sets', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ['bar', 'bar', 'box'];
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+  $array->sets('3' => 'bar', '1.bar' => 'bar', '1.bar.baz' => 'box');
+  is_deeply $array->get, ['foo', {'bar' => 'bar'}, 'bar', 'bar'];
 
   $result
 });

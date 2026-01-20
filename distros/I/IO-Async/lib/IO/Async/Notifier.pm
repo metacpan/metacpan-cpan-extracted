@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2006-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Notifier 0.804;
+package IO::Async::Notifier 0.805;
 
 use v5.14;
 use warnings;
@@ -23,6 +23,8 @@ use constant HAS_BROKEN_TRAMPOLINES => ( $] == "5.008004" );
 C<IO::Async::Notifier> - base class for L<IO::Async> event objects
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
 Usually not directly used by a program, but one valid use case may be:
 

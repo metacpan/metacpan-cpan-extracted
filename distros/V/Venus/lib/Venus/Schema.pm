@@ -5,73 +5,155 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Class 'attr', 'base';
+# IMPORTS
+
+use Venus::Class 'base', 'with';
+
+# INHERITS
 
 base 'Venus::Kind::Utility';
 
-# ATTRIBUTES
+# INTEGRATES
 
-attr 'definition';
-
-# BUILDERS
-
-sub build_args {
-  my ($self, $data) = @_;
-
-  if (keys %$data == 1 && exists $data->{definition}) {
-    return $data;
-  }
-  return {
-    definition => $data,
-  };
-}
+with 'Venus::Role::Encaseable';
 
 # METHODS
 
-sub assert {
-  my ($self) = @_;
-
-  require Venus::Assert;
-
-  my $assert = Venus::Assert->new;
-
-  return $assert->expression($assert->render('hashkeys', $self->definition));
-}
-
-sub check {
+sub rule {
   my ($self, $data) = @_;
 
-  my $assert = $self->assert;
+  my $ruleset = $self->ruleset;
 
-  return $assert->valid($data);
+  push @{$ruleset}, $data if ref $data eq 'HASH';
+
+  return $self;
 }
 
-sub deduce {
-  my ($self, $data) = @_;
+sub rules {
+  my ($self, @data) = @_;
 
-  require Venus::Type;
+  $self->rule($_) for @data;
 
-  my $assert = $self->assert;
-
-  return Venus::Type->new($assert->validate($data))->deduce_deep;
+  return $self;
 }
 
-sub error {
+sub ruleset {
   my ($self, $data) = @_;
 
-  my $error = $self->catch('validate', $data);
+  my $ruleset = $self->encased('ruleset');
 
-  die $error if $error && !$error->isa('Venus::Check::Error');
+  $ruleset = $self->recase('ruleset', ref $data eq 'ARRAY' ? $data : []) if !$ruleset;
 
-  return $error;
+  return $ruleset;
+}
+
+sub shorthand {
+  my ($self, $data) = @_;
+
+  my @pairs;
+
+  if (ref $data eq 'ARRAY') {
+    for (my $i = 0; $i < @{$data}; $i += 2) {
+      push @pairs, [$data->[$i], $data->[$i + 1]];
+    }
+  }
+  elsif (ref $data eq 'HASH') {
+    while (my ($key, $value) = each %{$data}) {
+      push @pairs, [$key, $value];
+    }
+  }
+  else {
+    return [];
+  }
+
+  my @ruleset;
+
+  for my $pair (@pairs) {
+    my ($key, $type) = @{$pair};
+
+    my $presence = 'required';
+
+    if ($key =~ s/!$//) {
+      $presence = 'required';
+    }
+    elsif ($key =~ s/\?$//) {
+      $presence = 'optional';
+    }
+    elsif ($key =~ s/\*$//) {
+      $presence = 'present';
+    }
+
+    my $selector;
+
+    if ($key =~ /\./) {
+      $selector = [split /\./, $key];
+    }
+    else {
+      $selector = $key;
+    }
+
+    push @ruleset, {
+      selector => $selector,
+      presence => $presence,
+      execute => $type,
+    };
+  }
+
+  return \@ruleset;
 }
 
 sub validate {
   my ($self, $data) = @_;
 
-  my $assert = $self->assert;
+  require Venus::Validate;
 
-  return $assert->validate($data);
+  my $validate = Venus::Validate->new(input => $data);
+
+  my $errors = $validate->errors([]);
+
+  my $ruleset = $self->ruleset;
+
+  for my $rule (@{$ruleset}) {
+    my $selector = $rule->{selector};
+    my $presence = $rule->{presence} || 'optional';
+    my $executes = $rule->{executes} || (
+      $rule->{execute} ? [$rule->{execute}] : undef
+    );
+
+    next if $presence ne 'optional' && $presence ne 'present' && $presence ne 'required';
+
+    my @nodes;
+
+    if (defined $selector) {
+      if (ref $selector eq 'ARRAY') {
+        @nodes = ($validate);
+        for my $i (0..$#{$selector}) {
+          my $path = $selector->[$i];
+          my $method = ($i == $#{$selector}) ? $presence : 'optional';
+          @nodes = map +($_->each($method, $path)), @nodes;
+        }
+      }
+      else {
+        @nodes = ($validate->$presence($selector));
+      }
+    }
+    else {
+      @nodes = ($validate->$presence);
+    }
+
+    for my $node (@nodes) {
+      for my $execute (@{$executes || []}) {
+        my ($method, @args) = ref $execute eq 'ARRAY' ? @{$execute} : ($execute);
+
+        $node->$method(@args);
+      }
+      $validate->sync($node);
+    }
+  }
+
+  my $value = $validate->value;
+
+  return wantarray ? ($errors, $value) : $errors;
 }
 
 1;
@@ -100,59 +182,16 @@ Schema Class for Perl 5
 
   # bless({...}, 'Venus::Schema')
 
+  # $schema->validate;
+
+  # ([], undef)
+
 =cut
 
 =head1 DESCRIPTION
 
-This package provides methods for validating whether objects and complex data
-structures conform to a schema.
-
-=cut
-
-=head1 ATTRIBUTES
-
-This package has the following attributes:
-
-=cut
-
-=head2 definition
-
-  definition(hashref $data) (hashref)
-
-The definition attribute is read-write, accepts C<(HashRef)> values, and is
-optional.
-
-I<Since C<2.55>>
-
-=over 4
-
-=item definition example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $definition = $schema->definition({});
-
-  # {}
-
-=back
-
-=over 4
-
-=item definition example 2
-
-  # given: synopsis
-
-  # given: example-1 definition
-
-  package main;
-
-  $definition = $schema->definition;
-
-  # {}
-
-=back
+This package provides a mechanism for validating complex data structures using
+data validation rules provided as a ruleset.
 
 =cut
 
@@ -164,352 +203,410 @@ L<Venus::Kind::Utility>
 
 =cut
 
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Encaseable>
+
+=cut
+
 =head1 METHODS
 
 This package provides the following methods:
 
 =cut
 
-=head2 assert
+=head2 new
 
-  assert() (Venus::Assert)
+  new(any @args) (Venus::Schema)
 
-The assert method builds and returns a L<Venus::Assert> object based on the
-L</definition>.
+The new method constructs an instance of the package.
 
-I<Since C<2.55>>
-
-=over 4
-
-=item assert example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $assert = $schema->assert;
-
-  # bless({...}, 'Venus::Assert')
-
-=back
+I<Since C<4.15>>
 
 =over 4
 
-=item assert example 2
-
-  # given: synopsis
+=item new example 1
 
   package main;
 
-  $schema->definition({
-    name => 'string',
-  });
+  use Venus::Schema;
 
-  my $assert = $schema->assert;
+  my $new = Venus::Schema->new;
 
-  # bless({...}, 'Venus::Assert')
+  # bless(..., "Venus::Schema")
 
 =back
 
 =cut
 
-=head2 check
+=head2 rule
 
-  check(hashref $data) (boolean)
+  rule(hashref $rule) (Venus::Schema)
 
-The check method builds an assert object using L</assert> and returns the
-result of the L<Venus::Assert/check> method.
+The rule method appends a new rule to the L</ruleset> to be used during
+L</validate>, and returns the invocant. A "rule" is a hashref that consists of
+an optional C<selector> key whose value will be provided to the
+L<Venus::Validate/select> method, a C<presence> key whose value must be one of
+the "required", "optional", or "present" L<Venus::Validate> methods, and a
+C<executes> key whose value must be an arrayref where each element is a
+L<Venus::Validate> validation method name or an arrayref with a method name and
+arguments.
 
-I<Since C<2.55>>
+I<Since C<4.15>>
 
 =over 4
 
-=item check example 1
+=item rule example 1
 
   # given: synopsis
 
   package main;
 
-  my $check = $schema->check;
+  my $rule = $schema->rule;
 
-  # false
+  # bless({...}, 'Venus::Schema')
 
 =back
 
 =over 4
 
-=item check example 2
+=item rule example 2
 
   # given: synopsis
 
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
+  my $rule = $schema->rule({
+    presence => 'required',
+    executes => ['string'],
   });
 
-  my $check = $schema->check({});
-
-  # false
+  # bless({...}, 'Venus::Schema')
 
 =back
 
 =over 4
 
-=item check example 3
+=item rule example 3
 
   # given: synopsis
 
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
+  my $rule = $schema->rule({
+    selector => 'name',
+    presence => 'required',
+    executes => ['string'],
   });
 
-  my $check = $schema->check({
-    name => 'someone',
-    role => {},
-  });
-
-  # false
+  # bless({...}, 'Venus::Schema')
 
 =back
 
 =over 4
 
-=item check example 4
+=item rule example 4
 
   # given: synopsis
 
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
+  my $rule = $schema->rule({
+    selector => 'name',
+    presence => 'required',
+    executes => [['type', 'string']],
   });
 
-  my $check = $schema->check({
-    name => 'someone',
-    role => {
-      title => 'engineer',
-      level => 1,
-    },
-  });
-
-  # true
+  # bless({...}, 'Venus::Schema')
 
 =back
 
 =cut
 
-=head2 deduce
+=head2 rules
 
-  deduce(hashref $data) (Venus::Hash)
+  rules(hashref @rules) (Venus::Schema)
 
-The deduce method builds an assert object using L</assert> and validates the
-value provided using L<Venus::Assert/validate>, passing the result to
-L<Venus::Type/deduce_deep> unless the validation throws an exception.
+The rules method appends new rules to the L</ruleset> using the L</rule> method
+and returns the invocant.
 
-I<Since C<2.55>>
+I<Since C<4.15>>
 
 =over 4
 
-=item deduce example 1
+=item rules example 1
 
   # given: synopsis
 
   package main;
 
-  my $deduce = $schema->deduce;
+  my $rules = $schema->rules;
 
-  # Exception! (isa Venus::Check::Error)
+  # bless(..., "Venus::Schema")
 
 =back
 
 =over 4
 
-=item deduce example 2
+=item rules example 2
 
   # given: synopsis
 
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
+  my $rules = $schema->rules({
+    presence => 'required',
+    executes => ['string'],
   });
 
-  my $deduce = $schema->deduce({});
-
-  # Exception! (isa Venus::Check::Error)
+  # bless(..., "Venus::Schema")
 
 =back
 
 =over 4
 
-=item deduce example 3
+=item rules example 3
 
   # given: synopsis
 
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
+  my $rules = $schema->rules(
+    {
+      selector => 'first_name',
+      presence => 'required',
+      executes => ['string'],
     },
-  });
+    {
+      selector => 'last_name',
+      presence => 'required',
+      executes => ['string'],
+    }
+  );
 
-  my $deduce = $schema->deduce({
-    name => 'someone',
-    role => {},
-  });
-
-  # Exception! (isa Venus::Check::Error)
-
-=back
-
-=over 4
-
-=item deduce example 4
-
-  # given: synopsis
-
-  package main;
-
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
-  });
-
-  my $deduce = $schema->deduce({
-    name => 'someone',
-    role => {
-      title => 'engineer',
-      level => 1,
-    },
-  });
-
-  # bless({...}, 'Venus::Hash')
+  # bless(..., "Venus::Schema")
 
 =back
 
 =cut
 
-=head2 error
+=head2 ruleset
 
-  error(hashref $data) (Venus::Error)
+  ruleset(arrayref $ruleset) (arrayref)
 
-The error method builds an assert object using L</assert> and validates the
-value provided using L<Venus::Assert/validate>, catching any error thrown and
-returning it, otherwise returning undefined.
+The ruleset method gets and sets the L<"rules"|/rule> to be used during
+L<"validation"|/validate>.
 
-I<Since C<2.55>>
+I<Since C<4.15>>
 
 =over 4
 
-=item error example 1
+=item ruleset example 1
 
   # given: synopsis
 
   package main;
 
-  my $error = $schema->error;
+  my $ruleset = $schema->ruleset;
 
-  # Exception! (isa Venus::Check::Error)
+  # []
 
 =back
 
 =over 4
 
-=item error example 2
+=item ruleset example 2
 
   # given: synopsis
 
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
+  my $ruleset = $schema->ruleset([
+    {
+      selector => 'first_name',
+      presence => 'required',
+      executes => ['string'],
     },
-  });
+    {
+      selector => 'last_name',
+      presence => 'required',
+      executes => ['string'],
+    }
+  ]);
 
-  my $error = $schema->error({});
+  # [
+  #   {
+  #     selector => 'first_name',
+  #     presence => 'required',
+  #     executes => ['string'],
+  #   },
+  #   {
+  #     selector => 'last_name',
+  #     presence => 'required',
+  #     executes => ['string'],
+  #   }
+  # ]
 
-  # Exception! (isa Venus::Check::Error)
+=back
+
+=cut
+
+=head2 shorthand
+
+  shorthand(arrayref | hashref $data) (arrayref)
+
+The shorthand method accepts an arrayref or hashref of shorthand notation and
+returns a ruleset arrayref. This provides a concise way to define validation
+rules. Keys can have suffixes to indicate presence: C<!> for (explicit)
+required, C<?> (explicit) for optional, C<*> for (explicit) present (i.e., must
+exist but can be null), and no suffix means (implicit) required. Keys using dot
+notation (e.g., C<website.url>) result in arrayref selectors for nested path
+validation.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item shorthand example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $shorthand = $schema->shorthand([
+    'fname!' => 'string',
+    'lname!' => 'string',
+  ]);
+
+  # [
+  #   {
+  #     selector => 'fname',
+  #     presence => 'required',
+  #     execute => 'string',
+  #   },
+  #   {
+  #     selector => 'lname',
+  #     presence => 'required',
+  #     execute => 'string',
+  #   },
+  # ]
 
 =back
 
 =over 4
 
-=item error example 3
+=item shorthand example 2
 
   # given: synopsis
 
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
-  });
+  my $shorthand = $schema->shorthand([
+    'email?' => 'string',
+    'age*' => 'number',
+  ]);
 
-  my $error = $schema->error({
-    name => 'someone',
-    role => {},
-  });
-
-  # Exception! (isa Venus::Check::Error)
+  # [
+  #   {
+  #     selector => 'email',
+  #     presence => 'optional',
+  #     execute => 'string',
+  #   },
+  #   {
+  #     selector => 'age',
+  #     presence => 'present',
+  #     execute => 'number',
+  #   },
+  # ]
 
 =back
 
 =over 4
 
-=item error example 4
+=item shorthand example 3
 
   # given: synopsis
 
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
-  });
+  my $shorthand = $schema->shorthand([
+    'login' => 'string',
+    'password' => 'string',
+  ]);
 
-  my $error = $schema->error({
-    name => 'someone',
-    role => {
-      title => 'engineer',
-      level => 1,
-    },
-  });
+  # [
+  #   {
+  #     selector => 'login',
+  #     presence => 'required',
+  #     execute => 'string',
+  #   },
+  #   {
+  #     selector => 'password',
+  #     presence => 'required',
+  #     execute => 'string',
+  #   },
+  # ]
 
-  # undef
+=back
+
+=over 4
+
+=item shorthand example 4
+
+  # given: synopsis
+
+  package main;
+
+  my $shorthand = $schema->shorthand([
+    'website.url' => 'string',
+    'profile.bio.text' => 'string',
+  ]);
+
+  # [
+  #   {
+  #     selector => ['website', 'url'],
+  #     presence => 'required',
+  #     execute => 'string',
+  #   },
+  #   {
+  #     selector => ['profile', 'bio', 'text'],
+  #     presence => 'required',
+  #     execute => 'string',
+  #   },
+  # ]
+
+=back
+
+=over 4
+
+=item shorthand example 5
+
+  package main;
+
+  use Venus::Schema;
+
+  my $schema = Venus::Schema->new;
+
+  my $ruleset = $schema->shorthand([
+    'fname!' => 'string',
+    'lname!' => 'string',
+    'email?' => 'string',
+    'login' => 'string',
+  ]);
+
+  $schema->rules(@{$ruleset});
+
+  my $input = {
+    fname => 'Elliot',
+    lname => 'Alderson',
+    login => 'mrrobot',
+  };
+
+  my $errors = $schema->validate($input);
+
+  # []
 
 =back
 
@@ -517,25 +614,27 @@ I<Since C<2.55>>
 
 =head2 validate
 
-  validate(hashref $data) (hashref)
+  validate(any $data) (arrayref)
 
-The validate method builds an assert object using L</assert> and validates the
-value provided using L<Venus::Assert/validate>, returning the result unless the
-validation throws an exception.
+The validate method validates the data provided using the L</ruleset> and
+returns an arrayref containing the errors encountered, if any. Returns the
+errors arrayref, and the data validated in list context.
 
-I<Since C<2.55>>
+I<Since C<4.15>>
 
 =over 4
 
 =item validate example 1
 
-  # given: synopsis
-
   package main;
 
-  my $validate = $schema->validate;
+  use Venus::Schema;
 
-  # Exception! (isa Venus::Check::Error)
+  my $schema = Venus::Schema->new;
+
+  my $errors = $schema->validate;
+
+  # []
 
 =back
 
@@ -543,21 +642,21 @@ I<Since C<2.55>>
 
 =item validate example 2
 
-  # given: synopsis
-
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
+  use Venus::Schema;
+
+  my $schema = Venus::Schema->new;
+
+  $schema->rule({
+    selector => 'handles',
+    presence => 'required',
+    executes => [['type', 'arrayref']],
   });
 
-  my $validate = $schema->validate({});
+  my $errors = $schema->validate;
 
-  # Exception! (isa Venus::Check::Error)
+  # [['handles', ['required', []]]]
 
 =back
 
@@ -565,24 +664,56 @@ I<Since C<2.55>>
 
 =item validate example 3
 
-  # given: synopsis
-
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
+  use Venus::Schema;
+
+  my $schema = Venus::Schema->new;
+
+  my $input = {
+    fname => 'Elliot',
+    lname => 'Alderson',
+    handles => [
+      {name => 'mrrobot'},
+      {name => 'fsociety'},
+    ],
+    level => 5,
+    skills => undef,
+    role => 'Engineer',
+  };
+
+  $schema->rule({
+    selector => 'fname',
+    presence => 'required',
+    executes => ['string', 'trim', 'strip'],
   });
 
-  my $validate = $schema->validate({
-    name => 'someone',
-    role => {},
+  $schema->rule({
+    selector => 'lname',
+    presence => 'required',
+    executes => ['string', 'trim', 'strip'],
   });
 
-  # Exception! (isa Venus::Check::Error)
+  $schema->rule({
+    selector => 'skills',
+    presence => 'present',
+  });
+
+  $schema->rule({
+    selector => 'handles',
+    presence => 'required',
+    executes => [['type', 'arrayref']],
+  });
+
+  $schema->rule({
+    selector => ['handles', 'name'],
+    presence => 'required',
+    executes => ['string', 'trim', 'strip'],
+  });
+
+  my $errors = $schema->validate($input);
+
+  # []
 
 =back
 
@@ -590,27 +721,56 @@ I<Since C<2.55>>
 
 =item validate example 4
 
-  # given: synopsis
-
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
+  use Venus::Schema;
+
+  my $schema = Venus::Schema->new;
+
+  my $input = {
+    fname => 'Elliot',
+    lname => 'Alderson',
+    handles => [
+      {name => 'mrrobot'},
+      {name => 'fsociety'},
+    ],
+    level => 5,
+    skills => undef,
+    role => 'Engineer',
+  };
+
+  $schema->rule({
+    selector => 'fname',
+    presence => 'required',
+    executes => ['string', 'trim', 'strip'],
   });
 
-  my $validate = $schema->validate({
-    name => 'someone',
-    role => {
-      title => 'engineer',
-      level => 1,
-    },
+  $schema->rule({
+    selector => 'lname',
+    presence => 'required',
+    executes => ['string', 'trim', 'strip'],
   });
 
-  # {name => 'someone', role => {title => 'engineer', level => 1,},}
+  $schema->rule({
+    selector => 'skills',
+    presence => 'required',
+  });
+
+  $schema->rule({
+    selector => 'handles',
+    presence => 'required',
+    executes => [['type', 'arrayref']],
+  });
+
+  $schema->rule({
+    selector => ['handles', 'name'],
+    presence => 'required',
+    executes => ['string', 'trim', 'strip'],
+  });
+
+  my $errors = $schema->validate($input);
+
+  # [['skills', ['required', []]]]
 
 =back
 

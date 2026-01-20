@@ -106,6 +106,22 @@ SKIP: {
    is( $new_stat->dev, (stat $wr)[0], '$new_stat->dev for renamed file' );
    is( $new_stat->ino, (stat $wr)[1], '$new_stat->ino for renamed file' );
 
+   undef $devino_changed;
+   unlink $filename;
+
+   wait_for { $devino_changed };
+
+   ok(  defined $old_stat, '$old_stat was defined for removed file' );
+   ok( !defined $new_stat, '$new_stat now undef for removed file' );
+
+   undef $devino_changed;
+   { open my $tmp, ">", $filename or die "Cannot create $filename - $!"; }
+
+   wait_for { $devino_changed };
+
+   ok( !defined $old_stat, '$old_stat was undef for created file' );
+   ok(  defined $new_stat, '$new_stat now defined for created file' );
+
    $loop->remove( $file );
 }
 

@@ -86,47 +86,47 @@
    "provides" : {
       "BeamerReveal" : {
          "file" : "lib/BeamerReveal.pm",
-         "version" : "20260111.1557"
+         "version" : "20260119.1636"
       },
       "BeamerReveal::FrameConverter" : {
          "file" : "lib/BeamerReveal/FrameConverter.pm",
-         "version" : "20260111.1557"
+         "version" : "20260119.1636"
       },
       "BeamerReveal::IPC::Run" : {
          "file" : "lib/BeamerReveal/IPC/Run.pm",
-         "version" : "20260111.1557"
+         "version" : "20260119.1636"
       },
       "BeamerReveal::Log" : {
          "file" : "lib/BeamerReveal/Log.pm",
-         "version" : "20260111.1557"
+         "version" : "20260119.1636"
       },
       "BeamerReveal::Log::Ansi" : {
          "file" : "lib/BeamerReveal/Log/Ansi.pm",
-         "version" : "20260111.1557"
+         "version" : "20260119.1636"
       },
       "BeamerReveal::MediaManager" : {
          "file" : "lib/BeamerReveal/MediaManager.pm",
-         "version" : "20260111.1557"
+         "version" : "20260119.1636"
       },
       "BeamerReveal::Object" : {
          "file" : "lib/BeamerReveal/Object.pm",
-         "version" : "20260111.1557"
+         "version" : "20260119.1636"
       },
       "BeamerReveal::Object::BeamerFrame" : {
          "file" : "lib/BeamerReveal/Object/BeamerFrame.pm",
-         "version" : "20260111.1557"
+         "version" : "20260119.1636"
       },
       "BeamerReveal::Object::Presentation" : {
          "file" : "lib/BeamerReveal/Object/Presentation.pm",
-         "version" : "20260111.1557"
+         "version" : "20260119.1636"
       },
       "BeamerReveal::TemplateStore" : {
          "file" : "lib/BeamerReveal/TemplateStore.pm",
-         "version" : "20260111.1557"
+         "version" : "20260119.1636"
       }
    },
    "release_status" : "stable",
-   "version" : "20260111.1557",
+   "version" : "20260119.1636",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"

@@ -9,66 +9,37 @@ no warnings 'once';
 
 use base 'Venus::Core';
 
+# IMPORTS
+
+use Venus::Hook;
+
+# HOOKS
+
+{
+  no warnings 'once';
+
+  *clone = *Venus::Hook::CLONE;
+
+  *does = *Venus::Hook::DOES;
+
+  *meta = *Venus::Hook::META;
+
+  *new = *Venus::Hook::BLESS;
+
+  *BUILD = *Venus::Hook::BUILD_FOR_CLASS;
+
+  *CONSTRUCT = *Venus::Hook::CONSTRUCT_FOR_CLASS;
+
+  *DECONSTRUCT = *Venus::Hook::DECONSTRUCT_FOR_CLASS;
+
+  *DESTROY = *Venus::Hook::DESTROY_FOR_CLASS;
+
+  *EXPORT = *Venus::Hook::EXPORT_FOR_CLASS;
+
+  *IMPORT = *Venus::Hook::IMPORT_FOR_CLASS;
+}
+
 # METHODS
-
-sub BUILD {
-  my ($self, @data) = @_;
-
-  no strict 'refs';
-
-  my @roles = @{$self->META->roles};
-
-  for my $action (grep defined, map *{"${_}::BUILD"}{"CODE"}, @roles) {
-    $self->$action(@data);
-  }
-
-  return $self;
-}
-
-sub DESTROY {
-  my ($self, @data) = @_;
-
-  no strict 'refs';
-
-  my @mixins = @{$self->META->mixins};
-
-  for my $action (grep defined, map *{"${_}::DESTROY"}{"CODE"}, @mixins) {
-    $self->$action(@data);
-  }
-
-  my @roles = @{$self->META->roles};
-
-  for my $action (grep defined, map *{"${_}::DESTROY"}{"CODE"}, @roles) {
-    $self->$action(@data);
-  }
-
-  return $self;
-}
-
-sub does {
-  my ($self, @args) = @_;
-
-  return $self->DOES(@args);
-}
-
-sub EXPORT {
-  my ($self, $into) = @_;
-
-  return [];
-}
-
-sub IMPORT {
-  my ($self, $into) = @_;
-
-  no strict 'refs';
-  no warnings 'redefine';
-
-  for my $name (@{$self->EXPORT($into)}) {
-    *{"${into}::${name}"} = \&{"@{[$self->NAME]}::${name}"};
-  }
-
-  return $self;
-}
 
 sub import {
   my ($self, @args) = @_;
@@ -78,18 +49,6 @@ sub import {
   $self->USE($target);
 
   return $self->IMPORT($target, @args);
-}
-
-sub meta {
-  my ($self) = @_;
-
-  return $self->META;
-}
-
-sub new {
-  my ($self, @args) = @_;
-
-  return $self->BLESS(@args);
 }
 
 sub unimport {
@@ -151,6 +110,28 @@ L<Venus::Core>
 =head1 METHODS
 
 This package provides the following methods:
+
+=cut
+
+=head2 clone
+
+  clone() (object)
+
+The clone method returns a cloned object.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item clone example 1
+
+  # given: synopsis
+
+  my $new_user = $user->clone;
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'User')
+
+=back
 
 =cut
 

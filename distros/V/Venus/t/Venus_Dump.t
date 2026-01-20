@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -38,6 +39,7 @@ $test->for('abstract');
 
 method: decode
 method: encode
+method: new
 
 =cut
 
@@ -164,6 +166,84 @@ $test->for('example', 1, 'encode', sub {
   ok my $result = $tryable->result;
   $result =~ s/[\n\s]//g;
   ok $result eq '{name=>["Ready","Robot"],stable=>bless({},\'Venus::True\'),version=>"0.12"}';
+
+  $result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Dump)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Dump;
+
+  my $new = Venus::Dump->new;
+
+  # bless(..., "Venus::Dump")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Dump');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Dump;
+
+  my $new = Venus::Dump->new({password => 'secret'});
+
+  # bless(..., "Venus::Dump")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Dump');
+  is_deeply $result->value, {password => 'secret'};
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Dump;
+
+  my $new = Venus::Dump->new(value => {password => 'secret'});
+
+  # bless(..., "Venus::Dump")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Dump');
+  is_deeply $result->value, {password => 'secret'};
 
   $result
 });

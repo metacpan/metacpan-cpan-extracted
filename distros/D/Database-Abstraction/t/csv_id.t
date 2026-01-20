@@ -4,7 +4,7 @@ use strict;
 use FindBin qw($Bin);
 
 use File::Spec;
-use Test::Most tests => 11;
+use Test::Most tests => 12;
 use Test::NoWarnings;
 
 use lib 't/lib';
@@ -39,6 +39,11 @@ is($john_doe->{'name'}, 'John Doe', 'Fetched John Doe');
 my @young_people = $test5->execute(query => 'SELECT * FROM test5 WHERE age < 30');
 is(scalar(@young_people), 2, 'Fetched young people');
 
+# Test args
+@young_people = $test5->execute(query => 'SELECT * FROM test5 WHERE age <= ?', args => (30));
+is(scalar(@young_people), 3, 'Fetched young people with args');
+
+# Test AUTOLOAD feature
 # Test AUTOLOAD feature
 my @names = $test5->name();
 is(scalar(@names), 5, 'Fetched all names');

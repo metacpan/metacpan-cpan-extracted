@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'attr', 'base', 'with';
 
+# INHERITS
+
 base 'Venus::Kind::Utility';
+
+# INTEGRATES
 
 with 'Venus::Role::Valuable';
 with 'Venus::Role::Buildable';
@@ -29,6 +35,18 @@ sub build_proxy {
     return $self->get($method) if !$has_value; # no value
     return $self->set($method, $value);
   };
+}
+
+sub build_data {
+  my ($self, $data, $xargs) = @_;
+
+  $data->{value} ||= {};
+
+  $data->{value} = ({%{$data->{value}}, %{$xargs}});
+
+  $data->{value} = $self->default if !keys %{$data->{value}};
+
+  return $data;
 }
 
 sub build_self {
@@ -398,6 +416,62 @@ I<Since C<0.01>>
   my $name = $vars->name('user');
 
   # "USER"
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Vars)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Vars;
+
+  my $new = Venus::Vars->new;
+
+  # bless(..., "Venus::Vars")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Vars;
+
+  my $new = Venus::Vars->new(
+    {USER => 'awncorp', HOME => '/home/awncorp'},
+  );
+
+  # bless(..., "Venus::Vars")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Vars;
+
+  my $new = Venus::Vars->new(
+    value => {USER => 'awncorp', HOME => '/home/awncorp'},
+  );
+
+  # bless(..., "Venus::Vars")
 
 =back
 

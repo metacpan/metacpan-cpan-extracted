@@ -34,6 +34,7 @@ static perl_mutex context_mutex;
 static perl_mutex tensor_mutex;
 static perl_mutex kvcache_mutex;
 static perl_mutex mempool_mutex;
+static perl_mutex lora_registry_mutex;
 static int mutex_initialized = 0;
 
 #define CONTEXT_LOCK()   MUTEX_LOCK(&context_mutex)
@@ -47,6 +48,7 @@ static int mutex_initialized = 0;
         MUTEX_INIT(&tensor_mutex); \
         MUTEX_INIT(&kvcache_mutex); \
         MUTEX_INIT(&mempool_mutex); \
+        MUTEX_INIT(&lora_registry_mutex); \
         mutex_initialized = 1; \
     } \
 } while(0)
@@ -710,6 +712,7 @@ typedef struct {
     int has_combined_qkv;            /* 1 if using wqkv instead of wq/wk/wv */
     int has_ffn_gate;                /* 1 if using SwiGLU, 0 for GELU */
     int has_post_norm;               /* 1 if architecture uses post-normalization */
+    int layer_idx;                   /* Layer index for LoRA tensor name lookup */
 } LughLayerWeights;
 
 /* Extract hyperparameters from Perl HV and model */
@@ -797,6 +800,9 @@ static int get_layer_weights_for_arch(struct ggml_context *ctx_w, int layer,
     
     /* Initialize all pointers to NULL */
     memset(lw, 0, sizeof(LughLayerWeights));
+    
+    /* Set layer index for LoRA lookups */
+    lw->layer_idx = layer;
     
     /* Set flags based on architecture */
     lw->has_combined_qkv = arch_has_combined_qkv(arch_type);
@@ -1162,6 +1168,456 @@ static struct ggml_context* create_compute_context(size_t mem_size) {
 }
 
 /* ============================================================================
+ * LoRA Adapter Support
+ * Low-Rank Adaptation for efficient model fine-tuning
+ * Supports GGUF and SafeTensors formats
+ * ============================================================================ */
+
+#define MAX_LORA_ADAPTERS 64
+#define MAX_LORA_WEIGHTS  512
+
+/* Individual LoRA weight pair for a single tensor */
+typedef struct {
+    char name[128];              /* Base tensor name (e.g., "blk.0.attn_q.weight") */
+    struct ggml_tensor *a;       /* Down-projection [rank × d_in] */
+    struct ggml_tensor *b;       /* Up-projection [d_out × rank] */
+    int rank;                    /* LoRA rank (inferred from tensor shapes) */
+} LughLoRAWeight;
+
+/* LoRA adapter container */
+typedef struct {
+    int id;
+    int active;
+    float alpha;                 /* Scaling factor from adapter metadata */
+    float scale;                 /* User-specified scale multiplier */
+    char *source_file;           /* Path to source file */
+    char *architecture;          /* Must match base model architecture */
+    char format[16];             /* "gguf" or "safetensors" */
+    /* Weight storage */
+    LughLoRAWeight *weights;     /* Array of LoRA weight pairs */
+    int n_weights;               /* Number of weight pairs */
+    int weights_capacity;        /* Allocated capacity */
+    /* Tensor memory */
+    struct ggml_context *ctx;    /* Context for LoRA tensors */
+    ggml_backend_buffer_t buffer; /* Backend buffer for tensor data */
+#ifdef USE_ITHREADS
+    perl_mutex lora_mutex;       /* Thread-safe access */
+#endif
+} LughLoRAAdapter;
+
+/* LoRA adapter registry */
+static LughLoRAAdapter* lora_registry[MAX_LORA_ADAPTERS] = {NULL};
+static int next_lora_id = 1;
+
+#ifdef USE_ITHREADS
+/* lora_registry_mutex is declared at top with other mutexes */
+#define LORA_REGISTRY_LOCK()   MUTEX_LOCK(&lora_registry_mutex)
+#define LORA_REGISTRY_UNLOCK() MUTEX_UNLOCK(&lora_registry_mutex)
+#define LORA_LOCK(lora)   MUTEX_LOCK(&(lora)->lora_mutex)
+#define LORA_UNLOCK(lora) MUTEX_UNLOCK(&(lora)->lora_mutex)
+#else
+#define LORA_REGISTRY_LOCK()
+#define LORA_REGISTRY_UNLOCK()
+#define LORA_LOCK(lora)
+#define LORA_UNLOCK(lora)
+#endif
+
+/* Allocate a LoRA adapter ID */
+static int alloc_lora_id(void) {
+    int id = -1;
+    LORA_REGISTRY_LOCK();
+    for (int i = 0; i < MAX_LORA_ADAPTERS; i++) {
+        int check_id = (next_lora_id + i) % MAX_LORA_ADAPTERS;
+        if (check_id == 0) check_id = 1;
+        if (lora_registry[check_id] == NULL) {
+            id = check_id;
+            next_lora_id = (id + 1) % MAX_LORA_ADAPTERS;
+            if (next_lora_id == 0) next_lora_id = 1;
+            break;
+        }
+    }
+    LORA_REGISTRY_UNLOCK();
+    return id;
+}
+
+/* Get LoRA adapter by ID */
+static LughLoRAAdapter* get_lora_by_id(int id) {
+    LughLoRAAdapter *lora = NULL;
+    if (id <= 0 || id >= MAX_LORA_ADAPTERS) return NULL;
+    LORA_REGISTRY_LOCK();
+    lora = lora_registry[id];
+    if (lora && !lora->active) lora = NULL;
+    LORA_REGISTRY_UNLOCK();
+    return lora;
+}
+
+/* Forward declaration for LoRA vtbl (defined later) */
+static MGVTBL lugh_lora_vtbl;
+
+/* Helper to get LughLoRAAdapter from SV (can return NULL if not a valid LoRA) */
+static LughLoRAAdapter* get_lugh_lora(pTHX_ SV *sv) {
+    MAGIC *mg;
+    int id;
+    LughLoRAAdapter *lora;
+    
+    if (!sv || !SvOK(sv)) return NULL;
+    if (!sv_isobject(sv)) return NULL;
+    
+    sv = SvRV(sv);
+    mg = mg_findext(sv, PERL_MAGIC_ext, &lugh_lora_vtbl);
+    if (!mg) return NULL;
+    
+    id = (int)(IV)mg->mg_ptr;
+    lora = get_lora_by_id(id);
+    
+    return lora;
+}
+
+/* Find LoRA weight for a given tensor name */
+static LughLoRAWeight* find_lora_weight(LughLoRAAdapter *lora, const char *tensor_name) {
+    int i;
+    if (!lora || !tensor_name) return NULL;
+    for (i = 0; i < lora->n_weights; i++) {
+        if (strcmp(lora->weights[i].name, tensor_name) == 0) {
+            return &lora->weights[i];
+        }
+    }
+    return NULL;
+}
+
+/* Add a LoRA weight pair to adapter */
+static int add_lora_weight(LughLoRAAdapter *lora, const char *name,
+                           struct ggml_tensor *a, struct ggml_tensor *b) {
+    if (!lora || !name || !a || !b) return 0;
+    
+    /* Grow capacity if needed */
+    if (lora->n_weights >= lora->weights_capacity) {
+        int new_cap = lora->weights_capacity == 0 ? 64 : lora->weights_capacity * 2;
+        LughLoRAWeight *new_weights;
+        Newxz(new_weights, new_cap, LughLoRAWeight);
+        if (!new_weights) return 0;
+        if (lora->weights) {
+            Copy(lora->weights, new_weights, lora->n_weights, LughLoRAWeight);
+            Safefree(lora->weights);
+        }
+        lora->weights = new_weights;
+        lora->weights_capacity = new_cap;
+    }
+    
+    /* Add the weight */
+    LughLoRAWeight *w = &lora->weights[lora->n_weights];
+    strncpy(w->name, name, sizeof(w->name) - 1);
+    w->a = a;
+    w->b = b;
+    /* Rank is second dimension of A: A is [in_features, rank] in GGML */
+    w->rank = (int)a->ne[1];
+    lora->n_weights++;
+    
+    return 1;
+}
+
+/* Free a LoRA adapter */
+static void free_lora_adapter(LughLoRAAdapter *lora) {
+    if (!lora) return;
+    
+    LORA_LOCK(lora);
+    
+    if (lora->weights) {
+        Safefree(lora->weights);
+        lora->weights = NULL;
+    }
+    if (lora->source_file) {
+        Safefree(lora->source_file);
+        lora->source_file = NULL;
+    }
+    if (lora->architecture) {
+        Safefree(lora->architecture);
+        lora->architecture = NULL;
+    }
+    if (lora->buffer) {
+        ggml_backend_buffer_free(lora->buffer);
+        lora->buffer = NULL;
+    }
+    if (lora->ctx) {
+        ggml_free(lora->ctx);
+        lora->ctx = NULL;
+    }
+    
+    lora->active = 0;
+    
+    LORA_UNLOCK(lora);
+    
+    /* Remove from registry */
+    LORA_REGISTRY_LOCK();
+    if (lora->id > 0 && lora->id < MAX_LORA_ADAPTERS) {
+        lora_registry[lora->id] = NULL;
+    }
+    LORA_REGISTRY_UNLOCK();
+    
+#ifdef USE_ITHREADS
+    MUTEX_DESTROY(&lora->lora_mutex);
+#endif
+    Safefree(lora);
+}
+
+/* Create a new LoRA adapter container */
+static LughLoRAAdapter* create_lora_adapter(void) {
+    int id = alloc_lora_id();
+    if (id < 0) return NULL;
+    
+    LughLoRAAdapter *lora;
+    Newxz(lora, 1, LughLoRAAdapter);
+    if (!lora) return NULL;
+    
+    lora->id = id;
+    lora->active = 1;
+    lora->alpha = 1.0f;
+    lora->scale = 1.0f;
+    lora->n_weights = 0;
+    lora->weights_capacity = 0;
+    lora->weights = NULL;
+    
+#ifdef USE_ITHREADS
+    MUTEX_INIT(&lora->lora_mutex);
+#endif
+    
+    LORA_REGISTRY_LOCK();
+    lora_registry[id] = lora;
+    LORA_REGISTRY_UNLOCK();
+    
+    return lora;
+}
+
+/* ============================================================================
+ * LoRA-Aware Matrix Multiplication
+ * Applies LoRA adaptation: y = W*x + scale * (B * (A * x))
+ * ============================================================================ */
+
+/* Helper: LoRA-aware matrix multiplication */
+static struct ggml_tensor* lora_mul_mat(
+    struct ggml_context *ctx,
+    struct ggml_tensor *w,           /* Base model weight */
+    struct ggml_tensor *x,           /* Input */
+    LughLoRAAdapter *lora,           /* LoRA adapter (can be NULL) */
+    const char *weight_name          /* Tensor name for LoRA lookup */
+) {
+    struct ggml_tensor *result = ggml_mul_mat(ctx, w, x);
+    
+    if (!lora || !weight_name) {
+        return result;
+    }
+    
+    LughLoRAWeight *lw = find_lora_weight(lora, weight_name);
+    if (!lw || !lw->a || !lw->b) {
+        return result;
+    }
+    
+    /* Compute scaling factor: alpha / rank * scale */
+    float s = (lora->alpha / (float)lw->rank) * lora->scale;
+    
+    /* LoRA: B * (A * x) */
+    struct ggml_tensor *ax = ggml_mul_mat(ctx, lw->a, x);
+    struct ggml_tensor *bax = ggml_mul_mat(ctx, lw->b, ax);
+    
+    /* Scale and add */
+    bax = ggml_scale(ctx, bax, s);
+    result = ggml_add(ctx, result, bax);
+    
+    return result;
+}
+
+/* ============================================================================
+ * LoRA-Aware Layer Building Helpers
+ * These functions wrap the matrix multiplications with LoRA support
+ * ============================================================================ */
+
+/* Build Q, K, V projections with LoRA support
+ * Returns reshaped tensors ready for attention computation
+ */
+typedef struct {
+    struct ggml_tensor *q;   /* [head_dim, n_head, n_tokens] */
+    struct ggml_tensor *k;   /* [head_dim, n_head_kv, n_tokens] */
+    struct ggml_tensor *v;   /* [head_dim, n_head_kv, n_tokens] */
+} LughQKVResult;
+
+static LughQKVResult build_qkv_with_lora(
+    struct ggml_context *ctx,
+    struct ggml_tensor *cur,       /* Input tensor [n_embd, n_tokens] */
+    LughLayerWeights *lw,          /* Layer weights */
+    LughHyperparams *hp,           /* Model hyperparameters */
+    LughLoRAAdapter *lora          /* LoRA adapter (can be NULL) */
+) {
+    LughQKVResult qkv;
+    int n_tokens = cur->ne[1];
+    char name_buf[64];
+    
+    if (lw->has_combined_qkv && lw->wqkv) {
+        /* Combined QKV: no LoRA support for combined (would need to split) */
+        struct ggml_tensor *combined = ggml_mul_mat(ctx, lw->wqkv, cur);
+        int qkv_dim = hp->n_embd + 2 * (hp->n_head_kv * hp->head_dim);
+        
+        qkv.q = ggml_view_2d(ctx, combined, hp->n_embd, n_tokens,
+                             qkv_dim * sizeof(float), 0);
+        qkv.k = ggml_view_2d(ctx, combined, hp->n_head_kv * hp->head_dim, n_tokens,
+                             qkv_dim * sizeof(float), hp->n_embd * sizeof(float));
+        qkv.v = ggml_view_2d(ctx, combined, hp->n_head_kv * hp->head_dim, n_tokens,
+                             qkv_dim * sizeof(float), (hp->n_embd + hp->n_head_kv * hp->head_dim) * sizeof(float));
+    } else {
+        /* Separate Q, K, V projections with LoRA */
+        snprintf(name_buf, sizeof(name_buf), "blk.%d.attn_q.weight", lw->layer_idx);
+        qkv.q = lora_mul_mat(ctx, lw->wq, cur, lora, name_buf);
+        
+        snprintf(name_buf, sizeof(name_buf), "blk.%d.attn_k.weight", lw->layer_idx);
+        qkv.k = lora_mul_mat(ctx, lw->wk, cur, lora, name_buf);
+        
+        snprintf(name_buf, sizeof(name_buf), "blk.%d.attn_v.weight", lw->layer_idx);
+        qkv.v = lora_mul_mat(ctx, lw->wv, cur, lora, name_buf);
+    }
+    
+    /* Reshape for attention heads */
+    qkv.q = ggml_reshape_3d(ctx, qkv.q, hp->head_dim, hp->n_head, n_tokens);
+    qkv.k = ggml_reshape_3d(ctx, qkv.k, hp->head_dim, hp->n_head_kv, n_tokens);
+    qkv.v = ggml_reshape_3d(ctx, qkv.v, hp->head_dim, hp->n_head_kv, n_tokens);
+    
+    return qkv;
+}
+
+/* Build FFN (Feed-Forward Network) with LoRA support */
+static struct ggml_tensor* build_ffn_with_lora(
+    struct ggml_context *ctx,
+    struct ggml_tensor *cur,
+    LughLayerWeights *lw,
+    LughLoRAAdapter *lora          /* LoRA adapter (can be NULL) */
+) {
+    char name_buf[64];
+    
+    if (lw->has_ffn_gate && lw->ffn_gate) {
+        /* SwiGLU: gate * silu(up) -> down (llama, qwen, gemma) */
+        struct ggml_tensor *gate, *up;
+        
+        snprintf(name_buf, sizeof(name_buf), "blk.%d.ffn_gate.weight", lw->layer_idx);
+        gate = lora_mul_mat(ctx, lw->ffn_gate, cur, lora, name_buf);
+        
+        snprintf(name_buf, sizeof(name_buf), "blk.%d.ffn_up.weight", lw->layer_idx);
+        up = lora_mul_mat(ctx, lw->ffn_up, cur, lora, name_buf);
+        
+        gate = ggml_silu(ctx, gate);
+        cur = ggml_mul(ctx, gate, up);
+        
+        snprintf(name_buf, sizeof(name_buf), "blk.%d.ffn_down.weight", lw->layer_idx);
+        cur = lora_mul_mat(ctx, lw->ffn_down, cur, lora, name_buf);
+    } else {
+        /* GELU: gelu(up) -> down (phi, gpt2, bert) */
+        struct ggml_tensor *up;
+        
+        snprintf(name_buf, sizeof(name_buf), "blk.%d.ffn_up.weight", lw->layer_idx);
+        up = lora_mul_mat(ctx, lw->ffn_up, cur, lora, name_buf);
+        
+        cur = ggml_gelu(ctx, up);
+        
+        snprintf(name_buf, sizeof(name_buf), "blk.%d.ffn_down.weight", lw->layer_idx);
+        cur = lora_mul_mat(ctx, lw->ffn_down, cur, lora, name_buf);
+    }
+    return cur;
+}
+
+/* Build attention output projection with LoRA support */
+static struct ggml_tensor* build_attn_output_with_lora(
+    struct ggml_context *ctx,
+    struct ggml_tensor *attn_out,   /* [n_embd, n_tokens] */
+    LughLayerWeights *lw,
+    LughLoRAAdapter *lora           /* LoRA adapter (can be NULL) */
+) {
+    char name_buf[64];
+    snprintf(name_buf, sizeof(name_buf), "blk.%d.attn_output.weight", lw->layer_idx);
+    return lora_mul_mat(ctx, lw->wo, attn_out, lora, name_buf);
+}
+
+/* ============================================================================
+ * JSON Parsing via Perl (for SafeTensors support)
+ * Calls Cpanel::JSON::XS::decode_json from C
+ * ============================================================================ */
+
+/* Decode JSON string using Cpanel::JSON::XS via Perl */
+static SV* decode_json_via_perl(pTHX_ const char *json_str, STRLEN len) {
+    dSP;
+    SV *json_sv;
+    SV *result = NULL;
+    int count;
+    
+    ENTER;
+    SAVETMPS;
+    
+    PUSHMARK(SP);
+    json_sv = sv_2mortal(newSVpvn(json_str, len));
+    XPUSHs(json_sv);
+    PUTBACK;
+    
+    /* Call Cpanel::JSON::XS::decode_json() */
+    count = call_pv("Cpanel::JSON::XS::decode_json", G_SCALAR | G_EVAL);
+    
+    SPAGAIN;
+    
+    if (SvTRUE(ERRSV)) {
+        /* JSON parse error */
+        POPs;
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+        return NULL;
+    }
+    
+    if (count != 1) {
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+        return NULL;
+    }
+    
+    result = POPs;
+    SvREFCNT_inc(result);
+    
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+    
+    return result;
+}
+
+/* Ensure Cpanel::JSON::XS is loaded */
+static void ensure_json_loaded(pTHX) {
+    static int loaded = 0;
+    if (!loaded) {
+        load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("Cpanel::JSON::XS"), NULL);
+        loaded = 1;
+    }
+}
+
+/* ============================================================================
+ * LoRA Magic vtable for cleanup
+ * ============================================================================ */
+
+static int lugh_lora_free(pTHX_ SV *sv, MAGIC *mg) {
+    int id = (int)(IV)mg->mg_ptr;
+    LughLoRAAdapter *lora = get_lora_by_id(id);
+    if (lora) {
+        free_lora_adapter(lora);
+    }
+    return 0;
+}
+
+static MGVTBL lugh_lora_vtbl = {
+    NULL,              /* get */
+    NULL,              /* set */
+    NULL,              /* len */
+    NULL,              /* clear */
+    lugh_lora_free,    /* free */
+    NULL,              /* copy */
+    NULL,              /* dup */
+    NULL               /* local */
+};
+
+/* ============================================================================
  * Architecture-Aware Tensor Builders
  * Reusable functions for building computation graphs across different model types
  * ============================================================================ */
@@ -1323,28 +1779,16 @@ static struct ggml_tensor* build_transformer_layer(
     return cur;
 }
 
-/* Build FFN (Feed-Forward Network) for a layer
+/* Build FFN (Feed-Forward Network) for a layer - without LoRA
  * Supports both SwiGLU (with gate) and GELU (without gate) architectures
+ * This is a convenience wrapper around build_ffn_with_lora
  */
 static struct ggml_tensor* build_ffn(
     struct ggml_context *ctx,
     struct ggml_tensor *cur,
     LughLayerWeights *lw
 ) {
-    if (lw->has_ffn_gate && lw->ffn_gate) {
-        /* SwiGLU: gate * silu(up) -> down (llama, qwen, gemma) */
-        struct ggml_tensor *gate = ggml_mul_mat(ctx, lw->ffn_gate, cur);
-        struct ggml_tensor *up = ggml_mul_mat(ctx, lw->ffn_up, cur);
-        gate = ggml_silu(ctx, gate);
-        cur = ggml_mul(ctx, gate, up);
-        cur = ggml_mul_mat(ctx, lw->ffn_down, cur);
-    } else {
-        /* GELU: gelu(up) -> down (phi, gpt2, bert) */
-        struct ggml_tensor *up = ggml_mul_mat(ctx, lw->ffn_up, cur);
-        cur = ggml_gelu(ctx, up);
-        cur = ggml_mul_mat(ctx, lw->ffn_down, cur);
-    }
-    return cur;
+    return build_ffn_with_lora(ctx, cur, lw, NULL);
 }
 
 /* Apply RMS norm and multiply by weight */
@@ -1853,6 +2297,7 @@ PREINIT:
     HV *hv;
     SV **svp;
     LughModel *model;
+    LughLoRAAdapter *lora = NULL;
     int i, n_tokens = 0;
     int *tokens = NULL;
     LughHyperparams hp;
@@ -1871,32 +2316,63 @@ PPCODE:
     model = get_lugh_model(aTHX_ *svp);
     if (!model) croak("Invalid model");
     
-    /* Parse tokens from args */
-    /* Expect either an array ref or a list of tokens */
-    if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVAV) {
-        /* Array reference passed */
-        AV *av = (AV*)SvRV(ST(1));
-        n_tokens = av_len(av) + 1;
-        if (n_tokens == 0) {
-            croak("forward() requires at least one token");
+    /* Parse arguments - support both positional and named */
+    /* Named: forward(tokens => \@tokens, lora => $lora) */
+    /* Positional: forward(\@tokens) or forward(@tokens) */
+    for (i = 1; i < items; i++) {
+        SV *arg = ST(i);
+        if (SvPOK(arg) && !SvROK(arg)) {
+            const char *key = SvPV_nolen(arg);
+            if (strEQ(key, "tokens") && i + 1 < items) {
+                i++;
+                arg = ST(i);
+                if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
+                    AV *av = (AV*)SvRV(arg);
+                    int j;
+                    n_tokens = av_len(av) + 1;
+                    Newx(tokens, n_tokens, int);
+                    for (j = 0; j < n_tokens; j++) {
+                        SV **elem = av_fetch(av, j, 0);
+                        tokens[j] = elem ? SvIV(*elem) : 0;
+                    }
+                }
+            } else if (strEQ(key, "lora") && i + 1 < items) {
+                i++;
+                lora = get_lugh_lora(aTHX_ ST(i));
+            }
+        } else if (!tokens && SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
+            /* Positional array ref */
+            AV *av = (AV*)SvRV(arg);
+            int j;
+            n_tokens = av_len(av) + 1;
+            Newx(tokens, n_tokens, int);
+            for (j = 0; j < n_tokens; j++) {
+                SV **elem = av_fetch(av, j, 0);
+                tokens[j] = elem ? SvIV(*elem) : 0;
+            }
         }
-        Newx(tokens, n_tokens, int);
-        for (i = 0; i < n_tokens; i++) {
-            SV **elem = av_fetch(av, i, 0);
-            tokens[i] = elem ? SvIV(*elem) : 0;
+    }
+    
+    /* Fallback: if no tokens array, try positional integers */
+    if (!tokens && items > 1) {
+        int first_is_int = 1;
+        for (i = 1; i < items && first_is_int; i++) {
+            SV *arg = ST(i);
+            if (SvROK(arg) || (SvPOK(arg) && !looks_like_number(arg))) {
+                first_is_int = 0;
+            }
         }
-    } else {
-        /* List of tokens passed directly */
-        for (i = 1; i < items; i++) {
-            n_tokens++;
+        if (first_is_int) {
+            n_tokens = items - 1;
+            Newx(tokens, n_tokens, int);
+            for (i = 0; i < n_tokens; i++) {
+                tokens[i] = SvIV(ST(i + 1));
+            }
         }
-        if (n_tokens == 0) {
-            croak("forward() requires at least one token");
-        }
-        Newx(tokens, n_tokens, int);
-        for (i = 0; i < n_tokens; i++) {
-            tokens[i] = SvIV(ST(i + 1));
-        }
+    }
+    
+    if (!tokens || n_tokens == 0) {
+        croak("forward() requires tokens (array ref or list of integers)");
     }
     
     /* Extract hyperparameters */
@@ -1973,61 +2449,38 @@ PPCODE:
             /* RMS Norm before attention */
             cur = apply_rms_norm(ctx_c, cur, lw.attn_norm, hp.rms_norm_eps);
             
-            /* Self-attention: Q, K, V projections */
+            /* Self-attention with LoRA support */
             {
-                struct ggml_tensor *q, *k, *v;
+                LughQKVResult qkv;
                 struct ggml_tensor *attn_out;
                 
-                /* Q, K, V projections - handle combined or separate */
-                if (lw.has_combined_qkv) {
-                    /* Split combined QKV tensor */
-                    struct ggml_tensor *qkv = ggml_mul_mat(ctx_c, lw.wqkv, cur);
-                    int qkv_dim = hp.n_embd + 2 * (hp.n_head_kv * hp.head_dim);
-                    q = ggml_view_2d(ctx_c, qkv, hp.n_embd, n_tokens, 
-                                     qkv_dim * sizeof(float), 0);
-                    k = ggml_view_2d(ctx_c, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
-                                     qkv_dim * sizeof(float), hp.n_embd * sizeof(float));
-                    v = ggml_view_2d(ctx_c, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
-                                     qkv_dim * sizeof(float), (hp.n_embd + hp.n_head_kv * hp.head_dim) * sizeof(float));
-                } else {
-                    q = ggml_mul_mat(ctx_c, lw.wq, cur);
-                    k = ggml_mul_mat(ctx_c, lw.wk, cur);
-                    v = ggml_mul_mat(ctx_c, lw.wv, cur);
-                }
-                
-                /* Reshape for attention heads */
-                q = ggml_reshape_3d(ctx_c, q, hp.head_dim, hp.n_head, n_tokens);
-                k = ggml_reshape_3d(ctx_c, k, hp.head_dim, hp.n_head_kv, n_tokens);
-                v = ggml_reshape_3d(ctx_c, v, hp.head_dim, hp.n_head_kv, n_tokens);
+                /* Q, K, V projections with LoRA */
+                qkv = build_qkv_with_lora(ctx_c, cur, &lw, &hp, lora);
                 
                 /* Apply RoPE (rotary positional embeddings) */
-                q = ggml_rope_ext(ctx_c, q, pos, NULL, hp.n_rot, 0, hp.n_ctx,
+                qkv.q = ggml_rope_ext(ctx_c, qkv.q, pos, NULL, hp.n_rot, 0, hp.n_ctx,
                                   hp.rope_freq_base, hp.rope_freq_scale, 0.0f, 1.0f, 0.0f, 0.0f);
-                k = ggml_rope_ext(ctx_c, k, pos, NULL, hp.n_rot, 0, hp.n_ctx,
+                qkv.k = ggml_rope_ext(ctx_c, qkv.k, pos, NULL, hp.n_rot, 0, hp.n_ctx,
                                   hp.rope_freq_base, hp.rope_freq_scale, 0.0f, 1.0f, 0.0f, 0.0f);
-                
-                /* For GQA: handled by ggml broadcasting */
                 
                 if (hp.use_flash_attn) {
                     /* Flash Attention path */
                     float scale = 1.0f / sqrtf((float)hp.head_dim);
                     
-                    /* Reshape for flash attention: add batch dimension */
-                    struct ggml_tensor *q_fa = ggml_cont(ctx_c, ggml_permute(ctx_c, q, 0, 2, 1, 3));
-                    struct ggml_tensor *k_fa = ggml_cont(ctx_c, ggml_permute(ctx_c, k, 0, 2, 1, 3));
-                    struct ggml_tensor *v_fa = ggml_cont(ctx_c, ggml_permute(ctx_c, v, 0, 2, 1, 3));
+                    struct ggml_tensor *q_fa = ggml_cont(ctx_c, ggml_permute(ctx_c, qkv.q, 0, 2, 1, 3));
+                    struct ggml_tensor *k_fa = ggml_cont(ctx_c, ggml_permute(ctx_c, qkv.k, 0, 2, 1, 3));
+                    struct ggml_tensor *v_fa = ggml_cont(ctx_c, ggml_permute(ctx_c, qkv.v, 0, 2, 1, 3));
                     
-                    /* Flash attention - NULL mask means causal masking */
                     attn_out = ggml_flash_attn_ext(ctx_c, q_fa, k_fa, v_fa, NULL, scale, 0.0f, 0.0f);
                     attn_out = ggml_reshape_3d(ctx_c, attn_out, hp.head_dim, hp.n_head, n_tokens);
                 } else {
                     /* Standard scaled dot-product attention */
-                    attn_out = build_standard_attention(ctx_c, q, k, v, hp.head_dim, 0);
+                    attn_out = build_standard_attention(ctx_c, qkv.q, qkv.k, qkv.v, hp.head_dim, 0);
                 }
                 
-                /* Attention output: reshape to 2D and project */
+                /* Attention output: reshape to 2D and project with LoRA */
                 attn_out = ggml_reshape_2d(ctx_c, attn_out, hp.n_embd, n_tokens);
-                cur = ggml_mul_mat(ctx_c, lw.wo, attn_out);
+                cur = build_attn_output_with_lora(ctx_c, attn_out, &lw, lora);
             }
             
             /* Post-attention normalization (gemma2, etc.) */
@@ -2039,9 +2492,9 @@ PPCODE:
             cur = ggml_add(ctx_c, cur, residual);
             residual = cur;
             
-            /* FFN: RMS norm -> SwiGLU/GELU -> down projection */
+            /* FFN with LoRA support */
             cur = apply_rms_norm(ctx_c, cur, lw.ffn_norm, hp.rms_norm_eps);
-            cur = build_ffn(ctx_c, cur, &lw);
+            cur = build_ffn_with_lora(ctx_c, cur, &lw, lora);
             
             /* Post-FFN normalization (gemma2, etc.) */
             if (lw.has_post_norm && lw.ffn_post_norm) {
@@ -2751,15 +3204,14 @@ OUTPUT:
     RETVAL
 
 void
-forward_with_cache(self, cache_sv, tokens_ref)
+forward_with_cache(self, ...)
     SV *self
-    SV *cache_sv
-    SV *tokens_ref
 PREINIT:
     HV *hv;
     SV **svp;
     LughModel *model;
-    LughKVCache *cache;
+    LughLoRAAdapter *lora = NULL;
+    LughKVCache *cache = NULL;
     LughHyperparams hp;
     int i, n_tokens = 0;
     int *tokens = NULL;
@@ -2785,26 +3237,51 @@ PPCODE:
     model = get_lugh_model(aTHX_ *svp);
     if (!model) croak("Invalid model");
     
-    /* Get cache */
-    cache = get_lugh_kvcache(aTHX_ cache_sv);
-    if (!cache) croak("Invalid KV cache");
+    /* Parse arguments - support both positional and named */
+    /* Named: forward_with_cache(cache => $cache, tokens => \@tokens, lora => $lora) */
+    /* Positional: forward_with_cache($cache, \@tokens) */
+    for (i = 1; i < items; i++) {
+        SV *arg = ST(i);
+        if (SvPOK(arg) && !SvROK(arg)) {
+            const char *key = SvPV_nolen(arg);
+            if (strEQ(key, "cache") && i + 1 < items) {
+                i++;
+                cache = get_lugh_kvcache(aTHX_ ST(i));
+            } else if (strEQ(key, "tokens") && i + 1 < items) {
+                i++;
+                arg = ST(i);
+                if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
+                    AV *av = (AV*)SvRV(arg);
+                    int j;
+                    n_tokens = av_len(av) + 1;
+                    Newx(tokens, n_tokens, int);
+                    for (j = 0; j < n_tokens; j++) {
+                        SV **elem = av_fetch(av, j, 0);
+                        tokens[j] = elem ? SvIV(*elem) : 0;
+                    }
+                }
+            } else if (strEQ(key, "lora") && i + 1 < items) {
+                i++;
+                lora = get_lugh_lora(aTHX_ ST(i));
+            }
+        } else if (!cache && sv_isobject(arg)) {
+            /* First positional object - try as cache */
+            cache = get_lugh_kvcache(aTHX_ arg);
+        } else if (cache && !tokens && SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
+            /* Second positional - tokens array ref */
+            AV *av = (AV*)SvRV(arg);
+            int j;
+            n_tokens = av_len(av) + 1;
+            Newx(tokens, n_tokens, int);
+            for (j = 0; j < n_tokens; j++) {
+                SV **elem = av_fetch(av, j, 0);
+                tokens[j] = elem ? SvIV(*elem) : 0;
+            }
+        }
+    }
     
-    /* Parse tokens from array ref */
-    if (!SvROK(tokens_ref) || SvTYPE(SvRV(tokens_ref)) != SVt_PVAV) {
-        croak("tokens must be an array reference");
-    }
-    {
-        AV *av = (AV*)SvRV(tokens_ref);
-        n_tokens = av_len(av) + 1;
-        if (n_tokens == 0) {
-            croak("forward_with_cache() requires at least one token");
-        }
-        Newx(tokens, n_tokens, int);
-        for (i = 0; i < n_tokens; i++) {
-            SV **elem = av_fetch(av, i, 0);
-            tokens[i] = elem ? SvIV(*elem) : 0;
-        }
-    }
+    if (!cache) croak("forward_with_cache() requires a cache parameter");
+    if (!tokens || n_tokens == 0) croak("forward_with_cache() requires at least one token");
     
     /* Lock cache and get position offset */
     KVCACHE_LOCK(cache);
@@ -2903,10 +3380,16 @@ PPCODE:
                 struct ggml_tensor *q, *k_new, *v_new;
                 struct ggml_tensor *k_full, *v_full;
                 struct ggml_tensor *attn_out;
+                char q_name[64], k_name[64], v_name[64];
+                
+                /* Build LoRA weight names for this layer */
+                snprintf(q_name, sizeof(q_name), "blk.%d.attn_q.weight", layer);
+                snprintf(k_name, sizeof(k_name), "blk.%d.attn_k.weight", layer);
+                snprintf(v_name, sizeof(v_name), "blk.%d.attn_v.weight", layer);
                 
                 /* Compute Q, K, V for new tokens - handle combined or separate */
                 if (lw.has_combined_qkv) {
-                    /* Split combined QKV tensor */
+                    /* Split combined QKV tensor - LoRA not supported for combined QKV yet */
                     struct ggml_tensor *qkv = ggml_mul_mat(ctx_c, lw.wqkv, cur);
                     int qkv_dim = hp.n_embd + 2 * (hp.n_head_kv * hp.head_dim);
                     q = ggml_view_2d(ctx_c, qkv, hp.n_embd, n_tokens, 
@@ -2920,9 +3403,10 @@ PPCODE:
                     k_new = ggml_reshape_3d(ctx_c, k_new, hp.head_dim, hp.n_head_kv, n_tokens);
                     v_new = ggml_reshape_3d(ctx_c, v_new, hp.head_dim, hp.n_head_kv, n_tokens);
                 } else {
-                    q = ggml_mul_mat(ctx_c, lw.wq, cur);
-                    k_new = ggml_mul_mat(ctx_c, lw.wk, cur);
-                    v_new = ggml_mul_mat(ctx_c, lw.wv, cur);
+                    /* Use LoRA-aware matrix multiplication */
+                    q = lora_mul_mat(ctx_c, lw.wq, cur, lora, q_name);
+                    k_new = lora_mul_mat(ctx_c, lw.wk, cur, lora, k_name);
+                    v_new = lora_mul_mat(ctx_c, lw.wv, cur, lora, v_name);
                     
                     /* Reshape for attention */
                     q = ggml_reshape_3d(ctx_c, q, hp.head_dim, hp.n_head, n_tokens);
@@ -3014,9 +3498,13 @@ PPCODE:
                     attn_out = ggml_cont(ctx_c, ggml_permute(ctx_c, attn_out, 0, 2, 1, 3));
                 }
                 
-                /* Reshape and project */
-                attn_out = ggml_reshape_2d(ctx_c, attn_out, hp.n_embd, n_tokens);
-                cur = ggml_mul_mat(ctx_c, lw.wo, attn_out);
+                /* Reshape and project with LoRA */
+                {
+                    char o_name[64];
+                    snprintf(o_name, sizeof(o_name), "blk.%d.attn_output.weight", layer);
+                    attn_out = ggml_reshape_2d(ctx_c, attn_out, hp.n_embd, n_tokens);
+                    cur = lora_mul_mat(ctx_c, lw.wo, attn_out, lora, o_name);
+                }
             }
             
             /* Post-attention normalization (gemma2, etc.) */
@@ -3024,12 +3512,12 @@ PPCODE:
                 cur = apply_rms_norm(ctx_c, cur, lw.attn_post_norm, hp.rms_norm_eps);
             }
             
-            /* Residual + FFN using helpers */
+            /* Residual + FFN using LoRA-aware helpers */
             cur = ggml_add(ctx_c, cur, residual);
             residual = cur;
             
             cur = apply_rms_norm(ctx_c, cur, lw.ffn_norm, hp.rms_norm_eps);
-            cur = build_ffn(ctx_c, cur, &lw);
+            cur = build_ffn_with_lora(ctx_c, cur, &lw, lora);
             
             /* Post-FFN normalization (gemma2, etc.) */
             if (lw.has_post_norm && lw.ffn_post_norm) {
@@ -3231,15 +3719,14 @@ OUTPUT:
     RETVAL
 
 void
-forward_with_pool(self, pool_sv, tokens_ref)
+forward_with_pool(self, ...)
     SV *self
-    SV *pool_sv
-    SV *tokens_ref
 PREINIT:
     HV *hv, *pool_hv;
     SV **svp;
     LughModel *model;
-    LughMemoryPool *pool;
+    LughMemoryPool *pool = NULL;
+    LughLoRAAdapter *lora = NULL;
     int *tokens = NULL;
     int n_tokens = 0;
     int i;
@@ -3256,30 +3743,62 @@ PPCODE:
     model = get_lugh_model(aTHX_ *svp);
     if (!model) croak("Invalid model");
     
-    /* Get memory pool */
-    if (!SvROK(pool_sv) || SvTYPE(SvRV(pool_sv)) != SVt_PVHV) {
-        croak("pool must be a Lugh::MemoryPool object");
-    }
-    pool_hv = (HV*)SvRV(pool_sv);
-    svp = hv_fetch(pool_hv, "_pool_id", 8, 0);
-    if (!svp || !*svp) croak("Invalid memory pool");
-    pool = get_mempool_by_id(SvIV(*svp));
-    if (!pool) croak("Memory pool not found or inactive");
-    
-    /* Parse tokens */
-    if (!SvROK(tokens_ref) || SvTYPE(SvRV(tokens_ref)) != SVt_PVAV) {
-        croak("tokens must be an array reference");
-    }
-    {
-        AV *av = (AV*)SvRV(tokens_ref);
-        n_tokens = av_len(av) + 1;
-        if (n_tokens == 0) croak("forward_with_pool requires at least one token");
-        Newx(tokens, n_tokens, int);
-        for (i = 0; i < n_tokens; i++) {
-            SV **elem = av_fetch(av, i, 0);
-            tokens[i] = elem ? SvIV(*elem) : 0;
+    /* Parse arguments - support both positional and named */
+    for (i = 1; i < items; i++) {
+        SV *arg = ST(i);
+        if (SvPOK(arg) && !SvROK(arg)) {
+            const char *key = SvPV_nolen(arg);
+            if (strEQ(key, "pool") && i + 1 < items) {
+                i++;
+                arg = ST(i);
+                if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVHV) {
+                    pool_hv = (HV*)SvRV(arg);
+                    svp = hv_fetch(pool_hv, "_pool_id", 8, 0);
+                    if (svp && *svp) {
+                        pool = get_mempool_by_id(SvIV(*svp));
+                    }
+                }
+            } else if (strEQ(key, "tokens") && i + 1 < items) {
+                i++;
+                arg = ST(i);
+                if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
+                    AV *av = (AV*)SvRV(arg);
+                    int j;
+                    n_tokens = av_len(av) + 1;
+                    Newx(tokens, n_tokens, int);
+                    for (j = 0; j < n_tokens; j++) {
+                        SV **elem = av_fetch(av, j, 0);
+                        tokens[j] = elem ? SvIV(*elem) : 0;
+                    }
+                }
+            } else if (strEQ(key, "lora") && i + 1 < items) {
+                i++;
+                lora = get_lugh_lora(aTHX_ ST(i));
+            }
+        } else if (!pool && sv_isobject(arg)) {
+            /* First positional object - try as pool */
+            if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVHV) {
+                pool_hv = (HV*)SvRV(arg);
+                svp = hv_fetch(pool_hv, "_pool_id", 8, 0);
+                if (svp && *svp) {
+                    pool = get_mempool_by_id(SvIV(*svp));
+                }
+            }
+        } else if (pool && !tokens && SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
+            /* Second positional - tokens array ref */
+            AV *av = (AV*)SvRV(arg);
+            int j;
+            n_tokens = av_len(av) + 1;
+            Newx(tokens, n_tokens, int);
+            for (j = 0; j < n_tokens; j++) {
+                SV **elem = av_fetch(av, j, 0);
+                tokens[j] = elem ? SvIV(*elem) : 0;
+            }
         }
     }
+    
+    if (!pool) croak("forward_with_pool() requires a pool parameter");
+    if (!tokens || n_tokens == 0) croak("forward_with_pool() requires at least one token");
     
     extract_hyperparams(aTHX_ hv, model, &hp);
     ctx_w = model->ctx;
@@ -3334,9 +3853,16 @@ PPCODE:
             {
                 struct ggml_tensor *q, *k, *v;
                 struct ggml_tensor *attn_out;
+                char q_name[64], k_name[64], v_name[64], o_name[64];
+                
+                /* Build LoRA weight names for this layer */
+                snprintf(q_name, sizeof(q_name), "blk.%d.attn_q.weight", layer);
+                snprintf(k_name, sizeof(k_name), "blk.%d.attn_k.weight", layer);
+                snprintf(v_name, sizeof(v_name), "blk.%d.attn_v.weight", layer);
+                snprintf(o_name, sizeof(o_name), "blk.%d.attn_output.weight", layer);
                 
                 if (lw.has_combined_qkv) {
-                    /* Split combined QKV tensor */
+                    /* Split combined QKV tensor - LoRA not supported for combined QKV yet */
                     struct ggml_tensor *qkv = ggml_mul_mat(pool->ctx_compute, lw.wqkv, cur);
                     int qkv_dim = hp.n_embd + 2 * (hp.n_head_kv * hp.head_dim);
                     q = ggml_view_2d(pool->ctx_compute, qkv, hp.n_embd, n_tokens, 
@@ -3346,9 +3872,10 @@ PPCODE:
                     v = ggml_view_2d(pool->ctx_compute, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
                                      qkv_dim * sizeof(float), (hp.n_embd + hp.n_head_kv * hp.head_dim) * sizeof(float));
                 } else {
-                    q = ggml_mul_mat(pool->ctx_compute, lw.wq, cur);
-                    k = ggml_mul_mat(pool->ctx_compute, lw.wk, cur);
-                    v = ggml_mul_mat(pool->ctx_compute, lw.wv, cur);
+                    /* Use LoRA-aware matrix multiplication */
+                    q = lora_mul_mat(pool->ctx_compute, lw.wq, cur, lora, q_name);
+                    k = lora_mul_mat(pool->ctx_compute, lw.wk, cur, lora, k_name);
+                    v = lora_mul_mat(pool->ctx_compute, lw.wv, cur, lora, v_name);
                 }
                 
                 q = ggml_reshape_3d(pool->ctx_compute, q, hp.head_dim, hp.n_head, n_tokens);
@@ -3362,7 +3889,7 @@ PPCODE:
                 
                 attn_out = build_standard_attention(pool->ctx_compute, q, k, v, hp.head_dim, 0);
                 attn_out = ggml_reshape_2d(pool->ctx_compute, attn_out, hp.n_embd, n_tokens);
-                attn_out = ggml_mul_mat(pool->ctx_compute, lw.wo, attn_out);
+                attn_out = lora_mul_mat(pool->ctx_compute, lw.wo, attn_out, lora, o_name);
                 
                 /* Post-attention norm (Gemma2, etc.) */
                 if (lw.has_post_norm && lw.attn_post_norm) {
@@ -3372,10 +3899,10 @@ PPCODE:
                 cur = ggml_add(pool->ctx_compute, residual, attn_out);
             }
             
-            /* FFN */
+            /* FFN with LoRA */
             residual = cur;
             cur = apply_rms_norm(pool->ctx_compute, cur, lw.ffn_norm, hp.rms_norm_eps);
-            cur = build_ffn(pool->ctx_compute, cur, &lw);
+            cur = build_ffn_with_lora(pool->ctx_compute, cur, &lw, lora);
             
             /* Post-FFN norm (Gemma2, etc.) */
             if (lw.has_post_norm && lw.ffn_post_norm) {
@@ -3449,14 +3976,14 @@ PPCODE:
     Safefree(tokens);
 
 void
-forward_batch(self, sequences_ref)
+forward_batch(self, ...)
     SV *self
-    SV *sequences_ref
 PREINIT:
     HV *hv;
     SV **svp;
     LughModel *model;
-    AV *sequences_av;
+    LughLoRAAdapter *lora = NULL;
+    AV *sequences_av = NULL;
     int n_sequences = 0;
     int **all_tokens = NULL;
     int *seq_lengths = NULL;
@@ -3477,11 +4004,28 @@ PPCODE:
     model = get_lugh_model(aTHX_ *svp);
     if (!model) croak("Invalid model");
     
-    /* Parse sequences - array of array refs */
-    if (!SvROK(sequences_ref) || SvTYPE(SvRV(sequences_ref)) != SVt_PVAV) {
-        croak("sequences must be an array of array references");
+    /* Parse arguments - support both positional and named */
+    for (i = 1; i < items; i++) {
+        SV *arg = ST(i);
+        if (SvPOK(arg) && !SvROK(arg)) {
+            const char *key = SvPV_nolen(arg);
+            if (strEQ(key, "sequences") && i + 1 < items) {
+                i++;
+                arg = ST(i);
+                if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
+                    sequences_av = (AV*)SvRV(arg);
+                }
+            } else if (strEQ(key, "lora") && i + 1 < items) {
+                i++;
+                lora = get_lugh_lora(aTHX_ ST(i));
+            }
+        } else if (!sequences_av && SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
+            /* Positional array ref */
+            sequences_av = (AV*)SvRV(arg);
+        }
     }
-    sequences_av = (AV*)SvRV(sequences_ref);
+    
+    if (!sequences_av) croak("forward_batch() requires sequences parameter");
     n_sequences = av_len(sequences_av) + 1;
     if (n_sequences == 0) croak("forward_batch requires at least one sequence");
     
@@ -3584,9 +4128,16 @@ PPCODE:
                 {
                     struct ggml_tensor *q, *k, *v;
                     struct ggml_tensor *attn_out;
+                    char q_name[64], k_name[64], v_name[64], o_name[64];
+                    
+                    /* Build LoRA weight names for this layer */
+                    snprintf(q_name, sizeof(q_name), "blk.%d.attn_q.weight", layer);
+                    snprintf(k_name, sizeof(k_name), "blk.%d.attn_k.weight", layer);
+                    snprintf(v_name, sizeof(v_name), "blk.%d.attn_v.weight", layer);
+                    snprintf(o_name, sizeof(o_name), "blk.%d.attn_output.weight", layer);
                     
                     if (lw.has_combined_qkv) {
-                        /* Split combined QKV tensor */
+                        /* Split combined QKV tensor - LoRA not supported for combined QKV yet */
                         struct ggml_tensor *qkv = ggml_mul_mat(seq_ctx, lw.wqkv, cur);
                         int qkv_dim = hp.n_embd + 2 * (hp.n_head_kv * hp.head_dim);
                         q = ggml_view_2d(seq_ctx, qkv, hp.n_embd, n_tokens, 
@@ -3596,9 +4147,10 @@ PPCODE:
                         v = ggml_view_2d(seq_ctx, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
                                          qkv_dim * sizeof(float), (hp.n_embd + hp.n_head_kv * hp.head_dim) * sizeof(float));
                     } else {
-                        q = ggml_mul_mat(seq_ctx, lw.wq, cur);
-                        k = ggml_mul_mat(seq_ctx, lw.wk, cur);
-                        v = ggml_mul_mat(seq_ctx, lw.wv, cur);
+                        /* Use LoRA-aware matrix multiplication */
+                        q = lora_mul_mat(seq_ctx, lw.wq, cur, lora, q_name);
+                        k = lora_mul_mat(seq_ctx, lw.wk, cur, lora, k_name);
+                        v = lora_mul_mat(seq_ctx, lw.wv, cur, lora, v_name);
                     }
                     
                     q = ggml_reshape_3d(seq_ctx, q, hp.head_dim, hp.n_head, n_tokens);
@@ -3612,7 +4164,7 @@ PPCODE:
                     
                     attn_out = build_standard_attention(seq_ctx, q, k, v, hp.head_dim, 0);
                     attn_out = ggml_reshape_2d(seq_ctx, attn_out, hp.n_embd, n_tokens);
-                    attn_out = ggml_mul_mat(seq_ctx, lw.wo, attn_out);
+                    attn_out = lora_mul_mat(seq_ctx, lw.wo, attn_out, lora, o_name);
                     
                     /* Post-attention norm (Gemma2, etc.) */
                     if (lw.has_post_norm && lw.attn_post_norm) {
@@ -3624,7 +4176,7 @@ PPCODE:
                 
                 residual = cur;
                 cur = apply_rms_norm(seq_ctx, cur, lw.ffn_norm, hp.rms_norm_eps);
-                cur = build_ffn(seq_ctx, cur, &lw);
+                cur = build_ffn_with_lora(seq_ctx, cur, &lw, lora);
                 
                 /* Post-FFN norm (Gemma2, etc.) */
                 if (lw.has_post_norm && lw.ffn_post_norm) {
@@ -4332,6 +4884,208 @@ PPCODE:
         mPUSHi(tensor->ne[i]);
     }
 
+int
+type(self)
+    SV *self
+CODE:
+    struct ggml_tensor *tensor = INT2PTR(struct ggml_tensor *, SvIV(SvRV(self)));
+    RETVAL = (int)tensor->type;
+OUTPUT:
+    RETVAL
+
+const char *
+type_name(self)
+    SV *self
+CODE:
+    struct ggml_tensor *tensor = INT2PTR(struct ggml_tensor *, SvIV(SvRV(self)));
+    RETVAL = ggml_type_name(tensor->type);
+OUTPUT:
+    RETVAL
+
+size_t
+type_size(self)
+    SV *self
+CODE:
+    struct ggml_tensor *tensor = INT2PTR(struct ggml_tensor *, SvIV(SvRV(self)));
+    RETVAL = ggml_type_size(tensor->type);
+OUTPUT:
+    RETVAL
+
+int64_t
+blck_size(self)
+    SV *self
+CODE:
+    struct ggml_tensor *tensor = INT2PTR(struct ggml_tensor *, SvIV(SvRV(self)));
+    RETVAL = ggml_blck_size(tensor->type);
+OUTPUT:
+    RETVAL
+
+int
+is_quantized(self)
+    SV *self
+CODE:
+    struct ggml_tensor *tensor = INT2PTR(struct ggml_tensor *, SvIV(SvRV(self)));
+    RETVAL = ggml_is_quantized(tensor->type) ? 1 : 0;
+OUTPUT:
+    RETVAL
+
+size_t
+nbytes(self)
+    SV *self
+CODE:
+    struct ggml_tensor *tensor = INT2PTR(struct ggml_tensor *, SvIV(SvRV(self)));
+    RETVAL = ggml_nbytes(tensor);
+OUTPUT:
+    RETVAL
+
+SV *
+quantize(self, ctx_sv, dest_type)
+    SV *self
+    SV *ctx_sv
+    int dest_type
+PREINIT:
+    LughContext *lctx;
+    struct ggml_tensor *src;
+    struct ggml_tensor *dst;
+    int64_t ne[4];
+    int i, n_dims;
+    float *src_data;
+    int64_t n_elements;
+CODE:
+    lctx = get_lugh_context(aTHX_ ctx_sv);
+    src = INT2PTR(struct ggml_tensor *, SvIV(SvRV(self)));
+    
+    if (dest_type < 0 || dest_type >= GGML_TYPE_COUNT) {
+        croak("Invalid destination type: %d", dest_type);
+    }
+    
+    if (!ggml_is_quantized((enum ggml_type)dest_type)) {
+        croak("Destination type %s is not a quantized type", 
+              ggml_type_name((enum ggml_type)dest_type));
+    }
+    
+    if (src->type != GGML_TYPE_F32) {
+        croak("Source tensor must be F32, got %s", ggml_type_name(src->type));
+    }
+    
+    /* Get dimensions */
+    n_dims = ggml_n_dims(src);
+    for (i = 0; i < 4; i++) {
+        ne[i] = src->ne[i];
+    }
+    
+    /* Create destination tensor */
+    switch (n_dims) {
+        case 1:
+            dst = ggml_new_tensor_1d(lctx->ctx, (enum ggml_type)dest_type, ne[0]);
+            break;
+        case 2:
+            dst = ggml_new_tensor_2d(lctx->ctx, (enum ggml_type)dest_type, ne[0], ne[1]);
+            break;
+        case 3:
+            dst = ggml_new_tensor_3d(lctx->ctx, (enum ggml_type)dest_type, ne[0], ne[1], ne[2]);
+            break;
+        case 4:
+            dst = ggml_new_tensor_4d(lctx->ctx, (enum ggml_type)dest_type, ne[0], ne[1], ne[2], ne[3]);
+            break;
+        default:
+            croak("Unsupported dimensionality: %d", n_dims);
+    }
+    
+    if (!dst) {
+        croak("Failed to create destination tensor");
+    }
+    
+    /* Quantize the data */
+    n_elements = ggml_nelements(src);
+    src_data = (float *)src->data;
+    
+    {
+        int64_t n_rows = n_elements / ne[0];
+        ggml_quantize_chunk(
+            (enum ggml_type)dest_type,
+            src_data,
+            dst->data,
+            0,
+            n_rows,
+            ne[0],
+            NULL
+        );
+    }
+    
+    RETVAL = sv_bless(
+        newRV_noinc(newSViv(PTR2IV(dst))),
+        gv_stashpv("Lugh::Tensor", GV_ADD)
+    );
+OUTPUT:
+    RETVAL
+
+SV *
+dequantize(self, ctx_sv)
+    SV *self
+    SV *ctx_sv
+PREINIT:
+    LughContext *lctx;
+    struct ggml_tensor *src;
+    struct ggml_tensor *dst;
+    int64_t ne[4];
+    int i, n_dims;
+    int64_t n_elements;
+CODE:
+    lctx = get_lugh_context(aTHX_ ctx_sv);
+    src = INT2PTR(struct ggml_tensor *, SvIV(SvRV(self)));
+    
+    if (!ggml_is_quantized(src->type) && src->type != GGML_TYPE_F16 && src->type != GGML_TYPE_BF16) {
+        croak("Source tensor is not quantized (type: %s)", ggml_type_name(src->type));
+    }
+    
+    /* Get dimensions */
+    n_dims = ggml_n_dims(src);
+    for (i = 0; i < 4; i++) {
+        ne[i] = src->ne[i];
+    }
+    
+    /* Create F32 destination tensor */
+    switch (n_dims) {
+        case 1:
+            dst = ggml_new_tensor_1d(lctx->ctx, GGML_TYPE_F32, ne[0]);
+            break;
+        case 2:
+            dst = ggml_new_tensor_2d(lctx->ctx, GGML_TYPE_F32, ne[0], ne[1]);
+            break;
+        case 3:
+            dst = ggml_new_tensor_3d(lctx->ctx, GGML_TYPE_F32, ne[0], ne[1], ne[2]);
+            break;
+        case 4:
+            dst = ggml_new_tensor_4d(lctx->ctx, GGML_TYPE_F32, ne[0], ne[1], ne[2], ne[3]);
+            break;
+        default:
+            croak("Unsupported dimensionality: %d", n_dims);
+    }
+    
+    if (!dst) {
+        croak("Failed to create destination tensor");
+    }
+    
+    /* Dequantize using ggml's type traits */
+    n_elements = ggml_nelements(src);
+    {
+        const struct ggml_type_traits *traits = ggml_get_type_traits(src->type);
+        if (traits && traits->to_float) {
+            traits->to_float(src->data, (float *)dst->data, n_elements);
+        } else {
+            croak("No dequantization function available for type %s", 
+                  ggml_type_name(src->type));
+        }
+    }
+    
+    RETVAL = sv_bless(
+        newRV_noinc(newSViv(PTR2IV(dst))),
+        gv_stashpv("Lugh::Tensor", GV_ADD)
+    );
+OUTPUT:
+    RETVAL
+
 MODULE = Lugh    PACKAGE = Lugh::Ops
 
 SV *
@@ -4838,6 +5592,561 @@ CODE:
     }
 OUTPUT:
     RETVAL
+
+void
+DESTROY(self)
+    SV *self
+CODE:
+    /* Magic cleanup handles this */
+    PERL_UNUSED_VAR(self);
+
+MODULE = Lugh    PACKAGE = Lugh::LoRA
+
+=pod
+
+=head1 Lugh::LoRA
+
+LoRA (Low-Rank Adaptation) adapter loading and management.
+Supports GGUF and SafeTensors formats.
+
+=cut
+
+SV *
+new(class, ...)
+    char *class
+PREINIT:
+    const char *adapter_file = NULL;
+    const char *config_file = NULL;
+    SV *model_sv = NULL;
+    LughModel *model = NULL;
+    float scale = 1.0f;
+    int i;
+CODE:
+    INIT_MUTEXES();
+    
+    /* Parse arguments */
+    for (i = 1; i < items; i += 2) {
+        if (i + 1 < items) {
+            const char *key = SvPV_nolen(ST(i));
+            if (strEQ(key, "adapter") || strEQ(key, "file")) {
+                adapter_file = SvPV_nolen(ST(i + 1));
+            } else if (strEQ(key, "config")) {
+                config_file = SvPV_nolen(ST(i + 1));
+            } else if (strEQ(key, "model")) {
+                model_sv = ST(i + 1);
+                model = get_lugh_model(aTHX_ model_sv);
+            } else if (strEQ(key, "scale")) {
+                scale = SvNV(ST(i + 1));
+            }
+        }
+    }
+    
+    if (!adapter_file) {
+        croak("Lugh::LoRA->new requires 'adapter' parameter with path to adapter file");
+    }
+    if (!model) {
+        croak("Lugh::LoRA->new requires 'model' parameter with Lugh::Model object");
+    }
+    
+    /* Detect format by extension */
+    int is_gguf = 0;
+    int is_safetensors = 0;
+    size_t len = strlen(adapter_file);
+    
+    if (len > 5 && strcmp(adapter_file + len - 5, ".gguf") == 0) {
+        is_gguf = 1;
+    } else if (len > 12 && strcmp(adapter_file + len - 12, ".safetensors") == 0) {
+        is_safetensors = 1;
+    } else {
+        croak("Unrecognized adapter format. Expected .gguf or .safetensors");
+    }
+    
+    /* Create adapter container */
+    LughLoRAAdapter *lora = create_lora_adapter();
+    if (!lora) {
+        croak("Failed to create LoRA adapter (max adapters reached)");
+    }
+    
+    lora->scale = scale;
+    Newx(lora->source_file, strlen(adapter_file) + 1, char);
+    strcpy(lora->source_file, adapter_file);
+    
+    if (is_gguf) {
+        /* ============================================
+         * GGUF LoRA Loading
+         * ============================================ */
+        strcpy(lora->format, "gguf");
+        
+        struct ggml_context *tensor_ctx = NULL;
+        struct gguf_init_params gguf_params = {
+            .no_alloc = false,
+            .ctx = &tensor_ctx
+        };
+        
+        struct gguf_context *gguf = gguf_init_from_file(adapter_file, gguf_params);
+        if (!gguf) {
+            free_lora_adapter(lora);
+            croak("Failed to load GGUF adapter: %s", adapter_file);
+        }
+        
+        lora->ctx = tensor_ctx;
+        
+        /* Validate adapter type */
+        int64_t key_id = gguf_find_key(gguf, "general.type");
+        if (key_id >= 0) {
+            const char *type = gguf_get_val_str(gguf, key_id);
+            if (strcmp(type, "adapter") != 0) {
+                gguf_free(gguf);
+                free_lora_adapter(lora);
+                croak("GGUF file is not an adapter (general.type='%s')", type);
+            }
+        }
+        
+        key_id = gguf_find_key(gguf, "adapter.type");
+        if (key_id >= 0) {
+            const char *atype = gguf_get_val_str(gguf, key_id);
+            if (strcmp(atype, "lora") != 0) {
+                gguf_free(gguf);
+                free_lora_adapter(lora);
+                croak("Adapter type is not LoRA (adapter.type='%s')", atype);
+            }
+        }
+        
+        /* Validate architecture match */
+        key_id = gguf_find_key(gguf, "general.architecture");
+        if (key_id >= 0) {
+            const char *adapter_arch = gguf_get_val_str(gguf, key_id);
+            if (model->architecture && strcmp(adapter_arch, model->architecture) != 0) {
+                gguf_free(gguf);
+                free_lora_adapter(lora);
+                croak("Architecture mismatch: model='%s', adapter='%s'",
+                      model->architecture, adapter_arch);
+            }
+            Newx(lora->architecture, strlen(adapter_arch) + 1, char);
+            strcpy(lora->architecture, adapter_arch);
+        }
+        
+        /* Get alpha */
+        key_id = gguf_find_key(gguf, "adapter.lora.alpha");
+        if (key_id >= 0) {
+            lora->alpha = gguf_get_val_f32(gguf, key_id);
+        } else {
+            lora->alpha = 1.0f;
+        }
+        
+        /* Collect tensor pairs: match *.lora_a with *.lora_b */
+        int n_tensors = gguf_get_n_tensors(gguf);
+        
+        /* First pass: collect all lora_a tensors */
+        for (i = 0; i < n_tensors; i++) {
+            const char *tname = gguf_get_tensor_name(gguf, i);
+            size_t tlen = strlen(tname);
+            
+            /* Check if ends with .lora_a */
+            if (tlen > 7 && strcmp(tname + tlen - 7, ".lora_a") == 0) {
+                /* Extract base name */
+                char base_name[128];
+                strncpy(base_name, tname, tlen - 7);
+                base_name[tlen - 7] = '\0';
+                
+                /* Build lora_b name */
+                char b_name[136];
+                snprintf(b_name, sizeof(b_name), "%s.lora_b", base_name);
+                
+                /* Find matching lora_b tensor */
+                struct ggml_tensor *tensor_a = ggml_get_tensor(tensor_ctx, tname);
+                struct ggml_tensor *tensor_b = ggml_get_tensor(tensor_ctx, b_name);
+                
+                if (tensor_a && tensor_b) {
+                    add_lora_weight(lora, base_name, tensor_a, tensor_b);
+                }
+            }
+        }
+        
+        gguf_free(gguf);  /* Free GGUF metadata, tensors remain in tensor_ctx */
+        
+    } else if (is_safetensors) {
+        /* ============================================
+         * SafeTensors LoRA Loading
+         * ============================================ */
+        strcpy(lora->format, "safetensors");
+        
+        ensure_json_loaded(aTHX);
+        
+        /* Open file */
+        FILE *fp = fopen(adapter_file, "rb");
+        if (!fp) {
+            free_lora_adapter(lora);
+            croak("Cannot open SafeTensors file: %s", adapter_file);
+        }
+        
+        /* Read header length (8-byte little-endian) */
+        uint64_t header_len;
+        if (fread(&header_len, 8, 1, fp) != 1) {
+            fclose(fp);
+            free_lora_adapter(lora);
+            croak("Failed to read SafeTensors header length");
+        }
+        
+        /* Sanity check header length */
+        if (header_len > 100 * 1024 * 1024) {  /* Max 100MB header */
+            fclose(fp);
+            free_lora_adapter(lora);
+            croak("SafeTensors header too large: %llu bytes", (unsigned long long)header_len);
+        }
+        
+        /* Read header JSON */
+        char *header_json;
+        Newx(header_json, header_len + 1, char);
+        if (fread(header_json, header_len, 1, fp) != 1) {
+            Safefree(header_json);
+            fclose(fp);
+            free_lora_adapter(lora);
+            croak("Failed to read SafeTensors header");
+        }
+        header_json[header_len] = '\0';
+        
+        /* Data starts after header */
+        long data_offset = 8 + header_len;
+        
+        /* Parse header JSON via Perl */
+        SV *header_hv_sv = decode_json_via_perl(aTHX_ header_json, header_len);
+        Safefree(header_json);
+        
+        if (!header_hv_sv || !SvROK(header_hv_sv) || SvTYPE(SvRV(header_hv_sv)) != SVt_PVHV) {
+            fclose(fp);
+            free_lora_adapter(lora);
+            croak("Failed to parse SafeTensors header JSON");
+        }
+        
+        HV *header_hv = (HV*)SvRV(header_hv_sv);
+        
+        /* Count tensors and calculate memory needed */
+        size_t total_tensor_size = 0;
+        int tensor_count = 0;
+        
+        hv_iterinit(header_hv);
+        HE *entry;
+        while ((entry = hv_iternext(header_hv))) {
+            const char *tname = HePV(entry, PL_na);
+            if (strcmp(tname, "__metadata__") == 0) continue;
+            
+            SV *val = HeVAL(entry);
+            if (!SvROK(val) || SvTYPE(SvRV(val)) != SVt_PVHV) continue;
+            
+            HV *tensor_info = (HV*)SvRV(val);
+            SV **offsets_sv = hv_fetch(tensor_info, "data_offsets", 12, 0);
+            if (offsets_sv && SvROK(*offsets_sv) && SvTYPE(SvRV(*offsets_sv)) == SVt_PVAV) {
+                AV *offsets = (AV*)SvRV(*offsets_sv);
+                SV **start_sv = av_fetch(offsets, 0, 0);
+                SV **end_sv = av_fetch(offsets, 1, 0);
+                if (start_sv && end_sv) {
+                    size_t start = SvUV(*start_sv);
+                    size_t end = SvUV(*end_sv);
+                    total_tensor_size += (end - start);
+                    tensor_count++;
+                }
+            }
+        }
+        
+        /* Create ggml context for tensors */
+        struct ggml_init_params ctx_params = {
+            .mem_size = tensor_count * ggml_tensor_overhead() + 1024,
+            .mem_buffer = NULL,
+            .no_alloc = true,
+        };
+        lora->ctx = ggml_init(ctx_params);
+        if (!lora->ctx) {
+            fclose(fp);
+            SvREFCNT_dec(header_hv_sv);
+            free_lora_adapter(lora);
+            croak("Failed to create tensor context");
+        }
+        
+        /* Create backend buffer for tensor data */
+        ggml_backend_t cpu_backend = ggml_backend_cpu_init();
+        lora->buffer = ggml_backend_alloc_buffer(cpu_backend, total_tensor_size + 4096);
+        ggml_backend_free(cpu_backend);
+        
+        if (!lora->buffer) {
+            fclose(fp);
+            SvREFCNT_dec(header_hv_sv);
+            free_lora_adapter(lora);
+            croak("Failed to allocate tensor buffer");
+        }
+        
+        struct ggml_tallocr alloc = ggml_tallocr_new(lora->buffer);
+        
+        /* Create tensors and load data */
+        /* We need to handle HuggingFace naming convention:
+         * base_model.model.layers.N.self_attn.q_proj.lora_A.weight
+         * -> blk.N.attn_q.weight.lora_a
+         */
+        
+        hv_iterinit(header_hv);
+        while ((entry = hv_iternext(header_hv))) {
+            STRLEN name_len;
+            const char *tname = HePV(entry, name_len);
+            if (strcmp(tname, "__metadata__") == 0) continue;
+            
+            SV *val = HeVAL(entry);
+            if (!SvROK(val) || SvTYPE(SvRV(val)) != SVt_PVHV) continue;
+            
+            HV *tensor_info = (HV*)SvRV(val);
+            
+            /* Get dtype */
+            SV **dtype_sv = hv_fetch(tensor_info, "dtype", 5, 0);
+            const char *dtype = dtype_sv ? SvPV_nolen(*dtype_sv) : "F32";
+            
+            enum ggml_type ggml_dtype;
+            if (strcmp(dtype, "F32") == 0) {
+                ggml_dtype = GGML_TYPE_F32;
+            } else if (strcmp(dtype, "F16") == 0) {
+                ggml_dtype = GGML_TYPE_F16;
+            } else if (strcmp(dtype, "BF16") == 0) {
+                ggml_dtype = GGML_TYPE_BF16;
+            } else {
+                continue;  /* Skip unsupported dtype */
+            }
+            
+            /* Get shape */
+            SV **shape_sv = hv_fetch(tensor_info, "shape", 5, 0);
+            if (!shape_sv || !SvROK(*shape_sv)) continue;
+            AV *shape_av = (AV*)SvRV(*shape_sv);
+            int ndims = av_len(shape_av) + 1;
+            int64_t dims[4] = {1, 1, 1, 1};
+            for (int d = 0; d < ndims && d < 4; d++) {
+                SV **dim_sv = av_fetch(shape_av, d, 0);
+                if (dim_sv) dims[d] = SvIV(*dim_sv);
+            }
+            
+            /* Get data offsets */
+            SV **offsets_sv = hv_fetch(tensor_info, "data_offsets", 12, 0);
+            if (!offsets_sv || !SvROK(*offsets_sv)) continue;
+            AV *offsets = (AV*)SvRV(*offsets_sv);
+            SV **start_sv = av_fetch(offsets, 0, 0);
+            SV **end_sv = av_fetch(offsets, 1, 0);
+            if (!start_sv || !end_sv) continue;
+            
+            size_t data_start = SvUV(*start_sv);
+            size_t data_end = SvUV(*end_sv);
+            size_t data_size = data_end - data_start;
+            
+            /* Create tensor */
+            struct ggml_tensor *t;
+            if (ndims == 1) {
+                t = ggml_new_tensor_1d(lora->ctx, ggml_dtype, dims[0]);
+            } else {
+                t = ggml_new_tensor_2d(lora->ctx, ggml_dtype, dims[1], dims[0]);
+            }
+            ggml_set_name(t, tname);
+            ggml_tallocr_alloc(&alloc, t);
+            
+            /* Read data from file */
+            void *data_buf;
+            Newx(data_buf, data_size, char);
+            fseek(fp, data_offset + data_start, SEEK_SET);
+            if (fread(data_buf, data_size, 1, fp) == 1) {
+                ggml_backend_tensor_set(t, data_buf, 0, data_size);
+            }
+            Safefree(data_buf);
+        }
+        
+        fclose(fp);
+        
+        /* Now pair up lora_A and lora_B tensors */
+        /* HuggingFace names: *.lora_A.weight and *.lora_B.weight */
+        struct ggml_tensor *t;
+        for (t = ggml_get_first_tensor(lora->ctx); t; t = ggml_get_next_tensor(lora->ctx, t)) {
+            const char *tname = t->name;
+            size_t tlen = strlen(tname);
+            
+            /* Check for lora_A.weight suffix */
+            if (tlen > 14 && strcmp(tname + tlen - 14, ".lora_A.weight") == 0) {
+                /* Extract base name */
+                char base_name[256];
+                strncpy(base_name, tname, tlen - 14);
+                base_name[tlen - 14] = '\0';
+                
+                /* Build lora_B name */
+                char b_name[280];
+                snprintf(b_name, sizeof(b_name), "%s.lora_B.weight", base_name);
+                
+                /* Find matching lora_B tensor */
+                struct ggml_tensor *tensor_b = ggml_get_tensor(lora->ctx, b_name);
+                
+                if (tensor_b) {
+                    /* Convert HuggingFace name to Lugh name for lookup */
+                    /* e.g., base_model.model.layers.0.self_attn.q_proj
+                     * -> blk.0.attn_q.weight */
+                    char lugh_name[128];
+                    int layer_num = -1;
+                    
+                    /* Try to parse layer number */
+                    const char *layers_pos = strstr(base_name, ".layers.");
+                    if (layers_pos) {
+                        sscanf(layers_pos, ".layers.%d", &layer_num);
+                    }
+                    
+                    /* Determine weight type */
+                    const char *weight_type = NULL;
+                    if (strstr(base_name, "q_proj")) weight_type = "attn_q";
+                    else if (strstr(base_name, "k_proj")) weight_type = "attn_k";
+                    else if (strstr(base_name, "v_proj")) weight_type = "attn_v";
+                    else if (strstr(base_name, "o_proj")) weight_type = "attn_output";
+                    else if (strstr(base_name, "gate_proj")) weight_type = "ffn_gate";
+                    else if (strstr(base_name, "up_proj")) weight_type = "ffn_up";
+                    else if (strstr(base_name, "down_proj")) weight_type = "ffn_down";
+                    
+                    if (layer_num >= 0 && weight_type) {
+                        snprintf(lugh_name, sizeof(lugh_name), "blk.%d.%s.weight", 
+                                 layer_num, weight_type);
+                    } else {
+                        /* Fallback: use original base name */
+                        strncpy(lugh_name, base_name, sizeof(lugh_name) - 1);
+                    }
+                    
+                    add_lora_weight(lora, lugh_name, t, tensor_b);
+                }
+            }
+        }
+        
+        SvREFCNT_dec(header_hv_sv);
+        
+        /* Try to load config if not specified */
+        if (!config_file) {
+            /* Look for adapter_config.json in same directory */
+            char config_path[512];
+            strncpy(config_path, adapter_file, sizeof(config_path) - 30);
+            char *last_slash = strrchr(config_path, '/');
+            if (last_slash) {
+                strcpy(last_slash + 1, "adapter_config.json");
+            } else {
+                strcpy(config_path, "adapter_config.json");
+            }
+            
+            FILE *cfg_fp = fopen(config_path, "r");
+            if (cfg_fp) {
+                fseek(cfg_fp, 0, SEEK_END);
+                long cfg_size = ftell(cfg_fp);
+                fseek(cfg_fp, 0, SEEK_SET);
+                
+                char *cfg_json;
+                Newx(cfg_json, cfg_size + 1, char);
+                if (fread(cfg_json, cfg_size, 1, cfg_fp) == 1) {
+                    cfg_json[cfg_size] = '\0';
+                    
+                    SV *cfg_sv = decode_json_via_perl(aTHX_ cfg_json, cfg_size);
+                    if (cfg_sv && SvROK(cfg_sv) && SvTYPE(SvRV(cfg_sv)) == SVt_PVHV) {
+                        HV *cfg_hv = (HV*)SvRV(cfg_sv);
+                        
+                        SV **alpha_sv = hv_fetch(cfg_hv, "lora_alpha", 10, 0);
+                        if (alpha_sv && SvOK(*alpha_sv)) {
+                            lora->alpha = SvNV(*alpha_sv);
+                        }
+                        
+                        SvREFCNT_dec(cfg_sv);
+                    }
+                }
+                Safefree(cfg_json);
+                fclose(cfg_fp);
+            }
+        }
+    }
+    
+    /* Create blessed reference with magic */
+    SV *sv = newSV(0);
+    sv_magicext(sv, NULL, PERL_MAGIC_ext, &lugh_lora_vtbl, INT2PTR(char*, (IV)lora->id), 0);
+    RETVAL = sv_bless(newRV_noinc(sv), gv_stashpv(class, GV_ADD));
+OUTPUT:
+    RETVAL
+
+float
+alpha(self)
+    SV *self
+PREINIT:
+    LughLoRAAdapter *lora;
+    MAGIC *mg;
+CODE:
+    if (!SvROK(self)) croak("Not a reference");
+    mg = mg_findext(SvRV(self), PERL_MAGIC_ext, &lugh_lora_vtbl);
+    if (!mg) croak("Invalid LoRA object");
+    lora = get_lora_by_id((int)(IV)mg->mg_ptr);
+    if (!lora) croak("LoRA adapter not found");
+    RETVAL = lora->alpha;
+OUTPUT:
+    RETVAL
+
+float
+scale(self, ...)
+    SV *self
+PREINIT:
+    LughLoRAAdapter *lora;
+    MAGIC *mg;
+CODE:
+    if (!SvROK(self)) croak("Not a reference");
+    mg = mg_findext(SvRV(self), PERL_MAGIC_ext, &lugh_lora_vtbl);
+    if (!mg) croak("Invalid LoRA object");
+    lora = get_lora_by_id((int)(IV)mg->mg_ptr);
+    if (!lora) croak("LoRA adapter not found");
+    
+    if (items > 1) {
+        lora->scale = SvNV(ST(1));
+    }
+    RETVAL = lora->scale;
+OUTPUT:
+    RETVAL
+
+int
+n_weights(self)
+    SV *self
+PREINIT:
+    LughLoRAAdapter *lora;
+    MAGIC *mg;
+CODE:
+    if (!SvROK(self)) croak("Not a reference");
+    mg = mg_findext(SvRV(self), PERL_MAGIC_ext, &lugh_lora_vtbl);
+    if (!mg) croak("Invalid LoRA object");
+    lora = get_lora_by_id((int)(IV)mg->mg_ptr);
+    if (!lora) croak("LoRA adapter not found");
+    RETVAL = lora->n_weights;
+OUTPUT:
+    RETVAL
+
+const char *
+format(self)
+    SV *self
+PREINIT:
+    LughLoRAAdapter *lora;
+    MAGIC *mg;
+CODE:
+    if (!SvROK(self)) croak("Not a reference");
+    mg = mg_findext(SvRV(self), PERL_MAGIC_ext, &lugh_lora_vtbl);
+    if (!mg) croak("Invalid LoRA object");
+    lora = get_lora_by_id((int)(IV)mg->mg_ptr);
+    if (!lora) croak("LoRA adapter not found");
+    RETVAL = lora->format;
+OUTPUT:
+    RETVAL
+
+void
+weight_names(self)
+    SV *self
+PREINIT:
+    LughLoRAAdapter *lora;
+    MAGIC *mg;
+    int i;
+PPCODE:
+    if (!SvROK(self)) croak("Not a reference");
+    mg = mg_findext(SvRV(self), PERL_MAGIC_ext, &lugh_lora_vtbl);
+    if (!mg) croak("Invalid LoRA object");
+    lora = get_lora_by_id((int)(IV)mg->mg_ptr);
+    if (!lora) croak("LoRA adapter not found");
+    
+    EXTEND(SP, lora->n_weights);
+    for (i = 0; i < lora->n_weights; i++) {
+        mPUSHp(lora->weights[i].name, strlen(lora->weights[i].name));
+    }
 
 void
 DESTROY(self)

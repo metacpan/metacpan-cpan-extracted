@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base', 'with';
 
+# INHERITS
+
 base 'Venus::Kind::Value';
+
+# INTEGRATES
 
 with 'Venus::Role::Mappable';
 
@@ -57,29 +63,19 @@ sub any {
   return $found ? true : false;
 }
 
-sub assertion {
-  my ($self) = @_;
-
-  my $assert = $self->SUPER::assertion;
-
-  $assert->clear->expression('arrayref');
-
-  return $assert;
-}
-
 sub call {
   my ($self, $mapper, $method, @args) = @_;
 
-  require Venus::Type;
+  require Venus::What;
 
   return $self->$mapper(sub{
     my ($key, $val) = @_;
 
-    my $type = Venus::Type->new($val)->deduce;
+    my $what = Venus::What->new($val)->deduce;
 
-    local $_ = $type;
+    local $_ = $what;
 
-    $type->$method(@args)
+    $what->$method(@args)
   });
 }
 
@@ -184,6 +180,14 @@ sub get {
   my ($index) = @args;
 
   return $self->value->[$index];
+}
+
+sub gets {
+  my ($self, @args) = @_;
+
+  my $result = $self->puts(map +(undef, $_), @args);
+
+  return wantarray ? (@{$result}) : $result;
 }
 
 sub grep {
@@ -302,7 +306,7 @@ sub merge {
 
   my $lvalue = [@{$self->get}];
 
-  return Venus::merge($lvalue, @rvalues);
+  return Venus::merge_swap($lvalue, @rvalues);
 }
 
 sub none {
@@ -426,7 +430,7 @@ sub puts {
   for (my $i = 0; $i < @args; $i += 2) {
     my ($into, $path) = @args[$i, $i+1];
 
-    next if !defined $path;
+    next if !defined $path || $path eq '';
 
     my $value;
     my @range;
@@ -434,7 +438,10 @@ sub puts {
     ($path, @range) = @{$path} if ref $path eq 'ARRAY';
 
     $value = $self->path($path);
-    $value = Venus::Array->new($value)->range(@range) if ref $value eq 'ARRAY';
+
+    if (ref $value eq 'ARRAY' && @range) {
+      $value = Venus::Array->new($value)->range(@range);
+    }
 
     if (ref $into eq 'SCALAR') {
       $$into = $value;
@@ -459,24 +466,9 @@ sub range {
 
   return $self->slice(@args) if @args > 1;
 
-  my ($note) = @args;
+  require Venus::Range;
 
-  return $self->slice if !defined $note;
-
-  my ($f, $l) = split /:/, $note, 2;
-
-  my $data = $self->get;
-
-  $f = 0 if !defined $f || $f eq '';
-  $l = $f if !defined $l;
-  $l = $#$data if !defined $l || $l eq '';
-
-  $f = 0+$f;
-  $l = 0+$l;
-
-  $l = $#$data + $l if $f > -1 && $l < 0;
-
-  return $self->slice($f..$l);
+  return scalar Venus::Range->parse(@args, $self->get)->select;
 }
 
 sub reverse {
@@ -517,6 +509,36 @@ sub set {
   return if not defined $index;
 
   return $self->value->[$index] = $value;
+}
+
+sub sets {
+  my ($self, @args) = @_;
+
+  my $result = [];
+
+  for (my $i = 0; $i < @args; $i += 2) {
+    my ($path, $data) = @args[$i, $i+1];
+
+    CORE::push @{$result}, $data;
+
+    next if !defined $path || $path eq "";
+
+    if (my ($first, $last) = $path =~ /^(.*)\.(\w+)$/) {
+      my $value = $self->path($first) or next;
+
+      if (ref $value eq 'ARRAY') {
+        $value->[$last] = $data;
+      }
+      elsif (ref $value eq 'HASH') {
+        $value->{$last} = $data;
+      }
+    }
+    else {
+      $self->set($path, $data);
+    }
+  }
+
+  return wantarray ? (@{$result}) : $result;
 }
 
 sub shift {
@@ -1699,6 +1721,66 @@ I<Since C<0.08>>
 
 =cut
 
+=head2 gets
+
+  gets(string @args) (arrayref)
+
+The gets method select values from within the underlying data structure using
+L<Venus::Array/path>, where each argument is a selector, returns all the values
+selected. Returns a list in list context.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item gets example 1
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+
+  my $gets = $array->gets('3', '1.bar');
+
+  # [['baz'], 'baz']
+
+=back
+
+=over 4
+
+=item gets example 2
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+
+  my ($baz, $one_bar) = $array->gets('3', '1.bar');
+
+  # (['baz'], 'baz')
+
+=back
+
+=over 4
+
+=item gets example 3
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+
+  my $gets = $array->gets('3', '1.bar', '1.bar.baz');
+
+  # [['baz'], 'baz', undef]
+
+=back
+
+=cut
+
 =head2 grep
 
   grep(coderef $code) (arrayref)
@@ -2080,6 +2162,77 @@ I<Since C<0.08>>
   my $result = $lvalue->gtlt($rvalue);
 
   # 0
+
+=back
+
+=cut
+
+=head2 head
+
+  head(number $size) (arrayref)
+
+The head method returns the topmost elements, limited by the desired size
+specified.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item head example 1
+
+  # given: synopsis;
+
+  my $head = $array->head;
+
+  # [1]
+
+=back
+
+=over 4
+
+=item head example 2
+
+  # given: synopsis;
+
+  my $head = $array->head(1);
+
+  # [1]
+
+=back
+
+=over 4
+
+=item head example 3
+
+  # given: synopsis;
+
+  my $head = $array->head(2);
+
+  # [1,2]
+
+=back
+
+=over 4
+
+=item head example 4
+
+  # given: synopsis;
+
+  my $head = $array->head(5);
+
+  # [1..5]
+
+=back
+
+=over 4
+
+=item head example 5
+
+  # given: synopsis;
+
+  my $head = $array->head(20);
+
+  # [1..9]
 
 =back
 
@@ -2901,6 +3054,58 @@ I<Since C<0.08>>
 
 =cut
 
+=head2 new
+
+  new(any @args) (Venus::Array)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Array;
+
+  my $new = Venus::Array->new;
+
+  # bless(..., "Venus::Array")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Array;
+
+  my $new = Venus::Array->new([1..9]);
+
+  # bless(..., "Venus::Array")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Array;
+
+  my $new = Venus::Array->new(value => [1..9]);
+
+  # bless(..., "Venus::Array")
+
+=back
+
+=cut
+
 =head2 none
 
   none(coderef $code) (boolean)
@@ -3348,7 +3553,25 @@ I<Since C<3.20>>
 
   my $puts = [$a, $b, $m, $x, $y];
 
-  # [1, 2, [3..18], 19, 20]
+  # [1, 2, [3..19], 19, 20]
+
+=back
+
+=over 4
+
+=item puts example 5
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([[{1..4}, {1..4}]]);
+
+  $array->puts(\my $a, '0');
+
+  my $puts = $a;
+
+  # [{1..4}, {1..4}]
 
 =back
 
@@ -3525,7 +3748,7 @@ I<Since C<2.55>>
 
   my $range = $array->range('-1:8');
 
-  # [9,1..9]
+  # [9]
 
 =back
 
@@ -3553,7 +3776,7 @@ I<Since C<2.55>>
 
   my $range = $array->range('0:-2');
 
-  # [1..7]
+  # [1..8]
 
 =back
 
@@ -3727,6 +3950,83 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 sets
+
+  sets(string @args) (arrayref)
+
+The sets method find values from within the underlying data structure using
+L<Venus::Array/path>, where each argument pair is a selector and value, and
+returns all the values provided. Returns a list in list context. Note, nested
+data structures can be updated but not created.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item sets example 1
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+
+  my $sets = $array->sets('3' => 'bar', '1.bar' => 'bar');
+
+  # ['bar', 'bar']
+
+=back
+
+=over 4
+
+=item sets example 2
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+
+  my ($baz, $one_bar) = $array->sets('3' => 'bar', '1.bar' => 'bar');
+
+  # ('bar', 'bar')
+
+=back
+
+=over 4
+
+=item sets example 3
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+
+  my $sets = $array->sets('3' => 'bar', '1.bar' => 'bar', '1.baz' => 'box');
+
+  # ['bar', 'bar', 'box']
+
+=back
+
+=over 4
+
+=item sets example 4
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new(['foo', {'bar' => 'baz'}, 'bar', ['baz']]);
+
+  my $sets = $array->sets('3' => 'bar', '1.bar' => 'bar', '1.bar.baz' => 'box');
+
+  # ['bar', 'bar', 'box']
+
+=back
+
+=cut
+
 =head2 shift
 
   shift() (any)
@@ -3818,6 +4118,77 @@ I<Since C<0.01>>
   my $sort = $array->sort;
 
   # ["a".."d"]
+
+=back
+
+=cut
+
+=head2 tail
+
+  tail(number $size) (arrayref)
+
+The tail method returns the bottommost elements, limited by the desired size
+specified.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item tail example 1
+
+  # given: synopsis;
+
+  my $tail = $array->tail;
+
+  # [9]
+
+=back
+
+=over 4
+
+=item tail example 2
+
+  # given: synopsis;
+
+  my $tail = $array->tail(1);
+
+  # [9]
+
+=back
+
+=over 4
+
+=item tail example 3
+
+  # given: synopsis;
+
+  my $tail = $array->tail(2);
+
+  # [8,9]
+
+=back
+
+=over 4
+
+=item tail example 4
+
+  # given: synopsis;
+
+  my $tail = $array->tail(5);
+
+  # [5..9]
+
+=back
+
+=over 4
+
+=item tail example 5
+
+  # given: synopsis;
+
+  my $tail = $array->tail(20);
+
+  # [1..9]
 
 =back
 

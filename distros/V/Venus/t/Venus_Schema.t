@@ -37,10 +37,11 @@ $test->for('abstract');
 
 =includes
 
-method: assert
-method: check
-method: deduce
-method: error
+method: new
+method: rule
+method: rules
+method: ruleset
+method: shorthand
 method: validate
 
 =cut
@@ -57,20 +58,26 @@ $test->for('includes');
 
   # bless({...}, 'Venus::Schema')
 
+  # $schema->validate;
+
+  # ([], undef)
+
 =cut
 
 $test->for('synopsis', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   ok $result->isa('Venus::Schema');
+  my $errors = $result->validate;
+  is_deeply $errors, [];
 
   $result
 });
 
 =description
 
-This package provides methods for validating whether objects and complex data
-structures conform to a schema.
+This package provides a mechanism for validating complex data structures using
+data validation rules provided as a ruleset.
 
 =cut
 
@@ -84,657 +91,797 @@ Venus::Kind::Utility
 
 $test->for('inherits');
 
-=attribute definition
+=integrates
 
-The definition attribute is read-write, accepts C<(HashRef)> values, and is
-optional.
+Venus::Role::Encaseable
 
-=signature definition
+=cut
 
-  definition(hashref $data) (hashref)
+$test->for('integrates');
 
-=metadata definition
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Schema)
+
+=metadata new
 
 {
-  since => '2.55',
+  since => '4.15',
 }
 
 =cut
 
-=example-1 definition
-
-  # given: synopsis
+=example-1 new
 
   package main;
 
-  my $definition = $schema->definition({});
+  use Venus::Schema;
 
-  # {}
+  my $new = Venus::Schema->new;
+
+  # bless(..., "Venus::Schema")
 
 =cut
 
-$test->for('example', 1, 'definition', sub {
+$test->for('example', 1, 'new', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is_deeply $result, {};
+  ok $result->isa('Venus::Schema');
 
   $result
 });
 
-=example-2 definition
+=method rule
 
-  # given: synopsis
+The rule method appends a new rule to the L</ruleset> to be used during
+L</validate>, and returns the invocant. A "rule" is a hashref that consists of
+an optional C<selector> key whose value will be provided to the
+L<Venus::Validate/select> method, a C<presence> key whose value must be one of
+the "required", "optional", or "present" L<Venus::Validate> methods, and a
+C<executes> key whose value must be an arrayref where each element is a
+L<Venus::Validate> validation method name or an arrayref with a method name and
+arguments.
 
-  # given: example-1 definition
+=signature rule
 
-  package main;
+  rule(hashref $rule) (Venus::Schema)
 
-  $definition = $schema->definition;
-
-  # {}
-
-=cut
-
-$test->for('example', 2, 'definition', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is_deeply $result, {};
-
-  $result
-});
-
-=method assert
-
-The assert method builds and returns a L<Venus::Assert> object based on the
-L</definition>.
-
-=signature assert
-
-  assert() (Venus::Assert)
-
-=metadata assert
+=metadata rule
 
 {
-  since => '2.55',
+  since => '4.15',
 }
 
 =cut
 
-=example-1 assert
+=example-1 rule
 
   # given: synopsis
 
   package main;
 
-  my $assert = $schema->assert;
+  my $rule = $schema->rule;
 
-  # bless({...}, 'Venus::Assert')
+  # bless({...}, 'Venus::Schema')
 
 =cut
 
-$test->for('example', 1, 'assert', sub {
+$test->for('example', 1, 'rule', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  isa_ok $result, 'Venus::Assert';
-  is $result->name, 'hashkeys[]';
+  ok $result->isa('Venus::Schema');
+  my $ruleset = $result->ruleset;
+  is_deeply $ruleset, [];
 
   $result
 });
 
-=example-2 assert
+=example-2 rule
 
   # given: synopsis
 
   package main;
 
-  $schema->definition({
-    name => 'string',
+  my $rule = $schema->rule({
+    presence => 'required',
+    executes => ['string'],
   });
 
-  my $assert = $schema->assert;
-
-  # bless({...}, 'Venus::Assert')
+  # bless({...}, 'Venus::Schema')
 
 =cut
 
-$test->for('example', 2, 'assert', sub {
+$test->for('example', 2, 'rule', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  isa_ok $result, 'Venus::Assert';
-  is $result->name, 'hashkeys["name", string]';
+  ok $result->isa('Venus::Schema');
+  my $ruleset = $result->ruleset;
+  is_deeply $ruleset, [{
+    presence => 'required',
+    executes => ['string'],
+  }];
 
   $result
 });
 
-=method check
+=example-3 rule
 
-The check method builds an assert object using L</assert> and returns the
-result of the L<Venus::Assert/check> method.
+  # given: synopsis
 
-=signature check
+  package main;
 
-  check(hashref $data) (boolean)
+  my $rule = $schema->rule({
+    selector => 'name',
+    presence => 'required',
+    executes => ['string'],
+  });
 
-=metadata check
+  # bless({...}, 'Venus::Schema')
+
+=cut
+
+$test->for('example', 3, 'rule', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Schema');
+  my $ruleset = $result->ruleset;
+  is_deeply $ruleset, [{
+    selector => 'name',
+    presence => 'required',
+    executes => ['string'],
+  }];
+
+  $result
+});
+
+=example-4 rule
+
+  # given: synopsis
+
+  package main;
+
+  my $rule = $schema->rule({
+    selector => 'name',
+    presence => 'required',
+    executes => [['type', 'string']],
+  });
+
+  # bless({...}, 'Venus::Schema')
+
+=cut
+
+$test->for('example', 4, 'rule', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Schema');
+  my $ruleset = $result->ruleset;
+  is_deeply $ruleset, [{
+    selector => 'name',
+    presence => 'required',
+    executes => [['type', 'string']],
+  }];
+
+  $result
+});
+
+=method rules
+
+The rules method appends new rules to the L</ruleset> using the L</rule> method
+and returns the invocant.
+
+=signature rules
+
+  rules(hashref @rules) (Venus::Schema)
+
+=metadata rules
 
 {
-  since => '2.55',
+  since => '4.15',
 }
 
 =cut
 
-=example-1 check
+=example-1 rules
 
   # given: synopsis
 
   package main;
 
-  my $check = $schema->check;
+  my $rules = $schema->rules;
 
-  # false
-
-=cut
-
-$test->for('example', 1, 'check', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  ok defined $result;
-  is $result, false;
-
-  !$result
-});
-
-=example-2 check
-
-  # given: synopsis
-
-  package main;
-
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
-  });
-
-  my $check = $schema->check({});
-
-  # false
+  # bless(..., "Venus::Schema")
 
 =cut
 
-$test->for('example', 2, 'check', sub {
+$test->for('example', 1, 'rules', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  ok defined $result;
-  is $result, false;
-
-  !$result
-});
-
-=example-3 check
-
-  # given: synopsis
-
-  package main;
-
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
-  });
-
-  my $check = $schema->check({
-    name => 'someone',
-    role => {},
-  });
-
-  # false
-
-=cut
-
-$test->for('example', 3, 'check', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  ok defined $result;
-  is $result, false;
-
-  !$result
-});
-
-=example-4 check
-
-  # given: synopsis
-
-  package main;
-
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
-  });
-
-  my $check = $schema->check({
-    name => 'someone',
-    role => {
-      title => 'engineer',
-      level => 1,
-    },
-  });
-
-  # true
-
-=cut
-
-$test->for('example', 4, 'check', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  ok defined $result;
-  is $result, true;
+  ok $result->isa('Venus::Schema');
+  my $ruleset = $result->ruleset;
+  is_deeply $ruleset, [];
 
   $result
 });
 
-=method deduce
+=example-2 rules
 
-The deduce method builds an assert object using L</assert> and validates the
-value provided using L<Venus::Assert/validate>, passing the result to
-L<Venus::Type/deduce_deep> unless the validation throws an exception.
+  # given: synopsis
 
-=signature deduce
+  package main;
 
-  deduce(hashref $data) (Venus::Hash)
+  my $rules = $schema->rules({
+    presence => 'required',
+    executes => ['string'],
+  });
 
-=metadata deduce
+  # bless(..., "Venus::Schema")
+
+=cut
+
+$test->for('example', 2, 'rules', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Schema');
+  my $ruleset = $result->ruleset;
+  is_deeply $ruleset, [{
+    presence => 'required',
+    executes => ['string'],
+  }];
+
+  $result
+});
+
+=example-3 rules
+
+  # given: synopsis
+
+  package main;
+
+  my $rules = $schema->rules(
+    {
+      selector => 'first_name',
+      presence => 'required',
+      executes => ['string'],
+    },
+    {
+      selector => 'last_name',
+      presence => 'required',
+      executes => ['string'],
+    }
+  );
+
+  # bless(..., "Venus::Schema")
+
+=cut
+
+$test->for('example', 3, 'rules', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Schema');
+  my $ruleset = $result->ruleset;
+  is_deeply $ruleset, [
+    {
+      selector => 'first_name',
+      presence => 'required',
+      executes => ['string'],
+    },
+    {
+      selector => 'last_name',
+      presence => 'required',
+      executes => ['string'],
+    }
+  ];
+
+  $result
+});
+
+=method ruleset
+
+The ruleset method gets and sets the L<"rules"|/rule> to be used during
+L<"validation"|/validate>.
+
+=signature ruleset
+
+  ruleset(arrayref $ruleset) (arrayref)
+
+=metadata ruleset
 
 {
-  since => '2.55',
+  since => '4.15',
 }
 
 =cut
 
-=example-1 deduce
+=example-1 ruleset
 
   # given: synopsis
 
   package main;
 
-  my $deduce = $schema->deduce;
+  my $ruleset = $schema->ruleset;
 
-  # Exception! (isa Venus::Check::Error)
-
-=cut
-
-$test->for('example', 1, 'deduce', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->error->result;
-  isa_ok $result, 'Venus::Check::Error';
-
-  $result
-});
-
-=example-2 deduce
-
-  # given: synopsis
-
-  package main;
-
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
-  });
-
-  my $deduce = $schema->deduce({});
-
-  # Exception! (isa Venus::Check::Error)
+  # []
 
 =cut
 
-$test->for('example', 2, 'deduce', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->error->result;
-  isa_ok $result, 'Venus::Check::Error';
-
-  $result
-});
-
-=example-3 deduce
-
-  # given: synopsis
-
-  package main;
-
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
-  });
-
-  my $deduce = $schema->deduce({
-    name => 'someone',
-    role => {},
-  });
-
-  # Exception! (isa Venus::Check::Error)
-
-=cut
-
-$test->for('example', 3, 'deduce', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->error->result;
-  isa_ok $result, 'Venus::Check::Error';
-
-  $result
-});
-
-=example-4 deduce
-
-  # given: synopsis
-
-  package main;
-
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
-  });
-
-  my $deduce = $schema->deduce({
-    name => 'someone',
-    role => {
-      title => 'engineer',
-      level => 1,
-    },
-  });
-
-  # bless({...}, 'Venus::Hash')
-
-=cut
-
-$test->for('example', 4, 'deduce', sub {
+$test->for('example', 1, 'ruleset', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  isa_ok $result, 'Venus::Hash';
+  is_deeply $result, [];
 
   $result
 });
 
-=method error
+=example-2 ruleset
 
-The error method builds an assert object using L</assert> and validates the
-value provided using L<Venus::Assert/validate>, catching any error thrown and
-returning it, otherwise returning undefined.
+  # given: synopsis
 
-=signature error
+  package main;
 
-  error(hashref $data) (Venus::Error)
+  my $ruleset = $schema->ruleset([
+    {
+      selector => 'first_name',
+      presence => 'required',
+      executes => ['string'],
+    },
+    {
+      selector => 'last_name',
+      presence => 'required',
+      executes => ['string'],
+    }
+  ]);
 
-=metadata error
+  # [
+  #   {
+  #     selector => 'first_name',
+  #     presence => 'required',
+  #     executes => ['string'],
+  #   },
+  #   {
+  #     selector => 'last_name',
+  #     presence => 'required',
+  #     executes => ['string'],
+  #   }
+  # ]
+
+=cut
+
+$test->for('example', 2, 'ruleset', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [
+    {
+      selector => 'first_name',
+      presence => 'required',
+      executes => ['string'],
+    },
+    {
+      selector => 'last_name',
+      presence => 'required',
+      executes => ['string'],
+    }
+  ];
+
+  $result
+});
+
+=method shorthand
+
+The shorthand method accepts an arrayref or hashref of shorthand notation and
+returns a ruleset arrayref. This provides a concise way to define validation
+rules. Keys can have suffixes to indicate presence: C<!> for (explicit)
+required, C<?> (explicit) for optional, C<*> for (explicit) present (i.e., must
+exist but can be null), and no suffix means (implicit) required. Keys using dot
+notation (e.g., C<website.url>) result in arrayref selectors for nested path
+validation.
+
+=signature shorthand
+
+  shorthand(arrayref | hashref $data) (arrayref)
+
+=metadata shorthand
 
 {
-  since => '2.55',
+  since => '4.15',
 }
 
 =cut
 
-=example-1 error
+=example-1 shorthand
 
   # given: synopsis
 
   package main;
 
-  my $error = $schema->error;
+  my $shorthand = $schema->shorthand([
+    'fname!' => 'string',
+    'lname!' => 'string',
+  ]);
 
-  # Exception! (isa Venus::Check::Error)
+  # [
+  #   {
+  #     selector => 'fname',
+  #     presence => 'required',
+  #     execute => 'string',
+  #   },
+  #   {
+  #     selector => 'lname',
+  #     presence => 'required',
+  #     execute => 'string',
+  #   },
+  # ]
 
 =cut
 
-$test->for('example', 1, 'error', sub {
+$test->for('example', 1, 'shorthand', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  isa_ok $result, 'Venus::Check::Error';
+  ok ref $result eq 'ARRAY';
+  ok @{$result} == 2;
+  ok $result->[0]{selector} eq 'fname';
+  ok $result->[0]{presence} eq 'required';
+  ok $result->[0]{execute} eq 'string';
+  ok $result->[1]{selector} eq 'lname';
+  ok $result->[1]{presence} eq 'required';
+  ok $result->[1]{execute} eq 'string';
 
   $result
 });
 
-=example-2 error
+=example-2 shorthand
 
   # given: synopsis
 
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
-  });
+  my $shorthand = $schema->shorthand([
+    'email?' => 'string',
+    'age*' => 'number',
+  ]);
 
-  my $error = $schema->error({});
-
-  # Exception! (isa Venus::Check::Error)
+  # [
+  #   {
+  #     selector => 'email',
+  #     presence => 'optional',
+  #     execute => 'string',
+  #   },
+  #   {
+  #     selector => 'age',
+  #     presence => 'present',
+  #     execute => 'number',
+  #   },
+  # ]
 
 =cut
 
-$test->for('example', 2, 'error', sub {
+$test->for('example', 2, 'shorthand', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  isa_ok $result, 'Venus::Check::Error';
+  ok ref $result eq 'ARRAY';
+  ok @{$result} == 2;
+  ok $result->[0]{selector} eq 'email';
+  ok $result->[0]{presence} eq 'optional';
+  ok $result->[0]{execute} eq 'string';
+  ok $result->[1]{selector} eq 'age';
+  ok $result->[1]{presence} eq 'present';
+  ok $result->[1]{execute} eq 'number';
 
   $result
 });
 
-=example-3 error
+=example-3 shorthand
 
   # given: synopsis
 
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
-  });
+  my $shorthand = $schema->shorthand([
+    'login' => 'string',
+    'password' => 'string',
+  ]);
 
-  my $error = $schema->error({
-    name => 'someone',
-    role => {},
-  });
-
-  # Exception! (isa Venus::Check::Error)
+  # [
+  #   {
+  #     selector => 'login',
+  #     presence => 'required',
+  #     execute => 'string',
+  #   },
+  #   {
+  #     selector => 'password',
+  #     presence => 'required',
+  #     execute => 'string',
+  #   },
+  # ]
 
 =cut
 
-$test->for('example', 3, 'error', sub {
+$test->for('example', 3, 'shorthand', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  isa_ok $result, 'Venus::Check::Error';
+  ok ref $result eq 'ARRAY';
+  ok @{$result} == 2;
+  ok $result->[0]{selector} eq 'login';
+  ok $result->[0]{presence} eq 'required';
+  ok $result->[0]{execute} eq 'string';
+  ok $result->[1]{selector} eq 'password';
+  ok $result->[1]{presence} eq 'required';
+  ok $result->[1]{execute} eq 'string';
 
   $result
 });
 
-=example-4 error
+=example-4 shorthand
 
   # given: synopsis
 
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
-  });
+  my $shorthand = $schema->shorthand([
+    'website.url' => 'string',
+    'profile.bio.text' => 'string',
+  ]);
 
-  my $error = $schema->error({
-    name => 'someone',
-    role => {
-      title => 'engineer',
-      level => 1,
-    },
-  });
-
-  # undef
+  # [
+  #   {
+  #     selector => ['website', 'url'],
+  #     presence => 'required',
+  #     execute => 'string',
+  #   },
+  #   {
+  #     selector => ['profile', 'bio', 'text'],
+  #     presence => 'required',
+  #     execute => 'string',
+  #   },
+  # ]
 
 =cut
 
-$test->for('example', 4, 'error', sub {
+$test->for('example', 4, 'shorthand', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  ok !defined $result;
+  ok ref $result eq 'ARRAY';
+  ok @{$result} == 2;
+  is_deeply $result->[0]{selector}, ['website', 'url'];
+  ok $result->[0]{presence} eq 'required';
+  ok $result->[0]{execute} eq 'string';
+  is_deeply $result->[1]{selector}, ['profile', 'bio', 'text'];
+  ok $result->[1]{presence} eq 'required';
+  ok $result->[1]{execute} eq 'string';
 
-  !$result
+  $result
+});
+
+=example-5 shorthand
+
+  package main;
+
+  use Venus::Schema;
+
+  my $schema = Venus::Schema->new;
+
+  my $ruleset = $schema->shorthand([
+    'fname!' => 'string',
+    'lname!' => 'string',
+    'email?' => 'string',
+    'login' => 'string',
+  ]);
+
+  $schema->rules(@{$ruleset});
+
+  my $input = {
+    fname => 'Elliot',
+    lname => 'Alderson',
+    login => 'mrrobot',
+  };
+
+  my $errors = $schema->validate($input);
+
+  # []
+
+=cut
+
+$test->for('example', 5, 'shorthand', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
 });
 
 =method validate
 
-The validate method builds an assert object using L</assert> and validates the
-value provided using L<Venus::Assert/validate>, returning the result unless the
-validation throws an exception.
+The validate method validates the data provided using the L</ruleset> and
+returns an arrayref containing the errors encountered, if any. Returns the
+errors arrayref, and the data validated in list context.
 
 =signature validate
 
-  validate(hashref $data) (hashref)
+  validate(any $data) (arrayref)
 
 =metadata validate
 
 {
-  since => '2.55',
+  since => '4.15',
 }
 
 =cut
 
 =example-1 validate
 
-  # given: synopsis
-
   package main;
 
-  my $validate = $schema->validate;
+  use Venus::Schema;
 
-  # Exception! (isa Venus::Check::Error)
+  my $schema = Venus::Schema->new;
+
+  my $errors = $schema->validate;
+
+  # []
 
 =cut
 
 $test->for('example', 1, 'validate', sub {
   my ($tryable) = @_;
   my $result = $tryable->error->result;
-  isa_ok $result, 'Venus::Check::Error';
+  is_deeply $result, [];
 
   $result
 });
 
 =example-2 validate
 
-  # given: synopsis
-
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
+  use Venus::Schema;
+
+  my $schema = Venus::Schema->new;
+
+  $schema->rule({
+    selector => 'handles',
+    presence => 'required',
+    executes => [['type', 'arrayref']],
   });
 
-  my $validate = $schema->validate({});
+  my $errors = $schema->validate;
 
-  # Exception! (isa Venus::Check::Error)
+  # [['handles', ['required', []]]]
 
 =cut
 
 $test->for('example', 2, 'validate', sub {
   my ($tryable) = @_;
   my $result = $tryable->error->result;
-  isa_ok $result, 'Venus::Check::Error';
+  is_deeply $result, [['handles', ['required', []]]];
 
   $result
 });
 
 =example-3 validate
 
-  # given: synopsis
-
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
+  use Venus::Schema;
+
+  my $schema = Venus::Schema->new;
+
+  my $input = {
+    fname => 'Elliot',
+    lname => 'Alderson',
+    handles => [
+      {name => 'mrrobot'},
+      {name => 'fsociety'},
+    ],
+    level => 5,
+    skills => undef,
+    role => 'Engineer',
+  };
+
+  $schema->rule({
+    selector => 'fname',
+    presence => 'required',
+    executes => ['string', 'trim', 'strip'],
   });
 
-  my $validate = $schema->validate({
-    name => 'someone',
-    role => {},
+  $schema->rule({
+    selector => 'lname',
+    presence => 'required',
+    executes => ['string', 'trim', 'strip'],
   });
 
-  # Exception! (isa Venus::Check::Error)
+  $schema->rule({
+    selector => 'skills',
+    presence => 'present',
+  });
+
+  $schema->rule({
+    selector => 'handles',
+    presence => 'required',
+    executes => [['type', 'arrayref']],
+  });
+
+  $schema->rule({
+    selector => ['handles', 'name'],
+    presence => 'required',
+    executes => ['string', 'trim', 'strip'],
+  });
+
+  my $errors = $schema->validate($input);
+
+  # []
 
 =cut
 
 $test->for('example', 3, 'validate', sub {
   my ($tryable) = @_;
   my $result = $tryable->error->result;
-  isa_ok $result, 'Venus::Check::Error';
+  is_deeply $result, [];
 
   $result
 });
 
 =example-4 validate
 
-  # given: synopsis
-
   package main;
 
-  $schema->definition({
-    name => 'string',
-    role => {
-      title => 'string',
-      level => 'number',
-    },
+  use Venus::Schema;
+
+  my $schema = Venus::Schema->new;
+
+  my $input = {
+    fname => 'Elliot',
+    lname => 'Alderson',
+    handles => [
+      {name => 'mrrobot'},
+      {name => 'fsociety'},
+    ],
+    level => 5,
+    skills => undef,
+    role => 'Engineer',
+  };
+
+  $schema->rule({
+    selector => 'fname',
+    presence => 'required',
+    executes => ['string', 'trim', 'strip'],
   });
 
-  my $validate = $schema->validate({
-    name => 'someone',
-    role => {
-      title => 'engineer',
-      level => 1,
-    },
+  $schema->rule({
+    selector => 'lname',
+    presence => 'required',
+    executes => ['string', 'trim', 'strip'],
   });
 
-  # {name => 'someone', role => {title => 'engineer', level => 1,},}
+  $schema->rule({
+    selector => 'skills',
+    presence => 'required',
+  });
+
+  $schema->rule({
+    selector => 'handles',
+    presence => 'required',
+    executes => [['type', 'arrayref']],
+  });
+
+  $schema->rule({
+    selector => ['handles', 'name'],
+    presence => 'required',
+    executes => ['string', 'trim', 'strip'],
+  });
+
+  my $errors = $schema->validate($input);
+
+  # [['skills', ['required', []]]]
 
 =cut
 
 $test->for('example', 4, 'validate', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  is_deeply $result, {
-    name => 'someone',
-    role => {
-      title => 'engineer',
-      level => 1,
-    },
-  };
+  my $result = $tryable->error->result;
+  is_deeply $result, [['skills', ['required', []]]];
 
   $result
 });

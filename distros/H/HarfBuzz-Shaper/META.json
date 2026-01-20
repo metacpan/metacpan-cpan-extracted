@@ -37,18 +37,19 @@
          "requires" : {
             "Archive::Tar" : "0",
             "ExtUtils::MakeMaker" : "6.46",
-            "Test::More" : "0",
             "perl" : "5.010001"
          }
       },
       "test" : {
-         "requires" : {}
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "provides" : {
       "HarfBuzz::Shaper" : {
          "file" : "lib/HarfBuzz/Shaper.pm",
-         "version" : "0.032"
+         "version" : "0.033"
       }
    },
    "release_status" : "stable",
@@ -62,6 +63,6 @@
          "web" : "https://github.com/sciurius/perl-HarfBuzz-Shaper"
       }
    },
-   "version" : "0.032",
+   "version" : "0.033",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -5,275 +5,74 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
+use Venus::Hook;
+
 # METHODS
 
-sub ARGS {
-  my ($self, @args) = @_;
+{
+  no warnings 'once';
 
-  return (!@args)
-    ? ($self->DATA)
-    : ((@args == 1 && ref($args[0]) eq 'HASH')
-    ? (do{my %args = %{$args[0]}; !CORE::keys(%args) ? $self->DATA : {%args}})
-    : (@args % 2 ? {@args, undef} : {@args}));
-}
+  *ARGS = *Venus::Hook::ARGS;
 
-sub ATTR {
-  my ($self, $attr, @args) = @_;
+  *ATTR = *Venus::Hook::ATTR;
 
-  no strict 'refs';
-  no warnings 'redefine';
+  *AUDIT = *Venus::Hook::AUDIT;
 
-  *{"@{[$self->NAME]}::$attr"} = sub {$_[0]->ITEM($attr, @_[1..$#_])}
-    if !$self->can($attr);
+  *BASE = *Venus::Hook::BASE;
 
-  my $index = int(keys(%{$${"@{[$self->NAME]}::META"}{ATTR}})) + 1;
+  *BLESS = *Venus::Hook::BLESS;
 
-  $${"@{[$self->NAME]}::META"}{ATTR}{$attr} = [$index, [$attr, @args]];
+  *BUILD = *Venus::Hook::BUILD;
 
-  my $metacache = join '::', $self->NAME, $self->METACACHE;
+  *BUILDARGS = *Venus::Hook::BUILDARGS;
 
-  ${$metacache} = undef;
+  *CONSTRUCT = *Venus::Hook::CONSTRUCT;
 
-  return $self;
-}
+  *CLONE = *Venus::Hook::CLONE;
 
-sub AUDIT {
-  my ($self) = @_;
+  *DATA = *Venus::Hook::DATA;
 
-  return $self;
-}
+  *DECONSTRUCT = *Venus::Hook::DECONSTRUCT;
 
-sub BASE {
-  my ($self, $base, @args) = @_;
+  *DESTROY = *Venus::Hook::DESTROY;
 
-  no strict 'refs';
+  *DOES = *Venus::Hook::DOES;
 
-  if (!grep !/\A[^:]+::\z/, keys(%{"${base}::"})) {
-    local $@; eval "require $base"; do{require Venus; Venus::fault($@)} if $@;
-  }
+  *EXPORT = *Venus::Hook::EXPORT;
 
-  @{"@{[$self->NAME]}::ISA"} = (
-    $base, (grep +($_ ne $base), @{"@{[$self->NAME]}::ISA"})
-  );
+  *FROM = *Venus::Hook::FROM;
 
-  my $index = int(keys(%{$${"@{[$self->NAME]}::META"}{BASE}})) + 1;
+  *GET = *Venus::Hook::GET;
 
-  $${"@{[$self->NAME]}::META"}{BASE}{$base} = [$index, [$base, @args]];
+  *IMPORT = *Venus::Hook::IMPORT;
 
-  my $metacache = join '::', $self->NAME, $self->METACACHE;
+  *ITEM = *Venus::Hook::ITEM;
 
-  ${$metacache} = undef;
+  *META = *Venus::Hook::META;
 
-  return $self;
-}
+  *METACACHE = *Venus::Hook::METACACHE;
 
-sub BLESS {
-  my ($self, @args) = @_;
+  *MIXIN = *Venus::Hook::MIXIN;
 
-  my $name = $self->NAME;
-  my $data = $self->DATA($self->ARGS($self->BUILDARGS(@args)));
-  my $anew = bless($data, $name);
+  *MASK = *Venus::Hook::MASK;
 
-  no strict 'refs';
+  *NAME = *Venus::Hook::NAME;
 
-  $anew->BUILD($data);
+  *ROLE = *Venus::Hook::ROLE;
 
-  return $anew if $name eq 'Venus::Meta';
+  *SET = *Venus::Hook::SET;
 
-  require Venus::Meta;
+  *STORE = *Venus::Hook::STORE;
 
-  my $metacache = join '::', $self->NAME, $self->METACACHE;
+  *SUBS = *Venus::Hook::SUBS;
 
-  ${$metacache} ||= Venus::Meta->new(name => $name);
+  *TEST = *Venus::Hook::TEST;
 
-  return $anew;
-}
+  *UNIMPORT = *Venus::Hook::UNIMPORT;
 
-sub BUILD {
-  my ($self) = @_;
-
-  return $self;
-}
-
-sub BUILDARGS {
-  my ($self, @args) = @_;
-
-  return (@args);
-}
-
-sub DATA {
-  my ($self, $data) = @_;
-
-  return $data || {};
-}
-
-sub DESTROY {
-  my ($self) = @_;
-
-  return;
-}
-
-sub DOES {
-  my ($self, $role) = @_;
-
-  return if !$role;
-
-  return $self->META->role($role);
-}
-
-sub EXPORT {
-  my ($self, $into) = @_;
-
-  return [];
-}
-
-sub FROM {
-  my ($self, $base) = @_;
-
-  $self->BASE($base);
-
-  $base->AUDIT($self->NAME) if $base->can('AUDIT');
-
-  no warnings 'redefine';
-
-  $base->IMPORT($self->NAME);
-
-  return $self;
-}
-
-sub GET {
-  my ($self, $name) = @_;
-
-  return $self->{$name};
-}
-
-sub IMPORT {
-  my ($self, $into) = @_;
-
-  return $self;
-}
-
-sub ITEM {
-  my ($self, $name, @args) = @_;
-
-  return undef if !$name;
-  return $self->GET($name) if !@args;
-  return $self->SET($name, $args[0]);
-}
-
-sub META {
-  my ($self) = @_;
-
-  no strict 'refs';
-
-  require Venus::Meta;
-
-  my $metacache = join '::', my $name = $self->NAME, $self->METACACHE;
-
-  return ${$metacache} ||= Venus::Meta->new(name => $name);
-}
-
-sub METACACHE {
-  my ($self) = @_;
-
-  return 'METACACHE';
-}
-
-sub MIXIN {
-  my ($self, $mixin, @args) = @_;
-
-  no strict 'refs';
-
-  if (!grep !/\A[^:]+::\z/, keys(%{"${mixin}::"})) {
-    local $@; eval "require $mixin"; do{require Venus; Venus::fault($@)} if $@;
-  }
-
-  no warnings 'redefine';
-
-  $mixin->IMPORT($self->NAME);
-
-  no strict 'refs';
-
-  my $index = int(keys(%{$${"@{[$self->NAME]}::META"}{MIXIN}})) + 1;
-
-  $${"@{[$self->NAME]}::META"}{MIXIN}{$mixin} = [$index, [$mixin, @args]];
-
-  my $metacache = join '::', $self->NAME, $self->METACACHE;
-
-  ${$metacache} = undef;
-
-  return $self;
-}
-
-sub NAME {
-  my ($self) = @_;
-
-  return ref $self || $self;
-}
-
-sub ROLE {
-  my ($self, $role, @args) = @_;
-
-  no strict 'refs';
-
-  if (!grep !/\A[^:]+::\z/, keys(%{"${role}::"})) {
-    local $@; eval "require $role"; do{require Venus; Venus::fault($@)} if $@;
-  }
-
-  no warnings 'redefine';
-
-  $role->IMPORT($self->NAME);
-
-  no strict 'refs';
-
-  my $index = int(keys(%{$${"@{[$self->NAME]}::META"}{ROLE}})) + 1;
-
-  $${"@{[$self->NAME]}::META"}{ROLE}{$role} = [$index, [$role, @args]];
-
-  my $metacache = join '::', $self->NAME, $self->METACACHE;
-
-  ${$metacache} = undef;
-
-  return $self;
-}
-
-sub SET {
-  my ($self, $name, $data) = @_;
-
-  return $self->{$name} = $data;
-}
-
-sub SUBS {
-  my ($self) = @_;
-
-  no strict 'refs';
-
-  return [
-    sort grep *{"@{[$self->NAME]}::$_"}{"CODE"},
-    grep /^[_a-zA-Z]\w*$/, keys %{"@{[$self->NAME]}::"}
-  ];
-}
-
-sub TEST {
-  my ($self, $role) = @_;
-
-  $self->ROLE($role);
-
-  $role->AUDIT($self->NAME) if $role->can('AUDIT');
-
-  return $self;
-}
-
-sub UNIMPORT {
-  my ($self, $into, @args) = @_;
-
-  return $self;
-}
-
-sub USE {
-  my ($self, $into, @args) = @_;
-
-  return $self;
+  *USE = *Venus::Hook::USE;
 }
 
 1;
@@ -825,6 +624,130 @@ I<Since C<1.00>>
 
 =cut
 
+=head2 clone
+
+  clone() (object)
+
+The CLONE method is an object construction lifecycle hook that returns a deep
+clone of the invocant. The invocant must be blessed, meaning that the method
+only applies to objects that are instances of a package. If the invocant is not
+blessed, an exception will be raised. This method uses deep cloning to create
+an independent copy of the object, including any private instance data, nested
+structures or references within the object.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item clone example 1
+
+  package User;
+
+  use base 'Venus::Core';
+
+  package main;
+
+  my $user = User->BLESS('Elliot');
+
+  my $clone = $user->CLONE;
+
+  # bless({name => 'Elliot'}, 'User')
+
+=back
+
+=over 4
+
+=item clone example 2
+
+  package User;
+
+  use base 'Venus::Core';
+
+  package main;
+
+  my $user = User->BLESS('Elliot');
+
+  my $clone = User->CLONE;
+
+  # Exception! "Can't clone without an instance of \"User\""
+
+=back
+
+=over 4
+
+=item clone example 3
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->MASK('password');
+
+  sub get_password {
+    my ($self) = @_;
+
+    $self->password;
+  }
+
+  sub set_password {
+    my ($self) = @_;
+
+    $self->password('secret');
+  }
+
+  package main;
+
+  my $user = User->BLESS('Elliot');
+
+  $user->set_password;
+
+  my $clone = $user->CLONE;
+
+  # bless({name => 'Elliot'}, 'User')
+
+=back
+
+=cut
+
+=head2 construct
+
+  construct() (any)
+
+The CONSTRUCT method is an object construction lifecycle hook that is
+automatically called after the L</BLESS> method, without any arguments. It is
+intended to prepare the instance for usage, separate from the build process,
+allowing for any setup or post-processing needed after the object has been
+blessed. This method's return value is not used in any subsequent processing,
+so its primary purpose is side effects or additional setup.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item construct example 1
+
+  package User;
+
+  use base 'Venus::Core';
+
+  sub CONSTRUCT {
+    my ($self) = @_;
+
+    $self->{ready} = 1;
+
+    return $self;
+  }
+
+  package main;
+
+  my $user = User->BLESS('Elliot');
+
+  # bless({name => 'Elliot', ready => 1}, 'User')
+
+=back
+
+=cut
+
 =head2 data
 
   DATA() (Ref)
@@ -877,6 +800,55 @@ I<Since C<1.00>>
 
 =cut
 
+=head2 deconstruct
+
+  deconstruct() (any)
+
+The DECONSTRUCT method is an object destruction lifecycle hook that is called
+just before the L</DESTROY> method. It provides an opportunity to perform any
+necessary cleanup or resource release on the instance before it is destroyed.
+This can include actions like disconnecting from external resources, clearing
+caches, or logging. The method returns the instance, but its return value is
+not used in subsequent processing.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item deconstruct example 1
+
+  package User;
+
+  use base 'Venus::Core';
+
+  our $CALLS = 0;
+
+  our $USERS = 0;
+
+  sub CONSTRUCT {
+    return $CALLS = $USERS += 1;
+  }
+
+  sub DECONSTRUCT {
+    return $USERS--;
+  }
+
+  package main;
+
+  my $user;
+
+  $user = User->BLESS('Elliot');
+
+  $user = User->BLESS('Elliot');
+
+  undef $user;
+
+  # undef
+
+=back
+
+=cut
+
 =head2 destroy
 
   DESTROY() (any)
@@ -894,14 +866,14 @@ I<Since C<1.00>>
 
   use base 'Venus::Core';
 
-  our $USERS = 0;
+  our $TRIES = 0;
 
   sub BUILD {
-    return $USERS++;
+    return $TRIES++;
   }
 
   sub DESTROY {
-    return $USERS--;
+    return $TRIES--;
   }
 
   package main;
@@ -1261,6 +1233,99 @@ I<Since C<1.11>>
 
 =cut
 
+=head2 mask
+
+  mask(string $name, any @args) (string | object)
+
+The MASK method is a class-building lifecycle hook that installs private
+instance data accessors in the calling package. The accessor created allows
+private access to an instance variable, ensuring that it can only be accessed
+within the class or its subclasses. The method takes the name of the private
+variable as the first argument and any additional parameters needed for
+configuration. Attempting to access or set this variable outside of the class
+will raise an exception. This feature is useful for creating encapsulated
+attributes that maintain controlled visibility.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item mask example 1
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->MASK('password');
+
+  package main;
+
+  my $user = User->BLESS(name => 'Elliot');
+
+  $user->password;
+
+  # Exception! "Can't get/set private variable \"password\" outside the class or subclass of \"User\""
+
+=back
+
+=over 4
+
+=item mask example 2
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->MASK('password');
+
+  package main;
+
+  my $user = User->BLESS(name => 'Elliot');
+
+  User->password;
+
+  # Exception! "Can't get/set private variable \"password\" without an instance of \"User\""
+
+=back
+
+=over 4
+
+=item mask example 3
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->MASK('password');
+
+  sub get_password {
+    my ($self) = @_;
+
+    $self->password;
+  }
+
+  sub set_password {
+    my ($self) = @_;
+
+    $self->password('secret');
+  }
+
+  package main;
+
+  my $user = User->BLESS(name => 'Elliot');
+
+  $user->set_password;
+
+  # "secret"
+
+  $user;
+
+  # bless({name => 'Elliot'}, 'User')
+
+=back
+
+=cut
+
 =head2 meta
 
   META() (Venus::Meta)
@@ -1449,6 +1514,8 @@ The SET method is a class instance lifecycle hook which is responsible for
 I<"setting"> instance items (or attribute values). By default, all class
 attributes I<"setters"> are dispatched to this method.
 
+I<Since C<2.91>>
+
 =over 4
 
 =item set example 1
@@ -1573,6 +1640,33 @@ I<Since C<2.91>>
   package main;
 
   User->UNIMPORT;
+
+  # 'User'
+
+=back
+
+=cut
+
+=head2 use
+
+  USE(string $into, any @args) (any)
+
+The USE method is a class building lifecycle hook which is invoked
+whenever the L<perlfunc/use> declaration is used.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item use example 1
+
+  package User;
+
+  use base 'Venus::Core';
+
+  package main;
+
+  User->USE;
 
   # 'User'
 

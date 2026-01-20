@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Path::Tiny" => "0.011",
     "Paws" => 0,
+    "Paws::Credential::Explicit" => 0,
     "Paws::Net::MultiplexCaller" => 0,
     "PawsX::FakeImplementation::Instance" => 0,
     "Test2::V0" => 0,
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.0.1",
+  "VERSION" => "0.0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %FallbackPrereqs = (
   "Feature::Compat::Try" => "0.05",
   "Path::Tiny" => "0.011",
   "Paws" => 0,
+  "Paws::Credential::Explicit" => 0,
   "Paws::Net::MultiplexCaller" => 0,
   "PawsX::FakeImplementation::Instance" => 0,
   "Test2::V0" => 0,

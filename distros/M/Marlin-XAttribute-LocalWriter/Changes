@@ -1,0 +1,14 @@
+Marlin-XAttribute-LocalWriter
+=============================
+
+Created:      2026-01-19
+Home page:    <https://metacpan.org/release/Marlin-XAttribute-LocalWriter>
+Bug tracker:  <https://github.com/tobyink/p5-marlin-xattribute-localwriter/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.020001	2026-01-19
+
+ [ Documentation ]
+ - Document importing.
+
+0.020000	2026-01-19	Split from main Marlin distribution

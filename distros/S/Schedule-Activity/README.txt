@@ -1,19 +1,20 @@
-"Schedule::Activity" Version 0.2.9
+"Schedule::Activity" Version 0.3.0
 
 Abstract:
 ---------
 This package provides a mechanism to construct "random" schedules of events using a graph-based configuration of activities and actions, together with event message randomization, attribute tracking and reporting, and secondary event notes.
 
-What's new in version 0.2.9:
+What's new in version 0.3.0:
 ----------------------------
-* Per-node attributes
+* Next weighted item support
 
 What's new in recent versions:
 ------------------------------
 * Incremental schedule construction
 * Attribute report formatting tools
-* Goals:  per-activity, weights
-* Improved safety checks
+* Scheduling goals
+* Node filtering improvements
+* Per-node automatic attributes
 
 Copyright & License:
 --------------------

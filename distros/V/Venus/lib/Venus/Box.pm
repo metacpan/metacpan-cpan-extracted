@@ -5,7 +5,11 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'with';
+
+# INTEGRATES
 
 with 'Venus::Role::Buildable';
 with 'Venus::Role::Proxyable';
@@ -34,11 +38,11 @@ sub build_args {
 sub build_self {
   my ($self, $data) = @_;
 
-  require Venus::Type;
+  require Venus::What;
 
   $data //= {};
 
-  $self->{value} = Venus::Type->new(value => $data->{value})->deduce;
+  $self->{value} = Venus::What->new(value => $data->{value})->deduce;
 
   return $self;
 }
@@ -76,9 +80,9 @@ sub build_proxy {
         : $result;
     }
     else {
-      require Venus::Type;
+      require Venus::What;
       return ref($self)->new(
-        value => Venus::Type->new(value => $result)->deduce
+        value => Venus::What->new(value => $result)->deduce
       );
     }
   };
@@ -141,6 +145,58 @@ L<Venus::Role::Proxyable>
 =head1 METHODS
 
 This package provides the following methods:
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Box)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Box;
+
+  my $new = Venus::Box->new;
+
+  # bless(..., "Venus::Box")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Box;
+
+  my $new = Venus::Box->new('hello');
+
+  # bless(..., "Venus::Box")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Box;
+
+  my $new = Venus::Box->new(value => 'hello');
+
+  # bless(..., "Venus::Box")
+
+=back
 
 =cut
 

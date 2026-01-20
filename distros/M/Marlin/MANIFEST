@@ -31,11 +31,6 @@ lib/Marlin/Struct.pm
 lib/Marlin/TypeConstraint.pm
 lib/Marlin/Util.pm
 lib/Marlin/X.pm
-lib/Marlin/X/Clone.pm
-lib/Marlin/X/UndefTolerant.pm
-lib/Marlin/XAttribute/Alias.pm
-lib/Marlin/XAttribute/LocalWriter.pm
-lib/Marlin/XAttribute/Lvalue.pm
 lib/MooX/Marlin.pm
 lib/MooseX/Marlin.pm
 t/.mite/config
@@ -53,9 +48,6 @@ t/integration/extend-attr.t
 t/integration/extend-eg.t
 t/integration/extend-lex.t
 t/integration/foreign-inherit.t
-t/integration/localwriter.t
-t/integration/lvalues-moose.t
-t/integration/lvalues.t
 t/integration/mite-inherit.t
 t/integration/moo-inherit-reversed.t
 t/integration/moo-inherit.t
@@ -63,13 +55,11 @@ t/integration/moose-inherit-reversed.t
 t/integration/moose-inherit.t
 t/integration/mouse-inherit.t
 t/integration/pad-inherit.skip
-t/integration/plugin.t
 t/integration/roles.t
 t/integration/roles2.t
 t/integration/storage.t
 t/integration/struct.t
 t/integration/triggers.t
-t/integration/undef-tolerant.pl
 t/integration/xscon-inherit.t
 t/integration/xsdelegation.t
 t/lib/Local/Example/Marlin.pm

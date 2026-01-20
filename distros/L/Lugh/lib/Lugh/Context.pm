@@ -2,18 +2,21 @@ package Lugh::Context;
 
 use strict;
 use warnings;
+use Lugh;
 
 =head1 NAME
 
 Lugh::Context - Memory Context for Tensor Allocation
 
+=encoding utf8
+
 =head1 VERSION
 
-Version 0.01
+Version 0.08
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 

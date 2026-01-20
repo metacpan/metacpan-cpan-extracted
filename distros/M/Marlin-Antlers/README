@@ -33,7 +33,7 @@ DESCRIPTION
 
     It also exports everything from Types::Common and Marlin::Util. This will
     give you `true`, `false`, `ro`, `rw`, `rwp`, etc for free, plus a whole
-    bunch of type constraints, `signature_for`, etc.
+    bunch of type constraints, etc.
 
     Everything is exported lexically.
 
@@ -144,6 +144,28 @@ DESCRIPTION
         See Class::Method::Modifiers.
 
         Moose and Moo don't provide this keyword.
+
+    `signature_for FUNCTION => ( SPEC )`
+    signature( SPEC )
+        Marlin::Antlers exports slightly modified versions of `signature` and
+        `signature_for` from Type::Params. The main user-visible difference is
+        that they default to `method => true`, as they are intended for use in
+        object-oriented packages.
+
+          package Local::Calculator {
+            use Marlin::Antlers;
+    
+            signature_for add_nums => (
+              positional => [ Int, Int ],
+            );
+    
+            sub add_nums ( $self, $first, $second ) {
+              return $first + $second;
+            }
+          }
+  
+          my $calc = Local::Calculator->new;
+          say $calc->add_nums( 40, 2 );  # 42
 
     `__FINALIZE__`
         You can call this function at the end of your class to finalize it.

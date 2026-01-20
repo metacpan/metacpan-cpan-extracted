@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base';
 
+# INHERITS
+
 base 'Venus::Kind::Value';
+
+# OVERLOADS
 
 use overload (
   'eq' => sub{"$_[0]" eq "$_[1]"},
@@ -17,16 +23,6 @@ use overload (
 );
 
 # METHODS
-
-sub assertion {
-  my ($self) = @_;
-
-  my $assert = $self->SUPER::assertion;
-
-  $assert->clear->expression('regexp');
-
-  return $assert;
-}
 
 sub comparer {
   my ($self) = @_;
@@ -1677,6 +1673,58 @@ I<Since C<0.08>>
   my $result = $lvalue->ne($rvalue);
 
   # 1
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Regexp)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $new = Venus::Regexp->new;
+
+  # bless(..., "Venus::Regexp")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $new = Venus::Regexp->new(qr/(?<greet>\w+) (?<username>\w+)/u);
+
+  # bless(..., "Venus::Regexp")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $new = Venus::Regexp->new(value => qr/(?<greet>\w+) (?<username>\w+)/u);
+
+  # bless(..., "Venus::Regexp")
 
 =back
 

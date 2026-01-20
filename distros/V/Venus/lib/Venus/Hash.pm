@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base', 'with';
 
+# INHERITS
+
 base 'Venus::Kind::Value';
+
+# INTEGRATES
 
 with 'Venus::Role::Mappable';
 
@@ -71,16 +77,16 @@ sub any {
 sub call {
   my ($self, $mapper, $method, @args) = @_;
 
-  require Venus::Type;
+  require Venus::What;
 
   return $self->$mapper(sub{
     my ($key, $val) = @_;
 
-    my $type = Venus::Type->new($val)->deduce;
+    my $what = Venus::What->new($val)->deduce;
 
-    local $_ = $type;
+    local $_ = $what;
 
-    $key, $type->$method(@args)
+    $key, $what->$method(@args)
   });
 }
 
@@ -180,6 +186,14 @@ sub get {
   return $self->value->{$index};
 }
 
+sub gets {
+  my ($self, @args) = @_;
+
+  my $result = $self->puts(map +(undef, $_), @args);
+
+  return wantarray ? (@{$result}) : $result;
+}
+
 sub grep {
   my ($self, $code) = @_;
 
@@ -260,7 +274,7 @@ sub merge {
 
   my $lvalue = {%{$self->get}};
 
-  return Venus::merge($lvalue, @rvalues);
+  return Venus::merge_swap($lvalue, @rvalues);
 }
 
 sub none {
@@ -333,7 +347,7 @@ sub puts {
   for (my $i = 0; $i < @args; $i += 2) {
     my ($into, $path) = @args[$i, $i+1];
 
-    next if !defined $path;
+    next if !defined $path || $path eq '';
 
     my $value;
     my @range;
@@ -341,7 +355,10 @@ sub puts {
     ($path, @range) = @{$path} if ref $path eq 'ARRAY';
 
     $value = $self->path($path);
-    $value = Venus::Array->new($value)->range(@range) if ref $value eq 'ARRAY';
+
+    if (ref $value eq 'ARRAY' && @range) {
+      $value = Venus::Array->new($value)->range(@range);
+    }
 
     if (ref $into eq 'SCALAR') {
       $$into = $value;
@@ -386,6 +403,14 @@ sub reverse {
   return {CORE::reverse(%$result)};
 }
 
+sub rsort {
+  my ($self) = @_;
+
+  my $pairs = $self->pairs;
+
+  return [CORE::sort { $b cmp $a } CORE::map $$_[1], @{$pairs}];
+}
+
 sub set {
   my ($self, @args) = @_;
 
@@ -400,12 +425,75 @@ sub set {
   return $self->value->{$index} = $value;
 }
 
+sub sets {
+  my ($self, @args) = @_;
+
+  my $result = [];
+
+  for (my $i = 0; $i < @args; $i += 2) {
+    my ($path, $data) = @args[$i, $i+1];
+
+    CORE::push @{$result}, $data;
+
+    next if !defined $path || $path eq "";
+
+    if (my ($first, $last) = $path =~ /^(.*)\.(\w+)$/) {
+      my $value = $self->path($first) or next;
+
+      if (ref $value eq 'ARRAY') {
+        $value->[$last] = $data;
+      }
+      elsif (ref $value eq 'HASH') {
+        $value->{$last} = $data;
+      }
+    }
+    else {
+      $self->set($path, $data);
+    }
+  }
+
+  return wantarray ? (@{$result}) : $result;
+}
+
+sub shuffle {
+  my ($self) = @_;
+
+  my $pairs = $self->pairs;
+
+  my $result = [CORE::map $$_[1], @{$pairs}];
+
+  for my $index (0..$#$result) {
+    my $other = int(rand(@$result));
+    my $stash = $result->[$index];
+    $result->[$index] = $result->[$other];
+    $result->[$other] = $stash;
+  }
+
+  return $result;
+}
+
 sub slice {
   my ($self, @args) = @_;
 
   my $data = $self->get;
 
   return [@{$data}{@args}];
+}
+
+sub sort {
+  my ($self) = @_;
+
+  my $pairs = $self->pairs;
+
+  return [CORE::sort { $a cmp $b } CORE::map $$_[1], @{$pairs}];
+}
+
+sub values {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  return [CORE::values(%$data)];
 }
 
 1;
@@ -1115,7 +1203,7 @@ I<Since C<0.01>>
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my $find = $hash->find('foo', 'bar');
 
@@ -1131,7 +1219,7 @@ I<Since C<0.01>>
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my $find = $hash->find('bar', 0);
 
@@ -1147,7 +1235,7 @@ I<Since C<0.01>>
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my $find = $hash->find('bar');
 
@@ -1163,7 +1251,7 @@ I<Since C<0.01>>
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my ($find, $exists) = $hash->find('baz');
 
@@ -1512,6 +1600,66 @@ I<Since C<0.08>>
   my $result = $lvalue->gele($rvalue);
 
   # 0
+
+=back
+
+=cut
+
+=head2 gets
+
+  gets(string @args) (arrayref)
+
+The gets method select values from within the underlying data structure using
+L<Venus::Hash/path>, where each argument is a selector, returns all the values
+selected. Returns a list in list context.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item gets example 1
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+
+  my $gets = $hash->gets('bar', 'foo.bar');
+
+  # [['baz'], 'baz']
+
+=back
+
+=over 4
+
+=item gets example 2
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+
+  my ($bar, $foo_bar) = $hash->gets('bar', 'foo.bar');
+
+  # (['baz'], 'baz')
+
+=back
+
+=over 4
+
+=item gets example 3
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+
+  my $gets = $hash->gets('bar', 'foo.bar', 'foo.bar.baz');
+
+  # [['baz'], 'baz', undef]
 
 =back
 
@@ -2623,6 +2771,58 @@ I<Since C<0.08>>
 
 =cut
 
+=head2 new
+
+  new(any @args) (Venus::Hash)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Hash;
+
+  my $new = Venus::Hash->new;
+
+  # bless(..., "Venus::Hash")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Hash;
+
+  my $new = Venus::Hash->new({1..8});
+
+  # bless(..., "Venus::Hash")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Hash;
+
+  my $new = Venus::Hash->new(value => {1..8});
+
+  # bless(..., "Venus::Hash")
+
+=back
+
+=cut
+
 =head2 none
 
   none(coderef $code) (boolean)
@@ -2747,7 +2947,7 @@ I<Since C<0.01>>
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my $path = $hash->path('/foo/bar');
 
@@ -2763,7 +2963,7 @@ I<Since C<0.01>>
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my $path = $hash->path('/bar/0');
 
@@ -2779,7 +2979,7 @@ I<Since C<0.01>>
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my $path = $hash->path('/bar');
 
@@ -2795,7 +2995,7 @@ I<Since C<0.01>>
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my ($path, $exists) = $hash->path('/baz');
 
@@ -2913,7 +3113,25 @@ I<Since C<3.20>>
 
   my $puts = [$a, $b, $m, $x, $y];
 
-  # [1, 2, [3..18], 19, 20]
+  # [1, 2, [3..19], 19, 20]
+
+=back
+
+=over 4
+
+=item puts example 5
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({set => [{1..4}, {1..4}]});
+
+  $hash->puts(\my $a, 'set');
+
+  my $puts = $a;
+
+  # [{1..4}, {1..4}]
 
 =back
 
@@ -2990,6 +3208,140 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 rsort
+
+  rsort() (arrayref)
+
+The rsort method returns an array reference containing the values in the array
+sorted alphanumerically in reverse.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item rsort example 1
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({1 => 'a', 2 => 'b', 3 => 'c', 4 => 'd'});
+
+  my $rsort = $hash->rsort;
+
+  # ["d", "c", "b", "a"]
+
+=back
+
+=cut
+
+=head2 sets
+
+  sets(string @args) (arrayref)
+
+The sets method find values from within the underlying data structure using
+L<Venus::Hash/path>, where each argument pair is a selector and value, and
+returns all the values provided. Returns a list in list context. Note, nested
+data structures can be updated but not created.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item sets example 1
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+
+  my $sets = $hash->sets('bar' => 'bar', 'foo.bar' => 'bar');
+
+  # ['bar', 'bar']
+
+=back
+
+=over 4
+
+=item sets example 2
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+
+  my ($bar, $foo_bar) = $hash->sets('bar' => 'bar', 'foo.bar' => 'bar');
+
+  # ('bar', 'bar')
+
+=back
+
+=over 4
+
+=item sets example 3
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+
+  my $sets = $hash->sets('bar' => 'bar', 'foo.bar' => 'bar', 'foo.baz' => 'box');
+
+  # ['bar', 'bar', 'box']
+
+=back
+
+=over 4
+
+=item sets example 4
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+
+  my $sets = $hash->sets('bar' => 'bar', 'foo.bar' => 'bar', 'foo.baz.box' => 'box');
+
+  # ['bar', 'bar', 'box']
+
+  # $hash->gets('foo.bar.baz');
+
+  # undef
+
+=back
+
+=cut
+
+=head2 shuffle
+
+  shuffle() (arrayref)
+
+The shuffle method returns an array with the values returned in a randomized order.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item shuffle example 1
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({1..20});
+
+  my $shuffle = $hash->shuffle;
+
+  # [6, 12, 2, 20, 18, 16, 10, 4, 8, 14]
+
+=back
+
+=cut
+
 =head2 slice
 
   slice(string @keys) (arrayref)
@@ -3008,6 +3360,33 @@ I<Since C<0.01>>
   my $slice = $hash->slice(1, 3);
 
   # [2, 4]
+
+=back
+
+=cut
+
+=head2 sort
+
+  sort() (arrayref)
+
+The sort method returns an array reference containing the values in the array
+sorted alphanumerically.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item sort example 1
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({1 => 'a', 2 => 'b', 3 => 'c', 4 => 'd'});
+
+  my $sort = $hash->sort;
+
+  # ["a".."d"]
 
 =back
 
@@ -3180,6 +3559,29 @@ I<Since C<0.08>>
   my $result = $lvalue->tv($rvalue);
 
   # 0
+
+=back
+
+=cut
+
+=head2 values
+
+  values() (arrayref)
+
+The values method returns an array reference consisting of all the values in
+the hash.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item values example 1
+
+  # given: synopsis;
+
+  my $values = $hash->values;
+
+  # [2, 4, 6, 8]
 
 =back
 

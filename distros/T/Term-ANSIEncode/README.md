@@ -1,75 +1,92 @@
 # Term::ANSIEncode
 
-![ANSIEncode Logo](ANSI-Encode.png?raw=true "ANSIEncode Logo Title Text 1")
+![Term::ANSIEncode Logo](images/ANSI-Encode.png?raw=true "Term::ANSIEncode Logo Title Text")
 
 ## Description
 
-Markup text to ANSI encoder
+Markup text to ANSI encoder.  Very handy for making server identification screens.
 
 ## Usage
 
-**ansi-encode** [options] [File or Search]
+### To use the Perl module:
+```
+ # Read the module's POD manual for more information, via "man" or "perldoc"
 
-It is HIGHLY encouraged for your terminal be set as UTF-8 for the advanced features in this module/utility.
+ my $ansi = Term::ANSIEncode->new;
 
-Read the pod or man page for Term::ANSIEncode
+ my $string = '[% CLS %]Some markup encoded string';
+ $string .= "\n" . '[% RED     %]Red foreground[% RESET %]' . "\n";
+ $string .= "\n" . '[% YELLOW  %]Yellow foreground[% RESET %]' . "\n";
+ $string .= "\n" . '[% GREEN   %]Green foreground[% RESET %]' . "\n";
+ $string .= "\n" . '[% CYAN    %]Cyan foreground[% RESET %]' . "\n";
+ $string .= "\n" . '[% BLUE    %]Blue foreground[% RESET %]' . "\n";
+ $string .= "\n" . '[% MAGENTA %]Magenta foreground[% RESET %]' . "\n";
+
+ $ansi->ansi_output($string);
+```
+### To use the executable, run:
+```
+ansi-encode [options] [File or Search]
+```
+It is HIGHLY encouraged for your terminal be set as UTF-8 for the advanced features in this module/utility.  It is also encouraged that you use a font having the graphics characters for frames and other features.
 
 ## Options
 
+![Help Screen](images/help.png?raw=true "Term::ANSIEncode Help Screen")
+
 ### -**a** or --**ansi-modes**
-```
-    Show aupported ANSI color modes
-```
+
+Show aupported ANSI color modes
+
+![Support Color Modes](images/supported.png?raw=true "Term::ANSIEncode Supported Color Modes")
 
 ### --**baud**=speed
-```
-    Slow down output to the specific baud rate.  75, 150, 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600 or 115200
-```
+
+Slow down output to the specific baud rate.  It can be any baud rate.  Full speed otherwise.
 
 ### -**c** or --**colors**
-```
-    Show color grid for use with "COLOR" and "GREY" tokens.
-```
+
+Show color grid for use with "COLOR" and "GRAY" tokens.
+
+![Colors](images/colors.png?raw=true "Term::ANSIEncode Color Examples")
 
 ### -**d** or --**dump** [search]
-~~~
-    Shows the symbols only.
-~~~
+
+Shows the symbols only.
 
 ### -**f** or --**frame**
-```
-    Show sample frame types.
-```
+
+Show sample frame types.
+
+![Frames](images/frames.png?raw=true "Term::ANSIEncode Frames Example")
 
 ### -**h** or --**horizontal-rules**
-```
-    Show sample horizontal rules.
-```
+
+Show sample horizontal rules.
+
+![Horizontal Rules](images/rules.png?raw=true "Term::ANSIEncode Horizontal Rules Example")
 
 ### -**r** or --**rawtokens**
-```
-    Raw dump of available tokens.
-```
+
+Raw dump of available tokens.
 
 ### -**s** or --**symbols** [search]
-```
-    Show all of the symbol character tokens by name.  Use search to shorten the huge list.
-````
+
+Show all of the symbol character tokens by name.  Use search to shorten the huge list.
 
 ### -**t** or --**tokens**
-```
-    Show most used tokens.
-```
+
+Show most used tokens.
 
 ### -**u** or --**unicode** [search]
-```
-    Show all of the symbol character tokens by unicode.  Use search to shorten the huge list.
-```
+
+Show all of the symbol character tokens by unicode.  Use search to shorten the huge list.
 
 ### -**v** or --**version**
-```
-    Show version and licensing info.
-```
+
+Show version and licensing info.
+
+![Version](images/version.png?raw=true "Term::ANSIEncode Version")
 
 ## Author
 
@@ -79,7 +96,11 @@ Richard Kelsch
 
 ## Fonts
 
-Some fonts do not support all of the Unicode characters.  The "examples" directory has an install script to install the "Awesome" fonts that look great and have all Unicode symbols.
+Some fonts do not support all of the Unicode characters.  The "examples" directory has an install script to install the "Awesome" fonts that look great and have all Unicode symbols.  They look great, are easy to read and have a plethora of support for the graphics and unicode characters.  They are TrueType fonts and can be installed on most systems and terminals.
+
+* http://github.com/gabrielelana/awesome-terminal-fonts
+
+I suggest "**SourceCodePro-Powerline-Awesome**" when selecting a font
 
 ## Tokens
 
@@ -209,5 +230,6 @@ Please use the "-t" option to see all of the tokens.  This is only a partial lis
 | HORIZONTAL RULE BRIGHT MAGENTA | A solid line of bright magenta background |
 | HORIZONTAL RULE BRIGHT CYAN  | A solid line of bright cyan background |
 | HORIZONTAL RULE BRIGHT WHITE | A solid line of bright white background |
+
 
 

@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -50,6 +51,7 @@ method: exists
 method: find
 method: ge
 method: gele
+method: gets
 method: grep
 method: gt
 method: gtlt
@@ -62,6 +64,7 @@ method: lt
 method: map
 method: merge
 method: ne
+method: new
 method: none
 method: one
 method: pairs
@@ -70,8 +73,13 @@ method: puts
 method: random
 method: reset
 method: reverse
+method: rsort
+method: sets
+method: shuffle
 method: slice
+method: sort
 method: tv
+method: values
 
 =cut
 
@@ -1038,7 +1046,7 @@ match was successful.
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my $find = $hash->find('foo', 'bar');
 
@@ -1060,7 +1068,7 @@ $test->for('example', 1, 'find', sub {
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my $find = $hash->find('bar', 0);
 
@@ -1082,7 +1090,7 @@ $test->for('example', 2, 'find', sub {
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my $find = $hash->find('bar');
 
@@ -1104,7 +1112,7 @@ $test->for('example', 3, 'find', sub {
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my ($find, $exists) = $hash->find('baz');
 
@@ -1580,6 +1588,90 @@ $test->for('example', 9, 'gele', sub {
   is $result, 0;
 
   !$result
+});
+
+=method gets
+
+The gets method select values from within the underlying data structure using
+L<Venus::Hash/path>, where each argument is a selector, returns all the values
+selected. Returns a list in list context.
+
+=signature gets
+
+  gets(string @args) (arrayref)
+
+=metadata gets
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 gets
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+
+  my $gets = $hash->gets('bar', 'foo.bar');
+
+  # [['baz'], 'baz']
+
+=cut
+
+$test->for('example', 1, 'gets', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [['baz'], 'baz'];
+
+  $result
+});
+
+=example-2 gets
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+
+  my ($bar, $foo_bar) = $hash->gets('bar', 'foo.bar');
+
+  # (['baz'], 'baz')
+
+=cut
+
+$test->for('example', 2, 'gets', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply \@result, [['baz'], 'baz'];
+
+  @result
+});
+
+=example-3 gets
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+
+  my $gets = $hash->gets('bar', 'foo.bar', 'foo.bar.baz');
+
+  # [['baz'], 'baz', undef]
+
+=cut
+
+$test->for('example', 3, 'gets', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [['baz'], 'baz', undef];
+
+  $result
 });
 
 =method grep
@@ -3083,6 +3175,84 @@ $test->for('example', 9, 'ne', sub {
   $result
 });
 
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Hash)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Hash;
+
+  my $new = Venus::Hash->new;
+
+  # bless(..., "Venus::Hash")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Hash');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Hash;
+
+  my $new = Venus::Hash->new({1..8});
+
+  # bless(..., "Venus::Hash")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Hash');
+  is_deeply $result->value, {1..8};
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Hash;
+
+  my $new = Venus::Hash->new(value => {1..8});
+
+  # bless(..., "Venus::Hash")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Hash');
+  is_deeply $result->value, {1..8};
+
+  $result
+});
+
 =method none
 
 The none method returns true if none of the elements in the array meet the
@@ -3253,7 +3423,7 @@ successful.
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my $path = $hash->path('/foo/bar');
 
@@ -3275,7 +3445,7 @@ $test->for('example', 1, 'path', sub {
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my $path = $hash->path('/bar/0');
 
@@ -3297,7 +3467,7 @@ $test->for('example', 2, 'path', sub {
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my $path = $hash->path('/bar');
 
@@ -3319,7 +3489,7 @@ $test->for('example', 3, 'path', sub {
 
   use Venus::Hash;
 
-  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
 
   my ($path, $exists) = $hash->path('/baz');
 
@@ -3469,14 +3639,38 @@ $test->for('example', 3, 'puts', sub {
 
   my $puts = [$a, $b, $m, $x, $y];
 
-  # [1, 2, [3..18], 19, 20]
+  # [1, 2, [3..19], 19, 20]
 
 =cut
 
 $test->for('example', 4, 'puts', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is_deeply $result, [1, 2, [3..18], 19, 20];
+  is_deeply $result, [1, 2, [3..19], 19, 20];
+
+  $result
+});
+
+=example-5 puts
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({set => [{1..4}, {1..4}]});
+
+  $hash->puts(\my $a, 'set');
+
+  my $puts = $a;
+
+  # [{1..4}, {1..4}]
+
+=cut
+
+$test->for('example', 5, 'puts', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [{1..4}, {1..4}];
 
   $result
 });
@@ -3581,6 +3775,202 @@ $test->for('example', 1, 'reverse', sub {
   $result
 });
 
+=method rsort
+
+The rsort method returns an array reference containing the values in the array
+sorted alphanumerically in reverse.
+
+=signature rsort
+
+  rsort() (arrayref)
+
+=metadata rsort
+
+{
+  since => '4.15',
+}
+
+=example-1 rsort
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({1 => 'a', 2 => 'b', 3 => 'c', 4 => 'd'});
+
+  my $rsort = $hash->rsort;
+
+  # ["d", "c", "b", "a"]
+
+=cut
+
+$test->for('example', 1, 'rsort', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ["d", "c", "b", "a"];
+
+  $result
+});
+
+=method sets
+
+The sets method find values from within the underlying data structure using
+L<Venus::Hash/path>, where each argument pair is a selector and value, and
+returns all the values provided. Returns a list in list context. Note, nested
+data structures can be updated but not created.
+
+=signature sets
+
+  sets(string @args) (arrayref)
+
+=metadata sets
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 sets
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+
+  my $sets = $hash->sets('bar' => 'bar', 'foo.bar' => 'bar');
+
+  # ['bar', 'bar']
+
+=cut
+
+$test->for('example', 1, 'sets', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ['bar', 'bar'];
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+  $hash->sets('bar' => 'bar', 'foo.bar' => 'bar');
+  is_deeply $hash->get, {'foo' => {'bar' => 'bar'}, 'bar' => 'bar'};
+
+  $result
+});
+
+=example-2 sets
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+
+  my ($bar, $foo_bar) = $hash->sets('bar' => 'bar', 'foo.bar' => 'bar');
+
+  # ('bar', 'bar')
+
+=cut
+
+$test->for('example', 2, 'sets', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply \@result, ['bar', 'bar'];
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+  $hash->sets('bar' => 'bar', 'foo.bar' => 'bar');
+  is_deeply $hash->get, {'foo' => {'bar' => 'bar'}, 'bar' => 'bar'};
+
+  @result
+});
+
+=example-3 sets
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+
+  my $sets = $hash->sets('bar' => 'bar', 'foo.bar' => 'bar', 'foo.baz' => 'box');
+
+  # ['bar', 'bar', 'box']
+
+=cut
+
+$test->for('example', 3, 'sets', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ['bar', 'bar', 'box'];
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+  $hash->sets('bar' => 'bar', 'foo.bar' => 'bar', 'foo.baz' => 'box');
+  is_deeply $hash->get, {'foo' => {'bar' => 'bar', 'baz' => 'box'}, 'bar' => 'bar'};
+
+  $result
+});
+
+=example-4 sets
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+
+  my $sets = $hash->sets('bar' => 'bar', 'foo.bar' => 'bar', 'foo.baz.box' => 'box');
+
+  # ['bar', 'bar', 'box']
+
+  # $hash->gets('foo.bar.baz');
+
+  # undef
+
+=cut
+
+$test->for('example', 4, 'sets', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ['bar', 'bar', 'box'];
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'}, 'bar' => ['baz']});
+  $hash->sets('bar' => 'bar', 'foo.bar' => 'bar', 'foo.baz.box' => 'box');
+  is_deeply $hash->get, {'foo' => {'bar' => 'bar'}, 'bar' => 'bar'};
+
+  $result
+});
+
+=method shuffle
+
+The shuffle method returns an array with the values returned in a randomized order.
+
+=signature shuffle
+
+  shuffle() (arrayref)
+
+=metadata shuffle
+
+{
+  since => '4.15',
+}
+
+=example-1 shuffle
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({1..20});
+
+  my $shuffle = $hash->shuffle;
+
+  # [6, 12, 2, 20, 18, 16, 10, 4, 8, 14]
+
+=cut
+
+$test->for('example', 1, 'shuffle', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  isnt "@$result", "2 4 6 8 10 12 14 16 18 20";
+
+  $result
+});
+
 =method slice
 
 The slice method returns an array reference of the values that correspond to
@@ -3610,6 +4000,43 @@ $test->for('example', 1, 'slice', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, [2, 4];
+
+  $result
+});
+
+=method sort
+
+The sort method returns an array reference containing the values in the array
+sorted alphanumerically.
+
+=signature sort
+
+  sort() (arrayref)
+
+=metadata sort
+
+{
+  since => '4.15',
+}
+
+=example-1 sort
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({1 => 'a', 2 => 'b', 3 => 'c', 4 => 'd'});
+
+  my $sort = $hash->sort;
+
+  # ["a".."d"]
+
+=cut
+
+$test->for('example', 1, 'sort', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ["a".."d"];
 
   $result
 });
@@ -3842,6 +4269,39 @@ $test->for('example', 9, 'tv', sub {
   is $result, 0;
 
   !$result
+});
+
+=method values
+
+The values method returns an array reference consisting of all the values in
+the hash.
+
+=signature values
+
+  values() (arrayref)
+
+=metadata values
+
+{
+  since => '4.15',
+}
+
+=example-1 values
+
+  # given: synopsis;
+
+  my $values = $hash->values;
+
+  # [2, 4, 6, 8]
+
+=cut
+
+$test->for('example', 1, 'values', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply [sort @{$result}], [2, 4, 6, 8];
+
+  $result
 });
 
 =partials

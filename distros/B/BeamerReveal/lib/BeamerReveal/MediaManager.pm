@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::MediaManager;
-our $VERSION = '20260111.1557'; # VERSION
+our $VERSION = '20260119.1636'; # VERSION
 
 use strict;
 use warnings;
@@ -31,6 +31,8 @@ use BeamerReveal::TemplateStore;
 use BeamerReveal::IPC::Run;
 use IPC::Run qw(harness start pump finish); 
 
+use File::chdir;
+
 use BeamerReveal::Log;
 
 sub min { $_[$_[0] > $_[1] ] }
@@ -39,10 +41,11 @@ sub nofdigits { length( "$_[0]" ) }
 
 sub new {
   my $class = shift;
-  my ( $jobname, $base, $presentationprms ) = @_;
+  my ( $jobname, $odir, $base, $presentationprms ) = @_;
 
   my $self = {
 	      jobname    => $jobname,
+	      outputdir  => $odir,
 	      base       => $base,
 	     };
   $class = (ref $class ? ref $class : $class );
@@ -60,14 +63,19 @@ sub new {
   $self->{iframes}    = "$self->{base}/media/Iframes";	
   $self->{slides}     = "$self->{base}/media/Slides";
   $self->{reveal}     = "$self->{base}/libs";
-  
-  # create animation path, but don't remove contents
-  File::Path::make_path( $self->{animations} );
 
-  # create all the ohter paths and also clean them
-  for my $item ( qw(reveal videos audios iframes images) ) {
-    File::Path::rmtree( $self->{$item} );
-    File::Path::make_path( $self->{$item} );
+  # put ourselves in the output directory for now
+  {
+    local $CWD = $self->{outputdir};
+  
+    # create animation path, but don't remove contents
+    File::Path::make_path( $self->{animations} );
+
+    # create all the ohter paths and also clean them
+    for my $item ( qw(reveal videos audios iframes images) ) {
+      File::Path::rmtree( $self->{$item} );
+      File::Path::make_path( $self->{$item} );
+    }
   }
 
   # read the relevant part of the preamble of the job
@@ -127,7 +135,8 @@ sub revealToStore {
   my $revealTree = File::ShareDir::dist_dir( 'BeamerReveal' ) . '/libs';
   my $destTree = $self->{reveal};
 
-  File::Copy::Recursive::dircopy( $revealTree, $destTree );
+  File::Copy::Recursive::dircopy( $revealTree,
+				  $self->{outputdir} . '/' . $destTree );
 }
 
 
@@ -151,8 +160,10 @@ sub animationFromStore {
   my $animid  = Digest::SHA::hmac_sha256_hex( $animation->{tex} );
   my $animdir = "$self->{animations}/$animid";
   my $fullpathid = $animdir . ".mp4";
+  # correct the effective path to reside in the output directory
+  $animdir = $self->{outputdir} . '/' . $animdir;
   
-  unless ( -r $fullpathid ) {
+  unless ( -r ( $self->{outputdir} . '/' . $fullpathid ) ) {
     File::Path::make_path( $animdir );
 
     my $templateStore = BeamerReveal::TemplateStore->new();
@@ -171,7 +182,7 @@ sub animationFromStore {
     if ( $nofCores > 4 ) {
       $nofCores = ceil( $nofCores / 2 );
     }
-
+    
     $self->{constructionBackOrders}->{$animid} = 
       {
        animation   => $animation,
@@ -201,7 +212,7 @@ sub processConstructionBackOrders {
     my $fileContent = $bo->{fileContent};
     my $nofFrames   = $bo->{nofFrames};
     my $nofCores    = $bo->{nofCores};
-    my $animdir     = "$self->{animations}/$animid";
+    my $animdir     = $self->{outputdir} . '/' . $self->{animations} . '/' . $animid;
     
     # I cannot get multithreading/multiprocessing to work reliably on MS-Windows
     my $progress;
@@ -288,8 +299,6 @@ sub processConstructionBackOrders {
       my $coreId = sprintf( '%0' . nofdigits( $nofCores ) . 'd', $core );
       for( my $frameno = $plan->{slicestart}; $frameno <= $plan->{slicestop}; ++$frameno ) {
 	my $frameId = sprintf( '%0' . nofdigits( $sliceSize ) . 'd', $frameno );
-	# my $src = File::Spec->catfile( $animdir, "frame-$coreId-$frameId.jpg" );
-	# my $dst = File::Spec->catfile( $animdir, sprintf( "frame-%06d.jpg", $framecounter++ ) );
 	my $src = "$animdir/frame-$coreId-$frameId.jpg";
 	my $dst = sprintf( "$animdir/frame-%06d.jpg", $framecounter++ );
 	File::Copy::move( $src, $dst );
@@ -354,7 +363,6 @@ sub _fromStore {
   my $fullpathid;
   do {
     my $uuid = $id->create();
-    #$fullpathid = File::Spec->catfile( $self->{base}, 'media', $type, $id->to_string( $uuid ) . $ext );
     $fullpathid = "$self->{base}/media/$type/@{[$id->to_string( $uuid )]}$ext";
   } until( ! -e $fullpathid );
 
@@ -363,7 +371,7 @@ sub _fromStore {
     {
      type => $type,
      from => $file,
-     to   => $fullpathid,
+     to   => $self->{outputdir} . '/' . $fullpathid,
     };
   
   return $fullpathid;
@@ -490,8 +498,6 @@ sub _animWork {
   my $desiredDigitCnt = nofdigits( $sliceSize );
   if ( $currentDigitCnt < $desiredDigitCnt ) {
     for ( my $i = 1; $i <= $plan->{slicestop}; ++$i ) {
-      #	  my $src = File::Spec->catfile( $animdir, sprintf( "frame-$coreId-%0" . $currentDigitCnt . 'd.jpg', $i ) );
-      #	  my $dst = File::Spec->catfile( $animdir, sprintf( "frame-$coreId-%0" . $desiredDigitCnt . 'd.jpg', $i ) );
       my $src = sprintf( "$animdir/frame-$coreId-%0${currentDigitCnt}d.jpg", $i );
       my $dst = sprintf( "$animdir/frame-$coreId-%0${desiredDigitCnt}d.jpg", $i );
       File::Copy::move( $src, $dst );
@@ -517,7 +523,7 @@ BeamerReveal::MediaManager - MediaManager
 
 =head1 VERSION
 
-version 20260111.1557
+version 20260119.1636
 
 =head1 SYNOPSIS
 

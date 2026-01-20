@@ -6,8 +6,18 @@ Home page:    <https://metacpan.org/release/Marlin-Antlers>
 Bug tracker:  <https://github.com/tobyink/p5-marlin-antlers/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.003000	2026-01-19
+
+ - Added custom versions of `signature_for` and `signature`.
+ - Updated: Work with newer versions of Marlin.
+
 0.002001	2026-01-17
 
+ [ Documentation ]
+ - Small documentation improvements.
+
 0.002000	2026-01-16
+
+ - Updated: Work with newer versions of Marlin.
 
 0.001000	2026-01-11	Initial release

@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -39,6 +40,7 @@ $test->for('abstract');
 method: apply
 method: call
 method: extend
+method: new
 
 =cut
 
@@ -362,6 +364,97 @@ $test->for('example', 3, 'extend', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Prototype');
   ok $result->access;
+
+  $result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Prototype)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Prototype;
+
+  my $new = Venus::Prototype->new;
+
+  # bless(..., "Venus::Prototype")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Prototype');
+  is_deeply $result->value, {};
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Prototype;
+
+  my $new = Venus::Prototype->new(
+    '$counter' => 0,
+    '&decrement' => sub { $_[0]->counter($_[0]->counter - 1) },
+    '&increment' => sub { $_[0]->counter($_[0]->counter + 1) },
+  );
+
+  # bless(..., "Venus::Prototype")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Prototype');
+  ok exists $result->value->{'$counter'};
+  ok exists $result->value->{'&decrement'};
+  ok exists $result->value->{'&increment'};
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Prototype;
+
+  my $new = Venus::Prototype->new(value => {
+    '$counter' => 0,
+    '&decrement' => sub { $_[0]->counter($_[0]->counter - 1) },
+    '&increment' => sub { $_[0]->counter($_[0]->counter + 1) },
+  });
+
+  # bless(..., "Venus::Prototype")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Prototype');
+  ok exists $result->value->{'$counter'};
+  ok exists $result->value->{'&decrement'};
+  ok exists $result->value->{'&increment'};
 
   $result
 });

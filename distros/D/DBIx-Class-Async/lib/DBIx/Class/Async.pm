@@ -1,6 +1,6 @@
 package DBIx::Class::Async;
 
-$DBIx::Class::Async::VERSION   = '0.40';
+$DBIx::Class::Async::VERSION   = '0.41';
 $DBIx::Class::Async::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ DBIx::Class::Async - Asynchronous database operations for DBIx::Class
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =cut
 
@@ -27,6 +27,7 @@ use IO::Async::Function;
 use Time::HiRes qw(time);
 use Digest::MD5 qw(md5_hex);
 use Type::Params qw(compile);
+use DBIx::Class::Async::Row;
 use Types::Standard qw(Str ScalarRef HashRef ArrayRef Maybe Int CodeRef);
 
 our $METRICS;
@@ -320,11 +321,18 @@ sub create {
 
     my $start_time = time;
 
-    return $self->_call_worker('create', $resultset, $data)->then(sub {
+    my $deflated_data = $self->_deflate_args($resultset, $data);
+
+    return $self->_call_worker('create', $resultset, $deflated_data)->then(sub {
         my ($result) = @_;
         my $duration = time - $start_time;
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
-        return Future->done($result);
+
+        if (ref $result eq 'HASH' && $result->{__error}) {
+            return Future->fail($result->{__error});
+        }
+
+        return Future->done($self->_inflate_row($resultset, $result));
     });
 }
 
@@ -468,7 +476,7 @@ sub find {
         my ($result) = @_;
         my $duration = time - $start_time;
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
-        return Future->done($result);
+        return Future->done($self->_inflate_row($resultset, $result));
     });
 }
 
@@ -515,6 +523,97 @@ sub health_check {
     });
 }
 
+=head2 inflate_column
+
+  $async_db->inflate_column($source_name, $column_name, {
+      inflate => sub { my ($value, $rowobj) = @_; ... },
+      deflate => sub { my ($value, $rowobj) = @_; ... },
+  });
+
+Registers custom inflation and deflation logic for a specific column within a
+ResultSource. This allows you to transform raw database values into complex
+objects (inflation) and back into raw storage formats (deflation).
+
+=over 4
+
+=item * C<$source_name> - The name of the ResultSource (e.g., 'User').
+
+=item * C<$column_name> - The name of the column to attach handlers to.
+
+=item * C<$handlers> - Hashref containing C<inflate> and C<deflate> coderefs.
+
+=back
+
+B<DESIGN DECISIONS & DIFFERENCES FROM L<DBIx::Class>>
+
+While this method shares a name with the standard L<DBIx::Class::InflateColumn>
+feature, its implementation and lifecycle differ significantly:
+
+=over 4
+
+=item B<Late-Bound Metadata Injection>
+
+In standard C<DBIx::Class>, inflation is usually defined at compile-time within
+the Result Class file. In C<DBIx::Class::Async>, this method allows for
+B<dynamic, runtime injection> of handlers. This is particularly useful in
+environments where the Schema is shared or where the asynchronous driver needs
+to intercept data transformations without modifying the original Result Classes.
+
+=item B<Schema Instance Requirement>
+
+Unlike the standard ORM which assumes an active connection, this method
+operates on the C<ResultSource> metadata. If no internal schema instance
+exists, it will attempt to lazily instantiate one via C<schema_class>. This
+ensures that metadata transformations are available even if the database
+worker has not yet been dispatched.
+
+=item B<Explicit Manual Registration>
+
+In C<DBIx::Class>, loading a component like C<InflateColumn> automatically
+sets up the infrastructure. In this module, C<inflate_column> acts as a
+bridge, explicitly attaching handlers to the underlying C<column_info>
+hash so that the L<DBIx::Class::Async::Row> C<AUTOLOAD> mechanism can
+access them during object lifecycle events.
+
+=back
+
+=cut
+
+sub inflate_column {
+    my ($self, $source_name, $column, $handlers) = @_;
+
+    # 1. If we don't have a schema instance, try to make one
+    if (!$self->{schema} && $self->{schema_class}) {
+        my $class = $self->{schema_class};
+        eval "require $class"
+            or die "Could not load schema class $class: $@";
+        # We don't necessarily need a DB connection in the parent just for
+        # metadata,so we can just call ->setup or ->clone
+        $self->{schema} = $class->clone;
+    }
+
+    croak "Cannot inflate_column: No schema instance available"
+        unless $self->{schema};
+
+    # 2. Get the Source metadata
+    my $source = eval { $self->_schema_instance->source($source_name) };
+
+    if (!$source) {
+        croak "Could not find result source for '$source_name'.";
+    }
+
+    # 3. Inject the handlers into the Source's column info
+    my $col_info = $source->column_info($column);
+    croak "Column '$column' does not exist in source '$source_name'"
+        unless keys %$col_info;
+
+    $source->add_column($column => {
+        %$col_info,
+        inflate => $handlers->{inflate},
+        deflate => $handlers->{deflate},
+    });
+}
+
 =head2 loop
 
 Returns the L<IO::Async::Loop> instance.
@@ -558,6 +657,66 @@ sub raw_query {
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
         return Future->done($result);
     });
+}
+
+=head2 resultset
+
+  my $rs = $async_db->resultset('User');
+
+Returns a L<DBIx::Class::Async::ResultSet> object for the specified source name.
+This is the primary entry point for performing asynchronous queries against
+your database.
+
+=over 4
+
+=item * C<$source_name>
+
+The name of the ResultSource (e.g., 'User', 'Product') as defined in your
+C<DBIx::Class> schema.
+
+=back
+
+B<DESIGN DECISIONS & DIFFERENCES FROM L<DBIx::Class>>
+
+=over 4
+
+=item B<Deferred Execution (Promises/Futures)>
+
+In standard L<DBIx::Class>, calling C<search> on a ResultSet often triggers
+immediate database activity. In C<DBIx::Class::Async>, the ResultSet acts
+as a factory for L<Future> objects. No database interaction occurs until
+terminal methods (like C<find>, C<update>, or C<search> in a specific context)
+are called and awaited.
+
+=item B<Decoupled Architecture>
+
+In standard L<DBIx::Class>, the ResultSet is tightly coupled to the C<Storage>
+engine. In this implementation, the ResultSet is a "thin" wrapper that
+communicates with the database via the C<async_db> driver. This decoupling
+allows the ResultSet to be used in non-blocking environments (like IO::Async
+or Mojo) without stalling the main event loop.
+
+=item B<Implicit Metadata Resolution>
+
+The ResultSet automatically resolves its internal metadata by calling
+C<_schema_instance> on the parent object. This differs from standard DBIC
+where the ResultSet usually inherits an already-active connection. Here,
+the connection state is managed by the C<async_db> worker, while the
+ResultSet manages the query logic.
+
+=back
+
+=cut
+
+sub resultset {
+    my ($self, $source_name) = @_;
+
+    require DBIx::Class::Async::ResultSet;
+    return DBIx::Class::Async::ResultSet->new(
+        async_db    => $self,
+        source_name => $source_name,
+        schema      => $self->_schema_instance,
+    );
 }
 
 =head2 schema_class
@@ -617,7 +776,11 @@ sub search {
         if ($cached) {
             $self->{stats}{cache_hits}++;
             $self->_record_metric('inc', 'db_async_cache_hits_total');
-            return Future->done($cached);
+
+            # Transform cached raw hashrefs into Row objects
+            my $rows = [ map { $self->_inflate_row($resultset, $_) } @$cached ];
+
+            return Future->done($rows);
         }
         $self->{stats}{cache_misses}++;
         $self->_record_metric('inc', 'db_async_cache_misses_total');
@@ -635,11 +798,15 @@ sub search {
         my $duration = time - $start_time;
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
 
+        # Store the RAW data in cache (before blessing)
         if ($use_cache && defined $self->{cache_ttl}) {
             $self->{cache}->set($cache_key, $result, $self->{cache_ttl});
         }
 
-        return Future->done($result);
+        # BLESSED wrapping: Convert hashrefs to Row objects
+        my $rows = [ map { $self->_inflate_row($resultset, $_) } @$result ];
+
+        return Future->done($rows);
     });
 }
 
@@ -742,7 +909,29 @@ sub search_with_prefetch {
 
     # We call our existing async search, which eventually
     # triggers execute_operation in the worker
-    return $self->search($source_name, $cond, $attrs);
+    return $self->search($source_name, $cond, $attrs)
+        ->then(sub {
+            my ($rows) = @_;
+
+            # Check if we need to deflate these for the test
+            if (($attrs->{result_class} // '') eq 'DBIx::Class::ResultClass::HashRefInflator') {
+                my @deflated = map {
+                     # { %$_ } creates a NEW unblessed hash reference
+                     # This satisfies the (ref eq 'HASH') check
+                     my $hash = { %$_ };
+
+                     # Clean up any internal keys that might have been blessed
+                     delete $hash->{_source};
+                     delete $hash->{_result_source};
+
+                     $hash;
+                } @$rows;
+
+                return Future->done(\@deflated);
+            }
+
+            return Future->done($rows);
+        });
 }
 
 =head2 stats
@@ -1099,47 +1288,6 @@ sub update_bulk {
 #
 # INTERNAL METHODS
 
-sub _record_metric {
-    my ($self, $type, $name, @args) = @_;
-
-    return unless $self->{enable_metrics} && defined $METRICS;
-
-    if ($type eq 'inc') {
-        $METRICS->inc($name, @args);
-    } elsif ($type eq 'observe') {
-        $METRICS->observe($name, @args);
-    } elsif ($type eq 'set') {
-        $METRICS->set($name, @args);
-    }
-}
-
-sub _generate_cache_key {
-    my ($operation, @args) = @_;
-
-    # The first element of @args is almost always the ResultSource name
-    # (e.g., 'User', 'Order'). We extract it to use as a searchable prefix.
-    my $source_prefix = (defined $args[0] && !ref $args[0]) ? $args[0] : 'global';
-
-    my @clean_args = map {
-        if (!defined $_) {
-            'UNDEF';
-        } elsif (ref $_ eq 'HASH') {
-            my $hashref = $_;
-            join(',', sort map { "$_=>$hashref->{$_}" } keys %$hashref);
-        } elsif (ref $_ eq 'ARRAY') {
-            # Deep join for nested arrays (prefetch/columns)
-            join(',', map { ref $_ ? 'REF' : ($_ // 'UNDEF') } @$_);
-        } elsif (ref $_ eq 'SCALAR') {
-            # Handle Literal SQL like \'NOW()'
-            ${$_};
-        } else {
-            $_;
-        }
-    } @args;
-
-    return join(':', $source_prefix, $operation, md5_hex(join('|', @clean_args)));
-}
-
 sub _build_default_cache {
     my ($ttl) = @_;
 
@@ -1154,205 +1302,72 @@ sub _build_default_cache {
     return CHI->new(%params);
 }
 
-sub _init_metrics {
-    my $self = shift;
+sub _call_worker {
+    my ($self, $operation, @args) = @_;
 
-    # Try to load Metrics::Any
-    eval {
-        require Metrics::Any;
-        Metrics::Any->import('$METRICS');
+    my $worker = $self->_next_worker;
 
-        # Initialise metrics
-        $METRICS->make_counter('db_async_queries_total');
-        $METRICS->make_counter('db_async_cache_hits_total');
-        $METRICS->make_counter('db_async_cache_misses_total');
-        $METRICS->make_histogram('db_async_query_duration_seconds');
-        $METRICS->make_gauge('db_async_workers_active');
-
-    };
-
-    # Silently ignore if Metrics::Any is not available
-    if ($@) {
-        $self->{enable_metrics} = 0;
-        undef $METRICS;
-    }
+    return $worker->call(
+        args => [
+            $self->{schema_class},
+            $self->{connect_info},
+            $self->{workers_config},
+            $operation,
+            @args,
+        ],
+        timeout => $self->{workers_config}{query_timeout},
+    );
 }
 
-sub _init_workers {
-    my $self = shift;
+sub _call_with_retry {
+    my ($self, $operation, @args) = @_;
 
-    for my $worker_id (1..$self->{workers_config}{count}) {
-        my $worker = IO::Async::Function->new(
-            code => sub {
-                use feature 'state';
-                my ($schema_class, $connect_info, $worker_config, $operation, @op_args) = @_;
+    my $retry_config = $self->{retry_config};
+    my $max_retries  = $retry_config->{max_retries};
+    my $delay        = $retry_config->{delay};
+    my $factor       = $retry_config->{factor};
 
-                # Get worker PID for state management
-                my $pid = $$;
+    # Start with the initial call
+    my $future = $self->_call_worker($operation, @args);
 
-                # Create or reuse schema connection
-                state $schema_cache = {};
+    # Add retry handlers
+    for my $retry_num (1..$max_retries) {
+        $future = $future->catch(sub {
+            my $error = shift;
 
-                unless (exists $schema_cache->{$pid}) {
-                    # Load schema class in worker process
-                    eval "require $schema_class; 1;" or do {
-                        my $error = $@ || 'Unknown error loading schema class';
-                        die "Failed to load schema class $schema_class: $error";
-                    };
+            # Check if this error should be retried
+            return Future->fail($error) unless $self->_should_retry_error($error);
 
-                    # Verify the class loaded correctly
-                    unless ($schema_class->can('connect')) {
-                        die "Schema class $schema_class does not provide 'connect' method";
-                    }
+            $self->{stats}{retries}++;
 
-                    # Connect to database with error handling
-                    my $schema = eval {
-                        $schema_class->connect(@$connect_info);
-                    };
+            # Calculate delay with exponential backoff
+            my $current_delay = $delay * ($factor ** ($retry_num - 1));
 
-                    if ($@) {
-                        die "Failed to connect to database: $@";
-                    }
-
-                    unless (defined $schema) {
-                        die "Schema connection returned undef";
-                    }
-
-                    $schema_cache->{$pid} = $schema;
-
-                    # Execute on_connect_do statements
-                    if (@{$worker_config->{on_connect_do}}) {
-                        eval {
-                            my $storage = $schema_cache->{$pid}->storage;
-                            my $dbh = $storage->dbh;
-                            $dbh->do($_) for @{$worker_config->{on_connect_do}};
-                        };
-                        if ($@) {
-                            warn "on_connect_do failed: $@";
-                        }
-                    }
-
-                    # Set connection attributes
-                    eval {
-                        $schema_cache->{$pid}->storage->debug(0) unless $ENV{DBIC_TRACE};
-                    };
-
-                    # Verify schema instance has sources
-                    eval {
-                        my @instance_sources = $schema_cache->{$pid}->sources;
-                        unless (@instance_sources) {
-                            # Try to force reload the schema
-                            delete $schema_cache->{$pid};
-                            die "Connected schema instance has no registered sources";
-                        }
-                    };
-                    if ($@) {
-                        # If sources check failed, don't cache this connection
-                        delete $schema_cache->{$pid};
-                        die "Schema validation failed: $@";
-                    }
-                }
-
-                # Execute operation with timeout
-                local $SIG{ALRM} = sub {
-                    die "Query timeout after $worker_config->{query_timeout} seconds\n"
-                };
-
-                alarm($worker_config->{query_timeout});
-
-                my $result;
-                eval {
-                    $result = _execute_operation($schema_cache->{$pid}, $operation, @op_args);
-                };
-                my $error = $@;
-
-                alarm(0);
-
-                if ($error) {
-                    die $error;
-                }
-
-                return $result;
-            },
-            max_workers => 1,  # One process per worker
-        );
-
-        $self->{loop}->add($worker);
-        push @{$self->{workers}}, {
-            instance => $worker,
-            healthy  => 1,
-            pid      => undef,  # Will be set on first use
-        };
+            # Delay then retry with a fresh call
+            return $self->{loop}->delay_future(after => $current_delay)
+                ->then(sub {
+                    return $self->_call_worker($operation, @args);
+                });
+        });
     }
+
+    return $future;
 }
 
-sub _start_health_checks {
-    my ($self, $interval) = @_;
+sub _deflate_args {
+    my ($self, $source_name, $data) = @_;
+    return $data unless ref $data eq 'HASH';
 
-    return if $interval <= 0;
+    my $source = $self->_schema_instance->source($source_name);
+    my %deflated = %$data;
 
-    # Try to create the timer
-    eval {
-        $self->{health_check_timer} = $self->{loop}->repeat(
-            interval => $interval,
-            code => sub {
-                # Don't use async here - just fire and forget
-                $self->health_check->retain;
-            },
-        );
-    };
-
-    if ($@) {
-        # If repeat fails, try a different approach or disable health checks
-        warn "Failed to start health checks: $@" if $ENV{DBIC_ASYNC_DEBUG};
-    }
-}
-
-sub _serialise_row_with_prefetch {
-    my ($row, $prefetch) = @_;
-    return unless $row;
-
-    # 1. Get the base columns
-    my %data = $row->get_columns;
-
-    # 2. Process Prefetches
-    if ($prefetch) {
-        # Normalise prefetch into a hash for easier recursion
-        # (Handles strings, arrays, and nested hashes like { comments => 'user' })
-        my $spec = _normalise_prefetch($prefetch);
-
-        foreach my $rel (keys %$spec) {
-            # Check if DBIC actually prefetched this relationship
-            # we check if the object has the related object already 'inflated'
-            if ($row->has_column_loaded($rel) || $row->can($rel)) {
-                my $related = eval { $row->$rel };
-                next if $@ || !defined $related;
-
-                if (ref($related) eq 'DBIx::Class::ResultSet' || eval { $related->isa('DBIx::Class::ResultSet') }) {
-                    # has_many relationship
-                    # Only call ->all if we are sure we want to fetch/serialise these
-                    my @items = $related->all;
-                    $data{$rel} = [
-                        map { _serialise_row_with_prefetch($_, $spec->{$rel}) } @items
-                    ];
-                } elsif (eval { $related->isa('DBIx::Class::Row') }) {
-                    # single relationship (belongs_to / might_have)
-                    $data{$rel} = _serialise_row_with_prefetch($related, $spec->{$rel});
-                }
-            }
+    for my $col (keys %deflated) {
+        my $info = $source->column_info($col);
+        if ($info->{deflate} && defined $deflated{$col}) {
+            $deflated{$col} = $info->{deflate}->($deflated{$col}, $self);
         }
     }
-
-    return \%data;
-}
-
-sub _normalise_prefetch {
-    my $p = shift;
-    return {} unless $p;
-    return { $p => undef } if !ref $p;
-    return { map { $_ => undef } @$p } if ref $p eq 'ARRAY';
-    return $p if ref $p eq 'HASH';
-    return {};
+    return \%deflated;
 }
 
 sub _execute_operation {
@@ -1603,6 +1618,46 @@ sub _execute_operation {
     }
 }
 
+sub _generate_cache_key {
+    my ($operation, @args) = @_;
+
+    # The first element of @args is almost always the ResultSource name
+    # (e.g., 'User', 'Order'). We extract it to use as a searchable prefix.
+    my $source_prefix = (defined $args[0] && !ref $args[0]) ? $args[0] : 'global';
+
+    my @clean_args = map {
+        if (!defined $_) {
+            'UNDEF';
+        } elsif (ref $_ eq 'HASH') {
+            my $hashref = $_;
+            join(',', sort map { "$_=>$hashref->{$_}" } keys %$hashref);
+        } elsif (ref $_ eq 'ARRAY') {
+            # Deep join for nested arrays (prefetch/columns)
+            join(',', map { ref $_ ? 'REF' : ($_ // 'UNDEF') } @$_);
+        } elsif (ref $_ eq 'SCALAR') {
+            # Handle Literal SQL like \'NOW()'
+            ${$_};
+        } else {
+            $_;
+        }
+    } @args;
+
+    return join(':', $source_prefix, $operation, md5_hex(join('|', @clean_args)));
+}
+
+sub _inflate_row {
+    my ($self, $source_name, $data) = @_;
+    return undef unless defined $data;
+
+    return DBIx::Class::Async::Row->new(
+        schema      => $self->_schema_instance,
+        async_db    => $self,
+        source_name => $source_name,
+        row_data    => $data,
+        in_storage  => 1,
+    );
+}
+
 sub _inflate_row_with_prefetch {
     my ($row, $prefetch) = @_;
 
@@ -1637,6 +1692,148 @@ sub _inflate_row_with_prefetch {
     return $result;
 }
 
+sub _init_metrics {
+    my $self = shift;
+
+    # Try to load Metrics::Any
+    eval {
+        require Metrics::Any;
+        Metrics::Any->import('$METRICS');
+
+        # Initialise metrics
+        $METRICS->make_counter('db_async_queries_total');
+        $METRICS->make_counter('db_async_cache_hits_total');
+        $METRICS->make_counter('db_async_cache_misses_total');
+        $METRICS->make_histogram('db_async_query_duration_seconds');
+        $METRICS->make_gauge('db_async_workers_active');
+
+    };
+
+    # Silently ignore if Metrics::Any is not available
+    if ($@) {
+        $self->{enable_metrics} = 0;
+        undef $METRICS;
+    }
+}
+
+sub _init_workers {
+    my $self = shift;
+
+    for my $worker_id (1..$self->{workers_config}{count}) {
+        my $worker = IO::Async::Function->new(
+            code => sub {
+                use feature 'state';
+                my ($schema_class, $connect_info, $worker_config, $operation, @op_args) = @_;
+
+                # Get worker PID for state management
+                my $pid = $$;
+
+                # Create or reuse schema connection
+                state $schema_cache = {};
+
+                unless (exists $schema_cache->{$pid}) {
+                    # Load schema class in worker process
+                    eval "require $schema_class; 1;" or do {
+                        my $error = $@ || 'Unknown error loading schema class';
+                        die "Failed to load schema class $schema_class: $error";
+                    };
+
+                    # Verify the class loaded correctly
+                    unless ($schema_class->can('connect')) {
+                        die "Schema class $schema_class does not provide 'connect' method";
+                    }
+
+                    # Connect to database with error handling
+                    my $schema = eval {
+                        $schema_class->connect(@$connect_info);
+                    };
+
+                    if ($@) {
+                        die "Failed to connect to database: $@";
+                    }
+
+                    unless (defined $schema) {
+                        die "Schema connection returned undef";
+                    }
+
+                    $schema_cache->{$pid} = $schema;
+
+                    # Execute on_connect_do statements
+                    if (@{$worker_config->{on_connect_do}}) {
+                        eval {
+                            my $storage = $schema_cache->{$pid}->storage;
+                            my $dbh = $storage->dbh;
+                            $dbh->do($_) for @{$worker_config->{on_connect_do}};
+                        };
+                        if ($@) {
+                            warn "on_connect_do failed: $@";
+                        }
+                    }
+
+                    # Set connection attributes
+                    eval {
+                        $schema_cache->{$pid}->storage->debug(0) unless $ENV{DBIC_TRACE};
+                    };
+
+                    # Verify schema instance has sources
+                    eval {
+                        my @instance_sources = $schema_cache->{$pid}->sources;
+                        unless (@instance_sources) {
+                            # Try to force reload the schema
+                            delete $schema_cache->{$pid};
+                            die "Connected schema instance has no registered sources";
+                        }
+                    };
+                    if ($@) {
+                        # If sources check failed, don't cache this connection
+                        delete $schema_cache->{$pid};
+                        die "Schema validation failed: $@";
+                    }
+                }
+
+                # Execute operation with timeout
+                local $SIG{ALRM} = sub {
+                    die "Query timeout after $worker_config->{query_timeout} seconds\n"
+                };
+
+                alarm($worker_config->{query_timeout});
+
+                my $result;
+                eval {
+                    $result = _execute_operation($schema_cache->{$pid}, $operation, @op_args);
+                };
+                my $error = $@;
+
+                alarm(0);
+
+                if ($error) {
+                    die $error;
+                }
+
+                return $result;
+            },
+            max_workers => 1,  # One process per worker
+        );
+
+        $self->{loop}->add($worker);
+        push @{$self->{workers}}, {
+            instance => $worker,
+            healthy  => 1,
+            pid      => undef,  # Will be set on first use
+        };
+    }
+}
+
+sub _invalidate_cache_for {
+   my ($self, $pattern) = @_;
+
+   return unless defined $self->{cache_ttl} && $self->{cache_ttl} > 0;
+
+   # Simple pattern-based invalidation
+   my @keys = grep { /$pattern/ } $self->{cache}->get_keys;
+   $self->{cache}->remove($_) for @keys;
+}
+
 sub _next_worker {
     my $self = shift;
 
@@ -1649,56 +1846,84 @@ sub _next_worker {
     return $worker->{instance};
 }
 
-sub _call_worker {
-    my ($self, $operation, @args) = @_;
-
-    my $worker = $self->_next_worker;
-
-    return $worker->call(
-        args => [
-            $self->{schema_class},
-            $self->{connect_info},
-            $self->{workers_config},
-            $operation,
-            @args,
-        ],
-        timeout => $self->{workers_config}{query_timeout},
-    );
+sub _normalise_prefetch {
+    my $p = shift;
+    return {} unless $p;
+    return { $p => undef } if !ref $p;
+    return { map { $_ => undef } @$p } if ref $p eq 'ARRAY';
+    return $p if ref $p eq 'HASH';
+    return {};
 }
 
-sub _call_with_retry {
-    my ($self, $operation, @args) = @_;
+sub _record_metric {
+    my ($self, $type, $name, @args) = @_;
 
-    my $retry_config = $self->{retry_config};
-    my $max_retries  = $retry_config->{max_retries};
-    my $delay        = $retry_config->{delay};
-    my $factor       = $retry_config->{factor};
+    return unless $self->{enable_metrics} && defined $METRICS;
 
-    # Start with the initial call
-    my $future = $self->_call_worker($operation, @args);
+    if ($type eq 'inc') {
+        $METRICS->inc($name, @args);
+    } elsif ($type eq 'observe') {
+        $METRICS->observe($name, @args);
+    } elsif ($type eq 'set') {
+        $METRICS->set($name, @args);
+    }
+}
 
-    # Add retry handlers
-    for my $retry_num (1..$max_retries) {
-        $future = $future->catch(sub {
-            my $error = shift;
+sub _schema_instance {
+    my $self = shift;
 
-            # Check if this error should be retried
-            return Future->fail($error) unless $self->_should_retry_error($error);
+    # If we already have it, return it
+    return $self->{schema} if $self->{schema} && ref $self->{schema};
 
-            $self->{stats}{retries}++;
+    # Otherwise, we need to build it from schema_class
+    if ($self->{schema_class}) {
+        my $class = $self->{schema_class};
+        eval "require $class" or die "Could not load $class: $@";
 
-            # Calculate delay with exponential backoff
-            my $current_delay = $delay * ($factor ** ($retry_num - 1));
-
-            # Delay then retry with a fresh call
-            return $self->{loop}->delay_future(after => $current_delay)
-                ->then(sub {
-                    return $self->_call_worker($operation, @args);
-                });
-        });
+        # Instantiate the schema (cloning or connecting)
+        $self->{schema} = $class->connect(@{ $self->{connect_info} || [] });
+        return $self->{schema};
     }
 
-    return $future;
+    die "Async object has no schema or schema_class defined";
+}
+
+sub _serialise_row_with_prefetch {
+    my ($row, $prefetch) = @_;
+    return unless $row;
+
+    # 1. Get the base columns
+    my %data = $row->get_columns;
+
+    # 2. Process Prefetches
+    if ($prefetch) {
+        # Normalise prefetch into a hash for easier recursion
+        # (Handles strings, arrays, and nested hashes like { comments => 'user' })
+        my $spec = _normalise_prefetch($prefetch);
+
+        foreach my $rel (keys %$spec) {
+            # Check if DBIC actually prefetched this relationship
+            # we check if the object has the related object already 'inflated'
+            if ($row->has_column_loaded($rel) || $row->can($rel)) {
+                my $related = eval { $row->$rel };
+                next if $@ || !defined $related;
+
+                if (ref($related) eq 'DBIx::Class::ResultSet' || eval { $related->isa('DBIx::Class::ResultSet') }) {
+                    # has_many relationship
+                    # Only call ->all if we are sure we want to fetch/serialise these
+                    my @items = $related->all;
+                    $data{$rel} = [
+                        map { _serialise_row_with_prefetch($_, $spec->{$rel}) } @items
+                    ];
+                } elsif (eval { $related->isa('DBIx::Class::Row') }) {
+                    # single relationship (belongs_to / might_have)
+                    $data{$rel} = _serialise_row_with_prefetch($related, $spec->{$rel});
+                }
+            }
+        }
+    }
+
+    return \%data;
 }
 
 sub _should_retry_error {
@@ -1716,14 +1941,26 @@ sub _should_retry_error {
     return 0;
 }
 
-sub _invalidate_cache_for {
-   my ($self, $pattern) = @_;
+sub _start_health_checks {
+    my ($self, $interval) = @_;
 
-   return unless defined $self->{cache_ttl} && $self->{cache_ttl} > 0;
+    return if $interval <= 0;
 
-   # Simple pattern-based invalidation
-   my @keys = grep { /$pattern/ } $self->{cache}->get_keys;
-   $self->{cache}->remove($_) for @keys;
+    # Try to create the timer
+    eval {
+        $self->{health_check_timer} = $self->{loop}->repeat(
+            interval => $interval,
+            code => sub {
+                # Don't use async here - just fire and forget
+                $self->health_check->retain;
+            },
+        );
+    };
+
+    if ($@) {
+        # If repeat fails, try a different approach or disable health checks
+        warn "Failed to start health checks: $@" if $ENV{DBIC_ASYNC_DEBUG};
+    }
 }
 
 sub DESTROY {

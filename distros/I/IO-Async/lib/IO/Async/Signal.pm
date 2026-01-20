@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Signal 0.804;
+package IO::Async::Signal 0.805;
 
 use v5.14;
 use warnings;
@@ -16,6 +16,8 @@ use Carp;
 C<IO::Async::Signal> - event callback on receipt of a POSIX signal
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use IO::Async::Signal;
 

@@ -3,12 +3,13 @@ package Schedule::Activity::Attribute::Report;
 use strict;
 use warnings;
 use Scalar::Util qw/looks_like_number/;
+use Ref::Util qw/is_ref/;
 
-our $VERSION='0.2.9';
+our $VERSION='0.3.0';
 
 sub new {
 	my ($ref,%schedule)=@_;
-	my $class=ref($ref)||$ref;
+	my $class=is_ref($ref)||$ref;
 	my %self=%schedule; # shallow
 	return bless(\%self,$class);
 }

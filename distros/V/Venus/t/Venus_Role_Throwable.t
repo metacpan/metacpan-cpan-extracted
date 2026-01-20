@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -36,6 +37,7 @@ $test->for('abstract');
 
 =includes
 
+method: die
 method: error
 method: throw
 
@@ -77,6 +79,60 @@ throwing context-aware errors (exceptions).
 
 $test->for('description');
 
+=method die
+
+The die method builds a L<Venus::Throw> object using L</throw> and
+automatically throws the exception.
+
+=signature die
+
+  die(maybe[string | hashref] $data) (any)
+
+=metadata die
+
+{
+  since => '4.15',
+}
+
+=example-1 die
+
+  # given: synopsis
+
+  package Example;
+
+  # ...
+
+  sub error_on_example {
+    my ($self) = @_;
+
+    return {
+      name => 'on.example',
+      capture => [$example],
+      stash => {
+        time => time,
+      },
+      raise => true,
+    };
+  }
+
+  package main;
+
+  my $die = $example->die('error_on_example');
+
+  # Exception! isa Example::Error
+
+=cut
+
+$test->for('example', 1, 'die', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error->result;
+  ok $result->isa('Example::Error');
+  is $result->name, 'on.example';
+  ok $result->stash('time');
+
+  $result
+});
+
 =method error
 
 The error method dispatches to the L</throw> method, excepts a hashref of
@@ -87,7 +143,7 @@ the thrower.
 
 =signature error
 
-  error(hashref $data) (any)
+  error(maybe[string | hashref] $data) (any)
 
 =metadata error
 
@@ -103,19 +159,20 @@ the thrower.
 
   my $example = Example->new;
 
-  my $throw = $example->error;
+  my $error = $example->error;
 
-  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+  # bless(..., "Example::Error")
 
-  # $throw->error;
+  # $error->throw;
+
+  # Exception! isa "Example::Error"
 
 =cut
 
 $test->for('example', 1, 'error', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result->isa('Venus::Throw');
-  ok $result->package eq 'Example::Error';
+  ok $result->isa('Example::Error');
 
   $result
 });
@@ -126,19 +183,20 @@ $test->for('example', 1, 'error', sub {
 
   my $example = Example->new;
 
-  my $throw = $example->error({package => 'Example::Error::Unknown'});
+  my $error = $example->error('Example::Error::Unknown');
 
-  # bless({ "package" => "Example::Error::Unknown", ..., }, "Venus::Throw")
+  # bless(..., "Example::Error::Unknown")
 
-  # $throw->error;
+  # $error->throw;
+
+  # Exception! isa "Example::Error::Unknown"
 
 =cut
 
 $test->for('example', 2, 'error', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result->isa('Venus::Throw');
-  ok $result->package eq 'Example::Error::Unknown';
+  ok $result->isa('Example::Error::Unknown');
 
   $result
 });
@@ -149,7 +207,7 @@ $test->for('example', 2, 'error', sub {
 
   my $example = Example->new;
 
-  my $throw = $example->error({
+  my $error = $example->error({
     name => 'on.example',
     capture => [$example],
     stash => {
@@ -157,17 +215,18 @@ $test->for('example', 2, 'error', sub {
     },
   });
 
-  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+  # bless(..., "Example::Error")
 
-  # $throw->error;
+  # $error->throw;
+
+  # Exception! isa "Example::Error"
 
 =cut
 
 $test->for('example', 3, 'error', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result->isa('Venus::Throw');
-  ok $result->package eq 'Example::Error';
+  ok $result->isa('Example::Error');
   is $result->name, 'on.example';
   ok $result->stash('captured');
   ok $result->stash('time');
@@ -197,19 +256,20 @@ $test->for('example', 3, 'error', sub {
 
   package main;
 
-  my $throw = $example->error({throw => 'error_on_example'});
+  my $error = $example->error('error_on_example');
 
-  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+  # bless(..., "Example::Error")
 
-  # $throw->error;
+  # $error->throw;
+
+  # Exception! isa "Example::Error"
 
 =cut
 
 $test->for('example', 4, 'error', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result->isa('Venus::Throw');
-  ok $result->package eq 'Example::Error';
+  ok $result->isa('Example::Error');
   is $result->name, 'on.example';
   ok $result->stash('captured');
   ok $result->stash('time');
@@ -234,23 +294,66 @@ $test->for('example', 4, 'error', sub {
       stash => {
         time => time,
       },
-      raise => 1,
+      raise => false,
     };
   }
 
   package main;
 
-  my $throw = $example->error({throw => 'error_on_example'});
+  my $error = $example->error({throw => 'error_on_example'});
 
-  # Exception! (isa Example::Error)
+  # bless(..., "Example::Error")
+
+  # $error->throw;
+
+  # Exception! isa "Example::Error"
 
 =cut
 
 $test->for('example', 5, 'error', sub {
   my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Example::Error');
+  is $result->name, 'on.example';
+  ok $result->stash('time');
+
+  $result
+});
+
+=example-6 error
+
+  # given: synopsis
+
+  package Example;
+
+  # ...
+
+  sub error_on_example {
+    my ($self) = @_;
+
+    return {
+      name => 'on.example',
+      capture => [$example],
+      stash => {
+        time => time,
+      },
+      raise => true,
+    };
+  }
+
+  package main;
+
+  my $error = $example->error({throw => 'error_on_example'});
+
+  # Exception! isa Example::Error
+
+=cut
+
+$test->for('example', 6, 'error', sub {
+  my ($tryable) = @_;
   ok my $result = $tryable->error->result;
   ok $result->isa('Example::Error');
-  is $result->name, 'on_example';
+  is $result->name, 'on.example';
   ok $result->stash('time');
 
   $result
@@ -289,9 +392,11 @@ throw the exception.
 
   my $throw = $example->throw;
 
-  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+  # bless({"package" => "Example::Error", ...,}, "Venus::Throw")
 
-  # $throw->error;
+  # $throw->die;
+
+  # Exception! isa Example::Error
 
 =cut
 
@@ -312,9 +417,11 @@ $test->for('example', 1, 'throw', sub {
 
   my $throw = $example->throw('Example::Error::Unknown');
 
-  # bless({ "package" => "Example::Error::Unknown", ..., }, "Venus::Throw")
+  # bless({"package" => "Example::Error::Unknown", ...,}, "Venus::Throw")
 
-  # $throw->error;
+  # $throw->die;
+
+  # Exception! isa Example::Error::Unknown
 
 =cut
 
@@ -341,9 +448,11 @@ $test->for('example', 2, 'throw', sub {
     },
   });
 
-  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+  # bless({"package" => "Example::Error", ...,}, "Venus::Throw")
 
-  # $throw->error;
+  # $throw->die;
+
+  # Exception! isa Example::Error
 
 =cut
 
@@ -383,9 +492,11 @@ $test->for('example', 3, 'throw', sub {
 
   my $throw = $example->throw('error_on_example');
 
-  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+  # bless({"package" => "Example::Error", ...,}, "Venus::Throw")
 
-  # $throw->error;
+  # $throw->die;
+
+  # Exception! isa Example::Error
 
 =cut
 
@@ -396,45 +507,6 @@ $test->for('example', 4, 'throw', sub {
   ok $result->package eq 'Example::Error';
   is $result->name, 'on.example';
   ok $result->stash('captured');
-  ok $result->stash('time');
-
-  $result
-});
-
-=example-5 throw
-
-  # given: synopsis
-
-  package Example;
-
-  # ...
-
-  sub error_on_example {
-    my ($self) = @_;
-
-    return {
-      name => 'on.example',
-      capture => [$example],
-      stash => {
-        time => time,
-      },
-      raise => 1,
-    };
-  }
-
-  package main;
-
-  my $throw = $example->throw('error_on_example');
-
-  # Exception! (isa Example::Error)
-
-=cut
-
-$test->for('example', 5, 'throw', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->error->result;
-  ok $result->isa('Example::Error');
-  is $result->name, 'on_example';
   ok $result->stash('time');
 
   $result

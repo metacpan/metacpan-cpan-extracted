@@ -5,182 +5,130 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Class 'attr', 'base';
+# IMPORTS
 
-base 'Venus::Path';
+use Venus::Class 'base', 'mask';
+
+# INHERITS
+
+base 'Venus::Kind::Utility';
 
 # ATTRIBUTES
 
-attr 'from';
-attr 'stag';
-attr 'etag';
+mask 'issues';
+mask 'ruleset';
+mask 'validated';
+mask 'value';
 
 # BUILDERS
 
 sub build_self {
   my ($self, $data) = @_;
 
-  return $self->docs;
-};
+  my $value = delete $data->{value};
 
-# METHODS
+  my $ruleset = delete $data->{ruleset};
 
-sub assertion {
-  my ($self) = @_;
+  $value = {%{$data}} if !$value && keys %{$data};
 
-  my $assertion = $self->SUPER::assertion;
+  require Venus;
 
-  $assertion->match('string')->format(sub{
-    (ref $self || $self)->new($_)
-  });
+  $self->value(Venus::clone($value));
 
-  return $assertion;
-}
+  $self->ruleset(Venus::clone($ruleset));
 
-sub count {
-  my ($self, $data) = @_;
-
-  my @result = ($self->search($data));
-
-  return scalar @result;
-}
-
-sub data {
-  my ($self) = @_;
-
-  my $data = $self->read;
-
-  $data = (split(/^__END__/m, (split(/^__DATA__/m, $data))[1] || ''))[0] || '';
-
-  $data =~ s/^\s+|\s+$//g;
-
-  return $data;
-}
-
-sub docs {
-  my ($self) = @_;
-
-  $self->stag('=');
-  $self->etag('=cut');
-  $self->from('read');
+  delete $self->{$_} for keys %{$self};
 
   return $self;
 }
 
-sub explode {
+# METHODS
+
+sub error {
   my ($self) = @_;
 
-  my $from = $self->from;
-  my $data = $self->$from;
-  my $stag = $self->stag;
-  my $etag = $self->etag;
+  my $errors = $self->errors;
 
-  my @chunks = split /^(?:\@$stag|$stag)\s*(.+?)\s*\r?\n/m, ($data . "\n");
-
-  shift @chunks;
-
-  my $items = [];
-
-  while (my ($meta, $data) = splice @chunks, 0, 2) {
-    next unless $meta && $data;
-    next unless $meta ne $etag;
-
-    my @info = split /\s/, $meta, 2;
-    my ($list, $name) = @info == 2 ? @info : (undef, @info);
-
-    $data =~ s/(\r?\n)\+$stag/$1$stag/g; # auto-escape nested syntax
-    $data = [split /\r?\n\r?\n/, $data];
-
-    my $item = {name => $name, data => $data, index => @$items + 1, list => $list};
-
-    push @$items, $item;
-  }
-
-  return $items;
+  return $errors->[0];
 }
 
-sub find {
-  my ($self, $list, $name) = @_;
+sub errors {
+  my ($self) = @_;
 
-  return $self->search({list => $list, name => $name});
+  require Venus;
+
+  my $issues = $self->issues;
+
+  return Venus::clone($issues);
 }
 
-sub search {
+sub renew {
+  my ($self, @args) = @_;
+
+  my $data = $self->ARGS(@args);
+
+  $data->{ruleset} = $self->ruleset;
+
+  return $self->class->new($data);
+}
+
+sub shorthand {
   my ($self, $data) = @_;
 
-  $data //= {};
+  require Venus::Schema;
 
-  my $exploded = $self->explode;
+  my $ruleset = Venus::Schema->shorthand($data);
 
-  return wantarray ? (@$exploded) : $exploded if !keys %$data;
+  $self->ruleset($ruleset);
 
-  my @result;
-
-  my $sought = {map +($_, 1), keys %$data};
-
-  for my $item (sort {$a->{index} <=> $b->{index}} @$exploded) {
-    my $found = {};
-
-    my $text;
-    if ($text = $data->{data}) {
-      $text = ref($text) eq 'Regexp' ? $text : qr/^@{[quotemeta($text)]}$/;
-      $found->{data} = 1 if "@{$item->{data}}" =~ $text;
-    }
-
-    my $index;
-    if ($index = $data->{index}) {
-      $index = ref($index) eq 'Regexp' ? $index : qr/^@{[quotemeta($index)]}$/;
-      $found->{index} = 1 if $item->{index} =~ $index;
-    }
-
-    my $list;
-    if ($list = $data->{list}) {
-      $list = (ref($list) eq 'Regexp' ? $list : qr/^@{[quotemeta($list)]}$/);
-      $found->{list} = 1 if defined $item->{list} && $item->{list} =~ $list;
-    }
-    else {
-      $found->{list} = 1 if (exists $data->{list} && !defined $data->{list})
-        && !defined $item->{list};
-    }
-
-    my $name;
-    if ($name = $data->{name}) {
-      $name = ref($name) eq 'Regexp' ? $name : qr/^@{[quotemeta($name)]}$/;
-      $found->{name} = 1 if $item->{name} =~ $name;
-    }
-
-    if (not(grep(not(defined($found->{$_})), keys(%$sought)))) {
-      push @result, $item;
-    }
-  }
-
-  return wantarray ? (@result) : \@result;
+  return $self;
 }
 
-sub string {
-  my ($self, $list, $name) = @_;
-
-  my @result;
-
-  for my $item ($self->find($list, $name)) {
-    push @result, join "\n\n", @{$item->{data}};
-  }
-
-  return wantarray ? (@result) : join "\n", @result;
-}
-
-sub text {
+sub valid {
   my ($self) = @_;
 
-  $self->stag('@@ ');
-  $self->etag('@@ end');
-  $self->from('data');
+  $self->validate if !defined $self->validated;
+
+  return $self->validated;
+}
+
+sub validate {
+  my ($self) = @_;
+
+  require Venus;
+
+  return $self->validated
+    ? Venus::clone($self->value)
+    : undef
+    if defined $self->validated;
+
+  require Venus::Schema;
+
+  my $schema = Venus::Schema->new->rules(
+    $self->ruleset
+    ? @{$self->ruleset}
+    : ()
+  );
+
+  my ($errors, $value) = $schema->validate($self->value);
+
+  if (@{$errors}) {
+    $self->validated(false);
+    $self->issues($errors);
+    $self->value($value);
+    return undef;
+  }
+  else {
+    $self->validated(true);
+    $self->issues([]);
+    $self->value($value);
+    return Venus::clone($value);
+  }
 
   return $self;
 }
 
 1;
-
 
 
 =head1 NAME
@@ -201,108 +149,20 @@ Data Class for Perl 5
 
   use Venus::Data;
 
-  my $data = Venus::Data->new('t/data/sections');
+  my $data = Venus::Data->new;
 
-  # $data->find(undef, 'name');
+  # bless({}, 'Venus::Data')
 
 =cut
 
 =head1 DESCRIPTION
 
-This package provides methods for extracting C<DATA> sections and POD blocks
-from any file or package. The package can be configured to parse either POD or
-DATA blocks, and it defaults to being configured for POD blocks.
-
-=head2 DATA syntax
-
-  __DATA__
-
-  # data syntax
-
-  @@ name
-
-  Example Name
-
-  @@ end
-
-  @@ titles #1
-
-  Example Title #1
-
-  @@ end
-
-  @@ titles #2
-
-  Example Title #2
-
-  @@ end
-
-=head2 DATA syntax (nested)
-
-  __DATA__
-
-  # data syntax (nested)
-
-  @@ nested
-
-  Example Nested
-
-  +@@ demo
-
-  blah blah blah
-
-  +@@ end
-
-  @@ end
-
-=head2 POD syntax
-
-  # pod syntax
-
-  =head1 NAME
-
-  Example #1
-
-  =cut
-
-  =head1 NAME
-
-  Example #2
-
-  =cut
-
-  # pod-ish syntax
-
-  =name
-
-  Example #1
-
-  =cut
-
-  =name
-
-  Example #2
-
-  =cut
-
-=head2 POD syntax (nested)
-
-  # pod syntax (nested)
-
-  =nested
-
-  Example #1
-
-  +=head1 WHY?
-
-  blah blah blah
-
-  +=cut
-
-  More information on the same topic as was previously mentioned in the
-  previous section demonstrating the topic, obviously from said section.
-
-  =cut
+This package provides a value object for encapsulating data validation. It
+represents a single immutable validation attempt, ensuring unvalidated data
+cannot be observed. Validation runs at most once per instance, with all
+observable outcomes flowing from that validation. The big idea is that the
+schema (or ruleset) is a contract, and if the validate was success you can be
+certain that the data (or value) is valid and conforms with the schema.
 
 =cut
 
@@ -310,7 +170,7 @@ DATA blocks, and it defaults to being configured for POD blocks.
 
 This package inherits behaviors from:
 
-L<Venus::Path>
+L<Venus::Kind::Utility>
 
 =cut
 
@@ -320,308 +180,709 @@ This package provides the following methods:
 
 =cut
 
-=head2 count
+=head2 error
 
-  count(hashref $criteria) (number)
+  error() (arrayref)
 
-The count method uses the criteria provided to L</search> for and return the
-number of blocks found.
+The error method returns the first validation error as an arrayref in the
+format C<[path, [error_type, args]]>, or undef if no errors exist. This is a
+convenience method for accessing the first error when you don't need the
+complete error list. Call C</validate> or C</valid> first to ensure validation
+has run.
 
-I<Since C<0.01>>
+I<Since C<4.15>>
 
 =over 4
 
-=item count example 1
+=item error example 1
 
-  # given: synopsis;
+  package main;
 
-  my $count = $data->docs->count;
+  use Venus::Data;
 
-  # 6
+  my $data = Venus::Data->new(
+    value => {
+      name => undef,
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  $data->validate;
+
+  my $error = $data->error;
+
+  # ['name', ['required', []]]
 
 =back
 
 =over 4
 
-=item count example 2
+=item error example 2
 
-  # given: synopsis;
+  package main;
 
-  my $count = $data->text->count;
+  use Venus::Data;
 
-  # 3
+  my $data = Venus::Data->new(
+    value => {
+      name => 'Example',
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
 
-=back
+  $data->validate;
 
-=cut
+  my $error = $data->error;
 
-=head2 data
-
-  data() (string)
-
-The data method returns the text between the C<DATA> and C<END> sections of a
-Perl package or file.
-
-I<Since C<0.01>>
-
-=over 4
-
-=item data example 1
-
-  # given: synopsis;
-
-  $data = $data->data;
-
-  # ...
-
-=back
-
-=cut
-
-=head2 docs
-
-  docs() (Venus::Data)
-
-The docs method configures the instance for parsing POD blocks.
-
-I<Since C<0.01>>
-
-=over 4
-
-=item docs example 1
-
-  # given: synopsis;
-
-  my $docs = $data->docs;
-
-  # bless({ etag => "=cut", from => "read", stag => "=", ... }, "Venus::Data")
-
-=back
-
-=cut
-
-=head2 find
-
-  find(maybe[string] $list, maybe[string] $name) (arrayref)
-
-The find method is a wrapper around L</search> as shorthand for searching by
-C<list> and C<name>.
-
-I<Since C<0.01>>
-
-=over 4
-
-=item find example 1
-
-  # given: synopsis;
-
-  my $find = $data->docs->find(undef, 'name');
-
-  # [
-  #   { data => ["Example #1"], index => 4, list => undef, name => "name" },
-  #   { data => ["Example #2"], index => 5, list => undef, name => "name" },
-  # ]
+  # undef
 
 =back
 
 =over 4
 
-=item find example 2
+=item error example 3
 
-  # given: synopsis;
+  package main;
 
-  my $find = $data->docs->find('head1', 'NAME');
+  use Venus::Data;
 
-  # [
-  #   { data => ["Example #1"], index => 1, list => "head1", name => "NAME" },
-  #   { data => ["Example #2"], index => 2, list => "head1", name => "NAME" },
-  # ]
+  my $data = Venus::Data->new(
+    value => {
+      name => 123,
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => [['type', 'string']]
+      },
+    ],
+  );
 
-=back
+  $data->validate;
 
-=over 4
+  my $error = $data->error;
 
-=item find example 3
-
-  # given: synopsis;
-
-  my $find = $data->text->find(undef, 'name');
-
-  # [
-  #   { data => ["Example Name"], index => 1, list => undef, name => "name" },
-  # ]
-
-=back
-
-=over 4
-
-=item find example 4
-
-  # given: synopsis;
-
-  my $find = $data->text->find('titles', '#1');
-
-  # [
-  #   { data => ["Example Title #1"], index => 2, list => "titles", name => "#1" },
-  # ]
+  # ['name', ['type', ['string']]]
 
 =back
 
 =cut
 
-=head2 search
+=head2 errors
 
-The search method returns the set of blocks matching the criteria provided.
-This method can return a list of values in list-context.
+  errors() (within[arrayref, arrayref])
+
+The errors method returns an arrayref of all validation errors. Each error is
+an arrayref with the format C<[path, [error_type, args]]> where path indicates
+which field failed and C<error_type> describes the failure (e.g., 'required',
+'type', etc). Returns an empty arrayref if validation succeeded or hasn't run
+yet.
+
+I<Since C<4.15>>
 
 =over 4
 
-=item search example 1
+=item errors example 1
 
-  # given: synopsis;
+  package main;
 
-  my $search = $data->docs->search({list => undef, name => 'name'});
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => undef,
+      age => 'invalid'
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+      {
+        selector => 'age',
+        presence => 'required',
+        executes => ['number']
+      },
+    ],
+  );
+
+  $data->validate;
+
+  my $errors = $data->errors;
 
   # [
-  #   { data => ["Example #1"], index => 4, list => undef, name => "name" },
-  #   { data => ["Example #2"], index => 5, list => undef, name => "name" },
+  #   ['name', ['required', []]],
+  #   ['age', ['number', []]],
   # ]
 
 =back
 
 =over 4
 
-=item search example 2
+=item errors example 2
 
-  # given: synopsis;
+  package main;
 
-  my $search = $data->docs->search({list => 'head1', name => 'NAME'});
+  use Venus::Data;
 
-  # [
-  #   { data => ["Example #1"], index => 1, list => "head1", name => "NAME" },
-  #   { data => ["Example #2"], index => 2, list => "head1", name => "NAME" },
-  # ]
+  my $data = Venus::Data->new(
+    value => {
+      name => 'Example',
+      age => 25
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+      {
+        selector => 'age',
+        presence => 'required',
+        executes => ['number']
+      },
+    ],
+  );
+
+  $data->validate;
+
+  my $errors = $data->errors;
+
+  # []
 
 =back
 
 =over 4
 
-=item search example 3
+=item errors example 3
 
-  # given: synopsis;
+  package main;
 
-  my $find = $data->text->search({list => undef, name => 'name'});
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => 123,
+      email => undef
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => [['type', 'string']]
+      },
+      {
+        selector => 'email',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  $data->validate;
+
+  my $errors = $data->errors;
 
   # [
-  #   { data => ["Example Name"], index => 1, list => undef, name => "name" },
-  # ]
-
-=back
-
-=over 4
-
-=item search example 4
-
-  # given: synopsis;
-
-  my $search = $data->text->search({list => 'titles', name => '#1'});
-
-  # [
-  #   { data => ["Example Title #1"], index => 2, list => "titles", name => "#1" },
+  #   ['name', ['type', ['string']]],
+  #   ['email', ['required', []]],
   # ]
 
 =back
 
 =cut
 
-=head2 string
+=head2 new
 
-  string(maybe[string] $list, maybe[string] $name) (string)
+  new(any @args) (Venus::Data)
 
-The string method is a wrapper around L</find> as shorthand for searching by
-C<list> and C<name>, returning only the strings found.
+The new method constructs an instance of the package.
 
-I<Since C<1.67>>
-
-=over 4
-
-=item string example 1
-
-  # given: synopsis;
-
-  my $string = $data->docs->string(undef, 'name');
-
-  # "Example #1\nExample #2"
-
-=back
+I<Since C<4.15>>
 
 =over 4
 
-=item string example 2
+=item new example 1
 
-  # given: synopsis;
+  package main;
 
-  my $string = $data->docs->string('head1', 'NAME');
+  use Venus::Data;
 
-  # "Example #1\nExample #2"
+  my $data = Venus::Data->new;
 
-=back
-
-=over 4
-
-=item string example 3
-
-  # given: synopsis;
-
-  my $string = $data->text->string(undef, 'name');
-
-  # "Example Name"
-
-=back
-
-=over 4
-
-=item string example 4
-
-  # given: synopsis;
-
-  my $string = $data->text->string('titles', '#1');
-
-  # "Example Title #1"
-
-=back
-
-=over 4
-
-=item string example 5
-
-  # given: synopsis;
-
-  my @string = $data->docs->string('head1', 'NAME');
-
-  # ("Example #1", "Example #2")
+  # bless({}, 'Venus::Data')
 
 =back
 
 =cut
 
-=head2 text
+=head2 renew
 
-  text() (Venus::Data)
+  renew(any @args) (object)
 
-The text method configures the instance for parsing DATA blocks.
+The renew method creates a new instance with updated arguments while preserving
+the ruleset from the current instance. This is the best way to "update" the
+value while maintaining the ruleset. The new instance will have its validation
+state reset and will need to be validated again.
 
-I<Since C<0.01>>
+I<Since C<4.15>>
 
 =over 4
 
-=item text example 1
+=item renew example 1
 
-  # given: synopsis;
+  package main;
 
-  my $text = $data->text;
+  use Venus::Data;
 
-  # bless({ etag  => '@@ end', from  => 'data', stag  => '@@ ', ... }, "Venus::Data")
+  my $data = Venus::Data->new(
+    value => {
+      name => 'Example',
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  my $renewed = $data->renew(value => {name => 'Updated'});
+
+  # bless({...}, 'Venus::Data')
+
+=back
+
+=over 4
+
+=item renew example 2
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => 'Example',
+      age => 25
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+      {
+        selector => 'age',
+        presence => 'required',
+        executes => ['number']
+      },
+    ],
+  );
+
+  $data->validate;
+
+  my $renewed = $data->renew({value => {name => 'Updated', age => 30}});
+
+  # bless({}, 'Venus::Data')
+
+=back
+
+=cut
+
+=head2 shorthand
+
+  shorthand(arrayref | hashref $data) (Venus::Data)
+
+The shorthand method accepts an arrayref or hashref of shorthand notation and
+sets the ruleset on the instance using L<Venus::Schema/shorthand>. This
+provides a concise way to define validation rules. Keys can have suffixes to
+indicate presence: C<!> for (explicit) required, C<?> (explicit) for optional,
+C<*> for (explicit) present (i.e., must exist but can be null), and no suffix
+means (implicit) required. Keys using dot notation (e.g., C<website.url>)
+result in arrayref selectors for nested path validation. Returns the invocant
+for method chaining.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item shorthand example 1
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      fname => 'Elliot',
+      lname => 'Alderson',
+    },
+  );
+
+  $data->shorthand([
+    'fname!' => 'string',
+    'lname!' => 'string',
+  ]);
+
+  my $valid = $data->valid;
+
+  # 1
+
+=back
+
+=over 4
+
+=item shorthand example 2
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      fname => 'Elliot',
+    },
+  );
+
+  $data->shorthand([
+    'fname!' => 'string',
+    'lname!' => 'string',
+  ]);
+
+  my $valid = $data->valid;
+
+  # 0
+
+=back
+
+=over 4
+
+=item shorthand example 3
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      fname => 'Elliot',
+      lname => 'Alderson',
+      login => 'mrrobot',
+    },
+  );
+
+  $data->shorthand([
+    'fname!' => 'string',
+    'lname!' => 'string',
+    'email?' => 'string',
+    'login' => 'string',
+  ]);
+
+  my $validated = $data->validate;
+
+  # {fname => 'Elliot', lname => 'Alderson', login => 'mrrobot'}
+
+=back
+
+=over 4
+
+=item shorthand example 4
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      user => {
+        name => 'Elliot',
+      },
+    },
+  );
+
+  $data->shorthand([
+    'user.name' => 'string',
+  ]);
+
+  my $validated = $data->validate;
+
+  # {user => {name => 'Elliot'}}
+
+=back
+
+=cut
+
+=head2 valid
+
+  valid() (boolean)
+
+The valid method returns a boolean indicating whether the data is valid. Triggers
+validation on first call if not already validated. Subsequent calls return the
+cached validation state without re-validating. This is the primary way to check
+if data passed validation.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item valid example 1
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => 'Example',
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  my $valid = $data->valid;
+
+  # 1
+
+=back
+
+=over 4
+
+=item valid example 2
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => undef,
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  my $valid = $data->valid;
+
+  # 0
+
+=back
+
+=over 4
+
+=item valid example 3
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => 'Example',
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  my $check_1 = $data->valid;
+
+  # true
+
+  my $check_2 = $data->valid;
+
+  # true (cached)
+
+=back
+
+=cut
+
+=head2 validate
+
+  validate() (any)
+
+The validate method performs validation of the value against the ruleset and
+returns the validated (and potentially modified) value on success, or undef on
+failure. Validation runs at most once per instance, and subsequent calls return
+cached results. The returned value may differ from the original due to
+transformations applied during validation (e.g., "trim", "strip", "lowercase",
+etc). After validation, check C</valid> to determine success/failure and
+C</errors> to get validation errors.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item validate example 1
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => '  Example  ',
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string', 'trim']
+      },
+    ],
+  );
+
+  my $validated = $data->validate;
+
+  # {name => 'Example'}
+
+=back
+
+=over 4
+
+=item validate example 2
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => undef,
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  my $validated = $data->validate;
+
+  # undef
+
+=back
+
+=over 4
+
+=item validate example 3
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => 'Example',
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  my $validated_1 = $data->validate;
+
+  # {name => 'Example'}
+
+  my $validated_2 = $data->validate;
+
+  # {name => 'Example'} (cached)
+
+=back
+
+=over 4
+
+=item validate example 4
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      fname => 'Elliot',
+    },
+    ruleset => [
+      {
+        selector => 'fname',
+        presence => 'required',
+        executes => ['string', 'trim', 'strip'],
+      },
+      {
+        selector => 'lname',
+        presence => 'required',
+        executes => ['string', 'trim', 'strip'],
+      },
+      {
+        selector => 'skills',
+        presence => 'present',
+      },
+      {
+        selector => 'handles',
+        presence => 'required',
+        executes => [['type', 'arrayref']],
+      },
+      {
+        selector => ['handles', 'name'],
+        presence => 'required',
+        executes => ['string', 'trim', 'strip'],
+      },
+      {
+        selector => ['level'],
+        presence => 'required',
+        executes => ['number', 'trim', 'strip'],
+      },
+    ],
+  );
+
+  my $validated = $data->validate;
+
+  # undef
+
+  my $errors = $data->errors;
+
+  # [
+  #   ['lname', ['required', []]],
+  #   ['skills', ['present', []]],
+  #   ['handles', ['required', []]],
+  #   ['handles.name', ['required', []]],
+  #   ['level', ['required', []]],
+  # ]
 
 =back
 

@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -72,7 +73,10 @@ $test->for('synopsis', sub {
 =description
 
 This package modifies the consuming package and provides methods for stashing
-data within the object.
+data within the object. This role differs from L<Venus::Role::Encaseable> in
+that it obsures the stash but its data is easily accessible without getters and
+setters, whereas Encaseable provides getters and setters to help obscure the
+private instance data.
 
 =cut
 

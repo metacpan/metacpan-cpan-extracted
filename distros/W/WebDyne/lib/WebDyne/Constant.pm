@@ -32,7 +32,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='2.072';
+$VERSION='2.073';
 
 
 #  Get mod_perl version taking intio account legacy strings. Clear $@ after evals
@@ -477,6 +477,15 @@ my %constant_temp;
         'pdf'  => 'application/pdf',
         'svg'  => 'image/svg+xml'
     },
+    
+    
+    #  Other files the PSGI indexer is allowed to open
+    #
+    WEBDYNE_INDEX_EXT_ALLOWED_HR => { map {$_=>1} qw(
+        psp
+        pm
+        pl
+    )},
     
     
     #  Dir_config can be loaded from here if not in Apache

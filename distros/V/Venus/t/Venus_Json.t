@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 if (require Venus::Json && not Venus::Json->package) {
   diag 'No suitable JSON library found' if $ENV{VENUS_DEBUG};
@@ -43,6 +44,7 @@ $test->for('abstract');
 
 method: decode
 method: encode
+method: new
 
 =cut
 
@@ -176,42 +178,102 @@ $test->for('example', 1, 'encode', sub {
   $result
 });
 
-=error error_on_config
+=method new
 
-This package may raise an error_on_config exception.
+The new method constructs an instance of the package.
 
-=cut
+=signature new
 
-$test->for('error', 'error_on_config');
+  new(any @args) (Venus::Json)
 
-=example-1 error_on_config
+=metadata new
 
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_config',
-  };
-
-  my $error = $json->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_config"
-
-  # my $message = $error->message;
-
-  # "No suitable JSON package"
+{
+  since => '4.15',
+}
 
 =cut
 
-$test->for('example', 1, 'error_on_config', sub {
+=example-1 new
+
+  package main;
+
+  use Venus::Json;
+
+  my $new = Venus::Json->new;
+
+  # bless(..., "Venus::Json")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_config";
-  my $message = $result->message;
-  is $message, "No suitable JSON package";
+  ok $result->isa('Venus::Json');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Json;
+
+  my $new = Venus::Json->new({password => 'secret'});
+
+  # bless(..., "Venus::Json")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Json');
+  is_deeply $result->value, {password => 'secret'};
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Json;
+
+  my $new = Venus::Json->new(value => {password => 'secret'});
+
+  # bless(..., "Venus::Json")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Json');
+  is_deeply $result->value, {password => 'secret'};
+
+  $result
+});
+
+=raise new Venus::Json::Error on.config
+
+  package main;
+
+  use Venus::Json;
+
+  local $ENV{VENUS_JSON_PACKAGE} = 'Fake::Json';
+
+  my $new = Venus::Json->new;
+
+  # Error! (on.config)
+
+=cut
+
+$test->for('raise', 'new', 'Venus::Json::Error', 'on.config', sub {
+  my ($tryable) = @_;
+
+  $test->type(my $result = $tryable->result, 'Venus::Json');
 
   $result
 });

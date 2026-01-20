@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base';
 
+# INHERITS
+
 base 'Venus::Kind::Value';
+
+# OVERLOADS
 
 use overload (
   '${}' => sub{$_[0]->value},
@@ -16,18 +22,6 @@ use overload (
 );
 
 # METHODS
-
-sub assertion {
-  my ($self) = @_;
-
-  my $assertion = $self->SUPER::assertion;
-
-  $assertion->match('scalarref')->format(sub{
-    (ref $self || $self)->new($_)
-  });
-
-  return $assertion;
-}
 
 sub default {
   return \'';
@@ -1642,6 +1636,30 @@ I<Since C<0.08>>
   my $result = $lvalue->ne($rvalue);
 
   # 1
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Scalar)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $new = Venus::Scalar->new;
+
+  # bless(..., "Venus::Scalar")
 
 =back
 

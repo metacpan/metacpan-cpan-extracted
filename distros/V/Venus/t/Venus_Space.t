@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 use File::Temp;
 use Venus;
 
@@ -39,13 +40,16 @@ $test->for('abstract');
 
 =includes
 
+method: after
 method: all
 method: append
+method: around
 method: array
 method: arrays
 method: attributes
 method: authority
 method: basename
+method: before
 method: blessed
 method: build
 method: call
@@ -56,21 +60,24 @@ method: cop
 method: data
 method: eval
 method: explain
+method: handle
 method: hash
 method: hashes
+method: hook
 method: id
-method: lfile
-method: init
-method: inherits
 method: included
+method: inherits
+method: init
 method: inject
 method: integrates
+method: lfile
 method: load
 method: loaded
 method: locate
 method: meta
 method: mock
 method: name
+method: new
 method: parent
 method: parse
 method: parts
@@ -87,19 +94,20 @@ method: routine
 method: routines
 method: scalar
 method: scalars
+method: scrub
 method: sibling
 method: siblings
 method: splice
 method: swap
 method: tfile
 method: tryload
-method: use
 method: unload
 method: unloaded
 method: unpatch
+method: use
 method: variables
-method: visible
 method: version
+method: visible
 
 =cut
 
@@ -139,6 +147,99 @@ Venus::Name
 =cut
 
 $test->for('inherits');
+
+=method after
+
+The after method installs a method modifier that executes after the original
+method, allowing you to perform actions after a method call. B<Note:> The
+return value of the modifier routine is ignored; the wrapped method always
+returns the value from the original method. Modifiers are executed in the order
+they are stacked.
+
+=signature after
+
+  after(string $name, coderef $code) (coderef)
+
+=metadata after
+
+{
+  since => '4.15',
+}
+
+=example-1 after
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('execute', sub {
+    my ($self) = @_;
+    return [@_];
+  });
+
+  my $after = $space->after('execute', sub {
+    my ($self) = @_;
+    $self->{executed} = 1;
+  });
+
+  # sub { ... }
+
+=cut
+
+$test->for('example', 1, 'after', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok ref($result) eq 'CODE';
+
+  $result
+});
+
+=example-2 after
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('new', sub {
+    my ($class) = @_;
+    return bless {}, $class;
+  });
+
+  $space->routine('execute', sub {
+    my ($self) = @_;
+    $self->{executed} = 1;
+    return $self;
+  });
+
+  $space->after('execute', sub {
+    my ($self) = @_;
+    return [@_];
+  });
+
+  my $object = $space->build({});
+
+  my $result = $object->execute;
+
+  # bless({executed => 1}, 'Foo::Bar')
+
+=cut
+
+$test->for('example', 2, 'after', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Foo::Bar');
+  ok $result->{executed};
+
+  $result
+});
 
 =method all
 
@@ -298,6 +399,95 @@ $test->for('example', 2, 'append', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Space');
   ok $result =~ m{Foo::Bar::Baz::Bax};
+
+  $result
+});
+
+=method around
+
+The around method installs a method modifier that wraps around the original
+method. The callback provided will recieve the original routine as its first
+argument. This method will raise an exception if the source routine does not
+exist. Modifiers are executed in the order they are stacked.
+
+=signature around
+
+  around(string $name, coderef $code) (coderef)
+
+=metadata around
+
+{
+  since => '4.15',
+}
+
+=example-1 around
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('execute', sub {
+    my ($self, $value) = @_;
+    return [$value];
+  });
+
+  my $around = $space->around('execute', sub {
+    my ($orig, $self, $value) = @_;
+    my $result = $self->$orig($value);
+    push @$result, 'wrapped';
+    return $result;
+  });
+
+  # sub { ... }
+
+=cut
+
+$test->for('example', 1, 'around', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok ref($result) eq 'CODE';
+
+  $result
+});
+
+=example-2 around
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('execute', sub {
+    my ($self, $value) = @_;
+    return [$value];
+  });
+
+  $space->around('execute', sub {
+    my ($orig, $self, $value) = @_;
+    my $result = $self->$orig($value);
+    push @$result, 'wrapped';
+    return $result;
+  });
+
+  my $object = $space->build({});
+
+  my $result = $object->execute('test');
+
+  # ['test', 'wrapped']
+
+=cut
+
+$test->for('example', 2, 'around', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['test', 'wrapped'];
 
   $result
 });
@@ -580,6 +770,101 @@ $test->for('example', 1, 'basename', sub {
   $result
 });
 
+=method before
+
+The before method installs a method modifier that executes before the original
+method, allowing you to perform actions before a method call. B<Note:> The
+return value of the modifier routine is ignored; the wrapped method always
+returns the value from the original method. Modifiers are executed in the order
+they are stacked.
+
+=signature before
+
+  before(string $name, coderef $code) (coderef)
+
+=metadata before
+
+{
+  since => '4.15',
+}
+
+=example-1 before
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('execute', sub {
+    my ($self) = @_;
+    return [@_];
+  });
+
+  my $before = $space->before('execute', sub {
+    my ($self) = @_;
+    $self->{started} = 1;
+  });
+
+  # sub { ... }
+
+=cut
+
+$test->for('example', 1, 'before', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok ref($result) eq 'CODE';
+
+  $result
+});
+
+=example-2 before
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('new', sub {
+    my ($class) = @_;
+    return bless {tick => 1}, $class;
+  });
+
+  $space->routine('execute', sub {
+    my ($self) = @_;
+    $self->{tick} = $self->{step_1} = $self->{tick} + 1;
+    return $self;
+  });
+
+  $space->before('execute', sub {
+    my ($self) = @_;
+    $self->{tick} = $self->{step_2} = $self->{tick} + 1;
+    return;
+  });
+
+  my $object = $space->build({});
+
+  my $result = $object->execute;
+
+  # bless({step_1 => 3, step_2 => 2}, 'Foo::Bar')
+
+=cut
+
+$test->for('example', 2, 'before', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Foo::Bar');
+  is $result->{step_1}, 3;
+  is $result->{step_2}, 2;
+
+  $result
+});
+
 =method blessed
 
 The blessed method blesses the given value into the package namespace and
@@ -587,7 +872,7 @@ returns an object. If no value is given, an empty hashref is used.
 
 =signature blessed
 
-  blessed(Ref $data) (Self)
+  blessed(Ref $data) (Venus::Space)
 
 =metadata blessed
 
@@ -652,7 +937,7 @@ successful returns the resulting object.
 
 =signature build
 
-  build(any @args) (Self)
+  build(any @args) (Venus::Space)
 
 =metadata build
 
@@ -1239,6 +1524,125 @@ $test->for('example', 1, 'explain', sub {
   $result
 });
 
+=method handle
+
+The handle method installs a method modifier that wraps a method similar to
+C<around>, providing low-level control over method execution. The modifier
+receives the original method as its first argument (which may be C<undef> if
+the method doesn't exist), followed by the method's arguments. This is the
+foundation for the other method modifiers (L</before|"before">,
+L</after|"after">, L</around|"around">). The modifiers are executed in the
+order they are stacked rather than maintaining a global registry.
+
+=signature handle
+
+  handle(string $name, coderef $code) (coderef)
+
+=metadata handle
+
+{
+  since => '4.15',
+}
+
+=example-1 handle
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('execute', sub {
+    my ($self, $value) = @_;
+    return $value;
+  });
+
+  my $handle = $space->handle('execute', sub {
+    my ($orig, $self, $value) = @_;
+    return $orig ? $self->$orig($value * 2) : 0;
+  });
+
+  # sub { ... }
+
+=cut
+
+$test->for('example', 1, 'handle', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok ref($result) eq 'CODE';
+
+  $result
+});
+
+=example-2 handle
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('execute', sub {
+    my ($self, $value) = @_;
+    return $value;
+  });
+
+  $space->handle('execute', sub {
+    my ($orig, $self, $value) = @_;
+    return $orig ? $self->$orig($value * 2) : 0;
+  });
+
+  my $object = $space->build({});
+
+  my $result = $object->execute(5);
+
+  # 10
+
+=cut
+
+$test->for('example', 2, 'handle', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 10;
+
+  $result
+});
+
+=example-3 handle
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->handle('missing', sub {
+    my ($orig, $self) = @_;
+    return 'method does not exist';
+  });
+
+  my $object = $space->build({});
+
+  my $result = $object->missing;
+
+  # "method does not exist"
+
+=cut
+
+$test->for('example', 3, 'handle', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'method does not exist';
+
+  $result
+});
+
 =method hash
 
 The hash method gets or sets the value for the given package hash variable name.
@@ -1346,6 +1750,95 @@ $test->for('example', 1, 'hashes', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, ["defaults", "settings"];
+
+  $result
+});
+
+=method hook
+
+The hook method is a specialized method modifier helper that applies a modifier
+(C<after>, C<around>, C<before>, or C<handle>) to a lifecycle hook method. It
+automatically uppercases the hook name, making it convenient for modifying
+Venus lifecycle hooks like C<BUILD>, C<BLESS>, C<BUILDARGS>, and C<AUDIT>.
+
+=signature hook
+
+  hook(string $type, string $name, coderef $code) (coderef)
+
+=metadata hook
+
+{
+  since => '4.15',
+}
+
+=example-1 hook
+
+  package Foo::Bar::Hook;
+
+  use Venus::Class;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar/hook');
+
+  $space->routine('BUILD', sub {
+    my ($self, $args) = @_;
+    $self->{started} = 1;
+  });
+
+  my $hook = $space->hook('before', 'build', sub {
+    my ($self) = @_;
+    $self->{initialized} = 1;
+  });
+
+  # sub { ... }
+
+=cut
+
+$test->for('example', 1, 'hook', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok ref($result) eq 'CODE';
+
+  $result
+});
+
+=example-2 hook
+
+  package Foo::Bar::Hook;
+
+  use Venus::Class;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar/hook');
+
+  $space->routine('BUILD', sub {
+    my ($self, $args) = @_;
+    $self->{started} = 1;
+  });
+
+  $space->hook('before', 'build', sub {
+    my ($self) = @_;
+    $self->{initialized} = 1;
+  });
+
+  my $object = $space->build({});
+
+  # bless({initialized => 1, started => 1}, 'Foo::Bar')
+
+=cut
+
+$test->for('example', 2, 'hook', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Foo::Bar::Hook');
+  ok $result->{initialized};
+  ok $result->{started};
 
   $result
 });
@@ -1974,6 +2467,64 @@ $test->for('example', 1, 'name', sub {
   $result
 });
 
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Space)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Space;
+
+  my $new = Venus::Space->new('Foo::Bar');
+
+  # bless(..., "Venus::Space")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  is $result->value, 'Foo::Bar';
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Space;
+
+  my $new = Venus::Space->new(value => 'Foo::Bar');
+
+  # bless(..., "Venus::Space")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  is $result->value, 'Foo::Bar';
+
+  $result
+});
+
 =method parent
 
 The parent method returns a new L<Venus::Space> object for the parent package
@@ -2491,11 +3042,14 @@ $test->for('example', 2, 'prepend', sub {
 =method purge
 
 The purge method purges a package space by expunging its symbol table and
-removing it from C<%INC>.
+removing it from C<%INC>. B<Warning:> This method deletes symbol table entries
+entirely, which may cause issues with code that holds compiled references to
+package variables. For safer cleanup that preserves symbol table structure, see
+L</scrub>.
 
 =signature purge
 
-  purge() (Self)
+  purge() (Venus::Space)
 
 =metadata purge
 
@@ -2961,6 +3515,56 @@ $test->for('example', 1, 'scalars', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, ["base", "file", "root"];
+
+  $result
+});
+
+=method scrub
+
+The scrub method cleans a package space by nullifying its typeglobs (setting
+them to C<undef>) for all symbols except special variables and routines (like
+C<@ISA>, C<DESTROY>, etc.), and removes it from C<%INC>. Unlike L</purge>, this
+method preserves the stash entries allowing compiled code holding references to
+remain valid. Unlike L</unload>, this method preserves special symbols needed
+for proper package operation. See also L</purge> and L</unload>.
+
+=signature scrub
+
+  scrub() (Venus::Space)
+
+=metadata scrub
+
+{
+  since => '4.15',
+}
+
+=example-1 scrub
+
+  package main;
+
+  use Venus::Space;
+
+  # Bar::Gen is generated with $VERSION as 0.01
+
+  my $space = Venus::Space->new('Bar/Gen');
+
+  $space->load;
+
+  my $scrub = $space->scrub;
+
+  # bless({ value => "Bar::Gen" }, "Venus::Space")
+
+  # Bar::Gen->VERSION was 0.01, now undef
+
+  # Symbol table persists, $space->visible is 1
+
+=cut
+
+$test->for('example', 1, 'scrub', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  ok $result->visible;
 
   $result
 });
@@ -3434,12 +4038,15 @@ $test->for('example', 3, 'use', sub {
 
 =method unload
 
-The unload method unloads a package space by nullifying its symbol table and
-removing it from C<%INC>.
+The unload method unloads a package space by nullifying its symbol table
+(setting all typeglobs to C<undef>) and removing it from C<%INC>. Unlike
+L</purge>, this method preserves symbol table entries, keeping the package
+visible. Unlike L</scrub>, this method nullifies entire typeglobs rather than
+individual slots.
 
 =signature unload
 
-  unload() (Self)
+  unload() (Venus::Space)
 
 =metadata unload
 
@@ -3913,370 +4520,114 @@ $test->for('example', 2, 'version', sub {
   $result
 });
 
-=error error_on_call_missing
+=raise call Venus::Space::Error on.call.missing
 
-This package may raise an error_on_call_missing exception.
+  package main;
 
-=cut
+  use Venus::Space;
 
-$test->for('error', 'error_on_call_missing');
+  my $space = Venus::Space->new('Venus::Check');
 
-=example-1 error_on_call_missing
+  $space->call('not_a_method');
 
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_call_missing',
-    package => 'Example',
-    routine => 'execute',
-  };
-
-  my $error = $space->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_call_missing"
-
-  # my $message = $error->render;
-
-  # "Unable to locate class method \"execute\" via package \"Example\""
-
-  # my $package = $error->stash('package');
-
-  # "Example"
-
-  # my $routine = $error->stash('routine');
-
-  # "execute"
+  # Error! (on.call.missing)
 
 =cut
 
-$test->for('example', 1, 'error_on_call_missing', sub {
+$test->for('raise', 'call', 'Venus::Space::Error', 'on.call.missing', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_call_missing";
-  my $message = $result->render;
-  is $message, "Unable to locate class method \"execute\" via package \"Example\"";
-  my $package = $result->stash('package');
-  is $package, "Example";
-  my $routine = $result->stash('routine');
-  is $routine, "execute";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_call_undefined
+=raise around Venus::Space::Error on.around.missing
 
-This package may raise an error_on_call_undefined exception.
+  package main;
 
-=cut
+  use Venus::Space;
 
-$test->for('error', 'error_on_call_undefined');
+  my $space = Venus::Space->new('Venus::Check');
 
-=example-1 error_on_call_undefined
+  $space->around('not_a_method');
 
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_call_undefined',
-    package => 'Example',
-    routine => 'execute',
-  };
-
-  my $error = $space->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_call_undefined"
-
-  # my $message = $error->render;
-
-  # "Attempt to call undefined class method in package \"Example\""
-
-  # my $package = $error->stash('package');
-
-  # "Example"
-
-  # my $routine = $error->stash('routine');
-
-  # "execute"
+  # Error! (on.around.missing)
 
 =cut
 
-$test->for('example', 1, 'error_on_call_undefined', sub {
+$test->for('raise', 'around', 'Venus::Space::Error', 'on.around.missing', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_call_undefined";
-  my $message = $result->render;
-  is $message, "Attempt to call undefined class method in package \"Example\"";
-  my $package = $result->stash('package');
-  is $package, "Example";
-  my $routine = $result->stash('routine');
-  is $routine, "execute";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_cop_missing
+=raise cop Venus::Space::Error on.cop.missing
 
-This package may raise an error_on_cop_missing exception.
+  package main;
 
-=cut
+  use Venus::Space;
 
-$test->for('error', 'error_on_cop_missing');
+  my $space = Venus::Space->new('Venus::Check');
 
-=example-1 error_on_cop_missing
+  $space->cop('not_a_method');
 
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_cop_missing',
-    package => 'Example',
-    routine => 'execute',
-  };
-
-  my $error = $space->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_cop_missing"
-
-  # my $message = $error->render;
-
-  # "Unable to locate object method \"execute\" via package \"Example\""
-
-  # my $package = $error->stash('package');
-
-  # "Example"
-
-  # my $routine = $error->stash('routine');
-
-  # "execute"
+  # Error! (on.cop.missing)
 
 =cut
 
-$test->for('example', 1, 'error_on_cop_missing', sub {
+$test->for('raise', 'cop', 'Venus::Space::Error', 'on.cop.missing', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_cop_missing";
-  my $message = $result->render;
-  is $message, "Unable to locate object method \"execute\" via package \"Example\"";
-  my $package = $result->stash('package');
-  is $package, "Example";
-  my $routine = $result->stash('routine');
-  is $routine, "execute";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_cop_undefined
+=raise eval Venus::Space::Error on.eval
 
-This package may raise an error_on_cop_undefined exception.
+  package main;
 
-=cut
+  use Venus::Space;
 
-$test->for('error', 'error_on_cop_undefined');
+  my $space = Venus::Space->new('Venus::Check');
 
-=example-1 error_on_cop_undefined
+  $space->eval('die');
 
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_cop_undefined',
-    package => 'Example',
-    routine => 'execute',
-  };
-
-  my $error = $space->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_cop_undefined"
-
-  # my $message = $error->render;
-
-  # "Attempt to cop undefined object method from package \"$class\""
-
-  # my $package = $error->stash('package');
-
-  # "Example"
-
-  # my $routine = $error->stash('routine');
-
-  # "execute"
+  # Error! (on.eval)
 
 =cut
 
-$test->for('example', 1, 'error_on_cop_undefined', sub {
+$test->for('raise', 'eval', 'Venus::Space::Error', 'on.eval', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_cop_undefined";
-  my $message = $result->render;
-  is $message, "Attempt to cop undefined object method from package \"Example\"";
-  my $package = $result->stash('package');
-  is $package, "Example";
-  my $routine = $result->stash('routine');
-  is $routine, "execute";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_eval
+=raise load Venus::Space::Error on.load
 
-This package may raise an error_on_eval exception.
+  package main;
 
-=cut
+  use Venus::Space;
 
-$test->for('error', 'error_on_eval');
+  my $space = Venus::Space->new('Fake::Package::NotReal');
 
-=example-1 error_on_eval
+  $space->load;
 
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_eval',
-    error => 'Exception!',
-    package => 'Example',
-  };
-
-  my $error = $space->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_eval"
-
-  # my $message = $error->render;
-
-  # "Exception!"
-
-  # my $package = $error->stash('package');
-
-  # "Example"
+  # Error! (on.load)
 
 =cut
 
-$test->for('example', 1, 'error_on_eval', sub {
+$test->for('raise', 'load', 'Venus::Space::Error', 'on.load', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_eval";
-  my $message = $result->render;
-  is $message, "Exception!";
-  my $package = $result->stash('package');
-  is $package, "Example";
 
-  $result
-});
+  $test->is_error(my $error = $tryable->error->result);
 
-=error error_on_load
-
-This package may raise an error_on_load exception.
-
-=cut
-
-$test->for('error', 'error_on_load');
-
-=example-1 error_on_load
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_load',
-    package => 'Example',
-    error => 'cause unknown',
-  };
-
-  my $error = $space->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_load"
-
-  # my $message = $error->render;
-
-  # "Error attempting to load Example: \"cause unknown\""
-
-  # my $package = $error->stash('package');
-
-  # "Example"
-
-=cut
-
-$test->for('example', 1, 'error_on_load', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_load";
-  my $message = $result->render;
-  is $message, "Error attempting to load Example: \"cause unknown\"";
-  my $package = $result->stash('package');
-  is $package, "Example";
-
-  $result
-});
-
-=error error_on_swap
-
-This package may raise an error_on_swap exception.
-
-=cut
-
-$test->for('error', 'error_on_swap');
-
-=example-1 error_on_swap
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_swap',
-    package => 'Example',
-    routine => 'execute',
-  };
-
-  my $error = $space->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_swap"
-
-  # my $message = $error->render;
-
-  # "Attempt to swap undefined subroutine in package \"$class\""
-
-  # my $package = $error->stash('package');
-
-  # "Example"
-
-  # my $routine = $error->stash('routine');
-
-  # "execute"
-
-=cut
-
-$test->for('example', 1, 'error_on_swap', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_swap";
-  my $message = $result->render;
-  is $message, "Attempt to swap undefined subroutine in package \"Example\"";
-  my $package = $result->stash('package');
-  is $package, "Example";
-  my $routine = $result->stash('routine');
-  is $routine, "execute";
-
-  $result
+  $error
 });
 
 =partials

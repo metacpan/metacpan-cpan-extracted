@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2026 -- leonerd@leonerd.org.uk
 
-package POE::Future 0.05;
+package POE::Future 0.06;
 
 use v5.14;
 use warnings;
@@ -20,6 +20,8 @@ use POE;
 C<POE::Future> - use L<Future> with L<POE>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use POE::Future;
 
@@ -127,6 +129,7 @@ sub await
 {
    my $self = shift;
    POE::Kernel::run_one_timeslice until $self->is_ready;
+   return $self;
 }
 
 =head1 AUTHOR

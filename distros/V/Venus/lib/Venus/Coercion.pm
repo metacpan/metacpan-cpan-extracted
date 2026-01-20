@@ -5,11 +5,17 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'attr', 'base', 'with';
 
 use Venus::Check;
 
+# INHERITS
+
 base 'Venus::Kind::Utility';
+
+# INTEGRATES
 
 with 'Venus::Role::Buildable';
 
@@ -497,6 +503,30 @@ I<Since C<3.55>>
   });
 
   # bless(.., "Venus::Coercion")
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Coercion)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Coercion;
+
+  my $new = Venus::Coercion->new;
+
+  # bless(..., "Venus::Coercion")
 
 =back
 

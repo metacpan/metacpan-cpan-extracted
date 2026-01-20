@@ -7,14 +7,11 @@ use 5.018;
 use strict;
 use warnings;
 
-BEGIN {
-  $ENV{VENUS_TASK_AUTO} = 1;
-  $ENV{VENUS_TASK_NAME} = 'vns';
-}
+use lib 'lib';
 
-use Venus::Run;
+use Venus::Task::Venus;
 
-1;
+run Venus::Task::Venus 'vns';
 
 =encoding utf8
 
@@ -24,39 +21,57 @@ vns
 
 =head1 SYNOPSIS
 
-  vns init
+  vns --help
 
 =head1 DESCRIPTION
 
-Run and alias arbitrary commands, and tasks derived from L<Venus::Task>, using
-L<Venus::Run>. See L<FEATURES|Venus::Run/FEATURES> for usage and configuration
-information.
+Run and alias arbitrary commands, and and dispatch to Venus subcommands. The
+subcommands are:
 
-=head1 QUICKSTART
+=over 4
 
-  # Mint a new configuration file
-  vns init
+=item *
 
-  # Install a distribution
-  vns cpan $DIST
+L<vns-gen>
 
-  # Install dependencies in the CWD
-  vns deps
+=item *
 
-  # Check that a package can be compiled
-  vns okay $FILE
+L<vns-get>
 
-  # Use the Perl debugger as a REPL
-  vns repl
+=item *
 
-  # Evaluate arbitrary Perl expressions
-  vns exec "say 'hello'"
+L<vns-new>
 
-  # Test the Perl project in the CWD
-  vns test t
+=item *
+
+L<vns-run>
+
+=item *
+
+L<vns-set>
+
+=back
+
+See L<FEATURES|Venus::Run/FEATURES> for usage and configuration information.
+This CLI dispatches to L<Venus::Task::Venus/perform>.
+
+=head1 EXAMPLES
+
+  # mint a new configuration file
+  $ vns new
+
+Z<>
+
+  # use the Perl debugger as a repl
+  $ vns run repl
+
+Z<>
+
+  # generate a new Venus Perl class
+  $ vns gen -p --class --name Example --stdout
 
 =head1 SEE ALSO
 
-L<Venus>, L<Venus::Run>, L<Venus::Task>.
+L<Venus>, L<Venus::Task::Venus>.
 
 =cut

@@ -1,5 +1,13 @@
 -----
 
+12.0.4    2026-01-19
+   [Fixed]
+       * MANIFEST doesn't include 'eg/decode.pl'
+
+12.0.3    2026-01-19
+   [Added]
+       * Protocol message stream decoder 'eg/decode.pl'
+
 12.0.2    2026-01-18
    [Fixed]
        * MANIFEST excluded Protocol::Sys::Virt::TypedParams and tests

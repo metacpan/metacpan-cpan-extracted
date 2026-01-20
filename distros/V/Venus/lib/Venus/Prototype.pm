@@ -5,53 +5,21 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base', 'with';
 
+# INHERITS
+
 base 'Venus::Kind::Utility';
+
+# INTEGRATES
 
 with 'Venus::Role::Valuable';
 with 'Venus::Role::Buildable';
 with 'Venus::Role::Proxyable';
 
 use Scalar::Util ();
-
-# HOOKS
-
-sub _clone {
-  my ($data) = @_;
-
-  if (!defined($data)) {
-    return $data;
-  }
-  elsif (!Scalar::Util::blessed($data) && ref($data) eq 'HASH') {
-    my $copy = {};
-    for my $key (keys %$data) {
-      $copy->{$key} = _clone($data->{$key});
-    }
-    return $copy;
-  }
-  elsif (!Scalar::Util::blessed($data) && ref($data) eq 'ARRAY') {
-    my $copy = [];
-    for (my $i = 0; $i < @$data; $i++) {
-      $copy->[$i] = _copy($data->[$i]);
-    }
-    return $copy;
-  }
-  else {
-    return $data;
-  }
-}
-
-sub _value {
-  my ($data) = @_;
-
-  if (keys %$data == 1 && exists $data->{value}) {
-    return $data->{value};
-  }
-  else {
-    return $data;
-  }
-}
 
 # BUILDERS
 
@@ -82,6 +50,44 @@ sub build_proxy {
   if exists $self->{value}{"\$$method"};
 
   return undef;
+}
+
+# HOOKS
+
+sub _clone {
+  my ($data) = @_;
+
+  if (!defined($data)) {
+    return $data;
+  }
+  elsif (!Scalar::Util::blessed($data) && ref($data) eq 'HASH') {
+    my $copy = {};
+    for my $key (keys %$data) {
+      $copy->{$key} = _clone($data->{$key});
+    }
+    return $copy;
+  }
+  elsif (!Scalar::Util::blessed($data) && ref($data) eq 'ARRAY') {
+    my $copy = [];
+    for (my $i = 0; $i < @$data; $i++) {
+      $copy->[$i] = _clone($data->[$i]);
+    }
+    return $copy;
+  }
+  else {
+    return $data;
+  }
+}
+
+sub _value {
+  my ($data) = @_;
+
+  if (keys %$data == 1 && exists $data->{value}) {
+    return $data->{value};
+  }
+  else {
+    return $data;
+  }
 }
 
 # METHODS
@@ -396,6 +402,66 @@ I<Since C<1.50>>
   my $elliot = $mrrobot->extend($ability);
 
   # bless({value => {...}}, 'Venus::Prototype')
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Prototype)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Prototype;
+
+  my $new = Venus::Prototype->new;
+
+  # bless(..., "Venus::Prototype")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Prototype;
+
+  my $new = Venus::Prototype->new(
+    '$counter' => 0,
+    '&decrement' => sub { $_[0]->counter($_[0]->counter - 1) },
+    '&increment' => sub { $_[0]->counter($_[0]->counter + 1) },
+  );
+
+  # bless(..., "Venus::Prototype")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Prototype;
+
+  my $new = Venus::Prototype->new(value => {
+    '$counter' => 0,
+    '&decrement' => sub { $_[0]->counter($_[0]->counter - 1) },
+    '&increment' => sub { $_[0]->counter($_[0]->counter + 1) },
+  });
+
+  # bless(..., "Venus::Prototype")
 
 =back
 

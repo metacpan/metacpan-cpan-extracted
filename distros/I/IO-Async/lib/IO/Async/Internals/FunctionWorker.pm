@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Internals::FunctionWorker 0.804;
+package IO::Async::Internals::FunctionWorker 0.805;
 
 use v5.14;
 use warnings;

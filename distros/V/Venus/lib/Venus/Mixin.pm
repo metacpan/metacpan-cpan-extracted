@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-# IMPORT
+# IMPORTS
 
 sub import {
   my ($self, @args) = @_;
@@ -25,6 +25,7 @@ sub import {
     base
     false
     from
+    mask
     mixin
     role
     test
@@ -32,13 +33,23 @@ sub import {
     with
   );
 
+
   @{"${from}::ISA"} = 'Venus::Core::Mixin';
 
+  if ($exports{"after"} && !*{"${from}::after"}{"CODE"}) {
+    *{"${from}::after"} = sub ($$) {require Venus; goto \&Venus::after};
+  }
+  if ($exports{"around"} && !*{"${from}::around"}{"CODE"}) {
+    *{"${from}::around"} = sub ($$) {require Venus; goto \&Venus::around};
+  }
   if ($exports{"attr"} && !*{"${from}::attr"}{"CODE"}) {
     *{"${from}::attr"} = sub {@_ = ($from, @_); goto \&attr};
   }
   if ($exports{"base"} && !*{"${from}::base"}{"CODE"}) {
     *{"${from}::base"} = sub {@_ = ($from, @_); goto \&base};
+  }
+  if ($exports{"before"} && !*{"${from}::before"}{"CODE"}) {
+    *{"${from}::before"} = sub ($$) {require Venus; goto \&Venus::before};
   }
   if ($exports{"catch"} && !*{"${from}::catch"}{"CODE"}) {
     *{"${from}::catch"} = sub (&) {require Venus; goto \&Venus::catch};
@@ -55,8 +66,17 @@ sub import {
   if ($exports{"from"} && !*{"${from}::from"}{"CODE"}) {
     *{"${from}::from"} = sub {@_ = ($from, @_); goto \&from};
   }
+  if ($exports{"handle"} && !*{"${from}::handle"}{"CODE"}) {
+    *{"${from}::handle"} = sub ($$) {require Venus; goto \&Venus::handle};
+  }
+  if ($exports{"hook"} && !*{"${from}::hook"}{"CODE"}) {
+    *{"${from}::hook"} = sub ($$$) {require Venus; goto \&Venus::hook};
+  }
   if ($exports{"raise"} && !*{"${from}::raise"}{"CODE"}) {
     *{"${from}::raise"} = sub ($;$) {require Venus; goto \&Venus::raise};
+  }
+  if ($exports{"mask"} && !*{"${from}::mask"}{"CODE"}) {
+    *{"${from}::mask"} = sub {@_ = ($from, @_); goto \&mask};
   }
   if ($exports{"mixin"} && !*{"${from}::mixin"}{"CODE"}) {
     *{"${from}::mixin"} = sub {@_ = ($from, @_); goto \&mixin};
@@ -81,6 +101,8 @@ sub import {
   return $self;
 }
 
+# ROUTINES
+
 sub attr {
   my ($from, @args) = @_;
 
@@ -101,6 +123,14 @@ sub from {
   my ($from, @args) = @_;
 
   $from->FROM(@args);
+
+  return $from;
+}
+
+sub mask {
+  my ($from, @args) = @_;
+
+  $from->MASK(@args);
 
   return $from;
 }
@@ -238,6 +268,114 @@ This package provides the following functions:
 
 =cut
 
+=head2 after
+
+  after(string $name, coderef $code) (coderef)
+
+The after function installs a method modifier that executes after the original
+method, allowing you to perform actions after a method call. B<Note:> The
+return value of the modifier routine is ignored; the wrapped method always
+returns the value from the original method. Modifiers are executed in the order
+they are stacked. This function is only exported when requested.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item after example 1
+
+  package Example1;
+
+  use Venus::Mixin 'after', 'attr';
+
+  attr 'calls';
+
+  sub BUILD {
+    my ($self) = @_;
+    $self->calls([]);
+  }
+
+  sub execute {
+    my ($self) = @_;
+    push @{$self->calls}, 'original';
+    return 'original';
+  }
+
+  after 'execute', sub {
+    my ($self) = @_;
+    push @{$self->calls}, 'after';
+    return 'ignored';
+  };
+
+  sub EXPORT {
+    ['execute', 'calls', 'BUILD']
+  }
+
+  package Consumer;
+
+  use Venus::Class;
+
+  mixin 'Example1';
+
+  package main;
+
+  my $example = Consumer->new;
+  my $result = $example->execute;
+
+  # "original"
+
+=back
+
+=cut
+
+=head2 around
+
+  around(string $name, coderef $code) (coderef)
+
+The around function installs a method modifier that wraps around the original
+method. The callback provided will recieve the original routine as its first
+argument. This function is only exported when requested.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item around example 1
+
+  package Example2;
+
+  use Venus::Mixin 'around', 'attr';
+
+  sub process {
+    my ($self, $value) = @_;
+    return $value;
+  }
+
+  around 'process', sub {
+    my ($orig, $self, $value) = @_;
+    return $self->$orig($value) * 2;
+  };
+
+  sub EXPORT {
+    ['process']
+  }
+
+  package Consumer2;
+
+  use Venus::Class;
+
+  mixin 'Example2';
+
+  package main;
+
+  my $result = Consumer2->new->process(5);
+
+  # 10
+
+=back
+
+=cut
+
 =head2 attr
 
   attr(string $name) (string)
@@ -292,6 +430,69 @@ I<Since C<1.00>>
   base 'Entity';
 
   # "Example"
+
+=back
+
+=cut
+
+=head2 before
+
+  before(string $name, coderef $code) (coderef)
+
+The before function installs a method modifier that executes before the
+original method, allowing you to perform actions before a method call. B<Note:>
+The return value of the modifier routine is ignored; the wrapped method always
+returns the value from the original method. Modifiers are executed in the order
+they are stacked. This function is only exported when requested.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item before example 1
+
+  package Example3;
+
+  use Venus::Mixin 'attr', 'before';
+
+  attr 'calls';
+
+  sub perform {
+    my ($self) = @_;
+    push @{$self->calls}, 'original';
+    return $self;
+  }
+
+  before 'perform', sub {
+    my ($self) = @_;
+    push @{$self->calls}, 'before';
+    return $self;
+  };
+
+  sub EXPORT {
+    ['perform']
+  }
+
+  package Consumer3;
+
+  use Venus::Class;
+
+  attr 'calls';
+
+  sub BUILD {
+    my ($self) = @_;
+    $self->calls([]);
+  }
+
+  mixin 'Example3';
+
+  package main;
+
+  my $example = Consumer3->new;
+  $example->perform;
+  my $calls = $example->calls;
+
+  # ['before', 'original']
 
 =back
 
@@ -470,6 +671,154 @@ I<Since C<1.00>>
   from 'Record';
 
   # "Example"
+
+=back
+
+=cut
+
+=head2 handle
+
+  handle(string $name, coderef $code) (coderef)
+
+The handle function installs a method modifier that wraps a method, providing
+low-level control. The callback provided will recieve the original routine as
+its first argument (or C<undef> if the source routine doesn't exist). This
+function is only exported when requested.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item handle example 1
+
+  package Example4;
+
+  use Venus::Mixin 'handle';
+
+  sub compute {
+    my ($self, $value) = @_;
+    return $value;
+  }
+
+  handle 'compute', sub {
+    my ($orig, $self, $value) = @_;
+    return $orig ? $self->$orig($value * 2) : 0;
+  };
+
+  sub EXPORT {
+    ['compute']
+  }
+
+  package Consumer4;
+
+  use Venus::Class;
+
+  mixin 'Example4';
+
+  package main;
+
+  my $result = Consumer4->new->compute(5);
+
+  # 10
+
+=back
+
+=cut
+
+=head2 hook
+
+  hook(string $type, string $name, coderef $code) (coderef)
+
+The hook function installs a method modifier on a lifecycle hook method. The
+first argument is the type of modifier desired, e.g., L</before>, L</after>,
+L</around>, and the callback provided will recieve the original routine as its
+first argument. This function is only exported when requested.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item hook example 1
+
+  package Example5;
+
+  use Venus::Mixin 'attr', 'hook';
+
+  attr 'startup';
+
+  sub BUILD {
+    my ($self, $args) = @_;
+    $self->startup('original');
+  }
+
+  hook 'after', 'build', sub {
+    my ($self) = @_;
+    $self->startup('modified');
+  };
+
+  sub EXPORT {
+    ['startup', 'BUILD']
+  }
+
+  package Consumer5;
+
+  use Venus::Class;
+
+  mixin 'Example5';
+
+  package main;
+
+  my $result = Consumer5->new->startup;
+
+  # "modified"
+
+=back
+
+=cut
+
+=head2 mask
+
+  mask(string $name) (string)
+
+The mask function creates private attribute accessors that can only be accessed
+from within the class or its subclasses. This function is exported on-demand
+unless a routine of the same name already exists.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item mask example 1
+
+  package Example;
+
+  use Venus::Mixin;
+
+  mask 'cache';
+
+  sub get_cache {
+    my ($self) = @_;
+    return $self->cache;
+  }
+
+  sub set_cache {
+    my ($self, $value) = @_;
+    $self->cache($value);
+  }
+
+  sub EXPORT {
+    ['cache', 'get_cache', 'set_cache']
+  }
+
+  package Consumer;
+
+  use Venus::Class;
+
+  mixin 'Example';
+
+  package main;
+
+  my $consumer = Consumer->new;
 
 =back
 

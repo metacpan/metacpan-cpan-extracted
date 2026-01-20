@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -52,6 +53,7 @@ method: exists
 method: first
 method: get
 method: grep
+method: head
 method: iterator
 method: intersection
 method: intersect
@@ -63,6 +65,7 @@ method: length
 method: list
 method: map
 method: merge
+method: new
 method: none
 method: one
 method: order
@@ -82,6 +85,7 @@ method: slice
 method: sort
 method: subset
 method: superset
+method: tail
 method: unique
 method: unshift
 
@@ -131,6 +135,7 @@ $test->for('inherits');
 =integrates
 
 Venus::Role::Mappable
+Venus::Role::Encaseable
 
 =cut
 
@@ -395,7 +400,7 @@ $test->for('example', 3, 'attest', sub {
 
   package main;
 
-  $set->accept('Venus::Number');
+  $set->accept('number');
 
   my $attest = $set->attest;
 
@@ -587,7 +592,7 @@ $test->for('example', 1, 'default', sub {
 =method delete
 
 The delete method returns the value of the element at the index specified after
-removing it from the array.
+removing it from the set.
 
 =signature delete
 
@@ -773,7 +778,7 @@ $test->for('example', 2, 'different', sub {
 
 =method each
 
-The each method executes a callback for each element in the array passing the
+The each method executes a callback for each element in the set passing the
 index and value as arguments. This method can return a list of values in
 list-context.
 
@@ -1772,6 +1777,85 @@ $test->for('example', 2, 'merge', sub {
   $result
 });
 
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Set)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Set;
+
+  my $new = Venus::Set->new;
+
+  # bless(..., "Venus::Set")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Set');
+  is_deeply $result->value, [];
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Set;
+
+  my $new = Venus::Set->new([1,1,2,2,3,3,4,4,5..9]);
+
+  # bless(..., "Venus::Set")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Set');
+  is_deeply $result->value, [1..9];
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Set;
+
+  my $new = Venus::Set->new(value => [1,1,2,2,3,3,4,4,5..9]);
+
+  # bless(..., "Venus::Set")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Set');
+  is_deeply $result->value, [1..9];
+
+  $result
+});
+
 =method none
 
 The none method returns true if none of the elements in the array meet the
@@ -1893,7 +1977,7 @@ returns the invocant.
 
 =signature order
 
-  order(number @indices) (Venus::Array)
+  order(number @indices) (Venus::Set)
 
 =metadata order
 
@@ -2385,14 +2469,14 @@ $test->for('example', 9, 'range', sub {
 
   my $range = $set->range('-1:8');
 
-  # [9,1..9]
+  # [9]
 
 =cut
 
 $test->for('example', 10, 'range', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is_deeply $result, [9,1..9];
+  is_deeply $result, [9];
 
   $result
 });
@@ -2425,14 +2509,14 @@ $test->for('example', 11, 'range', sub {
 
   my $range = $set->range('0:-2');
 
-  # [1..7]
+  # [1..8]
 
 =cut
 
 $test->for('example', 12, 'range', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is_deeply $result, [1..7];
+  is_deeply $result, [1..8];
 
   $result
 });

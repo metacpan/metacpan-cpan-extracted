@@ -1,3 +1,13 @@
+0.003   2026-01-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Convert image to RGB8 (so it can be used e.g. by PDF::API2).
+
+
+0.002   2026-01-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Add argument: level.
+
+
 0.001   2024-04-17  Released-By: PERLANCAR
 
         - First early release.

@@ -91,6 +91,13 @@ share {
     plugin 'Extract' => 'zip';
     plugin 'Build::CMake';
 
+    # Track which backends we're building
+    my $has_metal  = 0;
+    my $has_blas   = 0;
+    my $has_cuda   = 0;
+    my $has_vulkan = 0;
+    my $has_sycl   = 0;
+
     # Determine platform-specific build options
     my @cmake_args = (
         '-DBUILD_SHARED_LIBS=ON',
@@ -98,8 +105,43 @@ share {
         '-DGGML_BUILD_TESTS=OFF',
     );
 
+    # Check for CUDA (NVIDIA GPU)
+    my $has_cuda_sdk = (
+        -x '/usr/local/cuda/bin/nvcc' ||
+        -x '/opt/cuda/bin/nvcc' ||
+        -d '/usr/local/cuda/include'
+    );
+    if ($has_cuda_sdk) {
+        $has_cuda = 1;
+        push @cmake_args, '-DGGML_CUDA=ON';
+    }
+
+    # Check for Vulkan
+    my $has_vulkan_lib = (
+        -f '/usr/lib/x86_64-linux-gnu/libvulkan.so' ||
+        -f '/usr/lib/aarch64-linux-gnu/libvulkan.so' ||
+        -f '/usr/local/lib/libvulkan.so' ||
+        -f '/usr/lib/libvulkan.so'
+    );
+    if ($has_vulkan_lib) {
+        $has_vulkan = 1;
+        push @cmake_args, '-DGGML_VULKAN=ON';
+    }
+
+    # Check for Intel oneAPI (SYCL)
+    my $has_oneapi = (
+        -d '/opt/intel/oneapi' ||
+        -x '/opt/intel/oneapi/compiler/latest/bin/icpx'
+    );
+    if ($has_oneapi) {
+        $has_sycl = 1;
+        push @cmake_args, '-DGGML_SYCL=ON';
+    }
+
     # Platform-specific optimizations
     if ($^O eq 'darwin') {
+        $has_metal = 1;
+        $has_blas  = 1;
         push @cmake_args, (
             '-DGGML_METAL=ON',
             '-DGGML_ACCELERATE=ON',
@@ -116,6 +158,7 @@ share {
         );
 
         if ($has_openblas) {
+            $has_blas = 1;
             push @cmake_args, (
                 '-DGGML_BLAS=ON',
                 '-DGGML_BLAS_VENDOR=OpenBLAS',
@@ -134,26 +177,34 @@ share {
 
     plugin 'Gather::IsolateDynamic';
 
-    gather sub {
-        my ($build) = @_;
-        my $prefix = $build->runtime_prop->{prefix};
+    # Use after_hook to run AFTER Gather::IsolateDynamic has moved files
+    # to the dynamic/ directory. Include all backends that were enabled.
+    meta->after_hook(
+        gather_share => sub {
+            my ($build) = @_;
 
-        # Gather::IsolateDynamic moves .so/.dylib files to 'dynamic/' subdirectory
-        my $lib_path = "$prefix/dynamic";
+            my $prefix = $build->runtime_prop->{prefix};
 
-        # Detect which libraries were actually built
-        my @libs = ('-lggml');  # Core library always exists
+            # Core libraries (always built):
+            # - libggml (core/frontend)
+            # - libggml-base (base utilities)
+            # - libggml-cpu (CPU backend with ggml_graph_compute_with_ctx)
+            my @libs = ('-lggml', '-lggml-base', '-lggml-cpu');
 
-        # Check for additional ggml component libraries
-        for my $lib (qw(ggml-base ggml-cpu)) {
-            if (-f "$lib_path/lib${lib}.so" || -f "$lib_path/lib${lib}.dylib") {
-                push @libs, "-l$lib";
-            }
-        }
+            # Add optional backends that were enabled above
+            push @libs, '-lggml-metal'  if $has_metal;
+            push @libs, '-lggml-blas'   if $has_blas;
+            push @libs, '-lggml-cuda'   if $has_cuda;
+            push @libs, '-lggml-vulkan' if $has_vulkan;
+            push @libs, '-lggml-sycl'   if $has_sycl;
 
-        $build->runtime_prop->{cflags}        = "-I$prefix/include";
-        $build->runtime_prop->{cflags_static} = "-I$prefix/include";
-        $build->runtime_prop->{libs}          = "-L$lib_path " . join(' ', @libs);
-        $build->runtime_prop->{libs_static}   = "-L$lib_path " . join(' ', @libs);
-    };
+            $build->log("Setting libs to: " . join(' ', @libs));
+
+            # Set runtime properties with the FINAL prefix path
+            $build->runtime_prop->{cflags}        = "-I$prefix/include";
+            $build->runtime_prop->{cflags_static} = "-I$prefix/include";
+            $build->runtime_prop->{libs}          = "-L$prefix/dynamic " . join(' ', @libs);
+            $build->runtime_prop->{libs_static}   = "-L$prefix/dynamic " . join(' ', @libs);
+        },
+    );
 };

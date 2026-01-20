@@ -1,0 +1,86 @@
+NAME
+    Marlin::X::UndefTolerant - Marlin extension to make your constructor
+    forgive undefs.
+
+SYNOPSIS
+      package Local::Date {
+        use Types::Common 'Int';
+        use Marlin ':UndefTolerant',
+          'year?'  => Int,
+          'month?' => Int,
+          'day?'   => Int;
+      }
+  
+      my $xmas = Local::Date->new( day => 25, month => 12, year => undef );
+      $xmas->has_day;     # true
+      $xmas->has_month;   # true
+      $xmas->has_year;    # false
+
+IMPORTING THIS MODULE
+    The standard way to import Marlin extensions is to include them in the
+    list passed to `use Marlin`:
+
+      package Local::Date {
+        use Types::Common 'Int';
+        use Marlin ':UndefTolerant',
+          'year?'  => Int,
+          'month?' => Int,
+          'day?'   => Int;
+      }
+
+    It is possible to additionally load it with `use
+    Marlin::X::UndefTolerant`, which won't *do* anything, but might be useful
+    to automatic dependency analysis.
+
+      package Local::Date {
+        use Types::Common 'Int';
+        use Marlin::X::UndefTolerant;
+        use Marlin ':UndefTolerant',
+          'year?'  => Int,
+          'month?' => Int,
+          'day?'   => Int;
+      }
+
+DESCRIPTION
+    Marlin has a built-in feature for making attributes undef-tolerant. It
+    makes the constructor treat `attributename => undef` as being equivalent
+    to not passing the value to the constructor at all.
+
+    However, adding `undef_tolerant => true` to all your attributes is
+    annoying, so this extension does it for you.
+
+    You can override it on a per-attribute basis by setting `undef_tolerant =>
+    false` explicitly.
+
+    It will also skip any attributes which:
+
+    *   Are required attributes;
+
+    *   Have an `undef` init_arg; or
+
+    *   Have an explicit type constraint defined which allows `undef` as a
+        valid value (for example Maybe[Str] or Bool).
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-marlin-x-undeftolerant/issues>.
+
+SEE ALSO
+    Marlin.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2026 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+    🐟🐟
+

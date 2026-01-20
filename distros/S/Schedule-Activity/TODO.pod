@@ -2,41 +2,25 @@
 
 =head1 Overview
 
-=head2 Before 0.3.0
+=head2 Before 0.4.0
 
-The following are planned as part of the 0.3.0 release.
+The following are planned as part of the 0.4.0 release.
 
 =over
 
-=item Script incremental builds (done)
+=item (todo) Tutorial and samples extended for recent features
 
-=item Script attribute reporting (done)
+=item (todo) Script incremental build, retained materialized annotations
 
-=item Documentation rewrite (done)
+=item (todo) Attribute::Report end-of-activity values
 
-=item Goal scheduling (done)
+=item (todo) Timing multipliers per activity
 
-=item Attribute average values (done)
+=item (todo) Annotation overall closeness control
 
-=item Node filtering for average values (done)
+=item (todo) Attribute initial values via C<schedule()> and commandline
 
-=item Attribute support modulus operator (done)
-
-=item Script attribute grid for averages (done)
-
-=item Per-activity goals (done)
-
-=item Script incremental build supports configuration overwrite (done)
-
-=item Goals support attribute weighting (done)
-
-=item Automatic attributes per node (done)
-
-=item Weighted 'next' configurations (todo)
-
-=item Remove historically completed items from the list below (todo)
-
-For summarization, features below often specify availability "starting with" a version.  Documentation has been reorganized and rewritten.  Expect feature lists below to remove any completed, non-experimental items.
+=item (todo) Tension in outer scheduling step
 
 =back
 
@@ -44,37 +28,29 @@ For summarization, features below often specify availability "starting with" a v
 
 =head2 Goals
 
-Scheduling goals are available starting with 0.2.4.  Only attribute-based, average value goals seeking is planned at this time.
-
-Per-activity goals are experimental starting with 0.2.7.  Commandline support and attribute weighting is available with 0.2.8.
+Value-based goals.
 
 =head2 Attributes
 
-Attribute recomputation is supported starting with 0.2.2, primarily for merged annotation support.
-
-Attribute average values are available for goals starting with 0.2.5, which also cleaned up behavioral questions about initial average values, and averages during time overlaps.  See L<Schedule::Activity/Consistency>.
-
-Attribute reporting supports many different output formats starting in 0.2.7.
-
-Automatic per-node attributes are available with 0.2.9.  They support a configurable prefix, a script-based reporting mechanism, node filtering, and goal seeking (by y-value).
+Attribute reporting using activity boundaries.  The attribute reporting grids based on timestamp should support columns that show the values at the end of each activity.
 
 JSON output from the script is being considered, and would include JSON renderings of the attribute outputs.
 
 =head2 Node filtering
 
-Average value filtering is available starting with 0.2.5.  Floating-point modulus is available starting with 0.2.6.
+Nothing planned at this time.
 
 =head2 Annotations
 
-Annotation filtering.  Some annotations may occur before an action but not when after certain other actions.  Annotations should support node filtering for this situation.  No timeline has been established.
+Annotation filtering.  Some annotations may occur before an action but not when after certain other actions.  Annotations should support node filtering for this situation.
 
-Annotations may also benefit from a schedule-wide closeness configuration, but no timeline has been established.
+Annotations may also benefit from a schedule-wide closeness configuration.
 
 =head2 Scheduling
 
-Incremental scheduling is available in the module and from the commandline starting with 0.2.1.  Attribute recomputation is supported for materialized annotations starting with 0.2.2.  Ideally a finalized savefile could also store materialized annotations, but no timeline has been established.
+Incremental scheduling support for materialized annotations per-activity.
 
-Weighting for the C<next> array is being considered.
+Global time multiplier.  In some cases, buffer is insufficient to create an "expanded schedule".  For example, if an activity is 50% longer than configured, the usual behavior is to repeat actions.  A global time multiplier would increase tmmin/tmavg/tmmax to support stretching an activity without needing a new configuration.
 
 =head2 Tension configuration
 
@@ -82,11 +58,7 @@ Tension should also be configurable in the outer scheduling step.  This would pe
 
 =head2 Tutorial
 
-A basic tutorial and sample configuration is provided starting with 0.2.0.  It may be extended, but there is no timeline.
-
-=head2 Action limits
-
-The case C<limit=1> is not the primary/initial use case of this scheduler, but some events will likely never be repeated.  This can already be achieved by setting the attribute to zero initially, incrementing as appropriate, and then filtering.  Because there's a difference between limit-per-activity and limit-per-schedule, it's not clear that a special mechanism will be created.
+Many new features are not demonstrated in the tutorial.
 
 =head2 Slack/buffer defaults
 
@@ -98,7 +70,7 @@ No known issues at this time.
 
 =head2 Markdown
 
-Basic Markdown support is likely to change in non-backwards-compatible ways.  A written proposal might be posted to ensure support for the common use cases that would aide with faster definitions and imports.
+As part of a general review of import and export mechanisms, basic Markdown support needs updated to support some of the new features.  Some samples below suggest possible custom import functions.
 
 =head2 Sample text to speech tool
 
@@ -116,10 +88,6 @@ Fourth, this may be useful as a test generation tool.  The C<prove> command alre
 
 =head1 Functional improvements
 
-=head2 Annotation validation
-
-Annotations need better pre-scheduling validation and better separation from the main scheduling code.  Currently unclear of the best place to provide those helpers, as well as annotation-group-merging functions and the associated configurations.
-
 =head2 Slackless/Bufferless configurations
 
 Goals can never be met if slack/buffers are zero and the activity time requested doesn't exactly match action choices.  This should likely fail with an error similar to the convenience functions mentioned above.
@@ -131,5 +99,9 @@ The current mechanism is primarily for safety.  Better backtracking support shou
 =head2 Performance
 
 Both processing time and memory have been secondary considerations in initial versions.  Some optimizations are possible, particularly with rolling averages and the main scheduling algorithm.
+
+=head2 Validation
+
+There are always more checks to be performed on the configuration.
 
 =cut

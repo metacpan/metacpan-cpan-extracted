@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2008-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Listener 0.804;
+package IO::Async::Listener 0.805;
 
 use v5.14;
 use warnings;
@@ -25,6 +25,8 @@ use Carp;
 C<IO::Async::Listener> - listen on network sockets for incoming connections
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Future::AsyncAwait;
    use IO::Async::Listener;

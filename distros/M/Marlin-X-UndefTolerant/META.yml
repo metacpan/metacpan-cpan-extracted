@@ -1,0 +1,45 @@
+---
+abstract: 'Marlin extension to make your constructor forgive undefs'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test2::Plugin::BailOnFail: '0'
+  Test2::Require::AuthorTesting: '0'
+  Test2::Require::Module: '0'
+  Test2::Tools::Spec: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Marlin-X-UndefTolerant
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Marlin::X::UndefTolerant:
+    file: lib/Marlin/X/UndefTolerant.pm
+    version: '0.020000'
+requires:
+  Marlin: '0.020000'
+  Types::Common: '0'
+  perl: '5.008008'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Marlin-X-UndefTolerant/project
+  bugtracker: https://github.com/tobyink/p5-marlin-x-undeftolerant/issues
+  homepage: https://metacpan.org/release/Marlin-X-UndefTolerant
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-marlin-x-undeftolerant.git
+version: '0.020000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

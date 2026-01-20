@@ -5,17 +5,19 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Role 'with';
 
 require Scalar::Util;
-require Venus::Type;
+require Venus::What;
 
 # METHODS
 
 sub eq {
   my ($self, $data) = @_;
 
-  $data = Venus::Type->new(value => $data)->deduce;
+  $data = Venus::What->new(value => $data)->deduce;
 
   if (Scalar::Util::refaddr($self) eq Scalar::Util::refaddr($data)) {
     return true;
@@ -62,7 +64,7 @@ sub gele {
 sub gt {
   my ($self, $data) = @_;
 
-  $data = Venus::Type->new(value => $data)->deduce;
+  $data = Venus::What->new(value => $data)->deduce;
 
   if (Scalar::Util::refaddr($self) eq Scalar::Util::refaddr($data)) {
     return false;
@@ -112,7 +114,7 @@ sub is {
 sub lt {
   my ($self, $data) = @_;
 
-  $data = Venus::Type->new(value => $data)->deduce;
+  $data = Venus::What->new(value => $data)->deduce;
 
   if (Scalar::Util::refaddr($self) eq Scalar::Util::refaddr($data)) {
     return false;

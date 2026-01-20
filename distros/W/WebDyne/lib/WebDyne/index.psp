@@ -19,7 +19,9 @@
 >
 
 
-<perl handler="index">
+
+
+<perl handler="index" run="!{! !shift()->r->header('hx-request') !}">
 <header>
   <h1>Index of <span id="current-path">${path_dn}</span></h1>
   <hr>
@@ -96,8 +98,9 @@ __PERL__
 use strict;
 use File::stat;
 use File::Spec::Unix;
-use File::Basename qw(dirname);
+use File::Basename qw(dirname fileparse);
 use POSIX qw(strftime);
+use WebDyne::Constant;
 use WebDyne::Util;
 use Cwd qw(realpath);
 use IO::File;
@@ -114,16 +117,19 @@ sub source {
         return err('unable to get CGI object');
     
     
-    #  Massage to get full file name path
+    #  Massage to get full file name path and sanity check file is 
+    #  under document_root
     #
     my $srce_fn=$_{'source'} ||
         return err('no filename to display');
     my $full_dn=$self->full_dn() ||
         return err('no full_dn');
     my $path_fn=File::Spec->catfile($full_dn, $srce_fn);
-    $path_fn=$self->sanitize_path($cgi_or, $path_fn) ||
-        return err('unable to get path');
-    
+    $path_fn=$self->test_fn($path_fn) || do {
+        debug("null return from test_fn for path: $path_fn");
+        return '';
+    };
+        
 
     #  Vars we need
     #
@@ -199,12 +205,115 @@ sub source {
 }
 
 
+sub test_fn {
+
+    
+    #  Check if file type OK and path not outside root_dn
+    #
+    my ($self, $test_fn)=@_;
+    my $cgi_or=$self->CGI() ||
+         return err('unable to get CGI object');
+    my $r=$self->r() || 
+        return err('unable to get request object');
+        
+        
+    #  Return if not a real file
+    #
+    $test_fn=$self->sanitize_path($cgi_or, $test_fn) || do {
+        debug("fail, sanitize_path null return for fn: $test_fn");
+        return undef;
+    };
+        
+    
+    #  Return if extension not OK
+    #
+    my $ext=lc((fileparse($test_fn, qr/\.[^.]*/))[2]);
+    $ext=~s/^\.//;
+    unless ($WEBDYNE_MIME_TYPE_HR->{$ext} || $WEBDYNE_INDEX_EXT_ALLOWED_HR->{$ext}) {
+        debug("fail, file extenstion: $ext not supported MIME type for fn: $test_fn");
+        return undef;
+    }
+    
+    
+    #  Return if no realpath
+    #
+    unless (realpath($test_fn)) {
+        debug("fail, no realpath() for fn: $test_fn");
+        return undef;
+    }
+    
+    
+    #  No dot files, .. etc.
+    #
+    if ($test_fn=~/\/\.+/) {
+        debug("fail, not showing files with leading . for fn: $test_fn");
+        return undef;
+    }
+    if ( $test_fn=~/^\.+/) {
+        debug("fail, not showing files with multiple .. for fn: $test_fn");
+        return undef;
+    }
+    
+    
+    #  Get directory
+    #
+    my $test_dn=dirname(realpath($test_fn)) || do {
+        debug("fail, dirname not returned for fn: $test_fn");
+        return undef;
+    };
+
+
+    #  Now check not higher than document root
+    #    
+    my $root_dn=$r->document_root() || do {
+        debug('fail, root_dn not found !');
+        return undef;
+    };
+    if (!defined($test_dn) || (index($test_dn,$root_dn) !=0)) {
+        # Bad person, trying to escape
+        debug("fail, escape detected for dn: $test_dn, root_dn: $root_dn");
+        return undef;
+    }
+    elsif (-l  $test_fn) {
+        debug("fail, file is symlink for fn: $test_fn");
+        return undef;
+    }
+    elsif (! -f $test_fn) {
+        debug("fail, file not found for fn: $test_fn");
+        return undef;
+    }
+    elsif (! -r _) {
+        debug("fail, file not readable for fn: $test_fn");
+        return undef;
+    }
+    elsif (! -s _) {
+        debug('fail, file is zero size');
+        return undef;
+    }
+    elsif (! -f _) {
+        debug('fail, file is not regular file');
+        return undef;
+    }
+    else {
+        debug("returning fn: $test_fn");
+        return $test_fn if -f _;
+    }
+    
+
+    #  Fail safe
+    #
+    debug('fail, test cases not matched');
+    return undef;
+    
+}
+
+
 sub full_dn {
 
 
     #  Get the full dn of the URI location we are currently at
     #
-    my $self=shift();
+    my ($self, $path_dn)=@_;
     my $cgi_or=$self->CGI() ||
          return err('unable to get CGI object');
     my $r=$self->r() || 
@@ -214,8 +323,9 @@ sub full_dn {
     #  Where do we want to be ? Use File::Spec::Unix rather than URI, 
     #  it's not happy when we don't have a base component.
     #
-    my $path_dn=$self->sanitize_path($cgi_or, ($r->path_info() || $ENV{'PATH_INFO'})) ||
+    $path_dn ||= $self->sanitize_path($cgi_or, ($r->path_info() || $ENV{'PATH_INFO'})) ||
         return err('unable to get path');
+    debug("path_dn: $path_dn");
         
     
     #  Now get real dn and check not higher than document root

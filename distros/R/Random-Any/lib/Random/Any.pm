@@ -4,9 +4,9 @@ use strict 'subs', 'vars';
 #use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-01-07'; # DATE
+our $DATE = '2026-01-20'; # DATE
 our $DIST = 'Random-Any'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 my $warn;
 my $sub;
@@ -59,7 +59,7 @@ Random::Any - Try to use Data::Entropy::Algorithms::rand(), fallback on builtin 
 
 =head1 VERSION
 
-This document describes version 0.005 of Random::Any (from Perl distribution Random-Any), released on 2025-01-07.
+This document describes version 0.006 of Random::Any (from Perl distribution Random-Any), released on 2026-01-20.
 
 =head1 SYNOPSIS
 
@@ -75,7 +75,7 @@ available, warns to STDERR and falls back on the builtin C<rand()>.
 
 Note that whenever you can you are encouraged to use C<rand_int()> or
 C<random_int()>, or C<rand_flt()> or C<random_float()> function instead. From
-C<Data::Entropy::Algorithm>'s documentation:
+C<Data::Entropy::Algorithms>' documentation:
 
 "This function should not be used in any new code, because the kind of output
 supplied by C<rand> is hardly ever the right thing to use. The C<int(rand($n))>
@@ -142,7 +142,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

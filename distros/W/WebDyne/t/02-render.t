@@ -196,7 +196,7 @@ sub main {
                             { STYLE => 'Unified' }
                         );
                         diag("diff: $diff");
-                        exit;
+                        #exit;
                         #diag(sprintf('%s:%s', Dumper($data_live_ar, $data_thaw_ar)));
                     }
 

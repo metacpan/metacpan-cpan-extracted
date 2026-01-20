@@ -5,7 +5,11 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus;
+
+# INHERITS
 
 use base 'Venus::Core';
 
@@ -69,6 +73,56 @@ sub base {
   my $data = {map +($_,$_), @{$self->bases}};
 
   return $data->{$name} ? true : false;
+}
+
+sub mask {
+  my ($self, $name) = @_;
+
+  return 0 if !$name;
+
+  my $data = {map +($_,$_), @{$self->masks}};
+
+  return $data->{$name} ? true : false;
+}
+
+sub masks {
+  my ($self) = @_;
+
+  if ($self->{masks}) {
+    return wantarray ? (@{$self->{masks}}) : $self->{masks};
+  }
+
+  my $name = $self->{name};
+  my @masks = masks_resolver($name);
+
+  for my $base (@{$self->bases}) {
+    push @masks, masks_resolver($base);
+  }
+
+  for my $role (@{$self->roles}) {
+    push @masks, masks_resolver($role);
+  }
+
+  my %seen;
+  my $results = $self->{masks} ||= [grep !$seen{$_}++, @masks];
+
+  return wantarray ? (@$results) : $results;
+}
+
+sub masks_resolver {
+  my ($name) = @_;
+
+  no strict 'refs';
+  no warnings 'once';
+
+  if (${"${name}::META"} && $${"${name}::META"}{MASK}) {
+    return (sort {
+      $${"${name}::META"}{MASK}{$a}[0] <=> $${"${name}::META"}{MASK}{$b}[0]
+    } keys %{$${"${name}::META"}{MASK}});
+  }
+  else {
+    return ();
+  }
 }
 
 sub bases {
@@ -144,7 +198,7 @@ sub local {
 
   no strict 'refs';
 
-  return if !int grep $type eq $_, qw(attrs bases mixins roles subs);
+  return if !int grep $type eq $_, qw(attrs bases masks mixins roles subs);
 
   my $function = "${type}_resolver";
 
@@ -384,6 +438,8 @@ Class Metadata for Perl 5
 
   use Venus::Role;
 
+  mask 'auth_token';
+
   sub authenticate {
     return true;
   }
@@ -397,7 +453,7 @@ Class Metadata for Perl 5
 
   sub EXPORT {
     # explicitly declare routines to be consumed
-    ['authenticate']
+    ['auth_token', 'authenticate']
   }
 
   package Novice;
@@ -736,7 +792,7 @@ I<Since C<1.02>>
 
 The local method returns the names of properties defined in the package
 directly (not inherited) for the property type specified. The C<$type> provided
-can be either C<attrs>, C<bases>, C<roles>, or C<subs>.
+can be either C<attrs>, C<bases>, C<masks>, C<roles>, or C<subs>.
 
 I<Since C<1.02>>
 
@@ -794,6 +850,7 @@ I<Since C<1.02>>
 
   # [
   #   'attr',
+  #   'auth_token',
   #   'authenticate',
   #   'base',
   #   'email',
@@ -806,6 +863,70 @@ I<Since C<1.02>>
   #   'valid',
   #   'with',
   # ]
+
+=back
+
+=cut
+
+=head2 mask
+
+  mask(string $name) (boolean)
+
+The mask method returns true or false if the package referenced has the
+private attribute accessor named.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item mask example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $mask = $meta->mask('auth_token');
+
+  # 1
+
+=back
+
+=over 4
+
+=item mask example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $mask = $meta->mask('username');
+
+  # 0
+
+=back
+
+=cut
+
+=head2 masks
+
+  masks() (arrayref)
+
+The masks method returns all of the private attributes composed into the
+package referenced.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item masks example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $masks = $meta->masks;
+
+  # ['auth_token']
 
 =back
 

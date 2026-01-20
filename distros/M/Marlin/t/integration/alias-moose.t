@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Tests Marlin::XAttribute::Alias works with Moose.
+Tests aliases work with Moose.
 
 =head1 AUTHOR
 
@@ -26,7 +26,7 @@ use Data::Dumper;
 
 {
 	package Local::Foo1;
-	use Marlin foo => { ':Alias' => 'bar' };
+	use Marlin foo => { alias => 'bar' };
 }
 
 {

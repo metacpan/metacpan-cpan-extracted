@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter::Rinci qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-04-17'; # DATE
+our $DATE = '2026-01-20'; # DATE
 our $DIST = 'QRCode-Any'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $known_formats = [qw/png/]; # TODO: html, txt
 my $sch_format = ['str', in=>$known_formats, default=>'png'];
@@ -68,28 +68,41 @@ MARKDOWN
             schema => 'filename*',
             req => 1,
         },
+        level => {
+            summary => 'Error correction level',
+            schema => ['str*', in=>[qw/L M Q H/]],
+            default => 'M',
+        },
     },
 };
 sub encode_qrcode {
     my %args = @_;
     my $format = $args{format} // 'png';
+    my $level  = $args{level} // 'M';
 
     if ($format eq 'png') {
+        require Imager;
         require Imager::QRCode;
         my $qrcode = Imager::QRCode->new(
             size          => 5,
             margin        => 2,
             version       => 1,
-            level         => 'M',
+            level         => $level,
             casesensitive => 1,
             lightcolor    => Imager::Color->new(255, 255, 255),
             darkcolor     => Imager::Color->new(0, 0, 0),
         );
+
+        # generates rub-through image
         my $img = $qrcode->plot($args{text});
+
+        my $conv_img = $img->to_rgb8
+            or die "converting with to_rgb8() failed: " . Imager->errstr;
+
         my $filename = $args{filename};
         $filename .= ".png" unless $filename =~ /\.png\z/;
-        $img->write(file => $filename)
-            or return [500,  "Failed to write to file `$filename`: " . $img->errstr];
+        $conv_img->write(file => $filename)
+            or return [500,  "Failed to write to file `$filename`: " . $conv_img->errstr];
         [200, "OK", undef, {"func.filename"=>$filename}];
     } else {
         [501, "Unsupported format '$format'"];
@@ -111,7 +124,7 @@ QRCode::Any - Common interface to QRCode functions
 
 =head1 VERSION
 
-This document describes version 0.001 of QRCode::Any (from Perl distribution QRCode-Any), released on 2024-04-17.
+This document describes version 0.003 of QRCode::Any (from Perl distribution QRCode-Any), released on 2026-01-20.
 
 =head1 DESCRIPTION
 
@@ -147,6 +160,10 @@ The default, when left undef, is C<png>.
 =item * B<format_args> => I<hash>
 
 Format-specific arguments.
+
+=item * B<level> => I<str> (default: "M")
+
+Error correction level.
 
 =item * B<text>* => I<str>
 
@@ -198,7 +215,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

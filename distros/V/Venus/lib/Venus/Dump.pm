@@ -5,20 +5,28 @@ use 5.018;
 use strict;
 use warnings;
 
-use overload (
-  '""' => 'explain',
-  '~~' => 'explain',
-  fallback => 1,
-);
+# IMPORTS
 
 use Venus::Class 'attr', 'base', 'with';
 
+# INHERITS
+
 base 'Venus::Kind::Utility';
+
+# INTEGRATES
 
 with 'Venus::Role::Valuable';
 with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 with 'Venus::Role::Explainable';
+
+# OVERLOADS
+
+use overload (
+  '""' => 'explain',
+  '~~' => 'explain',
+  fallback => 1,
+);
 
 # ATTRIBUTES
 
@@ -85,16 +93,6 @@ sub build_self {
 }
 
 # METHODS
-
-sub assertion {
-  my ($self) = @_;
-
-  my $assert = $self->SUPER::assertion;
-
-  $assert->clear->expression('hashref');
-
-  return $assert;
-}
 
 sub decode {
   my ($self, $data) = @_;
@@ -294,6 +292,58 @@ I<Since C<0.01>>
   my $encode = $dump->encode;
 
   # '{name => ["Ready","Robot"], stable => !!1, version => "0.12"}'
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Dump)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Dump;
+
+  my $new = Venus::Dump->new;
+
+  # bless(..., "Venus::Dump")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Dump;
+
+  my $new = Venus::Dump->new({password => 'secret'});
+
+  # bless(..., "Venus::Dump")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Dump;
+
+  my $new = Venus::Dump->new(value => {password => 'secret'});
+
+  # bless(..., "Venus::Dump")
 
 =back
 

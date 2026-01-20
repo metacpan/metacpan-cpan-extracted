@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2007-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Test 0.804;
+package IO::Async::Test 0.805;
 
 use v5.14;
 use warnings;
@@ -21,6 +21,8 @@ our @EXPORT = qw(
 C<IO::Async::Test> - utility functions for use in test scripts
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Test2::V0;
    use Future::AsyncAwait;

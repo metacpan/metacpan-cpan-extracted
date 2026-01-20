@@ -3,27 +3,6 @@ Upstream-Name: Marlin
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Marlin
 
-Files: t/00start.t
- t/01basic.t
- t/integration/alias.t
- t/integration/comparison-example.t
- t/integration/complex-constructor.t
- t/integration/constant.t
- t/integration/destructors.t
- t/integration/localwriter.t
- t/integration/lvalues.t
- t/integration/moo-inherit-reversed.t
- t/integration/moo-inherit.t
- t/integration/moose-inherit-reversed.t
- t/integration/moose-inherit.t
- t/integration/plugin.t
- t/integration/roles.t
- t/integration/storage.t
- t/integration/struct.t
- t/integration/triggers.t
-Copyright: This software is copyright (c) 2025 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: Changes
  META.json
  META.yml
@@ -60,17 +39,31 @@ Files: INSTALL
  examples/test.pl
  t/.mite/config
  t/integration/pad-inherit.skip
- t/integration/undef-tolerant.pl
 Copyright: Unknown
 License: Unknown
 
+Files: t/00start.t
+ t/01basic.t
+ t/integration/comparison-example.t
+ t/integration/complex-constructor.t
+ t/integration/constant.t
+ t/integration/destructors.t
+ t/integration/moo-inherit-reversed.t
+ t/integration/moo-inherit.t
+ t/integration/moose-inherit-reversed.t
+ t/integration/moose-inherit.t
+ t/integration/roles.t
+ t/integration/storage.t
+ t/integration/struct.t
+ t/integration/triggers.t
+Copyright: This software is copyright (c) 2025 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: lib/Marlin/X.pm
- lib/Marlin/X/UndefTolerant.pm
  lib/MooX/Marlin.pm
  lib/MooseX/Marlin.pm
  t/integration/alias-moose.t
  t/integration/ct-inherit.t
- t/integration/lvalues-moose.t
  t/integration/mite-inherit.t
  t/integration/mouse-inherit.t
  t/integration/roles2.t
@@ -85,10 +78,7 @@ Files: README
  lib/Marlin/Role.pm
  lib/Marlin/Struct.pm
  lib/Marlin/Util.pm
- lib/Marlin/X/Clone.pm
- lib/Marlin/XAttribute/Alias.pm
- lib/Marlin/XAttribute/LocalWriter.pm
- lib/Marlin/XAttribute/Lvalue.pm
+ t/integration/alias.t
 Copyright: This software is copyright (c) 2025-2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 

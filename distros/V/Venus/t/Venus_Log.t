@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -42,6 +43,7 @@ method: fatal
 method: info
 method: input
 method: output
+method: new
 method: string
 method: trace
 method: warn

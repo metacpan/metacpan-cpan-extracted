@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-04-18'; # DATE
+our $DATE = '2026-01-20'; # DATE
 our $DIST = 'App-QRCodeUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/QRCodeUtils/gen_qrcode",
@@ -38,7 +38,7 @@ gen-qrcode - Generate QR Code and by default show it (or save it to a file)
 
 =head1 VERSION
 
-This document describes version 0.004 of gen-qrcode (from Perl distribution App-QRCodeUtils), released on 2024-04-18.
+This document describes version 0.005 of gen-qrcode (from Perl distribution App-QRCodeUtils), released on 2026-01-20.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ B<gen-qrcode> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L
 
 B<gen-qrcode> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<gen-qrcode> [B<L<--format-arg|/"--format-arg=s">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<text|/"--text=s*">>E<gt> [I<L<filename|/"--filename=s">>]
+B<gen-qrcode> [B<L<--format-arg|/"--format-arg=s">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--level|/"--level=s">>=I<str>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<text|/"--text=s*">>E<gt> [I<L<filename|/"--filename=s">>]
 
 =head1 OPTIONS
 
@@ -73,6 +73,18 @@ Default value:
 Valid values:
 
  ["png","html","txt"]
+
+=item B<--level>=I<s>
+
+Error correction level.
+
+Default value:
+
+ "M"
+
+Valid values:
+
+ ["L","M","Q","H"]
 
 =item B<--text>=I<s>*
 
@@ -225,7 +237,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2021, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

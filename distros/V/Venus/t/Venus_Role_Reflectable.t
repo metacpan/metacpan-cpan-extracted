@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -37,10 +38,11 @@ $test->for('abstract');
 =includes
 
 method: class
+method: clone
 method: meta
 method: reify
 method: space
-method: type
+method: what
 
 =cut
 
@@ -112,6 +114,45 @@ $test->for('example', 1, 'class', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result eq "Example";
+
+  $result
+});
+
+=method clone
+
+The clone method clones the invocant and returns the result.
+
+=signature clone
+
+  clone() (object)
+
+=metadata clone
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 clone
+
+  # given: synopsis
+
+  package main;
+
+  my $clone = $example->clone;
+
+  # bless(..., "Example")
+
+=cut
+
+$test->for('example', 1, 'clone', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa("Example");
+
+  require Scalar::Util;
+  isnt Scalar::Util::refaddr($result), Scalar::Util::refaddr($result->clone);
 
   $result
 });
@@ -257,54 +298,54 @@ $test->for('example', 1, 'space', sub {
   $result
 });
 
-=method type
+=method what
 
-The type method dispatches the method call or executes the callback and returns
-the result as a L<Venus::Type> object.
+The what method dispatches the method call or executes the callback and returns
+the result as a L<Venus::What> object.
 
-=signature type
+=signature what
 
-  type(string | coderef $code, any @args) (Venus::Type)
+  what(string | coderef $code, any @args) (Venus::What)
 
-=metadata type
+=metadata what
 
 {
   since => '0.01',
 }
 
-=example-1 type
+=example-1 what
 
   # given: synopsis;
 
-  my $type = $example->type;
+  my $what = $example->what;
 
-  # bless({ value => bless({}, "Example") }, "Venus::Type")
+  # bless({ value => bless({}, "Example") }, "Venus::What")
 
 =cut
 
-$test->for('example', 1, 'type', sub {
+$test->for('example', 1, 'what', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result->isa('Venus::Type');
+  ok $result->isa('Venus::What');
   ok $result->value->isa('Example');
 
   $result
 });
 
-=example-2 type
+=example-2 what
 
   # given: synopsis;
 
-  my $type = $example->type('class');
+  my $what = $example->what('class');
 
-  # bless({ value => "Example" }, "Venus::Type")
+  # bless({ value => "Example" }, "Venus::What")
 
 =cut
 
-$test->for('example', 2, 'type', sub {
+$test->for('example', 2, 'what', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result->isa('Venus::Type');
+  ok $result->isa('Venus::What');
   ok $result->value eq 'Example';
 
   $result

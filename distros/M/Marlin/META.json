@@ -43,7 +43,6 @@
             "Class::XSConstructor" : "0.021000",
             "Clone" : "0",
             "Exporter::Tiny" : "1.006002",
-            "LV" : "0",
             "List::Util" : "1.45",
             "Role::Tiny" : "0",
             "Sub::Accessor::Small" : "1.000003",
@@ -70,11 +69,11 @@
    "provides" : {
       "Marlin" : {
          "file" : "lib/Marlin.pm",
-         "version" : "0.016000"
+         "version" : "0.020000"
       },
       "Marlin::Attribute" : {
          "file" : "lib/Marlin/Attribute.pm",
-         "version" : "0.016000"
+         "version" : "0.020000"
       },
       "Marlin::Attribute::NONE" : {
          "file" : "lib/Marlin/Attribute.pm"
@@ -84,47 +83,27 @@
       },
       "Marlin::Role" : {
          "file" : "lib/Marlin/Role.pm",
-         "version" : "0.016000"
+         "version" : "0.020000"
       },
       "Marlin::Struct" : {
          "file" : "lib/Marlin/Struct.pm",
-         "version" : "0.016000"
+         "version" : "0.020000"
       },
       "Marlin::TypeConstraint" : {
          "file" : "lib/Marlin/TypeConstraint.pm",
-         "version" : "0.016000"
+         "version" : "0.020000"
       },
       "Marlin::Util" : {
          "file" : "lib/Marlin/Util.pm",
-         "version" : "0.016000"
+         "version" : "0.020000"
       },
       "Marlin::X" : {
          "file" : "lib/Marlin/X.pm",
-         "version" : "0.016000"
-      },
-      "Marlin::X::Clone" : {
-         "file" : "lib/Marlin/X/Clone.pm",
-         "version" : "0.016000"
-      },
-      "Marlin::X::UndefTolerant" : {
-         "file" : "lib/Marlin/X/UndefTolerant.pm",
-         "version" : "0.016000"
-      },
-      "Marlin::XAttribute::Alias" : {
-         "file" : "lib/Marlin/XAttribute/Alias.pm",
-         "version" : "0.016000"
-      },
-      "Marlin::XAttribute::LocalWriter" : {
-         "file" : "lib/Marlin/XAttribute/LocalWriter.pm",
-         "version" : "0.016000"
-      },
-      "Marlin::XAttribute::Lvalue" : {
-         "file" : "lib/Marlin/XAttribute/Lvalue.pm",
-         "version" : "0.016000"
+         "version" : "0.020000"
       },
       "MooseX::Marlin" : {
          "file" : "lib/MooseX/Marlin.pm",
-         "version" : "0.016000"
+         "version" : "0.020000"
       }
    },
    "release_status" : "stable",
@@ -143,6 +122,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Marlin/project"
    },
-   "version" : "0.016000",
+   "version" : "0.020000",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

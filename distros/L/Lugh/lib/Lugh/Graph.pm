@@ -2,18 +2,21 @@ package Lugh::Graph;
 
 use strict;
 use warnings;
+use Lugh;
 
 =head1 NAME
 
 Lugh::Graph - Computation Graph for Tensor Operations
 
+=encoding utf8
+
 =head1 VERSION
 
-Version 0.01
+Version 0.08
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 

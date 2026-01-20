@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -51,6 +52,7 @@ method: last
 method: list
 method: move
 method: name
+method: new
 method: one
 method: reset
 method: set
@@ -308,7 +310,7 @@ $test->for('example', 1, 'array', sub {
 =method cast
 
 The cast method processes the selected arguments, passing each value to the
-class name specified, or the L<Venus::Type/cast> method, and returns results.
+class name specified, or the L<Venus::What/cast> method, and returns results.
 
 =signature cast
 
@@ -1190,6 +1192,63 @@ $test->for('example', 2, 'name', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Unpack');
   ok $result->{name} eq 'example';
+
+  $result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Unpack)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Unpack;
+
+  my $new = Venus::Unpack->new;
+
+  # bless(..., "Venus::Unpack")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Unpack');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Unpack;
+
+  my $new = Venus::Unpack->new(args => ["hello", 123, 1.23]);
+
+  # bless(..., "Venus::Unpack")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Unpack');
+  is_deeply $result->{args}, ["hello", 123, 1.23];
 
   $result
 });

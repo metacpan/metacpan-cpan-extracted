@@ -26,7 +26,7 @@ do {
 			package Local::Bar2;
 			use Marlin
 				-base => 'Local::Foo',
-				bar   => { ':Alias' => "foo" };
+				bar   => { alias => "foo" };
 		};
 		$@;
 	};

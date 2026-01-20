@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'attr', 'base', 'with';
 
+# INHERITS
+
 base 'Venus::Kind::Utility';
+
+# INTEGRATES
 
 with 'Venus::Role::Buildable';
 
@@ -16,12 +22,6 @@ with 'Venus::Role::Buildable';
 state $FULFILLED = 'fulfilled';
 state $PENDING = 'pending';
 state $REJECTED = 'rejected';
-
-# HOOKS
-
-sub _time {
-  CORE::time();
-}
 
 # BUILDERS
 
@@ -49,6 +49,12 @@ sub build_self {
   $self->reject($result) if UNIVERSAL::isa($result, 'Venus::Error');
 
   return $self;
+}
+
+# HOOKS
+
+sub _time {
+  CORE::time();
 }
 
 # METHODS
@@ -527,7 +533,7 @@ sub wait {
       last if $seen = $self->fulfill;
     }
     if (!$seen) {
-      $self->error({throw => 'error_on_timeout', timeout => $timeout});
+      $self->error_on_timeout({timeout => $timeout})->throw;
     }
   }
   else {
@@ -544,20 +550,17 @@ sub wait {
 sub error_on_timeout {
   my ($self, $data) = @_;
 
+  my $error = $self->error->sysinfo;
+
   my $message = 'Future timed-out after {{timeout}} seconds';
 
-  my $stash = {
-    timeout => $data->{timeout},
-  };
+  $error->name('on.timeout');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
 
-  my $result = {
-    name => 'on.timeout',
-    raise => true,
-    stash => $stash,
-    message => $message,
-  };
-
-  return $result;
+  return $error;
 }
 
 1;
@@ -2017,44 +2020,24 @@ I<Since C<3.55>>
 
 =back
 
-=cut
-
-=head1 ERRORS
-
-This package may raise the following errors:
-
-=cut
-
 =over 4
 
-=item error: C<error_on_timeout>
-
-This package may raise an error_on_timeout exception.
-
-B<example 1>
+=item B<may raise> L<Venus::Future::Error> C<on.timeout>
 
   # given: synopsis;
 
-  my $input = {
-    throw => 'error_on_timeout',
-    timeout => 10,
-  };
+  $future->promise(sub{
+    my ($resolve, $reject) = @_;
+    # never fulfilled
+  });
 
-  my $error = $future->try('error', $input)->error->result;
+  $future->wait(0);
 
-  # my $name = $error->name;
-
-  # "on_timeout"
-
-  # my $message = $error->render;
-
-  # "Future timed-out after 10 seconds"
-
-  # my $timeout = $error->stash('timeout');
-
-  # 10
+  # Error! (on.timeout)
 
 =back
+
+=cut
 
 =head1 AUTHORS
 

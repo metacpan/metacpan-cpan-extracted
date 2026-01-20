@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 use Venus 'catch';
 
@@ -44,6 +45,7 @@ method: clear
 method: eval
 method: evaler
 method: format
+method: new
 method: result
 
 =cut
@@ -570,6 +572,42 @@ $test->for('example', 1, 'format', sub {
   is $result->eval(1), 1;
   is $result->eval(-1), -1;
   is $result->eval(123.45), 123;
+
+  $result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Coercion)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Coercion;
+
+  my $new = Venus::Coercion->new;
+
+  # bless(..., "Venus::Coercion")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Coercion');
 
   $result
 });

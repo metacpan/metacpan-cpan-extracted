@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Protocol::LineStream 0.804;
+package IO::Async::Protocol::LineStream 0.805;
 
 use v5.14;
 use warnings;
@@ -18,6 +18,8 @@ C<IO::Async::Protocol::LineStream> - stream-based protocols using lines of
 text
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
 Most likely this class will be subclassed to implement a particular network
 protocol.

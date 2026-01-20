@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2012-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Routine 0.804;
+package IO::Async::Routine 0.805;
 
 use v5.14;
 use warnings;
@@ -22,6 +22,8 @@ use Struct::Dumb qw( readonly_struct );
 C<IO::Async::Routine> - execute code in an independent sub-process or thread
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use IO::Async::Routine;
    use IO::Async::Channel;

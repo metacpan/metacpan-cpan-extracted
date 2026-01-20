@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -66,6 +67,7 @@ method: lt
 method: mod
 method: multi
 method: ne
+method: new
 method: neg
 method: numified
 method: pow
@@ -3202,6 +3204,84 @@ $test->for('example', 9, 'ne', sub {
   is $result, 0;
 
   !$result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Number)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Number;
+
+  my $new = Venus::Number->new;
+
+  # bless(..., "Venus::Number")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Number');
+
+  !$result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Number;
+
+  my $new = Venus::Number->new(1_000);
+
+  # bless(..., "Venus::Number")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Number');
+  is $result->value, 1_000;
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Number;
+
+  my $new = Venus::Number->new(value => 1_000);
+
+  # bless(..., "Venus::Number")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Number');
+  is $result->value, 1_000;
+
+  $result
 });
 
 =method neg

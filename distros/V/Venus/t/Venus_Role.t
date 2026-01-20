@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -36,12 +37,18 @@ $test->for('abstract');
 
 =includes
 
+function: after
+function: around
 function: attr
 function: base
+function: before
 function: catch
 function: error
 function: false
 function: from
+function: handle
+function: hook
+function: mask
 function: mixin
 function: raise
 function: role
@@ -165,6 +172,134 @@ automatically by the L<"test"|Venus::Class/test> function.
 
 $test->for('description');
 
+=function after
+
+The after function installs a method modifier that executes after the original
+method, allowing you to perform actions after a method call. B<Note:> The
+return value of the modifier routine is ignored; the wrapped method always
+returns the value from the original method. Modifiers are executed in the order
+they are stacked. This function is only exported when requested.
+
+=signature after
+
+  after(string $name, coderef $code) (coderef)
+
+=metadata after
+
+{
+  since => '4.15',
+}
+
+=example-1 after
+
+  package Example1;
+
+  use Venus::Role 'after', 'attr';
+
+  attr 'calls';
+
+  sub BUILD {
+    my ($self) = @_;
+    $self->calls([]);
+  }
+
+  sub execute {
+    my ($self) = @_;
+    push @{$self->calls}, 'original';
+    return 'original';
+  }
+
+  after 'execute', sub {
+    my ($self) = @_;
+    push @{$self->calls}, 'after';
+    return 'ignored';
+  };
+
+  sub EXPORT {
+    ['execute', 'calls', 'BUILD']
+  }
+
+  package Consumer;
+
+  use Venus::Class;
+
+  with 'Example1';
+
+  package main;
+
+  my $example = Consumer->new;
+  my $result = $example->execute;
+
+  # "original"
+
+=cut
+
+$test->for('example', 1, 'after', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 'original';
+
+  $result
+});
+
+=function around
+
+The around function installs a method modifier that wraps around the original
+method. The callback provided will recieve the original routine as its first
+argument. This function is only exported when requested.
+
+=signature around
+
+  around(string $name, coderef $code) (coderef)
+
+=metadata around
+
+{
+  since => '4.15',
+}
+
+=example-1 around
+
+  package Example2;
+
+  use Venus::Role 'around', 'attr';
+
+  sub process {
+    my ($self, $value) = @_;
+    return $value;
+  }
+
+  around 'process', sub {
+    my ($orig, $self, $value) = @_;
+    return $self->$orig($value) * 2;
+  };
+
+  sub EXPORT {
+    ['process']
+  }
+
+  package Consumer2;
+
+  use Venus::Class;
+
+  with 'Example2';
+
+  package main;
+
+  my $result = Consumer2->new->process(5);
+
+  # 10
+
+=cut
+
+$test->for('example', 1, 'around', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 10;
+
+  $result
+});
+
 =function attr
 
 The attr function creates attribute accessors for the calling package. This
@@ -202,6 +337,79 @@ $test->for('example', 1, 'attr', sub {
   ok $object->name eq 'example';
   $object = $result->new({name => 'example'});
   ok $object->name eq 'example';
+
+  $result
+});
+
+=function before
+
+The before function installs a method modifier that executes before the
+original method, allowing you to perform actions before a method call. B<Note:>
+The return value of the modifier routine is ignored; the wrapped method always
+returns the value from the original method. Modifiers are executed in the order
+they are stacked. This function is only exported when requested.
+
+=signature before
+
+  before(string $name, coderef $code) (coderef)
+
+=metadata before
+
+{
+  since => '4.15',
+}
+
+=example-1 before
+
+  package Example3;
+
+  use Venus::Role 'attr', 'before';
+
+  attr 'calls';
+
+  sub perform {
+    my ($self) = @_;
+    push @{$self->calls}, 'original';
+    return $self;
+  }
+
+  before 'perform', sub {
+    my ($self) = @_;
+    push @{$self->calls}, 'before';
+    return $self;
+  };
+
+  sub EXPORT {
+    ['perform']
+  }
+
+  package Consumer3;
+
+  use Venus::Class;
+
+  attr 'calls';
+
+  sub BUILD {
+    my ($self) = @_;
+    $self->calls([]);
+  }
+
+  with 'Example3';
+
+  package main;
+
+  my $example = Consumer3->new;
+  $example->perform;
+  my $calls = $example->calls;
+
+  # ['before', 'original']
+
+=cut
+
+$test->for('example', 1, 'before', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ['before', 'original'];
 
   $result
 });
@@ -478,6 +686,165 @@ $test->for('example', 1, 'from', sub {
   ok $result->does('Entity');
   ok $result->can('startup');
   ok $result->can('shutdown');
+
+  $result
+});
+
+=function handle
+
+The handle function installs a method modifier that wraps a method, providing
+low-level control. The callback provided will recieve the original routine as
+its first argument (or C<undef> if the source routine doesn't exist). This
+function is only exported when requested.
+
+=signature handle
+
+  handle(string $name, coderef $code) (coderef)
+
+=metadata handle
+
+{
+  since => '4.15',
+}
+
+=example-1 handle
+
+  package Example4;
+
+  use Venus::Role 'handle';
+
+  sub compute {
+    my ($self, $value) = @_;
+    return $value;
+  }
+
+  handle 'compute', sub {
+    my ($orig, $self, $value) = @_;
+    return $orig ? $self->$orig($value * 2) : 0;
+  };
+
+  sub EXPORT {
+    ['compute']
+  }
+
+  package Consumer4;
+
+  use Venus::Class;
+
+  with 'Example4';
+
+  package main;
+
+  my $result = Consumer4->new->compute(5);
+
+  # 10
+
+=cut
+
+$test->for('example', 1, 'handle', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 10;
+
+  $result
+});
+
+=function hook
+
+The hook function installs a method modifier on a lifecycle hook method. The
+first argument is the type of modifier desired, e.g., L</before>, L</after>,
+L</around>, and the callback provided will recieve the original routine as its
+first argument. This function is only exported when requested.
+
+=signature hook
+
+  hook(string $type, string $name, coderef $code) (coderef)
+
+=metadata hook
+
+{
+  since => '4.15',
+}
+
+=example-1 hook
+
+  package Example5;
+
+  use Venus::Role 'attr', 'hook';
+
+  attr 'startup';
+
+  sub BUILD {
+    my ($self, $args) = @_;
+    $self->startup('original');
+  }
+
+  hook 'after', 'build', sub {
+    my ($self) = @_;
+    $self->startup('modified');
+  };
+
+  sub EXPORT {
+    ['startup', 'BUILD']
+  }
+
+  package Consumer5;
+
+  use Venus::Class;
+
+  with 'Example5';
+
+  package main;
+
+  my $result = Consumer5->new->startup;
+
+  # "modified"
+
+=cut
+
+$test->for('example', 1, 'hook', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 'modified';
+
+  $result
+});
+
+=function mask
+
+The mask function creates private attribute accessors that can only be accessed
+from within the class or its subclasses. This function is exported on-demand
+unless a routine of the same name already exists.
+
+=signature mask
+
+  mask(string $name) (string)
+
+=metadata mask
+
+{
+  since => '4.15',
+}
+
+=example-1 mask
+
+  package Example;
+
+  use Venus::Class;
+
+  mask 'secret';
+
+  # "Example"
+
+=cut
+
+$test->for('example', 1, 'mask', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->can('name');
+  my $object = $result->new;
+  like do {eval {$object->secret}; $@},
+    qr/private variable/, 'mask from role prevents external access';
 
   $result
 });

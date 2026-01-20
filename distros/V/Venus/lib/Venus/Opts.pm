@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'attr', 'base', 'with';
 
+# INHERITS
+
 base 'Venus::Kind::Utility';
+
+# INTEGRATES
 
 with 'Venus::Role::Valuable';
 with 'Venus::Role::Buildable';
@@ -56,16 +62,6 @@ sub build_proxy {
 }
 
 # METHODS
-
-sub assertion {
-  my ($self) = @_;
-
-  my $assert = $self->SUPER::assertion;
-
-  $assert->clear->expression('arrayref');
-
-  return $assert;
-}
 
 sub default {
   my ($self) = @_;
@@ -461,6 +457,62 @@ I<Since C<0.01>>
   my $name = $opts->name('resources');
 
   # undef
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Opts)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Opts;
+
+  my $new = Venus::Opts->new;
+
+  # bless(..., "Venus::Opts")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Opts;
+
+  my $new = Venus::Opts->new(
+    ['--resource', 'users', '--help'],
+  );
+
+  # bless(..., "Venus::Opts")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Opts;
+
+  my $new = Venus::Opts->new(
+    value => ['--resource', 'users', '--help'],
+  );
+
+  # bless(..., "Venus::Opts")
 
 =back
 

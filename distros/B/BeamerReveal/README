@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 20260111.1557
+    version 20260119.1636
 
 SYNOPSIS
 
@@ -41,6 +41,21 @@ OPTIONS
     --man | -m
 
       prints manual page on standard output
+
+    --output-directory | -o
+
+      target directory where the reveal html files will end up in. Defaults
+      to '.'.
+
+    --aux-directory | -a
+
+      directory where the rvl file (and other auxiliary files) will be read
+      from. Defaults to the pdf-directory.
+
+    --pdf-directory | -p
+
+      directory where the PDF file of your beamer-presentation is stored.
+      Defaults to '.'.
 
 ARGUMENT
 

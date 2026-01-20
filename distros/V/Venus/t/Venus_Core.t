@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -43,7 +44,10 @@ method: base
 method: bless
 method: build
 method: buildargs
+method: clone
+method: construct
 method: data
+method: deconstruct
 method: destroy
 method: does
 method: export
@@ -51,6 +55,7 @@ method: from
 method: get
 method: import
 method: item
+method: mask
 method: meta
 method: mixin
 method: name
@@ -58,6 +63,7 @@ method: role
 method: set
 method: subs
 method: test
+method: use
 method: unimport
 
 =cut
@@ -796,6 +802,181 @@ $test->for('example', 1, 'buildargs', sub {
   $result
 });
 
+=method clone
+
+The CLONE method is an object construction lifecycle hook that returns a deep
+clone of the invocant. The invocant must be blessed, meaning that the method
+only applies to objects that are instances of a package. If the invocant is not
+blessed, an exception will be raised. This method uses deep cloning to create
+an independent copy of the object, including any private instance data, nested
+structures or references within the object.
+
+=signature clone
+
+  clone() (object)
+
+=metadata clone
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 clone
+
+  package User;
+
+  use base 'Venus::Core';
+
+  package main;
+
+  my $user = User->BLESS('Elliot');
+
+  my $clone = $user->CLONE;
+
+  # bless({name => 'Elliot'}, 'User')
+
+=cut
+
+$test->for('example', 1, 'clone', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('User');
+  my $clone = $result->CLONE;
+  is $result->{name}, $clone->{name};
+  require Scalar::Util;
+  isnt Scalar::Util::refaddr($result), Scalar::Util::refaddr($clone);
+
+  $result
+});
+
+=example-2 clone
+
+  package User;
+
+  use base 'Venus::Core';
+
+  package main;
+
+  my $user = User->BLESS('Elliot');
+
+  my $clone = User->CLONE;
+
+  # Exception! "Can't clone without an instance of \"User\""
+
+=cut
+
+$test->for('example', 2, 'clone', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->fault->result;
+  ok $result->isa('Venus::Fault');
+  is $result->{message}, "Can't clone without an instance of \"User\"";
+
+  $result
+});
+
+=example-3 clone
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->MASK('password');
+
+  sub get_password {
+    my ($self) = @_;
+
+    $self->password;
+  }
+
+  sub set_password {
+    my ($self) = @_;
+
+    $self->password('secret');
+  }
+
+  package main;
+
+  my $user = User->BLESS('Elliot');
+
+  $user->set_password;
+
+  my $clone = $user->CLONE;
+
+  # bless({name => 'Elliot'}, 'User')
+
+=cut
+
+$test->for('example', 3, 'clone', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('User');
+  ok int(keys(%$result)) == 1;
+  ok $result->{name} eq 'Elliot';
+  my $clone = $result->CLONE;
+  is $result->{name}, $clone->{name};
+  require Scalar::Util;
+  isnt Scalar::Util::refaddr($result), Scalar::Util::refaddr($clone);
+  is $clone->get_password, 'secret';
+
+  $result
+});
+
+=method construct
+
+The CONSTRUCT method is an object construction lifecycle hook that is
+automatically called after the L</BLESS> method, without any arguments. It is
+intended to prepare the instance for usage, separate from the build process,
+allowing for any setup or post-processing needed after the object has been
+blessed. This method's return value is not used in any subsequent processing,
+so its primary purpose is side effects or additional setup.
+
+=signature construct
+
+  construct() (any)
+
+=metadata construct
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 construct
+
+  package User;
+
+  use base 'Venus::Core';
+
+  sub CONSTRUCT {
+    my ($self) = @_;
+
+    $self->{ready} = 1;
+
+    return $self;
+  }
+
+  package main;
+
+  my $user = User->BLESS('Elliot');
+
+  # bless({name => 'Elliot', ready => 1}, 'User')
+
+=cut
+
+$test->for('example', 1, 'construct', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('User');
+  ok int(keys(%$result)) == 2;
+  ok $result->{name} eq 'Elliot';
+  ok $result->{ready} eq 1;
+
+  $result
+});
+
 =method data
 
 The DATA method is an object construction lifecycle hook which returns the
@@ -867,6 +1048,69 @@ $test->for('example', 2, 'data', sub {
   $result
 });
 
+=method deconstruct
+
+The DECONSTRUCT method is an object destruction lifecycle hook that is called
+just before the L</DESTROY> method. It provides an opportunity to perform any
+necessary cleanup or resource release on the instance before it is destroyed.
+This can include actions like disconnecting from external resources, clearing
+caches, or logging. The method returns the instance, but its return value is
+not used in subsequent processing.
+
+=signature deconstruct
+
+  deconstruct() (any)
+
+=metadata deconstruct
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 deconstruct
+
+  package User;
+
+  use base 'Venus::Core';
+
+  our $CALLS = 0;
+
+  our $USERS = 0;
+
+  sub CONSTRUCT {
+    return $CALLS = $USERS += 1;
+  }
+
+  sub DECONSTRUCT {
+    return $USERS--;
+  }
+
+  package main;
+
+  my $user;
+
+  $user = User->BLESS('Elliot');
+
+  $user = User->BLESS('Elliot');
+
+  undef $user;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'deconstruct', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  no warnings 'once';
+  is $User::CALLS, 2;
+  is $User::USERS, 0;
+
+  !$result
+});
+
 =method destroy
 
 The DESTROY method is an object destruction lifecycle hook which is called when
@@ -888,14 +1132,14 @@ the last reference to the object goes away.
 
   use base 'Venus::Core';
 
-  our $USERS = 0;
+  our $TRIES = 0;
 
   sub BUILD {
-    return $USERS++;
+    return $TRIES++;
   }
 
   sub DESTROY {
-    return $USERS--;
+    return $TRIES--;
   }
 
   package main;
@@ -912,7 +1156,7 @@ $test->for('example', 1, 'destroy', sub {
   my ($tryable) = @_;
   ok !(my $result = $tryable->result);
   no warnings 'once';
-  ok $User::USERS == 0;
+  ok $User::TRIES == 0;
 
   !$result
 });
@@ -1352,6 +1596,128 @@ $test->for('example', 2, 'item', sub {
   $result
 });
 
+=method mask
+
+The MASK method is a class-building lifecycle hook that installs private
+instance data accessors in the calling package. The accessor created allows
+private access to an instance variable, ensuring that it can only be accessed
+within the class or its subclasses. The method takes the name of the private
+variable as the first argument and any additional parameters needed for
+configuration. Attempting to access or set this variable outside of the class
+will raise an exception. This feature is useful for creating encapsulated
+attributes that maintain controlled visibility.
+
+=signature mask
+
+  mask(string $name, any @args) (string | object)
+
+=metadata mask
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 mask
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->MASK('password');
+
+  package main;
+
+  my $user = User->BLESS(name => 'Elliot');
+
+  $user->password;
+
+  # Exception! "Can't get/set private variable \"password\" outside the class or subclass of \"User\""
+
+=cut
+
+$test->for('example', 1, 'mask', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->fault->result;
+  ok $result->isa('Venus::Fault');
+  is $result->{message}, "Can't get/set private variable \"password\" outside the class or subclass of \"User\"";
+
+  $result
+});
+
+=example-2 mask
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->MASK('password');
+
+  package main;
+
+  my $user = User->BLESS(name => 'Elliot');
+
+  User->password;
+
+  # Exception! "Can't get/set private variable \"password\" without an instance of \"User\""
+
+=cut
+
+$test->for('example', 2, 'mask', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->fault->result;
+  ok $result->isa('Venus::Fault');
+  is $result->{message}, "Can't get/set private variable \"password\" without an instance of \"User\"";
+
+  $result
+});
+
+=example-3 mask
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->MASK('password');
+
+  sub get_password {
+    my ($self) = @_;
+
+    $self->password;
+  }
+
+  sub set_password {
+    my ($self) = @_;
+
+    $self->password('secret');
+  }
+
+  package main;
+
+  my $user = User->BLESS(name => 'Elliot');
+
+  $user->set_password;
+
+  # "secret"
+
+  $user;
+
+  # bless({name => 'Elliot'}, 'User')
+
+=cut
+
+$test->for('example', 3, 'mask', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('User');
+  ok int(keys(%$result)) == 1;
+  ok $result->{name} eq 'Elliot';
+  is $result->get_password, 'secret';
+
+  $result
+});
+
 =method meta
 
 The META method return a L<Venus::Meta> object which describes the invocant's
@@ -1599,7 +1965,7 @@ attributes I<"setters"> are dispatched to this method.
 
   SET(string $name, any @args) (any)
 
-=metadata get
+=metadata set
 
 {
   since => '2.91',

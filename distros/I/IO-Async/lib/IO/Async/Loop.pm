@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2025 -- leonerd@leonerd.org.uk
 
-package IO::Async::Loop 0.804;
+package IO::Async::Loop 0.805;
 
 use v5.14;
 use warnings;
@@ -87,6 +87,8 @@ $SIG{PIPE} = "IGNORE" if ( $SIG{PIPE} || "DEFAULT" ) eq "DEFAULT";
 C<IO::Async::Loop> - core loop of the C<IO::Async> framework
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use IO::Async::Stream;
    use IO::Async::Timer::Countdown;
@@ -2450,6 +2452,11 @@ If the filehandle does not yet have the C<O_NONBLOCK> flag set, it will be
 enabled by this method. This will ensure that any subsequent C<sysread>,
 C<syswrite>, or similar will not block on the filehandle.
 
+I<Since version 0.805> it is permitted to watch for read-readiness and
+write-readiness of the same filehandle via two separate calls to this method.
+Prior versions may have implemented it, but it was not specifically documented
+as being permitted, nor subject to integration testing.
+
 =cut
 
 # This class specifically does NOT implement this method, so that subclasses
@@ -2699,7 +2706,7 @@ sub watch_time
 
 =head2 unwatch_time
 
-   $loop->unwatch_time( $id )
+   $loop->unwatch_time( $id );
 
 Removes a timer callback previously created by C<watch_time>.
 

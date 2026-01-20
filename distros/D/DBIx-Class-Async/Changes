@@ -1,5 +1,8 @@
 Revision history for DBIx::Class::Async
 
+0.41  2026-01-19
+      - Added support for inflate column.
+
 0.40  2026-01-19
       - Added test to cover the use of CHI with DBIx::Class::Async.
 

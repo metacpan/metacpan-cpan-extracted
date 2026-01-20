@@ -2,16 +2,16 @@ package Schedule::Activity::Annotation;
 
 use strict;
 use warnings;
-use Ref::Util qw/is_hashref is_regexpref/;
+use Ref::Util qw/is_hashref is_regexpref is_ref/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION='0.2.9';
+our $VERSION='0.3.0';
 
 my %property=map {$_=>undef} qw/message nodes before between p limit attributes note/;
 
 sub new {
 	my ($ref,%opt)=@_;
-	my $class=ref($ref)||$ref;
+	my $class=is_ref($ref)||$ref;
 	return bless(\%opt,$class);
 }
 
@@ -53,7 +53,7 @@ sub annotate {
 	}
 	if($$self{limit}) { while(1+$#notes>$$self{limit}) {
 		my $idx=int(rand(1+$#notes)); splice(@notes,$idx,1) } }
-	for(my $i=1;$i<=$#notes;$i++) {
+	for(my $i=1;$i<=$#notes;$i++) {  ## no critic (CStyleForLoops)
 		if($notes[$i][0]-$notes[$i-1][0]<$opt{between}) {
 			if($notes[$i][1]-$notes[$i-1][0]<$opt{between}) { splice(@notes,$i,1); $i-- }
 			else { $notes[$i][0]=$notes[$i-1][0]+$opt{between} }

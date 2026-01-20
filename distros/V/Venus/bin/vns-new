@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+
+package main;
+
+use 5.018;
+
+use strict;
+use warnings;
+
+use lib 'lib';
+
+use Venus::Task::Venus::New;
+
+run Venus::Task::Venus::New 'vns-new';
+
+=encoding utf8
+
+=head1 NAME
+
+vns-new
+
+=head1 SYNOPSIS
+
+  vns-new --help
+
+=head1 DESCRIPTION
+
+Initialize a new Venus configuration file. This CLI dispatches to
+L<Venus::Task::Venus::New/perform>.
+
+=head1 EXAMPLES
+
+  # mint a new JSON configuration file
+  $ vns-new json
+
+Z<>
+
+  # mint a new YAML configuration file
+  $ vns-new yaml
+
+=head1 SEE ALSO
+
+L<Venus>, L<Venus::Task::Venus::New>.
+
+=cut

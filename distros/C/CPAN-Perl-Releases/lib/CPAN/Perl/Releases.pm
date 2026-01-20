@@ -1,5 +1,5 @@
 package CPAN::Perl::Releases;
-$CPAN::Perl::Releases::VERSION = '5.20251220';
+$CPAN::Perl::Releases::VERSION = '5.20260119';
 #ABSTRACT: Mapping Perl releases on CPAN to the location of the tarballs
 
 use strict;
@@ -342,6 +342,7 @@ our $data =
 "5.43.4" => { id => 'EHERMAN' },
 "5.43.5" => { id => 'CONTRA' },
 "5.43.6" => { id => 'SHAY' },
+"5.43.7" => { id => 'CORION' },
 };
 
 sub perl_tarballs {
@@ -411,7 +412,7 @@ CPAN::Perl::Releases - Mapping Perl releases on CPAN to the location of the tarb
 
 =head1 VERSION
 
-version 5.20251220
+version 5.20260119
 
 =head1 SYNOPSIS
 
@@ -476,7 +477,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Chris Williams.
+This software is copyright (c) 2026 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

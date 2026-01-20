@@ -1,5 +1,48 @@
 Revision history for Lugh
 
+0.08    2026-01-20
+        - New Lugh::Quant module
+        - All GGML quantization types exposed as constants:
+          - Float types: F32, F16, BF16, F64
+          - Integer types: I8, I16, I32, I64
+          - Basic quantization: Q4_0, Q4_1, Q5_0, Q5_1, Q8_0, Q8_1
+          - K-quant types: Q2_K, Q3_K, Q4_K, Q5_K, Q6_K, Q8_K
+          - IQ types: IQ1_S, IQ1_M, IQ2_XXS, IQ2_XS, IQ2_S, IQ3_XXS, IQ3_S, IQ4_NL, IQ4_XS
+          - Experimental: TQ1_0, TQ2_0, MXFP4
+        - Type introspection functions:
+          - type_name(), type_size(), blck_size(), type_sizef()
+          - is_quantized(), requires_imatrix(), row_size()
+          - type_count(), all_types(), all_quantized_types()
+          - type_from_name(), type_info()
+        - Tensor type methods: type(), type_name(), type_size(), blck_size(), 
+          is_quantized(), nbytes()
+        - OO quantize/dequantize on Lugh::Tensor:
+          - $tensor->quantize($ctx, $type) - F32 to quantized
+          - $tensor->dequantize($ctx) - quantized/F16/BF16 to F32
+        - Quantization loss test demonstrating accuracy vs bit depth
+
+0.07    2026-01-19
+        LoRA (Low-Rank Adaptation) Support
+        - New Lugh::LoRA module for loading and applying LoRA adapters
+        - Dual format support: GGUF (.gguf) and SafeTensors (.safetensors)
+        - Dynamic scale adjustment with scale() method (0.0 to 2.0+)
+        - Integration with all forward methods:
+          - forward(\@tokens, lora => $lora)
+          - forward_with_cache(..., lora => $lora)
+          - forward_with_pool(..., lora => $lora)
+          - forward_batch(..., lora => $lora)
+        - LoRA API methods:
+          - new(model => $model, file => $path) - Load adapter
+          - scale($value) / scale() - Set/get LoRA influence
+          - format() - Get format type ('gguf' or 'safetensors')
+          - n_weights() - Get number of adapted weights
+          - alpha() - Get LoRA alpha parameter
+        - Validated against llama-cpp-python reference implementation
+        - New test files: t/13-backend.t, t/14-memory-pool.t, t/15-batch.t,
+          t/16-edge-cases.t, t/17-sample-topk.t, t/18-inference-methods.t,
+          t/19-model-tensors.t, t/20-lora-interface.t, t/21-lora-forward.t,
+          t/22-lora-cache.t, t/23-lora-pool.t, t/24-lora-batch.t
+
 0.06    2026-01-18
         Extended Model Support (Multi-Architecture) and Chat Template / Prompt Formatting
         - Dynamic architecture detection from GGUF general.architecture

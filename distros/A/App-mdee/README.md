@@ -19,7 +19,7 @@ mdee - Markdown, Easy on the Eyes
      -t  --theme=#          color theme
      -m  --mode=#           light or dark (default: light)
      -B  --base-color=#     override theme's base color
-                            (e.g., <Red>, #FF5733, hsl(0,100,50))
+                            (e.g., Ivory, #780043, (120,0,67))
          --list-themes      list built-in themes
          --show=#           set field visibility (e.g., italic=1)
      -C  --pane=#           number of columns
@@ -32,7 +32,7 @@ mdee - Markdown, Easy on the Eyes
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # DESCRIPTION
 
@@ -121,10 +121,11 @@ bold text, etc.).
     terminal luminance.
 
     Each theme has light and dark variants optimized for different terminal
-    backgrounds.  The built-in `default` theme provides:
+    backgrounds.  The built-in `default` theme uses RoyalBlue as the base
+    color with automatic luminance adjustment:
 
-    - `light` - Navy blue base color for light backgrounds
-    - `dark` - Light blue (#CCCDFF) base color for dark backgrounds
+    - `light` - RoyalBlue with luminance 25 (dark text for light backgrounds)
+    - `dark` - RoyalBlue with luminance 80 (bright text for dark backgrounds)
 
     User configuration is loaded from:
 
@@ -144,18 +145,46 @@ bold text, etc.).
 
 - **-B** _COLOR_, **--base-color**=_COLOR_
 
-    Override the theme's base color.  This is useful for quickly adjusting
-    the color scheme without creating a custom theme.
-    Accepts [Term::ANSIColor::Concise](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise) color specifications:
+    Override the theme's base color.  The base color determines the overall
+    color scheme because all heading colors (h1, h2, h3, etc.) are derived
+    from it by adjusting luminance.  For example, h2 might be `${base}+y20`
+    (base color with luminance increased by 20).
 
-    - Color names: `<Red>`, `<NavyBlue>`
-    - RGB hex: `#FF5733`
-    - RGB decimal: `rgb(255,87,51)`
-    - HSL: `hsl(0,100,50)`
+    **Simple color name** - luminance is adjusted automatically:
 
-    **Note:** Basic ANSI color codes (`R`, `G`, `B`, etc.) are not supported
-    because the highlighting variations are created by adjusting lightness
-    of the base color, which requires full color specifications.
+    When you specify just a color name (without `<>` brackets or
+    other syntax), the default luminance adjustment is applied based on
+    the current mode:
+
+        -B RoyalBlue          # becomes <RoyalBlue>=y25 in light mode
+                              # becomes <RoyalBlue>=y80 in dark mode
+
+    This makes it easy to try different colors without worrying about
+    luminance values.  The default adjustments (`=y25` for light, `=y80`
+    for dark) are designed to provide good contrast against typical terminal
+    backgrounds.
+
+    **Full color specification** - used exactly as specified:
+
+    If you include `<>` brackets, luminance modifiers, or use RGB
+    notation, the value is used as-is without any automatic adjustment:
+
+        -B '<Ivory>'               # original color, no adjustment
+        -B '<Ivory>=y50'           # explicit luminance 50
+        -B '#780043'               # burgundy in hex
+        -B '(120,0,67)'            # same color in RGB decimal
+
+    **Customizing the default adjustment**:
+
+    The automatic luminance adjustment values can be customized with the
+    `--adjust` option:
+
+        --adjust 'light==y30'      # use =y30 instead of =y25 for light mode
+        --adjust 'dark==y70'       # use =y70 instead of =y80 for dark mode
+
+    **Note**: Basic ANSI color codes (`R`, `G`, `B`, etc.) cannot be used
+    because heading variations require luminance adjustment, which only works
+    with full color specifications (X11 names, RGB hex, or RGB decimal).
 
 - **--list-themes**
 
@@ -232,8 +261,8 @@ bold text, etc.).
     # Theme examples
     mdee --mode=dark file.md             # use dark mode
     mdee --mode=light file.md            # use light mode
-    mdee -B '<Red>' file.md              # override base color
-    mdee --mode=dark -B '<Cyan>' file.md # dark mode with cyan base
+    mdee -B Ivory file.md                # override base color
+    mdee --mode=dark -B '#780043' file.md # dark mode with burgundy
     mdee --list-themes                   # list available themes
 
 # INSTALLATION
@@ -328,8 +357,8 @@ The `--cm` option maps colors to captured groups.  For example,
 
 The color specification supports modifiers:
 
-- `+l10` / `-l10`: Adjust lightness by percentage
-- `=l50`: Set absolute lightness
+- `+y10` / `-y10`: Adjust luminance by percentage
+- `=y50`: Set absolute luminance
 - `D`: Bold, `U`: Underline, `E`: Erase line
 
 Example greple invocation:
@@ -366,20 +395,22 @@ directly to nup.
 ### Theme Structure
 
 Each theme is defined as a Bash associative array with color
-definitions for each Markdown element:
+definitions for each Markdown element.  The `${base}` placeholder
+references the base color (set via `--base-color` option):
 
     declare -A theme_default_dark=(
-        [base]='#CCCDFF'
         [h1]='L00DE/${base}'
-        [h2]='L00DE/${base}-l10'
+        [h2]='L00DE/${base}-y15'
+        [h3]='L00DN/${base}-y25'
         ...
     )
 
 #### Base Color Expansion
 
-The `${base}` placeholder in color values is expanded after theme
-loading.  This allows derived colors to be calculated from a single
-base color, making theme customization easier.
+The `${base}` placeholder is expanded to the effective base color
+after theme loading.  The base color is determined by the
+`--base-color` option (default: RoyalBlue) with automatic luminance
+adjustment based on mode (`=y25` for light, `=y80` for dark).
 
 #### Terminal Mode Detection
 
@@ -410,13 +441,21 @@ are not supported.
 
 ## OSC 8 Hyperlinks
 
-Links are converted to OSC 8 terminal hyperlinks for clickable URLs.
+Links are converted to OSC 8 terminal hyperlinks for clickable URLs:
+
+- `[text](url)` - `[text]` links to url
+- `![alt](url)` - `![alt]` links to url (image)
+- `[![alt](img)](url)` - `!` links to img, `[alt]` links to url
+
 This requires terminal support.  Compatible terminals include iTerm2,
 Kitty, WezTerm, Ghostty, and recent versions of GNOME Terminal.
 Apple's default Terminal.app does not support OSC 8.
 
 When using `less` as pager, version 566 or later is required with
 `-R` option.
+
+For OSC 8 specification, see:
+[https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5fedd](https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5fedd)
 
 # SEE ALSO
 

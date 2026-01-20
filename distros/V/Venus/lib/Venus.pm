@@ -7,11 +7,857 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '4.15';
+our $VERSION = '5.00';
 
 # AUTHORITY
 
 our $AUTHORITY = 'cpan:AWNCORP';
+
+# FILES
+
+our $FILES = {
+  'lib/Venus.pm' => {
+    help => 'lib/Venus.pod',
+    main => 1,
+    name => 'Venus',
+    skip => 0,
+    test => 't/Venus.t',
+    type => 'dsl',
+  },
+  'lib/Venus/Args.pm' => {
+    help => 'lib/Venus/Args.pod',
+    name => 'Venus::Args',
+    skip => 0,
+    test => 't/Venus_Args.t',
+    type => 'class',
+  },
+  'lib/Venus/Array.pm' => {
+    help => 'lib/Venus/Array.pod',
+    name => 'Venus::Array',
+    skip => 0,
+    test => 't/Venus_Array.t',
+    type => 'class',
+  },
+  'lib/Venus/Assert.pm' => {
+    help => 'lib/Venus/Assert.pod',
+    name => 'Venus::Assert',
+    skip => 0,
+    test => 't/Venus_Assert.t',
+    type => 'class',
+  },
+  'lib/Venus/Atom.pm' => {
+    help => 'lib/Venus/Atom.pod',
+    name => 'Venus::Atom',
+    skip => 0,
+    test => 't/Venus_Atom.t',
+    type => 'class',
+  },
+  'lib/Venus/Boolean.pm' => {
+    help => 'lib/Venus/Boolean.pod',
+    name => 'Venus::Boolean',
+    skip => 0,
+    test => 't/Venus_Boolean.t',
+    type => 'class',
+  },
+  'lib/Venus/Box.pm' => {
+    help => 'lib/Venus/Box.pod',
+    name => 'Venus::Box',
+    skip => 0,
+    test => 't/Venus_Box.t',
+    type => 'class',
+  },
+  'lib/Venus/Check.pm' => {
+    help => 'lib/Venus/Check.pod',
+    name => 'Venus::Check',
+    skip => 0,
+    test => 't/Venus_Check.t',
+    type => 'class',
+  },
+  'lib/Venus/Class.pm' => {
+    help => 'lib/Venus/Class.pod',
+    name => 'Venus::Class',
+    skip => 0,
+    test => 't/Venus_Class.t',
+    type => 'dsl',
+  },
+  'lib/Venus/Cli.pm' => {
+    help => 'lib/Venus/Cli.pod',
+    name => 'Venus::Cli',
+    skip => 0,
+    test => 't/Venus_Cli.t',
+    type => 'class',
+  },
+  'lib/Venus/Code.pm' => {
+    help => 'lib/Venus/Code.pod',
+    name => 'Venus::Code',
+    skip => 0,
+    test => 't/Venus_Code.t',
+    type => 'class',
+  },
+  'lib/Venus/Coercion.pm' => {
+    help => 'lib/Venus/Coercion.pod',
+    name => 'Venus::Coercion',
+    skip => 0,
+    test => 't/Venus_Coercion.t',
+    type => 'class',
+  },
+  'lib/Venus/Config.pm' => {
+    help => 'lib/Venus/Config.pod',
+    name => 'Venus::Config',
+    skip => 0,
+    test => 't/Venus_Config.t',
+    type => 'class',
+  },
+  'lib/Venus/Collect.pm' => {
+    help => 'lib/Venus/Collect.pod',
+    name => 'Venus::Collect',
+    skip => 0,
+    test => 't/Venus_Collect.t',
+    type => 'class',
+  },
+  'lib/Venus/Constraint.pm' => {
+    help => 'lib/Venus/Constraint.pod',
+    name => 'Venus::Constraint',
+    skip => 0,
+    test => 't/Venus_Constraint.t',
+    type => 'class',
+  },
+  'lib/Venus/Core.pm' => {
+    help => 'lib/Venus/Core.pod',
+    name => 'Venus::Core',
+    skip => 0,
+    test => 't/Venus_Core.t',
+    type => 'core',
+  },
+  'lib/Venus/Core/Class.pm' => {
+    help => 'lib/Venus/Core/Class.pod',
+    name => 'Venus::Core::Class',
+    skip => 0,
+    test => 't/Venus_Core_Class.t',
+    type => 'core',
+  },
+  'lib/Venus/Core/Mixin.pm' => {
+    help => 'lib/Venus/Core/Mixin.pod',
+    name => 'Venus::Core::Mixin',
+    skip => 0,
+    test => 't/Venus_Core_Mixin.t',
+    type => 'core',
+  },
+  'lib/Venus/Core/Role.pm' => {
+    help => 'lib/Venus/Core/Role.pod',
+    name => 'Venus::Core::Role',
+    skip => 0,
+    test => 't/Venus_Core_Role.t',
+    type => 'core',
+  },
+  'lib/Venus/Data.pm' => {
+    help => 'lib/Venus/Data.pod',
+    name => 'Venus::Data',
+    skip => 0,
+    test => 't/Venus_Data.t',
+    type => 'class',
+  },
+  'lib/Venus/Date.pm' => {
+    help => 'lib/Venus/Date.pod',
+    name => 'Venus::Date',
+    skip => 0,
+    test => 't/Venus_Date.t',
+    type => 'class',
+  },
+  'lib/Venus/Dump.pm' => {
+    help => 'lib/Venus/Dump.pod',
+    name => 'Venus::Dump',
+    skip => 0,
+    test => 't/Venus_Dump.t',
+    type => 'class',
+  },
+  'lib/Venus/Enum.pm' => {
+    help => 'lib/Venus/Enum.pod',
+    name => 'Venus::Enum',
+    skip => 0,
+    test => 't/Venus_Enum.t',
+    type => 'class',
+  },
+  'lib/Venus/Error.pm' => {
+    help => 'lib/Venus/Error.pod',
+    name => 'Venus::Error',
+    skip => 0,
+    test => 't/Venus_Error.t',
+    type => 'class',
+  },
+  'lib/Venus/Factory.pm' => {
+    help => 'lib/Venus/Factory.pod',
+    name => 'Venus::Factory',
+    skip => 0,
+    test => 't/Venus_Factory.t',
+    type => 'class',
+  },
+  'lib/Venus/False.pm' => {
+    help => 'lib/Venus/False.pod',
+    name => 'Venus::False',
+    skip => 0,
+    test => 't/Venus_False.t',
+    type => 'class',
+  },
+  'lib/Venus/Fault.pm' => {
+    help => 'lib/Venus/Fault.pod',
+    name => 'Venus::Fault',
+    skip => 0,
+    test => 't/Venus_Fault.t',
+    type => 'class',
+  },
+  'lib/Venus/Float.pm' => {
+    help => 'lib/Venus/Float.pod',
+    name => 'Venus::Float',
+    skip => 0,
+    test => 't/Venus_Float.t',
+    type => 'class',
+  },
+  'lib/Venus/Future.pm' => {
+    help => 'lib/Venus/Future.pod',
+    name => 'Venus::Future',
+    skip => 0,
+    test => 't/Venus_Future.t',
+    type => 'class',
+  },
+  'lib/Venus/Gather.pm' => {
+    help => 'lib/Venus/Gather.pod',
+    name => 'Venus::Gather',
+    skip => 0,
+    test => 't/Venus_Gather.t',
+    type => 'class',
+  },
+  'lib/Venus/Hash.pm' => {
+    help => 'lib/Venus/Hash.pod',
+    name => 'Venus::Hash',
+    skip => 0,
+    test => 't/Venus_Hash.t',
+    type => 'class',
+  },
+  'lib/Venus/Hook.pm' => {
+    help => 'lib/Venus/Hook.pod',
+    name => 'Venus::Hook',
+    skip => 1,
+    test => 't/Venus_Hook.t',
+    type => 'dsl',
+  },
+  'lib/Venus/Json.pm' => {
+    help => 'lib/Venus/Json.pod',
+    name => 'Venus::Json',
+    skip => 0,
+    test => 't/Venus_Json.t',
+    type => 'class',
+  },
+  'lib/Venus/Kind.pm' => {
+    help => 'lib/Venus/Kind.pod',
+    name => 'Venus::Kind',
+    skip => 0,
+    test => 't/Venus_Kind.t',
+    type => 'kind',
+  },
+  'lib/Venus/Kind/Utility.pm' => {
+    help => 'lib/Venus/Kind/Utility.pod',
+    name => 'Venus::Kind::Utility',
+    skip => 0,
+    test => 't/Venus_Kind_Utility.t',
+    type => 'kind',
+  },
+  'lib/Venus/Kind/Value.pm' => {
+    help => 'lib/Venus/Kind/Value.pod',
+    name => 'Venus::Kind::Value',
+    skip => 0,
+    test => 't/Venus_Kind_Value.t',
+    type => 'kind',
+  },
+  'lib/Venus/Log.pm' => {
+    help => 'lib/Venus/Log.pod',
+    name => 'Venus::Log',
+    skip => 0,
+    test => 't/Venus_Log.t',
+    type => 'class',
+  },
+  'lib/Venus/Match.pm' => {
+    help => 'lib/Venus/Match.pod',
+    name => 'Venus::Match',
+    skip => 0,
+    test => 't/Venus_Match.t',
+    type => 'class',
+  },
+  'lib/Venus/Map.pm' => {
+    help => 'lib/Venus/Map.pod',
+    name => 'Venus::Map',
+    skip => 0,
+    test => 't/Venus_Map.t',
+    type => 'class',
+  },
+  'lib/Venus/Meta.pm' => {
+    help => 'lib/Venus/Meta.pod',
+    name => 'Venus::Meta',
+    skip => 0,
+    test => 't/Venus_Meta.t',
+    type => 'class',
+  },
+  'lib/Venus/Mixin.pm' => {
+    help => 'lib/Venus/Mixin.pod',
+    name => 'Venus::Mixin',
+    skip => 0,
+    test => 't/Venus_Mixin.t',
+    type => 'dsl',
+  },
+  'lib/Venus/Module.pm' => {
+    help => 'lib/Venus/Module.pod',
+    name => 'Venus::Module',
+    skip => 0,
+    test => 't/Venus_Module.t',
+    type => 'dsl',
+  },
+  'lib/Venus/Name.pm' => {
+    help => 'lib/Venus/Name.pod',
+    name => 'Venus::Name',
+    skip => 0,
+    test => 't/Venus_Name.t',
+    type => 'class',
+  },
+  'lib/Venus/Number.pm' => {
+    help => 'lib/Venus/Number.pod',
+    name => 'Venus::Number',
+    skip => 0,
+    test => 't/Venus_Number.t',
+    type => 'class',
+  },
+  'lib/Venus/Opts.pm' => {
+    help => 'lib/Venus/Opts.pod',
+    name => 'Venus::Opts',
+    skip => 0,
+    test => 't/Venus_Opts.t',
+    type => 'class',
+  },
+  'lib/Venus/Os.pm' => {
+    help => 'lib/Venus/Os.pod',
+    name => 'Venus::Os',
+    skip => 0,
+    test => 't/Venus_Os.t',
+    type => 'class',
+  },
+  'lib/Venus/Path.pm' => {
+    help => 'lib/Venus/Path.pod',
+    name => 'Venus::Path',
+    skip => 0,
+    test => 't/Venus_Path.t',
+    type => 'class',
+  },
+  'lib/Venus/Process.pm' => {
+    help => 'lib/Venus/Process.pod',
+    name => 'Venus::Process',
+    skip => 0,
+    test => 't/Venus_Process.t',
+    type => 'class',
+  },
+  'lib/Venus/Prototype.pm' => {
+    help => 'lib/Venus/Prototype.pod',
+    name => 'Venus::Prototype',
+    skip => 0,
+    test => 't/Venus_Prototype.t',
+    type => 'class',
+  },
+  'lib/Venus/Random.pm' => {
+    help => 'lib/Venus/Random.pod',
+    name => 'Venus::Random',
+    skip => 0,
+    test => 't/Venus_Random.t',
+    type => 'class',
+  },
+  'lib/Venus/Range.pm' => {
+    help => 'lib/Venus/Range.pod',
+    name => 'Venus::Range',
+    skip => 0,
+    test => 't/Venus_Range.t',
+    type => 'class',
+  },
+  'lib/Venus/Regexp.pm' => {
+    help => 'lib/Venus/Regexp.pod',
+    name => 'Venus::Regexp',
+    skip => 0,
+    test => 't/Venus_Regexp.t',
+    type => 'class',
+  },
+  'lib/Venus/Replace.pm' => {
+    help => 'lib/Venus/Replace.pod',
+    name => 'Venus::Replace',
+    skip => 0,
+    test => 't/Venus_Replace.t',
+    type => 'class',
+  },
+  'lib/Venus/Result.pm' => {
+    help => 'lib/Venus/Result.pod',
+    name => 'Venus::Result',
+    skip => 0,
+    test => 't/Venus_Result.t',
+    type => 'class',
+  },
+  'lib/Venus/Role.pm' => {
+    help => 'lib/Venus/Role.pod',
+    name => 'Venus::Role',
+    skip => 0,
+    test => 't/Venus_Role.t',
+    type => 'dsl',
+  },
+  'lib/Venus/Role/Accessible.pm' => {
+    help => 'lib/Venus/Role/Accessible.pod',
+    name => 'Venus::Role::Accessible',
+    skip => 0,
+    test => 't/Venus_Role_Accessible.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Boxable.pm' => {
+    help => 'lib/Venus/Role/Boxable.pod',
+    name => 'Venus::Role::Boxable',
+    skip => 0,
+    test => 't/Venus_Role_Boxable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Buildable.pm' => {
+    help => 'lib/Venus/Role/Buildable.pod',
+    name => 'Venus::Role::Buildable',
+    skip => 0,
+    test => 't/Venus_Role_Buildable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Catchable.pm' => {
+    help => 'lib/Venus/Role/Catchable.pod',
+    name => 'Venus::Role::Catchable',
+    skip => 0,
+    test => 't/Venus_Role_Catchable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Coercible.pm' => {
+    help => 'lib/Venus/Role/Coercible.pod',
+    name => 'Venus::Role::Coercible',
+    skip => 0,
+    test => 't/Venus_Role_Coercible.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Comparable.pm' => {
+    help => 'lib/Venus/Role/Comparable.pod',
+    name => 'Venus::Role::Comparable',
+    skip => 0,
+    test => 't/Venus_Role_Comparable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Defaultable.pm' => {
+    help => 'lib/Venus/Role/Defaultable.pod',
+    name => 'Venus::Role::Defaultable',
+    skip => 0,
+    test => 't/Venus_Role_Defaultable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Deferrable.pm' => {
+    help => 'lib/Venus/Role/Deferrable.pod',
+    name => 'Venus::Role::Deferrable',
+    skip => 0,
+    test => 't/Venus_Role_Deferrable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Digestable.pm' => {
+    help => 'lib/Venus/Role/Digestable.pod',
+    name => 'Venus::Role::Digestable',
+    skip => 0,
+    test => 't/Venus_Role_Digestable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Doable.pm' => {
+    help => 'lib/Venus/Role/Doable.pod',
+    name => 'Venus::Role::Doable',
+    skip => 0,
+    test => 't/Venus_Role_Doable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Dumpable.pm' => {
+    help => 'lib/Venus/Role/Dumpable.pod',
+    name => 'Venus::Role::Dumpable',
+    skip => 0,
+    test => 't/Venus_Role_Dumpable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Encaseable.pm' => {
+    help => 'lib/Venus/Role/Encaseable.pod',
+    name => 'Venus::Role::Encaseable',
+    skip => 0,
+    test => 't/Venus_Role_Encaseable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Explainable.pm' => {
+    help => 'lib/Venus/Role/Explainable.pod',
+    name => 'Venus::Role::Explainable',
+    skip => 0,
+    test => 't/Venus_Role_Explainable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Fromable.pm' => {
+    help => 'lib/Venus/Role/Fromable.pod',
+    name => 'Venus::Role::Fromable',
+    skip => 0,
+    test => 't/Venus_Role_Fromable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Mappable.pm' => {
+    help => 'lib/Venus/Role/Mappable.pod',
+    name => 'Venus::Role::Mappable',
+    skip => 0,
+    test => 't/Venus_Role_Mappable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Matchable.pm' => {
+    help => 'lib/Venus/Role/Matchable.pod',
+    name => 'Venus::Role::Matchable',
+    skip => 0,
+    test => 't/Venus_Role_Matchable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Mockable.pm' => {
+    help => 'lib/Venus/Role/Mockable.pod',
+    name => 'Venus::Role::Mockable',
+    skip => 0,
+    test => 't/Venus_Role_Mockable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Optional.pm' => {
+    help => 'lib/Venus/Role/Optional.pod',
+    name => 'Venus::Role::Optional',
+    skip => 0,
+    test => 't/Venus_Role_Optional.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Patchable.pm' => {
+    help => 'lib/Venus/Role/Patchable.pod',
+    name => 'Venus::Role::Patchable',
+    skip => 0,
+    test => 't/Venus_Role_Patchable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Pluggable.pm' => {
+    help => 'lib/Venus/Role/Pluggable.pod',
+    name => 'Venus::Role::Pluggable',
+    skip => 0,
+    test => 't/Venus_Role_Pluggable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Printable.pm' => {
+    help => 'lib/Venus/Role/Printable.pod',
+    name => 'Venus::Role::Printable',
+    skip => 0,
+    test => 't/Venus_Role_Printable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Proxyable.pm' => {
+    help => 'lib/Venus/Role/Proxyable.pod',
+    name => 'Venus::Role::Proxyable',
+    skip => 0,
+    test => 't/Venus_Role_Proxyable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Reflectable.pm' => {
+    help => 'lib/Venus/Role/Reflectable.pod',
+    name => 'Venus::Role::Reflectable',
+    skip => 0,
+    test => 't/Venus_Role_Reflectable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Rejectable.pm' => {
+    help => 'lib/Venus/Role/Rejectable.pod',
+    name => 'Venus::Role::Rejectable',
+    skip => 0,
+    test => 't/Venus_Role_Rejectable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Resultable.pm' => {
+    help => 'lib/Venus/Role/Resultable.pod',
+    name => 'Venus::Role::Resultable',
+    skip => 0,
+    test => 't/Venus_Role_Resultable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Serializable.pm' => {
+    help => 'lib/Venus/Role/Serializable.pod',
+    name => 'Venus::Role::Serializable',
+    skip => 0,
+    test => 't/Venus_Role_Serializable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Stashable.pm' => {
+    help => 'lib/Venus/Role/Stashable.pod',
+    name => 'Venus::Role::Stashable',
+    skip => 0,
+    test => 't/Venus_Role_Stashable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Subscribable.pm' => {
+    help => 'lib/Venus/Role/Subscribable.pod',
+    name => 'Venus::Role::Subscribable',
+    skip => 0,
+    test => 't/Venus_Role_Subscribable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Superable.pm' => {
+    help => 'lib/Venus/Role/Superable.pod',
+    name => 'Venus::Role::Superable',
+    skip => 0,
+    test => 't/Venus_Role_Superable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Testable.pm' => {
+    help => 'lib/Venus/Role/Testable.pod',
+    name => 'Venus::Role::Testable',
+    skip => 0,
+    test => 't/Venus_Role_Testable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Throwable.pm' => {
+    help => 'lib/Venus/Role/Throwable.pod',
+    name => 'Venus::Role::Throwable',
+    skip => 0,
+    test => 't/Venus_Role_Throwable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Tryable.pm' => {
+    help => 'lib/Venus/Role/Tryable.pod',
+    name => 'Venus::Role::Tryable',
+    skip => 0,
+    test => 't/Venus_Role_Tryable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Unacceptable.pm' => {
+    help => 'lib/Venus/Role/Unacceptable.pod',
+    name => 'Venus::Role::Unacceptable',
+    skip => 0,
+    test => 't/Venus_Role_Unacceptable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Unpackable.pm' => {
+    help => 'lib/Venus/Role/Unpackable.pod',
+    name => 'Venus::Role::Unpackable',
+    skip => 0,
+    test => 't/Venus_Role_Unpackable.t',
+    type => 'role',
+  },
+  'lib/Venus/Role/Valuable.pm' => {
+    help => 'lib/Venus/Role/Valuable.pod',
+    name => 'Venus::Role::Valuable',
+    skip => 0,
+    test => 't/Venus_Role_Valuable.t',
+    type => 'role',
+  },
+  'lib/Venus/Run.pm' => {
+    help => 'lib/Venus/Run.pod',
+    name => 'Venus::Run',
+    skip => 0,
+    test => 't/Venus_Run.t',
+    type => 'class',
+  },
+  'lib/Venus/Scalar.pm' => {
+    help => 'lib/Venus/Scalar.pod',
+    name => 'Venus::Scalar',
+    skip => 0,
+    test => 't/Venus_Scalar.t',
+    type => 'class',
+  },
+  'lib/Venus/Schema.pm' => {
+    help => 'lib/Venus/Schema.pod',
+    name => 'Venus::Schema',
+    skip => 0,
+    test => 't/Venus_Schema.t',
+    type => 'class',
+  },
+  'lib/Venus/Sealed.pm' => {
+    help => 'lib/Venus/Sealed.pod',
+    name => 'Venus::Sealed',
+    skip => 0,
+    test => 't/Venus_Sealed.t',
+    type => 'class',
+  },
+  'lib/Venus/Search.pm' => {
+    help => 'lib/Venus/Search.pod',
+    name => 'Venus::Search',
+    skip => 0,
+    test => 't/Venus_Search.t',
+    type => 'class',
+  },
+  'lib/Venus/Set.pm' => {
+    help => 'lib/Venus/Set.pod',
+    name => 'Venus::Set',
+    skip => 0,
+    test => 't/Venus_Set.t',
+    type => 'class',
+  },
+  'lib/Venus/Space.pm' => {
+    help => 'lib/Venus/Space.pod',
+    name => 'Venus::Space',
+    skip => 0,
+    test => 't/Venus_Space.t',
+    type => 'class',
+  },
+  'lib/Venus/String.pm' => {
+    help => 'lib/Venus/String.pod',
+    name => 'Venus::String',
+    skip => 0,
+    test => 't/Venus_String.t',
+    type => 'class',
+  },
+  'lib/Venus/Task.pm' => {
+    help => 'lib/Venus/Task.pod',
+    name => 'Venus::Task',
+    skip => 0,
+    test => 't/Venus_Task.t',
+    type => 'class',
+  },
+  'lib/Venus/Task/Venus.pm' => {
+    help => 'lib/Venus/Task/Venus.pod',
+    name => 'Venus::Task::Venus',
+    skip => 0,
+    test => 't/Venus_Task_Venus.t',
+    type => 'class',
+  },
+  'lib/Venus/Task/Venus/Gen.pm' => {
+    help => 'lib/Venus/Task/Venus/Gen.pod',
+    name => 'Venus::Task::Venus::Gen',
+    skip => 0,
+    test => 't/Venus_Task_Venus_Gen.t',
+    type => 'class',
+  },
+  'lib/Venus/Task/Venus/Get.pm' => {
+    help => 'lib/Venus/Task/Venus/Get.pod',
+    name => 'Venus::Task::Venus::Get',
+    skip => 0,
+    test => 't/Venus_Task_Venus_Get.t',
+    type => 'class',
+  },
+  'lib/Venus/Task/Venus/New.pm' => {
+    help => 'lib/Venus/Task/Venus/New.pod',
+    name => 'Venus::Task::Venus::New',
+    skip => 0,
+    test => 't/Venus_Task_Venus_New.t',
+    type => 'class',
+  },
+  'lib/Venus/Task/Venus/Run.pm' => {
+    help => 'lib/Venus/Task/Venus/Run.pod',
+    name => 'Venus::Task::Venus::Run',
+    skip => 0,
+    test => 't/Venus_Task_Venus_Run.t',
+    type => 'class',
+  },
+  'lib/Venus/Task/Venus/Set.pm' => {
+    help => 'lib/Venus/Task/Venus/Set.pod',
+    name => 'Venus::Task::Venus::Set',
+    skip => 0,
+    test => 't/Venus_Task_Venus_Set.t',
+    type => 'class',
+  },
+  'lib/Venus/Template.pm' => {
+    help => 'lib/Venus/Template.pod',
+    name => 'Venus::Template',
+    skip => 0,
+    test => 't/Venus_Template.t',
+    type => 'class',
+  },
+  'lib/Venus/Test.pm' => {
+    help => 'lib/Venus/Test.pod',
+    name => 'Venus::Test',
+    skip => 0,
+    test => 't/Venus_Test.t',
+    type => 'class',
+  },
+  'lib/Venus/Text.pm' => {
+    help => 'lib/Venus/Text.pod',
+    name => 'Venus::Text',
+    skip => 0,
+    test => 't/Venus_Text.t',
+    type => 'class',
+  },
+  'lib/Venus/Text/Pod.pm' => {
+    help => 'lib/Venus/Text/Pod.pod',
+    name => 'Venus::Text::Pod',
+    skip => 0,
+    test => 't/Venus_Text_Pod.t',
+    type => 'class',
+  },
+  'lib/Venus/Text/Tag.pm' => {
+    help => 'lib/Venus/Text/Tag.pod',
+    name => 'Venus::Text::Tag',
+    skip => 0,
+    test => 't/Venus_Text_Tag.t',
+    type => 'class',
+  },
+  'lib/Venus/Throw.pm' => {
+    help => 'lib/Venus/Throw.pod',
+    name => 'Venus::Throw',
+    skip => 0,
+    test => 't/Venus_Throw.t',
+    type => 'class',
+  },
+  'lib/Venus/True.pm' => {
+    help => 'lib/Venus/True.pod',
+    name => 'Venus::True',
+    skip => 0,
+    test => 't/Venus_True.t',
+    type => 'class',
+  },
+  'lib/Venus/Try.pm' => {
+    help => 'lib/Venus/Try.pod',
+    name => 'Venus::Try',
+    skip => 0,
+    test => 't/Venus_Try.t',
+    type => 'class',
+  },
+  'lib/Venus/Type.pm' => {
+    help => 'lib/Venus/Type.pod',
+    name => 'Venus::Type',
+    skip => 0,
+    test => 't/Venus_Type.t',
+    type => 'class',
+  },
+  'lib/Venus/Undef.pm' => {
+    help => 'lib/Venus/Undef.pod',
+    name => 'Venus::Undef',
+    skip => 0,
+    test => 't/Venus_Undef.t',
+    type => 'class',
+  },
+  'lib/Venus/Unpack.pm' => {
+    help => 'lib/Venus/Unpack.pod',
+    name => 'Venus::Unpack',
+    skip => 0,
+    test => 't/Venus_Unpack.t',
+    type => 'class',
+  },
+  'lib/Venus/Validate.pm' => {
+    help => 'lib/Venus/Validate.pod',
+    name => 'Venus::Validate',
+    skip => 0,
+    test => 't/Venus_Validate.t',
+    type => 'class',
+  },
+  'lib/Venus/Vars.pm' => {
+    help => 'lib/Venus/Vars.pod',
+    name => 'Venus::Vars',
+    skip => 0,
+    test => 't/Venus_Vars.t',
+    type => 'class',
+  },
+  'lib/Venus/What.pm' => {
+    help => 'lib/Venus/What.pod',
+    name => 'Venus::What',
+    skip => 0,
+    test => 't/Venus_What.t',
+    type => 'class',
+  },
+  'lib/Venus/Yaml.pm' => {
+    help => 'lib/Venus/Yaml.pod',
+    name => 'Venus::Yaml',
+    skip => 0,
+    test => 't/Venus_Yaml.t',
+    type => 'class',
+  },
+};
 
 # IMPORTS
 
@@ -23,13 +869,18 @@ sub import {
   no strict 'refs';
 
   my %exports = (
+    after => 1,
+    all => 1,
+    any => 1,
     args => 1,
+    around => 1,
     array => 1,
     arrayref => 1,
     assert => 1,
     async => 1,
     atom => 1,
     await => 1,
+    before => 1,
     bool => 1,
     box => 1,
     call => 1,
@@ -42,31 +893,72 @@ sub import {
     cli => 1,
     clone => 1,
     code => 1,
+    collect => 1,
+    concat => 1,
     config => 1,
-    container => 1,
     cop => 1,
     data => 1,
     date => 1,
     docs => 1,
     enum => 1,
     error => 1,
+    factory => 1,
     false => 1,
     fault => 1,
+    flat => 1,
     float => 1,
     future => 1,
     gather => 1,
+    gets => 1,
+    handle => 1,
     hash => 1,
     hashref => 1,
+    hook => 1,
+    in => 1,
+    is => 1,
+    is_arrayref => 1,
+    is_blessed => 1,
     is_bool => 1,
+    is_boolean => 1,
+    is_coderef => 1,
+    is_dirhandle => 1,
+    is_enum => 1,
+    is_error => 1,
     is_false => 1,
+    is_fault => 1,
+    is_filehandle => 1,
+    is_float => 1,
+    is_glob => 1,
+    is_hashref => 1,
+    is_number => 1,
+    is_object => 1,
+    is_package => 1,
+    is_reference => 1,
+    is_regexp => 1,
+    is_scalarref => 1,
+    is_string => 1,
     is_true => 1,
+    is_undef => 1,
+    is_value => 1,
+    is_yesno => 1,
     json => 1,
     list => 1,
     load => 1,
     log => 1,
     make => 1,
+    map => 1,
     match => 1,
     merge => 1,
+    merge_flat => 1,
+    merge_flat_mutate => 1,
+    merge_join => 1,
+    merge_join_mutate => 1,
+    merge_keep => 1,
+    merge_keep_mutate => 1,
+    merge_swap => 1,
+    merge_swap_mutate => 1,
+    merge_take => 1,
+    merge_take_mutate => 1,
     meta => 1,
     name => 1,
     number => 1,
@@ -80,30 +972,52 @@ sub import {
     raise => 1,
     random => 1,
     range => 1,
+    read_env => 1,
+    read_env_file => 1,
+    read_json => 1,
+    read_json_file => 1,
+    read_perl => 1,
+    read_perl_file => 1,
+    read_yaml => 1,
+    read_yaml_file => 1,
     regexp => 1,
-    replace => 1,
     render => 1,
-    resolve => 1,
+    replace => 1,
     roll => 1,
+    schema => 1,
     search => 1,
     set => 1,
+    sets => 1,
+    sorts => 1,
     space => 1,
-    schema => 1,
     string => 1,
     syscall => 1,
     template => 1,
     test => 1,
-    text => 1,
+    text_pod => 1,
+    text_pod_string => 1,
+    text_tag => 1,
+    text_tag_string => 1,
     then => 1,
     throw => 1,
     true => 1,
     try => 1,
+    tv => 1,
     type => 1,
     unpack => 1,
     vars => 1,
-    venus => 1,
+    vns => 1,
+    what => 1,
     work => 1,
     wrap => 1,
+    write_env => 1,
+    write_env_file => 1,
+    write_json => 1,
+    write_json_file => 1,
+    write_perl => 1,
+    write_perl_file => 1,
+    write_yaml => 1,
+    write_yaml_file => 1,
     yaml => 1,
   );
 
@@ -127,6 +1041,44 @@ sub _qx {
 }
 
 # FUNCTIONS
+
+sub after ($$) {
+  my ($name, $code) = @_;
+
+  my $package = caller;
+
+  return space($package, 'after', $name, $code);
+}
+
+sub all ($;$) {
+  my ($data, $expr) = @_;
+
+  my $cast = cast($data);
+
+  my $code = (defined $expr && ref $expr ne 'CODE') ? sub{tv($_[1], $expr)} : $expr;
+
+  if ($cast->isa('Venus::Kind') && $cast->does('Venus::Role::Mappable')) {
+    return ref $code eq 'CODE' ? $cast->all($code) : $cast->count ? true() : false();
+  }
+  else {
+    return false();
+  }
+}
+
+sub any ($;$) {
+  my ($data, $expr) = @_;
+
+  my $cast = cast($data);
+
+  my $code = (defined $expr && ref $expr ne 'CODE') ? sub{tv($_[1], $expr)} : $expr;
+
+  if ($cast->isa('Venus::Kind') && $cast->does('Venus::Role::Mappable')) {
+    return ref $code eq 'CODE' ? $cast->any($code) : $cast->count ? true() : false();
+  }
+  else {
+    return false();
+  }
+}
 
 sub args ($;$@) {
   my ($data, $code, @args) = @_;
@@ -158,6 +1110,14 @@ sub arrayref (@) {
   return @args > 1
     ? ([@args])
     : ((ref $args[0] eq 'ARRAY') ? ($args[0]) : ([@args]));
+}
+
+sub around ($$) {
+  my ($name, $code) = @_;
+
+  my $package = caller;
+
+  return space($package, 'around', $name, $code);
 }
 
 sub assert ($$) {
@@ -192,6 +1152,14 @@ sub await ($;$) {
   require Venus::Future;
 
   return $future->wait($timeout);
+}
+
+sub before ($$) {
+  my ($name, $code) = @_;
+
+  my $package = caller;
+
+  return space($package, 'before', $name, $code);
 }
 
 sub bool (;$) {
@@ -243,11 +1211,11 @@ sub call (@) {
 sub cast (;$$) {
   my ($data, $into) = (@_ ? (@_) : ($_));
 
-  require Venus::Type;
+  require Venus::What;
 
-  my $type = Venus::Type->new($data);
+  my $what = Venus::What->new($data);
 
-  return $into ? $type->cast($into) : $type->deduce;
+  return $into ? $what->cast($into) : $what->deduce;
 }
 
 sub catch (&) {
@@ -265,25 +1233,20 @@ sub catch (&) {
 sub caught ($$;&) {
   my ($data, $type, $code) = @_;
 
+  require Scalar::Util;
+
   ($type, my($name)) = @$type if ref $type eq 'ARRAY';
 
   my $is_true = $data
-    && UNIVERSAL::isa($data, $type)
-    && UNIVERSAL::isa($data, 'Venus::Error')
-    && (
-      $data->name
-        ? ($name ? $data->of($name) : true())
-        : (!$name ? true() : false())
-    );
+    && Scalar::Util::blessed($data)
+    && $data->isa('Venus::Error')
+    && $data->isa($type || 'Venus::Error')
+    && ($data->name ? $data->of($name || '') : !$name);
 
-  if ($is_true) {
-    local $_ = $data;
+  return undef unless $is_true;
 
-    return $code ? $code->($data) : $data;
-  }
-  else {
-    return undef;
-  }
+  local $_ = $data;
+  return $code ? $code->($data) : $data;
 }
 
 sub chain {
@@ -309,13 +1272,11 @@ sub check ($$) {
 sub clargs (@) {
   my (@args) = @_;
 
-  my ($argv, $specs) = (@args > 1)
-    ? (map arrayref($_), @args)
-    : ([@ARGV], arrayref(@args));
+  my ($argv, $specs) = (@args > 1) ? (map arrayref($_), @args) : ([@ARGV], arrayref(@args));
 
-  return (
-    args($argv), opts($argv, 'reparse', $specs), vars({}),
-  );
+  my $opts = opts($argv, 'reparse', $specs);
+
+  return wantarray ? (args($opts->unused), $opts, vars({})) : $opts;
 }
 
 sub cli (;$) {
@@ -323,7 +1284,7 @@ sub cli (;$) {
 
   require Venus::Cli;
 
-  my $cli = Venus::Cli->new($data || [@ARGV]);
+  my $cli = Venus::Cli->new($data);
 
   return $cli;
 }
@@ -332,8 +1293,19 @@ sub clone ($) {
   my ($data) = @_;
 
   require Storable;
+  require Scalar::Util;
 
-  return Storable::dclone($data);
+  local $Storable::Deparse = 1;
+
+  local $Storable::Eval = 1;
+
+  return $data if !ref $data;
+
+  return Scalar::Util::blessed($data)
+    && $data->isa('Venus::Core')
+    && ($data->DOES('Venus::Role::Encaseable') || $data->DOES('Venus::Role::Reflectable'))
+    ? $data->clone
+    : Storable::dclone($data);
 }
 
 sub code ($;$@) {
@@ -360,16 +1332,20 @@ sub config ($;$@) {
   return Venus::Config->new($data)->$code(@args);
 }
 
-sub container ($;$@) {
-  my ($data, $code, @args) = @_;
+sub concat (@) {
+  my (@args) = @_;
 
-  require Venus::Container;
+  require Venus::Log;
 
-  if (!$code) {
-    return Venus::Container->new($data);
-  }
+  return Venus::Log->new->output(@args);
+}
 
-  return Venus::Container->new($data)->$code(@args);
+sub collect ($;$) {
+  my ($data, $code) = @_;
+
+  require Venus::Collect;
+
+  return Venus::Collect->new(value => $data)->execute($code);
 }
 
 sub cop (@) {
@@ -408,16 +1384,6 @@ sub date ($;$@) {
   return Venus::Date->new($data)->$code(@args);
 }
 
-sub docs {
-  my (@args) = @_;
-
-  my $file = (grep -f, (caller(0))[1], $0)[0];
-
-  my $data = data($file);
-
-  return $data->docs->string(@args > 1 ? @args : (undef, @args));
-}
-
 sub enum {
   my (@data) = @_;
 
@@ -429,12 +1395,24 @@ sub enum {
 sub error (;$) {
   my ($data) = @_;
 
-  $data //= {};
-  $data->{context} //= (caller(1))[3];
+  $data ||= {};
+  $data->{context} ||= (caller(1))[3];
 
   require Venus::Throw;
 
-  return Venus::Throw->new->error($data);
+  return Venus::Throw->new->die($data);
+}
+
+sub factory ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Factory;
+
+  if (!$code) {
+    return Venus::Factory->new($data);
+  }
+
+  return Venus::Factory->new($data)->$code(@args);
 }
 
 sub false () {
@@ -450,6 +1428,14 @@ sub fault (;$) {
   require Venus::Fault;
 
   return Venus::Fault->new($data)->throw;
+}
+
+sub flat {
+  my @args = @_;
+
+  return (
+    map +(ref $_ eq 'HASH' ? flat(%$_) : (ref $_ eq 'ARRAY' ? flat(@$_) : $_)), @args,
+  );
 }
 
 sub float ($;$@) {
@@ -490,6 +1476,31 @@ sub gather ($;&) {
   return $match->result;
 }
 
+sub gets ($;@) {
+  my ($data, @args) = @_;
+
+  $data = cast($data);
+
+  my $result = [];
+
+  if ($data->isa('Venus::Hash')) {
+    $result = $data->gets(@args);
+  }
+  elsif ($data->isa('Venus::Array')) {
+    $result = $data->gets(@args);
+  }
+
+  return wantarray ? (@{$result}) : $result;
+}
+
+sub handle ($$) {
+  my ($name, $code) = @_;
+
+  my $package = caller;
+
+  return space($package, 'handle', $name, $code);
+}
+
 sub hash ($;$@) {
   my ($data, $code, @args) = @_;
 
@@ -512,26 +1523,213 @@ sub hashref (@) {
     : ({(scalar(@args) % 2) ? (@args, undef) : @args}));
 }
 
-sub is_bool ($) {
-  my ($data) = @_;
+sub hook ($$$) {
+  my ($type, $name, $code) = @_;
 
-  return type($data, 'coded', 'BOOLEAN') ? true() : false();
+  my $package = caller;
+
+  return space($package, 'hook', $type, $name, $code);
 }
 
-sub is_false ($) {
-  my ($data) = @_;
+sub in ($$) {
+  my ($lvalue, $rvalue) = @_;
 
-  require Venus::Boolean;
-
-  return Venus::Boolean->new($data)->is_false;
+  return any($lvalue, sub{tv($rvalue, $_)});
 }
 
-sub is_true ($) {
+sub is_arrayref ($) {
   my ($data) = @_;
 
+  return check($data, 'arrayref');
+}
+
+sub is_blessed ($) {
+  my ($data) = @_;
+
+  return check($data, 'object');
+}
+
+sub is_boolean ($) {
+  my ($data) = @_;
+
+  return check($data, 'boolean');
+}
+
+sub is_coderef ($) {
+  my ($data) = @_;
+
+  return check($data, 'coderef');
+}
+
+sub is_dirhandle ($) {
+  my ($data) = @_;
+
+  return check($data, 'dirhandle');
+}
+
+sub is_enum ($@) {
+  my ($data, @args) = @_;
+
+  my $enum = sprintf 'enum[%s]', join ', ', map "$_", @args;
+
+  return check($data, $enum);
+}
+
+sub is_error ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Scalar::Util;
   require Venus::Boolean;
 
-  return Venus::Boolean->new($data)->is_true;
+  if (Scalar::Util::blessed($data) && $data->isa('Venus::Error')) {
+    return $code
+      ? ($data->can($code)
+        ? Venus::Boolean->new($data->$code(@args))->is_true
+        : Venus::Boolean->false)
+      : Venus::Boolean->new($data)->is_true;
+  }
+  else {
+    return Venus::Boolean->false;
+  }
+}
+
+sub is_false ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Scalar::Util;
+  require Venus::Boolean;
+
+  if (Scalar::Util::blessed($data) && $code) {
+    return Venus::Boolean->new($data->$code(@args))->is_false;
+  }
+  else {
+    return Venus::Boolean->new($data)->is_false;
+  }
+}
+
+sub is_fault ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Scalar::Util;
+  require Venus::Boolean;
+
+  if (Scalar::Util::blessed($data) && $data->isa('Venus::Fault')) {
+    return Venus::Boolean->true;
+  }
+  else {
+    return Venus::Boolean->false;
+  }
+}
+
+sub is_filehandle ($) {
+  my ($data) = @_;
+
+  return check($data, 'filehandle');
+}
+
+sub is_float ($) {
+  my ($data) = @_;
+
+  return check($data, 'float');
+}
+
+sub is_glob ($) {
+  my ($data) = @_;
+
+  return check($data, 'glob');
+}
+
+sub is_hashref ($) {
+  my ($data) = @_;
+
+  return check($data, 'hashref');
+}
+
+sub is_number ($) {
+  my ($data) = @_;
+
+  return check($data, 'number');
+}
+
+sub is_object ($) {
+  my ($data) = @_;
+
+  return check($data, 'object');
+}
+
+sub is_package ($) {
+  my ($data) = @_;
+
+  return check($data, 'package');
+}
+
+sub is_reference ($) {
+  my ($data) = @_;
+
+  return check($data, 'reference');
+}
+
+sub is_regexp ($) {
+  my ($data) = @_;
+
+  return check($data, 'regexp');
+}
+
+sub is_scalarref ($) {
+  my ($data) = @_;
+
+  return check($data, 'scalarref');
+}
+
+sub is_string ($) {
+  my ($data) = @_;
+
+  return check($data, 'string');
+}
+
+sub is_true ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Scalar::Util;
+  require Venus::Boolean;
+
+  if (Scalar::Util::blessed($data) && $code) {
+    return Venus::Boolean->new($data->$code(@args))->is_true;
+  }
+  else {
+    return Venus::Boolean->new($data)->is_true;
+  }
+}
+
+sub is_undef ($) {
+  my ($data) = @_;
+
+  return check($data, 'undef');
+}
+
+sub is_value ($) {
+  my ($data) = @_;
+
+  return check($data, 'value');
+}
+
+sub is_yesno ($) {
+  my ($data) = @_;
+
+  return check($data, 'yesno');
+}
+
+sub is ($$) {
+  my ($lvalue, $rvalue) = @_;
+
+  require Scalar::Util;
+
+  if (ref($lvalue) && ref($rvalue)) {
+    return Scalar::Util::refaddr($lvalue) == Scalar::Util::refaddr($rvalue) ? true() : false();
+  }
+  else {
+    return false();
+  }
 }
 
 sub json (;$$) {
@@ -598,6 +1796,18 @@ sub make (@) {
   return call($_[0], 'new', @_);
 }
 
+sub map ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Map;
+
+  if (!$code) {
+    return Venus::Map->new($data);
+  }
+
+  return Venus::Map->new($data)->$code(@args);
+}
+
 sub match ($;&) {
   my ($data, $code) = @_;
 
@@ -619,62 +1829,438 @@ sub match ($;&) {
 sub merge {
   my ($lvalue, @rvalues) = @_;
 
-  if (!$lvalue) {
-    return {};
-  }
+  return merge_join($lvalue, @rvalues);
+}
 
-  my $rvalue;
+sub merge_flat {
+  my ($lvalue, @rvalues) = @_;
+
+  return $lvalue if !@rvalues;
 
   if (@rvalues > 1) {
     my $result = $lvalue;
-    $result = merge($result, $_) for @rvalues;
+
+    $result = merge_flat($result, $_) for @rvalues;
+
     return $result;
   }
-  else {
-    $rvalue = $rvalues[0];
+
+  my $rvalue = $rvalues[0];
+
+  return $rvalue if !ref($lvalue) && !ref($rvalue);
+
+  return $rvalue if !ref($lvalue) && ref($rvalue);
+
+  if (ref($lvalue) eq 'ARRAY' && !ref($rvalue)) {
+    return [@$lvalue, $rvalue];
   }
 
-  if (!$rvalue) {
-    return $lvalue;
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'ARRAY') {
+    return [@$lvalue, @$rvalue];
   }
 
-  if (ref $lvalue eq 'HASH') {
-    if (ref $rvalue eq 'HASH') {
-      for my $index (keys %{$rvalue}) {
-        my $lprop = $lvalue->{$index};
-        my $rprop = $rvalue->{$index};
-        $lvalue->{$index} = (
-            ((ref($lprop) eq 'HASH') && (ref($rprop) eq 'HASH'))
-            || ((ref($lprop) eq 'ARRAY') && (ref($rprop) eq 'ARRAY'))
-          )
-          ? merge($lprop, $rprop)
-          : $rprop;
-      }
-    }
-    else {
-      $lvalue = $rvalue;
-    }
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'HASH') {
+    return [@$lvalue, values %$rvalue];
   }
 
-  if (ref $lvalue eq 'ARRAY') {
-    if (ref $rvalue eq 'ARRAY') {
-      for my $index (0..$#{$rvalue}) {
-        my $lprop = $lvalue->[$index];
-        my $rprop = $rvalue->[$index];
-        $lvalue->[$index] = (
-            ((ref($lprop) eq 'HASH') && (ref($rprop) eq 'HASH'))
-            || ((ref($lprop) eq 'ARRAY') && (ref($rprop) eq 'ARRAY'))
-          )
-          ? merge($lprop, $rprop)
-          : $rprop;
-      }
+  return $rvalue if ref($lvalue) eq 'HASH' && (!ref($rvalue) || ref($rvalue) eq 'ARRAY');
+
+  if (ref($lvalue) eq 'HASH' && ref($rvalue) eq 'HASH') {
+    my $result = {%$lvalue};
+    for my $key (keys %$rvalue) {
+      $result->{$key} = exists $lvalue->{$key} ? merge_flat($lvalue->{$key}, $rvalue->{$key}) : $rvalue->{$key};
     }
-    else {
-      $lvalue = $rvalue;
-    }
+    return $result;
   }
 
   return $lvalue;
+}
+
+sub merge_flat_mutate {
+  my ($lvalue, @rvalues) = @_;
+
+  return $lvalue if !@rvalues;
+
+  if (@rvalues > 1) {
+    $lvalue = merge_flat_mutate($lvalue, $_) for @rvalues;
+    return $lvalue;
+  }
+
+  my $rvalue = $rvalues[0];
+
+  return $_[0] = $rvalue if !ref($lvalue) && !ref($rvalue);
+
+  return $_[0] = $rvalue if !ref($lvalue) && ref($rvalue);
+
+  if (ref($lvalue) eq 'ARRAY' && !ref($rvalue)) {
+    push @$lvalue, $rvalue;
+    return $lvalue;
+  }
+
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'ARRAY') {
+    push @$lvalue, @$rvalue;
+    return $lvalue;
+  }
+
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'HASH') {
+    push @$lvalue, values %$rvalue;
+    return $lvalue;
+  }
+
+  return $_[0] = $rvalue if ref($lvalue) eq 'HASH' && (!ref($rvalue) || ref($rvalue) eq 'ARRAY');
+
+  if (ref($lvalue) eq 'HASH' && ref($rvalue) eq 'HASH') {
+    for my $key (keys %$rvalue) {
+      if (exists $lvalue->{$key}) {
+        merge_flat_mutate($lvalue->{$key}, $rvalue->{$key});
+      } else {
+        $lvalue->{$key} = $rvalue->{$key};
+      }
+    }
+    return $lvalue;
+  }
+
+  return $lvalue;
+}
+
+sub merge_join {
+  my ($lvalue, @rvalues) = @_;
+
+  return $lvalue if !@rvalues;
+
+  if (@rvalues > 1) {
+    my $result = $lvalue;
+
+    $result = merge_join($result, $_) for @rvalues;
+
+    return $result;
+  }
+
+  my $rvalue = $rvalues[0];
+
+  return $rvalue if !ref($lvalue) && !ref($rvalue);
+
+  return $rvalue if !ref($lvalue) && ref($rvalue);
+
+  if (ref($lvalue) eq 'ARRAY' && !ref($rvalue)) {
+    return [@$lvalue, $rvalue];
+  }
+
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'ARRAY') {
+    return [@$lvalue, @$rvalue];
+  }
+
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'HASH') {
+    return [@$lvalue, $rvalue];
+  }
+
+  return $rvalue if ref($lvalue) eq 'HASH' && (!ref($rvalue) || ref($rvalue) eq 'ARRAY');
+
+  if (ref($lvalue) eq 'HASH' && ref($rvalue) eq 'HASH') {
+    my $result = {%$lvalue};
+    for my $key (keys %$rvalue) {
+      $result->{$key} = exists $lvalue->{$key} ? merge_join($lvalue->{$key}, $rvalue->{$key}) : $rvalue->{$key};
+    }
+    return $result;
+  }
+
+  return $lvalue;
+}
+
+sub merge_join_mutate {
+  my ($lvalue, @rvalues) = @_;
+
+  return $lvalue if !@rvalues;
+
+  if (@rvalues > 1) {
+    $lvalue = merge_join_mutate($lvalue, $_) for @rvalues;
+    return $lvalue;
+  }
+
+  my $rvalue = $rvalues[0];
+
+  return $_[0] = $rvalue if !ref($lvalue) && !ref($rvalue);
+
+  return $_[0] = $rvalue if !ref($lvalue) && ref($rvalue);
+
+  if (ref($lvalue) eq 'ARRAY' && !ref($rvalue)) {
+    push @$lvalue, $rvalue;
+    return $lvalue;
+  }
+
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'ARRAY') {
+    push @$lvalue, @$rvalue;
+    return $lvalue;
+  }
+
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'HASH') {
+    push @$lvalue, $rvalue;
+    return $lvalue;
+  }
+
+  return $_[0] = $rvalue if ref($lvalue) eq 'HASH' && (!ref($rvalue) || ref($rvalue) eq 'ARRAY');
+
+  if (ref($lvalue) eq 'HASH' && ref($rvalue) eq 'HASH') {
+    for my $key (keys %$rvalue) {
+      if (exists $lvalue->{$key}) {
+        merge_join_mutate($lvalue->{$key}, $rvalue->{$key});
+      } else {
+        $lvalue->{$key} = $rvalue->{$key};
+      }
+    }
+    return $lvalue;
+  }
+
+  return $lvalue;
+}
+
+sub merge_keep {
+  my ($lvalue, @rvalues) = @_;
+
+  return $lvalue if !@rvalues;
+
+  if (@rvalues > 1) {
+    my $result = $lvalue;
+
+    $result = merge_keep($result, $_) for @rvalues;
+
+    return $result;
+  }
+
+  my $rvalue = $rvalues[0];
+
+  return $lvalue if !ref($lvalue) && !ref($rvalue);
+
+  return $lvalue if !ref($lvalue) && ref($rvalue);
+
+  if (ref($lvalue) eq 'ARRAY' && !ref($rvalue)) {
+    return [@$lvalue, $rvalue];
+  }
+
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'ARRAY') {
+    return [@$lvalue, @$rvalue];
+  }
+
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'HASH') {
+    return [@$lvalue, $rvalue];
+  }
+
+  return $lvalue if ref($lvalue) eq 'HASH' && (!ref($rvalue) || ref($rvalue) eq 'ARRAY');
+
+  if (ref($lvalue) eq 'HASH' && ref($rvalue) eq 'HASH') {
+    my $result = {%$lvalue};
+    for my $key (keys %$rvalue) {
+      $result->{$key} = exists $lvalue->{$key} ? merge_keep($lvalue->{$key}, $rvalue->{$key}) : $rvalue->{$key};
+    }
+    return $result;
+  }
+
+  return $lvalue;
+}
+
+sub merge_keep_mutate {
+  my ($lvalue, @rvalues) = @_;
+
+  return $lvalue if !@rvalues;
+
+  if (@rvalues > 1) {
+    $lvalue = merge_keep_mutate($lvalue, $_) for @rvalues;
+    return $lvalue;
+  }
+
+  my $rvalue = $rvalues[0];
+
+  return $lvalue if !ref($lvalue) && !ref($rvalue);
+
+  return $lvalue if !ref($lvalue) && ref($rvalue);
+
+  if (ref($lvalue) eq 'ARRAY' && !ref($rvalue)) {
+    push @$lvalue, $rvalue;
+    return $lvalue;
+  }
+
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'ARRAY') {
+    push @$lvalue, @$rvalue;
+    return $lvalue;
+  }
+
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'HASH') {
+    push @$lvalue, $rvalue;
+    return $lvalue;
+  }
+
+  return $lvalue if ref($lvalue) eq 'HASH' && (!ref($rvalue) || ref($rvalue) eq 'ARRAY');
+
+  if (ref($lvalue) eq 'HASH' && ref($rvalue) eq 'HASH') {
+    for my $key (keys %$rvalue) {
+      if (!exists $lvalue->{$key}) {
+        $lvalue->{$key} = $rvalue->{$key};
+      } else {
+        merge_keep_mutate($lvalue->{$key}, $rvalue->{$key});
+      }
+    }
+    return $lvalue;
+  }
+
+  return $lvalue;
+}
+
+sub merge_swap {
+  my ($lvalue, @rvalues) = @_;
+
+  return $lvalue if !@rvalues;
+
+  if (@rvalues > 1) {
+    my $result = $lvalue;
+
+    $result = merge_swap($result, $_) for @rvalues;
+
+    return $result;
+  }
+
+  my $rvalue = $rvalues[0];
+
+  return $rvalue if !ref($lvalue) && !ref($rvalue);
+
+  return $rvalue if !ref($lvalue) && ref($rvalue);
+
+  if (ref($lvalue) eq 'ARRAY' && !ref($rvalue)) {
+    return [@$lvalue, $rvalue];
+  }
+
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'ARRAY') {
+    my $result = [@$lvalue];
+    for my $i (0..$#$rvalue) {
+      $result->[$i] = $rvalue->[$i] if exists $rvalue->[$i];
+    }
+    return $result;
+  }
+
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'HASH') {
+    return [@$lvalue, $rvalue];
+  }
+
+  return $rvalue if ref($lvalue) eq 'HASH' && (!ref($rvalue) || ref($rvalue) eq 'ARRAY');
+
+  if (ref($lvalue) eq 'HASH' && ref($rvalue) eq 'HASH') {
+    my $result = {%$lvalue};
+    for my $key (keys %$rvalue) {
+      $result->{$key} = exists $lvalue->{$key} ? merge_swap($lvalue->{$key}, $rvalue->{$key}) : $rvalue->{$key};
+    }
+    return $result;
+  }
+
+  return $lvalue;
+}
+
+sub merge_swap_mutate {
+  my ($lvalue, @rvalues) = @_;
+
+  return $lvalue if !@rvalues;
+
+  if (@rvalues > 1) {
+    $lvalue = merge_swap_mutate($lvalue, $_) for @rvalues;
+    return $lvalue;
+  }
+
+  my $rvalue = $rvalues[0];
+
+  return $_[0] = $rvalue if !ref($lvalue) && !ref($rvalue);
+
+  return $_[0] = $rvalue if !ref($lvalue) && ref($rvalue);
+
+  if (ref($lvalue) eq 'ARRAY' && !ref($rvalue)) {
+    push @$lvalue, $rvalue;
+    return $lvalue;
+  }
+
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'ARRAY') {
+    for my $i (0..$#$rvalue) {
+      $lvalue->[$i] = $rvalue->[$i] if exists $rvalue->[$i];
+    }
+    return $lvalue;
+  }
+
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'HASH') {
+    push @$lvalue, $rvalue;
+    return $lvalue;
+  }
+
+  return $_[0] = $rvalue if ref($lvalue) eq 'HASH' && (!ref($rvalue) || ref($rvalue) eq 'ARRAY');
+
+  if (ref($lvalue) eq 'HASH' && ref($rvalue) eq 'HASH') {
+    for my $key (keys %$rvalue) {
+      if (exists $lvalue->{$key}) {
+        merge_swap_mutate($lvalue->{$key}, $rvalue->{$key});
+      } else {
+        $lvalue->{$key} = $rvalue->{$key};
+      }
+    }
+    return $lvalue;
+  }
+
+  return $lvalue;
+}
+
+sub merge_take {
+  my ($lvalue, @rvalues) = @_;
+
+  return $lvalue if !@rvalues;
+
+  if (@rvalues > 1) {
+    my $result = $lvalue;
+
+    $result = merge_take($result, $_) for @rvalues;
+
+    return $result;
+  }
+
+  my $rvalue = $rvalues[0];
+
+  if (ref($rvalue) eq 'ARRAY') {
+    return [map {merge_take(undef, $_)} @$rvalue];
+  }
+
+  if (ref($lvalue) eq 'HASH' && ref($rvalue) eq 'HASH') {
+    my $result = {%$lvalue};
+    foreach my $key (keys %$rvalue) {
+      $result->{$key} = merge_take($lvalue->{$key}, $rvalue->{$key});
+    }
+    return $result;
+  }
+
+  if (ref($rvalue) eq 'HASH') {
+    return {%$rvalue};
+  }
+
+  return $rvalue;
+}
+
+sub merge_take_mutate {
+  my ($lvalue, @rvalues) = @_;
+
+  return $lvalue if !@rvalues;
+
+  if (@rvalues > 1) {
+    $lvalue = merge_take_mutate($lvalue, $_) for @rvalues;
+    return $lvalue;
+  }
+
+  my $rvalue = $rvalues[0];
+
+  if (ref($lvalue) eq 'ARRAY' && ref($rvalue) eq 'ARRAY') {
+    @$lvalue = @$rvalue;
+    return $lvalue;
+  }
+
+  if (ref($lvalue) eq 'HASH' && ref($rvalue) eq 'HASH') {
+    foreach my $key (keys %$rvalue) {
+      $lvalue->{$key} = merge_take_mutate($lvalue->{$key}, $rvalue->{$key});
+    }
+    return $lvalue;
+  }
+
+  return $_[0] = $rvalue;
 }
 
 sub meta ($;$@) {
@@ -816,14 +2402,14 @@ sub raise ($;$) {
 
   ($self, my $parent) = (@$self) if (ref($self) eq 'ARRAY');
 
-  $data //= {};
-  $data->{context} //= (caller(1))[3];
+  $data ||= {};
+  $data->{context} ||= (caller(1))[3];
 
   $parent = 'Venus::Error' if !$parent;
 
   require Venus::Throw;
 
-  return Venus::Throw->new(package => $self, parent => $parent)->error($data);
+  return Venus::Throw->new(package => $self, parent => $parent)->die($data);
 }
 
 sub random (;$@) {
@@ -844,6 +2430,70 @@ sub range ($;@) {
   my ($data, @args) = @_;
 
   return array($data, 'range', @args);
+}
+
+sub read_env ($) {
+  my ($data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new->read_env($data);
+}
+
+sub read_env_file ($) {
+  my ($data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new->read_env_file($data);
+}
+
+sub read_json ($) {
+  my ($data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new->read_json($data);
+}
+
+sub read_json_file ($) {
+  my ($data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new->read_json_file($data);
+}
+
+sub read_perl ($) {
+  my ($data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new->read_perl($data);
+}
+
+sub read_perl_file ($) {
+  my ($data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new->read_perl_file($data);
+}
+
+sub read_yaml ($) {
+  my ($data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new->read_yaml($data);
+}
+
+sub read_yaml_file ($) {
+  my ($data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new->read_yaml_file($data);
 }
 
 sub regexp ($;$@) {
@@ -884,27 +2534,21 @@ sub replace ($;$@) {
   return Venus::Replace->new(@data)->$code(@args);
 }
 
-sub resolve ($;@) {
-  my ($data, @args) = @_;
-
-  return container($data, 'resolve', @args);
-}
-
 sub roll (@) {
 
   return (@_[1,0,2..$#_]);
 }
 
-sub schema ($;$@) {
-  my ($data, $code, @args) = @_;
+sub schema (;$@) {
+  my ($code, @args) = @_;
 
   require Venus::Schema;
 
   if (!$code) {
-    return Venus::Schema->new($data);
+    return Venus::Schema->new;
   }
 
-  return Venus::Schema->new($data)->$code(@args);
+  return Venus::Schema->new->$code(@args);
 }
 
 sub search ($;$@) {
@@ -938,6 +2582,27 @@ sub set ($;$@) {
   return Venus::Set->new($data)->$code(@args);
 }
 
+sub sets ($;@) {
+  my ($data, @args) = @_;
+
+  $data = cast($data);
+
+  my $result = [];
+
+  if ($data->isa('Venus::Hash')) {
+    $result = $data->sets(@args);
+
+    $_[0] = $data->get;
+  }
+  elsif ($data->isa('Venus::Array')) {
+    $result = $data->sets(@args);
+
+    $_[0] = $data->get;
+  }
+
+  return wantarray ? (@{$result}) : $result;
+}
+
 sub space ($;$@) {
   my ($data, $code, @args) = @_;
 
@@ -948,6 +2613,11 @@ sub space ($;$@) {
   }
 
   return Venus::Space->new($data)->$code(@args);
+}
+
+sub sorts (@) {
+
+  return CORE::sort(map list($_), @_);
 }
 
 sub string ($;$@) {
@@ -1021,14 +2691,44 @@ sub test ($;$@) {
   return Venus::Test->new($data)->$code(@args);
 }
 
-sub text {
+sub text_pod ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Text::Pod;
+
+  if (!$code) {
+    return Venus::Text::Pod->new($data);
+  }
+
+  return Venus::Text::Pod->new($data)->$code(@args);
+}
+
+sub text_pod_string {
   my (@args) = @_;
 
   my $file = (grep -f, (caller(0))[1], $0)[0];
 
-  my $data = data($file);
+  return text_pod($file, 'string', @args > 1 ? @args : (undef, @args));
+}
 
-  return $data->text->string(@args > 1 ? @args : (undef, @args));
+sub text_tag ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Text::Tag;
+
+  if (!$code) {
+    return Venus::Text::Tag->new($data);
+  }
+
+  return Venus::Text::Tag->new($data)->$code(@args);
+}
+
+sub text_tag_string {
+  my (@args) = @_;
+
+  my $file = (grep -f, (caller(0))[1], $0)[0];
+
+  return text_tag($file, 'string', @args > 1 ? @args : (undef, @args));
 }
 
 sub then (@) {
@@ -1039,49 +2739,16 @@ sub then (@) {
 sub throw ($;$@) {
   my ($data, $code, @args) = @_;
 
+  $data ||= {};
+
   require Venus::Throw;
 
-  my $throw = Venus::Throw->new(context => (caller(1))[3])->do(
-    frame => 1,
-  );
+  my $throw = Venus::Throw->new(context => (caller(1))[3]);
 
-  if (ref $data ne 'HASH') {
-    $throw->package($data) if $data;
-  }
-  else {
-    if (exists $data->{as}) {
-      $throw->as($data->{as});
-    }
-    if (exists $data->{capture}) {
-      $throw->capture(@{$data->{capture}});
-    }
-    if (exists $data->{context}) {
-      $throw->context($data->{context});
-    }
-    if (exists $data->{error}) {
-      $throw->error($data->{error});
-    }
-    if (exists $data->{frame}) {
-      $throw->frame($data->{frame});
-    }
-    if (exists $data->{message}) {
-      $throw->message($data->{message});
-    }
-    if (exists $data->{name}) {
-      $throw->name($data->{name});
-    }
-    if (exists $data->{package}) {
-      $throw->package($data->{package});
-    }
-    if (exists $data->{parent}) {
-      $throw->parent($data->{parent});
-    }
-    if (exists $data->{stash}) {
-      $throw->stash($_, $data->{stash}->{$_}) for keys %{$data->{stash}};
-    }
-    if (exists $data->{on}) {
-      $throw->on($data->{on});
-    }
+  $data = {package => $data} if ref $data ne 'HASH';
+
+  for my $key (keys %{$data}) {
+    $throw->$key($data->{$key}) if $throw->can($key);
   }
 
   return $throw if !$code;
@@ -1108,16 +2775,118 @@ sub try ($;$@) {
   return Venus::Try->new($data)->$code(@args);
 }
 
-sub type ($;$@) {
-  my ($data, $code, @args) = @_;
+sub tv {
+  my ($lvalue, $rvalue) = @_;
+
+  require Scalar::Util;
+
+  if (is($lvalue, $rvalue)) {
+    return true();
+  }
+  if (!defined($lvalue) && !defined($rvalue)) {
+    return true();
+  }
+  if (!defined($lvalue) || !defined($rvalue)) {
+    return false();
+  }
+  if (ref($lvalue) && ref($rvalue)) {
+    if (Scalar::Util::blessed($lvalue) && Scalar::Util::blessed($rvalue)) {
+      if (ref($lvalue) ne ref($rvalue)) {
+        return false();
+      }
+      if (UNIVERSAL::isa($lvalue, 'HASH')) {
+        return tv({%$lvalue}, {%$rvalue});
+      }
+      elsif (UNIVERSAL::isa($lvalue, 'ARRAY')) {
+        return tv([@$lvalue], [@$rvalue]);
+      }
+      elsif (UNIVERSAL::isa($lvalue, 'REF')) {
+        return tv($$lvalue, $$rvalue);
+      }
+      elsif (UNIVERSAL::isa($lvalue, 'SCALAR')) {
+        return tv($$lvalue, $$rvalue);
+      }
+      elsif (UNIVERSAL::isa($lvalue, 'GLOB')) {
+        return *$lvalue eq *$rvalue;
+      }
+      elsif (UNIVERSAL::isa($lvalue, 'REGEXP')) {
+        return $lvalue eq $rvalue;
+      }
+      else {
+        return false();
+      }
+    }
+    else {
+      if (ref($lvalue) eq 'ARRAY') {
+        if (@$lvalue != @$rvalue) {
+          return false();
+        }
+        for my $i (0 .. $#$lvalue) {
+          if (!tv($lvalue->[$i], $rvalue->[$i])) {
+            return false();
+          }
+        }
+        return true();
+      }
+      elsif (ref($lvalue) eq 'HASH') {
+        if (keys %$lvalue != keys %$rvalue) {
+          return false();
+        }
+        for my $key (keys %$lvalue) {
+          if (!exists $rvalue->{$key} || !tv($lvalue->{$key}, $rvalue->{$key})) {
+            return false();
+          }
+        }
+        return true();
+      }
+      elsif (ref($lvalue) eq 'SCALAR') {
+        return tv($$lvalue, $$rvalue);
+      }
+      elsif (ref($lvalue) eq 'GLOB') {
+        return *$lvalue eq *$rvalue;
+      }
+      elsif (ref($lvalue) eq 'REF') {
+        return tv($$lvalue, $$rvalue);
+      }
+      elsif (ref($lvalue) eq 'REGEXP') {
+        return $lvalue eq $rvalue;
+      }
+      else {
+        return false();
+      }
+    }
+  }
+  if (!ref($lvalue) && !ref($rvalue)) {
+    require Venus::What;
+
+    if (Venus::What::scalar_is_boolean($lvalue) && Venus::What::scalar_is_boolean($rvalue)) {
+      return $lvalue == $rvalue;
+    }
+    elsif (Venus::What::scalar_is_numeric($lvalue) && Venus::What::scalar_is_numeric($rvalue)) {
+      return $lvalue == $rvalue;
+    }
+    elsif (!Venus::What::scalar_is_numeric($lvalue) && !Venus::What::scalar_is_numeric($rvalue)) {
+      return $lvalue eq $rvalue;
+    }
+    else {
+      return false();
+    }
+  }
+  else {
+    return false();
+  }
+}
+
+sub type {
+  my ($code, @args) = @_;
 
   require Venus::Type;
 
   if (!$code) {
-    return Venus::Type->new($data);
+    return Venus::Type->new;
   }
 
-  return Venus::Type->new($data)->$code(@args);
+  return Venus::Type->new->$code(@args);
 }
 
 sub unpack (@) {
@@ -1140,12 +2909,28 @@ sub vars ($;$@) {
   return Venus::Vars->new($data)->$code(@args);
 }
 
-sub venus ($;@) {
-  my ($name, @args) = @_;
+sub vns ($;@) {
+  my ($name, $data, $code, @args) = @_;
 
-  @args = ('new') if !@args;
+  my $space = space('Venus')->child($name)->do('tryload');
 
-  return chain(\space(join('/', 'Venus', $name))->package, @args);
+  if (!$code) {
+    return $space->package->new($#_ > 0 ? $data : ());
+  }
+
+  return $space->package->new($#_ > 0 ? $data : ())->$code(@args);
+}
+
+sub what ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::What;
+
+  if (!$code) {
+    return Venus::What->new($data);
+  }
+
+  return Venus::What->new($data)->$code(@args);
 }
 
 sub work ($) {
@@ -1168,6 +2953,70 @@ sub wrap ($;$) {
   no warnings 'redefine';
 
   return *{"${caller}::${moniker}"} = sub {@_ ? make($data, @_) : $data};
+}
+
+sub write_env ($) {
+  my ($data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new($data)->write_env;
+}
+
+sub write_env_file ($$) {
+  my ($path, $data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new($data)->write_env_file($path);
+}
+
+sub write_json ($) {
+  my ($data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new($data)->write_json;
+}
+
+sub write_json_file ($$) {
+  my ($path, $data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new($data)->write_json_file($path);
+}
+
+sub write_perl ($) {
+  my ($data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new($data)->write_perl;
+}
+
+sub write_perl_file ($$) {
+  my ($path, $data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new($data)->write_perl_file($path);
+}
+
+sub write_yaml ($) {
+  my ($data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new($data)->write_yaml;
+}
+
+sub write_yaml_file ($$) {
+  my ($path, $data) = @_;
+
+  require Venus::Config;
+
+  return Venus::Config->new($data)->write_yaml_file($path);
 }
 
 sub yaml (;$$) {
@@ -1207,7 +3056,7 @@ Standard Library for Perl 5
 
 =head1 VERSION
 
-4.15
+5.00
 
 =cut
 
@@ -1233,7 +3082,7 @@ Standard Library for Perl 5
   }
 
   # boolean keywords, and more!
-  true ne false;
+  my $bool = true ne false;
 
 =cut
 
@@ -1337,6 +3186,346 @@ This package provides the following functions:
 
 =cut
 
+=head2 after
+
+  after(string $name, coderef $code) (coderef)
+
+The after function installs a method modifier that executes after the original
+method, allowing you to perform actions after a method call. B<Note:> The
+return value of the modifier routine is ignored; the wrapped method always
+returns the value from the original method. Modifiers are executed in the order
+they are stacked. This function is always exported unless a routine of the same
+name already exists.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item after example 1
+
+  package Example;
+
+  use Venus::Class 'after', 'attr';
+
+  attr 'calls';
+
+  sub BUILD {
+    my ($self) = @_;
+    $self->calls([]);
+  }
+
+  sub test {
+    my ($self) = @_;
+    push @{$self->calls}, 'original';
+    return 'original';
+  }
+
+  after 'test', sub {
+    my ($self) = @_;
+    push @{$self->calls}, 'after';
+    return 'ignored';
+  };
+
+  package main;
+
+  my $example = Example->new;
+  my $value = $example->test;
+
+  # "original"
+
+=back
+
+=over 4
+
+=item after example 2
+
+  package Example2;
+
+  use Venus::Class 'after', 'attr';
+
+  attr 'calls';
+
+  sub BUILD {
+    my ($self) = @_;
+    $self->calls([]);
+  }
+
+  sub test {
+    my ($self) = @_;
+    push @{$self->calls}, 'original';
+    return $self;
+  }
+
+  after 'test', sub {
+    my ($self) = @_;
+    push @{$self->calls}, 'after';
+    return $self;
+  };
+
+  package main;
+
+  my $example = Example2->new;
+  $example->test;
+  my $calls = $example->calls;
+
+  # ['original', 'after']
+
+=back
+
+=cut
+
+=head2 all
+
+  all(arrayref | hashref | consumes[Venus::Role::Mappable] $lvalue, any $rvalue) (boolean)
+
+The all function accepts an arrayref, hashref, or
+L<"mappable"|Venus::Role::Mappable> and returns true if the rvalue is a
+callback and returns true for all items in the collection. If the rvalue
+provided is not a coderef that value's type and value will be used as the
+criteria.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item all example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'all';
+
+  my $all = all [1, '1'], 1;
+
+  # false
+
+=back
+
+=over 4
+
+=item all example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'all';
+
+  my $all = all [1, 1], 1;
+
+  # true
+
+=back
+
+=over 4
+
+=item all example 3
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'all';
+
+  my $all = all {1, 2}, 1;
+
+  # false
+
+=back
+
+=over 4
+
+=item all example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'all';
+
+  my $all = all {1, 1}, 1;
+
+  # true
+
+=back
+
+=over 4
+
+=item all example 5
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'all';
+
+  my $all = all [[1], [1]], [1];
+
+  # true
+
+=back
+
+=over 4
+
+=item all example 6
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'all';
+
+  my $all = all [1, '1', 2..4], sub{$_ > 0};
+
+  # true
+
+=back
+
+=over 4
+
+=item all example 7
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'all';
+
+  my $all = all [1, '1', 2..4], sub{$_ > 1};
+
+  # false
+
+=back
+
+=cut
+
+=head2 any
+
+  any(arrayref | hashref | consumes[Venus::Role::Mappable] $lvalue, any $rvalue) (boolean)
+
+The any function accepts an arrayref, hashref, or
+L<"mappable"|Venus::Role::Mappable> and returns true if the rvalue is a
+callback and returns true for any items in the collection. If the rvalue
+provided is not a coderef that value's type and value will be used as the
+criteria.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item any example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'any';
+
+  my $any = any [1, '1'], 1;
+
+  # true
+
+=back
+
+=over 4
+
+=item any example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'any';
+
+  my $any = any [1, 1], 0;
+
+  # false
+
+=back
+
+=over 4
+
+=item any example 3
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'any';
+
+  my $any = any {1, 2}, 1;
+
+  # false
+
+=back
+
+=over 4
+
+=item any example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'any';
+
+  my $any = any {1, 1}, 1;
+
+  # true
+
+=back
+
+=over 4
+
+=item any example 5
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'any';
+
+  my $any = any [[0], [1]], [1];
+
+  # true
+
+=back
+
+=over 4
+
+=item any example 6
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'any';
+
+  my $any = any [1, '1', 2..4], sub{!defined};
+
+  # false
+
+=back
+
+=over 4
+
+=item any example 7
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'any';
+
+  my $any = any [1, '1', 2..4, undef], sub{!defined};
+
+  # true
+
+=back
+
+=cut
+
 =head2 args
 
   args(arrayref $value, string | coderef $code, any @args) (any)
@@ -1371,6 +3560,85 @@ I<Since C<3.10>>
   my $args = args ['--resource', 'users'], 'indexed';
 
   # {0 => '--resource', 1 => 'users'}
+
+=back
+
+=cut
+
+=head2 around
+
+  around(string $name, coderef $code) (coderef)
+
+The around function installs a method modifier that wraps around the original
+method, giving you complete control over its execution. The modifier receives
+the original method as its first argument, followed by the method's arguments,
+and must explicitly call the original method if desired.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item around example 1
+
+  package Example3;
+
+  use Venus::Class 'around', 'attr';
+
+  sub test {
+    my ($self, $value) = @_;
+    return $value;
+  }
+
+  around 'test', sub {
+    my ($orig, $self, $value) = @_;
+    my $result = $self->$orig($value);
+    return $result * 2;
+  };
+
+  package main;
+
+  my $result = Example3->new->test(5);
+
+  # 10
+
+=back
+
+=over 4
+
+=item around example 2
+
+  package Example4;
+
+  use Venus::Class 'around', 'attr';
+
+  attr 'calls';
+
+  sub BUILD {
+    my ($self) = @_;
+    $self->calls([]);
+  }
+
+  sub test {
+    my ($self) = @_;
+    push @{$self->calls}, 'original';
+    return $self;
+  }
+
+  around 'test', sub {
+    my ($orig, $self) = @_;
+    push @{$self->calls}, 'before';
+    $self->$orig;
+    push @{$self->calls}, 'after';
+    return $self;
+  };
+
+  package main;
+
+  my $example = Example4->new;
+  $example->test;
+  my $calls = $example->calls;
+
+  # ['before', 'original', 'after']
 
 =back
 
@@ -1604,6 +3872,88 @@ I<Since C<3.40>>
   my $await = await $async;
 
   # bless(..., "Venus::Future")
+
+=back
+
+=cut
+
+=head2 before
+
+  before(string $name, coderef $code) (coderef)
+
+The before function installs a method modifier that executes before the
+original method, allowing you to perform actions before a method call. B<Note:>
+The return value of the modifier routine is ignored; the wrapped method always
+returns the value from the original method. Modifiers are executed in the order
+they are stacked. This function is always exported unless a routine of the same
+name already exists.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item before example 1
+
+  package Example5;
+
+  use Venus::Class 'attr', 'before';
+
+  attr 'calls';
+
+  sub BUILD {
+    my ($self) = @_;
+    $self->calls([]);
+  }
+
+  sub test {
+    my ($self) = @_;
+    push @{$self->calls}, 'original';
+    return $self;
+  }
+
+  before 'test', sub {
+    my ($self) = @_;
+    push @{$self->calls}, 'before';
+    return $self;
+  };
+
+  package main;
+
+  my $example = Example5->new;
+  $example->test;
+  my $calls = $example->calls;
+
+  # ['before', 'original']
+
+=back
+
+=over 4
+
+=item before example 2
+
+  package Example6;
+
+  use Venus::Class 'attr', 'before';
+
+  attr 'validated';
+
+  sub test {
+    my ($self, $value) = @_;
+    return $value;
+  }
+
+  before 'test', sub {
+    my ($self, $value) = @_;
+    $self->validated(1) if $value > 0;
+    return 'ignored';
+  };
+
+  package main;
+
+  my $example = Example6->new;
+  my $value = $example->test(5);
+
+  # 5
 
 =back
 
@@ -2150,7 +4500,8 @@ The clargs function accepts a single arrayref of L<Getopt::Long> specs, or an
 arrayref of arguments followed by an arrayref of L<Getopt::Long> specs, and
 returns a three element list of L<Venus::Args>, L<Venus::Opts>, and
 L<Venus::Vars> objects. If only a single arrayref is provided, the arguments
-will be taken from C<@ARGV>.
+will be taken from C<@ARGV>. If this function is called in scalar context only
+the L<Venus::Opts> object will be returned.
 
 I<Since C<3.10>>
 
@@ -2209,6 +4560,39 @@ I<Since C<3.10>>
 
 =back
 
+=over 4
+
+=item clargs example 4
+
+  package main;
+
+  use Venus 'clargs';
+
+  my ($args, $opts, $vars) = clargs ['--help', 'how-to'],
+    ['resource|r=s', 'help|h'];
+
+  # (
+  #   bless(..., 'Venus::Args'),
+  #   bless(..., 'Venus::Opts'),
+  #   bless(..., 'Venus::Vars')
+  # )
+
+=back
+
+=over 4
+
+=item clargs example 5
+
+  package main;
+
+  use Venus 'clargs';
+
+  my $opts = clargs ['--help', 'how-to'], ['resource|r=s', 'help|h'];
+
+  # bless(..., 'Venus::Opts'),
+
+=back
+
 =cut
 
 =head2 cli
@@ -2241,11 +4625,15 @@ I<Since C<2.55>>
 
   use Venus 'cli';
 
-  my $cli = cli ['--help'];
+  my $cli = cli 'mycli';
 
   # bless({...}, 'Venus::Cli')
 
-  # $cli->set('opt', 'help', {})->opt('help');
+  # $cli->boolean('option', 'help');
+
+  # $cli->parse('--help');
+
+  # $cli->option_value('help');
 
   # 1
 
@@ -2343,6 +4731,165 @@ I<Since C<2.55>>
 
 =cut
 
+=head2 collect
+
+  collect(any $value, coderef $code) (any)
+
+The collect function uses L<Venus::Collect> to iterate over the value and
+selectively transform or filter the data. The function supports both list-like
+and hash-like data structures, handling key/value iteration when applicable.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item collect example 1
+
+  package main;
+
+  use Venus 'collect';
+
+  my $collect = collect [];
+
+  # []
+
+=back
+
+=over 4
+
+=item collect example 2
+
+  package main;
+
+  use Venus 'collect';
+
+  my $collect = collect [1..4], sub{$_%2==0?(@_):()};
+
+  # [2,4]
+
+=back
+
+=over 4
+
+=item collect example 3
+
+  package main;
+
+  use Venus 'collect';
+
+  my $collect = collect {};
+
+  # {}
+
+=back
+
+=over 4
+
+=item collect example 4
+
+  package main;
+
+  use Venus 'collect';
+
+  my $collect = collect {1..8}, sub{$_%6==0?(@_):()};
+
+  # {5,6}
+
+=back
+
+=cut
+
+=head2 concat
+
+  concat(any @args) (string)
+
+The concat function stringifies and L<"joins"|perlfunc/join> multiple values delimited
+by a single space and returns the resulting string.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item concat example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'concat';
+
+  my $concat = concat;
+
+  # ""
+
+=back
+
+=over 4
+
+=item concat example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'concat';
+
+  my $concat = concat 'hello';
+
+  # "hello"
+
+=back
+
+=over 4
+
+=item concat example 3
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'concat';
+
+  my $concat = concat 'hello', 'world';
+
+  # "hello world"
+
+=back
+
+=over 4
+
+=item concat example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'concat';
+
+  my $concat = concat 'value is', [1,2];
+
+  # "value is [1,2]"
+
+=back
+
+=over 4
+
+=item concat example 5
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'concat';
+
+  my $concat = concat 'value is', [1,2], 'and', [3,4];
+
+  # "value is [1,2] and [3,4]"
+
+=back
+
+=cut
+
 =head2 config
 
   config(hashref $value, string | coderef $code, any @args) (any)
@@ -2377,59 +4924,6 @@ I<Since C<2.55>>
   my $config = config {}, 'read_perl', '{"data"=>1}';
 
   # bless({...}, 'Venus::Config')
-
-=back
-
-=cut
-
-=head2 container
-
-  container(hashref $value, string | coderef $code, any @args) (any)
-
-The container function builds and returns a L<Venus::Container> object, or
-dispatches to the coderef or method provided.
-
-I<Since C<3.20>>
-
-=over 4
-
-=item container example 1
-
-  package main;
-
-  use Venus 'container';
-
-  my $container = container {};
-
-  # bless({...}, 'Venus::Config')
-
-=back
-
-=over 4
-
-=item container example 2
-
-  package main;
-
-  use Venus 'container';
-
-  my $data = {
-    '$metadata' => {
-      tmplog => "/tmp/log"
-    },
-    '$services' => {
-      log => {
-        package => "Venus/Path",
-        argument => {
-          '$metadata' => "tmplog"
-        }
-      }
-    }
-  };
-
-  my $log = container $data, 'resolve', 'log';
-
-  # bless({value => '/tmp/log'}, 'Venus::Path')
 
 =back
 
@@ -2478,12 +4972,12 @@ I<Since C<2.32>>
 
 =head2 data
 
-  data(string $value, string | coderef $code, any @args) (any)
+  data(any $value, string | coderef $code, any @args) (any)
 
-The data function builds and returns a L<Venus::Data> object, or dispatches
-to the coderef or method provided.
+The data function builds and returns a L<Venus::Data> object, or dispatches to
+the coderef or method provided.
 
-I<Since C<2.55>>
+I<Since C<4.15>>
 
 =over 4
 
@@ -2493,7 +4987,7 @@ I<Since C<2.55>>
 
   use Venus 'data';
 
-  my $data = data 't/data/sections';
+  my $data = data {value => {name => 'Elliot'}};
 
   # bless({...}, 'Venus::Data')
 
@@ -2507,9 +5001,45 @@ I<Since C<2.55>>
 
   use Venus 'data';
 
-  my $data = data 't/data/sections', 'string', undef, 'name';
+  my $data = data {value => {name => 'Elliot'}}, 'valid';
 
-  # "Example #1\nExample #2"
+  # 1
+
+=back
+
+=over 4
+
+=item data example 3
+
+  package main;
+
+  use Venus 'data';
+
+  my $data = data {value => {name => 'Elliot'}}, 'shorthand', ['name!' => 'string'];
+
+  # bless({...}, 'Venus::Data')
+
+  # $data->valid;
+
+  # 1
+
+=back
+
+=over 4
+
+=item data example 4
+
+  package main;
+
+  use Venus 'data';
+
+  my $data = data {value => {name => undef}}, 'shorthand', ['name!' => 'string'];
+
+  # bless({...}, 'Venus::Data')
+
+  # $data->valid;
+
+  # 0
 
 =back
 
@@ -2567,64 +5097,6 @@ I<Since C<2.40>>
   my $date = date time;
 
   # bless({...}, 'Venus::Date')
-
-=back
-
-=cut
-
-=head2 docs
-
-  docs(any @args) (any)
-
-The docs function builds a L<Venus::Data> object using L<Venus::Data/docs> for
-the current file, i.e. L<perlfunc/__FILE__> or script, i.e. C<$0>, and returns
-the result of a L<Venus::Data/string> operation using the arguments provided.
-
-I<Since C<3.30>>
-
-=over 4
-
-=item docs example 1
-
-  package main;
-
-  use Venus 'docs';
-
-  # =head1 ABSTRACT
-  #
-  # Example Abstract
-  #
-  # =cut
-
-  my $docs = docs 'head1', 'ABSTRACT';
-
-  # "Example Abstract"
-
-=back
-
-=over 4
-
-=item docs example 2
-
-  package main;
-
-  use Venus 'docs';
-
-  # =head1 NAME
-  #
-  # Example #1
-  #
-  # =cut
-  #
-  # =head1 NAME
-  #
-  # Example #2
-  #
-  # =cut
-
-  my $docs = docs 'head1', 'NAME';
-
-  # "Example #1\nExample #2"
 
 =back
 
@@ -2728,6 +5200,49 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 factory
+
+  factory(hashref $value, string | coderef $code, any @args) (any)
+
+The factory function builds and returns a L<Venus::Factory> object, or
+dispatches to the coderef or method provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item factory example 1
+
+  package main;
+
+  use Venus 'factory';
+
+  my $factory = factory {};
+
+  # bless(..., 'Venus::Factory')
+
+=back
+
+=over 4
+
+=item factory example 2
+
+  package main;
+
+  use Venus 'factory';
+
+  my $path = factory {name => 'path', value => ['/tmp/log']}, 'class', 'Venus::Path';
+
+  # bless(..., 'Venus::Factory')
+
+  # $path->build;
+
+  # bless({value => '/tmp/log'}, 'Venus::Path')
+
+=back
+
+=cut
+
 =head2 false
 
   false() (boolean)
@@ -2801,6 +5316,61 @@ I<Since C<1.80>>
   my $fault = fault 'Something failed!';
 
   # bless({message => 'Something failed!'}, 'Venus::Fault')
+
+=back
+
+=cut
+
+=head2 flat
+
+  flat(any @args) (any)
+
+The flat function take a list of arguments and flattens them where possible and
+returns the list of flattened values. When a hashref is encountered, it will be
+flattened into key/value pairs. When an arrayref is encountered, it will be
+flattened into a list of items.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item flat example 1
+
+  package main;
+
+  use Venus 'flat';
+
+  my @flat = flat 1, 2, 3;
+
+  # (1, 2, 3)
+
+=back
+
+=over 4
+
+=item flat example 2
+
+  package main;
+
+  use Venus 'flat';
+
+  my @flat = flat 1, 2, 3, [1, 2, 3];
+
+  # (1, 2, 3, 1, 2, 3)
+
+=back
+
+=over 4
+
+=item flat example 3
+
+  package main;
+
+  use Venus 'flat';
+
+  my @flat = flat 1, 2, 3, [1, 2, 3], {1, 2};
+
+  # (1, 2, 3, 1, 2, 3, 1, 2)
 
 =back
 
@@ -2980,6 +5550,143 @@ I<Since C<2.50>>
 
 =cut
 
+=head2 gets
+
+  gets(string @args) (arrayref)
+
+The gets function select values from within the underlying data structure using
+L<Venus::Array/path> or L<Venus::Hash/path>, where each argument is a selector,
+returns all the values selected. Returns a list in list context.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item gets example 1
+
+  package main;
+
+  use Venus 'gets';
+
+  my $data = {'foo' => {'bar' => 'baz'}, 'bar' => ['baz']};
+
+  my $gets = gets $data, 'bar', 'foo.bar';
+
+  # [['baz'], 'baz']
+
+=back
+
+=over 4
+
+=item gets example 2
+
+  package main;
+
+  use Venus 'gets';
+
+  my $data = {'foo' => {'bar' => 'baz'}, 'bar' => ['baz']};
+
+  my ($bar, $foo_bar) = gets $data, 'bar', 'foo.bar';
+
+  # (['baz'], 'baz')
+
+=back
+
+=over 4
+
+=item gets example 3
+
+  package main;
+
+  use Venus 'gets';
+
+  my $data = ['foo', {'bar' => 'baz'}, 'bar', ['baz']];
+
+  my $gets = gets $data, '3', '1.bar';
+
+  # [['baz'], 'baz']
+
+=back
+
+=over 4
+
+=item gets example 4
+
+  package main;
+
+  use Venus 'gets';
+
+  my $data = ['foo', {'bar' => 'baz'}, 'bar', ['baz']];
+
+  my ($baz, $one_bar) = gets $data, '3', '1.bar';
+
+  # (['baz'], 'baz')
+
+=back
+
+=cut
+
+=head2 handle
+
+  handle(string $name, coderef $code) (coderef)
+
+The handle function installs a method modifier that wraps a method similar to
+L</around>, but is the low-level implementation. The modifier receives the
+original method as its first argument (which may be undef if the method doesn't
+  exist), followed by the method's arguments. This is the foundation for the
+other method modifiers.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item handle example 1
+
+  package Example7;
+
+  use Venus::Class 'handle';
+
+  sub test {
+    my ($self, $value) = @_;
+    return $value;
+  }
+
+  handle 'test', sub {
+    my ($orig, $self, $value) = @_;
+    return $orig ? $self->$orig($value * 2) : 0;
+  };
+
+  package main;
+
+  my $result = Example7->new->test(5);
+
+  # 10
+
+=back
+
+=over 4
+
+=item handle example 2
+
+  package Example8;
+
+  use Venus::Class 'handle';
+
+  handle 'missing', sub {
+    my ($orig, $self) = @_;
+    return 'method does not exist';
+  };
+
+  package main;
+
+  my $result = Example8->new->missing;
+
+  # "method does not exist"
+
+=back
+
+=cut
+
 =head2 hash
 
   hash(hashref $value, string | coderef $code, any @args) (any)
@@ -3085,24 +5792,99 @@ I<Since C<3.10>>
 
 =cut
 
-=head2 is_bool
+=head2 hook
 
-  is_bool(any $arg) (boolean)
+  hook(string $type, string $name, coderef $code) (coderef)
 
-The is_bool function returns L</true> if the value provided is a boolean value,
-not merely truthy, and L</false> otherwise.
+The hook function is a specialized method modifier helper that applies a
+modifier (after, around, before, or handle) to a lifecycle hook method. It
+automatically uppercases the hook name, making it convenient for modifying
+Venus lifecycle hooks like BUILD, BLESS, BUILDARGS, and AUDIT.
 
-I<Since C<3.18>>
+I<Since C<4.15>>
 
 =over 4
 
-=item is_bool example 1
+=item hook example 1
+
+  package Example9;
+
+  use Venus::Class 'attr', 'hook';
+
+  attr 'startup';
+
+  sub BUILD {
+    my ($self, $args) = @_;
+    $self->startup('original');
+  }
+
+  hook 'after', 'build', sub {
+    my ($self) = @_;
+    $self->startup('modified');
+  };
 
   package main;
 
-  use Venus 'is_bool';
+  my $result = Example9->new->startup;
 
-  my $is_bool = is_bool true;
+  # "modified"
+
+=back
+
+=over 4
+
+=item hook example 2
+
+  package Example10;
+
+  use Venus::Class 'attr', 'hook';
+
+  attr 'calls';
+
+  sub BUILD {
+    my ($self, $args) = @_;
+    $self->calls([]) if !$self->calls;
+    push @{$self->calls}, 'BUILD';
+  }
+
+  hook 'before', 'build', sub {
+    my ($self) = @_;
+    $self->calls([]) if !$self->calls;
+    push @{$self->calls}, 'before';
+  };
+
+  package main;
+
+  my $example = Example10->new;
+  my $calls = $example->calls;
+
+  # ['before', 'BUILD']
+
+=back
+
+=cut
+
+=head2 in
+
+  in(arrayref | hashref | consumes[Venus::Role::Mappable] $lvalue, any $rvalue) (boolean)
+
+The in function accepts an arrayref, hashref, or
+L<"mappable"|Venus::Role::Mappable> and returns true if the type and value of
+the rvalue is the same for any items in the collection.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item in example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'in';
+
+  my $in = in [1, '1'], 1;
 
   # true
 
@@ -3110,27 +5892,15 @@ I<Since C<3.18>>
 
 =over 4
 
-=item is_bool example 2
+=item in example 2
+
+  # given: synopsis
 
   package main;
 
-  use Venus 'is_bool';
+  use Venus 'in';
 
-  my $is_bool = is_bool false;
-
-  # true
-
-=back
-
-=over 4
-
-=item is_bool example 3
-
-  package main;
-
-  use Venus 'is_bool';
-
-  my $is_bool = is_bool 1;
+  my $in = in [1, 1], 0;
 
   # false
 
@@ -3138,13 +5908,453 @@ I<Since C<3.18>>
 
 =over 4
 
-=item is_bool example 4
+=item in example 3
+
+  # given: synopsis
 
   package main;
 
-  use Venus 'is_bool';
+  use Venus 'in';
 
-  my $is_bool = is_bool 0;
+  my $in = in {1, 2}, 1;
+
+  # false
+
+=back
+
+=over 4
+
+=item in example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'in';
+
+  my $in = in {1, 1}, 1;
+
+  # true
+
+=back
+
+=over 4
+
+=item in example 5
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'in';
+
+  my $in = in [[0], [1]], [1];
+
+  # true
+
+=back
+
+=cut
+
+=head2 is
+
+  is(any $lvalue, any $rvalue) (boolean)
+
+The is function returns true if the lvalue and rvalue are identical, i.e.
+refers to the same memory address, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is';
+
+  my $is = is 1, 1;
+
+  # false
+
+=back
+
+=over 4
+
+=item is example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is', 'number';
+
+  my $a = number 1;
+
+  my $is = is $a, 1;
+
+  # false
+
+=back
+
+=over 4
+
+=item is example 3
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is', 'number';
+
+  my $a = number 1;
+
+  my $is = is $a, $a;
+
+  # true
+
+=back
+
+=over 4
+
+=item is example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is', 'number';
+
+  my $a = number 1;
+  my $b = number 1;
+
+  my $is = is $a, $b;
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_blessed
+
+  is_blessed(any $data) (boolean)
+
+The is_blessed function uses L</check> to validate that the data provided is an
+object returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_blessed example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_blessed';
+
+  my $is_blessed = is_blessed bless {};
+
+  # true
+
+=back
+
+=over 4
+
+=item is_blessed example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_blessed';
+
+  my $is_blessed = is_blessed {};
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_boolean
+
+  is_boolean(any $data) (boolean)
+
+The is_boolean function uses L</check> to validate that the data provided is a
+boolean returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_boolean example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_boolean';
+
+  my $is_boolean = is_boolean true;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_boolean example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_boolean';
+
+  my $is_boolean = is_boolean 1;
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_coderef
+
+  is_coderef(any $data) (boolean)
+
+The is_coderef function uses L</check> to validate that the data provided is a
+coderef returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_coderef example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_coderef';
+
+  my $is_coderef = is_coderef sub{};
+
+  # true
+
+=back
+
+=over 4
+
+=item is_coderef example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_coderef';
+
+  my $is_coderef = is_coderef {};
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_dirhandle
+
+  is_dirhandle(any $data) (boolean)
+
+The is_dirhandle function uses L</check> to validate that the data provided is
+a dirhandle returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_dirhandle example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_dirhandle';
+
+  opendir my $dh, 't';
+
+  my $is_dirhandle = is_dirhandle $dh;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_dirhandle example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_dirhandle';
+
+  open my $fh, '<', 't/data/moon';
+
+  my $is_dirhandle = is_dirhandle $fh;
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_enum
+
+  is_enum(any $data, value @args) (boolean)
+
+The is_enum function uses L</check> to validate that the data provided is an
+enum returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_enum example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_enum';
+
+  my $is_enum = is_enum 'yes', 'yes', 'no'
+
+  # true
+
+=back
+
+=over 4
+
+=item is_enum example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_enum';
+
+  my $is_enum = is_enum 'yes', 'Yes', 'No';
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_error
+
+  is_error(any $data, string | coderef $code, any @args) (boolean)
+
+The is_error function accepts a scalar value and returns true if the value is
+(or is derived from) L<Venus::Error>. This function can dispatch method calls
+and execute callbacks, and returns true of the return value from the callback
+is truthy, and false otherwise.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_error example 1
+
+  package main;
+
+  use Venus 'is_error';
+
+  my $is_error = is_error 0;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_error example 2
+
+  package main;
+
+  use Venus 'is_error';
+
+  my $is_error = is_error 1;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_error example 3
+
+  package main;
+
+  use Venus 'catch', 'fault', 'is_error';
+
+  my $fault = catch {fault};
+
+  my $is_error = is_error $fault;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_error example 4
+
+  package main;
+
+  use Venus 'catch', 'error', 'is_error';
+
+  my $error = catch {error};
+
+  my $is_error = is_error $error;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_error example 5
+
+  package main;
+
+  use Venus 'catch', 'error', 'is_error';
+
+  my $error = catch {error {verbose => true}};
+
+  my $is_error = is_error $error, 'verbose';
+
+  # true
+
+=back
+
+=over 4
+
+=item is_error example 6
+
+  package main;
+
+  use Venus 'catch', 'error', 'is_error';
+
+  my $error = catch {error {verbose => false}};
+
+  my $is_error = is_error $error, 'verbose';
 
   # false
 
@@ -3154,10 +6364,10 @@ I<Since C<3.18>>
 
 =head2 is_false
 
-  is_false(any $data) (boolean)
+  is_false(any $data, string | coderef $code, any @args) (boolean)
 
 The is_false function accepts a scalar value and returns true if the value is
-falsy.
+falsy. This function can dispatch method calls and execute callbacks.
 
 I<Since C<3.04>>
 
@@ -3189,14 +6399,626 @@ I<Since C<3.04>>
 
 =back
 
+=over 4
+
+=item is_false example 3
+
+  package main;
+
+  use Venus 'array', 'is_false';
+
+  my $array = array [];
+
+  my $is_false = is_false $array;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_false example 4
+
+  package main;
+
+  use Venus 'array', 'is_false';
+
+  my $array = array [];
+
+  my $is_false = is_false $array, 'count';
+
+  # true
+
+=back
+
+=over 4
+
+=item is_false example 5
+
+  package main;
+
+  use Venus 'array', 'is_false';
+
+  my $array = array [1];
+
+  my $is_false = is_false $array, 'count';
+
+  # false
+
+=back
+
+=over 4
+
+=item is_false example 6
+
+  package main;
+
+  use Venus 'is_false';
+
+  my $array = undef;
+
+  my $is_false = is_false $array, 'count';
+
+  # true
+
+=back
+
+=cut
+
+=head2 is_fault
+
+  is_fault(any $data) (boolean)
+
+The is_fault function accepts a scalar value and returns true if the value is
+(or is derived from) L<Venus::Fault>.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_fault example 1
+
+  package main;
+
+  use Venus 'is_fault';
+
+  my $is_fault = is_fault 0;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_fault example 2
+
+  package main;
+
+  use Venus 'is_fault';
+
+  my $is_fault = is_fault 1;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_fault example 3
+
+  package main;
+
+  use Venus 'catch', 'fault', 'is_fault';
+
+  my $fault = catch {fault};
+
+  my $is_fault = is_fault $fault;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_fault example 4
+
+  package main;
+
+  use Venus 'catch', 'error', 'is_fault';
+
+  my $error = catch {error};
+
+  my $is_fault = is_fault $error;
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_filehandle
+
+  is_filehandle(any $data) (boolean)
+
+The is_filehandle function uses L</check> to validate that the data provided is
+a filehandle returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_filehandle example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_filehandle';
+
+  open my $fh, '<', 't/data/moon';
+
+  my $is_filehandle = is_filehandle $fh;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_filehandle example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_filehandle';
+
+  opendir my $dh, 't';
+
+  my $is_filehandle = is_filehandle $dh;
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_float
+
+  is_float(any $data) (boolean)
+
+The is_float function uses L</check> to validate that the data provided is a
+float returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_float example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_float';
+
+  my $is_float = is_float .123;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_float example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_float';
+
+  my $is_float = is_float 123;
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_glob
+
+  is_glob(any $data) (boolean)
+
+The is_glob function uses L</check> to validate that the data provided is a
+glob returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_glob example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_glob';
+
+  my $is_glob = is_glob \*main;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_glob example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_glob';
+
+  my $is_glob = is_glob *::main;
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_hashref
+
+  is_hashref(any $data) (boolean)
+
+The is_hashref function uses L</check> to validate that the data provided is a
+hashref returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_hashref example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_hashref';
+
+  my $is_hashref = is_hashref {};
+
+  # true
+
+=back
+
+=over 4
+
+=item is_hashref example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_hashref';
+
+  my $is_hashref = is_hashref [];
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_number
+
+  is_number(any $data) (boolean)
+
+The is_number function uses L</check> to validate that the data provided is a
+number returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_number example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_number';
+
+  my $is_number = is_number 0;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_number example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_number';
+
+  my $is_number = is_number '0';
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_object
+
+  is_object(any $data) (boolean)
+
+The is_object function uses L</check> to validate that the data provided is an
+object returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_object example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_object';
+
+  my $is_object = is_object bless {};
+
+  # true
+
+=back
+
+=over 4
+
+=item is_object example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_object';
+
+  my $is_object = is_object {};
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_package
+
+  is_package(any $data) (boolean)
+
+The is_package function uses L</check> to validate that the data provided is a
+package returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_package example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_package';
+
+  my $is_package = is_package 'Venus';
+
+  # true
+
+=back
+
+=over 4
+
+=item is_package example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_package';
+
+  my $is_package = is_package 'MyApp';
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_reference
+
+  is_reference(any $data) (boolean)
+
+The is_reference function uses L</check> to validate that the data provided is
+a reference returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_reference example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_reference';
+
+  my $is_reference = is_reference \0;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_reference example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_reference';
+
+  my $is_reference = is_reference 0;
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_regexp
+
+  is_regexp(any $data) (boolean)
+
+The is_regexp function uses L</check> to validate that the data provided is a
+regexp returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_regexp example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_regexp';
+
+  my $is_regexp = is_regexp qr/hello/;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_regexp example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_regexp';
+
+  my $is_regexp = is_regexp 'hello';
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_scalarref
+
+  is_scalarref(any $data) (boolean)
+
+The is_scalarref function uses L</check> to validate that the data provided is
+a scalarref returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_scalarref example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_scalarref';
+
+  my $is_scalarref = is_scalarref \1;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_scalarref example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_scalarref';
+
+  my $is_scalarref = is_scalarref 1;
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_string
+
+  is_string(any $data) (boolean)
+
+The is_string function uses L</check> to validate that the data provided is a
+string returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_string example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_string';
+
+  my $is_string = is_string '0';
+
+  # true
+
+=back
+
+=over 4
+
+=item is_string example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_string';
+
+  my $is_string = is_string 0;
+
+  # false
+
+=back
+
 =cut
 
 =head2 is_true
 
-  is_true(any $data) (boolean)
+  is_true(any $data, string | coderef $code, any @args) (boolean)
 
 The is_true function accepts a scalar value and returns true if the value is
-truthy.
+truthy. This function can dispatch method calls and execute callbacks.
 
 I<Since C<3.04>>
 
@@ -3223,6 +7045,199 @@ I<Since C<3.04>>
   use Venus 'is_true';
 
   my $is_true = is_true 0;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_true example 3
+
+  package main;
+
+  use Venus 'array', 'is_true';
+
+  my $array = array [];
+
+  my $is_true = is_true $array;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_true example 4
+
+  package main;
+
+  use Venus 'array', 'is_true';
+
+  my $array = array [];
+
+  my $is_true = is_true $array, 'count';
+
+  # false
+
+=back
+
+=over 4
+
+=item is_true example 5
+
+  package main;
+
+  use Venus 'array', 'is_true';
+
+  my $array = array [1];
+
+  my $is_true = is_true $array, 'count';
+
+  # true
+
+=back
+
+=over 4
+
+=item is_true example 6
+
+  package main;
+
+  use Venus 'is_true';
+
+  my $array = undef;
+
+  my $is_true = is_true $array, 'count';
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_undef
+
+  is_undef(any $data) (boolean)
+
+The is_undef function uses L</check> to validate that the data provided is an
+undef returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_undef example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_undef';
+
+  my $is_undef = is_undef undef;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_undef example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_undef';
+
+  my $is_undef = is_undef '';
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_value
+
+  is_value(any $data) (boolean)
+
+The is_value function uses L</check> to validate that the data provided is an
+value returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_value example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_value';
+
+  my $is_value = is_value 0;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_value example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_value';
+
+  my $is_value = is_value sub{};
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_yesno
+
+  is_yesno(any $data) (boolean)
+
+The is_yesno function uses L</check> to validate that the data provided is a
+yesno returns true, otherwise returns false.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item is_yesno example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_yesno';
+
+  my $is_yesno = is_yesno 0;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_yesno example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'is_yesno';
+
+  my $is_yesno = is_yesno undef;
 
   # false
 
@@ -3446,6 +7461,44 @@ I<Since C<2.32>>
 
 =cut
 
+=head2 map
+
+  map(hashref $value) (Venus::Map)
+
+The map function returns a L<Venus::Map> object for the hashref provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item map example 1
+
+  package main;
+
+  use Venus;
+
+  my $map = Venus::map {1..4};
+
+  # bless(..., 'Venus::Map')
+
+=back
+
+=over 4
+
+=item map example 2
+
+  package main;
+
+  use Venus;
+
+  my $map = Venus::map {1..4}, 'count';
+
+  # 2
+
+=back
+
+=cut
+
 =head2 match
 
   match(any $value, coderef $callback) (any)
@@ -3573,7 +7626,8 @@ I<Since C<2.50>>
   merge(any @args) (any)
 
 The merge function returns a value which is a merger of all of the arguments
-provided.
+provided. This function is an alias for L</merge_join> given the principle of
+least surprise.
 
 I<Since C<2.32>>
 
@@ -3602,6 +7656,1837 @@ I<Since C<2.32>>
   my $merged = merge({1..4}, {5, 6}, {7, 8, 9, 0});
 
   # {1..9, 0}
+
+=back
+
+=cut
+
+=head2 merge_flat
+
+  merge_flat(any @args) (any)
+
+The merge_flat function merges two (or more) values and returns a new values
+based on the types of the inputs:
+
+B<Note:> This function appends hashref values to an arrayref when encountered.
+
+=over 4
+
+=item * When the C<lvalue> is a "scalar" and the C<rvalue> is a "scalar" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "scalar" and the C<rvalue> is a "arrayref" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "scalar" and the C<rvalue> is a "hashref" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "arrayref" and the C<rvalue> is a "scalar" we
+append the C<rvalue> to the C<lvalue>.
+
+=item * When the C<lvalue> is a "arrayref" and the C<rvalue> is a "arrayref"
+we append the items in C<rvalue> to the C<lvalue>.
+
+=item * When the C<lvalue> is a "arrayref" and the C<rvalue> is a "hashref" we
+append the values in C<rvalue> to the C<lvalue>.
+
+=item * When the C<lvalue> is a "hashref" and the C<rvalue> is a "scalar" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "hashref" and the C<rvalue> is a "arrayref" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "hashref" and the C<rvalue> is a "hashref" we
+append the keys and values in C<rvalue> to the C<lvalue>, overwriting existing
+keys where there's overlap.
+
+=back
+
+I<Since C<4.15>>
+
+=over 4
+
+=item merge_flat example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_flat';
+
+  my $merge_flat = merge_flat;
+
+  # undef
+
+=back
+
+=over 4
+
+=item merge_flat example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_flat';
+
+  my $merge_flat = merge_flat 1;
+
+  # 1
+
+=back
+
+=over 4
+
+=item merge_flat example 3
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_flat';
+
+  my $merge_flat = merge_flat 1, 2;
+
+  # 2
+
+=back
+
+=over 4
+
+=item merge_flat example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_flat';
+
+  my $merge_flat = merge_flat 1, [2, 3];
+
+  # [2, 3]
+
+=back
+
+=over 4
+
+=item merge_flat example 5
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_flat';
+
+  my $merge_flat = merge_flat 1, {a => 1};
+
+  # {a => 1}
+
+=back
+
+=over 4
+
+=item merge_flat example 6
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_flat';
+
+  my $merge_flat = merge_flat [1, 2], 3;
+
+  # [1, 2, 3]
+
+=back
+
+=over 4
+
+=item merge_flat example 7
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_flat';
+
+  my $merge_flat = merge_flat [1, 2], {a => 3, b => 4};
+
+  # [1, 2, 3, 4]
+
+=back
+
+=over 4
+
+=item merge_flat example 8
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_flat';
+
+  my $merge_flat = merge_flat(
+    {
+      a => 1,
+      b => {x => 10},
+      d => 0,
+      g => [4],
+    },
+    {
+      b => {y => 20},
+      c => 3,
+      e => [5],
+      f => [6]
+    },
+    {
+      b => {z => 456},
+      c => {z => 123},
+      d => 2,
+      e => [6, 7],
+      f => {7, 8},
+      g => 5,
+    },
+  );
+
+  # {
+  #   a => 1,
+  #   b => {
+  #     x => 10,
+  #     y => 20,
+  #     z => 456
+  #   },
+  #   c => {z => 123},
+  #   d => 2,
+  #   e => [5, 6, 7],
+  #   f => [6, 8],
+  #   g => [4, 5],
+  # }
+
+=back
+
+=cut
+
+=head2 merge_flat_mutate
+
+  merge_flat_mutate(any @args) (any)
+
+The merge_flat_mutate performs a merge operaiton in accordance with
+L</merge_flat> except that it mutates the values being merged and returns the
+mutated value.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item merge_flat_mutate example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_flat_mutate';
+
+  my $merge_flat_mutate = merge_flat_mutate;
+
+  # undef
+
+=back
+
+=over 4
+
+=item merge_flat_mutate example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_flat_mutate';
+
+  my $merge_flat_mutate = merge_flat_mutate 1;
+
+  # 1
+
+=back
+
+=over 4
+
+=item merge_flat_mutate example 3
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_flat_mutate';
+
+  $result = 1;
+
+  my $merge_flat_mutate = merge_flat_mutate $result, 2;
+
+  # 2
+
+  $result;
+
+  # 2
+
+=back
+
+=over 4
+
+=item merge_flat_mutate example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_flat_mutate';
+
+  $result = 1;
+
+  my $merge_flat_mutate = merge_flat_mutate $result, [2, 3];
+
+  # [2, 3]
+
+  $result;
+
+  # [2, 3]
+
+=back
+
+=over 4
+
+=item merge_flat_mutate example 5
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_flat_mutate';
+
+  $result = 1;
+
+  my $merge_flat_mutate = merge_flat_mutate $result, {a => 1};
+
+  # {a => 1}
+
+  $result;
+
+  # {a => 1}
+
+=back
+
+=over 4
+
+=item merge_flat_mutate example 6
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_flat_mutate';
+
+  $result = [1, 2];
+
+  my $merge_flat_mutate = merge_flat_mutate $result, 3;
+
+  # [1, 2, 3]
+
+  $result;
+
+  # [1, 2, 3]
+
+=back
+
+=over 4
+
+=item merge_flat_mutate example 7
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_flat_mutate';
+
+  $result = [1, 2];
+
+  my $merge_flat_mutate = merge_flat_mutate $result, {a => 3, b => 4};
+
+  # [1, 2, 3, 4]
+
+  $result;
+
+  # [1, 2, 3, 4]
+
+=back
+
+=cut
+
+=head2 merge_join
+
+  merge_join(any @args) (any)
+
+The merge_join merges two (or more) values and returns a new values based on
+the types of the inputs:
+
+B<Note:> This function merges hashrefs with hashrefs, and appends arrayrefs
+with arrayrefs.
+
+=over 4
+
+=item * When the C<lvalue> is a "scalar" and the C<rvalue> is a "scalar" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "scalar" and the C<rvalue> is a "arrayref" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "scalar" and the C<rvalue> is a "hashref" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "arrayref" and the C<rvalue> is a "scalar" we
+append the C<rvalue> to the C<lvalue>.
+
+=item * When the C<lvalue> is a "arrayref" and the C<rvalue> is a "arrayref"
+we append the items in C<rvalue> to the C<lvalue>.
+
+=item * When the C<lvalue> is a "arrayref" and the C<rvalue> is a "hashref" we
+append the C<rvalue> to the C<lvalue>.
+
+=item * When the C<lvalue> is a "hashref" and the C<rvalue> is a "scalar" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "hashref" and the C<rvalue> is a "arrayref" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "hashref" and the C<rvalue> is a "hashref" we
+append the keys and values in C<rvalue> to the C<lvalue>, overwriting existing
+keys where there's overlap.
+
+=back
+
+I<Since C<4.15>>
+
+=over 4
+
+=item merge_join example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_join';
+
+  my $merge_join = merge_join;
+
+  # undef
+
+=back
+
+=over 4
+
+=item merge_join example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_join';
+
+  my $merge_join = merge_join 1;
+
+  # 1
+
+=back
+
+=over 4
+
+=item merge_join example 3
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_join';
+
+  my $merge_join = merge_join 1, 2;
+
+  # 2
+
+=back
+
+=over 4
+
+=item merge_join example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_join';
+
+  my $merge_join = merge_join 1, [2, 3];
+
+  # [2, 3]
+
+=back
+
+=over 4
+
+=item merge_join example 5
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_join';
+
+  my $merge_join = merge_join [1, 2], 3;
+
+  # [1, 2, 3]
+
+=back
+
+=over 4
+
+=item merge_join example 6
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_join';
+
+  my $merge_join = merge_join [1, 2], [3, 4];
+
+  # [1, 2, 3, 4]
+
+=back
+
+=over 4
+
+=item merge_join example 7
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_join';
+
+  my $merge_join = merge_join {a => 1}, {a => 2, b => 3};
+
+  # {a => 2, b => 3}
+
+=back
+
+=over 4
+
+=item merge_join example 8
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_join';
+
+  my $merge_join = merge_join(
+    {
+      a => 1,
+      b => {x => 10},
+      d => 0,
+      g => [4],
+    },
+    {
+      b => {y => 20},
+      c => 3,
+      e => [5],
+      f => [6]
+    },
+    {
+      b => {z => 456},
+      c => {z => 123},
+      d => 2,
+      e => [6, 7],
+      f => {7, 8},
+      g => 5,
+    },
+  );
+
+  # {
+  #   a => 1,
+  #   b => {
+  #     x => 10,
+  #     y => 20,
+  #     z => 456
+  #   },
+  #   c => {z => 123},
+  #   d => 2,
+  #   e => [5, 6, 7],
+  #   f => [6, {7, 8}],
+  #   g => [4, 5],
+  # }
+
+=back
+
+=cut
+
+=head2 merge_join_mutate
+
+  merge_join_mutate(any @args) (any)
+
+The merge_join_mutate performs a merge operaiton in accordance with
+L</merge_join> except that it mutates the values being merged and returns the
+mutated value.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item merge_join_mutate example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_join_mutate';
+
+  my $merge_join_mutate = merge_join_mutate;
+
+  # undef
+
+=back
+
+=over 4
+
+=item merge_join_mutate example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_join_mutate';
+
+  my $merge_join_mutate = merge_join_mutate 1;
+
+  # 1
+
+=back
+
+=over 4
+
+=item merge_join_mutate example 3
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_join_mutate';
+
+  $result = 1;
+
+  my $merge_join_mutate = merge_join_mutate $result, 2;
+
+  # 2
+
+  $result;
+
+  # 2
+
+=back
+
+=over 4
+
+=item merge_join_mutate example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_join_mutate';
+
+  $result = 1;
+
+  my $merge_join_mutate = merge_join_mutate $result, [2, 3];
+
+  # [2, 3]
+
+  $result;
+
+  # [2, 3]
+
+=back
+
+=over 4
+
+=item merge_join_mutate example 5
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_join_mutate';
+
+  $result = [1, 2];
+
+  my $merge_join_mutate = merge_join_mutate $result, 3;
+
+  # [1, 2, 3]
+
+  $result;
+
+  # [1, 2, 3]
+
+=back
+
+=over 4
+
+=item merge_join_mutate example 6
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_join_mutate';
+
+  $result = [1, 2];
+
+  my $merge_join_mutate = merge_join_mutate $result, [3, 4];
+
+  # [1, 2, 3, 4]
+
+  $result;
+
+  # [1, 2, 3, 4]
+
+=back
+
+=over 4
+
+=item merge_join_mutate example 7
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_join_mutate';
+
+  $result = {a => 1};
+
+  my $merge_join_mutate = merge_join_mutate $result, {a => 2, b => 3};
+
+  # {a => 2, b => 3}
+
+  $result;
+
+  # {a => 2, b => 3}
+
+=back
+
+=cut
+
+=head2 merge_keep
+
+  merge_keep(any @args) (any)
+
+The merge_keep function merges two (or more) values and returns a new values
+based on the types of the inputs:
+
+B<Note:> This function retains the existing data, appends arrayrefs with
+arrayrefs, and only merges new keys and values when merging hashrefs with
+hashrefs.
+
+=over 4
+
+=item * When the C<lvalue> is a "scalar" and the C<rvalue> is a "scalar" we
+keep the C<lvalue>.
+
+=item * When the C<lvalue> is a "scalar" and the C<rvalue> is a "arrayref" we
+keep the C<lvalue>.
+
+=item * When the C<lvalue> is a "scalar" and the C<rvalue> is a "hashref" we
+keep the C<lvalue>.
+
+=item * When the C<lvalue> is a "arrayref" and the C<rvalue> is a "scalar" we
+append the C<rvalue> to the C<lvalue>.
+
+=item * When the C<lvalue> is a "arrayref" and the C<rvalue> is a "arrayref"
+we append the items in C<rvalue> to the C<lvalue>.
+
+=item * When the C<lvalue> is a "arrayref" and the C<rvalue> is a "hashref" we
+append the C<rvalue> to the C<lvalue>.
+
+=item * When the C<lvalue> is a "hashref" and the C<rvalue> is a "scalar" we
+keep the C<lvalue>.
+
+=item * When the C<lvalue> is a "hashref" and the C<rvalue> is a "arrayref" we
+keep the C<lvalue>.
+
+=item * When the C<lvalue> is a "hashref" and the C<rvalue> is a "hashref" we
+append the keys and values in C<rvalue> to the C<lvalue>, but without
+overwriting existing keys if there's overlap.
+
+=back
+
+I<Since C<4.15>>
+
+=over 4
+
+=item merge_keep example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_keep';
+
+  my $merge_keep = merge_keep;
+
+  # undef
+
+=back
+
+=over 4
+
+=item merge_keep example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_keep';
+
+  my $merge_keep = merge_keep 1;
+
+  # 1
+
+=back
+
+=over 4
+
+=item merge_keep example 3
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_keep';
+
+  my $merge_keep = merge_keep 1, 2;
+
+  # 1
+
+=back
+
+=over 4
+
+=item merge_keep example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_keep';
+
+  my $merge_keep = merge_keep 1, [2, 3];
+
+  # 1
+
+=back
+
+=over 4
+
+=item merge_keep example 5
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_keep';
+
+  my $merge_keep = merge_keep [1, 2], 3;
+
+  # [1, 2, 3]
+
+=back
+
+=over 4
+
+=item merge_keep example 6
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_keep';
+
+  my $merge_keep = merge_keep [1, 2], [3, 4];
+
+  # [1, 2, 3, 4]
+
+=back
+
+=over 4
+
+=item merge_keep example 7
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_keep';
+
+  my $merge_keep = merge_keep {a => 1}, {a => 2, b => 3};
+
+  # {a => 1, b => 3}
+
+=back
+
+=over 4
+
+=item merge_keep example 8
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_keep';
+
+  my $merge_keep = merge_keep(
+    {
+      a => 1,
+      b => {x => 10},
+      d => 0,
+      g => [4],
+    },
+    {
+      b => {y => 20},
+      c => 3,
+      e => [5],
+      f => [6]
+    },
+    {
+      b => {y => 30, z => 456},
+      c => {z => 123},
+      d => 2,
+      e => [6, 7],
+      f => {7, 8},
+      g => 5,
+    },
+  );
+
+  # {
+  #   a => 1,
+  #   b => {
+  #     x => 10,
+  #     y => 20,
+  #     z => 456
+  #   },
+  #   c => 3,
+  #   d => 0,
+  #   e => [5, 6, 7],
+  #   f => [6, {7, 8}],
+  #   g => [4, 5],
+  # }
+
+=back
+
+=cut
+
+=head2 merge_keep_mutate
+
+  merge_keep_mutate(any @args) (any)
+
+The merge_keep_mutate performs a merge operaiton in accordance with
+L</merge_keep> except that it mutates the values being merged and returns the
+mutated value.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item merge_keep_mutate example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_keep_mutate';
+
+  my $merge_keep_mutate = merge_keep_mutate;
+
+  # undef
+
+=back
+
+=over 4
+
+=item merge_keep_mutate example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_keep_mutate';
+
+  my $merge_keep_mutate = merge_keep_mutate 1;
+
+  # 1
+
+=back
+
+=over 4
+
+=item merge_keep_mutate example 3
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_keep_mutate';
+
+  $result = 1;
+
+  my $merge_keep_mutate = merge_keep_mutate $result, 2;
+
+  # 1
+
+  $result;
+
+  # 1
+
+=back
+
+=over 4
+
+=item merge_keep_mutate example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_keep_mutate';
+
+  $result = 1;
+
+  my $merge_keep_mutate = merge_keep_mutate $result, [2, 3];
+
+  # 1
+
+  $result;
+
+  # 1
+
+=back
+
+=over 4
+
+=item merge_keep_mutate example 5
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_keep_mutate';
+
+  $result = [1, 2];
+
+  my $merge_keep_mutate = merge_keep_mutate $result, 3;
+
+  # [1, 2, 3]
+
+  $result;
+
+  # [1, 2, 3]
+
+=back
+
+=over 4
+
+=item merge_keep_mutate example 6
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_keep_mutate';
+
+  $result = [1, 2];
+
+  my $merge_keep_mutate = merge_keep_mutate $result, [3, 4];
+
+  # [1, 2, 3, 4]
+
+  $result;
+
+  # [1, 2, 3, 4]
+
+=back
+
+=over 4
+
+=item merge_keep_mutate example 7
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_keep_mutate';
+
+  $result = {a => 1};
+
+  my $merge_keep_mutate = merge_keep_mutate $result, {a => 2, b => 3};
+
+  # {a => 1, b => 3}
+
+  $result;
+
+  # {a => 1, b => 3}
+
+=back
+
+=cut
+
+=head2 merge_swap
+
+  merge_swap(any @args) (any)
+
+The merge_swap function merges two (or more) values and returns a new values
+based on the types of the inputs:
+
+B<Note:> This function replaces the existing data, including when merging
+hashrefs with hashrefs, and overwrites values (instead of appending) when
+merging arrayrefs with arrayrefs.
+
+=over 4
+
+=item * When the C<lvalue> is a "scalar" and the C<rvalue> is a "scalar" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "scalar" and the C<rvalue> is a "arrayref" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "scalar" and the C<rvalue> is a "hashref" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "arrayref" and the C<rvalue> is a "scalar" we
+append the C<rvalue> to the C<lvalue>.
+
+=item * When the C<lvalue> is a "arrayref" and the C<rvalue> is a "arrayref"
+we replace each items in C<lvalue> with the value at the corresponding position
+in the C<rvalue>.
+
+=item * When the C<lvalue> is a "arrayref" and the C<rvalue> is a "hashref" we
+append the C<rvalue> to the C<lvalue>.
+
+=item * When the C<lvalue> is a "hashref" and the C<rvalue> is a "scalar" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "hashref" and the C<rvalue> is a "arrayref" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "hashref" and the C<rvalue> is a "hashref" we
+append the keys and values in C<rvalue> to the C<lvalue>, overwriting existing
+keys if there's overlap.
+
+=back
+
+I<Since C<4.15>>
+
+=over 4
+
+=item merge_swap example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_swap';
+
+  my $merge_swap = merge_swap;
+
+  # undef
+
+=back
+
+=over 4
+
+=item merge_swap example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_swap';
+
+  my $merge_swap = merge_swap 1;
+
+  # 1
+
+=back
+
+=over 4
+
+=item merge_swap example 3
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_swap';
+
+  my $merge_swap = merge_swap 1, 2;
+
+  # 2
+
+=back
+
+=over 4
+
+=item merge_swap example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_swap';
+
+  my $merge_swap = merge_swap 1, [2, 3];
+
+  # [2, 3]
+
+=back
+
+=over 4
+
+=item merge_swap example 5
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_swap';
+
+  my $merge_swap = merge_swap [1, 2], 3;
+
+  # [1, 2, 3]
+
+=back
+
+=over 4
+
+=item merge_swap example 6
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_swap';
+
+  my $merge_swap = merge_swap [1, 2, 3], [4, 5];
+
+  # [4, 5, 3]
+
+=back
+
+=over 4
+
+=item merge_swap example 7
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_swap';
+
+  my $merge_swap = merge_swap {a => 1}, {a => 2, b => 3};
+
+  # {a => 2, b => 3}
+
+=back
+
+=over 4
+
+=item merge_swap example 8
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_swap';
+
+  my $merge_swap = merge_swap(
+    {
+      a => 1,
+      b => {x => 10},
+      d => 0,
+      g => [4],
+    },
+    {
+      b => {y => 20},
+      c => 3,
+      e => [5],
+      f => [6]
+    },
+    {
+      b => {y => 30, z => 456},
+      c => {z => 123},
+      d => 2,
+      e => [6, 7],
+      f => {7, 8},
+      g => 5,
+    },
+  );
+
+  # {
+  #   a => 1,
+  #   b => {
+  #     x => 10,
+  #     y => 30,
+  #     z => 456
+  #   },
+  #   c => {z => 123},
+  #   d => 2,
+  #   e => [6, 7],
+  #   f => [6, {7, 8}],
+  #   g => [4, 5],
+  # }
+
+=back
+
+=cut
+
+=head2 merge_swap_mutate
+
+  merge_swap_mutate(any @args) (any)
+
+The merge_swap_mutate performs a merge operaiton in accordance with
+L</merge_swap> except that it mutates the values being merged and returns the
+mutated value.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item merge_swap_mutate example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_swap_mutate';
+
+  $result = undef;
+
+  my $merge_swap_mutate = merge_swap_mutate $result;
+
+  # undef
+
+  $result;
+
+  # undef
+
+=back
+
+=over 4
+
+=item merge_swap_mutate example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_swap_mutate';
+
+  $result = 1;
+
+  my $merge_swap_mutate = merge_swap_mutate $result;
+
+  # 1
+
+  $result;
+
+  # 1
+
+=back
+
+=over 4
+
+=item merge_swap_mutate example 3
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_swap_mutate';
+
+  $result = 1;
+
+  my $merge_swap_mutate = merge_swap_mutate $result, 2;
+
+  # 2
+
+  $result;
+
+  # 2
+
+=back
+
+=over 4
+
+=item merge_swap_mutate example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_swap_mutate';
+
+  $result = 1;
+
+  my $merge_swap_mutate = merge_swap_mutate $result, [2, 3];
+
+  # [2, 3]
+
+  $result;
+
+  # [2, 3]
+
+=back
+
+=over 4
+
+=item merge_swap_mutate example 5
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_swap_mutate';
+
+  $result = [1, 2];
+
+  my $merge_swap_mutate = merge_swap_mutate $result, 3;
+
+  # [1, 2, 3]
+
+  $result;
+
+  # [1, 2, 3]
+
+=back
+
+=over 4
+
+=item merge_swap_mutate example 6
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_swap_mutate';
+
+  $result = [1, 2, 3];
+
+  my $merge_swap_mutate = merge_swap_mutate $result, [4, 5];
+
+  # [4, 5, 3]
+
+  $result;
+
+  # [4, 5, 3]
+
+=back
+
+=over 4
+
+=item merge_swap_mutate example 7
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_swap_mutate';
+
+  $result = {a => 1};
+
+  my $merge_swap_mutate = merge_swap_mutate $result, {a => 2, b => 3};
+
+  # {a => 2, b => 3}
+
+  $result;
+
+  # {a => 2, b => 3}
+
+=back
+
+=cut
+
+=head2 merge_take
+
+  merge_take(any @args) (any)
+
+The merge_take function merges two (or more) values and returns a new values
+based on the types of the inputs:
+
+B<Note:> This function always "takes" the new value, does not append arrayrefs,
+and overwrites keys and values when merging hashrefs with hashrefs.
+
+=over 4
+
+=item * When the C<lvalue> is a "scalar" and the C<rvalue> is a "scalar" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "scalar" and the C<rvalue> is a "arrayref" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "scalar" and the C<rvalue> is a "hashref" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "arrayref" and the C<rvalue> is a "scalar" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "arrayref" and the C<rvalue> is a "arrayref"
+we keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "arrayref" and the C<rvalue> is a "hashref" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "hashref" and the C<rvalue> is a "scalar" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "hashref" and the C<rvalue> is a "arrayref" we
+keep the C<rvalue>.
+
+=item * When the C<lvalue> is a "hashref" and the C<rvalue> is a "hashref" we
+append the keys and values in C<rvalue> to the C<lvalue>, overwriting existing
+keys if there's overlap.
+
+=back
+
+I<Since C<4.15>>
+
+=over 4
+
+=item merge_take example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_take';
+
+  my $merge_take = merge_take;
+
+  # undef
+
+=back
+
+=over 4
+
+=item merge_take example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_take';
+
+  my $merge_take = merge_take 1;
+
+  # 1
+
+=back
+
+=over 4
+
+=item merge_take example 3
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_take';
+
+  my $merge_take = merge_take 1, 2;
+
+  # 2
+
+=back
+
+=over 4
+
+=item merge_take example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_take';
+
+  my $merge_take = merge_take [1], [2, 3];
+
+  # [2, 3]
+
+=back
+
+=over 4
+
+=item merge_take example 5
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_take';
+
+  my $merge_take = merge_take {a => 1, b => {x => 10}}, {b => {y => 20}, c => 3};
+
+  # {a => 1, b => {x => 10, y => 20}, c => 3}
+
+=back
+
+=over 4
+
+=item merge_take example 6
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_take';
+
+  my $merge_take = merge_take [1, 2], 3;
+
+  # 3
+
+=back
+
+=over 4
+
+=item merge_take example 7
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_take';
+
+  my $merge_take = merge_take {a => 1}, 2;
+
+  # 2
+
+=back
+
+=over 4
+
+=item merge_take example 8
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_take';
+
+  my $merge_take = merge_take(
+    {
+      a => 1,
+      b => {x => 10},
+      d => 0,
+      g => [4],
+    },
+    {
+      b => {y => 20},
+      c => 3,
+      e => [5],
+      f => [6]
+    },
+    {
+      b => {y => 30, z => 456},
+      c => {z => 123},
+      d => 2,
+      e => [6, 7],
+      f => {7, 8},
+      g => 5,
+    },
+  );
+
+  # {
+  #   a => 1,
+  #   b => {
+  #     x => 10,
+  #     y => 30,
+  #     z => 456
+  #   },
+  #   c => {z => 123},
+  #   d => 2,
+  #   e => [6, 7],
+  #   f => {7, 8},
+  #   g => 5,
+  # }
+
+=back
+
+=cut
+
+=head2 merge_take_mutate
+
+  merge_take_mutate(any @args) (any)
+
+The merge_take_mutate performs a merge operaiton in accordance with
+L</merge_take> except that it mutates the values being merged and returns the
+mutated value.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item merge_take_mutate example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_take_mutate';
+
+  $result = undef;
+
+  my $merge_take_mutate = merge_take_mutate $result;
+
+  # undef
+
+  $result;
+
+  # undef
+
+=back
+
+=over 4
+
+=item merge_take_mutate example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_take_mutate';
+
+  $result = 1;
+
+  my $merge_take_mutate = merge_take_mutate $result;
+
+  # 1
+
+  $result;
+
+  # 1
+
+=back
+
+=over 4
+
+=item merge_take_mutate example 3
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_take_mutate';
+
+  $result = 1;
+
+  my $merge_take_mutate = merge_take_mutate $result, 2;
+
+  # 2
+
+  $result;
+
+  # 2
+
+=back
+
+=over 4
+
+=item merge_take_mutate example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_take_mutate';
+
+  $result = [1];
+
+  my $merge_take_mutate = merge_take_mutate $result, [2, 3];
+
+  # [2, 3]
+
+  $result;
+
+  # [2, 3]
+
+=back
+
+=over 4
+
+=item merge_take_mutate example 5
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_take_mutate';
+
+  $result = {a => 1, b => {x => 10}};
+
+  my $merge_take_mutate = merge_take_mutate $result, {b => {y => 20}, c => 3};
+
+  # {a => 1, b => {x => 10, y => 20}, c => 3}
+
+  $result;
+
+  # {a => 1, b => {x => 10, y => 20}, c => 3}
+
+=back
+
+=over 4
+
+=item merge_take_mutate example 6
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_take_mutate';
+
+  $result = [1, 2];
+
+  my $merge_take_mutate = merge_take_mutate $result, 3;
+
+  # 3
+
+  $result;
+
+  # 3
+
+=back
+
+=over 4
+
+=item merge_take_mutate example 7
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'merge_take_mutate';
+
+  $result = {a => 1};
+
+  my $merge_take_mutate = merge_take_mutate $result, 2;
+
+  # 2
+
+  $result;
+
+  # 2
 
 =back
 
@@ -4198,6 +10083,232 @@ I<Since C<3.20>>
 
 =cut
 
+=head2 read_env
+
+  read_env(string $data) (Venus::Config)
+
+The read_env function returns a new L<Venus::Config> object based on the string
+of key/value pairs provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item read_env example 1
+
+  package main;
+
+  use Venus 'read_env';
+
+  my $read_env = read_env "APPNAME=Example\nAPPVER=0.01\n# Comment\n\n\nAPPTAG=\"Godzilla\"";
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=cut
+
+=head2 read_env_file
+
+  read_env_file(string $file) (Venus::Config)
+
+The read_env_file function uses L<Venus::Path> to return a new L<Venus::Config>
+object based on the file provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item read_env_file example 1
+
+  package main;
+
+  use Venus 'read_env_file';
+
+  my $config = read_env_file 't/conf/read.env';
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=cut
+
+=head2 read_json
+
+  read_json(string $data) (Venus::Config)
+
+The read_json function returns a new L<Venus::Config> object based on the JSON
+string provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item read_json example 1
+
+  package main;
+
+  use Venus 'read_json';
+
+  my $config = read_json q(
+  {
+    "$metadata": {
+      "tmplog": "/tmp/log"
+    },
+    "$services": {
+      "log": { "package": "Venus/Path", "argument": { "$metadata": "tmplog" } }
+    }
+  }
+  );
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=cut
+
+=head2 read_json_file
+
+  read_json_file(string $file) (Venus::Config)
+
+The read_json_file function uses L<Venus::Path> to return a new
+L<Venus::Config> object based on the file provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item read_json_file example 1
+
+  package main;
+
+  use Venus 'read_json_file';
+
+  my $config = read_json_file 't/conf/read.json';
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=cut
+
+=head2 read_perl
+
+  read_perl(string $data) (Venus::Config)
+
+The read_perl function returns a new L<Venus::Config> object based on the Perl
+string provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item read_perl example 1
+
+  package main;
+
+  use Venus 'read_perl';
+
+  my $config = read_perl q(
+  {
+    '$metadata' => {
+      tmplog => "/tmp/log"
+    },
+    '$services' => {
+      log => { package => "Venus/Path", argument => { '$metadata' => "tmplog" } }
+    }
+  }
+  );
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=cut
+
+=head2 read_perl_file
+
+  read_perl_file(string $file) (Venus::Config)
+
+The read_perl_file function uses L<Venus::Path> to return a new
+L<Venus::Config> object based on the file provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item read_perl_file example 1
+
+  package main;
+
+  use Venus 'read_perl_file';
+
+  my $config = read_perl_file 't/conf/read.perl';
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=cut
+
+=head2 read_yaml
+
+  read_yaml(string $data) (Venus::Config)
+
+The read_yaml function returns a new L<Venus::Config> object based on the YAML
+string provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item read_yaml example 1
+
+  package main;
+
+  use Venus 'read_yaml';
+
+  my $config = read_yaml q(
+  '$metadata':
+    tmplog: /tmp/log
+  '$services':
+    log:
+      package: "Venus/Path"
+      argument:
+        '$metadata': tmplog
+  );
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=cut
+
+=head2 read_yaml_file
+
+  read_yaml_file(string $file) (Venus::Config)
+
+The read_yaml_file function uses L<Venus::Path> to return a new
+L<Venus::Config> object based on the YAML string provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item read_yaml_file example 1
+
+  package main;
+
+  use Venus 'read_yaml_file';
+
+  my $config = read_yaml_file 't/conf/read.yaml';
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=cut
+
 =head2 regexp
 
   regexp(string $value, string | coderef $code, any @args) (any)
@@ -4307,52 +10418,6 @@ I<Since C<2.55>>
 
 =cut
 
-=head2 resolve
-
-  resolve(hashref $value, any @args) (any)
-
-The resolve function builds and returns an object via L<Venus::Container/resolve>.
-
-I<Since C<3.30>>
-
-=over 4
-
-=item resolve example 1
-
-  package main;
-
-  use Venus 'resolve';
-
-  my $resolve = resolve {};
-
-  # undef
-
-=back
-
-=over 4
-
-=item resolve example 2
-
-  package main;
-
-  use Venus 'resolve';
-
-  my $data = {
-    '$services' => {
-      log => {
-        package => "Venus/Path",
-      }
-    }
-  };
-
-  my $log = resolve $data, 'log';
-
-  # bless({...}, 'Venus::Path')
-
-=back
-
-=cut
-
 =head2 roll
 
   roll(string $name, any @args) (any)
@@ -4396,12 +10461,12 @@ I<Since C<2.32>>
 
 =head2 schema
 
-  schema(string $value, string | coderef $code, any @args) (any)
+  schema(string | coderef $code, any @args) (Venus::Schema)
 
 The schema function builds and returns a L<Venus::Schema> object, or dispatches
 to the coderef or method provided.
 
-I<Since C<2.55>>
+I<Since C<4.15>>
 
 =over 4
 
@@ -4411,7 +10476,7 @@ I<Since C<2.55>>
 
   use Venus 'schema';
 
-  my $schema = schema { name => 'string' };
+  my $schema = schema;
 
   # bless({...}, "Venus::Schema")
 
@@ -4425,9 +10490,35 @@ I<Since C<2.55>>
 
   use Venus 'schema';
 
-  my $result = schema { name => 'string' }, 'validate', { name => 'example' };
+  my $schema = schema 'rule', {
+    selector => 'handles',
+    presence => 'required',
+    executes => [['type', 'arrayref']],
+  };
 
-  # { name => 'example' }
+  # bless({...}, "Venus::Schema")
+
+=back
+
+=over 4
+
+=item schema example 3
+
+  package main;
+
+  use Venus 'schema';
+
+  my $schema = schema 'rules', {
+    selector => 'fname',
+    presence => 'required',
+    executes => ['string', 'trim', 'strip'],
+  },{
+    selector => 'lname',
+    presence => 'required',
+    executes => ['string', 'trim', 'strip'],
+  };
+
+  # bless({...}, "Venus::Schema")
 
 =back
 
@@ -4486,11 +10577,155 @@ I<Since C<4.11>>
 
   package main;
 
-  use Venus 'set';
+  use Venus;
 
-  my $set = set [1..9];
+  my $set = Venus::set [1..9];
 
   # bless(..., 'Venus::Set')
+
+=back
+
+=over 4
+
+=item set example 2
+
+  package main;
+
+  use Venus;
+
+  my $set = Venus::set [1..9], 'count';
+
+  # 9
+
+=back
+
+=cut
+
+=head2 sets
+
+  sets(string @args) (arrayref)
+
+The sets function find values from within the underlying data structure using
+L<Venus::Array/path> or L<Venus::Hash/path>, where each argument pair is a
+selector and value, and returns all the values provided. Returns a list in list
+context. Note, nested data structures can be updated but not created.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item sets example 1
+
+  package main;
+
+  use Venus 'sets';
+
+  my $data = ['foo', {'bar' => 'baz'}, 'bar', ['baz']];
+
+  my $sets = sets $data, '3' => 'bar', '1.bar' => 'bar';
+
+  # ['bar', 'bar']
+
+=back
+
+=over 4
+
+=item sets example 2
+
+  package main;
+
+  use Venus 'sets';
+
+  my $data = ['foo', {'bar' => 'baz'}, 'bar', ['baz']];
+
+  my ($baz, $one_bar) = sets $data, '3' => 'bar', '1.bar' => 'bar';
+
+  # ('bar', 'bar')
+
+=back
+
+=over 4
+
+=item sets example 3
+
+  package main;
+
+  use Venus 'sets';
+
+  my $data = {'foo' => {'bar' => 'baz'}, 'bar' => ['baz']};
+
+  my $sets = sets $data, 'bar' => 'bar', 'foo.bar' => 'bar';
+
+  # ['bar', 'bar']
+
+=back
+
+=over 4
+
+=item sets example 4
+
+  package main;
+
+  use Venus 'sets';
+
+  my $data = {'foo' => {'bar' => 'baz'}, 'bar' => ['baz']};
+
+  my ($bar, $foo_bar) = sets $data, 'bar' => 'bar', 'foo.bar' => 'bar';
+
+  # ('bar', 'bar')
+
+=back
+
+=cut
+
+=head2 sorts
+
+  sorts(any @args) (any)
+
+The sorts function accepts a list of values, flattens any arrayrefs, and sorts
+it using the default C<sort(LIST)> call style exclusively.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item sorts example 1
+
+  package main;
+
+  use Venus 'sorts';
+
+  my @sorts = sorts 1..4;
+
+  # (1..4)
+
+=back
+
+=over 4
+
+=item sorts example 2
+
+  package main;
+
+  use Venus 'sorts';
+
+  my @sorts = sorts 4,3,2,1;
+
+  # (1..4)
+
+=back
+
+=over 4
+
+=item sorts example 3
+
+  package main;
+
+  use Venus 'sorts';
+
+  my @sorts = sorts [1..4], 5, [6..9];
+
+  # (1..9)
 
 =back
 
@@ -4707,23 +10942,201 @@ I<Since C<2.55>>
 
 =cut
 
-=head2 text
+=head2 text_pod
 
-  text(any @args) (any)
+  text_pod(string $value, string | coderef $code, any @args) (any)
 
-The text function builds a L<Venus::Data> object using L<Venus::Data/text> for
-the current file, i.e. L<perlfunc/__FILE__> or script, i.e. C<$0>, and returns
-the result of a L<Venus::Data/string> operation using the arguments provided.
+The text_pod function builds and returns a L<Venus::Text::Pod> object, or
+dispatches to the coderef or method provided.
 
-I<Since C<3.30>>
+I<Since C<4.15>>
 
 =over 4
 
-=item text example 1
+=item text_pod example 1
 
   package main;
 
-  use Venus 'text';
+  use Venus 'text_pod';
+
+  my $text_pod = text_pod 't/data/sections';
+
+  # bless({...}, 'Venus::Text::Pod')
+
+=back
+
+=over 4
+
+=item text_pod example 2
+
+  package main;
+
+  use Venus 'text_pod';
+
+  my $text_pod = text_pod 't/data/sections', 'string', undef, 'name';
+
+  # "Example #1\nExample #2"
+
+=back
+
+=cut
+
+=head2 text_pod_string
+
+  text_pod_string(any @args) (any)
+
+The text_pod_string function builds a L<Venus::Text::Pod> object for the
+current file, i.e. L<perlfunc/__FILE__> or script, i.e. C<$0>, and returns the
+result of a L<Venus::Text::Pod/string> operation using the arguments provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item text_pod_string example 1
+
+  package main;
+
+  use Venus 'text_pod_string';
+
+  # =name
+  #
+  # Example #1
+  #
+  # =cut
+  #
+  # =name
+  #
+  # Example #2
+  #
+  # =cut
+  #
+  # =head1 NAME
+  #
+  # Example #1
+  #
+  # =cut
+  #
+  # =head1 NAME
+  #
+  # Example #2
+  #
+  # =cut
+  #
+  # =head1 ABSTRACT
+  #
+  # Example Abstract
+  #
+  # =cut
+
+  my $text_pod_string = text_pod_string 'name';
+
+  # "Example #1\nExample #2"
+
+=back
+
+=over 4
+
+=item text_pod_string example 2
+
+  package main;
+
+  use Venus 'text_pod_string';
+
+  # =name
+  #
+  # Example #1
+  #
+  # =cut
+  #
+  # =name
+  #
+  # Example #2
+  #
+  # =cut
+  #
+  # =head1 NAME
+  #
+  # Example #1
+  #
+  # =cut
+  #
+  # =head1 NAME
+  #
+  # Example #2
+  #
+  # =cut
+  #
+  # =head1 ABSTRACT
+  #
+  # Example Abstract
+  #
+  # =cut
+
+  my $text_pod_string = text_pod_string 'head1', 'ABSTRACT';
+
+  # "Example Abstract"
+
+=back
+
+=cut
+
+=head2 text_tag
+
+  text_tag(string $value, string | coderef $code, any @args) (any)
+
+The text_tag function builds and returns a L<Venus::Text::Tag> object, or
+dispatches to the coderef or method provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item text_tag example 1
+
+  package main;
+
+  use Venus 'text_tag';
+
+  my $text_tag = text_tag 't/data/sections';
+
+  # bless({...}, 'Venus::Text::Tag')
+
+=back
+
+=over 4
+
+=item text_tag example 2
+
+  package main;
+
+  use Venus 'text_tag';
+
+  my $text_tag = text_tag 't/data/sections', 'string', undef, 'name';
+
+  # "Example Name"
+
+=back
+
+=cut
+
+=head2 text_tag_string
+
+  text_tag_string(any @args) (any)
+
+The text_tag_string function builds a L<Venus::Text::Tag> object for the
+current file, i.e. L<perlfunc/__FILE__> or script, i.e. C<$0>, and returns the
+result of a L<Venus::Text::Tag/string> operation using the arguments provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item text_tag_string example 1
+
+  package main;
+
+  use Venus 'text_tag_string';
 
   # @@ name
   #
@@ -4743,7 +11156,7 @@ I<Since C<3.30>>
   #
   # @@ end
 
-  my $text = text 'name';
+  my $text_tag_string = text_tag_string 'name';
 
   # "Example Name"
 
@@ -4751,11 +11164,11 @@ I<Since C<3.30>>
 
 =over 4
 
-=item text example 2
+=item text_tag_string example 2
 
   package main;
 
-  use Venus 'text';
+  use Venus 'text_tag_string';
 
   # @@ name
   #
@@ -4775,7 +11188,7 @@ I<Since C<3.30>>
   #
   # @@ end
 
-  my $text = text 'titles', '#1';
+  my $text_tag_string = text_tag_string 'titles', '#1';
 
   # "Example Title #1"
 
@@ -4783,11 +11196,11 @@ I<Since C<3.30>>
 
 =over 4
 
-=item text example 3
+=item text_tag_string example 3
 
   package main;
 
-  use Venus 'text';
+  use Venus 'text_tag_string';
 
   # @@ name
   #
@@ -4807,7 +11220,7 @@ I<Since C<3.30>>
   #
   # @@ end
 
-  my $text = text undef, 'name';
+  my $text_tag_string = text_tag_string undef, 'name';
 
   # "Example Name"
 
@@ -4871,7 +11284,7 @@ I<Since C<2.55>>
 
   use Venus 'throw';
 
-  my $throw = throw 'Example::Error', 'catch', 'error';
+  my $throw = throw 'Example::Error', 'error';
 
   # bless({...}, 'Example::Error')
 
@@ -5004,14 +11417,183 @@ I<Since C<2.55>>
 
 =cut
 
+=head2 tv
+
+  tv(any $lvalue, any $rvalue) (boolean)
+
+The tv function compares the lvalue and rvalue and returns true if they have
+the same type and value, otherwise returns false. b<Note:> Comparison of
+coderefs, filehandles, and blessed objects with private state are impossible.
+This function will only return true if these data types are L<"identical"|/is>.
+It's also impossible to know which blessed objects have private state and
+therefore could produce false-positives when comparing object in those cases.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item tv example 1
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'tv';
+
+  my $tv = tv 1, 1;
+
+  # true
+
+=back
+
+=over 4
+
+=item tv example 2
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'tv';
+
+  my $tv = tv '1', 1;
+
+  # false
+
+=back
+
+=over 4
+
+=item tv example 3
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'tv';
+
+  my $tv = tv ['0', 1..4], ['0', 1..4];
+
+  # true
+
+=back
+
+=over 4
+
+=item tv example 4
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'tv';
+
+  my $tv = tv ['0', 1..4], [0, 1..4];
+
+  # false
+
+=back
+
+=over 4
+
+=item tv example 5
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'tv';
+
+  my $tv = tv undef, undef;
+
+  # true
+
+=back
+
+=over 4
+
+=item tv example 6
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'number', 'tv';
+
+  my $a = number 1;
+
+  my $tv = tv $a, undef;
+
+  # false
+
+=back
+
+=over 4
+
+=item tv example 7
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'number', 'tv';
+
+  my $a = number 1;
+
+  my $tv = tv $a, $a;
+
+  # true
+
+=back
+
+=over 4
+
+=item tv example 8
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'number', 'tv';
+
+  my $a = number 1;
+  my $b = number 1;
+
+  my $tv = tv $a, $b;
+
+  # true
+
+=back
+
+=over 4
+
+=item tv example 9
+
+  # given: synopsis
+
+  package main;
+
+  use Venus 'number', 'tv';
+
+  my $a = number 0;
+  my $b = number 1;
+
+  my $tv = tv $a, $b;
+
+  # false
+
+=back
+
+=cut
+
 =head2 type
 
-  type(any $data, string | coderef $code, any @args) (any)
+  type(string | coderef $code, any @args) (any)
 
 The type function builds and returns a L<Venus::Type> object, or dispatches to
 the coderef or method provided.
 
-I<Since C<2.55>>
+I<Since C<4.15>>
 
 =over 4
 
@@ -5021,13 +11603,9 @@ I<Since C<2.55>>
 
   use Venus 'type';
 
-  my $type = type [1..4];
+  my $type = type;
 
   # bless({...}, 'Venus::Type')
-
-  # $type->deduce;
-
-  # bless({...}, 'Venus::Array')
 
 =back
 
@@ -5039,9 +11617,23 @@ I<Since C<2.55>>
 
   use Venus 'type';
 
-  my $type = type [1..4], 'deduce';
+  my $expression = type 'expression', 'string | number';
 
-  # bless({...}, 'Venus::Array')
+  # ["either", "string", "number"]
+
+=back
+
+=over 4
+
+=item type example 3
+
+  package main;
+
+  use Venus 'type';
+
+  my $expression = type 'expression', ["either", "string", "number"];
+
+  # "string | number"
 
 =back
 
@@ -5140,24 +11732,25 @@ I<Since C<2.55>>
 
 =cut
 
-=head2 venus
+=head2 vns
 
-  venus(string $name, any @args) (any)
+  vns(string $name, args $args, string | coderef $callback, any @args) (any)
 
-The venus function build a L<Venus> package via the L</chain> function based on
-the name provided and returns an instance of that package.
+The vns function build a L<Venus> package based on the name provided, loads and
+instantiates the package, and returns an instance of that package or dispatches
+to the method provided and returns the result.
 
-I<Since C<2.40>>
+I<Since C<4.15>>
 
 =over 4
 
-=item venus example 1
+=item vns example 1
 
   package main;
 
-  use Venus 'venus';
+  use Venus 'vns';
 
-  my $space = venus 'space';
+  my $space = vns 'space';
 
   # bless({value => 'Venus'}, 'Venus::Space')
 
@@ -5165,13 +11758,13 @@ I<Since C<2.40>>
 
 =over 4
 
-=item venus example 2
+=item vns example 2
 
   package main;
 
-  use Venus 'venus';
+  use Venus 'vns';
 
-  my $space = venus 'space', ['new', 'venus/string'];
+  my $space = vns 'space', 'Venus::String';
 
   # bless({value => 'Venus::String'}, 'Venus::Space')
 
@@ -5179,15 +11772,58 @@ I<Since C<2.40>>
 
 =over 4
 
-=item venus example 3
+=item vns example 3
 
   package main;
 
-  use Venus 'venus';
+  use Venus 'vns';
 
-  my $space = venus 'code';
+  my $code = vns 'code', sub{};
 
   # bless({value => sub{...}}, 'Venus::Code')
+
+=back
+
+=cut
+
+=head2 what
+
+  what(any $data, string | coderef $code, any @args) (any)
+
+The what function builds and returns a L<Venus::What> object, or dispatches to
+the coderef or method provided.
+
+I<Since C<4.11>>
+
+=over 4
+
+=item what example 1
+
+  package main;
+
+  use Venus 'what';
+
+  my $what = what [1..4];
+
+  # bless({...}, 'Venus::What')
+
+  # $what->deduce;
+
+  # bless({...}, 'Venus::Array')
+
+=back
+
+=over 4
+
+=item what example 2
+
+  package main;
+
+  use Venus 'what';
+
+  my $what = what [1..4], 'deduce';
+
+  # bless({...}, 'Venus::Array')
 
 =back
 
@@ -5276,6 +11912,239 @@ I<Since C<2.32>>
   # my $digest = SHA(1);
 
   # bless(do{\(my $o = '...')}, 'Digest::SHA')
+
+=back
+
+=cut
+
+=head2 write_env
+
+  write_env(hashref $data) (string)
+
+The write_env function returns a string representing environment variable
+key/value pairs based on the L</value> held by the underlying L<Venus::Config>
+object.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item write_env example 1
+
+  package main;
+
+  use Venus 'write_env';
+
+  my $write_env = write_env {
+    APPNAME => "Example",
+    APPTAG => "Godzilla",
+    APPVER => 0.01,
+  };
+
+  # "APPNAME=Example\nAPPTAG=Godzilla\nAPPVER=0.01"
+
+=back
+
+=cut
+
+=head2 write_env_file
+
+  write_env_file(string $path, hashref $data) (Venus::Config)
+
+The write_env_file function saves a environment configuration file and returns
+a new L<Venus::Config> object.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item write_env_file example 1
+
+  package main;
+
+  use Venus 'write_env_file';
+
+  my $write_env_file = write_env_file 't/conf/write.env', {
+    APPNAME => "Example",
+    APPTAG => "Godzilla",
+    APPVER => 0.01,
+  };
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=cut
+
+=head2 write_json
+
+  write_json(hashref $data) (string)
+
+The write_json function returns a JSON encoded string based on the L</value>
+held by the underlying L<Venus::Config> object.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item write_json example 1
+
+  package main;
+
+  use Venus 'write_json';
+
+  my $write_json = write_json {
+    '$services' => {
+      log => { package => "Venus::Path" },
+    },
+  };
+
+  # '{ "$services":{ "log":{ "package":"Venus::Path" } } }'
+
+=back
+
+=cut
+
+=head2 write_json_file
+
+  write_json_file(string $path, hashref $data) (Venus::Config)
+
+The write_json_file function saves a JSON configuration file and returns a new
+L<Venus::Config> object.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item write_json_file example 1
+
+  package main;
+
+  use Venus 'write_json_file';
+
+  my $write_json_file = write_json_file 't/conf/write.json', {
+    '$services' => {
+      log => { package => "Venus/Path", argument => { value => "." } }
+    }
+  };
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=cut
+
+=head2 write_perl
+
+  write_perl(hashref $data) (string)
+
+The write_perl function returns a FILE encoded string based on the L</value>
+held by the underlying L<Venus::Config> object.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item write_perl example 1
+
+  package main;
+
+  use Venus 'write_perl';
+
+  my $write_perl = write_perl {
+    '$services' => {
+      log => { package => "Venus::Path" },
+    },
+  };
+
+  # '{ "\$services" => { log => { package => "Venus::Path" } } }'
+
+=back
+
+=cut
+
+=head2 write_perl_file
+
+  write_perl_file(string $path, hashref $data) (Venus::Config)
+
+The write_perl_file function saves a Perl configuration file and returns a new
+L<Venus::Config> object.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item write_perl_file example 1
+
+  package main;
+
+  use Venus 'write_perl_file';
+
+  my $write_perl_file = write_perl_file 't/conf/write.perl', {
+    '$services' => {
+      log => { package => "Venus/Path", argument => { value => "." } }
+    }
+  };
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=cut
+
+=head2 write_yaml
+
+  write_yaml(hashref $data) (string)
+
+The write_yaml function returns a FILE encoded string based on the L</value>
+held by the underlying L<Venus::Config> object.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item write_yaml example 1
+
+  package main;
+
+  use Venus 'write_yaml';
+
+  my $write_yaml = write_yaml {
+    '$services' => {
+      log => { package => "Venus::Path" },
+    },
+  };
+
+  # '---\n$services:\n\s\slog:\n\s\s\s\spackage:\sVenus::Path'
+
+=back
+
+=cut
+
+=head2 write_yaml_file
+
+  write_yaml_file(string $path, hashref $data) (Venus::Config)
+
+The write_yaml_file function saves a YAML configuration file and returns a new
+L<Venus::Config> object.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item write_yaml_file example 1
+
+  package main;
+
+  use Venus 'write_yaml_file';
+
+  my $write_yaml_file = write_yaml_file 't/conf/write.yaml', {
+    '$services' => {
+      log => { package => "Venus/Path", argument => { value => "." } }
+    }
+  };
+
+  # bless(..., 'Venus::Config')
 
 =back
 
@@ -5384,6 +12253,15 @@ asserting type constraints and coercion.
 
 =over 4
 
+=item venus-atom
+
+This library contains a L<Venus::Atom> class which provides a write-once object
+representing a constant value.
+
+=back
+
+=over 4
+
 =item venus-boolean
 
 This library contains a L<Venus::Boolean> class which provides a representation
@@ -5397,6 +12275,23 @@ for boolean values.
 
 This library contains a L<Venus::Box> class which provides a pure Perl boxing
 mechanism.
+
+=back
+
+=over 4
+
+=item venus-call
+
+This library contains a L<Venus::Call> class which provides a protocol for
+dynamically invoking methods with optional opt-in type safety.
+
+=back
+
+=over 4
+
+=item venus-check
+
+This library contains a L<Venus::Check> class which provides runtime dynamic type checking.
 
 =back
 
@@ -5428,6 +12323,23 @@ manipulating subroutines.
 
 =over 4
 
+=item venus-coercion
+
+This library contains a L<Venus::Coercion> class which provides data type coercions via L<Venus::Check>.
+
+=back
+
+=over 4
+
+=item venus-collect
+
+This library contains a L<Venus::Collect> class which provides a mechanism for
+iterating over mappable values.
+
+=back
+
+=over 4
+
 =item venus-config
 
 This library contains a L<Venus::Config> class which provides methods for
@@ -5437,10 +12349,19 @@ loading Perl, YAML, and JSON configuration data.
 
 =over 4
 
+=item venus-constraint
+
+This library contains a L<Venus::Constraint> class which provides data type
+constraints via L<Venus::Check>.
+
+=back
+
+=over 4
+
 =item venus-data
 
-This library contains a L<Venus::Data> class which provides methods for
-extracting C<DATA> sections and POD block.
+This library contains a L<Venus::Data> class which provides value object for
+encapsulating data validation.
 
 =back
 
@@ -5464,10 +12385,26 @@ and writing dumped Perl data.
 
 =over 4
 
+=item venus-enum
+
+This library contains a L<Venus::Enum> class which provides an interface for working with enumerations.
+
+=back
+
+=over 4
+
 =item venus-error
 
 This library contains a L<Venus::Error> class which represents a context-aware
 error (exception object).
+
+=back
+
+=over 4
+
+=item venus-factory
+
+This library contains a L<Venus::Factory> class which provides an object-oriented factory pattern for building objects.
 
 =back
 
@@ -5495,6 +12432,15 @@ error (exception object).
 
 This library contains a L<Venus::Float> class which provides methods for
 manipulating float data.
+
+=back
+
+=over 4
+
+=item venus-future
+
+This library contains a L<Venus::Future> class which provides a
+framework-agnostic implementation of the Future pattern.
 
 =back
 
@@ -5532,6 +12478,15 @@ and writing JSON data.
 
 This library contains a L<Venus::Log> class which provides methods for logging
 information using various log levels.
+
+=back
+
+=over 4
+
+=item venus-map
+
+This library contains a L<Venus::Map> class which provides a representation of
+a collection of ordered key/value pairs.
 
 =back
 
@@ -5590,6 +12545,16 @@ handling command-line arguments.
 
 =over 4
 
+=item venus-os
+
+This library contains a L<Venus::Os> class which provides methods for
+determining the current operating system, as well as finding and executing
+files.
+
+=back
+
+=over 4
+
 =item venus-path
 
 This library contains a L<Venus::Path> class which provides methods for working
@@ -5626,6 +12591,15 @@ object-oriented interface for Perl's pseudo-random number generator.
 
 =over 4
 
+=item venus-range
+
+This library contains a L<Venus::Range> class which provides an object-oriented
+interface for selecting elements from an arrayref using range expressions.
+
+=back
+
+=over 4
+
 =item venus-regexp
 
 This library contains a L<Venus::Regexp> class which provides methods for
@@ -5639,6 +12613,15 @@ manipulating regexp data.
 
 This library contains a L<Venus::Replace> class which provides methods for
 manipulating regexp replacement data.
+
+=back
+
+=over 4
+
+=item venus-result
+
+This library contains a L<Venus::Result> class which provides a container for
+representing success and error states.
 
 =back
 
@@ -5663,10 +12646,37 @@ manipulating scalar data.
 
 =over 4
 
+=item venus-schema
+
+This library contains a L<Venus::Schema> class which provides a mechanism for
+validating complex data structures.
+
+=back
+
+=over 4
+
+=item venus-sealed
+
+This library contains a L<Venus::Sealed> class which provides a mechanism for
+restricting access to the underlying data structure.
+
+=back
+
+=over 4
+
 =item venus-search
 
 This library contains a L<Venus::Search> class which provides methods for
 manipulating regexp search data.
+
+=back
+
+=over 4
+
+=item venus-set
+
+This library contains a L<Venus::Set> class which provides a representation of
+a collection of ordered key/value pairs.
 
 =back
 
@@ -5717,6 +12727,33 @@ for documenting L<Venus> derived software projects.
 
 =over 4
 
+=item venus-text
+
+This library contains a L<Venus::Text> class which provides methods for
+extracting C<DATA> sections and POD block.
+
+=back
+
+=over 4
+
+=item venus-text-pod
+
+This library contains a L<Venus::Text::Pod> class which provides methods for
+extracting POD blocks.
+
+=back
+
+=over 4
+
+=item venus-text-tag
+
+This library contains a L<Venus::Text::Tag> class which provides methods for
+extracting C<DATA> sections.
+
+=back
+
+=over 4
+
 =item venus-throw
 
 This library contains a L<Venus::Throw> class which provides a mechanism for
@@ -5746,8 +12783,8 @@ interface for performing complex try/catch operations.
 
 =item venus-type
 
-This library contains a L<Venus::Type> class which provides methods for casting
-native data types to objects.
+This library contains a L<Venus::Type> class which provides a mechanism for
+parsing, generating, and validating data type expressions.
 
 =back
 
@@ -5771,10 +12808,28 @@ validating, coercing, and otherwise operating on lists of arguments.
 
 =over 4
 
+=item venus-validate
+
+This library contains a L<Venus::Validate> class which provides a mechanism for
+performing data validation of simple and hierarchal data.
+
+=back
+
+=over 4
+
 =item venus-vars
 
 This library contains a L<Venus::Vars> class which provides methods for
 accessing C<%ENV> items.
+
+=back
+
+=over 4
+
+=item venus-what
+
+This library contains a L<Venus::What> class which provides methods for casting
+native data types to objects.
 
 =back
 

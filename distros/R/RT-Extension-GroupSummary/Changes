@@ -1,4 +1,12 @@
 Revision history for RT-Extension-GroupSummary
 
+0.03 2026-01-19
+ - This extension has been integrated into RT 5 core and therefore is useless for RT 5.0.0 and upper.
+ - Update copyright year to 2026
+ - Perl 5.26 and newer remove '.' from @inc by default. Re-add to Makefile.PL to enable installation on newer Perl releases. 
+
+0.02 2022-12-14
+ - Upgrade to RT 5
+
 0.01 2017-10-02
  - Initial commit

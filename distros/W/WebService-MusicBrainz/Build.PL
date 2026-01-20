@@ -7,14 +7,16 @@ my $build = Module::Build->new
      requires => {
                   'perl'          => '5.10.1',
                   'Mojolicious'   => '7.13',
-                  'Mojo::UserAgent::Role::Retry' => '0.002',
                  },
+     recommends => {
+                  'Mojo::UserAgent::Role::Retry' => '0.002',
+     },
      configure_requires => {
         'Module::Build' => '0.42'
      },
      create_makefile_pl => 'traditional',
      dist_author => 'Bob Faist <bob.faist@gmail.com>',
-     dist_version => '1.0.9',
+     dist_version => '1.0.10',
      meta_merge => {
         resources => {
            repository => 'git://github.com/bfaist/webservice-musicbrainz.git'

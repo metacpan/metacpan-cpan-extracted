@@ -5,20 +5,28 @@ use 5.018;
 use strict;
 use warnings;
 
-use overload (
-  '""' => 'explain',
-  '~~' => 'explain',
-  fallback => 1,
-);
+# IMPORTS
 
 use Venus::Class 'attr', 'base', 'with';
 
+# INHERITS
+
 base 'Venus::Kind::Utility';
+
+# INTEGRATES
 
 with 'Venus::Role::Valuable';
 with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 with 'Venus::Role::Explainable';
+
+# OVERLOADS
+
+use overload (
+  '""' => 'explain',
+  '~~' => 'explain',
+  fallback => 1,
+);
 
 # ATTRIBUTES
 
@@ -66,7 +74,7 @@ sub config {
   my ($self, $package) = @_;
 
   $package ||= $self->package
-    or $self->error({throw => 'error_on_config'});
+    or $self->error_on_config->capture($package)->throw;
 
   $package = $package->new
     ->canonical
@@ -225,11 +233,14 @@ sub TO_BOOL {
 sub error_on_config {
   my ($self) = @_;
 
-  return {
-    name => 'on.config',
-    message => 'No suitable JSON package',
-    raise => true,
-  };
+  my $error = $self->error->sysinfo;
+
+  $error->name('on.config');
+  $error->message('No suitable JSON package');
+  $error->offset(1);
+  $error->reset;
+
+  return $error;
 }
 
 1;
@@ -368,37 +379,73 @@ I<Since C<0.01>>
 
 =cut
 
-=head1 ERRORS
+=head2 new
 
-This package may raise the following errors:
+  new(any @args) (Venus::Json)
 
-=cut
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
 
 =over 4
 
-=item error: C<error_on_config>
+=item new example 1
 
-This package may raise an error_on_config exception.
+  package main;
 
-B<example 1>
+  use Venus::Json;
 
-  # given: synopsis;
+  my $new = Venus::Json->new;
 
-  my $input = {
-    throw => 'error_on_config',
-  };
-
-  my $error = $json->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_config"
-
-  # my $message = $error->message;
-
-  # "No suitable JSON package"
+  # bless(..., "Venus::Json")
 
 =back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Json;
+
+  my $new = Venus::Json->new({password => 'secret'});
+
+  # bless(..., "Venus::Json")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Json;
+
+  my $new = Venus::Json->new(value => {password => 'secret'});
+
+  # bless(..., "Venus::Json")
+
+=back
+
+=over 4
+
+=item B<may raise> L<Venus::Json::Error> C<on.config>
+
+  package main;
+
+  use Venus::Json;
+
+  local $ENV{VENUS_JSON_PACKAGE} = 'Fake::Json';
+
+  my $new = Venus::Json->new;
+
+  # Error! (on.config)
+
+=back
+
+=cut
 
 =head1 AUTHORS
 

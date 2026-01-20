@@ -21,8 +21,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "BeamerReveal",
   "EXE_FILES" => [
-    "bin/beamer-reveal.pl",
-    "bin/beamer-reveal.pl~"
+    "bin/beamer-reveal.pl"
   ],
   "LICENSE" => "open_source",
   "NAME" => "BeamerReveal",
@@ -61,7 +60,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "20260111.1557",
+  "VERSION" => "20260119.1636",
   "test" => {
     "TESTS" => "t/*.t t/02-bin/*.t"
   }

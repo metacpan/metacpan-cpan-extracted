@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::PID 0.804;
+package IO::Async::PID 0.805;
 
 use v5.14;
 use warnings;
@@ -16,6 +16,8 @@ use Carp;
 C<IO::Async::PID> - event callback on exit of a child process
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use IO::Async::PID;
    use POSIX qw( WEXITSTATUS );

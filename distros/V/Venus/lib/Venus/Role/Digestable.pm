@@ -1,9 +1,11 @@
 package Venus::Role::Digestable;
 
-use 5.014;
+use 5.018;
 
 use strict;
 use warnings;
+
+# IMPORTS
 
 use Venus::Role 'fault';
 

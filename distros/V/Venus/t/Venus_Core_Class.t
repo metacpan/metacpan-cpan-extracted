@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -36,6 +37,7 @@ $test->for('abstract');
 
 =includes
 
+method: clone
 method: import
 method: does
 method: meta
@@ -118,6 +120,45 @@ the L<perlfunc/use> declaration is used.
 
 $test->for('example', 1, 'import', sub {
   1
+});
+
+=method clone
+
+The clone method returns a cloned object.
+
+=signature clone
+
+  clone() (object)
+
+=metadata clone
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 clone
+
+  # given: synopsis
+
+  my $new_user = $user->clone;
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'User')
+
+=cut
+
+$test->for('example', 1, 'clone', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('User');
+  my $clone = $result->clone;
+  is $result->{fname}, $clone->{fname};
+  is $result->{lname}, $clone->{lname};
+  require Scalar::Util;
+  isnt Scalar::Util::refaddr($result), Scalar::Util::refaddr($clone);
+
+  $result
 });
 
 =method does

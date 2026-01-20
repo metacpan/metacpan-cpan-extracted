@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Tests Marlin::XAttribute::Alias.
+Tests attribute aliases.
 
 =head1 AUTHOR
 
@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2025 by Toby Inkster.
+This software is copyright (c) 2025-2026 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -23,7 +23,7 @@ use Test2::V0;
 use Data::Dumper;
 
 package Local::Foo1;
-use Marlin foo => { ':Alias' => 'bar' };
+use Marlin foo => { alias => 'bar' };
 my $class = __PACKAGE__;
 
 package main;
@@ -39,8 +39,8 @@ is( $y->bar, 42 );
 like( dies { $class->new( foo => 4, bar => 2 ) }, qr/Superfluous alias/ );
 
 use Marlin::Struct Point => [
-	'x!' => { ':Alias' => 'horizontal' },
-	'y!' => { ':Alias' => 'vertical' },
+	'x!' => { alias => 'horizontal' },
+	'y!' => { alias => 'vertical' },
 ];
 
 my $p1 = Point->new( x => 66, y => 99 );

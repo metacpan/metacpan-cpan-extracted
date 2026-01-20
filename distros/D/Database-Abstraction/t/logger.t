@@ -95,7 +95,8 @@ is($test2->number('four'), undef, 'PSV AUTOLOAD works not found');
 subtest 'Logger with Array' => sub {
 	my @messages;
 
-	my $test1 = new_ok('Database::test1' => [{ directory => $directory, logger => \@messages }] );
+	my $test1 = new_ok('Database::test1' => [{ directory => $directory }] );
+	$test1->set_logger(logger => \@messages);	# Overrides config file
 	$test1->{'logger'}->level('debug');
 
 	cmp_ok($test1->entry(number => 2), 'eq', 'two', 'CSV AUTOLOAD works');

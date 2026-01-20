@@ -6,40 +6,51 @@ use utf8;
 package Marlin::Role;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016000';
+our $VERSION   = '0.020000';
 
 # Marlin::Role is itself a Marlin class!
 use Marlin qw( requires ), -base => 'Marlin';
 
 use B                     ();
-use Exporter::Tiny        ();
 use Marlin::Util          ();
 use Role::Tiny            ();
-use Scalar::Util          qw( blessed );
 
 sub setup_steps {
 	my $me = shift;
-
-	# We don't really need accessors to be built in this package
-	# as the composing class will build them. But Moo wants them,
-	# so yeah.
-	return qw/
-		mark_inc
-		sanity_check
-		install_role_tiny
-		setup_roles
-		canonicalize_attributes
-		setup_accessors
-		setup_imports
-		run_delayed
-		setup_compat
-	/;
+	
+	# Roles should skip some steps.
+	my %should_skip = (
+		# They don't want a constructor or destructor.
+		setup_constructor  => 1,
+		setup_destructor   => 1,
+		
+		# These steps are all related to inheritance.
+		setup_mro          => 1,
+		setup_inheritance  => 1,
+		optimize_methods   => 1,
+		
+		# We don't really need accessors to be built in this package
+		# as the composing class will build them. But Moo wants them,
+		# so don't skip.
+		setup_accessors    => 0,
+	);
+	
+	# But also need some extra steps.
+	my %insert_after = (
+		mark_inc => [ qw( sanity_check install_role_tiny ) ],
+	);
+	
+	# Filter Marlin's setup steps through the above changes.
+	return
+		grep { not $should_skip{$_} }
+		map  { $_, @{ $insert_after{$_} or [] } }
+		$me->SUPER::setup_steps( @_ );
 }
 
 sub sanity_check {
 	my $me = shift;
 	
-	Marlin::Util::_croak("Roles cannot have parent classes") if @{ $me->parents };
+	Marlin::Util::_croak "Roles cannot have parent classes" if @{ $me->parents };
 	
 	return $me;
 }
@@ -78,6 +89,8 @@ sub _make_modifier_imports {
 		};
 	} qw( before after around );
 }
+
+no Types::Common;
 
 __PACKAGE__
 __END__

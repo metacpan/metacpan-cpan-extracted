@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 7d2c9b74f027536c66df4f2680455954bc4ea661fc7fa6fabaebb54ba9ed0265 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 4c814ca99a50e16023dbdbc2539e99d6855c6a24da59a7a8cdb6eb6c3cb66625 Changes
+SHA256 c5a69609f168870fd2b52ff848bd8d5e9b3b07fb698034bef496283ab235b268 INSTALL
+SHA256 ca1cc40b3da7bebb1b0368764650ad38ac603b31a25fbc5b6f9fb217cc6fa1e8 LICENSE
+SHA256 9cf34cdff410a11b31cd3bb529e21ccc8377d6e77dc0a72512e035bbca07ef58 MANIFEST
+SHA256 993dbefc2927f624d8bb67787ce9a78d2092dc923c9470ba7041ea86909728e9 META.json
+SHA256 11d52216a29279efa222f17313aa45a714e33842e5e6b614280b9d3b80ef3376 META.yml
+SHA256 8f3104849f093c05b4bdc367399d22f1616009a3508dc993209d4d50c2095019 Makefile.PL
+SHA256 91309ebbadcf15bbbb94f4133b4806e2d0c7fadfdd5402856e0520b495df4e14 README
+SHA256 76d81d0e373df95b9f669d87eeb6024efadaeccef9cb01474cc07915c02c613e dist.ini
+SHA256 7aa4616e6d46a52fea2f273fe3401632fb1e8f1dbe18513236a3d9644402b11c doap.ttl
+SHA256 db0f4393a1bb34be8105a7a8a85148d0f0d5b91415f3005d516f5916ed133385 lib/Marlin/X/ToHash.pm
+SHA256 2428f8ed83bae8bb761103b35064d5d9b59762e8b7fc06e6cf12c23618d7aa17 t/00start.t
+SHA256 8ab5a2f25023bd13fca6ff7a2247747fd4751e21a138cc46194eb6e102379f37 t/01basic.t
+SHA256 51fd4f17c0668c2e864afe0db73717af079a3f2e57ced90b716bd315b38fd4ca t/integration/person1.t
+SHA256 49618fd6b140a5aba9eb98a9f075b07fc5c5c714f93d114692b7d4fc30dcd920 t/integration/person2.t
+SHA256 67b3faaa4f269a769fe59fef65315c85626d1e20593eb7602e46bb0f72c37d60 t/integration/user1.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCaW5o/wAKCRDOv4Eoaip9
+ObE5AJ4+LoQxdUSPWc7HxuDvxKATuHeZtgCdFJTsIfoqv0DWTG5n3Pq4Iqt9H6g=
+=XM9K
+-----END PGP SIGNATURE-----

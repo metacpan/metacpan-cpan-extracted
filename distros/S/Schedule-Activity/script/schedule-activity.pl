@@ -272,7 +272,7 @@ Schedules can be incrementally constructed from a starting configuration as foll
 
 The C<schedule> must be provided initially, and the C<activity> or C<activities> will be built into the list of scheduled activities normally.  Results are stored in the C<save> filename.  Use C<after> to specify a savefile as a starting point for scheduling.  As a special case, omitting an C<activity> list is permitted with an C<after> file, and the saved schedule will be shown on stdout.  The configuration does not need to be provided after the bootstrapping step.
 
-Providing C<schedule> on a subsequent run will fully overwrite the saved configuration.  Existing scheduling results will be unaffected (but see below regarding annotations).  (This is experimental starting with 0.2.8)
+Providing C<schedule> on a subsequent run will fully overwrite the saved configuration.  Existing scheduling results will be unaffected (but see below regarding annotations).
 
 This permits buliding multiple, randomized schedules from the configuration into separate files for comparison and selection.  Subsequent activities can be built incrementally to achieve targets not specified within the configuration (attribute goals, etc.).
 

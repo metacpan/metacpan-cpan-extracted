@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Function 0.804;
+package IO::Async::Function 0.805;
 
 use v5.14;
 use warnings;
@@ -24,6 +24,8 @@ readonly_struct Pending => [qw( priority f )];
 C<IO::Async::Function> - call a function asynchronously
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Future::AsyncAwait;
    use IO::Async::Function;

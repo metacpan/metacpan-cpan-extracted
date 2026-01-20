@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Protocol 0.804;
+package IO::Async::Protocol 0.805;
 
 use v5.14;
 use warnings;
@@ -17,6 +17,8 @@ use Carp;
 C<IO::Async::Protocol> - base class for transport-based protocols
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 This subclass of L<IO::Async:Notifier> provides storage for a 
 L<IO::Async::Handle> object, to act as a transport for some protocol. It

@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::InlineAudioVideoAttachments;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 =encoding utf8
 
@@ -18,7 +18,7 @@ Displays audio and/or video attachments with HTML audio/video player.
 
 =head1 RT VERSION
 
-Works with RT 4.4 or greater
+Use version v0.07 with RT 4.4, v0.08 with RT 5, and v0.09 or greater with RT 6 .
 
 =head1 INSTALLATION
 
@@ -74,7 +74,7 @@ L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Inli
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2018-2022 by Gérald Sédrati, Easter-Eggs
+This software is Copyright (c) 2018-2026 by Gérald Sédrati, Easter-Eggs
 
 This is free software, licensed under:
 

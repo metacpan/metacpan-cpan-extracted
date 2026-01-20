@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Scalar::Util ();
 
+# STATE
+
 state $false = Scalar::Util::dualvar(0, "0");
+
+# OVERLOADS
 
 use overload (
   '!' => sub{!$false},
@@ -63,6 +69,30 @@ the L<Venus/false> function.
 =head1 METHODS
 
 This package provides the following methods:
+
+=cut
+
+=head2 new
+
+  new() (Venus::False)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::False;
+
+  my $new = Venus::False->new;
+
+  # bless(..., "Venus::False")
+
+=back
 
 =cut
 

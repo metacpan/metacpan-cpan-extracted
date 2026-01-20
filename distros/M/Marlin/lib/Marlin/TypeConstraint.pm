@@ -5,13 +5,13 @@ use warnings;
 package Marlin::TypeConstraint;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016000';
+our $VERSION   = '0.020000';
 
 use B                     ();
 use Eval::TypeTiny        ();
 use Scalar::Util          ();
 use Type::Tiny::Class     ();
-use Types::Common         qw( signature ArrayRef HashRef Any is_ArrayRef is_HashRef is_TypeTiny to_TypeTiny );
+use Types::Common         qw( -all );
 
 our @ISA = 'Type::Tiny::Class';
 
@@ -38,7 +38,7 @@ sub _cool_sig {
 				my $name = exists($attr->{init_arg}) ? $attr->{init_arg} : $attr->{slot};
 				my $type = is_TypeTiny($attr->{isa}) ? $attr->{isa} : $attr->{isa} ? to_TypeTiny( $attr->{isa} ) : Any;
 				my $opts = { optional => !$attr->{required} };
-				$opts->{alias} = $attr->{':Alias'}{alias} if $attr->{':Alias'};
+				$opts->{alias} = $attr->{alias} if $attr->{'alias'};
 				defined( $name ) ? ( $name, $type, $opts ) : ();
 			} @{ $me->{_marlin}->attributes_with_inheritance }
 		],
@@ -84,6 +84,8 @@ sub _build_coercion {
 		)
 		->freeze;
 }
+
+no Types::Common;
 
 __PACKAGE__
 __END__

@@ -1,3 +1,6 @@
+0.009004 2026-01-20
+     - work around a bug in RHEL 9 (and derivatives) kernels (RHEL-125143)
+
 0.009003 2026-01-18
      - drop deprecated ll_create_fs_ruleset/ll_create_net_ruleset
      - fix version number

@@ -5,12 +5,18 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base';
+
+# INHERITS
 
 base 'Venus::Kind::Value';
 
 use Venus::True;
 use Venus::False;
+
+# STATE
 
 state $true = Venus::True->value;
 state $true_ref = \$true;
@@ -19,6 +25,8 @@ state $true_type = 'true';
 state $false = Venus::False->value;
 state $false_ref = \$false;
 state $false_type = 'false';
+
+# OVERLOADS
 
 use overload (
   '!' => sub{$_[0]->get ? $false : $true},
@@ -72,16 +80,6 @@ sub build_self {
 }
 
 # METHODS
-
-sub assertion {
-  my ($self) = @_;
-
-  my $assert = $self->SUPER::assertion;
-
-  $assert->clear->expression('boolean');
-
-  return $assert;
-}
 
 sub comparer {
   my ($self) = @_;
@@ -2043,6 +2041,58 @@ I<Since C<0.01>>
   my $negate = $boolean->negate;
 
   # 1
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Boolean)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $new = Venus::Boolean->new;
+
+  # bless(..., "Venus::Boolean")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $new = Venus::Boolean->new(1);
+
+  # bless(..., "Venus::Boolean")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $new = Venus::Boolean->new(value => 1);
+
+  # bless(..., "Venus::Boolean")
 
 =back
 

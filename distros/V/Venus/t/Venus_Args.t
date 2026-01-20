@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -41,6 +42,7 @@ method: exists
 method: get
 method: indexed
 method: name
+method: new
 method: set
 method: unnamed
 
@@ -345,6 +347,65 @@ $test->for('example', 1, 'name', sub {
   ok $result == 0;
 
   !$result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Args)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Args;
+
+  my $new = Venus::Args->new;
+
+  # bless(..., "Venus::Args")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Args');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Args;
+
+  my $new = Venus::Args->new(
+    value => ['--help', 'execute'],
+  );
+
+  # bless(..., "Venus::Args")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Args');
+  is_deeply $result->value, ['--help', 'execute'];
+
+  $result
 });
 
 =method set

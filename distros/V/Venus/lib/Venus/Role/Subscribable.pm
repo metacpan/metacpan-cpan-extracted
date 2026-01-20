@@ -5,6 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Role 'with';
 
 # METHODS
@@ -22,7 +24,7 @@ sub publish {
 
   $name = name($name) or return $self;
 
-  &$_(@args) for @{subscriptions($self)->{$name}};
+  &$_(@args) for @{$self->{subscriptions}->{$name}};
 
   return $self;
 }
@@ -32,7 +34,7 @@ sub subscribe {
 
   $name = name($name) or return $self;
 
-  push @{subscriptions($self)->{$name}}, $code;
+  push @{$self->{subscriptions}->{$name}}, $code;
 
   return $self;
 }
@@ -42,18 +44,12 @@ sub subscribers {
 
   $name = name($name) or return 0;
 
-  if (exists subscriptions($self)->{$name}) {
-    return 0+@{subscriptions($self)->{$name}};
+  if (exists $self->{subscriptions}->{$name}) {
+    return 0+@{$self->{subscriptions}->{$name}};
   }
   else {
     return 0;
   }
-}
-
-sub subscriptions {
-  my ($self) = @_;
-
-  return $self->{'$subscriptions'} ||= {};
 }
 
 sub unsubscribe {
@@ -62,15 +58,15 @@ sub unsubscribe {
   $name = name($name) or return $self;
 
   if ($code) {
-    subscriptions($self)->{$name} = [
-      grep { $code ne $_ } @{subscriptions($self)->{$name}}
+    $self->{subscriptions}->{$name} = [
+      grep { $code ne $_ } @{$self->{subscriptions}->{$name}}
     ];
   }
   else {
-    delete subscriptions($self)->{$name};
+    delete $self->{subscriptions}->{$name};
   }
 
-  delete subscriptions($self)->{$name} if !$self->subscribers($name);
+  delete $self->{subscriptions}->{$name} if !$self->subscribers($name);
 
   return $self;
 }

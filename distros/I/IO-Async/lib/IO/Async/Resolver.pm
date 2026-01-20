@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2007-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Resolver 0.804;
+package IO::Async::Resolver 0.805;
 
 use v5.14;
 use warnings;
@@ -36,6 +36,8 @@ my %METHODS;
 C<IO::Async::Resolver> - performing name resolutions asynchronously
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
 This object is used indirectly via an L<IO::Async::Loop>:
 

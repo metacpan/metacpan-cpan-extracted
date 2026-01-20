@@ -5,7 +5,11 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base';
+
+# INHERITS
 
 base 'Venus::Kind::Value';
 
@@ -22,18 +26,6 @@ sub build_self {
 }
 
 # METHODS
-
-sub assertion {
-  my ($self) = @_;
-
-  my $assertion = $self->SUPER::assertion;
-
-  $assertion->match('undef')->format(sub{
-    (ref $self || $self)->new
-  });
-
-  return $assertion;
-}
 
 sub comparer {
   my ($self) = @_;
@@ -1667,6 +1659,30 @@ I<Since C<0.08>>
   my $result = $lvalue->ne($rvalue);
 
   # 0
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Undef)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Undef;
+
+  my $new = Venus::Undef->new;
+
+  # bless(..., "Venus::Undef")
 
 =back
 

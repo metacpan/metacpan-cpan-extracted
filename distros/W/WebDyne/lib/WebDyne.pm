@@ -61,7 +61,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='2.072';
+$VERSION='2.073';
 chomp($VERSION_GIT_SHA=do { local (@ARGV, $/) = ($_=__FILE__.'.sha'); <> if -f $_ });
 
 
@@ -2623,10 +2623,10 @@ sub htmx {
         #  Return whatever HTML we get back
         #
         $handler ||= '*perl*';
-        debug("htmx rendering with handler $handler");
+        debug("htmx rendering with handler: $handler");
         $html_sr=$self->perl($data_ar, $attr_hr) ||
             return err();
-        debug("html_sr: $html_sr");
+        debug("html_sr: $html_sr, %s", Dumper($html_sr));
         
     }
     else {
@@ -2636,7 +2636,7 @@ sub htmx {
         debug('htmx render without handler');
         $html_sr=$self->render_data_ar(data=> $data_ar->[WEBDYNE_NODE_CHLD_IX]) ||
             return err();
-        debug("html_sr: $html_sr");
+        debug("html_sr: $html_sr, %s", Dumper($html_sr));
         
     }
     
@@ -2760,7 +2760,10 @@ sub perl {
     #  Look for run param and if exists only run if value evaluates to true
     #
     if(exists $attr_hr->{'run'}) {
-        return \undef unless $attr_hr->{'run'};
+        unless ($attr_hr->{'run'}) {
+            debug('run attribute evaluated as false, not running');
+            return \undef;
+        }
     }
 
 
@@ -2921,7 +2924,7 @@ sub perl {
 
         #  Debug
         #
-        debug('perl eval return %s', Dumper($html_sr));
+        #debug('perl eval return %s', Dumper($html_sr));
 
 
         #  Return if we want the data for a JSON tag (above)
@@ -2963,21 +2966,24 @@ sub perl {
     $self->autonewline($autonewline);
     
     
-    #  Return whatever was generated unless hidden attr set
+    #  Return whatever was generated unless hidden attr set or display attr exists and is false
     #
-    #unless ( $attr_hr->{'hidden'} || (defined $attr_hr->{'display'} && ($attr_hr->{'display'}==0))) {
-    unless ( $attr_hr->{'hidden'} ) {
+    debug('attr_hr: %s', Dumper($attr_hr));
+    if ( $attr_hr->{'hidden'} || (exists $attr_hr->{'display'} && !$attr_hr->{'display'}) ) {
+
     
-        #  Not hidden return
+        #  No display wanted
         #
-        return $html_sr;
+        debug('hidden, not displaying. hidden:%s, display (exists):%s,%s', @{$attr_hr}{qw(hidden display)}, exists($attr_hr->{'display'}));
+        return \undef;
         
     }
     else {
     
-        #  No display wanted
+        #  Not hidden return
         #
-        return \undef;
+        debug('not hidden, displaying. hidden:%s, display:%s', @{$attr_hr}{qw(hidden display)});
+        return $html_sr;
         
     }
     #return $attr_hr->{'hidden'} ? \undef : $html_sr;

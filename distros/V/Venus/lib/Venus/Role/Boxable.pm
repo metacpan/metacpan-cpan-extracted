@@ -5,6 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Role 'with';
 
 # METHODS
@@ -21,10 +23,16 @@ sub box {
   return Venus::Box->new(value => $value);
 }
 
+sub boxed {
+  my ($self, @args) = @_;
+
+  return $self->box(@args)->unbox;
+}
+
 # EXPORTS
 
 sub EXPORT {
-  ['box']
+  ['box', 'boxed']
 }
 
 1;
@@ -113,6 +121,46 @@ I<Since C<0.01>>
   # bless({ value => bless(..., "Venus::String") }, "Venus::Box")
 
   # $example->box('text')->lc->ucfirst->concat('.')->unbox->get;
+
+=back
+
+=cut
+
+=head2 boxed
+
+  boxed(string | coderef $method, any @args) (object)
+
+The boxed method dispatches to L</box> and returns the "unboxed" value. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item boxed example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $boxed = $example->boxed;
+
+  # bless(..., "Example")
+
+=back
+
+=over 4
+
+=item boxed example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $boxed = $example->boxed('text');
+
+  # bless({value => 'hello world'}, "Venus::String")
 
 =back
 

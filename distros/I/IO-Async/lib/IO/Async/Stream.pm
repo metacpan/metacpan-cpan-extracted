@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2006-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Stream 0.804;
+package IO::Async::Stream 0.805;
 
 use v5.14;
 use warnings;
@@ -49,6 +49,8 @@ C<IO::Async::Stream> - event callbacks and write bufering for a stream
 filehandle
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use IO::Async::Stream;
 

@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 if (require Venus::Yaml && not Venus::Yaml->package) {
   diag 'No suitable YAML library found' if $ENV{VENUS_DEBUG};
@@ -43,6 +44,7 @@ $test->for('abstract');
 
 method: decode
 method: encode
+method: new
 
 =cut
 
@@ -176,42 +178,81 @@ $test->for('example', 1, 'encode', sub {
   $result
 });
 
-=error error_on_config
+=raise new Venus::Yaml::Error on.config
 
-This package may raise an error_on_config exception.
+  package main;
 
-=cut
+  use Venus::Yaml;
 
-$test->for('error', 'error_on_config');
+  local $ENV{VENUS_YAML_PACKAGE} = 'Fake::Yaml';
 
-=example-1 error_on_config
+  my $new = Venus::Yaml->new;
 
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_config',
-  };
-
-  my $error = $yaml->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_config"
-
-  # my $message = $error->message;
-
-  # "No suitable YAML package"
+  # Error! (on.config)
 
 =cut
 
-$test->for('example', 1, 'error_on_config', sub {
+$test->for('raise', 'new', 'Venus::Yaml::Error', 'on.config', sub {
+  my ($tryable) = @_;
+
+  $test->type(my $result = $tryable->result, 'Venus::Yaml');
+
+  $result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Yaml)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Yaml;
+
+  my $new = Venus::Yaml->new;
+
+  # bless(..., "Venus::Yaml")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_config";
-  my $message = $result->message;
-  is $message, "No suitable YAML package";
+  ok $result->isa('Venus::Yaml');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Yaml;
+
+  my $new = Venus::Yaml->new(value => {password => 'secret'});
+
+  # bless(..., "Venus::Yaml")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Yaml');
+  is_deeply $result->value, {password => 'secret'};
 
   $result
 });

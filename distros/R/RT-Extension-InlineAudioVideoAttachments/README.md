@@ -8,7 +8,7 @@ Displays audio and/or video attachments with HTML audio/video player.
 
 # RT VERSION
 
-Works with RT 4.4 or greater
+Use version v0.07 with RT 4.4, v0.08 with RT 5, and v0.09 or greater with RT 6 .
 
 # INSTALLATION
 
@@ -56,7 +56,7 @@ or via the web at
 
 # LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2018-2022 by Gérald Sédrati, Easter-Eggs
+This software is Copyright (c) 2018-2026 by Gérald Sédrati, Easter-Eggs
 
 This is free software, licensed under:
 

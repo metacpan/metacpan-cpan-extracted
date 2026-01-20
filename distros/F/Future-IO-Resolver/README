@@ -1,0 +1,98 @@
+NAME
+
+    Future::IO::Resolver - name resolver methods for Future::IO
+
+SYNOPSIS
+
+       use Future::IO;
+       use Future::IO::Resolver;
+    
+       use Socket qw( SOCK_STREAM );
+    
+       my $f = Future::IO::Resolver->getaddrinfo(
+          host     => "metacpan.org",
+          service  => "http",
+          socktype => SOCK_STREAM,
+       );
+       # when complete, $f will yield socket address structures
+
+DESCRIPTION
+
+    This package contains a selection of methods for performing name
+    resolver queries, running asynchronously via Future::IO. These are the
+    sorts of things typically performed as part of connect attempts or
+    other operations where names have to be turned into numerical address
+    structures, which may involve communication with the outside world.
+
+ Implementation Details
+
+    Currently this module uses Net::LibAsyncNS to offload the name resolver
+    operations asynchronously. This limits its abilities, and also means it
+    relies on having that library available. A later version of this module
+    should expand on this, offering possibly multiple different resolver
+    backends for more flexibility and portability.
+
+METHODS
+
+ getaddrinfo
+
+       @res = await Future::IO::Resolver->getaddrinfo( %args );
+
+    Perform a getaddrinfo resolve operation, which converts human-readable
+    descriptions of network addresses into socket-layer parameters and
+    address structures.
+
+    %args should contain a host and service key, and may optionally also
+    specify family, socktype, protocol, flags.
+
+    The returned list will contain HASH reference structures. Each will
+    provide family, socktype, protocol, addr and optionally canonname.
+
+ getnameinfo
+
+       ( $host, $service ) = await Future::IO::Resolver->getnameinfo( %args );
+
+    Perform a getnameinfo resolve operation, which converts socket-layer
+    address structures into human-readable description strings containing
+    names or numbers.
+
+    %args should contain a addr key and may optionally also specify flags.
+
+ res_query
+
+       $answer = Future::IO::Resolver->res_query( %args );
+
+    Perform a res_query resolve operation, which looks up DNS records of
+    various types, returning an answer in the form of a packed byte record.
+    Code using this method will need to understand how to unpack a DNS
+    record from this format.
+
+    %args should contain a dname and type key and may optionally also
+    specify class; though a default of the IN class is applied.
+
+ res_search
+
+       $answer = Future::IO::Resolver->res_search( %args );
+
+    Perform a res_search resolve operation, which looks up DNS records of
+    various types, returning an answer in the form of a packed byte record.
+    Code using this method will need to understand how to unpack a DNS
+    record from this format.
+
+    %args should contain a dname and type key and may optionally also
+    specify class; though a default of the IN class is applied.
+
+TODO
+
+      * Proper error handling if the run future dies; clear state and fail
+      all pending queries.
+
+      * Some wrapping of other resolvers, like the POSIX get*ent family.
+
+      * Look into other backends - will be necessary for other resolver
+      types too.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

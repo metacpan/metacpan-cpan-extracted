@@ -29,10 +29,10 @@ my @modules = qw(
 	Class::Method::Modifiers
 	Class::XSAccessor
 	Class::XSConstructor
+	Clone
 	Exporter::Tiny
 	Lexical::Sub
 	List::Util
-	Module::Runtime
 	MRO::Compat
 	Role::Tiny
 	Scalar::Util

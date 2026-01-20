@@ -5,26 +5,26 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Class 'attr', 'base', 'with';
+# IMPORTS
 
-base 'Venus::Kind::Utility';
+use Venus::Class 'attr', 'base';
 
-with 'Venus::Role::Stashable';
+# INHERITS
+
+base 'Venus::Error';
+
+# OVERLOADS
 
 use overload (
-  '""' => sub{$_[0]->catch('error')->explain},
-  '~~' => sub{$_[0]->catch('error')->explain},
+  '""' => sub{$_[0]->error->explain},
+  '~~' => sub{$_[0]->error->explain},
   fallback => 1,
 );
 
 # ATTRIBUTES
 
-attr 'frame';
-attr 'name';
-attr 'message';
 attr 'package';
 attr 'parent';
-attr 'context';
 
 # BUILDERS
 
@@ -39,107 +39,98 @@ sub build_arg {
 sub build_self {
   my ($self, $data) = @_;
 
-  $self->parent('Venus::Error') if !$self->parent;
+  if (!$self->parent) {
+    $self->parent('Venus::Error');
+  }
+
+  if (my $stash = delete $data->{stash}) {
+    %{$self->stash} = %{$stash};
+  }
 
   return $self;
 }
 
 # METHODS
 
-sub as {
-  my ($self, $name) = @_;
+sub die {
+  my ($self, $data) = @_;
 
-  $self->name($name);
+  $data ||= {};
 
-  return $self;
-}
+  $data->{raise} = true;
 
-sub assertion {
-  my ($self) = @_;
+  @_ = ($self, $data);
 
-  my $assertion = $self->SUPER::assertion;
-
-  $assertion->match('string')->format(sub{
-    (ref $self || $self)->new($_)
-  });
-
-  return $assertion;
-}
-
-sub capture {
-  my ($self, @args) = @_;
-
-  my $frame = $self->frame;
-
-  $self->stash(captured => {
-    callframe => [caller($frame // 1)],
-    arguments => [@args],
-  });
-
-  return $self;
+  goto $self->can('error');
 }
 
 sub error {
   my ($self, $data) = @_;
 
-  require Venus::Error;
+  $data ||= {};
 
-  my $frame = $self->frame;
-  my $name = $self->name;
-  my $context = $self->context || (caller($frame // 1))[3];
-  my $package = $self->package || join('::', map ucfirst, (caller(0))[0], 'error');
+  for my $key (keys %{$data}) {
+    next if $key eq 'die';
+    next if $key eq 'error';
+
+    $self->$key($data->{$key}) if $self->can($key);
+  }
+
+  my $context = $self->context;
+
+  if (!$context) {
+    $context = $self->context((caller(($self->offset // 0) + 1))[3]);
+  }
+
+  my $package = $self->package;
+
+  if (!$package) {
+    $package = $self->package(join('::', map ucfirst, (caller($self->offset // 0))[0], 'error'));
+  }
+
   my $parent = $self->parent;
-  my $message = $self->message;
 
-  $data //= {};
-  $data->{context} //= $context;
-  $data->{message} //= $message if $message;
-  $data->{name} //= $name if $name;
-
-  if (%{$self->stash}) {
-    $data->{'$stash'} //= $self->stash;
+  if (!$parent) {
+    $parent = $self->parent('Venus::Error');
   }
 
   local $@;
+
   if (!$package->can('new') and !eval "package $package; use base '$parent'; 1") {
-    my $throw = Venus::Throw->new(package => 'Venus::Throw::Error');
+    my $throw = $self->class->new;
     $throw->message($@);
+    $throw->package('Venus::Throw::Error');
+    $throw->parent('Venus::Error');
     $throw->stash(package => $package);
     $throw->stash(parent => $parent);
-    $throw->error;
+    $throw->die;
   }
+
   if (!$parent->isa('Venus::Error')) {
-    my $throw = Venus::Throw->new(package => 'Venus::Throw::Error');
+    my $throw = $self->class->new;
     $throw->message(qq(Parent '$parent' doesn't derive from 'Venus::Error'));
+    $throw->package('Venus::Throw::Error');
+    $throw->parent('Venus::Error');
     $throw->stash(package => $package);
     $throw->stash(parent => $parent);
-    $throw->error;
+    $throw->die;
   }
+
   if (!$package->isa('Venus::Error')) {
-    my $throw = Venus::Throw->new(package => 'Venus::Throw::Error');
+    my $throw = $self->class->new;
     $throw->message(qq(Package '$package' doesn't derive from 'Venus::Error'));
+    $throw->package('Venus::Throw::Error');
+    $throw->parent('Venus::Error');
     $throw->stash(package => $package);
     $throw->stash(parent => $parent);
-    $throw->error;
+    $throw->die;
   }
 
-  @_ = ($package->new($data ? $data : ()));
+  my $error = $package->new->copy($self);
 
-  goto $package->can('throw');
-}
+  (@_ = ($error)) && goto $error->can('throw') if $data && $data->{raise};
 
-sub on {
-  my ($self, $name) = @_;
-
-  my $frame = $self->frame;
-
-  my $routine = (split(/::/, (caller($frame // 1))[3]))[-1];
-
-  undef $routine if $routine eq '__ANON__' || $routine eq '(eval)';
-
-  $self->name(join('.', 'on', grep defined, $routine, $name)) if $routine || $name;
-
-  return $self;
+  return $error;
 }
 
 1;
@@ -183,51 +174,85 @@ This package has the following attributes:
 
 =cut
 
-=head2 frame
-
-  frame(Int)
-
-This attribute is read-write, accepts C<(Int)> values, and is optional.
-
-=cut
-
-=head2 name
-
-  name(Str)
-
-This attribute is read-write, accepts C<(Str)> values, and is optional.
-
-=cut
-
-=head2 message
-
-  message(Str)
-
-This attribute is read-write, accepts C<(Str)> values, and is optional.
-
-=cut
-
 =head2 package
 
-  package(Str)
+  package(string $package) (string)
 
-This attribute is read-only, accepts C<(Str)> values, and is optional.
+The package attribute is read-write, accepts C<(string)> values, and is
+optional.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item package example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $package = $throw->package("Example");
+
+  # "Example"
+
+=back
+
+=over 4
+
+=item package example 2
+
+  # given: synopsis
+
+  # given: example-1 package
+
+  package main;
+
+  $package = $throw->package;
+
+  # "Example"
+
+=back
 
 =cut
 
 =head2 parent
 
-  parent(Str)
+  parent(string $parent) (string)
 
-This attribute is read-only, accepts C<(Str)> values, is optional, and defaults to C<'Venus::Error'>.
+The parent attribute is read-write, accepts C<(string)> values, and is
+optional.
 
-=cut
+I<Since C<4.15>>
 
-=head2 context
+=over 4
 
-  context(Str)
+=item parent example 1
 
-This attribute is read-only, accepts C<(Str)> values, and is optional.
+  # given: synopsis
+
+  package main;
+
+  my $parent = $throw->parent("Venus::Error");
+
+  # "Venus::Error"
+
+=back
+
+=over 4
+
+=item parent example 2
+
+  # given: synopsis
+
+  # given: example-1 parent
+
+  package main;
+
+  $parent = $throw->parent;
+
+  # "Venus::Error"
+
+=back
 
 =cut
 
@@ -235,15 +260,7 @@ This attribute is read-only, accepts C<(Str)> values, and is optional.
 
 This package inherits behaviors from:
 
-L<Venus::Kind::Utility>
-
-=cut
-
-=head1 INTEGRATES
-
-This package integrates behaviors from:
-
-L<Venus::Role::Stashable>
+L<Venus::Error>
 
 =cut
 
@@ -253,25 +270,166 @@ This package provides the following methods:
 
 =cut
 
-=head2 as
+=head2 die
 
-  as(string $name) (Venus::Throw)
+  die(hashref $data) (Venus::Error)
 
-The as method sets a L</name> for the error and returns the invocant.
+The die method builds an error object from the attributes set on the invocant
+and throws it.
 
-I<Since C<2.55>>
+I<Since C<4.15>>
 
 =over 4
 
-=item as example 1
+=item die example 1
 
-  # given: synopsis
+  # given: synopsis;
+
+  my $die = $throw->die;
+
+  # bless({
+  #   ...,
+  #   "context"  => "(eval)",
+  #   "message"  => "Exception!",
+  # }, "Main::Error")
+
+=back
+
+=over 4
+
+=item die example 2
+
+  # given: synopsis;
+
+  my $die = $throw->die({
+    message => 'Something failed!',
+    context => 'Test.error',
+  });
+
+  # bless({
+  #   ...,
+  #   "context"  => "Test.error",
+  #   "message"  => "Something failed!",
+  # }, "Main::Error")
+
+=back
+
+=over 4
+
+=item die example 3
 
   package main;
 
-  $throw = $throw->as('on.handler');
+  use Venus::Throw;
 
-  # bless({...}, 'Venus::Throw')
+  my $throw = Venus::Throw->new('Example::Error');
+
+  my $die = $throw->die;
+
+  # bless({
+  #   ...,
+  #   "context"  => "(eval)",
+  #   "message"  => "Exception!",
+  # }, "Example::Error")
+
+=back
+
+=over 4
+
+=item die example 4
+
+  package main;
+
+  use Venus::Throw;
+
+  my $throw = Venus::Throw->new(
+    package => 'Example::Error',
+    parent => 'Venus::Error',
+  );
+
+  my $die = $throw->die({
+    message => 'Example error!',
+  });
+
+  # bless({
+  #   ...,
+  #   "context"  => "(eval)",
+  #   "message"  => "Example error!",
+  # }, "Example::Error")
+
+=back
+
+=over 4
+
+=item die example 5
+
+  package Example::Error;
+
+  use base 'Venus::Error';
+
+  package main;
+
+  use Venus::Throw;
+
+  my $throw = Venus::Throw->new(
+    package => 'Example::Error::Unknown',
+    parent => 'Example::Error',
+  );
+
+  my $die = $throw->die({
+    message => 'Example error (unknown)!',
+  });
+
+  # bless({
+  #   ...,
+  #   "context"  => "(eval)",
+  #   "message"  => "Example error (unknown)!",
+  # }, "Example::Error::Unknown")
+
+=back
+
+=over 4
+
+=item die example 6
+
+  package main;
+
+  use Venus::Throw;
+
+  my $throw = Venus::Throw->new(
+    package => 'Example::Error::NoThing',
+    parent => 'No::Thing',
+  );
+
+  my $die = $throw->die({
+    message => 'Example error (no thing)!',
+    raise => true,
+  });
+
+  # No::Thing does not exist
+
+  # Exception! Venus::Throw::Error (isa Venus::Error)
+
+=back
+
+=over 4
+
+=item die example 7
+
+  # given: synopsis;
+
+  my $die = $throw->die({
+    name => 'on.test.error',
+    context => 'Test.error',
+    message => 'Something failed!',
+  });
+
+  # bless({
+  #   ...,
+  #   "context"  => "Test.error",
+  #   "message"  => "Something failed!",
+  #   "name"  => "on_test_error",
+  # }, "Main::Error")
 
 =back
 
@@ -281,7 +439,8 @@ I<Since C<2.55>>
 
   error(hashref $data) (Venus::Error)
 
-The error method throws the prepared error object.
+The error method builds an error object from the attributes set on the invocant
+and returns or optionally automatically throws it.
 
 I<Since C<0.01>>
 
@@ -409,6 +568,7 @@ I<Since C<0.01>>
 
   my $error = $throw->error({
     message => 'Example error (no thing)!',
+    raise => true,
   });
 
   # No::Thing does not exist
@@ -440,95 +600,43 @@ I<Since C<0.01>>
 
 =cut
 
-=head2 on
+=head2 new
 
-  on(string $name) (Venus::Throw)
+  new(any @args) (Venus::Throw)
 
-The on method sets a L</name> for the error in the form of
-C<"on.$subroutine.$name"> or C<"on.$name"> (if outside of a subroutine) and
-returns the invocant.
+The new method constructs an instance of the package.
 
-I<Since C<2.55>>
+I<Since C<4.15>>
 
 =over 4
 
-=item on example 1
-
-  # given: synopsis
+=item new example 1
 
   package main;
 
-  $throw = $throw->on('handler');
+  use Venus::Throw;
 
-  # bless({...}, 'Venus::Throw')
+  my $new = Venus::Throw->new;
 
-  # $throw->name;
-
-  # "on.handler"
+  # bless(..., "Venus::Throw")
 
 =back
 
 =over 4
 
-=item on example 2
-
-  # given: synopsis
+=item new example 2
 
   package main;
 
-  sub execute {
-    $throw->on('handler');
-  }
+  use Venus::Throw;
 
-  $throw = execute();
+  my $new = Venus::Throw->new(package => 'Example::Error', parent => 'Venus::Error');
 
-  # bless({...}, 'Venus::Throw')
-
-  # $throw->name;
-
-  # "on.execute.handler"
+  # bless(..., "Venus::Throw")
 
 =back
 
 =cut
-
-=head1 OPERATORS
-
-This package overloads the following operators:
-
-=cut
-
-=over 4
-
-=item operation: C<("")>
-
-This package overloads the C<""> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = "$throw";
-
-  # "Exception!"
-
-=back
-
-=over 4
-
-=item operation: C<(~~)>
-
-This package overloads the C<~~> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $throw ~~ 'Exception!';
-
-  # 1
-
-=back
 
 =head1 AUTHORS
 

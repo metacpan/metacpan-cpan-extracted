@@ -46,5 +46,5 @@ $m->submit_form(
 );
 is($m->status, 200, "Request successful");
 
-$m->content_contains("Download $video_name", 'Page has file name');
+$m->content_contains('<span class="downloadfilename">' . $video_name . '</span>', 'Page has file name');
 $m->content_like(qr{<video controls[^>]*><source src="Attachment/\d+/\d+/$video_name" type="video/mp4">Your browser does not support the video tag.</video>}, 'Video can be watched in HTML5 player');

@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -37,6 +38,7 @@ $test->for('abstract');
 =includes
 
 method: box
+method: boxed
 
 =cut
 
@@ -138,6 +140,63 @@ $test->for('example', 2, 'box', sub {
   ok $result->isa('Venus::Box');
   ok $result->{value};
   ok $result->{value}->isa('Venus::String');
+
+  $result
+});
+
+=method boxed
+
+The boxed method dispatches to L</box> and returns the "unboxed" value. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
+
+=signature boxed
+
+  boxed(string | coderef $method, any @args) (object)
+
+=metadata boxed
+
+{
+  since => '4.15',
+}
+
+=example-1 boxed
+
+  # given: synopsis
+
+  package main;
+
+  my $boxed = $example->boxed;
+
+  # bless(..., "Example")
+
+=cut
+
+$test->for('example', 1, 'boxed', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Example');
+
+  $result
+});
+
+=example-2 boxed
+
+  # given: synopsis
+
+  package main;
+
+  my $boxed = $example->boxed('text');
+
+  # bless({value => 'hello world'}, "Venus::String")
+
+=cut
+
+$test->for('example', 2, 'boxed', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::String');
+  is $result->get, 'hello, world';
 
   $result
 });

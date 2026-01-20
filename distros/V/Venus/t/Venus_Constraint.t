@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 use Venus 'catch';
 
@@ -44,6 +45,7 @@ method: clear
 method: ensure
 method: eval
 method: evaler
+method: new
 method: result
 
 =cut
@@ -599,6 +601,42 @@ $test->for('example', 2, 'evaler', sub {
   ok defined $result;
   ok ref $result eq 'CODE';
   is $result->(), true;
+
+  $result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Constraint)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Constraint;
+
+  my $new = Venus::Constraint->new;
+
+  # bless(..., "Venus::Constraint")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Constraint');
 
   $result
 });

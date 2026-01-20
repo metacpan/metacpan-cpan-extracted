@@ -5,7 +5,11 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'with';
+
+# INTEGRATES
 
 with 'Venus::Role::Buildable';
 with 'Venus::Role::Proxyable';
@@ -206,6 +210,58 @@ I<Since C<3.55>>
   my $get = $sealed->get;
 
   # "012345"
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Sealed)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Sealed;
+
+  my $new = Venus::Sealed->new;
+
+  # bless(..., "Venus::Sealed")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Sealed;
+
+  my $new = Venus::Sealed->new('012345');
+
+  # bless(..., "Venus::Sealed")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Sealed;
+
+  my $new = Venus::Sealed->new(value => '012345');
+
+  # bless(..., "Venus::Sealed")
 
 =back
 

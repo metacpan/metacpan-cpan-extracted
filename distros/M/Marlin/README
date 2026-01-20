@@ -272,6 +272,25 @@ DESCRIPTION
 
         Supports the same lexical method possibilities as `reader`.
 
+    `alias` and `alias_for`
+        Allows you to establish aliases for an attribute.
+
+          use Marlin
+            name => {
+              required   => true,
+              isa        => Str,
+              alias      => [ 'moniker', 'label' ],
+            }, ...;
+
+        Aliases are accepted in the constructor and also additional reader
+        methods (or accessor methods for `is => 'rw'` attributes) are
+        installed for each alias.
+
+        You can use `alias_for => 'reader'` or `alias_for => 'accessor'` to
+        override which type of method is installed (though not on a per-alias
+        basis). Technically it's possible to create writer/predicate/clearer
+        aliases but that would be weird.
+
     `builder`, `default`, and `lazy`
         The `default` can be set to a coderef or a non-reference value to set
         a default value for the attribute.
@@ -939,8 +958,9 @@ SEE ALSO
     Marlin::Role, Marlin::Struct, Marlin::Util, Marlin::Manual::Principles,
     Marlin::Manual::Comparison.
 
-    Example extensions: Marlin::X::Clone, Marlin::XAttribute::Alias,
-    Marlin::XAttribute::LocalWriter, Marlin::XAttribute::Lvalue.
+    Example extensions: Marlin::X::Clone, Marlin::X::ToHash,
+    Marlin::X::UndefTolerant, Marlin::XAttribute::LocalWriter,
+    Marlin::XAttribute::Lvalue.
 
     Modules that Marlin exposes the functionality of: Class::XSAccessor,
     Class::XSConstructor, Types::Common, Type::Params, and Sub::HandlesVia.

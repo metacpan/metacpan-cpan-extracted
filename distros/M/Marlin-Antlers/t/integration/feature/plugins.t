@@ -1,4 +1,5 @@
 use Test2::V0;
+use Test2::Require::Module 'Marlin::X::Clone';
 
 package Local::Foo {
 	use Marlin::Antlers { x => ':Clone' };

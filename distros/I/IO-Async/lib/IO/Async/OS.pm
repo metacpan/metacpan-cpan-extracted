@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2012-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::OS 0.804;
+package IO::Async::OS 0.805;
 
 use v5.14;
 use warnings;
@@ -72,6 +72,8 @@ use constant LOOP_PREFER_CLASSES => ();
 C<IO::Async::OS> - operating system abstractions for C<IO::Async>
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 This module acts as a class to provide a number of utility methods whose exact
 behaviour may depend on the type of OS it is running on. It is provided as a

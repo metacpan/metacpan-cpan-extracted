@@ -3,13 +3,13 @@ Build.PL
 Changes
 lib/Future/IO/Impl/POE.pm
 lib/POE/Future.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01poe.t
 t/02timer.t
 t/10future-io.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

@@ -5,12 +5,20 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'attr', 'base', 'with';
+
+# INHERITS
 
 base 'Venus::Kind::Utility';
 
+# INTEGRATES
+
 with 'Venus::Role::Buildable';
 with 'Venus::Role::Explainable';
+
+# OVERLOADS
 
 use overload (
   '""' => 'explain',
@@ -165,18 +173,6 @@ sub add_years {
   $size = ($self->timeseconds->ONE_YEAR * $size) if $size;
 
   return $self->reset($self->epoch + $size);
-}
-
-sub assertion {
-  my ($self) = @_;
-
-  my $assertion = $self->SUPER::assertion;
-
-  $assertion->match('number')->format(sub{
-    (ref $self || $self)->new($_)
-  });
-
-  return $assertion;
 }
 
 sub epoch {
@@ -1202,6 +1198,65 @@ I<Since C<0.01>>
   my $mdy = $date->mdy;
 
   # 02-01-1988
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Date)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Date;
+
+  my $new = Venus::Date->new;
+
+  # bless(..., "Venus::Date")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Date;
+
+  my $new = Venus::Date->new(570672000);
+
+  # bless(..., "Venus::Date")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Date;
+
+  my $new = Venus::Date->new(
+    day => 3,
+    hour => 16,
+    minute => 17,
+    month => 3,
+    second => 54,
+    year => 1989
+  );
+
+  # bless(..., "Venus::Date")
 
 =back
 

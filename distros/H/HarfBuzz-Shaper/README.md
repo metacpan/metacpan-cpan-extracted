@@ -7,11 +7,13 @@ The subset is suitable for typesetting programs that need to deal with
 complex languages like Devanagari.
 
 This module is intended to be used with module L<Text::Layout>. Feel
-free to (ab)use it for other purposes.
+free to use it for other purposes.
 
 ## INSTALLATION
 
-Please read document INSTALL first.
+Building the HarfBuzz::Shaper module requires the `harfbuzz` library
+to be installed on your system. Most modern systems provide this
+library.
 
 To install this module type the following:
 
@@ -36,10 +38,7 @@ HarfBuzz website and documentation: https://harfbuzz.github.io/index.html.
 
 ## COPYRIGHT AND LICENCE
 
-Copyright (C) 2020 by Johan Vromans
+Copyright (C) 2020,2026 by Johan Vromans
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-The source for the HarfBuzz library may be included in this kit, and
-is licenced according to hb_src/harfbuzz/COPYING.

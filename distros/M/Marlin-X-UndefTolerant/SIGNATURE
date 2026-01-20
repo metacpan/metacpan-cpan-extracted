@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 1574fbf64ecf5f32439f888e24b7803f81b5d0f15dae3f7ec14628853d2f331f COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 e48636d7d996cb735d40eb133a43f63b523a3ae9926f303ae40e7cbad4ec68da Changes
+SHA256 260b22c50385419cf6f7c58dd6549569e359abe21210be014bb3efbf9fd92440 INSTALL
+SHA256 ca1cc40b3da7bebb1b0368764650ad38ac603b31a25fbc5b6f9fb217cc6fa1e8 LICENSE
+SHA256 30c8315f64759d2a2256410c98afa3b82d52e988fb4ba674a7b4947925038c8f MANIFEST
+SHA256 61695792dfdee0be8be4f8a44cb0e1a49594ebe09277ceaf42ad0734a54b06c1 META.json
+SHA256 efa5b098e45916b90e7dfd67748d97b7e4434f2b45778f390166e6da68dbfceb META.yml
+SHA256 0ad8e8e576961bfa912ea5e04e77e81fce81dc992f15a79b31ea8344196df748 Makefile.PL
+SHA256 72ca988a98d5066c2802bf4e8cc271d6cb970c3519cda683049a960212cde98f README
+SHA256 6d5e62ae0221769b11f272792f4a8e9e6c4efdca70e14396801072630b936844 dist.ini
+SHA256 7eb47a4c82b055b0e0d728a45dddaeab1e1b5bcbc42ff025f1371010025a5f22 doap.ttl
+SHA256 37b886bc25205899de31cdf88a6524e191604d96fb1a1b1c947f50f253d65463 lib/Marlin/X/UndefTolerant.pm
+SHA256 1c1edd907f3a0b51c5e7f8f442282c2f8437cd106c40f30a05296b586d511c74 t/00start.t
+SHA256 72803733d0b4b0ded939ac923d336d1437569ef768646b1210936fef3c1a5b18 t/01basic.t
+SHA256 36b97da1f37badc9d311cacbe617882fa34fe85ff29b400d8dd7fdef5cbfc807 t/integration/undef-tolerant.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCaW5psAAKCRDOv4Eoaip9
+ORdaAKCNp0eXp6zDzqqrAlqoC1/M4bKCnACeJNFX01uSXJ6X3vrvPffyEcdZFTM=
+=HZMh
+-----END PGP SIGNATURE-----

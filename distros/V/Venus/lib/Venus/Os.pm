@@ -5,17 +5,17 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base';
+
+# INHERITS
 
 base 'Venus::Kind::Utility';
 
+use Encode ();
+
 our %TYPES;
-
-# HOOKS
-
-sub _osname {
-  $TYPES{$^O} || $^O
-}
 
 # BUILDERS
 
@@ -23,6 +23,25 @@ sub build_arg {
   my ($self) = @_;
 
   return {};
+}
+
+# HOOKS
+
+sub _exitcode {
+  $? >> 8;
+}
+
+sub _open {
+  CORE::open(shift, shift, shift);
+}
+
+sub _osname {
+  $TYPES{$^O} || $^O
+}
+
+sub _system {
+  local $SIG{__WARN__} = sub {};
+  CORE::system(@_) or return 0;
 }
 
 # METHODS
@@ -173,6 +192,144 @@ sub quote {
   }
 }
 
+sub read {
+  my ($self, $from) = @_;
+
+  no warnings 'io';
+
+  my $fh;
+  my $is_handle = ref($from) eq 'GLOB' || UNIVERSAL::isa($from, 'IO::Handle');
+  my $error;
+
+  if ($is_handle) {
+    $fh = $from;
+    binmode($fh, ':raw') or $error = $!;
+    if ($error) {
+      $self->error_on_read_binmode({from => $from, error => $error, binmode => ':raw'})
+      ->input($self, $from)
+      ->output($error)
+      ->throw;
+    }
+    seek($fh, 0, 0) or $error = $!;
+    if ($error) {
+      $self->error_on_read_seek({filehandle => $fh, error => $error})
+      ->input($self, $from)
+      ->output($error)
+      ->throw;
+    }
+  }
+  else {
+    if (!defined $from || $from eq '-' || $from eq 'STDIN') {
+      if (!defined(fileno(STDIN))) {
+        _open(\*STDIN, '<&', 0) or $error = $!;
+        if ($error) {
+          $self->error_on_read_open_stdin({error => $error})
+          ->input($self, $from)
+          ->output($error)
+          ->throw;
+        }
+      }
+      $fh = *STDIN;
+      binmode($fh, ':raw') or $error = $!;
+      if ($error) {
+        $self->error_on_read_binmode({from => 'STDIN', error => $error, binmode => ':raw'})
+        ->input($self, $from)
+        ->output($error)
+        ->throw;
+      }
+    }
+    else {
+      _open($fh, '<:raw', $from) or $error = $!;
+      if ($error) {
+        $self->error_on_read_open_file({error => $error, file => $from})
+        ->input($self, $from)
+        ->output($error)
+        ->throw;
+      }
+    }
+  }
+
+  read($fh, my $bom, 4);
+  my $encoding;
+  my $offset = 0;
+
+  if ($bom =~ /^\xEF\xBB\xBF/) {
+    $encoding = 'UTF-8';
+    $offset = 3;
+  }
+  elsif ($bom =~ /^\xFF\xFE\x00\x00/) {
+    $encoding = 'UTF-32LE';
+    $offset = 4;
+  }
+  elsif ($bom =~ /^\x00\x00\xFE\xFF/) {
+    $encoding = 'UTF-32BE';
+    $offset = 4;
+  }
+  elsif ($bom =~ /^\xFF\xFE/) {
+    $encoding = 'UTF-16LE';
+    $offset = 2;
+  }
+  elsif ($bom =~ /^\xFE\xFF/) {
+    $encoding = 'UTF-16BE';
+    $offset = 2;
+  }
+  else {
+    $encoding = 'UTF-8';
+    seek($fh, 0, 0) or $error = $!;
+    if ($error) {
+      $self->error_on_read_seek_reset({error => $error})
+      ->input($self, $from)
+      ->output($error)
+      ->throw;
+    }
+  }
+
+  if ($offset > 0) {
+    seek($fh, $offset, 0) or $error = $!;
+    if ($error) {
+      $self->error_on_read_seek({error => $error})
+      ->input($self, $from)
+      ->output($error)
+      ->throw;
+    }
+  }
+
+  my $raw_content = '';
+
+  while (read($fh, my $chunk, 8192)) {
+    $raw_content .= $chunk;
+  }
+
+  local $@;
+
+  my $data = eval {
+    Encode::decode($encoding, $raw_content, Encode::FB_CROAK);
+  };
+  if ($@) {
+    $data = Encode::decode('ISO-8859-1', $raw_content);
+  }
+
+  close $fh if !$is_handle && fileno($fh) != fileno(STDIN);
+
+  $data =~ s/\r\n?/\n/g;
+
+  return $data;
+}
+
+sub syscall {
+  my ($self, @args) = @_;
+
+  (_system(@args) == 0) or do {
+    my $error = $!;
+    $self->error_on_system_call({args => [@args], error => $error || _exitcode(), exit_code => _exitcode()})
+      ->input($self, @args)
+      ->output($error)
+      ->throw;
+  };
+
+  return $self;
+}
+
 sub type {
   my ($self) = @_;
 
@@ -207,9 +364,294 @@ sub which {
   return $result->[0];
 }
 
+sub write {
+  my ($self, $into, $data, $encoding) = @_;
+
+  no warnings 'io';
+
+  $encoding ||= Encode::is_utf8($data) ? 'UTF-8' : 'ISO-8859-1';
+
+  my $fh;
+  my $is_handle = ref($into) eq 'GLOB' || UNIVERSAL::isa($into, 'IO::Handle');
+  my $error;
+
+  if ($is_handle) {
+    $fh = $into;
+  }
+  else {
+    if (!defined $into || $into eq '-' || $into eq 'STDOUT') {
+      if (!defined(fileno(STDOUT))) {
+        _open(\*STDOUT, '>&', 1) or $error = $!;
+        if ($error) {
+          $self->error_on_write_open_stdout({error => $error})
+          ->input($self, $into, $data, $encoding)
+          ->output($error)
+          ->throw;
+        }
+      }
+      $fh = \*STDOUT; select($fh); $| = 1;
+    }
+    elsif ($into eq 'STDERR') {
+      if (!defined(fileno(STDERR))) {
+        _open(\*STDERR, '>&', 2) or $error = $!;
+        if ($error) {
+          $self->error_on_write_open_stderr({error => $error})
+          ->input($self, $into, $data, $encoding)
+          ->output($error)
+          ->throw;
+        }
+      }
+      $fh = \*STDERR; select($fh); $| = 1;
+    }
+    else {
+      _open($fh, '>:raw', $into) or $error = $!;
+      if ($error) {
+        $self->error_on_write_open_file({error => $error, file => $into})
+        ->input($self, $into, $data, $encoding)
+        ->output($error)
+        ->throw;
+      }
+    }
+  }
+
+  if (fileno($fh) == fileno(STDOUT) || fileno($fh) == fileno(STDERR)) {
+    binmode($fh, ":raw") or $error = $!;
+    if ($error) {
+      $self->error_on_write_binmode({from => 'STOUT', error => $error, binmode => ':raw'})
+      ->input($self, $into, $data, $encoding)
+      ->output($error)
+      ->throw;
+    }
+  }
+  else {
+    binmode($fh, ':raw') or $error = $!;
+    if ($error) {
+      $self->error_on_write_binmode({from => $fh, error => $error, binmode => ':raw'})
+      ->input($self, $into, $data, $encoding)
+      ->output($error)
+      ->throw;
+    }
+
+    if ($encoding eq 'UTF-8') {
+      print $fh "\xEF\xBB\xBF";
+    }
+    elsif ($encoding eq 'UTF-16LE') {
+      print $fh "\xFF\xFE";
+    }
+    elsif ($encoding eq 'UTF-16BE') {
+      print $fh "\xFE\xFF";
+    }
+    elsif ($encoding eq 'UTF-32LE') {
+      print $fh "\xFF\xFE\x00\x00";
+    }
+    elsif ($encoding eq 'UTF-32BE') {
+      print $fh "\x00\x00\xFE\xFF";
+    }
+  }
+
+  $data = "" if !defined $data;
+
+  if ($self->is_vms || $self->is_win) {
+    $data =~ s/(?<!\r)\n/\r\n/g;
+  }
+
+  if (fileno($fh) == fileno(STDOUT) || fileno($fh) == fileno(STDERR)) {
+    my $encoded_content = Encode::is_utf8($data)
+      ? "$data"
+      : Encode::encode('UTF-8', $data, Encode::FB_CROAK);
+    print $fh $encoded_content;
+  }
+  else {
+    my $encoded_content = Encode::encode($encoding, $data, Encode::FB_CROAK);
+    my $chunk_size = 8192;
+    my $offset = 0;
+    my $length = length($encoded_content);
+
+    while ($offset < $length) {
+      my $chunk = substr($encoded_content, $offset, $chunk_size);
+      print $fh $chunk;
+      $offset += $chunk_size;
+    }
+  }
+
+  close $fh
+    if !$is_handle
+    && (fileno($fh) != fileno(STDOUT) && fileno($fh) != fileno(STDERR));
+
+  return $self;
+}
+
+# ERRORS
+
+sub error_on_read_binmode {
+  my ($self, $data) = @_;
+
+  my $error = $self->error->sysinfo;
+
+  my $message = 'Can\'t binmode on read: {{error}}';
+
+  $error->name('on.read.binmode');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
+
+  return $error;
+}
+
+sub error_on_read_open_file {
+  my ($self, $data) = @_;
+
+  my $error = $self->error->sysinfo;
+
+  my $message = 'Can\'t open "{{file}}" for reading: {{error}}';
+
+  $error->name('on.read.open.file');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
+
+  return $error;
+}
+
+sub error_on_read_open_stdin {
+  my ($self, $data) = @_;
+
+  my $error = $self->error->sysinfo;
+
+  my $message = 'Can\'t open STDIN for reading: {{error}}';
+
+  $error->name('on.read.open.stdin');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
+
+  return $error;
+}
+
+sub error_on_read_seek {
+  my ($self, $data) = @_;
+
+  my $error = $self->error->sysinfo;
+
+  my $message = 'Can\'t seek in filehandle: {{error}}';
+
+  $error->name('on.read.seek');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
+
+  return $error;
+}
+
+sub error_on_read_seek_reset {
+  my ($self, $data) = @_;
+
+  my $error = $self->error->sysinfo;
+
+  my $message = 'Can\'t reset seek in filehandle: {{error}}';
+
+  $error->name('on.read.seek.reset');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
+
+  return $error;
+}
+
+sub error_on_system_call {
+  my ($self, $data) = @_;
+
+  my $error = $self->error->sysinfo;
+
+  my $message = 'Can\'t make system call "{{command}}": {{error}}';
+
+  $data->{command} = join ' ', @{$data->{args}};
+
+  $error->name('on.system.call');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
+
+  return $error;
+}
+
+sub error_on_write_binmode {
+  my ($self, $data) = @_;
+
+  my $error = $self->error->sysinfo;
+
+  my $message = 'Can\'t binmode on write: {{error}}';
+
+  $error->name('on.write.binmode');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
+
+  return $error;
+}
+
+sub error_on_write_open_file {
+  my ($self, $data) = @_;
+
+  my $error = $self->error->sysinfo;
+
+  my $message = 'Can\'t open "{{file}}" for writing: {{error}}';
+
+  $error->name('on.write.open.file');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
+
+  return $error;
+}
+
+sub error_on_write_open_stderr {
+  my ($self, $data) = @_;
+
+  my $error = $self->error->sysinfo;
+
+  my $message = 'Can\'t open STDERR for writing: {{error}}';
+
+  $error->name('on.write.open.stderr');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
+
+  return $error;
+}
+
+sub error_on_write_open_stdout {
+  my ($self, $data) = @_;
+
+  my $error = $self->error->sysinfo;
+
+  my $message = 'Can\'t open STDOUT for writing: {{error}}';
+
+  $error->name('on.write.open.stdout');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
+
+  return $error;
+}
+
 1;
 
 
+
+=encoding UTF8
+
+=cut
 
 =head1 NAME
 
@@ -959,6 +1401,30 @@ I<Since C<2.80>>
 
 =cut
 
+=head2 new
+
+  new(any @args) (Venus::Os)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Os;
+
+  my $new = Venus::Os->new;
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=cut
+
 =head2 paths
 
   paths() (arrayref)
@@ -1060,6 +1526,258 @@ I<Since C<2.91>>
   my $quote = $os->quote('hello "world"');
 
   # '"hello \"world\""'
+
+=back
+
+=cut
+
+=head2 read
+
+  read(any $from) (string)
+
+The read method reads from a file, filehandle, or STDIN, and returns the data.
+To read from STDIN provide the string C<"STDIN">. The method defaults to reading from STDIN.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item read example 1
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $read = $os->read;
+
+  # from STDIN
+
+  # "..."
+
+=back
+
+=over 4
+
+=item read example 2
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $read = $os->read('STDIN');
+
+  # from STDIN
+
+  # "..."
+
+=back
+
+=over 4
+
+=item read example 3
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $read = $os->read('t/data/texts/iso-8859-1.txt');
+
+  # from file
+
+  # "Hello, world! This is ISO-8859-1."
+
+=back
+
+=over 4
+
+=item read example 4
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  open my $fh, '<', 't/data/texts/iso-8859-1.txt';
+
+  my $read = $os->read($fh);
+
+  # from filehandle
+
+  # "Hello, world! This is ISO-8859-1."
+
+=back
+
+=over 4
+
+=item read example 5
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  use IO::File;
+
+  my $fh = IO::File->new('t/data/texts/iso-8859-1.txt', 'r');
+
+  my $read = $os->read($fh);
+
+  # from filehandle
+
+  # "Hello, world! This is ISO-8859-1."
+
+=back
+
+=over 4
+
+=item read example 6
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $read = $os->read('t/data/texts/utf-16be.txt');
+
+  # from UTF-16BE encoded file
+
+  # "Hello, world! こんにちは世界！"
+
+=back
+
+=over 4
+
+=item read example 7
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $read = $os->read('t/data/texts/utf-16le.txt');
+
+  # from UTF-16LE encoded file
+
+  # "Hello, world! こんにちは世界！"
+
+=back
+
+=over 4
+
+=item read example 8
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $read = $os->read('t/data/texts/utf-32be.txt');
+
+  # from UTF-32BE encoded file
+
+  # "Hello, world! こんにちは世界！"
+
+=back
+
+=over 4
+
+=item read example 9
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $read = $os->read('t/data/texts/utf-32le.txt');
+
+  # from UTF-32LE encoded file
+
+  # "Hello, world! こんにちは世界！"
+
+=back
+
+=over 4
+
+=item read example 10
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $read = $os->read('t/data/texts/utf-8.txt');
+
+  # from UTF-8 encoded file
+
+  # "Hello, world! こんにちは世界！"
+
+=back
+
+=over 4
+
+=item B<may raise> L<Venus::Os::Error> C<on.read.open.file>
+
+  # given: synopsis;
+
+  $os->read('/path/to/nowhere');
+
+  # Error! (on.read.open.file)
+
+=back
+
+=cut
+
+=head2 syscall
+
+  syscall(any @data) (Venus::Os)
+
+The syscall method executes the command and arguments provided, via
+L<perlfunc/system>, and returns the invocant.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item syscall example 1
+
+  package main;
+
+  use Venus::Os;
+
+  my $os = Venus::Os->new;
+
+  $os->syscall($^X, '--help');
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=over 4
+
+=item syscall example 2
+
+  package main;
+
+  use Venus::Os;
+
+  my $os = Venus::Os->new;
+
+  $os->syscall('.help');
+
+  # Exception! (isa Venus::Os::Error) (see error_on_system_call)
 
 =back
 
@@ -1413,6 +2131,329 @@ I<Since C<2.80>>
   my $which = $os->which('app5');
 
   # undef
+
+=back
+
+=cut
+
+=head2 write
+
+  write(any $into, string $data, string $encoding) (Venus::Os)
+
+The write method writes to a file, filehandle, STDOUT, or STDERR, and returns
+the invocant. To write to STDOUT provide the string C<"STDOUT">. To write to
+STDERR provide the string C<"STDERR">. The method defaults to writing to
+STDOUT.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item write example 1
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $write = $os->write;
+
+  # to STDOUT
+
+  # ''
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=over 4
+
+=item write example 2
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $write = $os->write(undef, '');
+
+  # to STDOUT
+
+  # ''
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=over 4
+
+=item write example 3
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $write = $os->write('STDOUT');
+
+  # to STDOUT
+
+  # ''
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=over 4
+
+=item write example 4
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $write = $os->write('STDOUT', '...');
+
+  # to STDOUT
+
+  # '...'
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=over 4
+
+=item write example 5
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $write = $os->write('STDERR');
+
+  # to STDERR
+
+  # ''
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=over 4
+
+=item write example 6
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $write = $os->write('STDERR', '...');
+
+  # to STDERR
+
+  # '...'
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=over 4
+
+=item write example 7
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $file = 't/data/texts/iso-8859-1.txt';
+
+  my $write = $os->write($file, 'Hello, world! This is ISO-8859-1.');
+
+  # to file
+
+  # "Hello, world! This is ISO-8859-1."
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=over 4
+
+=item write example 8
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  open my $fh, '<', 't/data/texts/iso-8859-1.txt';
+
+  my $write = $os->write($fh, 'Hello, world! This is ISO-8859-1.');
+
+  # to file
+
+  # "Hello, world! This is ISO-8859-1."
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=over 4
+
+=item write example 9
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  use IO::File;
+
+  my $fh = IO::File->new('t/data/texts/iso-8859-1.txt', 'w');
+
+  my $write = $os->write($fh, 'Hello, world! This is ISO-8859-1.');
+
+  # to ISO-8859-1 encoded file
+
+  # "Hello, world! This is ISO-8859-1."
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=over 4
+
+=item write example 10
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $file = 't/data/texts/utf-16be.txt';
+
+  my $write = $os->write($file, 'Hello, world! こんにちは世界！', 'UTF-16BE');
+
+  # to UTF-16BE encoded file
+
+  # "Hello, world! こんにちは世界！"
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=over 4
+
+=item write example 11
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $file = 't/data/texts/utf-16le.txt';
+
+  my $write = $os->write($file, 'Hello, world! こんにちは世界！', 'UTF-16LE');
+
+  # to UTF-16LE encoded file
+
+  # "Hello, world! こんにちは世界！"
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=over 4
+
+=item write example 12
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $file = 't/data/texts/utf-32be.txt';
+
+  my $write = $os->write($file, 'Hello, world! こんにちは世界！', 'UTF-32BE');
+
+  # to UTF-32BE encoded file
+
+  # "Hello, world! こんにちは世界！"
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=over 4
+
+=item write example 13
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $file = 't/data/texts/utf-32le.txt';
+
+  my $write = $os->write($file, 'Hello, world! こんにちは世界！', 'UTF-32LE');
+
+  # to UTF-32LE encoded file
+
+  # "Hello, world! こんにちは世界！"
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=over 4
+
+=item write example 14
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $file = 't/data/texts/utf-8.txt';
+
+  my $write = $os->write($file, 'Hello, world! こんにちは世界！', 'UTF-8');
+
+  # to UTF-8 encoded file
+
+  # "Hello, world! こんにちは世界！"
+
+  # bless(..., "Venus::Os")
+
+=back
+
+=over 4
+
+=item B<may raise> L<Venus::Os::Error> C<on.write.open.file>
+
+  # given: synopsis;
+
+  $os->write('/path/to/nowhere/file.txt', 'content');
+
+  # Error! (on.write.open.file)
 
 =back
 

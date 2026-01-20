@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 use Scalar::Util 'refaddr';
 
@@ -38,7 +39,6 @@ $test->for('abstract');
 
 =includes
 
-method: assertion
 method: checksum
 method: numified
 method: renew
@@ -85,7 +85,6 @@ $test->for('description');
 
 =integrates
 
-Venus::Role::Assertable
 Venus::Role::Boxable
 Venus::Role::Catchable
 Venus::Role::Comparable
@@ -106,41 +105,6 @@ Venus::Role::Tryable
 =cut
 
 $test->for('integrates');
-
-=method assertion
-
-The assertion method returns a L<Venus::Assert> object based on the invocant.
-
-=signature assertion
-
-  assertion() (Venus::Assert)
-
-=metadata assertion
-
-{
-  since => '1.23',
-}
-
-=example-1 assertion
-
-  # given: synopsis
-
-  package main;
-
-  my $assertion = $example->assertion;
-
-  # bless({name => "Example"}, "Venus::Assert")
-
-=cut
-
-$test->for('example', 1, 'assertion', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Assert');
-  ok $result->name eq 'Example';
-
-  $result
-});
 
 =method checksum
 

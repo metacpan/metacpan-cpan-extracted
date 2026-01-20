@@ -1,7 +1,8 @@
 # t/04-error.t - Test error cases and invalid command-line input
 use strict;
 use warnings;
-use Test::More tests => 27;
+use Test::More tests => 28;
+use Test::NoWarnings 'had_no_warnings';
 
 use CLI::Cmdline qw(parse);
 
@@ -96,4 +97,5 @@ is_deeply($restored, ['--xyz=val'], '10 - unknown attached restored');
 $restored = run_test('12 - -vd without arg for -d', \%opt, 'v', 'dir|d', '-vd');
 is_deeply($restored, ['-vd'], '12 - bundle restored');
 
+had_no_warnings();
 done_testing();

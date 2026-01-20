@@ -2062,56 +2062,32 @@ $test->for('example', 2, 'wait', sub {
   my $result = $tryable->error->result;
   ok defined $result;
   isa_ok $result, "Venus::Future::Error";
-  is $result->name, 'on_timeout';
+  is $result->name, 'on.timeout';
 
   $result
 });
 
-=error error_on_timeout
-
-This package may raise an error_on_timeout exception.
-
-=cut
-
-$test->for('error', 'error_on_timeout');
-
-=example-1 error_on_timeout
+=raise wait Venus::Future::Error on.timeout
 
   # given: synopsis;
 
-  my $input = {
-    throw => 'error_on_timeout',
-    timeout => 10,
-  };
+  $future->promise(sub{
+    my ($resolve, $reject) = @_;
+    # never fulfilled
+  });
 
-  my $error = $future->try('error', $input)->error->result;
+  $future->wait(0);
 
-  # my $name = $error->name;
-
-  # "on_timeout"
-
-  # my $message = $error->render;
-
-  # "Future timed-out after 10 seconds"
-
-  # my $timeout = $error->stash('timeout');
-
-  # 10
+  # Error! (on.timeout)
 
 =cut
 
-$test->for('example', 1, 'error_on_timeout', sub {
+$test->for('raise', 'wait', 'Venus::Future::Error', 'on.timeout', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_timeout";
-  my $message = $result->render;
-  is $message, "Future timed-out after 10 seconds";
-  my $timeout = $result->stash('timeout');
-  is $timeout, 10;
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
 =partials

@@ -1,7 +1,8 @@
 # t/02-alias.t - Test alias functionality using | syntax
 use strict;
 use warnings;
-use Test::More tests => 27;
+use Test::More tests => 28;
+use Test::NoWarnings 'had_no_warnings';
 
 use CLI::Cmdline qw(parse);
 
@@ -79,4 +80,5 @@ is($opt{src}, '', '11 - missing required → empty string');
 run_test('12 - required provided via -s', \%opt, '', 'src|source|s', '-s', 'input.txt');
 is($opt{src}, 'input.txt', '12 - value set via short alias');
 
+had_no_warnings();
 done_testing();

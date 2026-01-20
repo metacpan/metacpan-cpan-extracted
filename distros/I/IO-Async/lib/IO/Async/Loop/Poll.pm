@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2007-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Loop::Poll 0.804;
+package IO::Async::Loop::Poll 0.805;
 
 use v5.14;
 use warnings;
@@ -40,6 +40,8 @@ use constant WATCHDOG_ENABLE => IO::Async::Loop->WATCHDOG_ENABLE;
 C<IO::Async::Loop::Poll> - use C<IO::Async> with C<poll(2)>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
 Normally an instance of this class would not be directly constructed by a
 program. It may however, be useful for runinng L<IO::Async> with an existing

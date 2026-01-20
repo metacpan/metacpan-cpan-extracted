@@ -1,6 +1,7 @@
 package TestingPaws;
 use Test2::V0;
 use Paws;
+use Paws::Credential::Explicit;
 use Paws::Net::MultiplexCaller;
 use PawsX::FakeImplementation::Instance;
 
@@ -19,6 +20,10 @@ sub build_test_paws {
 
     my $paws = Paws->new(
         config => {
+            credentials => Paws::Credential::Explicit->new(
+                access_key => 'a',
+                secret_key => 'b',
+            ),
             caller => Paws::Net::MultiplexCaller->new(
                 caller_for => {
                     S3 => PawsX::FakeImplementation::Instance->new(

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Protocol::Stream 0.804;
+package IO::Async::Protocol::Stream 0.805;
 
 use v5.14;
 use warnings;
@@ -17,6 +17,8 @@ use Carp;
 C<IO::Async::Protocol::Stream> - base class for stream-based protocols
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
 Most likely this class will be subclassed to implement a particular network
 protocol.

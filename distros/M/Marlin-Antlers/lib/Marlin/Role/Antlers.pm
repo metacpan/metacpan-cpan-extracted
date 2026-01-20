@@ -7,19 +7,20 @@ use warnings;
 package Marlin::Role::Antlers;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002001';
+our $VERSION   = '0.003000';
 
 use Exporter::Tiny ();
 use Marlin::Antlers ();
+use Marlin::Util -lexical, qw( true false );
 use Role::Tiny ();
 use Types::Common -lexical, -all;
 
 our @ISA    = qw( Marlin::Antlers );
-our @EXPORT = qw( has with requires before after around __FINALIZE__ );
+our @EXPORT = qw( has with requires before after around signature signature_for __FINALIZE__ );
 
 sub import {
 	my $me      = shift;
-	my $globals = +{ @_ && ref($_[0]) eq q(HASH) ? %{+shift} : () };
+	my $globals = +{ @_ && ref($_[0]) eq q(HASH) ? shift->%* : () };
 	$globals->{__role} = 1;
 	delete $globals->{constructor};
 	delete $globals->{sloppy};
@@ -38,13 +39,46 @@ sub _generate_requires ( $me, $name, $value, $globals ) {
 	};
 }
 
+sub _generate_signature_for ( $me, $name, $value, $globals ) {
+	my $SUB;
+	$SUB = sub {
+		my ( $function, %opts ) = @_;
+		$opts{method}  = 1                if !exists $opts{method};
+		$opts{package} = $globals->{into} if !exists $opts{package};
+		$opts{next}  ||= delete $opts{goto_next} if exists $opts{goto_next};
+		
+		if ( is_ArrayRef $function ) {
+			return map { $SUB->( $_, %opts ) } $function->@*;
+		}
+		
+		my $package  = $opts{package};
+		my $fullname = ( $function =~ /::/ ) ? $function : "$package\::$function";
+		$opts{subname}   ||= ( $function =~ /::(\w+)$/ ) ? $1 : $function;
+		$opts{next}      ||= do { no strict 'refs'; exists(&$fullname) ? \&$fullname : undef; };
+		if ( $opts{fallback} and not $opts{next} ) {
+			$opts{next} = ref( $opts{fallback} ) ? $opts{fallback} : sub {};
+		}
+		
+		if ( $opts{next} ) {
+			@_ = ( $function, %opts );
+			goto \&Type::Params::signature_for;
+		}
+		
+		my $wrapper = Type::Params::signature( %opts, next => true );
+		push @{ $Role::Tiny::INFO{$globals->{into}}{modifiers} ||= [] },
+			[ 'around', $function, $wrapper ];
+	};
+	return $SUB;
+}
+
 sub _for_cmm ( $me, $kind, $globals ) {
 	return sub ( @names ) {
 		
 		my $coderef = pop @names;
 		assert_CodeRef $coderef;
 		
-		push @{$Role::Tiny::INFO{$globals->{into}}{modifiers}||=[]}, [ $kind, @names, $coderef ];
+		push @{ $Role::Tiny::INFO{$globals->{into}}{modifiers} ||= [] },
+			[ $kind, @names, $coderef ];
 	};
 }
 
@@ -120,7 +154,7 @@ so you don't get repetitive strain injury typing that out each time.
 Example:
 
   has foo => (
-    is           => 'rw',
+    is           => rw,
     isa          => Int,
     clearer      => true,
     predicate    => true,
@@ -132,7 +166,7 @@ Note that it's possible to declare multiple attributes at the same time,
 as long as they share a spec.
 
   has [ 'foo', 'bar', 'baz' ] => (
-    is           => 'rw',
+    is           => rw,
     isa          => Int,
   );
 
@@ -197,6 +231,36 @@ See L<Role::Tiny>.
 Installs an "around" method modifier.
 
 See L<Role::Tiny>.
+
+=item C<< signature( SPEC ) >>
+
+Marlin::Role::Antlers exports modified versions of C<signature> and
+C<signature_for> from L<Type::Params>. Unlike the originals, they default
+to C<< method => true >>, as they are intended for use in object-oriented
+packages.
+
+When C<signature_for> is used in a role, it can be used to indicate
+a signature for the class the role will be composed into.
+
+  package Local::CalcInterface {
+    use Marlin::Role::Antlers;
+    
+    signature_for add_nums => (
+      positional => [ Int, Int ],
+    );
+  }
+  
+  package Local::Calc {
+    use Marlin::Antlers;
+    with 'Local::CalcInterface';
+    
+    sub add_nums ( $self, $first, $second ) {
+      return $first + $second;
+    }
+  }
+  
+  my $calc = Local::Calculator->new;
+  say $calc->add_nums( 40, 2 );  # 42
 
 =item C<< __FINALIZE__ >>
 

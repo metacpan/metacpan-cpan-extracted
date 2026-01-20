@@ -5,7 +5,11 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'with';
+
+# INTEGRATES
 
 with 'Venus::Role::Boxable';
 with 'Venus::Role::Tryable';
@@ -20,7 +24,6 @@ with 'Venus::Role::Printable';
 with 'Venus::Role::Reflectable';
 with 'Venus::Role::Testable';
 with 'Venus::Role::Throwable';
-with 'Venus::Role::Assertable';
 with 'Venus::Role::Serializable';
 with 'Venus::Role::Mockable';
 with 'Venus::Role::Patchable';
@@ -158,8 +161,6 @@ This package provides identity and methods common across all L<Venus> classes.
 
 This package integrates behaviors from:
 
-L<Venus::Role::Assertable>
-
 L<Venus::Role::Boxable>
 
 L<Venus::Role::Catchable>
@@ -197,30 +198,6 @@ L<Venus::Role::Tryable>
 =head1 METHODS
 
 This package provides the following methods:
-
-=cut
-
-=head2 assertion
-
-  assertion() (Venus::Assert)
-
-The assertion method returns a L<Venus::Assert> object based on the invocant.
-
-I<Since C<1.23>>
-
-=over 4
-
-=item assertion example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $assertion = $example->assertion;
-
-  # bless({name => "Example"}, "Venus::Assert")
-
-=back
 
 =cut
 

@@ -2,18 +2,21 @@ package Lugh::Inference;
 
 use strict;
 use warnings;
+use Lugh;
 
 =head1 NAME
 
 Lugh::Inference - Transformer Forward Pass and Token Generation
 
+=encoding utf8
+
 =head1 VERSION
 
-Version 0.01
+Version 0.08
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -188,7 +191,14 @@ B<Example:>
 
 =head2 forward
 
+    # Positional form
     my @logits = $inference->forward(\@tokens);
+    
+    # Named parameter form (required for LoRA)
+    my @logits = $inference->forward(
+        tokens => \@tokens,
+        lora   => $lora,        # optional: Lugh::LoRA adapter
+    );
 
 Runs the transformer forward pass on input tokens.
 
@@ -196,7 +206,9 @@ B<Parameters:>
 
 =over 4
 
-=item * C<\@tokens> - Array reference of token IDs (integers)
+=item * C<tokens> or C<\@tokens> - Array reference of token IDs (integers)
+
+=item * C<lora> (optional) - A Lugh::LoRA adapter to apply during inference
 
 =back
 
@@ -685,7 +697,15 @@ B<Example:>
 
 =head2 forward_with_pool
 
+    # Positional form
     my @logits = $inference->forward_with_pool($pool, \@tokens);
+    
+    # Named parameter form (required for LoRA)
+    my @logits = $inference->forward_with_pool(
+        pool   => $pool,
+        tokens => \@tokens,
+        lora   => $lora,        # optional: Lugh::LoRA adapter
+    );
 
 Runs forward pass using a pre-allocated memory pool. More efficient
 than C<forward()> for repeated inference on different inputs.
@@ -694,9 +714,11 @@ B<Parameters:>
 
 =over 4
 
-=item * C<$pool> - A Lugh::MemoryPool from C<create_memory_pool()>
+=item * C<pool> or C<$pool> - A Lugh::MemoryPool from C<create_memory_pool()>
 
-=item * C<\@tokens> - Array reference of token IDs
+=item * C<tokens> or C<\@tokens> - Array reference of token IDs
+
+=item * C<lora> (optional) - A Lugh::LoRA adapter to apply during inference
 
 =back
 
@@ -713,10 +735,29 @@ B<Example:>
         my $next_token = $inference->sample_top_p(\@logits, top_p => 0.9);
         print $tokenizer->decode([$next_token]), "\n";
     }
+    
+    # With LoRA adapter
+    my $lora = Lugh::LoRA->new(adapter => 'adapter.gguf', model => $model);
+    for my $prompt (@prompts) {
+        my @tokens = $tokenizer->encode($prompt);
+        my @logits = $inference->forward_with_pool(
+            pool   => $pool,
+            tokens => \@tokens,
+            lora   => $lora,
+        );
+        # ...
+    }
 
 =head2 forward_batch
 
+    # Positional form
     my $results = $inference->forward_batch(\@sequences);
+    
+    # Named parameter form (required for LoRA)
+    my $results = $inference->forward_batch(
+        sequences => \@sequences,
+        lora      => $lora,      # optional: Lugh::LoRA adapter
+    );
 
 Processes multiple token sequences, returning logits for each.
 Each sequence is processed independently with shared backend resources.
@@ -725,7 +766,9 @@ B<Parameters:>
 
 =over 4
 
-=item * C<\@sequences> - Array reference of array references of token IDs
+=item * C<sequences> or C<\@sequences> - Array reference of array references of token IDs
+
+=item * C<lora> (optional) - A Lugh::LoRA adapter to apply during inference
 
 =back
 
@@ -748,6 +791,13 @@ B<Example:>
         my $next = $inference->sample_top_p(\@logits, top_p => 0.9);
         print "Sequence $i next token: ", $tokenizer->decode([$next]), "\n";
     }
+    
+    # With LoRA adapter
+    my $lora = Lugh::LoRA->new(adapter => 'adapter.gguf', model => $model);
+    my $results = $inference->forward_batch(
+        sequences => [\@seq1, \@seq2, \@seq3],
+        lora      => $lora,
+    );
 
 =head1 MEMORY POOL
 

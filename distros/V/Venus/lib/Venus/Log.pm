@@ -5,22 +5,28 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'attr', 'base', 'with';
+
+# INHERITS
 
 base 'Venus::Kind::Utility';
 
+# INTEGRATES
+
 with 'Venus::Role::Buildable';
+
+# STATE
+
+state $NAME = {trace => 1, debug => 2, info => 3, warn => 4, error => 5, fatal => 6};
+state $CODE = {reverse %$NAME};
 
 # ATTRIBUTES
 
 attr 'handler';
 attr 'level';
 attr 'separator';
-
-# STATE
-
-state $NAME = {trace => 1, debug => 2, info => 3, warn => 4, error => 5, fatal => 6};
-state $CODE = {reverse %$NAME};
 
 # BUILDERS
 
@@ -35,8 +41,10 @@ sub build_arg {
 sub build_self {
   my ($self, $data) = @_;
 
+  require Venus::Os;
+
   $self->level($self->level_name($self->level) || $self->level_name(1));
-  $self->handler(sub{shift; CORE::print(STDOUT @_, "\n")}) if !$self->handler;
+  $self->handler(sub{shift; Venus::Os->new->write('STDOUT', join '', @_, "\n")}) if !$self->handler;
   $self->separator(" ") if !$self->separator;
 
   return $self;
@@ -511,6 +519,70 @@ I<Since C<1.68>>
   my @input = $log->input(1, 'Something failed!');
 
   # (1, 'Something failed!')
+
+=back
+
+=cut
+
+=head2 new
+
+  new(string $level | any %args | hashref $args) (Venus::Log)
+
+The new method returns a new instance of this package.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Log;
+
+  my $log = Venus::Log->new;
+
+  # bless(..., "Venus::Log")
+
+  # $log->level;
+
+  # "trace"
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Log;
+
+  my $log = Venus::Log->new('error');
+
+  # bless(..., "Venus::Log")
+
+  # $log->level;
+
+  # "error"
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Log;
+
+  my $log = Venus::Log->new(5);
+
+  # bless(..., "Venus::Log")
+
+  # $log->level;
+
+  # "error"
 
 =back
 

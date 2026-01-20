@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Attribute;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016000';
+our $VERSION   = '0.020000';
 
 BEGIN { our @ISA = 'Sub::Accessor::Small' };
 
@@ -16,7 +16,7 @@ use constant HAS_CXSA => eval {
 };
 
 use B                     ();
-use List::Util 1.29       ();
+use List::Util            ();
 use Marlin                ();
 use Marlin::Util          qw( true false );
 use Scalar::Util          ();
@@ -225,6 +225,10 @@ sub _auto_apply_roles {
 	
 	my @with;
 	for my $role ( @roles ) {
+		# Marlin::XAttribute::Alias functionality is now included
+		# directly in Marlin::Attribute; skip attempt to load it.
+		next if $role eq ':Alias';
+		
 		my $pkg  = "Marlin::XAttribute:$role";
 		my $opts = $me->{$role};
 		
@@ -257,6 +261,7 @@ sub canonicalize_opts {
 	my $me = shift;
 	
 	$me->canonicalize_constant;
+	$me->canonicalize_alias;
 	$me->SUPER::canonicalize_opts( @_ );
 	$me->canonicalize_storage;
 }
@@ -307,6 +312,21 @@ sub canonicalize_constant {
 		if ( !defined $me->{reader} and defined $name ) {
 			$me->{reader} = $name;
 		}
+	}
+}
+
+sub canonicalize_alias {
+	my $me = shift;
+	if ( exists $me->{alias} and not defined $me->{alias} ) {
+		delete $me->{alias};
+	}
+	if ( defined $me->{alias} and not ref $me->{alias} ) {
+		$me->{alias} = [ $me->{alias} ];
+	}
+	if ( exists $me->{alias} ) {
+		Marlin::Util::_croak("Not a valid value for the alias option: %s", defined($me->{alias}) ? $me->{alias} : 'undef' )
+			unless 'ARRAY' eq ref $me->{alias};
+		$me->{alias_for} ||= ( $me->{is} eq 'rw' ? 'accessor' : 'reader' );
 	}
 }
 
@@ -402,6 +422,19 @@ sub install_accessors {
 		}
 		Class::XSAccessor->import( class => $me->{package}, replace => 1, %args_for_cxsa ) if keys %args_for_cxsa;
 	}
+	
+	if ( my @aliases = @{ $me->{alias} or [] } ) {
+		my $for = $me->{alias_for} || 'reader';
+		my $coderef;
+		if ( my $orig_method_name = $me->{$for} ) {
+			no strict 'refs';
+			$coderef = \&{ $me->{package} . "::$orig_method_name" };
+		}
+		if ( not $coderef ) {
+			$coderef = $me->$for;
+		}
+		$me->install_coderef( $_, $coderef ) for @aliases;
+	}
 
 	if (defined $me->{handles}) {
 
@@ -455,6 +488,8 @@ sub provides_accessors {
 			push @list, [ $me->{$kind}, $kind, $me ] if $me->{$kind};
 		}
 	}
+	
+	push @list, map [ $_, 'alias', $me ], @{ $me->{alias} or [] };
 	
 	if ( defined $me->{handles} ) {
 		my @pairs = $me->expand_handles;
@@ -581,11 +616,16 @@ sub install_coderef {
 
 sub allowed_constructor_parameters {
 	my $me = shift;
+	my @list;
 	if ( exists $me->{init_arg} ) {
 		return if !defined $me->{init_arg};
-		return $me->{init_arg};
+		push @list, $me->{init_arg};
 	}
-	return $me->{slot};
+	else {
+		push @list, $me->{slot};
+	}
+	push @list, @{ $me->{alias} or [] };
+	return @list;
 }
 
 sub xs_constructor_args {
@@ -605,6 +645,7 @@ sub xs_constructor_args {
 	$opt->{init_arg} = $me->{init_arg}  if exists $me->{init_arg};
 	$opt->{trigger}  = $me->{trigger}   if $me->{trigger};
 	$opt->{weak_ref} = $me->{weak_ref}  if $me->{weak_ref};
+	$opt->{alias}    = $me->{alias}     if $me->{alias};
 	
 	$opt->{slot_initializer} = $me->{slot_initializer} if $me->{slot_initializer};
 	$opt->{slot_initializer} = $me->writer if $me->{storage} ne 'HASH';

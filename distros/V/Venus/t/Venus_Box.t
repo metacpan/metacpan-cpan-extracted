@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -36,6 +37,7 @@ $test->for('abstract');
 
 =includes
 
+method: new
 method: unbox
 
 =cut
@@ -81,6 +83,86 @@ Venus::Role::Proxyable
 =cut
 
 $test->for('integrates');
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Box)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Box;
+
+  my $new = Venus::Box->new;
+
+  # bless(..., "Venus::Box")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Box');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Box;
+
+  my $new = Venus::Box->new('hello');
+
+  # bless(..., "Venus::Box")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Box');
+  ok $result->value;
+  ok $result->{value}->isa('Venus::String');
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Box;
+
+  my $new = Venus::Box->new(value => 'hello');
+
+  # bless(..., "Venus::Box")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Box');
+  ok $result->value;
+  ok $result->{value}->isa('Venus::String');
+
+  $result
+});
 
 =method unbox
 

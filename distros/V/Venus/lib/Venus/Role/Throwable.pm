@@ -5,86 +5,92 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Role 'with';
 
 # METHODS
 
-sub error {
+sub die {
   my ($self, $data) = @_;
 
-  my @args = $data;
+  $data ||= {};
 
-  unshift @args, delete $data->{throw} if $data->{throw};
+  if (!ref $data) {
+    $data = $self->can($data) ? $self->$data : {package => $data};
+  }
 
-  @_ = ($self, @args);
+  $data = {} if ref $data ne 'HASH';
 
-  goto $self->can('throw');
-}
+  my $args = $data->{throw} ? delete $data->{throw} : $data->{args} ? delete $data->{args} : undef;
 
-sub throw {
-  my ($self, $data, @args) = @_;
+  $data = $self->$args($data) if $args;
 
   require Venus::Throw;
 
-  my $throw = Venus::Throw->new(context => (caller(1))[3])->do(
-    frame => 1,
+  my ($throw) = @_ = (
+    Venus::Throw->new(
+      context => (caller(1))[3],
+      package => join('::', map ucfirst, ref($self), 'error'),
+    ),
+    $data,
   );
 
-  if (!$data) {
-    return $throw->do(
-      'package', join('::', map ucfirst, ref($self), 'error')
-    );
-  }
-  if (ref $data ne 'HASH') {
-    if ($data =~ /^\w+$/ && $self->can($data)) {
-      $data = $self->$data(@args);
-    }
-    else {
-      return $throw->do(
-        'package', $data,
-      );
-    }
+  goto $throw->can('die');
+}
+
+sub error {
+  my ($self, $data) = @_;
+
+  $data ||= {};
+
+  if (!ref $data) {
+    $data = $self->can($data) ? $self->$data : {package => $data};
   }
 
-  if (exists $data->{as}) {
-    $throw->as($data->{as});
+  $data = {} if ref $data ne 'HASH';
+
+  my $args = $data->{throw} ? delete $data->{throw} : $data->{args} ? delete $data->{args} : undef;
+
+  $data = $self->$args($data) if $args;
+
+  require Venus::Throw;
+
+  my ($throw) = @_ = (
+    Venus::Throw->new(
+      context => (caller(1))[3],
+      package => $data->{package} || join('::', map ucfirst, ref($self), 'error'),
+    ),
+    $data,
+  );
+
+  goto $throw->can('error');
+}
+
+sub throw {
+  my ($self, $data) = @_;
+
+  $data ||= {};
+
+  if (!ref $data) {
+    $data = $self->can($data) ? $self->$data : {package => $data};
   }
-  if (exists $data->{capture}) {
-    $throw->capture(@{$data->{capture}});
-  }
-  if (exists $data->{context}) {
-    $throw->context($data->{context});
-  }
-  if (exists $data->{error}) {
-    $throw->error($data->{error});
-  }
-  if (exists $data->{frame}) {
-    $throw->frame($data->{frame});
-  }
-  if (exists $data->{message}) {
-    $throw->message($data->{message});
-  }
-  if (exists $data->{name}) {
-    $throw->name($data->{name});
-  }
-  if (exists $data->{package}) {
-    $throw->package($data->{package});
-  }
-  else {
-    $throw->package(join('::', map ucfirst, ref($self), 'error'));
-  }
-  if (exists $data->{parent}) {
-    $throw->parent($data->{parent});
-  }
-  if (exists $data->{stash}) {
-    $throw->stash($_, $data->{stash}->{$_}) for keys %{$data->{stash}};
-  }
-  if (exists $data->{on}) {
-    $throw->on($data->{on});
-  }
-  if (exists $data->{raise}) {
-    @_ = ($throw);
-    goto $throw->can('error');
+
+  $data = {} if ref $data ne 'HASH';
+
+  my $args = $data->{throw} ? delete $data->{throw} : $data->{args} ? delete $data->{args} : undef;
+
+  $data = $self->$args($data) if $args;
+
+  require Venus::Throw;
+
+  my $throw = Venus::Throw->new(
+    context => (caller(1))[3],
+    package => $data->{package} || join('::', map ucfirst, ref($self), 'error'),
+  );
+
+  for my $key (keys %{$data}) {
+    $throw->$key($data->{$key}) if $throw->can($key);
   }
 
   return $throw;
@@ -93,7 +99,7 @@ sub throw {
 # EXPORTS
 
 sub EXPORT {
-  ['error', 'throw']
+  ['die', 'error', 'throw']
 }
 
 1;
@@ -141,9 +147,51 @@ This package provides the following methods:
 
 =cut
 
+=head2 die
+
+  die(maybe[string | hashref] $data) (any)
+
+The die method builds a L<Venus::Throw> object using L</throw> and
+automatically throws the exception.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item die example 1
+
+  # given: synopsis
+
+  package Example;
+
+  # ...
+
+  sub error_on_example {
+    my ($self) = @_;
+
+    return {
+      name => 'on.example',
+      capture => [$example],
+      stash => {
+        time => time,
+      },
+      raise => true,
+    };
+  }
+
+  package main;
+
+  my $die = $example->die('error_on_example');
+
+  # Exception! isa Example::Error
+
+=back
+
+=cut
+
 =head2 error
 
-  error(hashref $data) (any)
+  error(maybe[string | hashref] $data) (any)
 
 The error method dispatches to the L</throw> method, excepts a hashref of
 options to be provided to the L</throw> method, and returns the result unless
@@ -161,11 +209,13 @@ I<Since C<3.40>>
 
   my $example = Example->new;
 
-  my $throw = $example->error;
+  my $error = $example->error;
 
-  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+  # bless(..., "Example::Error")
 
-  # $throw->error;
+  # $error->throw;
+
+  # Exception! isa "Example::Error"
 
 =back
 
@@ -177,11 +227,13 @@ I<Since C<3.40>>
 
   my $example = Example->new;
 
-  my $throw = $example->error({package => 'Example::Error::Unknown'});
+  my $error = $example->error('Example::Error::Unknown');
 
-  # bless({ "package" => "Example::Error::Unknown", ..., }, "Venus::Throw")
+  # bless(..., "Example::Error::Unknown")
 
-  # $throw->error;
+  # $error->throw;
+
+  # Exception! isa "Example::Error::Unknown"
 
 =back
 
@@ -193,7 +245,7 @@ I<Since C<3.40>>
 
   my $example = Example->new;
 
-  my $throw = $example->error({
+  my $error = $example->error({
     name => 'on.example',
     capture => [$example],
     stash => {
@@ -201,9 +253,11 @@ I<Since C<3.40>>
     },
   });
 
-  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+  # bless(..., "Example::Error")
 
-  # $throw->error;
+  # $error->throw;
+
+  # Exception! isa "Example::Error"
 
 =back
 
@@ -231,11 +285,13 @@ I<Since C<3.40>>
 
   package main;
 
-  my $throw = $example->error({throw => 'error_on_example'});
+  my $error = $example->error('error_on_example');
 
-  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+  # bless(..., "Example::Error")
 
-  # $throw->error;
+  # $error->throw;
+
+  # Exception! isa "Example::Error"
 
 =back
 
@@ -258,15 +314,50 @@ I<Since C<3.40>>
       stash => {
         time => time,
       },
-      raise => 1,
+      raise => false,
     };
   }
 
   package main;
 
-  my $throw = $example->error({throw => 'error_on_example'});
+  my $error = $example->error({throw => 'error_on_example'});
 
-  # Exception! (isa Example::Error)
+  # bless(..., "Example::Error")
+
+  # $error->throw;
+
+  # Exception! isa "Example::Error"
+
+=back
+
+=over 4
+
+=item error example 6
+
+  # given: synopsis
+
+  package Example;
+
+  # ...
+
+  sub error_on_example {
+    my ($self) = @_;
+
+    return {
+      name => 'on.example',
+      capture => [$example],
+      stash => {
+        time => time,
+      },
+      raise => true,
+    };
+  }
+
+  package main;
+
+  my $error = $example->error({throw => 'error_on_example'});
+
+  # Exception! isa Example::Error
 
 =back
 
@@ -301,9 +392,11 @@ I<Since C<0.01>>
 
   my $throw = $example->throw;
 
-  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+  # bless({"package" => "Example::Error", ...,}, "Venus::Throw")
 
-  # $throw->error;
+  # $throw->die;
+
+  # Exception! isa Example::Error
 
 =back
 
@@ -317,9 +410,11 @@ I<Since C<0.01>>
 
   my $throw = $example->throw('Example::Error::Unknown');
 
-  # bless({ "package" => "Example::Error::Unknown", ..., }, "Venus::Throw")
+  # bless({"package" => "Example::Error::Unknown", ...,}, "Venus::Throw")
 
-  # $throw->error;
+  # $throw->die;
+
+  # Exception! isa Example::Error::Unknown
 
 =back
 
@@ -339,9 +434,11 @@ I<Since C<0.01>>
     },
   });
 
-  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+  # bless({"package" => "Example::Error", ...,}, "Venus::Throw")
 
-  # $throw->error;
+  # $throw->die;
+
+  # Exception! isa Example::Error
 
 =back
 
@@ -371,40 +468,11 @@ I<Since C<0.01>>
 
   my $throw = $example->throw('error_on_example');
 
-  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+  # bless({"package" => "Example::Error", ...,}, "Venus::Throw")
 
-  # $throw->error;
+  # $throw->die;
 
-=back
-
-=over 4
-
-=item throw example 5
-
-  # given: synopsis
-
-  package Example;
-
-  # ...
-
-  sub error_on_example {
-    my ($self) = @_;
-
-    return {
-      name => 'on.example',
-      capture => [$example],
-      stash => {
-        time => time,
-      },
-      raise => 1,
-    };
-  }
-
-  package main;
-
-  my $throw = $example->throw('error_on_example');
-
-  # Exception! (isa Example::Error)
+  # Exception! isa Example::Error
 
 =back
 

@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base';
 
+# INHERITS
+
 base 'Venus::Name';
+
+# STATE
 
 state $SERIAL = 0;
 
@@ -34,6 +40,32 @@ sub all {
   }
 
   return $result;
+}
+
+sub after {
+  my ($self, $name, $code) = @_;
+
+  my $orig = $self->handle($name, sub{
+    my ($orig, @args) = @_;
+
+    my @return;
+
+    if (wantarray) {
+      @return = $orig->(@args);
+    }
+    elsif (defined wantarray) {
+      $return[0] = $orig->(@args);
+    }
+    else {
+      $orig->(@args);
+    }
+
+    $code->(@args);
+
+    return wantarray ? @return : defined(wantarray) ? $return[0] : ();
+  });
+
+  return $orig;
 }
 
 sub append {
@@ -76,6 +108,24 @@ sub arrays {
   return $arrays;
 }
 
+sub around {
+  my ($self, $name, $code) = @_;
+
+  my $package = $self->package;
+
+  my $qualified = "${package}::${name}";
+
+  my $current = $package->can($name);
+
+  if (!$current) {
+    $self->error_on_around_missing({package => $package, routine => $name})
+      ->input($self, $name, $code)
+      ->throw;
+  }
+
+  return $self->handle($name, $code);
+}
+
 sub attributes {
   my ($self) = @_;
 
@@ -92,6 +142,32 @@ sub basename {
   my ($self) = @_;
 
   return $self->parse->[-1];
+}
+
+sub before {
+  my ($self, $name, $code) = @_;
+
+  my $orig = $self->handle($name, sub{
+    my ($orig, @args) = @_;
+
+    $code->(@args);
+
+    my @return;
+
+    if (wantarray) {
+      @return = $orig->(@args);
+    }
+    elsif (defined wantarray) {
+      $return[0] = $orig->(@args);
+    }
+    else {
+      $orig->(@args);
+    }
+
+    return wantarray ? @return : defined(wantarray) ? $return[0] : ();
+  });
+
+  return $orig;
 }
 
 sub blessed {
@@ -118,11 +194,9 @@ sub call {
   my $class = $self->load;
 
   unless ($func) {
-    $self->error({
-      throw => 'error_on_call_undefined',
-      package => $class,
-      routine => $func,
-    });
+    $self->error_on_call_undefined({package => $class, routine => $func})
+      ->input($self, $func, @args)
+      ->throw;
   }
 
   my $next = $class->can($func);
@@ -134,11 +208,9 @@ sub call {
   }
 
   unless ($next) {
-    $self->error({
-      throw => 'error_on_call_missing',
-      package => $class,
-      routine => $func,
-    });
+    $self->error_on_call_missing({package => $class, routine => $func})
+      ->input($self, $func, @args)
+      ->throw;
   }
 
   @_ = @args; goto $next;
@@ -205,21 +277,17 @@ sub cop {
   my $class = $self->load;
 
   if (!$func) {
-    $self->error({
-      throw => 'error_on_cop_undefined',
-      package => $class,
-      routine => $func,
-    });
+    $self->error_on_cop_undefined({package => $class, routine => $func})
+      ->input($self, $func, @args)
+      ->throw;
   }
 
   my $next = $class->can($func);
 
   unless ($next) {
-    $self->error({
-      throw => 'error_on_cop_missing',
-      package => $class,
-      routine => $func,
-    });
+    $self->error_on_cop_missing({package => $class, routine => $func})
+      ->input($self, $func, @args)
+      ->throw;
   }
 
   return sub { $next->(@args ? (@args, @_) : @_) };
@@ -256,11 +324,10 @@ sub eval {
   my $result = eval join ' ', map "$_", "package @{[$self->package]};", @args;
 
   if (my $error = $@) {
-    $self->error({
-      throw => 'error_on_eval',
-      package => $self->package,
-      error => $error,
-    });
+    $self->error_on_eval({package => $self->package, error => $error})
+      ->input($self, @args)
+      ->output($error)
+      ->throw;
   }
 
   return $result;
@@ -270,6 +337,28 @@ sub explain {
   my ($self) = @_;
 
   return $self->package;
+}
+
+sub handle {
+  my ($self, $name, $code) = @_;
+
+  my $package = $self->package;
+
+  my $qualified = "${package}::${name}";
+
+  my $current = $package->can($name);
+
+  no strict 'refs';
+  no warnings 'redefine';
+
+  *{$qualified} = eval "package $package; sub { \$code->(\$current, \@_) }";
+
+  if (my $error = $@) {
+    $self->error_on_eval({package => $package, error => $error})
+      ->throw;
+  }
+
+  return $current;
 }
 
 sub hash {
@@ -297,6 +386,12 @@ sub hashes {
     sort grep !!%{"${class}::$_"},
     grep /^[_a-zA-Z]\w*$/, keys %{"${class}::"}
   ];
+}
+
+sub hook {
+  my ($self, $method, $name, $code) = @_;
+
+  return $self->$method(uc($name), $code);
 }
 
 sub id {
@@ -362,11 +457,10 @@ sub load {
   my $error = do{local $@; eval "require $class"; $@};
 
   if ($error) {
-    $self->error({
-      throw => 'error_on_load',
-      error => $error || 'cause unknown',
-      package => $class,
-    });
+    $self->error_on_load({error => $error || 'cause unknown', package => $class})
+      ->input($self)
+      ->output($error)
+      ->throw;
   }
 
   return $class;
@@ -450,7 +544,7 @@ sub parts {
 sub patch {
   my ($self, $name, $code) = @_;
 
-  my $patched = $self->{'$patched'} ||= {};
+  my $patched = $self->{patched} ||= {};
 
   my $orig = $self->swap($name, $code);
 
@@ -462,7 +556,7 @@ sub patch {
 sub patched {
   my ($self, $name) = @_;
 
-  my $patched = $self->{'$patched'};
+  my $patched = $self->{patched};
 
   return false if !$patched;
 
@@ -590,6 +684,31 @@ sub scalars {
   ];
 }
 
+sub scrub {
+  my ($self) = @_;
+
+  return $self if $self->unloaded;
+
+  my $package = $self->package;
+
+  no strict 'refs';
+
+  my $skip = qr/\A(
+    AUTOLOAD|BEGIN|CHECK|DESTROY|END|EXPORT|EXPORT_OK|EXPORT_TAGS|
+    IMPORT|INIT|ISA|UNITCHECK|VERSION|
+    import|unimport|
+    [^:]+::
+  )\z/x;
+
+  for my $name (grep !/$skip/, keys %{"${package}::"}) {
+    undef *{"${package}::${name}"};
+  }
+
+  delete $INC{$self->format('path', '%s.pm')};
+
+  return $self;
+}
+
 sub sibling {
   my ($self, @args) = @_;
 
@@ -658,11 +777,7 @@ sub swap {
   return $orig if !$code;
 
   if (!$orig) {
-    $self->error({
-      throw => 'error_on_swap',
-      package => $package,
-      routine => $name,
-    });
+    $self->error_on_swap({package => $package, routine => $name})->throw;
   }
 
   $self->routine($name, sub {$code->($orig, @_)});
@@ -746,7 +861,7 @@ sub unloaded {
 sub unpatch {
   my ($self, @names) = @_;
 
-  my $patched = $self->{'$patched'} ||= {};
+  my $patched = $self->{patched} ||= {};
 
   @names = keys %{$patched} if !@names;
 
@@ -755,7 +870,7 @@ sub unpatch {
     $self->routine($name, $orig);
   }
 
-  delete $self->{'$patched'} if !keys %{$patched};
+  delete $self->{patched} if !keys %{$patched};
 
   return $self;
 }
@@ -775,144 +890,133 @@ sub visible {
 sub error_on_call_missing {
   my ($self, $data) = @_;
 
+  my $error = $self->error->sysinfo;
+
   my $message = 'Unable to locate class method "{{routine}}" via package "{{package}}"';
 
-  my $stash = {
-    package => $data->{package},
-    routine => $data->{routine},
-  };
+  $error->name('on.call.missing');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
 
-  my $result = {
-    name => 'on.call.missing',
-    raise => true,
-    stash => $stash,
-    message => $message,
-  };
-
-  return $result;
+  return $error;
 }
 
 sub error_on_call_undefined {
   my ($self, $data) = @_;
 
+  my $error = $self->error->sysinfo;
+
   my $message = join ' ', 'Attempt to call undefined class method',
     'in package "{{package}}"';
 
-  my $stash = {
-    package => $data->{package},
-    routine => $data->{routine},
-  };
+  $error->name('on.call.undefined');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
 
-  my $result = {
-    name => 'on.call.undefined',
-    raise => true,
-    stash => $stash,
-    message => $message,
-  };
+  return $error;
+}
 
-  return $result;
+sub error_on_around_missing {
+  my ($self, $data) = @_;
+
+  my $error = $self->error->sysinfo;
+
+  my $message = join ' ', 'Unable to locate object method "{{routine}}"',
+    'via package "{{package}}"';
+
+  $error->name('on.around.missing');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
+
+  return $error;
 }
 
 sub error_on_cop_missing {
   my ($self, $data) = @_;
 
+  my $error = $self->error->sysinfo;
+
   my $message = join ' ', 'Unable to locate object method "{{routine}}"',
     'via package "{{package}}"';
 
-  my $stash = {
-    package => $data->{package},
-    routine => $data->{routine},
-  };
+  $error->name('on.cop.missing');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
 
-  my $result = {
-    name => 'on.cop.missing',
-    raise => true,
-    stash => $stash,
-    message => $message,
-  };
-
-  return $result;
+  return $error;
 }
 
 sub error_on_cop_undefined {
   my ($self, $data) = @_;
 
+  my $error = $self->error->sysinfo;
+
   my $message = join ' ', 'Attempt to cop undefined object method',
     'from package "{{package}}"';
 
-  my $stash = {
-    package => $data->{package},
-    routine => $data->{routine},
-  };
+  $error->name('on.cop.undefined');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
 
-  my $result = {
-    name => 'on.cop.undefined',
-    raise => true,
-    stash => $stash,
-    message => $message,
-  };
-
-  return $result;
+  return $error;
 }
 
 sub error_on_eval {
   my ($self, $data) = @_;
 
+  my $error = $self->error->sysinfo;
+
   my $message = $data->{error};
 
-  my $stash = {
-    error => $message,
-    package => $data->{package},
-  };
+  $error->name('on.eval');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
 
-  my $result = {
-    name => 'on.eval',
-    raise => true,
-    stash => $stash,
-    message => $message,
-  };
-
-  return $result;
+  return $error;
 }
 
 sub error_on_load {
   my ($self, $data) = @_;
 
+  my $error = $self->error->sysinfo;
+
   my $message = 'Error attempting to load {{package}}: "{{error}}"';
 
-  my $stash = {
-    error => $data->{error},
-    package => $data->{package},
-  };
+  $error->name('on.load');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
 
-  my $result = {
-    name => 'on.load',
-    raise => true,
-    stash => $stash,
-    message => $message,
-  };
-
-  return $result;
+  return $error;
 }
 
 sub error_on_swap {
   my ($self, $data) = @_;
 
+  my $error = $self->error->sysinfo;
+
   my $message = 'Attempt to swap undefined subroutine in package "{{package}}"';
 
-  my $stash = {
-    package => $data->{package},
-    routine => $data->{routine},
-  };
+  $error->name('on.swap');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
 
-  my $result = {
-    name => 'on.swap',
-    raise => true,
-    stash => $stash,
-    message => $message,
-  };
-
-  return $result;
+  return $error;
 }
 
 1;
@@ -960,6 +1064,82 @@ L<Venus::Name>
 =head1 METHODS
 
 This package provides the following methods:
+
+=cut
+
+=head2 after
+
+  after(string $name, coderef $code) (coderef)
+
+The after method installs a method modifier that executes after the original
+method, allowing you to perform actions after a method call. B<Note:> The
+return value of the modifier routine is ignored; the wrapped method always
+returns the value from the original method. Modifiers are executed in the order
+they are stacked.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item after example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('execute', sub {
+    my ($self) = @_;
+    return [@_];
+  });
+
+  my $after = $space->after('execute', sub {
+    my ($self) = @_;
+    $self->{executed} = 1;
+  });
+
+  # sub { ... }
+
+=back
+
+=over 4
+
+=item after example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('new', sub {
+    my ($class) = @_;
+    return bless {}, $class;
+  });
+
+  $space->routine('execute', sub {
+    my ($self) = @_;
+    $self->{executed} = 1;
+    return $self;
+  });
+
+  $space->after('execute', sub {
+    my ($self) = @_;
+    return [@_];
+  });
+
+  my $object = $space->build({});
+
+  my $result = $object->execute;
+
+  # bless({executed => 1}, 'Foo::Bar')
+
+=back
 
 =cut
 
@@ -1070,6 +1250,95 @@ I<Since C<0.01>>
   my $append = $space->append('baz', 'bax');
 
   # bless({ value => "Foo/Bar/Baz/Bax" }, "Venus::Space")
+
+=back
+
+=cut
+
+=head2 around
+
+  around(string $name, coderef $code) (coderef)
+
+The around method installs a method modifier that wraps around the original
+method. The callback provided will recieve the original routine as its first
+argument. This method will raise an exception if the source routine does not
+exist. Modifiers are executed in the order they are stacked.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item around example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('execute', sub {
+    my ($self, $value) = @_;
+    return [$value];
+  });
+
+  my $around = $space->around('execute', sub {
+    my ($orig, $self, $value) = @_;
+    my $result = $self->$orig($value);
+    push @$result, 'wrapped';
+    return $result;
+  });
+
+  # sub { ... }
+
+=back
+
+=over 4
+
+=item around example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('execute', sub {
+    my ($self, $value) = @_;
+    return [$value];
+  });
+
+  $space->around('execute', sub {
+    my ($orig, $self, $value) = @_;
+    my $result = $self->$orig($value);
+    push @$result, 'wrapped';
+    return $result;
+  });
+
+  my $object = $space->build({});
+
+  my $result = $object->execute('test');
+
+  # ['test', 'wrapped']
+
+=back
+
+=over 4
+
+=item B<may raise> L<Venus::Space::Error> C<on.around.missing>
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Venus::Check');
+
+  $space->around('not_a_method');
+
+  # Error! (on.around.missing)
 
 =back
 
@@ -1286,9 +1555,86 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 before
+
+  before(string $name, coderef $code) (coderef)
+
+The before method installs a method modifier that executes before the original
+method, allowing you to perform actions before a method call. B<Note:> The
+return value of the modifier routine is ignored; the wrapped method always
+returns the value from the original method. Modifiers are executed in the order
+they are stacked.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item before example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('execute', sub {
+    my ($self) = @_;
+    return [@_];
+  });
+
+  my $before = $space->before('execute', sub {
+    my ($self) = @_;
+    $self->{started} = 1;
+  });
+
+  # sub { ... }
+
+=back
+
+=over 4
+
+=item before example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('new', sub {
+    my ($class) = @_;
+    return bless {tick => 1}, $class;
+  });
+
+  $space->routine('execute', sub {
+    my ($self) = @_;
+    $self->{tick} = $self->{step_1} = $self->{tick} + 1;
+    return $self;
+  });
+
+  $space->before('execute', sub {
+    my ($self) = @_;
+    $self->{tick} = $self->{step_2} = $self->{tick} + 1;
+    return;
+  });
+
+  my $object = $space->build({});
+
+  my $result = $object->execute;
+
+  # bless({step_1 => 3, step_2 => 2}, 'Foo::Bar')
+
+=back
+
+=cut
+
 =head2 blessed
 
-  blessed(Ref $data) (Self)
+  blessed(Ref $data) (Venus::Space)
 
 The blessed method blesses the given value into the package namespace and
 returns an object. If no value is given, an empty hashref is used.
@@ -1335,7 +1681,7 @@ I<Since C<0.01>>
 
 =head2 build
 
-  build(any @args) (Self)
+  build(any @args) (Venus::Space)
 
 The build method attempts to call C<new> on the package namespace and if
 successful returns the resulting object.
@@ -1478,6 +1824,22 @@ I<Since C<0.01>>
   my $result = $space->call('missing');
 
   # Exception! (isa Venus::Space::Error) (see error_on_call_missing)
+
+=back
+
+=over 4
+
+=item B<may raise> L<Venus::Space::Error> C<on.call.missing>
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Venus::Check');
+
+  $space->call('not_a_method');
+
+  # Error! (on.call.missing)
 
 =back
 
@@ -1671,6 +2033,22 @@ I<Since C<0.01>>
 
 =back
 
+=over 4
+
+=item B<may raise> L<Venus::Space::Error> C<on.cop.missing>
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Venus::Check');
+
+  $space->cop('not_a_method');
+
+  # Error! (on.cop.missing)
+
+=back
+
 =cut
 
 =head2 data
@@ -1737,6 +2115,22 @@ I<Since C<0.01>>
 
 =back
 
+=over 4
+
+=item B<may raise> L<Venus::Space::Error> C<on.eval>
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Venus::Check');
+
+  $space->eval('die');
+
+  # Error! (on.eval)
+
+=back
+
 =cut
 
 =head2 explain
@@ -1757,6 +2151,103 @@ I<Since C<0.01>>
   my $explain = $space->explain;
 
   # "Foo::Bar"
+
+=back
+
+=cut
+
+=head2 handle
+
+  handle(string $name, coderef $code) (coderef)
+
+The handle method installs a method modifier that wraps a method similar to
+C<around>, providing low-level control over method execution. The modifier
+receives the original method as its first argument (which may be C<undef> if
+the method doesn't exist), followed by the method's arguments. This is the
+foundation for the other method modifiers (L</before|"before">,
+L</after|"after">, L</around|"around">). The modifiers are executed in the
+order they are stacked rather than maintaining a global registry.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item handle example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('execute', sub {
+    my ($self, $value) = @_;
+    return $value;
+  });
+
+  my $handle = $space->handle('execute', sub {
+    my ($orig, $self, $value) = @_;
+    return $orig ? $self->$orig($value * 2) : 0;
+  });
+
+  # sub { ... }
+
+=back
+
+=over 4
+
+=item handle example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->routine('execute', sub {
+    my ($self, $value) = @_;
+    return $value;
+  });
+
+  $space->handle('execute', sub {
+    my ($orig, $self, $value) = @_;
+    return $orig ? $self->$orig($value * 2) : 0;
+  });
+
+  my $object = $space->build({});
+
+  my $result = $object->execute(5);
+
+  # 10
+
+=back
+
+=over 4
+
+=item handle example 3
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->do('init');
+
+  $space->handle('missing', sub {
+    my ($orig, $self) = @_;
+    return 'method does not exist';
+  });
+
+  my $object = $space->build({});
+
+  my $result = $object->missing;
+
+  # "method does not exist"
 
 =back
 
@@ -1842,6 +2333,77 @@ I<Since C<0.01>>
   my $hashes = $space->hashes;
 
   # ["defaults", "settings"]
+
+=back
+
+=cut
+
+=head2 hook
+
+  hook(string $type, string $name, coderef $code) (coderef)
+
+The hook method is a specialized method modifier helper that applies a modifier
+(C<after>, C<around>, C<before>, or C<handle>) to a lifecycle hook method. It
+automatically uppercases the hook name, making it convenient for modifying
+Venus lifecycle hooks like C<BUILD>, C<BLESS>, C<BUILDARGS>, and C<AUDIT>.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item hook example 1
+
+  package Foo::Bar::Hook;
+
+  use Venus::Class;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar/hook');
+
+  $space->routine('BUILD', sub {
+    my ($self, $args) = @_;
+    $self->{started} = 1;
+  });
+
+  my $hook = $space->hook('before', 'build', sub {
+    my ($self) = @_;
+    $self->{initialized} = 1;
+  });
+
+  # sub { ... }
+
+=back
+
+=over 4
+
+=item hook example 2
+
+  package Foo::Bar::Hook;
+
+  use Venus::Class;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar/hook');
+
+  $space->routine('BUILD', sub {
+    my ($self, $args) = @_;
+    $self->{started} = 1;
+  });
+
+  $space->hook('before', 'build', sub {
+    my ($self) = @_;
+    $self->{initialized} = 1;
+  });
+
+  my $object = $space->build({});
+
+  # bless({initialized => 1, started => 1}, 'Foo::Bar')
 
 =back
 
@@ -2113,6 +2675,22 @@ I<Since C<0.01>>
 
 =back
 
+=over 4
+
+=item B<may raise> L<Venus::Space::Error> C<on.load>
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Fake::Package::NotReal');
+
+  $space->load;
+
+  # Error! (on.load)
+
+=back
+
 =cut
 
 =head2 loaded
@@ -2294,6 +2872,44 @@ I<Since C<0.01>>
   my $name = $space->name;
 
   # "Foo::Bar"
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Space)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $new = Venus::Space->new('Foo::Bar');
+
+  # bless(..., "Venus::Space")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $new = Venus::Space->new(value => 'Foo::Bar');
+
+  # bless(..., "Venus::Space")
 
 =back
 
@@ -2672,10 +3288,13 @@ I<Since C<0.01>>
 
 =head2 purge
 
-  purge() (Self)
+  purge() (Venus::Space)
 
 The purge method purges a package space by expunging its symbol table and
-removing it from C<%INC>.
+removing it from C<%INC>. B<Warning:> This method deletes symbol table entries
+entirely, which may cause issues with code that holds compiled references to
+package variables. For safer cleanup that preserves symbol table structure, see
+L</scrub>.
 
 I<Since C<1.02>>
 
@@ -3002,6 +3621,45 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 scrub
+
+  scrub() (Venus::Space)
+
+The scrub method cleans a package space by nullifying its typeglobs (setting
+them to C<undef>) for all symbols except special variables and routines (like
+C<@ISA>, C<DESTROY>, etc.), and removes it from C<%INC>. Unlike L</purge>, this
+method preserves the stash entries allowing compiled code holding references to
+remain valid. Unlike L</unload>, this method preserves special symbols needed
+for proper package operation. See also L</purge> and L</unload>.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item scrub example 1
+
+  package main;
+
+  use Venus::Space;
+
+  # Bar::Gen is generated with $VERSION as 0.01
+
+  my $space = Venus::Space->new('Bar/Gen');
+
+  $space->load;
+
+  my $scrub = $space->scrub;
+
+  # bless({ value => "Bar::Gen" }, "Venus::Space")
+
+  # Bar::Gen->VERSION was 0.01, now undef
+
+  # Symbol table persists, $space->visible is 1
+
+=back
+
+=cut
+
 =head2 sibling
 
   sibling(string $path) (Venus::Space)
@@ -3264,10 +3922,13 @@ I<Since C<0.01>>
 
 =head2 unload
 
-  unload() (Self)
+  unload() (Venus::Space)
 
-The unload method unloads a package space by nullifying its symbol table and
-removing it from C<%INC>.
+The unload method unloads a package space by nullifying its symbol table
+(setting all typeglobs to C<undef>) and removing it from C<%INC>. Unlike
+L</purge>, this method preserves symbol table entries, keeping the package
+visible. Unlike L</scrub>, this method nullifies entire typeglobs rather than
+individual slots.
 
 I<Since C<1.02>>
 
@@ -3673,256 +4334,6 @@ I<Since C<1.02>>
 =back
 
 =cut
-
-=head1 ERRORS
-
-This package may raise the following errors:
-
-=cut
-
-=over 4
-
-=item error: C<error_on_call_missing>
-
-This package may raise an error_on_call_missing exception.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_call_missing',
-    package => 'Example',
-    routine => 'execute',
-  };
-
-  my $error = $space->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_call_missing"
-
-  # my $message = $error->render;
-
-  # "Unable to locate class method \"execute\" via package \"Example\""
-
-  # my $package = $error->stash('package');
-
-  # "Example"
-
-  # my $routine = $error->stash('routine');
-
-  # "execute"
-
-=back
-
-=over 4
-
-=item error: C<error_on_call_undefined>
-
-This package may raise an error_on_call_undefined exception.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_call_undefined',
-    package => 'Example',
-    routine => 'execute',
-  };
-
-  my $error = $space->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_call_undefined"
-
-  # my $message = $error->render;
-
-  # "Attempt to call undefined class method in package \"Example\""
-
-  # my $package = $error->stash('package');
-
-  # "Example"
-
-  # my $routine = $error->stash('routine');
-
-  # "execute"
-
-=back
-
-=over 4
-
-=item error: C<error_on_cop_missing>
-
-This package may raise an error_on_cop_missing exception.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_cop_missing',
-    package => 'Example',
-    routine => 'execute',
-  };
-
-  my $error = $space->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_cop_missing"
-
-  # my $message = $error->render;
-
-  # "Unable to locate object method \"execute\" via package \"Example\""
-
-  # my $package = $error->stash('package');
-
-  # "Example"
-
-  # my $routine = $error->stash('routine');
-
-  # "execute"
-
-=back
-
-=over 4
-
-=item error: C<error_on_cop_undefined>
-
-This package may raise an error_on_cop_undefined exception.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_cop_undefined',
-    package => 'Example',
-    routine => 'execute',
-  };
-
-  my $error = $space->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_cop_undefined"
-
-  # my $message = $error->render;
-
-  # "Attempt to cop undefined object method from package \"$class\""
-
-  # my $package = $error->stash('package');
-
-  # "Example"
-
-  # my $routine = $error->stash('routine');
-
-  # "execute"
-
-=back
-
-=over 4
-
-=item error: C<error_on_eval>
-
-This package may raise an error_on_eval exception.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_eval',
-    error => 'Exception!',
-    package => 'Example',
-  };
-
-  my $error = $space->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_eval"
-
-  # my $message = $error->render;
-
-  # "Exception!"
-
-  # my $package = $error->stash('package');
-
-  # "Example"
-
-=back
-
-=over 4
-
-=item error: C<error_on_load>
-
-This package may raise an error_on_load exception.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_load',
-    package => 'Example',
-    error => 'cause unknown',
-  };
-
-  my $error = $space->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_load"
-
-  # my $message = $error->render;
-
-  # "Error attempting to load Example: \"cause unknown\""
-
-  # my $package = $error->stash('package');
-
-  # "Example"
-
-=back
-
-=over 4
-
-=item error: C<error_on_swap>
-
-This package may raise an error_on_swap exception.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_swap',
-    package => 'Example',
-    routine => 'execute',
-  };
-
-  my $error = $space->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_swap"
-
-  # my $message = $error->render;
-
-  # "Attempt to swap undefined subroutine in package \"$class\""
-
-  # my $package = $error->stash('package');
-
-  # "Example"
-
-  # my $routine = $error->stash('routine');
-
-  # "execute"
-
-=back
 
 =head1 AUTHORS
 

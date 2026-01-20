@@ -1,0 +1,108 @@
+NAME
+    Marlin::XAttribute::LocalWriter - Marlin attribute extension for
+    localizing attribute values.
+
+SYNOPSIS
+      package Local::Person {
+        use Marlin::Util -all;
+        use Types::Common -types;
+        use Marlin
+          name => {
+            required       => true,
+            isa            => Str,
+            ':LocalWriter' => 'temp_name',
+          };
+      }
+  
+      my $bob = Local::Person->new( name => 'Bob' );
+      say $bob->name;  # "Bob"
+  
+      {
+        my $guard = $bob->temp_name( 'Robert' );
+        say $bob->name;  # Robert
+      }
+  
+      say $bob->name;  # "Bob"
+
+IMPORTING THIS MODULE
+    The standard way to import Marlin attribute extensions is to include them
+    in the attribute definition hashrefs passed to `use Marlin`
+
+      package Local::Person {
+        use Marlin::Util -all;
+        use Types::Common -types;
+        use Marlin
+          name => {
+            required       => true,
+            isa            => Str,
+            ':LocalWriter' => 'temp_name',
+          };
+      }
+
+    It is possible to additionally load it with `use
+    Marlin::XAttribute::LocalWriter`, which won't *do* anything, but might be
+    useful to automatic dependency analysis.
+
+      package Local::Person {
+        use Marlin::Util -all;
+        use Marlin::XAttribute::LocalWriter;
+        use Types::Common -types;
+        use Marlin
+          name => {
+            required       => true,
+            isa            => Str,
+            ':LocalWriter' => 'temp_name',
+          };
+      }
+
+DESCRIPTION
+    The following are spiritually similar:
+
+      {
+        my $guard = $bob->temp_name( "Robert" );
+        ...;
+      }
+  
+      {
+        local $bob->{name} = "Robert";
+        ...;
+      }
+
+    However, the local writer method will honour type constraints, triggers,
+    etc.
+
+    Calling `$bob->temp_name()` with no parameters is equivalent to doing
+    `delete local`.
+
+    Note that the $guard which is returned by the method is where a lot of the
+    magic happens. When it goes out of scope, it restores the original value.
+
+    If you set `':LocalWriter' => 1`, this is a shortcut for `':LocalWriter'
+    => "_local$attrname"` if your attribute's name starts with an underscore,
+    and `':LocalWriter' => "local_$attrname"` otherwise.
+
+    This extension makes no changes to your constructor.
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-marlin-xattribute-localwriter/issues>.
+
+SEE ALSO
+    Marlin.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2025-2026 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+    🐟🐟
+

@@ -12,7 +12,7 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::KeepAlive v12.0.2;
+package Protocol::Sys::Virt::KeepAlive v12.0.4;
 
 use Carp qw(croak);
 use Log::Any qw($log);
@@ -103,7 +103,7 @@ Protocol::Sys::Virt::KeepAlive - Check transport link availability
 
 =head1 VERSION
 
-v12.0.2
+v12.0.4
 
 Based on LibVirt tag v12.0.0
 

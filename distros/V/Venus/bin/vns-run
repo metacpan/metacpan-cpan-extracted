@@ -1,0 +1,50 @@
+#!/usr/bin/env perl
+
+package main;
+
+use 5.018;
+
+use strict;
+use warnings;
+
+use lib 'lib';
+
+use Venus::Task::Venus::Run;
+
+run Venus::Task::Venus::Run 'vns-run';
+
+=encoding utf8
+
+=head1 NAME
+
+vns-run
+
+=head1 SYNOPSIS
+
+  vns-run --help
+
+=head1 DESCRIPTION
+
+Execute commands in the Venus configuration file. This CLI dispatches to
+L<Venus::Task::Venus::Run/perform>.
+
+=head1 EXAMPLES
+
+  # edit the configuration
+  $ vns-run edit
+
+Z<>
+
+  # print Perl information
+  $ vns-run info
+
+Z<>
+
+  # check the file's syntax
+  $ vns-run okay t/Venus.t
+
+=head1 SEE ALSO
+
+L<Venus>, L<Venus::Task::Venus::Run>.
+
+=cut

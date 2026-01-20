@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::FrameConverter;
-our $VERSION = '20260111.1557'; # VERSION
+our $VERSION = '20260119.1636'; # VERSION
 
 use strict;
 use warnings;
@@ -43,7 +43,6 @@ sub new {
 
   $logger->fatal( "Error: cannot find $pdffile, run your latex compiler first to produce the PDF file." ) unless ( -r $pdffile );
   
-  #  $self->{slides} = File::Spec->catfile( $self->{base}, 'media', 'Slides' );
   $self->{slides} = "$self->{base}/media/Slides";
   
   for my $item ( qw(slides) ) {
@@ -99,7 +98,7 @@ BeamerReveal::FrameConverter - FrameConverter
 
 =head1 VERSION
 
-version 20260111.1557
+version 20260119.1636
 
 =head1 SYNOPSIS
 

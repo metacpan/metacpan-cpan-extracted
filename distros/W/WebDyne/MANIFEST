@@ -1392,5 +1392,16 @@ t/data/02-start_html_base.dat.final
 t/data/02-start_html_base.html           
 t/data/02-start_html_base.tree           
 t/start_html_base.psp                    
+t/data/02-start_html_heading.dat.0       
+t/data/02-start_html_heading.dat.1       
+t/data/02-start_html_heading.dat.2       
+t/data/02-start_html_heading.dat.3       
+t/data/02-start_html_heading.dat.4       
+t/data/02-start_html_heading.dat.5       
+t/data/02-start_html_heading.dat.final   
+t/data/02-start_html_heading.html        
+t/data/02-start_html_heading.tree        
+t/start_html_heading.psp                 
+RELEASE.md                               
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

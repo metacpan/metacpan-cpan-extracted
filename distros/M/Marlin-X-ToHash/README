@@ -1,0 +1,289 @@
+NAME
+    Marlin::X::ToHash - Marlin extension to add a `to_hash` method to your
+    class.
+
+SYNOPSIS
+      package Local::Date {
+        use Marlin qw( year month day :ToHash );
+      }
+  
+      my $xmas      = Local::Date->new( day => 25, month => 12, year => 2025 );
+      my $xmas_href = $xmas->to_hash();
+
+IMPORTING THIS MODULE
+    The standard way to import Marlin extensions is to include them in the
+    list passed to `use Marlin`:
+
+      package Local::Date {
+        use Marlin qw( year month day :ToHash );
+      }
+
+    It is possible to additionally load it with `use Marlin::X::ToHash`, which
+    won't *do* anything, but might be useful to automatic dependency analysis.
+
+      package Local::Date {
+        use Marlin qw( year month day :ToHash );
+        use Marlin::X::ToHash 0.020000;  # does nothing
+      }
+
+DESCRIPTION
+    This package creates a method in your class that does roughly:
+
+      sub to_hash {
+        my ( $self, %args ) = @_;
+        my %hash = ( %$self, %args );
+        return \%hash;
+      }
+
+    Except it also:
+
+    *   Skips over "PRIVATE" storage attributes by default.
+
+    *   Respects the `init_arg` for each attribute.
+
+    *   Calls lazy defaults, checks type constraints, and does type coercions.
+
+    *   Allows per-attribute tweaks to its behaviour.
+
+    *   Will call a custom `AFTER_TO_HASH` before returning the hashref.
+
+    *   Complains if you give it arguments which it doesn't recognize.
+
+    You can tweak an attribute's behaviour using:
+
+      use Marlin foo => { to_hash => ... };
+
+    Valid values for `to_hash`:
+
+    `:simple`
+        A simple shallow copy. If the value is a reference, the value in the
+        hash will refer to the same data.
+
+          ## to_hash => ':simple'
+          $hash->{foo} = $self->{foo};
+
+        This is the default and will be used if `to_hash` is omitted, or for
+        `to_hash => true`.
+
+    `:deep`
+        Uses the Clone module to make a deep clone of the original value.
+
+          ## to_hash => ':deep'
+          $hash->{foo} = Clone::clone( $self->{foo} );
+
+    `:none`
+        Does not copy the attribute value to the hash.
+
+        You can also specify this as `to_hash => false`.
+
+    `:method` or :method(NAME)
+        Calls a method on the original value, assuming it's a blessed object.
+        If the original value is not a blessed object, it will silently be
+        skipped. If no `NAME` is provided, the name is assumed to be
+        "to_hash".
+
+          ## to_hash => ':method'
+          if ( blessed $self->{foo} ) {
+            $hash->{foo} = $self->{foo}->to_hash;
+          }
+  
+          ## to_hash => ':method(as_hash)'
+          if ( blessed $self->{foo} ) {
+            $hash->{foo} = $self->{foo}->as_hash;
+          }
+
+    :selfmethod(NAME)
+        Calls a method on the original object.
+
+          ## to_hash => ':selfmethod(make_copy)'
+          $hash->{foo} = $self->make_copy( foo => $self->{foo} );
+
+        You can also specify this as `to_hash => "NAME"` as a shortcut.
+
+    CODE
+        Setting `to_hash => sub {...}` will call the coderef in a similar
+        style to `:selfmethod`.
+
+          ## to_hash => $coderef
+          $hash->{foo} = $self->$coderef( foo => $self->{foo} );
+
+    :key(KEYNAME)
+        Renames this attribute in the hash.
+
+          ## to_hash => ':key(xyzzy)'
+          $hash->{xyzzy} = $self->{foo};
+
+    `:defined`
+        Only adds the value to the hash if it's defined.
+
+          ## to_hash => ':defined'
+          $hash->{foo} = $self->{foo} if defined $self->{foo};
+
+    `:build`
+        Forces any lazy default/builder to be run first.
+
+          ## to_hash => ':build'
+          $self->{foo} = $self->_build_foo() unless exists $self->{foo};
+          $hash->{foo} = $self->{foo};
+
+    Because `:method` only works when the value is a blessed object, you can
+    indicate a fallback that will be used in other cases.
+
+      ## to_hash => ':method(make_copy) :deep'
+      if ( blessed $self->{foo} ) {
+        $hash->{foo} = $self->{foo}->make_copy;
+      }
+      else {
+        $hash->{foo} = Clone::clone( $self->{foo} );
+      }
+
+    In general, you can combine any options that make sense to combine.
+
+      ## to_hash => ':method(make_copy) :simple :build :defined'
+      $self->{foo} = $self->_build_foo()
+        unless exists $self->{foo};
+      if ( blessed $self->{foo} ) {
+        my $tmp = $self->{foo}->make_copy;
+        $hash->{foo} = $tmp if defined $tmp;
+      }
+      else {
+        my $tmp = $self->{foo};
+        $hash->{foo} = $tmp if defined $tmp;
+      }
+
+    You can also set a few class-wide options for how the plugin behaves:
+
+      use Marlin qw( foo bar ),
+        ':ToHash' => {
+          method_name     => 'as_hash',  # Name for the method
+          strict_args     => true,       # Complain about unrecognized params?
+          extra_args      => false,      # Keep unrecognized params?
+        };
+
+    You can define an `AFTER_TO_HASH` method in your class to alter the
+    returned hash:
+
+      sub AFTER_TO_HASH ( $self, $args, $hash_ref ) {
+        ...;        # alter hash here
+        return 42;  # returned value is ignored
+      }
+
+    Any `AFTER_TO_HASH` methods in parent classes will also be automatically
+    called (like `BUILD`!), so you don't need to worry about calling
+    `$self->SUPER::AFTER_TO_HASH( $args, $hash_ref )` manually. (Indeed, you
+    should not!)
+
+COOKBOOK
+  Combining Attributes
+    Imagine you have a class which keeps a Person's first name and last name
+    in separate attributes but you wish to combine them in the output hashref
+    instead of them being separate.
+
+    In this example, we create a `full_name` attribute which is built from the
+    separate names, and make sure that it is built so that it can be included
+    in the output.
+
+      package Local::Person {
+        use Marlin::Util -all;
+        use Marlin ':ToHash',
+          'first_name!' => { to_hash => false },
+          'last_name!'  => { to_hash => false },
+          'full_name'   => { is      => lazy,
+                             builder => true,
+                             to_hash => ':build :simple' },
+          'age'         => { to_hash => true };
+    
+        sub _build_full_name ( $self ) {
+          join q[ ], $self->first_name, $self->last_name;
+        }
+      }
+
+    In this alternative implementation, we use `AFTER_TO_HASH` to manually add
+    the full name to the hashref.
+
+      package Local::Person {
+        use Marlin::Util -all;
+        use Marlin ':ToHash',
+          'first_name!' => { to_hash => false },
+          'last_name!'  => { to_hash => false },
+          'age'         => { to_hash => true };
+    
+        sub AFTER_TO_HASH ( $self, $args, $hashref ) {
+          $hashref->{full_name} = 
+            join q[ ], $self->first_name, $self->last_name;
+        }
+      }
+
+    In either case, the following test case should pass:
+
+      use Test2::V0;
+  
+      my $x = Local::Person->new(
+        first_name   => 'Alice',
+        last_name    => 'Smith',
+        age          => 30,
+      );
+  
+      is( $x->to_hash, { full_name => 'Alice Smith', age => 30 } );
+
+  Adding Ad-Hoc Keys
+    If you set the `extra_args` option to true, your `to_hash` method will
+    accept additional keys and values to pass through into the hash.
+
+      package Local::User {
+        use Marlin::Util -all;
+        use Marlin qw( name url ),
+          ':ToHash' => { extra_args => true };
+    
+        sub to_json_ld ( $self ) {
+          return $self->to_hash(
+            '@context' => 'http://schema.org/',
+            '@type'    => 'Person',
+          );
+        }
+      }
+  
+      use Test2::V0;
+  
+      my $user = Local::User->new( name => 'Bob' );
+  
+      is(
+        $user->to_hash,
+        { name => 'Bob' },
+      );
+  
+      is(
+        $user->to_json_ld,
+        {
+          '@context' => 'http://schema.org/',
+          '@type'    => 'Person',
+          'name'     => 'Bob',
+        },
+      );
+
+    Without enabling the `extra_args` option, any unrecognized arguments
+    passed to `to_hash` would be an error.
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-marlin-x-tohash/issues>.
+
+SEE ALSO
+    Marlin.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2026 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+    🐟🐟
+

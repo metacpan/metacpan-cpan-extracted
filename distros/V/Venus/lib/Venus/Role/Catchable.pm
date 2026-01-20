@@ -5,6 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Role 'fault';
 
 # AUDITS
@@ -29,6 +31,25 @@ sub catch {
   return wantarray ? ($error ? ($error, undef) : ($error, @result)) : $error;
 }
 
+sub caught {
+  my ($self, $data, $type, $code) = @_;
+
+  require Scalar::Util;
+
+  ($type, my($name)) = @$type if ref $type eq 'ARRAY';
+
+  my $is_true = $data
+    && Scalar::Util::blessed($data)
+    && $data->isa('Venus::Error')
+    && $data->isa($type || 'Venus::Error')
+    && ($data->name ? $data->of($name || '') : !$name);
+
+  return undef unless $is_true;
+
+  local $_ = $data;
+  return $code ? $code->($data) : $data;
+}
+
 sub maybe {
   my ($self, $method, @args) = @_;
 
@@ -40,7 +61,7 @@ sub maybe {
 # EXPORTS
 
 sub EXPORT {
-  ['catch', 'maybe']
+  ['catch', 'caught', 'maybe']
 }
 
 1;
@@ -164,6 +185,143 @@ I<Since C<0.01>>
   my ($catch, $result) = $example->catch('fail');
 
   # (bless({...}, "Venus::Error"), undef)
+
+=back
+
+=cut
+
+=head2 caught
+
+  caught(object $error, string | tuple[string, string] $identity, coderef $block) (any)
+
+The caught method evaluates the value provided and validates its identity and
+name (if provided) then executes the code block (if provided) returning the
+result of the callback. If no callback is provided this function returns the
+exception object on success and C<undef> on failure.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item caught example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch = $example->catch('fail');
+
+  my $result = $example->caught($catch);
+
+  # bless(..., 'Venus::Error')
+
+=back
+
+=over 4
+
+=item caught example 2
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch = $example->catch('fail');
+
+  my $result = $example->caught($catch, 'Venus::Error');
+
+  # bless(..., 'Venus::Error')
+
+=back
+
+=over 4
+
+=item caught example 3
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch = $example->catch('fail');
+
+  my $result = $example->caught($catch, 'Venus::Error', sub{
+    $example->{caught} = $_;
+  });
+
+  ($example, $result)
+
+  # (bless(..., 'Example'), bless(..., 'Venus::Error'))
+
+=back
+
+=over 4
+
+=item caught example 4
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch = $example->catch('fail');
+
+  $catch->name('on.issue');
+
+  my $result = $example->caught($catch, ['Venus::Error', 'on.issue']);
+
+  # bless(..., 'Venus::Error')
+
+=back
+
+=over 4
+
+=item caught example 5
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch = $example->catch('fail');
+
+  $catch->name('on.issue');
+
+  my $result = $example->caught($catch, ['Venus::Error', 'on.issue'], sub{
+    $example->{caught} = $_;
+  });
+
+  ($example, $result)
+
+  # (bless(..., 'Example'), bless(..., 'Venus::Error'))
+
+=back
+
+=over 4
+
+=item caught example 6
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch = $example->catch('fail');
+
+  my $result = $example->caught($catch, ['Venus::Error', 'on.issue']);
+
+  # undef
+
+=back
+
+=over 4
+
+=item caught example 7
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch;
+
+  my $result = $example->caught($catch);
+
+  # undef
 
 =back
 

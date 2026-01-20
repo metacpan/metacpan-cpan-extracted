@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Util;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016000';
+our $VERSION   = '0.020000';
 
 use B                     ();
 use Exporter::Tiny        qw( _croak _carp );
@@ -28,7 +28,7 @@ use constant do {
 };
 
 # Things below this point are not exportable.
-# It is a replacement for Module::Runtime.
+# Mostly a replacement for Module::Runtime.
 
 {
 	no strict 'refs';

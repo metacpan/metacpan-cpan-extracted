@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -47,6 +48,7 @@ method: lookslike_a_label
 method: lookslike_a_package
 method: lookslike_a_path
 method: lookslike_a_pragma
+method: new
 method: package
 method: path
 
@@ -453,6 +455,86 @@ $test->for('example', 1, 'lookslike_a_pragma', sub {
 
   !$result
 });
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Name)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Name;
+
+  my $new = Venus::Name->new;
+
+  # bless(..., "Venus::Name")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Name');
+  is $result->value, 'Venus';
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Name;
+
+  my $new = Venus::Name->new('Foo/Bar');
+
+  # bless(..., "Venus::Name")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Name');
+  is $result->value, 'Foo/Bar';
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Name;
+
+  my $new = Venus::Name->new(value => 'Foo/Bar');
+
+  # bless(..., "Venus::Name")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Name');
+  is $result->value, 'Foo/Bar';
+
+  $result
+});
+
 
 =method package
 

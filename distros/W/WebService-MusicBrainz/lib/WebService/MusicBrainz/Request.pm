@@ -8,13 +8,18 @@ use Mojo::Util qw/dumper/;
 has url_base => 'https://musicbrainz.org/ws/2';
 has ua => sub
 {
-    Mojo::UserAgent->with_roles('+Retry')->new(
-        retries         => 4,           # try up to 4 times (total 5 attempts)
-        retry_wait_min  => 1,           # seconds
-        retry_wait_max  => 15,          # exponential backoff up to 15s
-        # Optional: custom policy (default retries on connection errors + 429/503)
-        # retry_policy    => sub { ... }
-        )};
+    if (eval { my $ua = Mojo::UserAgent->with_roles("+Retry")->new(); 1 }) {
+        return Mojo::UserAgent->with_roles('+Retry')->new(
+           retries         => 4,           # try up to 4 times (total 5 attempts)
+           retry_wait_min  => 1,           # seconds
+           retry_wait_max  => 15,          # exponential backoff up to 15s
+           # Optional: custom policy (default retries on connection errors + 429/503)
+           # retry_policy    => sub { ... }
+        );
+    } else {
+        return Mojo::UserAgent->new();
+    }
+};
 has 'format' => 'json';
 has 'search_resource';
 has 'mbid';

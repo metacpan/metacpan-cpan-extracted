@@ -1,0 +1,14 @@
+.editorconfig
+Build.PL
+Changes
+lib/Future/IO/Resolver.pm
+MANIFEST			This list of files
+t/00use.t
+t/01getaddrinfo.t
+t/02getnameinfo.t
+t/03res_query.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

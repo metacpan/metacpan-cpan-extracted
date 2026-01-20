@@ -5,304 +5,28 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Class 'base';
+use Venus::Class 'attr', 'base', 'with';
 
-base 'Venus::Task';
+# IMPORTS
 
 use Venus;
+use Venus::Config;
+use Venus::Os;
+use Venus::Path;
 
-our $NAME = __PACKAGE__;
-our $FILE = '.vns.pl';
+# INHERITS
 
-# HOOKS
+base 'Venus::Kind::Utility';
 
-sub _print {
-  do {local $| = 1; CORE::print(@_, "\n")}
-}
+# INTEGRATES
 
-sub _prompt {
-  do {local $\ = ''; local $_ = <STDIN>; chomp; $_}
-}
+with 'Venus::Role::Optional';
 
-# METHODS
+# STATE
 
-state $args = {
-  'command' => {
-    help => 'Command to run',
-    required => 1,
-  }
-};
-
-sub args {
-
-  return $args;
-}
-
-state $cmds = {
-  'func' => {
-    help => 'Register function',
-    arg => 'command',
-  },
-  'help' => {
-    help => 'Display help and usages',
-    arg => 'command',
-  },
-  'init' => {
-    help => 'Initialize the configuration file',
-    arg => 'command',
-  },
-  'with' => {
-    help => 'Register subcommand',
-    arg => 'command',
-  },
-};
-
-sub cmds {
-
-  return $cmds;
-}
-
-sub conf {
-  my ($self) = @_;
-
-  require Venus::Config;
-
-  return Venus::Config->read_file($self->file)->value;
-}
-
-sub file {
-  my $base = $FILE =~ s/\.\w+$//r;
-
-  return $ENV{VENUS_FILE} || (grep -f, map "$base.$_", qw(yaml yml json js perl pl))[0]
-}
-
-state $footer = <<"EOF";
-Config:
-
-Here is an example configuration in YAML (e.g. in .vns.yaml).
-
-  ---
-  data:
-    ECHO: true
-  exec:
-    cpan: cpanm -llocal -qn
-    deps: cpan --installdeps .
-    each: \$PERL -MVenus=log -nE
-    exec: \$PERL -MVenus=log -E
-    okay: \$PERL -c
-    repl: \$PERL -dE0
-    says: exec "map log(eval), \@ARGV"
-    test: \$PROVE
-  libs:
-  - -Ilib
-  - -Ilocal/lib/perl5
-  path:
-  - bin
-  - dev
-  - local/bin
-  perl:
-    perl: perl
-    prove: prove
-  vars:
-    PERL: perl
-    PROVE: prove
-
-Examples:
-
-Here are examples usages using the example YAML configuration.
-
-  # Mint a new configuration file
-  vns init
-
-  # Install a distribution
-  vns cpan \$DIST
-
-  # Install dependencies in the CWD
-  vns deps
-
-  # Check that a package can be compiled
-  vns okay \$FILE
-
-  # Use the Perl debugger as a REPL
-  vns repl
-
-  # Evaluate arbitrary Perl expressions
-  vns exec ...
-
-  # Test the Perl project in the CWD
-  vns test t
-
-Copyright 2022-2023, Vesion $Venus::VERSION, The Venus "AUTHOR" and "CONTRIBUTORS"
-
-More information on "vns" and/or the "Venus" standard library, visit
-https://p3rl.org/vns.
-EOF
-
-sub footer {
-
-  return $footer;
-}
-
-sub handler {
-  my ($self, $data) = @_;
-
-  my $help = $data->{help};
-  my $next = $data->{command};
-
-  return $self->okay if !$help && !$next;
-
-  return $self->handler_for_help($data) if (!$next && $help) || (lc($next) eq 'help');
-
-  return $self->handler_for_func($data) if lc($next) eq 'func';
-
-  return $self->handler_for_with($data) if lc($next) eq 'with';
-
-  return $self->handler_for_init($data) if lc($next) eq 'init';
-
-  return $self->handler_for_exec($data);
-}
-
-sub handler_for_exec {
-  my ($self, $data) = @_;
-
-  my $code = sub {
-    my $command = _vars(join ' ', @_);
-
-    $self->log_info('Using:', $command) if $ENV{ECHO};
-
-    my $error = $self->catch('system', $command);
-
-    $self->log_error("Error running command! $command") if $ENV{ECHO} && $error;
-
-    return $error ? false : true;
-  };
-
-  return $self->exit(undef, sub{_exec($code, $self->conf, @{$self->data})});
-}
-
-sub handler_for_func {
-  my ($self, $data) = @_;
-
-  my ($func, $name, $path) = @{$self->cli->data};
-
-  require Venus::Path;
-
-  $path = Venus::Path->new($path)->absolute;
-
-  return $self->fail if !$func;
-
-  if (!$name) {
-    return $self->fail(sub{$self->log_error("No function name provided")});
-  }
-
-  if (!$path) {
-    return $self->fail(sub{$self->log_error("No function path provided")});
-  }
-
-  if (!$path->is_file) {
-    return $self->fail(sub{$self->log_error("Function path provided doesn't exist")});
-  }
-
-  my $command = _vars(join ' ', $func, $name, $path);
-
-  $self->log_info('Using:', $command) if $ENV{ECHO};
-
-  my $conf = $self->conf;
-
-  if (exists $conf->{func}->{$name}) {
-    return $self->fail(sub{$self->log_error("Function $name already exists")});
-  }
-
-  $conf->{func}->{$name} = "$path";
-
-  my $file = $self->file;
-
-  require Venus::Config;
-
-  Venus::Config->new($conf)->write_file($file);
-
-  return $self->okay('log_info', "Function $name registered in file $file");
-}
-
-sub handler_for_help {
-  my ($self, $data) = @_;
-
-  my $conf = $self->conf;
-  my $type = $self->data->[1];
-
-  if (exists $conf->{help} && exists $conf->{help}{$type}) {
-    return $self->fail(sub{$self->log_info($conf->{help}{$type})})
-  }
-  else {
-    return $self->fail(sub{$self->log_info($self->help)});
-  }
-}
-
-sub handler_for_init {
-  my ($self, $data) = @_;
-
-  my $file = $self->file;
-
-  return $self->fail('log_error', "Already using $file") if $file && -f $file;
-
-  $file ||= $FILE;
-
-  require Venus::Config;
-
-  my $init = $self->init;
-
-  Venus::Config->new($self->init)->write_file($file);
-
-  return $self->okay('log_info', "Initialized with generated file $file");
-}
-
-sub handler_for_with {
-  my ($self, $data) = @_;
-
-  my ($with, $name, $path) = @{$self->cli->data};
-
-  require Venus::Path;
-
-  $path = Venus::Path->new($path)->absolute;
-
-  return $self->fail if !$with;
-
-  if (!$name) {
-    return $self->fail(sub{$self->log_error("No subcommand name provided")});
-  }
-
-  if (!$path) {
-    return $self->fail(sub{$self->log_error("No subcommand path provided")});
-  }
-
-  if (!$path->is_file) {
-    return $self->fail(sub{$self->log_error("Subcommand path provided doesn't exist")});
-  }
-
-  my $command = _vars(join ' ', $with, $name, $path);
-
-  $self->log_info('Using:', $command) if $ENV{ECHO};
-
-  my $conf = $self->conf;
-
-  if (exists $conf->{with}->{$name}) {
-    return $self->fail(sub{$self->log_error("Subcommand $name already exists")});
-  }
-
-  $conf->{with}->{$name} = "$path";
-
-  my $file = $self->file;
-
-  require Venus::Config;
-
-  Venus::Config->new($conf)->write_file($file);
-
-  return $self->okay('log_info', "Subcommand $name registered in file $file");
-}
-
-state $init = {
+state $init_config = {
   data => {
-    ECHO => 1,
+    ECHO => 1
   },
   exec => {
     brew => 'perlbrew',
@@ -342,52 +66,96 @@ state $init = {
   },
 };
 
-sub init {
+# ATTRIBUTES
 
-  return $init;
+attr 'cache';
+attr 'config';
+attr 'debug';
+attr 'handler';
+
+# BUILDERS
+
+sub build_arg {
+  my ($self, $file) = @_;
+
+  return {
+    config => $self->load_config($file),
+  };
 }
 
-sub name {
+sub default_cache {
+  my ($self, $data) = @_;
 
-  return $ENV{VENUS_TASK_NAME} || $NAME;
+  return $self->new_cache;
 }
 
-state $opts = {
-  'help' => {
-    help => 'Show help information',
+sub default_config {
+  my ($self, $data) = @_;
+
+  return $self->new_config;
+}
+
+sub default_debug {
+  my ($self, $data) = @_;
+
+  return false;
+}
+
+sub default_handler {
+  my ($self, $data) = @_;
+
+  return $self->new_handler;
+}
+
+# HOOKS
+
+sub _error {
+  do {local $| = 1; CORE::print(STDERR @_, "\n")}
+}
+
+sub _print {
+  do {local $| = 1; CORE::print(@_, "\n")}
+}
+
+sub _prompt {
+  do {local $\ = ''; local $_ = <STDIN>; chomp; $_}
+}
+
+sub _system {
+  local $SIG{__WARN__} = sub {}; CORE::system(@_) == 0 ? true : false;
+}
+
+# METHODS
+
+sub callback {
+  my ($self, $code, @args) = @_;
+
+  if (!@args) {
+    return;
   }
-};
 
-sub opts {
-
-  return $opts;
-}
-
-# ROUTINES
-
-sub _exec {
-  my ($code, $conf, @data) = @_;
-
-  return () if !@data;
-
-  $conf = _set_conf($conf);
+  my $config = $self->prepare_conf($self->config);
 
   my %ORIG_ENV = %ENV;
 
-  _set_vars($conf);
-
-  _set_path($conf);
-
-  _set_libs($conf);
-
-  _set_vars($conf);
+  $self->prepare_vars($config);
+  $self->prepare_path($config);
+  $self->prepare_libs($config);
 
   my $result;
 
-  for my $step (_flow($conf, @data)) {
-    my ($prog, @args) = @{$step};
+  for my $step ($self->resolve($config, @args)) {
+    my ($prog, @step_args) = ref $step eq 'ARRAY' ? (@{$step}) : ($step);
 
-    ($result = $code->($prog, @args)) ? next : last if $prog;
+    if (!$prog) {
+      next;
+    }
+
+    $result = $code->($prog, @step_args);
+
+    if (!$result) {
+      last;
+    }
   }
 
   %ENV = %ORIG_ENV;
@@ -395,419 +163,462 @@ sub _exec {
   return $result;
 }
 
-sub _find {
-  my ($seen, $conf, @data) = @_;
+sub execute {
+  my ($self, @args) = @_;
 
-  return () if !@data;
-
-  @data = map _split($_), @data;
-
-  my @item = shift @data;
-
-  @item = (_find_in_exec($seen, $conf, @item));
-
-  if (@item > 1) {
-    unshift @data, @item; @item = shift @data;
-  }
-
-  @item = (_find_in_find($seen, $conf, @item));
-
-  if (@item > 1) {
-    unshift @data, @item; @item = shift @data;
-  }
-
-  @item = (_find_in_flow($seen, $conf, @item));
-
-  if (@item > 1) {
-    unshift @data, @item; @item = shift @data;
-  }
-
-  @item = (_find_in_func($seen, $conf, @item));
-
-  if (@item > 1) {
-    unshift @data, @item; @item = shift @data;
-  }
-
-  @item = (_find_in_perl($seen, $conf, @item));
-
-  if (@item > 1) {
-    unshift @data, @item; @item = shift @data;
-  }
-
-  @item = (_find_in_task($seen, $conf, @item));
-
-  if (@item > 1) {
-    unshift @data, @item; @item = shift @data;
-  }
-
-  @item = (_find_in_vars($seen, $conf, @item));
-
-  if (@item > 1) {
-    unshift @data, @item; @item = shift @data;
-  }
-
-  @item = (_find_in_with($seen, $conf, @item));
-
-  if (@item > 1) {
-    shift @data; unshift @data, @item; @item = shift @data;
-  }
-
-  return (@item, @data);
+  return $self->callback($self->handler, @args);
 }
 
-sub _find_in_exec {
-  my ($seen, $conf, $item) = @_;
+sub expand_prog {
+  my ($self, $prog) = @_;
 
-  return $conf->{exec}
-    ? (
-    $conf->{exec}{$item}
-    ? (do {
-      my $value = $conf->{exec}{$item};
-      ($value eq $item)
-        ? ($value)
-        : (_find_in_seen($seen, $conf, 'exec', $item, $value));
-    })
-    : ($item)
-    )
-    : ($item);
+  return Venus::Os->which($prog);
 }
 
-sub _find_in_find {
-  my ($seen, $conf, $item) = @_;
+sub expand_vars {
+  my ($self, $text) = @_;
 
-  return $conf->{find}
-    ? (
-    $conf->{find}{$item}
-    ? (do {
-      my $value = $conf->{find}{$item};
-      ($value eq $item)
-        ? ($value)
-        : (_find_in_seen($seen, $conf, 'find', $item, $value));
-    })
-    : ($item)
-    )
-    : ($item);
+  return ($text // '') =~ s{\$([A-Z_]+)}{$ENV{$1} // "\$" . $1}egr;
 }
 
-sub _find_in_flow {
-  my ($seen, $conf, $item) = @_;
+sub prepare_conf {
+  my ($self, $config) = @_;
 
-  return $conf->{flow}
-    ? (
-    $conf->{flow}{$item}
-    ? (do {
-      my $value = $conf->{flow}{$item};
-      join ' && ', map +(join(' ', _exec(sub{}, $conf, $_))), @{$value}
-    })
-    : ($item)
-    )
-    : ($item);
-}
+  if (my $from = $config->{from}) {
+    my @files = ref($from) eq 'ARRAY' ? @{$from} : ($from);
 
-sub _find_in_func {
-  my ($seen, $conf, $item) = @_;
-
-  return $conf->{func}
-    ? (
-    $conf->{func}{$item}
-    ? (do {
-      my $value = _vars($conf->{func}{$item});
-      ('perl', '-E', "(do \"$value\")->(\\\@ARGV)")
-    })
-    : ($item)
-    )
-    : ($item);
-}
-
-sub _find_in_perl {
-  my ($seen, $conf, $item) = @_;
-
-  return $conf->{perl}
-    ? (
-    $conf->{perl}{$item}
-    ? (do {
-      my $value = $conf->{perl}{$item};
-      ($value eq $item)
-        ? ($value)
-        : (_find_in_seen($seen, $conf, 'perl', $item, $value));
-    },
-      _load_from_libs($seen, $conf),
-      _load_from_load($seen, $conf),
-    )
-    : ($item)
-    )
-    : ($item);
-}
-
-sub _find_in_task {
-  my ($seen, $conf, $item) = @_;
-
-  return $conf->{task}
-    ? (
-    $conf->{task}{$item}
-    ? (do {
-      $ENV{VENUS_TASK_AUTO} = 1;
-      my $value = $conf->{task}{$item};
-      ($value eq $item)
-        ? ($value)
-        : (_find_in_seen($seen, $conf, 'task', $item, $value));
-    })
-    : ($item)
-    )
-    : ($item);
-}
-
-sub _find_in_vars {
-  my ($seen, $conf, $item) = @_;
-
-  my ($name) = $item =~ /\$?(.*)/;
-
-  return $conf->{vars}
-    ? (
-    $conf->{vars}{$name}
-    ? (do {
-      my $value = $conf->{vars}{$name};
-      ($value eq $name)
-        ? ($value)
-        : (_find_in_seen($seen, $conf, 'vars', $name, $value));
-    })
-    : ($item)
-    )
-    : ($item);
-}
-
-sub _find_in_with {
-  my ($seen, $conf, $item) = @_;
-
-  return $conf->{with}
-    ? (
-    $conf->{with}{$item}
-    ? (do {
-      $ENV{ECHO} = 0;
-      $ENV{VENUS_FILE} = _vars($conf->{with}{$item});
-      $ENV{VENUS_TASK_NAME} || 'vns';
-    })
-    : ($item)
-    )
-    : ($item);
-}
-
-sub _find_in_seen {
-  my ($seen, $conf, $item, $name, $value) = @_;
-
-  return $seen->{$item}{$name}++
-    ? ((_split($value))[0])
-    : (_find($seen, $conf, $value));
-}
-
-sub _flow {
-  my ($conf, @data) = @_;
-
-  return () if !@data;
-
-  my $item = shift @data;
-
-  return $conf->{flow}
-    ? (
-    $conf->{flow}{$item}
-    ? (do {
-     (map _flow($conf, $_, @data), @{$conf->{flow}{$item}});
-    })
-    : (_prep($conf, $item, @data))
-    )
-    : (_prep($conf, $item, @data));
-}
-
-sub _libs {
-  my ($conf) = @_;
-
-  return (map /^-I\w*?(.*)$/, _load_from_libs({}, $conf));
-}
-
-sub _load_from_libs {
-  my ($seen, $conf) = @_;
-
-  return !$seen->{libs}++ ? ($conf->{libs} ? (@{$conf->{libs}}) : ()) : ();
-}
-
-sub _load_from_load {
-  my ($seen, $conf) = @_;
-
-  return !$seen->{load}++ ? ($conf->{load} ? (@{$conf->{load}}) : ()) : ();
-}
-
-sub _make {
-  my ($conf, $name) = @_;
-
-  my ($item, @data) = _find({}, $conf, $name);
-
-  require Venus::Os;
-
-  my $path = Venus::Os->which($item);
-
-  return (($path ? $path : $item), @data);
-}
-
-sub _prep {
-  my ($conf, @data) = @_;
-
-  my @args = grep defined, _make($conf, shift(@data)), @data;
-
-  my $prog = _vars(shift(@args));
-
-  require Venus::Os;
-
-  for (my $i = 0; $i < @args; $i++) {
-    if ($args[$i] =~ /^\|+$/) {
-      next;
+    for my $file (@files) {
+      $config = Venus::merge(
+        $self->load_config($self->expand_vars($file)), $config,
+      );
     }
-    if ($args[$i] =~ /^\&+$/) {
-      next;
+  }
+
+  if (my $when = $config->{when}) {
+    my $os_type = Venus::Os->type;
+
+    if ($when->{$os_type}) {
+      $config = Venus::merge($config, $when->{$os_type});
     }
-    if ($args[$i] =~ /^\w+$/) {
-      next;
+  }
+
+  return $config;
+}
+
+sub prepare_libs {
+  my ($self, $config) = @_;
+
+  my $lib_paths = $config->{libs} // [];
+
+  my %seen_paths;
+
+  my @absolute_paths = map {Venus::Path->new($self->expand_vars($_))->absolute}
+    map /^-I\w*?(.*)$/, @{$lib_paths};
+
+  my $separator = Venus::Os->is_win ? ';' : ':';
+
+  $ENV{PERL5LIB} = join $separator, grep {!$seen_paths{$_}++} @absolute_paths;
+
+  return $config;
+}
+
+sub prepare_path {
+  my ($self, $config) = @_;
+
+  if (!$config->{path}) {
+    return $config;
+  }
+
+  my $separator = Venus::Os->is_win ? ';' : ':';
+
+  my @absolute_paths = map {Venus::Path->new($self->expand_vars($_))->absolute}
+    @{$config->{path}};
+
+  $ENV{PATH} = join $separator, @absolute_paths, $ENV{PATH};
+
+  return $config;
+}
+
+sub prepare_vars {
+  my ($self, $config) = @_;
+
+  if (my $data = $config->{data}) {
+    for my $key (sort keys %$data) {
+      $ENV{$key} = join ' ', grep defined, $data->{$key};
     }
-    if ($args[$i] =~ /^[<>]+$/) {
-      next;
+  }
+
+  if (my $vars = $config->{vars}) {
+    for my $key (sort keys %$vars) {
+      $ENV{$key} = join ' ', grep defined,
+        @{$self->resolve_command($config, $vars->{$key})};
     }
-    if ($args[$i] =~ /^\d[<>&]+\d?$/) {
-      next;
-    }
-    if ($args[$i] =~ /^\$[A-Z]\w+$/) {
-      $args[$i] = _vars($args[$i]);
-      next;
-    }
-    if ($args[$i] =~ /^\$\((.*)\)$/) {
-      if ($1) {
-        $args[$i] = "\$(@{[@{_prep($conf, $1)}]})";
+  }
+
+  if (my $asks = $config->{asks}) {
+    for my $key (sort keys %$asks) {
+      if (!defined $ENV{$key}) {
+        _print $asks->{$key}; my $input = _prompt;
+        $ENV{$key} = $input;
       }
+    }
+  }
+
+  return $config;
+}
+
+sub resolve {
+  my ($self, $config, @args) = @_;
+
+  if (!@args) {
+    return [];
+  }
+
+  my $item = shift @args;
+
+  my @resolved_with;
+
+  if (@args) {
+    @resolved_with = $self->resolve_with($config, $item, @args);
+  }
+
+  my @resolved;
+
+  if (!@resolved_with) {
+    @resolved = $self->resolve_recursive($config, $item);
+  }
+
+  my @resolved_flow;
+
+  if (@resolved) {
+    @resolved_flow = $self->resolve_flow($config, @resolved, @args);
+  }
+
+  my $results;
+
+  if (@resolved_with) {
+    $results = [@resolved_with];
+  }
+  elsif (@resolved_flow) {
+    $results = [@resolved_flow];
+  }
+  else {
+    $results = [scalar $self->resolve_command($config, @resolved, @args)];
+  }
+
+  return wantarray ? (@{$results}) : $results;
+}
+
+sub resolve_cache {
+  my ($self, $config, $item) = @_;
+
+  if (exists $self->cache->{$item}) {
+    return ref $self->cache->{$item}
+      ? $self->cache->{$item}
+      : $self->resolve_cache($config, $self->cache->{$item});
+  }
+  else {
+    return;
+  }
+}
+
+sub resolve_command {
+  my ($self, $config, @args) = @_;
+
+  my ($prog, @rest) = (@args);
+
+  my $path = $self->expand_prog($prog);
+
+  my @parts = grep defined, ($path || $prog), @rest;
+
+  $prog = $self->expand_vars(shift @parts);
+
+  for my $arg (@parts) {
+    if ($arg =~ /^(?:\|+|\&+|[<>]+|\d[<>&]+\d?)$/) {
       next;
     }
-    $args[$i] = Venus::Os->quote($args[$i]);
-  }
 
-  return [$prog ? ($prog, @args) : ()];
-}
-
-sub _split {
-  my ($text) = @_;
-
-  return (grep length, ($text // '') =~ /(?x)(?:"([^"]*)"|([^\s]*))\s?/g);
-}
-
-sub _set_conf {
-  my ($conf) = @_;
-
-  $conf = Venus::merge(Venus::Config->read_file(_vars($_))->value, $conf)
-    for (
-      $conf->{from}
-      ? ((ref $conf->{from} eq 'ARRAY') ? (@{$conf->{from}}) : ($conf->{from}))
-      : ()
-    );
-
-  if (exists $conf->{when}) {
-    require Venus::Os;
-
-    my $type = Venus::Os->type;
-
-    if (exists $conf->{when}{$type}) {
-      $conf = Venus::merge($conf, $conf->{when}{$type});
+    if ($arg =~ /^\$[A-Z]\w+$/) {
+      $arg = $self->expand_vars($arg);
     }
-  }
 
-  return $conf;
-}
-
-sub _set_libs {
-  my ($conf) = @_;
-
-  require Venus::Os;
-  require Venus::Path;
-
-  my %seen;
-  $ENV{PERL5LIB} = join((Venus::Os->is_win ? ';' : ':'),
-    (grep !$seen{$_}++, map Venus::Path->new(_vars($_))->absolute, _libs($conf)));
-
-  return $conf;
-}
-
-sub _set_path {
-  my ($conf) = @_;
-
-  require Venus::Os;
-  require Venus::Path;
-
-  if (my $path = $conf->{path}) {
-    $ENV{PATH} = join((Venus::Os->is_win ? ';' : ':'),
-      (map Venus::Path->new(_vars($_))->absolute, @{$conf->{path}}), $ENV{PATH});
-  }
-
-  return $conf;
-}
-
-sub _set_vars {
-  my ($conf) = @_;
-
-  if (my $data = $conf->{data}) {
-    for my $key (sort keys %{$data}) {
-      $ENV{$key} = join(' ', grep defined, $data->{$key});
+    if ($arg =~ /^\$\((.*)\)$/) {
+      $arg = "\$(@{[@{$self->prep($config, $1)}]})";
     }
+
+    $arg = Venus::Os->quote($arg);
   }
 
-  if (my $vars = $conf->{vars}) {
-    for my $key (sort keys %{$vars}) {
-      $ENV{$key} = join(' ', grep defined, @{_prep($conf, $vars->{$key})});
-    }
-  }
+  my $results = [$prog ? ($prog, @parts) : ()];
 
-  if (my $asks = $conf->{asks}) {
-    for my $key (sort keys %{$asks}) {
-      next if defined $ENV{$key}; _print $asks->{$key}; $ENV{$key} = _prompt;
-    }
-  }
-
-  return $conf;
+  return wantarray ? (@{$results}) : $results;
 }
 
-sub _vars {
-  (($_[0] // '') =~ s{\$([A-Z_]+)}{$ENV{$1}//"\$".$1}egr)
+sub resolve_exec {
+  my ($self, $config, $item) = @_;
+
+  if (exists $self->cache->{$item}) {
+    return $self->cache->{$item};
+  }
+
+  if (!($config->{exec} && exists $config->{exec}->{$item})) {
+    return;
+  }
+
+  return $self->cache->{$item} = $config->{exec}->{$item};
 }
 
-# AUTORUN
+sub resolve_find {
+  my ($self, $config, $item) = @_;
 
-auto Venus::Run sub {
+  if (exists $self->cache->{$item}) {
+    return $self->cache->{$item};
+  }
+
+  if (!($config->{find} && exists $config->{find}->{$item})) {
+    return;
+  }
+
+  return $self->cache->{$item} = $config->{find}->{$item};
+}
+
+sub resolve_flow {
+  my ($self, $config, $item, @args) = @_;
+
+  if (!($config->{flow} && $config->{flow}{$item})) {
+    return;
+  }
+
+  my @results = map {$self->resolve($config, $_, @args)} @{$config->{flow}{$item}};
+
+  return wantarray ? (@results) : [@results];
+}
+
+sub resolve_func {
+  my ($self, $config, $item) = @_;
+
+  if (exists $self->cache->{$item}) {
+    return $self->cache->{$item};
+  }
+
+  if (!($config->{func} && exists $config->{func}{$item})) {
+    return;
+  }
+
+  return $self->cache->{$item} = join ' ',
+    'perl', '-E', '(do("'.$config->{func}{$item}.'"))->(@ARGV)';
+}
+
+sub resolve_perl {
+  my ($self, $config, $item) = @_;
+
+  if (exists $self->cache->{$item}) {
+    return $self->cache->{$item};
+  }
+
+  if (!($config->{perl} && exists $config->{perl}{$item})) {
+    return;
+  }
+
+  my $perl = $config->{perl}{$item};
+  my @libs = map {$self->cache->{$_} = $_} @{$config->{libs} // []};
+  my @load = map {$self->cache->{$_} = $_} @{$config->{load} // []};
+
+  my $result = join ' ', $perl, @libs, @load;
+
+  $self->cache->{$item} = $self->cache->{$result} = [$perl, @libs, @load];
+
+  return $result;
+}
+
+sub resolve_recursive {
+  my ($self, $config, $item) = @_;
+
+  if (exists $self->cache->{$item}) {
+    return ref $self->cache->{$item} eq 'ARRAY'
+      ? (wantarray ? (@{$self->cache->{$item}}) : $self->cache->{$item})
+      : $self->cache->{$item};
+  }
+
+  my @parts = grep length, ($item // '') =~ /(?x)(?:"([^"]*)"|([^\s]*))\s?/g;
+
+  my @results;
+
+  for my $part (@parts) {
+    my $cached = exists $self->cache->{$part} ? 1 : 0;
+    my $recurse = $cached
+      ? (ref $self->cache->{$part} ? 0 : $self->cache->{$self->cache->{$part}})
+      : 0;
+    my $resolved
+      = $cached ? $self->cache->{$part} : $self->resolve_exec($config, $part)
+      // $self->resolve_func($config, $part)
+      // $self->resolve_task($config, $part)
+      // $self->resolve_vars($config, $part)
+      // $self->resolve_find($config, $part)
+      // $self->resolve_perl($config, $part);
+
+    push @results, Venus::list(
+      $resolved && ((!$cached && $resolved ne $part) || $recurse)
+        ? $self->resolve_recursive($config, $resolved)
+        : ($resolved // $part)
+      );
+  }
+
+  $self->cache->{$item} = [@results];
+
+  return wantarray ? (@results) : $self->cache->{$item};
+}
+
+sub resolve_task {
+  my ($self, $config, $item) = @_;
+
+  if (exists $self->cache->{$item}) {
+    return $self->cache->{$item};
+  }
+
+  if (!($config->{task} && exists $config->{task}{$item})) {
+    return;
+  }
+
+  return $self->cache->{$item} = $config->{task}{$item};
+}
+
+sub resolve_vars {
+  my ($self, $config, $item) = @_;
+
+  if (exists $self->cache->{$item}) {
+    return $self->cache->{$item};
+  }
+
+  my ($var) = $item =~ /^\$(\w+)$/;
+
+  if (!(defined $var && $config->{vars} && exists $config->{vars}{$var})) {
+    return;
+  }
+
+  return $self->cache->{$item} = $config->{vars}{$var};
+}
+
+sub resolve_with {
+  my ($self, $config, $item, @args) = @_;
+
+  if (!($config->{with} && exists $config->{with}->{$item})) {
+    return;
+  }
+
+  my $run = $self->from_file($config->{with}->{$item});
+
+  my $results = $run->resolve($run->config, @args);
+
+  return wantarray ? (@{$results}) : $results;
+}
+
+sub result {
+  my ($self, @args) = @_;
+
+  return $self->execute(@args);
+}
+
+# ROUTINES
+
+sub file {
   my ($self) = @_;
 
-  my $tryer = $self->tryer;
+  return $ENV{VENUS_FILE}
+      || (grep -f, map ".vns.$_", qw(yaml yml json js perl pl))[0]
+      || '.vns.pl';
+}
 
-  $tryer->catch('Venus::Json::Error', sub {
-    $self->log_error($_->render);
-  });
+sub find_config {
+  my ($self) = @_;
 
-  $tryer->catch('Venus::Path::Error', sub {
-    $self->log_error($_->render);
-  });
+  my $file = $self->file;
 
-  $tryer->catch('Venus::Yaml::Error', sub {
-    $self->log_error($_->render);
-  });
+  return -f $file ? $self->load_config($file) : $self->init_config;
+}
 
-  return $self;
-};
+sub from_file {
+  my ($self, $file) = @_;
+
+  $file ||= $self->file;
+
+  return $self->new(config => $self->load_config($file));
+}
+
+sub from_find {
+  my ($self) = @_;
+
+  return $self->new(config => $self->find_config);
+}
+
+sub from_hash {
+  my ($self, $data) = @_;
+
+  return $self->new(config => $data);
+}
+
+sub from_init {
+  my ($self) = @_;
+
+  return $self->new(config => $self->init_config);
+}
+
+sub init_config {
+  my ($self, @args) = @_;
+
+  return $init_config;
+}
+
+sub load_config {
+  my ($self, $file) = @_;
+
+  return Venus::Config->read_file($file)->value
+}
+
+sub new_cache {
+  my ($self) = @_;
+
+  return {};
+}
+
+sub new_config {
+  my ($self) = @_;
+
+  return $self->find_config;
+}
+
+sub new_handler {
+  my ($self) = @_;
+
+  return sub {
+    my $command = join ' ', @_;
+
+    if ($self->debug) {
+      _print("Using: $command");
+    }
+
+    my $result = _system($command);
+
+    if (!$result) {
+      _error("Error running command! $command");
+    }
+
+    return $result;
+  };
+}
 
 1;
 
 
-
 =head1 NAME
 
-Venus::Run - Runner Class
+Venus::Run - Run Class
 
 =cut
 
 =head1 ABSTRACT
 
-Runner Class for Perl 5
+Run Class for Perl 5
 
 =cut
 
@@ -825,222 +636,72 @@ Runner Class for Perl 5
 
 =head1 DESCRIPTION
 
-This package is a subclass of L<Venus::Task> which provides a command execution
-system. This package loads the configuration file used for defining tasks (i.e.
-command-line operations) which can recursively resolve, injects environment
-variables, resets the C<PATH> and C<PERL5LIB> variables where appropriate, and
-executes the tasks by name. See L<vns> for an executable file which loads this
+This package provides a modular command execution framework for Perl projects.
+It loads a configuration with commands, aliases, scripts, variables, and paths,
+and resolves them into full shell commands. This allows you to define reusable
+CLI behaviors using declarative config without writing wrappers or shell
+scripts. It supports layered configuration, caching, variable expansion, and
+recursive resolution, with support for custom flow control, Perl module
+injection, and user prompts. It also resets the C<PATH> and C<PERL5LIB>
+variables where appropriate. See L<vns> for an executable file which loads this
 package and provides the CLI. See L</FEATURES> for usage and configuration
 information.
 
 =cut
 
-=head1 INHERITS
+=head1 ATTRIBUTES
 
-This package inherits behaviors from:
-
-L<Venus::Task>
+This package has the following attributes:
 
 =cut
 
-=head1 METHODS
+=head2 cache
 
-This package provides the following methods:
+  cache(hashref $data) (hashref)
 
-=cut
+The cache attribute is used to store resolved values and avoid redundant
+computation during command expansion.
 
-=head2 args
-
-  args() (hashref)
-
-The args method returns the task argument declarations.
-
-I<Since C<2.91>>
+I<Since C<4.15>>
 
 =over 4
 
-=item args example 1
-
-  # given: synopsis
+=item cache example 1
 
   package main;
 
-  my $args = $run->args;
+  use Venus::Run;
 
-  # {
-  #   'command' => {
-  #     help => 'Command to run',
-  #     required => 1,
-  #   }
-  # }
+  my $run = Venus::Run->new;
 
-=back
-
-=cut
-
-=head2 cmds
-
-  cmds() (hashref)
-
-The cmds method returns the task command declarations.
-
-I<Since C<2.91>>
-
-=over 4
-
-=item cmds example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $cmds = $run->cmds;
-
-  # {
-  #   'help' => {
-  #     help => 'Display help and usages',
-  #     arg => 'command',
-  #   },
-  #   'init' => {
-  #     help => 'Initialize the configuration file',
-  #     arg => 'command',
-  #   },
-  # }
-
-=back
-
-=cut
-
-=head2 conf
-
-  conf() (hashref)
-
-The conf method loads the configuration file returned by L</file>, then decodes
-and returns the information as a hashref.
-
-I<Since C<2.91>>
-
-=over 4
-
-=item conf example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $conf = $run->conf;
+  my $cache = $run->cache;
 
   # {}
 
 =back
 
-=over 4
+=cut
 
-=item conf example 2
+=head2 config
 
-  # given: synopsis
+  config(hashref $data) (hashref)
 
-  package main;
+The config attribute is used to store the configuration used to resolve
+commands, variables, paths, and other runtime behavior.
 
-  local $ENV{VENUS_FILE} = 't/conf/.vns.pl';
-
-  my $conf = $run->conf;
-
-  # {...}
-
-=back
+I<Since C<4.15>>
 
 =over 4
 
-=item conf example 3
-
-  # given: synopsis
+=item config example 1
 
   package main;
 
-  # e.g. current directory has only a .vns.yaml file
+  use Venus::Run;
 
-  my $conf = $run->conf;
+  my $run = Venus::Run->new;
 
-  # {...}
-
-=back
-
-=over 4
-
-=item conf example 4
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.yml file
-
-  my $conf = $run->conf;
-
-  # {...}
-
-=back
-
-=over 4
-
-=item conf example 5
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.json file
-
-  my $conf = $run->conf;
-
-  # {...}
-
-=back
-
-=over 4
-
-=item conf example 6
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.js file
-
-  my $conf = $run->conf;
-
-  # {...}
-
-=back
-
-=over 4
-
-=item conf example 7
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.perl file
-
-  my $conf = $run->conf;
-
-  # {...}
-
-=back
-
-=over 4
-
-=item conf example 8
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.pl file
-
-  my $conf = $run->conf;
+  my $config = $run->config;
 
   # {...}
 
@@ -1048,165 +709,28 @@ I<Since C<2.91>>
 
 =cut
 
-=head2 file
+=head2 debug
 
-  file() (string)
+  debug(boolean $data) (boolean)
 
-The file method returns the configuration file specified in the C<VENUS_FILE>
-environment variable, or the discovered configuration file in the current
-directory. The default name for a configuration file is in the form of
-C<.vns.*>. Configuration files will be decoded based on their file extensions.
-Valid file extensions are C<yaml>, C<yml>, C<json>, C<js>, C<perl>, and C<pl>.
+The debug attribute is used to determine whether to output additional content
+for the purpose of debugging command execution.
 
-I<Since C<2.91>>
+I<Since C<4.15>>
 
 =over 4
 
-=item file example 1
-
-  # given: synopsis
+=item debug example 1
 
   package main;
 
-  my $file = $run->file;
+  use Venus::Run;
 
-  # undef
+  my $run = Venus::Run->new;
 
-=back
+  my $debug = $run->debug;
 
-=over 4
-
-=item file example 2
-
-  # given: synopsis
-
-  package main;
-
-  local $ENV{VENUS_FILE} = 't/conf/.vns.pl';
-
-  my $file = $run->file;
-
-  # "t/conf/.vns.pl"
-
-=back
-
-=over 4
-
-=item file example 3
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.yaml file
-
-  my $file = $run->file;
-
-  # ".vns.yaml"
-
-=back
-
-=over 4
-
-=item file example 4
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.yml file
-
-  my $file = $run->file;
-
-  # ".vns.yml"
-
-=back
-
-=over 4
-
-=item file example 5
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.json file
-
-  my $file = $run->file;
-
-  # ".vns.json"
-
-=back
-
-=over 4
-
-=item file example 6
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.js file
-
-  my $file = $run->file;
-
-  # ".vns.js"
-
-=back
-
-=over 4
-
-=item file example 7
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.perl file
-
-  my $file = $run->file;
-
-  # ".vns.perl"
-
-=back
-
-=over 4
-
-=item file example 8
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.pl file
-
-  my $file = $run->file;
-
-  # ".vns.pl"
-
-=back
-
-=cut
-
-=head2 footer
-
-  footer() (string)
-
-The footer method returns examples and usage information used in usage text.
-
-I<Since C<2.91>>
-
-=over 4
-
-=item footer example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $footer = $run->footer;
-
-  # "..."
+  # false
 
 =back
 
@@ -1214,12 +738,12 @@ I<Since C<2.91>>
 
 =head2 handler
 
-  handler(hashref $data) (any)
+  handler(coderef $data) (coderef)
 
-The handler method processes the data provided and executes the request then
-returns the invocant unless the program is exited.
+The handler attribute holds the callback (i.e. coderef) invoked for each step
+or command returned for a resolved command or expression.
 
-I<Since C<2.91>>
+I<Since C<4.15>>
 
 =over 4
 
@@ -1231,345 +755,538 @@ I<Since C<2.91>>
 
   my $run = Venus::Run->new;
 
-  $run->execute;
+  my $handler = $run->handler;
 
-  # ()
+  # sub {...}
 
 =back
 
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Role::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Optional>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 callback
+
+  callback(coderef $code, any @args) (any)
+
+The callback method executes a against each fully-resolved command derived from
+the given arguments. This method prepares the runtime environment by expanding
+variables, updating paths, and loading libraries as defined in the config. It
+resolves the given arguments into executable commands and passes each one to
+the callback in sequence. The callback receives the resolved program name
+followed by its arguments. Environment variables are restored to their original
+state after execution. Returns the result of the last successful callback
+execution, or C<undef> if none were executed.
+
+I<Since C<4.15>>
+
 =over 4
 
-=item handler example 2
+=item callback example 1
 
   package main;
 
   use Venus::Run;
 
-  my $run = Venus::Run->new(['help']);
+  my $run = Venus::Run->new;
 
-  $run->execute;
+  my $callback = $run->callback;
 
-  # ()
-
-=back
-
-=over 4
-
-=item handler example 3
-
-  package main;
-
-  use Venus::Run;
-
-  my $run = Venus::Run->new(['--help']);
-
-  $run->execute;
-
-  # ()
+  # undef
 
 =back
 
 =over 4
 
-=item handler example 4
+=item callback example 2
 
   package main;
 
   use Venus::Run;
 
-  my $run = Venus::Run->new(['init']);
+  my $run = Venus::Run->new;
 
-  $run->execute;
+  my $data;
 
-  # ()
+  $run->config({
+    exec => {
+      info => 'perl -V',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    perl => {
+      perl => 'perl',
+    },
+  });
+
+  my $callback = $run->callback(sub{join ' ', @_}, 'info');
+
+  # perl -Ilib -Ilocal/lib/perl5 -V
+
+=back
+
+=cut
+
+=head2 execute
+
+  execute(any @args) (any)
+
+The execute method L<"resolves"|/resolve> the argument(s) provided and executes
+L</callback> using the L</handler> for each fully-resolved command encountered.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item execute example 1
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  my $execute = $run->execute;
+
+  # undef
 
 =back
 
 =over 4
 
-=item handler example 5
+=item execute example 2
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  my $run = Venus::Run->new(['echo']);
+  $run->handler(sub{join ' ', @_});
 
-  $run->execute;
+  my $execute = $run->execute('perl');
 
-  # ()
-
-  # i.e. ['echo']
+  # ['perl']
 
 =back
 
 =over 4
 
-=item handler example 6
+=item execute example 3
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  # in config
-  #
-  # ---
-  # exec:
-  #   cpan: cpanm -llocal -qn
-  #
-  # ...
+  $run->config({
+    exec => {
+      info => 'perl -V',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    perl => {
+      perl => 'perl',
+    },
+  });
 
-  my $run = Venus::Run->new(['cpan', 'Venus']);
+  $run->handler(sub{join ' ', @_});
 
-  $run->execute;
+  my $execute = $run->execute('info');
 
-  # ()
+  # ['perl', "'-Ilib'", "'-Ilocal/lib/perl5'", "'-V'"]
 
-  # i.e. cpanm '-llocal' '-qn' Venus
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Run)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  # bless({...}, 'Venus::Run')
 
 =back
 
 =over 4
 
-=item handler example 7
+=item new example 2
 
   package main;
 
+  use Venus;
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new(debug => true);
 
-  # in config
-  #
-  # ---
-  # exec:
-  #   cpan: cpanm -llocal -qn
-  #   deps: cpan --installdeps .
-  #
-  # ...
-
-  my $run = Venus::Run->new(['cpan', '--installdeps', '.']);
-
-  $run->execute;
-
-  # ()
-
-  # i.e. cpanm '-llocal' '-qn' '--installdeps' '.'
+  # bless({...}, 'Venus::Run')
 
 =back
 
 =over 4
 
-=item handler example 8
+=item new example 3
+
+  package main;
+
+  use Venus;
+  use Venus::Run;
+
+  my $run = Venus::Run->new(debug => false, handler => sub {});
+
+  # bless({...}, 'Venus::Run')
+
+=back
+
+=cut
+
+=head2 resolve
+
+  resolve(hashref $config, any @data) (arrayref)
+
+The resolve method expands a given item or command by recursively resolving
+aliases, variables, and configuration entries into a full command string or
+array. This method returns a list in list context.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item resolve example 1
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  # in config
-  #
-  # ---
-  # exec:
-  #   okay: $PERL -c
-  #
-  # ...
-  #
-  # libs:
-  # - -Ilib
-  # - -Ilocal/lib/perl5
-  #
-  # ...
-  #
-  # vars:
-  #   PERL: perl
-  #
-  # ...
+  my $resolve = $run->resolve;
 
-  my $run = Venus::Run->new(['okay', 'lib/Venus.pm']);
-
-  $run->execute;
-
-  # ()
-
-  # i.e. perl '-Ilib' '-Ilocal/lib/perl5' '-c'
+  # []
 
 =back
 
 =over 4
 
-=item handler example 9
+=item resolve example 2
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  # in config
-  #
-  # ---
-  # exec:
-  #   repl: $REPL
-  #
-  # ...
-  #
-  # libs:
-  # - -Ilib
-  # - -Ilocal/lib/perl5
-  #
-  # ...
-  #
-  # vars:
-  #   PERL: perl
-  #   REPL: $PERL -dE0
-  #
-  # ...
+  my $resolve = $run->resolve({}, 'perl');
 
-  my $run = Venus::Run->new(['repl']);
-
-  $run->execute;
-
-  # ()
-
-  # i.e. perl '-Ilib' '-Ilocal/lib/perl5' '-dE0'
+  # [['perl']]
 
 =back
 
 =over 4
 
-=item handler example 10
+=item resolve example 3
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  # in config
-  #
-  # ---
-  # exec:
-  #   exec: $PERL
-  #
-  # ...
-  #
-  # libs:
-  # - -Ilib
-  # - -Ilocal/lib/perl5
-  #
-  # ...
-  #
-  # vars:
-  #   PERL: perl
-  #
-  # ...
+  my $config = {find => {perl => '/path/to/perl'}};
 
-  my $run = Venus::Run->new(['exec', '-MVenus=date', 'say date']);
+  my $resolve = $run->resolve($config, 'perl -c');
 
-  $run->execute;
-
-  # ()
-
-  # i.e. perl '-Ilib' '-Ilocal/lib/perl5' '-MVenus=date' 'say date'
+  # [['/path/to/perl', "'-c'"]]
 
 =back
 
 =over 4
 
-=item handler example 11
+=item resolve example 4
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  # in config
-  #
-  # ---
-  # exec:
-  #   test: $PROVE
-  #
-  # ...
-  #
-  # libs:
-  # - -Ilib
-  # - -Ilocal/lib/perl5
-  #
-  # ...
-  #
-  # vars:
-  #   PROVE: prove
-  #
-  # ...
+  my $config = {
+    exec => {
+      info => 'perl -V',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    perl => {
+      perl => 'perl',
+    },
+  };
 
-  my $run = Venus::Run->new(['test', 't']);
+  my $resolve = $run->resolve($config, 'info');
 
-  $run->execute;
-
-  # ()
-
-  # i.e. prove '-Ilib' '-Ilocal/lib/perl5' t
+  # [['perl', "'-Ilib'", "'-Ilocal/lib/perl5'", "'-V'"]]
 
 =back
 
 =over 4
 
-=item handler example 12
+=item resolve example 5
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  my $run = Venus::Run->new(['echo', 1, '|', 'less']);
+  my $config = {
+    exec => {
+      info => 'perl -V',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    load => [
+      '-MVenus',
+    ],
+    perl => {
+      perl => 'perl',
+    },
+  };
 
-  $run->execute;
+  my $resolve = $run->resolve($config, 'info');
 
-  # ()
-
-  # i.e. echo 1 | less
+  # [['perl', "'-Ilib'", "'-Ilocal/lib/perl5'", "'-MVenus'", "'-V'"]]
 
 =back
 
 =over 4
 
-=item handler example 13
+=item resolve example 6
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  my $run = Venus::Run->new(['echo', 1, '&&', 'echo', 2]);
+  my $config = {
+    exec => {
+      repl => '$REPL',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    load => [
+      '-MVenus',
+    ],
+    perl => {
+      perl => 'perl',
+    },
+    vars => {
+      REPL => 'perl -dE0',
+    },
+  };
 
-  $run->execute;
+  my $resolve = $run->resolve($config, 'repl');
 
-  # ()
-
-  # i.e. echo 1 && echo 2
+  # [['perl', "'-Ilib'", "'-Ilocal/lib/perl5'", "'-MVenus'", "'-dE0'"]]
 
 =back
 
 =over 4
 
-=item handler example 14
+=item resolve example 7
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  local $ENV{VENUS_FILE} = 't/conf/from.perl';
+  my $config = {
+    exec => {
+      eval => 'shim -E',
+      says => 'eval "map log(eval), @ARGV"',
+      shim => '$PERL -MVenus=true,false,log',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    perl => {
+      perl => 'perl',
+    },
+    vars => {
+      PERL => 'perl',
+    },
+  };
+
+  my $resolve = $run->resolve($config, 'says', 1);
+
+  # [['perl', "'-Ilib'", "'-Ilocal/lib/perl5'", "'-MVenus=true,false,log'", "'-E'", "\"map log(eval), \@ARGV\"", "'1'"]]
+
+=back
+
+=over 4
+
+=item resolve example 8
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  my $config = {
+    exec => {
+      cpan => 'cpanm -llocal -qn',
+    },
+  };
+
+  my $resolve = $run->resolve($config, 'cpan', 'Venus');
+
+  # [['cpanm', "'-llocal'", "'-qn'", "'Venus'"]]
+
+=back
+
+=over 4
+
+=item resolve example 9
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  my $config = {
+    exec => {
+      test => '$PROVE',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    perl => {
+      perl => 'perl',
+      prove => 'prove',
+    },
+    vars => {
+      PROVE => 'prove -j8',
+    },
+  };
+
+  my $resolve = $run->resolve($config, 'test', 't');
+
+  # [['prove', "'-Ilib'", "'-Ilocal/lib/perl5'", "'-j8'", "'t'"]]
+
+=back
+
+=over 4
+
+=item resolve example 10
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  my $config = {};
+
+  my $resolve = $run->resolve($config, 'echo 1 | less');
+
+  # [['echo', "'1'", '|', "'less'"]]
+
+=back
+
+=over 4
+
+=item resolve example 11
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  my $config = {};
+
+  my $resolve = $run->resolve($config, 'echo 1 && echo 2');
+
+  # [['echo', "'1'", '&&', 'echo', "'2'"]]
+
+=back
+
+=over 4
+
+=item resolve example 12
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  my $config = {};
+
+  my $resolve = $run->resolve($config, 'echo 1 || echo 2');
+
+  # [['echo', "'1'", '||', 'echo', "'2'"]]
+
+=back
+
+=over 4
+
+=item resolve example 13
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->from_file('t/conf/from.perl');
 
   # in config
   #
@@ -1590,27 +1307,23 @@ I<Since C<2.91>>
   #
   # ...
 
-  my $run = Venus::Run->new(['mypan']);
+  my $config = $run->prepare_conf($run->config);
 
-  $run->execute;
+  my $resolve = $run->resolve($config, 'mypan');
 
-  # ()
-
-  # i.e. cpanm '-llocal' '-qn' '-M' 'https://pkg.myapp.com'
+  # [['cpanm', "'-llocal'", "'-qn'", "'-M'", "'https://pkg.myapp.com'"]]
 
 =back
 
 =over 4
 
-=item handler example 15
+=item resolve example 14
 
   package main;
 
   use Venus::Run;
 
-  # on linux
-
-  local $ENV{VENUS_FILE} = 't/conf/with.perl';
+  my $run = Venus::Run->from_file('t/conf/with.perl');
 
   # in config
   #
@@ -1629,37 +1342,25 @@ I<Since C<2.91>>
   #
   # ...
 
-  my $run = Venus::Run->new(['psql', 'backup']);
+  my $config = $run->prepare_conf($run->config);
 
-  $run->execute;
+  my $resolve = $run->resolve($config, 'psql', 'backup');
 
-  # ()
-
-  # i.e. vns backup
+  # [['pg_backupcluster']]
 
 =back
 
 =over 4
 
-=item handler example 16
+=item resolve example 15
 
   package main;
 
   use Venus::Run;
 
-  # on linux
-
-  local $ENV{VENUS_FILE} = 't/conf/with.perl';
+  my $run = Venus::Run->from_file('t/conf/psql.perl');
 
   # in config
-  #
-  # ---
-  # with:
-  #   psql: /path/to/other
-  #
-  # ...
-
-  # in config (/path/to/other)
   #
   # ---
   # exec:
@@ -1668,33 +1369,23 @@ I<Since C<2.91>>
   #
   # ...
 
-  my $run = Venus::Run->new(['psql', 'backup']);
+  my $config = $run->prepare_conf($run->config);
 
-  $run->execute;
+  my $resolve = $run->resolve($config, 'backup');
 
-  # VENUS_FILE=t/conf/psql.perl vns backup
-
-  local $ENV{VENUS_FILE} = 't/conf/psql.perl';
-
-  $run = Venus::Run->new(['backup']);
-
-  $run->execute;
-
-  # ()
-
-  # i.e. pg_backupcluster
+  # [['pg_backupcluster']]
 
 =back
 
 =over 4
 
-=item handler example 17
+=item resolve example 16
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->from_file('t/conf/flow.perl');
 
   # in config
   #
@@ -1711,29 +1402,26 @@ I<Since C<2.91>>
   #
   # ...
 
-  local $ENV{VENUS_FILE} = 't/conf/flow.perl';
+  my $config = $run->prepare_conf($run->config);
 
-  my $run = Venus::Run->new(['setup-term']);
+  my $resolve = $run->resolve($config, 'setup-term');
 
-  $run->execute;
-
-  # ()
-
-  # i.e.
-  # cpanm '-llocal' '-qn' 'Term::ReadKey'
-  # cpanm '-llocal' '-qn' 'Term::ReadLine::Gnu'
+  # [
+  #   ['cpanm', "'-llocal'", "'-qn'", "'Term::ReadKey'"],
+  #   ['cpanm', "'-llocal'", "'-qn'", "'Term::ReadLine::Gnu'"],
+  # ]
 
 =back
 
 =over 4
 
-=item handler example 18
+=item resolve example 17
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->from_file('t/conf/asks.perl');
 
   # in config
   #
@@ -1743,27 +1431,23 @@ I<Since C<2.91>>
   #
   # ...
 
-  local $ENV{VENUS_FILE} = 't/conf/asks.perl';
+  my $config = $run->prepare_vars($run->prepare_conf($run->config));
 
-  my $run = Venus::Run->new(['echo', '$PASS']);
+  my $resolve = $run->resolve($config, 'echo', '$PASS');
 
-  $run->execute;
-
-  # ()
-
-  # i.e. echo '$PASS'
+  # [['echo', "'secret'"]]
 
 =back
 
 =over 4
 
-=item handler example 19
+=item resolve example 18
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->from_file('t/conf/func.perl');
 
   # in config
   #
@@ -1781,29 +1465,23 @@ I<Since C<2.91>>
   #   ...
   # }
 
-  local $ENV{VENUS_FILE} = 't/conf/func.perl';
+  my $config = $run->config;
 
-  my $run = Venus::Run->new(['dump', '--', 'hello']);
+  my $resolve = $run->resolve($config, 'dump', '--', 'hello');
 
-  $run->execute;
-
-  # ()
-
-  # i.e. perl -Ilib ... -E '(do "./t/path/etc/dump.pl")->(\@ARGV)' '--' hello
+  # [['echo', "'secret'"]]
 
 =back
 
 =over 4
 
-=item handler example 20
+=item resolve example 19
 
   package main;
 
   use Venus::Run;
 
-  # on linux
-
-  local $ENV{VENUS_FILE} = 't/conf/when.perl';
+  my $run = Venus::Run->from_file('t/conf/when.perl');
 
   # in config
   #
@@ -1818,33 +1496,29 @@ I<Since C<2.91>>
   #       OSNAME: LINUX
   #   is_win:
   #     data:
-  #       OSNAME: WINDOW
+  #       OSNAME: WINDOWS
   #
   # ...
 
-  my $run = Venus::Run->new(['name']);
+  # assume Linux OS
 
-  $run->execute;
+  my $config = $run->prepare_vars($run->prepare_conf($run->config));
 
-  # ()
+  my $resolve = $run->resolve($config, 'name');
 
-  # i.e. echo $OSNAME
-
-  # i.e. echo LINUX
+  # [['echo', "'LINUX'"]]
 
 =back
 
 =over 4
 
-=item handler example 21
+=item resolve example 20
 
   package main;
 
   use Venus::Run;
 
-  # on mswin32
-
-  local $ENV{VENUS_FILE} = 't/conf/when.perl';
+  my $run = Venus::Run->from_file('t/conf/when.perl');
 
   # in config
   #
@@ -1859,570 +1533,98 @@ I<Since C<2.91>>
   #       OSNAME: LINUX
   #   is_win:
   #     data:
-  #       OSNAME: WINDOW
+  #       OSNAME: WINDOWS
   #
   # ...
 
-  my $run = Venus::Run->new(['name']);
+  # assume Windows OS
 
-  $run->execute;
+  my $config = $run->prepare_vars($run->prepare_conf($run->config));
 
-  # ()
+  my $resolve = $run->resolve($config, 'name');
 
-  # i.e. echo $OSNAME
-
-  # i.e. echo WINDOWS
+  # [['echo', "'WINDOWS'"]]
 
 =back
 
+=cut
+
+=head2 result
+
+  result(any @args) (any)
+
+The result method is an alias for the L</execute> method, which executes the
+the L</handler> for each fully-resolved command based on the arguments
+provided.
+
+I<Since C<4.15>>
+
 =over 4
 
-=item handler example 22
+=item result example 1
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  local $ENV{VENUS_FILE} = 't/conf/help.perl';
+  my $result = $run->result;
 
-  # in config
-  #
-  # ---
-  # exec:
-  #   exec: perl -c
-  #
-  # ...
-  # help:
-  #   exec: Usage: perl -c <FILE>
-  #
-  # ...
-
-  my $run = Venus::Run->new(['help', 'exec']);
-
-  $run->execute;
-
-  # ()
-
-  # i.e. Usage: perl -c <FILE>
+  # undef
 
 =back
 
 =over 4
 
-=item handler example 23
+=item result example 2
 
   package main;
 
   use Venus::Run;
 
-  my $run = Venus::Run->new(['func', 'dump', 't/path/etc/dump.pl']);
+  my $run = Venus::Run->new;
 
-  $run->execute;
+  $run->handler(sub{join ' ', @_});
 
-  # ()
+  my $result = $run->result('perl');
+
+  # ['perl']
 
 =back
 
 =over 4
 
-=item handler example 24
+=item result example 3
 
   package main;
 
   use Venus::Run;
 
-  my $run = Venus::Run->new(['with', 'asks', 't/conf/asks.perl']);
+  my $run = Venus::Run->new;
 
-  $run->execute;
+  $run->config({
+    exec => {
+      info => 'perl -V',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    perl => {
+      perl => 'perl',
+    },
+  });
 
-  # ()
+  $run->handler(sub{join ' ', @_});
 
-=back
+  my $result = $run->result('info');
 
-=cut
-
-=head2 init
-
-  init() (hashref)
-
-The init method returns the default configuration to be used when initializing
-the system with a new configuration file.
-
-I<Since C<2.91>>
-
-=over 4
-
-=item init example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $init = $run->init;
-
-  # {
-  #   data => {
-  #     ECHO => 1,
-  #   },
-  #   exec => {
-  #     brew => 'perlbrew',
-  #     cpan => 'cpanm -llocal -qn',
-  #     docs => 'perldoc',
-  #     each => 'shim -nE',
-  #     edit => '$EDITOR $VENUS_FILE',
-  #     eval => 'shim -E',
-  #     exec => '$PERL',
-  #     info => '$PERL -V',
-  #     lint => 'perlcritic',
-  #     okay => '$PERL -c',
-  #     repl => '$REPL',
-  #     reup => 'cpanm -qn Venus',
-  #     says => 'eval "map log(eval), @ARGV"',
-  #     shim => '$PERL -MVenus=true,false,log',
-  #     test => '$PROVE',
-  #     tidy => 'perltidy',
-  #   },
-  #   libs => [
-  #     '-Ilib',
-  #     '-Ilocal/lib/perl5',
-  #   ],
-  #   path => [
-  #     './bin',
-  #     './dev',
-  #     './local/bin',
-  #   ],
-  #   perl => {
-  #     perl => 'perl',
-  #     prove => 'prove',
-  #   },
-  #   vars => {
-  #     PERL => 'perl',
-  #     PROVE => 'prove'
-  #     REPL => '$PERL -dE0'
-  #   },
-  # }
+  # ['perl', "'-Ilib'", "'-Ilocal/lib/perl5'", "'-V'"]
 
 =back
 
 =cut
-
-=head2 name
-
-  name() (string)
-
-The name method returns the default name for the task. This is used in usage
-text and can be controlled via the C<VENUS_TASK_NAME> environment variable, or
-the C<NAME> package variable.
-
-I<Since C<2.91>>
-
-=over 4
-
-=item name example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $name = $run->name;
-
-  # "Venus::Run"
-
-=back
-
-=over 4
-
-=item name example 2
-
-  # given: synopsis
-
-  package main;
-
-  local $ENV{VENUS_TASK_NAME} = 'venus-runner';
-
-  my $name = $run->name;
-
-  # "venus-runner"
-
-=back
-
-=over 4
-
-=item name example 3
-
-  # given: synopsis
-
-  package main;
-
-  local $Venus::Run::NAME = 'venus-runner';
-
-  my $name = $run->name;
-
-  # "venus-runner"
-
-=back
-
-=cut
-
-=head2 opts
-
-  opts() (hashref)
-
-The opts method returns the task options declarations.
-
-I<Since C<2.91>>
-
-=over 4
-
-=item opts example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $opts = $run->opts;
-
-  # {
-  #   'help' => {
-  #     help => 'Show help information',
-  #   }
-  # }
-
-=back
-
-=cut
-
-=head1 FEATURES
-
-This package provides the following features:
-
-=cut
-
-=over 4
-
-=item config
-
-The CLI provided by this package operates on a configuration file, typically
-having a base name of C<.vns> with a Perl, JSON, or YAML file extension. Here
-is an example of a configuration file using YAML with the filename
-C<.vns.yaml>.
-
-  ---
-  data:
-    ECHO: true
-  exec:
-    cpan: cpanm -llocal -qn
-    okay: $PERL -c
-    repl: $PERL -dE0
-    says: $PERL -E "map log(eval), @ARGV"
-    test: $PROVE
-  libs:
-  - -Ilib
-  - -Ilocal/lib/perl5
-  load:
-  - -MVenus=true,false
-  path:
-  - ./bin
-  - ./dev
-  - -Ilocal/bin
-  perl:
-    perl: perl
-    prove: prove
-  vars:
-    PERL: perl
-    PROVE: prove
-
-=back
-
-=over 4
-
-=item config-asks
-
-  ---
-  asks:
-    HOME: Enter your home dir
-
-The configuration file's C<asks> section provides a list of key/value pairs
-where the key is the name of the environment variable and the value is used as
-the message used by the CLI to prompt for input if the environment variable is
-not defined.
-
-=back
-
-=over 4
-
-=item config-data
-
-  ---
-  data:
-    ECHO: true
-
-The configuration file's C<data> section provides a non-dynamic list of
-key/value pairs that will be used as environment variables.
-
-=back
-
-=over 4
-
-=item config-exec
-
-  ---
-  exec:
-    okay: $PERL -c
-
-The configuration file's C<exec> section provides the main dynamic tasks which
-can be recursively resolved and expanded.
-
-=back
-
-=over 4
-
-=item config-find
-
-  ---
-  find:
-    cpanm: /usr/local/bin/cpanm
-
-The configuration file's C<find> section provides aliases which can be
-recursively resolved and expanded for use in other tasks.
-
-=back
-
-=over 4
-
-=item config-flow
-
-  ---
-  flow:
-    deps:
-    - cpan Term::ReadKey
-    - cpan Term::ReadLine::Gnu
-
-The configuration file's C<flow> section provides chainable tasks which are
-recursively resolved and expanded from other tasks.
-
-=back
-
-=over 4
-
-=item config-from
-
-  ---
-  from:
-  - /usr/share/vns/.vns.yaml
-
-The configuration file's C<from> section provides paths to other configuration
-files which will be merged before execution allowing the inheritance of of
-configuration values.
-
-=back
-
-=over 4
-
-=item config-func
-
-  ---
-  func:
-    build: ./scripts/build.pl
-
-The configuration file's C<func> section provides a list of static key/value
-pairs where the key is the "subcommand" passed to the runner as the first
-arugment, and the value is the Perl script that will be loaded and executed.
-The Perl script is expected to return a subroutine reference and will be passed
-an array reference to the arguments provided.
-
-=back
-
-=over 4
-
-=item config-help
-
-  ---
-  help:
-    build: Usage: vns build [<option>]
-
-The configuration file's C<help> section provides a list of static key/value
-pairs where the key is the "subcommand" to display help text for, and the value
-is the help text to be displayed.
-
-=back
-
-=over 4
-
-=item config-libs
-
-  ---
-  libs:
-  - -Ilib
-  - -Ilocal/lib/perl5
-
-The configuration file's C<libs> section provides a list of C<-I/path/to/lib>
-"include" statements that will be automatically added to tasks expanded from
-the C<perl> section.
-
-=back
-
-=over 4
-
-=item config-load
-
-  ---
-  load:
-  - -MVenus=true,false
-
-The configuration file's C<load> section provides a list of C<-MPackage>
-"import" statements that will be automatically added to tasks expanded from the
-C<perl> section.
-
-=back
-
-=over 4
-
-=item config-path
-
-  ---
-  path:
-  - ./bin
-  - ./dev
-  - -Ilocal/bin
-
-The configuration file's C<path> section provides a list of paths to be
-prepended to the C<PATH> environment variable which allows programs to be
-found.
-
-=back
-
-=over 4
-
-=item config-perl
-
-  ---
-  perl:
-    perl: perl
-
-The configuration file's C<perl> section provides the dynamic perl tasks which
-can serve as tasks with default commands (with options) and which can be
-recursively resolved and expanded.
-
-=back
-
-=over 4
-
-=item config-task
-
-  ---
-  task:
-    setup: $PERL -MMyApp::Task::Setup -E0 --
-
-The configuration file's C<task> section provides the dynamic perl tasks which
-"load" L<Venus::Task> derived packages, and which can be recursively resolved
-and expanded. These tasks will typically take the form of C<perl -Ilib
--MMyApp::Task -E0 --> and will be automatically executed as a CLI.
-
-=back
-
-=over 4
-
-=item config-vars
-
-  ---
-  vars:
-    PERL: perl
-
-The configuration file's C<vars> section provides a list of dynamic key/value
-pairs that can be recursively resolved and expanded and will be used as
-environment variables.
-
-=back
-
-=over 4
-
-=item config-when
-
-  ---
-  when:
-    is_lin:
-      data:
-        OSNAME: LINUX
-    is_win:
-      data:
-        OSNAME: WINDOWS
-
-The configuration file's C<when> section provides a configuration tree to be
-merged with the existing configuration based on the name current operating
-system. The C<is_$name> key should correspond to one of the types specified by
-L<Venus::Os/type>.
-
-=back
-
-=over 4
-
-=item config-with
-
-  ---
-  with:
-    psql: ./psql-tools/.vns.yml
-
-The configuration file's C<with> section provides a list of static key/value
-pairs where the key is the "subcommand" passed to the runner as the first
-arugment, and the value is the configuration file where the subcommand task
-definitions are defined which the runner dispatches to.
-
-=back
-
-=over 4
-
-=item vns-cli
-
-Here are example usages of the configuration file mentioned, executed by the
-L<vns> CLI, which is simply an executable file which loads this package.
-
-  # Mint a new configuration file
-  vns init
-
-  ...
-
-  # Mint a new JSON configuration file
-  VENUS_FILE=.vns.json vns init
-
-  # Mint a new YAML configuration file
-  VENUS_FILE=.vns.yaml vns init
-
-  ...
-
-  # Install a distribution
-  vns cpan $DIST
-
-  # i.e.
-  # cpanm --llocal -qn $DIST
-
-  # Check that a package can be compiled
-  vns okay $FILE
-
-  # i.e.
-  # perl -Ilib -Ilocal/lib/perl5 -c $FILE
-
-  # Use the Perl debugger as a REPL
-  vns repl
-
-  # i.e.
-  # perl -Ilib -Ilocal/lib/perl5 -dE0
-
-  # Evaluate arbitrary Perl expressions
-  vns exec ...
-
-  # i.e.
-  # perl -Ilib -Ilocal/lib/perl5 -MVenus=log -E $@
-
-  # Test the Perl project in the CWD
-  vns test t
-
-  # i.e.
-  # prove -Ilib -Ilocal/lib/perl5 t
-
-=back
 
 =head1 AUTHORS
 

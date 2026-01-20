@@ -5,6 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Role 'with';
 
 # METHODS
@@ -13,6 +15,18 @@ sub class {
   my ($self) = @_;
 
   return ref($self) || $self;
+}
+
+sub clone {
+  my ($self) = @_;
+
+  require Storable;
+
+  local $Storable::Deparse = 1;
+
+  local $Storable::Eval = 1;
+
+  return Storable::dclone($self);
 }
 
 sub meta {
@@ -26,7 +40,7 @@ sub meta {
 sub reify {
   my ($self, $method, @args) = @_;
 
-  return $self->type($method, @args)->deduce;
+  return $self->what($method, @args)->deduce;
 }
 
 sub space {
@@ -37,23 +51,23 @@ sub space {
   return Venus::Space->new($self->class);
 }
 
-sub type {
+sub what {
   my ($self, $method, @args) = @_;
 
-  require Venus::Type;
+  require Venus::What;
 
   local $_ = $self;
 
   my $value = $method
     ? $self->$method(@args) : $self->can('value') ? $self->value : $self;
 
-  return Venus::Type->new(value => $value);
+  return Venus::What->new(value => $value);
 }
 
 # EXPORTS
 
 sub EXPORT {
-  ['class', 'meta', 'reify', 'space', 'type']
+  ['class', 'clone', 'meta', 'reify', 'space', 'what']
 }
 
 1;
@@ -122,6 +136,30 @@ I<Since C<0.01>>
   my $class = $example->class;
 
   # "Example"
+
+=back
+
+=cut
+
+=head2 clone
+
+  clone() (object)
+
+The clone method clones the invocant and returns the result.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item clone example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $clone = $example->clone;
+
+  # bless(..., "Example")
 
 =back
 
@@ -224,36 +262,36 @@ I<Since C<0.01>>
 
 =cut
 
-=head2 type
+=head2 what
 
-  type(string | coderef $code, any @args) (Venus::Type)
+  what(string | coderef $code, any @args) (Venus::What)
 
-The type method dispatches the method call or executes the callback and returns
-the result as a L<Venus::Type> object.
+The what method dispatches the method call or executes the callback and returns
+the result as a L<Venus::What> object.
 
 I<Since C<0.01>>
 
 =over 4
 
-=item type example 1
+=item what example 1
 
   # given: synopsis;
 
-  my $type = $example->type;
+  my $what = $example->what;
 
-  # bless({ value => bless({}, "Example") }, "Venus::Type")
+  # bless({ value => bless({}, "Example") }, "Venus::What")
 
 =back
 
 =over 4
 
-=item type example 2
+=item what example 2
 
   # given: synopsis;
 
-  my $type = $example->type('class');
+  my $what = $example->what('class');
 
-  # bless({ value => "Example" }, "Venus::Type")
+  # bless({ value => "Example" }, "Venus::What")
 
 =back
 

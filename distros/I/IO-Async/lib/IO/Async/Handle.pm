@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2006-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Handle 0.804;
+package IO::Async::Handle 0.805;
 
 use v5.14;
 use warnings;
@@ -23,6 +23,8 @@ use IO::Async::OS;
 C<IO::Async::Handle> - event callbacks for a non-blocking file descriptor
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
 This class is likely not to be used directly, because subclasses of it exist
 to handle more specific cases. Here is an example of how it would be used to

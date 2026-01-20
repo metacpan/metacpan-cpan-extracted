@@ -1,6 +1,7 @@
 CHANGES
 cpanfile
 eg/remote.pl
+eg/decode.pl
 lib/Protocol/Sys/Virt.pm
 lib/Protocol/Sys/Virt/KeepAlive.pm
 lib/Protocol/Sys/Virt/KeepAlive/XDR.pm

@@ -53,6 +53,7 @@ method: coded
 method: coderef
 method: consumes
 method: defined
+method: dirhandle
 method: either
 method: enum
 method: eval
@@ -60,7 +61,9 @@ method: evaled
 method: evaler
 method: fail
 method: failed
+method: filehandle
 method: float
+method: glob
 method: hash
 method: hashkeys
 method: hashref
@@ -69,6 +72,7 @@ method: includes
 method: inherits
 method: integrates
 method: maybe
+method: new
 method: number
 method: object
 method: package
@@ -82,9 +86,9 @@ method: scalar
 method: scalarref
 method: string
 method: tuple
-method: type
 method: undef
 method: value
+method: what
 method: within
 method: yesno
 
@@ -394,7 +398,7 @@ $test->for('example', 4, 'accept', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', 12345);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -519,7 +523,7 @@ $test->for('example', 4, 'array', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {1..4});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -644,7 +648,7 @@ $test->for('example', 4, 'arrayref', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {1..4});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -800,7 +804,7 @@ $test->for('example', 4, 'attributes', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   require Venus::Space;
   Venus::Space->new('Example')->unload;
@@ -837,7 +841,7 @@ $test->for('example', 5, 'attributes', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', Example->new);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_pairs';
+  is $return->name, 'on.pairs';
 
   require Venus::Space;
   Venus::Space->new('Example')->unload;
@@ -872,7 +876,7 @@ $test->for('example', 6, 'attributes', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', Example->new);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_missing';
+  is $return->name, 'on.missing';
 
   require Venus::Space;
   Venus::Space->new('Example')->unload;
@@ -909,7 +913,7 @@ $test->for('example', 7, 'attributes', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', Example->new(name => rand));
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   require Venus::Space;
   Venus::Space->new('Example')->unload;
@@ -1046,7 +1050,7 @@ $test->for('example', 4, 'bool', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', 1);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -1180,7 +1184,7 @@ $test->for('example', 4, 'boolean', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', 1);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -1381,7 +1385,7 @@ $test->for('example', 4, 'code', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -1389,7 +1393,7 @@ $test->for('example', 4, 'code', sub {
 =method coded
 
 The coded method accepts a value and a type name returns the result of a
-L<Venus::Type/coded> operation.
+L<Venus::What/coded> operation.
 
 =signature coded
 
@@ -1564,7 +1568,7 @@ $test->for('example', 4, 'coderef', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -1717,7 +1721,7 @@ $test->for('example', 4, 'consumes', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -1751,7 +1755,7 @@ $test->for('example', 5, 'consumes', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', Example->new);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_consumes';
+  is $return->name, 'on.consumes';
 
   require Venus::Space;
   Venus::Space->new('Example')->unload;
@@ -1880,7 +1884,152 @@ $test->for('example', 4, 'defined', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', undef);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_defined';
+  is $return->name, 'on.defined';
+
+  $result
+});
+
+=method dirhandle
+
+The dirhandle method configures the object to accept dirhandles and returns the
+invocant.
+
+=signature dirhandle
+
+  dirhandle(coderef @code) (Venus::Check)
+
+=metadata dirhandle
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 dirhandle
+
+  # given: synopsis
+
+  package main;
+
+  $check = $check->dirhandle;
+
+  # bless(..., 'Venus::Check')
+
+  # opendir my $dh, './t';
+
+  # my $result = $check->eval($dh);
+
+  # true
+
+=cut
+
+# Unsupported on Windows: The dirfd function is unimplemented
+$test->skip_if('os_is_win')->for('example', 1, 'dirhandle', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok $result->isa('Venus::Check');
+  opendir my $dh, './t';
+  is $result->eval($dh), true;
+  is $result->eval(\*STDIN), false;
+  is $result->eval(\*STDOUT), false;
+  is $result->eval(\*STDERR), false;
+
+  $result
+});
+
+=example-2 dirhandle
+
+  # given: synopsis
+
+  package main;
+
+  $check = $check->dirhandle;
+
+  # bless(..., 'Venus::Check')
+
+  # opendir my $dh, './xyz';
+
+  # my $result = $check->eval($dh);
+
+  # false
+
+=cut
+
+# Unsupported on Windows: The dirfd function is unimplemented
+$test->skip_if('os_is_win')->for('example', 2, 'dirhandle', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok $result->isa('Venus::Check');
+  opendir my $dh, './xyz';
+  is $result->eval($dh), false;
+  is $result->eval(\*STDIN), false;
+  is $result->eval(\*STDOUT), false;
+  is $result->eval(\*STDERR), false;
+
+  $result
+});
+
+=example-3 dirhandle
+
+  # given: synopsis
+
+  package main;
+
+  $check = $check->dirhandle;
+
+  # bless(..., 'Venus::Check')
+
+  # opendir my $dh, './t';
+
+  # my $result = $check->result($dh);
+
+  # \*{'::$dh'}
+
+=cut
+
+# Unsupported on Windows: The dirfd function is unimplemented
+$test->skip_if('os_is_win')->for('example', 3, 'dirhandle', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok $result->isa('Venus::Check');
+  opendir my $dh, './t';
+  is $result->result($dh), $dh;
+
+  $result
+});
+
+=example-4 dirhandle
+
+  # given: synopsis
+
+  package main;
+
+  $check = $check->dirhandle;
+
+  # bless(..., 'Venus::Check')
+
+  # opendir my $dh, './xyz';
+
+  # my $result = $check->result($dh);
+
+  # Exception! (isa Venus::Check::Error) (see error_on_dirhandle)
+
+=cut
+
+# Unsupported on Windows: The dirfd function is unimplemented
+$test->skip_if('os_is_win')->for('example', 4, 'dirhandle', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok $result->isa('Venus::Check');
+  opendir my $dh, './xyz';
+  my $return = $result->catch('result', $dh);
+  ok $return->isa('Venus::Check::Error');
+  is $return->name, 'on.dirhandle';
 
   $result
 });
@@ -2005,7 +2154,7 @@ $test->for('example', 4, 'either', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', rand);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_either';
+  is $return->name, 'on.either';
 
   $result
 });
@@ -2130,7 +2279,7 @@ $test->for('example', 4, 'enum', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', undef);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_defined';
+  is $return->name, 'on.defined';
 
   $result
 });
@@ -2158,7 +2307,7 @@ $test->for('example', 5, 'enum', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', 'purple');
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_enum';
+  is $return->name, 'on.enum';
 
   $result
 });
@@ -2467,6 +2616,147 @@ $test->for('example', 3, 'failed', sub {
   !$result
 });
 
+=method filehandle
+
+The filehandle method configures the object to accept filehandles and returns the
+invocant.
+
+=signature filehandle
+
+  filehandle(coderef @code) (Venus::Check)
+
+=metadata filehandle
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 filehandle
+
+  # given: synopsis
+
+  package main;
+
+  $check = $check->filehandle;
+
+  # bless(..., 'Venus::Check')
+
+  # open my $fh, './t/Venus.t';
+
+  # my $result = $check->eval($fh);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'filehandle', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok $result->isa('Venus::Check');
+  open my $fh, '<', './t/Venus.t';
+  is $result->eval($fh), true;
+  is $result->eval(\*STDIN), true;
+  is $result->eval(\*STDOUT), true;
+  is $result->eval(\*STDERR), true;
+
+  $result
+});
+
+=example-2 filehandle
+
+  # given: synopsis
+
+  package main;
+
+  $check = $check->filehandle;
+
+  # bless(..., 'Venus::Check')
+
+  # open my $fh, './xyz/Venus.t';
+
+  # my $result = $check->eval($fh);
+
+  # false
+
+=cut
+
+$test->for('example', 2, 'filehandle', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok $result->isa('Venus::Check');
+  open my $fh, '<', './xyz/Venus.t';
+  is $result->eval($fh), false;
+  is $result->eval(\*STDIN), true;
+  is $result->eval(\*STDOUT), true;
+  is $result->eval(\*STDERR), true;
+
+  $result
+});
+
+=example-3 filehandle
+
+  # given: synopsis
+
+  package main;
+
+  $check = $check->filehandle;
+
+  # bless(..., 'Venus::Check')
+
+  # open my $fh, './t/Venus.t';
+
+  # my $result = $check->result($fh);
+
+  # \*{'::$fh'}
+
+=cut
+
+$test->for('example', 3, 'filehandle', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok $result->isa('Venus::Check');
+  open my $fh, '<', './t/Venus.t';
+  is $result->result($fh), $fh;
+
+  $result
+});
+
+=example-4 filehandle
+
+  # given: synopsis
+
+  package main;
+
+  $check = $check->filehandle;
+
+  # bless(..., 'Venus::Check')
+
+  # open my $fh, './xyz/Venus.t';
+
+  # my $result = $check->result($fh);
+
+  # Exception! (isa Venus::Check::Error) (see error_on_filehandle)
+
+=cut
+
+$test->for('example', 4, 'filehandle', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok $result->isa('Venus::Check');
+  open my $fh, '<', './xyz/Venus.t';
+  my $return = $result->catch('result', $fh);
+  ok $return->isa('Venus::Check::Error');
+  is $return->name, 'on.filehandle';
+
+  $result
+});
+
 =method float
 
 The float method configures the object to accept floating-point values and
@@ -2590,7 +2880,133 @@ $test->for('example', 4, 'float', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', 12345);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
+
+  $result
+});
+
+=method glob
+
+The glob method configures the object to accept typeglobs and returns the
+invocant.
+
+=signature glob
+
+  glob(coderef @code) (Venus::Check)
+
+=metadata glob
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 glob
+
+  # given: synopsis
+
+  package main;
+
+  $check = $check->glob;
+
+  # bless(..., 'Venus::Check')
+
+  # my $result = $check->eval(\*main);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'glob', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok $result->isa('Venus::Check');
+  is $result->eval(\*main), true;
+  is $result->eval(0), false;
+  is $result->eval({}), false;
+  is $result->eval(bless{}), false;
+
+  $result
+});
+
+=example-2 glob
+
+  # given: synopsis
+
+  package main;
+
+  $check = $check->glob;
+
+  # bless(..., 'Venus::Check')
+
+  # my $result = $check->eval(*main);
+
+  # false
+
+=cut
+
+$test->for('example', 2, 'glob', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok $result->isa('Venus::Check');
+  is $result->eval(*main), false;
+
+  $result
+});
+
+=example-3 glob
+
+  # given: synopsis
+
+  package main;
+
+  $check = $check->glob;
+
+  # bless(..., 'Venus::Check')
+
+  # my $result = $check->result(\*main);
+
+  # \*::main
+
+=cut
+
+$test->for('example', 3, 'glob', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok $result->isa('Venus::Check');
+  is $result->result(\*main), \*main;
+
+  $result
+});
+
+=example-4 glob
+
+  # given: synopsis
+
+  package main;
+
+  $check = $check->glob;
+
+  # bless(..., 'Venus::Check')
+
+  # my $result = $check->result(*main);
+
+  # Exception! (isa Venus::Check::Error) (see error_on_typeglob)
+
+=cut
+
+$test->for('example', 4, 'glob', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok $result->isa('Venus::Check');
+  my $return = $result->catch('result', *main);
+  ok $return->isa('Venus::Check::Error');
+  is $return->name, 'on.typeglob';
 
   $result
 });
@@ -2715,7 +3131,7 @@ $test->for('example', 4, 'hash', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', []);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -2840,7 +3256,7 @@ $test->for('example', 4, 'hashkeys', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', undef);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_defined';
+  is $return->name, 'on.defined';
 
   $result
 });
@@ -2868,7 +3284,7 @@ $test->for('example', 5, 'hashkeys', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', []);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_hashref';
+  is $return->name, 'on.hashref';
 
   $result
 });
@@ -2896,7 +3312,7 @@ $test->for('example', 6, 'hashkeys', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {rand => rand});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_pairs';
+  is $return->name, 'on.pairs';
 
   $result
 });
@@ -2924,7 +3340,7 @@ $test->for('example', 7, 'hashkeys', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {rndm => rand});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_missing';
+  is $return->name, 'on.missing';
 
   $result
 });
@@ -3049,7 +3465,7 @@ $test->for('example', 4, 'hashref', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', []);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -3177,7 +3593,7 @@ $test->for('example', 4, 'identity', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -3207,7 +3623,7 @@ $test->for('example', 5, 'identity', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', Venus::Config->new);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_identity';
+  is $return->name, 'on.identity';
 
   $result
 });
@@ -3332,7 +3748,7 @@ $test->for('example', 4, 'includes', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', 1);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_includes';
+  is $return->name, 'on.includes';
 
   $result
 });
@@ -3459,7 +3875,7 @@ $test->for('example', 4, 'inherits', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -3487,7 +3903,7 @@ $test->for('example', 5, 'inherits', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', Venus::Check->new);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_inherits';
+  is $return->name, 'on.inherits';
 
   $result
 });
@@ -3614,7 +4030,7 @@ $test->for('example', 4, 'integrates', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -3642,7 +4058,7 @@ $test->for('example', 5, 'integrates', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', Venus::Check->new);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_consumes';
+  is $return->name, 'on.consumes';
 
   $result
 });
@@ -3769,7 +4185,7 @@ $test->for('example', 4, 'maybe', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', 0);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_either';
+  is $return->name, 'on.either';
 
   $result
 });
@@ -3797,7 +4213,43 @@ $test->for('example', 5, 'maybe', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', []);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_either';
+  is $return->name, 'on.either';
+
+  $result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Check)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Check;
+
+  my $new = Venus::Check->new;
+
+  # bless(..., "Venus::Check")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Check');
 
   $result
 });
@@ -3924,7 +4376,7 @@ $test->for('example', 4, 'number', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', 1.234);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -4050,7 +4502,7 @@ $test->for('example', 4, 'object', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -4175,7 +4627,7 @@ $test->for('example', 4, 'package', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', 0);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -4203,7 +4655,7 @@ $test->for('example', 5, 'package', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', 'main');
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_package';
+  is $return->name, 'on.package';
 
   $result
 });
@@ -4231,7 +4683,7 @@ $test->for('example', 6, 'package', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', 'MyApp::Check');
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_package_loaded';
+  is $return->name, 'on.package.loaded';
 
   $result
 });
@@ -4478,7 +4930,7 @@ $test->for('example', 4, 'reference', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', undef);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_defined';
+  is $return->name, 'on.defined';
 
   $result
 });
@@ -4506,7 +4958,7 @@ $test->for('example', 5, 'reference', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', '');
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_reference';
+  is $return->name, 'on.reference';
 
   $result
 });
@@ -4634,7 +5086,7 @@ $test->for('example', 4, 'regexp', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', '');
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -4696,7 +5148,7 @@ $test->for('example', 2, 'result', sub {
   my $result = $tryable->error->result;
   ok defined $result;
   ok $result->isa('Venus::Check::Error');
-  is $result->name, 'on_coded';
+  is $result->name, 'on.coded';
 
   $result
 });
@@ -4827,7 +5279,7 @@ $test->for('example', 4, 'routines', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -4857,7 +5309,7 @@ $test->for('example', 5, 'routines', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', Venus::Config->new);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_missing';
+  is $return->name, 'on.missing';
 
   $result
 });
@@ -4984,7 +5436,7 @@ $test->for('example', 4, 'scalar', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', '');
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -5111,7 +5563,7 @@ $test->for('example', 4, 'scalarref', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', '');
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -5239,7 +5691,7 @@ $test->for('example', 4, 'string', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', 12345);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -5371,7 +5823,7 @@ $test->for('example', 4, 'tuple', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', undef);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_defined';
+  is $return->name, 'on.defined';
 
   $result
 });
@@ -5399,7 +5851,7 @@ $test->for('example', 5, 'tuple', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_arrayref';
+  is $return->name, 'on.arrayref';
 
   $result
 });
@@ -5427,105 +5879,7 @@ $test->for('example', 6, 'tuple', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', []);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_arrayref_count';
-
-  $result
-});
-
-=method type
-
-The type method returns the canonical data type name for the value provided.
-
-=signature type
-
-  type(any $data) (string)
-
-=metadata type
-
-{
-  since => '3.55',
-}
-
-=example-1 type
-
-  # given: synopsis
-
-  package main;
-
-  my $type = $check->type({});
-
-  # 'hashref'
-
-=cut
-
-$test->for('example', 1, 'type', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  ok defined $result;
-  is $result, 'hashref';
-
-  $result
-});
-
-=example-2 type
-
-  # given: synopsis
-
-  package main;
-
-  my $type = $check->type([]);
-
-  # 'arrayref'
-
-=cut
-
-$test->for('example', 2, 'type', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  ok defined $result;
-  is $result, 'arrayref';
-
-  $result
-});
-
-=example-3 type
-
-  # given: synopsis
-
-  package main;
-
-  my $type = $check->type('Venus::Check');
-
-  # 'string'
-
-=cut
-
-$test->for('example', 3, 'type', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  ok defined $result;
-  is $result, 'string';
-
-  $result
-});
-
-=example-4 type
-
-  # given: synopsis
-
-  package main;
-
-  my $type = $check->type(Venus::Check->new);
-
-  # 'object'
-
-=cut
-
-$test->for('example', 4, 'type', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  ok defined $result;
-  is $result, 'object';
+  is $return->name, 'on.arrayref.count';
 
   $result
 });
@@ -5652,7 +6006,7 @@ $test->for('example', 4, 'undef', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', '');
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -5780,7 +6134,7 @@ $test->for('example', 4, 'value', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', undef);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_defined';
+  is $return->name, 'on.defined';
 
   $result
 });
@@ -5808,7 +6162,105 @@ $test->for('example', 5, 'value', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_value';
+  is $return->name, 'on.value';
+
+  $result
+});
+
+=method what
+
+The type method returns the canonical data type name for the value provided.
+
+=signature what
+
+  what(any $data) (string)
+
+=metadata what
+
+{
+  since => '3.55',
+}
+
+=example-1 what
+
+  # given: synopsis
+
+  package main;
+
+  my $what = $check->what({});
+
+  # 'hashref'
+
+=cut
+
+$test->for('example', 1, 'what', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 'hashref';
+
+  $result
+});
+
+=example-2 what
+
+  # given: synopsis
+
+  package main;
+
+  my $what = $check->what([]);
+
+  # 'arrayref'
+
+=cut
+
+$test->for('example', 2, 'what', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 'arrayref';
+
+  $result
+});
+
+=example-3 what
+
+  # given: synopsis
+
+  package main;
+
+  my $what = $check->what('Venus::Check');
+
+  # 'string'
+
+=cut
+
+$test->for('example', 3, 'what', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 'string';
+
+  $result
+});
+
+=example-4 what
+
+  # given: synopsis
+
+  package main;
+
+  my $what = $check->what(Venus::Check->new);
+
+  # 'object'
+
+=cut
+
+$test->for('example', 4, 'what', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 'object';
 
   $result
 });
@@ -5816,10 +6268,12 @@ $test->for('example', 5, 'value', sub {
 =method within
 
 The within method configures the object, registering a constraint action as a
-sub-match operation, to accept array or hash based values, and returns a new
-L<Venus::Check> instance for the sub-match operation (not the invocant). This
-operation can traverse blessed array or hash based values. The value being
-evaluated must contain at-least one element to match.
+sub-match operation, to accept array references, hash references, or mappable
+values (see L<Venus::Role::Mappable>), and returns a new L<Venus::Check>
+instance for the sub-match operation (not the invocant). This operation can
+traverse blessed array or hash based values, or objects derived from classes
+which consume the "mappable" role. The value being evaluated must contain
+at-least one element to match.
 
 =signature within
 
@@ -5960,7 +6414,7 @@ $test->for('example', 4, 'within', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', undef);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_defined';
+  is $return->name, 'on.defined';
 
   $result
 });
@@ -5992,7 +6446,7 @@ $test->for('example', 5, 'within', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_arrayref';
+  is $return->name, 'on.arrayref';
 
   $result
 });
@@ -6024,7 +6478,7 @@ $test->for('example', 6, 'within', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', []);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_arrayref_count';
+  is $return->name, 'on.arrayref.count';
 
   $result
 });
@@ -6056,7 +6510,7 @@ $test->for('example', 7, 'within', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', [rand]);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
 
   $result
 });
@@ -6179,7 +6633,7 @@ $test->for('example', 11, 'within', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', undef);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_defined';
+  is $return->name, 'on.defined';
 
   $result
 });
@@ -6211,7 +6665,7 @@ $test->for('example', 12, 'within', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', []);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_hashref';
+  is $return->name, 'on.hashref';
 
   $result
 });
@@ -6243,7 +6697,7 @@ $test->for('example', 13, 'within', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_hashref_empty';
+  is $return->name, 'on.hashref.empty';
 
   $result
 });
@@ -6275,7 +6729,105 @@ $test->for('example', 14, 'within', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', {title => rand});
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_coded';
+  is $return->name, 'on.coded';
+
+  $result
+});
+
+=example-15 within
+
+  # given: synopsis
+
+  package main;
+
+  my $within = $check->within('Venus::Hash', 'string');
+
+  # bless(..., 'Venus::Check')
+
+  $check;
+
+  # bless(..., 'Venus::Check')
+
+  # my $result = $check->result({title => 'engineer'});
+
+  # Exception! (isa Venus::Check::Error) (see error_on_mappable_isa)
+
+=cut
+
+$test->for('example', 15, 'within', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok $result->isa('Venus::Check');
+  my $return = $result->catch('result', {title => 'engineer'});
+  ok $return->isa('Venus::Check::Error');
+  is $return->name, 'on.mappable.isa';
+
+  $result
+});
+
+=example-16 within
+
+  # given: synopsis
+
+  package main;
+
+  use Venus::Hash;
+
+  my $within = $check->within('Venus::Hash', 'string');
+
+  # bless(..., 'Venus::Check')
+
+  $check;
+
+  # bless(..., 'Venus::Check')
+
+  # my $result = $check->result(Venus::Hash->new);
+
+  # Exception! (isa Venus::Check::Error) (see error_on_mappable_empty)
+
+=cut
+
+$test->for('example', 16, 'within', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok $result->isa('Venus::Check');
+  my $return = $result->catch('result', Venus::Hash->new);
+  ok $return->isa('Venus::Check::Error');
+  is $return->name, 'on.mappable.empty';
+
+  $result
+});
+
+=example-17 within
+
+  # given: synopsis
+
+  package main;
+
+  use Venus::Hash;
+
+  my $within = $check->within('Venus::Hash', 'string');
+
+  # bless(..., 'Venus::Check')
+
+  $check;
+
+  # bless(..., 'Venus::Check')
+
+  # my $result = $check->eval(Venus::Hash->new({title => 'engineer'}));
+
+  # true
+
+=cut
+
+$test->for('example', 17, 'within', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok $result->isa('Venus::Check');
+  is $result->eval(Venus::Hash->new({title => 'engineer'})), true;
 
   $result
 });
@@ -6406,7 +6958,7 @@ $test->for('example', 4, 'yesno', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', undef);
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_defined';
+  is $return->name, 'on.defined';
 
   $result
 });
@@ -6434,1232 +6986,473 @@ $test->for('example', 5, 'yesno', sub {
   ok $result->isa('Venus::Check');
   my $return = $result->catch('result', 'yup');
   ok $return->isa('Venus::Check::Error');
-  is $return->name, 'on_yesno';
+  is $return->name, 'on.yesno';
 
   $result
 });
 
-=error error_on_arrayref
-
-This package may raise an error_on_arrayref exception.
-
-=cut
-
-$test->for('error', 'error_on_arrayref');
-
-=example-1 error_on_arrayref
+=raise result Venus::Check::Error on.arrayref
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    throw => 'error_on_arrayref',
-  };
+  $check->tuple('string');
 
-  my $error = $check->catch('error', $input);
+  $check->result({});
 
-  # my $name = $error->name;
-
-  # "on_arrayref"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, value provided is not an arrayref or arrayref derived, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
+  # Error! (on.arrayref)
 
 =cut
 
-$test->for('example', 1, 'error_on_arrayref', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.arrayref', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Check::Error';
-  my $name = $result->name;
-  is $name, "on_arrayref";
-  my $message = $result->render;
-  is $message, "Failed checking test, value provided is not an arrayref or arrayref derived, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_arrayref_count
-
-This package may raise an error_on_arrayref_count exception.
-
-=cut
-
-$test->for('error', 'error_on_arrayref_count');
-
-=example-1 error_on_arrayref_count
+=raise result Venus::Check::Error on.arrayref.count
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    throw => 'error_on_arrayref_count',
-  };
+  $check->tuple('string', 'string');
 
-  my $error = $check->catch('error', $input);
+  $check->result(['hello']);
 
-  # my $name = $error->name;
-
-  # "on_arrayref_count"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, incorrect item count in arrayref or arrayref derived object, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
+  # Error! (on.arrayref.count)
 
 =cut
 
-$test->for('example', 1, 'error_on_arrayref_count', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.arrayref.count', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_arrayref_count";
-  my $message = $result->render;
-  is $message, "Failed checking test, incorrect item count in arrayref or arrayref derived object, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_coded
-
-This package may raise an error_on_coded exception.
-
-=cut
-
-$test->for('error', 'error_on_coded');
-
-=example-1 error_on_coded
+=raise result Venus::Check::Error on.coded
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    expected => 'string',
-    received => 'number',
-    throw => 'error_on_coded',
-  };
+  $check->string;
 
-  my $error = $check->catch('error', $input);
+  $check->result(12345);
 
-  # my $name = $error->name;
-
-  # "on_coded"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, expected string, received number, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
-
-  # my $expected = $error->stash('expected');
-
-  # "string"
-
-  # my $received = $error->stash('received');
-
-  # "number"
+  # Error! (on.coded)
 
 =cut
 
-$test->for('example', 1, 'error_on_coded', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.coded', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_coded";
-  my $message = $result->render;
-  is $message, "Failed checking test, expected string, received number, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
-  my $expected = $result->stash('expected');
-  is $expected, "string";
-  my $received = $result->stash('received');
-  is $received, "number";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_consumes
-
-This package may raise an error_on_consumes exception.
-
-=cut
-
-$test->for('error', 'error_on_consumes');
-
-=example-1 error_on_consumes
+=raise result Venus::Check::Error on.consumes
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    role => 'Example::Role',
-    throw => 'error_on_consumes',
-  };
+  package Example;
 
-  my $error = $check->catch('error', $input);
+  use Venus::Class;
 
-  # my $name = $error->name;
+  package main;
 
-  # "on_consumes"
+  $check->consumes('Venus::Role::Throwable');
 
-  # my $message = $error->render;
+  $check->result(Example->new);
 
-  # "Failed checking test, object does not consume the role \"Example::Role\", at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
-
-  # my $role = $error->stash('role');
-
-  # "Example::Role"
+  # Error! (on.consumes)
 
 =cut
 
-$test->for('example', 1, 'error_on_consumes', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.consumes', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_consumes";
-  my $message = $result->render;
-  is $message, "Failed checking test, object does not consume the role \"Example::Role\", at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
-  my $role = $result->stash('role');
-  is $role, "Example::Role";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_defined
-
-This package may raise an error_on_defined exception.
-
-=cut
-
-$test->for('error', 'error_on_defined');
-
-=example-1 error_on_defined
+=raise result Venus::Check::Error on.defined
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    throw => 'error_on_defined',
-  };
+  $check->string;
 
-  my $error = $check->catch('error', $input);
+  $check->result(undef);
 
-  # my $name = $error->name;
-
-  # "on_defined"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, value provided is undefined, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
+  # Error! (on.defined)
 
 =cut
 
-$test->for('example', 1, 'error_on_defined', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.defined', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_defined";
-  my $message = $result->render;
-  is $message, "Failed checking test, value provided is undefined, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_either
-
-This package may raise an error_on_either exception.
-
-=cut
-
-$test->for('error', 'error_on_either');
-
-=example-1 error_on_either
+=raise result Venus::Check::Error on.dirhandle
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    errors => [
-      'Failed condition 1',
-      'Failed condition 2',
-    ],
-    throw => 'error_on_either',
-  };
+  $check->dirhandle;
 
-  my $error = $check->catch('error', $input);
+  $check->result('hello');
 
-  # my $name = $error->name;
-
-  # "on_either"
-
-  # my $message = $error->render;
-
-  # "Failed checking either-or condition:\n\nFailed condition 1\n\nFailed condition 2"
-
-  # my $errors = $error->stash('errors');
-
-  # ['Failed condition 1', Failed condition 2']
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
+  # Error! (on.dirhandle)
 
 =cut
 
-$test->for('example', 1, 'error_on_either', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.dirhandle', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_either";
-  my $message = $result->render;
-  is $message, "Failed checking either-or condition:\n\nFailed condition 1\n\nFailed condition 2";
-  my $errors = $result->stash('errors');
-  is_deeply $errors, ['Failed condition 1', 'Failed condition 2'];
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_enum
-
-This package may raise an error_on_enum exception.
-
-=cut
-
-$test->for('error', 'error_on_enum');
-
-=example-1 error_on_enum
+=raise result Venus::Check::Error on.either
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    data => 'black',
-    enum => ['this', 'that'],
-    throw => 'error_on_enum',
-  };
+  $check->either('string', 'number');
 
-  my $error = $check->catch('error', $input);
+  $check->result([]);
 
-  # my $name = $error->name;
-
-  # "on_enum"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, received black, valid options are this, that, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
-
-  # my $data = $error->stash('data');
-
-  # "black"
-
-  # my $enum = $error->stash('enum');
-
-  # ['this', 'that']
+  # Error! (on.either)
 
 =cut
 
-$test->for('example', 1, 'error_on_enum', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.either', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_enum";
-  my $message = $result->render;
-  is $message, "Failed checking test, received black, valid options are this, that, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
-  my $data = $result->stash('data');
-  is $data, "black";
-  my $enum = $result->stash('enum');
-  is_deeply $enum, ['this', 'that'];
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_hashref
-
-This package may raise an error_on_hashref exception.
-
-=cut
-
-$test->for('error', 'error_on_hashref');
-
-=example-1 error_on_hashref
+=raise result Venus::Check::Error on.enum
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    throw => 'error_on_hashref',
-  };
+  $check->enum('this', 'that');
 
-  my $error = $check->catch('error', $input);
+  $check->result('other');
 
-  # my $name = $error->name;
-
-  # "on_hashref"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, value provided is not a hashref or hashref derived, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
+  # Error! (on.enum)
 
 =cut
 
-$test->for('example', 1, 'error_on_hashref', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.enum', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_hashref";
-  my $message = $result->render;
-  is $message, "Failed checking test, value provided is not a hashref or hashref derived, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_hashref_empty
-
-This package may raise an error_on_hashref_empty exception.
-
-=cut
-
-$test->for('error', 'error_on_hashref_empty');
-
-=example-1 error_on_hashref_empty
+=raise result Venus::Check::Error on.filehandle
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    throw => 'error_on_hashref_empty',
-  };
+  $check->filehandle;
 
-  my $error = $check->catch('error', $input);
+  $check->result('hello');
 
-  # my $name = $error->name;
-
-  # "on_hashref_empty"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, no items found in hashref or hashref derived object, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
+  # Error! (on.filehandle)
 
 =cut
 
-$test->for('example', 1, 'error_on_hashref_empty', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.filehandle', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_hashref_empty";
-  my $message = $result->render;
-  is $message, "Failed checking test, no items found in hashref or hashref derived object, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_includes
-
-This package may raise an error_on_includes exception.
-
-=cut
-
-$test->for('error', 'error_on_includes');
-
-=example-1 error_on_includes
+=raise result Venus::Check::Error on.hashref
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    errors => [
-      'Failed condition 1',
-      'Failed condition 2',
-    ],
-    throw => 'error_on_includes',
-  };
+  $check->hashkeys('name', 'string');
 
-  my $error = $check->catch('error', $input);
+  $check->result([]);
 
-  # my $name = $error->name;
-
-  # "on_includes"
-
-  # my $message = $error->render;
-
-  # "Failed checking union-includes condition:\n\nFailed condition 1\n\nFailed condition 2"
-
-  # my $errors = $error->stash('errors');
-
-  # ['Failed condition 1', Failed condition 2']
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
+  # Error! (on.hashref)
 
 =cut
 
-$test->for('example', 1, 'error_on_includes', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.hashref', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_includes";
-  my $message = $result->render;
-  is $message, "Failed checking union-includes condition:\n\nFailed condition 1\n\nFailed condition 2";
-  my $errors = $result->stash('errors');
-  is_deeply $errors, ['Failed condition 1', 'Failed condition 2'];
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_identity
-
-This package may raise an error_on_identity exception.
-
-=cut
-
-$test->for('error', 'error_on_identity');
-
-=example-1 error_on_identity
+=raise result Venus::Check::Error on.hashref.empty
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    name => 'Example',
-    throw => 'error_on_identity',
-  };
+  $check->hashkeys('name', 'string');
 
-  my $error = $check->catch('error', $input);
+  $check->result({});
 
-  # my $name = $error->name;
-
-  # "on_identity"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, object is not a Example or derived object, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
-
-  # my $name = $error->stash('name');
-
-  # "Example"
+  # Error! (on.hashref.empty)
 
 =cut
 
-$test->for('example', 1, 'error_on_identity', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.hashref.empty', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_identity";
-  my $message = $result->render;
-  is $message, "Failed checking test, object is not a Example or derived object, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
-  $name = $result->stash('name');
-  is $name, "Example";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_inherits
-
-This package may raise an error_on_inherits exception.
-
-=cut
-
-$test->for('error', 'error_on_inherits');
-
-=example-1 error_on_inherits
+=raise result Venus::Check::Error on.includes
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    name => 'Example',
-    throw => 'error_on_inherits',
-  };
+  $check->includes('string', 'number');
 
-  my $error = $check->catch('error', $input);
+  $check->result([]);
 
-  # my $name = $error->name;
-
-  # "on_inherits"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, object is not a Example derived object, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
-
-  # my $name = $error->stash('name');
-
-  # "Example"
+  # Error! (on.includes)
 
 =cut
 
-$test->for('example', 1, 'error_on_inherits', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.includes', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_inherits";
-  my $message = $result->render;
-  is $message, "Failed checking test, object is not a Example derived object, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
-  $name = $result->stash('name');
-  is $name, "Example";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_missing
-
-This package may raise an error_on_missing exception.
-
-=cut
-
-$test->for('error', 'error_on_missing');
-
-=example-1 error_on_missing
+=raise result Venus::Check::Error on.identity
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    name => 'execute',
-    throw => 'error_on_missing',
-  };
+  $check->identity('Venus::String');
 
-  my $error = $check->catch('error', $input);
+  $check->result(Venus::Check->new);
 
-  # my $name = $error->name;
-
-  # "on_missing"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, "execute" is missing, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
-
-  # my $name = $error->stash('name');
-
-  # "execute"
+  # Error! (on.identity)
 
 =cut
 
-$test->for('example', 1, 'error_on_missing', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.identity', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_missing";
-  my $message = $result->render;
-  is $message, "Failed checking test, \"execute\" is missing, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
-  $name = $result->stash('name');
-  is $name, "execute";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_package
-
-This package may raise an error_on_package exception.
-
-=cut
-
-$test->for('error', 'error_on_package');
-
-=example-1 error_on_package
+=raise result Venus::Check::Error on.inherits
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    data => 'main',
-    from => 'test',
-    throw => 'error_on_package',
-  };
+  $check->inherits('Venus::String');
 
-  my $error = $check->catch('error', $input);
+  $check->result(Venus::Check->new);
 
-  # my $name = $error->name;
-
-  # "on_package"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, \"main\" is not a valid package name, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
-
-  # my $data = $error->stash('data');
-
-  # "main"
+  # Error! (on.inherits)
 
 =cut
 
-$test->for('example', 1, 'error_on_package', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.inherits', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_package";
-  my $message = $result->render;
-  is $message, "Failed checking test, \"main\" is not a valid package name, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
-  my $data = $result->stash('data');
-  is $data, "main";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_package_loaded
-
-This package may raise an error_on_package_loaded exception.
-
-=cut
-
-$test->for('error', 'error_on_package_loaded');
-
-=example-1 error_on_package_loaded
+=raise result Venus::Check::Error on.missing
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    data => 'main',
-    from => 'test',
-    throw => 'error_on_package_loaded',
-  };
+  $check->attributes('name', 'string');
 
-  my $error = $check->catch('error', $input);
+  $check->result(bless{});
 
-  # my $name = $error->name;
-
-  # "on_package_loaded"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, \"main\" is not loaded, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
-
-  # my $data = $error->stash('data');
-
-  # "main"
+  # Error! (on.missing)
 
 =cut
 
-$test->for('example', 1, 'error_on_package_loaded', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.missing', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_package_loaded";
-  my $message = $result->render;
-  is $message, "Failed checking test, \"main\" is not loaded, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
-  my $data = $result->stash('data');
-  is $data, "main";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_pairs
-
-This package may raise an error_on_pairs exception.
-
-=cut
-
-$test->for('error', 'error_on_pairs');
-
-=example-1 error_on_pairs
+=raise result Venus::Check::Error on.package
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    throw => 'error_on_pairs',
-  };
+  $check->package;
 
-  my $error = $check->catch('error', $input);
+  $check->result('not-a-package!');
 
-  # my $name = $error->name;
-
-  # "on_pairs"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, imblanced key/value pairs provided, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
+  # Error! (on.package)
 
 =cut
 
-$test->for('example', 1, 'error_on_pairs', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.package', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_pairs";
-  my $message = $result->render;
-  is $message, "Failed checking test, imblanced key/value pairs provided, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_reference
-
-This package may raise an error_on_reference exception.
-
-=cut
-
-$test->for('error', 'error_on_reference');
-
-=example-1 error_on_reference
+=raise result Venus::Check::Error on.package.loaded
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    throw => 'error_on_reference',
-  };
+  $check->package;
 
-  my $error = $check->catch('error', $input);
+  $check->result('Example::Fake');
 
-  # my $name = $error->name;
-
-  # "on_reference"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, value provided is not a reference, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
+  # Error! (on.package.loaded)
 
 =cut
 
-$test->for('example', 1, 'error_on_reference', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.package.loaded', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_reference";
-  my $message = $result->render;
-  is $message, "Failed checking test, value provided is not a reference, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_value
-
-This package may raise an error_on_value exception.
-
-=cut
-
-$test->for('error', 'error_on_value');
-
-=example-1 error_on_value
+=raise result Venus::Check::Error on.pairs
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    throw => 'error_on_value',
-  };
+  $check->hashkeys('name');
 
-  my $error = $check->catch('error', $input);
+  $check->result({name => 'example'});
 
-  # my $name = $error->name;
-
-  # "on_value"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, value provided is a reference, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
+  # Error! (on.pairs)
 
 =cut
 
-$test->for('example', 1, 'error_on_value', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.pairs', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_value";
-  my $message = $result->render;
-  is $message, "Failed checking test, value provided is a reference, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_within
-
-This package may raise an error_on_within exception.
-
-=cut
-
-$test->for('error', 'error_on_within');
-
-=example-1 error_on_within
+=raise result Venus::Check::Error on.reference
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    type => 'scalarref',
-    throw => 'error_on_within',
-  };
+  $check->reference;
 
-  my $error = $check->catch('error', $input);
+  $check->result('hello');
 
-  # my $name = $error->name;
-
-  # "on_within"
-
-  # my $message = $error->render;
-
-  # "Invalid type \"scalarref\" provided to the \"within\" method"
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
+  # Error! (on.reference)
 
 =cut
 
-$test->for('example', 1, 'error_on_within', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.reference', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_within";
-  my $message = $result->render;
-  is $message, "Invalid type \"scalarref\" provided to the \"within\" method";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_unknown
-
-This package may raise an error_on_unknown exception.
-
-=cut
-
-$test->for('error', 'error_on_unknown');
-
-=example-1 error_on_unknown
+=raise result Venus::Check::Error on.typeglob
 
   # given: synopsis;
 
-  my $input = {
-    throw => 'error_on_unknown',
-  };
+  $check->glob;
 
-  my $error = $check->catch('error', $input);
+  $check->result('hello');
 
-  # my $name = $error->name;
-
-  # "on_unknown"
-
-  # my $message = $error->render;
-
-  # "Failed performing check for unknown reason"
-
-  # my $from = $error->stash('from');
-
-  # undef
-
-  # my $at = $error->stash('at');
-
-  # "."
+  # Error! (on.typeglob)
 
 =cut
 
-$test->for('example', 1, 'error_on_unknown', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.typeglob', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_unknown";
-  my $message = $result->render;
-  is $message, "Failed performing check for unknown reason";
-  my $from = $result->stash('from');
-  is $from, undef;
-  my $at = $result->stash('at');
-  is $at, ".";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
-=error error_on_yesno
-
-This package may raise an error_on_yesno exception.
-
-=cut
-
-$test->for('error', 'error_on_yesno');
-
-=example-1 error_on_yesno
+=raise result Venus::Check::Error on.value
 
   # given: synopsis;
 
-  my $input = {
-    at => '.',
-    from => 'test',
-    throw => 'error_on_yesno',
-  };
+  $check->value;
 
-  my $error = $check->catch('error', $input);
+  $check->result([]);
 
-  # my $name = $error->name;
-
-  # "on_yesno"
-
-  # my $message = $error->render;
-
-  # "Failed checking test, value provided is not a recognized \"yes\" or \"no\" value, at ."
-
-  # my $from = $error->stash('from');
-
-  # "test"
-
-  # my $at = $error->stash('at');
-
-  # "."
+  # Error! (on.value)
 
 =cut
 
-$test->for('example', 1, 'error_on_yesno', sub {
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.value', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_yesno";
-  my $message = $result->render;
-  is $message, "Failed checking test, value provided is not a recognized \"yes\" or \"no\" value, at .";
-  my $from = $result->stash('from');
-  is $from, "test";
-  my $at = $result->stash('at');
-  is $at, ".";
 
-  $result
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
+});
+
+=raise within Venus::Check::Error on.within
+
+  # given: synopsis;
+
+  $check->within('scalarref', 'string');
+
+  # Error! (on.within)
+
+=cut
+
+$test->for('raise', 'within', 'Venus::Check::Error', 'on.within', sub {
+  my ($tryable) = @_;
+
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
+});
+
+=raise result Venus::Check::Error on.yesno
+
+  # given: synopsis;
+
+  $check->yesno;
+
+  $check->result('maybe');
+
+  # Error! (on.yesno)
+
+=cut
+
+$test->for('raise', 'result', 'Venus::Check::Error', 'on.yesno', sub {
+  my ($tryable) = @_;
+
+  $test->is_error(my $error = $tryable->error->result);
+
+  $error
 });
 
 =partials

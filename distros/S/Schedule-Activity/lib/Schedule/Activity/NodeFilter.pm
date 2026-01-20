@@ -2,9 +2,9 @@ package Schedule::Activity::NodeFilter;
 
 use strict;
 use warnings;
-use Ref::Util qw/is_plain_hashref/;
+use Ref::Util qw/is_plain_hashref is_ref/;
 
-our $VERSION='0.2.9';
+our $VERSION='0.3.0';
 
 my %property=map {$_=>undef} qw/f attr op value boolean filters mod/;
 my %matcher=(
@@ -16,7 +16,7 @@ my %matcher=(
 
 sub new {
 	my ($ref,%opt)=@_;
-	my $class=ref($ref)||$ref;
+	my $class=is_ref($ref)||$ref;
 	my %self=map {$_=>$opt{$_}} grep {exists($opt{$_})} keys(%property);
 	if($self{attr})    { $self{f}//='value' }
 	if($self{boolean}) { $self{f}='boolean'; $self{boolean}=lc($self{boolean}) }

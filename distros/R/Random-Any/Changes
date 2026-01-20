@@ -1,9 +1,16 @@
-0.005   2025-01-07  Released-By: PERLANCAR; Urgency: medium
+0.006   2026-01-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Fix typo in documentation.
+
+
+0.005   2025-01-07  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         - [doc] Discourage the use of rand() and this module, mention
           Random::Simple.
 
-        - [security] Turn on -warn option by default.
+        - [security] [Incompatible change] Turn on -warn option by default.
 
 
 0.004   2018-04-18  Released-By: PERLANCAR

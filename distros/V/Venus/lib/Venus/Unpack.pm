@@ -5,7 +5,11 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base', 'with';
+
+# INHERITS
 
 base 'Venus::Kind::Utility';
 
@@ -54,14 +58,14 @@ sub array {
 sub cast {
   my ($self, @args) = @_;
 
-  require Venus::Type;
+  require Venus::What;
 
   my $code = sub {
     my ($self, $data, $into) = @_;
 
-    my $type = Venus::Type->new($data);
+    my $what = Venus::What->new($data);
 
-    return $into ? $type->cast($into) : $type->deduce;
+    return $into ? $what->cast($into) : $what->deduce;
   };
 
   return $self->list('foreach', $code, @args);
@@ -489,7 +493,7 @@ I<Since C<2.01>>
   cast(string $name) (arrayref)
 
 The cast method processes the selected arguments, passing each value to the
-class name specified, or the L<Venus::Type/cast> method, and returns results.
+class name specified, or the L<Venus::What/cast> method, and returns results.
 
 I<Since C<2.01>>
 
@@ -1069,6 +1073,44 @@ I<Since C<2.23>>
   $unpack = $unpack->name('example');
 
   # bless(..., 'Venus::Unpack')
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Unpack)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Unpack;
+
+  my $new = Venus::Unpack->new;
+
+  # bless(..., "Venus::Unpack")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Unpack;
+
+  my $new = Venus::Unpack->new(args => ["hello", 123, 1.23]);
+
+  # bless(..., "Venus::Unpack")
 
 =back
 

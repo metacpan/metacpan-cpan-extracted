@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -36,16 +37,24 @@ $test->for('abstract');
 
 =includes
 
+method: defined
+method: boolean
 method: clear
 method: data
 method: expr
 method: just
+method: new
 method: none
+method: object
 method: only
 method: result
+method: take
+method: test
 method: then
+method: type
 method: when
 method: where
+method: yesno
 
 =cut
 
@@ -116,6 +125,95 @@ on_when: rw, opt, ArrayRef[CodeRef], C<[]>
 =cut
 
 $test->for('attributes');
+
+=method boolean
+
+The boolean method registers a L</then> condition which returns C<true> if the
+item is matched, and registers a L</none> condition which returns C<false> if
+there are no matches.
+
+=signature boolean
+
+  boolean() (Venus::Match)
+
+=metadata boolean
+
+{
+  since => '4.15',
+}
+
+=example-1 boolean
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(5);
+
+  $match->just(5)->boolean;
+
+  my $result = $match->result;
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'boolean', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, true;
+
+  $result
+});
+
+=example-2 boolean
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(6);
+
+  $match->just(5)->boolean;
+
+  my $result = $match->result;
+
+  # false
+
+=cut
+
+$test->for('example', 2, 'boolean', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, false;
+
+  !$result
+});
+
+=example-3 boolean
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(6);
+
+  $match->just(5)->boolean;
+  $match->just(6)->boolean;
+
+  my $result = $match->result;
+
+  # true
+
+=cut
+
+$test->for('example', 3, 'boolean', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, true;
+
+  $result
+});
 
 =method clear
 
@@ -229,6 +327,69 @@ $test->for('example', 2, 'data', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is $result, 'z';
+
+  $result
+});
+
+=method defined
+
+The defined method registers an L</only> condition which only allows matching
+if the value presented is C<defined>.
+
+=signature defined
+
+  defined() (Venus::Match)
+
+=metadata defined
+
+{
+  since => '4.15',
+}
+
+=example-1 defined
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new->defined;
+
+  $match->expr(qr/.*/)->then('okay');
+
+  my $result = $match->result;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'defined', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, undef;
+
+  !$result
+});
+
+=example-2 defined
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new->defined;
+
+  $match->expr(qr/.*/)->then('okay');
+
+  my $result = $match->result('');
+
+  # "okay"
+
+=cut
+
+$test->for('example', 2, 'defined', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, "okay";
 
   $result
 });
@@ -472,6 +633,84 @@ $test->for('example', 6, 'just', sub {
   $result
 });
 
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Match)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Match;
+
+  my $new = Venus::Match->new;
+
+  # bless(..., "Venus::Match")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Match');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Match;
+
+  my $new = Venus::Match->new(5);
+
+  # bless(..., "Venus::Match")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Match');
+  is $result->value, 5;
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Match;
+
+  my $new = Venus::Match->new(value => 5);
+
+  # bless(..., "Venus::Match")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Match');
+  is $result->value, 5;
+
+  $result
+});
+
 =method none
 
 The none method registers a special condition that returns a result only when
@@ -539,6 +778,69 @@ $test->for('example', 2, 'none', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is $result, "(z) not found";
+
+  $result
+});
+
+=method object
+
+The object method registers an L</only> condition which only allows matching if
+the value presented is an object.
+
+=signature object
+
+  object() (Venus::Match)
+
+=metadata object
+
+{
+  since => '4.15',
+}
+
+=example-1 object
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new->object;
+
+  $match->when('isa', 'main')->then('okay');
+
+  my $result = $match->result;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'object', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, undef;
+
+  !$result
+});
+
+=example-2 object
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new->object;
+
+  $match->when('isa', 'main')->then('okay');
+
+  my $result = $match->result(bless{});
+
+  # "okay"
+
+=cut
+
+$test->for('example', 2, 'object', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, "okay";
 
   $result
 });
@@ -763,6 +1065,95 @@ $test->for('example', 5, 'result', sub {
   !$result
 });
 
+=method take
+
+The take method registers a L</then> condition which returns (i.e. takes) the
+matched item as-is, and registers a L</none> condition which returns C<undef>
+if there are no matches.
+
+=signature take
+
+  take() (Venus::Match)
+
+=metadata take
+
+{
+  since => '4.15',
+}
+
+=example-1 take
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(5);
+
+  $match->just(5)->take;
+
+  my $result = $match->result;
+
+  # 5
+
+=cut
+
+$test->for('example', 1, 'take', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, 5;
+
+  $result
+});
+
+=example-2 take
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(6);
+
+  $match->just(5)->take;
+
+  my $result = $match->result;
+
+  # undef
+
+=cut
+
+$test->for('example', 2, 'take', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, undef;
+
+  !$result
+});
+
+=example-3 take
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(6);
+
+  $match->just(5)->take;
+  $match->just(6)->take;
+
+  my $result = $match->result;
+
+  # 6
+
+=cut
+
+$test->for('example', 3, 'take', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, 6;
+
+  $result
+});
+
 =method test
 
 The test method evaluates the registered conditions and returns truthy if a
@@ -938,6 +1329,70 @@ $test->for('example', 2, 'then', sub {
   $result
 });
 
+=method type
+
+The type method accepts a L<"type expression"|Venus::Type> and registers a
+L</when> condition which matches values conforming to the type expression
+specified.
+
+=signature type
+
+  type(string $expr) (Venus::Match)
+
+=metadata type
+
+{
+  since => '4.15',
+}
+
+=example-1 type
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new;
+
+  $match->type('string')->then('okay');
+
+  my $result = $match->result;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'type', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, undef;
+
+  !$result
+});
+
+=example-2 type
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new;
+
+  $match->type('string')->then('okay');
+
+  my $result = $match->result('hello');
+
+  # "okay"
+
+=cut
+
+$test->for('example', 2, 'type', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, "okay";
+
+  $result
+});
+
 =method when
 
 The when method registers a match condition that will be passed the match value
@@ -992,9 +1447,9 @@ $test->for('example', 1, 'when', sub {
   package main;
 
   use Venus::Match;
-  use Venus::Type;
+  use Venus::What;
 
-  my $match = Venus::Match->new(Venus::Type->new(1)->deduce);
+  my $match = Venus::Match->new(Venus::What->new(1)->deduce);
 
   $match->when('isa', 'Venus::Number');
   $match->then('Venus::Number');
@@ -1021,9 +1476,9 @@ $test->for('example', 2, 'when', sub {
   package main;
 
   use Venus::Match;
-  use Venus::Type;
+  use Venus::What;
 
-  my $match = Venus::Match->new(Venus::Type->new('1')->deduce);
+  my $match = Venus::Match->new(Venus::What->new('1')->deduce);
 
   $match->when('isa', 'Venus::Number');
   $match->then('Venus::Number');
@@ -1161,6 +1616,95 @@ $test->for('example', 3, 'where', sub {
   ok !defined $result;
 
   !$result
+});
+
+=method yesno
+
+The yesno method registers a L</then> condition which returns C<"yes"> if the
+item is matched, and registers a L</none> condition which returns C<"no"> if
+there are no matches.
+
+=signature yesno
+
+  yesno() (Venus::Match)
+
+=metadata yesno
+
+{
+  since => '4.15',
+}
+
+=example-1 yesno
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(5);
+
+  $match->just(5)->yesno;
+
+  my $result = $match->result;
+
+  # "yes"
+
+=cut
+
+$test->for('example', 1, 'yesno', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, "yes";
+
+  $result
+});
+
+=example-2 yesno
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(6);
+
+  $match->just(5)->yesno;
+
+  my $result = $match->result;
+
+  # "no"
+
+=cut
+
+$test->for('example', 2, 'yesno', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, "no";
+
+  $result
+});
+
+=example-3 yesno
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(6);
+
+  $match->just(5)->yesno;
+  $match->just(6)->yesno;
+
+  my $result = $match->result;
+
+  # "yes"
+
+=cut
+
+$test->for('example', 3, 'yesno', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, "yes";
+
+  $result
 });
 
 =partials

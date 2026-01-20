@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -46,6 +47,7 @@ method: gtlt
 method: le
 method: lt
 method: ne
+method: new
 method: numified
 method: replace
 method: search
@@ -2215,6 +2217,85 @@ $test->for('example', 9, 'ne', sub {
 
   $result
 });
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Regexp)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $new = Venus::Regexp->new;
+
+  # bless(..., "Venus::Regexp")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Regexp');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $new = Venus::Regexp->new(qr/(?<greet>\w+) (?<username>\w+)/u);
+
+  # bless(..., "Venus::Regexp")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Regexp');
+  is $result->value, qr/(?<greet>\w+) (?<username>\w+)/u;
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $new = Venus::Regexp->new(value => qr/(?<greet>\w+) (?<username>\w+)/u);
+
+  # bless(..., "Venus::Regexp")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Regexp');
+  is $result->value, qr/(?<greet>\w+) (?<username>\w+)/u;
+
+  $result
+});
+
 
 =method numified
 

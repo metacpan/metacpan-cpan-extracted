@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -46,6 +47,7 @@ method: gtlt
 method: le
 method: lt
 method: ne
+method: new
 method: numified
 method: stringified
 method: tv
@@ -2208,6 +2210,42 @@ $test->for('example', 9, 'ne', sub {
   my ($tryable) = @_;
   ok !(my $result = $tryable->result);
   is $result, 0;
+
+  !$result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Undef)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Undef;
+
+  my $new = Venus::Undef->new;
+
+  # bless(..., "Venus::Undef")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Undef');
 
   !$result
 });

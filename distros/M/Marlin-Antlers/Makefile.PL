@@ -25,26 +25,27 @@ my $meta = {
                                            "Class::Method::Modifiers" => 0,
                                            "Exporter::Tiny" => 0,
                                            "Import::Into" => 0,
-                                           "Marlin" => "0.016000",
-                                           "namespace::autoclean" => 0,
+                                           "Marlin" => "0.020000",
+                                           "namespace::autoclean" => 0.16,
                                            "perl" => "5.020000",
                                            "Role::Tiny" => 0,
-                                           "Types::Common" => 0,
+                                           "Types::Common" => 2.010001,
                                          },
                                        },
                           test      => {
-                                         requires => {
-                                           "Test2::Plugin::BailOnFail"     => 0,
-                                           "Test2::Require::AuthorTesting" => 0,
-                                           "Test2::Require::Module"        => 0,
-                                           "Test2::Tools::Spec"            => 0,
-                                           "Test2::V0"                     => 0,
-                                         },
+                                         recommends => { "Marlin::X::Clone" => 0 },
+                                         requires   => {
+                                                         "Test2::Plugin::BailOnFail"     => 0,
+                                                         "Test2::Require::AuthorTesting" => 0,
+                                                         "Test2::Require::Module"        => 0,
+                                                         "Test2::Tools::Spec"            => 0,
+                                                         "Test2::V0"                     => 0,
+                                                       },
                                        },
                         },
   "provides"         => {
-                          "Marlin::Antlers"       => { file => "lib/Marlin/Antlers.pm", version => 0.002001 },
-                          "Marlin::Role::Antlers" => { file => "lib/Marlin/Role/Antlers.pm", version => 0.002001 },
+                          "Marlin::Antlers"       => { file => "lib/Marlin/Antlers.pm", version => "0.003000" },
+                          "Marlin::Role::Antlers" => { file => "lib/Marlin/Role/Antlers.pm", version => "0.003000" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -58,7 +59,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Marlin-Antlers/project",
                         },
-  "version"          => 0.002001,
+  "version"          => "0.003000",
   "x_static_install" => 1,
 };
 

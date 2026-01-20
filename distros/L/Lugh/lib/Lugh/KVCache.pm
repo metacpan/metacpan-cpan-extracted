@@ -2,12 +2,15 @@ package Lugh::KVCache;
 
 use strict;
 use warnings;
+use Lugh;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 =head1 NAME
 
 Lugh::KVCache - KV Cache for efficient incremental decoding
+
+=encoding utf8
 
 =head1 SYNOPSIS
 
@@ -152,9 +155,40 @@ The recommended way to use KV caching:
     
     print $tokenizer->decode(\@tokens);
 
+=head2 Using with LoRA
+
+KV caching works with LoRA adapters using named parameters:
+
+    use Lugh::LoRA;
+    
+    my $lora = Lugh::LoRA->new(
+        adapter => 'adapter.gguf',
+        model   => $model,
+    );
+    my $cache = $inference->create_kv_cache();
+    
+    # Prefill with LoRA
+    my @logits = $inference->forward_with_cache(
+        cache  => $cache,
+        tokens => \@tokens,
+        lora   => $lora,
+    );
+    
+    # Incremental decoding with LoRA
+    for (1..100) {
+        my $next = sample_top_p(\@logits, 0.9);
+        last if $next == $tokenizer->eos_token;
+        
+        @logits = $inference->forward_with_cache(
+            cache  => $cache,
+            tokens => [$next],
+            lora   => $lora,
+        );
+    }
+
 =head1 SEE ALSO
 
-L<Lugh>, L<Lugh::Inference>, L<Lugh::Model>
+L<Lugh>, L<Lugh::Inference>, L<Lugh::Model>, L<Lugh::LoRA>
 
 =head1 AUTHOR
 

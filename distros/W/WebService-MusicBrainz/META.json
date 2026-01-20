@@ -24,8 +24,10 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Mojo::UserAgent::Role::Retry" : "0.002"
+         },
          "requires" : {
-            "Mojo::UserAgent::Role::Retry" : "0.002",
             "Mojolicious" : "7.13",
             "perl" : "v5.10.1"
          }
@@ -34,7 +36,7 @@
    "provides" : {
       "WebService::MusicBrainz" : {
          "file" : "lib/WebService/MusicBrainz.pm",
-         "version" : "v1.0.9"
+         "version" : "v1.0.10"
       },
       "WebService::MusicBrainz::Request" : {
          "file" : "lib/WebService/MusicBrainz/Request.pm",
@@ -50,6 +52,6 @@
          "url" : "git://github.com/bfaist/webservice-musicbrainz.git"
       }
    },
-   "version" : "v1.0.9",
+   "version" : "v1.0.10",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::GroupSummary;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =encoding utf8
 
@@ -34,7 +34,7 @@ Display of results from a Group Summary Search can be configured through the C<G
 
 =head1 RT VERSION
 
-Works with RT 4.2 or greater
+Works with RT 4.2 or greater. This extension has been integrated into RT 5 core and therefore is useless for RT 5.0.0 and upper.
 
 =head1 INSTALLATION
 
@@ -90,7 +90,7 @@ L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Grou
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2017-2022 by Gérald Sédrati, Easter-Eggs
+This software is Copyright (c) 2017-2026 by Gérald Sédrati, Easter-Eggs
 
 This is free software, licensed under:
 

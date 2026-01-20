@@ -5,14 +5,22 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base', 'with';
 
+# INHERITS
+
 base 'Venus::Kind::Utility';
+
+# INTEGRATES
 
 with 'Venus::Role::Valuable';
 with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 with 'Venus::Role::Explainable';
+
+# OVERLOADS
 
 use overload (
   '""' => 'explain',
@@ -36,16 +44,6 @@ sub build_arg {
 }
 
 # METHODS
-
-sub assertion {
-  my ($self) = @_;
-
-  my $assert = $self->SUPER::assertion;
-
-  $assert->clear->expression('string');
-
-  return $assert;
-}
 
 sub default {
   return 'Venus';
@@ -466,6 +464,58 @@ I<Since C<0.01>>
   my $lookslike_a_pragma = $name->lookslike_a_pragma;
 
   # ""
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Name)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Name;
+
+  my $new = Venus::Name->new;
+
+  # bless(..., "Venus::Name")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Name;
+
+  my $new = Venus::Name->new('Foo/Bar');
+
+  # bless(..., "Venus::Name")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Name;
+
+  my $new = Venus::Name->new(value => 'Foo/Bar');
+
+  # bless(..., "Venus::Name")
 
 =back
 

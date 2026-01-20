@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::Log;
-our $VERSION = '20260111.1557'; # VERSION
+our $VERSION = '20260119.1636'; # VERSION
 
 use parent 'Exporter';
 use Carp;
@@ -41,7 +41,7 @@ sub new {
     or die( "Error cannot open log file $self->{logfilename}" );
 
   # build opening lines for logfile
-  say {$self->{logfile}} _formatLines( $self->{opening}, 76 );
+  print {$self->{logfile}} _formatLines( $self->{opening}, 76 );
   # build opening lines for terminal
   print _formatLines( $self->{opening}, $self->{termwidth} );
   
@@ -112,8 +112,8 @@ sub _bar_line {
   return sprintf("%-${labelsize}s: %-${activitysize}s [%s%s] %5.1f%%",
 		 $label,
 		 $activity,
-		 "#" x $filled,
-		 " " x $empty,
+		 '#' x $filled,
+		 '-' x $empty,
 		 $pct * 100
 		);
 }
@@ -150,7 +150,7 @@ BeamerReveal::Log - Log
 
 =head1 VERSION
 
-version 20260111.1557
+version 20260119.1636
 
 =head1 SYNOPSIS
 

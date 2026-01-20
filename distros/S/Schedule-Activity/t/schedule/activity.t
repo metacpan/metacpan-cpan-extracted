@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Schedule::Activity;
-use Test::More tests=>21;
+use Test::More tests=>22;
 
 subtest 'validation'=>sub {
 	plan tests=>2;
@@ -18,7 +18,7 @@ subtest 'validation'=>sub {
 					'2'=>{},
 				},
 			});
-	is_deeply({$scheduler->schedule()},{error=>['Node 1, Undefined name in array:  next']},'node:  invalid next entry');
+	is_deeply({$scheduler->schedule()},{error=>['Node 1, Invalid entry in:  next']},'node:  invalid next entry');
 	$scheduler=Schedule::Activity->new(
 			configuration=>{
 				node=>{
@@ -1077,5 +1077,50 @@ subtest 'Per-activity goals'=>sub {
 		if(($schedule{attributes}{attrA}{y}>=5)&&($schedule{attributes}{attrB}{y}>=5)&&($schedule{attributes}{attrC}{avg}!=0)) { $pass=1; $maxouter=$steps }
 	}
 	ok($pass,"Optimized first two activities ($steps steps)");
+};
+
+subtest 'Next node weighting'=>sub {
+	plan tests=>2;
+	my %nexts=(
+		A=>{weight=>3},
+		B=>{weight=>2},
+		C=>{weight=>1},
+		D=>{weight=>9},
+	);
+	my %one=(tmmin=>1,tmavg=>1,tmmax=>1);
+	my %config=(node=>{
+		start=>{finish=>'finish',tmavg=>0,next=>\%nexts,attributes=>{never=>{set=>0}}},
+		A=>{message=>'A',%one,next=>{finish=>{weight=>1},%nexts},require=>{attr=>'never',op=>'eq',value=>0}},
+		B=>{message=>'B',%one,next=>{finish=>{weight=>1},%nexts}},
+		C=>{message=>'C',%one,next=>{finish=>{weight=>1},%nexts}},
+		D=>{message=>'D',%one,next=>{finish=>{weight=>1},%nexts},require=>{attr=>'never',op=>'ne',value=>0}},
+		finish=>{tmavg=>0},
+	});
+	my $scheduler=Schedule::Activity->new(configuration=>\%config);
+	my %need=(
+		A=>60,
+		B=>40,
+		C=>20,
+	);
+	my ($steps,$maxouter)=(0,184);
+	while($steps<$maxouter) {
+		my %seen=map {$_=>0} keys(%need);
+		my %schedule=$scheduler->schedule(activities=>[[120,'start']]);
+		foreach my $msg (grep {$_} map {$$_[2]{msg}[0]} @{$schedule{activities}}) { $seen{$msg}++ }
+		if($seen{D}) { $need{D}=-1; $maxouter=$steps }
+		foreach my $k (keys %need) { if($seen{$k}==$need{$k}) { delete($need{$k}) } }
+		if(!%need) { $maxouter=$steps }
+		$steps++;
+	}
+	if(defined($need{D})) { fail("Weighted next+require (saw D, $steps steps)") }
+	else { ok(!%need,"Weighted next+require ($steps steps)") }
+	#
+	$scheduler=Schedule::Activity->new(configuration=>{node=>{
+		start=>{finish=>'finish',tmavg=>0,next=>[qw/A/]},
+		finish=>{tmavg=>0},
+		A=>{tmavg=>1,next=>{A=>{weight=>0},finish=>{weight=>0}}}
+	}});
+	my %schedule=$scheduler->schedule(activities=>[[10,'start']]);
+	is_deeply($schedule{error},['Node A, Sum of weights must be positive'],'Zero weights invalid');
 };
 

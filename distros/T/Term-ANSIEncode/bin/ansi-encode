@@ -75,43 +75,7 @@ GetOptions(
 );
 
 if ($baud > 0) {
-    if ($baud < 75) {
-        $baud  = 75;
-        $speed = 1 / (75 / 8);
-    } elsif ($baud < 150) {
-        $baud  = 150;
-        $speed = 1 / (150 / 8);
-    } elsif ($baud < 600) {
-        $baud  = 300;
-        $speed = 1 / (300 / 8);
-    } elsif ($baud < 1200) {
-        $baud  = 600;
-        $speed = 1 / (600 / 8);
-    } elsif ($baud < 2400) {
-        $baud  = 1200;
-        $speed = 1 / (1200 / 8);
-    } elsif ($baud < 4800) {
-        $baud  = 2400;
-        $speed = 1 / (2400 / 8);
-    } elsif ($baud < 9600) {
-        $baud  = 4800;
-        $speed = 1 / (4800 / 8);
-    } elsif ($baud < 19200) {
-        $baud  = 9600;
-        $speed = 1 / (9600 / 8);
-    } elsif ($baud < 38400) {
-        $baud  = 19200;
-        $speed = 1 / (19200 / 8);
-    } elsif ($baud < 57600) {
-        $baud  = 38400;
-        $speed = 1 / (38400 / 8);
-    } elsif ($baud < 115200) {
-        $baud  = 57600;
-        $speed = 1 / (57600 / 8);
-    } else {
-        $baud  = 115200;
-        $speed = 1 / (115200 / 8);
-    }
+	$speed = calc_speed($baud);
 } else {
     $baud  = 0;
     $speed = 0;
@@ -181,19 +145,19 @@ VERSION
 } elsif ($ansi_modes) {
     my $out = "\n[% B_YELLOW %][% BLACK %]      ANSI Modes supported       [% RESET %]\n";
     if ($c3bit) {
-        $out .= "     ANSI 3 BIT:  [% GREEN %]Supported[% RESET %]\n";
+        $out .= "    ANSI  3 BIT:  [% GREEN %]Supported[% RESET %]\n";
     } else {
-        $out .= "     ANSI 3 BIT:  [% RED %]Not Supported[% RESET %]\n";
+        $out .= "    ANSI  3 BIT:  [% RED %]Not Supported[% RESET %]\n";
     }
     if ($c4bit) {
-        $out .= "     ANSI 4 BIT:  [% GREEN %]Supported[% RESET %]\n";
+        $out .= "    ANSI  4 BIT:  [% GREEN %]Supported[% RESET %]\n";
     } else {
-        $out .= "     ANSI 4 BIT:  [% RED %]Not Supported[% RESET %]\n";
+        $out .= "    ANSI  4 BIT:  [% RED %]Not Supported[% RESET %]\n";
     }
     if ($c8bit) {
-        $out .= "     ANSI 8 BIT:  [% GREEN %]Supported[% RESET %]\n";
+        $out .= "    ANSI  8 BIT:  [% GREEN %]Supported[% RESET %]\n";
     } else {
-        $out .= "     ANSI 8 BIT:  [% RED %]Not Supported[% RESET %]\n";
+        $out .= "    ANSI  8 BIT:  [% RED %]Not Supported[% RESET %]\n";
     }
     if ($c24bit) {
         $out .= "    ANSI 24 BIT:  [% GREEN %]Supported[% RESET %]\n";
@@ -580,6 +544,11 @@ FRAMES
 
 exit(0);
 
+sub calc_speed {
+	my $baud = shift;
+	return(1 / ($baud / 8));
+}
+
 sub type {
     my $text = substr(shift, 2);
 
@@ -625,52 +594,51 @@ sub add_row {
 sub help_text {
     my $help_text = <<'SMALL';
 
-[% CLS %]╔═════════════════════════════════════════════════════════════════╗
-║[% B_BLACK %]                 [% RED %]┏━┓[% BRIGHT YELLOW %]┏┓╻[% GREEN %]┏━┓[% BRIGHT BLUE %]╻   [% BRIGHT WHITE %]┏━╸┏┓╻┏━╸┏━┓╺┳┓┏━╸                 [% RESET %]║
-║[% B_BLACK %]                 [% RED %]┣━┫[% BRIGHT YELLOW %]┃┗┫[% GREEN %]┗━┓[% BRIGHT BLUE %]┃   [% BRIGHT WHITE %]┣╸ ┃┗┫┃  ┃ ┃ ┃┃┣╸                  [% RESET %]║
-║[% B_BLACK %]                 [% RED %]╹ ╹[% BRIGHT YELLOW %]╹ ╹[% GREEN %]┗━┛[% BRIGHT BLUE %]╹   [% BRIGHT WHITE %]┗━╸╹ ╹┗━╸┗━┛╺┻┛┗━╸                 [% RESET %]║
-╠═════════════════════════════════════════════════════════════════╣
-║[% B_COLOR 52 %][% BRIGHT YELLOW %] DESCRIPTION                                                     [% RESET %]║
-║     Markup text to ANSI encoder.                                ║
-╟─────────────────────────────────────────────────────────────────╢
-║[% B_COLOR 52 %][% BRIGHT YELLOW %] USAGE                                                           [% RESET %]║
-║     [% CYAN %]ansi-encode[% RESET %] [options] [text file]                           ║
-╟─────────────────────────────────────────────────────────────────╢
-║[% B_COLOR 52 %][% BRIGHT YELLOW %] OPTIONS                                                         [% RESET %]║
-║     -[% BRIGHT BLUE %]a[% RESET %] or --[% BRIGHT BLUE %]ansi-modes[% RESET %]                                          ║
-║         Show supported ANSI color modes                         ║
-║                                                                 ║
-║     --[% BRIGHT BLUE %]baud[% RESET %]=speed                                                ║
-║         "speed" can be 75, 150, 300, 600, 1200, 2400, 4800      ║
-║                        9600, 19200, 38400 or 115200             ║
-║                                                                 ║
-║     -[% BRIGHT BLUE %]c[% RESET %] or --[% BRIGHT BLUE %]colors[% RESET %]                                              ║
-║         Show available colors                                   ║
-║                                                                 ║
-║     -[% BRIGHT BLUE %]d[% RESET %] or --[% BRIGHT BLUE %]dump[% RESET %] [search]                                       ║
-║         Dump available sysmbols                                 ║
-║                                                                 ║
-║     -[% BRIGHT BLUE %]f[% RESET %] or --[% BRIGHT BLUE %]frames[% RESET %]                                              ║
-║         Show sample frame types                                 ║
-║                                                                 ║
-║     -[% BRIGHT BLUE %]h[% RESET %] or --[% BRIGHT BLUE %]horizontal-rules[% RESET %]                                    ║
-║         Show sample horizontal rules                            ║
-║                                                                 ║
-║     -[% BRIGHT BLUE %]r[% RESET %] or --[% BRIGHT BLUE %]rawtokens[% RESET %]                                           ║
-║         Raw dump of available tokens.                           ║
-║                                                                 ║
-║     -[% BRIGHT BLUE %]s[% RESET %] or --[% BRIGHT BLUE %]symbols[% RESET %] [search]                                    ║
-║         Show available symbols and character tokens by name     ║
-║                                                                 ║
-║     -[% BRIGHT BLUE %]t[% RESET %] or --[% BRIGHT BLUE %]tokens[% RESET %]                                              ║
-║         Show most used tokens                                   ║
-║                                                                 ║
-║     -[% BRIGHT BLUE %]u[% RESET %] or --[% BRIGHT BLUE %]unicode[% RESET %] [search]                                    ║
-║         Show available symbols and character tokens by unicode  ║
-║                                                                 ║
-║     -[% BRIGHT BLUE %]v[% RESET %] or --[% BRIGHT BLUE %]version[% RESET %]                                             ║
-║         Shows version and licensing info                        ║
-╚═════════════════════════════════════════════════════════════════╝
+[% CLS %]╔═══════════════════════════════════════════════════════════════════════════╗
+║[% B_BLACK %]                 [% RED %]┏━┓ [% BRIGHT YELLOW %]┏┓╻ [% GREEN %]┏━┓ [% BRIGHT BLUE %]╻     [% BRIGHT WHITE %]┏━╸ ┏┓╻ ┏━╸ ┏━┓ ╺┳┓ ┏━╸                 [% RESET %]║
+║[% B_BLACK %]                 [% RED %]┣━┫ [% BRIGHT YELLOW %]┃┗┫ [% GREEN %]┗━┓ [% BRIGHT BLUE %]┃     [% BRIGHT WHITE %]┣╸  ┃┗┫ ┃   ┃ ┃  ┃┃ ┣╸                  [% RESET %]║
+║[% B_BLACK %]                 [% RED %]╹ ╹ [% BRIGHT YELLOW %]╹ ╹ [% GREEN %]┗━┛ [% BRIGHT BLUE %]╹     [% BRIGHT WHITE %]┗━╸ ╹ ╹ ┗━╸ ┗━┛ ╺┻┛ ┗━╸                 [% RESET %]║
+╠═══════════════════════════════════════════════════════════════════════════╣
+║[% B_COLOR 52 %][% BRIGHT YELLOW %] DESCRIPTION                                                               [% RESET %]║
+║     Markup text to ANSI encoder.                                          ║
+╟───────────────────────────────────────────────────────────────────────────╢
+║[% B_COLOR 52 %][% BRIGHT YELLOW %] USAGE                                                                     [% RESET %]║
+║     [% CYAN %]ansi-encode[% RESET %] [options] [text file]                                     ║
+╟───────────────────────────────────────────────────────────────────────────╢
+║[% B_COLOR 52 %][% BRIGHT YELLOW %] OPTIONS                                                                   [% RESET %]║
+║     -[% BRIGHT CYAN %]a[% RESET %] or --[% BRIGHT CYAN %]ansi-modes[% RESET %]                                                    ║
+║         Show supported ANSI color modes                                   ║
+║                                                                           ║
+║     --[% BRIGHT CYAN %]baud[% RESET %]=speed                                                          ║
+║         "speed" can be any baud rate.                                     ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]c[% RESET %] or --[% BRIGHT CYAN %]colors[% RESET %]                                                        ║
+║         Show available colors                                             ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]d[% RESET %] or --[% BRIGHT CYAN %]dump[% RESET %] [search]                                                 ║
+║         Dump available sysmbols                                           ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]f[% RESET %] or --[% BRIGHT CYAN %]frames[% RESET %]                                                        ║
+║         Show sample frame types                                           ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]h[% RESET %] or --[% BRIGHT CYAN %]horizontal-rules[% RESET %]                                              ║
+║         Show sample horizontal rules                                      ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]r[% RESET %] or --[% BRIGHT CYAN %]rawtokens[% RESET %]                                                     ║
+║         Raw dump of available tokens.                                     ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]s[% RESET %] or --[% BRIGHT CYAN %]symbols[% RESET %] [search]                                              ║
+║         Show available symbols and character tokens by name               ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]t[% RESET %] or --[% BRIGHT CYAN %]tokens[% RESET %]                                                        ║
+║         Show most used tokens                                             ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]u[% RESET %] or --[% BRIGHT CYAN %]unicode[% RESET %] [search]                                              ║
+║         Show available symbols and character tokens by unicode            ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]v[% RESET %] or --[% BRIGHT CYAN %]version[% RESET %]                                                       ║
+║         Shows version and licensing info                                  ║
+╚═══════════════════════════════════════════════════════════════════════════╝
 SMALL
 ###
     return($help_text);

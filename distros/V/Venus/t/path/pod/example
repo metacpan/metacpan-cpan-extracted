@@ -192,6 +192,16 @@ The execute method executes the logic.
 
 =cut
 
+=raise execute Venus::Error on.unknown
+
+  # given: synopsis
+
+  $example->execute; # throw exception
+
+  # Error (on.unknown)
+
+=cut
+
 =error error_on_unknown
 
 This package may raise an error_on_unknown error.

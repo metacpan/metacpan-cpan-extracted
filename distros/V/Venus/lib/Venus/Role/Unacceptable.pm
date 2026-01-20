@@ -5,6 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Role 'raise';
 
 # BUILDERS
@@ -18,7 +20,7 @@ sub BUILD {
 
   raise 'Venus::Role::Unacceptable::Error', {
     name => 'on.build',
-    '$stash' => {unknowns => [@unknowns]},
+    stash => {unknowns => [@unknowns]},
     message => "$class was passed unknown attribute(s): " . join ', ',
       map "'$_'", @unknowns,
   }

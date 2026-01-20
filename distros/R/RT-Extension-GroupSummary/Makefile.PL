@@ -1,3 +1,4 @@
+use lib '.';
 use inc::Module::Install;
 use utf8;
 
@@ -6,7 +7,7 @@ license 'gpl_3';
 repository 'https://github.com/gibus/RT-Extension-GroupSummary';
 
 requires_rt('4.2.0');
-rt_too_new('5.1.0');
+rt_too_new('4.9.0');
 
 readme_from 'lib/RT/Extension/GroupSummary.pm', 0, 'md', 'README.md';
 

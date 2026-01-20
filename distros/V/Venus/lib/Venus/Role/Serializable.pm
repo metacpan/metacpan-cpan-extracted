@@ -5,6 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Role 'with';
 
 # METHODS
@@ -49,7 +51,7 @@ sub serialize {
   $throw->name('on.serialize');
   $throw->message("Can't serialize the object: $self");
   $throw->stash(self => $self);
-  $throw->error;
+  $throw->die;
 }
 
 sub deconstruct {
@@ -103,7 +105,7 @@ sub deconstruct {
     $throw->name('on.serialize.deconstruct');
     $throw->message("Can't serialize properties in the object: $self");
     $throw->stash(self => $self);
-    $throw->error;
+    $throw->die;
   }
 
   return $value;

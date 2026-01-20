@@ -3,8 +3,8 @@ NAME
     builtin rand()
 
 VERSION
-    This document describes version 0.005 of Random::Any (from Perl
-    distribution Random-Any), released on 2025-01-07.
+    This document describes version 0.006 of Random::Any (from Perl
+    distribution Random-Any), released on 2026-01-20.
 
 SYNOPSIS
      use Random::Any qw(rand);
@@ -18,7 +18,7 @@ DESCRIPTION
 
     Note that whenever you can you are encouraged to use rand_int() or
     random_int(), or rand_flt() or random_float() function instead. From
-    "Data::Entropy::Algorithm"'s documentation:
+    "Data::Entropy::Algorithms"' documentation:
 
     "This function should not be used in any new code, because the kind of
     output supplied by "rand" is hardly ever the right thing to use. The
@@ -74,7 +74,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

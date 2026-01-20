@@ -1,8 +1,58 @@
-4.15 2023-11-27
+5.00 2025-06-16
 
 - [feature] Implement built-in vns "func" and "with" commands
 - [feature] Implement Venus::Set
+- [feature] Implement "gets" and "sets" keyword functions
+- [feature] Breaking: Implement Venus::Type
+- [feature] Implement Venus::Os#{read,write}
+- [feature] Implement Venus::Role::Encaseable
+- [feature] Implement Venus::Try#fault
+- [feature] Implement Venus::Map
+- [feature] Implement Venus::Error {copy,cause}
+- [feature] Support mappables via Venus::Type#within
+- [feature] Venus#{is_true,is_false}
+- [feature] Update Venus::Config, Support Environment Variables
+- [feature] Implement Functions for Venus::Config Operations
+- [feature] Implement Venus::Result
+- [feature] Implement Venus::Result#{check,is}
+- [feature] Implement Venus::Role::Resultable
+- [feature] Implement Venus::Validate
+- [feature] Enhance Venus
+- [feature] Breaking: Refactor Venus::Container into Venus::Factory
+- [feature] Enhance "merge" functions
+- [feature] Add take, boolean, yesno, defined, object, and type to Venus::Match
+- [feature] Add type, count, reduce, defined, object to Venus::Gather
+- [feature] Extend Venus::Role::Coercible to include coerce-by-type behavior
+- [feature] Implement build_data in Venus::Role::Buildable
+- [feature] Add additional lifecycle events
+- [feature] Update "loop" feature in Venus::Template
+- [feature] Add "sorts" to Venus
+- [feature] Implement Venus::Range
+- [feature] Add "values" to Venus::Array and Venus::Hash
+- [feature] Add "syscall" to Venus::Os
+- [feature] Add {is_error,is_fault} to Venus
+- [feature] Implement Venus::Role::Fromable
 - [update] Emit errors during Venus::Run execution
+- [update] Breaking: Rename Venus::Type to Venus::What
+- [update] Update Venus::Path#{read,write}
+- [update] Update Venus::Type with glob, filehandle, and dirhandle
+- [update] Update Venus::Set internals
+- [update] Breaking: Change Venus::Error {id,name} mechanism
+- [update] Implement Venus::Hash#{sort,rsort}
+- [update] Implement "caught" in Venus::Role::Catchable
+- [update] Implement Venus::Validate#{errors,sync}
+- [update] Breaking: Refactor Venus::Schema with Venus::Validate
+- [update] Enhance Venus::Validate
+- [update] Remove flags from args in clargs
+- [update] Update clargs signature and return in scalar context
+- [update] Enhance Venus::Random
+- [update] Add "clone" to Venus::Role::Encaseable
+- [update] Refactor Error Handling
+- [update] Refactor Venus::Cli
+- [update] Fix bug in Venus::Prototype
+- [update] Support from_{type} in Venus::Role::Fromable
+- [update] Fix required vs optional in Venus::Validate
+- [update] Allow "vns" to auto-dispatch to "vns-run"
 
 4.11 2023-09-13
 
@@ -464,5 +514,3 @@
 - [update] Update CONTRIBUTING.md
 - [update] Update String#render token syntax
 - [update] Update Venus::Json to use encoder/decoder callbacks
-
-

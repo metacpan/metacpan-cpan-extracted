@@ -24,5 +24,6 @@ t/00start.t
 t/01basic.t
 t/integration/exception/import-into-existing.t
 t/integration/feature/plugins.t
+t/integration/feature/sigs.t
 t/integration/synopsis/Marlin-Antlers.t
 t/integration/synopsis/Marlin-Role-Antlers.t

@@ -1,4 +1,4 @@
-package Term::ANSIEncode 1.83;
+package Term::ANSIEncode 1.85;
 
 #######################################################################
 #            _   _  _____ _____   ______                     _        #
@@ -20,7 +20,7 @@ package Term::ANSIEncode 1.83;
 
 use strict;
 use warnings;
-use utf8;    # REQUIRED
+use utf8;    # REQUIRED for unicode characters and graphics characters
 use charnames();
 use constant {
     TRUE  => 1,
@@ -85,8 +85,25 @@ our %STYLES = (
     ARROWS        => ['🡕', '🡖', '🡔', '🡗', '🡒', '🡐', '🡑', '🡓'],
 );
 
-# Detecting ANSI terminal capability is a royal pain.
+sub new {
+    my $class = shift;
+    my $esc   = chr(27);
+    my $csi   = $esc . '[';
 
+    my $self = {
+        'ansi_prefix' => $csi,
+        'list'        => [(0x20 .. 0x7F, 0xA0 .. 0xFF, 0x2010 .. 0x205F, 0x2070 .. 0x242F, 0x2440 .. 0x244F, 0x2460 .. 0x29FF, 0x1F300 .. 0x1F8BF, 0x1F900 .. 0x1FBBF, 0x1F900 .. 0x1FBCF, 0x1FBF0 .. 0x1FBFF)],
+        'ansi_meta'   => $GLOBAL_ANSI_META,
+        'baud'        => 'FULL',
+        'columns'     => 80,
+        @_,
+    };
+
+    bless($self, $class);
+    return ($self);
+} ## end sub new
+
+# Detecting ANSI terminal capability is a royal pain.
 sub ansi_detect_capability {
     my $self = shift;
 
@@ -477,24 +494,6 @@ sub ansi_box {
 
     return ($text);
 } ## end sub ansi_box
-
-sub new {
-    my $class = shift;
-    my $esc   = chr(27);
-    my $csi   = $esc . '[';
-
-    my $self = {
-        'ansi_prefix' => $csi,
-        'list'        => [(0x20 .. 0x7F, 0xA0 .. 0xFF, 0x2010 .. 0x205F, 0x2070 .. 0x242F, 0x2440 .. 0x244F, 0x2460 .. 0x29FF, 0x1F300 .. 0x1F8BF, 0x1F900 .. 0x1FBBF, 0x1F900 .. 0x1FBCF, 0x1FBF0 .. 0x1FBFF)],
-        'ansi_meta'   => $GLOBAL_ANSI_META,
-        'baud'        => 'FULL',
-        'columns'     => 80,
-        @_,
-    };
-
-    bless($self, $class);
-    return ($self);
-} ## end sub new
 
 sub _global_ansi_meta {    # prefills the hash cache
     my $esc = chr(27);

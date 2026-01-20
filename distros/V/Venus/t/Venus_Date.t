@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -51,6 +52,7 @@ method: format
 method: hms
 method: iso8601
 method: mdy
+method: new
 method: parse
 method: reset
 method: restart
@@ -1013,6 +1015,90 @@ $test->for('example', 1, 'mdy', sub {
 
   $result
 });
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Date)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Date;
+
+  my $new = Venus::Date->new;
+
+  # bless(..., "Venus::Date")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Date');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Date;
+
+  my $new = Venus::Date->new(570672000);
+
+  # bless(..., "Venus::Date")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Date');
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Date;
+
+  my $new = Venus::Date->new(
+    day => 3,
+    hour => 16,
+    minute => 17,
+    month => 3,
+    second => 54,
+    year => 1989
+  );
+
+  # bless(..., "Venus::Date")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Date');
+
+  $result
+});
+
 
 =method parse
 

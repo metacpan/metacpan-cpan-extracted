@@ -5,6 +5,7 @@ author:
 build_requires:
   Path::Tiny: '0.011'
   Paws: '0'
+  Paws::Credential::Explicit: '0'
   Paws::Net::MultiplexCaller: '0'
   PawsX::FakeImplementation::Instance: '0'
   Test2::V0: '0'
@@ -33,7 +34,7 @@ requires:
   warnings: '0'
 resources:
   repository: git://bitbucket.org/broadbean/p5-pawsx-s3-uploader.git
-version: 0.0.1
+version: 0.0.2
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

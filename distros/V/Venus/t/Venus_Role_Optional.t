@@ -8,6 +8,7 @@ use warnings;
 use Test::More;
 use Venus::Space;
 use Venus::Test;
+use Venus;
 
 use Venus 'catch';
 

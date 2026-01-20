@@ -1,55 +1,40 @@
 ----------------------------------------------------------------------------
---  beamer-reveal.pl                                       v20260101.1936 --
+--  beamer-reveal.pl                                       v20260111.1441 --
 --  (C) 2025-2026 Walter PM Daems <wdaems@cpan.org>                 GPLv3 --
 ----------------------------------------------------------------------------
 
-- Reading driver file beamer-reveal-example.rvl
+- Using the following directories:
+  aux-files    : '.'
+  pdf-files    : '.'
+  output-files : '.'
+- Reading driver file ./beamer-reveal-example.rvl
 - Installing quarto/reveal.js boilerplate
 - Processing the presentation
   - making slide 1
-Test slide deck
   - making slide 2
-Introduction
   - making slide 3
-Slide making
   - making slide 4
-Good news
   - making slide 5
-Prêt-à-porter
   - making slide 6
-Très chique
   - making slide 7
-Pimping your slides
   - making slide 8
-And even more good news
   - making slide 9
-A dymmy slide
   - making slide 10
-In detail
   - making slide 11
-Candy for the eye
   - making slide 12
-Placing videos
   - making slide 13
     - adding video
-Placing videos
   - making slide 14
     - adding image
     - adding image
-Placing images (possibly animated)
   - making slide 15
     - adding iframe
-Placing iframe material (possibly animated)
   - making slide 16
-Resonance for the ear
   - making slide 17
     - adding audio
-Adding audio to your slides
   - making slide 18
-Make (video) animations with LaTeX
   - making slide 19
     - adding animation
-Making animations with LaTeX (using TikZ as example)
 - Generating the images
 - Producing presentation
   - Writing beamer-reveal-example.html

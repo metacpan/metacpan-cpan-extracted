@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 cca4a6c16f36ada29d2efffc0c37a1fb41840679308ff4f87ed5423050bf5d43 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 b381b35ffffe460feaa3f7e8ee3c83cf161e45e5112f79a9ba7fa2eb7946c655 Changes
+SHA256 f726a32b74096ad548143254e9c0936ef445b8fd3f61c78a13449ad94f8c47f9 INSTALL
+SHA256 ca1cc40b3da7bebb1b0368764650ad38ac603b31a25fbc5b6f9fb217cc6fa1e8 LICENSE
+SHA256 bb196cd3b323d05b4c1d3dfcd3a34d83ecda1f7ccb4a43d246a4c8e2d03b5cb3 MANIFEST
+SHA256 691d8ca6812e1d3b4494dcfccfbbbc3ffab2a6670e4d04247248631aa375fde1 META.json
+SHA256 73948ef8bb8c395ab0eaffba9a1ba382fa8c13ea118a05cad772119047212fe6 META.yml
+SHA256 f3878ae8c67e158627f531b9af16d82fa66c6f8d0bb358df027c8f5b68b6ffeb Makefile.PL
+SHA256 932202e743cf66ebe48e26a896d8a4938ef0fd8cc3ab18cdd63d5f88292f75ac README
+SHA256 a22f99e1c6c2419857f78c89b398c23ceaea652ad34d780ed2013fe0d44217b9 dist.ini
+SHA256 4578e88669b6b19a98dba03b4197c2f99825333c1c18460ac5e1604a809e708d doap.ttl
+SHA256 3cb49cbb201540189872a71f3cbdeed6551fa5aec7b2e4d4711eef7535345059 lib/Marlin/XAttribute/Lvalue.pm
+SHA256 ce8d80e7f5016a8fce748ba2a04bd060396e12728c8751405667a76b17e7aad8 t/00start.t
+SHA256 4886b0c7b9a9e191fc22d5c7cc26115dcf62fe110dab0354c0e870a35619e8e2 t/01basic.t
+SHA256 2a0c61c66dfe292d7489413f93bc16021d8c4a1755d1eaca99276bcd57181cd4 t/integration/alias.t
+SHA256 0ad3b5a696cf3066c161ad8c9c936ac1bdc82c20cf87f96fb64ac9ef6260cdc3 t/integration/lvalues-moose.t
+SHA256 3f91bc8fb83705e47f10fb602e784990d5fff3ec853feb6f9843664522eeb843 t/integration/lvalues.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCaW5n5QAKCRDOv4Eoaip9
+OcpdAJ0QnBXJBITCmU7JOIcinSqylNdBWgCghsk2lLz7p6U9L5aWy0imqCUa+MY=
+=9KE1
+-----END PGP SIGNATURE-----

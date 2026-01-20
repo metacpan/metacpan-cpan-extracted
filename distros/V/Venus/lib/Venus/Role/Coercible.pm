@@ -5,6 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Role 'with';
 
 # BUILDERS
@@ -59,7 +61,27 @@ sub coerce_into {
 
   my $name = lc $space->label;
 
-  if (my $method = $self->can("coerce_into_${name}")) {
+  require Venus::Name;
+  require Venus::What;
+
+  my $aliases = {
+    array => 'arrayref',
+    code => 'coderef',
+    hash => 'hashref',
+    regexp => 'regexpref',
+    scalar => 'scalarref',
+  };
+
+  my $type = lc Venus::Name->new(scalar Venus::What->new(value => $value)->identify)->label;
+
+  $type = $aliases->{$type} || $type;
+
+  my $method;
+
+  if ($method = $self->can("coerce_into_${name}_from_${type}")) {
+    return $self->$method($class, $value);
+  }
+  elsif ($method = $self->can("coerce_into_${name}")) {
     return $self->$method($class, $value);
   }
   if (Scalar::Util::blessed($value) && $value->isa($class)) {
@@ -79,7 +101,30 @@ sub coerce_onto {
 
   $value = $data->{$name} if $#_ < 4;
 
-  if (my $method = $self->can("coerce_${name}")) {
+  require Venus::Name;
+  require Venus::What;
+
+  my $aliases = {
+    array => 'arrayref',
+    code => 'coderef',
+    hash => 'hashref',
+    regexp => 'regexpref',
+    scalar => 'scalarref',
+  };
+
+  my $type = lc Venus::Name->new(scalar Venus::What->new(value => $value)->identify)->label;
+
+  $type = $aliases->{$type} || $type;
+
+  my $method;
+
+  if ($method = $self->can("coerce_onto_${name}_from_${type}")) {
+    return $data->{$name} = $self->$method(\&coerce_into, $class, $value);
+  }
+  elsif ($method = $self->can("coerce_onto_${name}")) {
+    return $data->{$name} = $self->$method(\&coerce_into, $class, $value);
+  }
+  elsif ($method = $self->can("coerce_${name}")) {
     return $data->{$name} = $self->$method(\&coerce_into, $class, $value);
   }
   else {
@@ -286,9 +331,57 @@ I<Since C<1.23>>
 
   coerce_into(string $class, any $value) (object)
 
-The coerce_into method attempts to build and return an object based on the
-class name and value provided, unless the value provided is already an object
-derived from the specified class.
+The coerce_into method attempts to coerce the value provided into an object of
+the specified class. If the value is already an object of that class, it is
+returned as-is. Otherwise, the method tries to find a suitable coercion method
+to convert the value based on its type. If no specific coercion method is
+found, it defaults to constructing a new instance of the target class using the
+provided value.
+
+This method supports dynamic coercion by dispatching to a method on the
+invocant (if present) named in the format C<coerce_into_${class}_from_${type}>
+or C<coerce_into_${class}>, where C<$class> is the name of the desired object
+class, and C<$type> is the data type of the value provided. If neither method
+is found, it defaults to checking if the value is already of the target type or
+creating a new instance of the target class.
+
+The class name used in the method name will be formatted as a lowercase string
+having underscores in place of any double-semi-colons.
+
+For example: Example::Package will be C<example_package> making the method name
+C<coerce_into_example_package>.
+
+The following are the possible values for data types that can be used in the
+method name:
+
+=over 4
+
+=item * arrayref
+
+=item * boolean
+
+=item * coderef
+
+=item * float
+
+=item * hashref
+
+=item * number
+
+=item * object
+
+=item * regexp
+
+=item * scalarref
+
+=item * string
+
+=item * undef
+
+=back
+
+For example: Coercing a string into the Example::Package would warrant the
+method name C<coerce_into_example_package_from_string>.
 
 I<Since C<0.07>>
 
@@ -308,6 +401,62 @@ I<Since C<0.07>>
 
 =back
 
+=over 4
+
+=item coerce_into example 2
+
+  package Player;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Coercible';
+
+  attr 'name';
+
+  sub coerce_into_person {
+    my ($self, $class, $value) = @_;
+
+    return $class->new({name => $value || 'friend'});
+  }
+
+  package main;
+
+  my $player = Player->new;
+
+  my $person = $player->coerce_into('Person');
+
+  # bless({...}, 'Person')
+
+=back
+
+=over 4
+
+=item coerce_into example 3
+
+  package Player;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Coercible';
+
+  attr 'name';
+
+  sub coerce_into_person_from_string {
+    my ($self, $class, $value) = @_;
+
+    return $class->new({name => $value});
+  }
+
+  package main;
+
+  my $player = Player->new;
+
+  my $person = $player->coerce_into('Person', 'friend');
+
+  # bless({...}, 'Person')
+
+=back
+
 =cut
 
 =head2 coerce_onto
@@ -318,6 +467,58 @@ The coerce_onto method attempts to build and assign an object based on the
 class name and value provided, as the value corresponding to the name
 specified, in the data provided. If the C<$value> is omitted, the value
 corresponding to the name in the C<$data> will be used.
+
+The coerce_onto method attempts to coerce the value provided into an object of
+the specified class, and add it as an item in the data structure provided. If
+the value is already an object of that class, it is returned as-is. Otherwise,
+the method tries to find a suitable coercion method to convert the value based
+on its type. If no specific coercion method is found, it defaults to
+constructing a new instance of the target class using the provided value.
+
+This method supports dynamic coercion by dispatching to a method on the
+invocant (if present) named in the format C<coerce_onto_${class}_from_${type}>
+or C<coerce_onto_${class}> or C<coerce_${class}>, where C<$class> is the name
+of the desired object class, and C<$type> is the data type of the value
+provided. If neither method is found, it defaults to checking if the value is
+already of the target type or creating a new instance of the target class.
+
+The class name used in the method name will be formatted as a lowercase string
+having underscores in place of any double-semi-colons.
+
+For example: Example::Package will be C<example_package> making the method name
+C<coerce_into_example_package>.
+
+The following are the possible values for data types that can be used in the
+method name:
+
+=over 4
+
+=item * arrayref
+
+=item * boolean
+
+=item * coderef
+
+=item * float
+
+=item * hashref
+
+=item * number
+
+=item * object
+
+=item * regexp
+
+=item * scalarref
+
+=item * string
+
+=item * undef
+
+=back
+
+For example: Coercing a string into the Example::Package would warrant the
+method name C<coerce_onto_example_package_from_string>.
 
 I<Since C<0.07>>
 
@@ -385,6 +586,98 @@ I<Since C<0.07>>
   my $player = Player->new;
 
   my $data = { teammates => [{ name => 'player2' }, { name => 'player3' }] };
+
+  my $teammates = $player->coerce_onto($data, 'teammates', 'Person');
+
+  # [bless({...}, 'Person'), bless({...}, 'Person')]
+
+  # $data was updated
+  #
+  # {
+  #   teammates => [bless({...}, 'Person'), bless({...}, 'Person')],
+  # }
+
+=back
+
+=over 4
+
+=item coerce_onto example 3
+
+  package Player;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Coercible';
+
+  attr 'name';
+  attr 'teammates';
+
+  sub coercers {
+    {
+      teammates => 'Person',
+    }
+  }
+
+  sub coerce_into_person_from_string {
+    my ($self, $class, $value) = @_;
+
+    return $class->new({name => $value});
+  }
+
+  sub coerce_onto_teammates_from_arrayref {
+    my ($self, $code, $class, $value) = @_;
+
+    return [map $self->$code($class, $_), @$value];
+  }
+
+  package main;
+
+  my $player = Player->new;
+
+  my $data = { teammates => ['player2', 'player3'] };
+
+  my $teammates = $player->coerce_onto($data, 'teammates', 'Person');
+
+  # [bless({...}, 'Person'), bless({...}, 'Person')]
+
+  # $data was updated
+  #
+  # {
+  #   teammates => [bless({...}, 'Person'), bless({...}, 'Person')],
+  # }
+
+=back
+
+=over 4
+
+=item coerce_onto example 4
+
+  package Player;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Coercible';
+
+  attr 'name';
+  attr 'teammates';
+
+  sub coercers {
+    {
+      teammates => 'Person',
+    }
+  }
+
+  sub coerce_onto_teammates_from_hashref {
+    my ($self, $code, $class, $value) = @_;
+
+    return [$self->$code($class, $value)];
+  }
+
+  package main;
+
+  my $player = Player->new;
+
+  my $data = { teammates => {name => 'player2'} };
 
   my $teammates = $player->coerce_onto($data, 'teammates', 'Person');
 

@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -48,6 +49,7 @@ method: is_true
 method: le
 method: lt
 method: ne
+method: new
 method: negate
 method: numified
 method: string
@@ -2447,6 +2449,84 @@ $test->for('example', 10, 'ne', sub {
   is $result, 0;
 
   !$result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Boolean)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $new = Venus::Boolean->new;
+
+  # bless(..., "Venus::Boolean")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Boolean');
+
+  !$result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $new = Venus::Boolean->new(1);
+
+  # bless(..., "Venus::Boolean")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Boolean');
+  is $result->value, 1;
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $new = Venus::Boolean->new(value => 1);
+
+  # bless(..., "Venus::Boolean")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Boolean');
+  is $result->value, 1;
+
+  $result
 });
 
 =method negate

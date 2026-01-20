@@ -26,7 +26,7 @@ my $build = Module::Build->new(
    },
    test_requires => {
       'File::Temp' => 0,
-      'Test::Future::IO::Impl' => 0,
+      'Test::Future::IO::Impl' => '0.17',
       'Test::Metrics::Any' => 0,
       'Test2::V0' => '0.000149',
    },

@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+
+package main;
+
+use 5.018;
+
+use strict;
+use warnings;
+
+use lib 'lib';
+
+use Venus::Task::Venus::Set;
+
+run Venus::Task::Venus::Set 'vns-set';
+
+=encoding utf8
+
+=head1 NAME
+
+vns-set
+
+=head1 SYNOPSIS
+
+  vns-set --help
+
+=head1 DESCRIPTION
+
+Set values in the Venus configuration file. This CLI dispatches to
+L<Venus::Task::Venus::Set/perform>.
+
+=head1 EXAMPLES
+
+  # set the perl.repl value
+  $ vns-set perl.repl "perl -Ilib -dE0"
+
+=head1 SEE ALSO
+
+L<Venus>, L<Venus::Task::Venus::Set>.
+
+=cut

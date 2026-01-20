@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -62,6 +63,7 @@ method: lines
 method: lowercase
 method: lt
 method: ne
+method: new
 method: numified
 method: pascalcase
 method: prepend
@@ -85,6 +87,7 @@ method: uc
 method: ucfirst
 method: uppercase
 method: words
+method: wrap
 
 =cut
 
@@ -3120,6 +3123,84 @@ $test->for('example', 2, 'repeat', sub {
   $result
 });
 
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::String)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::String;
+
+  my $new = Venus::String->new;
+
+  # bless(..., "Venus::String")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::String');
+
+  !$result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::String;
+
+  my $new = Venus::String->new('hello world');
+
+  # bless(..., "Venus::String")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::String');
+  is $result->value, 'hello world';
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::String;
+
+  my $new = Venus::String->new(value => 'hello world');
+
+  # bless(..., "Venus::String")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::String');
+  is $result->value, 'hello world';
+
+  $result
+});
+
 =method numified
 
 The numified method returns the numerical representation of the object. For
@@ -4207,6 +4288,57 @@ $test->for('example', 1, 'words', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, ["is", "this", "a", "bug", "we're", "experiencing"];
+
+  $result
+});
+
+=method wrap
+
+The wrap method takes a maximum character length for each line, and an optional
+number of spaces to use for indentation (defaulting to C<0>) and returns the
+text formatted as a string where each line wraps at the specified length and is
+indented with the given number of spaces. The default lenght is C<80>.
+
+=signature wrap
+
+  wrap(number $length, number $indent) (string)
+
+=metadata wrap
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 wrap
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new(join(' ',
+    'This is an example of a long line of text that needs',
+    'to be wrapped and formatted.'
+  ));
+
+  my $wrap = $string->wrap(40, 2);
+
+  # "  This is an example of a long line of
+  #   text that needs to be wrapped and
+  #   formatted."
+
+=cut
+
+$test->for('example', 1, 'wrap', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  like $result, qr/^  /;
+  like $result, qr/.{1,40}/;
+  is $result, join "\n",
+  "  This is an example of a long line of",
+  "  text that needs to be wrapped and",
+  "  formatted.";
 
   $result
 });

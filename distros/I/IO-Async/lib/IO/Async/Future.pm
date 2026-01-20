@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Future 0.804;
+package IO::Async::Future 0.805;
 
 use v5.14;
 use warnings;
@@ -22,6 +22,8 @@ use Carp;
 C<IO::Async::Future> - use L<Future> with L<IO::Async>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Future::AsyncAwait;
    use IO::Async::Loop;

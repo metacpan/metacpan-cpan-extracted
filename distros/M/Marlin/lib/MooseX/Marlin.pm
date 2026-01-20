@@ -5,7 +5,7 @@ use warnings;
 package MooseX::Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016000';
+our $VERSION   = '0.020000';
 
 use Marlin                ();
 use Marlin::Util          ();
@@ -123,6 +123,43 @@ sub Marlin::Role::inject_moose_metadata {
 	return $me->injected_metadata( Moose => $metarole );
 }
 
+my $missing_mxa_warning;
+sub INJECT_ALIASES {
+	my ( $me, $meta_attr ) = @_;
+	
+	if ( not eval { require MooseX::Aliases; 1 } ) {
+		if ( not $missing_mxa_warning++ ) {
+			require Carp;
+			Carp::carp('MooseX::Aliases is not installed');
+		}
+		return;
+	}
+	
+	require Moose::Util;
+	if ( $meta_attr->can('associated_role') ) {
+		Moose::Util::ensure_all_roles(
+			Moose::Util::find_meta($meta_attr->associated_role),
+			'MooseX::Aliases::Meta::Trait::Role',
+		);
+	}
+	else {
+		my $meta = Moose::Util::find_meta($meta_attr->associated_class);
+		$meta->make_mutable;
+		Moose::Util::ensure_all_roles(
+			$meta,
+			'MooseX::Aliases::Meta::Trait::Class',
+		);
+		$meta->make_immutable;
+	}
+	
+	Moose::Util::ensure_all_roles(
+		$meta_attr,
+		'MooseX::Aliases::Meta::Trait::Attribute',
+	);
+	
+	$meta_attr->{alias} = [ @{ $me->{alias} } ];
+};
+
 sub Marlin::Attribute::inject_moose_metadata {
 	my $me = shift;
 	my $metaclass = shift;
@@ -180,6 +217,8 @@ sub Marlin::Attribute::inject_moose_metadata {
 		$metaclass->add_attribute( $attr );
 	};
 	
+	INJECT_ALIASES( $me, $attr ) if $me->{alias};
+	
 	return $me->injected_metadata( Moose => $attr );
 }
 
@@ -234,6 +273,8 @@ sub Marlin::Attribute::inject_mooserole_metadata {
 	}
 	
 	$metarole->add_attribute( $attr );
+	
+	INJECT_ALIASES( $me, $attr ) if $me->{alias};
 	
 	return $me->injected_metadata( Moose => $attr );
 }

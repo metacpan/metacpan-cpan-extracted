@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 
 use Test2::V0;
-use Test::Timer;
+use Time::HiRes qw( gettimeofday tv_interval );
 
 use POE;
 use POE::Future;
@@ -16,7 +16,13 @@ POE::Kernel->run;
 sub time_about
 {
    my ( $code, $limit, $name ) = @_;
-   time_between $code, $limit * 0.9, $limit * 1.1, $name;
+
+   my $start = [ gettimeofday ];
+   $code->();
+   my $elapsed = tv_interval $start;
+
+   cmp_ok( $elapsed, ">=", $limit * 0.9, "$name took long enough" );
+   cmp_ok( $elapsed, "<=", $limit * 1.1, "$name did not take too long" );
 }
 
 # new_delay

@@ -50,6 +50,7 @@
             "App::nup" : "0.9906",
             "Getopt::EX::termcolor" : "0",
             "Getopt::Long::Bash" : "v0.7.1",
+            "Term::ANSIColor::Concise" : "3.02",
             "Text::ANSI::Fold" : "2.32",
             "perl" : "5.024"
          }
@@ -63,7 +64,7 @@
    "provides" : {
       "App::mdee" : {
          "file" : "lib/App/mdee.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -78,7 +79,7 @@
          "web" : "https://github.com/tecolicom/App-mdee"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],

@@ -26,7 +26,7 @@ no_index:
 provides:
   App::mdee:
     file: lib/App/mdee.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   App::Greple: '10.02'
   App::Greple::tee: '1.04'
@@ -36,13 +36,14 @@ requires:
   App::nup: '0.9906'
   Getopt::EX::termcolor: '0'
   Getopt::Long::Bash: v0.7.1
+  Term::ANSIColor::Concise: '3.02'
   Text::ANSI::Fold: '2.32'
   perl: '5.024'
 resources:
   bugtracker: https://github.com/tecolicom/App-mdee/issues
   homepage: https://github.com/tecolicom/App-mdee
   repository: https://github.com/tecolicom/App-mdee.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

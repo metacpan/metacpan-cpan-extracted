@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Timer::Absolute 0.804;
+package IO::Async::Timer::Absolute 0.805;
 
 use v5.14;
 use warnings;
@@ -16,6 +16,8 @@ use Carp;
 C<IO::Async::Timer::Absolute> - event callback at a fixed future time
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use IO::Async::Timer::Absolute;
 

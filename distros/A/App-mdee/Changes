@@ -1,5 +1,14 @@
 Revision history for Perl extension App-mdee
 
+0.06 2026-01-19T14:40:36Z
+
+    - Change color adjustment from HSL lightness (l) to Lab luminance (y)
+    - Set default base-color to RoyalBlue with automatic luminance adjustment
+    - Improve image_link: '!' links to image URL, '[alt]' links to target URL
+    - Require Term::ANSIColor::Concise 3.02 for luminance fix
+    - Rewrite -B/--base-color documentation
+    - Add OSC 8 hyperlink specification reference
+
 0.05 2026-01-19T09:08:47Z
 
     - Fix underscore emphasis inside inline code (e.g., `__PERL__`)

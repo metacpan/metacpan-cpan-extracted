@@ -1,13 +1,51 @@
 #! perl
 
+# Makefile generator for HarfBuzz::Shaper
+
+# Author          : Johan Vromans
+# Created On      : Sat Jan 17 21:40:08 2026
+# Last Modified By: Johan Vromans
+# Last Modified On: Mon Jan 19 20:57:19 2026
+# Update Count    : 28
+# Status          : Unknown, Use with caution!
+
+################ Common stuff ################
+
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 use lib 'inc';
 use Config;
+use PkgConfig;
 
 my $master = 'lib/HarfBuzz/Shaper.pm';
 my $version = MM->parse_version($master);
+
+# Package name.
+my $my_package = 'HarfBuzz::Shaper';
+# Program name and version.
+my $my_name = 'Makefile.PL';
+my $my_version = $version;
+
+################ Command line parameters ################
+
+use Getopt::Long 2.13;
+
+# Command line options.
+my $verbose = 1;		# verbose processing
+
+# Development options (not shown with -help).
+my $debug = 0;			# debugging
+my $trace = 0;			# trace (show process)
+my $test = 0;			# test mode.
+
+# Process command line options.
+app_options();
+
+# Post-processing.
+$trace |= ($debug || $test);
+
+################ Presets ################
 
 my %args = (
 
@@ -17,17 +55,17 @@ my %args = (
   ABSTRACT_FROM    => $master,
   LICENSE          => 'perl_5',
   PL_FILES         => {},
-  LIBS             => [ '-lharfbuzz' ],
+  LIBS             => [],
   INC              => '-I.',
   MIN_PERL_VERSION => '5.010001',
 
   PREREQ_PM => {
       'ExtUtils::MakeMaker' => 6.46, # for META_MERGE, LICENSE
-      'Test::More' => 0,
-      'Archive::Tar' => 0,
+      'Archive::Tar'        => 0,
   },
 
   TEST_REQUIRES  => {
+      'Test::More'          => 0,
   },
 
   META_MERGE => {
@@ -59,107 +97,81 @@ my %args = (
   }
 );
 
-# Check whether there is a harfbuzz library installed that we can use.
+################ The Process ################
 
-my $hb_include;
-my $hb_src = "hb_src.tar.gz";
-my $got_hb = $ENV{INCHS} ? -1 : 0;
-
-# First, try pkg-config.
-my $pkg_config = $ENV{'PKG_CONFIG'} // "pkg-config";
-my $res = `$pkg_config --version`;
-if ( !$got_hb && $res =~ /\d+\.\d+/ ) {
-    $res = `$pkg_config --libs harfbuzz`;
-    if ( $res =~ /(?:(-L.+)\s+)?(-l.+)/ ) {
-	$args{LIBS} = [ $res ];
-	$res = `$pkg_config --cflags harfbuzz`;
-	if ( $res =~ /-I.+/ ) {
-	    $args{INC} = $res;
-	}
-	warn("Using platform harfbuzz library (pkg-config)\n");
-	$got_hb = 1;
+my %po;
+if ( $^O =~ /darwin/ ) {
+    for ( qw( /opt/homebrew/lib/pkgconfig/ ) ) {
+	next unless -d $_;
+	push( @{$po{search_path}}, $_ );
     }
 }
 
-if ( !$got_hb ) {
-    require Devel::CheckLib;
-    my $ok =
-    Devel::CheckLib::check_lib( lib      => "harfbuzz",
-				header   => "harfbuzz/hb.h",
-				function => <<EOF );
-/* Need at least 1.7.7 */
-hb_blob_create_from_file("");
-return 0;
-EOF
-
-    if ( $ok ) {
-	# Okay, the test program compiled and ran. We can use this library.
-	warn("Using platform harfbuzz library (checklib)\n");
-	$got_hb = 1;
-	$args{CCFLAGS} = $Config{ccflags} . " -DHBDIR";
-    }
+my $ok = PkgConfig->find( "harfbuzz", %po );
+if ( $ok->errmsg ) {
+    die($ok->errmsg);
 }
 
-# If not, try to include our own copy of the library.
-# Note that this requires a C++ compiler. Luckily, there is often (but
-# not always) a C++ compiler around when using the GNU C-compiler.
-
-if ( $got_hb <= 0 && -s $hb_src ) {
-    $hb_include = 1;
-    warn(<<EOD);
-
-NOTICE !! NOTICE !! NOTICE !! NOTICE !! NOTICE !!
-
-We could not find a suitable harfbuzz library so we will try to
-build our own. This will require a decent C++ compiler (C++11).
-
-If building fails, see document INSTALL for (other options.
-
-EOD
-
-    $args{MYEXTLIB} = 'harfbuzz.o';
-
-    # FreeBSD 10 doesn't want the stdc++ library???
-    if ( $Config{osname} eq "freebsd" && $Config{osvers} =~ /^10\./ ) {
-	$args{LIBS} = [];
-    }
-    elsif ( $^O =~ /darwin/i ) {
-	$args{LIBS} = [ '-lc++' ];
-	# https://github.com/Homebrew/homebrew-core/issues/145991
-	$args{LDDLFLAGS} = $Config{lddlflags} . ' -Wl,-ld_classic';
-    }
-    else {
-	$args{LIBS} = [ '-lstdc++' ];
-    }
-    $args{INC}      = '-I. -Ihb_src -Ihb_src/harfbuzz';
-    $got_hb = 1;
-
-    require Archive::Tar;
-    Archive::Tar->new( $hb_src, undef, { extract => 1 } );
+my $vv = $ok->pkg_version;
+if ( $vv =~ /^(\d+)\.(\d+)/ ) {
+    die("HarfBuzz library $vv found, but too old (need at least 1.7.0\n")
+      if $1 < 1 || ( $1 == 1 && $2 < 7 );
 }
 
-# Sorry, there is no point in continuing...
-
-unless ( $got_hb >= 1 ) {
-    warn("HarfBuzz::Shaper needs the harfbuzz library, version 1.7.7 or later.\n",
-         "Please install it first. See file INSTALL for details.\n");
-    exit(1);
+my $res = $ok->get_ldflags;
+if ( $res ) {
+    $args{LIBS} = [ $res ];
 }
+
+$res = $ok->get_cflags;
+if ( $res  ) {
+    $args{INC} = $res;
+}
+
+warn("Using harfbuzz library $vv\n") if $verbose;
 
 # Write the Makefile.
 WriteMakefile(%args);
 
+exit 0;
+
 ################ Subroutines ################
 
-sub MY::postamble {
-    return unless $hb_include;
-    my $cxx = $ENV{CXX} || "c++";
-    return <<EOF;
-\$(MYEXTLIB) : hb_src/harfbuzz/harfbuzz.cc
-	$cxx -c -std=c++11 -fno-exceptions -o \$\@ -DHB_NO_MT \$(CCCDLFLAGS) \$<
+sub app_options {
+    my $help = 0;		# handled locally
+    my $ident = 0;		# handled locally
 
-clean ::
-	\$(RM_RF) hb_src
-EOF
+    # Process options, if any.
+    # Make sure defaults are set before returning!
+    return unless @ARGV > 0;
+
+    if ( !GetOptions(
+		     'ident'	=> \$ident,
+		     'verbose+'	=> \$verbose,
+		     'quiet'	=> sub { $verbose = 0 },
+		     'trace'	=> \$trace,
+		     'help|?'	=> \$help,
+		     'debug'	=> \$debug,
+		    ) or $help )
+    {
+	app_usage(2);
+    }
+    app_ident() if $ident;
 }
 
+sub app_ident {
+    print STDERR ("This is $my_package [$my_name $my_version]\n");
+}
+
+sub app_usage {
+    my ($exit) = @_;
+    app_ident();
+    print STDERR <<EndOfUsage;
+Usage: $^X $0 [options]
+   --ident		shows identification
+   --help		shows a brief help message and exits
+   --verbose		provides more verbose information
+   --quiet		runs as silently as possible
+EndOfUsage
+    exit $exit if defined $exit && $exit != 0;
+}

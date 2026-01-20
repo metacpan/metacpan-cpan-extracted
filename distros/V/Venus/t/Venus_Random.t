@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 if (require Venus::Random && Venus::Random->new(42)->range(1, 50) != 38) {
   diag "OS ($^O) rand function is undeterministic" if $ENV{VENUS_DEBUG};
@@ -45,17 +46,33 @@ $test->for('abstract');
 
 =includes
 
+method: alphanumeric
+method: alphanumerics
+method: base64
 method: bit
+method: bits
 method: boolean
 method: byte
+method: bytes
 method: character
+method: characters
 method: collect
+method: digest
 method: digit
+method: digits
 method: float
+method: hexdecimal
+method: hexdecimals
+method: id
 method: letter
+method: letters
 method: lowercased
+method: new
+method: nonce
 method: nonzero
 method: number
+method: numbers
+method: password
 method: pick
 method: range
 method: repeat
@@ -63,8 +80,13 @@ method: reseed
 method: reset
 method: restore
 method: select
+method: shuffle
 method: symbol
+method: symbols
+method: token
 method: uppercased
+method: urlsafe
+method: uuid
 
 =cut
 
@@ -119,6 +141,333 @@ Venus::Role::Valuable
 =cut
 
 $test->for('inherits');
+
+=method alphanumeric
+
+The alphanumeric method returns a random alphanumeric character, which is
+either a L</digit>, or L</letter> value.
+
+=signature alphanumeric
+
+  alphanumeric() (string)
+
+=metadata alphanumeric
+
+{
+  since => '4.15',
+}
+
+=example-1 alphanumeric
+
+  # given: synopsis
+
+  package main;
+
+  my $alphanumeric = $random->alphanumeric;
+
+  # "C"
+
+  # $alphanumeric = $random->alphanumeric;
+
+  # 0
+
+=cut
+
+$test->for('example', 1, 'alphanumeric', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  is $random->alphanumeric, 'C';
+  is $random->alphanumeric, '0';
+  is $random->alphanumeric, 'M';
+  is $random->alphanumeric, 'm';
+  is $random->alphanumeric, 'a';
+  is $random->alphanumeric, 'x';
+  is $random->alphanumeric, '5';
+  is $random->alphanumeric, '4';
+  is $random->alphanumeric, '9';
+  is $random->alphanumeric, '8';
+  is $random->alphanumeric, 'g';
+  is $random->alphanumeric, '0';
+  is $random->alphanumeric, '7';
+  is $random->alphanumeric, '2';
+  is $random->alphanumeric, '5';
+  is $random->alphanumeric, 'U';
+  is $random->alphanumeric, 'C';
+  is $random->alphanumeric, 'w';
+  is $random->alphanumeric, 'O';
+  is $random->alphanumeric, 'I';
+  is $random->alphanumeric, '1';
+  is $random->alphanumeric, '2';
+  is $random->alphanumeric, 'N';
+  is $random->alphanumeric, 'r';
+  is $random->alphanumeric, '2';
+  is $random->alphanumeric, '6';
+  is $random->alphanumeric, '4';
+  is $random->alphanumeric, 'V';
+  is $random->alphanumeric, '6';
+  is $random->alphanumeric, '5';
+  is $random->alphanumeric, '2';
+  is $random->alphanumeric, 'V';
+  is $random->alphanumeric, 'v';
+  is $random->alphanumeric, 'Q';
+  is $random->alphanumeric, '9';
+  is $random->alphanumeric, '5';
+  is $random->alphanumeric, 'a';
+  is $random->alphanumeric, 'h';
+  is $random->alphanumeric, 'c';
+  is $random->alphanumeric, '5';
+  is $random->alphanumeric, '8';
+  is $random->alphanumeric, 'Q';
+  is $random->alphanumeric, '8';
+  is $random->alphanumeric, 'p';
+  is $random->alphanumeric, 'p';
+  is $random->alphanumeric, '9';
+  is $random->alphanumeric, '2';
+  is $random->alphanumeric, '7';
+  is $random->alphanumeric, '5';
+  is $random->alphanumeric, '4';
+
+  $result
+});
+
+=method alphanumerics
+
+The alphanumerics method returns C<n> L</alphanumeric> characters based on the
+number (i.e. count) provided.
+
+=signature alphanumerics
+
+  alphanumerics(number $count) (string)
+
+=metadata alphanumerics
+
+{
+  since => '4.15',
+}
+
+=example-1 alphanumerics
+
+  # given: synopsis
+
+  package main;
+
+  my $alphanumerics = $random->alphanumerics(5);
+
+  # "C0Mma"
+
+  # $alphanumerics = $random->alphanumerics(5);
+
+  # "x5498"
+
+=cut
+
+$test->for('example', 1, 'alphanumerics', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  is $random->alphanumerics(5), 'C0Mma';
+  is $random->alphanumerics(5), 'x5498';
+  is $random->alphanumerics(5), 'g0725';
+  is $random->alphanumerics(5), 'UCwOI';
+  is $random->alphanumerics(5), '12Nr2';
+  is $random->alphanumerics(5), '64V65';
+  is $random->alphanumerics(5), '2VvQ9';
+  is $random->alphanumerics(5), '5ahc5';
+  is $random->alphanumerics(5), '8Q8pp';
+  is $random->alphanumerics(5), '92754';
+  is $random->alphanumerics(5), '410K0';
+  is $random->alphanumerics(5), 'Tj5V8';
+  is $random->alphanumerics(5), 'bV5g0';
+  is $random->alphanumerics(5), 'k7zp8';
+  is $random->alphanumerics(5), '2944C';
+  is $random->alphanumerics(5), 'v4m56';
+  is $random->alphanumerics(5), 'q1n8s';
+  is $random->alphanumerics(5), '513cQ';
+  is $random->alphanumerics(5), 'r1r4A';
+  is $random->alphanumerics(5), '7Wcd1';
+  is $random->alphanumerics(5), 'pcM0i';
+  is $random->alphanumerics(5), '2j745';
+  is $random->alphanumerics(5), '1lgUl';
+  is $random->alphanumerics(5), '0KA11';
+  is $random->alphanumerics(5), 'eu1p8';
+  is $random->alphanumerics(5), '980g8';
+  is $random->alphanumerics(5), 'eqq3s';
+  is $random->alphanumerics(5), '779kh';
+  is $random->alphanumerics(5), 'ib4K1';
+  is $random->alphanumerics(5), '4j038';
+  is $random->alphanumerics(5), '0Z697';
+  is $random->alphanumerics(5), '8N4j4';
+  is $random->alphanumerics(5), '04a98';
+  is $random->alphanumerics(5), '94dWb';
+  is $random->alphanumerics(5), 'lke65';
+  is $random->alphanumerics(5), 'Bq5k4';
+  is $random->alphanumerics(5), '3bVhm';
+  is $random->alphanumerics(5), '59J4i';
+  is $random->alphanumerics(5), '1IPc8';
+  is $random->alphanumerics(5), '2O61T';
+  is $random->alphanumerics(5), '1e78C';
+  is $random->alphanumerics(5), 'G563m';
+  is $random->alphanumerics(5), 'U8d05';
+  is $random->alphanumerics(5), '5U1IT';
+  is $random->alphanumerics(5), '5T60A';
+  is $random->alphanumerics(5), '25430';
+  is $random->alphanumerics(5), '243p0';
+  is $random->alphanumerics(5), '133Y8';
+  is $random->alphanumerics(5), '5GpBD';
+  is $random->alphanumerics(5), 'ZX4x8';
+
+  $result
+});
+
+=method base64
+
+The base64 method returns a unique randomly generated base64 encoded string.
+
+=signature base64
+
+  base64() (string)
+
+=metadata base64
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 base64
+
+  # given: synopsis
+
+  package main;
+
+  my $base64 = $random->base64;
+
+  # "gApCFiIVBS7JHxtVDkvQmOe2CU2RsVgzauI5EMMYI9s="
+
+  # $base64 = $random->base64;
+
+  # "ZdxOdj268Ge18X97cKr5yH6EJqfEdbI1OeeWJVH/XFQ="
+
+=cut
+
+$test->for('example', 1, 'base64', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  my $last;
+
+  isnt +($last = $random->base64), $random->base64;
+  isnt +($last = $random->base64), $random->base64;
+  isnt +($last = $random->base64), $random->base64;
+  isnt +($last = $random->base64), $random->base64;
+  isnt +($last = $random->base64), $random->base64;
+  isnt +($last = $random->base64), $random->base64;
+  isnt +($last = $random->base64), $random->base64;
+  isnt +($last = $random->base64), $random->base64;
+  isnt +($last = $random->base64), $random->base64;
+  isnt +($last = $random->base64), $random->base64;
+
+  $result
+});
+
+=method bits
+
+The bits method returns C<n> L</bit> characters based on the number (i.e.
+count) provided.
+
+=signature bits
+
+  bits(number $count) (string)
+
+=metadata bits
+
+{
+  since => '4.15',
+}
+
+=example-1 bits
+
+  # given: synopsis
+
+  package main;
+
+  my $bits = $random->bits(5);
+
+  # "01111"
+
+  # $bits = $random->bits(5);
+
+  # "01100"
+
+=cut
+
+$test->for('example', 1, 'bits', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  is $random->bits(5), '01111';
+  is $random->bits(5), '01100';
+  is $random->bits(5), '10010';
+  is $random->bits(5), '00101';
+  is $random->bits(5), '11010';
+  is $random->bits(5), '00111';
+  is $random->bits(5), '10111';
+  is $random->bits(5), '00100';
+  is $random->bits(5), '11000';
+  is $random->bits(5), '01001';
+  is $random->bits(5), '11111';
+  is $random->bits(5), '01000';
+  is $random->bits(5), '01110';
+  is $random->bits(5), '11010';
+  is $random->bits(5), '10101';
+  is $random->bits(5), '10100';
+  is $random->bits(5), '00010';
+  is $random->bits(5), '10100';
+  is $random->bits(5), '01001';
+  is $random->bits(5), '00110';
+  is $random->bits(5), '10010';
+  is $random->bits(5), '10000';
+  is $random->bits(5), '00010';
+  is $random->bits(5), '11101';
+  is $random->bits(5), '01111';
+  is $random->bits(5), '11110';
+  is $random->bits(5), '11110';
+  is $random->bits(5), '10001';
+  is $random->bits(5), '10010';
+  is $random->bits(5), '10001';
+  is $random->bits(5), '01010';
+  is $random->bits(5), '00111';
+  is $random->bits(5), '00110';
+  is $random->bits(5), '00000';
+  is $random->bits(5), '01011';
+  is $random->bits(5), '10111';
+  is $random->bits(5), '10110';
+  is $random->bits(5), '00110';
+  is $random->bits(5), '01101';
+  is $random->bits(5), '00001';
+  is $random->bits(5), '10001';
+  is $random->bits(5), '00001';
+  is $random->bits(5), '01111';
+  is $random->bits(5), '00101';
+  is $random->bits(5), '00001';
+  is $random->bits(5), '10001';
+  is $random->bits(5), '10111';
+  is $random->bits(5), '00100';
+  is $random->bits(5), '01001';
+  is $random->bits(5), '11000';
+
+  $result
+});
 
 =method bit
 
@@ -390,6 +739,97 @@ $test->for('example', 1, 'byte', sub {
   $result
 });
 
+=method bytes
+
+The bytes method returns C<n> L</byte> characters based on the number (i.e.
+count) provided.
+
+=signature bytes
+
+  bytes(number $count) (string)
+
+=metadata bytes
+
+{
+  since => '4.15',
+}
+
+=example-1 bytes
+
+  # given: synopsis
+
+  package main;
+
+  my $bytes = $random->bytes(5);
+
+  # "\xBE\x57\x1C\x6C\x14"
+
+  # $bytes = $random->bytes(5);
+
+  # "\xDB\x7F\x7A\xB0\xD5"
+
+=cut
+
+$test->for('example', 1, 'bytes', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  is $random->bytes(5), "\xBE\x57\x1C\x6C\x14";
+  is $random->bytes(5), "\xDB\x7F\x7A\xB0\xD5";
+  is $random->bytes(5), "\x76\x93\x88\x06\xC5";
+  is $random->bytes(5), "\x99\xE8\x7D\x89\x7F";
+  is $random->bytes(5), "\x70\x59\xEC\x0F\xDC";
+  is $random->bytes(5), "\xF8\xD9\x40\x34\x18";
+  is $random->bytes(5), "\x4D\xBA\x0E\x46\x4A";
+  is $random->bytes(5), "\x90\xDA\x37\xCD\xD1";
+  is $random->bytes(5), "\x36\x16\x8E\x86\xDD";
+  is $random->bytes(5), "\xEE\x23\x8B\x84\x4B";
+  is $random->bytes(5), "\x4F\x75\x30\x22\x40";
+  is $random->bytes(5), "\x89\x11\x81\xD0\xF1";
+  is $random->bytes(5), "\xAF\x48\x42\x02\x9E";
+  is $random->bytes(5), "\x67\x7D\x8A\x3B\xD6";
+  is $random->bytes(5), "\x58\x9E\x25\x93\x27";
+  is $random->bytes(5), "\x3F\xED\x36\xD1\xC6";
+  is $random->bytes(5), "\x9D\xD2\x9E\x40\x9D";
+  is $random->bytes(5), "\x1A\xF1\x20\x8B\x9D";
+  is $random->bytes(5), "\xFC\x09\xBD\x98\x48";
+  is $random->bytes(5), "\xD5\x9C\x17\x44\x95";
+  is $random->bytes(5), "\x64\xE5\xED\x42\xA1";
+  is $random->bytes(5), "\x37\xD8\xF4\xF3\x99";
+  is $random->bytes(5), "\x81\xBD\x9C\x21\xF1";
+  is $random->bytes(5), "\x35\x33\x6C\xB6\x0C";
+  is $random->bytes(5), "\x97\x5E\x72\x50\x74";
+  is $random->bytes(5), "\x06\x1F\x59\x15\xBC";
+  is $random->bytes(5), "\x63\x64\x4A\x01\xF1";
+  is $random->bytes(5), "\x72\xBB\xC0\xE7\x5F";
+  is $random->bytes(5), "\x02\x8A\xEA\x55\xD2";
+  is $random->bytes(5), "\x32\xCF\xFE\xE7\x0B";
+  is $random->bytes(5), "\xB9\x2B\xD0\x27\x97";
+  is $random->bytes(5), "\xB3\x9D\x3F\x09\x06";
+  is $random->bytes(5), "\xE5\xF4\x66\x1E\xBD";
+  is $random->bytes(5), "\x8D\xE7\xF7\xF5\xED";
+  is $random->bytes(5), "\x9B\x4C\xCF\x15\x40";
+  is $random->bytes(5), "\x4D\xFA\x74\x77\x34";
+  is $random->bytes(5), "\x7A\xEA\x1C\x1C\xFE";
+  is $random->bytes(5), "\xD3\xD2\x75\x7F\xFB";
+  is $random->bytes(5), "\x90\x7F\x69\x98\x03";
+  is $random->bytes(5), "\xB1\xA1\xF4\xA1\x55";
+  is $random->bytes(5), "\x29\xB9\xEB\x86\x2B";
+  is $random->bytes(5), "\xD7\xE7\xAE\xB8\x73";
+  is $random->bytes(5), "\x98\x7D\x28\x69\x61";
+  is $random->bytes(5), "\x81\xA5\x14\xEE\x01";
+  is $random->bytes(5), "\xA6\xAA\xC2\xAA\x78";
+  is $random->bytes(5), "\x25\xC7\xE5\xAE\x62";
+  is $random->bytes(5), "\x7A\xBE\x55\x08\x2D";
+  is $random->bytes(5), "\xB8\xB1\x7F\xE0\xAC";
+  is $random->bytes(5), "\xAC\x1B\x93\xB8\x25";
+  is $random->bytes(5), "\x73\x2F\xCF\xB4\x9B";
+
+  $result
+});
+
 =method character
 
 The character method returns a random character, which is either a L</digit>,
@@ -477,6 +917,97 @@ $test->for('example', 1, 'character', sub {
   is $random->character, "t";
   is $random->character, "Y";
   is $random->character, 2;
+
+  $result
+});
+
+=method characters
+
+The characters method returns C<n> L</character> characters based on the number
+(i.e. count) provided.
+
+=signature characters
+
+  characters(number $count) (string)
+
+=metadata characters
+
+{
+  since => '4.15',
+}
+
+=example-1 characters
+
+  # given: synopsis
+
+  package main;
+
+  my $characters = $random->characters(5);
+
+  # ")48R+"
+
+  # $characters = $random->characters(5);
+
+  # "a}[Lb"
+
+=cut
+
+$test->for('example', 1, 'characters', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  is $random->characters(5), ')48R+';
+  is $random->characters(5), 'a}[Lb';
+  is $random->characters(5), '?&072';
+  is $random->characters(5), '5^,0w';
+  is $random->characters(5), '$h415';
+  is $random->characters(5), '5>*0M';
+  is $random->characters(5), 'VdG^\'';
+  is $random->characters(5), 'q695a';
+  is $random->characters(5), '}8GX*';
+  is $random->characters(5), 'V>tY2';
+  is $random->characters(5), 'bL41T';
+  is $random->characters(5), 'H9t-5';
+  is $random->characters(5), ')^?!%';
+  is $random->characters(5), '$p08_';
+  is $random->characters(5), '7z<V2';
+  is $random->characters(5), '9Fc9,';
+  is $random->characters(5), 'ZKRqS';
+  is $random->characters(5), ']8;=E';
+  is $random->characters(5), 'NY6rU';
+  is $random->characters(5), ';TE;r';
+  is $random->characters(5), '#dV}c';
+  is $random->characters(5), '+AiX-';
+  is $random->characters(5), '74m8+';
+  is $random->characters(5), '>8sA7';
+  is $random->characters(5), '3A1YT';
+  is $random->characters(5), '"P}8j';
+  is $random->characters(5), '_5&w%';
+  is $random->characters(5), '{rI?~';
+  is $random->characters(5), '~[{U*';
+  is $random->characters(5), 'i"2iD';
+  is $random->characters(5), '4>A3l';
+  is $random->characters(5), '8lZ78';
+  is $random->characters(5), '#M\'LK';
+  is $random->characters(5), 'u1%~@';
+  is $random->characters(5), 'w58{6';
+  is $random->characters(5), 'O_}0O';
+  is $random->characters(5), '^8|5.';
+  is $random->characters(5), 'K3<88';
+  is $random->characters(5), 'h\Px3';
+  is $random->characters(5), '4i1I*';
+  is $random->characters(5), 'w4&75';
+  is $random->characters(5), '61&%6';
+  is $random->characters(5), '%78+8';
+  is $random->characters(5), '2fIm=';
+  is $random->characters(5), '-<$BO';
+  is $random->characters(5), '=_9P7';
+  is $random->characters(5), 'qhCAC';
+  is $random->characters(5), 'M3L4J';
+  is $random->characters(5), ']A133';
+  is $random->characters(5), '!##l6';
 
   $result
 });
@@ -803,6 +1334,64 @@ $test->for('example', 4, 'collect', sub {
   $result
 });
 
+=method digest
+
+The digest method returns a unique randomly generated L<"md5"|Digest::MD5>
+digest.
+
+=signature digest
+
+  digest() (string)
+
+=metadata digest
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 digest
+
+  # given: synopsis
+
+  package main;
+
+  my $digest = $random->digest;
+
+  # "86eb5865c3e4a1457fbefcc93e037459"
+
+  # $digest = $random->digest;
+
+  # "9be02d56ece7efe68bc59d2ebf3c4ed7"
+
+=cut
+
+$test->for('example', 1, 'digest', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok length($result) > 30;
+  like $result, qr/^\w+$/;
+
+  my $random = Venus::Random->new(42);
+
+  my $last;
+
+  isnt +($last = $random->digest), $random->digest;
+  isnt +($last = $random->digest), $random->digest;
+  isnt +($last = $random->digest), $random->digest;
+  isnt +($last = $random->digest), $random->digest;
+  isnt +($last = $random->digest), $random->digest;
+  isnt +($last = $random->digest), $random->digest;
+  isnt +($last = $random->digest), $random->digest;
+  isnt +($last = $random->digest), $random->digest;
+  isnt +($last = $random->digest), $random->digest;
+  isnt +($last = $random->digest), $random->digest;
+
+  $result
+});
+
 =method digit
 
 The digit method returns a random digit between C<0> and C<9>.
@@ -889,6 +1478,97 @@ $test->for('example', 1, 'digit', sub {
   is $random->digit, 5;
   is $random->digit, 5;
   is $random->digit, 2;
+
+  $result
+});
+
+=method digits
+
+The digits method returns C<n> L</digit> characters based on the number (i.e.
+count) provided.
+
+=signature digits
+
+  digits(number $count) (string)
+
+=metadata digits
+
+{
+  since => '4.15',
+}
+
+=example-1 digits
+
+  # given: synopsis
+
+  package main;
+
+  my $digits = $random->digits(5);
+
+  # 73140
+
+  # $digits = $random->digits(5);
+
+  # 84468
+
+=cut
+
+$test->for('example', 1, 'digits', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  is $random->digits(5), '73140';
+  is $random->digits(5), '84468';
+  is $random->digits(5), '45507';
+  is $random->digits(5), '69454';
+  is $random->digits(5), '43908';
+  is $random->digits(5), '98220';
+  is $random->digits(5), '37022';
+  is $random->digits(5), '58288';
+  is $random->digits(5), '20558';
+  is $random->digits(5), '91552';
+  is $random->digits(5), '34112';
+  is $random->digits(5), '50589';
+  is $random->digits(5), '62206';
+  is $random->digits(5), '44528';
+  is $random->digits(5), '36151';
+  is $random->digits(5), '29287';
+  is $random->digits(5), '68626';
+  is $random->digits(5), '19156';
+  is $random->digits(5), '90752';
+  is $random->digits(5), '86025';
+  is $random->digits(5), '38926';
+  is $random->digits(5), '28996';
+  is $random->digits(5), '57619';
+  is $random->digits(5), '22470';
+  is $random->digits(5), '53434';
+  is $random->digits(5), '01307';
+  is $random->digits(5), '33209';
+  is $random->digits(5), '47793';
+  is $random->digits(5), '05938';
+  is $random->digits(5), '18990';
+  is $random->digits(5), '71815';
+  is $random->digits(5), '76200';
+  is $random->digits(5), '89317';
+  is $random->digits(5), '59999';
+  is $random->digits(5), '62802';
+  is $random->digits(5), '39442';
+  is $random->digits(5), '49119';
+  is $random->digits(5), '88449';
+  is $random->digits(5), '54450';
+  is $random->digits(5), '66963';
+  is $random->digits(5), '17951';
+  is $random->digits(5), '89674';
+  is $random->digits(5), '54143';
+  is $random->digits(5), '56090';
+  is $random->digits(5), '66764';
+  is $random->digits(5), '17863';
+  is $random->digits(5), '47301';
+  is $random->digits(5), '76486';
+  is $random->digits(5), '61571';
+  is $random->digits(5), '41876';
 
   $result
 });
@@ -1211,6 +1891,242 @@ $test->for('example', 4, 'float', sub {
   $result
 });
 
+=method hexdecimal
+
+The hexdecimal method returns a hexdecimal character.
+
+=signature hexdecimal
+
+  hexdecimal() (string)
+
+=metadata hexdecimal
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 hexdecimal
+
+  # given: synopsis
+
+  package main;
+
+  my $hexdecimal = $random->hexdecimal;
+
+  # "b"
+
+  # $hexdecimal = $random->hexdecimal;
+
+  # 5
+
+=cut
+
+$test->for('example', 1, 'hexdecimal', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  is $random->hexdecimal, 'b';
+  is $random->hexdecimal, '5';
+  is $random->hexdecimal, '1';
+  is $random->hexdecimal, '6';
+  is $random->hexdecimal, '1';
+  is $random->hexdecimal, 'd';
+  is $random->hexdecimal, '7';
+  is $random->hexdecimal, '7';
+  is $random->hexdecimal, 'b';
+  is $random->hexdecimal, 'd';
+  is $random->hexdecimal, '7';
+  is $random->hexdecimal, '9';
+  is $random->hexdecimal, '8';
+  is $random->hexdecimal, '0';
+  is $random->hexdecimal, 'c';
+  is $random->hexdecimal, '9';
+  is $random->hexdecimal, 'e';
+  is $random->hexdecimal, '7';
+  is $random->hexdecimal, '8';
+  is $random->hexdecimal, '7';
+  is $random->hexdecimal, '7';
+  is $random->hexdecimal, '5';
+  is $random->hexdecimal, 'e';
+  is $random->hexdecimal, '0';
+  is $random->hexdecimal, 'd';
+  is $random->hexdecimal, 'f';
+  is $random->hexdecimal, 'd';
+  is $random->hexdecimal, '4';
+  is $random->hexdecimal, '3';
+  is $random->hexdecimal, '1';
+  is $random->hexdecimal, '4';
+  is $random->hexdecimal, 'b';
+  is $random->hexdecimal, '0';
+  is $random->hexdecimal, '4';
+  is $random->hexdecimal, '4';
+  is $random->hexdecimal, '9';
+  is $random->hexdecimal, 'd';
+  is $random->hexdecimal, '3';
+  is $random->hexdecimal, 'c';
+  is $random->hexdecimal, 'd';
+  is $random->hexdecimal, '3';
+  is $random->hexdecimal, '1';
+  is $random->hexdecimal, '8';
+  is $random->hexdecimal, '8';
+  is $random->hexdecimal, 'd';
+  is $random->hexdecimal, 'e';
+  is $random->hexdecimal, '2';
+  is $random->hexdecimal, '8';
+  is $random->hexdecimal, '8';
+  is $random->hexdecimal, '4';
+
+  $result
+});
+
+=method hexdecimals
+
+The hexdecimals method returns C<n> L</hexdecimal> characters based on the
+number (i.e. count) provided.
+
+=signature hexdecimals
+
+  hexdecimals(number $count) (string)
+
+=metadata hexdecimals
+
+{
+  since => '4.15',
+}
+
+=example-1 hexdecimals
+
+  # given: synopsis
+
+  package main;
+
+  my $hexdecimals = $random->hexdecimals(5);
+
+  # "b5161"
+
+  # $hexdecimals = $random->hexdecimals(5);
+
+  # "d77bd"
+
+=cut
+
+$test->for('example', 1, 'hexdecimals', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  is $random->hexdecimals(5), 'b5161';
+  is $random->hexdecimals(5), 'd77bd';
+  is $random->hexdecimals(5), '7980c';
+  is $random->hexdecimals(5), '9e787';
+  is $random->hexdecimals(5), '75e0d';
+  is $random->hexdecimals(5), 'fd431';
+  is $random->hexdecimals(5), '4b044';
+  is $random->hexdecimals(5), '9d3cd';
+  is $random->hexdecimals(5), '3188d';
+  is $random->hexdecimals(5), 'e2884';
+  is $random->hexdecimals(5), '47324';
+  is $random->hexdecimals(5), '818df';
+  is $random->hexdecimals(5), 'a4409';
+  is $random->hexdecimals(5), '6783d';
+  is $random->hexdecimals(5), '59292';
+  is $random->hexdecimals(5), '3e3dc';
+  is $random->hexdecimals(5), '9d949';
+  is $random->hexdecimals(5), '1f289';
+  is $random->hexdecimals(5), 'f0b94';
+  is $random->hexdecimals(5), 'd9149';
+  is $random->hexdecimals(5), '6ee4a';
+  is $random->hexdecimals(5), '3dff9';
+  is $random->hexdecimals(5), '8b92f';
+  is $random->hexdecimals(5), '336b0';
+  is $random->hexdecimals(5), '95757';
+  is $random->hexdecimals(5), '0151b';
+  is $random->hexdecimals(5), '6640f';
+  is $random->hexdecimals(5), '7bce5';
+  is $random->hexdecimals(5), '08e5d';
+  is $random->hexdecimals(5), '3cfe0';
+  is $random->hexdecimals(5), 'b2d29';
+  is $random->hexdecimals(5), 'b9300';
+  is $random->hexdecimals(5), 'ef61b';
+  is $random->hexdecimals(5), '8effe';
+  is $random->hexdecimals(5), '94c14';
+  is $random->hexdecimals(5), '4f773';
+  is $random->hexdecimals(5), '7e11f';
+  is $random->hexdecimals(5), 'dd77f';
+  is $random->hexdecimals(5), '97690';
+  is $random->hexdecimals(5), 'bafa5';
+  is $random->hexdecimals(5), '2be82';
+  is $random->hexdecimals(5), 'deab7';
+  is $random->hexdecimals(5), '97266';
+  is $random->hexdecimals(5), '8a1e0';
+  is $random->hexdecimals(5), 'aaca7';
+  is $random->hexdecimals(5), '2cea6';
+  is $random->hexdecimals(5), '7b502';
+  is $random->hexdecimals(5), 'bb7ea';
+  is $random->hexdecimals(5), 'a19b2';
+  is $random->hexdecimals(5), '72cb9';
+
+  $result
+});
+
+=method id
+
+The id method returns a machine unique thread-safe random numerical identifier.
+
+=signature id
+
+  id() (number)
+
+=metadata id
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 id
+
+  # given: synopsis
+
+  package main;
+
+  my $id = $random->id;
+
+  # 1729257495154941
+
+=cut
+
+$test->for('example', 1, 'id', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok length($result) > 10;
+  like $result, qr/^\d+$/;
+
+  my $random = Venus::Random->new(42);
+
+  my $last;
+
+  isnt +($last = $random->id), $random->id;
+  isnt +($last = $random->id), $random->id;
+  isnt +($last = $random->id), $random->id;
+  isnt +($last = $random->id), $random->id;
+  isnt +($last = $random->id), $random->id;
+  isnt +($last = $random->id), $random->id;
+  isnt +($last = $random->id), $random->id;
+  isnt +($last = $random->id), $random->id;
+  isnt +($last = $random->id), $random->id;
+  isnt +($last = $random->id), $random->id;
+
+  $result
+});
+
 =method letter
 
 The letter method returns a random letter, which is either an L</uppercased> or
@@ -1302,6 +2218,97 @@ $test->for('example', 1, 'letter', sub {
   $result
 });
 
+=method letters
+
+The letters method returns C<n> L</letter> characters based on the number (i.e.
+count) provided.
+
+=signature letters
+
+  letters(number $count) (string)
+
+=metadata letters
+
+{
+  since => '4.15',
+}
+
+=example-1 letters
+
+  # given: synopsis
+
+  package main;
+
+  my $letters = $random->letters(5);
+
+  # "iKWMv"
+
+  # $letters = $random->letters(5);
+
+  # "Papmm"
+
+=cut
+
+$test->for('example', 1, 'letters', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  is $random->letters(5), 'iKWMv';
+  is $random->letters(5), 'Papmm';
+  is $random->letters(5), 'JbzgC';
+  is $random->letters(5), 'SHOfv';
+  is $random->letters(5), 'CnyOh';
+  is $random->letters(5), 'LDNNy';
+  is $random->letters(5), 'hAkOV';
+  is $random->letters(5), 'QPGfu';
+  is $random->letters(5), 'vgcdp';
+  is $random->letters(5), 'apVcP';
+  is $random->letters(5), 'Xgfyp';
+  is $random->letters(5), 'tdfLb';
+  is $random->letters(5), 'jIAJT';
+  is $random->letters(5), 'KAltj';
+  is $random->letters(5), 'Oifzb';
+  is $random->letters(5), 'eesgA';
+  is $random->letters(5), 'yDozy';
+  is $random->letters(5), 'hcHlF';
+  is $random->letters(5), 'XCvlZ';
+  is $random->letters(5), 'mPRyi';
+  is $random->letters(5), 'SnVrl';
+  is $random->letters(5), 'mKNca';
+  is $random->letters(5), 'rrDxj';
+  is $random->letters(5), 'TASmr';
+  is $random->letters(5), 'csLVp';
+  is $random->letters(5), 'yYMAt';
+  is $random->letters(5), 'KXjSK';
+  is $random->letters(5), 'NEsUg';
+  is $random->letters(5), 'mslBf';
+  is $random->letters(5), 'QAECp';
+  is $random->letters(5), 'TuFxc';
+  is $random->letters(5), 'jjkNg';
+  is $random->letters(5), 'VtVqr';
+  is $random->letters(5), 'mSsUT';
+  is $random->letters(5), 'ZoUhz';
+  is $random->letters(5), 'WbLiJ';
+  is $random->letters(5), 'FUjAJ';
+  is $random->letters(5), 'WAklk';
+  is $random->letters(5), 'deyNM';
+  is $random->letters(5), 'tLJKO';
+  is $random->letters(5), 'aZUYM';
+  is $random->letters(5), 'wNWoS';
+  is $random->letters(5), 'lyUeQ';
+  is $random->letters(5), 'OfUqO';
+  is $random->letters(5), 'wJCWb';
+  is $random->letters(5), 'dohqM';
+  is $random->letters(5), 'mxJLp';
+  is $random->letters(5), 'ANIhy';
+  is $random->letters(5), 'cVGea';
+  is $random->letters(5), 'gZTEt';
+
+  $result
+});
+
 =method lowercased
 
 The lowercased method returns a random lowercased letter.
@@ -1388,6 +2395,132 @@ $test->for('example', 1, 'lowercased', sub {
   is $random->lowercased, "o";
   is $random->lowercased, "n";
   is $random->lowercased, "h";
+
+  $result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Random)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Random;
+
+  my $new = Venus::Random->new;
+
+  # bless(..., "Venus::Random")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Random');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Random;
+
+  my $new = Venus::Random->new(42);
+
+  # bless(..., "Venus::Random")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Random');
+  is $result->value, 42;
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Random;
+
+  my $new = Venus::Random->new(value => 42);
+
+  # bless(..., "Venus::Random")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Random');
+  is $result->value, 42;
+
+  $result
+});
+
+=method nonce
+
+The nonce method returns a 10-character L</alphanumeric> string.
+
+=signature nonce
+
+  nonce() (string)
+
+=metadata nonce
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 nonce
+
+  # given: synopsis
+
+  package main;
+
+  my $nonce = $random->nonce;
+
+  # "j2q1G45903"
+
+  # $nonce = $random->nonce;
+
+  # "7nmi8mT5Io"
+
+=cut
+
+$test->for('example', 1, 'nonce', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok length($result) == 10;
+  like $result, qr/^\w+$/;
+
+  my $random = Venus::Random->new(42);
+
+  my $last;
+
+  isnt +($last = $random->nonce), $random->nonce;
 
   $result
 });
@@ -2028,6 +3161,190 @@ $test->for('example', 4, 'number', sub {
   is $random->number(5), 54445;
   is $random->number(5), 51921;
   is $random->number(5), 29349;
+
+  $result
+});
+
+=method numbers
+
+The numbers method returns C<n> L</number> characters (between C<1> and C<9>)
+based on the number (i.e.  count) provided.
+
+=signature numbers
+
+  numbers(number $count) (string)
+
+=metadata numbers
+
+{
+  since => '4.15',
+}
+
+=example-1 numbers
+
+  # given: synopsis
+
+  package main;
+
+  my $numbers = $random->numbers(5);
+
+  # 74141
+
+  # $numbers = $random->numbers(5);
+
+  # 85578
+
+=cut
+
+$test->for('example', 1, 'numbers', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  is $random->numbers(5), '74141';
+  is $random->numbers(5), '85578';
+  is $random->numbers(5), '56517';
+  is $random->numbers(5), '69555';
+  is $random->numbers(5), '44918';
+  is $random->numbers(5), '98321';
+  is $random->numbers(5), '37133';
+  is $random->numbers(5), '68288';
+  is $random->numbers(5), '21658';
+  is $random->numbers(5), '92553';
+  is $random->numbers(5), '35223';
+  is $random->numbers(5), '51589';
+  is $random->numbers(5), '73316';
+  is $random->numbers(5), '45538';
+  is $random->numbers(5), '46262';
+  is $random->numbers(5), '39287';
+  is $random->numbers(5), '68636';
+  is $random->numbers(5), '19256';
+  is $random->numbers(5), '91763';
+  is $random->numbers(5), '86136';
+  is $random->numbers(5), '49936';
+  is $random->numbers(5), '28996';
+  is $random->numbers(5), '57629';
+  is $random->numbers(5), '22471';
+  is $random->numbers(5), '64535';
+  is $random->numbers(5), '12417';
+  is $random->numbers(5), '44319';
+  is $random->numbers(5), '57794';
+  is $random->numbers(5), '15938';
+  is $random->numbers(5), '28991';
+  is $random->numbers(5), '72826';
+  is $random->numbers(5), '76311';
+  is $random->numbers(5), '99427';
+  is $random->numbers(5), '59999';
+  is $random->numbers(5), '63813';
+  is $random->numbers(5), '39552';
+  is $random->numbers(5), '59129';
+  is $random->numbers(5), '88559';
+  is $random->numbers(5), '65461';
+  is $random->numbers(5), '76964';
+  is $random->numbers(5), '27952';
+  is $random->numbers(5), '89775';
+  is $random->numbers(5), '65244';
+  is $random->numbers(5), '56191';
+  is $random->numbers(5), '66775';
+  is $random->numbers(5), '28974';
+  is $random->numbers(5), '57412';
+  is $random->numbers(5), '77587';
+  is $random->numbers(5), '71672';
+  is $random->numbers(5), '52876';
+
+  $result
+});
+
+=method password
+
+The password method returns C<n> L<"characters"|/character> based on the number
+(i.e. count) provided. The default length is 16.
+
+=signature password
+
+  password(number $count) (string)
+
+=metadata password
+
+{
+  since => '4.15',
+}
+
+=example-1 password
+
+  # given: synopsis
+
+  package main;
+
+  my $password = $random->password;
+
+  # "0*89{745axCMg0m2"
+
+  # $password = $random->password;
+
+  # "5rV22V24>6Q1v#6N"
+
+=cut
+
+$test->for('example', 1, 'password', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is length($result), 16;
+
+  my $random = Venus::Random->new(42);
+
+  is $random->password, '0*89{745axCMg0m2';
+  is $random->password, '5rV22V24>6Q1v#6N';
+  is $random->password, '45>p1087p42Q9K=0';
+  is $random->password, '8p5g40289k7,4?zC';
+  is $random->password, '[n4s5r371AQc81r;';
+  is $random->password, '07^g21;5ljUiM0l4';
+  is $random->password, 'se7c508Z[78?3gqq';
+  is $random->password, '184$690Zj4+8307N';
+  is $random->password, 'Wqkd6B-be_5Yk5l4';
+  is $random->password, 'ITcO$11iP%J8X462';
+  is $random->password, '\150m53U)UT6d58I';
+  is $random->password, '84|g/G2529484117';
+  is $random->password, '7\'LIvn\Y4L0x2358';
+  is $random->password, '6{ueWDt8441323~4';
+  is $random->password, 'k944AH26179<$88x';
+  is $random->password, '4377E1X7$6K5VU,4';
+  is $random->password, 'FK0s02@Y11s40^Ju';
+  is $random->password, '4453R665O6]D0\Ov';
+  is $random->password, '1X5(n9e6F3V8^VI5';
+  is $random->password, '62Xp3~63%49187c9';
+  is $random->password, '361PL#U&7640l6g9';
+  is $random->password, '%B66.fQ2H120Ei6z';
+  is $random->password, '84Bda80!K0cj1"N7';
+  is $random->password, '67+6O090y181f,4n';
+  is $random->password, 'r\3PD8h]48qW8f0Y';
+  is $random->password, 'edGz0y4y3;[b34U2';
+  is $random->password, '12<545Kl5=65XUYb';
+  is $random->password, '7J:Ah9%13665HYvN';
+  is $random->password, 'R72=6dw0A516a$j1';
+  is $random->password, 'nXz734(f)p47230l';
+  is $random->password, 'BZb320uMQ%fE56d#';
+  is $random->password, '91Z.4PfwRJQc1%46';
+  is $random->password, 'Q!0VE%Os8X51L1r6';
+  is $random->password, '7113<97k3g7tdJ3)';
+  is $random->password, 'm\'e3uf51.31OY068';
+  is $random->password, '47SF.EG82:T6T23B';
+  is $random->password, 'Bo1n8_L959;32zAo';
+  is $random->password, 'y764]t26R9uJQp@0';
+  is $random->password, '41062581I1)D3>M2';
+  is $random->password, '2iw55Fwpz#=ezD49';
+  is $random->password, '7ho;5E253~Uw7825';
+  is $random->password, '$807>3KT656lSz33';
+  is $random->password, '{R4x?9265WBXh24p';
+  is $random->password, 'EcC{i9s*Pd61q3m8';
+  is $random->password, '!88Y910(8UA86MY9';
+  is $random->password, 'QksL0J2Kv3uoo!r!';
+  is $random->password, '2L-(Q37Yy0a58n21';
+  is $random->password, 'i619ryZ21}80T1(7';
+  is $random->password, '40:e81beSb&95ato';
+  is $random->password, '97Hx6jUpU0,6Fm|R';
 
   $result
 });
@@ -3176,6 +4493,54 @@ $test->for('example', 2, 'select', sub {
   $result
 });
 
+=method shuffle
+
+The shuffle method returns the string provided with its characters randomly
+rearranged.
+
+=signature shuffle
+
+  shuffle(string $string) (string)
+
+=metadata shuffle
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 shuffle
+
+  # given: synopsis
+
+  package main;
+
+  my $shuffle = $random->shuffle('hello');
+
+  # "olhel"
+
+  # $shuffle = $random->shuffle('hello');
+
+  # "loelh"
+
+=cut
+
+$test->for('example', 1, 'shuffle', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  is $random->shuffle('hello'), 'olhel';
+  is $random->shuffle('hello'), 'loelh';
+  is $random->shuffle('hello'), 'hleol';
+  is $random->shuffle('hello'), 'leohl';
+  is $random->shuffle('hello'), 'lhleo';
+
+  $result
+});
+
 =method symbol
 
 The symbol method returns a random symbol.
@@ -3266,6 +4631,215 @@ $test->for('example', 1, 'symbol', sub {
   $result
 });
 
+=method symbols
+
+The symbols method returns C<n> L</symbol> characters based on the number (i.e.
+count) provided.
+
+=signature symbols
+
+  symbols(number $count) (string)
+
+=metadata symbols
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 symbols
+
+  # given: synopsis
+
+  package main;
+
+  my $symbols = $random->symbols(5);
+
+  # "')#=@"
+
+  # $symbols = $random->symbols(5);
+
+  # ".[+;,"
+
+=cut
+
+$test->for('example', 1, 'symbols', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  is $random->symbols(5), '\')#=@';
+  is $random->symbols(5), '.[+;,';
+  is $random->symbols(5), '+{]~\'';
+  is $random->symbols(5), '}<[][';
+  is $random->symbols(5), '=)<!.';
+  is $random->symbols(5), '?.&^@';
+  is $random->symbols(5), '(:!**';
+  is $random->symbols(5), '{.^",';
+  is $random->symbols(5), '^@{].';
+  is $random->symbols(5), '<$]](';
+  is $random->symbols(5), '(+%$&';
+  is $random->symbols(5), ']@[,>';
+  is $random->symbols(5), ';**~\\';
+  is $random->symbols(5), '_[]&.';
+  is $random->symbols(5), ')\\${$';
+  is $random->symbols(5), '&<^,\'';
+  is $random->symbols(5), '\\,\\&\\';
+  is $random->symbols(5), '#>#]\\';
+  is $random->symbols(5), '?!:}*';
+  is $random->symbols(5), ',}@*}';
+  is $random->symbols(5), '_/<*\\';
+  is $random->symbols(5), '^.>>}';
+  is $random->symbols(5), '[:}$>';
+  is $random->symbols(5), '^^=:!';
+  is $random->symbols(5), '}-=(+';
+  is $random->symbols(5), '~#)@:';
+  is $random->symbols(5), '-_*~>';
+  is $random->symbols(5), '=:\'<-';
+  is $random->symbols(5), '~]<),';
+  is $random->symbols(5), '^,?<!';
+  is $random->symbols(5), ':%,$}';
+  is $random->symbols(5), ';\\&!~';
+  is $random->symbols(5), '/>_#:';
+  is $random->symbols(5), '{<>><';
+  is $random->symbols(5), '}(,@&';
+  is $random->symbols(5), '(?++^';
+  is $random->symbols(5), '+<##?';
+  is $random->symbols(5), ',,+[?';
+  is $random->symbols(5), '{[_}~';
+  is $random->symbols(5), ';\\>\\)';
+  is $random->symbols(5), '%:<]%';
+  is $random->symbols(5), '.<;:=';
+  is $random->symbols(5), '}[$_-';
+  is $random->symbols(5), '[|@<~';
+  is $random->symbols(5), '||\'|+';
+  is $random->symbols(5), '$"/;-';
+  is $random->symbols(5), '+\')!%';
+  is $random->symbols(5), ':;[/|';
+  is $random->symbols(5), '|#{:$';
+  is $random->symbols(5), '=%,;}';
+
+  $result
+});
+
+=method token
+
+The token method returns a unique randomly generated L<"md5"|Digest::MD5>
+digest.
+
+=signature token
+
+  token() (string)
+
+=metadata token
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 token
+
+  # given: synopsis
+
+  package main;
+
+  my $token = $random->token;
+
+  # "86eb5865c3e4a1457fbefcc93e037459"
+
+  # $token = $random->token;
+
+  # "9be02d56ece7efe68bc59d2ebf3c4ed7"
+
+=cut
+
+$test->for('example', 1, 'token', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok length($result) > 30;
+  like $result, qr/^\w+$/;
+
+  my $random = Venus::Random->new(42);
+
+  my $last;
+
+  isnt +($last = $random->token), $random->token;
+  isnt +($last = $random->token), $random->token;
+  isnt +($last = $random->token), $random->token;
+  isnt +($last = $random->token), $random->token;
+  isnt +($last = $random->token), $random->token;
+  isnt +($last = $random->token), $random->token;
+  isnt +($last = $random->token), $random->token;
+  isnt +($last = $random->token), $random->token;
+  isnt +($last = $random->token), $random->token;
+  isnt +($last = $random->token), $random->token;
+
+  $result
+});
+
+=method urlsafe
+
+The urlsafe method returns a unique randomly generated URL-safe string based on
+L</base64>.
+
+=signature urlsafe
+
+  urlsafe() (string)
+
+=metadata urlsafe
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 urlsafe
+
+  # given: synopsis
+
+  package main;
+
+  my $urlsafe = $random->urlsafe;
+
+  # "WtdsCPBQDKXPv2tcuFbBFcdDtJ6EZRyE3Xke0e65YRQ"
+
+  # $urlsafe = $random->urlsafe;
+
+  # "xXq7Mkwo7nLsFjMW8mvKgdzac5m4X0gFMykO1r0d7GA"
+
+=cut
+
+$test->for('example', 1, 'urlsafe', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok length($result) > 30;
+  like $result, qr/^[\w\-]+$/;
+
+  my $random = Venus::Random->new(42);
+
+  my $last;
+
+  isnt +($last = $random->urlsafe), $random->urlsafe;
+  isnt +($last = $random->urlsafe), $random->urlsafe;
+  isnt +($last = $random->urlsafe), $random->urlsafe;
+  isnt +($last = $random->urlsafe), $random->urlsafe;
+  isnt +($last = $random->urlsafe), $random->urlsafe;
+  isnt +($last = $random->urlsafe), $random->urlsafe;
+  isnt +($last = $random->urlsafe), $random->urlsafe;
+  isnt +($last = $random->urlsafe), $random->urlsafe;
+  isnt +($last = $random->urlsafe), $random->urlsafe;
+  isnt +($last = $random->urlsafe), $random->urlsafe;
+
+  $result
+});
+
 =method uppercased
 
 The uppercased method returns a random uppercased letter.
@@ -3352,6 +4926,65 @@ $test->for('example', 1, 'uppercased', sub {
   is $random->uppercased, "O";
   is $random->uppercased, "N";
   is $random->uppercased, "H";
+
+  $result
+});
+
+=method uuid
+
+The uuid method returns a machine-unique randomly generated psuedo UUID string.
+B<Note:> The identifier returned attempts to be unique across network devices
+but its uniqueness can't be guaranteed.
+
+=signature uuid
+
+  uuid() (string)
+
+=metadata uuid
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 uuid
+
+  # given: synopsis
+
+  package main;
+
+  my $uuid = $random->uuid;
+
+  # "0d3eea5f-1826-3d37-e242-72ea44a157fd"
+
+  # $uuid = $random->uuid;
+
+  # "6e179032-c7fe-1dc6-61b8-cebd00fa06a1"
+
+=cut
+
+$test->for('example', 1, 'uuid', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok length($result) > 30;
+  like $result, qr/^[\w\-]+$/;
+
+  my $random = Venus::Random->new(42);
+
+  my $last;
+
+  isnt +($last = $random->uuid), $random->uuid;
+  isnt +($last = $random->uuid), $random->uuid;
+  isnt +($last = $random->uuid), $random->uuid;
+  isnt +($last = $random->uuid), $random->uuid;
+  isnt +($last = $random->uuid), $random->uuid;
+  isnt +($last = $random->uuid), $random->uuid;
+  isnt +($last = $random->uuid), $random->uuid;
+  isnt +($last = $random->uuid), $random->uuid;
+  isnt +($last = $random->uuid), $random->uuid;
+  isnt +($last = $random->uuid), $random->uuid;
 
   $result
 });

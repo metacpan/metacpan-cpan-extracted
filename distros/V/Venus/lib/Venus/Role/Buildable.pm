@@ -5,6 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Role 'with';
 
 # BUILDERS
@@ -40,6 +42,13 @@ sub BUILDARGS {
 
   # build_args should not accept a single-arg (non-hash)
   my $ignore = @args == 1 && ref $args[0] ne 'HASH';
+
+  # build_data partitions expected and unexpected arguments
+  if ($self->can('build_data') && !$ignore) {
+    @args = @args == 1 ? ({}, $args[0]) : ({}, {@args});
+    do{$args[0]->{$_} = delete $args[1]->{$_} if exists $args[1]->{$_}} for $self->META->attrs;
+    @args = ($self->build_data(@args));
+  }
 
   # standard arguments
   if ($self->can('build_args') && !$ignore) {
@@ -181,6 +190,51 @@ I<Since C<0.01>>
   package main;
 
   my $example = Example2->new(x => 10, y => 10);
+
+  # $example->x;
+  # $example->y;
+
+=back
+
+=cut
+
+=head2 build_data
+
+  build_data(hashref $args, hashref $xargs) (hashref)
+
+The build_data method, if defined, is only called during object construction to
+hook into the handling of the arguments provided. This method is passed two
+hashrefs, the first containing expected arguments provided to the constructor
+(e.g. attributes), and the second containing all unexpected arguments. The
+hashref or key/value pairs returned from this method will be used in subsequent
+automation.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item build_data example 1
+
+  package Example5;
+
+  use Venus::Class;
+
+  attr 'x';
+  attr 'y';
+
+  with 'Venus::Role::Buildable';
+
+  sub build_data {
+    my ($self, $args, $xargs) = @_;
+
+    $args->{z} = delete $xargs->{z} if !exists $args->{z} && exists $xargs->{z};
+
+    return $args;
+  }
+
+  package main;
+
+  my $example = Example5->new(x => 10, y => 10, z => 10);
 
   # $example->x;
   # $example->y;

@@ -7,6 +7,8 @@ use autodie qw(:all);
 use File::Glob ':glob';
 use File::Slurp;
 use File::stat;
+use HTML::Entities;
+use IPC::Run3;
 use JSON::MaybeXS;
 use POSIX qw(strftime);
 use Readonly;
@@ -23,15 +25,14 @@ Readonly my %config => (
 );
 
 # Read and decode coverage data
-my $json_text = read_file($config{cover_db});
-my $data = decode_json($json_text);
+my $data = eval { decode_json(read_file($config{cover_db})) };
 
 my $coverage_pct = 0;
 my $badge_color = 'red';
 
 if(my $total_info = $data->{summary}{Total}) {
 	$coverage_pct = int($total_info->{total}{percentage} // 0);
-	$badge_color = $coverage_pct > 80 ? 'brightgreen' : $coverage_pct > 50 ? 'yellow' : 'red';
+	$badge_color = $coverage_pct > $config{med_threshold} ? 'brightgreen' : $coverage_pct > $config{low_threshold} ? 'yellow' : 'red';
 }
 
 Readonly my $coverage_badge_url => "https://img.shields.io/badge/coverage-${coverage_pct}%25-${badge_color}";
@@ -80,7 +81,7 @@ push @html, <<"HTML";
 		td.positive { color: green; font-weight: bold; }
 		td.negative { color: red; font-weight: bold; }
 		td.neutral { color: gray; }
-		// Show cursor points on the headers to show that they are clickable
+		/* Show cursor points on the headers to show that they are clickable */
 		th { background-color: #f2f2f2; cursor: pointer; }
 		th.sortable {
 			cursor: pointer;
@@ -155,8 +156,15 @@ if ($prev_data) {
 	}
 }
 
-my $commit_sha = `git rev-parse HEAD`;
-chomp $commit_sha;
+# Check if we're in a git repository first
+unless (run_git('rev-parse', '--git-dir')) {
+	die 'Error: Not in a git repository or git is not available';
+}
+
+my $commit_sha = run_git('rev-parse', 'HEAD');
+unless (defined $commit_sha && $commit_sha =~ /^[0-9a-f]{40}$/i) {
+	die 'Error: Could not get valid git commit SHA';
+}
 my $github_base = "https://github.com/$config{github_user}/$config{github_repo}/blob/$commit_sha/";
 
 # Add rows
@@ -221,22 +229,25 @@ for my $file (sort keys %{$data->{summary}}) {
 		? sprintf('<a href="%s" class="icon-link" title="View source on GitHub">&#128269;</a>', $source_url)
 		: '<span class="disabled-icon" title="No coverage data">&#128269;</span>';
 
-	# Create the sparkline
-	# There's probably some duplication of code here
+	# Create the sparkline - limit to last N points like the main trend chart
 	my @file_history;
-	my @history_files = sort <coverage_history/*.json>;
 
-	my %history;
-	for my $hist_file (sort @history_files) {
+	# Get the last max_points history files (same as trend chart)
+	my @limited_history = (scalar(@history_files) > $config{max_points})
+		? @history_files[-$config{max_points} .. -1]
+		: @history_files;
+
+	# Use the already-cached historical data
+	for my $hist_file (sort @limited_history) {
 		my $json = $historical_cache{$hist_file};
-
-		$history{$hist_file} = $json;
+		next unless $json;	# Skip if not cached (shouldn't happen, but be safe)
 
 		if($json->{summary}{$file}) {
 			my $pct = $json->{summary}{$file}{total}{percentage} // 0;
 			push @file_history, sprintf('%.1f', $pct);
 		}
 	}
+
 	my $points_attr = join(',', @file_history);
 
 	push @html, sprintf(
@@ -275,11 +286,6 @@ if (my $total_info = $data->{summary}{Total}) {
 	);
 }
 
-my $timestamp = 'Unknown';
-if (my $stat = stat($config{cover_db})) {
-	$timestamp = strftime('%Y-%m-%d %H:%M:%S', localtime($stat->mtime));
-}
-
 Readonly my $commit_url => "https://github.com/$config{github_user}/$config{github_repo}/commit/$commit_sha";
 my $short_sha = substr($commit_sha, 0, 7);
 
@@ -299,26 +305,26 @@ foreach my $file (sort @history_files) {
 
 # Inject chart if we have data
 my %commit_times;
-open(my $log, '-|', 'git log --all --pretty=format:"%H %h %ci"') or die "Can't run git log: $!";
-while (<$log>) {
-	chomp;
-	my ($full_sha, $short_sha, $datetime) = split ' ', $_, 3;
-	$commit_times{$short_sha} = $datetime;
-}
-close $log;
-
-my %commit_messages;
-open($log, '-|', 'git log --pretty=format:"%h %s"') or die "Can't run git log: $!";
-while (<$log>) {
-	chomp;
-	my ($short_sha, $message) = /^(\w+)\s+(.*)$/;
-	if($message =~ /^Merge branch /) {
-		delete $commit_times{$short_sha};
-	} else {
-		$commit_messages{$short_sha} = $message;
+my $log_output = run_git('log', '--all', '--pretty=format:%H %h %ci');
+if ($log_output) {
+	for my $line (split /\n/, $log_output) {
+		my ($full_sha, $short_sha, $datetime) = split ' ', $line, 3;
+		$commit_times{$short_sha} = $datetime if $short_sha;
 	}
 }
-close $log;
+
+my %commit_messages;
+$log_output = run_git('log', '--pretty=format:%h %s');
+if ($log_output) {
+	for my $line (split /\n/, $log_output) {
+		my ($short_sha, $message) = $line =~ /^(\w+)\s+(.*)$/;
+		if ($message && $message =~ /^Merge branch /) {
+			delete $commit_times{$short_sha};
+		} else {
+			$commit_messages{$short_sha} = $message if $message;
+		}
+	}
+}
 
 # Collect data points from non-merge commits
 my @data_points_with_time;
@@ -334,9 +340,18 @@ foreach my $file (reverse sort @history_files) {
 	next unless $commit_messages{$sha};	# Skip merge commits
 
 	my $timestamp = $commit_times{$sha} // strftime('%Y-%m-%dT%H:%M:%S', localtime((stat($file))->mtime));
-	$timestamp =~ s/ /T/;
-	$timestamp =~ s/\s+([+-]\d{2}):?(\d{2})$/$1:$2/;	# Fix space before timezone
-	$timestamp =~ s/ //g;	# Remove any remaining spaces
+
+	# Git log returns format like: "2024-01-15 14:30:45 -0500" or "2024-01-15 14:30:45 +0000"
+	# We need ISO 8601 format: "2024-01-15T14:30:45-05:00"
+
+	# Replace space between date and time with 'T'
+	$timestamp =~ s/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})/$1T$2/;
+
+	# Fix timezone format: convert "-0500" to "-05:00" or " -05:00" to "-05:00"
+	$timestamp =~ s/\s*([+-])(\d{2}):?(\d{2})$/$1$2:$3/;
+
+	# Remove any remaining spaces (safety cleanup)
+	$timestamp =~ s/\s+//g;
 
 	my $pct = $json->{summary}{Total}{total}{percentage} // 0;
 	my $color = 'gray';	# Will be set properly after sorting
@@ -367,7 +382,8 @@ foreach my $point (@data_points_with_time) {
 
 	my $color = $delta > 0 ? 'green' : $delta < 0 ? 'red' : 'gray';
 
-	push @data_points, qq{{ x: "$point->{timestamp}", y: $point->{pct}, delta: $delta, url: "$point->{url}", label: "$point->{timestamp}", pointBackgroundColor: "$color", comment: "$point->{comment}" }};
+	my $comment = js_escape($point->{comment});
+	push @data_points, qq{{ x: "$point->{timestamp}", y: $point->{pct}, delta: $delta, url: "$point->{url}", label: "$point->{timestamp}", pointBackgroundColor: "$color", comment: "$comment" }};
 }
 
 my $js_data = join(",\n", @data_points);
@@ -680,6 +696,11 @@ function refresh(){
 </script>
 HTML
 
+my $timestamp = 'Unknown';
+if (my $stat = stat($config{cover_db})) {
+	$timestamp = strftime('%Y-%m-%d %H:%M:%S', localtime($stat->mtime));
+}
+
 push @html, <<"HTML";
 <footer>
 	<p><span style="margin-left:8px;color:#666;font-size:0.9em;">Use mouse wheel or pinch to zoom; drag to pan</span></p>
@@ -692,3 +713,21 @@ HTML
 
 # Write to index.html
 write_file($config{output}, join("\n", @html));
+
+# Safe git command execution
+sub run_git {
+	my @cmd = @_;
+	my ($out, $err);
+	run3 ['git', @cmd], \undef, \$out, \$err;
+	return unless $? == 0;
+	chomp $out;
+	return $out;
+}
+
+sub js_escape {
+	my $str = $_[0];
+	$str =~ s/\\/\\\\/g;
+	$str =~ s/"/\\"/g;
+	$str =~ s/\n/\\n/g;
+	return $str;
+}

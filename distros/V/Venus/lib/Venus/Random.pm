@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base', 'with';
 
+# INHERITS
+
 base 'Venus::Kind::Utility';
+
+# INTEGRATES
 
 with 'Venus::Role::Valuable';
 with 'Venus::Role::Buildable';
@@ -31,22 +37,49 @@ sub build_self {
 
 # METHODS
 
-sub assertion {
+sub alphanumeric {
   my ($self) = @_;
 
-  my $assertion = $self->SUPER::assertion;
+  my $code = $self->select(['digit', 'letter']);
 
-  $assertion->match('number')->format(sub{
-    (ref $self || $self)->new($_)
-  });
+  return $self->$code;
+}
 
-  return $assertion;
+sub alphanumerics {
+  my ($self, $times) = @_;
+
+  my $result = $self->collect($times || 1, 'alphanumeric');
+
+  return $result;
+}
+
+sub base64 {
+  my ($self) = @_;
+
+  require Digest::SHA;
+  require MIME::Base64;
+
+  my $result = $self->token;
+
+  $result = MIME::Base64::encode_base64(Digest::SHA::sha256($result));
+
+  chomp $result;
+
+  return $result;
 }
 
 sub bit {
   my ($self) = @_;
 
   return $self->select([1, 0]);
+}
+
+sub bits {
+  my ($self, $times) = @_;
+
+  my $result = $self->collect($times || 1, 'bit');
+
+  return $result;
 }
 
 sub boolean {
@@ -61,12 +94,28 @@ sub byte {
   return chr(int($self->pick * 256));
 }
 
+sub bytes {
+  my ($self, $times) = @_;
+
+  my $result = $self->collect($times || 1, 'byte');
+
+  return $result;
+}
+
 sub character {
   my ($self) = @_;
 
   my $code = $self->select(['digit', 'letter', 'symbol']);
 
   return $self->$code;
+}
+
+sub characters {
+  my ($self, $times) = @_;
+
+  my $result = $self->collect($times || 1, 'character');
+
+  return $result;
 }
 
 sub collect {
@@ -81,10 +130,26 @@ sub default {
   return $default++;
 }
 
+sub digest {
+  my ($self) = @_;
+
+  my $result = $self->token;
+
+  return $result;
+}
+
 sub digit {
   my ($self) = @_;
 
   return int($self->pick(10));
+}
+
+sub digits {
+  my ($self, $times) = @_;
+
+  my $result = $self->collect($times || 1, 'digit');
+
+  return $result;
 }
 
 sub float {
@@ -100,12 +165,58 @@ sub float {
   return sprintf("%.${place}f", $from + rand() * ($upto - $from));
 }
 
+sub hexdecimal {
+  my ($self) = @_;
+
+  state $hexdecimal = [0..9, 'a'..'f'];
+
+  return $self->select($hexdecimal);
+}
+
+sub hexdecimals {
+  my ($self, $times) = @_;
+
+  my $result = $self->collect($times || 1, 'hexdecimal');
+
+  return $result;
+}
+
+sub id {
+  my ($self) = @_;
+
+  state $instance = 0;
+
+  state $previous = '';
+
+  my $current = time;
+
+  if ($current eq $previous) {
+    $instance++;
+  }
+  else {
+    $instance = 0;
+    $previous = $current;
+  }
+
+  my $result = $current . $instance . $$;
+
+  return $result;
+}
+
 sub letter {
   my ($self) = @_;
 
   my $code = $self->select(['uppercased', 'lowercased']);
 
   return $self->$code;
+}
+
+sub letters {
+  my ($self, $times) = @_;
+
+  my $result = $self->collect($times || 1, 'letter');
+
+  return $result;
 }
 
 sub lowercased {
@@ -118,6 +229,14 @@ sub pick {
   my ($self, $data) = @_;
 
   return $data ? rand($data) : rand;
+}
+
+sub nonce {
+  my ($self) = @_;
+
+  my $result = $self->collect(10, 'alphanumeric');
+
+  return $result;
 }
 
 sub nonzero {
@@ -142,6 +261,26 @@ sub number {
   return $self->range($from, $upto) if $upto;
 
   return int($self->pick(10 ** ($from > 9 ? 9 : $from) -1));
+}
+
+sub numbers {
+  my ($self, $times) = @_;
+
+  my $result = $self->collect($times || 1, 'number', 1, 9);
+
+  return $result;
+}
+
+sub password {
+  my ($self, $ccount) = @_;
+
+  $ccount ||= 16;
+
+  my $scount = $ccount > 8 ? $ccount / 8 : 1;
+
+  my $result = $self->shuffle(join '', $self->alphanumerics($ccount - $scount), $self->symbols($scount));
+
+  return $result;
 }
 
 sub range {
@@ -223,18 +362,78 @@ sub select {
   return undef;
 }
 
+sub shuffle {
+  my ($self, $data) = @_;
+
+  my @characters = split '', $data || '';
+
+  for (my $i = @characters - 1; $i > 0; $i--) {
+    my $j = $self->pick($i + 1); @characters[$i, $j] = @characters[$j, $i];
+  }
+
+  return join '', @characters;
+}
+
 sub symbol {
   my ($self) = @_;
 
-  state $symbols = [split //, q(~!@#$%^&*\(\)-_=+[]{}\|;:'",./<>?)];
+  state $symbols = [split '', q(~!@#$%^&*\(\)-_=+[]{}\|;:'",./<>?)];
 
   return $self->select($symbols);
+}
+
+sub symbols {
+  my ($self, $times) = @_;
+
+  my $result = $self->collect($times || 1, 'symbol');
+
+  return $result;
+}
+
+sub token {
+  my ($self) = @_;
+
+  require Sys::Hostname;
+
+  state $hostname = Sys::Hostname::hostname();
+
+  state $instance = 1;
+
+  require Time::HiRes;
+
+  my ($seconds, $microseconds) = Time::HiRes::gettimeofday();
+
+  require Digest::MD5;
+
+  my $result = Digest::MD5::md5_hex(join ':', $hostname, $^T, $^O, $^X, $0, $$, $seconds, $microseconds, $instance++);
+
+  return $result;
 }
 
 sub uppercased {
   my ($self) = @_;
 
   return uc(chr($self->range(97, 122)));
+}
+
+sub urlsafe {
+  my ($self) = @_;
+
+  my $result = $self->base64;
+
+  $result =~ tr{+/}{-_}; $result =~ s/=+$//;
+
+  return $result;
+}
+
+sub uuid {
+  my ($self) = @_;
+
+  my $result = $self->token;
+
+  $result =~ s/^(.{8})(.{4})(.{4})(.{4})(.{12})$/$1-$2-$3-$4-$5/;
+
+  return $result;
 }
 
 1;
@@ -301,6 +500,92 @@ This package provides the following methods:
 
 =cut
 
+=head2 alphanumeric
+
+  alphanumeric() (string)
+
+The alphanumeric method returns a random alphanumeric character, which is
+either a L</digit>, or L</letter> value.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item alphanumeric example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $alphanumeric = $random->alphanumeric;
+
+  # "C"
+
+  # $alphanumeric = $random->alphanumeric;
+
+  # 0
+
+=back
+
+=cut
+
+=head2 alphanumerics
+
+  alphanumerics(number $count) (string)
+
+The alphanumerics method returns C<n> L</alphanumeric> characters based on the
+number (i.e. count) provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item alphanumerics example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $alphanumerics = $random->alphanumerics(5);
+
+  # "C0Mma"
+
+  # $alphanumerics = $random->alphanumerics(5);
+
+  # "x5498"
+
+=back
+
+=cut
+
+=head2 base64
+
+  base64() (string)
+
+The base64 method returns a unique randomly generated base64 encoded string.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item base64 example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $base64 = $random->base64;
+
+  # "gApCFiIVBS7JHxtVDkvQmOe2CU2RsVgzauI5EMMYI9s="
+
+  # $base64 = $random->base64;
+
+  # "ZdxOdj268Ge18X97cKr5yH6EJqfEdbI1OeeWJVH/XFQ="
+
+=back
+
+=cut
+
 =head2 bit
 
   bit() (number)
@@ -324,6 +609,35 @@ I<Since C<1.11>>
   # $bit = $random->bit;
 
   # 1
+
+=back
+
+=cut
+
+=head2 bits
+
+  bits(number $count) (string)
+
+The bits method returns C<n> L</bit> characters based on the number (i.e.
+count) provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item bits example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $bits = $random->bits(5);
+
+  # "01111"
+
+  # $bits = $random->bits(5);
+
+  # "01100"
 
 =back
 
@@ -385,6 +699,35 @@ I<Since C<1.11>>
 
 =cut
 
+=head2 bytes
+
+  bytes(number $count) (string)
+
+The bytes method returns C<n> L</byte> characters based on the number (i.e.
+count) provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item bytes example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $bytes = $random->bytes(5);
+
+  # "\xBE\x57\x1C\x6C\x14"
+
+  # $bytes = $random->bytes(5);
+
+  # "\xDB\x7F\x7A\xB0\xD5"
+
+=back
+
+=cut
+
 =head2 character
 
   character() (string)
@@ -409,6 +752,35 @@ I<Since C<1.11>>
   # $character = $random->character;
 
   # 4
+
+=back
+
+=cut
+
+=head2 characters
+
+  characters(number $count) (string)
+
+The characters method returns C<n> L</character> characters based on the number
+(i.e. count) provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item characters example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $characters = $random->characters(5);
+
+  # ")48R+"
+
+  # $characters = $random->characters(5);
+
+  # "a}[Lb"
 
 =back
 
@@ -502,6 +874,35 @@ I<Since C<1.11>>
 
 =cut
 
+=head2 digest
+
+  digest() (string)
+
+The digest method returns a unique randomly generated L<"md5"|Digest::MD5>
+digest.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item digest example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $digest = $random->digest;
+
+  # "86eb5865c3e4a1457fbefcc93e037459"
+
+  # $digest = $random->digest;
+
+  # "9be02d56ece7efe68bc59d2ebf3c4ed7"
+
+=back
+
+=cut
+
 =head2 digit
 
   digit() (number)
@@ -525,6 +926,35 @@ I<Since C<1.11>>
   # $digit = $random->digit;
 
   # 3
+
+=back
+
+=cut
+
+=head2 digits
+
+  digits(number $count) (string)
+
+The digits method returns C<n> L</digit> characters based on the number (i.e.
+count) provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item digits example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $digits = $random->digits(5);
+
+  # 73140
+
+  # $digits = $random->digits(5);
+
+  # 84468
 
 =back
 
@@ -612,6 +1042,87 @@ I<Since C<1.11>>
 
 =cut
 
+=head2 hexdecimal
+
+  hexdecimal() (string)
+
+The hexdecimal method returns a hexdecimal character.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item hexdecimal example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $hexdecimal = $random->hexdecimal;
+
+  # "b"
+
+  # $hexdecimal = $random->hexdecimal;
+
+  # 5
+
+=back
+
+=cut
+
+=head2 hexdecimals
+
+  hexdecimals(number $count) (string)
+
+The hexdecimals method returns C<n> L</hexdecimal> characters based on the
+number (i.e. count) provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item hexdecimals example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $hexdecimals = $random->hexdecimals(5);
+
+  # "b5161"
+
+  # $hexdecimals = $random->hexdecimals(5);
+
+  # "d77bd"
+
+=back
+
+=cut
+
+=head2 id
+
+  id() (number)
+
+The id method returns a machine unique thread-safe random numerical identifier.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item id example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $id = $random->id;
+
+  # 1729257495154941
+
+=back
+
+=cut
+
 =head2 letter
 
   letter() (string)
@@ -641,6 +1152,35 @@ I<Since C<1.11>>
 
 =cut
 
+=head2 letters
+
+  letters(number $count) (string)
+
+The letters method returns C<n> L</letter> characters based on the number (i.e.
+count) provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item letters example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $letters = $random->letters(5);
+
+  # "iKWMv"
+
+  # $letters = $random->letters(5);
+
+  # "Papmm"
+
+=back
+
+=cut
+
 =head2 lowercased
 
   lowercased() (string)
@@ -664,6 +1204,86 @@ I<Since C<1.11>>
   # $lowercased = $random->lowercased;
 
   # "i"
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Random)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Random;
+
+  my $new = Venus::Random->new;
+
+  # bless(..., "Venus::Random")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Random;
+
+  my $new = Venus::Random->new(42);
+
+  # bless(..., "Venus::Random")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Random;
+
+  my $new = Venus::Random->new(value => 42);
+
+  # bless(..., "Venus::Random")
+
+=back
+
+=cut
+
+=head2 nonce
+
+  nonce() (string)
+
+The nonce method returns a 10-character L</alphanumeric> string.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item nonce example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $nonce = $random->nonce;
+
+  # "j2q1G45903"
+
+  # $nonce = $random->nonce;
+
+  # "7nmi8mT5Io"
 
 =back
 
@@ -832,6 +1452,64 @@ I<Since C<1.11>>
   # $number = $random->number(5);
 
   # 34269
+
+=back
+
+=cut
+
+=head2 numbers
+
+  numbers(number $count) (string)
+
+The numbers method returns C<n> L</number> characters (between C<1> and C<9>)
+based on the number (i.e.  count) provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item numbers example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $numbers = $random->numbers(5);
+
+  # 74141
+
+  # $numbers = $random->numbers(5);
+
+  # 85578
+
+=back
+
+=cut
+
+=head2 password
+
+  password(number $count) (string)
+
+The password method returns C<n> L<"characters"|/character> based on the number
+(i.e. count) provided. The default length is 16.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item password example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $password = $random->password;
+
+  # "0*89{745axCMg0m2"
+
+  # $password = $random->password;
+
+  # "5rV22V24>6Q1v#6N"
 
 =back
 
@@ -1207,6 +1885,35 @@ I<Since C<1.11>>
 
 =cut
 
+=head2 shuffle
+
+  shuffle(string $string) (string)
+
+The shuffle method returns the string provided with its characters randomly
+rearranged.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item shuffle example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $shuffle = $random->shuffle('hello');
+
+  # "olhel"
+
+  # $shuffle = $random->shuffle('hello');
+
+  # "loelh"
+
+=back
+
+=cut
+
 =head2 symbol
 
   symbol() (string)
@@ -1235,6 +1942,64 @@ I<Since C<1.11>>
 
 =cut
 
+=head2 symbols
+
+  symbols(number $count) (string)
+
+The symbols method returns C<n> L</symbol> characters based on the number (i.e.
+count) provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item symbols example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $symbols = $random->symbols(5);
+
+  # "')#=@"
+
+  # $symbols = $random->symbols(5);
+
+  # ".[+;,"
+
+=back
+
+=cut
+
+=head2 token
+
+  token() (string)
+
+The token method returns a unique randomly generated L<"md5"|Digest::MD5>
+digest.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item token example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $token = $random->token;
+
+  # "86eb5865c3e4a1457fbefcc93e037459"
+
+  # $token = $random->token;
+
+  # "9be02d56ece7efe68bc59d2ebf3c4ed7"
+
+=back
+
+=cut
+
 =head2 uppercased
 
   uppercased() (string)
@@ -1258,6 +2023,65 @@ I<Since C<1.11>>
   # $uppercased = $random->uppercased;
 
   # "I"
+
+=back
+
+=cut
+
+=head2 urlsafe
+
+  urlsafe() (string)
+
+The urlsafe method returns a unique randomly generated URL-safe string based on
+L</base64>.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item urlsafe example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $urlsafe = $random->urlsafe;
+
+  # "WtdsCPBQDKXPv2tcuFbBFcdDtJ6EZRyE3Xke0e65YRQ"
+
+  # $urlsafe = $random->urlsafe;
+
+  # "xXq7Mkwo7nLsFjMW8mvKgdzac5m4X0gFMykO1r0d7GA"
+
+=back
+
+=cut
+
+=head2 uuid
+
+  uuid() (string)
+
+The uuid method returns a machine-unique randomly generated psuedo UUID string.
+B<Note:> The identifier returned attempts to be unique across network devices
+but its uniqueness can't be guaranteed.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item uuid example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $uuid = $random->uuid;
+
+  # "0d3eea5f-1826-3d37-e242-72ea44a157fd"
+
+  # $uuid = $random->uuid;
+
+  # "6e179032-c7fe-1dc6-61b8-cebd00fa06a1"
 
 =back
 

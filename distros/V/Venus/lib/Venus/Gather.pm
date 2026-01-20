@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'attr', 'base', 'with';
 
+# INHERITS
+
 base 'Venus::Kind::Utility';
+
+# INTEGRATES
 
 with 'Venus::Role::Valuable';
 with 'Venus::Role::Buildable';
@@ -48,6 +54,14 @@ sub clear {
   return $self;
 }
 
+sub count {
+  my ($self, @args) = @_;
+
+  my $result = $self->result(@args);
+
+  return scalar @$result;
+}
+
 sub data {
   my ($self, $data) = @_;
 
@@ -58,13 +72,21 @@ sub data {
   return $self;
 }
 
+sub defined {
+  my ($self) = @_;
+
+  $self->when(sub{CORE::defined($_[0])});
+
+  return $self;
+}
+
 sub expr {
   my ($self, $topic) = @_;
 
   $self->when(sub{
     my $value = $_[0];
 
-    if (!defined $value) {
+    if (!CORE::defined($value)) {
       return false;
     }
     if (Scalar::Util::blessed($value) && !overload::Overloaded($value)) {
@@ -93,7 +115,7 @@ sub just {
   $self->when(sub{
     my $value = $_[0];
 
-    if (!defined $value) {
+    if (!CORE::defined($value)) {
       return false;
     }
     if (Scalar::Util::blessed($value) && !overload::Overloaded($value)) {
@@ -121,12 +143,30 @@ sub none {
   return $self;
 }
 
+sub object {
+  my ($self) = @_;
+
+  require Scalar::Util;
+
+  $self->when(sub{Scalar::Util::blessed($_[0])});
+
+  return $self;
+}
+
 sub only {
   my ($self, $code) = @_;
 
   $self->on_only($code);
 
   return $self;
+}
+
+sub reduce {
+  my ($self, @args) = @_;
+
+  my $result = $self->new(scalar $self->result(@args));
+
+  return $result;
 }
 
 sub result {
@@ -139,7 +179,11 @@ sub result {
   my $matched = 0;
 
   local $_ = $value;
-  return wantarray ? ($result, $matched) : $result if !$self->on_only->($value);
+  if (!$self->on_only->($value)) {
+    local $_ = $value;
+    $result = $self->on_none->($value) || [];
+    return wantarray ? ($result, $matched) : $result;
+  }
 
   for my $item (@$value) {
     local $_ = $item;
@@ -207,6 +251,16 @@ sub then {
   my $next = $#{$self->on_when};
 
   $self->on_then->[$next] = UNIVERSAL::isa($code, 'CODE') ? $code : sub{$code};
+
+  return $self;
+}
+
+sub type {
+  my ($self, $expr) = @_;
+
+  require Venus::Type;
+
+  $self->when(sub{Venus::Type->new->check($expr)->eval($_[0])});
 
   return $self;
 }
@@ -375,6 +429,45 @@ I<Since C<1.55>>
 
 =cut
 
+=head2 count
+
+  count(any $data) (number)
+
+The count method calls L</result> and returns the number of items gathered.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item count example 1
+
+  package main;
+
+  use Venus::Gather;
+
+  my $gather = Venus::Gather->new([
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "zero",
+  ]);
+
+  $gather->expr(qr/^t/)->take;
+
+  my $result = $gather->count;
+
+  # 2
+
+=back
+
+=cut
+
 =head2 data
 
   data(hashref $data) (Venus::Gather)
@@ -452,6 +545,35 @@ I<Since C<1.55>>
   my $result = $gather->none('?')->result;
 
   # [0]
+
+=back
+
+=cut
+
+=head2 defined
+
+  defined() (Venus::Gather)
+
+The defined method registers a L</when> condition which only allows matching if
+the value presented is C<defined>.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item defined example 1
+
+  package main;
+
+  use Venus::Gather;
+
+  my $gather = Venus::Gather->new;
+
+  $gather->defined->take;
+
+  my $result = $gather->result([0, "", undef, false]);
+
+  # [0, "", false]
 
 =back
 
@@ -632,6 +754,80 @@ I<Since C<1.55>>
 
 =cut
 
+=head2 new
+
+  new(any @args) (Venus::Gather)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Gather;
+
+  my $new = Venus::Gather->new;
+
+  # bless(..., "Venus::Gather")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Gather;
+
+  my $new = Venus::Gather->new([
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "zero",
+  ]);
+
+  # bless(..., "Venus::Gather")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Gather;
+
+  my $new = Venus::Gather->new(value => [
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "zero",
+  ]);
+
+  # bless(..., "Venus::Gather")
+
+=back
+
+=cut
+
 =head2 none
 
   none(any | coderef $code) (Venus::Gather)
@@ -716,6 +912,35 @@ I<Since C<1.55>>
 
 =cut
 
+=head2 object
+
+  object() (Venus::Gather)
+
+The object method registers a L</when> condition which only allows matching if
+the value presented is an object.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item object example 1
+
+  package main;
+
+  use Venus::Gather;
+
+  my $gather = Venus::Gather->new;
+
+  $gather->object->take;
+
+  my $result = $gather->result([0, "", undef, false, bless{}]);
+
+  # [bless({}, 'main')]
+
+=back
+
+=cut
+
 =head2 only
 
   only(coderef $code) (Venus::Gather)
@@ -789,6 +1014,46 @@ I<Since C<1.55>>
   #   "five",
   #   "nine",
   # ]
+
+=back
+
+=cut
+
+=head2 reduce
+
+  reduce(any $data) (Venus::Gather)
+
+The reduce method returns a new L<Venus::Gather> object using the values
+returned via the L</result> method.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item reduce example 1
+
+  package main;
+
+  use Venus::Gather;
+
+  my $gather = Venus::Gather->new([
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "zero",
+  ]);
+
+  $gather->expr(qr/^s/)->take;
+
+  my $reduce = $gather->reduce;
+
+  # bless(..., "Venus::Gather")
 
 =back
 
@@ -1040,6 +1305,78 @@ I<Since C<1.55>>
 
 =cut
 
+=head2 test
+
+  test() (boolean)
+
+The test method evaluates the registered conditions and returns truthy if a
+match can be made, without executing any of the actions (i.e. the L</then>
+code) or the special L</none> condition.
+
+I<Since C<1.55>>
+
+=over 4
+
+=item test example 1
+
+  package main;
+
+  use Venus::Gather;
+
+  my $gather = Venus::Gather->new([
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "zero",
+  ]);
+
+  $gather->just('one')->then(1);
+  $gather->just('six')->then(6);
+
+  my $test = $gather->test;
+
+  # 2
+
+=back
+
+=over 4
+
+=item test example 2
+
+  package main;
+
+  use Venus::Gather;
+
+  my $gather = Venus::Gather->new([
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "zero",
+  ]);
+
+  $gather->just('One')->then(1);
+  $gather->just('Six')->then(6);
+
+  my $test = $gather->test;
+
+  # 0
+
+=back
+
+=cut
+
 =head2 then
 
   then(any | coderef $code) (Venus::Gather)
@@ -1113,6 +1450,40 @@ I<Since C<1.55>>
   my $result = $gather->result;
 
   # [1,0]
+
+=back
+
+=cut
+
+=head2 type
+
+  type(string $expr) (Venus::Gather)
+
+The type method accepts a L<"type expression"|Venus::Type> and registers a
+L</when> condition which matches values conforming to the type expression
+specified.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item type example 1
+
+  package main;
+
+  use Venus::Gather;
+
+  my $gather = Venus::Gather->new([1, "1"]);
+
+  $gather->type('string');
+  $gather->then('string');
+
+  $gather->type('number');
+  $gather->then('number');
+
+  my $result = $gather->result;
+
+  # ["number", "string"]
 
 =back
 

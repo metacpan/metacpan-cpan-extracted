@@ -1,0 +1,167 @@
+NAME
+    Marlin::X::Clone - Marlin extension to add a `clone` method to your class.
+
+SYNOPSIS
+      package Local::Date {
+        use Marlin qw( year month day :Clone );
+      }
+  
+      my $xmas     = Local::Date->new( day => 25, month => 12, year => 2025 );
+      my $xmas_eve = $xmas->clone( day => 24 );
+
+IMPORTING THIS MODULE
+    The standard way to import Marlin extensions is to include them in the
+    list passed to `use Marlin`:
+
+      package Local::Date {
+        use Marlin qw( year month day :Clone );
+      }
+
+    It is possible to additionally load it with `use Marlin::X::Clone`, which
+    won't *do* anything, but might be useful to automatic dependency analysis.
+
+      package Local::Date {
+        use Marlin qw( year month day :Clone );
+        use Marlin::X::Clone 0.020000;  # does nothing
+      }
+
+DESCRIPTION
+    This package creates a method in your class that does roughly:
+
+      sub clone {
+        my ( $self, %args ) = @_;
+        my %clone = ( %$self, %args );
+        return bless \%clone, ref($self);
+      }
+
+    Except it also:
+
+    *   Skips over "PRIVATE" storage attributes by default.
+
+    *   Respects the `init_arg` for each attribute.
+
+    *   Calls trigger methods, uses defaults, checks type constraints, and
+        does type coercions.
+
+    *   Allows per-attribute tweaks to its behaviour.
+
+    *   Calls `BUILD` methods.
+
+    *   Complains if you give it arguments which it doesn't recognize.
+
+    You can tweak an attribute's behaviour using:
+
+      use Marlin foo => { on_clone => ... };
+
+    Valid values for `on_clone`:
+
+    `:simple`
+        A simple shallow copy. If the value is a reference, the cloned value
+        will refer to the same data.
+
+          ## on_clone => ':simple'
+          $clone->{foo} = $self->{foo};
+
+        This is the default and will be used if `on_clone` is omitted, or for
+        `on_clone => true`.
+
+    `:deep`
+        Uses the Clone module to make a deep clone of the original value.
+
+          ## on_clone => ':deep'
+          $clone->{foo} = Clone::clone( $self->{foo} );
+
+    `:none`
+        Does not clone the attribute value.
+
+        You can also specify this as `on_clone => false`.
+
+    `:method` or :method(NAME)
+        Calls a method on the original value, assuming it's a blessed object.
+        If the original value is not a blessed object, it will silently be
+        skipped. If no `NAME` is provided, the name is assumed to be "clone".
+
+          ## on_clone => ':method'
+          if ( blessed $self->{foo} ) {
+            $clone->{foo} = $self->{foo}->clone;
+          }
+  
+          ## on_clone => ':method(make_copy)'
+          if ( blessed $self->{foo} ) {
+            $clone->{foo} = $self->{foo}->make_copy;
+          }
+
+    :selfmethod(NAME)
+        Calls a method on the original object.
+
+          ## on_clone => ':selfmethod(make_copy)'
+          $clone->{foo} = $self->make_copy( foo => $self->{foo} );
+
+        You can also specify this as `on_clone => "NAME"` as a shortcut.
+
+    CODE
+        Setting `on_clone => sub {...}` will call the coderef in a similar
+        style to `:selfmethod`.
+
+          ## on_clone => $coderef
+          $clone->{foo} = $self->$coderef( foo => $self->{foo} );
+
+    Because `:method` only works when the value is a blessed object, you can
+    indicate a fallback that will be used in other cases.
+
+      ## on_clone => ':method(make_copy) :deep'
+      if ( blessed $self->{foo} ) {
+        $clone->{foo} = $self->{foo}->make_copy;
+      }
+      else {
+        $clone->{foo} = Clone::clone( $self->{foo} );
+      }
+  
+      ## on_clone => ':method(make_copy) :copy'
+      if ( blessed $self->{foo} ) {
+        $clone->{foo} = $self->{foo}->make_copy;
+      }
+      else {
+        $clone->{foo} = $self->{foo};
+      }
+  
+      ## on_clone => ':method(make_copy) :none'
+      if ( blessed $self->{foo} ) {
+        $clone->{foo} = $self->{foo}->make_copy;
+      }
+
+    You can also set a few options for how the plugin behaves:
+
+      use Marlin qw( foo bar ),
+        ':Clone' => {
+          method_name     => 'clone', # Name for the clone method
+          call_build      => true,    # Call BUILD after cloning?
+          strict_args     => true,    # Complain about unrecognized params?
+        };
+
+    This module also acts as a demonstration of Marlin's extension API. See
+    comments in the source code for more details.
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-marlin-x-clone/issues>.
+
+SEE ALSO
+    Marlin.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2025-2026 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+    🐟🐟
+

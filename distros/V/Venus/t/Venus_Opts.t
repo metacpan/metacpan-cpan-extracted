@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -40,6 +41,7 @@ method: default
 method: exists
 method: get
 method: name
+method: new
 method: parse
 method: reparse
 method: set
@@ -286,6 +288,89 @@ $test->for('example', 3, 'get', sub {
   ok !defined $result;
 
   !$result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Opts)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Opts;
+
+  my $new = Venus::Opts->new;
+
+  # bless(..., "Venus::Opts")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Opts');
+  ok $result->value;
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Opts;
+
+  my $new = Venus::Opts->new(
+    ['--resource', 'users', '--help'],
+  );
+
+  # bless(..., "Venus::Opts")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Opts');
+  is_deeply $result->value, ['--resource', 'users', '--help'];
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Opts;
+
+  my $new = Venus::Opts->new(
+    value => ['--resource', 'users', '--help'],
+  );
+
+  # bless(..., "Venus::Opts")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Opts');
+  is_deeply $result->value, ['--resource', 'users', '--help'];
+
+  $result
 });
 
 =method parse

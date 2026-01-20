@@ -5,6 +5,10 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
+# IMPORTS
+
 use Venus::Role 'fault';
 
 # AUDITS
@@ -19,7 +23,7 @@ sub AUDIT {
   return $self;
 }
 
-# METHODS
+# BUILDERS
 
 sub build_proxy {
   my ($self, $package, $method, @args) = @_;

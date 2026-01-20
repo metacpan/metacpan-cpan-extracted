@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base';
 
+# INHERITS
+
 base 'Venus::Kind::Value';
+
+# OVERLOADS
 
 use overload (
   '!' => sub{!$_[0]->get},
@@ -61,22 +67,6 @@ sub append_with {
   my $data = $self->get;
 
   return CORE::join($delimiter // '', $data, @args);
-}
-
-sub assertion {
-  my ($self) = @_;
-
-  my $assertion = $self->SUPER::assertion;
-
-  $assertion->match('float')->format(sub{
-    (ref $self || $self)->new($_)
-  });
-
-  $assertion->match('number')->format(sub{
-    (ref $self || $self)->new($_)
-  });
-
-  return $assertion;
 }
 
 sub atan2 {
@@ -2653,6 +2643,58 @@ I<Since C<0.01>>
   my $neg = $number->neg;
 
   # -12345
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Number)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $new = Venus::Number->new;
+
+  # bless(..., "Venus::Number")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Number;
+
+  my $new = Venus::Number->new(1_000);
+
+  # bless(..., "Venus::Number")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Number;
+
+  my $new = Venus::Number->new(value => 1_000);
+
+  # bless(..., "Venus::Number")
 
 =back
 

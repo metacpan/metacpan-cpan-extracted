@@ -8,13 +8,15 @@ use warnings;
 
 Lugh - Pure C LLM Inference Engine for Perl (built on ggml)
 
+=encoding utf8
+
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('Lugh', $VERSION);

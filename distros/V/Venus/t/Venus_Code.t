@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -51,6 +52,7 @@ method: gtlt
 method: le
 method: lt
 method: ne
+method: new
 method: next
 method: rcurry
 method: tv
@@ -2478,6 +2480,85 @@ $test->for('example', 9, 'ne', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is $result, 1;
+
+  $result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Code)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Code;
+
+  my $new = Venus::Code->new;
+
+  # bless(..., "Venus::Code")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Code');
+  ok ref $result->value, 'CODE';
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Code;
+
+  my $new = Venus::Code->new(sub{});
+
+  # bless(..., "Venus::Code")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Code');
+  ok ref $result->value, 'CODE';
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Code;
+
+  my $new = Venus::Code->new(value => sub{});
+
+  # bless(..., "Venus::Code")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Code');
+  ok ref $result->value, 'CODE';
 
   $result
 });

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2012 -- leonerd@leonerd.org.uk
 
-package IO::Async::Timer::Countdown 0.804;
+package IO::Async::Timer::Countdown 0.805;
 
 use v5.14;
 use warnings;
@@ -16,6 +16,8 @@ use Carp;
 C<IO::Async::Timer::Countdown> - event callback after a fixed delay
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use IO::Async::Timer::Countdown;
 

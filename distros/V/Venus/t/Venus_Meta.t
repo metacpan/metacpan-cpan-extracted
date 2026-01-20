@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -44,6 +45,8 @@ method: data
 method: emit
 method: find
 method: local
+method: mask
+method: masks
 method: mixin
 method: mixins
 method: new
@@ -83,6 +86,8 @@ $test->for('includes');
 
   use Venus::Role;
 
+  mask 'auth_token';
+
   sub authenticate {
     return true;
   }
@@ -96,7 +101,7 @@ $test->for('includes');
 
   sub EXPORT {
     # explicitly declare routines to be consumed
-    ['authenticate']
+    ['auth_token', 'authenticate']
   }
 
   package Novice;
@@ -563,7 +568,7 @@ $test->for('example', 4, 'find', sub {
 
 The local method returns the names of properties defined in the package
 directly (not inherited) for the property type specified. The C<$type> provided
-can be either C<attrs>, C<bases>, C<roles>, or C<subs>.
+can be either C<attrs>, C<bases>, C<masks>, C<roles>, or C<subs>.
 
 =signature local
 
@@ -645,6 +650,7 @@ $test->for('example', 3, 'local', sub {
 
   # [
   #   'attr',
+  #   'auth_token',
   #   'authenticate',
   #   'base',
   #   'email',
@@ -665,6 +671,7 @@ $test->for('example', 4, 'local', sub {
   ok my $result = $tryable->result;
   is_deeply [sort @$result], [
     'attr',
+    'auth_token',
     'authenticate',
     'base',
     'email',
@@ -679,6 +686,96 @@ $test->for('example', 4, 'local', sub {
     'valid',
     'with',
   ];
+
+  $result
+});
+
+=method mask
+
+The mask method returns true or false if the package referenced has the
+private attribute accessor named.
+
+=signature mask
+
+  mask(string $name) (boolean)
+
+=metadata mask
+
+{
+  since => '4.15',
+}
+
+=example-1 mask
+
+  # given: synopsis
+
+  package main;
+
+  my $mask = $meta->mask('auth_token');
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'mask', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=example-2 mask
+
+  # given: synopsis
+
+  package main;
+
+  my $mask = $meta->mask('username');
+
+  # 0
+
+=cut
+
+$test->for('example', 2, 'mask', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok $result == 0;
+
+  !$result
+});
+
+=method masks
+
+The masks method returns all of the private attributes composed into the
+package referenced.
+
+=signature masks
+
+  masks() (arrayref)
+
+=metadata masks
+
+{
+  since => '4.15',
+}
+
+=example-1 masks
+
+  # given: synopsis
+
+  package main;
+
+  my $masks = $meta->masks;
+
+  # ['auth_token']
+
+=cut
+
+$test->for('example', 1, 'masks', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['auth_token'];
 
   $result
 });

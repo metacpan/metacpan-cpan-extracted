@@ -1,0 +1,82 @@
+{
+   "abstract" : "Marlin extension to add a C<to_hash> method to your class",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Marlin-X-ToHash",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0",
+            "Eval::TypeTiny::CodeAccumulator" : "0",
+            "Marlin" : "0.020000",
+            "Types::Common" : "0",
+            "perl" : "5.008008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Plugin::BailOnFail" : "0",
+            "Test2::Require::AuthorTesting" : "0",
+            "Test2::Require::Module" : "0",
+            "Test2::Tools::Spec" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Marlin::X::ToHash" : {
+         "file" : "lib/Marlin/X/ToHash.pm",
+         "version" : "0.020000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tobyink/p5-marlin-x-tohash/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Marlin-X-ToHash",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-marlin-x-tohash.git",
+         "web" : "https://github.com/tobyink/p5-marlin-x-tohash"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Marlin-X-ToHash/project"
+   },
+   "version" : "0.020000",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

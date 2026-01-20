@@ -9,44 +9,29 @@ no warnings 'once';
 
 use base 'Venus::Core';
 
+# IMPORTS
+
+use Venus::Hook;
+
+# HOOKS
+
+{
+  no warnings 'once';
+
+  *does = *Venus::Hook::DOES;
+
+  *meta = *Venus::Hook::META;
+
+  *BUILD = *Venus::Hook::BUILD_FOR_MIXIN;
+
+  *DESTROY = *Venus::Hook::DESTROY_FOR_MIXIN;
+
+  *EXPORT = *Venus::Hook::EXPORT_FOR_MIXIN;
+
+  *IMPORT = *Venus::Hook::IMPORT_FOR_MIXIN;
+}
+
 # METHODS
-
-sub BUILD {
-  my ($self) = @_;
-
-  return $self;
-}
-
-sub DESTROY {
-  my ($self) = @_;
-
-  return;
-}
-
-sub EXPORT {
-  my ($self, $into) = @_;
-
-  return [];
-}
-
-sub IMPORT {
-  my ($self, $into) = @_;
-
-  no strict 'refs';
-  no warnings 'redefine';
-
-  for my $name (@{$self->EXPORT($into)}) {
-    *{"${into}::${name}"} = \&{"@{[$self->NAME]}::${name}"};
-  }
-
-  return $self;
-}
-
-sub does {
-  my ($self, @args) = @_;
-
-  return $self->DOES(@args);
-}
 
 sub import {
   my ($self) = @_;
@@ -56,12 +41,6 @@ sub import {
   @_ = ("${self} cannot be used via the \"use\" declaration");
 
   goto \&Venus::fault;
-}
-
-sub meta {
-  my ($self) = @_;
-
-  return $self->META;
 }
 
 sub unimport {

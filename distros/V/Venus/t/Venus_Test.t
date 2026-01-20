@@ -38,117 +38,107 @@ $test->for('abstract');
 =includes
 
 function: test
-
-method: collect
-method: collect_data_for_abstract
-method: collect_data_for_attribute
-method: collect_data_for_authors
-method: collect_data_for_description
-method: collect_data_for_encoding
-method: collect_data_for_error
-method: collect_data_for_example
-method: collect_data_for_feature
-method: collect_data_for_function
-method: collect_data_for_includes
-method: collect_data_for_inherits
-method: collect_data_for_integrates
-method: collect_data_for_layout
-method: collect_data_for_libraries
-method: collect_data_for_license
-method: collect_data_for_message
-method: collect_data_for_metadata
-method: collect_data_for_method
-method: collect_data_for_name
-method: collect_data_for_operator
-method: collect_data_for_partials
-method: collect_data_for_project
-method: collect_data_for_signature
-method: collect_data_for_synopsis
-method: collect_data_for_tagline
-method: collect_data_for_version
-method: data
+method: auto
+method: diag
 method: done
-method: execute
-method: execute_test_for_abstract
-method: execute_test_for_attribute
-method: execute_test_for_authors
-method: execute_test_for_description
-method: execute_test_for_encoding
-method: execute_test_for_error
-method: execute_test_for_example
-method: execute_test_for_feature
-method: execute_test_for_function
-method: execute_test_for_includes
-method: execute_test_for_inherits
-method: execute_test_for_integrates
-method: execute_test_for_layout
-method: execute_test_for_libraries
-method: execute_test_for_license
-method: execute_test_for_message
-method: execute_test_for_metadata
-method: execute_test_for_method
-method: execute_test_for_name
-method: execute_test_for_operator
+method: eval
 method: explain
 method: fail
 method: for
+method: gate
+method: handler
+method: in
+method: is
+method: is_arrayref
+method: is_blessed
+method: is_boolean
+method: is_coderef
+method: is_dirhandle
+method: is_enum
+method: is_error
+method: is_false
+method: is_fault
+method: is_filehandle
+method: is_float
+method: is_glob
+method: is_hashref
+method: is_number
+method: is_object
+method: is_package
+method: is_reference
+method: is_regexp
+method: is_scalarref
+method: is_string
+method: is_true
+method: is_undef
+method: is_value
+method: is_yesno
+method: isnt
+method: isnt_arrayref
+method: isnt_blessed
+method: isnt_boolean
+method: isnt_coderef
+method: isnt_dirhandle
+method: isnt_enum
+method: isnt_error
+method: isnt_false
+method: isnt_fault
+method: isnt_filehandle
+method: isnt_float
+method: isnt_glob
+method: isnt_hashref
+method: isnt_number
+method: isnt_object
+method: isnt_package
+method: isnt_reference
+method: isnt_regexp
+method: isnt_scalarref
+method: isnt_string
+method: isnt_true
+method: isnt_undef
+method: isnt_value
+method: isnt_yesno
+method: lfile
 method: like
-method: more
-method: okay
-method: okay_can
-method: okay_isa
+method: mktemp_dir
+method: mktemp_file
+method: new
+method: note
+method: only_if
+method: os
+method: os_is_bsd
+method: os_is_cyg
+method: os_is_dos
+method: os_is_lin
+method: os_is_mac
+method: os_is_non
+method: os_is_sun
+method: os_is_vms
+method: os_is_win
+method: os_isnt_bsd
+method: os_isnt_cyg
+method: os_isnt_dos
+method: os_isnt_lin
+method: os_isnt_mac
+method: os_isnt_non
+method: os_isnt_sun
+method: os_isnt_vms
+method: os_isnt_win
 method: pass
-method: perform
-method: perform_test_for_abstract
-method: perform_test_for_attribute
-method: perform_test_for_authors
-method: perform_test_for_description
-method: perform_test_for_encoding
-method: perform_test_for_error
-method: perform_test_for_example
-method: perform_test_for_feature
-method: perform_test_for_function
-method: perform_test_for_includes
-method: perform_test_for_inherits
-method: perform_test_for_integrates
-method: perform_test_for_layout
-method: perform_test_for_libraries
-method: perform_test_for_license
-method: perform_test_for_message
-method: perform_test_for_metadata
-method: perform_test_for_method
-method: perform_test_for_name
-method: perform_test_for_operator
-method: perform_test_for_partials
-method: perform_test_for_project
-method: perform_test_for_signature
-method: perform_test_for_synopsis
-method: perform_test_for_tagline
-method: perform_test_for_version
-method: present
-method: present_data_for_abstract
-method: present_data_for_attribute
-method: present_data_for_authors
-method: present_data_for_description
-method: present_data_for_encoding
-method: present_data_for_error
-method: present_data_for_example
-method: present_data_for_feature
-method: present_data_for_function
-method: present_data_for_includes
-method: present_data_for_inherits
-method: present_data_for_integrates
-method: present_data_for_layout
-method: present_data_for_libraries
-method: present_data_for_license
-method: present_data_for_message
-method: present_data_for_metadata
-method: present_data_for_method
-method: present_data_for_name
-method: present_data_for_operator
+method: patch
+method: path
+method: pfile
 method: render
 method: same
 method: skip
+method: skip_if
+method: space
+method: subtest
+method: text
+method: tfile
+method: type
+method: unlike
+method: unpatch
 
 =cut
 
@@ -186,7 +176,840 @@ $test->for('synopsis', sub {
 
 This package aims to provide a standard for documenting L<Venus> derived
 software projects, a framework writing tests, test automation, and
-documentation generation.
+documentation generation. This package will automatically exports C<true>,
+C<false>, and L</test> keyword functions.
+
++=cut
+
++=head1 SPECIFICATION
+
+This section describes the specification format used by L<Venus::Test> to
+generate documentation and automate testing for Perl packages. The
+specification uses specially formatted POD blocks that serve as both
+human-readable documentation and executable test cases.
+
+B<Note:> When code blocks are evaluated, "redefined" warnings are automatically
+disabled.
+
++=head2 Overview
+
+A specification document consists of POD blocks that describe a package. The
+blocks are organized into the following categories:
+
++=over 4
+
++=item * B<Required Blocks> - Must be present in every specification
+
++=item * B<Package Structure Blocks> - Define inheritance and dependencies
+
++=item * B<API Blocks> - Document attributes, methods, functions, etc.
+
++=item * B<Supporting Blocks> - Signatures, examples, metadata, and exceptions
+
++=item * B<Feature Blocks> - Special capabilities and operators
+
++=item * B<Document Control Blocks> - Layout and partial inclusions
+
++=item * B<Project Information Blocks> - Authors, license, version
+
++=back
+
++=head2 Quick Reference
+
+  # [required]
+
+  =name
+  =abstract
+  =tagline
+  =synopsis
+  =description
+
+  # [optional]
+
+  =encoding
+  =includes
+  =libraries
+  =inherits
+  =integrates
+
+  # [optional; repeatable]
+
+  =attribute $name
+  =signature $name
+  =metadata $name
+  =example-$number $name
+  =raise $name $error ($id optional)
+
+  =function $name
+  =signature $name
+  =metadata $name
+  =example-$number $name
+  =raise $name $error ($id optional)
+
+  =message $name
+  =signature $name
+  =metadata $name
+  =example-$number $name
+
+  =method $name
+  =signature $name
+  =metadata $name
+  =example-$number $name
+  =raise $name $error ($id optional)
+
+  =routine $name
+  =signature $name
+  =metadata $name
+  =example-$number $name
+  =raise $name $error ($id optional)
+
+  =feature $name
+  =metadata $name
+  =example-$number $name
+
+  =error $name
+  =example-$number $name
+
+  =operator $name
+  =example-$number $name
+
+  # [optional]
+
+  =layout
+  =partials
+  =authors
+  =license
+  =project
+  =version
+
++=head1 REQUIRED BLOCKS
+
+These blocks must be present in every specification document.
+
++=head2 name
+
+  =name
+
+  Example
+
+  =cut
+
+  $test->for('name');
+
+The C<name> block should contain the package name. This is tested for
+loadability.
+
++=head2 abstract
+
+  =abstract
+
+  Example Test Documentation
+
+  =cut
+
+  $test->for('abstract');
+
+The C<abstract> block should contain a subtitle describing the package. This is
+tested for existence.
+
++=head2 tagline
+
+  =tagline
+
+  Example Class
+
+  =cut
+
+  $test->for('tagline');
+
+The C<tagline> block should contain a 2-5 word description of the package,
+which will be prepended to the name as a full description of the package.
+
++=head2 synopsis
+
+  =synopsis
+
+    use Example;
+
+    my $example = Example->new;
+
+    # bless(..., "Example")
+
+  =cut
+
+  $test->for('synopsis', sub {
+    my ($tryable) = @_;
+    $tryable->result;
+  });
+
+The C<synopsis> block should contain the normative usage of the package. This
+is tested for existence. This block should be written in a way that allows it
+to be evaled successfully and should return a value.
+
++=head2 description
+
+  =description
+
+  This package provides an example class.
+
+  =cut
+
+  $test->for('description');
+
+The C<description> block should contain a description of the package and its
+behaviors.
+
++=head1 PACKAGE BLOCKS
+
+These optional blocks define the package's relationships and dependencies.
+
++=head2 includes
+
+  =includes
+
+  function: eg
+
+  method: prepare
+  method: execute
+
+  =cut
+
+  $test->for('includes');
+
+The C<includes> block should contain a list of C<function>, C<method>, and/or
+C<routine> names in the format of C<$type: $name>. Empty (or commented out)
+lines are ignored. Each function, method, and/or routine is tested to be
+documented properly, i.e. has the requisite counterparts (e.g. signature and at
+least one example block). Also, the package must recognize that each exists.
+
++=head2 libraries
+
+  =libraries
+
+  Venus::Check
+
+  =cut
+
+  $test->for('libraries');
+
+The C<libraries> block should contain a list of packages, each describing how
+particular type names used within function and method signatures will be
+validated. These packages are tested for loadability.
+
++=head2 inherits
+
+  =inherits
+
+  Venus::Core::Class
+
+  =cut
+
+  $test->for('inherits');
+
+The C<inherits> block should contain a list of parent packages. These packages
+are tested for loadability.
+
++=head2 integrates
+
+  =integrates
+
+  Venus::Role::Catchable
+  Venus::Role::Throwable
+
+  =cut
+
+  $test->for('integrates');
+
+The C<integrates> block should contain a list of packages that are involved in
+the behavior of the main package (typically roles). These packages are not
+automatically tested.
+
++=head1 API BLOCKS
+
+These blocks document the package's interface: attributes, methods, functions,
+messages, and routines. Each API block follows a common pattern requiring a
+description block, a signature block, and at least one example block.
+
++=head2 Common Pattern
+
+All API blocks (attribute, function, message, method, routine) follow this
+structure:
+
+  =$type $name               # Description of the $type
+  =signature $name           # Type signature
+  =metadata $name            # Optional metadata (since, deprecated, etc.)
+  =example-1 $name           # First example (required)
+  =example-2 $name           # Additional examples (optional)
+  =raise $name $error        # Document exceptions (optional)
+  =raise $name $error $id    # Exception with named error (optional)
+  ...
+
+The C<signature> block should contain a routine signature in the form of
+C<$signature : $return_type>, where C<$signature> is a valid typed signature
+and C<$return_type> is any valid L<Venus::Check> expression.
+
+The C<example-$number> block should contain valid Perl code and return a value.
+Examples can include a "magic" comment to incorporate other code:
+
++=over 4
+
++=item * C<# given: synopsis> - Include the synopsis code
+
++=item * C<# given: example-$number $name> - Include another example's code
+
++=back
+
++=head2 attribute
+
+  =attribute name
+
+  The name attribute is read-write, optional, and holds a string.
+
+  =signature name
+
+    name(string $value) (string)
+
+  =metadata name
+
+  since: 1.0.0
+
+  =example-1 name
+
+    # given: synopsis
+
+    my $name = $example->name;
+
+    # "..."
+
+  =cut
+
+  $test->for('attribute', 'name');
+
+  $test->for('example', 1, 'name', sub {
+    my ($tryable) = @_;
+    $tryable->result;
+  });
+
+The C<attribute> block should contain a description of the attribute and its
+purpose. Each attribute is tested and must be recognized to exist.
+
++=head2 method
+
+  =method prepare
+
+  The prepare method prepares for execution.
+
+  =signature prepare
+
+    prepare() (boolean)
+
+  =example-1 prepare
+
+    # given: synopsis
+
+    my $prepare = $example->prepare;
+
+    # "..."
+
+  =cut
+
+  $test->for('method', 'prepare');
+
+  $test->for('example', 1, 'prepare', sub {
+    my ($tryable) = @_;
+    $tryable->result;
+  });
+
+The C<method> block should contain a description of the method and its purpose.
+Each method is tested and must be recognized to exist.
+
++=head2 function
+
+  =function eg
+
+  The eg function returns a new instance of Example.
+
+  =signature eg
+
+    eg() (Example)
+
+  =example-1 eg
+
+    # given: synopsis
+
+    my $example = eg();
+
+    # "..."
+
+  =cut
+
+  $test->for('function', 'eg');
+
+  $test->for('example', 1, 'eg', sub {
+    my ($tryable) = @_;
+    $tryable->result;
+  });
+
+The C<function> block should contain a description of the function and its
+purpose. Each function is tested and must be recognized to exist.
+
++=head2 routine
+
+  =routine process
+
+  The process routine processes and returns data.
+
+  =signature process
+
+    process(any @args) (any)
+
+  =example-1 process
+
+    # given: synopsis
+
+    my $result = $example->process;
+
+    # "..."
+
+  =cut
+
+  $test->for('routine', 'process');
+
+  $test->for('example', 1, 'process', sub {
+    my ($tryable) = @_;
+    $tryable->result;
+  });
+
+The C<routine> block documents a subroutine that can be called as either a
+function or a method. It follows the same pattern as method and function
+blocks.
+
++=head2 message
+
+  =message accept
+
+  The accept message represents acceptance.
+
+  =signature accept
+
+    accept(any @args) (string)
+
+  =example-1 accept
+
+    # given: synopsis
+
+    my $accept = $example->accept;
+
+    # "..."
+
+  =cut
+
+  $test->for('message', 'accept');
+
+  $test->for('example', 1, 'accept', sub {
+    my ($tryable) = @_;
+    $tryable->result;
+  });
+
+The C<message> block documents a method that returns a message string, typically
+used for error messages or localization. It follows the same pattern as other
+API blocks.
+
++=head1 SUPPORTING BLOCKS
+
+These blocks provide additional context for API documentation.
+
++=head2 signature
+
+  =signature prepare
+
+    prepare() (boolean)
+
+  =cut
+
+  $test->for('signature', 'prepare');
+
+The C<signature> block should contain a routine signature in the form of
+C<$signature : $return_type>, where C<$signature> is a valid typed signature
+and C<$return_type> is any valid L<Venus::Check> expression.
+
++=head2 example
+
+  =example-1 name
+
+    # given: synopsis
+
+    my $name = $example->name;
+
+    # "..."
+
+  =cut
+
+  $test->for('example', 1, 'name', sub {
+    my ($tryable) = @_;
+    $tryable->result;
+  });
+
+The C<example-$number $name> block should contain valid Perl code and return a
+value. The block may contain a "magic" comment in the form of C<given:
+synopsis> or C<given: example-$number $name> which if present will include the
+given code example(s) with the evaluation of the current block.
+
++=head2 metadata
+
+  =metadata prepare
+
+  {since => "1.2.3"}
+
+  =cut
+
+  $test->for('metadata', 'prepare');
+
+The C<metadata $name> block should contain a stringified hashref containing
+Perl data structures used in the rendering of the package's documentation.
+Metadata can also be specified as flat key/value pairs:
+
+  =metadata prepare
+
+  introduced: 1.2.3
+  deprecated: 2.0.0
+
+  =cut
+
++=head2 raise
+
+  =raise execute Venus::Error
+
+    # given: synopsis
+
+    $example->operation; # throw exception
+
+    # Error
+
+  =cut
+
+  $test->for('raise', 'execute', 'Venus::Error', sub {
+    my ($tryable) = @_;
+    my $error = $tryable->error->result;
+    $test->is_error($error);
+  });
+
+The C<raise $name $error> block documents an exception that may be thrown by
+an API (attribute, function, method, or routine). The parameters are:
+
++=over 4
+
++=item * C<$name> - The name of the attribute, function, method, or routine that may throw the exception.
+
++=item * C<$error> - The error class or package that may be caught (e.g., C<Venus::Error>, C<Example::Error>).
+
++=item * C<$id> (optional) - An error name for further classification within the error class.
+
++=back
+
+The C<$error> represents the exception class that calling code can catch using
+a try/catch mechanism. This links the API documentation to error handling
+expectations.
+
+An optional C<$id> can be appended to specify a named error. Venus::Error
+objects support named errors for further classification:
+
+  =raise execute Venus::Error on.unknown
+
+    # given: synopsis
+
+    $example->operation; # throw exception
+
+    # Error (on.unknown)
+
+  =cut
+
+  $test->for('raise', 'execute', 'Venus::Error', 'on.unknown', sub {
+    my ($tryable) = @_;
+    my $error = $tryable->error->result;
+    $test->is_error($error);
+    $test->is($error->name, 'on.unknown');
+  });
+
+When C<$id> is provided, it indicates a specific named error within the error
+class, allowing for more granular error documentation and handling.
+
++=head1 FEATURE BLOCKS
+
+These blocks document special capabilities, errors, and operator overloads.
+
++=head2 feature
+
+  =feature noop
+
+  This package provides no particularly useful features.
+
+  =example-1 noop
+
+    # given: synopsis
+
+    my $feature = $example->feature;
+
+    # "..."
+
+  =cut
+
+  $test->for('feature');
+
+  $test->for('example', 1, 'noop', sub {
+    my ($tryable) = @_;
+    $tryable->result;
+  });
+
+The C<feature $name> block should contain a description of the feature(s) the
+package enables, and can include an C<example-$number $name> block to ensure
+the feature described works as expected.
+
++=head2 error
+
+  =error error_on_unknown
+
+  This package may raise an error_on_unknown error.
+
+  =example-1 error_on_unknown
+
+    # given: synopsis
+
+    my $error = $example->catch('error', {
+      with => 'error_on_unknown',
+    });
+
+    # "..."
+
+  =cut
+
+  $test->for('error', 'error_on_unknown');
+
+  $test->for('example', 1, 'error_on_unknown', sub {
+    my ($tryable) = @_;
+    $tryable->result;
+  });
+
+The C<error $name> block should contain a description of the error the package
+may raise, and can include an C<example-$number $name> block to ensure the
+error is raised and caught.
+
++=head2 operator
+
+  =operator ("")
+
+  This package overloads the C<""> operator.
+
+  =example-1 ("")
+
+    # given: synopsis
+
+    my $string = "$example";
+
+    # "..."
+
+  =cut
+
+  $test->for('operator', '("")');
+
+  $test->for('example', 1, '("")', sub {
+    my ($tryable) = @_;
+    $tryable->result;
+  });
+
+The C<operator $name> block should contain a description of the overloaded
+operation the package performs, and can include an C<example-$number $name>
+block to ensure the operation is functioning properly.
+
++=head1 CONTROL BLOCKS
+
+These blocks control how documentation is rendered.
+
++=head2 encoding
+
+  =encoding
+
+  utf8
+
+  =cut
+
+  $test->for('encoding');
+
+The C<encoding> block should contain the appropriate
+L<encoding|perlpod/encoding-encodingname>.
+
++=head2 layout
+
+  =layout
+
+  encoding
+  name
+  synopsis
+  description
+  attributes: attribute
+  authors
+  license
+
+  =cut
+
+  $test->for('layout');
+
+The C<layout> block should contain a list of blocks to render using L</render>,
+in the order they should be rendered.
+
++=head2 partials
+
+  =partials
+
+  t/path/to/other.t: present: authors
+  t/path/to/other.t: present: license
+
+  =cut
+
+  $test->for('partials');
+
+The C<partials> block should contain references to other marked-up test files
+in the form of C<$file: $method: $section>, which will call the C<$method> on a
+L<Venus::Test> instance for the C<$file> and include the results in-place as
+part of the rendering of the current file.
+
++=head1 PROJECT BLOCKS
+
+These blocks provide metadata about the project.
+
++=head2 authors
+
+  =authors
+
+  Awncorp, C<awncorp@cpan.org>
+
+  =cut
+
+  $test->for('authors');
+
+The C<authors> block should contain text describing the authors of the package.
+
++=head2 license
+
+  =license
+
+  No license granted.
+
+  =cut
+
+  $test->for('license');
+
+The C<license> block should contain a link and/or description of the license
+governing the package.
+
++=head2 project
+
+  =project
+
+  https://github.com/awncorp/example
+
+  =cut
+
+  $test->for('project');
+
+The C<project> block should contain a description and/or links for the
+package's project.
+
++=head2 version
+
+  =version
+
+  1.2.3
+
+  =cut
+
+  $test->for('version');
+
+The C<version> block should contain a valid version number for the package.
+
++=head1 TESTING
+
+This framework provides automated subtests based on the package specification,
+but also provides hooks for manual testing when automation is not sufficient.
+
++=head2 Basic Testing
+
+For simple blocks, testing verifies existence:
+
+  $test->for('name');
+  $test->for('abstract');
+  $test->for('description');
+
++=head2 Testing with Callbacks
+
+Code examples can be evaluated and returned using a callback for further
+testing:
+
+  $test->for('synopsis', sub {
+    my ($tryable) = @_;
+
+    my $result = $tryable->result;
+
+    # must return truthy to continue
+    $result;
+  });
+
++=head2 Exception Testing
+
+Because code examples are returned as L<Venus::Try> objects, capturing and
+testing exceptions is straightforward:
+
+  $test->for('synopsis', sub {
+    my ($tryable) = @_;
+
+    # catch exception thrown by the synopsis
+    $tryable->catch('Path::Find::Error', sub {
+      return $_[0];
+    });
+
+    # test the exception
+    my $result = $tryable->result;
+    ok $result->isa('Path::Find::Error'), 'exception caught';
+
+    # must return truthy to continue
+    $result;
+  });
+
++=head2 Testing Examples
+
+The C<example> method evaluates a given example and returns the result as a
+L<Venus::Try> object. The first argument is the example number:
+
+  $test->for('example', 1, 'children', sub {
+    my ($tryable) = @_;
+
+    my $result = $tryable->result;
+
+    # must return truthy to continue
+    $result;
+  });
+
++=head2 Testing Features
+
+The C<feature> method evaluates a documented feature and returns the result as
+a L<Venus::Try> object:
+
+  $test->for('feature', 'export-path-make', sub {
+    my ($tryable) = @_;
+
+    ok my $result = $tryable->result, 'result ok';
+
+    # must return truthy to continue
+    $result;
+  });
+
++=head2 Benefits
+
+The test automation and documentation generation enabled through this framework
+makes it easy to maintain source/test/documentation parity. This also increases
+reusability and reduces the need for complicated state and test setup.
+
++=cut
 
 =cut
 
@@ -203,6 +1026,7 @@ $test->for('inherits');
 =integrates
 
 Venus::Role::Buildable
+Venus::Role::Encaseable
 
 =cut
 
@@ -218,9 +1042,7 @@ The file attribute is read-write, accepts C<(string)> values, and is required.
 
 =metadata file
 
-{
-  since => '3.55',
-}
+since: 4.15
 
 =cut
 
@@ -301,7 +1123,4047 @@ $test->for('example', 1, 'test', sub {
   $result
 });
 
-=method collect
+=method done
+
+The done method dispatches to the L<Test::More/done_testing> operation and
+returns the result.
+
+=signature done
+
+  done() (any)
+
+=metadata done
+
+since: 4.15
+
+=cut
+
+=example-1 done
+
+  # given: synopsis
+
+  package main;
+
+  my $done = $test->done;
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'done', sub {
+  my ($tryable) = @_;
+  my $space = $test->space('Test::More');
+  my $call = 0;
+  $space->patch('done_testing', sub {++$call});
+  my $result = $tryable->result;
+  is $result, 1;
+  is $call, 1;
+  $space->unpatch('done_testing');
+
+  $result
+});
+
+=method explain
+
+The explain method dispatches to the L<Test::More/explain> operation and
+returns the result.
+
+=signature explain
+
+  explain(any @args) (any)
+
+=metadata explain
+
+since: 4.15
+
+=cut
+
+=example-1 explain
+
+  # given: synopsis
+
+  package main;
+
+  my $explain = $test->explain(123.456);
+
+  # "123.456"
+
+=cut
+
+$test->for('example', 1, 'explain', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "123.456";
+
+  $result
+});
+
+=method fail
+
+The fail method dispatches to the L<Test::More/ok> operation expecting the
+first argument to be falsy and returns the result.
+
+=signature fail
+
+  fail(any $data, string $description) (any)
+
+=metadata fail
+
+since: 4.15
+
+=cut
+
+=example-1 fail
+
+  # given: synopsis
+
+  package main;
+
+  my $fail = $test->fail(0, 'example-1 fail passed');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'fail', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, true;
+
+  $result
+});
+
+=method for
+
+The for method dispatches to the L</execute> method using the arguments
+provided within a L<subtest|Test::More/subtest> and returns the invocant.
+
+=signature for
+
+  for(any @args) (Venus::Test)
+
+=metadata for
+
+since: 4.15
+
+=cut
+
+=example-1 for
+
+  # given: synopsis
+
+  package main;
+
+  my $for = $test->for('name');
+
+  # bless(..., "Venus::Test")
+
+=cut
+
+$test->for('example', 1, 'for', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Test";
+
+  $result
+});
+
+=example-2 for
+
+  # given: synopsis
+
+  package main;
+
+  my $for = $test->for('synopsis');
+
+  # bless(..., "Venus::Test")
+
+=cut
+
+$test->for('example', 2, 'for', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Test";
+
+  $result
+});
+
+=example-3 for
+
+  # given: synopsis
+
+  package main;
+
+  my $for = $test->for('synopsis', sub{
+    my ($tryable) = @_;
+    return $tryable->result;
+  });
+
+  # bless(..., "Venus::Test")
+
+=cut
+
+$test->for('example', 3, 'for', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Test";
+
+  $result
+});
+
+=example-4 for
+
+  # given: synopsis
+
+  package main;
+
+  my $for = $test->for('example', 1, 'test', sub {
+    my ($tryable) = @_;
+    return $tryable->result;
+  });
+
+  # bless(..., "Venus::Test")
+
+=cut
+
+$test->for('example', 4, 'for', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Test";
+
+  $result
+});
+
+=method handler
+
+The handler method dispatches to the L<Test::More> method specified by the
+first argument and returns its result.
+
+=signature handler
+
+  handler(any @args) (any)
+
+=metadata handler
+
+since: 4.15
+
+=cut
+
+=example-1 handler
+
+  # given: synopsis
+
+  package main;
+
+  my $handler = $test->handler('ok', true);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'handler', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, true;
+
+  $result
+});
+
+=method like
+
+The like method dispatches to the L<Test::More/like> operation and returns the
+result.
+
+=signature like
+
+  like(string $data, string | Venus::Regexp $match, string $description) (any)
+
+=metadata like
+
+since: 4.15
+
+=cut
+
+=example-1 like
+
+  # given: synopsis
+
+  package main;
+
+  my $like = $test->like('hello world', 'world', 'example-1 like passed');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'like', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, true;
+
+  $result
+});
+
+=example-2 like
+
+  # given: synopsis
+
+  package main;
+
+  my $like = $test->like('hello world', qr/world/, 'example-1 like passed');
+
+  # true
+
+=cut
+
+$test->for('example', 2, 'like', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, true;
+
+  $result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Test)
+
+=metadata new
+
+since: 4.15
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Test;
+
+  my $new = Venus::Test->new;
+
+  # bless(..., "Venus::Test")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Test');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Test;
+
+  my $new = Venus::Test->new('t/Venus_Test.t');
+
+  # bless(..., "Venus::Test")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Test');
+  is $result->file, 't/Venus_Test.t';
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Test;
+
+  my $new = Venus::Test->new(file => 't/Venus_Test.t');
+
+  # bless(..., "Venus::Test")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Test');
+  is $result->file, 't/Venus_Test.t';
+
+  $result
+});
+
+=method pass
+
+The pass method dispatches to the L<Test::More/ok> operation expecting the
+first argument to be truthy and returns the result.
+
+=signature pass
+
+  pass(any $data, string $description) (any)
+
+=metadata pass
+
+since: 4.15
+
+=cut
+
+=example-1 pass
+
+  # given: synopsis
+
+  package main;
+
+  my $fail = $test->pass(1, 'example-1 pass passed');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'pass', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, true;
+
+  $result
+});
+
+=method render
+
+The render method reads the test specification and generates L<perlpod>
+documentation and returns a L<Venus::Path> object for the filename provided.
+
+=signature render
+
+  render(string $file) (Venus::Path)
+
+=metadata render
+
+since: 4.15
+
+=cut
+
+=example-1 render
+
+  # given: synopsis
+
+  package main;
+
+  my $path = $test->render('t/path/pod/test');
+
+  # bless(..., "Venus::Path")
+
+=cut
+
+$test->for('example', 1, 'render', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Path";
+  ok -f $result->absolute;
+  my $lines = $result->read;
+  like $lines, qr/=head1 NAME/;
+  like $lines, qr/Venus::Test - Test Class/;
+  like $lines, qr/=head1 ABSTRACT/;
+  like $lines, qr/Test Class for Perl 5/;
+  like $lines, qr/=head1 SYNOPSIS/;
+  like $lines, qr/=head1 DESCRIPTION/;
+  like $lines, qr/=head1 INHERITS/;
+  like $lines, qr/=head1 INTEGRATES/;
+  like $lines, qr/=head1 FUNCTIONS/;
+  like $lines, qr/=head1 METHODS/;
+  like $lines, qr/=head2 for/;
+  like $lines, qr/=item for example 1/;
+  like $lines, qr/=item for example 2/;
+  like $lines, qr/=item for example 3/;
+  like $lines, qr/=item for example 4/;
+  like $lines, qr/=head2 text/;
+  like $lines, qr/=item text example 1/;
+  like $lines, qr/=head1 AUTHORS/;
+  like $lines, qr/=head1 LICENSE/;
+
+  $result
+});
+
+=method same
+
+The same method dispatches to the L<Test::More/is_deeply> operation and returns
+the result.
+
+=signature same
+
+  same(any $data1, any $data2, string $description) (any)
+
+=metadata same
+
+since: 4.15
+
+=cut
+
+=example-1 same
+
+  # given: synopsis
+
+  package main;
+
+  my $same = $test->same({1..4}, {1..4}, 'example-1 same passed');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'same', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, true;
+
+  $result
+});
+
+=method skip
+
+The skip method dispatches to the L<Test::More/skip> operation with the
+C<plan_all> option and returns the result.
+
+=signature skip
+
+  skip(string $reason) (any)
+
+=metadata skip
+
+since: 4.15
+
+=cut
+
+=example-1 skip
+
+  # given: synopsis
+
+  package main;
+
+  my $skip = $test->skip('Unsupported');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'skip', sub {
+  my ($tryable) = @_;
+  my $space = $test->space('Test::More');
+  my $call = 0;
+  $space->patch('plan', sub {++$call});
+  my $result = $tryable->result;
+  is $result, 1;
+  is $call, 1;
+  $space->unpatch('plan');
+
+  $result
+});
+
+=method text
+
+The text method returns a L<Venus::Text::Pod> object using L</file> for parsing
+the test specification.
+
+=signature text
+
+  text() (Venus::Text::Pod)
+
+=metadata text
+
+since: 4.15
+
+=cut
+
+=example-1 text
+
+  # given: synopsis
+
+  package main;
+
+  my $text = $test->text;
+
+  # bless(..., "Venus::Text::Pod")
+
+=cut
+
+$test->for('example', 1, 'text', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Text::Pod";
+
+  $result
+});
+
+=method auto
+
+The auto method gets or sets environment variables that control automatic
+behaviors in the testing framework. When called with just a name, it returns
+the current value of the corresponding environment variable. When called with
+a name and value, it sets the environment variable. The environment variable
+name is derived from the name parameter as C<VENUS_TEST_AUTO_${NAME}>.
+
+Supported auto settings:
+
++=over 4
+
++=item * C<bailout> - When truthy, bails out of testing on the first error.
+
++=item * C<render> - When truthy, automatically renders POD when L</done> is
+called.
+
++=item * C<scrub> - When truthy, uses L<Venus::Space/scrub> to clean up packages
+created in example code for testing.
+
++=item * C<unpatch> - When truthy, uses L<Venus::Space/unpatch> (via
+L</unpatch>) to restore any existing monkey-patching on the package associated
+with the test.
+
++=back
+
+=cut
+
+=signature auto
+
+  auto(string $name, any @args) (any)
+
+=metadata auto
+
+since: 4.15
+
+=cut
+
+=example-1 auto
+
+  # given: synopsis
+
+  package main;
+
+  my $auto = $test->auto('render');
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_RENDER};
+  my $result = $tryable->result;
+  ok !defined $result;
+  delete $ENV{VENUS_TEST_AUTO_RENDER};
+
+  !$result
+});
+
+=example-2 auto
+
+  # given: synopsis
+
+  package main;
+
+  my $auto = $test->auto('render', 1);
+
+  # 1
+
+=cut
+
+$test->for('example', 2, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_RENDER};
+  my $result = $tryable->result;
+  ok $result;
+  ok $ENV{VENUS_TEST_AUTO_RENDER};
+  delete $ENV{VENUS_TEST_AUTO_RENDER};
+
+  $result
+});
+
+=example-3 auto
+
+  # given: synopsis
+
+  package main;
+
+  $test->auto('render', 1);
+
+  my $auto = $test->auto('render');
+
+  # 1
+
+=cut
+
+$test->for('example', 3, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_RENDER};
+  my $result = $tryable->result;
+  ok $result;
+  delete $ENV{VENUS_TEST_AUTO_RENDER};
+
+  $result
+});
+
+=example-4 auto
+
+  # given: synopsis
+
+  package main;
+
+  $test->auto('render', 0);
+
+  my $auto = $test->auto('render');
+
+  # 0
+
+=cut
+
+$test->for('example', 4, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_RENDER};
+  my $result = $tryable->result;
+  ok defined $result;
+  ok !$result;
+  delete $ENV{VENUS_TEST_AUTO_RENDER};
+
+  !$result
+});
+
+=example-5 auto
+
+  # given: synopsis
+
+  package main;
+
+  my $auto = $test->auto('bailout');
+
+  # undef
+
+=cut
+
+$test->for('example', 5, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_BAILOUT};
+  my $result = $tryable->result;
+  ok !defined $result;
+  delete $ENV{VENUS_TEST_AUTO_BAILOUT};
+
+  !$result
+});
+
+=example-6 auto
+
+  # given: synopsis
+
+  package main;
+
+  my $auto = $test->auto('bailout', 1);
+
+  # 1
+
+=cut
+
+$test->for('example', 6, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_BAILOUT};
+  my $result = $tryable->result;
+  ok $result;
+  ok $ENV{VENUS_TEST_AUTO_BAILOUT};
+  delete $ENV{VENUS_TEST_AUTO_BAILOUT};
+
+  $result
+});
+
+=example-7 auto
+
+  # given: synopsis
+
+  package main;
+
+  $test->auto('bailout', 1);
+
+  my $auto = $test->auto('bailout');
+
+  # 1
+
+=cut
+
+$test->for('example', 7, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_BAILOUT};
+  my $result = $tryable->result;
+  ok $result;
+  delete $ENV{VENUS_TEST_AUTO_BAILOUT};
+
+  $result
+});
+
+=example-8 auto
+
+  # given: synopsis
+
+  package main;
+
+  $test->auto('bailout', 0);
+
+  my $auto = $test->auto('bailout');
+
+  # 0
+
+=cut
+
+$test->for('example', 8, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_BAILOUT};
+  my $result = $tryable->result;
+  ok defined $result;
+  ok !$result;
+  delete $ENV{VENUS_TEST_AUTO_BAILOUT};
+
+  !$result
+});
+
+=example-9 auto
+
+  # given: synopsis
+
+  package main;
+
+  my $auto = $test->auto('scrub');
+
+  # undef
+
+=cut
+
+$test->for('example', 9, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_SCRUB};
+  my $result = $tryable->result;
+  ok !defined $result;
+  delete $ENV{VENUS_TEST_AUTO_SCRUB};
+
+  !$result
+});
+
+=example-10 auto
+
+  # given: synopsis
+
+  package main;
+
+  my $auto = $test->auto('scrub', 1);
+
+  # 1
+
+=cut
+
+$test->for('example', 10, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_SCRUB};
+  my $result = $tryable->result;
+  ok $result;
+  ok $ENV{VENUS_TEST_AUTO_SCRUB};
+  delete $ENV{VENUS_TEST_AUTO_SCRUB};
+
+  $result
+});
+
+=example-11 auto
+
+  # given: synopsis
+
+  package main;
+
+  $test->auto('scrub', 1);
+
+  my $auto = $test->auto('scrub');
+
+  # 1
+
+=cut
+
+$test->for('example', 11, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_SCRUB};
+  my $result = $tryable->result;
+  ok $result;
+  delete $ENV{VENUS_TEST_AUTO_SCRUB};
+
+  $result
+});
+
+=example-12 auto
+
+  # given: synopsis
+
+  package main;
+
+  $test->auto('scrub', 0);
+
+  my $auto = $test->auto('scrub');
+
+  # 0
+
+=cut
+
+$test->for('example', 12, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_SCRUB};
+  my $result = $tryable->result;
+  ok defined $result;
+  ok !$result;
+  delete $ENV{VENUS_TEST_AUTO_SCRUB};
+
+  !$result
+});
+
+=example-13 auto
+
+  # given: synopsis
+
+  package main;
+
+  my $auto = $test->auto('unpatch');
+
+  # undef
+
+=cut
+
+$test->for('example', 13, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_UNPATCH};
+  my $result = $tryable->result;
+  ok !defined $result;
+  delete $ENV{VENUS_TEST_AUTO_UNPATCH};
+
+  !$result
+});
+
+=example-14 auto
+
+  # given: synopsis
+
+  package main;
+
+  my $auto = $test->auto('unpatch', 1);
+
+  # 1
+
+=cut
+
+$test->for('example', 14, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_UNPATCH};
+  my $result = $tryable->result;
+  ok $result;
+  ok $ENV{VENUS_TEST_AUTO_UNPATCH};
+  delete $ENV{VENUS_TEST_AUTO_UNPATCH};
+
+  $result
+});
+
+=example-15 auto
+
+  # given: synopsis
+
+  package main;
+
+  $test->auto('unpatch', 1);
+
+  my $auto = $test->auto('unpatch');
+
+  # 1
+
+=cut
+
+$test->for('example', 15, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_UNPATCH};
+  my $result = $tryable->result;
+  ok $result;
+  delete $ENV{VENUS_TEST_AUTO_UNPATCH};
+
+  $result
+});
+
+=example-16 auto
+
+  # given: synopsis
+
+  package main;
+
+  $test->auto('unpatch', 0);
+
+  my $auto = $test->auto('unpatch');
+
+  # 0
+
+=cut
+
+$test->for('example', 16, 'auto', sub {
+  my ($tryable) = @_;
+  delete $ENV{VENUS_TEST_AUTO_UNPATCH};
+  my $result = $tryable->result;
+  ok defined $result;
+  ok !$result;
+  delete $ENV{VENUS_TEST_AUTO_UNPATCH};
+
+  !$result
+});
+
+=method diag
+
+The diag method prints diagnostic messages using L<Test::More/diag>.
+
+=signature diag
+
+  diag(string @messages) (any)
+
+=metadata diag
+
+since: 4.15
+
+=cut
+
+=example-1 diag
+
+  # given: synopsis
+
+  package main;
+
+  my $diag = $test->diag('Test failed due to...');
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'diag', sub {
+  # my ($tryable) = @_;
+  # my $result = $tryable->result;
+
+  1
+});
+
+=method eval
+
+The eval method evaluates Perl code and returns the result.
+
+=signature eval
+
+  eval(string $perl) (any)
+
+=metadata eval
+
+since: 4.15
+
+=cut
+
+=example-1 eval
+
+  # given: synopsis
+
+  package main;
+
+  my $eval = $test->eval('1 + 1');
+
+  # 2
+
+=cut
+
+$test->for('example', 1, 'eval', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 2;
+
+  $result
+});
+
+=method gate
+
+The gate method creates a new L<Venus::Test> instance with a gate callback that
+prevents subtests from running unless the callback returns a truthy value.
+
+=signature gate
+
+  gate(string $note, coderef $code) (Venus::Test)
+
+=metadata gate
+
+since: 4.15
+
+=cut
+
+=example-1 gate
+
+  # given: synopsis
+
+  package main;
+
+  my $test2 = $test->gate('OS is linux', sub {
+    $^O eq 'linux'
+  });
+
+  # bless(..., "Venus::Test")
+
+=cut
+
+$test->for('example', 1, 'gate', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Test";
+
+  $result
+});
+
+=method in
+
+The in method checks if a value exists in a collection (arrayref, hashref, or
+L<"mappable"|Venus::Role::Mappable> object) and returns true if the type and
+value match.
+
+=signature in
+
+  in(arrayref | hashref | consumes[Venus::Role::Mappable] $collection, any $value) (boolean)
+
+=metadata in
+
+since: 4.15
+
+=cut
+
+=example-1 in
+
+  # given: synopsis
+
+  package main;
+
+  my $in = $test->in([1, 2, 3], 2);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'in', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=method is
+
+The is method tests for equality using L<Test::More/is>.
+
+=signature is
+
+  is(any $data1, any $data2, string $description) (any)
+
+=metadata is
+
+since: 4.15
+
+=cut
+
+=example-1 is
+
+  # given: synopsis
+
+  package main;
+
+  my $is = $test->is('hello', 'hello', 'strings match');
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'is', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt
+
+The isnt method tests for inequality using L<Test::More/isnt>.
+
+=signature isnt
+
+  isnt(any $data1, any $data2, string $description) (any)
+
+=metadata isnt
+
+since: 4.15
+
+=cut
+
+=example-1 isnt
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt = $test->isnt('hello', 'world', 'strings differ');
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'isnt', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method lfile
+
+The lfile method returns the path to a lib file for the package being tested.
+
+=signature lfile
+
+  lfile() (Venus::Path)
+
+=metadata lfile
+
+since: 4.15
+
+=cut
+
+=example-1 lfile
+
+  # given: synopsis
+
+  package main;
+
+  my $lfile = $test->lfile;
+
+  # "lib/Venus/Test.pm"
+
+=cut
+
+$test->for('example', 1, 'lfile', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  like $result, qr/lib\/Venus\/Test\.pm$/;
+
+  $result
+});
+
+=method mktemp_dir
+
+The mktemp_dir method creates and returns a temporary directory as a
+L<Venus::Path> object.
+
+=signature mktemp_dir
+
+  mktemp_dir() (Venus::Path)
+
+=metadata mktemp_dir
+
+since: 4.15
+
+=cut
+
+=example-1 mktemp_dir
+
+  # given: synopsis
+
+  package main;
+
+  my $mktemp_dir = $test->mktemp_dir;
+
+  # bless(..., "Venus::Path")
+
+=cut
+
+$test->for('example', 1, 'mktemp_dir', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Path";
+  ok $result->exists;
+  ok $result->is_directory;
+
+  $result
+});
+
+=method mktemp_file
+
+The mktemp_file method creates and returns a temporary file as a L<Venus::Path>
+object.
+
+=signature mktemp_file
+
+  mktemp_file() (Venus::Path)
+
+=metadata mktemp_file
+
+since: 4.15
+
+=cut
+
+=example-1 mktemp_file
+
+  # given: synopsis
+
+  package main;
+
+  my $mktemp_file = $test->mktemp_file;
+
+  # bless(..., "Venus::Path")
+
+=cut
+
+$test->for('example', 1, 'mktemp_file', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Path";
+  ok $result->exists;
+  ok $result->is_file;
+
+  $result
+});
+
+=method note
+
+The note method prints debugging messages using L<Test::More/diag> and
+L<Test::More/explain>.
+
+=signature note
+
+  note(string @messages) (any)
+
+=metadata note
+
+since: 4.15
+
+=cut
+
+=example-1 note
+
+  # given: synopsis
+
+  package main;
+
+  my $note = $test->note('Example note...');
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'note', sub {
+  # my ($tryable) = @_;
+  # my $result = $tryable->result;
+
+  1
+});
+
+=method only_if
+
+The only_if method creates a gate that only runs subtests if the callback
+returns a truthy value.
+
+=signature only_if
+
+  only_if(string | coderef $code) (Venus::Test)
+
+=metadata only_if
+
+since: 4.15
+
+=cut
+
+=example-1 only_if
+
+  # given: synopsis
+
+  package main;
+
+  my $gate = $test->only_if('os_is_mac');
+
+  # bless(..., "Venus::Test")
+
+=cut
+
+$test->for('example', 1, 'only_if', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Test";
+
+  $result
+});
+
+=method os
+
+The os method returns a L<Venus::Os> object.
+
+=signature os
+
+  os() (Venus::Os)
+
+=metadata os
+
+since: 4.15
+
+=cut
+
+=example-1 os
+
+  # given: synopsis
+
+  package main;
+
+  my $os = $test->os;
+
+  # bless(..., "Venus::Os")
+
+=cut
+
+$test->for('example', 1, 'os', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Os";
+
+  $result
+});
+
+=method patch
+
+The patch method monkey-patches the named subroutine and returns the original
+coderef.
+
+=signature patch
+
+  patch(string $name, coderef $code) (coderef)
+
+=metadata patch
+
+since: 4.15
+
+=cut
+
+=example-1 patch
+
+  # given: synopsis
+
+  package main;
+
+  my $orig = $test->patch('pass', sub {
+    return 'patched';
+  });
+
+  # sub {...}
+
+  $test->unpatch;
+
+  # bless(..., "Venus::Space")
+
+  $orig
+
+  # sub {...}
+
+=cut
+
+$test->for('example', 1, 'patch', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  $test->is_coderef($result);
+
+  $result
+});
+
+=method path
+
+The path method returns a L<Venus::Path> object for the given path. Defaults to
+the test file.
+
+=signature path
+
+  path(string $path) (Venus::Path)
+
+=metadata path
+
+since: 4.15
+
+=cut
+
+=example-1 path
+
+  # given: synopsis
+
+  package main;
+
+  my $path = $test->path('t/Venus_Test.t');
+
+  # bless(..., "Venus::Path")
+
+=cut
+
+$test->for('example', 1, 'path', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Path";
+  like $result->get, qr/t\/Venus_Test\.t$/;
+
+  $result
+});
+
+=method pfile
+
+The pfile method returns the path to a pod file for the package being tested.
+
+=signature pfile
+
+  pfile() (Venus::Path)
+
+=metadata pfile
+
+since: 4.15
+
+=cut
+
+=example-1 pfile
+
+  # given: synopsis
+
+  package main;
+
+  my $pfile = $test->pfile;
+
+  # "lib/Venus/Test.pod"
+
+=cut
+
+$test->for('example', 1, 'pfile', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  like $result, qr/lib\/Venus\/Test\.pod$/;
+
+  $result
+});
+
+=method skip_if
+
+The skip_if method creates a gate that only runs subtests if the callback
+returns a falsy value.
+
+=signature skip_if
+
+  skip_if(string | coderef $code) (Venus::Test)
+
+=metadata skip_if
+
+since: 4.15
+
+=cut
+
+=example-1 skip_if
+
+  # given: synopsis
+
+  package main;
+
+  my $gate = $test->skip_if('os_is_mac');
+
+  # bless(..., "Venus::Test")
+
+=cut
+
+$test->for('example', 1, 'skip_if', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Test";
+
+  $result
+});
+
+=method space
+
+The space method returns a L<Venus::Space> object for the package being tested,
+or for the package name provided.
+
+=signature space
+
+  space(string $package) (Venus::Space)
+
+=metadata space
+
+since: 4.15
+
+=cut
+
+=example-1 space
+
+  # given: synopsis
+
+  package main;
+
+  my $space = $test->space;
+
+  # bless(..., "Venus::Space")
+
+=cut
+
+$test->for('example', 1, 'space', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Space";
+  is $result->package, "Venus::Test";
+
+  $result
+});
+
+=example-2 space
+
+  # given: synopsis
+
+  package main;
+
+  my $space = $test->space('Venus::Path');
+
+  # bless(..., "Venus::Space")
+
+=cut
+
+$test->for('example', 2, 'space', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Space";
+  is $result->package, "Venus::Path";
+
+  $result
+});
+
+=method subtest
+
+The subtest method runs a subtest using L<Test::More/subtest>. Enclosed tests
+maybe be made conditional using a L</gate>, e.g., L</only_if> and L</skip_if>.
+
+=signature subtest
+
+  subtest(string $name, coderef $code) (any)
+
+=metadata subtest
+
+since: 4.15
+
+=cut
+
+=example-1 subtest
+
+  # given: synopsis
+
+  package main;
+
+  my $subtest = $test->subtest('test something', sub {
+    $test->pass('it works');
+  });
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'subtest', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  1
+});
+
+=method tfile
+
+The tfile method returns the path to a test file for the package being tested.
+
+=signature tfile
+
+  tfile() (Venus::Path)
+
+=metadata tfile
+
+since: 4.15
+
+=cut
+
+=example-1 tfile
+
+  # given: synopsis
+
+  package main;
+
+  my $tfile = $test->tfile;
+
+  # "t/Venus_Test.t"
+
+=cut
+
+$test->for('example', 1, 'tfile', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  like $result, qr/t\/Venus_Test\.t$/;
+
+  $result
+});
+
+=method type
+
+The type method performs type assertion using L<Venus::Type> and tests if the
+data matches the type expression.
+
+=signature type
+
+  type(any $data, string $expression, string @args) (boolean)
+
+=metadata type
+
+since: 4.15
+
+=cut
+
+=example-1 type
+
+  # given: synopsis
+
+  package main;
+
+  my $type = $test->type([1,2,3], 'arrayref', 'valid arrayref');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'type', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method unlike
+
+The unlike method tests that a string doesn't match a regex using
+L<Test::More/unlike>.
+
+=signature unlike
+
+  unlike(string $data, regexp $regex, string $description) (any)
+
+=metadata unlike
+
+since: 4.15
+
+=cut
+
+=example-1 unlike
+
+  # given: synopsis
+
+  package main;
+
+  my $unlike = $test->unlike('hello', qr/world/, 'does not match');
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'unlike', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method unpatch
+
+The unpatch method undoes patches by name, or undoes all patches if no names
+are provided.
+
+=signature unpatch
+
+  unpatch(string @names) (Venus::Space)
+
+=metadata unpatch
+
+since: 4.15
+
+=cut
+
+=example-1 unpatch
+
+  # given: synopsis
+
+  package main;
+
+  $test->patch('pass', sub {'patched'});
+
+  # sub {...}
+
+  my $unpatch = $test->unpatch('pass');
+
+  # bless(..., "Venus::Space")
+
+=cut
+
+$test->for('example', 1, 'unpatch', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Space";
+
+  $result
+});
+
+=method is_arrayref
+
+The is_arrayref method tests whether the data is an arrayref using
+L<Venus/is_arrayref>.
+
+=signature is_arrayref
+
+  is_arrayref(any $data, string @args) (boolean)
+
+=metadata is_arrayref
+
+since: 4.15
+
+=cut
+
+=example-1 is_arrayref
+
+  # given: synopsis
+
+  package main;
+
+  my $is_arrayref = $test->is_arrayref([1,2,3], 'valid arrayref');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_arrayref', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_blessed
+
+The is_blessed method tests whether the data is blessed using
+L<Venus/is_blessed>.
+
+=signature is_blessed
+
+  is_blessed(any $data, string @args) (boolean)
+
+=metadata is_blessed
+
+since: 4.15
+
+=cut
+
+=example-1 is_blessed
+
+  # given: synopsis
+
+  package main;
+
+  my $is_blessed = $test->is_blessed(bless({}), 'valid blessed');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_blessed', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_boolean
+
+The is_boolean method tests whether the data is a boolean using
+L<Venus/is_boolean>.
+
+=signature is_boolean
+
+  is_boolean(any $data, string @args) (boolean)
+
+=metadata is_boolean
+
+since: 4.15
+
+=cut
+
+=example-1 is_boolean
+
+  # given: synopsis
+
+  package main;
+
+  require Venus;
+
+  my $is_boolean = $test->is_boolean(true, 'valid boolean');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_boolean', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_coderef
+
+The is_coderef method tests whether the data is a coderef using
+L<Venus/is_coderef>.
+
+=signature is_coderef
+
+  is_coderef(any $data, string @args) (boolean)
+
+=metadata is_coderef
+
+since: 4.15
+
+=cut
+
+=example-1 is_coderef
+
+  # given: synopsis
+
+  package main;
+
+  my $is_coderef = $test->is_coderef(sub{}, 'valid coderef');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_coderef', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_hashref
+
+The is_hashref method tests whether the data is a hashref using
+L<Venus/is_hashref>.
+
+=signature is_hashref
+
+  is_hashref(any $data, string @args) (boolean)
+
+=metadata is_hashref
+
+since: 4.15
+
+=cut
+
+=example-1 is_hashref
+
+  # given: synopsis
+
+  package main;
+
+  my $is_hashref = $test->is_hashref({a=>1}, 'valid hashref');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_hashref', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_number
+
+The is_number method tests whether the data is a number using
+L<Venus/is_number>.
+
+=signature is_number
+
+  is_number(any $data, string @args) (boolean)
+
+=metadata is_number
+
+since: 4.15
+
+=cut
+
+=example-1 is_number
+
+  # given: synopsis
+
+  package main;
+
+  my $is_number = $test->is_number(123, 'valid number');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_number', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_object
+
+The is_object method tests whether the data is an object using
+L<Venus/is_object>.
+
+=signature is_object
+
+  is_object(any $data, string @args) (boolean)
+
+=metadata is_object
+
+since: 4.15
+
+=cut
+
+=example-1 is_object
+
+  # given: synopsis
+
+  package main;
+
+  my $is_object = $test->is_object(bless({}), 'valid object');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_object', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_regexp
+
+The is_regexp method tests whether the data is a regexp using
+L<Venus/is_regexp>.
+
+=signature is_regexp
+
+  is_regexp(any $data, string @args) (boolean)
+
+=metadata is_regexp
+
+since: 4.15
+
+=cut
+
+=example-1 is_regexp
+
+  # given: synopsis
+
+  package main;
+
+  my $is_regexp = $test->is_regexp(qr/test/, 'valid regexp');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_regexp', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_string
+
+The is_string method tests whether the data is a string using
+L<Venus/is_string>.
+
+=signature is_string
+
+  is_string(any $data, string @args) (boolean)
+
+=metadata is_string
+
+since: 4.15
+
+=cut
+
+=example-1 is_string
+
+  # given: synopsis
+
+  package main;
+
+  my $is_string = $test->is_string('hello', 'valid string');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_string', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_undef
+
+The is_undef method tests whether the data is undef using L<Venus/is_undef>.
+
+=signature is_undef
+
+  is_undef(any $data, string @args) (boolean)
+
+=metadata is_undef
+
+since: 4.15
+
+=cut
+
+=example-1 is_undef
+
+  # given: synopsis
+
+  package main;
+
+  my $is_undef = $test->is_undef(undef, 'valid undef');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_undef', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_dirhandle
+
+The is_dirhandle method tests whether the data is a directory handle using
+L<Venus/is_dirhandle>.
+
+=signature is_dirhandle
+
+  is_dirhandle(any $data, string @args) (boolean)
+
+=metadata is_dirhandle
+
+since: 4.15
+
+=cut
+
+=example-1 is_dirhandle
+
+  # given: synopsis
+
+  package main;
+
+  opendir(my $dh, '.');
+  my $is_dirhandle = $test->is_dirhandle($dh, 'valid dirhandle');
+
+  # true
+
+=cut
+
+# Unsupported on Windows: The dirfd function is unimplemented
+$test->skip_if('os_is_win')->for('example', 1, 'is_dirhandle', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_enum
+
+The is_enum method tests whether the data is an enum using L<Venus/is_enum>.
+
+=signature is_enum
+
+  is_enum(any $data, arrayref | hashref $data, string @args) (boolean)
+
+=metadata is_enum
+
+since: 4.15
+
+=cut
+
+=example-1 is_enum
+
+  # given: synopsis
+
+  package main;
+
+  $test->is_enum('light', ['light', 'dark'], 'is in enum');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_enum', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_error
+
+The is_error method tests whether the data is a Venus::Error object using
+L<Venus/is_error>.
+
+=signature is_error
+
+  is_error(any $data, string @args) (boolean)
+
+=metadata is_error
+
+since: 4.15
+
+=cut
+
+=example-1 is_error
+
+  # given: synopsis
+
+  package main;
+
+  use Venus::Error;
+
+  my $is_error = $test->is_error(Venus::Error->new, 'valid error');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_error', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_false
+
+The is_false method tests whether the data is a false value using
+L<Venus/is_false>.
+
+=signature is_false
+
+  is_false(any $data, string @args) (boolean)
+
+=metadata is_false
+
+since: 4.15
+
+=cut
+
+=example-1 is_false
+
+  # given: synopsis
+
+  package main;
+
+  my $is_false = $test->is_false(0, 'valid false');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_false', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_fault
+
+The is_fault method tests whether the data is a Venus::Fault object using
+L<Venus/is_fault>.
+
+=signature is_fault
+
+  is_fault(any $data, string @args) (boolean)
+
+=metadata is_fault
+
+since: 4.15
+
+=cut
+
+=example-1 is_fault
+
+  # given: synopsis
+
+  package main;
+
+  use Venus::Fault;
+
+  my $is_fault = $test->is_fault(Venus::Fault->new, 'valid fault');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_fault', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_filehandle
+
+The is_filehandle method tests whether the data is a file handle using
+L<Venus/is_filehandle>.
+
+=signature is_filehandle
+
+  is_filehandle(any $data, string @args) (boolean)
+
+=metadata is_filehandle
+
+since: 4.15
+
+=cut
+
+=example-1 is_filehandle
+
+  # given: synopsis
+
+  package main;
+
+  open(my $fh, '<', 't/Venus_Test.t');
+  my $is_filehandle = $test->is_filehandle($fh, 'valid filehandle');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_filehandle', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_float
+
+The is_float method tests whether the data is a float using L<Venus/is_float>.
+
+=signature is_float
+
+  is_float(any $data, string @args) (boolean)
+
+=metadata is_float
+
+since: 4.15
+
+=cut
+
+=example-1 is_float
+
+  # given: synopsis
+
+  package main;
+
+  my $is_float = $test->is_float(1.5, 'valid float');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_float', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_glob
+
+The is_glob method tests whether the data is a glob reference using
+L<Venus/is_glob>.
+
+=signature is_glob
+
+  is_glob(any $data, string @args) (boolean)
+
+=metadata is_glob
+
+since: 4.15
+
+=cut
+
+=example-1 is_glob
+
+  # given: synopsis
+
+  package main;
+
+  my $is_glob = $test->is_glob(\*STDOUT, 'valid glob');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_glob', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_package
+
+The is_package method tests whether the data is a package name using
+L<Venus/is_package>.
+
+=signature is_package
+
+  is_package(any $data, string @args) (boolean)
+
+=metadata is_package
+
+since: 4.15
+
+=cut
+
+=example-1 is_package
+
+  # given: synopsis
+
+  package main;
+
+  my $is_package = $test->is_package('Venus::Test', 'valid package');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_package', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_reference
+
+The is_reference method tests whether the data is a reference using
+L<Venus/is_reference>.
+
+=signature is_reference
+
+  is_reference(any $data, string @args) (boolean)
+
+=metadata is_reference
+
+since: 4.15
+
+=cut
+
+=example-1 is_reference
+
+  # given: synopsis
+
+  package main;
+
+  my $is_reference = $test->is_reference([], 'valid reference');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_reference', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_scalarref
+
+The is_scalarref method tests whether the data is a scalar reference using
+L<Venus/is_scalarref>.
+
+=signature is_scalarref
+
+  is_scalarref(any $data, string @args) (boolean)
+
+=metadata is_scalarref
+
+since: 4.15
+
+=cut
+
+=example-1 is_scalarref
+
+  # given: synopsis
+
+  package main;
+
+  my $scalar = 'hello';
+  my $is_scalarref = $test->is_scalarref(\$scalar, 'valid scalarref');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_scalarref', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_true
+
+The is_true method tests whether the data is a true value using L<Venus/is_true>.
+
+=signature is_true
+
+  is_true(any $data, string @args) (boolean)
+
+=metadata is_true
+
+since: 4.15
+
+=cut
+
+=example-1 is_true
+
+  # given: synopsis
+
+  package main;
+
+  my $is_true = $test->is_true(1, 'valid true');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_true', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_value
+
+The is_value method tests whether the data is a defined value using
+L<Venus/is_value>.
+
+=signature is_value
+
+  is_value(any $data, string @args) (boolean)
+
+=metadata is_value
+
+since: 4.15
+
+=cut
+
+=example-1 is_value
+
+  # given: synopsis
+
+  package main;
+
+  my $is_value = $test->is_value('hello', 'valid value');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_value', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method is_yesno
+
+The is_yesno method tests whether the data is a yes/no value using
+L<Venus/is_yesno>.
+
+=signature is_yesno
+
+  is_yesno(any $data, string @args) (boolean)
+
+=metadata is_yesno
+
+since: 4.15
+
+=cut
+
+=example-1 is_yesno
+
+  # given: synopsis
+
+  package main;
+
+  my $is_yesno = $test->is_yesno(1, 'valid yesno');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_yesno', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_arrayref
+
+The isnt_arrayref method tests whether the data is not an arrayref.
+
+=signature isnt_arrayref
+
+  isnt_arrayref(any $data, string @args) (boolean)
+
+=metadata isnt_arrayref
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_arrayref
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_arrayref = $test->isnt_arrayref({}, 'not an arrayref');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_arrayref', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_hashref
+
+The isnt_hashref method tests whether the data is not a hashref.
+
+=signature isnt_hashref
+
+  isnt_hashref(any $data, string @args) (boolean)
+
+=metadata isnt_hashref
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_hashref
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_hashref = $test->isnt_hashref([], 'not a hashref');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_hashref', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_blessed
+
+The isnt_blessed method tests whether the data is not a blessed object.
+
+=signature isnt_blessed
+
+  isnt_blessed(any $data, string @args) (boolean)
+
+=metadata isnt_blessed
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_blessed
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_blessed = $test->isnt_blessed('string', 'not blessed');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_blessed', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_boolean
+
+The isnt_boolean method tests whether the data is not a boolean.
+
+=signature isnt_boolean
+
+  isnt_boolean(any $data, string @args) (boolean)
+
+=metadata isnt_boolean
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_boolean
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_boolean = $test->isnt_boolean('string', 'not boolean');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_boolean', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_coderef
+
+The isnt_coderef method tests whether the data is not a coderef.
+
+=signature isnt_coderef
+
+  isnt_coderef(any $data, string @args) (boolean)
+
+=metadata isnt_coderef
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_coderef
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_coderef = $test->isnt_coderef('string', 'not coderef');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_coderef', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_dirhandle
+
+The isnt_dirhandle method tests whether the data is not a directory handle.
+
+=signature isnt_dirhandle
+
+  isnt_dirhandle(any $data, string @args) (boolean)
+
+=metadata isnt_dirhandle
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_dirhandle
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_dirhandle = $test->isnt_dirhandle('string', 'not dirhandle');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_dirhandle', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_enum
+
+The isnt_enum method tests whether the data is not an enum.
+
+=signature isnt_enum
+
+  isnt_enum(any $data, arrayref | hashref $data, string @args) (boolean)
+
+=metadata isnt_enum
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_enum
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_enum = $test->isnt_enum('light', [], 'not in enum');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_enum', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_error
+
+The isnt_error method tests whether the data is not a Venus::Error object.
+
+=signature isnt_error
+
+  isnt_error(any $data, string @args) (boolean)
+
+=metadata isnt_error
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_error
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_error = $test->isnt_error('string', 'not error');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_error', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_false
+
+The isnt_false method tests whether the data is not a false value.
+
+=signature isnt_false
+
+  isnt_false(any $data, string @args) (boolean)
+
+=metadata isnt_false
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_false
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_false = $test->isnt_false(1, 'not false');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_false', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_fault
+
+The isnt_fault method tests whether the data is not a Venus::Fault object.
+
+=signature isnt_fault
+
+  isnt_fault(any $data, string @args) (boolean)
+
+=metadata isnt_fault
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_fault
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_fault = $test->isnt_fault('string', 'not fault');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_fault', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_filehandle
+
+The isnt_filehandle method tests whether the data is not a file handle.
+
+=signature isnt_filehandle
+
+  isnt_filehandle(any $data, string @args) (boolean)
+
+=metadata isnt_filehandle
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_filehandle
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_filehandle = $test->isnt_filehandle('string', 'not filehandle');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_filehandle', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_float
+
+The isnt_float method tests whether the data is not a float.
+
+=signature isnt_float
+
+  isnt_float(any $data, string @args) (boolean)
+
+=metadata isnt_float
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_float
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_float = $test->isnt_float(123, 'not float');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_float', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_glob
+
+The isnt_glob method tests whether the data is not a glob reference.
+
+=signature isnt_glob
+
+  isnt_glob(any $data, string @args) (boolean)
+
+=metadata isnt_glob
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_glob
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_glob = $test->isnt_glob('string', 'not glob');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_glob', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_number
+
+The isnt_number method tests whether the data is not a number.
+
+=signature isnt_number
+
+  isnt_number(any $data, string @args) (boolean)
+
+=metadata isnt_number
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_number
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_number = $test->isnt_number('string', 'not number');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_number', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_object
+
+The isnt_object method tests whether the data is not an object.
+
+=signature isnt_object
+
+  isnt_object(any $data, string @args) (boolean)
+
+=metadata isnt_object
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_object
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_object = $test->isnt_object('string', 'not object');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_object', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_package
+
+The isnt_package method tests whether the data is not a package name.
+
+=signature isnt_package
+
+  isnt_package(any $data, string @args) (boolean)
+
+=metadata isnt_package
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_package
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_package = $test->isnt_package([], 'not package');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_package', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_reference
+
+The isnt_reference method tests whether the data is not a reference.
+
+=signature isnt_reference
+
+  isnt_reference(any $data, string @args) (boolean)
+
+=metadata isnt_reference
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_reference
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_reference = $test->isnt_reference('string', 'not reference');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_reference', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_regexp
+
+The isnt_regexp method tests whether the data is not a regexp.
+
+=signature isnt_regexp
+
+  isnt_regexp(any $data, string @args) (boolean)
+
+=metadata isnt_regexp
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_regexp
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_regexp = $test->isnt_regexp('string', 'not regexp');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_regexp', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_scalarref
+
+The isnt_scalarref method tests whether the data is not a scalar reference.
+
+=signature isnt_scalarref
+
+  isnt_scalarref(any $data, string @args) (boolean)
+
+=metadata isnt_scalarref
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_scalarref
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_scalarref = $test->isnt_scalarref('string', 'not scalarref');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_scalarref', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_string
+
+The isnt_string method tests whether the data is not a string.
+
+=signature isnt_string
+
+  isnt_string(any $data, string @args) (boolean)
+
+=metadata isnt_string
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_string
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_string = $test->isnt_string([], 'not string');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_string', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_true
+
+The isnt_true method tests whether the data is not a true value.
+
+=signature isnt_true
+
+  isnt_true(any $data, string @args) (boolean)
+
+=metadata isnt_true
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_true
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_true = $test->isnt_true(0, 'not true');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_true', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_undef
+
+The isnt_undef method tests whether the data is not undef.
+
+=signature isnt_undef
+
+  isnt_undef(any $data, string @args) (boolean)
+
+=metadata isnt_undef
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_undef
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_undef = $test->isnt_undef('string', 'not undef');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_undef', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_value
+
+The isnt_value method tests whether the data is not a defined value.
+
+=signature isnt_value
+
+  isnt_value(any $data, string @args) (boolean)
+
+=metadata isnt_value
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_value
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_value = $test->isnt_value(undef, 'not value');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_value', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method isnt_yesno
+
+The isnt_yesno method tests whether the data is not a yes/no value.
+
+=signature isnt_yesno
+
+  isnt_yesno(any $data, string @args) (boolean)
+
+=metadata isnt_yesno
+
+since: 4.15
+
+=cut
+
+=example-1 isnt_yesno
+
+  # given: synopsis
+
+  package main;
+
+  my $isnt_yesno = $test->isnt_yesno('string', 'not yesno');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'isnt_yesno', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+
+  $result
+});
+
+=method os_is_bsd
+
+The os_is_bsd method returns true if the operating system is BSD.
+
+=signature os_is_bsd
+
+  os_is_bsd() (boolean)
+
+=metadata os_is_bsd
+
+since: 4.15
+
+=cut
+
+=example-1 os_is_bsd
+
+  # given: synopsis
+
+  package main;
+
+  my $os_is_bsd = $test->os_is_bsd;
+
+  # true
+
+=cut
+
+$test->only_if('os_is_bsd')->for('example', 1, 'os_is_bsd', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_is_lin
+
+The os_is_lin method returns true if the operating system is Linux.
+
+=signature os_is_lin
+
+  os_is_lin() (boolean)
+
+=metadata os_is_lin
+
+since: 4.15
+
+=cut
+
+=example-1 os_is_lin
+
+  # given: synopsis
+
+  package main;
+
+  my $os_is_lin = $test->os_is_lin;
+
+  # true
+
+=cut
+
+$test->only_if('os_is_lin')->for('example', 1, 'os_is_lin', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_is_mac
+
+The os_is_mac method returns true if the operating system is macOS.
+
+=signature os_is_mac
+
+  os_is_mac() (boolean)
+
+=metadata os_is_mac
+
+since: 4.15
+
+=cut
+
+=example-1 os_is_mac
+
+  # given: synopsis
+
+  package main;
+
+  my $os_is_mac = $test->os_is_mac;
+
+  # true
+
+=cut
+
+$test->only_if('os_is_mac')->for('example', 1, 'os_is_mac', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_is_cyg
+
+The os_is_cyg method returns true if the operating system is Cygwin.
+
+=signature os_is_cyg
+
+  os_is_cyg() (boolean)
+
+=metadata os_is_cyg
+
+since: 4.15
+
+=cut
+
+=example-1 os_is_cyg
+
+  # given: synopsis
+
+  package main;
+
+  my $os_is_cyg = $test->os_is_cyg;
+
+  # true
+
+=cut
+
+$test->only_if('os_is_cyg')->for('example', 1, 'os_is_cyg', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_is_dos
+
+The os_is_dos method returns true if the operating system is DOS.
+
+=signature os_is_dos
+
+  os_is_dos() (boolean)
+
+=metadata os_is_dos
+
+since: 4.15
+
+=cut
+
+=example-1 os_is_dos
+
+  # given: synopsis
+
+  package main;
+
+  my $os_is_dos = $test->os_is_dos;
+
+  # true
+
+=cut
+
+$test->only_if('os_is_dos')->for('example', 1, 'os_is_dos', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_is_non
+
+The os_is_non method returns true if the operating system is non-Unix.
+
+=signature os_is_non
+
+  os_is_non() (boolean)
+
+=metadata os_is_non
+
+since: 4.15
+
+=cut
+
+=example-1 os_is_non
+
+  # given: synopsis
+
+  package main;
+
+  my $os_is_non = $test->os_is_non;
+
+  # true
+
+=cut
+
+$test->only_if('os_is_non')->for('example', 1, 'os_is_non', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_is_sun
+
+The os_is_sun method returns true if the operating system is Solaris.
+
+=signature os_is_sun
+
+  os_is_sun() (boolean)
+
+=metadata os_is_sun
+
+since: 4.15
+
+=cut
+
+=example-1 os_is_sun
+
+  # given: synopsis
+
+  package main;
+
+  my $os_is_sun = $test->os_is_sun;
+
+  # true
+
+=cut
+
+$test->only_if('os_is_sun')->for('example', 1, 'os_is_sun', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_is_vms
+
+The os_is_vms method returns true if the operating system is VMS.
+
+=signature os_is_vms
+
+  os_is_vms() (boolean)
+
+=metadata os_is_vms
+
+since: 4.15
+
+=cut
+
+=example-1 os_is_vms
+
+  # given: synopsis
+
+  package main;
+
+  my $os_is_vms = $test->os_is_vms;
+
+  # true
+
+=cut
+
+$test->only_if('os_is_vms')->for('example', 1, 'os_is_vms', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_is_win
+
+The os_is_win method returns true if the operating system is Windows.
+
+=signature os_is_win
+
+  os_is_win() (boolean)
+
+=metadata os_is_win
+
+since: 4.15
+
+=cut
+
+=example-1 os_is_win
+
+  # given: synopsis
+
+  package main;
+
+  my $os_is_win = $test->os_is_win;
+
+  # true
+
+=cut
+
+$test->only_if('os_is_win')->for('example', 1, 'os_is_win', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_isnt_bsd
+
+The os_isnt_bsd method returns true if the operating system is not BSD.
+
+=signature os_isnt_bsd
+
+  os_isnt_bsd() (boolean)
+
+=metadata os_isnt_bsd
+
+since: 4.15
+
+=cut
+
+=example-1 os_isnt_bsd
+
+  # given: synopsis
+
+  package main;
+
+  my $os_isnt_bsd = $test->os_isnt_bsd;
+
+  # true
+
+=cut
+
+$test->skip_if('os_is_bsd')->for('example', 1, 'os_isnt_bsd', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_isnt_mac
+
+The os_isnt_mac method returns true if the operating system is not macOS.
+
+=signature os_isnt_mac
+
+  os_isnt_mac() (boolean)
+
+=metadata os_isnt_mac
+
+since: 4.15
+
+=cut
+
+=example-1 os_isnt_mac
+
+  # given: synopsis
+
+  package main;
+
+  my $os_isnt_mac = $test->os_isnt_mac;
+
+  # true
+
+=cut
+
+$test->skip_if('os_is_mac')->for('example', 1, 'os_isnt_mac', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_isnt_cyg
+
+The os_isnt_cyg method returns true if the operating system is not Cygwin.
+
+=signature os_isnt_cyg
+
+  os_isnt_cyg() (boolean)
+
+=metadata os_isnt_cyg
+
+since: 4.15
+
+=cut
+
+=example-1 os_isnt_cyg
+
+  # given: synopsis
+
+  package main;
+
+  my $os_isnt_cyg = $test->os_isnt_cyg;
+
+  # true
+
+=cut
+
+$test->skip_if('os_is_cyg')->for('example', 1, 'os_isnt_cyg', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_isnt_dos
+
+The os_isnt_dos method returns true if the operating system is not DOS.
+
+=signature os_isnt_dos
+
+  os_isnt_dos() (boolean)
+
+=metadata os_isnt_dos
+
+since: 4.15
+
+=cut
+
+=example-1 os_isnt_dos
+
+  # given: synopsis
+
+  package main;
+
+  my $os_isnt_dos = $test->os_isnt_dos;
+
+  # true
+
+=cut
+
+$test->skip_if('os_is_dos')->for('example', 1, 'os_isnt_dos', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_isnt_lin
+
+The os_isnt_lin method returns true if the operating system is not Linux.
+
+=signature os_isnt_lin
+
+  os_isnt_lin() (boolean)
+
+=metadata os_isnt_lin
+
+since: 4.15
+
+=cut
+
+=example-1 os_isnt_lin
+
+  # given: synopsis
+
+  package main;
+
+  my $os_isnt_lin = $test->os_isnt_lin;
+
+  # true
+
+=cut
+
+$test->skip_if('os_is_lin')->for('example', 1, 'os_isnt_lin', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_isnt_non
+
+The os_isnt_non method returns true if the operating system is not non-Unix.
+
+=signature os_isnt_non
+
+  os_isnt_non() (boolean)
+
+=metadata os_isnt_non
+
+since: 4.15
+
+=cut
+
+=example-1 os_isnt_non
+
+  # given: synopsis
+
+  package main;
+
+  my $os_isnt_non = $test->os_isnt_non;
+
+  # true
+
+=cut
+
+$test->skip_if('os_is_non')->for('example', 1, 'os_isnt_non', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_isnt_sun
+
+The os_isnt_sun method returns true if the operating system is not Solaris.
+
+=signature os_isnt_sun
+
+  os_isnt_sun() (boolean)
+
+=metadata os_isnt_sun
+
+since: 4.15
+
+=cut
+
+=example-1 os_isnt_sun
+
+  # given: synopsis
+
+  package main;
+
+  my $os_isnt_sun = $test->os_isnt_sun;
+
+  # true
+
+=cut
+
+$test->skip_if('os_is_sun')->for('example', 1, 'os_isnt_sun', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_isnt_vms
+
+The os_isnt_vms method returns true if the operating system is not VMS.
+
+=signature os_isnt_vms
+
+  os_isnt_vms() (boolean)
+
+=metadata os_isnt_vms
+
+since: 4.15
+
+=cut
+
+=example-1 os_isnt_vms
+
+  # given: synopsis
+
+  package main;
+
+  my $os_isnt_vms = $test->os_isnt_vms;
+
+  # true
+
+=cut
+
+$test->skip_if('os_is_vms')->for('example', 1, 'os_isnt_vms', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=method os_isnt_win
+
+The os_isnt_win method returns true if the operating system is not Windows.
+
+=signature os_isnt_win
+
+  os_isnt_win() (boolean)
+
+=metadata os_isnt_win
+
+since: 4.15
+
+=cut
+
+=example-1 os_isnt_win
+
+  # given: synopsis
+
+  package main;
+
+  my $os_isnt_win = $test->os_isnt_win;
+
+  # true
+
+=cut
+
+$test->skip_if('os_is_win')->for('example', 1, 'os_isnt_win', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+
+  $result
+});
+
+=feature collect
 
 The collect method dispatches to the C<collect_data_for_${name}> method
 indictated by the first argument and returns the result. Returns an arrayref in
@@ -313,9 +5175,8 @@ scalar context, and a list in list context.
 
 =metadata collect
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -361,7 +5222,7 @@ $test->for('example', 2, 'collect', sub {
   $result
 });
 
-=method collect_data_for_abstract
+=feature collect_data_for_abstract
 
 The collect_data_for_abstract method uses L</data> to fetch data for the C<abstract>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -373,9 +5234,8 @@ in list context.
 
 =metadata collect_data_for_abstract
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -437,7 +5297,7 @@ $test->for('example', 2, 'collect_data_for_abstract', sub {
   $result
 });
 
-=method collect_data_for_attribute
+=feature collect_data_for_attribute
 
 The collect_data_for_attribute method uses L</data> to fetch data for the
 C<attribute $name> section and returns the data. Returns an arrayref in scalar
@@ -449,9 +5309,8 @@ context, and a list in list context.
 
 =metadata collect_data_for_attribute
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -533,7 +5392,7 @@ $test->for('example', 2, 'collect_data_for_attribute', sub {
   $result
 });
 
-=method collect_data_for_authors
+=feature collect_data_for_authors
 
 The collect_data_for_authors method uses L</data> to fetch data for the
 C<authors> section and returns the data. Returns an arrayref in scalar context,
@@ -545,9 +5404,8 @@ and a list in list context.
 
 =metadata collect_data_for_authors
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -609,7 +5467,7 @@ $test->for('example', 2, 'collect_data_for_authors', sub {
   $result
 });
 
-=method collect_data_for_description
+=feature collect_data_for_description
 
 The collect_data_for_description method uses L</data> to fetch data for the C<description>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -621,9 +5479,8 @@ in list context.
 
 =metadata collect_data_for_description
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -685,7 +5542,7 @@ $test->for('example', 2, 'collect_data_for_description', sub {
   $result
 });
 
-=method collect_data_for_encoding
+=feature collect_data_for_encoding
 
 The collect_data_for_encoding method uses L</data> to fetch data for the C<encoding>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -697,9 +5554,8 @@ in list context.
 
 =metadata collect_data_for_encoding
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -761,7 +5617,7 @@ $test->for('example', 2, 'collect_data_for_encoding', sub {
   $result
 });
 
-=method collect_data_for_error
+=feature collect_data_for_error
 
 The collect_data_for_error method uses L</data> to fetch data for the C<error
 $name> section and returns the data. Returns an arrayref in scalar context, and
@@ -773,9 +5629,8 @@ a list in list context.
 
 =metadata collect_data_for_error
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -861,7 +5716,7 @@ $test->for('example', 2, 'collect_data_for_error', sub {
   $result
 });
 
-=method collect_data_for_example
+=feature collect_data_for_example
 
 The collect_data_for_example method uses L</data> to fetch data for the
 C<example-$number $name> section and returns the data. Returns an arrayref in
@@ -873,9 +5728,8 @@ scalar context, and a list in list context.
 
 =metadata collect_data_for_example
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -956,7 +5810,7 @@ $test->for('example', 2, 'collect_data_for_example', sub {
   @result
 });
 
-=method collect_data_for_feature
+=feature collect_data_for_feature
 
 The collect_data_for_feature method uses L</data> to fetch data for the
 C<feature $name> section and returns the data. Returns an arrayref in scalar
@@ -968,9 +5822,8 @@ context, and a list in list context.
 
 =metadata collect_data_for_feature
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -1032,7 +5885,7 @@ $test->for('example', 2, 'collect_data_for_feature', sub {
   $result
 });
 
-=method collect_data_for_function
+=feature collect_data_for_function
 
 The collect_data_for_function method uses L</data> to fetch data for the
 C<function $name> section and returns the data. Returns an arrayref in scalar
@@ -1044,9 +5897,8 @@ context, and a list in list context.
 
 =metadata collect_data_for_function
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -1128,7 +5980,7 @@ $test->for('example', 2, 'collect_data_for_function', sub {
   $result
 });
 
-=method collect_data_for_includes
+=feature collect_data_for_includes
 
 The collect_data_for_includes method uses L</data> to fetch data for the
 C<includes> section and returns the data. Returns an arrayref in scalar
@@ -1140,9 +5992,8 @@ context, and a list in list context.
 
 =metadata collect_data_for_includes
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -1209,7 +6060,7 @@ $test->for('example', 2, 'collect_data_for_includes', sub {
   @result
 });
 
-=method collect_data_for_inherits
+=feature collect_data_for_inherits
 
 The collect_data_for_inherits method uses L</data> to fetch data for the C<inherits>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -1221,9 +6072,8 @@ in list context.
 
 =metadata collect_data_for_inherits
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -1285,7 +6135,7 @@ $test->for('example', 2, 'collect_data_for_inherits', sub {
   $result
 });
 
-=method collect_data_for_integrates
+=feature collect_data_for_integrates
 
 The collect_data_for_integrates method uses L</data> to fetch data for the C<integrates>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -1297,9 +6147,8 @@ in list context.
 
 =metadata collect_data_for_integrates
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -1363,7 +6212,7 @@ $test->for('example', 2, 'collect_data_for_integrates', sub {
   $result
 });
 
-=method collect_data_for_layout
+=feature collect_data_for_layout
 
 The collect_data_for_layout method uses L</data> to fetch data for the C<layout>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -1375,9 +6224,8 @@ in list context.
 
 =metadata collect_data_for_layout
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -1451,7 +6299,7 @@ $test->for('example', 2, 'collect_data_for_layout', sub {
   $result
 });
 
-=method collect_data_for_libraries
+=feature collect_data_for_libraries
 
 The collect_data_for_libraries method uses L</data> to fetch data for the C<libraries>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -1463,9 +6311,8 @@ in list context.
 
 =metadata collect_data_for_libraries
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -1527,7 +6374,7 @@ $test->for('example', 2, 'collect_data_for_libraries', sub {
   $result
 });
 
-=method collect_data_for_license
+=feature collect_data_for_license
 
 The collect_data_for_license method uses L</data> to fetch data for the C<license>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -1539,9 +6386,8 @@ in list context.
 
 =metadata collect_data_for_license
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -1603,7 +6449,7 @@ $test->for('example', 2, 'collect_data_for_license', sub {
   $result
 });
 
-=method collect_data_for_message
+=feature collect_data_for_message
 
 The collect_data_for_message method uses L</data> to fetch data for the
 C<message $name> section and returns the data. Returns an arrayref in scalar
@@ -1615,9 +6461,8 @@ context, and a list in list context.
 
 =metadata collect_data_for_message
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -1699,7 +6544,7 @@ $test->for('example', 2, 'collect_data_for_message', sub {
   $result
 });
 
-=method collect_data_for_metadata
+=feature collect_data_for_metadata
 
 The collect_data_for_metadata method uses L</data> to fetch data for the C<metadata $name>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -1711,9 +6556,8 @@ in list context.
 
 =metadata collect_data_for_metadata
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -1807,7 +6651,7 @@ $test->for('example', 2, 'collect_data_for_metadata', sub {
   $result
 });
 
-=method collect_data_for_method
+=feature collect_data_for_method
 
 The collect_data_for_method method uses L</data> to fetch data for the C<method $name>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -1819,9 +6663,8 @@ in list context.
 
 =metadata collect_data_for_method
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -1915,7 +6758,7 @@ $test->for('example', 2, 'collect_data_for_method', sub {
   $result
 });
 
-=method collect_data_for_name
+=feature collect_data_for_name
 
 The collect_data_for_name method uses L</data> to fetch data for the C<name>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -1927,9 +6770,8 @@ in list context.
 
 =metadata collect_data_for_name
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -1991,7 +6833,7 @@ $test->for('example', 2, 'collect_data_for_name', sub {
   $result
 });
 
-=method collect_data_for_operator
+=feature collect_data_for_operator
 
 The collect_data_for_operator method uses L</data> to fetch data for the C<operator $name>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -2003,9 +6845,8 @@ in list context.
 
 =metadata collect_data_for_operator
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -2087,7 +6928,7 @@ $test->for('example', 2, 'collect_data_for_operator', sub {
   $result
 });
 
-=method collect_data_for_partials
+=feature collect_data_for_partials
 
 The collect_data_for_partials method uses L</data> to fetch data for the C<partials>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -2099,9 +6940,8 @@ in list context.
 
 =metadata collect_data_for_partials
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -2165,7 +7005,7 @@ $test->for('example', 2, 'collect_data_for_partials', sub {
   $result
 });
 
-=method collect_data_for_project
+=feature collect_data_for_project
 
 The collect_data_for_project method uses L</data> to fetch data for the C<project>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -2177,9 +7017,8 @@ in list context.
 
 =metadata collect_data_for_project
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -2241,7 +7080,7 @@ $test->for('example', 2, 'collect_data_for_project', sub {
   $result
 });
 
-=method collect_data_for_signature
+=feature collect_data_for_signature
 
 The collect_data_for_signature method uses L</data> to fetch data for the C<signature $name>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -2253,9 +7092,8 @@ in list context.
 
 =metadata collect_data_for_signature
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -2361,7 +7199,7 @@ $test->for('example', 2, 'collect_data_for_signature', sub {
   $result
 });
 
-=method collect_data_for_synopsis
+=feature collect_data_for_synopsis
 
 The collect_data_for_synopsis method uses L</data> to fetch data for the C<synopsis>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -2373,9 +7211,8 @@ in list context.
 
 =metadata collect_data_for_synopsis
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -2444,7 +7281,7 @@ $test->for('example', 2, 'collect_data_for_synopsis', sub {
   @result
 });
 
-=method collect_data_for_tagline
+=feature collect_data_for_tagline
 
 The collect_data_for_tagline method uses L</data> to fetch data for the C<tagline>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -2456,9 +7293,8 @@ in list context.
 
 =metadata collect_data_for_tagline
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -2520,7 +7356,7 @@ $test->for('example', 2, 'collect_data_for_tagline', sub {
   $result
 });
 
-=method collect_data_for_version
+=feature collect_data_for_version
 
 The collect_data_for_version method uses L</data> to fetch data for the C<version>
 section and returns the data. Returns an arrayref in scalar context, and a list
@@ -2532,9 +7368,8 @@ in list context.
 
 =metadata collect_data_for_version
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -2596,20 +7431,19 @@ $test->for('example', 2, 'collect_data_for_version', sub {
   $result
 });
 
-=method data
+=feature data
 
-The data method returns a L<Venus::Data> object using L</file> for parsing the
-test specification.
+The data method returns a L<Venus::Text::Pod> object using L</file> for parsing
+the test specification.
 
 =signature data
 
-  data() (Venus::Data)
+  data() (Venus::Text::Pod)
 
 =metadata data
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -2621,7 +7455,7 @@ test specification.
 
   my $data = $test->data;
 
-  # bless(..., "Venus::Data")
+  # bless(..., "Venus::Text::Pod")
 
 =cut
 
@@ -2629,55 +7463,12 @@ $test->for('example', 1, 'data', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   ok defined $result;
-  isa_ok $result, "Venus::Data";
+  isa_ok $result, "Venus::Text::Pod";
 
   $result
 });
 
-=method done
-
-The done method dispatches to the L<Test::More/done_testing> operation and
-returns the result.
-
-=signature done
-
-  done() (any)
-
-=metadata done
-
-{
-  since => '3.55',
-}
-
-=cut
-
-=example-1 done
-
-  # given: synopsis
-
-  package main;
-
-  my $done = $test->done;
-
-  # true
-
-=cut
-
-$test->for('example', 1, 'done', sub {
-  my ($tryable) = @_;
-  require Venus::Space;
-  my $space = Venus::Space->new('Test::More');
-  my $call = 0;
-  my $orig = $space->swap('done_testing', sub {$call++});
-  my $result = $tryable->result;
-  is $result, 0;
-  is $call, 1;
-  $space->routine('done_testing', $orig);
-
-  !$result
-});
-
-=method execute
+=feature execute
 
 The execute method dispatches to the C<execute_data_for_${name}> method
 indictated by the first argument and returns the result. Returns an arrayref in
@@ -2689,9 +7480,8 @@ scalar context, and a list in list context.
 
 =metadata execute
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -2745,7 +7535,8 @@ $test->for('example', 2, 'execute', sub {
   $result
 });
 
-=method execute_test_for_abstract
+
+=feature execute_test_for_abstract
 
 The execute_test_for_abstract method tests a documentation block for the C<abstract> section and returns the result.
 
@@ -2755,9 +7546,8 @@ The execute_test_for_abstract method tests a documentation block for the C<abstr
 
 =metadata execute_test_for_abstract
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -2790,7 +7580,7 @@ $test->for('example', 1, 'execute_test_for_abstract', sub {
   $result
 });
 
-=method execute_test_for_attribute
+=feature execute_test_for_attribute
 
 The execute_test_for_attribute method tests a documentation block for the C<attribute $name> section and returns the result.
 
@@ -2800,9 +7590,8 @@ The execute_test_for_attribute method tests a documentation block for the C<attr
 
 =metadata execute_test_for_attribute
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -2845,7 +7634,7 @@ $test->for('example', 1, 'execute_test_for_attribute', sub {
   $result
 });
 
-=method execute_test_for_authors
+=feature execute_test_for_authors
 
 The execute_test_for_authors method tests a documentation block for the C<authors> section and returns the result.
 
@@ -2855,9 +7644,8 @@ The execute_test_for_authors method tests a documentation block for the C<author
 
 =metadata execute_test_for_authors
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -2890,7 +7678,7 @@ $test->for('example', 1, 'execute_test_for_authors', sub {
   $result
 });
 
-=method execute_test_for_description
+=feature execute_test_for_description
 
 The execute_test_for_description method tests a documentation block for the C<description> section and returns the result.
 
@@ -2900,9 +7688,8 @@ The execute_test_for_description method tests a documentation block for the C<de
 
 =metadata execute_test_for_description
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -2935,7 +7722,7 @@ $test->for('example', 1, 'execute_test_for_description', sub {
   $result
 });
 
-=method execute_test_for_encoding
+=feature execute_test_for_encoding
 
 The execute_test_for_encoding method tests a documentation block for the C<encoding> section and returns the result.
 
@@ -2945,9 +7732,8 @@ The execute_test_for_encoding method tests a documentation block for the C<encod
 
 =metadata execute_test_for_encoding
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -2980,7 +7766,7 @@ $test->for('example', 1, 'execute_test_for_encoding', sub {
   $result
 });
 
-=method execute_test_for_error
+=feature execute_test_for_error
 
 The execute_test_for_error method tests a documentation block for the C<error $name> section and returns the result.
 
@@ -2990,9 +7776,8 @@ The execute_test_for_error method tests a documentation block for the C<error $n
 
 =metadata execute_test_for_error
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -3037,7 +7822,7 @@ $test->for('example', 1, 'execute_test_for_error', sub {
   $result
 });
 
-=method execute_test_for_example
+=feature execute_test_for_example
 
 The execute_test_for_example method tests a documentation block for the C<example-$number $name> section and returns the result.
 
@@ -3047,9 +7832,8 @@ The execute_test_for_example method tests a documentation block for the C<exampl
 
 =metadata execute_test_for_example
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -3092,7 +7876,7 @@ $test->for('example', 1, 'execute_test_for_example', sub {
   $result
 });
 
-=method execute_test_for_feature
+=feature execute_test_for_feature
 
 The execute_test_for_feature method tests a documentation block for the C<feature $name> section and returns the result.
 
@@ -3102,9 +7886,8 @@ The execute_test_for_feature method tests a documentation block for the C<featur
 
 =metadata execute_test_for_feature
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =example-1 execute_test_for_feature
 
@@ -3135,7 +7918,7 @@ $test->for('example', 1, 'execute_test_for_feature', sub {
   $result
 });
 
-=method execute_test_for_function
+=feature execute_test_for_function
 
 The execute_test_for_function method tests a documentation block for the C<function $name> section and returns the result.
 
@@ -3145,9 +7928,8 @@ The execute_test_for_function method tests a documentation block for the C<funct
 
 =metadata execute_test_for_function
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =example-1 execute_test_for_function
 
@@ -3188,7 +7970,7 @@ $test->for('example', 1, 'execute_test_for_function', sub {
   $result
 });
 
-=method execute_test_for_includes
+=feature execute_test_for_includes
 
 The execute_test_for_includes method tests a documentation block for the C<includes> section and returns the result.
 
@@ -3198,9 +7980,8 @@ The execute_test_for_includes method tests a documentation block for the C<inclu
 
 =metadata execute_test_for_includes
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -3236,7 +8017,7 @@ $test->for('example', 1, 'execute_test_for_includes', sub {
   $result
 });
 
-=method execute_test_for_inherits
+=feature execute_test_for_inherits
 
 The execute_test_for_inherits method tests a documentation block for the C<inherits> section and returns the result.
 
@@ -3246,9 +8027,8 @@ The execute_test_for_inherits method tests a documentation block for the C<inher
 
 =metadata execute_test_for_inherits
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =example-1 execute_test_for_inherits
 
@@ -3279,7 +8059,7 @@ $test->for('example', 1, 'execute_test_for_inherits', sub {
   $result
 });
 
-=method execute_test_for_integrates
+=feature execute_test_for_integrates
 
 The execute_test_for_integrates method tests a documentation block for the C<integrates> section and returns the result.
 
@@ -3289,9 +8069,8 @@ The execute_test_for_integrates method tests a documentation block for the C<int
 
 =metadata execute_test_for_integrates
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -3325,7 +8104,7 @@ $test->for('example', 1, 'execute_test_for_integrates', sub {
   $result
 });
 
-=method execute_test_for_layout
+=feature execute_test_for_layout
 
 The execute_test_for_layout method tests a documentation block for the C<layout> section and returns the result.
 
@@ -3335,9 +8114,8 @@ The execute_test_for_layout method tests a documentation block for the C<layout>
 
 =metadata execute_test_for_layout
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -3376,7 +8154,7 @@ $test->for('example', 1, 'execute_test_for_layout', sub {
   $result
 });
 
-=method execute_test_for_libraries
+=feature execute_test_for_libraries
 
 The execute_test_for_libraries method tests a documentation block for the C<libraries> section and returns the result.
 
@@ -3386,9 +8164,8 @@ The execute_test_for_libraries method tests a documentation block for the C<libr
 
 =metadata execute_test_for_libraries
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =example-1 execute_test_for_libraries
 
@@ -3419,7 +8196,7 @@ $test->for('example', 1, 'execute_test_for_libraries', sub {
   $result
 });
 
-=method execute_test_for_license
+=feature execute_test_for_license
 
 The execute_test_for_license method tests a documentation block for the C<license> section and returns the result.
 
@@ -3429,9 +8206,8 @@ The execute_test_for_license method tests a documentation block for the C<licens
 
 =metadata execute_test_for_license
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -3464,7 +8240,7 @@ $test->for('example', 1, 'execute_test_for_license', sub {
   $result
 });
 
-=method execute_test_for_message
+=feature execute_test_for_message
 
 The execute_test_for_message method tests a documentation block for the C<message $name> section and returns the result.
 
@@ -3474,9 +8250,8 @@ The execute_test_for_message method tests a documentation block for the C<messag
 
 =metadata execute_test_for_message
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -3519,7 +8294,7 @@ $test->for('example', 1, 'execute_test_for_message', sub {
   $result
 });
 
-=method execute_test_for_metadata
+=feature execute_test_for_metadata
 
 The execute_test_for_metadata method tests a documentation block for the C<metadata $name> section and returns the result.
 
@@ -3529,9 +8304,8 @@ The execute_test_for_metadata method tests a documentation block for the C<metad
 
 =metadata execute_test_for_metadata
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =example-1 execute_test_for_metadata
 
@@ -3578,7 +8352,7 @@ $test->for('example', 1, 'execute_test_for_metadata', sub {
   $result
 });
 
-=method execute_test_for_method
+=feature execute_test_for_method
 
 The execute_test_for_method method tests a documentation block for the C<method $name> section and returns the result.
 
@@ -3588,9 +8362,8 @@ The execute_test_for_method method tests a documentation block for the C<method 
 
 =metadata execute_test_for_method
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =example-1 execute_test_for_method
 
@@ -3637,7 +8410,7 @@ $test->for('example', 1, 'execute_test_for_method', sub {
   $result
 });
 
-=method execute_test_for_name
+=feature execute_test_for_name
 
 The execute_test_for_name method tests a documentation block for the C<name> section and returns the result.
 
@@ -3647,9 +8420,8 @@ The execute_test_for_name method tests a documentation block for the C<name> sec
 
 =metadata execute_test_for_name
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -3677,7 +8449,7 @@ $test->for('example', 1, 'execute_test_for_name', sub {
   true;
 });
 
-=method execute_test_for_operator
+=feature execute_test_for_operator
 
 The execute_test_for_operator method tests a documentation block for the C<operator $name> section and returns the result.
 
@@ -3687,9 +8459,8 @@ The execute_test_for_operator method tests a documentation block for the C<opera
 
 =metadata execute_test_for_operator
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -3732,258 +8503,65 @@ $test->for('example', 1, 'execute_test_for_operator', sub {
   $result
 });
 
-=method explain
+=feature execute_test_for_raise
 
-The explain method dispatches to the L<Test::More/explain> operation and
-returns the result.
+The execute_test_for_raise method tests a documentation block for the C<raise
+$name $error $id> section and returns the result.
 
-=signature explain
+=signature execute_test_for_raise
 
-  explain(any @args) (any)
+  execute_test_for_raise(string $name, string $class, string $id) (arrayref)
 
-=metadata explain
+=metadata execute_test_for_raise
 
-{
-  since => '3.55',
-}
+introduced: 4.15
 
-=cut
+=example-1 execute_test_for_raise
 
-=example-1 explain
-
-  # given: synopsis
-
-  package main;
-
-  my $explain = $test->explain(123.456);
-
-  # "123.456"
-
-=cut
-
-$test->for('example', 1, 'explain', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is $result, "123.456";
-
-  $result
-});
-
-=method fail
-
-The fail method dispatches to the L<Test::More/ok> operation expecting the
-first argument to be falsy and returns the result.
-
-=signature fail
-
-  fail(any $data, string $description) (any)
-
-=metadata fail
-
-{
-  since => '3.55',
-}
-
-=cut
-
-=example-1 fail
-
-  # given: synopsis
+  # =raise execute Venus::Error on.unknown
+  #
+  #   # given: synopsis
+  #
+  #   $example->operation; # throw exception
+  #
+  #   # Error (on.unknown)
+  #
+  # =cut
 
   package main;
 
-  my $fail = $test->fail(0, 'example-1 fail passed');
+  use Venus::Test 'test';
+
+  my $test = test 't/path/pod/example';
+
+  my $execute_test_for_raise = $test->execute_test_for_raise('execute', 'Venus::Error', 'on.unknown');
 
   # true
 
 =cut
 
-$test->for('example', 1, 'fail', sub {
+$test->for('example', 1, 'execute_test_for_raise', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
+  ok defined $result;
   is $result, true;
 
   $result
 });
 
-=method for
-
-The for method dispatches to the L</execute> method using the arguments
-provided within a L<subtest|Test::More/subtest> and returns the invocant.
-
-=signature for
-
-  for(any @args) (Venus::Test)
-
-=metadata for
-
-{
-  since => '3.55',
-}
-
-=cut
-
-=example-1 for
-
-  # given: synopsis
-
-  package main;
-
-  my $for = $test->for('name');
-
-  # bless(..., "Venus::Test")
-
-=cut
-
-$test->for('example', 1, 'for', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  ok defined $result;
-  isa_ok $result, "Venus::Test";
-
-  $result
-});
-
-=example-2 for
-
-  # given: synopsis
-
-  package main;
-
-  my $for = $test->for('synopsis');
-
-  # bless(..., "Venus::Test")
-
-=cut
-
-$test->for('example', 2, 'for', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  ok defined $result;
-  isa_ok $result, "Venus::Test";
-
-  $result
-});
-
-=example-3 for
-
-  # given: synopsis
-
-  package main;
-
-  my $for = $test->for('synopsis', sub{
-    my ($tryable) = @_;
-    return $tryable->result;
-  });
-
-  # bless(..., "Venus::Test")
-
-=cut
-
-$test->for('example', 3, 'for', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  ok defined $result;
-  isa_ok $result, "Venus::Test";
-
-  $result
-});
-
-=example-4 for
-
-  # given: synopsis
-
-  package main;
-
-  my $for = $test->for('example', 1, 'test', sub {
-    my ($tryable) = @_;
-    return $tryable->result;
-  });
-
-  # bless(..., "Venus::Test")
-
-=cut
-
-$test->for('example', 4, 'for', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  ok defined $result;
-  isa_ok $result, "Venus::Test";
-
-  $result
-});
-
-=method like
-
-The like method dispatches to the L<Test::More/like> operation and returns the
-result.
-
-=signature like
-
-  like(string $data, string | Venus::Regexp $match, string $description) (any)
-
-=metadata like
-
-{
-  since => '3.55',
-}
-
-=cut
-
-=example-1 like
-
-  # given: synopsis
-
-  package main;
-
-  my $like = $test->like('hello world', 'world', 'example-1 like passed');
-
-  # true
-
-=cut
-
-$test->for('example', 1, 'like', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is $result, true;
-
-  $result
-});
-
-=example-2 like
-
-  # given: synopsis
-
-  package main;
-
-  my $like = $test->like('hello world', qr/world/, 'example-1 like passed');
-
-  # true
-
-=cut
-
-$test->for('example', 2, 'like', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is $result, true;
-
-  $result
-});
-
-=method more
+=feature more
 
 The more method dispatches to the L<Test::More> method specified by the first
 argument and returns its result.
 
 =signature more
 
-  more(any @args) (Venus::Test)
+  more(any @args) (any)
 
 =metadata more
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4008,7 +8586,7 @@ $test->for('example', 1, 'more', sub {
   $result
 });
 
-=method okay
+=feature okay
 
 The okay method dispatches to the L<Test::More/ok> operation and returns the
 result.
@@ -4019,9 +8597,8 @@ result.
 
 =metadata okay
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4065,7 +8642,7 @@ $test->for('example', 2, 'okay', sub {
   $result
 });
 
-=method okay_can
+=feature okay_can
 
 The okay_can method dispatches to the L<Test::More/can_ok> operation and
 returns the result.
@@ -4076,9 +8653,8 @@ returns the result.
 
 =metadata okay_can
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4102,7 +8678,7 @@ $test->for('example', 1, 'okay_can', sub {
   $result
 });
 
-=method okay_isa
+=feature okay_isa
 
 The okay_isa method dispatches to the L<Test::More/isa_ok> operation and
 returns the result.
@@ -4113,9 +8689,9 @@ returns the result.
 
 =metadata okay_isa
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
+
 
 =cut
 
@@ -4139,44 +8715,7 @@ $test->for('example', 1, 'okay_isa', sub {
   $result
 });
 
-=method pass
-
-The pass method dispatches to the L<Test::More/ok> operation expecting the
-first argument to be truthy and returns the result.
-
-=signature pass
-
-  pass(any $data, string $description) (any)
-
-=metadata pass
-
-{
-  since => '3.55',
-}
-
-=cut
-
-=example-1 pass
-
-  # given: synopsis
-
-  package main;
-
-  my $fail = $test->pass(1, 'example-1 pass passed');
-
-  # true
-
-=cut
-
-$test->for('example', 1, 'pass', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is $result, true;
-
-  $result
-});
-
-=method perform
+=feature perform
 
 The perform method dispatches to the C<perform_data_for_${name}> method
 indictated by the first argument and returns the result. Returns an arrayref in
@@ -4188,9 +8727,8 @@ scalar context, and a list in list context.
 
 =metadata perform
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4217,7 +8755,7 @@ $test->for('example', 1, 'perform', sub {
   $result
 });
 
-=method perform_test_for_abstract
+=feature perform_test_for_abstract
 
 The perform_data_for_abstract method performs an overridable test for the C<abstract> section and returns truthy or falsy.
 
@@ -4227,9 +8765,8 @@ The perform_data_for_abstract method performs an overridable test for the C<abst
 
 =metadata perform_test_for_abstract
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4277,7 +8814,7 @@ $test->for('example', 1, 'perform_test_for_abstract', sub {
   $result
 });
 
-=method perform_test_for_attribute
+=feature perform_test_for_attribute
 
 The perform_data_for_attribute method performs an overridable test for the C<attribute $name> section and returns truthy or falsy.
 
@@ -4287,9 +8824,8 @@ The perform_data_for_attribute method performs an overridable test for the C<att
 
 =metadata perform_test_for_attribute
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4337,7 +8873,7 @@ $test->for('example', 1, 'perform_test_for_attribute', sub {
   $result
 });
 
-=method perform_test_for_authors
+=feature perform_test_for_authors
 
 The perform_data_for_authors method performs an overridable test for the C<authors> section and returns truthy or falsy.
 
@@ -4347,9 +8883,8 @@ The perform_data_for_authors method performs an overridable test for the C<autho
 
 =metadata perform_test_for_authors
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4397,7 +8932,7 @@ $test->for('example', 1, 'perform_test_for_authors', sub {
   $result
 });
 
-=method perform_test_for_description
+=feature perform_test_for_description
 
 The perform_data_for_description method performs an overridable test for the C<description> section and returns truthy or falsy.
 
@@ -4407,9 +8942,8 @@ The perform_data_for_description method performs an overridable test for the C<d
 
 =metadata perform_test_for_description
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4457,7 +8991,7 @@ $test->for('example', 1, 'perform_test_for_description', sub {
   $result
 });
 
-=method perform_test_for_encoding
+=feature perform_test_for_encoding
 
 The perform_data_for_encoding method performs an overridable test for the C<encoding> section and returns truthy or falsy.
 
@@ -4467,9 +9001,8 @@ The perform_data_for_encoding method performs an overridable test for the C<enco
 
 =metadata perform_test_for_encoding
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4517,7 +9050,7 @@ $test->for('example', 1, 'perform_test_for_encoding', sub {
   $result
 });
 
-=method perform_test_for_error
+=feature perform_test_for_error
 
 The perform_data_for_error method performs an overridable test for the C<error $name> section and returns truthy or falsy.
 
@@ -4527,9 +9060,8 @@ The perform_data_for_error method performs an overridable test for the C<error $
 
 =metadata perform_test_for_error
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4577,7 +9109,7 @@ $test->for('example', 1, 'perform_test_for_error', sub {
   $result
 });
 
-=method perform_test_for_example
+=feature perform_test_for_example
 
 The perform_data_for_example method performs an overridable test for the C<example-$number $name> section and returns truthy or falsy.
 
@@ -4587,9 +9119,8 @@ The perform_data_for_example method performs an overridable test for the C<examp
 
 =metadata perform_test_for_example
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4637,7 +9168,7 @@ $test->for('example', 1, 'perform_test_for_example', sub {
   $result
 });
 
-=method perform_test_for_feature
+=feature perform_test_for_feature
 
 The perform_data_for_feature method performs an overridable test for the C<feature $name> section and returns truthy or falsy.
 
@@ -4647,9 +9178,8 @@ The perform_data_for_feature method performs an overridable test for the C<featu
 
 =metadata perform_test_for_feature
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4697,7 +9227,7 @@ $test->for('example', 1, 'perform_test_for_feature', sub {
   $result
 });
 
-=method perform_test_for_function
+=feature perform_test_for_function
 
 The perform_data_for_function method performs an overridable test for the C<function $name> section and returns truthy or falsy.
 
@@ -4707,9 +9237,8 @@ The perform_data_for_function method performs an overridable test for the C<func
 
 =metadata perform_test_for_function
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4757,7 +9286,7 @@ $test->for('example', 1, 'perform_test_for_function', sub {
   $result
 });
 
-=method perform_test_for_includes
+=feature perform_test_for_includes
 
 The perform_data_for_includes method performs an overridable test for the C<includes> section and returns truthy or falsy.
 
@@ -4767,9 +9296,8 @@ The perform_data_for_includes method performs an overridable test for the C<incl
 
 =metadata perform_test_for_includes
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4817,7 +9345,7 @@ $test->for('example', 1, 'perform_test_for_includes', sub {
   $result
 });
 
-=method perform_test_for_inherits
+=feature perform_test_for_inherits
 
 The perform_data_for_inherits method performs an overridable test for the C<inherits> section and returns truthy or falsy.
 
@@ -4827,9 +9355,8 @@ The perform_data_for_inherits method performs an overridable test for the C<inhe
 
 =metadata perform_test_for_inherits
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4877,7 +9404,7 @@ $test->for('example', 1, 'perform_test_for_inherits', sub {
   $result
 });
 
-=method perform_test_for_integrates
+=feature perform_test_for_integrates
 
 The perform_data_for_integrates method performs an overridable test for the C<integrates> section and returns truthy or falsy.
 
@@ -4887,9 +9414,8 @@ The perform_data_for_integrates method performs an overridable test for the C<in
 
 =metadata perform_test_for_integrates
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4937,7 +9463,7 @@ $test->for('example', 1, 'perform_test_for_integrates', sub {
   $result
 });
 
-=method perform_test_for_layout
+=feature perform_test_for_layout
 
 The perform_data_for_layout method performs an overridable test for the C<layout> section and returns truthy or falsy.
 
@@ -4947,9 +9473,8 @@ The perform_data_for_layout method performs an overridable test for the C<layout
 
 =metadata perform_test_for_layout
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -4997,7 +9522,7 @@ $test->for('example', 1, 'perform_test_for_layout', sub {
   $result
 });
 
-=method perform_test_for_libraries
+=feature perform_test_for_libraries
 
 The perform_data_for_libraries method performs an overridable test for the C<libraries> section and returns truthy or falsy.
 
@@ -5007,9 +9532,8 @@ The perform_data_for_libraries method performs an overridable test for the C<lib
 
 =metadata perform_test_for_libraries
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5057,7 +9581,7 @@ $test->for('example', 1, 'perform_test_for_libraries', sub {
   $result
 });
 
-=method perform_test_for_license
+=feature perform_test_for_license
 
 The perform_data_for_license method performs an overridable test for the C<license> section and returns truthy or falsy.
 
@@ -5067,9 +9591,8 @@ The perform_data_for_license method performs an overridable test for the C<licen
 
 =metadata perform_test_for_license
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5117,7 +9640,7 @@ $test->for('example', 1, 'perform_test_for_license', sub {
   $result
 });
 
-=method perform_test_for_message
+=feature perform_test_for_message
 
 The perform_data_for_message method performs an overridable test for the C<message $name> section and returns truthy or falsy.
 
@@ -5127,9 +9650,8 @@ The perform_data_for_message method performs an overridable test for the C<messa
 
 =metadata perform_test_for_message
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5177,7 +9699,7 @@ $test->for('example', 1, 'perform_test_for_message', sub {
   $result
 });
 
-=method perform_test_for_metadata
+=feature perform_test_for_metadata
 
 The perform_data_for_metadata method performs an overridable test for the C<metadata $name> section and returns truthy or falsy.
 
@@ -5187,9 +9709,8 @@ The perform_data_for_metadata method performs an overridable test for the C<meta
 
 =metadata perform_test_for_metadata
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5237,7 +9758,7 @@ $test->for('example', 1, 'perform_test_for_metadata', sub {
   $result
 });
 
-=method perform_test_for_method
+=feature perform_test_for_method
 
 The perform_data_for_method method performs an overridable test for the C<method $name> section and returns truthy or falsy.
 
@@ -5247,9 +9768,8 @@ The perform_data_for_method method performs an overridable test for the C<method
 
 =metadata perform_test_for_method
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5297,7 +9817,7 @@ $test->for('example', 1, 'perform_test_for_method', sub {
   $result
 });
 
-=method perform_test_for_name
+=feature perform_test_for_name
 
 The perform_data_for_name method performs an overridable test for the C<name> section and returns truthy or falsy.
 
@@ -5307,9 +9827,8 @@ The perform_data_for_name method performs an overridable test for the C<name> se
 
 =metadata perform_test_for_name
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5357,7 +9876,7 @@ $test->for('example', 1, 'perform_test_for_name', sub {
   $result
 });
 
-=method perform_test_for_operator
+=feature perform_test_for_operator
 
 The perform_data_for_operator method performs an overridable test for the C<operator $name> section and returns truthy or falsy.
 
@@ -5367,9 +9886,8 @@ The perform_data_for_operator method performs an overridable test for the C<oper
 
 =metadata perform_test_for_operator
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5417,7 +9935,7 @@ $test->for('example', 1, 'perform_test_for_operator', sub {
   $result
 });
 
-=method perform_test_for_partials
+=feature perform_test_for_partials
 
 The perform_data_for_partials method performs an overridable test for the C<partials> section and returns truthy or falsy.
 
@@ -5427,9 +9945,8 @@ The perform_data_for_partials method performs an overridable test for the C<part
 
 =metadata perform_test_for_partials
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5477,7 +9994,7 @@ $test->for('example', 1, 'perform_test_for_partials', sub {
   $result
 });
 
-=method perform_test_for_project
+=feature perform_test_for_project
 
 The perform_data_for_project method performs an overridable test for the C<project> section and returns truthy or falsy.
 
@@ -5487,9 +10004,8 @@ The perform_data_for_project method performs an overridable test for the C<proje
 
 =metadata perform_test_for_project
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5537,7 +10053,7 @@ $test->for('example', 1, 'perform_test_for_project', sub {
   $result
 });
 
-=method perform_test_for_signature
+=feature perform_test_for_signature
 
 The perform_data_for_signature method performs an overridable test for the C<signature $name> section and returns truthy or falsy.
 
@@ -5547,9 +10063,8 @@ The perform_data_for_signature method performs an overridable test for the C<sig
 
 =metadata perform_test_for_signature
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5597,7 +10112,7 @@ $test->for('example', 1, 'perform_test_for_signature', sub {
   $result
 });
 
-=method perform_test_for_synopsis
+=feature perform_test_for_synopsis
 
 The perform_data_for_synopsis method performs an overridable test for the C<synopsis> section and returns truthy or falsy.
 
@@ -5607,9 +10122,8 @@ The perform_data_for_synopsis method performs an overridable test for the C<syno
 
 =metadata perform_test_for_synopsis
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5657,7 +10171,7 @@ $test->for('example', 1, 'perform_test_for_synopsis', sub {
   $result
 });
 
-=method perform_test_for_tagline
+=feature perform_test_for_tagline
 
 The perform_data_for_tagline method performs an overridable test for the C<tagline> section and returns truthy or falsy.
 
@@ -5667,9 +10181,8 @@ The perform_data_for_tagline method performs an overridable test for the C<tagli
 
 =metadata perform_test_for_tagline
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5717,7 +10230,7 @@ $test->for('example', 1, 'perform_test_for_tagline', sub {
   $result
 });
 
-=method perform_test_for_version
+=feature perform_test_for_version
 
 The perform_data_for_version method performs an overridable test for the C<version> section and returns truthy or falsy.
 
@@ -5727,9 +10240,8 @@ The perform_data_for_version method performs an overridable test for the C<versi
 
 =metadata perform_test_for_version
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5777,7 +10289,7 @@ $test->for('example', 1, 'perform_test_for_version', sub {
   $result
 });
 
-=method present
+=feature present
 
 The present method dispatches to the C<present_data_for_${name}> method
 indictated by the first argument and returns the result. Returns an arrayref in
@@ -5789,9 +10301,8 @@ scalar context, and a list in list context.
 
 =metadata present
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5825,7 +10336,7 @@ Venus::Test - Test Class
   $result
 });
 
-=method present_data_for_abstract
+=feature present_data_for_abstract
 
 The present_data_for_abstract method builds a documentation block for the C<abstract> section and returns it as a string.
 
@@ -5835,9 +10346,8 @@ The present_data_for_abstract method builds a documentation block for the C<abst
 
 =metadata present_data_for_abstract
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5879,7 +10389,7 @@ Example Test Documentation
   $result
 });
 
-=method present_data_for_attribute
+=feature present_data_for_attribute
 
 The present_data_for_attribute method builds a documentation block for the C<attribute $name> section and returns it as a string.
 
@@ -5889,9 +10399,8 @@ The present_data_for_attribute method builds a documentation block for the C<att
 
 =metadata present_data_for_attribute
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -5967,7 +10476,7 @@ The name attribute is read-write, optional, and holds a string.
   $result
 });
 
-=method present_data_for_authors
+=feature present_data_for_authors
 
 The present_data_for_authors method builds a documentation block for the C<authors> section and returns it as a string.
 
@@ -5977,9 +10486,8 @@ The present_data_for_authors method builds a documentation block for the C<autho
 
 =metadata present_data_for_authors
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -6021,7 +10529,7 @@ Awncorp, C<awncorp@cpan.org>
   $result
 });
 
-=method present_data_for_description
+=feature present_data_for_description
 
 The present_data_for_description method builds a documentation block for the C<description> section and returns it as a string.
 
@@ -6031,9 +10539,8 @@ The present_data_for_description method builds a documentation block for the C<d
 
 =metadata present_data_for_description
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -6075,7 +10582,7 @@ This package provides an example class.
   $result
 });
 
-=method present_data_for_encoding
+=feature present_data_for_encoding
 
 The present_data_for_encoding method builds a documentation block for the C<encoding> section and returns it as a string.
 
@@ -6085,9 +10592,8 @@ The present_data_for_encoding method builds a documentation block for the C<enco
 
 =metadata present_data_for_encoding
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -6125,7 +10631,7 @@ $test->for('example', 1, 'present_data_for_encoding', sub {
   $result
 });
 
-=method present_data_for_error
+=feature present_data_for_error
 
 The present_data_for_error method builds a documentation block for the C<error $name> section and returns it as a string.
 
@@ -6135,9 +10641,8 @@ The present_data_for_error method builds a documentation block for the C<error $
 
 =metadata present_data_for_error
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -6215,7 +10720,7 @@ B<example 1>
   $result
 });
 
-=method present_data_for_example
+=feature present_data_for_example
 
 The present_data_for_example method builds a documentation block for the C<example-$number $name> section and returns it as a string.
 
@@ -6225,9 +10730,8 @@ The present_data_for_example method builds a documentation block for the C<examp
 
 =metadata present_data_for_example
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -6291,7 +10795,7 @@ $test->for('example', 1, 'present_data_for_example', sub {
   $result
 });
 
-=method present_data_for_feature
+=feature present_data_for_feature
 
 The present_data_for_feature method builds a documentation block for the C<feature $name> section and returns it as a string.
 
@@ -6301,9 +10805,8 @@ The present_data_for_feature method builds a documentation block for the C<featu
 
 =metadata present_data_for_feature
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =example-1 present_data_for_feature
 
@@ -6347,7 +10850,7 @@ This package is no particularly useful features.
   $result
 });
 
-=method present_data_for_function
+=feature present_data_for_function
 
 The present_data_for_function method builds a documentation block for the C<function $name> section and returns it as a string.
 
@@ -6357,9 +10860,8 @@ The present_data_for_function method builds a documentation block for the C<func
 
 =metadata present_data_for_function
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =example-1 present_data_for_function
 
@@ -6409,7 +10911,7 @@ The eg function returns a new instance of Example.
   $result
 });
 
-=method present_data_for_includes
+=feature present_data_for_includes
 
 The present_data_for_includes method builds a documentation block for the C<includes> section and returns it as a string.
 
@@ -6419,9 +10921,8 @@ The present_data_for_includes method builds a documentation block for the C<incl
 
 =metadata present_data_for_includes
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -6457,7 +10958,7 @@ $test->for('example', 1, 'present_data_for_includes', sub {
   !$result
 });
 
-=method present_data_for_inherits
+=feature present_data_for_inherits
 
 The present_data_for_inherits method builds a documentation block for the C<inherits> section and returns it as a string.
 
@@ -6467,9 +10968,8 @@ The present_data_for_inherits method builds a documentation block for the C<inhe
 
 =metadata present_data_for_inherits
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =example-1 present_data_for_inherits
 
@@ -6513,7 +11013,7 @@ L<Venus::Core::Class>
   $result
 });
 
-=method present_data_for_integrates
+=feature present_data_for_integrates
 
 The present_data_for_integrates method builds a documentation block for the C<integrates> section and returns it as a string.
 
@@ -6523,9 +11023,8 @@ The present_data_for_integrates method builds a documentation block for the C<in
 
 =metadata present_data_for_integrates
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -6576,7 +11075,7 @@ L<Venus::Role::Throwable>
   $result
 });
 
-=method present_data_for_layout
+=feature present_data_for_layout
 
 The present_data_for_layout method builds a documentation block for the C<layout> section and returns it as a string.
 
@@ -6586,9 +11085,8 @@ The present_data_for_layout method builds a documentation block for the C<layout
 
 =metadata present_data_for_layout
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -6627,7 +11125,7 @@ $test->for('example', 1, 'present_data_for_layout', sub {
   !$result
 });
 
-=method present_data_for_libraries
+=feature present_data_for_libraries
 
 The present_data_for_libraries method builds a documentation block for the C<libraries> section and returns it as a string.
 
@@ -6637,9 +11135,8 @@ The present_data_for_libraries method builds a documentation block for the C<lib
 
 =metadata present_data_for_libraries
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =example-1 present_data_for_libraries
 
@@ -6683,7 +11180,7 @@ L<Venus::Check>
   $result
 });
 
-=method present_data_for_license
+=feature present_data_for_license
 
 The present_data_for_license method builds a documentation block for the C<license> section and returns it as a string.
 
@@ -6693,9 +11190,8 @@ The present_data_for_license method builds a documentation block for the C<licen
 
 =metadata present_data_for_license
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -6737,7 +11233,7 @@ No license granted.
   $result
 });
 
-=method present_data_for_message
+=feature present_data_for_message
 
 The present_data_for_message method builds a documentation block for the C<message $name> section and returns it as a string.
 
@@ -6747,9 +11243,8 @@ The present_data_for_message method builds a documentation block for the C<messa
 
 =metadata present_data_for_message
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -6821,7 +11316,7 @@ B<example 1>
   $result
 });
 
-=method present_data_for_metadata
+=feature present_data_for_metadata
 
 The present_data_for_metadata method builds a documentation block for the C<metadata $name> section and returns it as a string.
 
@@ -6831,9 +11326,8 @@ The present_data_for_metadata method builds a documentation block for the C<meta
 
 =metadata present_data_for_metadata
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =example-1 present_data_for_metadata
 
@@ -6880,7 +11374,7 @@ $test->for('example', 1, 'present_data_for_metadata', sub {
   !$result
 });
 
-=method present_data_for_method
+=feature present_data_for_method
 
 The present_data_for_method method builds a documentation block for the C<method $name> section and returns it as a string.
 
@@ -6890,9 +11384,8 @@ The present_data_for_method method builds a documentation block for the C<method
 
 =metadata present_data_for_method
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =example-1 present_data_for_method
 
@@ -6975,12 +11468,24 @@ I<Since C<1.2.3>>
 
 =back
 
+=over 4
+
+=item B<may raise> L<Venus::Error> C<on.unknown>
+
+  # given: synopsis
+
+  $example->execute; # throw exception
+
+  # Error (on.unknown)
+
+=back
+
 =cut';
 
   $result
 });
 
-=method present_data_for_name
+=feature present_data_for_name
 
 The present_data_for_name method builds a documentation block for the C<name> section and returns it as a string.
 
@@ -6990,9 +11495,8 @@ The present_data_for_name method builds a documentation block for the C<name> se
 
 =metadata present_data_for_name
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -7034,7 +11538,7 @@ Example - Example Class
   $result
 });
 
-=method present_data_for_operator
+=feature present_data_for_operator
 
 The present_data_for_operator method builds a documentation block for the C<operator $name> section and returns it as a string.
 
@@ -7044,9 +11548,8 @@ The present_data_for_operator method builds a documentation block for the C<oper
 
 =metadata present_data_for_operator
 
-{
-  since => '3.55',
-}
+introduced: 3.55
+deprecated: 4.15
 
 =cut
 
@@ -7118,1112 +11621,24 @@ B<example 1>
   $result
 });
 
-=method render
-
-The render method reads the test specification and generates L<perlpod>
-documentation and returns a L<Venus::Path> object for the filename provided.
-
-=signature render
-
-  render(string $file) (Venus::Path)
-
-=metadata render
-
-{
-  since => '3.55',
-}
-
-=cut
-
-=example-1 render
-
-  # given: synopsis
+=raise new Venus::Test::Error on.new
 
   package main;
 
-  my $path = $test->render('t/path/pod/test');
+  use Venus::Test;
 
-  # bless(..., "Venus::Path")
+  my $test = Venus::Test->new('t/data/no-name.t');
+
+  # Error! (on.new)
 
 =cut
 
-$test->for('example', 1, 'render', sub {
+$test->for('raise', 'new', 'Venus::Test::Error', 'on.new', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  ok defined $result;
-  isa_ok $result, "Venus::Path";
-  ok -f $result->absolute;
-  my $lines = $result->read;
-  like $lines, qr/=head1 NAME/;
-  like $lines, qr/Venus::Test - Test Class/;
-  like $lines, qr/=head1 ABSTRACT/;
-  like $lines, qr/Test Class for Perl 5/;
-  like $lines, qr/=head1 SYNOPSIS/;
-  like $lines, qr/=head1 DESCRIPTION/;
-  like $lines, qr/=head1 INHERITS/;
-  like $lines, qr/=head1 INTEGRATES/;
-  like $lines, qr/=head1 FUNCTIONS/;
-  like $lines, qr/=head1 METHODS/;
-  like $lines, qr/=head2 data/;
-  like $lines, qr/=item data example 1/;
-  like $lines, qr/=head2 for/;
-  like $lines, qr/=item for example 1/;
-  like $lines, qr/=item for example 2/;
-  like $lines, qr/=item for example 3/;
-  like $lines, qr/=item for example 4/;
-  like $lines, qr/=head1 AUTHORS/;
-  like $lines, qr/=head1 LICENSE/;
 
-  $result
-});
+  $test->is_error(my $error = $tryable->error->result);
 
-=method same
-
-The same method dispatches to the L<Test::More/is_deeply> operation and returns
-the result.
-
-=signature same
-
-  same(any $data1, any $data2, string $description) (any)
-
-=metadata same
-
-{
-  since => '3.55',
-}
-
-=cut
-
-=example-1 same
-
-  # given: synopsis
-
-  package main;
-
-  my $same = $test->same({1..4}, {1..4}, 'example-1 same passed');
-
-  # true
-
-=cut
-
-$test->for('example', 1, 'same', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is $result, true;
-
-  $result
-});
-
-=method skip
-
-The skip method dispatches to the L<Test::More/skip> operation with the
-C<plan_all> option and returns the result.
-
-=signature skip
-
-  skip(string $description, boolean | coderef $value) (any)
-
-=metadata skip
-
-{
-  since => '3.55',
-}
-
-=cut
-
-=example-1 skip
-
-  # given: synopsis
-
-  package main;
-
-  my $skip = $test->skip('Unsupported', !0);
-
-  # true
-
-=cut
-
-$test->for('example', 1, 'skip', sub {
-  my ($tryable) = @_;
-  require Venus::Space;
-  my $space = Venus::Space->new('Test::More');
-  my $call = 0;
-  my $orig = $space->swap('plan', sub {$call++});
-  my $result = $tryable->result;
-  is $result, 1;
-  is $call, 1;
-  $space->routine('skip', $orig);
-
-  $result
-});
-
-=example-2 skip
-
-  # given: synopsis
-
-  package main;
-
-  my $skip = $test->skip('Unsupported', sub{!0});
-
-  # true
-
-=cut
-
-$test->for('example', 2, 'skip', sub {
-  my ($tryable) = @_;
-  require Venus::Space;
-  my $space = Venus::Space->new('Test::More');
-  my $call = 0;
-  my $orig = $space->swap('plan', sub {$call++});
-  my $result = $tryable->result;
-  is $result, 1;
-  is $call, 1;
-  $space->routine('skip', $orig);
-
-  $result
-});
-
-=feature spec
-
-  # [required]
-
-  =name
-  =abstract
-  =tagline
-  =synopsis
-  =description
-
-  # [optional]
-
-  =includes
-  =libraries
-  =inherits
-  =integrates
-
-  # [optional; repeatable]
-
-  =attribute $name
-  =signature $name
-  =example-$number $name # [repeatable]
-
-  # [optional; repeatable]
-
-  =function $name
-  =signature $name
-  =example-$number $name # [repeatable]
-
-  # [optional; repeatable]
-
-  =message $name
-  =signature $name
-  =example-$number $name # [repeatable]
-
-  # [optional; repeatable]
-
-  =method $name
-  =signature $name
-  =example-$number $name # [repeatable]
-
-  # [optional; repeatable]
-
-  =routine $name
-  =signature $name
-  =example-$number $name # [repeatable]
-
-  # [optional; repeatable]
-
-  =feature $name
-  =example $name
-
-  # [optional; repeatable]
-
-  =error $name
-  =example $name
-
-  # [optional; repeatable]
-
-  =operator $name
-  =example $name
-
-  # [optional]
-
-  =partials
-  =authors
-  =license
-  =project
-
-The specification is designed to accommodate typical package declarations. It
-is used by the parser to provide the content used in test automation and
-document generation. B<Note:> When code blocks are evaluated, the
-I<"redefined"> warnings are now automatically disabled.
-
-=cut
-
-=feature spec-abstract
-
-  =abstract
-
-  Example Test Documentation
-
-  =cut
-
-  $test->for('abstract');
-
-The C<abstract> block should contain a subtitle describing the package. This is
-tested for existence.
-
-=cut
-
-=feature spec-attribute
-
-  =attribute name
-
-  The name attribute is read-write, optional, and holds a string.
-
-  =example-1 name
-
-    # given: synopsis
-
-    my $name = $example->name;
-
-    # "..."
-
-  =cut
-
-  $test->for('attribute', 'name');
-
-  $test->for('example', 1, 'name', sub {
-    my ($tryable) = @_;
-    $tryable->result;
-  });
-
-Describing an attribute requires at least three blocks, i.e. C<attribute
-$name>, C<signature $name>, and C<example-$number $name>. The C<attribute>
-block should contain a description of the attribute and its purpose. The
-C<signature> block should contain a routine signature in the form of
-C<$signature : $return_type>, where C<$signature> is a valid typed signature
-and C<$return_type> is any valid L<Venus::Check> expression. The
-C<example-$number> block is a repeatable block, and at least one block must
-exist when documenting an attribute. The C<example-$number> block should
-contain valid Perl code and return a value. The block may contain a "magic"
-comment in the form of C<given: synopsis> or C<given: example-$number $name>
-which if present will include the given code example(s) with the evaluation of
-the current block. Each attribute is tested and must be recognized to exist.
-
-=cut
-
-=feature spec-authors
-
-  =authors
-
-  Awncorp, C<awncorp@cpan.org>
-
-  =cut
-
-  $test->for('authors');
-
-The C<authors> block should contain text describing the authors of the package.
-
-=cut
-
-=feature spec-description
-
-  =description
-
-  This package provides an example class.
-
-  =cut
-
-  $test->for('description');
-
-The C<description> block should contain a description of the package and it's
-behaviors.
-
-=cut
-
-=feature spec-encoding
-
-  =encoding
-
-  utf8
-
-  =cut
-
-  $test->for('encoding');
-
-The C<encoding> block should contain the appropriate L<encoding|perlpod/encoding-encodingname>.
-
-=cut
-
-=feature spec-error
-
-  =error error_on_unknown
-
-  This package may raise an error_on_unknown error.
-
-  =example-1 error_on_unknown
-
-    # given: synopsis
-
-    my $error = $example->error;
-
-    # "..."
-
-  =cut
-
-  $test->for('error', 'error_on_unknown');
-
-  $test->for('example', 1, 'error_on_unknown', sub {
-    my ($tryable) = @_;
-    $tryable->result;
-  });
-
-The C<error $name> block should contain a description of the error the package
-may raise, and can include an C<example-$number $name> block to ensure the
-error is raised and caught.
-
-=cut
-
-=feature spec-example
-
-  =example-1 name
-
-    # given: synopsis
-
-    my $name = $example->name;
-
-    # "..."
-
-  =cut
-
-  $test->for('example', 1, 'name', sub {
-    my ($tryable) = @_;
-    $tryable->result;
-  });
-
-The C<example-$number $name> block should contain valid Perl code and return a
-value. The block may contain a "magic" comment in the form of C<given:
-synopsis> or C<given: example-$number $name> which if present will include the
-given code example(s) with the evaluation of the current block.
-
-=cut
-
-=feature spec-feature
-
-  =feature noop
-
-  This package is no particularly useful features.
-
-  =example-1 noop
-
-    # given: synopsis
-
-    my $feature = $example->feature;
-
-    # "..."
-
-  =cut
-
-  $test->for('feature');
-
-  $test->for('example', 1, 'noop', sub {
-    my ($tryable) = @_;
-    $tryable->result;
-  });
-
-The C<feature $name> block should contain a description of the feature(s) the
-package enables, and can include an C<example-$number $name> block to ensure
-the feature described works as expected.
-
-=cut
-
-=feature spec-function
-
-  =function eg
-
-  The eg function returns a new instance of Example.
-
-  =example-1 eg
-
-    # given: synopsis
-
-    my $example = eg();
-
-    # "..."
-
-  =cut
-
-  $test->for('function', 'eg');
-
-  $test->for('example', 1, 'eg', sub {
-    my ($tryable) = @_;
-    $tryable->result;
-  });
-
-Describing a function requires at least three blocks, i.e. C<function $name>,
-C<signature $name>, and C<example-$number $name>. The C<function> block should
-contain a description of the function and its purpose. The C<signature> block
-should contain a routine signature in the form of C<$signature : $return_type>,
-where C<$signature> is a valid typed signature and C<$return_type> is any valid
-L<Venus::Check> expression. The C<example-$number> block is a repeatable block,
-and at least one block must exist when documenting an attribute. The
-C<example-$number> block should contain valid Perl code and return a value. The
-block may contain a "magic" comment in the form of C<given: synopsis> or
-C<given: example-$number $name> which if present will include the given code
-example(s) with the evaluation of the current block. Each attribute is tested
-and must be recognized to exist.
-
-=cut
-
-=feature spec-includes
-
-  =includes
-
-  function: eg
-
-  method: prepare
-  method: execute
-
-  =cut
-
-  $test->for('includes');
-
-The C<includes> block should contain a list of C<function>, C<method>, and/or
-C<routine> names in the format of C<$type: $name>. Empty (or commented out)
-lines are ignored. Each function, method, and/or routine is tested to be
-documented properly, i.e. has the requisite counterparts (e.g. signature and at
-least one example block). Also, the package must recognize that each exists.
-
-=cut
-
-=feature spec-inherits
-
-  =inherits
-
-  Venus::Core::Class
-
-  =cut
-
-  $test->for('inherits');
-
-The C<inherits> block should contain a list of parent packages. These packages
-are tested for loadability.
-
-=cut
-
-=feature spec-integrates
-
-  =integrates
-
-  Venus::Role::Catchable
-  Venus::Role::Throwable
-
-  =cut
-
-  $test->for('integrates');
-
-The C<integrates> block should contain a list of packages that are involved in
-the behavior of the main package. These packages are not automatically tested.
-
-=cut
-
-=feature spec-layout
-
-  =layout
-
-  encoding
-  name
-  synopsis
-  description
-  attributes: attribute
-  authors
-  license
-
-  =cut
-
-  $test->for('layout');
-
-The C<layout> block should contain a list blocks to render using L</render>, in
-the order they should be rendered.
-
-=cut
-
-=feature spec-libraries
-
-  =libraries
-
-  Venus::Check
-
-  =cut
-
-  $test->for('libraries');
-
-The C<libraries> block should contain a list of packages, each describing how
-particular type names used within function and method signatures will be
-validated. These packages are tested for loadability.
-
-=cut
-
-=feature spec-license
-
-  =license
-
-  No license granted.
-
-  =cut
-
-  $test->for('license');
-
-The C<license> block should contain a link and/or description of the license
-governing the package.
-
-=cut
-
-=feature spec-message
-
-  =message accept
-
-  The accept message represents acceptance.
-
-  =example-1 accept
-
-    # given: synopsis
-
-    my $accept = $example->accept;
-
-    # "..."
-
-  =cut
-
-  $test->for('message', 'accept');
-
-  $test->for('example', 1, 'accept', sub {
-    my ($tryable) = @_;
-    $tryable->result;
-  });
-
-Describing a message requires at least three blocks, i.e. C<message $name>,
-C<signature $name>, and C<example-$number $name>. The C<message> block should
-contain a description of the message and its purpose. The C<signature> block
-should contain a routine signature in the form of C<$signature : $return_type>,
-where C<$signature> is a valid typed signature and C<$return_type> is any valid
-L<Venus::Check> expression. The C<example-$number> block is a repeatable block,
-and at least one block must exist when documenting an attribute. The
-C<example-$number> block should contain valid Perl code and return a value. The
-block may contain a "magic" comment in the form of C<given: synopsis> or
-C<given: example-$number $name> which if present will include the given code
-example(s) with the evaluation of the current block. Each attribute is tested
-and must be recognized to exist.
-
-=cut
-
-=feature spec-metadata
-
-  =metadata prepare
-
-  {since => "1.2.3"}
-
-  =cut
-
-  $test->for('metadata', 'prepare');
-
-The C<metadata $name> block should contain a stringified hashref containing Perl data
-structures used in the rendering of the package's documentation.
-
-=cut
-
-=feature spec-method
-
-  =method prepare
-
-  The prepare method prepares for execution.
-
-  =example-1 prepare
-
-    # given: synopsis
-
-    my $prepare = $example->prepare;
-
-    # "..."
-
-  =cut
-
-  $test->for('method', 'prepare');
-
-  $test->for('example', 1, 'prepare', sub {
-    my ($tryable) = @_;
-    $tryable->result;
-  });
-
-Describing a method requires at least three blocks, i.e. C<method $name>,
-C<signature $name>, and C<example-$number $name>. The C<method> block should
-contain a description of the method and its purpose. The C<signature> block
-should contain a routine signature in the form of C<$signature : $return_type>,
-where C<$signature> is a valid typed signature and C<$return_type> is any valid
-L<Venus::Check> expression. The C<example-$number> block is a repeatable block,
-and at least one block must exist when documenting an attribute. The
-C<example-$number> block should contain valid Perl code and return a value. The
-block may contain a "magic" comment in the form of C<given: synopsis> or
-C<given: example-$number $name> which if present will include the given code
-example(s) with the evaluation of the current block. Each attribute is tested
-and must be recognized to exist.
-
-=cut
-
-=feature spec-name
-
-  =name
-
-  Example
-
-  =cut
-
-  $test->for('name');
-
-The C<name> block should contain the package name. This is tested for
-loadability.
-
-=cut
-
-=feature spec-operator
-
-  =operator ("")
-
-  This package overloads the C<""> operator.
-
-  =example-1 ("")
-
-    # given: synopsis
-
-    my $string = "$example";
-
-    # "..."
-
-  =cut
-
-  $test->for('operator', '("")');
-
-  $test->for('example', 1, '("")', sub {
-    my ($tryable) = @_;
-    $tryable->result;
-  });
-
-The C<operator $name> block should contain a description of the overloaded
-operation the package performs, and can include an C<example-$number $name>
-block to ensure the operation is functioning properly.
-
-=cut
-
-=feature spec-partials
-
-  =partials
-
-  t/path/to/other.t: present: authors
-  t/path/to/other.t: present: license
-
-  =cut
-
-  $test->for('partials');
-
-The C<partials> block should contain references to other marked-up test files
-in the form of C<$file: $method: $section>, which will call the C<$method> on a
-L<Venus::Test> instance for the C<$file> and include the results in-place as
-part of the rendering of the current file.
-
-=cut
-
-=feature spec-project
-
-  =project
-
-  https://github.com/awncorp/example
-
-  =cut
-
-  $test->for('project');
-
-The C<project> block should contain a description and/or links for the
-package's project.
-
-=cut
-
-=feature spec-signature
-
-  =signature prepare
-
-    prepare() (boolean)
-
-  =cut
-
-  $test->for('signature', 'prepare');
-
-The C<signature $name> block should contain a routine signature in the form of
-C<$signature : $return_type>, where C<$signature> is a valid typed signature
-and C<$return_type> is any valid L<Venus::Check> expression.
-
-=cut
-
-=feature spec-synopsis
-
-  =synopsis
-
-    use Example;
-
-    my $example = Example->new;
-
-    # bless(..., "Example")
-
-  =cut
-
-  $test->for('synopsis', sub {
-    my ($tryable) = @_;
-    $tryable->result;
-  });
-
-The C<synopsis> block should contain the normative usage of the package. This
-is tested for existence. This block should be written in a way that allows it
-to be evaled successfully and should return a value.
-
-=cut
-
-=feature spec-tagline
-
-  =tagline
-
-  Example Class
-
-  =cut
-
-  $test->for('tagline');
-
-The C<tagline> block should contain a 2-5 word description of the package,
-which will be prepended to the name as a full description of the package.
-
-=cut
-
-=feature spec-version
-
-  =version
-
-  1.2.3
-
-  =cut
-
-  $test->for('version');
-
-The C<version> block should contain a valid version number for the package.
-
-=cut
-
-=feature test-for
-
-  # ...
-
-  $test->for('name');
-
-This framework provides a set of automated subtests based on the package
-specification, but not everything can be automated so it also provides you with
-powerful hooks into the framework for manual testing.
-
-  # ...
-
-  $test->for('synopsis', sub {
-    my ($tryable) = @_;
-
-    my $result = $tryable->result;
-
-    # must return truthy to continue
-    $result;
-  });
-
-The code examples documented can be automatically evaluated (evaled) and
-returned using a callback you provide for further testing. Because the code
-examples are returned as L<Venus::Try> objects this makes capturing and testing
-exceptions simple, for example:
-
-  # ...
-
-  $test->for('synopsis', sub {
-    my ($tryable) = @_;
-
-    # catch exception thrown by the synopsis
-    $tryable->catch('Path::Find::Error', sub {
-      return $_[0];
-    });
-
-    # test the exception
-    my $result = $tryable->result;
-    ok $result->isa('Path::Find::Error'), 'exception caught';
-
-    # must return truthy to continue
-    $result;
-  });
-
-Additionally, another manual testing hook (with some automation) is the
-C<example> method. This hook evaluates (evals) a given example and returns the
-result as a L<Venus::Try> object. The first argument is the example ID (or
-number), for example:
-
-  # ...
-
-  $test->for('example', 1, 'children', sub {
-    my ($tryable) = @_;
-
-    my $result = $tryable->result;
-
-    # must return truthy to continue
-    $result;
-  });
-
-Finally, the lesser-used but useful manual testing hook is the C<feature>
-method. This hook evaluates (evals) a documented feature and returns the result
-as a L<Venus::Try> object, for example:
-
-  # ...
-
-  $test->for('feature', 'export-path-make', sub {
-    my ($tryable) = @_;
-
-    ok my $result = $tryable->result, 'result ok';
-
-    # must return truthy to continue
-    $result;
-  });
-
-The test automation and documentation generation enabled through this framework
-makes it easy to maintain source/test/documentation parity. This also increases
-reusability and reduces the need for complicated state and test setup.
-
-=cut
-
-=error error_on_abstract
-
-This package may raise an error_on_abstract exception.
-
-=cut
-
-$test->for('error', 'error_on_abstract');
-
-=example-1 error_on_abstract
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_abstract',
-  };
-
-  my $error = $test->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_abstract"
-
-  # my $message = $error->render;
-
-  # "Test file \"t/Venus_Test.t\" missing abstract section"
-
-  # my $file = $error->stash('file');
-
-  # "t/Venus_Test.t"
-
-=cut
-
-$test->for('example', 1, 'error_on_abstract', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_abstract";
-  my $message = $result->render;
-  like $message, qr/Test file .*Venus_Test.* abstract section/;
-  my $file = $result->stash('file');
-  like $file, qr/Venus_Test/;
-
-  $result
-});
-
-=error error_on_description
-
-This package may raise an error_on_description exception.
-
-=cut
-
-$test->for('error', 'error_on_description');
-
-=example-1 error_on_description
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_description',
-  };
-
-  my $error = $test->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_description"
-
-  # my $message = $error->render;
-
-  # "Test file \"t/Venus_Test.t\" missing description section"
-
-  # my $file = $error->stash('file');
-
-  # "t/Venus_Test.t"
-
-=cut
-
-$test->for('example', 1, 'error_on_description', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_description";
-  my $message = $result->render;
-  like $message, qr/Test file .*Venus_Test.* description section/;
-  my $file = $result->stash('file');
-  like $file, qr/Venus_Test/;
-
-  $result
-});
-
-=error error_on_name
-
-This package may raise an error_on_name exception.
-
-=cut
-
-$test->for('error', 'error_on_name');
-
-=example-1 error_on_name
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_name',
-  };
-
-  my $error = $test->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_name"
-
-  # my $message = $error->render;
-
-  # "Test file \"t/Venus_Test.t\" missing name section"
-
-  # my $file = $error->stash('file');
-
-  # "t/Venus_Test.t"
-
-=cut
-
-$test->for('example', 1, 'error_on_name', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_name";
-  my $message = $result->render;
-  like $message, qr/Test file .*Venus_Test.* name section/;
-  my $file = $result->stash('file');
-  like $file, qr/Venus_Test/;
-
-  $result
-});
-
-=error error_on_synopsis
-
-This package may raise an error_on_synopsis exception.
-
-=cut
-
-$test->for('error', 'error_on_synopsis');
-
-=example-1 error_on_synopsis
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_synopsis',
-  };
-
-  my $error = $test->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_synopsis"
-
-  # my $message = $error->render;
-
-  # "Test file \"t/Venus_Test.t\" missing synopsis section"
-
-  # my $file = $error->stash('file');
-
-  # "t/Venus_Test.t"
-
-=cut
-
-$test->for('example', 1, 'error_on_synopsis', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_synopsis";
-  my $message = $result->render;
-  like $message, qr/Test file .*Venus_Test.* synopsis section/;
-  my $file = $result->stash('file');
-  like $file, qr/Venus_Test/;
-
-  $result
-});
-
-=error error_on_tagline
-
-This package may raise an error_on_tagline exception.
-
-=cut
-
-$test->for('error', 'error_on_tagline');
-
-=example-1 error_on_tagline
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_tagline',
-  };
-
-  my $error = $test->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_tagline"
-
-  # my $message = $error->render;
-
-  # "Test file \"t/Venus_Test.t\" missing tagline section"
-
-  # my $file = $error->stash('file');
-
-  # "t/Venus_Test.t"
-
-=cut
-
-$test->for('example', 1, 'error_on_tagline', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_tagline";
-  my $message = $result->render;
-  like $message, qr/Test file .*Venus_Test.* tagline section/;
-  my $file = $result->stash('file');
-  like $file, qr/Venus_Test/;
-
-  $result
+  $error
 });
 
 =partials
@@ -8239,4 +11654,4 @@ $test->for('partials');
 
 $test->render('lib/Venus/Test.pod') if $ENV{VENUS_RENDER};
 
-$test->done;
+ok 1 and done_testing;

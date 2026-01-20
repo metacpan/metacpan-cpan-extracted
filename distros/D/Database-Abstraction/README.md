@@ -15,7 +15,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 # VERSION
 
-Version 0.33
+Version 0.34
 
 # DESCRIPTION
 
@@ -291,6 +291,8 @@ to the query.
 If the data have been slurped,
 this will still work by accessing that actual database.
 
+If "args" is given, it's an array of the arguments (see `execute()` in [DBI](https://metacpan.org/pod/DBI)).
+
 ## updated
 
 Returns the timestamp of the last database update.
@@ -354,7 +356,7 @@ so if XML fails for you on a small file force non-slurping mode with
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2015-2025 Nigel Horne.
+Copyright 2015-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2.
 Usage is subject to licence terms.

@@ -59,6 +59,7 @@ t/43-result-class.t
 t/44-txn-batch.t
 t/45-pager.t
 t/46-using-chi.t
+t/47-inflation.t
 t/manifest.t
 t/pod.t
 t/test.db

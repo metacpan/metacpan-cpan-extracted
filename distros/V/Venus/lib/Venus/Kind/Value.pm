@@ -5,15 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
-use overload (
-  '""' => 'explain',
-  '~~' => 'explain',
-  fallback => 1,
-);
+# IMPORTS
 
 use Venus::Class 'base', 'with';
 
+# INHERITS
+
 base 'Venus::Kind';
+
+# INTEGRATES
 
 with 'Venus::Role::Valuable';
 with 'Venus::Role::Buildable';
@@ -21,6 +21,14 @@ with 'Venus::Role::Accessible';
 with 'Venus::Role::Explainable';
 with 'Venus::Role::Proxyable';
 with 'Venus::Role::Pluggable';
+
+# OVERLOADS
+
+use overload (
+  '""' => 'explain',
+  '~~' => 'explain',
+  fallback => 1,
+);
 
 # BUILDERS
 
@@ -37,11 +45,11 @@ sub build_arg {
 sub cast {
   my ($self, @args) = @_;
 
-  require Venus::Type;
+  require Venus::What;
 
   my $value = $self->can('value') ? $self->value : $self;
 
-  return Venus::Type->new(value => $value)->cast(@args);
+  return Venus::What->new(value => $value)->cast(@args);
 }
 
 sub defined {

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2025 -- leonerd@leonerd.org.uk
 
-package IO::Async::LoopTests 0.804;
+package IO::Async::LoopTests 0.805;
 
 use v5.14;
 use warnings;
@@ -39,6 +39,8 @@ END { undef $loop }
 C<IO::Async::LoopTests> - acceptance testing for L<IO::Async::Loop> subclasses
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use IO::Async::LoopTests;
    run_tests( 'IO::Async::Loop::Shiney', 'io' );
@@ -90,7 +92,7 @@ sub run_tests
 
    eval { require $file };
    if( $@ ) {
-      BAIL_OUT( "Unable to load $testclass - $@" );
+      bail_out( "Unable to load $testclass - $@" );
    }
 
    foreach my $test ( @tests ) {
@@ -130,15 +132,19 @@ sub time_between(&$$$)
 {
    my ( $code, $lower, $upper, $name ) = @_;
 
-   my $start = time;
-   $code->();
-   my $took = ( time - $start ) / AUT;
+   Test2::API::context_do {
+      my $ctx = shift;;
 
-   cmp_ok( $took, '>=', $lower, "$name took at least $lower seconds" ) if defined $lower;
-   cmp_ok( $took, '<=', $upper * 3, "$name took no more than $upper seconds" ) if defined $upper;
-   if( $took > $upper and $took <= $upper * 3 ) {
-      diag( "$name took longer than $upper seconds - this may just be an indication of a busy testing machine rather than a bug" );
-   }
+      my $start = time;
+      $code->();
+      my $took = ( time - $start ) / AUT;
+
+      $ctx->ok( $took >= $lower,     "$name took at least $lower seconds" ) if defined $lower;
+      $ctx->ok( $took <= $upper * 3, "$name took no more than $upper seconds" ) if defined $upper;
+      if( $took > $upper and $took <= $upper * 3 ) {
+         $ctx->note( "$name took longer than $upper seconds - this may just be an indication of a busy testing machine rather than a bug" );
+      }
+   };
 }
 
 =head1 TEST SUITES
@@ -238,6 +244,44 @@ sub run_tests_io
          handle => $S1,
          on_read_ready => 1,
       );
+   }
+
+   # Check that read- and write-readiness can be watched via two separate
+   # ->watch_io calls on the same handle
+   {
+      my ( $S1, $S2 ) = IO::Async::OS->socketpair or die "Cannot create socket pair - $!";
+      $_->blocking( 0 ) for $S1, $S2;
+
+      foreach my $first (qw( read write )) {
+         my $readready  = 0;
+         my $writeready = 0;
+
+         $loop->watch_io(
+            handle => $S1,
+            on_read_ready => sub { $readready = 1 },
+         ) if $first eq "read";
+         $loop->watch_io(
+            handle => $S1,
+            on_write_ready => sub { $writeready = 1 },
+         );
+         $loop->watch_io(
+            handle => $S1,
+            on_read_ready => sub { $readready = 1 },
+         ) if $first eq "write";
+
+         $S2->syswrite( "data\n" );
+
+         $loop->loop_once( 0.1 ) for 1..2;
+
+         ok( $readready,  '$readready after '.$first.' first split read+write watch' );
+         ok( $writeready, '$writeready after '.$first.' first split read+write watch' );
+
+         $loop->unwatch_io(
+            handle => $S1,
+            on_read_ready => 1,
+            on_write_ready => 1,
+         );
+      }
    }
 
    # HUP of pipe - can be different to sockets on some architectures

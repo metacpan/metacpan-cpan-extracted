@@ -13,8 +13,7 @@ use Math::BigInt;
 
 my $ppid        = getppid;
 my $base        = dirname(__FILE__) . '/data';
-my $abi_version = Linux::Landlock->get_abi_version();
-if ($abi_version < 0) {
+if (Linux::Landlock->get_abi_version() < 0) {
     my $ruleset = Linux::Landlock->new();
     ok(!$ruleset->allow_perl_inc_access(), "nothing done");
 } else {
@@ -31,7 +30,7 @@ if ($abi_version < 0) {
         "allow read_file + execute in /usr"
     );
     ok($ruleset->allow_std_dev_access(), "allow_std_dev_access");
-    if ($abi_version >= 4) {
+    if (Linux::Landlock->get_abi_version() >= 4) {
         is($ruleset->add_net_port_rule(33333, 'bind_tcp'), $LANDLOCK_ACCESS_NET{BIND_TCP}, "allow port 33333");
     } else {
         throws_ok(sub { $ruleset->add_net_port_rule(33333, 'bind_tcp') }, qr/invalid/i, "no network support");
@@ -45,7 +44,7 @@ if ($abi_version < 0) {
     ok(eval { require Data::Dumper; }, "require Data::Dumper");
 
   SKIP: {
-        skip "no network support", if $abi_version < 4;
+        skip "no network support", if Linux::Landlock->get_abi_version() < 4;
         ok(defined IO::Socket::INET->new(LocalPort  => 33333, Proto => 'tcp',), "socket created");
         ok(!defined IO::Socket::INET->new(LocalPort => 33334, Proto => 'tcp',), "socket not created: $!");
     }
@@ -76,7 +75,7 @@ if ($abi_version < 0) {
     );
     ok($ruleset2->apply(), "apply ruleset");
   SKIP: {
-        skip "No signal restrictions possible", if $abi_version < 6;
+        skip "No signal restrictions possible", if Linux::Landlock->get_abi_version() < 6;
         ok(!kill(0, $ppid), "cannot signal parent ($ppid)");
     }
     ok(-r "$base/b", "technically readable: $base/b");

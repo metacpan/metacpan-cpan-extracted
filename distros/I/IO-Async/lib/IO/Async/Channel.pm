@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Channel 0.804;
+package IO::Async::Channel 0.805;
 
 use v5.14;
 use warnings;
@@ -18,6 +18,8 @@ use IO::Async::Stream;
 C<IO::Async::Channel> - pass values into or out from an L<IO::Async::Routine>
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 A C<IO::Async::Channel> object allows Perl values to be passed into or out of
 an L<IO::Async::Routine>. It is intended to be used primarily with a Routine

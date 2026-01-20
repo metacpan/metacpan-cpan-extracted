@@ -5,7 +5,11 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base';
+
+# INHERITS
 
 base 'Venus::Number';
 
@@ -1624,6 +1628,58 @@ I<Since C<0.08>>
   my $result = $lvalue->ne($rvalue);
 
   # 0
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Float)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Float;
+
+  my $new = Venus::Float->new;
+
+  # bless(..., "Venus::Float")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Float;
+
+  my $new = Venus::Float->new(1.23);
+
+  # bless(..., "Venus::Float")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Float;
+
+  my $new = Venus::Float->new(value => 1.23);
+
+  # bless(..., "Venus::Float")
 
 =back
 

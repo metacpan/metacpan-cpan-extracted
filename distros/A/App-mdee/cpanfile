@@ -5,6 +5,7 @@ requires 'Text::ANSI::Fold', '2.32';
 requires 'App::ansiecho';
 requires 'App::ansifold', '1.34';
 requires 'App::ansicolumn', '1.48';
+requires 'Term::ANSIColor::Concise', '3.02';
 
 requires 'App::nup', '0.9906';
 requires 'Getopt::Long::Bash', '0.7.1';

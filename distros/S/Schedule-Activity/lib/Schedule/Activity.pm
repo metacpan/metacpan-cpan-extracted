@@ -2,18 +2,20 @@ package Schedule::Activity;
 
 use strict;
 use warnings;
-use Ref::Util qw/is_arrayref is_hashref is_plain_hashref/;
+use List::Util qw/any/;
+use Ref::Util qw/is_arrayref is_hashref is_plain_hashref is_ref/;
+use Scalar::Util qw/blessed/;
 use Schedule::Activity::Annotation;
 use Schedule::Activity::Attributes;
 use Schedule::Activity::Message;
 use Schedule::Activity::Node;
 use Schedule::Activity::NodeFilter;
 
-our $VERSION='0.2.9';
+our $VERSION='0.3.0';
 
 sub new {
 	my ($ref,%opt)=@_;
-	my $class=ref($ref)||$ref;
+	my $class=is_ref($ref)||$ref;
 	my %self=(
 		config  =>$opt{configuration}//{},
 		attr    =>undef,
@@ -79,17 +81,17 @@ sub _validateConfig {
 		push @nerrors,Schedule::Activity::Message::validate($$node{message},names=>$config{messages});
 		foreach my $kv (Schedule::Activity::Message::attributesFromConf($$node{message})) { push @nerrors,$attr->register($$kv[0],%{$$kv[1]}) }
 		if(@nerrors) { push @errors,map {"Node $k, $_"} @nerrors; next }
-		@invalids=grep {!defined($config{node}{$_})} @{$$node{next}//[]};
+		@invalids=grep {!defined($config{node}{$_})} Schedule::Activity::Node->nextnames(0,$$node{next}//[]);
 		if(@invalids) { push @errors,"Node $k, Undefined name in array:  next" }
 		if(defined($$node{finish})&&!defined($config{node}{$$node{finish}})) { push @errors,"Node $k, Undefined name:  finish" }
 	}
 	$config{annotations}//={};
 	if(!is_hashref($config{annotations})) { push @errors,'Annotations must be a hash' }
 	else { while(my ($k,$notes)=each %{$config{annotations}}) {
-		push @errors,map {"Annotation $k:  $_"} map {
+		push @errors,map {"Annotation $k:  $_"} map {(
 			Schedule::Activity::Annotation::validate(%$_),
 			Schedule::Activity::Message::validate($$_{message},names=>$config{messages})
-			} @$notes } }
+			)} @$notes } }
 	return @errors;
 }
 
@@ -99,7 +101,10 @@ sub _reachability {
 	my %reach=(min=>{},max=>{});
 	foreach my $namea (keys %{$$self{built}{node}}) {
 		my $nodea=$$self{built}{node}{$namea};
-		foreach my $nodeb (@{$$nodea{next}}) {
+		my @nodes;
+		if  (is_arrayref($$nodea{next})) { @nodes=@{$$nodea{next}} }
+		elsif(is_hashref($$nodea{next})) { @nodes=map {$$_{node}} values %{$$nodea{next}} }
+		foreach my $nodeb (@nodes) {
 			$reach{min}{$nodea}{$nodeb}=$$nodea{tmmin};
 			$reach{max}{$nodea}{$nodeb}=(($nodea eq $nodeb)?'+':$$nodea{tmmax});
 		}
@@ -196,7 +201,8 @@ sub _buildConfig {
 	if($base{PNA}) { $$self{PNA}=$base{PNA} }
 	while(my ($k,$node)=each %{$base{node}}) {
 		if(is_plain_hashref($node)) { $res{node}{$k}=Schedule::Activity::Node->new(%$node) }
-		else { $res{node}{$k}=$node }
+		elsif(blessed($node))       { $res{node}{$k}=$node }
+		else                        { die "Invalid node $k when building config" }
 		$res{node}{$k}{keyname}=$k;
 		if($$self{PNA}) {
 			$res{node}{$k}{attributes}{"$$self{PNA}$k"}={incr=>1};
@@ -205,9 +211,7 @@ sub _buildConfig {
 	}
 	my $msgNames=$base{messages}//{};
 	while(my ($k,$node)=each %{$res{node}}) {
-		my @nexts=map {$res{node}{$_}} @{$$node{next}//[]};
-		if(@nexts) { $$node{next}=\@nexts }
-		else       { delete($$node{next}) }
+		$node->nextremap($res{node});
 		if(defined($$node{finish})) { $$node{finish}=$res{node}{$$node{finish}} }
 		$$node{msg}=Schedule::Activity::Message->new(message=>$$node{message},names=>$msgNames);
 		if(is_plain_hashref($$node{require})) { $$node{require}=Schedule::Activity::NodeFilter->new(%{$$node{require}}) }
@@ -297,12 +301,12 @@ sub scheduler {
 	if($path{retry}) { return scheduler(%opt,retries=>$opt{retries},error=>$path{error}//'Retries exhausted') }
 	my @res=@{$path{steps}};
 	my ($tm,$slack,$buffer)=@path{qw/tm slack buffer/};
-	if($res[-1][1] ne $opt{node}{finish}) { return scheduler(%opt,retries=>$opt{retries},error=>"Didn't reach finish node") }
+	if($res[-1][1] ne $opt{node}{finish}) { return scheduler(%opt,retries=>$opt{retries},error=>q|Didn't reach finish node|) }
 	#
 	my $excess=$tm-$opt{goal};
 	if(abs($excess)>0.5) {
 		if(($excess>0)&&($excess>$slack))   { return scheduler(%opt,retries=>$opt{retries},error=>"Excess exceeds slack ($excess>$slack)") }
-		if(($excess<0)&&(-$excess>$buffer)) { return scheduler(%opt,retries=>$opt{retries},error=>"Shortage exceeds buffer (".(-$excess).">$buffer)") }
+		if(($excess<0)&&(-$excess>$buffer)) { return scheduler(%opt,retries=>$opt{retries},error=>'Shortage exceeds buffer ('.(-$excess).">$buffer)") }
 		my ($reduction,$rate)=(0);
 		if($excess>0) { $rate=$excess/$slack }
 		else          { $rate=$excess/$buffer }
@@ -352,11 +356,14 @@ sub goalScheduling {
 	my %goal=%{delete($opt{goal})};
 	if(!is_hashref($goal{attribute})) { return (error=>'goal{attribute} must be hash') }
 	{ my $attr=$self->_attr();
+		my %validOp=map {$_=>undef} (qw/min max eq ne/);
+		my %valueOp=map {$_=>undef} (qw/eq ne/);
 		foreach my $k (keys %{$goal{attribute}}) {
 			if(!defined($$attr{attr}{$k})) { return (error=>"goal-requested attribute does not exist:  $k") }
+			if(!is_hashref($goal{attribute}{$k}))  { return (error=>"goal attribute $k must be a hash") }
 			if(!defined($goal{attribute}{$k}{op})) { return (error=>"missing operator in goal $k") }
-			if(($goal{attribute}{$k}{op}//'')!~/^(?:max|min|eq|ne)$/) { return (error=>"invalid operator in goal $k") }
-			if(($goal{attribute}{$k}{op}=~/^(?:eq|ne)$/)&&!defined($goal{attribute}{$k}{value})) { return (error=>"missing value in goal $k") }
+			if(!exists($validOp{$goal{attribute}{$k}{op}//''})) { return (error=>"invalid operator in goal $k") }
+			if(exists($valueOp{$goal{attribute}{$k}{op}})&&!defined($goal{attribute}{$k}{value})) { return (error=>"missing value in goal $k") }
 		}
 	}
 	my $cycles=$goal{cycles}//10;
@@ -446,7 +453,7 @@ sub schedule {
 	my %check=$self->compile(unsafe=>$opt{unsafe}//$$self{unsafe});
 	if($check{error})                  { return (error=>$check{error}) }
 	if(!is_arrayref($opt{activities})) { return (error=>'Activities must be an array') }
-	if(grep {is_hashref($$_[2])&&defined($$_[2]{goal})} @{$opt{activities}}) { return $self->incrementalScheduling(%opt) }
+	if(any {is_hashref($$_[2])&&defined($$_[2]{goal})} @{$opt{activities}}) { return $self->incrementalScheduling(%opt) }
 	if($opt{goal}&&%{$opt{goal}})      { return $self->goalScheduling(%opt) }
 	my $tmoffset=$opt{tmoffset}//0;
 	my %res=(stat=>{slack=>0,buffer=>0});
@@ -483,7 +490,7 @@ sub schedule {
 			}
 		}
 		@schedule=sort {$$a[0]<=>$$b[0]} @schedule;
-		for(my $i=0;$i<$#schedule;$i++) {
+		for(my $i=0;$i<$#schedule;$i++) {  ## no critic (CStyleForLoops)
 			if($schedule[$i+1][0]==$schedule[$i][0]) {
 				splice(@schedule,$i+1,1); $i-- } }
 		$res{annotations}{$group}{events}=\@schedule;
@@ -566,7 +573,7 @@ Schedule::Activity - Generate activity schedules
 
 =head1 VERSION
 
-Version 0.2.9
+Version 0.3.0
 
 =head1 SYNOPSIS
 
@@ -637,20 +644,22 @@ Both activities and actions are configured as named C<node> entries.  With this 
 
   'activity name'=>{
     tmavg     =>value, ...,
-    next      =>[...],
     finish    =>'activity conclusion',
+    next      =>[...],
+    next      =>{name=>{weight=>value},...},
     message   =>...    # optional
     attributes=>{...}, # optional
   }
   'action name'=>{
     tmavg     =>value, ...,
     next      =>[...],
+    next      =>{...},
     message   =>...    # optional
     attributes=>{...}, # optional
     require   =>{...}, # optional
   }
 
-The list of C<next> nodes is a list of names, which must be defined in the configuration.  During schedule construction, entries will be I<chosen randomly> from the list of C<next> nodes.  The conclusion must be reachable from the initial activity, or scheduling will fail.  There is no further restriction on the items in C<next>:  Scheduling specifically supports cyclic/recursive actions, including self-cycles.
+An array of C<next> nodes is a list of names, which must be defined in the configuration.  During schedule construction, entries will be I<chosen randomly> from the list of C<next> nodes.  The conclusion must be reachable from the initial activity, or scheduling will fail.  Weighting is supported when C<next> is a hash, with keys that are the names of next possible actions and values of C<{weight=E<gt>number}>.  The total weight during scheduling includes only non-filtered nodes; the default weight is one (1).  There is no further restriction on the items in C<next>:  Scheduling specifically supports cyclic/recursive actions, including self-cycles.  
 
 There is no functional difference between activities and actions except that a node must contain C<finish> to be used for activity scheduling.  Nomenclature is primarily to support schedule organization:  A collection of random actions is used to build an activity; a sequence of activities is used to build a schedule.
 
@@ -673,7 +682,7 @@ Caution:  While startup/conclusion of activities may have fixed time specificati
 
 Providing any time value will automatically set any missing values at the fixed ratios 3,4,5.  EG, specifying only C<tmmax=40> will set C<tmmin=24> and C<tmavg=32>.  If provided two time values, priority is given to C<tmavg> to set the third.
 
-Scheduling may be controlled with the tension settings described below.  Future changes may support automatic slack/buffering, univeral slack/buffer ratios, and open-ended/relaxed slack/buffering.
+Scheduling may be controlled with the tension settings described below.  Future changes may support automatic slack/buffering, universal slack/buffer ratios, and open-ended/relaxed slack/buffering.
 
 =head2 Messages
 
@@ -836,7 +845,7 @@ Rudimentary merging mechanisms are provided in C<schedule-activity.pl>.
 
 =head2 Overview
 
-The configuration of the C<next> actions is the primary contributor to the schedules that can be built.  As with all algorithms of this type, there are many configurations that simply won't work well:  For example, this is not a maze solver, a best path finder, nor a resourcing optimization system.  Scheduling success toward the stated goals generally requires that actions have different C<tmmin>, C<tmmax>, and C<tmavg>, and that actions permit reasonable repetition and recursion.  Highly imbalanced actions, such as a branch of length 10 and another of length 5000, may always fail depending on the goal.  Neverthless, for the activities and actions so described, how does it work?
+The configuration of the C<next> actions is the primary contributor to the schedules that can be built.  As with all algorithms of this type, there are many configurations that simply won't work well:  For example, this is not a maze solver, a best path finder, nor a resourcing optimization system.  Scheduling success toward the stated goals generally requires that actions have different C<tmmin>, C<tmmax>, and C<tmavg>, and that actions permit reasonable repetition and recursion.  Highly imbalanced actions, such as a branch of length 10 and another of length 5000, may always fail depending on the goal.  Nevertheless, for the activities and actions so described, how does it work?
 
 The scheduler is a randomized, opportunistic, single-step path growth algorithm.  An activity starts at the indicated node.  At each step, the C<next> entries are filtered and a random action is chosen, then the process repeats.  The selection of the next step is restricted based on the I<current time> (at the end of the action) as follows.
 
@@ -963,7 +972,7 @@ Rudimentary markdown support is included for lists of actions that are all equal
   - Activity Three, 5min
     * Action one, 5min
 
-Any list identification markers may be used interchangably (number plus period, asterisks, hyphen).  One or more leading whitespace (tabs or spaces) indicates an action; otherwise the line indicates an activity.  Times are specified as C<\d+min> or C<\d+sec>.  If only a single action is included in an activity, its configured time should be equal to the activity time.
+Any list identification markers may be used (number plus period, asterisks, hyphen).  One or more leading whitespace (tabs or spaces) indicates an action; otherwise the line indicates an activity.  Times are specified as C<\d+min> or C<\d+sec>.  If only a single action is included in an activity, its configured time should be equal to the activity time.
 
 The imported configuration permits an activity to be followed by any of its actions, and any action can be followed by any other action within the activity (but not itself).  Any action can terminate the activity.
 

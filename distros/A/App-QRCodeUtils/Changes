@@ -1,3 +1,8 @@
+0.005   2026-01-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to QRCode::Any 0.002 (add argument 'level').
+
+
 0.004   2024-04-18  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Handle when gen_qrcode() is called as a function instead of

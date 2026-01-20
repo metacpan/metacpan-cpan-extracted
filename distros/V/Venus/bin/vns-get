@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+
+package main;
+
+use 5.018;
+
+use strict;
+use warnings;
+
+use lib 'lib';
+
+use Venus::Task::Venus::Get;
+
+run Venus::Task::Venus::Get 'vns-get';
+
+=encoding utf8
+
+=head1 NAME
+
+vns-get
+
+=head1 SYNOPSIS
+
+  vns-get --help
+
+=head1 DESCRIPTION
+
+Get values from a Venus configuration file. This CLI dispatches to
+L<Venus::Task::Venus::Get/perform>.
+
+=head1 EXAMPLES
+
+  # get the perl.repl value
+  $ vns-get perl.repl
+
+=head1 SEE ALSO
+
+L<Venus>, L<Venus::Task::Venus::Get>.
+
+=cut

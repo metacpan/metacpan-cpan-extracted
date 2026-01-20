@@ -5,7 +5,7 @@ use warnings;
 package Marlin::X;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016000';
+our $VERSION   = '0.020000';
 
 use Marlin::Util          qw( true false );
 use Types::Common         qw( -types );

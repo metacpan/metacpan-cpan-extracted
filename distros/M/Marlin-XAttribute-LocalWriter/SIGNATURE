@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 0164cd47040d7adb19da17c119290c2bca220e3d16a80e1d7c757cc95e2e421b COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 01891c4acc5746a21d4e826adc28f41c18e42c9935233908d7ada25c168e87fb Changes
+SHA256 655637ff88aeaa41934daa834e47366c87cfd414c5b410760efdddbfcb78b28f INSTALL
+SHA256 ca1cc40b3da7bebb1b0368764650ad38ac603b31a25fbc5b6f9fb217cc6fa1e8 LICENSE
+SHA256 1ccdc946762a2367ed4e460e244753ac4f387afd865a6fa7420d11546ce383b6 MANIFEST
+SHA256 9685633bea502b35c8b7d791521f544bfe46ae47f388ab8d8bcf17b0dacf3ede META.json
+SHA256 585c3ea9e6041db6a9ff6480933d0c58e3803d8083281d216d402baba3837722 META.yml
+SHA256 fdb3fd3bf09909824618f036ada536e48cd1bffba7ce0efecdde2f2d282e6d2d Makefile.PL
+SHA256 25f168cb35e64ea3c8d17c45b25540a8b32e475220f3e06299f48449521a9e96 README
+SHA256 0caa554826ceb24d4b773ba151fd2a3f8a11662d52fc6ab7f8edaade0944d56d dist.ini
+SHA256 f476b3b97408699717f588ec49267335c85638bc535a3d487f84eef8400c4fdd doap.ttl
+SHA256 302c00e8b1154cfecff0d047fabf76e68554b3b6577cf8cfadddc08d6715c0a1 lib/Marlin/XAttribute/LocalWriter.pm
+SHA256 764c0b49b329e494aefd48e0e5e068a16c066ceb092d82000a3abfc0d36e0d03 t/00start.t
+SHA256 c86c9d7671906d4e445a7513a7afc81c26e2c366b7997d4db62d721356605b3b t/01basic.t
+SHA256 a1981f8e5add489bc7c7ce30e717daead9a02e1416f81ff20dabab5394865c1c t/integration/localwriter.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCaW5nEwAKCRDOv4Eoaip9
+OduTAJ94E2jNehm+6KySKWs+5hLG7pUTGgCgj1QYGaHHzKasSxfwieOn6hyBJeY=
+=NNVC
+-----END PGP SIGNATURE-----

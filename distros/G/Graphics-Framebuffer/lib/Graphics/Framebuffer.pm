@@ -402,7 +402,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.84';
+    our $VERSION   = '6.85';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -489,7 +489,7 @@ use Inline C => <<'C_CODE', 'name' => 'Graphics::Framebuffer', 'VERSION' => $VER
 /* Copyright 2018-2026 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.84
+   Version:  6.85
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
@@ -501,6 +501,9 @@ use Inline C => <<'C_CODE', 'name' => 'Graphics::Framebuffer', 'VERSION' => $VER
 
    I am NOT a C programmer and this code likely proves that, but this code works
    and that's good enough for me.
+
+   Also note, portions of this code (which I initially wrote) have been
+   optimized by GitHub AI for both speed and reduction of complexity.
 */
 
 #include <fcntl.h>
@@ -1328,7 +1331,7 @@ void c_plot(char *framebuffer,
             *((uint16_t *)p) = res16;
         } break;
 
-        case 8: {
+        case 8: { /* Not supported yet, but here is the code if it ever is */
             uint8_t fb = *p;
             uint8_t col8 = (uint8_t)color;
             uint8_t res8 = fb;
@@ -1751,8 +1754,8 @@ void c_blit_write(char *framebuffer,
                   short yy_clip) {
     short fb_x = xoffset + x;
     short fb_y = yoffset + y;
-    short xx = x + w;
-    short yy = y + h;
+    short xx = x + w - 1;
+    short yy = y + h - 1;
     unsigned int bline = (unsigned int)w * (unsigned int)bytes_per_pixel;
 
     /* Fastest is unclipped normal mode (keep original memcpy path) */
@@ -7286,7 +7289,6 @@ sub blit_write {
 } ## end sub blit_write
 
 sub _blit_adjust_for_clipping {
-
     # Chops up the blit image to stay within the clipping (and screen) boundaries
     # This prevents nasty crashes
     my ($self, $pparams) = @_;
@@ -7302,19 +7304,19 @@ sub _blit_adjust_for_clipping {
     %{$params} = %{$pparams};
 
     # First fix the vertical errors
-    my $XX = $params->{'x'} + $params->{'width'};
-    my $YY = $params->{'y'} + $params->{'height'};
+    my $XX = $params->{'x'} + $params->{'width'} - 1;
+    my $YY = $params->{'y'} + $params->{'height'} - 1;
     return (undef) if ($YY < $yclip || $params->{'height'} < 1 || $XX < $xclip || $params->{'x'} > $xxclip);
     if ($params->{'y'} < $yclip) {    # Top
         $params->{'image'} = substr($params->{'image'}, ($yclip - $params->{'y'}) * ($params->{'width'} * $bytes));
         $params->{'height'} -= ($yclip - $params->{'y'});
         $params->{'y'} = $yclip;
     }
-    $YY = $params->{'y'} + $params->{'height'};
+    $YY = $params->{'y'} + $params->{'height'} - 1;
     return (undef) if ($params->{'height'} < 1);
     if ($YY > $yyclip) {              # Bottom
         $params->{'image'}  = substr($params->{'image'}, 0, ($yyclip - $params->{'y'}) * ($params->{'width'} * $bytes));
-        $params->{'height'} = $yyclip - $params->{'y'};
+        $params->{'height'} = $yyclip - $params->{'y'} + 1;
     }
 
     # Now we fix the horizontal errors
@@ -7330,11 +7332,11 @@ sub _blit_adjust_for_clipping {
         $params->{'width'} = $w;
         $params->{'x'}     = $xclip;
     } ## end if ($params->{'x'} < $xclip)
-    $XX = $params->{'x'} + $params->{'width'};
+    $XX = $params->{'x'} + $params->{'width'} - 1;
     if ($XX > $xxclip) {    # Right
         my $line = $params->{'width'} * $bytes;
         my $new  = '';
-        my $w    = $xxclip - $params->{'x'};
+        my $w    = $xxclip - $params->{'x'} + 1;
         foreach my $yl (0 .. ($params->{'height'} - 1)) {
             $new .= substr($params->{'image'}, $line * $yl, $w * $bytes);
         }
@@ -9782,7 +9784,7 @@ Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONT
 
 =head1 VERSION
 
-Version 6.84 (Jan 17, 2026)
+Version 6.85 (Jan 19, 2026)
 
 =head1 THANKS
 

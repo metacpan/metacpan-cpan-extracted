@@ -1,0 +1,68 @@
+{
+   "abstract" : "Use HarfBuzz for text shaping",
+   "author" : [
+      "Johan Vromans <jv@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HarfBuzz-Shaper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "inc",
+         "t",
+         "harfbuzz"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "ExtUtils::MakeMaker" : "6.46",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HarfBuzz::Shaper" : {
+         "file" : "lib/HarfBuzz/Shaper.pm",
+         "version" : "0.033"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sciurius/perl-HarfBuzz-Shaper/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sciurius/perl-HarfBuzz-Shaper.git",
+         "web" : "https://github.com/sciurius/perl-HarfBuzz-Shaper"
+      }
+   },
+   "version" : "0.033",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

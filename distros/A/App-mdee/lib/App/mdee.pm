@@ -4,7 +4,7 @@ package App::mdee;
 # POD documentation is appended from script/mdee at release time.
 # See minil.toml for details.
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 1;
 =encoding utf-8
@@ -29,7 +29,7 @@ mdee - Markdown, Easy on the Eyes
      -t  --theme=#          color theme
      -m  --mode=#           light or dark (default: light)
      -B  --base-color=#     override theme's base color
-                            (e.g., <Red>, #FF5733, hsl(0,100,50))
+                            (e.g., Ivory, #780043, (120,0,67))
          --list-themes      list built-in themes
          --show=#           set field visibility (e.g., italic=1)
      -C  --pane=#           number of columns
@@ -42,7 +42,7 @@ mdee - Markdown, Easy on the Eyes
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 =head1 DESCRIPTION
@@ -142,13 +142,14 @@ L<Getopt::EX::termcolor>), the mode is automatically selected based on
 terminal luminance.
 
 Each theme has light and dark variants optimized for different terminal
-backgrounds.  The built-in C<default> theme provides:
+backgrounds.  The built-in C<default> theme uses RoyalBlue as the base
+color with automatic luminance adjustment:
 
 =over 4
 
-=item C<light> - Navy blue base color for light backgrounds
+=item C<light> - RoyalBlue with luminance 25 (dark text for light backgrounds)
 
-=item C<dark> - Light blue (#CCCDFF) base color for dark backgrounds
+=item C<dark> - RoyalBlue with luminance 80 (bright text for dark backgrounds)
 
 =back
 
@@ -170,25 +171,46 @@ The C<${base}> string is expanded to the base color value after loading.
 
 =item B<-B> I<COLOR>, B<--base-color>=I<COLOR>
 
-Override the theme's base color.  This is useful for quickly adjusting
-the color scheme without creating a custom theme.
-Accepts L<Term::ANSIColor::Concise> color specifications:
+Override the theme's base color.  The base color determines the overall
+color scheme because all heading colors (h1, h2, h3, etc.) are derived
+from it by adjusting luminance.  For example, h2 might be C<${base}+y20>
+(base color with luminance increased by 20).
 
-=over 4
+B<Simple color name> - luminance is adjusted automatically:
 
-=item * Color names: C<E<lt>RedE<gt>>, C<E<lt>NavyBlueE<gt>>
+When you specify just a color name (without C<E<lt>E<gt>> brackets or
+other syntax), the default luminance adjustment is applied based on
+the current mode:
 
-=item * RGB hex: C<#FF5733>
+    -B RoyalBlue          # becomes <RoyalBlue>=y25 in light mode
+                          # becomes <RoyalBlue>=y80 in dark mode
 
-=item * RGB decimal: C<rgb(255,87,51)>
+This makes it easy to try different colors without worrying about
+luminance values.  The default adjustments (C<=y25> for light, C<=y80>
+for dark) are designed to provide good contrast against typical terminal
+backgrounds.
 
-=item * HSL: C<hsl(0,100,50)>
+B<Full color specification> - used exactly as specified:
 
-=back
+If you include C<E<lt>E<gt>> brackets, luminance modifiers, or use RGB
+notation, the value is used as-is without any automatic adjustment:
 
-B<Note:> Basic ANSI color codes (C<R>, C<G>, C<B>, etc.) are not supported
-because the highlighting variations are created by adjusting lightness
-of the base color, which requires full color specifications.
+    -B '<Ivory>'               # original color, no adjustment
+    -B '<Ivory>=y50'           # explicit luminance 50
+    -B '#780043'               # burgundy in hex
+    -B '(120,0,67)'            # same color in RGB decimal
+
+B<Customizing the default adjustment>:
+
+The automatic luminance adjustment values can be customized with the
+C<--adjust> option:
+
+    --adjust 'light==y30'      # use =y30 instead of =y25 for light mode
+    --adjust 'dark==y70'       # use =y70 instead of =y80 for dark mode
+
+B<Note>: Basic ANSI color codes (C<R>, C<G>, C<B>, etc.) cannot be used
+because heading variations require luminance adjustment, which only works
+with full color specifications (X11 names, RGB hex, or RGB decimal).
 
 =item B<--list-themes>
 
@@ -279,8 +301,8 @@ or C<--no-pager> to disable paging.
     # Theme examples
     mdee --mode=dark file.md             # use dark mode
     mdee --mode=light file.md            # use light mode
-    mdee -B '<Red>' file.md              # override base color
-    mdee --mode=dark -B '<Cyan>' file.md # dark mode with cyan base
+    mdee -B Ivory file.md                # override base color
+    mdee --mode=dark -B '#780043' file.md # dark mode with burgundy
     mdee --list-themes                   # list available themes
 
 =head1 INSTALLATION
@@ -403,9 +425,9 @@ The color specification supports modifiers:
 
 =over 4
 
-=item * C<+l10> / C<-l10>: Adjust lightness by percentage
+=item * C<+y10> / C<-y10>: Adjust luminance by percentage
 
-=item * C<=l50>: Set absolute lightness
+=item * C<=y50>: Set absolute luminance
 
 =item * C<D>: Bold, C<U>: Underline, C<E>: Erase line
 
@@ -445,20 +467,22 @@ B<mdee> implements a theme system with light and dark mode variants.
 =head3 Theme Structure
 
 Each theme is defined as a Bash associative array with color
-definitions for each Markdown element:
+definitions for each Markdown element.  The C<${base}> placeholder
+references the base color (set via C<--base-color> option):
 
     declare -A theme_default_dark=(
-        [base]='#CCCDFF'
         [h1]='L00DE/${base}'
-        [h2]='L00DE/${base}-l10'
+        [h2]='L00DE/${base}-y15'
+        [h3]='L00DN/${base}-y25'
         ...
     )
 
 =head4 Base Color Expansion
 
-The C<${base}> placeholder in color values is expanded after theme
-loading.  This allows derived colors to be calculated from a single
-base color, making theme customization easier.
+The C<${base}> placeholder is expanded to the effective base color
+after theme loading.  The base color is determined by the
+C<--base-color> option (default: RoyalBlue) with automatic luminance
+adjustment based on mode (C<=y25> for light, C<=y80> for dark).
 
 =head4 Terminal Mode Detection
 
@@ -489,13 +513,27 @@ are not supported.
 
 =head2 OSC 8 Hyperlinks
 
-Links are converted to OSC 8 terminal hyperlinks for clickable URLs.
+Links are converted to OSC 8 terminal hyperlinks for clickable URLs:
+
+=over 4
+
+=item C<[text](url)> - C<[text]> links to url
+
+=item C<![alt](url)> - C<![alt]> links to url (image)
+
+=item C<[![alt](img)](url)> - C<!> links to img, C<[alt]> links to url
+
+=back
+
 This requires terminal support.  Compatible terminals include iTerm2,
 Kitty, WezTerm, Ghostty, and recent versions of GNOME Terminal.
 Apple's default Terminal.app does not support OSC 8.
 
 When using C<less> as pager, version 566 or later is required with
 C<-R> option.
+
+For OSC 8 specification, see:
+L<https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5fedd>
 
 =head1 SEE ALSO
 

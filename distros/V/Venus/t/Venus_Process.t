@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 use Config;
 use Venus::Process;
@@ -231,6 +232,7 @@ method: killall
 method: leader
 method: leave
 method: limit
+method: new
 method: others
 method: others_active
 method: others_inactive
@@ -330,7 +332,7 @@ Venus::Role::Valuable
 
 =cut
 
-$test->for('inherits');
+$test->for('integrates');
 
 =attribute alarm
 
@@ -2833,6 +2835,85 @@ $test->for('example', 2, 'limit', sub {
   $result
 });
 
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Process)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Process;
+
+  my $new = Venus::Process->new;
+
+  # bless(..., "Venus::Process")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Process');
+  ok $result->value;
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Process;
+
+  my $new = Venus::Process->new(1);
+
+  # bless(..., "Venus::Process")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Process');
+  is $result->value, 1;
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Process;
+
+  my $new = Venus::Process->new(value => 1);
+
+  # bless(..., "Venus::Process")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Process');
+  is $result->value, 1;
+
+  $result
+});
+
 =method others
 
 The others method returns all L</registrants> other than the current process,
@@ -3094,7 +3175,7 @@ $test->for('example', 3, 'poll', sub {
   local $TEST_VENUS_PROCESS_TIME = (time - 6);
   my $result = $tryable->error->result;
   isa_ok $result, 'Venus::Process::Error';
-  is $result->name, 'on_timeout_poll';
+  is $result->name, 'on.timeout.poll';
 
   $result
 });
@@ -3243,7 +3324,7 @@ $test->for('example', 3, 'pool', sub {
   local $TEST_VENUS_PROCESS_TIME = (time - 1);
   my $result = $tryable->error->result;
   isa_ok $result, 'Venus::Process::Error';
-  is $result->name, 'on_timeout_pool';
+  is $result->name, 'on.timeout.pool';
   Venus::Process->new(12345)->unregister;
   Venus::Process->new(12346)->unregister;
   Venus::Process->new(12347)->unregister;
@@ -4819,7 +4900,7 @@ $test->for('example', 3, 'sync', sub {
   local $TEST_VENUS_PROCESS_TIME = (time - 1);
   my $result = $tryable->error->result;
   isa_ok $result, 'Venus::Process::Error';
-  is $result->name, 'on_timeout_sync';
+  is $result->name, 'on.timeout.sync';
   Venus::Process->new(12345)->unregister;
   Venus::Process->new(12346)->unregister;
   Venus::Process->new(12347)->unregister;
@@ -5546,6 +5627,78 @@ $test->for('example', 3, 'unwatch', sub {
   $result
 });
 
+=raise chdir Venus::Process::Error on.chdir
+
+  # given: synopsis;
+
+  $parent->chdir('/path/to/nowhere');
+
+  # Error! (on.chdir)
+
+=cut
+
+$test->for('raise', 'chdir', 'Venus::Process::Error', 'on.chdir', sub {
+  my ($tryable) = @_;
+
+  $test->type(my $result = $tryable->result, 'Venus::Process');
+
+  $result
+});
+
+=raise stderr Venus::Process::Error on.stderr
+
+  # given: synopsis;
+
+  $parent->stderr('/path/to/nowhere');
+
+  # Error! (on.stderr)
+
+=cut
+
+$test->for('raise', 'stderr', 'Venus::Process::Error', 'on.stderr', sub {
+  my ($tryable) = @_;
+
+  $test->type(my $result = $tryable->result, 'Venus::Process');
+
+  $result
+});
+
+=raise stdin Venus::Process::Error on.stdin
+
+  # given: synopsis;
+
+  $parent->stdin('/path/to/nowhere');
+
+  # Error! (on.stdin)
+
+=cut
+
+$test->for('raise', 'stdin', 'Venus::Process::Error', 'on.stdin', sub {
+  my ($tryable) = @_;
+
+  $test->type(my $result = $tryable->result, 'Venus::Process');
+
+  $result
+});
+
+=raise stdout Venus::Process::Error on.stdout
+
+  # given: synopsis;
+
+  $parent->stdout('/path/to/nowhere');
+
+  # Error! (on.stdout)
+
+=cut
+
+$test->for('raise', 'stdout', 'Venus::Process::Error', 'on.stdout', sub {
+  my ($tryable) = @_;
+
+  $test->type(my $result = $tryable->result, 'Venus::Process');
+
+  $result
+});
+
 =operator ("")
 
 This package overloads the C<""> operator.
@@ -5591,614 +5744,6 @@ $test->for('operator', '(~~)');
 
 $test->for('example', 1, '(~~)', sub {
   1;
-});
-
-=error error_on_chdir
-
-This package may raise an error_on_chdir exception.
-
-=cut
-
-$test->for('error', 'error_on_chdir');
-
-=example-1 error_on_chdir
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_chdir',
-    error => $!,
-    path => '/nowhere',
-    pid => 123,
-  };
-
-  my $error = $parent->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_chdir"
-
-  # my $message = $error->render;
-
-  # "Can't chdir \"$path\": $!"
-
-  # my $path = $error->stash('path');
-
-  # "/nowhere"
-
-  # my $pid = $error->stash('pid');
-
-  # 123
-
-=cut
-
-$test->for('example', 1, 'error_on_chdir', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_chdir";
-  my $message = $result->render;
-  is $message, "Can't chdir \"/nowhere\": $!";
-  my $path = $result->stash('path');
-  is $path, "/nowhere";
-  my $pid = $result->stash('pid');
-  is $pid, 123;
-
-  $result
-});
-
-=error error_on_fork_process
-
-This package may raise an error_on_fork_process exception.
-
-=cut
-
-$test->for('error', 'error_on_fork_process');
-
-=example-1 error_on_fork_process
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_fork_process',
-    error => $!,
-    pid => 123,
-  };
-
-  my $error = $parent->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_fork_process"
-
-  # my $message = $error->render;
-
-  # "Can't fork process $pid: $!"
-
-  # my $pid = $error->stash('pid');
-
-  # "123"
-
-=cut
-
-$test->for('example', 1, 'error_on_fork_process', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_fork_process";
-  my $message = $result->render;
-  is $message, "Can't fork process 123: $!";
-  my $pid = $result->stash('pid');
-  is $pid, "123";
-
-  $result
-});
-
-=error error_on_fork_support
-
-This package may raise an error_on_fork_support exception.
-
-=cut
-
-$test->for('error', 'error_on_fork_support');
-
-=example-1 error_on_fork_support
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_fork_support',
-    pid => 123,
-  };
-
-  my $error = $parent->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_fork_support"
-
-  # my $message = $error->render;
-
-  # "Can't fork process $pid: Fork emulation not supported"
-
-  # my $pid = $error->stash('pid');
-
-  # 123
-
-=cut
-
-$test->for('example', 1, 'error_on_fork_support', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_fork_support";
-  my $message = $result->render;
-  is $message, "Can't fork process 123: Fork emulation not supported";
-  my $pid = $result->stash('pid');
-  is $pid, 123;
-
-  $result
-});
-
-=error error_on_ping
-
-This package may raise an error_on_ping exception.
-
-=cut
-
-$test->for('error', 'error_on_ping');
-
-=example-1 error_on_ping
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_ping',
-    pid => 123,
-  };
-
-  my $error = $parent->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_ping"
-
-  # my $message = $error->render;
-
-  # "Process 123 not responding to ping"
-
-  # my $pid = $error->stash('pid');
-
-  # "123"
-
-=cut
-
-$test->for('example', 1, 'error_on_ping', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_ping";
-  my $message = $result->render;
-  is $message, "Process 123 not responding to ping";
-  my $pid = $result->stash('pid');
-  is $pid, "123";
-
-  $result
-});
-
-=error error_on_setid
-
-This package may raise an error_on_setid exception.
-
-=cut
-
-$test->for('error', 'error_on_setid');
-
-=example-1 error_on_setid
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_setid',
-    error => $!,
-    pid => 123,
-  };
-
-  my $error = $parent->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_setid"
-
-  # my $message = $error->render;
-
-  # "Can't start a new session: $!"
-
-  # my $pid = $error->stash('pid');
-
-  # 123
-
-=cut
-
-$test->for('example', 1, 'error_on_setid', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_setid";
-  my $message = $result->render;
-  is $message, "Can't start a new session: $!";
-  my $pid = $result->stash('pid');
-  is $pid, 123;
-
-  $result
-});
-
-=error error_on_stderr
-
-This package may raise an error_on_stderr exception.
-
-=cut
-
-$test->for('error', 'error_on_stderr');
-
-=example-1 error_on_stderr
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_stderr',
-    error => $!,
-    path => "/nowhere",
-    pid => 123,
-  };
-
-  my $error = $parent->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_stderr"
-
-  # my $message = $error->render;
-
-  # "Can't redirect STDERR to \"/nowhere\": $!"
-
-  # my $path = $error->stash('path');
-
-  # "/nowhere"
-
-  # my $pid = $error->stash('pid');
-
-  # 123
-
-=cut
-
-$test->for('example', 1, 'error_on_stderr', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_stderr";
-  my $message = $result->render;
-  is $message, "Can't redirect STDERR to \"/nowhere\": $!";
-  my $path = $result->stash('path');
-  is $path, "/nowhere";
-  my $pid = $result->stash('pid');
-  is $pid, 123;
-
-  $result
-});
-
-=error error_on_stdin
-
-This package may raise an error_on_stdin exception.
-
-=cut
-
-$test->for('error', 'error_on_stdin');
-
-=example-1 error_on_stdin
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_stdin',
-    error => $!,
-    path => "/nowhere",
-    pid => 123,
-  };
-
-  my $error = $parent->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_stdin"
-
-  # my $message = $error->render;
-
-  # "Can't redirect STDIN to \"$path\": $!"
-
-  # my $path = $error->stash('path');
-
-  # "/nowhere"
-
-  # my $pid = $error->stash('pid');
-
-  # 123
-
-=cut
-
-$test->for('example', 1, 'error_on_stdin', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_stdin";
-  my $message = $result->render;
-  is $message, "Can't redirect STDIN to \"/nowhere\": $!";
-  my $path = $result->stash('path');
-  is $path, "/nowhere";
-  my $pid = $result->stash('pid');
-  is $pid, 123;
-
-  $result
-});
-
-=error error_on_stdout
-
-This package may raise an error_on_stdout exception.
-
-=cut
-
-$test->for('error', 'error_on_stdout');
-
-=example-1 error_on_stdout
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_stdout',
-    error => $!,
-    path => "/nowhere",
-    pid => 123,
-  };
-
-  my $error = $parent->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_stdout"
-
-  # my $message = $error->render;
-
-  # "Can't redirect STDOUT to \"$path\": $!"
-
-  # my $path = $error->stash('path');
-
-  # "/nowhere"
-
-  # my $pid = $error->stash('pid');
-
-  # 123
-
-=cut
-
-$test->for('example', 1, 'error_on_stdout', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_stdout";
-  my $message = $result->render;
-  is $message, "Can't redirect STDOUT to \"/nowhere\": $!";
-  my $path = $result->stash('path');
-  is $path, "/nowhere";
-  my $pid = $result->stash('pid');
-  is $pid, 123;
-
-  $result
-});
-
-=error error_on_timeout_poll
-
-This package may raise an error_on_timeout_poll exception.
-
-=cut
-
-$test->for('error', 'error_on_timeout_poll');
-
-=example-1 error_on_timeout_poll
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_timeout_poll',
-    code => sub{},
-    timeout => 0,
-  };
-
-  my $error = $parent->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_timeout_poll"
-
-  # my $message = $error->render;
-
-  # "Timed out after 0 seconds in process 12345 while polling __ANON__"
-
-  # my $code = $error->stash('code');
-
-  # sub{}
-
-  # my $exchange = $error->stash('exchange');
-
-  # undef
-
-  # my $pid = $error->stash('pid');
-
-  # 12345
-
-  # my $timeout = $error->stash('timeout');
-
-  # 0
-
-=cut
-
-$test->for('example', 1, 'error_on_timeout_poll', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_timeout_poll";
-  my $message = $result->render;
-  is $message, "Timed out after 0 seconds in process 12345 while polling __ANON__";
-  my $code = $result->stash('code');
-  ok ref $code, 'CODE';
-  my $exchange = $result->stash('exchange');
-  is $exchange, undef;
-  my $pid = $result->stash('pid');
-  is $pid, 12345;
-  my $timeout = $result->stash('timeout');
-  is $timeout, 0;
-
-  $result
-});
-
-=error error_on_timeout_pool
-
-This package may raise an error_on_timeout_pool exception.
-
-=cut
-
-$test->for('error', 'error_on_timeout_pool');
-
-=example-1 error_on_timeout_pool
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_timeout_pool',
-    pool_size => 2,
-    timeout => 0,
-  };
-
-  my $error = $parent->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_timeout_pool"
-
-  # my $message = $error->render;
-
-  # "Timed out after 0 seconds in process 12345 while pooling"
-
-  # my $exchange = $error->stash('exchange');
-
-  # undef
-
-  # my $pid = $error->stash('pid');
-
-  # 12345
-
-  # my $pool_size = $error->stash('pool_size');
-
-  # 2
-
-  # my $timeout = $error->stash('timeout');
-
-  # 0
-
-=cut
-
-$test->for('example', 1, 'error_on_timeout_pool', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_timeout_pool";
-  my $message = $result->render;
-  is $message, "Timed out after 0 seconds in process 12345 while pooling";
-  my $exchange = $result->stash('exchange');
-  is $exchange, undef;
-  my $pid = $result->stash('pid');
-  is $pid, 12345;
-  my $pool_size = $result->stash('pool_size');
-  is $pool_size, 2;
-  my $timeout = $result->stash('timeout');
-  is $timeout, 0;
-
-  $result
-});
-
-=error error_on_timeout_sync
-
-This package may raise an error_on_timeout_sync exception.
-
-=cut
-
-$test->for('error', 'error_on_timeout_sync');
-
-=example-1 error_on_timeout_sync
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_timeout_sync',
-    pool_size => 2,
-    timeout => 0,
-  };
-
-  my $error = $parent->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_timeout_sync"
-
-  # my $message = $error->render;
-
-  # "Timed out after 0 seconds in process 12345 while syncing"
-
-  # my $exchange = $error->stash('exchange');
-
-  # undef
-
-  # my $pid = $error->stash('pid');
-
-  # 12345
-
-  # my $pool_size = $error->stash('pool_size');
-
-  # 2
-
-  # my $timeout = $error->stash('timeout');
-
-  # 0
-
-=cut
-
-$test->for('example', 1, 'error_on_timeout_sync', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
-  is $name, "on_timeout_sync";
-  my $message = $result->render;
-  is $message, "Timed out after 0 seconds in process 12345 while syncing";
-  my $exchange = $result->stash('exchange');
-  is $exchange, undef;
-  my $pid = $result->stash('pid');
-  is $pid, 12345;
-  my $pool_size = $result->stash('pool_size');
-  is $pool_size, 2;
-  my $timeout = $result->stash('timeout');
-  is $timeout, 0;
-
-  $result
 });
 
 =partials

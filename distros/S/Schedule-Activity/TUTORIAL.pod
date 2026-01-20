@@ -262,7 +262,7 @@ Additional examples, such as the Exercise related messages, can be found in C<sa
 
 =head2 Open for Improvement
 
-As of version 0.1.9, some of the attributes can not be ideally configured.  For example:
+Some of the attributes can not be ideally configured.  For example:
 
   {
     nodes  =>qr/^Chores, small$/,
@@ -278,7 +278,7 @@ This does provide the indicated message but it can occur in an undesirable locat
   00:08:40 Only 3 minutes to go!
   00:11:50 Start small chore 2
 
-While this is accurate, the preferred behavior is to place this note after the start of a large chore.  This requires adding an attribute to small chores (which is supported) to be used to prevent the annotation.  As of 0.1.9, however, annotations do not support I<filtering> by attributes, so the above is the best configuration assuming manual review of generated schedules.
+While this is accurate, the preferred behavior is to place this note after the start of a large chore.  This requires adding an attribute to small chores (which is supported) to be used to prevent the annotation.  Annotations do not support I<filtering> by attributes, however, so the above is the best configuration assuming manual review of generated schedules.
 
 A note can be placed after the start of large chore, for example "Ten minutes down, almost there!", and it will appear if the action is at least ten minutes long.
 

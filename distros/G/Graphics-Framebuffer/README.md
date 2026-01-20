@@ -2,17 +2,17 @@
 
 [![Graphics::Framebuffer Logo](GFB.png?raw=true "Graphics::Framebuffer")](https://youtu.be/qU5IFmtHmUo)
 
-### Windows Incompatibility
+### Windows Incompatibility, Linux Only
 
-![Windows Incompatible](Win-No.png?raw=true "Windows Incompatible")
+![Windows Incompatible](Win-No.png?raw=true "Windows Incompatible") ![Linux Logo](Linux.png?raw=true "Linux Only")
 
 Note, this module does NOT work (natively) in Microsoft Windows.  It will only function in "emulation" mode, and you will not see any screen output.  See the documentation on emulation mode for more details.
 
-Use a Virtual Machine like VirtualBox to use on Windows, with a Linux distribution installed.
+Use a Virtual Machine like VirtualBox or Docker to use on Windows, with a Linux distribution installed.
 
 ## PREREQUISITES
 
-This module was developed for Linux and only Linux.
+This module was developed for Linux and only Linux; not because of some fanatical appreciation for Linux, but because of how it accesses a Linux framebuffer.  If you know how to get it to work on Windows, Darwin, or even FreeBSD, then let me know how to do it.  Meanwwhile, it's Linux only.
 
 This module REQUIRES access to the video framebuffer, usually "/dev/fb0".  You must be using a video device and driver that exposes this device to software.  Video cards with their proprietary drivers are not likely to work.  However, most open-sourced drivers, seem to work fine.  VirtualBox drivers work too.  You must also have the appropriate permissions to write to this device (usually membership with group "video").
 
@@ -27,6 +27,14 @@ I highly recommend you install the system (or package) version of the "Imager" l
 The "build-essential" tools need to be installed. This is generally a C compiler, linker, and standard C libraries (usually gcc variety).  The module "Inline::C", which this module uses, requires it.  Also, the package "kernel-headers".
 
 You should also install typical TTF fonts as well.  I suggest the FreeType fonts, the Windows fonts (fonts-wine), Ubuntu fonts (fonts-ubuntu) and anything else you wish to use.
+
+## OPERATIONAL THEORY
+
+Linux has a special graphics mode it originally used since its early days called the framebuffer.  It allowed software to draw to the screen without special drivers (as originally Linux didn't have graphics drivers).  All operations were CPU driven.
+
+Graphics::Framebuffer exploits this feature and allows you to draw to the Linux screen without the overhead and complexity of a GPU driver.  It makes things nearly as easy to draw as they were on old 8 bit computers.
+
+On Linux, everything is treated as a file path, even hardware.  The framebuffer is just a file that is mapped directly to a Perl string variable.  The way things are "drawn" are by modifying this string.  In the early days of this module, everything was done strictly in Perl and it worked (you can still do that by turning C acceleration off).  However, I have added C code to make things faster.  Since accessing the framebuffer is strictly a CPU operation, you do not have hardware accelerated drawing.  Everything is done by the CPU.  However, today's CPUs are quite fast, even most ARM CPUs and the C code makes it quite fast.
 
 ## INSTALLATION
 
@@ -90,32 +98,6 @@ Mario Roy's MCE test scripts have been added (well, a script to go get them) to 
 
 There is a script template in the ```examples``` directory in this package.  You can use it as a starting point for your script.  It is conveniently called ```template.pl``` or ```threaded_template.pl```.  I recommend copying it, renaming it, and leaving the original template intact for use on another project.
 
-## COMPATIBILITY vs. SPEED
-
-This module, suprisingly, runs on a variety of hardware with accessible framebuffer devices.  The only limitation is CPU power.  Why CPU power?  The module uses the CPU for its graphics calculations and drawing, not the GPU.  There are very little framebuffer drivers that use the GPU for anything, and thus no reliable libraries for calling the GPU at the framebuffer level.
-
-Some lower clocked ARM devices may be too slow for practical use of all of the methods in this module, but the best way to find out is to run ```examples/primitives.pl``` to see which are fast enough to use.
-
-Here's what I have tested this module on (all at least 1920x1080x32):
-
-* **Raspberry PI2/3** - Tollerable, I did 16 bit mode testing and coding on this machine.  Using a Perlbrew custom compiled Perl helps a bit.  The Raspberry PI are configured, by default, to be in 16 bit graphics mode.  This is not the best mode if you are going to be loading images or rendering TrueType text, as color space conversions can take a long time (with acceleration off).  Overall, 32 bit mode works best on this machine, especially for image loading and text rendering.  This performance limitation can, however, be minimized using the C acceleration features, if you still wish to use the 16 bit display mode.
-
-* **Odroid XU3/XU4** - Surprisingly fast.  All methods plenty fast enough for heavy use.  Works great with threads too, 8 of them (when done properly).  Most early coding for this module was done on this machine at 1920x1080x32.  This is fast enough for full screen (1920 x 1080 or less) animations at 30 fps.  If your resolution is lower, then your FPS rating will be higher.
-
-* **Atom 1.60 GHz with NVidia Nouveau driver** - Decent, not nearly as fast as the Odroid XU3/4.  Works good with threads too (when done properly).  Great for normal graphical apps and static displayed output.  Recent versions of the Nouveau framebuffer driver have become noticably slower now days though.
-
-* **2.6 GHz MacBook with VirtualBox** - Blazingly fast. Most primitives draw nearly instantly.
-
-* **Windows 10 PC with VirtualBox, 4 GHz 6 core i7 CPU and 2 NVidia 970 Ti's** - Holy cow!  No, seriously, this sucker is fast!  I wonder how much faster if it were running Linux natively?  In addition, 3840x2160x32 (4K) is surprisingly fast.  Who'd have thought?  Full screen animations were choppy, but everything else was plenty fast enough.
-
-* **Native Linux Mint with 4.2 GHz 6 core i7 CPU and 2 NVidia 1080 Ti's** - This is how I found out that the Nouveau driver is very poor when handling a framebuffer.  It's actually disgraceful at how bad and how slow it really is.  It doesn't appear to be using any DMA for the memory copy of the framebuffer, but CPU itself for transfers.  Running Virtual Box on Windows is much faster than running Linux natively with the Nouveau framebuffer drivers.  Sad, really sad.
-
-* **NVidia Jetson Nano with 4GB of RAM** - Plenty zippy.  I am quite pleased with this offering by NVidia.
-
-* **Windows 11 PC with Virtualbox, 5 GHz 12 core AMD Ryzen 9900X with GeForce RTX 4080 Ti GPU** - Amazingly fast.  I have Linux installed on VirtualBox as an EFI OS.  I have the EFI resolution set to 3840x2160.  You can use the "ExtraData" section in the "vbox" description file to set that up.  For example:
-
-  * ```<ExtraDataItem name="VBoxInternal2/EfiGraphicsResolution" value="3840x2160"/>```
-
 ## SUPPORT AND DOCUMENTATION
 
 After installing, you can find documentation for this module with the 'perldoc' command.
@@ -141,6 +123,8 @@ You can also look for information at:
 * **GitHub** - https://github.com/richcsst/Graphics-Framebuffer
 
 * **GitHub Clone** - https://github.com/richcsst/Graphics-Framebuffer.git
+
+* **Mario Roy's Multiprocessing Examples** - https://github.com/marioroy/mce-examples 
 
 ## LICENSE AND COPYRIGHT
 

@@ -340,3 +340,11 @@
 1.83    Jan 18, 2026
 
         Removed the need for Term::ANSIScreen.
+
+1.84    Jan 19, 2026
+
+        Minor changes in the executable.
+
+1.85    Jan 19, 2026
+
+        Many changes to Makefile.PL, README.md and ansi-encode

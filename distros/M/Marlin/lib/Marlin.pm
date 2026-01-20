@@ -6,7 +6,7 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016000';
+our $VERSION   = '0.020000';
 
 use constant { true => !!1, false => !!0 };
 use Types::Common qw( -is -types to_TypeTiny );
@@ -32,20 +32,20 @@ use constant _ATTRS => (
 	short_name                => { isa => NonEmptyStr,              builder => '_build_short_name' },
 );
 
-use Class::XSReader       _ATTRS;
 use Class::XSConstructor  _ATTRS, '!!';
+use Class::XSReader       _ATTRS;
 use Class::XSDestructor;
 
 use B                     ();
 use B::Hooks::AtRuntime   ();
-use List::Util 1.45       qw( uniqstr );
+use List::Util            ();
 use Marlin::Util          ();
 use Scalar::Util          ();
 use Sub::Accessor::Small  ();
 
 use constant {
 	_HAS_NATIVE_LEXICAL_SUB  => !!( "$]" >= 5.037002 ),
-	_HAS_MODULE_LEXICAL_SUB  => !!( "$]" >= 5.011002 and eval('require Lexical::Sub; 1') ),
+	_HAS_MODULE_LEXICAL_SUB  => !!( "$]" >= 5.011002 and eval 'require Lexical::Sub; 1' ),
 	_NEEDS_MRO_COMPAT        => !!( "$]" < 5.010 ),
 };
 
@@ -121,8 +121,6 @@ sub try_inhale {
 				%{ $_->{spec} },
 				isa      => $_->{type},
 			);
-			# minor hack
-			$spec{':Alias'} = delete $spec{alias} if exists $spec{alias};
 			\%spec;
 		} @{ $xscon_meta->{params} or [] };
 		
@@ -170,8 +168,8 @@ sub try_inhale {
 				this         => $k,
 				attributes   => \@attrs,
 				parents      => [ map [ $_ ], @{"$k\::ISA"} ],
-				roles        => [ map [ $_ ], uniqstr( map { $_->name } @{ $moose_meta->roles } ) ],
-				strict       => !!Moose::Util::does_role($moose_meta, 'MooseX::StrictConstructor::Trait::Class'),
+				roles        => [ map [ $_ ], List::Util::uniqstr( map { $_->name } @{ $moose_meta->roles } ) ],
+				strict       => !!Moose::Util::does_role( $moose_meta, 'MooseX::StrictConstructor::Trait::Class' ),
 				constructor  => $moose_meta->constructor_name,
 				inhaled_from => 'Moose',
 				short_name   => $k_short,
@@ -197,7 +195,7 @@ sub try_inhale {
 			'Marlin::Role'->new( {
 				this         => $k,
 				attributes   => \@attrs,
-				roles        => [ map [ $_ ], uniqstr( map { $_->name } @{ $moose_meta->get_roles } ) ],
+				roles        => [ map [ $_ ], List::Util::uniqstr( map { $_->name } @{ $moose_meta->get_roles } ) ],
 				inhaled_from => 'Moose::Role',
 			} )->store_meta;
 			
@@ -221,7 +219,7 @@ sub try_inhale {
 			attributes   => \@attr,
 			parents      => [ map [ $_ ], @{"$k\::ISA"} ],
 			roles        => [ map [ $_ ], keys %{ $Role::Tiny::APPLIED_TO{$k} } ],
-			strict       => Moo::Role::does_role($maker, 'MooX::StrictConstructor::Role::Constructor::Base'),
+			strict       => Moo::Role::does_role( $maker, 'MooX::StrictConstructor::Role::Constructor::Base' ),
 			inhaled_from => 'Moo',
 			short_name   => $k_short,
 		} )->store_meta;
@@ -277,7 +275,7 @@ sub try_inhale {
 				this         => $k,
 				attributes   => \@attrs,
 				parents      => [ map [ $_ ], @{"$k\::ISA"} ],
-				roles        => [ map [ $_ ], uniqstr( map { $_->name } @{ $mouse_meta->roles } ) ],
+				roles        => [ map [ $_ ], List::Util::uniqstr( map { $_->name } @{ $mouse_meta->roles } ) ],
 				strict       => !!eval { $mouse_meta->strict_constructor },
 				constructor  => $mouse_meta->{constructor_name} || 'new',
 				inhaled_from => 'Mouse',
@@ -305,7 +303,7 @@ sub try_inhale {
 			'Marlin::Role'->new( {
 				this         => $k,
 				attributes   => \@attrs,
-				roles        => [ map [ $_ ], uniqstr( map { $_->name } @{ $mouse_meta->get_roles } ) ],
+				roles        => [ map [ $_ ], List::Util::uniqstr( map { $_->name } @{ $mouse_meta->get_roles } ) ],
 				inhaled_from => 'Mouse::Role',
 			} )->store_meta;
 			
@@ -612,7 +610,7 @@ sub setup_inheritance {
 		no strict 'refs';
 		\@{sprintf("%s::ISA", $me->this)};
 	};
-	@$ISA = uniqstr( @$ISA, @parents );
+	@$ISA = List::Util::uniqstr( @$ISA, @parents );
 	
 	return $me;
 }
@@ -620,7 +618,7 @@ sub setup_inheritance {
 sub setup_roles {
 	my $me = shift;
 	
-	my @roles = uniqstr(
+	my @roles = List::Util::uniqstr(
 		map {
 			my ( $pkg, $ver ) = @$_;
 			&Marlin::Util::_use_package_optimistically( $pkg, defined($ver) ? $ver : () );
@@ -1162,6 +1160,8 @@ sub setup_cleanups {
 	}
 }
 
+no Types::Common;
+
 __PACKAGE__
 __END__
 
@@ -1456,6 +1456,26 @@ default name for your predicate by adding "_has" to the front of attributes that
 have a leading underscore and "has_" otherwise.
 
 Supports the same lexical method possibilities as C<reader>.
+
+=item C<< alias >> and C<< alias_for >>
+
+Allows you to establish aliases for an attribute.
+
+  use Marlin
+    name => {
+      required   => true,
+      isa        => Str,
+      alias      => [ 'moniker', 'label' ],
+    }, ...;
+
+Aliases are accepted in the constructor and also additional reader methods
+(or accessor methods for C<< is => 'rw' >> attributes) are installed for
+each alias.
+
+You can use C<< alias_for => 'reader' >> or C<< alias_for => 'accessor' >>
+to override which type of method is installed (though not on a per-alias
+basis). Technically it's possible to create writer/predicate/clearer aliases
+but that would be weird.
 
 =item C<< builder >>, C<< default >>, and C<< lazy >>
 
@@ -2194,7 +2214,8 @@ L<Marlin::Manual::Comparison>.
 
 Example extensions:
 L<Marlin::X::Clone>,
-L<Marlin::XAttribute::Alias>,
+L<Marlin::X::ToHash>,
+L<Marlin::X::UndefTolerant>,
 L<Marlin::XAttribute::LocalWriter>,
 L<Marlin::XAttribute::Lvalue>.
 

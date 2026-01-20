@@ -3,7 +3,7 @@
 
 
 package BeamerReveal;
-our $VERSION = '20260111.1557'; # VERSION
+our $VERSION = '20260119.1636'; # VERSION
 
 use strict;
 use warnings;
@@ -59,7 +59,7 @@ BeamerReveal - BeamerReveal
 
 =head1 VERSION
 
-version 20260111.1557
+version 20260119.1636
 
 =head1 SYNOPSIS
 

@@ -4,9 +4,17 @@ use Alien::ggml;
 
 alien_ok 'Alien::ggml';
 
+diag "Install type: " . Alien::ggml->install_type;
+diag "Libs: " . Alien::ggml->libs;
+
 SKIP: {
+    # Skip XS test on macOS due to @rpath security restrictions
     skip 'XS test skipped on macOS due to @rpath security restrictions', 1
         if $^O eq 'darwin';
+    
+    skip 'XS runtime loading test skipped for share install (see Alien::Build::Manual::FAQ)', 1
+        if $^O eq 'linux' && Alien::ggml->install_type eq 'share';
+    
     xs_ok do { local $/; <DATA> }, with_subtest { ok(1) };
 }
 

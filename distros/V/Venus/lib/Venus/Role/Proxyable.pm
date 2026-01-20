@@ -5,7 +5,25 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Role 'with';
+
+# BUILDERS
+
+sub BUILDPROXY {
+  require Venus::Error;
+
+  my ($package, $method, $self, @args) = @_;
+
+  my $build = $self->can('build_proxy');
+
+  return $build->($self, $package, $method, @args) if $build;
+
+  my $error = qq(Can't locate object method "build_proxy" via package "$package");
+
+  Venus::Error->throw($error);
+}
 
 # METHODS
 
@@ -25,20 +43,6 @@ sub AUTOLOAD {
   Venus::Error->throw($error) unless $proxy && ref($proxy) eq 'CODE';
 
   goto &$proxy;
-}
-
-sub BUILDPROXY {
-  require Venus::Error;
-
-  my ($package, $method, $self, @args) = @_;
-
-  my $build = $self->can('build_proxy');
-
-  return $build->($self, $package, $method, @args) if $build;
-
-  my $error = qq(Can't locate object method "build_proxy" via package "$package");
-
-  Venus::Error->throw($error);
 }
 
 # EXPORTS

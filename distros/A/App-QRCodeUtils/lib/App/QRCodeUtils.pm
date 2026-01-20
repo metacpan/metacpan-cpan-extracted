@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-04-18'; # DATE
+our $DATE = '2026-01-20'; # DATE
 our $DIST = 'App-QRCodeUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our %SPEC;
 
@@ -59,6 +59,11 @@ MARKDOWN
             schema => ['str*', in=>[qw/png html txt/]],
             default => 'png',
         },
+        level => {
+            summary => 'Error correction level',
+            schema => ['str*', in=>['L', 'M', 'Q', 'H']],
+            default => 'M',
+        },
     },
     examples => [
     ],
@@ -79,6 +84,7 @@ sub gen_qrcode {
         format => $format,
         text => $args{text},
         filename => $filename,
+        level => $args{level},
     );
     return $res unless $res->[0] == 200;
 
@@ -103,7 +109,7 @@ App::QRCodeUtils - Utilities related to QR Code
 
 =head1 VERSION
 
-This document describes version 0.004 of App::QRCodeUtils (from Perl distribution App-QRCodeUtils), released on 2024-04-18.
+This document describes version 0.005 of App::QRCodeUtils (from Perl distribution App-QRCodeUtils), released on 2026-01-20.
 
 =head1 DESCRIPTION
 
@@ -177,6 +183,10 @@ L<Desktop::Open>.
 
 (No description)
 
+=item * B<level> => I<str> (default: "M")
+
+Error correction level.
+
 =item * B<text>* => I<str>
 
 (No description)
@@ -231,7 +241,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2021, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

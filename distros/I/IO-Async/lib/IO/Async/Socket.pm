@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Socket 0.804;
+package IO::Async::Socket 0.805;
 
 use v5.14;
 use warnings;
@@ -20,6 +20,8 @@ C<IO::Async::Socket> - event callbacks and send buffering for a socket
 filehandle
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Future::AsyncAwait;
    use IO::Async::Socket;

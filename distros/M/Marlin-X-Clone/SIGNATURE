@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 b3e92a009c0fafbbd8e4ce93b22fbf90d52748e597b1c1ed904884b576cbafd7 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 48f156ca2afcb1e05d16ac57b4b84b87155d37b6f6975ff1db72049974d00d9b Changes
+SHA256 38a6ee5f8ca6bd2e904ee8953cc1bbc30c6a1897c4b13f97272f315d8b7e5f5a INSTALL
+SHA256 ca1cc40b3da7bebb1b0368764650ad38ac603b31a25fbc5b6f9fb217cc6fa1e8 LICENSE
+SHA256 86af5188c1fd9029dbdbe11442574ec2a4cac6908314f2612313dce854a50931 MANIFEST
+SHA256 33750cea545fb576f2b12ae785c72feebac69f785081ee5706b53b2bcb7fa32f META.json
+SHA256 0774ae9a8f9aa10352e15ecbd7c0c107eceabef0857c6ad4311d47e7c7a7fc21 META.yml
+SHA256 e0d201fbfe6181c229398a1e2149d7e3acd0c83920fad5990996509861dc6c11 Makefile.PL
+SHA256 5699a5b1e03c3bc06f9294463ab6a8f5281f1ccb6f058cc784d9a0fb750f2b65 README
+SHA256 0c7d2e5e7512accc59029907807444836d9a35b545c93ce8b827be2abb6ed196 dist.ini
+SHA256 32f37b0b74a0f59b6cf6e5b47aef7f918f1dfa67e0facc6fc7bf9fa627844dde doap.ttl
+SHA256 648458ceb791f63dec459e6109ddcd5a05408e26fd6161d861dce981841569b1 lib/Marlin/X/Clone.pm
+SHA256 50491f89c9872e295e7f056a6ef7a64fef0aa8b1ca1c71cf2abd212fe48a6079 t/00start.t
+SHA256 0bf7344bfea88f9ba04e1b9ed368ccc63e5dcca196c736dd9ed5701e49cb346a t/01basic.t
+SHA256 82d1c806349b39836c7f2192e964072676840c7ed3ec0ca91bd18c466833f37b t/integration/simple.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCaW5ohwAKCRDOv4Eoaip9
+OVjzAKCuvvDoCgXEMDw/DoKFiFsEoGSlpwCglrjSM1Gz21Td1+RSSfpsq3eFpj4=
+=S0c/
+-----END PGP SIGNATURE-----

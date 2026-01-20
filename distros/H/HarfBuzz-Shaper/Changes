@@ -1,5 +1,14 @@
 Revision history for HarfBuzz::Shaper.
 
+0.033 2026-01-19
+
+   - Remove embedded harfbuzz code. Modern systems have functional
+     harfbuzz libraries and pkg-config tool.
+
+   - (GitHub) Update linux and macOS actions to use actions-setup-perl.
+
+   - (GitHub) Add windows action.
+
 0.032 2026-01-14
 
    - Upgrade embedded harfbuzz to 12.3.0 to fix CVE-2026-22693.

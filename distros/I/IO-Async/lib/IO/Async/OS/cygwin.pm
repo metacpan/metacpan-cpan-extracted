@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::OS::cygwin 0.804;
+package IO::Async::OS::cygwin 0.805;
 
 use v5.14;
 use warnings;

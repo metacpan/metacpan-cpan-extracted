@@ -52,10 +52,13 @@ eval {
     # Get result
     my $user = $future->get;
 
-    if ($user && ref $user eq 'HASH' && $user->{name} eq 'Direct Test') {
-        print "ok 3 - User created: $user->{id}\n";
+    # Check for Row object OR Hash (to be safe), and use name accessor
+    my $name = (ref $user eq 'HASH') ? $user->{name} : $user->name;
+
+    if ($user && $name eq 'Direct Test') {
+        print "ok 3 - User created: " . ($user->id // $user->{id}) . "\n";
     } else {
-        print "not ok 3 - User creation failed\n";
+        print "not ok 3 - User creation failed (Type: " . ref($user) . ")\n";
         exit 1;
     }
 

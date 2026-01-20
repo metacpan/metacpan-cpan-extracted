@@ -2,6 +2,7 @@ package Lugh::Model;
 
 use strict;
 use warnings;
+use Lugh;
 
 =head1 NAME
 
@@ -9,11 +10,11 @@ Lugh::Model - GGUF Model Loading and Tensor Access
 
 =head1 VERSION
 
-Version 0.01
+Version 0.08
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 

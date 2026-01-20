@@ -7,7 +7,6 @@ build_requires:
   Alien::Build::MM: '0.25'
   Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
   Alien::cmake3: '0.02'
-  Archive::Zip: '0'
   Config: '0'
   HTTP::Tiny: '0.044'
   IO::Socket::SSL: '1.56'
@@ -22,7 +21,7 @@ configure_requires:
   Alien::Build::Plugin::Build::CMake: '0.99'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,14 +35,13 @@ requires:
   Alien::Base: '2.38'
   Alien::Build: '0.25'
   perl: '5.008003'
-version: '0.06'
+version: '0.08'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.84'
   requires:
     share:
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
       Alien::cmake3: '0.02'
-      Archive::Zip: '0'
       Config: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
@@ -53,4 +51,4 @@ x_alienfile:
     system: {}
 x_contributors:
   - 'LNATION <email@lnation.org>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

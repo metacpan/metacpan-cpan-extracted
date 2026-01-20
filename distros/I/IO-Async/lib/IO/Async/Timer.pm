@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Timer 0.804;
+package IO::Async::Timer 0.805;
 
 use v5.14;
 use warnings;
@@ -16,6 +16,8 @@ use Carp;
 C<IO::Async::Timer> - base class for Notifiers that use timed delays
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 This module provides a subclass of L<IO::Async::Notifier> for implementing
 notifiers that use timed delays. For specific implementations, see one of the

@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -37,6 +38,7 @@ $test->for('abstract');
 =includes
 
 method: get
+method: new
 method: set
 
 =cut
@@ -164,6 +166,84 @@ $test->for('example', 2, 'get', sub {
 
   require Venus::Space;
   Venus::Space->new('Example')->unload;
+
+  $result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Sealed)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Sealed;
+
+  my $new = Venus::Sealed->new;
+
+  # bless(..., "Venus::Sealed")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Sealed');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Sealed;
+
+  my $new = Venus::Sealed->new('012345');
+
+  # bless(..., "Venus::Sealed")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Sealed');
+  ok $result->{scope};
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Sealed;
+
+  my $new = Venus::Sealed->new(value => '012345');
+
+  # bless(..., "Venus::Sealed")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Sealed');
+  ok $result->{scope};
 
   $result
 });

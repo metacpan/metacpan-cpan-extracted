@@ -5,6 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Role 'fault';
 
 # AUDITS
@@ -76,7 +78,11 @@ sub print_yaml {
 sub printer {
   my ($self, @args) = @_;
 
-  return CORE::print(STDOUT @args);
+  require Venus::Os;
+
+  Venus::Os->new->write('STDOUT', join '', @args);
+
+  return true;
 }
 
 sub say {

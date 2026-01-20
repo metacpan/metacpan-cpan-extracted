@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -37,15 +38,22 @@ $test->for('abstract');
 =includes
 
 method: clear
+method: count
 method: data
+method: defined
 method: expr
 method: just
+method: new
 method: none
+method: object
 method: only
+method: reduce
 method: result
 method: skip
 method: take
+method: test
 method: then
+method: type
 method: when
 method: where
 
@@ -173,6 +181,55 @@ $test->for('example', 1, 'clear', sub {
   $result
 });
 
+=method count
+
+The count method calls L</result> and returns the number of items gathered.
+
+=signature count
+
+  count(any $data) (number)
+
+=metadata count
+
+{
+  since => '4.15',
+}
+
+=example-1 count
+
+  package main;
+
+  use Venus::Gather;
+
+  my $gather = Venus::Gather->new([
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "zero",
+  ]);
+
+  $gather->expr(qr/^t/)->take;
+
+  my $result = $gather->count;
+
+  # 2
+
+=cut
+
+$test->for('example', 1, 'count', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, 2;
+
+  $result
+});
+
 =method data
 
 The data method takes a hashref (i.e. lookup table) and creates gather
@@ -267,6 +324,45 @@ $test->for('example', 2, 'data', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, [0];
+
+  $result
+});
+
+=method defined
+
+The defined method registers a L</when> condition which only allows matching if
+the value presented is C<defined>.
+
+=signature defined
+
+  defined() (Venus::Gather)
+
+=metadata defined
+
+{
+  since => '4.15',
+}
+
+=example-1 defined
+
+  package main;
+
+  use Venus::Gather;
+
+  my $gather = Venus::Gather->new;
+
+  $gather->defined->take;
+
+  my $result = $gather->result([0, "", undef, false]);
+
+  # [0, "", false]
+
+=cut
+
+$test->for('example', 1, 'defined', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [0, "", false];
 
   $result
 });
@@ -484,6 +580,128 @@ $test->for('example', 3, 'just', sub {
   $result
 });
 
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Gather)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Gather;
+
+  my $new = Venus::Gather->new;
+
+  # bless(..., "Venus::Gather")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Gather');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Gather;
+
+  my $new = Venus::Gather->new([
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "zero",
+  ]);
+
+  # bless(..., "Venus::Gather")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Gather');
+  is_deeply $result->value, [
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "zero",
+  ];
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Gather;
+
+  my $new = Venus::Gather->new(value => [
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "zero",
+  ]);
+
+  # bless(..., "Venus::Gather")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Gather');
+  is_deeply $result->value, [
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "zero",
+  ];
+
+  $result
+});
+
 =method none
 
 The none method registers a special condition that returns a result only when
@@ -595,6 +813,46 @@ $test->for('example', 2, 'none', sub {
   $result
 });
 
+=method object
+
+The object method registers a L</when> condition which only allows matching if
+the value presented is an object.
+
+=signature object
+
+  object() (Venus::Gather)
+
+=metadata object
+
+{
+  since => '4.15',
+}
+
+=example-1 object
+
+  package main;
+
+  use Venus::Gather;
+
+  my $gather = Venus::Gather->new;
+
+  $gather->object->take;
+
+  my $result = $gather->result([0, "", undef, false, bless{}]);
+
+  # [bless({}, 'main')]
+
+=cut
+
+$test->for('example', 1, 'object', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is scalar(@$result), 1;
+  ok $result->[0]->isa('main');
+
+  $result
+});
+
 =method only
 
 The only method registers a special condition that only allows matching on the
@@ -690,6 +948,60 @@ $test->for('example', 2, 'only', sub {
     "five",
     "nine",
   ];
+
+  $result
+});
+
+=method reduce
+
+The reduce method returns a new L<Venus::Gather> object using the values
+returned via the L</result> method.
+
+=signature reduce
+
+  reduce(any $data) (Venus::Gather)
+
+=metadata reduce
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 reduce
+
+  package main;
+
+  use Venus::Gather;
+
+  my $gather = Venus::Gather->new([
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "zero",
+  ]);
+
+  $gather->expr(qr/^s/)->take;
+
+  my $reduce = $gather->reduce;
+
+  # bless(..., "Venus::Gather")
+
+=cut
+
+$test->for('example', 1, 'reduce', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Gather');
+  my $value = $result->value;
+  is_deeply $value, ['six', 'seven'];
 
   $result
 });
@@ -1174,6 +1486,50 @@ $test->for('example', 2, 'then', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, [1,0];
+
+  $result
+});
+
+=method type
+
+The type method accepts a L<"type expression"|Venus::Type> and registers a
+L</when> condition which matches values conforming to the type expression
+specified.
+
+=signature type
+
+  type(string $expr) (Venus::Gather)
+
+=metadata type
+
+{
+  since => '4.15',
+}
+
+=example-1 type
+
+  package main;
+
+  use Venus::Gather;
+
+  my $gather = Venus::Gather->new([1, "1"]);
+
+  $gather->type('string');
+  $gather->then('string');
+
+  $gather->type('number');
+  $gather->then('number');
+
+  my $result = $gather->result;
+
+  # ["number", "string"]
+
+=cut
+
+$test->for('example', 1, 'type', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ["number", "string"];
 
   $result
 });

@@ -5,6 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Role 'with';
 
 # METHODS
@@ -92,7 +94,7 @@ This package provides the following methods:
   is_false(string | coderef $method, any @args) (boolean)
 
 The is_false method dispatches the method call or executes the callback and
-returns truthy returns as C<false> and falsy returns as C<true>
+returns truthy as C<false> and falsy returns as C<true>
 L<"boolean"|Venus::Boolean> values.
 
 I<Since C<0.08>>

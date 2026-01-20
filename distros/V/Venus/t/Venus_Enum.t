@@ -44,6 +44,7 @@ method: items
 method: list
 method: name
 method: names
+method: new
 method: value
 method: values
 
@@ -505,6 +506,85 @@ $test->for('example', 2, 'names', sub {
   is_deeply \@result, ["e", "n", "s", "w"];
 
   @result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Enum)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Enum;
+
+  my $new = Venus::Enum->new;
+
+  # bless(..., "Venus::Enum")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Enum');
+  ok $result->{scope};
+
+  !$result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Enum;
+
+  my $new = Venus::Enum->new(['n', 's', 'e', 'w']);
+
+  # bless(..., "Venus::Enum")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Enum');
+  ok $result->{scope};
+
+  !$result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Enum;
+
+  my $new = Venus::Enum->new(value => ['n', 's', 'e', 'w']);
+
+  # bless(..., "Venus::Enum")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Enum');
+  ok $result->{scope};
+
+  !$result
 });
 
 =method value

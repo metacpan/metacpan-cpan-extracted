@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+
+package main;
+
+use 5.018;
+
+use strict;
+use warnings;
+
+use lib 'lib';
+
+use Venus::Task::Venus::Gen;
+
+run Venus::Task::Venus::Gen 'vns-gen';
+
+=encoding utf8
+
+=head1 NAME
+
+vns-gen
+
+=head1 SYNOPSIS
+
+  vns-gen --help
+
+=head1 DESCRIPTION
+
+Generate Venus source code. This CLI dispatches to
+L<Venus::Task::Venus::Gen/perform>.
+
+=head1 EXAMPLES
+
+  # generate a Venus class
+  $ vns-gen --stdout --class
+
+Z<>
+
+  # generate a Venus test
+  $ vns-gen --stdout --test
+
+=head1 SEE ALSO
+
+L<Venus>, L<Venus::Task::Venus::Run>.
+
+=cut

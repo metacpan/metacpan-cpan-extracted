@@ -15,11 +15,11 @@ DBIx::Class::Async::Row - Asynchronous row object for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =cut
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 =head1 SYNOPSIS
 
@@ -129,17 +129,21 @@ sub new {
     croak "Missing required argument: row_data"    unless $args{row_data};
 
     my $in_storage = delete $args{in_storage} // 0;
+    my $data       = $args{row_data} || $args{_data} || {};
 
     my $self = bless {
         schema      => $args{schema},
         async_db    => $args{async_db},
         source_name => $args{source_name},
-        _source     => $args{_source}  // undef,
-        _data       => $args{row_data} || $args{_data} || {},
+        _source     => $args{_source} // undef,
+        _data       => { %$data },
         _dirty      => {},
         _inflated   => {},
         _related    => {},
         _in_storage => $in_storage,
+
+        # COMPATIBILITY HACK: Surface raw data to top-level
+        %$data
     }, $class;
 
     $self->_ensure_accessors;
@@ -233,27 +237,35 @@ sub copy {
     my ($self, $changes) = @_;
     $changes //= {};
 
-    # 1. Get all current data from the row
-    my %data = %{ $self->{_data} || {} };
-
-    # 2. Remove Primary Key columns so the DB creates a new record
-    # (or uses the replacement PK if provided in $changes)
     my $source = $self->_get_source;
-    my @pk     = $source->primary_columns;
-    foreach my $col (@pk) {
-        delete $data{$col} unless exists $changes->{$col};
+
+    # 1. Get ONLY keys that are valid database columns
+    my %data;
+    foreach my $col ($source->columns) {
+        # Check _data first (clean storage), then top-level (hack storage)
+        if (exists $self->{_data}{$col}) {
+            $data{$col} = $self->{_data}{$col};
+        }
+        elsif (exists $self->{$col}) {
+            # Ensure we don't accidentally copy our own management objects
+            # if a column happened to have the same name
+            next if $col =~ /^(?:async_db|schema|source_name|_source)$/;
+            $data{$col} = $self->{$col};
+        }
     }
 
-    # 3. Apply replacement data
+    # 2. Remove Primary Keys (unless specifically overridden in $changes)
+    foreach my $pk ($source->primary_columns) {
+        delete $data{$pk} unless exists $changes->{$pk};
+    }
+
+    # 3. Apply user changes
     foreach my $col (keys %$changes) {
         $data{$col} = $changes->{$col};
     }
 
-    # 4. Use the ResultSet to create the new record.
-    # This triggers new_result() which installs dynamic accessors
-    # and handles the async DB insert.
-    my $rs = $self->{schema}->resultset($self->{source_name});
-    return $rs->create(\%data);
+    # 4. Use the Async ResultSet to create
+    return $self->{async_db}->resultset($self->{source_name})->create(\%data);
 }
 
 =head2 create_related
@@ -388,8 +400,16 @@ sub discard_changes {
     )->then(sub {
         my ($fresh_data) = @_;
 
+        # Extract the raw data from the fresh data
+        my $raw_data = (ref($fresh_data) && $fresh_data->can('get_columns'))
+                            ? { $fresh_data->get_columns }
+                            : $fresh_data;
+
+        # If it's an arrayref (sometimes returned by search/find), take first
+        $raw_data = $raw_data->[0] if ref($raw_data) eq 'ARRAY';
+
         # Update our data
-        $self->{_data} = $fresh_data;
+        $self->{_data} = $raw_data;
         $self->{_dirty} = {};
 
         return Future->done($self);
@@ -429,6 +449,32 @@ Croaks if the column doesn't exist.
 
 sub get_column {
     my ($self, $col) = @_;
+
+    # 1. Return cached inflated value if it exists
+    return $self->{_inflated}{$col} if exists $self->{_inflated}{$col};
+
+    # 2. Check if the column exists in our raw data
+    if (ref $self->{_data} eq 'HASH' && exists $self->{_data}{$col}) {
+        my $raw_value = $self->{_data}{$col};
+        my $source    = $self->_get_source;
+
+        # 3. Handle Inflation Logic
+        if ($source && $source->has_column($col)) {
+            my $col_info = $source->column_info($col);
+
+            # Check for the 'inflate' subref (defined via inflate_column)
+            if (my $inflator = $col_info->{inflate}) {
+                # Only inflate if the value is defined
+                if (defined $raw_value) {
+                    $self->{_inflated}{$col} = $inflator->($raw_value, $self);
+                    return $self->{_inflated}{$col};
+                }
+            }
+        }
+
+        # If no inflator or value is undef, return the raw value
+        return $raw_value;
+    }
 
     # Direct column access first
     if (ref $self->{_data} eq 'HASH' && exists $self->{_data}{$col}) {
@@ -487,12 +533,20 @@ Hash containing all column names and values.
 
 sub get_columns {
     my $self = shift;
+    my $data = $self->{_data} || {};
 
-    # Return the hash if called in list context
-    return %{ $self->{_data} || {} } if wantarray;
+    # 1. Get the list of valid column names from the source
+    my @valid_cols = $self->_get_source->columns;
 
-    # Return the hashref if called in scalar context
-    return $self->{_data} || {};
+    # 2. Only extract keys that are actual database columns
+    my %cols;
+    foreach my $col (@valid_cols) {
+        if (exists $data->{$col}) {
+            $cols{$col} = $data->{$col};
+        }
+    }
+
+    return wantarray ? %cols : \%cols;
 }
 
 =head2 get_dirty_columns
@@ -921,7 +975,7 @@ sub related_resultset {
 
     my $search_cond = { $foreign_column => $value };
 
-    return $self->{schema}->resultset($moniker)->search($search_cond);
+    return $self->{async_db}->resultset($moniker)->search($search_cond);
 }
 
 =head2 result_source
@@ -1185,59 +1239,93 @@ sub update_or_insert {
     my $source      = $self->result_source;
     my ($pk_col)    = $source->primary_columns;
 
-    # 1. Update internal data with ad-hoc changes
+    # 1. Apply changes to the object
     if ($data && ref $data eq 'HASH') {
         foreach my $col (keys %$data) {
             $self->set_column($col, $data->{$col});
         }
     }
 
-    # 2. Determine path: UPDATE if in storage, otherwise INSERT
     my $is_update = $self->in_storage;
 
-    # 3. Collect payload
-    my %to_save;
-    if ($is_update) {
-        %to_save = $self->get_dirty_columns;
-        # If nothing changed, return self immediately
-        return Future->done($self) unless keys %to_save;
-    } else {
-        %to_save = %{ $self->{_data} // {} };
-    }
+    # 2. Prepare Payload
+    # We define this BEFORE the success handler so it is in scope for the closure
+    my %to_save = $is_update ? $self->get_dirty_columns : %{ $self->{_data} // {} };
 
-    # 4. Success handler to align internal state
+    # 3. Success handler
     my $on_success = sub {
         my ($res) = @_;
 
-        if (ref $res eq 'HASH'
-            && ($res->{error} || $res->{__error})) {
-            my $err = $res->{error} // $res->{__error};
-            return Future->fail($err, 'db_error');
+        if (ref $res && ref $res eq 'HASH' && ($res->{error} || $res->{__error})) {
+            return Future->fail($res->{error} // $res->{__error}, 'db_error');
         }
 
-        # Sync results (like auto-increment IDs) back into the object
-        my $final_data = (ref $res eq 'HASH') ? $res : \%to_save;
-        if (!$is_update && !ref $res && defined $res && $pk_col) {
-            $final_data->{$pk_col} = $res;
+        # Normalise data source
+        my $final_data;
+        if (ref $res && ref $res eq 'HASH') {
+            $final_data = $res;
+        }
+        elsif (ref $res && eval { $res->can('get_columns') }) {
+            # Handle case where $res is another Row object
+            my %cols = $res->get_columns;
+            $final_data = \%cols;
+        }
+        else {
+            # Scalar result (ID) or fallback
+            $final_data = { %to_save };
+            if (!$is_update && defined $res && !ref $res && $pk_col) {
+                $final_data->{$pk_col} = $res;
+            }
         }
 
-        # Sync internal _data hash
+        # Sync Loop
         foreach my $col (keys %$final_data) {
-            $self->{_data}{$col} = $final_data->{$col};
+            my $val  = $final_data->{$col};
+            my $info = $source->column_info($col);
+
+            my $raw_val = $val;
+            if ($info && $info->{deflate} && defined $val && !ref $val) {
+                $raw_val = $info->{deflate}->($val, $self);
+            }
+
+            $self->{_data}{$col} = $raw_val;
+            delete $self->{_inflated}{$col};
+            delete $self->{$col};
+        }
+
+        # Final safety for scalar PKs if not already set
+        if (!$is_update && defined $res && !ref $res && $pk_col) {
+             $self->{_data}{$pk_col} = $res;
         }
 
         $self->{_dirty} = {};     # Reset change tracking
         $self->in_storage(1);     # Mark as persisted in DB
-
         return Future->done($self);
     };
 
-    # 5. Dispatch to Worker
+    # 4. Dispatch
     if ($is_update) {
-        my $id_val = $self->get_column($pk_col);
-        return $async_db->update($source_name, $id_val, \%to_save)->then($on_success);
+        return Future->done($self) unless keys %to_save;
+
+        my $id_val = $self->{_data}{$pk_col}
+            // ( $self->can($pk_col) ? $self->$pk_col : undef )
+            // $self->{$pk_col};
+
+        if (ref $id_val && eval { $id_val->can('get_column') }) {
+            $id_val = $id_val->get_column($pk_col);
+        }
+
+        if (!defined $id_val) {
+            return Future->fail(
+                "Cannot update row: Primary key ($pk_col) is missing",
+                "logic_error");
+        }
+
+        return $async_db->update($source_name, $id_val, \%to_save)
+                        ->then($on_success);
     } else {
-        return $async_db->create($source_name, \%to_save)->then($on_success);
+        return $async_db->create($source_name, \%to_save)
+                        ->then($on_success);
     }
 }
 
@@ -1274,48 +1362,83 @@ sub AUTOLOAD {
     our $AUTOLOAD;
     my ($method) = $AUTOLOAD =~ /([^:]+)$/;
 
-    # 1. Immediate exit for DESTROY
-    # AWAIT_* methods are called by Future::AsyncAwait
-    # can/isa/etc should be handled by UNIVERSAL, but just in case:
-    return if $method =~ /^(?:DESTROY|AWAIT_\w+|can|isa)$/;
+    # 1. Immediate exit for core/Future methods
+    return if $method =~ /^(?:DESTROY|AWAIT_\w+|can|isa|then|get|on_\w+|failure|else)$/;
 
     my $source = $self->_get_source;
 
-    # 2. Handle Relationships
+    # 2. Handle Columns (Getter/Setter with Debugging)
+    if ($source && $source->has_column($method)) {
+        no strict 'refs';
+        no warnings 'redefine';
+
+        my $accessor = sub {
+            my ($inner_self, $new_val) = @_;
+            my $col_info = $inner_self->result_source->column_info($method);
+
+            # SETTER MODE
+            if (@_ > 1) {
+                delete $inner_self->{_inflated}{$method};
+                my $to_store = $new_val;
+
+                if ($col_info->{deflate} && defined $new_val) {
+                    $to_store = $col_info->{deflate}->($new_val, $inner_self);
+                }
+
+                $inner_self->set_column($method, $to_store);
+
+                if ($col_info->{inflate} && ref $new_val) {
+                    $inner_self->{_inflated}{$method} = $new_val;
+                }
+                return $new_val;
+            }
+
+            # GETTER MODE
+            return $inner_self->{_inflated}{$method} if exists $inner_self->{_inflated}{$method};
+
+            my $raw = $inner_self->get_column($method);
+            if ($col_info->{inflate} && defined $raw) {
+
+                # Check if the raw value is already in the 'inflated' format
+                # This is a safety check for DBs that return inflated strings
+                my $inflated = $col_info->{inflate}->($raw, $inner_self);
+
+                # If inflation resulted in a double-prefix (e.g. mailto:mailto:)
+                # then the $raw was already inflated. Use $raw instead.
+                if (!ref($inflated) && $inflated =~ /^mailto:mailto:/) {
+                    $inner_self->{_inflated}{$method} = $raw;
+                    return $raw;
+                }
+
+                $inner_self->{_inflated}{$method} = $inflated;
+                return $inflated;
+            }
+            return $raw;
+
+        };
+
+        *{ref($self) . "::$method"} = $accessor;
+        return $self->$method(@_);
+    }
+
+    # 3. Handle Relationships
     my $rel_info;
     if ($source && $source->can('relationship_info')) {
         $rel_info = $source->relationship_info($method);
     }
+
     if ($rel_info) {
-        my $accessor = $self->_build_relationship_accessor($method, $rel_info);
-        {
-            no strict 'refs';
-            no warnings 'redefine';
-            *{ref($self) . "::$method"} = $accessor;
-        }
-        return $accessor->($self, @_);
-    }
-
-    # 3. Handle Columns (Ensuring dirty tracking is triggered)
-    if ($source && $source->has_column($method)) {
-        my $accessor = sub {
-            my $inner_self = shift;
-            if (@_) {
-                # This ensures update_or_insert() knows there is work to do.
-                return $inner_self->set_column($method, @_);
-            }
-
-            return $inner_self->get_column($method);
+        # We found a relationship! Install our async version into the class
+        no strict 'refs';
+        no warnings 'redefine';
+        my $class = ref($self);
+        *{"${class}::$method"} = sub {
+            my ($inner_self, @args) = @_;
+            return $inner_self->_fetch_relationship_async($method, $rel_info, @args);
         };
 
-        {
-            no strict 'refs';
-            no warnings 'redefine';
-            # Install the accessor into the specific result class (e.g., Schema::Result::User)
-            # so AUTOLOAD doesn't have to run for this method next time.
-            *{ref($self) . "::$method"} = $accessor;
-        }
-        return $accessor->($self, @_);
+        # Now call the version we just installed
+        return $self->$method(@_);
     }
 
     # 4. Fallback for non-column data already in the buffer
@@ -1422,7 +1545,7 @@ sub _build_relationship_accessor {
                     return $prefetched_rs->search($extra_cond);
                 }
 
-                # Cache the prefetched ResultSet (only for base relationship, no extra conditions)
+                # Cache the prefetched ResultSet
                 $row->{_relationship_cache} ||= {};
                 $row->{_relationship_cache}{$rel_name} = $prefetched_rs;
 
@@ -1435,7 +1558,7 @@ sub _build_relationship_accessor {
                 my $rel_source = $row->_get_source->related_source($rel_name);
                 my $rs = $row->{schema}->resultset($rel_source->source_name)->search({});
 
-                # Don't cache if we couldn't extract FK (unusual case)
+                # Don't cache if we couldn't extract FK
                 return $rs;
             }
 
@@ -1444,8 +1567,7 @@ sub _build_relationship_accessor {
 
             # 4. Create new ResultSet for lazy loading
             my $rel_source = $row->_get_source->related_source($rel_name);
-            my $rs = $row->{schema}->resultset($rel_source->source_name)
-                ->search($related_cond);
+            my $rs = $row->{async_db}->resultset($rel_source->source_name);
 
             # 5. Cache the ResultSet (only if no extra conditions)
             if (!%$extra_cond) {
@@ -1477,37 +1599,83 @@ sub _ensure_accessors {
     my $source = $self->_get_source or return;
     my $class  = ref($self);
 
-    # If $class is just a string (not a reference), ref() returns empty.
-    # We only want to run this on blessed instances.
     return unless $class;
     return if $class eq 'DBIx::Class::Async::Row';
 
-    my @cols = $source->columns;
-    return unless @cols;
-
-    # Check if the first column already has a method in this specific package
-    # We use 'no strict refs' to check the symbol table directly
-    no strict 'refs';
-    return if defined &{"${class}::$cols[0]"};
-
-    # Use the source columns to ensure we cover all valid fields
+    # 1. Handle Columns
     foreach my $col ($source->columns) {
-        next if $source->can('relationship_info') && $source->relationship_info($col);
-
-        # CRITICAL: Create a fresh, unique copy for this specific iteration
-        my $column_name = $col;
-
         no strict 'refs';
-        no warnings 'redefine';
+        next if defined &{"${class}::$col"}; # Skip if already installed
 
+        my $column_name = $col;
+        no warnings 'redefine';
         *{"${class}::$column_name"} = sub {
             my $inner = shift;
-            # Use the PINNED variable, not the loop variable
-            if (@_) {
-                 return $inner->set_column($column_name, shift);
-            }
-            return $inner->get_column($column_name);
+            return @_ ? $inner->set_column($column_name, shift)
+                      : $inner->get_column($column_name);
         };
+    }
+
+    # 2. Handle Relationships
+    if ($source->can('relationships')) {
+        foreach my $rel ($source->relationships) {
+            no strict 'refs';
+            no warnings 'redefine';
+
+            # Force redefine even if it exists (to clobber DBIC's sync method)
+            my $rel_name = $rel;
+            my $rel_info = $source->relationship_info($rel_name);
+
+            *{"${class}::$rel_name"} = sub {
+                my ($inner, @args) = @_;
+                return $inner->_fetch_relationship_async($rel_name, $rel_info, @args);
+            };
+        }
+    }
+}
+
+sub _fetch_relationship_async {
+    my ($self, $rel_name, $rel_info, $attrs) = @_;
+
+    # 1. Handle Metadata first
+    $rel_info //= $self->_get_source->relationship_info($rel_name);
+    my $acc_type  = $rel_info->{attrs}{accessor} // '';
+    my $is_single = ($acc_type eq 'single' || $acc_type eq 'filter');
+
+    # 2. Cache Hit Logic
+    if (exists $self->{_related}{$rel_name}) {
+        my $cached = $self->{_related}{$rel_name};
+        # ONLY wrap in Future if it's a single row
+        return $is_single ? Future->done($cached) : $cached;
+    }
+
+    # 3. Resolve search params
+    my $target_source = $rel_info->{source};
+    my $cond          = $rel_info->{cond};
+    my %search_params;
+    while (my ($f_key, $s_key) = each %$cond) {
+        my $f_col = $f_key; $f_col =~ s/^foreign\.//;
+        my $s_col = $s_key; $s_col =~ s/^self\.//;
+        $search_params{$f_col} = $self->get_column($s_col);
+    }
+
+    if ($is_single) {
+        return $self->{async_db}->resultset($target_source)
+            ->search(\%search_params, { %{$attrs // {}}, rows => 1 })
+            ->next
+            ->then(sub {
+                my $row = shift;
+                $self->{_related}{$rel_name} = $row;
+                return Future->done($row);
+            });
+    }
+    else {
+        # Multi returns the RS directly (synchronously)
+        my $rs = $self->{async_db}->resultset($target_source)
+                                  ->search(\%search_params, $attrs);
+
+        $self->{_related}{$rel_name} = $rs;
+        return $rs;
     }
 }
 

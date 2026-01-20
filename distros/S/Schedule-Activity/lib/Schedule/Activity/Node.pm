@@ -3,10 +3,10 @@ package Schedule::Activity::Node;
 use strict;
 use warnings;
 use List::Util qw/any/;
-use Scalar::Util qw/looks_like_number/;
-use Ref::Util qw/is_arrayref/;
+use Ref::Util qw/is_arrayref is_hashref is_ref/;
+use Scalar::Util qw/blessed looks_like_number/;
 
-our $VERSION='0.2.9';
+our $VERSION='0.3.0';
 
 my %property=map {$_=>undef} qw/tmmin tmavg tmmax next finish message attribute note attributes require/;
 
@@ -18,7 +18,7 @@ my %defaults=(
 
 sub new {
 	my ($ref,%opt)=@_;
-	my $class=ref($ref)||$ref;
+	my $class=is_ref($ref)||$ref;
 	return bless(\%opt,$class);
 }
 
@@ -35,18 +35,54 @@ sub defaulting {
 			$$node{tmmax}//=$$node{tmavg}*$defaults{'tmmax/tmavg'};
 			$$node{tmmin}//=$$node{tmavg}/$defaults{'tmavg/tmmin'};
 		}
-		elsif($lln[0]&&$lln[2]) {
-			$$node{tmavg}=0.5*($$node{tmmin}+$$node{tmmax})
-		}
 		elsif($lln[0]) {
-			$$node{tmmax}//=$$node{tmmin}*$defaults{'tmmax/tmmin'};
-			$$node{tmavg}//=$$node{tmmin}*$defaults{'tmavg/tmmin'};
+			if($lln[2]) { $$node{tmavg}=0.5*($$node{tmmin}+$$node{tmmax}) }
+			else {
+				$$node{tmmax}//=$$node{tmmin}*$defaults{'tmmax/tmmin'};
+				$$node{tmavg}//=$$node{tmmin}*$defaults{'tmavg/tmmin'};
+			}
 		}
 		elsif($lln[2]) {
 			$$node{tmavg}//=$$node{tmmax}/$defaults{'tmmax/tmavg'};
 			$$node{tmmin}//=$$node{tmmax}/$defaults{'tmmax/tmmin'};
 		}
 	}
+	return;
+}
+
+sub nextnames {
+	my ($self,$filtered,$node)=@_;
+	if(!defined($node)) { $node=$$self{next}; $filtered=1 }
+	if(is_arrayref($node)) {
+		my @res;
+		foreach my $next (@$node) {
+			if(!$filtered)                            { push @res,$next }
+			elsif(defined($next)&&!is_ref($next))     { push @res,$next }
+			elsif(is_hashref($next)&&$$next{keyname}) { push @res,$$next{keyname} }
+		}
+		return @res;
+	}
+	elsif(is_hashref($node)) { return keys %$node }
+	elsif(!defined($node))   { return }
+	die 'Expected array/hash'; # only used during validation, not runtime
+}
+
+sub nextremap {
+	my ($self,$mapping)=@_;
+	if(is_arrayref($$self{next})) {
+		my @nexts=grep {defined($_)} map {$$mapping{$_}} @{$$self{next}};
+		if(@nexts) { $$self{next}=\@nexts }
+		else       { delete($$self{next}) }
+	}
+	elsif(is_hashref($$self{next})) {
+		while(my ($name,$next)=each %{$$self{next}}) {
+			my $x=$$mapping{$name};
+			if($x) { $$next{node}=$x }
+			else   { delete($$self{next}{$name}) }
+		}
+		if(!%{$$self{next}}) { delete($$self{next}) }
+	}
+	return $self;
 }
 
 sub validate {
@@ -63,20 +99,25 @@ sub validate {
 		else { push @invalids,$k }
 	}
 	@invalids=sort(@invalids);
-	if(@invalids&&($#invalids!=2)) { push @errors,"Incomplete time specification missing:  ".join(' ',@invalids) }
+	if(@invalids&&($#invalids!=2)) { push @errors,'Incomplete time specification missing:  '.join(' ',@invalids) }
 	if($#tmseq==2) {
-		if($tmseq[0]>$tmseq[1]) { push @errors,"Invalid:  tmmin>tmavg" }
-		if($tmseq[1]>$tmseq[2]) { push @errors,"Invalid:  tmavg>tmmax" }
+		if($tmseq[0]>$tmseq[1]) { push @errors,'Invalid:  tmmin>tmavg' }
+		if($tmseq[1]>$tmseq[2]) { push @errors,'Invalid:  tmavg>tmmax' }
 	}
 	if(exists($node{next})) {
-		if(!is_arrayref($node{next})) { push @errors,'Expected array:  next' }
-		else {
-			@invalids=grep {!defined($_)||ref($_)} @{$node{next}//[]};
-			if(@invalids) { push @errors,'Undefined name in array:  next' }
+		my @nexts;
+		eval { @nexts=nextnames(undef,0,$node{next}) };
+		if($@) { push @errors,'Expected array/hash:  next' }
+		@invalids=grep {!defined($_)||is_ref($_)} @nexts;
+		if(@invalids) { push @errors,'Invalid entry in:  next' }
+		if(is_hashref($node{next})) {
+			my $weight=0;
+			foreach my $x (map {$$_{weight}//1} values %{$node{next}}) { $weight+=$x }
+			if($weight<=0) { push @errors,'Sum of weights must be positive' }
 		}
 	}
 	if(exists($node{finish})) {
-		if(!defined($node{finish})||ref($node{finish})) { push @errors,'Expected name:  finish' }
+		if(!defined($node{finish})||is_ref($node{finish})) { push @errors,'Expected name:  finish' }
 	}
 	if(!@errors) { $node{_valid}=1 }
 	return @errors;
@@ -87,31 +128,54 @@ sub buffer { my ($self)=@_; return ($$self{tmmax}//$$self{tmavg}//0)-($$self{tma
 
 sub increment {
 	my ($self,$tm,$slack,$buffer)=@_;
-	if(ref($tm))     { $$tm    +=$$self{tmavg}//0 }
-	if(ref($slack))  { $$slack +=$self->slack()   }
-	if(ref($buffer)) { $$buffer+=$self->buffer()  }
+	if(is_ref($tm))     { $$tm    +=$$self{tmavg}//0 }
+	if(is_ref($slack))  { $$slack +=$self->slack()   }
+	if(is_ref($buffer)) { $$buffer+=$self->buffer()  }
 	return $self;
+}
+
+sub _randweighted {
+	my ($weight,$L)=@_;
+	my $y=rand($weight);
+	my $i=0;
+	while(($i<$#$L)&&($y>($$L[$i][1]{weight}//1))) { $y-=$$L[$i][1]{weight}//1; $i++ }
+	return $$L[$i][1]{node}//$$L[$i][0];
 }
 
 sub nextrandom {
 	my ($self,%opt)=@_;
 	if(!$$self{next}) { return }
-	my @candidates;
+	my (@candidates,$weight);
+	if(is_arrayref($$self{next})) {
 	foreach my $next (@{$$self{next}}) {
 		if($opt{not}&&($opt{not} eq $next)) { next }
-		if(!ref($next)) { push @candidates,$next; next }
-		if($$next{require}&&$opt{attr}) {
+		if(!is_ref($next)) { push @candidates,$next; next }
+		if(!is_hashref($next)) { next }
+		if(blessed($$next{require})&&$opt{attr}) {
 			if(!$$next{require}->matches($opt{tm},%{$opt{attr}})) { next } }
 		push @candidates,$next;
-	}
+	} }
+	elsif(is_hashref($$self{next})) {
+	while(my ($next,$href)=each %{$$self{next}}) {
+		if(!is_hashref($href)) { next }
+		if($$href{node}) {
+			if($opt{not}&&($opt{not} eq $$href{node})) { next }
+			if(blessed($$href{node}{require})&&$opt{attr}) {
+				if(!$$href{node}{require}->matches($opt{tm},%{$opt{attr}})) { next } } }
+		my $w=$$href{weight}//1;
+		if($w>0) { $weight+=$w; push @candidates,[$next,$href] }
+	} }
 	if(!@candidates) { return }
-	return $candidates[ int(rand(1+$#candidates)) ];
+	if($weight) { return _randweighted($weight,\@candidates) }
+	else { return $candidates[ int(rand(1+$#candidates)) ] }
 }
 
 sub hasnext {
 	my ($self,$node)=@_;
 	if(!$$self{next}) { return }
-	return (any {$_ eq $node} @{$$self{next}});
+	if(is_arrayref($$self{next})) { return (any {$_ eq $node} @{$$self{next}}) }
+	if(is_hashref($$self{next}))  { return (any {$$_{node} eq $node} values %{$$self{next}}) }
+	return;
 }
 
 1;

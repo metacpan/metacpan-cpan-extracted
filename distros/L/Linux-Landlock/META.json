@@ -61,7 +61,7 @@
          "web" : "https://github.com/mballarin/perl-linux-landlock"
       }
    },
-   "version" : "0.009003",
+   "version" : "0.009004",
    "x_osname" : "linux",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

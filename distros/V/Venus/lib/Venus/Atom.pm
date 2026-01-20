@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base';
 
+# INHERITS
+
 base 'Venus::Sealed';
+
+# OVERLOADS
 
 use overload (
   '""' => sub{$_[0]->get // ''},
@@ -35,28 +41,22 @@ sub __set {
 
   return $init->{value} = $value if !exists $init->{value};
 
-  return $self->error({throw => 'error_on_set', value => $value});
+  return $self->error_on_set->throw;
 }
 
 # ERRORS
 
 sub error_on_set {
-  my ($self, $data) = @_;
+  my ($self) = @_;
 
-  my $message = 'Can\'t re-set atom value to "{{value}}"';
+  my $error = $self->error->sysinfo;
 
-  my $stash = {
-    value => $data->{value},
-  };
+  $error->name('on.set');
+  $error->message('Can\'t re-set atom value');
+  $error->offset(1);
+  $error->reset;
 
-  my $result = {
-    name => 'on.set',
-    raise => true,
-    stash => $stash,
-    message => $message,
-  };
-
-  return $result;
+  return $error;
 }
 
 1;
@@ -150,6 +150,58 @@ I<Since C<3.55>>
 
 =cut
 
+=head2 new
+
+  new(any @args) (Venus::Atom)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Atom;
+
+  my $new = Venus::Atom->new;
+
+  # bless(..., "Venus::Atom")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Atom;
+
+  my $new = Venus::Atom->new('Important');
+
+  # bless(..., "Venus::Atom")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Atom;
+
+  my $new = Venus::Atom->new(value => 'Important');
+
+  # bless(..., "Venus::Atom")
+
+=back
+
+=cut
+
 =head2 set
 
   set(any $data) (any)
@@ -177,7 +229,7 @@ I<Since C<3.55>>
 
 =over 4
 
-=item set example 2
+=item B<may raise> L<Venus::Atom::Error> C<on.set>
 
   # given: synopsis
 
@@ -187,48 +239,11 @@ I<Since C<3.55>>
 
   $atom->set("hello");
 
-  # Exception! (isa Venus::Atom::Error) (see error_on_set)
+  # Error! (on.set)
 
 =back
 
 =cut
-
-=head1 ERRORS
-
-This package may raise the following errors:
-
-=cut
-
-=over 4
-
-=item error: C<error_on_set>
-
-This package may raise an error_on_set exception.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_set',
-    value => 'test',
-  };
-
-  my $error = $atom->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_set"
-
-  # my $message = $error->render;
-
-  # "Can't re-set atom value to \"test\""
-
-  # my $value = $error->stash('value');
-
-  # "test"
-
-=back
 
 =head1 OPERATORS
 

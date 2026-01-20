@@ -1,5 +1,29 @@
 Revision history for Perl module CLI::Cmdline
 
+1.25  2026-01-20
+    - make license term consistent
+    - change MANIFEST to include only needed files
+    - made seperate README file
+
+1.24  2026-01-17
+    - Added Test::NoWarnings to all test files for warning detection
+    - Created xt/release/pod-coverage.t for POD coverage testing
+    - Added POD documentation for parse() function
+    - Fixed POD link issue with @ARGV
+    - Removed redundant VERSION constant
+    - Added named return value constants (MATCH_SWITCH, MATCH_OPTION, NO_MATCH, ERROR)
+    - Pre-compiled regex patterns for better performance
+    - Removed dead commented code from _process_spec()
+    - Added @EXPORT for convenience (parse available without import)
+    - Added =head1 METHODS section for better POD organization
+    - Enhanced input validation in _check_match()
+    - Updated Makefile.PL with Test::NoWarnings and Test::Pod::Coverage dependencies
+
+1.23  2026-01-12
+    - Added LICENSE file
+    - Named alls files in MANIFEST
+    - No changes to the code
+
 1.22  2026-01-08
     - Added this file Changes
     - Added xt/release/kwalitee.t

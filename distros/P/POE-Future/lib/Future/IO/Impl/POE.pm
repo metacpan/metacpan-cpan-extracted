@@ -1,19 +1,24 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::Impl::POE 0.05;
+package Future::IO::Impl::POE 0.06;
 
 use v5.14;
 use warnings;
 use base qw( Future::IO::ImplBase );
+BEGIN { Future::IO::ImplBase->VERSION( '0.19' ); }
+
+use Future::IO qw( POLLIN POLLOUT POLLHUP );
 
 =head1 NAME
 
 C<Future::IO::Impl::POE> - implement C<Future::IO> using C<POE>
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 This module provides an implemention for L<Future::IO> which uses L<POE>.
 
@@ -25,6 +30,18 @@ loaded, and will provide the C<Future::IO> implementation methods.
 
    my $f = Future::IO->sleep(5);
    ...
+
+=head1 LIMITATIONS
+
+This module only provides a limited subset of the L<Future::IO/poll> method
+API. It fully handles C<POLLIN> and C<POLLOUT> conditions, but is not able to
+report on C<POLLHUP> and C<POLLERR> events.
+
+When a filehandle is at hangup condition it is reported as only C<POLLIN>, and
+when at error condition it is reported as only C<POLLOUT>. This I<should> be
+sufficient for most purposes, and works fine for internally providing
+asynchronous reading and writing on regular filehandles, but may cause some
+odd behaviours if you are attempting to detect those conditions directly.
 
 =cut
 
@@ -67,60 +84,51 @@ sub _mk_iosession
    );
 }
 
-my %watching_read_by_fileno; # {fileno} => [@futures]
+my %futures_read_by_fileno; # {fileno} => [@futures]
+my %futures_write_by_fileno; # {fileno} => [@futures]
 
-sub ready_for_read
+sub poll
 {
    shift;
-   my ( $fh ) = @_;
+   my ( $fh, $events ) = @_;
 
-   my $watching = $watching_read_by_fileno{ $fh->fileno } //= [];
+   my $fileno = $fh->fileno;
+
    my $f = POE::Future->new;
-
-   my $was = scalar @$watching;
-   push @$watching, $f;
-
-   return $f if $was;
-
    my $session = _mk_iosession;
-   POE::Kernel->call( $session, select_read => $fh, sub {
-      $watching->[0]->done;
-      shift @$watching;
 
-      return if scalar @$watching;
+   if( $events & (POLLIN|POLLHUP) ) {
+      my $futures = $futures_read_by_fileno{$fileno} //= [];
 
-      POE::Kernel->call( $session, unselect_read => $fh );
-      delete $watching_read_by_fileno{ $fh->fileno };
-   } );
+      my $was = scalar @$futures;
+      push @$futures, $f;
 
-   return $f;
-}
+      POE::Kernel->call( $session, select_read => $fh, sub {
+         $futures->[0]->done( POLLIN ); # we can't distinguish IN from HUP
+         shift @$futures;
 
-my %watching_write_by_fileno; # {fileno} => [@futures]
+         return if scalar @$futures;
 
-sub ready_for_write
-{
-   shift;
-   my ( $fh ) = @_;
+         POE::Kernel->call( $session, unselect_read => $fh );
+         delete $futures_read_by_fileno{$fileno};
+      } ) if !$was;
+   }
+   if( $events & POLLOUT ) {
+      my $futures = $futures_write_by_fileno{$fileno} //= [];
 
-   my $watching = $watching_write_by_fileno{ $fh->fileno } //= [];
-   my $f = POE::Future->new;
+      my $was = scalar @$futures;
+      push @$futures, $f;
 
-   my $was = scalar @$watching;
-   push @$watching, $f;
+      POE::Kernel->call( $session, select_write => $fh, sub {
+         $futures->[0]->done( POLLOUT ); # we can't distinguish OUT from ERR
+         shift @$futures;
 
-   return $f if $was;
+         return if scalar @$futures;
 
-   my $session = _mk_iosession;
-   POE::Kernel->call( $session, select_write => $fh, sub {
-      $watching->[0]->done;
-      shift @$watching;
-
-      return if scalar @$watching;
-
-      POE::Kernel->call( $session, unselect_write => $fh );
-      delete $watching_write_by_fileno{ $fh->fileno };
-   } );
+         POE::Kernel->call( $session, unselect_write => $fh );
+         delete $futures_write_by_fileno{$fileno};
+      } ) if !$was;
+   }
 
    return $f;
 }

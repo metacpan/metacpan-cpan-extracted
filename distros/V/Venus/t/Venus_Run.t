@@ -5,14 +5,10 @@ use 5.018;
 use strict;
 use warnings;
 
-BEGIN {
-  $ENV{VENUS_TASK_AUTO} = 0;
-  undef $ENV{VENUS_TASK_NAME};
-  undef $ENV{VENUS_FILE};
-}
-
 use Test::More;
 use Venus::Test;
+use Venus::Space;
+use Venus;
 
 use_ok "Venus::Run";
 
@@ -60,12 +56,19 @@ my $init = {
   },
 };
 
-our $TEST_VENUS_RUN_EXIT;
-our $TEST_VENUS_RUN_OUTPUT = [];
-our $TEST_VENUS_RUN_SYSTEM = [];
-our $TEST_VENUS_RUN_SYSTEM_LOG = [];
+our $TEST_VENUS_RUN_ERROR = [];
 our $TEST_VENUS_RUN_PRINT = [];
 our $TEST_VENUS_RUN_PROMPT = undef;
+our $TEST_VENUS_RUN_SYSTEM = [];
+
+# _error
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Run::_error"} = sub {
+    $TEST_VENUS_RUN_ERROR = [@_];
+  };
+}
 
 # _print
 {
@@ -85,40 +88,16 @@ our $TEST_VENUS_RUN_PROMPT = undef;
   };
 }
 
-# exit
+# _system
 {
   no strict 'refs';
   no warnings 'redefine';
-  *{"Venus::Run::exit"} = sub {
-    my ($self, $code, $method, @args) = @_;
-    $self->$method(@args) if $method;
-    $TEST_VENUS_RUN_EXIT = $code ||= 0;
+  *{"Venus::Run::_system"} = sub {
+    $TEST_VENUS_RUN_SYSTEM = [@_];
   };
 }
 
-# output
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Run::output"} = sub {
-    $TEST_VENUS_RUN_OUTPUT = [@_];
-  };
-}
-
-# system
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Run::system"} = sub {
-    push @{$TEST_VENUS_RUN_SYSTEM_LOG}, $TEST_VENUS_RUN_SYSTEM = [@_];
-  };
-}
-
-# config
-{
-  no warnings 'once';
-  $Venus::Run::FILE = ($Venus::Run::BASENAME = '.vns.test') . '.pl';
-}
+$ENV{VENUS_FILE} = 't/conf/.vns.pl';
 
 =name
 
@@ -130,7 +109,7 @@ $test->for('name');
 
 =tagline
 
-Runner Class
+Run Class
 
 =cut
 
@@ -138,7 +117,7 @@ $test->for('tagline');
 
 =abstract
 
-Runner Class for Perl 5
+Run Class for Perl 5
 
 =cut
 
@@ -146,15 +125,16 @@ $test->for('abstract');
 
 =includes
 
-method: args
-method: cmds
-method: conf
-method: file
-method: footer
-method: handler
-method: init
-method: name
-method: opts
+method: callback
+method: execute
+method: new
+method: resolve
+method: result
+routine: file
+routine: from_file
+routine: from_find
+routine: from_hash
+routine: from_init
 
 =cut
 
@@ -182,11 +162,14 @@ $test->for('synopsis', sub {
 
 =description
 
-This package is a subclass of L<Venus::Task> which provides a command execution
-system. This package loads the configuration file used for defining tasks (i.e.
-command-line operations) which can recursively resolve, injects environment
-variables, resets the C<PATH> and C<PERL5LIB> variables where appropriate, and
-executes the tasks by name. See L<vns> for an executable file which loads this
+This package provides a modular command execution framework for Perl projects.
+It loads a configuration with commands, aliases, scripts, variables, and paths,
+and resolves them into full shell commands. This allows you to define reusable
+CLI behaviors using declarative config without writing wrappers or shell
+scripts. It supports layered configuration, caching, variable expansion, and
+recursive resolution, with support for custom flow control, Perl module
+injection, and user prompts. It also resets the C<PATH> and C<PERL5LIB>
+variables where appropriate. See L<vns> for an executable file which loads this
 package and provides the CLI. See L</FEATURES> for usage and configuration
 information.
 
@@ -196,150 +179,50 @@ $test->for('description');
 
 =inherits
 
-Venus::Task
+Venus::Role::Utility
 
 =cut
 
 $test->for('inherits');
 
-=method args
+=integrates
 
-The args method returns the task argument declarations.
-
-=signature args
-
-  args() (hashref)
-
-=metadata args
-
-{
-  since => '2.91',
-}
+Venus::Role::Optional
 
 =cut
 
-=example-1 args
+$test->for('integrates');
 
-  # given: synopsis
+=attribute cache
+
+The cache attribute is used to store resolved values and avoid redundant
+computation during command expansion.
+
+=signature cache
+
+  cache(hashref $data) (hashref)
+
+=metadata cache
+
+{
+  since => '4.15',
+}
+
+=example-1 cache
 
   package main;
 
-  my $args = $run->args;
+  use Venus::Run;
 
-  # {
-  #   'command' => {
-  #     help => 'Command to run',
-  #     required => 1,
-  #   }
-  # }
+  my $run = Venus::Run->new;
 
-=cut
-
-$test->for('example', 1, 'args', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is_deeply $result, {
-    'command' => {
-      help => 'Command to run',
-      required => 1,
-    }
-  };
-
-  $result
-});
-
-=method cmds
-
-The cmds method returns the task command declarations.
-
-=signature cmds
-
-  cmds() (hashref)
-
-=metadata cmds
-
-{
-  since => '2.91',
-}
-
-=cut
-
-=example-1 cmds
-
-  # given: synopsis
-
-  package main;
-
-  my $cmds = $run->cmds;
-
-  # {
-  #   'help' => {
-  #     help => 'Display help and usages',
-  #     arg => 'command',
-  #   },
-  #   'init' => {
-  #     help => 'Initialize the configuration file',
-  #     arg => 'command',
-  #   },
-  # }
-
-=cut
-
-$test->for('example', 1, 'cmds', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is_deeply $result, {
-    'func' => {
-      help => 'Register function',
-      arg => 'command',
-    },
-    'help' => {
-      help => 'Display help and usages',
-      arg => 'command',
-    },
-    'init' => {
-      help => 'Initialize the configuration file',
-      arg => 'command',
-    },
-    'with' => {
-      help => 'Register subcommand',
-      arg => 'command',
-    },
-  };
-
-  $result
-});
-
-=method conf
-
-The conf method loads the configuration file returned by L</file>, then decodes
-and returns the information as a hashref.
-
-=signature conf
-
-  conf() (hashref)
-
-=metadata conf
-
-{
-  since => '2.91',
-}
-
-=cut
-
-=example-1 conf
-
-  # given: synopsis
-
-  package main;
-
-  my $conf = $run->conf;
+  my $cache = $run->cache;
 
   # {}
 
 =cut
 
-$test->for('example', 1, 'conf', sub {
+$test->for('example', 1, 'cache', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   is_deeply $result, {};
@@ -347,542 +230,94 @@ $test->for('example', 1, 'conf', sub {
   $result
 });
 
-=example-2 conf
+=attribute config
 
-  # given: synopsis
+The config attribute is used to store the configuration used to resolve
+commands, variables, paths, and other runtime behavior.
 
-  package main;
+=signature config
 
-  local $ENV{VENUS_FILE} = 't/conf/.vns.pl';
+  config(hashref $data) (hashref)
 
-  my $conf = $run->conf;
-
-  # {...}
-
-=cut
-
-$test->for('example', 2, 'conf', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is_deeply $result, $init;
-
-  $result
-});
-
-=example-3 conf
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.yaml file
-
-  my $conf = $run->conf;
-
-  # {...}
-
-=cut
-
-$test->for('example', 3, 'conf', sub {
-  if (require Venus::Yaml && not Venus::Yaml->package) {
-    plan skip_all => 'No suitable YAML library found';
-  }
-  my $file = "$Venus::Run::BASENAME.yaml";
-  require Venus::Path;
-  require Venus::Config;
-  Venus::Config
-    ->read_file('t/conf/.vns.pl')
-    ->write_file($file);
-  my $path = Venus::Path->new($file);
-
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is_deeply $result, $init;
-  $path->unlink;
-
-  $result
-});
-
-=example-4 conf
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.yml file
-
-  my $conf = $run->conf;
-
-  # {...}
-
-=cut
-
-$test->for('example', 4, 'conf', sub {
-  if (require Venus::Yaml && not Venus::Yaml->package) {
-    plan skip_all => 'No suitable YAML library found';
-  }
-  my $file = "$Venus::Run::BASENAME.yml";
-  require Venus::Path;
-  require Venus::Config;
-  Venus::Config
-    ->read_file('t/conf/.vns.pl')
-    ->write_file($file);
-  my $path = Venus::Path->new($file);
-
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is_deeply $result, $init;
-  $path->unlink;
-
-  $result
-});
-
-=example-5 conf
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.json file
-
-  my $conf = $run->conf;
-
-  # {...}
-
-=cut
-
-$test->for('example', 5, 'conf', sub {
-  if (require Venus::Json && not Venus::Json->package) {
-    plan skip_all => 'No suitable JSON library found';
-  }
-  my $file = "$Venus::Run::BASENAME.json";
-  require Venus::Path;
-  require Venus::Config;
-  Venus::Config
-    ->read_file('t/conf/.vns.pl')
-    ->write_file($file);
-  my $path = Venus::Path->new($file);
-
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is_deeply $result, $init;
-  $path->unlink;
-
-  $result
-});
-
-=example-6 conf
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.js file
-
-  my $conf = $run->conf;
-
-  # {...}
-
-=cut
-
-$test->for('example', 6, 'conf', sub {
-  if (require Venus::Json && not Venus::Json->package) {
-    plan skip_all => 'No suitable JSON library found';
-  }
-  my $file = "$Venus::Run::BASENAME.js";
-  require Venus::Path;
-  require Venus::Config;
-  Venus::Config
-    ->read_file('t/conf/.vns.pl')
-    ->write_file($file);
-  my $path = Venus::Path->new($file);
-
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is_deeply $result, $init;
-  $path->unlink;
-
-  $result
-});
-
-=example-7 conf
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.perl file
-
-  my $conf = $run->conf;
-
-  # {...}
-
-=cut
-
-$test->for('example', 7, 'conf', sub {
-  my $file = "$Venus::Run::BASENAME.perl";
-  require Venus::Path;
-  require Venus::Config;
-  Venus::Config
-    ->read_file('t/conf/.vns.pl')
-    ->write_file($file);
-  my $path = Venus::Path->new($file);
-
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is_deeply $result, $init;
-  $path->unlink;
-
-  $result
-});
-
-=example-8 conf
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.pl file
-
-  my $conf = $run->conf;
-
-  # {...}
-
-=cut
-
-$test->for('example', 8, 'conf', sub {
-  my $file = $Venus::Run::FILE;
-  require Venus::Path;
-  require Venus::Config;
-  Venus::Config
-    ->read_file('t/conf/.vns.pl')
-    ->write_file($file);
-  my $path = Venus::Path->new($file);
-
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is_deeply $result, $init;
-  $path->unlink;
-
-  $result
-});
-
-=method file
-
-The file method returns the configuration file specified in the C<VENUS_FILE>
-environment variable, or the discovered configuration file in the current
-directory. The default name for a configuration file is in the form of
-C<.vns.*>. Configuration files will be decoded based on their file extensions.
-Valid file extensions are C<yaml>, C<yml>, C<json>, C<js>, C<perl>, and C<pl>.
-
-=signature file
-
-  file() (string)
-
-=metadata file
+=metadata config
 
 {
-  since => '2.91',
+  since => '4.15',
 }
 
-=cut
-
-=example-1 file
-
-  # given: synopsis
+=example-1 config
 
   package main;
 
-  my $file = $run->file;
+  use Venus::Run;
 
-  # undef
+  my $run = Venus::Run->new;
+
+  my $config = $run->config;
+
+  # {...}
 
 =cut
 
-$test->for('example', 1, 'file', sub {
+$test->for('example', 1, 'config', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  ok !defined $result;
+  is_deeply $result, $init;
+
+  $result
+});
+
+=attribute debug
+
+The debug attribute is used to determine whether to output additional content
+for the purpose of debugging command execution.
+
+=signature debug
+
+  debug(boolean $data) (boolean)
+
+=metadata debug
+
+{
+  since => '4.15',
+}
+
+=example-1 debug
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  my $debug = $run->debug;
+
+  # false
+
+=cut
+
+$test->for('example', 1, 'debug', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, false;
 
   !$result
 });
 
-=example-2 file
+=attribute handler
 
-  # given: synopsis
-
-  package main;
-
-  local $ENV{VENUS_FILE} = 't/conf/.vns.pl';
-
-  my $file = $run->file;
-
-  # "t/conf/.vns.pl"
-
-=cut
-
-$test->for('example', 2, 'file', sub {
-  my ($tryable) = @_;
-  my $value = $ENV{VENUS_FILE};
-  my $result = $tryable->result;
-  is $result, "t/conf/.vns.pl";
-  $ENV{VENUS_FILE} = $value;
-
-  $result
-});
-
-=example-3 file
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.yaml file
-
-  my $file = $run->file;
-
-  # ".vns.yaml"
-
-=cut
-
-$test->for('example', 3, 'file', sub {
-  require Venus::Path;
-  my $path = Venus::Path->new;
-  my $file = $path->child("$Venus::Run::BASENAME.yaml")->mkfile;
-
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is $result, "$Venus::Run::BASENAME.yaml";
-  $file->unlink;
-
-  $result
-});
-
-=example-4 file
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.yml file
-
-  my $file = $run->file;
-
-  # ".vns.yml"
-
-=cut
-
-$test->for('example', 4, 'file', sub {
-  require Venus::Path;
-  require Venus::Config;
-  my $path = Venus::Path->new;
-  my $file = $path->child("$Venus::Run::BASENAME.yml")->mkfile;
-
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is $result, "$Venus::Run::BASENAME.yml";
-  $file->unlink;
-
-  $result
-});
-
-=example-5 file
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.json file
-
-  my $file = $run->file;
-
-  # ".vns.json"
-
-=cut
-
-$test->for('example', 5, 'file', sub {
-  require Venus::Path;
-  require Venus::Config;
-  my $path = Venus::Path->new;
-  my $file = $path->child("$Venus::Run::BASENAME.json")->mkfile;
-
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is $result, "$Venus::Run::BASENAME.json";
-  $file->unlink;
-
-  $result
-});
-
-=example-6 file
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.js file
-
-  my $file = $run->file;
-
-  # ".vns.js"
-
-=cut
-
-$test->for('example', 6, 'file', sub {
-  require Venus::Path;
-  require Venus::Config;
-  my $path = Venus::Path->new;
-  my $file = $path->child("$Venus::Run::BASENAME.js")->mkfile;
-
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is $result, "$Venus::Run::BASENAME.js";
-  $file->unlink;
-
-  $result
-});
-
-=example-7 file
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.perl file
-
-  my $file = $run->file;
-
-  # ".vns.perl"
-
-=cut
-
-$test->for('example', 7, 'file', sub {
-  require Venus::Path;
-  require Venus::Config;
-  my $path = Venus::Path->new;
-  my $file = $path->child("$Venus::Run::BASENAME.perl")->mkfile;
-
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is $result, "$Venus::Run::BASENAME.perl";
-  $file->unlink;
-
-  $result
-});
-
-=example-8 file
-
-  # given: synopsis
-
-  package main;
-
-  # e.g. current directory has only a .vns.pl file
-
-  my $file = $run->file;
-
-  # ".vns.pl"
-
-=cut
-
-$test->for('example', 8, 'file', sub {
-  require Venus::Path;
-  require Venus::Config;
-  my $path = Venus::Path->new;
-  my $file = $path->child($Venus::Run::FILE)->mkfile;
-
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  is $result, $Venus::Run::FILE;
-  $file->unlink;
-
-  $result
-});
-
-=method footer
-
-The footer method returns examples and usage information used in usage text.
-
-=signature footer
-
-  footer() (string)
-
-=metadata footer
-
-{
-  since => '2.91',
-}
-
-=cut
-
-=example-1 footer
-
-  # given: synopsis
-
-  package main;
-
-  my $footer = $run->footer;
-
-  # "..."
-
-=cut
-
-$test->for('example', 1, 'footer', sub {
-  my ($tryable) = @_;
-  my $result = $tryable->result;
-  like $result, qr|---|;
-  like $result, qr|data:|;
-  like $result, qr|ECHO: true|;
-  like $result, qr|exec:|;
-  like $result, qr|okay: \$PERL -c|;
-  like $result, qr|cpan: cpanm -llocal -qn|;
-  like $result, qr|deps: cpan --installdeps .|;
-  like $result, qr|each: \$PERL -MVenus=log -nE|;
-  like $result, qr|exec: \$PERL -MVenus=log -E|;
-  like $result, qr|repl: \$PERL -dE0|;
-  like $result, qr|says: exec "map log\(eval\), \@ARGV"|;
-  like $result, qr|test: \$PROVE|;
-  like $result, qr|libs:|;
-  like $result, qr|- -Ilib|;
-  like $result, qr|- -Ilocal/lib/perl5|;
-  like $result, qr|path:|;
-  like $result, qr|- bin|;
-  like $result, qr|- dev|;
-  like $result, qr|- local/bin|;
-  like $result, qr|perl:|;
-  like $result, qr|perl: perl|;
-  like $result, qr|prove: prove|;
-  like $result, qr|vars:|;
-  like $result, qr|PERL: perl|;
-  like $result, qr|PROVE: prove|;
-  like $result, qr|vns init|;
-  like $result, qr|vns cpan \$DIST|;
-  like $result, qr|vns deps|;
-  like $result, qr|vns okay \$FILE|;
-  like $result, qr|vns repl|;
-  like $result, qr|vns exec \.\.\.|;
-  like $result, qr|vns test t|;
-  like $result, qr|Copyright 2022-2023, Vesion \d\.\d+|;
-  like $result, qr|The Venus "AUTHOR" and "CONTRIBUTORS"|;
-
-  $result
-});
-
-=method handler
-
-The handler method processes the data provided and executes the request then
-returns the invocant unless the program is exited.
+The handler attribute holds the callback (i.e. coderef) invoked for each step
+or command returned for a resolved command or expression.
 
 =signature handler
 
-  handler(hashref $data) (any)
+  handler(coderef $data) (coderef)
 
 =metadata handler
 
 {
-  since => '2.91',
+  since => '4.15',
 }
-
-=cut
 
 =example-1 handler
 
@@ -892,544 +327,725 @@ returns the invocant unless the program is exited.
 
   my $run = Venus::Run->new;
 
-  $run->execute;
+  my $handler = $run->handler;
 
-  # ()
+  # sub {...}
 
 =cut
 
 $test->for('example', 1, 'handler', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  is_deeply $TEST_VENUS_RUN_SYSTEM, [];
-  is_deeply $TEST_VENUS_RUN_OUTPUT, [];
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  ok ref $result eq 'CODE';
 
-  1
+  $result
 });
 
-=example-2 handler
+=method callback
+
+The callback method executes a against each fully-resolved command derived from
+the given arguments. This method prepares the runtime environment by expanding
+variables, updating paths, and loading libraries as defined in the config. It
+resolves the given arguments into executable commands and passes each one to
+the callback in sequence. The callback receives the resolved program name
+followed by its arguments. Environment variables are restored to their original
+state after execution. Returns the result of the last successful callback
+execution, or C<undef> if none were executed.
+
+=signature callback
+
+  callback(coderef $code, any @args) (any)
+
+=metadata callback
+
+{
+  since => '4.15',
+}
+
+=example-1 callback
 
   package main;
 
   use Venus::Run;
 
-  my $run = Venus::Run->new(['help']);
+  my $run = Venus::Run->new;
 
-  $run->execute;
+  my $callback = $run->callback;
 
-  # ()
+  # undef
 
 =cut
 
-$test->for('example', 2, 'handler', sub {
+$test->for('example', 1, 'callback', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 1;
-  is_deeply $TEST_VENUS_RUN_SYSTEM, [];
-  is $$TEST_VENUS_RUN_OUTPUT[1], 'info';
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Usage: Venus::Run \<argument\> \[\<option\>\]|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  is $result, undef;
 
-  1
+  !$result
 });
 
-=example-3 handler
+=example-2 callback
 
   package main;
 
   use Venus::Run;
 
-  my $run = Venus::Run->new(['--help']);
+  my $run = Venus::Run->new;
 
-  $run->execute;
+  my $data;
 
-  # ()
+  $run->config({
+    exec => {
+      info => 'perl -V',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    perl => {
+      perl => 'perl',
+    },
+  });
+
+  my $callback = $run->callback(sub{join ' ', @_}, 'info');
+
+  # perl -Ilib -Ilocal/lib/perl5 -V
 
 =cut
 
-$test->for('example', 3, 'handler', sub {
+$test->for('example', 2, 'callback', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 1;
-  is_deeply $TEST_VENUS_RUN_SYSTEM, [];
-  is $$TEST_VENUS_RUN_OUTPUT[1], 'info';
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Usage: Venus::Run \<argument\> \[\<option\>\]|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  like $result, qr/perl.*-Ilib.*-Ilocal\/lib\/perl5.*-V/;
 
-  1
+  $result
 });
 
-=example-4 handler
+=method execute
+
+The execute method L<"resolves"|/resolve> the argument(s) provided and executes
+L</callback> using the L</handler> for each fully-resolved command encountered.
+
+=signature execute
+
+  execute(any @args) (any)
+
+=metadata execute
+
+{
+  since => '4.15',
+}
+
+=example-1 execute
 
   package main;
 
   use Venus::Run;
 
-  my $run = Venus::Run->new(['init']);
+  my $run = Venus::Run->new;
 
-  $run->execute;
+  my $execute = $run->execute;
 
-  # ()
+  # undef
 
 =cut
 
-$test->for('example', 4, 'handler', sub {
+$test->for('example', 1, 'execute', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  unlink $Venus::Run::FILE;
-  ok !-f $Venus::Run::FILE;
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  is_deeply $TEST_VENUS_RUN_SYSTEM, [];
-  is $$TEST_VENUS_RUN_OUTPUT[1], 'info';
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Initialized with generated file $Venus::Run::FILE|;
-  ok -f $Venus::Run::FILE;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  is $result, undef;
 
-  1
+  !$result
 });
 
-=example-5 handler
+=example-2 execute
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  my $run = Venus::Run->new(['echo']);
+  $run->handler(sub{join ' ', @_});
 
-  $run->execute;
+  my $execute = $run->execute('perl');
 
-  # ()
-
-  # i.e. ['echo']
+  # ['perl']
 
 =cut
 
-$test->for('example', 5, 'handler', sub {
+$test->for('example', 2, 'execute', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1], qr|echo$|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*echo|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  like $result, qr/perl/;
 
-  1
+  $result
 });
 
-=example-6 handler
+=example-3 execute
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  # in config
-  #
-  # ---
-  # exec:
-  #   cpan: cpanm -llocal -qn
-  #
-  # ...
+  $run->config({
+    exec => {
+      info => 'perl -V',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    perl => {
+      perl => 'perl',
+    },
+  });
 
-  my $run = Venus::Run->new(['cpan', 'Venus']);
+  $run->handler(sub{join ' ', @_});
 
-  $run->execute;
+  my $execute = $run->execute('info');
 
-  # ()
-
-  # i.e. cpanm '-llocal' '-qn' Venus
+  # ['perl', "'-Ilib'", "'-Ilocal/lib/perl5'", "'-V'"]
 
 =cut
 
-$test->for('example', 6, 'handler', sub {
+$test->for('example', 3, 'execute', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1], qr|cpanm '-llocal' '-qn' Venus|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*cpanm|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  like $result, qr/perl/;
+  like $result, qr/-Ilib/;
+  like $result, qr/-Ilocal\/lib\/perl5/;
+  like $result, qr/-V/;
 
-  1
+  $result
 });
 
-=example-7 handler
+=method new
 
-  package main;
+The new method constructs an instance of the package.
 
-  use Venus::Run;
+=signature new
 
-  # on linux
+  new(any @args) (Venus::Run)
 
-  # in config
-  #
-  # ---
-  # exec:
-  #   cpan: cpanm -llocal -qn
-  #   deps: cpan --installdeps .
-  #
-  # ...
+=metadata new
 
-  my $run = Venus::Run->new(['cpan', '--installdeps', '.']);
-
-  $run->execute;
-
-  # ()
-
-  # i.e. cpanm '-llocal' '-qn' '--installdeps' '.'
+{
+  since => '4.15',
+}
 
 =cut
 
-$test->for('example', 7, 'handler', sub {
-  my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
-  my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1], qr|cpanm '-llocal' '-qn' '--installdeps' '.'|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*cpanm|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
-
-  1
-});
-
-=example-8 handler
+=example-1 new
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  # in config
-  #
-  # ---
-  # exec:
-  #   okay: $PERL -c
-  #
-  # ...
-  #
-  # libs:
-  # - -Ilib
-  # - -Ilocal/lib/perl5
-  #
-  # ...
-  #
-  # vars:
-  #   PERL: perl
-  #
-  # ...
-
-  my $run = Venus::Run->new(['okay', 'lib/Venus.pm']);
-
-  $run->execute;
-
-  # ()
-
-  # i.e. perl '-Ilib' '-Ilocal/lib/perl5' '-c'
+  # bless({...}, 'Venus::Run')
 
 =cut
 
-$test->for('example', 8, 'handler', sub {
+$test->for('example', 1, 'new', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1], qr|perl '-Ilib' '-Ilocal/lib/perl5' '-c'|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*perl|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  ok $result->isa('Venus::Run');
+  is_deeply $result->cache, {};
+  ok ref $result->config eq 'HASH';
+  ok keys %{$result->config} > 0;
+  is $result->debug, false;
+  ok ref $result->handler eq 'CODE';
 
-  1
+  $result
 });
 
-=example-9 handler
+=example-2 new
 
   package main;
 
+  use Venus;
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new(debug => true);
 
-  # in config
-  #
-  # ---
-  # exec:
-  #   repl: $REPL
-  #
-  # ...
-  #
-  # libs:
-  # - -Ilib
-  # - -Ilocal/lib/perl5
-  #
-  # ...
-  #
-  # vars:
-  #   PERL: perl
-  #   REPL: $PERL -dE0
-  #
-  # ...
-
-  my $run = Venus::Run->new(['repl']);
-
-  $run->execute;
-
-  # ()
-
-  # i.e. perl '-Ilib' '-Ilocal/lib/perl5' '-dE0'
+  # bless({...}, 'Venus::Run')
 
 =cut
 
-$test->for('example', 9, 'handler', sub {
+$test->for('example', 2, 'new', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1], qr|perl '-Ilib' '-Ilocal/lib/perl5' '-dE0'|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*perl|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  ok $result->isa('Venus::Run');
+  is_deeply $result->cache, {};
+  ok ref $result->config eq 'HASH';
+  ok keys %{$result->config} > 0;
+  is $result->debug, true;
+  ok ref $result->handler eq 'CODE';
 
-  1
+  $result
 });
 
-=example-10 handler
+=example-3 new
 
   package main;
 
+  use Venus;
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new(debug => false, handler => sub {});
 
-  # in config
-  #
-  # ---
-  # exec:
-  #   exec: $PERL
-  #
-  # ...
-  #
-  # libs:
-  # - -Ilib
-  # - -Ilocal/lib/perl5
-  #
-  # ...
-  #
-  # vars:
-  #   PERL: perl
-  #
-  # ...
-
-  my $run = Venus::Run->new(['exec', '-MVenus=date', 'say date']);
-
-  $run->execute;
-
-  # ()
-
-  # i.e. perl '-Ilib' '-Ilocal/lib/perl5' '-MVenus=date' 'say date'
+  # bless({...}, 'Venus::Run')
 
 =cut
 
-$test->for('example', 10, 'handler', sub {
+$test->for('example', 3, 'new', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1],
-    qr|perl '-Ilib' '-Ilocal/lib/perl5' '-MVenus=date' 'say date'|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*perl|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  ok $result->isa('Venus::Run');
+  is_deeply $result->cache, {};
+  ok ref $result->config eq 'HASH';
+  ok keys %{$result->config} > 0;
+  is $result->debug, false;
+  ok ref $result->handler eq 'CODE';
 
-  1
+  $result
 });
 
-=example-11 handler
+=method resolve
+
+The resolve method expands a given item or command by recursively resolving
+aliases, variables, and configuration entries into a full command string or
+array. This method returns a list in list context.
+
+=signature resolve
+
+  resolve(hashref $config, any @data) (arrayref)
+
+=metadata resolve
+
+{
+  since => '4.15',
+}
+
+=example-1 resolve
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  # in config
-  #
-  # ---
-  # exec:
-  #   test: $PROVE
-  #
-  # ...
-  #
-  # libs:
-  # - -Ilib
-  # - -Ilocal/lib/perl5
-  #
-  # ...
-  #
-  # vars:
-  #   PROVE: prove
-  #
-  # ...
+  my $resolve = $run->resolve;
 
-  my $run = Venus::Run->new(['test', 't']);
-
-  $run->execute;
-
-  # ()
-
-  # i.e. prove '-Ilib' '-Ilocal/lib/perl5' t
+  # []
 
 =cut
 
-$test->for('example', 11, 'handler', sub {
+$test->for('example', 1, 'resolve', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1], qr|prove '-Ilib' '-Ilocal/lib/perl5' t|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*prove|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  is_deeply $result, [];
 
-  1
+  $result
 });
 
-=example-12 handler
+=example-2 resolve
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  my $run = Venus::Run->new(['echo', 1, '|', 'less']);
+  my $resolve = $run->resolve({}, 'perl');
 
-  $run->execute;
-
-  # ()
-
-  # i.e. echo 1 | less
+  # [['perl']]
 
 =cut
 
-$test->for('example', 12, 'handler', sub {
+$test->for('example', 2, 'resolve', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1], qr|echo 1 \| less|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*echo|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/perl/;
 
-  1
+  $result
 });
 
-=example-13 handler
+=example-3 resolve
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  my $run = Venus::Run->new(['echo', 1, '&&', 'echo', 2]);
+  my $config = {find => {perl => '/path/to/perl'}};
 
-  $run->execute;
+  my $resolve = $run->resolve($config, 'perl -c');
 
-  # ()
-
-  # i.e. echo 1 && echo 2
+  # [['/path/to/perl', "'-c'"]]
 
 =cut
 
-$test->for('example', 13, 'handler', sub {
+$test->for('example', 3, 'resolve', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1], qr|echo 1 \| echo 2|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*echo|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  ok ref $result eq 'ARRAY';
+  is $result->[0][0], '/path/to/perl';
+  like $result->[0][1], qr/-c/;
 
-  1
+  $result
 });
 
-=example-14 handler
+=example-4 resolve
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  local $ENV{VENUS_FILE} = 't/conf/from.perl';
+  my $config = {
+    exec => {
+      info => 'perl -V',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    perl => {
+      perl => 'perl',
+    },
+  };
+
+  my $resolve = $run->resolve($config, 'info');
+
+  # [['perl', "'-Ilib'", "'-Ilocal/lib/perl5'", "'-V'"]]
+
+=cut
+
+$test->for('example', 4, 'resolve', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/perl/;
+  like $result->[0][1], qr/-Ilib/;
+  like $result->[0][2], qr/-Ilocal\/lib\/perl5/;
+  like $result->[0][3], qr/-V/;
+
+  $result
+});
+
+=example-5 resolve
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  my $config = {
+    exec => {
+      info => 'perl -V',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    load => [
+      '-MVenus',
+    ],
+    perl => {
+      perl => 'perl',
+    },
+  };
+
+  my $resolve = $run->resolve($config, 'info');
+
+  # [['perl', "'-Ilib'", "'-Ilocal/lib/perl5'", "'-MVenus'", "'-V'"]]
+
+=cut
+
+$test->for('example', 5, 'resolve', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/perl/;
+  like $result->[0][1], qr/-Ilib/;
+  like $result->[0][2], qr/-Ilocal\/lib\/perl5/;
+  like $result->[0][3], qr/-MVenus/;
+  like $result->[0][4], qr/-V/;
+
+  $result
+});
+
+=example-6 resolve
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  my $config = {
+    exec => {
+      repl => '$REPL',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    load => [
+      '-MVenus',
+    ],
+    perl => {
+      perl => 'perl',
+    },
+    vars => {
+      REPL => 'perl -dE0',
+    },
+  };
+
+  my $resolve = $run->resolve($config, 'repl');
+
+  # [['perl', "'-Ilib'", "'-Ilocal/lib/perl5'", "'-MVenus'", "'-dE0'"]]
+
+=cut
+
+$test->for('example', 6, 'resolve', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/perl/;
+  like $result->[0][1], qr/-Ilib/;
+  like $result->[0][2], qr/-Ilocal\/lib\/perl5/;
+  like $result->[0][3], qr/-MVenus/;
+  like $result->[0][4], qr/-dE0/;
+
+  $result
+});
+
+=example-7 resolve
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  my $config = {
+    exec => {
+      eval => 'shim -E',
+      says => 'eval "map log(eval), @ARGV"',
+      shim => '$PERL -MVenus=true,false,log',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    perl => {
+      perl => 'perl',
+    },
+    vars => {
+      PERL => 'perl',
+    },
+  };
+
+  my $resolve = $run->resolve($config, 'says', 1);
+
+  # [['perl', "'-Ilib'", "'-Ilocal/lib/perl5'", "'-MVenus=true,false,log'", "'-E'", "\"map log(eval), \@ARGV\"", "'1'"]]
+
+=cut
+
+$test->for('example', 7, 'resolve', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/perl/;
+  like $result->[0][1], qr/-Ilib/;
+  like $result->[0][2], qr/-Ilocal\/lib\/perl5/;
+  like $result->[0][3], qr/-MVenus=true,false,log/;
+  like $result->[0][4], qr/-E/;
+  like $result->[0][5], qr/map log\(eval\), \@ARGV/;
+  like $result->[0][6], qr/1/;
+
+  $result
+});
+
+=example-8 resolve
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  my $config = {
+    exec => {
+      cpan => 'cpanm -llocal -qn',
+    },
+  };
+
+  my $resolve = $run->resolve($config, 'cpan', 'Venus');
+
+  # [['cpanm', "'-llocal'", "'-qn'", "'Venus'"]]
+
+=cut
+
+$test->for('example', 8, 'resolve', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/cpanm/;
+  like $result->[0][1], qr/-llocal/;
+  like $result->[0][2], qr/-qn/;
+  like $result->[0][3], qr/Venus/;
+
+  $result
+});
+
+=example-9 resolve
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  my $config = {
+    exec => {
+      test => '$PROVE',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    perl => {
+      perl => 'perl',
+      prove => 'prove',
+    },
+    vars => {
+      PROVE => 'prove -j8',
+    },
+  };
+
+  my $resolve = $run->resolve($config, 'test', 't');
+
+  # [['prove', "'-Ilib'", "'-Ilocal/lib/perl5'", "'-j8'", "'t'"]]
+
+=cut
+
+$test->for('example', 9, 'resolve', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/prove/;
+  like $result->[0][1], qr/-Ilib/;
+  like $result->[0][2], qr/-Ilocal\/lib\/perl5/;
+  like $result->[0][3], qr/-j8/;
+  like $result->[0][4], qr/t/;
+
+  $result
+});
+
+=example-10 resolve
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  my $config = {};
+
+  my $resolve = $run->resolve($config, 'echo 1 | less');
+
+  # [['echo', "'1'", '|', "'less'"]]
+
+=cut
+
+$test->for('example', 10, 'resolve', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/echo/;
+  like $result->[0][1], qr/1/;
+  like $result->[0][2], qr/\|/;
+  like $result->[0][3], qr/less/;
+
+  $result
+});
+
+=example-11 resolve
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  my $config = {};
+
+  my $resolve = $run->resolve($config, 'echo 1 && echo 2');
+
+  # [['echo', "'1'", '&&', 'echo', "'2'"]]
+
+=cut
+
+$test->for('example', 11, 'resolve', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/echo/;
+  like $result->[0][1], qr/1/;
+  like $result->[0][2], qr/\&\&/;
+  like $result->[0][3], qr/echo/;
+  like $result->[0][4], qr/2/;
+
+  $result
+});
+
+=example-12 resolve
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  my $config = {};
+
+  my $resolve = $run->resolve($config, 'echo 1 || echo 2');
+
+  # [['echo', "'1'", '||', 'echo', "'2'"]]
+
+=cut
+
+$test->for('example', 12, 'resolve', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/echo/;
+  like $result->[0][1], qr/1/;
+  like $result->[0][2], qr/\|\|/;
+  like $result->[0][3], qr/echo/;
+  like $result->[0][4], qr/2/;
+
+  $result
+});
+
+=example-13 resolve
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->from_file('t/conf/from.perl');
 
   # in config
   #
@@ -1450,44 +1066,34 @@ $test->for('example', 13, 'handler', sub {
   #
   # ...
 
-  my $run = Venus::Run->new(['mypan']);
+  my $config = $run->prepare_conf($run->config);
 
-  $run->execute;
+  my $resolve = $run->resolve($config, 'mypan');
 
-  # ()
-
-  # i.e. cpanm '-llocal' '-qn' '-M' 'https://pkg.myapp.com'
+  # [['cpanm', "'-llocal'", "'-qn'", "'-M'", "'https://pkg.myapp.com'"]]
 
 =cut
 
-$test->for('example', 14, 'handler', sub {
+$test->for('example', 13, 'resolve', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1],
-    qr|cpanm '-llocal' '-qn' '-M' 'https://pkg.myapp.com'|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*cpanm|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/cpanm/;
+  like $result->[0][1], qr/-llocal/;
+  like $result->[0][2], qr/-qn/;
+  like $result->[0][3], qr/-M/;
+  like $result->[0][4], qr/https:\/\/pkg\.myapp\.com/;
 
-  1
+  $result
 });
 
-=example-15 handler
+=example-14 resolve
 
   package main;
 
   use Venus::Run;
 
-  # on linux
-
-  local $ENV{VENUS_FILE} = 't/conf/with.perl';
+  my $run = Venus::Run->from_file('t/conf/with.perl');
 
   # in config
   #
@@ -1506,52 +1112,32 @@ $test->for('example', 14, 'handler', sub {
   #
   # ...
 
-  my $run = Venus::Run->new(['psql', 'backup']);
+  my $config = $run->prepare_conf($run->config);
 
-  $run->execute;
+  my $resolve = $run->resolve($config, 'psql', 'backup');
 
-  # ()
-
-  # i.e. vns backup
+  # [['pg_backupcluster']]
 
 =cut
 
-$test->for('example', 15, 'handler', sub {
+$test->for('example', 14, 'resolve', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1], qr|vns backup|;
-  is_deeply $TEST_VENUS_RUN_OUTPUT, [];
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/pg_backupcluster/;
 
-  1
+  $result
 });
 
-=example-16 handler
+=example-15 resolve
 
   package main;
 
   use Venus::Run;
 
-  # on linux
-
-  local $ENV{VENUS_FILE} = 't/conf/with.perl';
+  my $run = Venus::Run->from_file('t/conf/psql.perl');
 
   # in config
-  #
-  # ---
-  # with:
-  #   psql: /path/to/other
-  #
-  # ...
-
-  # in config (/path/to/other)
   #
   # ---
   # exec:
@@ -1560,49 +1146,30 @@ $test->for('example', 15, 'handler', sub {
   #
   # ...
 
-  my $run = Venus::Run->new(['psql', 'backup']);
+  my $config = $run->prepare_conf($run->config);
 
-  $run->execute;
+  my $resolve = $run->resolve($config, 'backup');
 
-  # VENUS_FILE=t/conf/psql.perl vns backup
-
-  local $ENV{VENUS_FILE} = 't/conf/psql.perl';
-
-  $run = Venus::Run->new(['backup']);
-
-  $run->execute;
-
-  # ()
-
-  # i.e. pg_backupcluster
+  # [['pg_backupcluster']]
 
 =cut
 
-$test->for('example', 16, 'handler', sub {
+$test->for('example', 15, 'resolve', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1], qr|pg_backupcluster|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*pg_backupcluster|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/pg_backupcluster/;
 
-  1
+  $result
 });
 
-=example-17 handler
+=example-16 resolve
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->from_file('t/conf/flow.perl');
 
   # in config
   #
@@ -1619,105 +1186,40 @@ $test->for('example', 16, 'handler', sub {
   #
   # ...
 
-  local $ENV{VENUS_FILE} = 't/conf/flow.perl';
+  my $config = $run->prepare_conf($run->config);
 
-  my $run = Venus::Run->new(['setup-term']);
+  my $resolve = $run->resolve($config, 'setup-term');
 
-  $run->execute;
-
-  # ()
-
-  # i.e.
-  # cpanm '-llocal' '-qn' 'Term::ReadKey'
-  # cpanm '-llocal' '-qn' 'Term::ReadLine::Gnu'
+  # [
+  #   ['cpanm', "'-llocal'", "'-qn'", "'Term::ReadKey'"],
+  #   ['cpanm', "'-llocal'", "'-qn'", "'Term::ReadLine::Gnu'"],
+  # ]
 
 =cut
 
-$test->for('example', 17, 'handler', sub {
+$test->for('example', 16, 'resolve', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM_LOG[0][1],
-    qr|.*cpanm '-llocal' '-qn' 'Term::ReadKey'|;
-  like $$TEST_VENUS_RUN_SYSTEM_LOG[1][1],
-    qr|.*cpanm '-llocal' '-qn' 'Term::ReadLine::Gnu'|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*cpanm|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/cpanm/;
+  like $result->[0][1], qr/-llocal/;
+  like $result->[0][2], qr/-qn/;
+  like $result->[0][3], qr/Term::ReadKey/;
+  like $result->[1][0], qr/cpanm/;
+  like $result->[1][1], qr/-llocal/;
+  like $result->[1][2], qr/-qn/;
+  like $result->[1][3], qr/Term::ReadLine::Gnu/;
 
-  1
+  $result
 });
 
-=example-17 handler
+=example-17 resolve
 
   package main;
 
   use Venus::Run;
 
-  # on linux
-
-  # in config
-  #
-  # ---
-  # exec:
-  #   cpan: cpanm -llocal -qn
-  #
-  # ...
-  #
-  # flow:
-  #   setup-term:
-  #   - cpan Term::ReadKey
-  #   - cpan Term::ReadLine::Gnu
-  #
-  # ...
-
-  local $ENV{VENUS_FILE} = 't/conf/flow.perl';
-
-  my $run = Venus::Run->new(['setup-term']);
-
-  $run->execute;
-
-  # ()
-
-  # i.e.
-  # cpanm '-llocal' '-qn' 'Term::ReadKey'
-  # cpanm '-llocal' '-qn' 'Term::ReadLine::Gnu'
-
-=cut
-
-$test->for('example', 17, 'handler', sub {
-  my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
-  my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM_LOG[0][1],
-    qr|.*cpanm '-llocal' '-qn' 'Term::ReadKey'|;
-  like $$TEST_VENUS_RUN_SYSTEM_LOG[1][1],
-    qr|.*cpanm '-llocal' '-qn' 'Term::ReadLine::Gnu'|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*cpanm|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-
-  1
-});
-
-=example-18 handler
-
-  package main;
-
-  use Venus::Run;
-
-  # on linux
+  my $run = Venus::Run->from_file('t/conf/asks.perl');
 
   # in config
   #
@@ -1727,46 +1229,36 @@ $test->for('example', 17, 'handler', sub {
   #
   # ...
 
-  local $ENV{VENUS_FILE} = 't/conf/asks.perl';
+  my $config = $run->prepare_vars($run->prepare_conf($run->config));
 
-  my $run = Venus::Run->new(['echo', '$PASS']);
+  my $resolve = $run->resolve($config, 'echo', '$PASS');
 
-  $run->execute;
-
-  # ()
-
-  # i.e. echo '$PASS'
+  # [['echo', "'secret'"]]
 
 =cut
 
-$test->for('example', 18, 'handler', sub {
+$test->for('example', 17, 'resolve', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  local $TEST_VENUS_RUN_PROMPT = 'secret';
   local $ENV{PASS} = undef;
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
+  local $TEST_VENUS_RUN_PRINT = [];
+  local $TEST_VENUS_RUN_PROMPT = 'secret';
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1], qr|echo secret$|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*echo|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  is $ENV{PASS}, 'secret';
   is_deeply $TEST_VENUS_RUN_PRINT, ["What's the password"];
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/echo/;
+  like $result->[0][1], qr/secret/;
 
-  1
+  $result
 });
 
-=example-19 handler
+=example-18 resolve
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->from_file('t/conf/func.perl');
 
   # in config
   #
@@ -1784,47 +1276,36 @@ $test->for('example', 18, 'handler', sub {
   #   ...
   # }
 
-  local $ENV{VENUS_FILE} = 't/conf/func.perl';
+  my $config = $run->config;
 
-  my $run = Venus::Run->new(['dump', '--', 'hello']);
+  my $resolve = $run->resolve($config, 'dump', '--', 'hello');
 
-  $run->execute;
-
-  # ()
-
-  # i.e. perl -Ilib ... -E '(do "./t/path/etc/dump.pl")->(\@ARGV)' '--' hello
+  # [['echo', "'secret'"]]
 
 =cut
 
-$test->for('example', 19, 'handler', sub {
+$test->for('example', 18, 'resolve', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
-  my $command =
-    qr|perl.* '-E' '\(do "./t/path/etc/dump.pl"\)->\(\\\@ARGV\)' '--' hello|;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1], qr|$command$|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*perl|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/perl/;
+  like $result->[0][1], qr/-Ilib/;
+  like $result->[0][2], qr/-Ilocal\/lib\/perl5/;
+  like $result->[0][3], qr/-E/;
+  like $result->[0][4], qr{[quotemeta('(do("./t/path/etc/dump.pl"))->(@ARGV)')]};
+  like $result->[0][5], qr/--/;
+  like $result->[0][6], qr/hello/;
 
-  1
+  $result
 });
 
-=example-20 handler
+=example-19 resolve
 
   package main;
 
   use Venus::Run;
 
-  # on linux
-
-  local $ENV{VENUS_FILE} = 't/conf/when.perl';
+  my $run = Venus::Run->from_file('t/conf/when.perl');
 
   # in config
   #
@@ -1839,49 +1320,39 @@ $test->for('example', 19, 'handler', sub {
   #       OSNAME: LINUX
   #   is_win:
   #     data:
-  #       OSNAME: WINDOW
+  #       OSNAME: WINDOWS
   #
   # ...
 
-  my $run = Venus::Run->new(['name']);
+  # assume Linux OS
 
-  $run->execute;
+  my $config = $run->prepare_vars($run->prepare_conf($run->config));
 
-  # ()
+  my $resolve = $run->resolve($config, 'name');
 
-  # i.e. echo $OSNAME
-
-  # i.e. echo LINUX
+  # [['echo', "'LINUX'"]]
 
 =cut
 
-$test->for('example', 20, 'handler', sub {
+$test->for('example', 19, 'resolve', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
+  my $patched = Venus::Space->new('Venus::Os')->patch('type', sub{'is_lin'});
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1], qr|echo LINUX$|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*echo LINUX|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/echo/;
+  like $result->[0][1], qr/LINUX/;
+  $patched->unpatch;
 
-  1
+  $result
 });
 
-=example-21 handler
+=example-20 resolve
 
   package main;
 
   use Venus::Run;
 
-  # on mswin32
-
-  local $ENV{VENUS_FILE} = 't/conf/when.perl';
+  my $run = Venus::Run->from_file('t/conf/when.perl');
 
   # in config
   #
@@ -1896,702 +1367,376 @@ $test->for('example', 20, 'handler', sub {
   #       OSNAME: LINUX
   #   is_win:
   #     data:
-  #       OSNAME: WINDOW
+  #       OSNAME: WINDOWS
   #
   # ...
 
-  my $run = Venus::Run->new(['name']);
+  # assume Windows OS
 
-  $run->execute;
+  my $config = $run->prepare_vars($run->prepare_conf($run->config));
 
-  # ()
+  my $resolve = $run->resolve($config, 'name');
 
-  # i.e. echo $OSNAME
-
-  # i.e. echo WINDOWS
+  # [['echo', "'WINDOWS'"]]
 
 =cut
 
-$test->for('example', 21, 'handler', sub {
+$test->for('example', 20, 'resolve', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'mswin32';
+  my $patched = Venus::Space->new('Venus::Os')->patch('type', sub{'is_win'});
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  like $$TEST_VENUS_RUN_SYSTEM[1], qr|echo WINDOWS$|;
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*echo WINDOWS|;
-  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  ok ref $result eq 'ARRAY';
+  like $result->[0][0], qr/echo/;
+  like $result->[0][1], qr/WINDOWS/;
+  $patched->unpatch;
 
-  1
+  $result
 });
 
-=example-22 handler
+=method result
+
+The result method is an alias for the L</execute> method, which executes the
+the L</handler> for each fully-resolved command based on the arguments
+provided.
+
+=signature result
+
+  result(any @args) (any)
+
+=metadata result
+
+{
+  since => '4.15',
+}
+
+=example-1 result
 
   package main;
 
   use Venus::Run;
 
-  # on linux
+  my $run = Venus::Run->new;
 
-  local $ENV{VENUS_FILE} = 't/conf/help.perl';
+  my $result = $run->result;
 
-  # in config
-  #
-  # ---
-  # exec:
-  #   exec: perl -c
-  #
-  # ...
-  # help:
-  #   exec: Usage: perl -c <FILE>
-  #
-  # ...
-
-  my $run = Venus::Run->new(['help', 'exec']);
-
-  $run->execute;
-
-  # ()
-
-  # i.e. Usage: perl -c <FILE>
+  # undef
 
 =cut
 
-$test->for('example', 22, 'handler', sub {
+$test->for('example', 1, 'result', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f $Venus::Run::FILE;
-  require Venus::Os;
-  $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 1;
-  is_deeply $TEST_VENUS_RUN_SYSTEM, [];
-  is $$TEST_VENUS_RUN_OUTPUT[1], 'info';
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Usage: perl -c \<FILE\>|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  is $result, undef;
 
-  1
+  !$result
 });
 
-=example-23 handler
+=example-2 result
 
   package main;
 
   use Venus::Run;
 
-  my $run = Venus::Run->new(['func', 'dump', 't/path/etc/dump.pl']);
+  my $run = Venus::Run->new;
 
-  $run->execute;
+  $run->handler(sub{join ' ', @_});
 
-  # ()
+  my $result = $run->result('perl');
+
+  # ['perl']
 
 =cut
 
-$test->for('example', 23, 'handler', sub {
+$test->for('example', 2, 'result', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  unlink $Venus::Run::FILE;
-  ok !-f $Venus::Run::FILE;
-  require Venus::Path;
-  Venus::Path->new('t/conf/write.func.perl')->copy(
-    my $temp_file = Venus::Path->mktemp_file->extension('pl')
-  );
-  local $ENV{VENUS_FILE} = "$temp_file";
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  is_deeply $TEST_VENUS_RUN_SYSTEM, [];
-  is $$TEST_VENUS_RUN_OUTPUT[1], 'info';
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Function dump registered in file $temp_file|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
-  require Venus::Config;
-  my $conf = Venus::Config->read_file($ENV{VENUS_FILE})->value;
-  ok exists $conf->{func};
-  ok exists $conf->{func}->{dump};
-  $temp_file->unlink;
+  like $result, qr/perl/;
 
-  1
+  $result
 });
 
-=example-24 handler
+=example-3 result
 
   package main;
 
   use Venus::Run;
 
-  my $run = Venus::Run->new(['with', 'asks', 't/conf/asks.perl']);
+  my $run = Venus::Run->new;
 
-  $run->execute;
+  $run->config({
+    exec => {
+      info => 'perl -V',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    perl => {
+      perl => 'perl',
+    },
+  });
 
-  # ()
+  $run->handler(sub{join ' ', @_});
+
+  my $result = $run->result('info');
+
+  # ['perl', "'-Ilib'", "'-Ilocal/lib/perl5'", "'-V'"]
 
 =cut
 
-$test->for('example', 24, 'handler', sub {
+$test->for('example', 3, 'result', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_RUN_EXIT;
-  local $TEST_VENUS_RUN_OUTPUT = [];
-  local $TEST_VENUS_RUN_SYSTEM = [];
-  unlink $Venus::Run::FILE;
-  ok !-f $Venus::Run::FILE;
-  require Venus::Path;
-  Venus::Path->new('t/conf/write.with.perl')->copy(
-    my $temp_file = Venus::Path->mktemp_file->extension('pl')
-  );
-  local $ENV{VENUS_FILE} = "$temp_file";
   my $result = $tryable->result;
-  is $TEST_VENUS_RUN_EXIT, 0;
-  is_deeply $TEST_VENUS_RUN_SYSTEM, [];
-  is $$TEST_VENUS_RUN_OUTPUT[1], 'info';
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Subcommand asks registered in file $temp_file|;
-  $TEST_VENUS_RUN_SYSTEM_LOG = [];
-  require Venus::Config;
-  my $conf = Venus::Config->read_file($ENV{VENUS_FILE})->value;
-  ok exists $conf->{with};
-  ok exists $conf->{with}->{asks};
-  $temp_file->unlink;
+  like $result, qr/perl/;
+  like $result, qr/-Ilib/;
+  like $result, qr/-Ilocal\/lib\/perl5/;
+  like $result, qr/-V/;
 
-  1
+  $result
 });
 
-=method init
+=routine file
 
-The init method returns the default configuration to be used when initializing
-the system with a new configuration file.
+The file routine ...
 
-=signature init
+=signature file
 
-  init() (hashref)
+  file(any @data) (any)
 
-=metadata init
+=metadata file
 
 {
-  since => '2.91',
+  since => '4.15',
 }
 
-=cut
-
-=example-1 init
-
-  # given: synopsis
+=example-1 file
 
   package main;
 
-  my $init = $run->init;
+  use Venus::Run;
 
-  # {
-  #   data => {
-  #     ECHO => 1,
-  #   },
-  #   exec => {
-  #     brew => 'perlbrew',
-  #     cpan => 'cpanm -llocal -qn',
-  #     docs => 'perldoc',
-  #     each => 'shim -nE',
-  #     edit => '$EDITOR $VENUS_FILE',
-  #     eval => 'shim -E',
-  #     exec => '$PERL',
-  #     info => '$PERL -V',
-  #     lint => 'perlcritic',
-  #     okay => '$PERL -c',
-  #     repl => '$REPL',
-  #     reup => 'cpanm -qn Venus',
-  #     says => 'eval "map log(eval), @ARGV"',
-  #     shim => '$PERL -MVenus=true,false,log',
-  #     test => '$PROVE',
-  #     tidy => 'perltidy',
-  #   },
-  #   libs => [
-  #     '-Ilib',
-  #     '-Ilocal/lib/perl5',
-  #   ],
-  #   path => [
-  #     './bin',
-  #     './dev',
-  #     './local/bin',
-  #   ],
-  #   perl => {
-  #     perl => 'perl',
-  #     prove => 'prove',
-  #   },
-  #   vars => {
-  #     PERL => 'perl',
-  #     PROVE => 'prove'
-  #     REPL => '$PERL -dE0'
-  #   },
-  # }
+  my $file = Venus::Run->file;
+
+  # '.vns.pl'
 
 =cut
 
-$test->for('example', 1, 'init', sub {
+$test->for('example', 1, 'file', sub {
   my ($tryable) = @_;
+  local $ENV{VENUS_FILE} = undef;
   my $result = $tryable->result;
-  is_deeply $result, $init;
+  is $result, '.vns.pl';
 
   $result
 });
 
-=method name
+=example-2 file
 
-The name method returns the default name for the task. This is used in usage
-text and can be controlled via the C<VENUS_TASK_NAME> environment variable, or
-the C<NAME> package variable.
+  package main;
 
-=signature name
+  use Venus::Run;
 
-  name() (string)
+  local $ENV{VENUS_FILE} = 'myapp.pl';
 
-=metadata name
+  my $file = Venus::Run->file;
+
+  # 'myapp.pl'
+
+=cut
+
+$test->for('example', 2, 'file', sub {
+  my ($tryable) = @_;
+  local $ENV{VENUS_FILE} = undef;
+  my $result = $tryable->result;
+  is $result, 'myapp.pl';
+
+  $result
+});
+
+=routine from_file
+
+The from_file routine ...
+
+=signature from_file
+
+  from_file(any @data) (any)
+
+=metadata from_file
 
 {
-  since => '2.91',
+  since => '4.15',
 }
 
-=cut
-
-=example-1 name
-
-  # given: synopsis
+=example-1 from_file
 
   package main;
 
-  my $name = $run->name;
+  use Venus::Run;
 
-  # "Venus::Run"
+  my $from_file = Venus::Run->from_file;
+
+  # bless({...}, "Venus::Run")
 
 =cut
 
-$test->for('example', 1, 'name', sub {
+$test->for('example', 1, 'from_file', sub {
   my ($tryable) = @_;
+  local $ENV{VENUS_FILE} = 't/conf/.vns.pl';
   my $result = $tryable->result;
-  is $result, "Venus::Run";
+  ok $result->isa('Venus::Run');
+  is_deeply $result->config, do './t/conf/.vns.pl';
 
   $result
 });
 
-=example-2 name
-
-  # given: synopsis
+=example-2 from_file
 
   package main;
 
-  local $ENV{VENUS_TASK_NAME} = 'venus-runner';
+  use Venus::Run;
 
-  my $name = $run->name;
+  my $from_file = Venus::Run->from_file('t/conf/.vns.pl');
 
-  # "venus-runner"
+  # bless({...}, "Venus::Run")
 
 =cut
 
-$test->for('example', 2, 'name', sub {
+$test->for('example', 2, 'from_file', sub {
   my ($tryable) = @_;
-  my $value = $ENV{VENUS_TASK_NAME};
   my $result = $tryable->result;
-  is $result, "venus-runner";
-  $ENV{VENUS_TASK_NAME} = $value;
+  ok $result->isa('Venus::Run');
+  is_deeply $result->config, do './t/conf/.vns.pl';
 
   $result
 });
 
-=example-3 name
+=routine from_find
 
-  # given: synopsis
+The from_find routine ...
 
-  package main;
+=signature from_find
 
-  local $Venus::Run::NAME = 'venus-runner';
+  from_find(any @data) (any)
 
-  my $name = $run->name;
-
-  # "venus-runner"
-
-=cut
-
-$test->for('example', 3, 'name', sub {
-  my ($tryable) = @_;
-  my $value = $Venus::Run::NAME;
-  my $result = $tryable->result;
-  is $result, "venus-runner";
-  $Venus::Run::NAME = $value;
-
-  $result
-});
-
-=method opts
-
-The opts method returns the task options declarations.
-
-=signature opts
-
-  opts() (hashref)
-
-=metadata opts
+=metadata from_find
 
 {
-  since => '2.91',
+  since => '4.15',
 }
 
-=cut
-
-=example-1 opts
-
-  # given: synopsis
+=example-1 from_find
 
   package main;
 
-  my $opts = $run->opts;
+  use Venus::Run;
 
-  # {
-  #   'help' => {
-  #     help => 'Show help information',
-  #   }
-  # }
+  my $from_find = Venus::Run->from_find;
+
+  # bless({...}, "Venus::Run")
 
 =cut
 
-$test->for('example', 1, 'opts', sub {
+$test->for('example', 1, 'from_find', sub {
+  my ($tryable) = @_;
+  local $ENV{VENUS_FILE} = 't/conf/.vns.pl';
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Run');
+  is_deeply $result->config, do './t/conf/.vns.pl';
+
+  $result
+});
+
+=routine from_hash
+
+The from_hash routine ...
+
+=signature from_hash
+
+  from_hash(any @data) (any)
+
+=metadata from_hash
+
+{
+  since => '4.15',
+}
+
+=example-1 from_hash
+
+  package main;
+
+  use Venus::Run;
+
+  my $from_hash = Venus::Run->from_hash({
+    exec => {
+      info => 'perl -V',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    perl => {
+      perl => 'perl',
+    },
+  });
+
+  # bless({...}, "Venus::Run")
+
+=cut
+
+$test->for('example', 1, 'from_hash', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is_deeply $result, {
-    'help' => {
-      help => 'Show help information',
-    }
+  ok $result->isa('Venus::Run');
+  is_deeply $result->config, {
+    exec => {
+      info => 'perl -V',
+    },
+    libs => [
+      '-Ilib',
+      '-Ilocal/lib/perl5',
+    ],
+    perl => {
+      perl => 'perl',
+    },
   };
 
   $result
 });
 
-=feature config
+=routine from_init
 
-The CLI provided by this package operates on a configuration file, typically
-having a base name of C<.vns> with a Perl, JSON, or YAML file extension. Here
-is an example of a configuration file using YAML with the filename
-C<.vns.yaml>.
+The from_init routine ...
 
-  ---
-  data:
-    ECHO: true
-  exec:
-    cpan: cpanm -llocal -qn
-    okay: $PERL -c
-    repl: $PERL -dE0
-    says: $PERL -E "map log(eval), @ARGV"
-    test: $PROVE
-  libs:
-  - -Ilib
-  - -Ilocal/lib/perl5
-  load:
-  - -MVenus=true,false
-  path:
-  - ./bin
-  - ./dev
-  - -Ilocal/bin
-  perl:
-    perl: perl
-    prove: prove
-  vars:
-    PERL: perl
-    PROVE: prove
+=signature from_init
+
+  from_init(any @data) (any)
+
+=metadata from_init
+
+{
+  since => '4.15',
+}
+
+=example-1 from_init
+
+  package main;
+
+  use Venus::Run;
+
+  my $from_init = Venus::Run->from_init;
+
+  # bless({...}, "Venus::Run")
 
 =cut
 
-$test->for('feature', 'config');
-
-=feature config-asks
-
-  ---
-  asks:
-    HOME: Enter your home dir
-
-The configuration file's C<asks> section provides a list of key/value pairs
-where the key is the name of the environment variable and the value is used as
-the message used by the CLI to prompt for input if the environment variable is
-not defined.
-
-=cut
-
-$test->for('feature', 'config-asks');
-
-=feature config-data
-
-  ---
-  data:
-    ECHO: true
-
-The configuration file's C<data> section provides a non-dynamic list of
-key/value pairs that will be used as environment variables.
-
-=cut
-
-$test->for('feature', 'config-data');
-
-=feature config-exec
-
-  ---
-  exec:
-    okay: $PERL -c
-
-The configuration file's C<exec> section provides the main dynamic tasks which
-can be recursively resolved and expanded.
-
-=cut
-
-$test->for('feature', 'config-exec');
-
-=feature config-find
-
-  ---
-  find:
-    cpanm: /usr/local/bin/cpanm
-
-The configuration file's C<find> section provides aliases which can be
-recursively resolved and expanded for use in other tasks.
-
-=cut
-
-$test->for('feature', 'config-find');
-
-=feature config-flow
-
-  ---
-  flow:
-    deps:
-    - cpan Term::ReadKey
-    - cpan Term::ReadLine::Gnu
-
-The configuration file's C<flow> section provides chainable tasks which are
-recursively resolved and expanded from other tasks.
-
-=cut
-
-$test->for('feature', 'config-flow');
-
-=feature config-from
-
-  ---
-  from:
-  - /usr/share/vns/.vns.yaml
-
-The configuration file's C<from> section provides paths to other configuration
-files which will be merged before execution allowing the inheritance of of
-configuration values.
-
-=cut
-
-$test->for('feature', 'config-from');
-
-=feature config-func
-
-  ---
-  func:
-    build: ./scripts/build.pl
-
-The configuration file's C<func> section provides a list of static key/value
-pairs where the key is the "subcommand" passed to the runner as the first
-arugment, and the value is the Perl script that will be loaded and executed.
-The Perl script is expected to return a subroutine reference and will be passed
-an array reference to the arguments provided.
-
-=cut
-
-$test->for('feature', 'config-func');
-
-=feature config-help
-
-  ---
-  help:
-    build: Usage: vns build [<option>]
-
-The configuration file's C<help> section provides a list of static key/value
-pairs where the key is the "subcommand" to display help text for, and the value
-is the help text to be displayed.
-
-=cut
-
-$test->for('feature', 'config-help');
-
-=feature config-libs
-
-  ---
-  libs:
-  - -Ilib
-  - -Ilocal/lib/perl5
-
-The configuration file's C<libs> section provides a list of C<-I/path/to/lib>
-"include" statements that will be automatically added to tasks expanded from
-the C<perl> section.
-
-=cut
-
-$test->for('feature', 'config-libs');
-
-=feature config-load
-
-  ---
-  load:
-  - -MVenus=true,false
-
-The configuration file's C<load> section provides a list of C<-MPackage>
-"import" statements that will be automatically added to tasks expanded from the
-C<perl> section.
-
-=cut
-
-$test->for('feature', 'config-load');
-
-=feature config-path
-
-  ---
-  path:
-  - ./bin
-  - ./dev
-  - -Ilocal/bin
-
-The configuration file's C<path> section provides a list of paths to be
-prepended to the C<PATH> environment variable which allows programs to be
-found.
-
-=cut
-
-$test->for('feature', 'config-path');
-
-=feature config-perl
-
-  ---
-  perl:
-    perl: perl
-
-The configuration file's C<perl> section provides the dynamic perl tasks which
-can serve as tasks with default commands (with options) and which can be
-recursively resolved and expanded.
-
-=cut
-
-$test->for('feature', 'config-perl');
-
-=feature config-task
-
-  ---
-  task:
-    setup: $PERL -MMyApp::Task::Setup -E0 --
-
-The configuration file's C<task> section provides the dynamic perl tasks which
-"load" L<Venus::Task> derived packages, and which can be recursively resolved
-and expanded. These tasks will typically take the form of C<perl -Ilib
--MMyApp::Task -E0 --> and will be automatically executed as a CLI.
-
-=cut
-
-$test->for('feature', 'config-task');
-
-=feature config-vars
-
-  ---
-  vars:
-    PERL: perl
-
-The configuration file's C<vars> section provides a list of dynamic key/value
-pairs that can be recursively resolved and expanded and will be used as
-environment variables.
-
-=back
-
-$test->for('feature', 'config-vars');
-
-=feature config-when
-
-  ---
-  when:
-    is_lin:
-      data:
-        OSNAME: LINUX
-    is_win:
-      data:
-        OSNAME: WINDOWS
-
-The configuration file's C<when> section provides a configuration tree to be
-merged with the existing configuration based on the name current operating
-system. The C<is_$name> key should correspond to one of the types specified by
-L<Venus::Os/type>.
-
-=back
-
-$test->for('feature', 'config-when');
-
-=feature config-with
-
-  ---
-  with:
-    psql: ./psql-tools/.vns.yml
-
-The configuration file's C<with> section provides a list of static key/value
-pairs where the key is the "subcommand" passed to the runner as the first
-arugment, and the value is the configuration file where the subcommand task
-definitions are defined which the runner dispatches to.
-
-=back
-
-$test->for('feature', 'config-with');
-
-=feature vns-cli
-
-Here are example usages of the configuration file mentioned, executed by the
-L<vns> CLI, which is simply an executable file which loads this package.
-
-  # Mint a new configuration file
-  vns init
-
-  ...
-
-  # Mint a new JSON configuration file
-  VENUS_FILE=.vns.json vns init
-
-  # Mint a new YAML configuration file
-  VENUS_FILE=.vns.yaml vns init
-
-  ...
-
-  # Install a distribution
-  vns cpan $DIST
-
-  # i.e.
-  # cpanm --llocal -qn $DIST
-
-  # Check that a package can be compiled
-  vns okay $FILE
-
-  # i.e.
-  # perl -Ilib -Ilocal/lib/perl5 -c $FILE
-
-  # Use the Perl debugger as a REPL
-  vns repl
-
-  # i.e.
-  # perl -Ilib -Ilocal/lib/perl5 -dE0
-
-  # Evaluate arbitrary Perl expressions
-  vns exec ...
-
-  # i.e.
-  # perl -Ilib -Ilocal/lib/perl5 -MVenus=log -E $@
-
-  # Test the Perl project in the CWD
-  vns test t
-
-  # i.e.
-  # prove -Ilib -Ilocal/lib/perl5 t
-
-=cut
-
-$test->for('feature', 'vns-cli');
+$test->for('example', 1, 'from_init', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Run');
+  is_deeply $result->config, $init;
+
+  $result
+});
 
 =partials
 
@@ -2602,10 +1747,6 @@ t/Venus.t: present: license
 
 $test->for('partials');
 
-# END
-
 $test->render('lib/Venus/Run.pod') if $ENV{VENUS_RENDER};
-
-unlink $Venus::Run::FILE;
 
 ok 1 and done_testing;

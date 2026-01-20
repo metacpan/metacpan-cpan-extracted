@@ -9,7 +9,7 @@ use Carp ();
 
 class PawsX::S3::Uploader;
 
-our $VERSION = '0.0.1'; # VERSION
+our $VERSION = '0.0.2'; # VERSION
 # ABSTRACT: upload to S3 from a streaming source
 
 
@@ -200,7 +200,7 @@ PawsX::S3::Uploader - upload to S3 from a streaming source
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 SYNOPSIS
 
@@ -210,7 +210,7 @@ version 0.0.1
 
     my $s3 = Paws->service(S3 => ( region => 'eu-west-1' ));
 
-    my $uploader = PawsX::S3::Uploader(
+    my $uploader = PawsX::S3::Uploader->new(
         s3     => $s3,
         bucket => 'my-bucket',
         key    => 'my-object-key',

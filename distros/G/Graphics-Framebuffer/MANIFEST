@@ -49,6 +49,7 @@ src/metadata.txt
 src/README.md
 t/01-primitives.t
 Win-No.png
+Linux.png
 LICENSE
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Process 0.804;
+package IO::Async::Process 0.805;
 
 use v5.14;
 use warnings;
@@ -22,6 +22,8 @@ use IO::Async::OS;
 C<IO::Async::Process> - start and manage a child process
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use IO::Async::Process;
 

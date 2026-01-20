@@ -4,7 +4,7 @@
       "lnation <email@lnation.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::ggml" : "0.01",
+            "Alien::ggml" : "0.08",
             "ExtUtils::MakeMaker" : "7.12"
          }
       },
@@ -37,6 +37,7 @@
          },
          "requires" : {
             "Alien::ggml" : "0.01",
+            "Cpanel::JSON::XS" : "0",
             "perl" : "5.008003"
          }
       },
@@ -47,16 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/lnation/Lugh/issues"
-      },
-      "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/lnation/Lugh.git",
-         "web" : "https://github.com/lnation/Lugh"
-      }
-   },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

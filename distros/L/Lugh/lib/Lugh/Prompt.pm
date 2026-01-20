@@ -3,7 +3,7 @@ package Lugh::Prompt;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('Lugh::Prompt', $VERSION);
@@ -18,7 +18,7 @@ Lugh::Prompt - Chat Template Formatting for LLM Conversations
 
 =head1 VERSION
 
-Version 0.01
+Version 0.08
 
 =head1 SYNOPSIS
 

@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -36,13 +37,13 @@ $test->for('abstract');
 
 =includes
 
-method: count
-method: data
-method: docs
-method: find
-method: search
-method: string
-method: text
+method: error
+method: errors
+method: new
+method: renew
+method: shorthand
+method: valid
+method: validate
 
 =cut
 
@@ -54,116 +55,28 @@ $test->for('includes');
 
   use Venus::Data;
 
-  my $data = Venus::Data->new('t/data/sections');
+  my $data = Venus::Data->new;
 
-  # $data->find(undef, 'name');
+  # bless({}, 'Venus::Data')
 
 =cut
 
 $test->for('synopsis', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Data');
+  my $result = $tryable->result;
+  ok $result;
 
   $result
 });
 
 =description
 
-This package provides methods for extracting C<DATA> sections and POD blocks
-from any file or package. The package can be configured to parse either POD or
-DATA blocks, and it defaults to being configured for POD blocks.
-
-+=head2 DATA syntax
-
-  __DATA__
-
-  # data syntax
-
-  @@ name
-
-  Example Name
-
-  @@ end
-
-  @@ titles #1
-
-  Example Title #1
-
-  @@ end
-
-  @@ titles #2
-
-  Example Title #2
-
-  @@ end
-
-+=head2 DATA syntax (nested)
-
-  __DATA__
-
-  # data syntax (nested)
-
-  @@ nested
-
-  Example Nested
-
-  +@@ demo
-
-  blah blah blah
-
-  +@@ end
-
-  @@ end
-
-+=head2 POD syntax
-
-  # pod syntax
-
-  =head1 NAME
-
-  Example #1
-
-  =cut
-
-  =head1 NAME
-
-  Example #2
-
-  =cut
-
-  # pod-ish syntax
-
-  =name
-
-  Example #1
-
-  =cut
-
-  =name
-
-  Example #2
-
-  =cut
-
-+=head2 POD syntax (nested)
-
-  # pod syntax (nested)
-
-  =nested
-
-  Example #1
-
-  +=head1 WHY?
-
-  blah blah blah
-
-  +=cut
-
-  More information on the same topic as was previously mentioned in the
-  previous section demonstrating the topic, obviously from said section.
-
-  =cut
+This package provides a value object for encapsulating data validation. It
+represents a single immutable validation attempt, ensuring unvalidated data
+cannot be observed. Validation runs at most once per instance, with all
+observable outcomes flowing from that validation. The big idea is that the
+schema (or ruleset) is a contract, and if the validate was success you can be
+certain that the data (or value) is valid and conforms with the schema.
 
 =cut
 
@@ -171,480 +84,896 @@ $test->for('description');
 
 =inherits
 
-Venus::Path
+Venus::Kind::Utility
 
 =cut
 
 $test->for('inherits');
 
-=method count
+=method error
 
-The count method uses the criteria provided to L</search> for and return the
-number of blocks found.
+The error method returns the first validation error as an arrayref in the
+format C<[path, [error_type, args]]>, or undef if no errors exist. This is a
+convenience method for accessing the first error when you don't need the
+complete error list. Call C</validate> or C</valid> first to ensure validation
+has run.
 
-=signature count
+=signature error
 
-  count(hashref $criteria) (number)
+  error() (arrayref)
 
-=metadata count
+=metadata error
 
 {
-  since => '0.01',
+  since => '4.15',
 }
 
-=example-1 count
+=example-1 error
 
-  # given: synopsis;
+  package main;
 
-  my $count = $data->docs->count;
+  use Venus::Data;
 
-  # 6
+  my $data = Venus::Data->new(
+    value => {
+      name => undef,
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  $data->validate;
+
+  my $error = $data->error;
+
+  # ['name', ['required', []]]
 
 =cut
 
-$test->for('example', 1, 'count', sub {
+$test->for('example', 1, 'error', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 7;
+  my $result = $tryable->result;
+  ok $result;
+  ok $result->[0] eq 'name';
+  ok $result->[1][0] eq 'required';
 
   $result
 });
 
-=example-2 count
+=example-2 error
 
-  # given: synopsis;
+  package main;
 
-  my $count = $data->text->count;
+  use Venus::Data;
 
-  # 3
+  my $data = Venus::Data->new(
+    value => {
+      name => 'Example',
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  $data->validate;
+
+  my $error = $data->error;
+
+  # undef
 
 =cut
 
-$test->for('example', 2, 'count', sub {
+$test->for('example', 2, 'error', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 3;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-3 error
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => 123,
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => [['type', 'string']]
+      },
+    ],
+  );
+
+  $data->validate;
+
+  my $error = $data->error;
+
+  # ['name', ['type', ['string']]]
+
+=cut
+
+$test->for('example', 3, 'error', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result;
+  ok $result->[0] eq 'name';
+  ok $result->[1][0] eq 'type';
+  ok $result->[1][1][0] eq 'string';
 
   $result
 });
 
-=method data
+=method errors
 
-The data method returns the text between the C<DATA> and C<END> sections of a
-Perl package or file.
+The errors method returns an arrayref of all validation errors. Each error is
+an arrayref with the format C<[path, [error_type, args]]> where path indicates
+which field failed and C<error_type> describes the failure (e.g., 'required',
+'type', etc). Returns an empty arrayref if validation succeeded or hasn't run
+yet.
 
-=signature data
+=signature errors
 
-  data() (string)
+  errors() (within[arrayref, arrayref])
 
-=metadata data
+=metadata errors
 
 {
-  since => '0.01',
+  since => '4.15',
 }
 
-=example-1 data
+=example-1 errors
 
-  # given: synopsis;
+  package main;
 
-  $data = $data->data;
+  use Venus::Data;
 
-  # ...
+  my $data = Venus::Data->new(
+    value => {
+      name => undef,
+      age => 'invalid'
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+      {
+        selector => 'age',
+        presence => 'required',
+        executes => ['number']
+      },
+    ],
+  );
+
+  $data->validate;
+
+  my $errors = $data->errors;
+
+  # [
+  #   ['name', ['required', []]],
+  #   ['age', ['number', []]],
+  # ]
 
 =cut
 
-$test->for('example', 1, 'data', sub {
+$test->for('example', 1, 'errors', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
+  my $result = $tryable->result;
+  ok $result;
+  ok @{$result} == 2;
+  ok $result->[0][0] eq 'name';
+  ok $result->[1][0] eq 'age';
 
   $result
 });
 
-=method docs
+=example-2 errors
 
-The docs method configures the instance for parsing POD blocks.
+  package main;
 
-=signature docs
+  use Venus::Data;
 
-  docs() (Venus::Data)
+  my $data = Venus::Data->new(
+    value => {
+      name => 'Example',
+      age => 25
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+      {
+        selector => 'age',
+        presence => 'required',
+        executes => ['number']
+      },
+    ],
+  );
 
-=metadata docs
+  $data->validate;
 
-{
-  since => '0.01',
-}
+  my $errors = $data->errors;
 
-=example-1 docs
-
-  # given: synopsis;
-
-  my $docs = $data->docs;
-
-  # bless({ etag => "=cut", from => "read", stag => "=", ... }, "Venus::Data")
+  # []
 
 =cut
 
-$test->for('example', 1, 'docs', sub {
+$test->for('example', 2, 'errors', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
+  my $result = $tryable->result;
+  ok $result;
+  ok @{$result} == 0;
+
+  $result
+});
+
+=example-3 errors
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => 123,
+      email => undef
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => [['type', 'string']]
+      },
+      {
+        selector => 'email',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  $data->validate;
+
+  my $errors = $data->errors;
+
+  # [
+  #   ['name', ['type', ['string']]],
+  #   ['email', ['required', []]],
+  # ]
+
+=cut
+
+$test->for('example', 3, 'errors', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result;
+  ok @{$result} == 2;
+  ok $result->[0][0] eq 'name';
+  ok $result->[1][0] eq 'email';
+
+  $result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Data)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new;
+
+  # bless({}, 'Venus::Data')
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
   ok $result->isa('Venus::Data');
-  ok $result->stag eq '=';
-  ok $result->etag eq '=cut';
-  ok $result->from eq 'read';
 
   $result
 });
 
-=method find
+=method renew
 
-The find method is a wrapper around L</search> as shorthand for searching by
-C<list> and C<name>.
+The renew method creates a new instance with updated arguments while preserving
+the ruleset from the current instance. This is the best way to "update" the
+value while maintaining the ruleset. The new instance will have its validation
+state reset and will need to be validated again.
 
-=signature find
+=signature renew
 
-  find(maybe[string] $list, maybe[string] $name) (arrayref)
+  renew(any @args) (object)
 
-=metadata find
+=metadata renew
 
 {
-  since => '0.01',
+  since => '4.15',
 }
 
-=example-1 find
+=example-1 renew
 
-  # given: synopsis;
+  package main;
 
-  my $find = $data->docs->find(undef, 'name');
+  use Venus::Data;
 
-  # [
-  #   { data => ["Example #1"], index => 4, list => undef, name => "name" },
-  #   { data => ["Example #2"], index => 5, list => undef, name => "name" },
-  # ]
+  my $data = Venus::Data->new(
+    value => {
+      name => 'Example',
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
 
-=cut
+  my $renewed = $data->renew(value => {name => 'Updated'});
 
-$test->for('example', 1, 'find', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, [
-    { data => ["Example #1"], index => 5, list => undef, name => "name" },
-    { data => ["Example #2"], index => 6, list => undef, name => "name" },
-  ];
-
-  $result
-});
-
-=example-2 find
-
-  # given: synopsis;
-
-  my $find = $data->docs->find('head1', 'NAME');
-
-  # [
-  #   { data => ["Example #1"], index => 1, list => "head1", name => "NAME" },
-  #   { data => ["Example #2"], index => 2, list => "head1", name => "NAME" },
-  # ]
+  # bless({...}, 'Venus::Data')
 
 =cut
 
-$test->for('example', 2, 'find', sub {
+$test->for('example', 1, 'renew', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, [
-    { data => ["Example #1"], index => 1, list => "head1", name => "NAME" },
-    { data => ["Example #2"], index => 2, list => "head1", name => "NAME" },
-  ];
-
-  $result
-});
-
-=example-3 find
-
-  # given: synopsis;
-
-  my $find = $data->text->find(undef, 'name');
-
-  # [
-  #   { data => ["Example Name"], index => 1, list => undef, name => "name" },
-  # ]
-
-=cut
-
-$test->for('example', 3, 'find', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, [
-    { data => ["Example Name"], index => 1, list => undef, name => "name" },
-  ];
-
-  $result
-});
-
-=example-4 find
-
-  # given: synopsis;
-
-  my $find = $data->text->find('titles', '#1');
-
-  # [
-  #   { data => ["Example Title #1"], index => 2, list => "titles", name => "#1" },
-  # ]
-
-=cut
-
-$test->for('example', 4, 'find', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, [
-    { data => ["Example Title #1"], index => 2, list => "titles", name => "#1" },
-  ];
-
-  $result
-});
-
-=method search
-
-The search method returns the set of blocks matching the criteria provided.
-This method can return a list of values in list-context.
-
-=signature find
-
-  find(hashref $criteria) (arrayref)
-
-=metadata find
-
-{
-  since => '0.01',
-}
-
-=example-1 search
-
-  # given: synopsis;
-
-  my $search = $data->docs->search({list => undef, name => 'name'});
-
-  # [
-  #   { data => ["Example #1"], index => 4, list => undef, name => "name" },
-  #   { data => ["Example #2"], index => 5, list => undef, name => "name" },
-  # ]
-
-=cut
-
-$test->for('example', 1, 'search', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, [
-    { data => ["Example #1"], index => 5, list => undef, name => "name" },
-    { data => ["Example #2"], index => 6, list => undef, name => "name" },
-  ];
-
-  $result
-});
-
-=example-2 search
-
-  # given: synopsis;
-
-  my $search = $data->docs->search({list => 'head1', name => 'NAME'});
-
-  # [
-  #   { data => ["Example #1"], index => 1, list => "head1", name => "NAME" },
-  #   { data => ["Example #2"], index => 2, list => "head1", name => "NAME" },
-  # ]
-
-=cut
-
-$test->for('example', 2, 'search', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, [
-    { data => ["Example #1"], index => 1, list => "head1", name => "NAME" },
-    { data => ["Example #2"], index => 2, list => "head1", name => "NAME" },
-  ];
-
-  $result
-});
-
-=example-3 search
-
-  # given: synopsis;
-
-  my $find = $data->text->search({list => undef, name => 'name'});
-
-  # [
-  #   { data => ["Example Name"], index => 1, list => undef, name => "name" },
-  # ]
-
-=cut
-
-$test->for('example', 3, 'search', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, [
-    { data => ["Example Name"], index => 1, list => undef, name => "name" },
-  ];
-
-  $result
-});
-
-=example-4 search
-
-  # given: synopsis;
-
-  my $search = $data->text->search({list => 'titles', name => '#1'});
-
-  # [
-  #   { data => ["Example Title #1"], index => 2, list => "titles", name => "#1" },
-  # ]
-
-=cut
-
-$test->for('example', 4, 'search', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, [
-    { data => ["Example Title #1"], index => 2, list => "titles", name => "#1" },
-  ];
-
-  $result
-});
-
-=method string
-
-The string method is a wrapper around L</find> as shorthand for searching by
-C<list> and C<name>, returning only the strings found.
-
-=signature string
-
-  string(maybe[string] $list, maybe[string] $name) (string)
-
-=metadata string
-
-{
-  since => '1.67',
-}
-
-=example-1 string
-
-  # given: synopsis;
-
-  my $string = $data->docs->string(undef, 'name');
-
-  # "Example #1\nExample #2"
-
-=cut
-
-$test->for('example', 1, 'string', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, "Example #1\nExample #2";
-
-  $result
-});
-
-=example-2 string
-
-  # given: synopsis;
-
-  my $string = $data->docs->string('head1', 'NAME');
-
-  # "Example #1\nExample #2"
-
-=cut
-
-$test->for('example', 2, 'string', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, "Example #1\nExample #2";
-
-  $result
-});
-
-=example-3 string
-
-  # given: synopsis;
-
-  my $string = $data->text->string(undef, 'name');
-
-  # "Example Name"
-
-=cut
-
-$test->for('example', 3, 'string', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, "Example Name";
-
-  $result
-});
-
-=example-4 string
-
-  # given: synopsis;
-
-  my $string = $data->text->string('titles', '#1');
-
-  # "Example Title #1"
-
-=cut
-
-$test->for('example', 4, 'string', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, "Example Title #1";
-
-  $result
-});
-
-=example-5 string
-
-  # given: synopsis;
-
-  my @string = $data->docs->string('head1', 'NAME');
-
-  # ("Example #1", "Example #2")
-
-=cut
-
-$test->for('example', 5, 'string', sub {
-  my ($tryable) = @_;
-  ok my $result = [$tryable->result];
-  is_deeply $result, ["Example #1", "Example #2"];
-
-  $result
-});
-
-=method text
-
-The text method configures the instance for parsing DATA blocks.
-
-=signature text
-
-  text() (Venus::Data)
-
-=metadata text
-
-{
-  since => '0.01',
-}
-
-=example-1 text
-
-  # given: synopsis;
-
-  my $text = $data->text;
-
-  # bless({ etag  => '@@ end', from  => 'data', stag  => '@@ ', ... }, "Venus::Data")
-
-=cut
-
-$test->for('example', 1, 'text', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+  my $result = $tryable->result;
+  ok $result;
   ok $result->isa('Venus::Data');
-  ok $result->stag eq '@@ ';
-  ok $result->etag eq '@@ end';
-  ok $result->from eq 'data';
+  is_deeply $result->validate, {name => 'Updated'};
+
+  $result
+});
+
+=example-2 renew
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => 'Example',
+      age => 25
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+      {
+        selector => 'age',
+        presence => 'required',
+        executes => ['number']
+      },
+    ],
+  );
+
+  $data->validate;
+
+  my $renewed = $data->renew({value => {name => 'Updated', age => 30}});
+
+  # bless({}, 'Venus::Data')
+
+=cut
+
+$test->for('example', 2, 'renew', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result;
+  ok $result->isa('Venus::Data');
+  is_deeply $result->validate, {name => 'Updated', age => 30};
+
+  $result
+});
+
+=method shorthand
+
+The shorthand method accepts an arrayref or hashref of shorthand notation and
+sets the ruleset on the instance using L<Venus::Schema/shorthand>. This
+provides a concise way to define validation rules. Keys can have suffixes to
+indicate presence: C<!> for (explicit) required, C<?> (explicit) for optional,
+C<*> for (explicit) present (i.e., must exist but can be null), and no suffix
+means (implicit) required. Keys using dot notation (e.g., C<website.url>)
+result in arrayref selectors for nested path validation. Returns the invocant
+for method chaining.
+
+=signature shorthand
+
+  shorthand(arrayref | hashref $data) (Venus::Data)
+
+=metadata shorthand
+
+{
+  since => '4.15',
+}
+
+=example-1 shorthand
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      fname => 'Elliot',
+      lname => 'Alderson',
+    },
+  );
+
+  $data->shorthand([
+    'fname!' => 'string',
+    'lname!' => 'string',
+  ]);
+
+  my $valid = $data->valid;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'shorthand', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result;
+
+  $result
+});
+
+=example-2 shorthand
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      fname => 'Elliot',
+    },
+  );
+
+  $data->shorthand([
+    'fname!' => 'string',
+    'lname!' => 'string',
+  ]);
+
+  my $valid = $data->valid;
+
+  # 0
+
+=cut
+
+$test->for('example', 2, 'shorthand', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok !$result;
+
+  !$result
+});
+
+=example-3 shorthand
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      fname => 'Elliot',
+      lname => 'Alderson',
+      login => 'mrrobot',
+    },
+  );
+
+  $data->shorthand([
+    'fname!' => 'string',
+    'lname!' => 'string',
+    'email?' => 'string',
+    'login' => 'string',
+  ]);
+
+  my $validated = $data->validate;
+
+  # {fname => 'Elliot', lname => 'Alderson', login => 'mrrobot'}
+
+=cut
+
+$test->for('example', 3, 'shorthand', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result;
+  ok $result->{fname} eq 'Elliot';
+  ok $result->{lname} eq 'Alderson';
+  ok $result->{login} eq 'mrrobot';
+
+  $result
+});
+
+=example-4 shorthand
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      user => {
+        name => 'Elliot',
+      },
+    },
+  );
+
+  $data->shorthand([
+    'user.name' => 'string',
+  ]);
+
+  my $validated = $data->validate;
+
+  # {user => {name => 'Elliot'}}
+
+=cut
+
+$test->for('example', 4, 'shorthand', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result;
+  ok $result->{user}{name} eq 'Elliot';
+
+  $result
+});
+
+=method valid
+
+The valid method returns a boolean indicating whether the data is valid. Triggers
+validation on first call if not already validated. Subsequent calls return the
+cached validation state without re-validating. This is the primary way to check
+if data passed validation.
+
+=signature valid
+
+  valid() (boolean)
+
+=metadata valid
+
+{
+  since => '4.15',
+}
+
+=example-1 valid
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => 'Example',
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  my $valid = $data->valid;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'valid', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result;
+
+  $result
+});
+
+=example-2 valid
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => undef,
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  my $valid = $data->valid;
+
+  # 0
+
+=cut
+
+$test->for('example', 2, 'valid', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  ok !$result;
+
+  !$result
+});
+
+=example-3 valid
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => 'Example',
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  my $check_1 = $data->valid;
+
+  # true
+
+  my $check_2 = $data->valid;
+
+  # true (cached)
+
+=cut
+
+$test->for('example', 3, 'valid', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result;
+
+  $result
+});
+
+=method validate
+
+The validate method performs validation of the value against the ruleset and
+returns the validated (and potentially modified) value on success, or undef on
+failure. Validation runs at most once per instance, and subsequent calls return
+cached results. The returned value may differ from the original due to
+transformations applied during validation (e.g., "trim", "strip", "lowercase",
+etc). After validation, check C</valid> to determine success/failure and
+C</errors> to get validation errors.
+
+=signature validate
+
+  validate() (any)
+
+=metadata validate
+
+{
+  since => '4.15',
+}
+
+=example-1 validate
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => '  Example  ',
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string', 'trim']
+      },
+    ],
+  );
+
+  my $validated = $data->validate;
+
+  # {name => 'Example'}
+
+=cut
+
+$test->for('example', 1, 'validate', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result;
+  ok $result->{name} eq 'Example';
+
+  $result
+});
+
+=example-2 validate
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => undef,
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  my $validated = $data->validate;
+
+  # undef
+
+=cut
+
+$test->for('example', 2, 'validate', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-3 validate
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      name => 'Example',
+    },
+    ruleset => [
+      {
+        selector => 'name',
+        presence => 'required',
+        executes => ['string']
+      },
+    ],
+  );
+
+  my $validated_1 = $data->validate;
+
+  # {name => 'Example'}
+
+  my $validated_2 = $data->validate;
+
+  # {name => 'Example'} (cached)
+
+=cut
+
+$test->for('example', 3, 'validate', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result;
+  ok $result->{name} eq 'Example';
+
+  $result
+});
+
+=example-4 validate
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new(
+    value => {
+      fname => 'Elliot',
+    },
+    ruleset => [
+      {
+        selector => 'fname',
+        presence => 'required',
+        executes => ['string', 'trim', 'strip'],
+      },
+      {
+        selector => 'lname',
+        presence => 'required',
+        executes => ['string', 'trim', 'strip'],
+      },
+      {
+        selector => 'skills',
+        presence => 'present',
+      },
+      {
+        selector => 'handles',
+        presence => 'required',
+        executes => [['type', 'arrayref']],
+      },
+      {
+        selector => ['handles', 'name'],
+        presence => 'required',
+        executes => ['string', 'trim', 'strip'],
+      },
+      {
+        selector => ['level'],
+        presence => 'required',
+        executes => ['number', 'trim', 'strip'],
+      },
+    ],
+  );
+
+  my $validated = $data->validate;
+
+  # undef
+
+  my $errors = $data->errors;
+
+  # [
+  #   ['lname', ['required', []]],
+  #   ['skills', ['present', []]],
+  #   ['handles', ['required', []]],
+  #   ['handles.name', ['required', []]],
+  #   ['level', ['required', []]],
+  # ]
+
+=cut
+
+$test->for('example', 4, 'validate', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result;
+  ok @{$result} == 5;
+  ok $result->[0][0] eq 'lname';
+  ok $result->[1][0] eq 'skills';
+  ok $result->[2][0] eq 'handles';
+  ok $result->[3][0] eq 'handles.name';
+  ok $result->[4][0] eq 'level';
 
   $result
 });

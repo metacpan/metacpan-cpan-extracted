@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -87,7 +88,7 @@ $test->for('description');
 =method is_false
 
 The is_false method dispatches the method call or executes the callback and
-returns truthy returns as C<false> and falsy returns as C<true>
+returns truthy as C<false> and falsy returns as C<true>
 L<"boolean"|Venus::Boolean> values.
 
 =signature is_false

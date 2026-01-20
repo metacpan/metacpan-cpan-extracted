@@ -6,7 +6,6 @@ WriteMakefile
   'NAME' => 'WebService::MusicBrainz',
   'VERSION_FROM' => 'lib/WebService/MusicBrainz.pm',
   'PREREQ_PM' => {
-                   'Mojo::UserAgent::Role::Retry' => '0.002',
                    'Mojolicious' => '7.13'
                  },
   'INSTALLDIRS' => 'site',

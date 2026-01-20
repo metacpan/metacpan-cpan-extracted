@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -37,6 +38,7 @@ $test->for('abstract');
 =includes
 
 method: catch
+method: caught
 method: maybe
 
 =cut
@@ -186,6 +188,220 @@ $test->for('example', 4, 'catch', sub {
   ok !defined $result[1];
 
   @result
+});
+
+=method caught
+
+The caught method evaluates the value provided and validates its identity and
+name (if provided) then executes the code block (if provided) returning the
+result of the callback. If no callback is provided this function returns the
+exception object on success and C<undef> on failure.
+
+=signature caught
+
+  caught(object $error, string | tuple[string, string] $identity, coderef $block) (any)
+
+=metadata caught
+
+{
+  since => '4.15',
+}
+
+=example-1 caught
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch = $example->catch('fail');
+
+  my $result = $example->caught($catch);
+
+  # bless(..., 'Venus::Error')
+
+=cut
+
+$test->for('example', 1, 'caught', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Error');
+  ok !$result->name;
+
+  $result
+});
+
+=example-2 caught
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch = $example->catch('fail');
+
+  my $result = $example->caught($catch, 'Venus::Error');
+
+  # bless(..., 'Venus::Error')
+
+=cut
+
+$test->for('example', 2, 'caught', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Error');
+  ok !$result->name;
+
+  $result
+});
+
+=example-3 caught
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch = $example->catch('fail');
+
+  my $result = $example->caught($catch, 'Venus::Error', sub{
+    $example->{caught} = $_;
+  });
+
+  ($example, $result)
+
+  # (bless(..., 'Example'), bless(..., 'Venus::Error'))
+
+=cut
+
+$test->for('example', 3, 'caught', sub {
+  my ($tryable) = @_;
+  ok my @result = $tryable->result;
+  ok $result[0]->isa('Example');
+  ok exists $result[0]->{caught};
+  ok $result[1]->isa('Venus::Error');
+  ok !$result[1]->name;
+
+  @result
+});
+
+=example-4 caught
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch = $example->catch('fail');
+
+  $catch->name('on.issue');
+
+  my $result = $example->caught($catch, ['Venus::Error', 'on.issue']);
+
+  # bless(..., 'Venus::Error')
+
+=cut
+
+$test->for('example', 4, 'caught', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Error');
+  is $result->name, 'on.issue';
+
+  $result
+});
+
+=example-5 caught
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch = $example->catch('fail');
+
+  $catch->name('on.issue');
+
+  my $result = $example->caught($catch, ['Venus::Error', 'on.issue'], sub{
+    $example->{caught} = $_;
+  });
+
+  ($example, $result)
+
+  # (bless(..., 'Example'), bless(..., 'Venus::Error'))
+
+=cut
+
+$test->for('example', 5, 'caught', sub {
+  my ($tryable) = @_;
+  ok my @result = $tryable->result;
+  ok $result[0]->isa('Example');
+  ok exists $result[0]->{caught};
+  ok $result[1]->isa('Venus::Error');
+  is $result[1]->name, 'on.issue';
+
+  @result
+});
+
+=example-6 caught
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch = $example->catch('fail');
+
+  my $result = $example->caught($catch, ['Venus::Error', 'on.issue']);
+
+  # undef
+
+=cut
+
+$test->for('example', 6, 'caught', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-6 caught
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch = $example->catch('fail');
+
+  my $result = $example->caught($catch, 'Venus::Error');
+
+  # undef
+
+=cut
+
+$test->for('example', 6, 'caught', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-7 caught
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch;
+
+  my $result = $example->caught($catch);
+
+  # undef
+
+=cut
+
+$test->for('example', 7, 'caught', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
 });
 
 =method maybe

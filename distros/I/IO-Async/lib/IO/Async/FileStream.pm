@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::FileStream 0.804;
+package IO::Async::FileStream 0.805;
 
 use v5.14;
 use warnings;
@@ -20,6 +20,8 @@ use Fcntl qw( SEEK_SET SEEK_CUR );
 C<IO::Async::FileStream> - read the tail of a file
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use IO::Async::FileStream;
 

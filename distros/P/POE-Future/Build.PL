@@ -16,7 +16,6 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004', # test_requires
    },
    test_requires => {
-      'Test::Timer' => 0,
       'Test2::V0' => 0,
    },
    license => 'perl',

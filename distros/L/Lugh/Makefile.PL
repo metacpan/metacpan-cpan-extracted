@@ -104,8 +104,8 @@ Or from source:
 END_ERROR
 };
 
-# Platform-specific flags
-my $ccflags = '-Wall';
+# Platform-specific flags - must include Perl's ccflags for correct ABI
+my $ccflags = $Config{ccflags} . ' -Wall -O3';
 my $cc = $Config{cc};
 my $ld = $Config{ld};
 
@@ -131,7 +131,7 @@ my %WriteMakefileArgs = (
     ($rpath ? (dynamic_lib => { OTHERLDFLAGS => $rpath }) : ()),
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '7.12',
-        'Alien::ggml'         => '0.01',
+       	'Alien::ggml'         => '0.08',
     },
     BUILD_REQUIRES => {
         'Alien::ggml' => '0.01',
@@ -141,19 +141,10 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
         'Alien::ggml' => '0.01',
+        'Cpanel::JSON::XS' => '0',  # For SafeTensors LoRA support
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },
-        resources => {
-            repository => {
-                type => 'git',
-                url  => 'https://github.com/lnation/Lugh.git',
-                web  => 'https://github.com/lnation/Lugh',
-            },
-            bugtracker => {
-                web => 'https://github.com/lnation/Lugh/issues',
-            },
-        },
         prereqs => {
             runtime => {
                 recommends => {

@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -38,6 +39,7 @@ $test->for('abstract');
 
 method: build_arg
 method: build_args
+method: build_data
 method: build_self
 method: build_nil
 
@@ -188,6 +190,65 @@ $test->for('example', 1, 'build_args', sub {
   ok $result->does('Venus::Role::Buildable');
   ok $result->x == 10;
   ok $result->y == 10;
+
+  $result
+});
+
+=method build_data
+
+The build_data method, if defined, is only called during object construction to
+hook into the handling of the arguments provided. This method is passed two
+hashrefs, the first containing expected arguments provided to the constructor
+(e.g. attributes), and the second containing all unexpected arguments. The
+hashref or key/value pairs returned from this method will be used in subsequent
+automation.
+
+=signature build_data
+
+  build_data(hashref $args, hashref $xargs) (hashref)
+
+=metadata build_data
+
+{
+  since => '4.15',
+}
+
+=example-1 build_data
+
+  package Example5;
+
+  use Venus::Class;
+
+  attr 'x';
+  attr 'y';
+
+  with 'Venus::Role::Buildable';
+
+  sub build_data {
+    my ($self, $args, $xargs) = @_;
+
+    $args->{z} = delete $xargs->{z} if !exists $args->{z} && exists $xargs->{z};
+
+    return $args;
+  }
+
+  package main;
+
+  my $example = Example5->new(x => 10, y => 10, z => 10);
+
+  # $example->x;
+  # $example->y;
+
+=cut
+
+$test->for('example', 1, 'build_data', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Example5');
+  ok $result->does('Venus::Role::Buildable');
+  ok $result->x == 10;
+  ok $result->y == 10;
+  ok $result->{z} == 10;
 
   $result
 });

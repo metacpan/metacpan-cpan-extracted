@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2025 -- leonerd@leonerd.org.uk
 
-package IO::Async::File 0.804;
+package IO::Async::File 0.805;
 
 use v5.14;
 use warnings;
@@ -21,6 +21,8 @@ my @STATS = qw( dev ino mode nlink uid gid rdev size atime mtime ctime );
 C<IO::Async::File> - watch a file for changes
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use IO::Async::File;
 
@@ -51,6 +53,10 @@ While called "File", it is not required that the watched filehandle be a
 regular file. It is possible to watch anything that C<stat(2)> may be called
 on, such as directories or other filesystem entities.
 
+I<Since version 0.805> a named file does not necessarily need to exist. If it
+is not present, all its C<stat()> fields are treated as undefined; events will
+be invoked when it becomes present or is removed, in addition to any changes.
+
 =cut
 
 =head1 EVENTS
@@ -68,7 +74,8 @@ references in parameters.
 
 Invoked when each of the individual C<stat()> fields have changed. All the
 C<stat()> fields are supported apart from C<blocks> and C<blksize>. Each is
-passed the new and old values of the field.
+passed the new and old values of the field. Either field may be C<undef> if
+the file did not or currently does not exist.
 
 =head2 on_devino_changed $new_stat, $old_stat
 
@@ -80,7 +87,8 @@ be observed to happen on opened filehandles.
 =head2 on_stat_changed $new_stat, $old_stat
 
 Invoked when any of the C<stat()> fields have changed. It is passed two
-L<File::stat> instances containing the old and new C<stat()> fields.
+L<File::stat> instances containing the old and new C<stat()> fields. Either
+value may be C<undef> if the file did not or currently does not exist.
 
 =cut
 
@@ -159,9 +167,12 @@ sub _reopen_file
 
    my $path = $self->{filename};
 
-   open $self->{handle}, "<", $path or croak "Cannot open $path for reading - $!";
-
-   $self->{last_stat} = stat $self->{handle};
+   if( open $self->{handle}, "<", $path ) {
+      $self->{last_stat} = stat $self->{handle};
+   }
+   else {
+      undef $self->{last_stat};
+   }
 }
 
 sub on_tick
@@ -171,15 +182,23 @@ sub on_tick
    my $old = $self->{last_stat};
    my $new = stat( defined $self->{filename} ? $self->{filename} : $self->{handle} );
 
+   # If it didn't and still doesn't exist, nothing to do
+   defined $old or defined $new or
+      return;
+
+   # From here onwards, one of $old or $new might be undef
+
    my $any_changed;
    foreach my $stat ( @STATS ) {
-      next if $old->$stat == $new->$stat;
+      next if $old and $new and $old->$stat == $new->$stat;
 
       $any_changed++;
-      $self->maybe_invoke_event( "on_${stat}_changed", $new->$stat, $old->$stat );
+      $self->maybe_invoke_event( "on_${stat}_changed",
+         ( $new ? $new->$stat : undef ),
+         ( $old ? $old->$stat : undef ) );
    }
 
-   if( $old->dev != $new->dev or $old->ino != $new->ino ) {
+   if( !$old or !$new or $old->dev != $new->dev or $old->ino != $new->ino ) {
       $self->maybe_invoke_event( on_devino_changed => $new, $old );
       $self->_reopen_file;
    }

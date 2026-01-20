@@ -4,13 +4,13 @@ use strict;
 use warnings;
 use Ref::Util qw/is_arrayref is_hashref is_ref/;
 
-our $VERSION='0.2.9';
+our $VERSION='0.3.0';
 
 my %property=map {$_=>undef} qw/message attributes names note/;
 
 sub new {
 	my ($ref,%opt)=@_;
-	my $class=ref($ref)||$ref;
+	my $class=is_ref($ref)||$ref;
 	my %self=(
 		attributes=>$opt{attributes}//{},
 		msg       =>[],
@@ -148,6 +148,6 @@ Given a plain (unknown) message configuration, find any embedded attributes.  Th
 
 =head1 BUGS
 
-As of version 0.1.2, there is very little validation of the C<names> contents.
+There is very little validation of the C<names> contents.
 
 =cut

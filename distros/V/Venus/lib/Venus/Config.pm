@@ -5,16 +5,25 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base', 'with';
 
+# INHERITS
+
 base 'Venus::Kind::Utility';
+
+# INTEGRATES
 
 with 'Venus::Role::Buildable';
 with 'Venus::Role::Valuable';
 
 use Scalar::Util ();
 
+# STATE
+
 state $reader = {
+  env => 'read_env_file',
   js => 'read_json_file',
   json => 'read_json_file',
   perl => 'read_perl_file',
@@ -24,6 +33,7 @@ state $reader = {
 };
 
 state $writer = {
+  env => 'write_env_file',
   js => 'write_json_file',
   json => 'write_json_file',
   perl => 'write_perl_file',
@@ -55,6 +65,140 @@ sub edit_file {
   $self->value($self->$code($self->value));
 
   return $self->write_file($file);
+}
+
+sub read_env {
+  my ($self, $lines) = @_;
+
+  my $data = {};
+
+  my $content = $lines // '';
+  my $length = length($content);
+  my $pos = 0;
+
+  while ($pos < $length) {
+    # Skip whitespace and newlines
+    if (substr($content, $pos, 1) =~ /[\s\n]/) {
+      $pos++;
+      next;
+    }
+
+    # Skip comments (lines starting with #)
+    if (substr($content, $pos, 1) eq '#') {
+      while ($pos < $length && substr($content, $pos, 1) ne "\n") {
+        $pos++;
+      }
+      next;
+    }
+
+    # Parse key (alphanumeric, underscore, and dot)
+    my $key = '';
+    while ($pos < $length && substr($content, $pos, 1) =~ /[\w\.]/) {
+      $key .= substr($content, $pos, 1);
+      $pos++;
+    }
+
+    # Skip if no key found
+    next if !length($key);
+
+    # Skip whitespace before =
+    while ($pos < $length && substr($content, $pos, 1) =~ /[ \t]/) {
+      $pos++;
+    }
+
+    # Expect =
+    if ($pos >= $length || substr($content, $pos, 1) ne '=') {
+      # Skip to end of line if no =
+      while ($pos < $length && substr($content, $pos, 1) ne "\n") {
+        $pos++;
+      }
+      next;
+    }
+    $pos++; # Skip =
+
+    # Skip whitespace after =
+    while ($pos < $length && substr($content, $pos, 1) =~ /[ \t]/) {
+      $pos++;
+    }
+
+    # Parse value
+    my $value = '';
+    my $char = substr($content, $pos, 1);
+
+    if ($char eq '"') {
+      # Double-quoted value (can be multiline)
+      $pos++; # Skip opening quote
+      while ($pos < $length) {
+        $char = substr($content, $pos, 1);
+        if ($char eq '\\' && $pos + 1 < $length) {
+          # Handle escape sequences
+          my $next = substr($content, $pos + 1, 1);
+          if ($next eq 'n') {
+            $value .= "\n";
+            $pos += 2;
+          }
+          elsif ($next eq 't') {
+            $value .= "\t";
+            $pos += 2;
+          }
+          elsif ($next eq '"') {
+            $value .= '"';
+            $pos += 2;
+          }
+          elsif ($next eq '\\') {
+            $value .= '\\';
+            $pos += 2;
+          }
+          else {
+            $value .= $char;
+            $pos++;
+          }
+        }
+        elsif ($char eq '"') {
+          $pos++; # Skip closing quote
+          last;
+        }
+        else {
+          $value .= $char;
+          $pos++;
+        }
+      }
+    }
+    elsif ($char eq "'") {
+      # Single-quoted value (can be multiline, no escape processing)
+      $pos++; # Skip opening quote
+      while ($pos < $length) {
+        $char = substr($content, $pos, 1);
+        if ($char eq "'") {
+          $pos++; # Skip closing quote
+          last;
+        }
+        else {
+          $value .= $char;
+          $pos++;
+        }
+      }
+    }
+    else {
+      # Unquoted value (single line, until whitespace or comment)
+      while ($pos < $length) {
+        $char = substr($content, $pos, 1);
+        last if $char =~ /[\s#\n]/;
+        $value .= $char;
+        $pos++;
+      }
+    }
+
+    $data->{$key} = $value;
+  }
+
+  return $self->class->new($data);
+}
+
+sub read_env_file {
+  my ($self, $file) = @_;
+
+  return $self->read_env(Venus::Path->new($file)->read);
 }
 
 sub read_file {
@@ -117,6 +261,42 @@ sub read_yaml_file {
   require Venus::Path;
 
   return $self->read_yaml(Venus::Path->new($file)->read);
+}
+
+sub write_env {
+  my ($self) = @_;
+
+  my @data;
+
+  for my $key (sort keys %{$self->value}) {
+    my $value = $self->value->{$key};
+
+    next if !defined $value || ref $value;
+
+    # Check if value needs quoting (contains whitespace, newlines, or special chars)
+    my $needs_quotes = $value =~ /[\s\n\t"'#\\]/;
+
+    if ($needs_quotes) {
+      # Escape special characters for double-quoted values
+      $value =~ s/\\/\\\\/g;
+      $value =~ s/"/\\"/g;
+      $value =~ s/\n/\\n/g;
+      $value =~ s/\t/\\t/g;
+      $value = qq("$value");
+    }
+
+    push @data, "$key=$value";
+  }
+
+  return join "\n", @data;
+}
+
+sub write_env_file {
+  my ($self, $file) = @_;
+
+  Venus::Path->new($file)->write($self->write_env);
+
+  return $self;
 }
 
 sub write_file {
@@ -273,6 +453,129 @@ I<Since C<3.10>>
 
     return $data;
   });
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Config)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Config;
+
+  my $config = Venus::Config->new;
+
+  # bless(..., "Venus::Config")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Config;
+
+  my $config = Venus::Config->new(value => {password => 'secret'});
+
+  # bless(..., "Venus::Config")
+
+=back
+
+=cut
+
+=head2 read_env
+
+  read_env(string $data) (Venus::Config)
+
+The read_env method returns a new L<Venus::Config> object based on the string
+of key/value pairs provided. This method supports multiline values when
+enclosed in double or single quotes.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item read_env example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $read_env = $config->read_env(
+    "APPNAME=Example\nAPPVER=0.01\n# Comment\n\n\nAPPTAG=\"Godzilla\"",
+  );
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=over 4
+
+=item read_env example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $read_env = $config->read_env(
+    "MESSAGE=\"Hello\nWorld\"\nSIGNATURE='Best,\nTeam'",
+  );
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=over 4
+
+=item read_env example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $read_env = $config->read_env(
+    'ESCAPE="line1\nline2\ttabbed"',
+  );
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=cut
+
+=head2 read_env_file
+
+  read_env_file(string $file) (Venus::Config)
+
+The read_env_file method uses L<Venus::Path> to return a new L<Venus::Config>
+object based on the file provided.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item read_env_file example 1
+
+  # given: synopsis
+
+  package main;
+
+  $config = $config->read_env_file('t/conf/read.env');
 
   # bless(..., 'Venus::Config')
 
@@ -502,6 +805,111 @@ I<Since C<2.91>>
   package main;
 
   $config = $config->read_yaml_file('t/conf/read.yaml');
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=cut
+
+=head2 write_env
+
+  write_env() (string)
+
+The write_env method returns a string representing environment variable
+key/value pairs based on the L</value> held by the underlying L<Venus::Config>
+object. Multiline values are escaped using C<\n> notation and enclosed in
+double quotes.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item write_env example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $value = $config->value({
+    APPNAME => "Example",
+    APPTAG => "Godzilla",
+    APPVER => 0.01,
+  });
+
+  my $write_env = $config->write_env;
+
+  # "APPNAME=Example\nAPPTAG=Godzilla\nAPPVER=0.01"
+
+=back
+
+=over 4
+
+=item write_env example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $value = $config->value({
+    MESSAGE => "Hello\nWorld",
+    NOTE => "line1\ttabbed",
+  });
+
+  my $write_env = $config->write_env;
+
+  # "MESSAGE=\"Hello\\nWorld\"\nNOTE=\"line1\\ttabbed\""
+
+=back
+
+=over 4
+
+=item write_env example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $value = $config->value({
+    APPNAME => "Example",
+    MESSAGE => "Hello\nWorld\nGoodbye",
+    APPTAG => "Godzilla",
+  });
+
+  my $write_env = $config->write_env;
+
+  my $read_env = $config->read_env($write_env);
+
+  # bless(..., 'Venus::Config')
+
+  # round-trip: read_env(write_env($value)) == $value
+
+=back
+
+=cut
+
+=head2 write_env_file
+
+  write_env_file(string $path) (Venus::Config)
+
+The write_env_file method saves a environment configuration file and returns a new
+L<Venus::Config> object.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item write_env_file example 1
+
+  # given: synopsis
+
+  my $value = $config->value({
+    APPNAME => "Example",
+    APPTAG => "Godzilla",
+    APPVER => 0.01,
+  });
+
+  $config = $config->write_env_file('t/conf/write.env');
 
   # bless(..., 'Venus::Config')
 

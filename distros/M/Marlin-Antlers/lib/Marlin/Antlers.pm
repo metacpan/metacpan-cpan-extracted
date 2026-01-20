@@ -7,7 +7,7 @@ use warnings;
 package Marlin::Antlers;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002001';
+our $VERSION   = '0.003000';
 
 use B::Hooks::AtRuntime qw( at_runtime after_runtime );
 use Class::Method::Modifiers qw( install_modifier );
@@ -21,7 +21,7 @@ use Types::Common -lexical, -all;
 use namespace::autoclean;
 
 our @ISA    = qw( Exporter::Tiny );
-our @EXPORT = qw( has extends with before after around fresh __FINALIZE__ );
+our @EXPORT = qw( has extends with before after around fresh signature signature_for __FINALIZE__ );
 
 my %PACKAGES;
 
@@ -46,7 +46,7 @@ sub _exporter_validate_opts ( $me, $globals ) {
 	strict->import::into( $pkg );
 	warnings->import::into( $pkg );
 	Marlin::Util->import::into( $pkg, -lexical, -all );
-	Types::Common->import::into( $pkg, -lexical, -all );
+	Types::Common->import::into( $pkg, -lexical, -all, qw( !signature !signature_for ) );
 	namespace::autoclean->import::into( $pkg );
 	
 	my @plugins = do {
@@ -79,7 +79,7 @@ sub _exporter_validate_opts ( $me, $globals ) {
 		my $marlin = $kind->new( $args );
 		$marlin->store_meta;
 		$marlin->do_setup;
-		install_modifier( $pkg, @$_ ) for $mods->@*;
+		install_modifier( $pkg, $_->@* ) for $mods->@*;
 	};
 	
 	&after_runtime( $finalize );
@@ -112,7 +112,7 @@ sub _generate_has ( $me, $name, $value, $globals ) {
 			push $globals->{MARLIN}{attributes}->@*, {
 				is        => 'ro',
 				init_arg  => $default_init_arg,
-				%$spec,
+				$spec->%*,
 				slot      => $name,
 			};
 		}
@@ -138,6 +138,26 @@ sub _generate_with ( $me, $name, $value, $globals ) {
 		push $globals->{MARLIN}{roles}->@*,
 			map [ split /\s+/ ],
 			@packages;
+	};
+}
+
+sub _generate_signature ( $me, $name, $value, $globals ) {
+	return sub {
+		my ( %opts ) = @_;
+		$opts{method}  = 1                if !exists $opts{method};
+		$opts{package} = $globals->{into} if !exists $opts{package};
+		@_ = ( %opts );
+		goto \&Type::Params::signature;
+	};
+}
+
+sub _generate_signature_for ( $me, $name, $value, $globals ) {
+	return sub {
+		my ( $function, %opts ) = @_;
+		$opts{method}  = 1                if !exists $opts{method};
+		$opts{package} = $globals->{into} if !exists $opts{package};
+		@_ = ( $function, %opts );
+		goto \&Type::Params::signature_for;
 	};
 }
 
@@ -216,7 +236,7 @@ for L<Marlin>.
 
 It also exports everything from L<Types::Common> and L<Marlin::Util>.
 This will give you C<true>, C<false>, C<ro>, C<rw>, C<rwp>, etc for
-free, plus a whole bunch of type constraints, C<signature_for>, etc.
+free, plus a whole bunch of type constraints, etc.
 
 Everything is exported lexically.
 
@@ -339,6 +359,30 @@ Defines a method but complains if you're overwriting an inherited method.
 See L<Class::Method::Modifiers>.
 
 Moose and Moo don't provide this keyword.
+
+=item C<< signature_for FUNCTION => ( SPEC ) >>
+
+=item C<< signature( SPEC ) >>
+
+Marlin::Antlers exports slightly modified versions of C<signature> and
+C<signature_for> from L<Type::Params>. The main user-visible difference
+is that they default to C<< method => true >>, as they are intended for
+use in object-oriented packages.
+
+  package Local::Calculator {
+    use Marlin::Antlers;
+    
+    signature_for add_nums => (
+      positional => [ Int, Int ],
+    );
+    
+    sub add_nums ( $self, $first, $second ) {
+      return $first + $second;
+    }
+  }
+  
+  my $calc = Local::Calculator->new;
+  say $calc->add_nums( 40, 2 );  # 42
 
 =item C<< __FINALIZE__ >>
 

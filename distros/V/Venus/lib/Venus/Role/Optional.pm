@@ -5,37 +5,9 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Role 'catch', 'error', 'with';
-
-# METHODS
-
-sub clear {
-  my ($self, $name) = @_;
-
-  return if !$name;
-
-  return delete $self->{$name};
-}
-
-sub has {
-  my ($self, $name) = @_;
-
-  return if !$name;
-
-  return exists $self->{$name} ? true : false;
-}
-
-sub reset {
-  my ($self, $name, @data) = @_;
-
-  return if !$name || !$self->can($name);
-
-  my $value = $self->clear($name);
-
-  $self->$name(@data);
-
-  return $value;
-}
 
 # BUILDERS
 
@@ -74,6 +46,36 @@ sub BUILD {
   }
 
   return $self;
+}
+
+# METHODS
+
+sub clear {
+  my ($self, $name) = @_;
+
+  return if !$name;
+
+  return delete $self->{$name};
+}
+
+sub has {
+  my ($self, $name) = @_;
+
+  return if !$name;
+
+  return exists $self->{$name} ? true : false;
+}
+
+sub reset {
+  my ($self, $name, @data) = @_;
+
+  return if !$name || !$self->can($name);
+
+  my $value = $self->clear($name);
+
+  $self->$name(@data);
+
+  return $value;
 }
 
 # EXTENSIONS
@@ -180,7 +182,7 @@ sub option_assert {
         $throw->stash(data => $value);
         $throw->stash(name => $name);
         $throw->stash(self => $self);
-        $throw->error;
+        $throw->die;
       }
     }
     elsif (length($return)) {
@@ -195,7 +197,7 @@ sub option_assert {
       $throw->stash(data => $value);
       $throw->stash(name => $name);
       $throw->stash(self => $self);
-      $throw->error;
+      $throw->die;
     }
   }
   return;
@@ -223,7 +225,7 @@ sub option_check {
     $throw->stash(name => $name);
     $throw->stash(self => $self);
     if (!$code->($self, @data)) {
-      $throw->error;
+      $throw->die;
     }
   }
   return;
@@ -238,8 +240,7 @@ sub option_coerce {
     my $value = @data ? $data[0] : $self->{$name};
     my $return = $code->($self, @data);
     my $package = Venus::Space->new($return)->load;
-    my $method = $package->can('DOES')
-      && $package->DOES('Venus::Role::Assertable') ? 'make' : 'new';
+    my $method =  'new';
     return $self->{$name} = $package->$method($value)
       if !Scalar::Util::blessed($value)
       || (Scalar::Util::blessed($value) && !$value->isa($return));
@@ -298,7 +299,7 @@ sub option_readonly {
     $throw->stash(name => $name);
     $throw->stash(self => $self);
     if ($code->($self, @data)) {
-      $throw->error;
+      $throw->die;
     }
   }
   return;
@@ -316,7 +317,7 @@ sub option_readwrite {
     $throw->stash(name => $name);
     $throw->stash(self => $self);
     if (!$code->($self, @data)) {
-      $throw->error;
+      $throw->die;
     }
   }
   return;
@@ -334,7 +335,7 @@ sub option_require {
     $throw->stash(name => $name);
     $throw->stash(self => $self);
     if ($code->($self, @data) && !@data) {
-      $throw->error;
+      $throw->die;
     }
   }
   return;

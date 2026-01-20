@@ -51,7 +51,7 @@ local $SIG{__DIE__}=\&Carp::confess;
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='2.072';
+$VERSION='2.073';
 
 
 #  Run main

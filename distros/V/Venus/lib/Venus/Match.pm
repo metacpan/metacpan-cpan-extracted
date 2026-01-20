@@ -5,15 +5,21 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'attr', 'base', 'with';
 
+use Scalar::Util ();
+
+# INHERITS
+
 base 'Venus::Kind::Utility';
+
+# INTEGRATES
 
 with 'Venus::Role::Valuable';
 with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
-
-use Scalar::Util ();
 
 # ATTRIBUTES
 
@@ -37,6 +43,14 @@ sub build_self {
 
 # METHODS
 
+sub boolean {
+  my ($self) = @_;
+
+  $self->then(sub{return true})->none(sub{return false});
+
+  return $self;
+}
+
 sub clear {
   my ($self) = @_;
 
@@ -58,13 +72,21 @@ sub data {
   return $self;
 }
 
+sub defined {
+  my ($self) = @_;
+
+  $self->only(sub{CORE::defined($_[0])});
+
+  return $self;
+}
+
 sub expr {
   my ($self, $topic) = @_;
 
   $self->when(sub{
     my $value = $self->value;
 
-    if (!defined $value) {
+    if (!CORE::defined($value)) {
       return false;
     }
     if (Scalar::Util::blessed($value) && !overload::Overloaded($value)) {
@@ -93,7 +115,7 @@ sub just {
   $self->when(sub{
     my $value = $self->value;
 
-    if (!defined $value) {
+    if (!CORE::defined($value)) {
       return false;
     }
     if (Scalar::Util::blessed($value) && !overload::Overloaded($value)) {
@@ -121,6 +143,16 @@ sub none {
   return $self;
 }
 
+sub object {
+  my ($self) = @_;
+
+  require Scalar::Util;
+
+  $self->only(sub{Scalar::Util::blessed($_[0])});
+
+  return $self;
+}
+
 sub only {
   my ($self, $code) = @_;
 
@@ -139,7 +171,11 @@ sub result {
   my $value = $self->value;
 
   local $_ = $value;
-  return wantarray ? ($result, $matched) : $result if !$self->on_only->($value);
+  if (!$self->on_only->($value)) {
+    local $_ = $value;
+    $result = $self->on_none->($value);
+    return wantarray ? ($result, $matched) : $result;
+  }
 
   for (my $i = 0; $i < @{$self->on_when}; $i++) {
     if ($self->on_when->[$i]->($value)) {
@@ -155,6 +191,14 @@ sub result {
   }
 
   return wantarray ? ($result, $matched) : $result;
+}
+
+sub take {
+  my ($self) = @_;
+
+  $self->then(sub{return $_[0]})->none(sub{return undef});
+
+  return $self;
 }
 
 sub test {
@@ -188,6 +232,16 @@ sub then {
   return $self;
 }
 
+sub type {
+  my ($self, $expr) = @_;
+
+  require Venus::Type;
+
+  $self->when(sub{Venus::Type->new->check($expr)->eval($_[0])});
+
+  return $self;
+}
+
 sub when {
   my ($self, $code, @args) = @_;
 
@@ -208,6 +262,14 @@ sub where {
   $self->then(sub{$where->result(@_)});
 
   return $where;
+}
+
+sub yesno {
+  my ($self) = @_;
+
+  $self->then(sub{return "yes"})->none(sub{return "no"});
+
+  return $self;
 }
 
 1;
@@ -317,6 +379,73 @@ This package provides the following methods:
 
 =cut
 
+=head2 boolean
+
+  boolean() (Venus::Match)
+
+The boolean method registers a L</then> condition which returns C<true> if the
+item is matched, and registers a L</none> condition which returns C<false> if
+there are no matches.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item boolean example 1
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(5);
+
+  $match->just(5)->boolean;
+
+  my $result = $match->result;
+
+  # true
+
+=back
+
+=over 4
+
+=item boolean example 2
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(6);
+
+  $match->just(5)->boolean;
+
+  my $result = $match->result;
+
+  # false
+
+=back
+
+=over 4
+
+=item boolean example 3
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(6);
+
+  $match->just(5)->boolean;
+  $match->just(6)->boolean;
+
+  my $result = $match->result;
+
+  # true
+
+=back
+
+=cut
+
 =head2 clear
 
   clear() (Venus::Match)
@@ -393,6 +522,53 @@ I<Since C<0.07>>
   my $result = $match->none('z')->result;
 
   # "z"
+
+=back
+
+=cut
+
+=head2 defined
+
+  defined() (Venus::Match)
+
+The defined method registers an L</only> condition which only allows matching
+if the value presented is C<defined>.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item defined example 1
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new->defined;
+
+  $match->expr(qr/.*/)->then('okay');
+
+  my $result = $match->result;
+
+  # undef
+
+=back
+
+=over 4
+
+=item defined example 2
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new->defined;
+
+  $match->expr(qr/.*/)->then('okay');
+
+  my $result = $match->result('');
+
+  # "okay"
 
 =back
 
@@ -581,6 +757,58 @@ I<Since C<0.03>>
 
 =cut
 
+=head2 new
+
+  new(any @args) (Venus::Match)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Match;
+
+  my $new = Venus::Match->new;
+
+  # bless(..., "Venus::Match")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Match;
+
+  my $new = Venus::Match->new(5);
+
+  # bless(..., "Venus::Match")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Match;
+
+  my $new = Venus::Match->new(value => 5);
+
+  # bless(..., "Venus::Match")
+
+=back
+
+=cut
+
 =head2 none
 
   none(any | coderef $code) (Venus::Match)
@@ -631,6 +859,53 @@ I<Since C<0.03>>
   my $result = $match->result;
 
   # "(z) not found"
+
+=back
+
+=cut
+
+=head2 object
+
+  object() (Venus::Match)
+
+The object method registers an L</only> condition which only allows matching if
+the value presented is an object.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item object example 1
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new->object;
+
+  $match->when('isa', 'main')->then('okay');
+
+  my $result = $match->result;
+
+  # undef
+
+=back
+
+=over 4
+
+=item object example 2
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new->object;
+
+  $match->when('isa', 'main')->then('okay');
+
+  my $result = $match->result(bless{});
+
+  # "okay"
 
 =back
 
@@ -806,6 +1081,151 @@ I<Since C<0.03>>
 
 =cut
 
+=head2 take
+
+  take() (Venus::Match)
+
+The take method registers a L</then> condition which returns (i.e. takes) the
+matched item as-is, and registers a L</none> condition which returns C<undef>
+if there are no matches.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item take example 1
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(5);
+
+  $match->just(5)->take;
+
+  my $result = $match->result;
+
+  # 5
+
+=back
+
+=over 4
+
+=item take example 2
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(6);
+
+  $match->just(5)->take;
+
+  my $result = $match->result;
+
+  # undef
+
+=back
+
+=over 4
+
+=item take example 3
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(6);
+
+  $match->just(5)->take;
+  $match->just(6)->take;
+
+  my $result = $match->result;
+
+  # 6
+
+=back
+
+=cut
+
+=head2 test
+
+  test() (boolean)
+
+The test method evaluates the registered conditions and returns truthy if a
+match can be made, without executing any of the actions (i.e. the L</then>
+code) or the special L</none> condition.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item test example 1
+
+  package Match;
+
+  use Venus::Match;
+
+  our $TEST = 0;
+
+  my $match = Venus::Match->new('a');
+
+  $match->just('a')->then(sub{$TEST = 1});
+  $match->just('b')->then(sub{$TEST = 2});
+  $match->just('c')->then(sub{$TEST = 3});
+
+  my $test = $match->test;
+
+  # 1
+
+=back
+
+=over 4
+
+=item test example 2
+
+  package Match;
+
+  use Venus::Match;
+
+  our $TEST = 0;
+
+  my $match = Venus::Match->new('b');
+
+  $match->just('a')->then(sub{$TEST = 1});
+  $match->just('b')->then(sub{$TEST = 2});
+  $match->just('c')->then(sub{$TEST = 3});
+
+  my $test = $match->test;
+
+  # 1
+
+=back
+
+=over 4
+
+=item test example 3
+
+  package Match;
+
+  use Venus::Match;
+
+  our $TEST = 0;
+
+  my $match = Venus::Match->new('z');
+
+  $match->just('a')->then(sub{$TEST = 1});
+  $match->just('b')->then(sub{$TEST = 2});
+  $match->just('c')->then(sub{$TEST = 3});
+
+  my $test = $match->test;
+
+  # 0
+
+=back
+
+=cut
+
 =head2 then
 
   then(any | coderef $code) (Venus::Match)
@@ -862,6 +1282,54 @@ I<Since C<0.03>>
 
 =cut
 
+=head2 type
+
+  type(string $expr) (Venus::Match)
+
+The type method accepts a L<"type expression"|Venus::Type> and registers a
+L</when> condition which matches values conforming to the type expression
+specified.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item type example 1
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new;
+
+  $match->type('string')->then('okay');
+
+  my $result = $match->result;
+
+  # undef
+
+=back
+
+=over 4
+
+=item type example 2
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new;
+
+  $match->type('string')->then('okay');
+
+  my $result = $match->result('hello');
+
+  # "okay"
+
+=back
+
+=cut
+
 =head2 when
 
   when(string | coderef $code, any @args) (Venus::Match)
@@ -906,9 +1374,9 @@ I<Since C<0.03>>
   package main;
 
   use Venus::Match;
-  use Venus::Type;
+  use Venus::What;
 
-  my $match = Venus::Match->new(Venus::Type->new(1)->deduce);
+  my $match = Venus::Match->new(Venus::What->new(1)->deduce);
 
   $match->when('isa', 'Venus::Number');
   $match->then('Venus::Number');
@@ -929,9 +1397,9 @@ I<Since C<0.03>>
   package main;
 
   use Venus::Match;
-  use Venus::Type;
+  use Venus::What;
 
-  my $match = Venus::Match->new(Venus::Type->new('1')->deduce);
+  my $match = Venus::Match->new(Venus::What->new('1')->deduce);
 
   $match->when('isa', 'Venus::Number');
   $match->then('Venus::Number');
@@ -1038,6 +1506,73 @@ I<Since C<1.40>>
   my $result = $match->result('pirch');
 
   # undef
+
+=back
+
+=cut
+
+=head2 yesno
+
+  yesno() (Venus::Match)
+
+The yesno method registers a L</then> condition which returns C<"yes"> if the
+item is matched, and registers a L</none> condition which returns C<"no"> if
+there are no matches.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item yesno example 1
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(5);
+
+  $match->just(5)->yesno;
+
+  my $result = $match->result;
+
+  # "yes"
+
+=back
+
+=over 4
+
+=item yesno example 2
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(6);
+
+  $match->just(5)->yesno;
+
+  my $result = $match->result;
+
+  # "no"
+
+=back
+
+=over 4
+
+=item yesno example 3
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new(6);
+
+  $match->just(5)->yesno;
+  $match->just(6)->yesno;
+
+  my $result = $match->result;
+
+  # "yes"
 
 =back
 

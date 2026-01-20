@@ -2,18 +2,21 @@ package Lugh::Tensor;
 
 use strict;
 use warnings;
+use Lugh;
 
 =head1 NAME
 
 Lugh::Tensor - N-Dimensional Tensor with ggml Backend
 
+=encoding utf8
+
 =head1 VERSION
 
-Version 0.01
+Version 0.08
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -178,6 +181,128 @@ B<Example:>
 
     my $t = Lugh::Tensor->new_f32($ctx, 10, 20, 30);
     my @shape = $t->shape();  # (10, 20, 30)
+
+=head2 type
+
+    my $type_id = $tensor->type();
+
+Returns the numeric type ID of the tensor (e.g., 0 for F32, 12 for Q4_K).
+
+B<Example:>
+
+    my $t = Lugh::Tensor->new_f32($ctx, 100);
+    print $t->type();  # 0 (F32)
+
+=head2 type_name
+
+    my $name = $tensor->type_name();
+
+Returns the string name of the tensor's type.
+
+B<Example:>
+
+    my $t = Lugh::Tensor->new_f32($ctx, 100);
+    print $t->type_name();  # "f32"
+    
+    # From a quantized model tensor
+    print $weight_tensor->type_name();  # "q4_K"
+
+=head2 type_size
+
+    my $bytes = $tensor->type_size();
+
+Returns the size in bytes of one block of this type.
+
+=head2 blck_size
+
+    my $elements = $tensor->blck_size();
+
+Returns the number of elements per block. For quantized types this is
+typically 32 or 256.
+
+=head2 is_quantized
+
+    my $bool = $tensor->is_quantized();
+
+Returns true if the tensor uses a quantized data type.
+
+B<Example:>
+
+    if ($tensor->is_quantized()) {
+        print "Tensor uses ", $tensor->type_name(), " quantization\n";
+    }
+
+=head2 nbytes
+
+    my $bytes = $tensor->nbytes();
+
+Returns the total number of bytes used by the tensor's data.
+
+B<Example:>
+
+    my $t = Lugh::Tensor->new_f32($ctx, 1000);
+    print $t->nbytes();  # 4000 (1000 × 4 bytes)
+
+=head2 quantize
+
+    my $quantized = $tensor->quantize($ctx, $dest_type);
+
+Quantizes an F32 tensor to the specified quantized type. Returns a new tensor.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$ctx> - A Lugh::Context with enough memory for the result
+
+=item * C<$dest_type> - Target quantization type (from Lugh::Quant)
+
+=back
+
+B<Returns:> A new Lugh::Tensor with the quantized data.
+
+B<Throws:> Dies if source is not F32 or destination is not a quantized type.
+
+B<Example:>
+
+    use Lugh::Quant qw(Q4_K);
+    
+    my $f32 = Lugh::Tensor->new_f32($ctx, 256);
+    $f32->set_f32(@weights);
+    
+    my $q4 = $f32->quantize($ctx, Q4_K);
+    printf "Compressed: %d -> %d bytes\n", $f32->nbytes, $q4->nbytes;
+
+=head2 dequantize
+
+    my $f32 = $tensor->dequantize($ctx);
+
+Dequantizes a quantized (or F16/BF16) tensor back to F32. Returns a new tensor.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$ctx> - A Lugh::Context with enough memory for the result
+
+=back
+
+B<Returns:> A new F32 Lugh::Tensor.
+
+B<Throws:> Dies if tensor is already F32.
+
+B<Example:>
+
+    # Round-trip: F32 -> Q4_K -> F32
+    my $original = Lugh::Tensor->new_f32($ctx, 256);
+    $original->set_f32(@data);
+    
+    my $quantized = $original->quantize($ctx, Lugh::Quant::Q4_K);
+    my $restored = $quantized->dequantize($ctx);
+    
+    # Compare original vs restored to measure quantization loss
+    my @orig = $original->get_f32();
+    my @rest = $restored->get_f32();
 
 =head1 TENSOR OPERATIONS
 

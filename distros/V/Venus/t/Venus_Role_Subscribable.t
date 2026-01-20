@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 use Venus 'catch';
 
@@ -122,7 +123,7 @@ $test->for('example', 1, 'publish', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Example');
-  ok !keys %{$result->{'$subscriptions'}};
+  ok !keys %{$result->{subscriptions}};
 
   $result
 });
@@ -143,7 +144,7 @@ $test->for('example', 2, 'publish', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Example');
-  is_deeply $result->{'$subscriptions'}, {on_execute=>[]};
+  is_deeply $result->{subscriptions}, {on_execute=>[]};
 
   $result
 });
@@ -225,8 +226,8 @@ $test->for('example', 1, 'subscribe', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Example');
-  is +keys %{$result->{'$subscriptions'}}, 1;
-  is @{$result->{'$subscriptions'}{on_execute}}, 1;
+  is +keys %{$result->{subscriptions}}, 1;
+  is @{$result->{subscriptions}{on_execute}}, 1;
 
   $result
 });
@@ -259,8 +260,8 @@ $test->for('example', 2, 'subscribe', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Example');
-  is +keys %{$result->{'$subscriptions'}}, 1;
-  is @{$result->{'$subscriptions'}{on_execute}}, 3;
+  is +keys %{$result->{subscriptions}}, 1;
+  is @{$result->{subscriptions}{on_execute}}, 3;
   ok !exists $result->{emitted_1};
   ok !exists $result->{emitted_2};
   ok !exists $result->{emitted_3};
@@ -384,18 +385,10 @@ $test->for('example', 1, 'unsubscribe', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Example');
-  ok !exists $result->{'$subscriptions'};
+  ok !exists $result->{subscriptions};
 
   $result
 });
-
-#$test->for('example', 1, 'unsubscribe', sub {
-#  my ($tryable) = @_;
-#  ok !(my $result = $tryable->error(\my $error)->result);
-#  ok $error->isa('Venus::Error');
-#
-#  !$result
-#});
 
 =example-2 unsubscribe
 
@@ -413,8 +406,8 @@ $test->for('example', 2, 'unsubscribe', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Example');
-  ok exists $result->{'$subscriptions'};
-  is +keys %{$result->{'$subscriptions'}}, 0;
+  ok exists $result->{subscriptions};
+  is +keys %{$result->{subscriptions}}, 0;
 
   $result
 });
@@ -441,8 +434,8 @@ $test->for('example', 3, 'unsubscribe', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Example');
-  ok exists $result->{'$subscriptions'};
-  is +keys %{$result->{'$subscriptions'}}, 0;
+  ok exists $result->{subscriptions};
+  is +keys %{$result->{subscriptions}}, 0;
 
   $result
 });
@@ -469,15 +462,15 @@ $test->for('example', 4, 'unsubscribe', sub {
   ok $result->isa('Example');
   my $execute_1 = sub {$result->{execute} = [@_]};
   ok $result->subscribe('on.execute', $execute_1);
-  is +keys %{$result->{'$subscriptions'}}, 1;
-  is @{$result->{'$subscriptions'}{on_execute}}, 1;
+  is +keys %{$result->{subscriptions}}, 1;
+  is @{$result->{subscriptions}{on_execute}}, 1;
   my $execute_2 = sub {$result->{execute} = [@_]};
   ok $result->subscribe('on.execute', $execute_2);
-  is @{$result->{'$subscriptions'}{on_execute}}, 2;
+  is @{$result->{subscriptions}{on_execute}}, 2;
   ok $result->unsubscribe('on.execute', $execute_2);
-  is @{$result->{'$subscriptions'}{on_execute}}, 1;
+  is @{$result->{subscriptions}{on_execute}}, 1;
   ok $result->unsubscribe('on.execute', $execute_1);
-  is @{$result->{'$subscriptions'}{on_execute}}, 0;
+  is @{$result->{subscriptions}{on_execute}}, 0;
 
   $result
 });

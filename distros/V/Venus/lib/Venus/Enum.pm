@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base';
 
+# INHERITS
+
 base 'Venus::Sealed';
+
+# OVERLOADS
 
 use overload (
   '""' => sub{$_[0]->value // ''},
@@ -506,6 +512,58 @@ I<Since C<3.55>>
   my @names = $enum->names;
 
   # ("e", "n", "s", "w")
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Enum)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Enum;
+
+  my $new = Venus::Enum->new;
+
+  # bless(..., "Venus::Enum")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Enum;
+
+  my $new = Venus::Enum->new(['n', 's', 'e', 'w']);
+
+  # bless(..., "Venus::Enum")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Enum;
+
+  my $new = Venus::Enum->new(value => ['n', 's', 'e', 'w']);
+
+  # bless(..., "Venus::Enum")
 
 =back
 

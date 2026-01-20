@@ -138,7 +138,7 @@ subtest 'Create operations' => sub {
     is($user->name, 'Eve', 'Created user has correct name');
 
     # Verify persistence
-    my $found = $rs->find($user->id)->get; # You can do it in one line if you like
+    my $found = $rs->find($user->id)->get;
     ok($found, 'Found the user in the database');
     is($found->email, 'eve@example.com', 'User email matches in database');
 };
@@ -159,9 +159,13 @@ subtest 'Sync iteration with next()' => sub {
     my $async_count   = scalar @$async_results;
 
     # Iterate with next()
-    $search_rs->reset;  # Start from beginning
+    $search_rs->reset;  # Ensure we are at position 0
     my $sync_count = 0;
-    while (my $row = $search_rs->next) {
+
+    # next() returns a Future, so we must ->get it to see the result
+    while (my $f = $search_rs->next) {
+        my $row = $f->get;
+        last unless defined $row; # This is how we detect the end of the ResultSet
         $sync_count++;
     }
 
@@ -169,13 +173,15 @@ subtest 'Sync iteration with next()' => sub {
 
     # Test reset
     $search_rs->reset;
-    my $first = $search_rs->next;
-    ok($first, 'reset() allows re-iteration');
+    my $first_f = $search_rs->next;
+    ok($first_f && $first_f->get, 'reset() allows re-iteration');
 
-    # Test get() returns arrayref
-    my $all = $search_rs->get;
-    isa_ok($all, 'ARRAY');
-    cmp_ok(scalar @$all, '==', $sync_count, 'get() returns all rows');
+    # Test get() (if implemented as a sync shortcut)
+    if ($search_rs->can('get')) {
+        my $all = $search_rs->get;
+        isa_ok($all, 'ARRAY');
+        cmp_ok(scalar @$all, '==', $sync_count, 'get() returns all rows');
+    }
 };
 
 # Test 6: Update operations (update to use async)

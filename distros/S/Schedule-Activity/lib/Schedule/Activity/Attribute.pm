@@ -2,8 +2,9 @@ package Schedule::Activity::Attribute;
 
 use strict;
 use warnings;
+use Ref::Util qw/is_hashref is_ref/;
 
-our $VERSION='0.2.9';
+our $VERSION='0.3.0';
 
 my %types=(
 	int=>{
@@ -20,7 +21,7 @@ my %types=(
 
 sub new {
 	my ($ref,%opt)=@_;
-	my $class=ref($ref)||$ref;
+	my $class=is_ref($ref)||$ref;
 	my ($tm,$y)=($opt{tm}//0,$opt{value}//0);
 	my %self=(
 		type =>$opt{type}//'int',
@@ -106,7 +107,7 @@ sub dump {
 
 sub restore {
 	my ($ref,%opt)=@_;
-	if(ref($ref)) {
+	if(is_hashref($ref)) {
 		foreach my $k (keys %opt) { $$ref{$k}=$opt{$k} }
 		return $ref;
 	}

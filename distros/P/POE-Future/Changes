@@ -1,5 +1,9 @@
 Revision history for POE-Future
 
+0.06    2026-01-19
+        [CHANGES]
+         * Implement (most of) the `Future::IO->poll` API
+
 0.05    2024-01-02
         [CHANGES]
          * Swap unit tests from `Test::More` to `Test2::V0`

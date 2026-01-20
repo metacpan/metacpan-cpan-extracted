@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -36,6 +37,7 @@ $test->for('abstract');
 
 =includes
 
+method: new
 method: value
 
 =cut
@@ -70,6 +72,42 @@ the L<Venus/false> function.
 =cut
 
 $test->for('description');
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new() (Venus::False)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::False;
+
+  my $new = Venus::False->new;
+
+  # bless(..., "Venus::False")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::False');
+
+  !$result
+});
 
 =method value
 

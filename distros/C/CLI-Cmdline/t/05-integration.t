@@ -1,7 +1,8 @@
 # t/05-integration.t - Real-world integration tests using executable scripts
 use strict;
 use warnings;
-use Test::More tests => 24;
+use Test::More tests => 25;
+use Test::NoWarnings 'had_no_warnings';
 
 use File::Temp qw(tempdir);
 use Cwd qw(getcwd);
@@ -215,5 +216,6 @@ script_ok('07 - full script missing required input → die', $code7,
 # Return to original directory
 chdir $orig_dir;
 
+had_no_warnings();
 done_testing();
 

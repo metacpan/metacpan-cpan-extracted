@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2014-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::OS::linux 0.804;
+package IO::Async::OS::linux 0.805;
 
 use v5.14;
 use warnings;

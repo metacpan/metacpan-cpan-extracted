@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 use Venus 'catch';
 
@@ -48,6 +49,7 @@ method: constraint
 method: ensure
 method: expression
 method: format
+method: new
 method: parse
 method: render
 method: result
@@ -1039,6 +1041,85 @@ $test->for('example', 1, 'format', sub {
   $result
 });
 
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Assert)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Assert;
+
+  my $new = Venus::Assert->new;
+
+  # bless(..., "Venus::Assert")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok !$result->name;
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Assert;
+
+  my $new = Venus::Assert->new('Float');
+
+  # bless(..., "Venus::Assert")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  is $result->name, 'Float';
+
+  $result
+});
+
+=example-3 new
+
+  package main;
+
+  use Venus::Assert;
+
+  my $new = Venus::Assert->new(name => 'Float');
+
+  # bless(..., "Venus::Assert")
+
+=cut
+
+$test->for('example', 3, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  is $result->name, 'Float';
+
+  $result
+});
+
 =method parse
 
 The parse method accepts a string representation of a type assertion and
@@ -1123,14 +1204,14 @@ $test->for('example', 3, 'parse', sub {
 
   my $parsed = $assert->parse('enum[up,down,left,right]');
 
-  # [['enum', 'up', 'down', 'left', 'right']]
+  # ['enum', 'up', 'down', 'left', 'right']
 
 =cut
 
 $test->for('example', 4, 'parse', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  is_deeply $result, [['enum', 'up', 'down', 'left', 'right']];
+  is_deeply $result, ['enum', 'up', 'down', 'left', 'right'];
 
   $result
 });
@@ -1203,14 +1284,14 @@ $test->for('example', 7, 'parse', sub {
 
   my $parsed = $assert->parse('tuple[number, arrayref, coderef]');
 
-  # [['tuple', 'number', 'arrayref', 'coderef']]
+  # ['tuple', 'number', 'arrayref', 'coderef']
 
 =cut
 
 $test->for('example', 8, 'parse', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  is_deeply $result, [['tuple', 'number', 'arrayref', 'coderef']];
+  is_deeply $result, ['tuple', 'number', 'arrayref', 'coderef'];
 
   $result
 });
@@ -1223,16 +1304,15 @@ $test->for('example', 8, 'parse', sub {
 
   my $parsed = $assert->parse('tuple[number, within[arrayref, hashref], coderef]');
 
-  # [['tuple', 'number', ['within', 'arrayref', 'hashref'], 'coderef']]
+  # ['tuple', 'number', ['within', 'arrayref', 'hashref'], 'coderef']
 
 =cut
 
 $test->for('example', 9, 'parse', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  is_deeply $result, [
-    ['tuple', 'number', ['within', 'arrayref', 'hashref'], 'coderef']
-  ];
+  is_deeply $result,
+    ['tuple', 'number', ['within', 'arrayref', 'hashref'], 'coderef'];
 
   $result
 });
@@ -1247,21 +1327,18 @@ $test->for('example', 9, 'parse', sub {
     'tuple[number, within[arrayref, hashref] | arrayref, coderef]'
   );
 
-  # [
-  #   ['tuple', 'number',
-  #     ['either', ['within', 'arrayref', 'hashref'], 'arrayref'], 'coderef']
-  # ]
-
+  # ['tuple', 'number', ['either', ['within', 'arrayref', 'hashref'], 'arrayref'], 'coderef']
 
 =cut
 
 $test->for('example', 10, 'parse', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  is_deeply $result, [
-    ['tuple', 'number',
-    ['either', ['within', 'arrayref', 'hashref'], 'arrayref'], 'coderef']
-  ];
+  is_deeply $result,
+    [
+    'tuple', 'number',
+    ['either', ['within', 'arrayref', 'hashref'], 'arrayref'], 'coderef'
+    ];
 
   $result
 });
@@ -1276,24 +1353,25 @@ $test->for('example', 10, 'parse', sub {
     'hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]'
   );
 
-  # [[
+  # [
   #   'hashkeys',
   #   'id',
   #     ['either', 'number', 'float'],
   #   'upvotes',
   #     ['within', 'arrayref', 'boolean']
-  # ]]
+  # ]
 
 =cut
 
 $test->for('example', 11, 'parse', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  is_deeply $result, [[
+  is_deeply $result,
+    [
     'hashkeys', 'id',
     ['either', 'number', 'float'], 'upvotes',
     ['within', 'arrayref', 'boolean']
-  ]];
+    ];
 
   $result
 });
@@ -1310,7 +1388,7 @@ to L</expression> based on the data provided.
 =metadata render
 
 {
-  since => '2.55',
+  since => '4.15',
 }
 
 =cut
@@ -1323,14 +1401,15 @@ to L</expression> based on the data provided.
 
   $assert = $assert->render;
 
-  # undef
+  # ""
 
 =cut
 
 $test->for('example', 1, 'render', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  ok !defined $result;
+  ok defined $result;
+  ok !$result;
 
   !$result
 });
@@ -1363,14 +1442,14 @@ $test->for('example', 2, 'render', sub {
 
   $assert = $assert->render('routines', ['say', 'say_pretty']);
 
-  # 'routines["say", "say_pretty"]'
+  # 'routines[say, say_pretty]'
 
 =cut
 
 $test->for('example', 3, 'render', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is $result, 'routines["say", "say_pretty"]';
+  is $result, 'routines[say, say_pretty]';
 
   $result
 });
@@ -1383,14 +1462,14 @@ $test->for('example', 3, 'render', sub {
 
   $assert = $assert->render('hashkeys', {id => 'number', name => 'string'});
 
-  # 'hashkeys["id", number, "name", string]'
+  # 'hashkeys[id, number, name, string]'
 
 =cut
 
 $test->for('example', 4, 'render', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is $result, 'hashkeys["id", number, "name", string]';
+  is $result, 'hashkeys[id, number, name, string]';
 
   $result
 });
@@ -1404,18 +1483,20 @@ $test->for('example', 4, 'render', sub {
   $assert = $assert->render('hashkeys', {
     id => 'number',
     profile => {
-      level => 'string',
+      hashkeys => {
+        level => 'string',
+      },
     },
   });
 
-  # 'hashkeys["id", number, "profile", hashkeys["level", string]]'
+  # 'hashkeys[id, number, profile, hashkeys[level, string]]'
 
 =cut
 
 $test->for('example', 5, 'render', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is $result, 'hashkeys["id", number, "profile", hashkeys["level", string]]';
+  is $result, 'hashkeys[id, number, profile, hashkeys[level, string]]';
 
   $result
 });
@@ -1481,7 +1562,7 @@ $test->for('example', 2, 'result', sub {
   my $result = $tryable->error->result;
   ok defined $result;
   ok $result->isa('Venus::Check::Error');
-  is $result->name, 'on_coded';
+  is $result->name, 'on.coded';
 
   $result
 });
@@ -1613,7 +1694,7 @@ $test->for('example', 2, 'validate', sub {
   my $result = $tryable->error->result;
   ok defined $result;
   ok $result->isa('Venus::Check::Error');
-  is $result->name, 'on_coded';
+  is $result->name, 'on.coded';
 
   $result
 });
@@ -1657,7 +1738,7 @@ $test->for('example', 1, 'validator', sub {
   ok ref $result eq 'CODE';
   my $error = catch{$result->()};
   ok $error->isa('Venus::Check::Error');
-  is $error->name, 'on_coded';
+  is $error->name, 'on.coded';
 
   $result
 });
@@ -2013,7 +2094,6 @@ EOF
 EOF
   $string =~ s/\s*\n+\s*/ /g;
   is_deeply scalar $assert->parse($string), [
-    [
     'hashkeys',
     'name',
     'string',
@@ -2030,7 +2110,6 @@ EOF
     'within',
     'arrayref',
     'string'
-    ]
     ]
     ];
 };

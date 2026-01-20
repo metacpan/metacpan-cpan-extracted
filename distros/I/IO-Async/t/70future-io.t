@@ -6,7 +6,7 @@ use warnings;
 use IO::Async::Test;
 
 use Test2::V0;
-use Test::Future::IO::Impl;
+use Test::Future::IO::Impl 0.17;
 
 use lib ".";
 use t::TimeAbout;
@@ -16,8 +16,9 @@ use IO::Async::OS;
 
 use Errno;
 
-eval { require Future::IO; require Future::IO::ImplBase } or
-   plan skip_all => "Future::IO is not available";
+eval { require Future::IO; Future::IO->VERSION( '0.19' );
+       require Future::IO::ImplBase } or
+   plan skip_all => "Future::IO 0.19 is not available";
 require Future::IO::Impl::IOAsync;
 
 use constant AUT => $ENV{TEST_QUICK_TIMERS} ? 0.1 : 1;
@@ -64,6 +65,13 @@ testing_loop( IO::Async::Loop->new_builtin );
    is( $buf, "ABCD", 'Future::IO->syswrite wrote data' );
 }
 
-run_tests qw( sleep sysread syswrite waitpid );
+run_tests qw(
+   sleep
+   poll_no_hup
+   read sysread write syswrite
+   connect accept
+   send recv
+   waitpid
+);
 
 done_testing;

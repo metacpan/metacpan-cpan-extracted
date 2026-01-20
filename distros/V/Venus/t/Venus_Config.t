@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -37,6 +38,9 @@ $test->for('abstract');
 =includes
 
 method: edit_file
+method: new
+method: read_env
+method: read_env_file
 method: read_file
 method: read_json
 method: read_json_file
@@ -44,6 +48,8 @@ method: read_perl
 method: read_perl_file
 method: read_yaml
 method: read_yaml_file
+method: write_env
+method: write_env_file
 method: write_file
 method: write_json
 method: write_json_file
@@ -154,6 +160,197 @@ $test->for('example', 1, 'edit_file', sub {
     delete $data->{edited};
     return $data;
   });
+
+  $result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Config)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Config;
+
+  my $config = Venus::Config->new;
+
+  # bless(..., "Venus::Config")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Config');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Config;
+
+  my $config = Venus::Config->new(value => {password => 'secret'});
+
+  # bless(..., "Venus::Config")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Config');
+  is_deeply $result->value, {password => 'secret'};
+
+  $result
+});
+
+=method read_env
+
+The read_env method returns a new L<Venus::Config> object based on the string
+of key/value pairs provided. This method supports multiline values when
+enclosed in double or single quotes.
+
+=signature read_env
+
+  read_env(string $data) (Venus::Config)
+
+=metadata read_env
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 read_env
+
+  # given: synopsis
+
+  package main;
+
+  my $read_env = $config->read_env(
+    "APPNAME=Example\nAPPVER=0.01\n# Comment\n\n\nAPPTAG=\"Godzilla\"",
+  );
+
+  # bless(..., 'Venus::Config')
+
+=cut
+
+$test->for('example', 1, 'read_env', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Config');
+  my $value = $result->value;
+  is_deeply $value, {
+    APPNAME => "Example",
+    APPTAG => "Godzilla",
+    APPVER => 0.01,
+  };
+
+  $result
+});
+
+=example-2 read_env
+
+  # given: synopsis
+
+  package main;
+
+  my $read_env = $config->read_env(
+    "MESSAGE=\"Hello\nWorld\"\nSIGNATURE='Best,\nTeam'",
+  );
+
+  # bless(..., 'Venus::Config')
+
+=cut
+
+$test->for('example', 2, 'read_env', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Config');
+  my $value = $result->value;
+  is $value->{MESSAGE}, "Hello\nWorld";
+  is $value->{SIGNATURE}, "Best,\nTeam";
+
+  $result
+});
+
+=example-3 read_env
+
+  # given: synopsis
+
+  package main;
+
+  my $read_env = $config->read_env(
+    'ESCAPE="line1\nline2\ttabbed"',
+  );
+
+  # bless(..., 'Venus::Config')
+
+=cut
+
+$test->for('example', 3, 'read_env', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Config');
+  my $value = $result->value;
+  is $value->{ESCAPE}, "line1\nline2\ttabbed";
+
+  $result
+});
+
+=method read_env_file
+
+The read_env_file method uses L<Venus::Path> to return a new L<Venus::Config>
+object based on the file provided.
+
+=signature read_env_file
+
+  read_env_file(string $file) (Venus::Config)
+
+=metadata read_env_file
+
+{
+  since => '4.15',
+}
+
+=example-1 read_env_file
+
+  # given: synopsis
+
+  package main;
+
+  $config = $config->read_env_file('t/conf/read.env');
+
+  # bless(..., 'Venus::Config')
+
+=cut
+
+$test->for('example', 1, 'read_env_file', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Config');
+  my $value = $result->value;
+  is $value->{APPNAME}, "Example";
+  is $value->{APPTAG}, "Godzilla";
+  is $value->{APPVER}, 0.01;
 
   $result
 });
@@ -541,6 +738,154 @@ $test->for('example', 1, 'read_yaml_file', sub {
     ok exists $value->{'$services'};
     ok exists $value->{'$metadata'};
   }
+
+  $result
+});
+
+=method write_env
+
+The write_env method returns a string representing environment variable
+key/value pairs based on the L</value> held by the underlying L<Venus::Config>
+object. Multiline values are escaped using C<\n> notation and enclosed in
+double quotes.
+
+=signature write_env
+
+  write_env() (string)
+
+=metadata write_env
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 write_env
+
+  # given: synopsis
+
+  package main;
+
+  my $value = $config->value({
+    APPNAME => "Example",
+    APPTAG => "Godzilla",
+    APPVER => 0.01,
+  });
+
+  my $write_env = $config->write_env;
+
+  # "APPNAME=Example\nAPPTAG=Godzilla\nAPPVER=0.01"
+
+=cut
+
+$test->for('example', 1, 'write_env', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "APPNAME=Example\nAPPTAG=Godzilla\nAPPVER=0.01";
+
+  $result
+});
+
+=example-2 write_env
+
+  # given: synopsis
+
+  package main;
+
+  my $value = $config->value({
+    MESSAGE => "Hello\nWorld",
+    NOTE => "line1\ttabbed",
+  });
+
+  my $write_env = $config->write_env;
+
+  # "MESSAGE=\"Hello\\nWorld\"\nNOTE=\"line1\\ttabbed\""
+
+=cut
+
+$test->for('example', 2, 'write_env', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, qq(MESSAGE="Hello\\nWorld"\nNOTE="line1\\ttabbed");
+
+  $result
+});
+
+=example-3 write_env
+
+  # given: synopsis
+
+  package main;
+
+  my $value = $config->value({
+    APPNAME => "Example",
+    MESSAGE => "Hello\nWorld\nGoodbye",
+    APPTAG => "Godzilla",
+  });
+
+  my $write_env = $config->write_env;
+
+  my $read_env = $config->read_env($write_env);
+
+  # bless(..., 'Venus::Config')
+
+  # round-trip: read_env(write_env($value)) == $value
+
+=cut
+
+$test->for('example', 3, 'write_env', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Config');
+  my $value = $result->value;
+  is $value->{APPNAME}, "Example";
+  is $value->{MESSAGE}, "Hello\nWorld\nGoodbye";
+  is $value->{APPTAG}, "Godzilla";
+
+  $result
+});
+
+=method write_env_file
+
+The write_env_file method saves a environment configuration file and returns a new
+L<Venus::Config> object.
+
+=signature write_env_file
+
+  write_env_file(string $path) (Venus::Config)
+
+=metadata write_env_file
+
+{
+  since => '4.15',
+}
+
+=example-1 write_env_file
+
+  # given: synopsis
+
+  my $value = $config->value({
+    APPNAME => "Example",
+    APPTAG => "Godzilla",
+    APPVER => 0.01,
+  });
+
+  $config = $config->write_env_file('t/conf/write.env');
+
+  # bless(..., 'Venus::Config')
+
+=cut
+
+$test->for('example', 1, 'write_env_file', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Config');
+  ok $result->value;
+  $result = $result->read_file('t/conf/write.env');
+  is $result->value->{APPNAME}, "Example";
+  is $result->value->{APPTAG}, "Godzilla";
+  is $result->value->{APPVER}, 0.01;
 
   $result
 });

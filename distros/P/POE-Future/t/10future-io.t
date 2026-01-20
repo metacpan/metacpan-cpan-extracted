@@ -4,63 +4,29 @@ use v5.14;
 use warnings;
 
 use Test2::V0;
-use Test::Timer;
 
 use POE;
 use POE::Future;
 
-eval { require Future::IO; require Future::IO::ImplBase; } or
-   plan skip_all => "Future::IO is not available";
+eval { require Future::IO;
+       Future::IO->VERSION( '0.19' );
+       require Future::IO::ImplBase; } or
+   plan skip_all => "Future::IO 0.19 is not available";
 require Future::IO::Impl::POE;
+
+eval { require Test::Future::IO::Impl;
+       Test::Future::IO::Impl->VERSION( '0.17' ); } or
+   plan skip_all => "Test::Future::IO::Impl 0.17 is not available";
 
 # Quiet warning
 POE::Kernel->run;
 
-# TODO - suggest this for Test::Timer
-sub time_about
-{
-   my ( $code, $limit, $name ) = @_;
-   time_between $code, $limit * 0.9, $limit * 1.1, $name;
-}
-
-# ->sleep
-{
-   my $f = Future::IO->sleep( 1 );
-
-   time_about( sub { $f->get }, 1, 'Future::IO->sleep' );
-}
-
-# ->sysread
-{
-   pipe my ( $rd, $wr ) or die "Cannot pipe() - $!";
-   $rd->blocking( 0 );
-
-   $wr->autoflush();
-   $wr->print( "Some bytes\n" );
-
-   my $f = Future::IO->sysread( $rd, 256 );
-
-   is( $f->get, "Some bytes\n", 'Future::IO->sysread' );
-}
-
-# ->syswrite
-{
-   pipe my ( $rd, $wr ) or die "Cannot pipe() - $!";
-   $wr->blocking( 0 );
-
-   $wr->autoflush();
-   1 while $wr->syswrite( "X" x 4096 ); # This will eventually return undef/EAGAIN
-   $! == Errno::EAGAIN or
-      die "Expected EAGAIN, got $!";
-
-   my $f = Future::IO->syswrite( $wr, "ABCD" );
-
-   $rd->sysread( my $buf, 4096 );
-
-   is( $f->get, 4, 'Future::IO->syswrite' );
-
-   1 while $rd->sysread( $buf, 4096 ) == 4096;
-   is( $buf, "ABCD", 'Future::IO->syswrite wrote data' );
-}
+Test::Future::IO::Impl::run_tests( qw(
+   sleep
+   poll_no_hup
+   read sysread write syswrite
+   connect accept
+   send recv
+) );
 
 done_testing;

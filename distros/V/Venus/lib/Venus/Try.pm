@@ -5,7 +5,11 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'attr', 'base';
+
+# INHERITS
 
 base 'Venus::Kind::Utility';
 
@@ -71,10 +75,8 @@ sub callback {
     }
 
     if (!$method) {
-      $self->throw('error_on_callback', {
-        invocant => $invocant,
-        callback => $callback,
-      });
+      $self->error_on_callback({invocant => $invocant, callback => $callback})
+        ->throw;
     }
 
     $callback = sub {goto $method};
@@ -124,6 +126,19 @@ sub execute {
     if defined($self->invocant);
 
   return wantarray ? ($callback->(@args)) : $callback->(@args);
+}
+
+sub fault {
+  my ($self, $variable) = @_;
+
+  if ($variable) {
+    $self->on_default(sub{($$variable) = @_})
+  }
+  else {
+    $self->catch('Venus::Fault');
+  }
+
+  return $self;
 }
 
 sub finally {
@@ -244,6 +259,8 @@ sub result {
 sub error_on_callback {
   my ($self, $data) = @_;
 
+  my $error = $self->throw->error->sysinfo;
+
   my $callback = $data->{callback};
   my $invocant = $data->{invocant};
 
@@ -252,19 +269,13 @@ sub error_on_callback {
       $invocant ? (ref($invocant) || $invocant) : (ref($self) || $self))
   );
 
-  my $stash = {
-    invocant => $invocant,
-    callback => $callback,
-  };
+  $error->name('on.callback');
+  $error->message($message);
+  $error->offset(1);
+  $error->stash($data);
+  $error->reset;
 
-  my $result = {
-    name => 'on.callback',
-    raise => true,
-    stash => $stash,
-    message => $message,
-  };
-
-  return $result;
+  return $error;
 }
 
 1;
@@ -567,6 +578,22 @@ I<Since C<0.01>>
 
 =back
 
+=over 4
+
+=item B<may raise> L<Venus::Try::Error> C<on.callback>
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call('execute')->result;
+
+  # Error! (on.callback)
+
+=back
+
 =cut
 
 =head2 catch
@@ -790,6 +817,66 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 fault
+
+  fault(Ref $variable) (Venus::Try)
+
+The fault method takes a scalar reference and assigns any uncaught exceptions
+to it during execution. If no variable is provided a L</catch> operation will
+be registered to capture all L<Venus::Fault> exceptions.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item fault example 1
+
+  package main;
+
+  use Venus 'fault';
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call(sub {
+    my (@args) = @_;
+
+    fault;
+  });
+
+  my $fault = $try->fault(\my $object);
+
+  # bless({ on_catch => ... }, "Venus::Try")
+
+=back
+
+=over 4
+
+=item fault example 2
+
+  package main;
+
+  use Venus 'fault';
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call(sub {
+    my (@args) = @_;
+
+    fault;
+  });
+
+  my $fault = $try->fault;
+
+  # bless({ on_catch => ... }, "Venus::Try")
+
+=back
+
+=cut
+
 =head2 finally
 
   finally(string | coderef $method) (Venus::Try)
@@ -867,6 +954,44 @@ I<Since C<0.01>>
   my $maybe = $try->maybe;
 
   # bless({ on_catch => ... }, "Venus::Try")
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Try)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Try;
+
+  my $new = Venus::Try->new;
+
+  # bless(..., "Venus::Try")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Try;
+
+  my $new = Venus::Try->new(invocant => (bless{}), arguments => [1..4]);
+
+  # bless(..., "Venus::Try")
 
 =back
 
@@ -1111,39 +1236,6 @@ I<Since C<0.01>>
 =back
 
 =cut
-
-=head1 ERRORS
-
-This package may raise the following errors:
-
-=cut
-
-=over 4
-
-=item error: C<error_on_callback>
-
-This package may raise an error_on_callback exception.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $input = {
-    invocant => 'Example',
-    callback => 'execute',
-  };
-
-  my $error = $try->throw('error_on_callback', $input)->catch('error');
-
-  # my $name = $error->name;
-
-  # "on_callback"
-
-  # my $message = $error->render;
-
-  # "Can't locate object method \"execute\" on package \"Example\""
-
-=back
 
 =head1 AUTHORS
 

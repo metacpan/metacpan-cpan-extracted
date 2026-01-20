@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 my $fsds = qr/[:\\\/\.]+/;
@@ -39,6 +40,7 @@ $test->for('abstract');
 
 method: explain
 method: frames
+method: new
 method: throw
 method: trace
 
@@ -143,6 +145,63 @@ $test->for('example', 1, 'frames', sub {
   my $last_frame = $result->[-1];
   ok $last_frame->[0] eq 'main';
   ok $last_frame->[1] =~ m{t${fsds}Venus_Fault.t$};
+
+  $result
+});
+
+=method new
+
+The new method constructs an instance of the package.
+
+=signature new
+
+  new(any @args) (Venus::Fault)
+
+=metadata new
+
+{
+  since => '4.15',
+}
+
+=cut
+
+=example-1 new
+
+  package main;
+
+  use Venus::Fault;
+
+  my $new = Venus::Fault->new;
+
+  # bless(..., "Venus::Fault")
+
+=cut
+
+$test->for('example', 1, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Fault');
+
+  $result
+});
+
+=example-2 new
+
+  package main;
+
+  use Venus::Fault;
+
+  my $new = Venus::Fault->new('Oops!');
+
+  # bless(..., "Venus::Fault")
+
+=cut
+
+$test->for('example', 2, 'new', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Fault');
+  is $result->{message}, 'Oops!';
 
   $result
 });

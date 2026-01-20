@@ -5,9 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
+# IMPORTS
+
 use Venus::Class 'base';
 
+# INHERITS
+
 base 'Venus::Kind::Value';
+
+# OVERLOADS
 
 use overload (
   '&{}' => sub{$_[0]->value},
@@ -15,16 +21,6 @@ use overload (
 );
 
 # METHODS
-
-sub assertion {
-  my ($self) = @_;
-
-  my $assert = $self->SUPER::assertion;
-
-  $assert->clear->expression('coderef');
-
-  return $assert;
-}
 
 sub call {
   my ($self, @args) = @_;
@@ -1885,6 +1881,58 @@ I<Since C<0.08>>
   my $result = $lvalue->ne($rvalue);
 
   # 1
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Code)
+
+The new method constructs an instance of the package.
+
+I<Since C<4.15>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  use Venus::Code;
+
+  my $new = Venus::Code->new;
+
+  # bless(..., "Venus::Code")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  use Venus::Code;
+
+  my $new = Venus::Code->new(sub{});
+
+  # bless(..., "Venus::Code")
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  use Venus::Code;
+
+  my $new = Venus::Code->new(value => sub{});
+
+  # bless(..., "Venus::Code")
 
 =back
 

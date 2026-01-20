@@ -1,7 +1,7 @@
 package Database::Abstraction;
 
 # Author Nigel Horne: njh@nigelhorne.com
-# Copyright (C) 2015-2025, Nigel Horne
+# Copyright (C) 2015-2026, Nigel Horne
 
 # Usage is subject to licence terms.
 # The licence terms of this software are as follows:
@@ -22,7 +22,7 @@ package Database::Abstraction;
 # TODO:	Add full CRUD support
 # TODO:	It would be better for the default sep_char to be ',' rather than '!'
 # FIXME:	t/xml.t fails in slurping mode
-# TODO:	Other databases e.g., Redis, noSQL, remote databases such as MySQL, PostgresSQL
+# TODO:	Other databases e.g., Redis, noSQL, remote databases such as MySQL, PostgreSQL
 # TODO: The no_entry/entry terminology is confusing.  Replace with no_id/id_column
 # TODO: Add support for DBM::Deep
 # TODO: Log queries and the time that they took to execute per database
@@ -54,11 +54,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.33
+Version 0.34
 
 =cut
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 =head1 DESCRIPTION
 
@@ -393,7 +393,7 @@ sub set_logger
 	my $self = shift;
 	my $params = Params::Get::get_params('logger', @_);
 
-	if(my $logger = ($params->{'logger'})) {
+	if(my $logger = $params->{'logger'}) {
 		if(Scalar::Util::blessed($logger)) {
 			$self->{'logger'} = $logger;
 		} else {
@@ -778,6 +778,7 @@ sub selectall_arrayref {
 		if(defined($query_args[0])) {
 			$key .= ' ' . join(', ', @query_args);
 		}
+		$self->_debug("cache key = '$key'");
 		if(my $rc = $c->get($key)) {
 			$self->_debug('cache HIT');
 			return $rc;	# We stored a ref to the array
@@ -928,6 +929,7 @@ sub selectall_array
 		if(defined($query_args[0])) {
 			$key .= ' ' . join(', ', @query_args);
 		}
+		$self->_debug("cache key = '$key'");
 		if(my $rc = $c->get($key)) {
 			$self->_debug('cache HIT');
 			return wantarray ? @{$rc} : $rc;	# We stored a ref to the array
@@ -1249,6 +1251,8 @@ to the query.
 If the data have been slurped,
 this will still work by accessing that actual database.
 
+If "args" is given, it's an array of the arguments (see C<execute()> in L<DBI>).
+
 =cut
 
 sub execute
@@ -1260,6 +1264,7 @@ sub execute
 	}
 
 	my $args = Params::Get::get_params('query', @_);
+
 	# Ensure the 'query' parameter is provided
 	Carp::croak(__PACKAGE__, ': Usage: execute(query => $query)')
 		unless defined $args->{'query'};
@@ -1276,7 +1281,11 @@ sub execute
 
 	# Prepare and execute the query
 	my $sth = $self->{$table}->prepare($query);
-	$sth->execute() or croak($query);	# Die with the query in case of error
+	if(exists($args->{args})) {
+		$sth->execute($args->{args}) or croak("$query: ", join(', ', $args->{args}));	# Die with the query in case of error
+	} else {
+		$sth->execute() or croak($query);	# Die with the query in case of error
+	}
 
 	# Fetch the results
 	my @results;
@@ -1731,7 +1740,7 @@ so if XML fails for you on a small file force non-slurping mode with
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015-2025 Nigel Horne.
+Copyright 2015-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2.
 Usage is subject to licence terms.
