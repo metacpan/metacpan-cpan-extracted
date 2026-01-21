@@ -1,5 +1,5 @@
 package HTTP::Cookies::Wget;
-$HTTP::Cookies::Wget::VERSION = '0.2501';
+$HTTP::Cookies::Wget::VERSION = '0.2602';
 use strict;
 
 our @ISA=qw(HTTP::Cookies);
@@ -86,7 +86,7 @@ HTTP::Cookies::Wget - access to Wget cookies files
 
 =head1 VERSION
 
-version 0.2501
+version 0.2602
 
 =head1 SYNOPSIS
 

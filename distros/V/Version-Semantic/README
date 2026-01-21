@@ -1,6 +1,6 @@
 NAME
 
-Version::Semantic - Tiny SemVer based class implementation
+Version::Semantic - Immutable SemVer scheme based version class
 
 INSTALLATION
 

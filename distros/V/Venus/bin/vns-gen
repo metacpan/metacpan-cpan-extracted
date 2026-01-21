@@ -40,6 +40,6 @@ Z<>
 
 =head1 SEE ALSO
 
-L<Venus>, L<Venus::Task::Venus::Run>.
+L<Venus>, L<Venus::Task::Venus::Gen>.
 
 =cut

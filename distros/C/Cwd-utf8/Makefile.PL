@@ -25,8 +25,8 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "File::Path" => "2.06_06",
     "File::Spec" => 0,
+    "File::Temp" => "0.19",
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::Exception" => 0,
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "open" => 0
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,8 +46,8 @@ my %FallbackPrereqs = (
   "Cwd" => 0,
   "Encode" => 0,
   "Exporter" => 0,
-  "File::Path" => "2.06_06",
   "File::Spec" => 0,
+  "File::Temp" => "0.19",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Test::Exception" => 0,

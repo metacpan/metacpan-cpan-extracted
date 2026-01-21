@@ -11,31 +11,26 @@ use Text::ParseWords;
 
 # builtin libsodium (these comments are to be updated when bundled lib is updated):
 
-# hopefully this is a one-time thing...libsodium had a CVE and has not released
-# a new version. the bundled library has been updated to 1.0.20-stable, which
-# upstream calls the "stable release". a new version of that version is
-# released daily as a repository snapshot. 
+# the libsodium release from 1.0.21 will again be from the upstream stable
+# branch snapshot. to the best of my knowledge, this is from the upstream
+# commit:
+# https://github.com/jedisct1/libsodium/commit/aa1d5c8d66abc0d246cc85d0e275a7eedc480ef4
+# it is the stable release as of Jan 21 2026 03:00:00 +0000
 
-# the included version is the version of 1.0.20-stable released on January 3,
-# 2026.
-
-# only a minisign signature is available for these "stable release"s. this can
+# a minisign signature is included with the bundled library tarball. this can
 # be verified with the `minisign` utility or `pminisign` from this cpan
-# distribution...assuming you already have libsodium, on which they both depend.
+# distribution. you will need to already have libsodium, on which they both
+# depend.
 
-# $ pminisign -P RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3 -Vm libsodium-1.0.20-stable.tar.gz
+# $ pminisign -P RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3 -Vm libsodium-1.0.21-stable.tar.gz
 # Signature and comment signature verified
-# Trusted comment: timestamp:1767486842   file:libsodium-stable.tar.gz    hashed
+# Trusted comment: timestamp:1768955633   file:libsodium-stable.tar.gz    hashed
 
-# the file name is not correct in the signature file (as seen in output above),
-# but this is what upstream provides.
+# sha256: bef95e3e4aecd123c6489048cf1b896cc8b35bc661556ca342b3dac61e8ae378  libsodium-1.0.21-stable.tar.gz
+# sha512: 71b0f0f3f2c4f2780871c0df122b9b74e26f05b6c583b62312a71d1620043dbf7137c148ada818a5b1f3d730eabe5092d8397bd960472319b415130069a23b14  libsodium-1.0.21-stable.tar.gz
 
-# if building from the source rather than a distribution, put in src/:
-# https://download.libsodium.org/libsodium/releases/libsodium-1.0.20-stable.tar.gz
-# https://download.libsodium.org/libsodium/releases/libsodium-1.0.20-stable.tar.gz.minisig
-# check the signature, or at least:
-# sha256: 1d4e9bf7fa96c8c9bf25ad996760a63b61fe3c65ddfd89421764a6f9b1ed4bc9  libsodium-1.0.20-stable.tar.gz
-# sha512: d68038c993de5cea2aeefd57c9789ee1d21e1c2777f8a8d060b58809685b75cc6da620f3013e506daaeb8f8140387085a188ceca0a9a7e5715950eb80bd70e87  libsodium-1.0.20-stable.tar.gz
+# see main module INSTALLATION section for how to install with a different
+# release.
 
 # almost certainly none of this will work on windows. although libsodium is
 # cross-platform and provides some msvc scripts (or however that works), i've
@@ -45,7 +40,7 @@ use Text::ParseWords;
 die "OS unsupported\n" if $^O eq 'MSWin32';
 
 my $src_dir = File::Spec->catdir(getcwd(), "src");
-my $libsodium_version = '1.0.20-stable';
+my $libsodium_version = '1.0.21-stable';
 my $libsodium_major_minimum = '10';
 my $libsodium_minor_minimum = '3';
 my $bundled_src_path = File::Spec->catfile($src_dir, "libsodium-$libsodium_version.tar.gz");

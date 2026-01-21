@@ -12,14 +12,17 @@ Lugh - Pure C LLM Inference Engine for Perl (built on ggml)
 
 =head1 VERSION
 
-Version 0.08
+Version 0.11
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
 require XSLoader;
 XSLoader::load('Lugh', $VERSION);
+
+# Load Perl extensions for XS packages
+require Lugh::Inference;
 
 =head1 SYNOPSIS
 
@@ -40,7 +43,7 @@ XSLoader::load('Lugh', $VERSION);
     my @tokens = $tokenizer->encode("The capital of France is");
     
     # Run forward pass to get logits
-    my @logits = $inference->forward(\@tokens);
+    my @logits = $inference->forward(tokens => \@tokens);
     
     # Find most likely next token (greedy decoding)
     my $max_idx = 0;
@@ -203,7 +206,7 @@ Lugh provides two levels of API:
     my @tokens = $tokenizer->encode("Once upon a time");
     
     for (1..50) {  # Generate 50 tokens
-        my @logits = $inference->forward(\@tokens);
+        my @logits = $inference->forward(tokens => \@tokens);
         
         # Sample next token (greedy)
         my $next = 0;
@@ -369,7 +372,20 @@ Available backends depend on your system and ggml installation:
 
 =item * C<metal_available()> - Check if Metal GPU is available at runtime
 
+=item * C<srand($seed)> - Seed the C random number generator used for sampling
+
 =back
+
+=head2 Reproducibility
+
+Sampling functions like C<sample_top_p> use C's random number generator. 
+To get reproducible results, seed it before sampling:
+
+    Lugh::srand(42);
+    my $token = $inference->sample_top_p(\@logits, temperature => 0.8);
+
+This is especially important for speculative decoding, where the draft model's
+sampling should be consistent regardless of prior operations.
 
 =head2 Memory Usage
 

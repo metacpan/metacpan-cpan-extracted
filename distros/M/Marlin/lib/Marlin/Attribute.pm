@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Attribute;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020000';
+our $VERSION   = '0.020001';
 
 BEGIN { our @ISA = 'Sub::Accessor::Small' };
 
@@ -44,6 +44,7 @@ our $NONE = do {
 sub new {
 	my $class = shift;
 	my $me = do {
+		no warnings 'redefine';
 		local *canonicalize_opts = sub {};
 		$class->SUPER::new( @_ );
 	};

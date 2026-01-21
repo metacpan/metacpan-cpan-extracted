@@ -2,7 +2,7 @@ use alienfile;
 
 # ggml version - using a known stable commit
 my $ggml_version = 'b4658';  # Short commit hash for reproducibility
-my $ggml_url = 'https://github.com/ggerganov/ggml/archive/refs/heads/master.zip';
+my $ggml_url = 'https://github.com/ggml-org/ggml/archive/refs/heads/master.zip';
 
 # Probe for system-installed ggml
 plugin 'Probe::CommandLine' => (

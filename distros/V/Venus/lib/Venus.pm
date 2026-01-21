@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '5.00';
+our $VERSION = '5.01';
 
 # AUTHORITY
 
@@ -942,6 +942,7 @@ sub import {
     is_value => 1,
     is_yesno => 1,
     json => 1,
+    kvargs => 1,
     list => 1,
     load => 1,
     log => 1,
@@ -1752,6 +1753,14 @@ sub json (;$$) {
   return fault(qq(Invalid "json" action "$code"));
 }
 
+sub kvargs {
+  my (@args) = @_;
+
+  return $args[0] if @args == 1 && ref($args[0]) eq 'HASH';
+
+  return (@args % 2) ? {@args, undef} : {@args};
+}
+
 sub list (@) {
   my (@args) = @_;
 
@@ -2397,12 +2406,13 @@ sub puts ($;@) {
   return wantarray ? (@{$result}) : $result;
 }
 
-sub raise ($;$) {
-  my ($self, $data) = @_;
+sub raise ($;@) {
+  my ($self, @args) = @_;
 
   ($self, my $parent) = (@$self) if (ref($self) eq 'ARRAY');
 
-  $data ||= {};
+  my $data = kvargs(@args);
+
   $data->{context} ||= (caller(1))[3];
 
   $parent = 'Venus::Error' if !$parent;
@@ -3056,7 +3066,7 @@ Standard Library for Perl 5
 
 =head1 VERSION
 
-5.00
+5.01
 
 =cut
 
@@ -7313,6 +7323,75 @@ I<Since C<2.40>>
 
 =cut
 
+=head2 kvargs
+
+  kvargs(any @args) (hashref)
+
+The kvargs function takes a list of arguments and returns a hashref. If a
+single hashref is provided, it is returned as-is. Otherwise, the arguments are
+treated as key-value pairs. If an odd number of arguments is provided, the last
+key will have C<undef> as its value.
+
+I<Since C<5.00>>
+
+=over 4
+
+=item kvargs example 1
+
+  package main;
+
+  use Venus 'kvargs';
+
+  my $kvargs = kvargs {name => 'Elliot'};
+
+  # {name => 'Elliot'}
+
+=back
+
+=over 4
+
+=item kvargs example 2
+
+  package main;
+
+  use Venus 'kvargs';
+
+  my $kvargs = kvargs name => 'Elliot', role => 'hacker';
+
+  # {name => 'Elliot', role => 'hacker'}
+
+=back
+
+=over 4
+
+=item kvargs example 3
+
+  package main;
+
+  use Venus 'kvargs';
+
+  my $kvargs = kvargs name => 'Elliot', 'role';
+
+  # {name => 'Elliot', role => undef}
+
+=back
+
+=over 4
+
+=item kvargs example 4
+
+  package main;
+
+  use Venus 'kvargs';
+
+  my $kvargs = kvargs;
+
+  # {}
+
+=back
+
+=cut
+
 =head2 list
 
   list(any @args) (any)
@@ -9952,7 +10031,7 @@ I<Since C<3.20>>
 
 =head2 raise
 
-  raise(string $class | tuple[string, string] $class, maybe[hashref] $args) (Venus::Error)
+  raise(string $class | tuple[string, string] $class, any @args) (Venus::Error)
 
 The raise function generates and throws a named exception object derived from
 L<Venus::Error>, or provided base class, using the exception object arguments
@@ -9999,6 +10078,34 @@ I<Since C<0.01>>
   my $error = raise ['MyApp::Error', 'Venus::Error'], {
     message => 'Something failed!',
   };
+
+  # bless({message => 'Something failed!', ...}, 'MyApp::Error')
+
+=back
+
+=over 4
+
+=item raise example 4
+
+  package main;
+
+  use Venus 'raise';
+
+  my $error = raise 'MyApp::Error', message => 'Something failed!';
+
+  # bless({message => 'Something failed!', ...}, 'MyApp::Error')
+
+=back
+
+=over 4
+
+=item raise example 5
+
+  package main;
+
+  use Venus 'raise';
+
+  my $error = raise 'MyApp::Error', name => 'on.issue',  message => 'Something failed!';
 
   # bless({message => 'Something failed!', ...}, 'MyApp::Error')
 

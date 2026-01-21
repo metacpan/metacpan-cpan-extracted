@@ -8,7 +8,9 @@ my $json = q({
   "title": "Hello World!",
   "tags": ["perl", "json", "cli"],
   "names": ["Alice", "Bob", "Alfred"],
-  "mixed": ["prefix", null, 123, {"key": "value"}]
+  "mixed": ["prefix", null, 123, {"key": "value"}],
+  "number": 123,
+  "numeric_string": "123"
 });
 
 my $jq = JQ::Lite->new;
@@ -45,6 +47,24 @@ is_deeply(
     [JSON::PP::true, JSON::PP::false, JSON::PP::false, JSON::PP::false],
     'non-string values yield JSON false booleans'
 );
+
+my @number_prefix = $jq->run_query($json, '.number | startswith("1")');
+ok(!$number_prefix[0], 'startswith() treats numeric scalars as non-strings');
+
+my @number_suffix = $jq->run_query($json, '.number | endswith("3")');
+ok(!$number_suffix[0], 'endswith() treats numeric scalars as non-strings');
+
+my @numeric_string_prefix = $jq->run_query($json, '.numeric_string | startswith("1")');
+ok($numeric_string_prefix[0], 'startswith() matches numeric string values');
+
+my @numeric_string_suffix = $jq->run_query($json, '.numeric_string | endswith("3")');
+ok($numeric_string_suffix[0], 'endswith() matches numeric string values');
+
+my @numeric_arg_prefix = $jq->run_query($json, '.numeric_string | startswith(1)');
+ok(!$numeric_arg_prefix[0], 'startswith() requires a string argument');
+
+my @numeric_arg_suffix = $jq->run_query($json, '.numeric_string | endswith(3)');
+ok(!$numeric_arg_suffix[0], 'endswith() requires a string argument');
 
 my @empty_prefix = $jq->run_query($json, '.title | startswith("")');
 ok($empty_prefix[0], 'empty prefix always matches');

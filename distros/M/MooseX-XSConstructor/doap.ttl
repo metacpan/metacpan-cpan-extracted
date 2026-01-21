@@ -14,7 +14,7 @@
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008008"^^doap-deps:CpanId ], [ doap-deps:on "Moose 2.2200"^^doap-deps:CpanId ], [
-		doap-deps:on "Class::XSConstructor 0.018001"^^doap-deps:CpanId;
+		doap-deps:on "Class::XSConstructor 0.022002"^^doap-deps:CpanId;
 	], [ doap-deps:on "Hook::AfterRuntime"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Warnings"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
 	doap:bug-database    <https://github.com/tobyink/p5-moosex-xsconstructor/issues>;
@@ -26,7 +26,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "MooseX-XSConstructor";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-XSConstructor/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSConstructor/v_0-001001>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-XSConstructor/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSConstructor/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSConstructor/v_0-001002>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-moosex-xsconstructor>;
@@ -49,6 +49,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-XSConstructor-0.001001.tar.gz>;
 	doap:revision        "0.001001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-XSConstructor/v_0-001002>
+	a                    doap:Version;
+	dc:identifier        "MooseX-XSConstructor-0.001002"^^xsd:string;
+	dc:issued            "2026-01-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Improvements for foreign constructor detection and handling.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-XSConstructor-0.001002.tar.gz>;
+	doap:revision        "0.001002"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

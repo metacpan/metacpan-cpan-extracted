@@ -2,15 +2,15 @@
 
 =head1 NAME
 
-Version::Semantic - Tiny SemVer based class implementation
+Version::Semantic - Immutable SemVer scheme based version class
 
 =head1 SYNOPSIS
 
   use Version::Semantic ();
 
-  my $v_unstable = Version::Semantic->parse( '1.0.0-alpha' );
-  my $v_testing  = Version::Semantic->parse( '1.0.0-beta' );
-  my $v_stable   = Version::Semantic->parse( 'v1.0.0' );
+  my $v_unstable = Version::Semantic->parse( '1.0.1-alpha' );
+  my $v_testing  = Version::Semantic->parse( '1.0.1-beta' );
+  my $v_stable   = Version::Semantic->parse( 'v1.0.1' );
 
   if ( $v_unstable < $v_testing and $v_testing < $v_stable ) {
     ...
@@ -19,7 +19,7 @@ Version::Semantic - Tiny SemVer based class implementation
 =head1 DESCRIPTION
 
 This class defines immutable version objects that support the L<Semantic
-Versioning Specification (SemVer)|https://semver.org/spec/v2.0.0.html>.
+Versioning (SemVer) Scheme|https://semver.org/spec/v2.0.0.html>.
 
 The class has a C<parse( $version )> factory method (a class method)
 to create objects from their semantic version strings. The method accepts
@@ -42,6 +42,20 @@ The C<compare_to()> object method implements the L<SemVer precedence
 rules|https://semver.org/spec/v2.0.0.html#spec-item-11>. This method is used
 to overload the numeric comparison C<E<lt>=E<gt>> operator. This allows you
 to compare version objects.
+
+=head1 ABOUT PRE-RELEASES
+
+Perl recognizes two version styles: decimal versions and dotted decimal
+versions. The dotted decimal version style is the newer one. It matches the
+SemVer scheme but doesn't allow pre-release and build extensions.
+
+If the archive file of a Perl distribution has a name ending in C<TRIAL\d*>
+(before the file extension), indicates that the distribution is a
+pre-release. C<TRIAL\d*> is a valid SemVer pre-release extension. For
+obvious reasons such kind of pre-releases are also named "trial releases".
+If L<ExtUtils::MakeMaker> (EUMM) is your installer, the DISTVNAME EUMM
+attribute can be used to mark a distribution as a trial release (example value
+"Foo-Bar-v1.0.1-TRIAL5").
 
 =head1 SEE ALSO
 

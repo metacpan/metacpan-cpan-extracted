@@ -35,7 +35,7 @@ requires:
   Alien::Base: '2.38'
   Alien::Build: '0.25'
   perl: '5.008003'
-version: '0.08'
+version: '0.09'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.84'
   requires:

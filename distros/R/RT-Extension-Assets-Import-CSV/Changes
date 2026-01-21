@@ -1,3 +1,7 @@
+2.5 2026-01-14
+ - Allow for possible BOM in CSV file
+ - Convert /r/r/n newlines to /n to clean up files from MS Excel
+
 2.4 2024-10-10
  - Allow to directly pass config options to Text::CSV_XS for custom delimiter,
    quote_char, etc

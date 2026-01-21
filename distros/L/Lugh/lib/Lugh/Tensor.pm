@@ -12,11 +12,11 @@ Lugh::Tensor - N-Dimensional Tensor with ggml Backend
 
 =head1 VERSION
 
-Version 0.08
+Version 0.11
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 

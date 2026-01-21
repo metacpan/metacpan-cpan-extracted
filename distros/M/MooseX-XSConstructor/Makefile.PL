@@ -21,7 +21,7 @@ my $meta = {
                           develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                           runtime   => {
                                          requires => {
-                                           "Class::XSConstructor" => 0.018001,
+                                           "Class::XSConstructor" => 0.022002,
                                            "Hook::AfterRuntime" => 0,
                                            "Moose" => "2.2200",
                                            "perl" => 5.008008,
@@ -37,7 +37,7 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "MooseX::XSConstructor" => { file => "lib/MooseX/XSConstructor.pm", version => 0.001001 },
+                          "MooseX::XSConstructor" => { file => "lib/MooseX/XSConstructor.pm", version => 0.001002 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -53,7 +53,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooseX-XSConstructor/project",
                         },
-  "version"          => 0.001001,
+  "version"          => 0.001002,
   "x_static_install" => 1,
 };
 

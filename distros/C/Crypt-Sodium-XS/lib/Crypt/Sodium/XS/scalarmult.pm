@@ -7,52 +7,108 @@ use Exporter 'import';
 
 _define_constants();
 
-# really no primitive-specific anything here, just being consistent.
+{
+  # really no primitive-specific anything here, just being consistent.
+  my @constant_bases = qw(
+    BYTES
+    SCALARBYTES
+  );
 
-my @constant_bases = qw(
-  BYTES
-  SCALARBYTES
+  my @bases = qw(
+    keygen
+    base
+  );
+
+  my $default = [
+    'scalarmult',
+    (map { "scalarmult_$_" } @bases),
+    (map { "scalarmult_$_" } @constant_bases),
+  ];
+
+  my $ed25519 = [
+    qw[
+      scalarmult_ed25519
+      scalarmult_ed25519_base_noclamp
+      scalarmult_ed25519_noclamp
+    ],
+    (map { "scalarmult_ed25519_$_" } @bases),
+    (map { "scalarmult_ed25519_$_" } @constant_bases),
+  ];
+
+  my $ristretto255 = [
+    'scalarmult_ristretto255',
+    (map { "scalarmult_ristretto255_$_" } @bases),
+    (map { "scalarmult_ristretto255_$_" } @constant_bases),
+  ];
+
+  my $features = [
+    'scalarmult_ristretto255_available',
+  ];
+
+  our %EXPORT_TAGS = (
+    all => [ @$default, @$ed25519 ],
+    default => $default,
+    ed25519 => $ed25519,
+    ristretto255 => $ristretto255,
+  );
+
+  our @EXPORT_OK = @{$EXPORT_TAGS{all}};
+}
+
+package Crypt::Sodium::XS::OO::scalarmult;
+use parent 'Crypt::Sodium::XS::OO::Base';
+
+my %methods = (
+  default => {
+    BYTES => \&Crypt::Sodium::XS::scalarmult::scalarmult_BYTES,
+    PRIMITIVE => sub { 'x25519' },
+    SCALARBYTES => \&Crypt::Sodium::XS::scalarmult::scalarmult_SCALARBYTES,
+    base => \&Crypt::Sodium::XS::scalarmult::scalarmult_base,
+    base_noclamp => sub { die "base_noclamp only available for 'ed25519' primitive" },
+    keygen => \&Crypt::Sodium::XS::scalarmult::scalarmult_keygen,
+    scalarmult => \&Crypt::Sodium::XS::scalarmult::scalarmult,
+    scalarmult_noclamp => sub { die "scalarmult_noclamp only available for 'ed25519' primitive" },
+  },
+  ed25519 => {
+    BYTES => \&Crypt::Sodium::XS::scalarmult::scalarmult_ed25519_BYTES,
+    PRIMITIVE => sub { 'ed25519' },
+    SCALARBYTES => \&Crypt::Sodium::XS::scalarmult::scalarmult_ed25519_SCALARBYTES,
+    base => \&Crypt::Sodium::XS::scalarmult::scalarmult_ed25519_base,
+    base_noclamp => \&Crypt::Sodium::XS::scalarmult::scalarmult_ed25519_base_noclamp,
+    keygen => \&Crypt::Sodium::XS::scalarmult::scalarmult_ed25519_keygen,
+    scalarmult => \&Crypt::Sodium::XS::scalarmult::scalarmult_ed25519,
+    scalarmult_noclamp => \&Crypt::Sodium::XS::scalarmult::scalarmult_ed25519_noclamp,
+  },
+  Crypt::Sodium::XS::scalarmult::scalarmult_ristretto255_available() ? (
+    ristretto255 => {
+      BYTES => \&Crypt::Sodium::XS::scalarmult::scalarmult_ristretto255_BYTES,
+      PRIMITIVE => sub { 'ristretto255' },
+      SCALARBYTES => \&Crypt::Sodium::XS::scalarmult::scalarmult_ristretto255_SCALARBYTES,
+      base => \&Crypt::Sodium::XS::scalarmult::scalarmult_ristretto255_base,
+      base_noclamp => sub { die "base_noclamp only available for 'ed25519' primitive" },
+      keygen => \&Crypt::Sodium::XS::scalarmult::scalarmult_ristretto255_keygen,
+      scalarmult => \&Crypt::Sodium::XS::scalarmult::scalarmult_ristretto255,
+      scalarmult_noclamp => sub { die "scalarmult_noclamp only available for 'ed25519' primitive" },
+    },
+  ) : (),
 );
+$methods{x25519} = $methods{default};
 
-my @bases = qw(
-  keygen
-  base
-);
+sub Crypt::Sodium::XS::scalarmult::primitives { keys %methods }
+*primitives = \&Crypt::Sodium::XS::scalarmult::primitives;
 
-my $default = [
-  'scalarmult',
-  (map { "scalarmult_$_" } @bases),
-  (map { "scalarmult_$_" } @constant_bases),
-];
+sub ristretto255_available { goto \&Crypt::Sodium::XS::scalarmult::scalarmult_ristretto255_available }
 
-my $ed25519 = [
-  qw[
-    scalarmult_ed25519
-    scalarmult_ed25519_base_noclamp
-    scalarmult_ed25519_noclamp
-  ],
-  (map { "scalarmult_ed25519_$_" } @bases),
-  (map { "scalarmult_ed25519_$_" } @constant_bases),
-];
+sub BYTES { my $self = shift; goto $methods{$self->{primitive}}->{BYTES}; }
+sub PRIMITIVE { my $self = shift; goto $methods{$self->{primitive}}->{PRIMITIVE}; }
+sub SCALARBYTES { my $self = shift; goto $methods{$self->{primitive}}->{SCALARBYTES}; }
+sub base { my $self = shift; goto $methods{$self->{primitive}}->{base}; }
+sub base_noclamp { my $self = shift; goto $methods{$self->{primitive}}->{base_noclamp}; }
+sub keygen { my $self = shift; goto $methods{$self->{primitive}}->{keygen}; }
+sub scalarmult { my $self = shift; goto $methods{$self->{primitive}}->{scalarmult}; }
+sub scalarmult_noclamp { my $self = shift; goto $methods{$self->{primitive}}->{scalarmult_noclamp}; }
 
-my $ristretto255 = [
-  'scalarmult_ristretto255',
-  (map { "scalarmult_ristretto255_$_" } @bases),
-  (map { "scalarmult_ristretto255_$_" } @constant_bases),
-];
-
-my $features = [
-  'scalarmult_ristretto255_available',
-];
-
-our %EXPORT_TAGS = (
-  all => [ @$default, @$ed25519 ],
-  default => $default,
-  ed25519 => $ed25519,
-  ristretto255 => $ristretto255,
-);
-
-our @EXPORT_OK = @{$EXPORT_TAGS{all}};
+1;
 
 __END__
 
@@ -65,31 +121,29 @@ curve.
 
 =head1 SYNOPSIS
 
-  use Crypt::Sodium::XS::scalarmult ':default';
   use Crypt::Sodium::XS 'sodium_random_bytes';
+  my $scalarmult = Crypt::Sodium::XS->scalarmult;
 
   my $keysize = Crypt::Sodium::XS->box->SECRETKEYBYTES;
   my $client_sk = sodium_random_bytes($keysize);
-  my $client_pk = scalarmult_base($client_sk);
+  my $client_pk = $scalarmult->base($client_sk);
   my $server_sk = sodium_random_bytes($keysize);
-  my $server_pk = scalarmult_base($client_sk);
+  my $server_pk = $scalarmult->base($client_sk);
 
   # !!! do not use output directly as key exchange !!!
   # use Crypt::Sodium::XS::kx instead, or you can extract shared keys of
   # arbitrary size with generichash:
 
-  use Crypt::Sodium::XS::generichash 'generichash_init';
-
   # client side:
-  my $client_shared_secret = scalarmult($client_sk, $server_pk);
-  my $hasher = generichash_init();
-  $hasher->update($client_shared_secret, $client_pk, $server_pk);
+  my $client_shared_secret = $scalarmult->scalarmult($client_sk, $server_pk);
+  my $hasher = Crypt::Sodium::XS->generichash->init;
+  $hasher->update($shared_secret, $client_pk, $server_pk);
   my $client_shared_key = $hasher->final;
 
   # server side:
-  my $server_shared_secret = scalarmult($server_sk, $client_pk);
-  my $hasher = generichash_init();
-  $hasher->update($server_shared_secret, $client_pk, $server_pk);
+  my $server_shared_secret = $scalarmult->scalarmult($server_sk, $client_pk);
+  my $hasher = Crypt::Sodium::XS->generichash->init;
+  $hasher->update($shared_secret, $client_pk, $server_pk);
   my $server_shared_key = $hasher->final;
 
 =head1 DESCRIPTION
@@ -101,24 +155,61 @@ This can be used as a building block to construct key exchange mechanisms, or
 more generally to compute a public key from a secret key. For key exchange, you
 generally want to use L<Crypt::Sodium::XS::kx> instead.
 
-=head1 FUNCTIONS
+=head1 CONSTRUCTOR
 
-Nothing is exported by default. A C<:default> tag imports the functions and
-constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
-provided for each of the primitives listed in L</PRIMITIVES>. These tags import
-the C<scalarmult_E<lt>primitiveE<gt>_*> functions and constants for that
-primitive.  A C<:all> tag imports everything.
+The constructor is called with the C<Crypt::Sodium::XS-E<gt>scalarmult> method.
 
-=head2 scalarmult_base
+  my $scalarmult = Crypt::Sodium::XS->scalarmult;
+  my $scalarmult = Crypt::Sodium::XS->scalarmult(primitive => 'x25519');
 
-=head2 scalarmult_E<lt>primitiveE<gt>_base
+Returns a new scalarmult object.
 
-  my $public_key = scalarmult_base($secret_key);
+Implementation detail: the returned object is blessed into
+C<Crypt::Sodium::XS::OO::scalarmult>.
 
-C<$secret_key> is a secret key. It must be L</scalarmult_SCALARBYTES> bytes. It
-may be a L<Crypt::Sodium::XS::MemVault>.
+=head1 ATTRIBUTES
 
-Returns a public key which is L</scalarmult_BYTES> bytes.
+=head2 primitive
+
+  my $primitive = $scalarmult->primitive;
+  $scalarmult->primitive('poly1305');
+
+Gets or sets the primitive used for all operations by this object. It must be
+one of the primitives listed in L</PRIMITIVES>, including C<default>.
+
+=head1 METHODS
+
+=head2 primitives
+
+  my @primitives = $scalarmult->primitives;
+  my @primitives = Crypt::Sodium::XS::scalarmult->primitives;
+
+Returns a list of all supported primitive names, including C<default>.
+
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $primitive = $scalarmult->PRIMITIVE;
+
+Returns the primitive used for all operations by this object. Note this will
+never be C<default> but would instead be the primitive it represents.
+
+=head2 keygen
+
+  my $secret_key = $scalarmult->keygen;
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a secret key of
+L</SCALARBYTES> bytes.
+
+=head2 base
+
+  my $public_key = $scalarmult->base($secret_key);
+
+C<$secret_key> is a secret key. It must be L</SCALARBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+Returns a public key which is L</BYTES> bytes.
 
 Multiplies the base point (x, 4/5) by a scalar C<$secret_key> (clamped) and
 returns the Y coordinate of the resulting point.
@@ -127,17 +218,15 @@ NOTE: With the ed25519 primitive, a C<$secret_key> of 0 will croak.
 
 =head2 scalarmult
 
-=head2 scalarmult_E<lt>primitiveE<gt>
+  my $q = $scalarmult->scalarmult($my_secret_key, $their_public_key);
 
-  my $shared_secret = scalarmult($my_secret_key, $their_public_key);
+C<$my_secret_key> is a secret key. It must be L</SCALARBYTES> bytes. It may be
+a L<Crypt::Sodium::XS::MemVault>.
 
-C<$my_secret_key> is a secret key. It must be L</scalarmult_SCALARBYTES> bytes.
-It may be a L<Crypt::Sodium::XS::MemVault>.
+C<$their_public_key> is a public key. It must be L</BYTES> bytes.
 
-C<$their_public_key> is a public key. It must be L</scalarmult_BYTES> bytes.
-
-Returns a L<Crypt::Sodium::XS::MemVault>: a shared secret of
-L</scalarmult_SCALARBYTES> bytes.
+Returns a L<Crypt::Sodium::XS::MemVault>: a shared secret of L</SCALARBYTES>
+bytes.
 
 B<Note> (ed25519):
 
@@ -176,62 +265,41 @@ See L</SYNOPSIS> for an example of this.
 
 =back
 
-=head2 scalarmult_keygen
+=head2 BYTES
 
-=head2 scalarmult_E<lt>primitiveE<gt>_keygen
+  my $out_size = $scalarmult->BYTES
 
-  my $secret_key = scalarmult_keygen();
+Returns the size, in bytes, of a public key.
 
-Returns a L<Crypt::Sodium::XS::MemVault>: a secret key of
-L</scalarmult_SCALARBYTES> bytes.
+=head2 SCALARBYTES
 
-=head1 ed25519 SCALAR MULTIPLICATION WITHOUT CLAMPING
+Returns the size, in bytes, of a shared or secret key.
 
-This section applies to primitive ed25519 only.
+  my $out_size = $scalarmult->SCALARBYTES
 
-In order to prevent attacks using small subgroups, the scalarmult functions
+L</BYTES> and L</SCALARBYTES> are provided for consistency, but it is safe to
+assume that C<$scalarmult->BYTES == $scalarmult->SCALARBYTES>.
+
+=head1 SCALAR MULTIPLICATION WITHOUT CLAMPING
+
+In order to prevent attacks using small subgroups, the scalarmult methods
 above clear lower bits of the scalar (C<$secret_key>). This may be indesirable
 to build protocols that require C<$secret_key> to be invertible.
 
 The noclamp variants of these functions do not clear these bits, and do not set
 the high bit either. These variants expect a scalar in the ]0..L[ range.
 
-These functions are only available for the ed25519 primitive.
+These methods are only available for the ed25519 primitive.
 
-=head2 scalarmult_ed25519_base_noclamp
+=head2 scalarmult_base_noclamp
 
-  my $q_noclamp = scalarmult_ed25519_base_noclamp($n);
+  my $q_noclamp = $scalarmult->base_noclamp($n);
 
-=head2 scalarmult_ed25519_noclamp
+=head2 scalarmult_noclamp
 
-  my $q_noclamp = scalarmult_ed25519_noclamp($n, $p);
-
-=head1 CONTSANTS
-
-L</scalarmult_BYTES> and L</scalarmult_SCALARBYTES> are provided for
-consistency, but it is safe to assume that C<scalarmult_BYTES ==
-scalarmult_SCALARBYTES>.
-
-=head2 scalarmult_BYTES
-
-=head2 scalarmult_E<lt>primitiveE<gt>_BYTES
-
-  my $public_key_size = scalarmult_BYTES();
-
-Returns the size, in bytes, of a public key.
-
-=head2 scalarmult_SCALARBYTES
-
-=head2 scalarmult_E<lt>primitiveE<gt>_SCALARBYTES
-
-  my $shared_and_secret_key_size = scalarmult_SCALARBYTES();
-
-Returns the size, in bytes, of a shared or secret key.
+  my $q_noclamp = $scalarmult->scalarmult_noclamp($n, $p);
 
 =head1 PRIMITIVES
-
-All functions have C<scalarmult_E<lt>primitiveE<gt>>-prefixed couterparts (e.g.,
-scalarmult_ed25519_base, scalarmult_).
 
 =over 4
 
@@ -260,13 +328,80 @@ groups.
 
 =back
 
+=head1 FUNCTIONS
+
+The object API above is the recommended way to use this module. The functions
+and constants documented below can be imported instead or in addition.
+
+Nothing is exported by default. A C<:default> tag imports the functions and
+constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
+provided for each of the primitives listed in L</PRIMITIVES>. These tags import
+the C<scalarmult_E<lt>primitiveE<gt>_*> functions and constants for that
+primitive.  A C<:all> tag imports everything.
+
+=head2 scalarmult_base
+
+=head2 scalarmult_E<lt>primitiveE<gt>_base
+
+  my $public_key = scalarmult_base($secret_key);
+
+Same as L</base>.
+
+=head2 scalarmult
+
+=head2 scalarmult_E<lt>primitiveE<gt>
+
+  my $shared_secret = scalarmult($my_secret_key, $their_public_key);
+
+Same as L</scalarmult>.
+
+=head2 scalarmult_keygen
+
+=head2 scalarmult_E<lt>primitiveE<gt>_keygen
+
+  my $secret_key = scalarmult_keygen();
+
+Same as L</keygen>.
+
+=head2 scalarmult_ed25519_base_noclamp
+
+  my $q_noclamp = scalarmult_ed25519_base_noclamp($n);
+
+Same as L</base_noclamp>.
+
+=head2 scalarmult_ed25519_noclamp
+
+  my $q_noclamp = scalarmult_ed25519_noclamp($n, $p);
+
+Same as L</scalarmult_noclamp>.
+
+=head1 CONTSANTS
+
+L</scalarmult_BYTES> and L</scalarmult_SCALARBYTES> are provided for
+consistency, but it is safe to assume that C<scalarmult_BYTES ==
+scalarmult_SCALARBYTES>.
+
+=head2 scalarmult_BYTES
+
+=head2 scalarmult_E<lt>primitiveE<gt>_BYTES
+
+  my $public_key_size = scalarmult_BYTES();
+
+Same as L</BYTES>.
+
+=head2 scalarmult_SCALARBYTES
+
+=head2 scalarmult_E<lt>primitiveE<gt>_SCALARBYTES
+
+  my $shared_and_secret_key_size = scalarmult_SCALARBYTES();
+
+Same as L</SCALARBYTES>.
+
 =head1 SEE ALSO
 
 =over 4
 
 =item L<Crypt::Sodium::XS>
-
-=item L<Crypt::Sodium::XS::OO::scalarmult>
 
 =item L<https://doc.libsodium.org/advanced/scalar_multiplication>
 

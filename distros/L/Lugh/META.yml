@@ -25,5 +25,5 @@ requires:
   Alien::ggml: '0.01'
   Cpanel::JSON::XS: '0'
   perl: '5.008003'
-version: '0.08'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

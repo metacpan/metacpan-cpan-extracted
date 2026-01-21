@@ -100,7 +100,7 @@ sub _coerce_number {
 
     return 0 if !defined $value;
 
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         return $value ? 1 : 0;
     }
 
@@ -316,7 +316,7 @@ sub _is_truthy {
 
     return 0 unless defined $value;
 
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         return $value ? 1 : 0;
     }
 
@@ -454,7 +454,7 @@ sub _apply_trimstr {
 sub _apply_paths {
     my ($value) = @_;
 
-    if (!ref $value || ref($value) eq 'JSON::PP::Boolean') {
+    if (!ref $value || JSON::PP::is_bool($value)) {
         return [];
     }
 
@@ -493,7 +493,7 @@ sub _validate_path_array {
     die "$caller(): path must be an array" if ref($path) ne 'ARRAY';
 
     for my $segment (@$path) {
-        my $is_boolean = ref($segment) && ref($segment) eq 'JSON::PP::Boolean';
+        my $is_boolean = ref($segment) && JSON::PP::is_bool($segment);
 
         die "$caller(): path elements must be defined" if !defined $segment;
         die "$caller(): path elements must be scalars" if ref($segment) && !$is_boolean;
@@ -618,7 +618,7 @@ sub _resolve_paths_from_expr {
                     push @paths, _validate_path_array($output, 'setpath');
                 }
             }
-            elsif (!ref $output || ref($output) eq 'JSON::PP::Boolean') {
+            elsif (!ref $output || JSON::PP::is_bool($output)) {
                 die 'setpath(): path must be an array';
             }
         }
@@ -707,7 +707,7 @@ sub _coerce_hash_key {
 
     return undef if !defined $segment;
 
-    if (ref($segment) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($segment)) {
         return $segment ? 'true' : 'false';
     }
 
@@ -728,7 +728,7 @@ sub _is_numeric_segment {
 
     return 0 if !defined $segment;
 
-    if (ref($segment) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($segment)) {
         return 1;
     }
 
@@ -742,7 +742,7 @@ sub _normalize_array_index_for_set {
 
     return undef if !defined $segment;
 
-    if (ref($segment) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($segment)) {
         $segment = $segment ? 1 : 0;
     }
 
@@ -762,7 +762,7 @@ sub _normalize_array_index_for_get {
 
     return undef if !defined $segment;
 
-    if (ref($segment) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($segment)) {
         $segment = $segment ? 1 : 0;
     }
 
@@ -928,7 +928,7 @@ sub _is_leaf_value {
     my ($value) = @_;
 
     return 1 unless ref $value;
-    return 1 if ref($value) eq 'JSON::PP::Boolean';
+    return 1 if JSON::PP::is_bool($value);
     return 0 if ref($value) eq 'ARRAY';
     return 0 if ref($value) eq 'HASH';
     return 1;

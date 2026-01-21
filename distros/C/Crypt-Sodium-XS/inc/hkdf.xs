@@ -59,13 +59,9 @@ SV * hkdf_sha256_extract( \
   hkdf_sha512_extract = 1
 
   PREINIT:
-  protmem *ikm_pm = NULL;
-  protmem *prk_pm;
-  unsigned char *salt_buf = NULL;
-  unsigned char *ikm_buf;
-  STRLEN prk_len;
-  STRLEN salt_len = 0;
-  STRLEN ikm_len;
+  protmem *ikm_pm = NULL, *prk_pm;
+  unsigned char *salt_buf = NULL, *ikm_buf;
+  STRLEN prk_len, salt_len = 0, ikm_len;
   unsigned int prk_flags = g_protmem_default_flags_key;
   int (*func)(unsigned char *,
               const unsigned char *, size_t, const unsigned char *, size_t);
@@ -137,14 +133,9 @@ SV * hkdf_sha256_expand( \
   hkdf_sha512_expand = 1
 
   PREINIT:
-  protmem *out_pm;
-  protmem *prk_pm = NULL;
-  unsigned char *ctx_buf = NULL;
-  unsigned char *prk_buf;
-  STRLEN out_max_len;
-  STRLEN ctx_len = 0;
-  STRLEN prk_len;
-  STRLEN prk_req_len;
+  protmem *out_pm, *prk_pm = NULL;
+  unsigned char *ctx_buf = NULL, *prk_buf;
+  STRLEN out_max_len, ctx_len = 0, prk_len, prk_req_len;
   unsigned int out_flags;
   int (*func)(unsigned char *, size_t, const char *, size_t, const unsigned char *);
 
@@ -315,8 +306,7 @@ SV * final(SV * self, SV * flags = &PL_sv_undef)
   Crypt::Sodium::XS::hkdf::sha512_multi::final = 1
 
   PREINIT:
-  protmem *state_pm;
-  protmem *prk_pm;
+  protmem *state_pm, *prk_pm;
   unsigned int prk_flags = g_protmem_default_flags_key;
 
   CODE:
@@ -374,8 +364,7 @@ SV * update(SV * self, ...)
   Crypt::Sodium::XS::hkdf::sha512_multi::update = 1
 
   PREINIT:
-  protmem *state_pm;
-  protmem *msg_pm = NULL;
+  protmem *state_pm, *msg_pm = NULL;
   unsigned char *msg_buf;
   STRLEN msg_len;
   I32 i;

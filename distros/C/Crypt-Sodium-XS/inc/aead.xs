@@ -84,8 +84,7 @@ nsec is not used by libsodium aead algorithms. provided for completeness.
 SV * aead_aes256gcm_beforenm(SV * key, SV * flags = &PL_sv_undef)
 
   PREINIT:
-  protmem *precalc_pm;
-  protmem *key_pm = NULL;
+  protmem *precalc_pm, *key_pm = NULL;
   unsigned char *key_buf;
   STRLEN key_len;
   unsigned int precalc_pm_flags = g_protmem_default_flags_key;
@@ -150,19 +149,10 @@ SV * aead_chacha20poly1305_decrypt( \
   aead_aegis256_decrypt = 5
 
   PREINIT:
-  protmem *key_pm = NULL;
-  protmem *msg_pm;
-  unsigned char *ct_buf;
-  unsigned char *adata_buf = NULL;
-  unsigned char *nonce_buf;
-  unsigned char *key_buf;
-  STRLEN ct_len;
-  STRLEN adata_len = 0;
-  STRLEN nonce_len;
-  STRLEN key_len;
-  STRLEN adata_req_len;
-  STRLEN nonce_req_len;
-  STRLEN key_req_len;
+  protmem *key_pm = NULL, *msg_pm;
+  unsigned char *ct_buf, *adata_buf = NULL, *nonce_buf, *key_buf;
+  STRLEN ct_len, adata_len = 0, nonce_len, key_len;
+  STRLEN adata_req_len, nonce_req_len, key_req_len;
   unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, unsigned long long *, unsigned char *,
@@ -293,21 +283,10 @@ SV * aead_chacha20poly1305_decrypt_detached( \
   aead_aegis256_decrypt_detached = 5
 
   PREINIT:
-  protmem *key_pm = NULL;
-  protmem *msg_pm;
-  unsigned char *ct_buf;
-  unsigned char *mac_buf;
-  unsigned char *adata_buf = NULL;
-  unsigned char *nonce_buf;
-  unsigned char *key_buf;
-  STRLEN ct_len;
-  STRLEN mac_len;
-  STRLEN adata_len = 0;
-  STRLEN nonce_len;
-  STRLEN key_len;
-  STRLEN adata_req_len;
-  STRLEN nonce_req_len;
-  STRLEN key_req_len;
+  protmem *key_pm = NULL, *msg_pm;
+  unsigned char *ct_buf, *mac_buf, *adata_buf = NULL, *nonce_buf, *key_buf;
+  STRLEN ct_len, mac_len, adata_len = 0, nonce_len, key_len;
+  STRLEN adata_req_len, nonce_req_len, key_req_len;
   unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, unsigned char *, const unsigned char *,
@@ -442,23 +421,11 @@ void aead_chacha20poly1305_encrypt( \
   aead_aegis256_encrypt_detached = 11
 
   PREINIT:
-  protmem *msg_pm = NULL;
-  protmem *key_pm = NULL;
-  SV * ct;
-  SV * adata_out = NULL;
-  unsigned char *msg_buf;
-  unsigned char *adata_buf = NULL;
-  unsigned char *nonce_buf;
-  unsigned char *key_buf;
-  unsigned char *ct_buf;
-  unsigned char *adata_out_buf;
-  STRLEN msg_len;
-  STRLEN adata_len = 0;
-  STRLEN nonce_len;
-  STRLEN key_len;
-  STRLEN adata_req_len;
-  STRLEN nonce_req_len;
-  STRLEN key_req_len;
+  protmem *msg_pm = NULL, *key_pm = NULL;
+  SV *ct, *adata_out = NULL;
+  unsigned char *msg_buf, *adata_buf = NULL, *nonce_buf, *key_buf, *ct_buf, *adata_out_buf;
+  STRLEN msg_len, adata_len = 0, nonce_len, key_len;
+  STRLEN adata_req_len, nonce_req_len, key_req_len;
   int (*comb_func)(unsigned char *, unsigned long long *, const unsigned char *,
                    unsigned long long, const unsigned char *, unsigned long long,
                    const unsigned char *, const unsigned char *, const unsigned char *);
@@ -738,14 +705,9 @@ SV * decrypt( \
 )
 
   PREINIT:
-  protmem *precalc_pm;
-  protmem *msg_pm;
-  unsigned char *ct_buf;
-  unsigned char *adata_buf = NULL;
-  unsigned char *nonce_buf;
-  STRLEN ct_len;
-  STRLEN adata_len = 0;
-  STRLEN nonce_len;
+  protmem *precalc_pm, *msg_pm;
+  unsigned char *ct_buf, *adata_buf = NULL, *nonce_buf;
+  STRLEN ct_len, adata_len = 0, nonce_len;
   unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
 
@@ -813,16 +775,9 @@ SV * decrypt_detached( \
 )
 
   PREINIT:
-  protmem *precalc_pm;
-  protmem *msg_pm;
-  unsigned char *ct_buf;
-  unsigned char *mac_buf;
-  unsigned char *adata_buf = NULL;
-  unsigned char *nonce_buf;
-  STRLEN ct_len;
-  STRLEN mac_len;
-  STRLEN adata_len = 0;
-  STRLEN nonce_len;
+  protmem *precalc_pm, *msg_pm;
+  unsigned char *ct_buf, *mac_buf, *adata_buf = NULL, *nonce_buf;
+  STRLEN ct_len, mac_len, adata_len = 0, nonce_len;
   unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
 
@@ -886,18 +841,10 @@ void encrypt(SV * self, SV * msg, SV * nonce, SV * adata = &PL_sv_undef)
   encrypt_detached = 1
 
   PREINIT:
-  protmem *precalc_pm;
-  protmem *msg_pm = NULL;
-  SV * ct;
-  SV * adata_out = NULL;
-  unsigned char *msg_buf;
-  unsigned char *adata_buf = NULL;
-  unsigned char *nonce_buf;
-  unsigned char *ct_buf;
-  unsigned char *adata_out_buf;
-  STRLEN msg_len;
-  STRLEN adata_len = 0;
-  STRLEN nonce_len;
+  protmem *precalc_pm, *msg_pm = NULL;
+  SV *ct, *adata_out = NULL;
+  unsigned char *msg_buf, *adata_buf = NULL, *nonce_buf, *ct_buf, *adata_out_buf;
+  STRLEN msg_len, adata_len = 0, nonce_len;
 
   PPCODE:
   nonce_buf = (unsigned char *)SvPVbyte(nonce, nonce_len);

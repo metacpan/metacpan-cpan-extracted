@@ -10,7 +10,7 @@ use vars qw($ERROR);
 use Carp qw(croak carp);
 use Data::Dumper;
 use HTML::Entities;
-use XML::Entities qw(decode_entities);
+use XML::Entities;
 
 BEGIN {
 	%HTML::Entities::char2entity = %{
@@ -44,7 +44,7 @@ our %EXPORT_TAGS = (
 	'all' => \@EXPORT_OK,
 	);
 
-our $VERSION = '1.605';
+our $VERSION = '1.606';
 
 =encoding utf8
 
@@ -1044,7 +1044,7 @@ Tom Wyant added support for UID types.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2004-2026, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

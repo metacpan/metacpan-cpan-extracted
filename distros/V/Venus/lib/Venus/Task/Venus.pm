@@ -42,8 +42,6 @@ Config:
 Here is an example configuration in YAML (e.g. in .vns.yaml).
 
   ---
-  data:
-    ECHO: true
   exec:
     cpan: cpanm -llocal -qn
     deps: cpan --installdeps .
@@ -116,9 +114,6 @@ sub handle_help {
 sub init {
 
   return {
-    data => {
-      ECHO => 1,
-    },
     exec => {
       brew => 'perlbrew',
       cpan => 'cpanm -llocal -qn',

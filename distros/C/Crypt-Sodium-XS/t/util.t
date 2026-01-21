@@ -93,4 +93,23 @@ is(unpack("H*", sodium_unpad($x, 16)), "666f6f626172", "sodium_unpad foobar bloc
 is(unpack("H*", sodium_unpad($y, 15)), "666f6f626172", "sodium_unpad foobar blocksize 15");
 is(unpack("H*", sodium_unpad($z, 3)), "666f6f626172", "sodium_unpad foobar blocksize 3");
 
+if (sodium_has_ip_codecs()) {
+  my $ip = "10.9.8.7";
+  $x = sodium_ip2bin($ip);
+  is(unpack("H*", $x), "00000000000000000000ffff0a090807", "sodium_ip2bin v4 $ip");
+  $ip = "fe80::dead:beef:c0ff:eeee";
+  $x = sodium_ip2bin($ip);
+  is(unpack("H*", $x), "fe80000000000000deadbeefc0ffeeee", "sodium_ip2bin v6 $ip");
+  $ip = "10.9.8.256";
+  eval { $x = sodium_ip2bin($ip) };
+  like($@, qr/(?i)invalid ip/, "sodium_ip2bin invalid v4 $ip");
+
+  $ip = "00000000000000000000ffff0a090807";
+  $x = sodium_bin2ip(pack("H*", $ip));
+  is($x, "10.9.8.7", "sodium_bin2ip v4 $ip");
+  $ip = "fe80000000000000deadbeefc0ffeeee";
+  $x = sodium_bin2ip(pack("H*", $ip));
+  is($x, "fe80::dead:beef:c0ff:eeee", "sodium_bin2ip v6 $ip");
+}
+
 done_testing();

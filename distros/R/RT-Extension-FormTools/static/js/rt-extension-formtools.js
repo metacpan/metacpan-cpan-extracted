@@ -383,9 +383,9 @@ formTools = {
             const cfhints = jQuery(this);
             if ( cfhints.parent().find('textarea.richtext').length ) {
                 const textarea = cfhints.parent().find('textarea.richtext');
-                const editor   = RT.CKEditor.instances[textarea.attr('id')];
+                const editor   = RT.CKEditor.instances[textarea.attr('name')];
                 // add change handler to show/hide invalid feedback
-                if ( ! formTools.ckeOnChangeAdded.hasOwnProperty( textarea.attr('id') ) ) {
+                if ( ! formTools.ckeOnChangeAdded.hasOwnProperty( textarea.attr('name') ) ) {
                     editor.ui.focusTracker.on('change:isFocused', function ( evt, name, isFocused ) {
                         if ( !isFocused ) {
                             if ( editor.getData() ) {
@@ -396,7 +396,7 @@ formTools = {
                             }
                         }
                     });
-                    formTools.ckeOnChangeAdded[ textarea.attr('id') ] = 1;
+                    formTools.ckeOnChangeAdded[ textarea.attr('name') ] = 1;
                 }
                 cfhints.addClass('invalid-feedback');
                 if ( editor.getData() ) {

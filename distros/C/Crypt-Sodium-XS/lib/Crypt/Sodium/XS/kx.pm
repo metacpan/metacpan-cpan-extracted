@@ -7,35 +7,75 @@ use Exporter 'import';
 
 _define_constants();
 
-my @constant_bases = qw(
-  PUBLICKEYBYTES
-  SECRETKEYBYTES
-  SEEDBYTES
-  SESSIONKEYBYTES
+{
+  my @constant_bases = qw(
+    PUBLICKEYBYTES
+    SECRETKEYBYTES
+    SEEDBYTES
+    SESSIONKEYBYTES
+  );
+
+  my @bases = qw(
+    keypair
+    client_session_keys
+    server_session_keys
+  );
+
+  my $default = [
+    (map { "kx_$_" } @bases),
+    (map { "kx_$_" } @constant_bases, "PRIMITIVE"),
+  ];
+  my $x25519blake2b = [
+    (map { "kx_x25519blake2b_$_" } @bases),
+    (map { "kx_x25519blake2b_$_" } @constant_bases),
+  ];
+
+  our %EXPORT_TAGS = (
+    all => [ @$default, @$x25519blake2b ],
+    default => $default,
+    x25519blake2b => $x25519blake2b,
+  );
+
+  our @EXPORT_OK = @{$EXPORT_TAGS{all}};
+}
+
+package Crypt::Sodium::XS::OO::kx;
+use parent 'Crypt::Sodium::XS::OO::Base';
+
+my %methods = (
+  default => {
+    PRIMITIVE => \&Crypt::Sodium::XS::kx::kx_PRIMITIVE,
+    PUBLICKEYBYTES => \&Crypt::Sodium::XS::kx::kx_PUBLICKEYBYTES,
+    SECRETKEYBYTES => \&Crypt::Sodium::XS::kx::kx_SECRETKEYBYTES,
+    SEEDBYTES => \&Crypt::Sodium::XS::kx::kx_SEEDBYTES,
+    SESSIONKEYBYTES => \&Crypt::Sodium::XS::kx::kx_SESSIONKEYBYTES,
+    keypair => \&Crypt::Sodium::XS::kx::kx_keypair,
+    client_session_keys => \&Crypt::Sodium::XS::kx::kx_client_session_keys,
+    server_session_keys => \&Crypt::Sodium::XS::kx::kx_server_session_keys,
+  },
+  x25519blake2b => {
+    PRIMITIVE => sub { 'x25519blake2b' },
+    PUBLICKEYBYTES => \&Crypt::Sodium::XS::kx::kx_x25519blake2b_PUBLICKEYBYTES,
+    SECRETKEYBYTES => \&Crypt::Sodium::XS::kx::kx_x25519blake2b_SECRETKEYBYTES,
+    SEEDBYTES => \&Crypt::Sodium::XS::kx::kx_x25519blake2b_SEEDBYTES,
+    SESSIONKEYBYTES => \&Crypt::Sodium::XS::kx::kx_x25519blake2b_SESSIONKEYBYTES,
+    keypair => \&Crypt::Sodium::XS::kx::kx_x25519blake2b_keypair,
+    client_session_keys => \&Crypt::Sodium::XS::kx::kx_x25519blake2b_client_session_keys,
+    server_session_keys => \&Crypt::Sodium::XS::kx::kx_x25519blake2b_server_session_keys,
+  },
 );
 
-my @bases = qw(
-  keypair
-  client_session_keys
-  server_session_keys
-);
+sub Crypt::Sodium::XS::kx::primitives { keys %methods }
+*primitives = \&Crypt::Sodium::XS::kx::primitives;
 
-my $default = [
-  (map { "kx_$_" } @bases),
-  (map { "kx_$_" } @constant_bases, "PRIMITIVE"),
-];
-my $x25519blake2b = [
-  (map { "kx_x25519blake2b_$_" } @bases),
-  (map { "kx_x25519blake2b_$_" } @constant_bases),
-];
-
-our %EXPORT_TAGS = (
-  all => [ @$default, @$x25519blake2b ],
-  default => $default,
-  x25519blake2b => $x25519blake2b,
-);
-
-our @EXPORT_OK = @{$EXPORT_TAGS{all}};
+sub PRIMITIVE { my $self = shift; goto $methods{$self->{primitive}}->{PRIMITIVE}; }
+sub PUBLICKEYBYTES { my $self = shift; goto $methods{$self->{primitive}}->{PUBLICKEYBYTES}; }
+sub SECRETKEYBYTES { my $self = shift; goto $methods{$self->{primitive}}->{SECRETKEYBYTES}; }
+sub SEEDBYTES { my $self = shift; goto $methods{$self->{primitive}}->{SEEDBYTES}; }
+sub SESSIONKEYBYTES { my $self = shift; goto $methods{$self->{primitive}}->{SESSIONKEYBYTES}; }
+sub keypair { my $self = shift; goto $methods{$self->{primitive}}->{keypair}; }
+sub client_session_keys { my $self = shift; goto $methods{$self->{primitive}}->{client_session_keys}; }
+sub server_session_keys { my $self = shift; goto $methods{$self->{primitive}}->{server_session_keys}; }
 
 1;
 
@@ -50,21 +90,22 @@ pairs
 
 =head1 SYNOPSIS
 
-  use Crypt::Sodium::XS::kx ":default";
+  use Crypt::Sodium::XS;
+  my $kx = Crypt::Sodium::XS->kx;
 
   # client
-  my ($client_pk, $client_sk) = kx_keypair();
-  my ($server_pk, $server_sk) = kx_keypair();
+  my ($client_pk, $client_sk) = $kx->keypair;
+  my ($server_pk, $server_sk) = $kx->keypair;
 
   # client must have server's public key
   # shared keys for server->client (client_rx) and client->server (client_tx)
   my ($client_rx, $client_tx)
-    = kx_client_session_keys($client_pk, $client_sk, $server_pk);
+    = $kx->client_session_keys($client_pk, $client_sk, $server_pk);
 
   # server must have client's public key
   # shared keys for client->server (server_rx) and server->client (server_tx)
   my ($server_rx, $server_tx)
-    = kx_client_session_keys($server_pk, $server_sk, $client_pk);
+    = $kx->client_session_keys($server_pk, $server_sk, $client_pk);
 
 =head1 DESCRIPTION
 
@@ -77,7 +118,137 @@ act as the "server" side of communications.
 The shared keys can be used used with symmetric encryption protocols such as
 L<Crypt::Sodium::XS::secretbox> and L<Crypt::Sodium::XS::aead>.
 
+=head1 CONSTRUCTOR
+
+The constructor is called with the C<Crypt::Sodium::XS-E<gt>kx> method.
+
+  my $kx = Crypt::Sodium::XS->kx;
+  my $kx = Crypt::Sodium::XS->kx(primitive => 'x25519blake2b');
+
+Returns a new kx object.
+
+Implementation detail: the returned object is blessed into
+C<Crypt::Sodium::XS::OO::kx>.
+
+=head1 ATTRIBUTES
+
+=head2 primitive
+
+  my $primitive = $kx->primitive;
+  $kx->primitive('x25519blake2b');
+
+Gets or sets the primitive used for all operations by this object. It must be
+one of the primitives listed in L</PRIMITIVES>, including C<default>.
+
+=head1 METHODS
+
+=head2 primitives
+
+  my @primitives = $kx->primitives;
+  my @primitives = Crypt::Sodium::XS::kx->primitives;
+
+Returns a list of all supported primitive names, including C<default>.
+
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $primitive = $kx->PRIMITIVE;
+
+Returns the primitive used for all operations by this object. Note this will
+never be C<default> but would instead be the primitive it represents.
+
+=head2 keypair
+
+  my ($public_key, $secret_key) = $kx->keypair($seed, $flags);
+
+C<$seed> is optional. It must be L</SEEDBYTES> in length. It may be a
+L<Crypt::Sodium::XS::MemVault>. Using the same seed will generate the same key
+pair, so it must be kept confidential. If omitted, a key pair is randomly
+generated.
+
+C<$flags> is optional. It is the flags used for the C<$secret_key>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a public key of L</PUBLICKEYBYTES> bytes and a
+L<Crypt::Sodium::XS::MemVault>: the secret key of L</SECRETKEYBYTES> bytes.
+
+=head2 client_session_keys
+
+  my ($client_rx, $client_tx)
+    = $kx->client_session_keys($client_pk, $client_sk, $server_pk, $flags);
+
+C<$client_pk> is a public key. It must be L</PUBLICKEYBYTES> bytes.
+
+C<$client_sk> is a secret key. It must be L</SECRETKEYBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$server_pk> is a public key. It must be L</PUBLICKEYBYTES> bytes.
+
+C<$flags> is optional. It is the flags used for both the C<$client_rx> and
+C<$client_tx> L<Crypt::Sodium::XS::MemVault>s. See
+L<Crypt::Sodium::XS::ProtMem>.
+
+Returns two L<Crypt::Sodium::XS::MemVault>s: a secret key of L</SECRETKEYBYTES>
+bytes intended for decrypting on the client side, and a secret key of
+L</SECRETKEYBYTES> intended for encrypting on the client side.
+
+=head2 server_session_keys
+
+  my ($server_rx, $server_tx)
+    = $kx->client_session_keys($server_pk, $server_sk, $client_pk, $flags);
+
+C<$server_pk> is a public key. It must be L</PUBLICKEYBYTES> bytes.
+
+C<$server_sk> is a secret key. It must be L</SECRETKEYBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$client_pk> is a public key. It must be L</PUBLICKEYBYTES> bytes.
+
+C<$flags> is optional. It is the flags used for both the C<$server_rx> and
+C<$server_tx> L<Crypt::Sodium::XS::MemVault>s. See
+L<Crypt::Sodium::XS::ProtMem>.
+
+Returns two L<Crypt::Sodium::XS::MemVault>s: a secret key of L</SECRETKEYBYTES>
+bytes intended for decrypting on the server side, and a secret key of
+L</SECRETKEYBYTES> intended for encrypting on the server side.
+
+=head2 PUBLICKEYBYTES
+
+  my $public_key_length = $kx->PUBLICKEYBYTES;
+
+The size, in bytes, of a public key.
+
+=head2 SECRETKEYBYTES
+
+  my $secret_key_length = $kx->SECRETKEYBYTES;
+
+The size, in bytes, of a secret key.
+
+=head2 SEEDBYTES
+
+  my $seed_length = $kx->SEEDKEYBYTES;
+
+The size, in bytes, of a seed used by L</keypair>.
+
+=head2 SESSIONKEYBYTES
+
+  my $session_key_length = $kx->SESSIONKEYBYTES;
+
+The size, in bytes, of a secret shared session key.
+
+=head1 PRIMITIVES
+
+=over 4
+
+=item * x25519blake2b (default)
+
+=back
+
 =head1 FUNCTIONS
+
+The object API above is the recommended way to use this module. The functions
+and constants documented below can be imported instead or in addition.
 
 Nothing is exported by default. A C<:default> tag imports the functions and
 constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
@@ -91,16 +262,7 @@ C<:all> tag imports everything.
 
   my ($public_key, $secret_key) = kx_keypair($seed, $flags);
 
-C<$seed> is optional. It must be L</kx_SEEDBYTES> in length. It may be a
-L<Crypt::Sodium::XS::MemVault>. Using the same seed will generate the same key
-pair, so it must be kept confidential. If omitted, a key pair is randomly
-generated.
-
-C<$flags> is optional. It is the flags used for the C<$secret_key>
-L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
-
-Returns a public key of L</kx_PUBLICKEYBYTES> bytes and a
-L<Crypt::Sodium::XS::MemVault>: the secret key of L</kx_SECRETKEYBYTES> bytes.
+Same as L</keypair>.
 
 =head2 kx_client_session_keys
 
@@ -109,20 +271,7 @@ L<Crypt::Sodium::XS::MemVault>: the secret key of L</kx_SECRETKEYBYTES> bytes.
   my ($client_rx, $client_tx)
     = kx_client_session_keys($client_pk, $client_sk, $server_pk, $flags);
 
-C<$client_pk> is a public key. It must be L</kx_PUBLICKEYBYTES> bytes.
-
-C<$client_sk> is a secret key. It must be L</kx_SECRETKEYBYTES> bytes. It may be a
-L<Crypt::Sodium::XS::MemVault>.
-
-C<$server_pk> is a public key. It must be L</kx_PUBLICKEYBYTES> bytes.
-
-C<$flags> is optional. It is the flags used for both the C<$client_rx> and
-C<$client_tx> L<Crypt::Sodium::XS::MemVault>s. See
-L<Crypt::Sodium::XS::ProtMem>.
-
-Returns two L<Crypt::Sodium::XS::MemVault>s: a secret key of
-L</kx_SECRETKEYBYTES> bytes intended for decrypting on the client side, and a
-secret key of L</kx_SECRETKEYBYTES> intended for encrypting on the client side.
+Same as L</client_session_keys>.
 
 =head2 kx_server_session_keys
 
@@ -131,20 +280,7 @@ secret key of L</kx_SECRETKEYBYTES> intended for encrypting on the client side.
   my ($server_rx, $server_tx)
     = kx_client_session_keys($server_pk, $server_sk, $client_pk, $flags);
 
-C<$server_pk> is a public key. It must be L</kx_PUBLICKEYBYTES> bytes.
-
-C<$server_sk> is a secret key. It must be L</kx_SECRETKEYBYTES> bytes. It may be a
-L<Crypt::Sodium::XS::MemVault>.
-
-C<$client_pk> is a public key. It must be L</kx_PUBLICKEYBYTES> bytes.
-
-C<$flags> is optional. It is the flags used for both the C<$server_rx> and
-C<$server_tx> L<Crypt::Sodium::XS::MemVault>s. See
-L<Crypt::Sodium::XS::ProtMem>.
-
-Returns two L<Crypt::Sodium::XS::MemVault>s: a secret key of
-L</kx_SECRETKEYBYTES> bytes intended for decrypting on the server side, and a
-secret key of L</SECRETKEYBYTES> intended for encrypting on the server side.
+Same as L</server_session_keys>.
 
 =head1 CONSTANTS
 
@@ -158,9 +294,7 @@ Returns the name of the default primitive.
 
 =head2 kx_E<lt>primitiveE<gt>_PUBLICKEYBYTES
 
-  my $public_key_length = kx_PUBLICKEYBYTES();
-
-The size, in bytes, of a public key.
+Same as L</PUBLICKEYBYTES>.
 
 =head2 kx_SECRETKEYBYTES
 
@@ -168,7 +302,7 @@ The size, in bytes, of a public key.
 
   my $secret_key_length = kx_SECRETKEYBYTES();
 
-The size, in bytes, of a secret key.
+Same as L</SECRETKEYBYTES>.
 
 =head2 kx_SEEDBYTES
 
@@ -176,7 +310,7 @@ The size, in bytes, of a secret key.
 
   my $seed_length = kx_SEEDKEYBYTES();
 
-The size, in bytes, of a seed used by L</keypair>.
+Same as L</SEEDBYTES>.
 
 =head2 kx_SESSIONKEYBYTES
 
@@ -184,27 +318,13 @@ The size, in bytes, of a seed used by L</keypair>.
 
   my $session_key_length = kx_SESSIONKEYBYTES();
 
-The size, in bytes, of a secret shared session key.
-
-=head1 PRIMITIVES
-
-All constants (except _PRIMITIVE) and functions have
-C<kx_E<lt>primitiveE<gt>>-prefixed couterparts (e.g.,
-kx_x25519blake2b_keypair, kx_x25519blake2b_PUBLICKEYBYTES).
-
-=over 4
-
-=item * x25519blake2b (default)
-
-=back
+Same as L</SESSIONKEYBYTES>.
 
 =head1 SEE ALSO
 
 =over 4
 
 =item L<Crypt::Sodium::XS>
-
-=item L<Crypt::Sodium::XS::OO::kx>
 
 =item L<https://doc.libsodium.org/key_exchange>
 

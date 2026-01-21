@@ -2,7 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 
-use Crypt::Sodium::XS::OO::onetimeauth;
+use Crypt::Sodium::XS;
+use Crypt::Sodium::XS::onetimeauth;
 use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
@@ -11,8 +12,8 @@ my $msg = "Signed by me";
 
 #TODO: test cloning. test hashing memvault.
 
-for my $alg (Crypt::Sodium::XS::OO::onetimeauth->primitives) {
-  my $m = Crypt::Sodium::XS::OO::onetimeauth->new(primitive => $alg);
+for my $alg (Crypt::Sodium::XS::onetimeauth->primitives) {
+  my $m = Crypt::Sodium::XS->onetimeauth(primitive => $alg);
 
   my $key = $m->keygen;
   ok($key, "key generated ($alg)");

@@ -2,7 +2,7 @@ package Lugh::Quant;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
 # @EXPORT_OK and %EXPORT_TAGS are populated by XS BOOT section
 
@@ -440,11 +440,7 @@ L<Lugh>, L<Lugh::Model>, L<Lugh::Tensor>
 
 =over 4
 
-=item * L<llama.cpp quantization|https://github.com/ggerganov/llama.cpp/blob/master/examples/quantize/quantize.cpp>
-
 =item * L<GGML types|https://github.com/ggerganov/ggml/blob/master/include/ggml.h>
-
-=item * L<K-quants paper|https://arxiv.org/abs/2206.01861> - GPTQ
 
 =back
 

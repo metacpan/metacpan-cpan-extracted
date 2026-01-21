@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use Crypt::Sodium::XS::OO::pwhash;
+use Crypt::Sodium::XS::pwhash;
 use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
@@ -16,8 +16,8 @@ my @passwords = (
     . " One Ring to bring them all and in the darkness bind them",
 );
 
-for my $alg (Crypt::Sodium::XS::OO::pwhash->primitives) {
-  my $m = Crypt::Sodium::XS::OO::pwhash->new(primitive => $alg);
+for my $alg (Crypt::Sodium::XS::pwhash->primitives) {
+  my $m = Crypt::Sodium::XS->pwhash(primitive => $alg);
 
   ok($m->$_ > 0, "$_ > 0 ($alg)")
     for qw(

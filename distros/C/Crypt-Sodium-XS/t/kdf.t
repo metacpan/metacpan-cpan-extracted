@@ -2,13 +2,14 @@ use strict;
 use warnings;
 use Test::More;
 
-use Crypt::Sodium::XS::OO::kdf;
+use Crypt::Sodium::XS;
+use Crypt::Sodium::XS::kdf;
 use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
 
-for my $alg (Crypt::Sodium::XS::OO::kdf->primitives) {
-  my $m = Crypt::Sodium::XS::OO::kdf->new(primitive => $alg);
+for my $alg (Crypt::Sodium::XS::kdf->primitives) {
+  my $m = Crypt::Sodium::XS->kdf(primitive => $alg);
 
   my @test_lens = qw(KEYBYTES BYTES_MAX);
   for my $blen (@test_lens) {

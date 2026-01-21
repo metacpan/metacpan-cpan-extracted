@@ -1530,8 +1530,8 @@ The handle method installs a method modifier that wraps a method similar to
 C<around>, providing low-level control over method execution. The modifier
 receives the original method as its first argument (which may be C<undef> if
 the method doesn't exist), followed by the method's arguments. This is the
-foundation for the other method modifiers (L</before|"before">,
-L</after|"after">, L</around|"around">). The modifiers are executed in the
+foundation for the other method modifiers (L<"before"|/before>,
+L<"after"|/after>, L<"around"|/around>). The modifiers are executed in the
 order they are stacked rather than maintaining a global registry.
 
 =signature handle

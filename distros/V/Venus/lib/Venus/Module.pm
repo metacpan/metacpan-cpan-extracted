@@ -164,7 +164,7 @@ Module Builder for Perl 5
 
 This package provides a package/module builder which when used causes the
 consumer to inherit from L<Venus::Core> which provides lifecycle
-L<hooks|Venus::Core>.
+L<hooks|Venus::Hook>.
 
 =cut
 

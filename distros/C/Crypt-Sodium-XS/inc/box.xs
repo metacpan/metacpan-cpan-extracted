@@ -73,15 +73,9 @@ SV * box_beforenm(SV * pk, SV * sk, SV * flags = &PL_sv_undef)
   box_curve25519xsalsa20poly1305_beforenm = 2
 
   PREINIT:
-  protmem *sk_pm = NULL;
-  protmem *precalc_pm;
-  unsigned char *pk_buf;
-  unsigned char *sk_buf;
-  STRLEN pk_len;
-  STRLEN sk_len;
-  STRLEN precalc_len;
-  STRLEN pk_req_len;
-  STRLEN sk_req_len;
+  protmem *sk_pm = NULL, *precalc_pm;
+  unsigned char *pk_buf, *sk_buf;
+  STRLEN pk_len, sk_len, precalc_len, pk_req_len, sk_req_len;
   unsigned int precalc_flags = g_protmem_default_flags_key;
   int ret;
   int (*func)(unsigned char *, const unsigned char *, const unsigned char *);
@@ -178,20 +172,10 @@ SV * box_decrypt( \
   box_curve25519xsalsa20poly1305_decrypt = 2
 
   PREINIT:
-  protmem *msg_pm;
-  protmem *sk_pm = NULL;
-  unsigned char *ct_buf;
-  unsigned char *nonce_buf;
-  unsigned char *sk_buf;
-  unsigned char *pk_buf;
-  STRLEN ct_len;
-  STRLEN nonce_len;
-  STRLEN sk_len;
-  STRLEN pk_len;
-  STRLEN nonce_req_len;
-  STRLEN sk_req_len;
-  STRLEN pk_req_len;
-  STRLEN mac_len;
+  protmem *msg_pm, *sk_pm = NULL;
+  unsigned char *ct_buf, *nonce_buf, *sk_buf, *pk_buf;
+  STRLEN ct_len, nonce_len, sk_len, pk_len;
+  STRLEN nonce_req_len, sk_req_len, pk_req_len, mac_len;
   unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, const unsigned char *,
@@ -294,22 +278,10 @@ SV * box_decrypt_detached( \
   box_curve25519xsalsa20poly1305_decrypt_detached = 2
 
   PREINIT:
-  protmem *msg_pm;
-  protmem *sk_pm = NULL;
-  unsigned char *ct_buf;
-  unsigned char *mac_buf;
-  unsigned char *nonce_buf;
-  unsigned char *sk_buf;
-  unsigned char *pk_buf;
-  STRLEN ct_len;
-  STRLEN mac_len;
-  STRLEN nonce_len;
-  STRLEN sk_len;
-  STRLEN pk_len;
-  STRLEN mac_req_len;
-  STRLEN nonce_req_len;
-  STRLEN sk_req_len;
-  STRLEN pk_req_len;
+  protmem *msg_pm, *sk_pm = NULL;
+  unsigned char *ct_buf, *mac_buf, *nonce_buf, *sk_buf, *pk_buf;
+  STRLEN ct_len, mac_len, nonce_len, sk_len, pk_len;
+  STRLEN mac_req_len, nonce_req_len, sk_req_len, pk_req_len;
   unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, const unsigned char *,
@@ -411,24 +383,11 @@ void box_encrypt(SV * msg, SV * nonce, SV * pk, SV * sk)
   box_curve25519xsalsa20poly1305_encrypt_detached = 5
 
   PREINIT:
-  protmem *msg_pm = NULL;
-  protmem *sk_pm = NULL;
-  SV *ct;
-  SV *mac = NULL;
-  unsigned char *msg_buf;
-  unsigned char *nonce_buf;
-  unsigned char *pk_buf;
-  unsigned char *sk_buf;
-  unsigned char *ct_buf;
-  unsigned char *mac_buf;
-  STRLEN msg_len;
-  STRLEN nonce_len;
-  STRLEN pk_len;
-  STRLEN sk_len;
-  STRLEN mac_len;
-  STRLEN nonce_req_len;
-  STRLEN pk_req_len;
-  STRLEN sk_req_len;
+  protmem *msg_pm = NULL, *sk_pm = NULL;
+  SV *ct, *mac = NULL;
+  unsigned char *msg_buf, *nonce_buf, *pk_buf, *sk_buf, *ct_buf, *mac_buf;
+  STRLEN msg_len, nonce_len, pk_len, sk_len, mac_len;
+  STRLEN nonce_req_len, pk_req_len, sk_req_len;
   int (*detached_func)(unsigned char *, unsigned char *,
                        const unsigned char *, unsigned long long,
                        const unsigned char *, const unsigned char *,
@@ -577,8 +536,7 @@ void box_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
   protmem *seed_pm = NULL, *sk_pm;
   SV *pk_sv;
   unsigned char *pk_buf, *seed_buf;
-  STRLEN seed_len, seed_req_len;
-  STRLEN pk_len, sk_len;
+  STRLEN seed_len, seed_req_len, pk_len, sk_len;
   unsigned int sk_flags = g_protmem_default_flags_key;
 
   PPCODE:
@@ -711,14 +669,8 @@ SV * box_seal_encrypt(SV * msg, SV * pk)
 
   PREINIT:
   protmem *msg_pm = NULL;
-  unsigned char *msg_buf;
-  unsigned char *pk_buf;
-  unsigned char *ct_buf;
-  STRLEN msg_len;
-  STRLEN pk_len;
-  STRLEN pk_req_len;
-  STRLEN seal_len;
-  STRLEN ct_len;
+  unsigned char *msg_buf, *pk_buf, *ct_buf;
+  STRLEN msg_len, pk_len, pk_req_len, seal_len, ct_len;
   int (*func)(unsigned char *, const unsigned char *,
               unsigned long long, const unsigned char *);
 
@@ -779,17 +731,9 @@ SV * box_seal_decrypt(SV * ciphertext, SV * pk, SV * sk, SV * flags = &PL_sv_und
   box_curve25519xsalsa20poly1305_seal_decrypt = 2
 
   PREINIT:
-  protmem *sk_pm = NULL;
-  protmem *msg_pm;
-  unsigned char *ct_buf;
-  unsigned char *pk_buf;
-  unsigned char *sk_buf;
-  STRLEN ct_len;
-  STRLEN pk_len;
-  STRLEN sk_len;
-  STRLEN pk_req_len;
-  STRLEN sk_req_len;
-  STRLEN seal_len;
+  protmem *sk_pm = NULL, *msg_pm;
+  unsigned char *ct_buf, *pk_buf, *sk_buf;
+  STRLEN ct_len, pk_len, sk_len, pk_req_len, sk_req_len, seal_len;
   unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, const unsigned char *,
@@ -891,14 +835,9 @@ SV * decrypt(SV * self, SV * ciphertext, SV * nonce, SV * flags = &PL_sv_undef)
   Crypt::Sodium::XS::box::precalc::curve25519xsalsa20poly1305::decrypt = 2
 
   PREINIT:
-  protmem *msg_pm;
-  protmem *precalc_pm;
-  unsigned char *ct_buf;
-  unsigned char *nonce_buf;
-  STRLEN ct_len;
-  STRLEN nonce_len;
-  STRLEN nonce_req_len;
-  STRLEN mac_len;
+  protmem *msg_pm, *precalc_pm;
+  unsigned char *ct_buf, *nonce_buf;
+  STRLEN ct_len, nonce_len, nonce_req_len, mac_len;
   unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, const unsigned char *,
@@ -977,16 +916,9 @@ SV * decrypt_detached(SV * self, SV * ciphertext, SV * mac, SV * nonce, SV * fla
   Crypt::Sodium::XS::box::precalc::curve25519xsalsa20poly1305::decrypt_detached = 2
 
   PREINIT:
-  protmem *msg_pm;
-  protmem *precalc_pm;
-  unsigned char *ct_buf;
-  unsigned char *mac_buf;
-  unsigned char *nonce_buf;
-  STRLEN ct_len;
-  STRLEN mac_len;
-  STRLEN nonce_len;
-  STRLEN mac_req_len;
-  STRLEN nonce_req_len;
+  protmem *msg_pm, *precalc_pm;
+  unsigned char *ct_buf, *mac_buf, *nonce_buf;
+  STRLEN ct_len, mac_len, nonce_len, mac_req_len, nonce_req_len;
   unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, const unsigned char *,
@@ -1070,18 +1002,10 @@ void encrypt(SV * self, SV * msg, SV * nonce)
   Crypt::Sodium::XS::box::precalc::curve25519xsalsa20poly1305::encrypt_detached = 5
 
   PREINIT:
-  protmem *msg_mv = NULL;
-  protmem *precalc_pm;
-  SV *ct;
-  SV *mac = NULL;
-  unsigned char *msg_buf;
-  unsigned char *nonce_buf;
-  unsigned char *ct_buf;
-  unsigned char *mac_buf;
-  STRLEN msg_len;
-  STRLEN nonce_len;
-  STRLEN nonce_req_len;
-  STRLEN mac_len;
+  protmem *msg_mv = NULL, *precalc_pm;
+  SV *ct, *mac = NULL;
+  unsigned char *msg_buf, *nonce_buf, *ct_buf, *mac_buf;
+  STRLEN msg_len, nonce_len, nonce_req_len, mac_len;
   int (*detached_func)(unsigned char *, unsigned char *,
                        const unsigned char *, unsigned long long,
                        const unsigned char *, const unsigned char *);

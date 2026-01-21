@@ -3,7 +3,7 @@
 
 
 package BeamerReveal;
-our $VERSION = '20260119.1636'; # VERSION
+our $VERSION = '20260120.1958'; # VERSION
 
 use strict;
 use warnings;
@@ -19,7 +19,9 @@ use BeamerReveal::Log;
 sub new {
   my $class = shift;
 
-  my $self = {};
+  my $self = {
+	      rawpage => 0
+	     };
   $class = (ref $class ? ref $class : $class );
   bless $self, $class;
 
@@ -38,7 +40,7 @@ sub createFromChunk {
     return BeamerReveal::Object::Presentation->new( $chunkData, \@lines, $chunkStartLine );
   }
   if( $chunkType eq 'BeamerFrame' ) {
-    return BeamerReveal::Object::BeamerFrame->new( $chunkData, \@lines, $chunkStartLine );
+    return BeamerReveal::Object::BeamerFrame->new( $chunkData, \@lines, $chunkStartLine, ++$self->{rawpage} );
   }
   else {
     $BeamerReveal::Log::logger->fatal( "Error: unknown chunk type $chunkType on line $chunkStartLine\n" );
@@ -59,7 +61,7 @@ BeamerReveal - BeamerReveal
 
 =head1 VERSION
 
-version 20260119.1636
+version 20260120.1958
 
 =head1 SYNOPSIS
 

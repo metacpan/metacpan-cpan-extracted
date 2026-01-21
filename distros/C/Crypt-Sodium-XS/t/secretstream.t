@@ -2,15 +2,15 @@ use strict;
 use warnings;
 use Test::More;
 
-use Crypt::Sodium::XS::OO::secretstream;
+use Crypt::Sodium::XS::secretstream;
 use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
 
 my $msg = "I'm doing just fine. And you?";
 
-for my $alg (Crypt::Sodium::XS::OO::secretstream->primitives) {
-  my $m = Crypt::Sodium::XS::OO::secretstream->new(primitive => $alg);
+for my $alg (Crypt::Sodium::XS::secretstream->primitives) {
+  my $m = Crypt::Sodium::XS->secretstream(primitive => $alg);
 
   ok(!!defined($m->TAG_MESSAGE), "TAG_MESSAGE has a value ($alg)");
   ok($m->$_ > 0, "$_ > 0 ($alg)") for qw[ABYTES HEADERBYTES KEYBYTES

@@ -1,17 +1,22 @@
 MODULE = Crypt::Sodium::XS PACKAGE = Crypt::Sodium::XS::Util
 
+SV * sodium_has_ip_codecs()
+
+  CODE:
+#ifdef SODIUM_HAS_IP_CODECS
+  RETVAL = &PL_sv_yes;
+#else
+  RETVAL = &PL_sv_no;
+#endif
+
+  OUTPUT:
+  RETVAL
+
 SV * sodium_add(SV * x, SV * y)
 
   PREINIT:
-  unsigned char *x_buf;
-  unsigned char *y_buf;
-  unsigned char *longer_buf;
-  unsigned char *shorter_buf;
-  unsigned char *out_buf;
-  STRLEN x_len;
-  STRLEN y_len;
-  STRLEN longer_len;
-  STRLEN shorter_len;
+  unsigned char *x_buf, *y_buf, *longer_buf, *shorter_buf, *out_buf;
+  STRLEN x_len, y_len, longer_len, shorter_len;
 
   CODE:
   x_buf = (unsigned char *)SvPVbyte(x, x_len);
@@ -47,10 +52,8 @@ SV * sodium_add(SV * x, SV * y)
 SV * sodium_bin2hex(SV * bytes)
 
   PREINIT:
-  char *bytes_buf;
-  char *out_buf;
-  STRLEN bytes_len;
-  STRLEN out_len;
+  char *bytes_buf, *out_buf;
+  STRLEN bytes_len, out_len;
 
   CODE:
   bytes_buf = SvPVbyte(bytes, bytes_len);
@@ -66,13 +69,32 @@ SV * sodium_bin2hex(SV * bytes)
   OUTPUT:
   RETVAL
 
+SV * sodium_bin2ip(SV * bytes)
+
+  PREINIT:
+  char *bytes_buf, ipstr_buf[46];
+  STRLEN bytes_len;
+
+  CODE:
+#ifdef SODIUM_HAS_IPCODECS
+  bytes_buf = SvPVbyte(bytes, bytes_len);
+  if (bytes_len != 16)
+    croak("Invalid binary length (must be 16 bytes)");
+  if (sodium_bin2ip(ipstr_buf, sizeof ipstr_buf, (unsigned char *)bytes_buf) == NULL)
+    croak("sodium_bin2ip failed");
+  RETVAL = newSVpvn(ipstr_buf, strlen(ipstr_buf));
+#else
+  croak("sodium_bin2ip not supported by this version of libsodium");
+#endif
+
+  OUTPUT:
+  RETVAL
+
 SV * sodium_compare(SV * x, SV * y, STRLEN len = 0)
 
   PREINIT:
-  unsigned char *x_buf;
-  unsigned char *y_buf;
-  STRLEN x_len;
-  STRLEN y_len;
+  unsigned char *x_buf, *y_buf;
+  STRLEN x_len, y_len;
 
   CODE:
   x_buf = (unsigned char *)SvPVbyte(x, x_len);
@@ -98,10 +120,8 @@ SV * sodium_compare(SV * x, SV * y, STRLEN len = 0)
 SV * sodium_hex2bin(SV * bytes)
 
   PREINIT:
-  char *bytes_buf;
-  char *out_buf;
-  STRLEN bytes_len;
-  STRLEN out_len;
+  char *bytes_buf, *out_buf;
+  STRLEN bytes_len, out_len;
 
   CODE:
   bytes_buf = SvPVbyte(bytes, bytes_len);
@@ -122,8 +142,7 @@ SV * sodium_hex2bin(SV * bytes)
 SV * sodium_increment(SV * val)
 
   PREINIT:
-  unsigned char *buf;
-  unsigned char *out_buf;
+  unsigned char *buf, *out_buf;
   STRLEN buf_len;
 
   CODE:
@@ -149,6 +168,25 @@ SV * sodium_increment(SV * val)
   OUTPUT:
   RETVAL
 
+SV * sodium_ip2bin(SV * ip)
+
+  PREINIT:
+  char *ip_buf, out_buf[16];
+  STRLEN ip_len;
+
+  CODE:
+#ifdef SODIUM_HAS_IPCODECS
+  ip_buf = SvPVbyte(ip, ip_len);
+  if (sodium_ip2bin((unsigned char *)out_buf, ip_buf, ip_len) != 0)
+    croak("sodium_ip2bin failed (invalid IP address?)");
+  RETVAL = newSVpvn(out_buf, sizeof out_buf);
+#else
+  croak("sodium_ip2bin not supported by this version of libsodium");
+#endif
+
+  OUTPUT:
+  RETVAL
+
 SV * sodium_is_zero(SV * bytes)
 
   PREINIT:
@@ -168,10 +206,8 @@ SV * sodium_is_zero(SV * bytes)
 SV * sodium_memcmp(SV * x, SV * y, STRLEN len = 0)
 
   PREINIT:
-  unsigned char *x_buf;
-  unsigned char *y_buf;
-  STRLEN x_len;
-  STRLEN y_len;
+  unsigned char *x_buf, *y_buf;
+  STRLEN x_len, y_len;
 
   CODE:
   x_buf = (unsigned char *)SvPVbyte(x, x_len);
@@ -245,9 +281,6 @@ SV * sodium_random_bytes( \
   int mv_flags = g_protmem_default_flags_memvault;
 
   CODE:
-  if (out_len < 1)
-    croak("Length must be greater than 0");
-
   if (SvTRUE(use_memvault)) {
     SvGETMAGIC(flags);
     if (SvOK(flags))
@@ -256,7 +289,8 @@ SV * sodium_random_bytes( \
     new_pm = protmem_init(aTHX_ out_len, mv_flags);
     if (new_pm == NULL)
       croak("Failed to allocate protmem");
-    randombytes_buf(new_pm->pm_ptr, out_len);
+    if (out_len > 0)
+      randombytes_buf(new_pm->pm_ptr, out_len);
     if (protmem_release(aTHX_ new_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
       protmem_free(aTHX_ new_pm);
       croak("Failed to release protmem RW");
@@ -271,7 +305,8 @@ SV * sodium_random_bytes( \
       croak("Failed to allocate memory");
     out_buf[out_len] = '\0';
 
-    randombytes_buf(out_buf, out_len);
+    if (out_len > 0)
+      randombytes_buf(out_buf, out_len);
 
     RETVAL = newSV(0);
     sv_usepvn_flags(RETVAL, (char *)out_buf, out_len, SV_HAS_TRAILING_NUL);
@@ -283,12 +318,8 @@ SV * sodium_random_bytes( \
 SV * sodium_sub(SV * x, SV * y)
 
   PREINIT:
-  unsigned char *x_buf;
-  unsigned char *y_buf;
-  unsigned char *out_buf;
-  unsigned char *realloc_buf = NULL;
-  STRLEN x_len;
-  STRLEN y_len;
+  unsigned char *x_buf, *y_buf, *out_buf, *realloc_buf = NULL;
+  STRLEN x_len, y_len;
 
   CODE:
   x_buf = (unsigned char *)SvPVbyte(x, x_len);

@@ -21,13 +21,9 @@ SV *onetimeauth(SV *msg, SV *key)
   onetimeauth_poly1305 = 1
 
   PREINIT:
-  protmem *msg_pm = NULL;
-  protmem *key_pm = NULL;
-  unsigned char *msg_buf;
-  unsigned char *key_buf;
-  unsigned char *out_buf;
-  STRLEN key_len;
-  STRLEN msg_len;
+  protmem *msg_pm = NULL, *key_pm = NULL;
+  unsigned char *msg_buf, *key_buf, *out_buf;
+  STRLEN key_len, msg_len;
   int (*func)(unsigned char *, const unsigned char *,
               unsigned long long, const unsigned char *);
 
@@ -118,14 +114,9 @@ void onetimeauth_verify(SV *mac, SV *msg, SV *key)
   onetimeauth_poly1305_verify = 1
 
   PREINIT:
-  protmem *msg_pm = NULL;
-  protmem *key_pm = NULL;
-  unsigned char *mac_buf;
-  unsigned char *msg_buf;
-  unsigned char *key_buf;
-  STRLEN mac_len;
-  STRLEN msg_len;
-  STRLEN key_len;
+  protmem *msg_pm = NULL, *key_pm = NULL;
+  unsigned char *mac_buf, *msg_buf, *key_buf;
+  STRLEN mac_len, msg_len, key_len;
   int ret;
   int (*func)(const unsigned char *, const unsigned char *,
                 unsigned long long, const unsigned char *);
@@ -190,8 +181,7 @@ SV * onetimeauth_init(SV *key, SV *flags = &PL_sv_undef)
   onetimeauth_poly1305_init = 1
 
   PREINIT:
-  protmem *state_pm;
-  protmem *key_pm = NULL;
+  protmem *state_pm, *key_pm = NULL;
   unsigned char *key_buf;
   STRLEN key_len;
   unsigned int state_flags = g_protmem_default_flags_key;
@@ -364,8 +354,7 @@ void update(SV *self, ...)
   Crypt::Sodium::XS::onetimeauth::poly1305_multi::update = 1
 
   PREINIT:
-  protmem *state_pm;
-  protmem *msg_mv = NULL;
+  protmem *state_pm, *msg_mv = NULL;
   unsigned char *msg_buf;
   STRLEN msg_len;
   I32 i;

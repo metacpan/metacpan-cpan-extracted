@@ -6,6 +6,15 @@ Home page:    <https://metacpan.org/release/MooX-XSConstructor>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-XSConstructor>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.003002	2026-01-20
+
+ [ Bug Fixes ]
+ - Bump Class::XSConstructor dependency for FOREIGNBUILDARGS fix.
+
+ [ Other ]
+ - Better detection of what should be considered a foreign class than
+   Class::XSConstructor has built in.
+
 0.003001	2026-01-17
 
  [ Documentation ]

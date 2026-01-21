@@ -97,7 +97,7 @@ $test->for('synopsis', sub {
 
 This package provides a package/module builder which when used causes the
 consumer to inherit from L<Venus::Core> which provides lifecycle
-L<hooks|Venus::Core>.
+L<hooks|Venus::Hook>.
 
 =cut
 

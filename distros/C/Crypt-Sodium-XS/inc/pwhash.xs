@@ -156,11 +156,8 @@ SV * pwhash( \
 
   PREINIT:
   protmem *out_pm, *pw_pm = NULL;
-  unsigned char *salt_buf;
-  unsigned char *pw_buf;
-  STRLEN salt_len;
-  STRLEN pw_len;
-  STRLEN salt_req_len;
+  unsigned char *salt_buf, *pw_buf;
+  STRLEN salt_len, pw_len, salt_req_len;
   int alg = 0, ret;
   U32 new_flags = g_protmem_default_flags_key;
   size_t out_min, out_max;
@@ -335,17 +332,12 @@ SV * pwhash_str(SV * passphrase, STRLEN opslimit = 0, STRLEN memlimit = 0)
 
   PREINIT:
   protmem *pw_pm = NULL;
-  unsigned char *pw_buf;
-  unsigned char *out_buf;
+  unsigned char *pw_buf, *out_buf;
   STRLEN pw_len;
   int alg = crypto_pwhash_ALG_DEFAULT;
   size_t out_len;
-  size_t opslimit_def;
-  size_t opslimit_min;
-  size_t opslimit_max;
-  size_t memlimit_def;
-  size_t memlimit_min;
-  size_t memlimit_max;
+  size_t opslimit_def, opslimit_min, opslimit_max;
+  size_t memlimit_def, memlimit_min, memlimit_max;
   int ret;
 
   CODE:
@@ -456,12 +448,8 @@ void pwhash_str_needs_rehash(SV * str, STRLEN opslimit = 0, STRLEN memlimit = 0)
   PREINIT:
   protmem *str_pm = NULL;
   char *str_buf;
-  size_t opslimit_def;
-  size_t opslimit_min;
-  size_t opslimit_max;
-  size_t memlimit_def;
-  size_t memlimit_min;
-  size_t memlimit_max;
+  size_t opslimit_def, opslimit_min, opslimit_max;
+  size_t memlimit_def, memlimit_min, memlimit_max;
   STRLEN str_len;
   int ret;
   int (*func)(const char *, unsigned long long, size_t);
@@ -551,10 +539,8 @@ void pwhash_verify(SV * str, SV * passphrase)
 
   PREINIT:
   protmem *pw_pm = NULL;
-  unsigned char *pw_buf;
-  unsigned char *str_buf;
-  STRLEN pw_len;
-  STRLEN str_len;
+  unsigned char *pw_buf, *str_buf;
+  STRLEN pw_len, str_len;
   int ret = 0;
   int (*func)(const char *, const char * const, unsigned long long);
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Lugh;
 
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -73,7 +73,7 @@ Where:
 
 =head2 GGUF Format
 
-The native format for llama.cpp and Lugh. GGUF LoRA files contain:
+The native format for Lugh. GGUF LoRA files contain:
 
 =over 4
 
@@ -181,35 +181,6 @@ Returns the source format of the adapter: "gguf" or "safetensors".
 Returns the list of tensor names that have LoRA adaptations. Names are in
 the internal format (e.g., "blk.0.attn_q.weight").
 
-=head1 CREATING LORA ADAPTERS
-
-LoRA adapters can be created from various sources:
-
-=head2 From PEFT (HuggingFace)
-
-    from peft import LoraConfig, get_peft_model
-    
-    config = LoraConfig(
-        r=16,                    # LoRA rank
-        lora_alpha=32,           # Scaling factor
-        target_modules=["q_proj", "v_proj"],
-    )
-    peft_model = get_peft_model(base_model, config)
-    peft_model.save_pretrained("lora_adapter/")
-
-Convert to GGUF:
-
-    python convert_lora_to_gguf.py lora_adapter/
-
-=head2 From llama.cpp Fine-tuning
-
-    ./llama-finetune \
-        --model-base base.gguf \
-        --train-data train.txt \
-        --lora-out adapter.gguf \
-        --lora-r 16 \
-        --lora-alpha 32
-
 =head1 USING LORA WITH INFERENCE
 
 LoRA adapters integrate with all forward methods:
@@ -224,7 +195,7 @@ LoRA adapters integrate with all forward methods:
 =head2 With KV Cache
 
     my $cache = $inference->create_kv_cache();
-    my @logits = $inference->forward_with_cache(
+    my @logits = $inference->forward_cache(
         cache  => $cache,
         tokens => \@tokens,
         lora   => $lora,
@@ -233,7 +204,7 @@ LoRA adapters integrate with all forward methods:
 =head2 With Memory Pool
 
     my $pool = $inference->create_memory_pool();
-    my @logits = $inference->forward_with_pool(
+    my @logits = $inference->forward_pool(
         pool   => $pool,
         tokens => \@tokens,
         lora   => $lora,

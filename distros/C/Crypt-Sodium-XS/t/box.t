@@ -2,19 +2,18 @@ use strict;
 use warnings;
 use Test::More;
 
+use Crypt::Sodium::XS;
 use Crypt::Sodium::XS::Util "sodium_random_bytes";
-use Crypt::Sodium::XS::OO::box;
 use Crypt::Sodium::XS::scalarmult "scalarmult_base";
+use Crypt::Sodium::XS::box;
 use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
 
 my $msg = "How do you do?";
 
-my $m = Crypt::Sodium::XS::OO::box->new;
-
-for my $alg (Crypt::Sodium::XS::OO::box->primitives) {
-  $m->primitive($alg);
+for my $alg (Crypt::Sodium::XS::box->primitives) {
+  my $m = Crypt::Sodium::XS->box(primitive =>$alg);
 
   ok($m->$_ > 0, "$_ > 0 ($alg)")
     for qw(BEFORENMBYTES MACBYTES MESSAGEBYTES_MAX NONCEBYTES

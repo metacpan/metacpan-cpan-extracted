@@ -1,5 +1,8 @@
 Revision history for CatalystX-CRUD-Model-RDBO
 
+0.303 20 Jan 2026
+ - fix bug affecting Perl >= 5.46.3 on 'use' or import() with quoted version
+
 0.302 13 May 2014
  - fix bug in find_related() where foreign table column name assumed to be
    same as local table, esp for one-to-many relationships

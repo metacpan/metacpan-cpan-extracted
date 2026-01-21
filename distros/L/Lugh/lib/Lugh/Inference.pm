@@ -12,11 +12,11 @@ Lugh::Inference - Transformer Forward Pass and Token Generation
 
 =head1 VERSION
 
-Version 0.08
+Version 0.11
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,7 @@ our $VERSION = '0.08';
     my @tokens = $tokenizer->encode("The capital of France is");
     
     # Run forward pass to get logits
-    my @logits = $inference->forward(\@tokens);
+    my @logits = $inference->forward(tokens => \@tokens);
     
     # Find the most likely next token (greedy)
     my $max_idx = 0;
@@ -191,13 +191,12 @@ B<Example:>
 
 =head2 forward
 
-    # Positional form
-    my @logits = $inference->forward(\@tokens);
+    my @logits = $inference->forward(tokens => \@tokens);
     
-    # Named parameter form (required for LoRA)
+    # With optional LoRA adapter
     my @logits = $inference->forward(
         tokens => \@tokens,
-        lora   => $lora,        # optional: Lugh::LoRA adapter
+        lora   => $lora,
     );
 
 Runs the transformer forward pass on input tokens.
@@ -247,7 +246,7 @@ B<Performance Notes:>
 B<Example:>
 
     my @tokens = (1, 450, 7483, 310, 3444, 338);  # "The capital of France is"
-    my @logits = $inference->forward(\@tokens);
+    my @logits = $inference->forward(tokens => \@tokens);
     
     # logits has 32000 elements (vocab size)
     print "Vocab size: ", scalar(@logits), "\n";
@@ -320,7 +319,7 @@ B<Top-p Effects:>
 
 B<Example:>
 
-    my @logits = $inference->forward(\@tokens);
+    my @logits = $inference->forward(tokens => \@tokens);
     
     # Creative generation
     my $token = $inference->sample_top_p(\@logits,
@@ -376,7 +375,7 @@ B<Algorithm:>
 
 B<Example:>
 
-    my @logits = $inference->forward(\@tokens);
+    my @logits = $inference->forward(tokens => \@tokens);
     
     # Sample from top 50 tokens
     my $token = $inference->sample_top_k(\@logits,
@@ -607,7 +606,7 @@ For manual control (building your own loop):
     my @generated;
     
     for (1..$max_tokens) {
-        my @logits = $inference->forward(\@tokens);
+        my @logits = $inference->forward(tokens => \@tokens);
         my $next = $inference->sample_top_p(\@logits,
             temperature => 0.8,
             top_p => 0.9
@@ -687,7 +686,7 @@ B<Example:>
     # Efficient repeated forward passes
     for my $text (@texts) {
         my @tokens = $tokenizer->encode($text);
-        my @logits = $inference->forward_with_pool($pool, \@tokens);
+        my @logits = $inference->forward_pool($pool, \@tokens);
         # Process logits...
     }
     
@@ -695,13 +694,13 @@ B<Example:>
     # Or manually reset for next batch:
     $pool->reset();
 
-=head2 forward_with_pool
+=head2 forward_pool
 
     # Positional form
-    my @logits = $inference->forward_with_pool($pool, \@tokens);
+    my @logits = $inference->forward_pool($pool, \@tokens);
     
     # Named parameter form (required for LoRA)
-    my @logits = $inference->forward_with_pool(
+    my @logits = $inference->forward_pool(
         pool   => $pool,
         tokens => \@tokens,
         lora   => $lora,        # optional: Lugh::LoRA adapter
@@ -731,7 +730,7 @@ B<Example:>
     # Much more efficient than calling forward() repeatedly
     for my $prompt (@prompts) {
         my @tokens = $tokenizer->encode($prompt);
-        my @logits = $inference->forward_with_pool($pool, \@tokens);
+        my @logits = $inference->forward_pool($pool, \@tokens);
         my $next_token = $inference->sample_top_p(\@logits, top_p => 0.9);
         print $tokenizer->decode([$next_token]), "\n";
     }
@@ -740,7 +739,7 @@ B<Example:>
     my $lora = Lugh::LoRA->new(adapter => 'adapter.gguf', model => $model);
     for my $prompt (@prompts) {
         my @tokens = $tokenizer->encode($prompt);
-        my @logits = $inference->forward_with_pool(
+        my @logits = $inference->forward_pool(
             pool   => $pool,
             tokens => \@tokens,
             lora   => $lora,
@@ -753,10 +752,11 @@ B<Example:>
     # Positional form
     my $results = $inference->forward_batch(\@sequences);
     
-    # Named parameter form (required for LoRA)
+    # Named parameter form (required for LoRA or per-sequence caches)
     my $results = $inference->forward_batch(
         sequences => \@sequences,
         lora      => $lora,      # optional: Lugh::LoRA adapter
+        caches    => \@caches,   # optional: per-sequence KV caches
     );
 
 Processes multiple token sequences, returning logits for each.
@@ -769,6 +769,11 @@ B<Parameters:>
 =item * C<sequences> or C<\@sequences> - Array reference of array references of token IDs
 
 =item * C<lora> (optional) - A Lugh::LoRA adapter to apply during inference
+
+=item * C<caches> (optional) - Array reference of KV caches, one per sequence.
+Must have the same count as sequences. Each sequence will use its corresponding
+cache for incremental decoding, allowing parallel continuation of multiple
+conversations.
 
 =back
 
@@ -798,6 +803,75 @@ B<Example:>
         sequences => [\@seq1, \@seq2, \@seq3],
         lora      => $lora,
     );
+    
+    # With per-sequence caches for incremental decoding
+    my $cache1 = $inference->create_kv_cache();
+    my $cache2 = $inference->create_kv_cache();
+    
+    # First pass - encode prompts
+    my $results = $inference->forward_batch(
+        sequences => [\@seq1, \@seq2],
+        caches    => [$cache1, $cache2],
+    );
+    
+    # Each cache now contains the KV state for its sequence
+    # Continue decoding with new tokens
+    my @next1 = ($inference->sample_top_p($results->[0], top_p => 0.9));
+    my @next2 = ($inference->sample_top_p($results->[1], top_p => 0.9));
+    
+    my $results2 = $inference->forward_batch(
+        sequences => [\@next1, \@next2],
+        caches    => [$cache1, $cache2],
+    );
+
+=head2 Convenience Methods
+
+The following convenience methods are thin wrappers around the unified
+C<_forward_unified()> function, providing simpler APIs for common use cases:
+
+=head3 forward_simple
+
+    my @logits = $inference->forward_simple(\@tokens);
+
+Simplest forward pass - just tokens, no cache, pool, or adapters.
+
+=head3 forward_pool
+
+    my @logits = $inference->forward_pool($pool, \@tokens);
+    my @logits = $inference->forward_pool($pool, \@tokens, lora => $lora);
+
+Forward pass using a memory pool for efficient compute resource reuse.
+
+=head3 forward_cache
+
+    my @logits = $inference->forward_cache($cache, \@tokens);
+    my @logits = $inference->forward_cache($cache, \@tokens, rope => $rope);
+
+Forward pass with KV cache for incremental decoding.
+
+=head3 forward_cache_pool
+
+    my @logits = $inference->forward_cache_pool($cache, $pool, \@tokens);
+
+Forward pass combining KV cache and memory pool for maximum efficiency.
+
+=head3 forward_batch_pool
+
+    my $results = $inference->forward_batch_pool($pool, \@sequences);
+
+Batch processing with memory pool for high-throughput inference.
+
+=head2 Unified Forward API
+
+For full control, use the unified C<_forward_unified()> XS function directly:
+
+    my @logits = $inference->_forward_unified(
+        tokens    => \@tokens,      # OR sequences => \@seqs
+        cache     => $cache,        # optional
+        pool      => $pool,         # optional
+        rope      => $rope,         # optional
+        lora      => $lora,         # optional
+    );
 
 =head1 MEMORY POOL
 
@@ -808,7 +882,7 @@ The Lugh::MemoryPool class provides reusable compute resources:
     $pool->reset();
 
 Resets the memory pool for reuse. Frees and reallocates the
-compute context. Called automatically by C<forward_with_pool()>.
+compute context. Called automatically by C<forward_pool()>.
 
 B<Returns:> True on success.
 

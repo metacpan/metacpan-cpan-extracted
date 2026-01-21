@@ -7,35 +7,72 @@ use Exporter 'import';
 
 _define_constants();
 
-my @constant_bases = qw(
-  BYTES
-  KEYBYTES
+{
+  my @constant_bases = qw(
+    BYTES
+    KEYBYTES
+  );
+
+  my @bases = qw(
+    init
+    keygen
+    verify
+  );
+
+  my $default = [
+    "onetimeauth",
+    (map { "onetimeauth_$_" } @bases),
+    (map { "onetimeauth_$_" } @constant_bases, "PRIMITIVE"),
+  ];
+  my $poly1305 = [
+    "onetimeauth_poly1305",
+    (map { "onetimeauth_poly1305_$_" } @bases),
+    (map { "onetimeauth_poly1305_$_" } @constant_bases),
+  ];
+
+  our %EXPORT_TAGS = (
+    all => [ @$default, @$poly1305 ],
+    default => $default,
+    poly1305 => $poly1305,
+  );
+
+  our @EXPORT_OK = @{$EXPORT_TAGS{all}};
+}
+
+package Crypt::Sodium::XS::OO::onetimeauth;
+use parent 'Crypt::Sodium::XS::OO::Base';
+
+my %methods = (
+  default => {
+    BYTES => \&Crypt::Sodium::XS::onetimeauth::onetimeauth_BYTES,
+    KEYBYTES => \&Crypt::Sodium::XS::onetimeauth::onetimeauth_KEYBYTES,
+    PRIMITIVE => \&Crypt::Sodium::XS::onetimeauth::onetimeauth_PRIMITIVE,
+    init => \&Crypt::Sodium::XS::onetimeauth::onetimeauth_init,
+    keygen => \&Crypt::Sodium::XS::onetimeauth::onetimeauth_keygen,
+    onetimeauth => \&Crypt::Sodium::XS::onetimeauth::onetimeauth,
+    verify => \&Crypt::Sodium::XS::onetimeauth::onetimeauth_verify,
+  },
+  poly1305 => {
+    BYTES => \&Crypt::Sodium::XS::onetimeauth::onetimeauth_poly1305_BYTES,
+    KEYBYTES => \&Crypt::Sodium::XS::onetimeauth::onetimeauth_poly1305_KEYBYTES,
+    PRIMITIVE => sub { 'poly1305' },
+    init => \&Crypt::Sodium::XS::onetimeauth::onetimeauth_poly1305_init,
+    keygen => \&Crypt::Sodium::XS::onetimeauth::onetimeauth_poly1305_keygen,
+    onetimeauth => \&Crypt::Sodium::XS::onetimeauth::onetimeauth_poly1305,
+    verify => \&Crypt::Sodium::XS::onetimeauth::onetimeauth_poly1305_verify,
+  },
 );
 
-my @bases = qw(
-  init
-  keygen
-  verify
-);
+sub Crypt::Sodium::XS::onetimeauth::primitives { keys %methods }
+*primitives = \&Crypt::Sodium::XS::onetimeauth::primitives;
 
-my $default = [
-  "onetimeauth",
-  (map { "onetimeauth_$_" } @bases),
-  (map { "onetimeauth_$_" } @constant_bases, "PRIMITIVE"),
-];
-my $poly1305 = [
-  "onetimeauth_poly1305",
-  (map { "onetimeauth_poly1305_$_" } @bases),
-  (map { "onetimeauth_poly1305_$_" } @constant_bases),
-];
-
-our %EXPORT_TAGS = (
-  all => [ @$default, @$poly1305 ],
-  default => $default,
-  poly1305 => $poly1305,
-);
-
-our @EXPORT_OK = @{$EXPORT_TAGS{all}};
+sub BYTES { my $self = shift; goto $methods{$self->{primitive}}->{BYTES}; }
+sub KEYBYTES { my $self = shift; goto $methods{$self->{primitive}}->{KEYBYTES}; }
+sub PRIMITIVE { my $self = shift; goto $methods{$self->{primitive}}->{PRIMITIVE}; }
+sub init { my $self = shift; goto $methods{$self->{primitive}}->{init}; }
+sub keygen { my $self = shift; goto $methods{$self->{primitive}}->{keygen}; }
+sub onetimeauth { my $self = shift; goto $methods{$self->{primitive}}->{onetimeauth}; }
+sub verify { my $self = shift; goto $methods{$self->{primitive}}->{verify}; }
 
 1;
 
@@ -49,14 +86,15 @@ Crypt::Sodium::XS::onetimeauth - Single-use secret key message authentication
 
 =head1 SYNOPSIS
 
-  use Crypt::Sodium::XS::onetimeauth ":default";
+  use Crypt::Sodium::XS;
+  my $ota = Crypt::Sodium::XS->onetimeauth;
 
   # NOTE: use a new key for every message
-  my $key = onetimeauth_keygen();
+  my $key = $ota->keygen;
   my $msg = "authenticate me";
 
-  my $tag = onetimeauth($msg, $key);
-  die "message tampered!" unless onetimeauth_verify($tag, $msg, $key);
+  my $tag = $ota->onetimeauth($msg, $key);
+  die "message tampered!" unless $ota->verify($tag, $msg, $key);
 
 =head1 DESCRIPTION
 
@@ -97,56 +135,68 @@ files.
 
 Finally, Poly1305 is not a replacement for a hash function.
 
-=head1 FUNCTIONS
+=head1 CONSTRUCTOR
 
-Nothing is exported by default. A C<:default> tag imports the functions and
-constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
-provided for each of the primitives listed in L</PRIMITIVES>. These tags import
-the C<onetimeauth_E<lt>primitiveE<gt>_*> functions and constants for that
-primitive. A C<:all> tag imports everything.
+The constructor is called with the C<Crypt::Sodium::XS-E<gt>onetimeauth>
+method.
 
-=head2 onetimeauth
+  my $ota = Crypt::Sodium::XS->onetimeauth;
+  my $ota = Crypt::Sodium::XS->onetimeauth(primitive => 'poly1305');
 
-=head2 onetimeauth_E<lt>primitiveE<gt>
+Returns a new onetimeauth object.
 
-  my $tag = onetimeauth($message, $key);
+Implementation detail: the returned object is blessed into
+C<Crypt::Sodium::XS::OO::box>.
 
-C<$message> is the message to authenticate. It may be a
-L<Crypt::Sodium::XS::MemVault>.
+=head1 ATTRIBUTES
 
-C<$key> is a secret key. It must be L</onetimeauth_KEYBYTES> bytes. It may be a
-L<Crypt::Sodium::XS::MemVault>.
+=head2 primitive
 
-Returns an authentication tag of L</onetimeauth_BYTES> bytes.
+  my $primitive = $ota->primitive;
+  $ota->primitive('poly1305');
 
-=head2 onetimeauth_init
+Gets or sets the primitive used for all operations by this object. It must be
+one of the primitives listed in L</PRIMITIVES>, including C<default>.
 
-=head2 onetimeauth_E<lt>primitiveE<gt>_init
+=head1 METHODS
 
-  my $multipart = onetimeauth_init($flags);
+=head2 primitives
+
+  my @primitives = $ota->primitives;
+  my @primitives = Crypt::Sodium::XS::onetimeauth->primitives;
+
+Returns a list of all supported primitive names, including C<default>.
+
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $primitive = $ota->PRIMITIVE;
+
+Returns the primitive used for all operations by this object. Note this will
+never be C<default> but would instead be the primitive it represents.
+
+=head2 init
+
+  my $multipart = $ota->init($flags);
 
 C<$flags> is optional. It is the flags used for the multipart protected memory
 object. See L<Crypt::Sodium::XS::ProtMem>.
 
 Returns a multipart onetimeauth object. See L</MULTI-PART INTERFACE>.
 
-=head2 onetimeauth_keygen
+=head2 keygen
 
-=head2 onetimeauth_E<lt>primitiveE<gt>_keygen
-
-  my $key = onetimeauth_keygen($flags);
+  my $key = $ota->keygen($flags);
 
 C<$flags> is optional. It is the flags used for the C<$key>
 L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
 
-Returns a L<Crypt::Sodium::XS::MemVault>: a secret key of
-L</onetimeauth_KEYBYTES> bytes.
+Returns a L<Crypt::Sodium::XS::MemVault>: a secret key of L</KEYBYTES> bytes.
 
-=head2 onetimeauth_verify
+=head2 verify
 
-=head2 onetimeauth_E<lt>primitiveE<gt>_verify
-
-  my $is_valid = onetimeauth_verify($tag, $message, $key);
+  my $is_valid = $ota->verify($tag, $message, $key);
 
 C<$tag> is the authentication tag to verify. It must be L</BYTES> bytes.
 
@@ -158,12 +208,36 @@ L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
 Returns true if the authentication tag C<$tag> validly authenticates
 C<$message> with C<$key>, false otherwise.
 
+=head2 onetimeauth
+
+  my $tag = $ota->onetimeauth($message, $key);
+
+C<$message> is the message to authenticate. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$key> is a secret key of L</KEYBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+Returns an authentication tag of L</BYTES> bytes.
+
+=head2 BYTES
+
+  my $tag_size = $ota->BYTES;
+
+Returns the size, in bytes, of an authentication tag.
+
+=head2 KEYBYTES
+
+  my $key_size = $ota->KEYBYTES;
+
+Returns the size, in bytes, of a secret key.
+
 =head1 MULTI-PART INTERFACE
 
-A multipart onetimeauth object is created by calling the L</onetimeauth_init>
-function. Data to be authenticated is added by calling the L</update> method of
-that object as many times as desired. An output tag is generated by calling its
-L</final> method. Do not use the object after calling L</final>.
+A multipart onetimeauth object is created by calling the L</init> method. Data
+to be authenticated is added by calling the L</update> method of that object as
+many times as desired. An output tag is generated by calling its L</final>
+method. Do not use the object after calling L</final>.
 
 The multipart onetimeauth object is an opaque object which provides the
 following methods:
@@ -190,6 +264,57 @@ Once C<final> has been called, the hashing object must not be used further.
 Adds all given arguments (stringified) to authenticated data. Any argument may
 be a L<Crypt::Sodium::XS::MemVault>.
 
+=head1 PRIMITIVES
+
+=over 4
+
+=item * poly1305 (default)
+
+=back
+
+=head1 FUNCTIONS
+
+The object API above is the recommended way to use this module. The functions
+and constants documented below can be imported instead or in addition.
+
+Nothing is exported by default. A C<:default> tag imports the functions and
+constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
+provided for each of the primitives listed in L</PRIMITIVES>. These tags import
+the C<onetimeauth_E<lt>primitiveE<gt>_*> functions and constants for that
+primitive. A C<:all> tag imports everything.
+
+=head2 onetimeauth (function)
+
+=head2 onetimeauth_E<lt>primitiveE<gt>
+
+  my $tag = onetimeauth($message, $key);
+
+Same as L</onetimeauth> (method).
+
+=head2 onetimeauth_init
+
+=head2 onetimeauth_E<lt>primitiveE<gt>_init
+
+  my $multipart = onetimeauth_init($flags);
+
+Same as L</init>.
+
+=head2 onetimeauth_keygen
+
+=head2 onetimeauth_E<lt>primitiveE<gt>_keygen
+
+  my $key = onetimeauth_keygen($flags);
+
+Same as L</keygen>.
+
+=head2 onetimeauth_verify
+
+=head2 onetimeauth_E<lt>primitiveE<gt>_verify
+
+  my $is_valid = onetimeauth_verify($tag, $message, $key);
+
+Same as L</verify>.
+
 =head1 CONSTANTS
 
 =head2 onetimeauth_PRIMITIVE
@@ -204,7 +329,7 @@ Returns the name of the default primitive.
 
   my $tag_size = onetimeauth_BYTES();
 
-Returns the size, in bytes, of an authentication tag.
+Same as L</BYTES>.
 
 =head2 onetimeauth_KEYBYTES
 
@@ -212,27 +337,13 @@ Returns the size, in bytes, of an authentication tag.
 
   my $key_size = onetimeauth_KEYBYTES();
 
-Returns the size, in bytes, of a secret key.
-
-=head1 PRIMITIVES
-
-All constants (except _PRIMITIVE) and functions have
-C<onetimeauth_E<lt>primitiveE<gt>>-prefixed couterparts (e.g.,
-onetimeauth_poly1305_keypair, onetimeauth_poly1305_KEYBYTES).
-
-=over 4
-
-=item * poly1305 (default)
-
-=back
+Same as L</KEYBYTES>.
 
 =head1 SEE ALSO
 
 =over 4
 
 =item L<Crypt::Sodium::XS>
-
-=item L<Crypt::Sodium::XS::OO::onetimeauth>
 
 =item L<https://doc.libsodium.org/advanced/poly1305>
 

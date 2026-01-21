@@ -35,6 +35,7 @@ static perl_mutex tensor_mutex;
 static perl_mutex kvcache_mutex;
 static perl_mutex mempool_mutex;
 static perl_mutex lora_registry_mutex;
+static perl_mutex speculative_mutex;
 static int mutex_initialized = 0;
 
 #define CONTEXT_LOCK()   MUTEX_LOCK(&context_mutex)
@@ -49,6 +50,7 @@ static int mutex_initialized = 0;
         MUTEX_INIT(&kvcache_mutex); \
         MUTEX_INIT(&mempool_mutex); \
         MUTEX_INIT(&lora_registry_mutex); \
+        MUTEX_INIT(&speculative_mutex); \
         mutex_initialized = 1; \
     } \
 } while(0)
@@ -63,7 +65,6 @@ static int mutex_initialized = 0;
 
 /* ============================================================================
  * Architecture Types
- * Based on llama.cpp architecture support - used for inference path selection
  * ============================================================================ */
 
 typedef enum {
@@ -174,7 +175,6 @@ static LughArchType get_arch_type(const char *arch) {
 }
 
 /* Check if architecture uses combined QKV tensor */
-/* Based on llama.cpp's LLM_TENSOR_ATTN_QKV usage */
 static int arch_has_combined_qkv(LughArchType arch_type) {
     switch (arch_type) {
         case LUGH_ARCH_QWEN:
@@ -282,6 +282,40 @@ typedef struct {
 #endif
 
 /* ============================================================================
+ * Speculative Decoding
+ * ============================================================================ */
+
+typedef struct {
+    int main_model_id;            /* ID of main (target) model */
+    int draft_model_id;           /* ID of draft model */
+    LughKVCache *main_cache;      /* KV cache for main model */
+    LughKVCache *draft_cache;     /* KV cache for draft model */
+    int k;                        /* Speculation depth (number of draft tokens) */
+    float temperature;            /* Sampling temperature */
+    float top_p;                  /* Top-p sampling threshold */
+    int n_vocab;                  /* Vocabulary size (shared between models) */
+    /* Statistics */
+    int64_t tokens_drafted;       /* Total tokens drafted */
+    int64_t tokens_accepted;      /* Total tokens accepted */
+    int64_t total_steps;          /* Total speculation steps */
+    int id;
+    int active;
+#ifdef USE_ITHREADS
+    perl_mutex spec_mutex;        /* Thread-safe access */
+#endif
+} LughSpeculative;
+
+#define MAX_SPECULATIVE 64
+
+#ifdef USE_ITHREADS
+#define SPECULATIVE_LOCK(spec)   MUTEX_LOCK(&(spec)->spec_mutex)
+#define SPECULATIVE_UNLOCK(spec) MUTEX_UNLOCK(&(spec)->spec_mutex)
+#else
+#define SPECULATIVE_LOCK(spec)
+#define SPECULATIVE_UNLOCK(spec)
+#endif
+
+/* ============================================================================
  * Global Registries (thread-safe via integer IDs)
  * ============================================================================ */
 
@@ -289,17 +323,23 @@ static LughContext* context_registry[MAX_CONTEXTS] = {NULL};
 static LughTensor*  tensor_registry[MAX_TENSORS]   = {NULL};
 static LughModel*   model_registry[MAX_CONTEXTS]   = {NULL};
 static LughKVCache* kvcache_registry[MAX_KVCACHES] = {NULL};
+static LughSpeculative* speculative_registry[MAX_SPECULATIVE] = {NULL};
 static int next_context_id = 1;
 static int next_tensor_id  = 1;
 static int next_model_id   = 1;
 static int next_kvcache_id = 1;
+static int next_speculative_id = 1;
 
 #ifdef USE_ITHREADS
 #define KVCACHE_REGISTRY_LOCK()   MUTEX_LOCK(&kvcache_mutex)
 #define KVCACHE_REGISTRY_UNLOCK() MUTEX_UNLOCK(&kvcache_mutex)
+#define SPECULATIVE_REGISTRY_LOCK()   MUTEX_LOCK(&speculative_mutex)
+#define SPECULATIVE_REGISTRY_UNLOCK() MUTEX_UNLOCK(&speculative_mutex)
 #else
 #define KVCACHE_REGISTRY_LOCK()
 #define KVCACHE_REGISTRY_UNLOCK()
+#define SPECULATIVE_REGISTRY_LOCK()
+#define SPECULATIVE_REGISTRY_UNLOCK()
 #endif
 
 /* Allocate a new context ID */
@@ -504,6 +544,105 @@ static LughKVCache* create_kvcache(int n_layer, int n_ctx, int n_head_kv, int he
 }
 
 /* ============================================================================
+ * Speculative Decoding Registry Functions
+ * ============================================================================ */
+
+/* Allocate a new speculative ID */
+static int alloc_speculative_id(void) {
+    int id = -1;
+    SPECULATIVE_REGISTRY_LOCK();
+    for (int i = 0; i < MAX_SPECULATIVE; i++) {
+        int check_id = (next_speculative_id + i) % MAX_SPECULATIVE;
+        if (check_id == 0) check_id = 1;
+        if (speculative_registry[check_id] == NULL) {
+            id = check_id;
+            next_speculative_id = (id + 1) % MAX_SPECULATIVE;
+            if (next_speculative_id == 0) next_speculative_id = 1;
+            break;
+        }
+    }
+    SPECULATIVE_REGISTRY_UNLOCK();
+    return id;
+}
+
+/* Get speculative decoder by ID */
+static LughSpeculative* get_speculative_by_id(int id) {
+    LughSpeculative *spec = NULL;
+    if (id <= 0 || id >= MAX_SPECULATIVE) return NULL;
+    SPECULATIVE_REGISTRY_LOCK();
+    spec = speculative_registry[id];
+    if (spec && !spec->active) spec = NULL;
+    SPECULATIVE_REGISTRY_UNLOCK();
+    return spec;
+}
+
+/* Free a speculative decoder (does NOT free the underlying models/caches) */
+static void free_speculative(LughSpeculative *spec) {
+    if (!spec) return;
+    
+    SPECULATIVE_LOCK(spec);
+    spec->active = 0;
+    SPECULATIVE_UNLOCK(spec);
+    
+#ifdef USE_ITHREADS
+    MUTEX_DESTROY(&spec->spec_mutex);
+#endif
+    
+    /* Note: we don't free main_cache/draft_cache here - they're owned separately */
+    
+    SPECULATIVE_REGISTRY_LOCK();
+    speculative_registry[spec->id] = NULL;
+    SPECULATIVE_REGISTRY_UNLOCK();
+    
+    Safefree(spec);
+}
+
+/* Create a new speculative decoder */
+static LughSpeculative* create_speculative(
+    int main_model_id, 
+    int draft_model_id,
+    LughKVCache *main_cache,
+    LughKVCache *draft_cache,
+    int n_vocab,
+    int k,
+    float temperature,
+    float top_p
+) {
+    LughSpeculative *spec;
+    int id;
+    
+    id = alloc_speculative_id();
+    if (id < 0) return NULL;
+    
+    Newxz(spec, 1, LughSpeculative);
+    if (!spec) return NULL;
+    
+#ifdef USE_ITHREADS
+    MUTEX_INIT(&spec->spec_mutex);
+#endif
+    
+    spec->id = id;
+    spec->active = 1;
+    spec->main_model_id = main_model_id;
+    spec->draft_model_id = draft_model_id;
+    spec->main_cache = main_cache;
+    spec->draft_cache = draft_cache;
+    spec->n_vocab = n_vocab;
+    spec->k = k;
+    spec->temperature = temperature;
+    spec->top_p = top_p;
+    spec->tokens_drafted = 0;
+    spec->tokens_accepted = 0;
+    spec->total_steps = 0;
+    
+    SPECULATIVE_REGISTRY_LOCK();
+    speculative_registry[id] = spec;
+    SPECULATIVE_REGISTRY_UNLOCK();
+    
+    return spec;
+}
+
+/* ============================================================================
  * Magic vtable for cleanup
  * ============================================================================ */
 
@@ -669,7 +808,132 @@ static LughContext* get_lugh_context(pTHX_ SV *sv) {
 }
 
 /* ============================================================================
- * Lugh::Inference Forward Pass Helpers - Shared between forward() and forward_with_cache()
+ * RoPE Scaling Types - For context extension
+ * ============================================================================ */
+
+typedef enum {
+    LUGH_ROPE_SCALING_NONE    = 0,  /* No scaling - use training context */
+    LUGH_ROPE_SCALING_LINEAR  = 1,  /* Linear interpolation */
+    LUGH_ROPE_SCALING_YARN    = 2,  /* YaRN (Yet another RoPE extensioN) */
+    LUGH_ROPE_SCALING_LONGROPE = 3  /* LongRoPE method */
+} LughRopeScalingType;
+
+/* RoPE configuration structure for Lugh::RoPE objects */
+typedef struct {
+    LughRopeScalingType scaling_type;
+    int    n_ctx_orig;      /* Original training context length */
+    int    target_ctx;      /* Target extended context length */
+    float  freq_base;       /* Base frequency (10000.0 default) */
+    float  freq_scale;      /* Frequency scale (1.0 = no scaling) */
+    float  ext_factor;      /* YaRN extension factor (-1.0 = auto) */
+    float  attn_factor;     /* YaRN attention factor (1.0 default) */
+    float  beta_fast;       /* YaRN high-freq boundary (32.0 default) */
+    float  beta_slow;       /* YaRN low-freq boundary (1.0 default) */
+    int    id;              /* Registry ID */
+    int    active;          /* Active flag */
+} LughRopeConfig;
+
+/* RoPE config registry */
+#define MAX_ROPE_CONFIGS 256
+static LughRopeConfig rope_registry[MAX_ROPE_CONFIGS];
+static int rope_registry_initialized = 0;
+
+static void init_rope_registry(void) {
+    if (!rope_registry_initialized) {
+        memset(rope_registry, 0, sizeof(rope_registry));
+        rope_registry_initialized = 1;
+    }
+}
+
+static int register_rope_config(LughRopeConfig *config) {
+    int i;
+    init_rope_registry();
+    for (i = 0; i < MAX_ROPE_CONFIGS; i++) {
+        if (!rope_registry[i].active) {
+            rope_registry[i] = *config;
+            rope_registry[i].id = i;
+            rope_registry[i].active = 1;
+            return i;
+        }
+    }
+    return -1;
+}
+
+static LughRopeConfig* get_rope_config_by_id(int id) {
+    if (id < 0 || id >= MAX_ROPE_CONFIGS) return NULL;
+    if (!rope_registry[id].active) return NULL;
+    return &rope_registry[id];
+}
+
+/* Magic vtable for Lugh::RoPE */
+static int lugh_rope_free(pTHX_ SV *sv, MAGIC *mg);
+static MGVTBL lugh_rope_vtbl = { 0, 0, 0, 0, lugh_rope_free, 0, 0, 0 };
+
+static int lugh_rope_free(pTHX_ SV *sv, MAGIC *mg) {
+    int id = (int)(IV)mg->mg_ptr;
+    if (id >= 0 && id < MAX_ROPE_CONFIGS) {
+        rope_registry[id].active = 0;
+    }
+    return 0;
+}
+
+static LughRopeConfig* get_lugh_rope(pTHX_ SV *sv) {
+    MAGIC *mg;
+    int id;
+    LughRopeConfig *config;
+    
+    if (!sv_isobject(sv))
+        croak("Not a Lugh::RoPE object");
+    
+    sv = SvRV(sv);
+    mg = mg_find(sv, PERL_MAGIC_ext);
+    if (!mg || mg->mg_virtual != &lugh_rope_vtbl)
+        croak("Invalid Lugh::RoPE object");
+    
+    id = (int)(IV)mg->mg_ptr;
+    config = get_rope_config_by_id(id);
+    if (!config)
+        croak("Lugh::RoPE has been destroyed");
+    
+    return config;
+}
+
+/* Magic vtable for Lugh::Speculative */
+static int lugh_speculative_free(pTHX_ SV *sv, MAGIC *mg);
+static MGVTBL lugh_speculative_vtbl = { 0, 0, 0, 0, lugh_speculative_free, 0, 0, 0 };
+
+static int lugh_speculative_free(pTHX_ SV *sv, MAGIC *mg) {
+    int id = (int)(IV)mg->mg_ptr;
+    LughSpeculative *spec = get_speculative_by_id(id);
+    if (spec) {
+        free_speculative(spec);
+    }
+    return 0;
+}
+
+static LughSpeculative* get_lugh_speculative(pTHX_ SV *sv) {
+    MAGIC *mg;
+    int id;
+    LughSpeculative *spec;
+    
+    if (!sv_isobject(sv))
+        croak("Not a Lugh::Speculative object");
+    
+    sv = SvRV(sv);
+    mg = mg_find(sv, PERL_MAGIC_ext);
+    if (!mg || mg->mg_virtual != &lugh_speculative_vtbl)
+        croak("Invalid Lugh::Speculative object");
+    
+    id = (int)(IV)mg->mg_ptr;
+    spec = get_speculative_by_id(id);
+    if (!spec)
+        croak("Lugh::Speculative has been destroyed");
+    
+    return spec;
+}
+
+/* ============================================================================
+ * Lugh::Inference Forward Pass Helpers - Shared between forward() and forward_cache()
  * ============================================================================ */
 
 /* Model hyperparameters structure */
@@ -690,7 +954,42 @@ typedef struct {
     char backend_name[32];  /* Backend name: "cpu", "metal", "cuda", "auto", etc. */
     char architecture[32];  /* Model architecture: "llama", "qwen2", "phi3", "gemma2", etc. */
     LughArchType arch_type; /* Architecture type enum for inference path selection */
+    /* RoPE scaling parameters */
+    LughRopeScalingType rope_scaling_type;
+    int   n_ctx_orig;       /* Original training context length */
+    float rope_ext_factor;  /* YaRN extension factor */
+    float rope_attn_factor; /* YaRN attention factor */
+    float rope_beta_fast;   /* YaRN high-freq boundary */
+    float rope_beta_slow;   /* YaRN low-freq boundary */
 } LughHyperparams;
+
+/* Forward pass options - passed to do_forward_unified */
+typedef struct {
+    int *tokens;            /* Single sequence tokens (NULL for batch mode) */
+    int n_tokens;           /* Number of tokens */
+    int **all_tokens;       /* Batch mode: array of token arrays */
+    int *seq_lengths;       /* Batch mode: length of each sequence */
+    int n_sequences;        /* Batch mode: number of sequences */
+    void *cache;            /* LughKVCache* - KV cache (optional, single sequence) */
+    void **caches;          /* LughKVCache** - Array of caches (batch mode) */
+    int n_caches;           /* Number of caches in array */
+    void *pool;             /* LughMemoryPool* - Memory pool (optional) */
+    void *lora;             /* LughLoRAAdapter* - LoRA adapter (optional) */
+    SV *rope_sv;            /* RoPE override (optional) */
+    int return_all_logits;  /* If 1, return logits for all positions */
+} LughForwardOpts;
+
+/* Forward result - returned by do_forward_unified */
+typedef struct {
+    float *logits;          /* Single sequence: logits for last position */
+    float *all_logits;      /* All positions: [n_tokens * n_vocab] if requested */
+    int n_tokens;           /* Number of tokens (for all_logits) */
+    int n_vocab;            /* Vocabulary size */
+    float **batch_logits;   /* Batch mode: array of logits arrays */
+    int n_sequences;        /* Batch mode: number of sequences */
+    int is_batch;           /* 1 if batch mode */
+    char *error;            /* Error message if failed */
+} LughForwardResult;
 
 /* Layer weights structure */
 typedef struct {
@@ -727,6 +1026,14 @@ static void extract_hyperparams(pTHX_ HV *hv, LughModel *model, LughHyperparams 
     hp->rope_freq_base = 10000.0f;
     hp->rope_freq_scale = 1.0f;
     strcpy(hp->architecture, "llama");  /* Default architecture */
+    
+    /* RoPE scaling defaults */
+    hp->rope_scaling_type = LUGH_ROPE_SCALING_NONE;
+    hp->n_ctx_orig = 0;  /* Will be set to n_ctx if not in metadata */
+    hp->rope_ext_factor = -1.0f;  /* -1.0 = auto-compute for YaRN */
+    hp->rope_attn_factor = 1.0f;
+    hp->rope_beta_fast = 32.0f;
+    hp->rope_beta_slow = 1.0f;
     
     /* Get architecture from model metadata (set during model load) */
     if (model->architecture && strlen(model->architecture) > 0) {
@@ -787,8 +1094,100 @@ static void extract_hyperparams(pTHX_ HV *hv, LughModel *model, LughHyperparams 
     key_id = gguf_find_key(model->gguf, key);
     hp->n_ctx = (key_id >= 0) ? gguf_get_val_u32(model->gguf, key_id) : 2048;
     
+    /* Default n_ctx_orig to n_ctx (training context) */
+    hp->n_ctx_orig = hp->n_ctx;
+    
+    /* RoPE scaling type from metadata */
+    snprintf(key, sizeof(key), "%s.rope.scaling.type", arch);
+    key_id = gguf_find_key(model->gguf, key);
+    if (key_id >= 0) {
+        const char *scaling_str = gguf_get_val_str(model->gguf, key_id);
+        if (scaling_str) {
+            if (strcmp(scaling_str, "linear") == 0)
+                hp->rope_scaling_type = LUGH_ROPE_SCALING_LINEAR;
+            else if (strcmp(scaling_str, "yarn") == 0)
+                hp->rope_scaling_type = LUGH_ROPE_SCALING_YARN;
+            else if (strcmp(scaling_str, "longrope") == 0)
+                hp->rope_scaling_type = LUGH_ROPE_SCALING_LONGROPE;
+        }
+    }
+    
+    /* RoPE scaling factor -> freq_scale (inverse) */
+    snprintf(key, sizeof(key), "%s.rope.scaling.factor", arch);
+    key_id = gguf_find_key(model->gguf, key);
+    if (key_id >= 0) {
+        float factor = gguf_get_val_f32(model->gguf, key_id);
+        hp->rope_freq_scale = (factor > 0) ? 1.0f / factor : 1.0f;
+    } else {
+        /* Fallback to legacy key */
+        snprintf(key, sizeof(key), "%s.rope.scale_linear", arch);
+        key_id = gguf_find_key(model->gguf, key);
+        if (key_id >= 0) {
+            float factor = gguf_get_val_f32(model->gguf, key_id);
+            hp->rope_freq_scale = (factor > 0) ? 1.0f / factor : 1.0f;
+        }
+    }
+    
+    /* Original context length for scaling */
+    snprintf(key, sizeof(key), "%s.rope.scaling.original_context_length", arch);
+    key_id = gguf_find_key(model->gguf, key);
+    if (key_id >= 0) {
+        hp->n_ctx_orig = gguf_get_val_u32(model->gguf, key_id);
+    }
+    
+    /* YaRN parameters */
+    snprintf(key, sizeof(key), "%s.rope.scaling.yarn_ext_factor", arch);
+    key_id = gguf_find_key(model->gguf, key);
+    if (key_id >= 0) hp->rope_ext_factor = gguf_get_val_f32(model->gguf, key_id);
+    
+    snprintf(key, sizeof(key), "%s.rope.scaling.yarn_attn_factor", arch);
+    key_id = gguf_find_key(model->gguf, key);
+    if (key_id >= 0) hp->rope_attn_factor = gguf_get_val_f32(model->gguf, key_id);
+    
+    snprintf(key, sizeof(key), "%s.rope.scaling.yarn_beta_fast", arch);
+    key_id = gguf_find_key(model->gguf, key);
+    if (key_id >= 0) hp->rope_beta_fast = gguf_get_val_f32(model->gguf, key_id);
+    
+    snprintf(key, sizeof(key), "%s.rope.scaling.yarn_beta_slow", arch);
+    key_id = gguf_find_key(model->gguf, key);
+    if (key_id >= 0) hp->rope_beta_slow = gguf_get_val_f32(model->gguf, key_id);
+    
+    /* Check for RoPE config override from Perl hash */
+    svp = hv_fetch(hv, "rope", 4, 0);
+    if (svp && SvROK(*svp) && sv_isobject(*svp)) {
+        LughRopeConfig *rope = get_lugh_rope(aTHX_ *svp);
+        hp->rope_scaling_type = rope->scaling_type;
+        hp->rope_freq_scale = rope->freq_scale;
+        hp->n_ctx_orig = rope->n_ctx_orig;
+        hp->rope_ext_factor = rope->ext_factor;
+        hp->rope_attn_factor = rope->attn_factor;
+        hp->rope_beta_fast = rope->beta_fast;
+        hp->rope_beta_slow = rope->beta_slow;
+        /* Override freq_base if set in rope config */
+        if (rope->freq_base > 0) {
+            hp->rope_freq_base = rope->freq_base;
+        }
+    }
+    
     /* Set architecture type for inference path selection */
     hp->arch_type = get_arch_type(arch);
+}
+
+/* Apply RoPE config override to hyperparams */
+static void apply_rope_override(pTHX_ LughHyperparams *hp, SV *rope_sv) {
+    if (!rope_sv || !SvROK(rope_sv) || !sv_isobject(rope_sv)) return;
+    
+    LughRopeConfig *rope = get_lugh_rope(aTHX_ rope_sv);
+    hp->rope_scaling_type = rope->scaling_type;
+    hp->rope_freq_scale = rope->freq_scale;
+    if (rope->n_ctx_orig > 0) hp->n_ctx_orig = rope->n_ctx_orig;
+    hp->rope_ext_factor = rope->ext_factor;
+    hp->rope_attn_factor = rope->attn_factor;
+    hp->rope_beta_fast = rope->beta_fast;
+    hp->rope_beta_slow = rope->beta_slow;
+    if (rope->freq_base > 0) {
+        hp->rope_freq_base = rope->freq_base;
+    }
 }
 
 /* Get layer weights from model context */
@@ -1679,10 +2078,58 @@ static void apply_rope_to_qkv(
     struct ggml_tensor *pos,       /* Position tensor */
     LughHyperparams *hp            /* Hyperparameters with RoPE config */
 ) {
-    qkv->q = ggml_rope_ext(ctx, qkv->q, pos, NULL, hp->n_rot, 0, hp->n_ctx,
-                           hp->rope_freq_base, hp->rope_freq_scale, 0.0f, 1.0f, 0.0f, 0.0f);
-    qkv->k = ggml_rope_ext(ctx, qkv->k, pos, NULL, hp->n_rot, 0, hp->n_ctx,
-                           hp->rope_freq_base, hp->rope_freq_scale, 0.0f, 1.0f, 0.0f, 0.0f);
+    float ext_factor  = hp->rope_ext_factor;
+    float attn_factor = hp->rope_attn_factor;
+    float beta_fast   = hp->rope_beta_fast;
+    float beta_slow   = hp->rope_beta_slow;
+    
+    /* For LINEAR scaling, set ext_factor to 0 (disables YaRN-specific interpolation) */
+    if (hp->rope_scaling_type == LUGH_ROPE_SCALING_LINEAR) {
+        ext_factor = 0.0f;
+    }
+    /* For NONE scaling, disable all YaRN parameters */
+    else if (hp->rope_scaling_type == LUGH_ROPE_SCALING_NONE) {
+        ext_factor = 0.0f;
+        attn_factor = 1.0f;
+        beta_fast = 0.0f;
+        beta_slow = 0.0f;
+    }
+    
+    qkv->q = ggml_rope_ext(ctx, qkv->q, pos, NULL, hp->n_rot, 0, hp->n_ctx_orig,
+                           hp->rope_freq_base, hp->rope_freq_scale,
+                           ext_factor, attn_factor, beta_fast, beta_slow);
+    qkv->k = ggml_rope_ext(ctx, qkv->k, pos, NULL, hp->n_rot, 0, hp->n_ctx_orig,
+                           hp->rope_freq_base, hp->rope_freq_scale,
+                           ext_factor, attn_factor, beta_fast, beta_slow);
+}
+
+/* Apply RoPE to a single tensor - convenience wrapper */
+static struct ggml_tensor* apply_rope_single(
+    struct ggml_context *ctx,
+    struct ggml_tensor *tensor,
+    struct ggml_tensor *pos,
+    LughHyperparams *hp
+) {
+    float ext_factor  = hp->rope_ext_factor;
+    float attn_factor = hp->rope_attn_factor;
+    float beta_fast   = hp->rope_beta_fast;
+    float beta_slow   = hp->rope_beta_slow;
+    
+    /* For LINEAR scaling, set ext_factor to 0 */
+    if (hp->rope_scaling_type == LUGH_ROPE_SCALING_LINEAR) {
+        ext_factor = 0.0f;
+    }
+    /* For NONE scaling, disable all YaRN parameters */
+    else if (hp->rope_scaling_type == LUGH_ROPE_SCALING_NONE) {
+        ext_factor = 0.0f;
+        attn_factor = 1.0f;
+        beta_fast = 0.0f;
+        beta_slow = 0.0f;
+    }
+    
+    return ggml_rope_ext(ctx, tensor, pos, NULL, hp->n_rot, 0, hp->n_ctx_orig,
+                         hp->rope_freq_base, hp->rope_freq_scale,
+                         ext_factor, attn_factor, beta_fast, beta_slow);
 }
 
 /* Build complete self-attention block
@@ -1839,6 +2286,1179 @@ static struct ggml_tensor* build_standard_attention(
 }
 
 /* ============================================================================
+ * Forward Pass Implementation - Core C function
+ * Called by all forward_* XS functions
+ * ============================================================================ */
+
+static void free_forward_result(LughForwardResult *result) {
+    if (result->logits) Safefree(result->logits);
+    if (result->all_logits) Safefree(result->all_logits);
+    if (result->batch_logits) {
+        int i;
+        for (i = 0; i < result->n_sequences; i++) {
+            if (result->batch_logits[i]) Safefree(result->batch_logits[i]);
+        }
+        Safefree(result->batch_logits);
+    }
+    if (result->error) Safefree(result->error);
+}
+
+static int do_forward_unified(
+    pTHX_
+    HV *self_hv,
+    LughForwardOpts *opts,
+    LughForwardResult *result
+) {
+    SV **svp;
+    LughModel *model;
+    LughLoRAAdapter *lora = opts->lora;
+    LughKVCache *cache = opts->cache;
+    LughKVCache **caches = (LughKVCache**)opts->caches;
+    int n_caches = opts->n_caches;
+    LughMemoryPool *pool = opts->pool;
+    int i, j;
+    int *tokens = opts->tokens;
+    int n_tokens = opts->n_tokens;
+    int **all_tokens = opts->all_tokens;
+    int *seq_lengths = opts->seq_lengths;
+    int n_sequences = opts->n_sequences;
+    int is_batch_mode = (all_tokens != NULL);
+    LughHyperparams hp;
+    struct ggml_context *ctx_w = NULL;
+    struct ggml_context *ctx_c = NULL;
+    struct ggml_cgraph *gf = NULL;
+    struct ggml_tensor *cur = NULL;
+    struct ggml_tensor *inpL = NULL;
+    ggml_backend_t backend = NULL;
+    ggml_gallocr_t allocr = NULL;
+    int pos_offset = 0;
+    int n_kv;
+    struct ggml_tensor **k_cache_tensors = NULL;
+    struct ggml_tensor **v_cache_tensors = NULL;
+    struct ggml_tensor **k_new_tensors = NULL;
+    struct ggml_tensor **v_new_tensors = NULL;
+    int owns_backend = 0;
+    int owns_allocr = 0;
+    
+    /* Initialize result */
+    Zero(result, 1, LughForwardResult);
+    result->is_batch = is_batch_mode;
+    
+    /* Get model */
+    svp = hv_fetch(self_hv, "_model", 6, 0);
+    if (!svp || !*svp) {
+        result->error = savepv("No model in inference object");
+        return 0;
+    }
+    model = get_lugh_model(aTHX_ *svp);
+    if (!model) {
+        result->error = savepv("Invalid model");
+        return 0;
+    }
+    
+    /* Extract hyperparameters */
+    extract_hyperparams(aTHX_ self_hv, model, &hp);
+    apply_rope_override(aTHX_ &hp, opts->rope_sv);
+    result->n_vocab = hp.n_vocab;
+    
+    ctx_w = model->ctx;
+    
+    /* Setup resources based on what's provided */
+    if (pool) {
+        POOL_LOCK(pool);
+        if (!reset_memory_pool_unlocked(pool)) {
+            POOL_UNLOCK(pool);
+            result->error = savepv("Failed to reset memory pool");
+            return 0;
+        }
+        ctx_c = pool->ctx_compute;
+        backend = pool->backend;
+        allocr = pool->allocator;
+    } else {
+        /* Initialize backend */
+        if (strcmp(hp.backend_name, "auto") == 0) {
+            backend = init_best_backend(hp.n_threads);
+        } else {
+            backend = init_backend_by_name(hp.backend_name, hp.n_threads);
+        }
+        owns_backend = 1;
+        if (!backend) {
+            result->error = savepv("Failed to initialize backend");
+            return 0;
+        }
+        
+        ctx_c = create_compute_context(512 * 1024 * 1024);
+        if (!ctx_c) {
+            ggml_backend_free(backend);
+            result->error = savepv("Failed to create compute context");
+            return 0;
+        }
+    }
+    
+    /* Setup cache if provided */
+    if (cache) {
+        KVCACHE_LOCK(cache);
+        pos_offset = cache->n_cached;
+        n_kv = pos_offset + n_tokens;
+        
+        Newxz(k_cache_tensors, hp.n_layer, struct ggml_tensor *);
+        Newxz(v_cache_tensors, hp.n_layer, struct ggml_tensor *);
+        Newxz(k_new_tensors, hp.n_layer, struct ggml_tensor *);
+        Newxz(v_new_tensors, hp.n_layer, struct ggml_tensor *);
+    }
+    
+    /* ============================================================
+     * Build forward pass graph - single sequence mode
+     * ============================================================ */
+    if (!is_batch_mode) {
+        struct ggml_tensor *tok_embd = ggml_get_tensor(ctx_w, "token_embd.weight");
+        struct ggml_tensor *output_norm = ggml_get_tensor(ctx_w, "output_norm.weight");
+        struct ggml_tensor *output = ggml_get_tensor(ctx_w, "output.weight");
+        struct ggml_tensor *pos;
+        int layer;
+        int n_kv_dim = hp.n_head_kv * hp.head_dim;
+        
+        if (!output) output = tok_embd;
+        if (!tok_embd) {
+            if (cache) {
+                Safefree(k_cache_tensors);
+                Safefree(v_cache_tensors);
+                Safefree(k_new_tensors);
+                Safefree(v_new_tensors);
+                KVCACHE_UNLOCK(cache);
+            }
+            if (pool) {
+                POOL_UNLOCK(pool);
+            } else {
+                ggml_free(ctx_c);
+                if (owns_backend) ggml_backend_free(backend);
+            }
+            result->error = savepv("Required tensors not found in model");
+            return 0;
+        }
+        
+        pos = ggml_new_tensor_1d(ctx_c, GGML_TYPE_I32, n_tokens);
+        ggml_set_name(pos, "pos");
+        
+        {
+            struct ggml_tensor *inp_tokens = ggml_new_tensor_1d(ctx_c, GGML_TYPE_I32, n_tokens);
+            ggml_set_name(inp_tokens, "inp_tokens");
+            inpL = ggml_get_rows(ctx_c, tok_embd, inp_tokens);
+            ggml_set_name(inpL, "inp_embd");
+        }
+        
+        cur = inpL;
+        
+        /* Process transformer layers */
+        for (layer = 0; layer < hp.n_layer; layer++) {
+            LughLayerWeights lw;
+            struct ggml_tensor *residual;
+            
+            if (!get_layer_weights_for_arch(ctx_w, layer, &lw, hp.arch_type)) continue;
+            
+            residual = cur;
+            cur = apply_rms_norm(ctx_c, cur, lw.attn_norm, hp.rms_norm_eps);
+            
+            /* Self-attention */
+            {
+                struct ggml_tensor *q, *k_new, *v_new;
+                struct ggml_tensor *k_full, *v_full;
+                struct ggml_tensor *attn_out;
+                char q_name[64], k_name[64], v_name[64], o_name[64];
+                
+                snprintf(q_name, sizeof(q_name), "blk.%d.attn_q.weight", layer);
+                snprintf(k_name, sizeof(k_name), "blk.%d.attn_k.weight", layer);
+                snprintf(v_name, sizeof(v_name), "blk.%d.attn_v.weight", layer);
+                snprintf(o_name, sizeof(o_name), "blk.%d.attn_output.weight", layer);
+                
+                if (lw.has_combined_qkv) {
+                    struct ggml_tensor *qkv = ggml_mul_mat(ctx_c, lw.wqkv, cur);
+                    int qkv_dim = hp.n_embd + 2 * n_kv_dim;
+                    q = ggml_view_2d(ctx_c, qkv, hp.n_embd, n_tokens, qkv_dim * sizeof(float), 0);
+                    k_new = ggml_view_2d(ctx_c, qkv, n_kv_dim, n_tokens, qkv_dim * sizeof(float), hp.n_embd * sizeof(float));
+                    v_new = ggml_view_2d(ctx_c, qkv, n_kv_dim, n_tokens, qkv_dim * sizeof(float), (hp.n_embd + n_kv_dim) * sizeof(float));
+                    q = ggml_reshape_3d(ctx_c, q, hp.head_dim, hp.n_head, n_tokens);
+                    k_new = ggml_reshape_3d(ctx_c, k_new, hp.head_dim, hp.n_head_kv, n_tokens);
+                    v_new = ggml_reshape_3d(ctx_c, v_new, hp.head_dim, hp.n_head_kv, n_tokens);
+                } else {
+                    q = lora_mul_mat(ctx_c, lw.wq, cur, lora, q_name);
+                    k_new = lora_mul_mat(ctx_c, lw.wk, cur, lora, k_name);
+                    v_new = lora_mul_mat(ctx_c, lw.wv, cur, lora, v_name);
+                    q = ggml_reshape_3d(ctx_c, q, hp.head_dim, hp.n_head, n_tokens);
+                    k_new = ggml_reshape_3d(ctx_c, k_new, hp.head_dim, hp.n_head_kv, n_tokens);
+                    v_new = ggml_reshape_3d(ctx_c, v_new, hp.head_dim, hp.n_head_kv, n_tokens);
+                }
+                
+                q = apply_rope_single(ctx_c, q, pos, &hp);
+                k_new = apply_rope_single(ctx_c, k_new, pos, &hp);
+                
+                /* Handle KV cache if present */
+                if (cache) {
+                    if (pos_offset > 0) {
+                        char k_cache_name[64], v_cache_name[64];
+                        struct ggml_tensor *k_cached, *v_cached;
+                        
+                        snprintf(k_cache_name, sizeof(k_cache_name), "k_cache_%d", layer);
+                        snprintf(v_cache_name, sizeof(v_cache_name), "v_cache_%d", layer);
+                        
+                        k_cached = ggml_new_tensor_3d(ctx_c, GGML_TYPE_F32, hp.head_dim, hp.n_head_kv, pos_offset);
+                        ggml_set_name(k_cached, k_cache_name);
+                        v_cached = ggml_new_tensor_3d(ctx_c, GGML_TYPE_F32, hp.head_dim, hp.n_head_kv, pos_offset);
+                        ggml_set_name(v_cached, v_cache_name);
+                        
+                        k_cache_tensors[layer] = k_cached;
+                        v_cache_tensors[layer] = v_cached;
+                        
+                        k_full = ggml_concat(ctx_c, k_cached, k_new, 2);
+                        v_full = ggml_concat(ctx_c, v_cached, v_new, 2);
+                    } else {
+                        k_full = k_new;
+                        v_full = v_new;
+                    }
+                    
+                    /* Create output copy tensors for cache extraction */
+                    {
+                        char k_new_name[64], v_new_name[64];
+                        struct ggml_tensor *k_out, *v_out;
+                        
+                        snprintf(k_new_name, sizeof(k_new_name), "k_new_%d", layer);
+                        snprintf(v_new_name, sizeof(v_new_name), "v_new_%d", layer);
+                        
+                        k_out = ggml_new_tensor_3d(ctx_c, GGML_TYPE_F32, k_new->ne[0], k_new->ne[1], k_new->ne[2]);
+                        v_out = ggml_new_tensor_3d(ctx_c, GGML_TYPE_F32, v_new->ne[0], v_new->ne[1], v_new->ne[2]);
+                        ggml_set_name(k_out, k_new_name);
+                        ggml_set_name(v_out, v_new_name);
+                        
+                        k_out = ggml_cpy(ctx_c, k_new, k_out);
+                        v_out = ggml_cpy(ctx_c, v_new, v_out);
+                        
+                        k_new_tensors[layer] = k_out;
+                        v_new_tensors[layer] = v_out;
+                    }
+                } else {
+                    k_full = k_new;
+                    v_full = v_new;
+                }
+                
+                attn_out = build_standard_attention(ctx_c, q, k_full, v_full, hp.head_dim, cache ? pos_offset : 0);
+                attn_out = ggml_reshape_2d(ctx_c, attn_out, hp.n_embd, n_tokens);
+                attn_out = lora_mul_mat(ctx_c, lw.wo, attn_out, lora, o_name);
+                
+                if (lw.has_post_norm && lw.attn_post_norm) {
+                    attn_out = apply_rms_norm(ctx_c, attn_out, lw.attn_post_norm, hp.rms_norm_eps);
+                }
+                
+                cur = ggml_add(ctx_c, residual, attn_out);
+            }
+            
+            /* FFN */
+            residual = cur;
+            cur = apply_rms_norm(ctx_c, cur, lw.ffn_norm, hp.rms_norm_eps);
+            cur = build_ffn_with_lora(ctx_c, cur, &lw, lora);
+            
+            if (lw.has_post_norm && lw.ffn_post_norm) {
+                cur = apply_rms_norm(ctx_c, cur, lw.ffn_post_norm, hp.rms_norm_eps);
+            }
+            
+            cur = ggml_add(ctx_c, residual, cur);
+        }
+        
+        /* Final norm and output projection */
+        if (output_norm) {
+            cur = apply_rms_norm(ctx_c, cur, output_norm, hp.rms_norm_eps);
+        }
+        cur = ggml_mul_mat(ctx_c, output, cur);
+        ggml_set_name(cur, "logits");
+        
+        gf = ggml_new_graph(ctx_c);
+        ggml_build_forward_expand(gf, cur);
+        
+        /* Add k_new/v_new tensors to graph for cache extraction */
+        if (cache) {
+            int layer;
+            for (layer = 0; layer < hp.n_layer; layer++) {
+                if (k_new_tensors[layer]) ggml_build_forward_expand(gf, k_new_tensors[layer]);
+                if (v_new_tensors[layer]) ggml_build_forward_expand(gf, v_new_tensors[layer]);
+            }
+        }
+        
+        /* Allocate and run */
+        if (!pool) {
+            allocr = ggml_gallocr_new(ggml_backend_get_default_buffer_type(backend));
+            owns_allocr = 1;
+            if (!ggml_gallocr_reserve(allocr, gf) || !ggml_gallocr_alloc_graph(allocr, gf)) {
+                ggml_gallocr_free(allocr);
+                ggml_free(ctx_c);
+                if (owns_backend) ggml_backend_free(backend);
+                if (cache) {
+                    Safefree(k_cache_tensors);
+                    Safefree(v_cache_tensors);
+                    Safefree(k_new_tensors);
+                    Safefree(v_new_tensors);
+                    KVCACHE_UNLOCK(cache);
+                }
+                result->error = savepv("Failed to allocate compute graph");
+                return 0;
+            }
+        } else {
+            if (!ggml_gallocr_alloc_graph(allocr, gf)) {
+                POOL_UNLOCK(pool);
+                if (cache) {
+                    Safefree(k_cache_tensors);
+                    Safefree(v_cache_tensors);
+                    Safefree(k_new_tensors);
+                    Safefree(v_new_tensors);
+                    KVCACHE_UNLOCK(cache);
+                }
+                result->error = savepv("Failed to allocate compute graph with pool");
+                return 0;
+            }
+        }
+        
+        /* Set input data */
+        {
+            struct ggml_tensor *inp = ggml_graph_get_tensor(gf, "inp_tokens");
+            struct ggml_tensor *pos_tensor = ggml_graph_get_tensor(gf, "pos");
+            
+            if (inp) ggml_backend_tensor_set(inp, tokens, 0, n_tokens * sizeof(int));
+            
+            if (pos_tensor) {
+                int *positions;
+                Newx(positions, n_tokens, int);
+                for (i = 0; i < n_tokens; i++) {
+                    positions[i] = pos_offset + i;
+                }
+                ggml_backend_tensor_set(pos_tensor, positions, 0, n_tokens * sizeof(int));
+                Safefree(positions);
+            }
+            
+            /* Set cached K/V data if cache with existing data */
+            if (cache && pos_offset > 0) {
+                for (i = 0; i < hp.n_layer; i++) {
+                    size_t cache_size = pos_offset * hp.n_head_kv * hp.head_dim * sizeof(float);
+                    if (k_cache_tensors[i] && cache->k_cache[i]) {
+                        ggml_backend_tensor_set(k_cache_tensors[i], cache->k_cache[i], 0, cache_size);
+                    }
+                    if (v_cache_tensors[i] && cache->v_cache[i]) {
+                        ggml_backend_tensor_set(v_cache_tensors[i], cache->v_cache[i], 0, cache_size);
+                    }
+                }
+            }
+        }
+        
+        /* Run forward pass */
+        if (ggml_backend_graph_compute(backend, gf) != GGML_STATUS_SUCCESS) {
+            if (owns_allocr) ggml_gallocr_free(allocr);
+            if (!pool) ggml_free(ctx_c);
+            if (owns_backend) ggml_backend_free(backend);
+            if (pool) POOL_UNLOCK(pool);
+            if (cache) {
+                Safefree(k_cache_tensors);
+                Safefree(v_cache_tensors);
+                Safefree(k_new_tensors);
+                Safefree(v_new_tensors);
+                KVCACHE_UNLOCK(cache);
+            }
+            result->error = savepv("Failed to compute graph");
+            return 0;
+        }
+        
+        /* Update cache with new K/V values */
+        if (cache) {
+            for (i = 0; i < hp.n_layer; i++) {
+                struct ggml_tensor *k_new_tensor = k_new_tensors[i];
+                struct ggml_tensor *v_new_tensor = v_new_tensors[i];
+                size_t new_size = n_tokens * hp.n_head_kv * hp.head_dim * sizeof(float);
+                size_t offset = pos_offset * hp.n_head_kv * hp.head_dim * sizeof(float);
+                
+                if (k_new_tensor && cache->k_cache[i]) {
+                    float *temp;
+                    Newx(temp, n_tokens * hp.n_head_kv * hp.head_dim, float);
+                    ggml_backend_tensor_get(k_new_tensor, temp, 0, new_size);
+                    memcpy((char*)cache->k_cache[i] + offset, temp, new_size);
+                    Safefree(temp);
+                }
+                if (v_new_tensor && cache->v_cache[i]) {
+                    float *temp;
+                    Newx(temp, n_tokens * hp.n_head_kv * hp.head_dim, float);
+                    ggml_backend_tensor_get(v_new_tensor, temp, 0, new_size);
+                    memcpy((char*)cache->v_cache[i] + offset, temp, new_size);
+                    Safefree(temp);
+                }
+            }
+            cache->n_cached = pos_offset + n_tokens;
+        }
+        
+        /* Extract logits */
+        {
+            struct ggml_tensor *logits_tensor = ggml_graph_get_tensor(gf, "logits");
+            if (logits_tensor) {
+                size_t logits_size = hp.n_vocab * sizeof(float);
+                
+                /* Always extract last position logits */
+                Newx(result->logits, hp.n_vocab, float);
+                ggml_backend_tensor_get(logits_tensor, result->logits, 
+                                        (n_tokens - 1) * hp.n_vocab * sizeof(float), logits_size);
+                
+                /* If requested, extract all position logits */
+                if (opts->return_all_logits && n_tokens > 1) {
+                    size_t all_logits_size = n_tokens * hp.n_vocab * sizeof(float);
+                    Newx(result->all_logits, n_tokens * hp.n_vocab, float);
+                    ggml_backend_tensor_get(logits_tensor, result->all_logits, 0, all_logits_size);
+                    result->n_tokens = n_tokens;
+                }
+            }
+        }
+        
+        /* Cleanup */
+        if (owns_allocr) ggml_gallocr_free(allocr);
+        if (!pool) ggml_free(ctx_c);
+        if (owns_backend) ggml_backend_free(backend);
+        if (pool) POOL_UNLOCK(pool);
+        if (cache) {
+            Safefree(k_cache_tensors);
+            Safefree(v_cache_tensors);
+            Safefree(k_new_tensors);
+            Safefree(v_new_tensors);
+            KVCACHE_UNLOCK(cache);
+        }
+    }
+    /* ============================================================
+     * Batch mode - process multiple sequences
+     * ============================================================ */
+    else {
+        result->n_sequences = n_sequences;
+        Newxz(result->batch_logits, n_sequences, float*);
+        
+        /* Process each sequence independently */
+        for (i = 0; i < n_sequences; i++) {
+            struct ggml_tensor *tok_embd, *output_norm, *output, *pos;
+            int layer;
+            int seq_len = seq_lengths[i];
+            int *seq_tokens = all_tokens[i];
+            LughKVCache *seq_cache = (caches && i < n_caches) ? caches[i] : NULL;
+            int seq_pos_offset = 0;
+            int seq_n_kv = seq_len;
+            struct ggml_tensor **seq_k_cache_tensors = NULL;
+            struct ggml_tensor **seq_v_cache_tensors = NULL;
+            struct ggml_tensor **seq_k_new_tensors = NULL;
+            struct ggml_tensor **seq_v_new_tensors = NULL;
+            int n_kv_dim = hp.n_head_kv * hp.head_dim;
+            
+            /* Setup cache for this sequence */
+            if (seq_cache) {
+                KVCACHE_LOCK(seq_cache);
+                seq_pos_offset = seq_cache->n_cached;
+                seq_n_kv = seq_pos_offset + seq_len;
+                
+                Newxz(seq_k_cache_tensors, hp.n_layer, struct ggml_tensor *);
+                Newxz(seq_v_cache_tensors, hp.n_layer, struct ggml_tensor *);
+                Newxz(seq_k_new_tensors, hp.n_layer, struct ggml_tensor *);
+                Newxz(seq_v_new_tensors, hp.n_layer, struct ggml_tensor *);
+            }
+            
+            /* Reset pool for each sequence if using pool */
+            if (pool) {
+                reset_memory_pool_unlocked(pool);
+                ctx_c = pool->ctx_compute;
+            } else if (i > 0) {
+                /* Free previous ctx_c and create new one */
+                ggml_free(ctx_c);
+                ctx_c = create_compute_context(512 * 1024 * 1024);
+                if (!ctx_c) {
+                    if (seq_cache) {
+                        Safefree(seq_k_cache_tensors);
+                        Safefree(seq_v_cache_tensors);
+                        Safefree(seq_k_new_tensors);
+                        Safefree(seq_v_new_tensors);
+                        KVCACHE_UNLOCK(seq_cache);
+                    }
+                    if (owns_backend) ggml_backend_free(backend);
+                    result->error = savepv("Failed to create compute context for sequence");
+                    return 0;
+                }
+            }
+            
+            tok_embd = ggml_get_tensor(ctx_w, "token_embd.weight");
+            output_norm = ggml_get_tensor(ctx_w, "output_norm.weight");
+            output = ggml_get_tensor(ctx_w, "output.weight");
+            if (!output) output = tok_embd;
+            
+            pos = ggml_new_tensor_1d(ctx_c, GGML_TYPE_I32, seq_len);
+            ggml_set_name(pos, "pos");
+            
+            {
+                struct ggml_tensor *inp_tokens = ggml_new_tensor_1d(ctx_c, GGML_TYPE_I32, seq_len);
+                ggml_set_name(inp_tokens, "inp_tokens");
+                inpL = ggml_get_rows(ctx_c, tok_embd, inp_tokens);
+            }
+            
+            cur = inpL;
+            
+            for (layer = 0; layer < hp.n_layer; layer++) {
+                LughLayerWeights lw;
+                struct ggml_tensor *residual;
+                char q_name[64], k_name[64], v_name[64], o_name[64];
+                
+                if (!get_layer_weights_for_arch(ctx_w, layer, &lw, hp.arch_type)) continue;
+                
+                residual = cur;
+                cur = apply_rms_norm(ctx_c, cur, lw.attn_norm, hp.rms_norm_eps);
+                
+                snprintf(q_name, sizeof(q_name), "blk.%d.attn_q.weight", layer);
+                snprintf(k_name, sizeof(k_name), "blk.%d.attn_k.weight", layer);
+                snprintf(v_name, sizeof(v_name), "blk.%d.attn_v.weight", layer);
+                snprintf(o_name, sizeof(o_name), "blk.%d.attn_output.weight", layer);
+                
+                {
+                    struct ggml_tensor *q, *k, *v, *k_new, *v_new, *attn_out;
+                    struct ggml_tensor *k_full, *v_full;
+                    
+                    if (lw.has_combined_qkv) {
+                        struct ggml_tensor *qkv = ggml_mul_mat(ctx_c, lw.wqkv, cur);
+                        int qkv_dim = hp.n_embd + 2 * n_kv_dim;
+                        q = ggml_view_2d(ctx_c, qkv, hp.n_embd, seq_len, qkv_dim * sizeof(float), 0);
+                        k_new = ggml_view_2d(ctx_c, qkv, n_kv_dim, seq_len, qkv_dim * sizeof(float), hp.n_embd * sizeof(float));
+                        v_new = ggml_view_2d(ctx_c, qkv, n_kv_dim, seq_len, qkv_dim * sizeof(float), (hp.n_embd + n_kv_dim) * sizeof(float));
+                        q = ggml_reshape_3d(ctx_c, q, hp.head_dim, hp.n_head, seq_len);
+                        k_new = ggml_reshape_3d(ctx_c, k_new, hp.head_dim, hp.n_head_kv, seq_len);
+                        v_new = ggml_reshape_3d(ctx_c, v_new, hp.head_dim, hp.n_head_kv, seq_len);
+                    } else {
+                        q = lora_mul_mat(ctx_c, lw.wq, cur, lora, q_name);
+                        k_new = lora_mul_mat(ctx_c, lw.wk, cur, lora, k_name);
+                        v_new = lora_mul_mat(ctx_c, lw.wv, cur, lora, v_name);
+                        q = ggml_reshape_3d(ctx_c, q, hp.head_dim, hp.n_head, seq_len);
+                        k_new = ggml_reshape_3d(ctx_c, k_new, hp.head_dim, hp.n_head_kv, seq_len);
+                        v_new = ggml_reshape_3d(ctx_c, v_new, hp.head_dim, hp.n_head_kv, seq_len);
+                    }
+                    
+                    q = apply_rope_single(ctx_c, q, pos, &hp);
+                    k_new = apply_rope_single(ctx_c, k_new, pos, &hp);
+                    
+                    /* Handle KV cache if present for this sequence */
+                    if (seq_cache) {
+                        if (seq_pos_offset > 0) {
+                            char k_cache_name[64], v_cache_name[64];
+                            struct ggml_tensor *k_cached, *v_cached;
+                            
+                            snprintf(k_cache_name, sizeof(k_cache_name), "k_cache_%d", layer);
+                            snprintf(v_cache_name, sizeof(v_cache_name), "v_cache_%d", layer);
+                            
+                            k_cached = ggml_new_tensor_3d(ctx_c, GGML_TYPE_F32, hp.head_dim, hp.n_head_kv, seq_pos_offset);
+                            ggml_set_name(k_cached, k_cache_name);
+                            v_cached = ggml_new_tensor_3d(ctx_c, GGML_TYPE_F32, hp.head_dim, hp.n_head_kv, seq_pos_offset);
+                            ggml_set_name(v_cached, v_cache_name);
+                            
+                            seq_k_cache_tensors[layer] = k_cached;
+                            seq_v_cache_tensors[layer] = v_cached;
+                            
+                            k_full = ggml_concat(ctx_c, k_cached, k_new, 2);
+                            v_full = ggml_concat(ctx_c, v_cached, v_new, 2);
+                        } else {
+                            k_full = k_new;
+                            v_full = v_new;
+                        }
+                        
+                        /* Track new K/V for cache update */
+                        {
+                            char k_out_name[64], v_out_name[64];
+                            snprintf(k_out_name, sizeof(k_out_name), "k_new_%d", layer);
+                            snprintf(v_out_name, sizeof(v_out_name), "v_new_%d", layer);
+                            seq_k_new_tensors[layer] = ggml_cpy(ctx_c, k_new, ggml_new_tensor_3d(ctx_c, GGML_TYPE_F32, hp.head_dim, hp.n_head_kv, seq_len));
+                            ggml_set_name(seq_k_new_tensors[layer], k_out_name);
+                            seq_v_new_tensors[layer] = ggml_cpy(ctx_c, v_new, ggml_new_tensor_3d(ctx_c, GGML_TYPE_F32, hp.head_dim, hp.n_head_kv, seq_len));
+                            ggml_set_name(seq_v_new_tensors[layer], v_out_name);
+                        }
+                    } else {
+                        k_full = k_new;
+                        v_full = v_new;
+                    }
+                    
+                    attn_out = build_standard_attention(ctx_c, q, k_full, v_full, hp.head_dim, seq_cache ? seq_pos_offset : 0);
+                    attn_out = ggml_reshape_2d(ctx_c, attn_out, hp.n_embd, seq_len);
+                    attn_out = lora_mul_mat(ctx_c, lw.wo, attn_out, lora, o_name);
+                    
+                    if (lw.has_post_norm && lw.attn_post_norm) {
+                        attn_out = apply_rms_norm(ctx_c, attn_out, lw.attn_post_norm, hp.rms_norm_eps);
+                    }
+                    
+                    cur = ggml_add(ctx_c, residual, attn_out);
+                }
+                
+                residual = cur;
+                cur = apply_rms_norm(ctx_c, cur, lw.ffn_norm, hp.rms_norm_eps);
+                cur = build_ffn_with_lora(ctx_c, cur, &lw, lora);
+                
+                if (lw.has_post_norm && lw.ffn_post_norm) {
+                    cur = apply_rms_norm(ctx_c, cur, lw.ffn_post_norm, hp.rms_norm_eps);
+                }
+                
+                cur = ggml_add(ctx_c, residual, cur);
+            }
+            
+            if (output_norm) {
+                cur = apply_rms_norm(ctx_c, cur, output_norm, hp.rms_norm_eps);
+            }
+            cur = ggml_mul_mat(ctx_c, output, cur);
+            ggml_set_name(cur, "logits");
+            
+            gf = ggml_new_graph(ctx_c);
+            ggml_build_forward_expand(gf, cur);
+            
+            /* Add k_new/v_new tensors to graph for cache extraction */
+            if (seq_cache) {
+                int lyr;
+                for (lyr = 0; lyr < hp.n_layer; lyr++) {
+                    if (seq_k_new_tensors[lyr]) ggml_build_forward_expand(gf, seq_k_new_tensors[lyr]);
+                    if (seq_v_new_tensors[lyr]) ggml_build_forward_expand(gf, seq_v_new_tensors[lyr]);
+                }
+            }
+            
+            if (!pool) {
+                if (i == 0) {
+                    allocr = ggml_gallocr_new(ggml_backend_get_default_buffer_type(backend));
+                    owns_allocr = 1;
+                }
+                ggml_gallocr_reserve(allocr, gf);
+            }
+            ggml_gallocr_alloc_graph(allocr, gf);
+            
+            /* Set inputs */
+            {
+                struct ggml_tensor *inp = ggml_graph_get_tensor(gf, "inp_tokens");
+                struct ggml_tensor *pos_tensor = ggml_graph_get_tensor(gf, "pos");
+                int lyr;
+                
+                if (inp) ggml_backend_tensor_set(inp, seq_tokens, 0, seq_len * sizeof(int));
+                
+                if (pos_tensor) {
+                    int *positions;
+                    Newx(positions, seq_len, int);
+                    for (j = 0; j < seq_len; j++) positions[j] = seq_pos_offset + j;
+                    ggml_backend_tensor_set(pos_tensor, positions, 0, seq_len * sizeof(int));
+                    Safefree(positions);
+                }
+                
+                /* Load cached K/V data for this sequence */
+                if (seq_cache && seq_pos_offset > 0) {
+                    for (lyr = 0; lyr < hp.n_layer; lyr++) {
+                        if (seq_k_cache_tensors[lyr] && seq_cache->k_cache[lyr]) {
+                            size_t cache_size = seq_pos_offset * n_kv_dim * sizeof(float);
+                            ggml_backend_tensor_set(seq_k_cache_tensors[lyr], seq_cache->k_cache[lyr], 0, cache_size);
+                        }
+                        if (seq_v_cache_tensors[lyr] && seq_cache->v_cache[lyr]) {
+                            size_t cache_size = seq_pos_offset * n_kv_dim * sizeof(float);
+                            ggml_backend_tensor_set(seq_v_cache_tensors[lyr], seq_cache->v_cache[lyr], 0, cache_size);
+                        }
+                    }
+                }
+            }
+            
+            ggml_backend_graph_compute(backend, gf);
+            
+            /* Update cache with new K/V values */
+            if (seq_cache) {
+                int lyr;
+                for (lyr = 0; lyr < hp.n_layer; lyr++) {
+                    struct ggml_tensor *k_new_tensor = seq_k_new_tensors[lyr];
+                    struct ggml_tensor *v_new_tensor = seq_v_new_tensors[lyr];
+                    size_t new_size = seq_len * n_kv_dim * sizeof(float);
+                    size_t offset = seq_pos_offset * n_kv_dim * sizeof(float);
+                    
+                    if (k_new_tensor && seq_cache->k_cache[lyr]) {
+                        float *temp;
+                        Newx(temp, seq_len * n_kv_dim, float);
+                        ggml_backend_tensor_get(k_new_tensor, temp, 0, new_size);
+                        memcpy((char*)seq_cache->k_cache[lyr] + offset, temp, new_size);
+                        Safefree(temp);
+                    }
+                    if (v_new_tensor && seq_cache->v_cache[lyr]) {
+                        float *temp;
+                        Newx(temp, seq_len * n_kv_dim, float);
+                        ggml_backend_tensor_get(v_new_tensor, temp, 0, new_size);
+                        memcpy((char*)seq_cache->v_cache[lyr] + offset, temp, new_size);
+                        Safefree(temp);
+                    }
+                }
+                seq_cache->n_cached = seq_pos_offset + seq_len;
+            }
+            
+            /* Extract logits for this sequence */
+            {
+                struct ggml_tensor *logits_tensor = ggml_graph_get_tensor(gf, "logits");
+                if (logits_tensor) {
+                    Newx(result->batch_logits[i], hp.n_vocab, float);
+                    ggml_backend_tensor_get(logits_tensor, result->batch_logits[i],
+                                            (seq_len - 1) * hp.n_vocab * sizeof(float),
+                                            hp.n_vocab * sizeof(float));
+                }
+            }
+            
+            /* Cleanup per-sequence cache resources */
+            if (seq_cache) {
+                Safefree(seq_k_cache_tensors);
+                Safefree(seq_v_cache_tensors);
+                Safefree(seq_k_new_tensors);
+                Safefree(seq_v_new_tensors);
+                KVCACHE_UNLOCK(seq_cache);
+            }
+        }
+        
+        /* Cleanup batch mode */
+        if (owns_allocr) ggml_gallocr_free(allocr);
+        if (!pool) ggml_free(ctx_c);
+        if (owns_backend) ggml_backend_free(backend);
+        if (pool) POOL_UNLOCK(pool);
+    }
+    
+    return 1;  /* Success */
+}
+
+/* Helper to parse tokens from AV to int array with validation */
+static int* parse_tokens_av(pTHX_ AV *av, int *n_tokens_out) {
+    int n = av_len(av) + 1;
+    int *tokens;
+    int i;
+
+    /* Validate: must have at least one token */
+    if (n == 0) {
+        croak("Token array cannot be empty - at least one token is required");
+    }
+
+    Newx(tokens, n, int);
+    for (i = 0; i < n; i++) {
+        SV **elem = av_fetch(av, i, 0);
+        int token = elem ? SvIV(*elem) : 0;
+
+        /* Validate: token IDs must be non-negative */
+        if (token < 0) {
+            Safefree(tokens);
+            croak("Invalid token ID %d at index %d: token IDs must be non-negative", token, i);
+        }
+
+        tokens[i] = token;
+    }
+    *n_tokens_out = n;
+    return tokens;
+}
+
+/* Helper to parse sequences from AV to int** array */
+static int parse_sequences_av(pTHX_ AV *av, int ***all_tokens_out, int **seq_lengths_out, int *n_sequences_out) {
+    int n = av_len(av) + 1;
+    int **all_tokens;
+    int *seq_lengths;
+    int i, j;
+    
+    if (n == 0) return 0;
+    
+    Newxz(all_tokens, n, int*);
+    Newxz(seq_lengths, n, int);
+    
+    for (i = 0; i < n; i++) {
+        SV **seq_svp = av_fetch(av, i, 0);
+        AV *seq_av;
+        if (!seq_svp || !SvROK(*seq_svp) || SvTYPE(SvRV(*seq_svp)) != SVt_PVAV) {
+            for (j = 0; j < i; j++) Safefree(all_tokens[j]);
+            Safefree(all_tokens);
+            Safefree(seq_lengths);
+            return 0;
+        }
+        seq_av = (AV*)SvRV(*seq_svp);
+        seq_lengths[i] = av_len(seq_av) + 1;
+        Newx(all_tokens[i], seq_lengths[i], int);
+        for (j = 0; j < seq_lengths[i]; j++) {
+            SV **elem = av_fetch(seq_av, j, 0);
+            all_tokens[i][j] = elem ? SvIV(*elem) : 0;
+        }
+    }
+    
+    *all_tokens_out = all_tokens;
+    *seq_lengths_out = seq_lengths;
+    *n_sequences_out = n;
+    return 1;
+}
+
+/* Helper to free sequences */
+static void free_sequences(int **all_tokens, int *seq_lengths, int n_sequences) {
+    int i;
+    if (all_tokens) {
+        for (i = 0; i < n_sequences; i++) {
+            if (all_tokens[i]) Safefree(all_tokens[i]);
+        }
+        Safefree(all_tokens);
+    }
+    if (seq_lengths) Safefree(seq_lengths);
+}
+
+/* ============================================================================
+ * Speculative Decoding Helper Functions (pure C)
+ * ============================================================================ */
+
+/* Initialize KV caches for speculative decoding */
+static int spec_init_caches(pTHX_ HV *spec_hv, LughSpeculative *spec) {
+    SV **svp, *main_inf, *draft_inf;
+    HV *inf_hv;
+    int main_n_layer, main_n_ctx, main_n_head_kv, main_n_embd, main_n_head, main_head_dim;
+    int draft_n_layer, draft_n_ctx, draft_n_head_kv, draft_n_embd, draft_n_head, draft_head_dim;
+    LughKVCache *main_cache, *draft_cache;
+    
+    /* Already have caches */
+    if (spec->main_cache && spec->draft_cache) {
+        return 1;
+    }
+    
+    /* Get inference objects */
+    svp = hv_fetch(spec_hv, "_main_inference", 15, 0);
+    if (!svp || !*svp) return 0;
+    main_inf = *svp;
+    
+    svp = hv_fetch(spec_hv, "_draft_inference", 16, 0);
+    if (!svp || !*svp) return 0;
+    draft_inf = *svp;
+    
+    /* Extract main model params */
+    inf_hv = (HV*)SvRV(main_inf);
+    svp = hv_fetch(inf_hv, "n_layer", 7, 0);
+    main_n_layer = svp ? SvIV(*svp) : 22;
+    svp = hv_fetch(inf_hv, "n_ctx", 5, 0);
+    main_n_ctx = svp ? SvIV(*svp) : 2048;
+    svp = hv_fetch(inf_hv, "n_head_kv", 9, 0);
+    main_n_head_kv = svp ? SvIV(*svp) : 4;
+    svp = hv_fetch(inf_hv, "n_embd", 6, 0);
+    main_n_embd = svp ? SvIV(*svp) : 2048;
+    svp = hv_fetch(inf_hv, "n_head", 6, 0);
+    main_n_head = svp ? SvIV(*svp) : 32;
+    main_head_dim = main_n_embd / main_n_head;
+    
+    /* Extract draft model params */
+    inf_hv = (HV*)SvRV(draft_inf);
+    svp = hv_fetch(inf_hv, "n_layer", 7, 0);
+    draft_n_layer = svp ? SvIV(*svp) : 22;
+    svp = hv_fetch(inf_hv, "n_ctx", 5, 0);
+    draft_n_ctx = svp ? SvIV(*svp) : 2048;
+    svp = hv_fetch(inf_hv, "n_head_kv", 9, 0);
+    draft_n_head_kv = svp ? SvIV(*svp) : 4;
+    svp = hv_fetch(inf_hv, "n_embd", 6, 0);
+    draft_n_embd = svp ? SvIV(*svp) : 2048;
+    svp = hv_fetch(inf_hv, "n_head", 6, 0);
+    draft_n_head = svp ? SvIV(*svp) : 32;
+    draft_head_dim = draft_n_embd / draft_n_head;
+    
+    /* Create caches */
+    SPECULATIVE_LOCK(spec);
+    if (!spec->main_cache) {
+        main_cache = create_kvcache(main_n_layer, main_n_ctx, main_n_head_kv, main_head_dim);
+        if (!main_cache) {
+            SPECULATIVE_UNLOCK(spec);
+            return 0;
+        }
+        spec->main_cache = main_cache;
+    }
+    if (!spec->draft_cache) {
+        draft_cache = create_kvcache(draft_n_layer, draft_n_ctx, draft_n_head_kv, draft_head_dim);
+        if (!draft_cache) {
+            SPECULATIVE_UNLOCK(spec);
+            return 0;
+        }
+        spec->draft_cache = draft_cache;
+    }
+    SPECULATIVE_UNLOCK(spec);
+    
+    return 1;
+}
+
+/* Generate draft tokens using draft model - returns array of token IDs or NULL on error */
+static AV* spec_draft_tokens(pTHX_ HV *spec_hv, LughSpeculative *spec, int *input_tokens, int n_input, int n_draft) {
+    SV **svp, *draft_inf;
+    int n_vocab;
+    int *tokens;
+    AV *draft_av;
+    int i, j;
+    LughForwardOpts opts;
+    LughForwardResult result;
+    float *probs = NULL;
+    int *indices = NULL;
+    
+    svp = hv_fetch(spec_hv, "_draft_inference", 16, 0);
+    if (!svp || !*svp) return NULL;
+    draft_inf = *svp;
+    
+    svp = hv_fetch(spec_hv, "n_vocab", 7, 0);
+    n_vocab = svp ? SvIV(*svp) : spec->n_vocab;
+    
+    if (n_draft <= 0) n_draft = spec->k;
+    if (n_draft > 16) n_draft = 16;
+    
+    /* Copy input tokens */
+    Newx(tokens, n_input + n_draft, int);
+    for (i = 0; i < n_input; i++) {
+        tokens[i] = input_tokens[i];
+    }
+    
+    draft_av = newAV();
+    
+    /* Generate n_draft tokens autoregressively using draft model */
+    for (i = 0; i < n_draft; i++) {
+        int cur_len = n_input + i;
+        float max_logit = -1e9f;
+        float sum = 0.0f;
+        float threshold, cumsum;
+        int sampled_token;
+        
+        /* Run forward pass on current sequence */
+        Zero(&opts, 1, LughForwardOpts);
+        Newx(opts.tokens, cur_len, int);
+        for (j = 0; j < cur_len; j++) opts.tokens[j] = tokens[j];
+        opts.n_tokens = cur_len;
+        
+        if (!do_forward_unified(aTHX_ (HV*)SvRV(draft_inf), &opts, &result)) {
+            Safefree(opts.tokens);
+            Safefree(tokens);
+            free_forward_result(&result);
+            av_undef(draft_av);
+            return NULL;
+        }
+        Safefree(opts.tokens);
+        
+        /* Sample from logits using top-p */
+        Newx(probs, n_vocab, float);
+        Newx(indices, n_vocab, int);
+        
+        for (j = 0; j < n_vocab && j < result.n_vocab; j++) {
+            probs[j] = result.logits[j];
+            if (probs[j] > max_logit) max_logit = probs[j];
+            indices[j] = j;
+        }
+        
+        /* Softmax with temperature */
+        for (j = 0; j < n_vocab; j++) {
+            probs[j] = expf((probs[j] - max_logit) / spec->temperature);
+            sum += probs[j];
+        }
+        for (j = 0; j < n_vocab; j++) {
+            probs[j] /= sum;
+        }
+        
+        /* Top-p (nucleus) sampling:
+           1. Sort tokens by probability (descending)
+           2. Find smallest set with cumulative prob >= top_p
+           3. Sample from that set */
+        
+        /* Simple bubble sort on indices by probability (descending) */
+        for (j = 0; j < n_vocab - 1; j++) {
+            int k;
+            for (k = j + 1; k < n_vocab; k++) {
+                if (probs[indices[k]] > probs[indices[j]]) {
+                    int tmp = indices[j];
+                    indices[j] = indices[k];
+                    indices[k] = tmp;
+                }
+            }
+            /* Early exit once we have enough probability mass */
+            if (j > 0) {
+                float top_sum = 0.0f;
+                int m;
+                for (m = 0; m <= j; m++) top_sum += probs[indices[m]];
+                if (top_sum >= spec->top_p) break;
+            }
+        }
+        
+        /* Find cutoff where cumulative prob >= top_p */
+        {
+            int cutoff = 0;
+            cumsum = 0.0f;
+            for (j = 0; j < n_vocab; j++) {
+                cumsum += probs[indices[j]];
+                cutoff = j + 1;
+                if (cumsum >= spec->top_p) break;
+            }
+            
+            /* Renormalize top-p subset and sample */
+            sum = 0.0f;
+            for (j = 0; j < cutoff; j++) {
+                sum += probs[indices[j]];
+            }
+            
+            threshold = (float)rand() / (float)RAND_MAX * sum;
+            cumsum = 0.0f;
+            sampled_token = indices[0];  /* Default to top token */
+            for (j = 0; j < cutoff; j++) {
+                cumsum += probs[indices[j]];
+                if (cumsum >= threshold) {
+                    sampled_token = indices[j];
+                    break;
+                }
+            }
+        }
+        
+        Safefree(probs);
+        Safefree(indices);
+        probs = NULL;
+        indices = NULL;
+        free_forward_result(&result);
+        
+        tokens[cur_len] = sampled_token;
+        av_push(draft_av, newSViv(sampled_token));
+    }
+
+    
+    SPECULATIVE_LOCK(spec);
+    spec->tokens_drafted += n_draft;
+    SPECULATIVE_UNLOCK(spec);
+    
+    Safefree(tokens);
+    
+    return draft_av;
+}
+
+/* Verify draft tokens using main model - returns array of accepted tokens or NULL on error */
+static AV* spec_verify_tokens(pTHX_ HV *spec_hv, LughSpeculative *spec, 
+                               int *input_tokens, int n_input, 
+                               int *draft_tokens, int n_draft) {
+    SV **svp, *main_inf;
+    int n_vocab;
+    int *all_tokens;
+    AV *accepted_av;
+    int n_accepted;
+    LughForwardOpts opts;
+    LughForwardResult result;
+    int i, j;
+    int total_tokens;
+    
+    svp = hv_fetch(spec_hv, "_main_inference", 15, 0);
+    if (!svp || !*svp) return NULL;
+    main_inf = *svp;
+    
+    svp = hv_fetch(spec_hv, "n_vocab", 7, 0);
+    n_vocab = svp ? SvIV(*svp) : spec->n_vocab;
+    
+    /* Build full sequence: input + draft tokens */
+    total_tokens = n_input + n_draft;
+    Newx(all_tokens, total_tokens, int);
+    for (i = 0; i < n_input; i++) {
+        all_tokens[i] = input_tokens[i];
+    }
+    for (i = 0; i < n_draft; i++) {
+        all_tokens[n_input + i] = draft_tokens[i];
+    }
+    
+    /* Run main model forward on full sequence, requesting all logits */
+    Zero(&opts, 1, LughForwardOpts);
+    opts.tokens = all_tokens;
+    opts.n_tokens = total_tokens;
+    opts.return_all_logits = 1;  /* Request logits for all positions */
+    
+    if (!do_forward_unified(aTHX_ (HV*)SvRV(main_inf), &opts, &result)) {
+        Safefree(all_tokens);
+        free_forward_result(&result);
+        return NULL;
+    }
+    
+    accepted_av = newAV();
+    n_accepted = 0;
+    
+    /* Proper speculative decoding verification:
+       - Logits at position (n_input - 1) predict what should be at position n_input
+       - So we check if draft_tokens[i] matches the prediction at position (n_input - 1 + i)
+       
+       For each draft token i:
+       - Get logits at position (n_input - 1 + i)
+       - Convert to probabilities
+       - Check if draft_tokens[i] has acceptable probability
+    */
+    for (i = 0; i < n_draft; i++) {
+        int logit_pos = n_input - 1 + i;  /* Position whose logits predict the next token */
+        int draft_token = draft_tokens[i];
+        float *pos_logits;
+        float max_logit = -1e9f;
+        float sum = 0.0f;
+        float *probs;
+        float prob;
+        
+        /* Get logits for this position */
+        if (result.all_logits && logit_pos < result.n_tokens) {
+            pos_logits = result.all_logits + (logit_pos * n_vocab);
+        } else {
+            /* Fallback to last position logits if all_logits not available */
+            pos_logits = result.logits;
+        }
+        
+        if (!pos_logits) break;
+        
+        /* Convert logits to probabilities with temperature */
+        Newx(probs, n_vocab, float);
+        for (j = 0; j < n_vocab && j < result.n_vocab; j++) {
+            probs[j] = pos_logits[j];
+            if (probs[j] > max_logit) max_logit = probs[j];
+        }
+        for (j = 0; j < n_vocab; j++) {
+            probs[j] = expf((probs[j] - max_logit) / spec->temperature);
+            sum += probs[j];
+        }
+        for (j = 0; j < n_vocab; j++) {
+            probs[j] /= sum;
+        }
+        
+        /* Get probability of draft token */
+        prob = (draft_token >= 0 && draft_token < n_vocab) ? probs[draft_token] : 0.0f;
+        
+        Safefree(probs);
+        
+        /* Accept if probability exceeds threshold (typical threshold ~0.01) */
+        if (prob >= 0.01f) {
+            av_push(accepted_av, newSViv(draft_token));
+            n_accepted++;
+        } else {
+            /* First rejection - stop accepting */
+            break;
+        }
+    }
+    
+    Safefree(all_tokens);
+    free_forward_result(&result);
+    
+    SPECULATIVE_LOCK(spec);
+    spec->tokens_accepted += n_accepted;
+    spec->total_steps++;
+    SPECULATIVE_UNLOCK(spec);
+    
+    return accepted_av;
+}
+
+/* One speculation step: draft + verify - returns accepted tokens or NULL on error */
+static AV* spec_step(pTHX_ HV *spec_hv, LughSpeculative *spec, int *input_tokens, int n_input) {
+    AV *draft_av, *accepted_av;
+    int *draft_tokens_arr;
+    int n_draft, i;
+    
+    /* Initialize caches if needed */
+    if (!spec_init_caches(aTHX_ spec_hv, spec)) {
+        return NULL;
+    }
+    
+    /* Generate draft tokens */
+    draft_av = spec_draft_tokens(aTHX_ spec_hv, spec, input_tokens, n_input, spec->k);
+    if (!draft_av) {
+        return NULL;
+    }
+    
+    n_draft = av_len(draft_av) + 1;
+    Newx(draft_tokens_arr, n_draft, int);
+    for (i = 0; i < n_draft; i++) {
+        SV **tv = av_fetch(draft_av, i, 0);
+        draft_tokens_arr[i] = tv ? SvIV(*tv) : 0;
+    }
+    
+    /* Verify draft tokens */
+    accepted_av = spec_verify_tokens(aTHX_ spec_hv, spec, input_tokens, n_input, draft_tokens_arr, n_draft);
+    
+    Safefree(draft_tokens_arr);
+    av_undef(draft_av);
+    
+    return accepted_av;
+}
+
+/* ============================================================================
  * XS Functions
  * ============================================================================ */
 
@@ -1855,6 +3475,12 @@ CODE:
     RETVAL = "0.04";
 OUTPUT:
     RETVAL
+
+void
+srand(seed)
+    unsigned int seed
+CODE:
+    srand(seed);
 
 const char *
 ggml_version()
@@ -2054,7 +3680,16 @@ CODE:
             }
         }
     }
-    
+
+    /* Validate mem_size - must be positive */
+    if (mem_size == 0) {
+        /* Release the allocated ID back to the pool */
+        CONTEXT_LOCK();
+        context_registry[id] = NULL;
+        CONTEXT_UNLOCK();
+        croak("mem_size must be positive (got 0)");
+    }
+
     /* Allocate our state */
     Newxz(lctx, 1, LughContext);
     lctx->mem_size = mem_size;
@@ -2295,328 +3930,662 @@ forward(self, ...)
     SV *self
 PREINIT:
     HV *hv;
-    SV **svp;
-    LughModel *model;
-    LughLoRAAdapter *lora = NULL;
-    int i, n_tokens = 0;
-    int *tokens = NULL;
-    LughHyperparams hp;
-    struct ggml_context *ctx_w = NULL;  /* weights context (model->ctx) */
-    struct ggml_context *ctx_c = NULL;  /* compute context */
-    struct ggml_cgraph *gf = NULL;
-    struct ggml_tensor *cur = NULL;
-    struct ggml_tensor *inpL = NULL;
-    ggml_backend_t backend = NULL;
-    ggml_gallocr_t allocr = NULL;
+    LughForwardOpts opts;
+    LughForwardResult result;
+    int i, j;
 PPCODE:
-    /* Get model */
     hv = (HV*)SvRV(self);
-    svp = hv_fetch(hv, "_model", 6, 0);
-    if (!svp || !*svp) croak("No model in inference object");
-    model = get_lugh_model(aTHX_ *svp);
-    if (!model) croak("Invalid model");
+    Zero(&opts, 1, LughForwardOpts);
     
-    /* Parse arguments - support both positional and named */
-    /* Named: forward(tokens => \@tokens, lora => $lora) */
-    /* Positional: forward(\@tokens) or forward(@tokens) */
-    for (i = 1; i < items; i++) {
-        SV *arg = ST(i);
-        if (SvPOK(arg) && !SvROK(arg)) {
-            const char *key = SvPV_nolen(arg);
-            if (strEQ(key, "tokens") && i + 1 < items) {
-                i++;
-                arg = ST(i);
-                if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
-                    AV *av = (AV*)SvRV(arg);
-                    int j;
-                    n_tokens = av_len(av) + 1;
-                    Newx(tokens, n_tokens, int);
-                    for (j = 0; j < n_tokens; j++) {
-                        SV **elem = av_fetch(av, j, 0);
-                        tokens[j] = elem ? SvIV(*elem) : 0;
+    /* Parse named parameters: forward(tokens => \@t, lora => $l, ...) */
+    for (i = 1; i < items; i += 2) {
+        if (i + 1 < items && SvPOK(ST(i))) {
+            const char *key = SvPV_nolen(ST(i));
+            SV *val = ST(i + 1);
+            if (strEQ(key, "tokens") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                opts.tokens = parse_tokens_av(aTHX_ (AV*)SvRV(val), &opts.n_tokens);
+            } else if (strEQ(key, "lora")) {
+                opts.lora = get_lugh_lora(aTHX_ val);
+            } else if (strEQ(key, "cache")) {
+                opts.cache = get_lugh_kvcache(aTHX_ val);
+            } else if (strEQ(key, "caches") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                AV *caches_av = (AV*)SvRV(val);
+                int nc = av_len(caches_av) + 1;
+                int ci;
+                Newxz(opts.caches, nc, void*);
+                opts.n_caches = nc;
+                for (ci = 0; ci < nc; ci++) {
+                    SV **csv = av_fetch(caches_av, ci, 0);
+                    if (csv && *csv && SvROK(*csv)) {
+                        opts.caches[ci] = get_lugh_kvcache(aTHX_ *csv);
                     }
                 }
-            } else if (strEQ(key, "lora") && i + 1 < items) {
-                i++;
-                lora = get_lugh_lora(aTHX_ ST(i));
-            }
-        } else if (!tokens && SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
-            /* Positional array ref */
-            AV *av = (AV*)SvRV(arg);
-            int j;
-            n_tokens = av_len(av) + 1;
-            Newx(tokens, n_tokens, int);
-            for (j = 0; j < n_tokens; j++) {
-                SV **elem = av_fetch(av, j, 0);
-                tokens[j] = elem ? SvIV(*elem) : 0;
+            } else if (strEQ(key, "pool") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV) {
+                HV *pool_hv = (HV*)SvRV(val);
+                SV **svp = hv_fetch(pool_hv, "_pool_id", 8, 0);
+                if (svp && *svp) opts.pool = get_mempool_by_id(SvIV(*svp));
+            } else if (strEQ(key, "rope")) {
+                opts.rope_sv = val;
+            } else if (strEQ(key, "sequences") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                if (!parse_sequences_av(aTHX_ (AV*)SvRV(val), &opts.all_tokens, &opts.seq_lengths, &opts.n_sequences)) {
+                    croak("Invalid sequences format");
+                }
             }
         }
     }
     
-    /* Fallback: if no tokens array, try positional integers */
-    if (!tokens && items > 1) {
-        int first_is_int = 1;
-        for (i = 1; i < items && first_is_int; i++) {
-            SV *arg = ST(i);
-            if (SvROK(arg) || (SvPOK(arg) && !looks_like_number(arg))) {
-                first_is_int = 0;
-            }
-        }
-        if (first_is_int) {
-            n_tokens = items - 1;
-            Newx(tokens, n_tokens, int);
-            for (i = 0; i < n_tokens; i++) {
-                tokens[i] = SvIV(ST(i + 1));
-            }
+    if (!opts.tokens && !opts.all_tokens) {
+        croak("forward() requires tokens => \\@tokens");
+    }
+    
+    /* Validate caches vs cache usage */
+    if (opts.all_tokens) {
+        if (opts.cache) croak("Use 'caches' (array) for batch mode, not 'cache'");
+        if (opts.caches && opts.n_caches != opts.n_sequences) {
+            Safefree(opts.caches);
+            free_sequences(opts.all_tokens, opts.seq_lengths, opts.n_sequences);
+            croak("Number of caches (%d) must match number of sequences (%d)", opts.n_caches, opts.n_sequences);
         }
     }
     
-    if (!tokens || n_tokens == 0) {
-        croak("forward() requires tokens (array ref or list of integers)");
+    if (!do_forward_unified(aTHX_ hv, &opts, &result)) {
+        char *err = result.error ? result.error : "Forward pass failed";
+        if (opts.tokens) Safefree(opts.tokens);
+        if (opts.caches) Safefree(opts.caches);
+        free_sequences(opts.all_tokens, opts.seq_lengths, opts.n_sequences);
+        free_forward_result(&result);
+        croak("%s", err);
     }
     
-    /* Extract hyperparameters */
-    extract_hyperparams(aTHX_ hv, model, &hp);
+    if (opts.tokens) Safefree(opts.tokens);
+    if (opts.caches) Safefree(opts.caches);
+    free_sequences(opts.all_tokens, opts.seq_lengths, opts.n_sequences);
     
-    /* Use model's context directly for weights */
-    ctx_w = model->ctx;
-    
-    /* Initialize backend based on backend_name */
-    if (strcmp(hp.backend_name, "auto") == 0) {
-        backend = init_best_backend(hp.n_threads);
+    if (result.is_batch) {
+        AV *results_av = newAV();
+        for (i = 0; i < result.n_sequences; i++) {
+            AV *seq_av = newAV();
+            for (j = 0; j < result.n_vocab; j++) {
+                av_push(seq_av, newSVnv(result.batch_logits[i][j]));
+            }
+            av_push(results_av, newRV_noinc((SV*)seq_av));
+        }
+        free_forward_result(&result);
+        EXTEND(SP, 1);
+        mPUSHs(newRV_noinc((SV*)results_av));
     } else {
-        backend = init_backend_by_name(hp.backend_name, hp.n_threads);
+        EXTEND(SP, result.n_vocab);
+        for (j = 0; j < result.n_vocab; j++) {
+            mPUSHn(result.logits[j]);
+        }
+        free_forward_result(&result);
     }
-    if (!backend) {
-        Safefree(tokens);
-        croak("Failed to initialize backend '%s'", hp.backend_name);
-    }
+
+SV *
+forward_all(self, ...)
+    SV *self
+PREINIT:
+    HV *hv;
+    LughForwardOpts opts;
+    LughForwardResult result;
+    int i, j;
+    AV *outer_av;
+CODE:
+    hv = (HV*)SvRV(self);
+    Zero(&opts, 1, LughForwardOpts);
+    opts.return_all_logits = 1;  /* Always request all position logits */
     
-    /* Create compute context for intermediate tensors */
-    ctx_c = create_compute_context(512 * 1024 * 1024);
-    if (!ctx_c) {
-        ggml_backend_free(backend);
-        Safefree(tokens);
-        croak("Failed to create compute context");
-    }
-    
-    /* Build the forward pass graph */
-    {
-        struct ggml_tensor *tok_embd = ggml_get_tensor(ctx_w, "token_embd.weight");
-        struct ggml_tensor *output_norm = ggml_get_tensor(ctx_w, "output_norm.weight");
-        struct ggml_tensor *output = ggml_get_tensor(ctx_w, "output.weight");
-        struct ggml_tensor *pos;
-        int layer;
-        
-        /* Support tied embeddings: if output.weight is missing, use token_embd.weight */
-        if (!output) {
-            output = tok_embd;
-        }
-        
-        if (!tok_embd) {
-            ggml_free(ctx_c);
-            ggml_backend_free(backend);
-            Safefree(tokens);
-            croak("Required tensors not found in model");
-        }
-        
-        /* Create position tensor for RoPE */
-        pos = ggml_new_tensor_1d(ctx_c, GGML_TYPE_I32, n_tokens);
-        ggml_set_name(pos, "pos");
-        
-        /* Create input embedding: lookup tokens in embedding table */
-        {
-            struct ggml_tensor *inp_tokens = ggml_new_tensor_1d(ctx_c, GGML_TYPE_I32, n_tokens);
-            ggml_set_name(inp_tokens, "inp_tokens");
-            inpL = ggml_get_rows(ctx_c, tok_embd, inp_tokens);
-            ggml_set_name(inpL, "inp_embd");
-        }
-        
-        cur = inpL;
-        
-        /* Process each transformer layer */
-        for (layer = 0; layer < hp.n_layer; layer++) {
-            LughLayerWeights lw;
-            struct ggml_tensor *residual;
-            
-            /* Get layer weights using architecture-aware helper */
-            if (!get_layer_weights_for_arch(ctx_w, layer, &lw, hp.arch_type)) {
-                continue;  /* Skip layers with missing weights */
-            }
-            
-            residual = cur;
-            
-            /* RMS Norm before attention */
-            cur = apply_rms_norm(ctx_c, cur, lw.attn_norm, hp.rms_norm_eps);
-            
-            /* Self-attention with LoRA support */
-            {
-                LughQKVResult qkv;
-                struct ggml_tensor *attn_out;
-                
-                /* Q, K, V projections with LoRA */
-                qkv = build_qkv_with_lora(ctx_c, cur, &lw, &hp, lora);
-                
-                /* Apply RoPE (rotary positional embeddings) */
-                qkv.q = ggml_rope_ext(ctx_c, qkv.q, pos, NULL, hp.n_rot, 0, hp.n_ctx,
-                                  hp.rope_freq_base, hp.rope_freq_scale, 0.0f, 1.0f, 0.0f, 0.0f);
-                qkv.k = ggml_rope_ext(ctx_c, qkv.k, pos, NULL, hp.n_rot, 0, hp.n_ctx,
-                                  hp.rope_freq_base, hp.rope_freq_scale, 0.0f, 1.0f, 0.0f, 0.0f);
-                
-                if (hp.use_flash_attn) {
-                    /* Flash Attention path */
-                    float scale = 1.0f / sqrtf((float)hp.head_dim);
-                    
-                    struct ggml_tensor *q_fa = ggml_cont(ctx_c, ggml_permute(ctx_c, qkv.q, 0, 2, 1, 3));
-                    struct ggml_tensor *k_fa = ggml_cont(ctx_c, ggml_permute(ctx_c, qkv.k, 0, 2, 1, 3));
-                    struct ggml_tensor *v_fa = ggml_cont(ctx_c, ggml_permute(ctx_c, qkv.v, 0, 2, 1, 3));
-                    
-                    attn_out = ggml_flash_attn_ext(ctx_c, q_fa, k_fa, v_fa, NULL, scale, 0.0f, 0.0f);
-                    attn_out = ggml_reshape_3d(ctx_c, attn_out, hp.head_dim, hp.n_head, n_tokens);
-                } else {
-                    /* Standard scaled dot-product attention */
-                    attn_out = build_standard_attention(ctx_c, qkv.q, qkv.k, qkv.v, hp.head_dim, 0);
+    /* Parse named parameters: forward_all(tokens => \@t, lora => $l, ...) */
+    for (i = 1; i < items; i += 2) {
+        if (i + 1 < items && SvPOK(ST(i))) {
+            const char *key = SvPV_nolen(ST(i));
+            SV *val = ST(i + 1);
+            if (strEQ(key, "tokens") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                opts.tokens = parse_tokens_av(aTHX_ (AV*)SvRV(val), &opts.n_tokens);
+            } else if (strEQ(key, "lora")) {
+                opts.lora = get_lugh_lora(aTHX_ val);
+            } else if (strEQ(key, "cache")) {
+                opts.cache = get_lugh_kvcache(aTHX_ val);
+            } else if (strEQ(key, "caches") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                AV *caches_av = (AV*)SvRV(val);
+                int nc = av_len(caches_av) + 1;
+                int ci;
+                Newxz(opts.caches, nc, void*);
+                opts.n_caches = nc;
+                for (ci = 0; ci < nc; ci++) {
+                    SV **csv = av_fetch(caches_av, ci, 0);
+                    if (csv && *csv && SvROK(*csv)) {
+                        opts.caches[ci] = get_lugh_kvcache(aTHX_ *csv);
+                    }
                 }
-                
-                /* Attention output: reshape to 2D and project with LoRA */
-                attn_out = ggml_reshape_2d(ctx_c, attn_out, hp.n_embd, n_tokens);
-                cur = build_attn_output_with_lora(ctx_c, attn_out, &lw, lora);
+            } else if (strEQ(key, "pool") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV) {
+                HV *pool_hv = (HV*)SvRV(val);
+                SV **svp = hv_fetch(pool_hv, "_pool_id", 8, 0);
+                if (svp && *svp) opts.pool = get_mempool_by_id(SvIV(*svp));
+            } else if (strEQ(key, "rope")) {
+                opts.rope_sv = val;
+            } else if (strEQ(key, "sequences") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                if (!parse_sequences_av(aTHX_ (AV*)SvRV(val), &opts.all_tokens, &opts.seq_lengths, &opts.n_sequences)) {
+                    croak("Invalid sequences format");
+                }
             }
-            
-            /* Post-attention normalization (gemma2, etc.) */
-            if (lw.has_post_norm && lw.attn_post_norm) {
-                cur = apply_rms_norm(ctx_c, cur, lw.attn_post_norm, hp.rms_norm_eps);
-            }
-            
-            /* Residual connection after attention */
-            cur = ggml_add(ctx_c, cur, residual);
-            residual = cur;
-            
-            /* FFN with LoRA support */
-            cur = apply_rms_norm(ctx_c, cur, lw.ffn_norm, hp.rms_norm_eps);
-            cur = build_ffn_with_lora(ctx_c, cur, &lw, lora);
-            
-            /* Post-FFN normalization (gemma2, etc.) */
-            if (lw.has_post_norm && lw.ffn_post_norm) {
-                cur = apply_rms_norm(ctx_c, cur, lw.ffn_post_norm, hp.rms_norm_eps);
-            }
-            
-            /* Residual connection after FFN */
-            cur = ggml_add(ctx_c, cur, residual);
         }
-        
-        /* Final norm and output projection */
-        if (output_norm) {
-            cur = apply_rms_norm(ctx_c, cur, output_norm, hp.rms_norm_eps);
-        }
-        
-        /* Project to vocabulary (logits) */
-        cur = ggml_mul_mat(ctx_c, output, cur);
-        ggml_set_name(cur, "logits");
-        
-        /* Build graph */
-        gf = ggml_new_graph(ctx_c);
-        ggml_build_forward_expand(gf, cur);
     }
     
-    /* Allocate compute buffer */
-    allocr = ggml_gallocr_new(ggml_backend_get_default_buffer_type(backend));
-    if (!ggml_gallocr_reserve(allocr, gf)) {
-        ggml_gallocr_free(allocr);
-        ggml_free(ctx_c);
-        ggml_backend_free(backend);
-        Safefree(tokens);
-        croak("Failed to reserve compute allocator");
+    if (!opts.tokens && !opts.all_tokens) {
+        croak("forward_all() requires tokens => \\@tokens");
     }
     
-    if (!ggml_gallocr_alloc_graph(allocr, gf)) {
-        ggml_gallocr_free(allocr);
-        ggml_free(ctx_c);
-        ggml_backend_free(backend);
-        Safefree(tokens);
-        croak("Failed to allocate compute graph");
-    }
-    
-    /* Set input token data */
-    {
-        struct ggml_tensor *inp = ggml_graph_get_tensor(gf, "inp_tokens");
-        struct ggml_tensor *pos_tensor = ggml_graph_get_tensor(gf, "pos");
-        struct ggml_tensor *mask_tensor = ggml_graph_get_tensor(gf, "kq_mask");
-        
-        if (inp) {
-            ggml_backend_tensor_set(inp, tokens, 0, n_tokens * sizeof(int));
+    /* Validate caches vs cache usage */
+    if (opts.all_tokens) {
+        if (opts.cache) croak("Use 'caches' (array) for batch mode, not 'cache'");
+        if (opts.caches && opts.n_caches != opts.n_sequences) {
+            Safefree(opts.caches);
+            free_sequences(opts.all_tokens, opts.seq_lengths, opts.n_sequences);
+            croak("Number of caches (%d) must match number of sequences (%d)", opts.n_caches, opts.n_sequences);
         }
-        
-        /* Set position indices (0, 1, 2, ..., n_tokens-1) */
-        if (pos_tensor) {
-            int *positions;
-            int p;
-            Newx(positions, n_tokens, int);
-            for (p = 0; p < n_tokens; p++) {
-                positions[p] = p;
+    }
+    
+    if (!do_forward_unified(aTHX_ hv, &opts, &result)) {
+        char *err = result.error ? result.error : "Forward pass failed";
+        if (opts.tokens) Safefree(opts.tokens);
+        if (opts.caches) Safefree(opts.caches);
+        free_sequences(opts.all_tokens, opts.seq_lengths, opts.n_sequences);
+        free_forward_result(&result);
+        croak("%s", err);
+    }
+    
+    if (opts.tokens) Safefree(opts.tokens);
+    if (opts.caches) Safefree(opts.caches);
+    free_sequences(opts.all_tokens, opts.seq_lengths, opts.n_sequences);
+    
+    /* Return array of arrays: [ [logits_pos0], [logits_pos1], ... ] */
+    outer_av = newAV();
+    
+    if (result.all_logits && result.n_tokens > 0) {
+        for (i = 0; i < result.n_tokens; i++) {
+            AV *pos_av = newAV();
+            float *pos_logits = result.all_logits + (i * result.n_vocab);
+            for (j = 0; j < result.n_vocab; j++) {
+                av_push(pos_av, newSVnv(pos_logits[j]));
             }
-            ggml_backend_tensor_set(pos_tensor, positions, 0, n_tokens * sizeof(int));
-            Safefree(positions);
+            av_push(outer_av, newRV_noinc((SV*)pos_av));
         }
-        
-        /* Set causal attention mask: 0 for allowed, -inf for masked */
-        if (mask_tensor) {
-            float *mask_data;
-            int row, col;
-            Newx(mask_data, n_tokens * n_tokens, float);
-            for (row = 0; row < n_tokens; row++) {
-                for (col = 0; col < n_tokens; col++) {
-                    /* Causal mask: can only attend to current and previous positions */
-                    if (col <= row) {
-                        mask_data[row * n_tokens + col] = 0.0f;
-                    } else {
-                        mask_data[row * n_tokens + col] = -INFINITY;
+    } else if (result.logits) {
+        /* Fallback: only last position available */
+        AV *pos_av = newAV();
+        for (j = 0; j < result.n_vocab; j++) {
+            av_push(pos_av, newSVnv(result.logits[j]));
+        }
+        av_push(outer_av, newRV_noinc((SV*)pos_av));
+    }
+    
+    free_forward_result(&result);
+    RETVAL = newRV_noinc((SV*)outer_av);
+OUTPUT:
+    RETVAL
+
+void
+forward_simple(self, tokens_ref)
+    SV *self
+    SV *tokens_ref
+PREINIT:
+    HV *hv;
+    LughForwardOpts opts;
+    LughForwardResult result;
+    int j;
+PPCODE:
+    if (!SvROK(tokens_ref) || SvTYPE(SvRV(tokens_ref)) != SVt_PVAV) {
+        croak("forward_simple() requires an array reference");
+    }
+    
+    hv = (HV*)SvRV(self);
+    Zero(&opts, 1, LughForwardOpts);
+    opts.tokens = parse_tokens_av(aTHX_ (AV*)SvRV(tokens_ref), &opts.n_tokens);
+    
+    if (!do_forward_unified(aTHX_ hv, &opts, &result)) {
+        char *err = result.error ? result.error : "Forward pass failed";
+        Safefree(opts.tokens);
+        free_forward_result(&result);
+        croak("%s", err);
+    }
+    
+    Safefree(opts.tokens);
+    
+    EXTEND(SP, result.n_vocab);
+    for (j = 0; j < result.n_vocab; j++) {
+        mPUSHn(result.logits[j]);
+    }
+    free_forward_result(&result);
+
+void
+forward_cache(self, ...)
+    SV *self
+PREINIT:
+    HV *hv;
+    LughForwardOpts opts;
+    LughForwardResult result;
+    int j, i;
+PPCODE:
+    hv = (HV*)SvRV(self);
+    Zero(&opts, 1, LughForwardOpts);
+    
+    /* Detect positional: forward_cache($cache, \@tokens, ...) */
+    if (items >= 3 && sv_isobject(ST(1)) && SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) == SVt_PVAV) {
+        opts.cache = get_lugh_kvcache(aTHX_ ST(1));
+        opts.tokens = parse_tokens_av(aTHX_ (AV*)SvRV(ST(2)), &opts.n_tokens);
+        /* Parse remaining as named params */
+        for (i = 3; i < items; i += 2) {
+            if (i + 1 < items && SvPOK(ST(i))) {
+                const char *key = SvPV_nolen(ST(i));
+                SV *val = ST(i + 1);
+                if (strEQ(key, "lora")) opts.lora = get_lugh_lora(aTHX_ val);
+                else if (strEQ(key, "rope")) opts.rope_sv = val;
+            }
+        }
+    } else {
+        /* Named params: forward_cache(cache => $c, tokens => \@t, ...) */
+        for (i = 1; i < items; i += 2) {
+            if (i + 1 < items && SvPOK(ST(i))) {
+                const char *key = SvPV_nolen(ST(i));
+                SV *val = ST(i + 1);
+                if (strEQ(key, "tokens") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                    opts.tokens = parse_tokens_av(aTHX_ (AV*)SvRV(val), &opts.n_tokens);
+                } else if (strEQ(key, "cache")) {
+                    opts.cache = get_lugh_kvcache(aTHX_ val);
+                } else if (strEQ(key, "lora")) {
+                    opts.lora = get_lugh_lora(aTHX_ val);
+                } else if (strEQ(key, "rope")) {
+                    opts.rope_sv = val;
+                }
+            }
+        }
+    }
+    
+    if (!opts.tokens) croak("forward_cache() requires tokens");
+    if (!opts.cache) croak("forward_cache() requires cache");
+    
+    if (!do_forward_unified(aTHX_ hv, &opts, &result)) {
+        char *err = result.error ? result.error : "Forward pass failed";
+        Safefree(opts.tokens);
+        free_forward_result(&result);
+        croak("%s", err);
+    }
+    
+    Safefree(opts.tokens);
+    
+    EXTEND(SP, result.n_vocab);
+    for (j = 0; j < result.n_vocab; j++) {
+        mPUSHn(result.logits[j]);
+    }
+    free_forward_result(&result);
+
+void
+forward_pool(self, ...)
+    SV *self
+PREINIT:
+    HV *hv;
+    LughForwardOpts opts;
+    LughForwardResult result;
+    int j, i;
+    SV **svp;
+PPCODE:
+    hv = (HV*)SvRV(self);
+    Zero(&opts, 1, LughForwardOpts);
+    
+    /* Detect positional: forward_pool($pool, \@tokens, ...) */
+    if (items >= 3 && sv_isobject(ST(1)) && SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) == SVt_PVAV) {
+        SV *pool_sv = ST(1);
+        if (SvROK(pool_sv) && SvTYPE(SvRV(pool_sv)) == SVt_PVHV) {
+            HV *pool_hv = (HV*)SvRV(pool_sv);
+            svp = hv_fetch(pool_hv, "_pool_id", 8, 0);
+            if (svp && *svp) opts.pool = get_mempool_by_id(SvIV(*svp));
+        }
+        opts.tokens = parse_tokens_av(aTHX_ (AV*)SvRV(ST(2)), &opts.n_tokens);
+        /* Parse remaining as named params */
+        for (i = 3; i < items; i += 2) {
+            if (i + 1 < items && SvPOK(ST(i))) {
+                const char *key = SvPV_nolen(ST(i));
+                SV *val = ST(i + 1);
+                if (strEQ(key, "lora")) opts.lora = get_lugh_lora(aTHX_ val);
+                else if (strEQ(key, "rope")) opts.rope_sv = val;
+            }
+        }
+    } else {
+        /* Named params */
+        for (i = 1; i < items; i += 2) {
+            if (i + 1 < items && SvPOK(ST(i))) {
+                const char *key = SvPV_nolen(ST(i));
+                SV *val = ST(i + 1);
+                if (strEQ(key, "tokens") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                    opts.tokens = parse_tokens_av(aTHX_ (AV*)SvRV(val), &opts.n_tokens);
+                } else if (strEQ(key, "pool") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV) {
+                    HV *pool_hv = (HV*)SvRV(val);
+                    svp = hv_fetch(pool_hv, "_pool_id", 8, 0);
+                    if (svp && *svp) opts.pool = get_mempool_by_id(SvIV(*svp));
+                } else if (strEQ(key, "lora")) {
+                    opts.lora = get_lugh_lora(aTHX_ val);
+                } else if (strEQ(key, "rope")) {
+                    opts.rope_sv = val;
+                }
+            }
+        }
+    }
+    
+    if (!opts.tokens) croak("forward_pool() requires tokens");
+    if (!opts.pool) croak("forward_pool() requires pool");
+    
+    if (!do_forward_unified(aTHX_ hv, &opts, &result)) {
+        char *err = result.error ? result.error : "Forward pass failed";
+        Safefree(opts.tokens);
+        free_forward_result(&result);
+        croak("%s", err);
+    }
+    
+    Safefree(opts.tokens);
+    
+    EXTEND(SP, result.n_vocab);
+    for (j = 0; j < result.n_vocab; j++) {
+        mPUSHn(result.logits[j]);
+    }
+    free_forward_result(&result);
+
+void
+forward_batch(self, ...)
+    SV *self
+PREINIT:
+    HV *hv;
+    LughForwardOpts opts;
+    LughForwardResult result;
+    int i, j;
+PPCODE:
+    hv = (HV*)SvRV(self);
+    Zero(&opts, 1, LughForwardOpts);
+    
+    /* Detect positional: forward_batch(\@sequences, ...) */
+    if (items >= 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVAV) {
+        if (!parse_sequences_av(aTHX_ (AV*)SvRV(ST(1)), &opts.all_tokens, &opts.seq_lengths, &opts.n_sequences)) {
+            croak("Invalid sequences format");
+        }
+        /* Parse remaining as named params */
+        for (i = 2; i < items; i += 2) {
+            if (i + 1 < items && SvPOK(ST(i))) {
+                const char *key = SvPV_nolen(ST(i));
+                SV *val = ST(i + 1);
+                if (strEQ(key, "lora")) opts.lora = get_lugh_lora(aTHX_ val);
+                else if (strEQ(key, "rope")) opts.rope_sv = val;
+                else if (strEQ(key, "caches") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                    AV *caches_av = (AV*)SvRV(val);
+                    int nc = av_len(caches_av) + 1;
+                    int ci;
+                    Newxz(opts.caches, nc, void*);
+                    opts.n_caches = nc;
+                    for (ci = 0; ci < nc; ci++) {
+                        SV **csv = av_fetch(caches_av, ci, 0);
+                        if (csv && *csv && SvROK(*csv)) {
+                            opts.caches[ci] = get_lugh_kvcache(aTHX_ *csv);
+                        }
                     }
                 }
             }
-            ggml_backend_tensor_set(mask_tensor, mask_data, 0, n_tokens * n_tokens * sizeof(float));
-            Safefree(mask_data);
         }
-    }
-    
-    /* Run the forward pass */
-    if (ggml_backend_graph_compute(backend, gf) != GGML_STATUS_SUCCESS) {
-        ggml_gallocr_free(allocr);
-        ggml_free(ctx_c);
-        ggml_backend_free(backend);
-        Safefree(tokens);
-        croak("Failed to compute graph");
-    }
-    
-    /* Extract logits from the last token */
-    {
-        struct ggml_tensor *logits_tensor = ggml_graph_get_tensor(gf, "logits");
-        if (logits_tensor) {
-            float *logits_data;
-            int j;
-            size_t logits_size = hp.n_vocab * sizeof(float);
-            
-            Newx(logits_data, hp.n_vocab, float);
-            
-            /* Get logits for last token */
-            ggml_backend_tensor_get(logits_tensor, logits_data, 
-                                    (n_tokens - 1) * hp.n_vocab * sizeof(float), logits_size);
-            
-            /* Return logits as array */
-            EXTEND(SP, hp.n_vocab);
-            for (j = 0; j < hp.n_vocab; j++) {
-                mPUSHn(logits_data[j]);
+    } else {
+        /* Named params */
+        for (i = 1; i < items; i += 2) {
+            if (i + 1 < items && SvPOK(ST(i))) {
+                const char *key = SvPV_nolen(ST(i));
+                SV *val = ST(i + 1);
+                if (strEQ(key, "sequences") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                    if (!parse_sequences_av(aTHX_ (AV*)SvRV(val), &opts.all_tokens, &opts.seq_lengths, &opts.n_sequences)) {
+                        croak("Invalid sequences format");
+                    }
+                } else if (strEQ(key, "caches") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                    AV *caches_av = (AV*)SvRV(val);
+                    int nc = av_len(caches_av) + 1;
+                    int ci;
+                    Newxz(opts.caches, nc, void*);
+                    opts.n_caches = nc;
+                    for (ci = 0; ci < nc; ci++) {
+                        SV **csv = av_fetch(caches_av, ci, 0);
+                        if (csv && *csv && SvROK(*csv)) {
+                            opts.caches[ci] = get_lugh_kvcache(aTHX_ *csv);
+                        }
+                    }
+                } else if (strEQ(key, "cache")) {
+                    /* Single cache - error for batch mode */
+                    opts.cache = get_lugh_kvcache(aTHX_ val);
+                } else if (strEQ(key, "lora")) {
+                    opts.lora = get_lugh_lora(aTHX_ val);
+                } else if (strEQ(key, "rope")) {
+                    opts.rope_sv = val;
+                }
             }
-            
-            Safefree(logits_data);
         }
     }
     
-    /* Cleanup - note: ctx_w is model->ctx, don't free it */
-    ggml_gallocr_free(allocr);
-    ggml_free(ctx_c);
-    ggml_backend_free(backend);
-    Safefree(tokens);
+    if (!opts.all_tokens) croak("forward_batch() requires sequences");
+    if (opts.cache) croak("Use 'caches' (array) for batch mode, not 'cache'");
+    if (opts.caches && opts.n_caches != opts.n_sequences) {
+        Safefree(opts.caches);
+        free_sequences(opts.all_tokens, opts.seq_lengths, opts.n_sequences);
+        croak("Number of caches (%d) must match number of sequences (%d)", opts.n_caches, opts.n_sequences);
+    }
+    
+    if (!do_forward_unified(aTHX_ hv, &opts, &result)) {
+        char *err = result.error ? result.error : "Forward pass failed";
+        if (opts.caches) Safefree(opts.caches);
+        free_sequences(opts.all_tokens, opts.seq_lengths, opts.n_sequences);
+        free_forward_result(&result);
+        croak("%s", err);
+    }
+    
+    if (opts.caches) Safefree(opts.caches);
+    free_sequences(opts.all_tokens, opts.seq_lengths, opts.n_sequences);
+    
+    /* Return array ref of results */
+    {
+        AV *results_av = newAV();
+        for (i = 0; i < result.n_sequences; i++) {
+            AV *seq_av = newAV();
+            for (j = 0; j < result.n_vocab; j++) {
+                av_push(seq_av, newSVnv(result.batch_logits[i][j]));
+            }
+            av_push(results_av, newRV_noinc((SV*)seq_av));
+        }
+        free_forward_result(&result);
+        EXTEND(SP, 1);
+        mPUSHs(newRV_noinc((SV*)results_av));
+    }
+
+void
+forward_cache_pool(self, ...)
+    SV *self
+PREINIT:
+    HV *hv;
+    LughForwardOpts opts;
+    LughForwardResult result;
+    int j, i;
+    SV **svp;
+PPCODE:
+    hv = (HV*)SvRV(self);
+    Zero(&opts, 1, LughForwardOpts);
+    
+    /* Detect positional: forward_cache_pool($cache, $pool, \@tokens, ...) */
+    if (items >= 4 && sv_isobject(ST(1)) && sv_isobject(ST(2)) && 
+        SvROK(ST(3)) && SvTYPE(SvRV(ST(3))) == SVt_PVAV) {
+        opts.cache = get_lugh_kvcache(aTHX_ ST(1));
+        SV *pool_sv = ST(2);
+        if (SvROK(pool_sv) && SvTYPE(SvRV(pool_sv)) == SVt_PVHV) {
+            HV *pool_hv = (HV*)SvRV(pool_sv);
+            svp = hv_fetch(pool_hv, "_pool_id", 8, 0);
+            if (svp && *svp) opts.pool = get_mempool_by_id(SvIV(*svp));
+        }
+        opts.tokens = parse_tokens_av(aTHX_ (AV*)SvRV(ST(3)), &opts.n_tokens);
+        /* Parse remaining as named params */
+        for (i = 4; i < items; i += 2) {
+            if (i + 1 < items && SvPOK(ST(i))) {
+                const char *key = SvPV_nolen(ST(i));
+                SV *val = ST(i + 1);
+                if (strEQ(key, "lora")) opts.lora = get_lugh_lora(aTHX_ val);
+                else if (strEQ(key, "rope")) opts.rope_sv = val;
+            }
+        }
+    } else {
+        /* Named params */
+        for (i = 1; i < items; i += 2) {
+            if (i + 1 < items && SvPOK(ST(i))) {
+                const char *key = SvPV_nolen(ST(i));
+                SV *val = ST(i + 1);
+                if (strEQ(key, "tokens") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                    opts.tokens = parse_tokens_av(aTHX_ (AV*)SvRV(val), &opts.n_tokens);
+                } else if (strEQ(key, "cache")) {
+                    opts.cache = get_lugh_kvcache(aTHX_ val);
+                } else if (strEQ(key, "pool") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV) {
+                    HV *pool_hv = (HV*)SvRV(val);
+                    svp = hv_fetch(pool_hv, "_pool_id", 8, 0);
+                    if (svp && *svp) opts.pool = get_mempool_by_id(SvIV(*svp));
+                } else if (strEQ(key, "lora")) {
+                    opts.lora = get_lugh_lora(aTHX_ val);
+                } else if (strEQ(key, "rope")) {
+                    opts.rope_sv = val;
+                }
+            }
+        }
+    }
+    
+    if (!opts.tokens) croak("forward_cache_pool() requires tokens");
+    if (!opts.cache) croak("forward_cache_pool() requires cache");
+    if (!opts.pool) croak("forward_cache_pool() requires pool");
+    
+    if (!do_forward_unified(aTHX_ hv, &opts, &result)) {
+        char *err = result.error ? result.error : "Forward pass failed";
+        Safefree(opts.tokens);
+        free_forward_result(&result);
+        croak("%s", err);
+    }
+    
+    Safefree(opts.tokens);
+    
+    EXTEND(SP, result.n_vocab);
+    for (j = 0; j < result.n_vocab; j++) {
+        mPUSHn(result.logits[j]);
+    }
+    free_forward_result(&result);
+
+void
+forward_batch_pool(self, ...)
+    SV *self
+PREINIT:
+    HV *hv;
+    LughForwardOpts opts;
+    LughForwardResult result;
+    int i, j;
+    SV **svp;
+PPCODE:
+    hv = (HV*)SvRV(self);
+    Zero(&opts, 1, LughForwardOpts);
+    
+    /* Detect positional: forward_batch_pool($pool, \@sequences, ...) */
+    if (items >= 3 && sv_isobject(ST(1)) && SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) == SVt_PVAV) {
+        SV *pool_sv = ST(1);
+        if (SvROK(pool_sv) && SvTYPE(SvRV(pool_sv)) == SVt_PVHV) {
+            HV *pool_hv = (HV*)SvRV(pool_sv);
+            svp = hv_fetch(pool_hv, "_pool_id", 8, 0);
+            if (svp && *svp) opts.pool = get_mempool_by_id(SvIV(*svp));
+        }
+        if (!parse_sequences_av(aTHX_ (AV*)SvRV(ST(2)), &opts.all_tokens, &opts.seq_lengths, &opts.n_sequences)) {
+            croak("Invalid sequences format");
+        }
+        /* Parse remaining as named params */
+        for (i = 3; i < items; i += 2) {
+            if (i + 1 < items && SvPOK(ST(i))) {
+                const char *key = SvPV_nolen(ST(i));
+                SV *val = ST(i + 1);
+                if (strEQ(key, "lora")) opts.lora = get_lugh_lora(aTHX_ val);
+                else if (strEQ(key, "rope")) opts.rope_sv = val;
+                else if (strEQ(key, "caches") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                    AV *caches_av = (AV*)SvRV(val);
+                    int nc = av_len(caches_av) + 1;
+                    int ci;
+                    Newxz(opts.caches, nc, void*);
+                    opts.n_caches = nc;
+                    for (ci = 0; ci < nc; ci++) {
+                        SV **csv = av_fetch(caches_av, ci, 0);
+                        if (csv && *csv && SvROK(*csv)) {
+                            opts.caches[ci] = get_lugh_kvcache(aTHX_ *csv);
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        /* Named params */
+        for (i = 1; i < items; i += 2) {
+            if (i + 1 < items && SvPOK(ST(i))) {
+                const char *key = SvPV_nolen(ST(i));
+                SV *val = ST(i + 1);
+                if (strEQ(key, "sequences") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                    if (!parse_sequences_av(aTHX_ (AV*)SvRV(val), &opts.all_tokens, &opts.seq_lengths, &opts.n_sequences)) {
+                        croak("Invalid sequences format");
+                    }
+                } else if (strEQ(key, "pool") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV) {
+                    HV *pool_hv = (HV*)SvRV(val);
+                    svp = hv_fetch(pool_hv, "_pool_id", 8, 0);
+                    if (svp && *svp) opts.pool = get_mempool_by_id(SvIV(*svp));
+                } else if (strEQ(key, "caches") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                    AV *caches_av = (AV*)SvRV(val);
+                    int nc = av_len(caches_av) + 1;
+                    int ci;
+                    Newxz(opts.caches, nc, void*);
+                    opts.n_caches = nc;
+                    for (ci = 0; ci < nc; ci++) {
+                        SV **csv = av_fetch(caches_av, ci, 0);
+                        if (csv && *csv && SvROK(*csv)) {
+                            opts.caches[ci] = get_lugh_kvcache(aTHX_ *csv);
+                        }
+                    }
+                } else if (strEQ(key, "lora")) {
+                    opts.lora = get_lugh_lora(aTHX_ val);
+                } else if (strEQ(key, "rope")) {
+                    opts.rope_sv = val;
+                }
+            }
+        }
+    }
+    
+    if (!opts.all_tokens) croak("forward_batch_pool() requires sequences");
+    if (!opts.pool) croak("forward_batch_pool() requires pool");
+    if (opts.caches && opts.n_caches != opts.n_sequences) {
+        Safefree(opts.caches);
+        free_sequences(opts.all_tokens, opts.seq_lengths, opts.n_sequences);
+        croak("Number of caches (%d) must match number of sequences (%d)", opts.n_caches, opts.n_sequences);
+    }
+    
+    if (!do_forward_unified(aTHX_ hv, &opts, &result)) {
+        char *err = result.error ? result.error : "Forward pass failed";
+        if (opts.caches) Safefree(opts.caches);
+        free_sequences(opts.all_tokens, opts.seq_lengths, opts.n_sequences);
+        free_forward_result(&result);
+        croak("%s", err);
+    }
+    
+    if (opts.caches) Safefree(opts.caches);
+    free_sequences(opts.all_tokens, opts.seq_lengths, opts.n_sequences);
+    
+    /* Return array ref of results */
+    {
+        AV *results_av = newAV();
+        for (i = 0; i < result.n_sequences; i++) {
+            AV *seq_av = newAV();
+            for (j = 0; j < result.n_vocab; j++) {
+                av_push(seq_av, newSVnv(result.batch_logits[i][j]));
+            }
+            av_push(results_av, newRV_noinc((SV*)seq_av));
+        }
+        free_forward_result(&result);
+        EXTEND(SP, 1);
+        mPUSHs(newRV_noinc((SV*)results_av));
+    }
 
 int
 sample_top_p(self, logits_ref, ...)
@@ -2673,42 +4642,49 @@ CODE:
         logits[i] /= sum;
     }
     
-    /* Sort by probability (simple bubble sort for now - ok for top_p sampling) */
+    /* Sort indices by probability (descending) using selection sort for top elements only */
+    /* We only need to find enough elements to reach top_p cumulative probability */
     {
-        int j, swapped;
-        for (i = 0; i < n_vocab - 1; i++) {
-            swapped = 0;
-            for (j = 0; j < n_vocab - i - 1; j++) {
-                if (logits[j] < logits[j + 1]) {
-                    float tmp = logits[j];
-                    int tmp_idx = indices[j];
-                    logits[j] = logits[j + 1];
-                    indices[j] = indices[j + 1];
-                    logits[j + 1] = tmp;
-                    indices[j + 1] = tmp_idx;
-                    swapped = 1;
+        int cutoff = 0;
+        float top_sum = 0.0f;
+        
+        /* Selection sort: find largest elements one by one until we have top_p mass */
+        for (i = 0; i < n_vocab && top_sum < top_p; i++) {
+            int max_idx = i;
+            float max_prob = logits[indices[i]];
+            int j;
+            
+            /* Find the maximum in remaining unsorted portion */
+            for (j = i + 1; j < n_vocab; j++) {
+                if (logits[indices[j]] > max_prob) {
+                    max_prob = logits[indices[j]];
+                    max_idx = j;
                 }
             }
-            if (!swapped) break;
-            /* Early exit when we have enough probability mass */
-            cumsum = 0;
-            for (j = 0; j <= i; j++) cumsum += logits[j];
-            if (cumsum >= top_p) break;
+            
+            /* Swap to position i */
+            if (max_idx != i) {
+                int tmp = indices[i];
+                indices[i] = indices[max_idx];
+                indices[max_idx] = tmp;
+            }
+            
+            top_sum += logits[indices[i]];
+            cutoff = i + 1;
         }
-    }
-    
-    /* Sample from top_p tokens */
-    threshold = (float)rand() / (float)RAND_MAX * top_p;
-    cumsum = 0.0f;
-    RETVAL = indices[0];  /* Default to most likely */
-    
-    for (i = 0; i < n_vocab; i++) {
-        cumsum += logits[i];
-        if (cumsum >= threshold) {
-            RETVAL = indices[i];
-            break;
+        
+        /* Renormalize the top_p subset and sample */
+        threshold = (float)rand() / (float)RAND_MAX * top_sum;
+        cumsum = 0.0f;
+        RETVAL = indices[0];  /* Default to most likely */
+        
+        for (i = 0; i < cutoff; i++) {
+            cumsum += logits[indices[i]];
+            if (cumsum >= threshold) {
+                RETVAL = indices[i];
+                break;
+            }
         }
-        if (cumsum >= top_p) break;
     }
     
     Safefree(logits);
@@ -2935,7 +4911,7 @@ PPCODE:
                 XPUSHs(input_ref);
                 PUTBACK;
                 
-                count = call_method("forward", G_ARRAY);
+                count = call_method("forward_simple", G_ARRAY);
                 
                 SPAGAIN;
                 
@@ -3203,486 +5179,6 @@ CODE:
 OUTPUT:
     RETVAL
 
-void
-forward_with_cache(self, ...)
-    SV *self
-PREINIT:
-    HV *hv;
-    SV **svp;
-    LughModel *model;
-    LughLoRAAdapter *lora = NULL;
-    LughKVCache *cache = NULL;
-    LughHyperparams hp;
-    int i, n_tokens = 0;
-    int *tokens = NULL;
-    int pos_offset;  /* Starting position for new tokens */
-    struct ggml_context *ctx_w = NULL;
-    struct ggml_context *ctx_c = NULL;
-    struct ggml_cgraph *gf = NULL;
-    struct ggml_tensor *cur = NULL;
-    struct ggml_tensor *inpL = NULL;
-    ggml_backend_t backend = NULL;
-    ggml_gallocr_t allocr = NULL;
-    int n_kv;  /* Total KV length = n_cached + n_tokens */
-    /* Arrays to track tensors for cache operations */
-    struct ggml_tensor **k_cache_tensors = NULL;
-    struct ggml_tensor **v_cache_tensors = NULL;
-    struct ggml_tensor **k_new_tensors = NULL;
-    struct ggml_tensor **v_new_tensors = NULL;
-PPCODE:
-    /* Get model */
-    hv = (HV*)SvRV(self);
-    svp = hv_fetch(hv, "_model", 6, 0);
-    if (!svp || !*svp) croak("No model in inference object");
-    model = get_lugh_model(aTHX_ *svp);
-    if (!model) croak("Invalid model");
-    
-    /* Parse arguments - support both positional and named */
-    /* Named: forward_with_cache(cache => $cache, tokens => \@tokens, lora => $lora) */
-    /* Positional: forward_with_cache($cache, \@tokens) */
-    for (i = 1; i < items; i++) {
-        SV *arg = ST(i);
-        if (SvPOK(arg) && !SvROK(arg)) {
-            const char *key = SvPV_nolen(arg);
-            if (strEQ(key, "cache") && i + 1 < items) {
-                i++;
-                cache = get_lugh_kvcache(aTHX_ ST(i));
-            } else if (strEQ(key, "tokens") && i + 1 < items) {
-                i++;
-                arg = ST(i);
-                if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
-                    AV *av = (AV*)SvRV(arg);
-                    int j;
-                    n_tokens = av_len(av) + 1;
-                    Newx(tokens, n_tokens, int);
-                    for (j = 0; j < n_tokens; j++) {
-                        SV **elem = av_fetch(av, j, 0);
-                        tokens[j] = elem ? SvIV(*elem) : 0;
-                    }
-                }
-            } else if (strEQ(key, "lora") && i + 1 < items) {
-                i++;
-                lora = get_lugh_lora(aTHX_ ST(i));
-            }
-        } else if (!cache && sv_isobject(arg)) {
-            /* First positional object - try as cache */
-            cache = get_lugh_kvcache(aTHX_ arg);
-        } else if (cache && !tokens && SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
-            /* Second positional - tokens array ref */
-            AV *av = (AV*)SvRV(arg);
-            int j;
-            n_tokens = av_len(av) + 1;
-            Newx(tokens, n_tokens, int);
-            for (j = 0; j < n_tokens; j++) {
-                SV **elem = av_fetch(av, j, 0);
-                tokens[j] = elem ? SvIV(*elem) : 0;
-            }
-        }
-    }
-    
-    if (!cache) croak("forward_with_cache() requires a cache parameter");
-    if (!tokens || n_tokens == 0) croak("forward_with_cache() requires at least one token");
-    
-    /* Lock cache and get position offset */
-    KVCACHE_LOCK(cache);
-    pos_offset = cache->n_cached;
-    n_kv = pos_offset + n_tokens;  /* Total sequence length */
-    
-    /* Check context overflow */
-    if (n_kv > cache->n_ctx) {
-        KVCACHE_UNLOCK(cache);
-        Safefree(tokens);
-        croak("KV cache overflow: %d tokens exceed context size %d", n_kv, cache->n_ctx);
-    }
-    
-    /* Get hyperparameters using helper */
-    extract_hyperparams(aTHX_ hv, model, &hp);
-    
-    ctx_w = model->ctx;
-    
-    /* Initialize backend based on backend_name */
-    if (strcmp(hp.backend_name, "auto") == 0) {
-        backend = init_best_backend(hp.n_threads);
-    } else {
-        backend = init_backend_by_name(hp.backend_name, hp.n_threads);
-    }
-    if (!backend) {
-        KVCACHE_UNLOCK(cache);
-        Safefree(tokens);
-        croak("Failed to initialize backend '%s'", hp.backend_name);
-    }
-    
-    /* Create compute context using helper */
-    ctx_c = create_compute_context(512 * 1024 * 1024);
-    if (!ctx_c) {
-        ggml_backend_free(backend);
-        KVCACHE_UNLOCK(cache);
-        Safefree(tokens);
-        croak("Failed to create compute context");
-    }
-    
-    /* Allocate arrays to track cache tensors */
-    Newxz(k_cache_tensors, hp.n_layer, struct ggml_tensor *);
-    Newxz(v_cache_tensors, hp.n_layer, struct ggml_tensor *);
-    Newxz(k_new_tensors, hp.n_layer, struct ggml_tensor *);
-    Newxz(v_new_tensors, hp.n_layer, struct ggml_tensor *);
-    
-    /* Build forward pass graph with KV cache */
-    {
-        struct ggml_tensor *tok_embd = ggml_get_tensor(ctx_w, "token_embd.weight");
-        struct ggml_tensor *output_norm = ggml_get_tensor(ctx_w, "output_norm.weight");
-        struct ggml_tensor *output = ggml_get_tensor(ctx_w, "output.weight");
-        struct ggml_tensor *pos;
-        int layer;
-        int n_kv_dim = hp.n_head_kv * hp.head_dim;
-        
-        if (!output) output = tok_embd;
-        
-        if (!tok_embd) {
-            ggml_free(ctx_c);
-            ggml_backend_free(backend);
-            KVCACHE_UNLOCK(cache);
-            Safefree(tokens);
-            croak("Required tensors not found in model");
-        }
-        
-        /* Position tensor - positions start at pos_offset */
-        pos = ggml_new_tensor_1d(ctx_c, GGML_TYPE_I32, n_tokens);
-        ggml_set_name(pos, "pos");
-        
-        /* Create input embedding */
-        {
-            struct ggml_tensor *inp_tokens = ggml_new_tensor_1d(ctx_c, GGML_TYPE_I32, n_tokens);
-            ggml_set_name(inp_tokens, "inp_tokens");
-            inpL = ggml_get_rows(ctx_c, tok_embd, inp_tokens);
-            ggml_set_name(inpL, "inp_embd");
-        }
-        
-        cur = inpL;
-        
-        /* Process each transformer layer with KV cache */
-        for (layer = 0; layer < hp.n_layer; layer++) {
-            LughLayerWeights lw;
-            struct ggml_tensor *residual;
-            
-            /* Get layer weights using architecture-aware helper */
-            if (!get_layer_weights_for_arch(ctx_w, layer, &lw, hp.arch_type)) {
-                continue;
-            }
-            
-            residual = cur;
-            
-            /* RMS Norm before attention using helper */
-            cur = apply_rms_norm(ctx_c, cur, lw.attn_norm, hp.rms_norm_eps);
-            
-            /* Self-attention with KV cache */
-            {
-                struct ggml_tensor *q, *k_new, *v_new;
-                struct ggml_tensor *k_full, *v_full;
-                struct ggml_tensor *attn_out;
-                char q_name[64], k_name[64], v_name[64];
-                
-                /* Build LoRA weight names for this layer */
-                snprintf(q_name, sizeof(q_name), "blk.%d.attn_q.weight", layer);
-                snprintf(k_name, sizeof(k_name), "blk.%d.attn_k.weight", layer);
-                snprintf(v_name, sizeof(v_name), "blk.%d.attn_v.weight", layer);
-                
-                /* Compute Q, K, V for new tokens - handle combined or separate */
-                if (lw.has_combined_qkv) {
-                    /* Split combined QKV tensor - LoRA not supported for combined QKV yet */
-                    struct ggml_tensor *qkv = ggml_mul_mat(ctx_c, lw.wqkv, cur);
-                    int qkv_dim = hp.n_embd + 2 * (hp.n_head_kv * hp.head_dim);
-                    q = ggml_view_2d(ctx_c, qkv, hp.n_embd, n_tokens, 
-                                     qkv_dim * sizeof(float), 0);
-                    k_new = ggml_view_2d(ctx_c, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
-                                     qkv_dim * sizeof(float), hp.n_embd * sizeof(float));
-                    v_new = ggml_view_2d(ctx_c, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
-                                     qkv_dim * sizeof(float), (hp.n_embd + hp.n_head_kv * hp.head_dim) * sizeof(float));
-                    /* Need to reshape for attention */
-                    q = ggml_reshape_3d(ctx_c, q, hp.head_dim, hp.n_head, n_tokens);
-                    k_new = ggml_reshape_3d(ctx_c, k_new, hp.head_dim, hp.n_head_kv, n_tokens);
-                    v_new = ggml_reshape_3d(ctx_c, v_new, hp.head_dim, hp.n_head_kv, n_tokens);
-                } else {
-                    /* Use LoRA-aware matrix multiplication */
-                    q = lora_mul_mat(ctx_c, lw.wq, cur, lora, q_name);
-                    k_new = lora_mul_mat(ctx_c, lw.wk, cur, lora, k_name);
-                    v_new = lora_mul_mat(ctx_c, lw.wv, cur, lora, v_name);
-                    
-                    /* Reshape for attention */
-                    q = ggml_reshape_3d(ctx_c, q, hp.head_dim, hp.n_head, n_tokens);
-                    k_new = ggml_reshape_3d(ctx_c, k_new, hp.head_dim, hp.n_head_kv, n_tokens);
-                    v_new = ggml_reshape_3d(ctx_c, v_new, hp.head_dim, hp.n_head_kv, n_tokens);
-                }
-                
-                /* Apply RoPE with position offset */
-                q = ggml_rope_ext(ctx_c, q, pos, NULL, hp.n_rot, 0, hp.n_ctx,
-                                  hp.rope_freq_base, hp.rope_freq_scale, 0.0f, 1.0f, 0.0f, 0.0f);
-                k_new = ggml_rope_ext(ctx_c, k_new, pos, NULL, hp.n_rot, 0, hp.n_ctx,
-                                      hp.rope_freq_base, hp.rope_freq_scale, 0.0f, 1.0f, 0.0f, 0.0f);
-                
-                /* Create tensors for cached K/V */
-                if (pos_offset > 0) {
-                    /* We have cached K/V - need to concatenate */
-                    char k_cache_name[64], v_cache_name[64];
-                    struct ggml_tensor *k_cached, *v_cached;
-                    
-                    snprintf(k_cache_name, sizeof(k_cache_name), "k_cache_%d", layer);
-                    snprintf(v_cache_name, sizeof(v_cache_name), "v_cache_%d", layer);
-                    
-                    /* Create tensors for cached data */
-                    k_cached = ggml_new_tensor_3d(ctx_c, GGML_TYPE_F32, hp.head_dim, hp.n_head_kv, pos_offset);
-                    ggml_set_name(k_cached, k_cache_name);
-                    v_cached = ggml_new_tensor_3d(ctx_c, GGML_TYPE_F32, hp.head_dim, hp.n_head_kv, pos_offset);
-                    ggml_set_name(v_cached, v_cache_name);
-                    
-                    /* Store tensor pointers for later data setting */
-                    k_cache_tensors[layer] = k_cached;
-                    v_cache_tensors[layer] = v_cached;
-                    
-                    /* Concatenate cached + new along sequence dimension (dim 2) */
-                    k_full = ggml_concat(ctx_c, k_cached, k_new, 2);
-                    v_full = ggml_concat(ctx_c, v_cached, v_new, 2);
-                } else {
-                    /* No cache - just use new K/V */
-                    k_full = k_new;
-                    v_full = v_new;
-                }
-                
-                /* Store new K/V tensor pointers for later extraction */
-                /* Use ggml_cpy to create output tensors that won't be aliased */
-                {
-                    char k_new_name[64], v_new_name[64];
-                    struct ggml_tensor *k_out, *v_out;
-                    
-                    snprintf(k_new_name, sizeof(k_new_name), "k_new_%d", layer);
-                    snprintf(v_new_name, sizeof(v_new_name), "v_new_%d", layer);
-                    
-                    /* Create destination tensors for output */
-                    k_out = ggml_new_tensor_3d(ctx_c, GGML_TYPE_F32, k_new->ne[0], k_new->ne[1], k_new->ne[2]);
-                    v_out = ggml_new_tensor_3d(ctx_c, GGML_TYPE_F32, v_new->ne[0], v_new->ne[1], v_new->ne[2]);
-                    
-                    ggml_set_name(k_out, k_new_name);
-                    ggml_set_name(v_out, v_new_name);
-                    
-                    /* Copy k_new/v_new to output tensors */
-                    k_out = ggml_cpy(ctx_c, k_new, k_out);
-                    v_out = ggml_cpy(ctx_c, v_new, v_out);
-                    
-                    k_new_tensors[layer] = k_out;
-                    v_new_tensors[layer] = v_out;
-                }
-                
-                /* Standard attention (no flash attention for simplicity) */
-                {
-                    float scale = 1.0f / sqrtf((float)hp.head_dim);
-                    struct ggml_tensor *kq;
-                    struct ggml_tensor *v_t;
-                    
-                    /* Permute: [head_dim, n_head, seq] -> [head_dim, seq, n_head] */
-                    q = ggml_permute(ctx_c, q, 0, 2, 1, 3);
-                    k_full = ggml_permute(ctx_c, k_full, 0, 2, 1, 3);
-                    v_full = ggml_permute(ctx_c, v_full, 0, 2, 1, 3);
-                    
-                    /* QK^T: [n_kv, n_tokens, n_head] */
-                    kq = ggml_mul_mat(ctx_c, k_full, q);
-                    kq = ggml_scale(ctx_c, kq, scale);
-                    
-                    /* Causal mask: for each query position, can attend to all positions <= query_pos + pos_offset */
-                    /* Using diag_mask_inf with offset to handle cached positions */
-                    kq = ggml_diag_mask_inf(ctx_c, kq, pos_offset);
-                    kq = ggml_soft_max(ctx_c, kq);
-                    
-                    /* Attention @ V */
-                    v_t = ggml_cont(ctx_c, ggml_transpose(ctx_c, v_full));
-                    attn_out = ggml_mul_mat(ctx_c, v_t, kq);
-                    attn_out = ggml_cont(ctx_c, ggml_permute(ctx_c, attn_out, 0, 2, 1, 3));
-                }
-                
-                /* Reshape and project with LoRA */
-                {
-                    char o_name[64];
-                    snprintf(o_name, sizeof(o_name), "blk.%d.attn_output.weight", layer);
-                    attn_out = ggml_reshape_2d(ctx_c, attn_out, hp.n_embd, n_tokens);
-                    cur = lora_mul_mat(ctx_c, lw.wo, attn_out, lora, o_name);
-                }
-            }
-            
-            /* Post-attention normalization (gemma2, etc.) */
-            if (lw.has_post_norm && lw.attn_post_norm) {
-                cur = apply_rms_norm(ctx_c, cur, lw.attn_post_norm, hp.rms_norm_eps);
-            }
-            
-            /* Residual + FFN using LoRA-aware helpers */
-            cur = ggml_add(ctx_c, cur, residual);
-            residual = cur;
-            
-            cur = apply_rms_norm(ctx_c, cur, lw.ffn_norm, hp.rms_norm_eps);
-            cur = build_ffn_with_lora(ctx_c, cur, &lw, lora);
-            
-            /* Post-FFN normalization (gemma2, etc.) */
-            if (lw.has_post_norm && lw.ffn_post_norm) {
-                cur = apply_rms_norm(ctx_c, cur, lw.ffn_post_norm, hp.rms_norm_eps);
-            }
-            
-            cur = ggml_add(ctx_c, cur, residual);
-        }
-        
-        /* Final norm and output projection */
-        if (output_norm) {
-            cur = apply_rms_norm(ctx_c, cur, output_norm, hp.rms_norm_eps);
-        }
-        
-        cur = ggml_mul_mat(ctx_c, output, cur);
-        ggml_set_name(cur, "logits");
-        
-        /* Build graph */
-        gf = ggml_new_graph(ctx_c);
-        ggml_build_forward_expand(gf, cur);
-        
-        /* Also need to include k_new/v_new tensors in graph for extraction */
-        for (layer = 0; layer < hp.n_layer; layer++) {
-            /* Use stored tensor pointers instead of looking up by name */
-            if (k_new_tensors[layer]) ggml_build_forward_expand(gf, k_new_tensors[layer]);
-            if (v_new_tensors[layer]) ggml_build_forward_expand(gf, v_new_tensors[layer]);
-        }
-    }
-    
-    /* Allocate compute buffer */
-    allocr = ggml_gallocr_new(ggml_backend_get_default_buffer_type(backend));
-    if (!ggml_gallocr_reserve(allocr, gf)) {
-        ggml_gallocr_free(allocr);
-        ggml_free(ctx_c);
-        ggml_backend_free(backend);
-        KVCACHE_UNLOCK(cache);
-        Safefree(tokens);
-        croak("Failed to reserve compute allocator");
-    }
-    
-    if (!ggml_gallocr_alloc_graph(allocr, gf)) {
-        ggml_gallocr_free(allocr);
-        ggml_free(ctx_c);
-        ggml_backend_free(backend);
-        KVCACHE_UNLOCK(cache);
-        Safefree(tokens);
-        croak("Failed to allocate compute graph");
-    }
-    
-    /* Set input data */
-    {
-        struct ggml_tensor *inp = ggml_graph_get_tensor(gf, "inp_tokens");
-        struct ggml_tensor *pos_tensor = ggml_graph_get_tensor(gf, "pos");
-        
-        if (inp) {
-            ggml_backend_tensor_set(inp, tokens, 0, n_tokens * sizeof(int));
-        }
-        
-        /* Set positions starting from pos_offset */
-        if (pos_tensor) {
-            int *positions;
-            int p;
-            Newx(positions, n_tokens, int);
-            for (p = 0; p < n_tokens; p++) {
-                positions[p] = pos_offset + p;
-            }
-            ggml_backend_tensor_set(pos_tensor, positions, 0, n_tokens * sizeof(int));
-            Safefree(positions);
-        }
-        
-        /* Set cached K/V data using stored tensor pointers */
-        if (pos_offset > 0) {
-            int layer;
-            for (layer = 0; layer < hp.n_layer; layer++) {
-                size_t cache_size = pos_offset * cache->n_head_kv * cache->head_dim * sizeof(float);
-                
-                if (k_cache_tensors[layer] && cache->k_cache[layer]) {
-                    ggml_backend_tensor_set(k_cache_tensors[layer], cache->k_cache[layer], 0, cache_size);
-                }
-                if (v_cache_tensors[layer] && cache->v_cache[layer]) {
-                    ggml_backend_tensor_set(v_cache_tensors[layer], cache->v_cache[layer], 0, cache_size);
-                }
-            }
-        }
-    }
-    
-    /* Run the forward pass */
-    if (ggml_backend_graph_compute(backend, gf) != GGML_STATUS_SUCCESS) {
-        ggml_gallocr_free(allocr);
-        ggml_free(ctx_c);
-        ggml_backend_free(backend);
-        KVCACHE_UNLOCK(cache);
-        Safefree(tokens);
-        croak("Failed to compute graph");
-    }
-    
-    /* Update cache with new K/V values */
-    {
-        int layer;
-        int n_kv_dim = cache->n_head_kv * cache->head_dim;
-        
-        for (layer = 0; layer < hp.n_layer; layer++) {
-            struct ggml_tensor *k_new_tensor, *v_new_tensor;
-            size_t new_size = n_tokens * n_kv_dim * sizeof(float);
-            size_t offset = pos_offset * n_kv_dim * sizeof(float);
-            
-            /* Use stored tensor pointers */
-            k_new_tensor = k_new_tensors[layer];
-            v_new_tensor = v_new_tensors[layer];
-            
-            if (k_new_tensor && cache->k_cache[layer]) {
-                /* Copy new K values to cache at the correct position */
-                float *temp;
-                Newx(temp, n_tokens * n_kv_dim, float);
-                ggml_backend_tensor_get(k_new_tensor, temp, 0, new_size);
-                memcpy((char*)cache->k_cache[layer] + offset, temp, new_size);
-                Safefree(temp);
-            }
-            if (v_new_tensor && cache->v_cache[layer]) {
-                float *temp;
-                Newx(temp, n_tokens * n_kv_dim, float);
-                ggml_backend_tensor_get(v_new_tensor, temp, 0, new_size);
-                memcpy((char*)cache->v_cache[layer] + offset, temp, new_size);
-                Safefree(temp);
-            }
-        }
-        
-        /* Update cached count */
-        cache->n_cached = n_kv;
-    }
-    
-    /* Extract logits */
-    {
-        struct ggml_tensor *logits_tensor = ggml_graph_get_tensor(gf, "logits");
-        if (logits_tensor) {
-            float *logits_data;
-            int j;
-            size_t logits_size = hp.n_vocab * sizeof(float);
-            
-            Newx(logits_data, hp.n_vocab, float);
-            
-            /* Get logits for last token */
-            ggml_backend_tensor_get(logits_tensor, logits_data,
-                                    (n_tokens - 1) * hp.n_vocab * sizeof(float), logits_size);
-            
-            EXTEND(SP, hp.n_vocab);
-            for (j = 0; j < hp.n_vocab; j++) {
-                mPUSHn(logits_data[j]);
-            }
-            
-            Safefree(logits_data);
-        }
-    }
-    
-    /* Cleanup */
-    Safefree(k_cache_tensors);
-    Safefree(v_cache_tensors);
-    Safefree(k_new_tensors);
-    Safefree(v_new_tensors);
-    ggml_gallocr_free(allocr);
-    ggml_free(ctx_c);
-    ggml_backend_free(backend);
-    KVCACHE_UNLOCK(cache);
-    Safefree(tokens);
-
 SV *
 create_memory_pool(self)
     SV *self
@@ -3717,534 +5213,6 @@ CODE:
     RETVAL = sv_bless(newRV_noinc((SV*)pool_hv), gv_stashpv("Lugh::MemoryPool", GV_ADD));
 OUTPUT:
     RETVAL
-
-void
-forward_with_pool(self, ...)
-    SV *self
-PREINIT:
-    HV *hv, *pool_hv;
-    SV **svp;
-    LughModel *model;
-    LughMemoryPool *pool = NULL;
-    LughLoRAAdapter *lora = NULL;
-    int *tokens = NULL;
-    int n_tokens = 0;
-    int i;
-    LughHyperparams hp;
-    struct ggml_context *ctx_w = NULL;
-    struct ggml_cgraph *gf = NULL;
-    struct ggml_tensor *cur = NULL;
-    struct ggml_tensor *inpL = NULL;
-PPCODE:
-    /* Get model */
-    hv = (HV*)SvRV(self);
-    svp = hv_fetch(hv, "_model", 6, 0);
-    if (!svp || !*svp) croak("No model in inference object");
-    model = get_lugh_model(aTHX_ *svp);
-    if (!model) croak("Invalid model");
-    
-    /* Parse arguments - support both positional and named */
-    for (i = 1; i < items; i++) {
-        SV *arg = ST(i);
-        if (SvPOK(arg) && !SvROK(arg)) {
-            const char *key = SvPV_nolen(arg);
-            if (strEQ(key, "pool") && i + 1 < items) {
-                i++;
-                arg = ST(i);
-                if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVHV) {
-                    pool_hv = (HV*)SvRV(arg);
-                    svp = hv_fetch(pool_hv, "_pool_id", 8, 0);
-                    if (svp && *svp) {
-                        pool = get_mempool_by_id(SvIV(*svp));
-                    }
-                }
-            } else if (strEQ(key, "tokens") && i + 1 < items) {
-                i++;
-                arg = ST(i);
-                if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
-                    AV *av = (AV*)SvRV(arg);
-                    int j;
-                    n_tokens = av_len(av) + 1;
-                    Newx(tokens, n_tokens, int);
-                    for (j = 0; j < n_tokens; j++) {
-                        SV **elem = av_fetch(av, j, 0);
-                        tokens[j] = elem ? SvIV(*elem) : 0;
-                    }
-                }
-            } else if (strEQ(key, "lora") && i + 1 < items) {
-                i++;
-                lora = get_lugh_lora(aTHX_ ST(i));
-            }
-        } else if (!pool && sv_isobject(arg)) {
-            /* First positional object - try as pool */
-            if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVHV) {
-                pool_hv = (HV*)SvRV(arg);
-                svp = hv_fetch(pool_hv, "_pool_id", 8, 0);
-                if (svp && *svp) {
-                    pool = get_mempool_by_id(SvIV(*svp));
-                }
-            }
-        } else if (pool && !tokens && SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
-            /* Second positional - tokens array ref */
-            AV *av = (AV*)SvRV(arg);
-            int j;
-            n_tokens = av_len(av) + 1;
-            Newx(tokens, n_tokens, int);
-            for (j = 0; j < n_tokens; j++) {
-                SV **elem = av_fetch(av, j, 0);
-                tokens[j] = elem ? SvIV(*elem) : 0;
-            }
-        }
-    }
-    
-    if (!pool) croak("forward_with_pool() requires a pool parameter");
-    if (!tokens || n_tokens == 0) croak("forward_with_pool() requires at least one token");
-    
-    extract_hyperparams(aTHX_ hv, model, &hp);
-    ctx_w = model->ctx;
-    
-    POOL_LOCK(pool);
-    
-    /* Reset the pool's compute context for this run (use unlocked version since we hold lock) */
-    if (!reset_memory_pool_unlocked(pool)) {
-        POOL_UNLOCK(pool);
-        Safefree(tokens);
-        croak("Failed to reset memory pool");
-    }
-    
-    /* Build forward pass using pool's resources */
-    {
-        struct ggml_tensor *tok_embd = ggml_get_tensor(ctx_w, "token_embd.weight");
-        struct ggml_tensor *output_norm = ggml_get_tensor(ctx_w, "output_norm.weight");
-        struct ggml_tensor *output = ggml_get_tensor(ctx_w, "output.weight");
-        struct ggml_tensor *pos;
-        int layer;
-        
-        if (!output) output = tok_embd;
-        if (!tok_embd) {
-            POOL_UNLOCK(pool);
-            Safefree(tokens);
-            croak("Required tensors not found");
-        }
-        
-        pos = ggml_new_tensor_1d(pool->ctx_compute, GGML_TYPE_I32, n_tokens);
-        ggml_set_name(pos, "pos");
-        
-        {
-            struct ggml_tensor *inp_tokens = ggml_new_tensor_1d(pool->ctx_compute, GGML_TYPE_I32, n_tokens);
-            ggml_set_name(inp_tokens, "inp_tokens");
-            inpL = ggml_get_rows(pool->ctx_compute, tok_embd, inp_tokens);
-            ggml_set_name(inpL, "inp_embd");
-        }
-        
-        cur = inpL;
-        
-        /* Process transformer layers */
-        for (layer = 0; layer < hp.n_layer; layer++) {
-            LughLayerWeights lw;
-            struct ggml_tensor *residual;
-            
-            if (!get_layer_weights_for_arch(ctx_w, layer, &lw, hp.arch_type)) continue;
-            
-            residual = cur;
-            cur = apply_rms_norm(pool->ctx_compute, cur, lw.attn_norm, hp.rms_norm_eps);
-            
-            /* Self-attention */
-            {
-                struct ggml_tensor *q, *k, *v;
-                struct ggml_tensor *attn_out;
-                char q_name[64], k_name[64], v_name[64], o_name[64];
-                
-                /* Build LoRA weight names for this layer */
-                snprintf(q_name, sizeof(q_name), "blk.%d.attn_q.weight", layer);
-                snprintf(k_name, sizeof(k_name), "blk.%d.attn_k.weight", layer);
-                snprintf(v_name, sizeof(v_name), "blk.%d.attn_v.weight", layer);
-                snprintf(o_name, sizeof(o_name), "blk.%d.attn_output.weight", layer);
-                
-                if (lw.has_combined_qkv) {
-                    /* Split combined QKV tensor - LoRA not supported for combined QKV yet */
-                    struct ggml_tensor *qkv = ggml_mul_mat(pool->ctx_compute, lw.wqkv, cur);
-                    int qkv_dim = hp.n_embd + 2 * (hp.n_head_kv * hp.head_dim);
-                    q = ggml_view_2d(pool->ctx_compute, qkv, hp.n_embd, n_tokens, 
-                                     qkv_dim * sizeof(float), 0);
-                    k = ggml_view_2d(pool->ctx_compute, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
-                                     qkv_dim * sizeof(float), hp.n_embd * sizeof(float));
-                    v = ggml_view_2d(pool->ctx_compute, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
-                                     qkv_dim * sizeof(float), (hp.n_embd + hp.n_head_kv * hp.head_dim) * sizeof(float));
-                } else {
-                    /* Use LoRA-aware matrix multiplication */
-                    q = lora_mul_mat(pool->ctx_compute, lw.wq, cur, lora, q_name);
-                    k = lora_mul_mat(pool->ctx_compute, lw.wk, cur, lora, k_name);
-                    v = lora_mul_mat(pool->ctx_compute, lw.wv, cur, lora, v_name);
-                }
-                
-                q = ggml_reshape_3d(pool->ctx_compute, q, hp.head_dim, hp.n_head, n_tokens);
-                k = ggml_reshape_3d(pool->ctx_compute, k, hp.head_dim, hp.n_head_kv, n_tokens);
-                v = ggml_reshape_3d(pool->ctx_compute, v, hp.head_dim, hp.n_head_kv, n_tokens);
-                
-                q = ggml_rope_ext(pool->ctx_compute, q, pos, NULL, hp.n_rot, 0, hp.n_ctx,
-                                  hp.rope_freq_base, hp.rope_freq_scale, 0.0f, 1.0f, 0.0f, 0.0f);
-                k = ggml_rope_ext(pool->ctx_compute, k, pos, NULL, hp.n_rot, 0, hp.n_ctx,
-                                  hp.rope_freq_base, hp.rope_freq_scale, 0.0f, 1.0f, 0.0f, 0.0f);
-                
-                attn_out = build_standard_attention(pool->ctx_compute, q, k, v, hp.head_dim, 0);
-                attn_out = ggml_reshape_2d(pool->ctx_compute, attn_out, hp.n_embd, n_tokens);
-                attn_out = lora_mul_mat(pool->ctx_compute, lw.wo, attn_out, lora, o_name);
-                
-                /* Post-attention norm (Gemma2, etc.) */
-                if (lw.has_post_norm && lw.attn_post_norm) {
-                    attn_out = apply_rms_norm(pool->ctx_compute, attn_out, lw.attn_post_norm, hp.rms_norm_eps);
-                }
-                
-                cur = ggml_add(pool->ctx_compute, residual, attn_out);
-            }
-            
-            /* FFN with LoRA */
-            residual = cur;
-            cur = apply_rms_norm(pool->ctx_compute, cur, lw.ffn_norm, hp.rms_norm_eps);
-            cur = build_ffn_with_lora(pool->ctx_compute, cur, &lw, lora);
-            
-            /* Post-FFN norm (Gemma2, etc.) */
-            if (lw.has_post_norm && lw.ffn_post_norm) {
-                cur = apply_rms_norm(pool->ctx_compute, cur, lw.ffn_post_norm, hp.rms_norm_eps);
-            }
-            
-            cur = ggml_add(pool->ctx_compute, residual, cur);
-        }
-        
-        /* Final norm and output projection */
-        cur = apply_rms_norm(pool->ctx_compute, cur, output_norm, hp.rms_norm_eps);
-        cur = ggml_mul_mat(pool->ctx_compute, output, cur);
-        ggml_set_name(cur, "logits");
-        
-        /* Build and allocate graph */
-        gf = ggml_new_graph(pool->ctx_compute);
-        ggml_build_forward_expand(gf, cur);
-        
-        if (!ggml_gallocr_alloc_graph(pool->allocator, gf)) {
-            POOL_UNLOCK(pool);
-            Safefree(tokens);
-            croak("Failed to allocate graph with pool");
-        }
-        
-        /* Set input data */
-        {
-            struct ggml_tensor *inp_tokens_tensor = ggml_graph_get_tensor(gf, "inp_tokens");
-            struct ggml_tensor *pos_tensor = ggml_graph_get_tensor(gf, "pos");
-            int *pos_data;
-            
-            if (inp_tokens_tensor) {
-                ggml_backend_tensor_set(inp_tokens_tensor, tokens, 0, n_tokens * sizeof(int));
-            }
-            if (pos_tensor) {
-                Newx(pos_data, n_tokens, int);
-                for (i = 0; i < n_tokens; i++) pos_data[i] = i;
-                ggml_backend_tensor_set(pos_tensor, pos_data, 0, n_tokens * sizeof(int));
-                Safefree(pos_data);
-            }
-        }
-    }
-    
-    /* Compute */
-    if (ggml_backend_graph_compute(pool->backend, gf) != GGML_STATUS_SUCCESS) {
-        POOL_UNLOCK(pool);
-        Safefree(tokens);
-        croak("Failed to compute graph with pool");
-    }
-    
-    /* Extract logits */
-    {
-        struct ggml_tensor *logits_tensor = ggml_graph_get_tensor(gf, "logits");
-        if (logits_tensor) {
-            float *logits_data;
-            int j;
-            size_t logits_size = hp.n_vocab * sizeof(float);
-            
-            Newx(logits_data, hp.n_vocab, float);
-            ggml_backend_tensor_get(logits_tensor, logits_data,
-                                    (n_tokens - 1) * hp.n_vocab * sizeof(float), logits_size);
-            
-            EXTEND(SP, hp.n_vocab);
-            for (j = 0; j < hp.n_vocab; j++) {
-                mPUSHn(logits_data[j]);
-            }
-            Safefree(logits_data);
-        }
-    }
-    
-    POOL_UNLOCK(pool);
-    Safefree(tokens);
-
-void
-forward_batch(self, ...)
-    SV *self
-PREINIT:
-    HV *hv;
-    SV **svp;
-    LughModel *model;
-    LughLoRAAdapter *lora = NULL;
-    AV *sequences_av = NULL;
-    int n_sequences = 0;
-    int **all_tokens = NULL;
-    int *seq_lengths = NULL;
-    int max_len = 0;
-    int total_tokens = 0;
-    int i, j;
-    LughHyperparams hp;
-    struct ggml_context *ctx_w = NULL;
-    struct ggml_context *ctx_c = NULL;
-    ggml_backend_t backend = NULL;
-    ggml_gallocr_t allocr = NULL;
-    AV *results_av;
-PPCODE:
-    /* Get model */
-    hv = (HV*)SvRV(self);
-    svp = hv_fetch(hv, "_model", 6, 0);
-    if (!svp || !*svp) croak("No model in inference object");
-    model = get_lugh_model(aTHX_ *svp);
-    if (!model) croak("Invalid model");
-    
-    /* Parse arguments - support both positional and named */
-    for (i = 1; i < items; i++) {
-        SV *arg = ST(i);
-        if (SvPOK(arg) && !SvROK(arg)) {
-            const char *key = SvPV_nolen(arg);
-            if (strEQ(key, "sequences") && i + 1 < items) {
-                i++;
-                arg = ST(i);
-                if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
-                    sequences_av = (AV*)SvRV(arg);
-                }
-            } else if (strEQ(key, "lora") && i + 1 < items) {
-                i++;
-                lora = get_lugh_lora(aTHX_ ST(i));
-            }
-        } else if (!sequences_av && SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVAV) {
-            /* Positional array ref */
-            sequences_av = (AV*)SvRV(arg);
-        }
-    }
-    
-    if (!sequences_av) croak("forward_batch() requires sequences parameter");
-    n_sequences = av_len(sequences_av) + 1;
-    if (n_sequences == 0) croak("forward_batch requires at least one sequence");
-    
-    /* Parse each sequence */
-    Newxz(all_tokens, n_sequences, int*);
-    Newxz(seq_lengths, n_sequences, int);
-    
-    for (i = 0; i < n_sequences; i++) {
-        SV **seq_svp = av_fetch(sequences_av, i, 0);
-        if (!seq_svp || !SvROK(*seq_svp) || SvTYPE(SvRV(*seq_svp)) != SVt_PVAV) {
-            for (j = 0; j < i; j++) Safefree(all_tokens[j]);
-            Safefree(all_tokens);
-            Safefree(seq_lengths);
-            croak("Each sequence must be an array reference");
-        }
-        AV *seq_av = (AV*)SvRV(*seq_svp);
-        seq_lengths[i] = av_len(seq_av) + 1;
-        total_tokens += seq_lengths[i];
-        if (seq_lengths[i] > max_len) max_len = seq_lengths[i];
-        
-        Newx(all_tokens[i], seq_lengths[i], int);
-        for (j = 0; j < seq_lengths[i]; j++) {
-            SV **elem = av_fetch(seq_av, j, 0);
-            all_tokens[i][j] = elem ? SvIV(*elem) : 0;
-        }
-    }
-    
-    extract_hyperparams(aTHX_ hv, model, &hp);
-    ctx_w = model->ctx;
-    
-    /* Initialize backend */
-    if (strcmp(hp.backend_name, "auto") == 0) {
-        backend = init_best_backend(hp.n_threads);
-    } else {
-        backend = init_backend_by_name(hp.backend_name, hp.n_threads);
-    }
-    if (!backend) {
-        for (i = 0; i < n_sequences; i++) Safefree(all_tokens[i]);
-        Safefree(all_tokens);
-        Safefree(seq_lengths);
-        croak("Failed to initialize backend");
-    }
-    
-    /* Create compute context */
-    ctx_c = create_compute_context(512 * 1024 * 1024);
-    if (!ctx_c) {
-        ggml_backend_free(backend);
-        for (i = 0; i < n_sequences; i++) Safefree(all_tokens[i]);
-        Safefree(all_tokens);
-        Safefree(seq_lengths);
-        croak("Failed to create compute context");
-    }
-    
-    /* Create result array */
-    results_av = newAV();
-    
-    /* Process each sequence (sequential batch - each gets its own forward pass) */
-    for (i = 0; i < n_sequences; i++) {
-        struct ggml_context *seq_ctx = create_compute_context(512 * 1024 * 1024);
-        struct ggml_cgraph *gf = NULL;
-        struct ggml_tensor *cur = NULL, *inpL = NULL;
-        AV *logits_av = newAV();
-        
-        if (!seq_ctx) {
-            av_push(results_av, newRV_noinc((SV*)newAV()));  /* empty result */
-            continue;
-        }
-        
-        /* Build forward pass for this sequence */
-        {
-            struct ggml_tensor *tok_embd = ggml_get_tensor(ctx_w, "token_embd.weight");
-            struct ggml_tensor *output_norm = ggml_get_tensor(ctx_w, "output_norm.weight");
-            struct ggml_tensor *output = ggml_get_tensor(ctx_w, "output.weight");
-            struct ggml_tensor *pos;
-            int layer;
-            int n_tokens = seq_lengths[i];
-            
-            if (!output) output = tok_embd;
-            
-            pos = ggml_new_tensor_1d(seq_ctx, GGML_TYPE_I32, n_tokens);
-            ggml_set_name(pos, "pos");
-            
-            {
-                struct ggml_tensor *inp_tokens = ggml_new_tensor_1d(seq_ctx, GGML_TYPE_I32, n_tokens);
-                ggml_set_name(inp_tokens, "inp_tokens");
-                inpL = ggml_get_rows(seq_ctx, tok_embd, inp_tokens);
-            }
-            
-            cur = inpL;
-            
-            for (layer = 0; layer < hp.n_layer; layer++) {
-                LughLayerWeights lw;
-                struct ggml_tensor *residual;
-                
-                if (!get_layer_weights_for_arch(ctx_w, layer, &lw, hp.arch_type)) continue;
-                
-                residual = cur;
-                cur = apply_rms_norm(seq_ctx, cur, lw.attn_norm, hp.rms_norm_eps);
-                
-                {
-                    struct ggml_tensor *q, *k, *v;
-                    struct ggml_tensor *attn_out;
-                    char q_name[64], k_name[64], v_name[64], o_name[64];
-                    
-                    /* Build LoRA weight names for this layer */
-                    snprintf(q_name, sizeof(q_name), "blk.%d.attn_q.weight", layer);
-                    snprintf(k_name, sizeof(k_name), "blk.%d.attn_k.weight", layer);
-                    snprintf(v_name, sizeof(v_name), "blk.%d.attn_v.weight", layer);
-                    snprintf(o_name, sizeof(o_name), "blk.%d.attn_output.weight", layer);
-                    
-                    if (lw.has_combined_qkv) {
-                        /* Split combined QKV tensor - LoRA not supported for combined QKV yet */
-                        struct ggml_tensor *qkv = ggml_mul_mat(seq_ctx, lw.wqkv, cur);
-                        int qkv_dim = hp.n_embd + 2 * (hp.n_head_kv * hp.head_dim);
-                        q = ggml_view_2d(seq_ctx, qkv, hp.n_embd, n_tokens, 
-                                         qkv_dim * sizeof(float), 0);
-                        k = ggml_view_2d(seq_ctx, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
-                                         qkv_dim * sizeof(float), hp.n_embd * sizeof(float));
-                        v = ggml_view_2d(seq_ctx, qkv, hp.n_head_kv * hp.head_dim, n_tokens,
-                                         qkv_dim * sizeof(float), (hp.n_embd + hp.n_head_kv * hp.head_dim) * sizeof(float));
-                    } else {
-                        /* Use LoRA-aware matrix multiplication */
-                        q = lora_mul_mat(seq_ctx, lw.wq, cur, lora, q_name);
-                        k = lora_mul_mat(seq_ctx, lw.wk, cur, lora, k_name);
-                        v = lora_mul_mat(seq_ctx, lw.wv, cur, lora, v_name);
-                    }
-                    
-                    q = ggml_reshape_3d(seq_ctx, q, hp.head_dim, hp.n_head, n_tokens);
-                    k = ggml_reshape_3d(seq_ctx, k, hp.head_dim, hp.n_head_kv, n_tokens);
-                    v = ggml_reshape_3d(seq_ctx, v, hp.head_dim, hp.n_head_kv, n_tokens);
-                    
-                    q = ggml_rope_ext(seq_ctx, q, pos, NULL, hp.n_rot, 0, hp.n_ctx,
-                                      hp.rope_freq_base, hp.rope_freq_scale, 0.0f, 1.0f, 0.0f, 0.0f);
-                    k = ggml_rope_ext(seq_ctx, k, pos, NULL, hp.n_rot, 0, hp.n_ctx,
-                                      hp.rope_freq_base, hp.rope_freq_scale, 0.0f, 1.0f, 0.0f, 0.0f);
-                    
-                    attn_out = build_standard_attention(seq_ctx, q, k, v, hp.head_dim, 0);
-                    attn_out = ggml_reshape_2d(seq_ctx, attn_out, hp.n_embd, n_tokens);
-                    attn_out = lora_mul_mat(seq_ctx, lw.wo, attn_out, lora, o_name);
-                    
-                    /* Post-attention norm (Gemma2, etc.) */
-                    if (lw.has_post_norm && lw.attn_post_norm) {
-                        attn_out = apply_rms_norm(seq_ctx, attn_out, lw.attn_post_norm, hp.rms_norm_eps);
-                    }
-                    
-                    cur = ggml_add(seq_ctx, residual, attn_out);
-                }
-                
-                residual = cur;
-                cur = apply_rms_norm(seq_ctx, cur, lw.ffn_norm, hp.rms_norm_eps);
-                cur = build_ffn_with_lora(seq_ctx, cur, &lw, lora);
-                
-                /* Post-FFN norm (Gemma2, etc.) */
-                if (lw.has_post_norm && lw.ffn_post_norm) {
-                    cur = apply_rms_norm(seq_ctx, cur, lw.ffn_post_norm, hp.rms_norm_eps);
-                }
-                
-                cur = ggml_add(seq_ctx, residual, cur);
-            }
-            
-            cur = apply_rms_norm(seq_ctx, cur, output_norm, hp.rms_norm_eps);
-            cur = ggml_mul_mat(seq_ctx, output, cur);
-            ggml_set_name(cur, "logits");
-            
-            gf = ggml_new_graph(seq_ctx);
-            ggml_build_forward_expand(gf, cur);
-            
-            /* Allocate and set inputs */
-            allocr = ggml_gallocr_new(ggml_backend_get_default_buffer_type(backend));
-            if (ggml_gallocr_alloc_graph(allocr, gf)) {
-                struct ggml_tensor *inp_tokens_tensor = ggml_graph_get_tensor(gf, "inp_tokens");
-                struct ggml_tensor *pos_tensor = ggml_graph_get_tensor(gf, "pos");
-                
-                if (inp_tokens_tensor) {
-                    ggml_backend_tensor_set(inp_tokens_tensor, all_tokens[i], 0, n_tokens * sizeof(int));
-                }
-                if (pos_tensor) {
-                    int *pos_data;
-                    Newx(pos_data, n_tokens, int);
-                    for (j = 0; j < n_tokens; j++) pos_data[j] = j;
-                    ggml_backend_tensor_set(pos_tensor, pos_data, 0, n_tokens * sizeof(int));
-                    Safefree(pos_data);
-                }
-                
-                /* Compute */
-                if (ggml_backend_graph_compute(backend, gf) == GGML_STATUS_SUCCESS) {
-                    struct ggml_tensor *logits_tensor = ggml_graph_get_tensor(gf, "logits");
-                    if (logits_tensor) {
-                        float *logits_data;
-                        size_t logits_size = hp.n_vocab * sizeof(float);
-                        
-                        Newx(logits_data, hp.n_vocab, float);
-                        ggml_backend_tensor_get(logits_tensor, logits_data,
-                                                (n_tokens - 1) * hp.n_vocab * sizeof(float), logits_size);
-                        
-                        for (j = 0; j < hp.n_vocab; j++) {
-                            av_push(logits_av, newSVnv(logits_data[j]));
-                        }
-                        Safefree(logits_data);
-                    }
-                }
-            }
-            ggml_gallocr_free(allocr);
-        }
-        
-        ggml_free(seq_ctx);
-        av_push(results_av, newRV_noinc((SV*)logits_av));
-    }
-    
-    /* Cleanup */
-    ggml_free(ctx_c);
-    ggml_backend_free(backend);
-    for (i = 0; i < n_sequences; i++) Safefree(all_tokens[i]);
-    Safefree(all_tokens);
-    Safefree(seq_lengths);
-    
-    /* Return array of logits arrays */
-    EXTEND(SP, 1);
-    mPUSHs(newRV_noinc((SV*)results_av));
 
 MODULE = Lugh  PACKAGE = Lugh::MemoryPool
 
@@ -4785,11 +5753,15 @@ CODE:
     n_dims = items - 2;
     if (n_dims < 1) n_dims = 1;
     if (n_dims > 4) croak("Maximum 4 dimensions supported");
-    
+
     for (i = 0; i < n_dims; i++) {
         ne[i] = SvIV(ST(i + 2));
+        /* Validate: dimensions must be positive */
+        if (ne[i] <= 0) {
+            croak("Invalid dimension %d at position %d: dimensions must be positive", (int)ne[i], i);
+        }
     }
-    
+
     /* Create tensor based on dimensionality */
     switch (n_dims) {
         case 1:
@@ -6154,3 +7126,1050 @@ DESTROY(self)
 CODE:
     /* Magic cleanup handles this */
     PERL_UNUSED_VAR(self);
+
+# ============================================================================
+# Lugh::RoPE - RoPE Scaling Configuration
+# ============================================================================
+
+MODULE = Lugh    PACKAGE = Lugh::RoPE
+
+PROTOTYPES: DISABLE
+
+SV *
+new(class, ...)
+    const char *class
+PREINIT:
+    LughRopeConfig config;
+    int i, id;
+    SV *obj;
+    HV *stash;
+CODE:
+    /* Initialize defaults */
+    config.scaling_type = LUGH_ROPE_SCALING_NONE;
+    config.n_ctx_orig = 0;
+    config.target_ctx = 0;
+    config.freq_base = 0.0f;   /* 0 = use model default */
+    config.freq_scale = 1.0f;
+    config.ext_factor = -1.0f; /* -1 = auto-compute for YaRN */
+    config.attn_factor = 1.0f;
+    config.beta_fast = 32.0f;
+    config.beta_slow = 1.0f;
+    
+    /* Parse key-value pairs */
+    for (i = 1; i < items; i += 2) {
+        if (i + 1 >= items) croak("Odd number of arguments");
+        
+        const char *key = SvPV_nolen(ST(i));
+        SV *val = ST(i + 1);
+        
+        if (strcmp(key, "scaling_type") == 0) {
+            if (SvIOK(val)) {
+                config.scaling_type = (LughRopeScalingType)SvIV(val);
+            } else if (SvPOK(val)) {
+                const char *s = SvPV_nolen(val);
+                if (strcmp(s, "none") == 0) config.scaling_type = LUGH_ROPE_SCALING_NONE;
+                else if (strcmp(s, "linear") == 0) config.scaling_type = LUGH_ROPE_SCALING_LINEAR;
+                else if (strcmp(s, "yarn") == 0) config.scaling_type = LUGH_ROPE_SCALING_YARN;
+                else if (strcmp(s, "longrope") == 0) config.scaling_type = LUGH_ROPE_SCALING_LONGROPE;
+                else croak("Unknown scaling_type: %s", s);
+            }
+        }
+        else if (strcmp(key, "n_ctx_orig") == 0) config.n_ctx_orig = SvIV(val);
+        else if (strcmp(key, "target_ctx") == 0) config.target_ctx = SvIV(val);
+        else if (strcmp(key, "freq_base") == 0) config.freq_base = SvNV(val);
+        else if (strcmp(key, "freq_scale") == 0) config.freq_scale = SvNV(val);
+        else if (strcmp(key, "ext_factor") == 0) config.ext_factor = SvNV(val);
+        else if (strcmp(key, "attn_factor") == 0) config.attn_factor = SvNV(val);
+        else if (strcmp(key, "beta_fast") == 0) config.beta_fast = SvNV(val);
+        else if (strcmp(key, "beta_slow") == 0) config.beta_slow = SvNV(val);
+    }
+    
+    /* Auto-compute freq_scale if target_ctx set and freq_scale not explicitly set */
+    if (config.target_ctx > 0 && config.n_ctx_orig > 0 && config.freq_scale == 1.0f) {
+        config.freq_scale = (float)config.n_ctx_orig / (float)config.target_ctx;
+    }
+    
+    /* Register config */
+    id = register_rope_config(&config);
+    if (id < 0) croak("Too many RoPE configs");
+    
+    /* Create blessed object */
+    obj = newSViv(0);
+    sv_magicext(obj, NULL, PERL_MAGIC_ext, &lugh_rope_vtbl, (char*)(IV)id, 0);
+    stash = gv_stashpv(class, GV_ADD);
+    RETVAL = sv_bless(newRV_noinc(obj), stash);
+OUTPUT:
+    RETVAL
+
+SV *
+none(class)
+    const char *class
+PREINIT:
+    LughRopeConfig config;
+    int id;
+    SV *obj;
+    HV *stash;
+CODE:
+    memset(&config, 0, sizeof(config));
+    config.scaling_type = LUGH_ROPE_SCALING_NONE;
+    config.freq_scale = 1.0f;
+    config.attn_factor = 1.0f;
+    
+    id = register_rope_config(&config);
+    if (id < 0) croak("Too many RoPE configs");
+    
+    obj = newSViv(0);
+    sv_magicext(obj, NULL, PERL_MAGIC_ext, &lugh_rope_vtbl, (char*)(IV)id, 0);
+    stash = gv_stashpv(class, GV_ADD);
+    RETVAL = sv_bless(newRV_noinc(obj), stash);
+OUTPUT:
+    RETVAL
+
+SV *
+linear(class, n_ctx_orig, target_ctx)
+    const char *class
+    int n_ctx_orig
+    int target_ctx
+PREINIT:
+    LughRopeConfig config;
+    int id;
+    SV *obj;
+    HV *stash;
+CODE:
+    memset(&config, 0, sizeof(config));
+    config.scaling_type = LUGH_ROPE_SCALING_LINEAR;
+    config.n_ctx_orig = n_ctx_orig;
+    config.target_ctx = target_ctx;
+    config.freq_scale = (float)n_ctx_orig / (float)target_ctx;
+    config.ext_factor = 0.0f;  /* Disable YaRN for linear */
+    config.attn_factor = 1.0f;
+    
+    id = register_rope_config(&config);
+    if (id < 0) croak("Too many RoPE configs");
+    
+    obj = newSViv(0);
+    sv_magicext(obj, NULL, PERL_MAGIC_ext, &lugh_rope_vtbl, (char*)(IV)id, 0);
+    stash = gv_stashpv(class, GV_ADD);
+    RETVAL = sv_bless(newRV_noinc(obj), stash);
+OUTPUT:
+    RETVAL
+
+SV *
+yarn(class, n_ctx_orig, target_ctx, ...)
+    const char *class
+    int n_ctx_orig
+    int target_ctx
+PREINIT:
+    LughRopeConfig config;
+    int id, i;
+    SV *obj;
+    HV *stash;
+CODE:
+    memset(&config, 0, sizeof(config));
+    config.scaling_type = LUGH_ROPE_SCALING_YARN;
+    config.n_ctx_orig = n_ctx_orig;
+    config.target_ctx = target_ctx;
+    config.freq_scale = (float)n_ctx_orig / (float)target_ctx;
+    config.ext_factor = -1.0f;  /* Auto-compute */
+    config.attn_factor = 1.0f;
+    config.beta_fast = 32.0f;
+    config.beta_slow = 1.0f;
+    
+    /* Parse optional YaRN params */
+    for (i = 3; i < items; i += 2) {
+        if (i + 1 >= items) break;
+        const char *key = SvPV_nolen(ST(i));
+        SV *val = ST(i + 1);
+        
+        if (strcmp(key, "ext_factor") == 0) config.ext_factor = SvNV(val);
+        else if (strcmp(key, "attn_factor") == 0) config.attn_factor = SvNV(val);
+        else if (strcmp(key, "beta_fast") == 0) config.beta_fast = SvNV(val);
+        else if (strcmp(key, "beta_slow") == 0) config.beta_slow = SvNV(val);
+    }
+    
+    id = register_rope_config(&config);
+    if (id < 0) croak("Too many RoPE configs");
+    
+    obj = newSViv(0);
+    sv_magicext(obj, NULL, PERL_MAGIC_ext, &lugh_rope_vtbl, (char*)(IV)id, 0);
+    stash = gv_stashpv(class, GV_ADD);
+    RETVAL = sv_bless(newRV_noinc(obj), stash);
+OUTPUT:
+    RETVAL
+
+SV *
+linear_2x(class, n_ctx_orig)
+    const char *class
+    int n_ctx_orig
+CODE:
+    /* Delegate to linear() with 2x target */
+    PUSHMARK(SP);
+    EXTEND(SP, 3);
+    mPUSHp(class, strlen(class));
+    mPUSHi(n_ctx_orig);
+    mPUSHi(n_ctx_orig * 2);
+    PUTBACK;
+    call_method("linear", G_SCALAR);
+    SPAGAIN;
+    RETVAL = SvREFCNT_inc(POPs);
+OUTPUT:
+    RETVAL
+
+SV *
+linear_4x(class, n_ctx_orig)
+    const char *class
+    int n_ctx_orig
+CODE:
+    PUSHMARK(SP);
+    EXTEND(SP, 3);
+    mPUSHp(class, strlen(class));
+    mPUSHi(n_ctx_orig);
+    mPUSHi(n_ctx_orig * 4);
+    PUTBACK;
+    call_method("linear", G_SCALAR);
+    SPAGAIN;
+    RETVAL = SvREFCNT_inc(POPs);
+OUTPUT:
+    RETVAL
+
+SV *
+yarn_32k(class, n_ctx_orig)
+    const char *class
+    int n_ctx_orig
+CODE:
+    PUSHMARK(SP);
+    EXTEND(SP, 3);
+    mPUSHp(class, strlen(class));
+    mPUSHi(n_ctx_orig);
+    mPUSHi(32768);
+    PUTBACK;
+    call_method("yarn", G_SCALAR);
+    SPAGAIN;
+    RETVAL = SvREFCNT_inc(POPs);
+OUTPUT:
+    RETVAL
+
+SV *
+yarn_64k(class, n_ctx_orig)
+    const char *class
+    int n_ctx_orig
+CODE:
+    PUSHMARK(SP);
+    EXTEND(SP, 3);
+    mPUSHp(class, strlen(class));
+    mPUSHi(n_ctx_orig);
+    mPUSHi(65536);
+    PUTBACK;
+    call_method("yarn", G_SCALAR);
+    SPAGAIN;
+    RETVAL = SvREFCNT_inc(POPs);
+OUTPUT:
+    RETVAL
+
+SV *
+yarn_128k(class, n_ctx_orig)
+    const char *class
+    int n_ctx_orig
+CODE:
+    PUSHMARK(SP);
+    EXTEND(SP, 3);
+    mPUSHp(class, strlen(class));
+    mPUSHi(n_ctx_orig);
+    mPUSHi(131072);
+    PUTBACK;
+    call_method("yarn", G_SCALAR);
+    SPAGAIN;
+    RETVAL = SvREFCNT_inc(POPs);
+OUTPUT:
+    RETVAL
+
+SV *
+from_model(class, model_sv)
+    const char *class
+    SV *model_sv
+PREINIT:
+    LughModel *lm;
+    LughRopeConfig config;
+    int id, key_id;
+    SV *obj;
+    HV *stash;
+    char key[128];
+    const char *arch;
+CODE:
+    lm = get_lugh_model(aTHX_ model_sv);
+    
+    /* Initialize defaults */
+    memset(&config, 0, sizeof(config));
+    config.scaling_type = LUGH_ROPE_SCALING_NONE;
+    config.freq_scale = 1.0f;
+    config.ext_factor = -1.0f;  /* Auto-compute for YaRN */
+    config.attn_factor = 1.0f;
+    config.beta_fast = 32.0f;
+    config.beta_slow = 1.0f;
+    
+    arch = lm->architecture ? lm->architecture : "llama";
+    
+    /* Get context length */
+    snprintf(key, sizeof(key), "%s.context_length", arch);
+    key_id = gguf_find_key(lm->gguf, key);
+    if (key_id >= 0) {
+        config.n_ctx_orig = gguf_get_val_u32(lm->gguf, key_id);
+        config.target_ctx = config.n_ctx_orig;  /* Default target = original */
+    }
+    
+    /* Get rope.freq_base */
+    snprintf(key, sizeof(key), "%s.rope.freq_base", arch);
+    key_id = gguf_find_key(lm->gguf, key);
+    if (key_id >= 0) {
+        config.freq_base = gguf_get_val_f32(lm->gguf, key_id);
+    }
+    
+    /* Get scaling type */
+    snprintf(key, sizeof(key), "%s.rope.scaling.type", arch);
+    key_id = gguf_find_key(lm->gguf, key);
+    if (key_id >= 0) {
+        const char *scaling_str = gguf_get_val_str(lm->gguf, key_id);
+        if (scaling_str) {
+            if (strcmp(scaling_str, "linear") == 0)
+                config.scaling_type = LUGH_ROPE_SCALING_LINEAR;
+            else if (strcmp(scaling_str, "yarn") == 0)
+                config.scaling_type = LUGH_ROPE_SCALING_YARN;
+            else if (strcmp(scaling_str, "longrope") == 0)
+                config.scaling_type = LUGH_ROPE_SCALING_LONGROPE;
+        }
+    }
+    
+    /* Get scaling factor -> freq_scale */
+    snprintf(key, sizeof(key), "%s.rope.scaling.factor", arch);
+    key_id = gguf_find_key(lm->gguf, key);
+    if (key_id >= 0) {
+        float factor = gguf_get_val_f32(lm->gguf, key_id);
+        if (factor > 0) {
+            config.freq_scale = 1.0f / factor;
+            /* Compute target_ctx from factor */
+            if (config.n_ctx_orig > 0) {
+                config.target_ctx = (int)(config.n_ctx_orig * factor);
+            }
+        }
+    } else {
+        /* Fallback to legacy key */
+        snprintf(key, sizeof(key), "%s.rope.scale_linear", arch);
+        key_id = gguf_find_key(lm->gguf, key);
+        if (key_id >= 0) {
+            float factor = gguf_get_val_f32(lm->gguf, key_id);
+            if (factor > 0) {
+                config.freq_scale = 1.0f / factor;
+                if (config.n_ctx_orig > 0) {
+                    config.target_ctx = (int)(config.n_ctx_orig * factor);
+                }
+            }
+        }
+    }
+    
+    /* Original context length for scaling */
+    snprintf(key, sizeof(key), "%s.rope.scaling.original_context_length", arch);
+    key_id = gguf_find_key(lm->gguf, key);
+    if (key_id >= 0) {
+        config.n_ctx_orig = gguf_get_val_u32(lm->gguf, key_id);
+    }
+    
+    /* YaRN parameters */
+    snprintf(key, sizeof(key), "%s.rope.scaling.yarn_ext_factor", arch);
+    key_id = gguf_find_key(lm->gguf, key);
+    if (key_id >= 0) config.ext_factor = gguf_get_val_f32(lm->gguf, key_id);
+    
+    snprintf(key, sizeof(key), "%s.rope.scaling.yarn_attn_factor", arch);
+    key_id = gguf_find_key(lm->gguf, key);
+    if (key_id >= 0) config.attn_factor = gguf_get_val_f32(lm->gguf, key_id);
+    
+    snprintf(key, sizeof(key), "%s.rope.scaling.yarn_beta_fast", arch);
+    key_id = gguf_find_key(lm->gguf, key);
+    if (key_id >= 0) config.beta_fast = gguf_get_val_f32(lm->gguf, key_id);
+    
+    snprintf(key, sizeof(key), "%s.rope.scaling.yarn_beta_slow", arch);
+    key_id = gguf_find_key(lm->gguf, key);
+    if (key_id >= 0) config.beta_slow = gguf_get_val_f32(lm->gguf, key_id);
+    
+    /* Register and create object */
+    id = register_rope_config(&config);
+    if (id < 0) croak("Too many RoPE configs");
+    
+    obj = newSViv(0);
+    sv_magicext(obj, NULL, PERL_MAGIC_ext, &lugh_rope_vtbl, (char*)(IV)id, 0);
+    stash = gv_stashpv(class, GV_ADD);
+    RETVAL = sv_bless(newRV_noinc(obj), stash);
+OUTPUT:
+    RETVAL
+
+int
+scaling_type(self)
+    SV *self
+CODE:
+    LughRopeConfig *config = get_lugh_rope(aTHX_ self);
+    RETVAL = config->scaling_type;
+OUTPUT:
+    RETVAL
+
+const char *
+scaling_type_name(self)
+    SV *self
+PREINIT:
+    LughRopeConfig *config;
+CODE:
+    config = get_lugh_rope(aTHX_ self);
+    switch (config->scaling_type) {
+        case LUGH_ROPE_SCALING_NONE:    RETVAL = "none"; break;
+        case LUGH_ROPE_SCALING_LINEAR:  RETVAL = "linear"; break;
+        case LUGH_ROPE_SCALING_YARN:    RETVAL = "yarn"; break;
+        case LUGH_ROPE_SCALING_LONGROPE: RETVAL = "longrope"; break;
+        default: RETVAL = "unknown";
+    }
+OUTPUT:
+    RETVAL
+
+int
+n_ctx_orig(self)
+    SV *self
+CODE:
+    LughRopeConfig *config = get_lugh_rope(aTHX_ self);
+    RETVAL = config->n_ctx_orig;
+OUTPUT:
+    RETVAL
+
+int
+target_ctx(self)
+    SV *self
+CODE:
+    LughRopeConfig *config = get_lugh_rope(aTHX_ self);
+    RETVAL = config->target_ctx;
+OUTPUT:
+    RETVAL
+
+double
+freq_base(self)
+    SV *self
+CODE:
+    LughRopeConfig *config = get_lugh_rope(aTHX_ self);
+    RETVAL = config->freq_base;
+OUTPUT:
+    RETVAL
+
+double
+freq_scale(self)
+    SV *self
+CODE:
+    LughRopeConfig *config = get_lugh_rope(aTHX_ self);
+    RETVAL = config->freq_scale;
+OUTPUT:
+    RETVAL
+
+double
+ext_factor(self)
+    SV *self
+CODE:
+    LughRopeConfig *config = get_lugh_rope(aTHX_ self);
+    RETVAL = config->ext_factor;
+OUTPUT:
+    RETVAL
+
+double
+attn_factor(self)
+    SV *self
+CODE:
+    LughRopeConfig *config = get_lugh_rope(aTHX_ self);
+    RETVAL = config->attn_factor;
+OUTPUT:
+    RETVAL
+
+double
+beta_fast(self)
+    SV *self
+CODE:
+    LughRopeConfig *config = get_lugh_rope(aTHX_ self);
+    RETVAL = config->beta_fast;
+OUTPUT:
+    RETVAL
+
+double
+beta_slow(self)
+    SV *self
+CODE:
+    LughRopeConfig *config = get_lugh_rope(aTHX_ self);
+    RETVAL = config->beta_slow;
+OUTPUT:
+    RETVAL
+
+void
+DESTROY(self)
+    SV *self
+CODE:
+    /* Magic cleanup handles this */
+    PERL_UNUSED_VAR(self);
+
+# Constants for scaling types
+int
+ROPE_SCALING_NONE()
+CODE:
+    RETVAL = LUGH_ROPE_SCALING_NONE;
+OUTPUT:
+    RETVAL
+
+int
+ROPE_SCALING_LINEAR()
+CODE:
+    RETVAL = LUGH_ROPE_SCALING_LINEAR;
+OUTPUT:
+    RETVAL
+
+int
+ROPE_SCALING_YARN()
+CODE:
+    RETVAL = LUGH_ROPE_SCALING_YARN;
+OUTPUT:
+    RETVAL
+
+int
+ROPE_SCALING_LONGROPE()
+CODE:
+    RETVAL = LUGH_ROPE_SCALING_LONGROPE;
+OUTPUT:
+    RETVAL
+
+# ============================================================================
+# Lugh::Speculative - Speculative Decoding
+# ============================================================================
+
+MODULE = Lugh    PACKAGE = Lugh::Speculative
+
+SV *
+new(class, ...)
+    const char *class
+PREINIT:
+    HV *hv;
+    SV *obj, *main_inference_sv = NULL, *draft_inference_sv = NULL;
+    SV **svp;
+    int main_model_id = 0, draft_model_id = 0;
+    int main_n_vocab = 0, draft_n_vocab = 0;
+    LughSpeculative *spec;
+    int i, k = 4;
+    float temperature = 0.8, top_p = 0.95;
+    HV *stash;
+CODE:
+    /* Parse named parameters */
+    for (i = 1; i < items; i += 2) {
+        if (i + 1 < items && SvPOK(ST(i))) {
+            const char *key = SvPV_nolen(ST(i));
+            SV *val = ST(i + 1);
+            if (strEQ(key, "inference") || strEQ(key, "main")) {
+                main_inference_sv = val;
+            } else if (strEQ(key, "draft") || strEQ(key, "draft_inference")) {
+                draft_inference_sv = val;
+            } else if (strEQ(key, "k") || strEQ(key, "depth")) {
+                k = SvIV(val);
+            } else if (strEQ(key, "temperature")) {
+                temperature = SvNV(val);
+            } else if (strEQ(key, "top_p")) {
+                top_p = SvNV(val);
+            }
+        }
+    }
+    
+    if (!main_inference_sv)
+        croak("Lugh::Speculative->new requires 'inference' (main inference engine)");
+    if (!draft_inference_sv)
+        croak("Lugh::Speculative->new requires 'draft' (draft inference engine)");
+    
+    /* Extract model IDs and vocab sizes from inference objects */
+    if (!SvROK(main_inference_sv) || SvTYPE(SvRV(main_inference_sv)) != SVt_PVHV)
+        croak("'inference' must be a Lugh::Inference object");
+    if (!SvROK(draft_inference_sv) || SvTYPE(SvRV(draft_inference_sv)) != SVt_PVHV)
+        croak("'draft' must be a Lugh::Inference object");
+    
+    hv = (HV*)SvRV(main_inference_sv);
+    svp = hv_fetch(hv, "_model_id", 9, 0);
+    if (svp && *svp) main_model_id = SvIV(*svp);
+    svp = hv_fetch(hv, "n_vocab", 7, 0);
+    if (svp && *svp) main_n_vocab = SvIV(*svp);
+    
+    hv = (HV*)SvRV(draft_inference_sv);
+    svp = hv_fetch(hv, "_model_id", 9, 0);
+    if (svp && *svp) draft_model_id = SvIV(*svp);
+    svp = hv_fetch(hv, "n_vocab", 7, 0);
+    if (svp && *svp) draft_n_vocab = SvIV(*svp);
+    
+    /* Validate vocab compatibility */
+    if (main_n_vocab != draft_n_vocab)
+        croak("Vocab size mismatch: main model has %d, draft model has %d", 
+              main_n_vocab, draft_n_vocab);
+    
+    if (main_n_vocab == 0)
+        croak("Could not determine vocabulary size from inference objects");
+    
+    /* Validate k */
+    if (k < 1 || k > 16)
+        croak("Speculation depth k must be between 1 and 16 (got %d)", k);
+    
+    /* Create KV caches for both models (we need to get model params) */
+    /* For now, create them lazily in generate() */
+    
+    /* Create speculative decoder */
+    spec = create_speculative(main_model_id, draft_model_id, 
+                              NULL, NULL, main_n_vocab,
+                              k, temperature, top_p);
+    if (!spec)
+        croak("Failed to create speculative decoder");
+    
+    /* Create blessed object */
+    obj = newSViv(0);
+    sv_magicext(obj, NULL, PERL_MAGIC_ext, &lugh_speculative_vtbl, (char*)(IV)spec->id, 0);
+    
+    /* Store references to inference objects */
+    hv = newHV();
+    hv_store(hv, "_spec_id", 8, newSViv(spec->id), 0);
+    hv_store(hv, "_main_inference", 15, SvREFCNT_inc(main_inference_sv), 0);
+    hv_store(hv, "_draft_inference", 16, SvREFCNT_inc(draft_inference_sv), 0);
+    hv_store(hv, "k", 1, newSViv(k), 0);
+    hv_store(hv, "temperature", 11, newSVnv(temperature), 0);
+    hv_store(hv, "top_p", 5, newSVnv(top_p), 0);
+    hv_store(hv, "n_vocab", 7, newSViv(main_n_vocab), 0);
+    
+    stash = gv_stashpv(class, GV_ADD);
+    RETVAL = sv_bless(newRV_noinc((SV*)hv), stash);
+OUTPUT:
+    RETVAL
+
+int
+k(self)
+    SV *self
+PREINIT:
+    HV *hv;
+    SV **svp;
+CODE:
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+        croak("Invalid Lugh::Speculative object");
+    hv = (HV*)SvRV(self);
+    svp = hv_fetch(hv, "k", 1, 0);
+    RETVAL = svp ? SvIV(*svp) : 4;
+OUTPUT:
+    RETVAL
+
+double
+temperature(self)
+    SV *self
+PREINIT:
+    HV *hv;
+    SV **svp;
+CODE:
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+        croak("Invalid Lugh::Speculative object");
+    hv = (HV*)SvRV(self);
+    svp = hv_fetch(hv, "temperature", 11, 0);
+    RETVAL = svp ? SvNV(*svp) : 0.8;
+OUTPUT:
+    RETVAL
+
+double
+top_p(self)
+    SV *self
+PREINIT:
+    HV *hv;
+    SV **svp;
+CODE:
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+        croak("Invalid Lugh::Speculative object");
+    hv = (HV*)SvRV(self);
+    svp = hv_fetch(hv, "top_p", 5, 0);
+    RETVAL = svp ? SvNV(*svp) : 0.95;
+OUTPUT:
+    RETVAL
+
+int
+n_vocab(self)
+    SV *self
+PREINIT:
+    HV *hv;
+    SV **svp;
+CODE:
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+        croak("Invalid Lugh::Speculative object");
+    hv = (HV*)SvRV(self);
+    svp = hv_fetch(hv, "n_vocab", 7, 0);
+    RETVAL = svp ? SvIV(*svp) : 0;
+OUTPUT:
+    RETVAL
+
+double
+acceptance_rate(self)
+    SV *self
+PREINIT:
+    HV *hv;
+    SV **svp;
+    LughSpeculative *spec;
+CODE:
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+        croak("Invalid Lugh::Speculative object");
+    hv = (HV*)SvRV(self);
+    svp = hv_fetch(hv, "_spec_id", 8, 0);
+    if (!svp) croak("Invalid Lugh::Speculative object");
+    spec = get_speculative_by_id(SvIV(*svp));
+    if (!spec) croak("Speculative decoder has been destroyed");
+    
+    if (spec->tokens_drafted == 0)
+        RETVAL = 0.0;
+    else
+        RETVAL = (double)spec->tokens_accepted / (double)spec->tokens_drafted;
+OUTPUT:
+    RETVAL
+
+IV
+tokens_drafted(self)
+    SV *self
+PREINIT:
+    HV *hv;
+    SV **svp;
+    LughSpeculative *spec;
+CODE:
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+        croak("Invalid Lugh::Speculative object");
+    hv = (HV*)SvRV(self);
+    svp = hv_fetch(hv, "_spec_id", 8, 0);
+    if (!svp) croak("Invalid Lugh::Speculative object");
+    spec = get_speculative_by_id(SvIV(*svp));
+    if (!spec) croak("Speculative decoder has been destroyed");
+    RETVAL = spec->tokens_drafted;
+OUTPUT:
+    RETVAL
+
+IV
+tokens_accepted(self)
+    SV *self
+PREINIT:
+    HV *hv;
+    SV **svp;
+    LughSpeculative *spec;
+CODE:
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+        croak("Invalid Lugh::Speculative object");
+    hv = (HV*)SvRV(self);
+    svp = hv_fetch(hv, "_spec_id", 8, 0);
+    if (!svp) croak("Invalid Lugh::Speculative object");
+    spec = get_speculative_by_id(SvIV(*svp));
+    if (!spec) croak("Speculative decoder has been destroyed");
+    RETVAL = spec->tokens_accepted;
+OUTPUT:
+    RETVAL
+
+IV
+total_steps(self)
+    SV *self
+PREINIT:
+    HV *hv;
+    SV **svp;
+    LughSpeculative *spec;
+CODE:
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+        croak("Invalid Lugh::Speculative object");
+    hv = (HV*)SvRV(self);
+    svp = hv_fetch(hv, "_spec_id", 8, 0);
+    if (!svp) croak("Invalid Lugh::Speculative object");
+    spec = get_speculative_by_id(SvIV(*svp));
+    if (!spec) croak("Speculative decoder has been destroyed");
+    RETVAL = spec->total_steps;
+OUTPUT:
+    RETVAL
+
+void
+reset_stats(self)
+    SV *self
+PREINIT:
+    HV *hv;
+    SV **svp;
+    LughSpeculative *spec;
+CODE:
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+        croak("Invalid Lugh::Speculative object");
+    hv = (HV*)SvRV(self);
+    svp = hv_fetch(hv, "_spec_id", 8, 0);
+    if (!svp) croak("Invalid Lugh::Speculative object");
+    spec = get_speculative_by_id(SvIV(*svp));
+    if (!spec) croak("Speculative decoder has been destroyed");
+    
+    SPECULATIVE_LOCK(spec);
+    spec->tokens_drafted = 0;
+    spec->tokens_accepted = 0;
+    spec->total_steps = 0;
+    SPECULATIVE_UNLOCK(spec);
+
+void
+DESTROY(self)
+    SV *self
+CODE:
+    /* Magic cleanup handles this */
+    PERL_UNUSED_VAR(self);
+
+int
+init_caches(self)
+    SV *self
+PREINIT:
+    HV *hv;
+    SV **svp;
+    LughSpeculative *spec;
+CODE:
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+        croak("Invalid Lugh::Speculative object");
+    hv = (HV*)SvRV(self);
+    
+    svp = hv_fetch(hv, "_spec_id", 8, 0);
+    if (!svp) croak("Invalid Lugh::Speculative object");
+    spec = get_speculative_by_id(SvIV(*svp));
+    if (!spec) croak("Speculative decoder has been destroyed");
+    
+    if (!spec_init_caches(aTHX_ hv, spec)) {
+        croak("Failed to initialize KV caches");
+    }
+    
+    RETVAL = 1;
+OUTPUT:
+    RETVAL
+
+void
+draft_tokens(self, input_tokens_ref, n_draft)
+    SV *self
+    SV *input_tokens_ref
+    int n_draft
+PREINIT:
+    HV *hv;
+    SV **svp;
+    LughSpeculative *spec;
+    AV *input_av, *draft_av;
+    int i, n_input;
+    int *input_tokens;
+PPCODE:
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+        croak("Invalid Lugh::Speculative object");
+    hv = (HV*)SvRV(self);
+    
+    svp = hv_fetch(hv, "_spec_id", 8, 0);
+    if (!svp) croak("Invalid Lugh::Speculative object");
+    spec = get_speculative_by_id(SvIV(*svp));
+    if (!spec) croak("Speculative decoder has been destroyed");
+    
+    if (!SvROK(input_tokens_ref) || SvTYPE(SvRV(input_tokens_ref)) != SVt_PVAV)
+        croak("input_tokens must be an array reference");
+    input_av = (AV*)SvRV(input_tokens_ref);
+    n_input = av_len(input_av) + 1;
+    
+    /* Convert input tokens to C array */
+    Newx(input_tokens, n_input, int);
+    for (i = 0; i < n_input; i++) {
+        SV **tv = av_fetch(input_av, i, 0);
+        input_tokens[i] = tv ? SvIV(*tv) : 0;
+    }
+    
+    /* Call C helper function */
+    draft_av = spec_draft_tokens(aTHX_ hv, spec, input_tokens, n_input, n_draft);
+    
+    Safefree(input_tokens);
+    
+    if (!draft_av) {
+        croak("Draft token generation failed");
+    }
+    
+    EXTEND(SP, 1);
+    mPUSHs(newRV_noinc((SV*)draft_av));
+
+void
+verify_tokens(self, input_tokens_ref, draft_tokens_ref)
+    SV *self
+    SV *input_tokens_ref
+    SV *draft_tokens_ref
+PREINIT:
+    HV *hv;
+    SV **svp;
+    LughSpeculative *spec;
+    AV *input_av, *draft_av_in, *accepted_av;
+    int i, n_input, n_draft;
+    int *input_tokens, *draft_tokens;
+PPCODE:
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+        croak("Invalid Lugh::Speculative object");
+    hv = (HV*)SvRV(self);
+    
+    svp = hv_fetch(hv, "_spec_id", 8, 0);
+    if (!svp) croak("Invalid Lugh::Speculative object");
+    spec = get_speculative_by_id(SvIV(*svp));
+    if (!spec) croak("Speculative decoder has been destroyed");
+    
+    if (!SvROK(input_tokens_ref) || SvTYPE(SvRV(input_tokens_ref)) != SVt_PVAV)
+        croak("input_tokens must be an array reference");
+    if (!SvROK(draft_tokens_ref) || SvTYPE(SvRV(draft_tokens_ref)) != SVt_PVAV)
+        croak("draft_tokens must be an array reference");
+    
+    input_av = (AV*)SvRV(input_tokens_ref);
+    draft_av_in = (AV*)SvRV(draft_tokens_ref);
+    n_input = av_len(input_av) + 1;
+    n_draft = av_len(draft_av_in) + 1;
+    
+    /* Convert input tokens to C array */
+    Newx(input_tokens, n_input, int);
+    for (i = 0; i < n_input; i++) {
+        SV **tv = av_fetch(input_av, i, 0);
+        input_tokens[i] = tv ? SvIV(*tv) : 0;
+    }
+    
+    /* Convert draft tokens to C array */
+    Newx(draft_tokens, n_draft, int);
+    for (i = 0; i < n_draft; i++) {
+        SV **tv = av_fetch(draft_av_in, i, 0);
+        draft_tokens[i] = tv ? SvIV(*tv) : 0;
+    }
+    
+    /* Call C helper function */
+    accepted_av = spec_verify_tokens(aTHX_ hv, spec, input_tokens, n_input, draft_tokens, n_draft);
+    
+    Safefree(input_tokens);
+    Safefree(draft_tokens);
+    
+    if (!accepted_av) {
+        croak("Token verification failed");
+    }
+    
+    EXTEND(SP, 1);
+    mPUSHs(newRV_noinc((SV*)accepted_av));
+
+void
+step(self, input_tokens_ref)
+    SV *self
+    SV *input_tokens_ref
+PREINIT:
+    HV *hv;
+    SV **svp;
+    LughSpeculative *spec;
+    AV *input_av, *accepted_av;
+    int *input_tokens;
+    int n_input, i;
+PPCODE:
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+        croak("Invalid Lugh::Speculative object");
+    hv = (HV*)SvRV(self);
+    
+    svp = hv_fetch(hv, "_spec_id", 8, 0);
+    if (!svp) croak("Invalid Lugh::Speculative object");
+    spec = get_speculative_by_id(SvIV(*svp));
+    if (!spec) croak("Speculative decoder has been destroyed");
+    
+    if (!SvROK(input_tokens_ref) || SvTYPE(SvRV(input_tokens_ref)) != SVt_PVAV)
+        croak("input_tokens must be an array reference");
+    
+    input_av = (AV*)SvRV(input_tokens_ref);
+    n_input = av_len(input_av) + 1;
+    
+    /* Convert input tokens to C array */
+    Newx(input_tokens, n_input, int);
+    for (i = 0; i < n_input; i++) {
+        SV **tv = av_fetch(input_av, i, 0);
+        input_tokens[i] = tv ? SvIV(*tv) : 0;
+    }
+    
+    /* Call C helper function directly */
+    accepted_av = spec_step(aTHX_ hv, spec, input_tokens, n_input);
+    
+    Safefree(input_tokens);
+    
+    if (!accepted_av) {
+        croak("Speculative step failed");
+    }
+    
+    EXTEND(SP, 1);
+    mPUSHs(newRV_noinc((SV*)accepted_av));
+
+void
+generate(self, input_tokens_ref, max_tokens)
+    SV *self
+    SV *input_tokens_ref
+    int max_tokens
+PREINIT:
+    HV *hv;
+    SV **svp;
+    LughSpeculative *spec;
+    AV *input_av, *output_av, *accepted_av;
+    int *current_tokens;
+    int n_current, n_generated;
+    int i;
+PPCODE:
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+        croak("Invalid Lugh::Speculative object");
+    hv = (HV*)SvRV(self);
+    
+    svp = hv_fetch(hv, "_spec_id", 8, 0);
+    if (!svp) croak("Invalid Lugh::Speculative object");
+    spec = get_speculative_by_id(SvIV(*svp));
+    if (!spec) croak("Speculative decoder has been destroyed");
+    
+    if (!SvROK(input_tokens_ref) || SvTYPE(SvRV(input_tokens_ref)) != SVt_PVAV)
+        croak("input_tokens must be an array reference");
+    
+    input_av = (AV*)SvRV(input_tokens_ref);
+    n_current = av_len(input_av) + 1;
+    
+    if (max_tokens <= 0) max_tokens = 256;
+    
+    /* Initialize caches directly */
+    if (!spec_init_caches(aTHX_ hv, spec)) {
+        croak("Failed to initialize caches");
+    }
+    
+    /* Build current tokens array */
+    Newx(current_tokens, n_current + max_tokens, int);
+    for (i = 0; i < n_current; i++) {
+        SV **tv = av_fetch(input_av, i, 0);
+        current_tokens[i] = tv ? SvIV(*tv) : 0;
+    }
+    
+    output_av = newAV();
+    n_generated = 0;
+    
+    /* Generation loop */
+    while (n_generated < max_tokens) {
+        int n_accepted;
+        
+        /* Call C helper function directly */
+        accepted_av = spec_step(aTHX_ hv, spec, current_tokens, n_current);
+        
+        if (!accepted_av) {
+            break;
+        }
+        
+        n_accepted = av_len(accepted_av) + 1;
+        
+        if (n_accepted == 0) {
+            av_undef(accepted_av);
+            break;
+        }
+        
+        /* Add accepted tokens to current sequence and output */
+        for (i = 0; i < n_accepted && n_generated < max_tokens; i++) {
+            SV **tv = av_fetch(accepted_av, i, 0);
+            if (tv && *tv) {
+                int token = SvIV(*tv);
+                current_tokens[n_current++] = token;
+                av_push(output_av, newSViv(token));
+                n_generated++;
+                
+                /* Check for EOS token */
+                if (token == 2) {
+                    av_undef(accepted_av);
+                    goto done;
+                }
+            }
+        }
+        
+        av_undef(accepted_av);
+    }
+    
+  done:
+    Safefree(current_tokens);
+    
+    EXTEND(SP, 1);
+    mPUSHs(newRV_noinc((SV*)output_av));
+

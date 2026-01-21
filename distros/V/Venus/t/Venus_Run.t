@@ -16,7 +16,7 @@ my $test = test(__FILE__);
 
 my $init = {
   data => {
-    ECHO => 1,
+    VENUS_RUN_DEBUG => 1,
   },
   exec => {
     brew => 'perlbrew',
@@ -173,6 +173,20 @@ variables where appropriate. See L<vns> for an executable file which loads this
 package and provides the CLI. See L</FEATURES> for usage and configuration
 information.
 
+Environment variables:
+
++=over 4
+
++=item * C<VENUS_FILE> - Explicitly set the config file for L<Venus::Run> (and L<vns>).
+
++=item * C<VENUS_RUN_FILE> - Alias for C<VENUS_FILE>.
+
++=item * C<VENUS_RUN_CONFIG> - Alias for C<VENUS_FILE>.
+
++=item * C<VENUS_RUN_DEBUG> - Enable debugging in L<Venus::Run> (and L<vns>).
+
++=back
+
 =cut
 
 $test->for('description');
@@ -298,7 +312,9 @@ for the purpose of debugging command execution.
 
 $test->for('example', 1, 'debug', sub {
   my ($tryable) = @_;
+  my $VENUS_DEBUG = delete $ENV{VENUS_DEBUG};
   my $result = $tryable->result;
+  $ENV{VENUS_DEBUG} = $VENUS_DEBUG if defined $VENUS_DEBUG;
   is $result, false;
 
   !$result
@@ -552,7 +568,9 @@ The new method constructs an instance of the package.
 
 $test->for('example', 1, 'new', sub {
   my ($tryable) = @_;
+  my $VENUS_DEBUG = delete $ENV{VENUS_DEBUG};
   my $result = $tryable->result;
+  $ENV{VENUS_DEBUG} = $VENUS_DEBUG if defined $VENUS_DEBUG;
   ok $result->isa('Venus::Run');
   is_deeply $result->cache, {};
   ok ref $result->config eq 'HASH';
@@ -578,7 +596,9 @@ $test->for('example', 1, 'new', sub {
 
 $test->for('example', 2, 'new', sub {
   my ($tryable) = @_;
+  my $VENUS_DEBUG = delete $ENV{VENUS_DEBUG};
   my $result = $tryable->result;
+  $ENV{VENUS_DEBUG} = $VENUS_DEBUG if defined $VENUS_DEBUG;
   ok $result->isa('Venus::Run');
   is_deeply $result->cache, {};
   ok ref $result->config eq 'HASH';
@@ -604,7 +624,9 @@ $test->for('example', 2, 'new', sub {
 
 $test->for('example', 3, 'new', sub {
   my ($tryable) = @_;
+  my $VENUS_DEBUG = delete $ENV{VENUS_DEBUG};
   my $result = $tryable->result;
+  $ENV{VENUS_DEBUG} = $VENUS_DEBUG if defined $VENUS_DEBUG;
   ok $result->isa('Venus::Run');
   is_deeply $result->cache, {};
   ok ref $result->config eq 'HASH';
@@ -1093,7 +1115,7 @@ $test->for('example', 13, 'resolve', sub {
 
   use Venus::Run;
 
-  my $run = Venus::Run->from_file('t/conf/with.perl');
+  my $run = Venus::Run->from_file('t/conf/func.perl');
 
   # in config
   #
@@ -1258,29 +1280,30 @@ $test->for('example', 17, 'resolve', sub {
 
   use Venus::Run;
 
-  my $run = Venus::Run->from_file('t/conf/func.perl');
+  my $run = Venus::Run->from_file('t/conf/with.perl');
 
   # in config
   #
   # ---
-  # func:
-  #   dump: /path/to/dump.pl
+  # with:
+  #   psql: /path/to/other
   #
   # ...
 
-  # in dump.pl (/path/to/dump.pl)
+  # in config (/path/to/other)
   #
-  # sub {
-  #   my ($args) = @_;
+  # ---
+  # exec:
+  #   backup: pg_backupcluster
+  #   restore: pg_restorecluster
   #
-  #   ...
-  # }
+  # ...
 
-  my $config = $run->config;
+  my $config = $run->prepare_conf($run->config);
 
-  my $resolve = $run->resolve($config, 'dump', '--', 'hello');
+  my $resolve = $run->resolve($config, 'psql', 'backup');
 
-  # [['echo', "'secret'"]]
+  # [['pg_backupcluster']]
 
 =cut
 
@@ -1288,13 +1311,7 @@ $test->for('example', 18, 'resolve', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   ok ref $result eq 'ARRAY';
-  like $result->[0][0], qr/perl/;
-  like $result->[0][1], qr/-Ilib/;
-  like $result->[0][2], qr/-Ilocal\/lib\/perl5/;
-  like $result->[0][3], qr/-E/;
-  like $result->[0][4], qr{[quotemeta('(do("./t/path/etc/dump.pl"))->(@ARGV)')]};
-  like $result->[0][5], qr/--/;
-  like $result->[0][6], qr/hello/;
+  like $result->[0][0], qr/pg_backupcluster/;
 
   $result
 });
@@ -1737,6 +1754,343 @@ $test->for('example', 1, 'from_init', sub {
 
   $result
 });
+
+=feature config
+
+The CLI provided by this package operates on a configuration file, typically
+having a base name of C<.vns> with a Perl, JSON, or YAML file extension. Here
+is an example of a configuration file using YAML with the filename
+C<.vns.yaml>.
+
+  ---
+  exec:
+    cpan: cpanm -llocal -qn
+    okay: $PERL -c
+    repl: $PERL -dE0
+    says: $PERL -E "map log(eval), @ARGV"
+    test: $PROVE
+  libs:
+  - -Ilib
+  - -Ilocal/lib/perl5
+  load:
+  - -MVenus=true,false
+  path:
+  - ./bin
+  - ./dev
+  - -Ilocal/bin
+  perl:
+    perl: perl
+    prove: prove
+  vars:
+    PERL: perl
+    PROVE: prove
+
+=cut
+
+$test->for('feature', 'config');
+
+=feature config: asks
+
+  ---
+  asks:
+    HOME: Enter your home dir
+
+The configuration file's C<asks> section provides a list of key/value pairs
+where the key is the name of the environment variable and the value is used as
+the message used by the CLI to prompt for input if the environment variable is
+not defined.
+
+=cut
+
+$test->for('feature', 'config: asks');
+
+=feature config: data
+
+  ---
+  data:
+    VENUS_DEBUG: true
+
+The configuration file's C<data> section provides a non-dynamic list of
+key/value pairs that will be used as environment variables.
+
+=cut
+
+$test->for('feature', 'config: data');
+
+=feature config: exec
+
+  ---
+  exec:
+    okay: $PERL -c
+
+The configuration file's C<exec> section provides the main dynamic tasks which
+can be recursively resolved and expanded.
+
+=cut
+
+$test->for('feature', 'config: exec');
+
+=feature config: find
+
+  ---
+  find:
+    cpanm: /usr/local/bin/cpanm
+
+The configuration file's C<find> section provides aliases which can be
+recursively resolved and expanded for use in other tasks.
+
+=cut
+
+$test->for('feature', 'config: find');
+
+=feature config: flow
+
+  ---
+  flow:
+    deps:
+    - cpan Term::ReadKey
+    - cpan Term::ReadLine::Gnu
+
+The configuration file's C<flow> section provides chainable tasks which are
+recursively resolved and expanded from other tasks.
+
+=cut
+
+$test->for('feature', 'config: flow');
+
+=feature config: from
+
+  ---
+  from:
+  - /usr/share/vns/.vns.yaml
+
+The configuration file's C<from> section provides paths to other configuration
+files which will be merged before execution allowing the inheritance of of
+configuration values.
+
+=cut
+
+$test->for('feature', 'config: from');
+
+=feature config: func
+
+  ---
+  func:
+    psql: ./psql-tools/.vns.yml
+
+The configuration file's C<func> section provides a list of static key/value
+pairs where the key is the "subcommand" passed to the runner as the first
+arugment, and the value is the configuration file where the subcommand task
+definitions are defined which the runner dispatches to. The differs from the
+C<with> section commands in that the runner doesn't C<"chdir"|perlfunc/chdir>
+into the configuration root before executing commands. When executed, the
+following environment variables are set.
+
+Environment variables:
+
++=over 4
+
++=item * C<VENUS_RUN_FROM_ROOT> - The C<$VENUS_FILE> root directory.
+
++=item * C<VENUS_RUN_FROM_FILE> - The C<$VENUS_FILE> configuration file path.
+
++=item * C<VENUS_RUN_FUNC_ROOT> - The I<"func"> configuration file root directory.
+
++=item * C<VENUS_RUN_FUNC_FILE> - The I<"func"> configuration file path.
+
++=back
+
+=cut
+
+$test->for('feature', 'config: func');
+
+=feature config: libs
+
+  ---
+  libs:
+  - -Ilib
+  - -Ilocal/lib/perl5
+
+The configuration file's C<libs> section provides a list of C<-I/path/to/lib>
+"include" statements that will be automatically added to tasks expanded from
+the C<perl> section.
+
+=cut
+
+$test->for('feature', 'config: libs');
+
+=feature config: load
+
+  ---
+  load:
+  - -MVenus=true,false
+
+The configuration file's C<load> section provides a list of C<-MPackage>
+"import" statements that will be automatically added to tasks expanded from the
+C<perl> section.
+
+=cut
+
+$test->for('feature', 'config: load');
+
+=feature config: path
+
+  ---
+  path:
+  - ./bin
+  - ./dev
+  - -Ilocal/bin
+
+The configuration file's C<path> section provides a list of paths to be
+prepended to the C<PATH> environment variable which allows programs to be
+found.
+
+=cut
+
+$test->for('feature', 'config: path');
+
+=feature config: perl
+
+  ---
+  perl:
+    perl: perl
+
+The configuration file's C<perl> section provides the dynamic perl tasks which
+can serve as tasks with default commands (with options) and which can be
+recursively resolved and expanded.
+
+=cut
+
+$test->for('feature', 'config: perl');
+
+=feature config: task
+
+  ---
+  task:
+    setup: $PERL -MMyApp::Task::Setup -E0 --
+
+The configuration file's C<task> section provides the dynamic perl tasks which
+"load" L<Venus::Task> derived packages, and which can be recursively resolved
+and expanded. These tasks will typically take the form of C<perl -Ilib
+-MMyApp::Task -E0 --> and will be automatically executed as a CLI.
+
+=cut
+
+$test->for('feature', 'config: task');
+
+=feature config: vars
+
+  ---
+  vars:
+    PERL: perl
+
+The configuration file's C<vars> section provides a list of dynamic key/value
+pairs that can be recursively resolved and expanded and will be used as
+environment variables.
+
+=back
+
+$test->for('feature', 'config: vars');
+
+=feature config: when
+
+  ---
+  when:
+    is_lin:
+      data:
+        OSNAME: LINUX
+    is_win:
+      data:
+        OSNAME: WINDOWS
+
+The configuration file's C<when> section provides a configuration tree to be
+merged with the existing configuration based on the name current operating
+system. The C<is_$name> key should correspond to one of the types specified by
+L<Venus::Os/type>.
+
+=back
+
+$test->for('feature', 'config: when');
+
+=feature config: with
+
+  ---
+  with:
+    psql: ./psql-tools/.vns.yml
+
+The configuration file's C<with> section provides a list of static key/value
+pairs where the key is the "subcommand" passed to the runner as the first
+arugment, and the value is the configuration file where the subcommand task
+definitions are defined which the runner dispatches to.  The differs from the
+C<func> section commands in that the runner will C<"chdir"|perlfunc/chdir> into
+the configuration root before executing commands. When executed, the
+following environment variables are set.
+
+Environment variables:
+
++=over 4
+
++=item * C<VENUS_RUN_FROM_ROOT> - The C<$VENUS_FILE> root directory.
+
++=item * C<VENUS_RUN_FROM_FILE> - The C<$VENUS_FILE> configuration file path.
+
++=item * C<VENUS_RUN_WITH_ROOT> - The I<"with"> configuration file root directory.
+
++=item * C<VENUS_RUN_WITH_FILE> - The I<"with"> configuration file path.
+
++=back
+
+=back
+
+$test->for('feature', 'config: with');
+
+=feature runner: vns
+
+Here are example usages of the configuration file mentioned, executed by the
+L<vns> CLI, which is an executable file which loads this package.
+
+  # Mint a new configuration file
+  vns new pl
+
+  # Mint a new JSON configuration file
+  vns new json
+
+  # Mint a new YAML configuration file
+  vns new yaml
+
+  # Install a distribution
+  vns cpan $DIST
+
+  # i.e.
+  # cpanm --llocal -qn $DIST
+
+  # Check that a package can be compiled
+  vns okay $FILE
+
+  # i.e.
+  # perl -Ilib -Ilocal/lib/perl5 -c $FILE
+
+  # Use the Perl debugger as a REPL
+  vns repl
+
+  # i.e.
+  # perl -Ilib -Ilocal/lib/perl5 -dE0
+
+  # Evaluate arbitrary Perl expressions
+  vns exec ...
+
+  # i.e.
+  # perl -Ilib -Ilocal/lib/perl5 -MVenus=log -E $@
+
+  # Test the Perl project in the CWD
+  vns test t
+
+  # i.e.
+  # prove -Ilib -Ilocal/lib/perl5 t
+
+=cut
+
+$test->for('feature', 'runner: vns');
 
 =partials
 

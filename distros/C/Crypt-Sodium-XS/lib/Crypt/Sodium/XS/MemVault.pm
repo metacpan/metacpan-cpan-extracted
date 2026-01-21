@@ -66,7 +66,8 @@ sub mv_from_ttyno { __PACKAGE__->new_from_ttyno(@_); }
 
 sub new_from_file {
   my $invocant = shift;
-  my $path = shift // '';
+  my $path = shift;
+  $path = '' unless defined $path;
   sysopen(my $fh, $path, O_NOCTTY|O_RDONLY)
     or die "$path: new_from_file:open: $!";
   return $invocant->new_from_fd(fileno($fh), @_);
@@ -77,7 +78,8 @@ $tty_init = 0 if !defined($tty_init);
 sub new_from_tty {
   my $invocant = shift;
   # undef intended to indicate 'controlling tty'
-  my $path = shift // '/dev/tty';
+  my $path = shift;
+  $path = '/dev/tty' unless defined $path;
   sysopen(my $fh, $path, O_NOCTTY|O_RDWR|$tty_init)
     or die "$path: new_from_tty:open: $!";
   return $invocant->new_from_ttyno(fileno($fh), @_);
@@ -85,8 +87,10 @@ sub new_from_tty {
 
 sub to_file {
   my $invocant = shift;
-  my $path = shift // '';
-  my $mode = shift // 0600;
+  my $path = shift;
+  $path = '' unless defined $path;
+  my $mode = shift;
+  $mode = 0600 unless defined $mode;
   sysopen(my $fh, $path, O_CREAT|O_NOCTTY|O_TRUNC|O_WRONLY, $mode)
     or die "$path: to_file:open: $!";
   return $invocant->to_fd(fileno($fh), @_);

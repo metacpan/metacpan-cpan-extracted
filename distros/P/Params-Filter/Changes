@@ -1,0 +1,94 @@
+Revision history for Params-Filter
+
+v0.006  2026-01-20 (STABLE RELEASE)
+    - First stable CPAN release
+    - Major documentation improvements:
+      - Updated POD to match README structure and clarity
+      - Improved DESCRIPTION section with clearer "When to Use" guidance
+      - Enhanced INPUT PARSING section with numbered formats and better examples
+      - Enhanced RETURN VALUES section with clearer structure
+      - Improved MODIFIER METHODS documentation with important behavior notes
+      - Improved WILDCARD SUPPORT section
+      - Enhanced EXAMPLES section with complex data flows
+    - Fixed bug in example code (extra empty arrayref argument to filter())
+      - Fixed in examples/arrayref_input.pl (3 instances)
+      - Fixed in examples/edge_cases.pl (3 instances)
+      - Fixed in README.md (2 instances)
+      - Fixed in lib/Params/Filter.pm POD (2 instances)
+    - Fixed syntax error in examples/advanced_filtering.pl (hashref construction)
+    - Replaced problematic examples/strict_construction_test.pl with proper
+      examples/strict_construction.pl (educational example, no external dependencies)
+    - All 11 example scripts tested and working correctly
+    - All 59 tests passing
+    - Ready for production use
+
+v0.6_002 2026-01-14 (DEVELOPER RELEASE)
+    - Improved message consistency: separated parsing messages from debug warnings
+    - Parsing messages (always shown): plain text args, odd array elements
+    - Debug warnings (debug mode only): unrecognized fields, excluded fields
+    - Updated DEBUG MODE documentation to clarify message types
+    - Updated Common Status Messages section with parsing vs debug distinction
+    - All 59 tests still passing
+
+v0.6_01 2026-01-14 (DEVELOPER RELEASE)
+    - Beta release for CPAN testing and feedback
+    - Renamed for CPAN publication: Local::Params::Filter → Params::Filter
+    - Changed failure return value from 0 to undef for clearer boolean semantics
+    - Lowered minimum Perl version from 5.40 to 5.36 (signatures stable since 5.36)
+    - Updated all test files with new namespace
+    - Updated all example files with new namespace
+    - Updated README.md with new namespace
+    - Updated Makefile.PL for CPAN distribution
+    - Comprehensive POD documentation in module file
+    - All 59 tests passing
+    - Seeking feedback from CPAN testers and early adopters
+
+v0.5.0 2026-01-13
+    - Renamed module from Local::Params::Strictly to Local::Params::Filter
+    - Renamed function: strictly() → filter()
+    - Renamed constructor: new_bouncer() → new_filter()
+    - Renamed method: admit() → apply()
+    - Modifier methods unchanged: set_required(), set_accepted(), set_excluded(), accept_all(), accept_none()
+    - Updated all test files (t/*.t) with new naming
+    - Updated all example files (examples/*.pl) with new naming
+    - Updated README.md with new terminology and examples
+    - Updated Changes file header
+    - All functionality remains identical (breaking API change only)
+
+v0.4.0 2026-01-13
+    - Added modifier methods for dynamic bouncer configuration
+    - New methods: set_required(), set_accepted(), set_excluded()
+    - Added convenience methods: accept_all(), accept_none()
+    - new_bouncer() can now be called without arguments (defaults to reject all)
+    - Methods support both arrayref and list arguments
+    - Empty calls to set_* methods set fields to [] (empty array)
+    - All modifier methods return $self for method chaining
+    - Enables meta-programming and conditional configuration patterns
+    - Added comprehensive test suite: t/03-modifier-methods.t (23 tests)
+    - Added example script: examples/modifier_methods.pl
+    - Updated README.md with modifier methods documentation
+    - All 59 tests passing across 4 test files
+
+v0.3.1 2025-01-12
+    - Enhanced wildcard feature: '*' can now appear anywhere in accepted list
+    - More flexible debugging: can add '*' to existing accepted fields
+    - ['name', 'email', '*'] now accepts all fields
+    - Documented wildcard behavior in README.md
+    - Clarified that '*' is only special in accepted parameter
+
+v0.3.0 2025-01-12
+    - Added wildcard ['*'] feature to accept all fields in accepted parameter
+    - When ['*'] is used as accepted parameter, all fields (except exclusions) are accepted
+    - Empty [] still means 'accept none' (backward compatible)
+
+v0.2.0 2025-01-12
+    - Renamed module from Local::Strictly to Local::Params::Strictly
+    - Renamed repository from Local-Strictly to Local-Params-Strictly
+    - Updated all documentation and examples
+
+v0.1.0 2025-01-08
+    - Initial repository setup from installed version
+    - Fresh repository structure with ExtUtils::MakeMaker
+    - Parameter validation for strict construction
+    - Both functional and OO interfaces
+    - Flexible input handling (hashref, arrayref, scalar)

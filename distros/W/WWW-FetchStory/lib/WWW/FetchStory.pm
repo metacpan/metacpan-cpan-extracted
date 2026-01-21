@@ -2,14 +2,14 @@ use strict;
 use warnings;
 
 package WWW::FetchStory;
-$WWW::FetchStory::VERSION = '0.2501';
+$WWW::FetchStory::VERSION = '0.2602';
 =head1 NAME
 
 WWW::FetchStory - Fetch a story from a fiction website
 
 =head1 VERSION
 
-version 0.2501
+version 0.2602
 
 =head1 SYNOPSIS
 
@@ -105,7 +105,7 @@ sub fetch_story ($%) {
 	{
 	    if ($fe->allow($first_url)
                 # the URL might be a file, check rurl
-                    or (-f $first_url and $fe->allow($args{rurl}))
+                    or (-f $first_url and $args{rurl} and $fe->allow($args{rurl}))
             )
             {
 		$fetcher = $fe;

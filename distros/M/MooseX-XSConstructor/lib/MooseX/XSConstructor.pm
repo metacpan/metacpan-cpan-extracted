@@ -5,7 +5,7 @@ use warnings;
 package MooseX::XSConstructor;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001001';
+our $VERSION   = '0.001002';
 
 use Moose 2.2200 ();
 use Moose::Object ();
@@ -108,7 +108,8 @@ sub setup_for {
 	};
 	
 	if ( $ok and my $meta = Class::XSConstructor::get_metadata( $klass ) ) {
-		if ( $meta->{foreignclass} eq 'Moose::Object' ) {
+		if ( defined $meta->{foreignclass}
+		and ( $meta->{foreignclass} eq 'Moose::Object' or $self->is_suitable_class( $meta->{foreignclass} ) ) ) {
 			delete $meta->{$_} for qw/
 				foreignbuildall
 				foreignconstructor
@@ -117,8 +118,10 @@ sub setup_for {
 			/;
 		}
 		if ( $meta->{buildargs} == \&Moose::Object::BUILDARGS ) {
+			$meta->{has_standard_buildargs} = !!1;
 			delete $meta->{buildargs};
 		}
+		$klass->XSCON_CLEAR_CONSTRUCTOR_CACHE;
 	}
 	else {
 		# If there was a failure, restore old constructor.

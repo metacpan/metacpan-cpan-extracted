@@ -60,7 +60,7 @@
    "provides" : {
       "Pivot::ArrayOfHashes" : {
          "file" : "lib/Pivot/ArrayOfHashes.pm",
-         "version" : "1.0001"
+         "version" : "1.0002"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/Troglodyne-Internet-Widgets/Pivot-ArrayOfHashes"
       }
    },
-   "version" : "1.0001",
+   "version" : "1.0002",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "MIT"

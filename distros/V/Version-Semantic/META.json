@@ -1,5 +1,5 @@
 {
-   "abstract" : "Tiny SemVer based class implementation",
+   "abstract" : "Immutable SemVer scheme based version class",
    "author" : [
       "Sven Willenbuecher <sven.willenbuecher@gmx.de>"
    ],
@@ -54,7 +54,7 @@
    "provides" : {
       "Version::Semantic" : {
          "file" : "lib/Version/Semantic.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
@@ -68,5 +68,5 @@
          "web" : "https://github.com/XSven/Version-Semantic"
       }
    },
-   "version" : "v1.0.0"
+   "version" : "v1.0.1"
 }

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Lugh;
 
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -34,11 +34,11 @@ Lugh::KVCache - KV Cache for efficient incremental decoding
     
     # Prefill: process prompt tokens
     my @prompt_tokens = (1, 450, 4996, 310);
-    my @logits = $inference->forward_with_cache($cache, \@prompt_tokens);
+    my @logits = $inference->forward_cache($cache, \@prompt_tokens);
     
     # Decode: generate one token at a time efficiently
     my $next_token = argmax(\@logits);
-    @logits = $inference->forward_with_cache($cache, [$next_token]);
+    @logits = $inference->forward_cache($cache, [$next_token]);
     
     # Check cache state
     print "Cached tokens: ", $cache->n_cached, "\n";
@@ -142,7 +142,7 @@ The recommended way to use KV caching:
     my @tokens = $tokenizer->encode("Once upon a time");
     
     # Prefill
-    my @logits = $inference->forward_with_cache($cache, \@tokens);
+    my @logits = $inference->forward_cache($cache, \@tokens);
     
     # Generate tokens
     for (1..100) {
@@ -150,7 +150,7 @@ The recommended way to use KV caching:
         last if $next == $tokenizer->eos_token;
         
         push @tokens, $next;
-        @logits = $inference->forward_with_cache($cache, [$next]);
+        @logits = $inference->forward_cache($cache, [$next]);
     }
     
     print $tokenizer->decode(\@tokens);
@@ -168,7 +168,7 @@ KV caching works with LoRA adapters using named parameters:
     my $cache = $inference->create_kv_cache();
     
     # Prefill with LoRA
-    my @logits = $inference->forward_with_cache(
+    my @logits = $inference->forward_cache(
         cache  => $cache,
         tokens => \@tokens,
         lora   => $lora,
@@ -179,7 +179,7 @@ KV caching works with LoRA adapters using named parameters:
         my $next = sample_top_p(\@logits, 0.9);
         last if $next == $tokenizer->eos_token;
         
-        @logits = $inference->forward_with_cache(
+        @logits = $inference->forward_cache(
             cache  => $cache,
             tokens => [$next],
             lora   => $lora,

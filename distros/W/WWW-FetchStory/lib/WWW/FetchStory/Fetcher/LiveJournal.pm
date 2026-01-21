@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher::LiveJournal;
-$WWW::FetchStory::Fetcher::LiveJournal::VERSION = '0.2501';
+$WWW::FetchStory::Fetcher::LiveJournal::VERSION = '0.2602';
 use strict;
 use warnings;
 use HTML::Entities;
@@ -9,7 +9,7 @@ WWW::FetchStory::Fetcher::LiveJournal - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.2501
+version 0.2602
 
 =head1 DESCRIPTION
 

@@ -1,9 +1,11 @@
 
 package AWS::S3::ResponseParser;
 
+use constant DEBUG => $ENV{AWS_S3_DEBUG};
 use Moose;
 use XML::LibXML;
 use XML::LibXML::XPathContext;
+use Log::Any qw( $LOG );
 
 has 'expect_nothing' => (
     is       => 'ro',
@@ -60,6 +62,23 @@ has 'error_message' => (
     required => 0,
 );
 
+has 'xml' => (
+    is       => 'ro',
+    isa      => 'XML::LibXML::Document',
+    required => 0,
+    lazy    => 1,
+    clearer => '_clear_xml',
+    default => sub {
+        my $self = shift;
+
+        my $src = $self->response->content;
+        print STDERR ">>> AWS Response:\n", $src, "\n" if DEBUG;
+
+        return unless $src =~ m/^[[:space:]]*</s;
+        return $self->libxml->parse_string( $src );
+    }
+);
+
 has 'xpc' => (
     is       => 'ro',
     isa      => 'XML::LibXML::XPathContext',
@@ -68,10 +87,8 @@ has 'xpc' => (
     clearer => '_clear_xpc',
     default => sub {
         my $self = shift;
-
-        my $src = $self->response->content;
-        return unless $src =~ m/^[[:space:]]*</s;
-        my $doc = $self->libxml->parse_string( $src );
+        my $doc = $self->xml;
+        return unless $doc;
 
         my $xpc = XML::LibXML::XPathContext->new( $doc );
         $xpc->registerNs( 's3', 'http://s3.amazonaws.com/doc/2006-03-01/' );
@@ -101,6 +118,7 @@ sub _parse_errors {
     # Do not try to parse non-xml:
     unless ( $src =~ m/^[[:space:]]*</s ) {
         ( my $code = $src ) =~ s/^[[:space:]]*\([0-9]*\).*$/$1/s;
+        $LOG->error('Error response from AWS', {code => $code, msg => $src});
         $self->error_code( $code );
         $self->error_message( $src );
         return 1;
@@ -112,8 +130,11 @@ sub _parse_errors {
     #### $s->_clear_xpc;
 
     if ( $self->xpc->findnodes( "//Error" ) ) {
-        $self->error_code( $self->xpc->findvalue( "//Error/Code" ) );
-        $self->error_message( $self->xpc->findvalue( "//Error/Message" ) );
+        my $code = $self->xpc->findvalue( "//Error/Code" );
+        my $msg = $self->xpc->findvalue( "//Error/Message" );
+        $LOG->error('Error response from AWS', {code => $code, msg => $msg});
+        $self->error_code( $code );
+        $self->error_message( $msg );
         return 1;
     }
 

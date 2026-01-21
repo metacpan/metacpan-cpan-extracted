@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Class-XSConstructor>
 Bug tracker:  <https://github.com/tobyink/p5-class-xsconstructor/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.022002	2026-01-20
+
+ [ Bug Fixes ]
+ - Fix issues passing parameters to FOREIGNBUILDARGS.
+
 0.022001	2026-01-16
 
  [ Bug Fixes ]

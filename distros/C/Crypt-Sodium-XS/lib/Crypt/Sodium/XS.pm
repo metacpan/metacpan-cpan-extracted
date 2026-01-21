@@ -1,7 +1,7 @@
 package Crypt::Sodium::XS;
 BEGIN {
   # BEGIN block and use line for MemVault are for its overloads to work
-  our $VERSION = '0.000042';
+  our $VERSION = '0.001000';
   require XSLoader;
   XSLoader::load(__PACKAGE__, $VERSION);
 }
@@ -10,6 +10,7 @@ use warnings;
 
 use Exporter 'import';
 use Crypt::Sodium::XS::MemVault;
+use parent 'Crypt::Sodium::XS::Base';
 
 _define_constants();
 
@@ -24,52 +25,25 @@ our %EXPORT_TAGS = (
 $EXPORT_TAGS{all} = [@{$EXPORT_TAGS{functions}}, @{$EXPORT_TAGS{constants}}];
 our @EXPORT_OK = @{$EXPORT_TAGS{all}};
 
-# NB: Crypt::Sodium::XS::Protmem import not required, calling XSUBs directly.
-if ($ENV{PROTMEM_FLAGS_KEY}) {
-  Crypt::Sodium::XS::ProtMem::protmem_flags_key_default($ENV{PROTMEM_FLAGS_KEY});
+# NB: Crypt::Sodium::XS::Protmem import not necessary, calling XSUBs directly.
+if (exists $ENV{PROTMEM_FLAGS_KEY}) {
+  Crypt::Sodium::XS::ProtMem::protmem_default_flags_key($ENV{PROTMEM_FLAGS_KEY});
 }
-if ($ENV{PROTMEM_FLAGS_DECRYPT}) {
-  Crypt::Sodium::XS::ProtMem::protmem_flags_decrypt_default($ENV{PROTMEM_FLAGS_DECRYPT});
+if (exists $ENV{PROTMEM_FLAGS_DECRYPT}) {
+  Crypt::Sodium::XS::ProtMem::protmem_default_flags_decrypt($ENV{PROTMEM_FLAGS_DECRYPT});
 }
-if ($ENV{PROTMEM_FLAGS_STATE}) {
-  Crypt::Sodium::XS::ProtMem::protmem_flags_state_default($ENV{PROTMEM_FLAGS_STATE});
+if (exists $ENV{PROTMEM_FLAGS_STATE}) {
+  Crypt::Sodium::XS::ProtMem::protmem_default_flags_state($ENV{PROTMEM_FLAGS_STATE});
 }
-if ($ENV{PROTMEM_FLAGS_MEMVAULT}) {
-  Crypt::Sodium::XS::ProtMem::protmem_flags_memvault_default($ENV{PROTMEM_FLAGS_MEMVAULT});
+if (exists $ENV{PROTMEM_FLAGS_MEMVAULT}) {
+  Crypt::Sodium::XS::ProtMem::protmem_default_flags_memvault($ENV{PROTMEM_FLAGS_MEMVAULT});
 }
-if ($ENV{PROTMEM_FLAGS_ALL}) {
-  Crypt::Sodium::XS::ProtMem::protmem_flags_key_default($ENV{PROTMEM_FLAGS_ALL});
-  Crypt::Sodium::XS::ProtMem::protmem_flags_decrypt_default($ENV{PROTMEM_FLAGS_ALL});
-  Crypt::Sodium::XS::ProtMem::protmem_flags_state_default($ENV{PROTMEM_FLAGS_ALL});
-  Crypt::Sodium::XS::ProtMem::protmem_flags_memvault_default($ENV{PROTMEM_FLAGS_ALL});
+if (exists $ENV{PROTMEM_FLAGS_ALL}) {
+  Crypt::Sodium::XS::ProtMem::protmem_default_flags_key($ENV{PROTMEM_FLAGS_ALL});
+  Crypt::Sodium::XS::ProtMem::protmem_default_flags_decrypt($ENV{PROTMEM_FLAGS_ALL});
+  Crypt::Sodium::XS::ProtMem::protmem_default_flags_state($ENV{PROTMEM_FLAGS_ALL});
+  Crypt::Sodium::XS::ProtMem::protmem_default_flags_memvault($ENV{PROTMEM_FLAGS_ALL});
 }
-
-sub sodium_op {
-  my $module = shift;
-  die "Invalid sodium module name '$module'" unless $module =~ /^\A[A-Z0-9a-z_]+\z/;
-  my $pkg = "Crypt::Sodium::XS::OO::$module";
-  my $path = "Crypt/Sodium/XS/OO/$module.pm";
-  die "Failed to load module '$path'" unless CORE::require($path);
-  return $pkg->new(@_);
-}
-
-sub aead { shift; sodium_op(aead => @_) }
-sub auth { shift; sodium_op(auth => @_) }
-sub box { shift; sodium_op(box => @_) }
-sub curve25519 { shift; sodium_op(curve25519 => @_) }
-sub generichash { shift; sodium_op(generichash => @_) }
-sub hash { shift; sodium_op(hash => @_) }
-sub hkdf { shift; sodium_op(hkdf => @_) }
-sub kdf { shift; sodium_op(kdf => @_) }
-sub kx { shift; sodium_op(kx => @_) }
-sub onetimeauth { shift; sodium_op(onetimeauth => @_) }
-sub pwhash { shift; sodium_op(pwhash => @_) }
-sub scalarmult { shift; sodium_op(scalarmult => @_) }
-sub secretbox { shift; sodium_op(secretbox => @_) }
-sub secretstream { shift; sodium_op(secretstream => @_) }
-sub shorthash { shift; sodium_op(shorthash => @_) }
-sub sign { shift; sodium_op(sign => @_) }
-sub stream { shift; sodium_op(stream => @_) }
 
 1;
 
@@ -226,39 +200,22 @@ something like:
   SODIUM_LIBS="-L/opt/sodium/lib -Wl,-rpath -Wl,/opt/sodium/lib -lsodium" \
   cpanm Crypt::Sodium::XS
 
-=head1 PROCEDURAL vs. OO
+=head1 PROCEDURAL vs. OBJECT ORIENTED
 
-For all libsodium operations, there are both procedural and object oriented
-perl modules. The OO interface is really just a convenience wrapper around the
-procedural one. If you are coming from L<Crypt::Sodium::NaCl>, the OO interface
-will be more familiar.
+For all libsodium operations, there are both convenience objects wrapping the
+API and exportable functions.
 
-The procedural interface gives a small but not insignificant performance
-improvement over OO, if micro-optimization is important to your use of the
-library. The OO interface can be more concise and easier to use, so it is
+The procedural interface can give a very small performance improvement over
+objects, if micro-optimization is important to your use of the library. The
+object oriented interface can be more concise and easier to use, so it is
 recommended for most use.
 
 It is acceptable to mix and match the use of procedural and OO interfaces.
 
-Procedural modules are in the C<Crypt::Sodium::XS::*> namespace, while object
-oriented modules are in the C<Crypt::Sodium::XS::OO::*> namespace.
+For each of the L</LIBSODIUM OPERATIONS>, L<Crypt::Sodium::XS> has a
+constructor method. For example:
 
-To use a procedural interface, see C<Crypt::Sodium::XS::E<lt>operationE<gt>>
-(e.g., L<Crypt::Sodium::XS::box>).
-
-To use an object oriented interface, see
-C<Crypt::Sodium::XS::OO::E<lt>operationE<gt>> (e.g.,
-L<Crypt::Sodium::XS::OO::box>).
-
-Additionally, L<Crypt::Sodium::XS> provides a convenience method as a shortcut
-to the constructor for OO modules. For example, the following two snippets are
-equivalent:
-
-  use Crypt::Sodium::XS::OO::box;
-  my $box = Crypt::Sodium::XS::OO::box->new(%args);
-
-  use Crypt::Sodium::XS;
-  my $box = Crypt::Sodium::XS->box(%args);
+  my $box_obj = Crypt::Sodium::XS->box(%constructor_args);
 
 =head1 LIBSODIUM OPERATIONS
 
@@ -270,106 +227,105 @@ The following libsodium operations are supported:
 
 Authenticated encryption with additional data
 
-See L<Crypt::Sodium::XS::aead> or L<Crypt::Sodium::XS::OO::aead>.
+See L<Crypt::Sodium::XS::aead>.
 
 =item * auth
 
 Secret key message authentication
 
-See L<Crypt::Sodium::XS::auth> or L<Crypt::Sodium::XS::OO::auth>.
+See L<Crypt::Sodium::XS::auth>.
 
 =item * box
 
 Public key authenticated or anonymous encryption
 
-See L<Crypt::Sodium::XS::box> or L<Crypt::Sodium::XS::OO::box>.
+See L<Crypt::Sodium::XS::box>.
 
 =item * curve25519
 
 Low-level functions over Curve25519. Only for creating custom constructions.
 
-See L<Crypt::Sodium::XS::curve25519> or L<Crypt::Sodium::XS::OO::curve25519>.
+See L<Crypt::Sodium::XS::curve25519>.
 
 =item * generichash
 
 Generic cryptographic hashing
 
-See L<Crypt::Sodium::XS::generichash> or L<Crypt::Sodium::XS::OO::generichash>.
+See L<Crypt::Sodium::XS::generichash>.
 
 =item * hash
 
 SHA2 hashing
 
-See L<Crypt::Sodium::XS::hash> or L<Crypt::Sodium::XS::OO::hash>.
+See L<Crypt::Sodium::XS::hash>.
 
 =item * hkdf
 
 (HMAC-based) Key derivation from a master key
 
-See L<Crypt::Sodium::XS::hkdf> or L<Crypt::Sodium::XS::OO::hkdf>.
+See L<Crypt::Sodium::XS::hkdf>.
 
 =item * kdf
 
 Key derivation from a master key
 
-See L<Crypt::Sodium::XS::kdf> or L<Crypt::Sodium::XS::OO::kdf>.
+See L<Crypt::Sodium::XS::kdf>.
 
 =item * kx
 
 Diffie-Hellman key exchange
 
-See L<Crypt::Sodium::XS::kx> or L<Crypt::Sodium::XS::OO::kx>.
+See L<Crypt::Sodium::XS::kx>.
 
 =item * onetimeauth
 
 One-time secret key authentication
 
-See L<Crypt::Sodium::XS::onetimeauth> or L<Crypt::Sodium::XS::OO::onetimeauth>.
+See L<Crypt::Sodium::XS::onetimeauth>.
 
 =item * pwhash
 
 Password hashing
 
-See L<Crypt::Sodium::XS::pwhash> or L<Crypt::Sodium::XS::OO::pwhash>.
+See L<Crypt::Sodium::XS::pwhash>.
 
 =item * shorthash
 
 Short-input hashing
 
-See L<Crypt::Sodium::XS::shorthash> or L<Crypt::Sodium::XS::OO::shorthash>.
+See L<Crypt::Sodium::XS::shorthash>.
 
 =item * sign
 
 Public key signatures
 
-See L<Crypt::Sodium::XS::sign> or L<Crypt::Sodium::XS::OO::sign>.
+See L<Crypt::Sodium::XS::sign>.
 
 =item * scalarmult
 
 Point multiplication on the curve25519 curve (primitive for key exchange,
 generating public key from secret key)
 
-See L<Crypt::Sodium::XS::scalarmult> or L<Crypt::Sodium::XS::OO::scalarmult>.
+See L<Crypt::Sodium::XS::scalarmult>.
 
 =item * secretbox
 
 Secret key (symmetric) authenticated encryption
 
-See L<Crypt::Sodium::XS::secretbox> or L<Crypt::Sodium::XS::OO::secretbox>.
+See L<Crypt::Sodium::XS::secretbox>.
 
 =item * secretstream
 
 Secret key (symmetric) authenticated message streams with additional data
 
-See L<Crypt::Sodium::XS::secretstream> or
-L<Crypt::Sodium::XS::OO::secretstream>.
+See L<Crypt::Sodium::XS::secretstream>.
 
 =item * stream
 
 Unauthenticated secret key encryption suitable only for pseudorandom
 generation, or as a primitive for higher-level construction
 
-See L<Crypt::Sodium::XS::stream> or L<Crypt::Sodium::XS::OO::stream>.
+See L<Crypt::Sodium::XS::stream>.
 
 =back
 
@@ -458,7 +414,9 @@ Brad Barden E<lt>perlmodules@5c30.orgE<gt>
 
 =head1 THANKS
 
-With thanks to Alex J. G. Burzyński for L<Crypt::NaCl::Sodium>, which inspired
+Thanks to Frank Denis for L<libsodium|https://libsodium.org/>.
+
+Thanks to Alex J. G. Burzyński for L<Crypt::NaCl::Sodium>, which inspired
 writing this.
 
 =head1 COPYRIGHT & LICENSE
@@ -467,5 +425,10 @@ Copyright (c) 2022 Brad Barden. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
+
+libsodium is Copyright (c) 2013-2024 Frank Denis <j at pureftpd dot org>
+
+Redistributed with this library under the ISC License. See the LICENSE file of
+the bundled software.
 
 =cut

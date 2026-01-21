@@ -26,13 +26,8 @@ SV * shorthash(SV * msg, SV * key)
 
   PREINIT:
   protmem *key_mv = NULL;
-  unsigned char *msg_buf;
-  unsigned char *key_buf;
-  unsigned char *out_buf;
-  STRLEN msg_len;
-  STRLEN key_len;
-  STRLEN key_req_len;
-  STRLEN out_len;
+  unsigned char *msg_buf, *key_buf, *out_buf;
+  STRLEN msg_len, key_len, key_req_len, out_len;
   int (*func)(unsigned char *, const unsigned char *,
               unsigned long long, const unsigned char *);
 

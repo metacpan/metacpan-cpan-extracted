@@ -21,13 +21,14 @@ for my $type (@types) {
 *protmem_flags_key_default = *protmem_default_flags_key;
 *protmem_flags_decrypt_default = *protmem_default_flags_decrypt;
 *protmem_flags_state_default = *protmem_default_flags_state;
-
 push(@functions, qw(
   protmem_flags_memvault_default
   protmem_flags_key_default
   protmem_flags_decrypt_default
   protmem_flags_state_default
 ));
+
+push(@functions, 'protmem_default_flags_all');
 
 our %EXPORT_TAGS = (
   functions => \@functions,
@@ -56,6 +57,13 @@ our %EXPORT_TAGS = (
 $EXPORT_TAGS{all} = [@{$EXPORT_TAGS{functions}}, @{$EXPORT_TAGS{constants}}];
 our @EXPORT_OK = @{$EXPORT_TAGS{all}};
 
+sub protmem_default_flags_all {
+  protmem_default_flags_memvault(@_);
+  protmem_default_flags_key(@_);
+  protmem_default_flags_decrypt(@_);
+  protmem_default_flags_state(@_);
+}
+
 1;
 
 __END__
@@ -72,18 +80,18 @@ Crypt::Sodium::XS::ProtMem - Memory protection functions and constants
 
   # read the docs first!
   # removing mlock requirement on keys
-  my $flags = protmem_flags_key_default();
+  my $flags = protmem_default_flags_key();
   $flags &= ~PROTMEM_MASK_MLOCK;
   $flags |= PROTMEM_FLAGS_MLOCK_PERMISSIVE;
-  my $old_flags = protmem_flags_key_default($flags);
+  my $old_flags = protmem_default_flags_key($flags);
 
-  my $flags = protmem_flags_state_default();
+  my $flags = protmem_default_flags_state();
   if (($flags & PROTMEM_MASK_MALLOC) == PROTMEM_FLAGS_MALLOC_PLAIN) {
     # no libsodium malloc, mprotect, or mlock for hash states by default
   }
 
   # removing all protection on multipart states
-  $old_flags = protmem_flags_state_default(PROTMEM_ALL_DISABLED);
+  $old_flags = protmem_default_flags_state(PROTMEM_ALL_DISABLED);
 
 =head1 DESCRIPTION
 
@@ -237,22 +245,22 @@ For a value to disable everything:
 =head2 PROTMEM_FLAGS_KEY
 
 Setting this environment variable is identical to calling
-L</protmem_flags_key_default> with the value of the variable.
+L</protmem_default_flags_key> with the value of the variable.
 
 =head2 PROTMEM_FLAGS_DECRYPT
 
 Setting this environment variable is identical to calling
-L</protmem_flags_decrypt_default> with the value of the variable.
+L</protmem_default_flags_decrypt> with the value of the variable.
 
 =head2 PROTMEM_FLAGS_STATE
 
 Setting this environment variable is identical to calling
-L</protmem_flags_state_default> with the value of the variable.
+L</protmem_default_flags_state> with the value of the variable.
 
 =head2 PROTMEM_FLAGS_MEMVAULT
 
 Setting this environment variable is identical to calling
-L</protmem_flags_memvault_default> with the value of the variable.
+L</protmem_default_flags_memvault> with the value of the variable.
 
 =head2 PROTMEM_FLAGS_ALL
 
@@ -288,8 +296,8 @@ For conceptual locking flags, use L</CONCEPTUAL LOCKING FLAGS>.
 
 =head2 protmem_default_flags_key
 
-  my $flags = protmem_flags_key_default();
-  my $old_flags = protmem_flags_key_default($new_flags);
+  my $flags = protmem_default_flags_key();
+  my $old_flags = protmem_default_flags_key($new_flags);
 
 Get or set the default flags of L<Crypt::Sodium::XS::MemVault>s created to
 store secret keys, as well as opaque object states that contain key material.
@@ -315,8 +323,8 @@ object states that contain key material.
 
 =head2 protmem_default_flags_decrypt
 
-  my $flags = protmem_flags_decrypt_default();
-  my $old_flags = protmem_flags_decrypt_default($new_flags);
+  my $flags = protmem_default_flags_decrypt();
+  my $old_flags = protmem_default_flags_decrypt($new_flags);
 
 Get or set the default flags of L<Crypt::Sodium::XS::MemVault>s created to
 store decrypted data.
@@ -339,21 +347,21 @@ The default flags are L</PROTMEM_FLAGS_ALL_ENABLED>.
 For the related memory protection, get or set the default flags of
 L<Crypt::Sodium::XS::MemVault>s created to store decrypted data.
 
-=head2 protmem_flags_memvault_default
+=head2 protmem_default_flags_memvault
 
-  my $flags = protmem_flags_memvault_default();
-  protmem_flags_memvault_default($new_flags);
+  my $flags = protmem_default_flags_memvault();
+  protmem_default_flags_memvault($new_flags);
 
 Get or set the default flags of explicitly-created
 L<Crypt::Sodium::XS::MemVault>s.
 
 The default flags are L</PROTMEM_FLAGS_ALL_ENABLED>.
 
-=head2 protmem_flags_memvault_default_mprotect
-=head2 protmem_flags_memvault_default_mlock
-=head2 protmem_flags_memvault_default_lock
-=head2 protmem_flags_memvault_default_memzero
-=head2 protmem_flags_memvault_default_malloc
+=head2 protmem_default_flags_memvault_mprotect
+=head2 protmem_default_flags_memvault_mlock
+=head2 protmem_default_flags_memvault_lock
+=head2 protmem_default_flags_memvault_memzero
+=head2 protmem_default_flags_memvault_malloc
 
   my $mprotect_flags = protmem_default_flags_memvault_mprotect();
   my $old_mprotect_flags = protmem_default_flags_memvault_mprotect($new_flags);
@@ -363,8 +371,8 @@ explicitly-created L<Crypt::Sodium::XS::MemVault>s.
 
 =head2 protmem_default_flags_state
 
-  my $flags = protmem_flags_state_default();
-  protmem_flags_state_default($new_flags);
+  my $flags = protmem_default_flags_state();
+  protmem_default_flags_state($new_flags);
 
 Get or set the default mprotect level of states created for multi-part
 interfaces which do not contain key material. The internal state is protected

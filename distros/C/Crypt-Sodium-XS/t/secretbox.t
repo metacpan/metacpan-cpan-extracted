@@ -2,15 +2,16 @@ use strict;
 use warnings;
 use Test::More;
 
-use Crypt::Sodium::XS::OO::secretbox;
+use Crypt::Sodium::XS;
+use Crypt::Sodium::XS::secretbox;
 use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
 
 my $msg = "How do you do?";
 
-for my $alg (Crypt::Sodium::XS::OO::secretbox->primitives) {
-  my $m = Crypt::Sodium::XS::OO::secretbox->new(primitive => $alg);
+for my $alg (Crypt::Sodium::XS::secretbox->primitives) {
+  my $m = Crypt::Sodium::XS->secretbox(primitive => $alg);
 
   ok($m->KEYBYTES > 0, "KEYBYTES > 0 ($alg)");
   ok($m->NONCEBYTES > 0, "NONCEBYTES > 0 ($alg)");

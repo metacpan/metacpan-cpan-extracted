@@ -3,14 +3,15 @@ use warnings;
 use Test::More;
 
 use Crypt::Sodium::XS;
+use Crypt::Sodium::XS::scalarmult;
 
 use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
 
-my $scalarmult = Crypt::Sodium::XS->scalarmult(primitive => 'default');
 
-for my $alg ($scalarmult->primitives) {
+for my $alg (Crypt::Sodium::XS::scalarmult->primitives) {
+  my $scalarmult = Crypt::Sodium::XS->scalarmult(primitive => $alg);
 
   ok($scalarmult->BYTES > 0, "scalarmult_BYTES > 0 ($alg)");
   ok($scalarmult->SCALARBYTES > 0, "scalarmult_SCALARBYTES > 0 ($alg)");

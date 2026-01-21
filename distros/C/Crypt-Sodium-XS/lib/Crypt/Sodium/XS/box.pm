@@ -7,55 +7,161 @@ use Exporter 'import';
 
 _define_constants();
 
-my @constant_bases = qw(
-  BEFORENMBYTES
-  MACBYTES
-  MESSAGEBYTES_MAX
-  NONCEBYTES
-  PUBLICKEYBYTES
-  SEALBYTES
-  SECRETKEYBYTES
-  SEEDBYTES
+{
+  my @constant_bases = qw(
+    BEFORENMBYTES
+    MACBYTES
+    MESSAGEBYTES_MAX
+    NONCEBYTES
+    PUBLICKEYBYTES
+    SEALBYTES
+    SECRETKEYBYTES
+    SEEDBYTES
+  );
+
+  my @bases = qw(
+    beforenm
+    decrypt
+    decrypt_afternm
+    decrypt_detached
+    decrypt_detached_afternm
+    encrypt
+    encrypt_detached
+    encrypt_afternm
+    encrypt_detached_afternm
+    keypair
+    nonce
+    seal_encrypt
+    seal_decrypt
+  );
+
+  my $default = [
+    (map { "box_$_" } @bases),
+    (map { "box_$_" } @constant_bases, "PRIMITIVE"),
+  ];
+  my $curve25519xchacha20poly1305 = [
+    (map { "box_curve25519xchacha20poly1305_$_" } @bases),
+    (map { "box_curve25519xchacha20poly1305_$_" } @constant_bases),
+  ];
+  my $curve25519xsalsa20poly1305 = [
+    (map { "box_curve25519xsalsa20poly1305_$_" } @bases),
+    (map { "box_curve25519xsalsa20poly1305_$_" } @constant_bases),
+  ];
+
+  our %EXPORT_TAGS = (
+    all =>
+      [ @$default, @$curve25519xchacha20poly1305, @$curve25519xsalsa20poly1305 ],
+    default => $default,
+    curve25519xchacha20poly1305 => $curve25519xchacha20poly1305,
+    curve25519xsalsa20poly1305 => $curve25519xsalsa20poly1305,
+  );
+
+  our @EXPORT_OK = @{$EXPORT_TAGS{all}};
+}
+
+package Crypt::Sodium::XS::OO::box;
+use parent 'Crypt::Sodium::XS::OO::Base';
+
+my %methods = (
+  default => {
+    BEFORENMBYTES => \&Crypt::Sodium::XS::box::box_BEFORENMBYTES,
+    MACBYTES => \&Crypt::Sodium::XS::box::box_MACBYTES,
+    MESSAGEBYTES_MAX => \&Crypt::Sodium::XS::box::box_MESSAGEBYTES_MAX,
+    NONCEBYTES => \&Crypt::Sodium::XS::box::box_NONCEBYTES,
+    PRIMITIVE => \&Crypt::Sodium::XS::box::box_PRIMITIVE,
+    PUBLICKEYBYTES => \&Crypt::Sodium::XS::box::box_PUBLICKEYBYTES,
+    SEALBYTES => \&Crypt::Sodium::XS::box::box_SEALBYTES,
+    SECRETKEYBYTES => \&Crypt::Sodium::XS::box::box_SECRETKEYBYTES,
+    SEEDBYTES => \&Crypt::Sodium::XS::box::box_SEEDBYTES,
+    beforenm => \&Crypt::Sodium::XS::box::box_beforenm,
+    decrypt => \&Crypt::Sodium::XS::box::box_decrypt,
+    decrypt_afternm => \&Crypt::Sodium::XS::box::box_decrypt_afternm,
+    decrypt_detached => \&Crypt::Sodium::XS::box::box_decrypt_detached,
+    decrypt_detached_afternm => \&Crypt::Sodium::XS::box::box_decrypt_detached_afternm,
+    encrypt => \&Crypt::Sodium::XS::box::box_encrypt,
+    encrypt_detached => \&Crypt::Sodium::XS::box::box_encrypt_detached,
+    encrypt_afternm => \&Crypt::Sodium::XS::box::box_encrypt_afternm,
+    encrypt_detached_afternm => \&Crypt::Sodium::XS::box::box_encrypt_detached_afternm,
+    keypair => \&Crypt::Sodium::XS::box::box_keypair,
+    nonce => \&Crypt::Sodium::XS::box::box_nonce,
+    seal_encrypt => \&Crypt::Sodium::XS::box::box_seal_encrypt,
+    seal_decrypt => \&Crypt::Sodium::XS::box::box_seal_decrypt,
+  },
+  curve25519xchacha20poly1305 => {
+    BEFORENMBYTES => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_BEFORENMBYTES,
+    MACBYTES => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_MACBYTES,
+    MESSAGEBYTES_MAX => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_MESSAGEBYTES_MAX,
+    NONCEBYTES => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_NONCEBYTES,
+    PRIMITIVE => sub { 'curve25519xchacha20poly1305' },
+    PUBLICKEYBYTES => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_PUBLICKEYBYTES,
+    SEALBYTES => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_SEALBYTES,
+    SECRETKEYBYTES => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_SECRETKEYBYTES,
+    SEEDBYTES => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_SEEDBYTES,
+    beforenm => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_beforenm,
+    decrypt => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_decrypt,
+    decrypt_afternm => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_decrypt_afternm,
+    decrypt_detached => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_decrypt_detached,
+    decrypt_detached_afternm => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_decrypt_detached_afternm,
+    encrypt => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_encrypt,
+    encrypt_detached => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_encrypt_detached,
+    encrypt_afternm => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_encrypt_afternm,
+    encrypt_detached_afternm => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_encrypt_detached_afternm,
+    keypair => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_keypair,
+    nonce => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_nonce,
+    seal_encrypt => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_seal_encrypt,
+    seal_decrypt => \&Crypt::Sodium::XS::box::box_curve25519xchacha20poly1305_seal_decrypt,
+  },
+  curve25519xsalsa20poly1305 => {
+    BEFORENMBYTES => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_BEFORENMBYTES,
+    MACBYTES => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_MACBYTES,
+    MESSAGEBYTES_MAX => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_MESSAGEBYTES_MAX,
+    NONCEBYTES => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_NONCEBYTES,
+    PRIMITIVE => sub { 'curve25519xsalsa20poly1305' },
+    PUBLICKEYBYTES => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_PUBLICKEYBYTES,
+    SEALBYTES => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_SEALBYTES,
+    SECRETKEYBYTES => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_SECRETKEYBYTES,
+    SEEDBYTES => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_SEEDBYTES,
+    beforenm => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_beforenm,
+    decrypt => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_decrypt,
+    decrypt_afternm => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_decrypt_afternm,
+    decrypt_detached => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_decrypt_detached,
+    decrypt_detached_afternm => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_decrypt_detached_afternm,
+    encrypt => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_encrypt,
+    encrypt_afternm => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_encrypt_afternm,
+    encrypt_detached => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_encrypt_detached,
+    encrypt_detached_afternm => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_encrypt_detached_afternm,
+    keypair => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_keypair,
+    nonce => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_nonce,
+    seal_encrypt => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_seal_encrypt,
+    seal_decrypt => \&Crypt::Sodium::XS::box::box_curve25519xsalsa20poly1305_seal_decrypt,
+  },
 );
 
-my @bases = qw(
-  beforenm
-  decrypt
-  decrypt_afternm
-  decrypt_detached
-  decrypt_detached_afternm
-  encrypt
-  encrypt_detached
-  encrypt_afternm
-  encrypt_detached_afternm
-  keypair
-  nonce
-  seal_encrypt
-  seal_decrypt
-);
+sub Crypt::Sodium::XS::box::primitives { keys %methods }
+*primitives = \&Crypt::Sodium::XS::box::primitives;
 
-my $default = [
-  (map { "box_$_" } @bases),
-  (map { "box_$_" } @constant_bases, "PRIMITIVE"),
-];
-my $curve25519xchacha20poly1305 = [
-  (map { "box_curve25519xchacha20poly1305_$_" } @bases),
-  (map { "box_curve25519xchacha20poly1305_$_" } @constant_bases),
-];
-my $curve25519xsalsa20poly1305 = [
-  (map { "box_curve25519xsalsa20poly1305_$_" } @bases),
-  (map { "box_curve25519xsalsa20poly1305_$_" } @constant_bases),
-];
-
-our %EXPORT_TAGS = (
-  all =>
-    [ @$default, @$curve25519xchacha20poly1305, @$curve25519xsalsa20poly1305 ],
-  default => $default,
-  curve25519xchacha20poly1305 => $curve25519xchacha20poly1305,
-  curve25519xsalsa20poly1305 => $curve25519xsalsa20poly1305,
-);
-
-our @EXPORT_OK = @{$EXPORT_TAGS{all}};
+sub BEFORENMBYTES { my $self = shift; goto $methods{$self->{primitive}}->{BEFORENMBYTES}; }
+sub MACBYTES { my $self = shift; goto $methods{$self->{primitive}}->{MACBYTES}; }
+sub MESSAGEBYTES_MAX { my $self = shift; goto $methods{$self->{primitive}}->{MESSAGEBYTES_MAX}; }
+sub NONCEBYTES { my $self = shift; goto $methods{$self->{primitive}}->{NONCEBYTES}; }
+sub PRIMITIVE { my $self = shift; goto $methods{$self->{primitive}}->{PRIMITIVE}; }
+sub PUBLICKEYBYTES { my $self = shift; goto $methods{$self->{primitive}}->{PUBLICKEYBYTES}; }
+sub SEALBYTES { my $self = shift; goto $methods{$self->{primitive}}->{SEALBYTES}; }
+sub SECRETKEYBYTES { my $self = shift; goto $methods{$self->{primitive}}->{SECRETKEYBYTES}; }
+sub SEEDBYTES { my $self = shift; goto $methods{$self->{primitive}}->{SEEDBYTES}; }
+sub beforenm { my $self = shift; goto $methods{$self->{primitive}}->{beforenm}; }
+sub decrypt { my $self = shift; goto $methods{$self->{primitive}}->{decrypt}; }
+sub decrypt_afternm { my $self = shift; goto $methods{$self->{primitive}}->{decrypt_afternm}; }
+sub decrypt_detached { my $self = shift; goto $methods{$self->{primitive}}->{decrypt_detached}; }
+sub decrypt_detached_afternm { my $self = shift; goto $methods{$self->{primitive}}->{decrypt_detached_afternm}; }
+sub encrypt { my $self = shift; goto $methods{$self->{primitive}}->{encrypt}; }
+sub encrypt_afternm { my $self = shift; goto $methods{$self->{primitive}}->{encrypt_afternm}; }
+sub encrypt_detached { my $self = shift; goto $methods{$self->{primitive}}->{encrypt_detached}; }
+sub encrypt_detached_afternm { my $self = shift; goto $methods{$self->{primitive}}->{encrypt_detached_afternm}; }
+sub keypair { my $self = shift; goto $methods{$self->{primitive}}->{keypair}; }
+sub nonce { my $self = shift; goto $methods{$self->{primitive}}->{nonce}; }
+sub seal_encrypt { my $self = shift; goto $methods{$self->{primitive}}->{seal_encrypt}; }
+sub seal_decrypt { my $self = shift; goto $methods{$self->{primitive}}->{seal_decrypt}; }
 
 1;
 
@@ -70,33 +176,35 @@ encryption
 
 =head1 SYNOPSIS
 
-  use Crypt::Sodium::XS::box ":default";
+  use Crypt::Sodium::XS;
   use Crypt::Sodium::XS::Util "sodium_increment";
 
-  my ($pk, $sk) = box_keypair();
-  my ($pk2, $sk2) = box_keypair();
-  my $nonce = box_nonce();
+  my $box = Crypt::Sodium::XS->box;
 
-  my $ct = box_encrypt("hello", $nonce, $pk2, $sk);
-  my $pt = box_decrypt($ct, $nonce, $pk, $sk2);
+  my ($pk, $sk) = $box->keypair;
+  my ($pk2, $sk2) = $box->keypair;
+  my $nonce = $box->nonce;
+
+  my $ct = $box->encrypt("hello", $nonce, $pk2, $sk);
+  my $pt = $box->decrypt($ct, $nonce, $pk, $sk2);
   # $pt is now "hello" (MemVault)
 
   $nonce = sodium_increment($nonce);
-  ($ct, my $tag) = box_encrypt_detached("world", $nonce, $pk, $sk2);
-  $pt = box_decrypt_detached($ct, $tag, $nonce, $pk2, $sk);
+  ($ct, my $tag) = $box->encrypt_detached("world", $nonce, $pk, $sk2);
+  $pt = $box->decrypt_detached($ct, $tag, $nonce, $pk2, $sk);
   # $pt is now "world" (MemVault)
 
-  my $precalc1 = box_beforenm($pk2, $sk);
-  my $precalc2 = box_beforenm($pk, $sk2);
+  my $precalc = $box->beforenm($pk2, $sk);
+  my $precalc2 = $box->beforenm($pk, $sk2);
   # $precalc and $precalc2 hold identical derived secret keys
 
-  $nonce = box_nonce();
+  $nonce = $box->nonce();
   $ct = $precalc->encrypt("goodbye", $nonce);
   $pt = $precalc2->decrypt($ct, $nonce);
   # $pt is now "goodbye" (MemVault)
 
   $ct = box_seal_encrypt("anonymous message", $pk2);
-  $pt = box_seal_decrypt($ct, $pk, $sk);
+  $pt = box_seal_decrypt($ct, $sk, $pk);
 
 =head1 DESCRIPTION
 
@@ -116,15 +224,15 @@ and the ciphertext. Alice should never ever share her secret key either, even
 with Bob.
 
 Bob can reply to Alice using the same system, without having to generate a
-distinct key pair.  The nonce doesn't have to be confidential, but it should be
-used with just one invocation of L</box_encrypt> for a particular pair of
+distinct key pair. The nonce doesn't have to be confidential, but it must be
+used with just one invocation of L</encrypt> for a particular pair of
 public and secret keys.
 
-One easy way to generate a nonce is to use L</box_nonce>, considering the size
+One easy way to generate a nonce is to use L</nonce>, considering the size
 of the nonces the risk of any random collisions is negligible. For some
 applications, if you wish to use nonces to detect missing messages or to ignore
 replayed messages, it is also acceptable to use a simple incrementing counter
-as a nonce. A better alternative is to use the
+as a nonce. A better alternative for that use case is the
 L<Crypt::Sodium::XS::secretstream> API.
 
 When doing so you must ensure that the same nonce can never be re-used (for
@@ -134,28 +242,58 @@ the same key pairs).
 As stated above, senders can decrypt their own messages, and compute a valid
 authentication tag for any messages encrypted with a given shared secret key.
 This is generally not an issue for online protocols. If this is not acceptable,
-check out L</box_seal_encrypt> and L</box_seal_decrypt>, as well as the
-L<Crypt::Sodium::XS::kx>.
+check out L</SEALED BOXES>, as well as L<Crypt::Sodium::XS::kx>.
 
-=head1 FUNCTIONS
+=head1 CONSTRUCTOR
 
-Nothing is exported by default. A C<:default> tag imports the functions and
-constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
-provided for each of the primitives listed in L</PRIMITIVES>. These tags import
-the C<box_E<lt>primitiveE<gt>_*> functions and constants for that primitive. A
-C<:all> tag imports everything.
+The constructor is called with the C<Crypt::Sodium::XS-E<gt>box> method.
 
-=head2 box_beforenm
+  my $box = Crypt::Sodium::XS->box;
+  my $primitive = 'curve25519xsalsa20poly1305';
+  my $box = Crypt::Sodium::XS->box(primitive => $primitive);
 
-=head2 box_E<lt>primitiveE<gt>_beforenm
+Returns a new box object.
 
-  my $precalc = box_beforenm($their_public_key, $my_secret_key, $flags);
+Implementation detail: the returned object is blessed into
+C<Crypt::Sodium::XS::OO::box>.
+
+=head1 ATTRIBUTES
+
+=head2 primitive
+
+  my $primitive = $box->primitive;
+  $box->primitive('curve25519xsalsa20poly1305');
+
+Gets or sets the primitive used for all operations by this object. It must be
+one of the primitives listed in L</PRIMITIVES>, including C<default>.
+
+=head1 METHODS
+
+=head2 primitives
+
+  my @primitives = $box->primitives;
+  my @primitives = Crypt::Sodium::XS::box->primitives;
+
+Returns a list of all supported primitive names, including C<default>.
+
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $primitive = $box->PRIMITIVE;
+
+Returns the primitive used for all operations by this object. Note this will
+never be C<default> but would instead be the primitive it represents.
+
+=head2 beforenm
+
+  my $precalc = $box->beforenm($their_public_key, $my_secret_key, $flags);
 
 C<$their_public_key> is the public key used by the precalcuation object. It
-must be L</box_PUBLICKEYBYTES> bytes.
+must be L</PUBLICKEYBYTES> bytes.
 
 C<$my_secret_key> is the secret key used by the precalculation object. It must
-be L</box_KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+be L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
 
 C<$flags> is optional. It is the flags used for the precalculation protected
 memory object. See L<Crypt::Sodium::XS::ProtMem>.
@@ -164,11 +302,9 @@ Returns an opaque protected memory object: a precalculation box object. This is
 useful if you send or receive many messages using the same public key. See
 L</PRECALCULATION INTERFACE>.
 
-=head2 box_decrypt
+=head2 decrypt
 
-=head2 box_E<lt>primitiveE<gt>_decrypt
-
-  my $plaintext = box_decrypt(
+  my $plaintext = $box->decrypt(
     $ciphertext,
     $nonce,
     $their_public_key,
@@ -180,28 +316,26 @@ Croaks on decryption failure.
 
 C<$ciphertext> is the ciphertext to decrypt.
 
-C<$nonce> is the nonce used to encrypt the ciphertext. It must be
-L</box_NONCEBYTES> bytes.
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NONCEBYTES>
+bytes.
 
 C<$their_public_key> is the public key used to authenticate the ciphertext. It
-must be L</box_PUBLICKEYBYTES> bytes.
+must be L</PUBLICKEYBYTES> bytes.
 
 C<$my_secret_key> is the secret key used to decrypt the ciphertext. It must be
-L</box_SECRETKEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+L</SECRETKEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
 
 C<$flags> is optional. It is the flags used for the C<$plaintext>
-L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::Protmem>.
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
 
 Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
 
 B<NOTE>: this is the libsodium function C<crypto_box_open_easy>. Its name is
 slightly different for consistency of this API.
 
-=head2 box_decrypt_detached
+=head2 decrypt_detached
 
-=head2 box_E<lt>primitiveE<gt>_decrypt_detached
-
-  my $plaintext = box_decrypt_detached(
+  my $plaintext = $box->decrypt_detached(
     $ciphertext,
     $tag,
     $nonce,
@@ -214,17 +348,16 @@ Croaks on decryption failure.
 
 C<$ciphertext> is the ciphertext to decrypt.
 
-C<$tag> is the ciphertext's authentication tag. It must be L</box_MACBYTES>
+C<$tag> is the ciphertext's authentication tag. It must be L</MACBYTES> bytes.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NONCEBYTES>
 bytes.
 
-C<$nonce> is the nonce used to encrypt the ciphertext. It must be
-L</box_NONCEBYTES> bytes.
-
 C<$their_public_key> is the public key used to authenticate the ciphertext. It
-must be L</box_PUBLICKEYBYTES> bytes.
+must be L</PUBLICKEYBYTES> bytes.
 
 C<$my_secret_key> is the secret key used to decrypt the ciphertext. It must be
-L</box_SECRETKEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+L</SECRETKEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
 
 C<$flags> is optional. It is the flags used for the C<$plaintext>
 L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::Protmem>.
@@ -234,63 +367,59 @@ Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
 B<NOTE>: this is the libsodium function C<crypto_box_open_detached>. Its name
 is slightly different for consistency of this API.
 
-=head2 box_encrypt
-
-=head2 box_E<lt>primitiveE<gt>_encrypt
+=head2 encrypt
 
   my $ciphertext
-    = box_encrypt($message, $nonce, $their_public_key, $my_secret_key);
+    = $box->encrypt($message, $nonce, $their_public_key, $my_secret_key);
 
 C<$message> is the message to encrypt. It may be a
 L<Crypt::Sodium::XS::MemVault>.
 
 C<$nonce> is the nonce used to encrypt the ciphertext. It must be
-L</box_NONCEBYTES> bytes.
+L</NONCEBYTES> bytes.
 
 C<$their_public_key> is the public key used to encrypt the ciphertext. It must
-be L</box_PUBLICKEYBYTES> bytes.
+be L</PUBLICKEYBYTES> bytes.
 
 C<$my_secret_key> is the secret key used to authenticate the ciphertext. It
-must be L</box_SECRETKEYBYTES> bytes. It may be a
-L<Crypt::Sodium::XS::MemVault>.
+must be L</SECRETKEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
 
 Returns the encrypted ciphertext.
 
 B<NOTE>: this is the libsodium function C<crypto_box>. Its name is slightly
 different for consistency of this API.
 
-=head2 box_encrypt_detached
+=head2 encrypt_detached
 
-=head2 box_E<lt>primitiveE<gt>_encrypt_detached
-
-  my ($ciphertext, $tag)
-    = box_encrypt_detached($message, $nonce, $their_public_key, $my_secret_key);
+  my ($ciphertext, $tag) = $box->encrypt_detached(
+    $message,
+    $nonce,
+    $their_public_key,
+    $my_secret_key
+  );
 
 C<$message> is the message to encrypt. It may be a
 L<Crypt::Sodium::XS::MemVault>.
 
 C<$nonce> is the nonce used to encrypt the ciphertext. It must be
-L</box_NONCEBYTES> bytes.
+L</NONCEBYTES> bytes.
 
 C<$their_public_key> is the public key used to encrypt the ciphertext. It must
-be L</box_PUBLICKEYBYTES> bytes.
+be L</PUBLICKEYBYTES> bytes.
 
 C<$my_secret_key> is the secret key used to authenticate the ciphertext. It
-must be L</box_SECRETKEYBYTES> bytes. It may be a
-L<Crypt::Sodium::XS::MemVault>.
+must be L</SECRETKEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
 
 Returns the encrypted ciphertext and its authentication tag.
 
 B<NOTE>: this is the libsodium function C<crypto_box_easy_detached>. Its name
 is slightly different for consistency of this API.
 
-=head2 box_keypair
+=head2 keypair
 
-=head2 box_E<lt>primitiveE<gt>_keypair
+  my ($public_key, $secret_key) = $box->keypair($seed, $flags);
 
-  my ($public_key, $secret_key) = box_keypair($seed, $flags);
-
-C<$seed> is optional. It must be L</box_SEEDBYTES> bytes. It may be a
+C<$seed> is optional. It must be L</SEEDBYTES> bytes. It may be a
 L<Crypt::Sodium::XS::MemVault>. Using the same seed will generate the same key
 pair, so it must be kept confidential. If omitted, a key pair is randomly
 generated.
@@ -298,19 +427,70 @@ generated.
 C<$flags> is optional. It is the flags used for the C<$secret_key>
 L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
 
-Returns a public key of L</box_PUBLICKEYBYTES> bytes and a
-L<Crypt::Sodium::XS::MemVault>: the secret key of L</box_SECRETKEYBYTES> bytes.
+Returns a public key of L</PUBLICKEYBYTES> bytes and a
+L<Crypt::Sodium::XS::MemVault>: the secret key of L</SECRETKEYBYTES> bytes.
 
-=head2 box_nonce
+=head2 nonce
 
-=head2 box_E<lt>primitiveE<gt>_nonce
+  my $nonce = $box->nonce($base);
 
-  my $nonce = box_nonce($base);
+C<$base> is optional. It must be less than or equal to L</NONCEBYTES> bytes. If
+not provided, the nonce will be random.
 
-C<$base> is optional. It must be less than or equal to L</box_NONCEBYTES>
-bytes. If not provided, the nonce will be random.
+Returns a nonce of L</NONCEBYTES> bytes.
 
-Returns a nonce of L</box_NONCEBYTES> bytes.
+=head2 BEFORENMBYTES
+
+  my $shared_key_size = $box->BEFORENMBYTES;
+
+Returns the size, in bytes, of the pre-calculated state created by
+L</beforenm>. Not normally needed.
+
+=head2 MACBYTES
+
+  my $tag_size = $box->MACBYTES;
+
+Returns the size, in bytes, of a message authentication tag.
+
+The size of a combined (not detached) ciphertext is message size +
+L</MACBYTES>.
+
+=head2 MESSAGEBYTES_MAX
+
+  my $message_max_size = $box->MESSAGEBYTES_MAX;
+
+Returns the size, in bytes, of the maximum size of any message to be encrypted.
+
+=head2 NONCEBYTES
+
+  my $nonce_size = $box->NONCEBYTES;
+
+Returns the size, in bytes, of a nonce.
+
+=head2 PUBLICKEYBYTES
+
+  my $public_key_size = $box->PUBLICKEYBYTES;
+
+Returns the size, in bytes, of a public key.
+
+=head2 SEALBYTES
+
+  my $seal_size = $box->SEALBYTES;
+
+Returns the size, in bytes, of the "seal" attached to a sealed box. The size of
+a sealed box is the message size + L</SEALBYTES>.
+
+=head2 SECRETKEYBYTES
+
+  my $secret_key_size = $box->SECRETKEYBYTES;
+
+Returns the size, in bytes, of a private key.
+
+=head2 SEEDBYTES
+
+  my $keypair_seed_size = $box->SEEDBYTES;
+
+Returns the size, in bytes, of a seed used by L</keypair>.
 
 =head1 SEALED BOXES
 
@@ -328,48 +508,43 @@ Without knowing the secret key used for a given message, the sender cannot
 decrypt the message later. Furthermore, without additional data, a message
 cannot be correlated with the identity of its sender.
 
-=head2 box_seal_decrypt
+=head2 seal_decrypt
 
-=head2 box_E<lt>primitiveE<gt>_seal_decrypt
-
-  my $plaintext = \
-    box_seal_decrypt($ciphertext, $my_public_key, $my_secret_key, $flags);
+  my $plaintext
+    = $box->seal_decrypt($ciphertext, $my_public_key, $my_secret_key, $flags);
 
 Croaks on decryption failure.
 
 C<$ciphertext> is the ciphertext to decrypt.
 
-C<$my_public_key> is the public key used to authenticate the ciphertext. It
-must be L</box_PUBLICKEYBYTES> bytes.
+C<$my_public_key> is the public key to which the message was encrypted. It must
+be L</PUBLICKEYBYTES> bytes.
 
 C<$my_secret_key> is the secret key from which the public key is derived. It
-must be L</box_SECRETKEYBYTES> bytes. It may be a
-L<Crypt::Sodium::XS::MemVault>.
+must be L</SECRETKEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
 
 C<$flags> is optional. It is the flags used for the C<$plaintext>
 L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
 
 Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
 
-This function doesn’t require passing the public key of the sender as the
+This method doesn’t require passing the public key of the sender as the
 ciphertext already includes this information. It requires passing
 C<$my_public_key> as the anonymous sender and recipient public keys are used to
 generate a nonce.
 
-B<NOTE>: this is the libsodium function C<crypto_box_seal_open>. Its name is
+B<Note>: this is the libsodium function C<crypto_box_seal_open>. Its name is
 slightly different for consistency of this API.
 
-=head2 box_seal_encrypt
+=head2 seal_encrypt
 
-=head2 box_E<lt>primitiveE<gt>_seal_encrypt
-
-  my $ciphertext = box_seal_encrypt($message, $their_public_key);
+  my $ciphertext = $box->seal_encrypt($message, $their_public_key);
 
 C<$message> is the message to encrypt. It may be a
 L<Crypt::Sodium::XS::MemVault>.
 
 C<$their_public_key> is the public key to which the message is encrypted. It
-must be L</box_PUBLICKEYBYTES> bytes.
+must be L</PUBLICKEYBYTES> bytes.
 
 Returns the combined ciphertext.
 
@@ -386,8 +561,8 @@ Applications that send several messages to the same recipient or receive
 several messages from the same sender can improve performance by calculating
 the shared key only once, via the precalculation interface.
 
-A precalculated box object is created by calling the L</box_beforenm> function.
-It is an opaque object which provides the following methods:
+A precalculated box object is created by calling the L</beforenm> method. It is
+an opaque object which provides the following methods:
 
 =over 4
 
@@ -399,14 +574,14 @@ Croaks on decryption failure.
 
 C<$ciphertext> is the ciphertext to decrypt.
 
-C<$nonce> is the nonce used to encrypt the ciphertext. It must be
-L</box_NONCEBYTES> bytes.
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NONCEBYTES>
+bytes.
 
 C<$their_public_key> is the public key derived from the secret key used to
-encrypt the ciphertext. It must be L</box_PUBLICKEYBYTES> bytes.
+encrypt the ciphertext. It must be L</PUBLICKEYBYTES> bytes.
 
 C<$my_secret_key> is the secret key from which was derived the public key used
-to encrypt the ciphertext. It must be L</box_SECRETKEYBYTES> bytes. It may be a
+to encrypt the ciphertext. It must be L</SECRETKEYBYTES> bytes. It may be a
 L<Crypt::Sodium::XS::MemVault>.
 
 C<$flags> is optional. It is the flags used for the C<$plaintext>
@@ -422,21 +597,20 @@ Croaks on decryption failure.
 
 C<$ciphertext> is the ciphertext to decrypt.
 
-C<$tag> is the ciphertext's authentication tag. It must be L</box_MACBYTES>
+C<$tag> is the ciphertext's authentication tag.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NONCEBYTES>
 bytes.
 
-C<$nonce> is the nonce used to encrypt the ciphertext. It must be
-L</box_NONCEBYTES> bytes.
-
 C<$their_public_key> is the public key derived from the secret key used to
-encrypt the ciphertext. It must be L</box_PUBLICKEYBYTES> bytes.
+encrypt the ciphertext. It must be L</PUBLICKEYBYTES> bytes.
 
 C<$my_secret_key> is the secret key from which was derived the public key used
-to encrypt the ciphertext. It must be L</box_SECRETKEYBYTES> bytes. It may be a
+to encrypt the ciphertext. It must be L</SECRETKEYBYTES> bytes. It may be a
 L<Crypt::Sodium::XS::MemVault>.
 
 C<$flags> is optional. It is the flags used for the C<$plaintext>
-L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::Protmem>.
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
 
 Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
 
@@ -448,7 +622,7 @@ C<$message> is the message to encrypt. It may be a
 L<Crypt::Sodium::XS::MemVault>.
 
 C<$nonce> is the nonce used to encrypt the ciphertext. It must be
-L</box_NONCEBYTES> bytes.
+L</NONCEBYTES> bytes.
 
 Returns the encrypted ciphertext.
 
@@ -460,11 +634,121 @@ C<$message> is the message to encrypt. It may be a
 L<Crypt::Sodium::XS::MemVault>.
 
 C<$nonce> is the nonce used to encrypt the ciphertext. It must be
-L</box_NONCEBYTES> bytes.
+L</NONCEBYTES> bytes.
 
 Returns the encrypted ciphertext and its authentication tag.
 
 =back
+
+=head1 PRIMITIVES
+
+=over 4
+
+=item * curve25519xchacha20poly1305
+
+=item * curve25519xsalsa20poly1305 (default)
+
+=back
+
+=head1 FUNCTIONS
+
+The object API above is the recommended way to use this module. The functions
+and constants documented below can be imported instead or in addition.
+
+Nothing is exported by default. A C<:default> tag imports the functions and
+constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
+provided for each of the primitives listed in
+L<Crypt::Sodium::XS::box/PRIMITIVES>. These tags import the
+C<box_E<lt>primitiveE<gt>_*> functions and constants for that primitive. A
+C<:all> tag imports everything.
+
+=head2 box_beforenm
+
+=head2 box_E<lt>primitiveE<gt>_beforenm
+
+  my $precalc = box_beforenm($their_public_key, $my_secret_key, $flags);
+
+Same as L</beforenm>.
+
+=head2 box_decrypt
+
+=head2 box_E<lt>primitiveE<gt>_decrypt
+
+  my $plaintext = box_decrypt(
+    $ciphertext,
+    $nonce,
+    $their_public_key,
+    $my_secret_key,
+    $flags
+  );
+
+Same as L</decrypt>.
+
+=head2 box_decrypt_detached
+
+=head2 box_E<lt>primitiveE<gt>_decrypt_detached
+
+  my $plaintext = box_decrypt_detached(
+    $ciphertext,
+    $tag,
+    $nonce,
+    $their_public_key,
+    $my_secret_key,
+    $flags
+  );
+
+Same as L</decrypt_detached>.
+
+=head2 box_encrypt
+
+=head2 box_E<lt>primitiveE<gt>_encrypt
+
+  my $ciphertext
+    = box_encrypt($message, $nonce, $their_public_key, $my_secret_key);
+
+Same as L</encrypt>.
+
+=head2 box_encrypt_detached
+
+=head2 box_E<lt>primitiveE<gt>_encrypt_detached
+
+  my ($ciphertext, $tag)
+    = box_encrypt_detached($message, $nonce, $their_public_key, $my_secret_key);
+
+Same as L</encrypt_detached>.
+
+=head2 box_keypair
+
+=head2 box_E<lt>primitiveE<gt>_keypair
+
+  my ($public_key, $secret_key) = box_keypair($seed, $flags);
+
+Same as L</keypair>.
+
+=head2 box_nonce
+
+=head2 box_E<lt>primitiveE<gt>_nonce
+
+  my $nonce = box_nonce($base);
+
+Same as L</nonce>.
+
+=head2 box_seal_decrypt
+
+=head2 box_E<lt>primitiveE<gt>_seal_decrypt
+
+  my $plaintext = \
+    box_seal_decrypt($ciphertext, $my_public_key, $my_secret_key, $flags);
+
+Same as L</seal_decrypt>.
+
+=head2 box_seal_encrypt
+
+=head2 box_E<lt>primitiveE<gt>_seal_encrypt
+
+  my $ciphertext = box_seal_encrypt($message, $their_public_key);
+
+Same as L</seal_encrypt>.
 
 =head1 CONSTANTS
 
@@ -480,8 +764,7 @@ Returns the name of the default primitive.
 
   my $shared_key_size = box_BEFORENMBYTES();
 
-Returns the size, in bytes, of the pre-calculated state created by
-L</box_beforenm>. Not normally needed.
+Same as L</BEFORENMBYTES>.
 
 =head2 box_MACBYTES
 
@@ -489,10 +772,7 @@ L</box_beforenm>. Not normally needed.
 
   my $tag_size = box_MACBYTES();
 
-Returns the size, in bytes, of a message authentication tag.
-
-The size of a combined (not detached) encrypted ciphertext is message size +
-L</box_MACBYTES>.
+Same as L</MACBYTES>.
 
 =head2 box_MESSAGEBYTES_MAX
 
@@ -500,7 +780,7 @@ L</box_MACBYTES>.
 
   my $message_max_size = box_MESSAGEBYTES_MAX();
 
-Returns the size, in bytes, of the maximum size of any message to be encrypted.
+Same as L</MESSAGEBYTES_MAX>.
 
 =head2 box_NONCEBYTES
 
@@ -508,15 +788,15 @@ Returns the size, in bytes, of the maximum size of any message to be encrypted.
 
   my $nonce_size = box_NONCEBYTES();
 
-Returns the size, in bytes, of a nonce.
+Same as L</NONCEBYTES>.
 
 =head2 box_PUBLICKEYBYTES
-
-Returns the size, in bytes, of a public key.
 
 =head2 box_E<lt>primitiveE<gt>_PUBLICKEYBYTES
 
   my $public_key_size = box_PUBLICKEYBYTES();
+
+Same as L</PUBLICKEYBYTES>.
 
 =head2 box_SEALBYTES
 
@@ -524,8 +804,7 @@ Returns the size, in bytes, of a public key.
 
   my $seal_size = box_SEALBYTES();
 
-Returns the size, in bytes, of the "seal" attached to a sealed box. The size of
-a sealed box is the message size + L</box_SEALBYTES>.
+Same as L</SEALBYTES>.
 
 =head2 box_SECRETKEYBYTES
 
@@ -533,7 +812,7 @@ a sealed box is the message size + L</box_SEALBYTES>.
 
   my $secret_key_size = box_SECRETKEYBYTES();
 
-Returns the size, in bytes, of a private key.
+Same as L</SECRETKEYBYTES>.
 
 =head2 box_SEEDBYTES
 
@@ -541,30 +820,13 @@ Returns the size, in bytes, of a private key.
 
   my $keypair_seed_size = box_SEEDBYTES();
 
-Returns the size, in bytes, of a seed used by L</box_keypair>.
-
-=head1 PRIMITIVES
-
-All constants (except _PRIMITIVE) and functions have
-C<box_E<lt>primitiveE<gt>>-prefixed couterparts (e.g.,
-box_curve25519xchacha20poly1305_encrypt,
-box_curve25519xsalsa20poly1305_SEEDBYTES).
-
-=over 4
-
-=item * curve25519xchacha20poly1305
-
-=item * curve25519xsalsa20poly1305 (default)
-
-=back
+Same as L</SEEDBYTES>.
 
 =head1 SEE ALSO
 
 =over 4
 
 =item L<Crypt::Sodium::XS>
-
-=item L<Crypt::Sodium::XS::OO::box>
 
 =item L<https://doc.libsodium.org/public-key_cryptography/authenticated_encryption>
 

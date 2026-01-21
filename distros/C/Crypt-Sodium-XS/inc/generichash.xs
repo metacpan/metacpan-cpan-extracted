@@ -42,15 +42,9 @@ SV * generichash(SV * msg, STRLEN out_len = 0, SV * key = &PL_sv_undef)
   generichash_blake2b = 1
 
   PREINIT:
-  protmem *key_pm = NULL;
-  protmem *msg_pm = NULL;
-  unsigned char *key_buf = NULL;
-  unsigned char *msg_buf;
-  unsigned char *out_buf;
-  STRLEN msg_len;
-  STRLEN key_len = 0;
-  STRLEN key_req_min;
-  STRLEN key_req_max;
+  protmem *key_pm = NULL, *msg_pm = NULL;
+  unsigned char *key_buf = NULL, *msg_buf, *out_buf;
+  STRLEN msg_len, key_len = 0, key_req_min, key_req_max;
   int (*func)(unsigned char *, size_t, const unsigned char *,
               unsigned long long, const unsigned char *, size_t);
 
@@ -142,14 +136,9 @@ SV * generichash_blake2b_init_salt_personal( \
 )
 
   PREINIT:
-  protmem *state_pm;
-  protmem *key_pm = NULL;
-  unsigned char *key_buf = NULL;
-  unsigned char *salt_buf;
-  unsigned char *personal_buf;
-  STRLEN salt_len;
-  STRLEN personal_len;
-  STRLEN key_len = 0;
+  protmem *state_pm, *key_pm = NULL;
+  unsigned char *key_buf = NULL, *salt_buf, *personal_buf;
+  STRLEN salt_len, personal_len, key_len = 0;
   HV *obj;
   unsigned int pm_flags = g_protmem_default_flags_state;
 
@@ -234,17 +223,9 @@ SV * generichash_blake2b_salt_personal( \
 )
 
   PREINIT:
-  protmem *key_pm = NULL;
-  protmem *msg_pm = NULL;
-  unsigned char *key_buf = NULL;
-  unsigned char *msg_buf;
-  unsigned char *salt_buf;
-  unsigned char *personal_buf;
-  unsigned char *out_buf;
-  STRLEN msg_len;
-  STRLEN salt_len;
-  STRLEN personal_len;
-  STRLEN key_len = 0;
+  protmem *key_pm = NULL, *msg_pm = NULL;
+  unsigned char *key_buf = NULL, *msg_buf, *salt_buf, *personal_buf, *out_buf;
+  STRLEN msg_len, salt_len, personal_len, key_len = 0;
 
   CODE:
   salt_buf = (unsigned char *)SvPVbyte(salt, salt_len);
@@ -323,8 +304,7 @@ SV * generichash_init( \
   generichash_blake2b_init = 1
 
   PREINIT:
-  protmem *state_pm;
-  protmem *key_pm = NULL;
+  protmem *state_pm, *key_pm = NULL;
   unsigned char *key_buf = NULL;
   STRLEN key_len = 0;
   HV *obj;
@@ -458,8 +438,7 @@ void DESTROY(SV * self)
 
   PREINIT:
   protmem *state_pm;
-  SV *obj;
-  SV **state;
+  SV *obj, **state;
 
   PPCODE:
   obj = SvRV(self);
@@ -485,9 +464,7 @@ SV * clone(SV * self)
 
   PREINIT:
   HV *newobj;
-  SV *obj;
-  SV **state;
-  SV **newstate;
+  SV *obj, **state, **newstate;
 
   CODE:
   obj = SvRV(self);
@@ -531,9 +508,7 @@ SV * final(SV * self)
   protmem *state_pm;
   unsigned char *out_buf;
   STRLEN out_len;
-  SV *obj;
-  SV **state;
-  SV **fetch;
+  SV *obj, **state, **fetch;
 
   CODE:
   obj = SvRV(self);
@@ -590,12 +565,10 @@ void update(SV * self, ...)
   Crypt::Sodium::XS::generichash::blake2b_multi::update = 1
 
   PREINIT:
-  protmem *state_pm;
-  protmem *msg_pm = NULL;
+  protmem *state_pm, *msg_pm = NULL;
   unsigned char *msg_buf;
   STRLEN msg_len;
-  SV *obj;
-  SV **state;
+  SV *obj, **state;
   I32 i;
 
   PPCODE:

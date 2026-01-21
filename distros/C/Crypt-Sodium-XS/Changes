@@ -1,3 +1,20 @@
+0.001000 Jan 21 2026
+
+- large re-factor (mostly just deduplication) of perl module code. one
+  user-facing change: packages in the Crypt::Sodium::XS::OO:: namespace can no
+  longer be imported directly. they really shouldn't have been previously, but
+  it will no longer work. if any code was doing so, remove the "::OO" from the
+  package name where it is imported (e.g., "use Crypt::Sodium::XS::OO::box"
+  becomes "use Crypt::Sodium::XS::box") and no further changes are necessary.
+
+- bump libsodium to version 1.0.21-stable as of Jan 21
+
+- implement new ipcrypt feature from 1.0.21
+
+- add related sodium_bin2ip and sodium_ip2bin from 1.0.21
+
+- minor bugfixes and improvements
+
 0.000042 Jan 4 2026
 
 IMPORTANT SECURITY UPDATE: bundled libsodium updated to 1.0.20-stable. fixes

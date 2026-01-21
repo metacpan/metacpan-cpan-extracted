@@ -288,6 +288,7 @@ function: is_undef
 function: is_value
 function: is_yesno
 function: json
+function: kvargs
 function: list
 function: load
 function: log
@@ -6359,6 +6360,105 @@ $test->for('example', 4, 'json', sub {
   $result
 });
 
+=function kvargs
+
+The kvargs function takes a list of arguments and returns a hashref. If a
+single hashref is provided, it is returned as-is. Otherwise, the arguments are
+treated as key-value pairs. If an odd number of arguments is provided, the last
+key will have C<undef> as its value.
+
+=signature kvargs
+
+  kvargs(any @args) (hashref)
+
+=metadata kvargs
+
+{
+  since => '5.00',
+}
+
+=cut
+
+=example-1 kvargs
+
+  package main;
+
+  use Venus 'kvargs';
+
+  my $kvargs = kvargs {name => 'Elliot'};
+
+  # {name => 'Elliot'}
+
+=cut
+
+$test->for('example', 1, 'kvargs', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, {name => 'Elliot'};
+
+  $result
+});
+
+=example-2 kvargs
+
+  package main;
+
+  use Venus 'kvargs';
+
+  my $kvargs = kvargs name => 'Elliot', role => 'hacker';
+
+  # {name => 'Elliot', role => 'hacker'}
+
+=cut
+
+$test->for('example', 2, 'kvargs', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, {name => 'Elliot', role => 'hacker'};
+
+  $result
+});
+
+=example-3 kvargs
+
+  package main;
+
+  use Venus 'kvargs';
+
+  my $kvargs = kvargs name => 'Elliot', 'role';
+
+  # {name => 'Elliot', role => undef}
+
+=cut
+
+$test->for('example', 3, 'kvargs', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, {name => 'Elliot', role => undef};
+
+  $result
+});
+
+=example-4 kvargs
+
+  package main;
+
+  use Venus 'kvargs';
+
+  my $kvargs = kvargs;
+
+  # {}
+
+=cut
+
+$test->for('example', 4, 'kvargs', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, {};
+
+  $result
+});
+
 =function list
 
 The list function accepts a list of values and flattens any arrayrefs,
@@ -10153,7 +10253,7 @@ provided.
 
 =signature raise
 
-  raise(string $class | tuple[string, string] $class, maybe[hashref] $args) (Venus::Error)
+  raise(string $class | tuple[string, string] $class, any @args) (Venus::Error)
 
 =metadata raise
 
@@ -10228,6 +10328,53 @@ $test->for('example', 3, 'raise', sub {
   ok $error->isa('MyApp::Error');
   ok $error->isa('Venus::Error');
   ok $error->message eq 'Something failed!';
+
+  $result
+});
+
+=example-4 raise
+
+  package main;
+
+  use Venus 'raise';
+
+  my $error = raise 'MyApp::Error', message => 'Something failed!';
+
+  # bless({message => 'Something failed!', ...}, 'MyApp::Error')
+
+=cut
+
+$test->for('example', 4, 'raise', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\(my $error))->result;
+  ok $error;
+  ok $error->isa('MyApp::Error');
+  ok $error->isa('Venus::Error');
+  ok $error->message eq 'Something failed!';
+
+  $result
+});
+
+=example-5 raise
+
+  package main;
+
+  use Venus 'raise';
+
+  my $error = raise 'MyApp::Error', name => 'on.issue',  message => 'Something failed!';
+
+  # bless({message => 'Something failed!', ...}, 'MyApp::Error')
+
+=cut
+
+$test->for('example', 5, 'raise', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\(my $error))->result;
+  ok $error;
+  ok $error->isa('MyApp::Error');
+  ok $error->isa('Venus::Error');
+  ok $error->message eq 'Something failed!';
+  ok $error->of('on.issue');
 
   $result
 });

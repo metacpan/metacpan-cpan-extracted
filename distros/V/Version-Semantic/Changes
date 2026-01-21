@@ -1,0 +1,9 @@
+Release history for Version-Semantic
+
+1.0.1    Wed Jan 21 07:26:13 AM CET 2026
+         - Add missing changes file to manifest file
+         - Simplify Makefile.PL modulino setup
+         - Improve and extend documentation
+
+1.0.0    Thu Jan  8 08:21:29 AM CET 2026
+         - Initial release

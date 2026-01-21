@@ -72,13 +72,8 @@ SV * stream(STRLEN out_len, SV * nonce, SV * key)
 
   PREINIT:
   protmem *key_pm = NULL;
-  unsigned char *nonce_buf;
-  unsigned char *key_buf;
-  unsigned char *out_buf;
-  STRLEN nonce_len;
-  STRLEN key_len;
-  STRLEN nonce_req_len;
-  STRLEN key_req_len;
+  unsigned char *nonce_buf, *key_buf, *out_buf;
+  STRLEN nonce_len, key_len, nonce_req_len, key_req_len;
   int (*func)(unsigned char *, unsigned long long,
               const unsigned char *, const unsigned char *);
 
@@ -250,19 +245,10 @@ SV * stream_xor(SV * msg, SV * nonce, SV * key, SV * flags = &PL_sv_undef)
   stream_xsalsa20_xor = 6
 
   PREINIT:
-  protmem *msg_pm = NULL;
-  protmem *key_pm = NULL;
-  protmem *ct_pm = NULL;
-  unsigned char *msg_buf;
-  unsigned char *nonce_buf;
-  unsigned char *key_buf;
-  unsigned char *ct_buf;
+  protmem *msg_pm = NULL, *key_pm = NULL, *ct_pm = NULL;
+  unsigned char *msg_buf, *nonce_buf, *key_buf, *ct_buf;
   unsigned int new_flags = g_protmem_default_flags_decrypt;
-  STRLEN msg_len;
-  STRLEN nonce_len;
-  STRLEN key_len;
-  STRLEN nonce_req_len;
-  STRLEN key_req_len;
+  STRLEN msg_len, nonce_len, key_len, nonce_req_len, key_req_len;
   int (*func)(unsigned char *, const unsigned char *, unsigned long long,
               const unsigned char *, const unsigned char *);
 
@@ -409,19 +395,10 @@ SV * stream_xor_ic(SV * msg, SV * nonce, UV ic, SV * key, SV * flags = &PL_sv_un
   stream_xsalsa20_xor_ic = 4
 
   PREINIT:
-  protmem *msg_pm = NULL;
-  protmem *key_pm = NULL;
-  protmem *ct_pm = NULL;
-  unsigned char *msg_buf;
-  unsigned char *nonce_buf;
-  unsigned char *key_buf;
-  unsigned char *ct_buf;
+  protmem *msg_pm = NULL, *key_pm = NULL, *ct_pm = NULL;
+  unsigned char *msg_buf, *nonce_buf, *key_buf, *ct_buf;
   unsigned int new_flags = g_protmem_default_flags_decrypt;
-  STRLEN msg_len;
-  STRLEN nonce_len;
-  STRLEN key_len;
-  STRLEN nonce_req_len;
-  STRLEN key_req_len;
+  STRLEN msg_len, nonce_len, key_len, nonce_req_len, key_req_len;
   int (*func)(unsigned char *, const unsigned char *, unsigned long long,
               const unsigned char *, uint64_t, const unsigned char *);
 
@@ -545,17 +522,10 @@ do not use with a counter that could exceed 2 ** 32 -1.
 SV * stream_chacha20_ietf_xor_ic(SV * msg, SV * nonce, U32 ic, SV * key, SV * flags = &PL_sv_undef)
 
   PREINIT:
-  protmem *msg_pm = NULL;
-  protmem *key_pm = NULL;
-  protmem *ct_pm = NULL;
-  unsigned char *msg_buf;
-  unsigned char *nonce_buf;
-  unsigned char *key_buf;
-  unsigned char *ct_buf;
+  protmem *msg_pm = NULL, *key_pm = NULL, *ct_pm = NULL;
+  unsigned char *msg_buf, *nonce_buf, *key_buf, *ct_buf;
   unsigned int new_flags = g_protmem_default_flags_decrypt;
-  STRLEN msg_len;
-  STRLEN nonce_len;
-  STRLEN key_len;
+  STRLEN msg_len, nonce_len, key_len;
 
   CODE:
   nonce_buf = (unsigned char *)SvPVbyte(nonce, nonce_len);

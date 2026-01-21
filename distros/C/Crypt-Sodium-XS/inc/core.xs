@@ -510,14 +510,9 @@ SV * hchacha20( \
 )
 
   PREINIT:
-  protmem *key_pm = NULL;
-  protmem *new_key_pm = NULL;
-  unsigned char *cnst_buf = NULL;
-  unsigned char *key_buf;
-  unsigned char *input_buf;
-  STRLEN cnst_len;
-  STRLEN key_len;
-  STRLEN input_len;
+  protmem *key_pm = NULL, *new_key_pm = NULL;
+  unsigned char *cnst_buf = NULL, *key_buf, *input_buf;
+  STRLEN cnst_len, key_len, input_len;
   unsigned int new_key_flags = g_protmem_default_flags_key;
 
   CODE:

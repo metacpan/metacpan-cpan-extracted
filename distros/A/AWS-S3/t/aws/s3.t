@@ -95,21 +95,24 @@ subtest 'create bucket strange temporary redirect' => sub {
 };
 
 # list all buckets and owner
-{
-    my $xml = get_data_section('ListAllMyBucketsResult.xml');
-    local *LWP::UserAgent::Determined::request = sub {
-        return Mocked::HTTP::Response->new( 200,$xml );
+for my $case ( qw(ListAllMyBucketsResult.xml ListAllMyBucketsResult-noxmlns.xml) ) {
+    subtest "List all buckets and owner: $case" => sub {
+        my $xml = get_data_section($case);
+
+        local *LWP::UserAgent::Determined::request = sub {
+            return Mocked::HTTP::Response->new( 200,$xml );
+        };
+
+        isa_ok( my $owner = $s3->owner,'AWS::S3::Owner' );
+        is( $owner->id, 'bcaf1ffd86f41161ca5fb16fd081034f', '... and the owner id correct' );
+        is( $owner->display_name, 'webfile', '... and the owner name is correct' );
+
+        my @buckets = $s3->buckets;
+        cmp_deeply( \@buckets,
+            [ obj_isa('AWS::S3::Bucket'), obj_isa('AWS::S3::Bucket') ], '->buckets' );
+        ok( ! $s3->bucket( 'does not exist' ),'!->bucket' );
+        is( $s3->bucket( 'foo' )->name, 'foo', '->bucket' );
     };
-
-    isa_ok( my $owner = $s3->owner,'AWS::S3::Owner' );
-    is( $owner->id, 'bcaf1ffd86f41161ca5fb16fd081034f', '... and the owner id correct' );
-    is( $owner->display_name, 'webfile', '... and the owner name is correct' );
-
-    my @buckets = $s3->buckets;
-    cmp_deeply( \@buckets,
-        [ obj_isa('AWS::S3::Bucket'), obj_isa('AWS::S3::Bucket') ], '->buckets' );
-    ok( ! $s3->bucket( 'does not exist' ),'!->bucket' );
-    is( $s3->bucket( 'foo' )->name, 'foo', '->bucket' );
 }
 
 {
@@ -149,3 +152,20 @@ __DATA__
   <Resource>/mybucket</Resource>
   <RequestId>4442587FB7D0A2F9</RequestId>
 </Error>
+@@ ListAllMyBucketsResult-noxmlns.xml
+<ListAllMyBucketsResult>
+  <Owner>
+    <ID>bcaf1ffd86f41161ca5fb16fd081034f</ID>
+    <DisplayName>webfile</DisplayName>
+  </Owner>
+  <Buckets>
+    <Bucket>
+      <Name>foo</Name>
+      <CreationDate>2006-02-03T16:45:09.000Z</CreationDate>
+    </Bucket>
+    <Bucket>
+      <Name>bar</Name>
+      <CreationDate>2006-02-03T16:41:58.000Z</CreationDate>
+    </Bucket>
+ </Buckets>
+</ListAllMyBucketsResult>

@@ -52,7 +52,7 @@ This file was originally in https://github.com/briandfoy/mac-propertylist
 
 =head1 COPYRIGHT
 
-Copyright © 2002-2025, brian d foy, C<< <briandfoy@pobox.com> >>
+Copyright © 2002-2026, brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 LICENSE
 

@@ -3,28 +3,30 @@ abstract: unknown
 author:
   - 'Peter Karman <karman@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.132510'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: CatalystX-CRUD-Model-RDBO
 no_index:
   directory:
     - t
     - inc
 requires:
-  Catalyst::Runtime: 5.8
-  CatalystX::CRUD: 0.56
-  Data::Dump: 0
-  JSON: 2
-  Rose::DB::Object: 0
-  Rose::DBx::Object::MoreHelpers: 0
-  Rose::DBx::TestDB: 0
-  Sort::SQL: 0.05
-  Test::More: 0
-version: 0.302
+  Catalyst::Runtime: '5.8'
+  CatalystX::CRUD: '0.56'
+  CatalystX::CRUD::Controller::REST: '0.005'
+  Data::Dump: '0'
+  JSON: '2'
+  Rose::DB::Object: '0'
+  Rose::DBx::Object::MoreHelpers: '0'
+  Rose::DBx::TestDB: '0'
+  Sort::SQL: '0.05'
+  Test::More: '0'
+version: '0.303'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

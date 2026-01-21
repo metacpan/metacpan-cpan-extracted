@@ -14,7 +14,7 @@ our @EXPORT = ('strtotime');
 ###############################################################################
 
 # https://pause.perl.org/pause/query?ACTION=pause_operating_model#3_5_factors_considering_in_the_indexing_phase
-our $VERSION = '0.8';
+our $VERSION = '1.0';
 
 # https://timezonedb.com/download
 my $TZ_OFFSET = {
@@ -46,7 +46,7 @@ my $TZ_OFFSET = {
 };
 
 # Separator between dates pieces: '-' or '/' or '\'
-my $sep = qr/[\/\\-]/;
+our $sep = qr/[\/\\-]/;
 
 # Force a local timezone offset (used for unit tests)
 our $LOCAL_TZ_OFFSET = undef;
@@ -79,9 +79,10 @@ Date::Parse::Modern - Provide string to unixtime conversions
 
 =head1 DESCRIPTION
 
-C<Date::Parse::Modern> provides a single function C<strtotime()> which takes a datetime string
-and returns a unixtime.  Care was given to support the most modern style strings that you would
-commonly find in log files or on the internet.
+C<Date::Parse::Modern> provides a single function C<strtotime()> which takes a
+datetime string and returns an integer unixtime.  Care was given to support
+modern datetime strings that one would commonly find in log files or on the
+internet.
 
 =head1 USAGE
 
@@ -95,30 +96,39 @@ C<Date::Parse::Modern> exports the C<strtotime()> function automatically.
 
   my $unixtime = strtotime('1979-02-24'); # 288691200
 
-Simply feed C<strtotime()> a string with some type of date or time in it, and it will return an
-integer unixtime. If the string is unparseable, or a weird error occurs, it will return C<undef>.
+Simply feed C<strtotime()> a string with some type of date or time in it,
+and it will return an integer unixtime. If the string is unparseable, or a
+weird error occurs, it will return C<undef>.
 
-All the "magic" in C<strtotime()> is done using regular expressions that look for common datetime
-formats. Common formats like YYYY-MM-DD and HH:II:SS are easily detected and converted to the
-appropriate formats. This allows the date or time to be found anywhere in the string, in (almost) any
-order. If you limit your string to only the date/time portion the parsing will
-be much quicker. Shorter input equals faster parsing.
+All the "magic" in C<strtotime()> is done using regular expressions that look
+for common datetime formats. Common formats like C<YYYY-MM-DD> and C<HH:II:SS>
+are easily detected and converted to the appropriate formats. This allows the
+date or time to be found anywhere in the string, in (almost) any order. If you
+limit your string to only the date/time portion the parsing will be much
+quicker. Shorter input equals faster parsing.
 
-B<Note:> Strings without a year are assumed to be in the current year. Example: C<May 15th, 10:15am>
+B<Note:> Strings without a year are assumed to be in the current year.
+Example: C<May 15th, 10:15am>
 
-B<Note:> Strings with only a date are assumed to occur at midnight. Example: C<2023-01-15>
+B<Note:> Strings with only a date are assumed to occur at midnight.
+Example: C<2023-01-15>
 
-B<Note:> Strings with only time are assumed to be the current day. Example: C<10:15am>
+B<Note:> Strings with only time are assumed to be the current day.
+Example: C<10:15am>
 
-B<Note:> In strings with numeric B<and> textual time zone offsets, the numeric is used. Example:
-C<14 Nov 1994 11:34:32 -0500 (EST)>
+B<Note:> In strings with numeric B<and> textual time zone offsets, the numeric
+is used. Example: C<14 Nov 1994 11:34:32 -0500 (EST)>
 
-B<Note:> In all cases, the day of the week is ignored in the input string. Example: C<Mon Mar 25 2024>
+B<Note:> If a string contains neither a textual nor numeric timezone, the local
+timezone is assumed. Example: C<11/23/2025 08:00 PM>
+
+B<Note:> In all cases, the day of the week is ignored in the input string.
+Example: C<Mon Mar 25 2024>
 
 =head1 Will you support XYZ format?
 
-Everyone has their B<favorite> date/time format, and we'd like to support as many
-as possible. We have tried to support as much of
+Everyone has their B<favorite> date/time format, and we'd like to support as
+many as possible. We have tried to support as much of
 L<ISO 8601|https://en.wikipedia.org/wiki/ISO_8601> as possible, but we
 cannot support everything. Every new format we support runs the risk of slowing
 down things for existing formats. You can submit a feature request on Github
@@ -251,8 +261,9 @@ sub strtotime {
 	}
 
 	# The year may be on the end of the string: Sat May  8 21:24:31 2021
+	# We use a negative look-behind to make sure it's not a +0900 or -0100 timezone
 	if (!$year) {
-		($year) = $str =~ m/\b(\d{4})\b/;
+		($year) = $str =~ m/\b(?<![-+])(\d{4})\b/;
 	}
 
 	# Match 1st, 2nd, 3rd, 29th
@@ -354,13 +365,15 @@ sub strtotime {
 		return undef;
 	};
 
-	$ret += $ms;
+	if ($ms) {
+		$ret += $ms;
+	}
 
 	# If we find a timezone offset we take that in to account now
 	# Either: +1000 or -0700
 	# or
 	# 11:53 PST (One to four chars after a time)
-	my $tz_offset_seconds = 0;
+	my $tz_offset_seconds = undef;
 	my $tz_str            = '';
 	state $tz_rule        = qr/
 		(
@@ -375,20 +388,28 @@ sub strtotime {
 	/x;
 
 	# If we have a string with a timezone piece
-	if ($ret && $str =~ $tz_rule) {
-		my $str_offset = 0;
+	if (defined($ret) && $str =~ $tz_rule) {
+		my $str_offset = undef;
 
 		# String timezone: 11:53 PST
 		if ($6 || $7)  {
 			# Whichever form matches, the TZ is that one
-			my $tz_code = $6 || $7 || '';
+			$tz_str = $6 || $7 || '';
 
-			# Lookup the timezone offset in the table
-			$str_offset  = $TZ_OFFSET->{$tz_code} || 0;
-			# Timezone offsets are in hours, so we convert to seconds
-			$str_offset *= 3600;
+			# In rare cases we get timezone after AM/PM: "12:12 PM CST"
+			if (in_array($tz_str, ("AM", "PM", "am", "pm"))) {
+				if ($str =~ /$tz_str ([A-Z]{1,4})\b/) {
+					$tz_str = $1;
+				}
+			}
 
-			$tz_str = $tz_code;
+			# AM/PM sometimes gets flagged as the TZ so we skip it if it happens
+			if (uc($tz_str) !~ /^(AM|PM)$/) {
+				# Lookup the timezone offset in the table
+				$str_offset  = $TZ_OFFSET->{$tz_str} || 0;
+				# Timezone offsets are in hours, so we convert to seconds
+				$str_offset *= 3600;
+			}
 		# Numeric format: +1000 or -0700
 		} else {
 			# Break the input string into parts so we can do math
@@ -402,9 +423,13 @@ sub strtotime {
 			$tz_str = "$3$4$5";
 		}
 
-		$tz_offset_seconds = $str_offset;
+		if (defined($str_offset)) {
+			$tz_offset_seconds = $str_offset;
+		}
+	}
+
 	# No timezone info found so we assume the local timezone
-	} elsif ($ret) {
+	if (defined($ret) && !defined($tz_offset_seconds)) {
 		my $local_offset = get_local_offset($ret);
 
 		$tz_offset_seconds = $local_offset;
@@ -464,19 +489,30 @@ sub get_local_offset {
 	return $ret;
 }
 
+sub in_array {
+	my ($needle, @haystack) = @_;
+
+	my $ret = grep { $_ eq $needle; } @haystack;
+
+	return $ret;
+}
+
 1;
 
 __END__
 
 Performance varies depending on string input
 
-Running the entire test suite through both this module and
-Date::Parse::str2time() via --bench gets the following output:
+Benchmarking the entire test suite with this module and
+Date::Parse::str2time() gets the following statistics.
 
-$ perl -I lib compare.pl --bench
-Comparing 24 strings
+Test results from: 2026-01-13 on my AMD Ryzen 7 5700G
+==================================================================
+$ perl compare.pl --bench
+Comparing 24 strings with Date::Parse::Modern v0.9
+
                       Rate         Date::Parse Date::Parse::Modern
-Date::Parse         1590/s                  --                -57%
-Date::Parse::Modern 3663/s                130%                  --
+Date::Parse         1650/s                  --                -59%
+Date::Parse::Modern 4000/s                142%                  --
 
 # vim: tabstop=4 shiftwidth=4 autoindent softtabstop=4

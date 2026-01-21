@@ -18,10 +18,8 @@ SV * hash(SV * msg)
 
   PREINIT:
   protmem *msg_pm = NULL;
-  unsigned char *msg_buf;
-  unsigned char *out_buf;
-  STRLEN msg_len;
-  STRLEN out_len;
+  unsigned char *msg_buf, *out_buf;
+  STRLEN msg_len, out_len;
   int (*func)(unsigned char *, const unsigned char *, unsigned long long);
 
   CODE:
@@ -220,8 +218,7 @@ void update(SV * self, ...)
   Crypt::Sodium::XS::hash::sha512_multi::update = 1
 
   PREINIT:
-  protmem *state_pm;
-  protmem *msg_pm = NULL;
+  protmem *state_pm, *msg_pm = NULL;
   unsigned char *msg_buf;
   STRLEN msg_len;
   I32 i;

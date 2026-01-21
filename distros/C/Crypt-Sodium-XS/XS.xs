@@ -60,6 +60,15 @@
 #define SODIUM_HAS_HKDF 1U
 #endif
 
+/* 1.0.21: major: 26 minor: 3 */
+#undef SODIUM_HAS_IPCODECS
+#undef SODIUM_HAS_IPCRYPT
+#if (SODIUM_LIBRARY_VERSION_MAJOR > 26U) || \
+    ((SODIUM_LIBRARY_VERSION_MAJOR == 26U) && (SODIUM_LIBRARY_VERSION_MINOR >= 3U))
+#define SODIUM_HAS_IPCODECS 1U
+#define SODIUM_HAS_IPCRYPT 1U
+#endif
+
 /* 00000011 */
 #define PROTMEM_FLAG_MPROTECT_MASK 0x3U
 #define PROTMEM_FLAG_MPROTECT_NOACCESS 0U
@@ -92,7 +101,7 @@
 #define PROTMEM_FLAG_MALLOC_PLAIN 0x80U
 
 #define PROTMEM_FLAG_ALL_DISABLED 0xffffffffU
-#define PROTMEM_FLAG_ALL_ENABLED 0x0U
+#define PROTMEM_FLAG_ALL_ENABLED 0U
 
 #define MEMVAULT_READ_BUFSIZE 4096U
 #define MEMVAULT_WRITE_BUFSIZE 4096U
@@ -124,22 +133,10 @@ static char * SvPVbyte_nomg(pTHX_ SV *sv, STRLEN *len)
 #endif
 
 
-static U32
-g_protmem_default_flags_state = PROTMEM_FLAG_MPROTECT_NOACCESS
-                              | PROTMEM_FLAG_MLOCK_STRICT;
-
-static U32
-g_protmem_default_flags_memvault = PROTMEM_FLAG_MPROTECT_NOACCESS
-                                 | PROTMEM_FLAG_MLOCK_STRICT
-                                 | PROTMEM_FLAG_LOCK_LOCKED;
-static U32
-g_protmem_default_flags_key = PROTMEM_FLAG_MPROTECT_NOACCESS
-                            | PROTMEM_FLAG_MLOCK_STRICT
-                            | PROTMEM_FLAG_LOCK_LOCKED;
-static U32
-g_protmem_default_flags_decrypt = PROTMEM_FLAG_MPROTECT_NOACCESS
-                                | PROTMEM_FLAG_MLOCK_STRICT
-                                | PROTMEM_FLAG_LOCK_LOCKED;
+static U32 g_protmem_default_flags_state = 0;
+static U32 g_protmem_default_flags_memvault = 0;
+static U32 g_protmem_default_flags_key = 0;
+static U32 g_protmem_default_flags_decrypt = 0;
 
 static int has_aes256gcm;
 
@@ -520,3 +517,5 @@ INCLUDE: inc/auth.xs
 INCLUDE: inc/onetimeauth.xs
 
 INCLUDE: inc/scalarmult.xs
+
+INCLUDE: inc/ipcrypt.xs

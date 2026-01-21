@@ -77,3 +77,5 @@ CHANGES\s\d
 \Ascratch\b
 Dockerfile
 plists.md
+
+.downstream.json

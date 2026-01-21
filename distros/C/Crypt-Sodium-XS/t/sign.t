@@ -2,9 +2,10 @@ use strict;
 use warnings;
 use Test::More;
 
+use Crypt::Sodium::XS;
 use Crypt::Sodium::XS::Util "sodium_random_bytes";
 use Crypt::Sodium::XS::generichash "generichash";
-use Crypt::Sodium::XS::OO::sign;
+use Crypt::Sodium::XS::sign;
 use Crypt::Sodium::XS::scalarmult "scalarmult_base";
 use FindBin '$Bin';
 use lib "$Bin/lib";
@@ -12,8 +13,8 @@ use Test::MemVault;
 
 my $msg = "How do you do?";
 
-for my $alg (Crypt::Sodium::XS::OO::sign->primitives) {
-  my $m = Crypt::Sodium::XS::OO::sign->new(primitive => $alg);
+for my $alg (Crypt::Sodium::XS::sign->primitives) {
+  my $m = Crypt::Sodium::XS->sign(primitive => $alg);
 
   ok($m->$_ > 0, "$_ > 0 ($alg)")
     for qw/BYTES MESSAGEBYTES_MAX PUBLICKEYBYTES SECRETKEYBYTES SEEDBYTES/;

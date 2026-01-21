@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    5.00
+    5.01
 
 SYNOPSIS
 
@@ -3281,6 +3281,57 @@ FUNCTIONS
       
         # Exception! (isa Venus::Fault)
 
+ kvargs
+
+      kvargs(any @args) (hashref)
+
+    The kvargs function takes a list of arguments and returns a hashref. If
+    a single hashref is provided, it is returned as-is. Otherwise, the
+    arguments are treated as key-value pairs. If an odd number of arguments
+    is provided, the last key will have undef as its value.
+
+    Since 5.00
+
+    kvargs example 1
+
+        package main;
+      
+        use Venus 'kvargs';
+      
+        my $kvargs = kvargs {name => 'Elliot'};
+      
+        # {name => 'Elliot'}
+
+    kvargs example 2
+
+        package main;
+      
+        use Venus 'kvargs';
+      
+        my $kvargs = kvargs name => 'Elliot', role => 'hacker';
+      
+        # {name => 'Elliot', role => 'hacker'}
+
+    kvargs example 3
+
+        package main;
+      
+        use Venus 'kvargs';
+      
+        my $kvargs = kvargs name => 'Elliot', 'role';
+      
+        # {name => 'Elliot', role => undef}
+
+    kvargs example 4
+
+        package main;
+      
+        use Venus 'kvargs';
+      
+        my $kvargs = kvargs;
+      
+        # {}
+
  list
 
       list(any @args) (any)
@@ -5392,7 +5443,7 @@ FUNCTIONS
 
  raise
 
-      raise(string $class | tuple[string, string] $class, maybe[hashref] $args) (Venus::Error)
+      raise(string $class | tuple[string, string] $class, any @args) (Venus::Error)
 
     The raise function generates and throws a named exception object
     derived from Venus::Error, or provided base class, using the exception
@@ -5429,6 +5480,26 @@ FUNCTIONS
         my $error = raise ['MyApp::Error', 'Venus::Error'], {
           message => 'Something failed!',
         };
+      
+        # bless({message => 'Something failed!', ...}, 'MyApp::Error')
+
+    raise example 4
+
+        package main;
+      
+        use Venus 'raise';
+      
+        my $error = raise 'MyApp::Error', message => 'Something failed!';
+      
+        # bless({message => 'Something failed!', ...}, 'MyApp::Error')
+
+    raise example 5
+
+        package main;
+      
+        use Venus 'raise';
+      
+        my $error = raise 'MyApp::Error', name => 'on.issue',  message => 'Something failed!';
       
         # bless({message => 'Something failed!', ...}, 'MyApp::Error')
 

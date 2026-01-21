@@ -1,8 +1,52 @@
 Revision history for Lugh
 
+0.11    2026-01-21
+        - Test coverage improvements
+        - memory leak tests and fixes
+
+0.10    2026-01-20
+        - Fix forward Batch Mode with Per-Sequence KV Caches
+          - forward_batch() now accepts caches => [$cache1, $cache2, ...] for 
+            per-sequence KV caching in batch mode
+          - Enables parallel incremental decoding of multiple conversations
+          - Each sequence uses its own independent cache
+          - Number of caches must match number of sequences
+          - Also supported via forward(sequences => [...], caches => [...])
+          - forward_batch_pool() also supports caches parameter
+          - New tests in t/28-unified-forward.t
+        - Speculative Decoding
+          - New Lugh::Speculative module for faster inference
+          - Uses smaller draft model to generate candidate tokens
+          - Main model verifies in parallel for 2-3x speedup
+          - Dual KV cache management for both models
+          - Statistics: acceptance_rate(), tokens_drafted/accepted, total_steps
+          - Vocab compatibility validation between models
+          - New tests in t/29-speculative.t
+
+0.09    2026-01-20
+        - Context Extension (RoPE Scaling)
+          - New Lugh::RoPE module for extending context beyond training length
+            - Four scaling types: none, linear, yarn, longrope
+            - Built-in presets: linear_2x, linear_4x, yarn_32k, yarn_64k, yarn_128k
+            - YaRN parameters: ext_factor, attn_factor, beta_fast, beta_slow
+            - Auto-detection from GGUF metadata (rope.scaling.* keys)
+          - LughHyperparams extended with rope_scaling_type, n_ctx_orig, rope_ext_factor, rope_attn_factor, rope_beta_fast, rope_beta_slow
+          - Integration with all forward methods via rope => $rope parameter
+          - New test files: t/26-rope.t, t/27-rope-integration.t
+        - Unified Forward Pass API Refactor
+          - now wrappers around static C function (do_forward_unified)
+          - forward() now only accepts named parameters (hash form):
+            - forward(tokens => \@tokens, lora => $lora, rope => $rope)
+            - forward_simple(\@tokens) - simple forward pass
+            - forward_cache($cache, \@tokens, ...) - with KV cache
+            - forward_pool($pool, \@tokens, ...) - with memory pool
+            - forward_batch(\@sequences, ...) - batch processing
+            - forward_cache_pool($cache, $pool, \@tokens, ...) - cache + pool
+            - forward_batch_pool($pool, \@sequences, ...) - batch + pool
+
 0.08    2026-01-20
         - New Lugh::Quant module
-        - All GGML quantization types exposed as constants:
+        - All 35+ GGML quantization types exposed as constants:
           - Float types: F32, F16, BF16, F64
           - Integer types: I8, I16, I32, I64
           - Basic quantization: Q4_0, Q4_1, Q5_0, Q5_1, Q8_0, Q8_1
@@ -19,7 +63,6 @@ Revision history for Lugh
         - OO quantize/dequantize on Lugh::Tensor:
           - $tensor->quantize($ctx, $type) - F32 to quantized
           - $tensor->dequantize($ctx) - quantized/F16/BF16 to F32
-        - Quantization loss test demonstrating accuracy vs bit depth
 
 0.07    2026-01-19
         LoRA (Low-Rank Adaptation) Support
@@ -27,9 +70,9 @@ Revision history for Lugh
         - Dual format support: GGUF (.gguf) and SafeTensors (.safetensors)
         - Dynamic scale adjustment with scale() method (0.0 to 2.0+)
         - Integration with all forward methods:
-          - forward(\@tokens, lora => $lora)
-          - forward_with_cache(..., lora => $lora)
-          - forward_with_pool(..., lora => $lora)
+          - forward(tokens => \@tokens, lora => $lora)
+          - forward_cache(..., lora => $lora)
+          - forward_pool(..., lora => $lora)
           - forward_batch(..., lora => $lora)
         - LoRA API methods:
           - new(model => $model, file => $path) - Load adapter

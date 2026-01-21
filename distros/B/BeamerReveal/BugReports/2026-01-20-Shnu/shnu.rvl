@@ -1,0 +1,11 @@
+%% Beamer-revealdriverfile
+@@Presentation: 
+-parameters:compiler={lualatex},canvaswidth={1920},canvasheight={1200}
+@@BeamerFrame: 
+-parameters:rawpage={0},truepage={1},overlay={1},transition={none},title={Boo}
+@@BeamerFrame: 
+-parameters:rawpage={1},truepage={2},overlay={1},transition={none},title={Ga}
+@@BeamerFrame: 
+-parameters:rawpage={0},truepage={3},overlay={1},transition={none},title={Lu}
+@@BeamerFrame: 
+-parameters:rawpage={1},truepage={4},overlay={1},transition={none},title={Loo}

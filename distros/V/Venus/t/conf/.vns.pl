@@ -1,6 +1,6 @@
 {
   data => {
-    ECHO => 1,
+    VENUS_RUN_DEBUG => 1,
   },
   exec => {
     brew => 'perlbrew',

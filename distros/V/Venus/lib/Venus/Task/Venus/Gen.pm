@@ -1563,7 +1563,7 @@ sub render_test {
     $self->render_test_routines,
     $self->render_test_errors,
     $self->render_test_tail,
-    "ok 1 and done_testing;",
+    "\$test->done;",
   );
 }
 
@@ -1577,14 +1577,16 @@ sub render_test_abstract {
   return () if !$abstract;
 
   my $text = <<"EOF";
-=abstract
++=abstract
 
 ${abstract}
 
-=cut
++=cut
 
 \$test->for('abstract');
 EOF
+
+  $text =~ s/^\+=/=/gm;
 
   return ($text);
 }
@@ -1593,21 +1595,21 @@ sub render_test_attribute {
   my ($self, $data) = @_;
 
   my $text = <<"EOF";
-=attribute ${data}
++=attribute ${data}
 
 The ${data} attribute ...
 
-=signature ${data}
++=signature ${data}
 
   ${data}(any \@data) (any)
 
-=metadata ${data}
++=metadata ${data}
 
 {
   since => '0.00',
 }
 
-=example-1 ${data}
++=example-1 ${data}
 
   # given: synopsis
 
@@ -1617,7 +1619,7 @@ The ${data} attribute ...
 
   # ()
 
-=cut
++=cut
 
 \$test->for('example', 1, '${data}', sub {
   my (\$tryable) = \@_;
@@ -1627,6 +1629,8 @@ The ${data} attribute ...
   \$result
 });
 EOF
+
+  $text =~ s/^\+=/=/gm;
 
   return ($text);
 }
@@ -1686,14 +1690,16 @@ sub render_test_description {
   return () if !$description;
 
   my $text = <<"EOF";
-=description
++=description
 
 ${description}
 
-=cut
++=cut
 
 \$test->for('description');
 EOF
+
+  $text =~ s/^\+=/=/gm;
 
   return ($text);
 }
@@ -1702,16 +1708,16 @@ sub render_test_error {
   my ($self, $data) = @_;
 
   my $text = <<"EOF";
-=error error_on_${data}
++=error error_on_${data}
 
 This package may raise an C<on.${data}> error, as an instance of
 C<Example::Error>, via the C<error_on_${data}> method.
 
-=cut
++=cut
 
 \$test->for('error', 'error_on_${data}');
 
-=example-1 error_on_${data}
++=example-1 error_on_${data}
 
   # given: synopsis;
 
@@ -1727,7 +1733,7 @@ C<Example::Error>, via the C<error_on_${data}> method.
 
   # "Exception!"
 
-=cut
++=cut
 
 \$test->for('example', 1, 'error_on_${data}', sub {
   my (\$tryable) = \@_;
@@ -1741,6 +1747,8 @@ C<Example::Error>, via the C<error_on_${data}> method.
   \$result
 });
 EOF
+
+  $text =~ s/^\+=/=/gm;
 
   chomp $text;
 
@@ -1761,21 +1769,21 @@ sub render_test_function {
   my ($self, $data) = @_;
 
   my $text = <<"EOF";
-=function ${data}
++=function ${data}
 
 The ${data} function ...
 
-=signature ${data}
++=signature ${data}
 
   ${data}(any \@data) (any)
 
-=metadata ${data}
++=metadata ${data}
 
 {
   since => '0.00',
 }
 
-=example-1 ${data}
++=example-1 ${data}
 
   # given: synopsis
 
@@ -1785,7 +1793,7 @@ The ${data} function ...
 
   # ()
 
-=cut
++=cut
 
 \$test->for('example', 1, '${data}', sub {
   my (\$tryable) = \@_;
@@ -1795,6 +1803,8 @@ The ${data} function ...
   \$result
 });
 EOF
+
+  $text =~ s/^\+=/=/gm;
 
   return ($text);
 }
@@ -1907,21 +1917,21 @@ sub render_test_method {
   my ($self, $data) = @_;
 
   my $text = <<"EOF";
-=method ${data}
++=method ${data}
 
 The ${data} method ...
 
-=signature ${data}
++=signature ${data}
 
   ${data}(any \@data) (any)
 
-=metadata ${data}
++=metadata ${data}
 
 {
   since => '0.00',
 }
 
-=example-1 ${data}
++=example-1 ${data}
 
   # given: synopsis
 
@@ -1931,7 +1941,7 @@ The ${data} method ...
 
   # ()
 
-=cut
++=cut
 
 \$test->for('example', 1, '${data}', sub {
   my (\$tryable) = \@_;
@@ -1941,6 +1951,8 @@ The ${data} method ...
   \$result
 });
 EOF
+
+  $text =~ s/^\+=/=/gm;
 
   return ($text);
 }
@@ -1998,21 +2010,21 @@ sub render_test_routine {
   my $name = $self->input_options->{name};
 
   my $text = <<"EOF";
-=routine ${data}
++=routine ${data}
 
 The ${data} routine ...
 
-=signature ${data}
++=signature ${data}
 
   ${data}(any \@data) (any)
 
-=metadata ${data}
++=metadata ${data}
 
 {
   since => '0.00',
 }
 
-=example-1 ${data}
++=example-1 ${data}
 
   package main;
 
@@ -2020,7 +2032,7 @@ The ${data} routine ...
 
   # ()
 
-=cut
++=cut
 
 \$test->for('example', 1, '${data}', sub {
   my (\$tryable) = \@_;
@@ -2030,6 +2042,8 @@ The ${data} routine ...
   \$result
 });
 EOF
+
+  $text =~ s/^\+=/=/gm;
 
   return ($text);
 }
@@ -2052,7 +2066,7 @@ sub render_test_synopsis {
   my $name = $data->{name};
 
   my $text = <<"EOF";
-=synopsis
++=synopsis
 
   package main;
 
@@ -2062,7 +2076,7 @@ sub render_test_synopsis {
 
   # ()
 
-=cut
++=cut
 
 \$test->for('synopsis', sub {
   my (\$tryable) = \@_;
@@ -2072,6 +2086,8 @@ sub render_test_synopsis {
   \$result
 });
 EOF
+
+  $text =~ s/^\+=/=/gm;
 
   return ($text);
 }
@@ -2086,14 +2102,16 @@ sub render_test_tagline {
   return () if !$tagline;
 
   my $text = <<"EOF";
-=tagline
++=tagline
 
 ${tagline}
 
-=cut
++=cut
 
 \$test->for('tagline');
 EOF
+
+  $text =~ s/^\+=/=/gm;
 
   return ($text);
 }
@@ -2108,7 +2126,7 @@ sub render_test_tail {
   my $pfile = $space->format('pfile', 'lib/%s');
 
   my $text = <<"EOF";
-\$test->render('$pfile') if \$ENV{VENUS_RENDER};
+\$test->render('$pfile');
 EOF
 
   return ($text);

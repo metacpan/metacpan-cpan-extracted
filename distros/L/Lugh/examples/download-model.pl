@@ -31,35 +31,69 @@ development.
 
 =cut
 
-# Available models (small ones suitable for testing)
+# Available models for testing and speculative decoding
+# For speculative decoding, draft and main models must share the same vocabulary.
+# 
+# Recommended pairings for speculative decoding:
+#   Draft (small/fast)      Main (medium/quality)
+#   ------------------      ---------------------
+#   qwen2-0.5b-q4           qwen2-1.5b-q4         (Qwen2 family)
+#   smollm-135m-q8          smollm-360m-q8        (SmolLM family)
+#   tinyllama-q2            tinyllama-q4          (same model, faster quant)
+
 my %MODELS = (
+    # === Qwen2 Family (same vocab) ===
+    'qwen2-0.5b-q4' => {
+        url  => 'https://huggingface.co/Qwen/Qwen2-0.5B-Instruct-GGUF/resolve/main/qwen2-0_5b-instruct-q4_k_m.gguf',
+        file => 'qwen2-0_5b-instruct-q4_k_m.gguf',
+        size => '400MB',
+        desc => 'Qwen2 0.5B Instruct - DRAFT model for speculative decoding',
+    },
+    'qwen2-1.5b-q4' => {
+        url  => 'https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/resolve/main/qwen2-1_5b-instruct-q4_k_m.gguf',
+        file => 'qwen2-1_5b-instruct-q4_k_m.gguf',
+        size => '1.0GB',
+        desc => 'Qwen2 1.5B Instruct - MAIN model for speculative decoding',
+    },
+    
+    # === SmolLM Family (same vocab, very small) ===
+    'smollm-135m-q8' => {
+        url  => 'https://huggingface.co/TheBloke/SmolLM-135M-GGUF/resolve/main/smollm-135m.Q8_0.gguf',
+        file => 'smollm-135m.Q8_0.gguf',
+        size => '144MB',
+        desc => 'SmolLM 135M - tiny DRAFT model for speculative decoding',
+    },
+    'smollm-360m-q8' => {
+        url  => 'https://huggingface.co/TheBloke/SmolLM-360M-GGUF/resolve/main/smollm-360m.Q8_0.gguf',
+        file => 'smollm-360m.Q8_0.gguf',
+        size => '386MB',
+        desc => 'SmolLM 360M - small MAIN model for speculative decoding',
+    },
+    
+    # === TinyLlama (different quantizations) ===
     'tinyllama-q2' => {
         url  => 'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q2_K.gguf',
         file => 'tinyllama-1.1b-chat-v1.0.Q2_K.gguf',
         size => '460MB',
-        desc => 'TinyLlama 1.1B Chat - Q2_K quantization (smallest)',
+        desc => 'TinyLlama 1.1B Q2_K - faster draft (lower quality)',
     },
     'tinyllama-q4' => {
         url  => 'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf',
         file => 'tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf',
         size => '637MB',
-        desc => 'TinyLlama 1.1B Chat - Q4_K_M quantization (recommended)',
+        desc => 'TinyLlama 1.1B Q4_K_M - balanced quality/speed',
     },
+    
+    # === Other models ===
     'phi2-q4' => {
         url  => 'https://huggingface.co/TheBloke/phi-2-GGUF/resolve/main/phi-2.Q4_K_M.gguf',
         file => 'phi-2.Q4_K_M.gguf',
         size => '1.6GB',
-        desc => 'Microsoft Phi-2 2.7B - Q4_K_M quantization',
-    },
-    'qwen2-0.5b-q4' => {
-        url  => 'https://huggingface.co/Qwen/Qwen2-0.5B-Instruct-GGUF/resolve/main/qwen2-0_5b-instruct-q4_k_m.gguf',
-        file => 'qwen2-0_5b-instruct-q4_k_m.gguf',
-        size => '400MB',
-        desc => 'Qwen2 0.5B Instruct - Q4_K_M quantization (tiny)',
+        desc => 'Microsoft Phi-2 2.7B - standalone model',
     },
 );
 
-my $DEFAULT_MODEL = 'tinyllama-q4';
+my $DEFAULT_MODEL = 'qwen2-0.5b-q4';
 
 # Parse options
 my $model_name = $DEFAULT_MODEL;

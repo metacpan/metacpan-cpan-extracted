@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use Crypt::Sodium::XS::OO::shorthash;
+use Crypt::Sodium::XS::shorthash;
 use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
@@ -14,8 +14,8 @@ my @adatas = (
   "",
 );
 
-for my $alg (Crypt::Sodium::XS::OO::shorthash->primitives) {
-  my $m = Crypt::Sodium::XS::OO::shorthash->new(primitive => $alg);
+for my $alg (Crypt::Sodium::XS::shorthash->primitives) {
+  my $m = Crypt::Sodium::XS->shorthash(primitive => $alg);
 
   ok($m->BYTES > 0, "shorthash_BYTES > 0");
   ok($m->KEYBYTES > 0, "shorthash_KEYBYTES > 0");

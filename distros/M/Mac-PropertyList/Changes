@@ -1,10 +1,16 @@
 Revision history for Perl module Mac::PropertyList
 
+1.606 2026-01-20T16:50:39Z
+	* remove import from XML::Entities, which does not export.
+	v5.44 will make this either fatal, or a warning.
+	(trwyant, #37)
+
 1.605 2025-08-08T17:04:09Z
 	* Fix XML encoding/decoding to be compliant with plutil (Jess Robinson, GH #36)
+	* keys in dicts are now sorted on output, like plutil (Jess Robinson, GH #36)
 
 1.604 2025-07-23T23:09:47Z
-	* encode entities in writing (GH #35)
+	* encode entities in writing (GH #35) (turns out I did this wrong)
 
 1.603_05 2025-07-21T20:31:59Z
 	* trial release for proper HTML entity writing (GH #35)

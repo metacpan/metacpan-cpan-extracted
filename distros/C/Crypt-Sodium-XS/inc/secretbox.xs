@@ -44,17 +44,9 @@ SV * secretbox_decrypt( \
   secretbox_xsalsa20poly1305_decrypt = 2
 
   PREINIT:
-  protmem *msg_pm;
-  protmem *key_pm = NULL;
-  unsigned char *ct_buf;
-  unsigned char *nonce_buf;
-  unsigned char *key_buf;
-  STRLEN ct_len;
-  STRLEN nonce_len;
-  STRLEN key_len;
-  STRLEN nonce_req_len;
-  STRLEN key_req_len;
-  STRLEN mac_len;
+  protmem *msg_pm, *key_pm = NULL;
+  unsigned char *ct_buf, *nonce_buf, *key_buf;
+  STRLEN ct_len, nonce_len, key_len, nonce_req_len, key_req_len, mac_len;
   unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, const unsigned char *,
@@ -143,19 +135,10 @@ SV * secretbox_decrypt_detached( \
   secretbox_xsalsa20poly1305_decrypt_detached = 2
 
   PREINIT:
-  protmem *msg_pm;
-  protmem *key_pm = NULL;
-  unsigned char *ct_buf;
-  unsigned char *mac_buf;
-  unsigned char *nonce_buf;
-  unsigned char *key_buf;
-  STRLEN ct_len;
-  STRLEN mac_len;
-  STRLEN nonce_len;
-  STRLEN key_len;
-  STRLEN mac_req_len;
-  STRLEN nonce_req_len;
-  STRLEN key_req_len;
+  protmem *msg_pm, *key_pm = NULL;
+  unsigned char *ct_buf, *mac_buf, *nonce_buf, *key_buf;
+  STRLEN ct_len, mac_len, nonce_len, key_len;
+  STRLEN mac_req_len, nonce_req_len, key_req_len;
   unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, const unsigned char *,
@@ -243,21 +226,10 @@ void secretbox_encrypt(SV * msg, SV * nonce, SV * key)
   secretbox_xsalsa20poly1305_encrypt_detached = 5
 
   PREINIT:
-  protmem *key_pm = NULL;
-  protmem *msg_mv = NULL;
-  SV *ct;
-  SV *mac = NULL;
-  unsigned char *msg_buf;
-  unsigned char *nonce_buf;
-  unsigned char *key_buf;
-  unsigned char *ct_buf;
-  unsigned char *mac_buf;
-  STRLEN msg_len;
-  STRLEN nonce_len;
-  STRLEN key_len;
-  STRLEN nonce_req_len;
-  STRLEN key_req_len;
-  STRLEN mac_len;
+  protmem *key_pm = NULL, *msg_mv = NULL;
+  SV *ct, *mac = NULL;
+  unsigned char *msg_buf, *nonce_buf, *key_buf, *ct_buf, *mac_buf;
+  STRLEN msg_len, nonce_len, key_len, nonce_req_len, key_req_len, mac_len;
   int (*detached_func)(unsigned char *, unsigned char *,
                        const unsigned char *, unsigned long long,
                        const unsigned char *, const unsigned char *);

@@ -37,15 +37,9 @@ SV * sign(SV * msg, SV * sk)
   sign_ed25519 = 1
 
   PREINIT:
-  protmem *msg_pm = NULL;
-  protmem *sk_pm = NULL;
-  unsigned char *msg_buf;
-  unsigned char *sk_buf;
-  unsigned char *smsg_buf;
-  STRLEN msg_len;
-  STRLEN sk_len;
-  STRLEN sk_req_len;
-  STRLEN sig_len;
+  protmem *msg_pm = NULL, *sk_pm = NULL;
+  unsigned char *msg_buf, *sk_buf, *smsg_buf;
+  STRLEN msg_len, sk_len, sk_req_len, sig_len;
   int (*func)(unsigned char *, unsigned long long *, const unsigned char *,
               unsigned long long, const unsigned char *);
 
@@ -153,15 +147,9 @@ SV * sign_detached(SV * msg, SV * sk)
   sign_ed25519_detached = 1
 
   PREINIT:
-  protmem *msg_pm = NULL;
-  protmem *sk_pm = NULL;
-  unsigned char *msg_buf;
-  unsigned char *sk_buf;
-  unsigned char *sig_buf;
-  STRLEN msg_len;
-  STRLEN sk_len;
-  STRLEN sk_req_len;
-  STRLEN sig_len;
+  protmem *msg_pm = NULL, *sk_pm = NULL;
+  unsigned char *msg_buf, *sk_buf, *sig_buf;
+  STRLEN msg_len, sk_len, sk_req_len, sig_len;
   int (*func)(unsigned char *, unsigned long long *, const unsigned char *,
               unsigned long long, const unsigned char *);
 
@@ -240,8 +228,7 @@ SV * sign_pk_to_curve25519(SV * pk)
   sign_ed25519_pk_to_curve25519 = 1
 
   PREINIT:
-  unsigned char *pk_buf;
-  unsigned char *ed_buf;
+  unsigned char *pk_buf, *ed_buf;
   STRLEN pk_len;
 
   CODE:
@@ -274,8 +261,7 @@ SV * sign_sk_to_curve25519(SV * sk, SV * flags = &PL_sv_undef)
   sign_ed25519_sk_to_curve25519 = 1
 
   PREINIT:
-  protmem *sk_pm = NULL;
-  protmem *ed_pm;
+  protmem *sk_pm = NULL, *ed_pm;
   unsigned char *sk_buf;
   STRLEN sk_len;
   unsigned int ed_flags = g_protmem_default_flags_key;
@@ -335,8 +321,7 @@ SV * sign_sk_to_pk(SV * sk)
 
   PREINIT:
   protmem *sk_pm = NULL;
-  unsigned char *sk_buf;
-  unsigned char *pk_buf;
+  unsigned char *sk_buf, *pk_buf;
   STRLEN sk_len;
 
   CODE:
@@ -387,8 +372,7 @@ SV * sign_sk_to_seed(SV * sk, SV * flags = &PL_sv_undef)
   sign_ed25519_sk_to_seed = 1
 
   PREINIT:
-  protmem *sk_pm = NULL;
-  protmem *seed_pm;
+  protmem *sk_pm = NULL, *seed_pm;
   unsigned char *sk_buf;
   STRLEN sk_len;
   unsigned int seed_flags = g_protmem_default_flags_key;
@@ -595,13 +579,8 @@ SV * sign_open(SV * smsg, SV * pk)
 
   PREINIT:
   protmem *smsg_pm = NULL;
-  unsigned char *smsg_buf;
-  unsigned char *pk_buf;
-  unsigned char *msg_buf;
-  STRLEN smsg_len;
-  STRLEN pk_len;
-  STRLEN pk_req_len;
-  STRLEN sig_len;
+  unsigned char *smsg_buf, *pk_buf, *msg_buf;
+  STRLEN smsg_len, pk_len, pk_req_len, sig_len;
   int (*func)(unsigned char *, unsigned long long *, const unsigned char *,
               unsigned long long, const unsigned char *);
 
@@ -688,14 +667,10 @@ void sign_to_curve25519(SV * pk, SV * sk, SV * flags = &PL_sv_undef)
   sign_ed25519_to_curve25519 = 1
 
   PREINIT:
-  protmem *sk_pm = NULL;
-  protmem *sk_ed_pm;
+  protmem *sk_pm = NULL, *sk_ed_pm;
   SV *pk_ed_sv;
-  unsigned char *pk_buf;
-  unsigned char *sk_buf;
-  unsigned char *pk_ed_buf;
-  STRLEN pk_len;
-  STRLEN sk_len;
+  unsigned char *pk_buf, *sk_buf, *pk_ed_buf;
+  STRLEN pk_len, sk_len;
   unsigned int sk_flags = g_protmem_default_flags_key;
 
   PPCODE:
@@ -775,14 +750,8 @@ void sign_verify(SV * msg, SV * sig, SV * pk)
 
   PREINIT:
   protmem *msg_pm = NULL;
-  unsigned char *msg_buf;
-  unsigned char *sig_buf;
-  unsigned char *pk_buf;
-  STRLEN msg_len;
-  STRLEN sig_len;
-  STRLEN pk_len;
-  STRLEN sig_req_len;
-  STRLEN pk_req_len;
+  unsigned char *msg_buf, *sig_buf, *pk_buf;
+  STRLEN msg_len, sig_len, pk_len, sig_req_len, pk_req_len;
   int ret;
   int (*func)(const unsigned char *, const unsigned char *,
               unsigned long long, const unsigned char *);
@@ -872,10 +841,8 @@ SV * final_sign(SV * self, SV * sk)
   Crypt::Sodium::XS::sign::ed25519ph_multi::final_sign = 1
 
   PREINIT:
-  protmem *state_pm;
-  protmem *sk_pm = NULL;
-  unsigned char *sk_buf;
-  unsigned char *sig_buf;
+  protmem *state_pm, *sk_pm = NULL;
+  unsigned char *sk_buf, *sig_buf;
   STRLEN sk_len;
 
   CODE:
@@ -964,10 +931,8 @@ void final_verify(SV * self, SV * sig, SV * pk)
 
   PREINIT:
   protmem *state_pm;
-  unsigned char *sig_buf;
-  unsigned char *pk_buf;
-  STRLEN sig_len;
-  STRLEN pk_len;
+  unsigned char *sig_buf, *pk_buf;
+  STRLEN sig_len, pk_len;
   int ret;
 
   PPCODE:
@@ -1015,8 +980,7 @@ void update(SV * self, ...)
   Crypt::Sodium::XS::sign::ed25519ph_multi::update = 1
 
   PREINIT:
-  protmem *state_pm;
-  protmem *msg_pm;
+  protmem *state_pm, *msg_pm;
   unsigned char *msg_buf;
   STRLEN msg_len;
   I32 i;

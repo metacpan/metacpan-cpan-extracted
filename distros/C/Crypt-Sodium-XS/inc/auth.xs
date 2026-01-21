@@ -57,15 +57,9 @@ SV * auth(SV * msg, SV * key)
   auth_hmacsha512256 = 3
 
   PREINIT:
-  protmem *msg_pm = NULL;
-  protmem *key_pm = NULL;
-  unsigned char *msg_buf;
-  unsigned char *key_buf;
-  unsigned char *mac_buf;
-  STRLEN msg_len;
-  STRLEN key_len;
-  STRLEN key_req_len;
-  STRLEN mac_len;
+  protmem *msg_pm = NULL, *key_pm = NULL;
+  unsigned char *msg_buf, *key_buf, *mac_buf;
+  STRLEN msg_len, key_len, key_req_len, mac_len;
   int (*func)(unsigned char *, const unsigned char *,
                 unsigned long long, const unsigned char *);
 
@@ -150,14 +144,9 @@ SV * auth(SV * msg, SV * key)
 void auth_verify(SV * mac, SV * msg, SV * key)
 
   PREINIT:
-  protmem *msg_pm = NULL;
-  protmem *key_pm = NULL;
-  unsigned char *msg_buf;
-  unsigned char *key_buf;
-  unsigned char *mac_buf;
-  STRLEN msg_len;
-  STRLEN key_len;
-  STRLEN mac_len;
+  protmem *msg_pm = NULL, *key_pm = NULL;
+  unsigned char *msg_buf, *key_buf, *mac_buf;
+  STRLEN msg_len, key_len, mac_len;
   int ret;
 
   CODE:
@@ -229,16 +218,9 @@ void auth_hmacsha256_verify(SV * mac, SV * msg, SV * key = &PL_sv_undef)
   auth_hmacsha512256_verify = 2
 
   PREINIT:
-  protmem *msg_pm = NULL;
-  protmem *key_pm = NULL;
-  unsigned char *msg_buf;
-  unsigned char *key_buf = NULL;
-  unsigned char *mac_buf;
-  STRLEN msg_len;
-  STRLEN key_len = 0;
-  STRLEN key_req_len;
-  STRLEN mac_len;
-  STRLEN mac_req_len;
+  protmem *msg_pm = NULL, *key_pm = NULL;
+  unsigned char *msg_buf, *key_buf = NULL, *mac_buf;
+  STRLEN msg_len, key_len = 0, key_req_len, mac_len, mac_req_len;
   int ret;
   int (*func)(const unsigned char *, const unsigned char *,
               unsigned long long, const unsigned char *);
@@ -366,8 +348,7 @@ SV * auth_init(SV * key = &PL_sv_undef, SV * flags = &PL_sv_undef)
   auth_hmacsha512256_init = 3
 
   PREINIT:
-  protmem *state_pm;
-  protmem *key_pm = NULL;
+  protmem *state_pm, *key_pm = NULL;
   unsigned char *key_buf = NULL;
   STRLEN key_len = 0;
   unsigned int state_flags = g_protmem_default_flags_key;
@@ -560,8 +541,7 @@ void update(SV * self, ...)
   Crypt::Sodium::XS::auth::hmacsha512256_multi::update = 2
 
   PREINIT:
-  protmem *state_pm;
-  protmem *msg_mv = NULL;
+  protmem *state_pm, *msg_mv = NULL;
   unsigned char *msg_buf;
   STRLEN msg_len;
   I32 i;

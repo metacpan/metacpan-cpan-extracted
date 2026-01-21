@@ -261,7 +261,6 @@ t/conf/edit.perl
 t/conf/flow.perl
 t/conf/from.perl
 t/conf/func.perl
-t/conf/help.perl
 t/conf/psql.perl
 t/conf/read.env
 t/conf/read.json
@@ -270,10 +269,8 @@ t/conf/read.yaml
 t/conf/when.perl
 t/conf/with.perl
 t/conf/write.env
-t/conf/write.func.perl
 t/conf/write.json
 t/conf/write.perl
-t/conf/write.with.perl
 t/conf/write.yaml
 t/data/moon
 t/data/planets/ceres

@@ -1,12 +1,12 @@
 package WWW::FetchStory::Fetcher::TwistingHellmouth;
-$WWW::FetchStory::Fetcher::TwistingHellmouth::VERSION = '0.2501';
+$WWW::FetchStory::Fetcher::TwistingHellmouth::VERSION = '0.2602';
 =head1 NAME
 
 WWW::FetchStory::Fetcher::TwistingHellmouth - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.2501
+version 0.2602
 
 =head1 DESCRIPTION
 

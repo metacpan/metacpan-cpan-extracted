@@ -7,36 +7,76 @@ use Exporter 'import';
 
 _define_constants();
 
-my @constant_bases = qw(
-  ABYTES
-  HEADERBYTES
-  KEYBYTES
-  MESSAGEBYTES_MAX
-  TAG_MESSAGE
-  TAG_PUSH
-  TAG_REKEY
-  TAG_FINAL
+{
+  my @constant_bases = qw(
+    ABYTES
+    HEADERBYTES
+    KEYBYTES
+    MESSAGEBYTES_MAX
+    TAG_MESSAGE
+    TAG_PUSH
+    TAG_REKEY
+    TAG_FINAL
+  );
+
+  my @bases = qw(
+    init_decrypt
+    init_encrypt
+    keygen
+  );
+
+  # NB: no generic functions for secretstream
+
+  my $xchacha20poly1305 = [
+    (map { "secretstream_xchacha20poly1305_$_" } @bases),
+    (map { "secretstream_xchacha20poly1305_$_" } @constant_bases),
+  ];
+
+  our %EXPORT_TAGS = (
+    all => [ @$xchacha20poly1305 ],
+    xchacha20poly1305 => $xchacha20poly1305,
+  );
+
+  our @EXPORT_OK = @{$EXPORT_TAGS{all}};
+}
+
+package Crypt::Sodium::XS::OO::secretstream;
+use parent 'Crypt::Sodium::XS::OO::Base';
+
+my %methods = (
+  xchacha20poly1305 => {
+    ABYTES => \&Crypt::Sodium::XS::secretstream::secretstream_xchacha20poly1305_ABYTES,
+    HEADERBYTES => \&Crypt::Sodium::XS::secretstream::secretstream_xchacha20poly1305_HEADERBYTES,
+    KEYBYTES => \&Crypt::Sodium::XS::secretstream::secretstream_xchacha20poly1305_KEYBYTES,
+    MESSAGEBYTES_MAX => \&Crypt::Sodium::XS::secretstream::secretstream_xchacha20poly1305_MESSAGEBYTES_MAX,
+    PRIMITIVE => sub { 'xchacha20poly1305' },
+    TAG_MESSAGE => \&Crypt::Sodium::XS::secretstream::secretstream_xchacha20poly1305_TAG_MESSAGE,
+    TAG_PUSH => \&Crypt::Sodium::XS::secretstream::secretstream_xchacha20poly1305_TAG_PUSH,
+    TAG_REKEY => \&Crypt::Sodium::XS::secretstream::secretstream_xchacha20poly1305_TAG_REKEY,
+    TAG_FINAL => \&Crypt::Sodium::XS::secretstream::secretstream_xchacha20poly1305_TAG_FINAL,
+    init_decrypt => \&Crypt::Sodium::XS::secretstream::secretstream_xchacha20poly1305_init_decrypt,
+    init_encrypt => \&Crypt::Sodium::XS::secretstream::secretstream_xchacha20poly1305_init_encrypt,
+    keygen => \&Crypt::Sodium::XS::secretstream::secretstream_xchacha20poly1305_keygen,
+  },
 );
 
-my @bases = qw(
-  init_decrypt
-  init_encrypt
-  keygen
-);
+sub Crypt::Sodium::XS::secretstream::primitives { keys %methods }
+*primitives = \&Crypt::Sodium::XS::secretstream::primitives;
 
-# NB: no generic functions for secretstream
-
-my $xchacha20poly1305 = [
-  (map { "secretstream_xchacha20poly1305_$_" } @bases),
-  (map { "secretstream_xchacha20poly1305_$_" } @constant_bases),
-];
-
-our %EXPORT_TAGS = (
-  all => [ @$xchacha20poly1305 ],
-  xchacha20poly1305 => $xchacha20poly1305,
-);
-
-our @EXPORT_OK = @{$EXPORT_TAGS{all}};
+sub ABYTES { my $self = shift; goto $methods{$self->{primitive}}->{ABYTES}; }
+sub HEADERBYTES { my $self = shift; goto $methods{$self->{primitive}}->{HEADERBYTES}; }
+sub KEYBYTES { my $self = shift; goto $methods{$self->{primitive}}->{KEYBYTES}; }
+sub MESSAGEBYTES_MAX { my $self = shift; goto $methods{$self->{primitive}}->{MESSAGEBYTES_MAX}; }
+sub PRIMITIVE { my $self = shift; goto $methods{$self->{primitive}}->{PRIMITIVE}; }
+sub TAG_MESSAGE { my $self = shift; goto $methods{$self->{primitive}}->{TAG_MESSAGE}; }
+sub TAG_PUSH { my $self = shift; goto $methods{$self->{primitive}}->{TAG_PUSH}; }
+sub TAG_REKEY { my $self = shift; goto $methods{$self->{primitive}}->{TAG_REKEY}; }
+sub TAG_FINAL { my $self = shift; goto $methods{$self->{primitive}}->{TAG_FINAL}; }
+sub init_decrypt { my $self = shift; goto $methods{$self->{primitive}}->{init_decrypt}; }
+sub init_pull { my $self = shift; goto $methods{$self->{primitive}}->{init_decrypt}; }
+sub init_encrypt { my $self = shift; goto $methods{$self->{primitive}}->{init_encrypt}; }
+sub init_push { my $self = shift; goto $methods{$self->{primitive}}->{init_encrypt}; }
+sub keygen { my $self = shift; goto $methods{$self->{primitive}}->{keygen}; }
 
 1;
 
@@ -51,43 +91,40 @@ multiple in-order messages
 
 =head1 SYNOPSIS
 
-  use Crypt::Sodium::XS::secretstream ":default";
+  use Crypt::Sodium::XS;
+  my $sstream
+    = Crypt::Sodium::XS->secretstream(primitive => 'xchacha20poly1305');
 
-  my $key = secretstream_xchacha20poly1305_keygen();
+  # typically, key exchange would be used for a shared secret key.
+  my $key = $sstream->keygen;
 
   # encryption
-  my ($header, $stream_enc) = secretstream_xchacha20poly1305_init_encrypt($key);
-  my $ciphertext = $stream_enc->encrypt("hello,");
+  my ($header, $sstream_enc) = $sstream->init_encrypt($key);
+  my $ciphertext = $sstream_enc->encrypt("hello,");
 
   my $adata = "foo bar";
-  my $ct2 = $stream_enc->encrypt(
-    " world!",
-    secretstream_xchacha20poly1305_TAG_PUSH,
-    $adata
-  );
+  my $ct2 = $sstream_enc->encrypt(" world!", $sstream->TAG_PUSH, $adata);
 
   # decryption
   # note that $header (created above) is required to begin decryption.
-  my $stream_dec = secretstream_xchacha20poly1305_init_decrypt($header, $key);
-  my $plaintext = $stream_dec->decrypt($ciphertext);
+  my $sstream_dec = $sstream->init_decrypt($header, $key);
+  my $plaintext = $sstream_dec->decrypt($ciphertext);
 
-  # note that $adata (created above) is required to decrypt successfully.
-  my ($pt2, $tag) = $stream_dec->decrypt($ct2, $adata);
-  if ($tag == secretstream_xchacha20poly1305_TAG_MESSAGE()) {
+  # note that $adata (created above) is required to decrypt this message.
+  my ($pt2, $tag) = $sstream_dec->decrypt($ct2, $adata);
+
+  # using tags
+  if ($tag == $sstream->TAG_MESSAGE) {
     # default, most common tag
-    ...
   }
-  elsif ($tag == secretstream_xchacha20poly1305_TAG_PUSH()) {
+  elsif ($tag == $sstream->TAG_PUSH) {
     # in-band mark for application to delimit related messages
-    ...
   }
-  elsif ($tag == secretstream_xchacha20poly1305_TAG_REKEY()) {
-    # re-keying after this message triggered by sender
-    ...
+  elsif ($tag == $sstream->TAG_REKEY) {
+    # re-keying after this message was triggered by sender
   }
-  elsif ($tag == secretstream_xchacha20poly1305_TAG_FINAL()) {
+  elsif ($tag == $sstream->TAG_FINAL) {
     # last message
-    ...
   }
 
 =head1 DESCRIPTION
@@ -139,24 +176,57 @@ it can also be used to encrypt files regardless of their size.
 
 It transparently generates nonces and automatically handles key rotation.
 
-=head1 FUNCTIONS
+=head1 CONSTRUCTOR
 
-Nothing is exported by default. L<Crypt::Sodium::XS::secretstream>, like
-libsodium, supports only the primitive-specific functions for one primitive.
-There is a single C<:xchacha20poly1305> import tag for the functions and
-constants listed below.
+The constructor is called with the C<Crypt::Sodium::XS-E<gt>secretstream>
+method.
 
-=head2 secretstream_xchacha20poly1305_init_decrypt
+  my $sstream = Crypt::Sodium::XS->secretstream;
+  my $sstream
+    = Crypt::Sodium::XS->secretstream(primitive => 'xchacha20poly1305');
 
-  my $stream_dec
-    = secretstream_xchacha20poly1305_init_decrypt($header, $key, $flags);
+Returns a new secretstream object. The primitive attribute is required.
 
-C<$header> is an opaque header of
-L</secretstream_xchacha20poly1305_HEADERBYTES> bytes generated by a previous
-call to L</secretstream_xchacha20poly1305_init_encrypt>.
+Implementation detail: the returned object is blessed into
+C<Crypt::Sodium::XS::OO::secretstream>.
 
-C<$key> is a shared secret key. It must be
-L</secretstream_xchacha20poly1305_KEYBYTES> bytes. It may be a
+=head1 ATTRIBUTES
+
+=head2 primitive
+
+  my $primitive = $sstream->primitive;
+  $sstream->primitive('xchacha20poly1305');
+
+Gets or sets the primitive used for all operations by this object. Must be one
+of the primitives listed in L</PRIMITIVES>. For this module there is no
+C<default> primitive, and this attribute is always identical to L</PRIMITIVE>.
+
+=head1 METHODS
+
+=head2 primitives
+
+  my @primitives = $sstream->primitives;
+  my @primitives = Crypt::Sodium::XS::secretstream->primitives;
+
+Returns a list of all supported primitive names.
+
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $primitive = $sstream->PRIMITIVE;
+
+Returns the primitive used for all operations by this object. For this module,
+always identical to the L</primitive> attribute.
+
+=head2 init_decrypt
+
+  my $sstream_dec = $sstream->init_decrypt($header, $key, $flags);
+
+C<$header> is an opaque header of L</HEADERBYTES> bytes generated by a previous
+call to L</init_encrypt>.
+
+C<$key> is a shared secret key. It must be L</KEYBYTES> bytes. It may be a
 L</Crypt::Sodium::XS::MemVault>.
 
 C<$flags> is optional. It is the flags used for the secretstream decryption
@@ -166,73 +236,113 @@ Returns an opaque protected memory object: a secretstream decryption object.
 
 See L</STREAM INTERFACE>.
 
-B<Note>: this is the libsodium function
-C<crypto_secretstream_xchacha20poly1305_init_pull>. Its name is slightly
-different for consistency of this API.
+=head2 init_encrypt
 
-=head2 secretstream_xchacha20poly1305_init_encrypt
+  my ($header, $sstream_enc) = $sstream->init_encrypt($key, $flags);
 
-  my ($header, $stream_enc)
-    = secretstream_xchacha20poly1305_init_encrypt($key, $flags);
-
-C<$key> is a shared secret key. It must be
-L</secretstream_xchacha20poly1305_KEYBYTES> bytes. It may be a
+C<$key> is a shared secret key. It must be L</KEYBYTES> bytes. It may be a
 L</Crypt::Sodium::XS::MemVault>.
 
 C<$flags> is optional. It is the flags used for the secretstream encryption
 protected memory object. See L<Crypt::Sodium::XS::ProtMem>.
 
-Returns an opaque header of L</secretstream_xchacha20poly1305_HEADERBYTES>
-bytes and an opaque protected memory object: a secretstream encryption object.
+Returns an opaque header of L</HEADERBYTES> bytes and an opaque protected
+memory object: a secretstream encryption object.
 
 See L</STREAM INTERFACE>.
 
-B<Note>: this is the libsodium function
-C<crypto_secretstream_xchacha20poly1305_init_push>. Its name is slightly
-different for consistency of this API.
+=head2 keygen
 
-=head2 secretstream_xchacha20poly1305_keygen
-
-  my $key = secretstream_xchacha20poly1305_keygen($flags);
+  my $key = $sstream->keygen($flags);
 
 C<$flags> is optional. It is the flags used for the C<$key>
 L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
 
-Returns a L<Crypt::Sodium::XS::MemVault>: a new secret key of
-L</secretstream_xchacha20poly1305_KEYBYTES> bytes.
+Returns a L<Crypt::Sodium::XS::MemVault>: a new secret key of L</KEYBYTES>
+bytes.
+
+=head2 ABYTES
+
+  my $tag_size = $sstream->ABYTES;
+
+Returns the size, in bytes, of an authentication tag. Note that this is not a
+restriction on the amount of additional data (adata).
+
+The size of any ciphertext is message size + L</ABYTES>.
+
+=head2 HEADERBYTES
+
+  my $header_size = $sstream->HEADERBYTES;
+
+Returns the size, in bytes, of a header generated by L</init_encrypt>.
+
+=head2 KEYBYTES
+
+  my $key_size = $sstream->KEYBYTES;
+
+Returns the size, in bytes, of a secret key.
+
+=head2 MESSAGEBYTES_MAX
+
+  my $message_max_size = $sstream->MESSAGEBYTES_MAX;
+
+Returns the size, in bytes, of the maximum size of any message to be encrypted.
+
+=head2 TAG_MESSAGE
+
+  my $message_tag = $sstream->TAG_MESSAGE;
+
+Returns the tag value for a TAG_MESSAGE secretstream tag.
+
+=head2 TAG_PUSH
+
+  my $push_tag = $sstream->TAG_PUSH;
+
+Returns the tag value for a TAG_PUSH secretstream tag.
+
+=head2 TAG_REKEY
+
+  my $rekey_tag = $sstream->TAG_REKEY;
+
+Returns the tag value for a TAG_REKEY secretstream tag.
+
+=head2 TAG_FINAL
+
+  my $final_tag = $sstream->TAG_FINAL;
+
+Returns the tag value for a TAG_FINAL secretstream tag.
 
 =head1 STREAM INTERFACE
 
 =head2 OVERVIEW
 
-An encrypted stream starts with a short header, whose size is
-L</secretstream_xchacha20poly1305_HEADERBYTES> bytes. That header must be
-sent/stored before the sequence of encrypted messages, as it is required to
-decrypt the stream. The header content doesn’t have to be secret and decryption
-with a different header would fail.
+An encrypted stream starts with a short header, whose size is L</HEADERBYTES>
+bytes. That header must be sent/stored before the sequence of encrypted
+messages, as it is required to decrypt the stream. The header content doesn’t
+have to be secret and decryption with a different header would fail.
 
 A tag is attached to each message. That tag can be any of:
 
 =over 4
 
-=item 0, or L</secretstream_xchacha20poly1305_TAG_MESSAGE>
+=item 0, or L</TAG_MESSAGE>
 
 The most common tag, that doesn’t add any information about the nature of the
 message.
 
-=item L</secretstream_xchacha20poly1305_TAG_FINAL>
+=item L</TAG_FINAL>
 
 Indicates that the message marks the end of the stream, and erases the secret
 key used to encrypt the previous sequence.
 
-=item L</secretstream_xchacha20poly1305_TAG_PUSH>
+=item L</TAG_PUSH>
 
 Indicates that the message marks the end of a set of messages, but not the end
 of the stream. For example, a huge JSON string sent as multiple chunks can use
 this tag to indicate to the application that the string is complete and that it
 can be decoded. But the stream itself is not closed, and more data may follow.
 
-=item L</secretstream_xchacha20poly1305_TAG_REKEY>
+=item L</TAG_REKEY>
 
 “Forget” the key used to encrypt this message and the previous ones, and derive
 a new secret key.
@@ -251,24 +361,28 @@ applications can just omit it.
 
 =head2 ENCRYPTION
 
-The L</secretstream_xchacha20poly1305_init_encrypt> method returns a header and
-a secretstream encryption object. This is an opaque object with the following
+The L</init_encrypt> method takes a shared secret key returns a header and a
+secretstream encryption object. This is an opaque object with the following
 methods:
 
 =over 4
 
 =item encrypt
 
-  my $ciphertext = $stream_enc->encrypt($plaintext, $tag, $adata);
+  my $ciphertext = $sstream_enc->encrypt($plaintext, $tag, $adata);
 
-C<$tag> is optional, and defaults to
-L</secrestream_xchacha20poly1305_TAG_MESSAGE>. The most common use is a tag of
-L</secretstream_xchacha20poly1305_TAG_FINAL> to indicate the last message in a
-stream.
+C<$plaintext> is the plaintext to encrypt. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$tag> is optional. It is the tag value attached to the message. If not
+provided, it defaults to L</TAG_MESSAGE>. The most common use is a tag of
+L</TAG_FINAL> to indicate the last message in a stream. See L</OVERVIEW>.
 
 C<$adata> is optional. If provided, it must match the additional data that was
 used when encrypting this message. It is rarely needed with the secretstream
 interface.
+
+Returns the encrypted ciphertext.
 
 =back
 
@@ -284,19 +398,57 @@ This is an opaque object with the following methods:
 
 =item decrypt
 
-  my $plaintext = $stream_dec->decrypt($ciphertext, $adata);
-  my ($plaintext, $tag) = $stream_dec->decrypt($ciphertext, $adata);
+  my $plaintext = $sstream_dec->decrypt($ciphertext, $adata);
+  my ($plaintext, $tag) = $sstream_dec->decrypt($ciphertext, $adata);
 
 Croaks on decryption failure.
 
-C<$tag> will be one of the tags listed in L</CONSTANTS>; the tag used when
-encrypting this message. The most common use is a tag of
-L</secretstream_xchacha20poly1305_TAG_FINAL> indicating the last message of a
-stream.
+C<$ciphertext> is the ciphertext to decrypt.
 
 C<$adata> is optional. It is rarely needed with the secretstream interface.
 
+Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext and the
+message tag. See L</OVERVIEW>.
+
 =back
+
+=head1 PRIMITIVES
+
+=over 4
+
+=item * xchacha20poly1305
+
+=back
+
+=head1 FUNCTIONS
+
+The object API above is the recommended way to use this module. The functions
+and constants documented below can be imported instead or in addition.
+
+Nothing is exported by default. L<Crypt::Sodium::XS::secretstream>, like
+libsodium, supports only the primitive-specific functions for one primitive.
+There is a single C<:xchacha20poly1305> import tag for the functions and
+constants listed below.
+
+=head2 secretstream_xchacha20poly1305_init_decrypt
+
+  my $stream_dec
+    = secretstream_xchacha20poly1305_init_decrypt($header, $key, $flags);
+
+Same as L</init_decrypt>.
+
+=head2 secretstream_xchacha20poly1305_init_encrypt
+
+  my ($header, $stream_enc)
+    = secretstream_xchacha20poly1305_init_encrypt($key, $flags);
+
+Same as L</init_encrypt>.
+
+=head2 secretstream_xchacha20poly1305_keygen
+
+  my $key = secretstream_xchacha20poly1305_keygen($flags);
+
+Same as L</keygen>.
 
 =head1 CONSTANTS
 
@@ -304,64 +456,49 @@ C<$adata> is optional. It is rarely needed with the secretstream interface.
 
   my $tag_size = secretstream_ABYTES();
 
-Returns the size, in bytes, of an authentication tag. Note that this is not a
-restriction on the amount of additional data (adata).
-
-The size of any ciphertext is message size +
-L</secretstream_xchacha20poly1305_ABYTES>.
+Same as L</ABYTES>.
 
 =head2 secretstream_xchacha20poly1305_HEADERBYTES
 
   my $header_size = secretstream_xchacha20poly1305_HEADERBYTES();
 
-Returns the size, in bytes, of a header generated by
-L</secretstream_xchacha20poly1305_init_encrypt>.
+Same as L</HEADERBYTES>.
 
 =head2 secretstream_xchacha20poly1305_KEYBYTES
 
   my $key_size = secretstream_xchacha20poly1305_KEYBYTES();
 
-Returns the size, in bytes, of a secret key.
+Same as L</KEYBYTES>.
 
 =head2 secretstream_xchacha20poly1305_MESSAGEBYTES_MAX
 
   my $message_max_size = secretstream_xchacha20poly1305_MESSAGEBYTES_MAX();
 
-Returns the size, in bytes, of the maximum size of any message to be encrypted.
+Same as L</MESSAGEBYTES_MAX>.
 
 =head2 secretstream_xchacha20poly1305_TAG_MESSAGE
 
   my $message_tag = secretstream_xchacha20poly1305_TAG_MESSAGE();
 
-Returns the tag value for a TAG_MESSAGE secretstream tag.
+Same as L</TAG_MESSAGE>.
 
 =head2 secretstream_xchacha20poly1305_TAG_PUSH
 
   my $push_tag = secretstream_xchacha20poly1305_TAG_PUSH();
 
-Returns the tag value for a TAG_PUSH secretstream tag.
+Same as L</TAG_PUSH>.
 
 =head2 secretstream_xchacha20poly1305_TAG_REKEY
 
   my $rekey_tag = secretstream_xchacha20poly1305_TAG_REKEY();
 
-Returns the tag value for a TAG_REKEY secretstream tag.
+Same as L</TAG_REKEY>.
 
 =head2 secretstream_xchacha20poly1305_TAG_FINAL
 
   my $final_tag = secretstream_xchacha20poly1305_TAG_FINAL();
 
-Returns the tag value for a TAG_FINAL secretstream tag.
-
-=head1 PRIMITIVES
-
-libsodium only supports one primitive for secretstream.
-
-=over 4
-
-=item * xchacha20poly1305
-
-=back
+Same as L</TAG_FINAL>.
 
 =head1 SEE ALSO
 

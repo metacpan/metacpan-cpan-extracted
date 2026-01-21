@@ -4,13 +4,16 @@ Date::Parse::Modern - Provide string to unixtime conversions
 
 # DESCRIPTION
 
-`Date::Parse::Modern` provides a single function `strtotime()` which takes a datetime string
-and returns a unixtime.  Care was given to support the most modern style strings that you would
-commonly find in log files or on the internet.
+`Date::Parse::Modern` provides a single function `strtotime()` which takes a
+datetime string and returns an integer unixtime.  Care was given to support
+modern datetime strings that one would commonly find in log files or on the
+internet.
 
 # USAGE
 
-    use Date::Parse::Modern;
+```perl
+use Date::Parse::Modern;
+```
 
 `Date::Parse::Modern` exports the `strtotime()` function automatically.
 
@@ -18,32 +21,43 @@ commonly find in log files or on the internet.
 
 ## strtotime($string)
 
-    my $unixtime = strtotime('1979-02-24'); # 288691200
+```perl
+my $unixtime = strtotime('1979-02-24'); # 288691200
+```
 
-Simply feed `strtotime()` a string with some type of date or time in it, and it will return an
-integer unixtime. If the string is unparseable, or a weird error occurs, it will return `undef`.
+Simply feed `strtotime()` a string with some type of date or time in it,
+and it will return an integer unixtime. If the string is unparseable, or a
+weird error occurs, it will return `undef`.
 
-All the "magic" in `strtotime()` is done using regular expressions that look for common datetime
-formats. Common formats like YYYY-MM-DD and HH:II:SS are easily detected and converted to the
-appropriate formats. This allows the date or time to be found anywhere in the string, in (almost) any
-order. If you limit your string to only the date/time portion the parsing will
-be much quicker. Shorter input equals faster parsing.
+All the "magic" in `strtotime()` is done using regular expressions that look
+for common datetime formats. Common formats like `YYYY-MM-DD` and `HH:II:SS`
+are easily detected and converted to the appropriate formats. This allows the
+date or time to be found anywhere in the string, in (almost) any order. If you
+limit your string to only the date/time portion the parsing will be much
+quicker. Shorter input equals faster parsing.
 
-**Note:** Strings without a year are assumed to be in the current year. Example: `May 15th, 10:15am`
+**Note:** Strings without a year are assumed to be in the current year.
+Example: `May 15th, 10:15am`
 
-**Note:** Strings with only a date are assumed to occur at midnight. Example: `2023-01-15`
+**Note:** Strings with only a date are assumed to occur at midnight.
+Example: `2023-01-15`
 
-**Note:** Strings with only time are assumed to be the current day. Example: `10:15am`
+**Note:** Strings with only time are assumed to be the current day.
+Example: `10:15am`
 
-**Note:** In strings with numeric **and** textual time zone offsets, the numeric is used. Example:
-`14 Nov 1994 11:34:32 -0500 (EST)`
+**Note:** In strings with numeric **and** textual time zone offsets, the numeric
+is used. Example: `14 Nov 1994 11:34:32 -0500 (EST)`
 
-**Note:** In all cases, the day of the week is ignored in the input string. Example: `Mon Mar 25 2024`
+**Note:** If a string contains neither a textual nor numeric timezone, the local
+timezone is assumed. Example: `11/23/2025 08:00 PM`
+
+**Note:** In all cases, the day of the week is ignored in the input string.
+Example: `Mon Mar 25 2024`
 
 # Will you support XYZ format?
 
-Everyone has their **favorite** date/time format, and we'd like to support as many
-as possible. We have tried to support as much of
+Everyone has their **favorite** date/time format, and we'd like to support as
+many as possible. We have tried to support as much of
 [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) as possible, but we
 cannot support everything. Every new format we support runs the risk of slowing
 down things for existing formats. You can submit a feature request on Github

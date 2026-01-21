@@ -50,6 +50,6 @@
          "web" : "https://github.com/scottchiefbaker/perl-Date-Parse-Modern"
       }
    },
-   "version" : "0.8",
+   "version" : "1.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

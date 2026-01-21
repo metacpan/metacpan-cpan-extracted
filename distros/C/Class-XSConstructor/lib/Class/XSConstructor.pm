@@ -9,7 +9,7 @@ use List::Util 1.45 qw( uniq );
 
 BEGIN {
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.022001';
+	our $VERSION   = '0.022002';
 	
 	if ( eval { require Types::Standard; 1 } ) {
 		Types::Standard->import(
@@ -456,9 +456,13 @@ sub populate_build {
 sub get_metadata {
 	my $klass = ref($_[0]) || $_[0];
 	my $meta  = $META{$klass} or return;
-	$meta->{buildargs}        ||= $klass->can('BUILDARGS');
+	
+	$meta->{buildargs} ||= $klass->can('BUILDARGS')
+		unless $meta->{has_standard_buildargs};
+	
 	$meta->{foreignbuildargs} ||= $klass->can('FOREIGNBUILDARGS')
 		if $meta->{foreignconstructor} && !$meta->{foreignbuildall};
+	
 	return $meta;
 }
 

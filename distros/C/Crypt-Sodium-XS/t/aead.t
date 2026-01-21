@@ -2,8 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 
+use Crypt::Sodium::XS;
 use Crypt::Sodium::XS::Util "sodium_increment";
-use Crypt::Sodium::XS::OO::aead;
+use Crypt::Sodium::XS::aead;
 use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
@@ -14,8 +15,8 @@ my @adatas = (
     "",
 );
 
-for my $alg (Crypt::Sodium::XS::OO::aead->primitives) {
-  my $m = Crypt::Sodium::XS::OO::aead->new(primitive => $alg);
+for my $alg (Crypt::Sodium::XS::aead->primitives) {
+  my $m = Crypt::Sodium::XS->aead(primitive => $alg);
 
   ok($m->$_ > 0, "$_ > 0 ($alg)") for qw(ABYTES KEYBYTES MESSAGEBYTES_MAX NPUBBYTES);
 

@@ -32,6 +32,7 @@ WriteMakefile(
         'URI'             => 1.59,
         'URI::QueryParam' => 0,
         'Date::Parse'     => 0,
+        'Log::Any'        => '1.718',
       },
     BUILD_REQUIRES => {
         'Test::More'       => 0.31,

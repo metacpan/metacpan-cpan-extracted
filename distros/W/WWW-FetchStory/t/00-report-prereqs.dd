@@ -35,6 +35,7 @@ do { my $x = {
                                       'HTTP::Cookies' => '0',
                                       'HTTP::Cookies::Mozilla' => '0',
                                       'Module::Pluggable' => '0',
+                                      'Path::Tiny' => '0',
                                       'Pod::Usage' => '0',
                                       'WWW::Mechanize::Sleepy' => '0',
                                       'XML::LibXML' => '0',

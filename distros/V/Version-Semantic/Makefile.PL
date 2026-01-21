@@ -1,17 +1,18 @@
 use strict;
 use warnings;
 
-use ExtUtils::MakeMaker::CPANfile;    # do not supply an empty list because import() has to be called
+use ExtUtils::MM          ();
 use File::Spec::Functions qw( catfile );
 
 my @main_module_namespace = qw( Version Semantic );
-my $release_status        = 'stable';                 # transition: unstable => testing => stable
+my $release_status        = 'stable';                 # Transitions: unstable => testing => stable
+my $pre_release_number    = 1;
 
 my $distname            = join '-',  @main_module_namespace;
 my $main_module         = join '::', @main_module_namespace;
 my $main_module_file    = catfile( @main_module_namespace ) . '.pm';
 my $main_module_podfile = catfile( @main_module_namespace ) . '.pod';
-# we are not using
+# We are not using
 # VERSION_FROM  => catfile( 'lib', $main_module_file )
 # because we have to set the main module version in META_MERGE/provides too
 my $main_module_version = MM->parse_version( catfile( 'lib', $main_module_file ) );
@@ -21,14 +22,14 @@ my %att = (
   AUTHOR        => 'Sven Willenbuecher <sven.willenbuecher@gmx.de>',
   VERSION       => $main_module_version,
   ABSTRACT_FROM => catfile( 'lib', $main_module_podfile ),
-  # another valid license string is "restricted"
+  # Another valid license string is "restricted"
   # https://metacpan.org/pod/CPAN::Meta::Spec#license
   LICENSE          => 'perl_5',
   MIN_PERL_VERSION => '5.010000',
-  # safe naming of custom arguments passed to Makefile.PL
-  # https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/470
-  DISTVNAME => "$distname-$main_module_version"
-    . ( $release_status ne 'stable' ? '-TRIAL1' : '' ),    # related to the below release_status metadata field
+  DISTNAME         => $distname,
+  DISTVNAME        =>
+    join( '-', $distname, $main_module_version, ( $release_status ne 'stable' ? "TRIAL$pre_release_number" : () ) )
+  ,    # Related to the below release_status metadata field
   EXE_FILES  => [ glob( join( ' ', map { catfile( $_, '*' ) } qw( bin script ) ) ) ],
   META_MERGE => {
     'meta-spec'    => { version => 2 },
@@ -62,12 +63,9 @@ my %att = (
 # Makefile.PL as a modulino
 # https://www.masteringperl.org/2015/01/makefile-pl-as-a-modulino/
 if ( caller() ) {
-  no warnings qw( redefine ); ## no critic (ProhibitNoWarnings)
-  # redefine ExtUtils::MakeMaker::WriteMakefile() to echo its atributes
-  *ExtUtils::MakeMaker::WriteMakefile = sub {
-    +{ @_ }    # \%att
-  };
-  # re-trigger the ExtUtils::MakeMaker::WriteMakefile() modification
+  *WriteMakefile = sub { +{ @_ } }    # \%att
+} else {
+  require ExtUtils::MakeMaker::CPANfile;
   ExtUtils::MakeMaker::CPANfile->import
 }
 WriteMakefile( %att )

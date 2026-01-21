@@ -1,5 +1,8 @@
 Revision history for Perl module Cwd-utf8
 
+0.014     2026-01-20
+  * Use File::Temp for temporary directories [gh-2]
+
 0.013     2026-01-18
   * Skipping tests when installing dependencies in AppVeyor build
   * Removed travis-ci

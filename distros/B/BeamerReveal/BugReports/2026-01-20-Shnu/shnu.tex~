@@ -1,0 +1,17 @@
+\documentclass[aspectratio=1610]{beamer}
+
+\usepackage{lipsum}
+\usepackage{beamer-reveal}
+
+\numberwithin{page}{section}
+\renewcommand{\thepage}{\thesection-\arabic{page}}
+
+\begin{document}
+
+\section{Section Title}
+
+\begin{frame}{Title}
+    \lipsum[1]
+\end{frame}
+
+\end{document}

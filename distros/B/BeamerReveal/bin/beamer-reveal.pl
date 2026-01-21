@@ -2,7 +2,7 @@
 # -*- cperl -*-
 # PODNAME: beamer-reveal.pl
 # ABSTRACT: converts the .rvl file and the corresponding pdf file to a full reveal website
-our $VERSION = '20260119.1636'; # VERSION
+our $VERSION = '20260120.1958'; # VERSION
 
 
 use strict;
@@ -158,7 +158,6 @@ my $factory = BeamerReveal->new();
 my $presentation = $factory->createFromChunk( $chunks[0], $chunksLineNrs[0] );
 
 my $slides = [];
-my $slideRawPageCount;
 eval {
   for( my $i = 1; $i < @chunks; ++$i ) {
     my $object = $factory->createFromChunk( $chunks[$i], $chunksLineNrs[$i] );
@@ -270,7 +269,7 @@ beamer-reveal.pl - converts the .rvl file and the corresponding pdf file to a fu
 
 =head1 VERSION
 
-version 20260119.1636
+version 20260120.1958
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::MediaManager;
-our $VERSION = '20260119.1636'; # VERSION
+our $VERSION = '20260120.1958'; # VERSION
 
 use strict;
 use warnings;
@@ -523,7 +523,7 @@ BeamerReveal::MediaManager - MediaManager
 
 =head1 VERSION
 
-version 20260119.1636
+version 20260120.1958
 
 =head1 SYNOPSIS
 

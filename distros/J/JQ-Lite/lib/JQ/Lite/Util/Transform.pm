@@ -19,7 +19,7 @@ sub _apply_tostring {
         return 'null';
     }
 
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         return $value ? 'true' : 'false';
     }
 
@@ -62,7 +62,7 @@ sub _apply_numeric_function {
 
     return undef if !defined $value;
 
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         my $numeric = $value ? 1 : 0;
         return $callback->($numeric);
     }
@@ -83,7 +83,7 @@ sub _apply_clamp {
 
     return undef if !defined $value;
 
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         my $numeric = $value ? 1 : 0;
         return _clamp_scalar($numeric, $min, $max);
     }
@@ -104,7 +104,7 @@ sub _normalize_numeric_bound {
 
     return undef if !defined $value;
 
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         return $value ? 1 : 0;
     }
 
@@ -128,7 +128,7 @@ sub _apply_to_number {
 
     return undef if !defined $value;
 
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         return $value ? 1 : 0;
     }
 
@@ -148,7 +148,7 @@ sub _normalize_percentile {
 
     return undef if !defined $value;
 
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         $value = $value ? 1 : 0;
     }
 
@@ -402,7 +402,7 @@ sub _apply_delpaths {
     my ($self, $value, $filter) = @_;
 
     return $value if !defined $value;
-    return $value if !ref $value || ref($value) eq 'JSON::PP::Boolean';
+    return $value if !ref $value || JSON::PP::is_bool($value);
 
     $filter //= '';
     $filter =~ s/^\s+|\s+$//g;
@@ -487,7 +487,7 @@ sub _path_segment_key {
 
     return 'undef' if !defined $segment;
 
-    if (ref($segment) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($segment)) {
         return $segment ? 'bool:true' : 'bool:false';
     }
 
@@ -507,7 +507,7 @@ sub _compare_path_segments {
 sub _numeric_segment_value {
     my ($segment) = @_;
 
-    if (ref($segment) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($segment)) {
         return $segment ? 1 : 0;
     }
 
@@ -518,7 +518,7 @@ sub _deep_clone {
     my ($value) = @_;
 
     return $value if !defined $value;
-    return $value if !ref $value || ref($value) eq 'JSON::PP::Boolean';
+    return $value if !ref $value || JSON::PP::is_bool($value);
 
     my $json = _encode_json($value);
     return _decode_json($json);
@@ -573,7 +573,7 @@ sub _normalize_array_index {
 
     return if !defined $value;
 
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         $value = $value ? 1 : 0;
     }
 
@@ -951,7 +951,7 @@ sub _value_to_comparable {
 
     return undef unless defined $value;
 
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         return $value ? 1 : 0;
     }
 
@@ -991,7 +991,7 @@ sub _project_numeric_values {
     for my $value (@values) {
         next unless defined $value;
 
-        if (ref($value) eq 'JSON::PP::Boolean') {
+        if (JSON::PP::is_bool($value)) {
             push @numbers, $value ? 1 : 0;
             next;
         }
@@ -1119,6 +1119,8 @@ sub _apply_string_predicate {
         return [ map { _apply_string_predicate($_, $needle, $mode) } @$value ];
     }
 
+    return JSON::PP::false if !_is_string_scalar($needle);
+
     return _string_predicate_result($value, $needle, $mode);
 }
 
@@ -1127,6 +1129,7 @@ sub _string_predicate_result {
 
     return JSON::PP::false if !defined $value;
     return JSON::PP::false if ref $value;
+    return JSON::PP::false if !_is_string_scalar($value);
 
     $needle //= '';
     my $len = length $needle;
@@ -1179,7 +1182,7 @@ sub _test_against_regex {
 
     return JSON::PP::false if !defined $value;
 
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         $value = $value ? 'true' : 'false';
     }
 
@@ -1197,7 +1200,7 @@ sub _match_against_regex {
 
     return undef if !defined $value;
 
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         $value = $value ? 'true' : 'false';
     }
 
@@ -1325,7 +1328,7 @@ sub _apply_base64 {
     if (!defined $value) {
         $text = 'null';
     }
-    elsif (ref($value) eq 'JSON::PP::Boolean') {
+    elsif (JSON::PP::is_bool($value)) {
         $text = $value ? 'true' : 'false';
     }
     elsif (!ref $value) {
@@ -1349,7 +1352,7 @@ sub _apply_base64d {
     if (!defined $value) {
         $text = '';
     }
-    elsif (ref($value) eq 'JSON::PP::Boolean') {
+    elsif (JSON::PP::is_bool($value)) {
         $text = $value ? 'true' : 'false';
     }
     elsif (!ref $value) {
@@ -1390,7 +1393,7 @@ sub _apply_uri {
     if (!defined $value) {
         $text = 'null';
     }
-    elsif (ref($value) eq 'JSON::PP::Boolean') {
+    elsif (JSON::PP::is_bool($value)) {
         $text = $value ? 'true' : 'false';
     }
     elsif (!ref $value) {
@@ -1413,7 +1416,7 @@ sub _format_csv_field {
 
     return '' if !defined $value;
 
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         return $value ? 'true' : 'false';
     }
 
@@ -1440,7 +1443,7 @@ sub _format_tsv_field {
 
     return '' if !defined $value;
 
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         return $value ? 'true' : 'false';
     }
 
@@ -1496,7 +1499,7 @@ sub _apply_split {
         my @parts;
 
         for my $element (@$value) {
-            if (ref($element) eq 'JSON::PP::Boolean') {
+            if (JSON::PP::is_bool($element)) {
                 my $stringified = $element ? 'true' : 'false';
                 my $result = _apply_split($stringified, $separator);
                 push @parts, ref($result) eq 'ARRAY' ? @$result : $result;
@@ -1511,7 +1514,7 @@ sub _apply_split {
     }
 
     return undef if !defined $value;
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         $value = $value ? 'true' : 'false';
     }
     elsif (ref $value) {
@@ -1538,7 +1541,7 @@ sub _apply_explode {
 
     return undef if !defined $value;
 
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         $value = $value ? 'true' : 'false';
     }
 
@@ -1580,7 +1583,7 @@ sub _apply_substr {
     }
 
     return undef if !defined $value;
-    if (ref($value) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($value)) {
         $value = $value ? 'true' : 'false';
     }
     elsif (ref $value) {
@@ -1954,7 +1957,7 @@ sub _apply_indices {
 
     return [] if !defined $value;
 
-    if (!ref $value || ref($value) eq 'JSON::PP::Boolean') {
+    if (!ref $value || JSON::PP::is_bool($value)) {
         return [] unless defined $needle;
 
         my $haystack = "$value";
@@ -2010,7 +2013,7 @@ sub _values_equal {
     return 1 if !defined $left && !defined $right;
     return 0 if !defined $left || !defined $right;
 
-    if (ref($left) eq 'JSON::PP::Boolean' && ref($right) eq 'JSON::PP::Boolean') {
+    if (JSON::PP::is_bool($left) && JSON::PP::is_bool($right)) {
         return (!!$left) == (!!$right);
     }
 
@@ -2110,7 +2113,7 @@ sub _scalar_contains {
     return 0 if !defined $value;
     return 0 if !defined $needle;
 
-    if (!ref $value || ref($value) eq 'JSON::PP::Boolean') {
+    if (!ref $value || JSON::PP::is_bool($value)) {
         my $haystack = "$value";
         my $fragment = "$needle";
         return index($haystack, $fragment) >= 0 ? 1 : 0;

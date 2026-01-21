@@ -1,6 +1,18 @@
 Revision History for WWW-FetchStory
 ===================================
 
+v0.2602 2026-01-21
+------------------
+
+* 2026-01-21 18:32:00 +1100
+  okay, fixing another problem with AO3 urls
+* 2026-01-21 18:09:13 +1100
+  fixing url
+* 2026-01-21 16:49:22 +1100
+  enable AO3 fetcher to derive URL
+* 2025-02-27 13:46:38 +1100
+  fixed bug with AO3 parsing
+
 v0.2501 2025-02-06
 ------------------
 

@@ -1,6 +1,10 @@
 
 Changelog for perl module AWS::S3
 
+2.00 2025-01-21
+  - Fix using AWS::S3 for Linode E3 object store (GH #20, thanks to preaction)
+  - Support using Log::Any for some better debugging (as above)
+
 1.00 2025-02-11
   - Start using v4 signatures (resolves GH #18, GH #17, GH #16, GH #14, GH #13, GH #7)
   - Adds new session_token and region attributes to the constructor (see perldoc)

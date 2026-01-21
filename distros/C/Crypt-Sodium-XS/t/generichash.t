@@ -2,9 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 
-use Crypt::Sodium::XS::MemVault;
+use Crypt::Sodium::XS;
 use Crypt::Sodium::XS::generichash qw(generichash_blake2b_SALTBYTES generichash_blake2b_PERSONALBYTES);
-use Crypt::Sodium::XS::OO::generichash;
 use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
@@ -14,8 +13,8 @@ my $msg = join('', 'a' .. 'z');
 my $salt = 'a' x generichash_blake2b_SALTBYTES;
 my $personal = 'z' x generichash_blake2b_PERSONALBYTES;
 
-for my $alg (Crypt::Sodium::XS::OO::generichash->primitives) {
-  my $m = Crypt::Sodium::XS::OO::generichash->new(primitive => $alg);
+for my $alg (Crypt::Sodium::XS::generichash->primitives) {
+  my $m = Crypt::Sodium::XS->generichash(primitive => $alg);
 
   ok($m->$_ > 0, "$_ > 0 ($alg)")
     for qw(BYTES_MAX BYTES_MIN KEYBYTES_MAX KEYBYTES_MIN);

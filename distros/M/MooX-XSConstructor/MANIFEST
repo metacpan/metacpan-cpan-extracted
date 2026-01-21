@@ -11,7 +11,13 @@ README
 SIGNATURE
 dist.ini
 doap.ttl
+examples/bench.pl
 lib/MooX/XSConstructor.pm
 t/01basic.t
 t/02strict-early.t
 t/02strict.t
+t/03foreigndetection.t
+t/gh-2.t
+t/lib/Container.pm
+t/lib/MyTest.pm
+t/lib/TestBase.pm

@@ -39,12 +39,9 @@ SV * secretstream_xchacha20poly1305_init_decrypt( \
 
   PREINIT:
   PERL_UNUSED_VAR(ix);
-  protmem *state_pm;
-  protmem *key_pm = NULL;
-  unsigned char *header_buf;
-  unsigned char *key_buf;
-  STRLEN header_len;
-  STRLEN key_len;
+  protmem *state_pm, *key_pm = NULL;
+  unsigned char *header_buf, *key_buf;
+  STRLEN header_len, key_len;
   unsigned int state_flags = g_protmem_default_flags_key;
 
   CODE:
@@ -100,11 +97,9 @@ void secretstream_xchacha20poly1305_init_encrypt(SV * key, SV * flags = &PL_sv_u
 
   PREINIT:
   PERL_UNUSED_VAR(ix);
-  protmem *state_pm;
-  protmem *key_pm = NULL;
+  protmem *state_pm, *key_pm = NULL;
   SV * header;
-  unsigned char *key_buf;
-  unsigned char *header_buf;
+  unsigned char *key_buf, *header_buf;
   STRLEN key_len;
   unsigned int state_flags = g_protmem_default_flags_key;
 
@@ -204,14 +199,9 @@ void decrypt( \
 
   PREINIT:
   PERL_UNUSED_VAR(ix);
-  protmem *state_pm;
-  protmem *ct_pm = NULL;
-  protmem *msg_pm;
-  unsigned char *ct_buf;
-  unsigned char *adata_buf = NULL;
-  unsigned char tag;
-  STRLEN ct_len;
-  STRLEN adata_len = 0;
+  protmem *state_pm, *ct_pm = NULL, *msg_pm;
+  unsigned char *ct_buf, *adata_buf = NULL, tag;
+  STRLEN ct_len, adata_len = 0;
   unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
 
@@ -298,14 +288,9 @@ SV * encrypt( \
 
   PREINIT:
   PERL_UNUSED_VAR(ix);
-  protmem *state_pm;
-  protmem *msg_pm = NULL;
-  unsigned char *msg_buf;
-  unsigned char *adata_buf = NULL;
-  unsigned char *ct_buf;
-  STRLEN msg_len;
-  STRLEN ct_len;
-  STRLEN adata_len = 0;
+  protmem *state_pm, *msg_pm = NULL;
+  unsigned char *msg_buf, *adata_buf = NULL, *ct_buf;
+  STRLEN msg_len, ct_len, adata_len = 0;
 
   CODE:
   if (sv_derived_from(msg, MEMVAULT_CLASS)) {

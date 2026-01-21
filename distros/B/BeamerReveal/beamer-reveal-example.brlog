@@ -1,13 +1,12 @@
 ----------------------------------------------------------------------------
---  beamer-reveal.pl                                       v20260111.1441 --
+--  beamer-reveal.pl                                       v20260119.1636 --
 --  (C) 2025-2026 Walter PM Daems <wdaems@cpan.org>                 GPLv3 --
 ----------------------------------------------------------------------------
-
 - Using the following directories:
-  aux-files    : '.'
-  pdf-files    : '.'
-  output-files : '.'
-- Reading driver file ./beamer-reveal-example.rvl
+  aux-files    : 'auxx'
+  pdf-files    : 'pdf'
+  output-files : 'abc'
+- Reading driver file auxx/./beamer-reveal-example.rvl
 - Installing quarto/reveal.js boilerplate
 - Processing the presentation
   - making slide 1
@@ -36,7 +35,11 @@
   - making slide 19
     - adding animation
 - Generating the images
+      - Preparing media generation of 187 (alas, no parallellization on MS-Windows)
+        - C:\Users\wdaems\AppData\Local\Programs\MiKTeX\miktex\bin\x64\pdfcrop.EXE run in thread no 0 finished
+        - C:\Users\wdaems\AppData\Local\Programs\MiKTeX\miktex\bin\x64\pdftoppm.EXE run in thread no 0 finished
+        - C:\Users\wdaems\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0.1-full_build\bin\ffmpeg.EXE run in thread no 0 finished
 - Producing presentation
-  - Writing beamer-reveal-example.html
+  - Writing abc/./beamer-reveal-example.html
   - Creating index.html link
 Done

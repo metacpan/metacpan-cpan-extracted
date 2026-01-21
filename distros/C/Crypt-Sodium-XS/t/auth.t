@@ -2,16 +2,17 @@ use strict;
 use warnings;
 use Test::More;
 
+use Crypt::Sodium::XS;
 use Crypt::Sodium::XS::Util "sodium_random_bytes";
-use Crypt::Sodium::XS::OO::auth;
+use Crypt::Sodium::XS::auth;
 use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
 
 my $msg = "How do you do?";
 
-for my $alg (Crypt::Sodium::XS::OO::auth->primitives) {
-  my $m = Crypt::Sodium::XS::OO::auth->new(primitive => $alg);
+for my $alg (Crypt::Sodium::XS::auth->primitives) {
+  my $m = Crypt::Sodium::XS->auth(primitive => $alg);
 
   ok($m->$_ > 0, "$_ > 0 ($alg)") for qw(BYTES KEYBYTES);
 

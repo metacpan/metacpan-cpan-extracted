@@ -12,11 +12,11 @@ Lugh::Tokenizer - BPE Tokenizer for Text Encoding and Decoding
 
 =head1 VERSION
 
-Version 0.08
+Version 0.11
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 

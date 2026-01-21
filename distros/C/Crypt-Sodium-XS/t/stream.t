@@ -3,15 +3,15 @@ use warnings;
 use Test::More;
 
 use Crypt::Sodium::XS::ProtMem ':constants';
-use Crypt::Sodium::XS::OO::stream;
+use Crypt::Sodium::XS::stream;
 use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
 
 my $msg = chr(0x42) x 160;
 
-for my $alg (Crypt::Sodium::XS::OO::stream->primitives) {
-  my $m = Crypt::Sodium::XS::OO::stream->new(primitive => $alg);
+for my $alg (Crypt::Sodium::XS::stream->primitives) {
+  my $m = Crypt::Sodium::XS->stream(primitive => $alg);
 
   ok($m->$_ > 0, "$_ > 0 ($alg)") for qw(KEYBYTES MESSAGEBYTES_MAX NONCEBYTES);
 

@@ -28,16 +28,16 @@ optional_features: {}
 provides:
   Class::XSConstructor:
     file: lib/Class/XSConstructor.pm
-    version: '0.022001'
+    version: '0.022002'
   Class::XSDelegation:
     file: lib/Class/XSDelegation.pm
-    version: '0.022001'
+    version: '0.022002'
   Class::XSDestructor:
     file: lib/Class/XSDestructor.pm
-    version: '0.022001'
+    version: '0.022002'
   Class::XSReader:
     file: lib/Class/XSReader.pm
-    version: '0.022001'
+    version: '0.022002'
 recommends:
   Type::Tiny::XS: '0'
   Types::Standard: '1.000000'
@@ -51,5 +51,5 @@ resources:
   homepage: https://metacpan.org/release/Class-XSConstructor
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-class-xsconstructor.git
-version: '0.022001'
+version: '0.022002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

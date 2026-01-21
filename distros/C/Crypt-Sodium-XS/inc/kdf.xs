@@ -34,16 +34,10 @@ SV * kdf_derive( \
   kdf_blake2b_derive = 1
 
   PREINIT:
-  protmem *key_mv = NULL;
-  protmem *new_key_mv;
+  protmem *key_mv = NULL, *new_key_mv;
   unsigned char *key_buf;
   char *ctx_buf = NULL;
-  STRLEN key_len;
-  STRLEN ctx_len;
-  STRLEN key_req_len;
-  STRLEN ctx_req_len;
-  STRLEN new_key_req_min;
-  STRLEN new_key_req_max;
+  STRLEN key_len, ctx_len, key_req_len, ctx_req_len, new_key_req_min, new_key_req_max;
   unsigned int new_key_flags;
   uint64_t id;
   int (*func)(unsigned char *, size_t, uint64_t,

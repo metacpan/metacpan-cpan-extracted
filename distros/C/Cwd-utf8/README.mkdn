@@ -4,7 +4,7 @@ Cwd::utf8 - Fully UTF-8 aware Cwd
 
 # VERSION
 
-version 0.013
+version 0.014
 
 # SYNOPSIS
 

@@ -5,6 +5,7 @@ use AWS::S3::ResponseParser;
 use MooseX::Types::URI qw(Uri);
 use URI::Escape qw/ uri_escape /;
 use AWS::S3::Signer::V4;
+use Log::Any qw( $LOG );
 
 has 's3' => (
     is       => 'ro',
@@ -97,6 +98,7 @@ has 'signerv4' => (
 
 sub _send_request {
     my ( $s, $method, $uri, $headers, $content ) = @_;
+    $LOG->debug('Making AWS request', {method => $method, uri => "$uri"});
 
     my $req = HTTP::Request->new( $method => $uri );
     $req->content( $content ) if $content;

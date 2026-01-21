@@ -125,15 +125,9 @@ void kx_client_session_keys(SV * cpk, SV * csk, SV * spk, SV * flags = &PL_sv_un
   kx_x25519blake2b_client_session_keys = 1
 
   PREINIT:
-  protmem *rx;
-  protmem *tx;
-  protmem *csk_pm = NULL;
-  unsigned char * cpk_buf;
-  unsigned char * csk_buf;
-  unsigned char * spk_buf;
-  STRLEN cpk_len;
-  STRLEN csk_len;
-  STRLEN spk_len;
+  protmem *rx, *tx, *csk_pm = NULL;
+  unsigned char * cpk_buf, * csk_buf, * spk_buf;
+  STRLEN cpk_len, csk_len, spk_len;
   unsigned int key_flags = g_protmem_default_flags_key;
   int ret;
 
@@ -215,15 +209,9 @@ void kx_server_session_keys(SV * spk, SV * ssk, SV * cpk, SV * flags = &PL_sv_un
   kx_x25519blake2b_server_session_keys = 1
 
   PREINIT:
-  protmem *rx;
-  protmem *tx;
-  protmem *ssk_pm = NULL;
-  unsigned char * spk_buf;
-  unsigned char * ssk_buf;
-  unsigned char * cpk_buf;
-  STRLEN spk_len;
-  STRLEN ssk_len;
-  STRLEN cpk_len;
+  protmem *rx, *tx, *ssk_pm = NULL;
+  unsigned char * spk_buf, * ssk_buf, * cpk_buf;
+  STRLEN spk_len, ssk_len, cpk_len;
   unsigned int key_flags = g_protmem_default_flags_key;
   int ret;
 

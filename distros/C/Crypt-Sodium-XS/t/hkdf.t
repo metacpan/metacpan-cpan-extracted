@@ -3,7 +3,6 @@ use warnings;
 use Test::More;
 
 use Crypt::Sodium::XS::hkdf 'hkdf_available';
-use Crypt::Sodium::XS::OO::hkdf;
 
 plan skip_all => 'no hkdf available' unless hkdf_available;
 
@@ -11,8 +10,8 @@ use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
 
-for my $alg (Crypt::Sodium::XS::OO::hkdf->primitives) {
-  my $m = Crypt::Sodium::XS::OO::hkdf->new(primitive => $alg);
+for my $alg (Crypt::Sodium::XS::hkdf->primitives) {
+  my $m = Crypt::Sodium::XS->hkdf(primitive => $alg);
 
   for my $blen (qw(KEYBYTES BYTES_MAX)) {
     ok($m->$blen > 0, "$blen > 0 ($alg)");
@@ -95,7 +94,6 @@ for my $alg (Crypt::Sodium::XS::OO::hkdf->primitives) {
   $gen->update($m->keygen);
   $prk2 = $gen->final;
   ok(!$prk2->memcmp($prk1), "prk extract/multipart with same salt and different ikm differ ($alg)");
-
 }
 
 done_testing();

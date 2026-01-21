@@ -8,9 +8,12 @@ use Exporter 'import';
 our @EXPORT_OK = (qw(
   sodium_add
   sodium_bin2hex
+  sodium_bin2ip
   sodium_compare
+  sodium_has_ip_codecs
   sodium_hex2bin
   sodium_increment
+  sodium_ip2bin
   sodium_is_zero
   sodium_memcmp
   sodium_memzero
@@ -69,6 +72,20 @@ operand. Addition wraps if C<$sum> would overflow.
 
 No real advantage over C<unpack("H*", $bytes)>.
 
+=head2 sodium_bin2ip
+
+Available only when built with libsodium >= 1.0.21. See
+L</sodium_has_ip_codecs>.
+
+  my $ip_str = sodium_bin2ip($binip);
+
+Unpacks the 16-byte binary address C<$binip> and returns an IPv4 string for
+IPv4-mapped addresses or an IPv6 string otherwise.
+
+Croaks on invalid input (must be 16 bytes).
+
+See L</IP ADDRESS REPRESENTATION>
+
 =head2 sodium_compare
 
   my $lt_eq_or_gt = sodium_compare($bytes, $other_bytes, $size);
@@ -85,6 +102,13 @@ B<Note>: This function is similar to L<memcmp(3)>; that is, it returns -1, 0,
 or 1 for the comparison results. For simple true/false equality comparisons,
 see L</sodium_memcmp>. The naming is chosen here to be consistent with
 libsodium.
+
+=head2 sodium_has_ip_codecs
+
+  my $has_ip_functions = sodium_has_ip_codecs();
+
+Returns true if L</sodium_bin2ip> and L</sodium_ip2bin> are supported, false
+otherwise.
 
 =head2 sodium_hex2bin
 
@@ -103,6 +127,23 @@ Interpret C<$bytes> as an arbitrarily long little-endian unsigned number and
 add one to it. This is intended for the return values of nonce functions. This
 function runs in constant time for a given C<$bytes> size. Incrementing wraps
 if C<$incremented> would overflow.
+
+=head2 sodium_ip2bin
+
+Available only when built with libsodium >= 1.0.21. See
+L</sodium_has_ip_codecs>.
+
+  my $binip = sodium_ip2bin($ip_str);
+
+Returns a 16-byte binary address representing the IP address string C<$ip_str>.
+
+Accepts both IPv4 (e.g., C<192.0.2.1>) and IPv6 (e.g., C<2001:db8::1>) address
+strings. IPv6 addresses with zone identifiers (e.g., C<fe80::1%eth0>) are also
+supported.
+
+Croaks on invalid input.
+
+See L</IP ADDRESS REPRESENTATION>
 
 =head2 sodium_is_zero
 
@@ -204,6 +245,13 @@ operand. Subtraction wraps if C<$diff> would overflow.
 
 Helper utility for clearing out sensitive memory contents. The PV values of any
 given arguments will be overwritten with (the same length of) null bytes.
+
+=head1 IP ADDRESS REPRESENTATION
+
+L</sodium_bin2ip> and L</sodium_ip2bin> use a consistent 16-byte binary format
+for IP addresses. IPv6 addresses are used directly in network byte order. IPv4
+addresses are represented as IPv4-mapped IPv6 addresses (10 zero bytes, 0xff
+0xff, then 4 IPv4 bytes).
 
 =head1 SEE ALSO
 

@@ -1,5 +1,5 @@
 package MyApp;
-use Catalyst::Runtime '5.70';
+use Catalyst::Runtime 5.70;
 use Catalyst;
 use Carp;
 use Data::Dump qw( dump );

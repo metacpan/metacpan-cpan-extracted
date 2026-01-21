@@ -564,8 +564,9 @@ xscon_foreignbuildargs(const xscon_constructor_t* sig, const char* klass, AV* ar
     dTHX;
     dSP;
 
-    /* Case 1: no foreignbuildargs_cv → return copy of @_ */
+    /* Case 1: no foreignbuildargs_cv → return @_, the class name shifted off */
     if (!sig->foreignbuildargs_cv) {
+        SV *discarded = av_shift(args);
         return args;
     }
 
@@ -574,9 +575,8 @@ xscon_foreignbuildargs(const xscon_constructor_t* sig, const char* klass, AV* ar
     SAVETMPS;
 
     PUSHMARK(SP);
-    XPUSHs(sv_2mortal(newSVpv(klass, 0)));
-    I32 avlen = av_len(args);
-    for (I32 i = 0; i <= avlen; i++) {
+    I32 argslen = av_len(args);
+    for (I32 i = 0; i <= argslen; i++) {
         SV **svp = av_fetch(args, i, 0);
         XPUSHs(svp ? *svp : &PL_sv_undef);
     }
@@ -1581,7 +1581,7 @@ CODE:
         if ( sig->foreignbuildargs_cv ) {
             /* @fbargs = scalar $foreign->BUILDARGS( @_ ) */
             AV *av = newAV();
-            for (I32 i = ax; i < items; i++) {
+            for (I32 i = 0; i < items; i++) {
                 av_push(av, newSVsv(ST(i)));
             }
             AV* fbargs = xscon_foreignbuildargs(sig, klassname, av, G_SCALAR);
@@ -1621,7 +1621,7 @@ CODE:
     else if ( sig->foreignconstructor_cv ) {
         /* @fbargs = $klassname->can('FOREIGNBUILDARGS') ? $klassname->FOREIGNBUILDARGS( @_ ) : @_ */
         AV *av = newAV();
-        for (I32 i = ax; i < items; i++) {
+        for (I32 i = 0; i < items; i++) {
             av_push(av, newSVsv(ST(i)));
         }
         AV* fbargs = xscon_foreignbuildargs(sig, klassname, av, G_ARRAY);

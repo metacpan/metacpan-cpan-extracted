@@ -7,38 +7,72 @@ use Exporter 'import';
 
 _define_constants();
 
-my @bases = qw(
-  init
+{
+  my @bases = qw(
+    init
+  );
+
+  my @constant_bases = qw(
+    BYTES
+  );
+
+  my $default = [
+    "hash",
+    (map { "hash_$_" } @bases),
+    (map { "hash_$_" } @constant_bases, "PRIMITIVE"),
+  ];
+  my $sha256 = [
+    "hash_sha256",
+    (map { "hash_sha256_$_" } @bases),
+    (map { "hash_sha256_$_" } @constant_bases),
+  ];
+  my $sha512 = [
+    "hash_sha512",
+    (map { "hash_sha512_$_" } @bases),
+    (map { "hash_sha512_$_" } @constant_bases),
+  ];
+
+  our %EXPORT_TAGS = (
+    all => [ @$default, @$sha256, @$sha512 ],
+    default => $default,
+    sha256 => $sha256,
+    sha512 => $sha512,
+  );
+
+  our @EXPORT_OK = @{$EXPORT_TAGS{all}};
+}
+
+package Crypt::Sodium::XS::OO::hash;
+use parent 'Crypt::Sodium::XS::OO::Base';
+
+my %methods = (
+  default => {
+    BYTES => \&Crypt::Sodium::XS::hash::hash_BYTES,
+    PRIMITIVE => \&Crypt::Sodium::XS::hash::hash_PRIMITIVE,
+    hash => \&Crypt::Sodium::XS::hash::hash,
+    init => sub { die "init is not supported for default primitive" },
+  },
+  sha256 => {
+    BYTES => \&Crypt::Sodium::XS::hash::hash_sha256_BYTES,
+    PRIMITIVE => sub { 'sha256' },
+    hash => \&Crypt::Sodium::XS::hash::hash_sha256,
+    init => \&Crypt::Sodium::XS::hash::hash_sha256_init,
+  },
+  sha512 => {
+    BYTES => \&Crypt::Sodium::XS::hash::hash_sha512_BYTES,
+    PRIMITIVE => sub { 'sha512' },
+    hash => \&Crypt::Sodium::XS::hash::hash_sha512,
+    init => \&Crypt::Sodium::XS::hash::hash_sha512_init,
+  },
 );
 
-my @constant_bases = qw(
-  BYTES
-);
+sub Crypt::Sodium::XS::hash::primitives { keys %methods }
+*primitives = \&Crypt::Sodium::XS::hash::primitives;
 
-my $default = [
-  "hash",
-  (map { "hash_$_" } @bases),
-  (map { "hash_$_" } @constant_bases, "PRIMITIVE"),
-];
-my $sha256 = [
-  "hash_sha256",
-  (map { "hash_sha256_$_" } @bases),
-  (map { "hash_sha256_$_" } @constant_bases),
-];
-my $sha512 = [
-  "hash_sha512",
-  (map { "hash_sha512_$_" } @bases),
-  (map { "hash_sha512_$_" } @constant_bases),
-];
-
-our %EXPORT_TAGS = (
-  all => [ @$default, @$sha256, @$sha512 ],
-  default => $default,
-  sha256 => $sha256,
-  sha512 => $sha512,
-);
-
-our @EXPORT_OK = @{$EXPORT_TAGS{all}};
+sub BYTES { my $self = shift; goto $methods{$self->{primitive}}->{BYTES}; }
+sub PRIMITIVE { my $self = shift; goto $methods{$self->{primitive}}->{PRIMITIVE}; }
+sub hash { my $self = shift; goto $methods{$self->{primitive}}->{hash}; }
+sub init { my $self = shift; goto $methods{$self->{primitive}}->{init}; }
 
 1;
 
@@ -52,11 +86,12 @@ Crypt::Sodium::XS::hash - SHA2 cryptographic hashing
 
 =head1 SYNOPSIS
 
-  use Crypt::Sodium::XS::hash ":default";
+  use Crypt::Sodium::XS;
+  my $xs_hash = Crypt::Sodium::XS->hash;
 
-  my $hash = hash("arbitrary input data");
+  my $hash = $xs_hash->hash("arbitrary input data");
 
-  my $multipart = hash_init();
+  my $multipart = $xs_hash->init;
   $multipart->update("arbitrary");
   $multipart->update("input", " data");
   $hash = $multipart->final;
@@ -77,43 +112,75 @@ untruncated versions are vulnerable to length extension attacks.
 A message can be hashed in a single pass, but a multi-part API is also
 available to process a message as a sequence of multiple chunks.
 
-=head1 FUNCTIONS
+=head1 CONSTRUCTOR
 
-Nothing is exported by default. A C<:default> tag imports the functions and
-constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
-provided for each of the primitives listed in L</PRIMITIVES>. These tags import
-the C<hash_E<lt>primitiveE<gt>_*> functions and constants for that primitive. A
-C<:all> tag imports everything.
+The constructor is called with the C<Crypt::Sodium::XS-E<gt>hash> method.
+
+  my $xs_hash = Crypt::Sodium::XS->hash;
+  my $xs_hash = Crypt::Sodium::XS->hash(primitive => 'sha256');
+
+Returns a new hash object.
+
+Implementation detail: the returned object is blessed into
+C<Crypt::Sodium::XS::OO::hash>.
+
+=head1 ATTRIBUTES
+
+=head2 primitive
+
+  my $primitive = $xs_hash->primitive;
+  $xs_hash->primitive('sha256');
+
+Gets or sets the primitive used for all operations by this object. It must be
+one of the primitives listed in L</PRIMITIVES>, including C<default>.
+
+=head1 METHODS
+
+=head2 primitives
+
+  my @primitives = $xs_hash->primitives;
+  my @primitives = Crypt::Sodium::XS::hash->primitives;
+
+Returns a list of all supported primitive names, including C<default>.
+
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $primitive = $xs_hash->PRIMITIVE;
+
+Returns the primitive used for all operations by this object. Note this will
+never be C<default> but would instead be the primitive it represents.
 
 =head2 hash
 
-=head2 hash_E<lt>primitiveE<gt>
-
-  my $hash = hash($message);
+  my $hash = $xs_hash->hash($message);
 
 C<$message> is the message to hash. It may be a L<Crypt::Sodium::XS::MemVault>.
 
-Returns the hash output of L</hash_BYTES> bytes.
+Returns the hash output of L</BYTES> bytes.
 
-=head2 MULTI-PART INTERFACE
+=head2 init
 
-=head2 hash_init
-
-=head2 hash_E<lt>primitiveE<gt>_init
-
-  my $multipart = hash_init($flags);
+  my $multipart = $xs_hash->init($flags);
 
 C<$flags> is optional. It is the flags used for the multipart protected memory
 object. See L<Crypt::Sodium::XS::ProtMem>.
 
 Returns a multipart hashing object. See L</MULTI-PART INTERFACE>.
 
+=head2 BYTES
+
+  my $xs_hash_size = $xs_hash->BYTES;
+
+Returns the size, in bytes, of hash output.
+
 =head1 MULTI-PART INTERFACE
 
-A multipart hashing object is created by calling the L</hash_init> function.
-Data to be hashed is added by calling the L</update> method of that object as
-many times as desired. An output hash is generated by calling its L</final>
-method. Do not use the object after calling L</final>.
+A multipart hashing object is created by calling the L</init> method. Data to
+be hashed is added by calling the L</update> method of that object as many
+times as desired. An output hash is generated by calling its L</final> method.
+Do not use the object after calling L</final>.
 
 The multipart hashing object is an opaque object which provides the following
 methods:
@@ -127,7 +194,7 @@ state.
 
 =head2 final
 
-  my $hash = $multipart->final;
+  my $xs_hash = $multipart->final;
 
 Retruns the final hash for all data added with L</update>.
 
@@ -139,6 +206,45 @@ Once C<final> has been called, the hashing object must not be used further.
 
 Adds all given arguments (stringified) to hashed data. Any argument may be a
 L<Crypt::Sodium::XS::MemVault>.
+
+=head1 PRIMITIVES
+
+=over 4
+
+=item * sha256
+
+=item * sha512 (default)
+
+=back
+
+=head1 FUNCTIONS
+
+The object API above is the recommended way to use this module. The functions
+and constants documented below can be imported instead or in addition.
+
+Nothing is exported by default. A C<:default> tag imports the functions and
+constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
+provided for each of the primitives listed in L</PRIMITIVES>. These tags import
+the C<hash_E<lt>primitiveE<gt>_*> functions and constants for that primitive. A
+C<:all> tag imports everything.
+
+=head2 hash (function)
+
+=head2 hash_E<lt>primitiveE<gt>
+
+  my $hash = hash($message);
+
+Same as L</hash> (method).
+
+=head2 MULTI-PART INTERFACE
+
+=head2 hash_init
+
+=head2 hash_E<lt>primitiveE<gt>_init
+
+  my $multipart = hash_init($flags);
+
+Same as L</init>.
 
 =head1 CONTSANTS
 
@@ -154,29 +260,13 @@ Returns the name of the default primitive.
 
   my $hash_size = hash_BYTES();
 
-Returns the size, in bytes, of hash output.
-
-=head1 PRIMITIVES
-
-All constants (except _PRIMITIVE) and functions have
-C<hash_E<lt>primitiveE<gt>>-prefixed couterparts (e.g., hash_sha256,
-hash_sha512_BYTES).
-
-=over 4
-
-=item * sha256
-
-=item * sha512 (default)
-
-=back
+Same as L</BYTES>.
 
 =head1 SEE ALSO
 
 =over
 
 =item L<Crypt::Sodium::XS>
-
-=item L<Crypt::Sodium::XS::OO::hash>
 
 =item L<https://doc.libsodium.org/advanced/sha-2_hash_function>
 

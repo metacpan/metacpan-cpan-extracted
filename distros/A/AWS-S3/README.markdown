@@ -91,8 +91,6 @@ AWS::S3 - Lightweight interface to Amazon S3 (Simple Storage Service)
 
 AWS::S3 attempts to provide an alternate interface to the Amazon S3 Simple Storage Service.
 
-**NOTE:** Until AWS::S3 gets to version 1.000 it will not implement the full S3 interface.
-
 **Disclaimer:** Several portions of AWS::S3 have been adopted from [Net::Amazon::S3](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3).
 
 **NOTE:** AWS::S3 is NOT a drop-in replacement for [Net::Amazon::S3](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3).
@@ -186,6 +184,12 @@ On success, returns the new [AWS::S3::Bucket](https://metacpan.org/pod/AWS%3A%3A
 On failure, dies with the error message.
 
 See [AWS::S3::Bucket](https://metacpan.org/pod/AWS%3A%3AS3%3A%3ABucket) for details on how to use buckets (and access their files).
+
+# ENVIRONMENT VARIABLES
+
+## AWS\_S3\_DEBUG
+
+If set, will print out debugging information to `STDERR`.
 
 # SEE ALSO
 

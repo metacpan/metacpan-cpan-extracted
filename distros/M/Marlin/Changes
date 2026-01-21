@@ -6,6 +6,14 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.020001	2026-01-20
+
+ [ Bug Fixes ]
+ - Avoid redefine warnings from Marlin::Attribute on Perl older than 5.36.
+
+ [ Other ]
+ - Updated: Require latest Class::XSConstructor.
+
 0.020000	2026-01-19
 
  [ Packaging ]

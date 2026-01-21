@@ -870,8 +870,6 @@ reusability and reduces the need for complicated state and test setup.
 
 =cut
 
-=cut
-
 =head1 ATTRIBUTES
 
 This package has the following attributes:

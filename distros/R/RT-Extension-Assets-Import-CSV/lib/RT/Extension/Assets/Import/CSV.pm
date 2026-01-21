@@ -3,11 +3,12 @@ use warnings;
 
 package RT::Extension::Assets::Import::CSV;
 use Text::CSV_XS;
+use File::Temp;
 
 use Data::Dumper;
 $Data::Dumper::Deparse = 1;
 
-our $VERSION = '2.4';
+our $VERSION = '2.5';
 
 sub _column {
     ref($_[0]) ? (ref($_[0]) eq "CODE" ?
@@ -400,20 +401,31 @@ sub parse_csv {
     my $opts = RT->Config->Get( 'AssetsImportParserOptions' ) // { binary => 1 };
     my $csv  = Text::CSV_XS->new( $opts );
 
-    open my $fh, '<', $file or die "failed to read $file: $!";
-    my $header = $csv->getline($fh);
+    # clean \r\r\n newlines that Excel adds
+    my $fh = File::Temp::tempfile();
+    open my $source_fh, '<', $file or die "failed to read $file: $!";
+    while ( my $line = <$source_fh> ) {
+        $line =~ s/\r\r\n/\n/g;
+        print $fh $line;
+    }
+    close $source_fh;
+    $fh->flush;
+    $fh->seek( 0, 0 );
+
+    my $header_opts = { sep_set => [ $opts->{sep_char} || ',' ], detect_bom => 1, munge_column_names => 'none' };
+    my @header      = $csv->header( $fh, $header_opts );
 
     my @items;
     while ( my $row = $csv->getline($fh) ) {
         my $item;
-        if (scalar @$header != scalar @$row) {
+        if (scalar @header != scalar @$row) {
             $item->{'_skip'} = 1;
             $item->{'_skip_reason'} = 'Number of columns does not match CSV header. Broken CSV?';
         }
 
-        for ( my $i = 0 ; $i < @$header ; $i++ ) {
-            if ( $header->[$i] ) {
-                $item->{ $header->[$i] } = $row->[$i];
+        for ( my $i = 0 ; $i < @header ; $i++ ) {
+            if ( $header[$i] ) {
+                $item->{ $header[$i] } = $row->[$i];
             }
         }
 
@@ -567,7 +579,7 @@ or via the web at
 
 =head1 COPYRIGHT
 
-This extension is Copyright (C) 2014-2021 Best Practical Solutions, LLC.
+This extension is Copyright (C) 2014-2026 Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 

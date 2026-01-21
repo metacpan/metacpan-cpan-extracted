@@ -7,7 +7,7 @@ use base qw( CatalystX::CRUD::Object );
 use Rose::DB::Object::Helpers qw( column_values_as_json );
 use JSON;
 
-our $VERSION = '0.302';
+our $VERSION = '0.303';
 
 =head1 NAME
 

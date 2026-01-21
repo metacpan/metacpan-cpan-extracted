@@ -88,11 +88,8 @@ SV * scalarmult_base(SV * sk)
   PREINIT:
   protmem *sk_pm = NULL;
   int ret;
-  unsigned char *sk_buf;
-  unsigned char *out_buf;
-  STRLEN out_len;
-  STRLEN sk_len;
-  STRLEN sk_req_len;
+  unsigned char *sk_buf, *out_buf;
+  STRLEN out_len, sk_len, sk_req_len;
 
   CODE:
   switch(ix) {
@@ -172,15 +169,9 @@ SV * scalarmult(SV * sk, SV * pk, SV * flags = &PL_sv_undef)
   scalarmult_x25519 = 99
 
   PREINIT:
-  protmem *sk_pm = NULL;
-  protmem *ss_pm;
-  unsigned char *sk_buf;
-  unsigned char *pk_buf;
-  STRLEN sk_len;
-  STRLEN sk_req_len;
-  STRLEN pk_len;
-  STRLEN pk_req_len;
-  STRLEN ss_len;
+  protmem *sk_pm = NULL, *ss_pm;
+  unsigned char *sk_buf, *pk_buf;
+  STRLEN sk_len, sk_req_len, pk_len, pk_req_len, ss_len;
   unsigned int sk_flags = g_protmem_default_flags_key;
   int ret;
 

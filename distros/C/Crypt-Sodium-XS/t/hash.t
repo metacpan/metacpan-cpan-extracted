@@ -2,7 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 
-use Crypt::Sodium::XS::OO::hash;
+use Crypt::Sodium::XS;
+use Crypt::Sodium::XS::hash;
 use Digest::SHA qw/sha256_hex sha512_hex/;
 use FindBin '$Bin';
 use lib "$Bin/lib";
@@ -15,8 +16,8 @@ my @adatas = (
 
 # TODO: test cloning
 
-for my $alg (Crypt::Sodium::XS::OO::hash->primitives) {
-  my $m = Crypt::Sodium::XS::OO::hash->new(primitive => $alg);
+for my $alg (Crypt::Sodium::XS::hash->primitives) {
+  my $m = Crypt::Sodium::XS->hash(primitive => $alg);
 
   my $validator;
   if ($alg eq 'sha256') {

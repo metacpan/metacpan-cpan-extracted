@@ -1,0 +1,48 @@
+%% Beamer-revealdriverfile
+@@Presentation: 
+-parameters:compiler={pdflatex},canvaswidth={1920},canvasheight={1080}
+@@BeamerFrame: 
+-parameters:rawpage={1},truepage={1},overlay={1},transition={none},title={Test slide deck},toc={titlepage}
+@@BeamerFrame: 
+-parameters:rawpage={2},truepage={2},overlay={1},transition={none},title={Introduction},toc={section}
+@@BeamerFrame: 
+-parameters:rawpage={3},truepage={3},overlay={1},transition={none},title={Slide making},toc={subsection}
+@@BeamerFrame: 
+-parameters:rawpage={4},truepage={4},overlay={1},transition={none},title={Good news}
+@@BeamerFrame: 
+-parameters:rawpage={5},truepage={5},overlay={1},transition={concave},title={Pr\^et-\`a-porter}
+@@BeamerFrame: 
+-parameters:rawpage={6},truepage={6},overlay={1},transition={convex},title={Très chique}
+@@BeamerFrame: 
+-parameters:rawpage={7},truepage={7},overlay={1},transition={none},title={Pimping your slides},toc={subsection}
+@@BeamerFrame: 
+-parameters:rawpage={8},truepage={8},overlay={1},transition={none},title={And even more good news}
+@@BeamerFrame: 
+-parameters:rawpage={9},truepage={9},overlay={1},transition={zoom},title={A dymmy slide}
+@@BeamerFrame: 
+-parameters:rawpage={10},truepage={10},overlay={1},transition={none},title={In detail},toc={section}
+@@BeamerFrame: 
+-parameters:rawpage={11},truepage={11},overlay={1},transition={none},title={Candy for the eye},toc={subsection}
+@@BeamerFrame: 
+-parameters:rawpage={12},truepage={12},overlay={1},transition={none},title={Placing videos}
+@@BeamerFrame: 
+-video:width={0.7},height={0.7},fit={contain},background={yellow},autoplay={},x={0.15},y={0.2},file={Media/beamer-reveal-testvideo.mp4}
+-parameters:rawpage={13},truepage={12},overlay={2},transition={none},title={Placing videos}
+@@BeamerFrame: 
+-image:width={0.33},height={0.586667},fit={contain},background={white},x={0.535},y={0.1066665},file={Media/beamer-reveal-AnimatedPendulum.gif}
+-image:width={0.25},height={0.444444},fit={contain},background={white},x={0.075},y={0.177778},file={Media/beamer-reveal-WiresTp.png}
+-parameters:rawpage={14},truepage={13},overlay={1},transition={none},title={Placing images (possibly animated)}
+@@BeamerFrame: 
+-iframe:width={0.6},height={0.6},fit={cover},background={white},x={0.2},y={0.3},file={Media/beamer-reveal-PCB.html}
+-parameters:rawpage={15},truepage={14},overlay={1},transition={none},title={Placing iframe material (possibly animated)}
+@@BeamerFrame: 
+-parameters:rawpage={16},truepage={15},overlay={1},transition={none},title={Resonance for the ear},toc={subsection}
+@@BeamerFrame: 
+-audio:width={0.1},height={0.1},fit={cover},background={blue},autoplay={},controls={},x={0.8},y={0.85},file={Media/beamer-reveal-AudioSample.ogg}
+-parameters:rawpage={17},truepage={16},overlay={1},transition={none},title={Adding audio to your slides}
+@@BeamerFrame: 
+-parameters:rawpage={18},truepage={17},overlay={1},transition={none},title={Make (video) animations with LaTeX},toc={subsection}
+@@BeamerFrame: 
+-animation:width={0.4833939411139624},height={0.6041663607664635},framerate={25},duration={7.5},x={0.2583030294430188},y={0.3479168196167682},fit={fit},background={white},autoplay={},loop={},
+ \begin {tikzpicture}[font=\footnotesize ,transform shape,scale=0.75] \pgfmathsetmacro \angle {\progress *540}\clip (-2,-5.25) rectangle (8,2); \node [below left,inner sep=1pt] at (0,0) {\tiny 0}; \node [below left,inner sep=1pt] at (2.5,0) {\tiny 0}; \node [above right,inner sep=1pt] at (0,-2) {\tiny 0}; \par \begin {scope}[every node/.style={right}] \node [thick,draw,rectangle] at (2.5,-2) {\large $x(t) = A \cdot \eu ^{j\omega t}$}; \node at (3.5,-3) {\large $\eu ^{j\alpha } = \cos \alpha +j\sin \alpha $}; \node at (2.5,-4) {\large $x(t) = \underbrace {A \cos \omega t}_{\text {\textcolor {orange}{real}}} + \underbrace {j A \sin \omega t}_{\text {\textcolor {olive}{imaginary}}}$}; \end {scope} \draw [->,thick] (3,-2.4) -- (3,-3.4); \draw [blue,thick] (0,0) circle (1); \par \draw [->] (-1.25,0) -- (1.25,0) node[below] {Re}; \draw [->] (0,-1.25) -- (0,1.25) node[left] {Im}; \par \draw [olive,very thick] (0,0) -- (0,{sin(\angle )}); \draw [orange,very thick] (0,0) -- ({cos(\angle )},0); \draw [blue,thick,->] (0,0) -- node[left,font=\tiny ] {A} +(\angle :1); \draw [->] (0.4,0) arc (0:\angle :0.4); \node at (0.5*\angle :0.7) {\scriptsize $\omega \tilde t$}; \par \draw [very thick,olive] ({2.5+\angle /180},0) -- +(0,{sin(\angle )}); \draw [densely dotted] ({min(0,cos(\angle ))},{sin(\angle )}) -- ({2.5+\angle /180},{sin(\angle )}); \draw [thick] ({2.5+\angle /180},0) +(0,1pt) -- +(0,-1pt) node[below] {$\tilde t$}; \par \draw [very thick,orange] (0,{-2-\angle /180}) -- +({cos(\angle )},0); \draw [densely dotted] ({cos(\angle )},{max(0,sin(\angle ))}) -- ({cos(\angle )},{-2-\angle /180}); \draw [thick] (0,{-2-\angle /180}) +(1pt,0) -- +(-1pt,0) node[left] {$\tilde t$}; \par \foreach \y /\l in {-1/-A,1/A} { \draw [gray,densely dotted] (2.5,\y ) -- (6.25,\y ); \draw (2.5,\y ) +(+1pt,0) -- +(-1pt,0) node[left] {$\l $}; } \draw [->] (2.0,0) -- (6.5,0) node[below] {$t$}; \draw [->] (2.5,-1.25) -- (2.5,1.25) node[left] {$Im(x(t))$}; \draw [olive,thick,domain=-0.25:3.5,samples=30,smooth] plot ({\x +2.5},{sin(pi*\x r)}); \par \foreach \y /\l in {-1/-A,1/A} { \draw [gray,densely dotted] (\y ,-2) -- (\y ,-4.5); \draw (2.5,\y ) +(+1pt,0) -- +(-1pt,0) node[left] {$\l $}; } \draw [->] (-1.25,-2) -- (1.25,-2) node[above] {$Re(x(t))$}; \draw [->] (0,-1.5) -- (0,-5) node[left] {$t$}; \par \draw [orange,thick,domain=-0.25:2.6,samples=30,smooth] plot ({cos(pi*\x r)},{-2-\x }); \end {tikzpicture} 
+-parameters:rawpage={19},truepage={18},overlay={1},transition={none},title={Making animations with LaTeX (using TikZ as example)}

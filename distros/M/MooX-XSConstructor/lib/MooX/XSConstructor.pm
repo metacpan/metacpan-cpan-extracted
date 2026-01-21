@@ -5,9 +5,10 @@ use warnings;
 package MooX::XSConstructor;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.003001';
+our $VERSION   = '0.003002';
 
 use Moo 2.004000 ();
+use Moo::Object ();
 use Hook::AfterRuntime;
 
 # Options that either XSCON can handle, or have no effect on the
@@ -136,8 +137,25 @@ sub setup_for {
 		1;
 	};
 	
-	# If there was a failure, restore old constructor.
-	if ( not $ok ) {
+	
+	if ( $ok and my $meta = Class::XSConstructor::get_metadata( $klass ) ) {
+		if ( defined $meta->{foreignclass}
+		and ( $meta->{foreignclass} eq 'Moo::Object' or $self->is_suitable_class( $meta->{foreignclass} ) ) ) {
+			delete $meta->{$_} for qw/
+				foreignbuildall
+				foreignconstructor
+				foreignclass
+				foreignbuildargs
+			/;
+		}
+		if ( $meta->{buildargs} and $meta->{buildargs} == \&Moo::Object::BUILDARGS ) {
+			$meta->{has_standard_buildargs} = !!1;
+			delete $meta->{buildargs};
+		}
+		$klass->XSCON_CLEAR_CONSTRUCTOR_CACHE;
+	}
+	else {
+		# If there was a failure, restore old constructor.
 		no strict 'refs';
 		no warnings 'redefine';
 		*{"${klass}::new"} = $old;

@@ -8,12 +8,13 @@ use HTTP::Response;
 use HTTP::Request::Common;
 use IO::Socket::INET;
 use Class::Load 'load_class';
+use Log::Any qw( $LOG );
 
 use AWS::S3::ResponseParser;
 use AWS::S3::Owner;
 use AWS::S3::Bucket;
 
-our $VERSION = '1.00';
+our $VERSION = '2.00';
 
 has [qw/access_key_id secret_access_key/] => ( is => 'ro', isa => 'Str' );
 
@@ -69,6 +70,7 @@ sub request {
     my ( $s, $type, %args ) = @_;
 
     my $class = "AWS::S3::Request::$type";
+
     load_class( $class );
     return $class->new( %args, s3 => $s, type => $type );
 }    # end request()
@@ -79,10 +81,15 @@ sub owner {
     my $type     = 'ListAllMyBuckets';
     my $request  = $s->request( $type );
     my $response = $request->request();
-    my $xpc      = $response->xpc;
+
+    # Linode/Akamai E3 endpoints do not include the `xmlns` in
+    # ListAllMyBuckets, so use the localname to work with or
+    # without a declared XML namespace.
+    my $xml      = $response->xml;
+    my ($node)   = $xml->getElementsByLocalName('Owner');
     return AWS::S3::Owner->new(
-        id           => $xpc->findvalue( '//s3:Owner/s3:ID' ),
-        display_name => $xpc->findvalue( '//s3:Owner/s3:DisplayName' ),
+        id           => $node->getElementsByLocalName('ID')->string_value,
+        display_name => $node->getElementsByLocalName('DisplayName')->string_value,
     );
 }    # end owner()
 
@@ -93,17 +100,21 @@ sub buckets {
     my $request  = $s->request( $type );
     my $response = $request->request();
 
-    my $xpc     = $response->xpc;
+    # Linode/Akamai E3 endpoints do not include the `xmlns` in
+    # ListAllMyBuckets, so use the localname to work with or
+    # without a declared XML namespace.
+    my $xml     = $response->xml;
     my @buckets = ();
-    foreach my $node ( $xpc->findnodes( './/s3:Bucket' ) ) {
+    foreach my $node ( $xml->getElementsByLocalName( 'Bucket' ) ) {
         push @buckets,
           AWS::S3::Bucket->new(
-            name          => $xpc->findvalue( './/s3:Name',         $node ),
-            creation_date => $xpc->findvalue( './/s3:CreationDate', $node ),
+            name          => $node->getElementsByLocalName('Name')->string_value,
+            creation_date => $node->getElementsByLocalName('CreationDate')->string_value,
             s3            => $s,
           );
     }    # end foreach()
 
+    $LOG->debug('Listed AWS buckets', { buckets => [map $_->name, @buckets] });
     return @buckets;
 }    # end buckets()
 
@@ -234,8 +245,6 @@ AWS::S3 - Lightweight interface to Amazon S3 (Simple Storage Service)
 
 AWS::S3 attempts to provide an alternate interface to the Amazon S3 Simple Storage Service.
 
-B<NOTE:> Until AWS::S3 gets to version 1.000 it will not implement the full S3 interface.
-
 B<Disclaimer:> Several portions of AWS::S3 have been adopted from L<Net::Amazon::S3>.
 
 B<NOTE:> AWS::S3 is NOT a drop-in replacement for L<Net::Amazon::S3>.
@@ -329,6 +338,12 @@ On success, returns the new L<AWS::S3::Bucket>
 On failure, dies with the error message.
 
 See L<AWS::S3::Bucket> for details on how to use buckets (and access their files).
+
+=head1 ENVIRONMENT VARIABLES
+
+=head2 AWS_S3_DEBUG
+
+If set, will print out debugging information to C<STDERR>.
 
 =head1 SEE ALSO
 

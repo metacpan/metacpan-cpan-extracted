@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::Object::BeamerFrame;
-our $VERSION = '20260119.1636'; # VERSION
+our $VERSION = '20260120.1958'; # VERSION
 
 use parent 'BeamerReveal::Object';
 use Carp;
@@ -19,11 +19,12 @@ use Digest::SHA;
 
 
 our $maxRawPage;
+
 sub nofdigits { length( "$_[0]" ) }
 
 sub new {
   my $class = shift;
-  my ( $chunkData, $lines, $lineCtr ) = @_;
+  my ( $chunkData, $lines, $lineCtr, $rawpage ) = @_;
   
   $class = (ref $class ? ref $class : $class );
   my $self = {};
@@ -42,6 +43,10 @@ sub new {
       or $logger->fatal( "Error: syntax incorrect in rvl file on line $lineCtr '$lines->[$i]'\n" );
     if ( $+{command} eq 'parameters' ) {
       $self->{parameters} = BeamerReveal::Object::readParameterLine( $+{payload} );
+      $self->{parameters}->{rawpage} = $rawpage;
+
+      # The correctness of this relies on the pages appearing in order in the .rvl file
+      $maxRawPage = $self->{parameters}->{rawpage};
     }
     elsif ( $+{command} eq 'video' ) {
       push @{$self->{videos}}, BeamerReveal::Object::readParameterLine( $+{payload} );
@@ -64,8 +69,6 @@ sub new {
     }
   }
 
-  # The correctness of this relies on the pages appearing in order in the .rvl file
-  $maxRawPage = $self->{parameters}->{rawpage};
   
   return $self;
 }
@@ -298,7 +301,7 @@ BeamerReveal::Object::BeamerFrame - BeamerFrame object
 
 =head1 VERSION
 
-version 20260119.1636
+version 20260120.1958
 
 =head1 SYNOPSIS
 

@@ -25,7 +25,7 @@ vns
 
 =head1 DESCRIPTION
 
-Run and alias arbitrary commands, and and dispatch to Venus subcommands. The
+Run and alias arbitrary commands, and dispatch to Venus subcommands. The
 subcommands are:
 
 =over 4
@@ -63,7 +63,7 @@ This CLI dispatches to L<Venus::Task::Venus/perform>.
 Z<>
 
   # use the Perl debugger as a repl
-  $ vns run repl
+  $ vns repl
 
 Z<>
 

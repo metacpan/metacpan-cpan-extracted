@@ -1009,8 +1009,6 @@ The test automation and documentation generation enabled through this framework
 makes it easy to maintain source/test/documentation parity. This also increases
 reusability and reduces the need for complicated state and test setup.
 
-+=cut
-
 =cut
 
 $test->for('description');

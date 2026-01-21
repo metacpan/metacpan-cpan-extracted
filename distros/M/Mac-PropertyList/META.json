@@ -59,6 +59,6 @@
          "web" : "https://github.com/briandfoy/mac-propertylist"
       }
    },
-   "version" : "1.605",
+   "version" : "1.606",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -7,8 +7,19 @@ Files: Changes
  META.json
  META.yml
  doap.ttl
+ t/03foreigndetection.t
+ t/gh-2.t
+ t/lib/Container.pm
+ t/lib/MyTest.pm
+ t/lib/TestBase.pm
 Copyright: Copyright 2026 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ examples/bench.pl
+Copyright: Unknown
+License: Unknown
 
 Files: COPYRIGHT
  CREDITS
@@ -26,21 +37,16 @@ Files: t/02strict-early.t
 Copyright: This software is copyright (c) 2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: INSTALL
- LICENSE
-Copyright: Unknown
-License: Unknown
-
-Files: Makefile.PL
-Copyright: Copyright 2020 Toby Inkster.
+Files: t/01basic.t
+Copyright: This software is copyright (c) 2018 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini
 Copyright: Copyright 2018 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/01basic.t
-Copyright: This software is copyright (c) 2018 by Toby Inkster.
+Files: Makefile.PL
+Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
