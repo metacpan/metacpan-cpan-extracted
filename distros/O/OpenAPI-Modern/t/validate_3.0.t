@@ -134,11 +134,20 @@ components:
         - type: string
           format: base64
           example: foo
+        - enum: [ foo ]
+        - enum: [ foo, bar ]
   responses:
     responseA:
       description: ''    # only required up to 3.1
     responseB:
       description: a non-empty description
+  requestBodies:
+    file_upload:
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
 YAML
 
   like(
@@ -181,11 +190,17 @@ components:
         - type: string
           contentEncoding: base64
           examples: [ foo ]
+        - const: foo
+        - enum: [ foo, bar ]
   responses:
     responseA:
       description: ''    # only required up to 3.1
     responseB:
       description: a non-empty description
+  requestBodies:
+    file_upload:
+      content:
+        application/octet-stream: {}
 YAML
     'upgrade to 3.1',
   );

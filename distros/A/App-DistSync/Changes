@@ -1,5 +1,8 @@
 # Version/Revision history
 
+1.11 Wed 21 Jan 2026 19:54:13 MSK
+    * Project relicensed from the Perl 5 dual license to the Artistic License 2.0
+
 1.10 Fri 05 Dec 2025 14:57:22 MSK
     * The project has been reworked
     * Documentation modified

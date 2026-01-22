@@ -76,6 +76,7 @@ sub tw_send_command {
 
     if ($response_array_len > 0) {
         my @response_array = (1 .. $response_array_len);
+        $response_array[0] = $message_array[0];
         $read_response_native->(\@response_array, $response_array_len);
         return \@response_array;
     }

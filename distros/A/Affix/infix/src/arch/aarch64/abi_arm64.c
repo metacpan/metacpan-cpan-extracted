@@ -400,6 +400,14 @@ static infix_status prepare_forward_call_frame_arm64(infix_arena_t * arena,
         // If it couldn't be placed in a register, it must go on the stack.
         if (!placed_in_register) {
             layout->arg_locations[i].type = ARG_LOCATION_STACK;
+
+            // Enforce natural alignment for stack arguments on ARM64
+            size_t align = type->alignment;
+            if (align < 8)
+                align = 8;
+
+            // Align the current stack offset
+            stack_offset = (stack_offset + (align - 1)) & ~(align - 1);
             layout->arg_locations[i].stack_offset = (uint32_t)stack_offset;
             stack_offset += (type->size + 7) & ~7;  // Stack slots are 8-byte aligned.
             layout->num_stack_args++;
@@ -506,12 +514,14 @@ static infix_status generate_forward_argument_moves_arm64(code_buffer * buf,
                     (type->meta.primitive_id == INFIX_PRIMITIVE_SINT8 ||
                      type->meta.primitive_id == INFIX_PRIMITIVE_SINT16 ||
                      type->meta.primitive_id == INFIX_PRIMITIVE_SINT32);
-                if (is_signed_lt_64)
-                    // Use Load Register Signed Word to sign-extend a 32-bit value to 64 bits.
-                    // Note: For signed 8/16 bit, we currently don't have LDRSB/LDRSH emitters, so we fall back to
-                    // standard load which zero-extends, relying on the user/compiler to handle sign extension for
-                    // char/short if strictly needed. But, for correctness, we should match size.
-                    emit_arm64_ldrsw_imm(buf, GPR_ARGS[loc->reg_index], X9_REG, 0);  // ldrsw xN, [x9]
+                if (is_signed_lt_64) {  // Use Load Register Signed Word to sign-extend a 32-bit value to 64 bits.
+                    if (type->size == 1)
+                        emit_arm64_ldrsb_imm(buf, GPR_ARGS[loc->reg_index], X9_REG, 0);
+                    else if (type->size == 2)
+                        emit_arm64_ldrsh_imm(buf, GPR_ARGS[loc->reg_index], X9_REG, 0);
+                    else
+                        emit_arm64_ldrsw_imm(buf, GPR_ARGS[loc->reg_index], X9_REG, 0);
+                }
                 else {
                     // Unsigned types and small structs
                     if (type->size == 1)
@@ -536,10 +546,14 @@ static infix_status generate_forward_argument_moves_arm64(code_buffer * buf,
             emit_arm64_mov_reg(buf, true, GPR_ARGS[loc->reg_index], X9_REG);  // mov xN, x9
             break;
         case ARG_LOCATION_VPR:
-            if (is_long_double(type) || (type->category == INFIX_TYPE_VECTOR && type->size == 16))
+            if ((is_long_double(type) && type->size == 16) || (type->category == INFIX_TYPE_VECTOR && type->size == 16))
                 emit_arm64_ldr_q_imm(buf, VPR_ARGS[loc->reg_index], X9_REG, 0);  // ldr qN, [x9] (128-bit load)
             else
-                emit_arm64_ldr_vpr(buf, is_double(type), VPR_ARGS[loc->reg_index], X9_REG, 0);  // ldr dN/sN, [x9]
+                emit_arm64_ldr_vpr(buf,
+                                   is_double(type) || is_long_double(type),
+                                   VPR_ARGS[loc->reg_index],
+                                   X9_REG,
+                                   0);  // ldr dN/sN, [x9]
             break;
         case ARG_LOCATION_VPR_HFA:
             {
@@ -660,10 +674,11 @@ static infix_status generate_forward_epilogue_arm64(code_buffer * buf,
     if (ret_type->category != INFIX_TYPE_VOID && !layout->return_value_in_memory) {
         // ...copy the result from the appropriate return register(s) into the user's return buffer (pointer in X20).
         const infix_type * hfa_base = nullptr;
+
         // The order of these checks is critical. Handle the most specific cases first.
-        if (is_long_double(ret_type) || (ret_type->category == INFIX_TYPE_VECTOR && ret_type->size == 16))
-            // On non-Apple AArch64, long double is 16 bytes and returned in V0.
-            // On Apple, this case is never hit because types.c aliases it to a standard double.
+        // On Apple Silicon, long double is 8 bytes. Only emit 128-bit store if size is actually 16.
+        if ((is_long_double(ret_type) && ret_type->size == 16) ||
+            (ret_type->category == INFIX_TYPE_VECTOR && ret_type->size == 16))
             emit_arm64_str_q_imm(buf, V0_REG, X20_REG, 0);  // str q0, [x20]
         else if (is_hfa(ret_type, &hfa_base)) {
             size_t num_elements = ret_type->size / hfa_base->size;
@@ -676,7 +691,8 @@ static infix_status generate_forward_epilogue_arm64(code_buffer * buf,
         }
         else if (is_float(ret_type))
             emit_arm64_str_vpr(buf, false, V0_REG, X20_REG, 0);  // str s0, [x20]
-        else if (is_double(ret_type))
+        // Handle standard double OR 8-byte long double (macOS)
+        else if (is_double(ret_type) || (is_long_double(ret_type) && ret_type->size == 8))
             emit_arm64_str_vpr(buf, true, V0_REG, X20_REG, 0);  // str d0, [x20]
         else {
             // Integer, pointer, or small aggregate return.
@@ -797,6 +813,7 @@ static infix_status generate_reverse_prologue_arm64(code_buffer * buf, infix_rev
  *          locations (GPRs, VPRs, or the caller's stack) into a contiguous "saved args"
  *          area on the stub's local stack. It then populates the `args_array` with
  *          pointers to this saved data, respecting all platform-specific ABI deviations.
+ *
  * @param buf The code buffer.
  * @param layout The layout blueprint.
  * @param context The reverse context.
@@ -805,32 +822,48 @@ static infix_status generate_reverse_prologue_arm64(code_buffer * buf, infix_rev
 static infix_status generate_reverse_argument_marshalling_arm64(code_buffer * buf,
                                                                 infix_reverse_call_frame_layout * layout,
                                                                 infix_reverse_t * context) {
-    // If the return type is a large struct, the caller passes a hidden pointer in X8.
-    // We must save this pointer into our return buffer location immediately, as X8 is volatile.
+    // Handle Return Value Pointer (Indirect Result Location)
+    // If the return type is a large struct (> 16 bytes), the caller passes a hidden pointer in X8.
+    // X8 is volatile, so we must save this pointer into our stack frame immediately.
     bool ret_is_aggregate =
         (context->return_type->category == INFIX_TYPE_STRUCT || context->return_type->category == INFIX_TYPE_UNION ||
          context->return_type->category == INFIX_TYPE_ARRAY || context->return_type->category == INFIX_TYPE_COMPLEX);
     bool return_in_memory = ret_is_aggregate && context->return_type->size > 16;
-    if (return_in_memory)  // str x8, [sp, #return_buffer_offset]
+
+    if (return_in_memory) {
+        // str x8, [sp, #return_buffer_offset]
         emit_arm64_str_imm(buf, true, X8_REG, SP_REG, layout->return_buffer_offset);
-    size_t gpr_idx = 0, vpr_idx = 0, current_saved_data_offset = 0;
-    // Arguments passed on the caller's stack start at an offset from our new frame pointer.
-    // [fp] points to old fp, [fp, #8] points to old lr. Args start at [fp, #16].
+    }
+
+    // Iterate over arguments
+    size_t gpr_idx = 0;
+    size_t vpr_idx = 0;
+    size_t current_saved_data_offset = 0;
+
+    // Arguments passed on the caller's stack start at offset 16 from our new frame pointer (X29).
+    // [fp] = old fp (8 bytes), [fp+8] = lr (8 bytes). Args start at [fp+16].
     size_t caller_stack_offset = 16;
+
     for (size_t i = 0; i < context->num_args; ++i) {
         infix_type * type = context->arg_types[i];
         bool is_variadic_arg = i >= context->num_fixed_args;
+
+        // Calculate where to save this argument's data in our local stack frame.
         int32_t arg_save_loc = (int32_t)(layout->saved_args_offset + current_saved_data_offset);
+
 #if defined(INFIX_OS_MACOS)
-        // On macOS, all variadic arguments are passed on the stack.
-        // This is a special case that bypasses all register logic.
+        // macOS ABI deviation:
+        // On macOS ARM64, ALL variadic arguments are passed on the stack.
+        // They are also promoted: types < 8 bytes occupy a full 8-byte stack slot.
         if (is_variadic_arg) {
-            // On macOS, variadic args smaller than 8 bytes are promoted to an 8-byte stack slot.
-            // We must copy the entire slot, not just the type's smaller size.
             size_t size_on_stack = (type->size < 8) ? 8 : type->size;
-            size_on_stack = (size_on_stack + 7) & ~7;  // Ensure it's a multiple of 8
+            size_on_stack = (size_on_stack + 7) & ~7;  // Align to 8 bytes
+
+            // Copy from caller's stack to our local save area
             for (size_t offset = 0; offset < size_on_stack; offset += 8) {
+                // ldr x9, [fp, #caller_offset]
                 emit_arm64_ldr_imm(buf, true, X9_REG, X29_FP_REG, (int32_t)(caller_stack_offset + offset));
+
                 int32_t dest_offset = arg_save_loc + (int32_t)offset;
                 if (dest_offset >= 0 && ((unsigned)dest_offset / 8) <= 0xFFF && (dest_offset % 8 == 0))
                     emit_arm64_str_imm(buf, true, X9_REG, SP_REG, dest_offset);
@@ -840,55 +873,68 @@ static infix_status generate_reverse_argument_marshalling_arm64(code_buffer * bu
                 }
             }
             caller_stack_offset += size_on_stack;
-            // Set the pointer in args_array to point to the saved data
+
+            // Set the pointer in args_array[i] to point to the saved data
             int32_t dest_offset = layout->args_array_offset + (int32_t)(i * sizeof(void *));
             emit_arm64_add_imm(buf, true, false, X9_REG, SP_REG, (uint32_t)arg_save_loc);
+
             if (dest_offset >= 0 && ((unsigned)dest_offset / 8) <= 0xFFF && (dest_offset % 8 == 0))
                 emit_arm64_str_imm(buf, true, X9_REG, SP_REG, dest_offset);
             else {
                 emit_arm64_add_imm(buf, true, false, X10_REG, SP_REG, dest_offset);
                 emit_arm64_str_imm(buf, true, X9_REG, X10_REG, 0);
             }
+
             current_saved_data_offset += (type->size + 15) & ~15;
-            continue;  // Skip to the next argument
+            continue;  // Argument handled, move to next
         }
 #endif
-        // Standard logic for non-macOS or non-variadic arguments
+
+        // Standard AAPCS64 logic
         bool is_pass_by_ref = (type->size > 16) && !is_variadic_arg;
         bool is_from_stack = false;
-        // Determine if the argument is expected in a VPR based on type and platform.
-        bool expect_in_vpr = is_float(type) || is_double(type) || is_long_double(type);
+
+        bool expect_in_vpr =
+            is_float(type) || is_double(type) || is_long_double(type) || type->category == INFIX_TYPE_VECTOR;
 #if defined(INFIX_OS_WINDOWS)
+        // Windows on ARM ABI disables HFA rules for variadic functions; floats go to GPRs.
         if (context->is_variadic)
             expect_in_vpr = false;
 #endif
+
         if (is_pass_by_ref) {
+            // Large aggregates passed by reference. The argument is a pointer.
+            // We store this pointer directly into args_array[i].
             int32_t dest_offset = layout->args_array_offset + (int32_t)(i * sizeof(void *));
             arm64_gpr src_reg;
+
             if (gpr_idx < NUM_GPR_ARGS)
                 src_reg = GPR_ARGS[gpr_idx++];
             else {
+                // Pointer passed on stack
                 emit_arm64_ldr_imm(buf, true, X9_REG, X29_FP_REG, (int32_t)caller_stack_offset);
                 src_reg = X9_REG;
                 caller_stack_offset += 8;
             }
-            // Correctly check offset for an 8-byte store.
+
             if (dest_offset >= 0 && (dest_offset / 8) <= 0xFFF && (dest_offset % 8 == 0))
                 emit_arm64_str_imm(buf, true, src_reg, SP_REG, dest_offset);
             else {
                 emit_arm64_add_imm(buf, true, false, X10_REG, SP_REG, dest_offset);
                 emit_arm64_str_imm(buf, true, src_reg, X10_REG, 0);
             }
-            continue;
+            continue;  // Argument handled (no data copying needed)
         }
+
         const infix_type * hfa_base_type = nullptr;
         bool is_hfa_candidate = !is_variadic_arg && is_hfa(type, &hfa_base_type);
 #if defined(INFIX_OS_WINDOWS)
-        // Windows on ARM ABI disables HFA for variadic arguments.
         if (context->is_variadic)
             is_hfa_candidate = false;
 #endif
+
         if (is_hfa_candidate) {
+            // Homogeneous Floating-point Aggregate
             size_t num_elements = type->size / hfa_base_type->size;
             if (vpr_idx + num_elements <= NUM_VPR_ARGS) {
                 const int scale = is_double(hfa_base_type) ? 8 : 4;
@@ -902,31 +948,54 @@ static infix_status generate_reverse_argument_marshalling_arm64(code_buffer * bu
                     }
                 }
             }
-            else
+            else {
                 is_from_stack = true;
+            }
         }
         else if (expect_in_vpr) {
+            // Single FP/Vector argument
             if (vpr_idx < NUM_VPR_ARGS) {
-                const int scale = is_long_double(type) ? 16 : (is_double(type) ? 8 : 4);
-                if (arg_save_loc >= 0 && ((unsigned)arg_save_loc / scale) <= 0xFFF && (arg_save_loc % scale == 0)) {
-                    if (is_long_double(type))
+                // Determine width: 128-bit (Quad), 64-bit (Double), or 32-bit (Single).
+                // On macOS ARM64, long double is 8 bytes, so we must check size == 16.
+                bool is_128bit = (type->size == 16);
+
+// On Windows, always use 128-bit stores for robustness against partial register updates.
+#if defined(INFIX_OS_WINDOWS)
+                is_128bit = true;
+#endif
+
+                if (is_128bit && ((type->category == INFIX_TYPE_VECTOR) || is_long_double(type))) {
+                    // Use STR Qn for 128-bit types
+                    if (arg_save_loc >= 0 && ((unsigned)arg_save_loc / 16) <= 0xFFF && (arg_save_loc % 16 == 0))
                         emit_arm64_str_q_imm(buf, VPR_ARGS[vpr_idx++], SP_REG, arg_save_loc);
-                    else
-                        emit_arm64_str_vpr(buf, is_double(type), VPR_ARGS[vpr_idx++], SP_REG, arg_save_loc);
+                    else {
+                        emit_arm64_add_imm(buf, true, false, X10_REG, SP_REG, arg_save_loc);
+                        emit_arm64_str_q_imm(buf, VPR_ARGS[vpr_idx++], X10_REG, 0);
+                    }
                 }
                 else {
-                    emit_arm64_add_imm(buf, true, false, X10_REG, SP_REG, arg_save_loc);
-                    if (is_long_double(type))
-                        emit_arm64_str_q_imm(buf, VPR_ARGS[vpr_idx++], X10_REG, 0);
-                    else
-                        emit_arm64_str_vpr(buf, is_double(type), VPR_ARGS[vpr_idx++], X10_REG, 0);
+                    // Use STR Dn (64-bit) or STR Sn (32-bit)
+                    // Note: macOS long double (8 bytes) falls into 'is_double' path here via size check/alias logic
+                    const int scale = (is_double(type) || is_long_double(type)) ? 8 : 4;
+                    bool is_64bit = (scale == 8);
+
+                    if (arg_save_loc >= 0 && ((unsigned)arg_save_loc / scale) <= 0xFFF && (arg_save_loc % scale == 0)) {
+                        emit_arm64_str_vpr(buf, is_64bit, VPR_ARGS[vpr_idx++], SP_REG, arg_save_loc);
+                    }
+                    else {
+                        emit_arm64_add_imm(buf, true, false, X10_REG, SP_REG, arg_save_loc);
+                        emit_arm64_str_vpr(buf, is_64bit, VPR_ARGS[vpr_idx++], X10_REG, 0);
+                    }
                 }
             }
-            else
+            else {
                 is_from_stack = true;
+            }
         }
-        else {                     // Argument is in a GPR
-            if (type->size > 8) {  // 16-byte value in two GPRs
+        else {
+            // Integer / Pointer / Small Struct in GPR
+            if (type->size > 8) {
+                // 16-byte aggregate in Xn, Xn+1
                 bool needs_alignment = true;
 #if defined(INFIX_OS_MACOS)
                 if (type->category == INFIX_TYPE_PRIMITIVE)
@@ -937,7 +1006,9 @@ static infix_status generate_reverse_argument_marshalling_arm64(code_buffer * bu
 #endif
                 if (needs_alignment && (gpr_idx % 2 != 0))
                     gpr_idx++;
+
                 if (gpr_idx + 1 < NUM_GPR_ARGS) {
+                    // Store first half
                     if (arg_save_loc >= 0 && (((unsigned)arg_save_loc + 8) / 8) <= 0xFFF && (arg_save_loc % 8 == 0)) {
                         emit_arm64_str_imm(buf, true, GPR_ARGS[gpr_idx++], SP_REG, arg_save_loc);
                         emit_arm64_str_imm(buf, true, GPR_ARGS[gpr_idx++], SP_REG, arg_save_loc + 8);
@@ -948,10 +1019,12 @@ static infix_status generate_reverse_argument_marshalling_arm64(code_buffer * bu
                         emit_arm64_str_imm(buf, true, GPR_ARGS[gpr_idx++], X10_REG, 8);
                     }
                 }
-                else
+                else {
                     is_from_stack = true;
+                }
             }
             else if (gpr_idx < NUM_GPR_ARGS) {
+                // <= 8 bytes in single GPR
                 if (arg_save_loc >= 0 && ((unsigned)arg_save_loc / 8) <= 0xFFF && (arg_save_loc % 8 == 0))
                     emit_arm64_str_imm(buf, true, GPR_ARGS[gpr_idx++], SP_REG, arg_save_loc);
                 else {
@@ -959,16 +1032,19 @@ static infix_status generate_reverse_argument_marshalling_arm64(code_buffer * bu
                     emit_arm64_str_imm(buf, true, GPR_ARGS[gpr_idx++], X10_REG, 0);
                 }
             }
-            else
+            else {
                 is_from_stack = true;
+            }
         }
+
         if (is_from_stack) {
-            // On macOS, variadic args smaller than 8 bytes are promoted to an 8-byte stack slot.
-            // We must copy the entire slot, not just the type's smaller size.
             size_t size_on_stack = (is_variadic_arg && type->size < 8) ? 8 : type->size;
-            size_on_stack = (size_on_stack + 7) & ~7;  // Ensure it's a multiple of 8
+            size_on_stack = (size_on_stack + 7) & ~7;  // 8-byte aligned
+
             for (size_t offset = 0; offset < size_on_stack; offset += 8) {
+                // ldr x9, [fp, #caller_offset]
                 emit_arm64_ldr_imm(buf, true, X9_REG, X29_FP_REG, (int32_t)(caller_stack_offset + offset));
+
                 int32_t dest_offset = arg_save_loc + (int32_t)offset;
                 if (dest_offset >= 0 && ((unsigned)dest_offset / 8) <= 0xFFF && (dest_offset % 8 == 0))
                     emit_arm64_str_imm(buf, true, X9_REG, SP_REG, dest_offset);
@@ -979,14 +1055,20 @@ static infix_status generate_reverse_argument_marshalling_arm64(code_buffer * bu
             }
             caller_stack_offset += size_on_stack;
         }
+
+        // Write pointer to this saved data into the args_array[i]
         int32_t dest_offset = layout->args_array_offset + (int32_t)(i * sizeof(void *));
+
+        // Calculate absolute address of saved arg: X9 = SP + arg_save_loc
         emit_arm64_add_imm(buf, true, false, X9_REG, SP_REG, (uint32_t)arg_save_loc);
+
         if (dest_offset >= 0 && ((unsigned)dest_offset / 8) <= 0xFFF && (dest_offset % 8 == 0))
             emit_arm64_str_imm(buf, true, X9_REG, SP_REG, dest_offset);
         else {
             emit_arm64_add_imm(buf, true, false, X10_REG, SP_REG, dest_offset);
             emit_arm64_str_imm(buf, true, X9_REG, X10_REG, 0);
         }
+
         current_saved_data_offset += (type->size + 15) & ~15;
     }
     return INFIX_SUCCESS;
@@ -1047,7 +1129,14 @@ static infix_status generate_reverse_epilogue_arm64(code_buffer * buf,
     bool return_in_memory = ret_is_aggregate && context->return_type->size > 16;
     if (context->return_type->category != INFIX_TYPE_VOID && !return_in_memory) {
         const infix_type * base = nullptr;
-        if (is_hfa(context->return_type, &base)) {
+
+        // Explicitly check for 128-bit types.
+        // Note: On macOS ARM64, long double is 8 bytes, so is_long_double() is true but size is 8.
+        // We only want the 128-bit load if the size matches.
+        bool is_128bit = (context->return_type->size == 16);
+        if (is_128bit && (is_long_double(context->return_type) || context->return_type->category == INFIX_TYPE_VECTOR))
+            emit_arm64_ldr_q_imm(buf, V0_REG, SP_REG, layout->return_buffer_offset);
+        else if (is_hfa(context->return_type, &base)) {
             size_t num_elements = context->return_type->size / base->size;
             for (size_t i = 0; i < num_elements; ++i) {
                 emit_arm64_ldr_vpr(buf,
@@ -1057,7 +1146,8 @@ static infix_status generate_reverse_epilogue_arm64(code_buffer * buf,
                                    (int32_t)(layout->return_buffer_offset + i * base->size));  // Explicit cast
             }
         }
-        else if (is_long_double(context->return_type))
+        else if (is_long_double(context->return_type) ||
+                 (context->return_type->category == INFIX_TYPE_VECTOR && context->return_type->size == 16))
             emit_arm64_ldr_q_imm(buf, V0_REG, SP_REG, layout->return_buffer_offset);
         else if (is_float(context->return_type) || is_double(context->return_type))
             emit_arm64_ldr_vpr(buf, is_double(context->return_type), V0_REG, SP_REG, layout->return_buffer_offset);
@@ -1423,8 +1513,11 @@ static infix_status generate_direct_forward_epilogue_arm64(code_buffer * buf,
         else if (is_hfa(ret_type, &hfa_base)) {
             size_t num_elements = ret_type->size / hfa_base->size;
             for (size_t i = 0; i < num_elements; ++i)
-                emit_arm64_str_vpr(
-                    buf, is_double(hfa_base), VPR_ARGS[i], X20_REG, (int32_t)(i * hfa_base->size));  // Explicit cast
+                emit_arm64_str_vpr(buf,
+                                   is_double(hfa_base),
+                                   VPR_ARGS[i],
+                                   X20_REG,
+                                   (int32_t)(i * hfa_base->size));  // Explicit cast
         }
         else if (is_float(ret_type))
             emit_arm64_str_vpr(buf, false, V0_REG, X20_REG, 0);

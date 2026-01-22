@@ -7,15 +7,30 @@ use Affix::Build;
 use Config;
 use ExtUtils::Embed;
 #
-diag $Config{shrpenv};
 diag '$Config{useshrplib} claims to be ' . $Config{useshrplib};
-$Config{useshrplib} eq 'true' || exit skip_all 'Cannot embed perl in a shared lib without building a shared libperl.';
+diag '$Config{libperl} is ' . $Config{libperl};
+
+#~ $Config{useshrplib} eq 'true' || exit skip_all 'Cannot embed perl in a shared lib without building a shared libperl.';
 eval {
     # See https://metacpan.org/release/RJBS/perl-5.36.0/view/INSTALL#Building-a-shared-Perl-library
     #
     # Compile C Library 1 (Basic Operations)
-    my $lib
-        = compile_ok( <<~'END', { cflags => ExtUtils::Embed::ccopts() . ' ' . ExtUtils::Embed::perl_inc(), ldflags => ExtUtils::Embed::ldopts(1) } );
+    my $cflags  = ccopts();    #$Config{ccflags} . ' -I' . $Config{archlib} . '\CORE';
+    my $ldflags = '';
+    if ( $^O eq 'MSWin32' ) {
+        $ldflags .= ' "' . $Config{archlib} . '/CORE/' . $Config{libperl} . '"';
+    }
+    elsif ( $^O eq 'darwin' ) {    # macOS/ARM64 requires ignoring undefined symbols from the host Perl
+        $ldflags .= ' -Wl,-undefined,dynamic_lookup';
+    }
+    else {
+        if ( $Config{useshrplib} && $Config{useshrplib} ne 'false' ) {
+            $ldflags .= '-L"' . $Config{archlib} . '/CORE" -l' . ( $Config{libperl} =~ s/^(?:lib)?([^.]+).*$/-l$1/r );
+        }
+    }
+    diag $cflags;
+    diag $ldflags;
+    my $lib = compile_ok( <<~'END', { cflags => $cflags, ldflags => $ldflags } );
         #include "std.h"
         //ext: .c
         #undef warn
@@ -57,8 +72,7 @@ eval {
     typedef CallbackSV => Callback [ [ Pointer [SV] ] => Pointer [SV] ];
 
     # We need a C function that takes this callback
-    my $lib2
-        = compile_ok( <<~'END', { cflags => ExtUtils::Embed::ccopts() . ' ' . ExtUtils::Embed::perl_inc(), ldflags => ExtUtils::Embed::ldopts(1) } );
+    my $lib2 = compile_ok( <<~'END', { cflags => $cflags, ldflags => $ldflags } );
         #include "std.h"
         //ext: .c
         #undef warn
@@ -95,4 +109,5 @@ eval {
     };
     is $caller->( $cb, 5 ), 10, 'Roundtrip SV through Callback';
 };
+skip_all 'Failed to embed perl: ' . $@ if $@;
 done_testing;

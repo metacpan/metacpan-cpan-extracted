@@ -60,18 +60,15 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2024 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2026 D&D Corporation
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+This program is distributed under the terms of the Artistic License Version 2.0
 
-See C<LICENSE> file and L<https://dev.perl.org/licenses/>
+See the C<LICENSE> file or L<https://opensource.org/license/artistic-2-0> for details
 
 =cut
-
-our $VERSION = '0.01';
 
 use Carp qw/croak/;
 

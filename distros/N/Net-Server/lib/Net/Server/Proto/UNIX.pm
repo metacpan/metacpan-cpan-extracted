@@ -19,7 +19,7 @@ package Net::Server::Proto::UNIX;
 
 use strict;
 use base qw(IO::Socket::UNIX);
-use Socket qw(SOCK_STREAM SOCK_DGRAM);
+use Socket qw(SOCK_STREAM SOCK_DGRAM SOMAXCONN);
 
 sub NS_proto { 'UNIX' }
 sub NS_port   { my $sock = shift; ${*$sock}{'NS_port'}   = shift if @_; return ${*$sock}{'NS_port'}   }
@@ -54,7 +54,7 @@ sub object {
     $sock->NS_port($port);
     $sock->NS_listen(defined($info->{'listen'}) ? $info->{'listen'}
                     : defined($server->{'server'}->{'listen'}) ? $server->{'server'}->{'listen'}
-                    : Socket::SOMAXCONN());
+                    : SOMAXCONN);
     return $sock;
 }
 

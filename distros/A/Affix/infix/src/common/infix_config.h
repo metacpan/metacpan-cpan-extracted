@@ -199,4 +199,16 @@ typedef ptrdiff_t ssize_t;
  * headroom provides that extra space to prevent allocation failures during the copy.
  */
 #define INFIX_TRAMPOLINE_HEADROOM 128
+
+/**
+ * @def INFIX_INTERNAL
+ * @brief When compiling with -fvisibility=hidden, we use this to explicitly mark internal-but-shared functions as
+ * hidden.
+ */
+#if (defined(__GNUC__) || defined(__clang__)) && !defined(_WIN32) && !defined(__CYGWIN__)
+#define INFIX_INTERNAL __attribute__((visibility("hidden")))
+#else
+#define INFIX_INTERNAL
+#endif
+
 /** @endinternal */

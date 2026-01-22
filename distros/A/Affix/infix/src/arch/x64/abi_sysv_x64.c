@@ -418,12 +418,19 @@ static infix_status prepare_forward_call_frame_sysv_x64(infix_arena_t * arena,
             }
             continue;  // Argument classified, skip the rest of the loop.
         }
-        // Step 1: Classify the argument type
+        // Classify the argument type
         // Special case: `long double` is always passed on the stack.
         if (is_long_double(type)) {
             layout->arg_locations[i].type = ARG_LOCATION_STACK;
+            size_t align = type->alignment;
+
+            if (align < 8)
+                align = 8;  // Stack slots are minimum 8 bytes
+
+            // Align current offset up to the required alignment (e.g. 16)
+            current_stack_offset = (current_stack_offset + (align - 1)) & ~(align - 1);
             layout->arg_locations[i].stack_offset = current_stack_offset;
-            current_stack_offset += (type->size + 7) & ~7;  // Align to 8 bytes.
+            current_stack_offset += (type->size + 7) & ~7;  // Advance by size, 8-byte aligned
             layout->num_stack_args++;
             continue;  // Go to next argument
         }
@@ -481,7 +488,7 @@ static infix_status prepare_forward_call_frame_sysv_x64(infix_arena_t * arena,
                 }
             }
             else {  // num_classes == 2
-                // Case 2: Argument is passed in two registers.
+                // Argument is passed in two registers.
                 // Here, a combined check is correct, as we must have room for both parts.
                 size_t gpr_needed = (classes[0] == INTEGER) + (classes[1] == INTEGER);
                 size_t xmm_needed = (classes[0] == SSE) + (classes[1] == SSE);
@@ -514,9 +521,15 @@ static infix_status prepare_forward_call_frame_sysv_x64(infix_arena_t * arena,
                 }
             }
         }
-        // Step 4: Fallback to stack
+        // Fallback to stack
         if (!placed_in_register) {
             layout->arg_locations[i].type = ARG_LOCATION_STACK;
+            // Align current offset to the argument's natural alignment requirements.
+            // SysV requires 16-byte alignment for long double, __int128, and __m128 on the stack.
+            size_t align = type->alignment;
+            if (align < 8)
+                align = 8;  // Stack slots are at least 8 bytes
+            current_stack_offset = (current_stack_offset + (align - 1)) & ~(align - 1);  // Align up
             layout->arg_locations[i].stack_offset = current_stack_offset;
             current_stack_offset += (type->size + 7) & ~7;  // Align to 8 bytes.
             layout->num_stack_args++;
@@ -938,24 +951,51 @@ static infix_status generate_reverse_argument_marshalling_sysv_x64(code_buffer *
     for (size_t i = 0; i < context->num_args; i++) {
         int32_t arg_save_loc = layout->saved_args_offset + current_saved_data_offset;
         infix_type * current_type = context->arg_types[i];
-        arg_class_t classes[2];
-        size_t num_classes;
-        classify_aggregate_sysv(current_type, classes, &num_classes);
+
+        // Correct classification logic for vectors/primitives vs aggregates
+        arg_class_t classes[2] = {NO_CLASS, NO_CLASS};
+        size_t num_classes = 0;
+        bool is_aggregate =
+            (current_type->category == INFIX_TYPE_STRUCT || current_type->category == INFIX_TYPE_UNION ||
+             current_type->category == INFIX_TYPE_ARRAY || current_type->category == INFIX_TYPE_COMPLEX);
+
+        if (is_aggregate) {
+            classify_aggregate_sysv(current_type, classes, &num_classes);
+        }
+        else if (is_float(current_type) || is_double(current_type) || current_type->category == INFIX_TYPE_VECTOR) {
+            classes[0] = SSE;
+            num_classes = 1;
+        }
+        else {
+            classes[0] = INTEGER;
+            num_classes = 1;
+            if (current_type->size > 8) {
+                classes[1] = INTEGER;
+                num_classes = 2;
+            }
+        }
+
         bool is_from_stack = false;
         // Determine if the argument is in registers or on the stack.
         if (classes[0] == MEMORY)
             is_from_stack = true;
         else if (num_classes == 1) {
             if (classes[0] == SSE)
-                if (xmm_idx < NUM_XMM_ARGS)
-                    emit_movsd_mem_xmm(buf, RBP_REG, arg_save_loc, XMM_ARGS[xmm_idx++]);
+                if (xmm_idx < NUM_XMM_ARGS) {
+                    // Use 128-bit move for vectors to prevent truncation
+                    if (current_type->category == INFIX_TYPE_VECTOR && current_type->size == 16)
+                        emit_movups_mem_xmm(buf, RBP_REG, arg_save_loc, XMM_ARGS[xmm_idx++]);
+                    else if (is_float(current_type))
+                        emit_movss_mem_xmm(buf, RBP_REG, arg_save_loc, XMM_ARGS[xmm_idx++]);
+                    else
+                        emit_movsd_mem_xmm(buf, RBP_REG, arg_save_loc, XMM_ARGS[xmm_idx++]);
+                }
                 else
                     is_from_stack = true;
-            else  // INTEGER
-                if (gpr_idx < NUM_GPR_ARGS)
-                    emit_mov_mem_reg(buf, RBP_REG, arg_save_loc, GPR_ARGS[gpr_idx++]);
-                else
-                    is_from_stack = true;
+            else if (gpr_idx < NUM_GPR_ARGS)
+                emit_mov_mem_reg(buf, RBP_REG, arg_save_loc, GPR_ARGS[gpr_idx++]);
+            else
+                is_from_stack = true;
         }
         else if (num_classes == 2) {
             size_t gprs_needed = (classes[0] == INTEGER) + (classes[1] == INTEGER);
@@ -1089,8 +1129,10 @@ static infix_status generate_reverse_epilogue_sysv_x64(code_buffer * buf,
             // Classify the return type to determine which registers to load.
             arg_class_t classes[2];
             size_t num_classes;
+            // Ensure 128-bit vectors are also classified as SSE
             if (context->return_type->category == INFIX_TYPE_VECTOR &&
-                (context->return_type->size == 32 || context->return_type->size == 64)) {
+                (context->return_type->size == 16 || context->return_type->size == 32 ||
+                 context->return_type->size == 64)) {
                 classes[0] = SSE;
                 num_classes = 1;
             }
@@ -1104,6 +1146,9 @@ static infix_status generate_reverse_epilogue_sysv_x64(code_buffer * buf,
                         emit_vmovupd_ymm_mem(buf, XMM0_REG, RBP_REG, layout->return_buffer_offset);
                     else if (context->return_type->category == INFIX_TYPE_VECTOR && context->return_type->size == 64)
                         emit_vmovupd_zmm_mem(buf, XMM0_REG, RBP_REG, layout->return_buffer_offset);
+                    // Use 128-bit move for standard vectors
+                    else if (context->return_type->category == INFIX_TYPE_VECTOR)
+                        emit_movups_xmm_mem(buf, XMM0_REG, RBP_REG, layout->return_buffer_offset);
                     else
                         emit_movsd_xmm_mem(buf, XMM0_REG, RBP_REG, layout->return_buffer_offset);
                 }

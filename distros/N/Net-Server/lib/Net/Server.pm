@@ -21,15 +21,29 @@
 package Net::Server;
 
 use strict;
-use Socket qw(AF_INET AF_UNIX SOCK_DGRAM SOCK_STREAM);
+use Socket ();
 use IO::Socket ();
 use IO::Select ();
 use POSIX ();
-use Net::Server::Proto ();
+use Net::Server::Proto qw[
+    AF_INET
+    AF_INET6
+    AF_UNIX
+    SOCK_DGRAM
+    SOCK_STREAM
+    SOL_SOCKET
+    SO_TYPE
+    sockaddr_family
+    sockaddr_in
+    sockaddr_in6
+    inet_ntoa
+    inet_ntop
+    safe_name_info
+];
 use Net::Server::Daemonize qw(check_pid_file create_pid_file safe_fork
                               get_uid get_gid set_uid set_gid);
 
-our $VERSION = '2.014';
+our $VERSION = '2.015';
 
 sub new {
     my $class = shift || die "Missing class";
@@ -451,7 +465,7 @@ sub accept {
         }
         $self->fatal("Received a bad sock!") if ! defined $sock;
 
-        if (SOCK_DGRAM == $sock->getsockopt(Socket::SOL_SOCKET(), Socket::SO_TYPE())) { # receive a udp packet
+        if (SOCK_DGRAM == $sock->getsockopt(SOL_SOCKET, SO_TYPE)) { # receive a udp packet
             $prop->{'client'}   = $sock;
             $prop->{'udp_true'} = 1;
             $prop->{'udp_peer'} = $sock->recv($prop->{'udp_data'}, $sock->NS_recv_len, $sock->NS_recv_flags);
@@ -535,20 +549,18 @@ sub get_client_info {
     }
 
     my $addr;
-    if ($prop->{'udp_true'}) {
-        if ($client->sockdomain == AF_INET) {
-            ($prop->{'peerport'}, $addr) = Socket::sockaddr_in($prop->{'udp_peer'});
-            $prop->{'peeraddr'} = Socket::inet_ntoa($addr);
-        } else {
-            ($prop->{'peerport'}, $addr) = Socket6::sockaddr_in6($prop->{'udp_peer'});
-            $prop->{'peeraddr'} = Socket6->can('inet_ntop')
-                                ? Socket6::inet_ntop($client->sockdomain, $addr)
-                                : Socket::inet_ntoa($addr);
+    if (my $peer = $prop->{'udp_true'} ? $prop->{'udp_peer'} : eval { $client->peername }) {
+        if (my $family = sockaddr_family( $prop->{'peername'} = $peer )) {
+            if ($family == AF_INET) {
+                ($prop->{'peerport'}, $addr) = sockaddr_in($peer);
+                $prop->{'peeraddr'} = inet_ntoa($addr);
+            } elsif (eval { Net::Server::Proto->ipv6_package($self) }) {
+                ($prop->{'peerport'}, $addr) = sockaddr_in6($peer);
+                $prop->{'peeraddr'} = inet_ntop($client->sockdomain, $addr);
+            } else {
+                $self->fatal("No IPv6 support for non-AF_INET sockdomain $@");
+            }
         }
-    } elsif ($prop->{'peername'} = $client->peername) {
-        $addr               = $client->peeraddr;
-        $prop->{'peeraddr'} = $client->peerhost;
-        $prop->{'peerport'} = $client->peerport;
     } else {
         @{ $prop }{qw(peeraddr peerhost peerport)} = ('0.0.0.0', 'inet.test', 0); # commandline
     }
@@ -557,14 +569,13 @@ sub get_client_info {
     if ($addr && $prop->{'reverse_lookups'}) {
         if ($client->can('peerhostname')) {
             $prop->{'peerhost'} = $client->peerhostname;
-        } elsif ($INC{'Socket6.pm'} && Socket6->can('getnameinfo')) {
-            my @res = Socket6::getnameinfo($client->peername, 0);
-            $prop->{'peerhost'} = $res[0] if @res > 1;
+        } elsif ($prop->{'peername'} and my @res = safe_name_info($prop->{'peername'}, 0)) {
+            $prop->{'peerhost'} = $res[1] if @res > 1 and !$res[0];
         } else {
             $prop->{'peerhost'} = gethostbyaddr($addr, AF_INET);
         }
         if ($prop->{'peerhost'} && $prop->{'double_reverse_lookups'}) {
-            $prop->{'peerhost_rev'} = {map {$_->[0] => 1} Net::Server::Proto->get_addr_info($prop->{'peerhost'})};
+            $prop->{'peerhost_rev'} = {map {$_->[0] => 1} Net::Server::Proto->get_addr_info($prop->{'peerhost'}, undef, undef, $self)};
         }
     }
 

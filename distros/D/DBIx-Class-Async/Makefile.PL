@@ -54,6 +54,10 @@ WriteMakefile(
                 file    => 'lib/DBIx/Class/Async/ResultSet.pm',
                 version => MM->parse_version('lib/DBIx/Class/Async/ResultSet.pm')
             },
+            'DBIx::Class::Async::ResultComponent' => {
+                file    => 'lib/DBIx/Class/Async/ResultComponent.pm',
+                version => MM->parse_version('lib/DBIx/Class/Async/ResultComponent.pm')
+            },
             'DBIx::Class::Async::ResultSet::Pager' => {
                 file    => 'lib/DBIx/Class/Async/ResultSet/Pager.pm',
                 version => MM->parse_version('lib/DBIx/Class/Async/ResultSet/Pager.pm')

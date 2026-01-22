@@ -16,11 +16,11 @@ DBIx::Class::Async::ResultSet - Asynchronous resultset for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.41
+Version 0.43
 
 =cut
 
-our $VERSION = '0.41';
+our $VERSION = '0.43';
 
 =head1 SYNOPSIS
 
@@ -201,7 +201,7 @@ Detects nested data structures (hashes or arrays) in the input and injects
 them into the object's internal relationship cache, allowing for
 non-blocking access to related data.
 
-=item * B<Data Normalization>:
+=item * B<Data Normalisation>:
 
 Handles SQL aliases (like C<me.id>), primary key detection for storage state,
 and preserves literal SQL columns (like C<COUNT(*)>) that may not exist
@@ -241,7 +241,7 @@ sub new_result {
         $is_in_storage = 1;
     }
 
-    # 3. Data Normalization (Keeping the working Prefetch & Count fixes)
+    # 3. Data Normalisation (Keeping the working Prefetch & Count fixes)
     my %clean_data;
     my %rel_data;
 
@@ -297,7 +297,7 @@ sub new_result {
         bless $row, $anon_class;
     }
 
-    # 6. Finalize state
+    # 6. Finalise state
     $row->{_dirty} = {} if $is_in_storage;
     $row->{_data}  = \%clean_data;
 
@@ -370,45 +370,26 @@ Results are cached internally for use with C<next> and C<reset> methods.
 sub all {
     my $self = shift;
 
-    # 1. Handle cached or prefetched ResultSet
-    if ($self->{is_prefetched} && $self->{entries}) {
-        # If entries are already objects (from set_cache), return them
-        if (ref $self->{entries}[0]
-            && $self->{entries}[0]->isa('DBIx::Class::Async::Row')) {
-            $self->{_rows} = $self->{entries};
-            return Future->done($self->{_rows});
-        }
+    # 1. Return cached objects if we have them
+    return Future->done($self->{_rows}) if $self->{_rows};
 
-        # Otherwise, inflate raw entries
-        my @rows       = map { $self->new_result($_) } @{$self->{entries}};
-        $self->{_rows} = \@rows;
-        return Future->done(\@rows);
+    # 2. Handle Prefetched/Manual entries
+    if ($self->{is_prefetched} && $self->{entries}) {
+        # Check if they are already objects or need inflation
+        if (ref $self->{entries}[0] && $self->{entries}[0]->isa('DBIx::Class::Async::Row')) {
+            $self->{_rows} = $self->{entries};
+        } else {
+            $self->{_rows} = $self->_inflate_collection($self->{entries});
+        }
+        return Future->done($self->{_rows});
     }
 
-    # 2. Standard Async Fetch
-    return $self->{async_db}->search(
-        $self->{source_name},
-        $self->{_cond},
-        $self->{_attrs}
-    )->then(sub {
+    # 3. Standard Async Fetch
+    return $self->all_future->then(sub {
         my ($rows_data) = @_;
-
-        my @rows = map {
-            my $row_data = $_;
-            my $row = $self->new_result($row_data);
-
-            # If the hash contains nested data, it's prefetched
-            if (grep { ref($row_data->{$_}) } keys %$row_data) {
-                $self->_inflate_prefetch($row, $row_data, $self->{_attrs}{prefetch});
-            }
-
-            $row;
-        } @$rows_data;
-
-        $self->{_rows} = \@rows;
+        $self->{_rows} = $self->_inflate_collection($rows_data);
         $self->{_pos}  = 0;
-
-        return Future->done(\@rows);
+        return Future->done($self->{_rows});
     });
 }
 
@@ -475,16 +456,23 @@ sub as_query {
     my $schema_class = $bridge->{schema_class};
 
     unless ($schema_class->can('resultset')) {
-        eval "require $schema_class" or die "as_query: Could not load $schema_class: $@";
+        eval "require $schema_class" or die "as_query: $@";
     }
 
-    $bridge->{_metadata_schema} //= $schema_class->connect();
+    # Silence the "Generic Driver" warnings for the duration of this method
+    local $SIG{__WARN__} = sub {
+        warn @_ unless $_[0] =~ /undetermined_driver|sql_limit_dialect|GenericSubQ/
+    };
 
+    unless ($bridge->{_metadata_schema}) {
+        $bridge->{_metadata_schema} = $schema_class->connect('dbi:NullP:');
+    }
+
+    # SQL is generated lazily; warnings often trigger here or at as_query()
     my $real_rs = $bridge->{_metadata_schema}
                          ->resultset($self->{source_name})
                          ->search($self->{_cond}, $self->{_attrs});
 
-    # This always returns the \[ $sql, @bind ] structure
     return $real_rs->as_query;
 }
 
@@ -528,10 +516,8 @@ A L<Future> that resolves to the number of matching rows.
 sub count {
     my $self = shift;
 
-    # If we have rows/offset, we need to count differently
-    # We can't just pass the condition - we need to actually apply the slice
-    if (exists $self->{_attrs}{rows} || exists $self->{_attrs}{offset}) {
-        # For sliced ResultSets, we need to fetch and count
+    # We simply fetch the results and return the count of the array.
+    if ($self->{_attrs}{rows} || $self->{_attrs}{offset}) {
         return $self->all->then(sub {
             my ($results) = @_;
             return Future->done(scalar @$results);
@@ -812,33 +798,22 @@ SQL delete via the underlying database handle.
 
 sub delete {
     my $self = shift;
+    my $bridge = $self->{async_db};
 
-    # Get all rows to count them and get their IDs
-    return $self->all_future->then(sub {
-        my ($rows) = @_;
+    return $self->delete_all if keys %{$self->{attrs} || {}};
 
-        # If no rows, return 0
-        return Future->done(0) unless @$rows;
+    # SAFETY CHECK: Only use Path A if we have a simple condition
+    # AND no complex attributes (rows, offset, etc.)
+    # AND the condition is a HASH with actual keys.
+    if ( !keys %{$self->{attrs} || {}}
+         && ref($self->{cond}) eq 'HASH'
+         && keys %{$self->{cond}} ) {
 
-        # Delete each row
-        my @futures;
-        my @pk = $self->result_source->primary_columns;
+        return $bridge->delete($self->{source_name}, $self->{cond});
+    }
 
-        foreach my $row_data (@$rows) {
-            my $id = $row_data->{$pk[0]};
-            push @futures, $self->{async_db}->delete($self->{source_name}, $id);
-        }
-
-        return Future->wait_all(@futures)->then(sub {
-            # Count successful deletes
-            my $deleted_count = 0;
-            foreach my $f (@_) {
-                my $result = eval { $f->get };
-                $deleted_count++ if $result;
-            }
-            return Future->done($deleted_count);
-        });
-    });
+    # DEFAULT/PATH B: Use the safe ID-mapping path.
+    return $self->delete_all;
 }
 
 =head2 delete_all
@@ -894,35 +869,28 @@ Use C<delete> when you need:
 =cut
 
 sub delete_all {
-    my $self = shift;
+    my $self   = shift;
+    my $bridge = $self->{async_db};
 
-    # Fetch all rows as Row objects (not raw data)
+    # Step 1: Fetch the rows matching the search (honours LIMIT/OFFSET)
     return $self->all->then(sub {
         my ($rows) = @_;
 
-        # If no rows, return 0
-        return Future->done(0) unless @$rows;
+        # Step 2: If no rows found, return 0 immediately (as a Future)
+        return Future->done(0) unless $rows && @$rows;
 
-        # Delete each Row object individually
-        # This will trigger all DBIC row-level operations
-        my @futures;
+        # Step 3: Extract Primary Keys
+        my ($pk)  = $self->result_source->primary_columns;
+        my @ids   = map { $_->get_column($pk) } @$rows;
+        my $count = scalar @ids;
 
-        foreach my $row (@$rows) {
-            # Call delete on the Row object
-            # This ensures triggers and cascades work
-            push @futures, $row->delete;
-        }
-
-        return Future->wait_all(@futures)->then(sub {
-            # Count successful deletes
-            my $deleted_count = 0;
-            foreach my $f (@_) {
-                my $result = eval { $f->get };
-                if ($result && !$@) {
-                    $deleted_count++;
-                }
-            }
-            return Future->done($deleted_count);
+        # Step 4: Send ONE bulk request to the bridge using WHERE IN (...)
+        return $bridge->delete(
+            $self->{source_name},
+            { $pk => { -in => \@ids } }
+        )->then(sub {
+            # Step 5: Return the count of rows we actually deleted
+            return Future->done($count);
         });
     });
 }
@@ -974,22 +942,27 @@ Dies if composite primary key is not supported.
 sub find {
     my ($self, @args) = @_;
 
+    # Extract attributes if the last argument is a hashref
+    # and we have more than one argument total.
+    my $attrs = (ref $args[-1] eq 'HASH' && @args > 1) ? pop @args : {};
+
     my $cond;
-
-    # Scalar -> primary key lookup (DBIC semantics)
     if (@args == 1 && !ref $args[0]) {
+        # Standard: find(5)
         my @pk = $self->result_source->primary_columns;
-        die "Composite PK not supported" if @pk != 1;
-
         $cond = { $pk[0] => $args[0] };
     }
-    else {
-        # Hashref or complex condition
+    elsif (ref $args[0] eq 'HASH') {
+        # Standard: find({ email => 'test@example.com' })
         $cond = $args[0];
     }
+    else {
+        # Composite PK: find(1, 2)
+        my @pk = $self->result_source->primary_columns;
+        $cond = { map { $pk[$_] => $args[$_] } 0 .. $#pk };
+    }
 
-    # Fully async: search builds query, single_future executes async
-    return $self->search($cond)->single_future;
+    return $self->single_future($cond, $attrs);
 }
 
 =head2 find_or_new
@@ -1091,10 +1064,12 @@ sub first {
         return Future->done($self->new_result($self->{entries}[0]));
     }
 
-    return $self->search(undef, { rows => 1 })->all->then(sub {
-        my (@rows) = @_;
-        return Future->done($rows[0]);
-    });
+    return $self->search(undef, { rows => 1 })
+                ->all
+                ->then(sub {
+                    my ($rows) = @_;
+                    return Future->done($rows->[0]);
+                });
 }
 
 =head2 first_future
@@ -1318,6 +1293,8 @@ B<PRO-TIP>: Warn the user if they are paginating unordered data.
 sub pager {
     my $self = shift;
 
+    return $self->{_pager} if $self->{_pager};
+
     unless ($self->is_paged) {
         die "Cannot call ->pager on a non-paged resultset. Call ->page(\$n) first.";
     }
@@ -1329,7 +1306,7 @@ sub pager {
     }
 
     require DBIx::Class::Async::ResultSet::Pager;
-    return DBIx::Class::Async::ResultSet::Pager->new(resultset => $self);
+    return $self->{_pager} = DBIx::Class::Async::ResultSet::Pager->new(resultset => $self);
 }
 
 =head2 populate
@@ -1813,16 +1790,17 @@ sub search {
     if (ref $cond eq 'REF' || ref $cond eq 'SCALAR') {
         $new_cond = $cond;
     }
+
     # 2. If the current existing condition is a literal,
     # and we try to add a hash, we usually want to encapsulate or override.
     # For now, let's allow the new condition to take precedence if it's a hash.
     elsif (ref $cond eq 'HASH') {
-        if (ref $self->{_cond} eq 'HASH') {
-            $new_cond = { %{$self->{_cond}}, %$cond };
+        if (ref $self->{_cond} eq 'HASH' && keys %{$self->{_cond}}) {
+            # ONLY use -and if we actually have two sets of criteria to join
+            $new_cond = { -and => [ $self->{_cond}, $cond ] };
         }
         else {
-            # If current is literal and new is hash, prioritize the new hash
-            # or handle based on your preference. Most DBIC users expect a merge.
+            # If the current condition is empty/undef, just use the new one
             $new_cond = $cond;
         }
     }
@@ -1837,6 +1815,7 @@ sub search {
         _attrs        => { %{$self->{_attrs} || {}}, %{$attrs || {}} },
         _rows         => undef,
         _pos          => 0,
+        _pager        => undef,
         entries       => undef,
         is_prefetched => 0,
     }, ref $self;
@@ -1935,7 +1914,7 @@ sub search_related_rs {
         return Future->done;
     })->get;
 
-This is a convenience method that performs a search and initializes a pager
+This is a convenience method that performs a search and initialises a pager
 simultaneously. It returns a L<Future> which, when resolved, provides two values:
 an arrayref of result objects (C<$rows>) and a L<DBIx::Class::Async::ResultSet::Pager>
 object (C<$pager>).
@@ -2053,7 +2032,7 @@ or C<undef> if not found.
 
 =item B<Notes>
 
-For simple primary key lookups, this method optimizes by using C<find>
+For simple primary key lookups, this method optimises by using C<find>
 internally. For complex queries, it adds C<rows =E<gt> 1> to the search
 attributes.
 
@@ -2062,7 +2041,7 @@ attributes.
 =cut
 
 sub single_future {
-    my $self = shift;
+    my ($self, $cond, $attrs) = @_;
 
     if ($self->{is_prefetched} && $self->{entries}) {
         my $data = $self->{entries}[0];
@@ -2088,7 +2067,7 @@ sub single_future {
         });
     }
 
-    return $self->search({}, { rows => 1 })->all->then(sub {
+    return $self->search($cond, { %{ $attrs || {} }, rows => 1 })->all->then(sub {
         my $results = shift;
         my $row = ($results && @$results) ? $results->[0] : undef;
         return Future->done($row);
@@ -2255,16 +2234,36 @@ row updates, use C<update> on the row object instead.
 sub update {
     my ($self, $data) = @_;
 
-    # Perform a single bulk update via the worker
-    # This uses the search condition (e.g., { active => 1 })
-    # instead of individual row IDs.
-    return $self->{async_db}->update_bulk(
-        $self->{source_name},
-        $self->{_cond} || {},
-        $data
-    )->then(sub {
-        my ($rows_affected) = @_;
-        return Future->done($rows_affected);
+    # PATH A: Fast Path
+    # If there are no complex attributes (like rows/offset),
+    # send the condition directly to the bridge.
+    if ( keys %{$self->{attrs} || {}} == 0 && $self->{cond} && keys %{$self->{cond}} ) {
+        return $self->{async_db}->update($self->{source_name}, $self->{cond}, $data);
+    }
+
+    # PATH B: Safe Path (The Optimisation)
+    # Use the ID-mapping strategy to respect LIMIT/OFFSET.
+    return $self->update_all($data);
+}
+
+
+sub update_all {
+    my ($self, $updates) = @_;
+    my $bridge = $self->{async_db};
+
+    return $self->all->then(sub {
+        my ($rows) = @_;
+        return Future->done(0) unless $rows && @$rows;
+
+        my ($pk) = $self->result_source->primary_columns;
+        my @ids  = map { $_->get_column($pk) } @$rows;
+
+        # Send ONE bulk update to the bridge
+        return $bridge->update(
+            $self->{source_name},
+            { $pk => { -in => \@ids } },
+            $updates
+        )->then(sub { Future->done(scalar @ids) });
     });
 }
 
@@ -2475,6 +2474,24 @@ sub _get_source {
     return $self->{_source};
 }
 
+sub _inflate_collection {
+    my ($self, $rows_data) = @_;
+    return [] unless $rows_data && ref $rows_data eq 'ARRAY';
+
+    my $prefetch = $self->{_attrs}{prefetch};
+
+    return [ map {
+        my $row_data = $_;
+        my $row = $self->new_result($row_data);
+
+        # This is what fixed the HasMany failure:
+        if ($prefetch) {
+            $self->_inflate_prefetch($row, $row_data, $prefetch);
+        }
+        $row;
+    } @$rows_data ];
+}
+
 =head2 _inflate_prefetch
 
 Inflates prefetched relationship data into the row object.
@@ -2482,23 +2499,50 @@ Inflates prefetched relationship data into the row object.
 =cut
 
 sub _inflate_prefetch {
-    my ($self, $row, $data, $prefetch_spec) = @_;
+    my ($self, $row, $raw_data, $prefetch) = @_;
 
-    # Initialize prefetch storage in the row if not exists
-    $row->{_prefetched} ||= {};
+    return unless $prefetch;
 
-    # Handle both scalar and arrayref prefetch specs
-    my @prefetches = grep { defined }
-        ref $prefetch_spec eq 'ARRAY' ? @$prefetch_spec : ($prefetch_spec);
+    # Normalise prefetch to an array for easier looping
+    my @prefetches = ref $prefetch eq 'ARRAY' ? @$prefetch
+                        : ref $prefetch eq 'HASH'  ? keys %$prefetch
+                        : ($prefetch);
 
-    foreach my $prefetch (@prefetches) {
-        # Handle nested prefetch (e.g., 'comments.user')
-        if ($prefetch =~ /\./) {
-            my @parts = split /\./, $prefetch;
-            $self->_inflate_nested_prefetch($row, $data, \@parts);
-        } else {
-            # Simple prefetch
-            $self->_inflate_simple_prefetch($row, $data, $prefetch);
+    foreach my $rel_name (@prefetches) {
+        # The worker sends prefetched data under the relationship name
+        my $rel_data = $raw_data->{$rel_name};
+        next unless defined $rel_data;
+
+        my $rel_info = $self->result_source->relationship_info($rel_name);
+        next unless $rel_info;
+
+        # Get the ResultSource for the related table
+        my $rel_source_name = $rel_info->{source};
+        my $rel_rs = $self->{schema}->resultset($rel_source_name);
+
+        if (ref $rel_data eq 'ARRAY') {
+            # has_many relationship: turn array of hashes into a virtual ResultSet
+            my @rel_objs = map { $rel_rs->new_result($_) } @$rel_data;
+
+            $row->{_relationship_data}{$rel_name} = $rel_rs->new_result_set({
+                entries       => \@rel_objs,
+                is_prefetched => 1,
+            });
+        }
+        elsif (ref $rel_data eq 'HASH') {
+             # belongs_to / might_have: turn single hash into a Row object
+             $row->{_relationship_data}{$rel_name} = $rel_rs->new_result($rel_data);
+        }
+
+        # Recursive prefetch: If the prefetch arg was a hash,
+        # dive deeper (e.g., { orders => 'order_items' })
+        if (ref $prefetch eq 'HASH' && ref $prefetch->{$rel_name}) {
+            my $sub_row = $row->{_relationship_data}{$rel_name};
+
+            # If it's a single row, inflate its sub-children
+            if (blessed($sub_row)) {
+                 $self->_inflate_prefetch($sub_row, $rel_data, $prefetch->{$rel_name});
+            }
         }
     }
 }

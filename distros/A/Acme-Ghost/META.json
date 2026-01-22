@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -42,7 +42,7 @@
    "resources" : {
       "homepage" : "https://sourceforge.net/projects/acme-ghost/",
       "license" : [
-         "https://dev.perl.org/licenses"
+         "https://opensource.org/license/artistic-2-0"
       ],
       "repository" : {
          "type" : "git",
@@ -50,6 +50,6 @@
          "web" : "https://sourceforge.net/p/acme-ghost/code/ci/master/tree/"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

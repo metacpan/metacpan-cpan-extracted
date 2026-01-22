@@ -65,10 +65,10 @@ Properties:
 
 =over
 
-=item C<contact>, The individual that is responsible for specific data
+=item * C<contact>, The individual that is responsible for specific data
 governance role(s).
 
-=item C<organization>, The organization that is responsible for specific
+=item * C<organization>, The organization that is responsible for specific
 data governance role(s).
 
 =back

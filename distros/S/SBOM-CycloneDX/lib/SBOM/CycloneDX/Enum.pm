@@ -8,23 +8,27 @@ use utf8;
 require SBOM::CycloneDX::Schema;
 require SBOM::CycloneDX::Util;
 
-use SBOM::CycloneDX::Enum::CommonExtensionName          ();
-use SBOM::CycloneDX::Enum::ComponentType                ();
-use SBOM::CycloneDX::Enum::CryptoAssetType              ();
-use SBOM::CycloneDX::Enum::CryptoCertificationLevel     ();
-use SBOM::CycloneDX::Enum::CryptoFunction               ();
-use SBOM::CycloneDX::Enum::CryptoImplementationPlatform ();
-use SBOM::CycloneDX::Enum::CryptoMode                   ();
-use SBOM::CycloneDX::Enum::CryptoPadding                ();
-use SBOM::CycloneDX::Enum::CryptoPrimitive              ();
-use SBOM::CycloneDX::Enum::ExternalReferenceType        ();
-use SBOM::CycloneDX::Enum::HashAlgorithm                ();
-use SBOM::CycloneDX::Enum::LicenseType                  ();
-use SBOM::CycloneDX::Enum::LifecyclePhase               ();
-use SBOM::CycloneDX::Enum::ProtocolType                 ();
-use SBOM::CycloneDX::Enum::RelatedCryptoMaterialState   ();
-use SBOM::CycloneDX::Enum::RelatedCryptoMaterialType    ();
-use SBOM::CycloneDX::Enum::TlpClassification            ();
+use SBOM::CycloneDX::Enum::CommonExtensionName;
+use SBOM::CycloneDX::Enum::ComponentType;
+use SBOM::CycloneDX::Enum::CryptoAssetType;
+use SBOM::CycloneDX::Enum::CryptoCertificationLevel;
+use SBOM::CycloneDX::Enum::CryptoFunction;
+use SBOM::CycloneDX::Enum::CryptoImplementationPlatform;
+use SBOM::CycloneDX::Enum::CryptoMode;
+use SBOM::CycloneDX::Enum::CryptoPadding;
+use SBOM::CycloneDX::Enum::CryptoPrimitive;
+use SBOM::CycloneDX::Enum::ExternalReferenceType;
+use SBOM::CycloneDX::Enum::HashAlgorithm;
+use SBOM::CycloneDX::Enum::ImpactAnalysisJustification;
+use SBOM::CycloneDX::Enum::ImpactAnalysisState;
+use SBOM::CycloneDX::Enum::LicenseType;
+use SBOM::CycloneDX::Enum::LifecyclePhase;
+use SBOM::CycloneDX::Enum::PatentAssertionType;
+use SBOM::CycloneDX::Enum::PatentLegalStatus;
+use SBOM::CycloneDX::Enum::ProtocolType;
+use SBOM::CycloneDX::Enum::RelatedCryptoMaterialState;
+use SBOM::CycloneDX::Enum::RelatedCryptoMaterialType;
+use SBOM::CycloneDX::Enum::TlpClassification;
 
 use Cpanel::JSON::XS qw(decode_json);
 
@@ -42,42 +46,28 @@ our @EXPORT_OK = qw(
     CRYPTO_PRIMITIVE
     EXTERNAL_REFERENCE_TYPE
     HASH_ALGORITHM
+    IMPACT_ANALYSIS_JUSTIFICATION
+    IMPACT_ANALYSIS_STATE
     LICENSE_TYPE
     LIFECYCLE_PHASE
+    PATENT_ASSERTION_TYPE
+    PATENT_LEGAL_STATUS
     PROTOCOL_TYPE
     RELATED_CRYPTO_MATERIAL_STATE
     RELATED_CRYPTO_MATERIAL_TYPE
     TLP_CLASSIFICATION
 );
 
-state @SPDX_LICENSES = do {
+state @SPDX_LICENSES;
+
+unless (@SPDX_LICENSES) {
     my $spdx_json_schema_file = SBOM::CycloneDX::Schema::schema_file('spdx.schema.json');
     my $spdx_json_schema      = decode_json(SBOM::CycloneDX::Util::file_read($spdx_json_schema_file));
 
-    @{$spdx_json_schema->{enum}};
-};
+    @SPDX_LICENSES = @{$spdx_json_schema->{enum}};
+}
 
 use constant SPDX_LICENSES => \@SPDX_LICENSES;
-
-# LEGACY
-use constant COMMON_EXTENSION_NAMES          => SBOM::CycloneDX::Enum::CommonExtensionName->values();
-use constant COMPONENT_TYPES                 => SBOM::CycloneDX::Enum::ComponentType->values();
-use constant CRYPTO_ASSET_TYPES              => SBOM::CycloneDX::Enum::CryptoAssetType->values();
-use constant CRYPTO_CERTIFICATION_LEVELS     => SBOM::CycloneDX::Enum::CryptoCertificationLevel->values();
-use constant CRYPTO_FUNCTIONS                => SBOM::CycloneDX::Enum::CryptoFunction->values();
-use constant CRYPTO_IMPLEMENTATION_PLATFORMS => SBOM::CycloneDX::Enum::CryptoImplementationPlatform->values();
-use constant CRYPTO_MODES                    => SBOM::CycloneDX::Enum::CryptoMode->values();
-use constant CRYPTO_PADDINGS                 => SBOM::CycloneDX::Enum::CryptoAssetType->values();
-use constant CRYPTO_PRIMITIVES               => SBOM::CycloneDX::Enum::CryptoPrimitive->values();
-use constant EXTERNAL_REFERENCE_TYPES        => SBOM::CycloneDX::Enum::ExternalReferenceType->values();
-use constant HASH_ALGORITHMS                 => SBOM::CycloneDX::Enum::HashAlgorithm->values();
-use constant LICENSE_TYPES                   => SBOM::CycloneDX::Enum::LicenseType->values();
-use constant LIFECYCLE_PHASES                => SBOM::CycloneDX::Enum::LifecyclePhase->values();
-use constant PROTOCOL_TYPES                  => SBOM::CycloneDX::Enum::ProtocolType->values();
-use constant RELATED_CRYPTO_MATERIAL_STATES  => SBOM::CycloneDX::Enum::RelatedCryptoMaterialState->values();
-use constant RELATED_CRYPTO_MATERIAL_TYPES   => SBOM::CycloneDX::Enum::RelatedCryptoMaterialType->values();
-use constant TLP_CLASSIFICATIONS             => SBOM::CycloneDX::Enum::TlpClassification->values();
-
 
 use constant {
     COMMON_EXTENSION_NAME          => 'SBOM::CycloneDX::Enum::CommonExtensionName',
@@ -91,13 +81,26 @@ use constant {
     CRYPTO_PRIMITIVE               => 'SBOM::CycloneDX::Enum::CryptoPrimitive',
     EXTERNAL_REFERENCE_TYPE        => 'SBOM::CycloneDX::Enum::ExternalReferenceType',
     HASH_ALGORITHM                 => 'SBOM::CycloneDX::Enum::HashAlgorithm',
+    IMPACT_ANALYSIS_JUSTIFICATION  => 'SBOM::CycloneDX::Enum::ImpactAnalysisJustification',
+    IMPACT_ANALYSIS_STATE          => 'SBOM::CycloneDX::Enum::ImpactAnalysisState',
     LICENSE_TYPE                   => 'SBOM::CycloneDX::Enum::LicenseType',
     LIFECYCLE_PHASE                => 'SBOM::CycloneDX::Enum::LifecyclePhase',
+    PATENT_ASSERTION_TYPE          => 'SBOM::CycloneDX::Enum::PatentAssertionType',
+    PATENT_LEGAL_STATUS            => 'SBOM::CycloneDX::Enum::PatentLegalStatus',
     PROTOCOL_TYPE                  => 'SBOM::CycloneDX::Enum::ProtocolType',
     RELATED_CRYPTO_MATERIAL_STATE  => 'SBOM::CycloneDX::Enum::RelatedCryptoMaterialState',
     RELATED_CRYPTO_MATERIAL_TYPE   => 'SBOM::CycloneDX::Enum::RelatedCryptoMaterialType',
     TLP_CLASSIFICATION             => 'SBOM::CycloneDX::Enum::TlpClassification',
 };
+
+sub values {
+    my ($class, $enum) = @_;
+
+    if (my $ref = $class->can($enum)) {
+        my @values = ($ref->())->values();
+        return wantarray ? @values : \@values;
+    }
+}
 
 1;
 
@@ -126,12 +129,25 @@ SBOM::CycloneDX::Enum - Enumeration
 
     use SBOM::CycloneDX::Enum;
 
-    say $_ for (@{SBOM::CycloneDX::Enum->SPDX_LICENSES})
+    say $_ for (@{ SBOM::CycloneDX::Enum->SPDX_LICENSES });
+
+
+    say $_ for (@{ SBOM::CycloneDX::Enum->values('EXTERNAL_REFERENCE_TYPE') });
 
 =head1 DESCRIPTION
 
 L<SBOM::CycloneDX::Enum> is internal class used by L<SBOM::CycloneDX>.
 
+
+=head1 METHODS
+
+=over
+
+=item SBOM::CycloneDX::Enum->values( $CONSTANT )
+
+Return the provided C<CONSTANT> Enum values.
+
+=back
 
 =head1 CONSTANTS
 
@@ -159,9 +175,17 @@ L<SBOM::CycloneDX::Enum> is internal class used by L<SBOM::CycloneDX>.
 
 =item * C<HASH_ALGORITHM>, L<SBOM::CycloneDX::Enum::HashAlgorithm>
 
+=item * C<IMPACT_ANALYSIS_JUSTIFICATION>, L<SBOM::CycloneDX::Enum::ImpactAnalysisJustification>
+
+=item * C<IMPACT_ANALYSIS_STATE>, L<SBOM::CycloneDX::Enum::ImpactAnalysisState>
+
 =item * C<LICENSE_TYPE>, L<SBOM::CycloneDX::Enum::LicenseType>
 
 =item * C<LIFECYCLE_PHASE>, L<SBOM::CycloneDX::Enum::LifecyclePhase>
+
+=item * C<PATENT_ASSERTION_TYPE>, L<SBOM::CycloneDX::Enum::PatentAssertionType>
+
+=item * C<PATENT_LEGAL_STATUS>, L<SBOM::CycloneDX::Enum::PatentLegalStatus>
 
 =item * C<PROTOCOL_TYPE>, L<SBOM::CycloneDX::Enum::ProtocolType>
 

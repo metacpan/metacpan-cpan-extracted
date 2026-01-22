@@ -881,50 +881,50 @@ void AddCallback(SV *action, struct _perlcontext *pcb, sasl_callback_t *cb)
 
 		default:
 				_DEBUG("Unknown parameter %d %s",SvTYPE(action),SvPV_nolen(action));
-				croak("Unknown parameter to %x callback.\n", cb->id);
+				croak("Unknown parameter to %lx callback.\n", cb->id);
 			break;
 	}
 
-	_DEBUG("Callback: %x",cb->id);
+	_DEBUG("Callback: %lx",cb->id);
 	/* Write the C SASL callbacks */
 	switch (cb->id)
 	{
 		case SASL_CB_USER:
 		case SASL_CB_AUTHNAME:
 		case SASL_CB_LANGUAGE:
-				 cb->proc = PerlCallback;
+				 cb->proc = (int (*)(void)) PerlCallback;
 			break;
 
 		case SASL_CB_PASS:
-				cb->proc = PerlCallbackSecret;
+				cb->proc = (int (*)(void)) PerlCallbackSecret;
 			break;
 
 		case SASL_CB_GETREALM:
-				cb->proc = PerlCallbackRealm;
+				cb->proc = (int (*)(void)) PerlCallbackRealm;
 			break;
 
 		case SASL_CB_ECHOPROMPT:
 		case SASL_CB_NOECHOPROMPT:
 			break;
 		case SASL_CB_PROXY_POLICY:
-				cb->proc = PerlCallbackAuthorize;
+				cb->proc = (int (*)(void)) PerlCallbackAuthorize;
 			break;
 
 		case SASL_CB_CANON_USER:
-				cb->proc = PerlCallbackCanonUser;
+				cb->proc = (int (*)(void)) PerlCallbackCanonUser;
 			break;
 #ifdef SASL2
 		case SASL_CB_SERVER_USERDB_CHECKPASS:
-				cb->proc = PerlCallbackServerCheckPass;
+				cb->proc = (int (*)(void)) PerlCallbackServerCheckPass;
 			break;
 
 		case SASL_CB_SERVER_USERDB_SETPASS:
-				cb->proc = PerlCallbackServerSetPass;
+				cb->proc =  (int (*)(void)) PerlCallbackServerSetPass;
 			break;
 #else
 		// SASL 1 Servercallbacks:
 		case SASL_CB_SERVER_GETSECRET:
-				cb->proc = PerlCallbackGetSecret;
+				cb->proc =  (int (*)(void)) PerlCallbackGetSecret;
 			break;
 		case SASL_CB_SERVER_PUTSECRET:
 				// Not implemented yet maybe TODO, if ever needed
@@ -946,7 +946,7 @@ void ExtractParentCallbacks(SV *parent, Authen_SASL_XS sasl)
 {
 	char *key;
 	int count=0,i;
-	long l;
+	int32_t l;
 #ifndef SASL2
 	// Missing SASL1 canonuser workaround
 	int canon=-1,auth=-1;
@@ -1193,7 +1193,7 @@ by the underlying mechanism. An example service therefore is "ldap".
 
 
 Authen_SASL_XS
-server_new(pkg, parent, service, host = NULL, iplocalport=NULL, ipremoteport=NULL ...)
+server_new(pkg, parent, service, host = NULL, iplocalport=NULL, ipremoteport=NULL, ...)
 	char *pkg
 	SV *parent
 	char *service
@@ -1258,12 +1258,14 @@ See sasl_server_new(3) for details.
 
 =over 4
 
+=item
+
 See SYNOPSIS for an example.
 
 =cut
 
 Authen_SASL_XS
-client_new(pkg, parent, service, host, iplocalport = NULL, ipremoteport = NULL...)
+client_new(pkg, parent, service, host, iplocalport = NULL, ipremoteport = NULL, ...)
     char *pkg
     SV *parent
     char *service
@@ -1451,6 +1453,8 @@ Therefore you have to check C<need_step> and C<code> during negotiation.
 See example below.
 
 =over 4
+
+=item
 
 =cut
 
@@ -1883,7 +1887,7 @@ PPCODE:
 			break;
 			case SASL_SSF:
 			case SASL_MAXOUTBUF:
-				XPUSHi((int *)value);
+				XPUSHi((long int)value);
 			break;
 #ifdef SASL2
 			case SASL_IPLOCALPORT:

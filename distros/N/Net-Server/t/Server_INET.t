@@ -43,7 +43,7 @@ my $ok = eval {
             # map these to look like inetd
             local *STDIN  = \*{ $client };
             local *STDOUT = \*{ $client };
-            close STDERR;
+            open STDERR, ">", "/dev/null";
             Net::Server::Test->run(
                 port => $env->{'ports'}->[0],
                 host => $env->{'hostname'},

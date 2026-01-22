@@ -67,12 +67,12 @@ Properties:
 
 =over
 
-=item C<email>, The email address of the individual who performed the
+=item * C<email>, The email address of the individual who performed the
 action
 
-=item C<name>, The name of the individual who performed the action
+=item * C<name>, The name of the individual who performed the action
 
-=item C<timestamp>, The timestamp in which the action occurred
+=item * C<timestamp>, The timestamp in which the action occurred
 
 =back
 

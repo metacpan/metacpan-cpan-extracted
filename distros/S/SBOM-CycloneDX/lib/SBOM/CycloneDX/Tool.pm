@@ -78,18 +78,18 @@ Properties:
 
 =over
 
-=item C<external_references>, External references provide a way to document
+=item * C<external_references>, External references provide a way to document
 systems, sites, and information that may be relevant, but are not included
 with the BOM. They may also establish specific relationships within or
 external to the BOM.
 
-=item C<hashes>, The hashes of the tool (if applicable).
+=item * C<hashes>, The hashes of the tool (if applicable).
 
-=item C<name>, The name of the tool
+=item * C<name>, The name of the tool
 
-=item C<vendor>, The name of the vendor who created the tool
+=item * C<vendor>, The name of the vendor who created the tool
 
-=item C<version>, The version of the tool
+=item * C<version>, The version of the tool
 
 =back
 

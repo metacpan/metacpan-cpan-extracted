@@ -96,34 +96,34 @@ Properties:
 
 =over
 
-=item C<bom_ref>, An identifier which can be used to reference the object
+=item * C<bom_ref>, An identifier which can be used to reference the object
 elsewhere in the BOM. Every C<bom_ref> must be unique within the BOM.
 
-=item C<counter_evidence>, The list of `bom-ref` to counterEvidence that
+=item * C<counter_evidence>, The list of `bom-ref` to counterEvidence that
 supports this claim.
 
-=item C<evidence>, The list of `bom-ref` to evidence that supports this
+=item * C<evidence>, The list of `bom-ref` to evidence that supports this
 claim.
 
-=item C<external_references>, External references provide a way to document
+=item * C<external_references>, External references provide a way to document
 systems, sites, and information that may be relevant but are not included
 with the BOM. They may also establish specific relationships within or
 external to the BOM.
 
-=item C<mitigation_strategies>, The list of  `bom-ref` to the evidence
+=item * C<mitigation_strategies>, The list of  `bom-ref` to the evidence
 provided describing the mitigation strategies. Each mitigation strategy
 should include an explanation of how any weaknesses in the evidence will be
 mitigated.
 
-=item C<predicate>, The specific statement or assertion about the target.
+=item * C<predicate>, The specific statement or assertion about the target.
 
-=item C<reasoning>, The written explanation of why the evidence provided
+=item * C<reasoning>, The written explanation of why the evidence provided
 substantiates the claim.
 
-=item C<signature>, Enveloped signature in JSON Signature Format (JSF)
+=item * C<signature>, Enveloped signature in JSON Signature Format (JSF)
 (L<https://cyberphone.github.io/doc/security/jsf.html>).
 
-=item C<target>, The `bom-ref` to a target representing a specific system,
+=item * C<target>, The `bom-ref` to a target representing a specific system,
 application, API, module, team, person, process, business unit, company,
 etc...  that this claim is being applied to.
 

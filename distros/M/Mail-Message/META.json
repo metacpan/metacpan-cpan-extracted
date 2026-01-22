@@ -93,7 +93,7 @@
          "web" : "https://github.com/markov2/perl5-Mail-Message"
       }
    },
-   "version" : "4.01",
+   "version" : "4.02",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2001,

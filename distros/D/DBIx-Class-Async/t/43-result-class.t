@@ -39,13 +39,13 @@ subtest "Result Class Overrides" => sub {
     is($custom_rs->result_class, 'My::Custom::User', "result_class accessor returns custom class");
 
     # 3. Manually trigger new_result
-    my $row = $custom_rs->new_result({ name => 'Gemini', id => 1 });
+    my $row = $custom_rs->new_result({ name => 'John', id => 1 });
 
     isa_ok($row, 'My::Custom::User', "Row object is instance of custom class");
     isa_ok($row, 'DBIx::Class::Async::Row', "Row object still inherits from base Row");
 
     # 4. Verify custom logic works
-    is($row->hello_name, "Hello, Gemini", "Custom method logic works");
+    is($row->hello_name, "Hello, John", "Custom method logic works");
     is($row->get_column('id'), 1, "Standard column data is still accessible");
 };
 

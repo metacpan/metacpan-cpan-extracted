@@ -1,0 +1,32 @@
+Chemistry/File/InChI version 0.10
+=================================
+
+This module reads InChI files.
+
+The InChI module automatically registers the 'inchi' format with
+Chemistry::Mol, so that molfiles may be identified and read by
+Chemistry::Mol::read_mol().
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Chemistry::Mol      0.35
+    List::Util          0
+    Parse::Yapp         0
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2022-2026 Andrius Merkys <merkys@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

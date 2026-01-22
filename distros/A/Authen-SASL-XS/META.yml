@@ -1,25 +1,29 @@
---- #YAML:1.0
-name:               Authen-SASL-XS
-version:            1.00
-abstract:           ~
-author:  []
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+---
+abstract: 'XS code to glue Perl SASL to Cyrus SASL'
+author:
+  - 'Graham Barr <gmbarr@gmail.com>'
 build_requires:
-    Devel::CheckLib:  0
-requires:
-    Authen::SASL:  2.08
-    Test::More:    0
-    Test::Simple:  0
-resources:
-    repository:  http://github.com/gbarr/perl-authen-sasl-xs
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.48
+  Authen::SASL: '2.08'
+  Test::More: '0'
+  Test::Simple: '0'
+configure_requires:
+  Devel::CheckLib: '0'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Authen-SASL-XS
+requires:
+  Authen::SASL: '2.08'
+  perl: '5.008'
+resources:
+  repository: git://github.com/perl-authen-sasl/perl-authen-sasl-xs.git
+version: '1.02'
+x_generated_by_perl: v5.42.0
+x_maintainers:
+  - 'Timothy Legge <timlegge@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

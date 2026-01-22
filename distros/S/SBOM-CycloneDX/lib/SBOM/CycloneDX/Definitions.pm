@@ -23,7 +23,7 @@ has standards => (
 
 has patents => (
     is      => 'rw',
-    isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::Patents']],
+    isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::Patent'] | InstanceOf ['SBOM::CycloneDX::PatentFamily']],
     default => sub { SBOM::CycloneDX::List->new }
 );
 
@@ -71,12 +71,12 @@ Properties:
 
 =over
 
-=item C<standards>, The list of standards which may consist of regulations,
+=item * C<standards>, The list of standards which may consist of regulations,
 industry or organizational-specific standards, maturity models, best
 practices, or any other requirements which can be evaluated against or
 attested to.
 
-=item C<patents>, The list of patents which may be referenced elsewhere
+=item * C<patents>, The list of patents which may be referenced elsewhere
 
 =back
 

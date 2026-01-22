@@ -30,7 +30,7 @@ use constant JSON_SCHEMA_1_5 => 'http://cyclonedx.org/schema/bom-1.5.schema.json
 use constant JSON_SCHEMA_1_6 => 'http://cyclonedx.org/schema/bom-1.6.schema.json';
 use constant JSON_SCHEMA_1_7 => 'http://cyclonedx.org/schema/bom-1.7.schema.json';
 
-our $VERSION = 1.06;
+our $VERSION = 1.07;
 
 our %JSON_SCHEMA = (
     '1.2' => JSON_SCHEMA_1_2,
@@ -229,7 +229,11 @@ sub TO_JSON {
     my $spec_version = $self->spec_version;
     my $schema       = $JSON_SCHEMA{$spec_version};
 
-    my $json = {'$schema' => $schema, bomFormat => $self->bom_format, specVersion => "$spec_version"};
+    my $json = {bomFormat => $self->bom_format, specVersion => "$spec_version"};
+
+    if ($spec_version > 1.5) {
+        $json->{'$schema'} = $schema;
+    }
 
     $json->{serialNumber}       = $self->serial_number       if $self->serial_number;
     $json->{version}            = $self->version             if $self->version;
@@ -323,15 +327,15 @@ SBOM::CycloneDX - CycloneDX Perl Library
 
 =head1 DESCRIPTION
 
-L<SBOM::CycloneDX> is a library for generate valid CycloneDX BOM file.
+L<SBOM::CycloneDX> is a library for generate valid OWASP CycloneDX BOM file.
 
-CycloneDX (ECMA-424) is a modern standard for the software supply chain. At its core,
-CycloneDX is a general-purpose Bill of Materials (BOM) standard capable of
-representing software, hardware, services, and other types of inventory.
-The CycloneDX standard began in 2017 in the Open Worldwide Application Security
-Project (OWASP) community. CycloneDX is an OWASP flagship project, has a formal
-standardization process and governance model, and is supported by the global
-information security community.
+OWASP CycloneDX (ECMA-424) is a modern standard for the software supply chain. 
+At its core, CycloneDX is a general-purpose Bill of Materials (BOM) standard 
+capable of representing software, hardware, services, and other types of 
+inventory. The CycloneDX standard began in 2017 in the Open Worldwide 
+Application Security Project (OWASP) community. CycloneDX is an OWASP flagship 
+project, has a formal standardization process and governance model, and is 
+supported by the global information security community.
 
 CycloneDX far exceeds the L<Minimum Elements for Software Bill of Materials|https://www.ntia.gov/files/ntia/publications/sbom_minimum_elements_report.pdf>
 as defined by the L<National Telecommunications and Information Administration (NTIA)|https://www.ntia.gov/>
@@ -411,7 +415,7 @@ This is the class hierarchy of the L<SBOM::CycloneDX> distribution.
 
 =item * L<SBOM::CycloneDX::Attachment>
 
-=item * L<SBOM::CycloneDX::Citations>
+=item * L<SBOM::CycloneDX::Citation>
 
 =item * L<SBOM::CycloneDX::Component>
 
@@ -527,6 +531,10 @@ This is the class hierarchy of the L<SBOM::CycloneDX> distribution.
 
 =item * L<SBOM::CycloneDX::Enum::HashAlgorithm>
 
+=item * L<SBOM::CycloneDX::Enum::ImpactAnalysisJustification>
+
+=item * L<SBOM::CycloneDX::Enum::ImpactAnalysisState>
+
 =item * L<SBOM::CycloneDX::Enum::LicenseType>
 
 =item * L<SBOM::CycloneDX::Enum::LifecyclePhase>
@@ -585,7 +593,17 @@ This is the class hierarchy of the L<SBOM::CycloneDX> distribution.
 
 =item * L<SBOM::CycloneDX::OrganizationalEntity>
 
-=item * L<SBOM::CycloneDX::PatentAssertions>
+=item * L<SBOM::CycloneDX::Patent>
+
+=over
+
+=item * L<SBOM::CycloneDX::Patent::PriorityApplication>
+
+=back
+
+=item * L<SBOM::CycloneDX::PatentAssertion>
+
+=item * L<SBOM::CycloneDX::PatentFamily>
 
 =item * L<SBOM::CycloneDX::PostalAddress>
 
@@ -643,6 +661,8 @@ This is the class hierarchy of the L<SBOM::CycloneDX> distribution.
 
 =item * L<SBOM::CycloneDX::List>
 
+=item * L<SBOM::CycloneDX::Lite>
+
 =item * L<SBOM::CycloneDX::Timestamp>
 
 =item * L<SBOM::CycloneDX::Util>
@@ -658,6 +678,26 @@ and implements the following new ones.
 
 =item SBOM::CycloneDX->new( %PARAMS )
 
+Create new CycloneDX instance.
+
+    my $bom = SBOM::CycloneDX->new(
+        spec_version  => '1.5',
+        version       => 1,
+        serial_number => $serial_number
+    );
+
+    $bom->components->add($component);
+
+    say $bom;
+
+=item $bom->spec_version
+
+The version of the CycloneDX specification the BOM conforms to.
+
+Default version is B<1.7>.
+
+    $bom->spec_version('1.5');
+
 =item $bom->version
 
 Whenever an existing BOM is modified, either manually or through
@@ -665,6 +705,15 @@ automated processes, the version of the BOM SHOULD be
 incremented by 1. When a system is presented with multiple BOMs
 with identical serial numbers, the system SHOULD use the most
 recent version of the BOM. The default version is '1'.
+
+=item $bom->serial_number
+
+Every BOM generated SHOULD have a unique serial number, even if the contents of 
+the BOM have not changed over time. If specified, the serial number must 
+conform to L<RFC 4122|https://www.ietf.org/rfc/rfc4122.html>. Use of serial 
+numbers is recommended.
+
+    $bom->serial_number('urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79');
 
 =item $bom->metadata
 
@@ -780,7 +829,7 @@ information for specific fields within the BOM.
 
     $bom->citations->add($citation);
 
-See L<SBOM::CycloneDX::Definition>.
+See L<SBOM::CycloneDX::Citation>.
 
 =item $bom->properties
 
@@ -839,7 +888,7 @@ Return L<SBOM::CycloneDX::List> with a list of vulnerabilities with the same C<b
 
 Return L<SBOM::CycloneDX::List> with a list of components affected with the same C<cve_id>.
 
-    say $_->bom_ref for($bom->get_affected_components_by_cve('CVE-2025-1234')->list);
+    say $_->bom_ref for($bom->get_affected_components_by_cve('CVE-2025-12345')->list);
 
 =item $bom->validate
 
@@ -863,6 +912,12 @@ Encode in JSON.
     # or
 
     say "$bom";
+
+=item $bom->to_hash
+
+Convert BOM object in HASH.
+
+    my $hashref = $bom->to_hash;
 
 =item $bom->TO_JSON
 

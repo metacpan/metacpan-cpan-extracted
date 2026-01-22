@@ -73,13 +73,13 @@ Properties:
 
 =over
 
-=item C<signatories>, The list of signatories authorized on behalf of an
+=item * C<signatories>, The list of signatories authorized on behalf of an
 organization to assert validity of this document.
 
-=item C<signature>, Enveloped signature in JSON Signature Format (JSF)
+=item * C<signature>, Enveloped signature in JSON Signature Format (JSF)
 (L<https://cyberphone.github.io/doc/security/jsf.html>).
 
-=item C<statement>, The brief statement affirmed by an individual regarding
+=item * C<statement>, The brief statement affirmed by an individual regarding
 all declarations.
 *- Notes This could be an affirmation of acceptance by a third-party
 auditor or receiving individual of a file.

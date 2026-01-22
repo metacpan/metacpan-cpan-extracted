@@ -58,10 +58,10 @@ Properties:
 
 =over
 
-=item C<image>, The graphic (vector or raster). Base64 encoding must be
+=item * C<image>, The graphic (vector or raster). Base64 encoding must be
 specified for binary images.
 
-=item C<name>, The name of the graphic.
+=item * C<name>, The name of the graphic.
 
 =back
 

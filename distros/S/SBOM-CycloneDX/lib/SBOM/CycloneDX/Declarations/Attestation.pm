@@ -64,15 +64,15 @@ Properties:
 
 =over
 
-=item C<assessor>, The `bom-ref` to the assessor asserting the attestation.
+=item * C<assessor>, The `bom-ref` to the assessor asserting the attestation.
 
-=item C<map>, The grouping of requirements to claims and the attestors
+=item * C<map>, The grouping of requirements to claims and the attestors
 declared conformance and confidence thereof.
 
-=item C<signature>, Enveloped signature in JSON Signature Format (JSF)
+=item * C<signature>, Enveloped signature in JSON Signature Format (JSF)
 (L<https://cyberphone.github.io/doc/security/jsf.html>).
 
-=item C<summary>, The short description explaining the main points of the
+=item * C<summary>, The short description explaining the main points of the
 attestation.
 
 =back

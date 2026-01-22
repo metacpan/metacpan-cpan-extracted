@@ -68,16 +68,16 @@ other cryptographic assets to be modelled.
 
 =over
 
-=item * L<ALGORITHM>, Mathematical function commonly used for data
+=item * C<ALGORITHM>, Mathematical function commonly used for data
 encryption, authentication, and digital signatures.
 
-=item * L<CERTIFICATE>, An electronic document that is used to provide the
+=item * C<CERTIFICATE>, An electronic document that is used to provide the
 identity or validate a public key.
 
-=item * L<PROTOCOL>, A set of rules and guidelines that govern the behavior
+=item * C<PROTOCOL>, A set of rules and guidelines that govern the behavior
 and communication with each other.
 
-=item * L<RELATED_CRYPTO_MATERIAL>, Other cryptographic assets related to
+=item * C<RELATED_CRYPTO_MATERIAL>, Other cryptographic assets related to
 algorithms, certificates, and protocols such as keys and tokens.
 
 =back

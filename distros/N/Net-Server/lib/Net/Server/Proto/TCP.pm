@@ -19,8 +19,8 @@ package Net::Server::Proto::TCP;
 
 use strict;
 use warnings;
-use IO::Socket::INET;
-use Net::Server::Proto;
+use IO::Socket::INET ();
+use Net::Server::Proto qw(IPPROTO_IPV6 IPV6_V6ONLY SOMAXCONN AF_INET AF_INET6 AF_UNSPEC);
 
 our @ISA = qw(IO::Socket::INET); # we may dynamically change this to a v6 compatible class based upon our server configuration
 
@@ -37,14 +37,14 @@ sub object {
     $ISA[0] = Net::Server::Proto->ipv6_package($server)
         if $ISA[0] eq 'IO::Socket::INET' && Net::Server::Proto->requires_ipv6($server);
 
-    my @sock = $class->SUPER::new();
+    my @sock = $class->new();
     foreach my $sock (@sock) {
         $sock->NS_host($info->{'host'});
         $sock->NS_port($info->{'port'});
         $sock->NS_ipv( $info->{'ipv'} );
         $sock->NS_listen(defined($info->{'listen'}) ? $info->{'listen'}
                         : defined($server->{'server'}->{'listen'}) ? $server->{'server'}->{'listen'}
-                        : Socket::SOMAXCONN());
+                        : SOMAXCONN);
         ${*$sock}{'NS_orig_port'} = $info->{'orig_port'} if defined $info->{'orig_port'};
     }
     return wantarray ? @sock : $sock[0];
@@ -55,23 +55,34 @@ sub log_connect {
     $server->log(2, "Binding to ".$sock->NS_proto." port ".$sock->NS_port." on host ".$sock->NS_host." with IPv".$sock->NS_ipv);
 }
 
+sub socket {
+    my $sock = shift;
+    my $ret  = $sock->SUPER::socket(@_);
+    my $ipv  = $sock->NS_ipv;
+    eval { setsockopt $sock, IPPROTO_IPV6, IPV6_V6ONLY, $ipv=~/[4*]/?0:1 } or warn "setsockopt(IPV6_V6ONLY) failed: ($!) ($@)" if $ipv =~ /[6*]/;
+    return $ret;
+}
+
 sub connect {
     my ($sock, $server) = @_;
     my $host = $sock->NS_host;
     my $port = $sock->NS_port;
     my $ipv  = $sock->NS_ipv;
     my $lstn = $sock->NS_listen;
-    my $isa_v6 = Net::Server::Proto->requires_ipv6($server) ? $sock->isa(Net::Server::Proto->ipv6_package($server)) : undef;
+    my $afis = Net::Server::Proto->requires_ipv6($server) ?
+        $sock->isa("IO::Socket::IP") ? "Family" :
+        $sock->isa("IO::Socket::INET6") ? "Domain" :
+        undef : undef; # XXX: Is there any single magic word for "Address Family" that works for both modules?
 
-    $sock->SUPER::configure({
+    $sock->configure({
         LocalPort => $port,
         Proto     => 'tcp',
         Listen    => $lstn,
         ReuseAddr => 1,
         Reuse     => 1,
-        (($host ne '*') ? (LocalAddr => $host) : ()), # * is all
-        ($isa_v6 ? (Domain => ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC()) : ()),
-    }) || $server->fatal("Can't connect to TCP port $port on $host [$!]");
+        LocalAddr => ($host eq '*' ? undef : $host), # undef means listen on all interfaces
+        ($afis ? ($afis => $ipv eq '6' ? AF_INET6 : $ipv eq '4' ? AF_INET : AF_UNSPEC) : ()),
+    }) or $server->fatal("Cannot bind and listen to TCP port $port on $host [$!]");
 
     if ($port eq '0' and $port = $sock->sockport) {
         $server->log(2, "  Bound to auto-assigned port $port");
@@ -92,7 +103,7 @@ sub reconnect { # after a sig HUP
     my $isa_v6 = Net::Server::Proto->requires_ipv6($server) ? $sock->isa(Net::Server::Proto->ipv6_package($server)) : undef;
     if ($isa_v6) {
         my $ipv = $sock->NS_ipv;
-        ${*$sock}{'io_socket_domain'} = ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC();
+        ${*$sock}{'io_socket_domain'} = ($ipv eq '6') ? Net::Server::Proto::AF_INET6() : ($ipv eq '4') ? Net::Server::Proto::AF_INET() : Net::Server::Proto::AF_UNSPEC();
     }
 
     if ($port ne $sock->NS_port) {

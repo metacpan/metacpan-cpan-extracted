@@ -2,12 +2,13 @@
 
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 BEGIN {
     use_ok('DBIx::Class::Async')                       || print "Bail out!\n";
     use_ok('DBIx::Class::Async::Schema')               || print "Bail out!\n";
     use_ok('DBIx::Class::Async::ResultSet')            || print "Bail out!\n";
+    use_ok('DBIx::Class::Async::ResultComponent')      || print "Bail out!\n";
     use_ok('DBIx::Class::Async::ResultSet::Pager')     || print "Bail out!\n";
     use_ok('DBIx::Class::Async::Row')                  || print "Bail out!\n";
     use_ok('DBIx::Class::Async::Storage')              || print "Bail out!\n";

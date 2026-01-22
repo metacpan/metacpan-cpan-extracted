@@ -5,11 +5,11 @@ use strict;
 use warnings;
 use utf8;
 
+use SBOM::CycloneDX::CryptoProperties::SecuredBy;
 use SBOM::CycloneDX::Enum;
 use SBOM::CycloneDX::Hash;
 use SBOM::CycloneDX::List;
 use SBOM::CycloneDX::Timestamp;
-use SBOM::CycloneDX::CryptoProperties::SecuredBy;
 
 use Types::Standard qw(Str Enum Num InstanceOf);
 use Types::TypeTiny qw(ArrayLike);
@@ -19,9 +19,9 @@ use namespace::autoclean;
 
 extends 'SBOM::CycloneDX::Base';
 
-has type  => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->RELATED_CRYPTO_MATERIAL_TYPES()]);
+has type  => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->values('RELATED_CRYPTO_MATERIAL_TYPE')]);
 has id    => (is => 'rw', isa => Str);
-has state => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->RELATED_CRYPTO_MATERIAL_STATES()]);
+has state => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->values('RELATED_CRYPTO_MATERIAL_STATE')]);
 
 has algorithm_ref => (
     is     => 'rw',
@@ -127,46 +127,46 @@ Properties:
 
 =over
 
-=item C<activation_date>, The date and time (timestamp) when the related
+=item * C<activation_date>, The date and time (timestamp) when the related
 cryptographic material was activated.
 
-=item C<algorithm_ref>, The bom-ref to the algorithm used to generate the
+=item * C<algorithm_ref>, The bom-ref to the algorithm used to generate the
 related cryptographic material.
 
-=item C<creation_date>, The date and time (timestamp) when the related
+=item * C<creation_date>, The date and time (timestamp) when the related
 cryptographic material was created.
 
-=item C<expiration_date>, The date and time (timestamp) when the related
+=item * C<expiration_date>, The date and time (timestamp) when the related
 cryptographic material expires.
 
-=item C<fingerprint>, The fingerprint is a cryptographic hash of the asset.
+=item * C<fingerprint>, The fingerprint is a cryptographic hash of the asset.
 
 See L<SBOM::CycloneDX::Hash>
 
-=item C<format>, The format of the related cryptographic material (e.g. P8,
+=item * C<format>, The format of the related cryptographic material (e.g. P8,
 PEM, DER).
 
-=item C<id>, The unique identifier for the related cryptographic
+=item * C<id>, The unique identifier for the related cryptographic
 material.
 
-=item C<related_cryptographic_assets>, A list of cryptographic assets related
+=item * C<related_cryptographic_assets>, A list of cryptographic assets related
 to this component.
 
 See L<SBOM::CycloneDX::CryptoProperties::RelatedCryptographicAsset>
 
-=item C<secured_by>, The mechanism by which the cryptographic asset is
+=item * C<secured_by>, The mechanism by which the cryptographic asset is
 secured by.
 
-=item C<size>, The size of the cryptographic asset (in bits).
+=item * C<size>, The size of the cryptographic asset (in bits).
 
-=item C<state>, The key state as defined by NIST SP 800-57.
+=item * C<state>, The key state as defined by NIST SP 800-57.
 
-=item C<type>, The type for the related cryptographic material
+=item * C<type>, The type for the related cryptographic material
 
-=item C<update_date>, The date and time (timestamp) when the related
+=item * C<update_date>, The date and time (timestamp) when the related
 cryptographic material was updated.
 
-=item C<value>, The associated value of the cryptographic material.
+=item * C<value>, The associated value of the cryptographic material.
 
 =back
 

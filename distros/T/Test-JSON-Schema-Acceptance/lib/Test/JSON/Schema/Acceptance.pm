@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.035-5-geada242
+package Test::JSON::Schema::Acceptance; # git description: v1.036-3-ga8fe3f6
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.036';
+our $VERSION = '1.037';
 
 use 5.020;
 use Moo;
@@ -303,7 +303,8 @@ sub _run_test ($self, $one_file, $test_group, $test, $options) {
         if ($result_bool xor $test->{valid}) {
           $ctx->fail('evaluation result is incorrect', 'expected '.$expected.'; got '.($result_bool ? 'true' : 'false'));
           $ctx->${ $self->verbose ? \'diag' : \'note' }('schema: '.$self->json_prettyprint($test_group->{schema}));
-          $ctx->${ $self->verbose ? \'diag' : \'note' }('data: '.$self->json_prettyprint($test->{data}));
+          $ctx->${ $self->verbose ? \'diag' : \'note' }('data: '.$self->json_prettyprint($test->{data})
+            .(ref $test->{data} ? 'reference to '.ref $test->{data} : ''));
 
           # for backwards compatibility, if only one value is returned, it might be possible to
           # jsonify it to access the full results
@@ -554,7 +555,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.036
+version 1.037
 
 =head1 SYNOPSIS
 

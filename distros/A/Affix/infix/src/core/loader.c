@@ -43,7 +43,7 @@
  * @return A pointer to an `infix_library_t` handle on success, or `nullptr` on failure.
  *         The returned handle must be freed with `infix_library_close`.
  */
-c23_nodiscard infix_library_t * infix_library_open(const char * path) {
+INFIX_API INFIX_NODISCARD infix_library_t * infix_library_open(const char * path) {
     infix_library_t * lib = infix_calloc(1, sizeof(infix_library_t));
     if (lib == nullptr) {
         _infix_set_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_OUT_OF_MEMORY, 0);
@@ -61,11 +61,14 @@ c23_nodiscard infix_library_t * infix_library_open(const char * path) {
     }
 #else
     // Use RTLD_LAZY for performance (resolve symbols only when they are first used).
+    // Use RTLD_LOCAL to keep symbols isolated within this handle. This prevents
+    // symbol pollution if multiple plugins link against different versions of the same
+    // dependency. Dependencies must be explicitly linked or loaded.
     // Use RTLD_GLOBAL to make symbols from this library available for resolution
     // by other libraries that might be loaded later. This is important for complex
     // dependency chains.
-    // On POSIX, passing NULL to dlopen returns a handle to the main executable, allowing searching of global symbols.
-    lib->handle = dlopen(path, RTLD_LAZY | RTLD_GLOBAL);
+    // On POSIX, passing NULL to dlopen returns a handle to the main executable.
+    lib->handle = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
 #endif
     if (lib->handle == nullptr) {
 #if defined(INFIX_OS_WINDOWS)
@@ -87,7 +90,7 @@ c23_nodiscard infix_library_t * infix_library_open(const char * path) {
  *
  * @param[in] lib The library handle to close. It is safe to call this function with `nullptr`.
  */
-void infix_library_close(infix_library_t * lib) {
+INFIX_API void infix_library_close(infix_library_t * lib) {
     if (lib == nullptr)
         return;
     if (lib->handle) {
@@ -118,7 +121,7 @@ void infix_library_close(infix_library_t * lib) {
  * @param[in] symbol_name The name of the symbol to look up (e.g., `"my_function"`).
  * @return A `void*` pointer to the symbol's address, or `nullptr` if not found.
  */
-c23_nodiscard void * infix_library_get_symbol(infix_library_t * lib, const char * symbol_name) {
+INFIX_API INFIX_NODISCARD void * infix_library_get_symbol(infix_library_t * lib, const char * symbol_name) {
     if (lib == nullptr || lib->handle == nullptr || symbol_name == nullptr)
         return nullptr;
 #if defined(INFIX_OS_WINDOWS)
@@ -144,11 +147,11 @@ c23_nodiscard void * infix_library_get_symbol(infix_library_t * lib, const char 
  * @param[in] registry An optional registry for resolving named types in the signature.
  * @return `INFIX_SUCCESS` on success, or an error code on failure (e.g., symbol not found, invalid signature).
  */
-c23_nodiscard infix_status infix_read_global(infix_library_t * lib,
-                                             const char * symbol_name,
-                                             const char * type_signature,
-                                             void * buffer,
-                                             infix_registry_t * registry) {
+INFIX_API INFIX_NODISCARD infix_status infix_read_global(infix_library_t * lib,
+                                                         const char * symbol_name,
+                                                         const char * type_signature,
+                                                         void * buffer,
+                                                         infix_registry_t * registry) {
     if (buffer == nullptr)
         return INFIX_ERROR_INVALID_ARGUMENT;
     void * symbol_addr = infix_library_get_symbol(lib, symbol_name);
@@ -186,11 +189,11 @@ c23_nodiscard infix_status infix_read_global(infix_library_t * lib,
  * @param[in] registry An optional registry for resolving named types in the signature.
  * @return `INFIX_SUCCESS` on success, or an error code on failure.
  */
-c23_nodiscard infix_status infix_write_global(infix_library_t * lib,
-                                              const char * symbol_name,
-                                              const char * type_signature,
-                                              void * buffer,
-                                              infix_registry_t * registry) {
+INFIX_API INFIX_NODISCARD infix_status infix_write_global(infix_library_t * lib,
+                                                          const char * symbol_name,
+                                                          const char * type_signature,
+                                                          void * buffer,
+                                                          infix_registry_t * registry) {
     if (buffer == nullptr)
         return INFIX_ERROR_INVALID_ARGUMENT;
     void * symbol_addr = infix_library_get_symbol(lib, symbol_name);

@@ -1,6 +1,6 @@
 package DBIx::Class::Async;
 
-$DBIx::Class::Async::VERSION   = '0.41';
+$DBIx::Class::Async::VERSION   = '0.43';
 $DBIx::Class::Async::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ DBIx::Class::Async - Asynchronous database operations for DBIx::Class
 
 =head1 VERSION
 
-Version 0.41
+Version 0.43
 
 =cut
 
@@ -27,6 +27,7 @@ use IO::Async::Function;
 use Time::HiRes qw(time);
 use Digest::MD5 qw(md5_hex);
 use Type::Params qw(compile);
+use Scalar::Util qw(blessed);
 use DBIx::Class::Async::Row;
 use Types::Standard qw(Str ScalarRef HashRef ArrayRef Maybe Int CodeRef);
 
@@ -291,6 +292,11 @@ sub count {
         my ($result) = @_;
         my $duration = time - $start_time;
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+
+        if (my $error = $self->_check_response($result)) {
+            return Future->fail($error);
+        }
+
         return Future->done($result);
     });
 }
@@ -325,14 +331,18 @@ sub create {
 
     return $self->_call_worker('create', $resultset, $deflated_data)->then(sub {
         my ($result) = @_;
+
+        # Record metrics
         my $duration = time - $start_time;
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
 
-        if (ref $result eq 'HASH' && $result->{__error}) {
-            return Future->fail($result->{__error});
+        if (my $error = $self->_check_response($result)) {
+            return Future->fail($error);
         }
 
-        return Future->done($self->_inflate_row($resultset, $result));
+        my $final_data = $self->_merge_result_data($resultset, $deflated_data, $result);
+
+        return Future->done($self->_inflate_row($resultset, $final_data));
     });
 }
 
@@ -349,7 +359,7 @@ Returns: 1 if deleted, 0 if row not found.
 sub delete {
     my ($self, $resultset, $id) = @_;
 
-    state $check = compile(Str, Int|Str);
+    state $check = compile(Str, Int|Str|HashRef);
     $check->($resultset, $id);
 
     $self->{stats}{queries}++;
@@ -364,6 +374,11 @@ sub delete {
         my ($result) = @_;
         my $duration = time - $start_time;
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+
+        if (my $error = $self->_check_response($result)) {
+            return Future->fail($error);
+        }
+
         return Future->done($result);
     });
 }
@@ -412,8 +427,15 @@ string returned by the worker.
 sub deploy {
     my ($self, $sqlt_args, $dir) = @_;
 
-    # Use the internal bridge discovered in your search method
-    return $self->_call_worker('deploy', $sqlt_args, $dir);
+    return $self->_call_worker('deploy', $sqlt_args, $dir)->then(sub {
+        my ($result) = @_;
+
+        if (my $error = $self->_check_response($result)) {
+            return Future->fail($error);
+        }
+
+        return Future->done($result);
+    });
 }
 
 =head2 disconnect
@@ -429,16 +451,27 @@ sub disconnect {
 
     return unless $self->{is_connected};
 
+    # During Global Destruction, IO::Async handles its own cleanup.
+    # Manually calling remove() then often triggers "Notifier does not exist"
+    # or uninitialised value warnings in the Loop.
+    my $in_destruction = (${^GLOBAL_PHASE} eq 'DESTRUCT');
+
     # Stop health checks
     if ($self->{health_check_timer}) {
-        $self->{loop}->remove($self->{health_check_timer});
+        if (!$in_destruction && $self->{loop}) {
+            eval { $self->{loop}->remove($self->{health_check_timer}) };
+        }
         undef $self->{health_check_timer};
     }
 
     # Stop all workers
     for my $worker (@{$self->{workers}}) {
         if (defined $worker->{instance}) {
-            $self->{loop}->remove($worker->{instance});
+            if (!$in_destruction && $self->{loop}) {
+                # eval protects against the "Notifier does not exist" race condition
+                eval { $self->{loop}->remove($worker->{instance}) };
+            }
+            undef $worker->{instance};
         }
     }
 
@@ -476,6 +509,11 @@ sub find {
         my ($result) = @_;
         my $duration = time - $start_time;
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+
+        if (my $error = $self->_check_response($result)) {
+            return Future->fail($error);
+        }
+
         return Future->done($self->_inflate_row($resultset, $result));
     });
 }
@@ -553,7 +591,7 @@ feature, its implementation and lifecycle differ significantly:
 
 =item B<Late-Bound Metadata Injection>
 
-In standard C<DBIx::Class>, inflation is usually defined at compile-time within
+In standard L<DBIx::Class>, inflation is usually defined at compile-time within
 the Result Class file. In C<DBIx::Class::Async>, this method allows for
 B<dynamic, runtime injection> of handlers. This is particularly useful in
 environments where the Schema is shared or where the asynchronous driver needs
@@ -569,7 +607,7 @@ worker has not yet been dispatched.
 
 =item B<Explicit Manual Registration>
 
-In C<DBIx::Class>, loading a component like C<InflateColumn> automatically
+In L<DBIx::Class>, loading a component like C<InflateColumn> automatically
 sets up the infrastructure. In this module, C<inflate_column> acts as a
 bridge, explicitly attaching handlers to the underlying C<column_info>
 hash so that the L<DBIx::Class::Async::Row> C<AUTOLOAD> mechanism can
@@ -655,6 +693,11 @@ sub raw_query {
         my ($result) = @_;
         my $duration = time - $start_time;
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+
+        if (my $error = $self->_check_response($result)) {
+            return Future->fail($error);
+        }
+
         return Future->done($result);
     });
 }
@@ -798,12 +841,17 @@ sub search {
         my $duration = time - $start_time;
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
 
-        # Store the RAW data in cache (before blessing)
+        # 1. Intercept errors before they touch the cache or the map
+        if (my $error = $self->_check_response($result)) {
+            return Future->fail($error);
+        }
+
+        # 2. Now it is safe to cache
         if ($use_cache && defined $self->{cache_ttl}) {
             $self->{cache}->set($cache_key, $result, $self->{cache_ttl});
         }
 
-        # BLESSED wrapping: Convert hashrefs to Row objects
+        # 3. Now it is safe to inflate (we know it's an ArrayRef)
         my $rows = [ map { $self->_inflate_row($resultset, $_) } @$result ];
 
         return Future->done($rows);
@@ -827,26 +875,27 @@ Returns: Array of results in the same order as queries.
 sub search_multi {
     my ($self, @queries) = @_;
 
+    # Record total query count
     $self->{stats}{queries} += scalar @queries;
     $self->_record_metric('inc', 'db_async_queries_total', scalar @queries);
 
+    # 1. Reuse the hardened search() method for each query
     my @futures = map {
         my ($resultset, $search_args, $attrs) = @$_;
-        $self->_call_worker('search', $resultset, $search_args, $attrs)
+        $self->search($resultset, $search_args, $attrs)
     } @queries;
 
     my $start_time = time;
 
-    return Future->wait_all(@futures)->then(sub {
+    # 2. Use needs_all so the entire batch fails if ANY single query fails
+    return Future->needs_all(@futures)->then(sub {
         my @results = @_;
 
         my $duration = time - $start_time;
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
 
-        # Extract values from completed futures
-        my @values = map { $_->get } @results;
-
-        return Future->done(@values);
+        # Results are now already inflated Row objects and error-checked
+        return Future->done(@results);
     });
 }
 
@@ -1015,7 +1064,7 @@ B<Literal SQL Support>
 
 All C<data> hashes support standard L<DBIx::Class> literal SQL via scalar
 references, for example: C<< data => { updated_at => \'NOW()' } >>. These are
-safely serialized and executed within the worker transaction.
+safely serialised and executed within the worker transaction.
 
 B<Atomicity and Error Handling>
 
@@ -1076,6 +1125,11 @@ sub txn_batch {
         my ($result) = @_;
         my $duration = time - $start_time;
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+
+        if (my $error = $self->_check_response($result)) {
+            return Future->fail($error);
+        }
+
         return Future->done($result);
     })->catch(sub {
         my ($error) = @_;
@@ -1176,7 +1230,7 @@ Returns: Hashref of updated row data or undef if row not found.
 sub update {
     my ($self, $resultset, $id, $data) = @_;
 
-    state $check = compile(Str, Int|Str, HashRef);
+    state $check = compile(Str, Int|Str|HashRef, HashRef);
     $check->($resultset, $id, $data);
 
     $self->{stats}{queries}++;
@@ -1191,6 +1245,18 @@ sub update {
         my ($result) = @_;
         my $duration = time - $start_time;
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+
+        # 1. SUCCESSFUL SINGLE UPDATE: Re-fetch and return the Row object
+        if ($result eq "1" && !ref $id) {
+            return $self->find($resultset, $id);
+        }
+
+        # 2. FAILED SINGLE UPDATE: Return undef
+        if ($result eq "0" && !ref $id) {
+            return Future->done(undef);
+        }
+
+        # 3. BULK UPDATE: Return the count (e.g., "0", "5", "50")
         return Future->done($result);
     });
 }
@@ -1281,7 +1347,27 @@ sub update_bulk {
     state $check = compile(Str, HashRef, HashRef);
     $check->($table, $condition, $data);
 
-    return $self->_call_worker('update_bulk', $table, $condition, $data);
+    $self->{stats}{queries}++;
+    $self->_record_metric('inc', 'db_async_queries_total');
+    $self->_invalidate_cache_for($table);
+
+    my $start_time = time;
+
+    return $self->_call_worker('update_bulk', $table, $condition, $data)->then(sub {
+        my ($result) = @_;
+
+        # 2. Metrics
+        my $duration = time - $start_time;
+        $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
+
+        # 3. Standard error check
+        if (my $error = $self->_check_response($result)) {
+            return Future->fail($error);
+        }
+
+        # Bulk updates usually return the count of affected rows
+        return Future->done($result);
+    });
 }
 
 #
@@ -1363,7 +1449,8 @@ sub _deflate_args {
 
     for my $col (keys %deflated) {
         my $info = $source->column_info($col);
-        if ($info->{deflate} && defined $deflated{$col}) {
+
+        if ($info->{deflate} && defined $deflated{$col} && ref $deflated{$col}) {
             $deflated{$col} = $info->{deflate}->($deflated{$col}, $self);
         }
     }
@@ -1410,7 +1497,18 @@ sub _execute_operation {
         my ($source_name, $id, $attrs) = @args;
 
         my $row = eval {
-            $schema->resultset($source_name)->find($id, $attrs || {})
+            my $rs = $schema->resultset($source_name);
+
+            # Step 1: Normalise the condition to a HashRef if it's a scalar
+            my $query_cond = ref $id
+                ? $id
+                : { ($rs->result_source->primary_columns)[0] => $id };
+
+            # Step 2: Explicitly set rows => 1 in a fresh resultset
+            my $limited_rs = $rs->search($query_cond, { %{$attrs || {}}, rows => 1 });
+
+            # Step 3: Use first()
+            return $limited_rs->first;
         };
 
         if ($@) { die "Find operation failed on $source_name: $@"; }
@@ -1459,22 +1557,25 @@ sub _execute_operation {
         }
     }
     elsif ($operation eq 'update') {
-        # @args contains (source_name, id, data_to_update, attrs)
         my ($source_name, $id, $data, $attrs) = @args;
 
-        my $results = eval {
-            my $rs  = $schema->resultset($source_name);
-            my $row = $rs->find($id);
+        return eval {
+            my $rs = $schema->resultset($source_name);
 
-            return undef unless $row;
+            # 1. Standardise the condition
+            # (Handles scalar ID or bulk HashRef)
+            my $cond = ref $id
+                ? $id
+                : { ($rs->result_source->primary_columns)[0] => $id };
 
-            $row->update($data);
+            # 2. Perform update and get count
+            # Adding { rows => undef } or similar isn't needed here,
+            # because ->update on a resultset returns the count.
+            my $rows_affected = $rs->search($cond)->update($data);
 
-            return _serialise_row_with_prefetch($row, $attrs->{prefetch});
+            # 3. Always return the count (numeric 0 instead of 0E0)
+            return $rows_affected + 0;
         };
-
-        if ($@) { die "Update operation failed on $source_name: $@"; }
-        return $results;
     }
     elsif ($operation eq 'update_bulk') {
         my ($source_name, $condition, $data) = @args;
@@ -1496,30 +1597,37 @@ sub _execute_operation {
         return $count; # Returns number of rows updated
     }
     elsif ($operation eq 'delete') {
-        # @args: (source_name, id, attrs)
         my ($source_name, $id, $attrs) = @args;
 
         my $result = eval {
             my $rs = $schema->resultset($source_name);
-            my $row = $rs->find($id);
 
-            unless ($row) {
+            return 0 unless defined $id && $id ne '';
+
+            # SAFETY: If condition is empty/undef, don't delete everything!
+            if (!defined $id || (ref $id eq 'HASH' && !keys %$id) || $id eq '') {
                 return 0;
             }
 
-            $row->delete;
-            return 1;
+            # If $id is just a number/string, find the PK column name
+            my $cond = $id;
+            if (!ref $id) {
+                my ($pk) = $rs->result_source->primary_columns;
+                $cond = { $pk => $id };
+            }
+
+            my $rows = $rs->search($cond)->delete;
+
+            return $rows + 0;
         };
 
-        # CRITICAL: Only die if there is an actual exception in $@
         if ($@) {
             my $err = $@ || 'No error message captured';
-            # Check if the error is a reference (like a DBIC error object)
             $err = $err->{msg} if ref $err eq 'HASH' && $err->{msg};
-            die "Delete operation failed on $source_name for ID $id: $err";
+            die "Delete operation failed on $source_name: $err";
         };
 
-        return $result;
+        return $result; # This now returns the real count (0, 1, or 50)
     }
     elsif ($operation eq 'count') {
         my ($source_name, $search_args, $attrs) = @args;
@@ -1648,6 +1756,12 @@ sub _generate_cache_key {
 sub _inflate_row {
     my ($self, $source_name, $data) = @_;
     return undef unless defined $data;
+
+    # Last line of defense: if an error slipped through to here,
+    # return it instead of a Row object.
+    if (my $error = $self->_check_response($data)) {
+        return $error;
+    }
 
     return DBIx::Class::Async::Row->new(
         schema      => $self->_schema_instance,
@@ -1967,6 +2081,107 @@ sub DESTROY {
     my $self = shift;
     $self->disconnect if $self->{is_connected};
 }
+
+#
+#
+# REALLY PRIVATE METHODS
+
+sub _check_response {
+    my ($self, $res) = @_;
+
+    return unless defined $res;
+
+    if (blessed($res) && $res->isa('DBIx::Class::Exception')) {
+        return $res;
+    }
+
+    if (ref $res eq 'HASH' && $res->{__error}) {
+        return $res->{__error};
+    }
+
+    return; # Not an error
+}
+
+sub _merge_result_data {
+    my ($self, $source_name, $original_data, $returned_result) = @_;
+
+    my $merged = { %$original_data };
+
+    if (ref $returned_result eq 'HASH') {
+        @{$merged}{keys %$returned_result} = values %$returned_result;
+    }
+    elsif (defined $returned_result && !ref $returned_result) {
+        my $source = $self->_schema_instance->source($source_name);
+        my ($pk)   = $source->primary_columns;
+        $merged->{$pk} = $returned_result if $pk;
+    }
+
+    return $merged;
+}
+
+=head1 INTEGRATION WITH RESULT CLASSES
+
+To enable asynchronous row-level methods (C<update> and C<delete>), you must
+load the C<Async::ResultComponent> in your specific Result classes. This
+registration allows the row objects to intercept standard blocking calls and
+reroute them to the background worker pool.
+
+B<Configuration>
+
+In each of your Result files (e.g., C<My/Schema/Result/User.pm>), add the
+component to the C<load_components> call. B<Note:> It is recommended to load
+this component before C<Core>.
+
+    package My::Schema::Result::User;
+
+    use strict;
+    use warnings;
+    use base 'DBIx::Class::Core';
+
+    __PACKAGE__->load_components(qw/Async::ResultComponent Core/);
+
+    __PACKAGE__->table('users');
+    # ... column and relationship definitions ...
+
+B<IMPORTANT: Return Values (Futures)>
+
+Unlike standard L<DBIx::Class>, where C<update> and C<delete> return the row
+object or success count immediately, these methods now return a B<Future>.
+You must use asynchronous chaining to handle the results:
+
+    $row->update({ name => 'New Name' })->then(sub {
+        my $updated_row = shift;
+        say "Update complete for: " . $updated_row->name;
+    });
+
+B<Why this is necessary?>
+
+Without this component, calling C<$row-E<gt>delete> would use the base
+L<DBIx::Class::Row> implementation, which is synchronous and blocking.
+Loading this component provides three critical benefits:
+
+=over 4
+
+=item * B<Non-blocking Row Logic>: Prevents a single row update from "freezing" your event loop.
+
+=item * B<Automatic Future Wrapping>: Ensures consistency with your ResultSet queries by returning a L<Future> object.
+
+=item * B<Context Awareness>: The component knows how to extract its own Primary Key and table name, so you don't have to pass them manually.
+
+=back
+
+B<Implementation Note: Automatic Identity Mapping>
+
+The component is B<Zero-Config>. It utilises the internal C<ident_condition>
+logic of L<DBIx::Class> to identify the row in the background worker.
+
+This means that whether your table uses a simple integer ID or a B<composite
+primary key> (e.g., C<user_id> + C<role_id>), the component automatically
+handles the construction of the complex C<WHERE> clause required by the bridge.
+You do not need to change how you define your schemas; simply ensure
+C<set_primary_key> is correctly defined as usual.
+
+=cut
 
 =head1 PERFORMANCE TIPS
 

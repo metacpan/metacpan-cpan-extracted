@@ -29,10 +29,25 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => 0
   },
   "TEST_REQUIRES" => {},
-  "VERSION" => "2.014",
+  "VERSION_FROM" => "lib/Net/Server.pm",
   "test" => {
     "TESTS" => "t/*.t"
-  }
+  },
+  META_MERGE => {
+    'meta-spec' => { version => 2 },
+     resources => {
+         homepage => "https://github.com/rhandom/perl-net-server",
+         repository => {
+             type => 'git',
+             url  => 'https://github.com/rhandom/perl-net-server',
+             web  => 'https://github.com/rhandom/perl-net-server',
+         },
+         bugtracker => {
+             #web => 'https://rt.cpan.org/Dist/Display.html?Name=Net-Server'
+             web => 'https://github.com/rhandom/perl-net-server/issues'
+         },
+     },
+  },
 );
 
 

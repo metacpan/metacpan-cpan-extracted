@@ -77,10 +77,10 @@ Properties:
 
 =over
 
-=item C<individual>, The individual, not associated with an organization,
+=item * C<individual>, The individual, not associated with an organization,
 that was granted the license
 
-=item C<organization>, The organization that was granted the license
+=item * C<organization>, The organization that was granted the license
 
 =back
 

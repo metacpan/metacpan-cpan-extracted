@@ -22,9 +22,9 @@ package Net::Server::Multiplex;
 use strict;
 use base qw(Net::Server);
 use Net::Server::SIG qw(register_sig check_sigs);
+use Socket qw(SO_TYPE SOL_SOCKET SOCK_DGRAM);
 use Carp qw(confess);
-eval { require IO::Multiplex; import IO::Multiplex 1.05; };
-$@ && warn "Module IO::Multiplex is required for Multiplex.";
+eval { require IO::Multiplex; 1 } or warn "Module IO::Multiplex is required for Multiplex.";
 
 our $VERSION = $Net::Server::VERSION;
 
@@ -38,7 +38,7 @@ sub loop {
     $self->{mux} = $mux;
 
     foreach my $sock ( @{ $prop->{sock} } ) {
-        if (Net::Server::SOCK_DGRAM == $sock->getsockopt(Socket::SOL_SOCKET(),Socket::SO_TYPE())) {
+        if (SOCK_DGRAM == $sock->getsockopt(SOL_SOCKET,SO_TYPE)) {
             $mux->add($sock);
         } else {
             $mux->listen($sock);

@@ -1,5 +1,23 @@
 Revision history for Perl extension Net::Server.
 
+2.015  Jan 21 2025
+        - Compatibility fix to work with MakeMaker prior to 6.58.
+          (Pull Request #35 by Gabor Szabo <gabor@szabgab.com>)
+        - Update META info from dzil. (rt #94977)
+        - Compatibility fix to work with Net::SSLeay prior to 1.34.
+          (Pull Request #38 by Petr Pisar <ppisar@redhat.com>)
+        - Multiplex fix for Perl 5.40.x (rt #172029)
+        - Compatibility fix to work with Socket.pm prior to 1.93.
+        - Remove all bindv6only sniffing. Always use setsockopt to
+          set IPV6_V6ONLY flag appropriately based on {ipv}.
+        - Honor {ipv6_package} preference, if specified.
+        - Fix to work without deprecated "Socket6.pm" module.
+          (IO::Socket::IP can handle everything now.)
+        - Fix {reverse_lookups} with {udp_true}.
+        - Fix tests where "localhost" is not listed as IPv6 loopback.
+        - Add more various {ipv} and NO_IPV6 tests.
+        - Fix comments, wordings, messages, and POD. (rt #85052)
+
 2.014  Mar 14 2023
         - Apply patch to Fork for UDP
         - Fix tests on perls without threads
@@ -179,7 +197,7 @@ Revision history for Perl extension Net::Server.
         - Check setuid better after POSIX setuid (Ricardo Signes) (rt #21262)
         - Update Syslog options parsing (Carlos Velasco) (rt #21265)
         - Allow no_client_stdout to work with Multiplex (Steven Lembark)
-        - Allow Sys::SysLog keyworks be passed through the ->log method (Peter Beckman)
+        - Allow Sys::SysLog keywords to be passed through the ->log method (Peter Beckman)
         - Allow more characters through in syslog_ident (Peter Beckman)
         - Fix Fork server bug which had post_accept_hook called twice (Curtis Wilbar)
         - Added pre_fork_hook to Fork server to handle removed duplicate post_accept_hook call.
@@ -390,7 +408,7 @@ Revision history for Perl extension Net::Server.
 0.75  Aug 23 10:49
         - Both Net::Server::Fork and Net::Server::PreFork are
                 using safe signals via Net::Server::SIG.
-        - Net::Server::PreFork has new child managment model.
+        - Net::Server::PreFork has new child management model.
                 NOTE: spare_servers is no longer used.  It
                 has been replaced by min_spare_servers and
                 max_spare_servers.  This is a major change.
@@ -602,7 +620,7 @@ Revision history for Perl extension Net::Server.
         - Clarified some of the pod
 
 0.46  Mar 05 07:37 2001
-	- secure removal of pid_file - only happens on success -
+        - secure removal of pid_file - only happens on success -
                 possibly should only happen after process has become
                 another user
         - secure removal of lock_file - only happens if we generated it
@@ -611,17 +629,17 @@ Revision history for Perl extension Net::Server.
         - added simple httpd example script
 
 0.45  Mar 02 00:44 2001
-	- clean up make process.
+        - clean up make process.
         - change version to hard coded number.
         - improve testing scripts
 
 0.44  Mar 01 00:55 2001
-	- partitioned properties in single hashref value.
+        - partitioned properties in single hashref value.
         - changed versioning system to use cvs revision.
         - general clean up and add documentation.
 
 0.43  Feb 28 01:08 2001
-	- this revision and last add bulk of documentation.
+        - this revision and last add bulk of documentation.
         -various clean ups
 
 0.4.1  Feb 26 17:48 2001

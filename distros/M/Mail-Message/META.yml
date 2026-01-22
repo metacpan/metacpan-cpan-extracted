@@ -58,7 +58,7 @@ resources:
   bugtracker: https://github.com/markov2/perl5-Mail-Message/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Mail-Message.git
-version: '4.01'
+version: '4.02'
 x_oodist:
   email: markov@cpan.org
   first_year: 2001

@@ -219,8 +219,6 @@ It is on that returned reference that the following methods are available.
 The SERVICE is the name of the service being implemented, which may be used
 by the underlying mechanism. An example service therefore is "ldap".
 
-=pod
-
 =item client_new ( SERVICE , HOST , IPLOCALPORT , IPREMOTEPORT )
 
 Constructor for creating server-side sasl contexts.
@@ -245,11 +243,11 @@ and CS 2.x on the server side. Don't know if it necessary for the client
 side. Format of this arguments in an IPv4 environment should be: a.b.c.d;port.
 See sasl_server_new(3) for details.
 
-=over 4
+=pod
 
 See SYNOPSIS for an example.
 
-=pod
+=over 4
 
 =item server_start ( CHALLENGE )
 
@@ -289,9 +287,9 @@ Therefore you have to check C<need_step> and C<code> during negotiation.
 
 See example below.
 
-=over 4
-
 =pod
+
+=over 4
 
 =item listmech( START , SEPARATOR , END )
 

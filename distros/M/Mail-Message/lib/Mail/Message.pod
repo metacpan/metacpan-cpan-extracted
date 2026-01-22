@@ -120,7 +120,7 @@ message: you may only set a new body with L<body()|Mail::Message/"The body">.
 
 =item shallow_head => BOOLEAN
 
-Only the head uses is reused, not the body.  This is probably a bad choice,
+Only the head is reused, not the body.  This is probably a bad choice,
 because the header fields can be updated, for instance when labels change.
 
 =back
@@ -1293,14 +1293,14 @@ Cast by C<build()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.01,
-built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.02,
+built on January 22, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2001-2025 by Mark Overmeer.
+This software is copyright (c) 2001-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

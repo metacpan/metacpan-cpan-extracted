@@ -10,7 +10,7 @@ use Gherkin::TokenMatcher;
 use Gherkin::MarkdownTokenMatcher;
 
 package App::GherkinGenerateTokens;
-$App::GherkinGenerateTokens::VERSION = '37.0.1';
+$App::GherkinGenerateTokens::VERSION = '38.0.0';
 sub run {
     my ( $class, $fh, @file_list ) = @_;
 

@@ -221,12 +221,15 @@ Example crontab entry:
 All logs and errors are written to `/var/log/distsync.log`.
 
 ### Adding files
+
 Copy files into the resource directory. They will be synchronized automatically.
 
 ### Deleting files
+
 Add filenames to `MANIFEST.DEL`. The system will handle deletion. You may remove files from disk manually afterwards.
 
 ### Updating files
+
 Replace the file with a newer version. Synchronization will propagate the change.
 
 ⚠ **Do NOT rename or move files or directories.**

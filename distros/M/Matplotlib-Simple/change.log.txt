@@ -1,0 +1,11 @@
+0.21
+---
+"show" now works; files are still output if specified
+---
+0.20
+---
+better warnings for incomplete data in "plot"
+"plot" can plot with "twinx" when data is given in array or hash form
+"tick_params" is removed from plt methods
+fewer "my" for error arrays, using empty arrays from earlier; should increase efficiency slightly
+added tests for twinx in plot for both array and hash variants

@@ -4,12 +4,12 @@ use warnings;
 
 package Class::XSConstructor;
 
-use Exporter::Tiny 1.000000 qw( mkopt _croak );
+use Exporter::Tiny 1.000000 qw( mkopt _croak _carp );
 use List::Util 1.45 qw( uniq );
 
 BEGIN {
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.022002';
+	our $VERSION   = '0.023001';
 	
 	if ( eval { require Types::Standard; 1 } ) {
 		Types::Standard->import(
@@ -28,7 +28,7 @@ BEGIN {
 	}
 	
 	require XSLoader;
-	__PACKAGE__->XSLoader::load($VERSION);
+	__PACKAGE__->XSLoader::load( $VERSION );
 };
 
 our ( %META, %BUILD_CACHE, %DEMOLISH_CACHE );
@@ -120,7 +120,7 @@ sub import {
 			_croak("Required attribute $name cannot have undef init_arg");
 		}
 		
-		my @unknown_keys = grep !/\A(isa|required|is|lazy|default|builder|coerce|init_arg|trigger|weak_ref|alias|slot_initializer|undef_tolerant|reader)\z/, keys %spec;
+		my @unknown_keys = grep !/\A(isa|required|is|lazy|default|builder|coerce|init_arg|trigger|weak_ref|alias|slot_initializer|undef_tolerant|reader|clone|clone_on_write|clone_on_read)\z/, keys %spec;
 		if ( @unknown_keys ) {
 			_croak("Unknown keys in spec: %s", join ", ", sort @unknown_keys);
 		}
@@ -170,6 +170,10 @@ sub import {
 		
 		if ( exists $spec{undef_tolerant} ) {
 			$meta_attribute{undef_tolerant} = !!$spec{undef_tolerant};
+		}
+		
+		if ( $spec{clone_on_write} or $spec{clone} ) {
+			$meta_attribute{clone_on_write} = $spec{clone_on_write} || $spec{clone};
 		}
 		
 		# Add new attribute
@@ -334,6 +338,7 @@ sub _build_flags {
 	$flags |= XSCON_FLAG_HAS_ALIASES           if $spec->{alias};
 	$flags |= XSCON_FLAG_HAS_SLOT_INITIALIZER  if $spec->{slot_initializer};
 	$flags |= XSCON_FLAG_UNDEF_TOLERANT        if $spec->{undef_tolerant};
+	$flags |= XSCON_FLAG_CLONE_ON_WRITE        if $spec->{clone_on_write} || $spec->{clone};
 	
 	unless ( $spec->{lazy} ) {
 		$flags |= XSCON_FLAG_HAS_DEFAULT
@@ -729,6 +734,39 @@ constructor.
 
 =item *
 
+Automatic deep data cloning.
+
+Setting C<< clone_on_write => 1 >> will automatically deep clone incoming
+arguments before setting them.
+
+  package Local::Foo {
+    use Class::XSConstructor foo => { clone_on_write => 1 };
+  }
+  
+  my @array = ( 1, 2, 3 );
+  my $obj = Local::Foo->new( foo => \@array );
+  
+  push @array, 4; # does not affect the array within $obj.
+
+It is possible to provide a custom callback to clone a value, which may be
+useful to control clone depth, etc. This is obviously slower than the built-in
+clone functionality.
+
+  package Local::Foo {
+    use Class::XSConstructor foo => { clone_on_write => sub {
+      my ( $self, $attr_name, $value ) = @_;
+      ...;
+      return $cloned_value;
+    } };
+  }
+
+The result of the callback will be re-checked against the type constraint,
+but will B<not> be coerced.
+
+Defaults are not cloned. Only values passed from outside are.
+
+=item *
+
 Undef-tolerant attributes.
 
   package My::Class {
@@ -967,6 +1005,12 @@ L<Marlin>.
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+Incorporates parts of L<Clone>, originally by
+Ray Finch E<lt>rdf@cpan.orgE<gt> and maintained by
+Breno G. de Oliveira E<lt>garu@cpan.orgE<gt>,
+Nicolas Rochelemagne E<lt>atoomic@cpan.orgE<gt>, and
+Florian Ragwitz E<lt>rafl@debian.orgE<gt>.
 
 =head1 THANKS
 

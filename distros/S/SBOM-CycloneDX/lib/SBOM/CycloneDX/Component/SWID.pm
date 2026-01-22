@@ -67,19 +67,19 @@ Properties:
 
 =over
 
-=item C<name>, Maps to the name of a SoftwareIdentity.
+=item * C<name>, Maps to the name of a SoftwareIdentity.
 
-=item C<patch>, Maps to the patch of a SoftwareIdentity.
+=item * C<patch>, Maps to the patch of a SoftwareIdentity.
 
-=item C<tag_id>, Maps to the tagId of a SoftwareIdentity.
+=item * C<tag_id>, Maps to the tagId of a SoftwareIdentity.
 
-=item C<tag_version>, Maps to the tagVersion of a SoftwareIdentity.
+=item * C<tag_version>, Maps to the tagVersion of a SoftwareIdentity.
 
-=item C<text>, Specifies the metadata and content of the SWID tag.
+=item * C<text>, Specifies the metadata and content of the SWID tag.
 
-=item C<url>, The URL to the SWID file.
+=item * C<url>, The URL to the SWID file.
 
-=item C<version>, Maps to the version of a SoftwareIdentity.
+=item * C<version>, Maps to the version of a SoftwareIdentity.
 
 =back
 

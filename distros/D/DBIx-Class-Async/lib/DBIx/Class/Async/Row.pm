@@ -7,7 +7,7 @@ use v5.14;
 
 use Carp;
 use Future;
-use Scalar::Util qw( blessed );
+use Scalar::Util qw(blessed);
 
 =head1 NAME
 
@@ -15,11 +15,11 @@ DBIx::Class::Async::Row - Asynchronous row object for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.41
+Version 0.43
 
 =cut
 
-our $VERSION = '0.41';
+our $VERSION = '0.43';
 
 =head1 SYNOPSIS
 
@@ -120,6 +120,10 @@ Croaks if any required parameter is missing.
 
 =cut
 
+# PRIVATE CONSTANTS
+# Protects internal attributes from being treated as database columns
+my $INTERNAL_KEYS = qr/^(?:_.*|async_db|source_name|schema|_inflation_map)$/;
+
 sub new {
     my ($class, %args) = @_;
 
@@ -132,21 +136,44 @@ sub new {
     my $data       = $args{row_data} || $args{_data} || {};
 
     my $self = bless {
-        schema      => $args{schema},
-        async_db    => $args{async_db},
-        source_name => $args{source_name},
-        _source     => $args{_source} // undef,
-        _data       => { %$data },
-        _dirty      => {},
-        _inflated   => {},
-        _related    => {},
-        _in_storage => $in_storage,
-
-        # COMPATIBILITY HACK: Surface raw data to top-level
-        %$data
+        schema         => $args{schema},
+        async_db       => $args{async_db},
+        source_name    => $args{source_name},
+        _source        => $args{_source} // undef,
+        _data          => { %$data },
+        _dirty         => {},
+        _inflated      => {},
+        _related       => {},
+        _in_storage    => $in_storage,
+        _inflation_map => {},
     }, $class;
 
     $self->_ensure_accessors;
+
+    # WARM-UP: Pre-calculate metadata and shadow plain columns for speed
+    my $source = $self->_get_source;
+    if ($source) {
+        foreach my $col (keys %$data) {
+            # Skip internal plumbing
+            next if $self->_is_internal($col);
+
+            if ($source->has_column($col)) {
+                my $info = $source->column_info($col);
+                my $inflator = $info->{inflate} // 0;
+                $self->{_inflation_map}{$col} = $inflator;
+
+                # If NO inflator, shadow to top-level for direct hash-key speed
+                if (!$inflator) {
+                    $self->{$col} = $data->{$col};
+                }
+            }
+            else {
+                # Relationship or custom key - safe to shadow
+                $self->{$col} = $data->{$col};
+                $self->{_inflation_map}{$col} = 0;
+            }
+        }
+    }
 
     return $self;
 }
@@ -345,13 +372,17 @@ sub delete {
         unless defined $id;
 
     return $self->{async_db}->delete($self->{source_name}, $id)->then(sub {
-        my ($success) = @_;
+        my ($result) = @_;
+
+        if (my $error = $self->_check_response($result)) {
+            return Future->fail($error, 'db_error');
+        }
 
         # Mark as not in storage
         $self->{_in_storage} = 0;
 
         # Return the success value (1 or 0), not $self
-        return Future->done($success);
+        return Future->done(1);
     });
 }
 
@@ -394,11 +425,12 @@ sub discard_changes {
         unless defined $id;
 
     # Fetch fresh data from database
-    return $self->{async_db}->find(
-        $self->{source_name},
-        $id
-    )->then(sub {
+    return $self->{async_db}->find($self->{source_name}, $id)->then(sub {
         my ($fresh_data) = @_;
+
+        if (my $error = $self->_check_response($fresh_data)) {
+            return Future->fail($error, 'db_error');
+        }
 
         # Extract the raw data from the fresh data
         my $raw_data = (ref($fresh_data) && $fresh_data->can('get_columns'))
@@ -450,69 +482,48 @@ Croaks if the column doesn't exist.
 sub get_column {
     my ($self, $col) = @_;
 
-    # 1. Return cached inflated value if it exists
+    # 1. Fast-track internal plumbing
+    return $self->{$col} if $self->_is_internal($col);
+
+    # 2. Return cached inflated value if it exists
     return $self->{_inflated}{$col} if exists $self->{_inflated}{$col};
 
-    # 2. Check if the column exists in our raw data
-    if (ref $self->{_data} eq 'HASH' && exists $self->{_data}{$col}) {
-        my $raw_value = $self->{_data}{$col};
-        my $source    = $self->_get_source;
-
-        # 3. Handle Inflation Logic
-        if ($source && $source->has_column($col)) {
-            my $col_info = $source->column_info($col);
-
-            # Check for the 'inflate' subref (defined via inflate_column)
-            if (my $inflator = $col_info->{inflate}) {
-                # Only inflate if the value is defined
-                if (defined $raw_value) {
-                    $self->{_inflated}{$col} = $inflator->($raw_value, $self);
-                    return $self->{_inflated}{$col};
-                }
-            }
-        }
-
-        # If no inflator or value is undef, return the raw value
-        return $raw_value;
-    }
-
-    # Direct column access first
-    if (ref $self->{_data} eq 'HASH' && exists $self->{_data}{$col}) {
-        # Check for column inflation if we have source info
+    # 3. Discovery & Exception Handling
+    if (!exists $self->{_inflation_map}{$col}) {
         my $source = $self->_get_source;
 
-        # Only attempt inflation if the source actually knows about this column
+        # If it's not in data AND not in schema, trigger DBIC exception
+        if ($source && !$source->has_column($col) && !exists $self->{_data}{$col}) {
+            # Calling column_info on a non-existent column triggers the "No such column" croak
+            return $source->column_info($col);
+        }
+
         if ($source && $source->has_column($col)) {
-             if (my $col_info = $source->column_info($col)) {
-                 if (my $inflator = $col_info->{inflate}) {
-                     unless (exists $self->{_inflated}{$col}) {
-                         $self->{_inflated}{$col} = $inflator->($self->{_data}{$col});
-                     }
-                     return $self->{_inflated}{$col};
-                 }
-             }
-        }
-        # If it's a synthetic column (like 'count') or has no inflator, just return it
-        return $self->{_data}{$col};
-    }
-
-    # Check if it's a relationship (if we have source info)
-    my $source = $self->_get_source;
-    if ($source && $source->can('relationship_info')) {
-        if (my $rel = $source->relationship_info($col)) {
-            # Trigger the relationship via AUTOLOAD
-            return $self->$col;
+            $self->{_inflation_map}{$col} = $source->column_info($col)->{inflate} // 0;
+        } else {
+            $self->{_inflation_map}{$col} = 0;
         }
     }
 
-    # If the column exists in the Source, but not in our local data yet,
-    # return undef instead of dying. This is common for auto-inc PKs
-    # or default values not yet fetched.
-    if ($source && $source->has_column($col)) {
-        return undef;
+    my $raw      = $self->{_data}{$col};
+    my $inflator = $self->{_inflation_map}{$col};
+
+    # 4. Inflate if needed
+    if ($inflator && defined $raw) {
+        # Check if already inflated via shadow key
+        if ("$raw" =~ /^HASH\(0x/ && ref $self->{$col}) {
+            return $self->{$col};
+        }
+
+        my $inflated = eval { $inflator->("$raw", $self) };
+        if (!$@ && defined $inflated) {
+            $self->{_inflated}{$col} = $inflated;
+            $self->{$col} = $inflated;
+            return $inflated;
+        }
     }
 
-    croak "No such column '$col' in " . ($self->{source_name} || 'Row');
+    return $raw;
 }
 
 =head2 get_columns
@@ -1051,33 +1062,47 @@ The value that was set.
 =cut
 
 sub set_column {
-    my ($self, $column, $value) = @_;
+    my ($self, $col, $value) = @_;
 
-    unless (defined $column && length $column) {
-        croak("Column name required for set_column");
+    if (!defined $col || $col eq '') {
+         require Carp;
+         Carp::croak("Column name required for set_column");
     }
 
-    $self->{_data}  //= {};
-    $self->{_dirty} //= {};
+    # If someone tries to set 'async_db' or '_source', we return early
+    # to protect the object's plumbing and prevent "dirty" poisoning.
+    return $value if $self->_is_internal($col);
 
-    my $existed = exists $self->{_data}{$column};
-    my $old     = $self->{_data}{$column};
+    # 1. Capture types before any operations occur
+    my $old = $self->{_data}{$col};
+    my $old_ref = ref($old)   || 'SCALAR';
+    my $new_ref = ref($value) || 'SCALAR';
 
-    $self->{_data}{$column} = $value;
-
-    # Determine if a real change occurred
     my $changed = 0;
-    if (!$existed) {
+    if (!defined $old && defined $value) {
         $changed = 1;
-    } elsif (defined($old) != defined($value)) {
-        $changed = 1; # Transition from/to undef
-    } elsif (defined($old) && defined($value) && $old ne $value) {
-        $changed = 1; # Value mismatch
+    } elsif (defined $old && !defined $value) {
+        $changed = 1;
+    } elsif (defined $old && defined $value) {
+        if ($old_ref ne 'SCALAR' || $new_ref ne 'SCALAR') {
+            $changed = 1;
+        } else {
+            # Safe to use string comparison
+            if ($old ne $value) {
+                $changed = 1;
+            }
+        }
     }
 
-    # Mark as dirty if changed
     if ($changed) {
-        $self->{_dirty}{$column} = 1;
+        $self->{_data}{$col} = $value;
+        $self->{_dirty}{$col} = 1;
+
+        # Clear the inflated cache so the next 'get_column' re-inflates the new data
+        delete $self->{_inflated}{$col};
+
+        # We delete the top-level key so it doesn't "shadow" the new data
+        delete $self->{$col};
     }
 
     return $value;
@@ -1249,15 +1274,35 @@ sub update_or_insert {
     my $is_update = $self->in_storage;
 
     # 2. Prepare Payload
-    # We define this BEFORE the success handler so it is in scope for the closure
-    my %to_save = $is_update ? $self->get_dirty_columns : %{ $self->{_data} // {} };
+    my %raw_payload = $is_update ? $self->get_dirty_columns : %{ $self->{_data} // {} };
+    my %to_save;
+
+    foreach my $col (keys %raw_payload) {
+        # If it's not in _inflated, fall back to the raw value in %raw_payload.
+        my $val  = exists $self->{_inflated}{$col} ? $self->{_inflated}{$col} : $raw_payload{$col};
+        my $info = $source->column_info($col);
+
+        # If a deflate handler exists and we have a reference, turn it into a string
+        if ($info && $info->{deflate} && defined $val && ref $val) {
+            $val = $info->{deflate}->($val, $self);
+        }
+
+        $to_save{$col} = $val;
+    }
 
     # 3. Success handler
     my $on_success = sub {
         my ($res) = @_;
 
-        if (ref $res && ref $res eq 'HASH' && ($res->{error} || $res->{__error})) {
-            return Future->fail($res->{error} // $res->{__error}, 'db_error');
+        # We check if it's an object FIRST before asking what kind of object it is.
+        if (blessed($res) && $res->isa('DBIx::Class::Exception')) {
+             return Future->fail($res->msg, 'db_error');
+        }
+
+        # Also check for the HASH-style error envelope which we saw in your logs
+        if (ref $res eq 'HASH' && ($res->{error} || $res->{__error})) {
+             my $err = $res->{error} // $res->{__error};
+            return Future->fail($err, 'db_error');
         }
 
         # Normalise data source
@@ -1278,29 +1323,44 @@ sub update_or_insert {
             }
         }
 
-        # Sync Loop
+        $self->{_in_storage} = 1;
+        $self->in_storage(1);
+
         foreach my $col (keys %$final_data) {
-            my $val  = $final_data->{$col};
-            my $info = $source->column_info($col);
+            my $new_val = $final_data->{$col};
 
-            my $raw_val = $val;
-            if ($info && $info->{deflate} && defined $val && !ref $val) {
-                $raw_val = $info->{deflate}->($val, $self);
-            }
+            # 1. Update core data first
+            $self->{_data}{$col} = $new_val;
 
-            $self->{_data}{$col} = $raw_val;
+            # 2. Clear caches
             delete $self->{_inflated}{$col};
-            delete $self->{$col};
+            delete $self->{_dirty}{$col};
+
+            # 3. Handle the Shadow Key with a "Column Only" safety check
+            my $source = $self->can('_get_source') ? $self->_get_source : undef;
+
+            # CRITICAL: Only call column_info IF the source confirms it is a real column.
+            # This skips 'schema', '_source', 'async_db', and relationships.
+            if ($source && $source->has_column($col)) {
+                my $info = $source->column_info($col);
+                if ($info && $info->{inflate}) {
+                    # For inflated cols, delete shadow to force get_column() to run.
+                    delete $self->{$col};
+                }
+                else {
+                    # For standard columns, update the shadow.
+                    $self->{$col} = $new_val;
+                }
+            }
+            else {
+                # If it's an internal attribute or relationship,
+                # just update the shadow if it already exists,
+                # but NEVER ask column_info about it.
+                $self->{$col} = $new_val if exists $self->{$col};
+            }
         }
 
-        # Final safety for scalar PKs if not already set
-        if (!$is_update && defined $res && !ref $res && $pk_col) {
-             $self->{_data}{$pk_col} = $res;
-        }
-
-        $self->{_dirty} = {};     # Reset change tracking
-        $self->in_storage(1);     # Mark as persisted in DB
-        return Future->done($self);
+        return $self;
     };
 
     # 4. Dispatch
@@ -1322,10 +1382,25 @@ sub update_or_insert {
         }
 
         return $async_db->update($source_name, $id_val, \%to_save)
-                        ->then($on_success);
+                        ->then(sub {
+                            my $res = shift;
+                            # We must catch the error before it gets 'inflated' into a Row
+                            if (blessed($res) && $res->isa('DBIx::Class::Exception')) {
+                                my $error_text = "$res";
+                                return Future->fail($error_text, 'db_error');
+                            }
+                            return $on_success->($res);
+                          });
     } else {
         return $async_db->create($source_name, \%to_save)
-                        ->then($on_success);
+                        ->then(sub {
+                            my $res = shift;
+                            if (blessed($res) && $res->isa('DBIx::Class::Exception')) {
+                                my $error_text = "$res";
+                                return Future->fail($error_text, 'db_error');
+                            }
+                            return $on_success->($res);
+                          });
     }
 }
 
@@ -1771,6 +1846,33 @@ sub _get_source {
     }
 
     return $self->{_source};
+}
+
+#
+#
+# REALLY PRIVATE METHODS
+
+sub _check_response {
+    my ($self, $res) = @_;
+    return undef unless ref $res;
+
+    # 1. Handle DBIx::Class::Exception objects
+    if (blessed($res) && $res->isa('DBIx::Class::Exception')) {
+        return $res->msg;
+    }
+
+    # 2. Handle HashRef error envelopes ({ __error => "..." })
+    if (ref $res eq 'HASH' && (my $err = $res->{error} // $res->{__error})) {
+        return $err;
+    }
+
+    return undef;
+}
+
+sub _is_internal {
+    my ($self, $col) = @_;
+
+    return $col =~ $INTERNAL_KEYS;
 }
 
 =head1 SEE ALSO

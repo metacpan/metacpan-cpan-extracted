@@ -13,6 +13,11 @@ Limitations to be fixed:
 #!!! number 3.  Use (at least) version 4 for new developments.
 #!!! Convert? See https://github.com/markov2/perl5-Mail-Box/wiki/
 
+version 4.02: Thu 22 Jan 09:18:53 CET 2026
+
+	Fixes:
+	- $msg->study [Andy Beverley]
+
 version 4.01: Sat 13 Dec 12:15:47 CET 2025
 
 	Fixes:

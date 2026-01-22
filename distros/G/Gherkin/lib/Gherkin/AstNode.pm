@@ -1,5 +1,5 @@
 package Gherkin::AstNode;
-$Gherkin::AstNode::VERSION = '37.0.1';
+$Gherkin::AstNode::VERSION = '38.0.0';
 use strict;
 use warnings;
 

@@ -1,5 +1,10 @@
 # Version/Revision history
 
+0.08 Tue 20 Jan 2026 19:29:10 MSK
+    * Project relicensed from the Perl 5 dual license to the Artistic License 2.0
+    * Added Acrux::Digest::Damm module with checkdigit/digest methods
+    * Added Acrux::FileLock module
+
 0.07 Tue 04 Nov 2025 16:21:16 MSK
     * Acme::Crux: root, configfile, logfile, pidfile attributes are redesigned
       Now each of the listed attributes does not depend on the application

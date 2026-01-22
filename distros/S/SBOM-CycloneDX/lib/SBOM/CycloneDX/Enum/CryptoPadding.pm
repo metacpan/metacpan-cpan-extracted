@@ -67,22 +67,22 @@ The padding scheme that is used for the cryptographic algorithm.
 
 =over
 
-=item * L<PKCS5>, Public Key Cryptography Standard: Password-Based
+=item * C<PKCS5>, Public Key Cryptography Standard: Password-Based
 Cryptography
 
-=item * L<PKCS7>, Public Key Cryptography Standard: Cryptographic Message
+=item * C<PKCS7>, Public Key Cryptography Standard: Cryptographic Message
 Syntax
 
-=item * L<PKCS1V15>, Public Key Cryptography Standard: RSA Cryptography
+=item * C<PKCS1V15>, Public Key Cryptography Standard: RSA Cryptography
 v1.5
 
-=item * L<OAEP>, Optimal asymmetric encryption padding
+=item * C<OAEP>, Optimal asymmetric encryption padding
 
-=item * L<RAW>, Raw
+=item * C<RAW>, Raw
 
-=item * L<OTHER>, Another padding scheme
+=item * C<OTHER>, Another padding scheme
 
-=item * L<UNKNOWN>, The padding scheme is not known
+=item * C<UNKNOWN>, The padding scheme is not known
 
 =back
 

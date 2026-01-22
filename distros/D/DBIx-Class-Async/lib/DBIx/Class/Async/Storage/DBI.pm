@@ -11,11 +11,11 @@ DBIx::Class::Async::Storage::DBI - DBI-based async storage backend for DBIx::Cla
 
 =head1 VERSION
 
-Version 0.41
+Version 0.43
 
 =cut
 
-our $VERSION = '0.41';
+our $VERSION = '0.43';
 
 =head1 SYNOPSIS
 

@@ -49,7 +49,7 @@
  * @param imm The 16-bit immediate value to load.
  * @param shift_count The left shift to apply (0 for LSL #0, 1 for LSL #16, etc.).
  */
-static void emit_arm64_mov_imm_chunk(
+INFIX_INTERNAL void emit_arm64_mov_imm_chunk(
     code_buffer * buf, bool is_movz, uint64_t dest_reg, uint16_t imm, uint8_t shift_count) {
     if (buf->error)
         return;
@@ -77,7 +77,7 @@ static void emit_arm64_mov_imm_chunk(
  * @param dest The destination GPR.
  * @param value The 64-bit immediate value to load.
  */
-void emit_arm64_load_u64_immediate(code_buffer * buf, arm64_gpr dest, uint64_t value) {
+INFIX_INTERNAL void emit_arm64_load_u64_immediate(code_buffer * buf, arm64_gpr dest, uint64_t value) {
     // Load the lowest 16 bits with MOVZ (zeros the rest of the register).
     emit_arm64_mov_imm_chunk(buf, true, dest, (value >> 0) & 0xFFFF, 0);
     // For each subsequent 16-bit chunk, use MOVK (Move Wide with Keep) only if
@@ -107,7 +107,7 @@ void emit_arm64_load_u64_immediate(code_buffer * buf, arm64_gpr dest, uint64_t v
  * @param dest The destination register.
  * @param src The source register.
  */
-void emit_arm64_mov_reg(code_buffer * buf, bool is64, arm64_gpr dest, arm64_gpr src) {
+INFIX_INTERNAL void emit_arm64_mov_reg(code_buffer * buf, bool is64, arm64_gpr dest, arm64_gpr src) {
     if (buf->error)
         return;
     // Special case: MOV to/from SP is an alias for ADD Xd, SP, #0.
@@ -141,7 +141,7 @@ void emit_arm64_mov_reg(code_buffer * buf, bool is64, arm64_gpr dest, arm64_gpr 
  * @param base The base address register (GPR or SP).
  * @param offset The byte offset from the base register. Must be a multiple of the access size.
  */
-void emit_arm64_ldr_imm(code_buffer * buf, bool is64, arm64_gpr dest, arm64_gpr base, int32_t offset) {
+INFIX_INTERNAL void emit_arm64_ldr_imm(code_buffer * buf, bool is64, arm64_gpr dest, arm64_gpr base, int32_t offset) {
     if (buf->error)
         return;
     const int scale = is64 ? 8 : 4;
@@ -168,7 +168,7 @@ void emit_arm64_ldr_imm(code_buffer * buf, bool is64, arm64_gpr dest, arm64_gpr 
  * @brief Emits a `LDRB` (Load Register Byte) instruction.
  * @details Opcode: 00_111_00_1_01_... (base 0x39400000)
  */
-void emit_arm64_ldrb_imm(code_buffer * buf, arm64_gpr dest, arm64_gpr base, int32_t offset) {
+INFIX_INTERNAL void emit_arm64_ldrb_imm(code_buffer * buf, arm64_gpr dest, arm64_gpr base, int32_t offset) {
     if (buf->error)
         return;
     if (offset >= 0 && offset <= 0xFFF) {
@@ -191,7 +191,7 @@ void emit_arm64_ldrb_imm(code_buffer * buf, arm64_gpr dest, arm64_gpr base, int3
  * @brief Emits a `LDRH` (Load Register Halfword) instruction.
  * @details Opcode: 01_111_00_1_01_... (base 0x79400000)
  */
-void emit_arm64_ldrh_imm(code_buffer * buf, arm64_gpr dest, arm64_gpr base, int32_t offset) {
+INFIX_INTERNAL void emit_arm64_ldrh_imm(code_buffer * buf, arm64_gpr dest, arm64_gpr base, int32_t offset) {
     if (buf->error)
         return;
     if (offset >= 0 && offset % 2 == 0 && (offset / 2) <= 0xFFF) {
@@ -222,7 +222,7 @@ void emit_arm64_ldrh_imm(code_buffer * buf, arm64_gpr dest, arm64_gpr base, int3
  * @param base The base address register.
  * @param offset The byte offset, which must be a multiple of 4.
  */
-void emit_arm64_ldrsw_imm(code_buffer * buf, arm64_gpr dest, arm64_gpr base, int32_t offset) {
+INFIX_INTERNAL void emit_arm64_ldrsw_imm(code_buffer * buf, arm64_gpr dest, arm64_gpr base, int32_t offset) {
     if (buf->error)
         return;
     if (offset >= 0 && offset % 4 == 0 && (offset / 4) <= 0xFFF) {
@@ -243,6 +243,52 @@ void emit_arm64_ldrsw_imm(code_buffer * buf, arm64_gpr dest, arm64_gpr base, int
 }
 /**
  * @internal
+ * @brief Emits a `LDRSB` (Load Register Signed Byte) instruction (64-bit destination).
+ * @details Opcode: 00_111_00_1_10_... (base 0x39800000)
+ */
+INFIX_INTERNAL void emit_arm64_ldrsb_imm(code_buffer * buf, arm64_gpr dest, arm64_gpr base, int32_t offset) {
+    if (buf->error)
+        return;
+    if (offset >= 0 && offset <= 0xFFF) {
+        uint32_t instr = 0x39800000;
+        instr |= ((uint32_t)offset & 0xFFF) << 10;
+        instr |= (uint32_t)(base & 0x1F) << 5;
+        instr |= (uint32_t)(dest & 0x1F);
+        emit_int32(buf, instr);
+    }
+    else {
+        if (offset >= 0)
+            emit_arm64_add_imm(buf, true, false, X16_REG, base, (uint32_t)offset);
+        else
+            emit_arm64_sub_imm(buf, true, false, X16_REG, base, (uint32_t)(-offset));
+        emit_arm64_ldrsb_imm(buf, dest, X16_REG, 0);
+    }
+}
+/**
+ * @internal
+ * @brief Emits a `LDRSH` (Load Register Signed Halfword) instruction (64-bit destination).
+ * @details Opcode: 01_111_00_1_10_... (base 0x79800000)
+ */
+INFIX_INTERNAL void emit_arm64_ldrsh_imm(code_buffer * buf, arm64_gpr dest, arm64_gpr base, int32_t offset) {
+    if (buf->error)
+        return;
+    if (offset >= 0 && offset % 2 == 0 && (offset / 2) <= 0xFFF) {
+        uint32_t instr = 0x79800000;
+        instr |= ((uint32_t)(offset / 2) & 0xFFF) << 10;
+        instr |= (uint32_t)(base & 0x1F) << 5;
+        instr |= (uint32_t)(dest & 0x1F);
+        emit_int32(buf, instr);
+    }
+    else {
+        if (offset >= 0)
+            emit_arm64_add_imm(buf, true, false, X16_REG, base, (uint32_t)offset);
+        else
+            emit_arm64_sub_imm(buf, true, false, X16_REG, base, (uint32_t)(-offset));
+        emit_arm64_ldrsh_imm(buf, dest, X16_REG, 0);
+    }
+}
+/**
+ * @internal
  * @brief Emits a `STR` (Store Register) instruction with an unsigned immediate offset.
  * @details Assembly: `STR <Wt|Xt>, [<Xn|SP>, #pimm]`
  *
@@ -255,7 +301,7 @@ void emit_arm64_ldrsw_imm(code_buffer * buf, arm64_gpr dest, arm64_gpr base, int
  * @param base The base address register.
  * @param offset The byte offset, a multiple of the access size.
  */
-void emit_arm64_str_imm(code_buffer * buf, bool is64, arm64_gpr src, arm64_gpr base, int32_t offset) {
+INFIX_INTERNAL void emit_arm64_str_imm(code_buffer * buf, bool is64, arm64_gpr src, arm64_gpr base, int32_t offset) {
     if (buf->error)
         return;
     const int scale = is64 ? 8 : 4;
@@ -290,7 +336,7 @@ void emit_arm64_str_imm(code_buffer * buf, bool is64, arm64_gpr src, arm64_gpr b
  * @param base The base address register.
  * @param offset The byte offset, a multiple of the access size.
  */
-void emit_arm64_strb_imm(code_buffer * buf, arm64_gpr src, arm64_gpr base, int32_t offset) {
+INFIX_INTERNAL void emit_arm64_strb_imm(code_buffer * buf, arm64_gpr src, arm64_gpr base, int32_t offset) {
     if (buf->error)
         return;
     if (offset >= 0 && offset <= 0xFFF) {
@@ -318,7 +364,7 @@ void emit_arm64_strb_imm(code_buffer * buf, arm64_gpr src, arm64_gpr base, int32
  *          Opcode: 01_111_00_1_00_... (base 0x79000000)
  *
  */
-void emit_arm64_strh_imm(code_buffer * buf, arm64_gpr src, arm64_gpr base, int32_t offset) {
+INFIX_INTERNAL void emit_arm64_strh_imm(code_buffer * buf, arm64_gpr src, arm64_gpr base, int32_t offset) {
     if (buf->error)
         return;
     if (offset >= 0 && offset % 2 == 0 && (offset / 2) <= 0xFFF) {
@@ -347,7 +393,7 @@ void emit_arm64_strh_imm(code_buffer * buf, arm64_gpr src, arm64_gpr base, int32
  *
  * @param offset A signed, scaled immediate offset.
  */
-void emit_arm64_stp_pre_index(
+INFIX_INTERNAL void emit_arm64_stp_pre_index(
     code_buffer * buf, bool is64, arm64_gpr src1, arm64_gpr src2, arm64_gpr base, int32_t offset) {
     if (buf->error)
         return;
@@ -371,7 +417,7 @@ void emit_arm64_stp_pre_index(
  * Encodes `LDP <Xt1>, <Xt2>, [Xn|SP], #imm`.
  * Opcode (64-bit): 1010100011...
  */
-void emit_arm64_ldp_post_index(
+INFIX_INTERNAL void emit_arm64_ldp_post_index(
     code_buffer * buf, bool is64, arm64_gpr dest1, arm64_gpr dest2, arm64_gpr base, int32_t offset) {
     uint32_t instr = 0xA8C00000;  // Base for LDP post-indexed
     if (is64)
@@ -391,7 +437,7 @@ void emit_arm64_ldp_post_index(
  * Opcode (64-bit, D reg): 11_111_10_1_01_... (base 0xBD400000)
  * Opcode (32-bit, S reg): 10_111_10_1_01_... (base 0x7D400000)
  */
-void emit_arm64_ldr_vpr(code_buffer * buf, bool is64, arm64_vpr dest, arm64_gpr base, int32_t offset) {
+INFIX_INTERNAL void emit_arm64_ldr_vpr(code_buffer * buf, bool is64, arm64_vpr dest, arm64_gpr base, int32_t offset) {
     if (buf->error)
         return;
     const int scale = is64 ? 8 : 4;
@@ -419,7 +465,7 @@ void emit_arm64_ldr_vpr(code_buffer * buf, bool is64, arm64_vpr dest, arm64_gpr 
  * Opcode (64-bit, D reg): 11_111_10_1_00_... (base 0xBD000000)
  * Opcode (32-bit, S reg): 10_111_10_1_00_... (base 0x7D000000)
  */
-void emit_arm64_str_vpr(code_buffer * buf, bool is64, arm64_vpr src, arm64_gpr base, int32_t offset) {
+INFIX_INTERNAL void emit_arm64_str_vpr(code_buffer * buf, bool is64, arm64_vpr src, arm64_gpr base, int32_t offset) {
     if (buf->error)
         return;
     const int scale = is64 ? 8 : 4;
@@ -446,7 +492,7 @@ void emit_arm64_str_vpr(code_buffer * buf, bool is64, arm64_vpr src, arm64_gpr b
  * Encodes `LDR <Qt>, [Xn, #imm]` for a 128-bit load into a full V-register.
  * Opcode: 00_111_10_1_01... (base 0x3DC00000)
  */
-void emit_arm64_ldr_q_imm(code_buffer * buf, arm64_vpr dest, arm64_gpr base, int32_t offset) {
+INFIX_INTERNAL void emit_arm64_ldr_q_imm(code_buffer * buf, arm64_vpr dest, arm64_gpr base, int32_t offset) {
     if (buf->error)
         return;
     // Validate immediate offset for 128-bit (16-byte) access
@@ -471,7 +517,7 @@ void emit_arm64_ldr_q_imm(code_buffer * buf, arm64_vpr dest, arm64_gpr base, int
  * Encodes `STR <Qt>, [Xn, #imm]` for a 128-bit store from a full V-register.
  * Opcode: 00_111_10_1_00... (base 0x3D800000)
  */
-void emit_arm64_str_q_imm(code_buffer * buf, arm64_vpr src, arm64_gpr base, int32_t offset) {
+INFIX_INTERNAL void emit_arm64_str_q_imm(code_buffer * buf, arm64_vpr src, arm64_gpr base, int32_t offset) {
     if (buf->error)
         return;
     // Validate immediate offset for 128-bit (16-byte) access
@@ -498,7 +544,7 @@ void emit_arm64_str_q_imm(code_buffer * buf, arm64_vpr src, arm64_gpr base, int3
  * It handles large immediates by falling back to a multi-instruction sequence that
  * uses a scratch register (X15), since single instructions have a limited immediate range.
  */
-static void emit_arm64_arith_imm(
+INFIX_INTERNAL void emit_arm64_arith_imm(
     code_buffer * buf, bool is_sub, bool is64, bool set_flags, arm64_gpr dest, arm64_gpr base, uint32_t imm) {
     uint32_t instr = is_sub ? 0x51000000 : 0x11000000;
     if (is64)
@@ -535,7 +581,8 @@ static void emit_arm64_arith_imm(
  * Opcode (64-bit): 10_0_10001_... (0x91...)
  * Opcode (32-bit): 00_0_10001_... (0x11...)
  */
-void emit_arm64_add_imm(code_buffer * buf, bool is64, bool set_flags, arm64_gpr dest, arm64_gpr base, uint32_t imm) {
+INFIX_INTERNAL void emit_arm64_add_imm(
+    code_buffer * buf, bool is64, bool set_flags, arm64_gpr dest, arm64_gpr base, uint32_t imm) {
     emit_arm64_arith_imm(buf, false, is64, set_flags, dest, base, imm);
 }
 /*
@@ -543,7 +590,8 @@ void emit_arm64_add_imm(code_buffer * buf, bool is64, bool set_flags, arm64_gpr 
  * Opcode (64-bit): 11_0_10001_... (0xD1...)
  * Opcode (32-bit): 01_0_10001_... (0x51...)
  */
-void emit_arm64_sub_imm(code_buffer * buf, bool is64, bool set_flags, arm64_gpr dest, arm64_gpr base, uint32_t imm) {
+INFIX_INTERNAL void emit_arm64_sub_imm(
+    code_buffer * buf, bool is64, bool set_flags, arm64_gpr dest, arm64_gpr base, uint32_t imm) {
     emit_arm64_arith_imm(buf, true, is64, set_flags, dest, base, imm);
 }
 // Control Flow Emitters
@@ -551,7 +599,7 @@ void emit_arm64_sub_imm(code_buffer * buf, bool is64, bool set_flags, arm64_gpr 
  * Implementation for emit_arm64_blr_reg (Branch with Link to Register).
  * Opcode: 1101011000111111000000... (0xD63F0000)
  */
-void emit_arm64_blr_reg(code_buffer * buf, arm64_gpr reg) {
+INFIX_INTERNAL void emit_arm64_blr_reg(code_buffer * buf, arm64_gpr reg) {
     uint32_t instr = 0xD63F0000;
     instr |= (uint32_t)(reg & 0x1F) << 5;
     emit_int32(buf, instr);
@@ -561,7 +609,7 @@ void emit_arm64_blr_reg(code_buffer * buf, arm64_gpr reg) {
  * Opcode: 1101011001011111000000... (0xD65F0000)
  * Defaults to `RET X30` if X30_LR_REG is passed.
  */
-void emit_arm64_ret(code_buffer * buf, arm64_gpr reg) {
+INFIX_INTERNAL void emit_arm64_ret(code_buffer * buf, arm64_gpr reg) {
     uint32_t instr = 0xD65F0000;
     instr |= (uint32_t)(reg & 0x1F) << 5;
     emit_int32(buf, instr);
@@ -575,7 +623,7 @@ void emit_arm64_ret(code_buffer * buf, arm64_gpr reg) {
  *
  * @param offset A signed byte offset from the current instruction, which must be a multiple of 4.
  */
-void emit_arm64_cbnz(code_buffer * buf, bool is64, arm64_gpr reg, int32_t offset) {
+INFIX_INTERNAL void emit_arm64_cbnz(code_buffer * buf, bool is64, arm64_gpr reg, int32_t offset) {
     if (buf->error)
         return;
     // Offset is encoded as a 19-bit immediate, scaled by 4 bytes.
@@ -597,7 +645,7 @@ void emit_arm64_cbnz(code_buffer * buf, bool is64, arm64_gpr reg, int32_t offset
  *
  * Opcode: 11010100001... (0xD42...)
  */
-void emit_arm64_brk(code_buffer * buf, uint16_t imm) {
+INFIX_INTERNAL void emit_arm64_brk(code_buffer * buf, uint16_t imm) {
     if (buf->error)
         return;
     uint32_t instr = A64_OP_SYSTEM | A64_OP_BRK;
@@ -615,7 +663,7 @@ void emit_arm64_brk(code_buffer * buf, uint16_t imm) {
  *
  * Opcode: 1101011000011111000000... (0xD61F0000)
  */
-void emit_arm64_b_reg(code_buffer * buf, arm64_gpr reg) {
+INFIX_INTERNAL void emit_arm64_b_reg(code_buffer * buf, arm64_gpr reg) {
     if (buf->error)
         return;
     uint32_t instr = A64_OP_BRANCH_REG | A64_OPC_BR;
@@ -627,7 +675,7 @@ void emit_arm64_b_reg(code_buffer * buf, arm64_gpr reg) {
  * @brief Emits `SVC #imm` (Supervisor Call) instruction.
  * @details Opcode: 11010100_00_imm16_0001
  */
-void emit_arm64_svc_imm(code_buffer * buf, uint16_t imm) {
+INFIX_INTERNAL void emit_arm64_svc_imm(code_buffer * buf, uint16_t imm) {
     if (buf->error)
         return;
     uint32_t instr = A64_OP_SYSTEM | A64_OP_SVC;

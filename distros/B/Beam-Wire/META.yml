@@ -18,7 +18,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Metadata: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,31 +35,31 @@ no_index:
 provides:
   Beam::Wire:
     file: lib/Beam/Wire.pm
-    version: '1.027'
+    version: '1.028'
   Beam::Wire::Event::BuildService:
     file: lib/Beam/Wire/Event/BuildService.pm
-    version: '1.027'
+    version: '1.028'
   Beam::Wire::Event::ConfigService:
     file: lib/Beam/Wire/Event/ConfigService.pm
-    version: '1.027'
+    version: '1.028'
   Beam::Wire::Exception:
     file: lib/Beam/Wire.pm
-    version: '1.027'
+    version: '1.028'
   Beam::Wire::Exception::Config:
     file: lib/Beam/Wire.pm
-    version: '1.027'
+    version: '1.028'
   Beam::Wire::Exception::Constructor:
     file: lib/Beam/Wire.pm
-    version: '1.027'
+    version: '1.028'
   Beam::Wire::Exception::InvalidConfig:
     file: lib/Beam/Wire.pm
-    version: '1.027'
+    version: '1.028'
   Beam::Wire::Exception::NotFound:
     file: lib/Beam/Wire.pm
-    version: '1.027'
+    version: '1.028'
   Beam::Wire::Exception::Service:
     file: lib/Beam/Wire.pm
-    version: '1.027'
+    version: '1.028'
 recommends:
   JSON: '0'
 requires:
@@ -78,7 +78,7 @@ resources:
   bugtracker: https://github.com/preaction/Beam-Wire/issues
   homepage: https://github.com/preaction/Beam-Wire
   repository: https://github.com/preaction/Beam-Wire.git
-version: '1.027'
+version: '1.028'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Al Tom <al-tom.ru@yandex.ru>'
@@ -90,6 +90,6 @@ x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'mohawk2 <mohawk2@users.noreply.github.com>'
   - 'Sven Willenbuecher <sven.willenbuecher@kuehne-nagel.com>'
-x_generated_by_perl: v5.40.2
+x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -69,17 +69,17 @@ Properties:
 
 =over
 
-=item C<algorithms>, A list of algorithms related to the cipher suite.
+=item * C<algorithms>, A list of algorithms related to the cipher suite.
 
-=item C<identifiers>, A list of common identifiers for the cipher suite.
+=item * C<identifiers>, A list of common identifiers for the cipher suite.
 
-=item C<name>, A common name for the cipher suite.
+=item * C<name>, A common name for the cipher suite.
 
-=item C<tls_groups>, A list of TLS named groups (formerly known as curves) for
+=item * C<tls_groups>, A list of TLS named groups (formerly known as curves) for
 this cipher suite. These groups define the parameters for key exchange algorithms
 like ECDHE.
 
-=item C<tls_signature_schemes>, A list of signature schemes supported for cipher
+=item * C<tls_signature_schemes>, A list of signature schemes supported for cipher
 suite. These schemes specify the algorithms used for digital signatures in TLS
 handshakes and certificate verification.
 

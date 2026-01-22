@@ -5,46 +5,67 @@ no source::encoding;
 use warnings FATAL => 'all';
 use autodie ':default';
 use Matplotlib::Simple;
-#use File::Temp;
+use File::Temp;
 
-my @plots = ({
-	data => {
-		'sin' => [map {sin($_ * 3.14159265/180)} 0..360],
-		'cos' => [map {cos($_ * 3.14159265/180)} 0..360]
-	},
-	'plot.type' => 'hist2d',
-	cbpad       => 0.001,
-	title       => 'pad = 0.001'
-});
-for (my $pad = 0.01; $pad <= 0.06; $pad += 0.03) {
-	push @plots, {
-		data => {
-			'sin' => [map {sin($_ * 3.14159265/180)} 0..360],
-			'cos' => [map {cos($_ * 3.14159265/180)} 0..360]
-		},
-		'plot.type' => 'hist2d',
-		cbdrawedges => 1,
-		cbpad       => $pad,
-		title       => "pad = $pad"
-	};
+my @t;
+for (my $t = 0.01; $t <= 10; $t += 0.01) {
+	push @t, $t;
 }
+my $fh = File::Temp->new(DIR => '/tmp', UNLINK => 0, SUFFIX => '.py');
 plt({
-	'output.file' => '/tmp/hist2d.pads.svg',
-	plots         => \@plots,
-	ncols         => 1,
-	nrows         => 3,
-	sharey        => 1,
-	scale         => 2
-});
-#my $fh = File::Temp->new(DIR => '/tmp', SUFFIX => '.py', UNLINK => 0);
-=plt({
-	cbpad       => 0.01,          # default 0.05 is too big
-	data        => {
-		'sin' => [map {sin($_ * 3.141592653/180)} 0..360],
-		'cos' => [map {cos($_ * 3.141592653/180)} 0..360]
+	execute       => 0,
+	fh            => $fh,
+	data          => [
+		[ # plot 0
+			[@t],              # x coordinates
+			[map {sin($_)} @t] # y coordinates
+		],
+		[ # plot 1
+			[@t],
+			[map {exp($_)} @t]
+		]
+	],
+	'output.file' => '/tmp/twinx.arr.svg',
+	'plot.type'   => 'plot',
+	'set.options' => [
+		'color = "blue"', # plot 0
+		'color = "red"'   # plot 1
+	],
+	tick_params => 'axis = "y", labelcolor = "blue"',
+	ylabel      => '"sin", color="blue"', # applies to base ax object
+	'twinx.args'  => {
+		1 => { # automatically knows that plot 1 is twinned on x
+			tick_params => 'axis = "y", labelcolor = "red"',
+			ylabel      => '"exp", color="red"',
+		}
 	},
-	'plot.type'   => 'hexbin',
-	'output.file' => '/tmp/hexbin.svg',
-	set_ylim      => '0, 1',
 });
-
+plt({
+	show          => 'True',
+	execute       => 1,
+	fh            => $fh,
+	data          => {
+		'sin' => [ # plot 0
+			[@t],              # x coordinates
+			[map {sin($_)} @t] # y coordinates
+		],
+		'exp' => [ # plot 1
+			[@t],
+			[map {exp($_)} @t]
+		]
+	},
+	'output.file' => '/tmp/twinx.hash.svg',
+	'plot.type'   => 'plot',
+	'set.options' => {
+		'sin' => 'color = "blue"',
+		'exp' => 'color = "red"'
+	},
+	tick_params => 'axis = "y", labelcolor = "blue"',
+	ylabel      => '"sin", color="blue"', # applies to base ax object
+	'twinx.args'  => {
+		'exp' => { # automatically knows that plot is twinx
+			tick_params => 'axis = "y", labelcolor = "red"',
+			ylabel      => '"exp", color="red"',
+		}
+	},
+});

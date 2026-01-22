@@ -53,6 +53,9 @@ cryptographic assets related to this component.
 
 =head2 METHODS
 
+L<SBOM::CycloneDX::CryptoProperties::RelatedCryptographicAsset> inherits all methods from L<SBOM::CycloneDX::Base>
+and implements the following new ones.
+
 =over
 
 =item SBOM::CycloneDX::CryptoProperties::RelatedCryptographicAsset->new( %PARAMS )
@@ -61,9 +64,9 @@ Properties:
 
 =over
 
-=item C<ref>, The bom-ref to cryptographic asset.
+=item * C<ref>, The bom-ref to cryptographic asset.
 
-=item C<type>, Specifies the mechanism by which the cryptographic asset is
+=item * C<type>, Specifies the mechanism by which the cryptographic asset is
 secured by.
 
 =back

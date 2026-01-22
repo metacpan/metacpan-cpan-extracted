@@ -25,20 +25,20 @@ my $exefiles = [qw(
 
 WriteMakefile(
     'NAME'              => 'App::DistSync',
-    'MIN_PERL_VERSION'  => 5.020001,
+    'MIN_PERL_VERSION'  => 5.020,
     'VERSION_FROM'      => 'lib/App/DistSync.pm',
     'ABSTRACT_FROM'     => 'lib/App/DistSync.pm',
     'BUILD_REQUIRES'    => $build_requires,
     'PREREQ_PM'         => $prereq_pm,
     'EXE_FILES'         => $exefiles,
     'AUTHOR'            => 'Serz Minus (Sergey Lepenkov) <abalama@cpan.org>',
-    'LICENSE'           => 'perl',
+    'LICENSE'           => 'artistic_2',
     'META_MERGE'        => {
         'meta-spec' => {version => 2},
         prereqs     => {runtime => {requires => {perl => '5.020'}}},
         resources   => {
             homepage    => 'https://sourceforge.net/projects/app-distsync/',
-            license     => 'https://dev.perl.org/licenses',
+            license     => 'https://opensource.org/license/artistic-2-0',
             repository      => {
                 type => 'git',
                 url  => 'https://abalama@git.code.sf.net/p/app-distsync/trunk',

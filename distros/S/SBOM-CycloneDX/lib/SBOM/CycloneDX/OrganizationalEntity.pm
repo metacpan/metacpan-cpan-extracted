@@ -85,19 +85,19 @@ Properties:
 
 =over
 
-=item C<address>, The physical address (location) of the organization
+=item * C<address>, The physical address (location) of the organization
 
-=item C<bom_ref>, An identifier which can be used to reference the object
+=item * C<bom_ref>, An identifier which can be used to reference the object
 elsewhere in the BOM. Every bom-ref must be unique within the BOM.
 Value SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid
 conflicts with BOM-Links.
 
-=item C<contact>, A contact at the organization. Multiple contacts are
+=item * C<contact>, A contact at the organization. Multiple contacts are
 allowed.
 
-=item C<name>, The name of the organization
+=item * C<name>, The name of the organization
 
-=item C<url>, The URL of the organization. Multiple URLs are allowed.
+=item * C<url>, The URL of the organization. Multiple URLs are allowed.
 
 =back
 

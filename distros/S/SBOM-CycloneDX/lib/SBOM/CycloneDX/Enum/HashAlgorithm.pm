@@ -73,33 +73,33 @@ The algorithm that generated the hash value.
 
 =over
 
-=item * L<MD5>
+=item * C<MD5>
 
-=item * L<SHA_1>
+=item * C<SHA_1>
 
-=item * L<SHA_256>
+=item * C<SHA_256>
 
-=item * L<SHA_384>
+=item * C<SHA_384>
 
-=item * L<SHA_512>
+=item * C<SHA_512>
 
-=item * L<SHA3_256>
+=item * C<SHA3_256>
 
-=item * L<SHA3_384>
+=item * C<SHA3_384>
 
-=item * L<SHA3_512>
+=item * C<SHA3_512>
 
-=item * L<BLAKE2B_256>
+=item * C<BLAKE2B_256>
 
-=item * L<BLAKE2B_384>
+=item * C<BLAKE2B_384>
 
-=item * L<BLAKE2B_512>
+=item * C<BLAKE2B_512>
 
-=item * L<BLAKE3>
+=item * C<BLAKE3>
 
-=item * L<STREEBOG_256>
+=item * C<STREEBOG_256>
 
-=item * L<STREEBOG_512>
+=item * C<STREEBOG_512>
 
 =back
 

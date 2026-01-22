@@ -83,19 +83,19 @@ Properties:
 
 =over
 
-=item C<auth>, IKEv2 Authentication method
+=item * C<auth>, IKEv2 Authentication method
 
-=item C<encr>, Transform Type 1: encryption algorithms
+=item * C<encr>, Transform Type 1: encryption algorithms
 
-=item C<esn>, Specifies if an Extended Sequence Number (ESN) is used.
+=item * C<esn>, Specifies if an Extended Sequence Number (ESN) is used.
 
-=item C<integ>, Transform Type 3: integrity algorithms
+=item * C<integ>, Transform Type 3: integrity algorithms
 
-=item C<ke>, Transform Type 4: Key Exchange Method (KE) per RFC
+=item * C<ke>, Transform Type 4: Key Exchange Method (KE) per RFC
 9370 (L<https://www.ietf.org/rfc/rfc9370.html>), formerly called
 Diffie-Hellman Group (D-H).
 
-=item C<prf>, Transform Type 2: pseudorandom functions
+=item * C<prf>, Transform Type 2: pseudorandom functions
 
 =back
 

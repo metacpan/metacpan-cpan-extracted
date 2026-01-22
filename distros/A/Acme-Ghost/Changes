@@ -1,5 +1,8 @@
 # Version/Revision history
 
+1.03 Wed 21 Jan 2026 16:27:59 MSK
+    * Project relicensed from the Perl 5 dual license to the Artistic License 2.0
+
 1.02 Fri 07 Nov 2025 19:22:49 MSK
     * The module was accidentally deleted
 

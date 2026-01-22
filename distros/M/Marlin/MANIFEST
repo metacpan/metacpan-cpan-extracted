@@ -20,6 +20,7 @@ examples/lib/Local/Example/Moose.pm
 examples/lib/Local/Example/Mouse.pm
 examples/lib/Local/Example/Plain.pm
 examples/lib/Local/Example/Tiny.pm
+examples/lib/Local/Example/Venus.pm
 examples/peek_at_delegations.pl
 examples/test.pl
 lib/Marlin.pm

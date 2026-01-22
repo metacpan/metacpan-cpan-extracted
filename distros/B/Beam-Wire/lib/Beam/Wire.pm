@@ -1,5 +1,5 @@
 package Beam::Wire;
-our $VERSION = '1.027';
+our $VERSION = '1.028';
 # ABSTRACT: Lightweight Dependency Injection Container
 
 #pod =head1 SYNOPSIS
@@ -1124,6 +1124,9 @@ sub _resolve_relative_path {
             return $dir->child( $file );
         }
     }
+    # Allow the file to fall through so we get an error message with
+    # the relative filename that we tried looking up.
+    return $file;
 }
 
 # Check config file for known issues and report
@@ -1405,7 +1408,7 @@ Beam::Wire - Lightweight Dependency Injection Container
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@ use DynaLoader;
 use Config;
 use File::Spec;
 #
-my $TMP_DIR = Path::Tiny->tempdir( CLEANUP => 1 );
+my $TMP_DIR = Path::Tiny->tempdir( CLEANUP => 0 );
 #
 subtest 'Inline Source' => sub {
     skip_all 'No CC' unless bin_path( $Config{cc} );

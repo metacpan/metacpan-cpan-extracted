@@ -35,6 +35,7 @@
  * @internal
  */
 #pragma once
+#include <infix/infix.h>
 #include <stdbool.h>
 #include <stddef.h>
 /**
@@ -47,7 +48,7 @@
  * the codebase can use `nullptr` consistently without causing compilation errors
  * in a strict C11/C17 environment.
  */
-#ifndef nullptr
+#if !defined(nullptr) && !defined(__cplusplus)
 #define nullptr ((void *)0)
 #endif
 /**
@@ -59,7 +60,8 @@
  * even if they support the underlying `_Static_assert` keyword. It allows for
  * compile-time assertions throughout the codebase.
  */
-#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) || (defined(_MSC_VER) && _MSC_VER >= 1900)
+#if !defined(__cplusplus) && \
+    ((defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) || (defined(_MSC_VER) && _MSC_VER >= 1900))
 #include <assert.h>
 #ifndef static_assert
 #define static_assert(cond, msg) _Static_assert(cond, msg)
@@ -84,27 +86,9 @@
 #endif
 /**
  * @def c23_nodiscard
- * @brief A compatibility macro for the C23 `[[nodiscard]]` attribute.
- *
- * @details This attribute is used to issue a compiler warning if the return value
- * of a function is ignored by the caller. This is extremely useful for catching
- * bugs where an error code or an important result is not checked.
- *
- * This macro expands to:
- * - `[[nodiscard]]` on compilers that support the C23 standard syntax.
- * - `__attribute__((warn_unused_result))` on GCC and Clang.
- * - `_Check_return_` on Microsoft Visual C++.
- * - Nothing on other compilers.
+ * @brief Internal alias for the public INFIX_NODISCARD macro.
  */
-#if COMPAT_HAS_C_ATTRIBUTE(nodiscard)
-#define c23_nodiscard [[nodiscard]]
-#elif defined(__GNUC__) || defined(__clang__)
-#define c23_nodiscard __attribute__((warn_unused_result))
-#elif defined(_MSC_VER)
-#define c23_nodiscard _Check_return_
-#else
-#define c23_nodiscard
-#endif
+#define c23_nodiscard INFIX_NODISCARD
 /**
  * @def c23_deprecated
  * @brief A compatibility macro for the C23 `[[deprecated]]` attribute.

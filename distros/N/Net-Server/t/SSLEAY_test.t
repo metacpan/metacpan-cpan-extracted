@@ -101,7 +101,7 @@ my $ok = eval {
     } else {
         eval {
             alarm $env->{'timeout'};
-            close STDERR;
+            open STDERR, ">", "/dev/null";
             Net::Server::Test->run(
                 host  => $env->{'hostname'},
                 port  => $env->{'ports'},

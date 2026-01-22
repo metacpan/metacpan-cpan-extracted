@@ -74,9 +74,11 @@ subtest 'Complete workflow' => sub {
     my $order_id = $orders->[0]->id;
     $orders->[0]->delete->get;
 
-    my $deleted_order_future = $schema->resultset('Order')->find($order_id);
-    my $deleted_order = $deleted_order_future->get;
-
+    my $re_check = $schema->resultset('Order')->search(
+        { id => $order_id },
+        { result_class => 'DBIx::Class::ResultClass::HashRefInflator' }
+    )->single_future;
+    my $deleted_order = $re_check->get;
     ok(!$deleted_order, 'Order was deleted');
 
     # 7. Now delete user

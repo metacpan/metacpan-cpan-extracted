@@ -1,0 +1,82 @@
+#!/usr/bin/env perl
+# xsone - Combine multiple XS files into a single XS file
+#
+# See ExtUtils::XSOne for documentation.
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use ExtUtils::XSOne;
+
+my $src_dir;
+my $output;
+my @order;
+my $verbose = 0;
+my $help    = 0;
+
+GetOptions(
+    'src|s=s'     => \$src_dir,
+    'out|o=s'     => \$output,
+    'order=s@'    => \@order,
+    'verbose|v'   => \$verbose,
+    'help|h|?'    => \$help,
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+pod2usage("--src is required") unless $src_dir;
+pod2usage("--out is required") unless $output;
+
+my $count = ExtUtils::XSOne->combine(
+    src_dir => $src_dir,
+    output  => $output,
+    order   => @order ? \@order : undef,
+    verbose => $verbose,
+);
+
+print "Combined $count files into $output\n" unless $verbose;
+
+__END__
+
+=head1 NAME
+
+xsone - Combine multiple XS files into a single XS file
+
+=head1 SYNOPSIS
+
+    xsone --src lib/MyModule/xs --out lib/MyModule.xs [options]
+
+    Options:
+      --src, -s DIR    Source directory containing .xs files (required)
+      --out, -o FILE   Output file path (required)
+      --order FILE     Specify file order (repeatable, without .xs extension)
+      --verbose, -v    Print progress information
+      --help, -h       Show this help message
+
+=head1 DESCRIPTION
+
+B<xsone> combines multiple XS source files into a single XS file,
+allowing you to organize XS code into multiple files while still
+producing a single shared library.
+
+=head1 EXAMPLES
+
+    # Basic usage
+    xsone --src lib/MyModule/xs --out lib/MyModule.xs
+
+    # With verbose output
+    xsone -v --src lib/MyModule/xs --out lib/MyModule.xs
+
+    # Custom file order
+    xsone --src lib/MyModule/xs --out lib/MyModule.xs \
+          --order _header --order context --order tensor --order _footer
+
+=head1 SEE ALSO
+
+L<ExtUtils::XSOne>
+
+=head1 AUTHOR
+
+LNATION email@lnation.org
+
+=cut

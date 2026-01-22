@@ -59,9 +59,9 @@ Properties:
 
 =over
 
-=item C<title>, A name of the advisory.
+=item * C<title>, A name of the advisory.
 
-=item C<url>, Location where the advisory can be obtained.
+=item * C<url>, Location where the advisory can be obtained.
 
 =back
 

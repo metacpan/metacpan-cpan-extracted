@@ -99,31 +99,31 @@ Properties:
 
 =over
 
-=item C<bom_ref>, An identifier which can be used to reference the
+=item * C<bom_ref>, An identifier which can be used to reference the
 object elsewhere in the BOM. Every bom-ref must be unique within the BOM.
 
-=item C<description>, The description of the standard.
+=item * C<description>, The description of the standard.
 
-=item C<external_references>, External references provide a way to document
+=item * C<external_references>, External references provide a way to document
 systems, sites, and information that may be relevant but are not included
 with the BOM. They may also establish specific relationships within or
 external to the BOM.
 
-=item C<levels>, The list of levels associated with the standard. Some
+=item * C<levels>, The list of levels associated with the standard. Some
 standards have different levels of compliance.
 
-=item C<name>, The name of the standard. This will often be a shortened,
+=item * C<name>, The name of the standard. This will often be a shortened,
 single name of the standard.
 
-=item C<owner>, The owner of the standard, often the entity responsible for
+=item * C<owner>, The owner of the standard, often the entity responsible for
 its release.
 
-=item C<requirements>, The list of requirements comprising the standard.
+=item * C<requirements>, The list of requirements comprising the standard.
 
-=item C<signature>, Enveloped signature in [JSON Signature Format
+=item * C<signature>, Enveloped signature in [JSON Signature Format
 (JSF)](https://cyberphone.github.io/doc/security/jsf.html).
 
-=item C<version>, The version of the standard.
+=item * C<version>, The version of the standard.
 
 =back
 

@@ -60,6 +60,9 @@ L<SBOM::CycloneDX::License::ExpressionDetail> Details for parts of the
 
 =head2 METHODS
 
+L<SBOM::CycloneDX::License::ExpressionDetail> inherits all methods from L<SBOM::CycloneDX::Base>
+and implements the following new ones.
+
 =over
 
 =item SBOM::CycloneDX::License::ExpressionDetail->new( %PARAMS )
@@ -68,19 +71,19 @@ Properties:
 
 =over
 
-=item C<bom_ref>, An identifier which can be used to reference the license
+=item * C<bom_ref>, An identifier which can be used to reference the license
 elsewhere in the BOM. Every C<bom-ref> must be unique within the BOM.
 Value SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid
 conflicts with BOM-Links.
 
-=item C<license_identifier>, The valid SPDX license identifier. Refer to
+=item * C<license_identifier>, The valid SPDX license identifier. Refer to
 L<https://spdx.org/specifications> for syntax requirements.
 This property serves as the primary key, which uniquely identifies each
 record.
 
-=item C<text>, A way to include the textual content of the license.
+=item * C<text>, A way to include the textual content of the license.
 
-=item C<url>, The URL to the license file. If specified, a 'license'
+=item * C<url>, The URL to the license file. If specified, a 'license'
 externalReference should also be specified for completeness
 
 =back

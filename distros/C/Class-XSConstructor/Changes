@@ -6,6 +6,17 @@ Home page:    <https://metacpan.org/release/Class-XSConstructor>
 Bug tracker:  <https://github.com/tobyink/p5-class-xsconstructor/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.023001	2026-01-22
+
+ [ Documentation ]
+ - Small correction.
+
+0.023000	2026-01-21
+
+ - Added: Class::XSConstructor now supports clone_on_write.
+ - Added: Class::XSConstructor::clone() utility function exists.
+ - Added: Class::XSReader now supports clone_on_read.
+
 0.022002	2026-01-20
 
  [ Bug Fixes ]

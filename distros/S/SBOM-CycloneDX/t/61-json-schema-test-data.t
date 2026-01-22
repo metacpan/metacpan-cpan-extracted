@@ -13,7 +13,7 @@ use List::Util            qw(first);
 
 use SBOM::CycloneDX::Schema;
 
-my @SKIP = qw(
+my @SKIP = qw[
     valid-attestation-1.6.json
     valid-attestation-1.7.json
     valid-service-empty-objects-1.6.json
@@ -23,9 +23,9 @@ my @SKIP = qw(
     valid-signatures-1.7.json
     valid-standard-1.6.json
     valid-standard-1.7.json
-);
+];
 
-my @SPEC_VERSIONS = qw(1.2 1.3 1.4 1.5 1.6 1.7);
+my @SPEC_VERSIONS = qw[1.2 1.3 1.4 1.5 1.6 1.7];
 
 for my $spec_version (@SPEC_VERSIONS) {
 

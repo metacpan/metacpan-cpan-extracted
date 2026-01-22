@@ -80,13 +80,13 @@ Properties:
 
 =over
 
-=item C<custodians>, Data custodians are responsible for the safe custody,
+=item * C<custodians>, Data custodians are responsible for the safe custody,
 transport, and storage of data.
 
-=item C<owners>, Data owners are concerned with risk and appropriate access
+=item * C<owners>, Data owners are concerned with risk and appropriate access
 to data.
 
-=item C<stewards>, Data stewards are responsible for data content, context,
+=item * C<stewards>, Data stewards are responsible for data content, context,
 and associated business rules.
 
 =back

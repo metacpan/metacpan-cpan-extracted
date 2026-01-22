@@ -92,25 +92,25 @@ Properties:
 
 =over
 
-=item C<annotator>, The organization, person, component, or service which
+=item * C<annotator>, The organization, person, component, or service which
 created the textual content of the annotation.
 
-=item C<bom_ref>, An identifier which can be used to reference the
+=item * C<bom_ref>, An identifier which can be used to reference the
 annotation elsewhere in the BOM. Every bom-ref must be unique within the
 BOM.
 Value SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid
 conflicts with BOM-Links.
 
-=item C<signature>, Enveloped signature in JSON Signature Format (JSF)
+=item * C<signature>, Enveloped signature in JSON Signature Format (JSF)
 (L<https://cyberphone.github.io/doc/security/jsf.html>).
 
-=item C<subjects>, The object in the BOM identified by its bom-ref. This is
+=item * C<subjects>, The object in the BOM identified by its bom-ref. This is
 often a component or service, but may be any object type supporting
 bom-refs.
 
-=item C<text>, The textual content of the annotation.
+=item * C<text>, The textual content of the annotation.
 
-=item C<timestamp>, The date and time (timestamp) when the annotation was
+=item * C<timestamp>, The date and time (timestamp) when the annotation was
 created.
 
 =back

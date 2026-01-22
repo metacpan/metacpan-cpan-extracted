@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-my @modules = (qw[
+my @modules = qw[
     SBOM::CycloneDX
     SBOM::CycloneDX::Advisory
     SBOM::CycloneDX::Annotation
@@ -64,9 +64,13 @@ my @modules = (qw[
     SBOM::CycloneDX::Enum::CryptoPadding
     SBOM::CycloneDX::Enum::CryptoPrimitive
     SBOM::CycloneDX::Enum::ExternalReferenceType
+    SBOM::CycloneDX::Enum::ImpactAnalysisJustification
+    SBOM::CycloneDX::Enum::ImpactAnalysisState
     SBOM::CycloneDX::Enum::HashAlgorithm
     SBOM::CycloneDX::Enum::LicenseType
     SBOM::CycloneDX::Enum::LifecyclePhase
+    SBOM::CycloneDX::Enum::PatentAssertionType
+    SBOM::CycloneDX::Enum::PatentLegalStatus
     SBOM::CycloneDX::Enum::ProtocolType
     SBOM::CycloneDX::Enum::RelatedCryptoMaterialState
     SBOM::CycloneDX::Enum::RelatedCryptoMaterialType
@@ -91,6 +95,10 @@ my @modules = (qw[
     SBOM::CycloneDX::Note
     SBOM::CycloneDX::OrganizationalContact
     SBOM::CycloneDX::OrganizationalEntity
+    SBOM::CycloneDX::Patent
+    SBOM::CycloneDX::Patent::PriorityApplication
+    SBOM::CycloneDX::PatentAssertion
+    SBOM::CycloneDX::PatentFamily
     SBOM::CycloneDX::PostalAddress
     SBOM::CycloneDX::Property
     SBOM::CycloneDX::ReleaseNotes
@@ -112,7 +120,7 @@ my @modules = (qw[
     SBOM::CycloneDX::Vulnerability::Rating
     SBOM::CycloneDX::Vulnerability::Reference
     SBOM::CycloneDX::Vulnerability::Source
-]);
+];
 
 for my $module (@modules) {
     use_ok $module or BAIL_OUT "Can't load $module";

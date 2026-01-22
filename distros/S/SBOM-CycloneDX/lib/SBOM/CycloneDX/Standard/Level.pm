@@ -74,18 +74,18 @@ Properties:
 
 =over
 
-=item C<bom_ref>, An identifier which can be used to reference the
+=item * C<bom_ref>, An identifier which can be used to reference the
 object elsewhere in the BOM. Every bom-ref must be unique within the BOM.
 
-=item C<description>, The description of the level.
+=item * C<description>, The description of the level.
 
-=item C<identifier>, The identifier used in the standard to identify a
+=item * C<identifier>, The identifier used in the standard to identify a
 specific level.
 
-=item C<requirements>, The list of requirement `bom-ref`s that comprise the
+=item * C<requirements>, The list of requirement `bom-ref`s that comprise the
 level.
 
-=item C<title>, The title of the level.
+=item * C<title>, The title of the level.
 
 =back
 

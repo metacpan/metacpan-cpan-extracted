@@ -69,12 +69,12 @@ Properties:
 
 =over
 
-=item C<bom_ref>, An identifier which can be used to reference the object
+=item * C<bom_ref>, An identifier which can be used to reference the object
 elsewhere in the BOM. Every C<bom_ref> must be unique within the BOM.
 
-=item C<organization>, The entity issuing the assessment.
+=item * C<organization>, The entity issuing the assessment.
 
-=item C<third_party>, The boolean indicating if the assessor is outside the
+=item * C<third_party>, The boolean indicating if the assessor is outside the
 organization generating claims. A value of false indicates a self assessor.
 
 =back

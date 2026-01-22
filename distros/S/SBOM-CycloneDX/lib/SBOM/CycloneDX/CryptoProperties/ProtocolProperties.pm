@@ -16,7 +16,7 @@ use namespace::autoclean;
 
 extends 'SBOM::CycloneDX::Base';
 
-has type    => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->PROTOCOL_TYPES()]);
+has type    => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->values('PROTOCOL_TYPE')]);
 has version => (is => 'rw', isa => Str);
 
 has cipher_suites => (
@@ -84,23 +84,23 @@ Properties:
 
 =over
 
-=item C<cipher_suites>, A list of cipher suites related to the protocol.
+=item * C<cipher_suites>, A list of cipher suites related to the protocol.
 
-=item C<crypto_ref_array>, [DEPRECATED] Use C<related_cryptographic_assets> instead.
+=item * C<crypto_ref_array>, [DEPRECATED] Use C<related_cryptographic_assets> instead.
 A list of protocol-related cryptographic assets.
 
-=item C<ikev2_transform_types>, The IKEv2 transform types supported (types
+=item * C<ikev2_transform_types>, The IKEv2 transform types supported (types
 1-4), defined in RFC 7296 section 3.3.2 (L<https://www.ietf.org/rfc/rfc7296.html#section-3.3.2>),
 and additional properties.
 
-=item C<related_cryptographic_assets>, A list of cryptographic assets related
+=item * C<related_cryptographic_assets>, A list of cryptographic assets related
 to this component.
 
 See L<SBOM::CycloneDX::CryptoProperties::RelatedCryptographicAsset>
 
-=item C<type>, The concrete protocol type.
+=item * C<type>, The concrete protocol type.
 
-=item C<version>, The version of the protocol.
+=item * C<version>, The version of the protocol.
 
 =back
 

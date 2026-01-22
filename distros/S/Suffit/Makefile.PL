@@ -23,19 +23,19 @@ my $prereq_pm = {
 
 WriteMakefile(
     'NAME'              => 'Suffit',
-    'MIN_PERL_VERSION'  => 5.020001,
+    'MIN_PERL_VERSION'  => 5.020,
     'VERSION_FROM'      => 'lib/Suffit.pm',
     'ABSTRACT_FROM'     => 'lib/Suffit.pm',
     'BUILD_REQUIRES'    => $build_requires,
     'PREREQ_PM'         => $prereq_pm,
     'AUTHOR'            => 'Serz Minus (Sergey Lepenkov) <abalama@cpan.org>',
-    'LICENSE'           => 'perl',
+    'LICENSE'           => 'artistic_2',
     'META_MERGE'        => {
         'meta-spec' => {version => 2},
         prereqs     => {runtime => {requires => {perl => '5.020'}}},
         resources   => {
             homepage    => 'https://sourceforge.net/projects/suffit/',
-            license     => 'https://dev.perl.org/licenses',
+            license     => 'https://opensource.org/license/artistic-2-0',
             repository      => {
                 type => 'git',
                 url  => 'https://abalama@git.code.sf.net/p/suffit/code',

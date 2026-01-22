@@ -27,4 +27,23 @@ is_deeply( $y, bless({}, 'Local::Foo2') );
 ok !eval { $y->get_foo; 1 };
 is_deeply( $y, bless({}, 'Local::Foo2') );
 
+BEGIN {
+	package Local::Foo3;
+	use Types::Standard 'HashRef';
+	use Class::XSConstructor 'foo';
+	use Class::XSReader foo => { reader => 'get_foo', isa => HashRef, clone_on_read => 1 };
+};
+
+my $z = Local::Foo3->new( foo => { xyz => 333 } );
+my $z1 = $z->get_foo;
+my $z2 = $z->get_foo;
+my $z3 = $z->get_foo;
+
+$z1->{xyz}++;
+$z3->{xyz}--;
+is( $z->{foo}{xyz}, 333 );
+is( $z1->{xyz}, 334 );
+is( $z2->{xyz}, 333 );
+is( $z3->{xyz}, 332 );
+
 done_testing;

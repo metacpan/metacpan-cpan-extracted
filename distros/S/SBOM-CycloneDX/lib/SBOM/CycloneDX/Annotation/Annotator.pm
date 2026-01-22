@@ -70,13 +70,13 @@ Properties:
 
 =over
 
-=item C<component>, The tool or component that created the annotation
+=item * C<component>, The tool or component that created the annotation
 
-=item C<individual>, The person that created the annotation
+=item * C<individual>, The person that created the annotation
 
-=item C<organization>, The organization that created the annotation
+=item * C<organization>, The organization that created the annotation
 
-=item C<service>, The service that created the annotation
+=item * C<service>, The service that created the annotation
 
 =back
 

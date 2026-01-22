@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 #
 # Add SASL encoding/decoding to a filehandle
 #
@@ -73,29 +75,12 @@ sub READ {
 # all the data to be encrypted is immediately available
 sub WRITE {
   my($ref,$string,$len) = @_;
-  my($fh, $clearbuf, $cryptbuf, $maxbuf);
+  my($fh, $clearbuf, $cryptbuf);
 
   $fh = $ref->{fh};
   $clearbuf = substr($string, 0, $len);
-  $len = length($clearbuf);
-  $maxbuf = $ref->{conn}->property("maxout");
-  if ($len < $maxbuf) {
-    $cryptbuf = $ref->{conn}->encode($clearbuf);
-    return(-1) if not defined ($cryptbuf);
-  } else {
-    my ($partial, $chunk, $chunksize);
-    my $offset = 0;
-    $cryptbuf = '';
-    while ($offset < $len) {
-      $chunksize = (($offset + $maxbuf) > $len) ? $len - $offset : $maxbuf;
-      $chunk = substr($clearbuf, $offset, $chunksize);
-      $partial = $ref->{conn}->encode($chunk);
-      return(-1) if not defined ($partial);
-      $cryptbuf .= $partial;
-      $offset += $chunksize;
-    }
-  }
-  return (print $fh $cryptbuf) ? $len : -1;
+  $cryptbuf = $ref->{conn}->encode($clearbuf);
+  print $fh $cryptbuf;
 }
 
 # Given a GLOB ref, tie the filehandle of the GLOB to this class

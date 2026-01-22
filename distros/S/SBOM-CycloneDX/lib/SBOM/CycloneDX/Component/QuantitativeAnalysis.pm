@@ -68,11 +68,11 @@ Properties:
 
 =over
 
-=item C<performance_metrics>, The model performance metrics being reported.
+=item * C<performance_metrics>, The model performance metrics being reported.
 Examples may include accuracy, F1 score, precision, top-3 error rates, MSC,
 etc.
 
-=item C<graphics>, A collection of graphics that represent various measurements.
+=item * C<graphics>, A collection of graphics that represent various measurements.
 
 =back
 

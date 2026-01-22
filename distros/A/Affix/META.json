@@ -106,15 +106,15 @@
    "provides" : {
       "Affix" : {
          "file" : "lib/Affix.pm",
-         "version" : "v1.0.5"
+         "version" : "v1.0.6"
       },
       "Affix::Build" : {
          "file" : "lib/Affix/Build.pm",
-         "version" : "v1.0.5"
+         "version" : "v1.0.6"
       },
       "Affix::Wrap" : {
          "file" : "lib/Affix/Wrap.pm",
-         "version" : "v1.0.5"
+         "version" : "v1.0.6"
       }
    },
    "release_status" : "stable",
@@ -132,7 +132,7 @@
          "web" : "https://github.com/sanko/Affix.pm"
       }
    },
-   "version" : "v1.0.5",
+   "version" : "v1.0.6",
    "x_help_wanted" : [
       "Tester",
       "Documenter"

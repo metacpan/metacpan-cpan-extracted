@@ -75,16 +75,16 @@ Properties:
 
 =over
 
-=item C<claims>, The list of `bom-ref` to the claims being attested to.
+=item * C<claims>, The list of `bom-ref` to the claims being attested to.
 
-=item C<confidence>, The confidence of the claim meeting the requirement.
+=item * C<confidence>, The confidence of the claim meeting the requirement.
 
-=item C<conformance>, The conformance of the claim meeting a requirement.
+=item * C<conformance>, The conformance of the claim meeting a requirement.
 
-=item C<counter_claims>, The list of  `bom-ref` to the counter claims being
+=item * C<counter_claims>, The list of  `bom-ref` to the counter claims being
 attested to.
 
-=item C<requirement>, The `bom-ref` to the requirement being attested to.
+=item * C<requirement>, The `bom-ref` to the requirement being attested to.
 
 =back
 

@@ -68,14 +68,14 @@ Properties:
 
 =over
 
-=item C<confidence_interval>, The confidence interval of the metric.
+=item * C<confidence_interval>, The confidence interval of the metric.
 
-=item C<slice>, The name of the slice this metric was computed on. By
+=item * C<slice>, The name of the slice this metric was computed on. By
 default, assume this metric is not sliced.
 
-=item C<type>, The type of performance metric.
+=item * C<type>, The type of performance metric.
 
-=item C<value>, The value of the performance metric.
+=item * C<value>, The value of the performance metric.
 
 =back
 

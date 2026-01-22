@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Class::XSAccessor" => 0,
     "Cpanel::JSON::XS" => 0,
-    "Cucumber::Messages" => ">= v31.0.0, < v32.0.0",
+    "Cucumber::Messages" => ">= v31.0.0, < v33.0.0",
     "Data::UUID" => 0,
     "Getopt::Long" => "2.58",
     "List::Util" => "1.70"
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "37.0.1",
+  "VERSION" => "38.0.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Class::XSAccessor" => 0,
   "Cpanel::JSON::XS" => 0,
-  "Cucumber::Messages" => ">= v31.0.0, < v32.0.0",
+  "Cucumber::Messages" => ">= v31.0.0, < v33.0.0",
   "Data::UUID" => 0,
   "Getopt::Long" => "2.58",
   "List::Util" => "1.70",

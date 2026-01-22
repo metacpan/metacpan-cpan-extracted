@@ -76,23 +76,23 @@ Properties:
 
 =over
 
-=item C<bom_ref>, An identifier which can be used to reference the
+=item * C<bom_ref>, An identifier which can be used to reference the
 address elsewhere in the BOM. Every bom-ref must be unique within the BOM.
 Value SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid
 conflicts with BOM-Links.
 
-=item C<country>, The country name or the two-letter ISO 3166-1 country
+=item * C<country>, The country name or the two-letter ISO 3166-1 country
 code.
 
-=item C<locality>, The locality or city within the country.
+=item * C<locality>, The locality or city within the country.
 
-=item C<post_office_box_number>, The post office box number.
+=item * C<post_office_box_number>, The post office box number.
 
-=item C<postal_code>, The postal code.
+=item * C<postal_code>, The postal code.
 
-=item C<region>, The region or state in the country.
+=item * C<region>, The region or state in the country.
 
-=item C<street_address>, The street address.
+=item * C<street_address>, The street address.
 
 =back
 

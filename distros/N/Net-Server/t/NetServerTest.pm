@@ -4,7 +4,7 @@ use strict;
 use IO::Socket;
 use Exporter;
 @NetServerTest::ISA = qw(Exporter);
-@NetServerTest::EXPORT_OK = qw(prepare_test client_connect ok is like use_ok skip note diag);
+@NetServerTest::EXPORT_OK = qw(prepare_test client_connect ok is like use_ok skip note diag skip_without_ipv6);
 my %env;
 use constant debug => $ENV{'NS_DEBUG'} ? 1 : 0;
 
@@ -13,15 +13,22 @@ END {
         if ($env{'_ok_N'} || 0) ne ($env{'_ok_n'} || 0) && ($env{'_ok_pid'} || 0) == $$;
 }
 
+sub skip_without_ipv6 {
+    if (!eval { require Net::Server::Proto; Net::Server::Proto->ipv6_package({}) }) {
+        my $reason = shift || "IPv6 is not supported";
+        $reason = "SKIP $reason\n$@";
+        $reason =~ s/\s*$/\n/;
+        $reason =~ s/^/# /gm;
+        print "1..0 $reason";
+        exit;
+    }
+}
+
 sub client_connect {
     shift if $_[0] && $_[0] eq __PACKAGE__;
-    if ($env{'ipv'} && $env{'ipv'} ne 4) {
-        return IO::Socket::IP->new(@_)    if eval { require IO::Socket::IP };
-        return IO::Socket::INET6->new(@_) if eval { require IO::Socket::INET6 };
-        die "Could not load IO::Socket::IP or IO::Socket::INET6: $@";
-    } else {
-        return IO::Socket::INET->new(@_);
-    }
+    my $pkg = eval { $env{'ipv'} && $env{'ipv'} =~ /[6*]/ && do { require Net::Server::Proto; Net::Server::Proto->ipv6_package({}) } } || "IO::Socket::INET";
+    warn "IPv6 FAILURE! $@" if $@;
+    return $pkg->new(@_);
 }
 
 # most of our tests need forking, a certain number of ports, and some pipes
@@ -91,6 +98,7 @@ sub can_fork {
         my $pid = fork;
         die "Trouble while forking" unless defined $pid; # can't fork
         exit unless $pid; # can fork, exit child
+        waitpid $pid, 0; # clear zombie
         1;
     } || 0;
 }
@@ -122,13 +130,14 @@ sub get_ports {
                 LocalPort => $port,
                 Timeout   => 2,
                 Listen    => 1,
-                ReuseAddr => 1, Reuse => 1,
-            ) || do { warn "Couldn't open server socket on port $port: $!\n" if $env{'trace'}; next };
+                ReuseAddr => 1,
+                Reusei    => 1,
+            ) || do { warn "Couldn't listen on [$env{hostname}] port [$port]: $!\n" if $env{'trace'}; next };
             my $client = client_connect(
                 PeerAddr => $env{'hostname'},
                 PeerPort => $port,
                 Timeout  => 2,
-            ) || do { warn "Couldn't open client socket on port $port: $!\n" if $env{'trace'}; next };
+            ) || do { warn "Couldn't connect to [$env{hostname}] port [$port]: $!\n" if $env{'trace'}; next };
             my $sock = $serv->accept || do { warn "Didn't accept properly on server: $!" if $env{'trace'}; next };
             $sock->autoflush(1);
             print $sock "hi from server\n";
@@ -138,6 +147,7 @@ sub get_ports {
             next if <$client> !~ /^hi from server/;
             $client->close;
             $sock->close;
+            $serv->close;
             push @ports, $port;
             last if @ports == $n;
         }

@@ -73,6 +73,7 @@
     do {                                       \
         printf("# INFIX_DEBUG: " __VA_ARGS__); \
         printf("\n");                          \
+        fflush(stdout);                        \
     } while (0)
 #endif  // DBLTAP_ENABLE
 /**
@@ -88,6 +89,21 @@
  * @param title A descriptive title to print before and after the hex dump.
  */
 void infix_dump_hex(const void * data, size_t size, const char * title);
+/**
+ * @internal
+ * @brief Declares the function prototype for `infix_dump_state` for use in debug builds.
+ * @details This function is an invaluable tool for inspecting the processor state.
+ *
+ * @param file The file name where the function is being called.
+ * @param title The line number.
+ */
+void infix_dump_state(const char * file, int line);
+/**
+ * @internal
+ * @def INFIX_DUMP_STATE(...)
+ * @brief Automatically pass on the current file and line to `infix_dump_state`.
+ */
+#define INFIX_DUMP_STATE() infix_dump_state(__FILE__, __LINE__)
 #else  // INFIX_DEBUG_ENABLED is NOT defined or is zero (Release Mode)
 /**
  * @internal
@@ -115,6 +131,22 @@ void infix_dump_hex(const void * data, size_t size, const char * title);
 static inline void infix_dump_hex(c23_maybe_unused const void * data,
                                   c23_maybe_unused size_t size,
                                   c23_maybe_unused const char * title) {
+    // This function does nothing in release builds and will be optimized away entirely.
+}
+/**
+ * @internal
+ * @brief A no-op version of `infix_dump_state` for use in release builds.
+ * @details This function is defined as an empty `static inline` function.
+ *          - `static`: Prevents linker errors if this header is included in multiple files.
+ *          - `inline`: Suggests to the compiler that the function body is empty,
+ *            allowing it to completely remove any calls to this function at the call site.
+ *          - `c23_maybe_unused`: Suppresses compiler warnings about the parameters
+ *            being unused in this empty implementation.
+ *
+ * @param file The file name where the function is being called.
+ * @param title The line number.
+ */
+static inline void infix_dump_state(c23_maybe_unused const char * file, c23_maybe_unused int line) {
     // This function does nothing in release builds and will be optimized away entirely.
 }
 #endif  // INFIX_DEBUG_ENABLED

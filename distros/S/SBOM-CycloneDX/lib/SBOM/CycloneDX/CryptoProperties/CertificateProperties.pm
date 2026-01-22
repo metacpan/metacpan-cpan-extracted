@@ -149,22 +149,22 @@ Properties:
 
 =over
 
-=item C<activation_date>, The date and time (timestamp) when the certificate was activated.
+=item * C<activation_date>, The date and time (timestamp) when the certificate was activated.
 
-=item C<certificate_extension>, [DEPRECATED] This will be removed in a future version.
+=item * C<certificate_extension>, [DEPRECATED] This will be removed in a future version.
 Use C<certificate_file_extension> instead. The file extension of the certificate.
 
-=item C<certificate_extensions>, A certificate extension is a field that
+=item * C<certificate_extensions>, A certificate extension is a field that
 provides additional information about the certificate or its use. Extensions
 are used to convey additional information beyond the standard fields.
 
 See L<SBOM::CycloneDX::CryptoProperties::CertificateExtension>
 
-=item C<certificate_file_extension>, The file extension of the certificate
+=item * C<certificate_file_extension>, The file extension of the certificate
 
-=item C<certificate_format>, The format of the certificate
+=item * C<certificate_format>, The format of the certificate
 
-=item C<certificate_state>, Certificate Lifecycle State
+=item * C<certificate_state>, Certificate Lifecycle State
 
 The certificate lifecycle is a comprehensive process that manages digital
 certificates from their initial creation to eventual expiration or revocation.
@@ -172,36 +172,36 @@ It typically involves several stages.
 
 See L<SBOM::CycloneDX::CertificateProperties::CertificateState>
 
-=item C<creation_date>, The date and time (timestamp) when the certificate was created or pre-activated.
+=item * C<creation_date>, The date and time (timestamp) when the certificate was created or pre-activated.
 
-=item C<deactivation_date>, The date and time (timestamp) when the related certificate was deactivated.
+=item * C<deactivation_date>, The date and time (timestamp) when the related certificate was deactivated.
 
-=item C<destruction_date>, The date and time (timestamp) when the certificate was destroyed.
+=item * C<destruction_date>, The date and time (timestamp) when the certificate was destroyed.
 
-=item C<fingerprint>, The fingerprint is a cryptographic hash of the certificate excluding it's signature.
+=item * C<fingerprint>, The fingerprint is a cryptographic hash of the certificate excluding it's signature.
 
 See L<SBOM::CycloneDX::Hash>
 
-=item C<issuer_name>, The issuer name for the certificate
+=item * C<issuer_name>, The issuer name for the certificate
 
-=item C<not_valid_after>, The date and time according to ISO-8601 standard
+=item * C<not_valid_after>, The date and time according to ISO-8601 standard
 from which the certificate is not valid anymore
 
-=item C<not_valid_before>, The date and time according to ISO-8601 standard
+=item * C<not_valid_before>, The date and time according to ISO-8601 standard
 from which the certificate is valid
 
-=item C<related_cryptographic_assets>, 
+=item * C<related_cryptographic_assets>, 
 
-=item C<revocation_date>, The date and time (timestamp) when the certificate was revoked.
+=item * C<revocation_date>, The date and time (timestamp) when the certificate was revoked.
 
-=item C<serial_number>, The serial number is a unique identifier for the certificate issued by a CA.
+=item * C<serial_number>, The serial number is a unique identifier for the certificate issued by a CA.
 
-=item C<signature_algorithm_ref>, [DEPRECATED] This will be removed in a future version. Use C<related_cryptographic_assets> instead.
+=item * C<signature_algorithm_ref>, [DEPRECATED] This will be removed in a future version. Use C<related_cryptographic_assets> instead.
 The bom-ref to signature algorithm used by the certificate.
 
-=item C<subject_name>, The subject name for the certificate
+=item * C<subject_name>, The subject name for the certificate
 
-=item C<subject_public_key_ref>, [DEPRECATED] This will be removed in a future version. Use C<related_cryptographic_assets> instead.
+=item * C<subject_public_key_ref>, [DEPRECATED] This will be removed in a future version. Use C<related_cryptographic_assets> instead.
 The bom-ref to the public key of the subject.
 
 =back

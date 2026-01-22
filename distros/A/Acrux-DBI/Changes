@@ -1,5 +1,8 @@
 # Version/Revision history
 
+0.04 Wed 21 Jan 2026 16:05:40 MSK
+    * Project relicensed from the Perl 5 dual license to the Artistic License 2.0
+
 0.03 Web 17 Apr 2024 18:04:54 MSK
     * Added Acrux::DBI::Dump class
     * Added set-context of dsn method

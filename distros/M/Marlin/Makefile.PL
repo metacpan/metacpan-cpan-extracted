@@ -48,16 +48,16 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Marlin"                  => { file => "lib/Marlin.pm", version => 0.020001 },
-                        "Marlin::Attribute"       => { file => "lib/Marlin/Attribute.pm", version => 0.020001 },
+                        "Marlin"                  => { file => "lib/Marlin.pm", version => 0.020002 },
+                        "Marlin::Attribute"       => { file => "lib/Marlin/Attribute.pm", version => 0.020002 },
                         "Marlin::Attribute::NONE" => { file => "lib/Marlin/Attribute.pm" },
                         "Marlin::Meta::Class"     => { file => "lib/MooseX/Marlin.pm" },
-                        "Marlin::Role"            => { file => "lib/Marlin/Role.pm", version => 0.020001 },
-                        "Marlin::Struct"          => { file => "lib/Marlin/Struct.pm", version => 0.020001 },
-                        "Marlin::TypeConstraint"  => { file => "lib/Marlin/TypeConstraint.pm", version => 0.020001 },
-                        "Marlin::Util"            => { file => "lib/Marlin/Util.pm", version => 0.020001 },
-                        "Marlin::X"               => { file => "lib/Marlin/X.pm", version => 0.020001 },
-                        "MooseX::Marlin"          => { file => "lib/MooseX/Marlin.pm", version => 0.020001 },
+                        "Marlin::Role"            => { file => "lib/Marlin/Role.pm", version => 0.020002 },
+                        "Marlin::Struct"          => { file => "lib/Marlin/Struct.pm", version => 0.020002 },
+                        "Marlin::TypeConstraint"  => { file => "lib/Marlin/TypeConstraint.pm", version => 0.020002 },
+                        "Marlin::Util"            => { file => "lib/Marlin/Util.pm", version => 0.020002 },
+                        "Marlin::X"               => { file => "lib/Marlin/X.pm", version => 0.020002 },
+                        "MooseX::Marlin"          => { file => "lib/MooseX/Marlin.pm", version => 0.020002 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -71,7 +71,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Marlin/project",
                       },
-  "version"        => 0.020001,
+  "version"        => 0.020002,
 };
 
 my %dynamic_config;

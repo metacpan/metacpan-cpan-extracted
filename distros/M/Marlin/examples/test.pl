@@ -15,6 +15,7 @@ eval 'require Local::Example::Moo;    1' or warn $@;
 eval 'require Local::Example::Moose;  1' or warn $@;
 eval 'require Local::Example::Mouse;  1' or warn $@;
 eval 'require Local::Example::Tiny;   1' or warn $@;
+eval 'require Local::Example::Venus;  1' or warn $@;
 
 for my $i ( @Local::Example::ALL ) {
 	

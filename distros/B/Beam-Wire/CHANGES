@@ -1,5 +1,12 @@
 Changelog for Beam-Wire
 
+1.028     2026-01-21 12:32:24-06:00 America/Chicago
+
+  [Fixed]
+
+  - Fixed confusing error message when relative inner container file did not exist.
+    Thanks @XSven for the report! [Github #87].
+
 1.027     2025-12-06 11:32:40-06:00 America/Chicago
 
   [Added]

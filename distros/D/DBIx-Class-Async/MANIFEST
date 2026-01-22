@@ -1,5 +1,6 @@
 Changes
 lib/DBIx/Class/Async.pm
+lib/DBIx/Class/Async/ResultComponent.pm
 lib/DBIx/Class/Async/ResultSet.pm
 lib/DBIx/Class/Async/ResultSet/Pager.pm
 lib/DBIx/Class/Async/Row.pm
@@ -60,6 +61,14 @@ t/44-txn-batch.t
 t/45-pager.t
 t/46-using-chi.t
 t/47-inflation.t
+t/48-asyn-helpers.t
+t/49-async-operations.t
+t/50-row-operations.t
+t/51-internal-protection.t
+t/52-resultset-operations.t
+t/53-as-query.t
+t/54-single-chaining.t
+t/55-bulk-delete.t
 t/manifest.t
 t/pod.t
 t/test.db

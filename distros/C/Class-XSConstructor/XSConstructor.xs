@@ -1,5 +1,7 @@
 #define PERL_NO_GET_CONTEXT     /* we want efficiency */
+
 #include "xshelper.h"
+#include "Clone.xs"
 
 #define IsObject(sv)    (SvROK(sv) && SvOBJECT(SvRV(sv)))
 #define IsArrayRef(sv)  (SvROK(sv) && !SvOBJECT(SvRV(sv)) && SvTYPE(SvRV(sv)) == SVt_PVAV)
@@ -40,6 +42,7 @@ enum {
     XSCON_FLAG_HAS_ALIASES          =  256,
     XSCON_FLAG_HAS_SLOT_INITIALIZER =  512,
     XSCON_FLAG_UNDEF_TOLERANT       = 1024,
+    XSCON_FLAG_CLONE_ON_WRITE       = 2048,
 
     XSCON_BITSHIFT_DEFAULTS         =   16,
     XSCON_BITSHIFT_TYPES            =   24,
@@ -91,6 +94,7 @@ typedef struct {
     CV     *check_cv;
     CV     *coercion_cv;
     CV     *slot_initializer_cv;
+    CV     *cloner_cv;
 } xscon_param_t;
 
 typedef struct {
@@ -131,6 +135,8 @@ typedef struct {
     CV     *check_cv;
     bool    has_coercion;
     CV     *coercion_cv;
+    bool    should_clone;
+    CV     *cloner_cv;
 } xscon_reader_t;
 
 typedef struct {
@@ -192,6 +198,8 @@ xscon_constructor_get_metadata(SV *sig_sv, xscon_constructor_t* sig) {
                 SvREFCNT_dec(p->trigger_sv);
                 SvREFCNT_dec(p->check_cv);
                 SvREFCNT_dec(p->coercion_cv);
+                SvREFCNT_dec(p->cloner_cv);
+                SvREFCNT_dec(p->slot_initializer_cv);
             }
             Safefree(sig->params);
         }
@@ -419,6 +427,19 @@ xscon_constructor_get_metadata(SV *sig_sv, xscon_constructor_t* sig) {
         }
         else {
             p->slot_initializer_cv = NULL;
+        }
+
+        svp = hv_fetchs(phv, "clone_on_write", 0);
+        if (svp && SvOK(*svp)) {
+            if (SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVCV) {
+                p->cloner_cv = (CV *)SvREFCNT_inc(SvRV(*svp));
+            }
+            else {
+                p->cloner_cv = NULL;
+            }
+        }
+        else {
+            p->cloner_cv = NULL;
         }
     }
     
@@ -1210,6 +1231,42 @@ xscon_initialize_object(const xscon_constructor_t* sig, const char* klass, SV* c
         }
         
         if ( has_value ) {
+            if ( value_was_from_args && ( flags & XSCON_FLAG_CLONE_ON_WRITE ) ) {
+                if ( param->cloner_cv ) {
+                    SV* newval;
+                    dSP;
+                    int count;
+                    ENTER;
+                    SAVETMPS;
+                    PUSHMARK(SP);
+                    EXTEND(SP, 3);
+                    PUSHs(object);
+                    PUSHs(newSVpv(keyname, keylen));
+                    PUSHs(val);
+                    PUTBACK;
+                    count = call_sv((SV *)param->cloner_cv, G_SCALAR);
+                    SPAGAIN;
+                    SV* tmpval = POPs;
+                    newval = newSVsv(tmpval);
+                    FREETMPS;
+                    LEAVE;
+                    bool passed_this_time = xscon_check_type(keyname, newSVsv(newval), flags >> XSCON_BITSHIFT_TYPES, param->check_cv);
+                    if ( passed_this_time ) {
+                        val = newSVsv(newval);
+                    }
+                    else {
+                        croak("Cloning result '%s' failed type constraint for '%s'", SvPV_nolen(newval), keyname);
+                    }
+                }
+                else {
+                    HV *hseen = newHV();
+                    SV *newval = sv_clone(aTHX_ val, hseen, -1);
+                    hv_clear(hseen);
+                    SvREFCNT_dec((SV *)hseen);
+                    val = newval;
+                }
+            }
+
             if ( ( flags & XSCON_FLAG_HAS_SLOT_INITIALIZER ) && param->slot_initializer_cv ) {
                 int count;
                 dSP;
@@ -1228,7 +1285,7 @@ xscon_initialize_object(const xscon_constructor_t* sig, const char* klass, SV* c
             else {
                 (void)hv_store((HV*)SvRV(object), keyname, keylen, val, 0);
             }
-            
+
             if ( value_was_from_args && ( flags & XSCON_FLAG_HAS_TRIGGER ) ) {
                 xscon_run_trigger(object, param);
             }
@@ -1524,6 +1581,7 @@ BOOT:
     newCONSTSUB(stash, "XSCON_FLAG_HAS_ALIASES",          newSViv(XSCON_FLAG_HAS_ALIASES));
     newCONSTSUB(stash, "XSCON_FLAG_HAS_SLOT_INITIALIZER", newSViv(XSCON_FLAG_HAS_SLOT_INITIALIZER));
     newCONSTSUB(stash, "XSCON_FLAG_UNDEF_TOLERANT",       newSViv(XSCON_FLAG_UNDEF_TOLERANT));
+    newCONSTSUB(stash, "XSCON_FLAG_CLONE_ON_WRITE",       newSViv(XSCON_FLAG_CLONE_ON_WRITE));
 
     newCONSTSUB(stash, "XSCON_BITSHIFT_DEFAULTS",         newSViv(XSCON_BITSHIFT_DEFAULTS));
     newCONSTSUB(stash, "XSCON_BITSHIFT_TYPES",            newSViv(XSCON_BITSHIFT_TYPES));
@@ -1789,7 +1847,50 @@ CODE:
     }
     
     SV** svp = hv_fetch(object_hv, sig->slot, slotlen, 0);
-    ST(0) = svp ? newSVsv(*svp) : &PL_sv_undef;
+    SV* val = svp ? newSVsv(*svp) : &PL_sv_undef;
+
+    if ( sig->should_clone && sig->cloner_cv == NULL ) {
+        HV *hseen = newHV();
+        SV *newval = sv_clone(aTHX_ val, hseen, -1);
+        hv_clear(hseen);
+        SvREFCNT_dec((SV *)hseen);
+        ST(0) = newval;
+    }
+    else if ( sig->should_clone ) {
+        SV* newval;
+        dSP;
+        int count;
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        EXTEND(SP, 3);
+        PUSHs(object);
+        PUSHs(newSVpv(sig->slot, 0));
+        PUSHs(val);
+        PUTBACK;
+        count = call_sv((SV *)sig->cloner_cv, G_SCALAR);
+        SPAGAIN;
+        SV* tmpval = POPs;
+        newval = newSVsv(tmpval);
+        FREETMPS;
+        LEAVE;
+        
+        bool passed_this_time = TRUE;
+        if ( sig->has_check ) {
+            passed_this_time = xscon_check_type(sig->slot, newSVsv(newval), sig->check_flags, sig->check_cv);
+        }
+        
+        if ( passed_this_time ) {
+            ST(0) = newval;
+        }
+        else {
+            croak("Cloning result '%s' failed type constraint for '%s'", SvPV_nolen(newval), sig->slot);
+        }
+    }
+    else {
+        ST(0) = val;
+    }
+
     XSRETURN(1);
 }
 
@@ -2006,7 +2107,7 @@ CODE:
 }
 
 void
-install_reader(char *name, char *slot, bool has_default, int default_flags, SV* default_sv, int check_flags, SV* check, SV* coercion)
+install_reader(char *name, char *slot, bool has_default, int default_flags, SV* default_sv, int check_flags, SV* check, SV* coercion, ...)
 CODE:
 {
     dTHX;
@@ -2040,5 +2141,38 @@ CODE:
         sig->coercion_cv = NULL;
     }
 
+    SV *cloner = &PL_sv_undef;
+    if (items >= 9) {
+        cloner = ST(8);
+    }
+
+    if (cloner && IsCodeRef(cloner)) {
+        sig->should_clone = TRUE;
+        sig->cloner_cv = (CV *)SvREFCNT_inc(SvRV(cloner));
+    }
+    else if (cloner && SvTRUE(cloner)) {
+        sig->should_clone = TRUE;
+        sig->cloner_cv = NULL;
+    }
+    else {
+        sig->has_coercion = FALSE;
+        sig->coercion_cv = NULL;
+    }
+
     CvXSUBANY(cv).any_ptr = sig;
 }
+
+void
+clone(self, depth=-1)
+    SV *self
+    int depth
+    PREINIT:
+    SV *clone = &PL_sv_undef;
+    HV *hseen = newHV();
+    PPCODE:
+    TRACEME(("ref = 0x%x\n", self));
+    clone = sv_clone(aTHX_ self, hseen, depth);
+    hv_clear(hseen);  /* Free HV */
+    SvREFCNT_dec((SV *)hseen);
+    EXTEND(SP,1);
+    PUSHs(sv_2mortal(clone));

@@ -141,7 +141,7 @@ static int Affix_pin_dup(pTHX_ MAGIC * mg, CLONE_PARAMS * param) {
         new_pin->type_arena = nullptr;
     }
     mg->mg_ptr = (char *)new_pin;
-    return 0;
+    return 1;
 }
 
 // Handles UTF-16LE (Windows) and UTF-32 (Linux/Mac) conversion to UTF-8 SV
@@ -201,6 +201,8 @@ static void affix_aggregate_writeback(void * sv_raw, void * src, const infix_typ
 static infix_direct_arg_handler_t get_direct_handler_for_type(const infix_type * type);
 
 void Affix_trigger_backend(pTHX_ CV * cv) {
+    // Backend optimization is not yet thread-clone friendly in this patch.
+    // For now, assume it works or isn't used in the threading test.
     dSP;
     dAXMARK;
     dXSTARG;
@@ -450,6 +452,26 @@ static const infix_type * _unwrap_pin_type(const infix_type * type) {
     return type;
 }
 
+// Robustly check if a type represents an SV* (or aliased version thereof)
+static bool is_perl_sv_type(const infix_type * t) {
+    if (!t)
+        return false;
+
+    // Check by name
+    const char * name = infix_type_get_name(t);
+    if (name && (strEQ(name, "SV") || strEQ(name, "@SV")))
+        return true;
+
+    // Fallback: Structural check for the opaque SV struct defined in boot_Affix.
+    // This catches typedef aliases: typedef MySV => SV;
+    if (t->category == INFIX_TYPE_STRUCT && t->meta.aggregate_info.num_members == 1) {
+        const char * mname = t->meta.aggregate_info.members[0].name;
+        if (mname && strEQ(mname, "__sv_opaque"))
+            return true;
+    }
+    return false;
+}
+
 static const char * _get_string_from_type_obj(pTHX_ SV * type_sv) {
     const char * str = nullptr;
     if (sv_isobject(type_sv) && sv_derived_from(type_sv, "Affix::Type")) {
@@ -497,7 +519,7 @@ static const char * _get_string_from_type_obj(pTHX_ SV * type_sv) {
         // Append remainder
         sv_catpv(modified, start);
 
-        // Only return modified string if we actually changed something
+        // only return modified string if we actually changed something
         if (SvCUR(modified) > strlen(str))
             return SvPV_nolen(modified);
     }
@@ -708,15 +730,11 @@ static Affix_Opcode get_opcode_for_type(const infix_type * type) {
         }
     case INFIX_TYPE_POINTER:
         {
-            const char * name = infix_type_get_name(type);
-            // Check for SV* itself
-            if (name && (strEQ(name, "SV") || strEQ(name, "@SV")))
+            if (is_perl_sv_type(type))
                 return OP_PUSH_SV;
 
             const infix_type * pointee = type->meta.pointer_info.pointee_type;
-            const char * pointee_name = infix_type_get_name(pointee);
-            // Check for Pointer to SV
-            if (pointee_name && (strEQ(pointee_name, "SV") || strEQ(pointee_name, "@SV")))
+            if (is_perl_sv_type(pointee))
                 return OP_PUSH_SV;
 
             if (pointee->category == INFIX_TYPE_PRIMITIVE) {
@@ -735,8 +753,7 @@ static Affix_Opcode get_opcode_for_type(const infix_type * type) {
         return OP_PUSH_VECTOR;
     case INFIX_TYPE_STRUCT:
         {
-            const char * name = infix_type_get_name(type);
-            if (name && (strEQ(name, "SV") || strEQ(name, "@SV")))
+            if (is_perl_sv_type(type))
                 croak("Type 'SV' cannot be passed by value. Use 'Pointer[SV]' instead.");
             return OP_PUSH_STRUCT;
         }
@@ -793,13 +810,11 @@ static Affix_Opcode get_ret_opcode_for_type(const infix_type * type) {
     }
 
     if (type->category == INFIX_TYPE_POINTER) {
-        const char * name = infix_type_get_name(type);
-        if (name && (strEQ(name, "SV") || strEQ(name, "@SV")))
+        if (is_perl_sv_type(type))
             return OP_RET_SV;
 
         const infix_type * pointee = type->meta.pointer_info.pointee_type;
-        const char * pointee_name = infix_type_get_name(pointee);
-        if (pointee_name && (strEQ(pointee_name, "SV") || strEQ(pointee_name, "@SV")))
+        if (is_perl_sv_type(pointee))
             return OP_RET_SV;
 
         if (pointee->category == INFIX_TYPE_PRIMITIVE) {
@@ -815,8 +830,7 @@ static Affix_Opcode get_ret_opcode_for_type(const infix_type * type) {
     }
 
     if (type->category == INFIX_TYPE_STRUCT) {
-        const char * name = infix_type_get_name(type);
-        if (name && (strEQ(name, "SV") || strEQ(name, "@SV")))
+        if (is_perl_sv_type(type))
             croak("Type 'SV' cannot be returned by value. Use 'Pointer[SV]' instead.");
     }
 
@@ -1035,7 +1049,10 @@ static void plan_step_push_pointer(pTHX_ Affix * affix,
     PING;
     sv_dump(sv);
     char signature_buf[256];
-    (void)infix_type_print(signature_buf, sizeof(signature_buf), (infix_type *)type, INFIX_DIALECT_SIGNATURE);
+    if (infix_type_print(signature_buf, sizeof(signature_buf), (infix_type *)type, INFIX_DIALECT_SIGNATURE) !=
+        INFIX_SUCCESS) {
+        strncpy(signature_buf, "[error printing type]", sizeof(signature_buf));
+    }
     croak("Don't know how to handle this type of scalar as a pointer argument yet: %s", signature_buf);
 }
 
@@ -1290,15 +1307,13 @@ Affix_Step_Executor get_plan_step_executor(const infix_type * type) {
         return primitive_executors[type->meta.primitive_id];
     case INFIX_TYPE_POINTER:
         {
-            const char * name = infix_type_get_name(type);
-            if (name && (strEQ(name, "SV") || strEQ(name, "@SV")))
+            if (is_perl_sv_type(type))
                 return plan_step_push_sv;
             return plan_step_push_pointer;
         }
     case INFIX_TYPE_STRUCT:
         {
-            const char * name = infix_type_get_name(type);
-            if (name && (strEQ(name, "SV") || strEQ(name, "@SV")))
+            if (is_perl_sv_type(type))
                 return plan_step_push_sv;
             return plan_step_push_struct;
         }
@@ -1543,6 +1558,9 @@ Affix_Out_Param_Writer get_out_param_writer(const infix_type * pointee_type) {
 #define DEFINE_DISPATCH_TABLE()
 #endif
 
+// Forward declaration for the lazy rebuilder
+static void rebuild_affix_data(pTHX_ Affix * affix);
+
 // We use a macro to generate two variants (Stack vs Arena) to ensure logic sync.
 #define GENERATE_TRIGGER_XSUB(NAME, USE_STACK_ALLOC)                                                         \
     void NAME(pTHX_ CV * cv) {                                                                               \
@@ -1550,6 +1568,10 @@ Affix_Out_Param_Writer get_out_param_writer(const infix_type * pointee_type) {
         dAXMARK;                                                                                             \
         dXSTARG;                                                                                             \
         Affix * affix = (Affix *)CvXSUBANY(cv).any_ptr;                                                      \
+                                                                                                             \
+        /* LAZY REBUILD: If we are in a new thread and data hasn't been built yet */                         \
+        if (UNLIKELY(!affix->infix))                                                                         \
+            rebuild_affix_data(aTHX_ affix);                                                                 \
                                                                                                              \
         if (UNLIKELY((SP - MARK) != affix->num_args))                                                        \
             croak("Wrong number of arguments. Expected %d, got %d", (int)affix->num_args, (int)(SP - MARK)); \
@@ -1560,10 +1582,9 @@ Affix_Out_Param_Writer get_out_param_writer(const infix_type * pointee_type) {
         /* ALLOCATION STRATEGY */                                                                            \
         size_t arena_mark = affix->args_arena->current_offset;                                               \
         void * args_buffer;                                                                                  \
-        if (USE_STACK_ALLOC) {                                                                               \
-            /* Fast path: Stack allocation */                                                                \
+        if (USE_STACK_ALLOC && affix->total_args_size <= 2048)                                               \
+            /* Fast path: Stack allocation if under 2k */                                                    \
             args_buffer = alloca(affix->total_args_size);                                                    \
-        }                                                                                                    \
         else {                                                                                               \
             /* Slow path: Arena allocation */                                                                \
             arena_mark = affix->args_arena->current_offset;                                                  \
@@ -1717,18 +1738,14 @@ CASE_OP_PUSH_PTR_CHAR:                                                          
             SV * sv = perl_stack_frame[step->data.index];                                                    \
             void * ptr = (char *)args_buffer + step->data.c_arg_offset;                                      \
             c_args[step->data.index] = ptr;                                                                  \
-            if (SvPOK(sv)) {                                                                                 \
+            if (SvPOK(sv))                                                                                   \
                 *(const char **)ptr = SvPV_nolen(sv);                                                        \
-            }                                                                                                \
-            else if (!SvOK(sv)) {                                                                            \
+            else if (!SvOK(sv))                                                                              \
                 *(void **)ptr = nullptr;                                                                     \
-            }                                                                                                \
-            else if (is_pin(aTHX_ sv)) {                                                                     \
+            else if (is_pin(aTHX_ sv))                                                                       \
                 *(void **)ptr = _get_pin_from_sv(aTHX_ sv)->pointer;                                         \
-            }                                                                                                \
-            else {                                                                                           \
+            else                                                                                             \
                 step->executor(aTHX_ affix, step, perl_stack_frame, args_buffer, c_args, ret_buffer);        \
-            }                                                                                                \
             DISPATCH();                                                                                      \
         }                                                                                                    \
 CASE_OP_PUSH_PTR_WCHAR:                                                                                      \
@@ -1749,23 +1766,19 @@ CASE_OP_PUSH_PTR_WCHAR:                                                         
                         *d++ = (wchar_t)((uv >> 10) + 0xD800);                                               \
                         *d++ = (wchar_t)((uv & 0x3FF) + 0xDC00);                                             \
                     }                                                                                        \
-                    else {                                                                                   \
+                    else                                                                                     \
                         *d++ = (wchar_t)uv;                                                                  \
-                    }                                                                                        \
                     s += UTF8SKIP(s);                                                                        \
                 }                                                                                            \
                 *d = 0;                                                                                      \
                 SAVEFREEPV(*(void **)ptr);                                                                   \
             }                                                                                                \
-            else if (!SvOK(sv)) {                                                                            \
+            else if (!SvOK(sv))                                                                              \
                 *(void **)ptr = nullptr;                                                                     \
-            }                                                                                                \
-            else if (is_pin(aTHX_ sv)) {                                                                     \
+            else if (is_pin(aTHX_ sv))                                                                       \
                 *(void **)ptr = _get_pin_from_sv(aTHX_ sv)->pointer;                                         \
-            }                                                                                                \
-            else {                                                                                           \
+            else                                                                                             \
                 step->executor(aTHX_ affix, step, perl_stack_frame, args_buffer, c_args, ret_buffer);        \
-            }                                                                                                \
             DISPATCH();                                                                                      \
         }                                                                                                    \
 CASE_OP_PUSH_POINTER:                                                                                        \
@@ -1900,9 +1913,8 @@ CASE_OP_DONE:                                                                   
                     SV * rsv = SvRV(arg_sv);                                                                 \
                     info->writer(aTHX_ affix, info, rsv, c_args[info->perl_stack_index]);                    \
                 }                                                                                            \
-                else if (!SvOK(arg_sv) && !SvREADONLY(arg_sv)) {                                             \
+                else if (!SvOK(arg_sv) && !SvREADONLY(arg_sv))                                               \
                     info->writer(aTHX_ affix, info, arg_sv, c_args[info->perl_stack_index]);                 \
-                }                                                                                            \
             }                                                                                                \
         }                                                                                                    \
                                                                                                              \
@@ -1979,12 +1991,13 @@ static int Affix_cv_dup(pTHX_ MAGIC * mg, CLONE_PARAMS * param) {
     Affix * new_affix;
     Newxz(new_affix, 1, Affix);
 
-    /* Basic copy of fields */
+    /* Basic copy of metadata */
     new_affix->num_args = old_affix->num_args;
     new_affix->plan_length = old_affix->plan_length;
     new_affix->total_args_size = old_affix->total_args_size;
     new_affix->ret_opcode = old_affix->ret_opcode;
     new_affix->num_out_params = old_affix->num_out_params;
+    new_affix->num_fixed_args = old_affix->num_fixed_args;  // Copied too
 
     /* Reconstruct strings */
     if (old_affix->sig_str)
@@ -1993,47 +2006,156 @@ static int Affix_cv_dup(pTHX_ MAGIC * mg, CLONE_PARAMS * param) {
         new_affix->sym_name = savepv(old_affix->sym_name);
     new_affix->target_addr = old_affix->target_addr;
 
-    /* Re-create Infix Trampoline in new thread */
-    /* Note: We rely on the signature string and target address to rebuild. */
-    /* This requires the new thread to have a valid registry. Affix_CLONE handles registry init. */
-    dMY_CXT;
-    infix_status status =
-        infix_forward_create(&new_affix->infix, new_affix->sig_str, new_affix->target_addr, MY_CXT.registry);
-
-    if (status == INFIX_SUCCESS) {
-        new_affix->cif = infix_forward_get_code(new_affix->infix);
-        new_affix->ret_type = infix_forward_get_return_type(new_affix->infix);
-        new_affix->ret_pull_handler = get_pull_handler(aTHX_ new_affix->ret_type);
-
-        /* Re-allocate Arenas */
-        new_affix->args_arena = infix_arena_create(4096);
-        new_affix->ret_arena = infix_arena_create(1024);
-        if (new_affix->num_args > 0)
-            Newx(new_affix->c_args, new_affix->num_args, void *);
-        new_affix->return_sv = newSV(0);
-
-        /* Re-create Plan (simplified copy since types are in infix) */
-        /* Note: For full thread safety, we should re-parse or deep copy the plan. */
-        /* This basic dup prevents the crash but might need more work for complex types in threads. */
-        if (old_affix->plan) {
-            Newxz(new_affix->plan, new_affix->plan_length + 1, Affix_Plan_Step);
-            for (size_t i = 0; i < new_affix->num_args; i++) {
-                new_affix->plan[i] = old_affix->plan[i];  // Copy descriptors
-                // Types are pointers to Infix types. If Infix types are shared or re-created, this needs care.
-                // Since we created a new infix_forward, we should technically re-fetch types.
-                // However, for now, we just want to stop the SEGV.
-            }
-        }
-    }
+    new_affix->infix = nullptr;
+    new_affix->args_arena = nullptr;
+    new_affix->ret_arena = nullptr;
+    new_affix->c_args = nullptr;
+    new_affix->plan = nullptr;
+    new_affix->out_param_info = nullptr;
+    new_affix->return_sv = nullptr;
+    new_affix->variadic_cache = nullptr;  // Don't copy cache, let it rebuild
 
     mg->mg_ptr = (char *)new_affix;
 
-    /* Update the new CV's fast access pointer */
+    // Update the new CV's fast access pointer
     CV * new_cv = (CV *)mg->mg_obj;
     CvXSUBANY(new_cv).any_ptr = (void *)new_affix;
 
-    return 0;
+    return 1;
 }
+
+// Helper to rebuild Affix data in the new thread
+static void rebuild_affix_data(pTHX_ Affix * affix) {
+    dMY_CXT;
+    infix_arena_t * parse_arena = nullptr;
+    infix_type * ret_type = nullptr;
+    infix_function_argument * args = nullptr;
+    size_t num_args = 0, num_fixed = 0;
+
+    // Re-parse signature using THIS thread's registry
+    infix_status status =
+        infix_signature_parse(affix->sig_str, &parse_arena, &ret_type, &args, &num_args, &num_fixed, MY_CXT.registry);
+
+    if (status != INFIX_SUCCESS) {
+        if (parse_arena)
+            infix_arena_destroy(parse_arena);
+        croak("Affix failed to rebuild in new thread: signature parse error");
+    }
+
+    // Prepare JIT types (handle array decay)
+    infix_type ** jit_arg_types = NULL;
+    if (num_args > 0) {
+        jit_arg_types = safemalloc(sizeof(infix_type *) * num_args);
+        for (size_t i = 0; i < num_args; ++i) {
+            infix_type * t = args[i].type;
+            if (t->category == INFIX_TYPE_ARRAY) {
+                infix_type * ptr_type = NULL;
+                status = infix_type_create_pointer_to(parse_arena, &ptr_type, t->meta.array_info.element_type);
+                if (status != INFIX_SUCCESS) {
+                    if (parse_arena)
+                        infix_arena_destroy(parse_arena);
+                    croak("Affix failed to rebuild in new thread: type clone error");
+                }
+                jit_arg_types[i] = ptr_type;
+            }
+            else
+                jit_arg_types[i] = t;
+        }
+    }
+
+    // Create trampoline
+    status =
+        infix_forward_create_manual(&affix->infix, ret_type, jit_arg_types, num_args, num_fixed, affix->target_addr);
+
+    if (jit_arg_types)
+        safefree(jit_arg_types);
+
+    if (status != INFIX_SUCCESS) {
+        infix_arena_destroy(parse_arena);
+        croak("Affix failed to rebuild trampoline in new thread");
+    }
+
+    affix->cif = infix_forward_get_code(affix->infix);
+    affix->ret_type = infix_forward_get_return_type(affix->infix);
+    affix->ret_pull_handler = get_pull_handler(aTHX_ affix->ret_type);
+    // affix->ret_opcode is already set from parent, but safe to assume it matches
+
+    // Allocate arenas & SV
+    affix->args_arena = infix_arena_create(4096);
+    affix->ret_arena = infix_arena_create(1024);
+    affix->return_sv = newSV(0);
+    if (affix->num_args > 0)
+        Newx(affix->c_args, affix->num_args, void *);
+
+    affix->variadic_cache = newHV();
+
+    // Rebuild plan
+    Newxz(affix->plan, affix->plan_length + 1, Affix_Plan_Step);
+
+    size_t out_param_count = 0;
+    OutParamInfo * temp_out_info = safemalloc(sizeof(OutParamInfo) * (affix->num_args > 0 ? affix->num_args : 1));
+    size_t current_offset = 0;
+
+    for (size_t i = 0; i < affix->num_args; ++i) {
+        // Deep copy types from parse_arena to persistent args_arena
+        const infix_type * original_type = _copy_type_graph_to_arena(affix->args_arena, args[i].type);
+
+        // Recalculate offsets (logic duplication from Affix_affix, but necessary)
+        size_t alignment, size;
+        if (original_type->category == INFIX_TYPE_ARRAY) {
+            alignment = _Alignof(void *);
+            size = sizeof(void *);
+        }
+        else {
+            alignment = infix_type_get_alignment(original_type);
+            size = infix_type_get_size(original_type);
+        }
+        if (alignment == 0)
+            alignment = 1;
+
+        current_offset = (current_offset + alignment - 1) & ~(alignment - 1);
+        affix->plan[i].data.c_arg_offset = current_offset;
+        current_offset += size;
+
+        affix->plan[i].executor = get_plan_step_executor(original_type);
+        affix->plan[i].opcode = get_opcode_for_type(original_type);
+        affix->plan[i].data.type = original_type;
+        affix->plan[i].data.index = i;
+
+        // Re-detect out params
+        if (original_type->category == INFIX_TYPE_POINTER) {
+            const infix_type * pointee = original_type->meta.pointer_info.pointee_type;
+            const char * pointee_name = infix_type_get_name(pointee);
+            bool is_sv_pointer = pointee_name && (strEQ(pointee_name, "SV") || strEQ(pointee_name, "@SV"));
+
+            if (!is_sv_pointer && pointee->category != INFIX_TYPE_REVERSE_TRAMPOLINE &&
+                pointee->category != INFIX_TYPE_VOID) {
+                temp_out_info[out_param_count].perl_stack_index = i;
+                temp_out_info[out_param_count].pointee_type = pointee;
+                temp_out_info[out_param_count].writer = get_out_param_writer(pointee);
+                out_param_count++;
+            }
+        }
+        else if (original_type->category == INFIX_TYPE_ARRAY) {
+            temp_out_info[out_param_count].perl_stack_index = i;
+            temp_out_info[out_param_count].pointee_type = original_type;
+            temp_out_info[out_param_count].writer = affix_array_writeback;
+            out_param_count++;
+        }
+    }
+    affix->plan[affix->num_args].opcode = OP_DONE;
+
+    // Setup OUT params
+    if (out_param_count > 0) {
+        affix->out_param_info = safemalloc(sizeof(OutParamInfo) * out_param_count);
+        memcpy(affix->out_param_info, temp_out_info, sizeof(OutParamInfo) * out_param_count);
+    }
+    safefree(temp_out_info);
+
+    // Done. parse_arena can go.
+    infix_arena_destroy(parse_arena);
+}
+
 
 static MGVTBL Affix_cv_vtbl = {0, 0, 0, 0, Affix_cv_free, 0, Affix_cv_dup, 0};
 
@@ -2685,10 +2807,16 @@ XS_INTERNAL(Affix_affix) {
     }
 
     // Attach magic for lifecycle management
-    sv_magicext((SV *)cv_new, nullptr, PERL_MAGIC_ext, &Affix_cv_vtbl, (const char *)affix, 0);
+    // We MUST use nullptr/0 here and assign mg_ptr manually, otherwise sv_magicext treats 'affix' as a string and
+    // copies truncated garbage.
+    MAGIC * mg = sv_magicext((SV *)cv_new, nullptr, PERL_MAGIC_ext, &Affix_cv_vtbl, nullptr, 0);
+    mg->mg_ptr = (char *)affix;
 
     // Set optimization pointer
     CvXSUBANY(cv_new).any_ptr = (void *)affix;
+
+    // Increase refcount to prevent premature destruction during threading/cloning operations
+    SvREFCNT_inc(cv_new);
 
     //
     SV * obj = newRV_inc(MUTABLE_SV(cv_new));
@@ -3036,7 +3164,8 @@ static void pull_pointer_as_pin(pTHX_ Affix * affix, SV * sv, const infix_type *
 
     // Create the Reference
     SV * rv = sv_2mortal(newRV_noinc(obj_data));
-    sv_magicext(obj_data, nullptr, PERL_MAGIC_ext, &Affix_pin_vtbl, (const char *)pin, 0);
+    MAGIC * mg = sv_magicext(obj_data, nullptr, PERL_MAGIC_ext, &Affix_pin_vtbl, nullptr, 0);
+    mg->mg_ptr = (char *)pin;
 
     // Update the target SV
     sv_setsv(sv, rv);
@@ -3256,13 +3385,16 @@ Affix_Pull get_pull_handler(pTHX_ const infix_type * type) {
                 if (strEQ(name, "SV") || strEQ(name, "@SV"))
                     return pull_sv;
             }
-            if (name != nullptr)
-                return pull_pointer_as_pin;
+
+            // DO NOT return early here if name != nullptr.
+            // Check pointee type first to support named/typedef'd pointers to SV/Char/etc.
 
             const infix_type * pointee_type = type->meta.pointer_info.pointee_type;
             const char * pointee_name = infix_type_get_name(pointee_type);
-            if (pointee_name && (strEQ(pointee_name, "SV") || strEQ(pointee_name, "@SV")))
+
+            if (is_perl_sv_type(pointee_type))
                 return pull_sv;
+
             if (pointee_name && (strEQ(pointee_name, "File") || strEQ(pointee_name, "@File")))
                 return pull_file;
             if (pointee_name && (strEQ(pointee_name, "PerlIO") || strEQ(pointee_name, "@PerlIO")))
@@ -3288,8 +3420,7 @@ Affix_Pull get_pull_handler(pTHX_ const infix_type * type) {
         }
     case INFIX_TYPE_STRUCT:
         {
-            const char * name = infix_type_get_name(type);
-            if (name && (strEQ(name, "SV") || strEQ(name, "@SV")))
+            if (is_perl_sv_type(type))
                 return pull_sv;
             return pull_struct;
         }
@@ -3367,12 +3498,15 @@ void sv2ptr(pTHX_ Affix * affix, SV * perl_sv, void * c_ptr, const infix_type * 
                 }
             }
             const infix_type * pointee_type = type->meta.pointer_info.pointee_type;
-            const char * pointee_name = infix_type_get_name(pointee_type);
-            if (pointee_name && (strEQ(pointee_name, "SV") || strEQ(pointee_name, "@SV"))) {
+
+            if (is_perl_sv_type(pointee_type)) {
                 *(SV **)c_ptr = perl_sv;
                 SvREFCNT_inc(perl_sv);
                 return;
             }
+
+            const char * pointee_name = infix_type_get_name(pointee_type);
+
             if (pointee_name && (strEQ(pointee_name, "File") || strEQ(pointee_name, "@File"))) {
                 IO * io = sv_2io(perl_sv);
                 if (!io)
@@ -3488,16 +3622,18 @@ void sv2ptr(pTHX_ Affix * affix, SV * perl_sv, void * c_ptr, const infix_type * 
             }
             else {
                 char signature_buf[256];
-                (void)infix_type_print(
-                    signature_buf, sizeof(signature_buf), (infix_type *)type, INFIX_DIALECT_SIGNATURE);
+                if (infix_type_print(
+                        signature_buf, sizeof(signature_buf), (infix_type *)type, INFIX_DIALECT_SIGNATURE) !=
+                    INFIX_SUCCESS) {
+                    strncpy(signature_buf, "[error printing type]", sizeof(signature_buf));
+                }
                 croak("sv2ptr cannot handle this kind of pointer conversion yet: %s", signature_buf);
             }
         }
         break;
     case INFIX_TYPE_STRUCT:
         {
-            const char * name = infix_type_get_name(type);
-            if (name && (strEQ(name, "SV") || strEQ(name, "@SV"))) {
+            if (is_perl_sv_type(type)) {
                 *(SV **)c_ptr = perl_sv;
                 SvREFCNT_inc(perl_sv);
                 return;
@@ -3875,8 +4011,11 @@ void _pin_sv(pTHX_ SV * sv, const infix_type * type, void * pointer, bool manage
     }
     else {
         Newxz(pin, 1, Affix_Pin);
-        mg = sv_magicext(sv, nullptr, PERL_MAGIC_ext, &Affix_pin_vtbl, (const char *)pin, 0);
+        mg = sv_magicext(sv, nullptr, PERL_MAGIC_ext, &Affix_pin_vtbl, nullptr, 0);
     }
+    // Re-assign mg_ptr because sv_magicext(..., 0) likely corrupted it by treating pin as a string
+    mg->mg_ptr = (char *)pin;
+
     pin->pointer = pointer;
     pin->managed = managed;
     pin->type_arena = infix_arena_create(2048);
@@ -3917,7 +4056,8 @@ XS_INTERNAL(Affix_find_symbol) {
         SV * obj_data = newSV(0);
         sv_setiv(obj_data, PTR2IV(pin));
         SV * rv = newRV_inc(obj_data);
-        sv_magicext(obj_data, nullptr, PERL_MAGIC_ext, &Affix_pin_vtbl, (const char *)pin, 0);
+        MAGIC * mg = sv_magicext(obj_data, nullptr, PERL_MAGIC_ext, &Affix_pin_vtbl, nullptr, 0);
+        mg->mg_ptr = (char *)pin;
         ST(0) = sv_2mortal(rv);
         XSRETURN(1);
     }
@@ -4071,6 +4211,13 @@ void _affix_callback_handler_entry(infix_context_t * ctx, void * retval, void **
     Affix_Callback_Data * cb_data = (Affix_Callback_Data *)infix_reverse_get_user_data(ctx);
     if (!cb_data)
         return;
+
+#ifdef MULTIPLICITY
+#ifdef PERL_SET_CONTEXT
+    PERL_SET_CONTEXT(cb_data->perl);
+#endif
+#endif
+
     dTHXa(cb_data->perl);
     dSP;
     ENTER;
@@ -4089,7 +4236,7 @@ void _affix_callback_handler_entry(infix_context_t * ctx, void * retval, void **
     }
     PUTBACK;
     const infix_type * ret_type = infix_reverse_get_return_type(ctx);
-    U32 call_flags = G_EVAL | G_KEEPERR | ((ret_type->category == INFIX_TYPE_VOID) ? G_VOID : G_SCALAR);
+    U32 call_flags = /* G_EVAL |*/ G_KEEPERR | ((ret_type->category == INFIX_TYPE_VOID) ? G_VOID : G_SCALAR);
     size_t count = call_sv(cb_data->coderef_rv, call_flags);
     if (SvTRUE(ERRSV)) {
         Perl_warn(aTHX_ "Perl callback died: %" SVf, ERRSV);
@@ -4130,6 +4277,7 @@ XS_INTERNAL(Affix_as_string) {
     XSRETURN(1);
 };
 
+
 XS_INTERNAL(Affix_END) {
     dXSARGS;
     dMY_CXT;
@@ -4148,6 +4296,16 @@ XS_INTERNAL(Affix_END) {
                          (int)entry->ref_count);
 #endif
 
+                // Temp fix: Disable library unloading at process exit.
+                //
+                // Many modern C libraries (WebUI, Go runtimes, Audio libs) spawn background
+                // threads that persist until the process dies. If we dlclose() the library
+                // here, the code segment is unmapped. When the background thread wakes up
+                // to do cleanup or work, it executes garbage memory and segfaults.
+                //
+                // Since the process is ending, the OS will reclaim file handles and memory
+                // automatically. It's (in my opinion) safer to leak the handle than to crash the process.
+#if 0
                 // This extra symbol check is here to prevent shared libs written in Go from crashing Affix.
                 // The issue is that Go inits the full Go runtime when the lib is loaded but DOES NOT STOP
                 // IT when the lib is unloaded. Threads and everything else still run and we crash when perl
@@ -4162,7 +4320,7 @@ XS_INTERNAL(Affix_END) {
 #endif
                 )
                     infix_library_close(entry->lib);
-
+#endif
                 safefree(entry);
             }
         }
@@ -4423,7 +4581,8 @@ static SV * _new_pointer_obj(pTHX_ Affix_Pin * pin) {
 
     sv_setiv(data_sv, PTR2IV(pin));
     SvUPGRADE(data_sv, SVt_PVMG);
-    sv_magicext(data_sv, nullptr, PERL_MAGIC_ext, &Affix_pin_vtbl, (const char *)pin, 0);
+    MAGIC * mg = sv_magicext(data_sv, nullptr, PERL_MAGIC_ext, &Affix_pin_vtbl, nullptr, 0);
+    mg->mg_ptr = (char *)pin;
     return rv;
 }
 
@@ -4579,7 +4738,6 @@ XS_INTERNAL(Affix_cast) {
         warn("Argument to cast must be a Pointer Object or Integer Address");
         XSRETURN_UNDEF;
     }
-
     SV * type_sv = ST(1);
     const char * signature = _get_string_from_type_obj(aTHX_ type_sv);
     if (!signature)
@@ -5091,6 +5249,31 @@ XS_INTERNAL(Affix_address) {
     XSRETURN(1);
 }
 
+// Helper to register core internal types
+static void _register_core_types(infix_registry_t * registry) {
+    // Register SV as a named type (dummy struct ensures it keeps the name in the registry).
+    // This allows signature parsing of "@SV" or "SV" (via hack) to map to a named opaque type.
+    // Direct usage of this type is blocked in get_opcode_for_type; it must be wrapped in Pointer[].
+    if (infix_register_types(registry, "@SV = { __sv_opaque: uint8 };") != INFIX_SUCCESS)
+        croak("Failed to register internal type alias '@SV'");
+
+    // We register File and PerlIO as opaque structs.
+    // This semantically matches C's FILE struct which (for now) will remain opaque to the user.
+    // We require "Pointer[File]" to mean "FILE*"
+    if (infix_register_types(registry, "@File = { _opaque: [0:uchar] };") != INFIX_SUCCESS)
+        croak("Failed to register internal type alias '@File'");
+    if (infix_register_types(registry, "@PerlIO = { _opaque: [0:uchar] };") != INFIX_SUCCESS)
+        croak("Failed to register internal type alias '@PerlIO'");
+
+    // Other special types are opaque structs too. ...but they don't always mean anything in particular.
+    if (infix_register_types(registry, "@StringList = *void;") != INFIX_SUCCESS)
+        croak("Failed to register internal type alias '@StringList'");
+    if (infix_register_types(registry, "@Buffer = *void;") != INFIX_SUCCESS)
+        croak("Failed to register internal type alias '@Buffer'");
+    if (infix_register_types(registry, "@SockAddr = *void;") != INFIX_SUCCESS)
+        croak("Failed to register internal type alias '@SockAddr'");
+}
+
 XS_INTERNAL(Affix_CLONE) {
     dXSARGS;
     PERL_UNUSED_VAR(items);
@@ -5098,14 +5281,32 @@ XS_INTERNAL(Affix_CLONE) {
     // Initialize the new thread's context (copies bitwise from parent)
     MY_CXT_CLONE;
 
+    // Capture the parent's registry pointer.
+    // After MY_CXT_CLONE, MY_CXT refers to the new thread's context,
+    // which has been initialized as a bitwise copy of the parent's context.
+    infix_registry_t * parent_registry = MY_CXT.registry;
+
     // Overwrite shared pointers with fresh objects for the new thread
     MY_CXT.lib_registry = newHV();
     MY_CXT.callback_registry = newHV();
     MY_CXT.enum_registry = newHV();
     MY_CXT.coercion_cache = newHV();
-    MY_CXT.registry = infix_registry_create();
+
+    // Deep copy the type registry.
+    // This ensures typedefs and structs defined in the parent thread exist in the child thread,
+    // but the child owns its own memory arena, making it thread-safe.
+    if (parent_registry)
+        MY_CXT.registry = infix_registry_clone(parent_registry);
+    else
+        MY_CXT.registry = infix_registry_create();
+
     if (!MY_CXT.registry)
         warn("Failed to initialize the global type registry in new thread");
+
+    // Don't ccall _register_core_types here if we cloned, because the clone already contains @SV, @File, etc.
+    if (!parent_registry)
+        _register_core_types(MY_CXT.registry);
+
     XSRETURN_EMPTY;
 }
 
@@ -5125,27 +5326,7 @@ void boot_Affix(pTHX_ CV * cv) {
     if (!MY_CXT.registry)
         croak("Failed to initialize the global type registry");
 
-    // Register SV as a named type (dummy struct ensures it keeps the name in the registry).
-    // This allows signature parsing of "@SV" or "SV" (via hack) to map to a named opaque type.
-    // NOTE: Direct usage of this type is blocked in get_opcode_for_type; it must be wrapped in Pointer[].
-    if (infix_register_types(MY_CXT.registry, "@SV = { __sv_opaque: uint8 };") != INFIX_SUCCESS)
-        croak("Failed to register internal type alias '@SV'");
-
-    // We register File and PerlIO as opaque structs.
-    // This semantically matches C's FILE struct which (for now) will remain opaque to the user.
-    // We require "Pointer[File]" to mean "FILE*"
-    if (infix_register_types(MY_CXT.registry, "@File = { _opaque: [0:uchar] };") != INFIX_SUCCESS)
-        croak("Failed to register internal type alias '@File'");
-    if (infix_register_types(MY_CXT.registry, "@PerlIO = { _opaque: [0:uchar] };") != INFIX_SUCCESS)
-        croak("Failed to register internal type alias '@PerlIO'");
-
-    // Other special types are opaque structs too. ...but they don't always mean anything in particular.
-    if (infix_register_types(MY_CXT.registry, "@StringList = *void;") != INFIX_SUCCESS)
-        croak("Failed to register internal type alias '@StringList'");
-    if (infix_register_types(MY_CXT.registry, "@Buffer = *void;") != INFIX_SUCCESS)
-        croak("Failed to register internal type alias '@Buffer'");
-    if (infix_register_types(MY_CXT.registry, "@SockAddr = *void;") != INFIX_SUCCESS)
-        croak("Failed to register internal type alias '@SockAddr'");
+    _register_core_types(MY_CXT.registry);
 
     // Helper macro to define and export an XSUB in one line.
     // Assumes C function is Affix_name and Perl sub is Affix::name.

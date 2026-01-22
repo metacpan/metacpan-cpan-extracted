@@ -25,9 +25,9 @@ Mail::Message::Head::Complete - the header of one message
 
 =head1 DESCRIPTION
 
-E-mail's message can be in various states: unread, partially read, and
-fully read.  The class stores a message of which all header lines are
-known for sure.
+Message headers can be in various states: unread, partially read, and
+fully read.  This class represents a header of which all fields are
+known for sure: the complete set.
 
 Extends L<"DESCRIPTION" in Mail::Message::Head|Mail::Message::Head/"DESCRIPTION">.
 
@@ -689,14 +689,14 @@ Cast by C<build()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.01,
-built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.02,
+built on January 22, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2001-2025 by Mark Overmeer.
+This software is copyright (c) 2001-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

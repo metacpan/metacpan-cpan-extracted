@@ -53,7 +53,7 @@ my $ok = eval {
     ### child does the server
     } else {
         eval {
-            close STDERR;
+            open STDERR, ">", "/dev/null";
             Net::Server::Test->run(
                 port => "$env->{'ports'}->[0]/tcp",
                 port => "$env->{'ports'}->[0]/udp",

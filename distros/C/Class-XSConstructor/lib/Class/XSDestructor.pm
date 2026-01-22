@@ -6,7 +6,7 @@ use Class::XSConstructor ();
 package Class::XSDestructor;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.022002';
+our $VERSION   = '0.023001';
 
 sub import {
 	my $class = shift;

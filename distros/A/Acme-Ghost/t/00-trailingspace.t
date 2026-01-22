@@ -3,12 +3,12 @@
 #
 # Serż Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2023 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2026 D&D Corporation
 #
-# This is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# This program is distributed under the terms of the Artistic License 2.0
 #
 # For Notapad++: [ \t]+\r\n -> \r\n
+# For Sublime Text: [ \t]+\n
 #
 #########################################################################
 use strict;

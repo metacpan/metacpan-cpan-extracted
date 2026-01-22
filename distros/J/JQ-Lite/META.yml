@@ -35,5 +35,5 @@ resources:
   bugtracker: https://github.com/kawamurashingo/JQ-Lite/issues
   homepage: https://kawamurashingo.github.io/JQ-Lite/
   repository: https://github.com/kawamurashingo/JQ-Lite.git
-version: '2.25'
+version: '2.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

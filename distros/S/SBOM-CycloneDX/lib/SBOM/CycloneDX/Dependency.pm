@@ -14,11 +14,13 @@ use namespace::autoclean;
 extends 'SBOM::CycloneDX::Base';
 
 has ref => (is => 'rw', isa => Str | InstanceOf ['SBOM::CycloneDX::BomRef'], required => 1);
+
 has depends_on => (
     is      => 'rw',
     isa     => ArrayLike [Str | InstanceOf ['SBOM::CycloneDX::BomRef']],
     default => sub { SBOM::CycloneDX::List->new }
 );
+
 has provides => (
     is      => 'rw',
     isa     => ArrayLike [Str | InstanceOf ['SBOM::CycloneDX::BomRef']],
@@ -75,17 +77,17 @@ Properties:
 
 =over
 
-=item C<depends_on>, The bom-ref identifiers of the components or services
+=item * C<depends_on>, The bom-ref identifiers of the components or services
 that are dependencies of this dependency object.
 
-=item C<provides>, The bom-ref identifiers of the components or services
+=item * C<provides>, The bom-ref identifiers of the components or services
 that define a given specification or standard, which are provided or
 implemented by this dependency object.
 For example, a cryptographic library which implements a cryptographic
 algorithm. A component which implements another component does not imply
 that the implementation is in use.
 
-=item C<ref>, References a component or service by its bom-ref attribute
+=item * C<ref>, References a component or service by its bom-ref attribute
 
 =back
 

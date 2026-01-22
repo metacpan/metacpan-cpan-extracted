@@ -22,13 +22,14 @@ use warnings;
 use IO::Socket::INET;
 use Fcntl ();
 use Errno ();
-use Socket ();
+use Socket qw(SOMAXCONN);
 
 BEGIN {
     eval { require Net::SSLeay; 1 }
         or warn "Module Net::SSLeay is required for SSLeay.";
     for my $sub (qw(load_error_strings SSLeay_add_ssl_algorithms ENGINE_load_builtin_engines ENGINE_register_all_complete randomize)) {
-        Net::SSLeay->can($sub)->();
+        my $subref = Net::SSLeay->can($sub);
+        $subref->() if $subref;
     }
     eval { [Fcntl::F_GETFL(), Fcntl::F_SETFL(), Fcntl::O_NONBLOCK()] } || die "Could not access Fcntl constant while loading ".__PACKAGE__.": $@";
 }
@@ -75,7 +76,7 @@ sub object {
         $sock->NS_ipv( $info->{'ipv'} );
         $sock->NS_listen(defined($info->{'listen'}) ? $info->{'listen'}
                         : defined($server->{'server'}->{'listen'}) ? $server->{'server'}->{'listen'}
-                        : Socket::SOMAXCONN());
+                        : SOMAXCONN);
         ${*$sock}{'NS_orig_port'} = $info->{'orig_port'} if defined $info->{'orig_port'};
 
         for my $key (@ssl_args) {
@@ -110,7 +111,7 @@ sub connect { # connect the first time
         ReuseAddr => 1,
         Reuse     => 1,
         (($host ne '*') ? (LocalAddr => $host) : ()), # * is all
-        ($isa_v6 ? (Domain => ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC()) : ()),
+        ($isa_v6 ? (Domain => ($ipv eq '6') ? Net::Server::Proto::AF_INET6() : ($ipv eq '4') ? Net::Server::Proto::AF_INET() : Net::Server::Proto::AF_UNSPEC()) : ()),
     }) || $server->fatal("Can't connect to SSLEAY port $port on $host [$!]");
 
     if ($port eq '0' and $port = $sock->sockport) {
@@ -134,7 +135,7 @@ sub reconnect { # connect on a sig -HUP
     my $isa_v6 = Net::Server::Proto->requires_ipv6($server) ? $sock->isa(Net::Server::Proto->ipv6_package($server)) : undef;
     if ($isa_v6) {
         my $ipv = $sock->NS_ipv;
-        ${*$sock}{'io_socket_domain'} = ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC();
+        ${*$sock}{'io_socket_domain'} = ($ipv eq '6') ? Net::Server::Proto::AF_INET6() : ($ipv eq '4') ? Net::Server::Proto::AF_INET() : Net::Server::Proto::AF_UNSPEC();
     }
 
     $sock->bind_SSL($server);
@@ -298,8 +299,7 @@ sub read_until {
 
             if (!length($buf)) {
                 last OUTER if !length($buf) && $n_empty++;
-            }
-            else {
+            } else {
                 $content .= $buf;
                 if ($non_greedy && length($content) == $bytes) {
                     $ok = 3;

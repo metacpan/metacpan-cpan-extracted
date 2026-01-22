@@ -99,9 +99,19 @@ static void skip_whitespace(parser_state * state) {
 static bool parse_size_t(parser_state * state, size_t * out_val) {
     const char * start = state->p;
     char * end;
+    errno = 0;  // Reset errno before call
     unsigned long long val = strtoull(start, &end, 10);
-    if (end == start) {
-        set_parser_error(state, INFIX_CODE_UNEXPECTED_TOKEN);
+
+    // Check for no conversion (end==start) OR overflow (ERANGE)
+    if (end == start || errno == ERANGE) {
+        // Use INTEGER_OVERFLOW code for range errors
+        set_parser_error(state, errno == ERANGE ? INFIX_CODE_INTEGER_OVERFLOW : INFIX_CODE_UNEXPECTED_TOKEN);
+        return false;
+    }
+
+    // Check for truncation if size_t is smaller than unsigned long long (e.g. 32-bit builds)
+    if (val > SIZE_MAX) {
+        set_parser_error(state, INFIX_CODE_INTEGER_OVERFLOW);
         return false;
     }
     *out_val = (size_t)val;
@@ -1183,9 +1193,12 @@ static void _print(printer_state * state, const char * fmt, ...) {
 }
 // Forward declaration for mutual recursion in printers.
 static void _infix_type_print_signature_recursive(printer_state * state, const infix_type * type);
+static void _infix_type_print_itanium_recursive(printer_state * state, const infix_type * type);
+static void _infix_type_print_msvc_recursive(printer_state * state, const infix_type * type);
+
 /**
  * @internal
- * @brief The internal implementation of the type-to-string printer.
+ * @brief The internal implementation of the type-to-string printer for standard signatures.
  *
  * This function recursively walks a type graph and prints its signature representation.
  * The key feature is the initial check for `type->name`. If a semantic alias exists,
@@ -1385,6 +1398,280 @@ static void _infix_type_print_signature_recursive(printer_state * state, const i
 }
 /**
  * @internal
+ * @brief Recursively prints the Itanium C++ ABI mangling for a type.
+ * @param state The printer state.
+ * @param type The type to mangle.
+ */
+static void _infix_type_print_itanium_recursive(printer_state * state, const infix_type * type) {
+    if (state->status != INFIX_SUCCESS || !type) {
+        if (state->status == INFIX_SUCCESS)
+            state->status = INFIX_ERROR_INVALID_ARGUMENT;
+        return;
+    }
+    switch (type->category) {
+    case INFIX_TYPE_VOID:
+        _print(state, "v");
+        break;
+    case INFIX_TYPE_POINTER:
+        _print(state, "P");
+        _infix_type_print_itanium_recursive(state, type->meta.pointer_info.pointee_type);
+        break;
+    case INFIX_TYPE_PRIMITIVE:
+        switch (type->meta.primitive_id) {
+        case INFIX_PRIMITIVE_BOOL:
+            _print(state, "b");
+            break;
+        case INFIX_PRIMITIVE_SINT8:
+            _print(state, "a");
+            break;  // signed char
+        case INFIX_PRIMITIVE_UINT8:
+            _print(state, "h");
+            break;  // unsigned char
+        case INFIX_PRIMITIVE_SINT16:
+            _print(state, "s");
+            break;  // short
+        case INFIX_PRIMITIVE_UINT16:
+            _print(state, "t");
+            break;  // unsigned short
+        case INFIX_PRIMITIVE_SINT32:
+            _print(state, "i");
+            break;  // int
+        case INFIX_PRIMITIVE_UINT32:
+            _print(state, "j");
+            break;  // unsigned int
+        case INFIX_PRIMITIVE_SINT64:
+            _print(state, "x");
+            break;  // long long
+        case INFIX_PRIMITIVE_UINT64:
+            _print(state, "y");
+            break;  // unsigned long long
+        case INFIX_PRIMITIVE_SINT128:
+            _print(state, "n");
+            break;  // __int128
+        case INFIX_PRIMITIVE_UINT128:
+            _print(state, "o");
+            break;  // unsigned __int128
+        case INFIX_PRIMITIVE_FLOAT:
+            _print(state, "f");
+            break;
+        case INFIX_PRIMITIVE_DOUBLE:
+            _print(state, "d");
+            break;
+        case INFIX_PRIMITIVE_LONG_DOUBLE:
+            _print(state, "e");
+            break;
+        }
+        break;
+    case INFIX_TYPE_NAMED_REFERENCE:
+        {
+            const char * name = type->meta.named_reference.name;
+            size_t len = strlen(name);
+            _print(state, "%zu%s", len, name);
+        }
+        break;
+    case INFIX_TYPE_STRUCT:
+    case INFIX_TYPE_UNION:
+        if (type->name) {
+            // Check for namespaced type (e.g. "Namespace::Class")
+            // Itanium mangling for namespaces is N...E
+            const char * p = type->name;
+            int parts = 0;
+            // Count parts
+            while (*p) {
+                if (p[0] == ':' && p[1] == ':') {
+                    parts++;
+                    p += 2;
+                }
+                else {
+                    p++;
+                }
+            }
+            parts++;  // Last part
+
+            if (parts > 1) {
+                _print(state, "N");
+                p = type->name;
+                while (*p) {
+                    const char * end = strstr(p, "::");
+                    size_t part_len = end ? (size_t)(end - p) : strlen(p);
+                    _print(state, "%zu", part_len);
+                    // Print part_len chars
+                    for (size_t i = 0; i < part_len; i++)
+                        _print(state, "%c", p[i]);
+                    if (end)
+                        p = end + 2;
+                    else
+                        break;
+                }
+                _print(state, "E");
+            }
+            else {
+                // Simple name
+                size_t len = strlen(type->name);
+                _print(state, "%zu%s", len, type->name);
+            }
+        }
+        else {
+            // Mangling for anonymous structs isn't standardized.
+            // Emitting 'void' as a safe placeholder for "unknown type".
+            _print(state, "v");
+        }
+        break;
+    default:
+        // Fallback for types that don't map cleanly to Itanium mangling
+        _print(state, "v");
+        break;
+    }
+}
+/**
+ * @internal
+ * @brief Recursively prints the MSVC C++ mangling for a type.
+ * @param state The printer state.
+ * @param type The type to mangle.
+ */
+static void _infix_type_print_msvc_recursive(printer_state * state, const infix_type * type) {
+    if (state->status != INFIX_SUCCESS || !type) {
+        if (state->status == INFIX_SUCCESS)
+            state->status = INFIX_ERROR_INVALID_ARGUMENT;
+        return;
+    }
+    // Handle named types (Struct/Union/Enum or aliases)
+    if (type->name) {
+        // MSVC encoding:
+        // U = Struct
+        // T = Union
+        // W = Enum
+        char prefix = 'U';
+        if (type->category == INFIX_TYPE_UNION)
+            prefix = 'T';
+        else if (type->category == INFIX_TYPE_ENUM)
+            prefix = 'W';
+
+        // Check for namespaces (e.g. "Namespace::Class")
+        // MSVC format: <Prefix><Name>@<Namespace>@@
+        // Reverse order of namespaces!
+        if (strstr(type->name, "::")) {
+            _print(state, "%c", prefix);
+
+            // We need to split and reverse. Since we can't allocate easily here,
+            // we'll scan the string multiple times or use recursion.
+            // Let's use a simple stack-based approach for small depth.
+            const char * parts[MAX_RECURSION_DEPTH];
+            size_t lens[MAX_RECURSION_DEPTH];
+            int count = 0;
+
+            const char * p = type->name;
+            while (*p && count < MAX_RECURSION_DEPTH) {
+                parts[count] = p;
+                const char * end = strstr(p, "::");
+                if (end) {
+                    lens[count] = end - p;
+                    p = end + 2;
+                }
+                else {
+                    lens[count] = strlen(p);
+                    p += lens[count];
+                }
+                count++;
+            }
+
+            // Print in reverse order
+            for (int i = count - 1; i >= 0; i--) {
+                for (size_t j = 0; j < lens[i]; j++)
+                    _print(state, "%c", parts[i][j]);
+                _print(state, "@");
+            }
+            _print(state, "@");  // Terminator
+        }
+        else {
+            _print(state, "%c%s@@", prefix, type->name);
+        }
+        return;
+    }
+
+    switch (type->category) {
+    case INFIX_TYPE_VOID:
+        _print(state, "X");
+        break;
+    case INFIX_TYPE_PRIMITIVE:
+        switch (type->meta.primitive_id) {
+        case INFIX_PRIMITIVE_BOOL:
+            _print(state, "_N");
+            break;
+        case INFIX_PRIMITIVE_SINT8:
+            _print(state, "C");
+            break;  // signed char
+        case INFIX_PRIMITIVE_UINT8:
+            _print(state, "E");
+            break;  // unsigned char
+        case INFIX_PRIMITIVE_SINT16:
+            _print(state, "F");
+            break;  // short
+        case INFIX_PRIMITIVE_UINT16:
+            _print(state, "G");
+            break;  // unsigned short
+        case INFIX_PRIMITIVE_SINT32:
+            _print(state, "H");
+            break;  // int
+        case INFIX_PRIMITIVE_UINT32:
+            _print(state, "I");
+            break;  // unsigned int
+        case INFIX_PRIMITIVE_SINT64:
+            _print(state, "_J");
+            break;  // __int64
+        case INFIX_PRIMITIVE_UINT64:
+            _print(state, "_K");
+            break;  // unsigned __int64
+        case INFIX_PRIMITIVE_FLOAT:
+            _print(state, "M");
+            break;
+        case INFIX_PRIMITIVE_DOUBLE:
+            _print(state, "N");
+            break;
+        // MSVC typically maps long double to double (N), but distinct type O exists
+        case INFIX_PRIMITIVE_LONG_DOUBLE:
+            _print(state, "O");
+            break;
+        default:
+            _print(state, "?");
+            break;
+        }
+        break;
+    case INFIX_TYPE_POINTER:
+        // Standard MSVC pointer encoding for x64:
+        // P = Pointer
+        // E = __ptr64
+        // A = const/volatile qualifiers (A = none)
+        // Then the pointee type.
+        _print(state, "PEA");
+        _infix_type_print_msvc_recursive(state, type->meta.pointer_info.pointee_type);
+        break;
+    case INFIX_TYPE_REVERSE_TRAMPOLINE:  // Function Pointer
+        // P6 = Pointer to Function
+        // A = __cdecl
+        _print(state, "P6A");
+        // Return type
+        _infix_type_print_msvc_recursive(state, type->meta.func_ptr_info.return_type);
+        // Arguments
+        if (type->meta.func_ptr_info.num_args == 0)
+            _print(state, "X");
+        else
+            for (size_t i = 0; i < type->meta.func_ptr_info.num_args; ++i)
+                _infix_type_print_msvc_recursive(state, type->meta.func_ptr_info.args[i].type);
+        _print(state, "@Z");
+        break;
+    case INFIX_TYPE_NAMED_REFERENCE:
+        // Unresolved references, treat as Struct for mangling purposes.
+        _print(state, "U%s@@", type->meta.named_reference.name);
+        break;
+    default:
+        // Arrays, function pointers, etc. are complex. Fallback.
+        _print(state, "?");
+        break;
+    }
+}
+/**
+ * @internal
  * @brief Serializes an `infix_type`'s structural body, ignoring its top-level semantic name.
  *
  * This function is a special-purpose printer used by `infix_registry_print`. Its job
@@ -1555,10 +1842,10 @@ c23_nodiscard infix_status _infix_type_print_body_only(char * buffer,
  * @param[in] dialect The desired output format dialect.
  * @return `INFIX_SUCCESS` on success, or `INFIX_ERROR_INVALID_ARGUMENT` if the buffer is too small.
  */
-c23_nodiscard infix_status infix_type_print(char * buffer,
-                                            size_t buffer_size,
-                                            const infix_type * type,
-                                            infix_print_dialect_t dialect) {
+INFIX_API c23_nodiscard infix_status infix_type_print(char * buffer,
+                                                      size_t buffer_size,
+                                                      const infix_type * type,
+                                                      infix_print_dialect_t dialect) {
     _infix_clear_error();
     if (!buffer || buffer_size == 0 || !type) {
         _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
@@ -1568,8 +1855,11 @@ c23_nodiscard infix_status infix_type_print(char * buffer,
     *buffer = '\0';
     if (dialect == INFIX_DIALECT_SIGNATURE)
         _infix_type_print_signature_recursive(&state, type);
+    else if (dialect == INFIX_DIALECT_ITANIUM_MANGLING)
+        _infix_type_print_itanium_recursive(&state, type);
+    else if (dialect == INFIX_DIALECT_MSVC_MANGLING)
+        _infix_type_print_msvc_recursive(&state, type);
     else {
-        // Placeholder for future dialects like C++ name mangling.
         _print(&state, "unsupported_dialect");
         state.status = INFIX_ERROR_INVALID_ARGUMENT;
     }
@@ -1591,7 +1881,7 @@ c23_nodiscard infix_status infix_type_print(char * buffer,
  * @brief Serializes a function signature's components into a string.
  * @param[out] buffer The output buffer.
  * @param[in] buffer_size The size of the output buffer.
- * @param[in] function_name Optional name for dialects that support it (currently unused).
+ * @param[in] function_name Optional name for dialects that support it.
  * @param[in] ret_type The return type.
  * @param[in] args The array of arguments.
  * @param[in] num_args The total number of arguments.
@@ -1599,14 +1889,14 @@ c23_nodiscard infix_status infix_type_print(char * buffer,
  * @param[in] dialect The output dialect.
  * @return `INFIX_SUCCESS` on success, or `INFIX_ERROR_INVALID_ARGUMENT` if the buffer is too small.
  */
-c23_nodiscard infix_status infix_function_print(char * buffer,
-                                                size_t buffer_size,
-                                                const char * function_name,
-                                                const infix_type * ret_type,
-                                                const infix_function_argument * args,
-                                                size_t num_args,
-                                                size_t num_fixed_args,
-                                                infix_print_dialect_t dialect) {
+INFIX_API c23_nodiscard infix_status infix_function_print(char * buffer,
+                                                          size_t buffer_size,
+                                                          const char * function_name,
+                                                          const infix_type * ret_type,
+                                                          const infix_function_argument * args,
+                                                          size_t num_args,
+                                                          size_t num_fixed_args,
+                                                          infix_print_dialect_t dialect) {
     _infix_clear_error();
     if (!buffer || buffer_size == 0 || !ret_type || (num_args > 0 && !args)) {
         _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
@@ -1614,8 +1904,8 @@ c23_nodiscard infix_status infix_function_print(char * buffer,
     }
     printer_state state = {buffer, buffer_size, INFIX_SUCCESS};
     *buffer = '\0';
-    (void)function_name;  // Not used in the standard signature dialect.
     if (dialect == INFIX_DIALECT_SIGNATURE) {
+        (void)function_name;  // Unused
         _print(&state, "(");
         for (size_t i = 0; i < num_fixed_args; ++i) {
             if (i > 0)
@@ -1632,6 +1922,101 @@ c23_nodiscard infix_status infix_function_print(char * buffer,
         }
         _print(&state, ")->");
         _infix_type_print_signature_recursive(&state, ret_type);
+    }
+    else if (dialect == INFIX_DIALECT_ITANIUM_MANGLING) {
+        // _Z <name_len> <name> <ret_type?> <args...>
+        // Note: Itanium mangling usually omits return type for standard functions unless it's a template or special
+        // case. We omit it here for simplicity to match extern "C" -> C++ linking expectations for simple functions.
+        _print(&state, "_Z");
+        if (function_name) {
+            // Check for namespace in function name (e.g., "MyNS::my_func")
+            const char * p = function_name;
+            int parts = 0;
+            while (*p)
+                if (p[0] == ':' && p[1] == ':') {
+                    parts++;
+                    p += 2;
+                }
+                else
+                    p++;
+            parts++;
+
+            if (parts > 1) {
+                _print(&state, "N");
+                p = function_name;
+                while (*p) {
+                    const char * end = strstr(p, "::");
+                    size_t part_len = end ? (size_t)(end - p) : strlen(p);
+                    _print(&state, "%zu", part_len);
+                    for (size_t i = 0; i < part_len; i++)
+                        _print(&state, "%c", p[i]);
+                    if (end)
+                        p = end + 2;
+                    else
+                        break;
+                }
+                _print(&state, "E");
+            }
+            else {
+                size_t name_len = strlen(function_name);
+                _print(&state, "%zu%s", name_len, function_name);
+            }
+        }
+        else
+            _print(&state, "4func");  // Default name if NULL
+
+        if (num_args == 0)
+            _print(&state, "v");  // void (no args)
+        else
+            for (size_t i = 0; i < num_args; ++i)
+                _infix_type_print_itanium_recursive(&state, args[i].type);
+    }
+    else if (dialect == INFIX_DIALECT_MSVC_MANGLING) {
+        // MSVC: ?<name>@@YA<ret><args...>@Z
+        _print(&state, "?");
+        if (function_name) {
+            // MSVC namespace handling: reverse order
+            if (strstr(function_name, "::")) {
+                const char * parts[MAX_RECURSION_DEPTH];
+                size_t lens[MAX_RECURSION_DEPTH];
+                int count = 0;
+                const char * p = function_name;
+                while (*p && count < MAX_RECURSION_DEPTH) {
+                    parts[count] = p;
+                    const char * end = strstr(p, "::");
+                    if (end) {
+                        lens[count] = end - p;
+                        p = end + 2;
+                    }
+                    else {
+                        lens[count] = strlen(p);
+                        p += lens[count];
+                    }
+                    count++;
+                }
+                // Print in reverse order
+                for (int i = count - 1; i >= 0; i--) {
+                    for (size_t j = 0; j < lens[i]; j++)
+                        _print(&state, "%c", parts[i][j]);
+                    _print(&state, "@");
+                }
+            }
+            else {
+                _print(&state, "%s@", function_name);
+            }
+        }
+        else {
+            _print(&state, "func@");
+        }
+        _print(&state, "@YA");  // __cdecl (default)
+        _infix_type_print_msvc_recursive(&state, ret_type);
+
+        if (num_args == 0)
+            _print(&state, "X");  // void argument list
+        else
+            for (size_t i = 0; i < num_args; ++i)
+                _infix_type_print_msvc_recursive(&state, args[i].type);
+        _print(&state, "@Z");
     }
     else {
         _print(&state, "unsupported_dialect");

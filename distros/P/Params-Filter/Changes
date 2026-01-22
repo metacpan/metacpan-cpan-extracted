@@ -1,5 +1,11 @@
 Revision history for Params-Filter
 
+v0.007  2026-01-21 (STABLE RELEASE)
+    - Version bump to resolve CPAN testers indexing issue
+    - Repository renamed: Local-Params-Filter → Params-Filter
+    - All package metadata updated for new repository location
+    - Ready for full CPAN distribution
+
 v0.006  2026-01-20 (STABLE RELEASE)
     - First stable CPAN release
     - Major documentation improvements:

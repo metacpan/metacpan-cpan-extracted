@@ -170,18 +170,6 @@ struct infix_registry_t {
     _infix_registry_entry_t ** buckets; /**< The array of hash table buckets (linked list heads). */
 };
 /**
- * @struct infix_registry_iterator_t
- * @brief Internal definition of a registry iterator.
- * @details This struct holds the complete state needed to traverse the registry's
- * internal hash table, including the current bucket and the current entry within
- * that bucket's linked list.
- */
-struct infix_registry_iterator_t {
-    const infix_registry_t * registry;             /**< The registry being iterated. */
-    size_t current_bucket;                         /**< The index of the current hash bucket. */
-    const _infix_registry_entry_t * current_entry; /**< The current entry in the bucket's chain. */
-};
-/**
  * @struct code_buffer
  * @brief A dynamic buffer for staged machine code generation.
  * @details This structure is used during the JIT compilation process. ABI-specific
@@ -509,7 +497,7 @@ typedef struct {
  * @param code The specific error code.
  * @param position For parser errors, the byte offset into the signature string where the error occurred.
  */
-void _infix_set_error(infix_error_category_t category, infix_error_code_t code, size_t position);
+INFIX_INTERNAL void _infix_set_error(infix_error_category_t category, infix_error_code_t code, size_t position);
 /**
  * @brief Sets the thread-local error state for a system-level error.
  * @details Located in `src/core/error.c`, this is used for errors originating from
@@ -519,16 +507,16 @@ void _infix_set_error(infix_error_category_t category, infix_error_code_t code, 
  * @param system_code The OS-specific error code (e.g., from `errno` or `GetLastError`).
  * @param msg An optional custom message from the OS (e.g., from `dlerror`).
  */
-void _infix_set_system_error(infix_error_category_t category,
-                             infix_error_code_t code,
-                             long system_code,
-                             const char * msg);
+INFIX_INTERNAL void _infix_set_system_error(infix_error_category_t category,
+                                            infix_error_code_t code,
+                                            long system_code,
+                                            const char * msg);
 /**
  * @brief Clears the thread-local error state.
  * @details Located in `src/core/error.c`. This is called at the beginning of every public
  * API function to ensure that a prior error from an unrelated call is not accidentally returned.
  */
-void _infix_clear_error(void);
+INFIX_INTERNAL void _infix_clear_error(void);
 /**
  * @brief Recalculates the layout of a fully resolved type graph.
  * @details Located in `src/core/types.c`. This is the "Layout" stage of the data pipeline.
@@ -537,7 +525,7 @@ void _infix_clear_error(void);
  * resolved graph.
  * @param[in,out] type The root of the type graph to recalculate. The graph is modified in-place.
  */
-void _infix_type_recalculate_layout(infix_type * type);
+INFIX_INTERNAL void _infix_type_recalculate_layout(infix_type * type);
 /**
  * @brief Resolves all named type references in a type graph in-place.
  * @details Located in `src/core/type_registry.c`. This is the "Resolve" stage of the
@@ -547,7 +535,8 @@ void _infix_type_recalculate_layout(infix_type * type);
  * @param[in] registry The registry to use for lookups.
  * @return `INFIX_SUCCESS` on success, or an error if a name cannot be resolved.
  */
-c23_nodiscard infix_status _infix_resolve_type_graph_inplace(infix_type ** type_ptr, infix_registry_t * registry);
+INFIX_INTERNAL c23_nodiscard infix_status _infix_resolve_type_graph_inplace(infix_type ** type_ptr,
+                                                                            infix_registry_t * registry);
 /**
  * @brief The internal core of the signature parser.
  * @details Located in `src/core/signature.c`. This is the "Parse" stage of the data pipeline.
@@ -558,7 +547,7 @@ c23_nodiscard infix_status _infix_resolve_type_graph_inplace(infix_type ** type_
  * @param[in] signature The signature string to parse.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status _infix_parse_type_internal(infix_type **, infix_arena_t **, const char *);
+INFIX_INTERNAL c23_nodiscard infix_status _infix_parse_type_internal(infix_type **, infix_arena_t **, const char *);
 /**
  * @brief An internal-only function to serialize a type's body without its registered name.
  * @details Located in `src/core/signature.c`. Unlike `infix_type_print`, which will
@@ -570,7 +559,10 @@ c23_nodiscard infix_status _infix_parse_type_internal(infix_type **, infix_arena
  * @param[in] dialect The output format dialect.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status _infix_type_print_body_only(char *, size_t, const infix_type *, infix_print_dialect_t);
+INFIX_INTERNAL c23_nodiscard infix_status _infix_type_print_body_only(char *,
+                                                                      size_t,
+                                                                      const infix_type *,
+                                                                      infix_print_dialect_t);
 /**
  * @brief Performs a deep copy of a type graph into a destination arena.
  * @details Located in `src/core/types.c`. This is the "Copy" stage of the data pipeline,
@@ -580,7 +572,7 @@ c23_nodiscard infix_status _infix_type_print_body_only(char *, size_t, const inf
  * @param[in] src_type The source type graph to copy.
  * @return A pointer to the newly created copy in `dest_arena`, or `nullptr` on failure.
  */
-infix_type * _copy_type_graph_to_arena(infix_arena_t *, const infix_type *);
+INFIX_INTERNAL infix_type * _copy_type_graph_to_arena(infix_arena_t *, const infix_type *);
 /**
  * @brief Estimates the total memory required to deep-copy a complete type graph.
  * @details Located in `src/core/types.c`. This function recursively walks the entire
@@ -590,7 +582,7 @@ infix_type * _copy_type_graph_to_arena(infix_arena_t *, const infix_type *);
  * @param[in] type The root of the type graph to estimate.
  * @return The estimated size in bytes required for a deep copy.
  */
-size_t _infix_estimate_graph_size(infix_arena_t * temp_arena, const infix_type * type);
+INFIX_INTERNAL size_t _infix_estimate_graph_size(infix_arena_t * temp_arena, const infix_type * type);
 /**
  * @brief Gets the ABI v-table for forward calls for the current platform.
  * @details See `src/jit/trampoline.c`. This function is the entry point to the ABI
@@ -598,19 +590,19 @@ size_t _infix_estimate_graph_size(infix_arena_t * temp_arena, const infix_type *
  * compile-time ABI detection.
  * @return A pointer to the active `infix_forward_abi_spec`.
  */
-const infix_forward_abi_spec * get_current_forward_abi_spec(void);
+INFIX_INTERNAL const infix_forward_abi_spec * get_current_forward_abi_spec(void);
 /**
  * @brief Gets the ABI v-table for reverse calls for the current platform.
  * @details See `src/jit/trampoline.c`. This function mirrors `get_current_forward_abi_spec`
  * for reverse call trampolines.
  * @return A pointer to the active `infix_reverse_abi_spec`.
  */
-const infix_reverse_abi_spec * get_current_reverse_abi_spec(void);
+INFIX_INTERNAL const infix_reverse_abi_spec * get_current_reverse_abi_spec(void);
 /**
  * @brief Gets the ABI v-table for direct marshalling forward calls for the current platform.
  * @return A pointer to the active `infix_direct_forward_abi_spec`.
  */
-const infix_direct_forward_abi_spec * get_current_direct_forward_abi_spec(void);
+INFIX_INTERNAL const infix_direct_forward_abi_spec * get_current_direct_forward_abi_spec(void);
 /**
  * @brief Initializes a code buffer for JIT code generation.
  * @details See `src/jit/trampoline.c`. Associates the buffer with a temporary
@@ -618,7 +610,7 @@ const infix_direct_forward_abi_spec * get_current_direct_forward_abi_spec(void);
  * @param[out] buf A pointer to the `code_buffer` to initialize.
  * @param[in] arena The temporary arena to use for the buffer's memory.
  */
-void code_buffer_init(code_buffer * buf, infix_arena_t * arena);
+INFIX_INTERNAL void code_buffer_init(code_buffer * buf, infix_arena_t * arena);
 /**
  * @brief Appends raw bytes to a code buffer, reallocating within its arena if necessary.
  * @details See `src/jit/trampoline.c`. This is the fundamental operation for building
@@ -627,34 +619,25 @@ void code_buffer_init(code_buffer * buf, infix_arena_t * arena);
  * @param[in] data A pointer to the bytes to append.
  * @param[in] len The number of bytes to append.
  */
-void code_buffer_append(code_buffer * buf, const void * data, size_t len);
+INFIX_INTERNAL void code_buffer_append(code_buffer * buf, const void * data, size_t len);
 /**
  * @brief A convenience wrapper to append a single byte to a code buffer.
  * @param[in,out] buf The code buffer.
  * @param[in] byte The byte to append.
  */
-void emit_byte(code_buffer * buf, uint8_t byte);
+INFIX_INTERNAL void emit_byte(code_buffer * buf, uint8_t byte);
 /**
  * @brief A convenience wrapper to append a 32-bit integer (little-endian) to a code buffer.
  * @param[in,out] buf The code buffer.
  * @param[in] value The 32-bit integer to append.
  */
-void emit_int32(code_buffer * buf, int32_t value);
+INFIX_INTERNAL void emit_int32(code_buffer * buf, int32_t value);
 /**
  * @brief A convenience wrapper to append a 64-bit integer (little-endian) to a code buffer.
  * @param[in,out] buf The code buffer.
  * @param[in] value The 64-bit integer to append.
  */
-void emit_int64(code_buffer * buf, int64_t value);
-/**
- * @brief The core implementation for creating all forward trampolines.
- * @details Located in `src/jit/trampoline.c`, this function orchestrates the
- * entire JIT pipeline for forward calls, from ABI classification to code generation
- * and final handle creation.
- * @return `INFIX_SUCCESS` on success.
- */
-c23_nodiscard infix_status
-_infix_forward_create_internal(infix_forward_t **, infix_type *, infix_type **, size_t, size_t, void *);
+INFIX_INTERNAL void emit_int64(code_buffer * buf, int64_t value);
 /**
  * @brief Allocates a block of executable memory using the platform's W^X strategy.
  * @details Located in `src/jit/executor.c`. This is a platform-specific function
@@ -662,14 +645,14 @@ _infix_forward_create_internal(infix_forward_t **, infix_type *, infix_type **, 
  * @param size The number of bytes to allocate.
  * @return An `infix_executable_t` handle containing pointers to the allocated memory.
  */
-c23_nodiscard infix_executable_t infix_executable_alloc(size_t size);
+INFIX_INTERNAL c23_nodiscard infix_executable_t infix_executable_alloc(size_t size);
 /**
  * @brief Frees a block of executable memory and applies guard pages to prevent use-after-free.
  * @details Located in `src/jit/executor.c`. Before freeing, it attempts to change
  * the memory's protection to be inaccessible, causing an immediate crash on a UAF.
  * @param exec The handle to the memory block to free.
  */
-void infix_executable_free(infix_executable_t exec);
+INFIX_INTERNAL void infix_executable_free(infix_executable_t exec);
 /**
  * @brief Makes a block of JIT memory executable, completing the W^X process.
  * @details Located in `src/jit/executor.c`. For single-map platforms, this calls
@@ -678,7 +661,7 @@ void infix_executable_free(infix_executable_t exec);
  * @param exec The handle to the memory block to make executable.
  * @return `true` on success, `false` on failure.
  */
-c23_nodiscard bool infix_executable_make_executable(infix_executable_t exec);
+INFIX_INTERNAL c23_nodiscard bool infix_executable_make_executable(infix_executable_t * exec);
 /**
  * @brief Allocates a block of standard memory for later protection.
  * @details Located in `src/jit/executor.c`. This is used to allocate the memory
@@ -686,13 +669,13 @@ c23_nodiscard bool infix_executable_make_executable(infix_executable_t exec);
  * @param size The number of bytes to allocate.
  * @return An `infix_protected_t` handle.
  */
-c23_nodiscard infix_protected_t infix_protected_alloc(size_t size);
+INFIX_INTERNAL c23_nodiscard infix_protected_t infix_protected_alloc(size_t size);
 /**
  * @brief Frees a block of protected memory.
  * @details Located in `src/jit/executor.c`.
  * @param prot The memory block to free.
  */
-void infix_protected_free(infix_protected_t prot);
+INFIX_INTERNAL void infix_protected_free(infix_protected_t prot);
 /**
  * @brief Makes a block of memory read-only for security hardening.
  * @details Located in `src/jit/executor.c`. This is called on the `infix_reverse_t`
@@ -700,7 +683,7 @@ void infix_protected_free(infix_protected_t prot);
  * @param prot The memory block to make read-only.
  * @return `true` on success, `false` on failure.
  */
-c23_nodiscard bool infix_protected_make_readonly(infix_protected_t prot);
+INFIX_INTERNAL c23_nodiscard bool infix_protected_make_readonly(infix_protected_t prot);
 /**
  * @brief The universal C entry point for all reverse call trampolines.
  * @details Located in `src/jit/executor.c`, this function is called by the JIT-compiled
@@ -710,7 +693,9 @@ c23_nodiscard bool infix_protected_make_readonly(infix_protected_t prot);
  * @param[out] return_value_ptr A pointer to the stack buffer for the return value.
  * @param[in] args_array A pointer to the `void**` array of argument pointers.
  */
-void infix_internal_dispatch_callback_fn_impl(infix_reverse_t * context, void * return_value_ptr, void ** args_array);
+INFIX_INTERNAL void infix_internal_dispatch_callback_fn_impl(infix_reverse_t * context,
+                                                             void * return_value_ptr,
+                                                             void ** args_array);
 // Utility Macros & Inlines
 /** @brief Appends a sequence of bytes (e.g., an instruction opcode) to a code buffer. */
 #define EMIT_BYTES(buf, ...)                             \

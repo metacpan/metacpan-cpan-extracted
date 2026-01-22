@@ -22,6 +22,7 @@ package Net::Server::Proto::UDP;
 
 use strict;
 use base qw(Net::Server::Proto::TCP);
+use Net::Server::Proto qw(AF_INET AF_INET6 AF_UNSPEC);
 
 my @udp_args = qw(
     udp_recv_len
@@ -58,7 +59,7 @@ sub object {
             : 0;
     $flg = ($flg =~ /^(\d+)$/) ? $1 : 0;
 
-    my @sock = $class->SUPER::new(); # it is possible that multiple connections will be returned if INET6 is in effect
+    my @sock = $class->new(); # XXX: Is it possible that multiple connections will be returned if INET6 is in effect?
     foreach my $sock (@sock) {
         $sock->NS_host($info->{'host'});
         $sock->NS_port($info->{'port'});
@@ -76,15 +77,18 @@ sub connect {
     my $host = $sock->NS_host;
     my $port = $sock->NS_port;
     my $ipv  = $sock->NS_ipv;
-    my $isa_v6 = Net::Server::Proto->requires_ipv6($server) ? $sock->isa(Net::Server::Proto->ipv6_package($server)) : undef;
+    my $afis = Net::Server::Proto->requires_ipv6($server) ?
+        $sock->isa("IO::Socket::IP") ? "Family" :
+        $sock->isa("IO::Socket::INET6") ? "Domain" :
+        undef : undef; # XXX: Is there any single magic word for "Address Family" that works for both modules?
 
-    $sock->SUPER::configure({
+    $sock->configure({
         LocalPort => $port,
         Proto     => 'udp',
         ReuseAddr => 1,
-        Reuse => 1, # may not be needed on UDP
-        (($host ne '*') ? (LocalAddr => $host) : ()), # * is all
-        ($isa_v6 ? (Domain => ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC()) : ()),
+        Reuse     => 1, # XXX: Is this needed on UDP?
+        LocalAddr => ($host eq '*' ? undef : $host), # undef means on all interfaces
+        ($afis ? ($afis => $ipv eq '6' ? AF_INET6 : $ipv eq '4' ? AF_INET : AF_UNSPEC) : ()),
         ($sock->NS_broadcast ? (Broadcast => 1) : ()),
     }) or $server->fatal("Cannot bind to UDP port $port on $host [$!]");
 

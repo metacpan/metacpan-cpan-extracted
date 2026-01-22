@@ -1,7 +1,18 @@
 Change history for SBOM::CycloneDX
 
+1.07 2026-01-21
+    - Improved support for CycloneDX 1.7 (https://cyclonedx.org/docs/1.7/json/)
+    - Improved documentations
+    - Improved ENUM classes
+    - Added "patent" and "patentFamily" support (CycloneDX 1.7)
+    - Added initial support for testing multiple CycloneDX specifications from a single test file
+    - Added new tests
+    - Remove '$schema' in CycloneDX < 1.5
+
 1.06 2026-01-15
-    - Added support for CycloneDX 1.7 (https://cyclonedx.org/docs/1.7/json/)
+    - Added initial support for CycloneDX 1.7 (https://cyclonedx.org/docs/1.7/json/)
+    - Added "citation" support
+    - Improved "certificateProperties" support
     - Added ENUM classes
     - Added EXPERIMENTAL "SBOM::CycloneDX::Lite"
     - Added examples ("x509-to-cbom.pl" and "rpm-to-sbom.pl")

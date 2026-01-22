@@ -14,8 +14,10 @@ lib/Acrux.pm                            Main library
 lib/Acrux/Config.pm                     Config class
 lib/Acrux/Const.pm                      Constants
 lib/Acrux/Digest.pm                     Digest base class
+lib/Acrux/Digest/Damm.pm                Damm check digit
 lib/Acrux/Digest/M11R.pm                Modulus 11 (recursive) check digit
 lib/Acrux/Digest/FNV32a.pm              FNV32a Digest calculation
+lib/Acrux/FileLock.pm                   FileLock interface
 lib/Acrux/FilePid.pm                    FilePid interface
 lib/Acrux/Log.pm                        Logger class
 lib/Acrux/Pointer.pm                    Pointer class
@@ -44,6 +46,8 @@ t/08-config.t                           Config test
 t/09-log.t                              Logger test
 t/10-app-min.t                          App with a minimum number of args
 t/11-strf.t                             The strf() function
+t/12-digest-damm.t                      Damm Digest test
+t/13-filelock.t                         FileLock interface
 t/test.conf                             Test file of config
 
 # Examples

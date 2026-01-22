@@ -1,0 +1,361 @@
+# Header section
+
+%{
+
+use strict;
+use warnings;
+
+use Chemistry::Atom;
+use Chemistry::Mol;
+
+use List::Util qw( first );
+
+my @LAYER_ORDER = qw( PREFIX FORMULA CONNECTIONS H_ATOMS CHARGE TETRAHEDRAL STEREOCHEMISTRY );
+
+%}
+
+%%
+
+# Rules section
+
+# The grammar is taken from https://github.com/metamolecular/inchi-grammar/blob/master/grammar.ebnf, commit 74a8858, MIT license
+
+string: prefix
+            { 'PREFIX' }
+      | string layer
+            {
+                my $layer1_id = first { $LAYER_ORDER[$_] eq $_[1] } 0..$#LAYER_ORDER;
+                my $layer2_id = first { $LAYER_ORDER[$_] eq $_[2] } 0..$#LAYER_ORDER;
+                die "unknown layer $_[2]\n" unless defined $layer2_id;
+                die "duplicated layer $_[1]\n" if $layer1_id == $layer2_id;
+                die "incorrect layer order, $_[2] must appear before $_[1]\n" if $layer1_id > $layer2_id;
+                $_[2];
+            }
+      ;
+
+layer: formula
+            { 'FORMULA' }
+     | connections
+            { 'CONNECTIONS' }
+     | h_atoms
+            { 'H_ATOMS' }
+     | charge
+            { 'CHARGE' }
+     | tetrahedral
+            { 'TETRAHEDRAL' }
+     | stereochemistry
+            { 'STEREOCHEMISTRY' }
+     ;
+
+formula: formula_first
+            { [ $_[1] ] }
+       | formula formula_continuation
+            { push @{$_[1]}, $_[2] }
+       ;
+
+connections: '/' 'c'
+                { $_[0]->{USER}{CURSOR}++ }
+           | '/' 'c' graph
+                { $_[0]->{USER}{CURSOR}++ }
+           | connections ';'
+                { $_[0]->{USER}{CURSOR}++ }
+           | connections ';' graph
+                { $_[0]->{USER}{CURSOR}++ }
+           ;
+
+h_atoms: '/' 'h'
+            { $_[0]->{USER}{CURSOR}++ }
+       | '/' 'h' hydrogens
+            { $_[0]->{USER}{CURSOR}++ }
+       | h_atoms ';'
+            { $_[0]->{USER}{CURSOR}++ }
+       | h_atoms ';' hydrogens
+            { $_[0]->{USER}{CURSOR}++ }
+       ;
+
+tetrahedral: '/' 't'
+           | '/' 't' tetrahedral_centers
+           | tetrahedral ';'
+           | tetrahedral ';' tetrahedral_centers
+           ;
+
+stereochemistry: '/' 's' '1'
+                    { $_[0]->{USER}{MOL}->attr( 'inchi/stereochemistry', $_[3] ) }
+               | '/' 's' '2'
+                    { $_[0]->{USER}{MOL}->attr( 'inchi/stereochemistry', $_[3] ) }
+               ;
+
+# Production 'tail' is merged to 'graph' and 'body' for simplicity.
+
+graph: chain
+     | count '*' chain
+     ;
+
+# Return: The last atom in a chain
+chain: index '-' index
+        { $_[0]->_add_bonds( $_[1], $_[3] ); return $_[3] }
+     | index branches index
+        { $_[0]->_add_bonds( $_[1], [ @{$_[2]}, $_[3] ] ); return $_[3] }
+     | chain '-' index
+        { $_[0]->_add_bonds( $_[1], $_[3] ); return $_[3] }
+     | chain branches index
+        { $_[0]->_add_bonds( $_[1], [ @{$_[2]}, $_[3] ] ); return $_[3] }
+     ;
+
+branch: '(' branch_body ')' { $_[2]->{bonds} } ;
+
+# Return: Array with all atoms connected to the parent one
+branch_body: index
+                { { bonds => [ $_[1] ], last => $_[1] } }
+           | branch_body ',' index
+                {
+                    push @{$_[1]->{bonds}}, $_[3];
+                    $_[1]->{last} = $_[3];
+                    return $_[1];
+                }
+           | branch_body '-' index
+                {
+                    $_[0]->_add_bonds( $_[1]->{last}, $_[3] );
+                    $_[1]->{last} = $_[3];
+                    return $_[1];
+                }
+           | branch_body branches index
+                {
+                    $_[0]->_add_bonds( $_[1]->{last}, [ @{$_[2]}, $_[3] ] );
+                    $_[1]->{last} = $_[3];
+                    return $_[1];
+                }
+           ;
+
+branches: branch
+            { $_[1] }
+        | branches branch
+            { [ @{$_[1]}, @{$_[2]} ] }
+        ;
+
+hydrogens: vh_count
+         | vh_count mh_counts
+         | count '*' vh_count
+         | count '*' vh_count mh_counts
+         | mh_count
+         ;
+
+vh_count: virtual_hydrogens
+        | vh_count ',' virtual_hydrogens
+        ;
+
+mh_count: mobile_hydrogens
+        | mh_count mobile_hydrogens
+        ;
+
+mh_counts: ',' mh_count
+         | mh_counts ',' mh_count
+         ;
+
+virtual_hydrogens: virtual_hydrogen_receivers 'H'
+                    { $_[0]->_add_hydrogens( $_[1] ) }
+                 | virtual_hydrogen_receivers 'H' count
+                    { $_[0]->_add_hydrogens( $_[1], $_[3] ) }
+                 ;
+
+virtual_hydrogen_receivers: index
+                            { [ $_[1] ] }
+                          | virtual_hydrogen_receivers ',' index
+                            {
+                                push @{$_[1]}, $_[3];
+                                return $_[1];
+                            }
+                          | virtual_hydrogen_receivers '-' index
+                            {
+                                push @{$_[1]}, ($_[1]->[-1] + 1)..$_[3];
+                                return $_[1]
+                            }
+                          ;
+
+mobile_hydrogens: '(' 'H' comma_separated_indexes ')'
+                | '(' 'H' '-' comma_separated_indexes ')'
+                | '(' 'H' count '-' comma_separated_indexes ')'
+                | '(' 'H' count comma_separated_indexes ')'
+                ;
+
+comma_separated_indexes: ',' index
+                            { [ $_[2] ] }
+                       | comma_separated_indexes ',' index
+                            {
+                                push @{$_[1]}, $_[3];
+                                return $_[1];
+                            }
+                       ;
+
+tetrahedral_center: index '+'
+                    { $_[0]->_get_atom( $_[1] )->attr( 'inchi/chirality', $_[2] ) }
+                  | index '-'
+                    { $_[0]->_get_atom( $_[1] )->attr( 'inchi/chirality', $_[2] ) }
+                  | index '?'
+                  ;
+
+tetrahedral_centers: tetrahedral_center
+                   | tetrahedral_centers ',' tetrahedral_center
+                   ;
+
+charge: '/' 'q'
+        { $_[0]->{USER}{MOL}->attr( 'inchi/charges', [] ) }
+      | charge '+' natural
+        { $_[0]->{USER}{MOL}->attr( 'inchi/charges' )->[$_[0]->{USER}{CURSOR}] = int(  $_[3] ) }
+      | charge '-' natural
+        { $_[0]->{USER}{MOL}->attr( 'inchi/charges' )->[$_[0]->{USER}{CURSOR}] = int( -$_[3] ) }
+      | charge ';'
+        { $_[0]->{USER}{CURSOR}++ }
+      ;
+
+index: '1' | count ;
+
+count: '1' digit
+        { join '', @_[1..2] }
+     | count digit
+        { join '', @_[1..2] }
+     | twoplus
+     ;
+
+natural: '1'
+       | twoplus
+       | natural digit
+            { join '', @_[1..2] }
+       ;
+
+digit: '0' | '1' | twoplus ;
+
+twoplus: '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' ;
+
+%%
+
+# Footer section
+
+sub parse
+{
+    my( $self, $string ) = @_;
+
+    $self->YYData->{INPUT} = $string;
+    $self->{USER}{MOL}     = Chemistry::Mol->new;
+    $self->{USER}{CURSOR}  = 0;
+    $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error, yydebug => 0 );
+
+    return $self->{USER}{MOL};
+}
+
+sub _Lexer
+{
+    my( $self ) = @_;
+
+    # If the line is empty and the input is originating from the file,
+    # another line is read.
+    if( !$self->YYData->{INPUT} && $self->{USER}{FILEIN} ) {
+        my $filein = $self->{USER}{FILEIN};
+        $self->YYData->{INPUT} = <$filein>;
+        $self->{USER}{CHARNO} = 0;
+    }
+
+    # Prefix
+    if( $self->YYData->{INPUT} =~ s/^(InChI=1S?)// ) {
+        return ( 'prefix', $1 );
+    }
+
+    # Formula parts
+    # TODO: Check Hill order, require counts > 1
+    if( $self->YYData->{INPUT} =~ s/^([\/\.])([2-9]|[1-9][0-9]+)?(([A-Z][a-z]?\d*)+)// ) {
+        my( $sep, $count, $formula ) = ( $1, $2, $3 );
+        $count = 1 unless $count;
+        my %atom_map;
+
+        while( $formula =~ /([A-Z][a-z]?)(\d*)/g ) {
+            my( $element, $count ) = ( $1, $2 );
+            next if $element eq 'H'; # H atoms will be added later
+            $count = 1 unless $count;
+            for (1..$count) {
+                my $atom = Chemistry::Atom->new( symbol => $element );
+                $self->{USER}{MOL}->add_atom( $atom );
+                $atom_map{scalar( keys %atom_map ) + 1} = $atom;
+            }
+        }
+
+        if( $sep eq '/') {
+            $self->{USER}{ATOM_MAPS} = [ \%atom_map ];
+            $self->{USER}{MOL}->attr( 'inchi/counts', [ $count ] );
+            return ( 'formula_first', $formula );
+        } else {
+            push @{$self->{USER}{ATOM_MAPS}}, \%atom_map;
+            push @{$self->{USER}{MOL}->attr( 'inchi/counts' )}, $count;
+            return ( 'formula_continuation', $formula );
+        }
+    }
+
+    # Reset cursor on 'h', 'q' or 't'
+    if( $self->YYData->{INPUT} =~ s/^([hqt])// ) {
+        $self->{USER}{CURSOR} = 0;
+        return ( $1, $1 );
+    }
+
+    # Remove unsupported layers
+    $self->YYData->{INPUT} =~ s/^(\/[pbmsifo][^\/]*)+//;
+
+    # Any other character
+    if( $self->YYData->{INPUT} =~ s/^(.)// ) {
+        return ( $1, $1 );
+    }
+
+    return ( '', '' );
+}
+
+sub _Error
+{
+    my( $self ) = @_;
+    die 'ERROR: ', $self->YYData->{INPUT}, "\n";
+}
+
+sub _add_bonds
+{
+    my( $self, $a, $b ) = @_;
+
+    my @bonds = ref $b eq 'ARRAY' ? @$b : $b;
+    for (@bonds) {
+        $self->{USER}{MOL}->new_bond( atoms => [ $self->_get_atom( $a ),
+                                                 $self->_get_atom( $_ ) ] );
+    }
+}
+
+sub _add_hydrogens
+{
+    my( $self, $atoms, $count ) = @_;
+
+    my $atom_map = $self->{USER}{ATOM_MAPS}[$self->{USER}{CURSOR}];
+    my @atoms = map { $atom_map->{$_} }
+                    ref $atoms ? @$atoms : ( $atoms );
+    $count = 1 unless $count;
+    for my $atom (@atoms) {
+        for (1..$count) {
+            my $H = Chemistry::Atom->new( symbol => 'H' );
+            $self->{USER}{MOL}->add_atom( $H );
+            $self->{USER}{MOL}->new_bond( atoms => [ $atom, $H ] );
+        }
+    }
+}
+
+sub _get_atom
+{
+    my( $self, $atom ) = @_;
+
+    my $atom_map = $self->{USER}{ATOM_MAPS}[$self->{USER}{CURSOR}];
+
+    if( !exists $atom_map->{$atom} ) {
+        # If an atom with given index does not exist, this is probably a hydrogen.
+        # FIXME: Check if there are unused hydrogen atoms.
+
+        my $H = Chemistry::Atom->new( symbol => 'H' );
+        $self->{USER}{MOL}->add_atom( $H );
+        $atom_map->{$atom} = $H;
+    }
+
+    return $atom_map->{$atom};
+}
+
+1;

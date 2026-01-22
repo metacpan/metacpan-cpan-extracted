@@ -6,6 +6,7 @@ use warnings;
 use utf8;
 
 use SBOM::CycloneDX::BomRef;
+use SBOM::CycloneDX::Enum;
 use SBOM::CycloneDX::List;
 use SBOM::CycloneDX::License::Licensing;
 

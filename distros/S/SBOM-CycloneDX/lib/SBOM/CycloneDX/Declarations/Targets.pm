@@ -78,12 +78,12 @@ Properties:
 
 =over
 
-=item C<components>, The list of components which claims are made against.
+=item * C<components>, The list of components which claims are made against.
 
-=item C<organizations>, The list of organizations which claims are made
+=item * C<organizations>, The list of organizations which claims are made
 against.
 
-=item C<services>, The list of services which claims are made against.
+=item * C<services>, The list of services which claims are made against.
 
 =back
 

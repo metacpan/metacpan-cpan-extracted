@@ -103,7 +103,7 @@ and L<Net::Server::Proto> are available here.
 
 Host to bind to.  Default is *.  Will bind to an IPv4 socket if an
 IPv4 address is given.  Will bind to an IPv6 socket if an IPv6 address
-is given (requires installation of IO::Socket::INET6).
+is given (requires installation of IO::Socket::IP or IO::Socket::INET6).
 
 If a hostname is given and C<ipv> is still set to 4, an IPv4 socket
 will be created.  If a hostname is given and C<ipv> is set to 6, an

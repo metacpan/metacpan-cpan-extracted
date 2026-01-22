@@ -1,4 +1,4 @@
-package Affix::Build v1.0.5 {
+package Affix::Build v1.0.6 {
     use v5.40;
     use experimental qw[class try];
     use Config;
@@ -36,6 +36,7 @@ package Affix::Build v1.0.5 {
         #
         ADJUST {
             my $so_ext = $Config{so} // 'so';
+            $build_dir = Path::Tiny->new($build_dir) unless builtin::blessed $build_dir;
 
             # Standard convention: Windows DLLs don't need 'lib' prefix, Unix SOs do.
             my $prefix = ( $os eq 'MSWin32' || $name =~ /^lib/ ) ? ''          : 'lib';

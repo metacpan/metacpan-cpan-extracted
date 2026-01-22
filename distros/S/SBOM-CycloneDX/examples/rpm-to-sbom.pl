@@ -11,7 +11,6 @@ use utf8;
 use v5.16;
 
 use SBOM::CycloneDX;
-use SBOM::CycloneDX::Enum;
 use SBOM::CycloneDX::Component;
 use SBOM::CycloneDX::Metadata::Lifecycle;
 use SBOM::CycloneDX::Tool;
@@ -60,10 +59,10 @@ foreach my $package (@packages) {
     my ($name, $version, $arch, $summary) = split /\t/, $package;
 
     my $purl = URI::PackageURL->new(
-        type      => 'rpm',
-        namespace => $os_release{ID},
-        name      => $name,
-        version   => $version,
+        type       => 'rpm',
+        namespace  => $os_release{ID},
+        name       => $name,
+        version    => $version,
         qualifiers => {arch => $arch, distro => sprintf('%s-%s', $os_release{ID}, $os_release{VERSION_ID})}
     );
 

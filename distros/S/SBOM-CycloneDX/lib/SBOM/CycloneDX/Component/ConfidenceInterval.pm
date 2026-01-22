@@ -63,9 +63,9 @@ Properties:
 
 =over
 
-=item C<lower_bound>, The lower bound of the confidence interval.
+=item * C<lower_bound>, The lower bound of the confidence interval.
 
-=item C<upper_bound>, The upper bound of the confidence interval.
+=item * C<upper_bound>, The upper bound of the confidence interval.
 
 =back
 

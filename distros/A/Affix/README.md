@@ -33,9 +33,8 @@ Affix::dump( $ptr, 32 );
 
 # Release the memory
 Affix::free($ptr);
+=head1 DESCRIPTION
 ```
-
-# DESCRIPTION
 
 **Affix** is a high-performance Foreign Function Interface (FFI) for Perl. It allows you to load dynamic libraries
 (DLLs, shared objects) and call their functions natively without writing XS code or configuring a C compiler.
@@ -236,7 +235,8 @@ information.
 my $ptr = malloc( 1024 );
 ```
 
-Allocates `$size` bytes of uninitialized memory. Returns a `Pointer[Void]` pin.
+Allocates `$size` bytes of uninitialized memory. Returns a `Pointer[Void]` pin. Memory allocated this way is
+**managed** by Perl (freed automatically when the pin goes out of scope).
 
 ## `calloc( $num, $size_or_type )`
 
@@ -285,10 +285,13 @@ Reinterprets a pointer.
 own( $ptr, $bool );
 ```
 
-Controls lifecycle management.
+Controls lifecycle management of the pointer.
 
-- `own($p, 1)`: Perl owns the memory; \`free()\` is called when \`$p\` goes out of scope.
-- `own($p, 0)`: Perl releases ownership. Useful when handing memory off to a C function.
+- `own($p, 1)`: Perl assumes ownership. `free()` will be called when `$p` goes out of scope.
+- `own($p, 0)`: Perl releases ownership. `free()` is never called by Perl.
+
+**Double free warning:** If you call `own($p, 1)` and then pass `$p` to a C function that _also_ frees that memory,
+your program will crash. Only take ownership if you are sure the C library expects you to free the memory.
 
 ## `address( $ptr )`
 
@@ -731,6 +734,30 @@ The return value is a **dualvar**:
 ## `sv_dump( $sv )`
 
 Dumps the internal flags and structure of a Perl `SV`.
+
+# Thread Safety & Concurrency
+
+Affix bridges Perl (a single-threaded interpreter, generally) with libraries that may be multi-threaded. This creates
+potential hazards that you must manage.
+
+## 1. Initialization Phase vs. Execution Phase
+
+Functions that modify Affix's global state are **not thread-safe**. You must perform all definitions in the main thread
+before starting any background threads or loops in the library.
+
+Unsafe operations that you should never call from Callbacks or in a threaded context:
+
+- `affix( ... )` - Binding new functions.
+- `typedef( ... )` - Registering new types.
+
+## 2. Callbacks
+
+When passing a Perl subroutine as a `Callback`, avoid performing complex Perl operations like loading modules or
+defining subs inside callback triggered on a foreign thread. Such callbacks should remain simple: process data, update
+a shared variable, and return.
+
+If the library executes the callback from a background thread (e.g., window managers, audio callbacks), Affix attempts
+to attach a temporary Perl context to that thread. This should be sufficient but Perl is gonna be Perl.
 
 # EXAMPLES
 

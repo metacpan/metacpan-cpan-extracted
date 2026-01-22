@@ -1,0 +1,27 @@
+---
+abstract: 'InChI identifier reader'
+author:
+  - 'Andrius Merkys <merkys@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Module::Build::Parse::Yapp: v0.1.2
+configure_requires:
+  Module::Build: '0.28'
+  Module::Build::Parse::Yapp: v0.1.2
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Chemistry-File-InChI
+requires:
+  Chemistry::Mol: '0.35'
+  List::Util: '0'
+  Parse::Yapp: '0'
+resources:
+  homepage: https://search.cpan.org/dist/Chemistry-File-InChI
+  repository: git://github.com/merkys/chemistry-file-inchi.git
+version: '0.10'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

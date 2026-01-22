@@ -275,17 +275,17 @@ static size_t _estimate_metadata_size(infix_arena_t * temp_arena,
     return total_size;
 }
 // Forward Trampoline API Implementation
-c23_nodiscard infix_unbound_cif_func infix_forward_get_unbound_code(infix_forward_t * trampoline) {
+INFIX_API c23_nodiscard infix_unbound_cif_func infix_forward_get_unbound_code(infix_forward_t * trampoline) {
     if (trampoline == nullptr || trampoline->is_direct_trampoline || trampoline->target_fn != nullptr)
         return nullptr;
     return (infix_unbound_cif_func)trampoline->exec.rx_ptr;
 }
-c23_nodiscard infix_cif_func infix_forward_get_code(infix_forward_t * trampoline) {
+INFIX_API c23_nodiscard infix_cif_func infix_forward_get_code(infix_forward_t * trampoline) {
     if (trampoline == nullptr || trampoline->is_direct_trampoline || trampoline->target_fn == nullptr)
         return nullptr;
     return (infix_cif_func)trampoline->exec.rx_ptr;
 }
-c23_nodiscard infix_direct_cif_func infix_forward_get_direct_code(infix_forward_t * trampoline) {
+INFIX_API c23_nodiscard infix_direct_cif_func infix_forward_get_direct_code(infix_forward_t * trampoline) {
     if (trampoline == nullptr || !trampoline->is_direct_trampoline)
         return nullptr;
     return (infix_direct_cif_func)trampoline->exec.rx_ptr;
@@ -313,13 +313,13 @@ c23_nodiscard infix_direct_cif_func infix_forward_get_direct_code(infix_forward_
  * @param[in] target_fn The target function pointer, or `nullptr` for an unbound trampoline.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status _infix_forward_create_impl(infix_forward_t ** out_trampoline,
-                                                      infix_arena_t * target_arena,
-                                                      infix_type * return_type,
-                                                      infix_type ** arg_types,
-                                                      size_t num_args,
-                                                      size_t num_fixed_args,
-                                                      void * target_fn) {
+static infix_status _infix_forward_create_impl(infix_forward_t ** out_trampoline,
+                                               infix_arena_t * target_arena,
+                                               infix_type * return_type,
+                                               infix_type ** arg_types,
+                                               size_t num_args,
+                                               size_t num_fixed_args,
+                                               void * target_fn) {
     if (out_trampoline == nullptr || return_type == nullptr || (arg_types == nullptr && num_args > 0)) {
         _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
@@ -421,7 +421,7 @@ c23_nodiscard infix_status _infix_forward_create_impl(infix_forward_t ** out_tra
         goto cleanup;
     }
     infix_memcpy(handle->exec.rw_ptr, buf.code, buf.size);
-    if (!infix_executable_make_executable(handle->exec)) {
+    if (!infix_executable_make_executable(&handle->exec)) {
         status = INFIX_ERROR_PROTECTION_FAILED;
         goto cleanup;
     }
@@ -460,12 +460,12 @@ cleanup:
  * @param[in] handlers An array of handler structs provided by the user.
  * @return `INFIX_SUCCESS` on success, or an error code on failure.
  */
-c23_nodiscard infix_status _infix_forward_create_direct_impl(infix_forward_t ** out_trampoline,
-                                                             infix_type * return_type,
-                                                             infix_type ** arg_types,
-                                                             size_t num_args,
-                                                             void * target_fn,
-                                                             infix_direct_arg_handler_t * handlers) {
+static infix_status _infix_forward_create_direct_impl(infix_forward_t ** out_trampoline,
+                                                      infix_type * return_type,
+                                                      infix_type ** arg_types,
+                                                      size_t num_args,
+                                                      void * target_fn,
+                                                      infix_direct_arg_handler_t * handlers) {
     // 1. Validation and Setup
     if (!out_trampoline || !return_type || (!arg_types && num_args > 0) || !target_fn || !handlers) {
         _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
@@ -559,7 +559,7 @@ c23_nodiscard infix_status _infix_forward_create_direct_impl(infix_forward_t ** 
         goto cleanup;
     }
     infix_memcpy(handle->exec.rw_ptr, buf.code, buf.size);
-    if (!infix_executable_make_executable(handle->exec)) {
+    if (!infix_executable_make_executable(&handle->exec)) {
         status = INFIX_ERROR_PROTECTION_FAILED;
         goto cleanup;
     }
@@ -591,12 +591,12 @@ cleanup:
  * @param[in] target_function The address of the C function to call.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status infix_forward_create_manual(infix_forward_t ** out_trampoline,
-                                                       infix_type * return_type,
-                                                       infix_type ** arg_types,
-                                                       size_t num_args,
-                                                       size_t num_fixed_args,
-                                                       void * target_function) {
+INFIX_API c23_nodiscard infix_status infix_forward_create_manual(infix_forward_t ** out_trampoline,
+                                                                 infix_type * return_type,
+                                                                 infix_type ** arg_types,
+                                                                 size_t num_args,
+                                                                 size_t num_fixed_args,
+                                                                 void * target_function) {
     // This is part of the "Manual API". It calls the internal implementation directly
     // without involving the signature parser. `source_arena` is null because the
     // types are assumed to be managed by the user.
@@ -617,11 +617,11 @@ c23_nodiscard infix_status infix_forward_create_manual(infix_forward_t ** out_tr
  * @param[in] num_fixed_args The number of non-variadic arguments.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status infix_forward_create_unbound_manual(infix_forward_t ** out_trampoline,
-                                                               infix_type * return_type,
-                                                               infix_type ** arg_types,
-                                                               size_t num_args,
-                                                               size_t num_fixed_args) {
+INFIX_API c23_nodiscard infix_status infix_forward_create_unbound_manual(infix_forward_t ** out_trampoline,
+                                                                         infix_type * return_type,
+                                                                         infix_type ** arg_types,
+                                                                         size_t num_args,
+                                                                         size_t num_fixed_args) {
     _infix_clear_error();
     return _infix_forward_create_impl(
         out_trampoline, nullptr, return_type, arg_types, num_args, num_fixed_args, nullptr);
@@ -633,7 +633,7 @@ c23_nodiscard infix_status infix_forward_create_unbound_manual(infix_forward_t *
  * stores the deep-copied type information.
  * @param[in] trampoline The trampoline to destroy. Safe to call with `nullptr`.
  */
-void infix_forward_destroy(infix_forward_t * trampoline) {
+INFIX_API void infix_forward_destroy(infix_forward_t * trampoline) {
     if (trampoline == nullptr)
         return;
     // Destroying the private arena frees all deep-copied type metadata.
@@ -810,7 +810,7 @@ static infix_status _infix_reverse_create_internal(infix_reverse_t ** out_contex
         goto cleanup;
     }
     infix_memcpy(context->exec.rw_ptr, buf.code, buf.size);
-    if (!infix_executable_make_executable(context->exec)) {
+    if (!infix_executable_make_executable(&context->exec)) {
         status = INFIX_ERROR_PROTECTION_FAILED;
         goto cleanup;
     }
@@ -840,12 +840,13 @@ cleanup:
  * @param[in] user_callback_fn A pointer to the type-safe C handler function.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status infix_reverse_create_callback_manual(infix_reverse_t ** out_context,
-                                                                infix_type * return_type,
-                                                                infix_type ** arg_types,
-                                                                size_t num_args,
-                                                                size_t num_fixed_args,
-                                                                void * user_callback_fn) {
+INFIX_API c23_nodiscard infix_status infix_reverse_create_callback_manual(infix_reverse_t ** out_context,
+                                                                          infix_type * return_type,
+                                                                          infix_type ** arg_types,
+                                                                          size_t num_args,
+                                                                          size_t num_fixed_args,
+                                                                          void * user_callback_fn) {
+
     _infix_clear_error();
     return _infix_reverse_create_internal(
         out_context, return_type, arg_types, num_args, num_fixed_args, user_callback_fn, nullptr, true);
@@ -861,13 +862,14 @@ c23_nodiscard infix_status infix_reverse_create_callback_manual(infix_reverse_t 
  * @param[in] user_data A `void*` pointer to application-specific state.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status infix_reverse_create_closure_manual(infix_reverse_t ** out_context,
-                                                               infix_type * return_type,
-                                                               infix_type ** arg_types,
-                                                               size_t num_args,
-                                                               size_t num_fixed_args,
-                                                               infix_closure_handler_fn user_callback_fn,
-                                                               void * user_data) {
+INFIX_API c23_nodiscard infix_status infix_reverse_create_closure_manual(infix_reverse_t ** out_context,
+                                                                         infix_type * return_type,
+                                                                         infix_type ** arg_types,
+                                                                         size_t num_args,
+                                                                         size_t num_fixed_args,
+                                                                         infix_closure_handler_fn user_callback_fn,
+                                                                         void * user_data) {
+
     _infix_clear_error();
     return _infix_reverse_create_internal(
         out_context, return_type, arg_types, num_args, num_fixed_args, (void *)user_callback_fn, user_data, false);
@@ -879,7 +881,7 @@ c23_nodiscard infix_status infix_reverse_create_closure_manual(infix_reverse_t *
  * trampoline (if any), and the special read-only memory region for the context itself.
  * @param[in] reverse_trampoline The reverse trampoline context to destroy. Safe to call with `nullptr`.
  */
-void infix_reverse_destroy(infix_reverse_t * reverse_trampoline) {
+INFIX_API void infix_reverse_destroy(infix_reverse_t * reverse_trampoline) {
     if (reverse_trampoline == nullptr)
         return;
     // The cached trampoline (if it exists) must also be destroyed.
@@ -897,7 +899,7 @@ void infix_reverse_destroy(infix_reverse_t * reverse_trampoline) {
  * @return A `void*` that can be cast to the appropriate C function pointer type and called.
  *         The returned pointer is valid for the lifetime of the context handle.
  */
-c23_nodiscard void * infix_reverse_get_code(const infix_reverse_t * reverse_trampoline) {
+INFIX_API c23_nodiscard void * infix_reverse_get_code(const infix_reverse_t * reverse_trampoline) {
     if (reverse_trampoline == nullptr)
         return nullptr;
     return reverse_trampoline->exec.rx_ptr;
@@ -907,17 +909,17 @@ c23_nodiscard void * infix_reverse_get_code(const infix_reverse_t * reverse_tram
  * @param[in] reverse_trampoline The `infix_reverse_t` context handle created with `infix_reverse_create_closure`.
  * @return The `void* user_data` that was provided during creation.
  */
-c23_nodiscard void * infix_reverse_get_user_data(const infix_reverse_t * reverse_trampoline) {
+INFIX_API c23_nodiscard void * infix_reverse_get_user_data(const infix_reverse_t * reverse_trampoline) {
     if (reverse_trampoline == nullptr)
         return nullptr;
     return reverse_trampoline->user_data;
 }
 // High-Level Signature API Wrappers
-c23_nodiscard infix_status infix_forward_create_in_arena(infix_forward_t ** out_trampoline,
-                                                         infix_arena_t * target_arena,
-                                                         const char * signature,
-                                                         void * target_function,
-                                                         infix_registry_t * registry) {
+INFIX_API c23_nodiscard infix_status infix_forward_create_in_arena(infix_forward_t ** out_trampoline,
+                                                                   infix_arena_t * target_arena,
+                                                                   const char * signature,
+                                                                   void * target_function,
+                                                                   infix_registry_t * registry) {
     _infix_clear_error();
     if (!signature) {
         _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
@@ -992,22 +994,22 @@ c23_nodiscard infix_status infix_forward_create_in_arena(infix_forward_t ** out_
     infix_arena_destroy(arena);
     return status;
 }
-c23_nodiscard infix_status infix_forward_create(infix_forward_t ** out_trampoline,
-                                                const char * signature,
-                                                void * target_function,
-                                                infix_registry_t * registry) {
+INFIX_API c23_nodiscard infix_status infix_forward_create(infix_forward_t ** out_trampoline,
+                                                          const char * signature,
+                                                          void * target_function,
+                                                          infix_registry_t * registry) {
     return infix_forward_create_in_arena(out_trampoline, NULL, signature, target_function, registry);
 }
-c23_nodiscard infix_status infix_forward_create_unbound(infix_forward_t ** out_trampoline,
-                                                        const char * signature,
-                                                        infix_registry_t * registry) {
+INFIX_API c23_nodiscard infix_status infix_forward_create_unbound(infix_forward_t ** out_trampoline,
+                                                                  const char * signature,
+                                                                  infix_registry_t * registry) {
     return infix_forward_create_in_arena(out_trampoline, NULL, signature, NULL, registry);
 }
-c23_nodiscard infix_status infix_forward_create_direct(infix_forward_t ** out_trampoline,
-                                                       const char * signature,
-                                                       void * target_function,
-                                                       infix_direct_arg_handler_t * handlers,
-                                                       infix_registry_t * registry) {
+INFIX_API c23_nodiscard infix_status infix_forward_create_direct(infix_forward_t ** out_trampoline,
+                                                                 const char * signature,
+                                                                 void * target_function,
+                                                                 infix_direct_arg_handler_t * handlers,
+                                                                 infix_registry_t * registry) {
     _infix_clear_error();
     if (!signature || !target_function || !handlers) {
         _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
@@ -1047,10 +1049,10 @@ c23_nodiscard infix_status infix_forward_create_direct(infix_forward_t ** out_tr
     infix_arena_destroy(arena);
     return status;
 }
-c23_nodiscard infix_status infix_reverse_create_callback(infix_reverse_t ** out_context,
-                                                         const char * signature,
-                                                         void * user_callback_fn,
-                                                         infix_registry_t * registry) {
+INFIX_API c23_nodiscard infix_status infix_reverse_create_callback(infix_reverse_t ** out_context,
+                                                                   const char * signature,
+                                                                   void * user_callback_fn,
+                                                                   infix_registry_t * registry) {
     infix_arena_t * arena = nullptr;
     infix_type * ret_type = nullptr;
     infix_function_argument * args = nullptr;

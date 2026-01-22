@@ -9,32 +9,37 @@ use Exporter ();
 
 require SBOM::CycloneDX;
 require SBOM::CycloneDX::Component;
+require SBOM::CycloneDX::ExternalReference;
+require SBOM::CycloneDX::Hash;
 require SBOM::CycloneDX::License;
+require SBOM::CycloneDX::OrganizationalContact;
+require SBOM::CycloneDX::OrganizationalEntity;
+require SBOM::CycloneDX::Property;
 
 
 our @EXPORT_OK = qw(
     bom
     component
-    license
-    external_reference
-    property
-    organization
     contact
+    external_reference
     hash
+    license
+    organization
+    property
 
     application_component
-    framework_component
-    library_component
     container_component
-    platform_component
-    operating_system_component
+    cryptographic_asset_component
+    data_component
     device_component
     device_driver_component
-    firmware_component
     file_component
+    firmware_component
+    framework_component
+    library_component
     machine_learning_model_component
-    data_component
-    cryptographic_asset_component
+    operating_system_component
+    platform_component
 );
 
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -70,26 +75,26 @@ sub import {
 
 sub bom                { SBOM::CycloneDX->new(spec_version => $DEFAULT_SPEC_VERSION, @_) }
 sub component          { SBOM::CycloneDX::Component->new(@_) }
-sub license            { SBOM::CycloneDX::License->new(@_) }
-sub external_reference { SBOM::CycloneDX::ExternalReference->new(@_) }
-sub property           { SBOM::CycloneDX::Property->new(@_) }
-sub organization       { SBOM::CycloneDX::OrganizationalEntity->new(@_) }
 sub contact            { SBOM::CycloneDX::OrganizationalContact->new(@_) }
+sub external_reference { SBOM::CycloneDX::ExternalReference->new(@_) }
 sub hash               { SBOM::CycloneDX::Hash->new(@_) }
+sub license            { SBOM::CycloneDX::License->new(@_) }
+sub organization       { SBOM::CycloneDX::OrganizationalEntity->new(@_) }
+sub property           { SBOM::CycloneDX::Property->new(@_) }
 
 sub application_component            { component(type => 'application',            @_) }
-sub framework_component              { component(type => 'framework',              @_) }
-sub library_component                { component(type => 'library',                @_) }
 sub container_component              { component(type => 'container',              @_) }
-sub platform_component               { component(type => 'platform',               @_) }
-sub operating_system_component       { component(type => 'operating-system',       @_) }
+sub cryptographic_asset_component    { component(type => 'cryptographic-asset',    @_) }
+sub data_component                   { component(type => 'data',                   @_) }
 sub device_component                 { component(type => 'device',                 @_) }
 sub device_driver_component          { component(type => 'device-driver',          @_) }
-sub firmware_component               { component(type => 'firmware',               @_) }
 sub file_component                   { component(type => 'file',                   @_) }
+sub firmware_component               { component(type => 'firmware',               @_) }
+sub framework_component              { component(type => 'framework',              @_) }
+sub library_component                { component(type => 'library',                @_) }
 sub machine_learning_model_component { component(type => 'machine-learning-model', @_) }
-sub data_component                   { component(type => 'data',                   @_) }
-sub cryptographic_asset_component    { component(type => 'cryptographic-asset',    @_) }
+sub operating_system_component       { component(type => 'operating-system',       @_) }
+sub platform_component               { component(type => 'platform',               @_) }
 
 1;
 
@@ -107,7 +112,7 @@ SBOM::CycloneDX::Lite - Simple accessors and helpers for SBOM::CycloneDX
 
     my $root_component = application_component(
         name     => 'MyApp',
-        licenses => [SBOM::CycloneDX::License->new('Artistic-2.0')],
+        licenses => [license('Artistic-2.0')],
         bom_ref  => 'MyApp'
     );
 

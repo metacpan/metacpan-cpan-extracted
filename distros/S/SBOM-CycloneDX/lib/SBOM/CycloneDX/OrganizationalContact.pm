@@ -68,16 +68,16 @@ Properties:
 
 =over
 
-=item C<bom_ref>, An identifier which can be used to reference the object
+=item * C<bom_ref>, An identifier which can be used to reference the object
 elsewhere in the BOM. Every bom-ref must be unique within the BOM.
 Value SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid
 conflicts with BOM-Links.
 
-=item C<email>, The email address of the contact.
+=item * C<email>, The email address of the contact.
 
-=item C<name>, The name of a contact
+=item * C<name>, The name of a contact
 
-=item C<phone>, The phone number of the contact.
+=item * C<phone>, The phone number of the contact.
 
 =back
 

@@ -1,5 +1,29 @@
 Revision history for DBIx::Class::Async
 
+0.43  2026-01-22
+      - Minor test cleanup.
+
+0.42  2026-01-22
+      - [MAJOR] Added DBIx::Class::Async::ResultComponent to provide
+        non-blocking row-level update() and delete() methods.
+      - [OPTIMISATION] Re-engineered ResultSet update() and delete() to use
+        high-performance bulk SQL ("WHERE PK IN (...)") instead of
+        individual N-queries.
+      - [FEATURE] Added support for bulk update_bulk() and delete_all()
+        respecting LIMIT and OFFSET attributes via ID-mapping.
+      - [FIX] Silenced "Query returned more than one row" deprecation
+        warnings by utilising search()->first() with explicit row limits
+        in worker operations.
+      - [FIX] Hardened the Bridge update() method to support hybrid return
+        types: returns Row objects for single updates and row-counts
+        for bulk updates.
+      - [STABILITY] Improved IO::Async cleanup during Global Destruction
+        to prevent "Notifier does not exist" warnings.
+      - [INTERNAL] Added _check_response() and _merge_result_data()
+        helpers to standardise error handling and row inflation.
+      - [TESTS] Added 8 new test files (t/48 through t/55) covering
+        bulk operations, row-level components, and internal safety guards.
+
 0.41  2026-01-19
       - Added support for inflate column.
 

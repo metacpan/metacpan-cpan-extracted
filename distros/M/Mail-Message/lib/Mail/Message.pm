@@ -1,8 +1,8 @@
-# This code is part of Perl distribution Mail-Message version 4.01.
-# The POD got stripped from this file by OODoc version 3.05.
+# This code is part of Perl distribution Mail-Message version 4.02.
+# The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
-# This software is copyright (c) 2001-2025 by Mark Overmeer.
+# This software is copyright (c) 2001-2026 by Mark Overmeer.
 
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
@@ -10,7 +10,7 @@
 
 
 package Mail::Message;{
-our $VERSION = '4.01';
+our $VERSION = '4.02';
 }
 
 use parent 'Mail::Reporter';
@@ -211,7 +211,7 @@ sub get($)
 
 
 sub study($)
-{	my $head = $_[0]->head or return;
+{	my $head = shift->head or return;
 	scalar $head->study(@_);    # return only last
 }
 

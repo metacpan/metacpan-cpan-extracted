@@ -720,7 +720,7 @@ to 6 (only 6 - not * or 4) will result in an error.
 
     localhost:20203:IPv4  # will use IPv4
 
-    127.0.0.1:20203       # will use IPv4 (IPv4 style address
+    127.0.0.1:20203       # will use IPv4 (IPv4 style address)
 
     localhost:20203:IPv4:IPv6 # will bind to both v4 and v6 - fails otherwise
 
@@ -775,59 +775,35 @@ me as in the following:
     Binding to TCP port 20203 on host localhost with IPv4
     Binding to TCP port 20203 on host localhost with IPv6
 
-There is a special case of using host => "*" as well as ipv => "*".
-The Net::Server::Proto::_bindv6only method is used to check the system
-setting for C<sysctl -n net.ipv6.bindv6only> (or
-net.inet6.ip6.v6only).  If this setting is false, then an IPv6 socket
-will listen for the corresponding IPv4 address.  For example the
-address [::] (IPv6 equivalent of INADDR_ANY) will also listen for
-0.0.0.0.  The address ::FFFF:127.0.0.1 (IPv6) would also listen to
-127.0.0.1 (IPv4).  In this case, only one socket will be created
-because it will handle both cases (an error is returned if an attempt
-is made to listen to both addresses when bindv6only is false).
+There is a special case of using host => "*" as well as ipv => "*"
+that will listen on all interfaces for both IPv4 and IPv6.
 
-However, if net.ipv6.bindv6only (or equivalent) is true, then a
-hostname (such as *) resolving to both a IPv4 entry as well as an IPv6
-will result in both an IPv4 socket as well as an IPv6 socket.
-
-On my linux box which defaults to net.ipv6.bindv6only=0, the following is output.
-
-    perl -e 'use base qw(Net::Server); main->run(host => "*")'
-
-    Resolved [*]:8080 to [::]:8080, IPv6
-    Not including resolved host [0.0.0.0] IPv4 because it will be handled by [::] IPv6
-    Binding to TCP port 8080 on host :: with IPv6
-
-If I issue a C<sudo /sbin/sysctl -w net.ipv6.bindv6only=1>, the following is output.
-
-    perl -e 'use base qw(Net::Server); main->run(host => "*")'
-
-    Resolved [*]:8080 to [0.0.0.0]:8080, IPv4
-    Resolved [*]:8080 to [::]:8080, IPv6
-    Binding to TCP port 8080 on host 0.0.0.0 with IPv4
-    Binding to TCP port 8080 on host :: with IPv6
-
-BSD differs from linux and generally defaults to
-net.inet6.ip6.v6only=0.  If it cannot be determined on your OS, it
-will default to false and the log message will change from "it will be
-handled" to "it should be handled" (if you have a non-resource
-intensive way to check on your platform, feel free to email me).  Be
-sure to check the logs as you test your server to make sure you have
-bound the ports you desire.  You can always pass in individual
-explicit IPv4 and IPv6 port specifications if you need.  For example,
-if your system has both IPv4 and IPv6 interfaces but you'd only like
+If your system has both IPv4 and IPv6 interfaces but you'd only like
 to bind to IPv6 entries, then you should use a hostname of [::]
 instead of [*].
 
-If bindv6only (or equivalent) is false, and you receive an IPv4
-connection on a bound IPv6 port, the textual representation of the
-peer's IPv4 address will typically be in a form of an IPv4-mapped IPv6
-addresses, e.g. "::FFFF:127.0.0.1" .
+If the operating system supports Dual-Stack sockets with ipv => "*"
+(default), then both IPv4 and IPv6 will be bound on the same IPv6 port.
+If you receive an IPv4 connection on a bound IPv6 port, the textual
+representation of the peer's IPv4 address will typically be in a
+form of an IPv4-mapped IPv6 addresses, e.g. "::ffff:127.0.0.1" .
+If this behavior is not desired, use ipv => "v4v6" instead of "*",
+or use distinct ports, e.g.,
+
+  port => "20203", ipv =>"IPv4v6", # v4v6
+
+  port => "20203/IPv4/IPv6", # Stacked IP Protocols
+
+  port => ["20203/IPv4","20203/IPv6"], # separate ports
+
+  port => ["*:20203/IPv4","*:20203/IPv6"], # distinct ipv
+
+  port => ["0.0.0.0:20203","[::]:20203"], # explicit listen hosts
 
 The ipv parameter was chosen because it does not conflict with any
 other existing usage, it is very similar to ipv4 or ipv6, it allows
-for user code to not need to know about Socket::AF_INET or
-Socket6::AF_INET6 or Socket::AF_UNSPEC, and it is short.
+for user code to not need to know about AF_INET or AF_INET6 or
+AF_UNSPEC, and it is short.
 
 =item listen
 

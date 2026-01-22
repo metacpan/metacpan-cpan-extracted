@@ -276,4 +276,4 @@ void _infix_clear_error(void) {
  * @brief Retrieves detailed information about the last error that occurred on the current thread.
  * @return A copy of the last error details structure. This function is thread-safe.
  */
-infix_error_details_t infix_get_last_error(void) { return g_infix_last_error; }
+INFIX_API infix_error_details_t infix_get_last_error(void) { return g_infix_last_error; }

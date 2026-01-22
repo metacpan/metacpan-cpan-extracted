@@ -70,24 +70,24 @@ is used.
 
 =over
 
-=item * L<CBC>, Cipher block chaining
+=item * C<CBC>, Cipher block chaining
 
-=item * L<ECB>, Electronic codebook
+=item * C<ECB>, Electronic codebook
 
-=item * L<CCM>, Counter with cipher block chaining message authentication
+=item * C<CCM>, Counter with cipher block chaining message authentication
 code
 
-=item * L<GCM>, Galois/counter
+=item * C<GCM>, Galois/counter
 
-=item * L<CFB>, Cipher feedback
+=item * C<CFB>, Cipher feedback
 
-=item * L<OFB>, Output feedback
+=item * C<OFB>, Output feedback
 
-=item * L<CTR>, Counter
+=item * C<CTR>, Counter
 
-=item * L<OTHER>, Another mode of operation
+=item * C<OTHER>, Another mode of operation
 
-=item * L<UNKNOWN>, The mode of operation is not known
+=item * C<UNKNOWN>, The mode of operation is not known
 
 =back
 

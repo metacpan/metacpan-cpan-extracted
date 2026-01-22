@@ -1,3 +1,9 @@
+2.26  2026-01-22
+
+  - Skip delpaths boolean index assertions on Perl versions older than 5.32.
+
+  - Bump module version to 2.26.
+
 2.25  2026-01-21
 
   - Normalize JSON boolean detection via JSON::PP::is_bool to ensure stable
@@ -1424,6 +1430,7 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
 
 
 

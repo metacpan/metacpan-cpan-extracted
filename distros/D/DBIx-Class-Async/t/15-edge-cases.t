@@ -215,8 +215,11 @@ subtest 'Concurrent access' => sub {
     $schema->disconnect;
 };
 
+
 # Test 5: Error recovery
 subtest 'Error recovery' => sub {
+    # 1. Reset the DB file
+    my $db_file = setup_test_db();
 
     my $schema = DBIx::Class::Async::Schema->connect(
         "dbi:SQLite:dbname=$db_file",
@@ -238,6 +241,14 @@ subtest 'Error recovery' => sub {
         })->all_future->get;
     };
     pass('Invalid column handled gracefully');
+
+    # 2. Before the valid operation, let's ensure one user exists
+    # so count > 0 is guaranteed.
+    $schema->resultset('User')->create({
+        name => 'Recovery Test User',
+        email => 'recovery@example.com',
+        active => 1
+    })->get;
 
     # Valid operation works
     my $valid_future = $schema->resultset('User')->count_future;

@@ -10,6 +10,7 @@ my $SHARE_DIR   = path( $Bin, '..', 'share' );
 my $SINGLE_FILE = $SHARE_DIR->child( 'file.yml' );
 my $DEEP_FILE   = $SHARE_DIR->child( 'inner_inline.yml' );
 my $INNER_FILE  = $SHARE_DIR->child( 'inner_file.yml' );
+my $MISSING_FILE= $SHARE_DIR->child( 'THIS_IS_NOT_A_FILE.yml' );
 
 use Beam::Wire;
 
@@ -81,6 +82,42 @@ subtest 'inner container file' => sub {
     isa_ok $foo->got_ref, 'My::ArgsTest', 'container injects Bar object';
     is refaddr $wire->get('container/bar'), refaddr $foo->got_ref, 'container caches Bar object';
     cmp_deeply $wire->get('container/bar')->got_args, [ text => "Hello, World" ], 'container gives bar text value';
+
+    subtest 'inner file missing' => sub {
+        my $wire = Beam::Wire->new(
+            config => {
+                inner => {
+                    class => 'Beam::Wire',
+                    args => { file => $MISSING_FILE },
+                },
+            },
+        );
+        local $@;
+        eval { $wire->get('inner') };
+        if ( ok my $e = $@, 'get missing inner fails' ) {
+          isa_ok $e, 'Beam::Wire::Exception::Constructor';
+          like "$e", qr{$MISSING_FILE}, 'file is in error' or diag $e;
+        }
+    };
+
+    subtest 'inner file missing (path lookup)' => sub {
+        my $rel_file = $MISSING_FILE->relative($SHARE_DIR);
+        my $wire = Beam::Wire->new(
+            dir => [$SHARE_DIR],
+            config => {
+                inner => {
+                    class => 'Beam::Wire',
+                    args => { file => "$rel_file" },
+                },
+            },
+        );
+        local $@;
+        eval { $wire->get('inner') };
+        if ( ok my $e = $@, 'get missing inner fails' ) {
+          isa_ok $e, 'Beam::Wire::Exception::Constructor';
+          like "$e", qr{$rel_file}, 'file is in error' or diag $e;
+        }
+    };
 };
 
 subtest 'inner container get() overrides' => sub {

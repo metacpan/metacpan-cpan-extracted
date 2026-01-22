@@ -1,0 +1,98 @@
+ExtUtils-XSOne
+
+Combine multiple XS files into a single shared library.
+
+DESCRIPTION
+
+ExtUtils::XSOne solves a fundamental limitation of Perl's XSMULTI feature:
+when using XSMULTI => 1 in ExtUtils::MakeMaker, each .xs file compiles
+into a separate shared library, which means they cannot share C static
+variables, registries, or internal state.
+
+This module allows you to organize your XS code into multiple files for
+maintainability while still producing a single shared library that can
+share all C-level state.
+
+THE PROBLEM
+
+With XSMULTI, this structure:
+
+    lib/
+    ├── Foo.xs           → blib/arch/auto/Foo/Foo.bundle
+    └── Foo/
+        └── Bar.xs       → blib/arch/auto/Foo/Bar/Bar.bundle
+
+Creates two separate shared libraries. If Foo.xs has:
+
+    static int my_registry[100];
+
+Then Foo/Bar.xs cannot access my_registry - each bundle has its own
+copy of static variables.
+
+THE SOLUTION
+
+With ExtUtils::XSOne, you organize code like this:
+
+    lib/
+    └── Foo/
+        └── xs/
+            ├── _header.xs    # Common includes, types, static vars
+            ├── context.xs    # MODULE = Foo PACKAGE = Foo::Context
+            ├── tensor.xs     # MODULE = Foo PACKAGE = Foo::Tensor
+            └── _footer.xs    # BOOT section
+
+These are combined at build time into a single lib/Foo.xs, which compiles
+to one shared library where all modules share the same C state.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+USAGE
+
+In your Makefile.PL:
+
+    use ExtUtils::MakeMaker;
+    use ExtUtils::XSOne;
+
+    ExtUtils::XSOne->combine(
+        src_dir => 'lib/MyModule/xs',
+        output  => 'lib/MyModule.xs',
+    );
+
+    WriteMakefile(
+        NAME => 'MyModule',
+        # ...
+    );
+
+Or use the command-line tool:
+
+    xsone --src lib/MyModule/xs --out lib/MyModule.xs
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with:
+
+    perldoc ExtUtils::XSOne
+    xsone --help
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-XSOne
+
+    Search CPAN
+        https://metacpan.org/release/ExtUtils-XSOne
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

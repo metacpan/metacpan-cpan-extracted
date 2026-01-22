@@ -91,25 +91,25 @@ Properties:
 
 =over
 
-=item C<affirmation>, A concise statement affirmed by an individual
+=item * C<affirmation>, A concise statement affirmed by an individual
 regarding all declarations, often used for third-party auditor acceptance
 or recipient acknowledgment. It includes a list of authorized signatories
 who assert the validity of the document on behalf of the organization.
 
-=item C<assessors>, The list of assessors evaluating claims and determining
+=item * C<assessors>, The list of assessors evaluating claims and determining
 conformance to requirements and confidence in that assessment.
 
-=item C<attestations>, The list of attestations asserted by an assessor
+=item * C<attestations>, The list of attestations asserted by an assessor
 that maps requirements to claims.
 
-=item C<claims>, The list of claims.
+=item * C<claims>, The list of claims.
 
-=item C<evidence>, The list of evidence
+=item * C<evidence>, The list of evidence
 
-=item C<signature>, Enveloped signature in JSON Signature Format
+=item * C<signature>, Enveloped signature in JSON Signature Format
 (JSF) (L<https://cyberphone.github.io/doc/security/jsf.html>).
 
-=item C<targets>, The list of targets which claims are made against.
+=item * C<targets>, The list of targets which claims are made against.
 
 =back
 

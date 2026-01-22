@@ -5,7 +5,7 @@ use warnings;
 package MooseX::Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020001';
+our $VERSION   = '0.020002';
 
 use Marlin                ();
 use Marlin::Util          ();
@@ -46,6 +46,8 @@ sub import {
 			}
 		}
 	}
+	
+	Marlin->find_meta( $_ ) for @_;
 }
 
 my $made_shim = 0;
@@ -59,7 +61,9 @@ sub Marlin::inject_moose_metadata {
 	# Recurse to any parents or roles
 	for my $pkg ( @{ $me->parents }, @{ $me->roles } ) {
 		Marlin::Util::_maybe_load_module( $pkg->[0] );
-		Marlin->find_meta( $pkg->[0] )->inject_moose_metadata;
+		if ( my $m = Marlin->find_meta( $pkg->[0] ) ) {
+			$m->inject_moose_metadata unless $m == $me;
+		}
 	}
 	
 	return if Moose::Util::find_meta( $me->this );
@@ -81,6 +85,7 @@ sub Marlin::inject_moose_metadata {
 	require Class::MOP;
 	Class::MOP::store_metaclass_by_name( $me->this, $metaclass );
 	
+	$me->canonicalize_attributes;
 	for my $attr ( @{ $me->attributes } ) {
 		$attr->inject_moose_metadata($metaclass) or next;
 	}
@@ -101,7 +106,9 @@ sub Marlin::Role::inject_moose_metadata {
 	# Recurse to other roles
 	for my $pkg ( @{ $me->roles } ) {
 		Marlin::Util::_maybe_load_module( $pkg->[0] );
-		Marlin->find_meta( $pkg->[0] )->inject_moose_metadata;
+		if ( my $m = Marlin->find_meta( $pkg->[0] ) ) {
+			$m->inject_moose_metadata unless $m == $me;
+		}
 	}
 	
 	return if Moose::Util::find_meta( $me->this );
@@ -112,6 +119,7 @@ sub Marlin::Role::inject_moose_metadata {
 	require Class::MOP;
 	Class::MOP::store_metaclass_by_name( $me->this, $metarole );
 	
+	$me->canonicalize_attributes;
 	for my $attr ( @{ $me->attributes } ) {
 		$attr->inject_mooserole_metadata( $metarole ) or next;
 	}
@@ -350,6 +358,41 @@ from L<Moose::Object> into the caller package, if the caller package is
 a Moose class.
 
 =back
+
+It is possible to list additional foreign classes on the
+C<< use MooseX::Marlin >> line to force Marlin to learn about them.
+This can allow Moose to inherit some non-Moose classes, like classes
+built by L<Mouse> or L<Class::Tiny>.
+
+In the following example C<< use MooseX::Marlin qw( Local::Squeak ) >>
+not only allows C<Local::Squash> to inherit from Marlin classes, but
+also disguises C<Local::Squeak> as a Marlin class. (Moose cannot
+normally inherit from Mouse classes!)
+
+  BEGIN {
+    package Local::Squeak;
+    use Mouse;
+    has squeak => ( is => 'ro', isa => 'Int' );
+  };
+  
+  BEGIN {
+    package Local::Squash;
+    use Moose;
+    
+    use MooseX::Marlin qw( Local::Squeak );
+    extends 'Local::Squeak';
+    
+    has squash => ( is => 'ro', isa => 'Int' );
+    __PACKAGE__->meta->make_immutable;
+  };
+  
+  use Data::Dumper;
+  
+  $Data::Dumper::Deparse = 1;
+  print Dumper( Local::Squash->can('new') );
+  
+  my $o = Local::Squash->new( squeak => 1, squash => 2 );
+  print Dumper( $o );
 
 =head1 BUGS
 

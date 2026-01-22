@@ -61,9 +61,9 @@ Properties:
 
 =over
 
-=item C<rationale>, The rationale for the confidence score.
+=item * C<rationale>, The rationale for the confidence score.
 
-=item C<score>, The confidence of the claim between and inclusive of 0 and
+=item * C<score>, The confidence of the claim between and inclusive of 0 and
 1, where 1 is 100% confidence.
 
 =back

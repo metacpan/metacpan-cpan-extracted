@@ -36,7 +36,6 @@ Affix - A Foreign Function Interface eXtension
 
     # Release the memory
     Affix::free($ptr);
-
 =head1 DESCRIPTION
 
 B<Affix> is a high-performance Foreign Function Interface (FFI) for Perl. It allows you to load dynamic libraries
@@ -246,7 +245,8 @@ information.
 
     my $ptr = malloc( 1024 );
 
-Allocates C<$size> bytes of uninitialized memory. Returns a C<Pointer[Void]> pin.
+Allocates C<$size> bytes of uninitialized memory. Returns a C<Pointer[Void]> pin. Memory allocated this way is
+B<managed> by Perl (freed automatically when the pin goes out of scope).
 
 =head2 C<calloc( $num, $size_or_type )>
 
@@ -290,15 +290,18 @@ Reinterprets a pointer.
 
     own( $ptr, $bool );
 
-Controls lifecycle management.
+Controls lifecycle management of the pointer.
 
 =over
 
-=item * C<own($p, 1)>: Perl owns the memory; `free()` is called when `$p` goes out of scope.
+=item * C<own($p, 1)>: Perl assumes ownership. C<free()> will be called when C<$p> goes out of scope.
 
-=item * C<own($p, 0)>: Perl releases ownership. Useful when handing memory off to a C function.
+=item * C<own($p, 0)>: Perl releases ownership. C<free()> is never called by Perl.
 
 =back
+
+B<Double free warning:> If you call C<own($p, 1)> and then pass C<$p> to a C function that I<also> frees that memory,
+your program will crash. Only take ownership if you are sure the C library expects you to free the memory.
 
 =head2 C<address( $ptr )>
 
@@ -802,6 +805,35 @@ The return value is a B<dualvar>:
 =head2 C<sv_dump( $sv )>
 
 Dumps the internal flags and structure of a Perl C<SV>.
+
+=head1 Thread Safety & Concurrency
+
+Affix bridges Perl (a single-threaded interpreter, generally) with libraries that may be multi-threaded. This creates
+potential hazards that you must manage.
+
+=head2 1. Initialization Phase vs. Execution Phase
+
+Functions that modify Affix's global state are B<not thread-safe>. You must perform all definitions in the main thread
+before starting any background threads or loops in the library.
+
+Unsafe operations that you should never call from Callbacks or in a threaded context:
+
+=over
+
+=item * C<affix( ... )> - Binding new functions.
+
+=item * C<typedef( ... )> - Registering new types.
+
+=back
+
+=head2 2. Callbacks
+
+When passing a Perl subroutine as a C<Callback>, avoid performing complex Perl operations like loading modules or
+defining subs inside callback triggered on a foreign thread. Such callbacks should remain simple: process data, update
+a shared variable, and return.
+
+If the library executes the callback from a background thread (e.g., window managers, audio callbacks), Affix attempts
+to attach a temporary Perl context to that thread. This should be sufficient but Perl is gonna be Perl.
 
 =head1 EXAMPLES
 

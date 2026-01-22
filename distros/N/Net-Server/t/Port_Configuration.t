@@ -9,6 +9,7 @@ Port_Configuration.t - Test different ways of specifying the port
 package FooServer;
 
 use strict;
+use Net::Server::Proto qw(SOMAXCONN);
 use FindBin qw($Bin);
 use lib $Bin;
 use NetServerTest qw(prepare_test ok is use_ok note skip);
@@ -91,7 +92,7 @@ if (!eval {
 }) {
     chomp(my $err = $@);
   SKIP: {
-      skip "Cannot load Socket6 libraries - skipping IPv6 proto tests ($err)", 25;
+      skip "Cannot load IPv6 libraries - skipping IPv6 proto tests ($err)", 25;
     };
 } else {
     local $ENV{'IPV'} = 4; # pretend to be on a system without IPv6
@@ -107,7 +108,7 @@ if (!eval {
             NS_port => Net::Server::default_port(),
             NS_ipv  => '4',
             NS_proto => 'TCP',
-            NS_listen => eval { Socket::SOMAXCONN() },
+            NS_listen => SOMAXCONN,
         }],
     });
 
@@ -263,7 +264,7 @@ if (!eval { require IO::Socket::UNIX }) {
 
     p_c([port => '/foo/bar|unix', udp_recv_len => 500], {
         bind => [{host => '*', port => '/foo/bar', proto => 'unix', ipv => '*'}],
-        sock => [{NS_host => '*', NS_port => '/foo/bar', NS_proto => 'UNIX', NS_ipv => '*', NS_listen => Socket::SOMAXCONN(), NS_unix_type => 'SOCK_STREAM', NS_unix_path => '/foo/bar'}],
+        sock => [{NS_host => '*', NS_port => '/foo/bar', NS_proto => 'UNIX', NS_ipv => '*', NS_listen => SOMAXCONN, NS_unix_type => 'SOCK_STREAM', NS_unix_path => '/foo/bar'}],
     });
 
     p_c([port => '/foo/bar|unixdgram', udp_recv_len => 500], {
@@ -307,14 +308,14 @@ if (!eval { require Net::SSLeay; 1 }) {
 }) {
     chomp(my $err = $@);
   SKIP: {
-      skip "Cannot load Socket6 libraries - skipping IPv6 proto tests ($err)", 3;
+      skip "Cannot load IPv6 libraries - skipping IPv6 proto tests ($err)", 3;
     };
 } else {
     local $ENV{'IPV'} = 4; # pretend to be on a system without IPv6
 
     p_c([proto => 'ssleay'], {
         bind => [{host => '*', port => Net::Server::default_port(), proto => 'ssleay', ipv => 4}],
-        sock => [{NS_host => '*', NS_port => 20203, NS_proto => 'SSLEAY', NS_ipv => 4, NS_listen => eval { Socket::SOMAXCONN() }, SSL_cert_file => FooServer::SSL_cert_file()}],
+        sock => [{NS_host => '*', NS_port => 20203, NS_proto => 'SSLEAY', NS_ipv => 4, NS_listen => SOMAXCONN, SSL_cert_file => FooServer::SSL_cert_file()}],
     });
 
     %class_m = (); # setting SSL_key_file may dynamically change the package methods
@@ -340,14 +341,14 @@ if (!eval { require IO::Socket::SSL }) {
 }) {
     chomp(my $err = $@);
   SKIP: {
-      skip "Cannot load Socket6 libraries - skipping IPv6 proto tests ($err)", 1;
+      skip "Cannot load IPv6 libraries - skipping IPv6 proto tests ($err)", 1;
     };
 } else {
     local $ENV{'IPV'} = 4; # pretend to be on a system without IPv6
 
     p_c([proto => 'ssl'], {
         bind => [{host => '*', port => Net::Server::default_port(), proto => 'ssl', ipv => 4}],
-        sock => [{NS_host => '*', NS_port => 20203, NS_proto => 'SSL', NS_ipv => 4, NS_listen => eval { Socket::SOMAXCONN() }, SSL_cert_file => FooServer::SSL_cert_file()}],
+        sock => [{NS_host => '*', NS_port => 20203, NS_proto => 'SSL', NS_ipv => 4, NS_listen => SOMAXCONN, SSL_cert_file => FooServer::SSL_cert_file()}],
     });
 }
 
@@ -356,15 +357,15 @@ if (!eval { require IO::Socket::SSL }) {
 # ipv6
 
 if (!eval {
-    require Socket6;
+    my $ipv6local = `cat /etc/hosts 2>/dev/null` =~ /^::1.*[\ \t](\S+)/m ? $1 : die "Missing IPv6 loopback hosts entry";
     my $pkg = eval { require IO::Socket::IP } ? 'IO::Socket::IP' : eval { require IO::Socket::INET6 } ? 'IO::Socket::INET6' : die "Could not load IO::Socket::IP or IO::Socket::INET6: $@";
-    $pkg->new->configure({LocalPort => 20203, Proto => 'tcp', Listen => 1, ReuseAddr => 1, Domain => Socket6::AF_INET6()}) or die;
-    $pkg->new->configure({LocalAddr => '::1', LocalPort => 20203, Proto => 'tcp', Listen => 1, ReuseAddr => 1, Domain => Socket6::AF_INET6()}) or die;
-    $pkg->new->configure({LocalAddr => 'localhost', LocalPort => 20203, Proto => 'tcp', Listen => 1, ReuseAddr => 1, Domain => Socket6::AF_INET6()}) or die;
+    $pkg->new->configure({LocalPort => 20203, Proto => 'tcp', Listen => 1, ReuseAddr => 1, Domain => Net::Server::Proto::AF_INET6()}) or die "IPv6-NoLocalAddr failed";
+    $pkg->new->configure({LocalAddr => '::1', LocalPort => 20203, Proto => 'tcp', Listen => 1, ReuseAddr => 1, Domain => Net::Server::Proto::AF_INET6()}) or die "IPv6-WithAddr failed";
+    $pkg->new->configure({LocalAddr => $ipv6local, LocalPort => 20203, Proto => 'tcp', Listen => 1, ReuseAddr => 1, Domain => Net::Server::Proto::AF_INET6()}) or die "IPv6-LocalHost $ipv6local failed";
 }) {
     chomp(my $err = $@);
   SKIP: {
-      skip "Cannot load Socket6 libraries - skipping IPv6 proto tests ($err)", 13;
+      skip "Cannot load IPv6 libraries - skipping IPv6 proto tests ($err)", 13;
     };
 
 } else {
@@ -372,12 +373,12 @@ if (!eval {
 
     p_c([port => 20201], {
         bind => [{host => '*', port => 20201, proto => 'tcp', ipv => 4}], # still defaults off even with library loaded
-        sock => [{NS_host => '*', NS_port => 20201, NS_proto => 'TCP', NS_ipv => 4, NS_listen => eval { Socket::SOMAXCONN() }}],
+        sock => [{NS_host => '*', NS_port => 20201, NS_proto => 'TCP', NS_ipv => 4, NS_listen => SOMAXCONN }],
     });
 
     p_c([port => 20201, ipv => 6], { # explicit request
         bind => [{host => '*', port => 20201, proto => 'tcp', ipv => 6}],
-        sock => [{NS_host => '*', NS_port => 20201, NS_proto => 'TCP', NS_ipv => 6, NS_listen => eval { Socket::SOMAXCONN() }}],
+        sock => [{NS_host => '*', NS_port => 20201, NS_proto => 'TCP', NS_ipv => 6, NS_listen => SOMAXCONN }],
     });
 
     p_c([port => [{port => 20201, ipv => 6}]], {
@@ -386,17 +387,17 @@ if (!eval {
 
     p_c([port => '[*]:20201:IPv6'], {
         bind => [{host => '*', port => 20201, proto => 'tcp', ipv => 6}],
-        sock => [{NS_host => '*', NS_port => 20201, NS_proto => 'TCP', NS_ipv => 6, NS_listen => eval { Socket::SOMAXCONN() }}],
+        sock => [{NS_host => '*', NS_port => 20201, NS_proto => 'TCP', NS_ipv => 6, NS_listen => SOMAXCONN }],
     });
 
     p_c([port => ['[localhost]:IPv6:20201']], {
         bind => [{host => 'localhost', port => 20201, proto => 'tcp', ipv => 6}],
-        sock => [{NS_host => 'localhost', NS_port => 20201, NS_proto => 'TCP', NS_ipv => 6, NS_listen => eval { Socket::SOMAXCONN() }}],
+        sock => [{NS_host => 'localhost', NS_port => 20201, NS_proto => 'TCP', NS_ipv => 6, NS_listen => SOMAXCONN }],
     });
 
     p_c([port => 20201, host => 'localhost/IPv6'], {
         bind => [{host => 'localhost', port => 20201, proto => 'tcp', ipv => 6}],
-        sock => [{NS_host => 'localhost', NS_port => 20201, NS_proto => 'TCP', NS_ipv => 6, NS_listen => eval { Socket::SOMAXCONN() }}],
+        sock => [{NS_host => 'localhost', NS_port => 20201, NS_proto => 'TCP', NS_ipv => 6, NS_listen => SOMAXCONN }],
     });
 
     p_c([port => 20201, host => 'localhost', proto => 'udp IPv6'], {
@@ -405,8 +406,8 @@ if (!eval {
 
     p_c([port => ['[localhost]:20201:IPv4', 'localhost:20201:IPv6']], {
         bind => [{host => 'localhost', port => 20201, proto => 'tcp', ipv => 4}, {host => 'localhost', port => 20201, proto => 'tcp', ipv => 6}],
-        sock => [{NS_host => 'localhost', NS_port => 20201, NS_proto => 'TCP', NS_ipv => 4, NS_listen => eval { Socket::SOMAXCONN() }},
-                 {NS_host => 'localhost', NS_port => 20201, NS_proto => 'TCP', NS_ipv => 6, NS_listen => eval { Socket::SOMAXCONN() }}],
+        sock => [{NS_host => 'localhost', NS_port => 20201, NS_proto => 'TCP', NS_ipv => 4, NS_listen => SOMAXCONN },
+                 {NS_host => 'localhost', NS_port => 20201, NS_proto => 'TCP', NS_ipv => 6, NS_listen => SOMAXCONN }],
     });
 
     p_c([port => 'localhost, 20201, IPv6, IPv4'], {

@@ -5,7 +5,7 @@ use warnings;
 package Marlin::TypeConstraint;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020001';
+our $VERSION   = '0.020002';
 
 use B                     ();
 use Eval::TypeTiny        ();

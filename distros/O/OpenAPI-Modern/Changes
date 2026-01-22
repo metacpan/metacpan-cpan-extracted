@@ -1,5 +1,8 @@
 Revision history for OpenAPI-Modern
 
+0.123     2026-01-21 22:53:30Z
+          - more scenarios are supported in OAD 3.0 -> 3.[1,2] upgrade
+
 0.122     2026-01-19 01:30:30Z
           - fix bug with number <-> string coercion on older perls
 

@@ -5,7 +5,7 @@ use warnings;
 package MooseX::Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020001';
+our $VERSION   = '0.020002';
 
 use Marlin                ();
 use Marlin::Util          ();
@@ -38,6 +38,8 @@ sub import {
 	Moo->is_class( $caller )
 		or Moo::Role->is_role( $caller )
 		or Marlin::Util::_croak("Package '$caller' does not use Moo");
+	
+	Marlin->find_meta( $_ ) for @_;
 }
 
 sub Marlin::inject_moo_metadata {
@@ -46,7 +48,9 @@ sub Marlin::inject_moo_metadata {
 	# Recurse to any parents or roles
 	for my $pkg ( @{ $me->parents }, @{ $me->roles } ) {
 		Marlin::Util::_maybe_load_module( $pkg->[0] );
-		Marlin->find_meta( $pkg->[0] )->inject_moo_metadata;
+		if ( my $m = Marlin->find_meta( $pkg->[0] ) ) {
+			$m->inject_moo_metadata unless $m == $me;
+		}
 	}
 	
 	require Method::Generate::Accessor;
@@ -59,6 +63,7 @@ sub Marlin::inject_moo_metadata {
 		accessor_generator   => $makers->{accessor},
 	);
 	
+	$me->canonicalize_attributes;
 	for my $attr ( @{ $me->attributes } ) {
 		$attr->inject_moo_metadata($makers) or next;
 	}
@@ -72,7 +77,9 @@ sub Marlin::Role::inject_moo_metadata {
 	# Recurse to any parents or roles
 	for my $pkg ( @{ $me->parents }, @{ $me->roles } ) {
 		Marlin::Util::_maybe_load_module( $pkg->[0] );
-		Marlin->find_meta( $pkg->[0] )->inject_moo_metadata;
+		if ( my $m = Marlin->find_meta( $pkg->[0] ) ) {
+			$m->inject_moo_metadata unless $m == $me;
+		}
 	}
 	
 	require Method::Generate::Accessor;
@@ -80,6 +87,7 @@ sub Marlin::Role::inject_moo_metadata {
 	$makers->{is_role} = 1;
 	$makers->{accessor_maker} = Method::Generate::Accessor->new;
 	
+	$me->canonicalize_attributes;
 	for my $attr ( @{ $me->attributes } ) {
 		$attr->inject_moorole_metadata($makers) or next;
 	}

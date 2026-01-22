@@ -57,25 +57,45 @@
 #include <pthread.h>
 #endif
 
+// C++ Headers must be included BEFORE extern "C"
+#if defined(__cplusplus)
+#include <atomic>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Portability Macros for Atomics and Thread-Local Storage
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_ATOMICS__)
+#if defined(__cplusplus)
+#define TAP_ATOMIC_SIZE_T std::atomic<size_t>
+#define TAP_ATOMIC_FETCH_ADD(ptr, val) std::atomic_fetch_add(ptr, (size_t)(val))
+#define TAP_ATOMIC_INIT(val) (val)
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_ATOMICS__)
 #include <stdatomic.h>
 #define TAP_ATOMIC_SIZE_T _Atomic size_t
 #define TAP_ATOMIC_FETCH_ADD(ptr, val) atomic_fetch_add(ptr, val)
+#define TAP_ATOMIC_INIT(val) = val
 #elif defined(__GNUC__) || defined(__clang__)
 #define TAP_ATOMIC_SIZE_T size_t
 #define TAP_ATOMIC_FETCH_ADD(ptr, val) __sync_fetch_and_add(ptr, val)
+#define TAP_ATOMIC_INIT(val) = val
 #else
 // Fallback for older compilers without atomics support. This is not thread-safe.
 #define TAP_ATOMIC_SIZE_T size_t
 #define TAP_ATOMIC_FETCH_ADD(ptr, val) ((*ptr) += (val))
+#define TAP_ATOMIC_INIT(val) = val
+#if !defined(_MSC_VER)
 #warning "Compiler does not support C11 atomics or GCC builtins; global counters will not be thread-safe."
+#endif
 #endif
 
 #if defined(__OpenBSD__)
 // OpenBSD has known issues with TLS cleanup in some linking scenarios.
 // Disable TLS to prevent segfaults at exit.
 #define TAP_THREAD_LOCAL
+#elif defined(__cplusplus)
+#define TAP_THREAD_LOCAL thread_local
 #elif defined(_MSC_VER)
 // Microsoft Visual C++
 #define TAP_THREAD_LOCAL __declspec(thread)
@@ -89,7 +109,17 @@
 #define TAP_THREAD_LOCAL _Thread_local
 #else
 #define TAP_THREAD_LOCAL
+#if !defined(_MSC_VER)
 #warning "Compiler does not support thread-local storage; tests will not be thread-safe."
+#endif
+#endif
+
+#if defined(__GNUC__) || defined(__clang__)
+#define DBLTAP_NOINLINE __attribute__((noinline))
+#elif defined(_MSC_VER)
+#define DBLTAP_NOINLINE __declspec(noinline)
+#else
+#define DBLTAP_NOINLINE
 #endif
 
 // Compiler-specific attribute for printf-style format checking.
@@ -114,6 +144,11 @@ void tap_skip(size_t count, const char * reason, ...) DBLTAP_PRINTF_FORMAT(2, 3)
 void tap_skip_all(const char * reason, ...) DBLTAP_PRINTF_FORMAT(1, 2);
 void diag(const char * fmt, ...) DBLTAP_PRINTF_FORMAT(1, 2);
 void tap_note(const char * fmt, ...) DBLTAP_PRINTF_FORMAT(1, 2);
+void test_body(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 // Public Test Harness Macros
 /** @brief Declares the total number of tests to be run in the current scope. Must be called before any tests. */
@@ -147,8 +182,11 @@ void tap_note(const char * fmt, ...) DBLTAP_PRINTF_FORMAT(1, 2);
 #define note(...) tap_note(__VA_ARGS__)
 #endif
 /** @brief Defines the main test function body where all tests are written. */
+#ifdef __cplusplus
+#define TEST extern "C" void test_body(void)
+#else
 #define TEST void test_body(void)
-void test_body(void);
+#endif
 
 #else  // If DBLTAP_ENABLE is not defined, provide stub macros to allow code to compile without the harness.
 #define plan(count) ((void)0)
@@ -206,7 +244,7 @@ static TAP_THREAD_LOCAL tap_state_t state_stack[MAX_DEPTH];
 /** @internal A pointer to the current test state on the thread-local stack. */
 static TAP_THREAD_LOCAL tap_state_t * current_state = NULL;
 /** @internal A global, thread-safe counter for the total number of failed tests across all threads. */
-static TAP_ATOMIC_SIZE_T g_total_failed = 0;
+static TAP_ATOMIC_SIZE_T g_total_failed TAP_ATOMIC_INIT(0);
 
 // One-Time Initialization for TAP Header
 #if defined(_WIN32) || defined(__CYGWIN__)

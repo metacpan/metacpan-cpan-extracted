@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use base 'DBIx::Class::Core';
 
+__PACKAGE__->load_components(qw/Async::ResultComponent Core/);
 __PACKAGE__->table('users');
 __PACKAGE__->add_columns(
     id => {

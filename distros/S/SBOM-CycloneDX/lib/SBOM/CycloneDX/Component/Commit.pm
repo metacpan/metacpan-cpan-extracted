@@ -66,17 +66,17 @@ Properties:
 
 =over
 
-=item C<author>, The author who created the changes in the commit
+=item * C<author>, The author who created the changes in the commit
 
-=item C<committer>, The person who committed or pushed the commit
+=item * C<committer>, The person who committed or pushed the commit
 
-=item C<message>, The text description of the contents of the commit
+=item * C<message>, The text description of the contents of the commit
 
-=item C<uid>, A unique identifier of the commit. This may be version
+=item * C<uid>, A unique identifier of the commit. This may be version
 control specific. For example, Subversion uses revision numbers whereas git
 uses commit hashes.
 
-=item C<url>, The URL to the commit. This URL will typically point to a
+=item * C<url>, The URL to the commit. This URL will typically point to a
 commit in a version control system.
 
 =back

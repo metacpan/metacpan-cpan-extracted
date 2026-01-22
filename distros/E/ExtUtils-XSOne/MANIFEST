@@ -1,0 +1,30 @@
+bin/xsone
+Changes
+ignore.txt
+lib/ExtUtils/XSOne.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-combine.t
+t/02-line-directives.t
+t/03-fixtures.t
+t/04-cli.t
+t/05-edge-cases.t
+t/06-simple-module.t
+t/07-compile.t
+t/08-deduplication.t
+t/09-load-xs.t
+t/lib/SimpleModule/xs/bar.xs
+t/lib/SimpleModule/xs/baz.xs
+t/lib/SimpleModule/xs/foo.xs
+t/lib/TestModule/xs/_footer.xs
+t/lib/TestModule/xs/_header.xs
+t/lib/TestModule/xs/context.xs
+t/lib/TestModule/xs/utils.xs
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

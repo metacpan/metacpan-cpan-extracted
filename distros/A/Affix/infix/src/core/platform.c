@@ -19,16 +19,51 @@
  * @internal
  * This module contains the platform-specific code for querying the runtime
  * environment's capabilities, such as support for advanced CPU instruction sets.
+ * Crucially, it checks both hardware support (CPUID) and OS support (XGETBV)
+ * to prevent crashes when using AVX/AVX-512 instructions.
  * @endinternal
  */
 #include "common/platform.h"
+#include <infix/infix.h>
+#include <stdint.h>
+
+/**
+ * @brief Retrieves the version of the infix library linked at runtime.
+ * @return An `infix_version_t` structure containing the major, minor, and patch numbers.
+ */
+INFIX_API INFIX_NODISCARD infix_version_t infix_get_version(void) {
+    return (infix_version_t){INFIX_MAJOR, INFIX_MINOR, INFIX_PATCH};
+}
+
 #if defined(INFIX_ARCH_X64)
 #if defined(_MSC_VER)
 #include <intrin.h>
 #elif defined(__GNUC__) || defined(__clang__)
 #include <cpuid.h>
 #endif
+
+// Helper to execute XGETBV and return XCR0
+static uint64_t _infix_xgetbv(void) {
+#if defined(_MSC_VER)
+    return _xgetbv(_XCR_XFEATURE_ENABLED_MASK);
+#elif defined(__GNUC__) || defined(__clang__)
+    uint32_t eax, edx;
+    __asm__ __volatile__("xgetbv" : "=a"(eax), "=d"(edx) : "c"(0));
+    return ((uint64_t)edx << 32) | eax;
+#else
+    return 0;
 #endif
+}
+
+// XCR0 Bit Masks
+#define XCR0_SSE (1 << 1)
+#define XCR0_AVX (1 << 2)
+#define XCR0_OPMASK (1 << 5)
+#define XCR0_ZMM_Hi256 (1 << 6)
+#define XCR0_Hi16_ZMM (1 << 7)
+
+#endif
+
 #if defined(INFIX_ARCH_AARCH64) && defined(__has_include)
 #if __has_include(<sys/auxv.h>) && defined(__linux__)
 #include <sys/auxv.h>
@@ -39,40 +74,74 @@
 #include <sys/sysctl.h>
 #endif
 #endif
+
 #if defined(INFIX_ARCH_X64)
 bool infix_cpu_has_avx2(void) {
+    // 1. Check CPUID for OSXSAVE bit (ECX bit 27 of leaf 1)
+    // If this is 0, we can't use XGETBV.
+    bool osxsave = false;
+    bool avx2_hardware = false;
+
 #if defined(_MSC_VER)
     int cpuInfo[4];
+    __cpuid(cpuInfo, 1);
+    osxsave = (cpuInfo[2] & (1 << 27)) != 0;
+
     __cpuidex(cpuInfo, 7, 0);
-    return (cpuInfo[1] & (1 << 5)) != 0;
+    avx2_hardware = (cpuInfo[1] & (1 << 5)) != 0;
 #elif defined(__GNUC__) || defined(__clang__)
     unsigned int eax, ebx, ecx, edx;
+    __cpuid(1, eax, ebx, ecx, edx);
+    osxsave = (ecx & (1 << 27)) != 0;
+
     if (__get_cpuid_max(0, NULL) >= 7) {
         __cpuid_count(7, 0, eax, ebx, ecx, edx);
-        return (ebx & (1 << 5)) != 0;
+        avx2_hardware = (ebx & (1 << 5)) != 0;
     }
-    return false;
-#else
-    return false;
 #endif
+
+    if (!osxsave || !avx2_hardware)
+        return false;
+
+    // 2. Check XCR0 to ensure OS has enabled YMM state saving.
+    // Must have SSE(1) and AVX(2) bits set.
+    uint64_t xcr0 = _infix_xgetbv();
+    return (xcr0 & (XCR0_SSE | XCR0_AVX)) == (XCR0_SSE | XCR0_AVX);
 }
+
 bool infix_cpu_has_avx512f(void) {
+    bool osxsave = false;
+    bool avx512f_hardware = false;
+
 #if defined(_MSC_VER)
     int cpuInfo[4];
+    __cpuid(cpuInfo, 1);
+    osxsave = (cpuInfo[2] & (1 << 27)) != 0;
+
     __cpuidex(cpuInfo, 7, 0);
-    return (cpuInfo[1] & (1 << 16)) != 0;
+    avx512f_hardware = (cpuInfo[1] & (1 << 16)) != 0;
 #elif defined(__GNUC__) || defined(__clang__)
     unsigned int eax, ebx, ecx, edx;
+    __cpuid(1, eax, ebx, ecx, edx);
+    osxsave = (ecx & (1 << 27)) != 0;
+
     if (__get_cpuid_max(0, NULL) >= 7) {
         __cpuid_count(7, 0, eax, ebx, ecx, edx);
-        return (ebx & (1 << 16)) != 0;
+        avx512f_hardware = (ebx & (1 << 16)) != 0;
     }
-    return false;
-#else
-    return false;
 #endif
+
+    if (!osxsave || !avx512f_hardware)
+        return false;
+
+    // 2. Check XCR0 for ZMM support.
+    // Need SSE(1) | AVX(2) | opmask(5) | ZMM_Hi256(6) | Hi16_ZMM(7)
+    uint64_t xcr0 = _infix_xgetbv();
+    uint64_t required = XCR0_SSE | XCR0_AVX | XCR0_OPMASK | XCR0_ZMM_Hi256 | XCR0_Hi16_ZMM;
+    return (xcr0 & required) == required;
 }
 #endif
+
 #if defined(INFIX_ARCH_AARCH64)
 bool infix_cpu_has_sve(void) {
 #if defined(__linux__) && defined(HWCAP_SVE)

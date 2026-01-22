@@ -14,7 +14,7 @@ use namespace::autoclean;
 
 extends 'SBOM::CycloneDX::Base';
 
-has tlp => (is => 'rw', default => 'CLEAR', isa => Enum [SBOM::CycloneDX::Enum->TLP_CLASSIFICATIONS()]);
+has tlp => (is => 'rw', default => 'CLEAR', isa => Enum [SBOM::CycloneDX::Enum->values('TLP_CLASSIFICATION')]);
 
 sub TO_JSON {
 
@@ -49,6 +49,9 @@ components described by this BOM.
 
 =head2 METHODS
 
+L<SBOM::CycloneDX::Metadata::DistributionConstraint> inherits all methods from L<SBOM::CycloneDX::Base>
+and implements the following new ones.
+
 =over
 
 =item SBOM::CycloneDX::Metadata::DistributionConstraint->new( %PARAMS )
@@ -57,7 +60,7 @@ Properties:
 
 =over
 
-=item C<tlp>, The Traffic Light Protocol (TLP) classification that controls
+=item * C<tlp>, The Traffic Light Protocol (TLP) classification that controls
 the sharing and distribution of the data that the BOM describes.
 
 The default classification is C<CLEAR>.

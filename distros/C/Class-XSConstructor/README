@@ -208,6 +208,37 @@ DESCRIPTION
         Custom slot initializers are likely to siginificantly slow down your
         constructor.
 
+    *   Automatic deep data cloning.
+
+        Setting `clone_on_write => 1` will automatically deep clone incoming
+        arguments before setting them.
+
+          package Local::Foo {
+            use Class::XSConstructor foo => { clone_on_write => 1 };
+          }
+  
+          my @array = ( 1, 2, 3 );
+          my $obj = Local::Foo->new( foo => \@array );
+  
+          push @array, 4; # does not affect the array within $obj.
+
+        It is possible to provide a custom callback to clone a value, which
+        may be useful to control clone depth, etc. This is obviously slower
+        than the built-in clone functionality.
+
+          package Local::Foo {
+            use Class::XSConstructor foo => { clone_on_write => sub {
+              my ( $self, $attr_name, $value ) = @_;
+              ...;
+              return $cloned_value;
+            } };
+          }
+
+        The result of the callback will be re-checked against the type
+        constraint, but will not be coerced.
+
+        Defaults are not cloned. Only values passed from outside are.
+
     *   Undef-tolerant attributes.
 
           package My::Class {
@@ -404,6 +435,10 @@ SEE ALSO
 
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.
+
+    Incorporates parts of Clone, originally by Ray Finch <rdf@cpan.org> and
+    maintained by Breno G. de Oliveira <garu@cpan.org>, Nicolas Rochelemagne
+    <atoomic@cpan.org>, and Florian Ragwitz <rafl@debian.org>.
 
 THANKS
     To everybody in *#xs* on irc.perl.org.

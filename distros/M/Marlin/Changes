@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.020002	2026-01-21
+
+ [ Bug Fixes ]
+ - Small bugfixes for MooX::Marlin and MooseX::Marlin.
+
 0.020001	2026-01-20
 
  [ Bug Fixes ]

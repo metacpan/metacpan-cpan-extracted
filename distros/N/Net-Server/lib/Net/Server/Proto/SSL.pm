@@ -19,6 +19,7 @@ package Net::Server::Proto::SSL;
 
 use strict;
 use warnings;
+use Net::Server::Proto qw(SOMAXCONN);
 
 BEGIN {
     # IO::Socket::SSL will automatically become IO::Socket::IP if it is available.
@@ -68,7 +69,7 @@ sub object {
         $sock->NS_ipv( $info->{'ipv'} );
         $sock->NS_listen(defined($info->{'listen'}) ? $info->{'listen'}
                         : defined($server->{'server'}->{'listen'}) ? $server->{'server'}->{'listen'}
-                        : Socket::SOMAXCONN());
+                        : SOMAXCONN);
         ${*$sock}{'NS_orig_port'} = $info->{'orig_port'} if defined $info->{'orig_port'};
 
         my %seen;
@@ -104,7 +105,7 @@ sub connect {
         Reuse     => 1,
         (($host ne '*') ? (LocalAddr => $host) : ()), # * is all
         (($sock->isa('IO::Socket::IP') || $sock->isa('IO::Socket::INET6'))
-            ? (Domain => ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC()) : ()),
+            ? (Domain => ($ipv eq '6') ? Net::Server::Proto::AF_INET6() : ($ipv eq '4') ? Net::Server::Proto::AF_INET() : Net::Server::Proto::AF_UNSPEC()) : ()),
         (map {$_ => $sock->$_();} grep {/^SSL_/} keys %{*$sock}),
         SSL_server => 1,
         SSL_startHandshake => 0,
@@ -134,7 +135,7 @@ sub reconnect { # after a sig HUP
 
     if ($sock->isa("IO::Socket::IP") || $sock->isa("IO::Socket::INET6")) {
         my $ipv = $sock->NS_ipv;
-        ${*$sock}{'io_socket_domain'} = ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC();
+        ${*$sock}{'io_socket_domain'} = ($ipv eq '6') ? Net::Server::Proto::AF_INET6() : ($ipv eq '4') ? Net::Server::Proto::AF_INET() : Net::Server::Proto::AF_UNSPEC();
     }
 
     if ($port ne $sock->NS_port) {
@@ -312,7 +313,7 @@ Net::SSLeay.  See L<Net::Server::Proto>.
 
 If you know that your server will only need IPv4 (which is the default
 for Net::Server), you can load IO::Socket::SSL in inet4 mode which
-will prevent it from using Socket6, IO::Socket::IP, or IO::Socket::INET6 since they
+will prevent it from using IO::Socket::IP or IO::Socket::INET6 since they
 would represent additional and unused overhead.
 
     use IO::Socket::SSL qw(inet4);

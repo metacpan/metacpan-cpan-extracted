@@ -41,7 +41,7 @@ has licenses => (
 
 has patent_assertions => (
     is      => 'rw',
-    isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::PatentAssertions']],
+    isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::PatentAssertion']],
     default => sub { SBOM::CycloneDX::List->new }
 );
 
@@ -130,46 +130,46 @@ Properties:
 
 =over
 
-=item C<authenticated>, A boolean value indicating if the service requires
+=item * C<authenticated>, A boolean value indicating if the service requires
 authentication. A value of true indicates the service requires
 authentication prior to use. A value of false indicates the service does
 not require authentication.
 
-=item C<bom_ref>, An identifier which can be used to reference the
+=item * C<bom_ref>, An identifier which can be used to reference the
 service elsewhere in the BOM. Every bom-ref must be unique within the BOM.
 Value SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid
 conflicts with BOM-Links.
 
-=item C<data>, Specifies information about the data including the
+=item * C<data>, Specifies information about the data including the
 directional flow of data and the data classification.
 
-=item C<description>, Specifies a description for the service
+=item * C<description>, Specifies a description for the service
 
-=item C<endpoints>, The endpoint URIs of the service. Multiple endpoints
+=item * C<endpoints>, The endpoint URIs of the service. Multiple endpoints
 are allowed.
 
-=item C<external_references>, External references provide a way to document
+=item * C<external_references>, External references provide a way to document
 systems, sites, and information that may be relevant but are not included
 with the BOM. They may also establish specific relationships within or
 external to the BOM.
 
-=item C<group>, The grouping name, namespace, or identifier. This will
+=item * C<group>, The grouping name, namespace, or identifier. This will
 often be a shortened, single name of the company or project that produced
 the service or domain name. Whitespace and special characters should be
 avoided.
 
-=item C<licenses>, Service License(s).
+=item * C<licenses>, Service License(s).
 
-=item C<name>, The name of the service. This will often be a shortened,
+=item * C<name>, The name of the service. This will often be a shortened,
 single name of the service.
 
-=item C<patent_assertions>, Service Patent(s).
+=item * C<patent_assertions>, Service Patent(s).
 
 Patent Assertions. A list of assertions made regarding patents associated
 with this component or service. Assertions distinguish between ownership,
 licensing, and other relevant interactions with patents.
 
-=item C<properties>, Provides the ability to document properties in a
+=item * C<properties>, Provides the ability to document properties in a
 name-value store. This provides flexibility to include data not officially
 supported in the standard without having to use additional namespaces or
 create extensions. Unlike key-value stores, properties support duplicate
@@ -178,24 +178,24 @@ to the general public are encouraged to be registered in the CycloneDX
 Property Taxonomy (L<https://github.com/CycloneDX/cyclonedx-property-taxonomy>).
 Formal registration is optional.
 
-=item C<provider>, The organization that provides the service.
+=item * C<provider>, The organization that provides the service.
 
-=item C<release_notes>, Specifies release notes.
+=item * C<release_notes>, Specifies release notes.
 
-=item C<services>, A list of services included or deployed behind the
+=item * C<services>, A list of services included or deployed behind the
 parent service. This is not a dependency tree. It provides a way to specify
 a hierarchical representation of service assemblies.
 
-=item C<signature>, Enveloped signature in JSON Signature Format
+=item * C<signature>, Enveloped signature in JSON Signature Format
 (JSF) (L<https://cyberphone.github.io/doc/security/jsf.html>).
 
-=item C<tags>, 
+=item * C<tags>, 
 
-=item C<trust_zone>, The name of the trust zone the service resides in.
+=item * C<trust_zone>, The name of the trust zone the service resides in.
 
-=item C<version>, The service version.
+=item * C<version>, The service version.
 
-=item C<x_trust_boundary>, A boolean value indicating if use of the service
+=item * C<x_trust_boundary>, A boolean value indicating if use of the service
 crosses a trust zone or boundary. A value of true indicates that by using
 the service, a trust boundary is crossed. A value of false indicates that by
 using the service, a trust boundary is not crossed.

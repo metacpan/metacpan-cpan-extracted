@@ -81,6 +81,9 @@ the BOM to a contributing entity or process.
 
 =head2 METHODS
 
+L<SBOM::CycloneDX::Citation> inherits all methods from L<SBOM::CycloneDX::Base>
+and implements the following new ones.
+
 =over
 
 =item SBOM::CycloneDX::Citation->new( %PARAMS )
@@ -89,34 +92,34 @@ Properties:
 
 =over
 
-=item C<attributed_to>, The C<bom-ref> of an object, such as a component,
+=item * C<attributed_to>, The C<bom-ref> of an object, such as a component,
 service, tool, organisational entity, or person that supplied the cited
 information.
 At least one of the "attributed_to" or "process" elements must be present.
 
-=item C<bom_ref>, BOM Reference
+=item * C<bom_ref>, BOM Reference
 
-=item C<expressions>, One or more path expressions used to locate values
+=item * C<expressions>, One or more path expressions used to locate values
 within a BOM.
 Exactly one of the "pointers" or "expressions" elements must be present.
 
-=item C<note>, A description or comment about the context or quality of the
+=item * C<note>, A description or comment about the context or quality of the
 data attribution.
 
-=item C<pointers>, One or more "JSON
+=item * C<pointers>, One or more "JSON
 Pointers" (L<https://datatracker.ietf.org/doc/html/rfc6901)> identifying the
 BOM fields to which the attribution applies.
 Exactly one of the "pointers" or "expressions" elements must be present.
 
-=item C<process>, The C<bom-ref> to a process (such as a formula, workflow,
+=item * C<process>, The C<bom-ref> to a process (such as a formula, workflow,
 task, or step) defined in the C<formulation> section that executed or
 generated the attributed data.
 At least one of the "attributed_to" or "process" elements must be present.
 
-=item C<signature>, A digital signature verifying the authenticity or
+=item * C<signature>, A digital signature verifying the authenticity or
 integrity of the attribution.
 
-=item C<timestamp>, The date and time when the attribution was made or the
+=item * C<timestamp>, The date and time when the attribution was made or the
 information was supplied.
 
 =back

@@ -74,54 +74,54 @@ L<SBOM::CycloneDX::Enum::LicenseType> is ENUM package used by L<SBOM::CycloneDX>
 
 =over
 
-=item * L<ACADEMIC>, A license that grants use of software solely for the
+=item * C<ACADEMIC>, A license that grants use of software solely for the
 purpose of education or research.
 
-=item * L<APPLIANCE>, A license covering use of software embedded in a
+=item * C<APPLIANCE>, A license covering use of software embedded in a
 specific piece of hardware.
 
-=item * L<CLIENT_ACCESS>, A Client Access License (CAL) allows client
+=item * C<CLIENT_ACCESS>, A Client Access License (CAL) allows client
 computers to access services provided by server software.
 
-=item * L<CONCURRENT_USER>, A Concurrent User license (aka floating
+=item * C<CONCURRENT_USER>, A Concurrent User license (aka floating
 license) limits the number of licenses for a software application and
 licenses are shared among a larger number of users.
 
-=item * L<CORE_POINTS>, A license where the core of a computer's processor
+=item * C<CORE_POINTS>, A license where the core of a computer's processor
 is assigned a specific number of points.
 
-=item * L<CUSTOM_METRIC>, A license for which consumption is measured by
+=item * C<CUSTOM_METRIC>, A license for which consumption is measured by
 non-standard metrics.
 
-=item * L<DEVICE>, A license that covers a defined number of installations
+=item * C<DEVICE>, A license that covers a defined number of installations
 on computers and other types of devices.
 
-=item * L<EVALUATION>, A license that grants permission to install and use
+=item * C<EVALUATION>, A license that grants permission to install and use
 software for trial purposes.
 
-=item * L<NAMED_USER>, A license that grants access to the software to one
+=item * C<NAMED_USER>, A license that grants access to the software to one
 or more pre-defined users.
 
-=item * L<NODE_LOCKED>, A license that grants access to the software on one
+=item * C<NODE_LOCKED>, A license that grants access to the software on one
 or more pre-defined computers or devices.
 
-=item * L<OEM>, An Original Equipment Manufacturer license that is
+=item * C<OEM>, An Original Equipment Manufacturer license that is
 delivered with hardware, cannot be transferred to other hardware, and is
 valid for the life of the hardware.
 
-=item * L<PERPETUAL>, A license where the software is sold on a one-time
+=item * C<PERPETUAL>, A license where the software is sold on a one-time
 basis and the licensee can use a copy of the software indefinitely.
 
-=item * L<PROCESSOR_POINTS>, A license where each installation consumes
+=item * C<PROCESSOR_POINTS>, A license where each installation consumes
 points per processor.
 
-=item * L<SUBSCRIPTION>, A license where the licensee pays a fee to use the
+=item * C<SUBSCRIPTION>, A license where the licensee pays a fee to use the
 software or service.
 
-=item * L<USER>, A license that grants access to the software or service by
+=item * C<USER>, A license that grants access to the software or service by
 a specified number of users.
 
-=item * L<OTHER>, Another license type.
+=item * C<OTHER>, Another license type.
 
 =back
 

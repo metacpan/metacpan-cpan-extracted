@@ -1,5 +1,11 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.037     2026-01-21 22:49:02Z
+        - when dumping data for a failed test, include its type when blessed
+          (e.g. a Math::BigInt object)
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/3fc541796930c64960f334917629a221e4d74ceb...75995a1c8112322024d5c04a5eac27813aeb46f0
+
 1.036     2026-01-06 18:04:22Z
         - do not add v1/ remotes when the implementation does not support that
           version

@@ -99,7 +99,7 @@ Properties:
 
 =over
 
-=item C<ancestors>, Describes zero or more components in which a component
+=item * C<ancestors>, Describes zero or more components in which a component
 is derived from. This is commonly used to describe forks from existing
 projects where the forked version contains a ancestor node containing the
 original component it was forked from. For example, Component A is the
@@ -108,22 +108,22 @@ in the BOM. However, Component B contains a pedigree node with a single
 ancestor documenting Component A - the original component from which
 Component B is derived from.
 
-=item C<commits>, A list of zero or more commits which provide a trail
+=item * C<commits>, A list of zero or more commits which provide a trail
 describing how the component deviates from an ancestor, descendant, or
 variant.
 
-=item C<descendants>, Descendants are the exact opposite of ancestors. This
+=item * C<descendants>, Descendants are the exact opposite of ancestors. This
 provides a way to document all forks (and their forks) of an original or
 root component.
 
-=item C<notes>, Notes, observations, and other non-structured commentary
+=item * C<notes>, Notes, observations, and other non-structured commentary
 describing the components pedigree.
 
-=item C<patches>, A list of zero or more patches describing how the
+=item * C<patches>, A list of zero or more patches describing how the
 component deviates from an ancestor, descendant, or variant. Patches may be
 complementary to commits or may be used in place of commits.
 
-=item C<variants>, Variants describe relations where the relationship
+=item * C<variants>, Variants describe relations where the relationship
 between the components is not known. For example, if Component A contains
 nearly identical code to Component B. They are both related, but it is
 unclear if one is derived from the other, or if they share a common

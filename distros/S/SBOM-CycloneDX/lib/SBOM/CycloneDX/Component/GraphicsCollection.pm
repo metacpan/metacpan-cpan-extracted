@@ -68,9 +68,9 @@ Properties:
 
 =over
 
-=item C<collection>, A collection of graphics.
+=item * C<collection>, A collection of graphics.
 
-=item C<description>, A description of this collection of graphics.
+=item * C<description>, A description of this collection of graphics.
 
 =back
 

@@ -76,33 +76,33 @@ platform.
 
 =over
 
-=item * L<GENERIC>
+=item * C<GENERIC>
 
-=item * L<X86_32>
+=item * C<X86_32>
 
-=item * L<X86_64>
+=item * C<X86_64>
 
-=item * L<ARMV7_A>
+=item * C<ARMV7_A>
 
-=item * L<ARMV7_M>
+=item * C<ARMV7_M>
 
-=item * L<ARMV8_A>
+=item * C<ARMV8_A>
 
-=item * L<ARMV8_M>
+=item * C<ARMV8_M>
 
-=item * L<ARMV9_A>
+=item * C<ARMV9_A>
 
-=item * L<ARMV9_M>
+=item * C<ARMV9_M>
 
-=item * L<S390X>
+=item * C<S390X>
 
-=item * L<PPC64>
+=item * C<PPC64>
 
-=item * L<PPC64LE>
+=item * C<PPC64LE>
 
-=item * L<OTHER>
+=item * C<OTHER>
 
-=item * L<UNKNOWN>
+=item * C<UNKNOWN>
 
 =back
 

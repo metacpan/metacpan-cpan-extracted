@@ -52,6 +52,7 @@
 #endif
 #if defined(INFIX_OS_MACOS)
 #include <dlfcn.h>
+#include <libkern/OSCacheControl.h>
 #include <pthread.h>
 #endif
 // Polyfills for mmap flags for maximum POSIX compatibility.
@@ -89,6 +90,8 @@ static struct {
     CFTypeRef kCFAllocatorDefault;
     SecTaskRef (*SecTaskCreateFromSelf)(CFTypeRef allocator);
     CFTypeRef (*SecTaskCopyValueForEntitlement)(SecTaskRef task, CFStringRef entitlement, CFErrorRef * error);
+    void (*pthread_jit_write_protect_np)(int enabled);
+    void (*sys_icache_invalidate)(void * start, size_t len);
 } g_macos_apis;
 /**
  * @internal
@@ -101,13 +104,17 @@ static void initialize_macos_apis(void) {
     // We don't need to link against these frameworks, which makes building simpler.
     void * cf = dlopen("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation", RTLD_LAZY);
     void * sec = dlopen("/System/Library/Frameworks/Security.framework/Security", RTLD_LAZY);
+
+    // Hardened Runtime helpers found in libSystem/libpthread
+    g_macos_apis.pthread_jit_write_protect_np = dlsym(RTLD_DEFAULT, "pthread_jit_write_protect_np");
+    g_macos_apis.sys_icache_invalidate = dlsym(RTLD_DEFAULT, "sys_icache_invalidate");
+
     if (!cf || !sec) {
         INFIX_DEBUG_PRINTF("Warning: Could not dlopen macOS frameworks. JIT security features will be degraded.");
         if (cf)
             dlclose(cf);
         if (sec)
             dlclose(sec);
-        memset(&g_macos_apis, 0, sizeof(g_macos_apis));
         return;
     }
     g_macos_apis.CFRelease = dlsym(cf, "CFRelease");
@@ -130,6 +137,11 @@ static bool has_jit_entitlement(void) {
     // Use pthread_once to ensure the dynamic loading happens exactly once, thread-safely.
     static pthread_once_t init_once = PTHREAD_ONCE_INIT;
     pthread_once(&init_once, initialize_macos_apis);
+
+    // Secure JIT path on macOS requires both the entitlement check and the toggle API.
+    if (!g_macos_apis.pthread_jit_write_protect_np)
+        return false;
+
     if (!g_macos_apis.SecTaskCopyValueForEntitlement || !g_macos_apis.CFStringCreateWithCString)
         return false;
     bool result = false;
@@ -158,19 +170,37 @@ static bool has_jit_entitlement(void) {
 #if !defined(INFIX_OS_WINDOWS) && !defined(INFIX_OS_MACOS) && !defined(INFIX_OS_ANDROID) && !defined(INFIX_OS_OPENBSD)
 #include <fcntl.h>
 #include <stdint.h>
+#if defined(__linux__) && defined(_GNU_SOURCE)
+#include <sys/syscall.h>
+#endif
+
 /**
  * @internal
- * @brief Creates an anonymous, unlinked shared memory object for dual-mapping.
+ * @brief Creates an anonymous file descriptor suitable for dual-mapping.
  *
- * @details This is the core of the dual-mapping W^X strategy on platforms like Linux
- * and FreeBSD. It creates a temporary shared memory object using a randomized
- * name to avoid collisions, immediately unlinks it so it cannot be accessed by
- * other processes and is automatically cleaned up by the kernel on process exit,
- * and returns the file descriptor.
- *
- * @return A valid file descriptor on success, or -1 on failure.
+ * @details Attempts multiple strategies in order of preference:
+ * 1. `memfd_create`: Modern Linux (kernel 3.17+). Best for security (no filesystem path).
+ * 2. `shm_open(SHM_ANON)`: FreeBSD/DragonFly. Automatic anonymity.
+ * 3. `shm_open(random_name)`: Fallback for older Linux/POSIX. Manually unlinked immediately.
  */
-static int shm_open_anonymous() {
+static int create_anonymous_file(void) {
+#if defined(__linux__) && defined(MFD_CLOEXEC)
+    // Strategy 1: memfd_create (Linux 3.17+)
+    // MFD_CLOEXEC ensures the FD isn't leaked to child processes.
+    int linux_fd = memfd_create("infix_jit", MFD_CLOEXEC);
+    if (linux_fd >= 0)
+        return linux_fd;
+    // If it fails (e.g. old kernel, ENOSYS), fall through to shm_open.
+#endif
+
+#if defined(__FreeBSD__) && defined(SHM_ANON)
+    // Strategy 2: SHM_ANON (FreeBSD)
+    int bsd_fd = shm_open(SHM_ANON, O_RDWR | O_CREAT | O_EXCL, 0600);
+    if (bsd_fd >= 0)
+        return bsd_fd;
+#endif
+
+    // Strategy 3: shm_open with randomized name (Legacy POSIX)
     char shm_name[64];
     uint64_t random_val = 0;
     // Generate a sufficiently random name to avoid collisions if multiple processes
@@ -182,12 +212,12 @@ static int shm_open_anonymous() {
     close(rand_fd);
     if (bytes_read != sizeof(random_val))
         return -1;
+
     snprintf(shm_name, sizeof(shm_name), "/infix-jit-%d-%llx", getpid(), (unsigned long long)random_val);
     // Create the shared memory object exclusively.
     int fd = shm_open(shm_name, O_RDWR | O_CREAT | O_EXCL, 0600);
     if (fd >= 0) {
-        // Unlink immediately. The file descriptor remains valid, but the name is removed.
-        // This ensures the kernel will clean up the memory object when the last fd is closed.
+        // Unlink immediately. The name is removed, but the inode persists until close().
         shm_unlink(shm_name);
         return fd;
     }
@@ -241,6 +271,12 @@ c23_nodiscard infix_executable_t infix_executable_alloc(size_t size) {
         flags |= MAP_JIT;
 #endif  // INFIX_OS_MACOS
     code = mmap(nullptr, size, PROT_READ | PROT_WRITE, flags, -1, 0);
+#if defined(INFIX_OS_MACOS)
+    if (code != MAP_FAILED && g_use_secure_jit_path) {
+        // Switch thread to Write mode. enabled=0 means Write allowed.
+        g_macos_apis.pthread_jit_write_protect_np(0);
+    }
+#endif
 #endif  // MAP_ANON
     if (code == MAP_FAILED) {  // Fallback for older systems without MAP_ANON
         int fd = open("/dev/zero", O_RDWR);
@@ -257,10 +293,10 @@ c23_nodiscard infix_executable_t infix_executable_alloc(size_t size) {
     exec.rx_ptr = code;
 #else
     // Dual-mapping POSIX platforms (e.g., Linux, FreeBSD). Create two separate views of the same memory.
-    exec.shm_fd = shm_open_anonymous();
+    exec.shm_fd = create_anonymous_file();
     if (exec.shm_fd < 0) {
         _infix_set_system_error(
-            INFIX_CATEGORY_ALLOCATION, INFIX_CODE_EXECUTABLE_MEMORY_FAILURE, errno, "shm_open failed");
+            INFIX_CATEGORY_ALLOCATION, INFIX_CODE_EXECUTABLE_MEMORY_FAILURE, errno, "create_anonymous_file failed");
         return exec;
     }
     if (ftruncate(exec.shm_fd, size) != 0) {
@@ -322,12 +358,6 @@ void infix_executable_free(infix_executable_t exec) {
     // On macOS with MAP_JIT, the memory is managed with special thread-local permissions.
     // We only need to unmap the single mapping.
     if (exec.rw_ptr) {
-#if INFIX_MACOS_SECURE_JIT_AVAILABLE  // This macro is not yet defined, placeholder for future
-        // If using the secure path, we should toggle write protection back on.
-        static bool g_use_secure_jit_path = false;  // Re-check or use a shared flag
-        if (g_use_secure_jit_path)
-            pthread_jit_write_protect_np(true);
-#endif
         // Creating a guard page before unmapping is good practice.
         mprotect(exec.rw_ptr, exec.size, PROT_NONE);
         munmap(exec.rw_ptr, exec.size);
@@ -366,55 +396,73 @@ void infix_executable_free(infix_executable_t exec) {
  * @param exec The executable memory block.
  * @return `true` on success, `false` on failure.
  */
-c23_nodiscard bool infix_executable_make_executable(infix_executable_t exec) {
-    if (exec.rw_ptr == nullptr || exec.size == 0)
+c23_nodiscard bool infix_executable_make_executable(infix_executable_t * exec) {
+    if (exec->rw_ptr == nullptr || exec->size == 0)
         return false;
     // On AArch64 (and other RISC architectures), the instruction and data caches can be
     // separate. We must explicitly flush the D-cache (where the JIT wrote the code)
     // and invalidate the I-cache so the CPU fetches the new instructions.
-#if defined(INFIX_ARCH_AARCH64)
+    // We might as well do it on x64 too.
 #if defined(_MSC_VER)
     // Use the Windows-specific API.
-    FlushInstructionCache(GetCurrentProcess(), exec.rw_ptr, exec.size);
+    FlushInstructionCache(GetCurrentProcess(), exec->rw_ptr, exec->size);
+#elif defined(INFIX_OS_MACOS)
+    // Use the Apple-specific API if available (required for Apple Silicon correctness)
+    if (g_macos_apis.sys_icache_invalidate)
+        g_macos_apis.sys_icache_invalidate(exec->rw_ptr, exec->size);
+    else
+        __builtin___clear_cache((char *)exec->rw_ptr, (char *)exec->rw_ptr + exec->size);
 #else
     // Use the GCC/Clang built-in for other platforms.
-    __builtin___clear_cache((char *)exec.rw_ptr, (char *)exec.rw_ptr + exec.size);
-#endif
+    __builtin___clear_cache((char *)exec->rw_ptr, (char *)exec->rw_ptr + exec->size);
 #endif
     bool result = false;
 #if defined(INFIX_OS_WINDOWS)
     // Finalize permissions to Read+Execute.
-    result = VirtualProtect(exec.rw_ptr, exec.size, PAGE_EXECUTE_READ, &(DWORD){0});
+    result = VirtualProtect(exec->rw_ptr, exec->size, PAGE_EXECUTE_READ, &(DWORD){0});
     if (!result)
         _infix_set_system_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_PROTECTION_FAILURE, GetLastError(), nullptr);
 #elif defined(INFIX_OS_MACOS)
-#if INFIX_MACOS_SECURE_JIT_AVAILABLE  // Placeholder
     static bool g_use_secure_jit_path = false;
-    if (g_use_secure_jit_path) {
-        pthread_jit_write_protect_np(false);  // Make writable region executable.
+    static bool g_checked_jit_support = false;
+    if (!g_checked_jit_support) {
+        g_use_secure_jit_path = has_jit_entitlement();
+        g_checked_jit_support = true;
+    }
+
+    if (g_use_secure_jit_path && g_macos_apis.pthread_jit_write_protect_np) {
+        // Switch thread state to Execute allowed (enabled=1)
+        g_macos_apis.pthread_jit_write_protect_np(1);
         result = true;
     }
-    else
-#endif
-        // On macOS with the JIT entitlement, we don't use mprotect. Instead, we toggle
-        // a thread-local "write permission" state for all JIT memory. The memory is
-        // RX by default, and we temporarily make it RW for writing.
-        // However, the current logic does this change via `pthread_jit_write_protect_np`
-        // within the allocator itself. For now, this is a placeholder for that logic.
-        result = (mprotect(exec.rw_ptr, exec.size, PROT_READ | PROT_EXEC) == 0);
+    else {
+        result = (mprotect(exec->rw_ptr, exec->size, PROT_READ | PROT_EXEC) == 0);
+    }
     if (!result)
         _infix_set_system_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_PROTECTION_FAILURE, errno, nullptr);
 #elif defined(INFIX_OS_ANDROID) || defined(INFIX_OS_OPENBSD) || defined(INFIX_OS_DRAGONFLY)
     // Other single-mapping POSIX platforms use mprotect.
-    result = (mprotect(exec.rw_ptr, exec.size, PROT_READ | PROT_EXEC) == 0);
+    result = (mprotect(exec->rw_ptr, exec->size, PROT_READ | PROT_EXEC) == 0);
     if (!result)
         _infix_set_system_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_PROTECTION_FAILURE, errno, nullptr);
 #else
-    // On dual-mapping platforms, the RX mapping is already executable. This is a no-op.
-    result = true;
+    // Dual-mapping POSIX (Linux, FreeBSD).
+    // The RX mapping is already executable.
+    // SECURITY CRITICAL: We MUST unmap the RW view now. If we leave it mapped,
+    // an attacker with a heap disclosure could find it and overwrite the JIT code,
+    // bypassing W^X.
+    if (munmap(exec->rw_ptr, exec->size) == 0) {
+        exec->rw_ptr = nullptr;  // Clear the pointer to prevent double-free or misuse.
+        result = true;
+    }
+    else {
+        _infix_set_system_error(
+            INFIX_CATEGORY_ALLOCATION, INFIX_CODE_PROTECTION_FAILURE, errno, "munmap of RW view failed");
+        result = false;
+    }
 #endif
     if (result)
-        INFIX_DEBUG_PRINTF("Memory at %p is now executable.", exec.rx_ptr);
+        INFIX_DEBUG_PRINTF("Memory at %p is now executable.", exec->rx_ptr);
     return result;
 }
 // Public API: Protected (Read-Only) Memory

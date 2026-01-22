@@ -69,16 +69,16 @@ Properties:
 
 =over
 
-=item C<classification>, 
+=item * C<classification>, 
 
-=item C<contents>, The contents or references to the contents of the data
+=item * C<contents>, The contents or references to the contents of the data
 being described.
 
-=item C<governance>, Data Governance
+=item * C<governance>, Data Governance
 
-=item C<name>, The name of the data.
+=item * C<name>, The name of the data.
 
-=item C<sensitive_data>, A description of any sensitive data included.
+=item * C<sensitive_data>, A description of any sensitive data included.
 
 =back
 

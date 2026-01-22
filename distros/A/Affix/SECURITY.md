@@ -7,8 +7,8 @@ Until I have the version 1.0.0 release, I'll support only the last two minor ver
 | Version    | Supported          |
 | ---------- | ------------------ |
 | v1.0.x     | :white_check_mark: |
-| v1.0.3     | :white_check_mark: |
-| \<= v1.0.2 | :x:                |
+| v1.0.6     | :white_check_mark: |
+| \<= v1.0.5 | :x:                |
 
 # Reporting a Vulnerability
 

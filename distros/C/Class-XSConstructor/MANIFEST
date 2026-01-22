@@ -1,6 +1,7 @@
 COPYRIGHT
 CREDITS
 Changes
+Clone.xs
 INSTALL
 LICENSE
 MANIFEST
@@ -33,6 +34,7 @@ t/11weaken.t
 t/12aliases.t
 t/13slotinit.t
 t/14undeftolerant.t
+t/15cloneonwrite.t
 t/30buildargs.t
 t/31foreignconstructor.t
 t/32foreignbuildargs.t
@@ -43,4 +45,5 @@ t/97reader.t
 t/98delegation.t
 t/99destroy.t
 t/bug-moosex.t
+t/clone.t
 xshelper.h

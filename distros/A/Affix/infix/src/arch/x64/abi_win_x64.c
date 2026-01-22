@@ -31,10 +31,14 @@
  *
  * - **By-Reference Passing:** Aggregates (structs/unions) are passed by reference
  *   if their size is not a power of two (1, 2, 4, or 8 bytes), or if they have
- *   special constructors. This is much simpler than System V's classification.
+ *   special constructors.
+ *   **Crucially, all SIMD vectors > 16 bytes (__m256, __m512) are passed by reference.**
+ *   **__m128 (16 bytes) is passed by value in XMM.**
  *
- * - **Return Values:** Aggregates are returned in RAX if their size is 1, 2, 4, or 8 bytes.
- *   Otherwise, they are returned via a hidden pointer passed by the caller in RCX.
+ * - **Return Values:**
+ *   - Scalars and __m128 are returned in registers (RAX/XMM0).
+ *   - **__m256 and __m512 are returned in registers (YMM0/ZMM0).**
+ *   - Aggregates > 8 bytes (excluding vectors) are returned via a hidden pointer.
  * @endinternal
  */
 // This file performs many safe conversions from size_t to int32_t for instruction
@@ -131,23 +135,23 @@ const infix_direct_forward_abi_spec g_win_x64_direct_forward_spec = {
 
 /**
  * @internal
- * @brief Determines if a type is returned by value in RAX or via a hidden pointer.
- * @details On Windows x64, aggregates are returned by value in RAX only if their size is
- * 1, 2, 4, or 8 bytes. All other aggregates are returned by reference.
- * @param type The type to check.
- * @return `true` if the type is returned via a hidden pointer, `false` otherwise.
+ * @brief Determines if a type is returned by value in RAX/XMM0 or via a hidden pointer.
+ * @details On Windows x64:
+ * - Scalars and __m128 are returned in registers (RAX or XMM0).
+ * - **__m256 and __m512 are returned in registers (YMM0 or ZMM0).**
+ * - Aggregates > 8 bytes (excluding vectors) are returned via a hidden pointer.
  */
 static bool return_value_is_by_reference(const infix_type * type) {
     if (type->category == INFIX_TYPE_VECTOR) {
-#if defined(INFIX_COMPILER_GCC)
-        // GCC on Windows returns vectors larger than 16 bytes by reference.
-        return type->size > 16;
-#else
-        // MSVC and Clang-cl return vectors up to 32 bytes (256-bit) by value
-        // in YMM0. Larger vectors are returned by reference.
-        return type->size > 32;
+// Windows x64 ABI (MSVC) returns ALL vectors in registers (XMM0, YMM0, ZMM0).
+// However, MinGW (GCC on Windows) diverges for __m256 and __m512, returning them via hidden pointer.
+#if defined(__MINGW32__) || defined(__MINGW64__)
+        if (type->size > 16)
+            return true;
 #endif
+        return false;
     }
+
     if (type->category == INFIX_TYPE_STRUCT || type->category == INFIX_TYPE_UNION ||
         type->category == INFIX_TYPE_ARRAY || type->category == INFIX_TYPE_COMPLEX)
         return type->size != 1 && type->size != 2 && type->size != 4 && type->size != 8;
@@ -161,15 +165,10 @@ static bool return_value_is_by_reference(const infix_type * type) {
 /**
  * @internal
  * @brief Determines if a type must be passed by reference on the Windows x64 ABI.
- * @details The rule is that aggregates (and other non-primitive types) are passed by
- * reference if their size is not a power of two (1, 2, 4, or 8 bytes).
- *
- * Crucially, arrays passed as arguments in C decay to pointers. Therefore, `infix`
- * handles `INFIX_TYPE_ARRAY` by passing the pointer to the array data, treating
- * it as "by reference" in the sense that the register holds a pointer, not the value.
- *
- * @param type The type to check.
- * @return `true` if the type is passed by reference (or is an array), `false` otherwise.
+ * @details
+ * - Arrays are passed as pointers (C decay).
+ * - __m128, __m256, __m512 are ALL passed by reference (pointer).
+ * - Aggregates > 8 bytes or non-power-of-two size are passed by reference.
  */
 static bool is_passed_by_reference(const infix_type * type) {
     if (type == nullptr)
@@ -177,8 +176,15 @@ static bool is_passed_by_reference(const infix_type * type) {
     // Arrays passed as arguments decay to pointers. We must pass the address.
     if (type->category == INFIX_TYPE_ARRAY)
         return true;
+
+    // Windows x64 ABI:
+    // All vector types are passed by reference (pointer to memory) in standard calls.
+    if (type->category == INFIX_TYPE_VECTOR)
+        return true;
+
     return type->size != 1 && type->size != 2 && type->size != 4 && type->size != 8;
 }
+
 /**
  * @internal
  * @brief Stage 1 (Forward): Analyzes a signature and creates a call frame layout for Windows x64.
@@ -226,7 +232,10 @@ static infix_status prepare_forward_call_frame_win_x64(infix_arena_t * arena,
     layout->num_stack_args = 0;
     for (size_t i = 0; i < num_args; ++i) {
         infix_type * current_type = arg_types[i];
-        bool is_fp = is_float(current_type) || is_double(current_type) || current_type->category == INFIX_TYPE_VECTOR;
+        // Detect vectors as FP so they get XMM slots if passed by value (<=16 bytes).
+        bool is_fp = is_float(current_type) || is_double(current_type) || (current_type->category == INFIX_TYPE_VECTOR);
+        // as FP register args in the slot assignment logic
+        // (they go to GPR slots as pointers).
         bool is_ref = is_passed_by_reference(current_type);
         bool is_variadic_arg = (i >= num_fixed_args);
 
@@ -245,7 +254,7 @@ static infix_status prepare_forward_call_frame_win_x64(infix_arena_t * arena,
             layout->arg_locations[i].stack_offset = (uint32_t)current_stack_offset;
             layout->num_stack_args++;
             // Calculate space needed on the stack for this argument.
-            // By-reference types (including arrays) are just a pointer (8 bytes).
+            // By-reference types (including arrays/vectors) are just a pointer (8 bytes).
             size_t arg_stack_space = is_ref ? 8 : ((current_type->size + 7) & ~7);
             current_stack_offset += arg_stack_space;
             // Step 0: Make sure we aren't blowing ourselves up
@@ -274,12 +283,11 @@ static infix_status prepare_forward_call_frame_win_x64(infix_arena_t * arena,
  *          The generated assembly performs these steps:
  *          1.  `push rbp` / `mov rbp, rsp`: Creates a standard stack frame.
  *          2.  `push r12-r15`: Saves all callee-saved registers that the trampoline will
- *              use to hold its context (target function pointer, return buffer, args array).
- *          3.  `mov r12, rcx`, etc.: Moves the trampoline's own arguments (which arrive in
- *              RCX, RDX, R8) into the preserved registers (R12, R13, R14).
- *          4.  `sub rsp, imm32`: Allocates the required space on the stack. This allocation
- *              **must** include the 32-byte "shadow space" for the callee, in addition
- *              to space for any arguments passed on the stack.
+ *              use to hold its context.
+ *          3.  `and rsp, -16`: **Forces 16-byte stack alignment**. This is critical because
+ *              SIMD instructions in the target function may segfault if the stack is misaligned.
+ *          4.  `mov r12, rcx`, etc.: Moves the trampoline's own arguments into preserved registers.
+ *          5.  `sub rsp, imm32`: Allocates the required space on the stack.
  *
  * @param buf The code buffer to write the assembly into.
  * @param layout The call frame layout containing total stack allocation information.
@@ -293,6 +301,11 @@ static infix_status generate_forward_prologue_win_x64(code_buffer * buf, infix_c
     emit_push_reg(buf, R13_REG);  // push r13 (will hold return value pointer)
     emit_push_reg(buf, R14_REG);  // push r14 (will hold argument pointers array)
     emit_push_reg(buf, R15_REG);  // push r15 (will be a scratch register for data moves)
+
+    // FORCE 16-BYTE ALIGNMENT.
+    // AND RSP, -16 (48 83 E4 F0)
+    EMIT_BYTES(buf, 0x48, 0x83, 0xE4, 0xF0);
+
     // Move incoming trampoline arguments to non-volatile registers.
     if (layout->target_fn == nullptr) {           // Unbound: (target_fn, ret_ptr, args_ptr) in RCX, RDX, R8
         emit_mov_reg_reg(buf, R12_REG, RCX_REG);  // R12 = target function
@@ -347,7 +360,7 @@ static infix_status generate_forward_argument_moves_win_x64(code_buffer * buf,
         emit_mov_reg_mem(buf, R15_REG, R14_REG, (int32_t)(i * sizeof(void *)));
         if (loc->type == ARG_LOCATION_GPR) {
             if (is_passed_by_reference(current_type))
-                // For Arrays/By-Ref Structs: The data in R15 IS the pointer we want. Move it to destination.
+                // For Arrays/By-Ref Structs/Vectors: The data in R15 IS the pointer we want. Move it to destination.
                 emit_mov_reg_reg(buf, GPR_ARGS[loc->reg_index], R15_REG);
             else if (layout->is_variadic && is_variadic_arg && (is_float(current_type) || is_double(current_type))) {
                 // Variadic Rule: float/double are passed in both GPR and XMM.
@@ -441,14 +454,15 @@ static infix_status generate_forward_call_instruction_win_x64(code_buffer * buf,
  * @details This function emits the code to handle the function's return value and
  *          properly tear down the stack frame.
  *
- *          Key behaviors implemented:
- *          - **Return Value Handling:** After the native `call` returns, it copies the
- *            result from the return register (`RAX` for integers/pointers, `XMM0` for
- *            floats/doubles/vectors) into the user-provided return buffer.
- *          - **Stack Cleanup:** Deallocates the stack space reserved in the prologue.
- *          - **Register Restoration:** Restores the saved callee-saved registers (r12-r15)
- *            and the caller's base pointer (`rbp`).
- *          - **Return:** Executes a `ret` instruction.
+ *          Since the prologue used `AND RSP, -16`, we cannot restore `RSP` by simply adding
+ *          to it. Instead, we use `LEA RSP, [RBP - 32]` to restore `RSP` to point exactly
+ *          to where the saved registers (R12-R15) are stored.
+ *          Offset calculation: RBP is pushed, then R12, R13, R14, R15.
+ *          RBP points to saved RBP.
+ *          R12 @ RBP-8
+ *          R13 @ RBP-16
+ *          R14 @ RBP-24
+ *          R15 @ RBP-32
  *
  * @param buf The code buffer.
  * @param layout The call frame layout.
@@ -470,6 +484,8 @@ static infix_status generate_forward_epilogue_win_x64(code_buffer * buf,
             emit_movups_mem_xmm(buf, R13_REG, 0, XMM0_REG);
         else if (ret_type->size == 32 && ret_type->category == INFIX_TYPE_VECTOR)
             emit_vmovupd_mem_ymm(buf, R13_REG, 0, XMM0_REG);
+        else if (ret_type->size == 64 && ret_type->category == INFIX_TYPE_VECTOR)
+            emit_vmovupd_mem_zmm(buf, R13_REG, 0, XMM0_REG);
         else {
             // All other by-value types are returned in RAX. Use a size-appropriate store.
             switch (ret_type->size) {
@@ -490,9 +506,11 @@ static infix_status generate_forward_epilogue_win_x64(code_buffer * buf,
             }
         }
     }
-    // Deallocate stack space.
-    if (layout->total_stack_alloc > 0)
-        emit_add_reg_imm32(buf, RSP_REG, layout->total_stack_alloc);
+    // Restore stack pointer to the saved registers area.
+    // 4 registers pushed (R12, R13, R14, R15) relative to RBP.
+    // LEA RSP, [RBP - 32]
+    emit_lea_reg_mem(buf, RSP_REG, RBP_REG, -32);
+
     // Restore callee-saved registers and return.
     emit_pop_reg(buf, R15_REG);
     emit_pop_reg(buf, R14_REG);
@@ -562,7 +580,10 @@ static infix_status prepare_reverse_call_frame_win_x64(infix_arena_t * arena,
     layout->gpr_save_area_offset = layout->return_buffer_offset + return_size;
     layout->xmm_save_area_offset = layout->gpr_save_area_offset + gpr_reg_save_area_size;
     layout->args_array_offset = layout->xmm_save_area_offset + xmm_reg_save_area_size;
-    layout->saved_args_offset = layout->args_array_offset + args_array_size;
+
+    // Ensure 16-byte alignment for the saved arguments area.
+    layout->saved_args_offset = (layout->args_array_offset + args_array_size + 15) & ~15;
+
     *out_layout = layout;
     return INFIX_SUCCESS;
 }
@@ -573,7 +594,8 @@ static infix_status prepare_reverse_call_frame_win_x64(infix_arena_t * arena,
  *          1. Creating a standard stack frame (`push rbp; mov rbp, rsp`).
  *          2. Saving any non-volatile registers that the stub will use as scratch space
  *             (RSI and RDI in this implementation).
- *          3. Allocating all necessary local stack space for the stub's internal
+ *          3. **Forcing stack alignment** (`and rsp, -16`).
+ *          4. Allocating all necessary local stack space for the stub's internal
  *             data structures, as calculated in the `prepare` stage.
  *
  * @param buf The code buffer to write the assembly into.
@@ -587,6 +609,11 @@ static infix_status generate_reverse_prologue_win_x64(code_buffer * buf, infix_r
     // Save callee-saved registers that we might use as scratch registers.
     emit_push_reg(buf, RSI_REG);
     emit_push_reg(buf, RDI_REG);
+
+    // FORCE 16-BYTE ALIGNMENT.
+    // AND RSP, -16 (48 83 E4 F0)
+    EMIT_BYTES(buf, 0x48, 0x83, 0xE4, 0xF0);
+
     // Allocate all local stack space calculated in the prepare stage. This includes
     // space for register save areas, the return buffer, args_array, and shadow space.
     if (layout->total_stack_alloc > 0)
@@ -635,7 +662,8 @@ static infix_status generate_reverse_argument_marshalling_win_x64(code_buffer * 
     size_t stack_slot_offset = 0;  // Tracks arguments on the caller's stack.
     for (size_t i = 0; i < context->num_args; i++) {
         infix_type * current_type = context->arg_types[i];
-        bool is_fp = is_float(current_type) || is_double(current_type);
+        bool is_fp = is_float(current_type) || is_double(current_type) ||
+            (current_type->category == INFIX_TYPE_VECTOR && current_type->size <= 16);
         bool passed_by_ref = is_passed_by_reference(current_type);
         size_t arg_pos = i + arg_pos_offset;
         bool is_variadic_arg = (i >= context->num_fixed_args);
@@ -726,19 +754,9 @@ static infix_status generate_reverse_dispatcher_call_win_x64(code_buffer * buf,
  *          the stub's local stack and places it into the correct native return register
  *          (`RAX` or `XMM0`) as required by the Windows x64 ABI.
  *
- *          This function correctly handles the rules for returning values:
- *          - **By-Reference Returns:** For large aggregates, the original caller passes a
- *            hidden pointer in `RCX`. The ABI requires the callback to return this same
- *            pointer in `RAX`. This function emits code to load the saved pointer
- *            (from the GPR save area) into `RAX`.
- *          - **By-Value Returns:** For values returned directly in registers, this
- *            function emits the correct `mov` instructions to load the data from
- *            the stack buffer into either `RAX` (for integers/pointers/small structs)
- *            or `XMM0` (for floats/doubles/vectors), respecting compiler-specific
- *            rules for types like `__int128_t`.
+ *          It then restores the stack pointer using `LEA RSP, [RBP - 16]` to undo the
+ *          dynamic alignment performed in the prologue, restores saved registers, and returns.
  *
- *          Finally, it emits the standard function epilogue to deallocate the stack frame,
- *          restore the caller's saved registers, and return control to the native caller.
  * @param buf The code buffer.
  * @param layout The blueprint containing stack offsets.
  * @param context The context containing the return type information.
@@ -761,8 +779,14 @@ static infix_status generate_reverse_epilogue_win_x64(code_buffer * buf,
                 emit_movups_xmm_mem(buf, XMM0_REG, RSP_REG, layout->return_buffer_offset);
             else
 #endif
-                if (context->return_type->category == INFIX_TYPE_VECTOR && context->return_type->size == 32)
-                emit_vmovupd_ymm_mem(buf, XMM0_REG, RSP_REG, layout->return_buffer_offset);
+                if (context->return_type->category == INFIX_TYPE_VECTOR) {
+                if (context->return_type->size == 64)
+                    emit_vmovupd_zmm_mem(buf, XMM0_REG, RSP_REG, layout->return_buffer_offset);
+                else if (context->return_type->size == 32)
+                    emit_vmovupd_ymm_mem(buf, XMM0_REG, RSP_REG, layout->return_buffer_offset);
+                else  // size 16
+                    emit_movups_xmm_mem(buf, XMM0_REG, RSP_REG, layout->return_buffer_offset);
+            }
             else if (is_float(context->return_type))
                 emit_movss_xmm_mem(buf, XMM0_REG, RSP_REG, layout->return_buffer_offset);
             else if (is_double(context->return_type))
@@ -772,8 +796,11 @@ static infix_status generate_reverse_epilogue_win_x64(code_buffer * buf,
                 emit_mov_reg_mem(buf, RAX_REG, RSP_REG, layout->return_buffer_offset);
         }
     }
-    // Epilogue: deallocate stack and restore non-volatile registers.
-    emit_add_reg_imm32(buf, RSP_REG, layout->total_stack_alloc);
+    // Restore stack pointer to the saved registers area.
+    // 2 registers pushed (RSI, RDI) = 16 bytes.
+    // LEA RSP, [RBP - 16]
+    emit_lea_reg_mem(buf, RSP_REG, RBP_REG, -16);
+
     emit_pop_reg(buf, RDI_REG);
     emit_pop_reg(buf, RSI_REG);
     emit_pop_reg(buf, RBP_REG);
@@ -900,6 +927,8 @@ static infix_status prepare_direct_forward_call_frame_win_x64(infix_arena_t * ar
  * @details Establishes a stack frame, saves callee-saved registers (R12-R15) for context,
  * moves the direct CIF arguments (`ret_ptr`, `lang_args`) into them, and allocates all
  * stack space required for outgoing arguments, shadow space, and local marshalling buffers.
+ *
+ * This version uses **forced 16-byte stack alignment** via `AND RSP, -16`.
  */
 static infix_status generate_direct_forward_prologue_win_x64(code_buffer * buf,
                                                              infix_direct_call_frame_layout * layout) {
@@ -910,6 +939,10 @@ static infix_status generate_direct_forward_prologue_win_x64(code_buffer * buf,
     emit_push_reg(buf, R13_REG);  // Will hold return value pointer
     emit_push_reg(buf, R14_REG);  // Will hold language objects array pointer
     emit_push_reg(buf, R15_REG);  // Will hold target function address
+
+    // FORCE 16-BYTE ALIGNMENT.
+    // AND RSP, -16 (48 83 E4 F0)
+    EMIT_BYTES(buf, 0x48, 0x83, 0xE4, 0xF0);
 
     // The direct CIF is called with (ret_ptr, lang_args) in RCX, RDX.
     emit_mov_reg_reg(buf, R13_REG, RCX_REG);  // r13 = ret_ptr
@@ -1044,6 +1077,8 @@ static infix_status generate_direct_forward_call_instruction_win_x64(code_buffer
 /**
  * @internal
  * @brief Stage 4 (Direct): Generates the epilogue, including write-back calls.
+ *
+ * Uses `LEA RSP, [RBP - 32]` to safely restore the stack pointer.
  */
 static infix_status generate_direct_forward_epilogue_win_x64(code_buffer * buf,
                                                              infix_direct_call_frame_layout * layout,
@@ -1060,6 +1095,8 @@ static infix_status generate_direct_forward_epilogue_win_x64(code_buffer * buf,
             emit_movups_mem_xmm(buf, R13_REG, 0, XMM0_REG);
         else if (ret_type->size == 32 && ret_type->category == INFIX_TYPE_VECTOR)
             emit_vmovupd_mem_ymm(buf, R13_REG, 0, XMM0_REG);
+        else if (ret_type->size == 64 && ret_type->category == INFIX_TYPE_VECTOR)
+            emit_vmovupd_mem_zmm(buf, R13_REG, 0, XMM0_REG);
         else {
             // All other by-value types are returned in RAX. Use a size-appropriate store.
             switch (ret_type->size) {
@@ -1105,9 +1142,11 @@ static infix_status generate_direct_forward_epilogue_win_x64(code_buffer * buf,
         }
     }
 
-    // 3. Standard Epilogue
-    if (layout->total_stack_alloc > 0)
-        emit_add_reg_imm32(buf, RSP_REG, layout->total_stack_alloc);
+    // 3. Safe Epilogue
+    // Restore stack pointer to the saved registers area.
+    // 4 registers pushed (R12, R13, R14, R15) = 32 bytes.
+    // LEA RSP, [RBP - 32]
+    emit_lea_reg_mem(buf, RSP_REG, RBP_REG, -32);
 
     emit_pop_reg(buf, R15_REG);
     emit_pop_reg(buf, R14_REG);

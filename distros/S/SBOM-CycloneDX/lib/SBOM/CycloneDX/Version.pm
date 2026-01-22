@@ -75,14 +75,14 @@ Properties:
 
 =over
 
-=item C<range>, A version range specified in Package URL Version Range
+=item * C<range>, A version range specified in Package URL Version Range
 syntax (vers) which is defined at
 L<https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst>
 
-=item C<status>, The vulnerability status for the version or range of
+=item * C<status>, The vulnerability status for the version or range of
 versions.
 
-=item C<version>, A single version of a component or service.
+=item * C<version>, A single version of a component or service.
 
 =back
 

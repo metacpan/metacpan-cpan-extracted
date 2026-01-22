@@ -7,7 +7,7 @@ package Class::XSReader;
 
 BEGIN {
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.022002';
+	our $VERSION   = '0.023001';
 	
 	if ( eval { require Types::Standard; 1 } ) {
 		Types::Standard->import(
@@ -87,13 +87,14 @@ sub import {
 			}
 		}
 		
-		my @unknown_keys = grep !/\A(isa|required|is|lazy|default|builder|coerce|init_arg|trigger|weak_ref|alias|slot_initializer|undef_tolerant|reader)\z/, keys %spec;
+		my @unknown_keys = grep !/\A(isa|required|is|lazy|default|builder|coerce|init_arg|trigger|weak_ref|alias|slot_initializer|undef_tolerant|reader|clone|clone_on_write|clone_on_read)\z/, keys %spec;
 		if ( @unknown_keys ) {
 			_croak("Unknown keys in spec: %s", join ", ", sort @unknown_keys);
 		}
 		
 		my $has_default = ( exists $spec{default} or defined $spec{builder} ) ? !!$spec{lazy} : 0;
 		my $has_type    = exists $spec{isa};
+		my $clone       = ( $spec{clone_on_read} or $spec{clone} );
 		
 		my @XS_args = (
 			sprintf( '%s::%s', $package, exists($spec{reader}) ? $spec{reader} : $slot ),
@@ -104,6 +105,7 @@ sub import {
 			$has_type ? Class::XSConstructor::_type_to_number( $type ) : 15,
 			$has_type ? $spec{isa} : undef,
 			$has_type ? $spec{coerce} : undef,
+			$clone ? $clone : undef,
 		);
 		
 		if (our $REDEFINE) {
@@ -181,6 +183,9 @@ Builders can be used:
   sub _build_full_name ( $self ) {
     return sprintf( '%s %s', $self->first_name, $self->last_name );
   }
+
+There is also a C<clone_on_read> option as a counterpart to
+Class::XSConstructor's C<clone_on_write>.
 
 =head1 SEE ALSO
 

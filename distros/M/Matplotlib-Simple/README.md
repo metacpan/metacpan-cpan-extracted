@@ -19,7 +19,7 @@ Simplest use case:
 	   }
     });
 
-A nore complete (and slightly faster execution):
+A more complete (and slightly faster execution):
 
     use Matplotlib::Simple;
     plt({

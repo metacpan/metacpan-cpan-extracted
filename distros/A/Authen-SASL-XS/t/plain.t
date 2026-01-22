@@ -1,7 +1,9 @@
 
 use strict;
 use Authen::SASL qw(XS); # Only use XS plugin
-use Test::Simple tests => 5;
+use Test::Simple tests => 6;
+
+ok( $ENV{USER}, '$ENV{USER} must be defined for the following tests' );
 
 our $me;
 require "t/common.pl";
@@ -50,7 +52,11 @@ sleep(1);
 		print "Server: Test successful Negotiation succeeded.\n";
 	} else {
 		ok(0);
-		print "Server: Negotiation failed.\n",$conn->error(),"\n";
+		my @error = $conn->error();
+ 		print STDERR "Server: Negotiation failed.\n";
+		foreach (@error) {
+			print STDERR "    $_\n";
+		}
 	}
 
 	close FROM_CLIENT;
@@ -82,7 +88,11 @@ sleep(1);
 	if ($conn->code == 0) {
 		print "Client: Negotiation succeeded.\n";
 	} else { 
-		print "Client: Negotiation failed.\n",$conn->error,"\n";
+		my @error = $conn->error();
+ 		print STDERR "Client: Negotiation failed.\n";
+		foreach (@error) {
+			print STDERR "    $_\n";
+		}
 	}
 	
 	close FROM_PARENT;

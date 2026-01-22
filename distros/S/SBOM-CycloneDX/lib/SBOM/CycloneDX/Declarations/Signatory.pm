@@ -81,18 +81,18 @@ Properties:
 
 =over
 
-=item C<external_reference>, External references provide a way to document
+=item * C<external_reference>, External references provide a way to document
 systems, sites, and information that may be relevant but are not included
 with the BOM. They may also establish specific relationships within or
 external to the BOM.
 
-=item C<name>, The signatory's name.
+=item * C<name>, The signatory's name.
 
-=item C<organization>, The signatory's organization.
+=item * C<organization>, The signatory's organization.
 
-=item C<role>, The signatory's role within an organization.
+=item * C<role>, The signatory's role within an organization.
 
-=item C<signature>, Enveloped signature in JSON Signature Format (JSF)
+=item * C<signature>, Enveloped signature in JSON Signature Format (JSF)
 (L<https://cyberphone.github.io/doc/security/jsf.html>).
 
 =back

@@ -98,15 +98,15 @@ Properties:
 
 =over
 
-=item C<bom_ref>, An identifier which can be used to reference the
+=item * C<bom_ref>, An identifier which can be used to reference the
 formula elsewhere in the BOM. Every bom-ref must be unique within the BOM.
 Value SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid
 conflicts with BOM-Links.
 
-=item C<components>, Transient components that are used in tasks that
+=item * C<components>, Transient components that are used in tasks that
 constitute one or more of this formula's workflows
 
-=item C<properties>, Provides the ability to document properties in a
+=item * C<properties>, Provides the ability to document properties in a
 name-value store. This provides flexibility to include data not officially
 supported in the standard without having to use additional namespaces or
 create extensions. Unlike key-value stores, properties support duplicate
@@ -115,10 +115,10 @@ to the general public are encouraged to be registered in the CycloneDX
 Property Taxonomy (L<https://github.com/CycloneDX/cyclonedx-property-taxonomy>).
 Formal registration is optional.
 
-=item C<services>, Transient services that are used in tasks that
+=item * C<services>, Transient services that are used in tasks that
 constitute one or more of this formula's workflows
 
-=item C<workflows>, List of workflows that can be declared to accomplish
+=item * C<workflows>, List of workflows that can be declared to accomplish
 specific orchestrated goals and independently triggered.
 
 =back

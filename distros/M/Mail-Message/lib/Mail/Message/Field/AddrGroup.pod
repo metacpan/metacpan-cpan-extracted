@@ -212,8 +212,6 @@ stored in a hash, so have an unpredictable order by default.
 
 =head2 Error handling
 
-=encoding utf8
-
 =head1 DIAGNOSTICS
 
 =over 4
@@ -244,7 +242,7 @@ Cast by C<renameRole()>
 
 Cast by C<renameRole()>
 
-=item Error: nvalid collection $name.
+=item Error: invalid collection $name.
 
 The collection with C<$name> does not exist and can not be created.
 Cast by C<add()>
@@ -263,14 +261,14 @@ Cast by C<addRole()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.01,
-built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.02,
+built on January 22, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2001-2025 by Mark Overmeer.
+This software is copyright (c) 2001-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

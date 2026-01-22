@@ -83,18 +83,18 @@ Properties:
 
 =over
 
-=item C<bom_ref>, An identifier which can be used to reference the
+=item * C<bom_ref>, An identifier which can be used to reference the
 model card elsewhere in the BOM. Every bom-ref must be unique within the
 BOM.
 Value SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid
 conflicts with BOM-Links.
 
-=item C<considerations>, What considerations should be taken into account
+=item * C<considerations>, What considerations should be taken into account
 regarding the model's construction, training, and application?
 
-=item C<model_parameters>, Hyper-parameters for construction of the model.
+=item * C<model_parameters>, Hyper-parameters for construction of the model.
 
-=item C<properties>, Provides the ability to document properties in a
+=item * C<properties>, Provides the ability to document properties in a
 name-value store. This provides flexibility to include data not officially
 supported in the standard without having to use additional namespaces or
 create extensions. Unlike key-value stores, properties support duplicate
@@ -103,7 +103,7 @@ to the general public are encouraged to be registered in the CycloneDX
 Property Taxonomy (L<https://github.com/CycloneDX/cyclonedx-property-taxonomy>).
 Formal registration is optional.
 
-=item C<quantitative_analysis>, A quantitative analysis of the model
+=item * C<quantitative_analysis>, A quantitative analysis of the model
 
 =back
 

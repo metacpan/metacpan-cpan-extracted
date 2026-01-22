@@ -8,6 +8,7 @@ Files: Changes
  META.yml
  doap.ttl
  t/13slotinit.t
+ t/15cloneonwrite.t
  t/30buildargs.t
  t/31foreignconstructor.t
  t/32foreignbuildargs.t
@@ -18,10 +19,12 @@ Files: Changes
  t/98delegation.t
  t/99destroy.t
  t/bug-moosex.t
+ t/clone.t
 Copyright: Copyright 2026 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: INSTALL
+Files: Clone.xs
+ INSTALL
  LICENSE
  Makefile.PL
  XSConstructor.xs
@@ -66,16 +69,16 @@ Files: README
 Copyright: This software is copyright (c) 2018-2019, 2025-2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: dist.ini
-Copyright: Copyright 2018 Toby Inkster.
+Files: t/03typenano.t
+Copyright: This software is copyright (c) 2019 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/Class/XSDestructor.pm
 Copyright: This software is copyright (c) 2025-2026 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/03typenano.t
-Copyright: This software is copyright (c) 2019 by Toby Inkster.
+Files: dist.ini
+Copyright: Copyright 2018 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

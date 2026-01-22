@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '6.30'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,5 +22,9 @@ requires:
   POSIX: '0'
   Socket: '0'
   Time::HiRes: '0'
-version: '2.014'
+resources:
+  bugtracker: https://github.com/rhandom/perl-net-server/issues
+  homepage: https://github.com/rhandom/perl-net-server
+  repository: https://github.com/rhandom/perl-net-server
+version: '2.015'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

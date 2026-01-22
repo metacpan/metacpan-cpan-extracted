@@ -3,6 +3,26 @@ Upstream-Name: Marlin
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Marlin
 
+Files: INSTALL
+ LICENSE
+ Makefile.PL
+ examples/benchmark.pl
+ examples/can_haz_xs.pl
+ examples/lib/Local/Example/Core.pm
+ examples/lib/Local/Example/Marlin.pm
+ examples/lib/Local/Example/Moo.pm
+ examples/lib/Local/Example/Moose.pm
+ examples/lib/Local/Example/Mouse.pm
+ examples/lib/Local/Example/Plain.pm
+ examples/lib/Local/Example/Tiny.pm
+ examples/lib/Local/Example/Venus.pm
+ examples/peek_at_delegations.pl
+ examples/test.pl
+ t/.mite/config
+ t/integration/pad-inherit.skip
+Copyright: Unknown
+License: Unknown
+
 Files: Changes
  META.json
  META.yml
@@ -22,25 +42,6 @@ Files: Changes
  t/lib/Local/Mitey/Mite.pm
 Copyright: Copyright 2026 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
-
-Files: INSTALL
- LICENSE
- Makefile.PL
- examples/benchmark.pl
- examples/can_haz_xs.pl
- examples/lib/Local/Example/Core.pm
- examples/lib/Local/Example/Marlin.pm
- examples/lib/Local/Example/Moo.pm
- examples/lib/Local/Example/Moose.pm
- examples/lib/Local/Example/Mouse.pm
- examples/lib/Local/Example/Plain.pm
- examples/lib/Local/Example/Tiny.pm
- examples/peek_at_delegations.pl
- examples/test.pl
- t/.mite/config
- t/integration/pad-inherit.skip
-Copyright: Unknown
-License: Unknown
 
 Files: t/00start.t
  t/01basic.t

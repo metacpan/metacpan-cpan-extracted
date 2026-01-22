@@ -5,8 +5,8 @@ use strict;
 use warnings;
 use utf8;
 
-use SBOM::CycloneDX::List;
 use SBOM::CycloneDX::Enum;
+use SBOM::CycloneDX::List;
 
 use Types::Standard qw(Str Enum InstanceOf);
 use Types::TypeTiny qw(ArrayLike);
@@ -16,9 +16,11 @@ use namespace::autoclean;
 
 extends 'SBOM::CycloneDX::Base';
 
-has url     => (is => 'rw', isa => Str, required => 1);
+has url => (is => 'rw', isa => Str, required => 1);
+
 has comment => (is => 'rw', isa => Str);
-has type    => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->EXTERNAL_REFERENCE_TYPES()], required => 1);
+
+has type => (is => 'rw', isa => Enum [SBOM::CycloneDX::Enum->values('EXTERNAL_REFERENCE_TYPE')], required => 1);
 
 has hashes => (
     is      => 'rw',
@@ -79,9 +81,9 @@ Properties:
 
 =over
 
-=item C<comment>, A comment describing the external reference
+=item * C<comment>, A comment describing the external reference
 
-=item C<hashes>, The hashes of the external reference (if applicable).
+=item * C<hashes>, The hashes of the external reference (if applicable).
 
 =item * C<properties>, Provides the ability to document properties in a name-value
 store. This provides flexibility to include data not officially supported in the
@@ -91,9 +93,9 @@ having different values. Property names of interest to the general public are
 encouraged to be registered in the CycloneDX Property Taxonomy. Formal
 registration is optional. See L<SBOM::CycloneDX::Property>
 
-=item C<type>, Specifies the type of external reference.
+=item * C<type>, Specifies the type of external reference.
 
-=item C<url>, The URI (URL or URN) to the external reference. External
+=item * C<url>, The URI (URL or URN) to the external reference. External
 references are URIs and therefore can accept any URL scheme including https
 (RFC-7230 - L<https://www.ietf.org/rfc/rfc7230.txt>), mailto
 (RFC-2368 - L<https://www.ietf.org/rfc/rfc2368.txt>), tel

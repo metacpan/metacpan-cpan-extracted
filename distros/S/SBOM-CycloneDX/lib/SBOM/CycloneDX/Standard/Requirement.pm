@@ -98,34 +98,34 @@ Properties:
 
 =over
 
-=item C<bom_ref>, An identifier which can be used to reference the
+=item * C<bom_ref>, An identifier which can be used to reference the
 object elsewhere in the BOM. Every bom-ref must be unique within the BOM.
 
-=item C<descriptions>, The supplemental text that provides additional
+=item * C<descriptions>, The supplemental text that provides additional
 guidance or context to the requirement, but is not directly part of the
 requirement.
 
-=item C<external_references>, External references provide a way to document
+=item * C<external_references>, External references provide a way to document
 systems, sites, and information that may be relevant, but are not included
 with the BOM. They may also establish specific relationships within or
 external to the BOM.
 
-=item C<identifier>, The unique identifier used in the standard to identify
+=item * C<identifier>, The unique identifier used in the standard to identify
 a specific requirement. This should match what is in the standard and
 should not be the requirements bom-ref.
 
-=item C<open_cre>, The Common Requirements Enumeration (CRE) identifier(s).
+=item * C<open_cre>, The Common Requirements Enumeration (CRE) identifier(s).
 CRE is a structured and standardized framework for uniting security
 standards and guidelines. CRE links each section of a resource to a shared
 topic identifier (a Common Requirement). Through this shared topic link,
 all resources map to each other. Use of CRE promotes clear and unambiguous
 communication among stakeholders.
 
-=item C<parent>, The optional `bom-ref` to a parent requirement. This
+=item * C<parent>, The optional `bom-ref` to a parent requirement. This
 establishes a hierarchy of requirements. Top-level requirements must not
 define a parent. Only child requirements should define parents.
 
-=item C<properties>, Provides the ability to document properties in a
+=item * C<properties>, Provides the ability to document properties in a
 name-value store. This provides flexibility to include data not officially
 supported in the standard without having to use additional namespaces or
 create extensions. Unlike key-value stores, properties support duplicate
@@ -135,9 +135,9 @@ Property
 Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal
 registration is optional.
 
-=item C<text>, The textual content of the requirement.
+=item * C<text>, The textual content of the requirement.
 
-=item C<title>, The title of the requirement.
+=item * C<title>, The title of the requirement.
 
 =back
 

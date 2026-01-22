@@ -20,6 +20,41 @@ To install this module, run the following commands:
     make test
     make install
 
+INTEGRATION WITH RESULT CLASSES
+
+To enable asynchronous row-level methods (update and delete), you must load the
+Async::ResultComponent in your specific Result classes. This allows row objects
+to intercept standard blocking calls and reroute them to the background worker.
+
+Configuration:
+
+    In each of your Result files (e.g., My/Schema/Result/User.pm):
+
+    package My::Schema::Result::User;
+    use base 'DBIx::Class::Core';
+
+    # Load Async::ResultComponent before Core
+    __PACKAGE__->load_components(qw/Async::ResultComponent Core/);
+
+    __PACKAGE__->table('users');
+
+IMPORTANT: Return Values (Futures)
+
+    Unlike standard DBIx::Class, row-level update and delete methods now
+    return a Future. You must use asynchronous chaining:
+
+    $row->update({ name => 'New Name' })->then(sub {
+        my $updated_row = shift;
+        say "Update complete!";
+    });
+
+Why this is necessary?
+
+    Standard DBIx::Class::Row methods are blocking. This component ensures
+    that row-level I/O does not stall your IO::Async event loop. It provides
+    zero-config identity mapping, automatically handling simple or composite
+    primary keys to target the correct database record.
+
 SUPPORT AND DOCUMENTATION
 
 After installing,  you  can  find  documentation for this module with the perldoc

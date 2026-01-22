@@ -1,5 +1,6 @@
 Build.PL
 CODE_OF_CONDUCT.md
+CONTRIBUTING.md
 Changes.md
 LICENSE
 MANIFEST
@@ -77,6 +78,8 @@ t/022_stringlist.t
 t/023_sockaddr.t
 t/024_buffer.t
 t/025_affix_wrap.t
+t/026_context.t
+t/027_thread_safety.t
 t/040_error.t
 t/900_leak.t
 t/src/std.h

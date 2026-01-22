@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
-license: perl
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -33,7 +33,7 @@ requires:
   perl: '5.020'
 resources:
   homepage: https://sourceforge.net/projects/suffit/
-  license: https://dev.perl.org/licenses
+  license: https://opensource.org/license/artistic-2-0
   repository: https://abalama@git.code.sf.net/p/suffit/code
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -63,12 +63,12 @@ Properties:
 
 =over
 
-=item C<diff>, The patch file (or diff) that shows changes. Refer to
+=item * C<diff>, The patch file (or diff) that shows changes. Refer to
 L<https://en.wikipedia.org/wiki/Diff>
 
-=item C<resolves>, A collection of issues the patch resolves
+=item * C<resolves>, A collection of issues the patch resolves
 
-=item C<type>, Specifies the purpose for the patch including the resolution
+=item * C<type>, Specifies the purpose for the patch including the resolution
 of defects, security issues, or new behavior or functionality.
 
 =back

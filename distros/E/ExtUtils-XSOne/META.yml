@@ -1,0 +1,29 @@
+---
+abstract: 'Combine multiple XS files into a single shared library'
+author:
+  - 'LNATION <email@lnation.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ExtUtils-XSOne
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Basename: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  perl: '5.008003'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

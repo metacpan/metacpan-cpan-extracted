@@ -11,11 +11,11 @@ DBIx::Class::Async::ResultSet::Pager - Asynchronous pagination handling for Asyn
 
 =head1 VERSION
 
-Version 0.41
+Version 0.43
 
 =cut
 
-our $VERSION = '0.41';
+our $VERSION = '0.43';
 
 =head1 SYNOPSIS
 

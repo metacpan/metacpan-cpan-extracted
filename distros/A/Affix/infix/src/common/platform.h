@@ -29,11 +29,11 @@
 #include <stdbool.h>
 #if defined(INFIX_ARCH_X64)
 /** @internal @brief Checks if the CPU supports the AVX2 instruction set at runtime. */
-c23_nodiscard bool infix_cpu_has_avx2(void);
+INFIX_INTERNAL c23_nodiscard bool infix_cpu_has_avx2(void);
 /** @internal @brief Checks if the CPU supports the AVX-512F (Foundation) instruction set at runtime. */
-c23_nodiscard bool infix_cpu_has_avx512f(void);
+INFIX_INTERNAL c23_nodiscard bool infix_cpu_has_avx512f(void);
 #endif
 #if defined(INFIX_ARCH_AARCH64)
 /** @internal @brief Checks if the CPU supports the SVE (Scalable Vector Extension) at runtime. */
-c23_nodiscard bool infix_cpu_has_sve(void);
+INFIX_INTERNAL c23_nodiscard bool infix_cpu_has_sve(void);
 #endif

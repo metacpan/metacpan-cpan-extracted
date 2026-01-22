@@ -93,6 +93,53 @@ static _infix_registry_entry_t * _registry_lookup(infix_registry_t * registry, c
             return current;
     return nullptr;
 }
+
+/**
+ * @internal
+ * @brief Expands the registry's hash table and redistributes existing entries.
+ * @details This is triggered when the load factor exceeds 0.75 to maintain O(1) lookup performance.
+ *          The new bucket array is allocated from the registry's arena.
+ */
+static void _registry_rehash(infix_registry_t * registry) {
+    // Roughly double the size. Keep it odd to slightly help with distribution.
+    size_t new_num_buckets = registry->num_buckets * 2 + 1;
+
+    // Allocate new buckets from the arena.
+    // Note: The old bucket array remains allocated in the arena (leak within arena),
+    // but this is an acceptable trade-off for the simplicity of arena management
+    // and the fact that registries usually grow during initialization and persist.
+    _infix_registry_entry_t ** new_buckets = infix_arena_calloc(
+        registry->arena, new_num_buckets, sizeof(_infix_registry_entry_t *), _Alignof(_infix_registry_entry_t *));
+
+    if (!new_buckets) {
+        // If allocation fails, we simply return and continue using the existing buckets.
+        // Performance will degrade, but correctness is preserved.
+        return;
+    }
+
+    // Rehash all existing entries.
+    for (size_t i = 0; i < registry->num_buckets; ++i) {
+        _infix_registry_entry_t * entry = registry->buckets[i];
+        while (entry) {
+            _infix_registry_entry_t * next_entry = entry->next;  // Save next pointer
+
+            // Calculate new index
+            uint64_t hash = _registry_hash_string(entry->name);
+            size_t new_index = hash % new_num_buckets;
+
+            // Insert into new bucket (prepend)
+            entry->next = new_buckets[new_index];
+            new_buckets[new_index] = entry;
+
+            entry = next_entry;
+        }
+    }
+
+    // Update the registry to use the new table.
+    registry->buckets = new_buckets;
+    registry->num_buckets = new_num_buckets;
+}
+
 /**
  * @internal
  * @brief Inserts a new, empty entry into the registry's hash table.
@@ -107,6 +154,11 @@ static _infix_registry_entry_t * _registry_lookup(infix_registry_t * registry, c
  * @return A pointer to the newly created entry, or `nullptr` on allocation failure.
  */
 static _infix_registry_entry_t * _registry_insert(infix_registry_t * registry, const char * name) {
+    // Check load factor. If num_items > num_buckets * 0.75, resize.
+    // Equivalent integer math: num_items * 4 > num_buckets * 3
+    if (registry->num_items * 4 > registry->num_buckets * 3)
+        _registry_rehash(registry);
+
     size_t index = _registry_hash_string(name) % registry->num_buckets;
     _infix_registry_entry_t * new_entry =
         infix_arena_alloc(registry->arena, sizeof(_infix_registry_entry_t), _Alignof(_infix_registry_entry_t));
@@ -142,7 +194,7 @@ static _infix_registry_entry_t * _registry_insert(infix_registry_t * registry, c
  * @return A pointer to the new registry, or `nullptr` on allocation failure. The returned
  *         handle must be freed with `infix_registry_destroy`.
  */
-c23_nodiscard infix_registry_t * infix_registry_create(void) {
+INFIX_API c23_nodiscard infix_registry_t * infix_registry_create(void) {
     _infix_clear_error();
     infix_registry_t * registry = infix_malloc(sizeof(infix_registry_t));
     if (!registry) {
@@ -180,7 +232,7 @@ c23_nodiscard infix_registry_t * infix_registry_create(void) {
  * @return A pointer to the new registry, or `nullptr` on allocation failure. The returned
  *         handle must be freed with `infix_registry_destroy`.
  */
-c23_nodiscard infix_registry_t * infix_registry_create_in_arena(infix_arena_t * arena) {
+INFIX_API c23_nodiscard infix_registry_t * infix_registry_create_in_arena(infix_arena_t * arena) {
     _infix_clear_error();
     if (!arena) {
         _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
@@ -205,6 +257,48 @@ c23_nodiscard infix_registry_t * infix_registry_create_in_arena(infix_arena_t * 
     return registry;
 }
 /**
+ * @brief Creates a deep copy of an existing registry.
+ * @param src The source registry to clone.
+ * @return A new registry containing deep copies of all types in 'src', or NULL on failure.
+ */
+INFIX_API c23_nodiscard infix_registry_t * infix_registry_clone(const infix_registry_t * src) {
+    if (!src)
+        return nullptr;
+
+    infix_registry_t * dest = infix_registry_create();
+    if (!dest)
+        return nullptr;
+
+    // Iterate over all buckets in the source registry
+    for (size_t i = 0; i < src->num_buckets; ++i) {
+        _infix_registry_entry_t * entry = src->buckets[i];
+        while (entry) {
+            // Create a new entry in the destination registry.
+            // _registry_insert handles allocating the entry and copying the name string.
+            _infix_registry_entry_t * new_entry = _registry_insert(dest, entry->name);
+            if (!new_entry) {
+                infix_registry_destroy(dest);
+                return nullptr;
+            }
+
+            // Copy flags
+            new_entry->is_forward_declaration = entry->is_forward_declaration;
+
+            // Deep copy the type graph into the new registry's arena
+            if (entry->type) {
+                new_entry->type = _copy_type_graph_to_arena(dest->arena, entry->type);
+                if (!new_entry->type) {
+                    infix_registry_destroy(dest);
+                    return nullptr;
+                }
+            }
+
+            entry = entry->next;
+        }
+    }
+    return dest;
+}
+/**
  * @brief Destroys a type registry and frees all associated memory.
  *
  * This includes freeing the registry handle itself and its internal arena, which in
@@ -213,7 +307,7 @@ c23_nodiscard infix_registry_t * infix_registry_create_in_arena(infix_arena_t * 
  *
  * @param[in] registry The registry to destroy. Safe to call with `nullptr`.
  */
-void infix_registry_destroy(infix_registry_t * registry) {
+INFIX_API void infix_registry_destroy(infix_registry_t * registry) {
     if (!registry)
         return;
     // Only destroy the arena if it was created internally by `infix_registry_create`.
@@ -425,7 +519,7 @@ static char * _registry_parser_parse_name(_registry_parser_state_t * state, char
  * @param[in] definitions A semicolon-separated string of definitions.
  * @return `INFIX_SUCCESS` on success, or an error code on failure.
  */
-c23_nodiscard infix_status infix_register_types(infix_registry_t * registry, const char * definitions) {
+INFIX_API c23_nodiscard infix_status infix_register_types(infix_registry_t * registry, const char * definitions) {
     _infix_clear_error();
     if (!registry || !definitions) {
         _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
@@ -685,11 +779,16 @@ cleanup:
  * }
  * @endcode
  */
-c23_nodiscard infix_registry_iterator_t infix_registry_iterator_begin(const infix_registry_t * registry) {
+INFIX_API c23_nodiscard infix_registry_iterator_t infix_registry_iterator_begin(const infix_registry_t * registry) {
     // Return an iterator positioned before the first element.
     // The first call to next() will advance it to the first valid element.
-    return (infix_registry_iterator_t){registry, 0, nullptr};
+    infix_registry_iterator_t it;
+    it.registry = registry;
+    it._bucket_index = 0;
+    it._current_entry = nullptr;
+    return it;
 }
+
 /**
  * @brief Advances the iterator to the next defined type in the registry.
  *
@@ -697,35 +796,39 @@ c23_nodiscard infix_registry_iterator_t infix_registry_iterator_begin(const infi
  * @return `true` if the iterator was advanced to a valid type, or `false` if there are
  *         no more types to visit.
  */
-c23_nodiscard bool infix_registry_iterator_next(infix_registry_iterator_t * iter) {
+INFIX_API c23_nodiscard bool infix_registry_iterator_next(infix_registry_iterator_t * iter) {
     if (!iter || !iter->registry)
         return false;
-    const _infix_registry_entry_t * entry = iter->current_entry;
+
+    // Cast the opaque void* back to the internal entry type
+    const _infix_registry_entry_t * entry = (const _infix_registry_entry_t *)iter->_current_entry;
+
     // If we have a current entry, start from the next one in the chain.
-    if (iter->current_entry)
+    if (entry)
         entry = entry->next;
-    // Otherwise, if we are starting, begin with the head of the current bucket.
-    else if (iter->current_bucket < iter->registry->num_buckets)
-        entry = iter->registry->buckets[iter->current_bucket];
+    // Otherwise, if we are starting (or moved buckets), begin with the head of the current bucket.
+    else if (iter->_bucket_index < iter->registry->num_buckets)
+        entry = iter->registry->buckets[iter->_bucket_index];
+
     while (true) {
         // Traverse the current chain looking for a valid entry.
         while (entry) {
             if (entry->type && !entry->is_forward_declaration) {
                 // Found one. Update the iterator and return successfully.
-                iter->current_entry = entry;
+                iter->_current_entry = (void *)entry;
                 return true;
             }
             entry = entry->next;
         }
         // If we're here, the current chain is exhausted. Move to the next bucket.
-        iter->current_bucket++;
+        iter->_bucket_index++;
         // If there are no more buckets, we're done.
-        if (iter->current_bucket >= iter->registry->num_buckets) {
-            iter->current_entry = nullptr;
+        if (iter->_bucket_index >= iter->registry->num_buckets) {
+            iter->_current_entry = nullptr;
             return false;
         }
         // Start the search from the head of the new bucket.
-        entry = iter->registry->buckets[iter->current_bucket];
+        entry = iter->registry->buckets[iter->_bucket_index];
     }
 }
 /**
@@ -736,10 +839,11 @@ c23_nodiscard bool infix_registry_iterator_next(infix_registry_iterator_t * iter
  * @return The name of the type (e.g., "Point"), or `nullptr` if the iterator is invalid
  *         or has reached the end of the collection.
  */
-c23_nodiscard const char * infix_registry_iterator_get_name(const infix_registry_iterator_t * iter) {
-    if (!iter || !iter->current_entry)
+INFIX_API c23_nodiscard const char * infix_registry_iterator_get_name(const infix_registry_iterator_t * iter) {
+    if (!iter || !iter->_current_entry)
         return nullptr;
-    return iter->current_entry->name;
+    const _infix_registry_entry_t * entry = (const _infix_registry_entry_t *)iter->_current_entry;
+    return entry->name;
 }
 /**
  * @brief Gets the `infix_type` object of the type at the iterator's current position.
@@ -749,10 +853,11 @@ c23_nodiscard const char * infix_registry_iterator_get_name(const infix_registry
  * @return A pointer to the canonical `infix_type` object, or `nullptr` if the iterator
  *         is invalid or has reached the end of the collection.
  */
-c23_nodiscard const infix_type * infix_registry_iterator_get_type(const infix_registry_iterator_t * iter) {
-    if (!iter || !iter->current_entry)
+INFIX_API c23_nodiscard const infix_type * infix_registry_iterator_get_type(const infix_registry_iterator_t * iter) {
+    if (!iter || !iter->_current_entry)
         return nullptr;
-    return iter->current_entry->type;
+    const _infix_registry_entry_t * entry = (const _infix_registry_entry_t *)iter->_current_entry;
+    return entry->type;
 }
 /**
  * @brief Checks if a type with the given name is fully defined in the registry.
@@ -764,7 +869,7 @@ c23_nodiscard const infix_type * infix_registry_iterator_get_type(const infix_re
  * @param[in] name The name of the type to check (e.g., "MyStruct").
  * @return `true` if a complete definition for the name exists, `false` otherwise.
  */
-c23_nodiscard bool infix_registry_is_defined(const infix_registry_t * registry, const char * name) {
+INFIX_API c23_nodiscard bool infix_registry_is_defined(const infix_registry_t * registry, const char * name) {
     if (!registry || !name)
         return false;
     _infix_registry_entry_t * entry = _registry_lookup((infix_registry_t *)registry, name);
@@ -780,7 +885,8 @@ c23_nodiscard bool infix_registry_is_defined(const infix_registry_t * registry, 
  *         Returns `nullptr` if the name is not found or is only a forward declaration.
  *         The returned pointer is owned by the registry and is valid for its lifetime.
  */
-c23_nodiscard const infix_type * infix_registry_lookup_type(const infix_registry_t * registry, const char * name) {
+INFIX_API c23_nodiscard const infix_type * infix_registry_lookup_type(const infix_registry_t * registry,
+                                                                      const char * name) {
     if (!registry || !name)
         return nullptr;
     _infix_registry_entry_t * entry = _registry_lookup((infix_registry_t *)registry, name);

@@ -8,6 +8,7 @@
 [![Build Status](https://github.com/json-schema-org/JSON-Schema-Test-Suite/workflows/Test%20Suite%20Sanity%20Checking/badge.svg)](https://github.com/json-schema-org/JSON-Schema-Test-Suite/actions?query=workflow%3A%22Test+Suite+Sanity+Checking%22)
 
 This repository contains a set of JSON objects that implementers of JSON Schema validation libraries can use to test their validators.
+The test suite repository exists to verify specified behavior defined by the JSON Schema specification and should not be confused with a style guide. It is not intended to demonstrate how schemas ought to be written. Tests may appear unusual or unintuitive, but they exist solely to exercise behavior prescribed by the specification.
 
 It is meant to be language agnostic and should require only a JSON parser.
 The conversion of the JSON objects into tests within a specific language and test framework of choice is left to be done by the validator implementer.
@@ -282,6 +283,11 @@ This suite is being used by:
 ### Kotlin
 
 * [json-schema-validation-comparison](https://www.creekservice.org/json-schema-validation-comparison/functional) (Comparison site for JVM-based validator implementations)
+* [kotlinx-schema](https://github.com/Kotlin/kotlinx-schema)
+
+### Lua
+
+* [lua-schema](https://framagit.org/fperrad/lua-schema)
 
 ### Node.js
 

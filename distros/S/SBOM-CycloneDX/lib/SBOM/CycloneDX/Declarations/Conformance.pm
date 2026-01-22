@@ -65,12 +65,12 @@ Properties:
 
 =over
 
-=item C<mitigation_strategies>, The list of  `bom-ref` to the evidence
+=item * C<mitigation_strategies>, The list of  `bom-ref` to the evidence
 provided describing the mitigation strategies.
 
-=item C<rationale>, The rationale for the conformance score.
+=item * C<rationale>, The rationale for the conformance score.
 
-=item C<score>, The conformance of the claim between and inclusive of 0 and
+=item * C<score>, The conformance of the claim between and inclusive of 0 and
 1, where 1 is 100% conformance.
 
 =back

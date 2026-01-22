@@ -326,7 +326,7 @@ strings.
     use Path::Tiny;
 
     my $binder = Affix::Wrap->new( project_files => ['mylib.h'] );
-    my $ast    = $binder->parse;
+    my @ast    = $binder->parse;
 
     my $code = <<~'PERL';
         package My::Lib;
@@ -338,7 +338,7 @@ strings.
 
         PERL
 
-    for my $node (@$ast) {
+    for my $node (@ast) {
         # Add POD documentation derived from C comments
         if ( defined $node->doc ) {
             $code .= "\n=head2 " . $node->name . "\n\n";

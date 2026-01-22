@@ -7,8 +7,10 @@ README
 README.md
 README.pod
 arr.pl
+change.log.txt
 color.table.pl
 colored.table.pl
+css4.colors.txt
 dist.ini
 lib/Matplotlib/Simple.pm
 make.subs.pl
@@ -21,6 +23,7 @@ output.images/boxplot.png
 output.images/dssp.multiple.png
 output.images/dssp.single.png
 output.images/hexbin.png
+output.images/hist2d.pads.png
 output.images/hist2d.png
 output.images/histogram.png
 output.images/hlines.png
@@ -47,6 +50,8 @@ output.images/single.violinplot.png
 output.images/single.wide.png
 output.images/tab.multiple.png
 output.images/trig.subplots.png
+output.images/twinx.arr.png
+output.images/twinx.hash.png
 output.images/violin.png
 output.images/wide.subplots.png
 sha.sums.tsv
@@ -81,6 +86,8 @@ t/output.images/single.scatter.svg
 t/output.images/single.tab.svg
 t/output.images/single.violinplot.svg
 t/output.images/single.wide.svg
+t/output.images/twinx.arr.svg
+t/output.images/twinx.hash.svg
 t/output.images/violin.svg
 t/output.images/wide.subplots.svg
 t/sha.sums.tsv

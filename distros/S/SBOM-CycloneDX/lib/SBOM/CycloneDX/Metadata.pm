@@ -82,7 +82,7 @@ sub TO_JSON {
 
     my $json = {};
 
-    if (ref ($self->tools) =~ /List/ && @{$self->tools} || ref($self->tools) =~ /Tools/) {
+    if (ref($self->tools) =~ /List/ && @{$self->tools} || ref($self->tools) =~ /Tools/) {
         $json->{tools} = $self->tools;
     }
 
@@ -129,33 +129,33 @@ Properties:
 
 =over
 
-=item C<BUILD>, 
+=item * C<BUILD>, 
 
-=item C<authors>, The person(s) who created the BOM.
+=item * C<authors>, The person(s) who created the BOM.
 Authors are common in BOMs created through manual processes. BOMs created
 through automated means may have "manufacturer" instead.
 
-=item C<component>, The component that the BOM describes.
+=item * C<component>, The component that the BOM describes.
 
-=item C<licenses>, The license information for the BOM document.
+=item * C<licenses>, The license information for the BOM document.
 This may be different from the license(s) of the component(s) that the BOM
 describes.
 
-=item C<lifecycles>, Lifecycles communicate the stage(s) in which data in
+=item * C<lifecycles>, Lifecycles communicate the stage(s) in which data in
 the BOM was captured. Different types of data may be available at various
 phases of a lifecycle, such as the Software Development Lifecycle (SDLC),
 IT Asset Management (ITAM), and Software Asset Management (SAM). Thus, a
 BOM may include data specific to or only obtainable in a given lifecycle.
 
-=item C<manufacture>, [Deprecated in 1.6] This will be removed in a future
+=item * C<manufacture>, [Deprecated in 1.6] This will be removed in a future
 version. Use the "manufacturer" method in L<SBOM::CycloneDX::Component> instead.
 The organization that manufactured the component that the BOM describes.
 
-=item C<manufacturer>, The organization that created the BOM.
+=item * C<manufacturer>, The organization that created the BOM.
 Manufacturer is common in BOMs created through automated processes. BOMs
 created through manual means may have `@.authors` instead.
 
-=item C<properties>, Provides the ability to document properties in a
+=item * C<properties>, Provides the ability to document properties in a
 name-value store. This provides flexibility to include data not officially
 supported in the standard without having to use additional namespaces or
 create extensions. Unlike key-value stores, properties support duplicate
@@ -164,13 +164,13 @@ to the general public are encouraged to be registered in the CycloneDX
 Property Taxonomy (L<https://github.com/CycloneDX/cyclonedx-property-taxonomy>).
 Formal registration is optional.
 
-=item C<supplier>,  The organization that supplied the component that the
+=item * C<supplier>,  The organization that supplied the component that the
 BOM describes. The supplier may often be the manufacturer, but may also be
 a distributor or repackager.
 
-=item C<timestamp>, The date and time (timestamp) when the BOM was created.
+=item * C<timestamp>, The date and time (timestamp) when the BOM was created.
 
-=item C<tools>, The tool(s) used in the creation, enrichment, and
+=item * C<tools>, The tool(s) used in the creation, enrichment, and
 validation of the BOM.
 
 =back

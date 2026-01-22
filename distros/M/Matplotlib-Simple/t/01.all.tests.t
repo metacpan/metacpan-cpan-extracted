@@ -192,6 +192,18 @@ dies_ok {
 		'output.file' => '/tmp/dies_ok.svg',
 	});
 } '"plt" dies when a single plot is given an empty data hash';
+dies_ok {
+	plt({
+		data => [
+			[
+				[0,1,'c'],
+				[2,3,'x']
+			]
+		],
+		'plot.type' => 'plot',
+		'output.file' => '/tmp/dies_ok.svg'
+	});
+} '"plt" dies when non-numeric values are given to "plot"';
 my ($tfh, $tfname) = tempfile(DIR => '/tmp', UNLINK => 1);
 dies_ok {
 	plt({
@@ -1720,6 +1732,67 @@ plt({
 	nrows         => 2,
 	scale         => 2
 });
+
+my @t;
+for (my $t = 0.01; $t <= 10; $t += 0.01) {
+	push @t, $t;
+}
+plt({
+	execute       => 0,
+	fh            => $fh,
+	data          => [
+		[ # plot 0
+			[@t],              # x coordinates
+			[map {sin($_)} @t] # y coordinates
+		],
+		[ # plot 1
+			[@t],
+			[map {exp($_)} @t]
+		]
+	],
+	'output.file' => '/tmp/twinx.arr.svg',
+	'plot.type'   => 'plot',
+	'set.options' => [
+		'color = "blue"', # plot 0
+		'color = "red"'   # plot 1
+	],
+	tick_params => 'axis = "y", labelcolor = "blue"',
+	ylabel      => '"sin", color="blue"', # applies to base ax object
+	'twinx.args'  => {
+		1 => { # automatically knows that plot 1 is twinned on x
+			tick_params => 'axis = "y", labelcolor = "red"',
+			ylabel      => '"exp", color="red"',
+		}
+	},
+});
+plt({
+	execute       => 0,
+	fh            => $fh,
+	data          => {
+		'sin' => [ # plot 0
+			[@t],              # x coordinates
+			[map {sin($_)} @t] # y coordinates
+		],
+		'exp' => [ # plot 1
+			[@t],
+			[map {exp($_)} @t]
+		]
+	},
+	'output.file' => '/tmp/twinx.hash.svg',
+	'plot.type'   => 'plot',
+	'set.options' => {
+		'sin' => 'color = "blue"',
+		'exp' => 'color = "red"'
+	},
+	tick_params => 'axis = "y", labelcolor = "blue"',
+	ylabel      => '"sin", color="blue"', # applies to base ax object
+	'twinx.args'  => {
+		'exp' => { # automatically knows that plot is twinx
+			tick_params => 'axis = "y", labelcolor = "red"',
+			ylabel      => '"exp", color="red"',
+		}
+	},
+});
 plt({
 	fh                => $fh,
 	execute           => 1,
@@ -1818,7 +1891,7 @@ plt({
 	'output.file' => '/tmp/hist2d.svg',
 });
 # σὺ δὲ τῇ πίστει ἕστηκας. μὴ ὑψηλὰ φρόνει, ἀλλὰ φοβοῦ
-my @output_files = ('/tmp/add.single.svg', '/tmp/single.wide.svg', '/tmp/single.array.svg', '/tmp/wide.subplots.svg', '/tmp/single.pie.svg', '/tmp/pie.svg', '/tmp/single.boxplot.svg', '/tmp/boxplot.svg', '/tmp/single.violinplot.svg', '/tmp/violin.svg', '/tmp/single.barplot.svg', '/tmp/single.hexbin.svg', '/tmp/single.hist2d.svg', '/tmp/hexbin.svg', '/tmp/plots.svg', '/tmp/plot.single.svg', '/tmp/plot.single.arr.svg', '/tmp/barplots.svg', '/tmp/single.hist.svg', '/tmp/histogram.svg', '/tmp/single.scatter.svg', '/tmp/scatterplots.svg', '/tmp/imshow.single.svg', '/tmp/imshow.multiple.svg', '/tmp/single.tab.svg', '/tmp/single.bonds.svg', '/tmp/hlines.svg', '/tmp/dssp.single.svg', '/tmp/dssp.multiple.svg', '/tmp/hist2d.pads.svg', '/tmp/hist2d.svg');
+my @output_files = ('/tmp/add.single.svg', '/tmp/single.wide.svg', '/tmp/single.array.svg', '/tmp/wide.subplots.svg', '/tmp/single.pie.svg', '/tmp/pie.svg', '/tmp/single.boxplot.svg', '/tmp/boxplot.svg', '/tmp/single.violinplot.svg', '/tmp/violin.svg', '/tmp/single.barplot.svg', '/tmp/single.hexbin.svg', '/tmp/single.hist2d.svg', '/tmp/hexbin.svg', '/tmp/plots.svg', '/tmp/plot.single.svg', '/tmp/plot.single.arr.svg', '/tmp/barplots.svg', '/tmp/single.hist.svg', '/tmp/histogram.svg', '/tmp/single.scatter.svg', '/tmp/scatterplots.svg', '/tmp/imshow.single.svg', '/tmp/imshow.multiple.svg', '/tmp/single.tab.svg', '/tmp/single.bonds.svg', '/tmp/hlines.svg', '/tmp/dssp.single.svg', '/tmp/dssp.multiple.svg', '/tmp/hist2d.pads.svg', '/tmp/twinx.arr.svg', '/tmp/twinx.hash.svg', '/tmp/hist2d.svg');
 my %file2SHA;
 open my $tsv, '<', $sha_sum_filename;
 while (<$tsv>) {
@@ -1854,14 +1927,13 @@ sub check_SHA_sum {
 my %check_files = map {'/tmp/' . "$_.svg" => 1} ('add.single', 'barplots',
 'imshow.multiple','imshow.single', 'plot.single', 'plots',
 'single.bonds', 'single.tab', 'barplots', 'single.barplot', 'hlines',
-'dssp.single', 'dssp.multiple', 'plot.single.arr', 'hist2d.pads');
+'dssp.single', 'dssp.multiple', 'plot.single.arr', 'hist2d.pads', 'twinx.arr', 'twinx.hash');
 foreach my $file (@output_files) {
 	if (defined $check_files{$file}) {
 		ok(check_SHA_sum($file2SHA{$file}, $file), "$file matches verified file SHA sum");
 	} else {
 		ok(is_valid_svg($file), "$file is likely a valid SVG file");
 	}
-#	unlink $file;
+	unlink $file;
 }
 done_testing();
-say 'Now removing test files and directory to save space.';

@@ -6,7 +6,7 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020001';
+our $VERSION   = '0.020002';
 
 use constant { true => !!1, false => !!0 };
 use Types::Common qw( -is -types to_TypeTiny );

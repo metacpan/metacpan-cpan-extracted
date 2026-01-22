@@ -82,7 +82,75 @@
  */
 #define INFIX_MAJOR 0 /**< The major version number. Changes with incompatible API updates. */
 #define INFIX_MINOR 1 /**< The minor version number. Changes with new, backward-compatible features. */
-#define INFIX_PATCH 3 /**< The patch version number. Changes with backward-compatible bug fixes. */
+#define INFIX_PATCH 4 /**< The patch version number. Changes with backward-compatible bug fixes. */
+
+#if defined(__has_c_attribute)
+#define _INFIX_HAS_C_ATTRIBUTE(x) __has_c_attribute(x)
+#else
+#define _INFIX_HAS_C_ATTRIBUTE(x) 0
+#endif
+
+/**
+ * @def INFIX_API
+ * @brief Symbol visibility macro
+ *
+ * @details infix relies on a unity build so we've been lax about symbol visibility. Functions like `_infix_set_error`
+ * or `_infix_type_recalculate_layout` are shared between internal modules (files included by `infix.c`) and thus cannot
+ * be static. However, this means that if infix.c is compiled into a shared library (`libinfix.so`), all of these
+ * internal _infix_* functions are exported in the dynamic symbol table. This pollutes the ABI and allows users to link
+ * against internal functions that might change.
+ */
+#if defined(_WIN32) || defined(__CYGWIN__)
+#if defined(INFIX_BUILDING_DLL)
+#define INFIX_API __declspec(dllexport)
+#elif defined(INFIX_USING_DLL)
+#define INFIX_API __declspec(dllimport)
+#else
+#define INFIX_API
+#endif
+#elif defined(__GNUC__) || defined(__clang__)
+#define INFIX_API __attribute__((visibility("default")))
+#else
+#define INFIX_API
+#endif
+
+/**
+ * @def INFIX_NODISCARD
+ * @brief A compatibility macro for the C23 `[[nodiscard]]` attribute.
+ *
+ * @details This attribute is used to issue a compiler warning if the return value
+ * of a function is ignored by the caller. This is extremely useful for catching
+ * bugs where an error code or an important result is not checked.
+ *
+ * This macro expands to:
+ * - `[[nodiscard]]` on compilers that support the C23 standard syntax.
+ * - `__attribute__((warn_unused_result))` on GCC and Clang.
+ * - `_Check_return_` on Microsoft Visual C++.
+ * - Nothing on other compilers.
+ *
+ * This is aliased as `c23_nodiscard` in `compat_c23.h`.
+ */
+#if _INFIX_HAS_C_ATTRIBUTE(nodiscard) && !defined(__GNUC__) && !defined(__clang__)
+#define INFIX_NODISCARD [[nodiscard]]
+#elif defined(__GNUC__) || defined(__clang__)
+#define INFIX_NODISCARD __attribute__((warn_unused_result))
+#elif defined(_MSC_VER)
+#define INFIX_NODISCARD _Check_return_
+#else
+#define INFIX_NODISCARD
+#endif
+
+/**
+ * @struct infix_version_t
+ * @brief A structure representing the semantic version of the library.
+ * @see infix_get_version
+ */
+typedef struct {
+    int major; /**< The major version number (incremented for incompatible API changes). */
+    int minor; /**< The minor version number (incremented for backwards-compatible features). */
+    int patch; /**< The patch version number (incremented for backwards-compatible bug fixes). */
+} infix_version_t;
+
 /** @} */
 // Define the POSIX source macro to ensure function declarations for shm_open,
 // ftruncate, etc., are visible on all POSIX-compliant systems.
@@ -95,7 +163,6 @@
 #if !defined(_POSIX_C_SOURCE)
 #define _POSIX_C_SOURCE 200809L
 #endif
-#include "common/compat_c23.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -103,6 +170,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+/**
+ * @brief Retrieves the version of the infix library linked at runtime.
+ *
+ * @details This function allows applications to verify that the version of the
+ *          library they are linked against matches the headers they were compiled with.
+ *          This is particularly useful when loading `infix` as a shared library/DLL
+ *          to detect version mismatches.
+ *
+ * @return An `infix_version_t` structure containing the major, minor, and patch numbers.
+ */
+INFIX_API INFIX_NODISCARD infix_version_t infix_get_version(void);
+
 /**
  * @defgroup high_level_api High-Level Signature API
  * @brief The primary, recommended API for creating trampolines from human-readable strings.
@@ -377,7 +456,17 @@ typedef enum {
  * @return A pointer to the new registry, or `nullptr` on allocation failure. The returned
  *         handle must be freed with `infix_registry_destroy`.
  */
-c23_nodiscard infix_registry_t * infix_registry_create(void);
+INFIX_API INFIX_NODISCARD infix_registry_t * infix_registry_create(void);
+/**
+ * @brief Creates a deep copy of an existing type registry.
+ *
+ * This copies all defined types and their dependency graphs into a new registry with its own arena.
+ * This is essential for thread safety in languages that spawn threads by cloning interpreter state (like Perl).
+ *
+ * @param[in] registry The registry to clone.
+ * @return A pointer to the new registry, or `nullptr` on failure.
+ */
+INFIX_API INFIX_NODISCARD infix_registry_t * infix_registry_clone(const infix_registry_t *);
 /**
  * @brief Destroys a type registry and frees all associated memory.
  *
@@ -386,7 +475,7 @@ c23_nodiscard infix_registry_t * infix_registry_create(void);
  *
  * @param[in] registry The registry to destroy. Safe to call with `nullptr`.
  */
-void infix_registry_destroy(infix_registry_t *);
+INFIX_API void infix_registry_destroy(infix_registry_t *);
 /**
  * @brief Parses a string of type definitions and adds them to a registry.
  *
@@ -407,7 +496,7 @@ void infix_registry_destroy(infix_registry_t *);
  * infix_register_types(registry, my_types);
  * @endcode
  */
-c23_nodiscard infix_status infix_register_types(infix_registry_t *, const char *);
+INFIX_API INFIX_NODISCARD infix_status infix_register_types(infix_registry_t *, const char *);
 /** @} */  // end of registry_api group
 /**
  * @defgroup registry_introspection_api Registry Introspection API
@@ -415,8 +504,20 @@ c23_nodiscard infix_status infix_register_types(infix_registry_t *, const char *
  * @ingroup high_level_api
  * @{
  */
-/** @brief An opaque handle to a registry iterator. Created by `infix_registry_iterator_begin`. */
-typedef struct infix_registry_iterator_t infix_registry_iterator_t;
+/**
+ * @struct infix_registry_iterator_t
+ * @brief An iterator for traversing a type registry.
+ * @details This struct holds the complete state needed to traverse the registry's
+ * internal hash table, including the current bucket and the current entry within
+ * that bucket's linked list.
+ *
+ * The fields in this struct are implementation details and should not be accessed directly.
+ */
+typedef struct infix_registry_iterator_t {
+    const infix_registry_t * registry; /**< The registry being iterated. */
+    size_t _bucket_index;              /**< Internal: current hash bucket. */
+    void * _current_entry;             /**< Internal: opaque pointer to current entry. */
+} infix_registry_iterator_t;
 /**
  * @brief Serializes all defined types within a registry into a single, human-readable string.
  *
@@ -429,7 +530,7 @@ typedef struct infix_registry_iterator_t infix_registry_iterator_t;
  * @param[in] registry The registry to serialize.
  * @return `INFIX_SUCCESS` on success, or `INFIX_ERROR_INVALID_ARGUMENT` if the buffer is too small.
  */
-c23_nodiscard infix_status infix_registry_print(char *, size_t, const infix_registry_t *);
+INFIX_API INFIX_NODISCARD infix_status infix_registry_print(char *, size_t, const infix_registry_t *);
 /**
  * @brief Initializes an iterator for traversing the types in a registry.
  *
@@ -437,28 +538,28 @@ c23_nodiscard infix_status infix_registry_print(char *, size_t, const infix_regi
  * @return An initialized iterator. If the registry is empty, the first call to
  *         `infix_registry_iterator_next` on this iterator will return `false`.
  */
-c23_nodiscard infix_registry_iterator_t infix_registry_iterator_begin(const infix_registry_t *);
+INFIX_API INFIX_NODISCARD infix_registry_iterator_t infix_registry_iterator_begin(const infix_registry_t *);
 /**
  * @brief Advances the iterator to the next defined type in the registry.
  *
  * @param[in,out] iterator The iterator to advance.
  * @return `true` if the iterator was advanced to a valid type, or `false` if there are no more types.
  */
-c23_nodiscard bool infix_registry_iterator_next(infix_registry_iterator_t *);
+INFIX_API INFIX_NODISCARD bool infix_registry_iterator_next(infix_registry_iterator_t *);
 /**
  * @brief Gets the name of the type at the iterator's current position.
  *
  * @param[in] iterator The iterator.
  * @return The name of the type (e.g., "MyStruct"), or `nullptr` if the iterator is invalid or at the end.
  */
-c23_nodiscard const char * infix_registry_iterator_get_name(const infix_registry_iterator_t *);
+INFIX_API INFIX_NODISCARD const char * infix_registry_iterator_get_name(const infix_registry_iterator_t *);
 /**
  * @brief Gets the `infix_type` object of the type at the iterator's current position.
  *
  * @param[in] iterator The iterator.
  * @return A pointer to the canonical `infix_type` object, or `nullptr` if the iterator is invalid or at the end.
  */
-c23_nodiscard const infix_type * infix_registry_iterator_get_type(const infix_registry_iterator_t *);
+INFIX_API INFIX_NODISCARD const infix_type * infix_registry_iterator_get_type(const infix_registry_iterator_t *);
 /**
  * @brief Checks if a type with the given name is fully defined in the registry.
  *
@@ -469,7 +570,7 @@ c23_nodiscard const infix_type * infix_registry_iterator_get_type(const infix_re
  * @param[in] name The name of the type to check (e.g., "MyStruct").
  * @return `true` if a complete definition for the name exists, `false` otherwise.
  */
-c23_nodiscard bool infix_registry_is_defined(const infix_registry_t *, const char *);
+INFIX_API INFIX_NODISCARD bool infix_registry_is_defined(const infix_registry_t *, const char *);
 /**
  * @brief Retrieves the canonical `infix_type` object for a given name from the registry.
  *
@@ -479,7 +580,7 @@ c23_nodiscard bool infix_registry_is_defined(const infix_registry_t *, const cha
  *         Returns `nullptr` if the name is not found or is only a forward declaration.
  *         The returned pointer is owned by the registry and is valid for its lifetime.
  */
-c23_nodiscard const infix_type * infix_registry_lookup_type(const infix_registry_t *, const char *);
+INFIX_API INFIX_NODISCARD const infix_type * infix_registry_lookup_type(const infix_registry_t *, const char *);
 /**
  * @brief Creates a new named type registry that allocates from a user-provided arena.
  *
@@ -492,7 +593,7 @@ c23_nodiscard const infix_type * infix_registry_lookup_type(const infix_registry
  * @note The registry should still be destroyed with `infix_registry_destroy`, but
  *       this will not free the user-provided arena itself.
  */
-c23_nodiscard infix_registry_t * infix_registry_create_in_arena(infix_arena_t * arena);
+INFIX_API INFIX_NODISCARD infix_registry_t * infix_registry_create_in_arena(infix_arena_t * arena);
 /** @} */  // end of registry_introspection_api group
 /**
  * @brief Creates a "bound" forward trampoline from a signature string.
@@ -542,7 +643,10 @@ c23_nodiscard infix_registry_t * infix_registry_create_in_arena(infix_arena_t * 
  * infix_forward_destroy(trampoline);
  * @endcode
  */
-c23_nodiscard infix_status infix_forward_create(infix_forward_t **, const char *, void *, infix_registry_t *);
+INFIX_API INFIX_NODISCARD infix_status infix_forward_create(infix_forward_t **,
+                                                            const char *,
+                                                            void *,
+                                                            infix_registry_t *);
 /**
  * @brief Creates an "unbound" forward trampoline from a signature string.
  *
@@ -586,7 +690,9 @@ c23_nodiscard infix_status infix_forward_create(infix_forward_t **, const char *
  * infix_forward_destroy(trampoline);
  * @endcode
  */
-c23_nodiscard infix_status infix_forward_create_unbound(infix_forward_t **, const char *, infix_registry_t *);
+INFIX_API INFIX_NODISCARD infix_status infix_forward_create_unbound(infix_forward_t **,
+                                                                    const char *,
+                                                                    infix_registry_t *);
 /**
  * @brief Creates a "bound" forward trampoline within a user-provided arena.
  *
@@ -600,7 +706,7 @@ c23_nodiscard infix_status infix_forward_create_unbound(infix_forward_t **, cons
  * @param[in] registry An optional type registry.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status
+INFIX_API INFIX_NODISCARD infix_status
 infix_forward_create_in_arena(infix_forward_t **, infix_arena_t *, const char *, void *, infix_registry_t *);
 /**
  * @brief Creates a type-safe reverse trampoline (callback).
@@ -642,7 +748,10 @@ infix_forward_create_in_arena(infix_forward_t **, infix_arena_t *, const char *,
  * infix_reverse_destroy(ctx);
  * @endcode
  */
-c23_nodiscard infix_status infix_reverse_create_callback(infix_reverse_t **, const char *, void *, infix_registry_t *);
+INFIX_API INFIX_NODISCARD infix_status infix_reverse_create_callback(infix_reverse_t **,
+                                                                     const char *,
+                                                                     void *,
+                                                                     infix_registry_t *);
 /**
  * @brief Creates a generic reverse trampoline (closure) for stateful callbacks.
  *
@@ -702,7 +811,7 @@ c23_nodiscard infix_status infix_reverse_create_callback(infix_reverse_t **, con
  * infix_reverse_destroy(ctx);
  * @endcode
  */
-c23_nodiscard infix_status
+INFIX_API INFIX_NODISCARD infix_status
 infix_reverse_create_closure(infix_reverse_t **, const char *, infix_closure_handler_fn, void *, infix_registry_t *);
 /**
  * @brief Parses a full function signature string into its constituent parts.
@@ -721,7 +830,7 @@ infix_reverse_create_closure(infix_reverse_t **, const char *, infix_closure_han
  * @param[in] registry An optional type registry.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status infix_signature_parse(
+INFIX_API INFIX_NODISCARD infix_status infix_signature_parse(
     const char *, infix_arena_t **, infix_type **, infix_function_argument **, size_t *, size_t *, infix_registry_t *);
 /**
  * @brief Parses a signature string representing a single data type.
@@ -736,7 +845,10 @@ c23_nodiscard infix_status infix_signature_parse(
  * @param[in] registry An optional type registry for resolving named types.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status infix_type_from_signature(infix_type **, infix_arena_t **, const char *, infix_registry_t *);
+INFIX_API INFIX_NODISCARD infix_status infix_type_from_signature(infix_type **,
+                                                                 infix_arena_t **,
+                                                                 const char *,
+                                                                 infix_registry_t *);
 /** @} */  // end of high_level_api group
 /**
  * @defgroup exports_api Dynamic Library & Globals API
@@ -748,19 +860,19 @@ c23_nodiscard infix_status infix_type_from_signature(infix_type **, infix_arena_
  * @param[in] path The file path to the library (e.g., `./mylib.so`, `user32.dll`).
  * @return A handle to the library, or `nullptr` on failure. The handle must be freed with `infix_library_close`.
  */
-c23_nodiscard infix_library_t * infix_library_open(const char *);
+INFIX_API INFIX_NODISCARD infix_library_t * infix_library_open(const char *);
 /**
  * @brief Closes a dynamic library handle.
  * @param[in] lib The library handle to close. Safe to call with `nullptr`.
  */
-void infix_library_close(infix_library_t *);
+INFIX_API void infix_library_close(infix_library_t *);
 /**
  * @brief Retrieves the address of a symbol (function or variable) from a loaded library.
  * @param[in] lib The library handle.
  * @param[in] symbol_name The name of the symbol to look up.
  * @return A pointer to the symbol's address, or `nullptr` if not found.
  */
-c23_nodiscard void * infix_library_get_symbol(infix_library_t *, const char *);
+INFIX_API INFIX_NODISCARD void * infix_library_get_symbol(infix_library_t *, const char *);
 /**
  * @brief Reads the value of a global variable from a library into a buffer.
  *
@@ -774,7 +886,8 @@ c23_nodiscard void * infix_library_get_symbol(infix_library_t *, const char *);
  * @param[in] registry An optional registry for resolving named types in the signature.
  * @return `INFIX_SUCCESS` on success, or an error code on failure.
  */
-c23_nodiscard infix_status infix_read_global(infix_library_t *, const char *, const char *, void *, infix_registry_t *);
+INFIX_API INFIX_NODISCARD infix_status
+infix_read_global(infix_library_t *, const char *, const char *, void *, infix_registry_t *);
 /**
  * @brief Writes data from a buffer into a global variable in a library.
  * @param[in] lib The library handle.
@@ -784,7 +897,7 @@ c23_nodiscard infix_status infix_read_global(infix_library_t *, const char *, co
  * @param[in] registry An optional registry for resolving named types in the signature.
  * @return `INFIX_SUCCESS` on success, or an error code on failure.
  */
-c23_nodiscard infix_status
+INFIX_API INFIX_NODISCARD infix_status
 infix_write_global(infix_library_t *, const char *, const char *, void *, infix_registry_t *);
 /** @} */  // end of exports_api group
 /**
@@ -806,7 +919,7 @@ infix_write_global(infix_library_t *, const char *, const char *, void *, infix_
  * @param[in] target_function The address of the C function to call.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status
+INFIX_API INFIX_NODISCARD infix_status
 infix_forward_create_manual(infix_forward_t **, infix_type *, infix_type **, size_t, size_t, void *);
 /**
  * @brief Creates an unbound forward trampoline from `infix_type` objects.
@@ -817,7 +930,7 @@ infix_forward_create_manual(infix_forward_t **, infix_type *, infix_type **, siz
  * @param[in] num_fixed_args The number of non-variadic arguments.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status
+INFIX_API INFIX_NODISCARD infix_status
 infix_forward_create_unbound_manual(infix_forward_t **, infix_type *, infix_type **, size_t, size_t);
 /**
  * @brief Creates a type-safe reverse trampoline (callback) from `infix_type` objects.
@@ -829,7 +942,7 @@ infix_forward_create_unbound_manual(infix_forward_t **, infix_type *, infix_type
  * @param[in] user_callback_fn A pointer to the type-safe C handler function.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status
+INFIX_API INFIX_NODISCARD infix_status
 infix_reverse_create_callback_manual(infix_reverse_t **, infix_type *, infix_type **, size_t, size_t, void *);
 /**
  * @brief Creates a generic reverse trampoline (closure) from `infix_type` objects.
@@ -842,18 +955,18 @@ infix_reverse_create_callback_manual(infix_reverse_t **, infix_type *, infix_typ
  * @param[in] user_data A `void*` pointer to application-specific state.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status infix_reverse_create_closure_manual(
+INFIX_API INFIX_NODISCARD infix_status infix_reverse_create_closure_manual(
     infix_reverse_t **, infix_type *, infix_type **, size_t, size_t, infix_closure_handler_fn, void *);
 /**
  * @brief Destroys a forward trampoline and frees all associated memory.
  * @param[in] trampoline The trampoline to destroy. Safe to call with `nullptr`.
  */
-void infix_forward_destroy(infix_forward_t *);
+INFIX_API void infix_forward_destroy(infix_forward_t *);
 /**
  * @brief Destroys a reverse trampoline and frees all associated memory.
  * @param[in] reverse_trampoline The reverse trampoline context to destroy. Safe to call with `nullptr`.
  */
-void infix_reverse_destroy(infix_reverse_t *);
+INFIX_API void infix_reverse_destroy(infix_reverse_t *);
 /**
  * @addtogroup type_system
  * @{
@@ -863,12 +976,12 @@ void infix_reverse_destroy(infix_reverse_t *);
  * @param[in] id The `infix_primitive_type_id` of the desired primitive type.
  * @return A pointer to the static `infix_type` descriptor. Does not need to be freed.
  */
-c23_nodiscard infix_type * infix_type_create_primitive(infix_primitive_type_id);
+INFIX_API INFIX_NODISCARD infix_type * infix_type_create_primitive(infix_primitive_type_id);
 /**
  * @brief Creates a static descriptor for a generic pointer (`void*`).
  * @return A pointer to the static `infix_type` descriptor. Does not need to be freed.
  */
-c23_nodiscard infix_type * infix_type_create_pointer(void);
+INFIX_API INFIX_NODISCARD infix_type * infix_type_create_pointer(void);
 /**
  * @brief Creates a new pointer type that points to a specific type.
  * @param[in] arena The arena to allocate the new type object in.
@@ -876,12 +989,12 @@ c23_nodiscard infix_type * infix_type_create_pointer(void);
  * @param[in] pointee_type The type that the new pointer will point to.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status infix_type_create_pointer_to(infix_arena_t *, infix_type **, infix_type *);
+INFIX_API INFIX_NODISCARD infix_status infix_type_create_pointer_to(infix_arena_t *, infix_type **, infix_type *);
 /**
  * @brief Creates a static descriptor for the `void` type.
  * @return A pointer to the static `infix_type` descriptor. Does not need to be freed.
  */
-c23_nodiscard infix_type * infix_type_create_void(void);
+INFIX_API INFIX_NODISCARD infix_type * infix_type_create_void(void);
 /**
  * @brief Creates a new struct type from an array of members, calculating layout automatically.
  * @param[in] arena The arena for allocation.
@@ -890,7 +1003,10 @@ c23_nodiscard infix_type * infix_type_create_void(void);
  * @param[in] num_members The number of members in the array.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status infix_type_create_struct(infix_arena_t *, infix_type **, infix_struct_member *, size_t);
+INFIX_API INFIX_NODISCARD infix_status infix_type_create_struct(infix_arena_t *,
+                                                                infix_type **,
+                                                                infix_struct_member *,
+                                                                size_t);
 /**
  * @brief Creates a new packed struct type with a user-specified layout.
  * @param[in] arena The arena for allocation.
@@ -901,7 +1017,7 @@ c23_nodiscard infix_status infix_type_create_struct(infix_arena_t *, infix_type 
  * @param[in] num_members The number of members.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status
+INFIX_API INFIX_NODISCARD infix_status
 infix_type_create_packed_struct(infix_arena_t *, infix_type **, size_t, size_t, infix_struct_member *, size_t);
 /**
  * @brief Creates a new union type from an array of members.
@@ -911,7 +1027,10 @@ infix_type_create_packed_struct(infix_arena_t *, infix_type **, size_t, size_t, 
  * @param[in] num_members The number of members.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status infix_type_create_union(infix_arena_t *, infix_type **, infix_struct_member *, size_t);
+INFIX_API INFIX_NODISCARD infix_status infix_type_create_union(infix_arena_t *,
+                                                               infix_type **,
+                                                               infix_struct_member *,
+                                                               size_t);
 /**
  * @brief Creates a new fixed-size array type.
  * @param[in] arena The arena for allocation.
@@ -920,7 +1039,7 @@ c23_nodiscard infix_status infix_type_create_union(infix_arena_t *, infix_type *
  * @param[in] num_elements The number of elements.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status infix_type_create_array(infix_arena_t *, infix_type **, infix_type *, size_t);
+INFIX_API INFIX_NODISCARD infix_status infix_type_create_array(infix_arena_t *, infix_type **, infix_type *, size_t);
 /**
  * @brief Creates a flexible array member type ([?:type]).
  * @details A Flexible Array Member (FAM) has an unspecified size and can only appear as the last member of a struct.
@@ -929,18 +1048,16 @@ c23_nodiscard infix_status infix_type_create_array(infix_arena_t *, infix_type *
  * @param[in] element_type The primitive type of each element.
  * @return `INFIX_SUCCESS` on success.
  */
-infix_status infix_type_create_flexible_array(
-    infix_arena_t *,
-    infix_type **,
-    infix_type *); /**
-                    * @brief Creates a new enum type with a specified underlying integer type.
-                    * @param[in] arena The arena for allocation.
-                    * @param[out] out_type A pointer to receive the new `infix_type`.
-                    * @param[in] underlying_type The integer `infix_type` (e.g., from
-                    * `infix_type_create_primitive(INFIX_PRIMITIVE_SINT32)`).
-                    * @return `INFIX_SUCCESS` on success.
-                    */
-c23_nodiscard infix_status infix_type_create_enum(infix_arena_t *, infix_type **, infix_type *);
+INFIX_API infix_status infix_type_create_flexible_array(infix_arena_t *, infix_type **, infix_type *);
+/**
+ * @brief Creates a new enum type with a specified underlying integer type.
+ * @param[in] arena The arena for allocation.
+ * @param[out] out_type A pointer to receive the new `infix_type`.
+ * @param[in] underlying_type The integer `infix_type` (e.g., from
+ * `infix_type_create_primitive(INFIX_PRIMITIVE_SINT32)`).
+ * @return `INFIX_SUCCESS` on success.
+ */
+INFIX_API INFIX_NODISCARD infix_status infix_type_create_enum(infix_arena_t *, infix_type **, infix_type *);
 /**
  * @brief Creates a placeholder for a named type to be resolved by a registry.
  * @param[in] arena The arena for allocation.
@@ -949,10 +1066,10 @@ c23_nodiscard infix_status infix_type_create_enum(infix_arena_t *, infix_type **
  * @param[in] agg_cat The expected category of the aggregate (struct or union).
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status infix_type_create_named_reference(infix_arena_t *,
-                                                             infix_type **,
-                                                             const char *,
-                                                             infix_aggregate_category_t);
+INFIX_API INFIX_NODISCARD infix_status infix_type_create_named_reference(infix_arena_t *,
+                                                                         infix_type **,
+                                                                         const char *,
+                                                                         infix_aggregate_category_t);
 /**
  * @brief Creates a new `_Complex` number type.
  * @param[in] arena The arena for allocation.
@@ -960,7 +1077,7 @@ c23_nodiscard infix_status infix_type_create_named_reference(infix_arena_t *,
  * @param[in] base_type The base floating-point type (`float` or `double`).
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status infix_type_create_complex(infix_arena_t *, infix_type **, infix_type *);
+INFIX_API INFIX_NODISCARD infix_status infix_type_create_complex(infix_arena_t *, infix_type **, infix_type *);
 /**
  * @brief Creates a new SIMD vector type.
  * @param[in] arena The arena for allocation.
@@ -969,7 +1086,7 @@ c23_nodiscard infix_status infix_type_create_complex(infix_arena_t *, infix_type
  * @param[in] num_elements The number of elements in the vector.
  * @return `INFIX_SUCCESS` on success.
  */
-c23_nodiscard infix_status infix_type_create_vector(infix_arena_t *, infix_type **, infix_type *, size_t);
+INFIX_API INFIX_NODISCARD infix_status infix_type_create_vector(infix_arena_t *, infix_type **, infix_type *, size_t);
 /**
  * @brief A factory function to create an `infix_struct_member`.
  * @param[in] name The name of the member (optional, can be `nullptr`).
@@ -977,7 +1094,7 @@ c23_nodiscard infix_status infix_type_create_vector(infix_arena_t *, infix_type 
  * @param[in] offset The byte offset of the member. This is ignored by `infix_type_create_struct`.
  * @return An initialized `infix_struct_member` object.
  */
-infix_struct_member infix_type_create_member(const char *, infix_type *, size_t);
+INFIX_API infix_struct_member infix_type_create_member(const char *, infix_type *, size_t);
 /**
  * @brief A factory function to create a bitfield `infix_struct_member`.
  * @param[in] name The name of the member.
@@ -986,7 +1103,7 @@ infix_struct_member infix_type_create_member(const char *, infix_type *, size_t)
  * @param[in] bit_width The width of the bitfield in bits.
  * @return An initialized `infix_struct_member` object with bitfield metadata.
  */
-infix_struct_member infix_type_create_bitfield_member(const char *, infix_type *, size_t, uint8_t);
+INFIX_API infix_struct_member infix_type_create_bitfield_member(const char *, infix_type *, size_t, uint8_t);
 /** @} */  // end of manual_api group (continued)
 /** @} */  // end of type_system group
 /**
@@ -1001,12 +1118,12 @@ infix_struct_member infix_type_create_bitfield_member(const char *, infix_type *
  * @param[in] initial_size The initial capacity of the arena in bytes.
  * @return A pointer to the new arena, or `nullptr` on failure. The caller must free this with `infix_arena_destroy`.
  */
-c23_nodiscard infix_arena_t * infix_arena_create(size_t);
+INFIX_API INFIX_NODISCARD infix_arena_t * infix_arena_create(size_t);
 /**
  * @brief Destroys an arena and frees all memory allocated from it.
  * @param[in] arena The arena to destroy. Safe to call with `nullptr`.
  */
-void infix_arena_destroy(infix_arena_t *);
+INFIX_API void infix_arena_destroy(infix_arena_t *);
 /**
  * @brief Allocates a block of memory from an arena.
  * @param[in] arena The arena to allocate from.
@@ -1014,7 +1131,7 @@ void infix_arena_destroy(infix_arena_t *);
  * @param[in] alignment The required alignment for the allocation. Must be a power of two.
  * @return A pointer to the allocated memory, or `nullptr` on failure.
  */
-c23_nodiscard void * infix_arena_alloc(infix_arena_t *, size_t, size_t);
+INFIX_API INFIX_NODISCARD void * infix_arena_alloc(infix_arena_t *, size_t, size_t);
 /**
  * @brief Allocates and zero-initializes a block of memory from an arena.
  * @param[in] arena The arena to allocate from.
@@ -1023,7 +1140,7 @@ c23_nodiscard void * infix_arena_alloc(infix_arena_t *, size_t, size_t);
  * @param[in] alignment The required alignment. Must be a power of two.
  * @return A pointer to the zero-initialized memory, or `nullptr` on failure.
  */
-c23_nodiscard void * infix_arena_calloc(infix_arena_t *, size_t, size_t, size_t);
+INFIX_API INFIX_NODISCARD void * infix_arena_calloc(infix_arena_t *, size_t, size_t, size_t);
 /** @} */  // end of memory_management group (continued)
 /**
  * @defgroup introspection_api Introspection API
@@ -1050,7 +1167,7 @@ typedef enum {
  * @param[in] dialect The desired output format dialect.
  * @return `INFIX_SUCCESS` on success, or `INFIX_ERROR_INVALID_ARGUMENT` if the buffer is too small.
  */
-c23_nodiscard infix_status infix_type_print(char *, size_t, const infix_type *, infix_print_dialect_t);
+INFIX_API INFIX_NODISCARD infix_status infix_type_print(char *, size_t, const infix_type *, infix_print_dialect_t);
 /**
  * @brief Serializes a function signature's components into a string.
  * @param[out] buffer The output buffer.
@@ -1063,41 +1180,41 @@ c23_nodiscard infix_status infix_type_print(char *, size_t, const infix_type *, 
  * @param[in] dialect The output dialect.
  * @return `INFIX_SUCCESS` on success, or `INFIX_ERROR_INVALID_ARGUMENT` if the buffer is too small.
  */
-c23_nodiscard infix_status infix_function_print(char *,
-                                                size_t,
-                                                const char *,
-                                                const infix_type *,
-                                                const infix_function_argument *,
-                                                size_t,
-                                                size_t,
-                                                infix_print_dialect_t);
+INFIX_API INFIX_NODISCARD infix_status infix_function_print(char *,
+                                                            size_t,
+                                                            const char *,
+                                                            const infix_type *,
+                                                            const infix_function_argument *,
+                                                            size_t,
+                                                            size_t,
+                                                            infix_print_dialect_t);
 /**
  * @brief Gets the callable function pointer from an unbound forward trampoline.
  * @param[in] trampoline The unbound `infix_forward_t` handle.
  * @return A callable `infix_unbound_cif_func` pointer on success, or `nullptr` if the
  *         trampoline is `nullptr` or if it is a bound trampoline.
  */
-c23_nodiscard infix_unbound_cif_func infix_forward_get_unbound_code(infix_forward_t *);
+INFIX_API INFIX_NODISCARD infix_unbound_cif_func infix_forward_get_unbound_code(infix_forward_t *);
 /**
  * @brief Gets the callable function pointer from a bound forward trampoline.
  * @param[in] trampoline The bound `infix_forward_t` handle.
  * @return A callable `infix_cif_func` pointer on success, or `nullptr` if the
  *         trampoline is `nullptr` or if it is an unbound trampoline.
  */
-c23_nodiscard infix_cif_func infix_forward_get_code(infix_forward_t *);
+INFIX_API INFIX_NODISCARD infix_cif_func infix_forward_get_code(infix_forward_t *);
 /**
  * @brief Gets the native, callable C function pointer from a reverse trampoline.
  * @param[in] reverse_trampoline The `infix_reverse_t` context handle.
  * @return A `void*` that can be cast to the appropriate C function pointer type and called.
  *         The returned pointer is valid for the lifetime of the context handle.
  */
-c23_nodiscard void * infix_reverse_get_code(const infix_reverse_t *);
+INFIX_API INFIX_NODISCARD void * infix_reverse_get_code(const infix_reverse_t *);
 /**
  * @brief Gets the user-provided data pointer from a closure context.
  * @param[in] reverse_trampoline The `infix_reverse_t` context handle created with `infix_reverse_create_closure`.
  * @return The `void* user_data` that was provided during creation.
  */
-c23_nodiscard void * infix_reverse_get_user_data(const infix_reverse_t *);
+INFIX_API INFIX_NODISCARD void * infix_reverse_get_user_data(const infix_reverse_t *);
 /** @addtogroup type_system */
 /** @{ */
 /**
@@ -1105,103 +1222,103 @@ c23_nodiscard void * infix_reverse_get_user_data(const infix_reverse_t *);
  * @param[in] trampoline The trampoline handle.
  * @return The number of arguments, or 0 if `trampoline` is `nullptr`.
  */
-c23_nodiscard size_t infix_forward_get_num_args(const infix_forward_t *);
+INFIX_API INFIX_NODISCARD size_t infix_forward_get_num_args(const infix_forward_t *);
 /**
  * @brief Gets the number of fixed (non-variadic) arguments for a forward trampoline.
  * @param[in] trampoline The trampoline handle.
  * @return The number of fixed arguments.
  */
-c23_nodiscard size_t infix_forward_get_num_fixed_args(const infix_forward_t *);
+INFIX_API INFIX_NODISCARD size_t infix_forward_get_num_fixed_args(const infix_forward_t *);
 /**
  * @brief Gets the return type for a forward trampoline.
  * @param[in] trampoline The trampoline handle.
  * @return A pointer to the `infix_type` for the return value, or `nullptr`.
  */
-c23_nodiscard const infix_type * infix_forward_get_return_type(const infix_forward_t *);
+INFIX_API INFIX_NODISCARD const infix_type * infix_forward_get_return_type(const infix_forward_t *);
 /**
  * @brief Gets the type of a specific argument for a forward trampoline.
  * @param[in] trampoline The trampoline handle.
  * @param[in] index The zero-based index of the argument.
  * @return A pointer to the `infix_type`, or `nullptr` if the index is out of bounds.
  */
-c23_nodiscard const infix_type * infix_forward_get_arg_type(const infix_forward_t *, size_t);
+INFIX_API INFIX_NODISCARD const infix_type * infix_forward_get_arg_type(const infix_forward_t *, size_t);
 /**
  * @brief Gets the total number of arguments for a reverse trampoline.
  * @param[in] trampoline The trampoline context handle.
  * @return The number of arguments, or 0 if `trampoline` is `nullptr`.
  */
-c23_nodiscard size_t infix_reverse_get_num_args(const infix_reverse_t *);
+INFIX_API INFIX_NODISCARD size_t infix_reverse_get_num_args(const infix_reverse_t *);
 /**
  * @brief Gets the return type for a reverse trampoline.
  * @param[in] trampoline The trampoline context handle.
  * @return A pointer to the `infix_type` for the return value, or `nullptr`.
  */
-c23_nodiscard const infix_type * infix_reverse_get_return_type(const infix_reverse_t *);
+INFIX_API INFIX_NODISCARD const infix_type * infix_reverse_get_return_type(const infix_reverse_t *);
 /**
  * @brief Gets the number of fixed (non-variadic) arguments for a reverse trampoline.
  * @param[in] trampoline The trampoline context handle.
  * @return The number of fixed arguments.
  */
-c23_nodiscard size_t infix_reverse_get_num_fixed_args(const infix_reverse_t *);
+INFIX_API INFIX_NODISCARD size_t infix_reverse_get_num_fixed_args(const infix_reverse_t *);
 /**
  * @brief Gets the type of a specific argument for a reverse trampoline.
  * @param[in] trampoline The trampoline context handle.
  * @param[in] index The zero-based index of the argument.
  * @return A pointer to the `infix_type`, or `nullptr` if the index is out of bounds.
  */
-c23_nodiscard const infix_type * infix_reverse_get_arg_type(const infix_reverse_t *, size_t);
+INFIX_API INFIX_NODISCARD const infix_type * infix_reverse_get_arg_type(const infix_reverse_t *, size_t);
 /**
  * @brief Gets the semantic alias of a type, if one exists.
  * @param[in] type The type object to inspect.
  * @return The name of the type if it was created from a registry alias (e.g., "MyInt"), or `nullptr` if the type is
  * anonymous.
  */
-c23_nodiscard const char * infix_type_get_name(const infix_type *);
+INFIX_API INFIX_NODISCARD const char * infix_type_get_name(const infix_type *);
 /**
  * @brief Gets the fundamental category of a type.
  * @param[in] type The type object to inspect.
  * @return The `infix_type_category` enum value.
  */
-c23_nodiscard infix_type_category infix_type_get_category(const infix_type *);
+INFIX_API INFIX_NODISCARD infix_type_category infix_type_get_category(const infix_type *);
 /**
  * @brief Gets the size of a type in bytes.
  * @param[in] type The type object to inspect.
  * @return The size in bytes.
  */
-c23_nodiscard size_t infix_type_get_size(const infix_type *);
+INFIX_API INFIX_NODISCARD size_t infix_type_get_size(const infix_type *);
 /**
  * @brief Gets the alignment requirement of a type in bytes.
  * @param[in] type The type object to inspect.
  * @return The alignment in bytes.
  */
-c23_nodiscard size_t infix_type_get_alignment(const infix_type *);
+INFIX_API INFIX_NODISCARD size_t infix_type_get_alignment(const infix_type *);
 /**
  * @brief Gets the number of members in a struct or union type.
  * @param[in] type The aggregate type object to inspect.
  * @return The number of members, or 0 if the type is not a struct or union.
  */
-c23_nodiscard size_t infix_type_get_member_count(const infix_type *);
+INFIX_API INFIX_NODISCARD size_t infix_type_get_member_count(const infix_type *);
 /**
  * @brief Gets a specific member from a struct or union type.
  * @param[in] type The aggregate type object to inspect.
  * @param[in] index The zero-based index of the member.
  * @return A pointer to the `infix_struct_member`, or `nullptr` if the index is out of bounds.
  */
-c23_nodiscard const infix_struct_member * infix_type_get_member(const infix_type *, size_t);
+INFIX_API INFIX_NODISCARD const infix_struct_member * infix_type_get_member(const infix_type *, size_t);
 /**
  * @brief Gets the name of a specific argument from a function type.
  * @param[in] func_type The function type object to inspect (`INFIX_TYPE_REVERSE_TRAMPOLINE`).
  * @param[in] index The zero-based index of the argument.
  * @return The name of the argument, or `nullptr` if anonymous or out of bounds.
  */
-c23_nodiscard const char * infix_type_get_arg_name(const infix_type *, size_t);
+INFIX_API INFIX_NODISCARD const char * infix_type_get_arg_name(const infix_type *, size_t);
 /**
  * @brief Gets the type of a specific argument from a function type.
  * @param[in] func_type The function type object to inspect.
  * @param[in] index The zero-based index of the argument.
  * @return A pointer to the `infix_type`, or `nullptr` if the index is out of bounds.
  */
-c23_nodiscard const infix_type * infix_type_get_arg_type(const infix_type *, size_t);
+INFIX_API INFIX_NODISCARD const infix_type * infix_type_get_arg_type(const infix_type *, size_t);
 /** @} */  // end addtogroup type_system
 /** @} */  // end of introspection_api group
 /**
@@ -1273,7 +1390,7 @@ typedef struct {
  * @brief Retrieves detailed information about the last error that occurred on the current thread.
  * @return A copy of the last error details structure. This function is thread-safe.
  */
-infix_error_details_t infix_get_last_error(void);
+INFIX_API infix_error_details_t infix_get_last_error(void);
 /** @} */  // end of error_api group
 /**
  * @defgroup direct_marshalling_api Direct Marshalling API
@@ -1388,11 +1505,11 @@ typedef struct {
  *              used within the signature. Can be `nullptr`.
  * @return `INFIX_SUCCESS` on success, or an error code on failure.
  */
-c23_nodiscard infix_status infix_forward_create_direct(infix_forward_t ** out_trampoline,
-                                                       const char * signature,
-                                                       void * target_function,
-                                                       infix_direct_arg_handler_t * handlers,
-                                                       infix_registry_t * registry);
+INFIX_API INFIX_NODISCARD infix_status infix_forward_create_direct(infix_forward_t ** out_trampoline,
+                                                                   const char * signature,
+                                                                   void * target_function,
+                                                                   infix_direct_arg_handler_t * handlers,
+                                                                   infix_registry_t * registry);
 /**
  * @brief Gets the callable function pointer from a direct marshalling trampoline.
  *
@@ -1400,7 +1517,7 @@ c23_nodiscard infix_status infix_forward_create_direct(infix_forward_t ** out_tr
  * @return A callable `infix_direct_cif_func` pointer on success, or `nullptr` if the
  *         trampoline is `nullptr` or is not a direct marshalling trampoline.
  */
-c23_nodiscard infix_direct_cif_func infix_forward_get_direct_code(infix_forward_t * trampoline);
+INFIX_API INFIX_NODISCARD infix_direct_cif_func infix_forward_get_direct_code(infix_forward_t * trampoline);
 /** @} */  // end of direct_marshalling_api group
 #ifdef __cplusplus
 }

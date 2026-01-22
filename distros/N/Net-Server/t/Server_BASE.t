@@ -36,7 +36,7 @@ my $ok = eval {
     } else {
         eval {
             alarm $env->{'timeout'};
-            close STDERR;
+            open STDERR, ">", "/dev/null";
             Net::Server::Test->run(
                 port => $env->{'ports'}->[0],
                 host => $env->{'hostname'},
@@ -81,7 +81,7 @@ $ok = eval {
     } else {
         eval {
             alarm $env->{'timeout'};
-            close STDERR;
+            open STDERR, ">", "/dev/null";
             Net::Server::Test->run(
                 port => "$env->{'hostname'}:$env->{'ports'}->[2]",
                 port => $env->{'ports'}->[1],

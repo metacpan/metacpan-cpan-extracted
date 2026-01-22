@@ -61,9 +61,9 @@ Properties:
 
 =over
 
-=item C<attachment>, A way to include textual or encoded data.
+=item * C<attachment>, A way to include textual or encoded data.
 
-=item C<url>, The URL to where the data can be retrieved.
+=item * C<url>, The URL to where the data can be retrieved.
 
 =back
 
