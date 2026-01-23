@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Lugh;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 NAME
 
@@ -192,7 +192,7 @@ L<Lugh>, L<Lugh::Inference>, L<Lugh::Model>, L<Lugh::LoRA>
 
 =head1 AUTHOR
 
-Your Name
+lnation E<lt>email@lnation.orgE<gt>
 
 =head1 LICENSE
 

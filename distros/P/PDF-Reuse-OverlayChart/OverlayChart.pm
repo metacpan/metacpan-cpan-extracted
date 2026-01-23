@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 our %possible = (x           => 1,
                  y           => 1,
@@ -595,7 +595,7 @@ sub draw
    }         
    
    ####################
-   # Några kontroller
+   # Nï¿½gra kontroller
    ####################
 
    if ($num < 1)

@@ -60,10 +60,9 @@ my %att = (
   test         => { RECURSIVE_TEST_FILES => 1 }
 );
 
-# Makefile.PL as a modulino
-# https://www.masteringperl.org/2015/01/makefile-pl-as-a-modulino/
 if ( caller() ) {
-  *WriteMakefile = sub { +{ @_ } }    # \%att
+  # +{ @_ } == \%att
+  *WriteMakefile = sub { @ARGV ? +{ @_ }->{ $ARGV[ 0 ] } : +{ @_ } }
 } else {
   require ExtUtils::MakeMaker::CPANfile;
   ExtUtils::MakeMaker::CPANfile->import

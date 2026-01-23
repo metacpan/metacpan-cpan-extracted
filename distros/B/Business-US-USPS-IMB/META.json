@@ -4,13 +4,13 @@
       "Chris Nighswonger"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Business-US-USPS-IMB",
    "no_index" : {
@@ -22,20 +22,37 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Test::More" : 0
+            "Test::More" : "0"
          }
       }
    },
+   "provides" : {
+      "Business::US::USPS::IMB" : {
+         "file" : "IMB.pm",
+         "version" : "0.04"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.02"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cnighswonger/Business-US-USPS-IMB/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cnighswonger/Business-US-USPS-IMB.git",
+         "web" : "https://github.com/cnighswonger/Business-US-USPS-IMB"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

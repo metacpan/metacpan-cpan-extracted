@@ -3,6 +3,12 @@ Revision history for Perl extension EV
 Changes marked with (libev) are changes in libev, and might have more
 documentation in the libev Changes file.
 
+4.37 Thu 22 Jan 2026 16:05:45 CET
+	- so ExtUtils::ParseXS is a mess. Installing the latest CPAN
+          version works, but the version in Perl 5.42 does not. That is,
+          fedora 43 fails, debian's 5.42 works. I've tried to work around
+          it again. Thanks to vividsnow for alerting me to this.
+
 4.36 Fri 19 Sep 2025 19:15:30 CEST
 	- seems the xsubpp maintainer changes syntax every few releases.
           use extremely ugly workaround. goddamnit.

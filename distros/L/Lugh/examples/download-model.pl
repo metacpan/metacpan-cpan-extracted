@@ -183,8 +183,8 @@ if ($success && -f $output_path) {
     my $size = -s $output_path;
     printf "\nDownload complete: %s (%.1f MB)\n", $output_path, $size / (1024*1024);
     print "\nUsage example:\n";
-    print "    use Lugh::Model;\n";
-    print "    my \$model = Lugh::Model->load('$output_path');\n";
+    print "    use Lugh;\n";
+    print "    my \$model = Lugh::Model->new(model => '$output_path');\n";
 } else {
     unlink $output_path if -f $output_path;
     die "Download failed.\n";

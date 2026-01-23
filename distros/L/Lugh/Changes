@@ -1,5 +1,16 @@
 Revision history for Lugh
 
+0.12    2026-01-23
+	- LoRA retraining on an existing model
+	- Full Model Weight Training from scratch
+	- Autograd - Automatic differentiation for Lugh tensors
+        - Optimizers  
+          - Lugh::Optimizer::AdamW with momentum, adaptive learning rates
+          - Lugh::Optimizer::SGD with momentum support
+          - Lugh::Optimizer::LRScheduler with cosine annealing, warmup, step decay
+        - New tests and examples
+	- Note: the next release will be a refactor to use XSOne        
+
 0.11    2026-01-21
         - Test coverage improvements
         - memory leak tests and fixes

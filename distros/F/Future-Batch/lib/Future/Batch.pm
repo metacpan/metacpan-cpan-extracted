@@ -1,13 +1,13 @@
 package Future::Batch;
 
-use 5.014;
+use 5.010;
 use strict;
 use warnings;
 
 use Future;
 use Exporter 'import';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @EXPORT_OK = qw(batch);
 
 sub new {
@@ -59,7 +59,7 @@ sub run {
         my $f = eval { $worker->($item, $idx) };
         if ($@) {
             $f = Future->fail($@);
-        } elsif (!defined $f || !$f->isa('Future')) {
+        } elsif (!defined $f || !ref($f) || !$f->isa('Future')) {
             $f = Future->done($f);
         }
 
@@ -145,7 +145,7 @@ Future::Batch - Process multiple Future-returning operations with concurrency co
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

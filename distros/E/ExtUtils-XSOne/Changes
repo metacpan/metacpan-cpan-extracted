@@ -1,5 +1,8 @@
 Revision history for ExtUtils-XSOne
 
+0.03	2026-01-23
+	- Attempt to fix the compile test on failing linux machines
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

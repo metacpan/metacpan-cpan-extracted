@@ -1,0 +1,26 @@
+Calculator.xs
+Changes
+ignore.txt
+lib/Acme/ExtUtils/XSOne/Test/_footer.xs
+lib/Acme/ExtUtils/XSOne/Test/_header.xs
+lib/Acme/ExtUtils/XSOne/Test/Calculator.pm
+lib/Acme/ExtUtils/XSOne/Test/Calculator/Basic.pm
+lib/Acme/ExtUtils/XSOne/Test/Calculator/Basic.xs
+lib/Acme/ExtUtils/XSOne/Test/Calculator/Memory.pm
+lib/Acme/ExtUtils/XSOne/Test/Calculator/Memory.xs
+lib/Acme/ExtUtils/XSOne/Test/Calculator/Scientific.pm
+lib/Acme/ExtUtils/XSOne/Test/Calculator/Scientific.xs
+lib/Acme/ExtUtils/XSOne/Test/Calculator/Trig.pm
+lib/Acme/ExtUtils/XSOne/Test/Calculator/Trig.xs
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-calculator.t
+t/02-import.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

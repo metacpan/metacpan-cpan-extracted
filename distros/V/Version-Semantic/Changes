@@ -1,5 +1,10 @@
 Release history for Version-Semantic
 
+1.0.2    Fri Jan 23 11:11:26 AM CET 2026
+         - Improve Makefile.PL modulino setup
+         - Remove Test::Fatal min version requirement
+         - Fix typo in documentation
+
 1.0.1    Wed Jan 21 07:26:13 AM CET 2026
          - Add missing changes file to manifest file
          - Simplify Makefile.PL modulino setup

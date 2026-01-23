@@ -1,5 +1,39 @@
 Revision history for Perl extension PDF::Reuse
 
+0.43 Thu Jan 23 2026
+     - Fix prTTFont/prEnd crash from orphaned docProxy (GitHub #24)
+       DESTROY was releasing TTFont0 objects still owned by DocProxy,
+       corrupting their uid and crashing write_objects().
+     - prInitVars now properly resets docProxy state
+
+0.42 Thu Jan 22 2026
+     - Add provides and no_index to META for proper PAUSE indexing
+     - Add LICENSE, SECURITY.md, CONTRIBUTING.md
+     - Address CPANTS Kwalitee experimental metrics
+
+0.41 Thu Jan 22 2026
+     - Add GitHub Issues bugtracker to distribution metadata
+     - Add IO::String to TEST_REQUIRES
+
+0.40 Thu Jan 22 2026
+     Bug fixes:
+     120459     Uses deprecated defined(%hash) - breaks Perl 5.24+
+     120346     Parsing of refs is too strict
+     120401     Reads the entire contents when extracting a single page
+     130152     sprintf with undefined objekt values should not warn
+     171691     IO::String untie - prFile() fails after IO::String write
+     83185      crossrefObj non-numeric argument warning from hex strings
+     168975     prForm() should accept IO::String objects as file input
+     131484     Document GhostScript usage for stream concatenation
+     GitHub#8   prDocForm crash on undefined links array reference
+
+     Internal improvements:
+     - Root object finding patch (from ver_0.40 branch)
+     - strict compatibility fixes (variable declarations)
+     - Added regression test suite (t/regression.t)
+
+     Thanks to all who contributed patches for these fixes!
+
 0.39 Tues Sept 26 2016
      This release simply corrects the rev number
 

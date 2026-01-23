@@ -15,6 +15,7 @@ t/06-simple-module.t
 t/07-compile.t
 t/08-deduplication.t
 t/09-load-xs.t
+t/10-recursive.t
 t/lib/SimpleModule/xs/bar.xs
 t/lib/SimpleModule/xs/baz.xs
 t/lib/SimpleModule/xs/foo.xs

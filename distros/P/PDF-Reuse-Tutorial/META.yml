@@ -1,10 +1,30 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         PDF-Reuse-Tutorial
-version:      0.11
-version_from: Tutorial.pm
-installdirs:  site
-requires:
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+---
+abstract: 'How to produce PDF-files with PDF::Reuse'
+author:
+  - 'Lars Lundberg larslund@cpan.org'
+  - 'Chris Nighswonger cnighs@cpan.org'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDF-Reuse-Tutorial
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  PDF::Reuse::Tutorial:
+    file: Tutorial.pm
+    version: '0.13'
+requires: {}
+resources:
+  bugtracker: https://github.com/cnighswonger/PDF-Reuse-Tutorial/issues
+  repository: https://github.com/cnighswonger/PDF-Reuse-Tutorial.git
+version: '0.13'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,11 +1,16 @@
 Changes
+CONTRIBUTING.md
+LICENSE
 Makefile.PL
 MANIFEST
 README
+SECURITY.md
 lib/PDF/Reuse.pm
 t/test.t
 t/Reuse.t
+t/regression.t
 lib/PDF/Util/reuseComponent_pl
 lib/PDF/Util/graphObj_pl
 lib/PDF/Reuse/Util.pm
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

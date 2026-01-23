@@ -11,4 +11,11 @@ dist.ini
 lib/Mooish/Base.pm
 t/author-pod-syntax.t
 t/base.t
-t/moose.t
+t/debug-moo.t
+t/debug-moose.t
+t/extra-module/hook-afterruntime.t
+t/extra-module/moosex-xsaccessor.t
+t/extra-module/moosex-xsconstructor.t
+t/extra-module/moox-typetiny.t
+t/extra-module/moox-xsconstructor.t
+t/extra-module/none.t

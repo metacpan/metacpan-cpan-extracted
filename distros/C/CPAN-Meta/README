@@ -2,7 +2,7 @@ NAME
     CPAN::Meta - the distribution metadata for a CPAN dist
 
 VERSION
-    version 2.150010
+    version 2.150011
 
 SYNOPSIS
         use v5.10;
@@ -69,41 +69,40 @@ METHODS
   create
       my $meta = CPAN::Meta->create($distmeta_struct, \%options);
 
-    This is same as "new()", except that "generated_by" and "meta-spec"
-    fields will be generated if not provided. This means the metadata
-    structure is assumed to otherwise follow the latest CPAN::Meta::Spec.
+    This is same as new(), except that "generated_by" and "meta-spec" fields
+    will be generated if not provided. This means the metadata structure is
+    assumed to otherwise follow the latest CPAN::Meta::Spec.
 
   load_file
       my $meta = CPAN::Meta->load_file($distmeta_file, \%options);
 
     Given a pathname to a file containing metadata, this deserializes the
     file according to its file suffix and constructs a new "CPAN::Meta"
-    object, just like "new()". It will die if the deserialized version fails
+    object, just like new(). It will die if the deserialized version fails
     to validate against its stated specification version.
 
-    It takes the same options as "new()" but "lazy_validation" defaults to
+    It takes the same options as new() but "lazy_validation" defaults to
     true.
 
   load_yaml_string
       my $meta = CPAN::Meta->load_yaml_string($yaml, \%options);
 
     This method returns a new CPAN::Meta object using the first document in
-    the given YAML string. In other respects it is identical to
-    "load_file()".
+    the given YAML string. In other respects it is identical to load_file().
 
   load_json_string
       my $meta = CPAN::Meta->load_json_string($json, \%options);
 
     This method returns a new CPAN::Meta object using the structure
     represented by the given JSON string. In other respects it is identical
-    to "load_file()".
+    to load_file().
 
   load_string
       my $meta = CPAN::Meta->load_string($string, \%options);
 
     If you don't know if a string contains YAML or JSON, this method will
     use Parse::CPAN::Meta to guess. In other respects it is identical to
-    "load_file()".
+    load_file().
 
   save
       $meta->save($distmeta_file, \%options);
@@ -195,8 +194,8 @@ METHODS
 
     For "version" greater than or equal to 2, the string will be serialized
     as JSON. For "version" less than 2, the string will be serialized as
-    YAML. In both cases, the same rules are followed as in the "save()"
-    method for choosing a serialization backend.
+    YAML. In both cases, the same rules are followed as in the save() method
+    for choosing a serialization backend.
 
     The serialized structure will include a "x_serialization_backend" entry
     giving the package and version used to serialize. Any existing key in
@@ -308,7 +307,7 @@ CONTRIBUTORS
 
     *   Damyan Ivanov <dam@cpan.org>
 
-    *   David Golden <xdg@xdg.me>
+    *   Dan Book <grinnz@gmail.com>
 
     *   Eric Wilhelm <ewilhelm@cpan.org>
 
@@ -346,9 +345,13 @@ CONTRIBUTORS
 
     *   Olaf Alders <olaf@wundersolutions.com>
 
-    *   Olivier Mengué <dolmen@cpan.org>
+    *   Olivier MenguÃ© <dolmen@cpan.org>
+
+    *   Philippe Bruhat (BooK) <book@cpan.org>
 
     *   Randy Sims <randys@thepierianspring.org>
+
+    *   Ricardo Signes <rjbs@semiotic.systems>
 
     *   Tomohiro Hosaka <bokutin@bokut.in>
 

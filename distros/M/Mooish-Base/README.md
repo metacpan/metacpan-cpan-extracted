@@ -1,5 +1,5 @@
 # Mooish::Base
-A Perl module for blah blah blah
+A handy importer for Mooish classes
 
 ## Code and documentation
 [Mooish::Base on CPAN](https://metacpan.org/release/Mooish-Base)
@@ -15,5 +15,4 @@ bigger so we can talk it through.
 
 ### Author
 Bartosz Jarzyna <bbrtj.pro@gmail.com>
-
 

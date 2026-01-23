@@ -28,7 +28,7 @@ version?|https://semver.org/spec/v2.0.0.html#is-v123-a-semantic-version>).
 
 Each object has the mandatory attributes C<major>, C<minor>,
 and C<patch>.  Optional object attributes are C<pre_release> and
-C<build>. C<has_pre_release()> and C<has_build_()> predicate methods exist too.
+C<build>. C<has_pre_release()> and C<has_build()> predicate methods exist too.
 
 The C<version_core()> object method returns the semantic version string of an
 object with the C<v> prefix (if originally set) but without the pre-release

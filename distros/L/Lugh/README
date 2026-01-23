@@ -1,41 +1,286 @@
-Lugh
+Lugh - Pure C LLM Inference Engine for Perl
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+DESCRIPTION
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+Lugh is a pure C large language model (LLM) inference engine for Perl,
+built on the ggml tensor library. It provides high-level APIs for running
+LLM inference and low-level tensor operations for custom neural network
+computations.
 
+Named after the Celtic god of skill and craftsmanship, Lugh provides
+complete understanding and control over LLM inference.
+
+FEATURES
+
+  * Load GGUF models (TinyLlama, LLaMA, Mistral, Qwen, Phi, Gemma, etc.)
+  * BPE tokenization (encode text to tokens, decode tokens to text)
+  * Full transformer forward pass with attention, RoPE, and FFN
+  * Grouped Query Attention (GQA) support
+  * Quantization support (Q4, Q5, Q8, and 30+ quantization types)
+  * GPU acceleration (Metal on macOS, CUDA, Vulkan)
+  * KV cache for efficient incremental decoding
+  * LoRA adapter support
+  * Speculative decoding for faster generation
+  * 110+ model architectures detected automatically
+
+QUICK START
+
+    use Lugh;
+
+    # Load a GGUF model
+    my $model = Lugh::Model->new(model => 'model.gguf');
+    my $tokenizer = Lugh::Tokenizer->new(model => $model);
+    my $inference = Lugh::Inference->new(model => $model);
+
+    # Generate text
+    my @prompt = $tokenizer->encode("Once upon a time");
+    my @generated = $inference->generate(
+        \@prompt,
+        max_tokens  => 50,
+        temperature => 0.8,
+        top_p       => 0.95,
+    );
+    print $tokenizer->decode(\@generated);
 
 INSTALLATION
 
+Lugh requires the Alien::ggml module which provides the ggml tensor library.
+
 To install this module, run the following commands:
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Or using cpanm:
+
+    cpanm Lugh
+
+DEPENDENCIES
+
+  * Perl 5.8.3 or later
+  * Alien::ggml (ggml tensor library)
+  * A C99-compatible compiler
+
+Optional:
+  * Cpanel::JSON::XS (for SafeTensors LoRA support)
+
+EXAMPLES
+
+1. Basic Text Generation
+
+    use Lugh;
+
+    my $model = Lugh::Model->new(model => 'model.gguf');
+    my $tokenizer = Lugh::Tokenizer->new(model => $model);
+    my $inference = Lugh::Inference->new(model => $model);
+
+    my @tokens = $tokenizer->encode("The capital of France is");
+    my @generated = $inference->generate(
+        \@tokens,
+        max_tokens => 20,
+        greedy     => 1,
+    );
+    print $tokenizer->decode(\@generated), "\n";
+
+2. Streaming Output (Token by Token)
+
+    use Lugh;
+
+    my $model = Lugh::Model->new(model => 'model.gguf');
+    my $tokenizer = Lugh::Tokenizer->new(model => $model);
+    my $inference = Lugh::Inference->new(model => $model);
+
+    my @tokens = $tokenizer->encode("Once upon a time");
+
+    $inference->generate(
+        \@tokens,
+        max_tokens  => 100,
+        temperature => 0.8,
+        callback    => sub {
+            my ($token, $count) = @_;
+            print $tokenizer->decode([$token]);
+            STDOUT->flush();
+            return 0;  # Continue (return 1 to stop)
+        },
+    );
+    print "\n";
+
+3. Manual Generation Loop (Full Control)
+
+    use Lugh;
+
+    my $model = Lugh::Model->new(model => 'model.gguf');
+    my $tokenizer = Lugh::Tokenizer->new(model => $model);
+    my $inference = Lugh::Inference->new(model => $model);
+
+    my @tokens = $tokenizer->encode("Hello, how are you");
+
+    for (1..50) {
+        my @logits = $inference->forward(tokens => \@tokens);
+        my $next = $inference->sample_top_p(
+            \@logits,
+            temperature => 0.8,
+            top_p       => 0.95,
+        );
+
+        last if $next == $tokenizer->eos_id;
+
+        push @tokens, $next;
+        print $tokenizer->decode([$next]);
+    }
+    print "\n";
+
+4. Model Information
+
+    use Lugh;
+
+    my $model = Lugh::Model->new(model => 'model.gguf');
+
+    print "Architecture: ", $model->architecture, "\n";
+    print "Tensors: ", $model->n_tensors, "\n";
+    print "Layers: ", $model->get_kv('llama.block_count'), "\n";
+    print "Embedding dim: ", $model->get_kv('llama.embedding_length'), "\n";
+    print "Attention heads: ", $model->get_kv('llama.attention.head_count'), "\n";
+
+5. Using KV Cache for Efficient Incremental Decoding
+
+    use Lugh;
+
+    my $model = Lugh::Model->new(model => 'model.gguf');
+    my $tokenizer = Lugh::Tokenizer->new(model => $model);
+    my $inference = Lugh::Inference->new(model => $model);
+
+    # Create KV cache for incremental decoding
+    my $cache = $inference->create_kv_cache();
+
+    my @tokens = $tokenizer->encode("Once upon a time");
+
+    for (1..50) {
+        # forward_cache only processes new tokens
+        my @logits = $inference->forward_cache($cache, \@tokens);
+        my $next = $inference->sample_top_p(\@logits, temperature => 0.8);
+
+        last if $next == $tokenizer->eos_id;
+
+        @tokens = ($next);  # Only need the new token
+        print $tokenizer->decode([$next]);
+    }
+    print "\n";
+
+6. Chat with Prompt Templates
+
+    use Lugh;
+    use Lugh::Prompt;
+
+    my $model = Lugh::Model->new(model => 'model.gguf');
+    my $tokenizer = Lugh::Tokenizer->new(model => $model);
+    my $inference = Lugh::Inference->new(model => $model);
+
+    # Create prompt formatter (auto-detect from model or specify format)
+    my $formatter = Lugh::Prompt->new(model => $model);
+    # Or: my $formatter = Lugh::Prompt->new(format => 'chatml');
+
+    # Format chat messages
+    my $prompt_text = $formatter->apply(
+        { role => 'system', content => 'You are a helpful assistant.' },
+        { role => 'user', content => 'What is 2 + 2?' },
+    );
+
+    my @tokens = $tokenizer->encode($prompt_text);
+    my @generated = $inference->generate(
+        \@tokens,
+        max_tokens  => 100,
+        temperature => 0.7,
+    );
+    print $tokenizer->decode(\@generated);
+
+SUPPORTED MODELS
+
+Lugh automatically detects model architecture from GGUF metadata:
+
+  LLaMA Family    llama, llama2, llama3, tinyllama, mistral, mixtral
+  Qwen Family     qwen, qwen2, qwen3
+  Phi Family      phi2, phi3
+  Gemma Family    gemma, gemma2, gemma3
+  GPT Family      gpt2, gptj, gptneox
+  Other           falcon, bloom, mpt, starcoder, stablelm, internlm,
+                  deepseek, command-r, bert, t5, and many more
+
+GETTING MODELS
+
+Download GGUF models from Hugging Face:
+
+    # Using huggingface-cli
+    pip install huggingface_hub
+    huggingface-cli download TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF \
+        tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf --local-dir ./models
+
+    # Recommended starter models:
+    # - TinyLlama 1.1B (small, fast, good for testing)
+    # - Qwen2 0.5B or 1.5B (efficient, good quality)
+    # - Phi-3 Mini (3.8B, excellent quality for size)
+
+PERFORMANCE
+
+Backend Selection:
+
+    # Check available backends
+    my @backends = Lugh::available_backends();
+    print "Available: @backends\n";  # e.g., Metal, BLAS, CPU
+
+    # Check best backend for your system
+    print "Best: ", Lugh::best_backend(), "\n";
+
+    # Force specific backend
+    my $inference = Lugh::Inference->new(
+        model   => $model,
+        backend => 'Metal',  # or 'CPU', 'CUDA', 'Vulkan'
+    );
+
+Typical speeds on Apple Silicon:
+  - TinyLlama 1.1B: 20-50 tokens/second
+  - LLaMA 7B: 10-20 tokens/second
+
+MODULES
+
+High-Level (LLM Inference):
+  - Lugh::Model      Load GGUF models, access tensors and metadata
+  - Lugh::Tokenizer  BPE tokenization (encode/decode)
+  - Lugh::Inference  Transformer forward pass and sampling
+  - Lugh::Prompt     Chat template formatting
+
+Advanced:
+  - Lugh::KVCache    KV cache for incremental decoding
+  - Lugh::LoRA       LoRA adapter support
+  - Lugh::RoPE       RoPE scaling for context extension
+  - Lugh::Speculative  Speculative decoding
+  - Lugh::Quant      Quantization utilities
+
+Low-Level (Tensor Operations):
+  - Lugh::Context    Memory context for allocation
+  - Lugh::Tensor     N-dimensional tensors
+  - Lugh::Ops        Tensor operations (add, mul, matmul, etc.)
+  - Lugh::Graph      Computation graph building
 
 SUPPORT AND DOCUMENTATION
 
 After installing, you can find documentation for this module with the
-perldoc command.
+perldoc command:
 
     perldoc Lugh
+    perldoc Lugh::Model
+    perldoc Lugh::Tokenizer
+    perldoc Lugh::Inference
 
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Lugh
-
-    Search CPAN
+    MetaCPAN
         https://metacpan.org/release/Lugh
 
+    GitHub Issues
+        https://github.com/lnation/Lugh/issues
 
 LICENSE AND COPYRIGHT
 
@@ -44,4 +289,3 @@ This software is Copyright (c) 2026 by lnation <email@lnation.org>.
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
-

@@ -1,29 +1,52 @@
 use 5.006;
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile1(
     'NAME'          => 'PDF::Reuse',
     'VERSION_FROM'  => 'lib/PDF/Reuse.pm', 
-    'PREREQ_PM'     => {  Digest::MD5    => 0,
-                          Compress::Zlib => 0,
-                          Carp           => 0,
-                          Exporter       => 0,
-                          AutoLoader     => 0,
-                          Data::Dumper   => 0,
-                          Text::PDF::TTFont0 => 0,
-                          Font::TTF   => 0},
+    'PREREQ_PM'     => {  'Digest::MD5'    => 0,
+                          'Compress::Zlib' => 0,
+                          'Carp'           => 0,
+                          'Exporter'       => 0,
+                          'AutoLoader'     => 0,
+                          'Data::Dumper'   => 0,
+                          'Text::PDF::TTFont0' => 0,
+                          'Font::TTF'   => 0},
     LICENSE => 'perl',
     MIN_PERL_VERSION => '5.006',
     META_MERGE => {
+        'meta-spec' => { version => 2 },
         resources => {
-            repository => 'https://github.com/cnighswonger/PDF-Reuse',
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/cnighswonger/PDF-Reuse.git',
+                web  => 'https://github.com/cnighswonger/PDF-Reuse',
+            },
+            bugtracker => {
+                web => 'https://github.com/cnighswonger/PDF-Reuse/issues',
+            },
+        },
+        provides => {
+            'PDF::Reuse' => {
+                file    => 'lib/PDF/Reuse.pm',
+                version => '0.43',
+            },
+            'PDF::Reuse::Util' => {
+                file    => 'lib/PDF/Reuse/Util.pm',
+            },
+        },
+        no_index => {
+            package => [ 'PDF::Reuse::DocProxy', 'PDF::Reuse::TTFont' ],
         },
     },
     TEST_REQUIRES => {
         'Test' 		=> 0,
 	'Test::More'	=> 0,
 	'Test::Deep'	=> 0,
+	'IO::String'	=> 0,
     },
     ABSTRACT_FROM => 'lib/PDF/Reuse.pm', 
     AUTHOR     => [  'Lars Lundberg LARSLUND@CPAN.ORG',

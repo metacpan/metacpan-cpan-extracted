@@ -4,13 +4,17 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Temp qw(tempdir);
 use File::Spec;
-use File::Path qw(make_path);
+use File::Path qw(make_path remove_tree);
+use FindBin qw($Bin);
 
 use_ok('ExtUtils::XSOne');
 
-my $tmpdir = tempdir(CLEANUP => 1);
+# Create a temporary directory for test files under t/
+my $tmpdir = File::Spec->catdir($Bin, 'tmp', '08-deduplication');
+remove_tree($tmpdir) if -d $tmpdir;
+make_path($tmpdir);
+END { remove_tree($tmpdir) if $tmpdir && -d $tmpdir }
 
 # =============================================================================
 # Test include deduplication

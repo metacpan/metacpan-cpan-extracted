@@ -348,7 +348,7 @@ Chris Nighswonger cnighs@cpan.org
 Copyright (C) 2003 - 2004   Lars Lundberg, Solidez HB.
 Copyright (C) 2005          Karin Lundberg.
 Copyright (C) 2006 - 2010   Lars Lundberg, Solidez HB.
-Copyright (C) 2010 - 2014   Chris Nighswonger
+Copyright (C) 2010 - 2019   Chris Nighswonger
 
 =head1 LICENSE
 

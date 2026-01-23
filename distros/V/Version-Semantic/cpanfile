@@ -18,6 +18,6 @@ on runtime => sub {
 
 on test => sub {
   requires 'Test::API'   => '0';
-  requires 'Test::Fatal' => '== 0.017';
+  requires 'Test::Fatal' => '0';
   requires 'Test::More' => '1.001005'                    # Subtests accept args
 }

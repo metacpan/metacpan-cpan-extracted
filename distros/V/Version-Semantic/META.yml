@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::API: '0'
-  Test::Fatal: '0.017'
+  Test::Fatal: '0'
   Test::More: '1.001005'
 configure_requires:
   ExtUtils::MakeMaker: '6.76'
@@ -27,7 +27,7 @@ no_index:
 provides:
   Version::Semantic:
     file: lib/Version/Semantic.pm
-    version: v1.0.1
+    version: v1.0.2
 requires:
   Carp: '1.32'
   overload: '0'
@@ -37,4 +37,4 @@ requires:
 resources:
   bugtracker: https://github.com/XSven/Version-Semantic/issues
   repository: https://github.com/XSven/Version-Semantic.git
-version: v1.0.1
+version: v1.0.2

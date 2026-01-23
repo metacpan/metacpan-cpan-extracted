@@ -16,7 +16,7 @@ App::Greple::xlate - ενότητα υποστήριξης μετάφρασης 
 
 =head1 VERSION
 
-Version 0.9924
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -371,15 +371,35 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head1 SEE ALSO
 
-L<App::Greple::xlate>
+=head2 MODULES
 
-L<App::Greple::xlate::deepl>
-
-L<App::Greple::xlate::gpt4>
-
-L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - Γενικός δρομέας Docker που χρησιμοποιείται από το xlate για λειτουργίες εμπορευματοκιβωτίων
+
+=head2 RELATED MODULES
+
+=over 2
+
+=item * L<App::Greple>
+
+Ανατρέξτε στο εγχειρίδιο B<greple> για λεπτομέρειες σχετικά με το μοτίβο κειμένου-στόχου. Χρησιμοποιήστε τις επιλογές B<--inside>, B<--outside>, B<--include>, B<--exclude> για να περιορίσετε την περιοχή αντιστοίχισης.
+
+=item * L<App::Greple::update>
+
+Μπορείτε να χρησιμοποιήσετε την ενότητα C<-Mupdate> για να τροποποιήσετε αρχεία με βάση το αποτέλεσμα της εντολής B<greple>.
+
+=item * L<App::sdif>
+
+Χρησιμοποιήστε την εντολή B<sdif> για να εμφανίσετε τη μορφή του δείκτη σύγκρουσης δίπλα-δίπλα με την επιλογή B<-V>.
+
+=item * L<App::Greple::stripe>
+
+Greple B<stripe> χρήση της μονάδας B<--xlate-stripe> με την επιλογή B<--xlate-stripe>.
+
+=back
+
+=head2 RESOURCES
 
 =over 2
 
@@ -402,22 +422,6 @@ DeepL βιβλιοθήκη Python και εντολή CLI.
 =item * L<https://github.com/tecolicom/App-gpty>
 
 Διεπαφή γραμμής εντολών OpenAI
-
-=item * L<App::Greple>
-
-Ανατρέξτε στο εγχειρίδιο B<greple> για λεπτομέρειες σχετικά με το μοτίβο κειμένου-στόχου. Χρησιμοποιήστε τις επιλογές B<--inside>, B<--outside>, B<--include>, B<--exclude> για να περιορίσετε την περιοχή αντιστοίχισης.
-
-=item * L<App::Greple::update>
-
-Μπορείτε να χρησιμοποιήσετε την ενότητα C<-Mupdate> για να τροποποιήσετε αρχεία με βάση το αποτέλεσμα της εντολής B<greple>.
-
-=item * L<App::sdif>
-
-Χρησιμοποιήστε την εντολή B<sdif> για να εμφανίσετε τη μορφή του δείκτη σύγκρουσης δίπλα-δίπλα με την επιλογή B<-V>.
-
-=item * L<App::Greple::stripe>
-
-Greple B<stripe> χρήση της μονάδας B<--xlate-stripe> με την επιλογή B<--xlate-stripe>.
 
 =back
 
@@ -445,7 +449,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

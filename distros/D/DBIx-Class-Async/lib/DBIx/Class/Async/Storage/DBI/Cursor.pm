@@ -10,27 +10,39 @@ DBIx::Class::Async::Storage::DBI::Cursor - Asynchronous cursor for DBIx::Class R
 
 =head1 VERSION
 
-Version 0.43
+Version 0.49
 
 =cut
 
-our $VERSION = '0.43';
+our $VERSION = '0.49';
 
 =head1 SYNOPSIS
 
-  my $cursor = DBIx::Class::Async::Storage::DBI::Cursor->new(
-      storage => $storage,
-      rs      => $resultset,
-  );
+    # Typically obtained from the storage or resultset
+    my $cursor = $rs->cursor;
 
-  $cursor->next->then(sub {
-      my ($row) = @_;
-      return unless $row;
-      say $row->id;
-  });
+    # Standard Async Iteration Pattern
+    my $process_next;
+    $process_next = sub {
+        return $cursor->next->then(sub {
+            my ($row_data) = @_;
 
-  # Reset and iterate again
-  $cursor->reset;
+            # If no data, we've reached the end of the ResultSet
+            return Future->done unless $row_data;
+
+            # Process the raw row data (hashref)
+            say "Processing: " . $row_data->{email};
+
+            # Recurse to fetch the next record
+            return $process_next->();
+        });
+    };
+
+    # Start the stream
+    $process_next->()->on_fail(sub { warn "Streaming failed: @_" });
+
+    # Reset the cursor to the beginning if needed
+    $cursor->reset;
 
 =head1 DESCRIPTION
 

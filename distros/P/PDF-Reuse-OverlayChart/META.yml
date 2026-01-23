@@ -1,11 +1,31 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         PDF-Reuse-OverlayChart
-version:      0.03
-version_from: OverlayChart.pm
-installdirs:  site
+---
+abstract: unknown
+author:
+  - 'Lars Lundberg larslund@cpan.org'
+  - 'Chris Nighswonger cnighs@cpan.org'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDF-Reuse-OverlayChart
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  PDF::Reuse::OverlayChart:
+    file: OverlayChart.pm
+    version: '0.05'
 requires:
-    PDF::Reuse:                    0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  PDF::Reuse: '0'
+resources:
+  bugtracker: https://github.com/cnighswonger/PDF-Reuse-OverlayChart/issues
+  repository: https://github.com/cnighswonger/PDF-Reuse-OverlayChart.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

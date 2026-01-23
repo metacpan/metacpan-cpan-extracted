@@ -2,7 +2,7 @@ package PDF::Reuse::Tutorial;
 
 use strict;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 1;
 
@@ -457,12 +457,12 @@ from being created.)
     prFontSize(9);
     prText(72, 79, 'Main Office');
     prText(72, 69, 'Box 99999');
-    prText(72, 59, 'Stora Allén 99');
+    prText(72, 59, 'Stora Allï¿½n 99');
     prText(72, 49, 'SE-19999 Stockholm');
     prText(72, 39, 'Phone +46-8-99999999');
     prText(264, 79, 'Shop (This Subsidiary)');
-    prText(264, 59, 'Breda Allén 99');
-    prText(264, 49, 'SE-15999 Skärholmen');
+    prText(264, 59, 'Breda Allï¿½n 99');
+    prText(264, 49, 'SE-15999 Skï¿½rholmen');
     prText(264, 39, 'Phone +46-8-19999999');
     prText(432, 79, 'VAT SE-559999-9999');
 
@@ -541,7 +541,7 @@ I have assigned everything directly in the program.
               . sprintf("%02d", $tvec[3]);
  
     my $customer  = 'Anders Svensson';
-    my $address   = 'Klämgränd 9';
+    my $address   = 'Klï¿½mgrï¿½nd 9';
     my $city      = 'Stockholm';
     my $phone     = '9999999';
     my $seller    = 'Alex Buhre';
@@ -555,7 +555,7 @@ I have assigned everything directly in the program.
                   '      Guarantee, ref No 345678,  is attached'],
                   [2, '20503 Microsoft Project Gotham', 1, 55, ' ',
                   '      To be fetched later by the customer'],
-                  [3, '20508 TV-Spel Hårdv DVD-Adapt/Fjärr', 1, 346, $today],
+                  [3, '20508 TV-Spel Hï¿½rdv DVD-Adapt/Fjï¿½rr', 1, 346, $today],
                   [4, '21964 EA Game       SIMS Unleashed', 1, 319, $today],
                   [5, '22249 Nordisk CD/MC/Spelfil Spiderm', 1, 239, $today],
                   [6, '21660 Sony    Videoband 3E-24oV-ORG-EUR', 1, 99, $today]
@@ -677,6 +677,99 @@ string, '436', which someone has decided should be used in this check number met
 After that, prLog puts a tag, <S1>, in the log. Now a hexadecimal digest is produced
 and printed.  With this check number method you need the log to verify that a document
 is consistent. If that is good or not depends on your needs.
+
+=head2 Replacing placeholders with form fields
+
+A common need is to have a nicely designed PDF template with placeholder areas that
+get filled in with data from your program. For example, you might have an invoice PDF
+with fields for customer name, address, and line items; or a certificate with a name
+and date field.
+
+The previous examples showed how to overlay text at specific coordinates using prForm()
+and prText(). That works well, but you have to know the exact x,y position for every
+piece of text. An alternative approach is to use B<interactive form fields> (AcroForm
+fields) as named placeholders. You design your template with named fields, and then use
+prField() to fill them in by name.
+
+B<Step 1: Create a PDF template with named form fields.>
+
+Use a tool like LibreOffice Writer, LibreOffice Draw, or Adobe Acrobat to create your
+PDF template. Add text form fields where you want dynamic content to appear. Give each
+field a meaningful name like "Name", "Address", "Date", etc. Export or save as PDF with
+the form fields intact.
+
+In LibreOffice Writer, you can insert form fields via View > Toolbars > Form Controls,
+then use the Text Box tool. Right-click each field and set its Name property. When done,
+export to PDF and check "Create PDF Form" in the export options.
+
+B<Step 2: Fill in the fields with prField() and prDocForm().>
+
+=for placeholderFields.pl begin
+
+    use PDF::Reuse;
+    use strict;
+
+    prFile('filled_form.pdf');
+
+    # Assign values to the named form fields
+    prField('Name',    'Jane Smith');
+    prField('Address', '123 Main Street');
+    prField('City',    'Springfield');
+    prField('Date',    '2026-01-22');
+    prField('Amount',  '$1,250.00');
+
+    # Load the template - fields get filled automatically
+    prDocForm('invoice_template.pdf');
+
+    prEnd();
+
+=for end
+
+The field names passed to prField() must match exactly the names you gave the fields
+in your template. The values are assigned via JavaScript when the PDF is opened, so
+the resulting PDF needs a viewer that supports JavaScript (Adobe Reader, most modern
+viewers).
+
+B<Step 3: Data-driven production.>
+
+Just like the mail merge example in "Starting to reuse", you can combine this with a
+data source to mass-produce filled forms:
+
+=for placeholderBatch.pl begin
+
+    use PDF::Reuse;
+    use strict;
+
+    prFile('all_certificates.pdf');
+
+    my @recipients = (
+        { name => 'Alice Johnson',  course => 'Advanced Perl',  date => '2026-01-15' },
+        { name => 'Bob Williams',   course => 'PDF Processing', date => '2026-01-16' },
+        { name => 'Carol Martinez', course => 'Advanced Perl',  date => '2026-01-17' },
+    );
+
+    for my $r (@recipients) {
+        prField('Recipient_Name', $r->{name});
+        prField('Course_Title',   $r->{course});
+        prField('Completion_Date', $r->{date});
+        prDocForm('certificate_template.pdf');
+        prPage();
+    }
+
+    prEnd();
+
+=for end
+
+This produces a multi-page PDF where each page is a filled-in certificate. The template
+is stored only once in the output file, keeping it compact even for thousands of pages.
+
+B<Notes:>
+
+If you cannot use form fields (e.g. you received a PDF without them), the coordinate-based
+approach from "Starting to reuse" is the way to go: use prForm() to load the template as
+a background, and prText() to place text at specific positions. You can use a tool like
+reuseComponent_pl to inspect the template's structure and determine the coordinates you
+need.
 
 =head2 Importing an image
 

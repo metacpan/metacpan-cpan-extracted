@@ -16,7 +16,7 @@ App::Greple::xlate - greple的翻译支持模块
 
 =head1 VERSION
 
-Version 0.9924
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -371,15 +371,35 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head1 SEE ALSO
 
-L<App::Greple::xlate>
+=head2 MODULES
 
-L<App::Greple::xlate::deepl>
-
-L<App::Greple::xlate::gpt4>
-
-L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - xlate 用于容器操作的通用 Docker 运行程序
+
+=head2 RELATED MODULES
+
+=over 2
+
+=item * L<App::Greple>
+
+关于目标文本模式的细节，请参见B<greple>手册。使用B<--inside>, B<--outside>, B<--include>, B<--exclude>选项来限制匹配区域。
+
+=item * L<App::Greple::update>
+
+你可以使用C<-Mupdate>模块通过B<greple>命令的结果来修改文件。
+
+=item * L<App::sdif>
+
+使用B<sdif>与B<-V>选项并列显示冲突标记格式。
+
+=item * L<App::Greple::stripe>
+
+通过 B<--xlate-stripe> 选项查看 B<stripe> 模块的使用情况。
+
+=back
+
+=head2 RESOURCES
 
 =over 2
 
@@ -402,22 +422,6 @@ OpenAI Python 库
 =item * L<https://github.com/tecolicom/App-gpty>
 
 OpenAI 命令行界面
-
-=item * L<App::Greple>
-
-关于目标文本模式的细节，请参见B<greple>手册。使用B<--inside>, B<--outside>, B<--include>, B<--exclude>选项来限制匹配区域。
-
-=item * L<App::Greple::update>
-
-你可以使用C<-Mupdate>模块通过B<greple>命令的结果来修改文件。
-
-=item * L<App::sdif>
-
-使用B<sdif>与B<-V>选项并列显示冲突标记格式。
-
-=item * L<App::Greple::stripe>
-
-通过 B<--xlate-stripe> 选项查看 B<stripe> 模块的使用情况。
 
 =back
 
@@ -445,7 +449,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

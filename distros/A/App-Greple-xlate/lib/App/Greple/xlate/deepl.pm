@@ -1,6 +1,6 @@
 package App::Greple::xlate::deepl;
 
-our $VERSION = "0.9924";
+our $VERSION = "1.00";
 
 use v5.14;
 use warnings;
@@ -8,7 +8,7 @@ use Encode;
 use Data::Dumper;
 
 use List::Util qw(sum);
-use App::cdif::Command;
+use Command::Run;
 
 use App::Greple::xlate qw(%opt &opt);
 use App::Greple::xlate::Lang qw(%LANGNAME);
@@ -24,7 +24,7 @@ my %param = (
     );
 
 sub deepl {
-    state $deepl = App::cdif::Command->new;
+    state $deepl = Command::Run->new;
     state $command = do {
 	my $glossary = $App::Greple::xlate::glossary;
 	my   @c = ('deepl', 'text');
@@ -37,7 +37,7 @@ sub deepl {
 	}
 	\@c;
     };
-    $deepl->command([@$command, +shift])->update->data;
+    $deepl->command(@$command, shift)->update->data;
 }
 
 sub clipboard {

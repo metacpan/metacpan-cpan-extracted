@@ -1,6 +1,6 @@
 package DBIx::Class::Async;
 
-$DBIx::Class::Async::VERSION   = '0.43';
+$DBIx::Class::Async::VERSION   = '0.49';
 $DBIx::Class::Async::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ DBIx::Class::Async - Asynchronous database operations for DBIx::Class
 
 =head1 VERSION
 
-Version 0.43
+Version 0.49
 
 =cut
 
@@ -53,37 +53,43 @@ You are encouraged to try and share your suggestions.
     use DBIx::Class::Async;
 
     my $loop = IO::Async::Loop->new;
-    my $db   = DBIx::Class::Async->new(
+
+    # Initialise the Async bridge
+    my $db = DBIx::Class::Async->new(
         schema_class => 'MyApp::Schema',
-        connect_info => [
-            'dbi:SQLite:dbname=my.db',
-            undef,
-            undef,
-            { sqlite_unicode => 1 },
-        ],
-        workers   => 2,
-        cache_ttl => 60,
-        loop      => $loop,
+        connect_info => [ 'dbi:SQLite:dbname=my.db', '', '' ],
+        workers      => 4,
+        loop         => $loop,
     );
 
-    my $f = $db->search('User', { active => 1 });
+    # Access a ResultSet bridge
+    my $rs = $db->resultset('User');
 
-    $f->on_done(sub {
-        my ($rows) = @_;
-        for my $row (@$rows) {
-            say $row->{name};
-        }
+    # 1. High-level Atomic Operations (Race-condition safe)
+    $rs->find_or_create({
+        email => 'john@example.com',
+        name  => 'John'
+    })->then(sub {
+        my $user = shift;
+        say "Found or created user: " . $user->name;
+
+        # 2. Chained async updates
+        return $user->update({ last_login => time });
+    })->then(sub {
+        # 3. Complex searching with Future results
+        return $rs->search({ active => 1 })->all;
+    })->then(sub {
+        my @users = @_;
+        say "Active users: " . scalar @users;
         $loop->stop;
-    });
-
-    $f->on_fail(sub {
-        warn "Query failed: @_";
+        return Future->done;
+    })->catch(sub {
+        my $error = shift;
+        warn "Database error occurred: $error";
         $loop->stop;
     });
 
     $loop->run;
-
-    $db->disconnect;
 
 =head1 DESCRIPTION
 
@@ -277,7 +283,7 @@ Returns: Integer count.
 =cut
 
 sub count {
-    my ($self, $resultset, $search_args) = @_;
+    my ($self, $resultset, $search_args, $attrs) = @_;
 
     # Allow Hash (standard), Array (OR/AND logic), or ScalarRef (Literal SQL)
     state $check = compile(Str, Maybe[ HashRef | ArrayRef | ScalarRef ]);
@@ -288,7 +294,7 @@ sub count {
 
     my $start_time = time;
 
-    return $self->_call_worker('count', $resultset, $search_args)->then(sub {
+    return $self->_call_worker('count', $resultset, $search_args, $attrs)->then(sub {
         my ($result) = @_;
         my $duration = time - $start_time;
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
@@ -310,7 +316,7 @@ Creates a new row.
         { name => 'John', email => 'john@example.com' }
     );
 
-Returns: Hashref of created row data.
+Returns a L<DBIx::Class::Async::Row> object.
 
 =cut
 
@@ -341,8 +347,19 @@ sub create {
         }
 
         my $final_data = $self->_merge_result_data($resultset, $deflated_data, $result);
+        my $in_storage = 1;
+        return Future->done($self->_inflate_row($resultset, $final_data, $in_storage));
+    })
+    ->catch(sub {
+        my ($error) = @_;
 
-        return Future->done($self->_inflate_row($resultset, $final_data));
+        # If it's a DBIC Exception object, extract the message
+        my $error_message = (ref $error && $error->can('msg'))
+            ? $error->msg
+            : "$error";
+
+        # Standardize the failure so the ResultSet catch can regex it
+        return Future->fail($error_message);
     });
 }
 
@@ -495,17 +512,17 @@ Returns: Hashref of row data or undef if not found.
 =cut
 
 sub find {
-    my ($self, $resultset, $id) = @_;
+    my ($self, $resultset, $id, $attrs) = @_;
 
-    state $check = compile(Str, Int|Str);
-    $check->($resultset, $id);
+    #state $check = compile(Str, Int|Str|HashRef, Maybe[HashRef]);
+    #$check->($resultset, $id, $attrs);
 
     $self->{stats}{queries}++;
     $self->_record_metric('inc', 'db_async_queries_total');
 
     my $start_time = time;
 
-    return $self->_call_worker('find', $resultset, $id)->then(sub {
+    return $self->_call_worker('find', $resultset, $id, $attrs)->then(sub {
         my ($result) = @_;
         my $duration = time - $start_time;
         $self->_record_metric('observe', 'db_async_query_duration_seconds', $duration);
@@ -811,8 +828,15 @@ sub search {
     $self->{stats}{queries}++;
     $self->_record_metric('inc', 'db_async_queries_total');
 
-    my $cache_key = delete $attrs->{cache_key} // _generate_cache_key('search', $resultset, $search_args, $attrs);
-    my $use_cache = exists $attrs->{cache} ? delete $attrs->{cache} : defined $self->{cache_ttl};
+    my $use_cache = exists $attrs->{cache}
+        ? delete $attrs->{cache}
+        : defined $self->{cache_ttl};
+
+    my $cache_key;
+    if ($use_cache) {
+        $cache_key = delete $attrs->{cache_key}
+            // _generate_cache_key('search', $resultset, $search_args, $attrs);
+    }
 
     if ($use_cache) {
         my $cached = $self->{cache}->get($cache_key);
@@ -875,17 +899,13 @@ Returns: Array of results in the same order as queries.
 sub search_multi {
     my ($self, @queries) = @_;
 
-    # Record total query count
-    $self->{stats}{queries} += scalar @queries;
-    $self->_record_metric('inc', 'db_async_queries_total', scalar @queries);
+    my $start_time = time;
 
     # 1. Reuse the hardened search() method for each query
     my @futures = map {
         my ($resultset, $search_args, $attrs) = @$_;
         $self->search($resultset, $search_args, $attrs)
     } @queries;
-
-    my $start_time = time;
 
     # 2. Use needs_all so the entire batch fails if ANY single query fails
     return Future->needs_all(@futures)->then(sub {
@@ -1079,6 +1099,11 @@ the worker will immediately:
 =item 2. Fail the L<Future> in the parent process with the specific error message.
 
 =back
+
+B<Note on Concurrency:> This entire batch is dispatched to a single worker
+process to ensure that the transaction maintains ACID properties. While the
+batch is running, that specific worker is "pinned" and unavailable for other
+queries.
 
 =cut
 
@@ -1634,8 +1659,24 @@ sub _execute_operation {
 
         my $count = eval {
             my $rs = $schema->resultset($source_name);
-            # Ensure we have hashes to avoid "Not a HASH reference" errors in DBIC
-            $rs->search($search_args || {}, $attrs || {})->count;
+            my $query_rs = $rs->search($search_args || {}, $attrs || {});
+
+            # If is_subquery is present, we want the count of the SLICE
+            if ($attrs && $attrs->{is_subquery}) {
+                my $subquery = $query_rs->as_query;
+
+                # Create a virtual ResultSet using the subquery as the 'from' source
+                return $schema->resultset($source_name)->search(
+                    {},
+                    {
+                        from => [ { subq => $subquery } ],
+                        alias => 'subq'
+                    }
+                )->count;
+            }
+
+            # Standard count (ignores rows/offset)
+            return $query_rs->count;
         };
 
         if ($@) {
@@ -1754,21 +1795,63 @@ sub _generate_cache_key {
 }
 
 sub _inflate_row {
-    my ($self, $source_name, $data) = @_;
+    my ($self, $source_name, $data, $in_storage_override) = @_;
     return undef unless defined $data;
 
-    # Last line of defense: if an error slipped through to here,
-    # return it instead of a Row object.
     if (my $error = $self->_check_response($data)) {
         return $error;
     }
 
-    return DBIx::Class::Async::Row->new(
+    # Determine storage state FIRST
+    my $is_in_storage = $in_storage_override;
+    if (!defined $is_in_storage) {
+        $is_in_storage = (ref $data eq 'HASH' && exists $data->{_in_storage})
+            ? $data->{_in_storage} # Check before shallow copy if you like
+            : 0;
+    }
+
+    # 2. Shallow copy
+    my $inflated = { %$data };
+
+    # 3. Walk the relationships to find nested data
+    my $source = $self->_schema_instance->source($source_name);
+
+    # Only walk relationships if the source supports it
+    if ($source->can('relationships')) {
+        foreach my $rel ($source->relationships) {
+            if (exists $inflated->{$rel} && defined $inflated->{$rel}) {
+                my $rel_info   = $source->relationship_info($rel);
+                my $rel_source = $rel_info->{source};
+
+                if (ref $inflated->{$rel} eq 'ARRAY') {
+                    $inflated->{$rel} = [
+                        map {
+                            $self->_inflate_row($rel_source, $_, $is_in_storage)
+                        } @{$inflated->{$rel}}
+                    ];
+                }
+                elsif (ref $inflated->{$rel} eq 'HASH') {
+                    $inflated->{$rel} = $self->_inflate_row($rel_source, $inflated->{$rel}, $is_in_storage);
+                }
+            }
+        }
+    }
+
+    # 4. Dynamic Subclassing (to satisfy isa_ok checks in tests)
+    my $row_class = "DBIx::Class::Async::Row::$source_name";
+    {
+        no strict 'refs';
+        unless (@{"${row_class}::ISA"}) {
+            @{"${row_class}::ISA"} = ('DBIx::Class::Async::Row');
+        }
+    }
+
+    return $row_class->new(
         schema      => $self->_schema_instance,
         async_db    => $self,
         source_name => $source_name,
-        row_data    => $data,
-        in_storage  => 1,
+        row_data    => $inflated,
+        in_storage  => $is_in_storage,
     );
 }
 
@@ -2102,18 +2185,38 @@ sub _check_response {
     return; # Not an error
 }
 
+# This handles three distinct database response patterns:
+# HASH  : The driver returned specific column/value pairs (e.g., PostgreSQL RETURNING).
+# ARRAY : The driver returned a list of values corresponding to the Primary Keys.
+#         We map these in order to the defined PK columns.
+# SCALAR: The driver returned a single value (e.g., SQLite last_insert_rowid).
+#         This is only mapped if the table has exactly one Primary Key.
+
 sub _merge_result_data {
     my ($self, $source_name, $original_data, $returned_result) = @_;
 
     my $merged = { %$original_data };
+    my $source = $self->_schema_instance->source($source_name);
+    my @pks    = $source->primary_columns;
 
     if (ref $returned_result eq 'HASH') {
         @{$merged}{keys %$returned_result} = values %$returned_result;
     }
     elsif (defined $returned_result && !ref $returned_result) {
-        my $source = $self->_schema_instance->source($source_name);
-        my ($pk)   = $source->primary_columns;
-        $merged->{$pk} = $returned_result if $pk;
+        # Only assign if there is exactly one PK (typical for auto-inc)
+        if (scalar @pks == 1) {
+            $merged->{$pks[0]} = $returned_result;
+        }
+    }
+    elsif (ref $returned_result eq 'ARRAY') {
+        # Map array values to PK columns in order
+        my $return_count = scalar @$returned_result;
+        for (my $i = 0; $i < @pks; $i++) {
+            # Safety: Don't overwrite if the DB didn't return enough values
+            last if $i >= $return_count;
+
+            $merged->{$pks[$i]} = $returned_result->[$i];
+        }
     }
 
     return $merged;

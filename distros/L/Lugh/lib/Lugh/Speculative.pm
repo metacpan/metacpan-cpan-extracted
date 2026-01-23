@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Lugh;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ Lugh::Speculative - Speculative decoding for faster LLM inference
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =head1 SYNOPSIS
 

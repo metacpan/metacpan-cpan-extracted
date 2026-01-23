@@ -5,7 +5,7 @@ use warnings;
 
 use Lugh;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 1;
 
@@ -310,10 +310,11 @@ Paper references:
 
 =head1 AUTHOR
 
-Lugh Authors
+lnation E<lt>email@lnation.orgE<gt>
 
 =head1 LICENSE
 
-Same as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut

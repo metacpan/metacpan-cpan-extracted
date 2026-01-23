@@ -14,7 +14,7 @@ App::Greple::xlate - greple のための翻訳サポートモジュール
 
 # VERSION
 
-Version 0.9924
+Version 1.00
 
 # DESCRIPTION
 
@@ -327,15 +327,31 @@ DeepLとChatGPTのコマンドラインツールをインストールする必�
 
 # SEE ALSO
 
-[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
+## MODULES
 
-[App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl)
-
-[App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4)
-
-[App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
+[App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl), [App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4), [App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
 [App::dozo](https://metacpan.org/pod/App%3A%3Adozo) - xlate がコンテナ操作に使用する汎用 Docker ランナー
+
+## RELATED MODULES
+
+- [App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
+
+    **greple**マニュアルで対象テキストのパターンについての詳細を参照してください。**--inside**、**--outside**、**--include**、**--exclude**オプションを使用してマッチ範囲を制限します。
+
+- [App::Greple::update](https://metacpan.org/pod/App%3A%3AGreple%3A%3Aupdate)
+
+    `-Mupdate`モジュールを使って、**greple**コマンドの結果でファイルを修正できます。
+
+- [App::sdif](https://metacpan.org/pod/App%3A%3Asdif)
+
+    **sdif**を使用すると、**-V**オプションと並べてコンフリクトマーカー形式を表示できます。
+
+- [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe)
+
+    Greple **stripe**モジュールは**--xlate-stripe**オプションで使用します。
+
+## RESOURCES
 
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 
@@ -357,22 +373,6 @@ DeepLとChatGPTのコマンドラインツールをインストールする必�
 
     OpenAIコマンドラインインターフェイス
 
-- [App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
-
-    **greple**マニュアルで対象テキストのパターンについての詳細を参照してください。**--inside**、**--outside**、**--include**、**--exclude**オプションを使用してマッチ範囲を制限します。
-
-- [App::Greple::update](https://metacpan.org/pod/App%3A%3AGreple%3A%3Aupdate)
-
-    `-Mupdate`モジュールを使って、**greple**コマンドの結果でファイルを修正できます。
-
-- [App::sdif](https://metacpan.org/pod/App%3A%3Asdif)
-
-    **sdif**を使用すると、**-V**オプションと並べてコンフリクトマーカー形式を表示できます。
-
-- [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe)
-
-    Greple **stripe**モジュールは**--xlate-stripe**オプションで使用します。
-
 ## ARTICLES
 
 - [https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250](https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250)
@@ -393,7 +393,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

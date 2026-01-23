@@ -61,7 +61,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='2.073';
+$VERSION='2.075';
 chomp($VERSION_GIT_SHA=do { local (@ARGV, $/) = ($_=__FILE__.'.sha'); <> if -f $_ });
 
 
@@ -2972,17 +2972,17 @@ sub perl {
     if ( $attr_hr->{'hidden'} || (exists $attr_hr->{'display'} && !$attr_hr->{'display'}) ) {
 
     
-        #  No display wanted
+        #  No display wanted. Note debug - don't do @{$attr_hr}{qw(hidden display)} or keys autovivify !
         #
-        debug('hidden, not displaying. hidden:%s, display (exists):%s,%s', @{$attr_hr}{qw(hidden display)}, exists($attr_hr->{'display'}));
+        debug('hidden, not displaying. hidden:%s, display:%s, display(exists) %s', $attr_hr->{'hidden'}, $attr_hr->{'display'}, exists($attr_hr->{'display'}));
         return \undef;
         
     }
     else {
     
-        #  Not hidden return
+        #  Not hidden return. Note debug - don't do @{$attr_hr}{qw(hidden display)} or keys autovivify !
         #
-        debug('not hidden, displaying. hidden:%s, display:%s', @{$attr_hr}{qw(hidden display)});
+        debug('not hidden, displaying. hidden:%s, display:%s', $attr_hr->{'hidden'}, $attr_hr->{'display'});
         return $html_sr;
         
     }

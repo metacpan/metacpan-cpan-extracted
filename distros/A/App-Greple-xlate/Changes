@@ -1,5 +1,11 @@
 Revision history for Perl extension App-Greple-xlate
 
+1.00 2026-01-23T01:53:06Z
+
+    - Replace App::cdif::Command with Command::Run
+    - Remove App::sdif dependency from cpanfile
+    - Reorganize SEE ALSO section structure in documentation
+
 0.9924 2025-12-20T00:41:26Z
 
     - fix test failure in CPAN test environment (add perl bin to PATH)

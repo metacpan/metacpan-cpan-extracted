@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Attribute;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020002';
+our $VERSION   = '0.021000';
 
 BEGIN { our @ISA = 'Sub::Accessor::Small' };
 
@@ -57,8 +57,8 @@ sub new {
 sub make_clone {
 	my $me = shift;
 	
-	defined &Clone::clone or require Clone;
-	my $clone = Clone::clone( $me );
+	defined &Class::XSConstructor::clone or require Class::XSConstructor;
+	my $clone = Class::XSConstructor::clone( $me );
 	
 	# Clone shouldn't clone anything lexical!
 	for my $kind ( @ACCESSOR_KINDS ) {
@@ -150,7 +150,7 @@ sub make_extended {
 	}
 	
 	# These things can just always be straight-up changed.
-	for my $option ( qw/ init_arg default builder trigger weak_ref undef_tolerant lazy documentation constant / ) {
+	for my $option ( qw/ init_arg default builder trigger weak_ref undef_tolerant lazy documentation constant clone_on_read clone_on_write clone_bypass / ) {
 		next unless exists $opts->{$option};
 		$clone->{$option} = delete $opts->{$option};
 	}
@@ -263,6 +263,7 @@ sub canonicalize_opts {
 	
 	$me->canonicalize_constant;
 	$me->canonicalize_alias;
+	$me->canonicalize_clone;
 	$me->SUPER::canonicalize_opts( @_ );
 	$me->canonicalize_storage;
 }
@@ -331,6 +332,23 @@ sub canonicalize_alias {
 	}
 }
 
+sub canonicalize_clone {
+	my $me = shift;
+	
+	my @opts = qw/ clone_on_read clone_on_write /;
+	
+	if ( my $c = delete $me->{clone} ) {
+		( exists $me->{$_} or $me->{$_} = $c ) for @opts;
+	}
+	
+	for my $opt ( @opts ) {
+		if ( $me->{$opt} and Types::Common::is_Str $me->{$opt} and $me->{$opt} ne '1' ) {
+			my $method_name = $me->{$opt};
+			$me->{$opt} = sub { shift->$method_name( @_ ) };
+		}
+	}
+}
+
 sub canonicalize_storage {
 	my $me = shift;
 	
@@ -377,18 +395,86 @@ sub inline_access_w {
 		Marlin::Util::_croak("Failed to inline writer code for constant " . $me->{slot});
 	}
 	
+	if ( Types::Common::is_CodeRef $me->{clone_on_write} ) {
+		$val = "do { $val }" if $val =~ /;/;
+		my $var = $me->make_var_name( 'write_cloner' );
+		$me->{inline_environment}{$var} = \$me->{clone_on_write};
+		$val = sprintf(
+			'do { my $cloned = %s->( %s, %s, %s ); %s; $cloned }',
+			$var,
+			$selfvar,
+			B::perlstring($me->{slot}),
+			$val,
+			$me->inline_type_assertion( $selfvar, '$cloned' ),
+		);
+	}
+	elsif ( $me->{clone_on_write} ) {
+		$val = "do { $val }" if $val =~ /;/;
+		$val = sprintf( 'Class::XSConstructor::clone( %s )', $val );
+	}
+	
 	return $me->SUPER::inline_access_w( $selfvar, $val );
 }
 
-for my $type ( @ACCESSOR_KINDS ) {
-	my $m = "has_simple_$type";
-	my $orig = Sub::Accessor::Small->can($m);
-	my $new = sub {
-		my $me = shift;
-		return false if $me->{storage} ne 'HASH';
-		return $me->$orig( @_ );
-	};
-	no strict 'refs'; *$m = $new;
+sub inline_reader {
+	my $me = shift;
+	my $selfvar = shift || '$_[0]';
+	
+	my $orig = $me->SUPER::inline_reader( $selfvar, @_ );
+	
+	if ( Types::Common::is_CodeRef $me->{clone_on_read} ) {
+		$orig = "do { $orig }" if $orig =~ /;/;
+		my $var = $me->make_var_name( 'read_cloner' );
+		$me->{inline_environment}{$var} = \$me->{clone_on_read};
+		return sprintf(
+			'%s->( %s, %s, %s )',
+			$var,
+			$selfvar,
+			B::perlstring($me->{slot}),
+			$orig,
+		)
+	}
+	elsif ( $me->{clone_on_read} ) {
+		$orig = "do { $orig }" if $orig =~ /;/;
+		return "Class::XSConstructor::clone( $orig )";
+	}
+	else {
+		return $orig;
+	}
+}
+
+sub has_simple_reader {
+	my $me = shift;
+	return false if $me->{storage} ne 'HASH';
+	return false if $me->{clone_on_read};
+	return $me->SUPER::has_simple_reader( @_ );
+}
+
+sub has_simple_writer {
+	my $me = shift;
+	return false if $me->{storage} ne 'HASH';
+	return false if $me->{clone_on_write};
+	return $me->SUPER::has_simple_writer( @_ );
+}
+
+sub has_simple_accessor {
+	my $me = shift;
+	return false if $me->{storage} ne 'HASH';
+	return false if $me->{clone_on_read};
+	return false if $me->{clone_on_write};
+	return $me->SUPER::has_simple_accessor( @_ );
+}
+
+sub has_simple_clearer {
+	my $me = shift;
+	return false if $me->{storage} ne 'HASH';
+	return $me->SUPER::has_simple_clearer( @_ );
+}
+
+sub has_simple_predicate {
+	my $me = shift;
+	return false if $me->{storage} ne 'HASH';
+	return $me->SUPER::has_simple_predicate( @_ );
 }
 
 my %cxsa_map = (
@@ -437,6 +523,24 @@ sub install_accessors {
 		$me->install_coderef( $_, $coderef ) for @aliases;
 	}
 
+	if ( my $bypass = $me->{clone_bypass} ) {
+		delete local $me->{clone_on_read};
+		delete local $me->{clone_on_write};
+		
+		if ( HAS_CXSA and $me->has_simple_accessor and !ref $bypass and $bypass !~ /^my\s+/ ) {
+			Class::XSAccessor->import(
+				class     => $me->{package},
+				replace   => 1,
+				accessors => { $bypass => $me->{slot} },
+			);
+			$me->{_implementation}{$bypass} = 'CXSA';
+		}
+		else {
+			$me->install_coderef($bypass, $me->accessor);
+			$me->{_implementation}{$bypass} = 'Marlin';
+		}
+	}
+	
 	if (defined $me->{handles}) {
 
 		my $shv_data;
@@ -448,6 +552,17 @@ sub install_accessors {
 				my ( $name ) = splice( @pairs, 0, 2 );
 				$handles_map{"$name"} = $name;
 			}
+
+			# Force inline_environment to be built
+			$me->inline_reader;
+			$me->inline_writer    if $me->{storage} ne 'NONE';
+			$me->inline_accessor  if $me->{storage} ne 'NONE';
+			$me->inline_predicate if $me->{storage} ne 'NONE';
+			$me->inline_clearer   if $me->{storage} ne 'NONE';
+
+			# We specifically want to suppress cloning
+			delete local $me->{clone_on_read};
+			delete local $me->{clone_on_write};
 
 			require Sub::HandlesVia::Toolkit::SubAccessorSmall;
 			my $SHV = 'Sub::HandlesVia::Toolkit::SubAccessorSmall'->new(
@@ -463,6 +578,10 @@ sub install_accessors {
 		}
 
 		if (!$shv_data) {
+			# We specifically want to suppress cloning
+			delete local $me->{clone_on_read};
+			delete local $me->{clone_on_write};
+
 			my @pairs = $me->expand_handles;
 			while (@pairs) {
 				my ($target, $method) = splice(@pairs, 0, 2);
@@ -531,6 +650,7 @@ sub xs_reader {
 		ref( $me->{coerce} ) eq 'CODE'
 			? $me->{coerce}
 			: $me->{coerce} ? $me->{isa}->coercion->compiled_coercion : undef,
+		$me->{clone_on_read},
 	);
 	return 1;
 }
@@ -651,6 +771,7 @@ sub xs_constructor_args {
 	$opt->{slot_initializer} = $me->{slot_initializer} if $me->{slot_initializer};
 	$opt->{slot_initializer} = $me->writer if $me->{storage} ne 'HASH';
 	$opt->{undef_tolerant}   = true if $me->{undef_tolerant};
+	$opt->{clone_on_write}   = $me->{clone_on_write};
 	
 	return ( $name . $req => $opt );
 }

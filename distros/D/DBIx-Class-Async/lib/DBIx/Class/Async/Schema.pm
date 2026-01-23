@@ -13,7 +13,7 @@ use DBIx::Class::Async::Storage;
 use DBIx::Class::Async::ResultSet;
 use DBIx::Class::Async::Storage::DBI;
 
-our $VERSION = '0.43';
+our $VERSION = '0.49';
 
 =head1 NAME
 
@@ -21,38 +21,47 @@ DBIx::Class::Async::Schema - Asynchronous schema for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.43
-
-=cut
+Version 0.49
 
 =head1 SYNOPSIS
 
     use DBIx::Class::Async::Schema;
+    use IO::Async::Loop;
 
-    # Connect with async options
+    my $loop = IO::Async::Loop->new;
+
+    # Connect returns a schema proxy that delegates queries to a worker pool
     my $schema = DBIx::Class::Async::Schema->connect(
-        'dbi:mysql:database=test',  # DBI connect string
-        'username',                 # Database username
-        'password',                 # Database password
-        { RaiseError => 1 },        # DBI options
-        {                           # Async options
+        'dbi:SQLite:dbname=myapp.db', # DBI DSN
+        undef,                        # User
+        undef,                        # Pass
+        { sqlite_unicode => 1 },      # Standard DBIx::Class options
+        {                             # Async-specific configuration
             schema_class => 'MyApp::Schema',
-            workers      => 4,
+            workers      => 5,        # Number of background worker processes
+            loop         => $loop,    # IO::Async::Loop instance
         }
     );
 
-    # Get a resultset
-    my $users_rs = $schema->resultset('User');
+    # Get a ResultSet bridge (returns a DBIx::Class::Async::ResultSet)
+    my $rs = $schema->resultset('User');
 
-    # Asynchronous operations
-    $users_rs->search({ active => 1 })->all->then(sub {
-        my ($active_users) = @_;
-        foreach my $user (@$active_users) {
-            say "Active user: " . $user->name;
-        }
+    # All persistence and retrieval methods return Futures
+    $rs->search({ active => 1 })->all->then(sub {
+        my @users = @_;
+        say "Fetched " . scalar(@users) . " users asynchronously.";
+
+        # Perform more async work
+        return $users[0]->update({ last_seen => time });
+    })->catch(sub {
+        my $err = shift;
+        warn "Database error: $err";
     });
 
-    # Disconnect when done
+    # The event loop manages the worker communication
+    $loop->run;
+
+    # Clean shutdown of worker pool
     $schema->disconnect;
 
 =head1 DESCRIPTION

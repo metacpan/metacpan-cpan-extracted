@@ -6,7 +6,7 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020002';
+our $VERSION   = '0.021000';
 
 use constant { true => !!1, false => !!0 };
 use Types::Common qw( -is -types to_TypeTiny );
@@ -1748,6 +1748,114 @@ shouldn't be relied on in place of proper security.)
 
 Marlin supports three storage methods for attributes: "HASH" (the default),
 "PRIVATE" (as above), and "NONE" (only used for constants).
+
+=item C<clone>, C<clone_on_read>, C<clone_on_write>, and C<clone_bypass>
+
+References provide shortcuts to data structures I<inside> your object,
+allowing code outside your class to tamper with your object's internals
+in unpredictable ways.
+
+  my @array  = ( 1, 2, 3 );
+  my $object = Local::Thing->new( numbers => \@array );
+  push @array, "Hello world";
+
+Setting C<clone_on_write> signals to the constructor and any writer/accessor
+methods that when they get passed a value, they should instead keep a I<clone>
+of the value, breaking any references outside code might be keeping to it.
+So in the previous example, C<< $object >> wouldn't have a reference to
+C<< @array >>, but a reference to a clone of that array. Altering C<< @array >>
+later wouldn't alter the copy that C<< $object >> had.
+
+Setting C<clone_on_read> does the same thing for reader/accessor methods and
+avoids this altering your object:
+
+  push @{ $object->numbers }, "Hello world";
+
+Because C<< $object->numbers >> would be returning a clone of the data the
+object holds internally instead of returning a direct reference to its
+internal data.
+
+C<clone_on_write> and C<clone_on_read> can be set to true to enable deep
+cloning of values. If you need more fine-grained control of cloning, you
+can set them to a coderef or a method name.
+
+  package Local::Thing {
+    use Types::Common -types;
+    use Marlin
+      numbers => {
+        is             => 'rw',
+        isa            => ArrayRef[Int],
+        clone_on_write => sub ( $self, $attrname, $value ) {
+          ...;
+          retun $cloned_value;
+        },
+        clone_on_read => '_clone',
+        handles_via   => 'Array',
+        handles       => { add_number => 'push' },
+      };
+    
+    sub _clone ( $self, $attrname, $value ) {
+      ...;
+      return $cloned_value;
+    }
+  }
+
+The C<clone> option is a shortcut for setting both C<clone_on_write> and
+C<clone_on_read>. You should usually use that as it's rare to need
+such fine-grained control.
+
+Delegated methods (see C<handles> and C<handles_via>) operate on the
+internal copy of the data, bypassing the clone options. This means
+that in our example C<< $object->add_number( 4 ) >> will correctly
+push a number onto the object's internal numbers arrayref instead of
+pushing it onto an ephemeral copy of the numbers arrayref.
+
+It is worth noting that your I<internal> use of the attributes will
+also trigger cloning. So for example, this will not work how you
+want it to:
+
+  package Local::Thing {
+    use Types::Common -types;
+    use Marlin
+      numbers => {
+        is      => 'rw',
+        isa     => ArrayRef[Int],
+        clone   => 1,
+      };
+    
+    sub push_numbers ( $self, @more_numbers ) {
+      push @{ $self->numbers }, @more_numbers;
+    }
+  }
+
+The C<clone_bypass> option creates a second, internal accessor:
+
+  package Local::Thing {
+    use Types::Common -types;
+    use Marlin
+      numbers => {
+        is           => 'rw',
+        isa          => ArrayRef[Int],
+        clone        => 1,
+        clone_bypass => '_numbers_ref',
+      };
+    
+    sub push_numbers ( $self, @more_numbers ) {
+      push @{ $self->_numbers_ref }, @more_numbers;
+    }
+  }
+
+(Note that C<clone_bypass> methods are always accessors, allowing you
+to get/set the attribute, even for read-only attributes! They are intended
+for your class's internal use only. Lexical clone bypass methods are
+supported and indeed recommended!)
+
+Setting the cloning options makes most sense for attributes which you expect
+to be arrayrefs, hashrefs, or annoyingly mutable objects (like L<DateTime>).
+It makes little sense for other attributes. It will slow down accessors and
+object construction.
+
+This feature is inspired by L<MooseX::Extended::Manual::Cloning>.
 
 =item C<< extends >>
 

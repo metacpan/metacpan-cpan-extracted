@@ -72,24 +72,23 @@ print "Attention heads: ", $inference->n_head, "\n";
 # Basic tensor operations work too
 print "\n=== Basic Tensor Operations ===\n";
 my $ctx = Lugh::Context->new(mem_size => 1024 * 1024);
-my $t1 = Lugh::Tensor->new(context => $ctx, type => 0, dims => [3]);
-my $t2 = Lugh::Tensor->new(context => $ctx, type => 0, dims => [3]);
+my $t1 = Lugh::Tensor->new_f32($ctx, 3);
+my $t2 = Lugh::Tensor->new_f32($ctx, 3);
 
-$t1->set(0, 1.0);
-$t1->set(1, 2.0);
-$t1->set(2, 3.0);
+$t1->set_f32(1.0, 2.0, 3.0);
+$t2->set_f32(4.0, 5.0, 6.0);
 
-$t2->set(0, 4.0);
-$t2->set(1, 5.0);
-$t2->set(2, 6.0);
+my $sum = Lugh::Ops::add($ctx, $t1, $t2);
+my $graph = Lugh::Graph->new($ctx);
+$graph->build_forward($sum);
+$graph->compute($ctx, 4);
 
-my $sum = Lugh::Ops->add($ctx, $t1, $t2);
-my $graph = Lugh::Graph->build($ctx, $sum);
-Lugh::Graph->compute($ctx, $graph);
-
-print "t1 = [", join(", ", map { $t1->get($_) } 0..2), "]\n";
-print "t2 = [", join(", ", map { $t2->get($_) } 0..2), "]\n";
-print "t1 + t2 = [", join(", ", map { $sum->get($_) } 0..2), "]\n";
+my @t1_vals = $t1->get_f32();
+my @t2_vals = $t2->get_f32();
+my @sum_vals = $sum->get_f32();
+print "t1 = [", join(", ", @t1_vals), "]\n";
+print "t2 = [", join(", ", @t2_vals), "]\n";
+print "t1 + t2 = [", join(", ", @sum_vals), "]\n";
 
 print "\n=== Summary ===\n";
 print "Lugh provides:\n";

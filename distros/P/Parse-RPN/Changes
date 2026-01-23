@@ -2,6 +2,21 @@ Revision history for Perl module Parse::RPN
 
 Note: version <2 is only a RPN parser
 
+
+2.89 2026-01-2T15:49:23+0100
+
+    Fix Bug #172856  POD typo
+
+
+2.88 2026-01-22T15:49:23+0100
+
+    Fix selftest with a timezone WITHOUT DST
+
+2.87 2024-01-03T16:54:50+0100
+
+    Fix selftest because more words are defined (RT150937)
+
+
 2.86 2023-08-22T11:40:00+0200
 
     - Fix Bug #88671 

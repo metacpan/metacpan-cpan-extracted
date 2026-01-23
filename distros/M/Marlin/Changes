@@ -6,6 +6,16 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.021000	2026-01-22
+
+ [ Packaging ]
+ - Eliminated dependency on Clone as Class::XSConstructor and
+   Class::XSReader now have built-in cloning support.
+
+ [ Other ]
+ - Added: clone_on_read, clone_on_write, and clone_bypass options for
+   attributes.
+
 0.020002	2026-01-21
 
  [ Bug Fixes ]

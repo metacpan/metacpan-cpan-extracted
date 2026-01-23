@@ -32,7 +32,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='2.073';
+$VERSION='2.075';
 
 
 #  Get mod_perl version taking intio account legacy strings. Clear $@ after evals
@@ -475,16 +475,33 @@ my %constant_temp;
         'js'   => 'application/javascript',
         'json' => 'application/json',
         'pdf'  => 'application/pdf',
-        'svg'  => 'image/svg+xml'
+        'svg'  => 'image/svg+xml',
+        'yml'  => 'application/x-yaml',
+        'yaml' => 'application/x-yaml',
+        'xml'  => 'application/xml',
+        'toml' => 'application/toml',
+        'md'   => 'text/markdown'
     },
     
     
-    #  Other files the PSGI indexer is allowed to open
+    #  Other file extenstions the PSGI indexer is allowed to open
     #
     WEBDYNE_INDEX_EXT_ALLOWED_HR => { map {$_=>1} qw(
         psp
         pm
         pl
+    )},
+
+
+    #  And raw file names. Should be regexp, todo
+    #
+    WEBDYNE_INDEX_FN_ALLOWED_HR => { map {$_=>1} qw(
+        LICENSE
+        MANIFEST
+        Makefile
+        cpanfile
+        cpanfile.snapshot
+        Dockerfile
     )},
     
     

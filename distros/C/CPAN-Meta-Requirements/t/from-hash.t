@@ -41,19 +41,15 @@ for my $string (10, '>= 2, <= 9, != 7') {
   );
 }
 
-SKIP: {
-  skip "Can't tell v-strings from strings until 5.8.1", 1
-    unless $] gt '5.008';
-  my $string_hash = {
-    Left   => 10,
-    Shared => '= 2',
-    Right  => 18,
-  };
+my $string_hash = {
+  Left   => 10,
+  Shared => '= 2',
+  Right  => 18,
+};
 
-  dies_ok { CPAN::Meta::Requirements->from_string_hash($string_hash) }
-    qr/Can't convert/,
-    "we die when we can't understand a version spec";
-}
+dies_ok { CPAN::Meta::Requirements->from_string_hash($string_hash) }
+  qr/Can't convert/,
+  "we die when we can't understand a version spec";
 
 {
   my $warning;
@@ -85,26 +81,22 @@ SKIP: {
   );
 }
 
-SKIP: {
-  skip "Can't tell v-strings from strings until 5.8.1", 2
-    unless $] gt '5.008';
-  my $string_hash = {
-    Left   => 10,
-    Shared => v50.44.60,
-    Right  => 18,
-  };
+my $string_hash = {
+  Left   => 10,
+  Shared => v50.44.60,
+  Right  => 18,
+};
 
-  my $warning;
-  local $SIG{__WARN__} = sub { $warning = join("\n",@_) };
+my $warning;
+local $SIG{__WARN__} = sub { $warning = join("\n",@_) };
 
-  my $req = eval { CPAN::Meta::Requirements->from_string_hash($string_hash); };
-  is( $@, '', "vstring in string hash lives" );
+my $req = eval { CPAN::Meta::Requirements->from_string_hash($string_hash); };
+is( $@, '', "vstring in string hash lives" );
 
-  ok(
-    $req->accepts_module(Shared => 'v50.44.60'),
-    "vstring treated as if string",
-  );
-}
+ok(
+  $req->accepts_module(Shared => 'v50.44.60'),
+  "vstring treated as if string",
+);
 
 
 {

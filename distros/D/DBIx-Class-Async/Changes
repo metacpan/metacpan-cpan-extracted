@@ -1,5 +1,100 @@
 Revision history for DBIx::Class::Async
 
+0.49 2026-01-22
+     - [IMPROVEMENT] Fixed ResultSet->slice to correctly return a ResultSet
+       in scalar context.
+     - [IMPROVEMENT] Fixed ResultSet->count to respect slices (LIMIT/OFFSET)
+       by using subqueries in the async worker.
+     - [IMPROVEMENT] Ensure result_class persists across chained search() calls.
+     - [IMPROVEMENT] Fixed constructor (new) to correctly store and inherit
+        result_class, rows, and pager attributes.
+     - [IMPROVEMENT] Fixed argument passing in Async.pm to ensure attributes
+       ($attrs) reach the background worker for count operations.
+     - [TEST] Fixed t/43-result-class.t to verify result_class persistence.
+     - [TEST] Fixed t/26-slice.t to test comprehensive slicing and chaining
+       behaviour against a real SQLite database.
+     - [TEST] Added t/57-count-performance.t to benchmark and verify the
+       overhead of asynchronous subquery counting.
+
+0.48 2026-01-22
+     - [ENHANCE] Hardened _merge_result_data to support multiple database
+       return patterns (HASH, ARRAY, and SCALAR).
+     - [FIX] Added support for positional Primary Key mapping from ARRAY
+       refs, improving compatibility with specialised DBI drivers.
+     - [FIX] Improved Composite Primary Key safety during row creation,
+       ensuring multi-column keys are correctly populated from database
+       returns (e.g., PostgreSQL RETURNING clauses).
+     - [TEST] Added comprehensive test suite for result data merging
+       logic (t/56-merge-result-data.t).
+
+0.47 2026-01-22
+     - [REFACTOR] Overhauled Row state management to use authoritative
+       'in_storage' flags instead of guessing based on Primary Key presence.
+     - [FIX] Resolved "Cannot update row: not in storage" errors in
+       complex workflows by propagating storage state through recursive
+       relationship inflation.
+     - [REFACTOR] Centralized row inflation logic into Async.pm bridge to
+       ensure consistent object creation across all ResultSet fetch paths.
+     - [FIX] Updated find_or_new to correctly distinguish between persistent
+       and transient objects.
+     - [IMPROVE] Hardened Row and ResultSet against Mock objects in test
+       suites by adding defensive metadata checks (can('columns')).
+     - [OPTIMISE] Improved search performance by only generating cache
+       keys when caching is explicitly enabled.
+     - [FIX] Ensure single-column primary keys are correctly merged during
+       create() operations across all bridge drivers.
+
+0.46 2026-01-22
+     - [DOCS] Major documentation overhaul across the entire distribution.
+     - [DOCS] Modernised SYNOPSIS for all core packages to utilise Future-based
+       chaining (->then/->catch) instead of legacy blocking patterns:
+        * DBIx::Class::Async
+        * DBIx::Class::Async::Schema
+        * DBIx::Class::Async::ResultSet
+        * DBIx::Class::Async::Row
+        * DBIx::Class::Async::Storage
+        * DBIx::Class::Async::Storage::DBI
+        * DBIx::Class::Async::Storage::DBI::Cursor
+        * DBIx::Class::Async::Pager
+        * DBIx::Class::Async::ResultComponent
+     - [DOCS] Added practical examples for high-concurrency operations, including
+       race-condition safe find_or_create and update_or_create.
+     - [DOCS] Documented the "Smart Discovery" logic for unique constraints.
+     - [DOCS] Improved technical clarity regarding synchronous metadata vs.
+       asynchronous data retrieval in Pager and Row objects.
+     - [DOCS] Demonstrated standard async patterns for recursive cursor iteration.
+
+0.45 2026-01-22
+     - [REFACTOR] Extracted unique constraint discovery into internal helper
+       _extract_unique_lookup to unify logic across ResultSet operations.
+     - [FEATURE] Refactored find_or_new to use Smart Discovery for lookups,
+       improving search accuracy.
+     - [FIX] Enhanced find_or_new to correctly strip "me." prefixes from
+       ResultSet conditions when instantiating new result objects.
+     - [FIX] Cleaned up find_or_create logic by utilising the new lookup
+       helper and streamlining the race-condition recovery path.
+     - [DOCS] Added POD documentation for internal _extract_unique_lookup method.
+     - [FIX] Refactored update_or_create to utilise _extract_unique_lookup and
+      implement atomic race-condition recovery.
+    - [FIX] Corrected update_or_new behavior to properly return a volatile
+      new_result object instead of persisting via create() on find failure.
+    - [IMPROVEMENT] Standardised prefix stripping (me/self/foreign) in
+      update_or_new to prevent invalid column crashes on filtered ResultSets.
+    - [REFACTOR] Streamlined identity discovery across all upsert-style
+      methods to ensure consistent unique key prioritisation.
+
+0.44 2026-01-22
+     - [FEATURE] Refactor find_or_create to be race-condition safe in
+       asynchronous environments.
+     - [IMPROVEMENT] Implement "Smart Discovery" for unique constraints;
+       automatically identifies lookup columns if 'key' is not provided.
+     - [FIX] Enhance Async.pm error propagation to correctly stringify
+       DBIx::Class::Exception objects for the parent process.
+     - [FIX] Ensure find_or_create handles the "Gap" between initial find
+       and create by performing an atomic recovery find on conflict.
+     - [FIX] Add missing $attrs propagation to find() in Async.pm to
+       support complex recovery searches.
+
 0.43  2026-01-22
       - Minor test cleanup.
 

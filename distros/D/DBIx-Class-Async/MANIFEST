@@ -69,6 +69,8 @@ t/52-resultset-operations.t
 t/53-as-query.t
 t/54-single-chaining.t
 t/55-bulk-delete.t
+t/56-merge-result-data.t
+t/57-count-performance.t
 t/manifest.t
 t/pod.t
 t/test.db

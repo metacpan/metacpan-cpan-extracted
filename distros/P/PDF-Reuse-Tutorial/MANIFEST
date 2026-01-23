@@ -1,7 +1,10 @@
 Changes
+CONTRIBUTING.md
+LICENSE
 Makefile.PL
 MANIFEST
 README
+SECURITY.md
 Tutorial.pm
 t/1.t
 examples/customerResponse.js
@@ -16,3 +19,4 @@ examples/weather.dat
 examples/weatherObj_pl
 examples/unzipThis.zip
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

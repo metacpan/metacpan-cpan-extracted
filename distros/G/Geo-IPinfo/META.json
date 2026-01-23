@@ -58,6 +58,6 @@
          "web" : "https://github.com/ipinfo/perl"
       }
    },
-   "version" : "v3.2.0",
+   "version" : "v3.3.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

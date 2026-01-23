@@ -1,8 +1,11 @@
 Changes
+CONTRIBUTING.md
 IMB.xs
 IMB.pm
+LICENSE
 Makefile.PL
 MANIFEST
+SECURITY.md
 ppport.h
 README
 t/01basic.t

@@ -29,44 +29,43 @@ optional_features: {}
 provides:
   Marlin:
     file: lib/Marlin.pm
-    version: '0.020002'
+    version: '0.021000'
   Marlin::Attribute:
     file: lib/Marlin/Attribute.pm
-    version: '0.020002'
+    version: '0.021000'
   Marlin::Attribute::NONE:
     file: lib/Marlin/Attribute.pm
   Marlin::Meta::Class:
     file: lib/MooseX/Marlin.pm
   Marlin::Role:
     file: lib/Marlin/Role.pm
-    version: '0.020002'
+    version: '0.021000'
   Marlin::Struct:
     file: lib/Marlin/Struct.pm
-    version: '0.020002'
+    version: '0.021000'
   Marlin::TypeConstraint:
     file: lib/Marlin/TypeConstraint.pm
-    version: '0.020002'
+    version: '0.021000'
   Marlin::Util:
     file: lib/Marlin/Util.pm
-    version: '0.020002'
+    version: '0.021000'
   Marlin::X:
     file: lib/Marlin/X.pm
-    version: '0.020002'
+    version: '0.021000'
   MooseX::Marlin:
     file: lib/MooseX/Marlin.pm
-    version: '0.020002'
+    version: '0.021000'
 requires:
   B::Hooks::AtRuntime: '0'
   Class::Method::Modifiers: '0'
   Class::XSAccessor: '1.19'
-  Class::XSConstructor: '0.022002'
-  Clone: '0'
+  Class::XSConstructor: '0.023000'
   Exporter::Tiny: '1.006002'
   List::Util: '1.45'
   Role::Tiny: '0'
   Sub::Accessor::Small: '1.000003'
   Sub::HandlesVia: '0.052000'
-  Type::Tiny: '2.010000'
+  Type::Tiny: '2.010001'
   Type::Tiny::XS: '0'
   perl: '5.008008'
 resources:
@@ -75,5 +74,5 @@ resources:
   homepage: https://metacpan.org/release/Marlin
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-marlin.git
-version: '0.020002'
+version: '0.021000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

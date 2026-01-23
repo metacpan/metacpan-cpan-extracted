@@ -16,7 +16,7 @@ App::Greple::xlate - tõlke tugimoodul greple jaoks
 
 =head1 VERSION
 
-Version 0.9924
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -371,15 +371,35 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head1 SEE ALSO
 
-L<App::Greple::xlate>
+=head2 MODULES
 
-L<App::Greple::xlate::deepl>
-
-L<App::Greple::xlate::gpt4>
-
-L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - xlate’i poolt konteineri toiminguteks kasutatav üldine Dockeri käitaja
+
+=head2 RELATED MODULES
+
+=over 2
+
+=item * L<App::Greple>
+
+Vaata sihtteksti mustri üksikasju käsiraamatust B<greple>. Kasuta valikuid B<--inside>, B<--outside>, B<--include>, B<--exclude> vastendusala piiramiseks.
+
+=item * L<App::Greple::update>
+
+Saad kasutada moodulit C<-Mupdate>, et muuta faile käsu B<greple> tulemuste põhjal.
+
+=item * L<App::sdif>
+
+Kasuta B<sdif>, et näidata konfliktimärgendite formaati kõrvuti valikuga B<-V>.
+
+=item * L<App::Greple::stripe>
+
+Greple B<stripe> moodulit kasutatakse valikuga B<--xlate-stripe>.
+
+=back
+
+=head2 RESOURCES
 
 =over 2
 
@@ -402,22 +422,6 @@ OpenAI Python’i teek
 =item * L<https://github.com/tecolicom/App-gpty>
 
 OpenAI käsurea liides
-
-=item * L<App::Greple>
-
-Vaata sihtteksti mustri üksikasju käsiraamatust B<greple>. Kasuta valikuid B<--inside>, B<--outside>, B<--include>, B<--exclude> vastendusala piiramiseks.
-
-=item * L<App::Greple::update>
-
-Saad kasutada moodulit C<-Mupdate>, et muuta faile käsu B<greple> tulemuste põhjal.
-
-=item * L<App::sdif>
-
-Kasuta B<sdif>, et näidata konfliktimärgendite formaati kõrvuti valikuga B<-V>.
-
-=item * L<App::Greple::stripe>
-
-Greple B<stripe> moodulit kasutatakse valikuga B<--xlate-stripe>.
 
 =back
 
@@ -445,7 +449,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

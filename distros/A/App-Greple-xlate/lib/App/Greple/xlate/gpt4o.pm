@@ -1,6 +1,6 @@
 package App::Greple::xlate::gpt4o;
 
-our $VERSION = "0.9924";
+our $VERSION = "1.00";
 
 use v5.14;
 use warnings;
@@ -9,7 +9,7 @@ use Encode;
 use Data::Dumper;
 
 use List::Util qw(sum);
-use App::cdif::Command;
+use Command::Run;
 
 use App::Greple::xlate qw(opt);
 use App::Greple::xlate::Lang qw(%LANGNAME);
@@ -39,7 +39,7 @@ sub initialize {
 }
 
 sub gpty {
-    state $gpty = App::cdif::Command->new;
+    state $gpty = Command::Run->new;
     my $text = shift;
     my $param = $param{$method};
     my $prompt = opt('prompt') || $param->{prompt};
@@ -59,7 +59,7 @@ sub gpty {
 	'-',
     );
     warn Dumper \@command if opt('debug');
-    $gpty->command(\@command)->setstdin($text)->update->data;
+    $gpty->command(@command)->with(stdin => $text)->update->data;
 }
 
 sub _progress {

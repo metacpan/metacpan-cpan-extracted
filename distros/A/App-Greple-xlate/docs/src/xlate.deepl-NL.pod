@@ -16,7 +16,7 @@ App::Greple::xlate - vertaalondersteuningsmodule voor greple
 
 =head1 VERSION
 
-Version 0.9924
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -371,15 +371,35 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head1 SEE ALSO
 
-L<App::Greple::xlate>
+=head2 MODULES
 
-L<App::Greple::xlate::deepl>
-
-L<App::Greple::xlate::gpt4>
-
-L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - Generieke Docker runner gebruikt door xlate voor containeroperaties
+
+=head2 RELATED MODULES
+
+=over 2
+
+=item * L<App::Greple>
+
+Zie de B<greple> handleiding voor de details over het doeltekstpatroon. Gebruik B<--inside>, B<--outside>, B<--include>, B<--exclude> opties om het overeenkomende gebied te beperken.
+
+=item * L<App::Greple::update>
+
+U kunt de module C<-Mupdate> gebruiken om bestanden te wijzigen door het resultaat van het commando B<greple>.
+
+=item * L<App::sdif>
+
+Gebruik B<sdif> om het formaat van de conflictmarkering naast de optie B<-V> te tonen.
+
+=item * L<App::Greple::stripe>
+
+Greple B<stripe> module gebruik door B<--xlate-stripe> optie.
+
+=back
+
+=head2 RESOURCES
 
 =over 2
 
@@ -402,22 +422,6 @@ OpenAI Python Bibliotheek
 =item * L<https://github.com/tecolicom/App-gpty>
 
 OpenAI opdrachtregelinterface
-
-=item * L<App::Greple>
-
-Zie de B<greple> handleiding voor de details over het doeltekstpatroon. Gebruik B<--inside>, B<--outside>, B<--include>, B<--exclude> opties om het overeenkomende gebied te beperken.
-
-=item * L<App::Greple::update>
-
-U kunt de module C<-Mupdate> gebruiken om bestanden te wijzigen door het resultaat van het commando B<greple>.
-
-=item * L<App::sdif>
-
-Gebruik B<sdif> om het formaat van de conflictmarkering naast de optie B<-V> te tonen.
-
-=item * L<App::Greple::stripe>
-
-Greple B<stripe> module gebruik door B<--xlate-stripe> optie.
 
 =back
 
@@ -445,7 +449,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

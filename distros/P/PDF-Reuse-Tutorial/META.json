@@ -1,0 +1,57 @@
+{
+   "abstract" : "How to produce PDF-files with PDF::Reuse",
+   "author" : [
+      "Lars Lundberg larslund@cpan.org",
+      "Chris Nighswonger cnighs@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PDF-Reuse-Tutorial",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      }
+   },
+   "provides" : {
+      "PDF::Reuse::Tutorial" : {
+         "file" : "Tutorial.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cnighswonger/PDF-Reuse-Tutorial/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cnighswonger/PDF-Reuse-Tutorial.git",
+         "web" : "https://github.com/cnighswonger/PDF-Reuse-Tutorial"
+      }
+   },
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

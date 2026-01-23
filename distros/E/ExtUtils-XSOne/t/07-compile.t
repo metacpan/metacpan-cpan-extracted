@@ -5,13 +5,17 @@ use strict;
 use warnings;
 use Test::More;
 use File::Spec;
-use File::Temp qw(tempdir);
-use FindBin;
+use File::Path qw(make_path remove_tree);
+use FindBin qw($Bin);
 use Config;
 
 use_ok('ExtUtils::XSOne');
 
-my $tmpdir = tempdir(CLEANUP => 1);
+# Create a temporary directory for test files under t/
+my $tmpdir = File::Spec->catdir($Bin, 'tmp', '07-compile');
+remove_tree($tmpdir) if -d $tmpdir;
+make_path($tmpdir);
+END { remove_tree($tmpdir) if $tmpdir && -d $tmpdir }
 
 # Find xsubpp
 my $xsubpp = $Config{installprivlib} . '/ExtUtils/xsubpp';
@@ -30,7 +34,7 @@ plan skip_all => "Cannot find xsubpp" unless -f $xsubpp;
 subtest 'SimpleModule compiles to C' => sub {
     plan tests => 6;
 
-    my $src_dir = File::Spec->catdir($FindBin::Bin, 'lib', 'SimpleModule', 'xs');
+    my $src_dir = File::Spec->catdir($Bin, 'lib', 'SimpleModule', 'xs');
     my $xs_file = File::Spec->catfile($tmpdir, 'SimpleModule.xs');
     my $c_file  = File::Spec->catfile($tmpdir, 'SimpleModule.c');
 
@@ -68,7 +72,7 @@ subtest 'SimpleModule compiles to C' => sub {
 subtest 'TestModule compiles to C' => sub {
     plan tests => 7;
 
-    my $src_dir = File::Spec->catdir($FindBin::Bin, 'lib', 'TestModule', 'xs');
+    my $src_dir = File::Spec->catdir($Bin, 'lib', 'TestModule', 'xs');
     my $xs_file = File::Spec->catfile($tmpdir, 'TestModule.xs');
     my $c_file  = File::Spec->catfile($tmpdir, 'TestModule.c');
 
@@ -108,7 +112,7 @@ subtest 'TestModule compiles to C' => sub {
 subtest 'Line directives in generated C' => sub {
     plan tests => 3;
 
-    my $src_dir = File::Spec->catdir($FindBin::Bin, 'lib', 'SimpleModule', 'xs');
+    my $src_dir = File::Spec->catdir($Bin, 'lib', 'SimpleModule', 'xs');
     my $xs_file = File::Spec->catfile($tmpdir, 'LineTest.xs');
     my $c_file  = File::Spec->catfile($tmpdir, 'LineTest.c');
 
@@ -149,7 +153,7 @@ subtest 'C syntax check' => sub {
 
     plan tests => 2;
 
-    my $src_dir = File::Spec->catdir($FindBin::Bin, 'lib', 'SimpleModule', 'xs');
+    my $src_dir = File::Spec->catdir($Bin, 'lib', 'SimpleModule', 'xs');
     my $xs_file = File::Spec->catfile($tmpdir, 'SyntaxTest.xs');
     my $c_file  = File::Spec->catfile($tmpdir, 'SyntaxTest.c');
 
@@ -166,15 +170,18 @@ subtest 'C syntax check' => sub {
         skip "C file not generated", 2 unless -f $c_file && -s $c_file > 100;
 
         # Try to compile (syntax check only, don't link)
+        # Include ccflags to get necessary definitions like -D_LARGEFILE64_SOURCE
+        # which are required for off64_t and other Perl-configured types
         my $perl_inc = $Config{archlibexp} . '/CORE';
-        my $compile_cmd = qq{$cc -fsyntax-only -I"$perl_inc" "$c_file" 2>&1};
+        my $ccflags = $Config{ccflags} || '';
+        my $compile_cmd = qq{$cc -fsyntax-only $ccflags -I"$perl_inc" "$c_file" 2>&1};
         my $compile_out = `$compile_cmd`;
         my $compile_exit = $? >> 8;
 
         # Some compilers don't support -fsyntax-only, try -c instead
         if ($compile_exit != 0 && $compile_out =~ /unrecognized|unknown/) {
             my $obj_file = File::Spec->catfile($tmpdir, 'SyntaxTest.o');
-            $compile_cmd = qq{$cc -c -I"$perl_inc" "$c_file" -o "$obj_file" 2>&1};
+            $compile_cmd = qq{$cc -c $ccflags -I"$perl_inc" "$c_file" -o "$obj_file" 2>&1};
             $compile_out = `$compile_cmd`;
             $compile_exit = $? >> 8;
         }

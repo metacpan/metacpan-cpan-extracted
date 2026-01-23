@@ -5,25 +5,30 @@ use strict;
 use warnings;
 
 use File::Spec;
-use File::Basename qw(dirname);
+use File::Basename qw(dirname basename);
 use File::Path qw(make_path);
+use File::Find qw(find);
 use Carp qw(croak);
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub combine {
     my ($class, %opts) = @_;
 
-    my $src_dir = $opts{src_dir} or croak "src_dir is required";
-    my $output  = $opts{output}  or croak "output is required";
-    my $order   = $opts{order};
-    my $verbose = $opts{verbose} || 0;
-    my $dedup   = exists $opts{deduplicate} ? $opts{deduplicate} : 1;
+    my $src_dir   = $opts{src_dir} or croak "src_dir is required";
+    my $output    = $opts{output}  or croak "output is required";
+    my $order     = $opts{order};
+    my $verbose   = $opts{verbose} || 0;
+    my $dedup     = exists $opts{deduplicate} ? $opts{deduplicate} : 1;
+    my $recursive = $opts{recursive} || 0;
 
-    my @xs_files = $class->_find_xs_files($src_dir);
-
-    # Sort files
-    my @sorted = $class->_sort_files(\@xs_files, $order);
+    my @sorted;
+    if ($recursive) {
+        @sorted = $class->_find_xs_files_recursive($src_dir);
+    } else {
+        my @xs_files = $class->_find_xs_files($src_dir);
+        @sorted = $class->_sort_files(\@xs_files, $order);
+    }
 
     if ($verbose) {
         warn "ExtUtils::XSOne: Processing files in order:\n";
@@ -37,19 +42,33 @@ sub combine {
     my @collected_includes;
     my @collected_defines;
     my @collected_c_code;
+    my @header_c_code;  # C code from _header.xs files (processed first)
 
     for my $file (@sorted) {
+        # In recursive mode, $file is already a relative path from src_dir
+        # In non-recursive mode, $file is just the filename
         my $path = File::Spec->catfile($src_dir, $file);
+        my $display_file = $recursive ? $file : basename($file);
         warn "ExtUtils::XSOne: Reading $path\n" if $verbose;
 
         my $content = $class->_read_file($path);
+        my $filename = basename($file);
+        my $is_header = ($filename eq '_header.xs');
 
         if ($dedup) {
             # Parse and extract C preamble (before MODULE =)
             my ($preamble, $xs_part) = $class->_split_preamble($content);
 
+            # For _header.xs files without MODULE, the entire content is in xs_part
+            # We need to treat it as preamble C code
+            my $c_content = $preamble;
+            if ($is_header && $preamble eq '' && $xs_part =~ /\S/) {
+                $c_content = $xs_part;
+                $xs_part = '';
+            }
+
             # Extract includes, defines, and other C code from preamble
-            my ($includes, $defines, $other_c) = $class->_parse_preamble($preamble);
+            my ($includes, $defines, $other_c) = $class->_parse_preamble($c_content);
 
             # Deduplicate includes
             for my $inc (@$includes) {
@@ -68,15 +87,25 @@ sub combine {
             }
 
             # Collect other C code (functions, structs, etc.)
-            push @collected_c_code, { file => $file, path => $path, code => $other_c }
-                if $other_c =~ /\S/;
+            # _header.xs code goes first to ensure definitions are available
+            if ($other_c =~ /\S/) {
+                if ($is_header) {
+                    push @header_c_code, { file => $file, path => $path, code => $other_c };
+                } else {
+                    push @collected_c_code, { file => $file, path => $path, code => $other_c };
+                }
+            }
 
-            # Store just the XS part
-            push @file_contents, { file => $file, path => $path, content => $xs_part };
+            # Store just the XS part (empty for pure _header.xs files)
+            push @file_contents, { file => $file, path => $path, content => $xs_part }
+                if $xs_part =~ /\S/;
         } else {
             push @file_contents, { file => $file, path => $path, content => $content };
         }
     }
+
+    # Merge header C code first, then other C code
+    @collected_c_code = (@header_c_code, @collected_c_code);
 
     # Build combined content
     my $combined = $class->_build_header($src_dir, \@sorted);
@@ -142,6 +171,64 @@ sub _find_xs_files {
     croak "No .xs files found in $src_dir" unless @xs_files;
 
     return @xs_files;
+}
+
+sub _find_xs_files_recursive {
+    my ($class, $src_dir) = @_;
+
+    croak "Source directory '$src_dir' does not exist" unless -d $src_dir;
+
+    my @headers;   # { path => relative_path, depth => N }
+    my @footers;   # { path => relative_path, depth => N }
+    my @packages;  # relative paths to package XS files
+
+    # Normalize src_dir for consistent path handling
+    $src_dir = File::Spec->canonpath($src_dir);
+    my $src_dir_len = length($src_dir);
+
+    find({
+        wanted => sub {
+            return unless -f && /\.xs$/;
+
+            my $full_path = $File::Find::name;
+            my $dir = $File::Find::dir;
+
+            # Get path relative to src_dir
+            my $rel_path = substr($full_path, $src_dir_len);
+            $rel_path =~ s{^[/\\]}{};  # Remove leading separator
+
+            # Calculate depth (number of directory separators)
+            my $depth = ($rel_path =~ tr!/\\!!);
+
+            my $filename = basename($full_path);
+
+            if ($filename eq '_header.xs') {
+                push @headers, { path => $rel_path, depth => $depth };
+            } elsif ($filename eq '_footer.xs') {
+                push @footers, { path => $rel_path, depth => $depth };
+            } else {
+                push @packages, $rel_path;
+            }
+        },
+        no_chdir => 1,
+    }, $src_dir);
+
+    croak "No .xs files found in $src_dir" unless @headers || @footers || @packages;
+
+    # Sort headers by depth (shallow first), then alphabetically
+    @headers = map { $_->{path} }
+               sort { $a->{depth} <=> $b->{depth} || $a->{path} cmp $b->{path} }
+               @headers;
+
+    # Sort footers by depth (deep first - reverse of headers), then alphabetically
+    @footers = map { $_->{path} }
+               sort { $b->{depth} <=> $a->{depth} || $a->{path} cmp $b->{path} }
+               @footers;
+
+    # Sort package files alphabetically
+    @packages = sort @packages;
+
+    return (@headers, @packages, @footers);
 }
 
 sub _sort_files {
@@ -311,7 +398,7 @@ ExtUtils::XSOne - Combine multiple XS files into a single shared library
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -322,7 +409,7 @@ Version 0.01
     # Combine XS files before WriteMakefile
     ExtUtils::XSOne->combine(
         src_dir => 'lib/MyModule/xs',
-        output  => 'lib/MyModule.xs',
+        output  => 'MyModule.xs',
     );
 
     WriteMakefile(
@@ -336,7 +423,7 @@ Or use the command-line tool:
 
 =head1 DESCRIPTION
 
-C<ExtUtils::XSOne> solves a fundamental limitation of Perl's XSMULTI feature:
+C<ExtUtils::XSOne> solves a limitation of Perl's XSMULTI feature:
 when using C<XSMULTI =E<gt> 1> in ExtUtils::MakeMaker, each C<.xs> file compiles
 into a separate shared library (C<.so>/C<.bundle>/C<.dll>), which means they
 cannot share C static variables, registries, or internal state.
@@ -363,7 +450,9 @@ copy of static variables.
 
 =head2 The Solution
 
-With ExtUtils::XSOne, you organize code like this:
+With ExtUtils::XSOne, you can organize code in two ways:
+
+B<Traditional layout> - all XS in a single C<xs/> subdirectory:
 
     lib/
     └── Foo/
@@ -373,7 +462,18 @@ With ExtUtils::XSOne, you organize code like this:
             ├── tensor.xs     # MODULE = Foo PACKAGE = Foo::Tensor
             └── _footer.xs    # BOOT section
 
-These are combined at build time into a single C<lib/Foo.xs>, which compiles
+B<Hierarchical layout> - XS files alongside their C<.pm> files:
+
+    lib/
+    └── Foo/
+        ├── _header.xs        # Common includes, types, static vars
+        ├── _footer.xs        # BOOT section
+        ├── Context.pm
+        ├── Context.xs        # MODULE = Foo PACKAGE = Foo::Context
+        ├── Tensor.pm
+        └── Tensor.xs         # MODULE = Foo PACKAGE = Foo::Tensor
+
+Both are combined at build time into a single C<Foo.xs>, which compiles
 to one shared library where all modules share the same C state.
 
 =head1 FILE NAMING CONVENTION
@@ -412,6 +512,15 @@ processed after regular files but before C<_footer.xs>.
         verbose => 1,                                            # optional
     );
 
+Or with recursive mode for hierarchical layouts:
+
+    ExtUtils::XSOne->combine(
+        src_dir   => 'lib/MyModule',
+        output    => 'MyModule.xs',
+        recursive => 1,
+        verbose   => 1,
+    );
+
 Combines multiple XS files into a single output file.
 
 B<Options:>
@@ -420,13 +529,45 @@ B<Options:>
 
 =item C<src_dir> (required)
 
-Directory containing the source C<.xs> files.
+Directory containing the source C<.xs> files. In recursive mode, this is
+the base directory to scan recursively.
 
 =item C<output> (required)
 
 Path to the output combined C<.xs> file.
 
-=item C<order> (optional)
+=item C<recursive> (optional, default: false)
+
+If true, recursively scans subdirectories for C<.xs> files. This allows
+XS files to be placed alongside their corresponding C<.pm> files rather
+than in a single C<xs/> subdirectory.
+
+In recursive mode:
+
+=over 4
+
+=item * C<_header.xs> files are processed first, ordered by directory depth
+(shallowest first)
+
+=item * Package C<.xs> files are then processed alphabetically by full path
+
+=item * C<_footer.xs> files are processed last, ordered by directory depth
+(deepest first, reverse of headers)
+
+=back
+
+This enables hierarchical layouts like:
+
+    lib/
+    └── MyModule/
+        ├── _header.xs          # Top-level shared state
+        ├── Context.pm
+        ├── Context.xs          # Context package
+        ├── Tensor.pm
+        ├── Tensor.xs           # Tensor package
+        └── _footer.xs          # BOOT section
+
+=item C<order> (optional, ignored in recursive mode)
 
 Array reference specifying the order of files (without C<.xs> extension).
 If not provided, files are sorted alphabetically with C<_header> first
@@ -455,9 +596,17 @@ The deduplication process:
 
 =item 4. Collects remaining C code (structs, functions, etc.) with source markers
 
-=item 5. Outputs the deduplicated preamble followed by the XS sections
+=item 5. B<C code from C<_header.xs> is placed first> in the combined preamble,
+ensuring that types, macros, and static variables defined in the header are
+available to C code in other XS files
+
+=item 6. Outputs the deduplicated preamble followed by the XS sections
 
 =back
+
+This ordering is important: helper functions in package XS files (e.g.,
+C<Memory.xs>) can access definitions from C<_header.xs> because the header's
+C code appears first in the combined output.
 
 Set to false to disable deduplication and combine files verbatim.
 
@@ -485,7 +634,7 @@ the combined XS file when source files change:
     # Generate initially
     ExtUtils::XSOne->combine(
         src_dir => 'lib/MyModule/xs',
-        output  => 'lib/MyModule.xs',
+        output  => 'MyModule.xs',
     );
 
     WriteMakefile(
@@ -503,17 +652,39 @@ the combined XS file when source files change:
     MAKE_FRAG
     }
 
-=head1 EXAMPLE DIRECTORY STRUCTURE
+=head1 EXAMPLE DIRECTORY STRUCTURES
+
+=head2 Traditional Layout (non-recursive)
+
+All XS files in a single C<xs/> subdirectory:
 
     lib/
     └── MyModule/
         ├── xs/
         │   ├── _header.xs      # Includes, types, static vars
-        │   ├── context.xs      # Lugh::Context methods
-        │   ├── tensor.xs       # Lugh::Tensor methods
-        │   ├── inference.xs    # Lugh::Inference methods
+        │   ├── context.xs      # MyModule::Context methods
+        │   ├── tensor.xs       # MyModule::Tensor methods
+        │   ├── inference.xs    # MyModule::Inference methods
         │   └── _footer.xs      # BOOT section
         └── MyModule.pm         # Perl module
+
+=head2 Hierarchical Layout (recursive mode)
+
+XS files alongside their corresponding C<.pm> files:
+
+    lib/
+    └── MyModule/
+        ├── _header.xs          # Shared includes, types, static vars
+        ├── _footer.xs          # BOOT section
+        ├── MyModule.pm         # Main module
+        ├── Context.pm          # Context module
+        ├── Context.xs          # Context XS code
+        ├── Tensor.pm           # Tensor module
+        ├── Tensor.xs           # Tensor XS code
+        └── Inference.pm        # Inference module
+            └── Inference.xs    # Inference XS code
+
+Use C<< recursive => 1 >> in C<combine()> for this layout.
 
 =head2 _header.xs example
 
@@ -522,21 +693,44 @@ the combined XS file when source files change:
     #include "perl.h"
     #include "XSUB.h"
 
-    /* Shared static registry - accessible from all modules */
-    static void *registry[1024];
-    static int registry_count = 0;
+    /* Shared constants and static variables - accessible from all modules */
+    #define MAX_SLOTS 10
+    static double slots[MAX_SLOTS];
+    static int slot_count = 0;
+
+    /* Shared helper function */
+    static int is_valid_slot(int slot) {
+        return (slot >= 0 && slot < MAX_SLOTS);
+    }
+
+Note: C<_header.xs> typically has B<no> C<MODULE => line - its entire content
+is treated as C preamble code that gets placed first in the combined output.
 
 =head2 context.xs example
 
+Package XS files can define their own C helper functions that use definitions
+from C<_header.xs>:
+
+    /*
+     * Context-specific helpers using shared state from _header.xs
+     */
+
+    /* This function can use MAX_SLOTS, slots[], and is_valid_slot()
+       because _header.xs C code is placed first in the combined preamble */
+    static int ctx_count_used(void) {
+        int count = 0;
+        for (int i = 0; i < MAX_SLOTS; i++) {
+            if (slots[i] != 0.0) count++;
+        }
+        return count;
+    }
+
     MODULE = MyModule    PACKAGE = MyModule::Context
 
-    SV *
-    new(class, ...)
-        char *class
+    int
+    used_slots()
     CODE:
-        /* Can access registry from _header.xs */
-        registry[registry_count++] = create_context();
-        /* ... */
+        RETVAL = ctx_count_used();
     OUTPUT:
         RETVAL
 
@@ -548,53 +742,13 @@ the combined XS file when source files change:
         /* Initialize shared state */
         memset(registry, 0, sizeof(registry));
 
-=head1 WHY NOT JUST USE XSMULTI?
-
-XSMULTI is great when your XS modules are truly independent. Use XSMULTI when:
-
-=over 4
-
-=item * Each module has no shared C state with other modules
-
-=item * Modules only depend on external libraries (like ggml, OpenSSL, etc.)
-
-=item * You want separate compilation for faster incremental builds
-
-=back
-
-Use ExtUtils::XSOne when:
-
-=over 4
-
-=item * Modules need to share C registries, caches, or static variables
-
-=item * You have a monolithic XS file that's grown too large to maintain
-
-=item * You want modular source organization with single-library deployment
-
-=back
 
 You can also combine both approaches: use XSMULTI for truly independent
 modules while using XSOne for modules that need to share state.
 
-=head1 DEBUGGING
-
-The combined file includes C<#line> preprocessor directives that point
-back to the original source files. This means:
-
-=over 4
-
-=item * Compiler errors show the original file and line number
-
-=item * Debuggers (gdb, lldb) can step through original source files
-
-=item * Stack traces reference the original files
-
-=back
-
 =head1 AUTHOR
 
-LNATION email@lnation.org
+LNATION E<lt>email@lnation.orgE<gt>
 
 =head1 BUGS
 

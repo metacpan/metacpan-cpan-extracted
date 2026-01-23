@@ -16,7 +16,7 @@ our @EXPORT = qw(
 	encode_IMB
 );
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Business::US::USPS::IMB', $VERSION);

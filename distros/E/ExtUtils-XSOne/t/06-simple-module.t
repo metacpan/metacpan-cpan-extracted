@@ -5,13 +5,19 @@ use strict;
 use warnings;
 use Test::More;
 use File::Spec;
-use File::Temp qw(tempdir);
-use FindBin;
+use File::Path qw(make_path remove_tree);
+use FindBin qw($Bin);
 
 use_ok('ExtUtils::XSOne');
 
-my $src_dir = File::Spec->catdir($FindBin::Bin, 'lib', 'SimpleModule', 'xs');
-my $tmpdir  = tempdir(CLEANUP => 1);
+my $src_dir = File::Spec->catdir($Bin, 'lib', 'SimpleModule', 'xs');
+
+# Create a temporary directory for test files under t/
+my $tmpdir = File::Spec->catdir($Bin, 'tmp', '06-simple-module');
+remove_tree($tmpdir) if -d $tmpdir;
+make_path($tmpdir);
+END { remove_tree($tmpdir) if $tmpdir && -d $tmpdir }
+
 my $output  = File::Spec->catfile($tmpdir, 'SimpleModule.xs');
 
 # =============================================================================

@@ -5,12 +5,16 @@ use strict;
 use warnings;
 use Test::More;
 use File::Spec;
-use File::Temp qw(tempdir);
-use File::Path qw(make_path);
+use File::Path qw(make_path remove_tree);
+use FindBin qw($Bin);
 
 use_ok('ExtUtils::XSOne');
 
-my $tmpdir = tempdir(CLEANUP => 1);
+# Create a temporary directory for test files under t/
+my $tmpdir = File::Spec->catdir($Bin, 'tmp', '05-edge-cases');
+remove_tree($tmpdir) if -d $tmpdir;
+make_path($tmpdir);
+END { remove_tree($tmpdir) if $tmpdir && -d $tmpdir }
 
 # =============================================================================
 # Test empty directory
@@ -158,8 +162,9 @@ subtest 'Multiple underscore files' => sub {
 
     my $content = read_file($output);
 
-    # Order: _header, public (regular), _internal, _private (underscore alpha), _footer
-    like($content, qr/BEGIN: _header\.xs.*BEGIN: public\.xs.*BEGIN: _internal\.xs.*BEGIN: _private\.xs.*BEGIN: _footer\.xs/s,
+    # Order: _header (in preamble), public (regular), _internal, _private (underscore alpha), _footer
+    # Note: _header.xs now goes into preamble section as "C code from:" marker
+    like($content, qr/C code from: _header\.xs.*BEGIN: public\.xs.*BEGIN: _internal\.xs.*BEGIN: _private\.xs.*BEGIN: _footer\.xs/s,
          'Underscore files ordered correctly');
 
     my @files = ExtUtils::XSOne->files_in_order($under_dir);

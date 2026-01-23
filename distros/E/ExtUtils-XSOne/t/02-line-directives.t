@@ -4,13 +4,18 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Temp qw(tempdir);
 use File::Spec;
-use File::Path qw(make_path);
+use File::Path qw(make_path remove_tree);
+use FindBin qw($Bin);
 
 use_ok('ExtUtils::XSOne');
 
-my $tmpdir = tempdir(CLEANUP => 1);
+# Create a temporary directory for test files under t/
+my $tmpdir = File::Spec->catdir($Bin, 'tmp', '02-line-directives');
+remove_tree($tmpdir) if -d $tmpdir;
+make_path($tmpdir);
+END { remove_tree($tmpdir) if $tmpdir && -d $tmpdir }
+
 my $src_dir = File::Spec->catdir($tmpdir, 'xs');
 my $output = File::Spec->catfile($tmpdir, 'Test.xs');
 
@@ -56,8 +61,9 @@ XS
     like($content, qr/#line \d+ "\Q$src_dir\E[\/\\]_header\.xs"/, 'Header #line path correct');
     like($content, qr/#line \d+ "\Q$src_dir\E[\/\\]module\.xs"/, 'Module #line path correct');
 
-    # The directives should come right after BEGIN markers
-    like($content, qr/BEGIN: _header\.xs.*\n#line/s, '#line follows BEGIN marker');
+    # The directives should come after C code markers (for _header.xs in preamble)
+    # or after BEGIN markers (for files with MODULE declarations)
+    like($content, qr/C code from: _header\.xs.*\n#line/s, '#line follows C code marker for header');
 };
 
 # =============================================================================

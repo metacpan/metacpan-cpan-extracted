@@ -22,5 +22,5 @@ no_index:
 requires:
   Future: '0.49'
   perl: '5.014'
-version: '0.02'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

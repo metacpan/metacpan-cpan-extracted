@@ -11,24 +11,43 @@ DBIx::Class::Async::ResultSet::Pager - Asynchronous pagination handling for Asyn
 
 =head1 VERSION
 
-Version 0.43
+Version 0.49
 
 =cut
 
-our $VERSION = '0.43';
+our $VERSION = '0.49';
 
 =head1 SYNOPSIS
 
-    my $rs = $schema->resultset('User')->page(1);
+    # Obtain a pager from a paged ResultSet
+    my $rs = $schema->resultset('User')->search({}, {
+        rows => 20,
+        page => 1
+    });
+
     my $pager = $rs->pager;
 
-    # total_entries returns a Future
+    # Synchronous Metadata (available immediately)
+    say "Page: "            . $pager->current_page;
+    say "Entries per page: ". $pager->entries_per_page;
+
+    # Asynchronous Metadata (returns a Future)
+    # total_entries performs a COUNT(*) in the background
     $pager->total_entries->then(sub {
         my $total = shift;
-        print "Total users: $total\n";
-        print "Last page: " . $pager->last_page . "\n";
+
+        say "Total entries in DB: $total";
+
+        # After total_entries resolves, these become available
+        say "First page: " . $pager->first_page;
+        say "Last page:  " . $pager->last_page;
+        say "Previous:   " . ($pager->previous_page // 'N/A');
+        say "Next:       " . ($pager->next_page     // 'N/A');
+
         return Future->done;
-    })->get;
+    })->catch(sub {
+        warn "Failed to fetch counts: @_";
+    });
 
 =head1 DESCRIPTION
 

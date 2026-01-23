@@ -16,7 +16,7 @@ App::Greple::xlate - модуль поддержки перевода для gre
 
 =head1 VERSION
 
-Version 0.9924
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -371,15 +371,35 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head1 SEE ALSO
 
-L<App::Greple::xlate>
+=head2 MODULES
 
-L<App::Greple::xlate::deepl>
-
-L<App::Greple::xlate::gpt4>
-
-L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - общий Docker runner, используемый xlate для операций с контейнерами.
+
+=head2 RELATED MODULES
+
+=over 2
+
+=item * L<App::Greple>
+
+Подробную информацию о шаблоне целевого текста см. в руководстве B<greple>. Используйте опции B<--inside>, B<--outside>, B<--include>, B<--exclude> для ограничения области совпадения.
+
+=item * L<App::Greple::update>
+
+Вы можете использовать модуль C<-Mupdate> для модификации файлов по результатам команды B<greple>.
+
+=item * L<App::sdif>
+
+Используйте B<sdif>, чтобы показать формат маркера конфликта бок о бок с опцией B<-V>.
+
+=item * L<App::Greple::stripe>
+
+Использование модуля Greple B<stripe> с помощью опции B<--xlate-stripe>.
+
+=back
+
+=head2 RESOURCES
 
 =over 2
 
@@ -402,22 +422,6 @@ DeepL Библиотека Python и команда CLI.
 =item * L<https://github.com/tecolicom/App-gpty>
 
 Интерфейс командной строки OpenAI
-
-=item * L<App::Greple>
-
-Подробную информацию о шаблоне целевого текста см. в руководстве B<greple>. Используйте опции B<--inside>, B<--outside>, B<--include>, B<--exclude> для ограничения области совпадения.
-
-=item * L<App::Greple::update>
-
-Вы можете использовать модуль C<-Mupdate> для модификации файлов по результатам команды B<greple>.
-
-=item * L<App::sdif>
-
-Используйте B<sdif>, чтобы показать формат маркера конфликта бок о бок с опцией B<-V>.
-
-=item * L<App::Greple::stripe>
-
-Использование модуля Greple B<stripe> с помощью опции B<--xlate-stripe>.
 
 =back
 
@@ -445,7 +449,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

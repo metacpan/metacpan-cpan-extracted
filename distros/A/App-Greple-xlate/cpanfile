@@ -1,6 +1,7 @@
 requires 'perl', 'v5.26';
 
 requires 'JSON';
+requires 'Command::Run';
 requires 'List::Util', '1.56';
 requires 'Hash::Util';
 requires 'Clipboard';
@@ -10,7 +11,6 @@ requires 'App::Greple::msdoc', '1.06';
 requires 'App::Greple::stripe', '1.02';
 requires 'Getopt::EX::termcolor';
 requires 'App::optex::textconv', '1.07';
-requires 'App::sdif', '4.41';
 requires 'Text::ANSI::Fold', '2.30';
 requires 'App::dozo', '0.9927';
 

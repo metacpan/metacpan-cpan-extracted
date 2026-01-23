@@ -1,0 +1,25 @@
+---
+abstract: 'A scientific calculator demonstrating ExtUtils::XSOne'
+author:
+  - 'lnation <email@lnation.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  ExtUtils::XSOne: '0.02'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-ExtUtils-XSOne-Test-Calculator
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008003'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

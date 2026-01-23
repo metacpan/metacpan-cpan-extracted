@@ -46,7 +46,7 @@ use Data::Dumper;
 
 #  Version information
 #
-$VERSION='2.073';
+$VERSION='2.075';
 
 
 #  Debug load
@@ -246,7 +246,9 @@ sub parse_fh {
             my @cr=($line=~/\n/g);
             $tree_or->{'_line_no'}=($tree_or->{'_line_no_next'} || 1);
             $tree_or->{'_line_no_next'}=$tree_or->{'_line_no'}+@cr;
-            debug("Line %s, Line_no_next %s, Line_no_start %s cr %s", @{$tree_or}{qw(_line_no _line_no_next _line_no_start)}, scalar @cr);
+            #  Stop auto vivification via hash slice
+            #debug("Line %s, Line_no_next %s, Line_no_start %s cr %s", @{$tree_or}{qw(_line_no _line_no_next _line_no_start)}, scalar @cr);
+            debug("Line %s, Line_no_next %s, Line_no_start %s cr %s", (map {$tree_or->{$_}} qw(_line_no _line_no_next _line_no_start)), scalar @cr);
         }
 
 
@@ -337,9 +339,10 @@ sub tag_parse {
     #map { $attr_hr->{$_}=($attr_hr->{$_}=~s/\s*[\r\n]+\s*/ /gr) } keys %{$attr_hr};
 
 
-    #  Debug
+    #  Debug. Amended to stop autovivification
     #
-    debug("tag_parse $method, tag: *%s*, line_no: %s, line_no_start: %s, attr_hr:%s ", $tag, @{$self}{qw(_line_no _line_no_start)}, Dumper($attr_hr));
+    #debug("tag_parse $method, tag: *%s*, line_no: %s, line_no_start: %s, attr_hr:%s ", $tag, @{$self}{qw(_line_no _line_no_start)}, Dumper($attr_hr));
+    debug("tag_parse $method, tag: *%s*, line_no: %s, line_no_start: %s, attr_hr:%s ", $tag, (map {$self->{$_}} qw(_line_no _line_no_start)), Dumper($attr_hr));
 
 
     #  Get the parent tag
@@ -753,7 +756,9 @@ sub start {
     else {
         my @cr=($text=~/\n/g);
         $self->{'_line_no_start'}=$self->{'_line_no'}-@cr;
-        debug("tag $tag line_no: %s, line_no_start: %s", @{$self}{qw(_line_no _line_no_start)});
+        #  Amend to stop autovivification
+        #debug("tag $tag line_no: %s, line_no_start: %s", @{$self}{qw(_line_no _line_no_start)});
+        debug("tag $tag line_no: %s, line_no_start: %s", (map {$self->{$_}} qw(_line_no _line_no_start)));
         $html_or=$self->tag_parse('SUPER::start', $tag, @_);
 
     }
@@ -1015,7 +1020,10 @@ sub text {
 
         my $html_perl_or;
         $self->push_content($self->_html_perl_or($html_perl_or=HTML::Element->new('perl', inline => 1)));
-        debug('insert line_no: %s into object ref: %s', @{$self}{qw(_line_no _html_perl_or)});
+        # Amended to stop autovivification
+        #
+        #debug('insert line_no: %s into object ref: %s', @{$self}{qw(_line_no _html_perl_or)});
+        debug('insert line_no: %s into object ref: %s', (map {$self->{$_}} qw(_line_no _html_perl_or)));
         @{$html_perl_or}{qw(_line_no _line_no_tag_end)}=@{$self}{qw(_line_no _line_no)};
         $html_perl_or->{'_code'}++;
         
@@ -1038,7 +1046,10 @@ sub text {
 
             #  Meeds subst. Get rid of cr's at start and end of text after a <perl> tag, stuffs up formatting in <pre> sections
             #
-            debug("found subst tag line_no_start: %s, line_no: %s, text '$text', script_stack: %s, %s", @{$self}{qw(_line_no_start _line_no _script_stack)}, Dumper($self->{'_script_stack'}));
+            #  Amend to stop autovivification
+            #
+            #debug("found subst tag line_no_start: %s, line_no: %s, text '$text', script_stack: %s, %s", @{$self}{qw(_line_no_start _line_no _script_stack)}, Dumper($self->{'_script_stack'}));
+            debug("found subst tag line_no_start: %s, line_no: %s, text '$text', script_stack: %s, %s", (map {$self->{$_}} qw(_line_no_start _line_no _script_stack)), Dumper($self->{'_script_stack'}));
 
             #my @cr=($text=~/\n/g);
             #if (my $html_or=$self->{'_pos'}) {
@@ -1077,7 +1088,9 @@ sub text {
             }
             else {
                 my $html_subst_or=HTML::Element->new('subst');
-                debug("insert line_no: %s, line_no_tag_end: %s into object ref $html_subst_or for text $text", @{$self}{qw(_line_no_start _line_no)});
+                #  Amend to stop autovivification
+                #debug("insert line_no: %s, line_no_tag_end: %s into object ref $html_subst_or for text $text", @{$self}{qw(_line_no_start _line_no)});
+                debug("insert line_no: %s, line_no_tag_end: %s into object ref $html_subst_or for text $text", (map {$self->{$_}} qw(_line_no_start _line_no)));
                 @{$html_subst_or}{'_line_no', '_line_no_tag_end'}=@{$self}{qw(_line_no _line_no)};
                 $html_subst_or->push_content($text);
                 $self->tag_parse('SUPER::text', $html_subst_or)

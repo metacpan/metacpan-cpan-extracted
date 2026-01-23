@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.9924";
+our $VERSION = "1.00";
 
 =encoding utf-8
 
@@ -20,7 +20,7 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 0.9924
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -487,15 +487,41 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head1 SEE ALSO
 
-L<App::Greple::xlate>
+=head2 MODULES
 
-L<App::Greple::xlate::deepl>
-
-L<App::Greple::xlate::gpt4>
-
+L<App::Greple::xlate::deepl>,
+L<App::Greple::xlate::gpt4>,
 L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - Generic Docker runner used by xlate for container operations
+
+=head2 RELATED MODULES
+
+=over 2
+
+=item * L<App::Greple>
+
+See the B<greple> manual for the detail about target text pattern.
+Use B<--inside>, B<--outside>, B<--include>, B<--exclude> options to
+limit the matching area.
+
+=item * L<App::Greple::update>
+
+You can use C<-Mupdate> module to modify files by the result of
+B<greple> command.
+
+=item * L<App::sdif>
+
+Use B<sdif> to show conflict marker format side by side with B<-V>
+option.
+
+=item * L<App::Greple::stripe>
+
+Greple B<stripe> module use by B<--xlate-stripe> option.
+
+=back
+
+=head2 RESOURCES
 
 =over 2
 
@@ -519,26 +545,6 @@ OpenAI Python Library
 =item * L<https://github.com/tecolicom/App-gpty>
 
 OpenAI command line interface
-
-=item * L<App::Greple>
-
-See the B<greple> manual for the detail about target text pattern.
-Use B<--inside>, B<--outside>, B<--include>, B<--exclude> options to
-limit the matching area.
-
-=item * L<App::Greple::update>
-
-You can use C<-Mupdate> module to modify files by the result of
-B<greple> command.
-
-=item * L<App::sdif>
-
-Use B<sdif> to show conflict marker format side by side with B<-V>
-option.
-
-=item * L<App::Greple::stripe>
-
-Greple B<stripe> module use by B<--xlate-stripe> option.
 
 =back
 
@@ -566,7 +572,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -580,7 +586,7 @@ use utf8;
 use Data::Dumper;
 
 use Text::ANSI::Fold ':constants';
-use App::cdif::Command;
+use Command::Run;
 use Hash::Util qw(lock_keys);
 use Unicode::EastAsianWidth;
 use List::Util qw(max);

@@ -9,7 +9,7 @@ use Carp ();
 
 class PawsX::S3::Uploader;
 
-our $VERSION = '0.0.2'; # VERSION
+our $VERSION = '0.0.3'; # VERSION
 # ABSTRACT: upload to S3 from a streaming source
 
 
@@ -21,7 +21,7 @@ field $s3               :param;
 field $bucket           :param;
 field $key              :param;
 field $min_part_size    :param = MULTIPART_MIN_SIZE;
-field $_under_testing   :param = false;
+field $_under_testing   :param(_under_testing) = false;
 field $extra_arguments  :param = {};
 field $always_multipart :param = false;
 field $callback         :param = undef;
@@ -200,7 +200,7 @@ PawsX::S3::Uploader - upload to S3 from a streaming source
 
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =head1 SYNOPSIS
 
@@ -378,7 +378,7 @@ Uploads all data from the filehandle. This is a shortcut method that
 repeatedly reads data from the given filehandle, L<adds|/add> it to
 the upload, and L<finishes|/finish> once it reaches end-of-file.
 
-=for Pod::Coverage MULTIPART_MIN_SIZE new
+=for Pod::Coverage MULTIPART_MIN_SIZE new DOES META
 
 =head1 Progress tracking
 

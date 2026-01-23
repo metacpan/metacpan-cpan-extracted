@@ -1,5 +1,12 @@
 Revision history for Perl extension PDF::Reuse::OverlayChart.
 
+0.05  Thu Jan 22 2026
+      Address CPANTS Kwalitee metrics: add provides, LICENSE,
+      SECURITY.md, CONTRIBUTING.md
+
+0.04  Thu Jan 22 2026
+      Added GitHub repository and bugtracker metadata
+
 0.03  Fri Oct 28 2005
       Added two new parameters, initialMaxY and initialMinY, to be used when you want to
       force the module to start with specific values along the y-axis. 

@@ -5,8 +5,10 @@ use warnings;
 use Test::More tests => 11;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-$ENV{ TZ } = 'EST';
+
 use Parse::RPN;
+
+BEGIN { $ENV{TZ} = 'GMT+5' };
 
 #########################
 sub Test

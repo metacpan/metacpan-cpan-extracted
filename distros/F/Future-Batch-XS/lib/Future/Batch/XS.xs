@@ -350,7 +350,7 @@ XS(XS_on_fail_callback)
     
     err = newHV();
     hv_store(err, "index", 5, newSViv(data->idx), 0);
-    hv_store(err, "item", 4, data->item ? newSVsv(data->item) : &PL_sv_undef, 0);
+    hv_store(err, "item", 4, data->item ? newSVsv(data->item) : newSV(0), 0);
     hv_store(err, "failure", 7, newRV_noinc((SV*)failure), 0);
     av_push(state->errors, newRV_noinc((SV*)err));
     
@@ -877,7 +877,7 @@ _presize_array(av, size)
 CODE:
     av_extend(av, size - 1);
     while (av_len(av) < size - 1) {
-        av_push(av, &PL_sv_undef);
+        av_push(av, newSV(0));
     }
 
 void

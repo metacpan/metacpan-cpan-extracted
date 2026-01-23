@@ -13,9 +13,9 @@ use autouse 'Carp' => qw(carp
 use Compress::Zlib qw(compress inflateInit);
 
 use autouse 'Data::Dumper'   => qw(Dumper);
-use AutoLoader qw(AUTOLOAD);
+#use AutoLoader qw(AUTOLOAD);
 
-our $VERSION = '0.39';
+our $VERSION = '0.43';
 our @ISA     = qw(Exporter);
 our @EXPORT  = qw(prFile
                   prPage
@@ -176,6 +176,8 @@ our %stdFont =
         'S'   => 'Symbol',
         'Z'   => 'ZapfDingbats');
 
+our $ws = '\s';#'(?:[ \0\n\r\t\f]|%[^\r\n]*[\r\n])';
+
 our $genLowerX    = 0;
 our $genLowerY    = 0;
 our $genUpperX    = 595,
@@ -290,6 +292,7 @@ sub prFile
    }
 
    my $utfil_ref = ref $utfil;
+   { no warnings; untie *UTFIL; }  # Clear any previous tie (e.g., from IO::String)
    if ($utfil_ref and ($utfil_ref eq 'Apache2::RequestRec') or
                       ($utfil_ref eq 'Apache::RequestRec') ) # mod_perl 2
    { tie *UTFIL, $utfil;
@@ -597,6 +600,24 @@ sub prForm
      $size     = shift || 1;
      $xsize    = shift || 1;
      $ysize    = shift || 1;
+  }
+
+  # Support IO::String and other IO handles as input (RT #168975)
+  if (ref($infil)) {
+     require File::Temp;
+     my $data;
+     if (ref($infil) eq "SCALAR") {
+        $data = $$infil;
+     } else {
+        local $/;
+        $data = <$infil>;
+        seek($infil, 0, 0) if $infil->can("seek");
+     }
+     my ($tmpfh, $tmpfile) = File::Temp::tempfile(SUFFIX => ".pdf", UNLINK => 1);
+     binmode $tmpfh;
+     print $tmpfh $data;
+     close $tmpfh;
+     $infil = $tmpfile;
   }
 
   my $refNr;
@@ -993,8 +1014,8 @@ sub skrivSida
 
     my $tSida = $sida + 1;
     if ((@annots)
-    || (%links && @{$links{'-1'}})
-    || (%links && @{$links{$tSida}}))
+    || (%links && $links{'-1'} && @{$links{'-1'}})
+    || (%links && $links{$tSida} && @{$links{$tSida}}))
     {  $sidObjekt .= '/Annots ' . mergeLinks() . ' 0 R';
     }
     if (defined $AAPageSaved)
@@ -1022,6 +1043,15 @@ sub prEnd
 
     if($docProxy)
     {  $docProxy->write_objects;
+       # Release Font::TTF data and TTFont0 objects now that they are written
+       for my $obj (values %{ $docProxy->{' objcache'} })
+       {  if ($obj->isa('Text::PDF::TTFont0'))
+          {  if (my $font = delete $obj->{' font'})
+             {  $font->release();
+             }
+             $obj->release();
+          }
+       }
        undef $docProxy;             # Break circular refs
     }
 
@@ -1093,7 +1123,7 @@ sub prEnd
     $pos += syswrite UTFIL, "0000000000 65535 f \n";
 
     for (my $i = 1; $i <= $antal; $i++)
-    {  $utrad = sprintf "%.10d 00000 n \n", $objekt[$i];
+    {  $utrad = sprintf "%.10d 00000 n \n", $objekt[$i] // 0;
        $pos += syswrite UTFIL, $utrad;
     }
 
@@ -1108,6 +1138,7 @@ sub prEnd
     $pos += syswrite UTFIL, $utrad;
     $pos += syswrite UTFIL, "%%EOF\n";
     close UTFIL;
+    { no warnings; untie *UTFIL; }
 
     if ($runfil)
     {   if ($log)
@@ -1527,12 +1558,10 @@ sub text_width
 
 sub DESTROY
 {  my $self = shift;
-   if(my $ttfont = $self->{ttfont})
-   {  if(my $font = delete $ttfont->{' font'})
-      { $font->release();
-      }
-      $ttfont->release();
-   }
+   # Do NOT release the ttfont (TTFont0) object here -- it is still
+   # owned by the DocProxy's objcache and will be cleaned up in prEnd().
+   # Releasing it here would wipe its ' uid' field causing write_objects
+   # to crash (GitHub issue #24).
    %$self = ();
 }
 
@@ -1541,7 +1570,7 @@ package PDF::Reuse;  # Applies to the autoloaded methods below (?)
 
 1;
 
-__END__
+##__END__
 
 =head1 NAME
 
@@ -2011,6 +2040,8 @@ from the tools menu). Select a line of text somewhere on the page. Right-click t
 mouse. Choose "Attributes".Change font size or anything else, and then you change
 it back to the old value. Save the document.
 If there was no text on the page, use some other "Touch Up" tool.
+Alternatively, use GhostScript to convert multi-stream PDFs (see prForm documentation
+for the command).
 
 
    use PDF::Reuse;
@@ -2159,6 +2190,9 @@ Alternative 2) You put your parameters in this order
 Anyway the function returns in list context:  B<$intName, @BoundingBox,
 $numberOfImages>, in scalar context:  B<$internalName> of the form.
 
+B<file> can be a filename, an IO::String object, a filehandle, or a scalar
+reference to PDF data in memory.
+
 if B<page> is excluded 1 is assumed.
 
 B<adjust>, could be 1, 2 or 0/nothing. If it is 1, the program tries to adjust the
@@ -2239,6 +2273,13 @@ Change font size or anything else, and then you change it back to the old value.
 Save the document. You could alternatively save the file as Postscript and redistill
 it with the distiller or with Ghost script, but this is a little more risky. You
 might loose fonts or something else. Another alternative could be to use prSinglePage().
+
+Alternatively, GhostScript can be used to convert multi-stream PDFs into
+single-stream format compatible with prForm:
+
+    gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/default \
+       -dNOPAUSE -dQUIET -dBATCH -dDetectDuplicateImages \
+       -dCompressFonts=true -r150 -sOutputFile=output.pdf input.pdf
 
 
    use PDF::Reuse;
@@ -3026,7 +3067,7 @@ Chris Nighswonger cnighs@cpan.org
 Copyright (C) 2003 - 2004 Lars Lundberg, Solidez HB.
 Copyright (C) 2005 Karin Lundberg.
 Copyright (C) 2006 - 2010 Lars Lundberg, Solidez HB.
-Copyright (C) 2010 - 2014 Chris Nighswonger
+Copyright (C) 2010 - 2019 Chris Nighswonger
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
@@ -3358,6 +3399,18 @@ sub prInitVars
     $filnamn, $interAktivSida, $taInterAkt, $type, $runfil, $checkCs,
     $confuseObj, $compress,$pos, $fontNr, $objNr,
     $defGState, $gSNr, $pattern, $shading, $colorSpace) = '';
+
+    if ($docProxy)
+    {  for my $obj (values %{ $docProxy->{' objcache'} })
+       {  if ($obj->isa('Text::PDF::TTFont0'))
+          {  if (my $font = delete $obj->{' font'})
+             {  $font->release();
+             }
+             $obj->release();
+          }
+       }
+       undef $docProxy;
+    }
 
     (@kids, @counts, @formBox, @objekt, @parents, @aktuellFont, @skapa,
      @jsfiler, @inits, @bookmarks, @annots) = ();
@@ -3750,7 +3803,7 @@ sub prDocForm
   if (($effect eq 'print') && ($form{$fSource}[fVALID]) && ($refNr))
   {   if ((! defined $interActive)
       && ($sidnr == 1)
-      &&  (defined %{$intAct{$fSource}[0]}) )
+      &&  (%{$intAct{$fSource}[0]}) )
       {  $interActive = $infil . ' ' . $sidnr;
          $interAktivSida = 1;
       }
@@ -3882,7 +3935,7 @@ sub prAltJpeg
    $imageNr++;
    $objNr++;
    $objekt[$objNr] = $pos;
-   $utrad = "$objNr 0 obj\n" .
+   my $utrad = "$objNr 0 obj\n" .
             "[ << /Image $altObjNr 0 R\n" .
             "/DefaultForPrinting true\n" .
             ">>\n" .
@@ -3892,8 +3945,8 @@ sub prAltJpeg
    if ($runfil)
    {  $log .= "Jpeg~AltImage\n";
    }
-   $objRef{$namnet} = $objNr;
    my $namnet = prJpeg($iData, $iWidth, $iHeight, $iFormat, $objNr);
+   $objRef{$namnet} = $objNr;
    if (! $pos)
    {  errLog("No output file, you have to call prFile first");
    }
@@ -3908,7 +3961,7 @@ sub prJpeg
    else
    {  $iColorType = 'DeviceRGB';
    }
-   my ($iLangd, $namnet, $utrad);
+   my ($iLangd, $namnet, $utrad, $iFile);
    if (! $pos)                    # If no output is active, it is no use to continue
    {   return undef;
    }
@@ -4306,14 +4359,14 @@ sub xRefs
       if ($buf =~ m'Encrypt'o)
       {  errLog("The file $infil is encrypted, cannot be used, aborts");
       }
-      if ($buf =~ m'\bstartxref\s+(\d+)'o)
+      if ($buf =~ m/\bstartxref$ws+(\d+)/)
       {  $xref = $1;
          if ($xref <= $bytes)
          {
             while ($xref)
             {  $res = sysseek INFIL, $xref, 0;
                $res = sysread INFIL, $buf, 200;
-               if ($buf =~ m '^\d+\s\d+\sobj'os)
+               if ($buf =~ m /^\d+$ws+\d+$ws+obj/os)
                {  ($xref, $tempRoot, $nr) = crossrefObj($nr, $xref);
                }
                else
@@ -4365,7 +4418,7 @@ sub crossrefObj
     sysseek INFIL, $xref, 0;
     sysread INFIL, $buf, 400;
     my $str;
-    if ($buf =~ m'^(.+>>\s*)stream'os)
+    if ($buf =~ m/^(.+>>$ws*)stream/os)
     {  $str = $1;
        $from = length($str) + 7;
        if (substr($buf, $from, 1) eq "\n")
@@ -4382,7 +4435,7 @@ sub crossrefObj
     if (!exists $param{'Index'})
     {  $param{'Index'} = "[0 $param{'Size'}]";
     }
-    if ((exists $param{'Root'}) && ($param{'Root'} =~ m'^\s*(\d+)'o))
+    if ((exists $param{'Root'}) && ($param{'Root'} =~ m/^$ws*(\d+)/o))
     {  $tempRoot = $1;
     }
     my @keys = ($param{'W'} =~ m'(\d+)'og);
@@ -4435,7 +4488,7 @@ sub crossrefObj
                 $j = 1;
              }
              else
-             {  $recTyp = $word[1];
+             {  $recTyp = hex($word[1]);
                 $j = 2;
              }
              my $k = 0;
@@ -4479,11 +4532,19 @@ sub xrefSection
     my ($i, $root, $antal);
     $nr++;
     $oldObject{('xref' . "$nr")} = $xref;  # Offset för xref sparas
-    $xref += 5;
     sysseek INFIL, $xref, 0;
+    sysread INFIL, my $buf, 30;
+    if ($buf =~ /xref/) {
+       sysseek INFIL, $xref+$-[0]+5, 0;
+    }
+    else {
+       # If the regexp fails (it shouldn't), fall back to the previous
+       # behaviour.
+       sysseek INFIL, $xref + 5, 0;
+    }
     $xref  = 0;
     my $inrad = '';
-    my $buf   = '';
+    $buf   = '';
     my $c;
     sysread INFIL, $c, 1;
     while ($c =~ m!\s!s)
@@ -4540,13 +4601,13 @@ sub xrefSection
         if ($buf =~ m'Encrypt'o)
         {  errLog("The file $infil is encrypted, cannot be used, aborts");
         }
-        if ((! $root) && ($buf =~ m'\/Root\s+(\d+)\s{1,2}\d+\s{1,2}R'so))
+        if ((! $root) && ($buf =~ m|\/Root$ws+(\d+)$ws+\d+$ws+R|so))
         {  $root = $1;
            if ($xref)
            { last; }
         }
 
-        if ((! $xref) && ($buf =~ m'\/Prev\s+(\d+)\D'so))
+        if ((! $xref) && ($buf =~ m|\/Prev$ws+(\d+)\D|so))
         {  $xref = $1;
            if ($root)
            { last; }
@@ -4554,6 +4615,12 @@ sub xrefSection
 
         if ($buf =~ m'xref'so)
         {  last; }
+
+        if($inrad=~ m/trailer/o && (! $root) && ($inrad =~ m'\/Root\s+(\d+)\s{1,2}\d+\s{1,2}R'so))
+        { $root = $1;
+          if ($xref)
+          { last; }
+        }
 
         sysread INFIL, $inrad, 30;
     }
@@ -4570,7 +4637,7 @@ sub getObject
     {  sysseek INFIL, $offs, 0;
        sysread INFIL, $buf, $siz;
        if (($noId) && ($noEnd))
-       {   if ($buf =~ m'^\d+ \d+ obj\s*(.*)endobj'os)
+       {   if ($buf =~ m/^\d+$ws+\d+$ws+obj$ws*(.*)endobj/os)
            {   if (wantarray)
                {   return ($1, $offs, $siz, $embedded);
                }
@@ -4580,7 +4647,7 @@ sub getObject
            }
        }
        elsif ($noId)
-       {   if ($buf =~ m'^\d+ \d+ obj\s*(.*)'os)
+       {   if ($buf =~ m/^\d+$ws+\d+$ws+obj$ws*(.*)/os)
            {   if (wantarray)
                {   return ($1, $offs, $siz, $embedded);
                }
@@ -4635,7 +4702,7 @@ sub getKnown
        if ($offs)
        {  sysseek INFIL, $offs, 0;
           sysread INFIL, $buf, $siz;
-          if ($buf =~ m'^\d+ \d+ obj\s*(.*)'os)
+          if ($buf =~ m/^\d+$ws+\d+$ws+obj$ws*(.*)/os)
           {   $del1 = $1;
           }
        }
@@ -4664,7 +4731,7 @@ sub unZipPrepare
    }
    my (%param, $stream, $str);
 
-   if ($buf =~ m'^(\d+ \d+ obj\s*<<[\w\d\/\s\[\]<>]+)stream\b'os)
+   if ($buf =~ m~^(\d+$ws+\d+$ws+obj$ws*<<[\w\d\/\s\[\]<>]+)stream\b~os)
    {  $str  = $1;
       $offs = length($str) + 7;
       if (substr($buf, $offs, 1) eq "\n")
@@ -4767,16 +4834,16 @@ sub getPage
    my $objektet = getObject($root);;
 
    if ($sidnr == 1)
-   {  if ($objektet =~ m'/AcroForm(\s+\d+\s{1,2}\d+\s{1,2}R)'so)
+   {  if ($objektet =~ m|/AcroForm($ws+\d+$ws+\d+$ws+R)|so)
       {  $AcroForm = $1;
       }
-      if ($objektet =~ m'/Names\s+(\d+)\s{1,2}\d+\s{1,2}R'so)
+      if ($objektet =~ m|/Names$ws+(\d+)$ws+\d+$ws+R|so)
       {  $Names = $1;
       }
       #################################################
       #  Finns ett dictionary för Additional Actions ?
       #################################################
-      if ($objektet =~ m'/AA\s*\<\<\s*[^\>]+[^\>]+'so) # AA är ett dictionary
+      if ($objektet =~ m|/AA$ws*\<\<$ws*[^\>]+[^\>]+|so) # AA är ett dictionary
       {  my $k;
          my ($dummy, $obj) = split /\/AA/, $objektet;
          $obj =~ s/\<\</\#\<\</gs;
@@ -4800,9 +4867,9 @@ sub getPage
    # Hitta pages
    #
 
-   if ($objektet =~ m'/Pages\s+(\d+)\s{1,2}\d+\s{1,2}R'os)
+   if ($objektet =~ m|/Pages$ws+(\d+)$ws+\d+$ws+R|os)
    {  $objektet = getObject($1);
-      if ($objektet =~ m'/Count\s+(\d+)'os)
+      if ($objektet =~ m|/Count$ws+(\d+)|os)
       {  $sidor = $1;
          if ($sidnr <= $sidor)
          {  ($formRes, $valid) = kolla($objektet);
@@ -4823,9 +4890,9 @@ sub getPage
    else
    { errLog("Didn't find Pages in $infil - aborting"); }
 
-   if ($objektet =~ m'/Kids\s*\[([^\]]+)'os)
+   if ($objektet =~ m|/Kids$ws*\[([^\]]+)|os)
    {  $vektor = $1; }
-   while ($vektor =~ m'(\d+)\s{1,2}\d+\s{1,2}R'go)
+   while ($vektor =~ m|(\d+)$ws+\d+$ws+R|go)
    {   push @sidObj, $1;
    }
 
@@ -4838,14 +4905,14 @@ sub getPage
       $bryt1++;
       for my $uO (@underObjekt)
       {  $objektet = getObject($uO);
-         if ($objektet =~ m'/Count\s+(\d+)'os)
+         if ($objektet =~ m|/Count$ws+(\d+)|os)
          {  if (($sidAcc + $1) < $sidnr)
             {  $sidAcc += $1; }
             else
             {  ($formRes, $valid) = kolla($objektet, $formRes);
-               if ($objektet =~ m'/Kids\s*\[([^\]]+)'os)
+               if ($objektet =~ m|/Kids$ws*\[([^\]]+)|os)
                {  $vektor = $1; }
-               while ($vektor =~ m'(\d+)\s{1,2}\d+\s{1,2}R'gso)
+               while ($vektor =~ m/(\d+)$ws+\d+$ws+R/gso)
                {   push @sidObj, $1;  }
                last;
             }
@@ -4869,13 +4936,13 @@ sub getPage
       # Kontrollera Page-objektet för annoteringar
       #################################################
 
-      if ($objektet =~ m'/Annots\s*([^\/]+)'so)
+      if ($objektet =~ m|/Annots$ws*([^\/]+)|so)
       {  $Annots = $1;
       }
       #################################################
       #  Finns ett dictionary för Additional Actions ?
       #################################################
-      if ($objektet =~ m'/AA\s*\<\<\s*[^\>]+[^\>]+'so)  # AA är ett dictionary. Hela kopieras
+      if ($objektet =~ m|/AA$ws*\<\<$ws*[^\>]+[^\>]+|so)  # AA är ett dictionary. Hela kopieras
       {  my $k;
          my ($dummy, $obj) = split /\/AA/, $objektet;
          $obj =~ s/\<\</\#\<\</gs;
@@ -4928,7 +4995,7 @@ sub getPage
        @{$$$robj[oNR]} = ($offs, $siz, $embedded);
        $$$robj[oFORM] = 'Y';
        $form{$fSource}[fMAIN] = $seq;
-       if ($objektet =~ m'^(\d+ \d+ obj\s*<<)(.+)(>>\s*stream)'so)
+       if ($objektet =~ m/^(\d+$ws+\d+$ws+obj$ws*<<)(.+)(>>$ws*stream)/so)
        {  $del1   = $2;
           $strPos           = length($1) + length($2) + length($3);
           $$$robj[oPOS]     = length($1);
@@ -4945,7 +5012,7 @@ sub getPage
           }
           $referens = $objNr;
 
-          $res = ($nyDel1 =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs);
+          $res = ($nyDel1 =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs);
           if ($res)
           { $$$robj[oKIDS] = 1; }
           if ($action eq 'print')
@@ -4957,11 +5024,11 @@ sub getPage
           $form{$fSource}[fVALID] = $validStream;
       }
       else                              # Endast resurserna kan behandlas
-      {   $formRes =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+      {   $formRes =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
       }
    }
    else                                # Endast resurserna kan behandlas
-   {  $formRes =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+   {  $formRes =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
    }
 
    my $preLength;
@@ -4975,24 +5042,24 @@ sub getPage
          ($objektet, $offs, $siz, $embedded)  = getObject($gammal);
          $robj      = \$$$rform[fOBJ]->{$gammal};
          @{$$$robj[oNR]} = ($offs, $siz, $embedded);
-         if ($objektet =~ m'^(\d+ \d+ obj\s*<<)(.+)(>>\s*stream)'os)
+         if($objektet =~ m/^(\d+$ws+\d+$ws+obj$ws*<<)(.+)(>>$ws*stream)/os)
          {  $del1             = $2;
             $strPos           = length ($1) + length($2) + length($3);
             $$$robj[oPOS]     = length($1);
             $$$robj[oSTREAMP] = $strPos;
 
             ######## En bild ########
-            if ($del1 =~ m'/Subtype\s*/Image'so)
+            if ($del1 =~ m|/Subtype$ws*/Image|so)
             {  $imSeq++;
                $$$robj[oIMAGENR] = $imSeq;
                push @{$$$rform[fIMAGES]}, $gammal;
 
-               if ($del1 =~ m'/Width\s+(\d+)'os)
+               if ($del1 =~ m|/Width$ws+(\d+)|os)
                {  $$$robj[oWIDTH] = $1; }
-               if ($del1 =~ m'/Height\s+(\d+)'os)
+               if ($del1 =~ m|/Height$ws+(\d+)|os)
                {  $$$robj[oHEIGHT] = $1; }
             }
-            $res = ($del1 =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs);
+            $res = ($del1 =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs);
             if ($res)
             { $$$robj[oKIDS] = 1; }
             if ($action eq 'print')
@@ -5003,7 +5070,7 @@ sub getPage
             }
          }
          else
-         {  if ($objektet =~ m'^(\d+ \d+ obj\s*)'os)
+         {  if ($objektet =~ m|^(\d+$ws+\d+$ws+obj$ws*)|os)
             {  $preLength = length($1);
                $$$robj[oPOS] = $preLength;
                $objektet     = substr($objektet, $preLength);
@@ -5011,23 +5078,23 @@ sub getPage
             else
             {  $$$robj[oPOS] = 0;
             }
-            $res = ($objektet =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs);
+            $res = ($objektet =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs);
             if ($res)
             { $$$robj[oKIDS] = 1; }
-            if ($objektet =~ m'/Subtype\s*/Image'so)
+            if ($objektet =~ m|/Subtype$ws*/Image|so)
             {  $imSeq++;
                $$$robj[oIMAGENR] = $imSeq;
                push @{$$$rform[fIMAGES]}, $gammal;
                ###################################
                # Sparar dimensionerna för bilden
                ###################################
-               if ($del1 =~ m'/Width\s+(\d+)'os)
+               if ($del1 =~ m|/Width$ws+(\d+)|os)
                {  $$$robj[oWIDTH] = $1; }
 
-               if ($del1 =~ m'/Height\s+(\d+)'os)
+               if ($del1 =~ m|/Height$ws+(\d+)|os)
                {  $$$robj[oHEIGHT] = $1; }
             }
-            elsif ($objektet =~ m'/BaseFont\s*/([^\s\/]+)'os)
+            elsif ($objektet =~ m|/BaseFont$ws*/([^\s\/]+)|os)
             {  $Font = $1;
                $$$robj[oTYPE] = 'Font';
                $$$robj[oNAME] = $Font;
@@ -5038,7 +5105,7 @@ sub getPage
                   $font{$Font}[foORIGINALNR]       = $gammal;
                   $fontSource{$Font}[foSOURCE]     = $fSource;
                   $fontSource{$Font}[foORIGINALNR] = $gammal;
-                  if ($objektet =~ m'/Subtype\s*/Type0'os)
+                  if ($objektet =~ m|/Subtype$ws*/Type0|os)
                   {  $font{$Font}[foTYP] = 1;
                   }
                   if ($action eq 'print')
@@ -5106,30 +5173,30 @@ sub getPage
        }
        if (defined $AcroForm)
        {   @$$ref[iACROFORM] = $AcroForm;
-           $AcroForm =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+           $AcroForm =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
        }
        if (defined $AARoot)
        {   @$$ref[iAAROOT] = $AARoot;
-           $AARoot =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+           $AARoot =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
        }
        if (defined $AAPage)
        {   @$$ref[iAAPAGE] = $AAPage;
-           $AAPage =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+           $AAPage =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
        }
        if (defined $Annots)
        {   my @array;
            if ($Annots =~ m'\[([^\[\]]*)\]'os)
            {  $Annots = $1;
-              @array = ($Annots =~ m'\b(\d+)\s{1,2}\d+\s{1,2}R\b'ogs);
+              @array = ($Annots =~ m/\b(\d+)$ws+\d+$ws+R\b/ogs);
            }
            else
-           {  if ($Annots =~ m'\b(\d+)\s{1,2}\d+\s{1,2}R\b'os)
+           {  if ($Annots =~ m/\b(\d+)$ws+\d+$ws+R\b/os)
               {  $Annots = getObject($1);
-                 @array = ($Annots =~ m'\b(\d+)\s{1,2}\d+\s{1,2}R\b'ogs);
+                 @array = ($Annots =~ m/\b(\d+)$ws+\d+$ws+R\b/ogs);
               }
            }
            @$$ref[iANNOTS] = \@array;
-           $Annots =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+           $Annots =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
        }
 
       while (scalar @skapa)
@@ -5141,22 +5208,23 @@ sub getPage
             ($objektet, $offs, $siz, $embedded) = getObject($gammal);
             $robj  = \$$$ref[fOBJ]->{$gammal};
             @{$$$robj[oNR]} = ($offs, $siz, $embedded);
-            if ($objektet =~ m'^(\d+ \d+ obj\s*<<)(.+)(>>\s*stream)'os)
+            if ($objektet
+                  =~ m/^(\d+$ws+\d+$ws+obj$ws*<<)(.+)(>>$ws*stream)/os)
             {  $del1             = $2;
                $$$robj[oPOS]     = length($1);
                $$$robj[oSTREAMP] = length($1) + length($2) + length($3);
 
-               $res = ($del1 =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs);
+               $res = ($del1 =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs);
                if ($res)
                { $$$robj[oKIDS] = 1; }
             }
             else
-            {  if ($objektet =~ m'^(\d+ \d+ obj)'os)
+            {  if ($objektet =~ m/^(\d+$ws+\d+$ws+obj)/os)
                {  my $preLength = length($1);
                   $$$robj[oPOS] = $preLength;
                   $objektet = substr($objektet, $preLength);
 
-                  $res = ($objektet =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs);
+                  $res = ($objektet =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs);
                   if ($res)
                   { $$$robj[oKIDS] = 1; }
                 }
@@ -5200,17 +5268,17 @@ sub kolla
    my $resources = shift;
    my $valid;
 
-   if ($obj =~ m'MediaBox\s*\[\s*([\-\.\d]+)\s+([\-\.\d]+)\s+([\-\.\d]+)\s+([\-\.\d]+)'os)
+   if ($obj =~ m/MediaBox$ws*\[$ws*([\-\.\d]+)$ws+([\-\.\d]+)$ws+([\-\.\d]+)$ws+([\-\.\d]+)/os)
    { $formBox[0] = $1;
      $formBox[1] = $2;
      $formBox[2] = $3;
      $formBox[3] = $4;
    }
 
-   if ($obj =~ m'/Contents\s+(\d+)'so)
+   if ($obj =~ m|/Contents$ws+(\d+)|so)
    {  $formCont = $1;
       my $cObj = getObject($formCont, 1, 1);
-      if ($cObj =~ m'^\s*\[[^\]]+\]\s*$'os)
+      if ($cObj =~ m/^$ws*\[[^\]]+\]$ws*$/os)
       {   $valid = 0;
           undef $formCont;
       }
@@ -5218,13 +5286,13 @@ sub kolla
       {   $valid    = 1;
       }
    }
-   elsif ($obj =~ m'/Contents\s*\[\s*(\d+)\s{1,2}\d+\s{1,2}R\s*\]'so)
+   elsif ($obj =~ m|/Contents$ws*\[$ws*(\d+)$ws+\d+$ws+R$ws*\]|so)
    { $formCont = $1;
      $valid    = 1;
    }
 
    if ($obj =~ m'^(.+/Resources)'so)
-   {  if ($obj =~ m'Resources(\s+\d+\s{1,2}\d+\s{1,2}R)'os)   # Hänvisning
+   {  if ($obj =~ m/Resources($ws+\d+$ws+\d+$ws+R)/os)   # Hänvisning
       {  $resources = $1; }
       else                 # Resurserna är ett dictionary. Hela kopieras
       {  my $dummy;
@@ -5347,7 +5415,7 @@ sub byggForm
 
        ($del1, $del2, $kids, $typ) = getKnown(\$form{$fSource},$key);
 
-       $$del1 =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/translate() . ' 0 R'/oegs;
+       $$del1 =~ s/\b(\d+)$ws+\d+$ws+R\b/translate() . ' 0 R'/oegs;
 
        if (defined $$del2)
        {  $utrad = "$nr 0 obj\n<<" . $$del1 . $$del2;
@@ -5400,7 +5468,7 @@ sub byggForm
                  $form{$fSource}->[fBBOX]->[3]  . ' ]' .
                  # "\]/Matrix \[ $sX 0 0 $sX $tX $tY \]" .
                  $$del1;
-   $nyDel1 =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/translate() . ' 0 R'/oegs;
+   $nyDel1 =~ s/\b(\d+)$ws+\d+$ws+R\b/translate() . ' 0 R'/oegs;
 
    $utrad = "$nr 0 obj" . $nyDel1 . $$del2;
 
@@ -5460,7 +5528,7 @@ sub getImage
 
    ($del1, $del2) = getKnown(\$form{$fSource}, $key);
 
-   $$del1 =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+   $$del1 =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
    if (defined $$del2)
    {  $utrad = "$nr 0 obj\n<<" . $$del1 . $$del2;
    }
@@ -5480,7 +5548,7 @@ sub getImage
 
          ($del1, $del2) = getKnown(\$form{$fSource}, $gammal);
 
-         $$del1 =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+         $$del1 =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
          if (defined $$del2)
          {  $utrad = "$ny 0 obj\n<<" . $$del1 . $$del2;
          }
@@ -5543,16 +5611,16 @@ sub AcroFormsEtc
 
    if (defined $intAct{$fSource}[iACROFORM])
    {   $AcroForm = $intAct{$fSource}[iACROFORM];
-       $AcroForm =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+       $AcroForm =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
    }
    if (defined $intAct{$fSource}[iAAROOT])
    {  $AARoot = $intAct{$fSource}[iAAROOT];
-      $AARoot =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+      $AARoot =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
    }
 
    if (defined $intAct{$fSource}[iAAPAGE])
    {   $AAPage = $intAct{$fSource}[iAAPAGE];
-       $AAPage =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+       $AAPage =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
    }
    if (defined $intAct{$fSource}[iANNOTS])
    {  for (@{$intAct{$fSource}[iANNOTS]})
@@ -5577,7 +5645,7 @@ sub AcroFormsEtc
          {  $res = sysseek INFIL, ($objData[0] + $$oD[oPOS]), 0;
             $corr = sysread INFIL, $del1, ($$oD[oSTREAMP] - $$oD[oPOS]) ;
             if (defined  $$oD[oKIDS])
-            {   $del1 =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+            {   $del1 =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
             }
             $res = sysread INFIL, $del2, ($objData[1] - $corr);
             $utrad = "$ny 0 obj\n<<" . $del1 . $del2;
@@ -5586,7 +5654,7 @@ sub AcroFormsEtc
          {  $del1 = getObject($gammal);
             $del1 = substr($del1, $$oD[oPOS]);
             if (defined  $$oD[oKIDS])
-            {   $del1 =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+            {   $del1 =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
             }
             $utrad = "$ny 0 obj " . $del1;
          }
@@ -5652,7 +5720,7 @@ sub extractName
    $formRes = $form{$fSource}->[fRESOURCE];
 
    if ($formRes !~ m'<<.*>>'os)                   # If not a directory, get it
-   {   if ($formRes =~ m'\b(\d+)\s{1,2}\d+\s{1,2}R'o)
+   {   if ($formRes =~ m/\b(\d+)$ws+\d+$ws+R/o)
        {  $key   = $1;
           $formRes = getKnown(\$form{$fSource}, $key);
        }
@@ -5661,27 +5729,27 @@ sub extractName
        }
    }
    undef $key;
-   while ($formRes =~ m'\/(\w+)\s*\<\<([^>]+)\>\>'osg)
+   while ($formRes =~ m|\/(\w+)$ws*\<\<([^>]+)\>\>|osg)
    {   $resType = $1;
        my $str  = $2;
-       if ($str =~ m|$namn\s+(\d+)\s{1,2}\d+\s{1,2}R|s)
+       if ($str =~ m|$namn$ws+(\d+)$ws+\d+$ws+R|s)
        {   $key = $1;
            last;
        }
    }
    if (! defined $key)                      # Try to expand the references
    {   my ($str, $del1, $del2);
-       while ($formRes =~ m'(\/\w+)\s+(\d+)\s{1,2}\d+\s{1,2}R'ogs)
+       while ($formRes =~ m|(\/\w+)$ws+(\d+)$ws+\d+$ws+R|ogs)
        { $str .= $1 . ' ';
          ($del1, $del2) = getKnown(\$form{$fSource}, $2);
          my $string =  $$del1;
          $str .= $string . ' ';
        }
        $formRes = $str;
-       while ($formRes =~ m'\/(\w+)\s*\<\<([^>]+)\>\>'osg)
+       while ($formRes =~ m|\/(\w+)$ws*\<\<([^>]+)\>\>|osg)
        {   $resType = $1;
            my $str  = $2;
-           if ($str =~ m|$namn (\d+)\s{1,2}\d+\s{1,2}R|s)
+           if ($str =~ m|$namn$ws+(\d+)$ws+\d+$ws+R|s)
            {   $key = $1;
                last;
            }
@@ -5700,14 +5768,14 @@ sub extractName
 
    if ($resType eq 'Font')
    {  my ($Font, $extNamn);
-      if ($$del1 =~ m'/BaseFont\s*/([^\s\/]+)'os)
+      if ($$del1 =~ m|/BaseFont$ws*/([^\s\/]+)|os)
       {  $extNamn = $1;
          if (! exists $font{$extNamn})
          {  $fontNr++;
             $Font = 'Ft' . $fontNr;
             $font{$extNamn}[foINTNAMN]       = $Font;
             $font{$extNamn}[foORIGINALNR]    = $nr;
-            if ($del1 =~ m'/Subtype\s*/Type0'os)
+            if ($del1 =~ m|/Subtype$ws*/Type0|os)
             {  $font{$extNamn}[foTYP] = 1;
             }
             $fontSource{$Font}[foSOURCE]     = $fSource;
@@ -5754,7 +5822,7 @@ sub extractName
       $objRef{$namn} = $nr;
    }
 
-   $$del1 =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+   $$del1 =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
 
    if (defined $$del2)
    {  $utrad = "$nr 0 obj\n<<" . $$del1 . $$del2;
@@ -5778,7 +5846,7 @@ sub extractName
 
          ($del1, $del2, $kids) = getKnown(\$form{$fSource}, $gammal);
 
-         $$del1 =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs
+         $$del1 =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs
                                      unless (! defined $kids);
          if (defined $$del2)
          {  $utrad = "$ny 0 obj\n<<" . $$del1 . $$del2;
@@ -5858,13 +5926,13 @@ sub extractObject
 
    if ($typ eq 'Font')
    {  my ($Font, $extNamn);
-      if ($$del1 =~ m'/BaseFont\s*/([^\s\/]+)'os)
+      if ($$del1 =~ m|/BaseFont$ws*/([^\s\/]+)|os)
       {  $extNamn = $1;
          $fontNr++;
          $Font = 'Ft' . $fontNr;
          $font{$extNamn}[foINTNAMN]    = $Font;
          $font{$extNamn}[foORIGINALNR] = $key;
-         if ($del1 =~ m'/Subtype\s*/Type0'os)
+         if ($del1 =~ m|/Subtype$ws*/Type0|os)
          {  $font{$extNamn}[foTYP] = 1;
          }
          if ( ! defined $fontSource{$extNamn}[foSOURCE])
@@ -5912,7 +5980,7 @@ sub extractObject
       $objRef{$namn} = $nr;
    }
 
-   $$del1 =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs
+   $$del1 =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs
                                   unless (! defined $kids);
    if (defined $$del2)
    {  $utrad = "$nr 0 obj\n<<" . $$del1 . $$del2;
@@ -5937,7 +6005,7 @@ sub extractObject
 
          ($del1, $del2, $kids) = getKnown(\$form{$fSource}, $gammal);
 
-         $$del1 =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs
+         $$del1 =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs
                                  unless (! defined  $kids);
 
          if (defined $$del2)
@@ -6011,10 +6079,10 @@ sub analysera
    my $objektet = getObject($root);
 
    if ((! $interActive) && ( ! $to) && ($from == 1))
-   {  if ($objektet =~ m'/AcroForm(\s+\d+\s{1,2}\d+\s{1,2}R)'so)
+   {  if ($objektet =~ m|/AcroForm($ws+\d+$ws+\d+$ws+R)|so)
       {  $AcroForm = $1;
       }
-      if ($objektet =~ m'/Names\s+(\d+)\s{1,2}\d+\s{1,2}R'so)
+      if ($objektet =~ m|/Names$ws+(\d+)$ws+\d+$ws+R|so)
       {  $Names = $1;
       }
       if ((scalar %fields) || (scalar @jsfiler) || (scalar @inits))
@@ -6027,9 +6095,9 @@ sub analysera
       #################################################
       #  Finns ett dictionary för Additional Actions ?
       #################################################
-      if ($objektet =~ m'/AA(\s+\d+\s{1,2}\d+\s{1,2}R)'os)   # Hänvisning
+      if ($objektet =~ m|/AA($ws+\d+$ws+\d+$ws+R)|os)   # Hänvisning
       {  $AARoot = $1; }
-      elsif ($objektet =~ m'/AA\s*\<\<\s*[^\>]+[^\>]+'so) # AA är ett dictionary
+      elsif ($objektet =~ m|/AA$ws*\<\<$ws*[^\>]+[^\>]+|so) # AA är ett dictionary
       {  my $k;
          my ($dummy, $obj) = split /\/AA/, $objektet;
          $obj =~ s/\<\</\#\<\</gs;
@@ -6054,10 +6122,10 @@ sub analysera
    # Hitta pages
    #
 
-   if ($objektet =~ m'/Pages\s+(\d+)\s{1,2}\d+\s{1,2}R'os)
+   if ($objektet =~ m|/Pages$ws+(\d+)$ws+\d+$ws+R|os)
    {  $objektet = getObject($1);
       $resources = checkResources($objektet, $resources);
-      if ($objektet =~ m'/Count\s+(\d+)'os)
+      if ($objektet =~ m|/Count$ws+(\d+)|os)
       {  $sidor = $1;
          $behandlad{$infil}->{sidor} = $sidor;
       }
@@ -6068,9 +6136,9 @@ sub analysera
    my @levels; my %kids;
    my $li = -1;
 
-   if ($objektet =~ m'/Kids\s*\[([^\]]+)'os)
+   if ($objektet =~ m|/Kids$ws*\[([^\]]+)|os)
    {  $vektor = $1;
-      while ($vektor =~ m'(\d+)\s{1,2}\d+\s{1,2}R'go)
+      while ($vektor =~ m|(\d+)$ws+\d+$ws+R|go)
       {   push @sidObj, $1;
       }
       $li++;
@@ -6081,11 +6149,11 @@ sub analysera
    {  if (scalar @{$levels[$li]})
       {   my $j = shift @{$levels[$li]};
           $objektet = getObject($j);
-          if ($objektet =~ m'/Kids\s*\[([^\]]+)'os)
+          if ($objektet =~ m|/Kids$ws*\[([^\]]+)|os)
           {  $resources = checkResources($objektet, $resources);
              $vektor = $1;
              my @sObj;
-             while ($vektor =~ m'(\d+)\s{1,2}\d+\s{1,2}R'go)
+             while ($vektor =~ m/(\d+)$ws+\d+$ws+R/go)
              {   push @sObj, $1 if !$kids{$1}; $kids{$1}=1;
              }
                if(@sObj)
@@ -6120,10 +6188,10 @@ sub analysera
    }
 
    if (defined $AcroForm)
-   {  $AcroForm =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+   {  $AcroForm =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
    }
    if (defined $AARoot)
-   {  $AARoot =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+   {  $AARoot =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
    }
 
    while (scalar @skapa)
@@ -6134,10 +6202,10 @@ sub analysera
          my $ny     = $$_[1];
          $objektet  = getObject($gammal);
 
-         if ($objektet =~ m'^(\d+ \d+ obj\s*<<)(.+)(>>\s*stream)'os)
+         if($objektet =~ m/^(\d+$ws+\d+$ws+obj$ws*<<)(.+)(>>$ws*stream)/os)
          {  $del1 = $2;
             $strPos = length($2) + length($3) + length($1);
-            $del1 =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+            $del1 =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
             $objekt[$ny] = $pos;
             $utrad = "$ny 0 obj<<" . "$del1" . '>>stream';
             $del2   = substr($objektet, $strPos);
@@ -6146,11 +6214,11 @@ sub analysera
             $pos += syswrite UTFIL, $utrad;
          }
          else
-         {  if ($objektet =~ m'^(\d+ \d+ obj)'os)
+         {  if ($objektet =~ m/^(\d+$ws+\d+$ws+obj)/os)
             {  my $preLength = length($1);
                $objektet = substr($objektet, $preLength);
             }
-            $objektet =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+            $objektet =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
             $objekt[$ny] = $pos;
             $utrad = "$ny 0 obj$objektet";
             $pos += syswrite UTFIL, $utrad;
@@ -6215,10 +6283,10 @@ sub sidAnalys
        # contains an array of content streams. Replace the ref with the array
        ########################################################################
 
-       if ($obj =~ m'/Contents\s+(\d+)\s{1,2}\d+\s{1,2}R'os)
+       if ($obj =~ m|/Contents$ws+(\d+)$ws+\d+$ws+R|os)
        {   my $cObj = getObject($1, 1, 1);
-           if ($cObj =~ m'^\s*\[[^\]]+\]\s*$'os)
-           {   $obj =~ s|/Contents\s+\d+\s{1,2}\d+\s{1,2}R|'/Contents ' . $cObj|oes;
+           if ($cObj =~ m/^$ws*\[[^\]]+\]$ws*$/os)
+           {   $obj =~ s|/Contents$ws+\d+$ws+\d+$ws+R|'/Contents ' . $cObj|oes;
            }
        }
 
@@ -6236,14 +6304,14 @@ sub sidAnalys
        my $i = 0;
        while (($resources !~ m'\/'os) && ($i < 10))
        {   $i++;
-           if ($resources =~ m'\s+(\d+)\s{1,2}\d+\s{1,2}R'os)
+           if ($resources =~ m/$ws+(\d+)$ws+\d+$ws+R/os)
            {   $resources = getObject($1, 1, 1);
            }
        }
        if ($i > 7)
        {  errLog("Couldn't find resources to merge");
        }
-       if ($resources =~ m'\s*\<\<(.*)\>\>'os)
+       if ($resources =~ m/$ws*\<\<(.*)\>\>/os)
        {  $resources = $1;
        }
 
@@ -6257,44 +6325,44 @@ sub sidAnalys
        ###############################################################
 
        if (scalar %sidFont)
-       {  if ($resources =~ m'/Font\s+(\d+)\s{1,2}\d+\s{1,2}R'os)
+       {  if ($resources =~ m|/Font$ws+(\d+)$ws+\d+$ws+R|os)
           {   my $dict = getObject($1, 1, 1);
-              $resources =~ s"/Font\s+\d+\s{1,2}\d+\s{1,2}R"'/Font' . $dict"ose;
+              $resources =~ s"/Font$ws+\d+$ws+\d+$ws+R"'/Font' . $dict"ose;
           }
        }
 
        if (scalar %sidXObject)
-       {  if ($resources =~ m'/XObject\s+(\d+)\s{1,2}\d+\s{1,2}R'os)
+       {  if ($resources =~ m|/XObject$ws+(\d+)$ws+\d+$ws+R|os)
           {   my $dict = getObject($1, 1, 1);
-              $resources =~ s"/XObject\s+\d+\s{1,2}\d+\s{1,2}R"'/XObject' . $dict"ose;
+              $resources =~ s"/XObject$ws+\d+$ws+\d+$ws+R"'/XObject' . $dict"ose;
           }
        }
 
        if (scalar %sidExtGState)
-       {  if ($resources =~ m'/ExtGState\s+(\d+)\s{1,2}\d+\s{1,2}R'os)
+       {  if ($resources =~ m|/ExtGState$ws+(\d+)$ws+\d+$ws+R|os)
           {   my $dict = getObject($1, 1, 1);
-              $resources =~ s"/ExtGState\s+\d+\s{1,2}\d+\s{1,2}R"'/ExtGState' . $dict"ose;
+              $resources =~ s"/ExtGState$ws+\d+$ws+\d+$ws+R"'/ExtGState' . $dict"ose;
           }
        }
 
        if (scalar %sidPattern)
-       {  if ($resources =~ m'/Pattern\s+(\d+)\s{1,2}\d+\s{1,2}R'os)
+       {  if ($resources =~ m|/Pattern$ws+(\d+)$ws+\d+$ws+R|os)
           {   my $dict = getObject($1, 1, 1);
-              $resources =~ s"/Pattern\s+\d+\s{1,2}\d+\s{1,2}R"'/Pattern' . $dict"ose;
+              $resources =~ s"/Pattern$ws+\d+$ws+\d+$ws+R"'/Pattern' . $dict"ose;
           }
        }
 
        if (scalar %sidShading)
-       {  if ($resources =~ m'/Shading\s+(\d+)\s{1,2}\d+\s{1,2}R'os)
+       {  if ($resources =~ m|/Shading$ws+(\d+)$ws+\d+$ws+R|os)
           {   my $dict = getObject($1, 1, 1);
-              $resources =~ s"/Shading\s+\d+\s{1,2}\d+\s{1,2}R"'/Shading' . $dict"ose;
+              $resources =~ s"/Shading$ws+\d+$ws+\d+$ws+R"'/Shading' . $dict"ose;
           }
        }
 
        if (scalar %sidColorSpace)
-       {  if ($resources =~ m'/ColorSpace\s+(\d+)\s{1,2}\d+\s{1,2}R'os)
+       {  if ($resources =~ m|/ColorSpace$ws+(\d+)$ws+\d+$ws+R|os)
           {   my $dict = getObject($1, 1, 1);
-              $resources =~ s"/ColorSpace\s+\d+\s{1,2}\d+\s{1,2}R"'/ColorSpace' . $dict"ose;
+              $resources =~ s"/ColorSpace$ws+\d+$ws+\d+$ws+R"'/ColorSpace' . $dict"ose;
           }
        }
        ####################################################
@@ -6302,7 +6370,7 @@ sub sidAnalys
        # värden. Spara värden för "översättning"
        ####################################################
 
-       $resources =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+       $resources =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
 
        ###############################
        # Komplettera med nya resurser
@@ -6317,7 +6385,7 @@ sub sidAnalys
           {   $resources =  "/Font << $str >> " . $resources;
           }
           else
-          {   $resources =~ s"/Font\s*<<"'/Font<<' . $str"oges;
+          {   $resources =~ s"/Font$ws*<<"'/Font<<' . $str"oges;
           }
        }
 
@@ -6330,7 +6398,7 @@ sub sidAnalys
           {   $resources =  "/XObject << $str >> " . $resources;
           }
           else
-          {   $resources =~ s"/XObject\s*<<"'/XObject<<' . $str"oges;
+          {   $resources =~ s"/XObject$ws*<<"'/XObject<<' . $str"oges;
           }
        }
 
@@ -6343,7 +6411,7 @@ sub sidAnalys
           {   $resources =  "/ExtGState << $str >> " . $resources;
           }
           else
-          {   $resources =~ s"/ExtGState\s*<<"'/ExtGState<<' . $str"oges;
+          {   $resources =~ s"/ExtGState$ws*<<"'/ExtGState<<' . $str"oges;
           }
        }
 
@@ -6356,7 +6424,7 @@ sub sidAnalys
           {   $resources =  "/Pattern << $str >> " . $resources;
           }
           else
-          {   $resources =~ s"/Pattern\s*<<"'/Pattern<<' . $str"oges;
+          {   $resources =~ s"/Pattern$ws*<<"'/Pattern<<' . $str"oges;
           }
        }
 
@@ -6369,7 +6437,7 @@ sub sidAnalys
           {   $resources =  "/Shading << $str >> " . $resources;
           }
           else
-          {   $resources =~ s"/Shading\s*<<"'/Shading<<' . $str"oges;
+          {   $resources =~ s"/Shading$ws*<<"'/Shading<<' . $str"oges;
           }
        }
 
@@ -6382,7 +6450,7 @@ sub sidAnalys
           {   $resources =  "/ColorSpace << $str >> " . $resources;
           }
           else
-          {   $resources =~ s"/ColorSpace\s*<<"'/ColorSpace<<' . $str"oges;
+          {   $resources =~ s"/ColorSpace$ws*<<"'/ColorSpace<<'.$str"oges;
           }
        }
 
@@ -6427,53 +6495,53 @@ sub sidAnalys
 
    $old{$oNr} = $ny;
 
-   if ($obj =~ m'/Parent\s+(\d+)\s{1,2}\d+\s{1,2}R\b'os)
+   if ($obj =~ m|/Parent$ws+(\d+)$ws+\d+$ws+R\b|os)
    {  $old{$1} = $parent;
    }
 
-   if ($obj =~ m'^\d+ \d+ obj\s*<<(.+)>>\s*endobj'os)
+   if ($obj =~ m/^\d+$ws+\d+$ws+obj$ws*<<(.+)>>$ws*endobj/os)
    {  $del1 = $1;
    }
 
    if (%links)
    {   my $tSida = $sida + 1;
-       if ((%links && @{$links{'-1'}}) || (%links && @{$links{$tSida}}))
-       {   if ($del1 =~ m'/Annots\s*([^\/\<\>]+)'os)
+       if ((%links && $links{'-1'} && @{$links{'-1'}}) || (%links && $links{$tSida} && @{$links{$tSida}}))
+       {   if ($del1 =~ m|/Annots$ws*([^\/\<\>]+)|os)
            {  $Annots  = $1;
               @annots = ();
               if ($Annots =~ m'\[([^\[\]]*)\]'os)
               {  ; }
               else
-              {  if ($Annots =~ m'\b(\d+)\s{1,2}\d+\s{1,2}R\b'os)
+              {  if ($Annots =~ m/\b(\d+)$ws+\d+$ws+R\b/os)
                  {  $Annots = getObject($1);
                  }
               }
-              while ($Annots =~ m'\b(\d+)\s{1,2}\d+\s{1,2}R\b'ogs)
+              while ($Annots =~ m/\b(\d+)$ws+\d+$ws+R\b/ogs)
               {   push @annots, xform();
               }
-              $del1 =~ s?/Annots\s*([^\/\<\>]+)??os;
+              $del1 =~ s?/Annots$ws*([^\/\<\>]+)??os;
            }
            $Annots = '/Annots ' . mergeLinks() . ' 0 R';
        }
    }
 
    if (! $taInterAkt)
-   {  $del1 =~ s?\s*/AA\s*<<[^>]*>>??os;
+   {  $del1 =~ s?$ws*/AA$ws*<<[^>]*>>??os;
    }
 
-   $del1 =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+   $del1 =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
 
    if ($del1 !~ m'/Resources'o)
    {  $del1 .= "/Resources $resources";
    }
 
    if (defined $streamObjekt)     # En ny ström ska läggas till
-   {  if ($del1 =~ m'/Contents\s+(\d+)\s{1,2}\d+\s{1,2}R'os)
+   {  if ($del1 =~ m|/Contents$ws+(\d+)$ws+\d+$ws+R|os)
       {  my $oldCont = $1;
-         $del1 =~ s|/Contents\s+(\d+)\s{1,2}\d+\s{1,2}R|'/Contents [' . "$oldCont 0 R $streamObjekt" . ']'|oes;
+         $del1 =~ s|/Contents$ws+(\d+)$ws+\d+$ws+R|'/Contents [' . "$oldCont 0 R $streamObjekt" . ']'|oes;
       }
-      elsif ($del1 =~ m'/Contents\s*\['os)
-      {   $del1 =~ s|/Contents\s*\[([^\]]+)|'/Contents [' . $1 ." $streamObjekt"|oes;
+      elsif ($del1 =~ m|/Contents$ws*\[|os)
+      {   $del1 =~ s|/Contents$ws*\[([^\]]+)|'/Contents [' . $1 ." $streamObjekt"|oes;
       }
       else
       {   $del1 .= "/Contents $streamObjekt\n";
@@ -6512,7 +6580,7 @@ sub checkResources
     if ( $p < 0)
     {  ;
     }
-    elsif ($pObj =~ m'/Resources(\s+\d+\s{1,2}\d+\s{1,2}R)'os)
+    elsif ($pObj =~ m|/Resources($ws+\d+$ws+\d+$ws+R)|os)
     {   $reStr = $1;
         $to = $p + 10 + length($reStr);
     }
@@ -6577,7 +6645,7 @@ sub behandlaNames
 
           if ($objektet =~ m'<<(.+)>>'ogs)
           { $objektet = $1; }
-          if ($objektet =~ s'/JavaScript\s+(\d+)\s{1,2}\d+\s{1,2}R''os)
+          if ($objektet =~ s|/JavaScript$ws+(\d+)$ws+\d+$ws+R||os)
           {  my $byt = $1;
              push @kid, $1;
              while (scalar @kid)
@@ -6585,17 +6653,17 @@ sub behandlaNames
                 @kid = ();
                 for my $sObj (@soek)
                 {  $obj = getObject($sObj, 1);
-                   if ($obj =~ m'/Kids\s*\[([^]]+)'ogs)
+                   if ($obj =~ m|/Kids$ws*\[([^]]+)|ogs)
                    {  $vektor = $1;
                    }
-                   while ($vektor =~ m'\b(\d+)\s{1,2}\d+\s{1,2}R\b'ogs)
+                   while ($vektor =~ m/\b(\d+)$ws+\d+$ws+R\b/ogs)
                    {  push @kid, $1;
                    }
                    $vektor = '';
-                   if ($obj =~ m'/Names\s*\[([^]]+)'ogs)
+                   if ($obj =~ m|/Names$ws*\[([^]]+)|ogs)
                    {   $vektor = $1;
                    }
-                   while ($vektor =~ m'\(([^\)]+)\)\s*(\d+) \d R'gos)
+                   while ($vektor=~m|\(([^\)]+)\)$ws*(\d+)$ws+\d$ws+R|gos)
                    {   $script{$1} = $2;
                    }
                 }
@@ -6606,7 +6674,7 @@ sub behandlaNames
       {  $objektet = getObject($namnObj);
          if ($objektet =~ m'<<(.+)>>'ogs)
          {  $objektet = $1; }
-         if ($objektet =~ s'/JavaScript\s+(\d+)\s{1,2}\d+\s{1,2}R''os)
+         if ($objektet =~ s|/JavaScript$ws+(\d+)$ws+\d+$ws+R||os)
          {  my $byt = $1;
             push @kid, $1;
             while (scalar @kid)
@@ -6614,17 +6682,17 @@ sub behandlaNames
                @kid = ();
                for my $sObj (@soek)
                {  $obj = getObject($sObj);
-                  if ($obj =~ m'/Kids\s*\[([^]]+)'ogs)
+                  if ($obj =~ m|/Kids$ws*\[([^]]+)|ogs)
                   {  $vektor = $1;
                   }
-                  while ($vektor =~ m'\b(\d+)\s{1,2}\d+\s{1,2}R\b'ogs)
+                  while ($vektor =~ m|\b(\d+)$ws+\d+$ws+R\b|ogs)
                   {  push @kid, $1;
                   }
                   undef $vektor;
-                  if ($obj =~ m'/Names\s*\[([^]]+)'ogs)
+                  if ($obj =~ m|/Names$ws*\[([^]]+)|ogs)
                   {  $vektor = $1;
                   }
-                  while ($vektor =~ m'\(([^\)]+)\)\s*(\d+) \d R'gos)
+                  while($vektor =~ m/\(([^\)]+)\)$ws*(\d+)$ws+\d\$ws+R/gos)
                   {   $script{$1} = $2;
                   }
                }
@@ -6758,8 +6826,8 @@ sub behandlaNames
 
 
    $ny = $objNr;
-   $objektet =~ s|\s*/JavaScript\s*\d+\s{1,2}\d+\s{1,2}R||os;
-   $objektet =~ s/\b(\d+)\s{1,2}\d+\s{1,2}R\b/xform() . ' 0 R'/oegs;
+   $objektet =~ s|$ws*/JavaScript$ws*\d+$ws+\d+$ws+R||os;
+   $objektet =~ s/\b(\d+)$ws+\d+$ws+R\b/xform() . ' 0 R'/oegs;
    if (scalar %script)
    {  $objektet .= "\n/JavaScript $ny 0 R\n";
    }

@@ -14,7 +14,7 @@ App::Greple::xlate - greple용 번역 지원 모듈
 
 # VERSION
 
-Version 0.9924
+Version 1.00
 
 # DESCRIPTION
 
@@ -327,15 +327,31 @@ DeepL과 ChatGPT용 명령줄 도구를 설치해야 합니다.
 
 # SEE ALSO
 
-[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
+## MODULES
 
-[App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl)
-
-[App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4)
-
-[App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
+[App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl), [App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4), [App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
 [App::dozo](https://metacpan.org/pod/App%3A%3Adozo) - 컨테이너 작업을 위해 xlate에서 사용하는 범용 Docker 실행기
+
+## RELATED MODULES
+
+- [App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
+
+    **greple** 매뉴얼에서 대상 텍스트 패턴에 대한 자세한 내용을 확인하십시오. 일치 범위를 제한하려면 **--inside**, **--outside**, **--include**, **--exclude** 옵션을 사용하십시오.
+
+- [App::Greple::update](https://metacpan.org/pod/App%3A%3AGreple%3A%3Aupdate)
+
+    **greple** 명령 결과로 파일을 수정하려면 `-Mupdate` 모듈을 사용할 수 있습니다.
+
+- [App::sdif](https://metacpan.org/pod/App%3A%3Asdif)
+
+    **-V** 옵션과 함께 **sdif**을 사용하여 충돌 마커 형식을 나란히 표시하십시오.
+
+- [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe)
+
+    Greple **stripe** 모듈은 **--xlate-stripe** 옵션으로 사용합니다.
+
+## RESOURCES
 
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 
@@ -357,22 +373,6 @@ DeepL과 ChatGPT용 명령줄 도구를 설치해야 합니다.
 
     OpenAI 명령줄 인터페이스
 
-- [App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
-
-    **greple** 매뉴얼에서 대상 텍스트 패턴에 대한 자세한 내용을 확인하십시오. 일치 범위를 제한하려면 **--inside**, **--outside**, **--include**, **--exclude** 옵션을 사용하십시오.
-
-- [App::Greple::update](https://metacpan.org/pod/App%3A%3AGreple%3A%3Aupdate)
-
-    **greple** 명령 결과로 파일을 수정하려면 `-Mupdate` 모듈을 사용할 수 있습니다.
-
-- [App::sdif](https://metacpan.org/pod/App%3A%3Asdif)
-
-    **-V** 옵션과 함께 **sdif**을 사용하여 충돌 마커 형식을 나란히 표시하십시오.
-
-- [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe)
-
-    Greple **stripe** 모듈은 **--xlate-stripe** 옵션으로 사용합니다.
-
 ## ARTICLES
 
 - [https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250](https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250)
@@ -393,7 +393,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

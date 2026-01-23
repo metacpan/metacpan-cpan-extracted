@@ -491,7 +491,7 @@ SSTTRRIINNGG ooppeerraattoorrss
              return the concatenation all element on the stack with 'x' as separator
 
    aa bb RREEPP
-             return the result of 'a' x 'b'  duplicate 'a' by the number of 'x'
+             return the result of 'a' x 'b'  duplicate 'a' by the number of 'b'
 
    aa RREEVV
              return the reverse of 'a'

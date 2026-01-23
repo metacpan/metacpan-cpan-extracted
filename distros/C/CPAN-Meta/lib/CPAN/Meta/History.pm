@@ -1,10 +1,10 @@
 # vi:tw=72
-use 5.006;
+use 5.008001;
 use strict;
 use warnings;
 package CPAN::Meta::History;
 
-our $VERSION = '2.150010';
+our $VERSION = '2.150011';
 
 1;
 
@@ -22,7 +22,7 @@ CPAN::Meta::History - history of CPAN Meta Spec changes
 
 =head1 VERSION
 
-version 2.150010
+version 2.150011
 
 =head1 DESCRIPTION
 

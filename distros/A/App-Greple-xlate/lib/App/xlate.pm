@@ -1,6 +1,6 @@
 package App::xlate;
 
-our $VERSION = "0.9924";
+our $VERSION = "1.00";
 
 1;
 =encoding utf-8
@@ -68,7 +68,7 @@ xlate [ options ] -t LANG FILE [ greple options ]
 
 =head1 VERSION
 
-    Version 0.9924
+    Version 1.00
 
 =cut
 =head1 DESCRIPTION
@@ -446,7 +446,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -15,48 +15,51 @@ DBIx::Class::Async::Row - Asynchronous row object for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.43
+Version 0.49
 
 =cut
 
-our $VERSION = '0.43';
+our $VERSION = '0.49';
 
 =head1 SYNOPSIS
 
-    use DBIx::Class::Async::Row;
+    # Typically obtained via a ResultSet bridge
+    my $user = $rs->find(1)->get;
 
-    # Typically created by DBIx::Class::Async, not directly
-    my $row = DBIx::Class::Async::Row->new(
-        schema      => $schema,
-        async_db    => $async_db,
-        source_name => 'User',
-        row_data    => { id => 1, name => 'John', email => 'john@example.com' },
-    );
+    # Accessing Data (Synchronous/In-memory)
 
-    # Access columns
-    my $name  = $row->name;                 # Returns 'John'
-    my $email = $row->get_column('email');  # Returns 'john@example.com'
+    say "User: " . $user->name;
+    my $email = $user->get_column('email');
+    my %data  = $user->get_columns;
 
-    # Get all columns
-    my %columns = $row->get_columns;
+    # Persistence Operations (Asynchronous, returns Future)
 
-    # Update asynchronously
-    $row->update({ name => 'John Doe' })->then(sub {
-        my ($updated_row) = @_;
-        say "Updated: " . $updated_row->name;
+    # Update with chaining
+    $user->update({ last_login => time })->then(sub {
+        my $self = shift;
+        say "Update complete for: " . $self->email;
+
+        # Discard local changes and refetch fresh data from DB
+        return $self->discard_changes;
+    })->then(sub {
+        my $fresh_user = shift;
+        say "Confirmed DB state: " . $fresh_user->last_login;
     });
 
-    # Delete asynchronously
-    $row->delete->then(sub {
-        my ($success) = @_;
-        say "Deleted: " . ($success ? 'yes' : 'no');
+    # Delete record
+    $user->delete->then(sub {
+        say "Record removed from database.";
     });
 
-    # Discard changes and refetch from database
-    $row->discard_changes->then(sub {
-        my ($fresh_row) = @_;
-        # $fresh_row contains latest data from database
-    });
+    # Relationship Access (Asynchronous)
+
+    # If the Row component is loaded, access related sets
+    $user->search_related('orders', { status => 'pending' })
+         ->all
+         ->then(sub {
+             my @orders = @_;
+             say "Found " . scalar(@orders) . " pending orders.";
+         });
 
 =head1 DESCRIPTION
 
@@ -789,19 +792,11 @@ sub in_storage {
 
     if (defined $val) {
         $self->{_in_storage} = $val ? 1 : 0;
-        return $self->{_in_storage};
+        # If it's in storage, it's no longer 'dirty' (unsaved changes)
+        $self->{_dirty} = {} if $self->{_in_storage};
     }
 
-    return $self->{_in_storage} if exists $self->{_in_storage};
-
-    # Fallback: Does the object have a primary key value?
-    my $source = eval { $self->result_source };
-    if ($source) {
-        my ($pk) = $source->primary_columns;
-        return 1 if $pk && defined $self->{_data}{$pk};
-    }
-
-    return 0;
+    return $self->{_in_storage} // 0;
 }
 
 =head2 is_column_changed
@@ -1678,17 +1673,19 @@ sub _ensure_accessors {
     return if $class eq 'DBIx::Class::Async::Row';
 
     # 1. Handle Columns
-    foreach my $col ($source->columns) {
-        no strict 'refs';
-        next if defined &{"${class}::$col"}; # Skip if already installed
+    if ($source->can('columns')) {
+        foreach my $col ($source->columns) {
+            no strict 'refs';
+            next if defined &{"${class}::$col"}; # Skip if already installed
 
-        my $column_name = $col;
-        no warnings 'redefine';
-        *{"${class}::$column_name"} = sub {
-            my $inner = shift;
-            return @_ ? $inner->set_column($column_name, shift)
-                      : $inner->get_column($column_name);
-        };
+            my $column_name = $col;
+            no warnings 'redefine';
+            *{"${class}::$column_name"} = sub {
+                my $inner = shift;
+                return @_ ? $inner->set_column($column_name, shift)
+                          : $inner->get_column($column_name);
+            };
+        }
     }
 
     # 2. Handle Relationships

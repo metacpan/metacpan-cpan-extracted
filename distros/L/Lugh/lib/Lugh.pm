@@ -12,11 +12,11 @@ Lugh - Pure C LLM Inference Engine for Perl (built on ggml)
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 require XSLoader;
 XSLoader::load('Lugh', $VERSION);
@@ -29,10 +29,16 @@ require Lugh::Inference;
     use Lugh;
     
     # === High-Level API: LLM Inference ===
-    
+
     # Load a GGUF model
     my $model = Lugh::Model->new(
         model => '/path/to/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf'
+    );
+
+    # Or load with mmap for multi-process deployments
+    my $model = Lugh::Model->new(
+        model    => '/path/to/llama-7b.Q4_K_M.gguf',
+        use_mmap => 1,  # Shares pages across forked processes
     );
     
     # Create tokenizer and inference engine
@@ -111,6 +117,8 @@ exactly how transformers work under the hood.
 =item * B<Metal GPU Acceleration> - Uses Apple Metal on macOS
 
 =item * B<BLAS Acceleration> - Uses Accelerate/OpenBLAS for matrix operations
+
+=item * B<Memory-Mapped Loading> - Share model weights across forked processes
 
 =back
 
@@ -394,6 +402,29 @@ Memory depends on model size and quantization:
     TinyLlama 1.1B Q4_K_M:  ~650 MB
     LLaMA 7B Q4_K_M:        ~4 GB
     LLaMA 13B Q4_K_M:       ~7.5 GB
+
+=head2 Memory-Mapped Loading
+
+For multi-process deployments (e.g., forked web servers), use mmap to share
+model weights across processes:
+
+    my $model = Lugh::Model->new(
+        model    => 'model.gguf',
+        use_mmap => 1,
+    );
+
+    # Check if mmap is supported
+    if (Lugh::Model->mmap_supported) {
+        print "mmap available\n";
+    }
+
+    # Check model's mmap status
+    print "Using mmap: ", $model->use_mmap, "\n";
+    print "Mapped size: ", $model->mmap_size, " bytes\n";
+
+With mmap enabled, forked processes share the same physical memory pages
+for read-only model weights, significantly reducing total memory usage.
+See L<Lugh::Model> for details.
 
 =head2 Speed
 

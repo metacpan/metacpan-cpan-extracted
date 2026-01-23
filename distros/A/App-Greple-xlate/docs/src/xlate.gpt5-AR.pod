@@ -16,7 +16,7 @@ App::Greple::xlate - وحدة دعم الترجمة لأداة greple
 
 =head1 VERSION
 
-Version 0.9924
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -371,15 +371,35 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head1 SEE ALSO
 
-L<App::Greple::xlate>
+=head2 MODULES
 
-L<App::Greple::xlate::deepl>
-
-L<App::Greple::xlate::gpt4>
-
-L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - مشغّل Docker عام يُستخدم بواسطة xlate لعمليات الحاويات
+
+=head2 RELATED MODULES
+
+=over 2
+
+=item * L<App::Greple>
+
+راجع دليل B<greple> للتفاصيل حول نمط نص الهدف. استخدم الخيارات B<--inside> وB<--outside> وB<--include> وB<--exclude> لتقييد منطقة المطابقة.
+
+=item * L<App::Greple::update>
+
+يمكنك استخدام وحدة C<-Mupdate> لتعديل الملفات بنتيجة أمر B<greple>.
+
+=item * L<App::sdif>
+
+استخدم B<sdif> لإظهار تنسيق علامات التعارض جنبًا إلى جنب مع خيار B<-V>.
+
+=item * L<App::Greple::stripe>
+
+تُستخدم وحدة Greple B<stripe> بواسطة خيار B<--xlate-stripe>.
+
+=back
+
+=head2 RESOURCES
 
 =over 2
 
@@ -402,22 +422,6 @@ L<App::dozo> - مشغّل Docker عام يُستخدم بواسطة xlate لعم
 =item * L<https://github.com/tecolicom/App-gpty>
 
 واجهة سطر الأوامر لـ OpenAI
-
-=item * L<App::Greple>
-
-راجع دليل B<greple> للتفاصيل حول نمط نص الهدف. استخدم الخيارات B<--inside> وB<--outside> وB<--include> وB<--exclude> لتقييد منطقة المطابقة.
-
-=item * L<App::Greple::update>
-
-يمكنك استخدام وحدة C<-Mupdate> لتعديل الملفات بنتيجة أمر B<greple>.
-
-=item * L<App::sdif>
-
-استخدم B<sdif> لإظهار تنسيق علامات التعارض جنبًا إلى جنب مع خيار B<-V>.
-
-=item * L<App::Greple::stripe>
-
-تُستخدم وحدة Greple B<stripe> بواسطة خيار B<--xlate-stripe>.
 
 =back
 
@@ -445,7 +449,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

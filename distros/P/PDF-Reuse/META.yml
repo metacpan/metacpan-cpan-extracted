@@ -1,22 +1,48 @@
---- #YAML:1.0
-name:                PDF-Reuse
-version:             0.39
-abstract:            Reuse and mass produce PDF documents
-license:             perl
+---
+abstract: 'Reuse and mass produce PDF documents'
 author:
-    - Lars Lundberg LARSLUND@CPAN.ORG
-    - Chris Nighswonger CNIGHS@CPAN.ORG
-generated_by:        ExtUtils::MakeMaker version 6.42_02
-distribution_type:   module
-requires:
-    AutoLoader:                    0
-    Carp:                          0
-    Compress::Zlib:                0
-    Data::Dumper:                  0
-    Digest::MD5:                   0
-    Exporter:                      0
-    Font::TTF:                     0
-    Text::PDF::TTFont0:            0
+  - 'Lars Lundberg LARSLUND@CPAN.ORG'
+  - 'Chris Nighswonger CNIGHS@CPAN.ORG'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  IO::String: '0'
+  Test: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDF-Reuse
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - PDF::Reuse::DocProxy
+    - PDF::Reuse::TTFont
+provides:
+  PDF::Reuse:
+    file: lib/PDF/Reuse.pm
+    version: '0.43'
+  PDF::Reuse::Util:
+    file: lib/PDF/Reuse/Util.pm
+requires:
+  AutoLoader: '0'
+  Carp: '0'
+  Compress::Zlib: '0'
+  Data::Dumper: '0'
+  Digest::MD5: '0'
+  Exporter: '0'
+  Font::TTF: '0'
+  Text::PDF::TTFont0: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/cnighswonger/PDF-Reuse/issues
+  repository: https://github.com/cnighswonger/PDF-Reuse.git
+version: '0.43'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

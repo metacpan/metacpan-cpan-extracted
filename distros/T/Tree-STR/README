@@ -1,0 +1,37 @@
+Tree-STR
+
+A Perl module for a Sort-Tile-Recursive R-Tree.
+
+INSTALLATION
+
+To install this module after downloading it, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tree::STR
+
+You can also look for information at:
+
+    GitHub issue tracker
+        https://github.com/biogeospatial/Tree-STR/issues
+
+    Search CPAN
+        https://metacpan.org/release/Tree-STR
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by Shawn Laffan <shawnlaffan@gmail.com>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

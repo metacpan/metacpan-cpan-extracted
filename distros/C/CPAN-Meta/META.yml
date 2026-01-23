@@ -24,7 +24,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150009'
+generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -42,31 +42,31 @@ no_index:
 provides:
   CPAN::Meta:
     file: lib/CPAN/Meta.pm
-    version: '2.150010'
+    version: '2.150011'
   CPAN::Meta::Converter:
     file: lib/CPAN/Meta/Converter.pm
-    version: '2.150010'
+    version: '2.150011'
   CPAN::Meta::Feature:
     file: lib/CPAN/Meta/Feature.pm
-    version: '2.150010'
+    version: '2.150011'
   CPAN::Meta::History:
     file: lib/CPAN/Meta/History.pm
-    version: '2.150010'
+    version: '2.150011'
   CPAN::Meta::Merge:
     file: lib/CPAN/Meta/Merge.pm
-    version: '2.150010'
+    version: '2.150011'
   CPAN::Meta::Prereqs:
     file: lib/CPAN/Meta/Prereqs.pm
-    version: '2.150010'
+    version: '2.150011'
   CPAN::Meta::Spec:
     file: lib/CPAN/Meta/Spec.pm
-    version: '2.150010'
+    version: '2.150011'
   CPAN::Meta::Validator:
     file: lib/CPAN/Meta/Validator.pm
-    version: '2.150010'
+    version: '2.150011'
   Parse::CPAN::Meta:
     file: lib/Parse/CPAN/Meta.pm
-    version: '2.150010'
+    version: '2.150011'
 requires:
   CPAN::Meta::Requirements: '2.121'
   CPAN::Meta::YAML: '0.011'
@@ -84,7 +84,7 @@ resources:
   bugtracker: https://github.com/Perl-Toolchain-Gang/CPAN-Meta/issues
   homepage: https://github.com/Perl-Toolchain-Gang/CPAN-Meta
   repository: https://github.com/Perl-Toolchain-Gang/CPAN-Meta.git
-version: '2.150010'
+version: '2.150011'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Ansgar Burchardt <ansgar@cpan.org>'
@@ -94,7 +94,7 @@ x_contributors:
   - 'Chuck Adams <cja987@gmail.com>'
   - 'Cory G Watson <gphat@cpan.org>'
   - 'Damyan Ivanov <dam@cpan.org>'
-  - 'David Golden <xdg@xdg.me>'
+  - 'Dan Book <grinnz@gmail.com>'
   - 'Eric Wilhelm <ewilhelm@cpan.org>'
   - 'Graham Knop <haarg@haarg.org>'
   - 'Gregor Hermann <gregoa@debian.org>'
@@ -114,6 +114,10 @@ x_contributors:
   - 'Niko Tyni <ntyni@debian.org>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
   - 'Randy Sims <randys@thepierianspring.org>'
+  - 'Ricardo Signes <rjbs@semiotic.systems>'
   - 'Tomohiro Hosaka <bokutin@bokut.in>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

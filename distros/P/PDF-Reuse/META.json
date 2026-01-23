@@ -1,0 +1,82 @@
+{
+   "abstract" : "Reuse and mass produce PDF documents",
+   "author" : [
+      "Lars Lundberg LARSLUND@CPAN.ORG",
+      "Chris Nighswonger CNIGHS@CPAN.ORG"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PDF-Reuse",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "PDF::Reuse::DocProxy",
+         "PDF::Reuse::TTFont"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AutoLoader" : "0",
+            "Carp" : "0",
+            "Compress::Zlib" : "0",
+            "Data::Dumper" : "0",
+            "Digest::MD5" : "0",
+            "Exporter" : "0",
+            "Font::TTF" : "0",
+            "Text::PDF::TTFont0" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::String" : "0",
+            "Test" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PDF::Reuse" : {
+         "file" : "lib/PDF/Reuse.pm",
+         "version" : "0.43"
+      },
+      "PDF::Reuse::Util" : {
+         "file" : "lib/PDF/Reuse/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cnighswonger/PDF-Reuse/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cnighswonger/PDF-Reuse.git",
+         "web" : "https://github.com/cnighswonger/PDF-Reuse"
+      }
+   },
+   "version" : "0.43",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

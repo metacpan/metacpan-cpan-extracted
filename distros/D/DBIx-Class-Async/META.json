@@ -65,7 +65,7 @@
    "provides" : {
       "DBIx::Class::Async" : {
          "file" : "lib/DBIx/Class/Async.pm",
-         "version" : "0.43"
+         "version" : "0.49"
       },
       "DBIx::Class::Async::ResultComponent" : {
          "file" : "lib/DBIx/Class/Async/ResultComponent.pm",
@@ -73,31 +73,31 @@
       },
       "DBIx::Class::Async::ResultSet" : {
          "file" : "lib/DBIx/Class/Async/ResultSet.pm",
-         "version" : "0.43"
+         "version" : "0.49"
       },
       "DBIx::Class::Async::ResultSet::Pager" : {
          "file" : "lib/DBIx/Class/Async/ResultSet/Pager.pm",
-         "version" : "0.43"
+         "version" : "0.49"
       },
       "DBIx::Class::Async::Row" : {
          "file" : "lib/DBIx/Class/Async/Row.pm",
-         "version" : "0.43"
+         "version" : "0.49"
       },
       "DBIx::Class::Async::Schema" : {
          "file" : "lib/DBIx/Class/Async/Schema.pm",
-         "version" : "0.43"
+         "version" : "0.49"
       },
       "DBIx::Class::Async::Storage" : {
          "file" : "lib/DBIx/Class/Async/Storage.pm",
-         "version" : "0.43"
+         "version" : "0.49"
       },
       "DBIx::Class::Async::Storage::DBI" : {
          "file" : "lib/DBIx/Class/Async/Storage/DBI.pm",
-         "version" : "0.43"
+         "version" : "0.49"
       },
       "DBIx::Class::Async::Storage::DBI::Cursor" : {
          "file" : "lib/DBIx/Class/Async/Storage/DBI/Cursor.pm",
-         "version" : "0.43"
+         "version" : "0.49"
       }
    },
    "release_status" : "stable",
@@ -111,6 +111,6 @@
          "web" : "https://github.com/manwar/DBIx-Class-Async"
       }
    },
-   "version" : "0.43",
+   "version" : "0.49",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

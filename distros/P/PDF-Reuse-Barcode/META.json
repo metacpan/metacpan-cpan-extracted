@@ -1,0 +1,72 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Lars Lundberg larslund@cpan.org",
+      "Chris Nighswonger cnighs@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PDF-Reuse-Barcode",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Barcode::Code128" : "0",
+            "GD::Barcode" : "0",
+            "GD::Barcode::COOP2of5" : "0",
+            "GD::Barcode::Code39" : "0",
+            "GD::Barcode::EAN13" : "0",
+            "GD::Barcode::EAN8" : "0",
+            "GD::Barcode::IATA2of5" : "0",
+            "GD::Barcode::ITF" : "0",
+            "GD::Barcode::Industrial2of5" : "0",
+            "GD::Barcode::Matrix2of5" : "0",
+            "GD::Barcode::NW7" : "0",
+            "GD::Barcode::UPCA" : "0",
+            "GD::Barcode::UPCE" : "0",
+            "PDF::Reuse" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PDF::Reuse::Barcode" : {
+         "file" : "Barcode.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cnighswonger/PDF-Reuse-Barcode/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cnighswonger/PDF-Reuse-Barcode.git",
+         "web" : "https://github.com/cnighswonger/PDF-Reuse-Barcode"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

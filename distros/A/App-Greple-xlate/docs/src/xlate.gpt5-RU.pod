@@ -16,7 +16,7 @@ App::Greple::xlate — модуль поддержки перевода для g
 
 =head1 VERSION
 
-Version 0.9924
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -371,15 +371,35 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head1 SEE ALSO
 
-L<App::Greple::xlate>
+=head2 MODULES
 
-L<App::Greple::xlate::deepl>
-
-L<App::Greple::xlate::gpt4>
-
-L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> — универсальный запускатель Docker, используемый xlate для операций с контейнерами
+
+=head2 RELATED MODULES
+
+=over 2
+
+=item * L<App::Greple>
+
+См. руководство B<greple> для подробностей о целевом шаблоне текста. Используйте опции B<--inside>, B<--outside>, B<--include>, B<--exclude> для ограничения области сопоставления.
+
+=item * L<App::Greple::update>
+
+Вы можете использовать модуль C<-Mupdate> для изменения файлов по результатам команды B<greple>.
+
+=item * L<App::sdif>
+
+Используйте B<sdif> для отображения формата маркера конфликта рядом с опцией B<-V>.
+
+=item * L<App::Greple::stripe>
+
+Модуль Greple B<stripe> используется опцией B<--xlate-stripe>.
+
+=back
+
+=head2 RESOURCES
 
 =over 2
 
@@ -402,22 +422,6 @@ L<App::dozo> — универсальный запускатель Docker, ис�
 =item * L<https://github.com/tecolicom/App-gpty>
 
 Интерфейс командной строки OpenAI
-
-=item * L<App::Greple>
-
-См. руководство B<greple> для подробностей о целевом шаблоне текста. Используйте опции B<--inside>, B<--outside>, B<--include>, B<--exclude> для ограничения области сопоставления.
-
-=item * L<App::Greple::update>
-
-Вы можете использовать модуль C<-Mupdate> для изменения файлов по результатам команды B<greple>.
-
-=item * L<App::sdif>
-
-Используйте B<sdif> для отображения формата маркера конфликта рядом с опцией B<-V>.
-
-=item * L<App::Greple::stripe>
-
-Модуль Greple B<stripe> используется опцией B<--xlate-stripe>.
 
 =back
 
@@ -445,7 +449,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

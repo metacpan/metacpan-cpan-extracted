@@ -10,11 +10,11 @@ Lugh::Model - GGUF Model Loading and Tensor Access
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -110,16 +110,41 @@ B<Parameters:>
 =item * C<model> (required) - Path to the GGUF model file. Also accepts
 C<file> or C<path> as aliases.
 
+=item * C<use_mmap> (optional) - If true, use memory-mapped I/O to load the
+model file. This allows the OS to share read-only pages across processes,
+significantly reducing memory usage for multi-process deployments.
+Defaults to false (0) for backward compatibility. Also accepts C<mmap>
+as an alias.
+
+=item * C<prefetch> (optional) - If true and C<use_mmap> is enabled, advise
+the kernel to prefetch the entire file into memory during loading. This can
+improve inference speed at the cost of longer initial load time.
+Defaults to true (1).
+
 =back
 
 B<Returns:> A Lugh::Model object.
 
 B<Throws:> Dies if the file cannot be loaded or is not a valid GGUF file.
 
-B<Example:>
+B<Examples:>
 
+    # Standard loading (copies file into memory)
     my $model = Lugh::Model->new(
         model => '/models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf'
+    );
+
+    # Memory-mapped loading (shares pages across processes)
+    my $model = Lugh::Model->new(
+        model    => '/models/llama-7b.Q4_K_M.gguf',
+        use_mmap => 1,
+    );
+
+    # Memory-mapped without prefetch (lazy loading)
+    my $model = Lugh::Model->new(
+        model    => '/models/llama-7b.Q4_K_M.gguf',
+        use_mmap => 1,
+        prefetch => 0,  # Pages loaded on demand
     );
 
 =head1 METHODS
@@ -136,6 +161,45 @@ Returns the path to the loaded GGUF file.
 
 Returns the model architecture string (e.g., "llama", "qwen2", "phi3", "gemma2").
 Returns "unknown" if the architecture is not specified in the model.
+
+=head2 use_mmap
+
+    my $is_mmap = $model->use_mmap;
+
+Returns true (1) if the model was loaded with memory mapping enabled,
+false (0) otherwise.
+
+B<Example:>
+
+    if ($model->use_mmap) {
+        print "Model is memory-mapped (fork-safe)\n";
+    }
+
+=head2 mmap_size
+
+    my $size = $model->mmap_size;
+
+Returns the size in bytes of the memory-mapped region, or 0 if the model
+was not loaded with mmap.
+
+B<Example:>
+
+    my $size = $model->mmap_size;
+    printf "Mapped region: %.2f MB\n", $size / (1024 * 1024) if $size;
+
+=head2 mmap_supported
+
+    my $supported = Lugh::Model->mmap_supported;
+
+Class method that returns true (1) if memory mapping is supported on the
+current platform, false (0) otherwise. mmap is supported on POSIX systems
+(Linux, macOS, *BSD) and Windows.
+
+B<Example:>
+
+    if (Lugh::Model->mmap_supported) {
+        print "mmap is available on this platform\n";
+    }
 
 =head2 arch_type
 
@@ -495,6 +559,52 @@ on the quantization:
     1.1B params   0.6 GB     1.1 GB     2.2 GB
 
 The memory is freed when the Model object goes out of scope.
+
+=head2 Memory-Mapped Loading
+
+When C<use_mmap =E<gt> 1> is specified, the model file is memory-mapped
+instead of being copied into heap memory. This provides several benefits
+for multi-process deployments:
+
+=over 4
+
+=item * B<Shared Pages> - The OS can share read-only pages across processes.
+If you fork() after loading a model with mmap, child processes share the
+same physical memory pages for model weights.
+
+=item * B<Reduced Memory> - Multiple processes loading the same model file
+will share physical memory pages, reducing total memory usage.
+
+=item * B<Copy-on-Write> - Forked processes only allocate new memory for
+modified pages, not the entire model.
+
+=item * B<Lazy Loading> - With C<prefetch =E<gt> 0>, pages are loaded on
+demand as they're accessed, reducing initial load time.
+
+=back
+
+B<Example: Multi-process inference with shared model>
+
+    # Parent process loads model with mmap
+    my $model = Lugh::Model->new(
+        model    => 'llama-7b.gguf',
+        use_mmap => 1,
+    );
+
+    # Fork workers - they share model memory pages
+    for my $i (1..4) {
+        my $pid = fork();
+        if ($pid == 0) {
+            # Child: model weights are shared via mmap
+            my $tokenizer = Lugh::Tokenizer->new(model => $model);
+            my $inference = Lugh::Inference->new(model => $model);
+            # ... process requests ...
+            exit(0);
+        }
+    }
+
+Note: While model weights are shared, each process still needs its own
+Tokenizer and Inference objects, as well as KV caches.
 
 =head1 SEE ALSO
 

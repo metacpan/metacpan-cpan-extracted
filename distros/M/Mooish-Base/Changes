@@ -1,5 +1,13 @@
 Revision history for Mooish-Base
 
+1.003 - 2026-01-22
+	- Added $Mooish::Base::DEBUG variable which allows debugging
+	- Added MOOISH_BASE_EXTRA_MODULES environmental variable to control used extra modules
+	- Extra modules are now only used if their versions are high enough
+	- Added MooseX::XSConstructor as an extra module
+	- Bump minimum versions of dependencies
+	- Internal refactoring and improved test suite
+
 1.002 - 2025-12-30
 	- Use the version of namespace::autoclean suggested by Moo docs
 

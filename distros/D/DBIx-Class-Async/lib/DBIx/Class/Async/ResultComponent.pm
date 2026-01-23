@@ -6,7 +6,7 @@ DBIx::Class::Async::ResultComponent - Non-blocking row-level CRUD for DBIx::Clas
 
 =head1 VERSION
 
-Version 0.43
+Version 0.49
 
 =cut
 
@@ -16,18 +16,34 @@ use parent 'DBIx::Class';
 
 =head1 SYNOPSIS
 
-    # In your Result Class
+    # In your Result Class (e.g. MyApp/Schema/Result/User.pm)
     __PACKAGE__->load_components(qw/Async::ResultComponent Core/);
 
-    # In your application
-    $row->delete->then(sub {
-        say "Deleted successfully";
-    })->get;
+    # In your Application
 
-    $row->update({ status => 'active' })->then(sub {
-        my $updated_row = shift;
-        say "Update complete";
-    })->get;
+    # 1. Non-blocking Updates
+    # Returns a Future that resolves to the row object itself
+    $row->update({ last_login => time })->then(sub {
+        my $self = shift;
+        say "User " . $self->username . " updated via background worker.";
+
+        # 2. Non-blocking Refresh
+        return $self->discard_changes;
+    })->then(sub {
+        my $fresh_row = shift;
+        say "Data synchronised with database.";
+    });
+
+    # 3. Non-blocking Deletion
+    $row->delete->then(sub {
+        say "Record successfully removed.";
+    })->catch(sub {
+        warn "Delete failed: @_";
+    });
+
+    # 4. Relationship Traversal (Async)
+    # Allows navigating to related ResultSets while maintaining the async bridge
+    my $orders_rs = $row->search_related('orders');
 
 =head1 DESCRIPTION
 

@@ -39,6 +39,7 @@ t/00start.t
 t/01basic.t
 t/integration/alias-moose.t
 t/integration/alias.t
+t/integration/clone.t
 t/integration/comparison-example.t
 t/integration/complex-constructor.t
 t/integration/conflicts.t

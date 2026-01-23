@@ -7,7 +7,7 @@ use warnings;
 use Future;
 use Exporter 'import';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @EXPORT_OK = qw(batch);
 
 require XSLoader;
@@ -23,7 +23,7 @@ Future::Batch::XS - XS implementation of batch processing for Future operations
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

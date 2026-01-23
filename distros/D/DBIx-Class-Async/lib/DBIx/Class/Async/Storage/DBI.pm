@@ -11,30 +11,47 @@ DBIx::Class::Async::Storage::DBI - DBI-based async storage backend for DBIx::Cla
 
 =head1 VERSION
 
-Version 0.43
+Version 0.49
 
 =cut
 
-our $VERSION = '0.43';
+our $VERSION = '0.49';
 
 =head1 SYNOPSIS
 
-  use DBIx::Class::Async::Schema;
+    # Typically obtained via the storage of an async schema
+    my $storage = $schema->storage;
 
-  my $schema = DBIx::Class::Async::Schema->connect(
-      "dbi:SQLite:dbname=mydb.db",
-      undef,
-      undef,
-      { sqlite_unicode => 1 },
-      { workers => 4, schema_class => 'MyApp::Schema' }
-  );
+    # Async Cursor / Streaming Support
 
-  my $storage = $schema->storage;
-  # $storage is a DBIx::Class::Async::Storage::DBI instance
+    my $rs = $schema->resultset('User')->search({ active => 1 });
 
-  # Create a cursor for async iteration
-  my $rs = $schema->resultset('User');
-  my $cursor = $storage->cursor($rs);
+    # Create an async cursor to iterate over results without blocking the loop
+    my $cursor = $storage->cursor($rs);
+
+    # Iterate through the results one by one
+    my $next_item;
+    $next_item = sub {
+        $cursor->next->then(sub {
+            my $row_data = shift;
+            return Future->done unless $row_data; # End of stream
+
+            say "Processing user data: " . $row_data->{name};
+
+            # Recurse to get the next item
+            return $next_item->();
+        });
+    };
+
+    $next_item->()->get;
+
+    # Low-Level Execution
+
+    # Execute raw SQL through the worker pool
+    $storage->execute_all("UPDATE users SET last_login = ?", [ time ])
+            ->then(sub {
+                say "Bulk update complete.";
+            });
 
 =head1 DESCRIPTION
 

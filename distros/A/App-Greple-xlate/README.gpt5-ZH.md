@@ -14,7 +14,7 @@ App::Greple::xlate - greple 的翻译支持模块
 
 # VERSION
 
-Version 0.9924
+Version 1.00
 
 # DESCRIPTION
 
@@ -327,15 +327,31 @@ Docker 操作由[App::dozo](https://metacpan.org/pod/App%3A%3Adozo)处理，它�
 
 # SEE ALSO
 
-[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
+## MODULES
 
-[App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl)
-
-[App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4)
-
-[App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
+[App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl), [App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4), [App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
 [App::dozo](https://metacpan.org/pod/App%3A%3Adozo) - 由 xlate 用于容器操作的通用 Docker 运行器
+
+## RELATED MODULES
+
+- [App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
+
+    关于目标文本模式的详细信息请参见**greple**手册。使用**--inside**、**--outside**、**--include**、**--exclude**选项限制匹配区域。
+
+- [App::Greple::update](https://metacpan.org/pod/App%3A%3AGreple%3A%3Aupdate)
+
+    你可以使用`-Mupdate`模块根据**greple**命令的结果来修改文件。
+
+- [App::sdif](https://metacpan.org/pod/App%3A%3Asdif)
+
+    使用**sdif**与**-V**选项并排显示冲突标记格式。
+
+- [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe)
+
+    通过**--xlate-stripe**选项使用 Greple **stripe**模块。
+
+## RESOURCES
 
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 
@@ -357,22 +373,6 @@ Docker 操作由[App::dozo](https://metacpan.org/pod/App%3A%3Adozo)处理，它�
 
     OpenAI 命令行界面
 
-- [App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
-
-    关于目标文本模式的详细信息请参见**greple**手册。使用**--inside**、**--outside**、**--include**、**--exclude**选项限制匹配区域。
-
-- [App::Greple::update](https://metacpan.org/pod/App%3A%3AGreple%3A%3Aupdate)
-
-    你可以使用`-Mupdate`模块根据**greple**命令的结果来修改文件。
-
-- [App::sdif](https://metacpan.org/pod/App%3A%3Asdif)
-
-    使用**sdif**与**-V**选项并排显示冲突标记格式。
-
-- [App::Greple::stripe](https://metacpan.org/pod/App%3A%3AGreple%3A%3Astripe)
-
-    通过**--xlate-stripe**选项使用 Greple **stripe**模块。
-
 ## ARTICLES
 
 - [https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250](https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250)
@@ -393,7 +393,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

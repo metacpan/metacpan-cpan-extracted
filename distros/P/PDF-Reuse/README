@@ -1,4 +1,4 @@
-PDF/Reuse version 0.39
+PDF/Reuse version 0.40
 ======================
 
 This module gives you a possibility to reuse PDF-files. You can use pages,
@@ -77,7 +77,7 @@ COPYRIGHT AND LICENCE
 Copyright (C) 2003 - 2004 Lars Lundberg, Solidez HB.
 Copyright (C) 2005 - 2007 Karin Lundberg. All rights reserved.
 Copyright (C) 2008 - 2010 Lars Lundberg, Solidez HB.
-Copyright (C) 2010 - 2016 Chris Nighswonger.
+Copyright (C) 2010 - 2019 Chris Nighswonger.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

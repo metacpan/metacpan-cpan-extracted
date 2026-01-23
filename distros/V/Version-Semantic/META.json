@@ -46,7 +46,7 @@
       "test" : {
          "requires" : {
             "Test::API" : "0",
-            "Test::Fatal" : "0.017",
+            "Test::Fatal" : "0",
             "Test::More" : "1.001005"
          }
       }
@@ -54,7 +54,7 @@
    "provides" : {
       "Version::Semantic" : {
          "file" : "lib/Version/Semantic.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       }
    },
    "release_status" : "stable",
@@ -68,5 +68,5 @@
          "web" : "https://github.com/XSven/Version-Semantic"
       }
    },
-   "version" : "v1.0.1"
+   "version" : "v1.0.2"
 }

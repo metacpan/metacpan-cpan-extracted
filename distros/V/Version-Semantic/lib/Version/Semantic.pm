@@ -5,7 +5,7 @@ use warnings;
 
 package Version::Semantic;
 
-$Version::Semantic::VERSION = 'v1.0.1';
+$Version::Semantic::VERSION = 'v1.0.2';
 
 use overload '""' => 'to_string', '<=>' => 'compare_to';
 

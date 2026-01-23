@@ -3,6 +3,27 @@ Upstream-Name: Marlin
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Marlin
 
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ lib/Marlin/Attribute.pm
+ lib/Marlin/TypeConstraint.pm
+ t/integration/clone.t
+ t/integration/conflicts.t
+ t/integration/extend-attr.t
+ t/integration/extend-eg.t
+ t/integration/extend-lex.t
+ t/integration/foreign-inherit.t
+ t/integration/xsdelegation.t
+ t/lib/Local/Mitey.pm
+ t/lib/Local/Mitey.pm.mite.pm
+ t/lib/Local/Mitey/MOP.pm
+ t/lib/Local/Mitey/Mite.pm
+Copyright: Copyright 2026 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: INSTALL
  LICENSE
  Makefile.PL
@@ -22,26 +43,6 @@ Files: INSTALL
  t/integration/pad-inherit.skip
 Copyright: Unknown
 License: Unknown
-
-Files: Changes
- META.json
- META.yml
- dist.ini
- doap.ttl
- lib/Marlin/Attribute.pm
- lib/Marlin/TypeConstraint.pm
- t/integration/conflicts.t
- t/integration/extend-attr.t
- t/integration/extend-eg.t
- t/integration/extend-lex.t
- t/integration/foreign-inherit.t
- t/integration/xsdelegation.t
- t/lib/Local/Mitey.pm
- t/lib/Local/Mitey.pm.mite.pm
- t/lib/Local/Mitey/MOP.pm
- t/lib/Local/Mitey/Mite.pm
-Copyright: Copyright 2026 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
 
 Files: t/00start.t
  t/01basic.t

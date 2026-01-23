@@ -5,7 +5,7 @@ use warnings;
 package MooseX::Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020002';
+our $VERSION   = '0.021000';
 
 use Marlin                ();
 use Marlin::Util          ();

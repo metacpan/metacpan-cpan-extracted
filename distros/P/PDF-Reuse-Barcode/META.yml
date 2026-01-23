@@ -1,28 +1,44 @@
---- #YAML:1.0
-name:                PDF-Reuse-Barcode
-version:             0.07
-abstract:            ~
-license:             perl
+---
+abstract: unknown
 author:
-    - Lars Lundberg larslund@cpan.org
-    - Chris Nighswonger cnighs@cpan.org
-generated_by:        ExtUtils::MakeMaker version 6.42_01
-distribution_type:   module
-requires:
-    Barcode::Code128:              0
-    GD::Barcode:                   0
-    GD::Barcode::Code39:           0
-    GD::Barcode::COOP2of5:         0
-    GD::Barcode::EAN13:            0
-    GD::Barcode::EAN8:             0
-    GD::Barcode::IATA2of5:         0
-    GD::Barcode::Industrial2of5:   0
-    GD::Barcode::ITF:              0
-    GD::Barcode::Matrix2of5:       0
-    GD::Barcode::NW7:              0
-    GD::Barcode::UPCA:             0
-    GD::Barcode::UPCE:             0
-    PDF::Reuse:                    0
+  - 'Lars Lundberg larslund@cpan.org'
+  - 'Chris Nighswonger cnighs@cpan.org'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDF-Reuse-Barcode
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  PDF::Reuse::Barcode:
+    file: Barcode.pm
+    version: '0.09'
+requires:
+  Barcode::Code128: '0'
+  GD::Barcode: '0'
+  GD::Barcode::COOP2of5: '0'
+  GD::Barcode::Code39: '0'
+  GD::Barcode::EAN13: '0'
+  GD::Barcode::EAN8: '0'
+  GD::Barcode::IATA2of5: '0'
+  GD::Barcode::ITF: '0'
+  GD::Barcode::Industrial2of5: '0'
+  GD::Barcode::Matrix2of5: '0'
+  GD::Barcode::NW7: '0'
+  GD::Barcode::UPCA: '0'
+  GD::Barcode::UPCE: '0'
+  PDF::Reuse: '0'
+resources:
+  bugtracker: https://github.com/cnighswonger/PDF-Reuse-Barcode/issues
+  repository: https://github.com/cnighswonger/PDF-Reuse-Barcode.git
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

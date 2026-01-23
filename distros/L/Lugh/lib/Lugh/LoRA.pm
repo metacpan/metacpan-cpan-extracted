@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Lugh;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 NAME
 
@@ -29,11 +29,20 @@ Lugh::LoRA - Low-Rank Adaptation (LoRA) adapter support for Lugh
         model   => $model,
     );
     
+    # Create a trainable LoRA adapter (for fine-tuning)
+    my $trainable_lora = Lugh::LoRA->create(
+        model   => $model,
+        rank    => 16,              # LoRA rank (default: 16)
+        alpha   => 32.0,            # Scaling factor (default: 32.0)
+        targets => [qw(attn_q attn_v)],  # Which layers to adapt
+    );
+    
     # Check adapter properties
     say "Alpha: ", $lora->alpha;
     say "Scale: ", $lora->scale;
     say "Weights: ", $lora->n_weights;
     say "Format: ", $lora->format;
+    say "Trainable: ", $lora->trainable ? "yes" : "no";
     
     # Adjust the LoRA scaling factor
     $lora->scale(0.5);  # Half strength
@@ -41,15 +50,23 @@ Lugh::LoRA - Low-Rank Adaptation (LoRA) adapter support for Lugh
     # Get weight names
     my @names = $lora->weight_names;
     
+    # Access trainable weight tensors for gradient-based training
+    my $tensor_a = $trainable_lora->get_weight_tensor('blk.0.attn_q.weight', 'a');
+    my $tensor_b = $trainable_lora->get_weight_tensor('blk.0.attn_q.weight', 'b');
+    
+    # Save trained adapter to GGUF format
+    $trainable_lora->save('my-finetuned-adapter.gguf');
+    
     # Use with inference
     my $inference = Lugh::Inference->new(model => $model);
     my @logits = $inference->forward(tokens => \@tokens, lora => $lora);
 
 =head1 DESCRIPTION
 
-Lugh::LoRA provides support for loading and applying Low-Rank Adaptation (LoRA)
-adapters to base models. LoRA is an efficient fine-tuning technique that adds
-small rank-decomposition weight matrices to frozen pre-trained models.
+Lugh::LoRA provides support for loading, creating, training, and saving 
+Low-Rank Adaptation (LoRA) adapters for base models. LoRA is an efficient 
+fine-tuning technique that adds small rank-decomposition weight matrices 
+to frozen pre-trained models.
 
 The modified output is computed as:
 
@@ -66,6 +83,54 @@ Where:
 =item * C<rank> is the inner dimension of the decomposition
 
 =item * C<scale> is a user-adjustable multiplier (default 1.0)
+
+=back
+
+=head1 TRAINABLE LORA
+
+Lugh supports creating trainable LoRA adapters from scratch for fine-tuning:
+
+    my $lora = Lugh::LoRA->create(
+        model   => $model,
+        rank    => 16,
+        alpha   => 32.0,
+        targets => [qw(attn_q attn_v)],
+    );
+
+Trainable LoRA adapters:
+
+=over 4
+
+=item * Have C<requires_grad> enabled on all weight tensors
+
+=item * Include pre-allocated gradient tensors for backpropagation
+
+=item * Use standard LoRA initialization (A: Kaiming, B: zeros)
+
+=item * Can be saved to GGUF format after training
+
+=back
+
+=head2 Target Layers
+
+The C<targets> parameter specifies which layers to add LoRA adapters to.
+Supported targets include:
+
+=over 4
+
+=item * C<attn_q> - Query projection (default)
+
+=item * C<attn_k> - Key projection
+
+=item * C<attn_v> - Value projection (default)
+
+=item * C<attn_output> - Output projection
+
+=item * C<ffn_up> - FFN up projection
+
+=item * C<ffn_down> - FFN down projection
+
+=item * C<ffn_gate> - FFN gate projection (SwiGLU models)
 
 =back
 
@@ -172,7 +237,7 @@ consists of an A matrix and a B matrix.
 
     my $fmt = $lora->format;
 
-Returns the source format of the adapter: "gguf" or "safetensors".
+Returns the source format of the adapter: "gguf", "safetensors", or "trainable".
 
 =head2 weight_names
 
@@ -180,6 +245,66 @@ Returns the source format of the adapter: "gguf" or "safetensors".
 
 Returns the list of tensor names that have LoRA adaptations. Names are in
 the internal format (e.g., "blk.0.attn_q.weight").
+
+=head2 trainable
+
+    my $is_trainable = $lora->trainable;
+
+Returns true if this is a trainable LoRA adapter created with C<create()>,
+false if it was loaded from a file with C<new()>.
+
+=head2 create
+
+    my $lora = Lugh::LoRA->create(
+        model   => $model,     # Required: Lugh::Model
+        rank    => $rank,      # Optional: LoRA rank (default: 16)
+        alpha   => $alpha,     # Optional: scaling factor (default: 32.0)
+        scale   => $scale,     # Optional: user scale (default: 1.0)
+        targets => \@targets,  # Optional: layers to adapt
+        context => $ctx,       # Optional: Lugh::Context for tensors
+    );
+
+Creates a new trainable LoRA adapter. Unlike C<new()>, this creates fresh
+weight matrices initialized for training rather than loading from a file.
+
+The C<rank> parameter controls the size of the low-rank decomposition.
+Common values are 4, 8, 16, 32, or 64. Lower ranks use less memory but
+have less expressiveness. Valid range: 1-256.
+
+=head2 get_weight_tensor
+
+    my $tensor_a = $lora->get_weight_tensor($name, 'a');
+    my $tensor_b = $lora->get_weight_tensor($name, 'b');
+
+Returns the LoRA weight tensor as a C<Lugh::Autograd::Tensor> object.
+Only available on trainable adapters (created with C<create()>).
+
+The C<$name> parameter is the base weight name (e.g., "blk.0.attn_q.weight").
+The second parameter specifies which matrix: 'a' for the down-projection
+or 'b' for the up-projection.
+
+The returned tensor has C<requires_grad> enabled and gradient storage
+allocated for use with backpropagation.
+
+=head2 save
+
+    $lora->save('my-adapter.gguf');
+
+Saves the LoRA adapter to a GGUF file. The path must end with C<.gguf>.
+
+The saved file includes:
+
+=over 4
+
+=item * Metadata: general.type, adapter.type, adapter.lora.alpha
+
+=item * Architecture information (if available)
+
+=item * All LoRA tensor pairs (*.lora_a, *.lora_b)
+
+=back
+
+The saved adapter can be loaded with C<new()> for inference.
 
 =head1 USING LORA WITH INFERENCE
 
@@ -228,11 +353,11 @@ Use the C<scale> property to adjust LoRA influence:
 
 =head1 SEE ALSO
 
-L<Lugh>, L<Lugh::Inference>, L<Lugh::KVCache>
+L<Lugh>, L<Lugh::Inference>, L<Lugh::KVCache>, L<Lugh::Autograd::Tensor>
 
 =head1 AUTHOR
 
-Your Name Here
+lnation E<lt>email@lnation.orgE<gt>
 
 =head1 LICENSE
 

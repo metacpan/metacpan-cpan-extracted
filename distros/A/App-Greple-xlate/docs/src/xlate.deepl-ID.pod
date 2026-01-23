@@ -16,7 +16,7 @@ App::Greple::xlate - modul dukungan penerjemahan untuk greple
 
 =head1 VERSION
 
-Version 0.9924
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -371,15 +371,35 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head1 SEE ALSO
 
-L <App::Greple::xlate>
+=head2 MODULES
 
-L<App::Greple::xlate::deepl>
-
-L<App::Greple::xlate::gpt4>
-
-L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - Runner Docker Generik yang digunakan oleh xlate untuk operasi kontainer
+
+=head2 RELATED MODULES
+
+=over 2
+
+=item * L<App::Greple>
+
+Lihat manual B<greple> untuk detail tentang pola teks target. Gunakan opsi B<--inside>, B<--outside>, B<--include>, B<--exclude> untuk membatasi area pencocokan.
+
+=item * L<App::Greple::update>
+
+Anda dapat menggunakan modul C<-Mupdate> untuk memodifikasi file berdasarkan hasil perintah B<greple>.
+
+=item * L<App::sdif>
+
+Gunakan B<sdif> untuk menampilkan format penanda konflik berdampingan dengan opsi B<-V>.
+
+=item * L<App::Greple::stripe>
+
+Modul Greple B<stripe> yang digunakan oleh opsi B<--xlate-stripe>.
+
+=back
+
+=head2 RESOURCES
 
 =over 2
 
@@ -402,22 +422,6 @@ Perpustakaan Python OpenAI
 =item * L<https://github.com/tecolicom/App-gpty>
 
 Antarmuka baris perintah OpenAI
-
-=item * L<App::Greple>
-
-Lihat manual B<greple> untuk detail tentang pola teks target. Gunakan opsi B<--inside>, B<--outside>, B<--include>, B<--exclude> untuk membatasi area pencocokan.
-
-=item * L<App::Greple::update>
-
-Anda dapat menggunakan modul C<-Mupdate> untuk memodifikasi file berdasarkan hasil perintah B<greple>.
-
-=item * L<App::sdif>
-
-Gunakan B<sdif> untuk menampilkan format penanda konflik berdampingan dengan opsi B<-V>.
-
-=item * L<App::Greple::stripe>
-
-Modul Greple B<stripe> yang digunakan oleh opsi B<--xlate-stripe>.
 
 =back
 
@@ -445,7 +449,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

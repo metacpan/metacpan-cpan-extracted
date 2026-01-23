@@ -17,29 +17,29 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Mooish::Base",
   "PREREQ_PM" => {
-    "Import::Into" => 0,
-    "Moo" => 2,
+    "Import::Into" => "1.002005",
+    "Moo" => "2.004000",
     "Mooish::AttributeBuilder" => "1.002",
-    "Type::Tiny" => 2,
-    "namespace::autoclean" => "0.16"
+    "Type::Tiny" => "2.010001",
+    "namespace::autoclean" => "0.19"
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => 0
   },
-  "VERSION" => "1.002",
+  "VERSION" => "1.003",
   "test" => {
-    "TESTS" => "t/*.t"
+    "TESTS" => "t/*.t t/extra-module/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
-  "Import::Into" => 0,
-  "Moo" => 2,
+  "Import::Into" => "1.002005",
+  "Moo" => "2.004000",
   "Mooish::AttributeBuilder" => "1.002",
   "Test2::V0" => 0,
-  "Type::Tiny" => 2,
-  "namespace::autoclean" => "0.16"
+  "Type::Tiny" => "2.010001",
+  "namespace::autoclean" => "0.19"
 );
 
 

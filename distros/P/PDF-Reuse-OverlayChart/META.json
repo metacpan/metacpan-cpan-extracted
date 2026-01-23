@@ -1,0 +1,59 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Lars Lundberg larslund@cpan.org",
+      "Chris Nighswonger cnighs@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PDF-Reuse-OverlayChart",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDF::Reuse" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PDF::Reuse::OverlayChart" : {
+         "file" : "OverlayChart.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cnighswonger/PDF-Reuse-OverlayChart/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cnighswonger/PDF-Reuse-OverlayChart.git",
+         "web" : "https://github.com/cnighswonger/PDF-Reuse-OverlayChart"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

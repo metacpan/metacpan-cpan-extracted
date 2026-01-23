@@ -106,8 +106,16 @@ END_ERROR
 
 # Platform-specific flags - must include Perl's ccflags for correct ABI
 my $ccflags = $Config{ccflags} . ' -Wall -O3';
+my $ldflags = '';
 my $cc = $Config{cc};
 my $ld = $Config{ld};
+
+# Enable AddressSanitizer if LUGH_ASAN=1
+if ($ENV{LUGH_ASAN}) {
+    print "*** AddressSanitizer ENABLED ***\n";
+    $ccflags .= ' -fsanitize=address -fno-omit-frame-pointer -g -O1';
+    $ldflags .= ' -fsanitize=address';
+}
 
 if ($is_macos) {
     $cc = 'clang' unless $cc =~ /clang/;
@@ -127,6 +135,7 @@ my %WriteMakefileArgs = (
     CC               => $cc,
     LD               => $ld,
     CCFLAGS          => $ccflags,
+    ($ldflags ? (LDDLFLAGS => $Config{lddlflags} . ' ' . $ldflags) : ()),
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     ($rpath ? (dynamic_lib => { OTHERLDFLAGS => $rpath }) : ()),
     CONFIGURE_REQUIRES => {
@@ -145,13 +154,18 @@ my %WriteMakefileArgs = (
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },
-        prereqs => {
-            runtime => {
-                recommends => {
-                    'threads' => 0,
-                },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/lnation/Lugh.git',
+                web  => 'https://github.com/lnation/Lugh',
             },
         },
+        # Note: Perl threads are NOT recommended with Lugh.
+        # ggml contexts cannot be shared between threads, so each thread
+        # must load its own model copy, which is memory-inefficient.
+        # For concurrent inference, use fork-based parallelism or
+        # a single-threaded request queue pattern instead.
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Lugh-* lib/*.o lib/*.c lib/*.bs blib' },

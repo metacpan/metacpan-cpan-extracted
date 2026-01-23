@@ -1,0 +1,15 @@
+Changes
+lib/Tree/STR.pm
+lib/Tree/STR/Node.pm
+LICENSE
+MANIFEST
+MANIFEST.bak
+MANIFEST.SKIP
+README
+t/00-load.t
+xt/boilerplate.t
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

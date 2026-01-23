@@ -1,5 +1,5 @@
 package Mooish::Base;
-$Mooish::Base::VERSION = '1.002';
+$Mooish::Base::VERSION = '1.003';
 use v5.10;
 use strict;
 use warnings;
@@ -12,14 +12,53 @@ require namespace::autoclean;
 use constant FLAVOUR => $ENV{MOOISH_BASE_FLAVOUR} // 'Moo';
 use constant ROLE_FLAVOUR => $ENV{MOOISH_BASE_ROLE_FLAVOUR} // (FLAVOUR . '::Role');
 
-use constant HAS_HOOK_AFTERRUNTIME => eval { require Hook::AfterRuntime; 1 };
-use constant HAS_MOOX_TYPETINY => eval { require MooX::TypeTiny; 1 };
-use constant HAS_MOOX_XSCONSTRUCTOR => eval { require MooX::XSConstructor; 1 };
-use constant HAS_MOOSEX_XSACCESSOR => eval { require MooseX::XSAccessor; 1 };
+use constant EXTRA_MODULES => $ENV{MOOISH_BASE_EXTRA_MODULES} // join ';', qw(
+	Hook::AfterRuntime
+	MooX::TypeTiny
+	MooX::XSConstructor
+	MooseX::XSConstructor
+	MooseX::XSAccessor
+);
+
+use constant EXTRA_MODULES_AVAILABLE => {
+	'Hook::AfterRuntime' => !!eval { require Hook::AfterRuntime; Hook::AfterRuntime->VERSION('0.003'); 1 },
+	'MooX::TypeTiny' => !!eval { require MooX::TypeTiny; MooX::TypeTiny->VERSION('0.002002'); 1 },
+	'MooX::XSConstructor' => !!eval { require MooX::XSConstructor; MooX::XSConstructor->VERSION('0.003002'); 1 },
+	'MooseX::XSConstructor' => !!
+		eval { require MooseX::XSConstructor; MooseX::XSConstructor->VERSION('0.001002'); 1 },
+	'MooseX::XSAccessor' => !!eval { require MooseX::XSAccessor; MooseX::XSAccessor->VERSION('0.010'); 1 },
+};
+
+use constant EXTRA_MODULES_RULES => {
+	'Hook::AfterRuntime' => {type => 'Moose'},
+	'MooX::TypeTiny' => {type => 'Moo'},
+	'MooX::XSConstructor' => {type => 'Moo'},
+	'MooseX::XSConstructor' => {type => 'Moose'},
+	'MooseX::XSAccessor' => {type => 'Moose', role => !!1},
+};
 
 BEGIN {
 	eval 'require ' . FLAVOUR or die $@;
 	eval 'require ' . ROLE_FLAVOUR or die $@;
+}
+
+our $DEBUG;
+
+sub _uses_extra_module
+{
+	my ($module, $class_type, $role) = @_;
+
+	state $wanted_modules = {
+		map { $_ => 1 }
+			map { s{^\s+}{}; s{\s+$}{}; $_ }
+			split ';', EXTRA_MODULES
+	};
+
+	return $wanted_modules->{$module}
+		&& EXTRA_MODULES_AVAILABLE->{$module}
+		&& EXTRA_MODULES_RULES->{$module}{type} eq $class_type
+		&& (!$role || EXTRA_MODULES_RULES->{$module}{role})
+		;
 }
 
 sub import
@@ -53,28 +92,39 @@ sub import
 	Types::Common->import::into($pkg, -types);
 	namespace::autoclean->import(-cleanee => $pkg);
 
-	if ($class_type eq 'Moo' && !$role) {
-		if (HAS_MOOX_TYPETINY) {
-			MooX::TypeTiny->import::into($pkg);
-		}
+	# install extra modules
 
-		if (HAS_MOOX_XSCONSTRUCTOR) {
-			MooX::XSConstructor->import::into($pkg);
-		}
+	my %extra_modules = map { $_ => _uses_extra_module($_, $class_type, $role) }
+		keys %{(EXTRA_MODULES_RULES)};
+
+	MooX::TypeTiny->import::into($pkg)
+		if $extra_modules{'MooX::TypeTiny'};
+
+	MooX::XSConstructor->import::into($pkg)
+		if $extra_modules{'MooX::XSConstructor'};
+
+	MooseX::XSConstructor->import::into($pkg)
+		if $extra_modules{'MooseX::XSConstructor'};
+
+	MooseX::XSAccessor->import::into($pkg)
+		if $extra_modules{'MooseX::XSAccessor'};
+
+	# special handling for Hook::AfterRuntime - warn if it can't be used on Moose
+	if ($extra_modules{'Hook::AfterRuntime'}) {
+		Hook::AfterRuntime::after_runtime { $pkg->meta->make_immutable };
+	}
+	elsif ($class_type eq 'Moose' && !$role) {
+		warn "Mooish::Base can't make $pkg Moose class immutable - please install Hook::AfterRuntime module";
 	}
 
-	if ($class_type eq 'Moose' && !$role) {
-		if (HAS_MOOSEX_XSACCESSOR) {
-			MooseX::XSAccessor->import::into($pkg);
-		}
-
-		if (HAS_HOOK_AFTERRUNTIME) {
-			Hook::AfterRuntime::after_runtime { $pkg->meta->make_immutable };
-		}
-		else {
-			warn "Mooish::Base can't make $pkg Moose class immutable - please install Hook::AfterRuntime module";
-		}
-	}
+	# put debug information if requested
+	$DEBUG->{$pkg} = {
+		class_type => $class_type,
+		role_type => $role_type,
+		role => $role,
+		standard => $standard,
+		extra_modules => \%extra_modules,
+	} if $DEBUG;
 }
 
 1;
@@ -124,6 +174,14 @@ Depending on C<MOOISH_BASE_FLAVOUR> some extra modules will be imported (if
 installed). Only modules which B<do not change the behavior> will ever be
 added to this list - mostly modules which improve performance for free.
 
+C<MOOISH_BASE_EXTRA_MODULES> environmental variable can be declared to control
+which extra modules should be used. It must contain a semicolon-separated a
+list of modules to be loaded, for example
+C<MooX::TypeTiny;MooX::XSConstructor>. It must be set prior to first loading
+the module to take effect. Normally, it should not be needed, but may be a
+helpful workaround if one of these modules contain a bug which causes the
+resulting class to misbehave.
+
 =head3 Moo
 
 =over
@@ -132,9 +190,13 @@ added to this list - mostly modules which improve performance for free.
 
 This module speeds up Type::Tiny checks in Moo code.
 
+I<minimum required version: 0.002002>
+
 =item * L<MooX::XSConstructor>
 
 This module attempts to use L<Class::XSConstructor> to speed up the constructor.
+
+I<minimum required version: 0.003002>
 
 =back
 
@@ -142,9 +204,17 @@ This module attempts to use L<Class::XSConstructor> to speed up the constructor.
 
 =over
 
+=item * L<MooseX::XSConstructor>
+
+This module attempts to use L<Class::XSConstructor> to speed up the constructor.
+
+I<minimum required version: 0.001002>
+
 =item * L<MooseX::XSAccessor>
 
 This module attempts to use L<Class::XSAccessor> to speed up the accessors.
+
+I<minimum required version: 0.010>
 
 =item * L<Hook::AfterRuntime>
 
@@ -153,7 +223,48 @@ Moose itself must be made immutable automatically after the class is built.
 This is done with the help of this module. Mooish::Base will warn if this
 module is not installed and Moose flavour is used.
 
+I<minimum required version: 0.003>
+
 =back
+
+=head2 Debugging
+
+Mooish::Base can be debugged by setting C<$Mooish::Base::DEBUG> prior to
+loading a class. This package variable should be set to a hash reference. If it
+is, it will fill it up with keys for each loaded class or role. An example
+debug code will look like that:
+
+	BEGIN {
+		require Mooish::Base;
+		$Mooish::Base::DEBUG = {};
+	}
+
+	package MyClass;
+	use Mooish::Base;
+
+	use Data::Dumper;
+	print Dumper($Mooish::Base::DEBUG);
+
+Example output:
+
+	$VAR1 = {
+		'MyClass' => {
+			'class_type' => 'Moo',
+			'role_type' => 'Moo::Role',
+			'role' => !!0,
+			'standard' => !!0
+			'extra_modules' => {
+				'MooX::TypeTiny' => !!1,
+				'MooX::XSConstructor' => !!0,
+				'Hook::AfterRuntime' => !!0,
+				'MooseX::XSConstructor' => !!0,
+				'MooseX::XSAccessor' => !!0
+			},
+		}
+	};
+
+If more classes are loaded then more keys will appear in the debug hash,
+allowing to easily check what was loaded and where.
 
 =head2 For module authors
 

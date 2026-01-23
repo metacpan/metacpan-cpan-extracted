@@ -16,7 +16,7 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
 =head1 VERSION
 
-Version 0.9924
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -371,15 +371,35 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head1 SEE ALSO
 
-L<App::Greple::xlate>
+=head2 MODULES
 
-L<App::Greple::xlate::deepl>
-
-L<App::Greple::xlate::gpt4>
-
-L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - xlate에서 컨테이너 작업에 사용하는 일반 Docker 러너입니다.
+
+=head2 RELATED MODULES
+
+=over 2
+
+=item * L<App::Greple>
+
+대상 텍스트 패턴에 대한 자세한 내용은 B<greple> 매뉴얼을 참조하세요. B<--내부>, B<--외부>, B<--포함>, B<--제외> 옵션을 사용하여 일치하는 영역을 제한할 수 있습니다.
+
+=item * L<App::Greple::update>
+
+C<-Mupdate> 모듈을 사용하여 B<greple> 명령의 결과에 따라 파일을 수정할 수 있습니다.
+
+=item * L<App::sdif>
+
+충돌 마커 형식을 B<-V> 옵션과 함께 나란히 표시하려면 B<에스디프>를 사용합니다.
+
+=item * L<App::Greple::stripe>
+
+회색 B<줄무늬> 모듈은 B<--xlate-stripe> 옵션으로 사용합니다.
+
+=back
+
+=head2 RESOURCES
 
 =over 2
 
@@ -402,22 +422,6 @@ OpenAI 파이썬 라이브러리
 =item * L<https://github.com/tecolicom/App-gpty>
 
 OpenAI 명령줄 인터페이스
-
-=item * L<App::Greple>
-
-대상 텍스트 패턴에 대한 자세한 내용은 B<greple> 매뉴얼을 참조하세요. B<--내부>, B<--외부>, B<--포함>, B<--제외> 옵션을 사용하여 일치하는 영역을 제한할 수 있습니다.
-
-=item * L<App::Greple::update>
-
-C<-Mupdate> 모듈을 사용하여 B<greple> 명령의 결과에 따라 파일을 수정할 수 있습니다.
-
-=item * L<App::sdif>
-
-충돌 마커 형식을 B<-V> 옵션과 함께 나란히 표시하려면 B<에스디프>를 사용합니다.
-
-=item * L<App::Greple::stripe>
-
-회색 B<줄무늬> 모듈은 B<--xlate-stripe> 옵션으로 사용합니다.
 
 =back
 
@@ -445,7 +449,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

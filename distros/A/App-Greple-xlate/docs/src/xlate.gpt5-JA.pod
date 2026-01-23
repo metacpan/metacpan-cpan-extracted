@@ -16,7 +16,7 @@ App::Greple::xlate - greple のための翻訳サポートモジュール
 
 =head1 VERSION
 
-Version 0.9924
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -371,15 +371,35 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head1 SEE ALSO
 
-L<App::Greple::xlate>
+=head2 MODULES
 
-L<App::Greple::xlate::deepl>
-
-L<App::Greple::xlate::gpt4>
-
-L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - xlate がコンテナ操作に使用する汎用 Docker ランナー
+
+=head2 RELATED MODULES
+
+=over 2
+
+=item * L<App::Greple>
+
+B<greple>マニュアルで対象テキストのパターンについての詳細を参照してください。B<--inside>、B<--outside>、B<--include>、B<--exclude>オプションを使用してマッチ範囲を制限します。
+
+=item * L<App::Greple::update>
+
+C<-Mupdate>モジュールを使って、B<greple>コマンドの結果でファイルを修正できます。
+
+=item * L<App::sdif>
+
+B<sdif>を使用すると、B<-V>オプションと並べてコンフリクトマーカー形式を表示できます。
+
+=item * L<App::Greple::stripe>
+
+Greple B<stripe>モジュールはB<--xlate-stripe>オプションで使用します。
+
+=back
+
+=head2 RESOURCES
 
 =over 2
 
@@ -402,22 +422,6 @@ OpenAI Pythonライブラリ
 =item * L<https://github.com/tecolicom/App-gpty>
 
 OpenAIコマンドラインインターフェイス
-
-=item * L<App::Greple>
-
-B<greple>マニュアルで対象テキストのパターンについての詳細を参照してください。B<--inside>、B<--outside>、B<--include>、B<--exclude>オプションを使用してマッチ範囲を制限します。
-
-=item * L<App::Greple::update>
-
-C<-Mupdate>モジュールを使って、B<greple>コマンドの結果でファイルを修正できます。
-
-=item * L<App::sdif>
-
-B<sdif>を使用すると、B<-V>オプションと並べてコンフリクトマーカー形式を表示できます。
-
-=item * L<App::Greple::stripe>
-
-Greple B<stripe>モジュールはB<--xlate-stripe>オプションで使用します。
 
 =back
 
@@ -445,7 +449,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

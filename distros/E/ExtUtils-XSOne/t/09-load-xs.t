@@ -5,10 +5,9 @@ use strict;
 use warnings;
 use Test::More;
 use File::Spec;
-use File::Temp qw(tempdir);
-use File::Path qw(make_path);
+use File::Path qw(make_path remove_tree);
 use File::Copy qw(copy);
-use FindBin;
+use FindBin qw($Bin);
 use Config;
 use Cwd qw(getcwd);
 
@@ -21,12 +20,19 @@ plan skip_all => "make not available" unless $make && `$make --version 2>&1`;
 my $cc = $Config{cc};
 plan skip_all => "C compiler not available" unless $cc && `$cc --version 2>&1`;
 
+# Base temp directory under t/
+my $base_tmpdir = File::Spec->catdir($Bin, 'tmp', '09-load-xs');
+remove_tree($base_tmpdir) if -d $base_tmpdir;
+make_path($base_tmpdir);
+END { remove_tree($base_tmpdir) if $base_tmpdir && -d $base_tmpdir }
+
 # =============================================================================
 # Build and test a simple XS module
 # =============================================================================
 
 subtest 'Build and load SimpleModule' => sub {
-    my $tmpdir = tempdir(CLEANUP => 1);
+    my $tmpdir = File::Spec->catdir($base_tmpdir, 'simple');
+    make_path($tmpdir);
     my $orig_dir = getcwd();
 
     # Create module structure
@@ -34,7 +40,7 @@ subtest 'Build and load SimpleModule' => sub {
     make_path($lib_dir);
 
     # Combine XS files
-    my $src_dir = File::Spec->catdir($FindBin::Bin, 'lib', 'SimpleModule', 'xs');
+    my $src_dir = File::Spec->catdir($Bin, 'lib', 'SimpleModule', 'xs');
     my $xs_file = File::Spec->catfile($tmpdir, 'SimpleModule.xs');
 
     my $count = ExtUtils::XSOne->combine(
@@ -164,7 +170,8 @@ TEST
 # =============================================================================
 
 subtest 'Shared state across modules' => sub {
-    my $tmpdir = tempdir(CLEANUP => 1);
+    my $tmpdir = File::Spec->catdir($base_tmpdir, 'shared');
+    make_path($tmpdir);
     my $orig_dir = getcwd();
 
     # Create a module with shared state

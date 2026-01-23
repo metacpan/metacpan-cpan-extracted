@@ -16,7 +16,7 @@ App::Greple::xlate - module d’assistance à la traduction pour greple
 
 =head1 VERSION
 
-Version 0.9924
+Version 1.00
 
 =head1 DESCRIPTION
 
@@ -371,15 +371,35 @@ L<https://github.com/tecolicom/App-gpty>
 
 =head1 SEE ALSO
 
-L<App::Greple::xlate>
+=head2 MODULES
 
-L<App::Greple::xlate::deepl>
-
-L<App::Greple::xlate::gpt4>
-
-L<App::Greple::xlate::gpt5>
+L<App::Greple::xlate::deepl>, L<App::Greple::xlate::gpt4>, L<App::Greple::xlate::gpt5>
 
 L<App::dozo> - Exécuteur Docker générique utilisé par xlate pour les opérations sur les conteneurs
+
+=head2 RELATED MODULES
+
+=over 2
+
+=item * L<App::Greple>
+
+Voir le manuel B<greple> pour les détails sur le motif de texte cible. Utilisez les options B<--inside>, B<--outside>, B<--include>, B<--exclude> pour limiter la zone de correspondance.
+
+=item * L<App::Greple::update>
+
+Vous pouvez utiliser le module C<-Mupdate> pour modifier des fichiers selon le résultat de la commande B<greple>.
+
+=item * L<App::sdif>
+
+Utilisez B<sdif> pour afficher le format de marqueur de conflit côte à côte avec l’option B<-V>.
+
+=item * L<App::Greple::stripe>
+
+Module Greple B<stripe> utilisé avec l’option B<--xlate-stripe>.
+
+=back
+
+=head2 RESOURCES
 
 =over 2
 
@@ -402,22 +422,6 @@ Bibliothèque Python OpenAI
 =item * L<https://github.com/tecolicom/App-gpty>
 
 Interface en ligne de commande OpenAI
-
-=item * L<App::Greple>
-
-Voir le manuel B<greple> pour les détails sur le motif de texte cible. Utilisez les options B<--inside>, B<--outside>, B<--include>, B<--exclude> pour limiter la zone de correspondance.
-
-=item * L<App::Greple::update>
-
-Vous pouvez utiliser le module C<-Mupdate> pour modifier des fichiers selon le résultat de la commande B<greple>.
-
-=item * L<App::sdif>
-
-Utilisez B<sdif> pour afficher le format de marqueur de conflit côte à côte avec l’option B<-V>.
-
-=item * L<App::Greple::stripe>
-
-Module Greple B<stripe> utilisé avec l’option B<--xlate-stripe>.
 
 =back
 
@@ -445,7 +449,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2025 Kazumasa Utashiro.
+Copyright © 2023-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -10,26 +10,41 @@ DBIx::Class::Async::Storage - Storage Layer for DBIx::Class::Async
 
 =head1 VERSION
 
-Version 0.43
+Version 0.49
 
 =cut
 
-our $VERSION = '0.43';
+our $VERSION = '0.49';
 
 =head1 SYNOPSIS
 
     use DBIx::Class::Async::Storage;
 
-    # Typically created internally by DBIx::Class::Async::Schema
-    my $storage = DBIx::Class::Async::Storage->new(
-        _schema => $schema_instance,
-    );
+    # Typically instantiated automatically via DBIx::Class::Async::Schema
+    my $storage = $schema->storage;
 
-    # Get the schema
+    # Connection Management
+
+    # Check if the worker pool is currently connected
+    if ( $storage->connected ) {
+        say "Worker pool is active and ready.";
+    }
+
+    # Gracefully shut down all background worker processes and disconnect
+    $storage->disconnect;
+
+    # Metadata & Configuration
+
+    # Access the underlying schema instance
     my $schema = $storage->schema;
 
-    # Disconnect
-    $storage->disconnect;
+    # Inspect the DSN (Data Source Name) currently in use
+    my $dsn = $storage->connect_info->[0];
+
+    # Debugging
+
+    # Storage acts as the gateway for the debug environment
+    $storage->debug(1) if $ENV{DBIC_TRACE};
 
 =head1 DESCRIPTION
 

@@ -79,7 +79,7 @@ sub cc
 
 @EXPORT = qw(rpn rpn_error rpn_separator_out  rpn_separator_in);
 
-$VERSION = '2.87';
+$VERSION = '2.89';
 
 my %dict;
 my %pub_dict;
@@ -2193,7 +2193,7 @@ $dict{JOINALL} = sub {
 
 =head2 a b REP
 
-      return the result of 'a' x 'b'  duplicate 'a' by the number of 'x' 
+      return the result of 'a' x 'b'  duplicate 'a' by the number of 'b' 
         
 =cut
 

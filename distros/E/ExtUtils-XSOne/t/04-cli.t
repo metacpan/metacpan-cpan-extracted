@@ -5,12 +5,17 @@ use strict;
 use warnings;
 use Test::More;
 use File::Spec;
-use File::Temp qw(tempdir);
-use FindBin;
+use File::Path qw(make_path remove_tree);
+use FindBin qw($Bin);
 
-my $bin = File::Spec->catfile($FindBin::Bin, '..', 'bin', 'xsone');
-my $src_dir = File::Spec->catdir($FindBin::Bin, 'lib', 'TestModule', 'xs');
-my $tmpdir  = tempdir(CLEANUP => 1);
+my $bin = File::Spec->catfile($Bin, '..', 'bin', 'xsone');
+my $src_dir = File::Spec->catdir($Bin, 'lib', 'TestModule', 'xs');
+
+# Create a temporary directory for test files under t/
+my $tmpdir = File::Spec->catdir($Bin, 'tmp', '04-cli');
+remove_tree($tmpdir) if -d $tmpdir;
+make_path($tmpdir);
+END { remove_tree($tmpdir) if $tmpdir && -d $tmpdir }
 
 # Skip if bin/xsone doesn't exist
 plan skip_all => "bin/xsone not found" unless -f $bin;
