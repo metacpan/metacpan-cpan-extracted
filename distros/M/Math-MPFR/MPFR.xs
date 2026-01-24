@@ -7434,6 +7434,7 @@ int Rmpfr_fpif_export(pTHX_ FILE * stream, mpfr_t * op) {
   fflush(stream);
   return ret;
 #else
+  PERL_UNUSED_ARG2(stream, op);
   croak("Rmpfr_fpif_export not implemented - need at least mpfr-4.0.0, have only %s", MPFR_VERSION_STRING);
 #endif
 }
@@ -7446,6 +7447,45 @@ int Rmpfr_fpif_import(pTHX_ mpfr_t * op, FILE * stream) {
 #else
   PERL_UNUSED_ARG2(op, stream);
   croak("Rmpfr_fpif_import not implemented - need at least mpfr-4.0.0, have only %s", MPFR_VERSION_STRING);
+#endif
+}
+
+UV Rmpfr_fpif_size(mpfr_t * op) {
+/*********************************************
+ From fpif.c in mpfr source:
+ #define MAX_VARIABLE_STORAGE(exponent_size, precision) \
+   ((size_t)(((precision) >> 3) + (exponent_size) +     \
+             ((precision) > 248 ? sizeof(mpfr_prec_t) : 0) + 3))
+
+*********************************************/
+  size_t ret = 3;
+  size_t precision;
+
+  if(!mpfr_regular_p(*op)) return 7;
+
+  precision = mpfr_get_prec(*op);
+  ret += (precision >> 3) + sizeof(mpfr_exp_t);
+  if(precision > 248) ret += sizeof(mpfr_prec_t);
+  return (UV)ret;
+}
+
+int Rmpfr_fpif_export_mem(pTHX_ unsigned char * str, SV * sizet,  mpfr_t * op) {
+#if defined(MPFR_VERSION) && MPFR_VERSION >= MPFR_VERSION_NUM(4,3,0)
+  int ret;
+  ret = mpfr_fpif_export_mem(str, (size_t)SvIV(sizet), *op);
+  return ret;
+#else
+  PERL_UNUSED_ARG3(str, sizet, op);
+  croak("Rmpfr_fpif_export_mem not implemented - need at least mpfr-4.3.0, have only %s", MPFR_VERSION_STRING);
+#endif
+}
+
+int Rmpfr_fpif_import_mem(pTHX_ mpfr_t * op, unsigned char * str, SV * sizet) {
+#if defined(MPFR_VERSION) && MPFR_VERSION >= MPFR_VERSION_NUM(4,3,0)
+  return mpfr_fpif_import_mem(*op, str, (size_t)SvIV(sizet));
+#else
+  PERL_UNUSED_ARG3(op, str, sizet);
+  croak("Rmpfr_fpif_import_mem not implemented - need at least mpfr-4.3.0, have only %s", MPFR_VERSION_STRING);
 #endif
 }
 
@@ -8906,6 +8946,38 @@ SV * _mpfrtoa(pTHX_ mpfr_t * pnv, int min_normal_prec) {
 /****************************
  * END _mpfrtoa             *
  ****************************/
+
+SV * mpfrtoa_subn (pTHX_ mpfr_t * obj, SV * prec, SV * emin, SV * emax) {
+   mpfr_exp_t exponent = mpfr_get_exp(*obj);
+   mpfr_prec_t revised_prec;
+   mpfr_t temp;
+
+   if(!mpfr_regular_p(*obj)) {
+     return _mpfrtoa(aTHX_ obj, 0);
+   }
+
+   if(exponent > (mpfr_exp_t)SvIV(emax)) {
+     if(mpfr_signbit(*obj)) return newSVpv("-Inf", 0);
+     return newSVpv("Inf", 0);
+   }
+
+   if(exponent < (mpfr_exp_t)SvIV(emin)) {
+     if(mpfr_signbit(*obj)) return newSVpv("-0.0", 0);
+     return newSVpv("0.0", 0);
+   }
+
+   if(exponent < (mpfr_exp_t)(SvIV(emin) + SvIV(prec) - 1)) {
+     SV * ret;
+     revised_prec = (mpfr_prec_t)(exponent + 1 - SvIV(emin));
+     mpfr_init2(temp, revised_prec);
+     mpfr_set(temp, *obj, GMP_RNDN);
+     ret = _mpfrtoa(aTHX_ &temp, (mpfr_prec_t)SvIV(prec));
+     mpfr_clear(temp);
+     return ret;
+   }
+
+   return _mpfrtoa(aTHX_ obj, 0);
+}
 
 /****************************
  * BEGIN doubletoa          *
@@ -13502,6 +13574,28 @@ CODE:
   RETVAL = Rmpfr_fpif_import (aTHX_ op, stream);
 OUTPUT:  RETVAL
 
+UV
+Rmpfr_fpif_size (op)
+	mpfr_t *	op
+
+int
+Rmpfr_fpif_export_mem (str, sizet, op)
+	unsigned char *	str
+	SV *	sizet
+	mpfr_t *	op
+CODE:
+  RETVAL = Rmpfr_fpif_export_mem (aTHX_ str, sizet, op);
+OUTPUT:  RETVAL
+
+int
+Rmpfr_fpif_import_mem (op, str, sizet)
+	mpfr_t *	op
+	unsigned char *	str
+	SV *	sizet
+CODE:
+  RETVAL = Rmpfr_fpif_import_mem (aTHX_ op, str, sizet);
+OUTPUT:  RETVAL
+
 void
 Rmpfr_flags_clear (mask)
 	unsigned int	mask
@@ -13716,6 +13810,16 @@ _mpfrtoa (pnv, min_normal_prec)
 	int	min_normal_prec
 CODE:
   RETVAL = _mpfrtoa (aTHX_ pnv, min_normal_prec);
+OUTPUT:  RETVAL
+
+SV *
+mpfrtoa_subn (obj, prec, emin, emax)
+	mpfr_t *	obj
+	SV *	prec
+	SV *	emin
+	SV *	emax
+CODE:
+  RETVAL = mpfrtoa_subn (aTHX_ obj, prec, emin, emax);
 OUTPUT:  RETVAL
 
 void

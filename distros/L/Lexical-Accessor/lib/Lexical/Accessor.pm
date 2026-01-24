@@ -9,7 +9,7 @@ use Carp qw(croak);
 use Sub::Accessor::Small ();
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.000003';
+our $VERSION   = '1.001000';
 our @EXPORT    = qw/ lexical_has /;
 our @ISA       = qw/ Sub::Accessor::Small /;
 
@@ -273,6 +273,20 @@ A method name or coderef to trigger when a new value is set.
 
 Boolean indicating whether to automatically dereference array and hash
 values if called in list context.
+
+=item C<< chain >>
+
+If set to true, then writer and clearer methods, plus accessor methods
+when setting a value, will return the original object as their return
+value. This makes it possible to do:
+
+  my $result = $obj->$set_foo(1)->$set_bar(2)->some_method();
+  $obj->$clear_foo->$clear_bar;
+
+It is also possible to set C<chain> to an arrayref of which kinds of
+accessors are expected to be chainable. For example:
+C<< chain => [ 'clearer', 'writer' ] >>. Only 'clearer', 'writer',
+and 'accessor' are valid values in this arrayref.
 
 =item C<< init_arg >>
 

@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,5 +34,5 @@ resources:
   bugtracker: https://github.com/briandfoy/net-ssh-perl/issues
   homepage: https://github.com/briandfoy/net-ssh-perl
   repository: https://github.com/briandfoy/net-ssh-perl
-version: '2.142'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '2.144'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

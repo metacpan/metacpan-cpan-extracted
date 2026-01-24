@@ -7,8 +7,8 @@ use warnings;
 use Test::More;
 
 # Author test - skip unless explicitly enabled
-unless ($ENV{TEST_AUTHOR} || $ENV{TEST_DISCONNECT}) {
-    plan skip_all => 'Author test. Set TEST_AUTHOR or TEST_DISCONNECT to run.';
+unless ($ENV{TEST_AUTHOR}) {
+    plan skip_all => 'Author test. Set TEST_AUTHOR to run.';
 }
 
 # Skip on Windows - uses fork()

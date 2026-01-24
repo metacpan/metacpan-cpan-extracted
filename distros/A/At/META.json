@@ -42,7 +42,9 @@
    },
    "prereqs" : {
       "configure" : {
-         "requires" : {}
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
       },
       "develop" : {
          "recommends" : {
@@ -59,7 +61,6 @@
          },
          "requires" : {
             "CPAN::Uploader" : "0",
-            "Minilla" : "0",
             "Pod::Markdown::Github" : "0",
             "Software::License::Artistic_2_0" : "0",
             "Test::CPAN::Meta" : "0",
@@ -72,18 +73,21 @@
       },
       "runtime" : {
          "recommends" : {
+            "CBOR::Free" : "0",
             "Mojo::UserAgent" : "0"
          },
          "requires" : {
+            "Crypt::JWT" : "0",
+            "Crypt::PK::ECC" : "0",
             "File::ShareDir::Tiny" : "0",
             "IO::Socket::SSL" : "1.42",
-            "JSON::Tiny" : "0",
+            "JSON::PP" : "0",
             "MIME::Base64" : "0",
             "Net::SSLeay" : "1.49",
             "Path::Tiny" : "0",
             "Time::Moment" : "0",
             "URI" : "0",
-            "perl" : "v5.40.0"
+            "perl" : "v5.42.0"
          }
       },
       "test" : {
@@ -95,14 +99,18 @@
    "provides" : {
       "At" : {
          "file" : "lib/At.pm",
-         "version" : "0.19"
+         "version" : "1.0"
       },
       "At::Error" : {
          "file" : "lib/At/Error.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       },
       "At::Protocol::DID" : {
          "file" : "lib/At/Protocol/DID.pm",
+         "version" : "1.0"
+      },
+      "At::Protocol::Firehose" : {
+         "file" : "lib/At/Protocol/Firehose.pm",
          "version" : "1.0"
       },
       "At::Protocol::Handle" : {
@@ -114,14 +122,14 @@
          "version" : "1.0"
       },
       "At::Protocol::Session" : {
-         "file" : "lib/At.pm"
+         "file" : "lib/At/Protocol/Session.pm"
       },
       "At::Protocol::URI" : {
          "file" : "lib/At/Protocol/URI.pm",
          "version" : "1.0"
       },
       "At::UserAgent" : {
-         "file" : "lib/At.pm"
+         "file" : "lib/At/UserAgent.pm"
       }
    },
    "release_status" : "stable",
@@ -139,9 +147,8 @@
          "web" : "https://github.com/sanko/At.pm"
       }
    },
-   "version" : "0.19",
+   "version" : "1.0",
    "x_contributors" : [
-      "@wwwjim <send@jimmy.email>",
       "Akiomi Kamakura <akiomik@gmail.com>",
       "Alberto Roura <mail@albertoroura.com>",
       "Alice <81575558+aliceisjustplaying@users.noreply.github.com>",
@@ -156,7 +163,6 @@
       "David Buchanan <d@vidbuchanan.co.uk>",
       "David Wood <davidwood@aliyun.com>",
       "Dean van Dugteren <31391056+deanpress@users.noreply.github.com>",
-      "Devin Ivy <devinivy@gmail.com>",
       "Dimitris Apostolou <dimitris.apostolou@icloud.com>",
       "Elijah <129013612+Evalprime@users.noreply.github.com>",
       "Emily Liu <emilyliu7321@gmail.com>",
@@ -213,10 +219,12 @@
       "Yoshihiro Sugi <sugi1982@gmail.com>",
       "bnewbold <bnewbold@robocracy.org>",
       "dan <dan.abramov@gmail.com>",
+      "devin ivy <devinivy@gmail.com>",
       "dumbmoron <136796770+dumbmoron@users.noreply.github.com>",
       "futur <me@futuristick.ca>",
       "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>",
       "intrnl <intrnl28+github@gmail.com>",
+      "jimmylee <send@jimmy.email>",
       "joev <105156480+j0ev@users.noreply.github.com>",
       "mehdiMj <mehdi.is@live.com>",
       "noriaki watanabe <nabeyang@gmail.com>",
@@ -227,10 +235,12 @@
       "zhuowei <zhuoweizhang@yahoo.com>"
    ],
    "x_ignore" : [
-      "github",
-      ".gitignore",
       ".tidyallrc",
-      "TODO.md"
+      ".gitignore",
+      ".clang-format",
+      ".github/**",
+      "eg/debug_connection.pl",
+      "eg/debug_dpop.pl"
    ],
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1

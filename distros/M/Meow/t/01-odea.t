@@ -15,24 +15,26 @@ use Test::More;
 	
 	rw array => Trigger(
 		Coerce(
-			Default(ArrayRef, [1,2,3]), 
+			Default(ArrayRef, [1,2,3]),
 			sub { ref $_[0] eq 'ARRAY' ? $_[0] : [split /,/, $_[0]] }
 		),
 		sub { 1; }
 	);
+
+	make_immutable;
 }
 
 {
 	package Zap;
-	
+
 	use Basic::Types::XS qw/Str/;
 	use Meow;
-	
+
 	rw boo => Str;
 
-	1;
+	make_immutable;
 }
-	
+
 {
 	package Bar;
 
@@ -40,7 +42,7 @@ use Test::More;
 
 	extends qw/Foo Zap/;
 
-	1;
+	make_immutable;
 }
 
 

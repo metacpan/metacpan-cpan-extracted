@@ -6,6 +6,7 @@ use strict;
 use Carp;
 use Encode;
 use Lingua::Conjunction;
+use Object::Configure 0.16;
 use Params::Get 0.13;
 use Scalar::Util;
 use String::Util;
@@ -17,16 +18,17 @@ Data::Text - Class to handle text in an OO way
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use overload (
 	'==' => \&equal,
 	'!=' => \&not_equal,
 	'""' => \&as_string,
+	# bool => sub { defined $_[0] && defined $_[0]->{'text'} && length $_[0]->{'text'} },
 	bool => sub { 1 },
 	fallback => 1	# So that boolean tests don't cause as_string to be called
 );
@@ -54,33 +56,39 @@ and overloads common operators to allow intuitive comparisons and stringificatio
 
 Creates a Data::Text object.
 
-The optional parameter contains a string, or object, to initialise the object with.
+The optional parameter contains a string or object to initialise the object with.
 
 =cut
 
 sub new {
-	my ($class, @args) = @_;
+	my $class = shift;
 	my $self;
+	my $params;
+
+	if(scalar(@_) == 1) {
+		# Just one parameter - the text to initialize with
+		$params = Params::Get::get_params('text', \@_);
+	} else {
+		$params = Params::Get::get_params(undef, \@_) || {};
+	}
 
 	if(!defined($class)) {
-		if((scalar @args) > 0) {
-			# Using Data::Text->new(), not Data::Text::new()
-			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-			return;
-		}
-		# FIXME: this only works when no arguments are given
+		# Using Data::Text->new(), not Data::Text::new()
+		# This only works when no arguments are given
 		$self = bless { }, __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
 		$self = bless { }, ref($class);
-		return $self->set($class) if(!scalar(@args));
+		return $self->set($class) if(!scalar keys %{$params});
 	} else {
 		# Create a new object
 		$self = bless { }, $class;
 	}
 
+	$params = Object::Configure::configure($class, $params);
+
 	# Set additional attributes if arguments are provided
-	$self->set(@args) if(scalar(@args));
+	$self->set($params) if($params->{'text'});
 
 	# Return the blessed object
 	return $self;
@@ -124,6 +132,8 @@ sub set {
 				$self = $self->append($text);
 			}
 			return $self;
+		} elsif(ref($params->{text}) eq 'HASH') {
+			Carp::croak(__PACKAGE__, ': set(): text cannot be a hashref');
 		}
 		$self->{'text'} = $params->{'text'}->as_string();
 	} else {
@@ -184,6 +194,10 @@ sub append
 	# Check for consecutive punctuation
 	# FIXME: handle ending with an abbreviation
 	if($self->{'text'} && ($self->{'text'} =~ /\s*[\.,;]\s*$/) && ($text =~ /^\s*[\.,;]/)) {
+		if(my $logger = $self->{'logger'}) {
+			$logger->warn(": attempt to add consecutive punctuation\n\tCurrent = '" . $self->{'text'} .
+			"' at $line of $file\n\tAppend = '", $text, "'");
+		}
 		Carp::carp(__PACKAGE__,
 			": attempt to add consecutive punctuation\n\tCurrent = '", $self->{'text'},
 			"' at $line of $file\n\tAppend = '", $text, "'");
@@ -233,7 +247,7 @@ sub lowercase {
 
 =head2 clear
 
-Clears the text and resets internal state.
+Clears the text and resets the internal state.
 
     $d->clear();
 
@@ -247,7 +261,7 @@ sub clear {
 	return $self;
 }
 
-=head2	equal
+=head2	equal($self, $other)
 
 Are two texts the same?
 
@@ -264,7 +278,7 @@ sub equal {
 	return $self->as_string() eq $other->as_string();
 }
 
-=head2	not_equal
+=head2	not_equal($self, $other)
 
 Are two texts different?
 
@@ -295,7 +309,7 @@ sub as_string {
 
 =head2	length
 
-Returns the length of the text.
+Returns the length of the text as an integer.
 
 This is actually the number of characters, not the number of bytes.
 
@@ -343,7 +357,7 @@ sub rtrim {
 	return $self;
 }
 
-=head2 replace
+=head2 replace($self, $replacements)
 
 Replaces multiple words in the text.
 
@@ -385,22 +399,26 @@ sub appendconjunction
 {
 	my $self = shift;
 
-	$self->append(Lingua::Conjunction::conjunction(@_));
-
-	return $self;
+	return $self->append(Lingua::Conjunction::conjunction(@_));
 }
 
 =head1 AUTHOR
 
-Nigel Horne, C<< <njh at bandsman.co.uk> >>
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
 
-There is no Unicode or UTF-8 support.
+There is limited Unicode or UTF-8 support.
 
 =head1 SEE ALSO
 
-L<String::Util>, L<Lingua::String>
+=over 4
+
+=item * <Test Coverage Report|https://nigelhorne.github.io/Data-Text/coverage/>
+
+=item * L<String::Util>, L<Lingua::String>
+
+=back
 
 =head1 SUPPORT
 
@@ -434,7 +452,7 @@ L<http://deps.cpantesters.org/?module=Data::Text>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021-2025 Nigel Horne.
+Copyright 2021-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

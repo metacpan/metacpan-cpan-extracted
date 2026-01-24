@@ -15,7 +15,7 @@ AnyEvent::I3X::Workspace::OnDemand::UserGuide - User document for AnyEvent::I3X:
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head2 Getting Started
 
@@ -204,6 +204,18 @@ Once a group (or context) is switched current workspaces get renamed to
 $former_group:$workspace_name and leaves new workspaces for the ones you have
 defined. If you switch back to the previous group the workspaces get renamed,
 and the old ones get reinserted/applied.
+
+=head2 Restarting i3
+
+If you change the configuration of i3 and restart i3 i3-wod will also restart
+itself. It will use two properties on the X11 root window to restore the
+previous state:
+
+  xprop -root -notype _I3_WOD_GROUP
+  xprop -root -notype _I3_WOD_WORKSPACE
+
+This allows us to pick up where we left of and you don't need to worry about
+mismatching groups or workspaces.
 
 =head1 AUTHOR
 

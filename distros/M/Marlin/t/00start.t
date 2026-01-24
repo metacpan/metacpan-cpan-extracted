@@ -25,11 +25,11 @@ use Test2::V0;
 my @modules = qw(
 	B
 	B::Hooks::AtRuntime
+	B::Hooks::AtRuntime::OnlyCoreDependencies
 	Carp
 	Class::Method::Modifiers
 	Class::XSAccessor
 	Class::XSConstructor
-	Clone
 	Exporter::Tiny
 	Lexical::Sub
 	List::Util

@@ -3,7 +3,7 @@ package Export::These;
 use strict;
 use warnings;
 
-our $VERSION="v0.2.1";
+our $VERSION="v0.2.2";
 
 sub import {
   my $package=shift;
@@ -73,12 +73,14 @@ sub import {
   # Generate the import sub here if it doesn't exist already
 
   local $"= " ";
-  my $exist=eval {*{\${$exporter."::"}{import}}{CODE}};
+  #my $exist=eval {*{\${$exporter."::"}{import}}{CODE}};
+  my $str="defined &$exporter"."::import" ;
+  my $exist=eval $str;
+
   if($exist){
     return;
   }
-
-  my $res=eval qq|
+  my $code=qq|
   package $exporter;
   no strict "refs";
 
@@ -149,8 +151,35 @@ sub import {
         }
 
         no warnings "redefine";
-        eval { *{\$target."::".\$name}= *{ \\\${__PACKAGE__ ."::"}{\$name}}{\$type}; };
-        die "Could not export \$prefix\$name from ".__PACKAGE__ if \$\@;
+        if(\$type ne "CODE"){
+          eval { *{\$target."::".\$name}= *{ \\\${__PACKAGE__ ."::"}{\$name}}{\$type}; };
+          die "Could not export \$prefix\$name from ".__PACKAGE__ if \$\@;
+        }
+        else {
+          #
+	  # No longer access CODE slot as this might not always exists. See
+	  # https://github.com/Perl/perl5/issues/23131
+	  # Work around here ( and elsewhere in this code) is to use the 
+	  # defined operator to test if sub routine exists instead of 
+	  # directly accessin the CODE slot in the typeclob
+	  #
+	  # If it is defined then we dereference a non strict ref.
+	  #
+	  # Note the the defined test is require to before hand to workaround
+	  # autovivification when dereferening
+          #
+
+          my \$package=__PACKAGE__;
+	  my \$str="&\$package"."::\$name";
+	  my \$defined=eval  "defined $str";
+	  if(\$defined){
+	  	my \$ref= \\&{\$package."::\$name"};
+	 	 *{\$target."::".\$name}= \$ref;
+  	  }
+	  else {
+        	  die "Could not export \$prefix\$name from ".__PACKAGE__;
+  		}
+        }
 
 
       }
@@ -165,9 +194,11 @@ sub import {
     \$Exporter::ExportLevel//=0;
     my \$target=(caller(\$Exporter::ExportLevel))[0];
 
-    my \$ref=eval {*{\\\${\$package."::"}{_preexport}}{CODE}};
+    #my \$ref=eval {*{\\\${\$package."::"}{_preexport}}{CODE}};
+    # my \$ref=eval { \\&{\$package."::_preexport"} };
+    my \$defined=eval "defined &\$package"."::_preexport";
     my \@args;
-    if(\$ref){
+    if(\$defined){
       \@args=$exporter->_preexport(\$target, \@_);
     }
     else {
@@ -177,9 +208,11 @@ sub import {
     $exporter->_self_export(\$target, \@args);
     
     local \$Exporter::ExportLevel=\$Exporter::ExportLevel+3;
-    \$ref=eval {*{\\\${\$package."::"}{_reexport}}{CODE}};
+    #\$ref=eval {*{\\\${\$package."::"}{_reexport}}{CODE}};
+    #\$ref=eval { \\&{\$package."::_reexport"} };
+    \$defined=eval "defined &\$package"."::_reexport";
 
-    if(\$ref){
+    if(\$defined){
       $exporter->_reexport(\$target, \@args);
     }
 
@@ -187,6 +220,7 @@ sub import {
 
   1;
   |;
+  my $res=eval $code;
   die $@ unless $res;
 }
 1;
@@ -232,7 +266,7 @@ Use package like usual:
 
   use My::ModB qw<:colors dog>
 
-  # suburtines blue, green , more_colors and dog  imported
+  # subroutines blue, green, more_colors and dog imported
 
 
 

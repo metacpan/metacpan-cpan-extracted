@@ -11,6 +11,7 @@ use_ok('Meow');
     rw foo => Coerce(sub { ($_[0] || 0) * 2 });
     rw bar => Coerce(Default(10), sub { $_[0] + 1 });
     rw baz => Coerce(Trigger(sub { $triggered = $_[1] }), sub { $_[0] ? $_[0] . "X" : "X" });
+    make_immutable;
 }
 
 my $obj = MyClass->new(foo => 5);

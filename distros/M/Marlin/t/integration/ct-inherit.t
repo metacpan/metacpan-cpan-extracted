@@ -20,6 +20,7 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 use Test2::V0;
+use Test2::Require::Module 'Class::Tiny';
 use Data::Dumper;
 
 BEGIN {

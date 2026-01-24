@@ -1,5 +1,11 @@
 Revision history for Net::SSH::Perl
 
+2.144 2026-01-14T19:45:53Z
+	* fix an XS problem that prevented building the module (#75)
+
+2.143 2025-01-04T01:42:27Z
+	* refresh distro and move to BRIANDFOY
+
 2.142 2023-08-07T18:22:52Z
 	* Yank out the SIGNATURES stuff. This is something you can do locally
 	if you need that.

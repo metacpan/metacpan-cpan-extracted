@@ -13,7 +13,7 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::URI v12.0.4;
+package Protocol::Sys::Virt::URI v12.0.5;
 
 use parent qw(Exporter);
 
@@ -79,7 +79,7 @@ Protocol::Sys::Virt::URI - Helper routines for parsing LibVirt URIs
 
 =head1 VERSION
 
-v12.0.4
+v12.0.5
 
 =head1 SYNOPSIS
 

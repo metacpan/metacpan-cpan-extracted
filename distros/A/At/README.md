@@ -6,184 +6,320 @@ At - The AT Protocol for Social Networking
 
 ```perl
 use At;
-my $at = At->new( service => 'https://your.atproto.service.example.com/' ); }
-$at->login( 'your.identifier.here', 'hunter2' );
-$at->post(
-    'com.atproto.repo.createRecord' => {
-        repo       => $at->did,
-        collection => 'app.bsky.feed.post',
-        record     => { '$type' => 'app.bsky.feed.post', text => 'Hello world! I posted this via the API.', createdAt => $at->now->as_string }
+my $at = At->new( host => 'bsky.social' );
+
+# Authentication (The Modern Way)
+my $auth_url = $at->oauth_start( 'user.bsky.social', 'http://localhost', 'http://127.0.0.1:8888/' );
+# ... Redirect user to $auth_url, then get $code and $state from callback ...
+$at->oauth_callback( $code, $state );
+
+# Creating a Post
+$at->post( 'com.atproto.repo.createRecord' => {
+    repo       => $at->did,
+    collection => 'app.bsky.feed.post',
+    record     => {
+        text      => 'Hello from Perl!',
+        createdAt => At::_now->to_string
     }
-);
+});
+
+# Streaming the Firehose
+my $fh = $at->firehose(sub ( $header, $body, $err ) {
+    return warn $err if $err;
+    say "New event: " . $header->{t};
+});
+$fh->start();
+# ... Start event loop (e.g. Mojo::IOLoop->start) ...
 ```
 
 # DESCRIPTION
 
-Unless you're designing a new client arount the AT Protocol, this is probably not what you're looking for.
+At.pm is a toolkit for interacting with the AT Protocol which powers decentralized social networks like Bluesky.
 
-Try [Bluesky.pm](https://metacpan.org/pod/Bluesky).
+Unless you're designing a new client around the AT Protocol, you are probably looking for [Bluesky.pm](https://metacpan.org/pod/Bluesky).
 
 ## Rate Limits
 
-At.pm attempts to keep track of rate limits according to the protocol's specs. Right now, we simply `carp` about
-nearing the limit but a future release will allow for devs to query these limits.
+At.pm attempts to keep track of rate limits according to the protocol's specs. Requests are categorized (`auth`,
+`repo`, `global`) and tracked per-identifier.
 
-See also: [https://docs.bsky.app/docs/advanced-guides/rate-limits](https://docs.bsky.app/docs/advanced-guides/rate-limits)
+If you approach a limit (less than 10% remaining), a warning is issued. If you exceed a limit, a warning is issued with
+the time until reset.
 
-## Session Management
+See [https://docs.bsky.app/docs/advanced-guides/rate-limits](https://docs.bsky.app/docs/advanced-guides/rate-limits)
 
-You'll need an authenticated session for most API calls. There are two ways to manage sessions:
+# Getting Started
 
-- 1. Username/password based (deprecated)
-- 2. OAuth based (still being rolled out)
+If you are new to the AT Protocol, the first thing to understand is that it is decentralized. Your data lives on a
+Personal Data Server (PDS), but your identity is portable.
 
-Developers of new code should be aware that the AT protocol will be [transitioning to OAuth in over the next year or
-so (2024-2025)](https://github.com/bluesky-social/atproto/discussions/2656) and this distribution will comply with this
-change.
+## Identity (Handles and DIDs)
 
-# Methods
+- **Handle**: A human-friendly name like `alice.bsky.social`.
+- **DID**: A persistent, machine-friendly identifier like `did:plc:z72i7...`.
 
-This module is based on perl's new (as of writing) class system which means it's (obviously) object oriented.
+# Authentication and Session Management
 
-## `new( ... )`
+There are two ways to authenticate: the modern OAuth system and the legacy password system. Once authenticated, all
+other methods (like `get`, `post`, and `subscribe`) work the same way.
+
+Developers of new code should be aware that the AT protocol is transitioning to OAuth and this library strongly
+encourages its use.
+
+## The OAuth System (Recommended)
+
+OAuth is the secure, modern way to authenticate. It uses DPoP (Demonstrating Proof-of-Possession) to ensure tokens
+cannot be stolen and reused. It's a three step process:
+
+- 1. Start the flow:
+
+    ```perl
+    my $auth_url = $at->oauth_start(
+        'user.bsky.social',
+        'http://localhost',                  # Client ID
+        'http://127.0.0.1:8888/callback',    # Redirect URI
+        'atproto transition:generic'         # Scopes
+    );
+    ```
+
+- 2. Redirect the user:
+
+    Open `$auth_url` in a browser. After they approve, they will be redirected to your callback URL with `code` and
+    `state` parameters.
+
+- 3. Complete the callback:
+
+    ```
+    $at->oauth_callback( $code, $state );
+    ```
+
+    See the demonstration scripts `eg/bsky_oauth.pl` and `eg/mojo_oauth.pl` for both a CLI and web based examples.
+
+Once authenticated, you should store your session data securely so you can resume it later without requiring the user
+to log in again.
+
+### Resuming an OAuth Session
+
+You need to store the tokens, the DPoP key, and the PDS endpoint. The `_raw` method on the session  object provides a
+simple hash for this purpose:
 
 ```perl
-my $at = At->new( service => ... );
-```
+# After login, save the session
+my $data = $at->session->_raw;
+# ... store $data securely ...
 
-Create a new At object. Easy.
-
-Expected parameters include:
-
-- `service` - required
-
-    Host for the service.
-
-- `lexicon`
-
-    Location of lexicons. This allows new [AT Protocol Lexicons](https://atproto.com/specs/lexicon) to be referenced
-    without installing a new version of this module.
-
-    Defaults to `/lexicons` under the dist's share directory.
-
-A new object is returned on success.
-
-## `login( ... )`
-
-Create an app password backed authentication session.
-
-```perl
-my $session = $bsky->login(
-    identifier => 'john@example.com',
-    password   => '1111-2222-3333-4444'
+# Later, resume the session
+$at->resume(
+    $data->{accessJwt},
+    $data->{refreshJwt},
+    $data->{token_type},
+    $data->{dpop_key_jwk},
+    $data->{client_id},
+    $data->{handle},
+    $data->{pds}
 );
 ```
 
-Expected parameters include:
+## The Legacy System (App Passwords)
 
-- `identifier` - required
-
-    Handle or other identifier supported by the server for the authenticating user.
-
-- `password` - required
-
-    This is the app password not the account's password. App passwords for Blueskyare generated at
-    [https://bsky.app/settings/app-passwords](https://bsky.app/settings/app-passwords).
-
-- `authFactorToken`
-
-Returns an authorized session on success.
-
-### `resume( ... )`
-
-Resumes an app password based session.
+Legacy authentication is simpler but less secure. It uses a single call to `login`. **Never use your main password;
+always use an App Password.**
 
 ```
-$bsky->resume( '...', '...' );
+$at->login( 'user.bsky.social', 'your-app-password' );
 ```
 
-Expected parameters include:
+Once authenticated, you should store your session data securely so you can resume it later without requiring the user
+to log in again.
 
-- `accessJwt` - required
-- `refreshJwt` - required
+### Resuming a Legacy Session
 
-If the `accessJwt` token has expired, we attempt to use the `refreshJwt` to continue the session with a new token. If
-that also fails, well, that's kinda it.
+Legacy sessions only require the access and refresh tokens:
 
-The new session is returned on success.
+```
+$at->resume( $access_jwt, $refresh_jwt );
+```
 
-## `did( )`
+**Note:** In both cases, if the access token has expired, `resume()` will automatically attempt to refresh it using the
+refresh token.
 
-Gather the [DID](https://atproto.com/specs/did) (Decentralized Identifiers) of the current user. Returns `undef` on
-failure or if the client is not authenticated.
+# Account Management
 
-## `session( )`
+## Creating an Account
 
-Gather the current AT Protocol session info. You should store the `accessJwt` and `refreshJwt` tokens securely.
-
-## `get( ... )`
+You can create a new account using `com.atproto.server.createAccount`. Note that PDS instances _may_ require an
+invite code.
 
 ```perl
-$at->get(
-    'com.atproto.repo.getRecord' => {
-        repo       => $at->did,
-        collection => 'app.bsky.actor.profile',
-        rkey       => 'self'
+my $res = $at->post( 'com.atproto.server.createAccount' => {
+    handle      => 'newuser.bsky.social',
+    email       => 'user@example.com',
+    password    => 'secure-password',
+    inviteCode  => 'bsky-social-abcde'
+});
+```
+
+# Working With Data: Records and Repositories
+
+Data in the AT Protocol is stored in "repositories" as "records". Each record belongs to a "collection" (defined by a
+Lexicon).
+
+## Creating a Post
+
+Posts are records in, for example, the `app.bsky.feed.post` collection.
+
+```perl
+$at->post( 'com.atproto.repo.createRecord' => {
+    repo       => $at->did,
+    collection => 'app.bsky.feed.post',
+    record     => {
+        '$type'   => 'app.bsky.feed.post',
+        text      => 'Content of the post',
+        createdAt => At::_now->to_string,
     }
-);
+});
 ```
 
-Sends an HTTP get request to the service.
+## Listing Records
 
-Expected parameters include:
-
-- `identifier` - required
-
-    Lexicon endpoint.
-
-- `content`
-
-    This will be passed along to the endpoint as query parameters.
-
-On success, the content is returned. If the lexicon is known, the returned data is coerced into simple (blessed)
-objects.
-
-On failure, a throwable error object is returned which will have a false boolean value.
-
-In array context, the resonse headers are also returned.
-
-## `post( ... )`
+To see what's in a collection:
 
 ```perl
-$at->post(
-    'com.atproto.repo.createRecord' => {
-        repo       => $at->did,
-        collection => 'app.bsky.feed.post',
-        record     => { '$type' => 'app.bsky.feed.post', text => 'Hello world! I posted this via the API.', createdAt => $at->now->as_string }
-    }
-);
+my $res = $at->get( 'com.atproto.repo.listRecords' => {
+    repo       => $at->did,
+    collection => 'app.bsky.feed.post',
+    limit      => 10
+});
+
+for my $record (@{$res->{records}}) {
+    say $record->{value}{text};
+}
 ```
 
-Sends an HTTP POST request to the service.
+# Drinking from the Firehose: Real-time Streaming
+
+The Firehose is a real-time stream of **all** events happening on the network (or a specific PDS). This includes new
+posts, likes, handle changes, deletions, and more.
+
+## Subscribing to the Firehose
+
+```perl
+my $fh = $at->firehose(sub ( $header, $body, $err ) {
+    if ($err) {
+        warn "Firehose error: $err";
+        return;
+    }
+
+    if ($header->{t} eq '#commit') {
+        say "New commit in repo: " . $body->{repo};
+    }
+});
+
+$fh->start();
+```
+
+**Note:** The Firehose requires [CBOR::Free](https://metacpan.org/pod/CBOR%3A%3AFree) and an async event loop to keep the connection alive. Currently, At.pm
+supports [Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent) so you should usually use [Mojo::IOLoop](https://metacpan.org/pod/Mojo%3A%3AIOLoop):
+
+```perl
+use Mojo::IOLoop;
+# ... setup firehose ...
+Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+```
+
+# Lexicon Caching
+
+The AT Protocol defines its API endpoints using "Lexicons" (JSON schemas). This library uses these schemas to
+automatically coerce API responses into Perl objects.
+
+## How it works
+
+When you call a method like `app.bsky.actor.getProfile`, the library:
+
+- 1. **Checks user-provided paths:** It looks in any directories passed to `lexicon_paths`.
+- 2. **Checks local storage:** It looks for the schema in the distribution's `share` directory.
+- 3. **Checks user cache:** It looks in `~/.cache/atproto/lexicons/`.
+- 4. **Downloads if missing:** If not found, it automatically downloads the schema from the
+official AT Protocol repository and saves it to your user cache.
+
+This system ensures that the library can support new or updated features without requiring a new release of the Perl
+module.
+
+# METHODS
+
+## `new( [ host =` ..., share => ... \] )>
+
+Constructor.
 
 Expected parameters include:
 
-- `identifier` - required
+- `host`
 
-    Lexicon endpoint.
+    Host for the service. Defaults to `bsky.social`.
 
-- `content`
+- `share`
 
-    This will be passed along to the endpoint as encoded JSON.
+    Location of lexicons. Defaults to the `share` directory under the distribution.
 
-On success, the content is returned. If the lexicon is known, the returned data is coerced into simple (blessed)
-objects.
+- `lexicon_paths`
 
-On failure, a throwable error object is returned which will have a false boolean value.
+    An optional path string or arrayref of paths to search for Lexicons before checking the default cache locations. Useful
+    for local development with a checkout of the `atproto` repository.
 
-In array context, the resonse headers are also returned.
+- `http`
 
-# Error Handling
+    A pre-instantiated [At::UserAgent](https://metacpan.org/pod/At%3A%3AUserAgent) object. By default, this is auto-detected by checking for [Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent),
+    falling back to [HTTP::Tiny](https://metacpan.org/pod/HTTP%3A%3ATiny).
+
+## `oauth_start( $handle, $client_id, $redirect_uri, [ $scope ] )`
+
+Initiates the OAuth 2.0 Authorization Code flow. Returns the authorization URL.
+
+## `oauth_callback( $code, $state )`
+
+Exchanges the authorization code for tokens and completes the OAuth flow.
+
+## `login( $handle, $app_password )`
+
+Performs legacy password-based authentication. **Deprecated: Use OAuth instead.**
+
+## `resume( $access_jwt, $refresh_jwt, [ $token_type, $dpop_key_jwk, $client_id, $handle, $pds ] )`
+
+Resumes a previous session using stored tokens and metadata.
+
+## `get( $method, [ \%params ] )`
+
+Calls an XRPC query (GET). Returns the decoded JSON response.
+
+## `post( $method, [ \%data ] )`
+
+Calls an XRPC procedure (POST). Returns the decoded JSON response.
+
+## `subscribe( $method, $callback )`
+
+Connects to a WebSocket stream (Firehose).
+
+## `firehose( $callback, [ $url ] )`
+
+Returns a new [At::Protocol::Firehose](https://metacpan.org/pod/At%3A%3AProtocol%3A%3AFirehose) client. `$url` defaults to the Bluesky relay firehose.
+
+## `resolve_handle( $handle )`
+
+Resolves a handle to a DID.
+
+## `collection_scope( $collection, [ $action ] )`
+
+Helper to generate granular OAuth scopes (e.g., `repo:app.bsky.feed.post?action=create`).
+
+## `session()`
+
+Returns the current [At::Protocol::Session](https://metacpan.org/pod/At%3A%3AProtocol%3A%3ASession) object.
+
+## `did()`
+
+Returns the DID of the authenticated user.
+
+# ERROR HANDLING
 
 Exception handling is carried out by returning [At::Error](https://metacpan.org/pod/At%3A%3AError) objects which have untrue boolean values.
 

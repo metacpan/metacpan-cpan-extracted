@@ -6,7 +6,7 @@ use utf8;
 package Marlin::Role;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.021000';
+our $VERSION   = '0.022001';
 
 # Marlin::Role is itself a Marlin class!
 use Marlin qw( requires ), -base => 'Marlin';
@@ -70,8 +70,13 @@ sub install_role_tiny {
 		package $this;
 		use Role::Tiny;
 		$maybe_requires;
+		no Role::Tiny;
 		1;
 	} or die $@;
+	
+	# Marlin::Role installs its own versions of these.
+	namespace::clean->clean_subroutines( $this, qw( before after around ) )
+		if $INC{'namespace/clean.pm'} && namespace::clean->can('clean_subroutines');
 	
 	return $me;
 }

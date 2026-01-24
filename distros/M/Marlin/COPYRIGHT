@@ -65,6 +65,7 @@ Files: lib/Marlin/X.pm
  lib/MooX/Marlin.pm
  lib/MooseX/Marlin.pm
  t/integration/alias-moose.t
+ t/integration/chaining.t
  t/integration/ct-inherit.t
  t/integration/mite-inherit.t
  t/integration/mouse-inherit.t

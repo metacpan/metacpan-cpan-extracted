@@ -1,0 +1,26 @@
+NAME
+    B::Hooks::AtRuntime::OnlyCoreDependencies - it is just B::Hooks::AtRuntime
+    but with only core dependencies
+
+DESCRIPTION
+    You probably want B::Hooks::AtRuntime.
+
+    I just created this version because I didn't want dependencies on
+    Sub::Name, Module::Build, and Test::Exports.
+
+SEE ALSO
+    B::Hooks::AtRuntime
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>, though almost all the code is directly
+    taken from B::Hooks::AtRuntime by Ben Morrow <ben@morrow.me.uk>.
+
+COPYRIGHT AND LICENCE
+    This distribution is available under the same terms as the original
+    B::Hooks::AtRuntime.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,5 +1,45 @@
-@  changeset:   217:1b87286ea326
+@  changeset:   225:b05a11d0fc7a
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Thu Jan 15 15:30:57 2026 +0100
+|  summary:     Bump to version 35
+|
+o  changeset:   224:4537c152c0c5
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Thu Jan 15 15:28:32 2026 +0100
+|  summary:     Add protocol documentation
+|
+o  changeset:   223:9d37f1b88f83
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Thu Jan 15 14:53:48 2026 +0100
+|  summary:     Fix some issues (i hope...) and add more tests
+|
+o  changeset:   222:8d8dc6f04e5c
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Jan 09 08:56:08 2026 +0100
+|  summary:     MANIFEST
+|
+o  changeset:   221:d8c114a5d2c3
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Jan 09 08:54:14 2026 +0100
+|  summary:     Replace cycle count "timeouts" with proper "time" based timeouts.
+|
+o  changeset:   220:5a83fa922ab5
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Thu Jan 08 21:13:48 2026 +0100
+|  summary:     Finetune SSL timeout stuff on connections over the internet
+|
+o  changeset:   219:7f5f47f13918
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Wed Jan 07 10:05:18 2026 +0100
+|  summary:     CLeanup
+|
+o  changeset:   218:ce03f8be996e
+|  user:        Rene Schickbauer <cavac@virgo.cavac.at>
+|  date:        Wed Jan 07 10:04:05 2026 +0100
+|  summary:     Release V34
+|
+o  changeset:   217:1b87286ea326
 |  user:        Rene Schickbauer <cavac@virgo.cavac.at>
 |  date:        Wed Jan 07 09:27:35 2026 +0100
 |  summary:     Cleanup

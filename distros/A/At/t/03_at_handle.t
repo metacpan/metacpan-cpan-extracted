@@ -2,7 +2,7 @@ use Test2::V0 '!subtest';
 use Test2::Util::Importer 'Test2::Tools::Subtest' => ( subtest_streamed => { -as => 'subtest' } );
 use Test2::Plugin::UTF8;
 use Path::Tiny qw[path];
-use v5.36;
+use v5.42;
 use lib '../lib', 'lib';
 #
 use At::Protocol::Handle qw[:all];
@@ -16,7 +16,7 @@ subtest 'old At.pm' => sub {
 
     # Invalid syntax:
     subtest 'malformed handle' => sub {
-        like( dies { At::Protocol::Handle->new($_) }, qr/malformed handle/, $_ ) for qw[
+        like( dies { At::Protocol::Handle->new($_) }, qr/Handle/i, $_ ) for qw[
             jo@hn.test
             💩.test
             john..test

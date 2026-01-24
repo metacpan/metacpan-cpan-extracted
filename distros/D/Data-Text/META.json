@@ -1,10 +1,10 @@
 {
    "abstract" : "Class to handle text in an OO way",
    "author" : [
-      "Nigel Horne <njh@bandsman.co.uk>"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150011",
    "license" : [
       "open_source"
    ],
@@ -34,7 +34,9 @@
          "requires" : {
             "Carp" : "0",
             "Encode" : "0",
+            "IPC::System::Simple" : "0",
             "Lingua::Conjunction" : "0",
+            "Object::Configure" : "0.16",
             "Params::Get" : "0.13",
             "Scalar::Util" : "0",
             "String::Util" : "0",
@@ -43,12 +45,18 @@
       },
       "test" : {
          "requires" : {
+            "Data::Random" : "0",
+            "FindBin" : "0",
+            "IPC::Run3" : "0",
+            "IPC::System::Simple" : "0",
             "Test::Carp" : "0",
             "Test::Compile" : "0",
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
-            "Test::NoWarnings" : "0"
+            "Test::NoWarnings" : "0",
+            "Test::Returns" : "0",
+            "Test::Which" : "0"
          }
       }
    },
@@ -66,6 +74,6 @@
          "x_repository" : "https://github.com/nigelhorne/Data-Text"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

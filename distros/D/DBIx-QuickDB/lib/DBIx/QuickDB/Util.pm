@@ -2,8 +2,9 @@ package DBIx::QuickDB::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.000038';
+our $VERSION = '0.000039';
 
+use File::Path qw/remove_tree/;
 use IPC::Cmd qw/can_run/;
 use Carp qw/confess/;
 
@@ -27,11 +28,13 @@ sub clone_dir {
 
 sub _clone_dir_rsync {
     my ($src, $dest, %params) = @_;
-    system($RSYNC, '-a', '--exclude' => '.nfs*', $params{verbose} ? ( '-vP' ) : (), "$src/", $dest) and die "$RSYNC returned $?";
+    system($RSYNC, '-a', '--delete', '--exclude' => '.nfs*', $params{checksum} ? ('-c') : (), $params{verbose} ? ( '-vP' ) : (), "$src/", $dest) and die "$RSYNC returned $?";
 }
 
 sub _clone_dir_cp {
     my ($src, $dest, %params) = @_;
+    my $err;
+    remove_tree($dest, {safe => 1, keep_root => 1, error => \$err}) if -d $dest;
     system($CP, '-a', $params{verbose} ? ( '-v' ) : (), "$src/", $dest) and die "$CP returned $?";
 }
 
@@ -39,6 +42,8 @@ sub _clone_dir_fcr {
     my ($src, $dest, %params) = @_;
     require File::Copy::Recursive;
 
+    my $err;
+    remove_tree($dest, {safe => 1, keep_root => 1, error => \$err}) if -d $dest;
     File::Copy::Recursive::dircopy($src, $dest) or die "$!";
 }
 

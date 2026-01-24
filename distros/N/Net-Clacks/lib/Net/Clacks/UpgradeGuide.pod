@@ -389,6 +389,14 @@ ClacksCache now only connects to server on first use, instead on instantiation.
 
 This version is fully backwards compatible to Version 33
 
+=head2 VERSION 35
+
+This version retunes some timeouts that may or may not have caused problems in the past.
+
+It now also provides more automated tests and a documentation of the protocol.
+
+This version is fully backwards compatible to Version 34, minus the bugs i hopefully managed to squash.
+
 =head1 AUTHOR
 
 Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>

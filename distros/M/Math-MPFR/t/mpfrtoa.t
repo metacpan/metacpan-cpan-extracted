@@ -1,3 +1,4 @@
+# Testing mpfrtoa and mpfrtoa_subn
 use strict;
 use warnings;
 use Math::MPFR qw(:mpfr);
@@ -119,4 +120,90 @@ for my $prec( 20000, 2000, 200, 96, 21, 5 ) {
   }
 }
 
+{
+  ### TESTING mpfrtoa_subn ###
+
+  my($bits, $emin, $emax) = ($Math::MPFR::NV_properties{bits}, $Math::MPFR::NV_properties{emin},
+                           $Math::MPFR::NV_properties{emax});
+
+  my @args = ($bits, $emin, $emax);
+
+  my $denorm_min = 2 ** $Math::MPFR::NV_properties{min_pow};
+  my $normal_min = $Math::MPFR::NV_properties{normal_min};
+  my $denorm_max = $normal_min - $denorm_min;
+  my $nv_max = $Math::MPFR::NV_properties{NV_MAX};
+
+  my $obj = Rmpfr_init2($bits);
+
+  cmp_ok($Math::MPFR::NV_properties{min_pow} + 1, '==', $Math::MPFR::NV_properties{emin}, "min_pow + 1 == $emin");
+
+  $denorm_min *= 2 if(!Math::MPFR::MPFR_4_0_2_OR_LATER); # Earlier versions don't properly accommodate
+                                                         # an mpfr precision of 1 bit.
+
+  for my $nv( $denorm_min,  $denorm_min * 9,  $denorm_min * 19,  $denorm_min * 1e300,  $normal_min,  $denorm_max,  $nv_max,  $nv_max * 2
+             -$denorm_min, -$denorm_min * 9, -$denorm_min * 19, -$denorm_min * 1e300, -$normal_min, -$denorm_max, -$nv_max, -$nv_max * 2 ) {
+    Rmpfr_set_NV($obj, $nv, MPFR_RNDN);
+    cmp_ok(mpfrtoa_subn($obj, @args), 'eq', nvtoa($nv), "$nv: nvtoa and mpfrtoa_subn agree");
+  }
+
+  like(mpfrtoa_subn(Math::MPFR->new(2) ** $emax, @args), qr/^inf$/i, "mpfrtoa_subn(2 ** $emax) =~ /^inf\$/i");
+  like(mpfrtoa_subn(-(Math::MPFR->new(2) ** $emax), @args), qr/^\-inf$/i, "mpfrtoa_subn(2 ** $emax) =~ /^\-inf\$/i");
+
+  cmp_ok(mpfrtoa_subn(Math::MPFR->new(2) ** ($emin - 2), @args),   'eq',  '0.0', "mpfrtoa_subn(2 ** ($emin - 2)) eq  '0.0'");
+  cmp_ok(mpfrtoa_subn(-(Math::MPFR->new(2) ** ($emin -2)), @args), 'eq', '-0.0', "mpfrtoa_subn(2 ** ($emin - 2)) eq '-0.0'");
+
+  my $first  = 2 ** ($emin + 5);
+  my $second = 2 ** ($emin + 4);
+  my $third  = 2 ** ($emin + 3);
+  my $fourth = 2 ** ($emin + 2);
+  my $fifth  = 2 ** ($emin + 1);
+  my $sixth  = 2 ** $emin;
+
+  my @sums = ($first, $second, $third, $fourth, $fifth, $sixth,
+              $first + $sixth, $first + $fifth, $first + $fourth, $first + $third, $first + $second,
+              $first + $sixth + $fifth, $first + $fifth + $fourth, $first + $fourth + $third, $first + $third + $second,
+              $first + $sixth + $fifth + $fourth, $first + $fifth + $fourth + $third, $first + $fourth + $third + $second,
+              $first + $sixth + $fifth + $fourth + $third, $first + $fifth + $fourth + $third + $second,
+              $first + $sixth + $fifth + $fourth + $third + $second);
+
+  for(1 .. 1000) {
+    my $s = rand($emin * -1) + 1.01;
+    my $e = rand($emin * -1) + 1.01;
+    #$e += 0.7328569; # $nv needs to be an NV, not an IV.
+    $e = -$e if $_ & 1;
+    my $nv = $s * (2 ** $e);
+    push @sums, $nv;
+  }
+
+  # For the following values, on perl's whose nvsize && ivsize is 8, Math::Ryu's pany and spanyf
+  # functions will disagree with Math::Ryu's nv2s. This is as expected.
+  # For example, nv2s(6.88626464539243e+16) produces the more succinct float 6.88626464539243e+16
+  # But pany(6.88626464539243e+16) and spanyf(6.88626464539243e+16) produce the integer 68862646453924328.
+
+  push @sums, 6.88626464539243e+16, 1.49396927900039e+18, 6.8423792978218e+18,
+              1.18210319200906e+18, 3.32018713959247e+18, 6.02326426473863e+17,
+              4.13155289244474e+17;
+
+
+  my $t = Rmpfr_init2($bits);
+
+  my $have_ryu = 0;
+  eval {require Math::Ryu;};
+  if(!$@) {
+    $have_ryu = 1 if $Math::Ryu::VERSION >= 1.03;
+  }
+
+  for my $sum(@sums) {
+    Rmpfr_set_NV($t, $sum, MPFR_RNDN);
+    my $mpfrtoa_res = mpfrtoa_subn($t, $bits, $emin, $emax);
+
+    if($have_ryu) {
+      my $ryu_res = Math::Ryu::nv2s($sum);
+      cmp_ok(lc($mpfrtoa_res), 'eq', lc($ryu_res), "$sum representation agrees with Math::Ryu::nv2s()");
+    }
+    cmp_ok($mpfrtoa_res, 'eq', nvtoa($sum), "$sum representation agrees with Math::MPFR::nvtoa()");
+  }
+}
+
 done_testing;
+

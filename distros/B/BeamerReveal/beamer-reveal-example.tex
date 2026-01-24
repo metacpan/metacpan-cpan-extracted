@@ -24,8 +24,8 @@
 %% 
 %% The Current Maintainer of this work is Walter Daems.
 %% 
-
-\documentclass[11pt,aspectratio=169,t]{beamer}
+%%
+\documentclass[11pt,aspectratio=1610,t]{beamer}
 \setbeamertemplate{navigation symbols}{}
 
 \usepackage[width=1920]{beamer-reveal}
@@ -134,7 +134,9 @@
   \only<2>{Here it is!}
   \video<2>[above,draw,autoplay,height=0.7,aspectratio=16/9,
             background=yellow,fit=contain]
-  at (0.5,0.1) {Media/beamer-reveal-testvideo.mp4}
+  (myvid) \at (0.5,0.1) {Media/beamer-reveal-testvideo.mp4}
+  \tikz[remember picture,overlay] \node<2>[anchor=north,font=\tiny] at (myvid.south)
+       {An example video (C) Walter Daems};
 \end{frame}
 
 \begin{frame}
@@ -145,16 +147,16 @@
     Below you will find a png (for which you don't need reveal, BTW).
     \vspace*{1cm}
 
-    But you can exploit the transparency!
-    \vspace*{2.5cm}
+    Of course, you can exploit the transparency of the background layer in the PNG!
+    \vspace*{2cm}
 
     And on the top right you will find a swinging pendulum (an animated GIF).
     \column[T]{0.45\textwidth}
+    % this is a image whose box consumes area on your slide
+    \image[width=0.33,aspectratio=1,fit=contain,draw] (myimage) {Media/beamer-reveal-AnimatedPendulum.gif}
   \end{columns}
-  \image[width=0.33,aspectratio=1,fit=contain]
-  at (0.7,0.6) {Media/beamer-reveal-AnimatedPendulum.gif}
-  \image[width=0.25,aspectratio=1,fit=contain]
-  at (0.2,0.6) {Media/beamer-reveal-WiresTp.png}
+  % this is an overlayed image (not consuming any space)
+  \image[width=0.25,aspectratio=1,fit=contain] \at (0.2,0.6) {Media/beamer-reveal-WiresTp.png}
 \end{frame}
 
 \begin{frame}
@@ -164,8 +166,7 @@
   Click and drag on the iframe below. You can manipulate it! Use your mouse
   scroll-wheel to zoom in or out.
   \iframe[draw,anchor=north,height=0.6,aspectratio=16/9,
-          fit=cover]
-  at (0.5,0.7) {Media/beamer-reveal-PCB.html}
+          fit=cover] \at (0.5,0.7) {Media/beamer-reveal-PCB.html}
 \end{frame}
 
 \subsection{Resonance for the ear}
@@ -173,11 +174,10 @@
 \begin{frame}
   {Adding audio to your slides}
   {}
-  On the very bottom right, there is an audio block
-  that automatically starts playing.
-  \audio[draw,autoplay,controls,width=0.1,aspectratio=16/9,
-         background=blue,fit=cover]
-  at (0.85,0.1) {Media/beamer-reveal-AudioSample.ogg}
+  Below, there is an audio block
+  that automatically starts playing.\\
+  \audio[autoplay,controls,width=0.1,aspectratio=16/9,
+    background=blue,fit=cover] {Media/beamer-reveal-AudioSample.ogg}
 \end{frame}
 
 \subsection{Make (video) animations with LaTeX}
@@ -186,13 +186,14 @@
   {Making animations with LaTeX (using TikZ as example)}
   {It is easier than ever before}
   \small The animation content is exported to a standalone \LaTeX-document that creates a
-  loop over it, for a duration of \texttt{duration} seconds at
+  loop over it, for a \texttt{duration} seconds at
   \texttt{framerate} frames per second providing a \texttt{\textbackslash{}progress}
   variable that goes gradually from 0 to 1 in \texttt{duration} $\times$
-  \texttt{framerate} frames. The beamer-reveal.pl script transforms it to mp4 exploiting
-  your full potential of your multi-core hardware.
+  \texttt{framerate} frames. The beamer-reveal.pl script transforms it
+  to mp4 maximally exploiting your multi-core CPU.
 
-  \animation[framerate=25,duration=7.5,pdfprogress=0.1,autoplay,loop] at (0.5,0.35) {
+  \begin{center}
+  \animation[framerate=25,duration=7.5,pdfprogress=0.1,autoplay,loop] {
     \begin{tikzpicture}[font=\footnotesize,transform shape,scale=0.75]
       \pgfmathsetmacro\angle{\progress*540}%
       \clip (-2,-5.25) rectangle (8,2);
@@ -202,7 +203,7 @@
 
       \begin{scope}[every node/.style={right}]
         \node[thick,draw,rectangle] at (2.5,-2)
-          {\large $x(t) = A \cdot \eu^{j\omega t}$};
+             {\large $x(t) = A \cdot \eu^{j\omega t}$};
         \node at (3.5,-3)
           {\large $\eu^{j\alpha} = \cos\alpha+j\sin\alpha$};
         \node at (2.5,-4)
@@ -256,6 +257,10 @@
       ({cos(pi*\x r)},{-2-\x});
     \end{tikzpicture}
   }
+  \end{center}
+  % let's play some audio in the background, totally hidden
+  \audio[autoplay,controls,width=0.1,aspectratio=16/9,fit=cover] \at (0,0)
+        {Media/beamer-reveal-AudioSample.ogg}
 \end{frame}
 
 \end{document}

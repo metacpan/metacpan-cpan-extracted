@@ -9,6 +9,7 @@ use_ok('Meow');
     use Meow;
     ro foo => ();
     ro bar => Default(123);
+    make_immutable;
 }
 
 my $obj = MyClass->new(foo => 42);

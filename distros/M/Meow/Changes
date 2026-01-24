@@ -35,3 +35,17 @@ Revision history for Meow
 
 0.16 	2025-12-20
 	- Update the benchmark to include Marlin.. it's closer than Meow..
+
+0.17	2026-01-23
+	- Meow is now faster than Moo and Moose but you should probably all be using Marlin...
+	 - Meow   2222222/s   153%    36%     --   -69%
+	 - Marlin 7142857/s   714%   336%   221%     --
+
+0.18	2026-01-23
+	- Switch to a just in time approach via Inline::C
+	- Updated benchmarks but limit is now hardware
+	  - Meow:  0 wallclock secs ( 1.10 usr +  0.00 sys =  1.10 CPU) @ 4545454.55/s (n=5000000)
+
+0.19	2026-01-24
+	- XS::JIT brings the unnecessary need for speed..
+	  - Meow: 1 wallclock secs ( 0.96 usr +  0.00 sys =  0.96 CPU) @ 5208333.33/s (n=5000000)

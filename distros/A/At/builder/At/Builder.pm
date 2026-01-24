@@ -1,7 +1,7 @@
 # Based on Module::Build::Tiny which is copyright (c) 2011 by Leon Timmermans, David Golden.
 # Module::Build::Tiny is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
-use v5.38;
+use v5.42;
 use feature 'class';
 no warnings 'experimental::class';
 class    #
@@ -23,16 +23,16 @@ class    #
     field $meta : reader = CPAN::Meta->load_file('META.json');
 
     # Params to Build script
-    field $install_base : param  //= '';
-    field $installdirs : param   //= '';
-    field $uninst : param        //= 0;    # Make more sense to have a ./Build uninstall command but...
-    field $install_paths : param //= ExtUtils::InstallPaths->new( dist_name => $meta->name );
-    field $verbose : param(v)    //= 0;
-    field $dry_run : param       //= 0;
-    field $pureperl : param      //= 0;
-    field $jobs : param          //= 1;
-    field $destdir : param       //= '';
-    field $prefix : param        //= '';
+    field $install_base  : param    //= '';
+    field $installdirs   : param    //= '';
+    field $uninst        : param    //= 0;    # Make more sense to have a ./Build uninstall command but...
+    field $install_paths : param    //= ExtUtils::InstallPaths->new( dist_name => $meta->name );
+    field $verbose       : param(v) //= 0;
+    field $dry_run       : param    //= 0;
+    field $pureperl      : param    //= 0;
+    field $jobs          : param    //= 1;
+    field $destdir       : param    //= '';
+    field $prefix        : param    //= '';
     #
     ADJUST {
         -e 'META.json' or die "No META information provided\n";
@@ -45,11 +45,12 @@ class    #
             ( my $pm = $pl_file ) =~ s/\.PL$//;
             system $^X, $pl_file, $pm and die "$pl_file returned $?\n";
         }
-        my %modules       = map { $_ => catfile( 'blib', $_ ) } find( qr/\.pm$/,  'lib' );
-        my %docs          = map { $_ => catfile( 'blib', $_ ) } find( qr/\.pod$/, 'lib' );
-        my %scripts       = map { $_ => catfile( 'blib', $_ ) } find( qr/(?:)/,   'script' );
-        my %sdocs         = map { $_ => delete $scripts{$_} } grep {/.pod$/} keys %scripts;
-        my %dist_shared   = map { $_ => catfile( qw[blib lib auto share dist],   $meta->name, abs2rel( $_, 'share' ) ) } find( qr/(?:)/, 'share' );
+        my %modules     = map { $_ => catfile( 'blib', $_ ) } find( qr/\.pm$/,  'lib' );
+        my %docs        = map { $_ => catfile( 'blib', $_ ) } find( qr/\.pod$/, 'lib' );
+        my %scripts     = map { $_ => catfile( 'blib', $_ ) } find( qr/(?:)/,   'script' );
+        my %sdocs       = map { $_ => delete $scripts{$_} } grep {/.pod$/} keys %scripts;
+        my %dist_shared = map { $_ => catfile( qw[blib lib auto share dist], $meta->name, abs2rel( $_, 'share' ) ) }
+            grep { !m[^share/lexicons/] } find( qr/(?:)/, 'share' );
         my %module_shared = map { $_ => catfile( qw[blib lib auto share module], abs2rel( $_, 'module-share' ) ) } find( qr/(?:)/, 'module-share' );
         pm_to_blib( { %modules, %docs, %scripts, %dist_shared, %module_shared }, catdir(qw[blib lib auto]) );
         make_executable($_) for values %scripts;
@@ -67,12 +68,8 @@ class    #
     method step_test() {
         $self->step_build() unless -d 'blib';
         require TAP::Harness::Env;
-        my %test_args = (
-            ( verbosity => $verbose ),
-            ( jobs  => $jobs ),
-            ( color => -t STDOUT ),
-            lib => [ map { rel2abs( catdir( 'blib', $_ ) ) } qw[arch lib] ],
-        );
+        my %test_args
+            = ( verbosity => $verbose, jobs => $jobs, color => -t STDOUT, lib => [ map { rel2abs( catdir( 'blib', $_ ) ) } qw[arch lib] ], );
         TAP::Harness::Env->create( \%test_args )->runtests( sort +find( qr/\.t$/, 't' ) )->has_errors;
     }
 
@@ -107,7 +104,7 @@ use %s;
             my $dynamic_parser = CPAN::Requirements::Dynamic->new();
             my $prereq         = $dynamic_parser->evaluate($dynamic);
             $meta{prereqs} = $meta->effective_prereqs->with_merged_prereqs($prereq)->as_string_hash;
-            $meta = CPAN::Meta->new( \%meta );
+            $meta = CPAN::Meta->new(%meta);
         }
         $meta->save(@$_) for ['MYMETA.json'];
     }

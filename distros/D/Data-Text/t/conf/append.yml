@@ -1,0 +1,31 @@
+---
+# Run this through https://github.com/nigelhorne/App-Test-Generator
+
+module: Data::Text
+function: append
+
+config:
+  test_undef: off
+  test_empty: off
+  test_nuls: off
+  test_non_ascii: on
+  dedup: on
+
+new: ''
+
+input:
+  text:
+    type: string
+    min: 1
+
+output:
+  type: object
+  isa: Data::Text
+  _returns_self: on
+
+cases:
+  undef_dies:
+    input:
+      text:
+        undef
+    _STATUS: DIES

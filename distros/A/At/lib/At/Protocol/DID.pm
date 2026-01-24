@@ -1,5 +1,5 @@
 package At::Protocol::DID 1.0 {
-    use v5.38;
+    use v5.42;
     no warnings qw[experimental::try];
     use feature 'try';
     use At::Error qw[register throw];

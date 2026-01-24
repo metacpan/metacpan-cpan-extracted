@@ -1,0 +1,21 @@
+%% Beamer-revealdriverfile
+@@Presentation: 
+-parameters:compiler={lualatex},canvaswidth={1920},canvasheight={1440}
+@@BeamerFrame: 
+-parameters:rawpage={1},truepage={1},overlay={1},transition={none},title={}
+@@BeamerFrame: 
+-parameters:rawpage={2},truepage={2},overlay={1},transition={none},title={Slide 1}
+@@BeamerFrame: 
+-parameters:rawpage={3},truepage={3},overlay={1},transition={none},title={Slide 2}
+@@BeamerFrame: 
+-parameters:rawpage={4},truepage={4},overlay={1},transition={none},title={Slide 3}
+@@BeamerFrame: 
+-parameters:rawpage={5},truepage={5},overlay={1},transition={none},title={Slide 4}
+@@BeamerFrame: 
+-parameters:rawpage={6},truepage={6},overlay={1},transition={none},title={Slide 5}
+@@BeamerFrame: 
+-parameters:rawpage={7},truepage={7},overlay={1},transition={none},title={Slide 6}
+@@BeamerFrame: 
+-parameters:rawpage={8},truepage={8},overlay={1},transition={none},title={Slide 7}
+@@BeamerFrame: 
+-parameters:rawpage={9},truepage={9},overlay={1},transition={none},title={Slide 8}

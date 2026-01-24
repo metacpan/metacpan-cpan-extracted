@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Attribute;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.021000';
+our $VERSION   = '0.022001';
 
 BEGIN { our @ISA = 'Sub::Accessor::Small' };
 
@@ -268,6 +268,14 @@ sub canonicalize_opts {
 	$me->canonicalize_storage;
 }
 
+sub canonicalize_chain {
+	my $me = shift;
+	$me->SUPER::canonicalize_chain( @_ );
+	if ( not exists $me->{chain} ) {
+		$me->{chain} = 1;
+	}
+}
+
 sub canonicalize_constant {
 	my $me = shift;
 	my $name = $me->{slot};
@@ -491,15 +499,21 @@ sub install_accessors {
 		$me->install_constant;
 	}
 	else {
-		my %args_for_cxsa;
 		for my $type ( @ACCESSOR_KINDS ) {
 			next unless defined $me->{$type};
 			if ( $type eq 'reader' and !$me->${\"has_simple_$type"} and $me->xs_reader ) {
 				$me->{_implementation}{$me->{$type}} = 'CXSR';
-				next;
 			}
 			elsif ( HAS_CXSA and exists $cxsa_map{$type} and $me->${\"has_simple_$type"} and !ref $me->{$type} and $me->{$type} !~ /^my\s+/ ) {
-				$args_for_cxsa{$cxsa_map{$type}}{$me->{$type}} = $me->{slot};
+				my $has_chainable = $me->can("has_chainable_$type");
+				Class::XSAccessor->import(
+					class            => $me->{package},
+					replace          => 1,
+					$cxsa_map{$type} => { $me->{$type} => $me->{slot} },
+					$has_chainable && $me->$has_chainable
+						? ( chained => 1 )
+						: (),
+				);
 				$me->{_implementation}{$me->{$type}} = 'CXSA';
 			}
 			else {
@@ -507,7 +521,7 @@ sub install_accessors {
 				$me->{_implementation}{$me->{$type}} = 'Marlin';
 			}
 		}
-		Class::XSAccessor->import( class => $me->{package}, replace => 1, %args_for_cxsa ) if keys %args_for_cxsa;
+		
 	}
 	
 	if ( my @aliases = @{ $me->{alias} or [] } ) {

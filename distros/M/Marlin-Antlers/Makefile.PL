@@ -21,7 +21,7 @@ my $meta = {
                           develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                           runtime   => {
                                          requires => {
-                                           "B::Hooks::AtRuntime" => 0,
+                                           "B::Hooks::AtRuntime::OnlyCoreDependencies" => 0,
                                            "Class::Method::Modifiers" => 0,
                                            "Exporter::Tiny" => 0,
                                            "Import::Into" => 0,
@@ -44,8 +44,8 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "Marlin::Antlers"       => { file => "lib/Marlin/Antlers.pm", version => "0.003000" },
-                          "Marlin::Role::Antlers" => { file => "lib/Marlin/Role/Antlers.pm", version => "0.003000" },
+                          "Marlin::Antlers"       => { file => "lib/Marlin/Antlers.pm", version => 0.003001 },
+                          "Marlin::Role::Antlers" => { file => "lib/Marlin/Role/Antlers.pm", version => 0.003001 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -59,7 +59,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Marlin-Antlers/project",
                         },
-  "version"          => "0.003000",
+  "version"          => 0.003001,
   "x_static_install" => 1,
 };
 

@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Marlin-Antlers>
 Bug tracker:  <https://github.com/tobyink/p5-marlin-antlers/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.003001	2026-01-23
+
+ [ Packaging ]
+ - use B::Hooks::AtRuntime::OnlyCoreDependencies.
+
 0.003000	2026-01-19
 
  - Added custom versions of `signature_for` and `signature`.

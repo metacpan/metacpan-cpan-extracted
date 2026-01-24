@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 34;
+our $VERSION = 35;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -550,6 +550,14 @@ sub _init($self) {
         $self->{config}->{cachecleaninterval} = 60; # 1 minute
     }
 
+    if(!defined($self->{config}->{readfailtimeout})) {
+        $self->{config}->{readfailtimeout} = 30; # 30 seconds - matches pingtimeout default
+    }
+
+    if(!defined($self->{config}->{interclacksreadfailtimeout})) {
+        $self->{config}->{interclacksreadfailtimeout} = 60; # 60 seconds for interclacks (higher latency)
+    }
+
     # Init run() variables
     $self->{savecache} = 0;
     $self->{lastsavecache} = 0;
@@ -940,7 +948,7 @@ sub _addInterclacksLink($self) {
                 lastmessage => $now,
                 authtimeout => $now + $self->{config}->{authtimeout},
                 authok => 0,
-                failcount => 0,
+                failtime => 0,
                 outmessages => [],
                 inmessages => [],
                 messagedelay => 0,
@@ -1038,7 +1046,7 @@ sub _addNewClients($self) {
                 lastmessage => $now,
                 authtimeout => $now + $self->{config}->{authtimeout},
                 authok => 0,
-                failcount => 0,
+                failtime => 0,
                 outmessages => [],
                 inmessages => [],
                 inmessagedelay => 0,
@@ -1212,16 +1220,24 @@ sub _clientInput($self) {
         
         # Check if we could read data from a socket that was marked as readable.
         # Thanks to SSL, this might occasionally fail. Don't bail out at the first
-        # error, only if multiple happen one after the other.
-        # Note: EOF and permanent errors are now handled above, so this failcount
-        # is mainly for SSL renegotiation edge cases.
+        # error, only if the condition persists for readfailtimeout seconds.
+        # Note: EOF and permanent errors are now handled above, so this failtime
+        # is mainly for SSL renegotiation edge cases and slow connections.
         if($totalread) {
-            $self->{clients}->{$cid}->{failcount} = 0;
+            # Data received - reset fail timer
+            $self->{clients}->{$cid}->{failtime} = 0;
         } else {
-            $self->{clients}->{$cid}->{failcount}++;
+            # Socket marked readable but no data
+            # Use longer timeout for interclacks connections (higher latency, more critical)
+            my $failtimeout = $self->{clients}->{$cid}->{interclacks}
+                ? $self->{config}->{interclacksreadfailtimeout}
+                : $self->{config}->{readfailtimeout};
 
-            if($self->{clients}->{$cid}->{failcount} > 2) {
-                # Socket marked readable but no data after 3 attempts
+            if($self->{clients}->{$cid}->{failtime} == 0) {
+                # First failure in this streak - record the time
+                $self->{clients}->{$cid}->{failtime} = $now;
+            } elsif(($now - $self->{clients}->{$cid}->{failtime}) > $failtimeout) {
+                # Failure streak has exceeded timeout threshold
                 push @{$self->{toremove}}, $cid;
             }
         }

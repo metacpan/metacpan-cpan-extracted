@@ -4,7 +4,7 @@ Data::Text - Class to handle text in an OO way
 
 # VERSION
 
-Version 0.18
+Version 0.19
 
 # DESCRIPTION
 
@@ -29,7 +29,7 @@ and overloads common operators to allow intuitive comparisons and stringificatio
 
 Creates a Data::Text object.
 
-The optional parameter contains a string, or object, to initialise the object with.
+The optional parameter contains a string or object to initialise the object with.
 
 ## set
 
@@ -68,11 +68,11 @@ Converts the text to lowercase.
 
 ## clear
 
-Clears the text and resets internal state.
+Clears the text and resets the internal state.
 
     $d->clear();
 
-## equal
+## equal($self, $other)
 
 Are two texts the same?
 
@@ -80,7 +80,7 @@ Are two texts the same?
     my $t2 = Data::Text->new('word');
     print ($t1 == $t2), "\n";   # Prints 1
 
-## not\_equal
+## not\_equal($self, $other)
 
 Are two texts different?
 
@@ -94,7 +94,7 @@ Returns the text as a string.
 
 ## length
 
-Returns the length of the text.
+Returns the length of the text as an integer.
 
 This is actually the number of characters, not the number of bytes.
 
@@ -106,7 +106,7 @@ Removes leading and trailing spaces from the text.
 
 Removes trailing spaces from the text.
 
-## replace
+## replace($self, $replacements)
 
 Replaces multiple words in the text.
 
@@ -129,15 +129,16 @@ this code works
 
 # AUTHOR
 
-Nigel Horne, `<njh at bandsman.co.uk>`
+Nigel Horne, `<njh at nigelhorne.com>`
 
 # BUGS
 
-There is no Unicode or UTF-8 support.
+There is limited Unicode or UTF-8 support.
 
 # SEE ALSO
 
-[String::Util](https://metacpan.org/pod/String%3A%3AUtil), [Lingua::String](https://metacpan.org/pod/Lingua%3A%3AString)
+- <Test Coverage Report|https://nigelhorne.github.io/Data-Text/coverage/>
+- [String::Util](https://metacpan.org/pod/String%3A%3AUtil), [Lingua::String](https://metacpan.org/pod/Lingua%3A%3AString)
 
 # SUPPORT
 
@@ -167,6 +168,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2021-2025 Nigel Horne.
+Copyright 2021-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2

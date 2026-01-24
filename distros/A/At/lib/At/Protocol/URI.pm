@@ -1,5 +1,5 @@
 package At::Protocol::URI 1.0 {    # https://github.com/bluesky-social/atproto/blob/main/packages/syntax/src/aturi.ts
-    use v5.38;
+    use v5.42;
     no warnings qw[experimental::builtin experimental::try];
     use At::Error            qw[register throw];
     use At::Protocol::DID    qw[ensureValidDid ensureValidDidRegex];
@@ -192,7 +192,7 @@ package At::Protocol::URI 1.0 {    # https://github.com/bluesky-social/atproto/b
 };
 package    #
     At::Protocol::URI::_query 1.0 {
-    use v5.38;
+    use v5.42;
     use URI::Escape qw[uri_escape_utf8 uri_unescape];
     use overload
         '""' => sub ( $s, $u, $q ) {
@@ -254,6 +254,8 @@ package    #
     };
 1;
 __END__
+=pod
+
 =encoding utf-8
 
 =head1 NAME

@@ -12,6 +12,7 @@ requires "List::Util" => "0";
 requires "Object::Pad" => "0";
 requires "Pod::Usage" => "0";
 requires "Proc::Find" => "0";
+requires "X11::Protocol" => "0";
 requires "YAML::XS" => "0";
 requires "perl" => "v5.26.0";
 

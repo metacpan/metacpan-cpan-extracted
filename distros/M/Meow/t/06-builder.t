@@ -10,6 +10,7 @@ use_ok('Meow');
     our $built;
     rw foo => Builder(sub { $built++; return 42 });
     rw bar => Builder(Default(100), sub { $built += 10; return 99 });
+    make_immutable;
 }
 
 $MyClass::built = 0;

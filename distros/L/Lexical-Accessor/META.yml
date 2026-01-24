@@ -28,13 +28,13 @@ optional_features: {}
 provides:
   Lexical::Accessor:
     file: lib/Lexical/Accessor.pm
-    version: '1.000003'
+    version: '1.001000'
   Sub::Accessor::Small:
     file: lib/Sub/Accessor/Small.pm
-    version: '1.000003'
+    version: '1.001000'
   Sub::HandlesVia::Toolkit::SubAccessorSmall:
     file: lib/Sub/HandlesVia/Toolkit/SubAccessorSmall.pm
-    version: '1.000003'
+    version: '1.001000'
 recommends:
   Hash::FieldHash: '0'
   Sub::HandlesVia: '0.025'
@@ -50,7 +50,7 @@ resources:
   homepage: https://metacpan.org/release/Lexical-Accessor
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-lexical-accessor.git
-version: '1.000003'
+version: '1.001000'
 x_contributors:
   - 'Lukas Atkinson (AMON) <amon@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

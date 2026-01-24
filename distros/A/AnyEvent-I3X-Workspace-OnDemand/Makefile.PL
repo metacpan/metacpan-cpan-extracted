@@ -32,6 +32,7 @@ my %WriteMakefileArgs = (
     "Object::Pad" => 0,
     "Pod::Usage" => 0,
     "Proc::Find" => 0,
+    "X11::Protocol" => 0,
     "YAML::XS" => 0
   },
   "TEST_REQUIRES" => {
@@ -40,7 +41,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,6 +64,7 @@ my %FallbackPrereqs = (
   "Pod::Usage" => 0,
   "Proc::Find" => 0,
   "Test::More" => "0.96",
+  "X11::Protocol" => 0,
   "YAML::XS" => 0
 );
 

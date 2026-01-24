@@ -1,0 +1,50 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Most' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::PerlTidy' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'strict' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Data::Printer' => '0',
+                                      'Getopt::Long' => '0',
+                                      'Pod::Usage' => '0',
+                                      'Type::Library' => '0',
+                                      'Type::Tiny' => '1.012000',
+                                      'experimental' => '0',
+                                      'lib' => '0',
+                                      'perl' => 'v5.40.0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'PerlX::Maybe' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Most' => '0',
+                                   'feature' => '0',
+                                   'strict' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

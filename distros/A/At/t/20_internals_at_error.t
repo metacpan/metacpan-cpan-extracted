@@ -1,6 +1,6 @@
 use Test2::V0;
 use Test2::Plugin::UTF8;
-use v5.36;
+use v5.42;
 use lib '../eg/', 'eg', '../lib', 'lib';
 #
 use At::Error;

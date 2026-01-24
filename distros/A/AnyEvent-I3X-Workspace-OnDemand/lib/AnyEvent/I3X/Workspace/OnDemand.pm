@@ -1,5 +1,5 @@
 package AnyEvent::I3X::Workspace::OnDemand;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use v5.26;
 use Object::Pad;
 
@@ -13,6 +13,7 @@ use List::Util            qw(first any);
 use File::Spec::Functions qw(catfile);
 use Data::Compare;
 use Data::Dumper;
+use X11::Protocol;
 
 field $i3;
 field $layout_path : param = catfile($ENV{HOME}, qw(.config i3));
@@ -41,6 +42,9 @@ field $c;
 field $current_group;
 field $current_workspace;
 
+field $x11;
+field $xroot;
+
 ADJUSTPARAMS {
   my $args = shift;
 
@@ -63,6 +67,9 @@ ADJUSTPARAMS {
   @groups   = @{ delete $args->{groups} } if ref $args->{groups} eq 'ARRAY';
   @swallows = @{ delete $args->{swallows} }
     if ref $args->{swallows} eq 'ARRAY';
+
+  $x11 = X11::Protocol->new();
+  $xroot = $x11->root;
 }
 
 method log_event($type, $event) {
@@ -87,6 +94,49 @@ method log_event($type, $event) {
   close($fh);
 }
 
+method _get_property_from_root_window($key) {
+  my $prop = $x11->atom($key);
+  my $utf8 = $x11->atom('UTF8_STRING');
+
+  my ($value, $type, $format, $bytes_after)
+      = $x11->GetProperty($xroot, $prop, $utf8, 0, 1024);
+
+  return $value if $value;
+  return;
+}
+
+method _set_property_on_root_window($key, $value) {
+  my $prop = $x11->atom($key);
+  my $utf8 = $x11->atom('UTF8_STRING');
+
+  $x11->ChangeProperty($xroot, $prop, $utf8, 8, 'Replace', $value);
+  $x11->flush;
+}
+
+method set_group_on_root_window($name) {
+  $self->_set_property_on_root_window('_I3_WOD_GROUP', $name);
+}
+
+method get_group_from_root_window() {
+  my $group = $self->_get_property_from_root_window('_I3_WOD_GROUP');
+  return $group if $group;
+  $self->set_group_on_root_window($groups[0]);
+  return $groups[0];
+}
+
+method set_workspace_on_root_window($name) {
+  $self->_set_property_on_root_window('_I3_WOD_WORKSPACE', $name);
+}
+
+method get_workspace_from_root_window() {
+  my $ws = $self->_get_property_from_root_window('_I3_WOD_WORKSPACE');
+  return $ws if $ws;
+  $self->set_workspace_on_root_window('__EMPTY__');
+  return '__EMPTY__';
+}
+
+
+
 ADJUST {
 
   $i3 = $socket ? i3($socket) : i3();
@@ -94,8 +144,8 @@ ADJUST {
 
   $c = Data::Compare->new();
 
-  $current_group     = $groups[0];
-  $current_workspace = "__EMPTY__";
+  $current_group = $self->get_group_from_root_window();
+  $current_workspace = $self->get_workspace_from_root_window();
 
   my $name;
 
@@ -107,6 +157,7 @@ ADJUST {
 
       $current_workspace = $event->{current}{name};
       $name              = $current_workspace;
+      $self->set_workspace_on_root_window($name);
 
       $self->log_event('workspace', $event);
 
@@ -304,6 +355,7 @@ method switch_to_group ($group) {
       }
 
       $current_group = $group;
+      $self->set_group_on_root_window($group);
       $self->workspace($cur);
     }
   );
@@ -463,7 +515,7 @@ AnyEvent::I3X::Workspace::OnDemand - An I3 workspace loader
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

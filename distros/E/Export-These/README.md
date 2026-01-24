@@ -40,7 +40,7 @@ Use package like usual:
 ```perl
 use My::ModB qw<:colors dog>
 
-# suburtines blue, green , more_colors and dog  imported
+# subroutines blue, green, more_colors and dog imported
 ```
 
 Also can use to pass in configuration information to a module:

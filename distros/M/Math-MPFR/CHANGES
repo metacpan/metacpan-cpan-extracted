@@ -1,5 +1,18 @@
 Revision history for Perl module Math::MPFR
 
+4.46
+  - Add Rmpfr_fpif_import_mem() and Rmpfr_fpif_export_mem(), new in 4.3.0-dev.
+  - Allow atonv() to receive octal arguments - via new function oct2bin.
+  - Add mpfrtoa_subn. (Tests added to mpfrtoa.t.)
+  - In Makefile.PL, exclude "-lquadmath" from the "LIBS" argument passed to
+    WriteMakefile() if ($Config{osname} =~/linux/i && $Config{nvtype} ne "__float128"
+    && !$config{gnulibc_version}).
+    We do this in an attempt to allow Math::MPFR to build on linux systems where
+    libc is musl, not glibc. For an example of the problem see:
+    https://www.cpantesters.org/cpan/report/65ddb9fa-a453-11f0-9829-bde118873113
+  - In Makefile.PL make allowance for some cygwin build options. See (eg):
+    https://www.cpantesters.org/cpan/report/41ed0a6e-6f74-1014-a0b5-c5df354b4780
+
 4.45
   - Fix typo in MPFR.xs - s/WE_HAVE_BENDIAN/MPFR_HAVE_BENDIAN/g
     See https://github.com/sisyphus/math-mpfr/issues/11. Thanks @gregoa.
@@ -53,7 +66,8 @@ Revision history for Perl module Math::MPFR
 
 4.35
   - Add Rmpfr_get_float16, Rmpfr_set_float16 and Rmpfr_buildopt_float16_p.
-    All 3 are new in mpfr-4.3.0.
+    All 3 are
+ in mpfr-4.3.0.
   - Overload '%' operator to perform fmod().
   - Accommodate overloading of Math::GMP objects.
   - Alter overloading of left shift and right shift operations to be compatible

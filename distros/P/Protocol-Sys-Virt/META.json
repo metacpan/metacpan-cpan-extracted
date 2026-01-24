@@ -34,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "Log::Any" : "0",
+            "Syntax::Operator::Elem" : "0",
             "URI::Encode" : "0",
             "perl" : "v5.14.1"
          }
@@ -55,6 +56,6 @@
          "web" : "https://github.com/ehuelsmann/perl-protocol-sys-virt"
       }
    },
-   "version" : "v12.0.4",
+   "version" : "v12.0.5",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -2,7 +2,7 @@ use Test2::V0 '!subtest';
 use Test2::Util::Importer 'Test2::Tools::Subtest' => ( subtest_streamed => { -as => 'subtest' } );
 use Test2::Plugin::UTF8;
 use Path::Tiny qw[path];
-use v5.36;
+use v5.42;
 use lib '../eg/', 'eg', '../lib', 'lib';
 #
 use At::Protocol::NSID qw[:all];
@@ -88,15 +88,15 @@ subtest 'NSID validation' => sub {
         expectValid('a01.thing.record');
         expectValid('a.0.c');
         expectValid('xn--fiqs8s.xn--fiqa61au8b7zsevnm8ak20mc4a87e.record.two');
+        expectValid('com.example.f00');
+        expectValid('a0.b1.c3');
         #
         expectInvalid('com.example.foo.*');
         expectInvalid('com.example.foo.blah*');
         expectInvalid('com.example.foo.*blah');
-        expectInvalid('com.example.f00');
         expectInvalid('com.exa💩ple.thing');
         expectInvalid('a-0.b-1.c-3');
         expectInvalid('a-0.b-1.c-o');
-        expectInvalid('a0.b1.c3');
         expectInvalid('1.0.0.127.record');
         expectInvalid('0two.example.foo');
         expectInvalid('example.com');

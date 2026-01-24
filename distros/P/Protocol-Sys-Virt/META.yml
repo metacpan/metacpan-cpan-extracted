@@ -21,10 +21,11 @@ no_index:
     - inc
 requires:
   Log::Any: '0'
+  Syntax::Operator::Elem: '0'
   URI::Encode: '0'
   perl: v5.14.1
 resources:
   bugtracker: https://github.com/ehuelsmann/perl-protocol-sys-virt/issues
   repository: git://github.com/ehuelsmann/perl-protocol-sys-virt.git
-version: v12.0.4
+version: v12.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

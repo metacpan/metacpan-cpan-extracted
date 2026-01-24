@@ -12,7 +12,7 @@ use_ok('Meow');
     rw foo => Default(undef, 42);
     rw bar => undef;
     sub perl_method { return "parent" }
-    1;
+    make_immutable;
 }
 
 {
@@ -25,7 +25,7 @@ use_ok('Meow');
     rw built => Builder(Str, sub { 123 });
     our $triggered;
     sub perl_method { "child" }
-    1;
+    make_immutable;
 }
 
 my $obj = Child->new({bar => 5, baz => 10});

@@ -1,0 +1,19 @@
+Revision history for Getopt-Type-Tiny
+
+2025-01-24 Version 0.03
+
+    - All changes via a PR from Toby Inkster. Thank you!
+    - Eliminates the need for Getopt::Type::Tiny::Types and removes the module.
+    - Removes the dependency on Ref::Util by using is_CodeRef from Types::Standard.
+    - Replaces a manual ref eq 'HASH' check with is_HashRef from Types::Standard.
+    - For defaults which are coderefs, delays calling $default->() until after running GetOptions, so we can skip calling the coderef at all when the user has provided an explicit value.
+    - Could consider passing %opt_for as a parameter to the coderef?
+    - Adds support for coerce => 1 to option specs.
+
+2026-01-23 Version 0.02
+
+    - Add support for multi-value types
+
+2025-01-22 Version 0.01
+
+    - Typed Getopt::Long replacement

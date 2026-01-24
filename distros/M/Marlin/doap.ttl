@@ -14,11 +14,11 @@
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008008"^^doap-deps:CpanId ], [
-		doap-deps:on "B::Hooks::AtRuntime"^^doap-deps:CpanId;
+		doap-deps:on "B::Hooks::AtRuntime::OnlyCoreDependencies"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Sub::HandlesVia 0.052000"^^doap-deps:CpanId;
 	], [
-		doap-deps:on "Sub::Accessor::Small 1.000003"^^doap-deps:CpanId;
+		doap-deps:on "Sub::Accessor::Small 1.001000"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Class::Method::Modifiers"^^doap-deps:CpanId;
 	], [
@@ -47,7 +47,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Marlin";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002003>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002004>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002005>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-004000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-005000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-008000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-009000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-010000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-012000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-012001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-013000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-013001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-014000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-015000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-016000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-020000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-020001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-020002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-021000>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002003>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002004>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002005>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-004000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-005000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-008000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-009000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-010000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-011002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-012000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-012001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-013000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-013001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-014000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-015000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-016000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-020000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-020001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-020002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-021000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-022000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-022001>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-marlin>;
@@ -699,6 +699,43 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.021000.tar.gz>;
 	doap:revision        "0.021000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Marlin/v_0-022000>
+	a                    doap:Version;
+	dc:identifier        "Marlin-0.022000"^^xsd:string;
+	dc:issued            "2026-01-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch from depending on B::Hooks::AtRuntime to B::Hooks::AtRuntime::OnlyCoreDependencies.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Require latest Sub::Accessor::Small.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "chain option for attributes, defaulting to true.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.022000.tar.gz>;
+	doap:revision        "0.022000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Marlin/v_0-022001>
+	a                    doap:Version;
+	dc:identifier        "Marlin-0.022001"^^xsd:string;
+	dc:issued            "2026-01-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Various minor fixes for Perl 5.8.x.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Skip t/extend-eg.t on Perl 5.8.x for now as it's causing segfaults.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.022001.tar.gz>;
+	doap:revision        "0.022001"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

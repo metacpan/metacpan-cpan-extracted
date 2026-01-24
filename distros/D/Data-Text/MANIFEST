@@ -5,6 +5,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
+scripts/generate_index.pl
 t/00-load.t
 t/10-compile.t
 t/20-new.t
@@ -13,6 +14,9 @@ t/40-more.t
 t/case.t
 t/clear.t
 t/comment-spelling.t
+t/conf/append.yml
+t/conf/set.yml
+t/conf/length.yml
 t/conjunction.t
 t/coverage.t
 t/critic.t
@@ -22,6 +26,7 @@ t/eof.t
 t/eol.t
 t/equal.t
 t/fixme.t
+t/fuzz.t
 t/kwalitee.t
 t/links.t
 t/manifest.t

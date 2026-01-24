@@ -16,7 +16,7 @@ $have_atonv = MPFR_VERSION <= 196869 ? 0 : 1;
 
 if($have_atonv) {
 
-  my($nv1, $nv2, $nv3, $double);
+  my($nv1, $nv2, $nv3, $nv4, $nv5, $nv6, $nv7, $double);
 
   if($Config::Config{nvtype} eq 'double' ||
       ($Config::Config{nvtype} eq 'long double' && ($Config::Config{nvsize} == 8 ||
@@ -25,9 +25,16 @@ if($have_atonv) {
     $nv1 = atonv('0b0.100001e-1074');
     $nv2 = atonv('4.96e-324');
     $nv3 = atonv('0x0.84p-1074');
-    if($nv1 == $nv2 && $double == $nv2 && $nv2 == $nv3 && $nv1 > 0) {print "ok 1\n"}
+    $nv4 = atonv(oct2bin('+0.41p-1074'));
+    $nv5 = atonv(oct2bin('+0o.41p-1074'));
+    $nv6 = atonv(oct2bin('+0O.41p-1074'));
+    $nv7 = atonv(oct2bin('+.41p-1074'));
+
+    if($nv1 == $nv2 && $double == $nv2 && $nv2 == $nv3 && $nv1 > 0 && $nv3 == $nv4 && $nv4 == $nv5 && $nv5 == $nv6  && $nv6 == $nv7) {
+       print "ok 1\n";
+    }
     else {
-      warn "\n \$double: $double\n \$nv1: $nv1\n \$nv2: $nv2\n \$nv3: $nv3\n";
+      warn "\n \$double: $double\n \$nv1: $nv1\n \$nv2: $nv2\n \$nv3: $nv3\n \$nv4: $nv4\n \$nv5: $nv5\n \$nv6: $nv6\n \$nv7: $nv7\n";
       print "not ok 1\n";
     }
 
@@ -39,9 +46,13 @@ if($have_atonv) {
     $nv1 = atonv('0b0.100001e-16445');
     $nv2 = atonv('3.6452e-4951');
     $nv3 = atonv('0x0.84p-16445');
-    if($nv1 == $nv2 && $nv2 == $nv3 && $nv1 > 0) {print "ok 1\n"}
+    $nv4 = atonv(oct2bin('+0.41p-16445'));
+    $nv5 = atonv(oct2bin('+0o.41p-16445'));
+    $nv6 = atonv(oct2bin('+0O.41p-16445'));
+    $nv7 = atonv(oct2bin('+.41p-16445'));
+    if($nv1 == $nv2 && $nv2 == $nv3 && $nv1 > 0 && $nv3 == $nv4 && $nv4 == $nv5 && $nv5 == $nv6  && $nv6 == $nv7) {print "ok 1\n"}
     else {
-      warn "\n \$nv1: $nv1\n \$nv2: $nv2\n \$nv3: $nv3\n";
+      warn "\n \$nv1: $nv1\n \$nv2: $nv2\n \$nv3: $nv3\n \$nv4: $nv4\n \$nv5: $nv5\n \$nv6: $nv6\n \$nv7: $nv7\n";
       print "not ok 1\n";
     }
 
@@ -77,15 +88,19 @@ if($have_atonv) {
 
   elsif($Config::Config{nvtype} eq '__float128' || $Config::Config{nvtype} eq 'long double') {
     # If nvtype is "long double" it will be the IEEE 754 long double, as the other kinds of
-    # long double have already been tested in one of the preceding branches.
+      $nv4 = atonv(oct2bin('+0.41p-16494'));    # long double have already been tested in one of the preceding branches.
     # For nvtype of "__float128" we also need to verify that $mpfr_has_float128 is TRUE.
     if($mpfr_has_float128 || $Config::Config{nvtype} eq 'long double') {
       $nv1 = atonv('0b0.100001e-16494');
       $nv2 = atonv('6.5e-4966');
       $nv3 = atonv('0x0.84p-16494');
-      if($nv1 == $nv2 && $nv2 == $nv3 && $nv1 > 0) {print "ok 1\n"}
+      $nv4 = atonv(oct2bin('+0.41p-16494'));
+      $nv5 = atonv(oct2bin('+0o.41p-16494'));
+      $nv6 = atonv(oct2bin('+0O.41p-16494'));
+      $nv7 = atonv(oct2bin('+.41p-16494'));
+      if($nv1 == $nv2 && $nv2 == $nv3 && $nv1 > 0 && $nv3 == $nv4 && $nv4 == $nv5 && $nv5 == $nv6  && $nv6 == $nv7) {print "ok 1\n"}
       else {
-        warn "\n \$nv1: $nv1\n \$nv2: $nv2\n";
+        warn "\n \$nv1: $nv1\n \$nv2: $nv2\n \$nv3: $nv3\n \$nv4: $nv4\n \$nv5: $nv5\n \$nv6: $nv6\n \$nv7: $nv7\n";
         print "not ok 1\n";
       }
 

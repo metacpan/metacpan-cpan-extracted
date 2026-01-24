@@ -21,7 +21,7 @@ name: AnyEvent-I3X-Workspace-OnDemand
 provides:
   AnyEvent::I3X::Workspace::OnDemand:
     file: lib/AnyEvent/I3X/Workspace/OnDemand.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   AnyEvent: '0'
   AnyEvent::I3: '0.19'
@@ -34,11 +34,12 @@ requires:
   Object::Pad: '0'
   Pod::Usage: '0'
   Proc::Find: '0'
+  X11::Protocol: '0'
   YAML::XS: '0'
   perl: v5.26.0
 resources:
   repository: git://gitlab.com/waterkip/anyevent-i3x-workspace-ondemand.git
-version: '0.005'
+version: '0.006'
 x_contributors:
   - 'Wesley Schwengle <waterkip@cpan.org>'
 x_generated_by_perl: v5.40.1

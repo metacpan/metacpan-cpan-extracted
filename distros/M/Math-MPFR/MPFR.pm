@@ -146,9 +146,10 @@ Rmpfr_fits_uint_p Rmpfr_fits_uintmax_p Rmpfr_fits_ulong_p Rmpfr_fits_ushort_p
 Rmpfr_flags_clear Rmpfr_flags_restore Rmpfr_flags_save Rmpfr_flags_set Rmpfr_flags_test
 Rmpfr_floor
 Rmpfr_fma Rmpfr_fmma Rmpfr_fmms Rmpfr_fmod Rmpfr_fmod_ui Rmpfr_fmodquo Rmpfr_fms
-Rmpfr_fpif_export Rmpfr_fpif_import Rmpfr_fprintf Rmpfr_frac
-Rmpfr_free_cache Rmpfr_free_cache2 Rmpfr_free_pool Rmpfr_frexp Rmpfr_gamma Rmpfr_gamma_inc
-Rmpfr_get_bfloat16
+Rmpfr_fpif_export Rmpfr_fpif_export_mem Rmpfr_fpif_import Rmpfr_fpif_import_mem
+Rmpfr_fpif_size
+Rmpfr_fprintf Rmpfr_frac Rmpfr_free_cache Rmpfr_free_cache2 Rmpfr_free_pool Rmpfr_frexp
+Rmpfr_gamma Rmpfr_gamma_inc Rmpfr_get_bfloat16
 Rmpfr_get_BFLOAT16 Rmpfr_get_DECIMAL128 Rmpfr_get_DECIMAL64 Rmpfr_get_FLOAT16 Rmpfr_get_FLOAT128
 Rmpfr_get_FLT Rmpfr_get_IV Rmpfr_get_LD Rmpfr_get_NV
 Rmpfr_get_d Rmpfr_get_d1 Rmpfr_get_d_2exp Rmpfr_get_default_prec Rmpfr_get_default_rounding_mode
@@ -202,15 +203,15 @@ Rmpfr_z_div Rmpfr_z_sub Rmpfr_zero_p Rmpfr_zeta Rmpfr_zeta_ui
 TRmpfr_inp_str TRmpfr_out_str
 anytoa atodouble atonum atonv
 check_exact_decimal decimalize doubletoa dragon_test
-fr_cmp_q_rounded mpfr_max_orig_len mpfr_min_inter_prec mpfrtoa numtoa nvtoa nv2mpfr nvtoa_test
-prec_cast q_add_fr q_cmp_fr q_div_fr q_fmod_fr q_mul_fr q_sub_fr rndna
+fr_cmp_q_rounded mpfr_max_orig_len mpfr_min_inter_prec mpfrtoa mpfrtoa_subn numtoa nvtoa nv2mpfr
+nvtoa_test oct2bin prec_cast q_add_fr q_cmp_fr q_div_fr q_fmod_fr q_mul_fr q_sub_fr rndna
 subnormalize_generic subnormalize_bfloat16 subnormalize_float16 subnormalize_float32
 unpack_bfloat16 unpack_float16 unpack_float32
 );
 
     @Math::MPFR::EXPORT_OK = (@tags, 'bytes');
 
-    our $VERSION = '4.45';
+    our $VERSION = '4.46';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -838,8 +839,8 @@ sub Rmpfr_round_nearest_away {
 sub _get_NV_properties {
   # For the record
   # __bf16  : $bits =  8; $emin = -132; $emax = 128;
-  # _Float16: $bits = 11; $emin = -23 ?; $emax = 16 ?;
-  # _Float32: $bits = 24; $emin = ????; $emax = ???;
+  # _Float16: $bits = 11; $emin = -23; $emax = 16;
+  # _Float32: $bits = 24; $emin = -148; $emax = 128;
 
   my($bits, $PREC, $max_dig, $min_pow, $normal_min, $NV_MAX, $nvtype, $emax, $emin);
 
@@ -1968,6 +1969,37 @@ sub _subn {
     Rmpfr_set_emin($emin_orig);
     Rmpfr_set_emax($emax_orig);
     return $to8;
+}
+
+sub oct2bin {
+   my $arg = shift;
+   my ($octal, $exponent) = split /p/i, $arg;
+   $octal =~ s/o//i;
+
+   die "In oct2bin: Octal mantissa ($octal) contains an illegal character"
+     if $octal =~ /[^0-7\.\+\-]/;
+
+   if($exponent) {
+     #$exponent *= 3;
+     $exponent = 'p' . $exponent;
+   }
+   else { $exponent = ''}
+
+   die "In oct2bin: Octal exponent ($exponent) contains an illegal character"
+     if $exponent =~ /[^0-9\.\+\-p]/;
+
+   $octal =~ s/0/000/g;
+   $octal =~ s/1/001/g;
+   $octal =~ s/2/010/g;
+   $octal =~ s/3/011/g;
+   $octal =~ s/4/100/g;
+   $octal =~ s/5/101/g;
+   $octal =~ s/6/110/g;
+   $octal =~ s/7/111/g;
+
+   if($octal =~ /^\d/ || $octal =~ s/^\+//)   { return '0b'  . $octal . $exponent }
+   if($octal =~ s/^\-//) { return '-0b' . $octal . $exponent }
+   die "In oct2bin: failed to parse given argument ($arg)";
 }
 
 1;

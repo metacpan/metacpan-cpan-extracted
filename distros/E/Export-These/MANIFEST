@@ -2,7 +2,7 @@ Changes
 lib/Export/These.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README
 README.md

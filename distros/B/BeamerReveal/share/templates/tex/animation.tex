@@ -4,8 +4,8 @@
 \pgfmathsetmacro\framerate{---FRAMERATE---}
 \pgfmathsetmacro\T{---DURATION---}
 \pgfmathsetmacro\N{\T*\framerate}
-\begin{standaloneframe}
-  \begin{tikzpicture}
+\begin{standaloneframe}%
+  \begin{tikzpicture}%
     \node[draw,rectangle] at (0,0) {%
       \foreach \n in {---SLICESTART---,...,---SLICESTOP---} {%
         \pgfmathsetmacro\progress{(\n-1+---NSTART---)/\N}%
@@ -13,8 +13,8 @@
           ---ANIMATION---
         }%
       }%
-    };
-  \end{tikzpicture}
-\end{standaloneframe}
+    };%
+  \end{tikzpicture}%
+\end{standaloneframe}%
 \end{document}
 

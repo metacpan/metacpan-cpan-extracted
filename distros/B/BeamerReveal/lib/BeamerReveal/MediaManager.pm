@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::MediaManager;
-our $VERSION = '20260120.1958'; # VERSION
+our $VERSION = '20260123.1702'; # VERSION
 
 use strict;
 use warnings;
@@ -306,7 +306,7 @@ sub processConstructionBackOrders {
     }
     
     # run ffmpeg or avconv
-    my $cmd = [ $self->{ffmpeg}, '-r', "$animation->{framerate}", '-i', 'frame-%06d.jpg', 'animation.mp4' ];
+    my $cmd = [ $self->{ffmpeg}, '-r', "$animation->{framerate}", '-i', 'frame-%06d.jpg', '-vf', "pad='ceil(iw/2)*2':'ceil(ih/2)*2'", 'animation.mp4' ];
     BeamerReveal::IPC::Run::run( $cmd, 0, 8, $animdir );
     File::Copy::move( "$animdir/animation.mp4",
 		      "$animdir/../$animid.mp4" );
@@ -315,9 +315,6 @@ sub processConstructionBackOrders {
 
     # all is done
     $logger->progress( $progressId, 1, "animation @{[$i+1]}/$totalNofBackOrders", 1 );
-    
-    ### issues:
-    # - automatic derivation of dimensions (needs to be multiple of 2)
   }
 }
     
@@ -487,7 +484,7 @@ sub _animWork {
   say $logFile "- Generating jpg files";
   $cmd = [ $self->{pdftoppm},
 	   '-scale-to-x', "$xrange",
-	   '-scale-to-y', "$yrange",
+	   '-scale-to-y', '-1',
 	   "animation-$coreId-crop.pdf", "./frame-$coreId", '-jpeg' ];
   BeamerReveal::IPC::Run::run( $cmd, $coreId, 8, $animdir );
   $progress->incr();
@@ -523,7 +520,7 @@ BeamerReveal::MediaManager - MediaManager
 
 =head1 VERSION
 
-version 20260120.1958
+version 20260123.1702
 
 =head1 SYNOPSIS
 

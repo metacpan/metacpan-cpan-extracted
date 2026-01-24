@@ -1,0 +1,26 @@
+\documentclass[]{beamer}
+
+\usepackage{beamer-reveal}
+\usepackage{lipsum}
+
+\title{Sample Beamer Presentation}
+
+\begin{document}
+  % Generate N slides with dummy content
+  \begin{frame}
+    \titlepage
+  \end{frame}
+
+  \foreach \n in {1,...,8} {
+    \begin{frame}
+      \frametitle{Slide \n}
+      \lipsum[\n]
+      \cite{mathew2008}
+    \end{frame}
+  }
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\end{document}
+

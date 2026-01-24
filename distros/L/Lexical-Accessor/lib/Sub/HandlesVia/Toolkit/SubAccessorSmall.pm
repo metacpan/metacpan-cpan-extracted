@@ -6,7 +6,7 @@ no warnings qw( void once uninitialized );
 package Sub::HandlesVia::Toolkit::SubAccessorSmall;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.000003';
+our $VERSION   = '1.001000';
 
 use Sub::HandlesVia::Toolkit;
 our @ISA = 'Sub::HandlesVia::Toolkit';

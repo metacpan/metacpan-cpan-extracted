@@ -1,5 +1,9 @@
 Revision history for AnyEvent-I3X-Workspace-OnDemand
 
+0.006     2026-01-23 16:47:27Z
+
+  * Allow restart of daemon with workspace/group preservation
+
 0.005     2025-09-28 23:27:00Z
 
   * Include i3-wod to distribution

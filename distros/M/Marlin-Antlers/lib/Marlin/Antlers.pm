@@ -7,9 +7,19 @@ use warnings;
 package Marlin::Antlers;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.003000';
+our $VERSION   = '0.003001';
 
-use B::Hooks::AtRuntime qw( at_runtime after_runtime );
+BEGIN {
+	my @funcs = qw( at_runtime after_runtime );
+	if ( eval 'require B::Hooks::AtRuntime; B::Hooks::AtRuntime->VERSION( 8 ) ' ) {
+		B::Hooks::AtRuntime->import( @funcs );
+	}
+	else {
+		require B::Hooks::AtRuntime::OnlyCoreDependencies;
+		B::Hooks::AtRuntime::OnlyCoreDependencies->import( @funcs );
+	}
+};
+
 use Class::Method::Modifiers qw( install_modifier );
 use Exporter::Tiny;
 use Import::Into;

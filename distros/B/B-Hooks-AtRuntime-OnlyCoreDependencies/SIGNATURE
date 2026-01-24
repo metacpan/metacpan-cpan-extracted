@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 97de19962ac9c98c791151230159d8ee2770ac1d909ff6c9407d28ac867b0e42 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 9225e2c3195a89f49b6081441b90a91148f5b631889bea83d6ef37273feb7540 Changes
+SHA256 d2f576bec33f55361cffca1f709f4f1b348226d5fad8bc18bf2fd115c60dfef7 INSTALL
+SHA256 ca1cc40b3da7bebb1b0368764650ad38ac603b31a25fbc5b6f9fb217cc6fa1e8 LICENSE
+SHA256 4e7cb7c551db1e3f6cabc6792b743dc26dfd7a2e1f961e649a1e317cb204b23a MANIFEST
+SHA256 d1d20f649a193a5add3547f34fb152dfb7dc66002f9611fc19f29f5518fbfd78 META.json
+SHA256 8d6081c7a5e81fb50103f36768528e04c43c76ea77119baec55b1128978e5d7d META.yml
+SHA256 10d8d19fc0c440f7841340853749ea63ff24389ba12e067e904f11c831475223 Makefile.PL
+SHA256 645265a2323a672127be584deb532f451e1566d5d5ce9ad640b99b469aa48174 OnlyCoreDependencies.xs
+SHA256 d3697ef16976ed11cb727e305b74a177a245c894bc481f57d50e3ce2cd332353 README
+SHA256 be442ed682d2e354c25616ee06210a56fcfba9ba32e69f1896bdcce36979e380 dist.ini
+SHA256 a88b755b20d4671cc79ec83602efaa50c7c55547cec283d666dff7fcaabc69ea doap.ttl
+SHA256 fe054ec402ee389b976f61d3932bfb188533a8b48df53f91ceb106c223d55c27 fallback/const-c.inc
+SHA256 1c883714b807d6d70a43949caf29539e968219261c9a1d0befb64767539ae5eb fallback/const-xs.inc
+SHA256 4ecbd578db1105acecc01f9d8d34a8193b9bbe0c5858ebf4085b5b97c8a377f6 lib/B/Hooks/AtRuntime/OnlyCoreDependencies.pm
+SHA256 ad599ba07ccba9ef867a7399bb3ef7c83faf7a6350d3dc90f1377c99bebdd72e ppport.h
+SHA256 ae00d9332819976b13b7f6f1a5dc69d87dd0212890dae23f5467b032953c0244 t/00start.t
+SHA256 8b2d810aebf7d007c738d639033a5066c81ab06843693b5bb759dc6e71b4dc9b t/01basic.t
+SHA256 8722e6216de25964fd8a7bf8281b0aec63fc0bbb4b1c9da94277d172c6eac811 t/02usage.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCaXOtJAAKCRDOv4Eoaip9
+OWM/AJ9dHyUR1pVfInwUUlQd5LLzr+eItgCfUBcC7Vzu3PKcZ0/is+sc4rrCpkk=
+=/4Rz
+-----END PGP SIGNATURE-----

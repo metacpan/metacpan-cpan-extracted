@@ -3,7 +3,11 @@ package Meow;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.16';
+our $VERSION = '0.19';
+
+# Store specs for use after JIT compilation (for inheritance)
+# This is accessed from XS via get_hv("Meow::SPECS", ...)
+our %SPECS;
 
 require XSLoader;
 XSLoader::load('Meow', $VERSION);
@@ -20,7 +24,7 @@ Meow - Object ฅ^•ﻌ•^ฅ Orientation
 
 =head1 VERSION
 
-Version 0.16
+Version 0.19
 
 =cut
 
@@ -191,7 +195,7 @@ Constructs a new object, applying defaults, coercions, triggers, and builders as
 	{
 		package Foo::Extends::Meow;
 
-		use Moo;
+		use Meow;
 		extends qw/Foo::Meow/;
 
 		1;
@@ -218,7 +222,7 @@ Constructs a new object, applying defaults, coercions, triggers, and builders as
 	}
 
 
-	my $r = timethese(1000000, {
+	my $r = timethese(5000000, {
 		'Moo' => sub {
 			my $foo = Foo::Extends::Moo->new();
 			$foo->one;
@@ -233,6 +237,11 @@ Constructs a new object, applying defaults, coercions, triggers, and builders as
 			my $foo = Foo::Extends::Mouse->new();
 			$foo->one;
 			$foo->two;
+		},
+		'Marlin' => sub {
+			my $foo = Foo::Extends::Marlin->new();
+			$foo->one;
+			$foo->two;
 		}
 	});
 
@@ -240,18 +249,36 @@ Constructs a new object, applying defaults, coercions, triggers, and builders as
 
 ...
 
-	Benchmark: timing 1000000 iterations of Marlin, Meow, Moo, Mouse...
-	    Marlin: 0.911942 wallclock secs ( 0.89 usr +  0.02 sys =  0.91 CPU) @ 1098901.10/s (n=1000000)
-	      Meow: 1.64158 wallclock secs ( 1.63 usr +  0.02 sys =  1.65 CPU) @ 606060.61/s (n=1000000)
-	       Moo: 1.64699 wallclock secs ( 1.64 usr +  0.00 sys =  1.64 CPU) @ 609756.10/s (n=1000000)
-	     Mouse: 0.889783 wallclock secs ( 0.88 usr +  0.00 sys =  0.88 CPU) @ 1136363.64/s (n=1000000)
-		    Rate   Meow    Moo Marlin  Mouse
-	Meow    606061/s     --    -1%   -45%   -47%
-	Moo     609756/s     1%     --   -45%   -46%
-	Marlin 1098901/s    81%    80%     --    -3%
-	Mouse  1136364/s    87%    86%     3%     --
+	Benchmark: timing 5,000,000 iterations of Marlin, Meow, Moo, Mouse...
+	    Marlin:  1 wallclock secs ( 0.98 usr +  0.02 sys =  1.00 CPU) @ 5000000.00/s (n=5000000)
+	      Meow:  1 wallclock secs ( 0.96 usr +  0.00 sys =  0.96 CPU) @ 5208333.33/s (n=5000000)
+	       Moo:  6 wallclock secs ( 5.70 usr +  0.00 sys =  5.70 CPU) @ 877192.98/s (n=5000000)
+	     Mouse:  3 wallclock secs ( 3.05 usr +  0.01 sys =  3.06 CPU) @ 1633986.93/s (n=5000000)
+
+		    Rate    Moo  Mouse Marlin   Meow
+	Moo     877193/s     --   -46%   -82%   -83%
+	Mouse  1633987/s    86%     --   -67%   -69%
+	Marlin 5000000/s   470%   206%     --    -4%
+	Meow   5208333/s   494%   219%     4%     --
 
 Note: Type::Tiny::XS is installed and so is the other optional XS dependancies for Moo.
+
+	Benchmark: running Cor, Marlin for at least 5 CPU seconds... Marlin and Meow has type constraint checking
+	       Cor:  5 wallclock secs ( 5.13 usr +  0.02 sys =  5.15 CPU) @ 2886788.16/s (n=14866959)
+	    Marlin:  5 wallclock secs ( 5.01 usr +  0.11 sys =  5.12 CPU) @ 4523074.80/s (n=23158143)
+	      Meow:  5 wallclock secs ( 5.16 usr + -0.01 sys =  5.15 CPU) @ 5196218.06/s (n=26760523)
+	
+	Benchmark: running Marlin, Meow, Moo, Mouse for at least 5 CPU seconds...
+	    Marlin:  5 wallclock secs ( 5.22 usr +  0.13 sys =  5.35 CPU) @ 4814728.04/s (n=25758795)
+	      Meow:  5 wallclock secs ( 5.23 usr +  0.01 sys =  5.24 CPU) @ 5203329.96/s (n=27265449)
+	       Moo:  4 wallclock secs ( 5.28 usr +  0.00 sys =  5.28 CPU) @ 860649.81/s (n=4544231)
+	     Mouse:  6 wallclock secs ( 5.29 usr +  0.01 sys =  5.30 CPU) @ 1603849.25/s (n=8500401)
+
+		    Rate    Moo  Mouse Marlin   Meow
+	Moo     860650/s     --   -46%   -82%   -83%
+	Mouse  1603849/s    86%     --   -67%   -69%
+	Marlin 4814728/s   459%   200%     --    -7%
+	Meow   5203330/s   505%   224%     8%     --
 
 =head1 AUTHOR
 

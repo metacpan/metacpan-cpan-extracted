@@ -1,4 +1,11 @@
 Revision history for Perl extension Export::These.
+
+v0.2.2
+  [fixes]
+    - Addressing https://github.com/Perl/perl5/issues/23131
+    - Spelling corrections ( thank you jkeenan)
+    
+
 v0.2.1 2023-12-03
   [fixes]
     - now using an empty string or undef value will prevent

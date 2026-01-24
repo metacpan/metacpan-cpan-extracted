@@ -6,6 +6,22 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.022001	2026-01-23
+
+ [ Bug Fixes ]
+ - Skip t/extend-eg.t on Perl 5.8.x for now as it's causing segfaults.
+ - Various minor fixes for Perl 5.8.x.
+
+0.022000	2026-01-23
+
+ [ Packaging ]
+ - Require latest Sub::Accessor::Small.
+ - Switch from depending on B::Hooks::AtRuntime to
+   B::Hooks::AtRuntime::OnlyCoreDependencies.
+
+ [ Other ]
+ - Added: chain option for attributes, defaulting to true.
+
 0.021000	2026-01-22
 
  [ Packaging ]

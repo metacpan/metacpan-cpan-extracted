@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 34;
+our $VERSION = 35;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -318,6 +318,12 @@ Reconnect to the clacks server. This is mostly used internally, but you can call
 =head2 disconnect
 
 Disconnect from the Server
+
+=head2 fastdisconnect
+
+Immediately closes the connection handle without sending a QUIT message or flushing output buffers.
+This is primarily used after forking, where the child process needs to close its copy of the socket
+without affecting the parent's connection to the server.
 
 =head2 sanitize_key
 

@@ -208,6 +208,46 @@ my $bar = db('bar');
 $total = time() - $start;
 note(sprintf("Initialized 'bar' from 'foo' in %.6f seconds", $total));
 
+subtest resync => sub {
+    my $bar = db('bar');
+
+    my $dbh = $bar->connect;
+
+    ok($dbh->do("INSERT INTO quick_test(test_val) VALUES('XXX')"), "Insert success");
+
+    my $sth = $dbh->prepare('SELECT * FROM quick_test ORDER BY test_id');
+    $sth->execute();
+    my $all = $sth->fetchall_arrayref({});
+    is(
+        $all,
+        [
+            {test_val => 'base', test_id => 1},
+            {test_val => 'foo',  test_id => 2},
+            {test_val => 'bar',  test_id => 3},
+            {test_val => 'XXX',  test_id => 4},
+        ],
+        "Got the inserted row"
+    );
+
+    $dbh->disconnect;
+
+    $bar->resync;
+
+    $dbh = $bar->connect;
+    $sth = $dbh->prepare('SELECT * FROM quick_test ORDER BY test_id');
+    $sth->execute();
+    $all = $sth->fetchall_arrayref({});
+    is(
+        $all,
+        [
+            {test_val => 'base', test_id => 1},
+            {test_val => 'foo',  test_id => 2},
+            {test_val => 'bar',  test_id => 3},
+        ],
+        "Inserted row is gone"
+    );
+};
+
 subtest checksum_change_update => sub {
     QDB_POOL->set_update_checksums(1);
 

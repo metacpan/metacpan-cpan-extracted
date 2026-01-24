@@ -6,7 +6,7 @@ no warnings qw( void once uninitialized );
 package Sub::Accessor::Small;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.000003';
+our $VERSION   = '1.001000';
 our @ISA       = qw/ Exporter::Tiny /;
 our @EXPORT_OK = qw/ has /;
 
@@ -260,33 +260,35 @@ sub expand_handles
 sub canonicalize_is : method
 {
 	my $me = shift;
-	my $name = $me->{slot};
+	
+	if ( $me->{is} eq 'lazy' ) {
+		$me->{lazy}    = 1  if !exists($me->{lazy});
+		$me->{builder} = 1  unless exists($me->{builder}) || exists($me->{default});
+	}
+	
+	defined( my $name = $me->{slot} ) or return;
 	
 	if ($me->{is} eq 'rw')
 	{
 		$me->{accessor} = $name
-			if !exists($me->{accessor}) and defined $name;
+			unless exists $me->{accessor} or ( defined $me->{reader} and $me->{reader} eq $name );
 	}
 	elsif ($me->{is} eq 'ro')
 	{
 		$me->{reader} = $name
-			if !exists($me->{reader}) and defined $name;
+			unless exists $me->{reader} or ( defined $me->{accessor} and $me->{accessor} eq $name );
 	}
 	elsif ($me->{is} eq 'rwp')
 	{
 		$me->{reader} = $name
-			if !exists($me->{reader}) and defined $name;
+			unless exists $me->{reader} or ( defined $me->{accessor} and $me->{accessor} eq $name );
 		$me->{writer} = "_set_$name"
-			if !exists($me->{writer}) and defined $name;
+			unless exists $me->{writer};
 	}
 	elsif ($me->{is} eq 'lazy')
 	{
 		$me->{reader} = $name
-			if !exists($me->{reader}) and defined $name;
-		$me->{lazy} = 1
-			if !exists($me->{lazy});
-		$me->{builder} = 1
-			unless $me->{builder} || exists $me->{default};
+			unless exists $me->{reader} or ( defined $me->{accessor} and $me->{accessor} eq $name );
 	}
 }
 
@@ -356,6 +358,30 @@ sub canonicalize_trigger : method
 	}
 }
 
+sub canonicalize_chain : method
+{
+	my $me = shift;
+	my $okay = qr/^(accessor|writer|clearer)$/;
+	
+	if ( exists $me->{chain} ) {
+		if ( 'ARRAY' eq ref $me->{chain} ) {
+			croak("Unrecognized chain option") if grep { !/$okay/ } @{$me->{chain}};
+		}
+		elsif ( ref $me->{chain} ) {
+			croak("Unrecognized chain option");
+		}
+		elsif ( $me->{chain} =~ $okay ) {
+			$me->{chain} = [ $me->{chain} ]
+		}
+		elsif ( $me->{chain} eq '0' or $me->{chain} eq '1' or $me->{chain} eq '' ) {
+			$me->{chain} = !!$me->{chain};
+		}
+		else {
+			croak("Unrecognized chain option");
+		}
+	}
+}
+
 sub canonicalize_opts : method
 {
 	my $me = shift;
@@ -370,6 +396,7 @@ sub canonicalize_opts : method
 	$me->canonicalize_default;
 	$me->canonicalize_builder;
 	$me->canonicalize_trigger;
+	$me->canonicalize_chain;
 }
 
 sub has_simple_accessor : method
@@ -406,6 +433,27 @@ sub has_simple_clearer : method
 {
 	my $me = shift;
 	return !!1;
+}
+
+sub has_chainable_writer : method
+{
+	my $me = shift;
+	return !!grep { $_ eq 'writer' } @{ $me->{chain} } if 'ARRAY' eq ref $me->{chain};
+	return !!$me->{chain};
+}
+
+sub has_chainable_accessor : method
+{
+	my $me = shift;
+	return !!grep { $_ eq 'accessor' } @{ $me->{chain} } if 'ARRAY' eq ref $me->{chain};
+	return !!$me->{chain};
+}
+
+sub has_chainable_clearer : method
+{
+	my $me = shift;
+	return !!grep { $_ eq 'clearer' } @{ $me->{chain} } if 'ARRAY' eq ref $me->{chain};
+	return !!$me->{chain};
 }
 
 sub accessor_kind : method
@@ -446,10 +494,12 @@ sub inline_clearer : method
 	my $me = shift;
 	my $selfvar = shift || '$_[0]';
 	
-	sprintf(
+	my $maybe_chain = $me->has_chainable_clearer ? sub { $_[0] . "; $selfvar" } : sub { $_[0] };
+	
+	$maybe_chain->( sprintf(
 		q[ delete(%s) ],
 		$me->inline_access( $selfvar ),
-	);
+	) );
 }
 
 sub inline_access : method
@@ -717,16 +767,18 @@ sub inline_writer : method
 	my $get    = $me->inline_access( $selfvar );
 	my $coerce = $me->inline_type_coercion( $selfvar, $expr );
 	
+	my $maybe_chain = $me->has_chainable_writer ? sub { $_[0] . "; $selfvar" } : sub { $_[0] };
+	
 	# no coercion and simple variable
 	if ($coerce eq $expr and $expr =~ /^\$\w+(?:[-][>])?(?:\[\d+\]|\{[^}]\})*$/)
 	{
 		if (!$me->{trigger} and !$me->{weak_ref})
 		{
 			$$flag = 1 if $flag;
-			return $me->inline_access_w(
+			return $maybe_chain->( $me->inline_access_w(
 				$selfvar,
 				$me->inline_type_assertion( $selfvar, $expr ),
-			);
+			) );
 		}
 		elsif ( !$me->{weak_ref} )
 		{
@@ -737,7 +789,7 @@ sub inline_writer : method
 				$me->inline_access( $selfvar ),
 				$me->inline_access_w( $selfvar, $expr ),
 				$me->inline_trigger( $selfvar, undef, '@old' ),
-				$me->inline_get( $selfvar ),
+				$me->has_chainable_writer ? $selfvar : $me->inline_get( $selfvar ),
 			);
 		}
 		else
@@ -750,7 +802,7 @@ sub inline_writer : method
 				$me->inline_access_w( $selfvar, $expr ),
 				$me->inline_trigger( $selfvar, undef, '@old' ),
 				$me->inline_weaken( $selfvar ),
-				$me->inline_get( $selfvar ),
+				$me->has_chainable_writer ? $selfvar : $me->inline_get( $selfvar ),
 			);
 		}
 	}
@@ -760,15 +812,15 @@ sub inline_writer : method
 	if ( !$me->{trigger} and !$me->{weak_ref} )
 	{
 		my $ass = $me->inline_type_assertion( $selfvar, '$val' );
-		sprintf(
+		return $maybe_chain->( sprintf(
 			'my $val = %s; %s',
 			$coerce,
 			$me->inline_access_w( $selfvar, $ass =~ /^do/ ? $ass : "do { $ass }" ),
-		);
+		) );
 	}
 	elsif ( !$me->{weak_ref} )
 	{
-		sprintf(
+		return sprintf(
 			'my $val = %s; %s; my @old = (%s) ? (%s) : (); %s; %s; %s',
 			$coerce,
 			$me->inline_type_assertion( $selfvar, '$val' ),
@@ -776,13 +828,13 @@ sub inline_writer : method
 			$me->inline_access( $selfvar ),
 			$me->inline_access_w( $selfvar, '$val' ),
 			$me->inline_trigger( $selfvar, undef, '@old' ),
-			$me->inline_access( $selfvar ),
+			$me->has_chainable_writer ? $selfvar : $me->inline_access( $selfvar ),
 		);
 	}
 	else
 	{
-		sprintf(
-			'my $val = %s; %s; my @old = (%s) ? (%s) : (); %s; %s; %s; $val',
+		return sprintf(
+			'my $val = %s; %s; my @old = (%s) ? (%s) : (); %s; %s; %s; %s',
 			$coerce,
 			$me->inline_type_assertion( $selfvar, '$val' ),
 			$me->inline_predicate( $selfvar ),
@@ -790,6 +842,7 @@ sub inline_writer : method
 			$me->inline_access_w( $selfvar, '$val' ),
 			$me->inline_trigger( $selfvar, undef, '@old' ),
 			$me->inline_weaken( $selfvar ),
+			$me->has_chainable_writer ? $selfvar : $me->inline_access( $selfvar ),
 		);
 	}
 }
@@ -813,6 +866,8 @@ sub inline_accessor : method
 	my $get    = $me->inline_access( $selfvar );
 	my $coerce = $me->inline_type_coercion( $selfvar, $expr );
 	
+	my $maybe_chain = $me->has_chainable_accessor ? sub { $_[0] . "; $selfvar" } : sub { $_[0] };
+	
 	if ($coerce eq $expr)  # i.e. no coercion
 	{
 		if (!$me->{lazy} and !$me->{trigger} and !$me->{weak_ref})
@@ -820,13 +875,19 @@ sub inline_accessor : method
 			return sprintf(
 				'(%s) ? (%s) : %s',
 				$toggle,
-				$me->inline_access_w( $selfvar, $me->inline_type_assertion( $selfvar, $expr ) ),
+				$me->has_chainable_accessor
+					? sprintf(
+						'do { %s; %s }',
+						$me->inline_access_w( $selfvar, $me->inline_type_assertion( $selfvar, $expr ) ),
+						$selfvar,
+					)
+					: $me->inline_access_w( $selfvar, $me->inline_type_assertion( $selfvar, $expr ) ),
 				$me->inline_get( $selfvar ),
 			);
 		}
 		
 		return sprintf(
-			'if (%s) { %s; my @old = (%s) ? (%s) : (); %s; %s; %s }; %s',
+			'if (%s) { %s; my @old = (%s) ? (%s) : (); %s; %s; %s; %s } else { %s }',
 			$toggle,
 			$me->inline_type_assertion( $selfvar, $expr ),
 			$me->inline_predicate( $selfvar ),
@@ -834,12 +895,25 @@ sub inline_accessor : method
 			$me->inline_access_w( $selfvar, $expr ),
 			$me->inline_trigger( $selfvar, undef, '@old' ),
 			$me->inline_weaken( $selfvar ),
+			$me->has_chainable_accessor ? $selfvar : $me->inline_reader( $selfvar ),
 			$me->inline_reader( $selfvar ),
 		);
 	}
 	
-	sprintf(
-		'if (%s) { my $val = %s; %s; my @old = (%s) ? (%s) : (); %s; %s; %s }; %s',
+	if ( !$me->{trigger} and !$me->{weak_ref} ) {
+		return sprintf(
+			'if (%s) { my $val = %s; %s; %s; %s } else { %s }',
+			$toggle,
+			$coerce,
+			$me->inline_type_assertion( $selfvar, '$val' ),
+			$me->inline_access_w( $selfvar, '$val' ),
+			$me->has_chainable_accessor ? $selfvar : $me->inline_reader( $selfvar ),
+			$me->inline_reader( $selfvar ),
+		);
+	}
+	
+	return sprintf(
+		'if (%s) { my $val = %s; %s; my @old = (%s) ? (%s) : (); %s; %s; %s; %s } else { %s }',
 		$toggle,
 		$coerce,
 		$me->inline_type_assertion( $selfvar, '$val' ),
@@ -848,6 +922,7 @@ sub inline_accessor : method
 		$me->inline_access_w( $selfvar, '$val' ),
 		$me->inline_trigger( $selfvar, undef, '@old' ),
 		$me->inline_weaken( $selfvar ),
+		$me->has_chainable_accessor ? $selfvar : $me->inline_reader( $selfvar ),
 		$me->inline_reader( $selfvar ),
 	);
 }
@@ -985,13 +1060,16 @@ sub inline_trigger : method
 		$run_trigger_code = sprintf('%s->%s(%s, %s)', $selfvar, $trigger, $new, $old);
 	}
 	
+	# Need to assign invocant to a temp lexical variable in case it's still
+	# (probably is!) $_[0] because the guard will not be able to close over
+	# $_[0].
 	my $mutex = $me->{trigger_mutex};
 	return sprintf(
 		'%s || do { my $tmp = %s; my $g = %s->new(sub { %s }); %s; %s }',
 		$mutex->inline_access($selfvar),
 		$selfvar,
 		$mutex->_guard_class,
-		$mutex->inline_clearer('$tmp'),
+		$mutex->inline_clearer('$tmp'), # $mutex hasn't inherited `chain` option
 		$mutex->inline_access_w($selfvar, '!!1'),
 		$run_trigger_code,
 	);

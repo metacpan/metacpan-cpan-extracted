@@ -1,5 +1,12 @@
 -----
 
+12.0.5    2026-01-23
+   [Added]
+       * Helper routine typed_params_check_fields_only() to help verify only
+         supported parameters are in a parameter set
+   [Fixed]
+       * Removed postfix-derefs: not supported by all targetted Perl versions
+
 12.0.4    2026-01-19
    [Fixed]
        * MANIFEST doesn't include 'eg/decode.pl'

@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::TemplateStore;
-our $VERSION = '20260120.1958'; # VERSION
+our $VERSION = '20260123.1702'; # VERSION
 
 use parent 'Exporter';
 use Carp;
@@ -81,7 +81,7 @@ BeamerReveal::TemplateStore - TemplateStore
 
 =head1 VERSION
 
-version 20260120.1958
+version 20260123.1702
 
 =head1 SYNOPSIS
 

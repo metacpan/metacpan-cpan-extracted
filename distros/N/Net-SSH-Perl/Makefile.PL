@@ -62,23 +62,31 @@ my %SSH_PREREQ = (
 
 $SSH_PREREQ{3} = { map %{$SSH_PREREQ{$_}}, 1..2 };
 
-my $p = prompt_for_protocol();
+my $p = do {
+	if( caller ) { 3 }
+	else {
+		prompt_for_protocol();
+		}
+	};
 
 @prereq{keys %{$SSH_PREREQ{$p}}} = values %{$SSH_PREREQ{$p}};
 
-print "Checking for optional modules\n\n";
+if( caller ) {  $prereq{'Digest::BubbleBabble'} = '0.01' }
+else {
+	print "Checking for optional modules\n\n";
 
-unless (have_module('Digest::BubbleBabble', 0.01)) {
-    print<<MSG, "\n";
+	unless (have_module('Digest::BubbleBabble', 0.01)) {
+		print<<MSG, "\n";
 Digest::BubbleBabble is required if you want to generate bubble babble
 key fingerprints with pssh-keygen.
 MSG
 
-    if (read_yes_or_no("Would you like to install it? (y/n)", "y")) {
-        $prereq{'Digest::BubbleBabble'} = '0.01';
-    }
-    print "\n";
-}
+		if (read_yes_or_no("Would you like to install it? (y/n)", "y")) {
+			$prereq{'Digest::BubbleBabble'} = '0.01';
+			}
+		print "\n";
+		}
+	}
 
 use File::Spec::Functions qw(catfile);
 

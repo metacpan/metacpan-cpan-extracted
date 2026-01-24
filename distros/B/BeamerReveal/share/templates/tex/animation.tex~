@@ -1,0 +1,20 @@
+\documentclass[beamer,multi]{standalone}
+---PREAMBLE---
+\begin{document}
+\pgfmathsetmacro\framerate{---FRAMERATE---}
+\pgfmathsetmacro\T{---DURATION---}
+\pgfmathsetmacro\N{\T*\framerate}
+\begin{standaloneframe}
+  \begin{tikzpicture}
+    \node[draw,rectangle] at (0,0) {%
+      \foreach \n in {---SLICESTART---,...,---SLICESTOP---} {%
+        \pgfmathsetmacro\progress{(\n-1+---NSTART---)/\N}%
+        \only<\n> {%
+          ---ANIMATION---
+        }%
+      }%
+    };
+  \end{tikzpicture}
+\end{standaloneframe}
+\end{document}
+

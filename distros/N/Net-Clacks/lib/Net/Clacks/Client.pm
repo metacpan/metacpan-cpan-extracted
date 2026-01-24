@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 34;
+our $VERSION = 35;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -1150,7 +1150,7 @@ sub disconnect($self) {
 
     $self->flush();
     $self->{outbuffer} .= "QUIT\r\n";
-    my $endtime = time + 0.1; # Wait a maximum of one half second to send
+    my $endtime = time + 0.5; # Wait a maximum of half a second to send
     while(1) {
         last if(time > $endtime);
         my $xstart = time;
@@ -1163,7 +1163,7 @@ sub disconnect($self) {
         last if(!length($self->{outbuffer}));
         sleep(0.02);
     }
-    #sleep(0.1); # Wait another tenth of a second for the OS to flush the socket
+    sleep(0.2); # Wait for the OS to flush the socket
 
     delete $self->{socket};
     $self->{needreconnect} = 1;
@@ -1321,6 +1321,13 @@ This is also part of the internal memcached compatibility setup. Don't use this 
 
 Tries to send all remaining data in the output buffers and then disconnect cleanly from the server. Of course, if
 the connection already has gone the way of the dodo, any chance of cleanly disconnecting has already passed.
+
+=head2 fastdisconnect
+
+Immediately closes the connection handle without sending a QUIT message or flushing output buffers.
+This is primarily used after forking, where the child process needs to close its copy of the socket
+without affecting the parent's connection to the server. Also useful in error handling scenarios
+where the connection is known to be broken.
 
 =head2 DESTROY
 

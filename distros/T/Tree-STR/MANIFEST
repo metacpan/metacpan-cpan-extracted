@@ -2,6 +2,7 @@ Changes
 lib/Tree/STR.pm
 lib/Tree/STR/Node.pm
 LICENSE
+Makefile.PL
 MANIFEST
 MANIFEST.bak
 MANIFEST.SKIP

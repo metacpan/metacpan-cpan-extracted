@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQLCom;
 use strict;
 use warnings;
 
-our $VERSION = '0.000038';
+our $VERSION = '0.000039';
 
 use IPC::Cmd qw/can_run/;
 use Capture::Tiny qw/capture/;
@@ -18,7 +18,7 @@ sub init {
     my $self = shift;
 
     my $binary = $self->server_bin;
-    my ($help) = capture { system($binary. '--help', '--verbose') };
+    my ($help) = capture { system($binary, '--help', '--verbose') };
 
     if ($help =~ m/--initialize/) {
         $self->{+USE_BOOTSTRAP} = 0;

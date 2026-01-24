@@ -6,7 +6,7 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.021000';
+our $VERSION   = '0.022001';
 
 use constant { true => !!1, false => !!0 };
 use Types::Common qw( -is -types to_TypeTiny );
@@ -37,7 +37,6 @@ use Class::XSReader       _ATTRS;
 use Class::XSDestructor;
 
 use B                     ();
-use B::Hooks::AtRuntime   ();
 use List::Util            ();
 use Marlin::Util          ();
 use Scalar::Util          ();
@@ -690,24 +689,39 @@ sub setup_roles {
 	return $me;
 }
 
-sub delay {
-	my $me = shift;
-	my $coderef = shift;
-	my $after_runtime = shift;
+{
+	my ( $at_runtime_sub, $after_runtime_sub, $find_hooks_sub );
 	
-	if ( eval { B::Hooks::AtRuntime::find_hooks(); 1 } ) {
-		if ( $after_runtime ) {
-			&B::Hooks::AtRuntime::after_runtime( sub { $coderef->( $me ) } );
+	sub delay {
+		my $me = shift;
+		my $coderef = shift;
+		my $after_runtime = shift;
+		
+		if ( not $find_hooks_sub ) {
+			my @funcs = qw/ at_runtime after_runtime find_hooks /;
+			no strict 'refs';
+			( $at_runtime_sub, $after_runtime_sub, $find_hooks_sub ) = @{(
+				eval {
+					require B::Hooks::AtRuntime;
+					B::Hooks::AtRuntime->VERSION( 8 );
+					[ map \&{"B::Hooks::AtRuntime::$_"}, @funcs ]
+				} or do {
+					require B::Hooks::AtRuntime::OnlyCoreDependencies;
+					[ map \&{"B::Hooks::AtRuntime::OnlyCoreDependencies::$_"}, @funcs ]
+				}
+			)};
+		}
+		
+		if ( eval { $find_hooks_sub->(); 1 } ) {
+			my $hook = $after_runtime ? $after_runtime_sub : $at_runtime_sub;
+			$hook->( sub { $coderef->( $me ) } );
+		}
+		elsif ( $me->delayed ) {
+			push @{ $me->delayed }, $coderef;
 		}
 		else {
-			&B::Hooks::AtRuntime::at_runtime( sub { $coderef->( $me ) } );
+			$coderef->( $me );
 		}
-	}
-	elsif ( $me->delayed ) {
-		push @{ $me->delayed }, $coderef;
-	}
-	else {
-		$coderef->( $me );
 	}
 }
 
@@ -1696,6 +1710,21 @@ C<< isa => Enum['foo','bar'] >>
 Rarely used Moose option. If you call a reader or accessor in list context,
 will automatically apply C<< @{} >> or C<< %{} >> to the value if it's an
 arrayref or hashref.
+
+=item C<< chain >>
+
+By default, Marlin's writers, clearers, and (when used as writers) accessors
+are chainable. That means, they return the object itself. So this works:
+
+  my $result = $object->set_foo(1)->set_bar(2)->foobar;
+  $object->clear_foo->clear_bar;
+
+However, you can set them to be not chainable using C<< chain => false >>.
+Non-chainable clearers return the old value (like C<delete> does).
+Non-chainable writers and accessors used as writers return the new value.
+
+Chainable versions are usually I<slightly> more useful, so that is the
+default since Marlin 0.022000.
 
 =item C<< storage >>
 

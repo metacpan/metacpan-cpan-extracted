@@ -2,7 +2,7 @@ use Test2::V0 '!subtest';
 use Test2::Util::Importer 'Test2::Tools::Subtest' => ( subtest_streamed => { -as => 'subtest' } );
 use Test2::Plugin::UTF8;
 use Path::Tiny qw[path];
-use v5.36;
+use v5.42;
 use lib '../eg/', 'eg', '../lib', 'lib';
 #
 use At::Protocol::DID qw[:all];
@@ -18,8 +18,8 @@ sub expectValid($uri) {
 
 sub expectInvalid($uri) {
     subtest $uri => sub {
-        ok dies { ensureValidDid($uri) },        'ensureValidDid( ... ) dies';
-        ok dies { ensureValidAtDidRegex($uri) }, 'ensureValidAtDidRegex( ... ) dies';
+        ok dies { ensureValidDid($uri) },      'ensureValidDid( ... ) dies';
+        ok dies { ensureValidDidRegex($uri) }, 'ensureValidDidRegex( ... ) dies';
     }
 }
 subtest 'enforces spec details' => sub {

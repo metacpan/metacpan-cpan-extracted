@@ -1,5 +1,5 @@
 package At::Protocol::NSID 1.0 {    # https://github.com/bluesky-social/atproto/blob/main/packages/syntax/src/nsid.ts
-    use v5.38;
+    use v5.42;
     no warnings qw[experimental::builtin experimental::try];
     use At::Error qw[register throw];
     use feature 'try';
@@ -16,7 +16,7 @@ package At::Protocol::NSID 1.0 {    # https://github.com/bluesky-social/atproto/
 #~  delim     = "."
 #~  segment   = alpha *( alpha / number / "-" )
 #~  authority = segment *( delim segment )
-#~  name      = alpha *( alpha )
+#~  name      = alpha *( alpha / number )
 #~  nsid      = authority delim name
     sub new( $class, $nsid ) {
         ensureValidNsid($nsid);
@@ -64,7 +64,7 @@ package At::Protocol::NSID 1.0 {    # https://github.com/bluesky-social/atproto/
             throw InvalidNsidError('NSID part too long (max 63 chars)')           if length $l > 63;
             throw InvalidNsidError('NSID parts can not start or end with hyphen') if $l =~ /^-|-$/;
             throw InvalidNsidError('NSID first part may not start with a digit')  if $i == 0        && $l =~ /^[0-9]/;
-            throw InvalidNsidError('NSID name part must be only letters')         if $i == $#labels && $l !~ /^[a-zA-Z]+$/;
+            throw InvalidNsidError('NSID name part must be letters or digits')    if $i == $#labels && $l !~ /^[a-zA-Z][a-zA-Z0-9]*$/;
         }
         1;
     }
@@ -74,8 +74,7 @@ package At::Protocol::NSID 1.0 {    # https://github.com/bluesky-social/atproto/
         #~ simple regex to enforce most constraints via just regex and length.
         #~ hand wrote this regex based on above constraints
         throw InvalidNsidError(q[NSID didn't validate via regex])
-            unless $nsid
-            =~ /^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\.[a-zA-Z]([a-zA-Z]{0,61}[a-zA-Z])?)$/;
+            unless $nsid =~ /^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\.[a-zA-Z][a-zA-Z0-9]{0,62})$/;
         throw InvalidNsidError('NSID is too long (317 chars max)') if length $nsid > 253 + 1 + 63;
         1;
     }
@@ -84,6 +83,8 @@ package At::Protocol::NSID 1.0 {    # https://github.com/bluesky-social/atproto/
 };
 1;
 __END__
+=pod
+
 =encoding utf-8
 
 =head1 NAME

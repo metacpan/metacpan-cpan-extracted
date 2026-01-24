@@ -1,0 +1,79 @@
+{
+   "abstract" : "it is just B::Hooks::AtRuntime but with only core dependencies",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "B-Hooks-AtRuntime-OnlyCoreDependencies",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Sub::Util" : "0",
+            "perl" : "5.0008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Plugin::BailOnFail" : "0",
+            "Test2::Require::AuthorTesting" : "0",
+            "Test2::Require::Module" : "0",
+            "Test2::Tools::Spec" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "B::Hooks::AtRuntime::OnlyCoreDependencies" : {
+         "file" : "lib/B/Hooks/AtRuntime/OnlyCoreDependencies.pm",
+         "version" : "8.000001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tobyink/p5-b-hooks-atruntime-onlycoredependencies/issues"
+      },
+      "homepage" : "https://metacpan.org/release/B-Hooks-AtRuntime-OnlyCoreDependencies",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-b-hooks-atruntime-onlycoredependencies.git",
+         "web" : "https://github.com/tobyink/p5-b-hooks-atruntime-onlycoredependencies"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/B-Hooks-AtRuntime-OnlyCoreDependencies/project"
+   },
+   "version" : "8.000001",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

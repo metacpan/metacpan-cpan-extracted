@@ -20,6 +20,7 @@ use_ok('Meow');
     rw baz => Trigger(Default(100), sub {
         $trigger_count++;
     });
+    make_immutable;
 }
 
 # Test trigger on constructor set

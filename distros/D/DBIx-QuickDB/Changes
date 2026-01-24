@@ -1,3 +1,7 @@
+0.000039  2026-01-23 12:04:49-08:00 America/Los_Angeles
+
+    - Add $db->resync method
+
 0.000038  2025-03-29 00:35:02-07:00 America/Los_Angeles
 
     - Remove rogue Carp::Always from test

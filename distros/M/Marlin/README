@@ -505,6 +505,22 @@ DESCRIPTION
         context, will automatically apply `@{}` or `%{}` to the value if it's
         an arrayref or hashref.
 
+    `chain`
+        By default, Marlin's writers, clearers, and (when used as writers)
+        accessors are chainable. That means, they return the object itself. So
+        this works:
+
+          my $result = $object->set_foo(1)->set_bar(2)->foobar;
+          $object->clear_foo->clear_bar;
+
+        However, you can set them to be not chainable using `chain => false`.
+        Non-chainable clearers return the old value (like `delete` does).
+        Non-chainable writers and accessors used as writers return the new
+        value.
+
+        Chainable versions are usually *slightly* more useful, so that is the
+        default since Marlin 0.022000.
+
     `storage`
         It is possible to give a hint to Marlin about how to store an
         attribute.

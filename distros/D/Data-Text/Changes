@@ -1,5 +1,12 @@
 Revision history for Data::Text
 
+0.19	Fri Jan 23 20:52:56 EST 2026
+	Try harder to handle non-English LANGUAGE setting (RT#168965)
+	Use Object::Configure
+	Added fuzz testing
+	Added test dashboard
+	Remove unreachable code
+		
 0.18	Mon Aug 11 11:24:22 EDT 2025
 	Bump the version of Params::Get
 	Ensure length(), uppercase() and lowercase() do what you expect with UTF-8 characters

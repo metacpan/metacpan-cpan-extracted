@@ -32,3 +32,5 @@ MODULE = Net::SSH::Perl  PACKAGE = Net::SSH::Perl
 
 INCLUDE: lib/Net/SSH/Perl/Key/Ed25519.xs
 INCLUDE: lib/Net/SSH/Perl/Cipher/ChachaPoly.xs
+
+MODULE = Net::SSH::Perl  PACKAGE = Net::SSH::Perl

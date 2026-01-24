@@ -1292,6 +1292,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     sign as $op, following IEEE 754-2019 (sinPi), so that the function
     is odd.  Similarly, the function 'Rmpfr_tanu' follows IEEE 754-2019
     (tanPi).
+    Rmpfr_cosu/sinu/tanu   ($rop, $op, $ui,    $rnd) is equivalent to
+    Rmpfr_cospi/sinpi/tanpi($rop, ($op/$ui)/2, $rnd) below.
 
    $inex = Rmpfr_acosu($rop, $op, $ui, $rnd); # mpfr-4.2.0 and later only
    $inex = Rmpfr_asinu($rop, $op, $ui, $rnd); # mpfr-4.2.0 and later only
@@ -1306,6 +1308,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Set $rop to the cosine (resp. sine and tangent) of $op multiplied
     by Pi.  See the description of 'Rmpfr_sinu', 'Rmpfr_cosu' and
     'Rmpfr_tanu' for special values.
+    Rmpfr_cospi/sinpi/tanpi($rop, $op, $rnd) is equivalent to
+    Rmpfr_cosu/sinu/tanu   ($rop, $op, 2, $rnd) above.
 
    $inex = Rmpfr_acospi($rop, $op, $rnd); # mpfr-4.2.0 and later only
    $inex = Rmpfr_asinpi($rop, $op, $rnd); # mpfr-4.2.0 and later only
@@ -1671,17 +1675,27 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     As with 'Rmpfr_print_binary' the exponent is in base 10.
 
    $si = Rmpfr_fpif_export ($stream, $op); # Needs mpfr-4.0.0
-   $si = Rmpfr_fpif_export ($op, $stream); # Needs mpfr-4.0.0
+   $si = Rmpfr_fpif_import ($op, $stream); # Needs mpfr-4.0.0
+   $si = Rmpfr_fpif_export_mem ($buf, $bufsize, $op); # Needs mpfr-4.3.0
+   $si = Rmpfr_fpif_import_mem ($op, $buf, $bufsize); # Needs mpfr-4.3.0
     Note: These function are experimental and their interface might
           change in future versions of mpfr.
-    Export/import the number $op to/from the stream $stream in a
-    floating-point interchange format. In particular one can export
-    on a 32-bit computer and import on a 64-bit computer, or export
-    on a little-endian computer and import on a big-endian computer.
-    The precision of OP is stored too. The import function fails if
-    the precision (which is read from the stream) is greater than
-    MPFR_PREC_MAX.
+    Export/import the number $op to/from the stream/string
+    $stream/$buf in a floating-point interchange format. The
+    import function fails if the precision (which is read from
+    the stream/string) is greater than RMPFR_PREC_MAX.
     Return 0 if the export/import was successful.
+    For the two *_mem functions, $buf is a string of sufficient
+    length to accommodate the output of the function. You can
+    create such a buffer for the Math::MPFR object $op with:
+
+      $size = Rmpfr_fpif_size($op);
+      $buf = chr(0) x $size;
+      $bufsize = $size + 1; # Include the terminating NULL byte
+
+   $ui = Rmpfr_fpif_size($op);
+    Return a satisfactory value for the size of the string buffer
+    needed as 1st arg to Rmpfr_fpif_export_mem() above.
 
    ########################
 
@@ -1903,30 +1917,81 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
             With double-double NVs, nvtoa() currently requires
             mpfr-4.0.0 or later.
 
-   $str = mpfrtoa($op [, $uv]); # $uv is optional, but mysterious
-                                # and discouraged !!!
+   $str = mpfrtoa($op [, $uv]); # $uv is optional.
     As for nvtoa(), except that mpfrtoa() instead takes a Math::MPFR
     object as its argument.
     Sets $str to the value of $op.
+    This achieved by calling _mpfrtoa($op, 0).
     $str will appear in standard decimal format, containing the
     *minimum* number of significant digits such that the condition
-    ($str == $op) is true when the current default precision equals
-    the precision of $op.
+    ($str == $op) is true whenever the current default precision
+    equals the precision of $op.
     (The overloaded '==' operator evaluates $str according to the
-    current default precision, so that condition might be untrue
-    whenever the default precision != the precision of $op.)
+    current default precision, so it can be that $str != $op when
+    and only when the default precision != the precision of $op.)
 
     The second (optional) arg became available with Math-MPFR-4.24 and
     it can alter the behaviour of mpfrtoa when the value of $uv is
-    greater than the precision of $op. AFAIK, it is used only (and
-    arcanely in Math:FakeDD::dd_repro(), and the option will be removed
-    as soon as Math::FakeDD::dd_repro() can be adapted to that removal.
+    greater than the precision of $op - which is useful in respect
+    to subnormalization. However, if subnormal values are required
+    use mpfrtoa_subn (documented below) instead of mpfrtoa.
 
-$str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
-    For example, you want to know what nvtoa(sqrt 3) would return
+    I have also used a 2nd argument arcanely in Math:FakeDD::dd_repro,
+    as that seems to work. But that 2nd arg will be removed when/if I
+    can work out how to implement that removal. (Might take a while.)
+
+   $str = mpfrtoa_subn($op, $bits, $emin, $emax);
+    The mpfr library does not automatically perform subnormalization.
+    Hence, for a given subnormal $nv, nvtoa($nv) will often differ
+    from mpfrtoa($op), even though $op == $nv.
+    This function achieves its result by passing the appropriate
+    first and second arguments to the _mpfrtoa XSub.
+    It also works correctly with normal NV values.
+
+    Some examples for those perls whose $Config{nvsize} is 8:
+
+    use Math::MPFR qw(:mpfr);
+    Rmpfr_set_default_prec(53); # Required precision 8-byte NVs.
+
+     $nv = 2 ** -1070;
+     $op = Math::MPFR->new($nv);
+     @args = (53, -1073, 1024);
+     print "ok\n" if $nv == $op;             # ok
+     print nvtoa  ($nv), "\n";               # 8e-323
+     print mpfrtoa($op), "\n";               # 7.905050333459945e-323
+     print mpfrtoa_subn($op, @args), "\n\n"; # 8e-323
+
+     # Any value with an exponent < -1073 will be zero:
+     $op = Math::MPFR->new(2) ** -1075;      # Exponent is -1074
+     $nv = Rmpfr_get_NV($op, MPFR_RNDN);
+     print nvtoa  ($nv), "\n";               # 0.0
+     print mpfrtoa($op), "\n";               # 2.4703282292062327e-324
+     print mpfrtoa_subn($op, @args), "\n\n"; # 0.0
+
+     # Any value with an exponent > 1024 will be Inf:
+     $op = Math::MPFR->new(2) ** 1024;       # Exponent is 1025
+     $nv = Rmpfr_get_NV($op, MPFR_RNDN);
+     print nvtoa  ($nv), "\n";               # Inf
+     print mpfrtoa($op), "\n";               # 1.797693134862316e+308
+     print mpfrtoa_subn($op, @args), "\n\n"; # Inf
+     __END__
+
+    For perls whose $Config{nvtype} is the 80-bit extended precision
+    long double, the default precision would be set to 64 and @args
+    to (64, -16444, 16384).
+
+    For all other perls, the default precision would be set to 113,
+    and @args set to (113, -16493, 16384).
+
+   $str = anytoa($op); # $op precision must be 53 or 64 or 113.
+
+      Note: It's probably now  better to use mpfrtoa_subn (above) as
+            that sub also handles subnormals and Infs.
+
+    For example, if you want to know what nvtoa(sqrt 3) would return
     on a perl whose nvtype is the 113-bit precision __float128 (or
     IEEE-754 128-bit long double) but you don't have access to such
-    a perl. You can do:
+    a perl, you can do:
 
       my $bits = 113;
       Rmpfr_set_default_prec($bits);
@@ -1934,10 +1999,10 @@ $str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
       my $s = anytoa($op);
       print "$s\n"; # 1.7320508075688772935274463415058723
 
-    Similarly, changing $bits to 53, or 64, or 2098 would provide
+    Similarly, changing $bits to 53, or 64 would provide
     the same as nvtoa(sqrt 3) for (respectively) the 53-bit
-    precision double nvtype , the 64-bit extended precision long
-    double nvtype, and the double-double nvtype.
+    precision double nvtype  and the 64-bit extended precision long
+    double nvtype.
 
     The value returned will be the same as returned by mpfrtoa($op)
     unless:
@@ -1951,10 +2016,6 @@ $str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
      2) $op holds a finite non-zero value that is so close to zero
         that the specified nvtype will either round it to zero or
         denormalize it;
-
-     or
-
-     3) the precision of $op is 2098 bits.
 
    $mask = nvtoa_test($str, $arg [, $debug]);
     DEPRECATED - dragon_test (see below) is recommended instead.
@@ -2015,16 +2076,31 @@ $str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
     Sets $NV to the NV value represented by the string $str.
     If $str expresses a base 2 value, begin it with '0b' or '0B'.
     If $str expresses a base 16 value, begin it with '0x' or '0X.
+    If $str expresses a base 8 value then do not pass $str directly
+    to atonv(). Instead do $NV = atonv(oct2bin($str));
+    (See the oct2bin documentation immediately below.)
     For example:
-      atonv('0x0.89p5'), atonv('0x0.112@2'), atonv('17.125') and
-      atonv('0b0.10001001e5') all return 17.125.
-    NOTE: ORIGINALLY TOOK 2 ARGUMENTS - NOW TAKES ONLY 1, as of
-          Math-MPFR-4.07.
+      atonv('0x0.89p5'), atonv('0x0.112@2'), atonv('17.125'),
+      atonv('0b0.10001001e5') and atonv(oct2bin('0.422p5')) all
+      return 17.125.
+    Any underscoeres included in the given argument will be treated
+    as non-numeric (illegal) characters.
+
+   $str2 = oct2num($str);
+    Treats $str as an octal string, and returns the equivalent
+    base 2 expression of that string, including the '0b'
+    identifying prefix. This enables atonv() to handle octal values.
+    The argument may (but does not need to) contain the 0/0o/0O
+    identifying prefix. Use 'p' or 'P' to separate the mantissa
+    from the exponent, and express the exponent as a base 10
+    integer. The value will be the mantissa multiplied by 2 raised
+    to the power of that base 10 integer. For example:
+      '5p3' == 5 * (2 ** 3) == 40.
+      oct2bin('-5p3') will return the string '-0b101p3'.
 
    $sv = atonum($str); # Needs mpfr-3.1.6 or later
     If $str numifies to an IV, return that IV.
     Else return the NV that is returned by atonv($str).
-
 
    $ret = decimalize($op [, $anything]); # 2nd (optional) arg
                                          # can be any scalar.
@@ -2891,7 +2967,7 @@ $str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2006-2025 Sisyphus
+    Copyright 2006-2026 Sisyphus
 
 =head1 AUTHOR
 

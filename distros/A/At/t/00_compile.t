@@ -1,9 +1,9 @@
 use Test2::V0 '!subtest';
 use Test2::Util::Importer 'Test2::Tools::Subtest' => ( subtest_streamed => { -as => 'subtest' } );
 use Test2::Plugin::UTF8;
-use JSON::Tiny qw[decode_json encode_json];
+use JSON::PP   qw[decode_json encode_json];
 use Path::Tiny qw[path];
-use v5.36;
+use v5.42;
 
 # Dev
 # https://github.com/bluesky-social/atproto/blob/main/packages/api/tests/bsky-agent.test.ts
@@ -16,7 +16,7 @@ my $share = -d 'share' ? 'share' : '../share';
 #
 my $bsky;
 subtest 'should build the client' => sub {
-    isa_ok $bsky = At->new( service => 'https://bsky.social', lexicon => $share . '/lexicons' ), ['At'];
+    isa_ok $bsky = At->new( host => 'https://bsky.social', share => $share ), ['At'];
 };
 #
 subtest live => sub {    # Public and totally worthless auth info
@@ -36,7 +36,7 @@ subtest live => sub {    # Public and totally worthless auth info
             my $todo = todo 'Working with live services here. Things might not go as we expect or hope...';
             ok $login = $bsky->login( $auth->{login}{identifier}, $auth->{login}{password} ), 'logging in for the following tests';
             if ($login) {
-                $auth->{resume} = { accessJwt => $bsky->session->{accessJwt}, refreshJwt => $bsky->session->{refreshJwt} };
+                $auth->{resume} = { accessJwt => $bsky->session->accessJwt, refreshJwt => $bsky->session->refreshJwt };
                 $path->spew_raw( encode_json $auth );
             }
         };
@@ -169,7 +169,7 @@ subtest live => sub {    # Public and totally worthless auth info
                                 uri => $post->{uri},
                                 cid => $post->{cid}
                             },
-                            createdAt => $bsky->now
+                            createdAt => At::_now->to_string
                         }
                     }
                     ),
@@ -212,7 +212,7 @@ subtest live => sub {    # Public and totally worthless auth info
                                 uri => $post->{uri},
                                 cid => $post->{cid}
                             },
-                            createdAt => At::now
+                            createdAt => At::_now->to_string
                         }
                     }
                     ),
@@ -284,7 +284,7 @@ subtest live => sub {    # Public and totally worthless auth info
                 'com.atproto.repo.createRecord' => {
                     repo       => $bsky->did,
                     collection => 'app.bsky.feed.follow',
-                    record     => { '$type' => 'app.bsky.feed.follow', subject => $bsky->did, createdAt => At::now }
+                    record     => { '$type' => 'app.bsky.feed.follow', subject => $bsky->did, createdAt => At::_now->to_string }
                 }
                 ),
                 hash {

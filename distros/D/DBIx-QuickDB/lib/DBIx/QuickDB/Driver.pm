@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000038';
+our $VERSION = '0.000039';
 
 use Carp qw/croak confess/;
 use File::Path qw/remove_tree/;
@@ -26,6 +26,7 @@ use DBIx::QuickDB::Util::HashBase qw{
     password
     env_vars
     <watcher
+    <cloned_from
 };
 
 sub viable { (0, "viable() is not implemented for the " . $_[0]->name . " driver") }
@@ -139,6 +140,21 @@ sub clone_data {
     );
 }
 
+sub resync {
+    my $self = shift;
+
+    my $from = $self->{+CLONED_FROM} or croak "No original source to sync from";
+
+    my $started = $self->started;
+    $self->stop if $started;
+
+    clone_dir($from, $self->{+DIR}, verbose => (($self->{+VERBOSE} // 0) > 2) ? 1 : 0, checksum => 1);
+
+    $self->write_config();
+
+    $self->start if $started;
+}
+
 sub clone {
     my $self = shift;
     my %params = @_;
@@ -169,6 +185,8 @@ sub clone {
         DIR() => $new_dir,
 
         WATCHER()  => undef,
+
+        CLONED_FROM() => $orig_dir,
     );
 
     $clone->write_config();
@@ -542,6 +560,16 @@ running.
 
 Stop the database. Most drivers will make this a no-op if the db is already
 stopped.
+
+=item $db->resync
+
+If the database is a clone of another, it will re-clone the data from the
+original, undoing any changes since the initial cloning.
+
+If the db is started it will be stopped and restarted during this process.
+
+This also re-writes the config file, so if you make custom changes to the
+config they will be wiped out.
 
 =item $user = $db->username
 
