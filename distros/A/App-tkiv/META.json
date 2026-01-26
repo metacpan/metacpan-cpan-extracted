@@ -1,4 +1,85 @@
 {
+   "prereqs" : {
+      "runtime" : {
+         "recommends" : {
+            "Getopt::Long" : "2.58",
+            "Image::Info" : "1.45",
+            "X11::Protocol" : "0.56",
+            "Image::Size" : "3.300",
+            "Tk::TIFF" : "0.11",
+            "Tk" : "804.036",
+            "Data::Peek" : "0.53",
+            "Image::ExifTool" : "13.44"
+         },
+         "requires" : {
+            "Image::ExifTool" : "0",
+            "Tk::DirTree" : "0",
+            "Tk" : "804.027",
+            "Getopt::Long" : "2.27",
+            "Tk::JPEG" : "0",
+            "perl" : "5.010",
+            "Tk::BrowseEntry" : "0",
+            "Tk::PNG" : "0",
+            "Tk::Bitmap" : "0",
+            "Data::Peek" : "0",
+            "Tk::Pane" : "0",
+            "File::Temp" : "0",
+            "Tk::Animation" : "0",
+            "Tk::Dialog" : "0",
+            "Tk::Balloon" : "0",
+            "File::Copy" : "0",
+            "Tk::Photo" : "0",
+            "Tk::Pixmap" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Harness" : "0",
+            "Test::More" : "0.88"
+         },
+         "recommends" : {
+            "Test::More" : "1.302219"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         },
+         "suggests" : {
+            "ExtUtils::MakeMaker" : "7.76"
+         },
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.22"
+         }
+      }
+   },
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+   },
+   "name" : "App-tkiv",
+   "abstract" : "An image viewer in Perl::Tk based on IrfanView",
+   "provides" : {
+      "App::tkiv" : {
+         "file" : "lib/App/tkiv.pm",
+         "version" : "0.135"
+      }
+   },
+   "version" : "0.135",
+   "dynamic_config" : 1,
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/App-tkiv/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Tux/App-tkiv",
+         "web" : "https://github.com/Tux/App-tkiv"
+      }
+   },
    "optional_features" : {
       "opt_format_tiff" : {
          "prereqs" : {
@@ -21,93 +102,12 @@
          "description" : "Use X11::Protocol to get the screen size"
       }
    },
-   "dynamic_config" : 1,
-   "version" : "0.134",
-   "resources" : {
-      "repository" : {
-         "web" : "https://github.com/Tux/App-tkiv",
-         "url" : "https://github.com/Tux/App-tkiv",
-         "type" : "git"
-      },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/App-tkiv/issues"
-      }
-   },
-   "name" : "App-tkiv",
-   "provides" : {
-      "App::tkiv" : {
-         "version" : "0.134",
-         "file" : "lib/App/tkiv.pm"
-      }
-   },
-   "abstract" : "An image viewer in Perl::Tk based on IrfanView",
-   "generated_by" : "Author",
-   "prereqs" : {
-      "runtime" : {
-         "recommends" : {
-            "Image::Size" : "3.300",
-            "X11::Protocol" : "0.56",
-            "Data::Peek" : "0.53",
-            "Image::Info" : "1.45",
-            "Tk" : "804.036",
-            "Getopt::Long" : "2.58",
-            "Image::ExifTool" : "13.10",
-            "Tk::TIFF" : "0.11"
-         },
-         "requires" : {
-            "Tk::Balloon" : "0",
-            "File::Temp" : "0",
-            "perl" : "5.010",
-            "Tk::BrowseEntry" : "0",
-            "Tk::JPEG" : "0",
-            "Image::ExifTool" : "0",
-            "Getopt::Long" : "2.27",
-            "Tk::Dialog" : "0",
-            "Tk::Animation" : "0",
-            "Tk::Pixmap" : "0",
-            "Tk::Photo" : "0",
-            "Data::Peek" : "0",
-            "File::Copy" : "0",
-            "Tk::Bitmap" : "0",
-            "Tk::DirTree" : "0",
-            "Tk::PNG" : "0",
-            "Tk::Pane" : "0",
-            "Tk" : "804.027"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         },
-         "recommends" : {
-            "ExtUtils::MakeMaker" : "7.22"
-         },
-         "suggests" : {
-            "ExtUtils::MakeMaker" : "7.70"
-         }
-      },
-      "test" : {
-         "recommends" : {
-            "Test::More" : "1.302207"
-         },
-         "requires" : {
-            "Test::Harness" : "0",
-            "Test::More" : "0.88"
-         }
-      }
-   },
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-   },
-   "author" : [
-      "H.Merijn Brand <hmbrand@cpan.org>"
-   ],
    "license" : [
       "perl_5"
    ],
-   "release_status" : "stable"
+   "author" : [
+      "H.Merijn Brand <hmbrand@cpan.org>"
+   ],
+   "release_status" : "stable",
+   "generated_by" : "Author"
 }

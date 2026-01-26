@@ -1,3 +1,8 @@
+0.39	- 25 Jan 2026, H.Merijn Brand
+    * It's 2026
+    * Add 5.42.0 test
+    * Add 5.43.7 test
+
 0.38	- 13 Jan 2025, H.Merijn Brand
     * doc should not be part of test
     * our instead of use vars (PR#4)

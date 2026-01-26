@@ -73,6 +73,7 @@ sub postamble {
     -d "xt" && ($ENV{AUTOMATED_TESTING} || 0) != 1 and push @pc,
 	'',
 	'test::',
+	'	perl doc/make-doc.pl',
 	'	-@env TEST_FILES="xt/*.t" make -e test_dynamic';
     join "\n" =>
 	'cover test_cover:',
@@ -95,15 +96,8 @@ sub postamble {
 	'	-@rm -f Debian_CPANTS.txt',
 	'',
 	'doc docs:		doc/Net-CVE.md doc/Net-CVE.html doc/Net-CVE.man',
-	'	-@rm -f pod2html.tmp',
 	'doc/Net-CVE.md:	lib/Net/CVE.pm',
-	'	pod2markdown  < $? > $@',
-	'doc/Net-CVE.html:	lib/Net/CVE.pm',
-	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
-	'doc/Net-CVE.3:		lib/Net/CVE.pm',
-	'	pod2man       < $? > $@',
-	'doc/Net-CVE.man:	doc/Net-CVE.3',
-	'	nroff2man     < $? > $@',
+	'	perl doc/make-doc.pl',
 	@pc,
 	'';
     } # postamble

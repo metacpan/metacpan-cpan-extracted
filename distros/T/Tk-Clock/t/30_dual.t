@@ -35,6 +35,10 @@ my %defconfig = (
     dateFont	=> "{fixed} 11",
     dateColor	=> "#cfb53b",
     infoFont	=> "{Helvetica} 11 bold",
+    time2TZ	=> "UTC",
+    time2Color  => "White",
+    time2Font	=> "{fixed} 12",
+#   time2Format	=> "HH:MM:SS",
     );
 
 ok (my $c1 = $m->Clock (%defconfig),			"Clock Local TimeZone");
@@ -44,6 +48,9 @@ like ($c1->config ((
     handColor  => "Red",
     timeZone   => $ENV{TZ} || undef,
     dateFormat => "Local",
+    useText    => 1,
+    textFormat => "\x{03a9}",
+    textColor  => "Blue",
     )), qr(^Tk::Clock=HASH), "config");
 ok ($c1->grid (-column => 0, -row => 0, -sticky => "news"), "grid");
 
@@ -56,6 +63,8 @@ like ($c2->config (
     handColor  => "Orange",
     timeZone   => "GMT",
     dateFormat => "London (GMT)",
+    useText    => 1,
+    textFormat => "\x{23f0}",
     ), qr(^Tk::Clock=HASH), "config");
 ok ($c2->grid (-column => 0, -row => 1, -sticky => "news", -padx => 20), "grid");
 

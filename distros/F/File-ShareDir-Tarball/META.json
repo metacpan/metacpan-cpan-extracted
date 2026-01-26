@@ -4,29 +4,26 @@
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "File-ShareDir-Tarball",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.3601"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
-            "version" : "0.9901"
+            "Software::Security::Policy::Individual" : "0",
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
@@ -37,42 +34,60 @@
             "File::ShareDir" : "0",
             "File::Temp" : "0",
             "File::chdir" : "0",
+            "Memoize" : "0",
             "parent" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
-            "File::Find" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test2::V0" : "0",
             "Test::File::ShareDir" : "v0.3.0",
-            "Test::More" : "0.88"
+            "Test::More" : "0",
+            "perl" : "5.006"
          }
       }
    },
    "provides" : {
       "File::ShareDir::Tarball" : {
          "file" : "lib/File/ShareDir/Tarball.pm",
-         "version" : "v0.2.2"
+         "version" : "v0.3.0"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-file-sharedir-tarball at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=File-ShareDir-Tarball"
+         "web" : "https://github.com/yanick/File-ShareDir-Tarball/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/File-ShareDir-Tarball/",
+      "homepage" : "https://github.com/yanick/File-ShareDir-Tarball",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/yanick/File-ShareDir-Tarball.git",
          "web" : "https://github.com/yanick/File-ShareDir-Tarball"
       }
    },
-   "version" : "0.2.2",
+   "version" : "0.3.0",
    "x_author_pledge" : {
       "version" : 1
    },
-   "x_authority" : "cpan:YANICK"
+   "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
+   "x_contributors" : [
+      "Yanick Champoux <yanick@babyl.ca>",
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -19,13 +19,17 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  File::Basename: '2.86'
+  File::Basename: '2.00'
   File::Compare: '1.00'
   File::Path: '2.18'
   Test::Exception: '0.43'
   Test::More: '0.98'
   Test::More::UTF8: '0.05'
+  Test::Output: '1.01'
   Test::Pod: '1.22'
   perl: '5.010000'
-version: '0.350'
+resources:
+  bugtracker: https://github.com/AlessandroGorohovski/LaTeX-Replicase/issues
+  repository: git://github.com/AlessandroGorohovski/LaTeX-Replicase.git
+version: '0.590'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

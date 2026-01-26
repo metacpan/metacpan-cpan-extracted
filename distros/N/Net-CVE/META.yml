@@ -7,7 +7,7 @@ build_requires:
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150010
+generated_by: Author, CPAN::Meta::Converter version 2.150011
 license: perl
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,13 +16,14 @@ name: Net-CVE
 provides: 
   Net::CVE: 
     file: lib/Net/CVE.pm
-    version: '0.009'
+    version: '0.010'
 recommends: 
-  Data::Dumper: '2.188'
-  Data::Peek: '0.52'
-  HTTP::Tiny: '0.088'
-  IO::Socket::SSL: '2.085'
-  Test::More: '1.302198'
+  Data::Dumper: '2.183'
+  Data::Peek: '0.53'
+  HTTP::Tiny: '0.092'
+  IO::Socket::SSL: '2.098'
+  JSON::MaybeXS: '1.004008'
+  Test::More: '1.302219'
 requires: 
   Carp: 0
   Data::Dumper: 0
@@ -38,4 +39,4 @@ resources:
   bugtracker: https://github.com/CPAN-Security/Net-CVE/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/CPAN-Security/Net-CVE
-version: '0.009'
+version: '0.010'

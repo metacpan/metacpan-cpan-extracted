@@ -6,9 +6,9 @@ use Pod::Usage;
 
 use HTTP::Request::FromCurl;
 
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
-Getopt::Long::Configure('pass_through');
+Getopt::Long::Configure('pass_through','no_ignore_case');
 GetOptions(
     'no-tidy'        => \my $no_tidy,
     'no-read-files'  => \my $no_read_files,

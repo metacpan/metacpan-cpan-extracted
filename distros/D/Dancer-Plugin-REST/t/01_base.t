@@ -1,3 +1,7 @@
-use Test::More tests => 1;
+use Test2::V0;
 
-use_ok 'Dancer::Plugin::REST';
+use Dancer::Plugin::REST;
+
+ok "module loaded";
+
+done_testing;

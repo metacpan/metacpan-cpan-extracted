@@ -1,6 +1,9 @@
 Revision history for Benchmark-DKbench
 
-3.0     2025-03-25
+3.01    2026-01-25
+        - Refactored harness to external module Benchmark::MCE (DKbench now uses the external harness).
+
+3.00    2025-03-25
         - Docker image available.
         - Fix invalid key error with newer CryptX.
         - Compatible with older versions of DBI.

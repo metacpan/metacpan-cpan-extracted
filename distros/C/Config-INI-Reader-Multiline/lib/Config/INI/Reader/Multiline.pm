@@ -1,24 +1,43 @@
 package Config::INI::Reader::Multiline;
-$Config::INI::Reader::Multiline::VERSION = '1.001';
+$Config::INI::Reader::Multiline::VERSION = '1.002';
 use strict;
 use warnings;
 
 use Config::INI::Reader 0.024;
 our @ISA = qw( Config::INI::Reader );
 
+# preprend the buffer if any
+sub preprocess_line {
+    my ( $self, $line ) = @_;
+    $$line = delete( $self->{__buffer} ) . $$line
+      if exists $self->{__buffer} && $$line =~ s/^\s*//;
+    return $self->SUPER::preprocess_line($line);
+}
+
 sub parse_value_assignment {
     my ( $self, $line ) = @_;
-    return if $line =~ /\s*\\\s*\z/;
-    $line = delete( $self->{__buffer} ) . $line
-        if exists $self->{__buffer} && $line =~ s/^\s*//;
+    return if $line =~ /\s*\\\s*\z/;   # handle_unparsed_line does continuations
     return $self->SUPER::parse_value_assignment($line);
 }
 
 sub handle_unparsed_line {
-    my ( $self, $line, $handle ) = @_; # order changed in CIR 0.024
-    return $self->{__buffer} .= "$line "
-        if $line =~ s/\s*\\\s*\z// && $line =~ s/\A\s*//;
+    my ( $self, $line, $handle ) = @_;    # order changed in CIR 0.024
+    return $self->{__buffer} .= "$line "  # buffer continuations
+      if $line =~ s/\s*\\\s*\z// && $line =~ s/\A\s*//;
     return $self->SUPER::handle_unparsed_line( $line, $handle );
+}
+
+sub finalize {
+    my ($self) = @_;
+
+    # if there's stuff in the buffer,
+    # we had a continuation on the last line
+    if ( exists $self->{__buffer} ) {
+        my $line = delete $self->{__buffer};
+        Carp::croak "Continuation on the last line: '$line\\'";
+    }
+
+    return $self->SUPER::finalize;
 }
 
 1;
@@ -74,26 +93,38 @@ All methods from L<Config::INI::Reader> are available, and none extra.
 The following two methods from L<Config::INI::Reader> are overriden
 (but still call for the parent version):
 
-=head2 parse_value_assignment
+=head2 preprocess_line
 
-This method skips lines ending with a C<\> and leaves them to
-L</handle_unparsed_line> for buffering. When given a "normal" line
-to process, it prepends the buffered lines, and lets the ancestor
-method deal with the resulting line.
+Prepends the buffered lines to the current line, and
+lets the ancestor method deal with the result.
 
 Note that whitespace at the end of continued lines and at the beginning
 of continuation lines is trimmed, and that consecutive lines are joined
 with a single space character.
+
+=head2 parse_value_assignment
+
+This method skips lines ending with a C<\> and leaves them to
+L</handle_unparsed_line> for buffering.
 
 =head2 handle_unparsed_line
 
 This method buffers the unparsed lines that contain a C<\> at the end,
 and calls its parent class version to deal with the others.
 
+=head2 finalize
+
+When the last line has been read and processed, and the buffer is not
+empty, this means the last line had a C</> at the end, which is
+considered a syntax error.
+
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Vincent Pit for help (on IRC, of course!) in finding a
 descriptive but not too long name for this module.
+
+Thanks to Steve Rogerson for finding out that continuations followed by
+an ignorable line were broken, which led to significant code simplication.
 
 =head1 AUTHOR
 
@@ -102,7 +133,7 @@ who needed to read F<act.ini> files without L<AppConfig>.
 
 =head1 COPYRIGHT
 
-Copyright 2014-2015 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2014-2026 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 

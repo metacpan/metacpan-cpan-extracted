@@ -3,7 +3,7 @@ use warnings;
 
 
 package XDR::Gen;
-$XDR::Gen::VERSION = '1.0.0';
+$XDR::Gen::VERSION = '1.1.0';
 use Carp qw(croak confess);
 use IO::Handle;
 use List::Util qw(max);
@@ -481,8 +481,10 @@ sub _serializer_string {
     SERIAL
 }
 
-sub _deserializer_opaque {
-    my ($ast_node, $value) = @_;
+sub __deserializer_bytes {
+    my ($is_array, $ast_node, $value) = @_;
+    my $type_name = ($is_array ? 'array' : 'opaque data');
+    my $Type_name = ucfirst( $type_name );
     my $variable_length = $ast_node->{variable};
     _assert_value_var($value);
 
@@ -496,7 +498,7 @@ sub _deserializer_opaque {
                 if (\$input_length - \$_[2]) < 4;
             my \$len = unpack("L>", substr( \$_[3], \$_[2] ));
             \$_[2] += 4;
-            die "Opaque data too long (max: $max): \$len"
+            die "$Type_name too long (max: $max): \$len"
                 unless (\$len <= $max);
             die "Input buffer too short"
                 if (\$input_length - \$_[2]) < \$len;
@@ -520,8 +522,10 @@ sub _deserializer_opaque {
     }
 }
 
-sub _serializer_opaque {
-    my ($ast_node, $value) = @_;
+sub __serializer_bytes {
+    my ($is_array, $ast_node, $value) = @_;
+    my $type_name = ($is_array ? 'array' : 'opaque data');
+    my $Type_name = ucfirst( $type_name );
     my $variable_length = $ast_node->{variable};
     _assert_value_var($value);
 
@@ -530,11 +534,11 @@ sub _serializer_opaque {
 
         return <<~SERIAL;
         # my (\$class, \$value, \$index, \$output) = \@_;
-        croak "Missing required input 'opaque' value"
+        croak "Missing required input '$type_name' value"
             unless defined $value;
         do {
             my \$len = length $value;
-            die "Opaque data too long (max: $max): \$len"
+            die "$Type_name too long (max: $max): \$len"
                 unless (\$len <= $max);
 
             substr( \$_[3], \$_[2] ) = pack("L>", \$len);
@@ -559,11 +563,11 @@ sub _serializer_opaque {
         PAD
         return <<~SERIAL;
         # my (\$class, \$value, \$index, \$output) = \@_;
-        croak "Missing required input 'opaque' value"
+        croak "Missing required input '$type_name' value"
             unless defined $value;
         do {
             my \$len = length $value;
-            die "Opaque value length mismatch (defined: $count): \$len"
+            die "$Type_name length mismatch (defined: $count): \$len"
                 if not \$len  == $count;
 
             substr( \$_[3], \$_[2] ) = $value;
@@ -571,6 +575,14 @@ sub _serializer_opaque {
         };
         SERIAL
     }
+}
+
+sub _deserializer_opaque {
+    return __deserializer_bytes( 0, @_ );
+}
+
+sub _serializer_opaque {
+    return __serializer_bytes( 0, @_ );
 }
 
 sub _deserializer_void {
@@ -609,6 +621,10 @@ sub _serializer_named {
 
 sub _deserializer_array {
     my ($ast_node, $value, %args) = @_;
+
+    return __deserializer_bytes( 1, @_ )
+        if $ast_node->{type}->{name} eq 'char';
+
     my $decl = $ast_node;
     _assert_value_var($value);
 
@@ -652,6 +668,10 @@ sub _deserializer_array {
 
 sub _serializer_array {
     my ($ast_node, $value, %args) = @_;
+
+    return __serializer_bytes( 1, @_ )
+        if $ast_node->{type}->{name} eq 'char';
+
     my $decl = $ast_node;
     _assert_value_var($value);
 
@@ -1249,7 +1269,7 @@ XDR::Gen - Generator for XDR (de)serializers
 
 =head1 VERSION
 
-version 1.0.0
+version 1.1.0
 
 =head1 SYNOPSIS
 
@@ -1289,6 +1309,9 @@ values, all values provided must be defined.  In case of boolean values, an
 undefined value will be interpreted to indicate C<false>.  In case of a
 pointer type, an undefined value will be serialized as "not provided", the
 same way a C C<NULL> pointer would have.
+
+An exception to regular array conversion is the conversion of C<char> and
+C<unsigned char> arrays which are converted to Perl strings (strings of bytes).
 
 =head1 FUNCTIONS
 

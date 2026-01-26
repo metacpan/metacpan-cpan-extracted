@@ -4,6 +4,7 @@
 #include "XSUB.h"
 
 #include "lib/XS/JIT/xs_jit.h"
+#include "lib/XS/JIT/xs_jit_builder.h"
 
 MODULE = XS::JIT  PACKAGE = XS::JIT
 
@@ -202,3 +203,4 @@ generate_code(class, code, name, functions_hv)
         }
     OUTPUT:
         RETVAL
+        

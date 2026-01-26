@@ -1,0 +1,25 @@
+benchmark/benchmark.pl
+benchmark/README.md
+example/example.pl
+example/example_dancer2.pl
+example/example_mojo.pl
+example/example_streamed.pl
+example/example_streamed_2.pl
+lib/Plack/Handler/H2.pm
+lib/Plack/Handler/H2.xs
+lib/Plack/Handler/H2/Writer.pm
+lib/Plack/Handler/plack_handler_h2.cc
+lib/Plack/Handler/plack_handler_h2.h
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/01-writer.t
+t/02-handler.t
+t/03-integration.t
+t/04-responder.t
+t/05-streaming.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

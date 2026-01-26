@@ -2,6 +2,7 @@ use v5.42;
 use lib '../lib', 'lib';
 use At;
 use Mojo::IOLoop;
+use open ':std', ':encoding(UTF-8)';
 $|++;
 #
 my $at = At->new();

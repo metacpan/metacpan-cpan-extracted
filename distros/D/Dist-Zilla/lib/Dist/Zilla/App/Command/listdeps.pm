@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::listdeps 6.036;
+package Dist::Zilla::App::Command::listdeps 6.037;
 # ABSTRACT: print your distribution's prerequisites
 
 use Dist::Zilla::Pragmas;
@@ -104,6 +104,7 @@ sub filter_core {
   for my $phase (@phases) {
     for my $relation (@relationships) {
       my $req = $prereqs->requirements_for($phase, $relation);
+      $req->clear_requirement('perl') if $req->accepts_module('perl', $core_version);
       for my $module ($req->required_modules) {
         next if not exists $Module::CoreList::version{$core_version}{$module};
         $req->clear_requirement($module) if $req->accepts_module($module, $Module::CoreList::version{$core_version}{$module});
@@ -194,7 +195,7 @@ Dist::Zilla::App::Command::listdeps - print your distribution's prerequisites
 
 =head1 VERSION
 
-version 6.036
+version 6.037
 
 =head1 SYNOPSIS
 
@@ -274,7 +275,7 @@ Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Ricardo SIGNES.
+This software is copyright (c) 2026 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

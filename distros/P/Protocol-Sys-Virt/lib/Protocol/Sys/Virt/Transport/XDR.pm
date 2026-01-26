@@ -9,7 +9,7 @@
 #
 ####################################################################
 
-package Protocol::Sys::Virt::Transport::XDR v12.0.5;
+package Protocol::Sys::Virt::Transport::XDR v12.0.6;
 
 use v5.14;
 use warnings FATAL => 'uninitialized';
@@ -709,7 +709,7 @@ Protocol::Sys::Virt::Transport::XDR - Protocol header and error constants and (d
 
 =head1 VERSION
 
-v12.0.5
+v12.0.6
 
 Based on LibVirt tag v12.0.0
 

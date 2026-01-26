@@ -1,11 +1,11 @@
 --- 
 abstract: OO Interface to SCCS files
 author: 
-  - H.Merijn Brand <h.m.brand@xs4all.nl>
+  - H.Merijn Brand <hmbrand@cpan.org>
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150010
+generated_by: Author, CPAN::Meta::Converter version 2.150011
 license: perl
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,9 +14,9 @@ name: VCS-SCCS
 provides: 
   VCS::SCCS: 
     file: SCCS.pm
-    version: '0.28'
+    version: '0.29'
 recommends: 
-  Test::More: '1.302191'
+  Test::More: '1.302219'
 requires: 
   Carp: 0
   File::Spec: 0
@@ -28,4 +28,4 @@ resources:
   bugtracker: https://github.com/Tux/VCS-SCCS/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/VCS-SCCS
-version: '0.28'
+version: '0.29'

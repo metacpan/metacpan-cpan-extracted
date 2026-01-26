@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Dancer::ModuleLoader;
-use Test::More import => ['!pass'];
+use Test2::Bundle::More;
 
 plan skip_all => "JSON is needed for this test"
     unless Dancer::ModuleLoader->load('JSON');

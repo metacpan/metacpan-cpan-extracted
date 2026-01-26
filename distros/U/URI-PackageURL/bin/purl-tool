@@ -21,12 +21,17 @@ purl-tool - Package URL tool
 
     purl-tool [OPTIONS]...STRING
     purl-tool --type STRING [--namespace STRING] --name STRING [--version STRING] [--subpath STRING] [--qualifier KEY=VALUE [...]]
+
     purl-tool [--help|--man|-v]
 
     Options:
+          --info TYPE               Display information about provided PURL type
+          --list                    Display known PURL type
           --help                    Brief help message
           --man                     Full documentation
           -v                        Print version
+
+      -q, --quiet                   Suppress output
 
     "purl" string encode options:
 
@@ -49,44 +54,108 @@ purl-tool - Package URL tool
           --yaml                    YAML output format (--format=yaml)
           --env                     ENV output format (--format=env)
 
+    "purl" validation options:
+
+          --validate                Validate a PURL string and return the exit code
+
     Examples:
 
     Parse the given Package URL string and return JSON and send the STDOUT to jq:
 
-        purl-tool pkg:cpan/GDT/URI-PackageURL@2.11 --json | jq
+        purl-tool pkg:cpan/GDT/URI-PackageURL@2.24 --json | jq
 
-    Download the package from the repository using Package URL string:
+    Download the package from the repository using PURL string:
 
-        wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.11 --download-url)
+        wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.24 --download-url)
 
-    Create a canonical Package URL string
+    Create a canonical PURL string
 
         purl-tool --type cpan \
                   --namespace GDT \
                   --name URI-PackageURL \
-                  --version 2.11
+                  --version 2.24
+
+    Validate a PURL string:
+
+        if $(purl-tool $PURL_STRING --validate -q); then
+            echo "PURL string is valid"
+        else
+            echo "PURL string is not valid"
+        fi
+
+    Display information about provided PURL type (allowed components, repository,
+    examples, etc.):
+
+        purl-tool --info rpm
+
+    Display all known PURL types:
+
+        purl-tool --list
 
 
 =head1 DESCRIPTION
 
 C<purl-tool> Package URL tool
 
+A Package URL (aka "purl") is a URL string used to identify and locate a software
+package in a mostly universal and uniform way across programing languages,
+package managers, packaging conventions, tools, APIs and databases.
+
+L<https://github.com/package-url/purl-spec>
+
+A purl is a URL composed of seven components:
+
+    scheme:type/namespace/name@version?qualifiers#subpath
+
+Components are separated by a specific character for unambiguous parsing.
+
+The definition for each components is:
+
+=over
+
+=item * "scheme": this is the URL scheme with the constant value of "pkg".
+One of the primary reason for this single scheme is to facilitate the future
+official registration of the "pkg" scheme for package URLs. Required.
+
+=item * "type": the package "type" or package "protocol" such as cpan, maven, npm,
+nuget, gem, pypi, etc. Required.
+
+=item * "namespace": some name prefix such as a Maven groupid, a Docker image
+owner, a GitHub user or organization. Optional and type-specific.
+
+=item * "name": the name of the package. Required.
+
+=item * "version": the version of the package. Optional.
+
+=item * "qualifiers": extra qualifying data for a package such as an OS,
+architecture, a distro, etc. Optional and type-specific.
+
+=item * "subpath": extra subpath within a package, relative to the package root.
+Optional.
+
+=back
+
 =head1 EXAMPLES
 
-Parse the given Package URL string and return JSON and send the STDOUT to L<jq>:
+Parse the given PURL string and return JSON and send the STDOUT to L<jq>:
 
-    purl-tool pkg:cpan/GDT/URI-PackageURL@2.11 --json | jq
+    purl-tool pkg:cpan/GDT/URI-PackageURL@2.24 --json | jq
 
 Download the package from the repository using Package URL string:
 
-    wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.11 --download-url)
+    wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.24 --download-url)
 
 Create a canonical Package URL string:
 
     purl-tool --type cpan \
               --namespace GDT \
               --name URI-PackageURL \
-              --version 2.11
+              --version 2.24
+
+Display information about provided PURL type (allowed components, repository,
+examples, etc.):
+
+    purl-tool --info rpm
 
 =head1 AUTHOR
 

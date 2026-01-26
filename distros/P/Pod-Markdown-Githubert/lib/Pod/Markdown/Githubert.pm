@@ -5,10 +5,17 @@ use warnings;
 use Pod::Markdown ();
 our @ISA = 'Pod::Markdown';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
     my $class = shift;
+    my %args = @_;
+
+    my $hl_language = '';
+    if (exists $args{hl_language}) {
+        $hl_language = delete $args{hl_language};
+    }
+
     my $self = $class->SUPER::new(
         markdown_fragment_format => sub {
             my ($self, $str) = @_;
@@ -17,13 +24,19 @@ sub new {
             $str
         },
         html_encode_chars => '\$',
-        @_
+        %args
     );
     $self->accept_targets('highlighter', 'github-markdown');
-    $self->{+__PACKAGE__} = {
-        hl_language => '',
-    };
+    $self->hl_language($hl_language);
     $self
+}
+
+sub hl_language {
+    my $self = shift;
+    if (@_) {
+        $self->{+__PACKAGE__}{hl_language} = $_[0];
+    }
+    $self->{+__PACKAGE__}{hl_language}
 }
 
 sub format_perldoc_url {
@@ -175,7 +188,8 @@ with a code block.
 Syntax highlighting can be enabled by tagging each code block with its
 language. As this module translates a POD document, it keeps a global "current
 language" setting, which is applied to every verbatim paragraph. Initially the
-"current language" is empty, which just produces ordinary C<```> code blocks.
+"current language" is empty, which just produces ordinary C<```> code blocks,
+but this is configurable using the L</hl_language> method; see below.
 
 A C<=for highlighter language=FOO> paragraph sets the "current language" to
 I<FOO>. (More specifically, you can put multiple I<KEY=VALUE> options in a
@@ -231,6 +245,38 @@ displays C<_N_th> verbatim as "_N_th", but C<*N*th> as "I<N>th". The latter is
 what we want for POD like C<IE<lt>NE<gt>th>.
 
 =back
+
+=head1 METHODS
+
+=head2 new
+
+Constructor. Takes a list of key-value pairs (like a hash initializer) to
+configure the created object. In addition to the constructor arguments
+inherited from L<Pod::Markdown>, this module also supports:
+
+=over
+
+=item C<< hl_language => $lang >>
+
+Sets the default (initial) language for syntax highlighting. Equivalent to
+calling the L</hl_language> method right after C<new>.
+
+=back
+
+=head2 hl_language
+
+Gets (with no arguments) or sets (with one argument) the current language for
+syntax highlighting. You can use this to set the initial language for code
+blocks that have no preceding C<=for highlighter language=...> paragraph:
+
+    my $p = Pod::Markdown::Githubert->new;
+    $p->hl_language('perl');
+    # or alternatively:
+    my $p = Pod::Markdown::Githubert->new(hl_language => 'perl');
+    ...
+
+Now the next document will be processed by C<$p> as if it had started with
+C<=for highlighter language=perl>.
 
 =begin :README
 

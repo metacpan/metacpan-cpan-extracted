@@ -1,4 +1,4 @@
-package HTTP::Request::CurlParameters 0.55;
+package HTTP::Request::CurlParameters 0.56;
 use 5.020;
 use HTTP::Request;
 use HTTP::Request::Common;
@@ -527,6 +527,41 @@ sub _build_mojolicious_headers( $self, $prefix = "    ", %options ) {
     $self->_pairlist([ map { $_ => $h{ $_ } } @order ], $prefix);
 }
 
+sub _build_rest_client_headers( $self, $prefix = "    ", %options ) {
+    # This is so we create the standard header order in our output
+    my @h = $self->_explode_headers;
+    my $h = HTTP::Headers->new( @h );
+    $h->remove_header( @{$options{implicit_headers}} );
+
+    # also skip the Host: header if it derives from $uri
+    my $val = $h->header('Host');
+    if( $val and ($val eq $self->uri->host_port
+                  or $val eq $self->uri->host   )) {
+                        # trivial host header
+        $h->remove_header('Host');
+    };
+
+    @h = $h->flatten;
+    my %h;
+    my @order;
+    while( @h ) {
+        my ($k,$v) = splice(@h,0,2);
+        if( ! exists $h{ $k }) {
+            # Fresh value
+            $h{ $k } = $v;
+            push @order, $k;
+        } elsif( ! ref $h{$k}) {
+            # Second value
+            $h{ $k } = [$h{$k}, $v];
+        } else {
+            # Multiple values
+            push @{$h{ $k }}, $v;
+        }
+    };
+
+    $self->_pairlist([ map { $_ => $h{ $_ } } @order ], $prefix);
+}
+
 =head2 C<< $r->as_snippet( %options ) >>
 
     print $r->as_snippet( type => 'LWP' );
@@ -862,6 +897,87 @@ sub as_mojolicious_snippet( $self, %options ) {
 SNIPPET
 };
 
+sub as_rest_client_snippet( $self, %options ) {
+    $options{ prefix } ||= '';
+    $options{ implicit_headers } ||= [];
+
+   my @preamble;
+    my @postamble;
+    my %ssl_options;
+    push @preamble, @{ $options{ preamble } } if $options{ preamble };
+    push @postamble, @{ $options{ postamble } } if $options{ postamble };
+    my @setup_ua = ('');
+
+    my $request_args = join ", ",
+                                 '$r',
+                           $self->_pairlist([
+                               maybe ':content_file', $self->output
+                           ], '')
+                       ;
+    my $init_cookie_jar = $self->_init_cookie_jar_tiny();
+    if( my $p = $init_cookie_jar->{preamble}) {
+        push @preamble, @{$p}
+    };
+
+    if( $self->show_error ) {
+        push @postamble,
+            '    die $res->{reason} if !$res->{success};',
+    } elsif( $self->fail ) {
+        push @postamble,
+            '    exit 1 if !$res->{success};',
+    };
+    my $constructor_args = join ",",
+                           $self->_pairlist([
+                               maybe timeout       => $self->timeout,
+                               maybe host          => $self->host,
+                               maybe cert          => $self->cert,
+                               maybe timeout       => $self->timeout,
+                           ], '')
+                           ;
+    if( defined( my $credentials = $self->credentials )) {
+        my( $user, $pass ) = split /:/, $credentials, 2;
+        my $setup_credentials = sprintf qq{\$ua->credentials("%s","%s");},
+            quotemeta $user,
+            quotemeta $pass;
+        push @setup_ua, $setup_credentials;
+    };
+
+    @setup_ua = ()
+        if @setup_ua == 1;
+
+    @preamble = map { "$options{prefix}    $_\n" } @preamble;
+    @postamble = map { "$options{prefix}    $_\n" } @postamble;
+    @setup_ua = map { "$options{prefix}    $_\n" } @setup_ua;
+
+    my @content = $self->_build_quoted_body();
+    if( grep {/\S/} @content ) {
+        unshift @content, 'content => ',
+    } elsif( @{ $self->form_args }) {
+        my $req = HTTP::Request::Common::POST(
+            'https://example.com',
+            Content_Type => 'form-data',
+            Content => $self->form_args,
+        );
+        @content = ('content => ', $self->_build_quoted_body( $req->content ));
+        $self->headers->{ 'Content-Type' } = join "; ", $req->headers->content_type;
+    }
+
+    return <<SNIPPET;
+@preamble
+    my \$ua = REST::Client->new($constructor_args);@setup_ua
+    my \$res = \$ua->request(
+        '@{[$self->method]}' => '@{[$self->uri]}',
+        {
+          headers => {
+@{[$self->_build_rest_client_headers('            ', %options)]}
+          },
+          @content
+        },
+    );
+@postamble
+SNIPPET
+};
+
 =head2 C<< $r->as_curl >>
 
     print $r->as_curl;
@@ -1114,7 +1230,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2018-2025 by Max Maischein C<corion@cpan.org>.
+Copyright 2018-2026 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

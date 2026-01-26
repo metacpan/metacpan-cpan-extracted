@@ -1,6 +1,6 @@
 package Pod::Elemental::Transformer::Author::GETTY;
 # ABSTRACT: Transform custom POD commands to =head2
-our $VERSION = '0.303';
+our $VERSION = '0.304';
 use Moose;
 with 'Pod::Elemental::Transformer';
 
@@ -57,7 +57,7 @@ Pod::Elemental::Transformer::Author::GETTY - Transform custom POD commands to =h
 
 =head1 VERSION
 
-version 0.303
+version 0.304
 
 =head1 SYNOPSIS
 
@@ -124,10 +124,6 @@ C<=example> - for documenting examples
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/issues>.
-
-=head2 IRC
-
-You can reach Getty on C<irc.perl.org> for questions and support.
 
 =head1 CONTRIBUTING
 

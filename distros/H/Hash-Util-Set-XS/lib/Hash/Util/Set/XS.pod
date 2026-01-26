@@ -1,0 +1,23 @@
+=pod
+
+=head1 NAME
+
+Hash::Util::Set::XS - XS implementation of L<Hash::Util::Set>
+
+=head1 DESCRIPTION
+
+L<Hash::Util::Set> automatically uses C<Hash::Util::Set::XS> if available. 
+Do not use this package directly, use L<Hash::Util::Set> instead.
+
+=head1 AUTHOR
+
+Christian Hansen <chansen@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2025 Christian Hansen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

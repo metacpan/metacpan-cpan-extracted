@@ -1,0 +1,30 @@
+---
+abstract: 'XS implementation of L<Hash::Util::Set>'
+author:
+  - 'Christian Hansen <chansen@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  ExtUtils::ParseXS: 3.18
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.21'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hash-Util-Set-XS
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  XSLoader: 0.02
+  perl: 5.10.1
+resources:
+  bugtracker: https://github.com/chansen/p5-hash-util-set-xs/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/chansen/p5-hash-util-set-xs
+version: '0.01'

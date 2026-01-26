@@ -1,12 +1,14 @@
 # Prefer numeric version for backwards compatibility
-BEGIN { require 5.010_001 }; ## no critic ( RequireUseStrict, RequireUseWarnings )
+BEGIN { require 5.010_000 }; ## no critic ( RequireUseStrict, RequireUseWarnings )
 use strict;
 use warnings;
 
 package Getopt::Guided;
 
-$Getopt::Guided::VERSION = 'v3.0.1';
+$Getopt::Guided::VERSION = 'v3.0.2';
 
+# Options Delimiter
+sub OD () { '-' }
 # End Of Options Delimiter
 sub EOOD () { '--' }
 # Flag Indicator Character Class
@@ -18,7 +20,12 @@ sub TRUE () { !!1 }
 # Perl boolean false value
 sub FALSE () { !!0 }
 
-@Getopt::Guided::EXPORT_OK = qw( EOOD getopts processopts );
+@Getopt::Guided::EXPORT_OK = qw( EOOD getopts print_version_info processopts );
+
+sub basename ( $ ) {
+  require File::Basename;
+  goto &File::Basename::basename
+}
 
 sub croakf ( $@ ) {
   @_ = ( ( @_ == 1 ? shift : sprintf shift, @_ ) . ', stopped' );
@@ -75,7 +82,7 @@ sub getopts ( $\%;\@ ) {
   my @argv_backup = @$argv;
   my @error;
   # Guideline 4, Guideline 9
-  while ( @$argv and my ( $name, $rest ) = ( $argv->[ 0 ] =~ m/\A - (.) (.*)/ox ) ) {
+  while ( @$argv and my ( $name, $rest ) = ( $argv->[ 0 ] =~ m/\A ${ \( OD ) } (.) (.*)/ox ) ) {
     # Guideline 10
     shift @$argv, last
       if $argv->[ 0 ] eq EOOD;
@@ -125,7 +132,7 @@ sub getopts ( $\%;\@ ) {
         # Shift delimeted option name
         shift @$argv
       } else {
-        $argv->[ 0 ] = "-$rest" ## no critic ( RequireLocalizedPunctuationVars )
+        $argv->[ 0 ] = OD . $rest ## no critic ( RequireLocalizedPunctuationVars )
       }
     }
 
@@ -137,11 +144,18 @@ sub getopts ( $\%;\@ ) {
     %$opts = ();
     # Prepare and print warning message:
     # Program name, type of error, and invalid option character
-    require File::Basename;
-    warn sprintf( "%s: %s -- %s\n", File::Basename::basename( $0 ), @error ) ## no critic ( RequireCarping )
+    warn sprintf( "%s: %s -- %s\n", basename( $0 ), @error ) ## no critic ( RequireCarping )
   }
 
   @error == 0
+}
+
+sub print_version_info {
+  # Prepare and print version info message:
+  # - Program name and version (first line)
+  # - Interpreter name ("perl") and version (second line)
+  printf STDOUT "%s %s\nperl v%vd\n", basename( $0 ), $main::VERSION, $^V;
+  EOOD
 }
 
 sub processopts ( \@@ ) {
@@ -154,7 +168,7 @@ sub processopts ( \@@ ) {
 
   return FALSE unless getopts $spec_as_hash, my %opts, @$argv;
 
-  # This ordered processing could be a feature
+  # This ordered processing is a feature!
   for ( my $i = 0 ; $i < @_ ; $i += 2 ) {
     # If $_[ $i ] refers to a flag with no indicator, the split still returns
     # the empty string (not undef!) as the value for the indicator
@@ -169,7 +183,12 @@ sub processopts ( \@@ ) {
         @{ $dest } = @$value
       } elsif ( $dest_ref_type eq 'CODE' ) {
         # Callbacks are called in scalar context
-        last if $dest->( $value, $name, $indicator ) eq EOOD
+        # If EOOD is the return value of the callback,
+        # processopts() will terminate early. The return value will be
+        # a special TRUE value. Using $name is not sufficient because 0 and 1
+        # a posible values for $name.
+        return ( OD . $name )
+          if ( $dest->( $value, $name, $indicator ) // '' ) eq EOOD
       } else {
         croakf "'%s' is an unsupported destination reference type for the '%s' indicator", $dest_ref_type, $indicator
       }

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package CPAN::Meta::Prereqs;
 
-our $VERSION = '2.150011';
+our $VERSION = '2.150012';
 
 #pod =head1 DESCRIPTION
 #pod
@@ -326,7 +326,7 @@ CPAN::Meta::Prereqs - a set of distribution prerequisites by phase and type
 
 =head1 VERSION
 
-version 2.150011
+version 2.150012
 
 =head1 DESCRIPTION
 
@@ -458,7 +458,7 @@ David Golden <dagolden@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =item *
 

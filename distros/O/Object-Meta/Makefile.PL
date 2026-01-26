@@ -11,6 +11,10 @@ WriteMakefile(
     BUILD_REQUIRES   => {
         'ExtUtils::MakeMaker' => '6.46',
     },
+    PREREQ_PM => {
+        'Data::Dump'                => '0',
+        'Digest::MD5'               => '0',
+    },
     META_MERGE          => {
         'meta-spec' => { version => 2 },
         resources       => {

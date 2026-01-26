@@ -15,3 +15,4 @@ pm_to_blib
 \.git(ignore|attributes)
 gz$
 ^V\.pm$
+^\.test_info\.

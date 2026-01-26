@@ -1,0 +1,83 @@
+=pod
+
+=head1 NAME
+
+Net::BitTorrent::Protocol::BEP03::Bencode - Utility functions for BEP03: The BitTorrent Protocol Specification
+
+=head1 SYNOPSIS
+
+    my $data = bencode( ... );
+    my $ref = bdecode( $data );
+
+=head1 Description
+
+Bencoding is the BitTorrent protocol's basic serialization and data organization format. The specification supports
+integers, lists (arrays), dictionaries (hashes), and byte strings.
+
+=head1 Functions
+
+By default, nothing is exported.
+
+You may import any of the following functions by name or with the C<:all> tag.
+
+=head2 C<bencode( ... )>
+
+    $data = bencode( 100 );
+    $data = bencode( { balance => '100.3', first => 'John', last => 'Smith' } );
+    $data = bencode( [ { count => 1, product => 'apple' }, 30] );
+
+Expects a single value (basic scalar, array reference, or hash reference) and returns a single string.
+
+=head2 C<bdecode( ... )>
+
+    $data = bdecode( 'i100e' );
+    $data = bdecode( 'd7:balance5:100.35:first4:John4:last5:Smithe' );
+    $data = bdecode( 'ld5:counti1e7:product5:appleei30ee' );
+
+Expects a bencoded string.  The return value depends on the type of data contained in the string.
+
+This function will C<die> on malformed data.
+
+=head1 See Also
+
+=over
+
+=item The BitTorrent Protocol Specification
+
+L<https://bittorrent.org/beps/bep_0003.html>
+
+=item Other Bencode related modules:
+
+=over
+
+=item L<Convert::Bencode|Convert::Bencode>
+
+=item L<Bencode|Bencode>
+
+=item L<Convert::Bencode_XS|Convert::Bencode_XS>
+
+=back
+
+=back
+
+=head1 Author
+
+Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/
+
+CPAN ID: SANKO
+
+=head1 License and Legal
+
+Copyright (C) 2008-2026 by Sanko Robinson <sanko@cpan.org>
+
+This program is free software; you can redistribute it and/or modify it under the terms of L<The Artistic License
+2.0|http://www.perlfoundation.org/artistic_license_2_0>. See the F<LICENSE> file included with this distribution or
+L<notes on the Artistic License 2.0|http://www.perlfoundation.org/artistic_2_0_notes> for clarification.
+
+When separated from the distribution, all original POD documentation is covered by the L<Creative Commons
+Attribution-Share Alike 3.0 License|http://creativecommons.org/licenses/by-sa/3.0/us/legalcode>. See the
+L<clarification of the CCA-SA3.0|http://creativecommons.org/licenses/by-sa/3.0/us/>.
+
+Neither this module nor the L<Author|/Author> is affiliated with BitTorrent, Inc.
+
+=cut

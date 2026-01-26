@@ -1,0 +1,16 @@
+NAME
+    Hash::Util::Set::XS - XS implementation of Hash::Util::Set
+
+DESCRIPTION
+    Hash::Util::Set automatically uses "Hash::Util::Set::XS" if available.
+    Do not use this package directly, use Hash::Util::Set instead.
+
+AUTHOR
+    Christian Hansen <chansen@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2025 Christian Hansen
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

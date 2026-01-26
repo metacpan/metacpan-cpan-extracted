@@ -5,6 +5,7 @@ OutputFilter.pm
 README
 cpanfile
 CONTRIBUTING.md
+SECURITY.md
 t/00_pod.t
 t/01_pod.t
 t/20_margin.t

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::Bundle::More;
 
 plan skip_all => 'XML::Simple required'
     unless eval "use XML::Simple; 1";

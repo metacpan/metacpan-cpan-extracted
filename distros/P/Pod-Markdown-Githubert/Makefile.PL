@@ -19,8 +19,7 @@ sub MY::postamble {
 
 sub find_tests_recursively_in {
     my ($dir) = @_;
-    -e $dir or return ();
-    -d _ or die "$dir is not a directory";
+    -d $dir or die "$dir is not a directory";
 
     my %seen;
     my $wanted = sub {
@@ -50,9 +49,11 @@ my %settings = %{do "./$settings_file" or die "Internal error: can't do $setting
 
     $settings{CONFIGURE_REQUIRES}{strict}                ||= 0;
     $settings{CONFIGURE_REQUIRES}{warnings}              ||= 0;
-    $settings{CONFIGURE_REQUIRES}{'ExtUtils::MakeMaker'} ||= 0;
     $settings{CONFIGURE_REQUIRES}{'File::Find'}          ||= 0;
     $settings{CONFIGURE_REQUIRES}{'File::Spec'}          ||= 0;
+    for ($settings{CONFIGURE_REQUIRES}{'ExtUtils::MakeMaker'}) {
+        $_ = '7.0' if !$_ || $_ < 7;
+    }
 
     my $module_file = $settings{NAME};
     $module_file =~ s!::!/!g;
@@ -102,7 +103,11 @@ my %settings = %{do "./$settings_file" or die "Internal error: can't do $setting
     if (my $repo = delete $settings{REPOSITORY}) {
         if (ref($repo) eq 'ARRAY') {
             my ($type, @args) = @$repo;
-            if ($type eq 'github') {
+            my %sites = (
+                github   => 'github.com',
+                codeberg => 'codeberg.org',
+            );
+            if (defined(my $site = $sites{$type})) {
                 my ($account, $project) = @args;
                 $project ||= '%d';
                 $project =~ s{%(L?)(.)}{
@@ -113,10 +118,10 @@ my %settings = %{do "./$settings_file" or die "Internal error: can't do $setting
                         die "Internal error: unknown placeholder %$1$2";
                     $1 ? lc($x) : $x
                 }seg;
-                my $addr = "github.com/$account/$project";
+                my $addr = "$site/$account/$project";
                 $repo = {
                     type => 'git',
-                    url  => "git://$addr",
+                    url  => "https://$addr.git",
                     web  => "https://$addr",
                 };
             } else {
@@ -127,45 +132,13 @@ my %settings = %{do "./$settings_file" or die "Internal error: can't do $setting
         @{$settings{META_MERGE}{resources}{repository}}{keys %$repo} = values %$repo;
     }
 
+    if (my $bugtracker = delete $settings{BUGTRACKER}) {
+        $settings{META_MERGE}{resources}{bugtracker}{web} = $bugtracker;
+    }
+
     if (my $harness_options = delete $settings{HARNESS_OPTIONS}) {
         $settings{postamble}{HARNESS_OPTIONS} = $harness_options;
     }
 }
-
-(my $mm_version = ExtUtils::MakeMaker->VERSION) =~ tr/_//d;
-
-if ($mm_version < 6.63_03) {
-    $settings{META_MERGE}{resources}{repository} = $settings{META_MERGE}{resources}{repository}{url}
-        if $settings{META_MERGE}{resources} &&
-           $settings{META_MERGE}{resources}{repository} &&
-           $settings{META_MERGE}{resources}{repository}{url};
-    delete $settings{META_MERGE}{'meta-spec'}{version};
-} elsif ($mm_version < 6.67_04) {
-    # Why? For the glory of satan, of course!
-    no warnings qw(redefine);
-    *ExtUtils::MM_Any::_add_requirements_to_meta_v1_4 = \&ExtUtils::MM_Any::_add_requirements_to_meta_v2;
-}
-
-{
-    my $merge_key_into = sub {
-        my ($target, $source) = @_;
-        %{$settings{$target}} = (%{$settings{$target}}, %{delete $settings{$source}});
-    };
-
-    $merge_key_into->('BUILD_REQUIRES', 'TEST_REQUIRES')
-        if $mm_version < 6.63_03;
-
-    $merge_key_into->('CONFIGURE_REQUIRES', 'BUILD_REQUIRES')
-        if $mm_version < 6.55_01;
-
-    $merge_key_into->('PREREQ_PM', 'CONFIGURE_REQUIRES')
-        if $mm_version < 6.51_03;
-}
-
-delete $settings{MIN_PERL_VERSION} if $mm_version < 6.47_01;
-delete $settings{META_MERGE}       if $mm_version < 6.46;
-delete $settings{LICENSE}          if $mm_version < 6.30_01;
-delete $settings{ABSTRACT_FROM}    if $mm_version < 6.06_03;
-delete $settings{AUTHOR}           if $mm_version < 6.06_03;
 
 WriteMakefile %settings;

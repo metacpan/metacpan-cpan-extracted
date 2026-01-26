@@ -1,14 +1,13 @@
 #
 # @author Bodo (Hugo) Barwich
-# @version 2025-10-21
+# @version 2026-01-26
 # @package Object::Meta
-# @subpackage Object/Meta.pm
+# @subpackage lib/Object/Meta.pm
 
 # This Module defines Classes to manage Data in an indexed List
 #
 #---------------------------------
 # Requirements:
-# - The Perl Package "libconst-fast-perl" must be installed
 #
 #---------------------------------
 # Features:
@@ -19,13 +18,13 @@
 
 =head1 NAME
 
-Object::Meta - Library to manage data and meta data as one object but keeping it separate
+Object::Meta - Library to manage raw data and meta data as one object but keeping it separate
 
 =cut
 
 package Object::Meta;
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.1.0';
 
 #----------------------------------------------------------------------------
 #Dependencies
@@ -35,7 +34,7 @@ use constant LIST_META_DATA => 1;
 
 =head1 DESCRIPTION
 
-C<Object::Meta> implements a Class to manage a data and additional meta data as an object
+C<Object::Meta> implements a class to manage raw data and additional meta data as an object
 
 Of special importance is the B<Index Field> which is use to create an automatical index
 in the C<Object::Meta::List>.
@@ -51,13 +50,17 @@ It does not require lengthly creation of definition modules.
 
 =head2 Constructor
 
-=over 4
-
-=item new ( [ DATA ] )
+=head3 new ( [ DATA ] )
 
 This is the constructor for a new C<Object::Meta> object.
 
-C<DATA> - is B<physical data> which is passed in a hash like fashion,
+B<Parameters:>
+
+=over 4
+
+=item C<DATA>
+
+The B<raw data> which is passed in a hash like fashion,
 using key and value pairs.
 
 =back
@@ -80,7 +83,6 @@ sub new {
         Object::Meta::set( $self, @_[ 1 .. $#_ ] );
     }
 
-    #Give the Object back
     return $self;
 }
 
@@ -97,13 +99,17 @@ sub DESTROY {
 
 =head2 Administration Methods
 
+=head3 set ( DATA )
+
+This method will populate the B<raw Data Fields> with values.
+
+B<Parameters:>
+
 =over 4
 
-=item set ( DATA )
+=item C<DATA>
 
-This method will asign values to B<physically Data Fields>.
-
-C<DATA> is a list which is passed in a hash like fashion, using key and value pairs.
+A list which is passed in a hash like fashion, using key and value pairs.
 
 =back
 
@@ -117,8 +123,8 @@ sub set {
         #The Field Name must not be empty
         if ( $_ ne '' ) {
             $self->[LIST_DATA]{$_} = $hshprms{$_};
-        }    #if($_ ne "")
-    }    #foreach (keys %hshprms)
+        }
+    }
 }
 
 =pod
@@ -141,10 +147,10 @@ sub setMeta {
     foreach ( keys %hshprms ) {
 
         #The Field Name must not be empty
-        if ( $_ ne "" ) {
+        if ( $_ ne '' ) {
             $self->[LIST_META_DATA]{$_} = $hshprms{$_};
-        }    #if($_ ne "")
-    }    #foreach (keys %hshprms)
+        }
+    }
 }
 
 =pod
@@ -167,7 +173,7 @@ sub setIndexField {
 
     if ( defined $sindexfield ) {
         Object::Meta::setMeta( $self, 'indexfield', $sindexfield );
-    }    #if(defined $sindexfield)
+    }
 
 }
 
@@ -193,7 +199,7 @@ sub setIndexValue {
         && $sindexfield ne '' )
     {
         Object::Meta::set( $self, $sindexfield, $sindexvalue );
-    }    #if(defined $sindexvalue && $sindexfield ne "")
+    }
 }
 
 sub Clear {
@@ -240,7 +246,7 @@ sub get {
 
     unless ($imta) {
         if ( defined $sfieldname
-            && $sfieldname ne "" )
+            && $sfieldname ne '' )
         {
             if ( exists $self->[LIST_DATA]{$sfieldname} ) {
                 $srs = $self->[LIST_DATA]{$sfieldname};
@@ -249,13 +255,13 @@ sub get {
                 #Check as Meta Field
                 $srs = Object::Meta::getMeta( $self, $sfieldname, $sdefault );
             }
-        }    #if(defined $sfieldname && $sfieldname ne "")
+        }
     }
     else     #A Meta Field is requested
     {
         #Check a Meta Field
         $srs = Object::Meta::getMeta( $self, $sfieldname, $sdefault );
-    }        #unless($imta)
+    }
 
     return $srs;
 }
@@ -282,12 +288,12 @@ sub getMeta {
     my $srs = $sdefault;
 
     if ( defined $sfieldname
-        && $sfieldname ne "" )
+        && $sfieldname ne '' )
     {
         $srs = $self->[LIST_META_DATA]{$sfieldname}
           if ( exists $self->[LIST_META_DATA]{$sfieldname} );
 
-    }    #if(defined $sfieldname && $sfieldname ne "")
+    }
 
     return $srs;
 }

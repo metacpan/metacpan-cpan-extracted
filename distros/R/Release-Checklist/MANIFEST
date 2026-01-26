@@ -6,6 +6,7 @@ Checklist.pm
 Checklist.pod
 check-versions.pl
 CONTRIBUTING.md
+SECURITY.md
 examples/xt/00_perlversion.t
 examples/xt/00_pod.t
 examples/xt/01_pod.t

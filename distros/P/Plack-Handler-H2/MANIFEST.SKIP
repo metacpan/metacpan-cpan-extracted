@@ -1,0 +1,74 @@
+# Version control
+^\.git/
+^\.gitignore$
+^\.github/
+
+# Build artifacts
+^blib/
+^pm_to_blib$
+^blibdirs$
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^\..*\.sw[po]$
+^\.build/
+
+# Object files and compiled artifacts
+\.o$
+\.obj$
+\.bs$
+\.c$
+\.so$
+\.dll$
+\.dylib$
+\.exe$
+
+# Backup and temporary files
+~$
+\.bak$
+\.tmp$
+\.old$
+\#$
+^test\.
+
+# IDE and editor files
+^\.vscode/
+^\.idea/
+^\.settings/
+^\.project$
+^\.classpath$
+^\.DS_Store$
+\.swp$
+\.swo$
+
+# SSL certificates (test files only)
+^server\.crt$
+^server\.key$
+^cert\.pem$
+^key\.pem$
+
+# Perl specific
+^_build/
+^Build$
+^Build.bat$
+^cover_db/
+^nytprof/
+^nytprof\.out$
+^MANIFEST\.bak$
+^pod2htm.*\.tmp$
+
+# Distribution files
+^Plack-Handler-H2-\d
+\.tar\.gz$
+\.zip$
+
+# Test coverage
+^cover_db/
+
+# Benchmark results
+^benchmark/results/
+^benchmark/.*\.log$
+
+# Temporary test files
+^t/tmp/
+^t/.*\.tmp$

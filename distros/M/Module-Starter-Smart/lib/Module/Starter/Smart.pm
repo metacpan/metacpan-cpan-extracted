@@ -12,11 +12,11 @@ an existing distribution
 
 =head1 VERSION
 
-version 0.0.9
+version 0.0.10
 
 =cut
 
-our $VERSION = '0.0.9';
+our $VERSION = '0.0.10';
 
 =head1 SYNOPSIS
 
@@ -373,6 +373,9 @@ Markus Böhme
 =item *
 Lisa Hare
 
+=item *
+Gregor Herrmann
+
 =back
 
 =head1 AUTHOR
@@ -381,7 +384,7 @@ Ruey-Cheng Chen  C<< <rueycheng@cpan.com> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2006, 2012, 2017 Ruey-Cheng Chen C<< <rueycheng@cpan.com> >>. All rights reserved.
+Copyright (c) 2006, 2012, 2017, 2026 Ruey-Cheng Chen C<< <rueycheng@cpan.com> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

@@ -5,20 +5,31 @@ use strict;
 use warnings;
 use utf8;
 
-use Getopt::Long qw(GetOptionsFromArray :config gnu_compat);
-use Pod::Usage   qw(pod2usage);
 use Carp         ();
-use JSON::PP     ();
 use Data::Dumper ();
+use Getopt::Long qw(GetOptionsFromArray :config gnu_compat);
+use JSON::PP     ();
+use Pod::Text    ();
+use Pod::Usage   qw(pod2usage);
 
-use URI::PackageURL ();
+use URI::PackageURL       ();
+use URI::PackageURL::Type ();
+use URI::PackageURL::Util qw(purl_types);
 
-our $VERSION = '2.23';
+our $VERSION = '2.24';
 
 sub cli_error {
     my ($error) = @_;
     $error =~ s/ at .* line \d+.*//;
-    print STDERR "ERROR: $error\n";
+    say STDERR "ERROR: $error";
+}
+
+sub print_stdout {
+    say STDOUT $_[0] if $_[1];
+}
+
+sub print_stderr {
+    say STDERR $_[0] if $_[1];
 }
 
 sub run {
@@ -35,6 +46,11 @@ sub run {
 
             download-url
             repository-url
+
+            validate
+            quiet|q
+            info=s
+            list
 
             type=s
             namespace=s
@@ -63,7 +79,7 @@ sub run {
         say <<"VERSION";
 $progname version $URI::PackageURL::VERSION
 
-Copyright 2022-2025, Giuseppe Di Terlizzi <gdt\@cpan.org>
+Copyright 2022-2026, Giuseppe Di Terlizzi <gdt\@cpan.org>
 
 This program is part of the "URI-PackageURL" distribution and is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.
@@ -74,6 +90,14 @@ VERSION
 
         return 0;
 
+    }
+
+    if (defined $options{info}) {
+        return definition_help(lc $options{info});
+    }
+
+    if (defined $options{list}) {
+        return purl_list();
     }
 
     if (defined $options{type}) {
@@ -94,7 +118,7 @@ VERSION
             return 1;
         }
 
-        print "$purl\n";
+        print "$purl" . (defined $options{null} ? "\0" : "\n");
         return 0;
 
     }
@@ -109,6 +133,16 @@ VERSION
     $options{format} = 'env'    if defined $options{env};
 
     my $purl = eval { URI::PackageURL->from_string($purl_string) };
+
+    if ($options{validate}) {
+
+        unless ($options{quiet}) {
+            say STDERR $purl ? 'true' : 'false';
+        }
+
+        return $purl ? 0 : 1;
+
+    }
 
     if ($@) {
         cli_error($@);
@@ -140,18 +174,18 @@ VERSION
     }
 
     if ($options{format} eq 'dumper') {
-        print Data::Dumper->new([$purl])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump;
+        print Data::Dumper->new([$purl->to_hash])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump;
         return 0;
     }
 
     if ($options{format} eq 'yaml') {
 
         if (eval { require YAML::XS }) {
-            print YAML::XS::Dump($purl);
+            print YAML::XS::Dump($purl->to_hash);
             return 0;
         }
         if (eval { require YAML }) {
-            print YAML::Dump($purl);
+            print YAML::Dump($purl->to_hash);
             return 0;
         }
 
@@ -204,6 +238,244 @@ VERSION
 
 }
 
+sub _md_to_pod {
+
+    my $text = shift;
+
+    $text =~ s/(``([^``]*)``)/C<$2>/gm;
+    $text =~ s/(`([^`]*)`)/C<$2>/gm;
+
+    return $text;
+
+}
+
+sub purl_list {
+
+    my @types = purl_types();
+
+    my $pattern = "%15s | %10s | %10s | %10s | %10s | %s";
+
+    say sprintf $pattern, 'TYPE', 'NAMESPACE', 'NAME', 'VERSION', 'SUBPATH', 'QUALIFIERS';
+
+    say sprintf "%s-|-%s-|-%s-|-%s-|-%s-|-%s", '-' x 15, '-' x 10, '-' x 10, '-' x 10, '-' x 10, '-' x 10;
+
+    for my $type (@types) {
+
+        my $definition = URI::PackageURL::Type->new($type);
+
+        my $namespace  = '-';
+        my $name       = '-';
+        my $version    = '-';
+        my $subpath    = '-';
+        my $qualifiers = '-';
+
+        if ($definition->component_have_definition('namespace')) {
+            $namespace = $definition->component_requirement('namespace') // '-';
+        }
+
+        if ($definition->component_have_definition('name')) {
+            $name = $definition->component_requirement('name') // '-';
+        }
+
+        if ($definition->component_have_definition('version')) {
+            $version = $definition->component_requirement('version') // '-';
+        }
+
+        if ($definition->component_have_definition('subpath')) {
+            $subpath = $definition->component_requirement('subpath') // '-';
+        }
+
+        if (@{$definition->qualifiers_definition}) {
+            $qualifiers = join ", ", map { $_->{key} } @{$definition->qualifiers_definition};
+        }
+
+        say sprintf $pattern, $type, $namespace, $name, $version, $subpath, $qualifiers;
+
+    }
+
+    return 0;
+
+}
+
+
+sub definition_help {
+
+    my $type = shift;
+
+    my $definition = URI::PackageURL::Type->new($type);
+
+    unless (%{$definition->definition}) {
+        say "No known PURL type definition for '$type'";
+        exit 1;
+    }
+
+    my $type_name      = $definition->type_name;
+    my $description    = $definition->description;
+    my $reference_urls = $definition->reference_urls;
+    my $examples       = $definition->examples;
+    my $note           = $definition->note;
+    my $repository     = $definition->repository;
+    my $schema_id      = $definition->schema_id;
+
+    my $qualifiers_definition = $definition->qualifiers_definition;
+
+    my $have_ns = ($definition->component_is_required('namespace') || $definition->component_is_optional('namespace'));
+
+    my $purl_syntax = "pkg:$type";
+    $purl_syntax .= '/E<lt>namespaceE<gt>' if $have_ns;
+    $purl_syntax .= '/E<lt>nameE<gt>@E<lt>versionE<gt>?E<lt>qualifiersE<gt>#E<lt>subpathE<gt>';
+
+    my $man = <<"MAN";
+=head1 NAME
+
+$type - $type_name
+
+=head1 DESCRIPTION
+
+$description
+
+=head1 SYNTAX
+
+The structure of a PURL for this package type is:
+
+C<$purl_syntax>
+
+MAN
+
+    foreach my $component (qw[namespace name version subpath]) {
+
+        next unless $definition->component_have_definition($component);
+
+        my $requirement          = $definition->component_requirement($component);
+        my $permitted_characters = $definition->component_permitted_characters($component);
+        my $normalization_rules  = $definition->component_normalization_rules($component);
+        my $case_sensitive       = $definition->component_case_sensitive($component);
+        my $native_name          = $definition->component_native_name($component);
+        my $note                 = $definition->component_note($component);
+
+        $man .= sprintf "=head2 %s\n\n", ucfirst $component;
+        $man .= "=over 2\n\n";
+
+        if ($requirement) {
+            $man .= sprintf "=item B<Requirement>: %s\n\n", ucfirst($requirement);
+        }
+
+        if ($permitted_characters) {
+            $man .= sprintf "=item B<Permitted Characters>: %s\n\n", ucfirst($permitted_characters);
+        }
+
+        if ($case_sensitive) {
+            $man .= sprintf "=item B<Is Case Sensitive>: %s\n\n", ($case_sensitive ? 'Yes' : 'No');
+        }
+
+        if (@{$normalization_rules}) {
+
+            $man .= "=item B<Normalization Rules>:\n\n";
+            $man .= "=over 2\n\n";
+
+            foreach (@{$normalization_rules}) {
+                $man .= sprintf "=item * %s\n\n", $_;
+            }
+
+            $man .= "=back\n\n";
+
+        }
+
+        if ($native_name) {
+            $man .= "=item B<Native Label>: $native_name\n\n";
+        }
+
+        $man .= "=back\n\n";
+
+        if ($note) {
+            $man .= sprintf "%s\n\n", _md_to_pod($note);
+        }
+    }
+
+    if (@{$qualifiers_definition}) {
+
+        $man .= "=head2 Qualifiers\n\n";
+        $man .= "=over 2\n\n";
+
+        foreach my $qualifier (@{$qualifiers_definition}) {
+
+            $man .= sprintf "=item C<%s>\n\n", $qualifier->{key};
+
+            if (my $requirement = $qualifier->{requirement}) {
+                $man .= sprintf "Requirement: %s\n\n", ucfirst($requirement);
+            }
+
+            if (my $native_name = $qualifier->{native_name}) {
+                $man .= sprintf "Native name: %s\n\n", $native_name;
+            }
+
+            if (my $default_value = $qualifier->{default_value}) {
+                $man .= sprintf "Default value: %s\n\n", $default_value;
+            }
+
+            $man .= sprintf "%s\n\n", _md_to_pod($qualifier->{description});
+
+        }
+
+        $man .= "=back\n\n";
+
+    }
+
+    if ($repository) {
+
+        my $use_repository         = $repository->{use_repository} ? 'Yes' : 'No';
+        my $default_repository_url = $repository->{default_repository_url};
+
+        $man .= "=head1 REPOSITORY\n\n";
+        $man .= "=over\n\n";
+        $man .= sprintf "=item B<Use repository>: %s\n\n",         $repository->{use_repository} ? 'Yes' : 'No';
+        $man .= sprintf "=item B<Default repository URL>: %s\n\n", $repository->{default_repository_url} || '(none)';
+        $man .= "=back\n\n";
+
+        if (my $note = $repository->{note}) {
+            $man .= sprintf "%s\n\n", _md_to_pod($note);
+        }
+
+    }
+
+    if (@{$examples}) {
+
+        $man .= "=head1 EXAMPLES\n\n";
+        $man .= "=over 2\n\n";
+
+        foreach (@{$examples}) {
+            $man .= sprintf "=item * %s\n\n", $_;
+        }
+
+        $man .= "=back\n\n";
+
+    }
+
+    if ($note) {
+        $man .= "=head1 NOTES\n\n";
+        $man .= sprintf "$note\n\n";
+    }
+
+    $man .= "=head1 REFERENCES\n\n";
+    $man .= "=over 2\n\n";
+
+    $man .= sprintf "=item * %s schema ID, L<%s>\n\n", $type_name, $schema_id;
+
+    foreach (@{$reference_urls}) {
+        $man .= sprintf "=item * %s reference, L<%s>\n\n", $type_name, $_;
+    }
+
+    $man .= "=item * PURL specification, L<https://github.com/package-url/purl-spec>\n\n";
+    $man .= "=item * VERS specification, L<https://github.com/package-url/vers-spec>\n\n";
+
+    $man .= "=back\n\n";
+
+    Pod::Text->new->parse_string_document($man, \my $output);
+
+    exit;
+
+}
+
 1;
 
 __END__
@@ -212,7 +484,7 @@ __END__
 
 =head1 NAME
 
-URI::PackageURL::App - URI::PackageURL (purl) Command Line Interface
+URI::PackageURL::App - URI::PackageURL (PURL) Command Line Interface
 
 =head1 SYNOPSIS
 
@@ -242,7 +514,7 @@ L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2022-2025 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+Copyright © 2022-2026 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 You may use and distribute this module according to the same terms
 that Perl is distributed under.

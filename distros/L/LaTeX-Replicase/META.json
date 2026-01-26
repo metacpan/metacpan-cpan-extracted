@@ -33,18 +33,29 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "File::Basename" : "2.86",
+            "File::Basename" : "2.00",
             "File::Compare" : "1.00",
             "File::Path" : "2.18",
             "Test::Exception" : "0.43",
             "Test::More" : "0.98",
             "Test::More::UTF8" : "0.05",
+            "Test::Output" : "1.01",
             "Test::Pod" : "1.22",
             "perl" : "5.010000"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.350",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/AlessandroGorohovski/LaTeX-Replicase/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/AlessandroGorohovski/LaTeX-Replicase.git",
+         "web" : "https://github.com/AlessandroGorohovski/LaTeX-Replicase"
+      }
+   },
+   "version" : "0.590",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

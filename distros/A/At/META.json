@@ -43,7 +43,17 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.035"
+            "CPAN::Meta" : "0",
+            "ExtUtils::Helpers" : "0.028",
+            "ExtUtils::Install" : "0",
+            "ExtUtils::InstallPaths" : "0.002",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec::Functions" : "0",
+            "JSON::PP" : "2",
+            "Path::Tiny" : "0",
+            "perl" : "v5.42.0"
          }
       },
       "develop" : {
@@ -99,7 +109,7 @@
    "provides" : {
       "At" : {
          "file" : "lib/At.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       },
       "At::Error" : {
          "file" : "lib/At/Error.pm",
@@ -147,7 +157,7 @@
          "web" : "https://github.com/sanko/At.pm"
       }
    },
-   "version" : "1.0",
+   "version" : "1.1",
    "x_contributors" : [
       "Akiomi Kamakura <akiomik@gmail.com>",
       "Alberto Roura <mail@albertoroura.com>",

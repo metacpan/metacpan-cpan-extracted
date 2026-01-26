@@ -1,3 +1,14 @@
+0.95    - 25 Jan 2026, H.Merijn Brand
+    * It's 2026
+    * Update to Devel-PPPort-3.73
+    * Add SECURITY.md
+
+0.94    - 18 Jun 2024, H.Merijn Brand
+    * Update Unicode release hist
+    * It's 2024
+    * Update to Devel-PPPort-3.72
+    * Tested with perl-5.40
+
 0.93    - 06 Jan 2023, H.Merijn Brand
     * It's 2023
     * Update to Devel-PPPort-3.68

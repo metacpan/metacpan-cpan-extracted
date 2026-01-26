@@ -134,7 +134,7 @@ sub check_kit {
     die "!! No distribution data found (expected at $datadir). You could define a different data directory (containing M31.bmp, wikiX.html etc) with the -datapath option. Refer to the documentation for more about installation etc.\n" unless $datadir && -f catfile($datadir, "wiki0.html") && -f catfile($datadir, "M31.bmp");
 
     unless ($opt{skip_prove} || -e catfile($datadir, 't', 'recipes')) {
-        $opt{skip_proove} = 1;
+        $opt{skip_prove} = 1;
         warn "!! Moose test data folder not found. Was the distribution not installed properly? Applying --skip-prove.\n";
     }
 

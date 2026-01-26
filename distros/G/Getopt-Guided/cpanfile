@@ -21,6 +21,7 @@ on test => sub {
   requires 'File::Spec::Functions' => '0';
   requires 'Test::Fatal'           => '0';
   requires 'Test::More'            => '1.001005';        # Subtests accept args
+  requires 'Test::Output'          => '0';
   requires 'Test::Script'          => '1.31';
   requires 'Test::Warn'            => '0'
 }

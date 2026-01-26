@@ -1,4 +1,6 @@
 ChangeLog
+CONTRIBUTING.md
+SECURITY.md
 cpanfile
 Files/CVE-1970-1.json
 Files/CVE-2022-26928.json

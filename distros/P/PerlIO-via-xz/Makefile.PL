@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2020-2023 H.Merijn Brand
+# Copyright 2020-2026 H.Merijn Brand
 
 require 5.012000;
 use strict;
@@ -84,8 +84,8 @@ sub postamble {
 	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
 	'doc/PerlIO-via-xz.3:		lib/PerlIO/via/xz.pm',
 	'	pod2man       < $? > $@',
-	'doc/PerlIO-via-xz.man:	doc/PerlIO-via-xz.3',
-	'	nroff -mandoc < $? > $@',
+	'doc/PerlIO-via-xz.man:		doc/PerlIO-via-xz.3',
+	'	nroff2man     < $? > $@',
 	'',
 	$min_vsn;
     } # postamble

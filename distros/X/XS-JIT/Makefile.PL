@@ -6,7 +6,9 @@ use Config;
 
 # Find the xs_jit.c file
 my $xs_jit_c = 'lib/XS/JIT/xs_jit.c';
+my $xs_jit_builder_c = 'lib/XS/JIT/xs_jit_builder.c';
 die "Cannot find $xs_jit_c" unless -f $xs_jit_c;
+die "Cannot find $xs_jit_builder_c" unless -f $xs_jit_builder_c;
 
 my %WriteMakefileArgs = (
     NAME             => 'XS::JIT',
@@ -15,11 +17,11 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/XS/JIT.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.008003',
-    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
-    # XS configuration
+    macro => { TARFLAGS => "--format=ustar -c -v -f" },
+    # XS configuration - JIT.xs in root (standard), Builder.xs handled by postamble
     XSOPT            => '-noprototypes',
-    INC              => '-I.',
-    # Include xs_jit.o in the object files to link
+    INC              => '-I. -Ilib/XS/JIT',
+    # Include xs_jit.o in the object files to link (builder.o goes to its own .so)
     OBJECT           => '$(O_FILES) lib/XS/JIT/xs_jit$(OBJ_EXT)',
 
     CONFIGURE_REQUIRES => {
@@ -34,7 +36,7 @@ my %WriteMakefileArgs = (
         'Config'      => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'XS-JIT-* lib/XS/JIT/*.o lib/XS/*.o *.o' },
+    clean => { FILES => 'XS-JIT-* lib/XS/JIT/*.o lib/XS/*.o *.o blib/arch/auto/XS/JIT/Builder/*' },
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker
@@ -65,6 +67,13 @@ sub postamble {
     my $xs_jit_o = 'lib/XS/JIT/xs_jit$(OBJ_EXT)';
     my $xs_jit_c = 'lib/XS/JIT/xs_jit.c';
     my $xs_jit_h = 'lib/XS/JIT/xs_jit.h';
+    my $xs_jit_builder_o = 'lib/XS/JIT/xs_jit_builder$(OBJ_EXT)';
+    my $xs_jit_builder_c = 'lib/XS/JIT/xs_jit_builder.c';
+    my $xs_jit_builder_h = 'lib/XS/JIT/xs_jit_builder.h';
+    my $builder_xs = 'lib/XS/JIT/Builder.xs';
+    my $builder_c = 'lib/XS/JIT/Builder.c';
+    my $builder_o = 'lib/XS/JIT/Builder$(OBJ_EXT)';
+    my $builder_so = 'blib/arch/auto/XS/JIT/Builder/Builder.$(DLEXT)';
 
     return <<"MAKE";
 
@@ -72,16 +81,37 @@ sub postamble {
 $xs_jit_o : $xs_jit_c $xs_jit_h
 \t\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) -c -o $xs_jit_o $xs_jit_c
 
-# Make sure xs_jit.o is built before linking
+# Compile xs_jit_builder.c to object file
+$xs_jit_builder_o : $xs_jit_builder_c $xs_jit_builder_h
+\t\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) -c -o $xs_jit_builder_o $xs_jit_builder_c
+
+# Make sure xs_jit object is built before linking main module
 \$(INST_DYNAMIC) : $xs_jit_o
 
-# Install header file
-install :: install_xs_jit_header
+# Compile Builder.xs to Builder.c
+$builder_c : $builder_xs
+\t\$(XSUBPPRUN) \$(XSPROTOARG) \$(XSUBPPARGS) -prototypes $builder_xs > $builder_c
 
-install_xs_jit_header :
+# Compile Builder.c to object file
+$builder_o : $builder_c $xs_jit_builder_h
+\t\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" -Ilib/XS/JIT \$(PASTHRU_DEFINE) \$(DEFINE) -c -o $builder_o $builder_c
+
+# Link Builder.so
+$builder_so : $builder_o $xs_jit_builder_o
+\t\$(NOECHO) \$(MKPATH) blib/arch/auto/XS/JIT/Builder
+\t\$(LD) \$(LDDLFLAGS) -o $builder_so $builder_o $xs_jit_builder_o \$(OTHERLDFLAGS) \$(MYEXTLIB) \$(PERL_ARCHIVE) \$(LDLOADLIBS) \$(EXPORT_LIST) \$(PERL_ARCHIVE_AFTER)
+
+# Build Builder as part of dynamic target
+dynamic :: $builder_so
+
+# Install header files
+install :: install_xs_jit_headers
+
+install_xs_jit_headers :
 \t\$(NOECHO) \$(MKPATH) "\$(DESTINSTALLSITEARCH)/auto/XS/JIT"
 \t\$(NOECHO) \$(CP) $xs_jit_h "\$(DESTINSTALLSITEARCH)/auto/XS/JIT/xs_jit.h"
-\t\$(NOECHO) \$(ECHO) "Installed xs_jit.h to \$(DESTINSTALLSITEARCH)/auto/XS/JIT/"
+\t\$(NOECHO) \$(CP) $xs_jit_builder_h "\$(DESTINSTALLSITEARCH)/auto/XS/JIT/xs_jit_builder.h"
+\t\$(NOECHO) \$(ECHO) "Installed headers to \$(DESTINSTALLSITEARCH)/auto/XS/JIT/"
 
 MAKE
 }

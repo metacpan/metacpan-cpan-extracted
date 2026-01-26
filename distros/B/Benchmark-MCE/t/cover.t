@@ -167,6 +167,14 @@ is([Benchmark::MCE::_drop_outliers([@arr, 1, 19],-1)], [@arr, 19], 'Drop left si
 is([Benchmark::MCE::_avg_stdev([])], [0, 0], 'Empty array');
 is([Benchmark::MCE::_min_max_avg([])], [0, 0, 0], 'Empty array');
 
+{
+    package Benchmark::DKbench;
+    our $VERSION = '9.99';
+    sub _probe_package_ver { Benchmark::MCE::_package_ver() }
+}
+
+is(Benchmark::DKbench::_probe_package_ver(), 'Benchmark::DKbench v9.99', 'DKbench caller in _package_ver');
+
 my $mock = Test2::Mock->new(
     class => 'System::CPU',
     override => [ get_cpu => sub {} ]
@@ -184,6 +192,15 @@ my $mock2 = Test2::Mock->new(
 
 @out = suite_calc({include => 'Astro', quick => '1', bench => $bench});
 is(scalar @out, 3, 'Multi / Scalability results');
+
+{
+    my $mock3 = Test2::Mock->new(
+        class => 'Benchmark::MCE',
+        override => [ system_identity => sub {return 1} ]
+    );
+    @out = suite_calc({include => 'Astro', quick => '1', threads => 2, bench => $bench});
+    is(scalar @out, 3, 'suite_calc threads option overrides system_identity');
+}
 
 @out = suite_calc({
         bench => {

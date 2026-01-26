@@ -1,5 +1,12 @@
 Release history for Getopt-Guided
 
+3.0.2    Sun Jan 25 09:22:55 AM CET 2026
+         - Describe processopts()
+         - Exit with code 255, if "broken" utility dies
+         - Lower Perl min version requirement
+         - Improve Makefile.PL
+         - Add api.t test script
+
 3.0.1    Tue Jan  6 10:17:06 AM CET 2026
          - Catch exception raised by die() to make "broken" utility testable
          - Fix wrong getopts() invocations

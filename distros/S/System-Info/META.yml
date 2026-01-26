@@ -8,7 +8,7 @@ build_requires:
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150010
+generated_by: Author, CPAN::Meta::Converter version 2.150011
 license: perl
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ name: System-Info
 provides: 
   System::Info: 
     file: lib/System/Info.pm
-    version: '0.066'
+    version: '0.067'
   System::Info::AIX: 
     file: lib/System/Info/AIX.pm
     version: '0.050'
@@ -58,7 +58,7 @@ provides:
     file: lib/System/Info/Windows.pm
     version: '0.051'
 recommends: 
-  Test::More: '1.302207'
+  Test::More: '1.302219'
 requires: 
   POSIX: 0
   Test::More: '0.88'
@@ -69,4 +69,4 @@ resources:
   bugtracker: https://github.com/Tux/System-Info/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/System-Info
-version: '0.066'
+version: '0.067'

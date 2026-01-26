@@ -6,13 +6,13 @@ build_requires:
   HTML::Entities: '0'
   Test2::V0: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.0'
   File::Find: '0'
   File::Spec: '0'
   strict: '0'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,10 +25,11 @@ no_index:
     - xt
 requires:
   Pod::Markdown: '3.200'
-  perl: '5.012000'
+  perl: '5.010000'
   strict: '0'
   warnings: '0'
 resources:
-  repository: git://github.com/mauke/Pod-Markdown-Githubert
-version: '0.04'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  bugtracker: https://codeberg.org/mauke/Pod-Markdown-Githubert/issues
+  repository: https://codeberg.org/mauke/Pod-Markdown-Githubert.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

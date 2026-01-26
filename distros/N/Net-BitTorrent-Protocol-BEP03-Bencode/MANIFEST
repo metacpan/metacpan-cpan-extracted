@@ -1,0 +1,16 @@
+Build.PL
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+Changes.md
+LICENSE
+MANIFEST
+META.json
+README.md
+SECURITY.md
+cpanfile
+eg/bench.pl
+eg/simple.pl
+eg/torrent_info.pl
+lib/Net/BitTorrent/Protocol/BEP03/Bencode.pm
+lib/Net/BitTorrent/Protocol/BEP03/Bencode.pod
+t/00_basics.t

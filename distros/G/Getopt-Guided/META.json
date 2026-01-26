@@ -38,7 +38,7 @@
          "requires" : {
             "Carp" : "1.32",
             "File::Basename" : "0",
-            "perl" : "5.010001",
+            "perl" : "5.010000",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -49,6 +49,7 @@
             "File::Spec::Functions" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "1.001005",
+            "Test::Output" : "0",
             "Test::Script" : "1.31",
             "Test::Warn" : "0"
          }
@@ -57,7 +58,7 @@
    "provides" : {
       "Getopt::Guided" : {
          "file" : "lib/Getopt/Guided.pm",
-         "version" : "v3.0.1"
+         "version" : "v3.0.2"
       }
    },
    "release_status" : "stable",
@@ -71,5 +72,5 @@
          "web" : "https://github.com/XSven/Getopt-Guided"
       }
    },
-   "version" : "v3.0.1"
+   "version" : "v3.0.2"
 }

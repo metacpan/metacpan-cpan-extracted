@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl extension for Package URL (aka "purl")'
+abstract: 'Perl extension for PURL (Package URL)'
 author:
   - 'Giuseppe Di Terlizzi <gdt@cpan.org>'
 build_requires:
@@ -27,6 +27,6 @@ requires:
 resources:
   bugtracker: https://github.com/giterlizzi/perl-URI-PackageURL/issues
   repository: git://github.com/giterlizzi/perl-URI-PackageURL
-version: '2.23'
+version: '2.24'
 x_purl: pkg:cpan/GDT/URI-PackageURL
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

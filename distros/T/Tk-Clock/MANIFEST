@@ -18,7 +18,9 @@ t/10_base.t
 t/20_resize.t
 t/30_dual.t
 t/40_backdrop.t
+t/50_infotext.t
 t/eye.png
 t/eye2.png
+SECURITY.md		Guide for reporting security issues
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

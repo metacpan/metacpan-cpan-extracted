@@ -36,7 +36,7 @@ package Object::Meta::List;
 
 use parent 'Object::Meta';
 
-use Scalar::Util 'blessed';
+use Scalar::Util qw(blessed);
 
 use constant LIST_ENTRIES         => 2;
 use constant LIST_ENTRIES_INDEXED => 3;
@@ -679,10 +679,33 @@ sub clearLists {
 #----------------------------------------------------------------------------
 #Consultation Methods
 
+=head2 Consultation Methods
+
+=head3 getIndexField ( [ INDEX ] )
+
+This method returns the name of the field that is used to index the instances
+by the index C<INDEX>.
+
+B<Parameters:>
+
+=over 4
+
+=item C<INDEX>
+
+Name of the index. If not given the predefined C<PRIMARY_INDEXNAME> index
+with name "I<primary>" is used.
+
+=back
+
+B<Returns:> string - The object with the indexed field having the
+value I<NAME>.
+
+=cut
+
 sub getIndexField {
     my ( $self, $sindexname ) = @_;
-    my $sindexfield = "";
-    my $hshidxcnfs  = $self->getMeta( "indexconfiguration", {} );
+    my $sindexfield = '';
+    my $hshidxcnfs  = $self->getMeta( 'indexconfiguration', {} );
 
     $sindexname = PRIMARY_INDEXNAME unless ( defined $sindexname );
 
@@ -711,11 +734,35 @@ sub getMetaObject {
         {
             #For a Indexed Object Lookup there need to be more parameters
             $rsety = $self->getIdxMetaObject( $iindex, @_[ 2 .. $#_ ] );
-        }       #if($iindex =~ /^\-?\d+$/)
-    }    #if(defined $iindex)
+        }
+    }
 
     return $rsety;
 }
+
+=head3 getIdxMetaObject ( INDEX, NAME )
+
+This uses the index of name C<INDEX> to find the C<Object::Meta> object to find
+the instance.
+
+B<Parameters:>
+
+=over 4
+
+=item C<INDEX>
+
+Name of the index.
+
+=item C<NAME>
+
+The string value for field indexed with the index C<INDEX> of the object.
+
+=back
+
+B<Returns:> C<Object::Meta> - The object with the indexed field having the
+value I<NAME>.
+
+=cut
 
 sub getIdxMetaObject {
     my ( $self, $sindexname, $sindexvalue ) = @_;
@@ -728,30 +775,24 @@ sub getIdxMetaObject {
 
     #print "idx nm: '$sindexname'; idx vl: '$sindexvalue'\n";
 
-    if ( $sindexname ne ""
+    if ( $sindexname ne ''
         && defined $self->[LIST_ENTRIES_INDEXED]{$sindexname} )
     {
         $rsety = $self->[LIST_ENTRIES_INDEXED]{$sindexname}{$sindexvalue}
           if (
             defined $self->[LIST_ENTRIES_INDEXED]{$sindexname}{$sindexvalue} );
 
-    } #if($sindexname ne "" && defined $self->[LIST_ENTRIES_INDEXED]{$sindexname})
+    }
 
     return $rsety;
 }
 
-=pod
-
-=over 4
-
-=item getMetaObjectCount
+=head3 getMetaObjectCount
 
 This Method gives the Count of C<Object::Meta> objects back that are hold in the List.
 If the B<Meta Data Field> C<entrycount> is not set it will be created.
 
 B<Returns:> integer - The Count of C<Object::Meta> objects in the List
-
-=back
 
 =cut
 

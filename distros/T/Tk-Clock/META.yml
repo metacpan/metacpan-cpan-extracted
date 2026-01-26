@@ -1,11 +1,11 @@
 --- 
 abstract: Clock widget with analog and digital display
 author: 
-  - H.Merijn Brand <h.m.brand@xs4all.nl>
+  - H.Merijn Brand <hmbrand@cpan.org>
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150010
+generated_by: Author, CPAN::Meta::Converter version 2.150011
 license: perl
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,10 +14,10 @@ name: Tk-Clock
 provides: 
   Tk::Clock: 
     file: Clock.pm
-    version: '0.44'
+    version: '0.45'
 recommends: 
-  Encode: '3.19'
-  Test::More: '1.302191'
+  Encode: '3.21'
+  Test::More: '1.302219'
   Tk: '804.036'
 requires: 
   Carp: 0
@@ -34,4 +34,4 @@ resources:
   bugtracker: https://github.com/Tux/Tk-Clock/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Tk-Clock
-version: '0.44'
+version: '0.45'

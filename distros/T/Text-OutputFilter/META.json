@@ -1,59 +1,62 @@
 {
-   "name" : "Text-OutputFilter",
-   "provides" : {
-      "Text::OutputFilter" : {
-         "version" : "0.25",
-         "file" : "OutputFilter.pm"
-         }
-      },
+   "generated_by" : "Author",
+   "release_status" : "stable",
+   "abstract" : "Filter and modify output",
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+   },
+   "author" : [
+      "H.Merijn Brand <hmbrand@cpan.org>"
+   ],
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/Tux/Text-OutputFilter/issues"
-         },
+      },
+      "repository" : {
+         "url" : "https://github.com/Tux/Text-OutputFilter",
+         "type" : "git",
+         "web" : "https://github.com/Tux/Text-OutputFilter"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
-         ],
-      "repository" : {
-         "type" : "git",
-         "web" : "https://github.com/Tux/Text-OutputFilter",
-         "url" : "https://github.com/Tux/Text-OutputFilter"
-         }
-      },
+      ]
+   },
+   "provides" : {
+      "Text::OutputFilter" : {
+         "file" : "OutputFilter.pm",
+         "version" : "0.27"
+      }
+   },
    "prereqs" : {
-      "runtime" : {
-         "requires" : {
-            "Carp" : "0",
-            "perl" : "5.008"
-            }
-         },
       "test" : {
          "recommends" : {
-            "Test::More" : "1.302191"
-            },
-         "requires" : {
-            "Test::More" : "0",
-            "Test::NoWarnings" : "0"
-            }
+            "Test::More" : "1.302219"
          },
-      "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-            }
+            "Test::NoWarnings" : "0",
+            "Test::More" : "0"
          }
       },
-   "version" : "0.25",
-   "release_status" : "stable",
-   "generated_by" : "Author",
-   "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008",
+            "Carp" : "0"
+         }
       },
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-      ],
-   "dynamic_config" : 1,
+      "configure" : {
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.76"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
    "license" : [
       "perl_5"
-      ],
-   "abstract" : "Filter and modify output"
-   }
+   ],
+   "dynamic_config" : 1,
+   "version" : "0.27",
+   "name" : "Text-OutputFilter"
+}

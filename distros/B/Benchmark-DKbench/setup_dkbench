@@ -117,4 +117,4 @@ foreach (@packages) {
             unless $ver eq $mod_ver{$mod};
     }
 }
-system "$sudo cpanm $t System::Info MCE::Loop Test::Harness Test::Output Test::Requires";
+system "$sudo cpanm $t Benchmark::MCE System::Info MCE::Loop Test::Harness Test::Output Test::Requires";

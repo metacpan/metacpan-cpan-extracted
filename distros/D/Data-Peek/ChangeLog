@@ -1,3 +1,7 @@
+0.54	- 2026-01-25, H.Merijn Brand   <hmbrand@cpan.org>
+    * It's 2026
+    * Update to Devel::PPPort-3.73
+
 0.53	- 2025-01-06, H.Merijn Brand   <hmbrand@cpan.org>
     * Requirements updated based on CVE's
     * Update to Devel::PPPort-3.72

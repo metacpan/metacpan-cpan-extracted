@@ -17,10 +17,9 @@ my $root = File::Spec->catdir($tempdir, 'Foo-Bar');
     };
 
     Module::Starter->create_distro(
-        author  => 'me',
+        author   => ['me <me@there.com>'],
         builder  => 'Module::Build',
         modules  => ['Foo::Bar'],
-        email    => 'me@there.com',
         dir      => $root,
     );
 }

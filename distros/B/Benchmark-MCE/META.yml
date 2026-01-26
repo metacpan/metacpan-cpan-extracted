@@ -26,5 +26,5 @@ requires:
   perl: '5.010000'
 resources:
   repository: git://github.com/SpareRoom/Benchmark-MCE.git
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

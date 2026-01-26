@@ -23,5 +23,5 @@ requires:
   Basic::Types::XS: '0.05'
   XS::JIT: '0.02'
   perl: '5.006'
-version: '0.19'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

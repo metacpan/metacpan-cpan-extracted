@@ -7,7 +7,7 @@ build_requires:
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150010
+generated_by: Author, CPAN::Meta::Converter version 2.150011
 license: perl
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,11 +16,11 @@ name: Data-Peek
 provides: 
   Data::Peek: 
     file: Peek.pm
-    version: '0.53'
+    version: '0.54'
 recommends: 
-  Data::Dumper: '2.189'
+  Data::Dumper: '2.183'
   Perl::Tidy: 0
-  Test::More: '1.302207'
+  Test::More: '1.302219'
 requires: 
   Data::Dumper: 0
   Test::More: '0.90'
@@ -32,4 +32,4 @@ resources:
   bugtracker: https://github.com/Tux/Data-Peek/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Data-Peek
-version: '0.53'
+version: '0.54'

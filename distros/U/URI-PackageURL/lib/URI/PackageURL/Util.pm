@@ -5,189 +5,34 @@ use strict;
 use utf8;
 use warnings;
 
-use Exporter qw(import);
+use File::Spec;
+use File::Basename qw(dirname basename);
+use Exporter       qw(import);
 
-our $VERSION = '2.23';
-our @EXPORT  = qw(purl_to_urls purl_components_normalize);
+our $VERSION = '2.24';
+our @EXPORT  = qw(purl_to_urls purl_types);
 
-sub purl_components_normalize {
+sub purl_types {
 
-    my (%component) = @_;
+    my @list = ();
 
-    my %TYPES = (
-        conan       => \&_conan_normalize,
-        cpan        => \&_cpan_normalize,
-        cran        => \&_cran_normalize,
-        huggingface => \&_huggingface_normalize,
-        mlflow      => \&_mlflow_normalize,
-        pypi        => \&_pypi_normalize,
-        swid        => \&_swid_normalize,
-        swift       => \&_swift_normalize,
-    );
+    my $spec_dir = File::Spec->catfile(dirname(__FILE__), 'types');
 
-    Carp::croak "Invalid Package URL: '$component{scheme}' is not a valid scheme" unless ($component{scheme} eq 'pkg');
+    opendir(my $dh, $spec_dir) or Carp::croak "Can't open spec dir: $!";
 
-    $component{type} = lc $component{type};
-
-    if (grep { $_ eq $component{type} } qw(alpm apk bitbucket composer deb github gitlab hex npm oci pypi)) {
-        $component{name} = lc $component{name};
+    while (my $file = readdir $dh) {
+        next unless -f File::Spec->catfile($spec_dir, $file);
+        $file =~ s/\-definition\.json//;
+        push @list, $file;
     }
 
-    if (defined $component{namespace}) {
-        if (grep { $_ eq $component{type} } qw(alpm apk bitbucket composer deb github gitlab golang hex rpm)) {
-            $component{namespace} = lc $component{namespace};
-        }
-    }
+    closedir $dh;
 
-    foreach my $qualifier (keys %{$component{qualifiers}}) {
-        Carp::croak "Invalid Package URL: '$qualifier' is not a valid qualifier" if ($qualifier =~ /\s/);
-        Carp::croak "Invalid Package URL: '$qualifier' is not a valid qualifier" if ($qualifier =~ /\%/);
-    }
+    @list = sort @list;
 
-    if (defined $TYPES{$component{type}}) {
-        return $TYPES{$component{type}}->(%component);
-    }
-
-    return \%component;
+    return wantarray ? @list : \@list;
 
 }
-
-sub _conan_normalize {
-
-    my (%component) = @_;
-
-    if (defined $component{namespace} && $component{namespace} ne '') {
-        if (!defined $component{qualifiers}->{channel}) {
-            Carp::croak
-                "Invalid Package URL: Conan 'channel' qualifier does not exist for namespace '$component{namespace}'";
-        }
-    }
-    else {
-        if (defined $component{qualifiers}->{channel}) {
-            Carp::croak
-                "Invalid Package URL: Conan 'namespace' does not exist for channel '$component{qualifiers}->{channel}'";
-        }
-    }
-
-    return \%component;
-
-}
-
-sub _cpan_normalize {
-
-    my (%component) = @_;
-
-    # Use legacy CPAN PURL type SPEC
-    if ($ENV{PURL_LEGACY_CPAN_TYPE}) {
-
-        $component{namespace} = uc $component{namespace} if (defined $component{namespace});
-
-        if ((defined $component{namespace} && defined $component{name}) && $component{namespace} =~ /\:/) {
-            Carp::croak "Invalid Package URL: CPAN 'namespace' component must have the distribution author";
-        }
-
-        if ((defined $component{namespace} && defined $component{name}) && $component{name} =~ /\:/) {
-            Carp::croak "Invalid Package URL: CPAN 'name' component must have the distribution name";
-        }
-
-        if (!defined $component{namespace} && $component{name} =~ /\-/) {
-            Carp::croak "Invalid Package URL: CPAN 'name' component must have the module name";
-        }
-
-        return \%component;
-
-    }
-
-    # The namespace is the CPAN id of the author/publisher. It MUST be written uppercase and is required.
-
-    unless (defined($component{namespace})) {
-        Carp::croak
-            "Invalid Package URL: The CPAN 'namespace' is required and must contain the CPAN ID of the author/publisher";
-    }
-
-    $component{namespace} = uc $component{namespace};
-
-    if ($component{name} =~ /\:/) {
-        Carp::croak "Invalid Package URL: The CPAN 'name' component must have the distribution name";
-    }
-
-    return \%component;
-
-}
-
-sub _cran_normalize {
-
-    my (%component) = @_;
-
-    Carp::croak "Invalid Package URL: Cran 'version' is required" unless defined $component{version};
-
-    return \%component;
-
-}
-
-sub _huggingface_normalize {
-
-    my (%component) = @_;
-
-    # The version is the model revision Git commit hash. It is case insensitive and
-    # must be lowercased in the package URL.
-    $component{version} = lc $component{version};
-
-    return \%component;
-
-}
-
-sub _mlflow_normalize {
-
-    my (%component) = @_;
-
-    # The "name" case sensitivity depends on the server implementation:
-    #   - Azure ML: it is case sensitive and must be kept as-is in the package URL.
-    #   - Databricks: it is case insensitive and must be lowercased in the package URL.
-
-    if (defined $component{qualifiers}->{repository_url}
-        && $component{qualifiers}->{repository_url} =~ /azuredatabricks/)
-    {
-        $component{name} = lc $component{name};
-    }
-
-    return \%component;
-
-}
-
-sub _pypi_normalize {
-
-    my (%component) = @_;
-
-    # A PyPI package name must be lowercased and underscore "_" replaced with a dash "-".
-    $component{name} =~ s/_/-/g;
-
-    return \%component;
-
-}
-
-sub _swid_normalize {
-
-    my (%component) = @_;
-
-    Carp::croak "Invalid Package URL: swid 'tag_id' qualifier is required"
-        unless defined $component{qualifiers}->{tag_id};
-
-    return \%component;
-
-}
-
-sub _swift_normalize {
-
-    my (%component) = @_;
-
-    Carp::croak "Invalid Package URL: Swift 'version' is required"   unless defined $component{version};
-    Carp::croak "Invalid Package URL: Swift 'namespace' is required" unless defined $component{namespace};
-
-    return \%component;
-
-}
-
 
 sub purl_to_urls {
 
@@ -199,20 +44,20 @@ sub purl_to_urls {
     }
 
     my %TYPES = (
-        bitbucket => \&_bitbucket_urls,
-        cargo     => \&_cargo_urls,
-        composer  => \&_composer_urls,
-        cpan      => \&_cpan_urls,
-        docker    => \&_docker_urls,
-        gem       => \&_gem_urls,
-        github    => \&_github_urls,
-        gitlab    => \&_gitlab_urls,
-        golang    => \&_golang_urls,
-        luarocks  => \&_luarocks_urls,
-        maven     => \&_maven_urls,
-        npm       => \&_npm_urls,
-        nuget     => \&_nuget_urls,
-        pypi      => \&_pypi_urls,
+        bitbucket => \&_to_bitbucket_urls,
+        cargo     => \&_to_cargo_urls,
+        composer  => \&_to_composer_urls,
+        cpan      => \&_to_cpan_urls,
+        docker    => \&_to_docker_urls,
+        gem       => \&_to_gem_urls,
+        github    => \&_to_github_urls,
+        gitlab    => \&_to_gitlab_urls,
+        golang    => \&_to_golang_urls,
+        luarocks  => \&_to_luarocks_urls,
+        maven     => \&_to_maven_urls,
+        npm       => \&_to_npm_urls,
+        nuget     => \&_to_nuget_urls,
+        pypi      => \&_to_pypi_urls,
     );
 
     my $urls = {};
@@ -229,7 +74,7 @@ sub purl_to_urls {
 
 }
 
-sub _bitbucket_urls {
+sub _to_bitbucket_urls {
 
     my $purl = shift;
 
@@ -253,7 +98,7 @@ sub _bitbucket_urls {
 
 }
 
-sub _cargo_urls {
+sub _to_cargo_urls {
 
     my $purl = shift;
 
@@ -271,7 +116,7 @@ sub _cargo_urls {
 
 }
 
-sub _composer_urls {
+sub _to_composer_urls {
 
     my $purl = shift;
 
@@ -284,32 +129,64 @@ sub _composer_urls {
 
 }
 
-sub _cpan_urls {
+sub _to_cpan_urls {
 
-    my $purl = shift;
+    my ($purl, $purl_type) = @_;
 
     my $name           = $purl->name;
     my $version        = $purl->version;
     my $qualifiers     = $purl->qualifiers;
-    my $author         = $purl->namespace ? uc($purl->namespace) : undef;
+    my $author         = $purl->namespace // $qualifiers->{author};
     my $file_ext       = $qualifiers->{ext}            || 'tar.gz';
-    my $repository_url = $qualifiers->{repository_url} || 'https://www.cpan.org';
+    my $repository_url = $qualifiers->{repository_url} || $purl->definition->default_repository_url;
+    my $distpath       = $qualifiers->{distpath};
+    my $distdir        = $qualifiers->{distdir};
+
+    $repository_url =~ s{/$}{};
 
     if ($repository_url !~ /^(http|https|file|ftp):\/\//) {
         $repository_url = 'https://' . $repository_url;
     }
 
-    $name =~ s/\:\:/-/g;    # TODO
-
     my $urls = {repository => "https://metacpan.org/dist/$name"};
 
     if ($name && $version && $author) {
 
-        my $author_1 = substr($author, 0, 1);
-        my $author_2 = substr($author, 0, 2);
-
         $urls->{repository} = "https://metacpan.org/release/$author/$name-$version";
-        $urls->{download}   = "$repository_url/authors/id/$author_1/$author_2/$author/$name-$version.$file_ext";
+
+        my $author_a  = substr($author, 0, 1);
+        my $author_au = substr($author, 0, 2);
+
+        my $download_base_url = "$repository_url/authors/id";
+
+        if (!$distpath && !$distdir) {
+            $urls->{download} = "$download_base_url/$author_a/$author_au/$author/$name-$version.$file_ext";
+        }
+
+        if ($distpath && !$distdir) {
+
+            $distpath =~ s{^/}{};
+            $distpath =~ s{^CPAN/}{};
+            $distpath =~ s{^id/}{};
+            $distpath =~ s{^authors/id/}{};
+
+            if ($distpath !~ /^([A-Z]{1})\/([A-Z]{2})/) {
+
+                my @parts     = split '/', $distpath;
+                my $author_a  = substr($parts[0], 0, 1);
+                my $author_au = substr($parts[0], 0, 2);
+
+                $distpath = join '/', $author_a, $author_au, $distpath;
+
+            }
+
+            $urls->{download} = "$download_base_url/$distpath";
+
+        }
+
+        if ($distdir && !$distpath) {
+            $urls->{download} = "$download_base_url/$author_a/$author_au/$author/$distdir/$name-$version.$file_ext";
+        }
 
     }
 
@@ -317,7 +194,7 @@ sub _cpan_urls {
 
 }
 
-sub _docker_urls {
+sub _to_docker_urls {
 
     my $purl = shift;
 
@@ -349,7 +226,7 @@ sub _docker_urls {
 
 }
 
-sub _gem_urls {
+sub _to_gem_urls {
 
     my $purl = shift;
 
@@ -367,7 +244,7 @@ sub _gem_urls {
 
 }
 
-sub _github_urls {
+sub _to_github_urls {
 
     my $purl = shift;
 
@@ -400,7 +277,7 @@ sub _github_urls {
 
 }
 
-sub _gitlab_urls {
+sub _to_gitlab_urls {
 
     my $purl = shift;
 
@@ -424,7 +301,7 @@ sub _gitlab_urls {
 
 }
 
-sub _golang_urls {
+sub _to_golang_urls {
 
     my $purl = shift;
 
@@ -447,7 +324,7 @@ sub _golang_urls {
 
 }
 
-sub _luarocks_urls {
+sub _to_luarocks_urls {
 
     my $purl = shift;
 
@@ -475,7 +352,7 @@ sub _luarocks_urls {
 
 }
 
-sub _maven_urls {
+sub _to_maven_urls {
 
     my $purl = shift;
 
@@ -507,7 +384,7 @@ sub _maven_urls {
 
 }
 
-sub _npm_urls {
+sub _to_npm_urls {
 
     my $purl = shift;
 
@@ -537,7 +414,7 @@ sub _npm_urls {
 
 }
 
-sub _nuget_urls {
+sub _to_nuget_urls {
 
     my $purl = shift;
 
@@ -555,7 +432,7 @@ sub _nuget_urls {
 
 }
 
-sub _pypi_urls {
+sub _to_pypi_urls {
 
     my $purl = shift;
 
@@ -581,7 +458,7 @@ URI::PackageURL::Util - Utility for URI::PackageURL
 
   use URI::PackageURL::Util qw(purl_to_urls);
 
-  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.23');
+  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.24');
 
   $filename = basename($urls->{download});
   $ua->mirror($urls->{download}, "/tmp/$filename");
@@ -593,16 +470,12 @@ URL::PackageURL::Util is the utility package for URL::PackageURL.
 
 =over
 
-=item %normalized_purl_components = purl_components_normalize(%purl_components)
-
-Normalize the given Package URL components
-
 =item $urls = purl_to_urls($purl_string | URI::PackageURL)
 
 Converts the given Package URL string or L<URI::PackageURL> instance and return
 the hash with C<repository> and/or C<download> URL.
 
-B<NOTE>: This utility support few purl types (C<bitbucket>,  C<cargo>, C<composer>,
+B<NOTE>: This utility support few PURL types (C<bitbucket>,  C<cargo>, C<composer>,
 C<cpan>, C<docker>, C<gem>, C<github>, C<gitlab>, C<luarocks>, C<maven>, C<npm>, C<nuget>, C<pypi>).
 
   +-----------+------------+--------------+
@@ -627,14 +500,14 @@ C<cpan>, C<docker>, C<gem>, C<github>, C<gitlab>, C<luarocks>, C<maven>, C<npm>,
 (*)  Only with B<version> component
 (**) Only if B<download_url> qualifier is provided
 
-  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.23');
+  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.24');
 
   print Dumper($urls);
 
   # $VAR1 = {
-  #           'repository' => 'https://metacpan.org/release/GDT/URI-PackageURL-2.23',
-  #           'download' => 'http://www.cpan.org/authors/id/G/GD/GDT/URI-PackageURL-2.23.tar.gz'
-  #         };
+  #   'repository' => 'https://metacpan.org/release/GDT/URI-PackageURL-2.24',
+  #   'download'   => 'http://www.cpan.org/authors/id/G/GD/GDT/URI-PackageURL-2.24.tar.gz'
+  # };
 
 =back
 
@@ -658,7 +531,7 @@ L<https://github.com/giterlizzi/perl-URI-PackageURL>
 
 =head1 AUTHOR
 
-=over 4
+=over
 
 =item * Giuseppe Di Terlizzi <gdt@cpan.org>
 
@@ -667,7 +540,7 @@ L<https://github.com/giterlizzi/perl-URI-PackageURL>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2022-2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2022-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

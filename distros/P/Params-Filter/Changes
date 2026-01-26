@@ -1,5 +1,32 @@
 Revision history for Params-Filter
 
+v0.010  2026-01-25 (STABLE RELEASE)
+    - Updated documentation to emphasize security, compliance, and correctness
+      over raw performance
+    - Added "Consistency" as primary benefit: converts varying data formats to
+      consistent key-value pairs
+    - Rewrote performance section with more nuanced messaging based on
+      comprehensive benchmarking
+    - Added comprehensive SECURITY documentation section with examples
+    - Changed module description from "Fast field filtering" to
+      "Secure field filtering"
+    - All tests passing
+
+v0.009  2026-01-24 (STABLE RELEASE)
+    - Fixed PAUSE indexing issue: added META.yml and META.json to distribution
+    - These files are required for CPAN indexing
+    - All 59 tests passing
+
+v0.008  2026-01-24 (STABLE RELEASE)
+    - Fixed CPAN distribution issues:
+      - Rebuilt tarball using COPY_EXTENDED_ATTRIBUTES_DISABLE=1 to avoid
+        PAX headers for CPAN testers compatibility
+      - Added =encoding utf-8 to POD documentation to resolve non-ASCII
+        character warnings (→ arrows in examples)
+      - Removed META.json and META.yml from MANIFEST (auto-generated)
+    - All 59 tests passing
+    - POD syntax validated
+
 v0.007  2026-01-21 (STABLE RELEASE)
     - Version bump to resolve CPAN testers indexing issue
     - Repository renamed: Local-Params-Filter → Params-Filter

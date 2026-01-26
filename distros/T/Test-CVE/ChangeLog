@@ -1,3 +1,6 @@
+0.12	- 2026-01-25, H.Merijn Brand
+    * It is 2026
+
 0.11	- 2025-05-04, H.Merijn Brand
     * Fix documentation
     * Run has_no_cves only in author mode and advice against using it

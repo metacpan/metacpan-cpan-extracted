@@ -12,7 +12,7 @@ use overload '""' => 'to_string', fallback => 1;
 
 use URI::VersionRange::Version;
 
-our $VERSION = '2.23';
+our $VERSION = '2.24';
 
 our %COMPARATOR = (
     '='  => 'equal',
@@ -85,6 +85,9 @@ sub TO_JSON { {version => $_[0]->version, comparator => $_[0]->comparator} }
 1;
 
 __END__
+
+=encoding utf-8
+
 =head1 NAME
 
 URI::VersionRange::Constraint - Version Constraint for Version Range Specification
@@ -130,25 +133,33 @@ L<https://github.com/package-url/purl-spec>
 
 =head2 OBJECT-ORIENTED INTERFACE
 
-=over
+=head3 B<new>
 
-=item $constraint = URI::VersionRange::Constraint->new( comparator => STRING, version => STRING )
+    $constraint = URI::VersionRange::Constraint->new( comparator => STRING, version => STRING )
 
 Create new B<URI::VersionRange::Constraint> instance.
 
-=item $constraint->comparator
+=head3 B<comparator>
+
+    $constraint->comparator
 
 Return the comparator.
 
-=item $constraint->version
+=head3 B<version>
+
+    $constraint->version
 
 Return the version string.
 
-=item $vers->to_string
+=head3 B<to_string>
+
+    $vers->to_string
 
 Stringify C<vers> components.
 
-=item $vers->to_human_string
+=head3 B<to_human_string>
+
+    $vers->to_human_string
 
 Convert the constraint into human-readable format.
 
@@ -159,7 +170,9 @@ Convert the constraint into human-readable format.
 
     say $constraint->to_human_string; # greater than or equal 2.10
 
-=item $vers->TO_JSON
+=head3 B<TO_JSON>
+
+    $vers->TO_JSON
 
 Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Mojo::JSON>, etc).
 
@@ -167,11 +180,11 @@ Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Mojo::JSON>
 
     say encode_json($constraint);  # {"comparator":">","version":"2.00"}
 
-=item $vers = URI::VersionRange::Constraint->from_string($vers_string);
+=head3 B<from_string>
+
+    $vers = URI::VersionRange::Constraint->from_string($vers_string);
 
 Converts the given "constraint" string to L<URI::VersionRange::Constraint> object. Croaks on error.
-
-=back
 
 
 =head1 SUPPORT
@@ -194,7 +207,7 @@ L<https://github.com/giterlizzi/perl-URI-PackageURL>
 
 =head1 AUTHOR
 
-=over 4
+=over
 
 =item * Giuseppe Di Terlizzi <gdt@cpan.org>
 
@@ -203,7 +216,7 @@ L<https://github.com/giterlizzi/perl-URI-PackageURL>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2022-2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2022-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

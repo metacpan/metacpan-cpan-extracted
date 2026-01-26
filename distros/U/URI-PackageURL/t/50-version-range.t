@@ -47,7 +47,7 @@ is $v1->contains($_), !!0, "$_ version not in range ($v1)" for (sort @not_in_ran
 is decode_vers('vers:cpan/<v13.37')->contains($_), !!1, "$_ version in range" for (sort @in_range);
 
 eval { decode_vers('foo:bar<baz') };
-like "$@", qr/Malformed Version Range string/;
+like "$@", qr/Malformed/;
 
 # Test generic schemes
 is decode_vers('vers:generic/*')->contains($_), !!1, "$_ version in range" for (sort @in_range);
@@ -57,9 +57,9 @@ is decode_vers('vers:intdot/*')->contains($_),  !!1, "$_ version in range" for (
 is decode_vers('vers:semver/*')->contains($_),  !!1, "$_ version in range" for (sort @in_range);
 
 eval { decode_vers('vers:none/1.00') };
-like "$@", qr/Malformed Version Range string/;
+like "$@", qr/Malformed/;
 
 eval { decode_vers('vers:all/1.00') };
-like "$@", qr/Malformed Version Range string/;
+like "$@", qr/Malformed/;
 
 done_testing();

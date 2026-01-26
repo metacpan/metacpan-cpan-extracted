@@ -12,7 +12,17 @@ requires 'perl', 'v5.42.0';
 recommends 'CBOR::Free';
 recommends 'Mojo::UserAgent';
 on configure => sub {
-    requires 'Module::Build::Tiny', '0.035';
+    requires 'CPAN::Meta';
+    requires 'ExtUtils::Helpers', '0.028';
+    requires 'ExtUtils::Install';
+    requires 'ExtUtils::InstallPaths', '0.002';
+    requires 'File::Basename';
+    requires 'File::Find';
+    requires 'File::Path';
+    requires 'File::Spec::Functions';
+    requires 'JSON::PP', '2';
+    requires 'Path::Tiny';
+    requires 'perl', 'v5.42.0';
 };
 on test => sub {
     requires 'Test2::V0';

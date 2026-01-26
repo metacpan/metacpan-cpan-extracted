@@ -1,5 +1,5 @@
 /*   Copyright (c) 1994,1995,1996,1997  Tim Bunce
- *   Modified for DBD::Unify by H.Merijn Brand <h.m.brand@xs4all.nl>
+ *   Modified for DBD::Unify by H.Merijn Brand <hmbrand@cpan.org>
  *
  *   You may distribute under the terms of either the GNU General Public
  *   License or the Artistic License, as specified in the Perl README file.

@@ -1,0 +1,195 @@
+=head1 NAME
+
+XS::JIT::Header - FFI-like interface for C headers using XS::JIT
+
+=head1 SYNOPSIS
+
+    use XS::JIT::Header;
+
+    # Bind to math library (JIT compile at runtime)
+    my $math = XS::JIT::Header->new(
+        header  => 'math.h',
+        package => 'FastMath',
+    );
+
+    $math->attach('sin');
+    $math->attach('cos');
+    $math->attach('pow');
+    $math->compile;
+
+    # Now use the functions
+    my $result = FastMath::sin(3.14159);
+    my $power = FastMath::pow(2, 10);  # 1024
+
+    # Or generate static files for distribution (no JIT needed)
+    my $lib = XS::JIT::Header->new(
+        header  => 'mylib.h',
+        package => 'My::Lib',
+    );
+    $lib->attach_all();
+    $lib->write_module(dir => 'My-Lib');
+    # Creates My-Lib/lib/My/Lib.pm, Lib.xs, Lib_funcs.c
+
+    # Or just export the C code for embedding
+    $lib->write_c_file('mylib_wrappers.c');
+
+=head1 DESCRIPTION
+
+XS::JIT::Header provides an FFI::Platypus-like interface for binding
+C libraries through their header files, but uses XS::JIT's compilation
+approach for better runtime performance (~2x faster than FFI).
+
+The module parses C header files to extract function declarations,
+generates XS wrapper code using XS::JIT::Builder, and compiles it
+using XS::JIT. The compiled code is cached for subsequent runs.
+
+=head1 METHODS
+
+=head2 new(%options)
+
+Creates a new XS::JIT::Header instance.
+
+    my $h = XS::JIT::Header->new(
+        header    => 'mylib.h',      # Required: path to C header
+        lib       => 'mylib',        # Optional: library name or path
+        include   => ['/opt/include'], # Optional: additional include paths
+        define    => { DEBUG => 1 }, # Optional: preprocessor defines
+        package   => 'MyLib',        # Optional: target Perl package (default: caller)
+        prefix    => 'mylib_',       # Optional: prefix to strip from function names
+        cache_dir => '_CACHED_XS',   # Optional: cache directory
+        force     => 0,              # Optional: force recompilation
+    );
+
+=head2 attach($c_name)
+
+=head2 attach($c_name => $perl_name)
+
+=head2 attach($c_name => \@arg_types => $return_type)
+
+Attach a C function to be compiled as a Perl subroutine.
+
+    # Use same name (stripped of prefix)
+    $h->attach('mylib_calculate');  # becomes MyLib::calculate
+
+    # Use custom Perl name
+    $h->attach('mylib_calculate' => 'calc');  # becomes MyLib::calc
+
+    # Explicit type specification (overrides header parsing)
+    $h->attach('custom_func' => ['int', 'double'] => 'double');
+
+=head2 attach_all()
+
+=head2 attach_all($filter)
+
+Attach all functions from the parsed header.
+
+    $h->attach_all;                  # All functions
+    $h->attach_all(qr/^math_/);      # Only functions matching regex
+    $h->attach_all(sub { length($_[0]) < 10 });  # Custom filter
+
+=head2 compile()
+
+Compile all attached functions. This is called automatically when
+the object goes out of scope, but can be called explicitly for
+better error handling.
+
+    $h->compile or die "Compilation failed";
+
+=head2 write_module(%options)
+
+Generate a complete distributable XS module without JIT compilation.
+This creates static C, XS, and PM files that can be compiled using
+a standard Makefile.PL build process.
+
+    $h->write_module(
+        dir     => 'MyModule',    # Output directory (default: '.')
+        package => 'My::Lib',     # Package name (default: from new())
+    );
+
+This creates:
+
+    MyModule/
+      lib/
+        My/
+          Lib.pm        # Perl module with XSLoader
+          Lib.xs        # XS boot code
+          Lib_funcs.c   # Generated function wrappers
+
+Returns a hashref with the created file paths.
+
+=head2 write_c_file($filename)
+
+Write just the generated C code (function wrappers) to a file.
+Useful for embedding into existing XS modules.
+
+    $h->write_c_file('my_funcs.c');
+
+=head2 functions()
+
+Returns a list of function names parsed from the header.
+
+    my @funcs = $h->functions;
+
+=head2 function($name)
+
+Returns detailed information about a specific function.
+
+    my $info = $h->function('sin');
+    # { name => 'sin', return_type => 'double',
+    #   params => [{ type => 'double', name => 'x' }], ... }
+
+=head2 constants()
+
+Returns a list of constant names (from #define) parsed from the header.
+
+    my @consts = $h->constants;
+
+=head2 constant($name)
+
+Returns the value of a constant.
+
+    my $pi = $h->constant('M_PI');
+
+=head1 TYPE MAPPING
+
+The following C types are automatically mapped to Perl types:
+
+    C Type              Perl Type   Conversion
+    ------------------  ----------  ----------
+    char, short, int    IV          SvIV/newSViv
+    long, long long
+    unsigned ...        UV          SvUV/newSVuv
+    size_t, uint*_t
+    float, double       NV          SvNV/newSVnv
+    char*, const char*  PV          SvPV/newSVpv
+    void                -           -
+    void*, T*           UV          PTR2UV/INT2PTR
+
+Unknown types are treated as opaque pointers (UV).
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item * Struct arguments are not yet supported (treated as opaque pointers)
+
+=item * Variable argument functions (like printf) have limited support
+
+=item * Complex preprocessor macros may not parse correctly
+
+=back
+
+=head1 SEE ALSO
+
+L<XS::JIT>, L<XS::JIT::Builder>, L<FFI::Platypus>
+
+=head1 AUTHOR
+
+LNATION <email@lnation.org>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

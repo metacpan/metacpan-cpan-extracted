@@ -1,5 +1,5 @@
 package Future::IO::Impl::Uring;
-$Future::IO::Impl::Uring::VERSION = '0.005';
+$Future::IO::Impl::Uring::VERSION = '0.006';
 use 5.020;
 use warnings;
 use experimental 'signatures';
@@ -103,6 +103,7 @@ sub send($self, $fh, $buffer, $flags, $to) {
 			local $! = -$res;
 			$future->fail("send: $!\n", send => $fh, $!);
 		}
+		$buffer;
 	};
 	$flags //= 0;
 	my $id;
@@ -157,6 +158,7 @@ sub syswrite($self, $fh, $buffer) {
 			local $! = -$res;
 			$future->fail("syswrite: $!\n", syswrite => $fh, $!);
 		}
+		$buffer;
 	});
 	$future->on_cancel(sub { $ring->cancel($id, 0, 0) });
 	return $future;
@@ -204,7 +206,7 @@ Future::IO::Impl::Uring - A Future::IO implementation for IO::Uring
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 

@@ -121,7 +121,7 @@ resources:
   bugtracker: https://github.com/rjbs/Dist-Zilla/issues
   homepage: http://dzil.org/
   repository: https://github.com/rjbs/Dist-Zilla.git
-version: '6.036'
+version: '6.037'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -274,6 +274,25 @@ x_Dist_Zilla:
       name: '@RJBS/Git::Remote::Check'
       version: 0.1.2
     -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: 1
+          fail_on_warning: author
+          fake_home: 0
+          filename: xt/author/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: 0
+          phase: develop
+          script_finder:
+            - ':PerlExecFiles'
+          skips:
+            - Dist::Zilla::Tutorial
+          switch: []
+      name: '@RJBS/Test::Compile'
+      version: '2.059'
+    -
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
@@ -376,7 +395,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::RJBSMisc
       name: '@RJBS/RJBSMisc'
-      version: '5.033'
+      version: '5.035'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@RJBS/GithubMeta'
@@ -424,7 +443,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '6.036'
+          tag: '6.037'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

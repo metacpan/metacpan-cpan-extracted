@@ -1,4 +1,4 @@
-Module-Starter-Smart version 0.0.9
+Module-Starter-Smart version 0.0.10
 
 INSTALLATION
 
@@ -24,10 +24,11 @@ CONTRIBUTORS
 * Andrew Kirkpatrick
 * Markus Böhme
 * Lisa Hare
+* Gregor Herrmann
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2006, 2011, 2012, 2017 Ruey-Cheng Chen
+Copyright (C) 2006, 2011, 2012, 2017, 2026 Ruey-Cheng Chen
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

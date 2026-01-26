@@ -3,7 +3,7 @@ requires   "File::Spec";
 on "configure" => sub {
     requires   "ExtUtils::MakeMaker";
 
-    recommends "ExtUtils::MakeMaker"      => "7.70";
+    recommends "ExtUtils::MakeMaker"      => "7.76";
     };
 
 on "test" => sub {
@@ -11,5 +11,5 @@ on "test" => sub {
     requires   "Test::Simple"             => "0.88";
     requires   "Test:Warnings";
 
-    recommends "Test::Simple"             => "1.302207";
+    recommends "Test::Simple"             => "1.302219";
     };

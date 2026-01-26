@@ -21,7 +21,6 @@ lib/Language/l33t/Specifications.pod
 script/l33t
 server
 t/00-compile.t
-t/00-load.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/basic.t

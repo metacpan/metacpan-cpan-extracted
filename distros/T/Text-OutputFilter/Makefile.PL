@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright PROCURA B.V. (c) 2006-2023 H.Merijn Brand
+# Copyright PROCURA B.V. (c) 2006-2026 H.Merijn Brand
 
 require 5.008;
 use strict;
@@ -77,6 +77,6 @@ sub postamble {
 	'doc/OutputFilter.3:	OutputFilter.pm',
 	'	pod2man       < $? > $@',
 	'doc/OutputFilter.man:	doc/OutputFilter.3',
-	'	nroff -mandoc < $? > $@',
+	'	nroff2man     < $? > $@',
 	'';
     } # postamble

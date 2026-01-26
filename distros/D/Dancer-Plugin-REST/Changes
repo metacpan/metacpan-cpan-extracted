@@ -1,5 +1,13 @@
 Revision history for
 
+0.12 2026-01-25
+ [ENHANCEMENTS]
+ - Move to Test2 for the testing.
+ - use Dancer::HTTP as the source of truth for the http codes.
+
+ [STATISTICS]
+ - code churn: 15 files changed, 274 insertions(+), 89 deletions(-)
+
 0.11 2014-03-25
  [BUG FIXES]
  - Routes with ':id.:format' were not created properly.  (GH#3, reported by
@@ -65,4 +73,3 @@ Revision history for
    serializer according to params->{format}
  - Support for resource definition When a resource is defined a set of
    routes are defined in a RESTful manner.
-

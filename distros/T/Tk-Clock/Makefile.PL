@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright PROCURA B.V. (c) 1999-2023 H.Merijn Brand
+# Copyright PROCURA B.V. (c) 1999-2026 H.Merijn Brand
 
 require 5.006;
 
@@ -101,8 +101,8 @@ sub postamble {
 	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
 	'doc/Clock.3:		Clock.pm',
 	'	pod2man       < $? > $@',
-	'doc/Clock.man:	doc/Clock.3',
-	'	nroff -mandoc < $? > $@',
+	'doc/Clock.man:		doc/Clock.3',
+	'	nroff2man     < $? > $@',
 	'',
 	$min_vsn;
     } # postamble

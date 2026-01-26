@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/issues
   homepage: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty
   repository: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty.git
-version: '0.303'
+version: '0.304'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -301,7 +301,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.303'
+          tag: '0.304'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

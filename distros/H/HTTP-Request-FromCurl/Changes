@@ -1,3 +1,9 @@
+0.56 2026-01-25
+    * Fix case-insensitive command line options. This broke the -H option
+      of Curl on the command line, confused with '-h' (for help). Reported
+      and diagnosed by BLIAKO.
+    * Tentative support for REST::Client code generation
+
 0.55 2025-02-01
     * Fix SSL options for LWP::UserAgent, reported and diagnosed by Mark West
 

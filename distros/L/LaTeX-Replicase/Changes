@@ -45,3 +45,16 @@ Revision history for Perl extension LaTeX::Replicase.
 	- Fixed tests.
 	- Removed Digest::MD5
 
+0.590 Sun Jan 25 14:14:14 2026
+	- The set of input template sources has been expanded: now, in addition to the template file, you can use a reference to an array template.
+	- Improved data source control: only the template file name and the reference to the template array are allowed.
+	- The set of output targets has been expanded: now, in addition to a file, you can specify output to the console (STDOUT).
+	- Improved control of output targets: file and directory.
+	- Added keys '@', '0-' and mixed indexes for {HASH|ARRAY}.ARRAY of VAR-structure.
+	- Optimized operation of END[TZ] tags.
+	- The pool of diagnostic messages has been expanded and improved.
+	- Reduced RAM consumption.
+	- Increased diversity of code test coverage.
+	- Fixed tests.
+	- The manual has been corrected and expanded.
+

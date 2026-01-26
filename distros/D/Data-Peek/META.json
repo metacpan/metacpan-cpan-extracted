@@ -1,10 +1,4 @@
 {
-   "abstract" : "Modified and extended debugging facilities",
-   "version" : "0.53",
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-   },
    "resources" : {
       "repository" : {
          "web" : "https://github.com/Tux/Data-Peek",
@@ -12,65 +6,71 @@
          "type" : "git"
       },
       "x_IRC" : "irc://irc.perl.org/#csv",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "bugtracker" : {
          "web" : "https://github.com/Tux/Data-Peek/issues"
-      }
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
    },
-   "dynamic_config" : 1,
+   "release_status" : "stable",
    "license" : [
       "perl_5"
    ],
    "generated_by" : "Author",
-   "release_status" : "stable",
+   "provides" : {
+      "Data::Peek" : {
+         "version" : "0.54",
+         "file" : "Peek.pm"
+      }
+   },
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "version" : "0.54",
    "prereqs" : {
-      "test" : {
-         "recommends" : {
-            "Test::More" : "1.302207"
-         },
-         "requires" : {
-            "Test::Warnings" : "0",
-            "Test::More" : "0.90"
-         }
-      },
       "build" : {
          "requires" : {
             "perl" : "5.008001"
          }
       },
+      "configure" : {
+         "suggests" : {
+            "ExtUtils::MakeMaker" : "7.76"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         },
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.22"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::More" : "1.302219"
+         },
+         "requires" : {
+            "Test::More" : "0.90",
+            "Test::Warnings" : "0"
+         }
+      },
       "runtime" : {
          "recommends" : {
-            "Perl::Tidy" : "0",
-            "Data::Dumper" : "2.189"
+            "Data::Dumper" : "2.183",
+            "Perl::Tidy" : "0"
          },
          "requires" : {
             "Data::Dumper" : "0",
             "perl" : "5.008001",
             "XSLoader" : "0"
          }
-      },
-      "configure" : {
-         "recommends" : {
-            "ExtUtils::MakeMaker" : "7.22"
-         },
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         },
-         "suggests" : {
-            "ExtUtils::MakeMaker" : "7.70"
-         }
       }
    },
+   "abstract" : "Modified and extended debugging facilities",
    "name" : "Data-Peek",
    "author" : [
       "H.Merijn Brand <hmbrand@cpan.org>"
    ],
-   "provides" : {
-      "Data::Peek" : {
-         "file" : "Peek.pm",
-         "version" : "0.53"
-      }
-   }
+   "dynamic_config" : 1
 }

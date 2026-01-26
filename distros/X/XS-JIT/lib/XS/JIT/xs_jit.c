@@ -436,12 +436,14 @@ int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file) {
 
     SV **cc_sv = hv_fetch(config, "cc", 2, 0);
     SV **ccflags_sv = hv_fetch(config, "ccflags", 7, 0);
+    SV **optimize_sv = hv_fetch(config, "optimize", 8, 0);
     SV **cccdlflags_sv = hv_fetch(config, "cccdlflags", 10, 0);
     SV **lddlflags_sv = hv_fetch(config, "lddlflags", 9, 0);
     SV **archlib_sv = hv_fetch(config, "archlib", 7, 0);
 
     const char *cc = (cc_sv && *cc_sv) ? SvPV_nolen(*cc_sv) : "cc";
     const char *ccflags = (ccflags_sv && *ccflags_sv) ? SvPV_nolen(*ccflags_sv) : "";
+    const char *optimize = (optimize_sv && *optimize_sv) ? SvPV_nolen(*optimize_sv) : "-O2";
     const char *cccdlflags = (cccdlflags_sv && *cccdlflags_sv) ? SvPV_nolen(*cccdlflags_sv) : "";
     const char *lddlflags = (lddlflags_sv && *lddlflags_sv) ? SvPV_nolen(*lddlflags_sv) : "";
     const char *archlib = (archlib_sv && *archlib_sv) ? SvPV_nolen(*archlib_sv) : "";
@@ -452,9 +454,9 @@ int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file) {
     char cmd[MAX_PATH_LEN * 2];
     int ret;
 
-    /* Compile to object */
-    snprintf(cmd, sizeof(cmd), "%s %s %s -c -o \"%s\" -I\"%s/CORE\" \"%s\" 2>&1",
-             cc, ccflags, cccdlflags, o_file, archlib, c_file);
+    /* Compile to object with optimization */
+    snprintf(cmd, sizeof(cmd), "%s %s %s %s -c -o \"%s\" -I\"%s/CORE\" \"%s\" 2>&1",
+             cc, ccflags, optimize, cccdlflags, o_file, archlib, c_file);
 
     ret = system(cmd);
     if (ret != 0) {

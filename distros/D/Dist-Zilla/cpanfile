@@ -112,6 +112,9 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "File::Spec" => "0";
+  requires "IO::Handle" => "0";
+  requires "IPC::Open3" => "0";
   requires "Test::CleanNamespaces" => "0.15";
   requires "Test::More" => "0.94";
   requires "Test::Pod" => "1.41";

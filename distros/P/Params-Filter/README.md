@@ -1,21 +1,43 @@
 # Params::Filter
 
-Fast field filtering for parameter construction.
+Secure field filtering for parameter construction.
 
 ## Description
 
-`Params::Filter` provides fast, lightweight parameter filtering that checks only for the presence or absence of specified fields. It does NOT validate values - no type checking, truthiness testing, or lookups.
+`Params::Filter` provides lightweight parameter filtering that checks only for the presence or absence of specified fields. It does NOT validate values - no type checking, truthiness testing, or lookups.
 
 This module separates field filtering from value validation:
 
 - **Field filtering** (this module) - Check which fields are present/absent
 - **Value validation** (later step) - Check if field values are correct
 
+### Primary Benefits
+
+The main advantages of using Params::Filter are:
+
+- **Consistency** - Converts varying incoming data formats to consistent key-value pairs
+- **Security** - Sensitive fields (passwords, SSNs, credit cards) never reach your validation code or database queries
+- **Compliance** - Automatically excludes fields that shouldn't be processed or stored (e.g., GDPR, PCI-DSS)
+- **Correctness** - Ensures only expected fields are processed, preventing accidental data leakage or processing errors
+- **Maintainability** - Clear separation between data filtering (what fields to accept) and validation (whether values are correct)
+
+### Performance Considerations
+
+**Important**: In many cases, Params::Filter is slower than manual hash lookups or similar operations, especially when the incoming data is in a known consistent format. The value of Params::Filter is in its capability to assure the security, compliance, and correctness benefits listed above.
+
+Nonetheless, Params::Filter CAN improve overall performance when downstream validation is expensive (database queries, API calls, complex regex).
+
+A simple benchmark comparing the validation cost of typical input to that of input restricted to required fields would reveal any speed gain with expensive downstream validations.
+
+For simple cases and when validation is cheap, raw speed is not the reason to use Params::Filter.
+
+### Common Use Cases
+
 This approach handles common parameter issues:
 - Subroutine signatures can become unwieldy with many parameters
 - Ad-hoc argument checking is error-prone
 - Validation may not catch missing inputs quickly enough
-- Many fields to check multiplies validation time
+- Many fields to check multiplies validation time (for expensive validation)
 
 ### When to Use This Module
 
@@ -44,20 +66,83 @@ If there isn't repetition or an unknown/unreliable data structure, this might be
 As much as this module attempts to be versatile in usage, there are some VERY HANDY AFFORDANCES IT DOES NOT PROVIDE:
 
 - No regex field name matching for designating fields to require, accept, or exclude
-- No conditional field designations _within_ a filter: 
+- No conditional field designations _within_ a filter:
 
     `if 'mailing_address' require 'postal_code'`   # No way a filter can do this
 - No coderefs or callbacks for use when filtering
-- No substitutions or changes to field names 
+- No substitutions or changes to field names
 - No built-in filter lists except null `[]` = none
 - No fields ADDED to yielded data, EXCEPT:
 
-    * If the provided data resolves to a list or array with an odd number of elements, 
+    * If the provided data resolves to a list or array with an odd number of elements,
     the LAST element is treated as a flag, set to the value 1
 
-    * If the provided data resolves to a single non-reference scalar (probably a text string) 
+    * If the provided data resolves to a single non-reference scalar (probably a text string)
     the data is stored as a hashref value with the key `‘_’`, and returned if `'_'` is
     included in the accepted list or the list is set to `['*']` (accept all)
+
+### Security Benefits
+
+This module provides important security benefits by separating data filtering from validation:
+
+#### Preventing Sensitive Data Leakage
+
+By excluding sensitive fields early in the request processing pipeline, you ensure they never reach validation code, database queries, or logging systems:
+
+```perl
+my $user_filter = Params::Filter->new_filter({
+    required => ['username', 'email'],
+    accepted => ['name', 'bio'],
+    excluded => ['password', 'ssn', 'credit_card', 'admin_token'],
+});
+
+# Web form submission with password field
+my $form_data = {
+    username => 'user',
+    email => 'user@example.com',
+    password => 'secret123',  # Never reaches validation!
+};
+
+my ($filtered, $msg) = $user_filter->apply($form_data);
+# $filtered = { username => 'user', email => 'user@example.com' }
+```
+
+#### Compliance Benefits
+
+Helps meet regulatory requirements by design:
+
+- **GDPR** - Exclude fields you shouldn't store before processing
+- **PCI-DSS** - Ensure credit card numbers never touch validation code
+- **Data Minimization** - Only process fields you actually need
+- **Audit Trails** - Clear record of what fields are accepted/excluded
+
+#### Defense in Depth
+
+Even if validation code has bugs or is later modified, excluded fields **never** reach it. This provides defense in depth:
+
+```perl
+# Filter excludes 'admin' field
+my $filter = Params::Filter->new_filter({
+    required => ['user'],
+    accepted => ['email'],
+    excluded => ['admin'],  # Security-critical field excluded
+});
+
+# Even if validation code is buggy, 'admin' never reaches it
+my ($data, $msg) = $filter->apply($untrusted_input);
+```
+
+#### Secure by Default
+
+The filter fails closed (returns undef) if required fields are missing, preventing incomplete data from progressing through your system:
+
+```perl
+# Missing required field - filter returns undef
+my ($data, $msg) = $filter->apply({user => 'bob'});  # email missing
+# $data is undef, $msg explains what's missing
+```
+
+This prevents partial data from causing security issues downstream.
 
 ## Installation
 
@@ -128,9 +213,10 @@ my ($user3, $msg3) = $user_filter->apply($db_record_data);
 ## Features
 
 - **Dual interface**: Functional or OO usage
-- **Fast-fail**: Returns immediately on missing required parameters
-- **Fast-success**: Returns immediately if all required parameters are provided and no others are provided or will be accepted
-- **Non-destructive Filtering** Allows multiple filters and use of filters in conditionals without affecting data
+- **Security-first**: Excludes sensitive fields before they reach validation code
+- **Fail-closed**: Returns immediately on missing required parameters
+- **Early validation**: Returns immediately if all required parameters are provided and no others are provided or will be accepted
+- **Non-destructive**: Allows multiple filters and conditional use without affecting data
 - **No value checking**: Only presence/absence of fields
 - **Debug mode**: Optional warnings about unrecognized or excluded fields
 - **Perl 5.36+**: Modern Perl with signatures and post-deref
@@ -269,13 +355,16 @@ The `filter()` function parses multiple common input formats into a consistent i
 
 ```perl
 # External data source (e.g., from web form, API, or database)
-my $incoming_user = { name => 'Alice', email => 'alice@example.com', phone => '555-1234' };
+my $incoming_user = { name => 'Alice', email => 'alice@example.com',
+ phone => '555-1234', UTM => "...", referred_by => 'Bob'
+};
 
 # Apply filter with rules defined inline
 my ($result, $msg) = filter(
     $incoming_user,
     ['name', 'email'],
-    ['phone'],
+    ['phone', 'text_ok'],
+    ['UTM']
 );
 # Result: { name => 'Alice', email => 'alice@example.com', phone => '555-1234' }
 ```

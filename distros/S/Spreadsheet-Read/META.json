@@ -1,83 +1,88 @@
 {
-   "release_status" : "stable",
-   "provides" : {
-      "Spreadsheet::Read" : {
-         "file" : "Read.pm",
-         "version" : "0.94"
-      }
-   },
-   "prereqs" : {
-      "test" : {
-         "requires" : {
-            "Test::Harness" : "0",
-            "Test::NoWarnings" : "0",
-            "Test::More" : "0.88"
-         },
-         "recommends" : {
-            "Test::More" : "1.302219"
-         }
-      },
-      "runtime" : {
-         "recommends" : {
-            "Data::Peek" : "0.53",
-            "Encode" : "3.21",
-            "Data::Dumper" : "2.183",
-            "IO::Scalar" : "0",
-            "File::Temp" : "0.2312"
-         },
-         "requires" : {
-            "Data::Dumper" : "0",
-            "File::Temp" : "0.22",
-            "Exporter" : "0",
-            "Encode" : "0",
-            "Data::Peek" : "0",
-            "List::Util" : "0",
-            "perl" : "5.008001",
-            "Carp" : "0"
-         },
-         "suggests" : {
-            "Data::Dumper" : "2.192"
-         }
-      },
-      "configure" : {
-         "suggests" : {
-            "ExtUtils::MakeMaker" : "7.76"
-         },
-         "recommends" : {
-            "ExtUtils::MakeMaker" : "7.22"
-         },
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      }
-   },
-   "name" : "Spreadsheet-Read",
-   "license" : [
-      "perl_5"
-   ],
-   "abstract" : "Meta-Wrapper for reading spreadsheet data",
-   "version" : "0.94",
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-   },
-   "dynamic_config" : 1,
-   "resources" : {
-      "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/Tux/Spreadsheet-Read",
-         "web" : "https://github.com/Tux/Spreadsheet-Read"
-      },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/Spreadsheet-Read/issues"
-      }
-   },
    "optional_features" : {
+      "opt_sxc" : {
+         "description" : "Provides parsing of OpenOffice spreadsheets old style",
+         "prereqs" : {
+            "runtime" : {
+               "recommends" : {
+                  "Spreadsheet::ReadSXC" : "0.39"
+               },
+               "requires" : {
+                  "Spreadsheet::ReadSXC" : "0.26"
+               }
+            }
+         }
+      },
+      "opt_tools" : {
+         "description" : "Spreadsheet tools",
+         "prereqs" : {
+            "runtime" : {
+               "recommends" : {
+                  "Tk::TableMatrix::Spreadsheet" : "0",
+                  "Tk::NoteBook" : "0",
+                  "Tk" : "804.036"
+               }
+            }
+         }
+      },
+      "opt_xls" : {
+         "description" : "Provides parsing of Microsoft Excel files",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Spreadsheet::ParseExcel::FmtDefault" : "0",
+                  "Spreadsheet::ParseExcel" : "0.34",
+                  "OLE::Storage_Lite" : "!= 0.21"
+               },
+               "recommends" : {
+                  "OLE::Storage_Lite" : "0.24",
+                  "Spreadsheet::ParseExcel" : "0.66"
+               }
+            }
+         }
+      },
+      "opt_gnumeric" : {
+         "description" : "Provides parsing of Gnumeric spreadsheets",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Spreadsheet::ReadGnumeric" : "0.2"
+               },
+               "recommends" : {
+                  "Spreadsheet::ReadGnumeric" : "0.4"
+               }
+            }
+         }
+      },
+      "opt_csv" : {
+         "prereqs" : {
+            "runtime" : {
+               "recommends" : {
+                  "Text::CSV_XS" : "1.61",
+                  "Text::CSV_PP" : "2.06",
+                  "Text::CSV" : "2.06"
+               },
+               "requires" : {
+                  "Text::CSV_XS" : "0.71"
+               }
+            }
+         },
+         "description" : "Provides parsing of CSV streams"
+      },
+      "opt_ods" : {
+         "description" : "Provides parsing of OpenOffice spreadsheets",
+         "prereqs" : {
+            "runtime" : {
+               "recommends" : {
+                  "Spreadsheet::ParseODS" : "0.39"
+               },
+               "requires" : {
+                  "Spreadsheet::ParseODS" : "0.26"
+               }
+            }
+         }
+      },
       "opt_xlsx" : {
-         "description" : "Provides parsing of Microsoft Excel 2007 files",
          "prereqs" : {
             "runtime" : {
                "recommends" : {
@@ -88,93 +93,85 @@
                   "Spreadsheet::ParseExcel::FmtDefault" : "0"
                }
             }
+         },
+         "description" : "Provides parsing of Microsoft Excel 2007 files"
+      }
+   },
+   "release_status" : "stable",
+   "abstract" : "Meta-Wrapper for reading spreadsheet data",
+   "author" : [
+      "H.Merijn Brand <HMBRAND@cpan.org>"
+   ],
+   "version" : "0.95",
+   "name" : "Spreadsheet-Read",
+   "prereqs" : {
+      "configure" : {
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.22"
+         },
+         "suggests" : {
+            "ExtUtils::MakeMaker" : "7.76"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
          }
       },
-      "opt_gnumeric" : {
-         "prereqs" : {
-            "runtime" : {
-               "recommends" : {
-                  "Spreadsheet::ReadGnumeric" : "0.4"
-               },
-               "requires" : {
-                  "Spreadsheet::ReadGnumeric" : "0.2"
-               }
-            }
+      "test" : {
+         "recommends" : {
+            "Test::More" : "1.302219"
          },
-         "description" : "Provides parsing of Gnumeric spreadsheets"
-      },
-      "opt_ods" : {
-         "description" : "Provides parsing of OpenOffice spreadsheets",
-         "prereqs" : {
-            "runtime" : {
-               "requires" : {
-                  "Spreadsheet::ParseODS" : "0.26"
-               },
-               "recommends" : {
-                  "Spreadsheet::ParseODS" : "0.39"
-               }
-            }
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::NoWarnings" : "0",
+            "Test::Harness" : "0"
          }
       },
-      "opt_sxc" : {
-         "prereqs" : {
-            "runtime" : {
-               "requires" : {
-                  "Spreadsheet::ReadSXC" : "0.26"
-               },
-               "recommends" : {
-                  "Spreadsheet::ReadSXC" : "0.39"
-               }
-            }
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Data::Peek" : "0",
+            "Exporter" : "0",
+            "List::Util" : "0",
+            "File::Temp" : "0.22",
+            "Carp" : "0",
+            "Encode" : "0",
+            "perl" : "5.008001"
          },
-         "description" : "Provides parsing of OpenOffice spreadsheets old style"
-      },
-      "opt_tools" : {
-         "prereqs" : {
-            "runtime" : {
-               "recommends" : {
-                  "Tk" : "804.036",
-                  "Tk::TableMatrix::Spreadsheet" : "0",
-                  "Tk::NoteBook" : "0"
-               }
-            }
-         },
-         "description" : "Spreadsheet tools"
-      },
-      "opt_csv" : {
-         "prereqs" : {
-            "runtime" : {
-               "requires" : {
-                  "Text::CSV_XS" : "0.71"
-               },
-               "recommends" : {
-                  "Text::CSV" : "2.06",
-                  "Text::CSV_XS" : "1.61",
-                  "Text::CSV_PP" : "2.06"
-               }
-            }
-         },
-         "description" : "Provides parsing of CSV streams"
-      },
-      "opt_xls" : {
-         "prereqs" : {
-            "runtime" : {
-               "recommends" : {
-                  "OLE::Storage_Lite" : "0.24",
-                  "Spreadsheet::ParseExcel" : "0.66"
-               },
-               "requires" : {
-                  "OLE::Storage_Lite" : "!= 0.21",
-                  "Spreadsheet::ParseExcel::FmtDefault" : "0",
-                  "Spreadsheet::ParseExcel" : "0.34"
-               }
-            }
-         },
-         "description" : "Provides parsing of Microsoft Excel files"
+         "recommends" : {
+            "IO::Scalar" : "0",
+            "File::Temp" : "0.2312",
+            "Data::Peek" : "0.53",
+            "Encode" : "3.21",
+            "Data::Dumper" : "2.183"
+         }
       }
    },
    "generated_by" : "Author",
-   "author" : [
-      "H.Merijn Brand <HMBRAND@cpan.org>"
-   ]
+   "provides" : {
+      "Spreadsheet::Read" : {
+         "version" : "0.95",
+         "file" : "Read.pm"
+      }
+   },
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/Tux/Spreadsheet-Read",
+         "url" : "https://github.com/Tux/Spreadsheet-Read"
+      },
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/Spreadsheet-Read/issues"
+      }
+   },
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "dynamic_config" : 1
 }

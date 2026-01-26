@@ -12,7 +12,7 @@ use MCE::Loop;
 use System::CPU;
 use System::Info;
 
-our $VERSION    = '1.00';
+our $VERSION    = '1.01';
 our @EXPORT     = qw(system_identity suite_run calc_scalability suite_calc);
 our $MONO_CLOCK = $^O !~ /win/i || $Time::HiRes::VERSION >= 1.9764;
 our $QUIET      = 0;
@@ -158,8 +158,8 @@ Define a fixed seed to keep runs reproducible when your benchmark functions use
 C<rand>. The seed will be passed to C<srand> before each call to a benchmark
 function. Set to 0 to skip rand seeding.
 
-=item * C<no_pass> (Bool; default 0):
-Do check for Pass/Fail even if reference output is defined.
+=item * C<no_check> (Bool; default 0):
+Do not check for Pass/Fail even if reference output is defined.
 
 =item * C<no_mce> (Bool; default 0):
 Do not run under L<MCE::Loop> (sets C<threads=1>, C<scale=1>).
@@ -188,15 +188,17 @@ The result hash return looks like this:
 
 =head2 C<suite_calc>
 
- my ($stats, $stats_multi, $scal) = suite_calc(\%suite_run_options, , $keep_outliers?);
+ my ($stats, $stats_multi, $scal) = suite_calc(\%suite_run_options, $keep_outliers?);
 
-Convenience function that combines 3 calls, L<suite_run> with C<threads=E<gt>1>,
-L<suite_run> with C<threads=E<gt>system_identity(1)> and L<calc_scalability> with
+Convenience function that combines 3 calls, L</suite_run> with C<threads=E<gt>1>,
+L</suite_run> with C<threads=E<gt>system_identity(1)> and L</calc_scalability> with
 the results of those two, returning hashrefs with the results of all three calls.
 
 For single-core systems (or when C<system_identity(1)> does not return E<gt> 1)
 only C<$stats> will be returned.
 
+You can override the C<system_identity(1)> call and run the multi-thread bench with
+a custom number of threads by passing C<threads =E<gt> [count]>.
 
 =head1 BENCHMARK FUNCTIONS
 
@@ -284,7 +286,7 @@ sub system_identity {
     my $model = System::CPU::get_name || '';
     my $arch  = System::CPU::get_arch || '';
     $arch = " ($arch)" if $arch;
-    _print("--------------- Software ---------------\n",__PACKAGE__," v$VERSION\n");
+    _print("--------------- Software ---------------\n",_package_ver(),"\n");
     _printf(
         "Perl $^V (%sthreads, %smulti)\n",
         $Config{usethreads}      ? '' : 'no ',
@@ -307,7 +309,7 @@ sub suite_calc {
     my $opt      = shift;
     my $outliers = shift;
     my %single   = suite_run({%$opt, threads => 1});
-    my $cpus     = system_identity(1);
+    my $cpus     = $opt->{threads} || system_identity(1);
     return \%single unless $cpus > 1;
     my %multi = suite_run({%$opt, threads => $cpus});
     return \%single, \%multi, {calc_scalability(\%single, \%multi, $outliers)};
@@ -450,7 +452,7 @@ sub _init_options {
     ($opt->{time}, $opt->{no_check}) = (1, 1) if $opt->{quick};
     $opt->{scale} = 1 if $opt->{quick} || $opt->{no_mce};
     foreach my $arr (values %{$opt->{bench}}) {
-        $opt->{time}     = 1 unless scalar(@$arr) > 2 && $arr->[2] > 0;
+        $opt->{time}     = 1 unless scalar(@$arr) > 2 && $arr->[2] && $arr->[2] > 0;
         $opt->{no_check} = 1 unless scalar(@$arr) > 1 && defined $arr->[1];
     }
     $opt->{f} = $opt->{time} ? '%.3f' : '%5.0f';
@@ -631,6 +633,23 @@ sub _get_time {
     return $MONO_CLOCK
         ? Time::HiRes::clock_gettime(CLOCK_MONOTONIC)
         : Time::HiRes::time();
+}
+
+sub _package_ver {
+    my $pkg = __PACKAGE__;
+    my $ver = $VERSION;
+
+    my $caller = caller(0);
+    for (my $i = 0; $i < 5; $i++) {
+        my $caller = caller($i) or last;
+        if ($caller eq 'Benchmark::DKbench') {
+            $pkg = $caller;
+            $ver = eval {$caller->VERSION} || '';
+            last;
+        }
+    }
+
+    return "$pkg v$ver";
 }
 
 1;

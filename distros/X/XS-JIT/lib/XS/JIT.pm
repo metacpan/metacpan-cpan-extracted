@@ -6,7 +6,7 @@ use warnings;
 use File::Spec;
 use Config;
 
-our $VERSION = '0.03';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('XS::JIT', $VERSION);
@@ -453,7 +453,7 @@ L<perlapi> - Perl API listing
 
 =head1 AUTHOR
 
-LNATION E<lt>email@lnation.orgE<gt>
+LNATION <email@lnation.org>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright Toolchain Gang / CPAN Security group (c) 2023-2025 H.Merijn Brand
+# Copyright Toolchain Gang / CPAN Security group (c) 2023-2026 H.Merijn Brand
 
 require 5.014000;
 use strict;

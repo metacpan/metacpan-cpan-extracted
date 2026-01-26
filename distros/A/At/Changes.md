@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1] - 2026-01-24
+
+- Fix ::Builder prereqs
+
 ## [1.0] - 2026-01-23
 
 ### Added
@@ -134,7 +138,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Original version.
 
-[Unreleased]: https://github.com/sanko/At.pm/compare/1.0...HEAD
+[Unreleased]: https://github.com/sanko/At.pm/compare/1.1...HEAD
+[1.1]: https://github.com/sanko/At.pm/compare/1.0...1.1
 [1.0]: https://github.com/sanko/At.pm/compare/0.18...1.0
 [0.18]: https://github.com/sanko/At.pm/compare/0.17...0.18
 [0.17]: https://github.com/sanko/At.pm/compare/0.16...0.17

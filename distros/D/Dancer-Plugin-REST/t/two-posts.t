@@ -15,7 +15,7 @@ use warnings;
 
 }
 
-use Test::More;
+use Test2::Bundle::More;
 use Dancer::ModuleLoader;
 
 plan skip_all => 'tests require JSON' 

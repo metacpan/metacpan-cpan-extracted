@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Dancer::ModuleLoader;
-use Test::More import => ['!pass'];
+use Test2::Bundle::More;
 
 # Dancer::Test had a bug in version previous 1.3059_01 that prevent this test
 # from running correctly.
@@ -16,7 +16,7 @@ plan tests => 8;
     package Webservice;
     use Dancer;
     use Dancer::Plugin::REST;
-    use Test::More import => ['!pass'];
+    use Test2::Bundle::More;
 
     resource user => 
         'get' => \&on_get_user,

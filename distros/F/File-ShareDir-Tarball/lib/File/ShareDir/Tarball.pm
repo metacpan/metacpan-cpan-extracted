@@ -1,12 +1,7 @@
 package File::ShareDir::Tarball;
-BEGIN {
-  $File::ShareDir::Tarball::AUTHORITY = 'cpan:YANICK';
-}
-{
-  $File::ShareDir::Tarball::VERSION = '0.2.2';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Deal transparently with shared files distributed as tarballs
-
+$File::ShareDir::Tarball::VERSION = '0.3.0';
 
 use strict;
 use warnings;
@@ -19,6 +14,7 @@ use File::ShareDir;
 use Archive::Tar;
 use File::Temp qw/ tempdir /;
 use File::chdir;
+use Memoize;
 
 our @EXPORT_OK   = qw{
     dist_dir dist_file
@@ -29,20 +25,17 @@ our %EXPORT_TAGS = (
 
 my $shared_files_tarball = 'shared-files.tar.gz';
 
-# we don't want to extract the same dirs again and 
+# we don't want to extract the same dirs again and
 # again within a single program
-my %DIR_CACHE;
+memoize('dist_dir');
 
 sub dist_dir {
     my $dist = shift;
 
-    return $DIR_CACHE{$dist} if $DIR_CACHE{$dist};
-
     my $dir = File::ShareDir::dist_dir($dist);
 
     # no tarball? Assume regular shared dir
-    return $DIR_CACHE{$dist} = $dir 
-        unless -f "$dir/$shared_files_tarball";
+    return $dir unless -f "$dir/$shared_files_tarball";
 
     my $archive = Archive::Tar->new;
     $archive->read("$dir/$shared_files_tarball");
@@ -56,7 +49,7 @@ sub dist_dir {
 
     $archive->extract;
 
-    return $DIR_CACHE{$dist} = $tmpdir;
+    return $tmpdir;
 }
 
 sub dist_file {
@@ -65,17 +58,16 @@ sub dist_file {
 
     my $path = dist_dir($dist).'/'.$file;
 
-	return undef unless -e $path;
+    return undef unless -e $path;
 
-    croak("Found dist_file '$path', but not a file") 
+    croak("Found dist_file '$path', but not a file")
         unless -f $path;
 
-    croak("File '$path', no read permissions") 
+    croak("File '$path', no read permissions")
         unless -r $path;
 
-	return $path;
+    return $path;
 }
-
 
 1;
 
@@ -83,13 +75,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 File::ShareDir::Tarball - Deal transparently with shared files distributed as tarballs
 
 =head1 VERSION
 
-version 0.2.2
+version 0.3.0
 
 =head1 SYNOPSIS
 
@@ -102,10 +96,10 @@ version 0.2.2
 
 If the shared files of a distribution are contained in a
 tarball (see L<Dist::Zilla::Plugin::ShareDir::Tarball> for
-why you would want to do that), automatically 
+why you would want to do that), automatically
 extract the archive in a temporary
 directory and return the path to that directory. If called for a regular distribution without a bundle file
-(C<shared-files.tar.gz>), it'll return the original shared dir. 
+(C<shared-files.tar.gz>), it'll return the original shared dir.
 In other words,
 from the consumer point of view, it'll behave just like L<File::ShareDir>.
 
@@ -131,7 +125,7 @@ Behaves just like C<dist_file()> from L<File::ShareDir>.
 
 =item L<Test::File::ShareDir>
 
-To test or use a shared dir that is not deployed yet. 
+To test or use a shared dir that is not deployed yet.
 
 =item L<Dist::Zilla::Plugin::ShareDir::Tarball>
 
@@ -151,7 +145,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2026 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

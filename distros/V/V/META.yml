@@ -6,7 +6,7 @@ author:
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150010
+generated_by: Author, CPAN::Meta::Converter version 2.150011
 license: perl
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,9 +15,9 @@ name: V
 provides: 
   V: 
     file: lib/V.pm
-    version: '0.22'
+    version: '0.23'
 recommends: 
-  Test::Simple: '1.302207'
+  Test::Simple: '1.302219'
 requires: 
   File::Spec: 0
   Test::Fatal: 0
@@ -29,4 +29,4 @@ resources:
   homepage: https://metacpan.org/pod/V
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/V
-version: '0.22'
+version: '0.23'

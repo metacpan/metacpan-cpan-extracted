@@ -1,0 +1,144 @@
+NAME
+    Hash::Util::Set - Set operations on hash keys
+
+SYNOPSIS
+       use Hash::Util::Set qw(:all);
+   
+       %x = (a => 1, b => 2, c => 3);
+       %y = (b => 4, c => 5, d => 6);
+   
+       # Set operations
+       @keys = keys_union %x, %y;                 # (a, b, c, d)
+       @keys = keys_intersection %x, %y;          # (b, c)
+       @keys = keys_difference %x, %y;            # (a)
+       @keys = keys_symmetric_difference %x, %y;  # (a, d)
+   
+       # Set predicates
+       $bool = keys_disjoint %x, %y;              # no common keys?
+       $bool = keys_equal %x, %y;                 # same keys?
+       $bool = keys_subset %x, %y;                # x ⊆ y?
+       $bool = keys_proper_subset %x, %y;         # x ⊂ y?
+       $bool = keys_superset %x, %y;              # x ⊇ y?
+       $bool = keys_proper_superset %x, %y;       # x ⊃ y?
+   
+       # Key membership tests
+       $bool = keys_any  %x, 'a', 'z';            # at least one exists?
+       $bool = keys_all  %x, 'a', 'b', 'c';       # all exist?
+       $bool = keys_none %x, 'x', 'y', 'z';       # none exist?
+
+DESCRIPTION
+    "Hash::Util::Set" provides set operations on hash keys. It treats the
+    keys of a hash as a set and provides common set operations (union,
+    intersection, difference), set predicates, and membership tests.
+
+    All operations work only on keys; values are ignored.
+
+    This module automatically uses the XS implementation if available,
+    falling back to pure Perl otherwise.
+
+FUNCTIONS
+  Set Operations
+    Order of keys is unspecified for all set operations.
+
+   keys_union
+       @keys = keys_union %x, %y;
+
+    Returns all keys present in either hash ("A ∪ B").
+
+   keys_intersection
+       @keys = keys_intersection %x, %y;
+
+    Returns keys present in both hashes ("A ∩ B").
+
+   keys_difference
+       @keys = keys_difference %x, %y;
+
+    Returns keys in %x but not in %y ("A \ B").
+
+   keys_symmetric_difference
+       @keys = keys_symmetric_difference %x, %y;
+
+    Returns keys in either hash but not both ("A △ B").
+
+  Set Predicates
+   keys_disjoint
+       $bool = keys_disjoint %x, %y;
+
+    True if hashes have no common keys ("A ∩ B = ∅").
+
+   keys_equal
+       $bool = keys_equal %x, %y;
+
+    True if hashes have exactly the same keys ("A = B").
+
+   keys_subset
+       $bool = keys_subset %x, %y;
+
+    True if all keys in %x are in %y ("A ⊆ B").
+
+   keys_proper_subset
+       $bool = keys_proper_subset %x, %y;
+
+    True if %x ⊂ %y and they're not equal ("A ⊂ B" where "A ≠ B").
+
+   keys_superset
+       $bool = keys_superset %x, %y;
+
+    True if %x contains all keys from %y ("A ⊇ B").
+
+   keys_proper_superset
+       $bool = keys_proper_superset %x, %y;
+
+    True if %x ⊃ %y and they're not equal ("A ⊃ B" where "A ≠ B").
+
+  Key Membership Tests
+    These functions test whether specific keys exist in a hash.
+
+   keys_any
+       $bool = keys_any %x, LIST;
+
+    True if at least one key in LIST exists in %x. Returns false for empty
+    LIST.
+
+   keys_all
+       $bool = keys_all %x, LIST;
+
+    True if all keys in LIST exist in %x. Returns true for empty LIST.
+
+   keys_none
+       $bool = keys_none %x, LIST;
+
+    True if none of the keys in LIST exist in %x. Returns true for empty
+    LIST.
+
+ALIASES
+    Shorter aliases:
+
+        keys_or   =>  keys_union
+        keys_and  =>  keys_intersection
+        keys_sub  =>  keys_difference
+        keys_xor  =>  keys_symmetric_difference
+
+EXPORTS
+    Nothing is exported by default. Import functions individually or use
+    ":all":
+
+        use Hash::Util::Set qw(keys_union keys_intersection);
+        use Hash::Util::Set qw(:all);
+
+IMPLEMENTATION
+    Automatically uses "Hash::Util::Set::XS" if available, otherwise falls
+    back to "Hash::Util::Set::PP".
+
+SEE ALSO
+    Hash::Util, List::Util, Set::Scalar, Set::Object
+
+AUTHOR
+    Christian Hansen <chansen@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2025 Christian Hansen
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

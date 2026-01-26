@@ -1,0 +1,89 @@
+{
+   "X_No_Archive" : "Yes",
+   "abstract" : "BitTorrent's Serialization Format for Structured Data",
+   "author" : [
+      "Sanko Robinson <sanko@cpan.org>"
+   ],
+   "description" : "Bencoding is the BitTorrent protocol's basic serialization and data organization format.",
+   "dynamic_config" : 0,
+   "generated_by" : "App::mii v1.0.0",
+   "keywords" : [
+      "bencode",
+      "serialization",
+      "bittorrent"
+   ],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-BitTorrent-Protocol-BEP03-Bencode",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0",
+            "perl" : "v5.40.0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.40.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::BitTorrent::Protocol::BEP03::Bencode" : {
+         "file" : "lib/Net/BitTorrent/Protocol/BEP03/Bencode.pm",
+         "version" : "v2.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sanko/Net-BitTorrent-Protocol-BEP03-Bencode.pm/issues"
+      },
+      "homepage" : "https://github.com/sanko/Net-BitTorrent-Protocol-BEP03-Bencode.pm",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sanko/Net-BitTorrent-Protocol-BEP03-Bencode.pm.git",
+         "web" : "https://github.com/sanko/Net-BitTorrent-Protocol-BEP03-Bencode.pm"
+      }
+   },
+   "version" : "v2.0.1",
+   "x_help_wanted" : [
+      "Tester",
+      "Documenter"
+   ],
+   "x_ignore" : [
+      ".tidyallrc",
+      ".gitignore",
+      ".github/",
+      ".github/*",
+      ".github/**",
+      ".clang-format"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 0
+}

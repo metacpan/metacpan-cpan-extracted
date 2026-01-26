@@ -49,3 +49,16 @@ Revision history for Meow
 0.19	2026-01-24
 	- XS::JIT brings the unnecessary need for speed..
 	  - Meow: 1 wallclock secs ( 0.96 usr +  0.00 sys =  0.96 CPU) @ 5208333.33/s (n=5000000)
+
+0.20	2026-01-24
+	- Move to slots which reduces overhead... overhead maybe in XS callstack itself now unsure :)
+	  - Meow:  5 wallclock secs ( 5.30 usr +  0.01 sys =  5.31 CPU) @ 6277761.96/s (n=33334916)
+
+0.21	2026-01-24
+	- Expose slot variables and then show accessing by slot index is actually faster than pure python..
+	- limit with accessors is in perl stack call not sure how to get around that one yet..
+	  - Meow (direct):  5 wallclock secs ( 5.00 usr +  0.02 sys =  5.02 CPU) @ 7230451.20/s (n=36296865)
+
+0.22	2026-01-24
+	- The unholy op's...
+	  -  Meow (op):  5 wallclock secs ( 5.16 usr +  0.01 sys =  5.17 CPU) @ 7394453.19/s (n=38229323)

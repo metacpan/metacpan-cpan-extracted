@@ -7,13 +7,14 @@ use Test::More;
 
 my @CLASSES = qw(
     URI::PackageURL
-    URI::PackageURL::Util
     URI::PackageURL::App
+    URI::PackageURL::Type
+    URI::PackageURL::Util
 
     URI::VersionRange
+    URI::VersionRange::App
     URI::VersionRange::Constraint
     URI::VersionRange::Version
-    URI::VersionRange::App
 );
 
 use_ok($_) for @CLASSES;

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Dancer::ModuleLoader;
-use Test::More import => ['!pass'];
+use Test2::Bundle::More;
 
 # Dancer::Test had a bug in version previous 1.3059_01 that prevent this test
 # from running correctly.

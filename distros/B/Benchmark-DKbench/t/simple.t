@@ -53,27 +53,6 @@ is([sort keys %scal], [qw/Astro _total/], 'Expected scal keys');
 like($std[0], qr/Overall Avg Score/, 'Aggregate');
 diag $std[0];
 
-%stats2 = %stats1;
-$stats2{_opt} = {%{$stats1{_opt}}};
-$stats2{_opt}->{threads} = 2;
-@std = capture {calc_scalability(\%stats1, \%stats2)};
-like($std[0], qr/Single:\s*\d+\s*\(\d+ - \d+/, 'Min Max');
-
-$stats1{_opt}->{iter} = 1;
-@std = capture {calc_scalability(\%stats1, \%stats2)};
-
-unlike($std[0], qr/scale/, 'No scale listed');
-unlike($std[0], qr/iterations/, 'No iterations listed');
-
-$stats1{_opt}->{iter}  = 2;
-$stats1{_opt}->{time}  = 1;
-$stats1{_opt}->{scale} = 2;
-$stats2{_opt}->{scale} = 2;
-@std = capture {calc_scalability(\%stats2, \%stats1)};
-
-like($std[0], qr/scale/, 'Scale listed');
-like($std[0], qr/iterations/, 'Iterations listed');
-
 @std = capture {
     suite_run({
             threads => 1,

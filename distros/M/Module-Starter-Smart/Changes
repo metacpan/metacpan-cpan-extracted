@@ -1,5 +1,8 @@
 Revision history for Module-Starter-Smart
 
+0.0.10 Jan 25, 2026
+    * Adjust tests to Module::Starter::Simple >= 1.790 (backport from Debian)
+
 0.0.9  Nov 24, 2017
     * Bug fixes
 

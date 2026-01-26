@@ -1,69 +1,75 @@
 {
-   "abstract" : "Clock widget with analog and digital display",
+   "version" : "0.45",
+   "release_status" : "stable",
    "name" : "Tk-Clock",
-   "dynamic_config" : 1,
+   "author" : [
+      "H.Merijn Brand <hmbrand@cpan.org>"
+   ],
    "provides" : {
       "Tk::Clock" : {
-         "version" : "0.44",
+         "version" : "0.45",
          "file" : "Clock.pm"
-         }
-      },
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/Tk-Clock/issues"
-         },
-      "repository" : {
-         "web" : "https://github.com/Tux/Tk-Clock",
-         "type" : "git",
-         "url" : "https://github.com/Tux/Tk-Clock"
-         },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ]
-      },
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-      ],
+      }
+   },
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+   },
+   "license" : [
+      "perl_5"
+   ],
    "prereqs" : {
       "configure" : {
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.22"
+         },
+         "suggests" : {
+            "ExtUtils::MakeMaker" : "7.76"
+         },
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
-            }
-         },
+         }
+      },
       "test" : {
          "requires" : {
             "Test::NoWarnings" : "0",
             "Test::More" : "0.90"
-            },
-         "recommends" : {
-            "Test::More" : "1.302191"
-            }
          },
+         "recommends" : {
+            "Test::More" : "1.302219"
+         }
+      },
       "runtime" : {
+         "recommends" : {
+            "Encode" : "3.21",
+            "Tk" : "804.036"
+         },
          "requires" : {
+            "POSIX" : "0",
             "Tk" : "402.000",
             "Tk::Canvas" : "0",
             "perl" : "5.006",
-            "POSIX" : "0",
-            "Tk::Derived" : "0",
-            "Tk::Widget" : "0",
             "Carp" : "0",
+            "Tk::Widget" : "0",
+            "Tk::Derived" : "0",
             "Encode" : "0"
-            },
-         "recommends" : {
-            "Tk" : "804.036",
-            "Encode" : "3.19"
-            }
          }
-      },
-   "license" : [
-      "perl_5"
-      ],
-   "version" : "0.44",
+      }
+   },
+   "abstract" : "Clock widget with analog and digital display",
    "generated_by" : "Author",
-   "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+   "dynamic_config" : 1,
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/Tk-Clock/issues"
       },
-   "release_status" : "stable"
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Tux/Tk-Clock",
+         "type" : "git",
+         "web" : "https://github.com/Tux/Tk-Clock"
+      }
    }
+}

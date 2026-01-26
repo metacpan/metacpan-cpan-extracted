@@ -1,4 +1,4 @@
-package Dist::Zilla::Chrome::Term 6.036;
+package Dist::Zilla::Chrome::Term 6.037;
 # ABSTRACT: chrome used for terminal-based interaction
 
 use Moose;
@@ -148,7 +148,7 @@ sub prompt_str {
     print "\n";
   }
 
-  my $input = $decode->($input_bytes);
+  my $input = $decode->($input_bytes) // q{};
   chomp $input;
 
   return $input;
@@ -217,7 +217,7 @@ Dist::Zilla::Chrome::Term - chrome used for terminal-based interaction
 
 =head1 VERSION
 
-version 6.036
+version 6.037
 
 =head1 OVERVIEW
 
@@ -243,7 +243,7 @@ Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Ricardo SIGNES.
+This software is copyright (c) 2026 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

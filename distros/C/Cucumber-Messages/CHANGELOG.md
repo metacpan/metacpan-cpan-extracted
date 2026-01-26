@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [32.0.1] - 2026-01-25
+### Fixed
+- Fix field order for ExternalAttachment ([#377](https://github.com/cucumber/messages/pull/377))
+
 ## [32.0.0] - 2026-01-21
 ### Added
 - Add `ExternalAttachment` for externalised attachments ([#372](https://github.com/cucumber/messages/pull/372))
@@ -651,7 +655,8 @@ aggregated status.
 ### Added
 - Protobuf messages for Go, Java, JavaScript, TypeScript and Ruby
 
-[Unreleased]: https://github.com/cucumber/messages/compare/v32.0.0...HEAD
+[Unreleased]: https://github.com/cucumber/messages/compare/v32.0.1...HEAD
+[32.0.1]: https://github.com/cucumber/messages/compare/v32.0.0...v32.0.1
 [32.0.0]: https://github.com/cucumber/messages/compare/v31.2.0...v32.0.0
 [31.2.0]: https://github.com/cucumber/messages/compare/v31.1.0...v31.2.0
 [31.1.0]: https://github.com/cucumber/messages/compare/v31.0.1...v31.1.0

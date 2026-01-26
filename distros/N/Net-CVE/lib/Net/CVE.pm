@@ -5,7 +5,7 @@ package Net::CVE;
 use 5.014002;
 use warnings;
 
-our $VERSION = "0.009";
+our $VERSION = "0.010";
 
 use Carp;
 use HTTP::Tiny;
@@ -476,6 +476,9 @@ Readme, Changelog, Makefile.PL, ...
 Optionally. It does not (yet) provide vendor, product and platforms.
 It however provides nice search capabilities.
 
+=item EUVD support
+
+
 =item RHSA support
 
 Extend to return results for C<RHSA-2023:1791> type vulnerability tags.
@@ -497,6 +500,16 @@ Will set C<@cve> to
      CVE-2023-29550 );
 
 See L<the API documentation|https://access.redhat.com/documentation/en-us/red_hat_security_data_api/1.0/html-single/red_hat_security_data_api/index>.
+
+=item SUSE support
+
+Extend to return results for C<SUSE-SU-2025:01968-1> type vulnerability tags.
+
+ https://www.suse.com/support/update/announcement/2025/suse-su-202501968-1/
+
+Shouls set C<@cve> to
+
+ qw( CVE-2025-5601 );
 
 =back
 
@@ -524,7 +537,7 @@ H.Merijn Brand <hmbrand@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2023-2024 H.Merijn Brand
+Copyright (C) 2023-2026 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. See L<perlartistic>.

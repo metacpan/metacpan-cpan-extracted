@@ -10,16 +10,32 @@ WriteMakefile(
     ABSTRACT_FROM     => 'lib/LaTeX/Replicase.pm', # retrieve abstract from module
     AUTHOR            => 'Alessandro Gorohovski <an.gorohovski@gmail.com>',
     LICENSE           => 'perl', #Value must be from legacy list of licenses here http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI
-
     PREREQ_PM         => {
-		'Test::More'         => '0.98',
-		'Test::More::UTF8'   => '0.05',
-		'Test::Pod'          => '1.22',
-		'Test::Exception'    => '0.43',
-		'File::Basename'     => '2.86',
-		'File::Path'         => '2.18',
-		'File::Compare'      => '1.00',
-		'Carp'               => '0',
+      'Test::More'         => '0.98',
+      'Test::More::UTF8'   => '0.05',
+      'Test::Pod'          => '1.22',
+      'Test::Exception'    => '0.43',
+      'File::Basename'     => '2.00',
+      'File::Path'         => '2.18',
+      'File::Compare'      => '1.00',
+      'Carp'               => '0',
+      'Test::Output'       => '1.01',
+    },
+    test => {
+      TESTS => 't/*.t t/*/*.t',
+    },
+    META_MERGE => {
+      'meta-spec' => { version => 2 },
+      resources => {
+        repository => {
+          type => 'git',
+          url  => 'git://github.com/AlessandroGorohovski/LaTeX-Replicase.git',
+          web  => 'https://github.com/AlessandroGorohovski/LaTeX-Replicase',
+        },
+        bugtracker => {
+          web => 'https://github.com/AlessandroGorohovski/LaTeX-Replicase/issues'
+        },
+      },
     },
     dist => {
         COMPRESS => 'gzip -9f',
@@ -29,3 +45,4 @@ WriteMakefile(
       (ABSTRACT_FROM  => 'lib/LaTeX/Replicase.pm',
        AUTHOR         => 'Alessandro Gorohovski <an.gorohovski@gmail.com>') : ()),
 );
+

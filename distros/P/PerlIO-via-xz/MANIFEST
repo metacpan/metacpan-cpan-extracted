@@ -2,6 +2,7 @@ MANIFEST
 README
 ChangeLog
 CONTRIBUTING.md
+SECURITY.md
 Makefile.PL
 cpanfile
 lib/PerlIO/via/xz.pm

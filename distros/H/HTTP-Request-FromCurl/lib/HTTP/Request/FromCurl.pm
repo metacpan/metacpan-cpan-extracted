@@ -1,4 +1,4 @@
-package HTTP::Request::FromCurl 0.55;
+package HTTP::Request::FromCurl 0.56;
 use 5.020;
 use File::Basename 'basename';
 use HTTP::Request;
@@ -714,7 +714,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2018-2025 by Max Maischein C<corion@cpan.org>.
+Copyright 2018-2026 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

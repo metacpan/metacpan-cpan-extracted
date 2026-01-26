@@ -10,6 +10,7 @@ use List::Util qw(first);
 use Exporter   qw(import);
 
 use URI::VersionRange::Constraint;
+use URI::VersionRange::Util qw(native_range_to_vers version_compare);
 use URI::VersionRange::Version;
 
 use constant DEBUG => $ENV{VERS_DEBUG};
@@ -18,7 +19,9 @@ use constant FALSE => !!0;
 
 use overload '""' => 'to_string', fallback => 1;
 
-our $VERSION = '2.23';
+BEGIN { *VERS:: = *URI::VersionRange:: }
+
+our $VERSION = '2.24';
 our @EXPORT  = qw(encode_vers decode_vers);
 
 my $VERS_REGEXP = qr{^vers:[a-z\\.\\-\\+][a-z0-9\\.\\-\\+]*/.+};
@@ -44,44 +47,10 @@ sub new {
 
     $scheme = lc $scheme;
 
-    my $self = {scheme => $scheme, constraints => \@constraints, _version_class => _scheme_version_class($scheme)};
+    my $self
+        = {scheme => $scheme, constraints => \@constraints, scheme_class => URI::VersionRange::Version->load($scheme)};
 
     return bless $self, $class;
-
-}
-
-sub _load_version_class {
-
-    my $version_class = shift;
-
-    if ($version_class->can('new') or eval "require $version_class; 1") {
-        DEBUG and say STDERR "-- Loaded '$version_class' class";
-        return 1;
-    }
-
-    DEBUG and say STDERR "-- (E) Failed to load '$version_class' class:" if $@;
-
-    return 0;
-
-}
-
-sub _scheme_version_class {
-
-    my $scheme = shift;
-
-    my @CLASSES = (
-        join('::', 'URI::VersionRange::Version', lc($scheme)),    # Schema specific
-        'URI::VersionRange::Version::generic',                    # Generic or used-defined class
-        'URI::VersionRange::Version'                              # Fallback class
-    );
-
-    foreach my $version_class (@CLASSES) {
-        if (_load_version_class($version_class)) {
-            return $version_class;
-        }
-    }
-
-    Carp::croak 'Unable to find version scheme class';
 
 }
 
@@ -90,6 +59,18 @@ sub constraints { shift->{constraints} }
 
 sub encode_vers { __PACKAGE__->new(@_)->to_string }
 sub decode_vers { __PACKAGE__->from_string(shift) }
+
+sub from_native {
+
+    my ($class, %params) = @_;
+
+    my $scheme = delete $params{scheme} or Carp::croak "Invalid Version Range: 'scheme' is required";
+    my $range  = delete $params{range}  or Carp::croak "Invalid Version Range: 'range' is required";
+
+    my $vers = native_range_to_vers(lc $scheme, $range);
+    return $class->from_string($vers);
+
+}
 
 sub from_string {
 
@@ -166,7 +147,9 @@ sub from_string {
 }
 
 sub to_string {
-    return join '', 'vers:', $_[0]->scheme, '/', join('|', @{$_[0]->constraints});
+    my $self        = shift;
+    my @constraints = sort { version_compare($self->scheme, $a->version, $b->version) } @{$self->constraints};
+    return join '', 'vers:', $self->scheme, '/', join('|', @constraints);
 }
 
 sub constraint_contains {
@@ -175,10 +158,10 @@ sub constraint_contains {
 
     return TRUE if $constraint->comparator eq '*';
 
-    my $version_class = $self->{_version_class};
+    my $version_class = $self->{scheme_class};
 
-    my $v1 = $version_class->parse($version);
-    my $v2 = $version_class->parse($constraint->version);
+    my $v1 = $version_class->new($version);
+    my $v2 = $version_class->new($constraint->version);
 
     return ($v1 == $v2) if ($constraint->comparator eq '=');
     return ($v1 != $v2) if ($constraint->comparator eq '!=');
@@ -198,7 +181,7 @@ sub contains {
     my @first  = ();
     my @second = ();
 
-    my $version_class = $self->{_version_class};
+    my $version_class = $self->{scheme_class};
 
     if (scalar @{$self->constraints} == 1) {
         return $self->constraint_contains($self->constraints->[0], $version);
@@ -212,7 +195,7 @@ sub contains {
 
         return TRUE
             if ((first { $constraint->comparator eq $_ } ('=', '<=', '>='))
-            && ($version_class->parse($version) == $version_class->parse($constraint->version)));
+            && ($version_class->new($version) == $version_class->new($constraint->version)));
 
         # If the "tested version" is equal to the any of the constraint version
         # where the constraint comparator is "=!" then the "tested version" is NOT
@@ -220,7 +203,7 @@ sub contains {
 
         return FALSE
             if ($constraint->comparator eq '!='
-            && ($version_class->parse($version) == $version_class->parse($constraint->version)));
+            && ($version_class->new($version) == $version_class->new($constraint->version)));
 
         # Split the constraint list in two sub lists:
         #    a first list where the comparator is "=" or "!="
@@ -262,7 +245,7 @@ sub contains {
 
             return TRUE
                 if ((first { $current_constraint->comparator eq $_ } ('<=', '<'))
-                && ($version_class->parse($version) < $version_class->parse($current_constraint->version)));
+                && ($version_class->new($version) < $version_class->new($current_constraint->version)));
 
             $is_first_iteration = FALSE;
 
@@ -275,8 +258,8 @@ sub contains {
 
         if (   (first { $current_constraint->comparator eq $_ } ('>', '>='))
             && (first { $next_constraint->comparator eq $_ } ('<', '<='))
-            && ($version_class->parse($version) > $version_class->parse($current_constraint->version))
-            && ($version_class->parse($version) < $version_class->parse($next_constraint->version)))
+            && ($version_class->new($version) > $version_class->new($current_constraint->version))
+            && ($version_class->new($version) < $version_class->new($next_constraint->version)))
         {
             return TRUE;
         }
@@ -298,15 +281,17 @@ sub contains {
 
     return TRUE
         if ((first { $next_constraint->comparator eq $_ } ('>', '>='))
-        && ($version_class->parse($version) > $version_class->parse($next_constraint->version)));
+        && ($version_class->new($version) > $version_class->new($next_constraint->version)));
 
     return FALSE;
 
 }
 
-sub TO_JSON {
+sub to_hash {
     return {scheme => $_[0]->scheme, constraints => $_[0]->constraints};
 }
+
+sub TO_JSON { shift->to_hash }
 
 sub _pairwise {
 
@@ -323,9 +308,12 @@ sub _pairwise {
 1;
 
 __END__
+
+=encoding utf-8
+
 =head1 NAME
 
-URI::VersionRange - Perl extension for Version Range Specification
+URI::VersionRange - Perl extension for VERS (Version Range Specifier)
 
 =head1 SYNOPSIS
 
@@ -345,20 +333,31 @@ URI::VersionRange - Perl extension for Version Range Specification
   }
 
   # Parse "vers" string
-  $vers = URI::VersionRange->from_string('vers:cpan/>2.00|<2.23');
+  $vers = URI::VersionRange->from_string('vers:cpan/>2.00|<2.24');
+
 
   # exported functions
 
-  $vers = decode_vers('vers:cpan/>2.00|<2.23');
+  $vers = decode_vers('vers:cpan/>2.00|<2.24');
   say $vers->scheme;  # cpan
 
   $vers_string = encode_vers(scheme => cpan, constraints => ['>2.00']);
   say $vers_string; # vers:cpan/>2.00
 
 
+  # alias
+
+  $vers = VERS->new(
+    scheme      => 'cpan',
+    constraints => ['>2.00']
+  );
+
+  $vers = VERS->from_string('vers:cpan/>2.00|<2.24');
+
+
 =head1 DESCRIPTION
 
-A version range specifier (aka. "vers") is a URI string using the C<vers> URI-scheme with this syntax:
+A version range specifier (VERS) is a URI string using the C<vers> URI-scheme with this syntax:
 
   vers:<versioning-scheme>/<version-constraint>|<version-constraint>|...
 
@@ -375,16 +374,18 @@ that specify version intervals.
 A C<version> satisfies a version range specifier if it is contained within any
 of the intervals defined by these C<version-constraint>.
 
-L<https://github.com/package-url/purl-spec>
+L<https://github.com/package-url/vers-spec>
+
+L<TC54 - Software and system transparency|https://tc54.org/>
 
 
 =head2 FUNCTIONAL INTERFACE
 
 They are exported by default:
 
-=over
+=head3 B<encode_vers>
 
-=item $vers_string = encode_vers(%params);
+    $vers_string = encode_vers(%params);
 
 Converts the given C<vers> components to "vers" string. Croaks on error.
 
@@ -392,7 +393,9 @@ This function call is functionally identical to:
 
     $vers_string = URI::VersionRange->new(%params)->to_string;
 
-=item $vers = decode_vers($vers_string);
+=head3 B<decode_vers>
+
+    $vers = decode_vers($vers_string);
 
 Converts the given "vers" string to L<URI::VersionRange> object. Croaks on error.
 
@@ -400,31 +403,37 @@ This function call is functionally identical to:
 
     $vers = URI::VersionRange->from_string($vers_string);
 
-=back
 
 =head2 OBJECT-ORIENTED INTERFACE
 
-=over
+=head3 B<new>
 
-=item $vers = URI::VersionRange->new( scheme => STRING, constraints => ARRAY )
+    $vers = URI::VersionRange->new( scheme => STRING, constraints => ARRAY )
+    $vers = VERS->new( scheme => STRING, constraints => ARRAY )
 
-Create new B<URI::VersionRange> instance using provided C<vers> components
+Create new L<URI::VersionRange> instance using provided VERS components
 (scheme, constraints).
 
-=item $vers->scheme
+=head3 B<scheme>
+
+    $vers->scheme
 
 By convention the versioning scheme should be the same as the L<URI::PackageURL>
 package C<type> for a given package ecosystem.
 
-=item $vers->constraints
+=head3 B<constraints>
+
+    $vers->constraints
 
 C<constraints> is ARRAY of L<URI::VersionRange::Constraint> object.
 
-=item $vers->contains($version)
+=head3 B<contains>
+
+    $vers->contains($version)
 
 Check if a version is contained within a range
 
-    my $vers = URI::VersionRange::from_string('vers:cpan/>2.00|<2.23');
+    my $vers = URI::VersionRange::from_string('vers:cpan/>2.00|<2.24');
 
     if ($vers->contains('2.10')) {
         say "The version is in range";
@@ -432,29 +441,58 @@ Check if a version is contained within a range
 
 See L<URI::VersionRange::Version>.
 
-=item $vers->constraint_contains
+=head3 B<constraint_contains>
+
+    $vers->constraint_contains
 
 Check if a version is contained within a specific constraint.
 
 See L<URI::VersionRange::Version>.
 
-=item $vers->to_string
+=head3 B<to_hash>
 
-Stringify C<vers> components.
+    $vers->to_hash
 
-=item $vers->TO_JSON
+Turn VERS components into a hash reference.
+
+=head3 B<to_string>
+
+    $vers->to_string
+
+Stringify VERS components.
+
+=head3 B<TO_JSON>
+
+    $vers->TO_JSON
 
 Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Mojo::JSON>, etc).
 
     use Mojo::JSON qw(encode_json);
 
-    say encode_json($vers);  # {"constraints":[{"comparator":">","version":"2.00"},{"comparator":"<","version":"2.23"}],"scheme":"cpan"}
+    say encode_json($vers);
 
-=item $vers = URI::VersionRange->from_string($vers_string);
+    # {
+    #   "constraints": [
+    #     {
+    #       "comparator": ">",
+    #       "version": "2.00"
+    #     },
+    #     {
+    #       "comparator": "<",
+    #       "version": "2.24"
+    #     }
+    #   ],
+    #   "scheme": "cpan"
+    # }
 
-Converts the given "vers" string to L<URI::VersionRange> object. Croaks on error.
 
-=back
+=head3 B<from_string>
+
+    $vers = URI::VersionRange->from_string($vers_string);
+    $vers = VERS->from_string($vers_string);
+
+Converts the given "vers" string to VERS components and return L<URI::VersionRange>
+instance. Croaks on error.
 
 
 =head1 SUPPORT
@@ -477,7 +515,7 @@ L<https://github.com/giterlizzi/perl-URI-PackageURL>
 
 =head1 AUTHOR
 
-=over 4
+=over
 
 =item * Giuseppe Di Terlizzi <gdt@cpan.org>
 
@@ -486,7 +524,7 @@ L<https://github.com/giterlizzi/perl-URI-PackageURL>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2022-2025 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2022-2026 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

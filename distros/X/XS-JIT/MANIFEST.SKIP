@@ -1,0 +1,36 @@
+# Build artifacts
+\.o$
+\.bs$
+^blib/
+^_CACHED_XS/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^pm_to_blib$
+
+# Generated C files in root (not lib/)
+^JIT\.c$
+
+# Version control
+^\.git/
+\.gitignore$
+
+# Editor files
+~$
+\.swp$
+\.bak$
+
+# Debug/development files
+^debug_
+^ignore\.txt$
+^JIT\.(o|c|bs)$
+
+# Documentation drafts
+^PLAN-
+^docs/
+
+# Benchmarks and examples that aren't needed for distribution
+^bench/
+
+# Test cache
+^t/_test_cache/

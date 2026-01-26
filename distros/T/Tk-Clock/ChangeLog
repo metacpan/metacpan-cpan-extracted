@@ -1,7 +1,19 @@
-0.43	- 06 Jan 2023, H.Merijn Brand
+0.45	- 25 Jan 2026, H.Merijn Brand
+    * Refine requirements based on CVE's
+    * Work around groff-1.24
+    * It's 2024
+    * Missing ; in doc example
+    * Tested on perl-5.40
+    * Added textInfo / useText
+    * Added time2* with own timeZone
+    * It's 2026
+
+0.44	- 06 Jan 2023, H.Merijn Brand
+    * It's 2023
+
+0.43	- 01 Jan 2022, H.Merijn Brand
     * It's 2021 - no changes in 2021
     * It's 2022
-    * It's 2023
 
 0.42	- 23 Dec 2020, H.Merijn Brand
     * Ignore leading dash in config

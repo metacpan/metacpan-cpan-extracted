@@ -9,12 +9,12 @@ use HTTP::Request::FromWget;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
 my $has_tidy;
 BEGIN { eval { require Perl::Tidy; $has_tidy = 1; } }
 
-Getopt::Long::Configure('pass_through');
+Getopt::Long::Configure('pass_through','no_ignore_case');
 GetOptions(
     'no-tidy'   => \my $no_tidy,
     'type|t=s'  => \my $ua_type,

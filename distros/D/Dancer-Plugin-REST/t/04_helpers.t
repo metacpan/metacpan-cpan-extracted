@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Dancer::ModuleLoader;
-use Test::More import => ['!pass'];
+use Test2::Bundle::More;
 
 plan tests => 16;
 

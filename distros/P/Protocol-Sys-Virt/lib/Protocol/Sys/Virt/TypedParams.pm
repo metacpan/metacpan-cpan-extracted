@@ -14,7 +14,7 @@ use v5.14.1;
 use warnings;
 use Syntax::Operator::Elem qw( elem_str );
 
-package Protocol::Sys::Virt::TypedParams v12.0.5;
+package Protocol::Sys::Virt::TypedParams v12.0.6;
 
 
 use Carp qw(croak);
@@ -75,8 +75,8 @@ sub typed_params_check_fields_only {
     my ( $params, @fields ) = @_;
 
     for my $param (@{ $params }) {
-        unless (elem_str $param->{field}, @fields) {
-            croak "Unexpected parameter $param->{fields}";
+        unless (elem_str( $param->{field}, @fields )) {
+            croak "Unexpected parameter $param->{field}";
         }
     }
     return 1;
@@ -212,7 +212,7 @@ Protocol::Sys::Virt::TypedParams - Helper routines for typed parameter values
 
 =head1 VERSION
 
-v12.0.5
+v12.0.6
 
 =head1 SYNOPSYS
 
@@ -308,6 +308,15 @@ adds a field by this name to the parameter set.
   my $fields = typed_params_fields( $params, $fieldname );
 
 Returns all fields in the parameter set whose name matches C<$fieldname>.
+
+=head2 typed_params_check_fields_only
+
+  my $bool = typed_params_check_fields_only( $params, $fieldname1, $fieldname2, ... );
+
+Returns true when there are no other parameters than with the field names
+passed in the arguments list.
+
+On failure, throws an error.
 
 =head2 typed_params_field_int_value
 

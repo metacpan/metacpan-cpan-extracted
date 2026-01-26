@@ -38,9 +38,10 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'Test::Exception' => '0',
-                                   'Test::More' => '0',
-                                   'Test::Warn' => '0'
+                                   'Test2::Bundle::More' => '0',
+                                   'Test2::Tools::Exception' => '0',
+                                   'Test2::Tools::Warnings' => '0',
+                                   'Test::More' => '0'
                                  }
                  }
      };

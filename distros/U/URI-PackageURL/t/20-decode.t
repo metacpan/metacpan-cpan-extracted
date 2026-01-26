@@ -41,7 +41,6 @@ subtest "Decode '$t2'" => sub {
 
     is($purl->to_string, $t2, 'PackageURL');
 
-
 };
 
 subtest "Decode '$t3'" => sub {

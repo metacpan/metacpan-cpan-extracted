@@ -4,7 +4,7 @@
       "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -53,20 +53,21 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::Exception" : "0",
-            "Test::More" : "0",
-            "Test::Warn" : "0"
+            "Test2::Bundle::More" : "0",
+            "Test2::Tools::Exception" : "0",
+            "Test2::Tools::Warnings" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Language::l33t" : {
          "file" : "lib/Language/l33t.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.1.0"
       },
       "Language::l33t::Operators" : {
          "file" : "lib/Language/l33t/Operators.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.1.0"
       }
    },
    "release_status" : "stable",
@@ -81,7 +82,7 @@
          "web" : "https://github.com/yanick/language-l33t"
       }
    },
-   "version" : "1.0.2",
+   "version" : "1.1.0",
    "x_author_pledge" : {
       "version" : 1
    },
@@ -93,8 +94,8 @@
       "Yanick Champoux <yanick@babyl.ca>",
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -4,10 +4,10 @@ use warnings;
 
 use HTTP::Request::FromWget;
 use LWP::UserAgent;
-use Getopt::Long ':config','pass_through';
+use Getopt::Long ':config','pass_through','no_ignore_case';
 use Pod::Usage;
 
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
 # parse output options from @ARGV
 GetOptions(

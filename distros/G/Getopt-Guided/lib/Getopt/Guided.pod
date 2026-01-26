@@ -15,7 +15,20 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
   # Parse result
   # %opts == ( a => 'av2', c => !!1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
-  # @ARGV == ( 'v1', 'v2' )
+  # @argv == ( 'v1', 'v2' )
+
+  # ---
+
+  use Getopt::Guided qw( print_version_info processopts );
+
+  my @argv = qw( -v -I lib -vv -I local/lib/perl5 );
+
+  processopts( @argv, 'V' => \&print_version_info, 'v+' => \my $verbosity, 'I,' => \my @inc );
+
+  # Processing result
+  # $verbosity == 3
+  # @inc       == ( 'lib', 'local/lib/perl5' )
+  # @argv      == ()
 
 =head1 DESCRIPTION
 
@@ -61,10 +74,10 @@ The options specification C<$spec> is the first parameter of the C<getopts()>
 function.  It is a non-empty string containing the option names (the single
 alphanumeric characters) recognized by the C<getopts()> function.
 
-If an option name (C<a>) is followed by a colon (C<:>) character or a comma
+If an option name ("a") is followed by a colon (C<:>) character or a comma
 (C<,>) character, the option should have an option-argument which either
-shall be supplied as a separate argument (C<-a foo>) or shall be part of the
-same argument string as the option name (C<-afoo>).  We call an option whose
+shall be supplied as a separate argument ("-a foo") or shall be part of the
+same argument string as the option name ("-afoo").  We call an option whose
 option name is followed by a colon/comma "option-argument indicator" a "common
 option"/"list option". A list option is sometimes called "multi-value option".
 The POSIX standard knows only common options.
@@ -126,8 +139,51 @@ to true (C<!!1>).  If a flag with no flag-type indicator is repeated, its
 initial value will not change.  If a negatable flag is repeated, its initial
 value will be logically negated on each occurrence.  If an incrementable flag
 is repeated, its initial value (its IV value) will be incremented by one on
-each occurrence.  Use case: A verbosity level can be represented by a C<v+>
+each occurrence.  Use case: A verbosity level can be represented by a "v+"
 incrementable flag.
+
+=head1 SEMANTIC
+
+The C<processopts( \@@ )> function adds semantic to the parse result provided
+by the C<getopts()> function. The C<processopts()> function is exported on
+request.
+
+The command-line arguments list C<@argv> is the first parameter of the
+C<processopts()> function.  The list must be passed by reference. A possible
+value of this parameter is the global C<ARGV> array.  The remaining function
+parameters form a non-empty list with an even number of elements. Each
+even-numbered element represents a single "option specification".  The element
+that follows such an option specification (an odd-numbered element) is called
+its "option destination". The destination has to be a SCALAR, an ARRAY,
+or a CODE reference.
+
+The option specification/option destination pairs are applied in order to
+the parse result. This feature can be used to implement best practices such
+as ensuring that a "-V" (version) option should have a higher precedence
+(semantic priority) than a "-h" (help) option:
+
+  processopts @argv, 'V' => sub { ... }, 'h' => sub { ... };
+
+If an option belongs to the parse result and its destination is a SCALAR
+reference, this reference points to the option-argument value (or the
+flag value).
+
+If a list option belongs to the parse result and its destination is an ARRAY
+reference, this reference points to the list of option-argument values.
+
+If an option belongs to the parse result and its destination is a CODE
+reference, the corresponding anonymous callback function is called with the
+option-argument value (or the flag value) as its first, with the option
+name as its second, and with the option-argument indicator (or flag-type
+indicator) as its third argument. If the option (or flag) has no indicator,
+the third argument is an empty string. The callback function is invoked in
+scalar context. If the callback function returns the end of options delimiter
+(C<-->), the C<processopts()> function stops prematurely. C<EOOD> is a constant
+that returns the end of options delimiter. The constant is exported on request.
+
+The C<processopts()> function returns true (C<!!1>) on success; otherwise the
+function returns false (C<!!0>). If the function stops prematurely, its return
+value for true changes to the option name prefixed by the options delimiter.
 
 =head1 SEE ALSO
 
@@ -140,6 +196,10 @@ L<Tie::Hash::MultiValueOpts>
 =item *
 
 L<Tacit list of POSIX short options|https://stackoverflow.com/questions/56131811/is-there-a-tacit-list-of-reserved-names-for-posix-short-options>
+
+=item *
+
+L<The -W option of GNU getopt()|https://stackoverflow.com/questions/14338223/what-is-the-w-option-of-gnu-getopt-used-for>
 
 =back
 

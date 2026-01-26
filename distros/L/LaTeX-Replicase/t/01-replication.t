@@ -12,7 +12,7 @@ use warnings;
 use utf8;
 
 # use Test::More 'no_plan';
-use Test::More tests => 41;
+use Test::More tests => 53;
 use Test::More::UTF8;
 # use Test::NoWarnings;
 use Test::Exception;
@@ -34,7 +34,7 @@ understanding of the transcriptome. The enhanced ChiTaRS-${}_{3.1}$ database (\u
 to make widely accessible a wealth of mined data on chimeric RNAs, with easy-to-use analytical tools built-in.',
 		myCaption => 'The major improvements and data additions in ChiTaRS-${}_{3.1}$ in comparison to ChiTaRS-${}_{2.1}$.',
 		myTable_array => [ # custom user variable ARRAY-ARRAY
-			['00', '01', '02', '03', '04',], # row 0
+			['00','01','02','03','04',], # row 0
 			[10, 11, 12, 13, 14,], # row 1
 			[20, 21, 22, undef, 24,], # row 2
 			[30, 31, 32, 33, 34,], # row 3
@@ -60,14 +60,14 @@ is( @$msg, 0, "Test #2: '$file' without errors");
 sub read_file {
 	my $file = shift;
 
-	open FILE, $file or die "Can't open '$file': $!\n";
+	open my $fh, '<', $file or die "Can't open '$file': $!\n";
 
 	my @msg;
-	while(<FILE>) {
+	while(<$fh>) {
 		s/\s+$//;
 		push @msg, $_;
 	}
-	close FILE;
+	close $fh;
 
 	return \@msg;
 }
@@ -104,7 +104,7 @@ unlink $ofile;
 $msg = replication( $file, $info, ofile => $ofile, def => 1, debug => 1 ) // [];
 
 my $msg_ref8 = [
-          '--> Check \'t/template_good.tex\' file',
+          '--> Checking source data: \'t/template_good.tex\'',
           '--> Using \'t/ready_good.tex\' file as output',
           '--> Open \'t/template_good.tex\'',
           '--> Open \'t/ready_good.tex\'',
@@ -175,7 +175,7 @@ to make widely accessible a wealth of mined data on chimeric RNAs, with easy-to-
           '-->	l.61>67 Insert head:  &
 ',
           '--> l.61>68 Insert %%%V[AR]:2= 22',
-          '-->	l.61 NOT defined %%%V:3',
+          '~~> l.61 NOT defined %%%V:3',
           '-->	l.61>69 Insert head:  &
 ',
           '--> l.61>70 Insert %%%V[AR]:4= 24',
@@ -280,7 +280,7 @@ $ofile = 't/ready_unknown.tex';
 $msg = replication( $file, $info, ofile => $ofile, silent =>1, debug => 0 ) // [];
 
 is( $msg->[0],
-	"!!! ERROR#1: 't/template_unknown.tex' does NOT exist or is EMPTY!",
+	"!!! ERROR#1: source ('t/template_unknown.tex') does NOT exist or is EMPTY!",
 	"Test #4: 't/template_unknown.tex'"
 );
 
@@ -325,7 +325,7 @@ $ofile = 't/ready_good.tex';
 $msg = replication( $file, $info, ofile => $ofile, def => 1, silent =>1, debug => 1 ) // [];
 
 my $msg_ref2 = [
-	"--> Check 't/template_good.tex' file",
+	"--> Checking source data: 't/template_good.tex'",
 	"--> Using 't/ready_good.tex' file as output",
 	"--> Open 't/template_good.tex'",
 	"--> Open 't/ready_good.tex'",
@@ -399,7 +399,7 @@ $info = {
 		myAbstract => 'My Abstract',
 		myCaption => 'My Caption',
 		myTable_array => {
-			0 => ['00', '01', '02', '03', '04',], # row 0
+			0 => ['00','01','02','03','04',], # row 0
 		},
 		myTable_hash => [ # custom user variable ARRAY-HASH
 			{A=>'00', B=>'01', C=>'02', D=>'03', E=>'04',}, # row 0
@@ -475,7 +475,6 @@ sub save_file {
 	open FILE, ">$file" or die "Can't open '$file': $!\n";
 	print FILE $$tex;
 	close FILE;
-
 }
 
 
@@ -738,8 +737,6 @@ $msg_ref_s = [
 ' \multicolumn{1}{l}{1}',
 ' &',
 ' \multicolumn{1}{l}{4}',
-' &',
-' \multicolumn{1}{l}{}',
 ' \\\\ \hline',
 '\end{tabular}',
 ];
@@ -778,6 +775,8 @@ myArray 2nd:
 %%%VAR: myArray
 ~ %%%ADD:%
 SPECIFY VALUE %%%V:-5-1,-3
+* %%%ADD:%
+SPECIFY VALUE %%%V: k
 %%%END:
 ~
 ArrRefs:
@@ -809,6 +808,13 @@ SPECIFY VALUE %%%V:E%
 %%%VAR: Mixed
 ~ %%%ADD:%
 SPECIFY VALUE %%%V:@
+%%%END:
+emptyArray:
+%%%VAR: emptyArray
+~ %%%ADD:%
+%%%VAR: ArrayArray
+aa %%%ADD:%
+SPECIFY VALUE %%%V:@
 %%%ENDZ:
 }
 |;
@@ -834,11 +840,21 @@ $info = {
 		Arr_in_Hash => [
 			{A=>1, B=>[2,6..8], C=>3, D=>4, E=>5,},
 		],
+		emptyArray => [],
+		ArrayArray => [[0..3],[10..13]],
 	};
 
 $msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // []; # debug => 0
 
-is( $msg->[0], "~~> l.16 WARNING#4: wrong type (not SCALAR|ARRAY|HASH) of 'RefSub' in %%%V:RefSub", "Test #19.2: '$file_s'");
+my $msg_ref_19_2 = [
+	'~~> l.16 WARNING#4: wrong type (not SCALAR|ARRAY|HASH) of \'RefSub\' in %%%V:RefSub',
+	'~~> l.59 WARNING#6: mixed types (ARRAY with HASH with SCALAR or other) of %%%VAR:Mixed',
+	'~~> l.61 WARNING#3: unknown sub-key \'@\' in %%%V:@',
+	'~~> l.64 WARNING#7: empty ARRAY of %%%VAR:emptyArray'
+];
+
+is_deeply( $msg, $msg_ref_19_2, "Test #19.2: '$file_s'");
+
 
 
 ###Test 20
@@ -862,7 +878,7 @@ $msg_ref_s = [
 '~6',
 '~5',
 '~7',
-'~',
+'*~',
 'ArrRefs:',
 '(11)',
 '~33',
@@ -881,16 +897,21 @@ $msg_ref_s = [
 '%%%VAR: Mixed',
 '~ %%%ADD:%',
 'SPECIFY VALUE %%%V:@',
+'emptyArray:',
+'%%%VAR: emptyArray',
+'~ %%%ADD:%',
+'aa0',
+'aa1',
+'aa2',
+'aa3',
+'aa10',
+'aa11',
+'aa12',
+'aa13',
 '}',
 ];
 
 is_deeply( $msg, $msg_ref_s, "Test #20.2: '%%%VAR:' nested within another '%%%VAR:'");
-
-# open F, ">test.log";
-# print F Dumper($msg);
-# close F;
-# exit;
-
 
 unlink $file_s, $ofile_s;
 
@@ -929,7 +950,7 @@ my $msg_ref_23_2 = [
 is_deeply( $msg, $msg_ref_23_2, "Test #23.2: wrong input info as subroutine");
 
 
-###Test 24
+###Test #24
 lives_ok { $msg = read_file( $ofile_s ) } "Test #24.1: $ofile_s read";
 
 $msg_ref_s = [
@@ -955,12 +976,289 @@ is( $msg->[0], '!!! ERROR#2: EMPTY or WRONG data!', 'Test #24.3: SUB %%%VAR:');
 
 unlink $file_s, $ofile_s;
 
-###Test 25
+###Test #25
 $msg = replication( undef, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
 
-is( $msg->[0], '!!! ERROR#0: undefined input file!', 'Test #25: undefined input name of TeX file');
+is( $msg->[0], '!!! ERROR#0: undefined input FILE or ARRAY!', 'Test #25: undefined input name of TeX file');
 
 unlink $ofile_s;
+
+
+###Test #26
+my $tex2 = q|
+%%%TDZ:  %-- beginning of The Dead Zone
+\documentclass[10pt,a4paper]{article}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{url}
+\title{ChiTaRS-${}_{3.1}$-the enhanced chimeric transcripts and RNA-seq database etc...}
+\author{Alessandro Gorohovski, etc...}
+\begin{document}
+\maketitle
+%%%ENDZ: -- end of The Dead Zone
+SPECIFY VALUE of myParam! %%%V: myParam  %-- substitutes Variable
+etc...
+\begin{tcolorbox}
+\rule{0mm}{4.5em}%%%VAR: myParam -- substitutes Variable as well
+...
+... SPECIFY VALUE of myParam!
+...
+%%%END:
+\end{tcolorbox}
+\begin{tabular}{%
+c
+%%%VAR: myArray
+l %%%ADD:%  -- column "l" type will repeat as many times as myArray size, e.g. 'lll...l'
+ lllll
+%%%END:
+}
+% head of table
+Expense item &
+%%%VAR: myArray
+%-- eXcept 1st (0) row (record)
+%%%ADDX: &
+\multicolumn{1}{c}{ %%%ADD:%  -- there will be no line break
+% there will be no line break also
+2020 %%%V:@%
+} %%%ADDE:  -- final part of '@' variables
+& 2021 & 2022 & 2023 & 2024 & 2025  % All of this will be replaced until %%%END:
+%%%END:
+\\\\ \hline
+etc...
+\\\\ \hline
+HASH Summary
+%%%VAR: myHash
+& %%%ADD:
+00000 %%%V: year0
+& %%%ADD:
+11111 %%%V: year1
+& %%%ADD:
+22222 %%%V: year2%
+ &  %%%ADD:%
+33333 %%%V: year3
+& 44444  &  55555
+%%%END:
+%%%VAR: myTable_array
+\\\\ \hline %%%ADD:
+ SPECIFY VALUE 0!  %%%V:0
+&  %%%ADD:
+\multicolumn{1}{c}{ %%%ADD:% -- there will be no line break
+ SPECIFY VALUES from 3 to last element of array! %%%V:3-%
+} %%%ADDE:
+& %%%ADD:%
+ SPECIFY VALUES 1 and 2 %%%V:1,2
+&  22222  &  33333  & 44444  &  55555
+%%%TDZ: -- beginning of The Dead Zone. Yes, you can use this instead of %%%END:
+\\\\ \hline
+\end{tabular}
+...
+\begin{tabular}{cccc}
+ column2 & column1 & column0 \\\\
+ \toprule
+%%%ENDZ: -- end of The Dead Zone
+%%%VAR: myTable_array
+SPECIFY VALUE 4 %%%V: 4
+ & %%%ADD:%  % add " &" without line breaks ("\n")
+SPECIFY VALUES 2, 1, and 0! %%%V: -3-%
+ & VALUE 1
+ & VALUE 0
+\\\\ %%%ADD:
+\midrule %%%ADDX:
+...
+VALUE 4 & VALUE 2 & VALUE 1 & VALUE 0
+\\\\
+\midrule
+...
+%%%TDZ: %-- beginning of The Dead Zone.
+\end{tabular}
+...
+\begin{tabbing}
+%%%ENDZ: -- end of The Dead Zone
+%%%VAR: myTable_hash
+%%%ADDX: \\\\
+   SPECIFY VALUE 'A'! %%%V: A%
+ \= %%%ADD:%
+   SPECIFY VALUE 'B'! %%%V: B%
+ \= %%%ADD:%
+   SPECIFY VALUE 'C'! %%%V: C
+%%%ENDT: -- end of Template area (and myTable_hash also)
+\end{tabbing}
+etc...
+\end{document}
+|;
+
+lives_ok { &save_file( $file_s, \$tex2 ) } "Test #26.1: $file_s save of USAGE";
+
+$info = {
+		myParam => 'Blah-blah blah-blah blah-blah',
+		myArray => [2024, 2025, 2026, 2027],
+		myHash => {year0 => 123456, year1 => 789012, year2 => 345678, year3 => 901234},
+		myTable_array => [ # custom user variable ARRAY-ARRAY
+			['00', '01', '02', '03', '04',], # row 0
+			[10, 11, 12, 13, 14,], # row 1
+			[20, 21, 22, 23, 24,], # row 2
+		],
+		myTable_hash => [ # custom user variable ARRAY-HASH
+			{A=>'00', B=>'01', C=>'02', }, # row 0
+			{A=>10, B=>11, C=>12, }, # row 1
+		],
+	};
+
+$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // []; # debug => 0
+
+is( @$msg, 0, "Test #26.2: '$file_s' of USAGE");
+
+
+###Test 27
+lives_ok { $msg = read_file( $ofile_s ) } "Test #27.1: $ofile_s read of USAGE";
+
+$msg_ref_s = [
+'',
+' %-- beginning of The Dead Zone',
+'\\documentclass[10pt,a4paper]{article}',
+'\\usepackage[english]{babel}',
+'\\usepackage{amsmath}',
+'\\usepackage{color}',
+'\\usepackage{url}',
+'\\title{ChiTaRS-${}_{3.1}$-the enhanced chimeric transcripts and RNA-seq database etc...}',
+'\\author{Alessandro Gorohovski, etc...}',
+'\\begin{document}',
+'\\maketitle',
+'Blah-blah blah-blah blah-blah %-- substitutes Variable',
+'etc...',
+'\\begin{tcolorbox}',
+'\\rule{0mm}{4.5em}Blah-blah blah-blah blah-blah-- substitutes Variable as well',
+'\\end{tcolorbox}',
+'\\begin{tabular}{%',
+'c',
+'llll}',
+'% head of table',
+'Expense item &',
+'\\multicolumn{1}{c}{2024}',
+'&',
+'\\multicolumn{1}{c}{2025}',
+'&',
+'\\multicolumn{1}{c}{2026}',
+'&',
+'\\multicolumn{1}{c}{2027}',
+'\\\\ \\hline',
+'etc...',
+'\\\\ \\hline',
+'HASH Summary',
+'&',
+'123456',
+'&',
+'789012',
+'&',
+'345678 & 901234',
+'\\\\ \\hline',
+'00',
+'&',
+'\\multicolumn{1}{c}{03}',
+'&',
+'\\multicolumn{1}{c}{04}',
+'&01',
+'&02',
+'\\\\ \hline',
+'10',
+'&',
+'\\multicolumn{1}{c}{13}',
+'&',
+'\\multicolumn{1}{c}{14}',
+'&11',
+'&12',
+'\\\\ \\hline',
+'20',
+'&',
+'\\multicolumn{1}{c}{23}',
+'&',
+'\\multicolumn{1}{c}{24}',
+'&21',
+'&22',
+'\\\\ \\hline',
+'\\end{tabular}',
+'...',
+'\\begin{tabular}{cccc}',
+' column2 & column1 & column0 \\\\',
+' \\toprule',
+'04',
+' &02 &01 &00\\\\',
+'\\midrule',
+'14',
+' &12 &11 &10\\\\',
+'\\midrule',
+'24',
+' &22 &21 &20\\\\',
+'\\end{tabular}',
+'...',
+'\\begin{tabbing}',
+'00 \=01 \=02',
+'\\\\',
+'10 \=11 \=12',
+'\\end{tabbing}',
+'etc...',
+'\\end{document}',
+];
+
+is_deeply( $msg, $msg_ref_s, "Test #27.2: main example of USAGE");
+
+# Clean up
+unlink $file_s, $ofile_s;
+
+
+###Test 28
+my @tex3 = map{"$_\n"} split /\n/, $tex2;
+
+$msg = replication( \@tex3, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
+is( @$msg, 0, "Test #28.1: ARRAY input of USAGE");
+
+lives_ok { $msg = read_file( $ofile_s ) } "Test #28.2: $ofile_s filling ARRAY read of USAGE";
+
+is_deeply( $msg, $msg_ref_s, "Test #28.3: main example filling ARRAY of USAGE");
+
+unlink $ofile_s;
+
+
+###Test 29
+$msg = replication( {0 => "test\n"}, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
+
+$msg_ref = [
+	"!!! ERROR#6: invalid FILE or ARRAY input!",
+];
+
+is_deeply( $msg, $msg_ref, "Test #29: HASH input of USAGE");
+
+unlink $ofile_s;
+
+
+###Test 30
+
+# my $msg_ref_out = join("\n", map{s/\s+$//;$_} @$msg_ref_s ) . "\n";
+# use Test::Output;
+# stdout_is {replication( \@tex3, $info, ofile => *STDOUT, silent =>1, debug => 0 )} $msg_ref_out, "Test #30: STDOUT filling ARRAY";
+
+my $old_stdout;
+lives_ok {
+	open $old_stdout, '>&', STDOUT or die "Can't dup STDOUT: $!";
+	open STDOUT, '>', $ofile_s or die "Can't redirect STDOUT: $!";
+} "Test #30.1: Redirect STDOUT to a temporary file";
+
+$msg = replication( \@tex3, $info, ofile => *STDOUT, silent =>1, debug => 0 ) // [];
+
+lives_ok {
+	close STDOUT;
+	open STDOUT, '>&', $old_stdout or die "Can't restore STDOUT: $!";
+} "Test #30.2: Restore original STDOUT";
+
+# Read contents of temporary file
+lives_ok { $msg = read_file( $ofile_s ) } "Test #30.3: $ofile_s read";
+
+# Test the content
+is_deeply( $msg, $msg_ref_s, "Test #30.4: STDOUT content was captured correctly");
+
+unlink $ofile_s;
+
 
 rmtree('t/tmp');
 

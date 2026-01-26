@@ -6,12 +6,6 @@ use File::ShareDir::Install;
 
 install_share dist => 'data';
 
-# Optional except for cpancover, cpantesters etc.
-my $extra_test =
-  ( $ENV{EXTENDED_TESTING} || $ENV{AUTOMATED_TESTING} )
-  ? 'requires'
-  : 'recommends';
-
 my %WriteMakefileArgs = (
     NAME               => 'Benchmark::DKbench',
     AUTHOR             => q{Dimitrios Kechagias <dkechag@cpan.org>},
@@ -30,6 +24,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         'Astro::Coord::Constellations'   => '0',
         'Astro::Coord::Precession'       => '0',
+        'Benchmark::MCE'                 => '0',
         'CryptX'                         => '0.067',
         'Crypt::JWT'                     => '0.032',
         'CSS::Inliner'                   => '0',
@@ -46,11 +41,8 @@ my %WriteMakefileArgs = (
         'Math::MatrixReal'               => '0',
         'Math::DCT'                      => '0',
         'Moose'                          => '2.2005',
-        'MCE::Loop'                      => '0',
         'SQL::Inserter'                  => '0',
         'SQL::Abstract::Classic'         => '0',
-        'System::CPU'                    => '0',
-        'System::Info'                   => '0.057',
         'Test::Harness'                  => '0',
         'Test::Requires'                 => '0',
         'Text::Levenshtein::XS'          => '0',
@@ -62,13 +54,6 @@ my %WriteMakefileArgs = (
     },
     META_MERGE        => {
         "meta-spec" => { version => 2 },
-        prereqs => {
-            test => {
-                $extra_test => {
-                    'Test::MockFile' => '0',
-                }
-            },
-        },
         resources => {
             repository => {
                 type => 'git',

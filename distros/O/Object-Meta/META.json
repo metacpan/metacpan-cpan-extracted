@@ -32,6 +32,8 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Dump" : "0",
+            "Digest::MD5" : "0",
             "perl" : "5.010"
          }
       }
@@ -47,6 +49,6 @@
          "web" : "https://github.com/bodo-hugo-barwich/object-meta"
       }
    },
-   "version" : "v1.0.1",
+   "version" : "v1.1.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::Stash 6.036;
+package Dist::Zilla::Role::Stash 6.037;
 # ABSTRACT: something that stores options or data for later reference
 
 use Moose::Role;
@@ -39,7 +39,7 @@ Dist::Zilla::Role::Stash - something that stores options or data for later refer
 
 =head1 VERSION
 
-version 6.036
+version 6.037
 
 =head1 PERL VERSION
 
@@ -60,7 +60,7 @@ Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Ricardo SIGNES.
+This software is copyright (c) 2026 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

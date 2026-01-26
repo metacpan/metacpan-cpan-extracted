@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright PROCURA B.V. (c) 2008-2025 H.Merijn Brand
+# Copyright PROCURA B.V. (c) 2008-2026 H.Merijn Brand
 
 require 5.008001; # <- also see postamble at the bottom for META.yml
 use strict;
@@ -126,8 +126,8 @@ sub postamble {
 	'	-@cpants_lint.pl $(DISTVNAME).tgz',
 	'	-@rm -f Debian_CPANTS.txt',
 	'',
-	'doc docs:		doc/Peek.md doc/Peek.html doc/Peek.3 doc/Peek.man',
-	'doc/Peek.md:		Peek.pm',
+	'doc docs:		doc/Data-Peek.md doc/Data-Peek.html doc/Data-Peek.3 doc/Data-Peek.man',
+	'doc/Data-Peek.md:	Peek.pm',
 	'	perl doc/make-doc.pl',
 	'',
 	$min_vsn;
@@ -162,7 +162,7 @@ H.Merijn Brand <hmbrand@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2025 H.Merijn Brand
+Copyright (C) 2008-2026 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -4,17 +4,17 @@ requires   "Storable";
 
 recommends "DBD::CSV"                 => "0.62";
 recommends "DBD::Pg"                  => "3.18.0";
-recommends "DBD::SQLite"              => "1.76";
+recommends "DBD::SQLite"              => "1.78";
 recommends "DBI"                      => "1.647";
 recommends "Sereal"                   => "5.004";
-recommends "Storable"                 => "3.32";
+recommends "Storable"                 => "3.25";
 
 on "configure" => sub {
     requires   "ExtUtils::MakeMaker";
 
     recommends "ExtUtils::MakeMaker"      => "7.22";
 
-    suggests   "ExtUtils::MakeMaker"      => "7.72";
+    suggests   "ExtUtils::MakeMaker"      => "7.76";
     };
 
 on "test" => sub {
@@ -22,5 +22,5 @@ on "test" => sub {
     requires   "Test::More"               => "0.90";
     requires   "Time::HiRes";
 
-    recommends "Test::More"               => "1.302209";
+    recommends "Test::More"               => "1.302219";
     };

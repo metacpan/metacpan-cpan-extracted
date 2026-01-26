@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use vars qw( $VERSION $NO_EXIT );
-$VERSION  = "0.22";
+$VERSION  = "0.23";
 
 $NO_EXIT ||= 0; # prevent import() from exit()ing and fall of the edge
 
@@ -171,11 +171,11 @@ inspiration. L<Module::Info> was used to copy code from.
 =head1 AUTHOR
 
  Abe Timmerman -- 2002 - 2024 (✝ 2024-08-15 😢)
- H.Merijn Brand C<< <hmbrand@cpan.org> >> (2024 ...)
+ H.Merijn Brand C<< <hmbrand@cpan.org> >> (2026 ...)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2024-2025 H.Merijn Brand, All Rights Reserved.
+Copyright 2024-2026 H.Merijn Brand, All Rights Reserved.
 Copyright 2002-2024 Abe Timmerman,  All Rights Reserved.
 
 This library is free software; you can redistribute it and/or modify

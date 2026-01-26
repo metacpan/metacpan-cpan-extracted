@@ -1,4 +1,5 @@
 [![Automated Tests](https://github.com/bodo-hugo-barwich/object-meta/actions/workflows/automated_testing.yml/badge.svg)](https://github.com/bodo-hugo-barwich/object-meta/actions/workflows/automated_testing.yml)
+[![Publish on CPAN](https://github.com/bodo-hugo-barwich/object-meta/actions/workflows/publish_release.yml/badge.svg)](https://github.com/bodo-hugo-barwich/object-meta/actions/workflows/publish_release.yml)
 
 # Object::Meta
 

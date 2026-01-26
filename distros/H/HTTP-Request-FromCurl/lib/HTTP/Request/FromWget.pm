@@ -1,4 +1,4 @@
-package HTTP::Request::FromWget 0.55;
+package HTTP::Request::FromWget 0.56;
 use 5.020;
 use HTTP::Request;
 use HTTP::Request::Common;
@@ -525,7 +525,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2018-2025 by Max Maischein C<corion@cpan.org>.
+Copyright 2018-2026 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

@@ -1,10 +1,12 @@
 package Params::Filter;
 use v5.36;
-our $VERSION = '0.007';
+our $VERSION = '0.010';
 
 =head1 NAME
 
-Params::Filter - Fast field filtering for parameter construction
+Params::Filter - Secure field filtering for parameter construction
+
+=encoding utf-8
 
 =head1 SYNOPSIS
 
@@ -46,9 +48,9 @@ Params::Filter - Fast field filtering for parameter construction
 
 =head1 DESCRIPTION
 
-C<Params::Filter> provides fast, lightweight parameter filtering that
-checks only for the presence or absence of specified fields. It does B<NOT>
-validate values - no type checking, truthiness testing, or lookups.
+C<Params::Filter> provides lightweight parameter filtering that checks
+only for the presence or absence of specified fields. It does B<NOT> validate
+values - no type checking, truthiness testing, or lookups.
 
 This module separates field filtering from value validation:
 
@@ -60,7 +62,42 @@ This module separates field filtering from value validation:
 
 =back
 
-This approach handles common parameter issues:
+=head2 Primary Benefits
+
+The main advantages of using Params::Filter are:
+
+=over 4
+
+=item * **Consistency** - Converts varying incoming data formats to consistent key-value pairs
+
+=item * **Security** - Sensitive fields (passwords, SSNs, credit cards) never reach your validation code or database queries
+
+=item * **Compliance** - Automatically excludes fields that shouldn't be processed or stored (e.g., GDPR, PCI-DSS)
+
+=item * **Correctness** - Ensures only expected fields are processed, preventing accidental data leakage or processing errors
+
+=item * **Maintainability** - Clear separation between data filtering (what fields to accept) and validation (whether values are correct)
+
+=back
+
+=head2 Performance Considerations
+
+B<Important>: In many cases, Params::Filter is slower than manual hash lookups or 
+similar operations, especialy when the incoming data is in a known consistent 
+format. The value of Params::Filter is in its capability to assure the security, 
+compliance, and correctness benefits listed above. 
+
+Nonetheless, Params::Filter CAN improve overall performance when downstream 
+validation is expensive (database queries, API calls, complex regex).
+
+A simple benchmark comparing the validation cost of typical input to that of
+input restricted to required fields would reveal any speed gain with expensive 
+downstream validations.
+
+For simple cases and when validation is cheap, raw speed is not the
+reason to use Params::Filter.
+
+=head2 This Approach Handles Common Issues
 
 =over 4
 
@@ -70,7 +107,7 @@ This approach handles common parameter issues:
 
 =item * Validation may not catch missing inputs quickly enough
 
-=item * Many fields to check multiplies validation time
+=item * Many fields to check multiplies validation time (for expensive validation)
 
 =back
 
@@ -163,6 +200,74 @@ sub new_filter {
 	bless $self, __PACKAGE__;
 	return $self;
 }
+
+=head1 SECURITY
+
+This module provides important security benefits by separating data filtering
+from validation:
+
+=head2 Preventing Sensitive Data Leakage
+
+By excluding sensitive fields early in the request processing pipeline, you
+ensure they never reach validation code, database queries, or logging systems:
+
+    my $user_filter = Params::Filter->new_filter({
+        required => ['username', 'email'],
+        accepted => ['name', 'bio'],
+        excluded => ['password', 'ssn', 'credit_card', 'admin_token'],
+    });
+
+    # Web form submission with password field
+    my $form_data = {
+        username => 'user',
+        email => 'user@example.com',
+        password => 'secret123',  # Never reaches validation!
+    };
+
+    my ($filtered, $msg) = $user_filter->apply($form_data);
+    # $filtered = { username => 'user', email => 'user@example.com' }
+
+=head2 Compliance Benefits
+
+Helps meet regulatory requirements by design:
+
+=over 4
+
+=item * **GDPR** - Exclude fields you shouldn't store before processing
+
+=item * **PCI-DSS** - Ensure credit card numbers never touch validation code
+
+=item * **Data Minimization** - Only process fields you actually need
+
+=item * **Audit Trails** - Clear record of what fields are accepted/excluded
+
+=back
+
+=head2 Defense in Depth
+
+Even if validation code has bugs or is later modified, excluded fields B<never>
+reach it. This provides defense in depth:
+
+    # Filter excludes 'admin' field
+    my $filter = Params::Filter->new_filter({
+        required => ['user'],
+        accepted => ['email'],
+        excluded => ['admin'],  # Security-critical field excluded
+    });
+
+    # Even if validation code is buggy, 'admin' never reaches it
+    my ($data, $msg) = $filter->apply($untrusted_input);
+
+=head2 Secure by Default
+
+The filter fails closed (returns undef) if required fields are missing, preventing
+incomplete data from progressing through your system:
+
+    # Missing required field - filter returns undef
+    my ($data, $msg) = $filter->apply({user => 'bob'});  # email missing
+    # $data is undef, $msg explains what's missing
+
+This prevents partial data from causing security issues downstream.
 
 =head1 OBJECT-ORIENTED INTERFACE
 
@@ -442,6 +547,7 @@ sub filter ($args,$req,$ok=[],$no=[],$db=0) {
 	my %args		= ();
 	my @messages	= ();	# Parsing messages (always reported)
 	my @warnings	= ();	# Debug warnings (only when $db is true)
+	my $wantarray	= wantarray;
 
 	if (ref $args eq 'HASH') {
 		%args	= $args->%*
@@ -481,13 +587,13 @@ sub filter ($args,$req,$ok=[],$no=[],$db=0) {
 	unless ( keys %args ) {
 		my $err = "Unable to initialize without required arguments: " .
 			join ', ' => map { "'$_'" } @required_flds;
-		return wantarray ? (undef, $err) : undef;
+		return $wantarray ? (undef, $err) : undef;
 	}
 
 	if ( scalar keys(%args) < @required_flds ) {
 		my $err	= "Unable to initialize without all required arguments: " .
 			join ', ' => map { "'$_'" } @required_flds;
-		return wantarray ? (undef, $err) : undef;
+		return $wantarray ? (undef, $err) : undef;
 	}
 
 	# Now create the output hashref
@@ -508,17 +614,17 @@ sub filter ($args,$req,$ok=[],$no=[],$db=0) {
 	# Return fast if all set
 	# required fields assured and no other fields provided
 	if ( keys(%args) == 0 ) {
-		return wantarray ? ($filtered, "Admitted") : $filtered;
+		return $wantarray ? ($filtered, "Admitted") : $filtered;
 	}
 	# required fields assured and no more fields allowed
 	if ( scalar keys $filtered->%* == @required_flds and not $ok->@*) {
-		return wantarray ? ($filtered, "Admitted") : $filtered;
+		return $wantarray ? ($filtered, "Admitted") : $filtered;
 	}
 	# Can't continue
 	if ( @missing_required ) {
 		my $err = "Unable to initialize without required arguments: " .
 			join ', ' => map { "'$_'" } @missing_required;
-		return wantarray ? (undef, $err) : undef;
+		return $wantarray ? (undef, $err) : undef;
 	}
 
 	# Now remove any excluded fields
@@ -564,7 +670,7 @@ sub filter ($args,$req,$ok=[],$no=[],$db=0) {
 		? join "\n" => @all_msgs
 		: "Admitted";
 
-	return wantarray ? ( $filtered, $return_msg ) : $filtered;
+	return $wantarray ? ( $filtered, $return_msg ) : $filtered;
 }
 
 =head1 INPUT PARSING

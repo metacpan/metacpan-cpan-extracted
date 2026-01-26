@@ -1,21 +1,26 @@
 [![Release](https://img.shields.io/github/release/giterlizzi/perl-URI-PackageURL.svg)](https://github.com/giterlizzi/perl-URI-PackageURL/releases) [![Actions Status](https://github.com/giterlizzi/perl-URI-PackageURL/workflows/linux/badge.svg)](https://github.com/giterlizzi/perl-URI-PackageURL/actions) [![License](https://img.shields.io/github/license/giterlizzi/perl-URI-PackageURL.svg)](https://github.com/giterlizzi/perl-URI-PackageURL) [![Starts](https://img.shields.io/github/stars/giterlizzi/perl-URI-PackageURL.svg)](https://github.com/giterlizzi/perl-URI-PackageURL) [![Forks](https://img.shields.io/github/forks/giterlizzi/perl-URI-PackageURL.svg)](https://github.com/giterlizzi/perl-URI-PackageURL) [![Issues](https://img.shields.io/github/issues/giterlizzi/perl-URI-PackageURL.svg)](https://github.com/giterlizzi/perl-URI-PackageURL/issues) [![Coverage Status](https://coveralls.io/repos/github/giterlizzi/perl-URI-PackageURL/badge.svg)](https://coveralls.io/github/giterlizzi/perl-URI-PackageURL)
 
-# URI::PackageURL - Perl extension for Package URL (aka "purl")
+# URI::PackageURL - Perl extension for PURL (Package URL) and VERS (Version Range)
 
 ## Synopsis
 
-```.pl
+```perl
 use URI::PackageURL;
 
 # OO-interface
 
-# Encode components in PackageURL string
-$purl = URI::PackageURL->new(type => cpan, namespace => 'GDT', name => 'URI-PackageURL', version => '2.23');
+# Encode components in PURL string
+$purl = URI::PackageURL->new(
+  type      => 'cpan',
+  namespace => 'GDT',
+  name      => 'URI-PackageURL',
+  version   => '2.24'
+);
 
-say $purl; # pkg:cpan/GDT/URI-PackageURL@2.23
+say $purl; # pkg:cpan/GDT/URI-PackageURL@2.24
 
-# Parse PackageURL string
-$purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.23');
+# Parse a PURL string
+$purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.24');
 
 
 # use setter methods
@@ -25,17 +30,46 @@ my $purl = URI::PackageURL->new(type => 'cpan', namespace => 'GDT', name => 'URI
 say $purl; # pkg:cpan/GDT/URI-PackageURL
 say $purl->version; # undef
 
-$purl->version('2.23');
-say $purl; # pkg:cpan/GDT/URI-PackageURL@2.23
-say $purl->version; # 2.23
+$purl->version('2.24');
+say $purl; # pkg:cpan/GDT/URI-PackageURL@2.24
+say $purl->version; # 2.24
 
 
 # exported functions
 
-$purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.23');
+$purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.24');
 say $purl->type;  # cpan
 
-$purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI::PackageURL', version => '2.23');
+$purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI-PackageURL', version => '2.24');
+say $purl_string; # pkg:cpan/GDT/URI-PackageURL@2.24
+
+
+# uses the legacy CPAN PURL type, to be used only for compatibility (will be removed in the future)
+
+$ENV{PURL_LEGACY_CPAN_TYPE} = 1;
+URI::PackageURL->new(type => 'cpan', name => 'URI::PackageURL');
+
+
+# alias
+
+$purl = PURL->new(
+  type      => 'cpan',
+  namespace => 'GDT',
+  name      => 'URI-PackageURL',
+  version   => '2.24'
+);
+
+$purl = PURL->from_string('pkg:cpan/GDT/URI-PackageURL');
+
+
+# clone
+
+$cloned = $purl->clone;
+
+$cloned->version('1.00');
+
+say $cloned; # pkg:cpan/GDT/URI-PackageURL@1.00
+say $purl;   # pkg:cpan/GDT/URI-PackageURL@2.24
 ```
 
 
@@ -44,14 +78,14 @@ $purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI::Packa
 Inspect and export "purl" string in various formats (JSON, YAML, Data::Dumper, ENV):
 
 ```console
-$ purl-tool pkg:cpan/GDT/URI-PackageURL@2.23 --json | jq
+$ purl-tool pkg:cpan/GDT/URI-PackageURL@2.24 --json | jq
 {
   "name": "URI-PackageURL",
   "namespace": "GDT",
   "qualifiers": {},
   "subpath": null,
   "type": "cpan",
-  "version": "2.23"
+  "version": "2.24"
 }
 ```
 
@@ -59,18 +93,18 @@ $ purl-tool pkg:cpan/GDT/URI-PackageURL@2.23 --json | jq
 Download package using "purl" string:
 
 ```console
-$ wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.23 --download-url)
+$ wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.24 --download-url)
 ```
 
 
 Use "purl" string in your shell-scripts:
 
-```.bash
+```bash
 #!bash
 
 set -e 
 
-PURL="pkg:cpan/GDT/URI-PackageURL@2.23"
+PURL="pkg:cpan/GDT/URI-PackageURL@2.24"
 
 eval $(purl-tool "$PURL" --env)
 
@@ -92,9 +126,59 @@ Create on-the-fly a "purl" string:
 $ purl-tool --type cpan \
             --namespace GDT \
             --name URI-PackageURL \
-            --version 2.23
+            --version 2.24
 ```
 
+
+Validate a PURL string:
+
+```bash
+if $(purl-tool $PURL_STRING --validate -q); then
+    echo "PURL string is valid"
+else
+    echo "PURL string is not valid"
+fi
+```
+
+
+Display information about provided PURL type (allowed components, repository,
+examples, etc.):
+
+```console
+$ purl-tool --info rpm
+```
+
+Display all known PURL types:
+
+```console
+$ purl-tool --list
+```
+
+
+## vers-tool a CLI for URI::VersionRange module
+
+Decode a "vers" string:
+
+```console
+$ vers-tool "vers:cpan/1.00|>=2.00|<5.00" | jq
+```
+
+Check if a version is contained within a range:
+
+```console
+$ vers-tool "vers:cpan/1.00|>=2.00|<5.00" --contains "2.20"
+```
+
+Humanize "vers":
+
+```console
+$ vers-tool "vers:cpan/1.00|>=2.00|<5.00" --human-readable
+
+cpan
+- equal 1.00
+- greater than or equal 2.00
+- less than 5.00
+```
 
 ## Install
 
@@ -114,11 +198,14 @@ Using App::cpanminus:
 
 ## Documentation
 
- - `perldoc URI::PackageURL`
- - https://metacpan.org/release/URI-PackageURL
- - https://github.com/package-url/purl-spec
+- `perldoc URI::PackageURL`
+- `perldoc URI::VersionRange`
+- https://metacpan.org/release/URI-PackageURL
+- Specification: https://github.com/package-url/purl-spec
+- TC54 - Software and system transparency: https://tc54.org
+- ECMA-427 - Package-URL (PURL) specification: https://ecma-international.org/publications-and-standards/standards/ecma-427
 
 
 ## Copyright
 
- - Copyright 2022-2025 © Giuseppe Di Terlizzi
+- Copyright 2022-2026 © Giuseppe Di Terlizzi

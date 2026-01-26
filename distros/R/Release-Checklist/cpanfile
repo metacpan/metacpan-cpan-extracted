@@ -1,14 +1,14 @@
 requires   "Test::More";
 
 recommends "CPAN::Audit"		            => "20250829.001";
-recommends "CPAN::Meta::Converter"	            => "2.150010";
-recommends "CPAN::Meta::Validator"	            => "2.150010";
+recommends "CPAN::Meta::Converter"	            => "2.150011";
+recommends "CPAN::Meta::Validator"	            => "2.150011";
 recommends "Devel::Cover"		            => "1.51";
 recommends "Devel::PPPort"		            => "3.73";
 recommends "JSON::PP"			            => "4.16";
 recommends "Module::CPANTS::Analyse"	            => "1.02";
-recommends "Module::Release"		            => "2.136";
-recommends "Parse::CPAN::Meta"		            => "2.150010";
+recommends "Module::Release"		            => "2.137";
+recommends "Parse::CPAN::Meta"		            => "2.150011";
 recommends "Perl::Critic"		            => "1.156";
 recommends "Perl::Critic::TooMuchCode"	            => "0.18";
 recommends "Perl::MinimumVersion"	            => "1.44";

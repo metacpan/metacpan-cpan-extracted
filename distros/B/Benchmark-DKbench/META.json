@@ -35,6 +35,7 @@
          "requires" : {
             "Astro::Coord::Constellations" : "0",
             "Astro::Coord::Precession" : "0",
+            "Benchmark::MCE" : "0",
             "CSS::Inliner" : "0",
             "Crypt::JWT" : "0.032",
             "CryptX" : "0.067",
@@ -48,14 +49,11 @@
             "Image::PHash" : "0.3",
             "Imager" : "1.007",
             "JSON::XS" : "4.0",
-            "MCE::Loop" : "0",
             "Math::DCT" : "0",
             "Math::MatrixReal" : "0",
             "Moose" : "2.2005",
             "SQL::Abstract::Classic" : "0",
             "SQL::Inserter" : "0",
-            "System::CPU" : "0",
-            "System::Info" : "0.057",
             "Test::Harness" : "0",
             "Test::Requires" : "0",
             "Text::Levenshtein::Damerau::XS" : "0",
@@ -64,9 +62,6 @@
          }
       },
       "test" : {
-         "recommends" : {
-            "Test::MockFile" : "0"
-         },
          "requires" : {
             "Test2::V0" : "0"
          }
@@ -80,6 +75,6 @@
          "web" : "https://github.com/dkechag/Benchmark-DKbench"
       }
    },
-   "version" : "3.00",
+   "version" : "3.01",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

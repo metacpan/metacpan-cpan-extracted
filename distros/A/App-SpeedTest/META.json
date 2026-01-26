@@ -1,89 +1,89 @@
 {
-   "prereqs" : {
-      "configure" : {
-         "recommends" : {
-            "ExtUtils::MakeMaker" : "7.22"
-         },
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         },
-         "suggests" : {
-            "ExtUtils::MakeMaker" : "7.70"
-         }
-      },
-      "test" : {
-         "recommends" : {
-            "Test::More" : "1.302207"
-         },
-         "requires" : {
-            "Test::More" : "0"
-         }
-      },
-      "runtime" : {
-         "recommends" : {
-            "Time::HiRes" : "1.9777",
-            "Getopt::Long" : "2.58",
-            "Data::Dumper" : "2.154",
-            "LWP::UserAgent" : "6.77",
-            "Text::CSV_XS" : "1.59",
-            "Socket" : "2.038",
-            "XML::Simple" : "2.25",
-            "Data::Peek" : "0.53",
-            "HTML::TreeBuilder" : "5.07"
-         },
-         "requires" : {
-            "Getopt::Long" : "0",
-            "perl" : "5.010000",
-            "Time::HiRes" : "0",
-            "LWP::UserAgent" : "0",
-            "Math::Trig" : "0",
-            "Data::Dumper" : "0",
-            "Socket" : "0",
-            "Data::Peek" : "0",
-            "XML::Simple" : "0",
-            "List::Util" : "0",
-            "HTML::TreeBuilder" : "0"
-         },
-         "suggests" : {
-            "Data::Dumper" : "2.189"
-         }
-      }
-   },
-   "abstract" : "Command line interface to speedtest.net",
-   "dynamic_config" : 1,
+   "generated_by" : "Author",
    "author" : [
       "H.Merijn Brand <hmbrand@cpan.org>"
    ],
-   "generated_by" : "Author",
-   "license" : [
-      "perl_5"
-   ],
-   "provides" : {
-      "App::SpeedTest" : {
-         "file" : "speedtest",
-         "version" : "0.30"
-      }
-   },
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-   },
    "resources" : {
+      "homepage" : "https://metacpan.org/pod/App::SpeedTest",
       "x_IRC" : "irc://irc.perl.org/#csv",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
-      "homepage" : "https://metacpan.org/pod/App::SpeedTest",
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/speedtest/issues"
-      },
       "repository" : {
          "web" : "https://github.com/Tux/speedtest",
-         "url" : "https://github.com/Tux/speedtest",
-         "type" : "git"
+         "type" : "git",
+         "url" : "https://github.com/Tux/speedtest"
+      },
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/speedtest/issues"
       }
    },
-   "release_status" : "stable",
-   "version" : "0.30",
-   "name" : "App-SpeedTest"
+   "name" : "App-SpeedTest",
+   "dynamic_config" : 1,
+   "provides" : {
+      "App::SpeedTest" : {
+         "version" : "0.31",
+         "file" : "speedtest"
+      }
+   },
+   "abstract" : "Command line interface to speedtest.net",
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         },
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.22"
+         },
+         "suggests" : {
+            "ExtUtils::MakeMaker" : "7.76"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Getopt::Long" : "2.58",
+            "Data::Peek" : "0.53",
+            "Data::Dumper" : "2.154",
+            "Time::HiRes" : "1.9764",
+            "XML::Simple" : "2.25",
+            "Socket" : "2.040",
+            "HTML::TreeBuilder" : "5.07",
+            "Text::CSV_XS" : "1.61",
+            "LWP::UserAgent" : "6.81"
+         },
+         "suggests" : {
+            "Data::Dumper" : "2.183"
+         },
+         "requires" : {
+            "Math::Trig" : "0",
+            "perl" : "5.010000",
+            "List::Util" : "0",
+            "XML::Simple" : "0",
+            "LWP::UserAgent" : "0",
+            "HTML::TreeBuilder" : "0",
+            "Data::Peek" : "0",
+            "Getopt::Long" : "0",
+            "Time::HiRes" : "0",
+            "Data::Dumper" : "0",
+            "Socket" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         },
+         "recommends" : {
+            "Test::More" : "1.302219"
+         }
+      }
+   },
+   "version" : "0.31",
+   "license" : [
+      "perl_5"
+   ],
+   "release_status" : "stable"
 }

@@ -1,0 +1,172 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Hash::Util::Set - Set operations on hash keys
+
+=head1 SYNOPSIS
+
+   use Hash::Util::Set qw(:all);
+   
+   %x = (a => 1, b => 2, c => 3);
+   %y = (b => 4, c => 5, d => 6);
+   
+   # Set operations
+   @keys = keys_union %x, %y;                 # (a, b, c, d)
+   @keys = keys_intersection %x, %y;          # (b, c)
+   @keys = keys_difference %x, %y;            # (a)
+   @keys = keys_symmetric_difference %x, %y;  # (a, d)
+   
+   # Set predicates
+   $bool = keys_disjoint %x, %y;              # no common keys?
+   $bool = keys_equal %x, %y;                 # same keys?
+   $bool = keys_subset %x, %y;                # x ⊆ y?
+   $bool = keys_proper_subset %x, %y;         # x ⊂ y?
+   $bool = keys_superset %x, %y;              # x ⊇ y?
+   $bool = keys_proper_superset %x, %y;       # x ⊃ y?
+   
+   # Key membership tests
+   $bool = keys_any  %x, 'a', 'z';            # at least one exists?
+   $bool = keys_all  %x, 'a', 'b', 'c';       # all exist?
+   $bool = keys_none %x, 'x', 'y', 'z';       # none exist?
+
+=head1 DESCRIPTION
+
+C<Hash::Util::Set> provides set operations on hash keys. It treats
+the keys of a hash as a set and provides common set operations (union,
+intersection, difference), set predicates, and membership tests. 
+
+All operations work only on keys; values are ignored.
+
+This module automatically uses the XS implementation if available, falling back
+to pure Perl otherwise. 
+
+=head1 FUNCTIONS
+
+=head2 Set Operations
+
+Order of keys is unspecified for all set operations.
+
+=head3 keys_union
+
+   @keys = keys_union %x, %y;
+
+Returns all keys present in either hash (C<A ∪ B>).
+
+=head3 keys_intersection
+
+   @keys = keys_intersection %x, %y;
+
+Returns keys present in both hashes (C<A ∩ B>).
+
+=head3 keys_difference
+
+   @keys = keys_difference %x, %y;
+
+Returns keys in C<%x> but not in C<%y> (C<A \ B>).
+
+=head3 keys_symmetric_difference
+
+   @keys = keys_symmetric_difference %x, %y;
+
+Returns keys in either hash but not both (C<A △ B>).
+
+=head2 Set Predicates
+
+=head3 keys_disjoint
+
+   $bool = keys_disjoint %x, %y;
+
+True if hashes have no common keys (C<A ∩ B = ∅>).
+
+=head3 keys_equal
+
+   $bool = keys_equal %x, %y;
+
+True if hashes have exactly the same keys (C<A = B>).
+
+=head3 keys_subset
+
+   $bool = keys_subset %x, %y;
+
+True if all keys in C<%x> are in C<%y> (C<A ⊆ B>).
+
+=head3 keys_proper_subset
+
+   $bool = keys_proper_subset %x, %y;
+
+True if C<%x> ⊂ C<%y> and they're not equal (C<A ⊂ B> where C<A ≠ B>).
+
+=head3 keys_superset
+
+   $bool = keys_superset %x, %y;
+
+True if C<%x> contains all keys from C<%y> (C<A ⊇ B>).
+
+=head3 keys_proper_superset
+
+   $bool = keys_proper_superset %x, %y;
+
+True if C<%x> ⊃ C<%y> and they're not equal (C<A ⊃ B> where C<A ≠ B>).
+
+=head2 Key Membership Tests
+
+These functions test whether specific keys exist in a hash.
+
+=head3 keys_any
+
+   $bool = keys_any %x, LIST;
+
+True if at least one key in LIST exists in C<%x>. Returns false for empty LIST.
+
+=head3 keys_all
+
+   $bool = keys_all %x, LIST;
+
+True if all keys in LIST exist in C<%x>. Returns true for empty LIST.
+
+=head3 keys_none
+
+   $bool = keys_none %x, LIST;
+
+True if none of the keys in LIST exist in C<%x>. Returns true for empty LIST.
+
+=head1 ALIASES
+
+Shorter aliases:
+
+    keys_or   =>  keys_union
+    keys_and  =>  keys_intersection
+    keys_sub  =>  keys_difference
+    keys_xor  =>  keys_symmetric_difference
+
+=head1 EXPORTS
+
+Nothing is exported by default. Import functions individually or use C<:all>:
+
+    use Hash::Util::Set qw(keys_union keys_intersection);
+    use Hash::Util::Set qw(:all);
+
+=head1 IMPLEMENTATION
+
+Automatically uses C<Hash::Util::Set::XS> if available, otherwise falls back to
+C<Hash::Util::Set::PP>.
+
+=head1 SEE ALSO
+
+L<Hash::Util>, L<List::Util>, L<Set::Scalar>, L<Set::Object>
+
+=head1 AUTHOR
+
+Christian Hansen <chansen@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2025 Christian Hansen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

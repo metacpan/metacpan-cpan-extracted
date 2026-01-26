@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test2::Bundle::More;
 
 use Language::l33t;
 
-my $output;
-open my $fh_output, '>', \$output;
+open my $fh_output, '>', \my $output;
+
 Language::l33t->new( stdout => $fh_output, source => <<'END_CODE')->run;
     Gr34t l33tN3$$? 
     M3h...
@@ -38,3 +38,5 @@ Language::l33t->new( stdout => $fh_output, source => <<'END_CODE')->run;
 END_CODE
 
 is $output => 'H3LL0 W0RLD!!!', 'sample 1';
+
+done_testing;

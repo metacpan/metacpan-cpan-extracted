@@ -1,5 +1,5 @@
 package Beam::Minion::Util;
-our $VERSION = '0.017';
+our $VERSION = '0.019';
 # ABSTRACT: Utility functions for Beam::Minion
 
 #pod =head1 SYNOPSIS
@@ -19,8 +19,7 @@ our $VERSION = '0.017';
 #pod
 #pod =cut
 
-use strict;
-use warnings;
+use Mojo::Base -strict, -signatures;
 use Exporter qw( import );
 use Minion;
 use Beam::Runner::Util qw( find_containers );
@@ -29,7 +28,7 @@ use Mojolicious;
 use Mojo::Log;
 use Beam::Wire;
 use YAML::PP qw( LoadFile );
-
+use Log::Any qw($LOG);
 
 our @EXPORT_OK = qw( minion_init_args minion build_mojo_app );
 
@@ -131,9 +130,16 @@ sub minion {
 #pod =cut
 
 sub build_mojo_app {
-    my $app = Mojolicious->new(
-        log => Mojo::Log->new, # Log to STDERR
-    );
+    my $app = Mojolicious->new;
+    # Remove Mojo::Log from STDERR so that we don't double-log
+    $app->log(Mojo::Log->new(handle => undef));
+    # Forward Mojo::Log logs to the Log::Any logger, so that from there
+    # they will be forwarded to OpenTelemetry.
+    # Modules should prefer to log with Log::Any because it supports
+    # structured logging.
+    $app->log->on( message => sub ( $, $level, @lines ) {
+      $LOG->$level(@lines);
+    });
 
     push @{$app->commands->namespaces}, 'Minion::Command';
 
@@ -147,21 +153,30 @@ sub build_mojo_app {
         my $config = $wire->config;
         for my $service_name ( keys %$config ) {
             next unless $wire->is_meta( $config->{ $service_name }, 1 );
-            $minion->add_task( "$container_name:$service_name" => sub {
+            my $task_name = "$container_name:$service_name";
+            $minion->add_task( $task_name => sub {
                 my ( $job, @args ) = @_;
+                local $LOG->context->{task} = $task_name;
+                local $LOG->context->{job} = $job->id;
+                $LOG->info('Running task');
                 my $wire = Beam::Wire->new( file => $path );
 
+                local $@;
                 my $obj = eval { $wire->get( $service_name, lifecycle => 'factory' ) };
-                if ( $@ ) {
-                    return $job->fail( { error => $@ } );
+                if ( my $error = $@ ) {
+                    $LOG->error('Error getting runnable service', { service => $service_name, error => $error });
+                    return $job->fail( { error => $error } );
                 }
 
+                local $@;
                 my $exit = eval { $obj->run( @args ) };
-                if ( my $err = $@ ) {
-                    return $job->fail( { error => $err } );
+                if ( my $error = $@ ) {
+                    $LOG->error('Error running task', { error => $error });
+                    return $job->fail( { error => $error } );
                 }
 
                 my $method = $exit ? 'fail' : 'finish';
+                $LOG->info('Task result', { exit => $exit, state => $method });
                 $job->$method( { exit => $exit } );
             } );
         }
@@ -183,7 +198,7 @@ Beam::Minion::Util - Utility functions for Beam::Minion
 
 =head1 VERSION
 
-version 0.017
+version 0.019
 
 =head1 SYNOPSIS
 

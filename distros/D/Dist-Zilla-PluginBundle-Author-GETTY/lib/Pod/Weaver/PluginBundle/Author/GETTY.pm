@@ -1,6 +1,6 @@
 package Pod::Weaver::PluginBundle::Author::GETTY;
 # ABSTRACT: GETTY's default Pod::Weaver config
-our $VERSION = '0.303';
+our $VERSION = '0.304';
 use strict;
 use warnings;
 
@@ -33,13 +33,19 @@ sub mvp_bundle_config {
   }
 
   # IRC support
+  my $irc_user = $distmeta->{resources}{x_IRC_user};
   my $irc_url = $distmeta->{resources}{x_IRC};
   if ($irc_url) {
-    # Extract channel from irc:// URL
-    my ($channel) = $irc_url =~ m{/([^/]+)$};
-    push @parts, "=head2 IRC\n\nJoin C<$channel> on C<irc.perl.org> or message Getty directly.";
-  } else {
-    push @parts, "=head2 IRC\n\nYou can reach Getty on C<irc.perl.org> for questions and support.";
+    # Extract channel and server from irc:// URL
+    my ($server, $channel) = $irc_url =~ m{irc://([^/]+)/(.+)$};
+    $server ||= 'irc.perl.org';
+    if ($irc_user) {
+      push @parts, "=head2 IRC\n\nJoin C<$channel> on C<$server> or message $irc_user directly.";
+    } else {
+      push @parts, "=head2 IRC\n\nJoin C<$channel> on C<$server> for questions and support.";
+    }
+  } elsif ($irc_user) {
+    push @parts, "=head2 IRC\n\nYou can reach $irc_user on C<irc.perl.org> for questions and support.";
   }
 
   join "\n\n", @parts;
@@ -82,7 +88,7 @@ Pod::Weaver::PluginBundle::Author::GETTY - GETTY's default Pod::Weaver config
 
 =head1 VERSION
 
-version 0.303
+version 0.304
 
 =head1 SYNOPSIS
 
@@ -310,10 +316,6 @@ L<Dist::Zilla::PluginBundle::Author::GETTY>
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/issues>.
-
-=head2 IRC
-
-You can reach Getty on C<irc.perl.org> for questions and support.
 
 =head1 CONTRIBUTING
 

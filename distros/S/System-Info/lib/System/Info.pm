@@ -3,7 +3,7 @@ package System::Info;
 use strict;
 use warnings;
 
-our $VERSION = "0.066";
+our $VERSION = "0.067";
 
 use base "Exporter";
 our @EXPORT_OK = qw( &sysinfo &sysinfo_hash &si_uname );
@@ -308,7 +308,7 @@ Interface to FreeDesktop.Org's os-release standard.
 
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2025, Abe Timmerman & H.Merijn Brand, All rights reserved.
+(c) 2016-2026, Abe Timmerman & H.Merijn Brand, All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

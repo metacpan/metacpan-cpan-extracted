@@ -18,7 +18,7 @@ requires   "Tk::Pixmap";
 
 recommends "Data::Peek"               => "0.53";
 recommends "Getopt::Long"             => "2.58";
-recommends "Image::ExifTool"          => "13.10";
+recommends "Image::ExifTool"          => "13.44";
 recommends "Image::Info"              => "1.45";
 recommends "Image::Size"              => "3.300";
 recommends "Tk"                       => "804.036";
@@ -30,14 +30,14 @@ on "configure" => sub {
 
     recommends "ExtUtils::MakeMaker"      => "7.22";
 
-    suggests   "ExtUtils::MakeMaker"      => "7.70";
+    suggests   "ExtUtils::MakeMaker"      => "7.76";
     };
 
 on "test" => sub {
     requires   "Test::Harness";
     requires   "Test::More"               => "0.88";
 
-    recommends "Test::More"               => "1.302207";
+    recommends "Test::More"               => "1.302219";
     };
 
 feature "opt_format_tiff", "Support for TIFF" => sub {

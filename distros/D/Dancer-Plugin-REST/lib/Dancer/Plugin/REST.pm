@@ -1,15 +1,16 @@
 package Dancer::Plugin::REST;
-BEGIN {
-  $Dancer::Plugin::REST::AUTHORITY = 'cpan:SUKRIA';
-}
+our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: A plugin for writing RESTful apps with Dancer
-$Dancer::Plugin::REST::VERSION = '0.11';
+$Dancer::Plugin::REST::VERSION = '0.12';
+use 5.24.0;
+
 use strict;
 use warnings;
 
 use Carp 'croak';
 use Dancer ':syntax';
 use Dancer::Plugin;
+use Dancer::HTTP;
 
 my $content_types = {
     json => 'application/json',
@@ -83,9 +84,8 @@ register resource => sub {
             $method->( "/${resource}.:format" => $triggers{$t} );
         }
         else {
-            for my $ext ( '.:format', '' ) {
-                $method->( "/${resource}/:id$ext" => $triggers{$t} );
-            }
+            $method->( "/${resource}/:id$_" => $triggers{$t} )
+                for '.:format', '';
         }
     }
 
@@ -97,72 +97,7 @@ register send_entity => sub {
     $_[0];
 };
 
-my %http_codes = (
-
-    # 1xx
-    100 => 'Continue',
-    101 => 'Switching Protocols',
-    102 => 'Processing',
-
-    # 2xx
-    200 => 'OK',
-    201 => 'Created',
-    202 => 'Accepted',
-    203 => 'Non-Authoritative Information',
-    204 => 'No Content',
-    205 => 'Reset Content',
-    206 => 'Partial Content',
-    207 => 'Multi-Status',
-    210 => 'Content Different',
-
-    # 3xx
-    300 => 'Multiple Choices',
-    301 => 'Moved Permanently',
-    302 => 'Found',
-    303 => 'See Other',
-    304 => 'Not Modified',
-    305 => 'Use Proxy',
-    307 => 'Temporary Redirect',
-    310 => 'Too many Redirect',
-
-    # 4xx
-    400 => 'Bad Request',
-    401 => 'Unauthorized',
-    402 => 'Payment Required',
-    403 => 'Forbidden',
-    404 => 'Not Found',
-    405 => 'Method Not Allowed',
-    406 => 'Not Acceptable',
-    407 => 'Proxy Authentication Required',
-    408 => 'Request Time-out',
-    409 => 'Conflict',
-    410 => 'Gone',
-    411 => 'Length Required',
-    412 => 'Precondition Failed',
-    413 => 'Request Entity Too Large',
-    414 => 'Request-URI Too Long',
-    415 => 'Unsupported Media Type',
-    416 => 'Requested range unsatisfiable',
-    417 => 'Expectation failed',
-    418 => 'Teapot',
-    422 => 'Unprocessable entity',
-    423 => 'Locked',
-    424 => 'Method failure',
-    425 => 'Unordered Collection',
-    426 => 'Upgrade Required',
-    449 => 'Retry With',
-    450 => 'Parental Controls',
-
-    # 5xx
-    500 => 'Internal Server Error',
-    501 => 'Not Implemented',
-    502 => 'Bad Gateway',
-    503 => 'Service Unavailable',
-    504 => 'Gateway Time-out',
-    505 => 'HTTP Version not supported',
-    507 => 'Insufficient storage',
-    509 => 'Bandwidth Limit Exceeded',
-);
+my %http_codes = Dancer::HTTP->codes->%*; 
 
 for my $code (keys %http_codes) {
     my $helper_name = lc($http_codes{$code});
@@ -170,12 +105,8 @@ for my $code (keys %http_codes) {
     $helper_name = "status_${helper_name}";
 
     register $helper_name => sub {
-        if ($code >= 400) {
-            send_entity({error => $_[0]}, $code);
-        }
-        else {
-            send_entity($_[0], $code);
-        }
+        my $entity = ($code >= 400 )  ? { error => $_[0]} : $_[0];
+        send_entity($entity, $code);
     };
 }
 
@@ -194,7 +125,7 @@ Dancer::Plugin::REST - A plugin for writing RESTful apps with Dancer
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 DESCRIPTION
 
@@ -318,7 +249,7 @@ Franck Cuny <franckc@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

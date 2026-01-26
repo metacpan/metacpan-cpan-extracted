@@ -2,7 +2,7 @@ NAME
     CPAN::Meta - the distribution metadata for a CPAN dist
 
 VERSION
-    version 2.150011
+    version 2.150012
 
 SYNOPSIS
         use v5.10;
@@ -288,7 +288,7 @@ SUPPORT
 AUTHORS
     *   David Golden <dagolden@cpan.org>
 
-    *   Ricardo Signes <rjbs@cpan.org>
+    *   Ricardo Signes <cpan@semiotic.systems>
 
     *   Adam Kennedy <adamk@cpan.org>
 

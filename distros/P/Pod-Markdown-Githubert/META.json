@@ -4,7 +4,7 @@
       "Lukas Mai <l.mai@web.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -26,7 +26,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::MakeMaker" : "7.0",
             "File::Find" : "0",
             "File::Spec" : "0",
             "strict" : "0",
@@ -35,7 +35,7 @@
       },
       "develop" : {
          "requires" : {
-            "Pod::Markdown::Githubert" : "0.03",
+            "Pod::Markdown::Githubert" : "0",
             "Pod::Text" : "4.09",
             "Test::Pod" : "1.22"
          }
@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "Pod::Markdown" : "3.200",
-            "perl" : "5.012000",
+            "perl" : "5.010000",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -57,12 +57,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/mauke/Pod-Markdown-Githubert/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mauke/Pod-Markdown-Githubert",
-         "web" : "https://github.com/mauke/Pod-Markdown-Githubert"
+         "url" : "https://codeberg.org/mauke/Pod-Markdown-Githubert.git",
+         "web" : "https://codeberg.org/mauke/Pod-Markdown-Githubert"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,12 @@
 Revision history for Config-INI-Reader-Multiline
 
+1.002 2026-01-24 BOOK
+    - Ignore blank lines/comments in continuation lines (Steve Rogerson)
+      (Fixes GH #3)
+    - Simplify handling of continuations, to make them more broadly
+      applicable. Continutation on the last line is now a syntax error
+    - Added more tests, updated documentation
+
 1.001 2016-08-07 BOOK
     - Replaced obsolete dzil plugin ReportVersions::Tiny by Test::ReportPrereqs
     - Replaced t/01use.t test script by the Test::Compile dzil plugin

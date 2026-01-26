@@ -9,6 +9,7 @@ do { my $x = {
                                       'Beam::Runner' => '0.014',
                                       'Beam::Wire' => '1.019',
                                       'Getopt::Long' => '2.36',
+                                      'Log::Any' => '1.050',
                                       'Minion' => '9',
                                       'Module::Runtime' => '0',
                                       'Mojolicious' => '7',

@@ -1,5 +1,8 @@
 Revision history for Future-IO-Impl-Uring
 
+0.006     2026-01-24 22:52:10+01:00 Europe/Brussels
+          - Capture buffer in write and send handler
+
 0.005     2026-01-18 23:32:06+01:00 Europe/Brussels
           - Eliminate IOSQE_ASYNC
           - Add poll method

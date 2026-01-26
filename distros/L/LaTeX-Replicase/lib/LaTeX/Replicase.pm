@@ -23,7 +23,7 @@ our %EXPORT_TAGS = ('all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( );
 
-our $VERSION = '0.350';
+our $VERSION = '0.590';
 our $DEBUG; $DEBUG = 0 unless defined $DEBUG;
 our @logs;
 our $nlo = 1; # Number Line Output, start of 1
@@ -42,32 +42,43 @@ sub tex_escape {
 
 
 sub replication {
-	my( $ifile, $info, %op ) = @_;
+	my( $source, $info, %op ) = @_;
 
 	our $DEBUG; $DEBUG = $op{debug} if defined $op{debug};
 	$DEBUG += 0;
 	our @logs = ();
 
-	if( defined( $ifile ) && length( $ifile ) ) {
-		for( $ifile ) {
-			s/^\s+//;
-			s/\s+.*//s;
+	if( defined( $source ) && length( $source ) ) {
 
-			$_ = (glob)[0] if $^O =~/(?:linux|bsd|darwin|solaris|sunos)/;
+		if(ref \$source eq 'SCALAR') {
+			for( $source ) {
+				s/^\s+//;
+				s/\s+.*//s;
+
+				$_ = (glob)[0] if $^O =~/(?:linux|bsd|darwin|solaris|sunos)/;
+			}
 		}
+		elsif(ref $source ne 'ARRAY')  {
+			$_ = "!!! ERROR#6: invalid FILE or ARRAY input!";
+			$op{silent} or carp $_;
+
+			push @logs, $_;
+			return \@logs;
+		}
+
 	}
 	else {
-		$_ = "!!! ERROR#0: undefined input file!";
+		$_ = "!!! ERROR#0: undefined input FILE or ARRAY!";
 		$op{silent} or carp $_;
 
 		push @logs, $_;
 		return \@logs;
 	}
 
-push @logs, "--> Check '$ifile' file" if $DEBUG;
+push @logs, "--> Checking source data: '$source'" if $DEBUG;
 
-	unless( -s $ifile ) {
-		$_ = "!!! ERROR#1: '$ifile' does NOT exist or is EMPTY!";
+	if((ref \$source eq 'SCALAR' and ! -s $source) or (ref $source eq 'ARRAY' and ! @$source)) {
+		$_ = "!!! ERROR#1: source ('$source') does NOT exist or is EMPTY!";
 		$op{silent} or carp $_;
 
 		push @logs, $_;
@@ -75,8 +86,8 @@ push @logs, "--> Check '$ifile' file" if $DEBUG;
 	}
 
 	# global data of TeX file
-	unless( $info 
-		and (( ref( $info ) eq 'HASH' and %$info ) or (ref( $info ) eq 'ARRAY' and @$info ))
+	unless( $info
+		and (( ref $info eq 'HASH' and %$info ) or (ref $info eq 'ARRAY' and @$info ))
 	) {
 		$_= "!!! ERROR#2: EMPTY or WRONG data!";
 		$op{silent} or carp $_;
@@ -88,20 +99,29 @@ push @logs, "--> Check '$ifile' file" if $DEBUG;
 	# environments: global for %%%V:, %%%VAR: ; and local for %%%VAR:
 	my $data = my $vardata = $info;
 
-	my( $filename, $dir, $ext ) = fileparse($ifile);
+	my( $filename, $dir );
+	if( ref \$source eq 'SCALAR') {
+		( $filename, $dir, my($ext)) = fileparse( $source );
+	}
+	else { # for ARRAY input
+		$filename = 'ready.tex';
+		$dir = '.';
+	}
 
-	my $ofile;
-	if( defined( $op{ofile} ) && length( $op{ofile} ) ) {
-		for( $op{ofile} ) {
+	my( $fh, $ofile );
+	if( defined( $_ = $op{ofile} ) && length ) {
+		if(/::STDOUT$/) {
+			$fh = $ofile = $_;
+		}
+		else {
 			s/^\s+//;
 			s/\s+.*//s;
-
 			$ofile = ( $^O =~/(?:linux|bsd|darwin|solaris|sunos)/ ) ? (glob)[0] : $_;
 		}
 	}
 	else {
 		my $outdir = $op{outdir} // "$dir/$$"; # Target dir for ready TeX file
-		if( length( $outdir ) ) {
+		if( length $outdir ) {
 			for( $outdir ) {
 				s/^\s+//;
 				s/\s+.*//s;
@@ -109,10 +129,28 @@ push @logs, "--> Check '$ifile' file" if $DEBUG;
 				$_ = (glob)[0] if $^O =~/(?:linux|bsd|darwin|solaris|sunos)/;
 			}
 		}
-		else {
+		else { # for $outdir = ''
 			$outdir = "./$$";
 		}
-		make_path( $outdir ) unless -d $outdir;
+
+		unless( -d $outdir ) {
+			make_path( $outdir, {error => \my $err} );
+
+			if ($err && @$err) {
+
+				for my $diag (@$err) {
+					my( $path, $message ) = %$diag;
+					$_ = ( $path && length( $path ) ) ?
+						"!!! ERROR#7: ('$path' creation problem) $message" :
+						"!!! ERROR#8: (general error) $message";
+					$op{silent} or carp $_;
+					push @logs, $_;
+				}
+
+				return \@logs;
+			}
+
+		}
 
 		$ofile = "$outdir/$filename";
 	}
@@ -120,11 +158,11 @@ push @logs, "--> Check '$ifile' file" if $DEBUG;
 push @logs, "--> Using '$ofile' file as output" if $DEBUG;
 
 	# new file must be different
-	if( -s $ofile
+	if( -s $ofile and ref \$source eq 'SCALAR'
 		and (
-			( $ifile eq $ofile and compare( $ifile, $ofile ) == 0 )
+			( $source eq $ofile and compare( $source, $ofile ) == 0 )
 			or
-			( join(',', stat $ifile) eq join(',', stat $ofile) )
+			( join(',', stat $source) eq join(',', stat $ofile) )
 		)
 	) {
 		$_= "!!! ERROR#3: Input (template) & output files match. Can't overwrite template file!";
@@ -134,34 +172,38 @@ push @logs, "--> Using '$ofile' file as output" if $DEBUG;
 		return \@logs;
 	}
 
-	my $mode = $op{utf8} ? ':utf8' : '';
+	my $TEMPLATE;
+	if( ref \$source eq 'SCALAR') {
+		my $mode = $op{utf8} ? ':utf8' : '';
 
-push @logs, "--> Open '$ifile'" if $DEBUG;
+push @logs, "--> Open '$source'" if $DEBUG;
 
-	open my $TEMPLATE, "<:raw$mode", $ifile or do{
-		$_= "!!! ERROR#4: $!";
-		$op{silent} or carp $_;
+		open $TEMPLATE, "<:raw$mode", $source or do{
+			$_= "!!! ERROR#4: $!";
+			$op{silent} or carp $_;
 
-		push @logs, $_;
-		return \@logs;
-	};
+			push @logs, $_;
+			return \@logs;
+		};
+	}
 
-	$mode = $op{utf8} ? ':encoding(utf8)' : '';
+	unless( $fh ) { # it's not "::STDOUT"
+		my $mode = $op{utf8} ? ':encoding(utf8)' : '';
 
 push @logs, "--> Open '$ofile'" if $DEBUG;
 
-	open my $fh, ">$mode", $ofile or do{
-		$_= "!!! ERROR#5: $!";
-		$op{silent} or carp $_;
+		open $fh, ">$mode", $ofile or do{
+			$_= "!!! ERROR#5: $!";
+			$op{silent} or carp $_;
 
-		push @logs, $_;
-		return \@logs;
-	};
+			push @logs, $_;
+			return \@logs;
+		};
+	}
 
 	$nlo = 1;
 	my $chkVAR = 0; # check %%%VAR for ARRAY|HASH|SCALAR|REF->SCALAR type
 	my $key;
-	my $root; # global key (parent) for child: %%%VAR: or %%%V: (not nested in %%%VAR:)
 	my $tdz; # flag of The Dead Zone
 	my @columns;
 
@@ -179,301 +221,30 @@ push @logs, "--> Open '$ofile'" if $DEBUG;
 =end comment
 =cut
 
-	while( <$TEMPLATE> ) {
-		my $z = $_;
+	if( $TEMPLATE )  {
+		while( my $z = <$TEMPLATE> ) {
 
-		if( defined $key ) { # We are in VAR-structure
-
-			next unless /%%%[AETV]\S*:/; # Nope control tags --> drop TeX line
-
-			if(/%%%(?:END(?<t>[TZ]?)|TDZ|VAR):/) {
-				my $t = $+{t};
-				&_var_output( $fh, $key, $vardata, \@columns, \%op );
-
-				# Clear the VAR-structure for the next external VARiable
-				$chkVAR = 0;
-				undef $key;
-				@columns = ();
-
-				if( $t && $t eq 'T') { # end of template area
-					print { $fh } <$TEMPLATE>;
-					last; #--> Exit template
-				}
-
-				undef $tdz if $t && $t eq 'Z';
-
-				$_ = $z;
-
-				next if /%%%ENDZ?:/; # end of %%%VAR: teg
-
-				if( /%%%+TDZ:/) { # The Dead Zone
-					$tdz = 1;
-					next;
-				}
-
-			}
-			elsif( (ref($vardata) eq 'HASH' and ( ref( $vardata->{ $key } ) eq 'HASH' or ref( $vardata->{ $key } ) eq 'ARRAY'))
-				or (ref($vardata) eq 'ARRAY' and ( ref( $vardata->[ $key ] ) eq 'HASH' or ref( $vardata->[ $key ] ) eq 'ARRAY'))
-			) {
-				# Index of column in target table
-				my $j = (@columns && exists( $columns[-1]{ki} )) ?
-							@columns :
-							($#columns // 0);
-				$j = 0 if $j < 0; # JIC
-
-				my $vk = ref $vardata eq 'HASH' ? $vardata->{ $key } : $vardata->[ $key ];
-
-				if(/%%%V:\s*([^\s:%#]+)(%?)\s?(.*)/) {
-				# this V-variable is nested in a VAR-structure
-					my $ki = $1; # name (key or index) of V-variable
-					my $Np = $2; # NO \par
-					my $paste = $3; # on right
-
-					if( $chkVAR == 0b0001) { # V-variable is in ARRAY.ARRAY of VAR-structure
-						if( $ki =~/^[\+\-]*\d+$/ ) {
-							$columns[$j]{ki} = $ki+0; # save variable index in the j-th column
-						}
-					}
-					elsif( $chkVAR == 0b0010) { # V-variable is in ARRAY.HASH of VAR-structure
-
-						for my $d ( @$vk ) {
-							if( exists $d->{$ki} ) {
-								$columns[$j]{ki} = $ki; # save variable name in j-th column
-								last;
-							}
-						}
-					}
-					elsif( $chkVAR == 0b0100 or $chkVAR == 0b01000 ) { # V-variable is SCALAR (or REF->SCALAR) in regular ARRAY of VAR-structure
-
-						if( $ki eq '@') {
-							$ki = '0-'; # ALL elements
-							$columns[$j]{ki} = $ki; # starting index (unnamed meaning)
-						}
-						elsif( $ki =~/^\-*(\d+)$/ && ($1 < @$vk or ($ki < 0 && $1 == @$vk)) ) {
-							# specific indices, e.g.: 0 or 3 or -1
-							$columns[$j]{ki} = $ki;
-						}
-						elsif( $ki =~/^[\d,\-]+$/) {
-						# mixed indexes, e.g.: 1-3,6-7-9,-,4,-5,0,7- or 3- (i.e. 3..arr_end) or 0-5 (0..5) or -1- (-1,-2,..arr_start)
-							for( $ki ) {
-								s/\-+/-/g;
-								s/,+/,/g;
-							}
-							$columns[$j]{ki} = $ki;
-						}
-
-					}
-					elsif( ref( $vk ) eq 'HASH'
-							and ( (ref( \$vk->{$ki} ) eq 'SCALAR' and defined( $vk->{$ki} ) )
-								or (ref( \$vk->{$ki} ) eq 'REF'
-									and ref($vk->{$ki}) eq 'SCALAR'
-									and defined( ${ $vk->{$ki} } )
-								)
-								or ( $ki eq '@'
-									and exists($vk->{$ki})
-									and ref($vk->{$ki}) eq 'ARRAY'
-								)
-							)
-					) {
-
-						$columns[$j]{ki} = $ki; # save variable key in j-th element
-					}
-
-					&_set_column( $Np, $paste, $columns[$j] ) if exists $columns[$j]{ki};
-				}
-				elsif( /(?<s>.+?)\s?%%%+ADD(?<t>[EX]?):(?<p>%?)/ or /^\s*%%%+ADD(?<t>[EX]?):(?<p>%?)\s?(?<s>.*?)[\r\n]*$/ ) {
-					my $s = $+{s};
-
-					if( $+{p} ) {
-						length($s) or next;
-					}
-					else {
-						$s .= "\n";
-					}
-
-					if( $+{t} eq 'E') { # %%%ADDE:
-						if( @columns && exists( $columns[-1]{ki} ) && ! $columns[$j] ) {
-							push @{ $columns[-1]{tail} }, $s;
-						}
-						else {
-							push @{ $columns[$j]{head} }, $s;
-						}
-					}
-					else {
-						push @{ $columns[$j]{head} }, $s;
-						$columns[$j]{eX}{ $#{ $columns[$j]{head} } } = undef if $+{t} eq 'X'; # $chkVAR && ...  %%%ADDX:
-					}
-				}
-
-				next;
-			}
-
-			else {
-				next;
-			}
-		}
-
-		if(/%%%+END(?<t>[TZ]?):/) { # end of template area
-
-			# Clear the VAR-structure for the next external variable
-			$chkVAR = 0;
-			undef $key;
-			@columns = ();
-
-			if($+{t} eq 'T') { # end of template area
+			if( &_line_decryption( $fh, $info, \$z, \$data, \$vardata, \$chkVAR, \$key, \$tdz, \@columns, \%op ) ) {
 				print { $fh } <$TEMPLATE>;
 				last; #--> Exit template
 			}
-
-			undef $tdz if $+{t} eq 'Z'; # End of TDZ
-			next;
-		}
-
-		$tdz = 1 if s/^\s*%%%+TDZ:\s*//; # The Dead Zone
-
-		if( $tdz ) { # The Dead Zone is ON
-			if( length ) {# Output TeX
-				print { $fh } $_;
-				++$nlo;
-			}
-			next;
-		}
-
-		if(/(.*?)\s?%%%+VAR:\s*([^\s:%#]+)(%?)\s?(.*)/) {
-			my $before = $1;
-			my $k = $2; # name (key)
-			my $Np = $3; # NO \par
-			my $paste = $4; # on right text for SCALAR only
-
-			# root or global structure (environment)
-			my $vd = ( $k =~s/^\/+//) ? $info : $data;
-
-			my $x; # for unknown/undefined sub-key
-
-			# Search nested sub-keys
-			for my $sk ( split '/', $k ) {
-				$vardata = $vd;
-				length( $sk ) or next;
-
-				if( $sk =~/^\d+$/ && ref($vd) eq 'ARRAY' and defined( $vd->[$sk] )) {
-					last if &_data_redef( $sk, $vd->[$sk], \$k, \$vd, \$x );
-				}
-				elsif( ref($vd) eq 'HASH' and exists( $vd->{$sk} )) {
-					last if &_data_redef( $sk, $vd->{$sk}, \$k, \$vd, \$x );
-				}
-				else {
-					$x = $sk;
-					last;
-				}
-			}
-
-			# Clear the VAR-structure for a new variable
-			$chkVAR = 0;
-			undef $key;
-			@columns = ();
-
-			if( $x ) {
-push @logs, "~~> l.$. WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key '$x' in %%%VAR:". $k if $DEBUG or ! $op{ignore};
-
-				$vardata = $data;
-				print { $fh } $z;
-				++$nlo;
-				next;
-			}
-
-			# key or sub-...sub-key is found
-push @logs, "--> l.$. Found %%%VAR:". $k if $DEBUG;
-
-			my $vk = ref $vardata eq 'HASH' ? $vardata->{$k} :
-				(ref $vardata eq 'ARRAY' ? $vardata->[$k] : undef);
-
-			unless( $vk ) {
-push @logs, "--> l.$. NOT defined key in %%%VAR:". $k if $DEBUG && $op{def};
-				next;
-			}
-
-			next if &_chk_var( $fh, $k, $vk, $Np, \$paste, \$before, \$chkVAR, \@columns, \$z, \%op );
-
-# push @logs, "--> l.$. Remember key = '$k' (chkVAR=$chkVAR), type: ".ref($vk) if $DEBUG; ###AG
-
-			$key = $k; # save key name
-			next;
+			undef $z;
 
 		}
-		elsif(/%%%V:\s*(?<k>[^\s:%#]+)(?<p>%?)\s?(?<s>.*)/) {
-			my $k = $+{k};
-
-			my %el;
-			&_set_column( $+{p}, $+{s}, \%el );
-
-			my $inidata = $data; # save initial environment
-
-			if( $k =~s/^\/+//) {
-				$data = $info; # reset to root environment
-
-				length($k) or next;
-			}
-
-			# Search nested sub-keys
-			my $x = 0; # for unknown sub-key
-			for my $sk ( split '/', $k ) {
-				length( $sk ) or next;
-
-				my $d;
-				if( $sk =~/^\d+$/ && ref($data) eq 'ARRAY' && defined( $data->[$sk] )) {
-					$d = $data->[$sk];
-				}
-				elsif( ref($data) eq 'HASH' && exists( $data->{$sk} )) {
-					$d = $data->{$sk};
-				}
-				else {
-push @logs, "~~> l.$. WARNING#3: unknown sub-key '$sk' in %%%V:". $k if $DEBUG or ! $op{ignore};
-
-					print { $fh } $z;
-					++$nlo;
-
-					$x = 1;
-					last;
-				}
-
-				# Check type
-				if( (ref($d) eq 'ARRAY' or ref($d) eq 'HASH') ) {
-					$data = $d; #  sub-key (path) found: redefined
-					next;
-				}
-
-				my $v;
-				if( ref(\$d) eq 'SCALAR') {
-					$v = $d;
-				}
-				elsif( ref(\$d) eq 'REF' and ref($d) eq 'SCALAR') { # REF->SCALAR
-					$v = $$d;
-				}
-				else {
-push @logs, "~~> l.$. WARNING#4: wrong type (not SCALAR|ARRAY|HASH) of '$sk' in %%%V:". $k if $DEBUG or ! $op{ignore};
-
-					print { $fh } $z;
-					++$nlo;
-
-					$x = 1;
-					last;
-				}
-
-				&_v_print( $fh, $k, $v, \%el, \%op );
-
-				$x = 1;
-				last;
-			}
-
-			$data = $inidata if $x; # value found or unknown sub-key: reset to initial environment
-
-			next;
-		}
-
-		print { $fh } $z;
-		++$nlo;
+		close $TEMPLATE;
 	}
-	close $TEMPLATE;
+	else {
+		my $e;
+		for my $z ( @$source ) {
+
+			if( $e ) {
+				print { $fh } $z;
+			}
+			else {
+				$e = &_line_decryption( $fh, $info, \$z, \$data, \$vardata, \$chkVAR, \$key, \$tdz, \@columns, \%op );
+			}
+		}
+	}
 
 	if( defined $key ) {
 		&_var_output( $fh, $key, $vardata, \@columns, \%op );
@@ -483,7 +254,7 @@ push @logs, "~~> l.$. WARNING#4: wrong type (not SCALAR|ARRAY|HASH) of '$sk' in 
 		push @logs, $_;
 	}
 
-	close $fh;
+	$ofile =~/::STDOUT$/ or close $fh;
 
 	@logs or return;
 	return \@logs;
@@ -491,6 +262,318 @@ push @logs, "~~> l.$. WARNING#4: wrong type (not SCALAR|ARRAY|HASH) of '$sk' in 
 
 #---------------------
 # Internal function(s)
+
+sub _line_decryption {
+	my( $fh, $info, $z, $data, $vardata, $chkVAR, $key, $tdz, $columns, $op ) = @_;
+
+	our $DEBUG;
+	our @logs;
+	our $nlo;
+
+	if( defined $$key ) { # We are in VAR-structure
+
+		return unless $$z =~/%%%[AETV]\S*:/; # Nope control tags --> drop TeX line
+
+		if( $$z =~/%%%(?:END(?<t>[TZ]?)|TDZ|VAR):/) {
+			my $t = $+{t};
+			&_var_output( $fh, $$key, $$vardata, $columns, $op );
+
+			# Clear the VAR-structure for the next external VARiable
+			$$chkVAR = 0;
+			undef $$key;
+			@$columns = ();
+
+			return 1 if $t && $t eq 'T'; # end of template area --> Exit template
+
+			undef $$tdz if $t && $t eq 'Z';
+
+			return if $$z =~/%%%ENDZ?:/; # end of %%%VAR: tag
+
+			if( $$z =~/%%%+TDZ:/) { # The Dead Zone
+				$$tdz = 1;
+				return;
+			}
+
+		}
+		elsif( (ref $$vardata eq 'HASH' and ( ref $$vardata->{ $$key } eq 'HASH' or ref $$vardata->{ $$key } eq 'ARRAY'))
+			or (ref $$vardata eq 'ARRAY' and ( ref $$vardata->[ $$key ] eq 'HASH' or ref $$vardata->[ $$key ] eq 'ARRAY'))
+		) {
+			# Index of column in target table
+			my $j = ( @$columns && exists( $columns->[-1]{ki} ) ) ?
+						@$columns :
+						($#$columns // 0);
+			$j = 0 if $j < 0; # JIC
+
+			my $vk = ref $$vardata eq 'HASH' ? $$vardata->{ $$key } : $$vardata->[ $$key ];
+
+			if( $$z =~/%%%V:\s*([^\s:%#]+)(%?)\s?(.*)/) {
+				# this V-variable is nested in a VAR-structure
+				my $ki = $1; # name (key or index) of V-variable
+				my $Np = $2; # NO \par
+				my $paste = $3; # on right
+
+				if( $$chkVAR == 0b0001) { # V-variable is in {HASH|ARRAY}.ARRAY of VAR-structure
+
+					if( $ki eq '@') {
+						$ki = '0-'; # ALL elements
+						$columns->[$j]{ki} = $ki; # starting index (unnamed meaning)
+					}
+					elsif( $ki =~/^\-*(\d+)$/ && ($1 < @$vk or ($ki < 0 && $1 == @$vk)) ) {
+						# specific indices, e.g.: 0 or 3 or -1
+						$columns->[$j]{ki} = $ki;
+					}
+					elsif( $ki =~/^[\d,\-]+$/) {
+					# mixed indexes, e.g.: 1-3,6-7-9,-,4,-5,0,7- or 3- (i.e. 3..arr_end) or 0-5 (0..5) or -1- (-1,-2,..arr_start)
+						for( $ki ) {
+							s/\-+/-/g;
+							s/,+/,/g;
+						}
+						$columns->[$j]{ki} = $ki;
+					}
+					else {
+push @logs, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". $ki if $DEBUG or ! $op->{ignore};
+					}
+
+				}
+				elsif( $$chkVAR == 0b0010) { # V-variable is in {HASH|ARRAY}.HASH of VAR-structure
+
+					for my $d ( @$vk ) {
+						if( exists $d->{$ki} ) {
+							$columns->[$j]{ki} = $ki; # save variable name in j-th column
+							last;
+						}
+					}
+				}
+				elsif( $$chkVAR == 0b0100 or $$chkVAR == 0b01000 ) { # V-variable is SCALAR (or REF->SCALAR) in regular ARRAY of VAR-structure
+
+					if( $ki eq '@') {
+						$ki = '0-'; # ALL elements
+						$columns->[$j]{ki} = $ki; # starting index (unnamed meaning)
+					}
+					elsif( $ki =~/^\-*(\d+)$/ && ($1 < @$vk or ($ki < 0 && $1 == @$vk)) ) {
+						# specific indices, e.g.: 0 or 3 or -1
+						$columns->[$j]{ki} = $ki;
+					}
+					elsif( $ki =~/^[\d,\-]+$/) {
+					# mixed indexes, e.g.: 1-3,6-7-9,-,4,-5,0,7- or 3- (i.e. 3..arr_end) or 0-5 (0..5) or -1- (-1,-2,..arr_start)
+						for( $ki ) {
+							s/\-+/-/g;
+							s/,+/,/g;
+						}
+						$columns->[$j]{ki} = $ki;
+					}
+
+				}
+				elsif( ref $vk eq 'HASH'
+						and ( (ref \$vk->{$ki} eq 'SCALAR' and defined( $vk->{$ki} ) )
+							or (ref \$vk->{$ki} eq 'REF'
+								and ref $vk->{$ki} eq 'SCALAR'
+								and defined( ${ $vk->{$ki} } )
+							)
+							or ( $ki eq '@'
+								and exists($vk->{$ki})
+								and ref $vk->{$ki} eq 'ARRAY'
+							)
+							)
+				) {
+					$columns->[$j]{ki} = $ki; # save variable key in j-th element
+				}
+
+				&_set_column( $Np, $paste, $columns->[$j] ) if exists $columns->[$j]{ki};
+			}
+			elsif( $$z =~/(?<s>.+?)\s?%%%+ADD(?<t>[EX]?):(?<p>%?)/
+				or $$z =~/^\s*%%%+ADD(?<t>[EX]?):(?<p>%?)\s?(?<s>.*?)[\r\n]*$/
+			) {
+				my $s = $+{s};
+
+				if( $+{p} ) {
+					length($s) or return;
+				}
+				else {
+					$s .= "\n";
+				}
+
+				if( $+{t} eq 'E') { # %%%ADDE:
+					if( @$columns && exists( $columns->[-1]{ki} ) && ! $columns->[$j] ) {
+						push @{ $columns->[-1]{tail} }, $s;
+					}
+					else {
+						push @{ $columns->[$j]{head} }, $s;
+					}
+				}
+				else {
+					push @{ $columns->[$j]{head} }, $s;
+					$columns->[$j]{eX}{ $#{ $columns->[$j]{head} } } = undef if $+{t} eq 'X'; # $$chkVAR && ...  %%%ADDX:
+				}
+			}
+
+			return;
+		}
+		else {
+			return;
+		}
+
+	}
+	elsif( $$z =~/%%%+END(?<t>[TZ]?):/) { # end of template area
+
+		# Clear the VAR-structure for the next external variable
+		$$chkVAR = 0;
+		undef $$key;
+		@$columns = ();
+
+		return 1 if $+{t} eq 'T'; # end of template area --> Exit template
+
+		undef $$tdz if $+{t} eq 'Z'; # End of TDZ
+		return;
+	}
+
+	$$tdz = 1 if $$z =~s/^\s*%%%+TDZ:\s?[\r\n]*//; # The Dead Zone
+
+	if( $$tdz ) { # The Dead Zone is ON
+		if( length $$z ) {# Output TeX
+			print { $fh } $$z;
+			++$nlo;
+		}
+		return;
+	}
+
+	if( $$z =~/(.*?)\s?%%%+VAR:\s*([^\s:%#]+)(%?)\s?(.*)/) {
+		my $before = $1;
+		my $k = $2; # name (key)
+		my $Np = $3; # NO \par
+		my $paste = $4; # on right text for SCALAR only
+
+		# root or global structure (environment)
+		my $vd = ( $k =~s/^\/+//) ? $info : $$data;
+
+		my $x; # for unknown/undefined sub-key
+
+		# Search nested sub-keys
+		for my $sk ( split '/', $k ) {
+			$$vardata = $vd;
+			length( $sk ) or next;
+
+			if( $sk =~/^\d+$/ && ref $vd eq 'ARRAY' and defined( $vd->[$sk] )) {
+				last if &_data_redef( $sk, $vd->[$sk], \$k, \$vd, \$x );
+			}
+			elsif( ref $vd eq 'HASH' and exists( $vd->{$sk} )) {
+				last if &_data_redef( $sk, $vd->{$sk}, \$k, \$vd, \$x );
+			}
+			else {
+				$x = $sk;
+				last;
+			}
+		}
+
+		# Clear the VAR-structure for a new variable
+		$$chkVAR = 0;
+		undef $$key;
+		@$columns = ();
+
+		if( $x ) {
+push @logs, "~~> l.$. WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key '$x' in %%%VAR:". $k if $DEBUG or ! $op->{ignore};
+
+			$$vardata = $$data;
+			print { $fh } $$z;
+			++$nlo;
+			return;
+		}
+
+		# key or sub-...sub-key is found
+push @logs, "--> l.$. Found %%%VAR:". $k if $DEBUG;
+
+		my $vk = ref $$vardata eq 'HASH' ? $$vardata->{$k} :
+			(ref $$vardata eq 'ARRAY' ? $$vardata->[$k] : undef);
+
+		unless( $vk ) {
+push @logs, "~~> l.$. NOT defined key in %%%VAR:". $k if $DEBUG && $op->{def};
+			return;
+		}
+
+		return if &_chk_var( $fh, $k, $vk, $Np, \$paste, \$before, $chkVAR, $columns, $z, $op );
+
+# push @logs, "--> l.$. Remember key = '$k' (chkVAR=$$chkVAR), type: ".ref($vk) if $DEBUG; ###AG
+
+		$$key = $k; # save key name
+		return;
+
+	}
+	elsif( $$z =~/%%%V:\s*(?<k>[^\s:%#]+)(?<p>%?)\s?(?<s>.*)/) {
+		my $k = $+{k};
+
+		my %el;
+		&_set_column( $+{p}, $+{s}, \%el );
+
+		my $inidata = $$data; # save initial environment
+
+		if( $k =~s/^\/+//) {
+			$$data = $info; # reset to root environment
+
+			length($k) or return;
+		}
+
+		# Search nested sub-keys
+		my $x = 0; # for unknown sub-key
+		for my $sk ( split '/', $k ) {
+			length( $sk ) or next;
+
+			my $d;
+			if( $sk =~/^\d+$/ && ref $$data eq 'ARRAY' && defined( $$data->[$sk] )) {
+				$d = $$data->[$sk];
+			}
+			elsif( ref $$data eq 'HASH' && exists( $$data->{$sk} )) {
+				$d = $$data->{$sk};
+			}
+			else {
+push @logs, "~~> l.$. WARNING#3: unknown sub-key '$sk' in %%%V:". $k if $DEBUG or ! $op->{ignore};
+
+				print { $fh } $$z;
+				++$nlo;
+
+				$x = 1;
+				last;
+			}
+
+			# Check type
+			if( (ref $d eq 'ARRAY' or ref $d eq 'HASH') ) {
+				$$data = $d; #  sub-key (path) found: redefined
+				next;
+			}
+
+			my $v;
+			if( ref \$d eq 'SCALAR') {
+				$v = $d;
+			}
+			elsif( ref \$d eq 'REF' and ref $d eq 'SCALAR') { # REF->SCALAR
+				$v = $$d;
+			}
+			else {
+push @logs, "~~> l.$. WARNING#4: wrong type (not SCALAR|ARRAY|HASH) of '$sk' in %%%V:". $k if $DEBUG or ! $op->{ignore};
+
+				print { $fh } $$z;
+				++$nlo;
+
+				$x = 1;
+				last;
+			}
+
+			&_v_print( $fh, $k, $v, \%el, $op );
+
+			$x = 1;
+			last;
+		}
+
+		$$data = $inidata if $x; # value found or unknown sub-key: reset to initial environment
+
+		return;
+	}
+
+	print { $fh } $$z;
+	++$nlo;
+
+	return;
+}
+
 
 sub _set_column {
 	my( $Np, $paste, $column ) = @_;
@@ -502,12 +585,12 @@ sub _set_column {
 sub _data_redef {
 	my( $sk, $d, $k, $data, $x ) = @_;
 
-	if( ref($d) eq 'ARRAY' or ref($d) eq 'HASH') {
+	if( ref $d eq 'ARRAY' or ref $d eq 'HASH') {
 		$$data = $d; # redefined for %%%VAR:
 		return 0;
 	}
 
-	if( ref(\$d) eq 'SCALAR' or (ref(\$d) eq 'REF' and ref($d) eq 'SCALAR')) {
+	if( ref \$d eq 'SCALAR' or (ref \$d eq 'REF' and ref $d eq 'SCALAR')) {
 		$$k = $sk;
 	}
 	else {
@@ -523,19 +606,28 @@ sub _chk_var {
 	our @logs;
 	our $nlo;
 
-	if( ref( $vk ) eq 'ARRAY') {
+	if( ref $vk eq 'ARRAY') {
+
+		unless( @{ $vk } ) {
+push @logs, "~~> l.$. WARNING#7: empty ARRAY of %%%VAR:". $k if $DEBUG or ! $op->{ignore};
+
+			print { $fh } $$z;
+			++$nlo;
+			return 1;
+		}
+
 	# Check ARRAY.{ARRAY|HASH|SCALAR[.REF]}
 		for my $d ( @{ $vk } ) {
-			if(ref($d) eq 'ARRAY'){
+			if(ref $d eq 'ARRAY'){
 				$$chkVAR |= 0b00001;
 			}
-			elsif(ref($d) eq 'HASH') {
+			elsif(ref $d eq 'HASH') {
 				$$chkVAR |= 0b00010;
 			}
-			elsif(ref(\$d) eq 'SCALAR') {
+			elsif(ref \$d eq 'SCALAR') {
 				$$chkVAR |= 0b00100;
 			}
-			elsif(ref(\$d) eq 'REF' and ref($d) eq 'SCALAR') {
+			elsif(ref \$d eq 'REF' and ref $d eq 'SCALAR') {
 				$$chkVAR |= 0b01000;
 			}
 			else {
@@ -551,7 +643,7 @@ push @logs, "~~> l.$. WARNING#6: mixed types (ARRAY with HASH with SCALAR or oth
 			return 1;
 		}
 	}
-	elsif( ref( \$vk ) eq 'SCALAR') {
+	elsif( ref \$vk eq 'SCALAR') {
 		$columns->[0]{ki} = $k;
 		&_set_column( $Np, $$paste, $columns->[0] );
 	}
@@ -622,6 +714,15 @@ push @logs, "-->\tl.$.>$nlo Insert $ht: ". $_ if $DEBUG;
 sub _hvt_print {
 	my( $fh, $ki, $val, $el, $op, $border ) = @_;
 
+	our $DEBUG;
+	our @logs;
+	our $nlo;
+
+	if( length($ki) and ! defined $val ) {
+		push @logs, "~~> l.$.".' NOT defined %%%V:'. $ki if $DEBUG && $op->{def};
+		return;
+	}
+
 	# output head of variable
 	&_ht_print( $fh, $el, 'head', $border );
 
@@ -633,8 +734,37 @@ sub _hvt_print {
 }
 
 
+sub _s_a_prn {
+	my( $fh, $i, $values, $el, $op, $border, $col ) = @_;
+
+	my $val = $values->[$i];
+	if( ref \$val eq 'REF' and ref $val eq 'SCALAR') {
+		$val = $$val;
+	}
+
+	if( ref \$val eq 'SCALAR') {
+		&_hvt_print( $fh, $i, $val, $el, $op, $$border );
+		++$$col;
+		$$border = 0;
+	}
+	elsif( ref $val eq 'ARRAY') { # [...].ARRAY.ARRAY
+		for( @$val ) {
+			next if ref \$_ ne 'SCALAR';
+
+			&_hvt_print( $fh, $i, $_, $el, $op, $$border );
+			++$$col;
+			$$border = 0;
+		}
+	}
+
+}
+
+
 sub _mixed_indices {
-	my( $fh, $type, $ki, $nd, $values, $el, $op, $border ) = @_;
+	my( $fh, $ki, $values, $el, $op, $border ) = @_;
+
+	my $nd = @$values;
+	my $col = 0;
 
 	for my $ii ( split ',', $ki ) { # e.g. -1-,1-3,6-7-9,-,4,-5,0,7-
 		next if $ii eq '-';
@@ -647,17 +777,16 @@ sub _mixed_indices {
 			($s, $e) = ($e, $s) if $e > $s;
 
 			for( my $i = $s; $i >= $e; --$i ) {
-				&_hvt_print( $fh, $i, ( $type eq 'SCALAR' ? $values->[$i] : ${ $values->[$i] } ), $el, $op, $border );
-				$border = 0;
+				&_s_a_prn( $fh, $i, $values, $el, $op, \$border, \$col );
 			}
 			next;
 		}
 
 		if( $ii =~/^\-[0-9]+$/ ) { # -5
 			my $i = $ii+0;
+
 			if( abs($i) <= $nd ) {
-				&_hvt_print( $fh, $i, ( $type eq 'SCALAR' ? $values->[$i] : ${ $values->[$i] } ), $el, $op, $border );
-				$border = 0;
+				&_s_a_prn( $fh, $i, $values, $el, $op, \$border, \$col );
 			}
 			next;
 		}
@@ -668,32 +797,30 @@ sub _mixed_indices {
 			if( $ii =~/\-$/) { # 7(-)
 
 				for( my $i = $n[0]; $i < $nd; ++$i ) {
-					&_hvt_print( $fh, $i, ( $type eq 'SCALAR' ? $values->[$i] : ${ $values->[$i] } ), $el, $op, $border );
-					$border = 0;
+					&_s_a_prn( $fh, $i, $values, $el, $op, \$border, \$col );
 				}
 
 			}
 			else { # 4 || 0
-				my $i = $n[0];
-				&_hvt_print( $fh, $i, ( $type eq 'SCALAR' ? $values->[$i] : ${ $values->[$i] } ), $el, $op, $border );
-				$border = 0;
+				&_s_a_prn( $fh, $n[0], $values, $el, $op, \$border, \$col );
 			}
 
 		}
 		else { # 1-3 ->(1..3) || 6-7-9 ->(6..9)
 			for( my $i = $n[0]; $i <= $n[-1]; ++$i ) {
-				&_hvt_print( $fh, $i, ( $type eq 'SCALAR' ? $values->[$i] : ${ $values->[$i] } ), $el, $op, $border );
-				$border = 0;
+				&_s_a_prn( $fh, $i, $values, $el, $op, \$border, \$col );
 			}
 		}
 
 	}
+
+	return $col;
 }
 
 
 sub _var_output {
 	my( $fh, $key, $vardata, $columns, $op ) = @_;
-	my $values =  (ref( $vardata ) eq 'HASH') ? $vardata->{ $key } : $vardata->[ $key ];
+	my $values =  (ref $vardata eq 'HASH') ? $vardata->{ $key } : $vardata->[ $key ];
 
 	@$columns or return;
 
@@ -701,12 +828,12 @@ sub _var_output {
 	our @logs;
 	our $nlo;
 
-	if( ref( \$values ) eq 'SCALAR') { # key => SCALAR
+	if( ref \$values eq 'SCALAR') { # key => SCALAR
 		&_v_print( $fh, $key, $values, $columns->[0], $op );
 		return;
 	}
 
-	if( ref( $values ) eq 'ARRAY') { # key => ARRAY
+	if( ref $values eq 'ARRAY') { # key => ARRAY
 
 		# Forming a table
 		my $row = 0;
@@ -725,69 +852,46 @@ push @logs, '--> Table row = '. $row if $DEBUG;
 
 				my $val;
 				if( defined $ki ) {
-					if( ref(\$d) eq 'SCALAR') { # ARRAY.SCALAR in regular vector
+					if((ref \$d eq 'SCALAR') or (ref \$d eq 'REF' and ref $d eq 'SCALAR')) { # (ARRAY.SCALAR or ARRAY.REF->SCALAR) in regular vector
 
 						if( $ki =~/^[\d,\-]+$/) {
 						# mixed indices, e.g.: 1-3,6-7-9,-,4,-5,0,7- or 3- (i.e. 3..arr_end) or 0-5 (0..5) or -1- (-1,-2,..arr_start)
 							last _var_output_M0 if $row;
 
-							&_mixed_indices( $fh, 'SCALAR', $ki, $nd, $values, $el, $op, $border );
-							next;
+							if( $_ = &_mixed_indices( $fh, $ki, $values, $el, $op, $border ) ) {
+								$col += $_ - 1;
+							}
 						}
-						else {
-							next;
-						}
+						next;
 					}
-					elsif( ref(\$d) eq 'REF' and ref($d) eq 'SCALAR') { # ARRAY.REF->SCALAR in regular array
-						if( $ki =~/^[\d,\-]+$/) {
-						# mixed indices, e.g.: 1-3,6-7-9,-,4,-5,0,7- or 3- (i.e. 3..arr_end) or 0-5 (0..5) or -1- (-1,-2,..arr_start)
-							last _var_output_M0 if $row;
-
-							&_mixed_indices( $fh, 'REF', $ki, $nd, $values, $el, $op, $border );
-							next;
-						}
-						else {
-							next;
-						}
-					}
-					elsif( ref($d) eq 'HASH' and defined( $d->{$ki} ) ) { # ARRAY.HASH
+					elsif( ref $d eq 'HASH' and defined( $d->{$ki} ) ) { # ARRAY.HASH
 						$val = $d->{$ki};
 
-						if( ref($val) eq 'ARRAY') { # ARRAY.HASH.ARRAY
+						if( ref $val eq 'ARRAY') { # ARRAY.HASH.ARRAY
 							for my $vv ( @$val ) {
-								next unless ref(\$vv) eq 'SCALAR';
+								next unless ref \$vv eq 'SCALAR';
 
 								&_hvt_print( $fh, $ki, $vv, $el, $op, $border );
-
 								++$col;
 							}
 							next;
 						}
-						elsif( ref(\$val) ne 'SCALAR') { # TODO for REF
+						elsif( ref \$val ne 'SCALAR') { # TODO for REF
 							next;
 						}
 					}
-					elsif( ref($d) eq 'ARRAY' and defined( $d->[$ki] ) ) { # ARRAY.ARRAY
-						$val = $d->[$ki];
+					elsif( ref $d eq 'ARRAY') { # ARRAY.ARRAY
 
-						if( ref($val) eq 'ARRAY') { # ARRAY.ARRAY.ARRAY
-							for my $vv ( @$val ) {
-								next unless ref(\$vv) eq 'SCALAR';
-
-								&_hvt_print( $fh, $ki, $vv, $el, $op, $border );
-
-								++$col;
-							}
-							next;
-						}
-						elsif( ref(\$val) ne 'SCALAR') {
-							next;
+						if( $ki =~/^[\d,\-]+$/) {
+						# mixed indices, e.g.: 1-3,6-7-9,-,4,-5,0,7- or 3- (i.e. 3..arr_end) or 0-5 (0..5) or -1- (-1,-2,..arr_start)
+							$_ = &_mixed_indices( $fh, $ki, $d, $el, $op, $border ) and $col += $_ - 1;
 						}
 
+						next;
 					}
 					elsif( $op->{def} ) {
 
-push @logs, "-->\tl.$. NOT defined %%%V:". $ki if $DEBUG;
+push @logs, "~~> l.$. NOT defined %%%V:". $ki if $DEBUG;
 
 						next;
 					}
@@ -808,7 +912,7 @@ push @logs, "-->\tl.$. NOT defined %%%V:". $ki if $DEBUG;
 		}
 
 	}
-	elsif( ref( $values ) eq 'HASH') {
+	elsif( ref $values eq 'HASH') {
 
 		my $col = 0;
 		foreach my $el ( @$columns ) { # loop through parameters of %%%VAR-structure
@@ -818,21 +922,21 @@ push @logs, "-->\tl.$. NOT defined %%%V:". $ki if $DEBUG;
 
 			my $val;
 			if( defined $ki ) {
-				if( ref( \$values->{$ki} ) eq 'SCALAR' and defined( $values->{$ki} )) { # HASH.SCALAR
+				if( ref \$values->{$ki} eq 'SCALAR' and defined( $values->{$ki} )) { # HASH.SCALAR
 					$val = $values->{$ki};
 				}
-				elsif( ref( \$values->{$ki} ) eq 'REF' and ref( $values->{$ki} ) eq 'SCALAR') { # HASH.REF->SCALAR
+				elsif( ref \$values->{$ki} eq 'REF' and ref $values->{$ki} eq 'SCALAR') { # HASH.REF->SCALAR
 					$val = ${ $values->{$ki} };
 				}
-				elsif( $ki eq '@' and ref( $values->{'@'} ) eq 'ARRAY') {
+				elsif( $ki eq '@' and ref $values->{'@'} eq 'ARRAY') {
 					for my $k ( @{ $values->{'@'} } ) {
 						next unless defined($k) && exists( $values->{$k} );
 
 						my $v;
-						if( ref( \$values->{$k} ) eq 'SCALAR') {
+						if( ref \$values->{$k} eq 'SCALAR') {
 							$v = $values->{$k};
 						}
-						elsif( ref( \$values->{$k} ) eq 'REF' and ref( $values->{$k} ) eq 'SCALAR') {
+						elsif( ref \$values->{$k} eq 'REF' and ref $values->{$k} eq 'SCALAR') {
 							$v = ${ $values->{$k} };
 						}
 						elsif( $op->{def} ) {
@@ -847,7 +951,7 @@ push @logs, "-->\tl.$. ". 'NOT HASH.ARRAY.SCALAR %%%V:@->{'.$k."} in %%%VAR:". $
 					next;
 				}
 				elsif( $op->{def} ) {
-push @logs, "-->\tl.$. NOT HASH.SCALAR or NOT defined %%%V:". $ki if $DEBUG;
+push @logs, "~~> l.$. NOT HASH.SCALAR or NOT defined %%%V:". $ki if $DEBUG;
 
 					next;
 				}
@@ -899,10 +1003,10 @@ The following pseudo-code extract demonstrates this:
 =over 6
 
 =item *
-Fragment of the original (source) TeX file with fillable fields 
-C<myParam>, C<myArray>, C<myHash>, C<myTable_array>, and C<myTable_hash>:
+Fragment of the original (source) TeX file (or an array of strings, each of which is an element of this array)
+with fillable fields C<myParam>, C<myArray>, C<myHash>, C<myTable_array>, and C<myTable_hash>:
 
-  %%%TDZ: -- beginning of The Dead Zone
+  %%%TDZ:  %-- beginning of The Dead Zone
   \documentclass[10pt,a4paper]{article}
   \usepackage[english]{babel}
   \usepackage{amsmath}
@@ -929,18 +1033,20 @@ C<myParam>, C<myArray>, C<myHash>, C<myTable_array>, and C<myTable_hash>:
   \end{tcolorbox}
 
   \begin{tabular}{%
-   c
+  c
   %%%VAR: myArray
-   l  %%%ADD:%  -- column "l" type will repeat as many times as myArray size, e.g. 'lll...l'
-   lllll
+  l %%%ADD:%  -- column "l" type will repeat as many times as myArray size, e.g. 'lll...l'
+  lllll
   %%%END:
   }
   % head of table
   Expense item &
   %%%VAR: myArray
-  %%%ADDX: &  %-- eXcept 1st (0) row (record)
-  \multicolumn{1}{c}{  %%%ADD:%  -- there will be no line break
-  2020 %%%V:@%  % there will be no line break also
+  %-- eXcept 1st (0) row (record)
+  %%%ADDX: &
+  \multicolumn{1}{c}{ %%%ADD:%  -- there will be no line break
+  % there will be no line break also
+  2020 %%%V:@%
   } %%%ADDE:  -- final part of '@' variables
   & 2021 & 2022 & 2023 & 2024 & 2025  % All of this will be replaced until %%%END:
   %%%END:
@@ -966,9 +1072,9 @@ C<myParam>, C<myArray>, C<myHash>, C<myTable_array>, and C<myTable_hash>:
   \\ \hline %%%ADD:
    SPECIFY VALUE 0!  %%%V:0
   &  %%%ADD:
-  \multicolumn{1}{c}{  %%%ADD:% -- there will be no line break
-   SPECIFY VALUES from 3 to last element of array!  %%%V:3-%  } %-- ' }' will be added to right of values
-  }
+  \multicolumn{1}{c}{ %%%ADD:% -- there will be no line break
+   SPECIFY VALUES from 3 to last element of array! %%%V:3-%
+  } %%%ADDE:
   & %%%ADD:%
    SPECIFY VALUES 1 and 2 %%%V:1,2
   &  22222  &  33333  & 44444  &  55555
@@ -978,32 +1084,31 @@ C<myParam>, C<myArray>, C<myHash>, C<myTable_array>, and C<myTable_hash>:
   \\ \hline
   \end{tabular}
   ...
-  \begin{tabular}{ccc}
-   column2 & column1 & column0 \\
+  \begin{tabular}{cccc}
+   column2 & column1 & column0 \\\\
    \toprule
   %%%ENDZ: -- end of The Dead Zone
 
   %%%VAR: myTable_array
-   & %%%ADDX:%  % add " &" without line breaks ("\n"), except for the 1st
+  SPECIFY VALUE 4 %%%V: 4
+   & %%%ADD:%  % add " &" without line breaks ("\n")
   SPECIFY VALUES 2, 1, and 0! %%%V: -3-%
    & VALUE 1
    & VALUE 0
   \\ %%%ADD:
-  \midrule %%%ADD:
-  % All of this will be replaced until %%%TDZ: (or %%%END:)
+  \midrule %%%ADDX:
   ...
-  VALUE 2 & VALUE 1 & VALUE 0
+  VALUE 4 & VALUE 2 & VALUE 1 & VALUE 0
   \\
   \midrule
   ...
-  %%%TDZ: -- beginning of The Dead Zone.
+  %%%TDZ: %-- beginning of The Dead Zone.
   \end{tabular}
-
   ...
   \begin{tabbing}
   %%%ENDZ: -- end of The Dead Zone
   %%%VAR: myTable_hash
-  %%%ADDX: \\
+  %%%ADDX: \\\\
      SPECIFY VALUE 'A'! %%%V: A%
    \= %%%ADD:%
      SPECIFY VALUE 'B'! %%%V: B%
@@ -1025,12 +1130,12 @@ Dataset to fill TeX file (see above):
        myArray => [2024, 2025, 2026, 2027],
        myHash => {year0 => 123456, year1 => 789012, year2 => 345678, year3 => 901234},
        myTable_array => [ # custom user variable ARRAY-ARRAY
-          [00, 01, 02, 03, 04,], # row 0
+          ['00','01','02','03','04',], # row 0
           [10, 11, 12, 13, 14,], # row 1
           [20, 21, 22, 23, 24,], # row 2
        ],
        myTable_hash => [ # custom user variable ARRAY-HASH
-         {A=>00, B=>01, C=>02, }, # row 0
+         {A=>'00',B=>'01',C=>'02',}, # row 0
          {A=>10, B=>11, C=>12, }, # row 1
        ],
   };
@@ -1039,8 +1144,9 @@ Dataset to fill TeX file (see above):
 
 
 =item *
-Ready (filled, completed) TeX file:
+Ready (filled, completed) TeX file (or the console output result, i.e. STDOUT):
 
+  %-- beginning of The Dead Zone
   \documentclass[10pt,a4paper]{article}
   \usepackage[english]{babel}
   \usepackage{amsmath}
@@ -1058,13 +1164,11 @@ Ready (filled, completed) TeX file:
   etc...
 
   \begin{tcolorbox}
-  \rule{0mm}{4.5em}Blah-blah blah-blah blah-blah
+  \rule{0mm}{4.5em}Blah-blah blah-blah blah-blah-- substitutes Variable as well
   \end{tcolorbox}
-
   \begin{tabular}{%
-   c
-   llll
-  }
+  c
+  llll}
   % head of table
   Expense item &
   \multicolumn{1}{c}{2024}
@@ -1086,63 +1190,67 @@ Ready (filled, completed) TeX file:
   789012
   &
   345678 & 901234
-
   \\ \hline
   00
-  &
-  \multicolumn{1}{c}{ 03 } %-- ' }' will be added to right of values
-  &
-  \multicolumn{1}{c}{ 04 } %-- ' }' will be added to right of values
-  & 01
-  & 02
+  & 
+  \multicolumn{1}{c}{03}
+  & 
+  \multicolumn{1}{c}{04}
+  &01
+  &02
   \\ \hline
   10
-  &
-  \multicolumn{1}{c}{ 13 } %-- ' }' will be added to right of values
-  &
-  \multicolumn{1}{c}{ 14 } %-- ' }' will be added to right of values
-  & 11
-  & 12
+  & 
+  \multicolumn{1}{c}{13}
+  & 
+  \multicolumn{1}{c}{14}
+  &11
+  &12
   \\ \hline
   20
-  &
-  \multicolumn{1}{c}{ 23 } %-- ' }' will be added to right of values
-  &
-  \multicolumn{1}{c}{ 24 } %-- ' }' will be added to right of values
-  & 21
-  & 22
+  & 
+  \multicolumn{1}{c}{23}
+  & 
+  \multicolumn{1}{c}{24}
+  &21
+  &22
   \\ \hline
   \end{tabular}
   ...
-  \begin{tabular}{ccc}
+  \begin{tabular}{cccc}
    column2 & column1 & column0 \\
    \toprule
-  02 & 01 & 00 \\
+  04
+   &02 &01 &00\\
   \midrule
-  12 & 11 & 10 \\
+  14
+   &12 &11 &10\\
   \midrule
-  22 & 21 & 20 \\
-  \midrule
+  24
+   &22 &21 &20\\
   \end{tabular}
   ...
   \begin{tabbing}
-  00 \= 01 \= 02
+  00 \=01 \=02
   \\
-  00 \= 01 \= 02
+  10 \=11 \=12
   \end{tabbing}
-
   etc...
-
   \end{document}
+
 
 =back
 
-A new TeX C<base_file> from the template C<$file> filled with data from C<$info> will be created in
+A new TeX C<base_file> from the template C<$file> (or C<$arr>) filled with data from C<$info> will be created in
 B<random subdirectory> (its name is stored in C<$$> variable) of current directory.
 File name of source C<$file> can be absolute,
 i.e. with a full path (include directories and subdirectories).
 C<base_file> name is extracted (same) from source C<$file>.
 Under no circumstances will source C<$file> be overwritten by new C<base_file>.
+
+If the source is an array reference and no target file name is specified by C<ofile> option,
+then 'ready.tex' file will be created in a B<random subdirectory> 
+(its name is stored in C<$$> variable) of current directory.
 
 =item 2.
 Using C<outdir> option:
@@ -1160,6 +1268,13 @@ A new C<$ofile> will be created.
 C<ofile> option suppresses (eliminates) C<outdir> option, i.e.
 file name of C<$ofile> can be absolute.
 Under no circumstances will source C<$file> be overwritten by new C<$ofile>.
+
+If the completed template (ready TeX) needs to be output directly to the console
+(or, for example, for the Web), you can specify:
+
+  ofile => *STDOUT
+
+Of course, in this case C<outdir> option will not be valid either.
 
 =item 4.
 Set the C<$DEBUG> package variable to enable debugging messages (global debug mode):
@@ -1422,32 +1537,41 @@ Only B<ONE tag> can be located on B<ONE line> of input C<$file> (document).
 
 Tag names must be in C<%%%UPPERCASE:>.
 
+Tags can "absorb" one whitespace character around them (left and/or right), if present.
+
 
 =head1 SUBROUTINES
 
 LaTeX::Replicase provides these subroutines:
 
-    replication( $file, $info [, %facultative_options ] );
+    replication( $source, $info [, %facultative_options ] );
     tex_escape( $value [, '~'] );
 
 
-=head2 replication( $file, $info [, %facultative_options ] )
+=head2 replication( $source, $info [, %facultative_options ] )
 
-Creates a new output file from the specified TeX C<$file>, which is a template.
+Creates a new output file from the specified TeX C<$source>, which is a template.
+The TeX-template C<$source> can be either a TeX-file or an array reference,
+each element of which is a TeX-string ((with line break C<\n> if necessary).
+
+File name of C<$source> can be absolute,
+i.e. with a full path (include directories and subdirectories).
+File and directory names and paths to them must not contain space characters.
+
+The output file name is extracted (the same) from C<$source>.
+Under no circumstances will C<$source> be overwritten by the new one.
+
+If C<$source> is an array reference and no target file name is specified by C<ofile> option,
+then 'ready.tex' file will be created in a B<random subdirectory> 
+(its name is stored in C<$$> variable) of current directory.
+
 C<$info> HASH or ARRAY is used to fill template:
 
   $info = { };
   # or
   $info = [ ];
 
-File name of source C<$file> can be absolute,
-i.e. with a full path (include directories and subdirectories).
-File and directory names and paths to them must not contain space characters.
-
-The output file name is extracted (the same) from the source C<$file>.
-Under no circumstances will source C<$file> be overwritten by the new one.
-
-When C<replication> processes C<$file> it identifies tags and replaces them with the result of whatever 
+When C<replication> processes C<$source> it identifies tags and replaces them with the result of whatever 
 the tag represents (e.g. variable value for C<%%%V:> or from C<%%%VAR:> to C<%%%END:>). Anything outside the tag(s),
 including newline characters, are left intact.
 
@@ -1457,32 +1581,39 @@ The following C<%facultative_options> can be used when calling C<replication>:
 
 =item C<outdir>
 
-  my $msg = replication( $file, $info, outdir => $target_dir );
+  my $msg = replication( $source, $info, outdir => $target_dir );
 
-A new C<$file> will be created in C<$target_dir> directory.
+A new C<$source> will be created in C<$target_dir> directory.
 File and directory names and paths to them must not contain space characters.
 
 =item C<ofile>
 
-  my $msg = replication( $file, $info, ofile => $ofile );
+  my $msg = replication( $source, $info, ofile => $ofile );
 
 A new C<$ofile> will be created.
 C<ofile> option suppresses (eliminates) C<outdir> option, i.e.
 file name of C<$ofile> can be absolute.
 File and directory names and paths to them must not contain space characters.
 
+If the completed template (ready TeX) needs to be output directly to the console
+(or, for example, for the Web), you can specify:
+
+  ofile => *STDOUT
+
+Of course, in this case C<outdir> option will not be valid either.
+
 =item C<utf8>
 
 This option specifies the template and output files' character encoding as utf8:
 
-  my $msg = replication( $file, $info, utf8 =>1 );
+  my $msg = replication( $source, $info, utf8 =>1 );
 
 =item C<esc>
 
 This option applies C<tex_escape()> subroutine to all incoming values to mask active TeX characters:
 C<&> C<%> C<$> C<#> C<_> C<{> C<}> C<~> C<^> C<\>.
 
-  my $msg = replication( $file, $info, esc =>1 ); # or esc =>'~'
+  my $msg = replication( $source, $info, esc =>1 ); # or esc =>'~'
 
 BTW: if the value starts with the C<%%%:> tag, then this tag is removed 
 (e.g. C<%%%:$\frac{12345}{67890}$> is converted to C<$\frac{12345}{67890}$>),
@@ -1493,7 +1624,7 @@ and the value itself is not masked, it is skipped.
 This option specifies B<discarding> (ignoring) C<undefined> values and associated structures (C<%%%ADD...>),
 i.e. dictates that only C<defined> values be B<into account>.
 
-  my $msg = replication( $file, $info, def =>1 );
+  my $msg = replication( $source, $info, def =>1 );
 
 This option is useful, for example, for creating merged cells in tables (using C<\multicolumn> LaTeX-command)
 and applies to all incoming data. Also this option can be used as an ON or OFF switch (see above).
@@ -1502,19 +1633,19 @@ and applies to all incoming data. Also this option can be used as an ON or OFF s
 
 This option specifies silently ignore undefined B<name|key|index> of C<%%%V:> and C<%%%VAR:> tags:
 
-  my $msg = replication( $file, $info, ignore =>1 );
+  my $msg = replication( $source, $info, ignore =>1 );
 
 =item C<silent> 
 
 This option activates silent mode of operation:
 
-  my $msg = replication( $file, $info, silent =>1 );
+  my $msg = replication( $source, $info, silent =>1 );
 
 =item C<debug>
 
 This option sets local debug mode:
 
-  my $msg = replication( $file, $info, debug =>1 );
+  my $msg = replication( $source, $info, debug =>1 );
   if( ! $msg ) {
     say 'Ok';
   }
@@ -1592,7 +1723,7 @@ Alessandro N. Gorohovski, E<lt>an.gorohovski@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2025 by Alessandro N. Gorohovski
+Copyright (C) 2010-2026 by Alessandro N. Gorohovski
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

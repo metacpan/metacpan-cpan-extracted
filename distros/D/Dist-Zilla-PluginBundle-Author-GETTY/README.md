@@ -30,6 +30,7 @@ copyright_holder = Your Name
 - Automatic changelog generation
 - CPAN release workflow
 - Optional IRC metadata support
+- Distribution adoption marking (x_adoptme metadata)
 - Alien distribution support
 - Task distribution support
 
@@ -96,6 +97,14 @@ Auto-generated sections: NAME, VERSION, SUPPORT, CONTRIBUTING, AUTHORS, LICENSE
 |--------|---------|-------------|
 | `irc` | - | IRC channel for SUPPORT section (e.g., `#perl`) |
 | `irc_server` | `irc.perl.org` | IRC server hostname |
+| `irc_user` | `Getty` (when author is GETTY) | IRC username to display in SUPPORT section |
+
+### Adoption & Metadata
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `authority` | - | Override x_authority metadata (defaults to author) |
+| `adoptme` | `0` | Mark distribution as available for adoption on MetaCPAN |
 
 ### Git::GatherDir Options
 
@@ -152,6 +161,9 @@ For building distributions that wrap external libraries:
 | `alien_isolate_dynamic` | Isolate dynamic libraries |
 | `alien_version_check` | Command to check installed version |
 | `alien_bin_requires` | Build dependencies (multi-value) |
+| `alien_build_command` | Custom build commands (multi-value) |
+| `alien_install_command` | Custom install commands (multi-value) |
+| `alien_test_command` | Custom test commands (multi-value) |
 
 ## Examples
 
@@ -174,6 +186,14 @@ author = YOURCPANID
 [@Author::GETTY]
 irc = #mychannel
 irc_server = irc.libera.chat
+irc_user = Getty or ether
+```
+
+### Mark Distribution for Adoption
+
+```ini
+[@Author::GETTY]
+adoptme = 1
 ```
 
 ### Private Distribution (No CPAN Upload)

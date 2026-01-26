@@ -1,3 +1,9 @@
+0.304     2026-01-26 05:55:39Z
+
+ - Add alien_build_command, alien_install_command, alien_test_command parameters
+ - Add adoptme attribute to mark distributions as available for adoption
+ - Add irc_user attribute for configurable IRC contact in SUPPORT section
+
 0.303     2026-01-13 23:01:57Z
 
  - Add authority attribute to override x_authority metadata

@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.303';
+our $VERSION = '0.304';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -154,6 +154,25 @@ has irc_server => (
   default => sub { $_[0]->payload->{irc_server} || 'irc.perl.org' },
 );
 
+has irc_user => (
+  is      => 'ro',
+  isa     => 'Str',
+  lazy    => 1,
+  default => sub {
+    my $self = shift;
+    return $self->payload->{irc_user} if $self->payload->{irc_user};
+    return 'Getty' if $self->author eq 'GETTY';
+    return '';
+  },
+);
+
+has adoptme => (
+  is      => 'ro',
+  isa     => 'Bool',
+  lazy    => 1,
+  default => sub { $_[0]->payload->{adoptme} },
+);
+
 my @gather_array_options = qw( exclude_filename exclude_match );
 my @gather_array_attributes = map { 'gather_'.$_ } @gather_array_options;
 
@@ -195,8 +214,10 @@ for my $attr (@run_attributes) {
 }
 
 my @alien_options = qw( msys repo name bins pattern_prefix pattern_suffix pattern_version pattern autoconf_with_pic isolate_dynamic version_check );
+my @alien_array_options = qw( build_command install_command test_command );
 
 my @alien_attributes = map { 'alien_'.$_ } @alien_options;
+my @alien_array_attributes = map { 'alien_'.$_ } @alien_array_options;
 
 for my $attr (@alien_attributes) {
   has $attr => (
@@ -207,6 +228,15 @@ for my $attr (@alien_attributes) {
   );
 }
 
+for my $attr (@alien_array_attributes) {
+  has $attr => (
+    is      => 'ro',
+    isa     => 'ArrayRef[Str]',
+    lazy    => 1,
+    default => sub { defined $_[0]->payload->{$attr} ? $_[0]->payload->{$attr} : [] },
+  );
+}
+
 has alien_bin_requires => (
   is      => 'ro',
   isa     => 'ArrayRef[Str]',
@@ -214,7 +244,7 @@ has alien_bin_requires => (
   default => sub { defined $_[0]->payload->{alien_bin_requires} ? $_[0]->payload->{alien_bin_requires} : [] },
 );
 
-sub mvp_multivalue_args { @run_attributes, @gather_array_attributes, 'alien_bin_requires' }
+sub mvp_multivalue_args { @run_attributes, @gather_array_attributes, 'alien_bin_requires', @alien_array_attributes }
 
 sub configure {
   my ($self) = @_;
@@ -303,10 +333,17 @@ sub configure {
     my $channel = $self->irc;
     $channel = '#' . $channel unless $channel =~ /^#/;
     my $irc_url = 'irc://' . $self->irc_server . '/' . $channel;
+    my %irc_resources = ( 'x_IRC' => $irc_url );
+    $irc_resources{'x_IRC_user'} = $self->irc_user if $self->irc_user;
     $self->add_plugins([
-      'MetaResources' => {
-        'x_IRC' => $irc_url,
-      }
+      'MetaResources' => \%irc_resources
+    ]);
+  }
+
+  # Add adoptme metadata if configured
+  if ($self->adoptme) {
+    $self->add_plugins([
+      'MetaResources' => 'adoptme' => { 'x_adoptme' => 1 }
     ]);
   }
 
@@ -315,6 +352,10 @@ sub configure {
     for (@alien_options) {
       my $func = 'alien_'.$_;
       $alien_values{$_} = $self->$func if defined $self->$func && $self->$func ne '';
+    }
+    for (@alien_array_options) {
+      my $func = 'alien_'.$_;
+      $alien_values{$_} = $self->$func if @{ $self->$func };
     }
     if(@{ $self->alien_bin_requires }) {
       $alien_values{bin_requires} = $self->alien_bin_requires;
@@ -404,7 +445,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.303
+version 0.304
 
 =head1 SYNOPSIS
 
@@ -617,6 +658,28 @@ Specify the IRC server. Defaults to C<irc.perl.org>.
   irc = #mychannel
   irc_server = irc.libera.chat
 
+=head2 irc_user
+
+Specify the IRC username to display in the SUPPORT section. Defaults to
+C<Getty> when author is C<GETTY>.
+
+If C<irc> is set but C<irc_user> is not, the IRC section will only mention
+the channel without referencing a specific user.
+
+  [@Author::GETTY]
+  irc = #perl
+  irc_user = Getty or ether
+
+=head2 adoptme
+
+If set to 1, this marks the distribution as available for adoption. This will
+add C<x_adoptme> metadata to the distribution, which is recognized by
+L<MetaCPAN|https://metacpan.org/> and displayed prominently to indicate that
+the current maintainer is looking for someone to take over the module.
+
+  [@Author::GETTY]
+  adoptme = 1
+
 =head1 SEE ALSO
 
 L<Dist::Zilla::Plugin::Alien>
@@ -649,10 +712,6 @@ L<Dist::Zilla::Plugin::TaskWeaver>
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/issues>.
-
-=head2 IRC
-
-You can reach Getty on C<irc.perl.org> for questions and support.
 
 =head1 CONTRIBUTING
 

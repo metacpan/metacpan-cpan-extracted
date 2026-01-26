@@ -18,10 +18,29 @@ my %test = (
             vronk => 'zlott',
         },
         glurpp => {
-            zok    => 'plop kapow',
-            zapeth => 'eee_yow',
+            zok              => 'plop kapow',
+            zapeth           => 'eee_yow',
+            '[clange] slosh' => 'ouch',
         },
     },
+    't/comment.ini' => {
+        'section1' => {
+            'name1' => 'value1 extravalue1',
+            'name2' => 'value2',
+        },
+        'section2' => {
+            'name3' => 'value3',
+        },
+        section3 => {},
+    },
+    't/weird_continuations.ini' => {
+        'flrbbbbb thunk' => {
+            whap => 'z_zwap   glipp',
+        },
+        'blurp clank_est' => {
+            bang_eth => 'ker_sploosh',
+        },
+    }
 );
 
 plan tests => scalar keys %test;

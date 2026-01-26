@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright PROCURA B.V. (c) 2007-2023 H.Merijn Brand
+# Copyright PROCURA B.V. (c) 2007-2026 H.Merijn Brand
 
 require 5.006;
 
@@ -85,15 +85,9 @@ sub postamble {
 	'	-@cpants_lint.pl $(DISTVNAME).tgz',
 	'	-@rm -f Debian_CPANTS.txt',
 	'',
-	'doc docs:		doc/VCS-SCCS.md doc/VCS-SCCS.html doc/VCS-SCCS.man',
-	'doc/VCS-SCCS.md:	SCCS.pm',
-	'	pod2markdown  < $? > $@',
-	'doc/VCS-SCCS.html:	SCCS.pm',
-	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
-	'doc/VCS-SCCS.3:	SCCS.pm',
-	'	pod2man       < $? > $@',
-	'doc/VCS-SCCS.man:	doc/VCS-SCCS.3',
-	'	nroff -mandoc < $? > $@',
+	'doc docs:		doc/SCCS.md doc/SCCS.html doc/SCCS.man',
+	'doc/SCCS.md:	SCCS.pm',
+	'	perl doc/make-doc.pl',
 	'';
     } # postamble
 

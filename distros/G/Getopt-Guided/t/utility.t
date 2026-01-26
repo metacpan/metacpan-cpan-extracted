@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( plan subtest ) ], tests => 3;
-use Test::Script qw( script_compiles script_fails script_runs script_stderr_is script_stdout_is script_stderr_like );
+use Test::More import => [ qw( plan subtest ) ], tests => 4;
+use Test::Script qw( script_compiles script_fails script_runs script_stderr_is script_stdout_like script_stderr_like );
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile );
@@ -12,7 +12,7 @@ subtest 'Utility is broken: getopts has $spec error' => sub {
 
   my $utility = catfile( qw( t examples broken ) );
   script_compiles $utility;
-  script_fails $utility, { exit => 2 }, 'Check exit status';
+  script_fails $utility, { exit => 255 }, 'Check exit status';
   script_stderr_like
     qr/\A\$spec parameter isn't a non-empty string of alphanumeric characters, stopped at \Q$utility\E.*/, ## no critic ( ProhibitComplexRegexes )
     'Check standard error output'
@@ -27,11 +27,20 @@ subtest 'Utility is fine but called wrongly: unknown option' => sub {
   script_stderr_is basename( $utility ) . ": illegal option -- g\n", 'Check standard error output'
 };
 
-subtest 'Ask utility for its version information' => sub {
+subtest 'Premature stop: ask utility for its version information' => sub {
   plan tests => 3;
 
   my $utility = catfile( qw( t examples fine ) );
   script_compiles $utility;
   script_runs [ $utility, '-V' ], 'Check exit status';
-  script_stdout_is basename( $utility ) . " v6.6.6\n", 'Check standard output'
+  script_stdout_like qr/\A ${ \( basename( $utility ) ) } \  v6\.6\.6 \n perl \  v\d+\.\d+\.\d+ \n \z/x,
+    'Check standard output'
+};
+
+subtest 'Normal utility run' => sub {
+  plan tests => 2;
+
+  my $utility = catfile( qw( t examples fine ) );
+  script_compiles $utility;
+  script_fails [ $utility, '-x' ], { exit => 3 }, 'Check exit status'
 }

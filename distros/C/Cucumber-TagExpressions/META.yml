@@ -19,25 +19,25 @@ name: Cucumber-TagExpressions
 provides:
   Cucumber::TagExpressions:
     file: lib/Cucumber/TagExpressions.pm
-    version: v8.1.0
+    version: v9.0.0
   Cucumber::TagExpressions::AndNode:
     file: lib/Cucumber/TagExpressions/Node.pm
-    version: v8.1.0
+    version: v9.0.0
   Cucumber::TagExpressions::ExpressionNode:
     file: lib/Cucumber/TagExpressions/Node.pm
-    version: v8.1.0
+    version: v9.0.0
   Cucumber::TagExpressions::LiteralNode:
     file: lib/Cucumber/TagExpressions/Node.pm
-    version: v8.1.0
+    version: v9.0.0
   Cucumber::TagExpressions::Node:
     file: lib/Cucumber/TagExpressions/Node.pm
-    version: v8.1.0
+    version: v9.0.0
   Cucumber::TagExpressions::NotNode:
     file: lib/Cucumber/TagExpressions/Node.pm
-    version: v8.1.0
+    version: v9.0.0
   Cucumber::TagExpressions::OrNode:
     file: lib/Cucumber/TagExpressions/Node.pm
-    version: v8.1.0
+    version: v9.0.0
 requires:
   List::Util: '1.70'
   Moo: '0'
@@ -45,7 +45,7 @@ requires:
 resources:
   bugtracker: https://github.com/cucumber/tag-expressions/issues
   repository: https://github.com/cucumber/tag-expressions.git
-version: 8.1.0
+version: 9.0.0
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

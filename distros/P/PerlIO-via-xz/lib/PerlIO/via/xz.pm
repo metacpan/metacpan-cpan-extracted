@@ -9,7 +9,7 @@ use IO::Uncompress::UnXz qw( $UnXzError );
 #use Data::Peek;
 use Carp;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 sub import {
     my ($class, %args) = @_;
@@ -230,7 +230,7 @@ H.Merijn Brand E<lt>hmbrand@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2020-2023 by H.Merijn Brand
+Copyright (C) 2020-2026 by H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -3,7 +3,7 @@
 use 5.020000;
 use warnings;
 
-our $VERSION = "1.34 - 2024-05-15";
+our $VERSION = "1.35 - 2026-01-25";
 our $CMD = $0 =~ s{.*/}{}r;
 
 sub usage {
@@ -159,18 +159,18 @@ sub modules {
       <table>
         <thead>
           <tr>
-            <th><a href="https://v1.metacpan.org/author/$author">Distribution</a></th>
+            <th><a href="https://metacpan.org/author/$author">Distribution</a></th>
             <th>vsn</th>
             <th class="rhdr">released</th>
             <th class="tci" colspan="4"><a href="https://github.com/$git_id">repo</a></th>
             <th class="rhdr"><a href="https://rt.cpan.org/Public/Dist/ByMaintainer.html?Name=$author">RT</a></th>
             <th class="center">doc</th>
-            <th class="tci"><a href="https://travis-ci.org/profile/$travis_id">TravisCI</a></th>
+            <th class="tci">CI</th>
             <th class="cpants"><a href="https://cpants.perl.org/author/$author">kwalitee</a></th>
-            <th class="rhdr"><a href="http://cpancover.com">cover</a></th>
-            <th class="rhdr" colspan="3"><a href="http://www.cpantesters.org/author/$auid1/$author.html">cpantesters</a></th>
+            <th class="rhdr"><a href="https://cpancover.com">cover</a></th>
+            <th class="rhdr" colspan="3"><a href="https://www.cpantesters.org/author/$auid1/$author.html">cpantesters</a></th>
             <th class="rhdr"><span style="color: green">&#x2714;</span><span style="color: red">&#x2718;</span></th>
-            <th class="rhdr"><a href="http://deps.cpantesters.org">&#x219d;</a></th>
+            <th class="rhdr"><a href="https://deps.cpantesters.org">&#x219d;</a></th>
             <th class="rhdr" style="color: red">&#x2665;</th>
             </tr>
           </thead>
@@ -206,8 +206,9 @@ EOH
 
 	$data->{version} //= "*";
 
-	my $mcpd = eval { $mcpan->distribution ($dist) };
-	my $mcpr = eval { $mcpan->release      ($dist) };
+	my $mcpd = eval { $mcpan->distribution ( $dist                  ) };
+	my $mcpr = eval { $mcpan->release      ( $dist                  ) };
+	my $mcpc = eval { $mcpan->cover        ("$dist-$data->{version}") };
 
 	# Kwalitee
 	my $kwtc = "none";
@@ -289,31 +290,50 @@ EOH
 	$opt_v > 7 and warn "  (@{$data->{cptst}})\n";
 	$time{cpantesters} += t_used;
 
+	my %issues;
+	$mcpd and %issues = %{$mcpd->bugs || {}};
+
 	# RT tickets
-	my $rt = $m->{rt} // "https://rt.cpan.org/Public/Dist/Display.html?Name=$dist";
-	# https://rt.cpan.org/Dist/Display.html?Name=$dist";
-	# https://rt.cpan.org/Dist/Display.html?Queue=DBD%3A%3ACSV
+	my $rt = $m->{rt};
 	my $rt_tag = "*";
-	if ($rt =~ m{/rt.cpan.org/}) {
-	    if ($mcpd and $r = $mcpd->bugs and my $brt = $r->{rt}) {
-		$rt_tag = sum0 map { $brt->{$_} || 0 } qw( open new );
-		# Possibly use a popup to show active, closed, new, open,
-		# patched, rejected, resolved, stalled
-		}
-	    elsif ($r = $ua->get ($rt) and $r->is_success) {
-		$opt_v > 1 and warn " Fetching RT ticket list\n";
-		$opt_v > 2 and warn "  $rt\n";
-		my $tree = HTML::TreeBuilder->new;
-		$tree->parse_content (decode ("utf-8", $r->content));
-		#$opt_v > 8 and warn $tree->as_HTML (undef, "  ", {});
-		my %id;
-		$id{$_->attr ("href")}++ for
-		    $tree->look_down (_tag => "a", href => qr{^/Ticket/Display.html\?id=[0-9]+$});
-		$opt_v > 8 and DDumper \%id;
-		$rt_tag = scalar keys %id;
-		}
-	    else {
-		warn $r->status_line;
+	if ($issues{rt}) {
+	    # rt         => {
+	    #   active   => 0,
+	    #   closed   => 1,
+	    #   new      => 0,
+	    #   open     => 0,
+	    #   patched  => 0,
+	    #   rejected => 0,
+	    #   resolved => 1,
+	    #   source   => 'https://rt.cpan.org/Public/Dist/Display.html?Name=App-SpeedTest',
+	    #   stalled  => 0
+	    #   }
+	    $rt   ||= $issues{rt}{source};
+	    $rt_tag = sum0 map { $issues{rt}{$_} || 0 } qw( open new );
+	    # Possibly use a popup to show active, closed, new, open,
+	    # patched, rejected, resolved, stalled
+	    }
+	else {
+	    $rt   ||= "http://rt.cpan.org/Public/Dist/Display.html?Name=$dist";
+	    # http://rt.cpan.org/NoAuth/Bugs.html?Dist=$dist"; - does not work anymore
+	    # https://rt.cpan.org/Dist/Display.html?Name=$dist";
+	    # https://rt.cpan.org/Dist/Display.html?Queue=DBD%3A%3ACSV
+	    if ($rt =~ m{/rt.cpan.org/}) {
+		if ($r = $ua->get ($rt) and $r->is_success) {
+		    $opt_v > 1 and warn " Fetching RT ticket list\n";
+		    $opt_v > 2 and warn "  $rt\n";
+		    my $tree = HTML::TreeBuilder->new;
+		    $tree->parse_content (decode ("utf-8", $r->content));
+		    #$opt_v > 8 and warn $tree->as_HTML (undef, "  ", {});
+		    my %id;
+		    $id{$_->attr ("href")}++ for
+			$tree->look_down (_tag => "a", href => qr{^/Ticket/Display.html\?id=[0-9]+$});
+		    $opt_v > 8 and DDumper \%id;
+		    $rt_tag = scalar keys %id;
+		    }
+		else {
+		    warn $r->status_line;
+		    }
 		}
 	    }
 	$time{rt} += t_used;
@@ -326,36 +346,37 @@ EOH
 	    "open"	=> [ "-", undef ],
 	    "closed"	=> [ "-", undef ],
 	    );
-	if ($git =~ m/\b github.com \b/x) {
-	    if ($mcpd and $r = $mcpd->bugs and my $bgh = $r->{github}) {
-		# source, closed, open, active
-		$issues_tag = $bgh->{open};
-		}
-	    else {
-		$opt_v > 1 and warn " Fetch github issues\n";
-		my $il = "$git/issues";
-		$r = $ua->get ($il);
-		my $tree = HTML::TreeBuilder->new;
-		if ($r && $r->is_success) {
-		    $issues     = $il;
-		    $issues_tag = "0";
-		    $tree->parse_content (decode ("utf-8", $r->content));
-		    # Get most recent commit date
-		    my $ib = $il =~ s{^https?://github.com}{}r;
-		    $rt_tag eq "*" and $rt_tag = 0;
-		    for ($tree->look_down (_tag => "a",
-					   href => qr{$ib\?q=is(?:%3A|:)open\+is(?:%3A|:)issue$})) {
-			$_->as_text =~ m/^\s*([0-9]+)\s+Open/i or next;
-			$issues_tag = $1;
-			}
+	$opt_v > 8 and warn " Github issues from $git ...\n";
+	if ($issues{github}) {
+	    # github     => {
+	    #   active   => 2,
+	    #   closed   => 13,
+	    #   open     => 2,
+	    #   source   => 'https://github.com/Tux/speedtest'
+	    #   },
+	    $issues   ||= $issues{github}{source};
+	    $issues_tag = $issues{github}{"open"} || 0;
+	    }
+	elsif ($git =~ m/\b github.com \b/x) {
+	    $opt_v > 1 and warn " Fetch github issues\n";
+	    my $il = "$git/issues";
+	    $r = $ua->get ($il);
+	    my $tree = HTML::TreeBuilder->new;
+	    if ($r && $r->is_success) {
+		$issues     = $il;
+		$issues_tag = "0";
+		$tree->parse_content (decode ("utf-8", $r->content));
+		# Get most recent commit date
+		my $ib = $il =~ s{^https?://github.com}{}r;
+		$rt_tag eq "*" and $rt_tag = 0;
+		for ($tree->look_down (_tag => "a",
+				       href => qr{$ib\?q=is(?:%3A|:)open\+is(?:%3A|:)issue$})) {
+		    $_->as_text =~ m/^\s*([0-9]+)\s+Open/i or next;
+		    $issues_tag = $1;
 		    }
 		}
-	    $issues_tag =~ m/^[0-9]+$/ and push @$issue_class, (
-		$issues_tag == 0 ? "pass" :
-		$issues_tag < 10 ? "na"   :
-		$issues_tag < 25 ? "warn" : "fail");
 
-	    my $tree = HTML::TreeBuilder->new;
+	    $tree = HTML::TreeBuilder->new;
 	    $r = $ua->get ("$git/pulls");
 	    $tree->parse_content ($r && $r->is_success ? decode ("utf-8", $r->content) : "");
 	    foreach my $a ($tree->look_down (_tag => "a", href => qr{/issues\?q=is%3A})) {
@@ -364,6 +385,12 @@ EOH
 		$pr{$2} = [ $1 + 0, "$git/pulls?q=is%3Apr+is%3A$2" ];
 		}
 	    }
+
+	$issues_tag =~ m/^[0-9]+$/ and push @$issue_class, (
+	    $issues_tag == 0 ? "pass" :
+	    $issues_tag < 10 ? "na"   :
+	    $issues_tag < 25 ? "warn" : "fail");
+
 	$time{github} += t_used;
 	$rt_tag =~ m/^[-0-9]?$/ or
 	    $rt_tag = ($mcpd ? $mcpd->bugs->{rt}{active} // "" : "") || "*";
@@ -487,11 +514,11 @@ if (0) {
 	dta ($tci_class,     $tci_tag || "-",         $tci);
 	dta (["kwt",$kwtc ], $data->{kwalitee},       $m->{cpants} // "https://cpants.cpanauthors.org/dist/$dist");
 	dta (["cvr",$cvrc ], $cvrt,                   $cvrr);
-	dta (["cpt","pass"], $data->{cptst}[0] // "", $m->{ct}     // "http://www.cpantesters.org/show/$dist.html");
+	dta (["cpt","pass"], $data->{cptst}[0] // "", $m->{ct}     // "https://www.cpantesters.org/show/$dist.html");
 	dta (["cpt","na"  ], $data->{cptst}[1] // "");
-	dta (["cpt","fail"], $data->{cptst}[2] // "", $m->{ctm}    // "http://matrix.cpantesters.org/?dist=$dist");
-	dta ($cos_class,     $cos,                                    "http://deps.cpantesters.org/?module=$mod&amp;perl=5.32.0&amp;os=Any+OS");
-	dta (["rd"        ], $rd,                     $m->{rd}     // "http://deps.cpantesters.org/depended-on-by.pl?module=$mod");
+	dta (["cpt","fail"], $data->{cptst}[2] // "", $m->{ctm}    // "https://fast-matrix.cpantesters.org/?dist=$dist");
+	dta ($cos_class,     $cos,                                    "https://deps.cpantesters.org/?module=$mod&amp;perl=5.32.0&amp;os=Any+OS");
+	dta (["rd"        ], $rd,                     $m->{rd}     // "https://deps.cpantesters.org/depended-on-by.pl?module=$mod");
 	dta (["kwt"       ], $data->{fav},
 					$data->{fav} eq "-" ? undef : "https://metacpan.org/release/$dist/plussers");
 	say $html qq{            </tr>};

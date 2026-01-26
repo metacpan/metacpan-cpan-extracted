@@ -547,6 +547,14 @@ t/etc/rocky-9.4/rocky-release
 t/etc/rocky-9.4/rocky-release-upstream
 t/etc/rocky-9.4/system-release
 t/etc/rocky-9.4/system-release-cpe
+t/etc/rocky-10.0/DISTNAME
+t/etc/rocky-10.0/issue
+t/etc/rocky-10.0/os-release
+t/etc/rocky-10.0/redhat-release
+t/etc/rocky-10.0/rocky-release
+t/etc/rocky-10.0/rocky-release-upstream
+t/etc/rocky-10.0/system-release
+t/etc/rocky-10.0/system-release-cpe
 t/etc/s390x-sles11-sp2/DISTNAME
 t/etc/s390x-sles11-sp2/issue
 t/etc/s390x-sles11-sp2/lsb-release

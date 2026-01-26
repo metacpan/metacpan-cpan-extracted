@@ -54,9 +54,14 @@ foreach my $cd (
 	dateFont	=> "{Liberation Mono} 12",
 	dateColor	=> "Gold",
 
-	dateFormat => $city,
-	timeZone   => $tz,
-	handColor  => $color,
+	dateFormat	=> $city,
+	timeZone	=> $tz,
+	handColor	=> $color,
+
+	time2TZ		=> "UTC",
+	time2Font	=> "{Liberation Mono} 12",
+	time2Color	=> "Silver",
+	time2Format	=> "HH:MM:SS",
 	);
     $c->pack (-side => "left", -expand => 1, -fill => "both");
     }

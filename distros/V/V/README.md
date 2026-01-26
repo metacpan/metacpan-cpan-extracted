@@ -56,7 +56,7 @@ V`](https://metacpan.org/pod/V)
 # COPYRIGHT
 
 &copy; 2002..2024 Abe Timmerman <abeltje@cpan.org>. All rights reserved.
-&copy; 2024..2025 H.Merijn Brand <hmbrand@cpan.org>. All rights reserved.
+&copy; 2024..2026 H.Merijn Brand <hmbrand@cpan.org>. All rights reserved.
 
 # LICENSE
 

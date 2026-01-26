@@ -1,3 +1,8 @@
+0.19	25 Jan 2026 - H.Merijn Brand
+    * Add SECURITY.md
+    * It's 2026
+    * Update changed URL's
+
 0.18	09 Dec 2025 - H.Merijn Brand
     * Versions update, including recommendations based on CVE's
     * Doc fixes (mauke: issues on GH)
