@@ -1,0 +1,45 @@
+NAME
+    nkc-to-isbd - Tool to fetch record from National library of the Czech
+    Republic to ISBD text file.
+
+SYNOPSIS
+     nkc-to-isbd [-h] [--version] id_of_book ..
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "id_of_book .."
+
+            Identifier of book. Could be multiple values. Possible ids are:
+            ISBN or Czech national bibliography id.
+
+EXAMPLE1
+     # Fetch book edition defined by ISBN number.
+     nkc-to-isbd 978-80-276-0470-8
+
+EXAMPLE2
+     # Fetch book edition defined by Czech national bibliography id
+     nkc-to-isbd cnb003322696
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-NKC2ISBD>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2026 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

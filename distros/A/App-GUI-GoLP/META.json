@@ -1,5 +1,5 @@
 {
-   "abstract" : "A GUI for viewing Life-like cellular automata, in Perl/Prima",
+   "abstract" : "A GUI for viewing and editing Life-like cellular automata, in Perl/Prima",
    "author" : [
       "Matt Johnson <mjohnson@cpan.org>"
    ],
@@ -60,6 +60,6 @@
          "web" : "https://github.com/mjohnson108/p5-App-GUI-GoLP"
       }
    },
-   "version" : "1.1",
+   "version" : "1.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

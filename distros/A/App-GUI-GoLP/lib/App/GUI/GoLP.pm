@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "1.1";
+our $VERSION = "1.2";
 
 1;
 
@@ -12,11 +12,11 @@ __END__
 
 =head1 NAME
 
-App::GUI::GoLP - A GUI for viewing Life-like cellular automata, in Perl/Prima
+App::GUI::GoLP - A GUI for viewing and editing Life-like cellular automata, in Perl/Prima
 
 =head1 VERSION
 
-Version 1.1
+Version 1.2
 
 =head1 SYNOPSIS
 
@@ -36,7 +36,13 @@ This program will load and run Life-like cellular automata from .rle or .cells f
 
 =head3 File
 
-The I<Open> option provides a dialog box allowing the user to select a .rle or .cells format file to be loaded. The I<Exit> option exits the program.
+The I<New> option allows the user to create a new board. Choose the width and height of the board and whether the initial cell status will be all 'dead', all 'live' or chosen at random according to a specified percentage chance. Use the I<Rules> submenu in the I<Options> menu to change the birth/survival rules used by the simulation.
+
+The I<Open> option provides a dialog box allowing the user to select a .rle or .cells format file to be loaded. 
+
+The I<Save> option will save the current board in .rle or .cells format.
+
+The I<Exit> option exits the program.
 
 =head3 Options
 
@@ -62,17 +68,25 @@ I<Dead cell color> allows the user to select the color of a 'dead' cell.
 
 I<Grid color> allows the user to select the color of the grid.
 
+I<Edit mode> can be used to switch in and out of 'edit mode'. When in edit mode clicking the left mouse button on the board will toggle the state of the cell under the cursor (indicated by a highlighted cell). Entering edit mode pauses the simulation.
+
 =head3 About
 
 Provides a small 'about' dialog.
 
 =head2 Mouse interaction
 
-The mouse wheel can be used to adjust the zoom setting (otherwise use the menu option). If the zoom is such that the board is clipped, the user can click and drag within the window to move the viewed section of the board.
+The mouse wheel can be used to adjust the zoom setting (otherwise use the menu option). If the zoom is such that the board is clipped, the user can click and drag within the window to move the viewed section of the board. When not in edit mode, this can be done with both left and right mouse buttons, but when in edit mode the left mouse button will edit the board and the right mouse button can be used to click and drag to move the board.
 
-=head1 TODO
+=head2 Keyboard commands
 
-Options for stepping through the simulation, and editing and saving the board.
+Pressing the space bar will play and pause the simulation.
+
+When paused, the ']' key will step the simulation.
+
+F1 enters 'Edit Mode'.
+
+F5 takes a screenshot of the board.
 
 =head1 SEE ALSO
 

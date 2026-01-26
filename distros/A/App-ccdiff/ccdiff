@@ -11,7 +11,7 @@ use List::Util      qw( first  max                  );
 use Term::ANSIColor qw(:constants color             );
 use Getopt::Long    qw(:config bundling noignorecase);
 
-our $VERSION = "0.34";
+our $VERSION = "0.35";
 our $CMD     = $0 =~ s{.*/}{}r;
 
 sub usage {
@@ -46,6 +46,8 @@ sub usage {
     say "          --old=red      Color to indicate removed content";
     say "          --new=green    Color to indicate added   content";
     say "          --bg=white     Background color for colored indicators";
+    say "          --old-label=L  Set file/stream indicator for header old";
+    say "          --new-label=L  Set file/stream indicator for header new";
     say "   -p     --pink         Shortcut for --old=magenta";
     say "   -r     --reverse      Reverse/invert the colors of the indicators";
     say "   -s     --swap         Swap old/new color indicators";
@@ -69,6 +71,8 @@ my %rc = (
     heuristics	=> 0,
     index	=> 0,
     iwbzusepp	=> 0,
+    new_label	=> undef,
+    old_label	=> undef,
     markers	=> 0,
     new		=> "green",
     old		=> "red",
@@ -105,6 +109,8 @@ my $new_color = $rc{new};
 my $rev_color = $rc{bg};
 my $cli_color = $ENV{CLICOLOR};	# https://bixense.com/clicolors/
 my $no_colors = $ENV{NO_COLOR}; # https://no-color.org
+my $old_label = $rc{old_label};
+my $new_label = $rc{new_label};
 my $list_colors;
 my $diff_class;
 
@@ -149,6 +155,9 @@ unless (caller) {
 	"Z|ignore-trailing-space!"		=> \$opt_Z,
 	"E|ignore-tab-expansion!"		=> \$opt_E, # NYI
 	"B|ignore-blank-lines!"			=> \$opt_B, # Partly implemented
+
+	  "old-label|label-old=s"		=> \$old_label,
+	  "new-label|label-new=s"		=> \$new_label,
 
 	"p|pink!"		=> sub { $old_color = "magenta" },
 	  "old=s"		=> \$old_color,
@@ -357,6 +366,8 @@ sub ccdiff {
 	    $o eq "markers"			and $opt_m = $v;
 	    $o eq "new"				and $new_color = $v;
 	    $o eq "old"				and $old_color = $v;
+	    $o eq "new-label"			and $new_label = $v;
+	    $o eq "old-label"			and $old_label = $v;
 	    $o eq "reverse"			and $opt_r = $v;
 	    $o eq "swap"			and $opt_s = $v;
 	    $o eq "threshold"			and $opt_t = $v;
@@ -403,13 +414,15 @@ sub ccdiff {
 	    }
 	my $nl = max length $f1, length $f2, 7;
 	my $sl = $hc ? ($ENV{COLUMNS} || 80) - 4 - $nl : 1;
-	my @h = map { -f $_
+	my $hi = -1;
+	my @hi = ($old_label, $new_label);
+	my @h  = map { $hi++; -f $_
 	    ? { tag   => "",
 		name  => $_,
 		stamp => scalar localtime ((stat $_)[9]),
 		}
 	    : { tag   => "",
-		name  => "*STDIN",
+		name  => $hi[$hi] // "*STDIN",
 		stamp => scalar localtime,
 		}
 	    } $f1, $f2;
@@ -1120,6 +1133,27 @@ If the value is a valid supported color, it will show the header in that
 color scheme.  To disable the header set it to C<0> in the RC file or use
 C<--no-header> as a command line argument.
 
+=item old-label
+
+=item new-label
+
+Defines the tag(s) in the header for the source file(s)/stream(s).
+
+ App::ccdiff::ccdiff ($left, $right);
+
+ =>
+
+ < *STDIN  Fri Nov  7 10:14:51 2025
+ > *STDIN  Fri Nov  7 10:14:51 2025
+
+ App::ccdiff::ccdiff ($left, $right,
+    { "old-label" => "OLD", "new-label" => "NEW" });
+
+ =>
+
+ < OLD     Fri Nov  7 10:14:51 2025
+ > NEW     Fri Nov  7 10:14:51 2025
+
 =item verbose
 
  verbose : cyan
@@ -1335,7 +1369,7 @@ H.Merijn Brand
 
 =head1 COPYRIGHT AND LICENSE
 
- Copyright (C) 2018-2025 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2018-2026 H.Merijn Brand.  All rights reserved.
 
 This library is free software;  you can redistribute and/or modify it under
 the same terms as The Artistic License 2.0.

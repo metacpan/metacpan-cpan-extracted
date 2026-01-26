@@ -7,7 +7,7 @@ build_requires:
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150010
+generated_by: Author, CPAN::Meta::Converter version 2.150011
 license: artistic_2
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: App-ccdiff
 provides: 
   App::ccdiff: 
     file: lib/App/ccdiff.pm
-    version: '0.34'
+    version: '0.35'
 recommends: 
   Algorithm::Diff: '1.201'
   Algorithm::Diff::XS: '0.04'
@@ -36,4 +36,4 @@ resources:
   homepage: https://metacpan.org/pod/App::ccdiff
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/App-ccdiff
-version: '0.34'
+version: '0.35'

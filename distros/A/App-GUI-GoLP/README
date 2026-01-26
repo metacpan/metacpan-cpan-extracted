@@ -1,8 +1,8 @@
 App-GUI-GoLP
 
-App::GUI::GoLP - A GUI for viewing Life-like cellular automata, in Perl/Prima
+App::GUI::GoLP - A GUI for viewing and editing Life-like cellular automata, in Perl/Prima
 
-Version 1.1
+Version 1.2
 
 SYNOPSIS
 
@@ -16,7 +16,13 @@ Menus
 
 File
 
-The Open option provides a dialog box allowing the user to select a .rle or .cells format file to be loaded. The Exit option exits the program.
+The New option allows the user to create a new board. Choose the width and height of the board and whether the initial cell status will be all 'dead', all 'live' or chosen at random according to a specified percentage chance. Use the Rules submenu in the Options menu to change the birth/survival rules used by the simulation.
+
+The Open option provides a dialog box allowing the user to select a .rle or .cells format file to be loaded. 
+
+The Save option will save the current board in .rle or .cells format.
+
+The Exit option exits the program.
 
 Options
 
@@ -42,17 +48,25 @@ Dead cell color allows the user to select the color of a 'dead' cell.
 
 Grid color allows the user to select the color of the grid.
 
+Edit mode can be used to switch in and out of 'edit mode'. When in edit mode clicking the left mouse button on the board will toggle the state of the cell under the cursor (indicated by a highlighted cell). Entering edit mode pauses the simulation.
+
 About
 
 Provides a small 'about' dialog.
 
 Mouse interaction
 
-The mouse wheel can be used to adjust the zoom setting (otherwise use the menu option). If the zoom is such that the board is clipped, the user can click and drag within the window to move the viewed section of the board.
+The mouse wheel can be used to adjust the zoom setting (otherwise use the menu option). If the zoom is such that the board is clipped, the user can click and drag within the window to move the viewed section of the board. When not in edit mode, this can be done with both left and right mouse buttons, but when in edit mode the left mouse button will edit the board and the right mouse button can be used to click and drag to move the board.
 
-TODO
+Keyboard commands
 
-Options for stepping through the simulation, and editing and saving the board.
+Pressing the space bar will play and pause the simulation.
+
+When paused, the ']' key will step the simulation.
+
+F1 enters 'Edit Mode'.
+
+F5 takes a screenshot of the board.
 
 SEE ALSO
 

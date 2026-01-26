@@ -3,13 +3,13 @@ package Acme::CPANModules::PickingRandomItemsFromList;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-20'; # DATE
+our $DATE = '2025-05-22'; # DATE
 our $DIST = 'Acme-CPANModules-PickingRandomItemsFromList'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our $LIST = {
     summary => 'List of modules to pick random items from a list',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 If you are picking random lines from a file, there's a separate CPANModules list
 for it: <pm:Acme::CPANModules::PickingRandomLinesFromFile>.
@@ -18,6 +18,7 @@ for it: <pm:Acme::CPANModules::PickingRandomLinesFromFile>.
 
 If you only want to pick a single item, with equal probability, you can simply
 get a random element from an array using the `$ary[rand @ary]` idiom.
+
 
 **2. Picking multiple items, with equal probability**
 
@@ -39,6 +40,7 @@ you need from the first elements of the array using slice
 
 Keywords: sample, sampling.
 
+
 **3. Picking item(s), with weights**
 
 If you want to assign different weights to different items (so one item might be
@@ -51,7 +53,13 @@ allowing duplicates) or with replacement (allowing duplicates).
 
 <pm:Data::Random::Weighted> currently can only pick a single item.
 
-_
+
+**Tangentially-related modules**
+
+<pm:App::PickArgs> provides CLI <prog:pick-args> to pick random items from
+command-line arguments.
+
+MARKDOWN
     tags => ['task', 'sampling', 'random'],
     entries => [
         {
@@ -87,7 +95,7 @@ Acme::CPANModules::PickingRandomItemsFromList - List of modules to pick random i
 
 =head1 VERSION
 
-This document describes version 0.005 of Acme::CPANModules::PickingRandomItemsFromList (from Perl distribution Acme-CPANModules-PickingRandomItemsFromList), released on 2023-06-20.
+This document describes version 0.006 of Acme::CPANModules::PickingRandomItemsFromList (from Perl distribution Acme-CPANModules-PickingRandomItemsFromList), released on 2025-05-22.
 
 =head1 DESCRIPTION
 
@@ -131,6 +139,11 @@ L<Random::Skew>.
 
 L<Data::Random::Weighted> currently can only pick a single item.
 
+B<Tangentially-related modules>
+
+L<App::PickArgs> provides CLI L<pick-args> to pick random items from
+command-line arguments.
+
 =head1 ACME::CPANMODULES ENTRIES
 
 =over
@@ -148,6 +161,8 @@ Author: L<REHSACK|https://metacpan.org/author/REHSACK>
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =item L<Random::Skew>
+
+Author: L<TRILLICH|https://metacpan.org/author/TRILLICH>
 
 =item L<Data::Random::Weighted>
 
@@ -233,7 +248,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

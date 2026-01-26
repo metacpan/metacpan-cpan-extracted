@@ -1,0 +1,102 @@
+{
+   "X_No_Archive" : "Yes",
+   "abstract" : "Pure Perl implementation of the Kademlia DHT Algorithm",
+   "author" : [
+      "Sanko Robinson <sanko@cpan.org>"
+   ],
+   "description" : "Kademlia is a communications protocol for peer-to-peer networks. It is one of many versions of a DHT, a Distributed Hash Table.",
+   "dynamic_config" : 0,
+   "generated_by" : "App::mii v1.0.0",
+   "keywords" : [
+      "dht",
+      "kademlia",
+      "bittorrent",
+      "interplanetary"
+   ],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Algorithm-Kademlia",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0",
+            "perl" : "v5.40.0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.40.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Algorithm::Kademlia" : {
+         "file" : "lib/Algorithm/Kademlia.pm",
+         "version" : "v1.0.0"
+      },
+      "Algorithm::Kademlia::RoutingTable" : {
+         "file" : "lib/Algorithm/Kademlia.pm",
+         "version" : "v1.0.0"
+      },
+      "Algorithm::Kademlia::Search" : {
+         "file" : "lib/Algorithm/Kademlia.pm",
+         "version" : "v1.0.0"
+      },
+      "Algorithm::Kademlia::Storage" : {
+         "file" : "lib/Algorithm/Kademlia.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sanko/Algorithm-Kademlia.pm/issues"
+      },
+      "homepage" : "https://github.com/sanko/Algorithm-Kademlia.pm",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sanko/Algorithm-Kademlia.pm.git",
+         "web" : "https://github.com/sanko/Algorithm-Kademlia.pm"
+      }
+   },
+   "version" : "v1.0.0",
+   "x_help_wanted" : [
+      "Tester",
+      "Documenter"
+   ],
+   "x_ignore" : [
+      ".tidyallrc",
+      ".gitignore",
+      ".github/",
+      ".github/*",
+      ".github/**",
+      ".clang-format"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 0
+}

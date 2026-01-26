@@ -1,5 +1,5 @@
 ---
-abstract: 'A GUI for viewing Life-like cellular automata, in Perl/Prima'
+abstract: 'A GUI for viewing and editing Life-like cellular automata, in Perl/Prima'
 author:
   - 'Matt Johnson <mjohnson@cpan.org>'
 build_requires:
@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/mjohnson108/p5-App-GUI-GoLP/issues
   homepage: https://github.com/mjohnson108/
   repository: https://github.com/mjohnson108/p5-App-GUI-GoLP.git
-version: '1.1'
+version: '1.2'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

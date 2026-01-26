@@ -3,7 +3,7 @@
 use 5.014000;
 use warnings;
 
-our $VERSION = "0.18 - 20230106";
+our $VERSION = "0.19 - 20250113";
 our $CMD = $0 =~ s{.*/}{}r;
 
 sub usage {
@@ -1178,7 +1178,7 @@ mentioning features of or use of this database.
 This tool uses, but does not include, the GeoLite2 data created by MaxMind,
 available from [http://www.maxmind.com](http://www.maxmind.com).
 
- Copyright (C) 2018-2023 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2018-2026 H.Merijn Brand.  All rights reserved.
 
 This library is free software;  you can redistribute and/or modify it under
 the same terms as Perl itself.

@@ -2,6 +2,85 @@
 use 5.014;
 use strict;
 
+package GoLP_save;
+# routines to save files
+
+sub save {
+    my ($filename, $board, $w, $h, $b, $s) = @_;
+    
+    if ( $filename =~ /\.cells \z/imsx ) {
+        return save_cells_file($filename, $board);
+    }
+    elsif ( $filename =~ /\.rle \z/imsx ) {
+        return save_RLE_file($filename, $board, $w, $h, $b, $s);
+    }
+    
+    warn("Unknown file type: '$filename'");
+    return 0;
+}    
+
+sub save_RLE_file {
+    my ($filename, $board, $w, $h, $b, $s) = @_;
+    
+    my $fh;
+    unless ( defined open($fh, ">", $filename) ) {
+        warn("Could not open file '$filename': $!");      
+        return 0;  
+    }   
+  
+    my $header = "x = $w, y = $h, rule = B" . join('', @{$b}) . "/S" . join('', @{$s});
+    print $fh "$header\n";
+    
+    my $rle = "";
+    my $current_char;
+    my $count;
+
+    foreach my $row (@{$board}) {
+        $count = 1;
+        $row =~ tr/.X/bo/;
+        
+        $current_char = substr($row, 0, 1);
+        
+        for (my $i = 1; $i <= length($row); $i++) {
+            my $char = substr($row, $i, 1);
+            if ($char eq $current_char) {
+                $count++;
+            } else {
+                $rle .= $count . $current_char;
+                $current_char = $char;
+                $count = 1;
+            }
+        }
+        $rle .= $count . $current_char;
+        $rle .= '$';
+    }
+    
+    print $fh "$rle\n";
+    close($fh);
+    
+    return 1;
+}
+
+sub save_cells_file {
+    my ($filename, $board) = @_;
+
+    my $fh;
+    unless ( defined open($fh, ">", $filename) ) {
+        warn("Could not open file '$filename': $!");      
+        return 0;  
+    }
+    
+    foreach my $row (@{$board}) {
+        # Prefer 'O' to 'X'
+        $row =~ tr/X/O/;
+        print $fh $row . "\n";
+    }
+
+    close($fh);
+    
+    return 1;
+}
+
 package GoLP_load;
 # routines to load files
 # .cells and .rle are common file formats 
@@ -150,7 +229,173 @@ sub load_cells_file {
     return { rows => $rows, cols => $cols, data => \@grid };
 }
 
+package NewBoard;
+# 'New' dialog
 
+use Prima;
+use Prima::Classes;
+use vars qw(@ISA);
+@ISA = qw(Prima::MainWindow);
+
+use Prima::Buttons;
+use Prima::Label;
+use Prima::Sliders;
+
+sub profile_default
+{
+	my $def = $_[ 0]-> SUPER::profile_default;
+	my %prf = (
+		designScale => [ 9, 18],
+		name => 'New Board',
+		origin => [ 776, 197],
+		originDontCare => 0,
+		size => [ 332, 360],
+		sizeDontCare => 0,
+		width => 332,
+		height => 360,
+		left => 776,
+		bottom => 197,
+		designScale => [ 9, 18],
+	);
+	@$def{keys %prf} = values %prf;
+	return $def;
+}
+
+sub init
+{
+	my $self = shift;
+	my %instances = map {$_ => {}} qw();
+	my %profile = $self-> SUPER::init(@_);
+	my %names   = ( q(NewBoard) => $self);
+	$self-> lock;
+	
+	# Board size box
+	$names{GroupBox2} = $names{NewBoard}->insert( qq(Prima::GroupBox) => 
+		name => 'GroupBox2',
+		origin => [ 16, 240],
+		size => [ 300, 106],
+		text => 'Board size',
+	);
+	
+	# Width 
+	$names{Label2} = $names{GroupBox2}->insert( qq(Prima::Label) => 
+		name => 'Label2',
+		origin => [ 43, 46],
+		size => [ 100, 22],
+		text => 'Width',
+	);
+	$names{SpinEdit2} = $names{GroupBox2}->insert( qq(Prima::SpinEdit) => 
+		name => 'SpinEdit2',
+		origin => [ 128, 48],
+		size => [ 156, 22],
+		min => 1,
+		max => 100000,
+		value => 100,
+	);
+	
+	# Height
+	$names{Label30} = $names{GroupBox2}->insert( qq(Prima::Label) => 
+		name => 'Label30',
+		origin => [ 43, 14],
+		size => [ 100, 22],
+		text => 'Height',
+	);
+	$names{SpinEdit30} = $names{GroupBox2}->insert( qq(Prima::SpinEdit) => 
+		name => 'SpinEdit30',
+		origin => [ 128, 16],
+		size => [ 156, 22],
+		min => 1,
+		max => 100000,
+		value => 100,
+	);	
+
+	# Cell state box
+	$names{GroupBox1} = $names{NewBoard}->insert( qq(Prima::GroupBox) => 
+		name => 'GroupBox1',
+		origin => [ 16, 66],
+		size => [ 300, 160],
+		text => 'Initial cell state',
+	);
+	
+	# Radio buttons for cell state
+	$names{Radio1} = $names{GroupBox1}->insert( qq(Prima::Radio) => 
+		name => 'Radio1',
+		origin => [ 18, 98],
+		size => [ 100, 36],
+		text => 'All dead',
+		checked => 1,
+	);
+	$names{Radio2} = $names{GroupBox1}->insert( qq(Prima::Radio) => 
+		name => 'Radio2',
+		origin => [ 18, 54],
+		size => [ 100, 36],
+		text => 'All live',
+	);	
+	$names{Radio3} = $names{GroupBox1}->insert( qq(Prima::Radio) => 
+		name => 'Radio3',
+		origin => [ 18, 10], 
+		size => [ 100, 36],
+		text => 'Random',
+	);	
+
+	$names{Label3} = $names{GroupBox1}->insert( qq(Prima::Label) => 
+		name => 'Label3',
+		origin => [ 144, 14],
+		size => [ 84, 22],
+		text => 'Live cell %',
+	);
+	$names{SpinEdit3} = $names{GroupBox1}->insert( qq(Prima::SpinEdit) => 
+		name => 'SpinEdit3',
+		origin => [ 228, 16],
+		size => [ 56, 22],
+		max => 99,
+		min => 1,
+		value => 50,
+	);
+	
+	# OK and cancel buttons
+	$names{Button1} = $names{NewBoard}->insert( qq(Prima::Button) => 
+		name => 'Button1',
+		origin => [ 40, 14],
+		size => [ 96, 36],
+		text => '~OK',
+        modalResult => mb::OK,
+	);
+	$names{Button2} = $names{NewBoard}->insert( qq(Prima::Button) => 
+		name => 'Button2',
+		origin => [ 196, 14],
+		size => [ 96, 36],
+		text => 'Cancel',
+        modalResult => mb::Cancel,
+	);
+	
+	$self->unlock;
+	return %profile;
+}
+
+sub value {
+    my $self = shift;
+    
+    my %vals;
+    $vals{width} = $self->SpinEdit2->value();   
+    $vals{height} = $self->SpinEdit30->value();   
+    
+    my $CellState;
+    if ( $self->Radio1->checked() ) {
+        $CellState = 'All dead';
+    }
+    elsif ( $self->Radio2->checked() ) {
+        $CellState = 'All live';
+    }
+    elsif ( $self->Radio3->checked() ) {
+        $CellState = 'Random';
+    }
+    
+    $vals{cell_state} = $CellState;
+    $vals{probability} = $self->SpinEdit3->value();
+    
+    return \%vals;
+}
 
 package CustomRuleForm;
 # Dialog to set birth/survival rules
@@ -306,7 +551,6 @@ sub get_rule_string {
 
 package ZoomChangeForm;
 # Dialog box for adjusting the zoom/scale (which can also be changed using the mousewheel)
-# created using the VB program
 
 use Prima;
 use Prima::Classes;
@@ -406,6 +650,8 @@ my ($birth, $survival);
 my $game;
 my $game_ready = 0;
 my $tick_delay_ms = 250;
+my $edit_mode = 0;
+my $play = 0;
 my $grid = 1;
 my $autogrow = 1;
 my $ticks = 0;
@@ -458,6 +704,8 @@ my $scale = 4; # pixels per cell dimension
 my $vp_x_offset = 0;
 my $vp_y_offset = 0;
 
+my $board_pos;
+
 if ( defined $filename ) {
     if ( load_game($filename) ) {
         ($filebase, $dirs, $suffix) = fileparse($filename, '.rle', '.cells');
@@ -478,6 +726,34 @@ my $w = Prima::MainWindow->new(
 
     menuItems => [
             [ '~File' => [
+                    ['~New', 'Ctrl+N', '^N', sub {
+                            my ( $window, $menu ) = @_;
+                            
+                            # pause
+                            $window->menu->uncheck('play');
+                            $window->Timer->stop();
+                            $play = 0;
+                            
+                            my $new_board = NewBoard->new();
+                            if ( $new_board->execute() != mb::Cancel ) {
+
+                                my $params = $new_board->value();
+                                
+                                # Default B/S to Conway's Life
+                                $birth = [3];
+                                $survival = [2,3];
+                                
+                                if ( new_game($params) ) {
+                                    my $rule = to_bs_string($birth, $survival);
+                                    $window->menu->check($rule);
+                                    $ticks = 0;
+                                    $window->repaint();                                                                    
+                                }
+                                else {
+                                    message('ERROR: Could not create new board.');
+                                }
+                            }
+                        }],
                     ['~Open', 'Ctrl+O', '^O', sub { 
                             my ( $window, $menu ) = @_;
 
@@ -491,9 +767,14 @@ my $w = Prima::MainWindow->new(
                             if ( $open->execute ) {
                                 if ( load_game($open->fileName) ) {
                                     # start paused
-                                    $window->menu->uncheck('pause');
+                                    $window->menu->uncheck('play');
                                     $window->Timer->stop();
+                                    $play = 0;
                                     $ticks = 0;
+                                    
+                                    # exit edit mode if on
+                                    $window->menu->uncheck('edit');
+                                    $edit_mode = 0;
                         
                                     ($filebase, $dirs, $suffix) = fileparse($open->fileName, '.rle', '.cells');                                    
                                     $window->text("GoLP | " . $filebase . $suffix);
@@ -507,14 +788,42 @@ my $w = Prima::MainWindow->new(
                                 }                                
                             }
                         }],
+                        ['Save' => sub {
+                            my ( $window, $menu ) = @_;
+                            
+                            my $save_file = ($filebase // '') . ($suffix // '');
+                            my $save = Prima::Dialog::SaveDialog-> new(
+                                fileName => $save_file,
+                                defaultExt => '.rle',
+                                filter => [
+                                            ['Run-length encoded (.rle)' => '*.rle'],
+                                            ['Plaintext (.cells)' => '*.cells'],
+                                    ]
+                            );
+                            
+                            if ( $save->execute ) {
+                                
+                                if ( save_game($save->fileName) ) {
+                                    ($filebase, $dirs, $suffix) = fileparse($save->fileName, '.rle', '.cells');                                    
+                                    $window->text("GoLP | " . $filebase . $suffix);
+                                }
+                                else {
+                                    message('ERROR: Could not save ' . $save->fileName);                                
+                                }
+                            }
+                        }],
                     [],
                     ['~Exit', 'Ctrl+X', '^X', sub { shift-> close } ],
             ]],
             [ '~Options' => [
 
-		            [ 'pause' => '~Play/Pause' => 'Space' => kb::Space => sub {
+		            [ 'play' => '~Play/Pause' => 'Space' => kb::Space => sub {
 			            my ( $window, $menu ) = @_;
-                        $window->menu->toggle($menu) ? $window->Timer->start() : $window->Timer->stop();
+			            unless ( $edit_mode ) {
+			            	# prevent accidental unpausing if editing
+		                    $play = $window->menu->toggle($menu);
+		                    $play ? $window->Timer->start() : $window->Timer->stop();
+		                }
 		            } ],
                     ['*Grid' => '~Grid' => sub { 
 			            my ( $window, $menu ) = @_;
@@ -611,10 +920,22 @@ my $w = Prima::MainWindow->new(
                     ['grid_color' => 'Gr~id color...' => sub {
                         handle_color($_[0], \$gridcolor, \$grid_r, \$grid_g, \$grid_b);
                     } ],
+                    [],
+                    [ 'edit' => '~Edit mode' => 'F1' => kb::F1 => sub { 
+			            my ( $window, $menu ) = @_;
+                        $edit_mode = $window->menu->toggle($menu);
+                        if ( $edit_mode ) {
+                            # edit paused
+                            $window->menu->uncheck('play');
+                            $window->Timer->stop();
+                            $play = 0;
+                        }
+                        $window->repaint();
+                    } ],
             ]],                
             [],
             ['About' => sub {
-                    message_box("GoLP", "App::GUI::GoLP v1.0\nby Matt Johnson (mjohnson\@cpan.org)", mb::Information);
+                    message_box("GoLP", "App::GUI::GoLP v1.2\nby Matt Johnson (MJOHNSON)", mb::Information);
             }],
     ],
 
@@ -625,14 +946,20 @@ my $w = Prima::MainWindow->new(
         my $cr = $canvas->cairo_context(transform => 0);
         my $data;
         $data = $game->get_grid() if defined $game;
-        my $live_cells = to_window($cr, $size[0], $size[1], $data );     
+        my $live_cells = to_window($cr, $size[0], $size[1], $data, $self->{cur_pos} );     
 
+        # display status bar if set
         if ( $status ) {
             my $bs_string = to_bs_string($birth, $survival);
             if ( exists $rule_BS_to_name{$bs_string} ) {
                 $bs_string .= " (" . $rule_BS_to_name{$bs_string} . ")";
             }
-            my $status_line = "Rules: $bs_string | " . sprintf("Zoom: %d ppc | Ticks: %d | Live cells: %d", $scale, $ticks, $live_cells);    
+            my $status_line = "Rules: $bs_string | " . sprintf("Zoom: %d ppc | Ticks: %d | Live cells: %d", $scale, $ticks, $live_cells);   
+            my $board_coords = "(,)";
+			if ( defined $board_pos ) {
+				$board_coords = "(" . $board_pos->[0] . "," . $board_pos->[1] . ")";
+			}
+            $status_line .= " | Cell: $board_coords"; 
 
             my @box = @{$canvas->get_text_box($status_line)}[0..7]; # can the return order be guaranteed?
             my @x = @box[0,2,4,6];
@@ -648,29 +975,73 @@ my $w = Prima::MainWindow->new(
             $canvas->color(cl::White);
             $canvas->text_out($status_line,0,0);
         }
+        
+        # display a warning if in edit mode
+        if ( $edit_mode ) {
+        
+            my $edit_str = "EDIT MODE ON";
+            
+            my @box = @{$canvas->get_text_box($edit_str)}[0..7];
+            my @x = @box[0,2,4,6];
+            my @y = @box[1,3,5,7];            
+            my $min_x = min(@x);
+            my $max_x = max(@x);
+            my $min_y = min(@y);
+            my $max_y = max(@y);
+
+            $canvas->color(cl::Red);
+            $canvas->bar(int(($size[0]/2)-($max_x/2)), $size[1]-$max_y, int(($size[0]/2)+($max_x/2)), $size[1]);
+            $canvas->bar_alpha(255, int(($size[0]/2)-($max_x/2)), $size[1]-$max_y, int(($size[0]/2)+($max_x/2)), $size[1]);
+            $canvas->color(cl::White);
+            $canvas->text_out($edit_str,int(($size[0]/2)-($max_x/2)),$size[1]-$max_y);        
+        }
     },
 
 	onMouseDown  => sub { 
                             my ($self, $btn, $mod, $x, $y) = @_; 
-                            $self->{dragging} = 1;
+                            $self->{mb_left} = 1 if $btn == mb::Left;
+                            $self->{mb_right} = 1 if $btn == mb::Right;
                             $self->{cur_pos} = [$x, $y];
                             $self->{cur_vel} = [0, 0];
+                            
+                            if ( $game_ready && $edit_mode && ($btn == 1) ) {
+                                my ($vp_w, $vp_h) = $self->size;
+                                $board_pos = to_board_pos($x, $y, $vp_w, $vp_h);
+                                
+                                if ( defined $board_pos ) {
+                                    $game->toggle_point( $board_pos->[1], $board_pos->[0] );
+                                    $self->repaint();
+                                }
+                            }
                         },
 
 	onMouseUp    => sub { 
                             my ($self, $btn, $mod, $x, $y) = @_; 
-                            $self->{dragging} = 0;
+                            $self->{mb_left} = 0 if $btn == mb::Left;
+                            $self->{mb_right} = 0 if $btn == mb::Right;
                         },
 
     onMouseMove =>  sub {
                             my ($self, $mod, $x, $y) = @_;
-                            if ( $game_ready && $self->{dragging} ) {
-                                $self->{prev_pos} = $self->{cur_pos};
-                                $self->{cur_pos} = [$x, $y];
-                                $self->{cur_vel} = [$x - $self->{prev_pos}[0], $y - $self->{prev_pos}[1]];
-                                my @size = $self->size; 
-                                drag_viewport($self->{cur_vel}, \@size);
-                                $self->repaint();
+                
+                            $self->{prev_pos} = $self->{cur_pos};
+                            $self->{cur_pos} = [$x, $y];
+                                                        
+                            if ( $game_ready ) {
+                            	
+                            	my ($vp_w, $vp_h) = $self->size;
+                            	$board_pos = to_board_pos($x, $y, $vp_w, $vp_h);
+                            	
+                            	if ( $self->{mb_left} && $edit_mode ) {
+                            		$game->toggle_point( $board_pos->[1], $board_pos->[0] );
+                            	}
+                            	elsif ( $self->{mb_right} || ($self->{mb_left} && !$edit_mode) ) {
+	                                $self->{cur_vel} = [$x - $self->{prev_pos}[0], $y - $self->{prev_pos}[1]];
+	                                my @size = $self->size; 
+	                                drag_viewport($self->{cur_vel}, \@size);                            	                            	
+                            	}
+                                                            
+                            	$self->repaint();
                             }
                         },
 
@@ -683,47 +1054,60 @@ my $w = Prima::MainWindow->new(
                                 }
                             }
                         },
+                        
+    onKeyDown => sub {
+        my ( $self, $code, $key, $mod ) = @_;
+
+        if ( chr($code) eq ']' ) {
+            # Step the simulation
+            if ( !$play ) {
+                step_simulation();
+            }
+        }
+    },
 );
 
 # Timer runs the simulation
 $w->insert( Timer => 
 	timeout => $tick_delay_ms,
     name    => 'Timer',
-	onTick  => sub {
-        if ( $game_ready ) {
-            $game->process();
-            $ticks++;		    
-
-            if ( $autogrow ) {
-                my $boundary;
-                try { 
-                    $boundary = $game->get_used_grid_coord();
-                }
-                catch ($e) {
-                    $boundary = undef;
-                }
-                if ( defined $boundary ) {
-                    my ($min_row, $max_row, $min_col, $max_col) = @{$boundary};
-                    if (    ($min_row < 5) || 
-                            ($min_col < 5) || 
-                            (($board_width-$max_col) < 5) ||
-                            (($board_height-$max_row) < 5) 
-                            ) {
-
-                        grow_board( $boundary );
-                    }
-                }
-            }
-
-            $w->repaint();
-        }
-	}
+	onTick  => \&step_simulation,
 )->stop();
 
 run Prima;
 
 ###############
 
+sub step_simulation {
+
+    if ( $game_ready) {
+        $game->process();
+        $ticks++;		    
+
+        if ( $autogrow ) {
+            my $boundary;
+            try { 
+                $boundary = $game->get_used_grid_coord();
+            }
+            catch ($e) {
+                $boundary = undef;
+            }
+            if ( defined $boundary ) {
+                my ($min_row, $max_row, $min_col, $max_col) = @{$boundary};
+                if (    ($min_row < 5) || 
+                        ($min_col < 5) || 
+                        (($board_width-$max_col) < 5) ||
+                        (($board_height-$max_row) < 5) 
+                        ) {
+
+                    grow_board( $boundary );
+                }
+            }
+        }
+
+        $w->repaint();
+    }
+}
 
 sub grow_board {
     my ($bounds) = @_;
@@ -753,7 +1137,7 @@ sub grow_board {
         $add_left = $expansion_factor;
         $col_start += $expansion_factor;
     }
-
+ 
     if ( ($board_width-$max_col) < 5 ) {
         $add_right = $expansion_factor;
     }
@@ -770,6 +1154,57 @@ sub grow_board {
     $board_height = $new_board_height;
    
     return;
+}
+
+sub new_game {
+    my ($params) = @_;
+    
+    $board_width = $params->{width};
+    $board_height = $params->{height};
+    
+    # $birth and $survival should already have been set 
+    $game = Game::Life::Faster->new( [$board_width, $board_height], $birth, $survival );
+
+    # figure out board contents
+    my $all_dead = sub { return 0 };
+    my $all_live = sub { return 1 };
+    my $random = sub { rand(100) < $_[0] ? 1 : 0 };
+    my $cellfunc;
+    
+    if ($params->{cell_state} eq 'All dead') {
+        $cellfunc = $all_dead;
+    }
+    elsif ($params->{cell_state} eq 'All live') {
+        $cellfunc = $all_live;
+    }
+    elsif ($params->{cell_state} eq 'Random') {
+        $cellfunc = $random;
+    }
+    else {
+        warn("Unknown desired cell state: $params->{cell_state}");
+        return 0;
+    }
+    
+    my @points;
+    for (1..$board_height) {
+        my @row;
+        push @row, $cellfunc->($params->{probability}) for (1..$board_width);
+        push @points, \@row;
+    }
+    $game->place_points(0, 0, \@points);
+    
+    $game_ready = 1;  
+    return 1;
+}
+
+sub save_game {
+    my ($filename) = @_;
+    
+    return 0 unless defined $game;
+    
+    my @board = $game->get_text_grid();   
+
+    return GoLP_save::save($filename, \@board, $board_width, $board_height, $birth, $survival);
 }
 
 sub load_game {
@@ -871,7 +1306,7 @@ sub drag_viewport {
 }
 
 sub to_window {
-    my ($cr, $vp_w, $vp_h, $data) = @_;
+    my ($cr, $vp_w, $vp_h, $data, $cur_pos) = @_;
 
     my $b_w = $board_width; 
     my $b_h = $board_height; 
@@ -976,15 +1411,24 @@ sub render {
 
     my $live_cells = 0;
 
+    my $p_row = 0;
     my $p_row_offset = 0;
     foreach my $row (@{$data}) {
 
+        my $p_col = 0;
         my $p_col_offset = 0;
         foreach my $col (@{$row}) {
+        
+            my $hover = 0;
+            if ( $edit_mode && defined($board_pos)) {
+                if ( ($board_pos->[0] == $p_col) && ($board_pos->[1] == $p_row) ) {
+                    $hover = 1;
+                }
+            }
+            
+            if ( $col || $hover ) {
 
-            if ( $col ) {
-
-                $live_cells++;
+                $live_cells++ if $col;
     
                 my $x_start = $p_start_x+$p_col_offset;
                 my $y_start = $p_start_y+$p_row_offset;
@@ -1020,13 +1464,34 @@ sub render {
                     }
                    
                     $cr->rectangle ($x_start, $y_start, $x_dim, $y_dim );
-                    $cr->fill;
+                    
+                    if ( $hover && !$col ) {
+                    	my $r_diff = $live_r - $dead_r;
+                    	my $g_diff = $live_g - $dead_g;
+                    	my $b_diff = $live_b - $dead_b;
+                        $cr->set_source_rgb($live_r-($r_diff/4), $live_g-($g_diff/4), $live_b-($b_diff/4));
+                        $cr->fill;
+                        $cr->set_source_rgb($live_r, $live_g, $live_b);
+                    }
+                    elsif ( $hover && $col ) {
+                    	my $r_diff = $live_r - $dead_r;
+                    	my $g_diff = $live_g - $dead_g;
+                    	my $b_diff = $live_b - $dead_b;
+                        $cr->set_source_rgb($dead_r+($r_diff/4), $dead_g+($g_diff/4), $dead_b+($b_diff/4));
+                        $cr->fill;                    
+                        $cr->set_source_rgb($live_r, $live_g, $live_b);
+                    }
+                    elsif ( $col ) {
+                        $cr->fill;
+                    }
                 }
             }            
             
+            $p_col++;
             $p_col_offset += $scale;
         }
 
+        $p_row++;
         $p_row_offset += $scale;
     }       
 
@@ -1093,4 +1558,56 @@ sub to_bs_string {
     return "B" . $b_t . "/S" . $s_t;
 }
 
+sub to_board_pos {
+    my ($x, $y, $vp_w, $vp_h) = @_;
+    
+    return undef unless defined $game;
+    
+    my $b_w = $board_width; 
+    my $b_h = $board_height; 
+
+    my $p_w = $b_w * $scale;
+    my $p_h = $b_h * $scale;
+
+    my $p_start_x;
+    my $p_start_y;
+
+    if ( $p_w > $vp_w ) {
+        $p_start_x = -$vp_x_offset;
+    }
+    elsif ( $p_w < $vp_w ) {
+        $p_start_x = int($vp_w/2) - int($p_w/2);
+    }
+    else {
+        $p_start_x = 0;
+    }
+
+    if ( $p_h > $vp_h ) {
+        $p_start_y = -$vp_y_offset;
+    }
+    elsif( $p_h < $vp_h ) {
+        $p_start_y = int($vp_h/2) - int($p_h/2);
+    }
+    else {
+        $p_start_y = 0;
+    }
+
+    my $p_end_x = $p_start_x + $p_w;
+    my $p_end_y = $p_start_y + $p_h;
+                            
+    my $in_board = 0;
+    if ( ($x > $p_start_x) && ($x < $p_end_x) && ($y > $p_start_y) && ($y < $p_end_y) ) {
+        $in_board = 1;
+    }
+    
+    return undef unless $in_board;
+    
+    my $p_x_in_board = $x - $p_start_x;
+    my $b_x = int($p_x_in_board / $scale);
+    
+    my $p_y_in_board = $vp_h - $y - $p_start_y;
+    my $b_y = int($p_y_in_board / $scale);
+
+    return [$b_x, $b_y];   
+}
 

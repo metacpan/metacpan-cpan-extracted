@@ -7,7 +7,7 @@ build_requires:
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150010
+generated_by: Author, CPAN::Meta::Converter version 2.150011
 license: perl
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,19 +16,19 @@ name: App-geoip
 provides: 
   App::geoip: 
     file: lib/App/geoip.pm
-    version: '0.18'
+    version: '0.19'
 recommends: 
   Archive::Zip: '1.68'
-  DBI: '1.646'
-  Data::Dumper: '2.189'
+  DBI: '1.647'
+  Data::Dumper: '2.183'
   Getopt::Long: '2.58'
   JSON::PP: '4.16'
-  LWP::Simple: '6.77'
-  Math::Trig: '1.62'
-  Net::CIDR: '0.21'
-  Pod::Usage: '2.03'
-  Socket: '2.038'
-  Text::CSV_XS: '1.59'
+  LWP::Simple: '6.81'
+  Math::Trig: '1.63'
+  Net::CIDR: '0.27'
+  Pod::Usage: '2.05'
+  Socket: '2.040'
+  Text::CSV_XS: '1.61'
 requires: 
   Archive::Zip: 0
   DBI: 0
@@ -50,4 +50,4 @@ resources:
   homepage: https://metacpan.org/pod/App::geoip
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/GeoIP2
-version: '0.18'
+version: '0.19'

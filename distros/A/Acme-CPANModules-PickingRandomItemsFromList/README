@@ -3,9 +3,9 @@ NAME
     random items from a list
 
 VERSION
-    This document describes version 0.005 of
+    This document describes version 0.006 of
     Acme::CPANModules::PickingRandomItemsFromList (from Perl distribution
-    Acme-CPANModules-PickingRandomItemsFromList), released on 2023-06-20.
+    Acme-CPANModules-PickingRandomItemsFromList), released on 2025-05-22.
 
 DESCRIPTION
     If you are picking random lines from a file, there's a separate
@@ -29,12 +29,12 @@ DESCRIPTION
 
     If you do not want to allow duplicates, there are several alternatives:
 
-    List::Util (from version 1.54, 2020-02-02) provides "sample()". If you
-    use an older version, you can use "shuffle()" then get as many number of
+    List::Util (from version 1.54, 2020-02-02) provides sample(). If you use
+    an older version, you can use shuffle() then get as many number of
     samples as you need from the first elements of the array using slice
-    (@shuffled[0..$num_wanted-1]) or "head()".
+    (@shuffled[0..$num_wanted-1]) or head().
 
-    List::MoreUtils also provides "samples()".
+    List::MoreUtils also provides samples().
 
     Keywords: sample, sampling.
 
@@ -50,6 +50,11 @@ DESCRIPTION
 
     Data::Random::Weighted currently can only pick a single item.
 
+    Tangentially-related modules
+
+    App::PickArgs provides CLI pick-args to pick random items from
+    command-line arguments.
+
 ACME::CPANMODULES ENTRIES
     List::Util
         Author: PEVANS <https://metacpan.org/author/PEVANS>
@@ -61,6 +66,8 @@ ACME::CPANMODULES ENTRIES
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
     Random::Skew
+        Author: TRILLICH <https://metacpan.org/author/TRILLICH>
+
     Data::Random::Weighted
         Author: GEISTBERG <https://metacpan.org/author/GEISTBERG>
 
@@ -137,8 +144,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2021 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
