@@ -2,7 +2,6 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#include "ppport.h"
 
 static bool
 THX_keys_disjoint(pTHX_ HV *x, HV *y) {
@@ -79,23 +78,42 @@ PROTOTYPE: \%\%
 PREINIT:
   HV *seen;
   HE *he;
+  SV *key;
 PPCODE:
+  EXTEND(SP, HvTOTALKEYS(x) + HvTOTALKEYS(y));
+
   sv_2mortal((SV *)(seen = newHV()));
 
   hv_iterinit(x);
   while ((he = hv_iternext(x))) {
-    (void)hv_store_ent(seen, hv_iterkeysv(he), &PL_sv_undef, HeHASH(he));
+    key = hv_iterkeysv(he);
+#ifdef HV_FETCH_EMPTY_HE
+    he = (HE *)hv_common(seen, key, NULL, 0, 0, HV_FETCH_LVALUE|HV_FETCH_EMPTY_HE, NULL, HeHASH(he));
+    if (HeVAL(he))
+      continue;
+    HeVAL(he) = &PL_sv_undef;
+#else
+    if (hv_exists_ent(seen, key, HeHASH(he)))
+      continue;
+    (void)hv_store_ent(seen, key, &PL_sv_yes, HeHASH(he));
+#endif
+    PUSHs(key);
   }
 
   hv_iterinit(y);
   while ((he = hv_iternext(y))) {
-    (void)hv_store_ent(seen, hv_iterkeysv(he), &PL_sv_undef, HeHASH(he));
-  }
-
-  hv_iterinit(seen);
-  EXTEND(SP, HvTOTALKEYS(seen));
-  while ((he = hv_iternext(seen))) {
-    PUSHs(sv_2mortal(newSVsv(hv_iterkeysv(he))));
+    key = hv_iterkeysv(he);
+#ifdef HV_FETCH_EMPTY_HE
+    he = (HE *)hv_common(seen, key, NULL, 0, 0, HV_FETCH_LVALUE|HV_FETCH_EMPTY_HE, NULL, HeHASH(he));
+    if (HeVAL(he))
+      continue;
+    HeVAL(he) = &PL_sv_undef;
+#else
+    if (hv_exists_ent(seen, key, HeHASH(he)))
+      continue;
+    (void)hv_store_ent(seen, key, &PL_sv_yes, HeHASH(he));
+#endif
+    PUSHs(key);
   }
 
 void
@@ -105,6 +123,7 @@ keys_intersection(x, y)
 PROTOTYPE: \%\%
 PREINIT:
   HE *he;
+  SV *key;
 PPCODE:
   if (HvTOTALKEYS(x) > HvTOTALKEYS(y)) {
     HV *tmp = x;
@@ -112,10 +131,13 @@ PPCODE:
     y = tmp;
   }
 
+  EXTEND(SP, HvTOTALKEYS(x));
+
   hv_iterinit(x);
   while ((he = hv_iternext(x))) {
-    if (hv_exists_ent(y, hv_iterkeysv(he), HeHASH(he)))
-      PUSHs(sv_2mortal(newSVsv(hv_iterkeysv(he))));
+    key = hv_iterkeysv(he);
+    if (hv_exists_ent(y, key, HeHASH(he)))
+      PUSHs(key);
   }
 
 void
@@ -125,11 +147,15 @@ keys_difference(x, y)
 PROTOTYPE: \%\%
 PREINIT:
   HE *he;
+  SV *key;
 PPCODE:
+  EXTEND(SP, HvTOTALKEYS(x));
+
   hv_iterinit(x);
   while ((he = hv_iternext(x))) {
-    if (!hv_exists_ent(y, hv_iterkeysv(he), HeHASH(he)))
-      XPUSHs(sv_2mortal(newSVsv(hv_iterkeysv(he))));
+    key = hv_iterkeysv(he);
+    if (!hv_exists_ent(y, key, HeHASH(he)))
+      PUSHs(key);
   }
 
 void
@@ -139,17 +165,22 @@ keys_symmetric_difference(x, y)
 PROTOTYPE: \%\%
 PREINIT:
   HE *he;
+  SV *key;
 PPCODE:
+  EXTEND(SP, HvTOTALKEYS(x) + HvTOTALKEYS(y));
+  
   hv_iterinit(x);
   while ((he = hv_iternext(x))) {
-    if (!hv_exists_ent(y, hv_iterkeysv(he), HeHASH(he)))
-      XPUSHs(sv_2mortal(newSVsv(hv_iterkeysv(he))));
+    key = hv_iterkeysv(he);
+    if (!hv_exists_ent(y, key, HeHASH(he)))
+      PUSHs(key);
   }
 
   hv_iterinit(y);
   while ((he = hv_iternext(y))) {
-    if (!hv_exists_ent(x, hv_iterkeysv(he), HeHASH(he)))
-      XPUSHs(sv_2mortal(newSVsv(hv_iterkeysv(he))));
+    key = hv_iterkeysv(he);
+    if (!hv_exists_ent(x, key, HeHASH(he)))
+      PUSHs(key);
   }
 
 bool

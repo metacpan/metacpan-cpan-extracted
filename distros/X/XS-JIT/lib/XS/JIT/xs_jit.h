@@ -30,6 +30,8 @@ typedef struct {
  *   num_functions - Number of functions in array
  *   cache_dir    - Cache directory (NULL for default "_CACHED_XS")
  *   force        - 1 to force recompilation even if cached
+ *   extra_cflags - Additional compiler flags (e.g., "-I/path/to/headers"), or NULL
+ *   extra_ldflags - Additional linker flags (e.g., "-L/path/to/libs -lssl"), or NULL
  *
  * Returns: 1 on success, 0 on failure
  */
@@ -39,7 +41,9 @@ int xs_jit_compile(pTHX_
     XS_JIT_Func *functions,
     int num_functions,
     const char *cache_dir,
-    int force
+    int force,
+    const char *extra_cflags,
+    const char *extra_ldflags
 );
 
 /*
@@ -64,12 +68,15 @@ char* xs_jit_generate_code(pTHX_
  * Compile C file to shared object
  *
  * Parameters:
- *   c_file  - Path to C source file
- *   so_file - Path for output shared object
+ *   c_file        - Path to C source file
+ *   so_file       - Path for output shared object
+ *   extra_cflags  - Additional compiler flags, or NULL
+ *   extra_ldflags - Additional linker flags, or NULL
  *
  * Returns: 1 on success, 0 on failure
  */
-int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file);
+int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file,
+                        const char *extra_cflags, const char *extra_ldflags);
 
 /*
  * Load compiled module

@@ -21,7 +21,7 @@ use overload '""' => 'to_string', fallback => 1;
 
 BEGIN { *VERS:: = *URI::VersionRange:: }
 
-our $VERSION = '2.24';
+our $VERSION = '2.25';
 our @EXPORT  = qw(encode_vers decode_vers);
 
 my $VERS_REGEXP = qr{^vers:[a-z\\.\\-\\+][a-z0-9\\.\\-\\+]*/.+};
@@ -47,8 +47,9 @@ sub new {
 
     $scheme = lc $scheme;
 
-    my $self
-        = {scheme => $scheme, constraints => \@constraints, scheme_class => URI::VersionRange::Version->load($scheme)};
+    my $scheme_class = URI::VersionRange::Version->load($scheme);
+
+    my $self = {scheme => $scheme, constraints => \@constraints, scheme_class => $scheme_class};
 
     return bless $self, $class;
 
@@ -95,8 +96,6 @@ sub from_string {
     $string =~ s/(\s|\t)+//g;
 
     my @s1 = split(':', $string);
-
-    # $params{uri_scheme} = lc $s1[0];
 
     # - Split the specifier from left once on a slash "/".
     # - The left hand side is the <versioning-scheme> that must be lowercase. Tools
@@ -333,12 +332,12 @@ URI::VersionRange - Perl extension for VERS (Version Range Specifier)
   }
 
   # Parse "vers" string
-  $vers = URI::VersionRange->from_string('vers:cpan/>2.00|<2.24');
+  $vers = URI::VersionRange->from_string('vers:cpan/>2.00|<2.25');
 
 
   # exported functions
 
-  $vers = decode_vers('vers:cpan/>2.00|<2.24');
+  $vers = decode_vers('vers:cpan/>2.00|<2.25');
   say $vers->scheme;  # cpan
 
   $vers_string = encode_vers(scheme => cpan, constraints => ['>2.00']);
@@ -352,7 +351,7 @@ URI::VersionRange - Perl extension for VERS (Version Range Specifier)
     constraints => ['>2.00']
   );
 
-  $vers = VERS->from_string('vers:cpan/>2.00|<2.24');
+  $vers = VERS->from_string('vers:cpan/>2.00|<2.25');
 
 
 =head1 DESCRIPTION
@@ -433,7 +432,7 @@ C<constraints> is ARRAY of L<URI::VersionRange::Constraint> object.
 
 Check if a version is contained within a range
 
-    my $vers = URI::VersionRange::from_string('vers:cpan/>2.00|<2.24');
+    my $vers = URI::VersionRange::from_string('vers:cpan/>2.00|<2.25');
 
     if ($vers->contains('2.10')) {
         say "The version is in range";
@@ -479,7 +478,7 @@ Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Mojo::JSON>
     #     },
     #     {
     #       "comparator": "<",
-    #       "version": "2.24"
+    #       "version": "2.25"
     #     }
     #   ],
     #   "scheme": "cpan"
@@ -494,6 +493,36 @@ Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Mojo::JSON>
 Converts the given "vers" string to VERS components and return L<URI::VersionRange>
 instance. Croaks on error.
 
+
+=head3 B<from_native>
+
+Converts the specified native range string using C<native_range_to_vers> and
+returns and return L<URI::VersionRange> instance.
+
+    $vers = URI::VersionRange->from_native('npm', '~1.6.5 || >=1.7.2');
+
+Supported native range scheme:
+
+=over
+
+=item conan
+
+=item gem
+
+=item nginx
+
+=item npm
+
+=item nuget
+
+=item raku
+
+=item semver
+
+=back
+
+For other schemes, C<native_range_to_vers> will attempt to convert the native
+range string to a VERS string, but this may not work perfectly.
 
 =head1 SUPPORT
 

@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::simpsons;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -44,6 +44,12 @@ Philippe "BooK" Bruhat.
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2026-01-26 - v1.003
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.057.
 
 =item *
 
@@ -509,7 +515,6 @@ Lyle_Lanley
 Mabel_Simpson
 MacArthur_Parker
 Maggie_Simpson
-Maggie_Simpson_Jr
 Male_Twin
 Malicious_Krubb
 Manjula_Nahasapeemapetilon

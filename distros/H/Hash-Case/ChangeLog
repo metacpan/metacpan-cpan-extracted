@@ -2,6 +2,23 @@
 
 All changes made by Mark Overmeer, unless explicitly stated otherwise.
 
+version 1.07: Mon 26 Jan 14:24:32 CET 2026
+
+	Fixes:
+	- Tie::StdHash needs to be compiled via Tie::Hash.
+
+version 1.06: Mon 26 Jan 11:29:04 CET 2026
+
+	Changes:
+	- require Perl 5.16 (2015)
+
+	Improvements:
+	- convert Makefile.PL to OODoc 3.06.
+	- convert code and syntax to new preferences.
+	- add .gitignore
+	- add README.md
+	- improve documentation
+
 version 1.05: Thu  6 Feb 16:41:09 CET 2020
 
 	Fixes:

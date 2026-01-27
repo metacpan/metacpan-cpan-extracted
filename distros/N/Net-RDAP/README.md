@@ -269,5 +269,5 @@ Registration Data Access Protocol (RDAP) Response
 
 # COPYRIGHT
 
-Copyright 2018-2023 CentralNic Ltd, 2024-2025 Gavin Brown. For licensing information,
+Copyright 2018-2023 CentralNic Ltd, 2024-2026 Gavin Brown. For licensing information,
 please see the `LICENSE` file in the [Net::RDAP](https://metacpan.org/pod/Net%3A%3ARDAP) distribution.

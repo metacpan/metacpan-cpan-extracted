@@ -2,7 +2,6 @@ use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use File::ShareDir::Install;
 
 my %WriteMakefileArgs = (
     NAME               => 'Benchmark::MCE',
@@ -12,8 +11,7 @@ my %WriteMakefileArgs = (
     LICENSE            => 'perl_5',
     MIN_PERL_VERSION   => '5.10.0',
     CONFIGURE_REQUIRES => {
-        "ExtUtils::MakeMaker"     => '6.52',
-        "File::ShareDir::Install" => 0,
+        "ExtUtils::MakeMaker" => '6.52',
     },
     TEST_REQUIRES => {
         'Test2::V0' => '0',
@@ -59,6 +57,3 @@ delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
-
-package MY;
-use File::ShareDir::Install 'postamble';

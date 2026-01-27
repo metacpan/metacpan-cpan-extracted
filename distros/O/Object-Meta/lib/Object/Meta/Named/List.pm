@@ -48,6 +48,32 @@ The C<hash> meta data field is used to lookup entries.
 #----------------------------------------------------------------------------
 #Constructors
 
+=head1 METHODS
+
+=head2 Constructor
+
+=head3 new ( [ DATA ] )
+
+This is the constructor for a new C<Object::Meta::Named::List> object.
+
+This overrides the C<Object::Meta> constructor to create the 'I<primary>' index
+on the 'hash' field.
+
+B<Parameters:>
+
+=over 4
+
+=item C<DATA>
+
+The B<raw data> which is passed in a hash like fashion,
+using key and value pairs.
+
+=back
+
+See L<Method C<Object::Meta::List::new()>|Object::Meta::List/"new ( [ DATA ] )">
+
+=cut
+
 sub new {
     my $class = ref( $_[0] ) || $_[0];
 
@@ -61,6 +87,36 @@ sub new {
 
 #----------------------------------------------------------------------------
 #Administration Methods
+
+=head2 Administration Methods
+
+=head3 Add ( [ C<Object::Meta::Named> | DATA ] )
+
+This works like C<Object::Meta::List::Add()> only that it handles
+C<Object::Meta::Named> instances.
+
+If no parameter is given it creates an empty instance of C<Object::Meta::Named>
+and adds it to the list
+
+B<Parameters:>
+
+=over 4
+
+=item C<Object::Meta::Named>
+
+An instance of C<Object::Meta::Named> to be added to the list.
+
+=item C<DATA>
+
+A hash with data to create an instance of C<Object::Meta::Named> and add it to the list.
+
+=back
+
+B<Returns:> C<Object::Meta::Named> - The object which was created or added.
+
+See L<Method C<Object::Meta::List::Add()>|Object::Meta::List/"Add ( [ C<Object::Meta> | DATA ] )">
+
+=cut
 
 sub Add {
     my $self   = $_[0];

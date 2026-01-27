@@ -1,5 +1,8 @@
 Revision history for Benchmark-MCE
 
+1.02    2026-01-26
+        - Remove unused module.
+
 1.01    2026-01-25
         - threads option for suite_calc.
         - Fix no_check documentation.

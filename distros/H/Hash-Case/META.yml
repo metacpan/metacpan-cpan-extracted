@@ -1,13 +1,15 @@
 ---
-abstract: 'Play trics with hash keys'
+abstract: 'Play trics with HASH keys'
 author:
   - 'Mark Overmeer <markov@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '1'
+  Test::Pod: '1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,11 +19,33 @@ no_index:
   directory:
     - t
     - inc
+recommends: {}
 requires:
-  Test::More: '0.47'
+  Carp: '0'
+  Tie::Hash: '0'
 resources:
+  bugtracker: https://github.com/markov2/perl5-Hash-Case/issues
   homepage: http://perl.overmeer.net/CPAN/
-  license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Hash-Case.git
-version: '1.05'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+version: '1.07'
+x_oodist:
+  email: markov@cpan.org
+  first_year: 2002
+  generate:
+    -
+      format: pod3
+      podtail: ~
+  include: []
+  oodoc_version: 3.06
+  parser:
+    pmhead: ~
+    skip_links:
+      - Tie::StdHash
+    syntax: markov
+  raw:
+    publish: ../public_html/hash-case/raw
+  release:
+    publish: ../public_html/hash-case/source
+  tests: {}
+  use: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

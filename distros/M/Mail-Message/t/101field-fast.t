@@ -11,7 +11,7 @@ use warnings;
 use Mail::Message::Test;
 use Mail::Message::Field::Fast;
 
-use Test::More tests => 72;
+use Test::More;
 use Mail::Address;
 
 #
@@ -155,6 +155,22 @@ is($q->comment, 'charset="iso-10646"');
 is($q->toString, qq(Content-Type: text/plain; charset="iso-10646"\n));
 
 #
+# Attributes are case-insensitive
+#
+
+my $s = Mail::Message::Field::Fast->new("Content-Type: text/plain; CHARSET=a");
+ok defined $s, 'Case-insensitive';
+
+is $s->attribute('CHARSET'), 'a';
+is $s->attribute('charset'), 'a';
+is $s->attribute('charSET'), 'a';
+is_deeply [ $s->attributes ], [ CHARSET => 'a' ];
+
+is $s->attribute(FORMAT => 'flowed'), 'flowed';
+is $s->attribute('FORMAT'), 'flowed';
+is $s->attribute('format'), 'flowed';
+
+#
 # Check preferred capitization of Labels
 #
 
@@ -175,3 +191,4 @@ while(@tests)
     is(Mail::Message::Field->wellformedName($from), $to);
 }
 
+done_testing;

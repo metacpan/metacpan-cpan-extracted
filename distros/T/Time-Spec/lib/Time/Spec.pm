@@ -1,10 +1,11 @@
 package Time::Spec;
-$Time::Spec::VERSION = '0.003';
+$Time::Spec::VERSION = '0.005';
 use strict;
 use warnings;
 
 use overload
-	'0+'     => \&to_float,
+	'0+'     => sub { $_[0]->to_float },
+	bool     => sub { 1 },
 	fallback => 1;
 
 use XSLoader;
@@ -27,7 +28,7 @@ Time::Spec - a wrapper arount struct timespec
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -65,7 +66,7 @@ Convert the time back into fractional seconds.
 
 =head2 to_pair()
 
-This returns a pair of seconds an nanoseconds of the object.
+This returns a pair of seconds and nanoseconds of the object.
 
 =head1 AUTHOR
 

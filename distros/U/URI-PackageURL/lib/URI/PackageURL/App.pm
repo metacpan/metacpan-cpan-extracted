@@ -16,20 +16,12 @@ use URI::PackageURL       ();
 use URI::PackageURL::Type ();
 use URI::PackageURL::Util qw(purl_types);
 
-our $VERSION = '2.24';
+our $VERSION = '2.25';
 
 sub cli_error {
     my ($error) = @_;
     $error =~ s/ at .* line \d+.*//;
     say STDERR "ERROR: $error";
-}
-
-sub print_stdout {
-    say STDOUT $_[0] if $_[1];
-}
-
-sub print_stderr {
-    say STDERR $_[0] if $_[1];
 }
 
 sub run {
@@ -93,11 +85,11 @@ VERSION
     }
 
     if (defined $options{info}) {
-        return definition_help(lc $options{info});
+        return _definition_help(lc $options{info});
     }
 
     if (defined $options{list}) {
-        return purl_list();
+        return _purl_list();
     }
 
     if (defined $options{type}) {
@@ -195,45 +187,7 @@ VERSION
     }
 
     if ($options{format} eq 'env') {
-
-        my %PURL_ENVS = (
-            PURL            => $purl->to_string,
-            PURL_TYPE       => $purl->type,
-            PURL_NAMESPACE  => $purl->namespace,
-            PURL_NAME       => $purl->name,
-            PURL_VERSION    => $purl->version,
-            PURL_SUBPATH    => $purl->subpath,
-            PURL_QUALIFIERS => (join ' ', sort keys %{$purl->qualifiers}),
-        );
-
-        # Preserve order
-        my @PURL_ENVS = qw(PURL PURL_TYPE PURL_NAMESPACE PURL_NAME PURL_VERSION PURL_SUBPATH PURL_QUALIFIERS);
-
-        my $qualifiers = $purl->qualifiers;
-
-        foreach my $qualifier (sort keys %{$qualifiers}) {
-            my $key = "PURL_QUALIFIER_$qualifier";
-            push @PURL_ENVS, $key;
-            $PURL_ENVS{$key} = $qualifiers->{$qualifier};
-        }
-
-        if ($purl_urls) {
-            if (defined $purl_urls->{download}) {
-                push @PURL_ENVS, 'PURL_DOWNLOAD_URL';
-                $PURL_ENVS{PURL_DOWNLOAD_URL} = $purl_urls->{download};
-            }
-            if (defined $purl_urls->{repository}) {
-                push @PURL_ENVS, 'PURL_REPOSITORY_URL';
-                $PURL_ENVS{PURL_REPOSITORY_URL} = $purl_urls->{repository};
-            }
-        }
-
-        foreach my $key (@PURL_ENVS) {
-            print sprintf qq{%s="%s"\n}, $key, $PURL_ENVS{$key} || q{};
-        }
-
-        return 0;
-
+        return _purl_env($purl);
     }
 
 }
@@ -249,7 +203,53 @@ sub _md_to_pod {
 
 }
 
-sub purl_list {
+sub _purl_env {
+
+    my $purl = shift;
+
+    my $purl_urls = $purl->to_urls;
+
+    my %PURL_ENVS = (
+        PURL            => $purl->to_string,
+        PURL_TYPE       => $purl->type,
+        PURL_NAMESPACE  => $purl->namespace,
+        PURL_NAME       => $purl->name,
+        PURL_VERSION    => $purl->version,
+        PURL_SUBPATH    => $purl->subpath,
+        PURL_QUALIFIERS => (join ' ', sort keys %{$purl->qualifiers}),
+    );
+
+    # Preserve order
+    my @PURL_ENVS = qw(PURL PURL_TYPE PURL_NAMESPACE PURL_NAME PURL_VERSION PURL_SUBPATH PURL_QUALIFIERS);
+
+    my $qualifiers = $purl->qualifiers;
+
+    foreach my $qualifier (sort keys %{$qualifiers}) {
+        my $key = "PURL_QUALIFIER_$qualifier";
+        push @PURL_ENVS, $key;
+        $PURL_ENVS{$key} = $qualifiers->{$qualifier};
+    }
+
+    if ($purl_urls) {
+        if (defined $purl_urls->{download}) {
+            push @PURL_ENVS, 'PURL_DOWNLOAD_URL';
+            $PURL_ENVS{PURL_DOWNLOAD_URL} = $purl_urls->{download};
+        }
+        if (defined $purl_urls->{repository}) {
+            push @PURL_ENVS, 'PURL_REPOSITORY_URL';
+            $PURL_ENVS{PURL_REPOSITORY_URL} = $purl_urls->{repository};
+        }
+    }
+
+    foreach my $key (@PURL_ENVS) {
+        print sprintf qq{%s="%s"\n}, $key, $PURL_ENVS{$key} || q{};
+    }
+
+    return 0;
+
+}
+
+sub _purl_list {
 
     my @types = purl_types();
 
@@ -298,7 +298,7 @@ sub purl_list {
 }
 
 
-sub definition_help {
+sub _definition_help {
 
     my $type = shift;
 

@@ -1,6 +1,12 @@
 Change history for URI-PackageURL
 
-2.24 2026-01-26
+2.25 2026-01-26
+    - Added missing import (@gregoa patch applied from Debian Perl Group -
+      liburi-packageurl-perl) - giterlizzi/perl-URI-PackageURL#22
+    - Updated documentations
+    - FIX MANIFEST
+
+2.24 2026-01-25
     - Imported all PURL type definition files from https://package-url/purl-spec
     - Added "URI::PackageURL::Type" helper class for normalize components,
       validation and load the using PURL type definition schema file, generate

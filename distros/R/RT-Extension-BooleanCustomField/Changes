@@ -1,5 +1,15 @@
 Revision history for RT-Extension-BooleanCustomField
 
+0.04  2026-01-26
+ - Add doc for use with RT 4 and RT > 5
+ - Add export /home/gibus/work/rt.github.bp/rt/lib/ in install doc
+ - Add documentation about Checkbox Select CFs
+ - Add initialdata file to convert Boolean CFs to Checkbox Select CFs
+ - Upgrade tests to RT 6
+ - Upgrade to RT 6
+ - Update copyright year to 2026
+ - Perl 5.26 and newer remove '.' from @inc by default. Re-add to Makefile.PL to enable installation on newer Perl releases.
+
 0.03  2022-12-14
  - Update author's name
 

@@ -2,7 +2,7 @@ use v5.40;
 
 package App::Gimei;
 
-use version; our $VERSION = version->declare("v0.2.11");
+use version; our $VERSION = version->declare("v0.3.0");
 
 1;
 

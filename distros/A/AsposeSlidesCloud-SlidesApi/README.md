@@ -23,9 +23,16 @@ You may want to check out Aspose free [Powerpoint to PDF](https://products.aspos
 ## Save Presentation As
 
 **Fixed Layout:** XPS
-**Images:** JPEG, PNG, BMP, TIFF, GIF, SVG
+**Images:** JPEG, PNG, BMP, TIFF, GIF, EMF, SVG
 **Web:** HTML/HTML5
 **Other:** MPEG4, SWF (export whole presentations)
+
+## Enhancements in Version 25.10
+
+* Added **SetEmbeddedFonts** and **SetEmbeddedFontsOnline** methods to embed many fonts in one call.
+* Removed **SetEmbeddedFontFromRequest** and **SetEmbeddedFontFromRequestOnline** methods. The above methods can be used instead.
+* Added optional **shapeIndex** and **shapeIndex** parameters to **GetSlideImages** method.
+* Renamed **GetVideoCaptionTracks**, **CreateVideoCaptionTrack**, **DeleteVideoCaptionTracks** and **DeleteVideoCaptionTracks** methods into **GetCaptionTracks**, **CreateCaptionTrack**, **DeleteCaptionTracks** and **DeleteCaptionTracks**. The methods now work with video frames and audio frames.
 
 ## Enhancements in Version 25.6
 

@@ -27,8 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.52",
-            "File::ShareDir::Install" : "0"
+            "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "runtime" : {
@@ -53,6 +52,6 @@
          "web" : "https://github.com/SpareRoom/Benchmark-MCE"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

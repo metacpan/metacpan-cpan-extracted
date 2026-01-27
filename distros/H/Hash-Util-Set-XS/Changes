@@ -1,2 +1,8 @@
+0.02 2026-01-26
+  - Optimize hash key set operations
+  - Added dev/bench.pl
+  - Added Hash::Util::Set as a prerequisite
+  - Dropped Devel::PPPort as a prerequisite
+
 0.01 2026-01-25
   - Initial CPAN release.

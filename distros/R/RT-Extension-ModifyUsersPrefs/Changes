@@ -1,5 +1,12 @@
 Revision history for RT-Extension-ModifyUsersPrefs
 
+0.03  2026-01-27
+ - Add export RTHOME in install doc
+ - Upgrade tests to RT 6
+ - Upgrade to RT 6
+ - Update copyright year to 2026
+ - Perl 5.26 and newer remove '.' from @inc by default. Re-add to Makefile.PL to enable installation on newer Perl releases.
+
 0.02  2022-12-14
  - Upgrade to RT 5
 

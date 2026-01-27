@@ -1,5 +1,39 @@
 Revision history for Params-Filter
 
+v0.011  2026-01-26 (STABLE RELEASE)
+    - NEW: Added closure interface with make_filter() function for maximum performance
+    - make_filter() creates optimized, reusable closures that can be 20-25% faster than
+      hand-written Perl filtering code due to pre-computed exclusion lookups and
+      specialized closure variants
+    - Three specialized closure variants:
+      * Required-only (empty accepted list) - 3.1M ops/sec
+      * Wildcard (accepted contains '*') - 1.3M ops/sec, 24% faster than raw Perl
+      * Accepted-specific (normal case) - 1.8M ops/sec, 20% faster than raw Perl
+    - OPTIMIZED: filter() function now uses same optimizations as closure interface:
+      * Pre-computed exclusion hash (O(1) lookups instead of O(n) array search)
+      * Hash slice for required field copying (faster bulk operations)
+      * Non-destructive operations with hash lookups instead of delete
+      * Single wildcard check instead of per-iteration checks
+    - All interfaces (functional, OO, closure) now use identical optimization techniques
+    - Closure interface is 142-239% faster than functional interface due to:
+      * No input parsing overhead (hashref-only input)
+      * No error message construction overhead
+      * Pre-compiled closures optimized for specific configuration
+    - Added comprehensive test suite for make_filter() (t/04-make_filter.t with 10 subtests)
+    - Added complete POD documentation for closure interface
+    - Added usage examples (examples/closure_interface.pl with 6 working examples)
+    - Added benchmark scripts:
+      * benchmark-three-variants.pl - Performance comparison of three closure types
+      * benchmark-optimized-filter.pl - Optimized filter() vs make_filter() comparison
+      * benchmark-make_filter.pl - Closure vs raw Perl performance
+    - Updated README.md with closure interface documentation and performance notes
+    - Updated performance considerations to clarify that closure interface provides
+      maximum speed while functional/OO have feature overhead
+    - Changed "database queries" to "database statements" for accuracy (includes inserts/updates)
+    - All 73 tests passing across 6 test files
+    - POD syntax validated
+    - Full backward compatibility maintained
+
 v0.010  2026-01-25 (STABLE RELEASE)
     - Updated documentation to emphasize security, compliance, and correctness
       over raw performance

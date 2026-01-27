@@ -4,7 +4,7 @@ author:
   - 'Christian Hansen <chansen@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
-  List::Util: 0
+  List::Util: '1.33'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: 6.59
@@ -26,4 +26,4 @@ resources:
   bugtracker: https://github.com/chansen/p5-hash-util-set/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/chansen/p5-hash-util-set
-version: '0.01'
+version: '0.03'

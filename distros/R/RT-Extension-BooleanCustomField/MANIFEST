@@ -1,4 +1,5 @@
 Changes
+etc/boolean2checbox.initialdata
 html/Elements/EditCustomFieldBoolean
 html/Elements/ShowCustomFieldBoolean
 inc/Module/AutoInstall.pm
@@ -33,4 +34,3 @@ xt/group.t
 xt/queue.t
 xt/ticket.t
 xt/user.t
-SIGNATURE                                Public-key signature (added by MakeMaker)

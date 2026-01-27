@@ -402,7 +402,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.85';
+    our $VERSION   = '6.86';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -489,7 +489,7 @@ use Inline C => <<'C_CODE', 'name' => 'Graphics::Framebuffer', 'VERSION' => $VER
 /* Copyright 2018-2026 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.85
+   Version:  6.86
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
@@ -1693,41 +1693,17 @@ void c_blit_read(char *framebuffer,
                  short y_clip,
                  short xx_clip,
                  short yy_clip) {
-    short fb_x = xoffset + x;
-    short fb_y = yoffset + y;
-    short xx = x + w;
-    short yy = y + h;
-    short horizontal;
-    short vertical;
     unsigned int bline = w * bytes_per_pixel;
+    short yend = y + h - 1;
+    short xx = (xoffset + x) * bytes_per_pixel;
+    char *fb_idx = framebuffer + (bytes_per_line * (y + yoffset)) + xx;
+    char *blit_idx = blit_data;
+    short line;
 
-    for (vertical = 0; vertical < h; vertical++) {
-        unsigned int vbl = vertical * bline;
-        unsigned short yv = fb_y + vertical;
-        unsigned int yvbl = yv * bytes_per_line;
-        if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
-            for (horizontal = 0; horizontal < w; horizontal++) {
-                unsigned short xh = fb_x + horizontal;
-                unsigned int xhbp = xh * bytes_per_pixel;
-                if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
-                    unsigned int hzpixel = horizontal * bytes_per_pixel;
-                    unsigned int vhz = vbl + hzpixel;
-                    unsigned int yvhz = yvbl + hzpixel;
-                    unsigned int xhbp_yvbl = xhbp + yvbl;
-                    if (bytes_per_pixel == 4) {
-                        *((unsigned int *)(blit_data + vhz)) =
-                            *((unsigned int *)(framebuffer + xhbp_yvbl));
-                    } else if (bytes_per_pixel == 3) {
-                        *(blit_data + vhz) = *(framebuffer + xhbp_yvbl);
-                        *(blit_data + vhz + 1) = *(framebuffer + xhbp_yvbl + 1);
-                        *(blit_data + vhz + 2) = *(framebuffer + xhbp_yvbl + 2);
-                    } else {
-                        *((unsigned short *)(blit_data + vhz)) =
-                            *((unsigned short *)(framebuffer + xhbp_yvbl));
-                    }
-                }
-            }
-        }
+    for ( line = y ; line <= yend ; line++ ) {
+        memcpy(blit_idx, fb_idx, bline);
+        blit_idx += bline;
+        fb_idx += bytes_per_line;
     }
 }
 
@@ -7094,10 +7070,10 @@ sub blit_read {
     my $h     = int($params->{'height'} || $cliph);
     my $buf;
 
-    $x = 0                       if ($x < 0);
-    $y = 0                       if ($y < 0);
-    $w = $self->{'XX_CLIP'} - $x if ($w > ($clipw));
-    $h = $self->{'YY_CLIP'} - $y if ($h > ($cliph));
+    $x = 0                           if ($x < 0);
+    $y = 0                           if ($y < 0);
+    $w = $self->{'XX_CLIP'} - $x + 1 if ($w > ($clipw));
+    $h = $self->{'YY_CLIP'} - $y + 1 if ($h > ($cliph));
 
     my $W    = $w * $self->{'BYTES'};
     my $scrn = '';
@@ -7105,11 +7081,12 @@ sub blit_read {
         $scrn = chr(0) x ($W * $h);
         c_blit_read($self->{'SCREEN'}, $self->{'XRES'}, $self->{'YRES'}, $self->{'BYTES_PER_LINE'}, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $scrn, $x, $y, $w, $h, $self->{'BYTES'}, $draw_mode, $self->{'COLOR_ALPHA'}, $self->{'RAW_BACKGROUND_COLOR'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'});
     } else {
-        my $yend = $y + $h;
-        my $XX   = ($self->{'XOFFSET'} + $x) * $self->{'BYTES'};
-        foreach my $line ($y .. ($yend - 1)) {
-            my $index = ($self->{'BYTES_PER_LINE'} * ($line + $self->{'YOFFSET'})) + $XX;
-            $scrn .= substr($self->{'SCREEN'}, $index, $W);
+        my $fb  = $self->{'SCREEN'};
+        my $bpl = $self->{'BYTES_PER_LINE'};
+        my $XX  = ($self->{'XOFFSET'} + $x) * $self->{'BYTES'};
+        my $end = $bpl * ($y + $h - 1 + $self->{'YOFFSET'}) + $XX;
+        for (my $idx = $bpl * ($y + $self->{'YOFFSET'}) + $XX ; $idx <= $end ; $idx += $bpl) {
+            $scrn .= substr($fb,  $idx, $W);
         }
     } ## end else [ if ($h > 1 && $self->{...})]
     return ({ 'x' => $x, 'y' => $y, 'width' => $w, 'height' => $h, 'image' => $scrn });
@@ -9734,7 +9711,7 @@ Try using 'polygon' to draw complex shapes instead of a series of plot or line c
 
 Does your device have more than one core?  Well, how about using threads (or MCE)?  Just make sure you do it according to the examples in the "examples" directory.  Yes, I know this can be too advanced for the average coder, but the option is there.
 
-Plain and simple, your device just may be too slow for some CPU intensive operations, specifically anything involving animated images and heaviy blitting.  If you must use images, then make sure they are already the right size for your needs.  Don't force the module to resize them when loading, as this takes CPU time (and memory).
+Plain and simple, your device just may be too slow for some CPU intensive operations, specifically anything involving animated images and heavy blitting.  If you must use images, then make sure they are already the right size for your needs.  Don't force the module to resize them when loading, as this takes CPU time (and memory).
 
 =item B< Ask For Help >
 
@@ -9784,7 +9761,7 @@ Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONT
 
 =head1 VERSION
 
-Version 6.85 (Jan 19, 2026)
+Version 6.86 (Jan 24, 2026)
 
 =head1 THANKS
 

@@ -1,23 +1,28 @@
 use v5.40;
+use feature 'class';
+no warnings 'experimental::class';
 
-package t::CLI;
+class t::CLI {
 
-use App::Gimei::Runner;
-use Capture::Tiny qw(capture);
-use Class::Tiny   qw(stdout stderr exit_code error_message);
+    use App::Gimei::Runner;
+    use Capture::Tiny qw(capture);
 
-sub run ( $class, @args ) {
-    my $self = $class->new;
+    field $stdout        : param : reader;
+    field $stderr        : param : reader;
+    field $exit_code     : param : reader;
+    field $error_message : param : reader;
 
-    my @capture = capture {
-        my $code = eval { App::Gimei::Runner->new->execute(@args) };
-        $self->exit_code($code);
-        $self->error_message($@);
-    };
-    $self->stdout( $capture[0] );
-    $self->stderr( $capture[1] );
+    sub run ( $class, @args ) {
+        my %param;
 
-    return $self;
+        my @capture = capture {
+            my $code = eval { App::Gimei::Runner->new->execute(@args) };
+            $param{exit_code}     = $code;
+            $param{error_message} = $@;
+        };
+
+        return $class->new( %param, stdout => $capture[0], stderr => $capture[1] );
+    }
 }
 
 1;

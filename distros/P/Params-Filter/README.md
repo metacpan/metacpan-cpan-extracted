@@ -16,20 +16,20 @@ This module separates field filtering from value validation:
 The main advantages of using Params::Filter are:
 
 - **Consistency** - Converts varying incoming data formats to consistent key-value pairs
-- **Security** - Sensitive fields (passwords, SSNs, credit cards) never reach your validation code or database queries
+- **Security** - Sensitive fields (passwords, SSNs, credit cards) never reach your validation code or database statements
 - **Compliance** - Automatically excludes fields that shouldn't be processed or stored (e.g., GDPR, PCI-DSS)
 - **Correctness** - Ensures only expected fields are processed, preventing accidental data leakage or processing errors
 - **Maintainability** - Clear separation between data filtering (what fields to accept) and validation (whether values are correct)
 
 ### Performance Considerations
 
-**Important**: In many cases, Params::Filter is slower than manual hash lookups or similar operations, especially when the incoming data is in a known consistent format. The value of Params::Filter is in its capability to assure the security, compliance, and correctness benefits listed above.
+**Important**: The functional and OO interfaces include features that add overhead compared to manual hash lookups, especially when the incoming data is in a known consistent format. The value of Params::Filter is in its capability to assure the security, compliance, and correctness benefits listed above.
 
-Nonetheless, Params::Filter CAN improve overall performance when downstream validation is expensive (database queries, API calls, complex regex).
+However, the **Closure Interface** (`make_filter`) provides maximum performance and can be faster than hand-written Perl filtering code due to pre-computed exclusion lookups and specialized closure variants. Use `make_filter` for hot code paths or high-frequency filtering.
+
+For all interfaces, Params::Filter CAN improve overall performance when downstream validation is expensive (database statements, API calls, complex regex) by failing fast when required fields are missing.
 
 A simple benchmark comparing the validation cost of typical input to that of input restricted to required fields would reveal any speed gain with expensive downstream validations.
-
-For simple cases and when validation is cheap, raw speed is not the reason to use Params::Filter.
 
 ### Common Use Cases
 
@@ -87,7 +87,7 @@ This module provides important security benefits by separating data filtering fr
 
 #### Preventing Sensitive Data Leakage
 
-By excluding sensitive fields early in the request processing pipeline, you ensure they never reach validation code, database queries, or logging systems:
+By excluding sensitive fields early in the request processing pipeline, you ensure they never reach validation code, database statements, or logging systems:
 
 ```perl
 my $user_filter = Params::Filter->new_filter({
@@ -210,10 +210,48 @@ my ($user2, $msg2) = $user_filter->apply($api_request_data);
 my ($user3, $msg3) = $user_filter->apply($db_record_data);
 ```
 
+### Closure Interface (Maximum Speed)
+
+```perl
+use Params::Filter qw/make_filter/;
+
+# Create a reusable filter closure
+my $fast_filter = make_filter(
+    [qw(id username)],      # required
+    [qw(email bio)],        # accepted
+    [qw(password token)],   # excluded
+);
+
+# Apply to high-volume data stream
+for my $record (@large_dataset) {
+    my $filtered = $fast_filter->($record);
+    next unless $filtered;  # Skip if required fields missing
+    process($filtered);
+}
+
+# Wildcard example - accept everything except sensitive fields
+my $safe_filter = make_filter(
+    [qw(id type)],
+    ['*'],                      # accept all other fields
+    [qw(password token ssn)],   # but exclude these
+);
+
+# Safe logging - sensitive fields automatically excluded
+my $log_entry = $safe_filter->($incoming_data);
+log_to_file($log_entry);  # Passwords, tokens, SSNs never logged
+```
+
+The closure interface provides maximum performance for hot code paths and high-frequency filtering operations. It only accepts data in the form of a hashref. It creates a specialized, optimized closure based on your configuration:
+
+- **Required-only** - When accepted list is empty, returns only required fields
+- **Wildcard** - When accepted contains `'*'`, accepts all input fields except exclusions
+- **Accepted-specific** - When accepted has specific fields, returns required plus those accepted fields (minus exclusions)
+
 ## Features
 
-- **Dual interface**: Functional or OO usage
+- **Three interfaces**: Functional, OO, or Closure (for maximum speed)
 - **Security-first**: Excludes sensitive fields before they reach validation code
+- **Performance**: Closure interface can be faster than hand-written Perl filtering
 - **Fail-closed**: Returns immediately on missing required parameters
 - **Early validation**: Returns immediately if all required parameters are provided and no others are provided or will be accepted
 - **Non-destructive**: Allows multiple filters and conditional use without affecting data
@@ -796,6 +834,7 @@ NOTE: The original `$data` is not modified during filtering, so the same data ca
 See the `examples/` directory for complete working scripts:
 - `basic_usage.pl` - Simple form input filtering
 - `oo_interface.pl` - Reusable filters
+- `closure_interface.pl` - High-performance closure interface
 - `wildcard.pl` - Wildcard acceptance patterns
 - `error_handling.pl` - Various error handling strategies
 - `debug_mode.pl` - Development-time warnings

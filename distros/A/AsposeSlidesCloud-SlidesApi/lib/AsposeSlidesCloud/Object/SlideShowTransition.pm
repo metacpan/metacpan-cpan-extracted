@@ -258,6 +258,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'duration' => {
+    	datatype => 'int',
+    	base_name => 'Duration',
+    	description => 'The duration of the slide transition effect in milliseconds. If not set, the duration is determined automatically based on Speed and Type values.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -284,7 +291,8 @@ __PACKAGE__->swagger_types( {
     'corner_and_center_direction' => 'string',
     'shred_pattern' => 'string',
     'orientation' => 'string',
-    'spokes' => 'int'
+    'spokes' => 'int',
+    'duration' => 'int'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -311,7 +319,8 @@ __PACKAGE__->attribute_map( {
     'corner_and_center_direction' => 'CornerAndCenterDirection',
     'shred_pattern' => 'ShredPattern',
     'orientation' => 'Orientation',
-    'spokes' => 'Spokes'
+    'spokes' => 'Spokes',
+    'duration' => 'Duration'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -15,7 +15,6 @@ inc/My/Module/Recommend.pm
 inc/My/Module/Recommend/Any.pm
 inc/My/Module/Test.pm
 lib/Astro/SpaceTrack.pm
-lib/Astro/SpaceTrack/BulkData.pod
 LICENSE-Artistic
 LICENSE-GPL
 Makefile.PL

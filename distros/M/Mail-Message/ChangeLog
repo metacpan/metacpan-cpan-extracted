@@ -13,6 +13,14 @@ Limitations to be fixed:
 #!!! number 3.  Use (at least) version 4 for new developments.
 #!!! Convert? See https://github.com/markov2/perl5-Mail-Box/wiki/
 
+version 4.03: Mon 26 Jan 14:53:24 CET 2026
+
+	Fixes:
+	- field attributes must be handled case-insensitive.
+	  GitHub issue #5 [Andy Beverley]
+	- wrongly added LF after multipart parts which do not end in a LF
+	  [Andy Beverly]
+	
 version 4.02: Thu 22 Jan 09:18:53 CET 2026
 
 	Fixes:

@@ -28,4 +28,3 @@ README
 README.md
 xt/00-load.t
 xt/modify-users-prefs.t
-SIGNATURE                                Public-key signature (added by MakeMaker)

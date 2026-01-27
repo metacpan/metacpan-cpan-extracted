@@ -297,6 +297,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'spell_check' => {
+    	datatype => 'boolean',
+    	base_name => 'SpellCheck',
+    	description => 'true to enable spell checking for the portion.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -328,7 +335,8 @@ __PACKAGE__->swagger_types( {
     'hyperlink_mouse_over' => 'Hyperlink',
     'latin_font' => 'string',
     'east_asian_font' => 'string',
-    'complex_script_font' => 'string'
+    'complex_script_font' => 'string',
+    'spell_check' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -360,7 +368,8 @@ __PACKAGE__->attribute_map( {
     'hyperlink_mouse_over' => 'HyperlinkMouseOver',
     'latin_font' => 'LatinFont',
     'east_asian_font' => 'EastAsianFont',
-    'complex_script_font' => 'ComplexScriptFont'
+    'complex_script_font' => 'ComplexScriptFont',
+    'spell_check' => 'SpellCheck'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

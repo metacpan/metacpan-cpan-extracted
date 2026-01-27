@@ -1,7 +1,7 @@
 package Dancer::Logger::Abstract;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: Abstract logging engine for Dancer
-$Dancer::Logger::Abstract::VERSION = '1.3521';
+$Dancer::Logger::Abstract::VERSION = '1.3522';
 use strict;
 use warnings;
 use Carp;
@@ -156,7 +156,7 @@ Dancer::Logger::Abstract - Abstract logging engine for Dancer
 
 =head1 VERSION
 
-version 1.3521
+version 1.3522
 
 =head1 SYNOPSIS
 

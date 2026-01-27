@@ -22,7 +22,10 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.46"
+            "ExtUtils::MakeMaker" : "6.46",
+            "Pod::Coverage" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
          }
       },
       "configure" : {
@@ -49,6 +52,6 @@
          "web" : "https://github.com/bodo-hugo-barwich/object-meta"
       }
    },
-   "version" : "v1.1.0",
+   "version" : "v1.1.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

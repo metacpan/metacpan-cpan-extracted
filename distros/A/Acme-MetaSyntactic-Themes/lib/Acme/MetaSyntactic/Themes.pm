@@ -1,5 +1,5 @@
 package Acme::MetaSyntactic::Themes;
-$Acme::MetaSyntactic::Themes::VERSION = '1.056';
+$Acme::MetaSyntactic::Themes::VERSION = '1.057';
 use strict;
 use warnings;
 

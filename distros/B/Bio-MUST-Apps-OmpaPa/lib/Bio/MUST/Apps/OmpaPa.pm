@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::OmpaPa;
 # ABSTRACT: Main class for ompa-pa tool
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Apps::OmpaPa::VERSION = '0.252040';
+$Bio::MUST::Apps::OmpaPa::VERSION = '0.260260';
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ Bio::MUST::Apps::OmpaPa - Main class for ompa-pa tool
 
 =head1 VERSION
 
-version 0.252040
+version 0.260260
 
 =head1 SYNOPSIS
 

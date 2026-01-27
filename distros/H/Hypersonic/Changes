@@ -1,0 +1,26 @@
+Revision history for Hypersonic
+
+0.03    2026-01-26
+        - Response
+        - Request
+        - TLS
+        - Session
+        - Compress
+
+0.02    2025-01-26
+        - Dynamic route support for real request handling
+        - Path parameters (e.g., /users/:id) automatically extract values
+        - Handlers receive $req hashref with method, path, body, id
+        - Mixed static/dynamic routes in same server
+        - Static routes still ~290K req/sec, dynamic routes call Perl per-request
+
+0.01    2025-01-26
+        - Initial release
+        - JIT-compiled XS functions via XS::JIT (not Perl custom ops)
+        - Handlers run once at compile time, full HTTP responses baked into C
+        - Pure C event loop (kqueue on macOS/BSD, epoll on Linux)
+        - ~290K requests/second on single core
+        - Zero Perl in the hot path - recv/dispatch/send all in C
+        - Support for GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS
+        - Keep-alive connection support
+        - TCP_NODELAY for low latency

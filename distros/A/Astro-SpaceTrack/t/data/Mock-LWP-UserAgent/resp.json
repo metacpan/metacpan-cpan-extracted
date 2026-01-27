@@ -71,6 +71,19 @@
          "\"\""
       ]
    },
+   "https://www.space-track.org/basicspacedata/modeldef/class/gp" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "application/json",
+            "Status",
+            "200"
+         ],
+         "{\"controller\":\"basicspacedata\",\"data\":[{\"Field\":\"ORDINAL\",\"Type\":\"tinyint(3) unsigned\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"COMMENT\",\"Type\":\"varchar(32)\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"\",\"Extra\":\"\"},{\"Field\":\"ORIGINATOR\",\"Type\":\"varchar(5)\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"\",\"Extra\":\"\"},{\"Field\":\"NORAD_CAT_ID\",\"Type\":\"mediumint(8) unsigned\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"OBJECT_NAME\",\"Type\":\"varchar(60)\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"\",\"Extra\":\"\"},{\"Field\":\"OBJECT_TYPE\",\"Type\":\"varchar(11)\",\"Null\":\"YES\",\"Key\":\"\",\"Default\":null,\"Extra\":\"\"},{\"Field\":\"CLASSIFICATION_TYPE\",\"Type\":\"char(1)\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"\",\"Extra\":\"\"},{\"Field\":\"INTLDES\",\"Type\":\"varchar(8)\",\"Null\":\"YES\",\"Key\":\"\",\"Default\":null,\"Extra\":\"\"},{\"Field\":\"EPOCH\",\"Type\":\"datetime\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"1000-01-01 00:00:00\",\"Extra\":\"\"},{\"Field\":\"EPOCH_MICROSECONDS\",\"Type\":\"mediumint(8) unsigned\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"MEAN_MOTION\",\"Type\":\"double\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"ECCENTRICITY\",\"Type\":\"double\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"INCLINATION\",\"Type\":\"double\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"RA_OF_ASC_NODE\",\"Type\":\"double\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"ARG_OF_PERICENTER\",\"Type\":\"double\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"MEAN_ANOMALY\",\"Type\":\"double\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"EPHEMERIS_TYPE\",\"Type\":\"tinyint(3) unsigned\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"ELEMENT_SET_NO\",\"Type\":\"smallint(5) unsigned\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"REV_AT_EPOCH\",\"Type\":\"float\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"BSTAR\",\"Type\":\"double\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"MEAN_MOTION_DOT\",\"Type\":\"double\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"MEAN_MOTION_DDOT\",\"Type\":\"double\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"FILE\",\"Type\":\"int(10) unsigned\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"TLE_LINE0\",\"Type\":\"varchar(62)\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"\",\"Extra\":\"\"},{\"Field\":\"TLE_LINE1\",\"Type\":\"char(71)\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"\",\"Extra\":\"\"},{\"Field\":\"TLE_LINE2\",\"Type\":\"char(71)\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"\",\"Extra\":\"\"},{\"Field\":\"OBJECT_ID\",\"Type\":\"varchar(11)\",\"Null\":\"YES\",\"Key\":\"\",\"Default\":null,\"Extra\":\"\"},{\"Field\":\"OBJECT_NUMBER\",\"Type\":\"mediumint(8) unsigned\",\"Null\":\"YES\",\"Key\":\"\",\"Default\":\"0\",\"Extra\":\"\"},{\"Field\":\"SEMIMAJOR_AXIS\",\"Type\":\"double(20,3)\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0.000\",\"Extra\":\"\"},{\"Field\":\"PERIOD\",\"Type\":\"double(20,3)\",\"Null\":\"YES\",\"Key\":\"\",\"Default\":null,\"Extra\":\"\"},{\"Field\":\"APOGEE\",\"Type\":\"double(20,3)\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0.000\",\"Extra\":\"\"},{\"Field\":\"PERIGEE\",\"Type\":\"double(20,3)\",\"Null\":\"NO\",\"Key\":\"\",\"Default\":\"0.000\",\"Extra\":\"\"}]}"
+      ]
+   },
    "https://www.space-track.org/basicspacedata/modeldef/class/tle_latest" : {
       "GET" : [
          "200",
@@ -123,6 +136,19 @@
          "[\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {}\n]\n"
       ]
    },
+   "https://www.space-track.org/basicspacedata/query/class/satcat/format/json/orderby/NORAD_CAT_ID%20asc/predicates/all/CURRENT/Y/DECAY/2010-01-10" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "application/json",
+            "Status",
+            "200"
+         ],
+         "[\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : null,\n      \"COUNTRY\" : \"CIS\",\n      \"DECAY\" : \"2010-01-10\",\n      \"FILE\" : \"5942\",\n      \"INTLDES\" : \"1993-036WY\",\n      \"LAUNCH\" : \"1993-06-16\",\n      \"LAUNCH_NUM\" : \"36\",\n      \"LAUNCH_PIECE\" : \"WY\",\n      \"LAUNCH_YEAR\" : \"1993\",\n      \"NORAD_CAT_ID\" : \"34627\",\n      \"OBJECT_ID\" : \"1993-036WY\",\n      \"OBJECT_NAME\" : \"COSMOS 2251 DEB\",\n      \"OBJECT_NUMBER\" : \"34627\",\n      \"OBJECT_TYPE\" : \"DEBRIS\",\n      \"RCSVALUE\" : \"0\",\n      \"SATNAME\" : \"COSMOS 2251 DEB\",\n      \"SITE\" : \"PKMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : null,\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : \"2010-01-10\",\n      \"FILE\" : \"5942\",\n      \"INTLDES\" : \"2009-038C\",\n      \"LAUNCH\" : \"2009-07-15\",\n      \"LAUNCH_NUM\" : \"38\",\n      \"LAUNCH_PIECE\" : \"C\",\n      \"LAUNCH_YEAR\" : \"2009\",\n      \"NORAD_CAT_ID\" : \"35691\",\n      \"OBJECT_ID\" : \"2009-038C\",\n      \"OBJECT_NAME\" : \"ANDE DEB (POLLUX CYLIN)\",\n      \"OBJECT_NUMBER\" : \"35691\",\n      \"OBJECT_TYPE\" : \"DEBRIS\",\n      \"RCSVALUE\" : \"0\",\n      \"SATNAME\" : \"ANDE DEB (POLLUX CYLIN)\",\n      \"SITE\" : \"AFETR\"\n   }\n]\n"
+      ]
+   },
    "https://www.space-track.org/basicspacedata/query/class/satcat/format/json/orderby/OBJECT_NUMBER%20asc/predicates/all/CURRENT/Y/DECAY/2010-01-10" : {
       "GET" : [
          "200",
@@ -134,6 +160,21 @@
             "200"
          ],
          "[\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : null,\n      \"COUNTRY\" : \"CIS\",\n      \"DECAY\" : \"2010-01-10\",\n      \"FILE\" : \"5942\",\n      \"INTLDES\" : \"1993-036WY\",\n      \"LAUNCH\" : \"1993-06-16\",\n      \"LAUNCH_NUM\" : \"36\",\n      \"LAUNCH_PIECE\" : \"WY\",\n      \"LAUNCH_YEAR\" : \"1993\",\n      \"NORAD_CAT_ID\" : \"34627\",\n      \"OBJECT_ID\" : \"1993-036WY\",\n      \"OBJECT_NAME\" : \"COSMOS 2251 DEB\",\n      \"OBJECT_NUMBER\" : \"34627\",\n      \"OBJECT_TYPE\" : \"DEBRIS\",\n      \"RCSVALUE\" : \"0\",\n      \"SATNAME\" : \"COSMOS 2251 DEB\",\n      \"SITE\" : \"PKMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : null,\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : \"2010-01-10\",\n      \"FILE\" : \"5942\",\n      \"INTLDES\" : \"2009-038C\",\n      \"LAUNCH\" : \"2009-07-15\",\n      \"LAUNCH_NUM\" : \"38\",\n      \"LAUNCH_PIECE\" : \"C\",\n      \"LAUNCH_YEAR\" : \"2009\",\n      \"NORAD_CAT_ID\" : \"35691\",\n      \"OBJECT_ID\" : \"2009-038C\",\n      \"OBJECT_NAME\" : \"ANDE DEB (POLLUX CYLIN)\",\n      \"OBJECT_NUMBER\" : \"35691\",\n      \"OBJECT_TYPE\" : \"DEBRIS\",\n      \"RCSVALUE\" : \"0\",\n      \"SATNAME\" : \"ANDE DEB (POLLUX CYLIN)\",\n      \"SITE\" : \"AFETR\"\n   }\n]\n"
+      ]
+   },
+   "https://www.space-track.org/basicspacedata/query/class/satcat/format/json/orderby/NORAD_CAT_ID%20asc/predicates/all/CURRENT/Y/DECAY/null-val/LAUNCH/2009-04-01" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "application/json",
+            "Set-Cookie",
+            "chocolatechip=This bears no relation to any cookie set by Space Track; path=/; domain=www.space-track.org",
+            "Status",
+            "200"
+         ],
+         "[]"
       ]
    },
    "https://www.space-track.org/basicspacedata/query/class/satcat/format/json/orderby/OBJECT_NUMBER%20asc/predicates/all/CURRENT/Y/DECAY/null-val/LAUNCH/2009-04-01" : {
@@ -151,6 +192,19 @@
          "[]"
       ]
    },
+   "https://www.space-track.org/basicspacedata/query/class/satcat/format/json/orderby/NORAD_CAT_ID%20asc/predicates/all/CURRENT/Y/DECAY/null-val/LAUNCH/2012-06-13" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "application/json",
+            "Status",
+            "200"
+         ],
+         "[\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : null,\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"6881\",\n      \"INTLDES\" : \"2012-031A\",\n      \"LAUNCH\" : \"2012-06-13\",\n      \"LAUNCH_NUM\" : \"31\",\n      \"LAUNCH_PIECE\" : \"A\",\n      \"LAUNCH_YEAR\" : \"2012\",\n      \"NORAD_CAT_ID\" : \"38358\",\n      \"OBJECT_ID\" : \"2012-031A\",\n      \"OBJECT_NAME\" : \"NUSTAR\",\n      \"OBJECT_NUMBER\" : \"38358\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0\",\n      \"SATNAME\" : \"NUSTAR\",\n      \"SITE\" : \"KWAJL\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"3\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"6562\",\n      \"INTLDES\" : \"2012-031B\",\n      \"LAUNCH\" : \"2012-06-13\",\n      \"LAUNCH_NUM\" : \"31\",\n      \"LAUNCH_PIECE\" : \"B\",\n      \"LAUNCH_YEAR\" : \"2012\",\n      \"NORAD_CAT_ID\" : \"38359\",\n      \"OBJECT_ID\" : \"2012-031B\",\n      \"OBJECT_NAME\" : \"PEGASUS R/B\",\n      \"OBJECT_NUMBER\" : \"38359\",\n      \"OBJECT_TYPE\" : \"ROCKET BODY\",\n      \"RCSVALUE\" : \"0\",\n      \"SATNAME\" : \"PEGASUS R/B\",\n      \"SITE\" : \"KWAJL\"\n   }\n]\n"
+      ]
+   },
    "https://www.space-track.org/basicspacedata/query/class/satcat/format/json/orderby/OBJECT_NUMBER%20asc/predicates/all/CURRENT/Y/DECAY/null-val/LAUNCH/2012-06-13" : {
       "GET" : [
          "200",
@@ -162,6 +216,21 @@
             "200"
          ],
          "[\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : null,\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"6881\",\n      \"INTLDES\" : \"2012-031A\",\n      \"LAUNCH\" : \"2012-06-13\",\n      \"LAUNCH_NUM\" : \"31\",\n      \"LAUNCH_PIECE\" : \"A\",\n      \"LAUNCH_YEAR\" : \"2012\",\n      \"NORAD_CAT_ID\" : \"38358\",\n      \"OBJECT_ID\" : \"2012-031A\",\n      \"OBJECT_NAME\" : \"NUSTAR\",\n      \"OBJECT_NUMBER\" : \"38358\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0\",\n      \"SATNAME\" : \"NUSTAR\",\n      \"SITE\" : \"KWAJL\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"3\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"6562\",\n      \"INTLDES\" : \"2012-031B\",\n      \"LAUNCH\" : \"2012-06-13\",\n      \"LAUNCH_NUM\" : \"31\",\n      \"LAUNCH_PIECE\" : \"B\",\n      \"LAUNCH_YEAR\" : \"2012\",\n      \"NORAD_CAT_ID\" : \"38359\",\n      \"OBJECT_ID\" : \"2012-031B\",\n      \"OBJECT_NAME\" : \"PEGASUS R/B\",\n      \"OBJECT_NUMBER\" : \"38359\",\n      \"OBJECT_TYPE\" : \"ROCKET BODY\",\n      \"RCSVALUE\" : \"0\",\n      \"SATNAME\" : \"PEGASUS R/B\",\n      \"SITE\" : \"KWAJL\"\n   }\n]\n"
+      ]
+   },
+   "https://www.space-track.org/basicspacedata/query/class/satcat/format/json/orderby/NORAD_CAT_ID%20asc/predicates/all/CURRENT/Y/DECAY/null-val/OBJECT_ID/1998-067A" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "application/json",
+            "Set-Cookie",
+            "chocolatechip=This bears no relation to any cookie set by Space Track; path=/; domain=www.space-track.org",
+            "Status",
+            "200"
+         ],
+         "[\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"ISS\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067A\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"A\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"397.013\",\n      \"SATNAME\" : \"ISS (ZARYA)\",\n      \"SITE\" : \"TTMTR\"\n   }\n]\n"
       ]
    },
    "https://www.space-track.org/basicspacedata/query/class/satcat/format/json/orderby/OBJECT_NUMBER%20asc/predicates/all/CURRENT/Y/DECAY/null-val/OBJECT_ID/1998-067A" : {
@@ -177,6 +246,21 @@
             "200"
          ],
          "[\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"ISS\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067A\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"A\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"397.013\",\n      \"SATNAME\" : \"ISS (ZARYA)\",\n      \"SITE\" : \"TTMTR\"\n   }\n]\n"
+      ]
+   },
+   "https://www.space-track.org/basicspacedata/query/class/satcat/format/json/orderby/NORAD_CAT_ID%20asc/predicates/all/CURRENT/Y/DECAY/null-val/OBJECT_ID/~~1998-067" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "application/json",
+            "Set-Cookie",
+            "chocolatechip=This bears no relation to any cookie set by Space Track; path=/; domain=www.space-track.org",
+            "Status",
+            "200"
+         ],
+         "[\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"ISS\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067A\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"A\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"397.013\",\n      \"SATNAME\" : \"ISS (ZARYA)\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"ISS\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DF\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DF\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39496\",\n      \"OBJECT_ID\" : \"1998-067DF\",\n      \"OBJECT_NAME\" : \"ISS DEB (VSPLESK PLTFRM)\",\n      \"OBJECT_NUMBER\" : \"39496\",\n      \"OBJECT_TYPE\" : \"DEBRIS\",\n      \"RCSVALUE\" : \"0.208\",\n      \"SATNAME\" : \"ISS DEB (VSPLESK PLTFRM)\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DG\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DG\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39512\",\n      \"OBJECT_ID\" : \"1998-067DG\",\n      \"OBJECT_NAME\" : \"FLOCK 1-3\",\n      \"OBJECT_NUMBER\" : \"39512\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.1082\",\n      \"SATNAME\" : \"FLOCK 1-3\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DH\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DH\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39513\",\n      \"OBJECT_ID\" : \"1998-067DH\",\n      \"OBJECT_NAME\" : \"FLOCK 1-1\",\n      \"OBJECT_NUMBER\" : \"39513\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0766\",\n      \"SATNAME\" : \"FLOCK 1-1\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DJ\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DJ\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39514\",\n      \"OBJECT_ID\" : \"1998-067DJ\",\n      \"OBJECT_NAME\" : \"FLOCK 1-2\",\n      \"OBJECT_NUMBER\" : \"39514\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.073\",\n      \"SATNAME\" : \"FLOCK 1-2\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DK\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DK\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39515\",\n      \"OBJECT_ID\" : \"1998-067DK\",\n      \"OBJECT_NAME\" : \"FLOCK 1-4\",\n      \"OBJECT_NUMBER\" : \"39515\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0667\",\n      \"SATNAME\" : \"FLOCK 1-4\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DL\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DL\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39518\",\n      \"OBJECT_ID\" : \"1998-067DL\",\n      \"OBJECT_NAME\" : \"FLOCK 1-5\",\n      \"OBJECT_NUMBER\" : \"39518\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.086\",\n      \"SATNAME\" : \"FLOCK 1-5\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DM\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DM\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39519\",\n      \"OBJECT_ID\" : \"1998-067DM\",\n      \"OBJECT_NAME\" : \"FLOCK 1-6\",\n      \"OBJECT_NUMBER\" : \"39519\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0564\",\n      \"SATNAME\" : \"FLOCK 1-6\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DN\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DN\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39520\",\n      \"OBJECT_ID\" : \"1998-067DN\",\n      \"OBJECT_NAME\" : \"FLOCK 1-7\",\n      \"OBJECT_NUMBER\" : \"39520\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0733\",\n      \"SATNAME\" : \"FLOCK 1-7\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DP\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DP\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39521\",\n      \"OBJECT_ID\" : \"1998-067DP\",\n      \"OBJECT_NAME\" : \"FLOCK 1-8\",\n      \"OBJECT_NUMBER\" : \"39521\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0834\",\n      \"SATNAME\" : \"FLOCK 1-8\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5048\",\n      \"INTLDES\" : \"1998-067DQ\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DQ\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39525\",\n      \"OBJECT_ID\" : \"1998-067DQ\",\n      \"OBJECT_NAME\" : \"FLOCK 1-9\",\n      \"OBJECT_NUMBER\" : \"39525\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0604\",\n      \"SATNAME\" : \"FLOCK 1-9\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DR\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DR\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39526\",\n      \"OBJECT_ID\" : \"1998-067DR\",\n      \"OBJECT_NAME\" : \"FLOCK 1-10\",\n      \"OBJECT_NUMBER\" : \"39526\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.06\",\n      \"SATNAME\" : \"FLOCK 1-10\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DS\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DS\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39527\",\n      \"OBJECT_ID\" : \"1998-067DS\",\n      \"OBJECT_NAME\" : \"FLOCK 1-11\",\n      \"OBJECT_NUMBER\" : \"39527\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.067\",\n      \"SATNAME\" : \"FLOCK 1-11\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5048\",\n      \"INTLDES\" : \"1998-067DT\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DT\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39528\",\n      \"OBJECT_ID\" : \"1998-067DT\",\n      \"OBJECT_NAME\" : \"FLOCK 1-12\",\n      \"OBJECT_NUMBER\" : \"39528\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.061\",\n      \"SATNAME\" : \"FLOCK 1-12\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DU\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DU\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39529\",\n      \"OBJECT_ID\" : \"1998-067DU\",\n      \"OBJECT_NAME\" : \"FLOCK 1-13\",\n      \"OBJECT_NUMBER\" : \"39529\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0859\",\n      \"SATNAME\" : \"FLOCK 1-13\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DV\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DV\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39530\",\n      \"OBJECT_ID\" : \"1998-067DV\",\n      \"OBJECT_NAME\" : \"FLOCK 1-14\",\n      \"OBJECT_NUMBER\" : \"39530\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0854\",\n      \"SATNAME\" : \"FLOCK 1-14\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DW\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DW\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39531\",\n      \"OBJECT_ID\" : \"1998-067DW\",\n      \"OBJECT_NAME\" : \"FLOCK 1-15\",\n      \"OBJECT_NUMBER\" : \"39531\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0695\",\n      \"SATNAME\" : \"FLOCK 1-15\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5048\",\n      \"INTLDES\" : \"1998-067DX\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DX\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39532\",\n      \"OBJECT_ID\" : \"1998-067DX\",\n      \"OBJECT_NAME\" : \"FLOCK 1-16\",\n      \"OBJECT_NUMBER\" : \"39532\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0771\",\n      \"SATNAME\" : \"FLOCK 1-16\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DY\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DY\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39555\",\n      \"OBJECT_ID\" : \"1998-067DY\",\n      \"OBJECT_NAME\" : \"FLOCK 1-17\",\n      \"OBJECT_NUMBER\" : \"39555\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0723\",\n      \"SATNAME\" : \"FLOCK 1-17\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067DZ\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"DZ\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39556\",\n      \"OBJECT_ID\" : \"1998-067DZ\",\n      \"OBJECT_NAME\" : \"FLOCK 1-18\",\n      \"OBJECT_NUMBER\" : \"39556\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.063\",\n      \"SATNAME\" : \"FLOCK 1-18\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067EA\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"EA\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39557\",\n      \"OBJECT_ID\" : \"1998-067EA\",\n      \"OBJECT_NAME\" : \"FLOCK 1-21\",\n      \"OBJECT_NUMBER\" : \"39557\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.1179\",\n      \"SATNAME\" : \"FLOCK 1-21\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067EB\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"EB\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39558\",\n      \"OBJECT_ID\" : \"1998-067EB\",\n      \"OBJECT_NAME\" : \"FLOCK 1-22\",\n      \"OBJECT_NUMBER\" : \"39558\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0981\",\n      \"SATNAME\" : \"FLOCK 1-22\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067EC\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"EC\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39559\",\n      \"OBJECT_ID\" : \"1998-067EC\",\n      \"OBJECT_NAME\" : \"FLOCK 1-19\",\n      \"OBJECT_NUMBER\" : \"39559\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.126\",\n      \"SATNAME\" : \"FLOCK 1-19\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5048\",\n      \"INTLDES\" : \"1998-067ED\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"ED\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39560\",\n      \"OBJECT_ID\" : \"1998-067ED\",\n      \"OBJECT_NAME\" : \"FLOCK 1-20\",\n      \"OBJECT_NUMBER\" : \"39560\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0483\",\n      \"SATNAME\" : \"FLOCK 1-20\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067EE\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"EE\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39561\",\n      \"OBJECT_ID\" : \"1998-067EE\",\n      \"OBJECT_NAME\" : \"FLOCK 1-23\",\n      \"OBJECT_NUMBER\" : \"39561\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0935\",\n      \"SATNAME\" : \"FLOCK 1-23\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067EF\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"EF\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39562\",\n      \"OBJECT_ID\" : \"1998-067EF\",\n      \"OBJECT_NAME\" : \"FLOCK 1-24\",\n      \"OBJECT_NUMBER\" : \"39562\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0762\",\n      \"SATNAME\" : \"FLOCK 1-24\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067EG\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"EG\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39563\",\n      \"OBJECT_ID\" : \"1998-067EG\",\n      \"OBJECT_NAME\" : \"FLOCK 1-25\",\n      \"OBJECT_NUMBER\" : \"39563\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.072\",\n      \"SATNAME\" : \"FLOCK 1-25\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067EH\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"EH\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39564\",\n      \"OBJECT_ID\" : \"1998-067EH\",\n      \"OBJECT_NAME\" : \"FLOCK 1-26\",\n      \"OBJECT_NUMBER\" : \"39564\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0649\",\n      \"SATNAME\" : \"FLOCK 1-26\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067EK\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"EK\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39566\",\n      \"OBJECT_ID\" : \"1998-067EK\",\n      \"OBJECT_NAME\" : \"FLOCK 1-28\",\n      \"OBJECT_NUMBER\" : \"39566\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.055\",\n      \"SATNAME\" : \"FLOCK 1-28\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067EL\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"EL\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39567\",\n      \"OBJECT_ID\" : \"1998-067EL\",\n      \"OBJECT_NAME\" : \"ARDUSAT 2\",\n      \"OBJECT_NUMBER\" : \"39567\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0756\",\n      \"SATNAME\" : \"ARDUSAT 2\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"PER\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067EM\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"EM\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39568\",\n      \"OBJECT_ID\" : \"1998-067EM\",\n      \"OBJECT_NAME\" : \"UAPSAT 1\",\n      \"OBJECT_NUMBER\" : \"39568\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.041\",\n      \"SATNAME\" : \"UAPSAT 1\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"US\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067EN\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"EN\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39569\",\n      \"OBJECT_ID\" : \"1998-067EN\",\n      \"OBJECT_NAME\" : \"SKYCUBE\",\n      \"OBJECT_NUMBER\" : \"39569\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0791\",\n      \"SATNAME\" : \"SKYCUBE\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"LTU\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067EP\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"EP\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39570\",\n      \"OBJECT_ID\" : \"1998-067EP\",\n      \"OBJECT_NAME\" : \"LITSAT 1\",\n      \"OBJECT_NUMBER\" : \"39570\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.0849\",\n      \"SATNAME\" : \"LITSAT 1\",\n      \"SITE\" : \"TTMTR\"\n   },\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"LTU\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5049\",\n      \"INTLDES\" : \"1998-067EQ\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"EQ\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"39571\",\n      \"OBJECT_ID\" : \"1998-067EQ\",\n      \"OBJECT_NAME\" : \"LITUANICASAT 1\",\n      \"OBJECT_NUMBER\" : \"39571\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0.1182\",\n      \"SATNAME\" : \"LITUANICASAT 1\",\n      \"SITE\" : \"TTMTR\"\n   }\n]\n"
       ]
    },
    "https://www.space-track.org/basicspacedata/query/class/satcat/format/json/orderby/OBJECT_NUMBER%20asc/predicates/all/CURRENT/Y/DECAY/null-val/OBJECT_ID/~~1998-067" : {
@@ -222,6 +306,34 @@
          "[\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : null,\n      \"COUNTRY\" : \"ISS\",\n      \"DECAY\" : null,\n      \"FILE\" : \"6877\",\n      \"INTLDES\" : \"1998-067A\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"A\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0\",\n      \"SATNAME\" : \"ISS (ZARYA)\",\n      \"SITE\" : \"TTMTR\",\n      \"TLE_LINE1\" : null,\n      \"TLE_LINE2\" : null\n   }\n]\n"
       ]
    },
+   "https://www.space-track.org/basicspacedata/query/class/satcat/format/json/orderby/NORAD_CAT_ID%20asc/predicates/all/CURRENT/Y/DECAY/null-val/OBJECT_NAME/~~zarya" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "application/json",
+            "Status",
+            "200"
+         ],
+         "[\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : null,\n      \"COUNTRY\" : \"ISS\",\n      \"DECAY\" : null,\n      \"FILE\" : \"6877\",\n      \"INTLDES\" : \"1998-067A\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"A\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"0\",\n      \"SATNAME\" : \"ISS (ZARYA)\",\n      \"SITE\" : \"TTMTR\",\n      \"TLE_LINE1\" : null,\n      \"TLE_LINE2\" : null\n   }\n]\n"
+      ]
+   },
+   "https://www.space-track.org/basicspacedata/query/class/satcat/format/json/orderby/NORAD_CAT_ID%20asc/predicates/all/CURRENT/Y/DECAY/null-val/NORAD_CAT_ID/25544" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "application/json",
+            "Set-Cookie",
+            "chocolatechip=This bears no relation to any cookie set by Space Track; path=/; domain=www.space-track.org",
+            "Status",
+            "200"
+         ],
+         "[\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"ISS\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5055\",\n      \"INTLDES\" : \"1998-067A\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"A\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"256\",\n      \"SATNAME\" : \"ISS (ZARYA)\",\n      \"SITE\" : \"TTMTR\"\n   }\n]\n"
+      ]
+   },
    "https://www.space-track.org/basicspacedata/query/class/satcat/format/json/orderby/OBJECT_NUMBER%20asc/predicates/all/CURRENT/Y/DECAY/null-val/OBJECT_NUMBER/25544" : {
       "GET" : [
          "200",
@@ -237,6 +349,19 @@
          "[\n   {\n      \"COMMENT\" : null,\n      \"COMMENTCODE\" : \"0\",\n      \"COUNTRY\" : \"ISS\",\n      \"DECAY\" : null,\n      \"FILE\" : \"5055\",\n      \"INTLDES\" : \"1998-067A\",\n      \"LAUNCH\" : \"1998-11-20\",\n      \"LAUNCH_NUM\" : \"67\",\n      \"LAUNCH_PIECE\" : \"A\",\n      \"LAUNCH_YEAR\" : \"1998\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"RCSVALUE\" : \"256\",\n      \"SATNAME\" : \"ISS (ZARYA)\",\n      \"SITE\" : \"TTMTR\"\n   }\n]\n"
       ]
    },
+   "https://www.space-track.org/basicspacedata/query/class/gp_history/format/tle/orderby/NORAD_CAT_ID%20asc/EPOCH/2012-04-01%2000:00:00--2012-04-02%2000:00:00/NORAD_CAT_ID/25544" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "text/plain;charset=UTF-8",
+            "Status",
+            "200"
+         ],
+         "1 25544U First line of data\r\n2 25544 Second line of data\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n"
+      ]
+   },
    "https://www.space-track.org/basicspacedata/query/class/tle/format/tle/orderby/OBJECT_NUMBER%20asc/EPOCH/2012-04-01%2000:00:00--2012-04-02%2000:00:00/OBJECT_NUMBER/25544" : {
       "GET" : [
          "200",
@@ -250,6 +375,19 @@
          "1 25544U First line of data\r\n2 25544 Second line of data\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n"
       ]
    },
+   "https://www.space-track.org/basicspacedata/query/class/gp/NORAD_CAT_ID/25544" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "application/json",
+            "Status",
+            "200"
+         ],
+         "[\n   {\n      \"COMMENT\" : \"GENERATED VIA SPACETRACK.ORG API\",\n      \"FILE\" : \"2434103\",\n      \"INTLDES\" : \"98067A\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"TLE_LINE0\" : \"0 ISS (ZARYA)\",\n      \"TLE_LINE1\" : \"1 25544U First line of data\",\n      \"TLE_LINE2\" : \"2 25544 Second line of data\"\n   },\n   {\n      \"COMMENT\" : \"GENERATED VIA SPACETRACK.ORG API\",\n      \"FILE\" : \"2434105\",\n      \"INTLDES\" : \"98067A\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"TLE_LINE0\" : \"0 ISS (ZARYA)\",\n      \"TLE_LINE1\" : \"1 25544U First line of data\",\n      \"TLE_LINE2\" : \"2 25544 Second line of data\"\n   },\n   {\n      \"COMMENT\" : \"GENERATED VIA SPACETRACK.ORG API\",\n      \"FILE\" : \"2434106\",\n      \"INTLDES\" : \"98067A\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"TLE_LINE0\" : \"0 ISS (ZARYA)\",\n      \"TLE_LINE1\" : \"1 25544U First line of data\",\n      \"TLE_LINE2\" : \"2 25544 Second line of data\"\n   },\n   {\n      \"COMMENT\" : \"GENERATED VIA SPACETRACK.ORG API\",\n      \"FILE\" : \"2434108\",\n      \"INTLDES\" : \"98067A\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"TLE_LINE0\" : \"0 ISS (ZARYA)\",\n      \"TLE_LINE1\" : \"1 25544U First line of data\",\n      \"TLE_LINE2\" : \"2 25544 Second line of data\"\n   },\n   {\n      \"COMMENT\" : \"GENERATED VIA SPACETRACK.ORG API\",\n      \"FILE\" : \"2434294\",\n      \"INTLDES\" : \"98067A\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"TLE_LINE0\" : \"0 ISS (ZARYA)\",\n      \"TLE_LINE1\" : \"1 25544U First line of data\",\n      \"TLE_LINE2\" : \"2 25544 Second line of data\"\n   }\n]\n"
+      ]
+   },
    "https://www.space-track.org/basicspacedata/query/class/tle_latest/NORAD_CAT_ID/25544" : {
       "GET" : [
          "200",
@@ -261,6 +399,21 @@
             "200"
          ],
          "[\n   {\n      \"COMMENT\" : \"GENERATED VIA SPACETRACK.ORG API\",\n      \"FILE\" : \"2434103\",\n      \"INTLDES\" : \"98067A\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"TLE_LINE0\" : \"0 ISS (ZARYA)\",\n      \"TLE_LINE1\" : \"1 25544U First line of data\",\n      \"TLE_LINE2\" : \"2 25544 Second line of data\"\n   },\n   {\n      \"COMMENT\" : \"GENERATED VIA SPACETRACK.ORG API\",\n      \"FILE\" : \"2434105\",\n      \"INTLDES\" : \"98067A\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"TLE_LINE0\" : \"0 ISS (ZARYA)\",\n      \"TLE_LINE1\" : \"1 25544U First line of data\",\n      \"TLE_LINE2\" : \"2 25544 Second line of data\"\n   },\n   {\n      \"COMMENT\" : \"GENERATED VIA SPACETRACK.ORG API\",\n      \"FILE\" : \"2434106\",\n      \"INTLDES\" : \"98067A\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"TLE_LINE0\" : \"0 ISS (ZARYA)\",\n      \"TLE_LINE1\" : \"1 25544U First line of data\",\n      \"TLE_LINE2\" : \"2 25544 Second line of data\"\n   },\n   {\n      \"COMMENT\" : \"GENERATED VIA SPACETRACK.ORG API\",\n      \"FILE\" : \"2434108\",\n      \"INTLDES\" : \"98067A\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"TLE_LINE0\" : \"0 ISS (ZARYA)\",\n      \"TLE_LINE1\" : \"1 25544U First line of data\",\n      \"TLE_LINE2\" : \"2 25544 Second line of data\"\n   },\n   {\n      \"COMMENT\" : \"GENERATED VIA SPACETRACK.ORG API\",\n      \"FILE\" : \"2434294\",\n      \"INTLDES\" : \"98067A\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_NUMBER\" : \"25544\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"TLE_LINE0\" : \"0 ISS (ZARYA)\",\n      \"TLE_LINE1\" : \"1 25544U First line of data\",\n      \"TLE_LINE2\" : \"2 25544 Second line of data\"\n   }\n]\n"
+      ]
+   },
+   "https://www.space-track.org/basicspacedata/query/class/gp/format/3le/orderby/NORAD_CAT_ID%20asc/NORAD_CAT_ID/25544" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "text/plain; charset=UTF-8",
+            "Set-Cookie",
+            "chocolatechip=This bears no relation to any cookie set by Space Track; path=/; domain=www.space-track.org",
+            "Status",
+            "200"
+         ],
+         "0 ISS (ZARYA)\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n"
       ]
    },
    "https://www.space-track.org/basicspacedata/query/class/tle_latest/format/3le/orderby/OBJECT_NUMBER%20asc/OBJECT_NUMBER/25544/ORDINAL/1" : {
@@ -278,6 +431,21 @@
          "0 ISS (ZARYA)\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n"
       ]
    },
+   "https://www.space-track.org/basicspacedata/query/class/gp/format/3le/orderby/NORAD_CAT_ID%20asc/predicates/OBJECT_NAME,TLE_LINE1,TLE_LINE2/NORAD_CAT_ID/25544,39496,39512--39515,39518--39521,39525--39532,39555--39564,39566--39571" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "text/plain; charset=UTF-8",
+            "Set-Cookie",
+            "chocolatechip=This bears no relation to any cookie set by Space Track; path=/; domain=www.space-track.org",
+            "Status",
+            "200"
+         ],
+         "ISS (ZARYA)\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\nISS DEB (VSPLESK PLTFRM)\r\n1 39496U First line of data\r\n2 39496 Second line of data\r\nFLOCK 1-3\r\n1 39512U First line of data\r\n2 39512 Second line of data\r\nFLOCK 1-1\r\n1 39513U First line of data\r\n2 39513 Second line of data\r\nFLOCK 1-2\r\n1 39514U First line of data\r\n2 39514 Second line of data\r\nFLOCK 1-4\r\n1 39515U First line of data\r\n2 39515 Second line of data\r\nFLOCK 1-5\r\n1 39518U First line of data\r\n2 39518 Second line of data\r\nFLOCK 1-6\r\n1 39519U First line of data\r\n2 39519 Second line of data\r\nFLOCK 1-7\r\n1 39520U First line of data\r\n2 39520 Second line of data\r\nFLOCK 1-8\r\n1 39521U First line of data\r\n2 39521 Second line of data\r\nFLOCK 1-9\r\n1 39525U First line of data\r\n2 39525 Second line of data\r\nFLOCK 1-10\r\n1 39526U First line of data\r\n2 39526 Second line of data\r\nFLOCK 1-11\r\n1 39527U First line of data\r\n2 39527 Second line of data\r\nFLOCK 1-12\r\n1 39528U First line of data\r\n2 39528 Second line of data\r\nFLOCK 1-13\r\n1 39529U First line of data\r\n2 39529 Second line of data\r\nFLOCK 1-14\r\n1 39530U First line of data\r\n2 39530 Second line of data\r\nFLOCK 1-15\r\n1 39531U First line of data\r\n2 39531 Second line of data\r\nFLOCK 1-16\r\n1 39532U First line of data\r\n2 39532 Second line of data\r\nFLOCK 1-17\r\n1 39555U First line of data\r\n2 39555 Second line of data\r\nFLOCK 1-18\r\n1 39556U First line of data\r\n2 39556 Second line of data\r\nFLOCK 1-21\r\n1 39557U First line of data\r\n2 39557 Second line of data\r\nFLOCK 1-22\r\n1 39558U First line of data\r\n2 39558 Second line of data\r\nFLOCK 1-19\r\n1 39559U First line of data\r\n2 39559 Second line of data\r\nFLOCK 1-20\r\n1 39560U First line of data\r\n2 39560 Second line of data\r\nFLOCK 1-23\r\n1 39561U First line of data\r\n2 39561 Second line of data\r\nFLOCK 1-24\r\n1 39562U First line of data\r\n2 39562 Second line of data\r\nFLOCK 1-25\r\n1 39563U First line of data\r\n2 39563 Second line of data\r\nFLOCK 1-26\r\n1 39564U First line of data\r\n2 39564 Second line of data\r\nFLOCK 1-28\r\n1 39566U First line of data\r\n2 39566 Second line of data\r\nARDUSAT 2\r\n1 39567U First line of data\r\n2 39567 Second line of data\r\nUAPSAT 1\r\n1 39568U First line of data\r\n2 39568 Second line of data\r\nSKYCUBE\r\n1 39569U First line of data\r\n2 39569 Second line of data\r\nLITSAT 1\r\n1 39570U First line of data\r\n2 39570 Second line of data\r\nLITUANICASAT 1\r\n1 39571U First line of data\r\n2 39571 Second line of data\r\n"
+      ]
+   },
    "https://www.space-track.org/basicspacedata/query/class/tle_latest/format/3le/orderby/OBJECT_NUMBER%20asc/predicates/OBJECT_NAME,TLE_LINE1,TLE_LINE2/OBJECT_NUMBER/25544,39496,39512--39515,39518--39521,39525--39532,39555--39564,39566--39571/ORDINAL/1" : {
       "GET" : [
          "200",
@@ -293,6 +461,21 @@
          "ISS (ZARYA)\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\nISS DEB (VSPLESK PLTFRM)\r\n1 39496U First line of data\r\n2 39496 Second line of data\r\nFLOCK 1-3\r\n1 39512U First line of data\r\n2 39512 Second line of data\r\nFLOCK 1-1\r\n1 39513U First line of data\r\n2 39513 Second line of data\r\nFLOCK 1-2\r\n1 39514U First line of data\r\n2 39514 Second line of data\r\nFLOCK 1-4\r\n1 39515U First line of data\r\n2 39515 Second line of data\r\nFLOCK 1-5\r\n1 39518U First line of data\r\n2 39518 Second line of data\r\nFLOCK 1-6\r\n1 39519U First line of data\r\n2 39519 Second line of data\r\nFLOCK 1-7\r\n1 39520U First line of data\r\n2 39520 Second line of data\r\nFLOCK 1-8\r\n1 39521U First line of data\r\n2 39521 Second line of data\r\nFLOCK 1-9\r\n1 39525U First line of data\r\n2 39525 Second line of data\r\nFLOCK 1-10\r\n1 39526U First line of data\r\n2 39526 Second line of data\r\nFLOCK 1-11\r\n1 39527U First line of data\r\n2 39527 Second line of data\r\nFLOCK 1-12\r\n1 39528U First line of data\r\n2 39528 Second line of data\r\nFLOCK 1-13\r\n1 39529U First line of data\r\n2 39529 Second line of data\r\nFLOCK 1-14\r\n1 39530U First line of data\r\n2 39530 Second line of data\r\nFLOCK 1-15\r\n1 39531U First line of data\r\n2 39531 Second line of data\r\nFLOCK 1-16\r\n1 39532U First line of data\r\n2 39532 Second line of data\r\nFLOCK 1-17\r\n1 39555U First line of data\r\n2 39555 Second line of data\r\nFLOCK 1-18\r\n1 39556U First line of data\r\n2 39556 Second line of data\r\nFLOCK 1-21\r\n1 39557U First line of data\r\n2 39557 Second line of data\r\nFLOCK 1-22\r\n1 39558U First line of data\r\n2 39558 Second line of data\r\nFLOCK 1-19\r\n1 39559U First line of data\r\n2 39559 Second line of data\r\nFLOCK 1-20\r\n1 39560U First line of data\r\n2 39560 Second line of data\r\nFLOCK 1-23\r\n1 39561U First line of data\r\n2 39561 Second line of data\r\nFLOCK 1-24\r\n1 39562U First line of data\r\n2 39562 Second line of data\r\nFLOCK 1-25\r\n1 39563U First line of data\r\n2 39563 Second line of data\r\nFLOCK 1-26\r\n1 39564U First line of data\r\n2 39564 Second line of data\r\nFLOCK 1-28\r\n1 39566U First line of data\r\n2 39566 Second line of data\r\nARDUSAT 2\r\n1 39567U First line of data\r\n2 39567 Second line of data\r\nUAPSAT 1\r\n1 39568U First line of data\r\n2 39568 Second line of data\r\nSKYCUBE\r\n1 39569U First line of data\r\n2 39569 Second line of data\r\nLITSAT 1\r\n1 39570U First line of data\r\n2 39570 Second line of data\r\nLITUANICASAT 1\r\n1 39571U First line of data\r\n2 39571 Second line of data\r\n"
       ]
    },
+   "https://www.space-track.org/basicspacedata/query/class/gp/format/3le/orderby/NORAD_CAT_ID%20asc/predicates/OBJECT_NAME,TLE_LINE1,TLE_LINE2/NORAD_CAT_ID/25544" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "text/plain; charset=UTF-8",
+            "Set-Cookie",
+            "chocolatechip=This bears no relation to any cookie set by Space Track; path=/; domain=www.space-track.org",
+            "Status",
+            "200"
+         ],
+         "ISS (ZARYA)\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n"
+      ]
+   },
    "https://www.space-track.org/basicspacedata/query/class/tle_latest/format/3le/orderby/OBJECT_NUMBER%20asc/predicates/OBJECT_NAME,TLE_LINE1,TLE_LINE2/OBJECT_NUMBER/25544/ORDINAL/1" : {
       "GET" : [
          "200",
@@ -306,6 +489,21 @@
             "200"
          ],
          "ISS (ZARYA)\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n"
+      ]
+   },
+   "https://www.space-track.org/basicspacedata/query/class/gp/format/json/orderby/NORAD_CAT_ID%20asc/NORAD_CAT_ID/25544" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "application/json",
+            "Set-Cookie",
+            "chocolatechip=This bears no relation to any cookie set by Space Track; path=/; domain=www.space-track.org",
+            "Status",
+            "200"
+         ],
+         "[\n   {\n      \"COMMENT\" : \"GENERATED VIA SPACETRACK.ORG API\",\n      \"FILE\" : \"1681502\",\n      \"INTLDES\" : \"98067A\",\n      \"NORAD_CAT_ID\" : \"25544\",\n      \"OBJECT_ID\" : \"1998-067A\",\n      \"OBJECT_NAME\" : \"ISS (ZARYA)\",\n      \"OBJECT_TYPE\" : \"PAYLOAD\",\n      \"TLE_LINE0\" : \"0 ISS (ZARYA)\",\n      \"TLE_LINE1\" : \"1 25544U First line of data\",\n      \"TLE_LINE2\" : \"2 25544 Second line of data\"\n   }\n]\n"
       ]
    },
    "https://www.space-track.org/basicspacedata/query/class/tle_latest/format/json/orderby/OBJECT_NUMBER%20asc/OBJECT_NUMBER/25544/ORDINAL/1" : {
@@ -334,6 +532,34 @@
             "200"
          ],
          "1 20918U First line of data\r\n2 20918 Second line of data\r\n1 21149U First line of data\r\n2 21149 Second line of data\r\n1 21814U First line of data\r\n2 21814 Second line of data\r\n1 21940U First line of data\r\n2 21940 Second line of data\r\n1 23839U First line of data\r\n2 23839 Second line of data\r\n1 24307U First line of data\r\n2 24307 Second line of data\r\n1 24674U First line of data\r\n2 24674 Second line of data\r\n1 24819U First line of data\r\n2 24819 Second line of data\r\n1 25153U First line of data\r\n2 25153 Second line of data\r\n1 28628U First line of data\r\n2 28628 Second line of data\r\n1 28899U First line of data\r\n2 28899 Second line of data\r\n1 33278U First line of data\r\n2 33278 Second line of data\r\n1 39476U First line of data\r\n2 39476 Second line of data\r\n1 40384U First line of data\r\n2 40384 Second line of data\r\n1 40882U First line of data\r\n2 40882 Second line of data\r\n1 42698U First line of data\r\n2 42698 Second line of data\r\n"
+      ]
+   },
+   "https://www.space-track.org/basicspacedata/query/class/gp/format/tle/orderby/NORAD_CAT_ID%20asc/EPOCH/%3Enow-30/OBJECT_NAME/inmarsat~~/OBJECT_TYPE/payload" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "text/plain;charset=UTF-8",
+            "Status",
+            "200"
+         ],
+         "1 20918U First line of data\r\n2 20918 Second line of data\r\n1 21149U First line of data\r\n2 21149 Second line of data\r\n1 21814U First line of data\r\n2 21814 Second line of data\r\n1 21940U First line of data\r\n2 21940 Second line of data\r\n1 23839U First line of data\r\n2 23839 Second line of data\r\n1 24307U First line of data\r\n2 24307 Second line of data\r\n1 24674U First line of data\r\n2 24674 Second line of data\r\n1 24819U First line of data\r\n2 24819 Second line of data\r\n1 25153U First line of data\r\n2 25153 Second line of data\r\n1 28628U First line of data\r\n2 28628 Second line of data\r\n1 28899U First line of data\r\n2 28899 Second line of data\r\n1 33278U First line of data\r\n2 33278 Second line of data\r\n1 39476U First line of data\r\n2 39476 Second line of data\r\n1 40384U First line of data\r\n2 40384 Second line of data\r\n1 40882U First line of data\r\n2 40882 Second line of data\r\n1 42698U First line of data\r\n2 42698 Second line of data\r\n"
+      ]
+   },
+   "https://www.space-track.org/basicspacedata/query/class/gp/format/tle/orderby/NORAD_CAT_ID%20asc/NORAD_CAT_ID/1--50" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "text/plain; charset=UTF-8",
+            "Set-Cookie",
+            "chocolatechip=This bears no relation to any cookie set by Space Track; path=/; domain=www.space-track.org",
+            "Status",
+            "200"
+         ],
+         "1 00004U First line of data\r\n2 00004 Second line of data\r\n1 00005U First line of data\r\n2 00005 Second line of data\r\n1 00008U First line of data\r\n2 00008 Second line of data\r\n1 00009U First line of data\r\n2 00009 Second line of data\r\n1 00011U First line of data\r\n2 00011 Second line of data\r\n1 00012U First line of data\r\n2 00012 Second line of data\r\n1 00015U First line of data\r\n2 00015 Second line of data\r\n1 00016U First line of data\r\n2 00016 Second line of data\r\n1 00017U First line of data\r\n2 00017 Second line of data\r\n1 00018U First line of data\r\n2 00018 Second line of data\r\n1 00019U First line of data\r\n2 00019 Second line of data\r\n1 00020U First line of data\r\n2 00020 Second line of data\r\n1 00022U First line of data\r\n2 00022 Second line of data\r\n1 00023U First line of data\r\n2 00023 Second line of data\r\n1 00024U First line of data\r\n2 00024 Second line of data\r\n1 00025U First line of data\r\n2 00025 Second line of data\r\n1 00026U First line of data\r\n2 00026 Second line of data\r\n1 00028U First line of data\r\n2 00028 Second line of data\r\n1 00029U First line of data\r\n2 00029 Second line of data\r\n1 00030U First line of data\r\n2 00030 Second line of data\r\n1 00031U First line of data\r\n2 00031 Second line of data\r\n1 00032U First line of data\r\n2 00032 Second line of data\r\n1 00033U First line of data\r\n2 00033 Second line of data\r\n1 00034U First line of data\r\n2 00034 Second line of data\r\n1 00035U First line of data\r\n2 00035 Second line of data\r\n1 00036U First line of data\r\n2 00036 Second line of data\r\n1 00037U First line of data\r\n2 00037 Second line of data\r\n1 00038U First line of data\r\n2 00038 Second line of data\r\n1 00039U First line of data\r\n2 00039 Second line of data\r\n1 00040U First line of data\r\n2 00040 Second line of data\r\n1 00041U First line of data\r\n2 00041 Second line of data\r\n1 00042U First line of data\r\n2 00042 Second line of data\r\n1 00043U First line of data\r\n2 00043 Second line of data\r\n1 00044U First line of data\r\n2 00044 Second line of data\r\n1 00045U First line of data\r\n2 00045 Second line of data\r\n1 00046U First line of data\r\n2 00046 Second line of data\r\n1 00047U First line of data\r\n2 00047 Second line of data\r\n1 00048U First line of data\r\n2 00048 Second line of data\r\n1 00049U First line of data\r\n2 00049 Second line of data\r\n1 00050U First line of data\r\n2 00050 Second line of data\r\n"
       ]
    },
    "https://www.space-track.org/basicspacedata/query/class/tle_latest/format/tle/orderby/OBJECT_NUMBER%20asc/OBJECT_NUMBER/1--50/ORDINAL/1" : {
@@ -377,7 +603,35 @@
          "1 25544U First line of data\r\n2 25544 Second line of data\r\n1 25545U First line of data\r\n2 25545 Second line of data\r\n1 25546U First line of data\r\n2 25546 Second line of data\r\n"
       ]
    },
+   "https://www.space-track.org/basicspacedata/query/class/gp/format/tle/orderby/NORAD_CAT_ID%20asc/NORAD_CAT_ID/25544--25546" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "text/plain;charset=UTF-8",
+            "Status",
+            "200"
+         ],
+         "1 25544U First line of data\r\n2 25544 Second line of data\r\n1 25545U First line of data\r\n2 25545 Second line of data\r\n1 25546U First line of data\r\n2 25546 Second line of data\r\n"
+      ]
+   },
    "https://www.space-track.org/basicspacedata/query/class/tle_latest/format/tle/orderby/OBJECT_NUMBER%20asc/OBJECT_NUMBER/25544/ORDINAL/1" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "text/plain; charset=UTF-8",
+            "Set-Cookie",
+            "chocolatechip=This bears no relation to any cookie set by Space Track; path=/; domain=www.space-track.org",
+            "Status",
+            "200"
+         ],
+         "1 25544U First line of data\r\n2 25544 Second line of data\r\n"
+      ]
+   },
+   "https://www.space-track.org/basicspacedata/query/class/gp/format/tle/orderby/NORAD_CAT_ID%20asc/NORAD_CAT_ID/25544" : {
       "GET" : [
          "200",
          "OK",
@@ -407,6 +661,19 @@
          "1 25544U First line of data\r\n2 25544 Second line of data\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n1 25544U First line of data\r\n2 25544 Second line of data\r\n"
       ]
    },
+   "https://www.space-track.org/basicspacedata/query/class/gp/format/tle/orderby/NORAD_CAT_ID%20asc/NORAD_CAT_ID/34627,35691" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "text/plain;charset=UTF-8",
+            "Status",
+            "200"
+         ],
+         "1 34627U First line of data\r\n2 34627 Second line of data\r\n1 35691U First line of data\r\n2 35691 Second line of data\r\n"
+      ]
+   },
    "https://www.space-track.org/basicspacedata/query/class/tle_latest/format/tle/orderby/OBJECT_NUMBER%20asc/OBJECT_NUMBER/34627,35691/ORDINAL/1" : {
       "GET" : [
          "200",
@@ -420,6 +687,19 @@
          "1 34627U First line of data\r\n2 34627 Second line of data\r\n1 35691U First line of data\r\n2 35691 Second line of data\r\n"
       ]
    },
+   "https://www.space-track.org/basicspacedata/query/class/gp/format/tle/orderby/NORAD_CAT_ID%20asc/NORAD_CAT_ID/38358,38359" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "text/plain;charset=UTF-8",
+            "Status",
+            "200"
+         ],
+         "1 38358U First line of data\r\n2 38358 Second line of data\r\n1 38359U First line of data\r\n2 38359 Second line of data\r\n"
+      ]
+   },
    "https://www.space-track.org/basicspacedata/query/class/tle_latest/format/tle/orderby/OBJECT_NUMBER%20asc/OBJECT_NUMBER/38358,38359/ORDINAL/1" : {
       "GET" : [
          "200",
@@ -431,6 +711,21 @@
             "200"
          ],
          "1 38358U First line of data\r\n2 38358 Second line of data\r\n1 38359U First line of data\r\n2 38359 Second line of data\r\n"
+      ]
+   },
+   "https://www.space-track.org/basicspacedata/query/class/gp/format/tle/orderby/NORAD_CAT_ID%20asc/NORAD_CAT_ID/51--66" : {
+      "GET" : [
+         "200",
+         "OK",
+         [
+            "Content-Type",
+            "text/plain; charset=UTF-8",
+            "Set-Cookie",
+            "chocolatechip=This bears no relation to any cookie set by Space Track; path=/; domain=www.space-track.org",
+            "Status",
+            "200"
+         ],
+         "1 00051U First line of data\r\n2 00051 Second line of data\r\n1    52U First line of data\r\n2    52 Second line of data\r\n1 00053U First line of data\r\n2 00053 Second line of data\r\n1 00054U First line of data\r\n2 00054 Second line of data\r\n1 00055U First line of data\r\n2 00055 Second line of data\r\n1 00056U First line of data\r\n2 00056 Second line of data\r\n1 00057U First line of data\r\n2 00057 Second line of data\r\n1 00058U First line of data\r\n2 00058 Second line of data\r\n1 00059U First line of data\r\n2 00059 Second line of data\r\n1 00060U First line of data\r\n2 00060 Second line of data\r\n1 00061U First line of data\r\n2 00061 Second line of data\r\n1 00062U First line of data\r\n2 00062 Second line of data\r\n1 00063U First line of data\r\n2 00063 Second line of data\r\n1 00064U First line of data\r\n2 00064 Second line of data\r\n1 00065U First line of data\r\n2 00065 Second line of data\r\n1 00066U First line of data\r\n2 00066 Second line of data\r\n"
       ]
    },
    "https://www.space-track.org/basicspacedata/query/class/tle_latest/format/tle/orderby/OBJECT_NUMBER%20asc/OBJECT_NUMBER/51--66/ORDINAL/1" : {

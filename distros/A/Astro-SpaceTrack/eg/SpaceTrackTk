@@ -10,7 +10,7 @@ use IO::File;
 use Tk;
 use Tk::Pane;
 
-our $VERSION = '0.172';
+our $VERSION = '0.180';
 
 my @pad = qw{ -padx 5 -pady 5 };	# Standard cell padding
 
@@ -450,19 +450,6 @@ sub retrieve_args {
 sub retrieve_options_widgets {
     my ( $widget, $source, $data, $dg ) = @_;
 
-    $widget->{$source}{last5_label} ||= $widget->{data_frame}->Label(
-	-text => 'Return last 5 data sets:' );
-    $widget->{$source}{last5_value} ||= $widget->{data_frame}->Checkbutton(
-	-relief => 'flat',
-	-variable => \$data->{$source}{last5},
-	-command => sub {
-	    $widget->{$source}{start_value}->configure( -state =>
-		$data->{$source}{last5} ? 'disable' : 'normal' );
-	    $widget->{$source}{end_value}->configure( -state =>
-		$data->{$source}{last5} ? 'disable' : 'normal' );
-	},
-    );
-
     $widget->{$source}{start_label} ||= $widget->{data_frame}->Label(
 	-text => 'Start epoch (year-month-day):' );
     $widget->{$source}{start_value} ||= $widget->{data_frame}->Entry(
@@ -493,12 +480,6 @@ sub retrieve_options_widgets {
 	-relief => 'flat',
 	-variable => \$data->{$source}{descending},
     );
-
-    grid_next_row( $dg );
-    $widget->{$source}{last5_label}->grid(
-	grid_args( $dg, sticky => 'e') );
-    $widget->{$source}{last5_value}->grid(
-	grid_args( $dg, sticky => 'w') )->raise();
 
     grid_next_row( $dg );
     $widget->{$source}{start_label}->grid(
@@ -536,13 +517,11 @@ sub retrieve_options_widgets_state {
     my $state = ( exists $data->{$source}{retrieve_tle}
 	&& ! $data->{$source}{retrieve_tle} ) ? 'disable' : 'normal';
 
-    foreach my $name ( qw{ last5_value sort_value desc_value
+    foreach my $name ( qw{ sort_value desc_value
 	retrieve_rcs_value } ) {
 	exists $widget->{$source}{$name} or next;
 	$widget->{$source}{$name}->configure( -state => $state );
     }
-
-    $data->{$source}{last5} and $state = 'disable';
 
     foreach my $name ( qw{ start_value end_value } ) {
 	exists $widget->{$source}{$name} or next;
@@ -561,14 +540,10 @@ sub retrieve_options_args {
 	and not $data->{$source}{retrieve_tle}
 	and return @rslt;
 
-    if ( $data->{$source}{last5} ) {
-	push @rslt, '-last5';
-    } else {
-	$data->{$source}{start_epoch}
-	    and push @rslt, '-start_epoch', $data->{$source}{start_epoch};
-	$data->{$source}{end_epoch}
-	    and push @rslt, '-end_epoch', $data->{$source}{end_epoch};
-    }
+    $data->{$source}{start_epoch}
+	and push @rslt, '-start_epoch', $data->{$source}{start_epoch};
+    $data->{$source}{end_epoch}
+	and push @rslt, '-end_epoch', $data->{$source}{end_epoch};
     $data->{$source}{sort_type}
 	and push @rslt, '-sort', $data->{$source}{sort_type};
     $data->{$source}{descending} and push @rslt, '-descending';

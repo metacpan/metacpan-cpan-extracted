@@ -1,284 +1,320 @@
 # NAME
 
-Net::BitTorrent::DHT - Kademlia-like DHT Node for BitTorrent
+Net::BitTorrent::DHT - BitTorrent Mainline DHT implementation
 
-# Synopsis
+# SYNOPSIS
 
-    use Net::BitTorrent::DHT;
-    use AnyEvent;
-    use Bit::Vector;
-    # Standalone node with user-defined port and boot_nodes
-    my $dht = Net::BitTorrent::DHT->new(
-          port => [1337 .. 1340, 0],
-          boot_nodes =>
-              [['router.bittorrent.com', 6881], ['router.utorrent.com', 6881]]
-    );
+```perl
+use Net::BitTorrent::DHT;
 
-    my $peer_quest
-    = $dht->get_peers(Bit::Vector->new_Hex('ab97a7bca78f2628380e6609a8241a7fb02aa981'), \&dht_cb);
+my $dht = Net::BitTorrent::DHT->new(
+    node_id_bin => pack('H*', '0123456789abcdef0123456789abcdef01234567'),
+    port        => 6881,
+    address     => '0.0.0.0' # Optional: bind to specific address
+    want_v6     => 1
+);
 
-    # tick, tick, tick, ...
-    AnyEvent->condvar->recv;
+# Connect to the DHT network
+$dht->bootstrap();
 
-    sub dht_cb {
-        my ($infohash, $node, $peers) = @_;
-        printf "We found %d peers for %s from %s:%d via DHT\n\t%s\n",
-            scalar(@$peers),
-            $infohash->to_Hex, $node->host, $node->port,
-            join ', ', map { sprintf '%s:%d', @$_ } @$peers;
+# Event loop integration
+while (1) {
+    # Process incoming packets and timeouts
+    my ($new_nodes, $found_peers, $data) = $dht->tick(0.1);
+
+    # $found_peers contains Net::BitTorrent::DHT::Peer objects
+    for my $peer (@$found_peers) {
+        say "Found peer: " . $peer->to_string;
     }
+}
+```
 
-# Description
+# DESCRIPTION
 
-BitTorrent uses a "distributed sloppy hash table" (DHT) for storing peer
-contact information for "trackerless" torrents. In effect, each peer becomes a
-tracker. The protocol is based on [Kademila](#kademlia) and is implemented
-over UDP.
+`Net::BitTorrent::DHT` is a comprehensive implementation of the BitTorrent Mainline DHT protocol. It is designed to be
+transport-agnostic and event-loop friendly, making it suitable for integration into existing applications. It uses
+[Algorithm::Kademlia](https://metacpan.org/pod/Algorithm%3A%3AKademlia) for its core routing logic and [Net::BitTorrent::Protocol::BEP03::Bencode](https://metacpan.org/pod/Net%3A%3ABitTorrent%3A%3AProtocol%3A%3ABEP03%3A%3ABencode) for wire
+serialization.
 
-# Methods
+# CONSTRUCTOR
 
-[Net::BitTorrent::DHT](https://metacpan.org/pod/Net::BitTorrent::DHT)'s API is simple but powerful.
-...well, I think so anyway.
+## `new( %args )`
 
-# Net::BitTorrent::DHT->new( )
+Creates a new DHT node instance. All arguments are optional.
 
-The constructor accepts a number different arguments which all greatly affect
-the function of your DHT node. Any combination of the following arguments may
-be used during construction.
+```perl
+my $dht = Net::BitTorrent::DHT->new( port => 8999 );
+```
 
-For brevity, the following examples assume you are building a
-[standalone node](https://metacpan.org/pod/Net::BitTorrent::DHT::Standalone) (for reasearch, etc.).
+- `node_id_bin`
 
-## Net::BitTorrent::DHT->new( nodeid => ... )
+    A 20-byte binary string representing the unique Node ID. If not provided, one is generated randomly. It is recommended
+    to persist this ID between sessions.
 
-During construction, our local DHT nodeID can be set during construction. This
-is mostly useful when creating a
-[standalone DHT node](https://metacpan.org/pod/Net::BitTorrent::DHT::Standalone).
+- `port`
 
-    use Net::BitTorrent::DHT;
-    # Bit::Vector object
-    use Bit::Vector;
-    my $node_c = Net::BitTorrent::DHT->new(
-        nodeid => Bit::Vector->new_Hex( 160, 'ABCD' x 10 )
-    );
-    # A SHA1 digest
-    use Digest::SHA;
-    my $node_d = Net::BitTorrent::DHT->new(
-            nodeid => Bit::Vector->new_Hex( 160, Digest::SHA::sha1( $possibly_random_value ) )
-    );
+    The UDP port to listen on. Defaults to `6881`.
 
-Note that storing and reusing DHT nodeIDs over a number of sessions may seem
-advantagious (as if you had a "reserved parking place" in the DHT network) but
-will likely not improve performance as unseen nodeIDs are removed from remote
-routing tables after a half hour.
+- `address`
 
-NodeIDs, are 160-bit integers.
+    The local address to bind to. Defaults to `undef` (binds to all interfaces).
 
-## Net::BitTorrent::DHT->new( port => ... )
+- `want_v4`
 
-Opens a specific UDP port number to the outside world on both IPv4 and IPv6.
+    Boolean. Enable IPv4 support. Defaults to `1`.
 
-    use Net::BitTorrent::DHT;
-    # A single possible port
-    my $node_a = Net::BitTorrent::DHT->new( port => 1123 );
-    # A list of ports
-    my $node_b = Net::BitTorrent::DHT->new( port => [1235 .. 9875] );
+- `want_v6`
 
-Note that when handed a list of ports, they are each tried until we are able
-to bind to the specific port.
+    Boolean. Enable IPv6 support. Defaults to `1`.
 
-# Net::BitTorrent::DHT->find\_node( $target, $callback )
+- `v`
 
-This method asks for remote nodes with nodeIDs closer to our target. As the
-remote nodes respond, the callback is called with the following arguments:
+    A 4-byte binary string representing the client version (e.g., `NB21`). This is included in every message to identify
+    the client software. The first two bytes should be a client identifier registered in BEP20, followed by two bytes
+    representing the version number. Optional but recommended.
 
-- target
+- `bep32`
 
-    This is the target nodeid. This is useful when you've set the same callback
-    for multiple, concurrent `find_node( )` [quest](#quests-and-callbacks).
+    Boolean. Enable BEP 32 (IPv6 extensions). Defaults to `1`.
 
-    Targets are 160-bit [Bit::Vector](https://metacpan.org/pod/Bit::Vector) objects.
+- `bep33`
 
-- node
+    Boolean. Enable BEP 33 (Scraping). Defaults to `1`.
 
-    This is a blessed object. TODO.
+- `bep42`
 
-- nodes
+    Boolean. Enable BEP 42 (Security Extensions). Defaults to `1`.
 
-    This is a list of ip:port combinations the remote node claims are close to our
-    target.
+- `bep44`
 
-A single `find_node` [quest](https://metacpan.org/pod/Net::BitTorrent::Notes#Quests-and-Callbacks)
-is an array ref which contains the following data:
+    Boolean. Enable BEP 44 (Arbitrary Data). Defaults to `1`.
 
-- target
+    Note: Only supports immutable data unless dependencies are met.
 
-    This is the target nodeID.
+- `read_only`
 
-- coderef
+    Boolean. Enable BEP 43 (Read-only mode). Defaults to `0`.
 
-    This is the callback triggered as we locate new peers.
+- `boot_nodes`
 
-- nodes
+    An array reference of `[host, port]` tuples to use for bootstrapping. Defaults to standard public routers
+    (`router.bittorrent.com`, etc.).
 
-    This is a list of nodes we have announced to so far.
+# METHODS
 
-- timer
+## `bootstrap( )`
 
-    This is an [AnyEvent](https://metacpan.org/pod/AnyEvent) timer which is triggered every few minutes.
+Initializes the node by querying the bootstrap nodes. This kicks off the process of finding other nodes and populating
+the routing table.
 
-    Don't modify this.
+```
+$dht->bootstrap( );
+```
 
-# Net::BitTorrent::DHT->get\_peers( $infohash, $callback )
+## `tick( [$timeout] )`
 
-This method initiates a search for peers serving a torrent with this infohash.
-As they are found, the callback is called with the following arguments:
+Checks for incoming packets and processes them. Should be called repeatedly in your event loop.
 
-- infohash
+```perl
+my ( $nodes, $peers, $data ) = $dht->tick( 0.5 );
+```
 
-    This is the infohash related to these peers. This is useful when you've set
-    the same callback for multiple, concurrent `get_peers( )` quests. This is a
-    160-bit [Bit::Vector](https://metacpan.org/pod/Bit::Vector) object.
+Returns a list of three elements:
 
-- node
+- `$nodes`: array of hash references representing new nodes found.
+- `$peers`: array of `Net::BitTorrent::DHT::Peer` objects found (responses to `get_peers`).
+- `$data`: hash of data or stats (responses to `get`, `scrape_peers`, `sample_infohashes`).
 
-    This is a blessed object. TODO.
+## `ping( $addr, $port )`
 
-- peers
+Sends a ping query to a remote node. Useful for checking liveness.
 
-    This is an array ref of peers sent to us by aforementioned remote node.
+```
+$dht->ping( '1.2.3.4', 6881 );
+```
 
-A single `get_peers` [quest](https://metacpan.org/pod/Net::BitTorrent::Notes#Quests-and-Callbacks)
-is an array ref which contains the following data:
+## `find_node_remote( $target_id, $addr, $port )`
 
-- infohash
+Queries a node for nodes close to the target ID. Used during routing table maintenance and lookups.
 
-    This is the infohash related to these peers. This is a 160-bit
-    [Bit::Vector](https://metacpan.org/pod/Bit::Vector) object.
+```
+$dht->find_node_remote( $target_id, '1.2.3.4', 6881 );
+```
 
-- coderef
+## `get_peers( $info_hash, $addr, $port )`
 
-    This is the callback triggered as we locate new peers.
+Queries a node for peers associated with an infohash. The primary method for peer discovery.
 
-- peers
+```
+$dht->get_peers( $info_hash, '1.2.3.4', 6881 );
+```
 
-    This is a compacted list of all peers found so far. This is probably more
-    useful than the list passed to the callback.
+## `announce_peer( $info_hash, $token, $implied_port, $addr, $port, [$seed] )`
 
-- timer
+Announces to a remote node that you are a peer for the given infohash. Requires a valid `$token` received from a
+previous `get_peers` response from that node.
 
-    This is an [AnyEvent](https://metacpan.org/pod/AnyEvent) timer which is triggered every five minutes.
-    When triggered, the node requests new peers from nodes in the bucket nearest
-    to the infohash.
+```
+# $token received from get_peers response
+$dht->announce_peer( $info_hash, $token, 6881, '1.2.3.4', 6881, 1 );
+```
 
-    Don't modify this.
+## `get_remote( $target, $addr, $port )`
 
-# Net::BitTorrent::DHT->**announce\_peer**( $infohash, $port, $callback )
+Sends a BEP 44 `get` query to retrieve data associated with a target (SHA1 hash of the key or value).
 
-This method announces that the peer controlling the querying node is
-downloading a torrent on a port. These outgoing queries are sent to nodes
-'close' to the target infohash. As the remote nodes respond, the callback is
-called with the following arguments:
+```
+$dht->get_remote( $target_hash, '1.2.3.4', 6881 );
+```
 
-- infohash
+## `put_remote( \%args, $addr, $port )`
 
-    This is the infohash related to this announcment. This is useful when you've
-    set the same callback for multiple, concurrent `announce_peer( )`
-    [quest](#quests-and-callbacks). Infohashes are 160-bit
-    [Bit::Vector](https://metacpan.org/pod/Bit::Vector) objects.
+Sends a BEP 44 `put` query to store data on a remote node.
 
-- port
+```perl
+# Immutable Data
+$dht->put_remote( { v => 'Hello World' }, '1.2.3.4', 6881 );
 
-    This is port you defined above.
+# Mutable Data
+$dht->put_remote(
+{   v    => 'New Value',
+    k    => $public_key_bin,
+    sig  => $signature_bin,
+    seq  => $sequence_number,
+    salt => 'optional_salt'
+}, '1.2.3.4', 6881 );
+```
 
-- node
+## `scrape_peers_remote( $info_hash, $addr, $port )`
 
-    This is a blessed object. TODO.
+Sends a BEP 33 scrape query to get statistics (seeders/leechers) for an infohash.
 
-A single `announce_peer` [quest](#quests-and-callbacks) is an array ref
-which contains the following data:
+```
+$dht->scrape_peers_remote( $info_hash, '1.2.3.4', 6881 );
+```
 
-- infohash
+## `sample_infohashes_remote( $target_id, $addr, $port )`
 
-    This is the infohash related to these peers. This is a 160-bit
-    [Bit::Vector](https://metacpan.org/pod/Bit::Vector) object.
+Sends a BEP 51 sample infohashes query to discover infohashes stored on a node.
 
-- coderef
+```
+$dht->sample_infohashes_remote( $target_id, '1.2.3.4', 6881 );
+```
 
-    This is the callback triggered as we locate new peers.
+## `export_state( )`
 
-- port
+Returns the current state (routing table buckets, values, peers) as a hash reference. This is essential for saving the
+DHT's progress so it doesn't have to re-bootstrap on restart.
 
-    This is port you defined above.
+```perl
+my $state = $dht->export_state( );
+# Save $state to disk...
+```
 
-- nodes
+## `import_state( $state )`
 
-    This is a list of nodes we have announced to so far.
+Restores the DHT state from a hash reference previously generated by `export_state()`.
 
-- timer
+```
+$dht->import_state( $loaded_state );
+```
 
-    This is an [AnyEvent](https://metacpan.org/pod/AnyEvent) timer which is triggered every few minutes.
+## `run( )`
 
-    Don't modify this.
+A simple blocking loop that calls `tick( 1 )` indefinitely. Useful for simple scripts.
 
-`announce_peer` queries require a token sent in reply to a `get_peers` query
-so they should be used together.
+```
+$dht->run( );
+```
 
-    use Net::BitTorrent::DHT;
-    my $node = Net::BitTorrent::DHT->new( );
-    my $quest_a = $dht->announce_peer(Bit::Vector->new_Hex('A' x 40), 6881, \&dht_cb);
-    my $quest_b = $dht->announce_peer(Bit::Vector->new_Hex('1' x 40), 9585, \&dht_cb);
+## `handle_incoming( )`
 
-    sub dht_cb {
-        my ($infohash, $port, $node) = @_;
-        say sprintf '%s:%d now knows we are serving %s on port %d',
-            $node->host, $node->port, $infohash->to_Hex, $port;
+Manually processes a single packet from the socket. Used when integrating with other event loops where you control the
+socket reading.
+
+```perl
+$loop->watch_io(
+    handle => $dht->socket,
+    on_read_ready => sub {
+        my ($nodes, $peers, $data) = $dht->handle_incoming();
+        # ...
     }
+);
+```
 
-# Net::BitTorrent::DHT->dump\_ipv4\_buckets( )
+# Event Loop Integration
 
-This is a quick utility method which returns or prints (depending on context)
-a list of the IPv4-based routing table's bucket structure.
+This module is designed to be protocol-agnostic regarding the event loop.
 
-    use Net::BitTorrent::DHT;
-    my $node = Net::BitTorrent::DHT->new( );
-    # After some time has passed...
-    $node->dump_ipv4_buckets; # prints to STDOUT with say
-    my @dump = $node->dump_ipv4_buckets; # returns list of lines
+## Using with IO::Select (Default)
 
-# Net::BitTorrent::DHT->dump\_ipv6\_buckets( )
+Simply call `tick($timeout)` in your own loop.
 
-This is a quick utility method which returns or prints (depending on context)
-a list of the IPv6-based routing table's bucket structure.
+## Using with IO::Async
 
-    use Net::BitTorrent::DHT;
-    my $node = Net::BitTorrent::DHT->new( );
-    # After some time has passed...
-    $node->dump_ipv6_buckets; # prints to STDOUT with say
-    my @dump = $node->dump_ipv6_buckets; # returns list of lines
+```perl
+my $handle = IO::Async::Handle->new(
+    handle => $dht->socket,
+    on_read_ready => sub {
+        my ($nodes, $peers) = $dht->handle_incoming();
+        # ...
+    },
+);
+$loop->add($handle);
+```
 
-# Author
+# Supported BEPs
 
-Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/
+This module implements the following BitTorrent Enhancement Proposals (BEPs):
 
-CPAN ID: SANKO
+## BEP 5: Mainline DHT Protocol
 
-# License and Legal
+The core protocol implementation. It allows for decentralized peer discovery without a tracker.
 
-Copyright (C) 2008-2014 by Sanko Robinson <sanko@cpan.org>
+## BEP 32: IPv6 Extensions
 
-This program is free software; you can redistribute it and/or modify it under
-the terms of
-[The Artistic License 2.0](http://www.perlfoundation.org/artistic_license_2_0).
-See the `LICENSE` file included with this distribution or
-[notes on the Artistic License 2.0](http://www.perlfoundation.org/artistic_2_0_notes)
-for clarification.
+Adds support for IPv6 nodes and peers. Can be toggled via the `bep32` constructor argument.
 
-When separated from the distribution, all original POD documentation is
-covered by the
-[Creative Commons Attribution-Share Alike 3.0 License](http://creativecommons.org/licenses/by-sa/3.0/us/legalcode).
-See the
-[clarification of the CCA-SA3.0](http://creativecommons.org/licenses/by-sa/3.0/us/).
+## BEP 33: DHT Scrapes
 
-Neither this module nor the [Author](#author) is affiliated with BitTorrent,
-Inc.
+Allows querying for the number of seeders and leechers for a specific infohash. Can be toggled via the `bep33`
+constructor argument.
+
+## BEP 42: DHT Security Extensions
+
+Implements node ID validation to mitigate specific attacks. Can be toggled via the `bep42` constructor argument.
+
+## BEP 43: Read-only DHT Nodes
+
+Allows the node to participate in the DHT without being added to other nodes' routing tables. Useful for mobile devices
+or low-bandwidth clients. Set the `read_only` constructor argument to a true value.
+
+## BEP 44: Storing Arbitrary Data
+
+Enables `get` and `put` operations for storing immutable and mutable data items in the DHT. Can be explicitly
+disabled via the `bep44` constructor argument.
+
+In order to handle mutable data, [Crypt::PK::Ed25519](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AEd25519) or [Crypt::Perl::Ed25519::PublicKey](https://metacpan.org/pod/Crypt%3A%3APerl%3A%3AEd25519%3A%3APublicKey) must be installed.
+
+## BEP 51: Infohash Indexing
+
+Adds the `sample_infohashes` RPC to allow indexing of the DHT's content. Supported and enabled by default.
+
+# SEE ALSO
+
+[Algorithm::Kademlia](https://metacpan.org/pod/Algorithm%3A%3AKademlia), [Net::BitTorrent::Protocol::BEP03::Bencode](https://metacpan.org/pod/Net%3A%3ABitTorrent%3A%3AProtocol%3A%3ABEP03%3A%3ABencode)
+
+[BEP05](https://www.bittorrent.org/beps/bep_0005.html), [BEP20](https://www.bittorrent.org/beps/bep_0020.html),
+[BEP32](https://www.bittorrent.org/beps/bep_0032.html), [BEP33](https://www.bittorrent.org/beps/bep_0033.html),
+[BEP42](https://www.bittorrent.org/beps/bep_0042.html), [BEP43](https://www.bittorrent.org/beps/bep_0043.html),
+[BEP44](https://www.bittorrent.org/beps/bep_0044.html), [BEP51](https://www.bittorrent.org/beps/bep_0051.html).
+
+# AUTHOR
+
+Sanko Robinson <sanko@cpan.org>
+
+# COPYRIGHT
+
+Copyright (C) 2008-2026 by Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.

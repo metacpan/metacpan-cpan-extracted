@@ -10,5 +10,6 @@ t/test_named-list.t
 t/test_object-list.t
 t/test_object-named.t
 t/test_object.t
+t/test_pod-coverage.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

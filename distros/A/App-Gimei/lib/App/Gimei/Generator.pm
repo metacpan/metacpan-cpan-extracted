@@ -1,48 +1,39 @@
 use v5.40;
+use feature 'class';
+no warnings 'experimental::class';
 
-package App::Gimei::Generator;
+class App::Gimei::Generator {
 
-use Data::Gimei;
+    use Data::Gimei;
 
-use Class::Tiny qw(
-  word_class
-  gender
-  word_subtype
-  rendering
-);
+    field $word_class   : param : reader;
+    field $gender       : param : reader = undef;
+    field $word_subtype : param = undef;
+    field $rendering    : param : reader = 'kanji';
 
-sub BUILDARGS ( $class, %args ) {
-    for my $arg (qw/word_class/) {
-        die "$arg arg required" unless exists $args{$arg};
-    }
+    method execute ($cache) {
+        my ($word);
 
-    $args{rendering} //= 'kanji';
-
-    return \%args;
-}
-
-sub execute ( $self, $cache ) {
-    my ($word);
-
-    my $key = $self->word_class . ( $self->gender // '' );
-    $word = $cache->{$key};
-    if ( !defined $word ) {
-        $word = $self->word_class->new( gender => $self->gender );
-        $cache->{$key} = $word;
-    }
-
-    if ( $self->word_subtype ) {
-        if ( $self->word_subtype eq 'gender' ) {
-            return $word->gender;
+        my $key = $word_class . ( $gender // '' );
+        $word = $cache->{$key};
+        if ( !defined $word ) {
+            $word = $word_class->new( gender => $gender );
+            $cache->{$key} = $word;
         }
-        my $call = $word->can( $self->word_subtype );
+
+        if ($word_subtype) {
+            if ( $word_subtype eq 'gender' ) {
+                return $word->gender;
+            }
+            my $call = $word->can($word_subtype);
+            $word = $word->$call();
+        }
+
+        my $call = $word->can($rendering);
         $word = $word->$call();
+
+        return $word;
     }
-
-    my $call = $word->can( $self->rendering );
-    $word = $word->$call();
-
-    return $word;
 }
 
 1;

@@ -16,14 +16,18 @@ Hash::Case - base class for hashes with key-casing requirements
 
 =head1 SYNOPSIS
 
- use Hash::Case::Lower;
- tie my(%lchash), 'Hash::Case::Lower';
- $lchash{StraNGeKeY} = 3;
- print keys %lchash;  # strangekey
+  use Hash::Case::Lower;
+  tie my(%lchash), 'Hash::Case::Lower';
+  $lchash{StraNGeKeY} = 3;
+  print keys %lchash;  # strangekey
+
+  (tied %lchash)->addPairs(key => value, ...);
+  (tied %lchash)->addHashData(\%data);
+  (tied %lchash)->setHash(\%replacement);
 
 =head1 DESCRIPTION
 
-Hash::Case is the base class for various classes which tie special
+L<Hash::Case|Hash::Case> is the base class for various classes which tie special
 treatment for the casing of keys.  Be aware of the differences in
 implementation: C<Lower> and C<Upper> are tied native hashes:
 these hashes have no need for hidden fields or other assisting
@@ -34,19 +38,19 @@ The following strategies are implemented:
 
 =over 4
 
-=item * Hash::Case::Lower (native hash)
+=item * L<Hash::Case::Lower|Hash::Case::Lower> (native hash)
 
 Keys are always considered lower case. The internals of this
 module translate any incoming key to lower case before it is used.
 
-=item * Hash::Case::Upper (native hash)
+=item * L<Hash::Case::Upper|Hash::Case::Upper> (native hash)
 
 Like the ::Lower, but then all keys are always translated into
 upper case.  This module can be of use for some databases, which
 do translate everything to capitals as well.  To avoid confusion,
 you may want to have you own internal Perl hash do this as well.
 
-=item * Hash::Case::Preserve
+=item * L<Hash::Case::Preserve|Hash::Case::Preserve>
 
 The actual casing is ignored, but not forgotten.
 
@@ -58,57 +62,66 @@ The actual casing is ignored, but not forgotten.
 
 =over 4
 
-=item $obj-E<gt>B<addHashData>(HASH)
+=item tie B<%hash>, $class, [$values,] %options
 
-Add the data of a hash (passed as reference) to the created tied hash.  The
-existing values in the hash remain, the keys are adapted to the needs of the
-the casing.
+Tie the C<%hash> with the C<$class> (package which extends L<Hash::Case>).
+The C<%options> differ per implementation: read the manual page for the
+package you actually use.  The optional C<$values> is a reference to an ARRAY
+(containing key-value PAIRS) or a HASH: they fill-in the initial C<%hash>.
 
-=item $obj-E<gt>B<addPairs>(PAIRS)
+» example: 
+
+  my %x;
+  tie %x, 'Hash::Case::Lower';
+  $x{Upper} = 3;
+  print keys %x;       # 'upper'
+
+  my @y = (ABC => 3, DeF => 4);
+  tie %x, 'Hash::Case::Lower', \@y;
+  print keys %x;       # 'abc' 'def'
+
+  my %z = (ABC => 3, DeF => 4);
+  tie %x, 'Hash::Case::Lower', \%z;
+
+=back
+
+=head2 Hidden object access
+
+Besides all the usual HASH actions which are implemented for the tied
+C<%hash>, you can also call methods on the C<tied()> object.
+
+=over 4
+
+=item $obj-E<gt>B<addHashData>(\%data)
+
+Add the C<%data> to the created tied hash.  The existing values in the hash
+remain, the keys are adapted to the needs of the the casing.
+
+=item $obj-E<gt>B<addPairs>(@pairs)
 
 Specify an even length list of alternating key and value to be stored in
 the hash.
 
-=item $obj-E<gt>B<setHash>(HASH)
+=item $obj-E<gt>B<setHash>(\%data)
 
 The functionality differs for native and wrapper hashes.  For native
 hashes, this is the same as first clearing the hash, and then a call
-to L<addHashData()|Hash::Case/"Constructors">.  Wrapper hashes will use the hash you specify here
+to L<addHashData()|Hash::Case/"Hidden object access">.  Wrapper hashes will use the hash you specify here
 to store the data, and re-create the mapping hash.
-
-=item B<tie>(HASH, TIE, [VALUES,] OPTIONS)
-
-Tie the HASH with the TIE package which extends L<Hash::Case>.  The OPTIONS
-differ per implementation: read the manual page for the package you actually
-use.  The VALUES is a reference to an array containing key-value pairs,
-or a reference to a hash: they fill the initial hash.
-
-example: 
-
- my %x;
- tie %x, 'Hash::Case::Lower';
- $x{Upper} = 3;
- print keys %x;       # 'upper'
-
- my @y = (ABC => 3, DeF => 4);
- tie %x, 'Hash::Case::Lower', \@y;
- print keys %x;       # 'abc' 'def'
-
- my %z = (ABC => 3, DeF => 4);
- tie %x, 'Hash::Case::Lower', \%z;
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Hash-Case distribution version 1.05,
-built on February 06, 2020. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Hash-Case version 1.07,
+built on January 26, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2002-2020 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2002-2026 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

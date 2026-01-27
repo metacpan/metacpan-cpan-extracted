@@ -12,7 +12,7 @@ use MCE::Loop;
 use System::CPU;
 use System::Info;
 
-our $VERSION    = '1.01';
+our $VERSION    = '1.02';
 our @EXPORT     = qw(system_identity suite_run calc_scalability suite_calc);
 our $MONO_CLOCK = $^O !~ /win/i || $Time::HiRes::VERSION >= 1.9764;
 our $QUIET      = 0;

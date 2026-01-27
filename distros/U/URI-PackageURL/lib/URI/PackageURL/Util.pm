@@ -8,8 +8,9 @@ use warnings;
 use File::Spec;
 use File::Basename qw(dirname basename);
 use Exporter       qw(import);
+use Carp           ();
 
-our $VERSION = '2.24';
+our $VERSION = '2.25';
 our @EXPORT  = qw(purl_to_urls purl_types);
 
 sub purl_types {
@@ -458,7 +459,7 @@ URI::PackageURL::Util - Utility for URI::PackageURL
 
   use URI::PackageURL::Util qw(purl_to_urls);
 
-  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.24');
+  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.25');
 
   $filename = basename($urls->{download});
   $ua->mirror($urls->{download}, "/tmp/$filename");
@@ -468,9 +469,19 @@ URI::PackageURL::Util - Utility for URI::PackageURL
 
 URL::PackageURL::Util is the utility package for URL::PackageURL.
 
-=over
+=head2 EXPORTED FUNCTIONS
 
-=item $urls = purl_to_urls($purl_string | URI::PackageURL)
+=head3 B<purl_types>
+
+    use URI::PackageURL::Util qw(purl_types);
+    @types = purl_types();
+
+Return the list of known PURL types.
+
+=head3 B<purl_to_urls>
+
+    use URI::PackageURL::Util qw(purl_to_urls);
+    $urls = purl_to_urls($purl_string // URI::PackageURL->new(...));
 
 Converts the given Package URL string or L<URI::PackageURL> instance and return
 the hash with C<repository> and/or C<download> URL.
@@ -500,13 +511,13 @@ C<cpan>, C<docker>, C<gem>, C<github>, C<gitlab>, C<luarocks>, C<maven>, C<npm>,
 (*)  Only with B<version> component
 (**) Only if B<download_url> qualifier is provided
 
-  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.24');
+  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.25');
 
   print Dumper($urls);
 
   # $VAR1 = {
-  #   'repository' => 'https://metacpan.org/release/GDT/URI-PackageURL-2.24',
-  #   'download'   => 'http://www.cpan.org/authors/id/G/GD/GDT/URI-PackageURL-2.24.tar.gz'
+  #   'repository' => 'https://metacpan.org/release/GDT/URI-PackageURL-2.25',
+  #   'download'   => 'http://www.cpan.org/authors/id/G/GD/GDT/URI-PackageURL-2.25.tar.gz'
   # };
 
 =back

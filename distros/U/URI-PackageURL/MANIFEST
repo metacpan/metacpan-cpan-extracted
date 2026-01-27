@@ -51,7 +51,7 @@ lib/URI/VersionRange/Util.pm
 lib/URI/VersionRange/Version.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 README.md
 sync-purl-spec.sh
 t/00-load.t
@@ -74,7 +74,6 @@ t/purl/spec/specification-test.json
 t/purl/types/alpm-test.json
 t/purl/types/apk-test.json
 t/purl/types/bazel-test.json
-t/purl/types/bintray-test.json
 t/purl/types/bitbucket-test.json
 t/purl/types/bitnami-test.json
 t/purl/types/cargo-test.json

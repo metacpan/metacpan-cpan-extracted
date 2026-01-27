@@ -46,6 +46,29 @@ use constant PRIMARY_INDEXNAME => 'primary';
 #----------------------------------------------------------------------------
 #Constructors
 
+=head1 METHODS
+
+=head2 Constructor
+
+=head3 new ( [ DATA ] )
+
+This is the constructor for a new C<Object::Meta::List> object.
+
+Since C<Object::Meta::List> is also a C<Object::Meta> it can also hold meta data.
+
+B<Parameters:>
+
+=over 4
+
+=item C<DATA>
+
+The B<raw data> which is passed in a hash like fashion, using key and value pairs.
+This is passed to the inherited C<Object::Meta> constructor.
+
+=back
+
+=cut
+
 sub new {
     my $class = ref( $_[0] ) || $_[0];
 
@@ -92,6 +115,35 @@ sub setIndexField {
     }
 }
 
+=head2 Administration Methods
+
+=head3 Add ( [ C<Object::Meta> | DATA ] )
+
+This adds new items to the list.
+
+If no parameter is given it creates an empty instance of C<Object::Meta>
+and adds it to the list
+
+B<Parameters:>
+
+=over 4
+
+=item C<Object::Meta>
+
+An instance of C<Object::Meta> to be added to the list.
+
+=item C<DATA>
+
+A hash with data to create an instance of C<Object::Meta> and add it to the list.
+
+=back
+
+B<Returns:> C<Object::Meta> - The object which was created or added.
+
+See L<Method C<Object::Meta::new()>|Object::Meta/"new ( [ DATA ] )">
+
+=cut
+
 sub Add {
     my $self   = $_[0];
     my $mtaety = undef;
@@ -112,14 +164,14 @@ sub Add {
                 #Create the new Object::Meta with the Index Value
                 $mtaety = Object::Meta::->new( $self->getIndexField, $_[1] );
             }
-        }    #if(defined blessed $_[1])
-    }    #if(scalar(@_) > 1)
+        }
+    }
 
     if ( defined $mtaety ) {
-        unless ( $mtaety->isa("Object::Meta") ) {
+        unless ( $mtaety->isa('Object::Meta') ) {
             $mtaety = undef;
         }
-    }    #if(defined $mtaety)
+    }
 
     $mtaety = Object::Meta::->new unless ( defined $mtaety );
 

@@ -1,105 +1,117 @@
 {
-   "abstract" : "Kademlia-like DHT Node for BitTorrent",
+   "X_No_Archive" : "Yes",
+   "abstract" : "Pure Perl Kademlia-like BitTorrent DHT Node",
    "author" : [
-      "Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/"
+      "Sanko Robinson <sanko@cpan.org>"
    ],
+   "description" : "Kademlia is a communications protocol for peer-to-peer networks. It is one of many versions of a DHT, a Distributed Hash Table.",
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.2.1",
+   "generated_by" : "App::mii v1.0.0",
+   "keywords" : [
+      "dht",
+      "kademlia",
+      "bittorrent",
+      "interplanetary"
+   ],
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
    },
    "name" : "Net-BitTorrent-DHT",
    "no_index" : {
       "directory" : [
          "t",
          "xt",
-         "inc",
-         "share",
-         "eg",
-         "examples",
-         "author",
-         "builder"
+         "eg"
       ]
    },
+   "optional_features" : {
+      "BEP44" : {
+         "description" : "BEP44: Storing arbitrary data in the DHT",
+         "prereqs" : {
+            "runtime" : {
+               "suggests" : {
+                  "Crypt::PK::Ed25519" : "0",
+                  "Crypt::Perl::Ed25519::PublicKey" : "0"
+               }
+            }
+         }
+      }
+   },
    "prereqs" : {
-      "configure" : {
+      "build" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.035"
+            "Module::Build::Tiny" : "0"
          }
       },
-      "develop" : {
+      "configure" : {
          "requires" : {
-            "Test::CPAN::Meta" : "0",
-            "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
-            "Test::Pod" : "1.41",
-            "Test::Spellunker" : "v0.2.7"
+            "Module::Build::Tiny" : "0",
+            "perl" : "v5.42.0"
          }
       },
       "runtime" : {
          "recommends" : {
-            "Config::IPFilter" : "0"
+            "IO::Async" : "0"
          },
          "requires" : {
-            "AnyEvent" : "0",
-            "AnyEvent::HTTP" : "0",
-            "AnyEvent::Util" : "0",
-            "Bit::Vector" : "0",
-            "Moose" : "0",
-            "Moose::Role" : "0",
-            "Moose::Util::TypeConstraints" : "0",
-            "Net::BitTorrent::Protocol" : "v1.0.2",
-            "Scalar::Util" : "0",
+            "Algorithm::Kademlia" : "0",
+            "IO::Select" : "0",
+            "IO::Socket::INET" : "0",
+            "Net::BitTorrent::Protocol::BEP03::Bencode" : "0",
             "Socket" : "0",
-            "Types::Standard" : "0",
-            "feature" : "0",
-            "perl" : "v5.10.0"
+            "perl" : "v5.42.0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Class" : "0",
-            "Test::Moose" : "0",
-            "Test::More" : "0.98"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Net::BitTorrent::DHT" : {
          "file" : "lib/Net/BitTorrent/DHT.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.0"
       },
-      "Net::BitTorrent::DHT::Bucket" : {
-         "file" : "lib/Net/BitTorrent/DHT/Bucket.pm",
-         "version" : "v1.0.3"
+      "Net::BitTorrent::DHT::Peer" : {
+         "file" : "lib/Net/BitTorrent/DHT.pm"
       },
-      "Net::BitTorrent::DHT::Node" : {
-         "file" : "lib/Net/BitTorrent/DHT/Node.pm",
-         "version" : "v1.0.3"
-      },
-      "Net::BitTorrent::DHT::RoutingTable" : {
-         "file" : "lib/Net/BitTorrent/DHT/RoutingTable.pm",
-         "version" : "v1.0.3"
-      },
-      "Net::BitTorrent::DHT::Tracker" : {
-         "file" : "lib/Net/BitTorrent/DHT/Tracker.pm",
-         "version" : "v1.0.3"
+      "Net::BitTorrent::DHT::Security" : {
+         "file" : "lib/Net/BitTorrent/DHT/Security.pm"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/sanko/net-bittorrent-dht/issues"
+         "web" : "https://github.com/sanko/Net-BitTorrent-DHT.pm/issues"
       },
-      "homepage" : "https://github.com/sanko/net-bittorrent-dht",
+      "homepage" : "https://github.com/sanko/Net-BitTorrent-DHT.pm",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
       "repository" : {
-         "url" : "git://github.com/sanko/net-bittorrent-dht.git",
-         "web" : "https://github.com/sanko/net-bittorrent-dht"
+         "type" : "git",
+         "url" : "git://github.com/sanko/Net-BitTorrent-DHT.pm.git",
+         "web" : "https://github.com/sanko/Net-BitTorrent-DHT.pm"
       }
    },
-   "version" : "v1.0.3"
+   "version" : "v2.0.0",
+   "x_help_wanted" : [
+      "Tester",
+      "Documenter"
+   ],
+   "x_ignore" : [
+      ".tidyallrc",
+      ".gitignore",
+      ".github/",
+      ".github/*",
+      ".github/**",
+      ".clang-format"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 0
 }

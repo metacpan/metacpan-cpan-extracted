@@ -1,8 +1,11 @@
 Revision history for Tree-STR
 
+0.04  20260127
+    Fix URLs in Makefile.PL metadata
+
 0.03  20260124
     Fix manifest issues.
-    
+
 0.02  20260123
     Fix some egregious bugs in v0.01.
     More tests.

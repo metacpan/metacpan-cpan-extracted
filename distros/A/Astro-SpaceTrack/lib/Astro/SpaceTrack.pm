@@ -34,6 +34,40 @@ In practice, it is probably not useful to retrieve data from any source
 more often than once every four hours, and in fact daily usually
 suffices.
 
+=head1 CAVEAT
+
+This is an emergency release of this module. It was caused by Space
+Track deprecating and ultimately revoking the C<'tle_latest'> and
+C<'tle'> data classes in favor of C<'gp'> and C<'gp_history'>
+respectively, and me being oblivious until the revocation occurred.
+
+Unlike the previous release (v0.172) release 0.180 will actually return
+Space Track data.
+
+Known changes:
+
+=over
+
+=item The --last5 option is ignored.
+
+It is also deprecated, will warn on every use, and will be removed in a
+future release. This functionality relied on a datum (C<ORDINAL>) that
+Space Track no longer provides.
+
+=item The C<OBJECT_NUMBER> datum is missing from JSON data.
+
+This datum is no longer provided by Space Track, and I am not minded to
+fudge it in. C<NORAD_CAT_ID> has the same value.
+
+=item Favorites do not work
+
+In the previous release C<spacetrack()> would fetch canned favorites
+curated by Space Track. As of January 21 2026 these are 404. If I find
+these data sets I will restore them. I also plan to support the existing
+favorites by a new mechanism (i.e. not via C<spacetrack()>).
+
+=back
+
 =head1 LEGAL NOTICE
 
 The following two paragraphs are quoted from the Space Track web site.
@@ -130,7 +164,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.172';
+our $VERSION = '0.180';
 our @EXPORT_OK = qw{
     shell
 
@@ -232,7 +266,7 @@ use constant HASH_REF	=> ref {};
 use constant CLASSIC_RETRIEVE_OPTIONS => [
     descending => '(direction of sort)',
     'end_epoch=s' => 'date',
-    last5 => '(ignored if -start_epoch or -end_epoch specified)',
+    last5 => '(ignored and deprecated)',
     'sort=s' =>
 	"type ('catnum' or 'epoch', with 'catnum' the default)",
     'start_epoch=s' => 'date',
@@ -499,8 +533,12 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	undef,	# No interface version 0
 	undef,	# No interface version 1 any more
 	{	# Interface version 2 (REST)
+
+	    # On Space Track "Recent ELSETs" tab
 	    full => {
 		name	=> 'Full catalog',
+		# As of 2026-01-19
+		# https://www.space-track.org/basicspacedata/query/class/gp/EPOCH/%3Enow-30/orderby/NORAD_CAT_ID,EPOCH/format/3le
 		# We have to go through satcat to eliminate bodies that
 		# are not on orbit, since tle_latest includes bodies
 		# decayed in the last two years or so
@@ -510,14 +548,10 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 		},
 #		number	=> 1,
 	    },
-	    payloads	=> {
-		name	=> 'All payloads',
-		satcat	=> {
-		    OBJECT_TYPE	=> 'PAYLOAD',
-		},
-	    },
 	    geosynchronous => {		# GEO
 		name	=> 'Geosynchronous satellites',
+		# As of 2026-01-19
+		# https://www.space-track.org/basicspacedata/query/class/gp/EPOCH/%3Enow-30/MEAN_MOTION/0.99--1.01/ECCENTRICITY/%3C0.01/OBJECT_TYPE/payload/orderby/NORAD_CAT_ID,EPOCH/format/3le
 #		number	=> 3,
 		# We have to go through satcat to eliminate bodies that
 		# are not on orbit, since tle_latest includes bodies
@@ -543,18 +577,22 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	    },
 	    medium_earth_orbit => {	# MEO
 		name	=> 'Medium Earth Orbit',
+		# As of 2026-01-19
+		# https://www.space-track.org/basicspacedata/query/class/gp/EPOCH/%3Enow-30/MEAN_MOTION/1.8--2.39/ECCENTRICITY/%3C0.25/OBJECT_TYPE/payload/orderby/NORAD_CAT_ID,EPOCH/format/3le
 		tle	=> {
 		    ECCENTRICITY	=> '<0.25',
 		    EPOCH		=> '>now-30',
 		    # The web page says '600 minutes <= Period <= 800
 		    # minutes', but the query is in terms of mean
 		    # motion.
-		    MEAN_MOTION		=> '1.8--2.30',
+		    MEAN_MOTION		=> '1.8--2.39',
 		    OBJECT_TYPE		=> 'payload',
 		},
 	    },
 	    low_earth_orbit => {	# LEO
 		name	=> 'Low Earth Orbit',
+		# As of 2026-01-19https://www.space-track.org/basicspacedata/query/class/gp/EPOCH/%3Enow-30/ECCENTRICITY/%3E0.25/OBJECT_TYPE/payload/orderby/NORAD_CAT_ID,EPOCH/format/3le
+		# https://www.space-track.org/basicspacedata/query/class/gp/EPOCH/%3Enow-30/MEAN_MOTION/%3E11.25/ECCENTRICITY/%3C0.25/OBJECT_TYPE/payload/orderby/NORAD_CAT_ID,EPOCH/format/3le
 		tle	=> {
 		    ECCENTRICITY	=> '<0.25',
 		    EPOCH		=> '>now-30',
@@ -564,12 +602,88 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	    },
 	    highly_elliptical_orbit => {	# HEO
 		name	=> 'Highly Elliptical Orbit',
+		# As of 2026-01-19
+		# https://www.space-track.org/basicspacedata/query/class/gp/EPOCH/%3Enow-30/ECCENTRICITY/%3E0.25/OBJECT_TYPE/payload/orderby/NORAD_CAT_ID,EPOCH/format/3le
 		tle	=> {
 		    ECCENTRICITY	=> '>0.25',
 		    EPOCH		=> '>now-30',
 		    OBJECT_TYPE		=> 'payload',
 		},
 	    },
+	    globalstar => {
+		name	=> 'Globalstar satellites',
+		# As of 2026-01-19
+		# https://www.space-track.org/basicspacedata/query/class/gp/EPOCH/%3Enow-30/OBJECT_TYPE/payload/orderby/NORAD_CAT_ID,EPOCH/format/3le/OBJECT_NAME/globalstar~~/
+		tle	=> {
+		    EPOCH	=> '>now-30',
+		    OBJECT_NAME	=> 'globalstar~~',
+		    OBJECT_TYPE	=> 'payload',
+		},
+#		number	=> 13,
+	    },
+	    inmarsat => {
+		name	=> 'Inmarsat satellites',
+		# As of 2026-01-19
+		# https://www.space-track.org/basicspacedata/query/class/gp/EPOCH/%3Enow-30/OBJECT_TYPE/payload/orderby/NORAD_CAT_ID,EPOCH/format/3le/OBJECT_NAME/inmarsat~~/
+		tle	=> {
+		    EPOCH	=> '>now-30',
+		    OBJECT_NAME	=> 'inmarsat~~',
+		    OBJECT_TYPE	=> 'payload',
+		},
+#		number	=> 17,
+	    },
+	    intelsat => {
+		name	=> 'Intelsat satellites',
+		# As of 2026-01-19
+		# https://www.space-track.org/basicspacedata/query/class/gp/EPOCH/%3Enow-30/OBJECT_TYPE/payload/orderby/NORAD_CAT_ID,EPOCH/format/3le/OBJECT_NAME/intelsat~~/
+		tle	=> {
+		    EPOCH	=> '>now-30',
+		    OBJECT_NAME	=> 'intelsat~~',
+		    OBJECT_TYPE	=> 'payload',
+		},
+#		number	=> 15,
+	    },
+	    iridium => {
+		name	=> 'Iridium satellites',
+		# As of 2026-01-19
+		# https://www.space-track.org/basicspacedata/query/class/gp/EPOCH/%3Enow-30/OBJECT_TYPE/payload/orderby/NORAD_CAT_ID,EPOCH/format/3le/OBJECT_NAME/iridium~~/
+		tle => {
+		    EPOCH	=> '>now-30',
+		    OBJECT_NAME	=> 'iridium~~',
+		    OBJECT_TYPE	=> 'payload',
+		},
+#		number	=> 9,
+	    },
+	    orbcomm	=> {
+		name	=> 'OrbComm satellites',
+		# As of 2026-01-19
+		# https://www.space-track.org/basicspacedata/query/class/gp/EPOCH/%3Enow-30/OBJECT_NAME/~~orbcomm,~~VESSELSAT/OBJECT_TYPE/payload/orderby/NORAD_CAT_ID,EPOCH/format/3le
+		tle	=> {
+		    EPOCH	=> '>now-30',
+		    OBJECT_NAME	=> 'ORBCOMM~~,VESSELSAT~~',
+		    OBJECT_TYPE	=> 'payload',
+		},
+#		number	=> 11,
+	    },
+	    well_tracked_objects	=> {
+		name	=> 'Well-Tracked Objects',
+		# As of 2026-01-19
+		# https://www.space-track.org/basicspacedata/query/class/gp/EPOCH/%3Enow-30/NORAD_CAT_ID/80000--89999/orderby/NORAD_CAT_ID/format/tle/emptyresult/show
+#		satcat	=> {
+#		    COUNTRY	=> 'UNKN',
+#		    SITE	=> 'UNKN',
+#		},
+		tle	=> {
+		    EPOCH	=> '>now-30',
+		    NORAD_CAT_ID	=> '80000--89999',
+		    format	=> 'tle',
+		    epmtyresult	=> 'show',
+		},
+	    },
+
+	    # Favorites (whatever that means). As of 2026-01-19 these
+	    # are specific to the individual user, and therefore
+	    # useless.
 	    navigation => {
 		name => 'Navigation satellites',
 		favorite	=> 'Navigation',
@@ -585,51 +699,6 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 		    EPOCH	=> '>now-30',
 		},
 #		number => 7,
-	    },
-	    iridium => {
-		name	=> 'Iridium satellites',
-		tle => {
-		    EPOCH	=> '>now-30',
-		    OBJECT_NAME	=> 'iridium~~',
-		    OBJECT_TYPE	=> 'payload',
-		},
-#		number	=> 9,
-	    },
-	    orbcomm	=> {
-		name	=> 'OrbComm satellites',
-		tle	=> {
-		    EPOCH	=> '>now-30',
-		    OBJECT_NAME	=> 'ORBCOMM~~,VESSELSAT~~',
-		    OBJECT_TYPE	=> 'payload',
-		},
-#		number	=> 11,
-	    },
-	    globalstar => {
-		name	=> 'Globalstar satellites',
-		tle	=> {
-		    EPOCH	=> '>now-30',
-		    OBJECT_NAME	=> 'globalstar~~',
-		    OBJECT_TYPE	=> 'payload',
-		},
-#		number	=> 13,
-	    },
-	    intelsat => {
-		name	=> 'Intelsat satellites',
-		tle	=> {
-		    EPOCH	=> '>now-30',
-		    OBJECT_NAME	=> 'intelsat~~',
-		    OBJECT_TYPE	=> 'payload',
-		},
-#		number	=> 15,
-	    },
-	    inmarsat => {
-		name	=> 'Inmarsat satellites',
-		tle	=> {
-		    EPOCH	=> '>now-30',
-		    OBJECT_NAME	=> 'inmarsat~~',
-		    OBJECT_TYPE	=> 'payload',
-		},
-#		number	=> 17,
 	    },
 	    amateur => {
 		favorite	=> 'Amateur',
@@ -669,11 +738,16 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 		    EPOCH	=> '>now-30',
 		},
 	    },
-	    well_tracked_objects	=> {
-		name	=> 'Well-Tracked Objects',
-		satcat	=> {
-		    COUNTRY	=> 'UNKN',
-		    SITE	=> 'UNKN',
+
+	    # Added by TRW
+	    payloads	=> {
+		name	=> 'All payloads',
+#		satcat	=> {
+#		    OBJECT_TYPE	=> 'PAYLOAD',
+#		},
+		tle	=> {
+		    EPOCH	=> '>now-30',
+		    OBJECT_TYPE	=> 'payload',
 		},
 	    },
 	},
@@ -2700,7 +2774,7 @@ This method and the associated manifest constants are B<deprecated>.
 	    # satellites, which do not flare.
 	    $body->{LAUNCH_YEAR} < 2017
 		or next;
-	    my $oid = $body->{OBJECT_NUMBER};
+	    my $oid = $body->{NORAD_CAT_ID};
 	    $rslt->{$oid}
 		and not $body->{DECAY}
 		and next;
@@ -3094,8 +3168,8 @@ Number ranges are represented as 'start-end', where both 'start' and
 taken in the reverse order. Non-numeric ranges are ignored.
 
 You can specify options for the retrieval as either command-type options
-(e.g. C<< retrieve ('-last5', ...) >>) or as a leading hash reference
-(e.g. C<< retrieve ({last5 => 1}, ...) >>). If you specify the hash
+(e.g. C<< retrieve ('-json', ...) >>) or as a leading hash reference
+(e.g. C<< retrieve ({json => 1}, ...) >>). If you specify the hash
 reference, option names must be specified in full, without the leading
 '-', and the argument list will not be parsed for command-type options.
 If you specify command-type options, they may be abbreviated, as long as
@@ -3113,9 +3187,7 @@ The legal options are:
  -json
    specifies the TLE be returned in JSON format.
  -last5
-   specifies the last 5 element sets be retrieved.
-   Ignored if start_epoch, end_epoch or since_file is
-   specified.
+   Ignored and deprecated.
  -start_epoch date
    specifies the start epoch for the desired data.
  -since_file number
@@ -3145,7 +3217,7 @@ non-numeric string. It is an error to specify an end_epoch before the
 start_epoch.
 
 If you are passing the options as a hash reference, you must specify
-a value for the Boolean options 'descending' and 'last5'. This value is
+a value for Boolean options like 'descending' and 'json'. This value is
 interpreted in the Perl sense - that is, undef, 0, and '' are false,
 and anything else is true.
 
@@ -3208,7 +3280,7 @@ sub retrieve {
     while ( @args ) {
 
 	my @batch = splice @args, 0, $RETRIEVAL_SIZE;
-	$rest->{OBJECT_NUMBER} = _stringify_oid_list( {
+	$rest->{NORAD_CAT_ID} = _stringify_oid_list( {
 		separator	=> ',',
 		range_operator	=> '--',
 	    }, @batch );
@@ -3248,37 +3320,47 @@ sub retrieve {
     return $resp;
 }
 
+sub _convert_retrieve_options_to_rest {
+    my ( $self ) = @_;
+    my $method = "_convert_retrieve_options_to_rest_v$self->{space_track_version}";
+    my $code = $self->can( $method )
+	or Carp::confess( "Bug - method $method() not found" );
+    goto $code;
+}
+
 {
 
     my %rest_sort_map = (
-	catnum	=> 'OBJECT_NUMBER',
+	catnum	=> 'NORAD_CAT_ID',
 	epoch	=> 'EPOCH',
     );
 
-    sub _convert_retrieve_options_to_rest {
+    # Called dynamically
+    sub _convert_retrieve_options_to_rest_v2 { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+
 	my ( $self, $opt ) = @_;
 
 	my %rest = (
-	    class	=> 'tle_latest',
+	    class	=> 'gp',
 	);
 
 	if ( $opt->{start_epoch} || $opt->{end_epoch} ) {
 	    $rest{EPOCH} = join '--', map { _rest_date( $opt->{$_} ) }
 	    qw{ _start_epoch _end_epoch };
-	    $rest{class} = 'tle';
+	    $rest{class} = 'gp_history';
 	}
 
 	$rest{orderby} = ( $rest_sort_map{$opt->{sort} || 'catnum'} ||
-	    'OBJECT_NUMBER' )
+	    'NORAD_CAT_ID' )
 	.  ( $opt->{descending} ? ' desc' : ' asc' );
 
 	if ( $opt->{since_file} ) {
 	    $rest{FILE} = ">$opt->{since_file}";
-	    $rest{class} = 'tle';
+	    $rest{class} = 'gp_history';
 	}
 
 	if ( $opt->{status} && $opt->{status} ne 'onorbit' ) {
-	    $rest{class} = 'tle';
+	    $rest{class} = 'gp_history';
 	}
 
 	foreach my $name (
@@ -3298,9 +3380,8 @@ sub retrieve {
 		$rest{format} = 'tle';
 	    }
 	}
-
-	$rest{class} eq 'tle_latest'
-	    and $rest{ORDINAL} = $opt->{last5} ? '1--5' : 1;
+	$opt->{last5}
+	    and $self->_deprecation_notice( qw{ option last5 } ); # v2.1
 
 	return \%rest;
     }
@@ -3309,7 +3390,7 @@ sub retrieve {
 
 {
     my @heading_info = (
-	[ undef,	OBJECT_NUMBER	=> 'Catalog Number' ],
+	[ undef,	NORAD_CAT_ID	=> 'Catalog Number' ],
 	[ undef,	OBJECT_NAME	=> 'Common Name' ],
 	[ undef,	OBJECT_ID	=> 'International Designator' ],
 	[ undef,	COUNTRY		=> 'Country' ],
@@ -3354,10 +3435,7 @@ sub _search_rest {
 
     ( my $opt, @args ) = $self->_parse_search_args( @args );
 
-    my $headings = _search_heading_hash_ref( $opt );
-    my @heading_order = _search_heading_order( $opt );
-
-    if ( $pred eq 'OBJECT_NUMBER' ) {
+    if ( $pred eq 'NORAD_CAT_ID' ) {
 
 	@args = $self->_expand_oid_list( @args )
 	    or return HTTP::Response->new(
@@ -3413,13 +3491,17 @@ sub _search_rest {
 	my $ropt = _remove_search_options( $opt );
 
 	my $rslt = $self->retrieve( $ropt,
-	    map { $_->{OBJECT_NUMBER} } @{ $data } );
+	    map { $_->{NORAD_CAT_ID} } @{ $data } );
 
 	return $rslt;
 
     } else {
 
 	if ( 'legacy' eq $opt->{format} ) {
+
+	    my $headings = _search_heading_hash_ref( $opt );
+	    my @heading_order = _search_heading_order( $opt );
+
 	    $content = '';
 	    foreach my $datum (
 		$headings,
@@ -3445,7 +3527,7 @@ sub _search_rest {
     }
 
     # Note - if we're doing the tab output, the names and order are:
-    # Catalog Number: OBJECT_NUMBER
+    # Catalog Number: NORAD_CAT_ID
     # Common Name: OBJECT_NAME
     # International Designator: OBJECT_ID
     # Country: COUNTRY
@@ -3463,7 +3545,6 @@ sub _search_rest {
 sub __search_rest_raw {
     my ( $self, %args ) = @_;
     delete $self->{_pragmata};
-    # https://beta.space-track.org/basicspacedata/query/class/satcat/CURRENT/Y/OBJECT_NUMBER/25544/predicates/all/limit/10,0/metadata/true
 
     %args
 	or return HTTP::Response->new( HTTP_PRECONDITION_FAILED, NO_CAT_ID );
@@ -3478,7 +3559,7 @@ sub __search_rest_raw {
     exists $args{predicates}
 	or $args{predicates} = 'all';
     exists $args{orderby}
-	or $args{orderby} = 'OBJECT_NUMBER asc';
+	or $args{orderby} = 'NORAD_CAT_ID asc';
 #   exists $args{limit}
 #	or $args{limit} = 1000;
 
@@ -3544,12 +3625,10 @@ options may be specified:
  -status
    specifies the desired status of the returned body (or
    bodies). Must be 'onorbit', 'decayed', or 'all'.  The
-   default is 'onorbit'. Specifying a value other than the
-   default will cause the -last5 option to be ignored.
-   Note that this option represents status at the time the
-   search was done; you can not combine it with the
-   retrieve() date options to find bodies onorbit as of a
-   given date in the past.
+   default is 'onorbit'. Note that this option represents
+   status at the time the search was done; you can not combine
+   it with the retrieve() date options to find bodies onorbit
+   as of a given date in the past.
  -tle
    specifies that you want TLE data retrieved for all
    bodies that satisfy the search criteria. This is
@@ -3572,7 +3651,7 @@ C<'legacy'>, or C<'json'>.
 Examples:
 
  search_date (-status => 'onorbit', -exclude =>
-    'debris,rocket', -last5 '2005-12-25');
+    'debris,rocket', '2005-12-25');
  search_date (-exclude => 'debris',
     -exclude => 'rocket', '2005/12/25');
  search_date ({exclude => ['debris', 'rocket']},
@@ -3887,7 +3966,7 @@ containing the actual search results.
 
 sub search_oid {	## no critic (RequireArgUnpacking)
 ##  my ( $self, @args ) = @_;
-    splice @_, 1, 0, OBJECT_NUMBER => sub { return $_[0] };
+    splice @_, 1, 0, NORAD_CAT_ID => sub { return $_[0] };
     goto &_search_rest;
 }
 
@@ -4036,7 +4115,7 @@ my %known_meta = (
 		my $data = $self->_get_json_object()->decode( $content );
 		foreach my $datum ( @{ $data } ) {
 		    push @lines, [
-			sprintf '%05d', $datum->{OBJECT_NUMBER},
+			sprintf '%05d', $datum->{NORAD_CAT_ID},
 			defined $datum->{OBJECT_NAME} ? $datum->{OBJECT_NAME} :
 			(),
 		    ];
@@ -4329,24 +4408,27 @@ The following catalogs are available:
     Name            Description
     full            Full catalog
     payloads        All payloads
-    navigation      Navigation satellites
-    weather         Weather satellites
+  * navigation      Navigation satellites
+  * weather         Weather satellites
     geosynchronous  Geosynchronous bodies
     iridium         Iridium satellites
     orbcomm         OrbComm satellites
     globalstar      Globalstar satellites
     intelsat        Intelsat satellites
     inmarsat        Inmarsat satellites
-    amateur         Amateur Radio satellites
-    visible         Visible satellites
-    special         Special satellites
-    bright_geosynchronous
+  * amateur         Amateur Radio satellites
+  * visible         Visible satellites
+  * special         Special satellites
+  * bright_geosynchronous
                     Bright Geosynchronous satellites
-    human_spaceflight
+  * human_spaceflight
                     Human Spaceflight
     well_tracked_objects
-                    Well-Tracked Objects having
-		    unknown country and launch point
+                    Well-Tracked Objects not associated
+		    with a specific launch
+
+The starred items are 404 as of 2026-01-19. They are deprecated and will
+be removed.
 
 The following option is supported:
 
@@ -4436,8 +4518,10 @@ sub spacetrack {
     defined $info->{deprecate}
 	and Carp::croak "Catalog '$catalog' is deprecated in favor of '$info->{deprecate}'";
 
-    defined $info->{favorite}
-	and return $self->favorite( $opt, $info->{favorite} );
+    if ( defined $info->{favorite} ) {
+	$self->_deprecation_notice( spacetrack => $info->{favorite} );
+	return $self->favorite( $opt, $info->{favorite} );
+    }
 
     my %retrieve_opt = %{
 	$self->_convert_retrieve_options_to_rest( $opt )
@@ -4459,7 +4543,7 @@ sub spacetrack {
 		basicspacedata	=> 'query',
 		class		=> 'satcat',
 		format		=> 'json',
-		predicates	=> 'OBJECT_NUMBER',
+		predicates	=> 'NORAD_CAT_ID',
 		CURRENT		=> 'Y',
 		DECAY		=> 'null-val',
 		_sort_rest_arguments( $query ),
@@ -4471,7 +4555,7 @@ sub spacetrack {
 	    foreach my $body ( @{
 		$self->_get_json_object()->decode( $rslt->content() )
 	    } ) {
-		$oid{ $body->{OBJECT_NUMBER} + 0 } = 1;
+		$oid{ $body->{NORAD_CAT_ID} + 0 } = 1;
 	    }
 
 	}
@@ -4577,7 +4661,7 @@ C<'tle_latest'>,
 }
 
 {
-    my %tle_class = map { $_ => 1 } qw{ tle tle_latest };
+    my %tle_class = map { $_ => 1 } qw{ tle tle_latest gp gp_history };
 
     sub spacetrack_query_v2 {
 	my ( $self, @args ) = @_;
@@ -4779,7 +4863,7 @@ lost as the individual OIDs are updated.
 	my $file = -1;
 	my @oids;
 	foreach my $datum ( @{ $data } ) {
-	    push @oids, $datum->{OBJECT_NUMBER};
+	    push @oids, $datum->{NORAD_CAT_ID};
 	    my $ff = defined $datum->{_file_of_record} ?
 		delete $datum->{_file_of_record} :
 		$datum->{FILE};
@@ -4810,10 +4894,10 @@ lost as the individual OIDs are updated.
 	    $resp->is_success()
 		or return $resp;
 
-	    my %merge = map { $_->{OBJECT_NUMBER} => $_ } @{ $data };
+	    my %merge = map { $_->{NORAD_CAT_ID} => $_ } @{ $data };
 
 	    foreach my $datum ( @{ $json->decode( $resp->content() ) } ) {
-		%{ $merge{$datum->{OBJECT_NUMBER}} } = %{ $datum };
+		%{ $merge{$datum->{NORAD_CAT_ID}} } = %{ $datum };
 	    }
 
 	    {
@@ -5167,6 +5251,7 @@ sub _check_cookie_generic {
 {
 
     use constant _MASTER_IRIDIUM_DEPRECATION_LEVEL	=> 2;
+    use constant _MASTER_FAVORITE_DEPRECATION_LEVEL	=> 2;
 
     my %deprecate = (
 	celestrak => {
@@ -5190,6 +5275,9 @@ sub _check_cookie_generic {
 	    mccants	=> 3,
 	    sladen	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
 	},
+	option => {
+	    last5	=> 2,
+	},
 	mccants	=> {
 	    mcnames	=> 2,
 	    quicksat	=> 1,
@@ -5199,6 +5287,15 @@ sub _check_cookie_generic {
 	BODY_STATUS_IS_SPARE	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
 	BODY_STATUS_IS_TUMBLING	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
 	BODY_STATUS_IS_DECAYED	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
+	spacetrack => {
+	    navigation => _MASTER_FAVORITE_DEPRECATION_LEVEL,
+	    weather => _MASTER_FAVORITE_DEPRECATION_LEVEL,
+	    amateur => _MASTER_FAVORITE_DEPRECATION_LEVEL,
+	    visible => _MASTER_FAVORITE_DEPRECATION_LEVEL,
+	    special => _MASTER_FAVORITE_DEPRECATION_LEVEL,
+	    bright_geosynchronous => _MASTER_FAVORITE_DEPRECATION_LEVEL,
+	    human_spaceflight => _MASTER_FAVORITE_DEPRECATION_LEVEL,
+	},
     );
 
     sub _deprecation_notice {

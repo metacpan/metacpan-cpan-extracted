@@ -4,6 +4,9 @@ author:
   - 'Bodo (Hugo) Barwich <b.barwich@hotmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '6.46'
+  Pod::Coverage: '0'
+  Test::More: '0'
+  Test::Pod: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -24,5 +27,5 @@ requires:
 resources:
   bugtracker: https://github.com/bodo-hugo-barwich/object-meta/issues
   repository: https://github.com/bodo-hugo-barwich/object-meta.git
-version: v1.1.0
+version: v1.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -11,7 +11,7 @@ use overload ('cmp' => \&compare, '<=>' => \&compare, fallback => 1);
 
 use constant DEBUG => $ENV{VERS_DEBUG};
 
-our $VERSION = '2.24';
+our $VERSION = '2.25';
 
 sub load {
 
@@ -136,7 +136,13 @@ Compare the version
 
     $v->from_native( $native_range )
 
-Convert the native range of the scheme into a VERS string
+Convert the native range of the scheme into a VERS string.
+
+=head3 B<load>
+
+    $class = URI::VersionRange::Version->load( $scheme )
+
+Load scheme class.
 
 
 =head2 HOW TO CREATE A NEW SCHEME COMPARATOR CLASS

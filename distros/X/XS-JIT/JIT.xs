@@ -17,6 +17,8 @@ compile(class, ...)
         const char *code = NULL;
         const char *name = NULL;
         const char *cache_dir = NULL;
+        const char *extra_cflags = NULL;
+        const char *extra_ldflags = NULL;
         int force = 0;
         HV *functions_hv = NULL;
         XS_JIT_Func *functions = NULL;
@@ -45,6 +47,14 @@ compile(class, ...)
                 }
             } else if (strEQ(key, "force")) {
                 force = SvTRUE(val) ? 1 : 0;
+            } else if (strEQ(key, "extra_cflags")) {
+                if (SvOK(val)) {
+                    extra_cflags = SvPV_nolen(val);
+                }
+            } else if (strEQ(key, "extra_ldflags")) {
+                if (SvOK(val)) {
+                    extra_ldflags = SvPV_nolen(val);
+                }
             } else if (strEQ(key, "functions")) {
                 if (!SvROK(val) || SvTYPE(SvRV(val)) != SVt_PVHV) {
                     croak("XS::JIT->compile: 'functions' must be a hashref");
@@ -118,7 +128,7 @@ compile(class, ...)
 
         /* Call the C compile function */
         RETVAL = xs_jit_compile(aTHX_ code, name, functions, num_functions,
-                                cache_dir, force);
+                                cache_dir, force, extra_cflags, extra_ldflags);
 
         /* Clean up */
         for (i = 0; i < num_functions; i++) {

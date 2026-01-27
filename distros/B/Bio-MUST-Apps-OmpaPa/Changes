@@ -1,3 +1,7 @@
+0.260260  2026-01-26 14:49:48+01:00 Europe/Brussels
+    - Additions
+       - binaries: new option --batch-classify to sort skipped reports into subdirs
+
 0.252040  2025-07-23 16:19:33+02:00 Europe/Rome
     - Additions
        - lib/binaries: new option --max-hits to truncate long reports

@@ -1,7 +1,7 @@
 package Dancer::Renderer;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Rendering class for Dancer
-$Dancer::Renderer::VERSION = '1.3521';
+$Dancer::Renderer::VERSION = '1.3522';
 use strict;
 use warnings;
 use Carp;
@@ -331,7 +331,7 @@ Dancer::Renderer - Rendering class for Dancer
 
 =head1 VERSION
 
-version 1.3521
+version 1.3522
 
 =head1 AUTHOR
 

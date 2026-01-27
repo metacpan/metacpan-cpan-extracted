@@ -13,7 +13,7 @@ Dancer::Introduction - A gentle introduction to Dancer
 
 =head1 VERSION
 
-version 1.3521
+version 1.3522
 
 =head1 DESCRIPTION
 

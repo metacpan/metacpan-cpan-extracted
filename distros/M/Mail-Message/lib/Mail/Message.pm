@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 4.02.
+# This code is part of Perl distribution Mail-Message version 4.03.
 # The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Message;{
-our $VERSION = '4.02';
+our $VERSION = '4.03';
 }
 
 use parent 'Mail::Reporter';
@@ -133,7 +133,9 @@ sub print(;$)
 	$self->head->print($out);
 	my $body = $self->body;
 	$body->print($out) if $body;
-	$body->endsOnNewline or $out->print("\n");
+
+	# We need a new-line at the end of a full message.
+	ref $self ne __PACKAGE__ or $body->endsOnNewline or $out->print("\n");
 	$self;
 }
 

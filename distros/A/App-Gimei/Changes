@@ -1,5 +1,13 @@
 Revision history for Perl extension App-Gimei
 
+v0.3.0 2026-01-27T07:47:03Z
+    - Switch module manager back to Carton
+    - Migrate formatter script from Shell to Perl
+    - Format source files and cpanfile
+    - Migrated from package to the native class syntax, resulting in a slight performance boost.
+    - Remove unused module Class::Tiny
+    - Rename the Generators->push() method to add_generator()
+
 v0.2.11 2026-01-17T07:59:58Z
     - Add module dependencies
 

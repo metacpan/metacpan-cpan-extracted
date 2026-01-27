@@ -34,7 +34,7 @@ canonicalisation are enabled.
 
 =head1 COPYRIGHT
 
-Copyright 2024-2025 Gavin Brown. For licensing information, please see the
+Copyright 2024-2026 Gavin Brown. For licensing information, please see the
 C<LICENSE> file in the L<Net::RDAP> distribution.
 
 =cut

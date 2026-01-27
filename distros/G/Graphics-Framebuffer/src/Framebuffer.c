@@ -1205,41 +1205,17 @@ void c_blit_read(char *framebuffer,
                  short y_clip,
                  short xx_clip,
                  short yy_clip) {
-    short fb_x = xoffset + x;
-    short fb_y = yoffset + y;
-    short xx = x + w;
-    short yy = y + h;
-    short horizontal;
-    short vertical;
     unsigned int bline = w * bytes_per_pixel;
+    short yend = y + h - 1;
+    short xx = (xoffset + x) * bytes_per_pixel;
+    char *fb_idx = framebuffer + (bytes_per_line * (y + yoffset)) + xx;
+    char *blit_idx = blit_data;
+    short line;
 
-    for (vertical = 0; vertical < h; vertical++) {
-        unsigned int vbl = vertical * bline;
-        unsigned short yv = fb_y + vertical;
-        unsigned int yvbl = yv * bytes_per_line;
-        if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
-            for (horizontal = 0; horizontal < w; horizontal++) {
-                unsigned short xh = fb_x + horizontal;
-                unsigned int xhbp = xh * bytes_per_pixel;
-                if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
-                    unsigned int hzpixel = horizontal * bytes_per_pixel;
-                    unsigned int vhz = vbl + hzpixel;
-                    unsigned int yvhz = yvbl + hzpixel;
-                    unsigned int xhbp_yvbl = xhbp + yvbl;
-                    if (bytes_per_pixel == 4) {
-                        *((unsigned int *)(blit_data + vhz)) =
-                            *((unsigned int *)(framebuffer + xhbp_yvbl));
-                    } else if (bytes_per_pixel == 3) {
-                        *(blit_data + vhz) = *(framebuffer + xhbp_yvbl);
-                        *(blit_data + vhz + 1) = *(framebuffer + xhbp_yvbl + 1);
-                        *(blit_data + vhz + 2) = *(framebuffer + xhbp_yvbl + 2);
-                    } else {
-                        *((unsigned short *)(blit_data + vhz)) =
-                            *((unsigned short *)(framebuffer + xhbp_yvbl));
-                    }
-                }
-            }
-        }
+    for ( line = y ; line <= yend ; line++ ) {
+        memcpy(blit_idx, fb_idx, bline);
+        blit_idx += bline;
+        fb_idx += bytes_per_line;
     }
 }
 

@@ -4,7 +4,7 @@ DEVELOPMENT.md
 LICENSE
 META.json
 README.md
-author/format.sh
+author/format.pl
 cpanfile
 cpanfile.snapshot
 lib/App/Gimei.pm
@@ -18,10 +18,12 @@ t/00_compile.t
 t/CLI.pm
 t/Util.pm
 t/generator.t
+t/generators.t
 t/option_h.t
 t/option_n.t
 t/option_sep.t
 t/option_v.t
+t/parser.t
 t/render.t
 t/subtype.t
 t/word_type.t

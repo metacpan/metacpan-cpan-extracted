@@ -1,5 +1,12 @@
 Revision history for Time-Spec
 
+0.005     2026-01-26 21:03:16+01:00 Europe/Brussels
+          - Fix metadata
+
+0.004     2026-01-26 13:57:08+01:00 Europe/Brussels
+          - Make overloads pass basic sanity
+          - Add some basic tests
+
 0.003     2025-02-12 15:52:03+01:00 Europe/Brussels
           - Re-release with correct version
 

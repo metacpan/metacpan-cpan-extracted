@@ -37,6 +37,7 @@ requires:
   File::Copy: '0'
   File::Spec: '0.7'
   File::Temp: '0'
+  Hash::Case: '1.05'
   IO::Lines: '0'
   IO::Scalar: '0'
   List::Util: '0'
@@ -58,7 +59,7 @@ resources:
   bugtracker: https://github.com/markov2/perl5-Mail-Message/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Mail-Message.git
-version: '4.02'
+version: '4.03'
 x_oodist:
   email: markov@cpan.org
   first_year: 2001

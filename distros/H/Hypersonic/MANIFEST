@@ -1,0 +1,32 @@
+Changes
+lib/Hypersonic.pm
+lib/Hypersonic/Compress.pm
+lib/Hypersonic/Request.pm
+lib/Hypersonic/Response.pm
+lib/Hypersonic/Session.pm
+lib/Hypersonic/Socket.pm
+lib/Hypersonic/TLS.pm
+Makefile.PL
+MANIFEST
+t/00-load.t
+t/01-dispatch.t
+t/02-socket.t
+t/03-server.t
+t/04-compile-time.t
+t/05-errors.t
+t/06-dynamic.t
+t/07-custom-status.t
+t/08-multi-params.t
+t/09-security.t
+t/10-tls.t
+t/11-request-features.t
+t/12-response.t
+t/13-request.t
+t/14-middleware.t
+t/15-static.t
+t/16-session.t
+t/17-compression.t
+examples/hello.pl
+bench/dispatch.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

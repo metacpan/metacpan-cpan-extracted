@@ -5,8 +5,6 @@
 
 typedef struct timespec* Time__Spec;
 
-#define timespec_new(class, value) &(value)
-#define timespec_new_from_pair(class, secs, nsecs)
 #define timespec_sec(self) (self)->tv_sec
 #define timespec_nsec(self) (self)->tv_nsec
 #define timespec_to_float(self) (self)->tv_sec + ((self)->tv_nsec / (double)1000000000)
@@ -16,11 +14,17 @@ MODULE = Time::Spec		PACKAGE = Time::Spec	PREFIX = timespec_
 PROTOTYPES: DISABLED
 
 Time::Spec timespec_new(class, struct timespec value)
+CODE:
+	RETVAL = safecalloc(1, sizeof(struct timespec));
+	*RETVAL = value;
+OUTPUT:
+	RETVAL
 
 Time::Spec timespec_new_from_pair(class, UV secs, UV nsecs)
 CODE:
-	struct timespec retval = (struct timespec){ .tv_sec = secs, .tv_nsec = nsecs };
-	RETVAL = &retval;
+	RETVAL = safecalloc(1, sizeof(struct timespec));
+	RETVAL->tv_sec = secs;
+	RETVAL->tv_nsec = nsecs;
 OUTPUT:
 	RETVAL
 

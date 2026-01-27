@@ -15,6 +15,16 @@ examples/realistic-benchmark.pl
 examples/strict_construction.pl
 examples/test-fastpath.pl
 examples/wildcard.pl
+examples/closure_interface.pl
+examples/benchmark-all-interfaces.pl
+examples/benchmark-make_filter.pl
+examples/benchmark-vs-raw.pl
+examples/CALL_CHAIN_ANALYSIS.md
+examples/CALL_CHAIN_VISUALIZATION.txt
+benchmark-make_filter.pl
+benchmark-optimized-filter.pl
+benchmark-three-variants.pl
+test-make_filter.pl
 lib/Params/Filter.pm
 Makefile.PL
 MANIFEST
@@ -25,3 +35,5 @@ t/00-load.t
 t/01-functional.t
 t/02-oo-interface.t
 t/03-modifier-methods.t
+t/04-make_filter.t
+t/benchmark.t

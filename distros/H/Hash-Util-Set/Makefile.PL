@@ -34,7 +34,7 @@ repository     'https://github.com/chansen/p5-hash-util-set';
 bugtracker     'https://github.com/chansen/p5-hash-util-set/issues';
 readme_from    'lib/Hash/Util/Set.pod';
 
-test_requires  'List::Util' => '0';
+test_requires  'List::Util' => '1.33';
 test_requires  'Test::More' => '0.88';
 
 WriteAll;

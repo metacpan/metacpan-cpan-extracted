@@ -10,9 +10,13 @@ This implies that `AdminUsers` and ` ShowConfigTab` rights should be granted in 
 
 # RT VERSION
 
-Works with RT 4.2 or greater
+Works with RT 4.2 or greater, including RT 5 and RT 6.
 
 # INSTALLATION
+
+- export `$RTHOME=/home/of/your/RT/installation/lib`
+
+    This is needed if your `RT` installation directory is not `/opt/rt6/` (nor `/opt/rt5` for RT 5, nor `/opt/rt4` for RT 4).
 
 - `perl Makefile.PL`
 - `make`
@@ -58,7 +62,7 @@ or via the web at
 
 # LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2017-2022 by Gérald Sédrati, Easter-Eggs
+This software is Copyright (c) 2017-2026 by Gérald Sédrati, Easter-Eggs
 
 This is free software, licensed under:
 

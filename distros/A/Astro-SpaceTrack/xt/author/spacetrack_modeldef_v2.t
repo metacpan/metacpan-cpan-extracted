@@ -240,10 +240,10 @@ EOD
 }
 
 $rslt = $st->spacetrack_query_v2( qw{
-    basicspacedata modeldef class tle
+    basicspacedata modeldef class gp_history
     } );
 
-ok $rslt->is_success(), 'Fetch modeldef for class tle';
+ok $rslt->is_success(), 'Fetch modeldef for class gp_history';
 
 if ( $rslt->is_success() ) {
 
@@ -254,10 +254,26 @@ if ( $rslt->is_success() ) {
       {
          "Default" : "",
          "Extra" : "",
+         "Field" : "CCSDS_OMM_VERS",
+         "Key" : "",
+         "Null" : "NO",
+         "Type" : "varchar(3)"
+      },
+      {
+         "Default" : "",
+         "Extra" : "",
          "Field" : "COMMENT",
          "Key" : "",
          "Null" : "NO",
-         "Type" : "varchar(32)"
+         "Type" : "varchar(33)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "CREATION_DATE",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "datetime"
       },
       {
          "Default" : "",
@@ -270,18 +286,202 @@ if ( $rslt->is_success() ) {
       {
          "Default" : null,
          "Extra" : "",
-         "Field" : "NORAD_CAT_ID",
+         "Field" : "OBJECT_NAME",
          "Key" : "",
          "Null" : "YES",
-         "Type" : "int(10) unsigned"
+         "Type" : "varchar(25)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "OBJECT_ID",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "varchar(12)"
       },
       {
          "Default" : "",
          "Extra" : "",
-         "Field" : "OBJECT_NAME",
+         "Field" : "CENTER_NAME",
          "Key" : "",
          "Null" : "NO",
-         "Type" : "varchar(25)"
+         "Type" : "varchar(5)"
+      },
+      {
+         "Default" : "",
+         "Extra" : "",
+         "Field" : "REF_FRAME",
+         "Key" : "",
+         "Null" : "NO",
+         "Type" : "varchar(4)"
+      },
+      {
+         "Default" : "",
+         "Extra" : "",
+         "Field" : "TIME_SYSTEM",
+         "Key" : "",
+         "Null" : "NO",
+         "Type" : "varchar(3)"
+      },
+      {
+         "Default" : "",
+         "Extra" : "",
+         "Field" : "MEAN_ELEMENT_THEORY",
+         "Key" : "",
+         "Null" : "NO",
+         "Type" : "varchar(4)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "EPOCH",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "datetime(6)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "MEAN_MOTION",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(13,8)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "ECCENTRICITY",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(13,8)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "INCLINATION",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(7,4)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "RA_OF_ASC_NODE",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(7,4)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "ARG_OF_PERICENTER",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(7,4)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "MEAN_ANOMALY",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(7,4)"
+      },
+      {
+         "Default" : "0",
+         "Extra" : "",
+         "Field" : "EPHEMERIS_TYPE",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "tinyint(3) unsigned"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "CLASSIFICATION_TYPE",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "char(1)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "NORAD_CAT_ID",
+         "Key" : "",
+         "Null" : "NO",
+         "Type" : "int(10) unsigned"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "ELEMENT_SET_NO",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "smallint(5) unsigned"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "REV_AT_EPOCH",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "mediumint(8) unsigned"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "BSTAR",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(19,14)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "MEAN_MOTION_DOT",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(9,8)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "MEAN_MOTION_DDOT",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(22,13)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "SEMIMAJOR_AXIS",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "double(12,3)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "PERIOD",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "double(12,3)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "APOAPSIS",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "double(12,3)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "PERIAPSIS",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "double(12,3)"
       },
       {
          "Default" : null,
@@ -292,240 +492,104 @@ if ( $rslt->is_success() ) {
          "Type" : "varchar(12)"
       },
       {
-         "Default" : "",
+         "Default" : null,
          "Extra" : "",
-         "Field" : "CLASSIFICATION_TYPE",
+         "Field" : "RCS_SIZE",
          "Key" : "",
-         "Null" : "NO",
-         "Type" : "char(1)"
+         "Null" : "YES",
+         "Type" : "varchar(6)"
       },
       {
          "Default" : null,
          "Extra" : "",
-         "Field" : "INTLDES",
+         "Field" : "COUNTRY_CODE",
          "Key" : "",
          "Null" : "YES",
-         "Type" : "varchar(8)"
+         "Type" : "char(6)"
       },
       {
-         "Default" : "1000-01-01 00:00:00",
+         "Default" : null,
          "Extra" : "",
-         "Field" : "EPOCH",
+         "Field" : "LAUNCH_DATE",
          "Key" : "",
-         "Null" : "NO",
-         "Type" : "datetime"
+         "Null" : "YES",
+         "Type" : "varchar(10)"
       },
       {
-         "Default" : "0",
+         "Default" : null,
          "Extra" : "",
-         "Field" : "EPOCH_MICROSECONDS",
+         "Field" : "SITE",
          "Key" : "",
-         "Null" : "NO",
-         "Type" : "mediumint(8) unsigned"
+         "Null" : "YES",
+         "Type" : "char(5)"
       },
       {
-         "Default" : "0",
+         "Default" : null,
          "Extra" : "",
-         "Field" : "MEAN_MOTION",
+         "Field" : "DECAY_DATE",
          "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
+         "Null" : "YES",
+         "Type" : "varchar(10)"
       },
       {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "ECCENTRICITY",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "INCLINATION",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "RA_OF_ASC_NODE",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "ARG_OF_PERICENTER",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "MEAN_ANOMALY",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "EPHEMERIS_TYPE",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "tinyint(3) unsigned"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "ELEMENT_SET_NO",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "smallint(5) unsigned"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "REV_AT_EPOCH",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "float"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "BSTAR",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "MEAN_MOTION_DOT",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "MEAN_MOTION_DDOT",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
+         "Default" : null,
          "Extra" : "",
          "Field" : "FILE",
          "Key" : "",
+         "Null" : "YES",
+         "Type" : "bigint(20) unsigned"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "GP_ID",
+         "Key" : "",
          "Null" : "NO",
          "Type" : "int(10) unsigned"
       },
       {
-         "Default" : "",
+         "Default" : null,
          "Extra" : "",
          "Field" : "TLE_LINE0",
          "Key" : "",
-         "Null" : "NO",
+         "Null" : "YES",
          "Type" : "varchar(27)"
       },
       {
-         "Default" : "",
+         "Default" : null,
          "Extra" : "",
          "Field" : "TLE_LINE1",
          "Key" : "",
-         "Null" : "NO",
-         "Type" : "char(71)"
+         "Null" : "YES",
+         "Type" : "varchar(71)"
       },
       {
-         "Default" : "",
+         "Default" : null,
          "Extra" : "",
          "Field" : "TLE_LINE2",
          "Key" : "",
-         "Null" : "NO",
-         "Type" : "char(71)"
-      },
-      {
-         "Default" : null,
-         "Extra" : "",
-         "Field" : "OBJECT_ID",
-         "Key" : "",
          "Null" : "YES",
-         "Type" : "varchar(11)"
-      },
-      {
-         "Default" : null,
-         "Extra" : "",
-         "Field" : "OBJECT_NUMBER",
-         "Key" : "",
-         "Null" : "YES",
-         "Type" : "int(10) unsigned"
-      },
-      {
-         "Default" : "0.000",
-         "Extra" : "",
-         "Field" : "SEMIMAJOR_AXIS",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double(20,3)"
-      },
-      {
-         "Default" : null,
-         "Extra" : "",
-         "Field" : "PERIOD",
-         "Key" : "",
-         "Null" : "YES",
-         "Type" : "double(20,3)"
-      },
-      {
-         "Default" : "0.000",
-         "Extra" : "",
-         "Field" : "APOGEE",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double(20,3)"
-      },
-      {
-         "Default" : "0.000",
-         "Extra" : "",
-         "Field" : "PERIGEE",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double(20,3)"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "DECAYED",
-         "Key" : "",
-         "Null" : "YES",
-         "Type" : "tinyint(1) unsigned"
+         "Type" : "varchar(71)"
       }
    ]
 }
 EOD
     my $got = $json->decode( $rslt->content() );
-    is_deeply $got, $expect, 'Got expected modeldef for class tle'
+    is_deeply $got, $expect, 'Got expected modeldef for class gp_history'
 	or do {
 	diag <<'EOD';
-Writing modeldef we got and we expect to tle.got and tle.expect
+Writing modeldef we got and we expect to gp_history.got and gp_history.expect
 EOD
-	dump_data( 'tle.got', $got );
-	dump_data( 'tle.expect', $expect );
+	dump_data( 'gp_history.got', $got );
+	dump_data( 'gp_history.expect', $expect );
     };
 }
 
 $rslt = $st->spacetrack_query_v2( qw{
-    basicspacedata modeldef class tle_latest
+    basicspacedata modeldef class gp
     } );
 
-ok $rslt->is_success(), 'Fetch modeldef for class tle_latest';
+ok $rslt->is_success(), 'Fetch modeldef for class gp';
 
 if ( $rslt->is_success() ) {
 
@@ -534,12 +598,12 @@ if ( $rslt->is_success() ) {
    "controller" : "basicspacedata",
    "data" : [
       {
-         "Default" : "0",
+         "Default" : "",
          "Extra" : "",
-         "Field" : "ORDINAL",
+         "Field" : "CCSDS_OMM_VERS",
          "Key" : "",
          "Null" : "NO",
-         "Type" : "tinyint(1) unsigned"
+         "Type" : "varchar(3)"
       },
       {
          "Default" : "",
@@ -547,7 +611,15 @@ if ( $rslt->is_success() ) {
          "Field" : "COMMENT",
          "Key" : "",
          "Null" : "NO",
-         "Type" : "varchar(32)"
+         "Type" : "varchar(33)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "CREATION_DATE",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "datetime"
       },
       {
          "Default" : "",
@@ -560,18 +632,202 @@ if ( $rslt->is_success() ) {
       {
          "Default" : null,
          "Extra" : "",
-         "Field" : "NORAD_CAT_ID",
+         "Field" : "OBJECT_NAME",
          "Key" : "",
          "Null" : "YES",
-         "Type" : "int(10) unsigned"
+         "Type" : "varchar(25)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "OBJECT_ID",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "varchar(12)"
       },
       {
          "Default" : "",
          "Extra" : "",
-         "Field" : "OBJECT_NAME",
+         "Field" : "CENTER_NAME",
          "Key" : "",
          "Null" : "NO",
-         "Type" : "varchar(25)"
+         "Type" : "varchar(5)"
+      },
+      {
+         "Default" : "",
+         "Extra" : "",
+         "Field" : "REF_FRAME",
+         "Key" : "",
+         "Null" : "NO",
+         "Type" : "varchar(4)"
+      },
+      {
+         "Default" : "",
+         "Extra" : "",
+         "Field" : "TIME_SYSTEM",
+         "Key" : "",
+         "Null" : "NO",
+         "Type" : "varchar(3)"
+      },
+      {
+         "Default" : "",
+         "Extra" : "",
+         "Field" : "MEAN_ELEMENT_THEORY",
+         "Key" : "",
+         "Null" : "NO",
+         "Type" : "varchar(4)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "EPOCH",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "datetime(6)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "MEAN_MOTION",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(13,8)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "ECCENTRICITY",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(13,8)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "INCLINATION",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(7,4)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "RA_OF_ASC_NODE",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(7,4)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "ARG_OF_PERICENTER",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(7,4)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "MEAN_ANOMALY",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(7,4)"
+      },
+      {
+         "Default" : "0",
+         "Extra" : "",
+         "Field" : "EPHEMERIS_TYPE",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "tinyint(4)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "CLASSIFICATION_TYPE",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "char(1)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "NORAD_CAT_ID",
+         "Key" : "",
+         "Null" : "NO",
+         "Type" : "int(10) unsigned"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "ELEMENT_SET_NO",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "smallint(5) unsigned"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "REV_AT_EPOCH",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "mediumint(8) unsigned"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "BSTAR",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(19,14)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "MEAN_MOTION_DOT",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(9,8)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "MEAN_MOTION_DDOT",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "decimal(22,13)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "SEMIMAJOR_AXIS",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "double(12,3)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "PERIOD",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "double(12,3)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "APOAPSIS",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "double(12,3)"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "PERIAPSIS",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "double(12,3)"
       },
       {
          "Default" : null,
@@ -582,232 +838,96 @@ if ( $rslt->is_success() ) {
          "Type" : "varchar(12)"
       },
       {
-         "Default" : "",
+         "Default" : null,
          "Extra" : "",
-         "Field" : "CLASSIFICATION_TYPE",
+         "Field" : "RCS_SIZE",
          "Key" : "",
-         "Null" : "NO",
-         "Type" : "char(1)"
+         "Null" : "YES",
+         "Type" : "char(6)"
       },
       {
          "Default" : null,
          "Extra" : "",
-         "Field" : "INTLDES",
+         "Field" : "COUNTRY_CODE",
          "Key" : "",
          "Null" : "YES",
-         "Type" : "varchar(8)"
+         "Type" : "char(6)"
       },
       {
-         "Default" : "1000-01-01 00:00:00",
+         "Default" : null,
          "Extra" : "",
-         "Field" : "EPOCH",
+         "Field" : "LAUNCH_DATE",
          "Key" : "",
-         "Null" : "NO",
-         "Type" : "datetime"
+         "Null" : "YES",
+         "Type" : "date"
       },
       {
-         "Default" : "0",
+         "Default" : null,
          "Extra" : "",
-         "Field" : "EPOCH_MICROSECONDS",
+         "Field" : "SITE",
          "Key" : "",
-         "Null" : "NO",
-         "Type" : "mediumint(8) unsigned"
+         "Null" : "YES",
+         "Type" : "char(5)"
       },
       {
-         "Default" : "0",
+         "Default" : null,
          "Extra" : "",
-         "Field" : "MEAN_MOTION",
+         "Field" : "DECAY_DATE",
          "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
+         "Null" : "YES",
+         "Type" : "date"
       },
       {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "ECCENTRICITY",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "INCLINATION",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "RA_OF_ASC_NODE",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "ARG_OF_PERICENTER",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "MEAN_ANOMALY",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "EPHEMERIS_TYPE",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "tinyint(3) unsigned"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "ELEMENT_SET_NO",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "smallint(5) unsigned"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "REV_AT_EPOCH",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "float"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "BSTAR",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "MEAN_MOTION_DOT",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "MEAN_MOTION_DDOT",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double"
-      },
-      {
-         "Default" : "0",
+         "Default" : null,
          "Extra" : "",
          "Field" : "FILE",
          "Key" : "",
+         "Null" : "YES",
+         "Type" : "bigint(20) unsigned"
+      },
+      {
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "GP_ID",
+         "Key" : "",
          "Null" : "NO",
          "Type" : "int(10) unsigned"
       },
       {
-         "Default" : "",
+         "Default" : null,
          "Extra" : "",
          "Field" : "TLE_LINE0",
          "Key" : "",
-         "Null" : "NO",
+         "Null" : "YES",
          "Type" : "varchar(27)"
       },
       {
-         "Default" : "",
+         "Default" : null,
          "Extra" : "",
          "Field" : "TLE_LINE1",
          "Key" : "",
-         "Null" : "NO",
-         "Type" : "char(71)"
+         "Null" : "YES",
+         "Type" : "varchar(71)"
       },
       {
-         "Default" : "",
+         "Default" : null,
          "Extra" : "",
          "Field" : "TLE_LINE2",
          "Key" : "",
-         "Null" : "NO",
-         "Type" : "char(71)"
-      },
-      {
-         "Default" : null,
-         "Extra" : "",
-         "Field" : "OBJECT_ID",
-         "Key" : "",
          "Null" : "YES",
-         "Type" : "varchar(11)"
-      },
-      {
-         "Default" : null,
-         "Extra" : "",
-         "Field" : "OBJECT_NUMBER",
-         "Key" : "",
-         "Null" : "YES",
-         "Type" : "int(10) unsigned"
-      },
-      {
-         "Default" : "0.000",
-         "Extra" : "",
-         "Field" : "SEMIMAJOR_AXIS",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double(20,3)"
-      },
-      {
-         "Default" : null,
-         "Extra" : "",
-         "Field" : "PERIOD",
-         "Key" : "",
-         "Null" : "YES",
-         "Type" : "double(20,3)"
-      },
-      {
-         "Default" : "0.000",
-         "Extra" : "",
-         "Field" : "APOGEE",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double(20,3)"
-      },
-      {
-         "Default" : "0.000",
-         "Extra" : "",
-         "Field" : "PERIGEE",
-         "Key" : "",
-         "Null" : "NO",
-         "Type" : "double(20,3)"
-      },
-      {
-         "Default" : "0",
-         "Extra" : "",
-         "Field" : "DECAYED",
-         "Key" : "",
-         "Null" : "YES",
-         "Type" : "tinyint(1) unsigned"
+         "Type" : "varchar(71)"
       }
    ]
 }
 EOD
     my $got = $json->decode( $rslt->content() );
-    is_deeply $got, $expect, 'Got expected modeldef for class tle_latest'
+    is_deeply $got, $expect, 'Got expected modeldef for class gp'
 	or do {
 	diag <<'EOD';
-Writing modeldef we got and we expect to tle_latest.got and tle_latest.expect
+Writing modeldef we got and we expect to gp.got and gp.expect
 EOD
-	dump_data( 'tle_latest.got', $got );
-	dump_data( 'tle_latest.expect', $expect );
+	dump_data( 'gp.got', $got );
+	dump_data( 'gp.expect', $expect );
     };
 }
 

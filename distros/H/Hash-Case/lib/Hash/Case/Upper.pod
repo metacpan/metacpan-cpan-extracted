@@ -12,59 +12,69 @@ Hash::Case::Upper - native hash with enforced lower cased keys
 
 =head1 SYNOPSIS
 
- use Hash::Case::Upper;
- tie my(%uchash), 'Hash::Case::Upper';
- $uchash{StraNGeKeY} = 3;
- print keys %uchash;  # STRANGEKEY
+  use Hash::Case::Upper;
+  tie my(%uchash), 'Hash::Case::Upper';
+  $uchash{StraNGeKeY} = 3;
+  print keys %uchash;  # STRANGEKEY
 
 =head1 DESCRIPTION
 
-Hash::Case::Upper extends L<Hash::Case|Hash::Case>, which lets you play various
+L<Hash::Case::Upper|Hash::Case::Upper> extends L<Hash::Case|Hash::Case>, which lets you play various
 trics with hash keys. In this implementation, the fake hash is case
 insensitive and the keys stored in upper-case.
 
 Extends L<"DESCRIPTION" in Hash::Case|Hash::Case/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Hash::Case|Hash::Case/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Hash::Case|Hash::Case/"Constructors">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<addHashData>(HASH)
+=item tie B<%hash>, 'Hash::Case::Upper', [$values,] %options
 
-Inherited, see L<Hash::Case/"Constructors">
+Define C<%hash> to have only upper-cased keys.  The hash is
+initialized with the C<$values>, specified as ARRAY or
+HASH.  Currently, there are no C<%options> defined.
+Improves base, see L<Hash::Case/"Constructors">
 
-=item $obj-E<gt>B<addPairs>(PAIRS)
+=back
 
-Inherited, see L<Hash::Case/"Constructors">
+=head2 Hidden object access
 
-=item $obj-E<gt>B<setHash>(HASH)
+Extends L<"Hidden object access" in Hash::Case|Hash::Case/"Hidden object access">.
 
-Inherited, see L<Hash::Case/"Constructors">
+=over 4
 
-=item B<tie>(HASH, 'Hash::Case::Upper', [VALUES,] OPTIONS)
+=item $obj-E<gt>B<addHashData>(\%data)
 
-Define HASH to have only upper cased keys.  The hash is
-initialized with the VALUES, specified as ref-array or
-ref-hash.  Currently, there are no OPTIONS defined.
+Inherited, see L<Hash::Case/"Hidden object access">
+
+=item $obj-E<gt>B<addPairs>(@pairs)
+
+Inherited, see L<Hash::Case/"Hidden object access">
+
+=item $obj-E<gt>B<setHash>(\%data)
+
+Inherited, see L<Hash::Case/"Hidden object access">
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Hash-Case distribution version 1.05,
-built on February 06, 2020. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Hash-Case version 1.07,
+built on January 26, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2002-2020 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2002-2026 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

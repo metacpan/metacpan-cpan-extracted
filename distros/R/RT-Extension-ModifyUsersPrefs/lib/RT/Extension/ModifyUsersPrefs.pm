@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::ModifyUsersPrefs;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =encoding utf8
 
@@ -20,11 +20,15 @@ This implies that C<AdminUsers> and C< ShowConfigTab> rights should be granted i
 
 =head1 RT VERSION
 
-Works with RT 4.2 or greater
+Works with RT 4.2 or greater, including RT 5 and RT 6.
 
 =head1 INSTALLATION
 
 =over
+
+=item export C<$RTHOME=/home/of/your/RT/installation/lib>
+
+This is needed if your C<RT> installation directory is not C</opt/rt6/> (nor C</opt/rt5> for RT 5, nor C</opt/rt4> for RT 4).
 
 =item C<perl Makefile.PL>
 
@@ -76,7 +80,7 @@ L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Modi
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2017-2022 by Gérald Sédrati, Easter-Eggs
+This software is Copyright (c) 2017-2026 by Gérald Sédrati, Easter-Eggs
 
 This is free software, licensed under:
 

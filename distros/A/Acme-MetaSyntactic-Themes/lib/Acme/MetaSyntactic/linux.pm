@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::linux;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.037';
+our $VERSION = '1.038';
 
 our %Remote = (
     source  => 'http://distrowatch.com/',
@@ -45,6 +45,12 @@ Philippe Bruhat (BooK).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2026-01-26 - v1.038
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.057.
 
 =item *
 
@@ -319,6 +325,7 @@ L<Acme::MetaSyntactic>, L<Acme::MetaSyntactic::List>.
 
 __DATA__
 # names
+lt_lt_Hack_Track
 ThreeCX
 FourMLinux
 Accessible_Coconut
@@ -327,6 +334,7 @@ AcreetionOS
 Adelie
 Aeon
 AerynOS
+AfagOS
 AgarimOS
 Alien_OS
 AlmaLinux
@@ -389,6 +397,7 @@ Clear_NDR
 Clonezilla
 CloudLinux
 Commodore
+Coyote
 CROWZ
 Crunchbangplusplus
 CRUX
@@ -413,6 +422,7 @@ Drauger
 Dynebolic
 DynFi
 EasyOS
+EcoOS
 Edubuntu
 ELEGANCE
 elementary
@@ -423,6 +433,7 @@ EN_OS
 EndeavourOS
 Endless
 Escuelas
+Essora
 EterTICs
 Exe
 Exherbo
@@ -467,9 +478,9 @@ Haiku
 HamoniKR
 HardenedBSD
 HeliumOS
+Helwan
 Huayra
 HydraPWK
-Hyperbola
 iDeal
 iodeOS
 IPFire
@@ -494,6 +505,7 @@ Lernstick
 LFS
 LibraZiK
 LibreELEC
+Lilidog
 Lingmo
 Linux_Schools
 LinuxCNC
@@ -563,6 +575,7 @@ openSUSE
 OPNsense
 Oracle
 Oreon
+OSGeoLive
 OSINT_VM
 OSMC
 OsoLinux
@@ -577,17 +590,20 @@ Parted_Magic
 PCLinuxOS
 Pearl
 pearOS
+PelandukOS
 PelicanHPC
 Pentoo
 Peppermint
 Peropesis
 pfSense
 PikaOS
+PimersusOS
 Pisi
 Plamo
 Planeta_Tecno
 PLD
 Plop
+PluriOS
 Pop_OS
 Porteus
 Porteus_Kiosk
@@ -667,6 +683,7 @@ Tails
 Talos
 TeaLinux
 Thinstation
+TigerOS
 TileOS
 Tiny_Core
 TobbeOS
@@ -713,7 +730,6 @@ Void
 Volumio
 Voyager
 VyOS
-wattOS
 Whonix
 Wifislax
 WM_Live

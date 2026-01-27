@@ -12,59 +12,45 @@ Hash::Case::Preserve - hash with enforced lower cased keys
 
 =head1 SYNOPSIS
 
- use Hash::Case::Preserve;
- tie my(%cphash), 'Hash::Case::Preserve';
- $cphash{StraNGeKeY} = 3;
- print keys %cphash;         # StraNGeKeY
- print $cphash{strangekey};  # 3
- print $cphash{STRANGEKEY};  # 3
+  use Hash::Case::Preserve;
+  tie my(%cphash), 'Hash::Case::Preserve';
+  $cphash{StraNGeKeY} = 3;
+  print keys %cphash;         # StraNGeKeY
+  print $cphash{strangekey};  # 3
+  print $cphash{STRANGEKEY};  # 3
 
 =head1 DESCRIPTION
 
-Hash::Case::Preserve extends L<Hash::Case|Hash::Case>, which lets you play
+L<Hash::Case::Preserve|Hash::Case::Preserve> extends L<Hash::Case|Hash::Case>, which lets you play
 various trics with hash keys. This extension implements a fake
 hash which is case-insentive. The keys are administered in the
 casing as they were used: case-insensitive but case-preserving.
 
 Extends L<"DESCRIPTION" in Hash::Case|Hash::Case/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Hash::Case|Hash::Case/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Hash::Case|Hash::Case/"Constructors">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<addHashData>(HASH)
+=item tie B<%hash>, 'Hash::Case::Preserve', [$values,] %options
 
-Inherited, see L<Hash::Case/"Constructors">
-
-=item $obj-E<gt>B<addPairs>(PAIRS)
-
-Inherited, see L<Hash::Case/"Constructors">
-
-=item $obj-E<gt>B<setHash>(HASH)
-
-Inherited, see L<Hash::Case/"Constructors">
-
-=item B<tie>(HASH, 'Hash::Case::Preserve', [VALUES,] OPTIONS)
-
-Define HASH to be case insensitive, but case preserving.
-The hash is initialized with the VALUES, specified as ref-array (passing
-a list of key-value pairs) or ref-hash.
-
-OPTIONS is a list of key/value pairs, which specify how the hash
-must handle preservation.  Current options:
+Define C<%hash> to be case insensitive, but case preserving.
+The hash is initialized with the C<$values>, specified as ARRAY (passing
+flat key-value pairs) or HASH.
+Improves base, see L<Hash::Case/"Constructors">
 
  -Option--Default
   keep    'LAST'
 
 =over 2
 
-=item keep => 'FIRST' | 'LAST'
+=item keep => 'FIRST'|'LAST'
 
 Which casing is the preferred casing?  The FIRST appearance or the LAST.
 Only stores will affect the casing, deletes will undo the definition.
@@ -74,16 +60,37 @@ Defaults to LAST, which is slightly faster.
 
 =back
 
+=head2 Hidden object access
+
+Extends L<"Hidden object access" in Hash::Case|Hash::Case/"Hidden object access">.
+
+=over 4
+
+=item $obj-E<gt>B<addHashData>(\%data)
+
+Inherited, see L<Hash::Case/"Hidden object access">
+
+=item $obj-E<gt>B<addPairs>(@pairs)
+
+Inherited, see L<Hash::Case/"Hidden object access">
+
+=item $obj-E<gt>B<setHash>(\%data)
+
+Inherited, see L<Hash::Case/"Hidden object access">
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Hash-Case distribution version 1.05,
-built on February 06, 2020. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Hash-Case version 1.07,
+built on January 26, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2002-2020 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2002-2026 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

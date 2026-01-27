@@ -240,6 +240,7 @@ static int generate_wrapper(StrBuf *buf, const char *target,
 static int generate_boot(StrBuf *buf, const char *module_name,
                          XS_JIT_Func *functions, int num_funcs) {
     char safe_module[256];
+    int i;
     safe_name(module_name, safe_module, sizeof(safe_module));
 
     strbuf_append(buf, "\n/* Boot function */\n");
@@ -272,7 +273,7 @@ static int generate_boot(StrBuf *buf, const char *module_name,
     strbuf_append(buf, "\n");
 
     /* Register each function */
-    for (int i = 0; i < num_funcs; i++) {
+    for (i = 0; i < num_funcs; i++) {
         if (!functions[i].target) break;
 
         char safe_target[256];
@@ -306,6 +307,7 @@ char* xs_jit_generate_code(pTHX_ const char *user_code,
                            XS_JIT_Func *functions,
                            int num_funcs) {
     StrBuf buf;
+    int i;
     strbuf_init(&buf);
 
     /* Standard headers */
@@ -394,7 +396,7 @@ char* xs_jit_generate_code(pTHX_ const char *user_code,
     strbuf_append(&buf, "/* ========== XS Wrappers ========== */\n");
 
     /* Generate wrapper for each function */
-    for (int i = 0; i < num_funcs; i++) {
+    for (i = 0; i < num_funcs; i++) {
         if (!functions[i].target) break;
         generate_wrapper(&buf, functions[i].target, functions[i].source,
                         functions[i].has_varargs, functions[i].is_xs_native);
@@ -427,7 +429,8 @@ static int mkdir_p(const char *path) {
 }
 
 /* Compile C file to shared object */
-int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file) {
+int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file,
+                        const char *extra_cflags, const char *extra_ldflags) {
     HV *config = get_hv("Config::Config", 0);
     if (!config) {
         warn("XS::JIT: Cannot access %%Config");
@@ -448,15 +451,19 @@ int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file) {
     const char *lddlflags = (lddlflags_sv && *lddlflags_sv) ? SvPV_nolen(*lddlflags_sv) : "";
     const char *archlib = (archlib_sv && *archlib_sv) ? SvPV_nolen(*archlib_sv) : "";
 
+    /* Default to empty string if NULL */
+    if (!extra_cflags) extra_cflags = "";
+    if (!extra_ldflags) extra_ldflags = "";
+
     char o_file[MAX_PATH_LEN];
     snprintf(o_file, sizeof(o_file), "%s.o", c_file);
 
-    char cmd[MAX_PATH_LEN * 2];
+    char cmd[MAX_PATH_LEN * 4];  /* Larger buffer for extra flags */
     int ret;
 
-    /* Compile to object with optimization */
-    snprintf(cmd, sizeof(cmd), "%s %s %s %s -c -o \"%s\" -I\"%s/CORE\" \"%s\" 2>&1",
-             cc, ccflags, optimize, cccdlflags, o_file, archlib, c_file);
+    /* Compile to object with optimization and extra cflags */
+    snprintf(cmd, sizeof(cmd), "%s %s %s %s %s -c -o \"%s\" -I\"%s/CORE\" \"%s\" 2>&1",
+             cc, ccflags, optimize, cccdlflags, extra_cflags, o_file, archlib, c_file);
 
     ret = system(cmd);
     if (ret != 0) {
@@ -464,9 +471,9 @@ int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file) {
         return 0;
     }
 
-    /* Link to shared object */
-    snprintf(cmd, sizeof(cmd), "%s %s -o \"%s\" \"%s\" 2>&1",
-             cc, lddlflags, so_file, o_file);
+    /* Link to shared object with extra ldflags */
+    snprintf(cmd, sizeof(cmd), "%s %s %s -o \"%s\" \"%s\" 2>&1",
+             cc, lddlflags, extra_ldflags, so_file, o_file);
 
     ret = system(cmd);
     if (ret != 0) {
@@ -615,7 +622,8 @@ int xs_jit_load(pTHX_ const char *module_name, const char *so_file) {
 
 /* Check if any of the target functions are already defined */
 static int functions_already_loaded(pTHX_ XS_JIT_Func *functions, int num_functions) {
-    for (int i = 0; i < num_functions && functions[i].target; i++) {
+    int i;
+    for (i = 0; i < num_functions && functions[i].target; i++) {
         /* Split target into package and function name */
         const char *target = functions[i].target;
         const char *last_colon = strrchr(target, ':');
@@ -645,7 +653,8 @@ static int functions_already_loaded(pTHX_ XS_JIT_Func *functions, int num_functi
 /* Main compile function */
 int xs_jit_compile(pTHX_ const char *code, const char *name,
                    XS_JIT_Func *functions, int num_functions,
-                   const char *cache_dir, int force) {
+                   const char *cache_dir, int force,
+                   const char *extra_cflags, const char *extra_ldflags) {
     char so_path[MAX_PATH_LEN];
     char c_path[MAX_PATH_LEN];
     char dir_path[MAX_PATH_LEN];
@@ -702,8 +711,8 @@ int xs_jit_compile(pTHX_ const char *code, const char *name,
     fclose(fp);
     free(generated);
 
-    /* Compile */
-    if (!xs_jit_compile_file(aTHX_ c_path, so_path)) {
+    /* Compile with extra flags */
+    if (!xs_jit_compile_file(aTHX_ c_path, so_path, extra_cflags, extra_ldflags)) {
         return 0;
     }
 

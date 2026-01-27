@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 4.02.
+# This code is part of Perl distribution Mail-Message version 4.03.
 # The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Parser::Lines;{
-our $VERSION = '4.02';
+our $VERSION = '4.03';
 }
 
 use parent 'Mail::Box::Parser';
@@ -153,7 +153,7 @@ sub _read_stripped_lines(;$$)
 	}
 
 	unless($self->trusted)
-	{	s/\015// for @$take;
+	{	s/\015// for @$take;   # remove \r, keep \n
 	}
 
 	$take;

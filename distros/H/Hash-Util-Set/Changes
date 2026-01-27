@@ -1,2 +1,8 @@
+0.03 2026-01-26
+ - any() and all() require List::Util ≥ 1.33.
+
+0.02 2026-01-26
+  - Ensure tests run against the pure-Perl version, not an installed XS version.
+
 0.01 2026-01-25
   - Initial CPAN release.

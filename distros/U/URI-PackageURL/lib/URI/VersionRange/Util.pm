@@ -6,8 +6,9 @@ use utf8;
 use warnings;
 
 use Exporter qw(import);
+use Carp     ();
 
-our $VERSION = '2.24';
+our $VERSION = '2.25';
 
 our @EXPORT = qw(
     parse_semver normalize_semver is_semver
@@ -598,7 +599,7 @@ URI::VersionRange::Util - Utility for URI::VersionRange
 
   use URI::VersionRange::Util qw(native_range_to_vers);
 
-  $vers = native_range_to_vers('npm', '~1.6.5 || >=1.7.2'); # vers:npm/>=1.6.5|<1.7.0|>=1.7.2'
+  $vers = native_range_to_vers('npm', '~1.6.5 || >=1.7.2'); # vers:npm/>=1.6.5|<1.7.0|>=1.7.2
 
 
 =head1 DESCRIPTION
@@ -611,7 +612,7 @@ URL::VersionRange::Util is the utility package for URL::VersionRange.
 
 Converts the specified native range string and returns the corresponding VERS string.
 
-    $vers = native_range_to_vers('npm', '~1.6.5 || >=1.7.2'); # vers:npm/>=1.6.5|<1.7.0|>=1.7.2'
+    $vers = native_range_to_vers('npm', '~1.6.5 || >=1.7.2'); # vers:npm/>=1.6.5|<1.7.0|>=1.7.2
 
 
 Supported native range scheme:

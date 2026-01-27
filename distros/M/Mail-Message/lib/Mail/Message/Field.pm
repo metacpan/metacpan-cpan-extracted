@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 4.02.
+# This code is part of Perl distribution Mail-Message version 4.03.
 # The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Message::Field;{
-our $VERSION = '4.02';
+our $VERSION = '4.03';
 }
 
 use parent 'Mail::Reporter';
@@ -18,12 +18,13 @@ use parent 'Mail::Reporter';
 use strict;
 use warnings;
 
-use Log::Report      'mail-message', import => [ qw/__x error info panic warning/ ];
+use Log::Report  'mail-message', import => [ qw/__x error info panic warning/ ];
 
-use Mail::Address    ();
-use IO::Handle       ();
-use Date::Format     qw/strftime/;
-use Scalar::Util     qw/blessed/;
+use Mail::Address        ();
+use IO::Handle           ();
+use Date::Format         qw/strftime/;
+use Scalar::Util         qw/blessed/;
+use Hash::Case::Preserve ();
 
 our %_structured;  # not to be used directly: call isStructured!
 my $default_wrap_length = 78;
@@ -204,7 +205,7 @@ sub attribute($;$)
 	# broken messages do repeat them.  See github issue 20.  Apple Mail and
 	# Outlook will take the last of the repeated in such case, so we do that
 	# as well.
-	my %attrs = $self->attributes;
+	tie my %attrs, 'Hash::Case::Preserve', [ $self->attributes ];
 	@_ or return $attrs{$attr};
 
 	# set the value

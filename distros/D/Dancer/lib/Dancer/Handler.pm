@@ -1,7 +1,7 @@
 package Dancer::Handler;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Dancer request handler
-$Dancer::Handler::VERSION = '1.3521';
+$Dancer::Handler::VERSION = '1.3522';
 use strict;
 use warnings;
 use Carp;
@@ -223,7 +223,7 @@ Dancer::Handler - Dancer request handler
 
 =head1 VERSION
 
-version 1.3521
+version 1.3522
 
 =head1 AUTHOR
 

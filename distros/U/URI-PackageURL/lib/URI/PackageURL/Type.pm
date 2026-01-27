@@ -13,7 +13,7 @@ use List::Util qw(first);
 
 use constant DEBUG => $ENV{PURL_DEBUG};
 
-our $VERSION = '2.24';
+our $VERSION = '2.25';
 
 
 my %ALGO_LENGTH = ('md5' => 32, 'sha1' => 40, 'sha256' => 64, 'sha384' => 96, 'sha512' => 128);
@@ -186,6 +186,7 @@ TYPE: for ($components{type}) {
 
         if (/cpan/) {
             if (defined $components{qualifiers}->{author}) {
+
                 # CPAN ID. It MUST be written uppercase.
                 $components{qualifiers}->{author} = uc $components{qualifiers}->{author};
             }
@@ -402,18 +403,30 @@ URI::PackageURL::Type - PURL type definition class for URI::PackageURL
 
 =head1 DESCRIPTION
 
-L<URL::PackageURL::Type> is the PURL type definition helper for URL::PackageURL.
+L<URL::PackageURL::Type> is the PURL type definition helper for L<URL::PackageURL>.
 
-=over
+=head2 FUNCTIONAL INTERFACE
 
-=item $purl_type = URI::PackageURL::Type->new($purl_type)
+=head3 B<definition_dir>
+
+    $path = URI::PackageURL::Type::definition_dir();
+
+Return the local PURL type definitions directory.
+
+=head2 OBJECT-ORIENTED INTERFACE
+
+=head3 B<new>
+
+    $purl_type = URI::PackageURL::Type->new($purl_type)
 
 Create new B<URI::PackageURL::Type> instance and load PURL type definition for
 normalization and validation.
 
-    $type = URI::PackageURL::Type->new('cpan');
+    $purl_type = URI::PackageURL::Type->new('cpan');
 
-=item $purl_type->normalize(%components)
+=head3 B<normalize>
+
+    $purl_type->normalize(%components)
 
 Perform PURL components normalization:
 
@@ -431,7 +444,9 @@ Perform PURL components normalization:
     #   name      => 'URI-PackageURL'
     # }
 
-=item $purl_type->validate(%components)
+=head3 B<validate>
+
+    $purl_type->validate(%components)
 
 Perform PURL components validation:
 
@@ -439,9 +454,6 @@ Perform PURL components validation:
         type => 'CPAN',
         name => 'URI-PackageURL'
     );
-
-=back
-
 
 =head2 Definition
 

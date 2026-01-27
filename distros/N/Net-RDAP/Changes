@@ -1,5 +1,8 @@
 Revision history for perl module Net::RDAP:
 
+0.41 - 2026-01-27
+  - add support for the ttl0 extension.
+
 0.40 - 2025-07-09
   - update this file with the changes from the last release.
 

@@ -1,5 +1,14 @@
 Revision history for OpenAPI-Modern
 
+0.125     2026-01-27 00:00:08Z
+          - fix stringification bug on older perls from last release
+
+0.124     2026-01-26 22:23:44Z
+          - BREAKING CHANGE: "path_captures" in find_path_item and
+            validate_request is no longer percent-decoded
+          - full support for parsing of "path" parameters: simple, matrix and
+            label styles, as well as parsing into arrays and objects
+
 0.123     2026-01-21 22:53:30Z
           - more scenarios are supported in OAD 3.0 -> 3.[1,2] upgrade
 

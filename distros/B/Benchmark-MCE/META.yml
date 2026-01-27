@@ -7,7 +7,6 @@ build_requires:
   Test2::V0: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.52'
-  File::ShareDir::Install: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -26,5 +25,5 @@ requires:
   perl: '5.010000'
 resources:
   repository: git://github.com/SpareRoom/Benchmark-MCE.git
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

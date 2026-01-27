@@ -5,7 +5,7 @@ use warnings;
 use Exporter   qw[import];
 use List::Util qw[all any];
 
-our $VERSION   = '0.01';
+our $VERSION   = '0.03';
 our @EXPORT_OK = qw[ keys_union
                      keys_intersection
                      keys_difference

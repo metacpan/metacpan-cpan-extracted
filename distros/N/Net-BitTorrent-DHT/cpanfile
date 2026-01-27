@@ -1,20 +1,17 @@
-requires 'AnyEvent';
-requires 'AnyEvent::Util';
-requires 'AnyEvent::HTTP';
-requires 'Bit::Vector';
-requires 'Moose';
-requires 'Moose::Role';
-requires 'Moose::Util::TypeConstraints';
-requires 'Net::BitTorrent::Protocol', 'v1.0.2';
-requires 'Scalar::Util';
+requires 'Algorithm::Kademlia';
+requires 'IO::Select';
+requires 'IO::Socket::INET';
+requires 'Net::BitTorrent::Protocol::BEP03::Bencode';
 requires 'Socket';
-requires 'Types::Standard';
-requires 'feature';
-requires 'perl', '5.010';
-recommends 'Config::IPFilter';
-
-on 'test' => sub {
-    requires 'Test::More', '0.98';
-    requires 'Test::Class';
-    requires 'Test::Moose';
+requires 'perl', 'v5.42.0';
+recommends 'IO::Async';
+on configure => sub {
+    requires 'Module::Build::Tiny';
+    requires 'perl', 'v5.42.0';
+};
+on build => sub {
+    requires 'Module::Build::Tiny';
+};
+on test => sub {
+    requires 'Test2::V0';
 };

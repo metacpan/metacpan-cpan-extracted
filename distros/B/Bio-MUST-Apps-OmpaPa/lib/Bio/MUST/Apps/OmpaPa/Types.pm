@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::OmpaPa::Types;
 # ABSTRACT: Distribution-wide Moose types for Bio::MUST::Apps::OmpaPa
-$Bio::MUST::Apps::OmpaPa::Types::VERSION = '0.252040';
+$Bio::MUST::Apps::OmpaPa::Types::VERSION = '0.260260';
 use Moose::Util::TypeConstraints;
 
 use autodie;
@@ -32,7 +32,7 @@ Bio::MUST::Apps::OmpaPa::Types - Distribution-wide Moose types for Bio::MUST::Ap
 
 =head1 VERSION
 
-version 0.252040
+version 0.260260
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::OmpaPa::Roles::Parsable;
 # ABSTRACT: Parsable Moose role for search report objects
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Apps::OmpaPa::Roles::Parsable::VERSION = '0.252040';
+$Bio::MUST::Apps::OmpaPa::Roles::Parsable::VERSION = '0.260260';
 use Moose::Role;
 
 use autodie;
@@ -993,7 +993,7 @@ Bio::MUST::Apps::OmpaPa::Roles::Parsable - Parsable Moose role for search report
 
 =head1 VERSION
 
-version 0.252040
+version 0.260260
 
 =head1 SYNOPSIS
 

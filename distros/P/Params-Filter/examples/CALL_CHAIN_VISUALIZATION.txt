@@ -1,0 +1,177 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                 Params::Filter Call Chain Visualization                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ FUNCTIONAL INTERFACE                                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    User Code
+        │
+        │  use Params::Filter qw/filter/;
+        │  my ($result, $msg) = filter($data, \@req, \@acc, \@exc);
+        │
+        ▼
+    ┌──────────────┐
+    │   filter()   │  ◄─── Does ALL the work
+    └──────────────┘
+        │
+        ├─► Parse input (hashref/arrayref/scalar)
+        ├─► Validate required fields
+        ├─► Remove excluded fields
+        ├─► Accept optional fields
+        ├─► Build result hashref
+        └─► Return (hashref, message)
+
+    Total call depth: 1 level
+    Performance: 2.85µs average
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ OBJECT-ORIENTED INTERFACE                                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    User Code
+        │
+        │  use Params::Filter;
+        │  my $f = Params::Filter->new_filter({ ... });
+        │  my ($result, $msg) = $f->apply($data);
+        │
+        ▼
+    ┌──────────────┐
+        │ new_filter() │  ◄─── One-time setup (cached in object)
+        └──────────────┘
+        │
+        ├─► Store required array
+        ├─► Store accepted array
+        ├─► Store excluded array
+        └─► Store debug flag
+
+    Then for each apply() call:
+
+        │
+        ▼
+    ┌──────────────┐
+    │   apply()    │  ◄─── THIN WRAPPER
+    └──────────────┘
+        │
+        ├─► Extract $self->{required}
+        ├─► Extract $self->{accepted}
+        ├─► Extract $self->{excluded}
+        ├─► Extract $self->{debug}
+        ├─► Call filter($data, $req, $ok, $no, $db)  ◄─── 0.37µs overhead
+        ├─► Check wantarray
+        └─► Return in context
+        │
+        ▼
+    ┌──────────────┐
+    │   filter()   │  ◄─── Same as functional interface
+    └──────────────┘
+        │
+        └─► [Does ALL the work - same as above]
+
+    Total call depth: 2 levels
+    Performance: 3.22µs average (0.37µs wrapper overhead)
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ CALL GRAPH (from profiling)                                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    main::RUNTIME
+        │
+        ├─► Params::Filter::new_filter()  [called once]
+        │       └─► CORE:match
+        │
+        ├─► Params::Filter::filter()      [called directly]
+        │       └─► [does all work]
+        │
+        └─► Params::Filter::apply()       [called for OO interface]
+                └─► Params::Filter::filter()
+                        └─► [does all work]
+
+    Key insight: apply() → filter() is the ONLY internal call chain
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ COMPARISON: Functional vs OO                                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────┬──────────────┬──────────────┐
+    │ Metric              │ Functional   │ OO           │
+    ├─────────────────────┼──────────────┼──────────────┤
+    │ Call depth          │ 1 level      │ 2 levels     │
+    │ Time per call       │ 2.85µs       │ 3.22µs       │
+    │ Wrapper overhead    │ 0%           │ 13%          │
+    │ Absolute overhead   │ 0µs          │ 0.37µs       │
+    │ Setup cost          │ 0µs          │ 6µs (once)   │
+    │ Code reuse          │ N/A          │ Good         │
+    │ Interface clarity   │ Good         │ Excellent    │
+    └─────────────────────┴──────────────┴──────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SIMPLIFICATION OPTIONS                                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    Option 1: Inline filter() into apply()
+        ┌─────────────────────────────────────────┐
+        │ apply($data) {                          │
+        │     # Directly use $self->{required}    │
+        │     # Inline all filter logic here      │
+        │ }                                       │
+        └─────────────────────────────────────────┘
+        Gain: ~0.37µs per call
+        Cost: Code duplication, harder to maintain
+
+
+    Option 2: Make apply() an alias
+        ┌─────────────────────────────────────────┐
+        │ *apply = \&filter;  # Simple alias      │
+        └─────────────────────────────────────────┘
+        Gain: ~0.3µs per call
+        Cost: Breaking change, less explicit
+
+
+    Option 3: Single unified function
+        ┌─────────────────────────────────────────┐
+        │ sub filter {                            │
+        │     if (ref $_[0] eq 'Params::Filter') {│
+        │         # OO mode: extract from $self   │
+        │     } else {                            │
+        │         # Functional mode               │
+        │     }                                   │
+        │     # Common logic                      │
+        │ }                                       │
+        └─────────────────────────────────────────┘
+        Gain: ~0.2µs per call
+        Cost: Mixed paradigms, more complex
+
+
+    Option 4: NO CHANGE (RECOMMENDED)
+        ✓ Clean separation of concerns
+        ✓ Easy to understand and maintain
+        ✓ Minimal overhead (0.37µs is negligible)
+        ✓ API stability preserved
+        ✓ Both interfaces work identically
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ RECOMMENDATION                                                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    Keep the current call structure.
+
+    Why?
+    • 0.37µs overhead is negligible for real-world use cases
+    • Code clarity and maintainability are more valuable
+    • The module is intentionally designed for safety, not raw speed
+    • Users who need maximum speed can use manual hash operations
+    • Current structure is already well-optimized
+
+    When to consider changes?
+    • Only if profiling shows filter() in a VERY tight loop (millions of calls)
+    • When every microsecond truly matters
+    • And you're willing to break API compatibility
+
+    Otherwise: Current design is optimal for its goals.

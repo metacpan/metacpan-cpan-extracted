@@ -1,31 +1,28 @@
 use v5.40;
+use feature 'class';
+no warnings 'experimental::class';
 
-package App::Gimei::Generators;
+class App::Gimei::Generators {
 
-use Data::Gimei;
+    use Data::Gimei;
 
-use Class::Tiny qw(
-  body
-);
+    field $body : param = [];
 
-sub BUILDARGS ($self) {
-    return { body => [] };
-}
-
-sub push ( $self, $generator ) {
-    CORE::push @{ $self->body }, $generator;
-}
-
-sub execute ($self) {
-    my ( @words, %cache );
-    foreach my $g ( @{ $self->body } ) {
-        CORE::push( @words, $g->execute( \%cache ) );
+    method add_generator ($generator) {
+        push @{$body}, $generator;
     }
-    return @words;
-}
 
-sub to_list ($self) {
-    return @{ $self->body };
+    method execute () {
+        my ( @words, %cache );
+        foreach my $g ( @{$body} ) {
+            push( @words, $g->execute( \%cache ) );
+        }
+        return @words;
+    }
+
+    method to_list () {
+        return @{$body};
+    }
 }
 
 1;

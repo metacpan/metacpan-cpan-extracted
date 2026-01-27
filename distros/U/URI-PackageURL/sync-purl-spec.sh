@@ -19,3 +19,6 @@ wget -O $PURL_ARCHIVE_FILE $PURL_ARCHIVE_URL
 unzip -j $PURL_ARCHIVE_FILE 'purl-spec-*/types/*-definition.json' -d $CWD/lib/URI/PackageURL/types
 
 rm $PURL_ARCHIVE_FILE
+
+# Update manifest
+make manifest

@@ -2,9 +2,7 @@ use ExtUtils::MakeMaker;
 
 require 5.016;
 
-use IO::Handle;
-
-my $version  = '4.02';
+my $version  = '4.03';
 my $git      = "https://github.com/markov2/perl5-Mail-Message";
 my $publish  = "../public_html/mail-message";
 my $homepage = "http://perl.overmeer.net/CPAN/";
@@ -61,29 +59,30 @@ my %oodist   = (
 my %requires = (
 	'Date::Format'   => 0,
 	'Date::Parse'    => 0,
-	'Encode'         => 2.26,
+	'Encode'         => '2.26',
 	'Encode::Alias'  => 0,
 	'Fcntl'          => 0,
 	'File::Basename' => 0,
 	'File::Copy'     => 0,
-	'File::Spec'     => 0.7,
+	'File::Spec'     => '0.7',
 	'File::Temp'     => 0,
+	'Hash::Case'     => '1.05',
 	'IO::Scalar'     => 0,
 	'IO::Lines'      => 0,
 	'List::Util'     => 0,
 	'Log::Report'    => '1.42',
-	'Mail::Address'  => 2.17,
+	'Mail::Address'  => '2.17',
 	'MIME::Base64'   => 0,
 	'MIME::QuotedPrint' => 0,
-	'MIME::Types'    => 1.004,
+	'MIME::Types'    => '1.004',
 	'POSIX'          => 0,
-	'Scalar::Util'   => 1.13,
+	'Scalar::Util'   => '1.13',
 	'Storable'       => 0,
-	'String::Print'  => 1.01,
+	'String::Print'  => '1.01',
 	'Sys::Hostname'  => 0,
-	'Time::HiRes'    => 1.51,
+	'Time::HiRes'    => '1.51',
 	'Time::Zone'     => 0,
-	'URI'            => 1.23,
+	'URI'            => '1.23',
 	'User::Identity' => '4.0',
 );
 

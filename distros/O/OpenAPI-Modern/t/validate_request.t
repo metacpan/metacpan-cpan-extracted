@@ -16,6 +16,7 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use lib 't/lib';
 use Helper;
 use JSON::Schema::Modern::Utilities qw(jsonp get_type);
+use OpenAPI::Modern::Utilities 'uri_encode';
 
 my $doc_uri_rel = Mojo::URL->new('/api');
 my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('http://example.com'));
@@ -491,7 +492,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/headers/Cookie/yum',
+          instanceLocation => '/request/header/Cookie',
           keywordLocation => jsonp(qw(/paths /foo post parameters 0)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 0)))->to_string,
           error => 'cookie parameters not yet supported',
@@ -1032,6 +1033,221 @@ YAML
     $openapi->validate_request($request = request('GET', 'http://example.com/application/x-www-form-urlencoded?key=%e0%b2%a0&bar=2'))->TO_JSON,
     { valid => true },
     'application/x-www-form-urlencoded querystring is url-decoded and properly decoded',
+  );
+
+
+  # see examples in 3.2.0 §4.12.8
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo/{username}:
+    parameters:
+      - name: username
+        in: path
+        description: username to fetch
+        required: true
+        schema:
+          type: string
+          enum: [ edijkstra, diṅnāga, الخوارزميّ ]
+        examples:
+          "Edsger Dijkstra":
+            dataValue: edijkstra
+            serializedValue: edijkstra
+          Diṅnāga:
+            dataValue: diṅnāga
+            serializedValue: di%E1%B9%85n%C4%81ga
+          Al-Khwarizmi:
+            dataValue: "الخوارزميّ"
+            serializedValue: "%D8%A7%D9%84%D8%AE%D9%88%D8%A7%D8%B1%D8%B2%D9%85%D9%8A%D9%91"
+    get: {}
+YAML
+
+  foreach my $username (qw(diṅnāga الخوارزميّ)) {
+    $request = request('GET', 'http://example.com/foo/'.$username);
+    cmp_result(
+      $openapi->validate_request($request)->TO_JSON,
+      { valid => true },
+      'all path parameters are deserialized correctly',
+    );
+  }
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo/{path_token}:
+    get: {}
+    parameters:
+      - name: path_token
+        in: path
+        required: true
+        schema:
+          type: array
+          items:
+            type: integer
+            format: int64
+          const: [ 12345678, 90099 ]
+        style: simple
+        examples:
+          Tokens:
+            dataValue:
+              - 12345678
+              - 90099
+            serializedValue: "12345678,90099"
+YAML
+
+  $request = request('GET', 'http://example.com/foo/12345678,90099');
+  cmp_result(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'all path parameters are deserialized correctly',
+  );
+
+
+  # note: characters in parameter names and values that look like - are actually − U+2212 %E2%88%92
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+servers:
+  - url: http://{host}.example.com/{subdir}
+    variables:
+      host:
+        default: prod
+        enum: [dev, stg, prod, st💩g]
+      subdir:
+        default: blah
+paths:
+  /{simple−string}/{simple−array−false}/{simple−array−true}/{simple−object−false}/{simple−object−true}/{cølör0}/{cølör1}/{cølör2}/{cølör3}/{cølör4}/{label−string}/{label−array−false}/{label−array−true}/{label−object−false}/{label−object−true}:
+    parameters:
+      - name: simple−string
+        in: path
+        required: true
+        schema:
+          const: red﹠green
+      - name: simple−array−false
+        in: path
+        required: true
+        schema:
+          type: array
+          const: [ blue−black, blackish﹠green, 100𝑥brown ]
+      - name: simple−array−true
+        in: path
+        required: true
+        explode: true
+        schema:
+          type: array
+          const: [ blue−black, blackish﹠green, 100𝑥brown ]
+      - name: simple−object−false
+        in: path
+        required: true
+        schema:
+          type: object
+          const: { blue−black: yes!, blackish﹠green: ¿no?, 100𝑥brown: fl¡p }
+      - name: simple−object−true
+        in: path
+        required: true
+        explode: true
+        schema:
+          type: object
+          const: { blue−black: yes!, blackish﹠green: ¿no?, 100𝑥brown: fl¡p }
+      - name: cølör0
+        in: path
+        required: true
+        style: matrix
+        schema:
+          const: red﹠green
+      - name: cølör1
+        in: path
+        required: true
+        style: matrix
+        schema:
+          type: array
+          const: [ blue−black, blackish﹠green, 100𝑥brown ]
+      - name: cølör2
+        in: path
+        required: true
+        style: matrix
+        explode: true
+        schema:
+          type: array
+          const: [ blue−black, blackish﹠green, 100𝑥brown ]
+      - name: cølör3
+        in: path
+        required: true
+        style: matrix
+        schema:
+          type: object
+          const: { blue−black: yes!, blackish﹠green: ¿no?, 100𝑥brown: fl¡p }
+      - name: cølör4
+        in: path
+        required: true
+        style: matrix
+        explode: true
+        schema:
+          type: object
+          const: { blue−black: yes!, blackish﹠green: ¿no?, 100𝑥brown: fl¡p }
+      - name: label−string
+        in: path
+        required: true
+        style: label
+        schema:
+          const: red﹠gr.e.en
+      - name: label−array−false
+        in: path
+        required: true
+        style: label
+        schema:
+          type: array
+          const: [ blue−black, blackish﹠green, 100𝑥brown ]
+      - name: label−array−true
+        in: path
+        required: true
+        style: label
+        explode: true
+        schema:
+          type: array
+          const: [ blue−black, blackish﹠green, 100𝑥brown ]
+      - name: label−object−false
+        in: path
+        required: true
+        style: label
+        schema:
+          type: object
+          const: { blue−black: yes!, blackish﹠green: ¿no?, 100𝑥brown: fl¡p }
+      - name: label−object−true
+        in: path
+        required: true
+        style: label
+        explode: true
+        schema:
+          type: object
+          const: { blue−black: yes!, blackish﹠green: ¿no?, 100𝑥brown: fl¡p }
+    get: {}
+YAML
+
+  $request = request('GET', 'http://st💩g.example.com/'.join('/', map uri_encode($_), '🐙',
+    'red﹠green',
+    ('blue−black,blackish﹠green,100𝑥brown')x2,
+    'blue−black,yes!,blackish﹠green,¿no?,100𝑥brown,fl¡p',
+    'blue−black=yes!,blackish﹠green=¿no?,100𝑥brown=fl¡p',
+    ';cølör0=red﹠green',
+    ';cølör1=blue−black,blackish﹠green,100𝑥brown',
+    ';cølör2=blue−black;cølör2=blackish﹠green;cølör2=100𝑥brown',
+    ';cølör3=blue−black,yes!,blackish﹠green,¿no?,100𝑥brown,fl¡p',
+    ';blue−black=yes!;blackish﹠green=¿no?;100𝑥brown=fl¡p',
+    '.red﹠gr.e.en',
+    '.blue−black,blackish﹠green,100𝑥brown',
+    '.blue−black.blackish﹠green.100𝑥brown',
+    '.blue−black,yes!,blackish﹠green,¿no?,100𝑥brown,fl¡p',
+    '.blue−black=yes!.blackish﹠green=¿no?.100𝑥brown=fl¡p',
+  ));
+
+  cmp_result(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'all path parameters are deserialized correctly',
   );
 
 

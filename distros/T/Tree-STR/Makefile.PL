@@ -27,11 +27,11 @@ my %WriteMakefileArgs = (
         resources   => {
             repository => {
                 type => 'git',
-                url  => 'https://github.com/biogeospatial/Tree-STR.git',
-                web  => 'https://github.com/biogeospatial/Tree-STR',
+                url  => 'https://github.com/biogeospatial/Perl-Tree-STR.git',
+                web  => 'https://github.com/biogeospatial/Perl-Tree-STR',
             },
             bugtracker => {
-                web => 'https://github.com/biogeospatial/Tree-STR/issues',
+                web => 'https://github.com/biogeospatial/Perl-Tree-STR/issues',
             },
         },
     },

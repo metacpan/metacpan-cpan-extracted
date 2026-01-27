@@ -312,7 +312,8 @@ returned.  The attribute is still encoded.
 =item $obj-E<gt>B<attributes>()
 
 Returns a list of key-value pairs, where the values are not yet decoded.
-Keys may appear more than once.
+Keys may appear more than once and must be interpreted case insensitive
+(RFC2073 section 5.1)
 
 » example: 
 
@@ -864,8 +865,8 @@ Cast by C<consume()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.02,
-built on January 22, 2026. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.03,
+built on January 26, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

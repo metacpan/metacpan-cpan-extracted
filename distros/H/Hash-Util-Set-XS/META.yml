@@ -21,10 +21,11 @@ no_index:
     - inc
     - t
 requires:
+  Hash::Util::Set: 0
   XSLoader: 0.02
   perl: 5.10.1
 resources:
   bugtracker: https://github.com/chansen/p5-hash-util-set-xs/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/chansen/p5-hash-util-set-xs
-version: '0.01'
+version: '0.02'

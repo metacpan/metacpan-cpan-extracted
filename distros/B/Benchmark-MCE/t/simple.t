@@ -1,7 +1,6 @@
 use Test2::V0;
 use Benchmark::MCE;
 use Capture::Tiny 'capture';
-use File::ShareDir 'dist_dir';
 
 # Test adapted from Benchmark::DKbench
 

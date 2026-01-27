@@ -8,19 +8,19 @@ use open ':std', ':encoding(UTF-8)';
 use Test::More;
 
 BEGIN {
-  use_ok('Hash::Util::Set', qw[ keys_union
-                                keys_intersection
-                                keys_difference
-                                keys_symmetric_difference
-                                keys_disjoint
-                                keys_equal
-                                keys_subset
-                                keys_proper_subset
-                                keys_superset
-                                keys_proper_superset
-                                keys_any
-                                keys_all
-                                keys_none ]);
+  use_ok('Hash::Util::Set::PP', qw[ keys_union
+                                    keys_intersection
+                                    keys_difference
+                                    keys_symmetric_difference
+                                    keys_disjoint
+                                    keys_equal
+                                    keys_subset
+                                    keys_proper_subset
+                                    keys_superset
+                                    keys_proper_superset
+                                    keys_any
+                                    keys_all
+                                    keys_none ]);
 }
 
 {

@@ -1,31 +1,36 @@
-# Copyrights 2002-2020 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of distribution Hash::Case.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Hash-Case version 1.07.
+# The POD got stripped from this file by OODoc version 3.06.
+# For contributors see file ChangeLog.
 
-package Hash::Case::Lower;
-use vars '$VERSION';
-$VERSION = '1.05';
+# This software is copyright (c) 2002-2026 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+
+package Hash::Case::Lower;{
+our $VERSION = '1.07';
+}
 
 use base 'Hash::Case';
 
 use strict;
 use warnings;
-use Carp   qw(croak);
 
+use Carp   qw/croak/;
+
+#--------------------
 
 sub init($)
-{   my ($self, $args) = @_;
+{	my ($self, $args) = @_;
 
-    $self->SUPER::native_init($args);
+	$self->SUPER::native_init($args);
 
-    croak "no options possible for ". __PACKAGE__
-        if keys %$args;
+	! keys %$args
+		or croak "no options possible for ". __PACKAGE__;
 
-    $self;
+	$self;
 }
 
 sub FETCH($)  { $_[0]->{lc $_[1]} }

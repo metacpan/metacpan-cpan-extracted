@@ -1,0 +1,75 @@
+use utf8;
+
+our @values = ('False', 'True');
+
+our @Final = (
+    sub {
+        # Iterate through Boolean CustomFields
+        my $cfs = RT::CustomFields->new(RT->SystemUser);
+        $cfs->Limit(FIELD => 'Type', VALUE => 'Boolean');
+        while (my $cf = $cfs->Next) {
+            $RT::Logger->info("Processing " . $cf->Name . "…");
+
+            # Update Type
+            $cf->SetType('Select');
+
+            # Add values
+            for (my $i = 0; $i < scalar @values; $i++) {
+                $cf->AddValue(Name => $values[$i], SortOrder => $i);
+            }
+
+            # Update RenderType
+            $cf->SetRenderType('Checkbox');
+
+            my $object_type_from_lookup_type = $cf->ObjectTypeFromLookupType;
+            my $record_class_from_lookup_type = $cf->CollectionClassFromLookupType($cf->RecordClassFromLookupType);
+            my $collection_class_from_lookup_type = $cf->CollectionClassFromLookupType($object_type_from_lookup_type);
+
+            my $added = $cf->AddedTo;
+            unless ($added && $added->Count) {
+                if ($cf->IsGlobal) {
+                    $added = $record_class_from_lookup_type->new(RT->SystemUser);
+                    $added->UnLimit;
+                } else {
+                    $RT::Logger->info("No collection");
+                    next;
+                }
+            }
+            $added->LimitToUserDefinedGroups if $record_class_from_lookup_type eq 'RT::Groups';
+
+            while (my $collection_class = $added->Next) {
+                my $objects;
+                if ($record_class_from_lookup_type eq collection_class_from_lookup_type) {
+                    $objects = $collection_class;
+                } else {
+                    $objects = $collection_class_from_lookup_type->new(RT->SystemUser);
+                }
+                $RT::Logger->info("Updating all " . ref($objects) . " of " . ref($collection_class) . " #" . $collection_class->id);
+                if ($collection_class_from_lookup_type eq 'RT::Articles') {
+                    $objects->Limit(FIELD => 'class', VALUE => $collection_class->id);
+                } elsif ($collection_class_from_lookup_type eq 'RT::Assets') {
+                    $objects->LimitCatalog(VALUE => $collection_class->id);
+                } elsif ($collection_class_from_lookup_type eq 'RT::Tickets') {
+                    $objects->LimitQueue(VALUE => $collection_class->id);
+                } elsif ($collection_class_from_lookup_type eq 'RT::Transactions' && $cf->LookupType eq 'RT::Queue-RT::Ticket-RT::Transaction') {
+                    $objects->FromSQL("TicketQueue = " . $collection_class->id);
+                } elsif ($collection_class_from_lookup_type =~ /^(?:RT::Queues|RT::Classes|RT::Groups|RT::Users)$/) {
+                    $objects->Limit(FIELD => 'id', VALUE => $collection_class->id);
+                }
+
+                $objects->LimitToEnabled unless $collection_class_from_lookup_type =~ /^(?:RT::Assets|RT::Tickets|RT::Transactions)$/;
+
+                while (my $object = $objects->Next) {
+                    my $bool = $object->FirstCustomFieldValue($cf->id);
+                    my $val = $bool ? $values[1] : $values[0];
+                    my ($ok, $err) = $object->AddCustomFieldValue(Field => $cf->id, Value => $val);
+                    if ($ok) {
+                        $RT::Logger->info(ref($object) . " #" . $object->id . " updated to $val");
+                    } else {
+                        $RT::Logger->info("Cannot update " . ref($object) . " #" . $object->id . " to $val: $err");
+                    }
+                }
+            }
+        }
+    },
+);

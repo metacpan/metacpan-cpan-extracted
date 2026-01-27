@@ -35,12 +35,12 @@ repository     'https://github.com/chansen/p5-hash-util-set-xs';
 bugtracker     'https://github.com/chansen/p5-hash-util-set-xs/issues';
 readme_from    'lib/Hash/Util/Set/XS.pod';
 
-requires       'XSLoader'   => '0';
-test_requires  'Test::More' => '0.88';
+requires       'XSLoader'        => '0';
+requires       'Hash::Util::Set' => '0';
+test_requires  'Test::More'      => '0.88';
 
 cc_warnings;
 
-ppport;
 requires_external_cc;
 
 WriteAll;

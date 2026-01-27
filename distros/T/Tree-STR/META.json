@@ -46,14 +46,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/biogeospatial/Tree-STR/issues"
+         "web" : "https://github.com/biogeospatial/Perl-Tree-STR/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/biogeospatial/Tree-STR.git",
-         "web" : "https://github.com/biogeospatial/Tree-STR"
+         "url" : "https://github.com/biogeospatial/Perl-Tree-STR.git",
+         "web" : "https://github.com/biogeospatial/Perl-Tree-STR"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -8,6 +8,7 @@ use autodie;
 
 use Config::Any;
 use Getopt::Euclid qw(:vars);
+use Path::Class qw(file dir);
 use Smart::Comments;
 
 use IO::Prompter [
@@ -37,12 +38,17 @@ Missing required arguments:
     --taxdir=<dir>
 EOT
 
+die <<'EOT' if !$ARGV_skip_config && $ARGV_batch_classify;
+Missing required arguments:
+    --skip-config=<file>
+EOT
+
 # setup OmpaPa sub-class based on report type
 my $class = $ARGV_report_type eq 'blastxml' ? Blast : Hmmer;
 
 # setup Taxonomy-related objects
 my $scheme;
-my $skip_classifier;
+my $classifier;
 if ($ARGV_taxdir) {
     my $tax = Taxonomy->new_from_cache( tax_dir => $ARGV_taxdir );
     $scheme = $ARGV_colorize ? $tax->load_color_scheme($ARGV_colorize)
@@ -61,8 +67,7 @@ if ($ARGV_taxdir) {
             use_ext         => 1,
         } );
         ### skip_config: $skip_config->{$ARGV_skip_config}
-        $skip_classifier
-            = $tax->tax_classifier( $skip_config->{$ARGV_skip_config} );
+        $classifier = $tax->tax_classifier( $skip_config->{$ARGV_skip_config} );
     }
 }
 
@@ -78,10 +83,11 @@ $args{scheme}              = $scheme          if $scheme;
 ### Silencing most Taxonomy-related warnings to reduce interactive clutter
 local $SIG{__WARN__} = Taxonomy->no_warnings;
 
-# process infiles
 FILE:
 for my $infile (@ARGV_infiles) {
+
     ### Processing: $infile
+    my $inf_obj = file($infile);
 
     # enforce precedence order for Parameters (supercede class defaults)
     if ($ARGV_restore_last_params) {
@@ -103,16 +109,32 @@ for my $infile (@ARGV_infiles) {
     say '[' . $oum->count_hits . ' hits processed] ';
 
     # optionally skip report
-    if ($skip_classifier) {
+    if ($classifier) {
+
+        # optionally create output directories named after categories
+        # Note: this could happen in different indirs (depending on infiles)
+        if ($ARGV_batch_classify) {
+            for my $cat ( $classifier->all_categories ) {
+                my $subdir = dir( $inf_obj->dir, $cat->label )->relative;
+                $subdir->mkpath();
+            }
+        }
 
         # extract all hit ids
         my @hits = map { $_->{acc} } $oum->all_hits;
         my $listable = IdList->new( ids => \@hits );
 
         # classify report
-        my $cat_label = $skip_classifier->classify($listable);
+        my $cat_label = $classifier->classify($listable);
         if ($cat_label) {
             ### Skipping report: "$infile | $cat_label"
+
+            # optionally copy report to corresponding output directory
+            if ($ARGV_batch_classify) {
+                my $subdir = dir( $inf_obj->dir, $cat_label )->relative;
+                $inf_obj->copy_to( file($subdir, $inf_obj->basename) );
+            }
+
             next FILE;
         }
     }
@@ -185,7 +207,7 @@ ompa-pa.pl - Extract seqs from BLAST/HMMER interactively or in batch mode
 
 =head1 VERSION
 
-version 0.252040
+version 0.260260
 
 =head1 USAGE
 
@@ -234,18 +256,6 @@ To build such a database, use one of the following commands:
 This argument is required when the option C<--extract-seqs> is enabled.
 
 =for Euclid: file.type: string
-
-=item --skip-config=<file>
-
-Path to an optional configuration file specifying the reports to skip based on
-their raw taxonomic content [default: none]. The assessment is made before any
-filtering other than C<--max-hits>.
-
-The configuration file follows the classifier format (often YAML) of
-<classify-ali.pl>. This requires enabling taxonomic annotation and thus a
-local mirror of the NCBI Taxonomy database
-
-=for Euclid: file.type: readable
 
 =item --colorize=<scheme>
 
@@ -299,20 +309,6 @@ Taxonomy extraction switch [default: no]. When specified, NCBI taxons of
 selected sequences are stored into a file using the same basename as other
 output files. This requires a local mirror of the NCBI Taxonomy database.
 
-=item --restore-params-from=<file>
-
-Batch-mode switch [default: no]. When specified, parameters are restored from
-the user-specified JSON file. This option takes precedence on any command-line
-specified option, such as C<--max-hits>, C<--min-cov> and C<--max-copy>.
-
-=for Euclid: file.type: string
-
-=item --restore-last-params
-
-Batch-mode switch [default: no]. When specified, parameters are restored from
-the last saved JSON file for each report. This option takes precedence over
-all other command-line options.
-
 =item --print-plots
 
 When specified, plots are printed in PDF format [default: no].
@@ -328,6 +324,40 @@ variable C<OUM_GNUPLOT_EXEC>.
 
 =for Euclid: str.type:    string
     str.default: 'x11'
+
+=item --restore-params-from=<file>
+
+Batch-mode switch for selecting parameters [default: no]. When specified,
+parameters are restored from the user-specified JSON file. This option takes
+precedence on any command-line specified option, such as C<--max-hits>,
+C<--min-cov> and C<--max-copy>.
+
+=for Euclid: file.type: string
+
+=item --restore-last-params
+
+Batch-mode switch for selecting parameters [default: no]. When specified,
+parameters are restored from the last saved JSON file for each report. This
+option takes precedence over all other command-line options.
+
+=item --skip-config=<file>
+
+Path to an optional configuration file specifying the reports to skip based on
+their raw taxonomic content [default: none]. The assessment is made before any
+filtering other than C<--max-hits>.
+
+The configuration file follows the classifier format (often YAML) of
+C<classify-ali.pl>. This requires enabling taxonomic annotation and thus a
+local mirror of the NCBI Taxonomy database
+
+=for Euclid: file.type: readable
+
+=item --batch-classify
+
+Batch-mode switch for skipping reports [default: no]. This option is meant to
+complement the option C<--skip-config>. When specified, reports are sorted
+into subdirectories named after the categories of the config file, in a way
+similar to what <classify-ali.pl> does. No GUI is presented to the user.
 
 =item --version
 

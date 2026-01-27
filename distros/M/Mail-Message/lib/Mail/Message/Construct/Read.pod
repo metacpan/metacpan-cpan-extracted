@@ -114,8 +114,8 @@ Cast by C<read()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.02,
-built on January 22, 2026. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.03,
+built on January 26, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
