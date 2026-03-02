@@ -46,7 +46,7 @@ resources:
   bugtracker: https://github.com/adriaandens/Container-Builder/issues
   homepage: https://github.com/adriaandens/Container-Builder
   repository: https://github.com/adriaandens/Container-Builder.git
-version: '0.07'
+version: '0.09'
 x_contributors:
   - 'Adriaan Dens <adriaan.dens@gmail.com>'
 x_generated_by_perl: v5.40.1

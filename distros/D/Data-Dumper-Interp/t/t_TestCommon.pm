@@ -88,8 +88,10 @@ our @EXPORT = qw/silent
                  rawstr showstr showcontrols displaystr
                  show_white show_empty_string
                  fmt_codestring
+                 verif_warning
                  verif_no_internals_mentioned
                  insert_loc_in_evalstr verif_eval_err
+                 tdir
                  timed_run
                  mycheckeq_literal expect1 mycheck _mycheck_end
                  arrays_eq hash_subset
@@ -123,7 +125,8 @@ sub bug(@) { @_=("BUG FOUND:",@_); goto &Carp::confess }
 
 # Parse manual-testing args from @ARGV
 my @orig_ARGV = @ARGV;
-our ($debug, $verbose, $silent, $savepath, $nobail, $nonrandom, %dvs);
+our ($debug, $verbose, $silent, $savepath, $nobail, $nonrandom,
+     $workdir, %dvs);
 use Getopt::Long qw(GetOptions);
 Getopt::Long::Configure("pass_through");
 GetOptions(
@@ -133,6 +136,7 @@ GetOptions(
   "nobail"            => \$nobail,
   "n|nonrandom"       => \$nonrandom,
   "v|verbose"         => \$verbose,
+  "workdir=s"         => \$workdir,
 ) or die "bad args";
 Getopt::Long::Configure("default");
 say "> ARGV PASSED THROUGH: ",join(",",map{ "'${_}'" } @ARGV)
@@ -162,6 +166,25 @@ if ($nonrandom) {
     # https://web.archive.org/web/20160308025634/http://wiki.cpantesters.org/wiki/cpanauthornotes
     exec $Config{perlpath}, $0, @orig_ARGV; # for reproducible results
   }
+}
+
+# Return a Path::Tiny object to a temporary directory, which may be
+# specified with the --workdir command-line arg.
+sub tdir() {
+  state $tdir;
+  if (! $tdir) {
+    if ($workdir) {
+      $workdir = path($workdir);
+      if ($workdir->exists) {
+        warn("# Removing old workdir ", qsh($workdir),"\n");
+        $workdir->remove_tree;
+      }
+      $tdir = $workdir->mkdir;
+    } else {
+      $tdir = Path::Tiny->tempdir();
+    }
+  };
+  $tdir
 }
 
 sub import {
@@ -753,6 +776,24 @@ sub mycheck($$@) {
         goto &mycheckeq_literal
       }
     }
+  }
+}
+
+# USAGE: verif_warning { code... } qr/.../  [,"optional description"]
+#                                 ^ NO COMMA!
+sub verif_warning(&$) {
+  my ($code, $expected, $desc) = @_;
+  local $_;  # preserve $1 etc. for caller
+  my $got = "";
+  local $SIG{__WARN__} = sub { $got .= join("", @_); };
+  $code->();
+  unless ($got =~ qr/$expected/) {
+    my @caller = caller(0);
+    my $ln = $caller[2];
+    my $fn = $caller[1];
+    confess "expected warning did not occur at $fn line $ln\n",
+            "  (expected $expected)\n",
+            "  (got '${got}')\n";
   }
 }
 

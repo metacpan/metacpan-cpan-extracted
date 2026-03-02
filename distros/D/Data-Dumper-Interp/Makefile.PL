@@ -35,6 +35,7 @@ my %WriteMakefileArgs = (
     "feature" => 0,
     "if" => 0,
     "overload" => 0,
+    "re" => 0,
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
@@ -82,7 +83,7 @@ my %WriteMakefileArgs = (
     "threads::shared" => 0,
     "vars" => 0
   },
-  "VERSION" => "7.022",
+  "VERSION" => "7.023",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -145,6 +146,7 @@ my %FallbackPrereqs = (
   "multidimensional" => 0,
   "overload" => 0,
   "parent" => 0,
+  "re" => 0,
   "strict" => 0,
   "threads" => 0,
   "threads::shared" => 0,

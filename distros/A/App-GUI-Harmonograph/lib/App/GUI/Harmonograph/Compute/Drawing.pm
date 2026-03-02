@@ -297,6 +297,7 @@ sub compile {
     my $code = join '', map {$_.";\n"} @code, '}'; # say $code;
     my $code_ref = eval $code;
     die "bug '$@' in drawing code: $code" if $@;   # say "comp: ",timestr( timediff( Benchmark->new(), $t) );
+say "draw";
     return $code_ref;
 }
 

@@ -74,9 +74,19 @@ subtest 'parallel option' => sub {
     like $out, qr/-V/, '-V passed to up.pm';
 };
 
-subtest 'fold option' => sub {
+subtest 'no-paginate option' => sub {
     my $out = nup('-F script/nup');
-    like $out, qr/-F/, '-F passed to up.pm';
+    like $out, qr/--no-paginate/, '-F converted to --no-paginate';
+};
+
+subtest 'no-fold re-enables paginate' => sub {
+    my $out = nup('-F --no-fold script/nup');
+    unlike $out, qr/--no-paginate/, '--no-fold re-enables paginate';
+};
+
+subtest 'auto-paginate option' => sub {
+    my $out = nup('-A script/nup');
+    like $out, qr/-A/, '-A passed to up.pm';
 };
 
 subtest 'auto command mode' => sub {

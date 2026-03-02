@@ -13,7 +13,7 @@ my $default_settings = {
         duration=> 60, dot_density => 200, colors_used => 2,
         color_flow_type => 'no', color_flow_dynamic => 0, color_flow_speed => 4, invert_flow_speed => 0,
 };
-my @state_keys = keys %$default_settings;
+my @state_keys = sort keys %$default_settings;
 my @state_widgets = qw/line_thickness pen_style dot_probability color_flow_type
                        color_flow_dynamic color_flow_speed invert_flow_speed colors_used/;
 my @widget_keys;
@@ -155,7 +155,9 @@ sub init         { $_[0]->set_settings( $default_settings ) }
 sub set_settings {
     my ( $self, $settings ) = @_;
     return unless ref $settings eq 'HASH' and exists $settings->{'draw'};
-    $settings->{ $_ } //= $default_settings->{ $_ } for @state_keys;
+    for (@state_keys){
+		$settings->{ $_ } = $default_settings->{ $_ } unless exists $settings->{ $_ } and defined $settings->{ $_ } and $settings->{ $_ } ne ' ';
+	}
     $self->{'widget'}{ $_ }->SetValue( $settings->{ $_ } ) for @state_widgets;
 
     $self->{'widget'}{'draw'}->SetSelection(
@@ -169,7 +171,7 @@ sub set_settings {
 }
 sub get_settings {
     my ( $self ) = @_;
-    my $settings = { map { $_ => $self->{'widget'}{$_}->GetValue } @state_widgets};
+    my $settings = { map { $_ => ($self->{'widget'}{$_}->GetValue ? $self->{'widget'}{$_}->GetValue : 0) } @state_widgets};
     $settings->{'duration'} = ($self->{'widget'}{ 'duration_min' }->GetValue * 60)
                              + $self->{'widget'}{ 'duration_s' }->GetValue;
     $settings->{'dot_density'} = ($self->{'widget'}{ '100dots_per_second' }->GetValue * 100)

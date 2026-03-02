@@ -1,5 +1,5 @@
 requires 'perl', '5.008001';
-requires 'Digest::SHA';
+requires 'Crypt::SysRandom';
 requires 'Amon2::Util';
 
 on 'test' => sub {

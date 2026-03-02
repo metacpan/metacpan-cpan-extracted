@@ -1,6 +1,6 @@
 # NAME
 
-Amon2::Plugin::Web::CSRFDefender - Anti CSRF filter
+Amon2::Plugin::Web::CSRFDefender - (DEPRECATED) Anti CSRF filter
 
 # SYNOPSIS
 
@@ -11,9 +11,11 @@ Amon2::Plugin::Web::CSRFDefender - Anti CSRF filter
 
 # DESCRIPTION
 
+**This module is deprecated.** Do not use it in new code.
+
 This plugin denies CSRF request.
 
-Do not use this with [HTTP::Session2](https://metacpan.org/pod/HTTP::Session2). Because [HTTP::Session2](https://metacpan.org/pod/HTTP::Session2) has XSRF token management function by itself.
+Do not use this with [HTTP::Session2](https://metacpan.org/pod/HTTP%3A%3ASession2). Because [HTTP::Session2](https://metacpan.org/pod/HTTP%3A%3ASession2) has XSRF token management function by itself.
 
 # METHODS
 

@@ -1,6 +1,6 @@
 package App::nup;
 
-our $VERSION = "0.9908";
+our $VERSION = "1.07";
 
 1;
 =encoding utf-8
@@ -22,7 +22,8 @@ nup - n-up, multi-column paged output for commands and files
          --alias=CMD=OPTS   set command alias
      -V  --parallel         parallel view mode
      -D  --document         document mode (default: on)
-     -F  --fold             fold mode (disable page mode)
+     -F  --no-paginate      disable page mode
+     -A  --auto-paginate    auto disable page mode for single column
      -H  --filename         show filename headers (default: on)
      -G  --grid=#           grid layout (e.g., 2x3)
      -C  --pane=#           number of columns
@@ -43,7 +44,7 @@ nup - n-up, multi-column paged output for commands and files
 
 =head1 VERSION
 
-Version 0.9908
+Version 1.07
 
 =cut
 =head1 DESCRIPTION
@@ -112,7 +113,7 @@ Example:
 
 Enable parallel view mode for ansicolumn.  In this mode, each file
 is displayed in its own column without pagination, similar to
-C<--fold>.  Automatically enabled when multiple files are
+C<--no-paginate>.  Automatically enabled when multiple files are
 specified.  Single file or stdin input results in single column
 output.
 
@@ -122,11 +123,20 @@ Enable document mode for ansicolumn.  This mode is optimized for
 viewing documents with n-up page-based layout.  Enabled by default.
 Use C<--no-document> to disable.
 
-=item B<-F>, B<--fold>
+=for comment
+--fold is accepted as an undocumented alias for backward compatibility
 
-Enable fold mode (disable page mode).  In fold mode, the entire
-content is split evenly across columns without pagination.  Page
-mode is the default.
+=item B<-F>, B<--no-paginate>
+
+Disable page mode.  Without pagination, the entire content is
+split evenly across columns.  Page mode is the default; use
+B<--paginate> to re-enable if needed.
+
+=item B<-A>, B<--auto-paginate>
+
+Automatically disable page mode when only one column fits the
+terminal.  This is useful when using C<nup> as C<MANPAGER>,
+where single-column page splitting wastes space.
 
 =item B<-H>, B<--filename>
 
@@ -249,9 +259,13 @@ Typical n-up usage:
     nup man nup                # view manual in n-up layout
     nup -C2 man perl           # 2 columns
     nup -G2x2 man perl         # 2x2 grid (4-up layout)
-    nup -F man perl            # fold mode (no pagination)
+    nup -F man perl            # no pagination
     nup file1.txt file2.txt    # view files side by side
     nup -e ./script.sh         # force command mode for a file
+
+Using C<nup> as a C<MANPAGER>:
+
+    export MANPAGER="nup -A"
 
 =head1 INSTALLATION
 
@@ -271,7 +285,7 @@ the output is passed through a filter pipeline.
 
 =head1 SEE ALSO
 
-L<App::optex::up>, L<optex>
+L<App::optex::up> (bundled), L<optex>
 
 =head1 AUTHOR
 

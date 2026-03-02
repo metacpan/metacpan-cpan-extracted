@@ -18,8 +18,8 @@ use lib $Bin;
 use t_Common ; # strict, warnings, Carp
 use t_TestCommon ##':silent', # Test2::V0 etc.
                  qw/bug displaystr fmt_codestring timed_run
-                    rawstr showstr showcontrols
-                    mycheckeq_literal mycheck @quotes/;
+                    rawstr showstr showcontrols verif_warning
+                    verif_eval_err mycheckeq_literal mycheck @quotes/;
 
 diag "executing at line ".__LINE__; # try to find mystery Windows crash
 
@@ -34,6 +34,7 @@ BEGIN{ diag "before use Data::Compare etc."; } # try to find mystery Windows cra
 use Data::Compare qw(Compare);
 use Data::Dumper::Interp qw/:all/;
 BEGIN{ diag "after  use Data::Compare etc."; } # try to find mystery Windows crash
+
 
 diag "executing at line ".__LINE__; # try to find mystery Windows crash
 
@@ -81,6 +82,13 @@ sub visFoldwidth() {
 
 confess("Non-zero initial CHILD_ERROR ($?)") if $? != 0;
 
+# Bug in v7.022 :
+#   Trailing literal backslash --> parse error
+#   parse error --> uninitialized LQ & RQ if there were no prior conversions
+#   This dies bc of "use warnings FATAL => 'all'" in lib/Data/Dumper/Interp.pm
+#   but silently succeeds if the bug is fixed.
+verif_warning { ()=dvis('BBB \\'); } qr/invalid expression.*\\/si;
+pass("uninitialized LQ bug seems to be fixed");
 
 # Run a variety of tests on an item which is a string or strigified object
 # which is not presented as a bare number (i.e. it is shown in quotes).
@@ -402,6 +410,7 @@ diag "Now at line ".__LINE__."\n"; # try to find mystery Windows crash
   mycheck $code, 'a vv=123 b', eval $code; }
 
 diag "Now at line ".__LINE__."\n"; # try to find mystery Windows crash
+
 
 # Check Deparse support
 { my $data = \&test_sub;

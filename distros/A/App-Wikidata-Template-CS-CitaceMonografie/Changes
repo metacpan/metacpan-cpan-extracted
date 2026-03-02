@@ -1,3 +1,9 @@
+0.06 2026-03-01T13:56:32+01:00
+ - Add test for real situation from Wikidata with translators defined by
+   P655 and P2093.
+ - Fix usage od 'cb_wikidata' callbacku.
+ - Update copyright years.
+
 0.05 2025-09-27T12:31:07+02:00
  - Add check of 'cb_wikidata' callback.
  - Add link to author.

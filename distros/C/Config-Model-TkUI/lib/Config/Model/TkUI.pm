@@ -7,12 +7,15 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::TkUI 1.380;
+package Config::Model::TkUI 1.381;
 
-use 5.10.1;
+use 5.20.1;
 use strict;
 use warnings;
 use Carp;
+
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 use base qw/Tk::Toplevel/;
 use vars qw/$icon_path $error_img $warn_img/;
@@ -37,7 +40,7 @@ use Tk::FontDialog;
 use Tk::Pod;
 use Tk::Pod::Text;    # for findpod
 
-use Config::Model 2.134; # reset config
+use Config::Model 2.135; # reset config clears changes
 
 use Config::Model::Tk::Filter qw/apply_filter/;
 
@@ -179,26 +182,7 @@ sub Populate {
     $cw->configure( -menu => $menubar );
     $cw->{my_menu} = $menubar;
 
-    my $file_items = [
-        [ qw/command wizard -command/, sub { $cw->wizard } ],
-        [ command => 'redraw tree', -command => sub { $cw->reload } ],
-        [ command => 'reload from file', -command => sub { $cw->ask_reset; } ],
-        [ command => 'check for errors',     -command => sub { $cw->check(1) } ],
-        [ command => 'check for warnings',   -command => sub { $cw->check( 1, 1 ) } ],
-        [ command => 'show unsaved changes', -command => sub { $cw->show_changes; } ],
-        [ command => 'save (Ctrl-s)', -command => sub { $cw->save } ],
-        @$extra_menu,
-        [
-            command  => 'debug ...',
-            -command => sub {
-                require Tk::ObjScanner;
-                Tk::ObjScanner::scan_object( $cw->{instance}->config_root );
-                }
-        ],
-        [ command => 'quit (Ctrl-q)', -command => sub { $cw->quit } ],
-    ];
-    $menubar->cascade( -label => 'File', -menuitems => $file_items );
-
+    $cw->add_file_menu($menubar, $extra_menu);
     $cw->add_help_menu($menubar);
 
     $cw->bind( '<Control-s>', sub { $cw->save } );
@@ -207,14 +191,9 @@ sub Populate {
     $cw->bind( '<Control-v>', sub { $cw->edit_paste } );
     $cw->bind( '<Control-f>', sub { $cw->pack_find_widget } );
 
-    my $edit_items = [
+    $cw->add_edit_menu($menubar);
 
-        # [ qw/command cut   -command/, sub{ $cw->edit_cut }],
-        [ command => 'copy (Ctrl-c)',  '-command', sub { $cw->edit_copy } ],
-        [ command => 'paste (Ctrl-v)', '-command', sub { $cw->edit_paste } ],
-        [ command => 'find (Ctrl-f)',  '-command', sub { $cw->pack_find_widget; } ],
-    ];
-    $menubar->cascade( -label => 'Edit', -menuitems => $edit_items );
+    my $history_menu = $menubar->cascade(-label => 'History');
 
     my $option_menu = $menubar->cascade( -label => 'Options');
     $option_menu->command( -label => 'Font', -command => sub { $cw->set_font(); });
@@ -249,8 +228,25 @@ sub Populate {
     });
 
     # create frame for location entry
-    my $loc_frame =
-        $cw->Frame( -relief => 'sunken', -borderwidth => 1 )->pack( -pady => 0, -fill => 'x' );
+    my $loc_frame = $cw->Frame( -relief => 'sunken', -borderwidth => 1 )
+        ->pack( -pady => 0, -fill => 'x' );
+    $cw->{path_history} = [];
+    $cw->{path_index} = 0;
+
+    # add button
+    my $previous_btn = $loc_frame->Button (
+        -image => $gnome_img{'previous'},
+        -state => 'disabled',
+        -command => sub { $cw->go_to_previous();},
+    );
+    $previous_btn->pack(-side => 'left');
+    my $next_btn = $loc_frame->Button (
+        -image => $gnome_img{'next'},
+        -state => 'disabled',
+        -command => sub { $cw->go_to_next();},
+    );
+    $next_btn->pack(-side => 'left');
+
     $loc_frame->Label( -text => 'location :' )->pack( -side => 'left' );
     $loc_frame->Label( -textvariable => \$cw->{location} )->pack( -side => 'left' );
 
@@ -380,10 +376,13 @@ sub Populate {
 
     $cw->Advertise( tree        => $tree );
     $cw->Advertise( menubar     => $menubar );
+    $cw->Advertise( history     => $history_menu );
     $cw->Advertise( right_frame => $eh_frame );
     $cw->Advertise( ed_frame    => $e_frame );
     $cw->Advertise( find_frame  => $find_frame );
     $cw->Advertise( msg_label   => $msg_label );
+    $cw->Advertise( prev_btn    => $previous_btn );
+    $cw->Advertise( next_btn    => $next_btn );
 
     $cw->OnDestroy(sub {$cw->Parent->destroy if ref($cw->Parent) eq 'MainWindow'} );
 
@@ -432,6 +431,30 @@ foreach my $head1 ( $pom->head1() ) {
 
 }
 
+sub add_file_menu($cw, $menubar, $extra_menu) {
+    my $file_items = [
+        [ qw/command wizard -command/, sub { $cw->wizard } ],
+        [ command => 'redraw tree', -command => sub { $cw->reload } ],
+        [ command => 'reload from file', -command => sub { $cw->ask_reset; } ],
+        [ command => 'check for errors',     -command => sub { $cw->check(1) } ],
+        [ command => 'check for warnings',   -command => sub { $cw->check( 1, 1 ) } ],
+        [ command => 'show unsaved changes', -command => sub { $cw->show_changes; } ],
+        [ command => 'save (Ctrl-s)', -command => sub { $cw->save } ],
+        @$extra_menu,
+        [
+            command  => 'debug ...',
+            -command => sub {
+                require Tk::ObjScanner;
+                Tk::ObjScanner::scan_object( $cw->{instance}->config_root );
+            }
+        ],
+        [ command => 'quit (Ctrl-q)', -command => sub { $cw->quit } ],
+    ];
+    $menubar->cascade( -label => 'File', -menuitems => $file_items );
+
+    return;
+}
+
 sub add_help_menu {
     my ( $cw, $menubar ) = @_;
 
@@ -475,6 +498,17 @@ sub add_help_menu {
         [ command => "$class help", -command => $man_sub ],
     ];
     $menubar->cascade( -label => 'Help', -menuitems => $help_items );
+}
+
+sub add_edit_menu($cw, $menubar) {
+    my $edit_items = [
+        # [ qw/command cut   -command/, sub{ $cw->edit_cut }],
+        [ command => 'copy (Ctrl-c)',  '-command', sub { $cw->edit_copy } ],
+        [ command => 'paste (Ctrl-v)', '-command', sub { $cw->edit_paste } ],
+        [ command => 'find (Ctrl-f)',  '-command', sub { $cw->pack_find_widget; } ],
+    ];
+    $menubar->cascade( -label => 'Edit', -menuitems => $edit_items );
+    return;
 }
 
 # Note: this callback is called by Tk::Tree *before* changing the
@@ -607,10 +641,6 @@ sub ask_reset {
 sub do_reset {
     my $cw = shift;
     $cw->{instance}->reset_config;
-
-    # this line can be removed after Config::Model 2.135
-    $cw->{instance}->clear_changes;
-
     $cw->reload;
 }
 
@@ -722,6 +752,7 @@ sub reload {
 sub on_browse {
     my ( $cw, $path ) = @_;
     $cw->update_loc_bar($path);
+    $cw->update_history($path);
     $cw->create_element_widget('view');
 }
 
@@ -731,18 +762,99 @@ sub update_loc_bar {
     #$cw->{path}=$path ;
     my $datar = $cw->{tktree}->infoData($path);
     my $obj   = $datar->[1];
-    $cw->{location} = $obj->location_short;
+    my $loc = $cw->{location} = $obj->location_short;
+    return $loc;
+}
+
+sub update_history ($cw, $loc) {
+    my $history = $cw->{path_history};
+
+    # avoid consecutive duplicated entries
+    if ($history->@* > 1 and $loc eq $history->[-1]) {
+        return;
+    }
+
+    push $history->@*, $loc;
+    my $path_idx = $cw->{path_index} = $history->$#*;
+
+    # enable previous button when history has more than one item
+    $cw->Subwidget('prev_btn')->configure(-state => $path_idx > 0 ? 'normal' : 'disabled');
+
+    my $h_cascade = $cw->Subwidget('history');
+
+    my $max_count = 20;
+    $cw->{history_count} //= 0;
+
+    if ($cw->{history_count}++ > $max_count) {
+        # delete all history entries from the menu
+        $h_cascade->menu->delete(0, 'end');
+
+        # Add the last $max_count history entries to the menu
+        for (my $i = 0; $i <= $max_count; $i++) {
+            my $entry_idx = $path_idx - $i;
+            $h_cascade->menu->add(
+                'command',
+                -label => $history->[$entry_idx],
+                -command =>sub { $cw->go_to_loc($path_idx); }
+            );
+        }
+    }
+    else {
+        # add a menu entry
+        $h_cascade->command(
+            -label => $loc,
+            -command => sub { $cw->go_to_loc($path_idx); }
+        );
+    }
+
+    return;
+}
+
+sub go_to_loc ($cw, $idx) {
+    my $path = $cw->{path_history}[$idx];
+    my $loc = $cw->update_loc_bar($path);
+    # enable previous button when history has more than one item
+    $cw->Subwidget('prev_btn')->configure(-state => $idx > 0 ? 'normal' : 'disabled');
+    # when jumping into history, the next location does not make
+    # sense, hence next button is disabled
+    $cw->Subwidget('next_btn')->configure(-state => 'disabled');
+    $cw->force_display($path, $loc);
+    $cw->create_element_widget('view', $path);
+}
+
+sub go_to_previous ($cw) {
+    my $idx = --$cw->{path_index};
+    my $path = $cw->{path_history}[$idx];
+    my $loc = $cw->update_loc_bar($path);
+    $cw->Subwidget('prev_btn')->configure(-state => $idx > 0 ? 'normal' : 'disabled');
+    $cw->Subwidget('next_btn')->configure(-state => 'normal');
+    $cw->force_display($path, $loc);
+    $cw->create_element_widget('view', $path);
+}
+
+sub go_to_next ($cw) {
+    my $idx = ++$cw->{path_index};
+    my $path = $cw->{path_history}[$idx];
+    my $history_last_idx = $cw->{path_history}->$#*;
+
+    my $loc = $cw->update_loc_bar($path);
+    $cw->Subwidget('prev_btn')->configure(-state => 'normal');
+    $cw->Subwidget('next_btn')->configure(-state => $idx < $history_last_idx ? 'normal' : 'disabled');
+    $cw->force_display($path, $loc);
+    $cw->create_element_widget('view', $path);
 }
 
 sub on_select {
     my ( $cw, $path ) = @_;
     $cw->update_loc_bar($path);
+    $cw->update_history($path);
     $cw->create_element_widget('edit');
 }
 
 sub on_cut_buffer_dump {
     my ( $cw, $tree_path, $selection_for_test ) = @_;
     $cw->update_loc_bar($tree_path);
+    $cw->update_history($tree_path);
 
     # get cut buffer content, See Perl/Tk book p297
     my $sel = $selection_for_test // eval { $cw->SelectionGet; };
@@ -817,7 +929,7 @@ sub prune {
 
 # Beware: TkTree items store tree object and not tree cds path. These
 # object might become irrelevant when warp master values are
-# modified. So the whole Tk Tree layout must be redone very time a
+# modified. So the whole Tk Tree layout must be redone every time a
 # config value is modified. This is a bit heavy, but a smarter
 # alternative would need hooks in the configuration tree to
 # synchronise the Tk Tree with the configuration tree :-p
@@ -916,9 +1028,10 @@ sub force_display {
     my ($cw, $path, $loc) = @_;
     $logger->debug("force_display called on $path, location $loc");
     my $tree = $cw->{tktree};
-    $tree->see($path);
     $tree->selectionClear();
-    $tree->selectionSet($path, $path);
+    $tree->anchorClear();
+    $tree->see($path);
+    $tree->anchorSet($path);
     $cw->{location} = $loc;
 }
 
@@ -1183,8 +1296,6 @@ sub setup_scanner {
     require Config::Model::ObjTreeScanner;
 
     my $scanner = Config::Model::ObjTreeScanner->new(
-
-        fallback => 'node',
         check    => 'no',
 
         # node callback
@@ -1198,16 +1309,6 @@ sub setup_scanner {
 
         # leaf callback
         leaf_cb            => \&disp_leaf,
-        enum_value_cb      => \&disp_leaf,
-        integer_value_cb   => \&disp_leaf,
-        number_value_cb    => \&disp_leaf,
-        boolean_value_cb   => \&disp_leaf,
-        string_value_cb    => \&disp_leaf,
-        uniline_value_cb   => \&disp_leaf,
-        reference_value_cb => \&disp_leaf,
-
-        # call-back when going up the tree
-        up_cb => sub { },
     );
 
     $cw->{scanner} = $scanner;

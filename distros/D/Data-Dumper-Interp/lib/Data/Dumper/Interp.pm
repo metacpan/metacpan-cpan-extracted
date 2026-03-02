@@ -26,8 +26,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.022'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-12-11'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.023'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2026-03-01'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # Arrgh!  Moose forcibly enables experimental feature warnings!
 # So import Moose first and then adjust warnings...
@@ -47,6 +47,7 @@ BEGIN {
 }
 use if $bitwise_supported, "feature", "bitwise";
 
+use re qw/is_regexp regexp_pattern/;
 use Data::Dumper ();
 use Carp;
 use POSIX qw(INT_MAX);
@@ -215,7 +216,7 @@ sub _reset_defaults() {
   # Initial D::D values are captured once when we are first loaded.
 
   #$Useqq          = "<unicode:controlpic>" unless defined $Useqq;
-  $Useqq          = "<unicode>"    unless defined $Useqq;
+  $Useqq          = "unicode"    unless defined $Useqq;
   $Quotekeys      = 0            unless defined $Quotekeys;
   $Sortkeys       = \&__sortkeys unless defined $Sortkeys;
   $Maxdepth       = $Data::Dumper::Maxdepth   unless defined $Maxdepth;
@@ -272,7 +273,7 @@ has dd => (
                 /],
 );
 
-# Config values which have no counter part in Data::Dumper
+# Config values which have no counterpart in Data::Dumper
 has Debug          => (is=>'rw', default => sub{ $Debug                 });
 has MaxStringwidth => (is=>'rw', default => sub{ $MaxStringwidth        });
 has Truncsuffix    => (is=>'rw', default => sub{ $Truncsuffix           });
@@ -862,7 +863,9 @@ btw '@@@repl item is obj ',$item if $debug;
       my $enabled;
       OSPEC:
       foreach my $ospec (@$objects) {
-        if (ref($ospec) eq "Regexp") {
+        #if (ref($ospec) eq "Regexp")
+        if (is_regexp($ospec))
+        {
           my @stack = ($class);
           my %seen;
           while (my $c = shift @stack) {
@@ -1042,7 +1045,8 @@ sub visit_ref {
   # Data::Dumper's Maxdepth() option will not work as we intend.
   # Therefore we implement Maxdepth ourself
   if ($my_visit_depth >= $my_maxdepth) {
-    oops unless $my_visit_depth == $my_maxdepth;
+    oops "vd=$my_visit_depth maxd=$my_maxdepth debug=",_dbvis($debug)," item=",_dbshow($item),"\n   self=",_dbvis($self)
+      unless $my_visit_depth == $my_maxdepth;
     $item = _MAGIC_NOQUOTES_PFX.addrvis($item);
     say "!       maxdepth reached, returning ",_dbvis2($item) if $debug;
     return $item
@@ -1054,7 +1058,7 @@ sub visit_ref {
     my $subname = sub_fullname($item);
     if ($subname =~ /__ANON__/) {  # add more info
       my ($file, $line) = get_code_location($item);
-      $subname .= " from ".basename($file).":$line";
+      $subname .= "\@".basename($file).":$line";
     }
     $item = _MAGIC_NOQUOTES_PFX.'\&'.$subname;
     say "!       CODEref without DEPARSE, returning ",_dbvis2($item) if $debug;
@@ -1502,15 +1506,39 @@ use constant {
 };
 use constant _WRAP_STYLE => (_WRAP_ALLHASH);
 
+sub _get_useqq_set_widechars {
+  my ($self) = @_;
+  my $useqq = $self->Useqq();
+  if ($useqq) {
+
+    carp "WARNING: The Useqq specification string ",_dbvis($useqq)," contains a non-ASCII character but 'use utf8;' was not in effect when the literal was compiled; the intended chracter was probably not used.\n"
+      if $useqq =~ /[^\x{0}-\x{7F}]/ && !utf8::is_utf8($useqq);
+
+    my $unesc_unicode = $useqq =~ /utf|unic/;
+    if ($unesc_unicode && _utfoutput()) {
+      # STDOUT is using a UTF encoding -- wide characters should be safe
+      $COND_LB = "\N{LEFT DOUBLE PARENTHESIS}";   # left bracket for 'condense' form
+      $COND_RB = "\N{RIGHT DOUBLE PARENTHESIS}";
+      $COND_MULT = "\N{MULTIPLICATION SIGN}";
+      $LQ = "«";
+      $RQ = "»";
+    } else {
+      $COND_LB = "(";
+      $COND_RB = ")";
+      $COND_MULT = "x";
+      $LQ = "<<";
+      $RQ = ">>";
+    }
+  }
+  return $useqq;
+}
+
 sub _postprocess_DD_result {
   (my $self, local $_, my $original) = @_;
   no warnings 'recursion';
   my ($debug, $listform, $foldwidth, $foldwidth1)
     = @$self{qw/Debug _Listform Foldwidth Foldwidth1/};
-  my $useqq = $self->Useqq();
-
-  carp "WARNING: The Useqq specification string ",_dbvis($useqq)," contains a non-ASCII character but 'use utf8;' was not in effect when the literal was compiled; the intended chracter was probably not used.\n"
-    if $useqq =~ /[^\x{0}-\x{7F}]/ && !utf8::is_utf8($useqq);
+  my $useqq = $self->_get_useqq_set_widechars();
 
   my ($unesc_unicode,$condense_strings,$octet_strings,$nums_in_hex,
       $controlpics,$showspaces,$underscores,$q_pfx,$q_lq,$q_rq);
@@ -1545,21 +1573,6 @@ sub _postprocess_DD_result {
 
   my $maxlinelen = $foldwidth1 || $foldwidth || INT_MAX;
   my $maxlineNlen = ($foldwidth // INT_MAX) - length($pad);
-
-  if ($unesc_unicode && _utfoutput()) {
-    # Probably it's safe to use wide characters
-    $COND_LB = "\N{LEFT DOUBLE PARENTHESIS}";
-    $COND_RB = "\N{RIGHT DOUBLE PARENTHESIS}";
-    $COND_MULT = "\N{MULTIPLICATION SIGN}";
-    $LQ = "«";
-    $RQ = "»";
-  } else {
-    $COND_LB = "(";
-    $COND_RB = ")";
-    $COND_MULT = "x";
-    $LQ = "<<";
-    $RQ = ">>";
-  }
 
   if ($debug) {
     our $_dbmaxlen = INT_MAX;
@@ -1968,7 +1981,8 @@ sub _Interpolate {
   &_SaveAndResetPunct;
 
   my $debug = $self->Debug;
-  my $useqq = $self->Useqq;
+  my $useqq = $self->_get_useqq_set_widechars();
+  #my $useqq = $self->Useqq(); ###TEMP FOR TEST DEBUG
 
   my $q = $useqq ? "" : "q";
   my $funcname = $i_or_d . "vis" .$q;
@@ -2995,8 +3009,8 @@ Printable Unicode characters appear as themselves instead of \x{ABCD}.
 Note: If your data contains 'wide characters', you should
 C<< use open IO => ':locale'; >> or otherwise arrange to
 encode the output for your terminal.
-You'll also want C<< use utf8; >> if your Perl source
-contains characters outside the ASCII range.
+You'll also want C<< use utf8; >> if your Perl source is written
+using utf8 characters outside the ASCII range.
 
 Undecoded binary octets (e.g. data read from a 'binmode' file)
 will still be escaped as individual bytes.
@@ -3038,7 +3052,7 @@ For example "A.20" sorts before "A.100".
 
 Numbers and strings which look like numbers are kept distinct when displayed,
 i.e. "0" does not become 0 or vice-versa. Floating-point values are shown
-as numbers not 'quoted strings' and similarly for stringified objects.
+as numbers not 'quoted strings'.
 
 Although such differences might be immaterial to Perl during execution,
 they may be important when communicating to a human.

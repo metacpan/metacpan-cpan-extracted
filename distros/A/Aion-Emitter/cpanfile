@@ -1,0 +1,42 @@
+requires 'perl', '5.22.0';
+
+on 'develop' => sub {
+	requires 'App::cpm';
+	requires 'CPAN::Uploader';
+	requires 'Data::Printer', '1.000004';
+	requires 'Minilla', 'v3.1.19';
+	requires 'Liveman', '1.0';
+	requires 'Software::License::GPL_3';
+	requires 'Test::CPAN::Meta';
+	requires 'Test::MinimumVersion::Fast';
+	requires 'Test::PAUSE::Permissions';
+	requires 'Test::Pod';
+	requires 'Test::Spellunker';
+	requires 'V';
+	requires 'Version::Next';
+};
+
+on 'test' => sub {
+	requires 'Test::More', '0.98';
+	
+	requires 'Carp';
+	requires 'Cwd';
+	requires 'Data::Dumper';
+	requires 'File::Basename';
+	requires 'File::Find';
+	requires 'File::Path';
+	requires 'File::Slurper';
+	requires 'File::Spec';
+	requires 'Scalar::Util';
+	requires 'String::Diff';
+	requires 'Term::ANSIColor';
+	requires 'lib';
+	requires 'open';
+};
+
+requires 'Aion', '1.6';
+requires 'Aion::Format', '0.1.1';
+requires 'Aion::Run', '0.0.3';
+requires 'List::Util';
+requires 'common::sense';
+requires 'config';

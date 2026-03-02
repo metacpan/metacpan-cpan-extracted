@@ -1,5 +1,8 @@
 Revision history for Perl bundle Bundle::Maintainer::MHASCH
 
+0.006   Sat, 28 Feb 2026 12:08:11 +0100
+        - move repository and issue tracker to codeberg
+
 0.005   Sat, 27 Feb 2021 11:34:42 +0100
         - made module loading tests non-fatal
 

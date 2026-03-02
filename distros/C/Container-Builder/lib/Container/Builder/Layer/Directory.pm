@@ -1,5 +1,9 @@
 package Container::Builder::Layer::Directory;
 
+use v5.40;
+use feature 'class';
+no warnings 'experimental::class';
+
 use Container::Builder::Layer;
 use Container::Builder::Tar;
 

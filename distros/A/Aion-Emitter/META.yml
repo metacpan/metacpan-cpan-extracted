@@ -1,0 +1,62 @@
+---
+abstract: 'event dispatcher'
+author:
+  - 'Yaroslav O. Kosmina L<mailto:dart@cpan.org>'
+build_requires:
+  Carp: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Slurper: '0'
+  File::Spec: '0'
+  Scalar::Util: '0'
+  String::Diff: '0'
+  Term::ANSIColor: '0'
+  Test::More: '0.98'
+  lib: '0'
+  open: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Aion-Emitter
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Aion::Emitter:
+    file: lib/Aion/Emitter.pm
+    version: v0.0.1
+  Aion::Emitter::ListenersRun:
+    file: lib/Aion/Emitter/ListenersRun.pm
+requires:
+  Aion: '1.6'
+  Aion::Format: v0.1.1
+  Aion::Run: v0.0.3
+  List::Util: '0'
+  common::sense: '0'
+  config: '0'
+  perl: v5.22.0
+resources:
+  bugtracker: https://github.com/darviarush/perl-aion-emitter/issues
+  homepage: https://github.com/darviarush/perl-aion-emitter
+  repository: https://github.com/darviarush/perl-aion-emitter.git
+version: 0.0.1
+x_authority: cpan:DART
+x_contributors:
+  - 'Yaroslav O. Kosmina <dart@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

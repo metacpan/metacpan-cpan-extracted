@@ -12,36 +12,39 @@ use App::GUI::Harmonograph::Compute::Drawing;
 sub new {
     my ( $class, $parent, $x, $y ) = @_;
     my $self = $class->SUPER::new( $parent, -1, [-1,-1], [$x+5, $y+5] );
-    $self->{'precision'} = 4;
     $self->{'menu_size'} = 27;
     $self->{'size'}{'x'} = $x;
     $self->{'size'}{'y'} = $y;
     $self->{'center'}{'x'} = $x / 2;
     $self->{'center'}{'y'} = $y / 2;
     $self->{'hard_radius'} = ($x > $y ? $self->{'center'}{'y'} : $self->{'center'}{'x'});
-    $self->{'dc'} = Wx::PaintDC->new( $self );
+   # $self->{'dc'} = Wx::PaintDC->new( $self );
+    $self->{'dc'} = Wx::MemoryDC->new( );
+    $self->{'bmp'} = Wx::Bitmap->new( $self->{'size'}{'x'} + 10, $self->{'size'}{'y'} +10 + $self->{'menu_size'}, 24);
+    $self->{'dc'}->SelectObject( $self->{'bmp'} );
+    $self->{'tab'}{'constraint'} = '';
+    $self->{'never_painted'} = 1;
 
     Wx::Event::EVT_PAINT( $self, sub {
         my( $self, $event ) = @_;
-        return unless exists $self->{'draw_args'};
+        return if exists $self->{'never_painted'};
+
         $self->{'x_pos'} = $self->GetPosition->x;
         $self->{'y_pos'} = $self->GetPosition->y;
-        $self->{'dc'}->Blit (0, 0, $self->{'size'}{'x'} + $self->{'x_pos'},
-                                   $self->{'size'}{'y'} + $self->{'y_pos'} + $self->{'menu_size'},
-                                   $self->paint( Wx::PaintDC->new( $self ), $self->{'size'} ), 0, 0);
-        #my $bmp = Wx::Bitmap->new( $self->{'size'}{'x'} , $self->{'size'}{'y'}, 24); # + 10
-        #my $dc = Wx::MemoryDC->new( );
-        # $dc->SelectObject( $bmp );
-        #~ my $dc = Wx::PaintDC->new( $self );
-        #~ $self->paint( $dc, $self->{'size'} );
-        #~ #$self->{'dc'}->DrawBitmap($bmp, 0, 0, 1);
-        #~ #$self->{'dc'} = Wx::PaintDC->new( $self );
-        #~ #my $dc = Wx::MemoryDC->new( );
-        #~ #$self->paint( $self->{'dc'}, $self->{'size'} );
-        #~ $self->{'dc'}->Blit( 0 , 0, $self->{'size'}{'x'}, $self->{'size'}{'y'}, $dc, 0,0, &Wx::wxCOPY );
-        #~ $self->{'dc'}->DestroyClippingRegion();
-        #~ $dc->DestroyClippingRegion();
-        # DrawBitmap()
+        if (exists $self->{'draw_args'}) {
+
+            $self->{'dc'}->Blit (0, 0, # x y destination
+                                 $self->{'size'}{'x'} + $self->{'x_pos'},                        # width
+                                 $self->{'size'}{'y'} + $self->{'y_pos'} + $self->{'menu_size'}, # height
+                                 $self->paint( Wx::PaintDC->new( $self ), $self->{'size'} ), # source 
+                                 0, 0, &Wx::wxCOPY ); # x y source
+                                 
+        } else {
+            Wx::PaintDC->new( $self )->Blit (0, 0, # dest
+                                             $self->{'size'}{'x'},  $self->{'size'}{'y'} - 1, # size
+                                             $self->{'dc'}, 5, $self->{'menu_size'} + 6);
+        }
+
         1;
     });
 
@@ -51,12 +54,14 @@ sub new {
 sub draw {
     my( $self, $settings, $progress_bar ) = @_;
     return unless ref $settings eq 'HASH' and ref $progress_bar;
+    delete  $self->{'never_painted'};
     $self->{'draw_args'} = {settings => $settings, progress_bar => $progress_bar, redraw => 1 };
     $self->Refresh;
 }
 sub sketch {
     my( $self, $settings, $progress_bar ) = @_;
     return unless ref $settings eq 'HASH' and ref $progress_bar;
+    delete  $self->{'never_painted'};
     $self->{'draw_args'} = {settings => $settings, progress_bar => $progress_bar, redraw => 1, sketch => 1};
     $self->Refresh;
 }

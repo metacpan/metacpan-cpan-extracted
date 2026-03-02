@@ -19,10 +19,15 @@ MANIFEST			This list of files
 META.yml
 README
 SIGNATURE
+t/App-MARC-Validator-Utils/01-use.t
+t/App-MARC-Validator-Utils/02-version.t
 t/App-MARC-Validator/01-use.t
 t/App-MARC-Validator/02-version.t
 t/App-MARC-Validator/03-new.t
 t/App-MARC-Validator/04-run.t
 Validator.pm
+Validator/Utils.pm
+xt/App-MARC-Validator-Utils/01-pod_coverage.t
+xt/App-MARC-Validator-Utils/02-pod.t
 xt/App-MARC-Validator/01-pod_coverage.t
 xt/App-MARC-Validator/02-pod.t

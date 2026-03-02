@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+doc/badges/total.svg
+i18n/Aion/Emitter.ru-en.po
+lib/Aion/Emitter.md
+lib/Aion/Emitter.pm
+lib/Aion/Emitter/ListenersRun.md
+lib/Aion/Emitter/ListenersRun.pm
+minil.toml
+t/aion/emitter.t
+t/aion/emitter/listeners-run.t
+META.yml
+MANIFEST

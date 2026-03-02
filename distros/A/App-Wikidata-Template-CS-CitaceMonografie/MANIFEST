@@ -26,5 +26,11 @@ t/App-Wikidata-Template-CS-CitaceMonografie/01-use.t
 t/App-Wikidata-Template-CS-CitaceMonografie/02-version.t
 t/App-Wikidata-Template-CS-CitaceMonografie/03-new.t
 t/App-Wikidata-Template-CS-CitaceMonografie/04-run.t
+t/data/Q1085.json
+t/data/Q115345396.json
+t/data/Q11773650.json
+t/data/Q138465517.json
+t/data/Q138470117.json
+t/data/Q138471014.json
 xt/App-Wikidata-Template-CS-CitaceMonografie/01-pod_coverage.t
 xt/App-Wikidata-Template-CS-CitaceMonografie/02-pod.t

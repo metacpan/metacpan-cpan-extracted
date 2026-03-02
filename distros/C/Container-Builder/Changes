@@ -1,5 +1,13 @@
 Revision history for Container-Builder
 
+0.09  2026-03-01 22:37:01 CET
+	- Restructure Index json to hopefully avoid triggering "Perl_av_new_alloc: Assertion size > 0 failed".
+
+0.08  2026-02-28 22:28:37 CET
+	- Forgot to mention v5.40 in Directory class -> Kwalitee showed this.
+	- Forgot to update some copy pasted doc in SingleFile.
+	- Forgot to remove some old hardcoded JSON from Index instead of a hashref to JSON.
+
 0.07  2026-02-26 00:09:03 CET
 	- Documentation update.
 

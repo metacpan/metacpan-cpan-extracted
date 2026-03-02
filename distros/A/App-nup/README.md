@@ -16,7 +16,8 @@ nup - n-up, multi-column paged output for commands and files
          --alias=CMD=OPTS   set command alias
      -V  --parallel         parallel view mode
      -D  --document         document mode (default: on)
-     -F  --fold             fold mode (disable page mode)
+     -F  --no-paginate      disable page mode
+     -A  --auto-paginate    auto disable page mode for single column
      -H  --filename         show filename headers (default: on)
      -G  --grid=#           grid layout (e.g., 2x3)
      -C  --pane=#           number of columns
@@ -37,7 +38,7 @@ nup - n-up, multi-column paged output for commands and files
 
 # VERSION
 
-Version 0.9907
+Version 1.06
 
 # DESCRIPTION
 
@@ -101,7 +102,7 @@ force command mode when needed.
 
     Enable parallel view mode for ansicolumn.  In this mode, each file
     is displayed in its own column without pagination, similar to
-    `--fold`.  Automatically enabled when multiple files are
+    `--no-paginate`.  Automatically enabled when multiple files are
     specified.  Single file or stdin input results in single column
     output.
 
@@ -111,11 +112,17 @@ force command mode when needed.
     viewing documents with n-up page-based layout.  Enabled by default.
     Use `--no-document` to disable.
 
-- **-F**, **--fold**
+- **-F**, **--no-paginate**
 
-    Enable fold mode (disable page mode).  In fold mode, the entire
-    content is split evenly across columns without pagination.  Page
-    mode is the default.
+    Disable page mode.  Without pagination, the entire content is
+    split evenly across columns.  Page mode is the default; use
+    **--paginate** to re-enable if needed.
+
+- **-A**, **--auto-paginate**
+
+    Automatically disable page mode when only one column fits the
+    terminal.  This is useful when using `nup` as `MANPAGER`,
+    where single-column page splitting wastes space.
 
 - **-H**, **--filename**
 
@@ -216,9 +223,13 @@ Typical n-up usage:
     nup man nup                # view manual in n-up layout
     nup -C2 man perl           # 2 columns
     nup -G2x2 man perl         # 2x2 grid (4-up layout)
-    nup -F man perl            # fold mode (no pagination)
+    nup -F man perl            # no pagination
     nup file1.txt file2.txt    # view files side by side
     nup -e ./script.sh         # force command mode for a file
+
+Using `nup` as a `MANPAGER`:
+
+    export MANPAGER="nup -A"
 
 # INSTALLATION
 
@@ -238,7 +249,7 @@ the output is passed through a filter pipeline.
 
 # SEE ALSO
 
-[App::optex::up](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Aup), [optex](https://metacpan.org/pod/optex)
+[App::optex::up](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Aup) (bundled), [optex](https://metacpan.org/pod/optex)
 
 # AUTHOR
 

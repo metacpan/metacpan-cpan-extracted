@@ -1,0 +1,887 @@
+[
+  {
+    "pageid": 12910099,
+    "title": "Q11773650",
+    "labels": {
+      "en": {
+        "value": "Computer Press",
+        "language": "en"
+      },
+      "cs": {
+        "value": "Computer Press",
+        "language": "cs"
+      },
+      "vec": {
+        "language": "vec",
+        "value": "Computer Press"
+      },
+      "fr": {
+        "value": "Computer Press",
+        "language": "fr"
+      }
+    },
+    "claims": {
+      "P1454": [
+        {
+          "mainsnak": {
+            "property": "P1454",
+            "hash": "6dab84581e2ba3ca993ea2e6e7cf58f83951a011",
+            "datatype": "wikibase-item",
+            "datavalue": {
+              "type": "wikibase-entityid",
+              "value": {
+                "numeric-id": 15646299,
+                "entity-type": "item",
+                "id": "Q15646299"
+              }
+            },
+            "snaktype": "value"
+          },
+          "id": "Q11773650$B26FA94F-AF6C-4E9A-94C2-CB5BAE531C4D",
+          "rank": "normal",
+          "type": "statement"
+        }
+      ],
+      "P31": [
+        {
+          "rank": "normal",
+          "id": "Q11773650$A3B5A311-45CD-4DA8-8EA8-92825F7C3EF9",
+          "type": "statement",
+          "mainsnak": {
+            "snaktype": "value",
+            "datatype": "wikibase-item",
+            "hash": "326e3d41d1e9c34715e880be6e1c6a1e822e4317",
+            "datavalue": {
+              "value": {
+                "numeric-id": 4830453,
+                "entity-type": "item",
+                "id": "Q4830453"
+              },
+              "type": "wikibase-entityid"
+            },
+            "property": "P31"
+          }
+        },
+        {
+          "rank": "normal",
+          "type": "statement",
+          "id": "Q11773650$eba6577e-42f0-98b9-199c-265d358a4297",
+          "mainsnak": {
+            "datavalue": {
+              "type": "wikibase-entityid",
+              "value": {
+                "numeric-id": 2085381,
+                "id": "Q2085381",
+                "entity-type": "item"
+              }
+            },
+            "datatype": "wikibase-item",
+            "hash": "bd78895b289899dec7e4d131afc9f6d4e434599c",
+            "property": "P31",
+            "snaktype": "value"
+          }
+        },
+        {
+          "mainsnak": {
+            "snaktype": "value",
+            "property": "P31",
+            "datavalue": {
+              "value": {
+                "numeric-id": 6881511,
+                "id": "Q6881511",
+                "entity-type": "item"
+              },
+              "type": "wikibase-entityid"
+            },
+            "hash": "eef1731db85f0ac84d4ae5d83756e45ce052108d",
+            "datatype": "wikibase-item"
+          },
+          "rank": "normal",
+          "id": "Q11773650$3164E1E5-30F9-48A5-8B37-DBCD535C7CF7",
+          "type": "statement"
+        }
+      ],
+      "P856": [
+        {
+          "mainsnak": {
+            "snaktype": "value",
+            "hash": "4d1d31d7ec98256f8c5d04f4c2449ce20013cc4f",
+            "datatype": "url",
+            "datavalue": {
+              "type": "string",
+              "value": "http://www.cpress.cz/"
+            },
+            "property": "P856"
+          },
+          "rank": "normal",
+          "id": "Q11773650$e699be80-4573-f682-78a9-f4cfc3560a49",
+          "type": "statement",
+          "references": [
+            {
+              "snaks": {
+                "P813": [
+                  {
+                    "datavalue": {
+                      "value": {
+                        "before": 0,
+                        "timezone": 0,
+                        "calendarmodel": "http://www.wikidata.org/entity/Q1985727",
+                        "after": 0,
+                        "time": "+2016-02-09T00:00:00Z",
+                        "precision": 11
+                      },
+                      "type": "time"
+                    },
+                    "hash": "c21f56c48cc488748aab5130a0ae3aa4f151f749",
+                    "datatype": "time",
+                    "property": "P813",
+                    "snaktype": "value"
+                  }
+                ],
+                "P854": [
+                  {
+                    "snaktype": "value",
+                    "property": "P854",
+                    "datavalue": {
+                      "type": "string",
+                      "value": "http://www.cpress.cz/"
+                    },
+                    "hash": "c8ce46170012ed8c3c01ffc2f8b3c67105466f8d",
+                    "datatype": "url"
+                  }
+                ]
+              },
+              "hash": "2089f9c9802f87ef16657fb40c9d5a2e5cef9c46",
+              "snaks-order": [
+                "P854",
+                "P813"
+              ]
+            }
+          ]
+        }
+      ],
+      "P1889": [
+        {
+          "rank": "normal",
+          "id": "Q11773650$f3c098c3-4146-1c60-67a1-5d7de58e3ef2",
+          "type": "statement",
+          "mainsnak": {
+            "snaktype": "value",
+            "datavalue": {
+              "type": "wikibase-entityid",
+              "value": {
+                "entity-type": "item",
+                "id": "Q96329981",
+                "numeric-id": 96329981
+              }
+            },
+            "hash": "86c9f092d08515b103a8d84ca9abfc169cbeaee2",
+            "datatype": "wikibase-item",
+            "property": "P1889"
+          }
+        },
+        {
+          "mainsnak": {
+            "property": "P1889",
+            "datavalue": {
+              "type": "wikibase-entityid",
+              "value": {
+                "numeric-id": 65706655,
+                "entity-type": "item",
+                "id": "Q65706655"
+              }
+            },
+            "hash": "a7905907e03cd904a0b8115438002eba8d176418",
+            "datatype": "wikibase-item",
+            "snaktype": "value"
+          },
+          "rank": "normal",
+          "type": "statement",
+          "id": "Q11773650$dd729085-4534-cde7-b758-4cca8dec9560"
+        }
+      ],
+      "P4156": [
+        {
+          "rank": "normal",
+          "type": "statement",
+          "id": "Q11773650$d7335513-4267-3ddf-84bc-7b4ca641a998",
+          "mainsnak": {
+            "property": "P4156",
+            "datavalue": {
+              "type": "string",
+              "value": "61460150"
+            },
+            "hash": "1ae21854a7abbe5e2fd305d2ce630f1ab0020e38",
+            "datatype": "external-id",
+            "snaktype": "value"
+          }
+        }
+      ],
+      "P112": [
+        {
+          "references": [
+            {
+              "snaks-order": [
+                "P958",
+                "P813",
+                "P143"
+              ],
+              "snaks": {
+                "P958": [
+                  {
+                    "property": "P958",
+                    "hash": "eaec73ab5b85e5dfc55321b1e68e6b1516228c79",
+                    "datatype": "string",
+                    "datavalue": {
+                      "type": "string",
+                      "value": "Computer Press"
+                    },
+                    "snaktype": "value"
+                  }
+                ],
+                "P813": [
+                  {
+                    "datatype": "time",
+                    "hash": "c21f56c48cc488748aab5130a0ae3aa4f151f749",
+                    "datavalue": {
+                      "value": {
+                        "time": "+2016-02-09T00:00:00Z",
+                        "after": 0,
+                        "precision": 11,
+                        "before": 0,
+                        "timezone": 0,
+                        "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                      },
+                      "type": "time"
+                    },
+                    "property": "P813",
+                    "snaktype": "value"
+                  }
+                ],
+                "P143": [
+                  {
+                    "snaktype": "value",
+                    "datavalue": {
+                      "type": "wikibase-entityid",
+                      "value": {
+                        "id": "Q191168",
+                        "entity-type": "item",
+                        "numeric-id": 191168
+                      }
+                    },
+                    "datatype": "wikibase-item",
+                    "hash": "5946b91c53409c48f5f1fb0319ed41fc67a764da",
+                    "property": "P143"
+                  }
+                ]
+              },
+              "hash": "a971b84182fd6ef2211151dcfa316a82b98fb2b0"
+            }
+          ],
+          "id": "Q11773650$dbfbce0c-484d-3018-d079-7a703b1191cb",
+          "rank": "normal",
+          "type": "statement",
+          "mainsnak": {
+            "snaktype": "value",
+            "property": "P112",
+            "datavalue": {
+              "value": {
+                "id": "Q12059164",
+                "entity-type": "item",
+                "numeric-id": 12059164
+              },
+              "type": "wikibase-entityid"
+            },
+            "hash": "1a9aef43e3c73f812cc317720b746c7c5169ea3e",
+            "datatype": "wikibase-item"
+          }
+        },
+        {
+          "rank": "normal",
+          "type": "statement",
+          "id": "Q11773650$85ba53b4-4f42-29a3-cd2f-aa0fa4e5c3f8",
+          "mainsnak": {
+            "snaktype": "value",
+            "datavalue": {
+              "type": "wikibase-entityid",
+              "value": {
+                "entity-type": "item",
+                "id": "Q12028931",
+                "numeric-id": 12028931
+              }
+            },
+            "hash": "63424a4398c33a93e73445eae5d091bca889e10b",
+            "datatype": "wikibase-item",
+            "property": "P112"
+          },
+          "references": [
+            {
+              "snaks": {
+                "P958": [
+                  {
+                    "snaktype": "value",
+                    "property": "P958",
+                    "datavalue": {
+                      "type": "string",
+                      "value": "Computer Press"
+                    },
+                    "datatype": "string",
+                    "hash": "eaec73ab5b85e5dfc55321b1e68e6b1516228c79"
+                  }
+                ],
+                "P143": [
+                  {
+                    "snaktype": "value",
+                    "datatype": "wikibase-item",
+                    "hash": "5946b91c53409c48f5f1fb0319ed41fc67a764da",
+                    "datavalue": {
+                      "type": "wikibase-entityid",
+                      "value": {
+                        "numeric-id": 191168,
+                        "entity-type": "item",
+                        "id": "Q191168"
+                      }
+                    },
+                    "property": "P143"
+                  }
+                ],
+                "P813": [
+                  {
+                    "snaktype": "value",
+                    "datavalue": {
+                      "type": "time",
+                      "value": {
+                        "after": 0,
+                        "time": "+2016-02-09T00:00:00Z",
+                        "precision": 11,
+                        "before": 0,
+                        "timezone": 0,
+                        "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                      }
+                    },
+                    "hash": "c21f56c48cc488748aab5130a0ae3aa4f151f749",
+                    "datatype": "time",
+                    "property": "P813"
+                  }
+                ]
+              },
+              "hash": "a971b84182fd6ef2211151dcfa316a82b98fb2b0",
+              "snaks-order": [
+                "P958",
+                "P813",
+                "P143"
+              ]
+            }
+          ]
+        }
+      ],
+      "P17": [
+        {
+          "rank": "normal",
+          "type": "statement",
+          "id": "Q11773650$A8B8071C-FE9C-48CC-9F16-9F26CB992930",
+          "mainsnak": {
+            "snaktype": "value",
+            "hash": "535305d6abccf7a97ea501f68a448836f3fffccf",
+            "datatype": "wikibase-item",
+            "datavalue": {
+              "type": "wikibase-entityid",
+              "value": {
+                "id": "Q213",
+                "entity-type": "item",
+                "numeric-id": 213
+              }
+            },
+            "property": "P17"
+          }
+        }
+      ],
+      "P1320": [
+        {
+          "type": "statement",
+          "rank": "normal",
+          "id": "Q11773650$d2ae16ad-8a83-458e-a0fc-c1c93be83912",
+          "mainsnak": {
+            "datavalue": {
+              "type": "string",
+              "value": "cz/61460150"
+            },
+            "hash": "cb6b8cade47229ad145281afb101a3efffcaee14",
+            "datatype": "external-id",
+            "property": "P1320",
+            "snaktype": "value"
+          }
+        }
+      ],
+      "P214": [
+        {
+          "mainsnak": {
+            "property": "P214",
+            "datavalue": {
+              "value": "127152292",
+              "type": "string"
+            },
+            "hash": "1e0efe4ea805affd9cbc4e3802e4f23aca180d05",
+            "datatype": "external-id",
+            "snaktype": "value"
+          },
+          "rank": "normal",
+          "type": "statement",
+          "id": "Q11773650$44901005-9BB4-4483-BD33-CC0BFEDABA8A",
+          "references": [
+            {
+              "snaks-order": [
+                "P248",
+                "P813"
+              ],
+              "snaks": {
+                "P813": [
+                  {
+                    "snaktype": "value",
+                    "datavalue": {
+                      "type": "time",
+                      "value": {
+                        "time": "+2023-06-20T00:00:00Z",
+                        "after": 0,
+                        "precision": 11,
+                        "before": 0,
+                        "calendarmodel": "http://www.wikidata.org/entity/Q1985727",
+                        "timezone": 0
+                      }
+                    },
+                    "hash": "8f78f934214fed06845fba598ead818abd8b0ccb",
+                    "datatype": "time",
+                    "property": "P813"
+                  }
+                ],
+                "P248": [
+                  {
+                    "property": "P248",
+                    "datavalue": {
+                      "type": "wikibase-entityid",
+                      "value": {
+                        "numeric-id": 54919,
+                        "entity-type": "item",
+                        "id": "Q54919"
+                      }
+                    },
+                    "hash": "6b7d4330c4aac4caec4ede9de0311ce273f88ecd",
+                    "datatype": "wikibase-item",
+                    "snaktype": "value"
+                  }
+                ]
+              },
+              "hash": "b2b1e3fdc00d1864dd04cfe15abcdabb117ab71e"
+            }
+          ]
+        }
+      ],
+      "P3035": [
+        {
+          "type": "statement",
+          "rank": "normal",
+          "id": "Q11773650$be7ab3f4-4ae4-7dd8-2758-6f053a0d33c0",
+          "mainsnak": {
+            "property": "P3035",
+            "datavalue": {
+              "value": "978-80-7226",
+              "type": "string"
+            },
+            "datatype": "external-id",
+            "hash": "b88abd7b6e69e4dbefbcae0378ac7380acd8f984",
+            "snaktype": "value"
+          }
+        },
+        {
+          "mainsnak": {
+            "snaktype": "value",
+            "property": "P3035",
+            "datavalue": {
+              "type": "string",
+              "value": "978-80-85896"
+            },
+            "datatype": "external-id",
+            "hash": "a793d491ed661fc548b67187f9c208530906e916"
+          },
+          "rank": "normal",
+          "type": "statement",
+          "id": "Q11773650$651786ca-428f-32e1-8d05-5d13ad24d255"
+        }
+      ],
+      "P571": [
+        {
+          "references": [
+            {
+              "snaks-order": [
+                "P4156",
+                "P813"
+              ],
+              "hash": "fc1c5ae716c18d49a006428a76ed821290d65f92",
+              "snaks": {
+                "P813": [
+                  {
+                    "snaktype": "value",
+                    "property": "P813",
+                    "datavalue": {
+                      "value": {
+                        "before": 0,
+                        "timezone": 0,
+                        "calendarmodel": "http://www.wikidata.org/entity/Q1985727",
+                        "after": 0,
+                        "time": "+2019-07-21T00:00:00Z",
+                        "precision": 11
+                      },
+                      "type": "time"
+                    },
+                    "hash": "736c155784ae3817ffcd04a8656bb022e3af2cc1",
+                    "datatype": "time"
+                  }
+                ],
+                "P4156": [
+                  {
+                    "hash": "1ae21854a7abbe5e2fd305d2ce630f1ab0020e38",
+                    "datatype": "external-id",
+                    "datavalue": {
+                      "value": "61460150",
+                      "type": "string"
+                    },
+                    "property": "P4156",
+                    "snaktype": "value"
+                  }
+                ]
+              }
+            }
+          ],
+          "rank": "normal",
+          "id": "Q11773650$7e4387b9-42d7-dab2-85cf-204a77cec901",
+          "type": "statement",
+          "mainsnak": {
+            "snaktype": "value",
+            "hash": "f01bd1b7195e5bce2c31b72dccb5262fda245954",
+            "datatype": "time",
+            "datavalue": {
+              "type": "time",
+              "value": {
+                "before": 0,
+                "calendarmodel": "http://www.wikidata.org/entity/Q1985727",
+                "timezone": 0,
+                "after": 0,
+                "time": "+1994-04-18T00:00:00Z",
+                "precision": 11
+              }
+            },
+            "property": "P571"
+          }
+        }
+      ],
+      "P691": [
+        {
+          "qualifiers-order": [
+            "P1810"
+          ],
+          "rank": "normal",
+          "type": "statement",
+          "id": "Q11773650$CB080E05-E3C0-425A-8DBB-E6167494A749",
+          "qualifiers": {
+            "P1810": [
+              {
+                "property": "P1810",
+                "hash": "fc7953edafc7ec656820e5ed92e82ce2aeb29d4f",
+                "datatype": "string",
+                "datavalue": {
+                  "type": "string",
+                  "value": "Computer Press (vydavatelství)"
+                },
+                "snaktype": "value"
+              }
+            ]
+          },
+          "mainsnak": {
+            "snaktype": "value",
+            "property": "P691",
+            "datavalue": {
+              "type": "string",
+              "value": "kn20070410002"
+            },
+            "hash": "aba909b7d21352c3d2a502fd3218a8f12c5c4d64",
+            "datatype": "external-id"
+          }
+        }
+      ],
+      "P576": [
+        {
+          "mainsnak": {
+            "property": "P576",
+            "datatype": "time",
+            "hash": "1b3605e67dbd5ff23bffc376098292bf71c1e30e",
+            "datavalue": {
+              "type": "time",
+              "value": {
+                "precision": 11,
+                "time": "+2002-12-23T00:00:00Z",
+                "after": 0,
+                "timezone": 0,
+                "calendarmodel": "http://www.wikidata.org/entity/Q1985727",
+                "before": 0
+              }
+            },
+            "snaktype": "value"
+          },
+          "id": "Q11773650$9365d953-443d-a7ff-ae1c-682b4322d05d",
+          "rank": "normal",
+          "type": "statement"
+        }
+      ],
+      "P1448": [
+        {
+          "rank": "normal",
+          "type": "statement",
+          "id": "Q11773650$1675988e-4cc4-12dc-b736-4147e907b8bc",
+          "mainsnak": {
+            "property": "P1448",
+            "hash": "89edceaff0dba13631c181fa2c3835cc49bbdb52",
+            "datatype": "monolingualtext",
+            "datavalue": {
+              "value": {
+                "text": "Computer Press, s.r.o.",
+                "language": "cs"
+              },
+              "type": "monolingualtext"
+            },
+            "snaktype": "value"
+          }
+        }
+      ],
+      "P4840": [
+        {
+          "rank": "normal",
+          "type": "statement",
+          "id": "Q11773650$fd262ffc-4628-c01e-abc4-468b8192979c",
+          "mainsnak": {
+            "datavalue": {
+              "value": "000012614",
+              "type": "string"
+            },
+            "hash": "7d39b772a9476e85f0bc128a65e10a592f20dea4",
+            "datatype": "external-id",
+            "property": "P4840",
+            "snaktype": "value"
+          }
+        },
+        {
+          "rank": "normal",
+          "type": "statement",
+          "id": "Q11773650$1cc23639-4c41-4a86-4225-2b05a7228ece",
+          "mainsnak": {
+            "property": "P4840",
+            "hash": "0a1bf2dcdcf9ec97552ea070e356504ae8b028be",
+            "datatype": "external-id",
+            "datavalue": {
+              "value": "000021636",
+              "type": "string"
+            },
+            "snaktype": "value"
+          }
+        }
+      ],
+      "P159": [
+        {
+          "references": [
+            {
+              "snaks": {
+                "P248": [
+                  {
+                    "snaktype": "value",
+                    "datavalue": {
+                      "type": "wikibase-entityid",
+                      "value": {
+                        "entity-type": "item",
+                        "id": "Q8182488",
+                        "numeric-id": 8182488
+                      }
+                    },
+                    "datatype": "wikibase-item",
+                    "hash": "7747592c7b897d69dc653ad1eae1be2ae1143ad8",
+                    "property": "P248"
+                  }
+                ]
+              },
+              "hash": "54733bf240f0e92bdc29b736069ca6934f83e8c7",
+              "snaks-order": [
+                "P248"
+              ]
+            }
+          ],
+          "rank": "normal",
+          "type": "statement",
+          "id": "Q11773650$4A0682FD-C5FF-454B-94AE-7DABB64353E2",
+          "mainsnak": {
+            "snaktype": "value",
+            "hash": "6c13eac8b304972143df03cc891ef22eea8d2e54",
+            "datatype": "wikibase-item",
+            "datavalue": {
+              "value": {
+                "id": "Q14960",
+                "entity-type": "item",
+                "numeric-id": 14960
+              },
+              "type": "wikibase-entityid"
+            },
+            "property": "P159"
+          },
+          "qualifiers": {
+            "P670": [
+              {
+                "snaktype": "value",
+                "property": "P670",
+                "datavalue": {
+                  "value": "48",
+                  "type": "string"
+                },
+                "hash": "d8ad9f23f865f1c594c8f5ffc0d610d54f49bfb3",
+                "datatype": "string"
+              }
+            ],
+            "P625": [
+              {
+                "datatype": "globe-coordinate",
+                "hash": "3b22bf5450eecc3c4013ffcc43c950db68f9770f",
+                "datavalue": {
+                  "value": {
+                    "globe": "http://www.wikidata.org/entity/Q2",
+                    "altitude": null,
+                    "precision": 0.013747793899404,
+                    "latitude": 49.1996639,
+                    "longitude": 16.6139222
+                  },
+                  "type": "globecoordinate"
+                },
+                "property": "P625",
+                "snaktype": "value"
+              }
+            ],
+            "P281": [
+              {
+                "snaktype": "value",
+                "datavalue": {
+                  "type": "string",
+                  "value": "635 00"
+                },
+                "hash": "9e0420215a57202e68848d80188545cad21c86c2",
+                "datatype": "string",
+                "property": "P281"
+              }
+            ],
+            "P669": [
+              {
+                "property": "P669",
+                "datavalue": {
+                  "value": {
+                    "id": "Q20428149",
+                    "entity-type": "item",
+                    "numeric-id": 20428149
+                  },
+                  "type": "wikibase-entityid"
+                },
+                "hash": "33fd022a80ef53e612f00a532fe2745ab20d1e7a",
+                "datatype": "wikibase-item",
+                "snaktype": "value"
+              }
+            ],
+            "P4856": [
+              {
+                "property": "P4856",
+                "hash": "340ecc94690c0a0b7b1cf256fd3032be61ac1bbb",
+                "datatype": "string",
+                "datavalue": {
+                  "value": "1",
+                  "type": "string"
+                },
+                "snaktype": "value"
+              }
+            ]
+          },
+          "qualifiers-order": [
+            "P669",
+            "P4856",
+            "P670",
+            "P625",
+            "P281"
+          ]
+        }
+      ],
+      "P2088": [
+        {
+          "mainsnak": {
+            "snaktype": "value",
+            "property": "P2088",
+            "datavalue": {
+              "value": "computer-press",
+              "type": "string"
+            },
+            "datatype": "external-id",
+            "hash": "cb1e293a174e0bd72329c56f8b3b42a9b784c188"
+          },
+          "id": "Q11773650$253BC2DF-7269-45B2-A19B-109D9F16813F",
+          "rank": "normal",
+          "type": "statement"
+        }
+      ],
+      "P1366": [
+        {
+          "mainsnak": {
+            "datavalue": {
+              "type": "wikibase-entityid",
+              "value": {
+                "id": "Q65706655",
+                "entity-type": "item",
+                "numeric-id": 65706655
+              }
+            },
+            "datatype": "wikibase-item",
+            "hash": "c49626a4fb199b054853d1dc181cf453bcae22b9",
+            "property": "P1366",
+            "snaktype": "value"
+          },
+          "id": "Q11773650$9c158f02-4b67-7bd6-9b66-0b4182ce856d",
+          "rank": "normal",
+          "type": "statement"
+        }
+      ]
+    },
+    "aliases": {
+      "cs": [
+        {
+          "language": "cs",
+          "value": "Computer Press, s.r.o."
+        }
+      ]
+    },
+    "modified": "2023-06-20T18:41:14Z",
+    "id": "Q11773650",
+    "type": "item",
+    "lastrevid": 1920043093,
+    "ns": 0,
+    "descriptions": {
+      "en": {
+        "value": "former Czech publisher (1994-2002)",
+        "language": "en"
+      },
+      "fr": {
+        "value": "maison d'édition",
+        "language": "fr"
+      },
+      "cs": {
+        "value": "zaniklé české nakladatelství (1994–2002)",
+        "language": "cs"
+      }
+    },
+    "sitelinks": {
+      "cswiki": {
+        "site": "cswiki",
+        "title": "Computer Press",
+        "badges": []
+      }
+    }
+  }
+]

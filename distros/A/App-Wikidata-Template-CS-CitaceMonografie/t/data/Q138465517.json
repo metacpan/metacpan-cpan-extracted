@@ -1,0 +1,231 @@
+[
+  {
+    "claims": {
+      "P691": [
+        {
+          "mainsnak": {
+            "snaktype": "value",
+            "datatype": "external-id",
+            "property": "P691",
+            "hash": "2fd5cc120d50b45e88a025416eb9de4f18b9020d",
+            "datavalue": {
+              "type": "string",
+              "value": "xx0031032"
+            }
+          },
+          "references": [
+            {
+              "hash": "2e3b1dcc938ca256bf5bd5062b4f310b4f748248",
+              "snaks": {
+                "P813": [
+                  {
+                    "hash": "c1ba41dd0b70373af8985e482dbdf402b97a11d7",
+                    "datavalue": {
+                      "value": {
+                        "before": 0,
+                        "after": 0,
+                        "precision": 11,
+                        "time": "+2026-02-25T00:00:00Z",
+                        "timezone": 0,
+                        "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                      },
+                      "type": "time"
+                    },
+                    "snaktype": "value",
+                    "datatype": "time",
+                    "property": "P813"
+                  }
+                ]
+              },
+              "snaks-order": [
+                "P813"
+              ]
+            }
+          ],
+          "type": "statement",
+          "id": "Q138465517$996d299f-4eb2-119a-f189-198cbd27f282",
+          "rank": "normal"
+        }
+      ],
+      "P106": [
+        {
+          "mainsnak": {
+            "datatype": "wikibase-item",
+            "snaktype": "value",
+            "property": "P106",
+            "datavalue": {
+              "value": {
+                "entity-type": "item",
+                "id": "Q333634",
+                "numeric-id": 333634
+              },
+              "type": "wikibase-entityid"
+            },
+            "hash": "788d702ab6de98397237c2cbcab07498f83b887c"
+          },
+          "type": "statement",
+          "id": "Q138465517$699491e2-4d85-c7f6-d3ed-0de468663313",
+          "rank": "normal"
+        }
+      ],
+      "P21": [
+        {
+          "mainsnak": {
+            "property": "P21",
+            "datatype": "wikibase-item",
+            "snaktype": "value",
+            "datavalue": {
+              "value": {
+                "entity-type": "item",
+                "numeric-id": 6581097,
+                "id": "Q6581097"
+              },
+              "type": "wikibase-entityid"
+            },
+            "hash": "85ad4b1c7348f7a5aac521135040d74e91fb5939"
+          },
+          "rank": "normal",
+          "id": "Q138465517$438389ac-4944-a745-98bc-509422e4b5e8",
+          "type": "statement"
+        }
+      ],
+      "P735": [
+        {
+          "mainsnak": {
+            "property": "P735",
+            "snaktype": "value",
+            "datatype": "wikibase-item",
+            "hash": "960b0c306a29ac5810d4b35d97286e993433c42d",
+            "datavalue": {
+              "type": "wikibase-entityid",
+              "value": {
+                "entity-type": "item",
+                "numeric-id": 168563,
+                "id": "Q168563"
+              }
+            }
+          },
+          "id": "Q138465517$af2cfb3a-40a2-30b6-6943-0a443bcbb0b8",
+          "rank": "normal",
+          "type": "statement"
+        }
+      ],
+      "P31": [
+        {
+          "type": "statement",
+          "rank": "normal",
+          "id": "Q138465517$d311d087-4608-44cd-1bab-db399bf5b403",
+          "mainsnak": {
+            "datatype": "wikibase-item",
+            "snaktype": "value",
+            "property": "P31",
+            "datavalue": {
+              "type": "wikibase-entityid",
+              "value": {
+                "id": "Q5",
+                "numeric-id": 5,
+                "entity-type": "item"
+              }
+            },
+            "hash": "ad7d38a03cdd40cdc373de0dc4e7b7fcbccb31d9"
+          }
+        }
+      ],
+      "P214": [
+        {
+          "id": "Q138465517$e76fc3d1-4778-159c-ce85-7073857e3a9d",
+          "rank": "normal",
+          "type": "statement",
+          "mainsnak": {
+            "datavalue": {
+              "type": "string",
+              "value": "85490934"
+            },
+            "hash": "9667080c8046ffc8597ad7373170e5826a09ab77",
+            "property": "P214",
+            "datatype": "external-id",
+            "snaktype": "value"
+          },
+          "references": [
+            {
+              "snaks-order": [
+                "P813"
+              ],
+              "hash": "2e3b1dcc938ca256bf5bd5062b4f310b4f748248",
+              "snaks": {
+                "P813": [
+                  {
+                    "datatype": "time",
+                    "snaktype": "value",
+                    "property": "P813",
+                    "datavalue": {
+                      "type": "time",
+                      "value": {
+                        "timezone": 0,
+                        "calendarmodel": "http://www.wikidata.org/entity/Q1985727",
+                        "time": "+2026-02-25T00:00:00Z",
+                        "after": 0,
+                        "precision": 11,
+                        "before": 0
+                      }
+                    },
+                    "hash": "c1ba41dd0b70373af8985e482dbdf402b97a11d7"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "modified": "2026-02-25T16:28:46Z",
+    "descriptions": {
+      "es": {
+        "value": "traductor checo",
+        "language": "es"
+      },
+      "bn": {
+        "value": "চেক অনুবাদক",
+        "language": "bn"
+      },
+      "fr": {
+        "language": "fr",
+        "value": "traducteur tchèque"
+      },
+      "ar": {
+        "language": "ar",
+        "value": "مترجم تشيكي"
+      },
+      "en": {
+        "value": "Czech translator",
+        "language": "en"
+      },
+      "hr": {
+        "value": "češki prevoditelj",
+        "language": "hr"
+      },
+      "he": {
+        "language": "he",
+        "value": "מתרגם צ'כי"
+      }
+    },
+    "ns": 0,
+    "labels": {
+      "mul": {
+        "value": "Jiři Veselský",
+        "language": "mul"
+      },
+      "cs": {
+        "language": "cs",
+        "value": "Jiři Veselský"
+      }
+    },
+    "pageid": 132001975,
+    "lastrevid": 2466766717,
+    "id": "Q138465517",
+    "type": "item",
+    "sitelinks": {},
+    "aliases": {},
+    "title": "Q138465517"
+  }
+]

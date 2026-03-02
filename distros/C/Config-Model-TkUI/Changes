@@ -1,3 +1,17 @@
+1.381 2026-02-28
+
+  Main UI changes:
+    * TkUI: add history menu
+    * TkUI: add previous and next location buttons
+
+  Bug fixes:
+    * TkUI: fix call to ObjTreeScanner->new() which will
+      break with Config::Model 2.157
+    * TkUI: fix double selection that may happen
+
+  Dependency changes:
+    * dist.ini: require perl 5.20
+
 1.380 2026-02-02
 
   Bug fixes:

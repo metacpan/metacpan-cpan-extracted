@@ -1,5 +1,10 @@
 Revision history for Perl extension Amon2-Plugin-Web-CSRFDefender
 
+7.04 2026-03-01T00:38:17Z
+
+    - Use Crypt::SysRandom instead of reading /dev/urandom directly.
+    - Deprecated this module.
+
 7.03 2014-09-22T05:38:57Z
 
     - Fixed recursive requirements

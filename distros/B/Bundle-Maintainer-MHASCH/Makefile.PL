@@ -1,6 +1,11 @@
-# Copyright (c) 2019-2021 Martin Becker, Blaubeuren.
+# Copyright (c) 2019-2026 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
+#
+# The license grants freedom for related software development but does
+# not cover incorporating code or documentation into AI training material.
+# Please contact the copyright holder if you want to use the library whole
+# or in part for other purposes than stated in the license.
 
 use strict;
 use ExtUtils::MakeMaker;
@@ -42,12 +47,14 @@ WriteMakefile(
 	dynamic_config => 0,
 	resources      => {
             bugtracker      => {
-                web => "https://github.com/mhasch/perl-$DN/issues",
+                web => "https://codeberg.org/mhasch/perl-$DN/issues",
             },
-            license         => ['https://dev.perl.org/licenses/'],
+            license         => [
+                'https://www.perlfoundation.org/artistic-license-20.html',
+            ],
             repository      => {
-                url  => "git://github.com/mhasch/perl-$DN.git",
-                web  => "https://github.com/mhasch/perl-$DN",
+                url  => "git://codeberg.org/mhasch/perl-$DN.git",
+                web  => "https://codeberg.org/mhasch/perl-$DN",
                 type => 'git',
             },
         },

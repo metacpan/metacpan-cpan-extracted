@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::HashViewer 1.380;
+package Config::Model::Tk::HashViewer 1.381;
 
 use strict;
 use warnings;

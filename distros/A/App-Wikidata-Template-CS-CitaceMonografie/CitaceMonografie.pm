@@ -13,7 +13,7 @@ use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 use Wikibase::API;
 use Wikibase::Datatype::Query 0.06;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 Readonly::Array our @LANGUAGES => ('mul', 'cs', 'en');
 
@@ -145,7 +145,7 @@ sub _get_citace_params {
 			$family_name .= $author_count;
 			$author .= $author_count;
 		}
-		my $author_item = $self->{'_api'}->get_item($author_page_id);
+		my $author_item = $self->{'cb_wikidata'}->($self, $author_page_id);
 		my $family_name_id = $self->{'_q'}->query($author_item, 'P734');
 		my @given_name_ids = $self->{'_q'}->query($author_item, 'P735');
 		if (@given_name_ids && $family_name_id) {
@@ -215,7 +215,7 @@ sub _get_citace_params {
 	# TODO Link to translator
 	my $translator_count = 1;
 	foreach my $translator_page_id ($self->{'_q'}->query($item, 'P655')) {
-		my $translator_item = $self->{'_api'}->get_item($translator_page_id);
+		my $translator_item = $self->{'cb_wikidata'}->($self, $translator_page_id);
 		my $family_name_id = $self->{'_q'}->query($translator_item, 'P734');
 		my @given_name_ids = $self->{'_q'}->query($translator_item, 'P735');
 		my $translator_name;
@@ -237,7 +237,7 @@ sub _get_citace_params {
 	# Illustrators.
 	my $illustrator_count = 1;
 	foreach my $illustrator_page_id ($self->{'_q'}->query($item, 'P110')) {
-		my $illustrator_item = $self->{'_api'}->get_item($illustrator_page_id);
+		my $illustrator_item = $self->{'cb_wikidata'}->($self, $illustrator_page_id);
 		my $family_name_id = $self->{'_q'}->query($illustrator_item, 'P734');
 		my @given_name_ids = $self->{'_q'}->query($illustrator_item, 'P735');
 		my $illustrator_name;
@@ -294,7 +294,7 @@ sub _get_citace_params {
 sub _get_page_label {
 	my ($self, $page_id, $lang) = @_;
 
-	my $item = $self->{'_api'}->get_item($page_id);
+	my $item = $self->{'cb_wikidata'}->($self, $page_id);
 	my @languages = @LANGUAGES;
 	if (defined $lang) {
 		unshift @languages, $lang;
@@ -399,12 +399,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2018-2025 Michal Josef Špaček
+© 2018-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

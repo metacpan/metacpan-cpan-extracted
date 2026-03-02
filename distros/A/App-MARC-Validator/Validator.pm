@@ -3,16 +3,19 @@ package App::MARC::Validator;
 use strict;
 use warnings;
 
+use App::MARC::Validator::Utils qw(obj_to_json);
 use Class::Utils qw(set_params);
-use Cpanel::JSON::XS;
+use Data::MARC::Validator::Report;
+use DateTime;
 use English;
 use Getopt::Std;
 use IO::Barf qw(barf);
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::Validator 0.06;
+use MARC::Validator::Filter;
 use Unicode::UTF8 qw(encode_utf8);
 
-our $VERSION = 0.04;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -35,20 +38,24 @@ sub run {
 	# Process arguments.
 	$self->{'_opts'} = {
 		'd' => 0,
+		'f' => 0,
 		'h' => 0,
 		'i' => '001',
 		'l' => 0,
 		'o' => undef,
 		'p' => 0,
+		'r' => 0,
 		'v' => 0,
 	};
-	if (! getopts('dhi:lo:pv', $self->{'_opts'})
+	if (! getopts('dfhi:lo:prv', $self->{'_opts'})
 		|| $self->{'_opts'}->{'h'}) {
 
 		$self->_usage;
 		return 1;
 	}
-	if (! $self->{'_opts'}->{'l'}) {
+	if (! $self->{'_opts'}->{'f'}
+		&& ! $self->{'_opts'}->{'l'}) {
+
 		if (@ARGV < 1) {
 			$self->_usage;
 			return 1;
@@ -59,11 +66,25 @@ sub run {
 	my $exit_code;
 	if ($self->{'_opts'}->{'l'}) {
 		$exit_code = $self->_list_plugins;
+	} elsif ($self->{'_opts'}->{'f'}) {
+		$exit_code = $self->_list_filter_plugins;
 	} else {
 		$exit_code = $self->_process_validation;
 	}
 
 	return $exit_code;
+}
+
+sub _list_filter_plugins {
+	my $self = shift;
+
+	my @plugins = MARC::Validator::Filter::plugins;
+
+	print "List of filter plugins:\n";
+	print map { '- '.$_ } join "\n- ", @plugins;
+	print "\n";
+
+	return 0;
 }
 
 sub _init_plugins {
@@ -73,7 +94,8 @@ sub _init_plugins {
 	foreach my $plugin (MARC::Validator::plugins) {
 		my $plugin_obj = $plugin->new(
 			'debug' => $self->{'_opts'}->{'d'},
-			'error_id_def' => $self->{'_opts'}->{'i'},
+			'record_id_def' => $self->{'_opts'}->{'i'},
+			'recommendation' => $self->{'_opts'}->{'r'},
 			'verbose' => $self->{'_opts'}->{'v'},
 		);
 		$plugin_obj->init;
@@ -136,17 +158,16 @@ sub _process_validation {
 	}
 	$self->_postprocess_plugins;
 
-	my $output_struct_hr = {};
+	my @plugin_reports;
 	foreach my $plugin_obj (@{$self->{'_plugins'}}) {
-		$output_struct_hr->{$plugin_obj->name} = $plugin_obj->struct;
+		push @plugin_reports, $plugin_obj->struct;
 	}
+	my $report = Data::MARC::Validator::Report->new(
+		'datetime' => DateTime->now,
+		'plugins' => \@plugin_reports,
+	);
 
-	# JSON output.
-	my $j = Cpanel::JSON::XS->new;
-	if ($self->{'_opts'}->{'p'}) {
-		$j = $j->pretty;
-	}
-	my $json = $j->canonical(1)->encode($output_struct_hr);
+	my $json = obj_to_json($self, $report);
 
 	# Save to file.
 	if (defined $self->{'_opts'}->{'o'}) {
@@ -173,13 +194,15 @@ sub _postprocess_plugins {
 sub _usage {
 	my $self = shift;
 
-	print STDERR "Usage: $0 [-d] [-h] [-i id] [-l] [-o output_file] [-p] [-v] [--version] marc_xml_file..\n";
+	print STDERR "Usage: $0 [-d] [-f] [-h] [-i id] [-l] [-o output_file] [-p] [-r] [-v] [--version] marc_xml_file..\n";
 	print STDERR "\t-d\t\tDebug mode.\n";
+	print STDERR "\t-f\t\tList of filter plugins.\n";
 	print STDERR "\t-h\t\tPrint help.\n";
 	print STDERR "\t-i id\t\tRecord identifier (default value is 001).\n";
 	print STDERR "\t-l\t\tList of plugins.\n";
 	print STDERR "\t-o output_file\tOutput file (default is STDOUT).\n";
 	print STDERR "\t-p\t\tPretty print JSON output.\n";
+	print STDERR "\t-r\t\tRecommendations.\n";
 	print STDERR "\t-v\t\tVerbose mode.\n";
 	print STDERR "\t--version\tPrint version.\n";
 	print STDERR "\tmarc_xml_file..\tMARC XML file(s).\n";

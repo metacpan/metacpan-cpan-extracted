@@ -1,3 +1,10 @@
+1.03 2026-03-01  lichtkind
+-------
+    * = minor fix release = 3 fixes
+    * & undefined values in settings reset to default value
+    * ! dropped drawing when main window went out of focus
+    * ! writing value for settings key: visual > invert_flow_speed
+
 1.02 2025-12-26  lichtkind
 -------
     * = minor fix release = 2 fixes

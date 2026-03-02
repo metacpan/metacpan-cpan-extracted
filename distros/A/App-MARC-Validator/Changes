@@ -1,3 +1,12 @@
+0.06 2026-03-01T19:06:29+01:00
+ - Add -r option for recommendations.
+
+0.05 2026-02-22T17:09:41+01:00
+ - Add -f option to list of filter plugins.
+ - Add ACKNOWLEDGEMENTS section to doc.
+ - Rewrite to new MARC::Validator@0.10 with new data model.
+ - Update copyright years.
+
 0.04 2025-10-31T15:11:53+01:00
  - Add -i option for definition of record id.
 

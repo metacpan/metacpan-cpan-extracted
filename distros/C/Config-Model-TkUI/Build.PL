@@ -88,7 +88,7 @@ my $build = Module::Build->new
     'Tk::Tree' => '0',
     'Try::Tiny' => '0',
     'YAML::PP' => '0',
-    'perl' => '5.012'
+    'perl' => 'v5.20.0'
   },
 
    add_to_cleanup => [qw/stderr.log wr_data/] ,

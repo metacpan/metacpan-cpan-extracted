@@ -52,11 +52,11 @@ __END__
 
 =head1 NAME
 
-Container::Builder::Layer::DebianPackageFile - Make a container layer based upon a Debian package file.
+Container::Builder::Layer::SingleFile - Make a container layer with a single file.
 
 =head1 DESCRIPTION
 
-Container::Builder::Layer::DebianPackageFile implements Container::Builder::Layer and can be used to create container layers based upon a debian package file.
+Container::Builder::Layer::SingleFile implements Container::Builder::Layer and can be used to create container layers that contain a single file.
 
 =head1 METHODS
 

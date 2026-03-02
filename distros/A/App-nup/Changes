@@ -1,5 +1,16 @@
 Revision history for Perl extension App-nup
 
+1.07 2026-03-02T06:26:15Z
+
+    - Rename --fold/-F to --no-paginate/-F for clarity
+    - Add --auto-paginate/-A option to auto-disable page mode for
+      single column layout
+
+1.06 2026-02-28T11:41:39Z
+
+    - Bundle App::optex::up module (merged from optex-up repository)
+    - Rewrite capture.sh to use iTerm directly without tmux
+
 0.9908 2026-02-28T06:11:37Z
 
     - Add --textconv option for automatic non-text file conversion
@@ -55,3 +66,38 @@ Revision history for Perl extension App-nup
     - -V/--parallel option for parallel view mode
     - Requires App::optex::up 1.01
 
+Revision history for App::optex::up (merged from optex-up repository)
+
+1.05 2025-12-26T03:13:16Z
+
+    - Use NUP_PAGER instead of PAGER to avoid infinite loop when PAGER=nup
+    - Default pager is now 'less -F +Gg' and can be customized via NUP_PAGER
+
+1.04 2025-12-24T16:06:43Z
+
+    - Use pass_through for unknown options to ansicolumn
+    - Add shell_escape for special characters in filter command options
+
+1.03 2025-12-22T06:31:53Z
+
+    - Add -H/--filename and -V/--parallel options for ansicolumn
+
+1.02 2025-12-22T02:24:05Z
+
+    - Merge stderr to stdout in output filter
+    - Pass terminal width explicitly to ansicolumn
+    - Require App::optex 1.04
+
+1.01 2025-12-20T09:57:07Z
+
+    - When ansicolumn is given as command, apply default options to it
+      and use pager as output filter
+    - Add -F/--fold option to enable fold mode (disable page mode)
+    - Add border by default (-DBP instead of -DP)
+    - Fix --pager= (empty value) to disable pager
+    - Add ansicolumn script directory to PATH in tests
+
+1.00 2025-12-08T05:49:34Z
+
+    - Initial release
+    - Provides multi-column output with ansicolumn and pager support

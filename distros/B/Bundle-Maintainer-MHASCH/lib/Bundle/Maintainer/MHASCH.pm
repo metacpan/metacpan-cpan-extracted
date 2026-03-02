@@ -3,7 +3,7 @@ package Bundle::Maintainer::MHASCH;
 use strict;
 use warnings;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 1;
 
@@ -15,7 +15,7 @@ Bundle::Maintainer::MHASCH - CPAN Modules maintained by Martin Becker (MHASCH).
 
 =head1 VERSION
 
-This documentation refers to version 0.005 of Bundle::Maintainer::MHASCH.
+This documentation refers to version 0.006 of Bundle::Maintainer::MHASCH.
 
 =head1 SYNOPSIS
 
@@ -86,8 +86,8 @@ L<Distributions by Martin Becker (MHASCH)|https://metacpan.org/author/MHASCH>
 
 =head1 BUGS AND LIMITATIONS
 
-Please submit bug reports and suggestions via the github issue tracker,
-L<https://github.com/mhasch/perl-Bundle-Maintainer-MHASCH/issues>.
+Please submit bug reports and suggestions via the codeberg issue tracker,
+L<https://codeberg.org/mhasch/perl-Bundle-Maintainer-MHASCH/issues>.
 
 =head1 AUTHOR
 
@@ -95,10 +95,15 @@ Martin Becker, E<lt>mhasch I<at> cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2026 by Martin Becker, Neuental.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+The license grants freedom for related software development but does
+not cover incorporating code or documentation into AI training material.
+Please contact the copyright holder if you want to use the library whole
+or in part for other purposes than stated in the license.
 
 =head1 DISCLAIMER OF WARRANTY
 

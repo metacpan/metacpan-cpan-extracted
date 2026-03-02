@@ -32,10 +32,11 @@ This will:
 - Commit and create git tag
 - Upload to CPAN
 
-## Related Projects
+## Project Structure
 
-This is a wrapper for `App::optex::up`. When `up.pm` is updated:
+`script/nup` is the main command (bash script) and `lib/App/optex/up.pm`
+is the optex module that provides the core multi-column layout functionality.
+Both are bundled in this distribution.
 
-- Check if the same changes are needed in `script/nup`
-- Keep option documentation order consistent
-- Update `cpanfile` if new `App::optex::up` version is required
+- When modifying `up.pm`, check if option documentation in `script/nup` needs updating
+- Keep option documentation order consistent between both files

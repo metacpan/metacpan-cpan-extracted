@@ -1,5 +1,5 @@
 ---
-abstract: 'Anti CSRF filter'
+abstract: '(DEPRECATED) Anti CSRF filter'
 author:
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
 build_requires:
@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.141520'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,16 +28,19 @@ no_index:
 provides:
   Amon2::Plugin::Web::CSRFDefender:
     file: lib/Amon2/Plugin/Web/CSRFDefender.pm
-    version: '7.03'
+    version: '7.04'
   Amon2::Plugin::Web::CSRFDefender::Random:
     file: lib/Amon2/Plugin/Web/CSRFDefender/Random.pm
 requires:
   Amon2::Util: '0'
-  Digest::SHA: '0'
+  Crypt::SysRandom: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/tokuhirom/Amon2-Plugin-Web-CSRFDefender/issues
   homepage: https://github.com/tokuhirom/Amon2-Plugin-Web-CSRFDefender
-  repository: git://github.com/tokuhirom/Amon2-Plugin-Web-CSRFDefender.git
-version: '7.03'
+  repository: https://github.com/tokuhirom/Amon2-Plugin-Web-CSRFDefender.git
+version: '7.04'
 x_authority: cpan:TOKUHIROM
+x_deprecated: 1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

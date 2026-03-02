@@ -1,0 +1,36 @@
+msgid "Aion::Emitter - диспетчер событий"
+msgstr "Aion::Emitter - event dispatcher"
+
+msgid "Файл lib/Event/BallEvent.pm:"
+msgstr "File lib/Event/BallEvent.pm:"
+
+msgid "Файл lib/Listener/RadiusListener.pm:"
+msgstr "File lib/Listener/RadiusListener.pm:"
+
+msgid "Файл lib/Listener/WeightListener.pm:"
+msgstr "File lib/Listener/WeightListener.pm:"
+
+msgid "Файл etc/annotation/listen.ann:"
+msgstr "File etc/annotation/listen.ann:"
+
+msgid "Данный диспетчер событий реализует паттерн **Event Dispatcher** в котором событие определяется по классу объекта события (event)."
+msgstr "This event dispatcher implements the **Event Dispatcher** pattern in which an event is defined by the class of the event object (event)."
+
+msgid "Слушатель регистрируется как эон в плероме и будет всегда представлен одним объектом."
+msgstr "The listener is registered as an aeon in the pleroma and will always be represented by one object."
+
+msgid "Метод обрабатывающий события отмечается аннотацией `#@listen`."
+msgstr "The event processing method is marked with the `#@listen` annotation."
+
+msgid "Излучает событие: вызывает все слушатели связанные с событием `$event`."
+msgstr "Emits an event: calls all listeners associated with the `$event` event."
+
+msgid "Дополнительный параметр `$key` позволяет указать уточняющее событие. Представьте, что у нас множество контроллеров и мы хотим излучить событие не для всех, а для каждого конкретного контроллера. Писать для каждого контроллера класс расширяющий класс запроса – расточительно."
+msgstr "The additional parameter `$key` allows you to specify a qualifying event. Imagine that we have many controllers and we want to emit an event not for all, but for each specific controller. Writing a class that extends the request class for each controller is wasteful."
+
+msgid "`$key` может содержать буквы, цифры, подчёркивание, тире, двоеточие и точку."
+msgstr "`$key` can contain letters, numbers, underscores, dashes, colons and periods."
+
+msgid "⚖ **Perl5**"
+msgstr "⚖ **Perl5**"
+

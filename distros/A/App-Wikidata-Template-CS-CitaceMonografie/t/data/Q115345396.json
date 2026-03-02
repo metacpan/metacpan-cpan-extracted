@@ -1,0 +1,239 @@
+[
+  {
+    "labels": {
+      "en": {
+        "language": "en",
+        "value": "Jan Škvařil"
+      },
+      "cs": {
+        "value": "Jan Škvařil",
+        "language": "cs"
+      },
+      "mul": {
+        "value": "Jan Škvařil",
+        "language": "mul"
+      }
+    },
+    "lastrevid": 2400067156,
+    "id": "Q115345396",
+    "type": "item",
+    "sitelinks": {},
+    "ns": 0,
+    "aliases": {},
+    "pageid": 109932673,
+    "modified": "2025-09-03T20:21:26Z",
+    "claims": {
+      "P691": [
+        {
+          "references": [
+            {
+              "snaks-order": [
+                "P813"
+              ],
+              "snaks": {
+                "P813": [
+                  {
+                    "datavalue": {
+                      "type": "time",
+                      "value": {
+                        "before": 0,
+                        "after": 0,
+                        "timezone": 0,
+                        "precision": 11,
+                        "calendarmodel": "http://www.wikidata.org/entity/Q1985727",
+                        "time": "+2022-11-22T00:00:00Z"
+                      }
+                    },
+                    "datatype": "time",
+                    "hash": "dd95ce2bf1a2e43f54a6b9fce3ece016f144c5c6",
+                    "property": "P813",
+                    "snaktype": "value"
+                  }
+                ]
+              },
+              "hash": "d77b8c2d71c747d1d3a79b336ed0fb5cdff0bded"
+            }
+          ],
+          "rank": "normal",
+          "id": "Q115345396$d4e540c5-4aeb-80ba-8f97-ec07321e383c",
+          "type": "statement",
+          "mainsnak": {
+            "snaktype": "value",
+            "property": "P691",
+            "hash": "be44c4f0347ddeec91eac72be50d1511b08192cc",
+            "datatype": "external-id",
+            "datavalue": {
+              "value": "jk01130401",
+              "type": "string"
+            }
+          }
+        }
+      ],
+      "P735": [
+        {
+          "id": "Q115345396$dbf54b0b-4cc7-c1b9-578a-ccea56f1a1d6",
+          "type": "statement",
+          "rank": "normal",
+          "mainsnak": {
+            "datavalue": {
+              "value": {
+                "numeric-id": 12173670,
+                "id": "Q12173670",
+                "entity-type": "item"
+              },
+              "type": "wikibase-entityid"
+            },
+            "datatype": "wikibase-item",
+            "hash": "ff76e8758fbfcccee9ad49287f7938b968d728f9",
+            "property": "P735",
+            "snaktype": "value"
+          }
+        }
+      ],
+      "P214": [
+        {
+          "mainsnak": {
+            "datavalue": {
+              "type": "string",
+              "value": "83923425"
+            },
+            "snaktype": "value",
+            "datatype": "external-id",
+            "property": "P214",
+            "hash": "8313153aadf2a3aa04d4e2e299693e95eaa8583b"
+          },
+          "references": [
+            {
+              "hash": "d77b8c2d71c747d1d3a79b336ed0fb5cdff0bded",
+              "snaks": {
+                "P813": [
+                  {
+                    "datavalue": {
+                      "value": {
+                        "calendarmodel": "http://www.wikidata.org/entity/Q1985727",
+                        "time": "+2022-11-22T00:00:00Z",
+                        "after": 0,
+                        "before": 0,
+                        "timezone": 0,
+                        "precision": 11
+                      },
+                      "type": "time"
+                    },
+                    "datatype": "time",
+                    "hash": "dd95ce2bf1a2e43f54a6b9fce3ece016f144c5c6",
+                    "property": "P813",
+                    "snaktype": "value"
+                  }
+                ]
+              },
+              "snaks-order": [
+                "P813"
+              ]
+            }
+          ],
+          "rank": "normal",
+          "id": "Q115345396$ddccf57c-4056-5a33-8133-355a575f6117",
+          "type": "statement"
+        }
+      ],
+      "P21": [
+        {
+          "mainsnak": {
+            "datavalue": {
+              "value": {
+                "id": "Q6581097",
+                "numeric-id": 6581097,
+                "entity-type": "item"
+              },
+              "type": "wikibase-entityid"
+            },
+            "snaktype": "value",
+            "hash": "85ad4b1c7348f7a5aac521135040d74e91fb5939",
+            "property": "P21",
+            "datatype": "wikibase-item"
+          },
+          "id": "Q115345396$d592ffa5-48e1-4a09-4c8e-47a363618c34",
+          "type": "statement",
+          "rank": "normal"
+        }
+      ],
+      "P106": [
+        {
+          "type": "statement",
+          "id": "Q115345396$53595adb-4890-cdc7-81cb-ffe7cc0cc3a6",
+          "rank": "normal",
+          "mainsnak": {
+            "snaktype": "value",
+            "hash": "788d702ab6de98397237c2cbcab07498f83b887c",
+            "property": "P106",
+            "datatype": "wikibase-item",
+            "datavalue": {
+              "type": "wikibase-entityid",
+              "value": {
+                "numeric-id": 333634,
+                "id": "Q333634",
+                "entity-type": "item"
+              }
+            }
+          }
+        }
+      ],
+      "P31": [
+        {
+          "rank": "normal",
+          "type": "statement",
+          "id": "Q115345396$6d63e1c5-4be4-7a13-b096-8d8890d2b721",
+          "mainsnak": {
+            "datavalue": {
+              "type": "wikibase-entityid",
+              "value": {
+                "entity-type": "item",
+                "id": "Q5",
+                "numeric-id": 5
+              }
+            },
+            "snaktype": "value",
+            "property": "P31",
+            "hash": "ad7d38a03cdd40cdc373de0dc4e7b7fcbccb31d9",
+            "datatype": "wikibase-item"
+          }
+        }
+      ]
+    },
+    "descriptions": {
+      "fr": {
+        "language": "fr",
+        "value": "traducteur tchèque"
+      },
+      "en": {
+        "language": "en",
+        "value": "Czech translator"
+      },
+      "hr": {
+        "language": "hr",
+        "value": "češki prevoditelj"
+      },
+      "es": {
+        "language": "es",
+        "value": "traductor checo"
+      },
+      "ar": {
+        "language": "ar",
+        "value": "مترجم تشيكي"
+      },
+      "he": {
+        "value": "מתרגם צ'כי",
+        "language": "he"
+      },
+      "cs": {
+        "value": "český překladatel",
+        "language": "cs"
+      },
+      "bn": {
+        "value": "চেক অনুবাদক",
+        "language": "bn"
+      }
+    },
+    "title": "Q115345396"
+  }
+]

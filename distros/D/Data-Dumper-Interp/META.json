@@ -47,6 +47,7 @@
             "if" : "0",
             "overload" : "0",
             "perl" : "5.018",
+            "re" : "0",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -101,7 +102,7 @@
    "provides" : {
       "Data::Dumper::Interp" : {
          "file" : "lib/Data/Dumper/Interp.pm",
-         "version" : "7.022"
+         "version" : "7.023"
       }
    },
    "release_status" : "stable",
@@ -116,7 +117,7 @@
          "web" : "https://github.com/jimav/Data-Dumper-Interp"
       }
    },
-   "version" : "7.022",
+   "version" : "7.023",
    "x_generated_by_perl" : "v5.40.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "CC0-1.0"

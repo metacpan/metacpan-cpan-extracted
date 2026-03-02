@@ -1,0 +1,135 @@
+[
+  {
+    "id": "Q138470117",
+    "modified": "2026-02-25T19:16:38Z",
+    "labels": {
+      "cs": {
+        "value": "Operační systémy",
+        "language": "cs"
+      },
+      "mul": {
+        "value": "Operační systémy",
+        "language": "mul"
+      }
+    },
+    "ns": 0,
+    "title": "Q138470117",
+    "descriptions": {
+      "en": {
+        "value": "Czech book series by Computer Press",
+        "language": "en"
+      }
+    },
+    "claims": {
+      "P527": [
+        {
+          "type": "statement",
+          "id": "Q138470117$dbd42677-4331-016b-190a-175ac0172474",
+          "rank": "normal",
+          "mainsnak": {
+            "property": "P527",
+            "hash": "ed450ea2e4e65b6f53c7d286cfb835d7906f65a9",
+            "snaktype": "value",
+            "datatype": "wikibase-item",
+            "datavalue": {
+              "value": {
+                "numeric-id": 138471014,
+                "entity-type": "item",
+                "id": "Q138471014"
+              },
+              "type": "wikibase-entityid"
+            }
+          }
+        }
+      ],
+      "P1476": [
+        {
+          "type": "statement",
+          "id": "Q138470117$04af4838-45c8-659c-92db-9305e4c06860",
+          "mainsnak": {
+            "property": "P1476",
+            "hash": "47d788d3c0cb696e12be17c4a1b0c287cdecef7a",
+            "datatype": "monolingualtext",
+            "snaktype": "value",
+            "datavalue": {
+              "type": "monolingualtext",
+              "value": {
+                "text": "Operační systémy",
+                "language": "cs"
+              }
+            }
+          },
+          "rank": "normal"
+        }
+      ],
+      "P123": [
+        {
+          "rank": "normal",
+          "mainsnak": {
+            "hash": "89471ac6a56749c82783cbb27890f8f373280324",
+            "property": "P123",
+            "datatype": "wikibase-item",
+            "snaktype": "value",
+            "datavalue": {
+              "type": "wikibase-entityid",
+              "value": {
+                "numeric-id": 11773650,
+                "entity-type": "item",
+                "id": "Q11773650"
+              }
+            }
+          },
+          "id": "Q138470117$639ed316-45ab-d8c7-17c6-e4499f91e860",
+          "type": "statement"
+        }
+      ],
+      "P407": [
+        {
+          "type": "statement",
+          "id": "Q138470117$cab3dc59-417f-2787-30d1-0e065c87c399",
+          "rank": "normal",
+          "mainsnak": {
+            "hash": "a2ffd1c88a23721a8fd7eeb8d02b7c7f4e60c0c9",
+            "property": "P407",
+            "datavalue": {
+              "value": {
+                "id": "Q9056",
+                "entity-type": "item",
+                "numeric-id": 9056
+              },
+              "type": "wikibase-entityid"
+            },
+            "datatype": "wikibase-item",
+            "snaktype": "value"
+          }
+        }
+      ],
+      "P31": [
+        {
+          "type": "statement",
+          "rank": "normal",
+          "mainsnak": {
+            "snaktype": "value",
+            "datatype": "wikibase-item",
+            "datavalue": {
+              "value": {
+                "numeric-id": 277759,
+                "entity-type": "item",
+                "id": "Q277759"
+              },
+              "type": "wikibase-entityid"
+            },
+            "hash": "402a53b605b71caec3d414df89cda61e8ed2c06b",
+            "property": "P31"
+          },
+          "id": "Q138470117$f5333433-4456-aea4-075d-5bf72f41e7ca"
+        }
+      ]
+    },
+    "sitelinks": {},
+    "type": "item",
+    "lastrevid": 2466831375,
+    "pageid": 132002662,
+    "aliases": {}
+  }
+]

@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "7.03";
+our $VERSION = "7.04";
 
 use Amon2::Util ();
 use Amon2::Plugin::Web::CSRFDefender::Random;
@@ -90,7 +90,7 @@ __END__
 
 =head1 NAME
 
-Amon2::Plugin::Web::CSRFDefender - Anti CSRF filter
+Amon2::Plugin::Web::CSRFDefender - (DEPRECATED) Anti CSRF filter
 
 =head1 SYNOPSIS
 
@@ -100,6 +100,8 @@ Amon2::Plugin::Web::CSRFDefender - Anti CSRF filter
     __PACKAGE__->load_plugin('Web::CSRFDefender');
 
 =head1 DESCRIPTION
+
+B<This module is deprecated.> Do not use it in new code.
 
 This plugin denies CSRF request.
 
