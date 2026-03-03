@@ -103,5 +103,19 @@ sub delete($self, $table, $keys) {
     $result->{result} = 1;
     return $result;
 }
+
+sub super_select($self, $table, $select, $conditions, $data ) {
+    my $result->{result} = 0;
+
+    my $stmt = qq{
+        SELECT $select FROM $table WHERE $conditions
+    };
+
+    my $load = $self->db->query($stmt, $data);
+    $result->{data} = [];
+    $result->{data} = $load->hashes if $load and $load->rows > 0;
+    $result->{result} = 1;
+    return $result;
+}
 1;
 

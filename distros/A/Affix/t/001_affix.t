@@ -236,7 +236,7 @@ subtest 'affix/wrap function pointer' => sub {
         is my_add( 5, 5 ), 10, 'Affixed raw function pointer works';
     };
 
-    # 4. Test wrap with explicit raw integer (simulating cast)
+    # Test wrap with explicit raw integer (simulating cast)
     subtest 'wrap(undef, int_addr, ...)' => sub {
         my $addr = address($ptr);                               # Convert Pin to UV
         my $fn   = wrap( undef, $addr, [ Int, Int ] => Int );

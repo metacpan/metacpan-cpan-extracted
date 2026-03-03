@@ -1,5 +1,5 @@
 name = "App-PerlPackage2PlantUMLClassDiagram"
-# badges = ["travis"]
+badges = ["github_actions"]
 authority="cpan:HITODE"
 
 module_maker="ModuleBuildTiny"

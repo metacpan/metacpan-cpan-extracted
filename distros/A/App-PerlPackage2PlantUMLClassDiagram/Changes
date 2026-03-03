@@ -1,5 +1,9 @@
 Revision history for Perl extension App-PerlPackage2PlantUMLClassDiagram
 
+0.03 2026-03-03T09:47:47Z
+    - Fix "Downgrading a use VERSION declaration" error on Perl 5.40+
+    - Switch CI from Travis CI to GitHub Actions
+
 0.02 2015-12-09T01:40:52Z
     - Experimental push on scalar is now forbidden
 

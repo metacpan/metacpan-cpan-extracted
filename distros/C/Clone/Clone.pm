@@ -1,17 +1,15 @@
 package Clone;
 
 use strict;
-our $AUTOLOAD;
 
 require Exporter;
-require AutoLoader;
 use XSLoader ();
 
 our @ISA       = qw(Exporter);
 our @EXPORT;
 our @EXPORT_OK = qw( clone );
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 XSLoader::load('Clone', $VERSION);
 
@@ -23,8 +21,7 @@ __END__
 Clone - recursively copy Perl datatypes
 
 =for html
-<a href="https://travis-ci.org/garu/Clone"><img src="https://travis-ci.org/garu/Clone.png?branch=master" alt="Build Status"></a>
-<a href="https://coveralls.io/r/garu/Clone?branch=master"><img src="https://coveralls.io/repos/garu/Clone/badge.png?branch=master" alt="Coverage Status"></a>
+<a href="https://github.com/garu/Clone/actions/workflows/test.yml"><img src="https://github.com/garu/Clone/actions/workflows/test.yml/badge.svg" alt="Build Status"></a>
 <a href="https://metacpan.org/pod/Clone"><img src="https://badge.fury.io/pl/Clone.svg" alt="CPAN version"></a>
 
 =head1 SYNOPSIS
@@ -71,6 +68,146 @@ arrays or hashes, pass them in by reference, e.g.
 
     my %copy = %{ clone (\%hash) };
 
+=head1 EXAMPLES
+
+=head2 Cloning Blessed Objects
+
+    package Person;
+    sub new {
+        my ($class, $name) = @_;
+        bless { name => $name, friends => [] }, $class;
+    }
+
+    package main;
+    use Clone 'clone';
+
+    my $person = Person->new('Alice');
+    my $clone = clone($person);
+
+    # $clone is a separate object with the same data
+    push @{$person->{friends}}, 'Bob';
+    print scalar @{$clone->{friends}};  # 0
+
+=head2 Handling Circular References
+
+Clone properly handles circular references, preventing infinite loops:
+
+    my $a = { name => 'A' };
+    my $b = { name => 'B', ref => $a };
+    $a->{ref} = $b;  # circular reference
+
+    my $clone = clone($a);
+    # Circular structure is preserved in the clone
+
+=head2 Cloning Weakened References
+
+    use Scalar::Util 'weaken';
+
+    my $obj = { data => 'important' };
+    my $container = { strong => $obj, weak => $obj };
+    weaken($container->{weak});
+
+    my $clone = clone($container);
+    # Both strong and weak references are preserved correctly
+
+=head2 Cloning Tied Variables
+
+    use Tie::Hash;
+    tie my %hash, 'Tie::StdHash';
+    %hash = (a => 1, b => 2);
+
+    my $clone = clone(\%hash);
+    # The tied behavior is preserved in the clone
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item * Maximum Recursion Depth
+
+Clone supports structures up to 32,000 levels deep. Deeper structures
+will cause the clone operation to fail with an error. This limit prevents
+stack overflow and ensures safe operation.
+
+=item * Filehandles and IO Objects
+
+Filehandles and IO objects are cloned, but the underlying file descriptor
+is shared. Both the original and cloned filehandle will refer to the same
+file position. For DBI database handles and similar objects, Clone attempts
+to handle them safely, but behavior may vary depending on the object type.
+
+=item * Code References
+
+Code references (subroutines) are cloned by reference, not by value.
+The cloned coderef points to the same subroutine as the original.
+
+=item * Thread Safety
+
+Clone is not explicitly thread-safe. Use appropriate synchronization
+when cloning data structures across threads.
+
+=back
+
+=head1 PERFORMANCE
+
+Clone is implemented in C using Perl's XS interface, making it very fast
+for most use cases.
+
+=over 4
+
+=item * When to use Clone
+
+Clone is optimized for speed and works best with:
+
+=over 4
+
+=item * Shallow to medium-depth structures (3 levels or fewer)
+
+=item * Data structures that need fast cloning in hot code paths
+
+=item * Structures containing blessed objects and tied variables
+
+=back
+
+=item * When to use Storable::dclone
+
+L<Storable>'s C<dclone()> may be faster for:
+
+=over 4
+
+=item * Very deep structures (4+ levels)
+
+=item * When you need serialization features
+
+=back
+
+=back
+
+Benchmarking your specific use case is recommended for performance-critical
+applications.
+
+=head1 CAVEATS
+
+=over 4
+
+=item * Cloned objects are deep copies
+
+Changes to the clone do not affect the original, and vice versa. This
+includes nested references and objects.
+
+=item * Object internals
+
+While Clone handles most blessed objects correctly, objects with XS
+components or complex internal state may not clone as expected. Test
+thoroughly with your specific object types.
+
+=item * Memory usage
+
+Cloning large data structures creates a complete copy in memory. Ensure
+you have sufficient memory available.
+
+=back
+
 =head1 SEE ALSO
 
 L<Storable>'s C<dclone()> is a flexible solution for cloning variables,
@@ -79,9 +216,31 @@ and naive benchmarks show that Clone is faster for data structures
 with 3 or fewer levels, while C<dclone()> can be faster for structures
 4 or more levels deep.
 
+Other modules that may be of interest:
+
+L<Clone::PP> - Pure Perl implementation of Clone
+
+L<Scalar::Util> - For C<weaken()> and other scalar utilities
+
+L<Data::Dumper> - For debugging and inspecting data structures
+
+=head1 SUPPORT
+
+=over 4
+
+=item * Bug Reports and Feature Requests
+
+Please report bugs on GitHub: L<https://github.com/garu/Clone/issues>
+
+=item * Source Code
+
+The source code is available on GitHub: L<https://github.com/garu/Clone>
+
+=back
+
 =head1 COPYRIGHT
 
-Copyright 2001-2022 Ray Finch. All Rights Reserved.
+Copyright 2001-2026 Ray Finch. All Rights Reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

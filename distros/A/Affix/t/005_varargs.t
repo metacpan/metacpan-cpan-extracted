@@ -49,7 +49,7 @@ DLLEXPORT int var_sum(const char *fmt, ...) {
 END_C
 my $lib = compile_ok( $c_code, { name => 'variadic_dynamic_lib' } );
 
-# 2. Bind with "Empty" Variadic Signature
+# Bind with "Empty" Variadic Signature
 # We define the fixed arguments (*char) and end with a semicolon.
 # We do NOT specify any optional types here. Affix must generate them at runtime.
 # Signature: (*char;)->int
@@ -87,7 +87,7 @@ subtest 'Runtime Coercion (Structs)' => sub {
     is $fn->( "PP", coerce( Point__(), $p1 ), coerce( Point__(), $p2 ) ), 10, 'Dynamically generated signature for coerced structs';
 };
 
-# 5. Test Safety / Constraints
+# Test Safety / Constraints
 subtest 'Safety' => sub {
 
     # coerce() modifies the SV (attaches magic).

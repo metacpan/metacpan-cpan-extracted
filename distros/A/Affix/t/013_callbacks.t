@@ -144,5 +144,11 @@ subtest 'unions passed to callbacks' => sub {
     # Verify the write inside the callback persisted to the C caller
     is $ret, 1073741824, 'Callback modifications persisted to C (Union write-back)';
 };
+subtest 'ThisCall Sugar' => sub {
+    my $cb = ThisCall( Callback( [ [ Int() ] => Void() ] ) );
+    is $cb->signature, '*((*void,int)->void)', 'ThisCall prepends Pointer[Void] (*void)';
+    my $str = ThisCall('*((int)->void)');
+    is $str, '*((*void,int)->void)', 'ThisCall also works on signature strings';
+};
 #
 done_testing;

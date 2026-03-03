@@ -1,0 +1,23 @@
+bench/benchmark.pl
+bench/large_struct.pl
+bench/results.txt
+Changes
+lib/Data/Path/XS.pm
+Makefile.PL
+MANIFEST
+README
+XS.xs
+t/array-api.t
+t/basic.t
+t/compiled.t
+t/comprehensive.t
+t/kw-edge-cases.t
+t/kw-integration.t
+t/kw-pathdelete.t
+t/kw-pathexists.t
+t/kw-pathget.t
+t/kw-pathset.t
+t/leaks.t
+t/stress.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

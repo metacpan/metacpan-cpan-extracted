@@ -1,0 +1,65 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'libpq';
+
+share {
+    # Detect latest stable version from FTP listing, download tarball
+    download sub {
+        my $build = shift;
+        require HTTP::Tiny;
+
+        my $http = HTTP::Tiny->new;
+        my $res  = $http->get('https://ftp.postgresql.org/pub/source/');
+        die "Failed to fetch source listing\n" unless $res->{success};
+
+        my @versions;
+        while ($res->{content} =~ /href="v(\d+)\.(\d+)\/"/g) {
+            push @versions, [ $1 + 0, $2 + 0 ];
+        }
+        @versions = sort { $b->[0] <=> $a->[0] || $b->[1] <=> $a->[1] } @versions;
+        die "No PostgreSQL versions found\n" unless @versions;
+
+        my $version  = "$versions[0][0].$versions[0][1]";
+        my $filename = "postgresql-$version.tar.bz2";
+        $build->log("Latest stable PostgreSQL: $version");
+
+        $res = $http->mirror(
+            "https://ftp.postgresql.org/pub/source/v$version/$filename",
+            $filename,
+        );
+        die "Failed to download $filename\n" unless $res->{success};
+
+        $build->runtime_prop->{version} = $version;
+    };
+
+    plugin 'Extract' => 'tar.bz2';
+
+    plugin 'Build::Autoconf';
+
+    # PostgreSQL requires GNU make; on BSDs %{make} resolves to BSD make
+    my $make = ($^O =~ /bsd/i) ? 'gmake' : '%{make}';
+
+    build [
+        '%{configure} --prefix=%{.install.prefix} --without-readline --without-zlib --without-icu --without-openssl',
+        "$make -C src/backend generated-headers",
+        "$make -C src/common",
+        "$make -C src/port",
+        "$make -C src/interfaces/libpq",
+        "$make -C src/interfaces/libpq install",
+        'cp src/include/postgres_ext.h $DESTDIR/%{.install.prefix}/include/',
+        'cp src/common/libpgcommon.a src/port/libpgport.a $DESTDIR/%{.install.prefix}/lib/',
+        sub {
+            # On macOS, fix the dylib install_name from an absolute path to
+            # @rpath so it can work after Alien::Build DESTDIR relocation.
+            my $build = shift;
+            return unless $^O eq 'darwin';
+            my $prefix  = $build->install_prop->{prefix};
+            my $destdir = $ENV{DESTDIR} // '';
+            my $lib     = "$destdir$prefix/lib";
+
+            system('install_name_tool', '-id', '@rpath/libpq.5.dylib',
+                   "$lib/libpq.5.dylib") == 0
+                or die "install_name_tool failed";
+        },
+    ];
+};

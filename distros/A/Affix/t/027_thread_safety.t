@@ -3,23 +3,26 @@ use lib '../lib', 'lib';
 use blib;
 use Test2::Tools::Affix qw[:all];
 use Affix               qw[:all];
+use Config;
+#
 $|++;
 #
-typedef Callback_t => Callback [ [Int] => Void ];
-typedef ThreadTask => Struct [ cb   => Callback_t(), val  => Int ];
-typedef TaskNode   => Struct [ task => ThreadTask(), next => Pointer [ ThreadTask() ] ];
-typedef TaskQueue =>
-    Struct [ head => Pointer [ TaskNode() ], tail => Pointer [ TaskNode() ], lock => Pointer [Void], cond => Pointer [Void], stop => Int ];
-typedef ThreadPool => Struct [
-    threads         => Pointer [Void],
-    thread_count    => Int,
-    task_queue      => TaskQueue(),
-    pool_lock       => Pointer [Void],
-    task_available  => Pointer [Void],
-    active_threads  => Int,
-    tasks_remaining => Int
-];
-my $c_source = <<~'C';
+subtest 'os threads' => sub {
+    typedef Callback_t => Callback [ [Int] => Void ];
+    typedef ThreadTask => Struct [ cb   => Callback_t(), val  => Int ];
+    typedef TaskNode   => Struct [ task => ThreadTask(), next => Pointer [ ThreadTask() ] ];
+    typedef TaskQueue =>
+        Struct [ head => Pointer [ TaskNode() ], tail => Pointer [ TaskNode() ], lock => Pointer [Void], cond => Pointer [Void], stop => Int ];
+    typedef ThreadPool => Struct [
+        threads         => Pointer [Void],
+        thread_count    => Int,
+        task_queue      => TaskQueue(),
+        pool_lock       => Pointer [Void],
+        task_available  => Pointer [Void],
+        active_threads  => Int,
+        tasks_remaining => Int
+    ];
+    my $c_source = <<~'C';
         #include "std.h"
         //ext: .c
         #if _WIN32
@@ -76,26 +79,49 @@ my $c_source = <<~'C';
         }
     C
 
-# Pass reference (\$c_source) so Affix::Build treats it as code, not a filename
-my $lib = compile_ok($c_source);
-ok $lib && -e $lib, 'Compiled a threaded test library';
-#
-ok affix( $lib, 'run_in_foreign_thread', [ Callback_t(), Int ] => Void ), 'affix run_in_foreign_thread';
-#
-my $ok_flag = 0;
-my $str;
+    # Pass reference (\$c_source) so Affix::Build treats it as code, not a filename
+    my $lib = compile_ok($c_source);
+    ok $lib && -e $lib, 'Compiled a threaded test library';
+    #
+    ok affix( $lib, 'run_in_foreign_thread', [ Callback_t(), Int ] => Void ), 'affix run_in_foreign_thread';
+    #
+    my $ok_flag = 0;
+    my $str;
 
-# This calls C, which spawns a thread, which calls this sub
-run_in_foreign_thread(
-    sub ($val) {
+    # This calls C, which spawns a thread, which calls this sub
+    run_in_foreign_thread(
+        sub ($val) {
 
-        # Allocating memory here (creating SVs) tests the memory allocator context
-        $str     = 'Received: ' . $val;
-        $ok_flag = $val;
-    },
-    123
-);
-is $ok_flag, 123, 'Callback executed successfully from foreign thread without crashing';
-diag $str;
+            # Allocating memory here (creating SVs) tests the memory allocator context
+            $str     = 'Received: ' . $val;
+            $ok_flag = $val;
+        },
+        123
+    );
+    is $ok_flag, 123, 'Callback executed successfully from foreign thread without crashing';
+    diag $str;
+};
+#
+subtest ithreads => sub {
+    skip_all 'No ithreads', 1 unless $Config{useithreads};
+    require threads;
+
+    # Test core affix cloning and usage across threads
+    ok affix libc(), [ abs => 'absolute' ], [Int] => Int;
+    is absolute(-42), 42, 'Main thread: absolute(-42) == 42';
+    my @threads = map {
+        threads->create(
+            sub {
+                my $tid = threads->tid();
+                my $res = absolute( -100 * $tid );
+                return $res == ( 100 * $tid );
+            }
+        )
+    } 1 .. 5;
+    for my $thr (@threads) {
+        my $tid = $thr->tid();
+        ok $thr->join(), "Thread $tid: absolute() worked correctly after cloning";
+    }
+};
 #
 done_testing();

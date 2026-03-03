@@ -1,0 +1,194 @@
+======================================================================
+Data::Path::XS Benchmark (XS vs Pure Perl vs Native expressions)
+======================================================================
+
+--- Shallow get: /foo ---
+             Rate   Perl     XS Native
+Perl    2131868/s     --   -91%   -94%
+XS     22654416/s   963%     --   -36%
+Native 35393953/s  1560%    56%     --
+
+--- Deep get: /level1/level2/level3/level4/level5/value ---
+            Rate   Perl Native     XS
+Perl    755152/s     --   -89%   -91%
+Native 7048682/s   833%     --   -18%
+XS     8600472/s  1039%    22%     --
+
+--- Array get: /arr/1/1/1/1/1 ---
+             Rate   Perl Native     XS
+Perl     494036/s     --   -94%   -96%
+Native  8093923/s  1538%     --   -39%
+XS     13336849/s  2600%    65%     --
+
+--- Deep get (missing key): /level1/level2/nope/x ---
+             Rate   Perl Native     XS
+Perl    1292258/s     --   -71%   -91%
+Native  4443800/s   244%     --   -70%
+XS     14719311/s  1039%   231%     --
+
+--- Shallow set: /foo ---
+             Rate   Perl     XS Native
+Perl    2027308/s     --   -79%   -91%
+XS      9776361/s   382%     --   -56%
+Native 22365988/s  1003%   129%     --
+
+--- Deep set (existing path): /level1/level2/level3/level4/level5/value ---
+            Rate   Perl     XS Native
+Perl    775665/s     --   -89%   -90%
+XS     7297745/s   841%     --   -10%
+Native 8104559/s   945%    11%     --
+
+--- Deep set (create path): /a/b/c/d/e ---
+            Rate   Perl Native     XS
+Perl    677956/s     --   -75%   -75%
+Native 2711834/s   300%     --    -1%
+XS     2733255/s   303%     1%     --
+
+======================================================================
+Array-based API (patha_*) - zero parsing overhead
+======================================================================
+
+--- Shallow get: ['foo'] ---
+             Rate XS arr XS str Native
+XS arr 17342556/s     --   -17%   -52%
+XS str 20811071/s    20%     --   -42%
+Native 35911567/s   107%    73%     --
+
+--- Deep get: [qw(level1 level2 level3 level4 level5 value)] ---
+            Rate Native XS arr XS str
+Native 6251649/s     --    -4%   -23%
+XS arr 6520439/s     4%     --   -20%
+XS str 8121213/s    30%    25%     --
+
+--- Array get: ['arr', 1, 1, 1, 1, 1] ---
+             Rate Native XS arr XS str
+Native  8063517/s     --   -23%   -37%
+XS arr 10533417/s    31%     --   -18%
+XS str 12816575/s    59%    22%     --
+
+--- Deep get (missing): [qw(level1 level2 nope x)] ---
+             Rate Native XS arr XS str
+Native  4369066/s     --   -62%   -69%
+XS arr 11549885/s   164%     --   -19%
+XS str 14234063/s   226%    23%     --
+
+--- Deep set (create): [qw(a b c d e)] ---
+            Rate XS arr Native XS str
+XS arr 2353241/s     --    -8%   -14%
+Native 2548622/s     8%     --    -7%
+XS str 2739050/s    16%     7%     --
+
+======================================================================
+Compiled path API (pathc_*) - pre-parsed, maximum speed
+======================================================================
+
+--- Shallow get (compiled) ---
+              Rate  XS str XS comp  Native
+XS str  21483020/s      --     -8%    -43%
+XS comp 23354644/s      9%      --    -38%
+Native  37770319/s     76%     62%      --
+
+--- Deep get (compiled) ---
+             Rate  Native  XS str XS comp
+Native  7117027/s      --    -11%    -18%
+XS str  7961807/s     12%      --     -8%
+XS comp 8688593/s     22%      9%      --
+
+--- Array get (compiled) ---
+              Rate  Native  XS str XS comp
+Native   8071878/s      --    -36%    -42%
+XS str  12626201/s     56%      --     -9%
+XS comp 13875297/s     72%     10%      --
+
+--- Deep get missing (compiled) ---
+              Rate  Native  XS str XS comp
+Native   4633856/s      --    -65%    -73%
+XS str  13406447/s    189%      --    -21%
+XS comp 16968973/s    266%     27%      --
+
+--- Deep set create (compiled) ---
+             Rate  Native  XS str XS comp
+Native  2520615/s      --     -6%     -9%
+XS str  2676891/s      6%      --     -4%
+XS comp 2778870/s     10%      4%      --
+
+======================================================================
+EXISTS benchmarks
+======================================================================
+
+--- Shallow exists: /foo ---
+             Rate   Perl     XS Native
+Perl    2152366/s     --   -91%   -94%
+XS     22791198/s   959%     --   -36%
+Native 35775350/s  1562%    57%     --
+
+--- Deep exists: /level1/level2/level3/level4/level5/value ---
+            Rate   Perl Native     XS
+Perl    741054/s     --   -89%   -92%
+Native 6848667/s   824%     --   -22%
+XS     8787280/s  1086%    28%     --
+
+--- Deep exists (missing): /level1/level2/nope/x ---
+             Rate   Perl Native     XS
+Perl    1286219/s     --   -67%   -91%
+Native  3936828/s   206%     --   -71%
+XS     13623539/s   959%   246%     --
+
+--- Exists (compiled) ---
+              Rate  Native  XS str XS comp
+Native   6284269/s      --    -28%    -39%
+XS str   8696715/s     38%      --    -15%
+XS comp 10230009/s     63%     18%      --
+
+======================================================================
+KEYWORDS API (pathget, pathset, pathdelete, pathexists)
+======================================================================
+
+--- pathget shallow (constant path) ---
+               Rate  XS func   kw dyn   Native kw const
+XS func  22731809/s       --     -38%     -39%     -46%
+kw dyn   36875757/s      62%       --      -2%     -13%
+Native   37502246/s      65%       2%       --     -11%
+kw const 42184090/s      86%      14%      12%       --
+
+--- pathget deep (constant vs dynamic vs native) ---
+                Rate dyn native     Native   kw const     kw dyn
+dyn native 5636122/s         --       -22%       -33%       -43%
+Native     7252991/s        29%         --       -14%       -27%
+kw const   8456253/s        50%        17%         --       -15%
+kw dyn     9959333/s        77%        37%        18%         --
+
+--- pathset shallow (constant path) ---
+               Rate  XS func   kw dyn kw const   Native
+XS func   9737640/s       --     -22%     -60%     -60%
+kw dyn   12520155/s      29%       --     -48%     -49%
+kw const 24242250/s     149%      94%       --      -1%
+Native   24524450/s     152%      96%       1%       --
+
+--- pathset deep create (constant vs dynamic) ---
+              Rate   kw dyn   Native  XS func kw const
+kw dyn   2554406/s       --      -1%      -4%      -4%
+Native   2569124/s       1%       --      -4%      -4%
+XS func  2664144/s       4%       4%       --      -0%
+kw const 2670590/s       5%       4%       0%       --
+
+--- pathexists deep (constant vs dynamic) ---
+                Rate dyn native     Native   kw const     kw dyn
+dyn native 5774942/s         --       -23%       -31%       -40%
+Native     7485461/s        30%         --       -11%       -22%
+kw const   8377205/s        45%        12%         --       -13%
+kw dyn     9619963/s        67%        29%        15%         --
+
+--- pathexists missing (dynamic only - const autovivifies) ---
+              Rate  Native XS func  kw dyn
+Native   3830578/s      --    -74%    -79%
+XS func 14698729/s    284%      --    -18%
+kw dyn  17850536/s    366%     21%      --
+
+--- pathdelete (constant vs dynamic) ---
+              Rate   kw dyn  XS func   Native kw const
+kw dyn   3612669/s       --      -6%     -13%     -13%
+XS func  3862769/s       7%       --      -7%      -7%
+Native   4151598/s      15%       7%       --      -1%
+kw const 4174987/s      16%       8%       1%       --
+

@@ -1,10 +1,56 @@
-
 # Changelog
 
 All notable changes to Affix.pm will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [v1.0.8] - 2026-03-02
+
+This release introduces a modernization of pointer handling, turning pins into first-class objects with native indexing support. In other words, you can now use `$ptr->[$n]` to access the nth element.
+
+Support for passing 128bit integers around is now complete. Additionally, functions expecting an enumeration now accept the string name of a constant; `state('PLASMA')` is the same as `state(PLASMA)` where `state` expects values defined like this: `typedef States => Enum['SOLID', 'LIQUID', 'GAS', 'PLASMA']`.
+
+### Added
+
+- Added support for native Perl array indexing on pointers and arrays. You can now use `$ptr->[$i]` to read or write memory at an offset without manual casting.
+- New `Affix::Pointer` objects for structs and unions now allow direct field access like `$ptr->{field}` without explicit casting to `LiveStruct`.
+- Recursive Liveness: Unified access and `LiveStruct` now work recursively. Accessing a nested struct member returns a live view or pointer tied to the original memory block.
+- All pointers returned by `malloc`, `calloc`, `cast`, etc., are now blessed into the `Affix::Pointer` class, which provides several new methods:
+    - `address()`: Returns the virtual memory address.
+    - `type()`: Returns the L<infix> signature of the pointer.
+    - `element_type()`: Returns the signature of the pointed-to elements.
+    - `count()`: Returns the element count for Arrays, or byte size for Void pointers.
+    - `size()`: Returns the total allocated size for managed pointers.
+    - `cast($type)`: Reinterprets the pointer.
+    - `attach_destructor($destructor, [$lib])`: Attaches a custom C cleanup routine to the pointer.
+- Added `attach_destructor( $pin, $destructor, [$lib] )` to allow attaching custom C cleanup routines to managed pointers.
+- Improved `VarArgs` support to automatically promote Perl strings to `char*`.
+- Experimental Zero-Copy 'Live' Aggregates:
+    - `LiveStruct`: A new helper to return zero-copy, live views of C structs. Modifications to the returned blessed hash reflect immediately in C memory.
+    - `LiveArray`: A new helper to return live `Affix::Pointer` objects instead of deeply copied array references.
+    - Implemented the `TIEHASH` interface for `Affix::Live` so perl can treat them as standard Perl hashes (`keys %$live`, `each %$live`, etc.).
+- Fully implemented marshalling for `Int128` and `UInt128` (sint128/uint128) primitive types.
+- Added `Affix::Wrap->generate( $lib, $pkg, $file )` for static binding generation. This emits standalone Perl modules that depend only on `Affix`, eliminating the need for `Clang` or header files at runtime.
+- Recursive macro resolution support in `Affix::Wrap` for bitwise OR expressions like `(FLAG_A | FLAG_B)`.
+- Support for passing string names of enum constants directly to functions.
+- Added `params()` method to `Affix::Type::Callback` to allow inspecting and modifying callback parameters.
+- Added string-to-integer conversion when passing Perl strings to C functions expecting enums.
+
+### Fixed
+
+- Optimized `Pointer` returns in the XSUB dispatcher for performance by inlining the marshalling path and caching the stash.
+- Fixed several issues in `CLONE` where metadata, managed memory, and enum registries were not correctly duplicated across perl's ithreads.
+- Improved `_get_pin_from_sv` and `is_pin` to safely handle both references to pins and direct magical scalars like those found in Unions.
+- Fixed potential double-frees and leaks in `Affix_Lib_DESTROY` and `Affix_free_pin` by improving reference counting and ownership tracking.
+- Symbols found via `find_symbol` now correctly track the parent `Affix::Lib` object to prevent the library from being unloaded while symbols are still in use.
+- Corrected a memory corruption bug in `Affix_malloc` and `Affix_strdup` caused by uninitialized internal `Affix_Pin` structures.
+- Fixed `dualvar` behavior for enums returned from C, ensuring they correctly function as both strings and integers in Perl.
+- Fixed the `clean` action in `Affix::Builder` which was failing due to an undefined `rmtree` call.
+- Fixed an issue where blessing a return value could prematurely trigger 'set' magic on the underlying SV.
+- Fixed `typedef` parsing: Named types now return proper `Affix::Type::Reference` objects instead of strings, ensuring they are correctly resolved when nested in other aggregates.
+- Fixed `cast` to correctly return blessed `Affix::Live` objects when the `+` hint is used for live struct views.
+- Hardened pointer indexing: Added strict type checks to `$ptr->[$i]` to ensure indexing is only performed on `Array` types or `Void*` (byte-indexed).
 
 ## [v1.0.7] - 2026-02-15
 
@@ -246,7 +292,8 @@ Based on infix v0.1.3
 
   - Affix.pm is born
 
-[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.0.7...HEAD
+[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.0.8...HEAD
+[v1.0.8]: https://github.com/sanko/Affix.pm/compare/v1.0.7...v1.0.8
 [v1.0.7]: https://github.com/sanko/Affix.pm/compare/v1.0.6...v1.0.7
 [v1.0.6]: https://github.com/sanko/Affix.pm/compare/v1.0.5...v1.0.6
 [v1.0.5]: https://github.com/sanko/Affix.pm/compare/v1.0.4...v1.0.5

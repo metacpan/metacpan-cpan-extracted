@@ -1,0 +1,9 @@
+Revision history for Alien-libpq
+
+0.02  2026-03-03
+    - Detect latest stable PostgreSQL version dynamically
+
+0.01  2026-03-02
+    - Initial release
+    - System detection via pkg-config
+    - Source build from PostgreSQL 18.3

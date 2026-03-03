@@ -4,65 +4,88 @@
 
 =head1 NAME
 
-Affix::Wrap - Frictionless C Header Introspection and FFI Wrapper Generation
+Affix::Wrap - Frictionless C/C++ Binding Generator for Affix
 
 =head1 SYNOPSIS
 
-    use v5.40;
-    use Affix;
     use Affix::Wrap;
 
-    # Parse headers and install symbols into the current package
-    Affix::Wrap->new(
-        project_files => [ 'include/mylib.h' ],
-        include_dirs  => [ '/usr/local/include' ],
+    my $wrapper = Affix::Wrap->new(
+        project_files => ['/usr/include/sqlite3.h'],
+        include_dirs  => ['/usr/include'],
         types         => {
-            'git_repository' => Pointer[Void], # Treat opaque struct as void pointer
-            'git_off_t'      => Int64,         # Force specific integer width
+            'sqlite3' => 'Pointer[Void]' # Custom override
         }
-    )->wrap( load_library('demo') );
+    );
 
-    # Use the C functions immediately
-    my $val = mylib_function(10);
+    # Option 1: Instantly wrap and inject into the current namespace
+    # You may call functions exported by the lib immediately
+    $wrapper->wrap('libsqlite3.so', __PACKAGE__);
+
+    # Option 2: Generate a standalone Perl module file to disk
+    # This should get you started on a library wrapper you'll eventually put on CPAN
+    $wrapper->generate('libsqlite3.so', 'My::SQLite', 'lib/My/SQLite.pm');
 
 =head1 DESCRIPTION
 
-C<Affix::Wrap> acts as a bridge between C/C++ header files and L<Affix>. It parses C header files to produce a
-structured object model (AST) representing functions, structs, enums, typedefs, macros, and variables.
+C<Affix::Wrap> is a frictionless binding generator that bridges C/C++ header files and L<Affix>. It parses headers to
+extract functions, structs, enums, typedefs, macros, and global variables, automatically converting this information
+into L<Affix> definitions.
 
-This module is designed to facilitate two primary workflows:
+It is designed to facilitate two primary developer workflows:
 
 =over
 
-=item 1. B<Runtime Wrapping>
+=item 1. B<Rapid Prototyping (Runtime Wrapping)>
 
-Parsing headers on the fly to wrap libraries dynamically via C<wrap()>. This is ideal for rapid prototyping, private
-tooling, or when you don't want to maintain a separate XS/FFI module file.
+Parse headers on the fly and inject bindings directly into your running Perl environment via C<wrap()>. This is perfect
+for private tooling, experimental scripts, or whenever you want to avoid the boilerplate of a dedicated FFI module.
 
-=item 2. B<Static Generation>
+=item 2. B<Distribution (Static Generation)>
 
-Creating F<.pm> files to be distributed on CPAN via C<parse()>. This provides the fastest load times for end users, as
-the parsing happens only once during development.
+Generate standalone F<.pm> files for CPAN via C<generate()>. This produces a pure-Perl module that depends only on
+L<Affix>, ensuring fast load times and zero development dependencies (like C<Clang> or C<Affix::Wrap> itself) for your
+end users.
 
 =back
 
-Please be aware that this is experimental software!
+=head2 Parsing Drivers
 
-=head2 Drivers
-
-Affix::Wrap utilizes a dual-driver approach to parsing:
+C<Affix::Wrap> employs a dual-driver strategy:
 
 =over
 
-=item * B<Clang driver>
+=item * B<Clang Driver (Recommended)>
 
-The preferred driver. It uses the system's C<clang> executable to dump the AST in JSON format. It is extremely
-accurate, handles C preprocessor logic (macros, includes), and resolves complex typedef chains correctly.
+The primary driver. It leverages C<clang -Xclang -ast-dump=json> to perform compiler-grade analysis of your headers. It
+is highly accurate and handles complex C++ templates, macros, and deep inclusion chains with ease.
 
-=item * B<Regex driver>
+=item * B<Regex Driver (Fallback)>
 
-A fallback driver implemented in pure Perl. It scans headers using regular expressions. While zero-dependency, it may
-struggle with heavily macro-laden code or complex C++ templates.
+A pure-Perl heuristic parser. While less capable than the Clang driver (it may struggle with complex macros or nested
+C++ constructs), it requires no external dependencies and is sufficient for many straightforward C headers.
+
+=back
+
+=head1 Supported Features
+
+C<Affix::Wrap> extracts and bridges:
+
+=over
+
+=item * Function signatures (including pointer-to-function arguments)
+
+=item * Nested Structs and Unions
+
+=item * Enums (maps them to Affix Dualvar Enums)
+
+=item * Macros (numeric and string constants)
+
+=item * Typedefs (follows deep typedef chains)
+
+=item * Extern Global Variables (binds them via C<Affix::pin>)
+
+=item * Doxygen/Markdown Comments (extracts to POD when generating modules)
 
 =back
 
@@ -93,22 +116,8 @@ C<project_files> is automatically added to this list.
 
 =item C<types>
 
-Optional. A hash reference mapping type names to L<Affix> type objects or definition strings.
-
-These are registered via C<typedef> before parsing begins. This is useful for:
-
-=over
-
-=item * Defining opaque types (e.g. mapping a complex C struct to C<Pointer[Void]>).
-
-=item * Fixing integer widths (e.g. forcing C<off_t> to C<Int64> across platforms).
-
-=item * Overriding definitions that the parser might misinterpret.
-
-=back
-
-If the parser encounters a struct, enum, or typedef in the C header with the same name as an entry in this hash, the C
-definition is B<skipped> to prevent redefinition warnings and ensure your override takes precedence.
+Optional. A hash reference for manually mapping type names to L<Affix> type objects or definition strings. Very useful
+for masking complex internal library structures behind Pointer[Void] handles.
 
 =item C<driver>
 
@@ -119,7 +128,7 @@ to find the C<clang> executable and falls back to Regex if unavailable.
 
 =head1 METHODS
 
-=head2 wrap( $lib, [$target] )
+=head2 wrap( $lib, [$target_package] )
 
     $binder->wrap( $lib );
     $binder->wrap( $lib, 'My::Package' );
@@ -131,13 +140,20 @@ target package.
 
 =item C<$lib>
 
-An instance of an L<Affix> library object (created via C<load_library>).
+The shared library to link the functions against.
 
-=item C<$target>
+=item C<$target_package>
 
-Optional. The package name to install symbols into. Defaults to the B<calling package>.
+Optional. The namespace to inject symbols and types into. Defaults to the caller package.
 
 =back
+
+=head2 generate( $lib, $pkg, $output_file )
+
+    $binder->generate( 'mylib', 'My::Lib', 'lib/My/Lib.pm' );
+
+Parses the headers and writes a fully functioning, standalone Perl .pm module to disk. This is highly recommended for
+production modules to avoid the overhead of parsing headers at runtime.
 
 =head2 parse( [$entry_point] )
 
@@ -319,54 +335,18 @@ calling C<wrap>:
 
 =head2 Generating Affix Modules for CPAN
 
-To create a distributable module (e.g., C<My::Lib.pm>), use the C<affix_type> method. This returns Perl source code
-strings.
+To create a distributable module (e.g., C<My::Lib.pm>) without requiring your users to have C<Clang> or C<Affix::Wrap>
+installed at runtime, use the C<generate> method:
 
     use Affix::Wrap;
-    use Path::Tiny;
 
     my $binder = Affix::Wrap->new( project_files => ['mylib.h'] );
-    my @ast    = $binder->parse;
 
-    my $code = <<~'PERL';
-        package My::Lib;
-        use v5.40;
-        use Affix;
+    # Creates 'lib/My/Lib.pm' which depends only on 'Affix'
+    $binder->generate( 'mylib', 'My::Lib', 'lib/My/Lib.pm' );
 
-        # Load the library (user must ensure this exists)
-        my $lib = load_library('mylib');
-
-        PERL
-
-    for my $node (@ast) {
-        # Add POD documentation derived from C comments
-        if ( defined $node->doc ) {
-            $code .= "\n=head2 " . $node->name . "\n\n";
-            $code .= $node->doc . "\n\n=cut\n";
-        }
-
-        # Generate Perl code
-        if ( $node isa Affix::Wrap::Function ) {
-            # e.g. "affix $lib, 'my_func', [Int], Void;"
-            $code .= $node->affix_type . "\n";
-        }
-        elsif ( $node isa Affix::Wrap::Typedef ) {
-            # e.g. "typedef MyStruct => Struct[ ... ];"
-            $code .= $node->affix_type . ";\n";
-        }
-        elsif ( $node isa Affix::Wrap::Macro ) {
-            # e.g. "use constant MAX_VAL => 100;"
-            $code .= $node->affix_type . ";\n";
-        }
-        elsif ( $node isa Affix::Wrap::Variable ) {
-            # e.g. "pin my $var, $lib, ..."
-            $code .= $node->affix_type . ";\n";
-        }
-    }
-
-    $code .= "\n1;\n";
-
-    path('lib/My/Lib.pm')->spew_utf8($code);
+If you need custom behaviors (like filtering functions or adding custom POD), you can iterate over the AST manually as
+described in L<parse()>.
 
 =head1 AUTHOR
 

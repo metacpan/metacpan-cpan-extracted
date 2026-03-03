@@ -91,14 +91,25 @@ class    #
         make_path( catdir(qw[blib arch]), { chmod => 0777, verbose => $verbose } );
         0;
     }
-    method step_clean() { rmtree( $_, $verbose ) for qw[blib temp]; 0 }
+    method step_clean() { remove_tree( $_, { verbose => $verbose } ) for qw[blib temp]; 0 }
 
     method step_install() {
         $self->step_build() unless -d 'blib';
-        install( $install_paths->install_map, $verbose, $dry_run, $uninst );
+        my %res;
+        install(
+            [   from_to     => $install_paths->install_map,
+                verbose     => $verbose,
+                always_copy => 1,
+                dry_run     => $dry_run,
+                uninst      => $uninst,
+                result      => \%res
+            ]
+        );
+
+        # In the future, I might check the values of %res according to https://metacpan.org/pod/ExtUtils::Install#install
         0;
     }
-    method step_realclean () { rmtree( $_, $verbose ) for qw[blib temp Build _build_params MYMETA.yml MYMETA.json]; 0 }
+    method step_realclean () { remove_tree( $_, { verbose => $verbose } ) for qw[blib temp Build _build_params MYMETA.yml MYMETA.json]; 0 }
 
     method step_test() {
         $self->step_build() unless -d 'blib';
@@ -192,7 +203,7 @@ use %s;
         $build_lib->mkpath unless -d $build_lib;
         my @include_dirs = ( $infix_dir->child('include'), $infix_dir->child('src') );
 
-        # 1. Detect Compiler settings using Perl's Config as base
+        # Detect Compiler settings using Perl's Config as base
         my $cc_cmd  = $Config{cc} || 'cc';
         my $cc_type = 'gcc';                 # Default flavor
         if    ( $cc_cmd =~ /cl(\.exe)?$/i ) { $cc_type = 'msvc'; }
@@ -200,7 +211,7 @@ use %s;
         elsif ( $cc_cmd =~ /gcc/i )         { $cc_type = 'gcc'; }
         elsif ( $cc_cmd =~ /egcc/i )        { $cc_type = 'gcc'; }
 
-        # 2. Setup Flags
+        # Setup Flags
         my ( $ar_cmd, @cflags, @arflags, $out_flag_cc, $out_flag_ar );
         my @includes = map { ( $cc_type eq 'msvc' ? '/I' : '-I' ) . $_ } @include_dirs;
         if ( $cc_type eq 'msvc' ) {
@@ -224,7 +235,7 @@ use %s;
             push @cflags, '-pthread' unless $^O eq 'MSWin32';
         }
 
-        # 3. Compile infix.c -> infix.o
+        # Compile infix.c -> infix.o
         my $obj_ext  = $cc_type eq 'msvc' ? '.obj' : '.o';
         my $obj_file = $build_lib->child( 'infix' . $obj_ext );
         my @compile_cmd;
@@ -239,7 +250,7 @@ use %s;
             die "Failed to compile infix.c";
         }
 
-        # 4. Archive infix.o -> libinfix.a
+        # Archive infix.o -> libinfix.a
         my @archive_cmd;
         if ( $cc_type eq 'msvc' ) {
             @archive_cmd = ( $ar_cmd, @arflags, $out_flag_ar . $lib_file, $obj_file );
@@ -304,21 +315,31 @@ END_C
         my @dirs;
         push @dirs, '../';
         my $has_cxx = !1;
+        my @sources = $cwd->child('lib/Affix.c');
 
-        for my $source ( $cwd->child('lib/Affix.c') ) {
+        #~ warn "Sources to process: @sources\n";
+        for my $source (@sources) {
+
+            #~ warn "Processing source: $source\n";
             my $cxx       = $source =~ /cx+$/;
             my $file_base = $source->basename(qr[.c$]);
             my $tempdir   = path('lib');
             $tempdir->mkdir( { verbose => $verbose, mode => oct '755' } );
             my $version = $meta->version;
             my $obj     = $builder->object_file($source);
+
+            #~ warn "Checking obj: $obj\n";
+            my $should_compile
+                = ( $force ||
+                    ( !-f $obj ) ||
+                    ( $source->stat->mtime >= path($obj)->stat->mtime ) ||
+                    ( path(__FILE__)->stat->mtime > path($obj)->stat->mtime ) );
+
+            #~ warn "Should compile: $should_compile\n";
             push @dirs, $source->dirname();
             $has_cxx = 1 if $cxx;
             push @objs,
-                ( $force ||
-                    ( !-f $obj ) ||
-                    ( $source->stat->mtime >= path($obj)->stat->mtime ) ||
-                    ( path(__FILE__)->stat->mtime > path($obj)->stat->mtime ) ) ?
+                $should_compile ?
                 $builder->compile(
                 quiet        => 0,
                 'C++'        => $cxx,

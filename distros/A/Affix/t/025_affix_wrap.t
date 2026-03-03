@@ -1,10 +1,9 @@
 use v5.40;
-use blib;
 use Affix::Wrap;
 use Test2::Tools::Affix qw[:all];
 use Path::Tiny;
+use Capture::Tiny qw[capture];
 
-#~ use Capture::Tiny qw[capture];
 # Determine if Clang is available
 my $CLANG_AVAIL = do {
     my ( undef, undef, $exit ) = capture { system 'clang', '--version' };
@@ -27,6 +26,9 @@ sub run_tests_for_driver ( $driver_class, $label ) {
 #define BUF_SIZE 1024
 #define API_NAME "MyLib"
 #define CALC_VAL (10 + 20)
+#define FLAG_A 1
+#define FLAG_B 2
+#define FLAGS_AB (FLAG_A | FLAG_B)
 EOF
                 'main.c' => '#include "defs.h"'
             );
@@ -41,6 +43,13 @@ EOF
 
             # affix_type should quote expressions: '(10 + 20)' -> "'(10 + 20)'" or similar
             like( $calc->affix_type, qr/'?\(10 \+ 20\)'?/, 'Expression quoted in affix_type' );
+
+            # Test bitwise OR resolution in wrap()
+            my $wrap   = Affix::Wrap->new( driver => $parser );
+            my $target = "Test::Macro::" . $label;
+            $target =~ s/\W+/_/g;
+            $wrap->wrap( undef, $target );
+            is( $target->can('FLAGS_AB')->(), 3, 'FLAGS_AB resolved to 3' );
         };
         subtest 'Records (Structs & Unions)' => sub {
             my $dir = Path::Tiny->tempdir;
@@ -130,6 +139,7 @@ EOF
                 $dir,
                 'funcs.h' => <<'EOF',
 int calc(int a);
+int ptr_calc(int *p);
 extern double global_val;
 void cb_test(void (*callback)(int));
 EOF
@@ -143,6 +153,9 @@ EOF
             ok( $f1, 'Found function calc' );
             is( $f1->ret->affix_type, 'Int', 'Ret Int' );
             is( $f1->args->[0]->name, 'a',   'Arg name a' );
+            my ($f2) = grep { $_->name eq 'ptr_calc' } @objs;
+            ok( $f2, 'Found function ptr_calc' );
+            is( $f2->args->[0]->type->affix_type, 'Pointer[Int]', 'Arg 0 is Pointer[Int]' );
 
             # Variable
             my ($var) = grep { $_->name eq 'global_val' } @objs;
@@ -171,6 +184,8 @@ typedef struct {
     char* name;
     float matrix[4][4];
 } Buffer;
+typedef const char * const * double_ptr;
+typedef int *array_of_pointers[5];
 EOF
                 'main.c' => '#include "edge.h"'
             );
@@ -191,6 +206,12 @@ EOF
                 isa_ok( $m2->type, ['Affix::Wrap::Type::Array'], 'Member 2 is Array' );
                 is( $m2->type->affix_type, 'Array[Array[Float, 4], 4]', '2D Array Affix Sig' );
             }
+            my ($dp) = grep { $_->name eq 'double_ptr' } @objs;
+            ok( $dp, 'Found double_ptr' );
+            is( $dp->underlying->affix_type, 'Pointer[Pointer[Char]]', 'double_ptr affix_type' );
+            my ($ap) = grep { $_->name eq 'array_of_pointers' } @objs;
+            ok( $ap, 'Found array_of_pointers' );
+            is( $ap->underlying->affix_type, 'Array[Pointer[Int], 5]', 'array_of_pointers affix_type' );
         };
         subtest 'Compile -> Bind -> Affix' => sub {
             use v5.40;
@@ -214,6 +235,32 @@ EOF
             $binder->wrap( $lib, $pkg );
             #
             is $pkg->can('return_six')->(), 6, 'returned 6';
+        };
+        subtest 'Static Generation' => sub {
+            my $dir = Path::Tiny->tempdir;
+            spew_files(
+                $dir,
+                'static.h' => <<'EOF',
+#define STATIC_VAL 42
+typedef struct { int x; } StaticStruct;
+int static_func(int i);
+EOF
+                'main.c' => '#include "static.h"'
+            );
+            my $parser  = $driver_class->new( project_files => [ $dir->child('static.h')->stringify ] );
+            my $binder  = Affix::Wrap->new( driver => $parser );
+            my $pm_file = $dir->child('StaticLib.pm');
+            $binder->generate( 'dummy_lib', 'StaticLib', $pm_file->stringify );
+            ok -e $pm_file, 'Generated .pm file';
+            my $content = $pm_file->slurp_utf8;
+            like $content, qr/package\s+StaticLib\s*{/,                                                         'Package decl';
+            like $content, qr/use constant STATIC_VAL => 42;/,                                                  'Constant generated';
+            like $content, qr/typedef 'StaticStruct' => Struct\[ x => Int \];/,                                 'Struct typedef generated';
+            like $content, qr/affix \$lib, ('static_func'|\[_static_func => 'static_func'\]) => \[Int\], Int;/, 'Function affix generated';
+
+            # Syntax check
+            my ( undef, undef, $exit ) = capture { system $^X, '-Ilib', '-c', $pm_file->stringify };
+            is $exit >> 8, 0, 'Generated code syntax check OK';
         };
     };
 }

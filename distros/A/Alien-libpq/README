@@ -1,0 +1,31 @@
+NAME
+    Alien::libpq - Find or build libpq PostgreSQL client library
+
+SYNOPSIS
+        use Alien::libpq;
+        use ExtUtils::MakeMaker;
+
+        WriteMakefile(
+            ...
+            CONFIGURE_REQUIRES => {
+                'Alien::libpq' => 0,
+            },
+            CCFLAGS => Alien::libpq->cflags,
+            LIBS    => Alien::libpq->libs,
+        );
+
+DESCRIPTION
+    This module provides the libpq C library (PostgreSQL client library). It
+    will use the system library if available, or download and build from
+    source if necessary.
+
+METHODS
+    All methods are inherited from Alien::Base.
+
+SEE ALSO
+    Alien::Base, <https://www.postgresql.org/docs/current/libpq.html>
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

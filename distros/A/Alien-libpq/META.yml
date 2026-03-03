@@ -1,0 +1,42 @@
+---
+abstract: 'Find or build libpq PostgreSQL client library'
+author:
+  - vividsnow
+build_requires:
+  Alien::Build::MM: '0.25'
+  Test::Alien: '0'
+  Test::More: '0'
+configure_requires:
+  Alien::Build::MM: '0.25'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-libpq
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Alien::libpq:
+    file: lib/Alien/libpq.pm
+    version: '0.02'
+requires:
+  Alien::Base: '0'
+  Alien::Build: '0.25'
+  perl: '5.010'
+resources:
+  repository: https://github.com/vividsnow/perl5-alien-libpq.git
+version: '0.02'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.84'
+  requires:
+    share:
+      Archive::Tar: '0'
+      Config: '0'
+      IO::Compress::Bzip2: '0'
+      IO::Uncompress::Bunzip2: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

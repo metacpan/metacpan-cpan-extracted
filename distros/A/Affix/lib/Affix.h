@@ -37,6 +37,7 @@ typedef struct {
     HV * enum_registry;
     // Cache for coercion strings to avoid re-fetching from SV objects
     HV * coercion_cache;
+    HV * stash_pointer;  // Cache for Affix::Pointer stash
 } my_cxt_t;
 START_MY_CXT;
 // Helper macro to fetch a value from a hash if it exists, otherwise return a default.
@@ -174,17 +175,20 @@ struct Affix {
     OutParamInfo * out_param_info;
     size_t num_out_params;
     const infix_type * ret_type;
-    Affix_Pull ret_pull_handler;  ///< Cached handler for marshalling the return value.
-    Affix_Opcode ret_opcode;      ///< Optimized return opcode.
+    const infix_type * unwrapped_ret_type;  // Pre-unwrapped for OP_RET_PTR
+    Affix_Pull ret_pull_handler;            ///< Cached handler for marshalling the return value.
+    Affix_Opcode ret_opcode;                ///< Optimized return opcode.
     void ** c_args;
 
     // Reconstruction info for threading/cloning
     char * sig_str;
     char * sym_name;
     void * target_addr;
+    char * lib_path;
+    dTHXfield(owner_perl)
 
-    // Variadic demo
-    HV * variadic_cache;
+        // Variadic demo
+        HV * variadic_cache;
     size_t num_fixed_args;
 };
 /// Represents an Affix::Pin object, a blessed Perl scalar that wraps a raw C pointer.
@@ -195,6 +199,9 @@ typedef struct {
     bool managed;                ///< If true, Perl owns the 'pointer' and will safefree() it on DESTROY.
     UV ref_count;                ///< Refcount to prevent premature freeing when SVs are copied.
     size_t size;                 ///< Size of malloc'd void pointers.
+    void (*destructor)(void *);  ///< Custom destructor function (e.g. SDL_DestroyWindow).
+    SV * destructor_lib_sv;      ///< Perl object (Affix::Lib) to keep alive for the destructor.
+    SV * owner_sv;               ///< Perl object that owns the memory, kept alive by this pin.
 } Affix_Pin;
 /// Holds the necessary data for a callback, specifically the Perl subroutine to call.
 typedef struct {
@@ -222,6 +229,12 @@ struct Affix_Backend {
     Affix_Pull pull_handler;       ///< Pre-resolved handler for marshalling the return value.
     Affix_Opcode ret_opcode;       ///< Optimized return opcode.
     size_t num_args;               ///< Cached number of arguments.
+
+    char * sig_str;
+    char * sym_name;
+    void * target_addr;
+    char * lib_path;
+    dTHXfield(owner_perl)
 };
 
 // Trigger function for the experimental backend (shh!)
@@ -240,7 +253,8 @@ void push_reverse_trampoline(pTHX_ Affix * affix, const infix_type * type, SV * 
 
 // Marshalling (Perl <- C)
 void ptr2sv(pTHX_ Affix * affix, void * c_ptr, SV * perl_sv, const infix_type * type);
-void _populate_hv_from_c_struct(pTHX_ Affix * affix, HV * hv, const infix_type * type, void * p);
+void _populate_hv_from_c_struct(
+    pTHX_ Affix * affix, HV * hv, const infix_type * type, void * p, bool live, SV * owner_sv);
 
 // Handler resolution
 Affix_Step_Executor get_plan_step_executor(const infix_type * type);
@@ -248,9 +262,10 @@ Affix_Pull get_pull_handler(pTHX_ const infix_type * type);
 Affix_Out_Param_Writer get_out_param_writer(const infix_type * type);
 
 // Pin management
-void _pin_sv(pTHX_ SV * sv, const infix_type * type, void * pointer, bool managed);
+void _pin_sv(pTHX_ SV * sv, const infix_type * type, void * pointer, bool managed, SV * owner_sv);
 bool is_pin(pTHX_ SV * sv);
 Affix_Pin * _get_pin_from_sv(pTHX_ SV * sv);
+SV * _new_pointer_obj(pTHX_ Affix_Pin * pin);
 
 // Reverse trampolines
 void _affix_callback_handler_entry(infix_context_t *, void *, void **);

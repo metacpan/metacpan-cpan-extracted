@@ -1,23 +1,22 @@
-package Affix v1.0.7 {    # 'FFI' is my middle name!
+package Affix v1.0.8 {    # 'FFI' is my middle name!
 
     #~ |-----------------------------------|-----------------------------------||
     #~ |--------------------------4---5~---|--4--------------------------------||
     #~ |--7~\-----4---44-/777--------------|------7/4~-------------------------||
     #~ |-----------------------------------|-----------------------------------||
     use v5.40;
+    use Exporter           qw[import];
     use vars               qw[@EXPORT_OK @EXPORT %EXPORT_TAGS];
     use warnings::register qw[Type];
-    use feature            qw[class];
-    no warnings qw[experimental::class experimental::try];
+    no warnings qw[experimental::try];
     use Carp                  qw[];
     use Config                qw[%Config];
     use File::Spec::Functions qw[rel2abs canonpath curdir path catdir];
     use File::Basename        qw[basename dirname];
     use File::Find            qw[find];
     use File::Temp            qw[tempdir];
-    #
     my $okay = 0;
-    #
+
     BEGIN {
         use XSLoader;
         $DynaLoad::dl_debug = $DynaLoad::dl_debug = 1;
@@ -35,17 +34,6 @@ package Affix v1.0.7 {    # 'FFI' is my middle name!
         $@ && die $@;
         our @ISA = ($platform);
     }
-
-    #~ $EXPORT_TAGS{pin}    = [qw[pin unpin]];
-    #~ $EXPORT_TAGS{memory} = [
-    #~ qw[ affix wrap pin unpin
-    #~ cast
-    #~ errno getwinerror
-    #~ malloc calloc realloc free
-    #~ memchr memcmp memset memcpy memmove
-    #~ sizeof offsetof alignof
-    #~ raw hexdump],
-    #~ ];
     push @{ $EXPORT_TAGS{lib} }, qw[libm libc];
     $EXPORT_TAGS{types} = [
         qw[ typedef
@@ -60,7 +48,8 @@ package Affix v1.0.7 {    # 'FFI' is my middle name!
             Float32 Float64
             Size_t SSize_t
             String WString
-            Pointer Array Struct Union Enum Callback CodeRef Complex Vector
+            Pointer Array LiveArray Struct LiveStruct Union Enum Callback CodeRef Complex Vector
+            ThisCall attach_destructor
             Packed VarArgs
             SV
             File PerlIO
@@ -83,6 +72,10 @@ package Affix v1.0.7 {    # 'FFI' is my middle name!
     #
     sub libm() { CORE::state $m //= find_library('m'); $m }
     sub libc() { CORE::state $c //= find_library('c'); $c }
+
+    sub attach_destructor ( $pin, $destructor, $lib //= () ) {
+        Affix::_attach_destructor( $pin, $destructor, $lib );
+    }
     #
     our $OS = $^O;
     my $is_win = $OS eq 'MSWin32';
@@ -113,8 +106,7 @@ package Affix v1.0.7 {    # 'FFI' is my middle name!
             else {
                 $libdirs = [
                     ( split ' ', $Config{libsdirs} ),
-                    map { warn $ENV{$_}; split /[:;]/, ( $ENV{$_} ) }
-                        grep { $ENV{$_} } qw[LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH]
+                    map { split /[:;]/, ( $ENV{$_} ) } grep { $ENV{$_} } qw[LD_LIBRARY_PATH DYLD_LIBRARY_PATH DYLD_FALLBACK_LIBRARY_PATH]
                 ];
             }
             no warnings qw[once];
@@ -128,50 +120,26 @@ package Affix v1.0.7 {    # 'FFI' is my middle name!
         if ( !defined $regex ) {
             $regex = $is_win ?
                 qr/^
-        (?:lib)?(?<name>\w+)
-        (?:[_-](?<version>[0-9\-\._]+))?_*
-        \.$Config{so}
-        $/ix :
+    (?:lib)?(?<name>\w+)
+    (?:[_-](?<version>[0-9\-\._]+))?_*
+    \.$Config{so}
+    $/ix :
                 $is_mac ?
                 qr/^
-        (?:lib)?(?<name>\w+)
-        (?:\.(?<version>[0-9]+(?:\.[0-9]+)*))?
-        \.(?:so|dylib|bundle)
-        $/x :    # assume *BSD or linux
+    (?:lib)?(?<name>\w+)
+    (?:\.(?<version>[0-9]+(?:\.[0-9]+)*))?
+    \.(?:so|dylib|bundle)
+    $/x :
                 qr/^
-        (?:lib)?(?<name>\w+)
-        \.$Config{so}
-        (?:\.(?<version>[0-9]+(?:\.[0-9]+)*))?
-        $/x;
+    (?:lib)?(?<name>\w+)
+    \.$Config{so}
+    (?:\.(?<version>[0-9]+(?:\.[0-9]+)*))?
+    $/x;
         }
         my %store;
-
-        #~ warn join ', ', @$libdirs;
-        my %_seen;
         find(
-            0 ?
-                sub {    # This is rather slow...
-                warn $File::Find::name;
-                return if $store{ basename $File::Find::name };
-
-                #~ return if $_seen{basename $File::Find::name}++;
-                return if !-e $File::Find::name;
-                warn basename $File::Find::name;
-                warn;
+            sub {
                 $File::Find::prune = 1 if !grep { canonpath $_ eq canonpath $File::Find::name } @$libdirs;
-                /$regex/ or return;
-                warn;
-                $+{name} eq $lib or return;
-                warn;
-                my $lib_ver;
-                $lib_ver = version->parse( $+{version} ) if defined $+{version};
-                $store{ canonpath $File::Find::name } = { %+, path => $File::Find::name, ( defined $lib_ver ? ( version => $lib_ver ) : () ) }
-                    if ( defined($ver) && defined($lib_ver) ? $lib_ver == $ver : 1 );
-                } :
-                sub {
-                $File::Find::prune = 1 if !grep { canonpath $_ eq canonpath $File::Find::name } @$libdirs;
-
-                #~ return                 if -d $_;
                 return unless $_ =~ $regex;
                 return unless defined $+{name};
                 return unless $+{name} eq $lib;
@@ -179,12 +147,8 @@ package Affix v1.0.7 {    # 'FFI' is my middle name!
                 my $lib_ver;
                 $lib_ver = version->parse( $+{version} ) if defined $+{version};
                 return unless ( defined $lib_ver && defined($ver) ? $ver == $lib_ver : 1 );
-
-                #~ use Data::Dump;
-                #~ warn $File::Find::name;
-                #~ ddx %+;
                 $store{ canonpath $File::Find::name } //= { %+, path => $File::Find::name, ( defined $lib_ver ? ( version => $lib_ver ) : () ) };
-                },
+            },
             @$libdirs
         );
         values %store;
@@ -216,27 +180,19 @@ package Affix v1.0.7 {    # 'FFI' is my middle name!
         ();
     }
 
-    # Regex to heuristically identify if a string is a valid infix type signature.
-    # Matches primitives, pointers (*), arrays ([), structs ({), unions (<), named types (@), etc.
-    my $IS_TYPE = qr{^
-        (?:
-            (?:
-                void|bool|
-                [usw]?char|
-                u?short|
-                u?int|
-                u?long(?:long)?|
-                float|double|longdouble|
-                s?size_t|
-                s?int\d+|uint\d+|
-                float\d+|
-                m\d+[a-z]*
-            )\b
-            |
-            e:|c\[|v\[|
-            \*|\[|\{|\!|<|\(|@
-        )
-    }x;
+    sub _is_type ($thing) {
+        return 1 if builtin::blessed($thing) && $thing->isa('Affix::Type');
+        return 0 if !defined $thing || ref $thing;
+
+        # Strictly check for signature characters
+        return 1 if $thing =~ /^[\*\[\{\!<@]/;
+
+        # Primitive types must match exactly or be followed by a delimiter
+        return 1
+            if $thing
+            =~ /^(?:void|bool|[usw]?char|u?short|u?int|u?long(?:long)?|float|double|longdouble|s?size_t|s?int\d+|uint\d+|float\d+|m\d+[a-z]*)$/;
+        return 0;
+    }
 
     # Abstract
     sub Void ()       { Affix::Type::Primitive->new( name => 'void' ) }
@@ -294,16 +250,27 @@ package Affix v1.0.7 {    # 'FFI' is my middle name!
         my $t = ref( $_[0] ) ? $_[0]->[0] : $_[0];
         Affix::Type::Pointer->new( subtype => $t );
     }
-
-    # Struct[ id => Int, score => Double ] -> {id:int,score:double}
     sub Struct : prototype($) { Affix::Type::Struct->new( members => $_[0] ) }
+
+    sub LiveStruct : prototype($) {
+        my $s = $_[0];
+        $s = $s->()     if ref($s) eq 'CODE';
+        $s = Struct($s) if ref($s) eq 'ARRAY';
+        $s = "$s"       if builtin::blessed($s) && $s->isa('Affix::Type');
+        return '+' . $s;
+    }
 
     # Union[ i => Int, f => Float ] -> <i:int,f:float>
     sub Union : prototype($) { Affix::Type::Union->new( members => $_[0] ) }
 
     sub Array : prototype($) {
         my ( $type, $size ) = @{ $_[0] };
-        Affix::Type::Array->new( type => $type, count => $size );
+        return Affix::Type::Array->new( type => $type, count => $size );
+    }
+
+    sub LiveArray : prototype($) {
+        my ( $type, $size ) = @{ $_[0] };
+        return Pointer [ Array [ $type, $size ] ];
     }
 
     # Callback[ [Int, Int] => Void ] -> (int,int)->void
@@ -323,6 +290,22 @@ package Affix v1.0.7 {    # 'FFI' is my middle name!
     sub Vector : prototype($) {
         my ( $size, $type ) = @{ $_[0] };
         return "v[$size:$type]";
+    }
+
+    sub ThisCall : prototype($) {
+        my $cb = $_[0];
+        if ( builtin::blessed($cb) && $cb->isa('Affix::Type::Callback') ) {
+
+            # Prepend 'this' pointer
+            unshift @{ $cb->params }, Pointer [Void];
+            return $cb;
+        }
+        elsif ( !ref $cb && $cb =~ /^\*\(\((.*)\)->(.*)\)$/ ) {
+            my ( $args, $ret ) = ( $1, $2 );
+            $args = $args ? "*void,$args" : "*void";
+            return "*(($args)->$ret)";
+        }
+        return $cb;
     }
 
     # Enum[ Int ] -> e:int
@@ -380,427 +363,352 @@ package Affix v1.0.7 {    # 'FFI' is my middle name!
         for ( my $i = 0; $i < @$args; $i++ ) {
             my $curr = $args->[$i];
             my $next = $args->[ $i + 1 ];
-
-            # Heuristic: If current is NOT a type, and next IS a type, treat as Key => Value
-            if ( defined $next && $curr !~ $IS_TYPE && $next =~ $IS_TYPE ) {
+            if ( defined $next &&
+                ( !ref($curr) || !builtin::blessed($curr) || !$curr->isa('Affix::Type') ) &&
+                builtin::blessed($next) &&
+                $next->isa('Affix::Type') ) {
                 push @parts, "$curr:$next";
-                $i++;    # Skip the type
+                $i++;
             }
             else {
-                # Anonymous member
-                push @parts, $curr;
+                push @parts, "$curr";
             }
         }
         my $content = join( ',', @parts );
         return sprintf( $wrapper, $content );
     }
-    {
 
-        sub typedef ( $name, $type //= () ) {
-            ( my $clean_name = $name ) =~ s/^@//;
-
-            # Handle Forward Declarations: typedef 'Node';
-            if ( !defined $type ) {    # Register forward decl with XS
-                Affix::_typedef($clean_name);
-            }
-            else {
-                # Handle Enum Constants (Pure Perl Logic)
-                if ( builtin::blessed($type) && $type->isa('Affix::Type::Enum') ) {
-                    my ( $const_map, $val_map ) = $type->resolve();
-                    my $pkg = caller;
-                    no strict 'refs';
-                    while ( my ( $const_name, $val ) = each %$const_map ) {
-
-                        # TODO: builtin::export_lexically
-                        # Install enum values as constants: STATE_IDLE() -> 0
-                        *{"${pkg}::${const_name}"} = sub () {$val};
-                    }
-
-                    # Register values map for Dualvar support in XS
-                    Affix::_register_enum_values( $clean_name, $val_map );
+    sub typedef ( $name, $type //= () ) {
+        ( my $clean_name = $name ) =~ s/^@//;
+        if ( !defined $type ) {
+            Affix::_typedef($clean_name);
+        }
+        else {
+            if ( builtin::blessed($type) && $type->isa('Affix::Type::Enum') ) {
+                my ( $const_map, $val_map ) = $type->resolve();
+                my $pkg = caller;
+                no strict 'refs';
+                while ( my ( $const_name, $val ) = each %$const_map ) {
+                    *{"${pkg}::${const_name}"} = sub () {$val};
                 }
-
-                # Register Definition with XS
-                # The object stringifies to its signature (e.g. "e:int" or "{...}")
+                &Affix::_register_enum_values( $clean_name, $val_map, $const_map );
+            }
+            if ( builtin::blessed($type) && $type->isa('Affix::Type') ) {
                 Affix::_typedef("$clean_name = $type");
             }
-
-            # Install Type Constructor: MachineState() -> Ref object
-            my $pkg = caller;
-            {
-                no strict 'refs';
-
-                # Avoid redefining if it exists (though arguably typedef SHOULD redefine)
-                if ( !defined &{"${pkg}::${name}"} ) {
-                    *{"${pkg}::${name}"} = sub {
-                        return '@' . $clean_name;
-                    };
+            else {
+                if ( $type =~ /^@/ ) {
+                    Affix::_typedef($type);
+                }
+                else {
+                    Affix::_typedef("$clean_name = $type");
                 }
             }
-            return 1;
         }
-        class Affix::Type v0.12.0 {
-            use overload
-                '""' => sub { shift->signature() },
+        my $pkg = caller;
+        {
+            no strict 'refs';
+            if ( !defined &{"${pkg}::${name}"} ) {
+                *{"${pkg}::${name}"} = sub {
+                    return Affix::Type::Reference->new( name => $clean_name );
+                };
+            }
+        }
+        return 1;
+    }
+    package    #
+        Affix::Type {
+        use overload '""' => sub { shift->signature() }, fallback => 1;
+        sub new       { my ( $class, %args ) = @_; bless \%args, $class }
+        sub signature { die "Abstract method" }
+    }
+    package    #
+        Affix::Type::Reference {
+        our @ISA = qw[Affix::Type];
+        sub signature { '@' . shift->{name} }
+    }
+    package    #
+        Affix::Type::Primitive {
+        our @ISA = qw[Affix::Type];
+        use overload
+            '|'      => sub { Affix::Type::Bitfield->new( type => $_[0], width => $_[1] ) },
+            '""'     => sub { shift->signature() },
             fallback => 1;
-            method signature {...}
-        };
+        sub signature { shift->{name} }
+    }
+    package    #
+        Affix::Type::Bitfield {
+        our @ISA = qw[Affix::Type];
+        sub signature { my $self = shift; $self->{type}->signature . ':' . $self->{width} }
+    }
+    package    #
+        Affix::Type::Enum {
+        our @ISA = qw[Affix::Type];
+        use Carp;
+        sub signature { 'e:' . shift->{type} }
 
-        class Affix::Type::Reference : isa(Affix::Type) {
-            field $name : param;
-            method signature { '@' . $name }
-        };
-
-        class Affix::Type::Primitive : isa(Affix::Type) {
-            field $name : param;
-            use overload
-                '|'      => sub { Affix::Type::Bitfield->new( type => $_[0], width => $_[1] ) },
-                '""'     => sub { shift->signature() },
-                fallback => 1;
-            method signature() {$name}
-        };
-
-        class Affix::Type::Bitfield : isa(Affix::Type) {
-            field $type  : param;
-            field $width : param;
-            use overload
-                '""'     => sub { shift->signature() },
-                fallback => 1;
-            method signature() { $type->signature . ':' . $width }
-        };
-
-        class Affix::Type::Enum : isa(Affix::Type) {
-            use Carp;
-            field $elements : param;
-            field $type : param //= Affix::Int();
-
-            # Lazy-built cache for values
-            field $values_map;
-            field $const_map;
-            method signature() { return 'e:' . $type; }
-
-            method resolve() {
-                return ( $const_map, $values_map ) if defined $values_map;
-                $const_map  = {};    # Name -> Int
-                $values_map = {};    # Int  -> Name
-                my $counter = 0;
-                for my $item (@$elements) {
-                    my ( $name, $final_val );
-
-                    # Determine Name and Raw Value Source
-                    if ( !ref $item ) {
-
-                        # Case: 'NAME' (Auto-increment)
-                        $name      = $item;
-                        $final_val = $counter;
+        sub resolve {
+            my $self = shift;
+            return ( $self->{const_map}, $self->{values_map} ) if defined $self->{values_map};
+            $self->{const_map}  = {};
+            $self->{values_map} = {};
+            my $counter = 0;
+            for my $item ( @{ $self->{elements} } ) {
+                my ( $name, $final_val );
+                if ( !ref $item ) {
+                    $name      = $item;
+                    $final_val = $counter;
+                }
+                elsif ( ref $item eq 'ARRAY' ) {
+                    my $raw_val;
+                    ( $name, $raw_val ) = @$item;
+                    if ( $raw_val =~ /^-?\d+$/ ) {
+                        $final_val = $raw_val;
                     }
-                    elsif ( ref $item eq 'ARRAY' ) {
-
-                        # Case: [ NAME => VALUE ]
-                        my $raw_val;
-                        ( $name, $raw_val ) = @$item;
-
-                        # Calculate Value
-                        if ( $raw_val =~ /^-?\d+$/ ) {
-
-                            # Literal Integer
-                            $final_val = $raw_val;
-                        }
-                        elsif ( $raw_val =~ /^0x[0-9a-fA-F]+$/ ) {
-
-                            # Literal Hex
-                            $final_val = hex($raw_val);
-                        }
-                        else {
-                            # Calculated String (e.g., "FLAG_A | FLAG_B")
-                            $final_val = $self->_calculate_expr( $raw_val, $const_map );
-                        }
+                    elsif ( $raw_val =~ /^0x[0-9a-fA-F]+$/ ) {
+                        $final_val = hex($raw_val);
                     }
                     else {
-                        Carp::croak("Enum elements must be Strings or [Name => Value] ArrayRefs");
-                    }
-
-                    # Store and Increment
-                    $const_map->{$name} = $final_val;
-
-                    # Only map value->name if not already mapped (first name for a value wins in C usually)
-                    $values_map->{$final_val} //= $name;
-                    $counter = $final_val + 1;
-                }
-                return ( $const_map, $values_map );
-            }
-
-            # Shunting-yard algorithm
-            # Handles: + - * / % << >> | & ^ ~ ! ( ) && || == != < <= > >= ? :
-            method _calculate_expr( $expr, $lookup ) {
-                use integer;    # Force signed integer arithmetic to match C enums. This ensures ~0 becomes -1, not 18446744073709551615.
-
-                # Tokenize: Split on operators
-                # Regex matches:
-                # - Multi-char ops: << >> && || == != <= >=
-                # - Single-char ops: + - * / % | & ^ ~ ! ( ) ? : < >
-                # - Numbers (hex/dec)
-                # - Identifiers
-                my @tokens = $expr =~ /(0x[0-9a-fA-F]+|\d+|[a-zA-Z_]\w*|<<|>>|&&|\|\||==|!=|<=|>=|[+\-*\/%|&^~!?:()<>])/g;
-
-                # Resolve Identifiers
-                for my $t (@tokens) {
-                    next if $t =~ /^(?:<<|>>|&&|\|\||==|!=|<=|>=|[+\-*\/%|&^~!?:()<>])$/;
-                    next if $t =~ /^\d+$/;
-                    next if $t =~ /^0x/;
-                    if ( exists $lookup->{$t} ) {
-                        $t = $lookup->{$t};
-                    }
-                    else {
-                        # Provide a cleaner error message
-                        Carp::croak("Enum definition error: Unknown symbol '$t' in expression '$expr'");
-                    }
-
-                    # Convert hex strings to numbers immediately if found
-                    $t = hex($t) if $t =~ /^0x/;
-                }
-
-                # Shunting-yard
-                my @output_queue;
-                my @op_stack;
-
-                # Precedence and Associativity (1=Left, 0=Right)
-                my %prec = (
-                    '*'          => [ 13, 1 ],
-                    '/'          => [ 13, 1 ],
-                    '%'          => [ 13, 1 ],
-                    '+'          => [ 12, 1 ],
-                    '-'          => [ 12, 1 ],
-                    '<<'         => [ 11, 1 ],
-                    '>>'         => [ 11, 1 ],
-                    '<'          => [ 10, 1 ],
-                    '<='         => [ 10, 1 ],
-                    '>'          => [ 10, 1 ],
-                    '>='         => [ 10, 1 ],
-                    '=='         => [ 9,  1 ],
-                    '!='         => [ 9,  1 ],
-                    '&'          => [ 8,  1 ],
-                    '^'          => [ 7,  1 ],
-                    '|'          => [ 6,  1 ],
-                    '&&'         => [ 5,  1 ],
-                    '||'         => [ 4,  1 ],
-                    '?'          => [ 3,  0 ],
-                    ':'          => [ 3,  0 ],                                                                    # Ternary
-                    'unary_plus' => [ 14, 0 ], 'unary_minus' => [ 14, 0 ], '!' => [ 14, 0 ], '~' => [ 14, 0 ],    # Unary
-                    '('          => [ -1, 0 ],
-                );
-                my $expect_unary = 1;
-                for my $token (@tokens) {
-                    if ( $token =~ /^\d+$/ ) {
-                        push @output_queue, $token;
-                        $expect_unary = 0;
-                    }
-                    elsif ( $token eq '(' ) {
-                        push @op_stack, $token;
-                        $expect_unary = 1;
-                    }
-                    elsif ( $token eq ')' ) {
-                        while ( @op_stack && $op_stack[-1] ne '(' ) {
-                            push @output_queue, pop @op_stack;
-                        }
-                        pop @op_stack;    # Discard '('
-                        $expect_unary = 0;
-                    }
-                    elsif ( $token eq '?' ) {    # Ternary Start
-                        while ( @op_stack && $op_stack[-1] ne '(' && $prec{ $op_stack[-1] }[0] > $prec{$token}[0] ) {
-                            push @output_queue, pop @op_stack;
-                        }
-                        push @op_stack, $token;
-                        $expect_unary = 1;
-                    }
-                    elsif ( $token eq ':' ) {    # Ternary Mid
-                        while ( @op_stack && $op_stack[-1] ne '?' ) {
-                            push @output_queue, pop @op_stack;
-                        }
-
-                        # Don't pop '?' yet, we need it for the final evaluation
-                        $expect_unary = 1;
-                    }
-                    else {
-                        # Handle Unary Operators
-                        if ( $expect_unary && ( $token eq '+' || $token eq '-' || $token eq '!' || $token eq '~' ) ) {
-                            $token = $token eq '+' ? 'unary_plus' : $token eq '-' ? 'unary_minus' : $token;
-                        }
-                        elsif ( !exists $prec{$token} ) {
-                            Carp::croak("Unknown token '$token'");
-                        }
-                        my $p1    = $prec{$token}[0];
-                        my $assoc = $prec{$token}[1];
-                        while (@op_stack) {
-                            my $top = $op_stack[-1];
-                            last if $top eq '(';
-                            my $p2 = $prec{$top}[0];
-                            if ( ( $assoc == 1 && $p1 <= $p2 ) || ( $assoc == 0 && $p1 < $p2 ) ) {
-                                push @output_queue, pop @op_stack;
-                            }
-                            else {
-                                last;
-                            }
-                        }
-                        push @op_stack, $token;
-                        $expect_unary = 1;
+                        $final_val = $self->_calculate_expr( $raw_val, $self->{const_map} );
                     }
                 }
-                push @output_queue, pop @op_stack while @op_stack;
-
-                # RPN Evaluator
-                my @stack;
-                for my $token (@output_queue) {
-                    if ( $token =~ /^\d+$/ ) {
-                        push @stack, $token;
-                    }
-                    elsif ( $token eq 'unary_plus' ) {    # No-op
-                    }
-                    elsif ( $token eq 'unary_minus' ) {
-                        push @stack, -( pop @stack );
-                    }
-                    elsif ( $token eq '!' ) {
-                        push @stack, int( !( pop @stack ) );
-                    }
-                    elsif ( $token eq '~' ) {
-                        push @stack, ~( pop @stack );
-                    }
-                    elsif ( $token eq '?' ) {             # Ternary Op: stack is [cond, true_val, false_val]
-                        my $false_val = pop @stack;
-                        my $true_val  = pop @stack;
-                        my $cond      = pop @stack;
-                        push @stack, $cond ? $true_val : $false_val;
-                    }
-                    else {
-                        my $b = pop @stack;
-                        my $a = pop @stack;
-                        if    ( $token eq '+' )  { push @stack, $a + $b; }
-                        elsif ( $token eq '-' )  { push @stack, $a - $b; }
-                        elsif ( $token eq '*' )  { push @stack, $a * $b; }
-                        elsif ( $token eq '/' )  { push @stack, int( $a / $b ); }
-                        elsif ( $token eq '%' )  { push @stack, $a % $b; }
-                        elsif ( $token eq '<<' ) { push @stack, $a << $b; }
-                        elsif ( $token eq '>>' ) { push @stack, $a >> $b; }
-                        elsif ( $token eq '|' )  { push @stack, $a | $b; }
-                        elsif ( $token eq '&' )  { push @stack, $a & $b; }
-                        elsif ( $token eq '^' )  { push @stack, $a ^ $b; }
-                        elsif ( $token eq '==' ) { push @stack, int( $a == $b ); }
-                        elsif ( $token eq '!=' ) { push @stack, int( $a != $b ); }
-                        elsif ( $token eq '<' )  { push @stack, int( $a < $b ); }
-                        elsif ( $token eq '<=' ) { push @stack, int( $a <= $b ); }
-                        elsif ( $token eq '>' )  { push @stack, int( $a > $b ); }
-                        elsif ( $token eq '>=' ) { push @stack, int( $a >= $b ); }
-                        elsif ( $token eq '&&' ) { push @stack, int( $a && $b ); }
-                        elsif ( $token eq '||' ) { push @stack, int( $a || $b ); }
-                    }
+                else {
+                    Carp::croak("Enum elements must be Strings or [Name => Value] ArrayRefs");
                 }
-                return $stack[0];
+                $self->{const_map}->{$name} = $final_val;
+                $self->{values_map}->{$final_val} //= $name;
+                $counter = $final_val + 1;
             }
+            return ( $self->{const_map}, $self->{values_map} );
         }
 
-        class Affix::Type::Aggregate : isa(Affix::Type) {
-            field $members : param;                      # ArrayRef of [ Name => Type, ... ]
-            field $kind : param //= __CLASS__->_KIND;    # '{%s}' or '<%s>'
-
-            method signature() {
-                my @parts;
-
-                # Iterate
-                for ( my $i = 0; $i < @$members; $i++ ) {
-                    my $curr = $members->[$i];
-                    my $next = $members->[ $i + 1 ];
-
-                    # Heuristic: Key => Value detection
-                    # If $next looks like a type (or is a Type object), treat $curr as name
-                    if ( defined $next && $self->_is_type($next) && !$self->_is_type($curr) ) {
-                        my $name = $curr;
-                        my $type = $next;
-                        $i++;
-
-                        # Check for bitfield width: [ name => type, width ]
-                        my $width = $members->[ $i + 1 ];
-                        if ( defined $width && !ref($width) && $width =~ /^\d+$/ ) {
-                            push @parts, "$name:$type:$width";
-                            $i++;
-                        }
-                        else {
-                            push @parts, "$name:$type";
-                        }
-                    }
-                    else {
-                        push @parts, "$curr";
-                    }
+        sub _calculate_expr {
+            my ( $self, $expr, $lookup ) = @_;
+            use integer;
+            my @tokens = $expr =~ /(0x[0-9a-fA-F]+|\d+|[a-zA-Z_]\w*|<<|>>|&&|\|\||==|!=|<=|>=|[+\-*\/%|&^~!?:()<>])/g;
+            for my $t (@tokens) {
+                next if $t =~ /^(?:<<|>>|&&|\|\||==|!=|<=|>=|[+\-*\/%|&^~!?:()<>])$/;
+                next if $t =~ /^\d+$/;
+                next if $t =~ /^0x/;
+                if ( exists $lookup->{$t} ) {
+                    $t = $lookup->{$t};
                 }
-                return sprintf( $kind, join( ',', @parts ) );
+                else {
+                    Carp::croak("Enum definition error: Unknown symbol '$t' in expression '$expr'");
+                }
+                $t = hex($t) if $t =~ /^0x/;
             }
-
-            method _is_type($thing) {
-                return 1 if builtin::blessed($thing) && $thing->isa('Affix::Type');
-
-                # Fallback regex for raw strings
-                return $thing =~ qr{^
-                    (?:
-                        (?:
-                            void|bool|
-                            [usw]?char|
-                            u?short|
-                            u?int|
-                            u?long(?:long)?|
-                            float|double|longdouble|
-                            s?size_t|
-                            s?int\d+|uint\d+|
-                            float\d+|
-                            m\d+[a-z]*
-                        )\b
-                        |
-                        e:|c\[|v\[|
-                        \*|\[|\{|\!|<|\(|@
-                    )
-                }x;
+            my @output_queue;
+            my @op_stack;
+            my %prec = (
+                '*'           => [ 13, 1 ],
+                '/'           => [ 13, 1 ],
+                '%'           => [ 13, 1 ],
+                '+'           => [ 12, 1 ],
+                '-'           => [ 12, 1 ],
+                '<<'          => [ 11, 1 ],
+                '>>'          => [ 11, 1 ],
+                '<'           => [ 10, 1 ],
+                '<='          => [ 10, 1 ],
+                '>'           => [ 10, 1 ],
+                '>='          => [ 10, 1 ],
+                '=='          => [ 9,  1 ],
+                '!='          => [ 9,  1 ],
+                '&'           => [ 8,  1 ],
+                '^'           => [ 7,  1 ],
+                '|'           => [ 6,  1 ],
+                '&&'          => [ 5,  1 ],
+                '||'          => [ 4,  1 ],
+                '?'           => [ 3,  0 ],
+                ':'           => [ 3,  0 ],
+                'unary_plus'  => [ 14, 0 ],
+                'unary_minus' => [ 14, 0 ],
+                '!'           => [ 14, 0 ],
+                '~'           => [ 14, 0 ],
+                '('           => [ -1, 0 ],
+            );
+            my $expect_unary = 1;
+            for my $token (@tokens) {
+                if    ( $token =~ /^\d+$/ ) { push @output_queue, $token; $expect_unary = 0; }
+                elsif ( $token eq '(' )     { push @op_stack,     $token; $expect_unary = 1; }
+                elsif ( $token eq ')' ) {
+                    while ( @op_stack && $op_stack[-1] ne '(' ) { push @output_queue, pop @op_stack; }
+                    pop @op_stack;
+                    $expect_unary = 0;
+                }
+                elsif ( $token eq '?' ) {
+                    while ( @op_stack && $op_stack[-1] ne '(' && $prec{ $op_stack[-1] }[0] > $prec{$token}[0] ) { push @output_queue, pop @op_stack; }
+                    push @op_stack, $token;
+                    $expect_unary = 1;
+                }
+                elsif ( $token eq ':' ) {
+                    while ( @op_stack && $op_stack[-1] ne '?' ) { push @output_queue, pop @op_stack; }
+                    $expect_unary = 1;
+                }
+                else {
+                    if ( $expect_unary && ( $token eq '+' || $token eq '-' || $token eq '!' || $token eq '~' ) ) {
+                        $token = $token eq '+' ? 'unary_plus' : $token eq '-' ? 'unary_minus' : $token;
+                    }
+                    elsif ( !exists $prec{$token} ) { Carp::croak("Unknown token '$token'"); }
+                    my $p1    = $prec{$token}[0];
+                    my $assoc = $prec{$token}[1];
+                    while (@op_stack) {
+                        my $top = $op_stack[-1];
+                        last if $top eq '(';
+                        my $p2 = $prec{$top}[0];
+                        if ( ( $assoc == 1 && $p1 <= $p2 ) || ( $assoc == 0 && $p1 < $p2 ) ) { push @output_queue, pop @op_stack; }
+                        else                                                                 { last; }
+                    }
+                    push @op_stack, $token;
+                    $expect_unary = 1;
+                }
             }
-        }
-
-        class Affix::Type::Struct : isa(Affix::Type::Aggregate) {
-            use constant _KIND => '{%s}';
-        }
-
-        class Affix::Type::Union : isa(Affix::Type::Aggregate) {
-            use constant _KIND => '<%s>';
-        }
-
-        class Affix::Type::Array : isa(Affix::Type) {
-            field $type  : param;
-            field $count : param;
-
-            method signature() {
-                my $c = $count // '?';
-                return "[$c:$type]";
+            push @output_queue, pop @op_stack while @op_stack;
+            my @stack;
+            for my $token (@output_queue) {
+                if    ( $token =~ /^\d+$/ )       { push @stack, $token; }
+                elsif ( $token eq 'unary_plus' )  { }
+                elsif ( $token eq 'unary_minus' ) { push @stack, -( pop @stack ); }
+                elsif ( $token eq '!' )           { push @stack, int( !( pop @stack ) ); }
+                elsif ( $token eq '~' )           { push @stack, ~( pop @stack ); }
+                elsif ( $token eq '?' )           { my $f = pop @stack; my $t = pop @stack; my $c = pop @stack; push @stack, $c ? $t : $f; }
+                else {
+                    my $b = pop @stack;
+                    my $a = pop @stack;
+                    if    ( $token eq '+' )  { push @stack, $a + $b; }
+                    elsif ( $token eq '-' )  { push @stack, $a - $b; }
+                    elsif ( $token eq '*' )  { push @stack, $a * $b; }
+                    elsif ( $token eq '/' )  { push @stack, int( $a / $b ); }
+                    elsif ( $token eq '%' )  { push @stack, $a % $b; }
+                    elsif ( $token eq '<<' ) { push @stack, $a << $b; }
+                    elsif ( $token eq '>>' ) { push @stack, $a >> $b; }
+                    elsif ( $token eq '|' )  { push @stack, $a | $b; }
+                    elsif ( $token eq '&' )  { push @stack, $a & $b; }
+                    elsif ( $token eq '^' )  { push @stack, $a ^ $b; }
+                    elsif ( $token eq '==' ) { push @stack, int( $a == $b ); }
+                    elsif ( $token eq '!=' ) { push @stack, int( $a != $b ); }
+                    elsif ( $token eq '<' )  { push @stack, int( $a < $b ); }
+                    elsif ( $token eq '<=' ) { push @stack, int( $a <= $b ); }
+                    elsif ( $token eq '>' )  { push @stack, int( $a > $b ); }
+                    elsif ( $token eq '>=' ) { push @stack, int( $a >= $b ); }
+                    elsif ( $token eq '&&' ) { push @stack, int( $a && $b ); }
+                    elsif ( $token eq '||' ) { push @stack, int( $a || $b ); }
+                }
             }
-        }
-
-        class Affix::Type::Pointer : isa(Affix::Type) {
-            field $subtype : param;
-
-            method signature() {
-                return '*' . ( $subtype // 'void' );
-            }
-        }
-
-        class Affix::Type::Callback : isa(Affix::Type) {
-            field $params : param;    # ArrayRef
-            field $ret    : param;
-
-            method signature() {
-                my $args = join( ',', @$params );
-
-                # Handle varargs marker placement if present
-                $args =~ s/,\;,/;/g;
-                $args =~ s/,\;$/;/;
-                return "*(($args)->$ret)";
-            }
+            return $stack[0];
         }
     }
-}
+    package    #
+        Affix::Type::Aggregate {
+        our @ISA = qw[Affix::Type];
+
+        sub signature {
+            my $self    = shift;
+            my $members = $self->{members};
+            my $kind    = $self->{kind} // '{%s}';
+            my @parts;
+            for ( my $i = 0; $i < @$members; $i++ ) {
+                my $curr = $members->[$i];
+                my $next = $members->[ $i + 1 ];
+                if ( defined $next &&
+                    builtin::blessed($next)   &&
+                    $next->isa('Affix::Type') &&
+                    ( !builtin::blessed($curr) || !$curr->isa('Affix::Type') ) ) {
+                    my $name = $curr;
+                    my $type = $next;
+                    $i++;
+                    my $width = $members->[ $i + 1 ];
+                    if ( defined $width && !ref($width) && $width =~ /^\d+$/ ) { push @parts, "$name:$type:$width"; $i++; }
+                    else                                                       { push @parts, "$name:$type"; }
+                }
+                else { push @parts, "$curr"; }
+            }
+            return sprintf( $kind, join( ',', @parts ) );
+        }
+    }
+    package    #
+        Affix::Type::Struct {
+        our @ISA = qw[Affix::Type::Aggregate];
+        sub new { my $class = shift; my %args = @_; $args{kind} = '{%s}'; bless \%args, $class }
+    }
+    package    #
+        Affix::Type::Union {
+        our @ISA = qw[Affix::Type::Aggregate];
+        sub new { my $class = shift; my %args = @_; $args{kind} = '<%s>'; bless \%args, $class }
+    }
+    package    #
+        Affix::Type::Array {
+        our @ISA = qw[Affix::Type];
+        sub signature { my $self = shift; my $c = $self->{count} // '?'; return "[$c:" . $self->{type} . "]"; }
+    }
+    package    #
+        Affix::Type::Pointer {
+        our @ISA = qw[Affix::Type];
+        sub signature { '*' . ( shift->{subtype} // 'void' ) }
+    }
+    package    #
+        Affix::Type::Callback {
+        our @ISA = qw[Affix::Type];
+        sub params { shift->{params} }
+
+        sub signature {
+            my $self = shift;
+            my @args = map { builtin::blessed($_) ? $_->signature : $_ } @{ $self->{params} };
+            my $args = join( ',', @args );
+            $args =~ s/,\;,/;/g;
+            $args =~ s/,\;$/;/;
+            my $r = builtin::blessed( $self->{ret} ) ? $self->{ret}->signature : $self->{ret};
+            return "*(($args)->$r)";
+        }
+    }
+    package    #
+        Affix::Pointer {
+        use v5.40;
+        use overload '""' => \&address, '@{}' => \&_as_array, '%{}' => \&_as_hash, fallback => 1;
+        sub address           { Affix::address(shift) }
+        sub type              { Affix::_pin_type(shift) }
+        sub element_type      { Affix::_pin_element_type(shift) }
+        sub size              { Affix::_pin_size(shift) }
+        sub count             { Affix::_pin_count(shift) }
+        sub cast              { Affix::cast( shift, shift ) }
+        sub _as_array         { my $self = shift; my @proxy; tie @proxy, 'Affix::Pointer::TiedArray', $self; return \@proxy; }
+        sub _as_hash          { my $self = shift; my %proxy; tie %proxy, 'Affix::Pointer::TiedHash',  $self; return \%proxy; }
+        sub attach_destructor { my ( $self, $destructor, $lib ) = @_; Affix::attach_destructor( $self, $destructor, $lib ); }
+    }
+    package    #
+        Affix::Pointer::TiedHash {
+        use v5.40;
+        sub TIEHASH  { my ( $class, $ptr ) = @_; my $obj = $ptr->cast( "+" . $ptr->element_type ); return $obj; }
+        sub FETCH    { my ( $self, $key ) = @_; return $self->{$key}; }
+        sub STORE    { my ( $self, $key, $val ) = @_; $self->{$key} = $val; }
+        sub EXISTS   { my ( $self, $key ) = @_; return exists $self->{$key}; }
+        sub FIRSTKEY { my ($self) = @_; keys %$self; return each %$self; }
+        sub NEXTKEY  { my ( $self, $last ) = @_; return each %$self; }
+        sub SCALAR   { my ($self) = @_; return scalar %$self; }
+        };
+    package    #
+        Affix::Pointer::TiedArray {
+        use v5.40;
+        sub TIEARRAY  { bless { pin => $_[1] }, $_[0] }
+        sub FETCH     { my ( $self, $index ) = @_; Affix::_pin_get_at( $self->{pin}, $index ); }
+        sub STORE     { my ( $self, $index, $value ) = @_; Affix::_pin_set_at( $self->{pin}, $index, $value ); }
+        sub FETCHSIZE { my $self = shift; Affix::_pin_count( $self->{pin} ) // 0x7FFFFFFF; }
+        sub EXISTS    { my ( $self, $index ) = @_; my $count = Affix::_pin_count( $self->{pin} ); return defined($count) ? ( $index < $count ) : 1; }
+        sub DELETE    { die "Cannot delete elements from a C array" }
+        sub CLEAR     { die "Cannot clear a C array" }
+        };
+    package    #
+        Affix::Live {
+        use v5.40;
+        sub new      { my ( $class, $ref ) = @_; return bless $ref // {}, $class; }
+        sub FETCH    { my ( $self, $key ) = @_; return $self->{$key}; }
+        sub STORE    { my ( $self, $key, $val ) = @_; $self->{$key} = $val; }
+        sub EXISTS   { my ( $self, $key ) = @_; return exists $self->{$key}; }
+        sub FIRSTKEY { my ($self) = @_; keys %$self; return each %$self; }
+        sub NEXTKEY  { my ( $self, $last ) = @_; return each %$self; }
+        sub SCALAR   { my ($self) = @_; return scalar %$self; }
+    }
+};
 1;
 __END__
 Copyright (C) Sanko Robinson.

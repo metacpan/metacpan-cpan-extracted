@@ -82,6 +82,12 @@ t/024_buffer.t
 t/025_affix_wrap.t
 t/026_context.t
 t/027_thread_safety.t
+t/028_pointer_indexing.t
+t/029_union_pins.t
+t/030_live_struct.t
+t/031_live_array.t
+t/032_recursive_liveness.t
+t/033_unified_access.t
 t/040_error.t
 t/050_affix_build.t
 t/900_leak.t

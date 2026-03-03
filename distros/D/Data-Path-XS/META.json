@@ -1,0 +1,66 @@
+{
+   "abstract" : "Fast path-based access to nested data structures",
+   "author" : [
+      "vividsnow"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Path-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "XS::Parse::Keyword::Builder" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XS::Parse::Keyword" : "0.40",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::LeakTrace" : "0.14",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Path::XS" : {
+         "file" : "lib/Data/Path/XS.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vividsnow/perl5-data-path-xs/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vividsnow/perl5-data-path-xs.git",
+         "web" : "https://github.com/vividsnow/perl5-data-path-xs"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

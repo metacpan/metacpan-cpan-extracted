@@ -78,11 +78,8 @@ plan tests => 59;
         is cowrefcnt($k), 0, "cowrefcnt on key $k is 0...";
 
         my $clone_key = clone($k);
-      TODO: {
-            local $TODO = "losing the COW status when cowrefcnt=0...";
-            ok !is_cow($clone_key), "clone_key lost its cow value (LEN=0)";
-            is cowrefcnt($clone_key), undef, "clone_key has lost cow...";
-        }
+        ok !is_cow($clone_key), "clone_key lost its cow value (LEN=0)";
+        is cowrefcnt($clone_key), undef, "clone_key has lost cow...";
         is $clone_key, $k, " clone_key eq k";
     }
 

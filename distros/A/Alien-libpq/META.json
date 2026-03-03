@@ -1,0 +1,75 @@
+{
+   "abstract" : "Find or build libpq PostgreSQL client library",
+   "author" : [
+      "vividsnow"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-libpq",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build::MM" : "0.25"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build::MM" : "0.25"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "Alien::Build" : "0.25",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Alien" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::libpq" : {
+         "file" : "lib/Alien/libpq.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vividsnow/perl5-alien-libpq.git",
+         "web" : "https://github.com/vividsnow/perl5-alien-libpq"
+      }
+   },
+   "version" : "0.02",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 2.84",
+      "requires" : {
+         "share" : {
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "IO::Compress::Bzip2" : "0",
+            "IO::Uncompress::Bunzip2" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -95,10 +95,10 @@ DLLEXPORT Rect* get_static_rect(void) {
 
 END_C
 
-# 2. Compile the library
+# Compile the library
 my $lib = compile_ok($c_source);
 
-# 3. Define Types in Affix
+# Define Types in Affix
 # ------------------------
 # Simple Struct: Point
 # typedef Point => Struct [ x => Int, y => Int ];
@@ -125,7 +125,7 @@ typedef 'Node' => Struct [
     next   => Pointer [ Node() ]
 ];
 
-# 4. Bind Functions
+# Bind Functions
 # -----------------
 # int rect_area(Rect r)
 isa_ok my $rect_area = wrap( $lib, 'rect_area', [$Rect] => Int ), ['Affix'];
@@ -139,7 +139,7 @@ isa_ok my $sum_nodes = wrap( $lib, 'sum_nodes', [ Pointer [ Node() ] ] => Double
 # Rect* get_static_rect()
 isa_ok my $get_static_rect = wrap( $lib, 'get_static_rect', [] => Pointer [$Rect] ), ['Affix'];
 
-# 5. Run Tests
+# Run Tests
 # ------------
 subtest 'Nested Structs (Pass by Value)' => sub {
 

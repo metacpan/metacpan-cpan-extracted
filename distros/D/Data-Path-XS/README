@@ -1,0 +1,55 @@
+Data-Path-XS
+============
+
+Fast XS module for path-based access to nested Perl data structures.
+
+SYNOPSIS
+
+    use Data::Path::XS qw(path_get path_set path_delete path_exists);
+
+    my $data = { foo => { bar => [1, 2, 3] } };
+
+    path_get($data, '/foo/bar/1');        # 2
+    path_set($data, '/foo/bar/1', 42);    # sets to 42
+    path_exists($data, '/foo/baz');       # 0
+    path_delete($data, '/foo/bar/0');     # removes first element
+
+    # Keywords API - near-native performance
+    use Data::Path::XS ':keywords';
+
+    my $val = pathget $data, "/foo/bar/1";
+    pathset $data, "/foo/bar/1", 99;
+
+DESCRIPTION
+
+Minimal XS module for fast access to deeply nested Perl data structures
+using slash-separated paths. Provides four APIs optimized for different
+use cases:
+
+  * Keywords API - Near-native performance via compile-time optimization
+  * String API (path_*) - Best general-purpose performance
+  * Array API (patha_*) - When path components are already parsed
+  * Compiled API (pathc_*) - Maximum speed for repeated access patterns
+
+PERFORMANCE
+
+  * 10-25x faster than pure Perl for deep paths
+  * Competitive with or faster than native Perl hash/array access
+  * Missing key detection is 3-5x faster than native (early termination)
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+  * Perl 5.14 or later
+  * XS::Parse::Keyword 0.40 or later
+
+LICENSE
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

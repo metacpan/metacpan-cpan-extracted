@@ -1,0 +1,14 @@
+Revision history for Data-Path-XS
+
+0.01  2026-03-03
+    - Initial release
+    - String path API: path_get, path_set, path_delete, path_exists
+    - Array path API: patha_get, patha_set, patha_delete, patha_exists
+    - Compiled path API: path_compile, pathc_get, pathc_set, pathc_delete, pathc_exists
+    - Keywords API: pathget, pathset, pathdelete, pathexists (via :keywords import)
+    - Compile-time optimization for constant paths
+    - Custom ops for dynamic paths (runs in Perl's runloop)
+    - Negative array indices, autovivification on set with type detection
+    - Leading-zero and integer overflow protection
+    - Memory-safe store handling with proper refcount management
+    - 10-25x faster than pure Perl for deep paths

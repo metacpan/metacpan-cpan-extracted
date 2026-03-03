@@ -1,6 +1,6 @@
 use v5.40;
-use Test2::V0;
-use Affix qw[:all];
+use Test2::Tools::Affix qw[:all];
+use Affix               qw[:all];
 use Affix::Build;
 #
 my $c = Affix::Build->new();

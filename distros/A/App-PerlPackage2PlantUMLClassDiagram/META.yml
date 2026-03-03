@@ -1,13 +1,13 @@
 ---
 abstract: "Generate Plant UML's class diagraom from Perl packages."
 author:
-  - 'This library is free software; you can redistribute it and/or modify'
+  - 'hitode909 <hitode909@gmail.com>'
 build_requires:
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   App::PerlPackage2PlantUMLClassDiagram:
     file: lib/App/PerlPackage2PlantUMLClassDiagram.pm
-    version: '0.02'
+    version: '0.03'
   App::PerlPackage2PlantUMLClassDiagram::Package:
     file: lib/App/PerlPackage2PlantUMLClassDiagram/Package.pm
   App::PerlPackage2PlantUMLClassDiagram::Repository:
@@ -38,8 +38,8 @@ requires:
 resources:
   bugtracker: https://github.com/hitode909/App-PerlPackage2PlantUMLClassDiagram/issues
   homepage: https://github.com/hitode909/App-PerlPackage2PlantUMLClassDiagram
-  repository: git://github.com/hitode909/App-PerlPackage2PlantUMLClassDiagram.git
-version: '0.02'
+  repository: https://github.com/hitode909/App-PerlPackage2PlantUMLClassDiagram.git
+version: '0.03'
 x_authority: cpan:HITODE
-x_contributors:
-  - 'hitode909 <hitode909@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

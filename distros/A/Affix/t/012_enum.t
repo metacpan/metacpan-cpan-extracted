@@ -1,5 +1,4 @@
 use v5.40;
-use lib '../lib', 'lib';
 use blib;
 use Test2::Tools::Affix qw[:all];
 use Affix               qw[:all];
@@ -43,6 +42,20 @@ DLLEXPORT MachineState get_next_state(MachineState s) {
     if (s == STATE_RUNNING) return STATE_PAUSED;
     if (s == STATE_PAUSED)  return STATE_STOPPED;
     return STATE_ERROR;
+}
+
+typedef enum {
+    APPLE  = 1,
+    BANANA = 2,
+    CHERRY = 3
+} Fruit;
+
+DLLEXPORT int identify_fruit(Fruit f) {
+    return (int)f;
+}
+
+DLLEXPORT Fruit get_fruit(int v) {
+    return (Fruit)v;
 }
 END_C
 my $lib = compile_ok($c_source);
@@ -129,7 +142,7 @@ END_RAW
         # Behavior for unknown strings depends on impl, usually just the number as string
         # or undef string slot. Usually sv_setiv sets the IV, sv_setpv is skipped.
         # So "$val" should be "555".
-        is "$val", "555", 'Stringification of unknown enum value falls back to number';
+        is "$val", '555', 'Stringification of unknown enum value falls back to number';
     };
 };
 {
@@ -184,5 +197,39 @@ subtest 'Logical and Ternary' => sub {
     is $c->{LOGIC_AND}, 1,  'Logic AND';
     is $c->{LOGIC_OR},  0,  'Logic OR';
     is $c->{CMP_LESS},  1,  'Comparison <';
+};
+subtest 'Passing Strings as Enum Values' => sub {
+    ok typedef( Fruit => Enum [ [ APPLE => 1 ], [ BANANA => 2 ], [ CHERRY => 3 ] ] ), 'typedef Fruit Enum';
+    affix $lib, 'identify_fruit', [ Fruit() ] => Int;
+    is identify_fruit( APPLE() ),  1, 'Passed constant APPLE (1)';
+    is identify_fruit( BANANA() ), 2, 'Passed constant BANANA (2)';
+
+    # This is the feature: passing the string name of the enum element
+    is identify_fruit('APPLE'),  1, 'Passed string "APPLE" -> maps to 1';
+    is identify_fruit('BANANA'), 2, 'Passed string "BANANA" -> maps to 2';
+    is identify_fruit('CHERRY'), 3, 'Passed string "CHERRY" -> maps to 3';
+    like warning { identify_fruit('DURIAN') }, qr[numeric], 'Unknown string "DURIAN" for enum';
+};
+subtest 'Dualvar Roundtrip' => sub {
+    affix $lib, 'get_fruit', [Int] => Fruit();
+    my $f = get_fruit(2);
+    is 0 + $f, 2,        'Numeric value is 2';
+    is "$f",   'BANANA', 'String value is "BANANA"';
+
+    # Passing the returned dualvar back to C
+    is identify_fruit($f), 2, 'Passed dualvar $f back to C';
+};
+subtest 'Calculated Enum Expressions' => sub {
+    ok typedef(
+        ComplexEnum => Enum [
+            [ BASE => 100 ], [ OFFSET => 5 ], [ CALC => 'BASE + OFFSET * 2' ],    # 110
+            'NEXT'                                                                # 111
+        ]
+        ),
+        'typedef ComplexEnum with expressions';
+    is BASE(),   100, 'BASE is 100';
+    is OFFSET(), 5,   'OFFSET is 5';
+    is CALC(),   110, 'CALC is 110 (BASE + OFFSET * 2)';
+    is NEXT(),   111, 'NEXT is 111 (Auto-increment from CALC)';
 };
 done_testing;

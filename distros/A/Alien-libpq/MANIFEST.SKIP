@@ -1,0 +1,13 @@
+^\.git
+^\.github/
+^Alien-libpq-
+^_alien/
+^blib/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^pm_to_blib
+\.bak$
+~$
+\.swp$
+\.o$

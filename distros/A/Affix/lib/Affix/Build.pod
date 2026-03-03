@@ -1,4 +1,3 @@
-
 =pod
 
 =encoding utf-8
@@ -9,65 +8,71 @@ Affix::Build - Robust, Polyglot Build System for FFI Extensions
 
 =head1 SYNOPSIS
 
+    use v5.40;
     use Affix::Build;
+    use Affix;
 
-    # Builds a shared library using Rust's native toolchain configuration.
+    # Example 1: Single Language (Rust)
     my $rust = Affix::Build->new( name => 'my_rust_lib' );
-    $rust->add('src/logic.rs');
-    my $lib_path = $rust->compile_and_link(); # Returns path to .so/.dll (e.g., /tmp/.../my_rust_lib.dll)
 
-    # Compiles C and Go separately, then links them into a single library.
+    $rust->add( \<<~'RUST', lang => 'rust' );
+        #[no_mangle]
+        pub extern "C" fn add(a: i32, b: i32) -> i32 { a + b }
+    RUST
+
+    my $rust_dll = $rust->link();
+
+    # Example 2: Polyglot (C and Go)
     my $mix = Affix::Build->new(
         name      => 'hybrid_lib',
-        build_dir => 'build/',
         flags     => { cflags => '-O3', ldflags => '-L/opt/lib' },
         debug     => 1
     );
 
-    $mix->add('src/wrapper.c', flags => '-DDEBUG'); # Per-file overrides
+    # Add file with per-file compiler overrides
+    $mix->add('src/wrapper.c', flags => '-DDEBUG');
     $mix->add('src/core.go');
 
-    my $dll = $mix->link();
+    my $poly_dll = $mix->link();
 
 =head1 DESCRIPTION
 
 C<Affix::Build> is a cross-platform compilation utility designed to generate shared libraries (C<.dll>, C<.so>,
-C<.dylib>) from source code in over 15 different programming languages.
+C<.dylib>) from source code in over 20 different programming languages.
 
-It is specifically engineered to support Foreign Function Interface (FFI) development. It abstracts away the complexity
-of invoking various compilers, normalizing object file extensions, handling platform-specific linker flags (such as
-MinGW vs MSVC on Windows), and ensuring that language runtimes (like the Go GC or .NET Runtime) are correctly
-initialized.
+While originally developed to compile test fixtures for the Affix suite, it has evolved into a robust tool for creating
+polyglot extensions. It abstracts away the complexity of invoking various compilers, normalizing object file
+extensions, handling platform-specific linker flags (such as MinGW vs. MSVC on Windows), and ensuring that language
+runtimes (like the Go GC or .NET Runtime) are correctly initialized.
 
-To be honest, this might be an easy backdoor way to get the functionality of an L<Inline> module but I wrote it to test
-against compiled libs in the Affix test suite.
+It serves as a powerful, polyglot alternative to C<Inline::*> modules—allowing you to write native code in your
+language of choice and instantly bind to it from Perl using L<Affix>.
 
 =head2 Build Strategies
 
-The compiler automatically selects the best build strategy based on the input sources:
+The builder automatically selects the optimal strategy based on the input sources:
 
 =over
 
-=item 1. B<Native/Dynamic Strategy> (Single Language)
+=item 1. B<Native Toolchain Strategy> (Single Language)
 
 If you provide source files for only B<one> language, C<Affix::Build> delegates the entire build process to that
-language's native toolchain (e.g., `go build -buildmode=c-shared`, `rustc --crate-type cdylib`, `dotnet publish`).
+language's native toolchain (e.g., C<go build -buildmode=c-shared>, C<rustc --crate-type cdylib>, C<dotnet publish>).
+This ensures that the language's standard library and runtime environment are configured exactly as intended by its
+maintainers.
 
-This is the preferred method as it guarantees the language's standard library and runtime environment are configured
-exactly as the language maintainers intended.
+=item 2. B<Polyglot Aggregation Strategy> (Mixed Languages)
 
-=item 2. B<Polyglot/Static Strategy> (Mixed Languages)
-
-If you provide source files from B<multiple> languages (e.g., C calling into Rust), the compiler switches to an
-aggregation strategy:
+If you provide source files from B<multiple> languages (e.g., C code calling into a Rust library), the builder switches
+to an aggregation strategy:
 
 =over
 
-=item 1. It instructs every compiler to output a B<Static Library> (C<.a> / C<.lib>) or B<Object File> (C<.o> / C<.obj>).
+=item 1. It instructs each language's compiler to output a B<Static Library> (C<.a> / C<.lib>) or B<Object File> (C<.o> / C<.obj>).
 
-=item 2. It aggregates these artifacts.
+=item 2. It aggregates these intermediate artifacts into a unified build context.
 
-=item 3. It invokes the system C/C++ linker (usually C<cc> or C<g++>) to link them all into a final shared library.
+=item 3. It invokes the system C/C++ linker (usually C<cc> or C<g++>) to securely link them into a final shared library, bridging their differing ABIs.
 
 =back
 
@@ -75,58 +80,49 @@ aggregation strategy:
 
 =head1 CONSTRUCTOR
 
-    my $c = Affix::Build->new( %params );
+    my $builder = Affix::Build->new( %params );
 
 Creates a new compiler instance.
 
 =over
 
-=item C<name> (Default: C<'affix_lib'>)
+=item * B<C<name>>: The base name of the resulting library (default: C<'affix_lib'>). The compiler will automatically append the OS-specific extension (C<.dll> on Windows, C<.dylib> on macOS, C<.so> on Linux).
 
-The base name of the resulting library. The compiler will automatically append the OS-specific extension (C<.dll> on
-Windows, C<.dylib> on macOS, C<.so> on Linux).
+=item * B<C<version>>: Optional version string to append to the library name.
 
-=item C<build_dir> (Default: Temporary Directory)
+=item * B<C<build_dir>>: The directory where intermediate artifacts and the final library will be written. If not provided, a temporary directory is created via L<Path::Tiny>.
 
-The directory where intermediate artifacts and the final library will be written. If not provided, a temporary
-directory is created via L<Path::Tiny> and cleaned up when the object is destroyed.
+=item * B<C<clean>>: If true, the generated C<build_dir> and all its contents will be deleted when the object is destroyed (default: C<0>).
 
-=item C<debug> (Default: 0)
+=item * B<C<debug>>: If true, the exact system commands executed by the compiler will be printed to C<STDERR> (default: C<0>).
 
-If set to true, the exact system commands executed by the compiler will be printed to STDERR.
+=item * B<C<flags>>: A HashRef of global flags applied across all files. Keys can be C<cflags>, C<cxxflags>, and C<ldflags>.
 
-=item C<flags> (Default: C<{}>)
-
-Hashref of global flags: C<cflags>, C<cxxflags>, C<ldflags>.
-
-=item C<os> (Default: C<$^O>)
-
-Override the detected operating system (useful for testing).
+=item * B<C<os>>: Override the detected operating system (defaults to C<$^O>).
 
 =back
 
 =head1 METHODS
 
-=head2 C<add( ... )>
+=head2 C<add( $input, %args )>
 
-    $c->add( 'path/to/file.c' );
-    $c->add( 'path/to/logic.rs' );
-    $c->add( 'file.c', flags => '-DDEBUG' );
-    $c->add( \'int main(){}', lang => 'c' );
+Adds a source file to the build manifest.
 
-Adds a source file to the build manifest. The compiler auto-detects the language based on the file extension.
+    $builder->add( 'path/to/file.c' );
+    $builder->add( 'file.c', flags => ['-DDEBUG', '-Wall'] );
+    $builder->add( \"int main(){}", lang => 'c' );
 
-You can also pass raw source code as a SCALAR reference; in this case, the C<lang> argument is required (e.g., C<'c'>,
-C<'rust'>, C<'go'>). See L</SUPPORTED LANGUAGES> for a list of recognized extensions.
+=over
 
-Optionally, this method accepts a C<flags> argument (string or arrayref) to pass specific flags to the compiler for
-this file.
+=item * B<File Path:> If C<$input> is a string, it is treated as a file path. The compiler auto-detects the language based on the extension.
 
-See L</SUPPORTED LANGUAGES> for a list of recognized extensions.
+=item * B<Inline Code:> If C<$input> is a SCALAR reference, you B<must> provide the C<lang> argument (e.g., C<'c'>, C<'rust'>) so the compiler knows how to handle it.
+
+=item * B<C<flags>>: An ArrayRef or space-separated string of compiler flags specific to this source file.
+
+=back
 
 =head2 C<compile_and_link( )>
-
-    my $path_object = $c->compile_and_link();
 
 Performs the build process:
 
@@ -145,77 +141,104 @@ STDOUT/STDERR of the failed command) if compilation fails.
 
 =head2 C<link( )>
 
-An alias for L</compile_and_link( )> but only compiles and links if the state hasn't changed since the last build.
+An alias for C<compile_and_link()>. Safe to call multiple times; it will return the cached library handle if the build
+has already completed.
 
 =head1 SUPPORTED LANGUAGES
 
-C<Affix::Build> attempts to locate the necessary binaries in your C<PATH>.
+C<Affix::Build> attempts to locate the necessary binaries in your system C<PATH>.
 
 =head3 C / C++
 
 Automatically handles C<-fPIC> on non-Windows platforms.
 
-Supported extensions: C<.c>, C<.cpp>, C<.cxx>, C<.cc>
+=over
 
-Known compilers: C<cc>, C<gcc>, C<clang>, C<cl> (MSVC), C<c++>, C<g++>.
+=item * B<Extensions:> C<.c>, C<.cpp>, C<.cxx>, C<.cc>
+
+=item * B<Known Compilers:> C<cc>, C<gcc>, C<clang>, C<cl> (MSVC), C<c++>, C<g++>, C<icx>.
+
+=back
 
 =head3 Rust
 
-Extensions: C<.rs>
+=over
 
-Compiler: C<rustc>
+=item * B<Extensions:> C<.rs>
 
-Windows Note: If running under Strawberry Perl (MinGW), you must have the GNU ABI target installed via C<rustup>:
+=item * B<Compiler:> C<rustc>
 
-    > rustup target add x86_64-pc-windows-gnu
+=back
+
+B<Windows Note:> If running under Strawberry Perl (MinGW), you must have the GNU ABI target installed via C<rustup> so
+the objects can link against Perl's GCC:
+
+    rustup target add x86_64-pc-windows-gnu
 
 =head3 C# / F#
 
-Uses **NativeAOT** to compile C# code directly to machine code. The source must use C<[UnmanagedCallersOnly]>.
+Uses B<NativeAOT> to compile .NET code directly to unmanaged machine code. Your C# source must tag exported methods
+with C<[UnmanagedCallersOnly]>.
 
-Extensions: C<.cs>, C<.fs>
+=over
 
-Compiler: C<dotnet> (SDK 8.0 or newer required)
+=item * B<Extensions:> C<.cs>, C<.fs>
+
+=item * B<Compiler:> C<dotnet> (SDK 8.0 or newer required)
+
+=back
 
 =head3 Go
 
-Extensions: C<.go>
+=over
 
-Compiler: C<go> or C<gccgo>
+=item * B<Extensions:> C<.go>
 
-Notes:
+=item * B<Compiler:> C<go> or C<gccgo>
+
+=back
+
+B<Caveats:>
 
 =over
 
 =item * In Polyglot mode, requires C<gccgo> or standard C<go> with C<c-archive> support.
 
-=item * The Go runtime spins up background threads (for GC and scheduling) that do not shut down cleanly when a shared library is unloaded. This often causes access violations on Windows during program exit.
-
-Affix attempts to detect Go libraries (by looking for the C<_cgo_dummy_export> symbol) and keep them in memory to
-prevent this crash. However, if you still encounter segmentation faults during global destruction, you can force a safe
-exit using C<POSIX::_exit(0)> which skips global destructors.
+=item * The Go runtime spins up background threads (for GC and scheduling) that do not shut down cleanly when a shared library is unloaded. This can cause access violations on Windows during program exit. If you encounter segmentation faults during global destruction, you can force a safe exit using C<POSIX::_exit(0)> to skip global destructors.
 
 =back
 
 =head3 Zig
 
-Extensions: C<.zig>
+=over
 
-Compiler: C<zig>
+=item * B<Extensions:> C<.zig>
+
+=item * B<Compiler:> C<zig>
+
+=back
 
 =head3 Fortran
 
-Extensions: C<.f>, C<.f90>, C<.f95>, C<.for>
+=over
 
-Compiler: C<gfortran>, C<ifx>, C<ifort>
+=item * B<Extensions:> C<.f>, C<.f90>, C<.f95>, C<.for>
+
+=item * B<Compilers:> C<gfortran>, C<ifx>, C<ifort>
+
+=back
 
 =head3 Assembly
 
-Extensions: C<.asm> (Intel syntax), C<.s> (AT&T/GNU syntax)
+Correctly handles ARM64 (AArch64) via the system compiler and x86_64 via NASM.
 
-Compilers: C<nasm> (for .asm), System C<cc> (for .s)
+=over
 
-Notes: Correctly handles ARM64 (AArch64) via the system compiler and x86_64 via NASM.
+=item * B<Extensions:> C<.asm> (Intel syntax), C<.s> (AT&T/GNU syntax)
+
+=item * B<Compilers:> C<nasm> (for .asm), System C<cc> (for .s)
+
+=back
 
 =head3 Other Languages
 
@@ -223,45 +246,46 @@ Support is also included for:
 
 =over
 
-=item Odin (C<.odin>)
+=item * B<Odin> (C<.odin>)
 
-=item D (C<.d>)
+=item * B<D> (C<.d>) - via C<dmd>, C<ldc2>, or C<gdc>
 
-=item Nim (C<.nim>)
+=item * B<Nim> (C<.nim>)
 
-=item V (C<.v>)
+=item * B<V> (C<.v>)
 
-=item Swift (C<.swift>)
+=item * B<Swift> (C<.swift>)
 
-=item Pascal (C<.pas>, C<.pp>) - via Free Pascal
+=item * B<Pascal> (C<.pas>, C<.pp>) - via C<fpc> (Free Pascal)
 
-=item Crystal (C<.cr>)
+=item * B<Crystal> (C<.cr>)
 
-=item Haskell (C<.hs>) - via GHC
+=item * B<Haskell> (C<.hs>) - via C<ghc>
 
-=item Cobol (C<.cob>, C<.cbl>) - via GnuCOBOL
+=item * B<Cobol> (C<.cob>, C<.cbl>) - via C<cobc> (GnuCOBOL)
 
-=item OCaml (C<.ml>)
+=item * B<OCaml> (C<.ml>) - via C<ocamlopt>
 
-=item Eiffel (C<.e>) - via SmartEiffel
+=item * B<Eiffel> (C<.e>) - via C<se> (SmartEiffel)
 
-=item Futhark (C<.fut>) - Transpiles to C
+=item * B<Futhark> (C<.fut>) - Transpiles to C automatically
 
 =back
 
-=head1 Platform Notes
+=head1 PLATFORM NOTES
 
 =head2 Windows (MinGW / Strawberry Perl)
 
-This environment is "Polyglot Hard Mode." C<Affix::Build> performs several tricks to make it work:
+This environment is notoriously considered "Polyglot Hard Mode." C<Affix::Build> performs several behind-the-scenes
+tricks to make it work:
 
 =over
 
-=item 1. Rust Compatibility: Forces C<rustc> to use the GNU ABI target to ensure the resulting static libraries can link against Perl's GCC.
+=item 1. B<Rust Compatibility:> Forces C<rustc> to use the C<x86_64-pc-windows-gnu> target to ensure the resulting static libraries can link against Perl's GCC.
 
-=item 2. Whole Archive: When linking static libraries (C<.a>) into a shared library, passes C<-Wl,--whole-archive> to ensure symbols are exported.
+=item 2. B<Whole Archive:> When linking static libraries (C<.a>) into a shared library, passes C<-Wl,--whole-archive> to the linker to ensure symbols aren't stripped out prematurely.
 
-=item 3. Exports: Automatically adds C<-Wl,--export-all-symbols> when linking to ensure Fortran/Assembly symbols are visible without explicit decoration.
+=item 3. B<Exports:> Automatically adds C<-Wl,--export-all-symbols> when linking to ensure Fortran/Assembly symbols are visible without explicit decoration.
 
 =back
 

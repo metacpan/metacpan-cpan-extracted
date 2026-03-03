@@ -17,7 +17,7 @@ build_requires:
   Test2::Tools::Compare: '0'
   Test2::V0: '0'
 configure_requires:
-  CPAN::Meta: '0'
+  CPAN::Meta: '2.150012'
   Exporter: '5.57'
   ExtUtils::Helpers: '0.028'
   ExtUtils::Install: '0'
@@ -63,33 +63,13 @@ optional_features:
 provides:
   Affix:
     file: lib/Affix.pm
-    version: v1.0.7
+    version: v1.0.8
   Affix::Build:
     file: lib/Affix/Build.pm
-    version: v1.0.7
-  Affix::Type::Aggregate:
-    file: lib/Affix.pm
-  Affix::Type::Array:
-    file: lib/Affix.pm
-  Affix::Type::Bitfield:
-    file: lib/Affix.pm
-  Affix::Type::Callback:
-    file: lib/Affix.pm
-  Affix::Type::Enum:
-    file: lib/Affix.pm
-  Affix::Type::Pointer:
-    file: lib/Affix.pm
-  Affix::Type::Primitive:
-    file: lib/Affix.pm
-  Affix::Type::Reference:
-    file: lib/Affix.pm
-  Affix::Type::Struct:
-    file: lib/Affix.pm
-  Affix::Type::Union:
-    file: lib/Affix.pm
+    version: v1.0.8
   Affix::Wrap:
     file: lib/Affix/Wrap.pm
-    version: v1.0.7
+    version: v1.0.8
 requires:
   Capture::Tiny: '0'
   Carp: '0'
@@ -102,7 +82,7 @@ resources:
   homepage: https://github.com/sanko/Affix.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/sanko/Affix.pm.git
-version: v1.0.7
+version: v1.0.8
 x_help_wanted:
   - Tester
   - Documenter

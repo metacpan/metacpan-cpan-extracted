@@ -5,7 +5,7 @@ requires 'Storable';
 requires 'XSLoader';
 requires 'perl', 'v5.40.0';
 on configure => sub {
-    requires 'CPAN::Meta';
+    requires 'CPAN::Meta',        '2.150012';
     requires 'Exporter',          '5.57';
     requires 'ExtUtils::Helpers', '0.028';
     requires 'ExtUtils::Install';

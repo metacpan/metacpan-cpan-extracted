@@ -70,18 +70,13 @@ SKIP: {
       is ref($pv), 'B::PVMG', "got a PV";
       ok $pv->MAGIC, "PV as a magic set";
       is $pv->MAGIC->TYPE, 'w', 'PERL_MAGIC_utf8';
-      Devel::Peek::Dump(  $content );
-
       # Now clone it
       $clone_ref = Clone::clone(\$content);
-      #is svref_2object( $clone_ref )->MAGIC->PTR, undef, 'undef ptr';
       # And inspect it with Devel::Peek.
       $pv = B::svref_2object( $clone_ref );
       is ref($pv), 'B::PVMG', "clone - got a PV";
       ok $pv->MAGIC, "clone - PV as a magic set";
       is $pv->MAGIC->TYPE, 'w', 'clone - PERL_MAGIC_utf8';
-
-      Devel::Peek::Dump(  $$clone_ref );
 
       ok 1, "Dump without segfault";
   }

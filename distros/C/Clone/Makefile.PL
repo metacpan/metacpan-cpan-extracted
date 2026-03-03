@@ -21,9 +21,9 @@ my %WriteMakefile_params = (
     clean           => { FILES => '_Inline' },
     META_MERGE      => {
       resources => {
-        license    => 'http://dev.perl.org/licenses/',
+        license    => 'https://dev.perl.org/licenses/',
         bugtracker => 'https://github.com/garu/Clone/issues',
-        repository => 'http://github.com/garu/Clone',
+        repository => 'https://github.com/garu/Clone',
       },
     },
 );
