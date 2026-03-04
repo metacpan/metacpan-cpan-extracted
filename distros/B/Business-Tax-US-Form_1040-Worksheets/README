@@ -7,7 +7,7 @@ U.S. IRS Form 1040 instructions.
 The current version of this library supports the Social
 Security Benefits Worksheet and most of the Qualified
 Dividends and Capital Gain Tax Worksheet for filing years
-2022 and 2023.  Future versions may extend the support of
+2022 through 2025.  Future versions may extend the support of
 those worksheets forwards and backwords; may offer more
 complete support for the Qualified worksheet; and may offer
 support for other worksheets found within the Form 1040

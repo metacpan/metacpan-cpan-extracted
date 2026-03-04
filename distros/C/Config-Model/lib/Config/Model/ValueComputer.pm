@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::ValueComputer 2.156;
+package Config::Model::ValueComputer 2.157;
 
 use Mouse;
 use MouseX::StrictConstructor;
@@ -544,7 +544,7 @@ Config::Model::ValueComputer - Provides configuration value computation
 
 =head1 VERSION
 
-version 2.156
+version 2.157
 
 =head1 SYNOPSIS
 
@@ -809,7 +809,7 @@ This computed default value is written to the configuration file.
 
 This default value may be already known by the application so the computed value
 should B<not> be written to the configuration file. The computed value is interesting
-because it cab be shown to the user. In this case, use the C<use_as_upstream_default>
+because it can be shown to the user. In this case, use the C<use_as_upstream_default>
 parameter:
 
  compute_known_upstream => {

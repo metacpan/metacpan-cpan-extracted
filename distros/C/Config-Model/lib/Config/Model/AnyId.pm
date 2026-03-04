@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyId 2.156;
+package Config::Model::AnyId 2.157;
 
 use 5.020;
 
@@ -820,6 +820,11 @@ sub fetch_all {
     return map { $self->fetch_with_id($_); } @keys;
 }
 
+sub fetch_size {
+    my $self = shift;
+    return scalar $self->fetch_all_indexes;
+}
+
 sub fetch ($self, @args) {
     return join(',', $self->fetch_all_values(@args) );
 }
@@ -883,10 +888,10 @@ sub fetch_all_indexes {
     return $self->_fetch_all_indexes;
 }
 
+# TODO: remove in 2027
 sub get_all_indexes {
     my $self = shift;
-    carp "get_all_indexes is deprecated. use fetch_all_indexes";
-    return $self->fetch_all_indexes;
+    croak "get_all_indexes is obsolete. use fetch_all_indexes";
 }
 
 sub children {
@@ -1070,7 +1075,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.156
+version 2.157
 
 =head1 SYNOPSIS
 
@@ -1585,6 +1590,11 @@ copied from one node to another.
 =head2 fetch_all
 
 Returns an array containing all elements held by the hash or list.
+
+=head2 fetch_size
+
+Return the number of elements of the array or the number of keys of
+the hash. (from v2.157)
 
 =head2 fetch_value
 

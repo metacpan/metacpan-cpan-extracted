@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use parent 'Alien::Base';
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 sub _add_rpath {
     my ($self, $libs) = @_;
@@ -46,9 +46,19 @@ This module provides the libpq C library (PostgreSQL client library).
 It will use the system library if available, or download and build
 from source if necessary.
 
+The source build is configured without OpenSSL, readline, zlib, and ICU
+for a minimal footprint.  SSL/TLS connections require system-provided libpq.
+
 =head1 METHODS
 
-All methods are inherited from L<Alien::Base>.
+=head2 libs
+
+=head2 libs_static
+
+On macOS with a share install, appends C<-Wl,-rpath> so the dynamic
+linker can find C<libpq.dylib> after Alien::Build DESTDIR relocation.
+
+All other methods are inherited from L<Alien::Base>.
 
 =head1 SEE ALSO
 

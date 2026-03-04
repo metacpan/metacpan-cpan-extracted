@@ -11,6 +11,13 @@ diag 'cflags: ' . Alien::libpq->cflags;
 diag 'libs: ' . Alien::libpq->libs;
 diag 'install_type: ' . Alien::libpq->install_type;
 
+SKIP: {
+    skip 'rpath only on macOS share installs', 2
+        unless $^O eq 'darwin' && Alien::libpq->install_type eq 'share';
+    like(Alien::libpq->libs, qr/-Wl,-rpath/, 'libs includes -rpath on macOS share');
+    like(Alien::libpq->libs_static, qr/-Wl,-rpath/, 'libs_static includes -rpath on macOS share');
+}
+
 xs_ok { xs => do { local $/; <DATA> }, verbose => 1 }, with_subtest {
     my $conninfo = $ENV{TEST_PG_CONNINFO};
     plan skip_all => 'TEST_PG_CONNINFO not set' unless $conninfo;
@@ -32,9 +39,14 @@ check_connect(conninfo)
     const char *conninfo
 CODE:
     PGconn *conn = PQconnectdb(conninfo);
-    RETVAL = (PQstatus(conn) != CONNECTION_OK);
-    if (RETVAL)
-        fprintf(stderr, "PQconnectdb: %s\n", PQerrorMessage(conn));
-    PQfinish(conn);
+    if (!conn) {
+        fprintf(stderr, "PQconnectdb returned NULL\n");
+        RETVAL = 1;
+    } else {
+        RETVAL = (PQstatus(conn) != CONNECTION_OK);
+        if (RETVAL)
+            fprintf(stderr, "PQconnectdb: %s\n", PQerrorMessage(conn));
+        PQfinish(conn);
+    }
 OUTPUT:
     RETVAL

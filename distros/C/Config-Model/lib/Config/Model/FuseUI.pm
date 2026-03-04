@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::FuseUI 2.156;
+package Config::Model::FuseUI 2.157;
 
 # there's no Singleton with Mouse
 use Mouse;
@@ -320,7 +320,7 @@ Config::Model::FuseUI - Fuse virtual file interface for Config::Model
 
 =head1 VERSION
 
-version 2.156
+version 2.157
 
 =head1 SYNOPSIS
 
@@ -373,7 +373,7 @@ For some configuration, mapping each parameter to a file may lead to a high numb
 
 =item *
 
-The content of a file is when writing a wrong value. I.e. the files is
+The content of a file is trashed when writing a wrong value. I.e. the files is
 empty and the old value is lost.
 
 =back

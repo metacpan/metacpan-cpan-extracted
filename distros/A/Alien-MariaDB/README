@@ -1,0 +1,38 @@
+NAME
+    Alien::MariaDB - Find or build libmariadb client library
+
+SYNOPSIS
+        use Alien::MariaDB;
+        use ExtUtils::MakeMaker;
+
+        WriteMakefile(
+            ...
+            CONFIGURE_REQUIRES => {
+                'Alien::MariaDB' => 0,
+            },
+            CCFLAGS => Alien::MariaDB->cflags,
+            LIBS    => Alien::MariaDB->libs,
+        );
+
+DESCRIPTION
+    This module provides the MariaDB Connector/C client library
+    (libmariadb). It will use the system library if available, or download
+    and build from source if necessary.
+
+METHODS
+    Inherits all methods from Alien::Base.
+
+  libs
+    Overridden to add "-Wl,-rpath" flags on macOS share installs so the
+    dynamic linker can find the bundled libmariadb at runtime.
+
+SEE ALSO
+    Alien::Base, <https://mariadb.com/kb/en/mariadb-connector-c/>
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

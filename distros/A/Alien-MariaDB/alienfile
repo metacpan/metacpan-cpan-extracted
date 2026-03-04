@@ -1,0 +1,97 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'libmariadb';
+
+share {
+    requires 'Alien::Build::Plugin::Build::CMake' => 0;
+
+    start_url 'https://archive.mariadb.org/';
+    plugin 'Fetch::HTTPTiny';
+    plugin 'Decode::HTML';
+
+    download sub {
+        my ($build) = @_;
+
+        my $listing = $build->fetch;
+        $listing = $build->decode($listing) if $listing->{type} eq 'html';
+
+        my @dirs =
+            sort { _vercmp($b->{ver}, $a->{ver}) }
+            grep { $_->{ver}[0] == 3 }
+            map  { $_->{ver} = [ $_->{filename} =~ /(\d+)\.(\d+)\.(\d+)/ ]; $_ }
+            grep { $_->{filename} =~ /connector-c-\d+\.\d+\.\d+\/?$/ }
+            @{ $listing->{list} };
+
+        die "no connector-c directories found" unless @dirs;
+        my $dir = $dirs[0];
+        $build->log("picked $dir->{filename}");
+
+        my $listing2 = $build->fetch($dir->{url});
+        $listing2 = $build->decode($listing2) if $listing2->{type} eq 'html';
+
+        my ($tarball) = grep { $_->{filename} =~ /src\.tar\.gz$/ }
+                        @{ $listing2->{list} };
+
+        die "no source tarball in $dir->{url}" unless $tarball;
+
+        my $file = $build->fetch($tarball->{url});
+        die "expected file, got $file->{type}" unless $file->{type} eq 'file';
+
+        require File::Basename;
+        my $path = File::Basename::basename($file->{filename});
+        if ($file->{content}) {
+            open my $fh, '>:raw', $path or die "write $path: $!";
+            print $fh $file->{content};
+            close $fh;
+        } elsif ($file->{path}) {
+            require File::Copy;
+            File::Copy::copy($file->{path}, $path) or die "copy: $!";
+        }
+
+        my $version = join '.', @{ $dir->{ver} };
+        $build->runtime_prop->{version} = $version;
+    };
+
+    plugin 'Extract' => 'tar.gz';
+    plugin 'Build::CMake';
+
+    build [
+        sub {
+            my $build = shift;
+            return unless $^O eq 'darwin';
+            my $ssl = `brew --prefix openssl 2>/dev/null`;
+            chomp $ssl;
+            $ENV{OPENSSL_ROOT_DIR} = $ssl if $ssl && -d $ssl;
+        },
+        ['%{cmake}',
+            @{ meta->prop->{plugin_build_cmake}->{args} },
+            '-DCMAKE_BUILD_TYPE=RelWithDebInfo',
+            '-DCLIENT_PLUGIN_AUTH_GSSAPI_CLIENT=OFF',
+            '-DWITH_EXTERNAL_ZLIB=OFF',
+            '-DWITH_UNIT_TESTS=OFF',
+            '-DWITH_CURL=OFF',
+            '%{.install.extract}',
+        ],
+        ['%{cmake}', '--build', '.'],
+        ['%{cmake}', '--install', '.', '--prefix', '%{.install.prefix}'],
+        sub {
+            my $build = shift;
+            return unless $^O eq 'darwin';
+            my $prefix  = $build->install_prop->{prefix};
+            my $destdir = $ENV{DESTDIR} // '';
+            my $lib     = "$destdir$prefix/lib";
+
+            for my $dylib (glob "$lib/libmariadb*.dylib") {
+                next if -l $dylib;
+                (my $name = $dylib) =~ s{.*/}{};
+                system('install_name_tool', '-id', "\@rpath/$name", $dylib) == 0
+                    or die "install_name_tool failed on $dylib";
+            }
+        },
+    ];
+};
+
+sub _vercmp {
+    my ($x, $y) = @_;
+    $x->[0] <=> $y->[0] || $x->[1] <=> $y->[1] || $x->[2] <=> $y->[2];
+}

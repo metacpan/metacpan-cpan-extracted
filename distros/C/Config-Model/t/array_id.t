@@ -29,6 +29,7 @@ my @element = (
 # minimal set up to get things working
 $model->create_config_class(
     name    => "Master",
+    gist => '@{olist} olist elts, @{plain_list} plain_list elts',
     element => [
         bounded_list => {
             type       => 'list',
@@ -139,10 +140,14 @@ subtest "bounded list" => sub {
     ok( $b, "bounded list created" );
     is( $inst->needs_save, 0, "verify instance needs_save status after element creation" );
 
+    is($b->fetch_size, 0, "check size is zero");
+
+
     # each line triggers 2 changes: element creation and value storage
     is( $b->fetch_with_id(1)->store('foo'), 1, "stored in 1" );
     is( $b->fetch_with_id(0)->store('baz'), 1, "stored in 0" );
     is( $b->fetch_with_id(2)->store('bar'), 1, "stored in 2" );
+    is($b->fetch_size, 3, "check size after element creation");
     is( $inst->needs_save, 3, "verify instance needs_save status after storing into element" );
     print join( "\n", $inst->list_changes("\n") ), "\n" if $trace;
 
@@ -284,6 +289,9 @@ subtest "test move swap with node list" => sub {
     $ol->remove(0);
     print $root->dump_tree( ) if $trace;
     is( $ol->fetch_with_id(0)->fetch_element('X')->fetch, 'Bv', "check after move" );
+
+    # test gist with
+    is($root->fetch_gist, "4 olist elts, 0 plain_list elts", "gist with array size");
 
     # test node gist in an array display
     my $olgist = $ol->fetch_with_id(5);

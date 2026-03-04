@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::Any 2.156;
+package Config::Model::Backend::Any 2.157;
 
 use v5.20;
 
@@ -35,6 +35,7 @@ has 'node' => (
 
 sub skip_open { return 0; }
 
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub read {
     my $self = shift;
     my $err  = "Internal error: read not defined in backend $self->{name}.";
@@ -97,6 +98,7 @@ sub read_global_comments {
             last;
         }
     }
+    return;
 }
 
 sub associates_comments_with_data {
@@ -193,7 +195,7 @@ Config::Model::Backend::Any - Virtual class for other backends
 
 =head1 VERSION
 
-version 2.156
+version 2.157
 
 =head1 SYNOPSIS
 

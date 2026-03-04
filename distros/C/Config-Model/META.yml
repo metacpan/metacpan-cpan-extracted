@@ -3,12 +3,15 @@ abstract: 'a framework to validate, migrate and edit configuration files'
 author:
   - 'Dominique Dumont'
 build_requires:
+  Config::INI::Reader: '0'
   Config::Model::Tester: '4.002'
   Config::Model::Tester::Setup: '0'
   File::Copy: '0'
   File::Spec: '0'
   IO::File: '0'
+  JSON: '0'
   Module::Build: '0.34'
+  TOML::Tiny: '0'
   Test::Differences: '0'
   Test::Exception: '0'
   Test::File::Contents: '0'
@@ -19,12 +22,15 @@ build_requires:
   Test::Pod: '1.00'
   Test::Synopsis::Expectation: '0'
   Test::Warn: '0.11'
+  Text::Levenshtein::Damerau: '0'
+  YAML::PP: '0'
+  YAML::Tiny: '0'
   boolean: '0'
   lib: '0'
 configure_requires:
   Module::Build: '0.34'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -45,7 +51,6 @@ requires:
   File::HomeDir: '0'
   File::Path: '0'
   Hash::Merge: '0.12'
-  JSON: '0'
   List::MoreUtils: '0'
   List::Util: '0'
   Log::Log4perl: '1.11'
@@ -66,7 +71,6 @@ requires:
   Storable: '0'
   Text::Levenshtein::Damerau: '0'
   Text::Wrap: '0'
-  YAML::Tiny: '0'
   base: '0'
   feature: '0'
   open: '0'
@@ -81,7 +85,7 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model.git
-version: '2.156'
+version: '2.157'
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: LGPL-2.1

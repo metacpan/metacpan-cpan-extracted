@@ -1,5 +1,5 @@
 package Crypt::HSM::Encrypt;
-$Crypt::HSM::Encrypt::VERSION = '0.025';
+$Crypt::HSM::Encrypt::VERSION = '0.026';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Encrypt - A PKCS11 ongoing encryption operation.
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 

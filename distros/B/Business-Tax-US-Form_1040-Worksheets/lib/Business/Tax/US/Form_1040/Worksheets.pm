@@ -8,7 +8,7 @@ BEGIN {
     use Exporter ();
     use List::Util qw( min );
     our ($VERSION, @ISA, @EXPORT_OK);
-    $VERSION     = '0.07';
+    $VERSION     = '0.08';
     @ISA         = qw(Exporter);
     @EXPORT_OK   = qw(
         social_security_benefits
@@ -54,24 +54,24 @@ B<Acronyms:>
 =item *
 
 B<SSBW:> I<Social Security Benefits Worksheet>, I<e.g.,> as found on page 32
-of IRS Form 1040 Instructions for filing year 2024.
+of IRS Form 1040 Instructions for filing year 2025.
 
 =item *
 
 B<QDCGTW:> I<Qualified Dividends and Capital Gain Tax Worksheet>, I<e.g.,> as
-found on page 36 of those 2024 Instructions.
+found on page 38 of those 2025 Instructions.
 
 =back
 
 The current version of this library supports the SSBW and most of the QDCGTW
-for filing years 2022, 2023 and 2024.  Future versions may extend the support of
-those worksheets forwards and backwords; may offer more complete support for
-the QDCGTW; and may offer support for other worksheets found within the Form
-1040 instructions.
+for filing years 2022, 2023, 2024 and 2025.  Future versions may extend the
+support of those worksheets forwards and backwords; may offer more complete
+support for the QDCGTW; and may offer support for other worksheets found
+within the Form 1040 instructions.
 
 B<The accuracy of the calculations in these functions has not been reviewed by
-the Internal Revenue Service, any other tax authority, any accountant or any
-attorney.  Use at your own risk!>
+the Internal Revenue Service, any other tax authority, accountant or attorney.
+Use at your own risk!>
 
 =head1 SUBROUTINES
 
@@ -83,13 +83,14 @@ attorney.  Use at your own risk!>
 
 Calculate taxable social security benefits per the SSBW for the purpose of
 entering the amount of such taxable benefits on IRS Form 1040.  (For filing
-year 2024, these would be lines 6a and 6b on that form.)
+year 2025, these would be lines 6a and 6b on that form.)
 
     my $benefits = social_security_benefits( $inputs );
 
 =item * Arguments
 
-Single hash reference with the following keys (values are purely for example):
+Single hash reference with the following keys (values displayed here are
+purely for example):
 
     $inputs = {
         box5    => 30000.00,    # Sum of box 5 on all Forms SSA-1099 and RRB-1099
@@ -98,7 +99,7 @@ Single hash reference with the following keys (values are purely for example):
         l3b     => 6000.00,
         l4b     => 0,
         l5b     => 8000.00,
-        l7      => 1600.00,
+        l7a     => 1600.00,     # Use 'l7' for tax years 2022 through 2024
         l8      => 1000.00,
         l2a     => 0,
         s1l11     => 0,         # Schedule 1 (Form 1040), line 11
@@ -114,12 +115,19 @@ Single hash reference with the following keys (values are purely for example):
         s1l23     => 0,
         s1l25     => 0,
         status     => 'single', # Social Security Benefits Worksheet, line 8
-        filing_year => 2023,
+        filing_year => 2025,
     };
 
 Appropriate values for elements in C<$inputs>:
 
 =over 4
+
+=item * C<l7a>: Capital gain (or loss):  Number holding dollar amount (to
+2-decimal maximum).  If value is C<0>, element may be omitted.
+
+B<NOTE: For tax years up through 2024, use the value on Line 7 of IRS Form
+1040.  Beginning with tax year 2025, this value is entered on Line 7a of IRS
+Form 1040.>
 
 =item * C<status>:  String holding one of C<married single married_sep>.
 
@@ -159,12 +167,16 @@ my %data_2023_ssb = map { $_ => $data_2022_ssb{$_} } keys %data_2022_ssb;
 # inspection of 2024 Soc Sec worksheet indicates no change in
 # parameters
 my %data_2024_ssb = map { $_ => $data_2023_ssb{$_} } keys %data_2023_ssb;
+# inspection of 2025 Soc Sec worksheet indicates no change in
+# parameters
+my %data_2025_ssb = map { $_ => $data_2024_ssb{$_} } keys %data_2024_ssb;
 
 our %params = (
     ssb => {
         2022 => { %data_2022_ssb },
         2023 => { %data_2023_ssb },
         2024 => { %data_2024_ssb },
+        2025 => { %data_2025_ssb },
     },
     qd => {
         2022 => {
@@ -200,6 +212,18 @@ our %params = (
             married_sep_amt_b           => 291850,
             married_amt_b               => 583750,
             head_of_household_amt_b     => 551350,
+            percentage_a                => 0.15,
+            percentage_b                => 0.20,
+        },
+        2025 => {
+            worksheet_line_count        => 21,
+            single_or_married_sep_amt_a => 48350,
+            married_amt_a               => 96700,
+            head_of_household_amt_a     => 64750,
+            single_amt_b                => 533400,
+            married_sep_amt_b           => 300000,
+            married_amt_b               => 600050,
+            head_of_household_amt_b     => 566700,
             percentage_a                => 0.15,
             percentage_b                => 0.20,
         },
@@ -247,20 +271,32 @@ sub _social_security_benefits_engine {
     my ($inputs) = @_;
     croak "Argument to social_security_benefits() must be hashref"
         unless ref($inputs) eq 'HASH';
-    my @numerics = qw(
-        box5
-        l1z
-        l2b
-        l3b
-        l4b
-        l5b
-        l7
-        l8
-        l2a
-        s1l11 s1l12 s1l13 s1l14 s1l15
-        s1l16 s1l17 s1l18 s1l19 s1l20
-        s1l23
-        s1l25
+
+    croak "Must include 4-digit value for 'filing_year' in argument to social_security_benefits()"
+        unless $inputs->{filing_year};
+    my $filing_year = $inputs->{filing_year}; # TODO add test for numeric; required element
+    croak "Must include 4-digit value for 'filing_year' in argument to social_security_benefits()"
+        unless $inputs->{filing_year} =~ m/^\d{4}$/;
+    croak "'filing_year' must be > 2000" unless $inputs->{filing_year} > 2000;
+
+    my @numerics = (
+        qw(
+            box5
+            l1z
+            l2b
+            l3b
+            l4b
+            l5b
+        ),
+        $filing_year <= 2024 ? 'l7' : 'l7a',
+        qw(
+            l8
+            l2a
+            s1l11 s1l12 s1l13 s1l14 s1l15
+            s1l16 s1l17 s1l18 s1l19 s1l20
+            s1l23
+            s1l25
+        ),
     );
     my %permitted = map { $_ => 1 } (@numerics, 'status', 'filing_year');
     for my $k (keys %{$inputs}) {
@@ -277,7 +313,6 @@ sub _social_security_benefits_engine {
         $data->{$el} = $inputs->{$el} // 0;
     }
     $data->{status} = $inputs->{status};
-    my $filing_year = $inputs->{filing_year}; # TODO add test for numeric; required element
     my @lines = (undef, (undef) x $params{ssb}{$filing_year}{worksheet_line_count});
     my $formatted_lines;
     $lines[1] = $data->{box5};
@@ -288,7 +323,7 @@ sub _social_security_benefits_engine {
         $data->{l3b} +
         $data->{l4b} +
         $data->{l5b} +
-        $data->{l7} +
+        ($filing_year <= 2024 ? $data->{l7} : $data->{l7a}) +
         $data->{l8};
     $lines[4] = $data->{l2a};
     $lines[5] = $lines[2] + $lines[3] + $lines[4];
@@ -411,7 +446,7 @@ sub pp_ssbw {
         undef,
         { formatting => $f[1], text => "Enter sum of 1099s, box 5" },
         { formatting => $f[2], text => "Line 1 x 50%" },
-        { formatting => $f[2], text => "Sum of 1040 lines 1z 2b 3b 4b 5b 7 8" },
+        { formatting => $f[2], text => "Sum of 1040 lines 1z 2b 3b 4b 5b 7/7a 8" },
         { formatting => $f[2], text => "1040 line 2a" },
         { formatting => $f[2], text => "Line 2 + Line 3 + Line 4" },
         { formatting => $f[2], text => "Schedule 1, sum lines 11-20, 23, 25" },
@@ -443,6 +478,8 @@ sub pp_ssbw {
     return 1;
 }
 
+#######################################
+
 =head2 C<qualified_dividends_capital_gains_tax()>
 
 =over 4
@@ -451,7 +488,7 @@ sub pp_ssbw {
 
 B<Partial calculation> of taxes due per the QDCGTW for the purpose of
 entering the amount of such taxes due on IRS Form 1040.  (For filing
-year 2024, these would be Form 1040 line 16.)
+year 2025, the relevant line on Form 1040 would be line 16.)
 
     my $lines = qualified_dividends_capital_gains_tax( $inputs );
 
@@ -463,8 +500,8 @@ Reference to a hash with 6 required elements: C<l15 l3a sD status1 status2 filin
         l15 => 7000.00,                     # Form 1040, line 15
         l3a => 4900.00,                     # Form 1040, line 3a
         sD =>  1600.00,                     # If filing Schedule D, enter smaller
-                                            # of Schedule D, line 15 o4 16;
-                                            # if not, enter Form 1040, line 7.
+                                            # of Schedule D, line 15 or 16;
+                                            # if not, enter Form 1040, line 7a.
         status1 => 'single_or_married_sep', # Permissible values:
                                             #  single_or_married_sep
                                             #  married
@@ -474,7 +511,7 @@ Reference to a hash with 6 required elements: C<l15 l3a sD status1 status2 filin
                                             #  married_sep
                                             #  married
                                             #  head_of_household
-        filing_year => 2023,
+        filing_year => 2025,
     };
 
 =item * Return Value
@@ -654,7 +691,7 @@ sub pp_qdcgtw {
         undef,
         { formatting => $f[2], text => "Enter Form 1040, line 15" },
         { formatting => $f[1], text => "Enter Form 1040, line 3a" },
-        { formatting => $f[1], text => "Sched. D/Form 1040, line 7" },
+        { formatting => $f[1], text => "Sche. D/Form 1040, line 7/7a" },
         { formatting => $f[1], text => "Line 2 - Line 3" },
         { formatting => $f[2], text => "Line 1 - Line 4" },
         { formatting => $f[2], text => "Filing status amount (1)" },

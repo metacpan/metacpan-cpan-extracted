@@ -1,5 +1,6 @@
 ^\.git
 ^\.github/
+^\.claude/
 ^Alien-libpq-
 ^_alien/
 ^blib/

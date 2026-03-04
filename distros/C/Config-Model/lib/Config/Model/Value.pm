@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.156;
+package Config::Model::Value 2.157;
 
 use v5.20;
 
@@ -25,6 +25,8 @@ use Config::Model::Exception;
 use Config::Model::ValueComputer;
 use Config::Model::IdElementReference;
 use Config::Model::Warper;
+use Config::Model::Value::Update;
+
 use Log::Log4perl qw(get_logger :levels);
 use Scalar::Util qw/weaken/;
 use Carp;
@@ -71,8 +73,20 @@ has value_type => ( is => 'rw', isa => 'ValueType' );
 my @common_int_params = qw/min max mandatory /;
 has \@common_int_params => ( is => 'ro', isa => 'Maybe[Int]' );
 
-my @common_hash_params = qw/replace assert warn_if_match warn_unless_match warn_if warn_unless help/;
+my @common_hash_params = qw/replace assert update warn_if_match warn_unless_match warn_if warn_unless help/;
 has \@common_hash_params => ( is => 'ro', isa => 'Maybe[HashRef]' );
+
+has update_obj => (
+    is => 'ro',
+    isa => 'Undef|Config::Model::Value::Update',
+    handles => [qw/get_update_value/],
+    lazy => 1,
+    builder => sub ($self) {
+        if (my $ref = $self->update) {
+            return Config::Model::Value::Update->new(%$ref, location => $self->location);
+        }
+    }
+);
 
 my @common_list_params = qw/choice/;
 has \@common_list_params => ( is => 'ro', isa => 'Maybe[ArrayRef]' );
@@ -572,6 +586,7 @@ sub set_properties ($self, @args) {
     }
 
     $self->set_help( \%args );
+    $self->set_update( \%args );
     $self->set_value_type( \%args );
     $self->set_default( \%args );
     $self->set_convert( \%args ) if defined $args{convert};
@@ -605,10 +620,28 @@ sub set_properties ($self, @args) {
 }
 
 # simple but may be overridden
-sub set_help {
-    my ( $self, $args ) = @_;
+sub set_help ($self, $args) {
     return unless defined $args->{help};
     $self->{help} = delete $args->{help};
+    return;
+}
+
+sub set_update ($self, $args) {
+    return unless defined $args->{update};
+    $self->{update} = delete $args->{update};
+    return;
+}
+
+sub update_from_file ($self) {
+    return unless defined $self->update;
+
+    my $v = $self->get_update_value;
+    if (defined $v) {
+        $user_logger->info("Updating ". $self->location. " value from file");
+        $self->store($v);
+        # tell caller that something was done. User logger provides the details
+        return '';
+    }
     return;
 }
 
@@ -760,6 +793,10 @@ sub get_info {
     }
     elsif ( defined $self->computed_refer_to ) {
         push @items, "computed reference to: " . $self->computed_refer_to;
+    }
+
+    if ($self->update) {
+        push @items, "update value from " . $self->update_obj->get_info;
     }
 
     my $m = $self->mandatory;
@@ -1999,7 +2036,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.156
+version 2.157
 
 =head1 SYNOPSIS
 
@@ -2089,6 +2126,11 @@ A reference to the Id of a hash of list element. In other word, the
 value is an enumerated type where the possible values (choice) is
 defined by the existing keys of a has element somewhere in the tree. See
 L</"Value Reference">.
+
+=item *
+
+update from an external file: a value can be extracted from an
+external file.
 
 =back
 
@@ -2397,6 +2439,10 @@ For instance:
    '.' => 'help for all other values'
  }
 
+=item update
+
+See L</update>
+
 =back
 
 =head2 Value types
@@ -2446,6 +2492,48 @@ A directory name or path. A warning is issued if the directory
 does not exists (or is a plain file)
 
 =back
+
+=head2 update
+
+Specify how the value can be updated from an external file. User must
+specify, the file type (ini, yaml, json or toml), the file path
+(absolute or relative to where the program is run), and the sub path
+to get the data. Several files can be tried.
+
+For instance, the value of C<repository> element below is loaded from
+C<package.json> using C<repository> and C<url> keys:
+
+  element => [
+    repository => {
+      type => 'leaf',
+      value_type => 'unline',
+      update => [
+        {
+          type => 'json',
+          file => "package.json",
+          subpath => "repository.url"
+        }
+      ]
+    }
+  ]
+
+Here's an example to try 2 files:
+
+  update => [ {
+    type => 'json',
+    file => 'META.json',
+    subpath => 'resources.repository.url'
+  } , {
+    type => 'ini',
+    file => 'dist.ini',
+    subpath => 'MetaResources.repository\.url'
+  }]
+
+Note the C<\.> to allow a sub path element with an embedded dot.
+
+Note that value are updated when L</update_from_file> method is
+called. This is the case when running a C<cme udpate> command (See
+L<App::Cme::Command::update> for details)
 
 =head1 Warp: dynamic value configuration
 
@@ -2883,6 +2971,12 @@ Get a value from a directory like path.
 
 Set a value from a directory like path.
 
+=head2 update_from_file
+
+Trigger an update from files specified in C<update> configuration
+parameter. This method is intented to be called by
+L<Config::Model::Instance/update>
+
 =head1 Examples
 
 =head2 Number with min and max values
@@ -2982,7 +3076,7 @@ A specific warning can be specified:
     warn_if_match => {
         '/A-Z/' => {
             fix  => '$_ = lc;',
-            mesg => 'NO UPPER CASE PLEASE'
+            msg => 'NO UPPER CASE PLEASE'
         }
     },
  },

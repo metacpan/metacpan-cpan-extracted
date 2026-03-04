@@ -151,6 +151,8 @@ subtest "mega regexp" => sub {
         # function call
         [ 'a:.b("foo(a > b)")', [ 'a',  ':.b','"foo(a > b)"','x',            'x',  'x',      'x',        'x' ] ], # tricky value with ()
         [ q!a:.b('foo(a > b)')!,[ 'a',  ':.b',"'foo(a > b)'",'x',            'x',  'x',      'x',        'x' ] ], # tricky value with ()
+        [ 'a:.b("bar","foo(a > b)")', [ 'a',  ':.b','"bar","foo(a > b)"','x','x',  'x',      'x',        'x' ] ], # tricky value with ()
+        [ q!a:.b('bar','foo(a > b)')!,[ 'a',  ':.b',"'bar','foo(a > b)'",'x','x',  'x',      'x',        'x' ] ], # tricky value with ()
     );
 
     foreach my $subtest (@regexp_test) {
@@ -651,9 +653,9 @@ subtest "test clear instruction" => sub {
 };
 
 subtest "test load data from file" => sub {
-    $root->load("a_string=.file(README.md)");
-    like( $root->grab_value('a_string'), qr/# What is Config-Model project/,
-          "slurp README.md file");
+    $root->load("a_string=.file(README.org)");
+    like( $root->grab_value('a_string'), qr/\* What is Config-Model project/,
+          "slurp README.org file");
 };
 
 subtest "test load data from JSON file" => sub {
@@ -690,6 +692,12 @@ subtest "test load data from JSON utf8 file" => sub {
 subtest "test load data from YAML file" => sub {
     $root->load('a_string=.yaml("t/lib/load-data.yaml/0/foo/bar")');
     is( $root->grab_value('a_string'), "bar yaml value", "extract data from yaml file");
+};
+
+# Mostly target dist.ini files for Perl modules using Dist::Zilla
+subtest "test load data from INI file" => sub {
+    $root->load('a_string=.ini("t/lib/load-data.ini/foo/bar")');
+    is( $root->grab_value('a_string'), "bar INI value", "extract data from INI file");
 };
 
 subtest "load data from environment" => sub {

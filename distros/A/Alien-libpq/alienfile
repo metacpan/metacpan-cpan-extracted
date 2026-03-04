@@ -3,7 +3,6 @@ use alienfile;
 plugin 'PkgConfig' => 'libpq';
 
 share {
-    # Detect latest stable version from FTP listing, download tarball
     download sub {
         my $build = shift;
         require HTTP::Tiny;
@@ -14,7 +13,7 @@ share {
 
         my @versions;
         while ($res->{content} =~ /href="v(\d+)\.(\d+)\/"/g) {
-            push @versions, [ $1 + 0, $2 + 0 ];
+            push @versions, [ $1, $2 ];
         }
         @versions = sort { $b->[0] <=> $a->[0] || $b->[1] <=> $a->[1] } @versions;
         die "No PostgreSQL versions found\n" unless @versions;
@@ -37,7 +36,7 @@ share {
     plugin 'Build::Autoconf';
 
     # PostgreSQL requires GNU make; on BSDs %{make} resolves to BSD make
-    my $make = ($^O =~ /bsd/i) ? 'gmake' : '%{make}';
+    my $make = ($^O =~ /bsd|dragonfly/i) ? 'gmake' : '%{make}';
 
     build [
         '%{configure} --prefix=%{.install.prefix} --without-readline --without-zlib --without-icu --without-openssl',

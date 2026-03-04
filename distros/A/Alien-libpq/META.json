@@ -4,7 +4,7 @@
       "vividsnow"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -34,7 +34,7 @@
          "requires" : {
             "Alien::Base" : "0",
             "Alien::Build" : "0.25",
-            "perl" : "5.010"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -42,12 +42,6 @@
             "Test::Alien" : "0",
             "Test::More" : "0"
          }
-      }
-   },
-   "provides" : {
-      "Alien::libpq" : {
-         "file" : "lib/Alien/libpq.pm",
-         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -58,7 +52,7 @@
          "web" : "https://github.com/vividsnow/perl5-alien-libpq"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.84",
       "requires" : {

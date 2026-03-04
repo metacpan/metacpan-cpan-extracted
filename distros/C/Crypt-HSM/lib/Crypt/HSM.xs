@@ -11,6 +11,10 @@
 #define newSVbool(value) newSVsv(boolSV(value))
 #endif
 
+#ifndef mXPUSHpvs
+#define mXPUSHpvs(s)    mXPUSHp("" s "", sizeof(s)-1)
+#endif
+
 #include "cryptoki.h"
 #include "refcount.h"
 

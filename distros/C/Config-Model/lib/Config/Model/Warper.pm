@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Warper 2.156;
+package Config::Model::Warper 2.157;
 
 use Mouse;
 
@@ -224,6 +224,7 @@ sub refresh_values_from_master {
 
         my $warper = $self->warped_object->grab(
             step => $warper_path,
+            grab_non_available => 1,
             mode => 'loose',
         );
 
@@ -623,7 +624,7 @@ Config::Model::Warper - Warp tree properties
 
 =head1 VERSION
 
-version 2.156
+version 2.157
 
 =head1 SYNOPSIS
 

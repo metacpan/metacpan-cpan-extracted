@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::BackendMgr 2.156;
+package Config::Model::BackendMgr 2.157;
 
 use Mouse;
 use strict;
@@ -383,7 +383,6 @@ sub auto_write_init {
     );
 
     # used bby C::M::Dumper and C::M::DumpAsData
-    # TODO: is this needed once multi backend are removed
     $self->{auto_write}{$backend} = 1;
 
     my $wb;
@@ -523,7 +522,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.156
+version 2.157
 
 =head1 SYNOPSIS
 

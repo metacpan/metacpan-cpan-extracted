@@ -20,14 +20,8 @@ if ( $Config{osname} ne 'linux' ) {
     plan skip_all => "Not a Linux system";
 }
 
-my @lsmod = eval { `lsmod`; };
-
-if ($@) {
-    plan skip_all => "Cannot check is fuse kernel module is loaded: $@";
-}
-
-if ( not any {/fuse/} @lsmod ) {
-    plan skip_all => "fuse kernel module is not loaded";
+if ( not -w '/dev/fuse' ) {
+    plan skip_all => "fuse kernel module is not loaded. /dev/fuse is either missing or not writable";
 }
 
 if ( system(q!bash -c 'type -p fusermount' > /dev/null!) != 0 ) {
@@ -142,6 +136,8 @@ $a_boolean_fhw->print("1");
 $a_boolean_fhw->close;
 is( $fused->child('a_boolean')->slurp, "1\n", "check new a_boolean content (set to 1)" );
 
+# cannot use Test::Log4perl because the warning comes from a forked process
+note("The test below shows a warning coming from a forked process, which is expected");
 $a_boolean_fhw = $fused->child('a_boolean')->openw;
 $a_boolean_fhw->print("a");
 $a_boolean_fhw->close;

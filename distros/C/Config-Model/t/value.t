@@ -1,6 +1,3 @@
-# -*- cperl -*-
-
-
 use ExtUtils::testlib;
 use Test::More;
 use Test::Exception;
@@ -10,17 +7,26 @@ use Config::Model;
 use Config::Model::Tester::Setup qw/init_test/;
 use Config::Model::Value;
 use Test::Log::Log4perl;
+use Path::Tiny;
 
 use strict;
 use warnings;
 
 use 5.010;
 
-Test::Log::Log4perl->ignore_priority("info");
-
 binmode STDOUT, ':encoding(UTF-8)';
 
+my $test_dir = path("wr_root/value");
+$test_dir->mkdir;
+my $ini_file = $test_dir->child('test.ini');
+my $json_file = $test_dir->child('test.json');
+my $yaml_file = $test_dir->child('test.yaml');
+my $toml_file = $test_dir->child('test.toml');
+
 my ($model, $trace) = init_test();
+
+# override setup done in init_test()
+Test::Log::Log4perl->ignore_priority("debug");
 
 # minimal set up to get things working
 $model->create_config_class(
@@ -285,8 +291,87 @@ $failed++ unless $v =~ /$item[1]/ ;
         t_dir => {
             type => 'leaf',
             value_type => 'dir'
-        }
-    ],                          # dummy class
+        },
+    ],
+);
+
+$model->create_config_class(
+    name    => "IniLoad",
+    element => [
+        data_from_ini_file => {
+            type => 'leaf',
+            value_type => 'uniline',
+            update => {
+                when_missing => 'warn',
+                files => [{ type => 'ini', file => $ini_file->stringify, subpath => "foo.bar"}]
+            }
+        },
+    ],
+);
+
+$model->create_config_class(
+    name    => "DistIniLoad",
+    element => [
+        data_from_ini_file => {
+            type => 'leaf',
+            value_type => 'uniline',
+            update => {
+                when_missing => 'warn',
+                files => [{
+                    type => 'ini',
+                    file => $ini_file->stringify,
+                    subpath => "MetaResources.bugtracker.web"
+                }]
+            }
+        },
+    ],
+);
+
+$model->create_config_class(
+    name    => "JsonLoad",
+    element => [
+        data_from_json_file => {
+            type => 'leaf',
+            value_type => 'uniline',
+            update => {
+                when_missing => 'warn',
+                files => [
+                    { type => 'json', file => $json_file->stringify, subpath => "foo.bar"}
+                ]
+            }
+        },
+    ],
+);
+
+$model->create_config_class(
+    name    => "YamlLoad",
+    element => [
+        data_from_yaml_file => {
+            type => 'leaf',
+            value_type => 'uniline',
+            update => {
+                when_missing => 'warn',
+                files => [
+                    { type => 'yaml', file => $yaml_file->stringify, subpath => 'foo.bar\.baz'}
+                ]
+            }
+        },
+    ],
+);
+
+$model->create_config_class(
+    name    => "TomlLoad",
+    element => [
+        data_from_toml_file => {
+            type => 'leaf',
+            value_type => 'uniline',
+            update => {
+                when_missing => 'warn',
+                files => [
+                    { type => 'toml', file => $toml_file->stringify, subpath => "foo.bar"}
+            ]}
+        },
+    ],
 );
 
 my $bad_inst = $model->instance(
@@ -1043,7 +1128,7 @@ subtest "problems during initial load" => sub {
         root_class_name => 'Master',
         instance_name   => 'initial_test'
     );
-    ok( $inst2, "created initial_test inst2ance" );
+    ok( $inst2, "created initial_test instance" );
 
     # is triggered internally only when at least one node has a RW backend
     $inst2->initial_load_start;
@@ -1073,6 +1158,150 @@ subtest "problems during initial load" => sub {
     is( $inst2->needs_save, 0, "verify instance needs_save status after writing 'boolean_with_write_as'" );
 
     $inst2->initial_load_stop;
+};
+
+subtest "load from ini file" => sub {
+    # cleanup;
+    $ini_file->remove;
+
+    my $inst2 = $model->instance(
+        root_class_name => 'IniLoad',
+        instance_name   => 'load_from_ini_test'
+    );
+    ok( $inst2, "created load_from_ini_test instance" );
+    my $data = "my_data";
+
+    my $ini = $inst2->config_root->fetch_element("data_from_ini_file");
+    is($ini->fetch, undef,"test that parameter is empty before udpate");
+
+    {
+        my $xp = Test::Log::Log4perl->expect(['User', warn => qr/does not exist/,]);
+
+        # first test missing file
+        $ini->update_from_file;
+        is($ini->fetch, undef,"test that parameter is still empty after missing file");
+    }
+
+    {
+        my $xp = Test::Log::Log4perl->expect(['User', warn => qr/No value found/,]);
+        # test wrong subpath in INI file
+        $ini_file->spew("[foo]\n","bad_key = $data\n");
+        # direct call to leaf's update
+        $ini->update_from_file;
+        is($ini->fetch, undef,"test that parameter is still empty after error in path");
+    }
+
+    {
+        my $xp = Test::Log::Log4perl->expect(
+            ['User', (info =>  qr/Updating data_from_ini_file value from file/) x 2,]
+        );
+        # set right path in INI file
+        $ini_file->spew("[foo]\n","bar = $data\n");
+        $ini->update_from_file;
+        is($ini->fetch, $data,"test that parameter is set after leaf udpate");
+
+        my $new_data = "new_data";
+        $ini_file->spew("[foo]\n","bar = $new_data\n");
+        # update via instance
+        $inst2->update;
+        is($ini->fetch, $new_data,"test that parameter is set after instance udpate");
+    }
+};
+
+subtest "load from ini file à la dist.ini" => sub {
+    # dist.ini contains keys with '.'
+    # cleanup;
+    $ini_file->remove;
+
+    my $inst2 = $model->instance(
+        root_class_name => 'DistIniLoad',
+        instance_name   => 'load_from_dist_ini_test'
+    );
+    my $ini = $inst2->config_root->fetch_element("data_from_ini_file");
+
+    my $xp = Test::Log::Log4perl->expect(
+            ['User', info =>  qr/Updating data_from_ini_file value from file/]
+        );
+
+    # set right path in INI file
+    my $data = "https://github.com/dod38fr/config-model/issues";
+    $ini_file->spew("[MetaResources]\n",
+                    "bugtracker.web    = $data\n");
+    $ini->update_from_file;
+    is($ini->fetch, $data,"test that parameter is set after leaf udpate");
+
+};
+
+subtest "load from json file" => sub {
+    # cleanup;
+    $json_file->remove;
+
+    my $inst2 = $model->instance(
+        root_class_name => 'JsonLoad',
+        instance_name   => 'load_from_json_test'
+    );
+    ok( $inst2, "created load_from_json_test instance" );
+    my $data = "my_data";
+
+    my $json = $inst2->config_root->fetch_element("data_from_json_file");
+
+    my $xp = Test::Log::Log4perl->expect(
+        ['User', info =>  qr/Updating data_from_json_file value from file/]
+    );
+
+    my @info = $json->get_info();
+    is($info[1], "update value from ".$json_file.":foo.bar");
+
+    # set right path in JSON file
+    $json_file->spew(qq!{"foo": { "bar" : "$data" }}\n!);
+    $inst2->update;
+    is($json->fetch, $data,"test that parameter is set after instance udpate");
+};
+
+subtest "load from yaml file" => sub {
+    # cleanup;
+    $yaml_file->remove;
+
+    my $inst2 = $model->instance(
+        root_class_name => 'YamlLoad',
+        instance_name   => 'load_from_yaml_test'
+    );
+    ok( $inst2, "created load_from_yaml_test instance" );
+    my $data = "my_data";
+
+    my $yaml = $inst2->config_root->fetch_element("data_from_yaml_file");
+
+    my $xp = Test::Log::Log4perl->expect(
+        ['User', info =>  qr/Updating data_from_yaml_file value from file/]
+    );
+
+    # set right path in YAML file
+    $yaml_file->spew(qq!---\nfoo:\n  bar.baz: $data\n!);
+    $inst2->update;
+    is($yaml->fetch, $data,"test that parameter is set after instance udpate");
+};
+
+subtest "load from toml file" => sub {
+    # cleanup;
+    $toml_file->remove;
+
+    my $inst2 = $model->instance(
+        root_class_name => 'TomlLoad',
+        instance_name   => 'load_from_toml_test'
+    );
+    ok( $inst2, "created load_from_toml_test instance" );
+    my $data = "my_data";
+
+    my $toml = $inst2->config_root->fetch_element("data_from_toml_file");
+
+    my $xp = Test::Log::Log4perl->expect(
+        ['User', info =>  qr/Updating data_from_toml_file value from file/]
+    );
+
+    # set right path in TOML file
+    $toml_file->spew(qq![foo]\nbar = "$data"\n!);
+    $inst2->update;
+    is($toml->fetch, $data,"test that parameter is set after instance udpate");
 };
 
 memory_cycle_ok( $model, "check memory cycles" );

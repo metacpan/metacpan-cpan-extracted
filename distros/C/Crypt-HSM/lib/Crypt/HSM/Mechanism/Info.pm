@@ -1,5 +1,5 @@
 package Crypt::HSM::Mechanism::Info;
-$Crypt::HSM::Mechanism::Info::VERSION = '0.025';
+$Crypt::HSM::Mechanism::Info::VERSION = '0.026';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Mechanism::Info - PKCS11 mechanism information
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 METHODS
 

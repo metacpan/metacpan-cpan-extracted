@@ -7,9 +7,9 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::ListId 2.156;
+package Config::Model::ListId 2.157;
 
-use 5.10.1;
+use 5.20.0;
 use Mouse;
 
 use Config::Model::Exception;
@@ -20,6 +20,9 @@ extends qw/Config::Model::AnyId/;
 
 with "Config::Model::Role::Grab";
 with "Config::Model::Role::ComputeFunction";
+with "Config::Model::Role::Utils";
+
+use feature qw/postderef signatures/;
 
 my $logger = get_logger("Tree::Element::Id::List");
 my $user_logger = get_logger("User");
@@ -49,10 +52,10 @@ sub BUILD {
         ) if defined $self->{$wrong};
     }
 
-    if ( defined $self->{migrate_keys_from} ) {
+    if ( delete $self->{migrate_keys_from} ) {
         $user_logger->warn(
             $self->name, "Using migrate_keys_from with ",
-            "list element is deprecated. Use migrate_values_from"
+            "list element is obsolete and ignored. Use migrate_values_from"
         );
     }
 
@@ -60,10 +63,9 @@ sub BUILD {
     return $self;
 }
 
-sub set_properties {
-    my $self = shift;
+sub set_properties ($self, @args) {
 
-    $self->SUPER::set_properties(@_);
+    $self->SUPER::set_properties(@args);
 
     # remove unwanted items
     my $data = $self->{data};
@@ -77,6 +79,7 @@ sub set_properties {
         $logger->trace( "set_properties: ", $self->name, " deleting index $k" );
         delete $data->[$k];
     }
+    return;
 }
 
 sub _migrate {
@@ -100,15 +103,7 @@ sub _migrate {
             $self->fetch_with_id( $idx++ )->load_data($data);
         }
     }
-    elsif ( $self->{migrate_keys_from} ) {
-
-        # FIXME: remove this deprecated stuff
-        my $followed = $self->safe_typed_grab( param => 'migrate_keys_from', check => 'no' );
-        for ( $followed->fetch_all_indexes ) {
-            $self->_store( $_, undef ) unless $self->_defined($_);
-        }
-    }
-
+    return;
 }
 
 sub get_type {
@@ -203,24 +198,23 @@ sub load {
     }
 
     $self->store_set(\@set, check => $check);
+    return;
 }
 
-sub store_set {
-    my $self = shift;
+sub store_set ($self, @raw_args) {
     my (@v, %args);
 
-    if (ref $_[0] eq 'ARRAY') {
-        @v    = @{ shift @_ };
-        %args = @_;
+    if (ref $raw_args[0] eq 'ARRAY') {
+        @v    = shift(@raw_args)->@*;
+        %args = @raw_args;
     }
     else {
+        @v = @raw_args;
         %args = ( check => 'yes' );
-        @v = @_;
     }
 
     if ($logger->is_debug) {
-        no warnings "uninitialized";
-        $logger->debug($self->name, " store_set called with ".map {"«$_» "} @v);
+        $logger->debug($self->name, " store_set called with ".map {"«$_» "} map { $_ // "<undef>" } @v);
     }
 
     my @comments = @{ $args{comment} || [] };
@@ -233,6 +227,7 @@ sub store_set {
 
     # and delete unused items
     $self->_prune_above_idx($idx);
+    return;
 }
 
 sub _prune_above_idx {
@@ -243,6 +238,7 @@ sub _prune_above_idx {
         $logger->debug($self->name, " pruning idx ", $#$ref);
         $self->delete($#$ref);
     }
+    return;
 }
 
 # store without any check
@@ -267,13 +263,12 @@ sub _delete {
     return delete $self->{data}[$idx];
 }
 
-sub _clear {
-    my ($self) = @_;
+sub _clear ($self) {
     $self->{data} = [];
+    return;
 }
 
-sub move {
-    my ( $self, $from, $to, %args ) = @_;
+sub move ($self, $from, $to, %args) {
     my $check = $self->_check_check( $args{check} );
 
     my $moved = $self->fetch_with_id($from);
@@ -298,20 +293,20 @@ sub move {
             );
         }
     }
+    return;
 }
 
 # list only methods
-sub push {
-    my $self = shift;
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub push ($self, @args) {
     $self->_assert_leaf_cargo;
     my $idx = $self->fetch_size;
-    map { $self->fetch_with_id( $idx++ )->store($_); } @_;
+    map { $self->fetch_with_id( $idx++ )->store($_); } @args;
+    return;
 }
 
 # list only methods
-sub push_x {
-    my $self = shift;
-    my %args = @_;
+sub push_x ($self, %args) {
     $self->_assert_leaf_cargo;
     my $check = delete $args{check}  || 'yes';
     my $v_arg = delete $args{values} || delete $args{value};
@@ -328,37 +323,32 @@ sub push_x {
         $obj->store($val);
         $obj->annotation( shift @a ) if @a;
     }
+    return;
 }
 
-sub unshift {
-    my $self = shift;
-    $self->insert_at( 0, @_ );
+sub unshift ($self, @args) {
+    $self->insert_at(0, @args);
+    return;
 }
 
-sub insert_at {
-    my $self = shift;
-    my $idx  = shift;
-
+sub insert_at ($self, $idx, @args) {
     $self->_assert_leaf_cargo;
 
     # check if max_idx is respected
-    $self->check_idx( $self->fetch_size + scalar @_ );
+    $self->check_idx( $self->fetch_size + scalar @args );
 
     # make room at the beginning of the array
-    $self->_splice_data( $idx, 0, (undef) x scalar @_ );
+    $self->_splice_data( $idx, 0, (undef) x scalar @args );
     my $i = $idx;
-    map { $self->fetch_with_id( $i++ )->store($_); } @_;
+    map { $self->fetch_with_id( $i++ )->store($_); } @args;
 
     $self->_reindex;
+    return;
 }
 
-sub insert_before {
-    my $self = shift;
-    my $val  = shift;
-    my $test =
-        ref($val) eq 'Regexp'
-        ? sub { $_[0] =~ /$val/ }
-        : sub { $_[0] eq $val };
+sub insert_before ($self, $val, @args) {
+    my $test = ref($val) eq 'Regexp' ? sub ($in) { $in =~ /$val/ }
+        :                              sub ($in) { $in eq $val };
 
     $self->_assert_leaf_cargo;
 
@@ -368,13 +358,13 @@ sub insert_before {
         $point++;
     }
 
-    $self->insert_at( $point, @_ );
+    $self->insert_at($point, @args);
+    return;
 }
 
-sub insort {
-    my $self = shift;
+sub insort ($self, @args) {
     $self->_assert_leaf_cargo;
-    my @insert = sort @_;
+    my @insert = sort @args;
 
     my $point = 0;
     foreach my $v ( $self->fetch_all_values ) {
@@ -384,11 +374,11 @@ sub insort {
         $point++;
     }
     $self->push(@insert) if @insert;
+    return;
 }
 
-sub store {
-    my $self = shift;
-    $self->push_x(@_);
+sub store ($self, @args) {
+    return $self->push_x(@args);
 }
 
 sub _assert_leaf_cargo {
@@ -400,12 +390,14 @@ sub _assert_leaf_cargo {
         object => $self,
         error  => "Cannot call sort on list of $ct"
     ) unless $ct eq 'leaf';
+    return;
 }
 
 sub sort_algorithm {
     return sub { $_[0]->fetch cmp $_[1]->fetch; };
 }
 
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub sort {
     my $self = shift;
 
@@ -414,6 +406,7 @@ sub sort {
 
     my $has_changed = $self->_reindex;
     $self->notify_change( note => "sorted" ) if $has_changed;
+    return;
 }
 
 sub _reindex {
@@ -447,6 +440,7 @@ sub swap {
     $self->{data}[$idb] = $obja;
 
     $self->notify_change( note => "swapped index $ida and $idb" );
+    return;
 }
 
 #die "check index number after wap";
@@ -467,6 +461,7 @@ sub remove {
     }
     $self->notify_change(note => $note);
     splice @{ $self->{data} }, $idx, 1;
+    return;
 }
 
 #internal
@@ -487,6 +482,7 @@ sub auto_create_elements {
 
     # create empty slots
     map { $self->{data}[$_] = undef unless defined $self->{data}[$_]; } ( 0 .. $auto_p );
+    return;
 }
 
 # internal
@@ -501,11 +497,11 @@ sub create_default {
     map { $self->{data}[$_] = undef } @$def;
 
     $self->create_default_with_init;
+    return;
 }
 
-sub load_data {
-    my $self     = shift;
-    my %args     = @_ > 1 ? @_ : ( data => shift );
+sub load_data ($self, @args) {
+    my %args = _resolve_arg_shortcut(\@args, 'data');
     my $raw_data = delete $args{data};
     my $check    = $self->_check_check( $args{check} );
 
@@ -532,6 +528,7 @@ sub load_data {
 
     # and delete unused items
     $self->_prune_above_idx($idx);
+    return 1;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -552,7 +549,7 @@ Config::Model::ListId - Handle list element for configuration model
 
 =head1 VERSION
 
-version 2.156
+version 2.157
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,4 @@
+0.01  2026-03-02
+    - Initial release
+    - System detection via pkg-config
+    - Share build from MariaDB Connector/C source (auto-detects latest)

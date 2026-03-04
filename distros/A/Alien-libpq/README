@@ -19,8 +19,17 @@ DESCRIPTION
     will use the system library if available, or download and build from
     source if necessary.
 
+    The source build is configured without OpenSSL, readline, zlib, and ICU
+    for a minimal footprint. SSL/TLS connections require system-provided
+    libpq.
+
 METHODS
-    All methods are inherited from Alien::Base.
+  libs
+  libs_static
+    On macOS with a share install, appends "-Wl,-rpath" so the dynamic
+    linker can find "libpq.dylib" after Alien::Build DESTDIR relocation.
+
+    All other methods are inherited from Alien::Base.
 
 SEE ALSO
     Alien::Base, <https://www.postgresql.org/docs/current/libpq.html>

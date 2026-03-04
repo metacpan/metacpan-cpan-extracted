@@ -7,7 +7,10 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::ObjTreeScanner 2.156;
+package Config::Model::ObjTreeScanner 2.157;
+
+use 5.20.0;
+use feature qw/postderef signatures/;
 
 use strict;
 use Config::Model::Exception;
@@ -18,10 +21,10 @@ use warnings;
 
 use Carp qw/croak confess cluck/;
 
-sub new {
-    my $type = shift;
-    my %args = @_;
+my @value_cb =
+    map { $_ . '_value_cb' } qw/boolean dir enum file string uniline integer number reference/;
 
+sub new ($type, %args) {
     my $self = { auto_vivify => 1, check => 'yes' };
     bless $self, $type;
 
@@ -32,9 +35,6 @@ sub new {
     $self->create_fallback( delete $args{fallback} || 'all' );
 
     # get all call_backs
-    my @value_cb =
-        map { $_ . '_value_cb' } qw/boolean enum string uniline integer number reference/;
-
     foreach my $param (
         qw/check node_element_cb hash_element_cb
         list_element_cb check_list_element_cb node_content_cb
@@ -107,18 +107,15 @@ sub create_fallback {
         $done++;
         my $l = $self->{string_value_cb} ||= $self->{leaf_cb};
 
-        $self->{check_list_element_cb} ||= $l;
-        $self->{enum_value_cb}         ||= $l;
-        $self->{integer_value_cb}      ||= $l;
-        $self->{number_value_cb}       ||= $l;
-        $self->{boolean_value_cb}      ||= $l;
-        $self->{reference_value_cb}    ||= $l;
-        $self->{uniline_value_cb}      ||= $l;
+        foreach my $cb (@value_cb, "check_list_element_cb") {
+            $self->{$cb} ||= $l;
+        }
     }
 
     croak __PACKAGE__, "->new: Unexpected fallback value '$fallback'. ",
         "Expected 'node', 'leaf', 'all' or 'none'"
         if not $done;
+    return;
 }
 
 sub scan_node {
@@ -151,6 +148,7 @@ sub scan_node {
     $actual_cb->( $self, $data_r, $node, @element_list );
 
     $self->{up_cb}->( $self, $data_r, $node );
+    return;
 }
 
 sub scan_element {
@@ -217,6 +215,7 @@ sub scan_element {
     else {
         croak "Unexpected element_type: $element_type";
     }
+    return;
 }
 
 sub scan_hash {
@@ -245,6 +244,7 @@ sub scan_hash {
     else {
         croak "Unexpected cargo_type: $cargo_type";
     }
+    return;
 }
 
 sub scan_list {
@@ -266,6 +266,7 @@ sub get_keys {
         object => $node
     );
 
+    return;
 }
 
 1;
@@ -284,7 +285,7 @@ Config::Model::ObjTreeScanner - Scan config tree and perform call-backs for each
 
 =head1 VERSION
 
-version 2.156
+version 2.157
 
 =head1 SYNOPSIS
 
@@ -399,7 +400,7 @@ hooks are listed below:
 C<leaf_cb> is a catch-all generic callback. All other are specialized
 call-back : C<enum_value_cb>, C<integer_value_cb>, C<number_value_cb>,
 C<boolean_value_cb>, C<string_value_cb>, C<uniline_value_cb>,
-C<reference_value_cb>
+C<reference_value_cb>, C<file_value_cb>, C<dir_value_cb>
 
 =item node callback:
 

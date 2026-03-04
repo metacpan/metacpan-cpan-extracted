@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Node 2.156;
+package Config::Model::Node 2.157;
 
 use Mouse;
 with "Config::Model::Role::NodeLoader";
@@ -92,6 +92,9 @@ has gist => (
 sub fetch_gist {
     my $self = shift;
     my $gist = $self->gist // '';
+    # handle hash or list element count
+    $gist =~ s!\@\{([\w -]+)}!$self->grab($1)->fetch_size!ge;
+    # handle element value
     $gist =~ s!{([\w -]+)}!$self->grab($1)->fetch // ''!ge;
     return $gist;
 }
@@ -1182,7 +1185,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.156
+version 2.157
 
 =head1 SYNOPSIS
 
@@ -1310,9 +1313,10 @@ See below for details on element declaration.
 String used to construct a summary of the content of a node. This
 parameter is used by user interface to show users the gist of the
 content of this node. This parameter has no other effect. This string
-may contain element values in the form "C<{foo} or {bar}>". When
-constructing the gist, C<{foo}> is replaced by the value of element
-C<foo>. Likewise for C<{bar}>.
+may contain element values in the form "C<{foo} and
+@{a_hash_or_list}>". When constructing the gist, C<{foo}> is replaced
+by the value of element C<foo>, and C<@{a_hash_of_list}> is replaced
+by the number of elements of the hash or list element.
 
 =item B<level>
 
@@ -1835,8 +1839,17 @@ deprecated elements or values. Return 1 if data needs to be saved.
 
 =head2 apply_fixes
 
+Parameters: C<[ Perl regexp filter ]>
+
 Scan the tree from this node and apply fixes that are attached to warning specifications.
 See C<warn_if_match> or C<warn_unless_match> in L<Config::Model::Value/>. Return C<$self> since v2.151.
+
+Optional filter parameter limits the fix application to elements whose name matches the filter.
+
+For instance, using dpkg-control model, the following call apply fixes
+on C<Build-Depends> and C<Build-Depend-Indep> elements:
+
+  apply_fixes('Build')
 
 =head2 load
 

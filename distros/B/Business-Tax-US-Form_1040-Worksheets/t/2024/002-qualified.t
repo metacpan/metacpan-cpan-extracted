@@ -98,33 +98,6 @@ my ($tax);
 note("single_or_married_sep / single");
 {
     my $inputs = {
-        l15 => 7000.00,
-        l3a => 4900.00,
-        sD  => 1600.00,
-        status1 => 'single_or_married_sep',
-        status2 => 'single',
-        filing_year => 2024,
-    };
-    my $expect = {
-        5 =>    500.00,
-        18 =>   0,
-        21 =>   0,
-        1 =>    7000.00,
-    };
-    my $results = qualified_dividends_capital_gains_tax($inputs);
-    for my $j (18, 21, 1) {
-        cmp_ok($results->[$j], '==', $expect->{$j},
-            "Got expected result for line $j");
-    }
-    my $k = 5;
-    cmp_ok(abs($results->[$k] - $expect->{$k}), '<', 1,
-        "Result for line $k, $results->[$k] is within expected tolerance from $expect->{$k}"
-    );
-}
-
-note("single_or_married_sep / single");
-{
-    my $inputs = {
         l15 => 7000.00,                     # Form 1040, line 15
         l3a => 4900.00,                     # Form 1040, line 3a
         sD  => 1600.00,                     # If filing Schedule D, enter smaller

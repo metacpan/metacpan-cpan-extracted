@@ -7,12 +7,14 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Instance 2.156;
+package Config::Model::Instance 2.157;
 
-#use Scalar::Util qw(weaken) ;
+use 5.20.0;
+
 use strict;
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
-use 5.10.1;
 use Mouse;
 use Mouse::Util::TypeConstraints;
 use MouseX::StrictConstructor;
@@ -620,22 +622,28 @@ sub save {
 sub update {
     my ($self, %args) = @_;
 
-    my @msgs ;
     my $hook = sub {
         my ($scanner, $data_ref,$node,@element_list) = @_;
         if ($node->can('update')) {
             my $loc = $node->location;
             say "Calling update on node '$loc'" if $loc and not $args{quiet};
-            push (@msgs, $node->update(%args))
+            push (@$data_ref, $node->update(%args))
         } ;
+    };
+
+    my $leaf_cb = sub ($scanner, $data_ref,$node,$element_name,$index, $leaf_object) {
+        push @$data_ref, $leaf_object->update_from_file();
     };
 
     my $root = $self->config_root ;
 
+    my @msgs ;
     Config::Model::ObjTreeScanner->new(
         node_content_hook => $hook,
         check => ($args{quiet} ? 'no' : 'yes'),
-        leaf_cb => sub { }
+        leaf_cb => $leaf_cb,
+        file_value_cb => $leaf_cb,
+        dir_value_cb => $leaf_cb,
     )->scan_node( \@msgs, $root );
 
     return @msgs;
@@ -664,7 +672,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.156
+version 2.157
 
 =head1 SYNOPSIS
 
@@ -883,11 +891,17 @@ Returns the number of warning found in the elements of this configuration instan
 
 Parameters: C<< ( quiet => (0|1), %args ) >>
 
-Try to run update command on all nodes of the configuration tree. Node
-without C<update> method are ignored. C<update> prints a message
-otherwise (unless C<quiet> is true). Note that plain
+Try to run C<update> method on all nodes and leaves of the
+configuration tree.
+
+Node without C<update> method are ignored. C<update> prints a
+message otherwise (unless C<quiet> is true). Note that plain
 L<Config::Model::Node> has no C<update> method. Only classes
 inheriting from L<Config::Model::Node> can have C<update> methods.
+
+C<update> is called on all leaves. L<Config::Model::Values/update> is
+called as well to update value from external files, like INI or YAML
+file, according to the user's configuration model.
 
 The goal of the update method is to update configuration data from
 external data. For instance, update is called on

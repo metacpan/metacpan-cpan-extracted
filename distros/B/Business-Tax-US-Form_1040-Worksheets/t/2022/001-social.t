@@ -23,8 +23,38 @@ note('social_security_benefits()');
 
 {
     local $@;
-    my $k = 'l1000';
+    my $k = 'box5';
     eval { $benefits = social_security_benefits({ $k => 789.10 }); };
+    like( $@,
+        qr/Must include 4-digit value for 'filing_year' in argument to social_security_benefits\(\)/,
+        "Got expected error message: missing 'filing_year'"
+    );
+}
+
+{
+    local $@;
+    my $k = 'filing_year';
+    eval { $benefits = social_security_benefits({ $k => 789 }); };
+    like( $@,
+        qr/Must include 4-digit value for 'filing_year' in argument to social_security_benefits\(\)/,
+        "Got expected error message: missing 4-digit 'filing_year'"
+    );
+}
+
+{
+    local $@;
+    my $k = 'filing_year';
+    eval { $benefits = social_security_benefits({ $k => 1789 }); };
+    like( $@,
+        qr/'filing_year' must be > 2000/,
+        "Got expected error message: 'filing_year'must be past 2000"
+    );
+}
+
+{
+    local $@;
+    my $k = 'l1000';
+    eval { $benefits = social_security_benefits({ filing_year => 2022, $k => 789.10 }); };
     like( $@, qr/Invalid element in hashref passed to social_security_benefits\(\)/,
         "Got expected error message: bad argument '$k' to social_security_benefits()"
     );
@@ -33,7 +63,7 @@ note('social_security_benefits()');
 {
     local $@;
     my $v = 'foo';
-    eval { $benefits = social_security_benefits({ status => undef }); };
+    eval { $benefits = social_security_benefits({ filing_year => 2022, status => undef }); };
     like( $@, qr/Invalid value for 'status' element/,
         "Got expected error message: 'status' not defined"
     );
@@ -42,7 +72,7 @@ note('social_security_benefits()');
 {
     local $@;
     my $v = 'foo';
-    eval { $benefits = social_security_benefits({ status => $v }); };
+    eval { $benefits = social_security_benefits({ filing_year => 2022, status => $v }); };
     like( $@, qr/Invalid value for 'status' element/,
         "Got expected error message: bad argument '$v' for 'status'"
     );
@@ -60,7 +90,7 @@ note('social_security_worksheet_data()');
 {
     local $@;
     my $k = 'l1000';
-    eval { $benefits = social_security_worksheet_data({ $k => 789.10 }); };
+    eval { $benefits = social_security_worksheet_data({ filing_year => 2022, $k => 789.10 }); };
     like( $@, qr/Invalid element in hashref passed to social_security_benefits\(\)/,
         "Got expected error message: bad argument '$k' to social_security_worksheet_data()"
     );
@@ -69,7 +99,7 @@ note('social_security_worksheet_data()');
 {
     local $@;
     my $v = 'foo';
-    eval { $benefits = social_security_worksheet_data({ status => undef }); };
+    eval { $benefits = social_security_worksheet_data({ filing_year => 2022, status => undef }); };
     like( $@, qr/Invalid value for 'status' element/,
         "Got expected error message: 'status' not defined"
     );
@@ -78,7 +108,7 @@ note('social_security_worksheet_data()');
 {
     local $@;
     my $v = 'foo';
-    eval { $benefits = social_security_worksheet_data({ status => $v }); };
+    eval { $benefits = social_security_worksheet_data({ filing_year => 2022, status => $v }); };
     like( $@, qr/Invalid value for 'status' element/,
         "Got expected error message: bad argument '$v' for 'status'"
     );

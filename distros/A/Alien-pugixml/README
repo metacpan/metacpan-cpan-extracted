@@ -1,0 +1,34 @@
+NAME
+    Alien::pugixml - Find or build pugixml C++ XML parser library
+
+SYNOPSIS
+        use Alien::pugixml;
+        use ExtUtils::MakeMaker;
+
+        WriteMakefile(
+            ...
+            CONFIGURE_REQUIRES => {
+                'Alien::pugixml' => 0,
+            },
+            CCFLAGS => Alien::pugixml->cflags,
+            LIBS    => Alien::pugixml->libs,
+        );
+
+DESCRIPTION
+    This module provides the pugixml C++ XML parsing library. It will either
+    use the system library if available, or download and build it from
+    source.
+
+METHODS
+    All methods are inherited from Alien::Base.
+
+SEE ALSO
+    Alien::Base, pugixml <https://pugixml.org/>
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

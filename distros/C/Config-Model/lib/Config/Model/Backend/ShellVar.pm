@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::ShellVar 2.156;
+package Config::Model::Backend::ShellVar 2.157;
 
 use Carp;
 use Mouse;
@@ -15,6 +15,10 @@ use Config::Model::Exception;
 use File::Path;
 use Log::Log4perl qw(get_logger :levels);
 use Config::Model::BackendTrackOrder;
+use 5.020;
+
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 extends 'Config::Model::Backend::Any';
 
@@ -37,10 +41,8 @@ sub _build_tracker {
 
 sub annotation { return 1; }
 
-sub read {
-    my $self = shift;
-    my %args = @_;
-
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub read ($self, %args) {
     # args are:
     # object     => $obj,         # Config::Model::Node object
     # root       => './my_test',  # fake root directory, userd for tests
@@ -76,10 +78,7 @@ sub read {
     return 1;
 }
 
-sub write {
-    my $self = shift;
-    my %args = @_;
-
+sub write ($self, %args) {
     # args are:
     # object     => $obj,         # Config::Model::Node object
     # root       => './my_test',  # fake root directory, userd for tests
@@ -132,7 +131,7 @@ Config::Model::Backend::ShellVar - Read and write config as a C<SHELLVAR> data s
 
 =head1 VERSION
 
-version 2.156
+version 2.157
 
 =head1 SYNOPSIS
 

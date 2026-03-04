@@ -19,17 +19,17 @@ my %WriteMakefileArgs = (
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? () : ( META_MERGE => {
         'meta-spec' => { version => 2 },
         dynamic_config => 1,
-        #resources => {
-        #    homepage    => undef,
-        #    repository  => {
-        #        url         => undef,
-        #        web         => undef,
-        #        type        => undef,
-        #    },
-        #    bugtracker => {
-        #        web         => undef,
-        #    },
-        #},
+        resources => {
+            homepage => 'https://thenceforward.net/perl/modules/Business-Tax-US-Form_1040-Worksheets/',
+            repository => {
+                url => 'https://github.com/jkeenan/p5-Business-Tax-US-Form_1040-Worksheets.git',
+                web => 'https://github.com/jkeenan/p5-Business-Tax-US-Form_1040-Worksheets',
+                type => 'git',
+            },
+            bugtracker => {
+                web => 'https://github.com/jkeenan/p5-Business-Tax-US-Form_1040-Worksheets/issues',
+            },
+        },
     })),
 );
 

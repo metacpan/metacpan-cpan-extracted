@@ -12,7 +12,7 @@ WriteMakefile($abmm->mm_args(
     ABSTRACT         => 'Find or build libpq PostgreSQL client library',
     AUTHOR           => 'vividsnow',
     LICENSE          => 'perl_5',
-    MIN_PERL_VERSION => '5.010',
+    MIN_PERL_VERSION => '5.014',
 
     CONFIGURE_REQUIRES => {
         'Alien::Build::MM' => 0,
@@ -35,12 +35,6 @@ WriteMakefile($abmm->mm_args(
                 type => 'git',
                 url  => 'https://github.com/vividsnow/perl5-alien-libpq.git',
                 web  => 'https://github.com/vividsnow/perl5-alien-libpq',
-            },
-        },
-        provides => {
-            'Alien::libpq' => {
-                file    => 'lib/Alien/libpq.pm',
-                version => '0.02',
             },
         },
     },
