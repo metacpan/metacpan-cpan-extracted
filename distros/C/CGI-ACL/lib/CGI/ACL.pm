@@ -1,7 +1,7 @@
 package CGI::ACL;
 
 # Author Nigel Horne: njh@bandsman.co.uk
-# Copyright (C) 2017-2024, Nigel Horne
+# Copyright (C) 2017-2026, Nigel Horne
 
 # Usage is subject to licence terms.
 # The licence terms of this software are as follows:
@@ -10,7 +10,12 @@ package CGI::ACL;
 #	must apply in writing for a licence for use from Nigel Horne at the
 #	above e-mail.
 
-# TODO:  Add deny_all_countries() and allow_country() methods, so that we can easily block all but a few countries.
+# TODO:  Add deny_all_countries() method, so that we can easily block all but a few countries.
+
+# TODO: Add a rate limiter to block brute-force attacks
+# use Net::CIDR::Lite;
+# my $rate_limiter = Net::CIDR::Lite->new;
+# $rate_limiter->add("$_/32") for @recent_ips;  # Track IPs in a shared cache
 
 use 5.006_001;
 use warnings;
@@ -18,6 +23,9 @@ use strict;
 use namespace::clean;
 use Carp;
 use Net::CIDR;
+use Regexp::Common qw/net/;
+use Scalar::Util;
+use Socket;
 
 =head1 NAME
 
@@ -25,15 +33,16 @@ CGI::ACL - Decide whether to allow a client to run this script
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
-Does what it says on the tin.
+Does what it says on the tin,
+providing control client access to a CGI script based on IP addresses and geographical location (countries).
 
     use CGI::Lingua;
     use CGI::ACL;
@@ -42,38 +51,53 @@ Does what it says on the tin.
     # ...
     my $denied = $acl->all_denied(info => CGI::Lingua->new(supported => 'en'));
 
+The module optionally integrates with L<CGI::Lingua> for detecting the client's country.
+
 =head1 SUBROUTINES/METHODS
 
 =head2 new
 
-Creates a CGI::ACL object.
+Creates an instance of the CGI::ACL class.
+Handles both hash and hashref arguments.
+Includes basic error handling for invalid arguments.
+
+    my $acl = CGI::ACL->new(allowed_ips => { '127.0.0.1' => 1 });
 
 =cut
 
 sub new
 {
-	my $class = $_[0];
+	my $class = shift;
 
-	shift;
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	# Handle hash or hashref arguments
+	my %args;
+	if((@_ == 1) && (ref $_[0] eq 'HASH')) {
+		%args = %{$_[0]};
+	} elsif((@_ % 2) == 0) {
+		%args = @_;
+	} else {
+		carp(__PACKAGE__, ': Invalid arguments passed to new()');
+		return;
+	}
 
 	if(!defined($class)) {
-		# Using CGI::ACL->new(), not CGI::ACL::new()
-		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		# return;
-
+		if((scalar keys %args) > 0) {
+			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			return;
+		}
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
-	} elsif(ref($class)) {
+	} elsif(Scalar::Util::blessed($class)) {
 		# clone the given object
 		return bless { %{$class}, %args }, ref($class);
 	}
-	return bless { }, $class;
+
+	return bless { %args }, $class;
 }
 
 =head2 allow_ip
 
-Give an IP (or CIDR) that we allow to connect to us
+Give an IP (or CIDR block) that we allow to connect to us.
 
     use CGI::ACL;
 
@@ -97,7 +121,7 @@ sub allow_ip {
 	}
 
 	if(defined($params{'ip'})) {
-		$self->{_allowed_ips}->{$params{'ip'}} = 1;
+		$self->{allowed_ips}->{$params{'ip'}} = 1;
 	} else {
 		Carp::carp('Usage: allow_ip($ip_address)');
 	}
@@ -125,7 +149,7 @@ sub deny_country {
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
 	} elsif(ref($_[0])) {
-		Carp::carp('Usage: deny_country($ip_address)');
+		Carp::carp('Usage: deny_country($country)');
 		return;
 	} elsif(@_ % 2 == 0) {
 		%params = @_;
@@ -137,10 +161,10 @@ sub deny_country {
 		# This shenanigans allows country to be a scalar or list
 		if(ref($c) eq 'ARRAY') {
 			foreach my $country(@{$c}) {
-				$self->{_deny_countries}->{lc($country)} = 1;
+				$self->{deny_countries}->{lc($country)} = 1;
 			}
 		} else {
-			$self->{_deny_countries}->{lc($c)} = 1;
+			$self->{deny_countries}->{lc($c)} = 1;
 		}
 	} else {
 		Carp::carp('Usage: deny_country($ip_address)');
@@ -150,7 +174,8 @@ sub deny_country {
 
 =head2 allow_country
 
-Give a country, or a reference to a list of countries, that we will allow to access us
+Give a country, or a reference to a list of countries, that we will allow to access us,
+overriding the deny list if needed.
 
     use CGI::ACL;
 
@@ -178,10 +203,10 @@ sub allow_country {
 		# This shenanigans allows country to be a scalar or list
 		if(ref($c) eq 'ARRAY') {
 			foreach my $country(@{$c}) {
-				$self->{_allow_countries}->{lc($country)} = 1;
+				$self->{allow_countries}->{lc($country)} = 1;
 			}
 		} else {
-			$self->{_allow_countries}->{lc($c)} = 1;
+			$self->{allow_countries}->{lc($c)} = 1;
 		}
 	} else {
 		Carp::carp('Usage: allow_country($country)');
@@ -191,8 +216,12 @@ sub allow_country {
 
 =head2 all_denied
 
+Evaluates all restrictions (IP and country) and determines if access is denied.
+
 If any of the restrictions return false then return false, which should allow access.
-Note that by default localhost isn't allowed access, call allow_ip('127.0.0.1') to enable it.
+Access is allowed by default if no restrictions are set,
+however as soon as any restriction is set you may find you need to explicitly allow access.
+Note, therefore, that by default localhost isn't allowed access, call allow_ip('127.0.0.1') to enable it.
 
     use CGI::Lingua;
     use CGI::ACL;
@@ -217,19 +246,25 @@ Note that by default localhost isn't allowed access, call allow_ip('127.0.0.1') 
 sub all_denied {
 	my $self = shift;
 
-	if((!defined($self->{_allowed_ips})) && !defined($self->{_deny_countries})) {
+	if((!defined($self->{allowed_ips})) && !defined($self->{deny_countries})) {
 		return 0;
 	}
 
 	my $addr = $ENV{'REMOTE_ADDR'} ? $ENV{'REMOTE_ADDR'} : '127.0.0.1';
 
-	if($self->{_allowed_ips}) {
-		if($self->{_allowed_ips}->{$addr}) {
+	return 1 unless $addr =~ /^$RE{net}{IPv4}$/ || $addr =~ /^$RE{net}{IPv6}$/;
+
+	if ($self->{deny_cloud}) {
+		return 1 if _is_cloud_host($addr);
+	}
+
+	if($self->{allowed_ips}) {
+		if($self->{allowed_ips}->{$addr}) {
 			return 0;
 		}
 
 		my @cidrlist;
-		foreach my $block(keys(%{$self->{_allowed_ips}})) {
+		foreach my $block(keys(%{$self->{allowed_ips}})) {
 			@cidrlist = Net::CIDR::cidradd($block, @cidrlist);
 		}
 		if(Net::CIDR::cidrlookup($addr, @cidrlist)) {
@@ -237,7 +272,7 @@ sub all_denied {
 		}
 	}
 
-	if($self->{_deny_countries} || $self->{_allow_countries}) {
+	if($self->{deny_countries} || $self->{allow_countries}) {
 		my %params;
 
 		if(ref($_[0]) eq 'HASH') {
@@ -249,16 +284,17 @@ sub all_denied {
 		}
 
 		if(my $lingua = $params{'lingua'}) {
-			if($self->{_deny_countries}->{'*'} && !defined($self->{_allow_countries})) {
+			if($self->{deny_countries}->{'*'} && !defined($self->{allow_countries})) {
 				return 0;
 			}
 			if(my $country = $lingua->country()) {
-				if($self->{_deny_countries}->{'*'}) {
+				$country = lc($country);
+				if($self->{deny_countries}->{'*'}) {
 					# Default deny
-					return !$self->{_allow_countries}->{$country};
+					return $self->{allow_countries}->{$country} ? 0 : 1;
 				}
 				# Default allow
-				return $self->{_deny_countries}->{$country};
+				return $self->{deny_countries}->{$country} ? 1 : 0;
 			}
 			# Unknown country - disallow access
 		} else {
@@ -269,9 +305,98 @@ sub all_denied {
 	return 1;
 }
 
+sub _is_cloud_host {
+	my $ip = $_[0];
+
+	my $hostname = verified_rdns($ip) or return 0;
+
+	# AWS
+	return 1 if $hostname =~ /\.compute(-\d+)?\.amazonaws\.com$/;
+	return 1 if $hostname =~ /\.compute\.amazonaws\.com$/;
+
+	# Google Cloud
+	return 1 if $hostname =~ /\.bc\.googleusercontent\.com$/;
+
+	# Azure
+	return 1 if $hostname =~ /\.cloudapp\.net$/;
+	return 1 if $hostname =~ /\.azure\.com$/;
+
+	# DigitalOcean
+	return 1 if $hostname =~ /digitalocean/;
+
+	# Linode
+	return 1 if $hostname =~ /\.members\.linode\.com$/;
+
+	# Hetzner
+	return 1 if $hostname =~ /hetzner/;
+	return 1 if $hostname =~ /your-server\.de$/;
+
+	# OVH
+	return 1 if $hostname =~ /\.ovh\.net$/;
+	return 1 if $hostname =~ /^ip-\d+-\d+-\d+-\d+\.eu$/;
+
+	return 0;
+}
+
+sub _verified_rdns {
+	my $ip = $_[0];
+
+	# Convert dotted quad to packed format
+	my $packed = inet_aton($ip) or return;
+
+	# Step 1: reverse lookup
+	my ($hostname) = gethostbyaddr($packed, AF_INET) or return;
+
+	# Step 2: forward lookup
+		my @forward_ips = map { inet_ntoa($_) }
+		grep { defined }
+		map { inet_aton($_) }
+		($hostname);
+
+	# Step 3: confirm match
+	return ($hostname && grep { $_ eq $ip } @forward_ips) ? $hostname : undef;
+}
+
+=head2 deny_cloud
+
+Enables blocking of requests originating from major cloud-hosting providers
+such as Amazon Web Services (AWS), Google Cloud Platform (GCP), Microsoft Azure,
+DigitalOcean, Linode, Hetzner, and OVH.
+
+This method relies on verified reverse DNS lookups to classify the client's
+network origin.
+A reverse DNS lookup is performed on the client's IP address,
+and the resulting hostname is then forward-confirmed to ensure that it is not spoofed.
+If the hostname matches known patterns associated with cloud infrastructure providers,
+access is denied.
+
+This feature is useful for preventing automated bots, scrapers, and abusive
+traffic commonly launched from cloud environments, while still allowing access
+from residential and business networks.
+
+    use CGI::ACL;
+
+    my $acl = CGI::ACL->new()->deny_cloud();
+
+    if($acl->all_denied()) {
+        print "Access from cloud-hosted systems is not permitted.";
+        exit;
+    }
+
+Returns the object instance to allow method chaining.
+
+=cut
+
+sub deny_cloud {
+	my $self = shift;
+
+	$self->{deny_cloud} = 1;
+	return $self;
+}
+
 =head1 AUTHOR
 
-Nigel Horne, C<< <njh at bandsman.co.uk> >>
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
 
@@ -280,6 +405,8 @@ or through the web interface at
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-ACL>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
+
+A VPN or proxy would most likely bypass the IP-based access control.
 
 =head1 SEE ALSO
 
@@ -319,7 +446,7 @@ L<http://deps.cpantesters.org/?module=CGI::ACL>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2024 Nigel Horne.
+Copyright 2017-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

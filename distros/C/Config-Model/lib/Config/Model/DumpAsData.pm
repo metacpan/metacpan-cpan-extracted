@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::DumpAsData 2.157;
+package Config::Model::DumpAsData 2.158;
 
 use Carp;
 use strict;
@@ -264,7 +264,7 @@ Config::Model::DumpAsData - Dump configuration content as a perl data structure
 
 =head1 VERSION
 
-version 2.157
+version 2.158
 
 =head1 SYNOPSIS
 

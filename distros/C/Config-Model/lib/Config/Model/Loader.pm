@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Loader 2.157;
+package Config::Model::Loader 2.158;
 
 use Carp;
 use strict;
@@ -20,6 +20,7 @@ use Log::Log4perl qw(get_logger :levels);
 use Path::Tiny;
 
 use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 my $logger = get_logger("Loader");
 my $verbose_logger = get_logger("Verbose.Loader");
@@ -1159,7 +1160,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.157
+version 2.158
 
 =head1 SYNOPSIS
 

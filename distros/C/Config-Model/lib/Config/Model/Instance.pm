@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Instance 2.157;
+package Config::Model::Instance 2.158;
 
 use 5.20.0;
 
@@ -19,6 +19,7 @@ use Mouse;
 use Mouse::Util::TypeConstraints;
 use MouseX::StrictConstructor;
 with "Config::Model::Role::NodeLoader";
+with "Config::Model::Role::Utils";
 
 use File::Path;
 use Path::Tiny;
@@ -113,19 +114,7 @@ has changes => (
         clear_changes => 'clear',
     } );
 
-sub needs_save {
-    my $self = shift;
-    my $arg  = shift;
-    if ( defined $arg ) {
-        if ($arg) {
-            croak "replace needs_save(1) call with add_change";
-            $self->add_change();    # may not work
-        }
-        else {
-            croak "replace needs_save(0) call with clear_changes";
-            $self->clear_changes;
-        }
-    }
+sub needs_save ($self) {
     return $self->c_count;
 }
 
@@ -145,6 +134,7 @@ has errors => (
 sub add_error {
     my $self = shift;
     $self->_set_error( shift, '' );
+    return;
 }
 
 sub error_messages {
@@ -210,6 +200,7 @@ has initial_load => (
 sub _trace_initial_load {
     my ( $self, $n, $o ) = @_;
     $logger->debug("switched to $n");
+    return;
 }
 
 # This array holds a set of sub ref that will be invoked when
@@ -233,6 +224,7 @@ has _write_back => (
 sub register_write_back {
     my ($self, $path, $backend, $wb) = @_;
     push @{ $self->_write_back->{$path} //= [] }, [$backend, $wb];
+    return;
 }
 
 # used for auto_read auto_write feature
@@ -299,12 +291,14 @@ sub preset_start {
     carp "Cannot start preset mode during layered mode"
         if $self->{layered};
     $self->{preset} = 1;
+    return;
 }
 
 sub preset_stop {
     my $self = shift;
     $logger->info("Stopping preset mode");
     $self->{preset} = 0;
+    return;
 }
 
 sub preset_clear {
@@ -316,6 +310,7 @@ sub preset_clear {
     };
 
     $self->_stuff_clear($leaf_cb);
+    return;
 }
 
 sub layered_start {
@@ -324,12 +319,14 @@ sub layered_start {
     carp "Cannot start layered mode during preset mode"
         if $self->{preset};
     $self->{layered} = 1;
+    return;
 }
 
 sub layered_stop {
     my $self = shift;
     $logger->info("Stopping layered mode");
     $self->{layered} = 0;
+    return;
 }
 
 sub layered_clear {
@@ -341,6 +338,7 @@ sub layered_clear {
     };
 
     $self->_stuff_clear($leaf_cb);
+    return;
 }
 
 sub get_data_mode {
@@ -384,11 +382,11 @@ sub _stuff_clear {
 
     $wiper->scan_node( undef, $self->config_root );
 
+    return;
 }
 
-sub modify {
-    my $self = shift ;
-    my %args   = @_ eq 1 ? ( step => $_[0] ) : @_;
+sub modify ($self, @args) {
+    my %args = _resolve_arg_shortcut(\@args, 'step');
     my $force = delete $args{force_save} || delete $args{force};
     my $quiet = delete $args{quiet};
     $self->load(%args);
@@ -397,17 +395,11 @@ sub modify {
     return $self;
 }
 
-sub load {
-    my $self   = shift;
+sub load ($self, @args) {
+    my %args = _resolve_arg_shortcut(\@args, 'step');
     my $loader = Config::Model::Loader->new( start_node => $self->config_root );
-    my %args   = @_ eq 1 ? ( step => $_[0] ) : @_;
     $loader->load( %args );
     return $self;
-}
-
-sub search_element {
-    my $self = shift;
-    $self->config_root->search_element(@_);
 }
 
 sub wizard_helper {
@@ -415,10 +407,7 @@ sub wizard_helper {
     goto &iterator;
 }
 
-sub iterator {
-    my $self = shift;
-    my @args = @_;
-
+sub iterator ($self, @args) {
     my $tree_root = $self->config_root;
 
     return Config::Model::Iterator->new( root => $tree_root, @args );
@@ -442,9 +431,7 @@ sub write_root_dir {
 }
 
 # FIXME: record changes to implement undo/redo ?
-sub notify_change {
-    my $self = shift;
-    my %args = @_;
+sub notify_change ($self, %args) {
     if ( $change_logger->is_debug ) {
         $change_logger->debug( "in instance ", $self->name, ' for path ', $args{path} );
     }
@@ -459,6 +446,7 @@ sub notify_change {
 
     $self->add_change( \%args );
     $self->on_change_cb->( %args );
+    return;
 }
 
 sub _truncate {
@@ -518,11 +506,10 @@ sub say_changes {
     return $self;
 }
 
-sub write_back {
-    my $self = shift;
+sub write_back ($self, @args) {
     my %args =
-          scalar @_ > 1 ? @_
-        : scalar @_ == 1 ? ( config_dir => $_[0] )
+          scalar @args > 1  ? @args
+        : scalar @args == 1 ? ( config_dir => $args[0] )
         :                  ();
 
     my $force_write   = delete $args{force}   || 0;
@@ -542,7 +529,7 @@ sub write_back {
     foreach my $k ( keys %args ) {
         if ($k eq 'config_dir') {
             $args{$k} ||= '';
-            $args{$k} .= '/' if $args{$k} and $args{$k} !~ m(/$);
+            $args{$k} .= '/' if $args{$k} and $args{$k} !~ m!/$!;
         }
         elsif ( $k ne 'config_file' ) {
             croak "write_back: wrong parameters $k";
@@ -569,12 +556,10 @@ sub write_back {
         $self->_write_back_node(%args, path => $path, force_write => $force_write) ;
     }
     $self->clear_changes;
+    return;
 }
 
-sub _write_back_node {
-    my $self = shift;
-    my %args = @_;
-
+sub _write_back_node ($self, %args) {
     my $path = delete $args{path};
     my $force_write   = delete $args{force_write};
 
@@ -613,6 +598,7 @@ sub _write_back_node {
     }
 
     $logger->trace( "write_back on node '$path' done" );
+    return;
 }
 
 sub save {
@@ -652,6 +638,7 @@ sub update {
 sub DEMOLISH {
     my $self = shift;
     $self->clear_write_back; # avoid reference loops
+    return;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -672,7 +659,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.157
+version 2.158
 
 =head1 SYNOPSIS
 

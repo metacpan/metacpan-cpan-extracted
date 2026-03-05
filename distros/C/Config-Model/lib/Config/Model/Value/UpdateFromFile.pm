@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value::UpdateFromFile 2.157;
+package Config::Model::Value::UpdateFromFile 2.158;
 
 use v5.20;
 use Mouse;
@@ -120,7 +120,7 @@ Config::Model::Value::UpdateFromFile - Retrieve data from external file
 
 =head1 VERSION
 
-version 2.157
+version 2.158
 
 =head1 SYNOPSIS
 

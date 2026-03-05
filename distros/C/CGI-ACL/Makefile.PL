@@ -3,9 +3,18 @@ use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 use File::Spec;
 
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
+}
+
 WriteMakefile(
 	NAME		=> 'CGI::ACL',
-	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+	AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
 	VERSION_FROM	=> 'lib/CGI/ACL.pm',
 	ABSTRACT_FROM	=> 'lib/CGI/ACL.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
@@ -18,8 +27,9 @@ WriteMakefile(
 		'Data::Dumper' => 0,
 		'English' => 0,
 		'Test::Carp' => 0,
-		'Test::EOF' => 0,
-		'Test::EOL' => 0,
+		'Test::DescribeMe' => 0,
+		'Test::MockObject' => 0,
+		'Test::MockModule' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'File::Spec' => 0,
@@ -27,7 +37,6 @@ WriteMakefile(
 		'Test::CleanNamespaces' => 0,
 		'Test::Distribution' => 0,
 		'Test::Kwalitee' => 0,
-		# 'Test::Perl::Metrics::Simple' => 0,
 		'autodie' => 0,
 		'strict' => 0,
 		'warnings' => 0,
@@ -35,10 +44,12 @@ WriteMakefile(
 		'WWW::RT::CPAN' => 0
 	}, PREREQ_PM => {
 		'Carp' => 0,
+		'File::Spec' => 3.4,
 		'namespace::clean' => 0,
 		'Net::CIDR' => 0,
+		'Regexp::Common' => 0
 	},
-	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	dist => $dist,
 	clean		=> { FILES => 'CGI-ACL-*' },
 	META_MERGE		=> {
 		'meta-spec' => { version => 2 },

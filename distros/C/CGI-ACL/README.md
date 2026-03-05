@@ -15,7 +15,8 @@ Version 0.05
 
 # SYNOPSIS
 
-Does what it says on the tin.
+Does what it says on the tin,
+providing control client access to a CGI script based on IP addresses and geographical location (countries).
 
     use CGI::Lingua;
     use CGI::ACL;
@@ -24,15 +25,21 @@ Does what it says on the tin.
     # ...
     my $denied = $acl->all_denied(info => CGI::Lingua->new(supported => 'en'));
 
+The module optionally integrates with [CGI::Lingua](https://metacpan.org/pod/CGI%3A%3ALingua) for detecting the client's country.
+
 # SUBROUTINES/METHODS
 
 ## new
 
-Creates a CGI::ACL object.
+Creates an instance of the CGI::ACL class.
+Handles both hash and hashref arguments.
+Includes basic error handling for invalid arguments.
+
+    my $acl = CGI::ACL->new(allowed_ips => { '127.0.0.1' => 1 });
 
 ## allow\_ip
 
-Give an IP (or CIDR) that we allow to connect to us
+Give an IP (or CIDR block) that we allow to connect to us.
 
     use CGI::ACL;
 
@@ -53,7 +60,8 @@ Give a country, or a reference to a list of countries, that we will not allow to
 
 ## allow\_country
 
-Give a country, or a reference to a list of countries, that we will allow to access us
+Give a country, or a reference to a list of countries, that we will allow to access us,
+overriding the deny list if needed.
 
     use CGI::ACL;
 
@@ -63,8 +71,12 @@ Give a country, or a reference to a list of countries, that we will allow to acc
 
 ## all\_denied
 
+Evaluates all restrictions (IP and country) and determines if access is denied.
+
 If any of the restrictions return false then return false, which should allow access.
-Note that by default localhost isn't allowed access, call allow\_ip('127.0.0.1') to enable it.
+Access is allowed by default if no restrictions are set,
+however as soon as any restriction is set you may find you need to explicitly allow access.
+Note, therefore, that by default localhost isn't allowed access, call allow\_ip('127.0.0.1') to enable it.
 
     use CGI::Lingua;
     use CGI::ACL;
@@ -84,9 +96,37 @@ Note that by default localhost isn't allowed access, call allow\_ip('127.0.0.1')
         return;
     }
 
+## deny\_cloud
+
+Enables blocking of requests originating from major cloud-hosting providers
+such as Amazon Web Services (AWS), Google Cloud Platform (GCP), Microsoft Azure,
+DigitalOcean, Linode, Hetzner, and OVH.
+
+This method relies on verified reverse DNS lookups to classify the client's
+network origin.
+A reverse DNS lookup is performed on the client's IP address,
+and the resulting hostname is then forward-confirmed to ensure that it is not spoofed.
+If the hostname matches known patterns associated with cloud infrastructure providers,
+access is denied.
+
+This feature is useful for preventing automated bots, scrapers, and abusive
+traffic commonly launched from cloud environments, while still allowing access
+from residential and business networks.
+
+    use CGI::ACL;
+
+    my $acl = CGI::ACL->new()->deny_cloud();
+
+    if($acl->all_denied()) {
+        print "Access from cloud-hosted systems is not permitted.";
+        exit;
+    }
+
+Returns the object instance to allow method chaining.
+
 # AUTHOR
 
-Nigel Horne, `<njh at bandsman.co.uk>`
+Nigel Horne, `<njh at nigelhorne.com>`
 
 # BUGS
 
@@ -95,6 +135,8 @@ or through the web interface at
 [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-ACL](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-ACL).
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
+
+A VPN or proxy would most likely bypass the IP-based access control.
 
 # SEE ALSO
 
@@ -130,6 +172,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017-2024 Nigel Horne.
+Copyright 2017-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2

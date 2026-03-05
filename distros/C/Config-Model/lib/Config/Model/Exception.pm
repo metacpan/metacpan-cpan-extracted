@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Exception 2.157;
+package Config::Model::Exception 2.158;
 
 use warnings;
 use strict;
@@ -17,6 +17,7 @@ use v5.20;
 use Carp;
 
 use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 # I don't like multiple packages in a file, but this is an Exception
 ## no critic (Modules::ProhibitMultiplePackages)
@@ -119,12 +120,12 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::Any 2.157;
+package Config::Model::Exception::Any 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception';
 
-package Config::Model::Exception::ModelDeclaration 2.157;
+package Config::Model::Exception::ModelDeclaration 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::Fatal';
@@ -133,7 +134,7 @@ sub _desc {
     return 'configuration model declaration error' ;
 }
 
-package Config::Model::Exception::User 2.157;
+package Config::Model::Exception::User 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::Any';
@@ -143,7 +144,7 @@ sub _desc {
 
 
 ## old classes below
-package Config::Model::Exception::Syntax 2.157;
+package Config::Model::Exception::Syntax 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::Any';
@@ -166,7 +167,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::LoadData 2.157;
+package Config::Model::Exception::LoadData 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -194,7 +195,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::Model 2.157;
+package Config::Model::Exception::Model 2.158;
 
 use Carp;
 use Mouse;
@@ -231,7 +232,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::Load 2.157;
+package Config::Model::Exception::Load 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -262,7 +263,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::UnavailableElement 2.157;
+package Config::Model::Exception::UnavailableElement 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -295,7 +296,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::AncestorClass 2.157;
+package Config::Model::Exception::AncestorClass 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -305,7 +306,7 @@ sub _desc {
 }
 
 
-package Config::Model::Exception::ObsoleteElement 2.157;
+package Config::Model::Exception::ObsoleteElement 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -332,7 +333,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::UnknownElement 2.157;
+package Config::Model::Exception::UnknownElement 2.158;
 
 use Carp;
 
@@ -411,7 +412,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::WarpError 2.157;
+package Config::Model::Exception::WarpError 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -420,7 +421,7 @@ sub _desc {
     return 'warp error';
 }
 
-package Config::Model::Exception::Fatal 2.157;
+package Config::Model::Exception::Fatal 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::Any';
@@ -430,7 +431,7 @@ sub _desc {
 }
 
 
-package Config::Model::Exception::UnknownId 2.157;
+package Config::Model::Exception::UnknownId 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -466,7 +467,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::WrongValue 2.157;
+package Config::Model::Exception::WrongValue 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -476,7 +477,7 @@ sub _desc {
 ;
 
 
-package Config::Model::Exception::WrongType 2.157;
+package Config::Model::Exception::WrongType 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -512,7 +513,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::ConfigFile 2.157;
+package Config::Model::Exception::ConfigFile 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -521,7 +522,7 @@ sub _desc {
     return 'error in configuration file' ;
 }
 
-package Config::Model::Exception::ConfigFile::Missing 2.157;
+package Config::Model::Exception::ConfigFile::Missing 2.158;
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
@@ -542,7 +543,7 @@ sub full_message {
     return "Error: cannot find configuration file " . $self->file . "\n";
 }
 
-package Config::Model::Exception::Formula 2.157;
+package Config::Model::Exception::Formula 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::Model';
@@ -551,7 +552,7 @@ sub _desc {
     return 'error in computation formula of the configuration model';
 }
 
-package Config::Model::Exception::Internal 2.157;
+package Config::Model::Exception::Internal 2.158;
 
 use Mouse;
 extends 'Config::Model::Exception::Fatal';
@@ -576,7 +577,7 @@ Config::Model::Exception - Exception mechanism for configuration model
 
 =head1 VERSION
 
-version 2.157
+version 2.158
 
 =head1 SYNOPSIS
 
