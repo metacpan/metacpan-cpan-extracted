@@ -213,11 +213,16 @@ subtest parse => sub {
       'parse entire line with negated match';
 
    $s= secret('')->span;
-   is $s->parse('-', MATCH_NEGATE|MATCH_MULTI), undef, 'parse from empty buffer';
+   is $s->parse('-', MATCH_NEGATE|MATCH_MULTI),
+      object { call pos => 0; call len => 0; },
+      'parse from empty buffer';
 
    $s= secret('-')->span;
-   is $s->parse('', MATCH_NEGATE|MATCH_MULTI),
+   is $s->parse('', MATCH_MULTI),
       object { call len => 0; },
+      'parse nothing from nonempty buffer';
+   is $s->parse('', MATCH_NEGATE|MATCH_MULTI),
+      undef,
       'parse nothing from nonempty buffer';
 };
 

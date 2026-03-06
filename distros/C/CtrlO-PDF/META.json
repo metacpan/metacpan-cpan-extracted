@@ -23,6 +23,7 @@
       "build" : {
          "requires" : {
             "DateTime::Format::SQLite" : "0",
+            "Image::PNG::Libpng" : "0",
             "Test::MockObject" : "0",
             "Test::More" : "0",
             "Test::Warn" : "0"
@@ -54,6 +55,6 @@
          "url" : "https://github.com/ctrlo/CtrlO-PDF"
       }
    },
-   "version" : "0.35",
+   "version" : "0.36",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

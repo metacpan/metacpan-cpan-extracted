@@ -3,6 +3,7 @@ use lib "$FindBin::Bin/lib";
 use Test2AndUtils;
 use Crypt::SecretBuffer qw( secret );
 use Crypt::SecretBuffer::PEM;
+use Crypt::SecretBuffer::PEM::Headers;
 
 # Test utility to compare Span objects with a string of bytes
 sub span_of_bytes {
@@ -155,6 +156,41 @@ END
        ],
        'Found all 3 PEM blocks'
    );
+};
+
+subtest header_manipulation => sub {
+   my @kv= (
+      A     => 1,
+      ' A ' => 2,
+      xyz   => 8,
+      a     => 3,
+      XYz   => 9,
+   );
+   my $h= Crypt::SecretBuffer::PEM::Headers->new(raw_kv_array => \@kv);
+   is( $h->get('a'), 3, 'one match for "a"' );
+   $h->caseless_keys(1);
+   is( $h->get('a'), [1,3], 'caseless, two matches for "a"' );
+   $h->trim_keys(1);
+   is( $h->get('a'), [1,2,3], 'caseless+trim, three matches for "a"' );
+
+   $h->caseless_keys(0);
+   $h->set(xyz => 6);
+   is( \@kv, [ A => 1, ' A ' => 2, xyz => 6, a => 3, XYz => 9 ],
+      'modified only xyz' );
+   $h->set('XYZ' => [8,7,6]);
+   is( \@kv, [ A => 1, ' A ' => 2, xyz => 6, a => 3, XYz => 9, XYZ => 8, XYZ => 7, XYZ => 6 ],
+      'appended new XYZ values' );
+   $h->caseless_keys(1);
+   $h->set('XYZ' => [8,7,6]);
+   is( \@kv, [ A => 1, ' A ' => 2, xyz => 8, xyz => 7, xyz => 6, a => 3 ],
+      'xyz gets 3 values, others removed' );
+
+   $h->delete('a');
+   is( \@kv, [ xyz => 8, xyz => 7, xyz => 6 ],
+      'all "a" matches removed' );
+   $h->append(A => 1);
+   is( \@kv, [ xyz => 8, xyz => 7, xyz => 6, A => 1 ],
+      'added new key/value' );
 };
 
 done_testing;

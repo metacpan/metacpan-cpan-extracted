@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
         'Test::More'  => 0,
         'Test::Warn'  => 0,
         'DateTime::Format::SQLite' => 0,
+        'Image::PNG::Libpng' => 0,
     },
     PREREQ_PM => {
         'Carp' => 0,

@@ -10,10 +10,13 @@ README.md
 sample/ctrlo.pl
 sample/logo.png
 sample/3.026/002_basic.pdf
+sample/3.026/003_header_page_boundary.pdf
 sample/3.026/004_image.pdf
 sample/3.027/002_basic.pdf
+sample/3.027/003_header_page_boundary.pdf
 sample/3.027/004_image.pdf
 sample/3.028/002_basic.pdf
+sample/3.028/003_header_page_boundary.pdf
 sample/3.028/004_image.pdf
 t/001_base.t
 t/002_basic.t

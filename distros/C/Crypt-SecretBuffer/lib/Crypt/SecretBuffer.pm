@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer;
 # VERSION
 # ABSTRACT: Prevent accidentally leaking a string of sensitive data
-$Crypt::SecretBuffer::VERSION = '0.018';
+$Crypt::SecretBuffer::VERSION = '0.019';
 
 use strict;
 use warnings;
@@ -18,12 +18,12 @@ bootstrap Crypt::SecretBuffer;
 
 {
    package Crypt::SecretBuffer::Exports;
-$Crypt::SecretBuffer::Exports::VERSION = '0.018';
+$Crypt::SecretBuffer::Exports::VERSION = '0.019';
    use Exporter 'import';
    @Crypt::SecretBuffer::Exports::EXPORT_OK= qw(
       secret_buffer secret span unmask_secrets_to memcmp
       NONBLOCK AT_LEAST ISO8859_1 ASCII UTF8 UTF16LE UTF16BE HEX BASE64
-      MATCH_MULTI MATCH_REVERSE MATCH_NEGATE MATCH_ANCHORED
+      MATCH_MULTI MATCH_REVERSE MATCH_NEGATE MATCH_ANCHORED MATCH_CONST_TIME
    );
 }
 
@@ -505,10 +505,10 @@ or a character class.  The scan can optionally be limited to an offset and
 length describing a substring of the buffer.  The return value is the position
 of the start of the match and number of I<bytes> matched (which can be greater
 than one when matching a character class in UTF-8, or if C<MATCH_MULTI> flag is
-requested).  Unlike C<index> or C<rindex>, on failure the return value will be
-C<< (C<$ofs> + C<$len>, 0) >>, or with MATCH_REVERSE, C<< (C<$ofs>, 0) >>.
-Also unlike C<rindex>, a reverse scan must fall entirely within the range of
-C<< ($ofs, $len) >> rather than just starting before C<< $ofs+$len >>.
+requested).  On failure, the return value is an empty list. (versions before
+0.19 returned C<< $len == 0 >> and a seldom-useful C<$ofs>)
+Unlike C<rindex>, a reverse scan match must fall entirely within the range of
+C<< ($ofs .. $ofs+$len) >> rather than just starting before the ending offset.
 
 Eventually, this function may be enhanced with full regex support, but for now
 it is limited to one character class and optionally a '+' modifier as an alias
@@ -531,7 +531,8 @@ L<Span object|Crypt::SecretBuffer::Span> and then call its methods.
   $cmp= $buf->memcmp($buf2);
 
 Compare contents of the buffer byte-by-byte to another SecretBuffer (or Span, or plain scalar)
-in the same manner as the C function C<memcmp>.  (returns C<< <0 >>, C<0>, or C<< >0 >>)
+in the same manner as the C function C<memcmp> but in constant time. (iterating the full length
+of the shortest string to prevent timing attacks)
 
 =head2 append_lenprefixed
 
@@ -854,6 +855,17 @@ of buffer.
 Require the match begin at the start of the specified span of the buffer.
 (or with C<MATCH_REVERSE>, end at the end of the span of the buffer).
 
+=item MATCH_CONST_TIME
+
+Don't shortcut any loops on a non-matching byte/character.  This helps prevent timing attacks
+by making all searches take the same length of time, but beware that this guarantees you always
+get the worst-case performance of C<< O(N*M) >> when searching for a string within a secret.
+
+NOTE: currently there is still about 15% difference in speed between the different code paths
+of L</scan> between matching the start of the buffer vs. matching the end, due to complex
+branching with all these match options.  An attacker would likely only be able to measure this
+for particularly large buffers, though.  Patches welcome.
+
 =back
 
 =head1 C API
@@ -910,7 +922,7 @@ instructions how to report security vulnerabilities.
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 AUTHOR
 

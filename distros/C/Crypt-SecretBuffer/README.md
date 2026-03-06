@@ -17,7 +17,7 @@ When distributed, all you should need to do is run
 
 or better,
 
-    cpanm Crypt-SecretBuffer.tar.gz
+    cpanm Crypt-SecretBuffer-0.xxx.tar.gz
 
 or from CPAN:
 
@@ -44,7 +44,7 @@ and runs "perl Makefile.PL" to compile the XS, then "prove -lvb t/01-ctor.t".
 
 ### Copyright
 
-This software is copyright (c) 2025 by Michael Conrad
+This software is copyright (c) 2025-2026 by Michael Conrad
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -327,13 +327,17 @@ Specify bit widths using the pipe (C<|>) operator within Structs/Unions. Affix h
 Standard structs and arrays copy data between Perl and C. Live views allow you to directly manipulate C memory through
 Perl references.
 
-=over
+C<Live[ $type ]> Returns a live, zero-copy view of the memory as defined by C<$type>.
 
-=item * B<C<LiveStruct[ ... ]>>: Returns an C<Affix::Live> tied hash. Modifying keys in this hash updates C memory immediately.
+If C<$type> is a C<Struct> or C<Union>, it returns an C<Affix::Live> tied hash. Modifying keys in this hash updates C
+memory immediately.
 
-=item * B<C<LiveArray[ $type, $count ]>>: Returns an C<Affix::Pointer> tied array. C<< $arr->[0] = 5 >> writes directly to memory.
+If C<$type> is an C<Array>, it returns an C<Affix::Pointer> object. Modifying elements (e.g. C<< $arr->[0] = 5 >>)
+writes directly to memory.
 
-=back
+    # Example: Live view of a struct
+    my $live = cast( $ptr, Live[ Struct[ x => Int, y => Int ] ] );
+    $live->{x} = 42; # Updates C memory
 
 =head3 Unified Access
 

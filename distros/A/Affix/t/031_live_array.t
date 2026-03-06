@@ -25,8 +25,8 @@ subtest 'Live Array' => sub {
     affix $lib_path, 'get_elem', [Int] => Int;
     is get_elem(0), 10, 'Modifying deep copy did NOT affect C memory';
 
-    # Live: zero-copy view via LiveArray
-    my $live = cast( $ptr, LiveArray [ Int, 4 ] );
+    # Live: zero-copy view via Live()
+    my $live = cast( $ptr, Live [ Array [ Int, 4 ] ] );
     isa_ok $live, ['Affix::Pointer'], 'Live array is an Affix::Pointer';
     is $live->[0], 10, 'Live view has correct element';
 

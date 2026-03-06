@@ -33,8 +33,8 @@ subtest 'Live Struct' => sub {
     is get_id(), 1, 'Modifying deep copy did NOT affect C memory';
 
     # Live: zero-copy view
-    # We use cast() with LiveStruct to get a live view
-    my $live = cast( $ptr, LiveStruct( [ id => Int32, value => Double ] ) );
+    # We use cast() with Live() to get a live view
+    my $live = cast( $ptr, Live( Struct [ id => Int32, value => Double ] ) );
     isa_ok $live, ['Affix::Live'], 'Live struct is blessed as Affix::Live';
     is $live->{id}, 1, 'Live view has correct ID';
 

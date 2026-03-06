@@ -1,4 +1,4 @@
-package Affix v1.0.8 {    # 'FFI' is my middle name!
+package Affix v1.0.9 {    # 'FFI' is my middle name!
 
     #~ |-----------------------------------|-----------------------------------||
     #~ |--------------------------4---5~---|--4--------------------------------||
@@ -48,7 +48,7 @@ package Affix v1.0.8 {    # 'FFI' is my middle name!
             Float32 Float64
             Size_t SSize_t
             String WString
-            Pointer Array LiveArray Struct LiveStruct Union Enum Callback CodeRef Complex Vector
+            Pointer Array Live Struct Union Enum Callback CodeRef Complex Vector Live
             ThisCall attach_destructor
             Packed VarArgs
             SV
@@ -252,12 +252,23 @@ package Affix v1.0.8 {    # 'FFI' is my middle name!
     }
     sub Struct : prototype($) { Affix::Type::Struct->new( members => $_[0] ) }
 
-    sub LiveStruct : prototype($) {
-        my $s = $_[0];
-        $s = $s->()     if ref($s) eq 'CODE';
-        $s = Struct($s) if ref($s) eq 'ARRAY';
-        $s = "$s"       if builtin::blessed($s) && $s->isa('Affix::Type');
-        return '+' . $s;
+    sub Live : prototype($) {
+        my $t = $_[0];
+        $t = $t->() if ref($t) eq 'CODE';
+        if ( ref($t) eq 'ARRAY' ) {
+            if   ( @$t == 1 ) { $t = $t->[0]; }
+            else              { $t = ( @$t == 2 && !ref( $t->[1] ) && $t->[1] =~ /^\d+$/ ) ? Array($t) : Struct($t); }
+        }
+        if ( builtin::blessed($t) ) {
+            return '+' . $t->signature if $t->isa('Affix::Type::Struct') || $t->isa('Affix::Type::Union');
+            return Pointer [$t]        if $t->isa('Affix::Type::Array');
+            return Pointer [$t];
+        }
+        if ( !ref $t ) {
+            return '+' . $t if $t =~ /^[\{\<@]/;
+            return '*' . $t if $t =~ /^\[/;
+        }
+        return $t;
     }
 
     # Union[ i => Int, f => Float ] -> <i:int,f:float>
@@ -266,11 +277,6 @@ package Affix v1.0.8 {    # 'FFI' is my middle name!
     sub Array : prototype($) {
         my ( $type, $size ) = @{ $_[0] };
         return Affix::Type::Array->new( type => $type, count => $size );
-    }
-
-    sub LiveArray : prototype($) {
-        my ( $type, $size ) = @{ $_[0] };
-        return Pointer [ Array [ $type, $size ] ];
     }
 
     # Callback[ [Int, Int] => Void ] -> (int,int)->void

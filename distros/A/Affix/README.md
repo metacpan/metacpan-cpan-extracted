@@ -289,8 +289,19 @@ typedef Config => Struct[ a => UInt32 | 1, b => UInt32 | 3 ];
 Standard structs and arrays copy data between Perl and C. Live views allow you to directly manipulate C memory through
 Perl references.
 
-- **`LiveStruct[ ... ]`**: Returns an `Affix::Live` tied hash. Modifying keys in this hash updates C memory immediately.
-- **`LiveArray[ $type, $count ]`**: Returns an `Affix::Pointer` tied array. `$arr->[0] = 5` writes directly to memory.
+`Live[ $type ]` Returns a live, zero-copy view of the memory as defined by `$type`.
+
+If `$type` is a `Struct` or `Union`, it returns an `Affix::Live` tied hash. Modifying keys in this hash updates C
+memory immediately.
+
+If `$type` is an `Array`, it returns an `Affix::Pointer` object. Modifying elements (e.g. `$arr->[0] = 5`)
+writes directly to memory.
+
+```perl
+# Example: Live view of a struct
+my $live = cast( $ptr, Live[ Struct[ x => Int, y => Int ] ] );
+$live->{x} = 42; # Updates C memory
+```
 
 ### Unified Access
 

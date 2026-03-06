@@ -10,7 +10,7 @@ use parent 'Test2::V0';
 our @EXPORT= (
    @Test2::V0::EXPORT,
    qw( explain unindent pipe_with_data escape_nonprintable unescape_nonprintable
-      pack_msg unpack_msg setup_tty_helper )
+      pack_msg unpack_msg setup_tty_helper cmpthese )
 );
 
 # Test2 runs async by default, which messes up the relation between warnings and the test
@@ -44,6 +44,40 @@ sub pipe_with_data {
    $w->autoflush(1);
    $w->print($data) if defined $data;
    return ($r, $w);
+}
+
+# Run Benchmark's 'cmpthese' but redirect the output to 'note' and return
+# the benchmark hashref from 'timethese'.
+# Usage:
+#   cmpthese($count, { Name1 => sub { code1 }, ... });  or
+#   cmpthese($result, $style);
+
+sub cmpthese {
+   require Benchmark;
+   Benchmark->import(':hireswallclock');
+   my ($benchmarks, $count, $tests, $style);
+   if (ref $_[0] ne 'ARRAY' && ref $_[1] eq 'HASH') {
+      ($count, $tests, $style)= @_;
+      for my $tname (sort keys %$tests) {
+         # temporarily capture STDOUT
+         my $buffer;
+         {  local *main::STDOUT;
+            open *main::STDOUT, '>', \$buffer or die "can't capture STDOUT";
+            $benchmarks->{$tname}= Benchmark::timethis($count, $tests->{$tname}, $tname, $style);
+         }
+         note $buffer;
+      }
+   } else {
+      ($benchmarks, $style)= @_;
+   }
+   # capture STDOUT
+   my $buffer;
+   {  local *main::STDOUT;
+      open *main::STDOUT, '>', \$buffer or die "can't capture STDOUT";
+      Benchmark::cmpthese($benchmarks, $style);
+   }
+   note $buffer;
+   return $benchmarks;
 }
 
 # Convert data strings to and from C / Perl backslash notation.

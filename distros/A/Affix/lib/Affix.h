@@ -202,6 +202,8 @@ typedef struct {
     void (*destructor)(void *);  ///< Custom destructor function (e.g. SDL_DestroyWindow).
     SV * destructor_lib_sv;      ///< Perl object (Affix::Lib) to keep alive for the destructor.
     SV * owner_sv;               ///< Perl object that owns the memory, kept alive by this pin.
+    size_t bit_offset;           ///< Bit offset (for bitfields)
+    size_t bit_width;            ///< Bit width (for bitfields, 0 = not a bitfield)
 } Affix_Pin;
 /// Holds the necessary data for a callback, specifically the Perl subroutine to call.
 typedef struct {
@@ -262,7 +264,13 @@ Affix_Pull get_pull_handler(pTHX_ const infix_type * type);
 Affix_Out_Param_Writer get_out_param_writer(const infix_type * type);
 
 // Pin management
-void _pin_sv(pTHX_ SV * sv, const infix_type * type, void * pointer, bool managed, SV * owner_sv);
+void _pin_sv(pTHX_ SV * sv,
+             const infix_type * type,
+             void * pointer,
+             bool managed,
+             SV * owner_sv,
+             size_t bit_offset,
+             size_t bit_width);
 bool is_pin(pTHX_ SV * sv);
 Affix_Pin * _get_pin_from_sv(pTHX_ SV * sv);
 SV * _new_pointer_obj(pTHX_ Affix_Pin * pin);

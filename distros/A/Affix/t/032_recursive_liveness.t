@@ -26,10 +26,10 @@ typedef Point => Struct [ x => Int, y => Int ];
 typedef Rect => Struct [ top_left => Point(), bottom_right => Point() ];
 subtest 'Recursive Liveness (Struct in Struct)' => sub {
 
-    # Cast to LiveStruct
+    # Cast to Live
     affix $lib_path, 'get_rect_ptr', [] => Pointer [ Rect() ];
     my $ptr  = get_rect_ptr();
-    my $live = cast( $ptr, LiveStruct( Rect() ) );
+    my $live = cast( $ptr, Live [ Rect() ] );
 
     # top_left should be a Live view (Hash)
     my $tl = $live->{top_left};
@@ -45,16 +45,16 @@ subtest 'Recursive Liveness (Array in Struct)' => sub {
     typedef NestedArray => Struct [ id => Int, data => Array [ Int, 4 ] ];
     affix $lib_path, [ get_rect_ptr => 'get_arr_ptr' ], [] => Pointer [ NestedArray() ];
     my $ptr  = get_arr_ptr();
-    my $live = cast( $ptr, LiveStruct( NestedArray() ) );
+    my $live = cast( $ptr, Live [ NestedArray() ] );
     my $arr  = $live->{data};
     isa_ok $arr, ['Affix::Pointer'], 'Nested array member is a Pointer (Live view)';
     $arr->[0] = 999;
     is $arr->[0], 999, 'Modified nested array via live view';
 };
-subtest 'Recursive Liveness: LiveArray of Structs' => sub {
+subtest 'Recursive Liveness: Live array of Structs' => sub {
     my $Point    = Struct [ x => Int, y => Int ];
     my $ptr      = malloc( sizeof($Point) * 2 );
-    my $live_arr = cast( $ptr, Pointer [ Array [ $Point, 2 ] ] );
+    my $live_arr = cast( $ptr, Live [ Array [ $Point, 2 ] ] );
 
     # Set values
     $live_arr->[0]{x} = 10;
@@ -67,14 +67,14 @@ subtest 'Recursive Liveness: LiveArray of Structs' => sub {
     is $live_arr->[0]{x}, 30, 'Changes to live element reflect in original memory';
     free($ptr);
 };
-subtest 'Recursive Liveness: LiveStruct with Array' => sub {
+subtest 'Recursive Liveness: Live struct with Array' => sub {
 
     # Using typedef to ensure member names are preserved in the infix registry
     typedef ListStruct => Struct [ items => Array [ Int, 3 ] ];
     my $ptr         = malloc( sizeof( ListStruct() ) );
-    my $live_struct = cast( $ptr, LiveStruct( ListStruct() ) );
+    my $live_struct = cast( $ptr, Live [ ListStruct() ] );
 
-    # Accessing $live_struct->{items} returns an Affix::Pointer object (LiveArray)
+    # Accessing $live_struct->{items} returns an Affix::Pointer object
     my $items = $live_struct->{items};
     isa_ok $items, ['Affix::Pointer'], 'Array field of live struct should be Affix::Pointer';
     $items->[0] = 100;

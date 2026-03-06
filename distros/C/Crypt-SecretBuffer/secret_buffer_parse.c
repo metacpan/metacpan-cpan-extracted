@@ -101,72 +101,79 @@ bool secret_buffer_parse_init_from_sv(secret_buffer_parse *parse, SV *sv) {
 bool secret_buffer_match(secret_buffer_parse *parse, SV *pattern, int flags) {
    dTHX;
    REGEXP *rx= (REGEXP*)SvRX(pattern);
-   secret_buffer *src_buf;
-   secret_buffer_span *span;
+   secret_buffer_parse pat_parse;
+
    /* Is the pattern a regexp-ref? */
    if (rx) {
       secret_buffer_charset *cset= secret_buffer_charset_from_regexpref(pattern);
       return secret_buffer_match_charset(parse, cset, flags);
    }
-   /* Is the pattern a SecretBuffer? */
-   else if (SvROK(pattern) && (src_buf= secret_buffer_from_magic(pattern, 0))) {
-      return sb_parse_match_str_U8(parse, (U8*) src_buf->data, src_buf->len, flags);
+
+   /* load up a parse struct with the pos, lim, and encoding */
+   if (!secret_buffer_parse_init_from_sv(&pat_parse, pattern))
+      croak("%s", pat_parse.error);
+
+   /* Remove edge case of zero-length pattern (always matches) */
+   if (pat_parse.pos >= pat_parse.lim) {
+      if ((flags & SECRET_BUFFER_MATCH_REVERSE))
+         parse->pos= parse->lim;
+      else
+         parse->lim= parse->pos;
+      return !(flags & SECRET_BUFFER_MATCH_NEGATE);
    }
-   /* Is the pattern a SecretBuffer::Span? */
-   else if (SvROK(pattern) && (span= secret_buffer_span_from_magic(pattern, 0))) {
-      secret_buffer_parse pattern_parse;
-      SV **buf_field= hv_fetchs(((HV*)SvRV(pattern)), "buf", 0);
-      IV len= span->lim - span->pos;
-      if (!buf_field || !*buf_field || !(src_buf= secret_buffer_from_magic(*buf_field, 0)))
-         croak("Span lacks reference to source buffer");
-      if (!secret_buffer_parse_init(&pattern_parse, src_buf, span->pos, span->lim, span->encoding))
-         croak("%s", pattern_parse.error);
-      /* optimize if it is a span of plain bytes */
-      if (span->encoding == SECRET_BUFFER_ENCODING_ISO8859_1) {
-         return sb_parse_match_str_U8(parse, pattern_parse.pos, len, flags);
-      }
-      /* else need to unpack the codepoints of the span */
-      else {
-         /* create a temporary secret buffer of integers */
-         secret_buffer *tmp= secret_buffer_new(len * sizeof(I32), NULL);
-         IV i= 0;
-         while (pattern_parse.pos < pattern_parse.lim) {
-            int cp= sb_parse_next_codepoint(&pattern_parse);
-            if (cp < 0)
-               croak("encoding error in pattern: %s", pattern_parse.error);
-            ASSUME(i < len);
-            ((I32*)tmp->data)[i++]= cp;
-         }
-         secret_buffer_set_len(tmp, i * sizeof(I32));
-         return sb_parse_match_str_I32(parse, (I32*) tmp->data, i, flags);
+   /* Remove edge case of zero-length subject (never matches) */
+   if (parse->pos >= parse->lim) {
+      return (flags & SECRET_BUFFER_MATCH_NEGATE);
+   }
+
+   /* Since unicode iteration of the pattern is a hassle and might happen lots of times,
+    * convert it to either plain bytes or array of U32 codepoints.
+    */
+   if (pat_parse.encoding != SECRET_BUFFER_ENCODING_ISO8859_1) {
+      int dst_enc= 
+         /* these can be transcoded to bytes */
+         (pat_parse.encoding == SECRET_BUFFER_ENCODING_ASCII
+          || pat_parse.encoding == SECRET_BUFFER_ENCODING_HEX
+          || pat_parse.encoding == SECRET_BUFFER_ENCODING_BASE64)
+         ? SECRET_BUFFER_ENCODING_ISO8859_1
+         : SECRET_BUFFER_ENCODING_I32;
+      SSize_t dst_len= secret_buffer_sizeof_transcode(&pat_parse, dst_enc);
+      if (dst_len < 0)
+         croak("transcode of pattern failed: %s", pat_parse.error);
+      /* No need to transcode SECRET_BUFFER_ENCODING_ASCII, but the above size check
+       * verified it is clean 7-bit, which is the whole point of that encoding.
+       */
+      if (pat_parse.encoding == SECRET_BUFFER_ENCODING_ASCII
+         /* Likewise, if SECRET_BUFFER_ENCODING_UTF8's I32 len is exactly 4x the number of
+          * original bytes, that means every byte became a character, which means every
+          * character could fit in a byte. */
+         || (pat_parse.encoding == SECRET_BUFFER_ENCODING_UTF8
+            && dst_len == (pat_parse.lim - pat_parse.pos) * 4)
+      ) {
+         pat_parse.encoding= SECRET_BUFFER_ENCODING_ISO8859_1;
+      } else {
+         /* create a temporary secret buffer to hold the transcode */
+         secret_buffer *tmp= secret_buffer_new(0, NULL);
+         secret_buffer_parse pat_orig= pat_parse;
+         secret_buffer_set_len(tmp, dst_len);
+         if (!secret_buffer_parse_init(&pat_parse, tmp, 0, dst_len, dst_enc))
+            croak("transcode of pattern failed: %s", pat_parse.error);
+         /* Transcode the pattern */
+         if (!secret_buffer_transcode(&pat_orig, &pat_parse))
+            croak("transcode of pattern failed: %s", pat_orig.error? pat_orig.error : pat_parse.error);
       }
    }
-   /* Else treat it as a normal SV, either UTF-8 or bytes (ISO8859-1) */
-   else {
-      STRLEN len;
-      U8 *str= (U8*) SvPV(pattern, len);
-      if (SvUTF8(pattern)) {
-         /* unpack the UTF8 codepoints into I32 array.  Just in case they are a
-          * secret, use a SecretBuffer instead of a plain malloc.
-          */
-         secret_buffer_parse tmp;
-         secret_buffer *sb= secret_buffer_new(len * sizeof(I32), NULL); /* mortal, cleans itself up */
-         size_t i= 0;
-         Zero(&tmp, 1, secret_buffer_parse);
-         tmp.pos= str;
-         tmp.lim= str + len;
-         tmp.encoding= SECRET_BUFFER_ENCODING_UTF8;
-         while (tmp.pos < tmp.lim) {
-            int cp= sb_parse_next_codepoint(&tmp);
-            if (cp < 0)
-               croak("%s", tmp.error);
-            ASSUME(i < len);
-            ((I32*)sb->data)[i++]= cp;
-         }
-         secret_buffer_set_len(sb, i * sizeof(I32));
-         return sb_parse_match_str_I32(parse, (I32*) sb->data, i, flags);
-      }
-      return sb_parse_match_str_U8(parse, str, len, flags);
+   /* In some cases it would also be nice to transcode the subject first, but the
+    * final state of the parse struct carries information back to the caller and
+    * needs to refer to original positions of characters. */
+
+   /* Now dipatch to sb_parse_match_str_X */
+   if (pat_parse.encoding == SECRET_BUFFER_ENCODING_ISO8859_1) {
+      size_t pat_len= pat_parse.lim - pat_parse.pos;
+      return sb_parse_match_str_U8(parse, pat_parse.pos, pat_len, flags);
+   } else { /* must be _I32 encoding, from above */
+      size_t pat_len= (pat_parse.lim - pat_parse.pos) >> 2;
+      return sb_parse_match_str_I32(parse, (I32*) pat_parse.pos, pat_len, flags);
    }
 }
 
@@ -379,14 +386,13 @@ secret_buffer_copy_to(secret_buffer_parse *src, SV *dst_sv, int encoding, bool a
       if (!append)
          secret_buffer_set_len(dst_sbuf, 0); /* clears secrets */
       secret_buffer_alloc_at_least(dst_sbuf, dst_sbuf->len + need_bytes);
-      dst.pos= dst_sbuf->data + dst_sbuf->len;
+      dst.pos= (U8*) dst_sbuf->data + dst_sbuf->len;
       dst.lim= dst.pos + need_bytes;
    }
    else {
       // For destination SV, set length to 0 unless appending, then force it to
       // be bytes or utf-8, then grow it to ensure room for additional `need_bytes`.
       STRLEN len;
-      char *pv;
       // If overwriting, set the length to 0 before forcing to bytes or utf8
       if (!append)
          sv_setpvn(dst_sv, "", 0);
@@ -395,7 +401,7 @@ secret_buffer_copy_to(secret_buffer_parse *src, SV *dst_sv, int encoding, bool a
       else SvPVbyte(dst_sv, len);
       // grow it to the required length, for writing
       sv_grow(dst_sv, (append? len : 0) + need_bytes + 1);
-      dst.pos= SvPVX_mutable(dst_sv) + len;
+      dst.pos= (U8*) SvPVX_mutable(dst_sv) + len;
       dst.lim= dst.pos + need_bytes;
       // don't forget the NUL terminator
       *dst.lim= '\0';
@@ -443,7 +449,7 @@ secret_buffer_append_uv_asn1_der_length(secret_buffer *buf, UV val) {
     */
    ASSUME(enc_len < 127);
    secret_buffer_set_len(buf, buf->len + enc_len);
-   pos= buf->data + buf->len - 1;
+   pos= (U8*) buf->data + buf->len - 1;
    if (val <= 127) {
       *pos = (U8) val;
    } else {
@@ -464,7 +470,6 @@ secret_buffer_parse_uv_asn1_der_length(secret_buffer_parse *parse, UV *out) {
    U8 *pos = parse->pos;
    U8 *lim = parse->lim;
    UV result;
-   int n;
 
    if (pos >= lim) {
       parse->error = "unexpected end of buffer";
@@ -537,7 +542,7 @@ secret_buffer_append_uv_base128le(secret_buffer *buf, UV val) {
       tmp >>= 7;
    }
    secret_buffer_set_len(buf, buf->len + enc_len);
-   pos= buf->data + buf->len - enc_len;
+   pos= (U8*) buf->data + buf->len - enc_len;
    /* Encode */
    tmp= val;
    do {
@@ -609,7 +614,7 @@ secret_buffer_append_uv_base128be(secret_buffer *buf, UV val) {
       tmp >>= 7;
    }
    secret_buffer_set_len(buf, buf->len + enc_len);
-   pos= buf->data + buf->len - enc_len;
+   pos= (U8*) buf->data + buf->len - enc_len;
    /* Encode */
    for (shift= (enc_len-1) * 7; shift >= 0; shift -= 7) {
       U8 byte = (U8)((val >> shift) & 0x7F);
@@ -626,7 +631,6 @@ secret_buffer_parse_uv_base128be(secret_buffer_parse *parse, UV *out) {
    U8 *pos = parse->pos;
    U8 *lim = parse->lim;
    UV result= 0;
-   int shift= 0;
 
    if (pos >= lim) {
       parse->error = "unexpected end of buffer";
@@ -668,6 +672,7 @@ static bool sb_parse_match_charset_bytes(
    bool reverse=  0 != (flags & SECRET_BUFFER_MATCH_REVERSE);
    bool multi=    0 != (flags & SECRET_BUFFER_MATCH_MULTI) || cset->match_multi;
    bool anchored= 0 != (flags & SECRET_BUFFER_MATCH_ANCHORED);
+   bool consttime=0 != (flags & SECRET_BUFFER_MATCH_CONST_TIME);
    int step= reverse? -1 : 1;
    U8 *pos= reverse? parse->lim-1 : parse->pos,
       *lim= reverse? parse->pos-1 : parse->lim,
@@ -679,16 +684,26 @@ static bool sb_parse_match_charset_bytes(
          // Found.  Now are we looking for a span?
          if (span_start)
             break;
-         if (!multi) {
-            parse->pos= pos;
-            parse->lim= pos+1;
-            return true;
-         }
          span_start= pos;
+         if (!multi) {
+            pos += step;
+            break;
+         }
          negate= !negate;
       } else if (anchored && !span_start)
          break;
       pos += step;
+   }
+   /* If constant time operation is requested, we need to perform one sbc_bitmap_test
+    * for every character in the span, and make sure the compiler doesn't eliminate it.
+    */
+   if (consttime) {
+      volatile bool sink= false;
+      while (pos != lim) {
+         sink ^= sbc_bitmap_test(cset->bitmap, *pos);
+         pos += step;
+      }
+      (void) sink;
    }
    // reached end of defined range, and implicitly ends span
    if (reverse) {
@@ -711,37 +726,55 @@ static bool sb_parse_match_charset_codepoints(
    bool reverse=  0 != (flags & SECRET_BUFFER_MATCH_REVERSE);
    bool multi=    0 != (flags & SECRET_BUFFER_MATCH_MULTI) || cset->match_multi;
    bool anchored= 0 != (flags & SECRET_BUFFER_MATCH_ANCHORED);
+   bool consttime=0 != (flags & SECRET_BUFFER_MATCH_CONST_TIME);
    bool span_started= false;
+   bool encoding_error= false;
    U8 *span_mark= NULL, *prev_mark= reverse? parse->lim : parse->pos;
 
    while (parse->pos < parse->lim) {
       int codepoint= reverse? sb_parse_prev_codepoint(parse)
                             : sb_parse_next_codepoint(parse);
       // warn("parse.pos=%p  parse.lim=%p  parse.enc=%d  cp=%d  parse.err=%s", parse->pos, parse->lim, parse->encoding, codepoint, parse->error);
-      if (codepoint < 0) // encoding error
-         return false;
+      if (codepoint < 0) {// encoding error
+         encoding_error= true;
+         break;
+      }
       if (sbc_test_codepoint(aTHX_ cset, codepoint) != negate) {
          // Found.  Mark boundaries of char.
          // Now are we looking for a span?
          if (span_started)
             break;
-         if (!multi) {
-            if (reverse) {
-               parse->pos= parse->lim;
-               parse->lim= prev_mark;
-            } else {
-               parse->lim= parse->pos;
-               parse->pos= prev_mark;
-            }
-            return true;
-         }
          span_started= true;
          span_mark= prev_mark;
          negate= !negate;
+         if (!multi) {
+            prev_mark= reverse? parse->lim : parse->pos;
+            break;
+         }
       } else if (anchored && !span_started)
          break;
       prev_mark= reverse? parse->lim : parse->pos;
    }
+   /* If constant time operation is requested, we need to perform one sbc_bitmap_test
+    * for every character in the span, and make sure the compiler doesn't eliminate it.
+    */
+   if (consttime) {
+      volatile bool sink= false;
+      while (parse->pos < parse->lim) {
+         int codepoint= reverse? sb_parse_prev_codepoint(parse)
+                               : sb_parse_next_codepoint(parse);
+         // warn("parse.pos=%p  parse.lim=%p  parse.enc=%d  cp=%d  parse.err=%s", parse->pos, parse->lim, parse->encoding, codepoint, parse->error);
+         if (codepoint < 0) { // encoding error
+            encoding_error= true;
+            sink ^= sbc_test_codepoint(aTHX_ cset, 0);
+         }
+         else
+            sink ^= sbc_test_codepoint(aTHX_ cset, codepoint);
+      }
+      (void) sink;
+   }
+   if (encoding_error)
+      return false;
    // reached end of defined range
    if (span_started) { // and implicitly ends span
       if (reverse) {
@@ -759,6 +792,8 @@ static bool sb_parse_match_charset_codepoints(
 
 int sb_parse_codepointcmp(secret_buffer_parse *lhs, secret_buffer_parse *rhs) {
    I32 lhs_cp, rhs_cp;
+   volatile int ret= 0;
+   /* constant-time iteration per the shorter of the two strings */
    while (lhs->pos < lhs->lim && rhs->pos < rhs->lim) {
       lhs_cp= sb_parse_next_codepoint(lhs);
       if (lhs_cp < 0)
@@ -766,10 +801,11 @@ int sb_parse_codepointcmp(secret_buffer_parse *lhs, secret_buffer_parse *rhs) {
       rhs_cp= sb_parse_next_codepoint(rhs);
       if (rhs_cp < 0)
          croak("Encoding error in right-hand buffer");
-      if (lhs_cp != rhs_cp)
-         return lhs_cp < rhs_cp? -1 : 1;
+      if (lhs_cp != rhs_cp && !ret)
+         ret= lhs_cp < rhs_cp? -1 : 1;
    }
-   return (lhs->pos < lhs->lim)?  1 /* right string shorter than left */
+   return ret? ret
+        : (lhs->pos < lhs->lim)?  1 /* right string shorter than left */
         : (rhs->pos < rhs->lim)? -1 /* left string shorter than right */
         : 0;
 }
@@ -906,6 +942,12 @@ static int sb_parse_next_codepoint(secret_buffer_parse *parse) {
          }
       }
    }
+   else if (encoding == SECRET_BUFFER_ENCODING_I32) {
+      if (lim - pos < 4)
+         SB_RETURN_ERROR("end of span");
+      cp= *(I32*)pos;
+      pos+= 4;
+   }
    else SB_RETURN_ERROR("unsupported encoding")
    parse->pos= pos;
    return cp;
@@ -1024,6 +1066,12 @@ static int sb_parse_prev_codepoint(secret_buffer_parse *parse) {
          //warn(" cp=%d, lim-pos=%d, lim_bit=%d", cp, (int)(lim-pos), parse->lim_bit);
       } while (again);
    }
+   else if (encoding == SECRET_BUFFER_ENCODING_I32) {
+      if (lim - pos < 4)
+         SB_RETURN_ERROR("end of span");
+      lim -= 4;
+      cp= *(I32*)lim;
+   }
    else SB_RETURN_ERROR("unsupported encoding")
    parse->lim= lim;
    return cp;
@@ -1046,41 +1094,45 @@ static int sizeof_codepoint_encoding(int codepoint, int encoding) {
    /* Base64 would need to track an accumulator, so just return 1 and fix it in the caller */
    else if (encoding == SECRET_BUFFER_ENCODING_BASE64)
       return codepoint < 0x100? 1 : -1;
+   else if (encoding == SECRET_BUFFER_ENCODING_I32)
+      return 4;
    else
       return -1;
 }
 
 static bool sb_parse_encode_codepoint(secret_buffer_parse *dst, int codepoint) {
    #define SB_RETURN_ERROR(msg) { dst->error= msg; return false; }
-   int encoding= dst->encoding;
+   int encoding= dst->encoding, n;
+   U8 *dst_pos= dst->pos;
    // codepoints above 0x10FFFF are illegal
    if (codepoint >= 0x110000)
       SB_RETURN_ERROR("invalid codepoint");
    // not quite as efficient as checking during the code below, but saves a bunch of redundancy
-   int n= sizeof_codepoint_encoding(codepoint, encoding);
+   n= sizeof_codepoint_encoding(codepoint, encoding);
    if (n < 0)
       SB_RETURN_ERROR("character too wide for encoding")
-   if (dst->lim - dst->pos < n)
+   if (dst->lim - dst_pos < n)
       SB_RETURN_ERROR("buffer too small")
+   dst->pos += n;
 
    if (encoding == SECRET_BUFFER_ENCODING_ASCII
     || encoding == SECRET_BUFFER_ENCODING_ISO8859_1
     || encoding == SECRET_BUFFER_ENCODING_UTF8
    ) {
       switch ((n-1)&0x3) { // help the compiler understand there are only 4 possible values
-      case 0: *dst->pos++ = (U8) codepoint;
+      case 0: *dst_pos++ = (U8) codepoint;
               break;
-      case 1: *dst->pos++ = (U8)(0xC0 | (codepoint >> 6));
-              *dst->pos++ = (U8)(0x80 | (codepoint & 0x3F));
+      case 1: *dst_pos++ = (U8)(0xC0 | (codepoint >> 6));
+              *dst_pos++ = (U8)(0x80 | (codepoint & 0x3F));
               break;
-      case 2: *dst->pos++ = (U8)(0xE0 | (codepoint >> 12));
-              *dst->pos++ = (U8)(0x80 | ((codepoint >> 6) & 0x3F));
-              *dst->pos++ = (U8)(0x80 | (codepoint & 0x3F));
+      case 2: *dst_pos++ = (U8)(0xE0 | (codepoint >> 12));
+              *dst_pos++ = (U8)(0x80 | ((codepoint >> 6) & 0x3F));
+              *dst_pos++ = (U8)(0x80 | (codepoint & 0x3F));
               break;
-      case 3: *dst->pos++ = (U8)(0xF0 | (codepoint >> 18));
-              *dst->pos++ = (U8)(0x80 | ((codepoint >> 12) & 0x3F));
-              *dst->pos++ = (U8)(0x80 | ((codepoint >> 6) & 0x3F));
-              *dst->pos++ = (U8)(0x80 | (codepoint & 0x3F));
+      case 3: *dst_pos++ = (U8)(0xF0 | (codepoint >> 18));
+              *dst_pos++ = (U8)(0x80 | ((codepoint >> 12) & 0x3F));
+              *dst_pos++ = (U8)(0x80 | ((codepoint >> 6) & 0x3F));
+              *dst_pos++ = (U8)(0x80 | (codepoint & 0x3F));
               break;
       }
    }
@@ -1089,24 +1141,25 @@ static bool sb_parse_encode_codepoint(secret_buffer_parse *dst, int codepoint) {
    ) {
       int low= (encoding == SECRET_BUFFER_ENCODING_UTF16LE)? 0 : 1;
       if (n == 2) {
-         dst->pos[low] = (U8)(codepoint & 0xFF);
-         dst->pos[low^1] = (U8)(codepoint >> 8);
-         dst->pos+= 2;
+         dst_pos[low] = (U8)(codepoint & 0xFF);
+         dst_pos[low^1] = (U8)(codepoint >> 8);
       }
       else {
          int adjusted = codepoint - 0x10000;
          int w0 = 0xD800 | (adjusted >> 10);
          int w1 = 0xDC00 | (adjusted & 0x3FF);
-         dst->pos[low] = (U8)(w0 & 0xFF);
-         dst->pos[1^low] = (U8)(w0 >> 8);
-         dst->pos[2^low] = (U8)(w1 & 0xFF);
-         dst->pos[3^low] = (U8)(w1 >> 8);
-         dst->pos+= 4;
+         dst_pos[low]   = (U8)(w0 & 0xFF);
+         dst_pos[1^low] = (U8)(w0 >> 8);
+         dst_pos[2^low] = (U8)(w1 & 0xFF);
+         dst_pos[3^low] = (U8)(w1 >> 8);
       }
    }
    else if (encoding == SECRET_BUFFER_ENCODING_HEX) {
-      *dst->pos++ = "0123456789ABCDEF"[(codepoint >> 4) & 0xF];
-      *dst->pos++ = "0123456789ABCDEF"[codepoint & 0xF];
+      dst_pos[0] = "0123456789ABCDEF"[(codepoint >> 4) & 0xF];
+      dst_pos[1] = "0123456789ABCDEF"[codepoint & 0xF];
+   }
+   else if (encoding == SECRET_BUFFER_ENCODING_I32) {
+      *(I32*)dst_pos = codepoint;
    }
    /* BASE64 is not handled here because the '=' padding can only be generated in
     * a context that knows when we are ending on a non-multiple-of-4. */

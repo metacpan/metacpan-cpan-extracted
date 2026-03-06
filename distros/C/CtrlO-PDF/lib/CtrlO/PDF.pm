@@ -12,7 +12,7 @@ use PDF::Builder;
 use PDF::Table;
 use version;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 =head1 NAME
 
@@ -774,11 +774,13 @@ sub text
         $grfx   = $page->gfx;
 
         ($rc, $next_y, $unused) = $text->column($page, $text, $grfx, 'pre', $unused,
-            rect  => [$x, $self->_y, $self->_width_print, $height],
-            para  => [0, $top_padding],
-            state => $self->state,
-            page  => [ 1, 1, $self->page_count, undef, $self->page_count, undef, undef ],
-            style => $style,
+            rect      => [$x, $self->_y, $self->_width_print, $height],
+            para      => [0, $top_padding],
+            state     => $self->state,
+            page      => [ 1, 1, $self->page_count, undef, $self->page_count, undef, undef ],
+            font_size => $size,
+            font_info =>'-fm-',
+            style     => $style,
             %options,
         );
         $self->_set_is_new_page(0);
@@ -1019,7 +1021,7 @@ sub content
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018-2021 Ctrl O Ltd
+Copyright 2018-2026 Ctrl O Ltd
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of either: the GNU General Public License (GPL) as published by the

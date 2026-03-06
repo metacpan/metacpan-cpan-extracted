@@ -1,10 +1,12 @@
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use Test2AndUtils;
-use Crypt::SecretBuffer qw( secret MATCH_MULTI UTF8 MATCH_REVERSE );
+use List::Util 'max';
+use Crypt::SecretBuffer qw( secret UTF8
+   MATCH_MULTI MATCH_REVERSE MATCH_ANCHORED MATCH_NEGATE MATCH_CONST_TIME );
 
 subtest index_str => sub {
-   my $buf = Crypt::SecretBuffer->new("abc123\0abc456");
+   my $buf = secret("abc123\0abc456");
    is($buf->index('abc'), 0, 'find first substring');
    is($buf->index('123'), 3, 'find middle substring');
    is($buf->index("\0"), 6, 'find NUL byte');
@@ -18,7 +20,7 @@ subtest index_str => sub {
 };
 
 subtest rindex_str => sub {
-   my $buf = Crypt::SecretBuffer->new("abc123\0abc456");
+   my $buf = secret("abc123\0abc456");
    is($buf->rindex('abc'), 7, 'find second "abc"');
    is($buf->rindex("\0"), 6, 'find NUL byte');
    is($buf->rindex("\0", 6), 6, 'find NUL byte from its own ofs');
@@ -27,6 +29,88 @@ subtest rindex_str => sub {
    is($buf->rindex("a", 0), 0, 'find first byte starting from first byte');
    is($buf->rindex("6", -1), 12, 'find last byte using negative index');
    is($buf->index(secret("\0abc")), 6, 'Use secretbuffer as pattern' );
+};
+
+sub check_span {
+   my ($ofs, $len)= @_;
+   return object {
+      call pos => $ofs;
+      call len => $len;
+   };
+}
+
+for my $const_time (0, MATCH_CONST_TIME) {
+   for my $reverse (0, MATCH_REVERSE) {
+      my $const_time= 0;
+      my $suffix= ($const_time? ' CONST_TIME' : '') . ($reverse? ' REVERSE' : '');
+      subtest "scan$suffix" => sub {
+         my $str= "abababababababababcabababab";
+         $str= reverse $str if $reverse;
+         my $buf= secret($str);
+         for (
+            [ 0,              'ab',   0,2 ],
+            [ 0,              'abc', 16,3 ],
+            [ 0,              'babababa', 1,8 ],
+            [ MATCH_ANCHORED, 'ab', 0,2 ],
+            [ MATCH_ANCHORED, 'abc' ],
+            [ MATCH_ANCHORED, 'babababa' ],
+            [ MATCH_MULTI,    'ab', 0,18 ],
+            [ MATCH_MULTI,    'abc', 16,3 ],
+            [ MATCH_MULTI,    'babababa', 1,16 ],
+            [ MATCH_MULTI | MATCH_ANCHORED, 'ab', 0,18 ],
+            [ MATCH_MULTI | MATCH_ANCHORED, 'abc' ],
+            [ MATCH_MULTI | MATCH_ANCHORED, 'babababa' ],
+            [ MATCH_NEGATE,   'ab', 18,1 ],
+            [ MATCH_NEGATE,   'abc', 0,1 ],
+            [ MATCH_NEGATE,   'babababa', 0,1 ],
+            [ MATCH_NEGATE | MATCH_ANCHORED, 'ab' ],
+            [ MATCH_NEGATE | MATCH_ANCHORED, 'abc',      0,1 ],
+            [ MATCH_NEGATE | MATCH_ANCHORED, 'babababa', 0,1 ],
+            [ MATCH_NEGATE | MATCH_MULTI, 'ab', 18,1 ],
+            [ MATCH_NEGATE | MATCH_MULTI, 'abc', 0,16 ],
+            [ MATCH_NEGATE | MATCH_MULTI, 'babababa', 0,1 ],
+            [ MATCH_NEGATE | MATCH_MULTI, 'bababababababababa', 0,27 ],
+            [ MATCH_NEGATE | MATCH_MULTI | MATCH_ANCHORED, 'ab' ],
+            [ MATCH_NEGATE | MATCH_MULTI | MATCH_ANCHORED, 'abc', 0,16 ],
+            [ MATCH_NEGATE | MATCH_MULTI | MATCH_ANCHORED, 'babababa', 0,1 ],
+         ) {
+            my ($flags, $pattern, $pos, $len)= @$_;
+            $flags |= $const_time | $reverse;
+            my $name= ($flags & MATCH_ANCHORED? 'ANCHORED ':'')
+                    . ($flags & MATCH_MULTI? 'MULTI ':'')
+                    . ($flags & MATCH_NEGATE? 'NEGATE ':'')
+                    . $pattern;
+            if ($reverse) {
+               $pattern= reverse $pattern;
+               $pos= length($str) - ($pos + $len)
+                  if defined $pos;
+            }
+            my $expect= defined $pos? "$pos+$len" : '';
+            is( join('+',$buf->scan($pattern, $flags)), $expect, $name );
+         }
+      };
+   }
+}
+
+# Test that the CONST_TIME flag yields a full scan of the buffer regardless
+# of where the match occurs.
+subtest scan_const_time => sub {
+   plan skip_all => "Set SB_TEST_CONSTTIME to enable this test"
+      unless $ENV{SB_TEST_CONSTTIME};
+   
+   my $long= secret(("x" x 40_000) . ('z'x100));
+   my $bench= cmpthese(-2, {
+         find_early        => sub { $long->scan(('x'x100), MATCH_CONST_TIME) },
+         find_late         => sub { $long->scan(('z'x100), MATCH_CONST_TIME) },
+         not_found         => sub { $long->scan(('a'x100), MATCH_CONST_TIME) },
+         find_negate_early => sub { $long->scan(('z'x100), MATCH_CONST_TIME|MATCH_NEGATE) },
+         find_negate_late  => sub { $long->scan(('x'x100), MATCH_CONST_TIME|MATCH_NEGATE) },
+      });
+   my @keys= qw( find_early find_late not_found find_negate_early find_negate_late );
+   my @rate= map { $_->iters / $_->cpu_a } @{$bench}{@keys};
+   my $max= max @rate;
+   is( $rate[$_] / $max, float(1, tolerance => .2), "$keys[$_] matches slowest method" )
+      for 0..$#keys;
 };
 
 sub _render_char {

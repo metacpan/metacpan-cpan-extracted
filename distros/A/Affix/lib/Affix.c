@@ -565,9 +565,14 @@ static const char * _get_string_from_type_obj(pTHX_ SV * type_sv) {
             SV * rv = SvRV(type_sv);
             if (SvTYPE(rv) == SVt_PVHV) {
                 HV * hv = (HV *)rv;
-                SV ** stringify_sv_ptr = hv_fetchs(hv, "stringify", 0);
-                if (stringify_sv_ptr && SvPOK(*stringify_sv_ptr))
-                    str = SvPV_nolen(*stringify_sv_ptr);
+                SV ** sig_sv_ptr = hv_fetchs(hv, "signature", 0);
+                if (sig_sv_ptr && SvPOK(*sig_sv_ptr))
+                    str = SvPV_nolen(*sig_sv_ptr);
+                else {
+                    SV ** stringify_sv_ptr = hv_fetchs(hv, "stringify", 0);
+                    if (stringify_sv_ptr && SvPOK(*stringify_sv_ptr))
+                        str = SvPV_nolen(*stringify_sv_ptr);
+                }
             }
         }
     }
@@ -630,7 +635,13 @@ static int Affix_get_pin(pTHX_ SV * sv, MAGIC * mg);
 static int Affix_set_pin(pTHX_ SV * sv, MAGIC * mg);
 static U32 Affix_len_pin(pTHX_ SV * sv, MAGIC * mg);
 static int Affix_free_pin(pTHX_ SV * sv, MAGIC * mg);
-void _pin_sv(pTHX_ SV * sv, const infix_type * type, void * pointer, bool managed, SV * owner_sv);
+void _pin_sv(pTHX_ SV * sv,
+             const infix_type * type,
+             void * pointer,
+             bool managed,
+             SV * owner_sv,
+             size_t bit_offset,
+             size_t bit_width);
 
 static void push_union(pTHX_ Affix * affix, const infix_type * type, SV * sv, void * p);
 
@@ -4256,6 +4267,19 @@ static int Affix_set_pin(pTHX_ SV * sv, MAGIC * mg) {
     if (!pin || !pin->pointer || !pin->type)
         return 0;
 
+    if (pin->bit_width > 0) {
+        size_t sz = infix_type_get_size(pin->type);
+        uint64_t val = (uint64_t)SvUV(sv);
+        uint64_t mask = ((uint64_t)1 << pin->bit_width) - 1;
+        val &= mask;
+        uint64_t current = 0;
+        memcpy(&current, pin->pointer, sz);
+        current &= ~(mask << pin->bit_offset);
+        current |= (val << pin->bit_offset);
+        memcpy(pin->pointer, &current, sz);
+        return 0;
+    }
+
     const infix_type * type_to_marshal = pin->type;
 
     if (pin->type->category == INFIX_TYPE_POINTER) {
@@ -4320,6 +4344,15 @@ static int Affix_get_pin(pTHX_ SV * sv, MAGIC * mg) {
         return 0;
     }
 
+    if (pin->bit_width > 0) {
+        size_t sz = infix_type_get_size(pin->type);
+        uint64_t raw = 0;
+        memcpy(&raw, pin->pointer, sz);
+        uint64_t val = (raw >> pin->bit_offset) & (((uint64_t)1 << pin->bit_width) - 1);
+        sv_setuv(sv, val);
+        return 0;
+    }
+
     if (pin->type && pin->type->category == INFIX_TYPE_POINTER) {
         const infix_type * pointee = pin->type->meta.pointer_info.pointee_type;
 
@@ -4376,7 +4409,13 @@ bool is_pin(pTHX_ SV * sv) {
         return false;
     return mg_findext(SvRV(sv), PERL_MAGIC_ext, &Affix_pin_vtbl) != nullptr;
 }
-void _pin_sv(pTHX_ SV * sv, const infix_type * type, void * pointer, bool managed, SV * owner_sv) {
+void _pin_sv(pTHX_ SV * sv,
+             const infix_type * type,
+             void * pointer,
+             bool managed,
+             SV * owner_sv,
+             size_t bit_offset,
+             size_t bit_width) {
     if (SvREADONLY(sv))
         return;
     SvUPGRADE(sv, SVt_PVMG);
@@ -4404,6 +4443,8 @@ void _pin_sv(pTHX_ SV * sv, const infix_type * type, void * pointer, bool manage
 
     pin->pointer = pointer;
     pin->managed = managed;
+    pin->bit_offset = bit_offset;
+    pin->bit_width = bit_width;
 
     if (owner_sv) {
         pin->owner_sv = owner_sv;
@@ -4512,7 +4553,7 @@ XS_INTERNAL(Affix_pin) {
             safefree(clean_sig);
         XSRETURN_UNDEF;
     }
-    _pin_sv(aTHX_ target_sv, type, ptr, false, nullptr);
+    _pin_sv(aTHX_ target_sv, type, ptr, false, nullptr, 0, 0);
     infix_arena_destroy(arena);
     if (clean_sig)
         safefree(clean_sig);
@@ -4836,7 +4877,7 @@ XS_INTERNAL(Affix_typedef) {
         const char * type_str = _get_string_from_type_obj(aTHX_ type_sv);
         if (!type_str)
             type_str = SvPV_nolen(type_sv);
-        // LiveStruct prepends '+' to signatures. Infix doesn't support this character.
+        // Live() prepends '+' to signatures. Infix doesn't support this character.
         if (type_str[0] == '+')
             type_str++;
         sv_catpv(def_sv, type_str);
@@ -5128,6 +5169,8 @@ XS_INTERNAL(Affix_free) {
     XSRETURN_YES;
 }
 
+static const infix_type * _resolve_type(pTHX_ const infix_type * type);
+
 XS_INTERNAL(Affix_cast) {
     dXSARGS;
     dMY_CXT;
@@ -5199,6 +5242,7 @@ XS_INTERNAL(Affix_cast) {
         /* Read memory -> Perl Scalar */
         SV * ret_val = sv_newmortal();
 
+        const infix_type * resolved = _resolve_type(aTHX_ new_type);
         if (is_string_type) {
             /*
              * String pull handlers expect a pointer-to-pointer (char**).
@@ -5207,18 +5251,18 @@ XS_INTERNAL(Affix_cast) {
              */
             ptr2sv(aTHX_ nullptr, &ptr_val, ret_val, new_type);
         }
-        else if (live_hint && new_type->category == INFIX_TYPE_STRUCT) {
+        else if (live_hint && (resolved->category == INFIX_TYPE_STRUCT || resolved->category == INFIX_TYPE_UNION)) {
             // Live struct return from cast: bypass ptr2sv and create blessed HV
             HV * hv = newHV();
             SV * rv = newRV_noinc(MUTABLE_SV(hv));
             sv_bless(rv, gv_stashpv("Affix::Live", GV_ADD));
             _populate_hv_from_c_struct(
-                aTHX_ nullptr, hv, new_type, ptr_val, true, pin ? (pin->owner_sv ? pin->owner_sv : arg) : nullptr);
+                aTHX_ nullptr, hv, resolved, ptr_val, true, pin ? (pin->owner_sv ? pin->owner_sv : arg) : nullptr);
             ret_val = sv_2mortal(rv);
         }
-        else if (new_type->category == INFIX_TYPE_UNION) {
+        else if (resolved->category == INFIX_TYPE_UNION) {
             // Unions are always live!
-            pull_union(aTHX_ nullptr, ret_val, new_type, ptr_val);
+            pull_union(aTHX_ nullptr, ret_val, resolved, ptr_val);
         }
         else {
             /*
@@ -5668,25 +5712,36 @@ XS_INTERNAL(Affix_is_null) {
     XSRETURN(1);
 }
 
+static const infix_type * _resolve_type(pTHX_ const infix_type * type) {
+    if (type->category == INFIX_TYPE_NAMED_REFERENCE) {
+        dMY_CXT;
+        const infix_type * resolved = infix_registry_lookup_type(MY_CXT.registry, type->meta.named_reference.name);
+        return resolved ? resolved : type;
+    }
+    return type;
+}
+
 void _populate_hv_from_c_struct(
     pTHX_ Affix * affix, HV * hv, const infix_type * type, void * p, bool live, SV * owner_sv) {
     hv_clear(hv);
-    for (size_t i = 0; i < type->meta.aggregate_info.num_members; ++i) {
-        const infix_struct_member * member = &type->meta.aggregate_info.members[i];
+    const infix_type * resolved_type = _resolve_type(aTHX_ type);
+    for (size_t i = 0; i < resolved_type->meta.aggregate_info.num_members; ++i) {
+        const infix_struct_member * member = &resolved_type->meta.aggregate_info.members[i];
         if (member->name) {
             void * member_ptr = (char *)p + member->offset;
             SV * member_sv = nullptr;
 
-            if (live && !member->is_bitfield) {
+            if (live) {
                 // Live mode: Create a Pin or Live view for this member
-                if (member->type->category == INFIX_TYPE_STRUCT || member->type->category == INFIX_TYPE_UNION) {
+                const infix_type * resolved = _resolve_type(aTHX_ member->type);
+                if (resolved->category == INFIX_TYPE_STRUCT || resolved->category == INFIX_TYPE_UNION) {
                     HV * sub_hv = newHV();
                     SV * sub_rv = newRV_noinc(MUTABLE_SV(sub_hv));
                     sv_bless(sub_rv, gv_stashpv("Affix::Live", GV_ADD));
-                    _populate_hv_from_c_struct(aTHX_ affix, sub_hv, member->type, member_ptr, true, owner_sv);
+                    _populate_hv_from_c_struct(aTHX_ affix, sub_hv, resolved, member_ptr, true, owner_sv);
                     member_sv = sub_rv;
                 }
-                else if (member->type->category == INFIX_TYPE_ARRAY) {
+                else if (resolved->category == INFIX_TYPE_ARRAY) {
                     Affix_Pin * sub_pin;
                     Newxz(sub_pin, 1, Affix_Pin);
                     sub_pin->pointer = member_ptr;
@@ -5703,7 +5758,13 @@ void _populate_hv_from_c_struct(
                 }
                 else {
                     member_sv = newSV(0);
-                    _pin_sv(aTHX_ member_sv, member->type, member_ptr, false, owner_sv);
+                    _pin_sv(aTHX_ member_sv,
+                            member->type,
+                            member_ptr,
+                            false,
+                            owner_sv,
+                            member->bit_offset,
+                            member->bit_width);
                 }
             }
             else if (member->is_bitfield) {
@@ -5861,7 +5922,7 @@ XS_INTERNAL(Affix_pin_get_at) {
         ST(0) = sv_2mortal(rv);
     }
     else if (elem_type->category == INFIX_TYPE_ARRAY) {
-        // Return a new Affix::Pointer for this sub-array (LiveArray view)
+        // Return a new Affix::Pointer for this sub-array (Live view)
         Affix_Pin * new_pin;
         Newxz(new_pin, 1, Affix_Pin);
         new_pin->pointer = target;

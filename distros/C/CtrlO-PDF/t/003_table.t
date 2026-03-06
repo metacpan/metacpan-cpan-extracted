@@ -5,6 +5,9 @@ use Test::More;
 
 use CtrlO::PDF;
 
+use lib '.';
+use t::lib::Tools qw(compare_pdf);
+
 subtest 'Normal-sized table'                      => \&test_normality;
 subtest 'Table straddling a page boundary'        => \&test_page_boundary;
 subtest 'Table header straddling a page boundary' => \&test_header_page_boundary;
@@ -76,9 +79,5 @@ sub test_header_page_boundary {
         ]
     ]);
     is $pdf->pdf->page_count, 2, 'Our table spanned two pages';
-    if ($ENV{AUTHOR_TESTING}) {
-        open (my $fh, '>', 'header_page_boundary.pdf');
-        print $fh $pdf->content;
-        close $fh;
-    }
+    compare_pdf($pdf, '003_header_page_boundary.pdf');
 }

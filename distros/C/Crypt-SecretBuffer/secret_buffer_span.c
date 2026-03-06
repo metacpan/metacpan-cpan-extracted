@@ -62,7 +62,7 @@ extern SV *secret_buffer_span_new_obj_from_parse(secret_buffer_parse *src) {
    if (!src->sbuf)
       croak("parse struct lacks secret_buffer reference");
    /* sanity check on pos and lim since this is about to subtract pointers */
-   sbuf_start= src->sbuf->data;
+   sbuf_start= (U8*) src->sbuf->data;
    sbuf_lim= sbuf_start + src->sbuf->len;
    if (src->pos < sbuf_start || src->pos > sbuf_lim)
       croak("parse->pos out of bounds");

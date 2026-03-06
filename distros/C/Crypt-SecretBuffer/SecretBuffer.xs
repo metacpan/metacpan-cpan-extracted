@@ -618,11 +618,12 @@ scan(buf, pattern, flags= 0, ofs= 0, len_sv= &PL_sv_undef)
       ))
          croak("%s", parse.error);
    PPCODE:
-      if (!secret_buffer_match(&parse, pattern, flags))
-         if (parse.error)
-            croak("%s", parse.error);
-      PUSHs(sv_2mortal(newSViv(parse.pos - (U8*) buf->data)));
-      PUSHs(sv_2mortal(newSViv(parse.lim - parse.pos)));
+      if (secret_buffer_match(&parse, pattern, flags)) {
+         PUSHs(sv_2mortal(newSViv(parse.pos - (U8*) buf->data)));
+         PUSHs(sv_2mortal(newSViv(parse.lim - parse.pos)));
+      }
+      else if (parse.error)
+         croak("%s", parse.error);
 
 void
 splice(buf, ofs, len, replacement)
@@ -706,7 +707,7 @@ append_lenprefixed(buf, ...)
    secret_buffer *buf
    INIT:
       size_t bytes_needed= 0;
-      IV val_count, i;
+      IV i;
    PPCODE:
       /* Add up all the lengths and over-estimate 9 bytes for each length specifier */
       for (i= 1; i < items; i++) {
@@ -741,11 +742,17 @@ memcmp(lhs, rhs, reverse=false)
       const char *rhs_buf= secret_buffer_SvPVbyte(rhs, &rhs_len);
       PERL_UNUSED_VAR(ix);
    CODE:
-      RETVAL= memcmp(lhs_buf, rhs_buf, (lhs_len < rhs_len? lhs_len : rhs_len));
-      if (RETVAL < 0) RETVAL= -1;
-      else if (RETVAL > 0) RETVAL= 1;
-      else if (RETVAL == 0 && lhs_len != rhs_len)
-         RETVAL= lhs_len < rhs_len? -1 : 1;
+      /* constant-time loop */
+      {
+         volatile int ret= 0;
+         int i, common_len= lhs_len < rhs_len? lhs_len : rhs_len;
+         for (i = 0; i < common_len; i++)
+            if (lhs_buf[i] != rhs_buf[i] && !ret)
+               ret= lhs_buf[i] < rhs_buf[i]? -1 : 1;
+         if (ret == 0 && lhs_len != rhs_len)
+            ret= lhs_len < rhs_len? -1 : 1;
+         RETVAL= ret;
+      }
       if (reverse)
          RETVAL= -RETVAL;
    OUTPUT:
@@ -1211,6 +1218,7 @@ set_up_us_the_bom(self)
       secret_buffer_parse p;
       if (!secret_buffer_parse_init_from_sv(&p, self))
          croak("%s", p.error);
+      PERL_UNUSED_VAR(ix);
    PPCODE:
       if (p.lim - p.pos >= 3 && p.pos[0] == 0xEF && p.pos[1] == 0xBB && p.pos[2] == 0xBF) {
          span->encoding= SECRET_BUFFER_ENCODING_UTF8;
@@ -1319,7 +1327,6 @@ parse_lenprefixed(self, count = 1)
       secret_buffer_parse p;
       UV len;
       size_t ofs;
-      bool success;
       /* treat an invalid span as a bug, rather than returning it to the user in the err_out param */
       if (!secret_buffer_parse_init_from_sv(&p, self))
          croak("%s", p.error);
@@ -1381,7 +1388,6 @@ copy(self, ...)
       copy_to = 1
       append_to = 2
    INIT:
-      secret_buffer_span *span= secret_buffer_span_from_magic(self, SECRET_BUFFER_MAGIC_OR_DIE);
       SV *dst_sv= NULL;
       int next_arg, dst_encoding= -1;
       secret_buffer_parse src;
@@ -1427,7 +1433,6 @@ cmp(lhs, rhs, reverse=false)
          croak("%s", rhs_parse.error);
    CODE:
       RETVAL= sb_parse_codepointcmp(&lhs_parse, &rhs_parse);
-      RETVAL= RETVAL < 0? -1 : RETVAL > 0? 1 : 0;
       if (reverse)
          RETVAL= -RETVAL;
    OUTPUT:
@@ -1446,6 +1451,7 @@ BOOT:
    EXPORT_CONST("MATCH_REVERSE", SECRET_BUFFER_MATCH_REVERSE);
    EXPORT_CONST("MATCH_NEGATE",  SECRET_BUFFER_MATCH_NEGATE);
    EXPORT_CONST("MATCH_ANCHORED",SECRET_BUFFER_MATCH_ANCHORED);
+   EXPORT_CONST("MATCH_CONST_TIME",SECRET_BUFFER_MATCH_CONST_TIME);
 #undef EXPORT_CONST
    SV *enc[SECRET_BUFFER_ENCODING_MAX+1];
    memset(enc, 0, sizeof(enc));

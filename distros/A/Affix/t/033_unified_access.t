@@ -23,7 +23,7 @@ subtest 'Unified Pointer/Struct Access' => sub {
     my $ptr = get_point_ptr();
 
     # Standard $ptr is a Pointer[Point]
-    # We want $ptr->{x} to work without explicit cast to LiveStruct
+    # We want $ptr->{x} to work without explicit cast to Live
     is $ptr->{x}, 10, 'Read x field directly from pointer';
     is $ptr->{y}, 20, 'Read y field directly from pointer';
     $ptr->{x} = 42;

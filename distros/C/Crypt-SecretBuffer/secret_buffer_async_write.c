@@ -35,6 +35,8 @@ static SV *secret_buffer_async_result_wrap_with_object(pTHX_ secret_buffer_async
    MAGIC *mg= sv_magicext(SvRV(ref), NULL, PERL_MAGIC_ext, &secret_buffer_async_result_magic_vtbl, (const char *)result, 0);
 #ifdef USE_ITHREADS
    mg->mg_flags |= MGf_DUP;
+#else
+   PERL_UNUSED_VAR(mg);
 #endif
    return sv_bless(ref, gv_stashpv("Crypt::SecretBuffer::AsyncResult", GV_ADD));
 }

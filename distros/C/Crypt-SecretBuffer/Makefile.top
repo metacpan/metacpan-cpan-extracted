@@ -61,7 +61,7 @@ $dep->add_exported_c_api($_) for @exports;
 
 $dep->install('SecretBuffer.h', 'SecretBufferManualLinkage.h');
 $dep->add_xs('SecretBuffer.xs');
-$dep->add_pm(map { my $n= $_; $n =~ s/^lib/\$(INST_LIB)/; $_ => $n } <lib/*/*.pm>, <lib/*/*/*.pm>);
+$dep->add_pm(map { my $n= $_; $n =~ s/^lib/\$(INST_LIB)/; $_ => $n } <lib/*/*.pm>, <lib/*/*/*.pm>, <lib/*/*/*/*.pm>);
 $dep->add_typemaps('typemap');
 $dep->save_config('InstallFiles.pm');
 

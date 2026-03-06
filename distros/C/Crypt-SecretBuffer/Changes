@@ -1,3 +1,16 @@
+Version 0.019 - 2026-03-05
+  - Method 'memcmp' and Span->cmp are now constant-time operations, protecting
+    against timing attacks when comparing passwords.
+  - Method ->scan has a new CONST_TIME flag that improves protection against
+    timing attacks, but needs more work.
+  - The ::PEM object has an improved design where ->header_kv is the official
+    array of attributes and 'headers' is a view of that array, providing
+    features like multi-value, case-insensitivity, and whitespace trimming
+    without modifying the original array.
+  - Breaking Change: The return value of ->scan on failure to match is now an
+    empty list, where previously it was (x,0) where x was sometimes useful
+    and sometimes not and would vary depending on other flags.
+
 Version 0.018 - 2026-02-11
   - New exportable span() function which universally constructs a span
     from a SecretBuffer, Span object, or plain scalar.

@@ -63,13 +63,13 @@ optional_features:
 provides:
   Affix:
     file: lib/Affix.pm
-    version: v1.0.8
+    version: v1.0.9
   Affix::Build:
     file: lib/Affix/Build.pm
-    version: v1.0.8
+    version: v1.0.9
   Affix::Wrap:
     file: lib/Affix/Wrap.pm
-    version: v1.0.8
+    version: v1.0.9
 requires:
   Capture::Tiny: '0'
   Carp: '0'
@@ -82,7 +82,7 @@ resources:
   homepage: https://github.com/sanko/Affix.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/sanko/Affix.pm.git
-version: v1.0.8
+version: v1.0.9
 x_help_wanted:
   - Tester
   - Documenter

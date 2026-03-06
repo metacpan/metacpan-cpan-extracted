@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer::ConsoleState;
 # VERSION
 # ABSTRACT: Disable TTY echo within a scope
-$Crypt::SecretBuffer::ConsoleState::VERSION = '0.018';
+$Crypt::SecretBuffer::ConsoleState::VERSION = '0.019';
 1;
 
 __END__
@@ -88,7 +88,7 @@ Set the console/tty state to the original value seen when the object was created
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 AUTHOR
 

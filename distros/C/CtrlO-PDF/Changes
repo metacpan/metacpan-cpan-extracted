@@ -1,5 +1,10 @@
 Revision history for CtrlO::PDF
 
+0.36 Thu Mar 5 2026 16:00
+
+    * Fix formatting of continuation pages
+    * Updates to test suite - thanks Gabor Szabo
+
 0.35 Thu Feb 26 2026 15:00
 
     * Update tests to also pass with PDF::Builder 3.026 and 3.028
