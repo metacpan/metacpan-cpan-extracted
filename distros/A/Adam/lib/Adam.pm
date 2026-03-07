@@ -1,9 +1,6 @@
 package Adam;
-BEGIN {
-  $Adam::VERSION = '0.91';
-}
 # ABSTRACT: The patriarch of IRC Bots
-# Dist::Zilla: +PodWeaver
+our $VERSION = '1.000';
 use MooseX::POE;
 use namespace::autoclean;
 
@@ -26,6 +23,7 @@ with qw(
   MooseX::Getopt
 );
 
+
 has logger => (
     does       => 'Adam::Logger::API',
     is         => 'ro',
@@ -33,6 +31,7 @@ has logger => (
     lazy_build => 1,
     handles    => 'Adam::Logger::API',
 );
+
 
 sub _build_logger { Adam::Logger::Default->new() }
 
@@ -46,6 +45,7 @@ has nickname => (
     builder  => 'default_nickname',
 );
 
+
 sub default_nickname { $_[0]->meta->name }
 
 has server => (
@@ -56,6 +56,7 @@ has server => (
     required => 1,
     builder  => 'default_server',
 );
+
 
 sub default_server { 'irc.perl.org' }
 
@@ -68,6 +69,7 @@ has port => (
     builder  => 'default_port',
 );
 
+
 sub default_port { 6667 }
 
 has channels => (
@@ -79,6 +81,7 @@ has channels => (
     auto_deref => 1,
 );
 
+
 sub default_channels { [] }
 
 has owner => (
@@ -88,6 +91,7 @@ has owner => (
     cmd_flag => 'owner',
     builder  => 'default_owner',
 );
+
 
 sub default_owner { 'perigrin!~perigrin@217.168.150.167' }
 
@@ -99,6 +103,7 @@ has username => (
     builder  => 'default_username',
 );
 
+
 sub default_username { 'adam' }
 
 has password => (
@@ -109,6 +114,7 @@ has password => (
     builder  => 'default_password',
 );
 
+
 sub default_password { '' }
 
 has flood => (
@@ -118,6 +124,7 @@ has flood => (
     cmd_flag => 'flood',
     builder  => 'default_flood',
 );
+
 
 sub default_flood { 0 }
 
@@ -134,6 +141,7 @@ has plugins => (
     }
 );
 
+
 sub core_plugins {
     return {
         'Core_Connector'    => 'POE::Component::IRC::Plugin::Connector',
@@ -146,17 +154,21 @@ sub core_plugins {
     };
 }
 
+
 sub custom_plugins { {} }
+
 
 sub default_plugins {
     return { %{ $_[0]->core_plugins }, %{ $_[0]->custom_plugins } };
 }
+
 
 has plugin_manager => (
     isa        => 'POE::Component::IRC::Plugin::PlugMan',
     is         => 'ro',
     lazy_build => 1,
 );
+
 
 sub _build_plugin_manager {
     POE::Component::IRC::Plugin::PlugMan->new(
@@ -178,6 +190,7 @@ has poco_irc_args => (
     builder  => 'default_poco_irc_args',
 );
 
+
 sub default_poco_irc_args {
     {};
 }
@@ -189,6 +202,7 @@ has poco_irc_options => (
     cmd_flag => 'extra_args',
     builder  => 'default_poco_irc_options',
 );
+
 
 sub default_poco_irc_options { { trace => 0 } }
 
@@ -223,6 +237,7 @@ sub privmsg {
     POE::Kernel->post( $self->irc_session_id => privmsg => @_ );
 }
 
+
 sub START {
     my ( $self, $heap ) = @_[ OBJECT, HEAP ];
     $poe_kernel->post( $self->irc_session_id => register => 'all' );
@@ -235,6 +250,7 @@ sub load_plugin {
     my ( $self, $name, $plugin ) = @_;
     $self->plugin_manager->load( $name => $plugin, bot => $self );
 }
+
 
 event irc_plugin_add => sub {
     my ( $self, $desc, $plugin ) = @_[ OBJECT, ARG0, ARG1 ];
@@ -277,11 +293,41 @@ sub run {
     POE::Kernel->run;
 }
 
-1;    # Magic true value required at end of module
+
+has _loop => (
+    is        => 'rw',
+    traits    => ['NoGetopt'],
+    predicate => 'has_loop',
+);
 
 
+sub async {
+    my $self = shift;
+    require IO::Async::Loop::POE;
+    $self = $self->new_with_options unless blessed $self;
+    my $loop = IO::Async::Loop::POE->new();
+    $self->_loop($loop);
+    $loop->run;
+}
+
+
+sub stop {
+    my $self = shift;
+    if ($self->has_loop) {
+        $self->_loop->stop;
+    } else {
+        POE::Kernel->stop;
+    }
+}
+
+
+1;
+
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -289,84 +335,142 @@ Adam - The patriarch of IRC Bots
 
 =head1 VERSION
 
-version 0.91
+version 1.000
 
 =head1 SYNOPSIS
 
-See the Synopsis in L<Moses|Moses>. Adam is not meant to be used directly.
+See the Synopsis in L<Moses>. Adam is not meant to be used directly.
 
 =head1 DESCRIPTION
 
-The Adam class implements a basic L<POE::Component::IRC|POE::Component::IRC>
-bot based on L<Moose|Moose> and L<MooseX::POE|MooseX::POE>.
+The Adam class implements a basic L<POE::Component::IRC> bot based on
+L<Moose> and L<MooseX::POE>.
 
-=head1 ATTRIBUTES
+=head2 logger
 
-=head2 nickname (Str)
+Logger object that implements the L<Adam::Logger::API> role. Defaults to
+L<Adam::Logger::Default>.
 
-The IRC nickname for the bot, it will default to the package name.
+=head2 nickname
 
-=head2 server (Str)
+The IRC nickname for the bot. Defaults to the package name. Required.
 
-The IRC server to connect to.
+=head2 server
 
-=head2 port (Int)
+The IRC server to connect to. Defaults to C<irc.perl.org>. Required.
 
-The port for the IRC server, defaults to 6667
+=head2 port
 
-=head2 username(Str)
+The port for the IRC server. Defaults to C<6667>.
 
-The username which we should use
+=head2 channels
 
-=head2 password(Str)
+IRC channels to connect to. ArrayRef of channel names.
 
-The server password which we shoulduse
+=head2 owner
 
-=head2 channels (ArrayRef[Str])
+The hostmask of the owner of the bot. The owner can control the bot's plugins
+through IRC using the L<POE::Component::IRC::Plugin::PlugMan> interface.
 
-IRC channels to connect to.
+=head2 username
 
-=head2 owner (Str)
+The username to use for IRC connection. Defaults to C<adam>.
 
-The hostmask of the ower of the bot. The owner can control the bot's plugins
-through IRC using the <POE::Component::IRC::Plugin::Plugman|Plugman>
-interface.
+=head2 password
 
-=head2 flood (Bool)
+The server password to use for IRC connection. Defaults to empty string.
 
-Disable flood protection. Defaults to False.
+=head2 flood
 
-=head2 plugins (HashRef)
+Disable flood protection. Defaults to C<0> (false).
 
-A list of plugins associated with the IRC bot. See L<Moses::Plugin> for more
+=head2 plugins
+
+A HashRef of plugins associated with the IRC bot. See L<Moses::Plugin> for more
 details.
 
-=head2 extra_args (HashRef)
+=head2 core_plugins
 
-A list of extra arguments to pass to the irc constructor.
+Returns the core plugins that are loaded by default.
 
-=head1 METHODS
+=head2 custom_plugins
 
-=head2 privmsg (Str $who, Str $what)
+Returns custom plugins to be loaded. Override this in subclasses.
+
+=head2 default_plugins
+
+Returns all plugins (core and custom) to be loaded.
+
+=head2 plugin_manager
+
+The L<POE::Component::IRC::Plugin::PlugMan> instance for managing plugins.
+
+=head2 poco_irc_args
+
+A HashRef of extra arguments to pass to the IRC component constructor.
+
+=head2 poco_irc_options
+
+A HashRef of options to pass to the IRC component. Defaults to C<< { trace => 0 } >>.
+
+=head2 privmsg
+
+    $bot->privmsg($who, $what);
 
 Send message C<$what> as a private message to C<$who>, a channel or nick.
 
-=head2 run ()
+=head2 load_plugin
 
-Start the IRC bot. This method also works as a Class Method and will
-instanciate the bot if called as such.
+    $bot->load_plugin($name, $plugin);
 
-=head1 DEPENDENCIES
+Load a plugin with the given name.
 
-L<MooseX::POE|MooseX::POE>, L<namespace::autoclean|namespace::autoclean>,
-L<MooseX::Alias|MooseX::Alias>, L<POE::Component::IRC|POE::Component::IRC>,
-L<MooseX::Getopt|MooseX::Getopt>,
-L<MooseX::SimpleConfig|MooseX::SimpleConfig>,
-L<MooseX::LogDispatch|MooseX::LogDispatch>
+=head2 run
 
-=head1 BUGS AND LIMITATIONS
+    MyBot->run;
+    # or
+    $bot->run;
 
-None known currently, please report bugs to L<https://rt.cpan.org/Ticket/Create.html?Queue=Adam>
+Start the IRC bot using the POE event loop. This method also works as a
+class method and will instantiate the bot if called as such.
+
+=head2 _loop
+
+The L<IO::Async::Loop> instance when running in async mode. Used internally.
+
+=head2 async
+
+    MyBot->async;
+    # or
+    $bot->async;
+
+Start the IRC bot using IO::Async as the event loop. This allows you to
+integrate the bot with other IO::Async-based components. Requires
+L<IO::Async::Loop::POE> to be installed.
+
+This method also works as a class method and will instantiate the bot
+if called as such.
+
+=head2 stop
+
+    $bot->stop;
+
+Stop the bot's event loop. Works with both POE and IO::Async modes.
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/perigrin/adam-bot-framework/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHORS
 
@@ -378,7 +482,7 @@ Chris Prather <chris@prather.org>
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de> L<http://www.raudssus.de/>
+Torsten Raudssus <torsten@raudssus.de>
 
 =back
 
@@ -390,7 +494,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

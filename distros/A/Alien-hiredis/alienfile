@@ -15,8 +15,8 @@ meta->around_hook(probe => sub {
 });
 
 share {
-  start_url 'https://github.com/redis/hiredis/archive/refs/tags/v1.3.0.tar.gz';
-  plugin 'Download';
+  start_url 'src/hiredis-1.3.0.tar.gz';
+  plugin 'Fetch::Local';
   plugin Extract => format => 'tar.gz';
   build [
     [ '%{make} PREFIX=%{.install.prefix}' ],

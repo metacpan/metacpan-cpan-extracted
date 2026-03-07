@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2019 by Dominique Dumont.
+# This software is Copyright (c) 2007-2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -45,7 +45,9 @@ return [
                    ]
                }
 			    },
-		   description => 'Each key of the hash is a test (as formula using the variables defined in "follow" element) that are tried in sequences to apply its associated effects',
+           description => 'Each key of the ordered hash is a test (as formula using the '
+               . 'variables defined in "follow" element) that are tried in sequences to apply '
+               . 'its associated effects. Only the first match is applied.',
 		  },
       ],
   ],

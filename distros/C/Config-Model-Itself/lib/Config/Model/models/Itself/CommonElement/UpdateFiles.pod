@@ -1,0 +1,39 @@
+# PODNAME: Config::Model::models::Itself::CommonElement::UpdateFiles
+# ABSTRACT:  Configuration class Itself::CommonElement::UpdateFiles
+
+=encoding utf8
+
+=head1 NAME
+
+Config::Model::models::Itself::CommonElement::UpdateFiles - Configuration class Itself::CommonElement::UpdateFiles
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+=head1 Elements
+
+=head2 type
+
+the syntax of the external file. I< Optional. Type enum. choice: 'ini', 'json', 'yaml', 'toml'.  > 
+
+=head2 file
+
+file path. Either absolute or relative to the running directory of cme. I< Optional. Type uniline.  > 
+
+=head2 subpath
+
+The subpath to get data in the file. For instance, the C<bar> item of this JSON string C<{"for" : { "bar" : "baz" }}> can be retrieved with C<for.bar>. See L<Config::Model::Value/update> amd L<Config::Model::Value::UpdateFromFile> for more details. I< Optional. Type uniline.  > 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=back
+
+=cut
+

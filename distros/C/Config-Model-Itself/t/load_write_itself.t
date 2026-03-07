@@ -51,14 +51,20 @@ my $map = $rw_obj->read_all( root_model => 'Itself', application => 'itself' );
 
 ok(1,"Read all models from $target_model_dir") ;
 
-my @expected_classes = qw/Itself::Application Itself::CargoElement
-Itself::Class Itself::CommonElement Itself::CommonElement::Assert
-Itself::CommonElement::WarnIfMatch Itself::ComputedValue
-Itself::ConfigAccept Itself::ConfigReadWrite
-Itself::ConfigReadWrite::DefaultLayer Itself::Element
-Itself::MigratedValue Itself::Model Itself::NonWarpableElement
-Itself::WarpOnlyElement Itself::WarpValue Itself::WarpableCargoElement
-Itself::WarpableElement/;
+my @expected_classes =
+    qw/
+          Itself::Application Itself::CargoElement
+          Itself::Class Itself::CommonElement
+          Itself::CommonElement::Assert
+          Itself::CommonElement::Update
+          Itself::CommonElement::UpdateFiles
+          Itself::CommonElement::WarnIfMatch Itself::ComputedValue
+          Itself::ConfigAccept Itself::ConfigReadWrite
+          Itself::ConfigReadWrite::DefaultLayer Itself::Element
+          Itself::MigratedValue Itself::Model Itself::NonWarpableElement
+          Itself::WarpOnlyElement Itself::WarpValue Itself::WarpableCargoElement
+          Itself::WarpableElement
+      /;
 
 my @classes = $root->fetch_element('class')->fetch_all_indexes;
 is_deeply(\@classes, \@expected_classes, "found all configuration classes of Itself model");

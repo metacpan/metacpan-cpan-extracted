@@ -1,0 +1,12 @@
+Revision history for Data-HashMap
+
+0.01  2026-03-07
+    - Initial release
+    - 14 type-specialized hash map variants: I16, I16A, I16S, I32, I32A, I32S, IA, II, IS, SA, SI16, SI32, SI, SS
+    - Keyword API via XS::Parse::Keyword (bypasses method dispatch)
+    - Method dispatch API ($map->put, $map->get, etc.)
+    - Counter operations (incr, decr, incr_by) for integer-value variants
+    - LRU eviction (max_size) and TTL expiry (default_ttl)
+    - Per-key TTL via put_ttl keyword/method
+    - clear, to_hash, get_or_set operations
+    - Open addressing with linear probing, xxHash, tombstone compaction

@@ -1,9 +1,6 @@
 package Moses;
-BEGIN {
-  $Moses::VERSION = '0.91';
-}
 # ABSTRACT: A framework for building IRC bots quickly and easily.
-# Dist::Zilla: +PodWeaver
+our $VERSION = '1.000';
 use MooseX::POE ();
 use Moose::Exporter;
 use Adam;
@@ -27,12 +24,13 @@ Moose::Exporter->setup_import_methods(
     also => [qw(MooseX::POE)],
 );
 
+
 sub init_meta {
     my ( $class, %args ) = @_;
 
     my $for = $args{for_class};
     eval qq{
-        package $for; 
+        package $for;
         use POE;
         use POE::Component::IRC::Common qw( :ALL );
     };
@@ -49,11 +47,13 @@ sub nickname {
     $class->add_method( 'default_nickname' => sub { return $name } );
 }
 
+
 sub server {
     my ( $caller, $name ) = @_;
     my $class = Moose::Meta::Class->initialize($caller);
     $class->add_method( 'default_server' => sub { return $name } );
 }
+
 
 sub port {
     my ( $caller, $port ) = @_;
@@ -61,11 +61,13 @@ sub port {
     $class->add_method( 'default_port' => sub { return $port } );
 }
 
+
 sub channels {
     my ( $caller, @channels ) = @_;
     my $class = Moose::Meta::Class->initialize($caller);
     $class->add_method( 'default_channels' => sub { return \@channels } );
 }
+
 
 sub plugins {
     my ( $caller, %plugins ) = @_;
@@ -73,11 +75,13 @@ sub plugins {
     $class->add_method( 'custom_plugins' => sub { return \%plugins } );
 }
 
+
 sub username {
     my ( $caller, $username ) = @_;
     my $class = Moose::Meta::Class->initialize($caller);
     $class->add_method( 'default_username' => sub { return $username } );
 }
+
 
 sub password {
     my ( $caller, $password ) = @_;
@@ -85,17 +89,20 @@ sub password {
     $class->add_method( 'default_password' => sub { return $password } );
 }
 
+
 sub flood {
     my ( $caller, $flood ) = @_;
     my $class = Moose::Meta::Class->initialize($caller);
     $class->add_method( 'default_flood' => sub { return $flood } );
 }
 
+
 sub owner {
     my ( $caller, $owner ) = @_;
     my $class = Moose::Meta::Class->initialize($caller);
     $class->add_method( 'default_owner' => sub { return $owner } );
 }
+
 
 sub poco_irc_args {
     my ( $caller, %extra_args ) = @_;
@@ -104,6 +111,7 @@ sub poco_irc_args {
     );
 }
 
+
 sub poco_irc_options {
     my ( $caller, %options ) = @_;
     my $class = Moose::Meta::Class->initialize($caller);
@@ -111,10 +119,14 @@ sub poco_irc_options {
     );
 }
 
+
 1;
 
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -122,97 +134,123 @@ Moses - A framework for building IRC bots quickly and easily.
 
 =head1 VERSION
 
-version 0.91
+version 1.000
 
 =head1 SYNOPSIS
 
-	package SampleBot;
-	use Moses;
-	use namespace::autoclean;
-	
-	server 'irc.perl.org';
-	nickname 'sample-bot';
-	channels '#bots';
+    package SampleBot;
+    use Moses;
+    use namespace::autoclean;
 
-	has message => (
-	    isa     => 'Str',
-	    is      => 'rw',
-	    default => 'Hello',
-	);
+    server 'irc.perl.org';
+    nickname 'sample-bot';
+    channels '#bots';
 
-	event irc_bot_addressed => sub {
-	    my ( $self, $nickstr, $channel, $msg ) = @_[ OBJECT, ARG0, ARG1, ARG2 ];
-	    my ($nick) = split /!/, $nickstr;
-	    $self->privmsg( $channel => "$nick: ${ \$self->message }" );
-	};
+    has message => (
+        isa     => 'Str',
+        is      => 'rw',
+        default => 'Hello',
+    );
 
-	__PACKAGE__->run unless caller;
+    event irc_bot_addressed => sub {
+        my ( $self, $nickstr, $channel, $msg ) = @_[ OBJECT, ARG0, ARG1, ARG2 ];
+        my ($nick) = split /!/, $nickstr;
+        $self->privmsg( $channel => "$nick: ${ \$self->message }" );
+    };
+
+    # Run with POE (default)
+    __PACKAGE__->run unless caller;
+
+    # Or run with IO::Async (requires IO::Async::Loop::POE)
+    # __PACKAGE__->async unless caller;
 
 =head1 DESCRIPTION
 
-Moses is some declarative sugar for building an IRC bot based on the
-L<Adam|Adam> IRC Bot. Moses is designed to minimize the amount of work you
-have to do to make an IRC bot functional, and to make the process as
-declarative as possible. 
+Moses is declarative sugar for building IRC bots based on the L<Adam> IRC Bot.
+Moses is designed to minimize the amount of work you have to do to make an IRC
+bot functional, and to make the process as declarative as possible.
 
-=head1 FUNCTIONS
+=head2 nickname
 
-=head2 nickname (Str $name)
+    nickname 'sample-bot';
 
-Set the nickname for the bot. Default's to the current package.
+Set the nickname for the bot. Defaults to the current package name.
 
-=head2 username(Str)
+=head2 server
 
-The username which we should use
+    server 'irc.perl.org';
 
-=head2 password(Str)
+Set the IRC server for the bot to connect to.
 
-The server password which we shoulduse
+=head2 port
 
-=head2 server (Str $server)
+    port 6667;
 
-Set the server for the bot.
+Set the port for the bot's server. Defaults to C<6667>.
 
-=head2 port (Int $port)
+=head2 channels
 
-Set the port for the bot's server. Default's to 6667.
-
-=head2 owner (Str)
-
-The hostmask of the ower of the bot. The owner can control the bot's plugins
-through IRC using the <POE::Component::IRC::Plugin::Plugman|Plugman>
-interface.
-
-=head2 flood (Bool)
-
-Disable flood protection. Defaults to False.
-
-=head2 channels (@channels)
+    channels '#bots', '#perl';
 
 Supply a list of channels for the bot to join upon connecting.
 
-=head2 plugins (@plugins)
+=head2 plugins
 
-Extra L<POE::Component::IRC::Plugin|POE::Component::IRC::Plugin> objects or
-class names to load into the bot.
+    plugins MyPlugin => 'MyBot::Plugin::Foo';
 
-=head2 extra_args (HashRef)
+Extra L<POE::Component::IRC::Plugin> objects or class names to load into the bot.
 
-A list of extra arguments to pass to the irc constructor.
+=head2 username
 
-=head1 DEPENDENCIES
+    username 'mybot';
 
-The same dependencies as L<Adam|Adam>. 
+The username to use for IRC connection.
 
-L<MooseX::POE|MooseX::POE>, L<namespace::autoclean|namespace::autoclean>,
-L<MooseX::Alias|MooseX::Alias>, L<POE::Component::IRC|POE::Component::IRC>,
-L<MooseX::Getopt|MooseX::Getopt>,
-L<MooseX::SimpleConfig|MooseX::SimpleConfig>,
-L<MooseX::LogDispatch|MooseX::LogDispatch>
+=head2 password
 
-=head1 BUGS AND LIMITATIONS
+    password 'secret';
 
-None known currently, please report bugs to L<https://rt.cpan.org/Ticket/Create.html?Queue=Adam>
+The server password to use for IRC connection.
+
+=head2 flood
+
+    flood 1;
+
+Disable flood protection. Defaults to false.
+
+=head2 owner
+
+    owner 'nick!user@host';
+
+The hostmask of the owner of the bot. The owner can control the bot's plugins
+through IRC using the L<POE::Component::IRC::Plugin::PlugMan> interface.
+
+=head2 poco_irc_args
+
+    poco_irc_args LocalAddr => '127.0.0.1';
+
+Extra arguments to pass to the IRC component constructor.
+
+=head2 poco_irc_options
+
+    poco_irc_options trace => 1;
+
+Options to pass to the IRC component constructor.
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/perigrin/adam-bot-framework/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHORS
 
@@ -224,7 +262,7 @@ Chris Prather <chris@prather.org>
 
 =item *
 
-Torsten Raudssus <torsten@raudssus.de> L<http://www.raudssus.de/>
+Torsten Raudssus <torsten@raudssus.de>
 
 =back
 
@@ -236,7 +274,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

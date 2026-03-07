@@ -3,7 +3,7 @@ package Alien::hiredis;
 use strict;
 use warnings;
 
-our $VERSION = '0.014';
+our $VERSION = '0.016';
 
 use parent 'Alien::Base';
 
@@ -34,6 +34,10 @@ This software is Copyright (c) 2019 by Dan Book.
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+Bundled L<hiredis|https://github.com/redis/hiredis> library for
+share installs is licensed under the (three-clause) BSD License.
+See its F<COPYING> file for details.
 
 =head1 SEE ALSO
 

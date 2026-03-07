@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2019 by Dominique Dumont.
+# This software is Copyright (c) 2007-2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -118,6 +118,51 @@ return [
 'Perl instructions to test the value. $_ contains the value to test. C<$self> contains the value object. Use with care.',
             },
         ],
+    ],
+    [
+        name => 'Itself::CommonElement::Update',
+        gist => '@{files} files',
+        element => [
+            when_missing => {
+                type => 'leaf',
+                value_type => 'enum',
+                choice => [qw/die warn ignore/],
+                description => 'Action when no data is found in any external file',
+            },
+            files => {
+                type => 'list',
+                cargo => {
+                    type => 'node',
+                    config_class_name => 'Itself::CommonElement::UpdateFiles',
+                },
+                description => 'List of file specifictions to get external data from.'
+            }
+        ]
+    ],
+    [
+        name => 'Itself::CommonElement::UpdateFiles',
+        gist => "{file}:{subpath}",
+        element => [
+            type => {
+                type => 'leaf',
+                value_type => 'enum',
+                choice => [qw/ini json yaml toml/],
+                description => 'the syntax of the external file',
+            },
+            file => {
+                type => 'leaf',
+                value_type => 'uniline',
+                description => 'file path. Either absolute or relative to the running directory of cme.'
+            },
+            subpath => {
+                type => 'leaf',
+                value_type => 'uniline',
+                description => 'The subpath to get data in the file. For instance, the C<bar> item of this '.
+                'JSON string C<{"for" : { "bar" : "baz" }}> can be retrieved with C<for.bar>. '.
+                'See L<Config::Model::Value/update> amd L<Config::Model::Value::UpdateFromFile> '.
+                'for more details.'
+            }
+        ]
     ],
     [
         name => 'Itself::CommonElement',
@@ -261,6 +306,13 @@ return [
                           { level => 'normal', },
                     ]
                 }
+            },
+
+            update => {
+                type => 'node',
+                description => 'Update instructions to get value from an external file when '.
+                ' running "cme update". This require Config::Model >= 2.157.',
+                config_class_name => 'Itself::CommonElement::Update',
             },
 
             'default' => {

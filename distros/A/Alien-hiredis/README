@@ -24,6 +24,10 @@ COPYRIGHT AND LICENSE
 
       The Artistic License 2.0 (GPL Compatible)
 
+    Bundled hiredis <https://github.com/redis/hiredis> library for share
+    installs is licensed under the (three-clause) BSD License. See its
+    COPYING file for details.
+
 SEE ALSO
 
     Redis::hiredis, Protocol::Redis::XS

@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2019 by Dominique Dumont.
+# This software is Copyright (c) 2007-2026 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -63,7 +63,6 @@ my $build = $class->new
   'build_requires' => {
     'App::Cmd::Tester' => '0',
     'App::Cme' => '1.002',
-    'Config::Model' => '2.142',
     'Config::Model::Tester::Setup' => '0',
     'File::Copy::Recursive' => '0',
     'Getopt::Long' => '0',
@@ -74,8 +73,7 @@ my $build = $class->new
     'Test::Memory::Cycle' => '0',
     'Test::More' => '0',
     'Test::Pod' => '1.00',
-    'Text::Diff' => '0',
-    'perl' => '5.014'
+    'Text::Diff' => '0'
   },
   'configure_requires' => {
     'Module::Build' => '0.34'
@@ -84,7 +82,7 @@ my $build = $class->new
     'App::Cme' => '1.002',
     'App::Cme::Common' => '0',
     'Carp' => '0',
-    'Config::Model' => '2.142',
+    'Config::Model' => '2.157',
     'Config::Model::TkUI' => '1.378',
     'Config::Model::Value' => '0',
     'Data::Compare' => '0',
@@ -102,8 +100,9 @@ my $build = $class->new
     'Tk' => '0',
     'YAML::PP' => '0',
     'base' => '0',
+    'feature' => '0',
     'lib' => '0',
-    'perl' => '5.014',
+    'perl' => 'v5.20.0',
     'strict' => '0',
     'warnings' => '0'
   },

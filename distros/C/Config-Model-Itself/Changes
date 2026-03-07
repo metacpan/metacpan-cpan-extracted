@@ -1,3 +1,16 @@
+2.026 2026-03-06
+
+  Misc:
+    * dist.ini: require perl 5.020
+    * dist.ini: fix homepage
+    * dist.ini: update copyright year
+    * requires Config::Model >= 2.157
+
+  Model update:
+    * Itself model: add support for Value update parameter
+    * Itself model: update description of default_with_init parameter
+    * WarpValue: improve description of "rules" parameter
+
 2.025 2025-04-05
 
   Misc:
@@ -12,7 +25,7 @@
   Misc:
     * docs: remove links to cpanratings
     * tests: check stderr and error of test_app results
-    * bump version dep on Tk 1.378
+    * bump version dep on Config::Model::TkUI 1.378
     * use YAML::PP instead of YAML::XS
     * do not ship test files in wr_root
 

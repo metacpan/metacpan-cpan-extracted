@@ -1,0 +1,39 @@
+# PODNAME: Config::Model::models::Itself::CommonElement::Update
+# ABSTRACT:  Configuration class Itself::CommonElement::Update
+
+=encoding utf8
+
+=head1 NAME
+
+Config::Model::models::Itself::CommonElement::Update - Configuration class Itself::CommonElement::Update
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+=head1 Elements
+
+=head2 when_missing
+
+Action when no data is found in any external file. I< Optional. Type enum. choice: 'die', 'warn', 'ignore'.  > 
+
+=head2 files
+
+List of file specifictions to get external data from. I< Optional. Type list of node of class L<Itself::CommonElement::UpdateFiles|Config::Model::models::Itself::CommonElement::UpdateFiles> .  > 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=item *
+
+L<Config::Model::models::Itself::CommonElement::UpdateFiles>
+
+=back
+
+=cut
+

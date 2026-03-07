@@ -4,13 +4,13 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "lgpl_2_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Config-Model-Itself",
    "prereqs" : {
@@ -35,7 +35,7 @@
             "App::Cme" : "1.002",
             "App::Cme::Common" : "0",
             "Carp" : "0",
-            "Config::Model" : "2.142",
+            "Config::Model" : "2.157",
             "Config::Model::TkUI" : "1.378",
             "Config::Model::Value" : "0",
             "Data::Compare" : "0",
@@ -53,8 +53,9 @@
             "Tk" : "0",
             "YAML::PP" : "0",
             "base" : "0",
+            "feature" : "0",
             "lib" : "0",
-            "perl" : "5.014",
+            "perl" : "v5.20.0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -62,7 +63,6 @@
       "test" : {
          "requires" : {
             "App::Cmd::Tester" : "0",
-            "Config::Model" : "2.142",
             "Config::Model::Tester::Setup" : "0",
             "File::Copy::Recursive" : "0",
             "Getopt::Long" : "0",
@@ -72,27 +72,26 @@
             "Test::Memory::Cycle" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.00",
-            "Text::Diff" : "0",
-            "perl" : "5.014"
+            "Text::Diff" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "ddumont at cpan.org",
+         "mailto" : "ddumont",
          "web" : "https://github.com/dod38fr/config-model-itself/issues"
       },
-      "homepage" : "https://github.com/dod38fr/config-model/wiki",
+      "homepage" : "https://github.com/dod38fr/config-model-itself",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/dod38fr/config-model-itself.git",
          "web" : "http://github.com/dod38fr/config-model-itself"
       }
    },
-   "version" : "2.025",
+   "version" : "2.026",
    "x_generated_by_perl" : "v5.40.1",
-   "x_serialization_backend" : "JSON::XS version 4.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "LGPL-2.1"
 }
 

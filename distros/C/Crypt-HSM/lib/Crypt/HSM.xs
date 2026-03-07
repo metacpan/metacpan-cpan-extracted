@@ -270,7 +270,7 @@ static SV* S_reverse_flags(pTHX_ const map table, size_t table_size, CK_ULONG in
 		CK_ULONG right = 1ul << i;
 		const entry* item = S_map_reverse_find(aTHX_ table, table_size, right);
 		if (item)
-			hv_store(result, item->key, item->length, newSVbool(input & right), 0);
+			hv_store(result, item->key, (I32)item->length, newSVbool(input & right), 0);
 	}
 	return newRV_noinc((SV*)result);
 }
@@ -789,10 +789,18 @@ static const map kdfs = {
 static CK_BYTE* S_get_buffer(pTHX_ SV* buffer, CK_ULONG* length) {
 	STRLEN len;
 	char* temp = SvPVbyte(buffer, len);
-	*length = len;
+	*length = (CK_ULONG)len;
 	return (CK_BYTE*)temp;
 }
 #define get_buffer(buffer, length) S_get_buffer(aTHX_ buffer, length)
+
+static CK_UTF8CHAR* S_get_text(pTHX_ SV* buffer, CK_ULONG* length) {
+	STRLEN len;
+	char* temp = SvPVutf8(buffer, len);
+	*length = (CK_ULONG)len;
+	return (CK_UTF8CHAR*)temp;
+}
+#define get_text(buffer, length) S_get_text(aTHX_ buffer, length)
 
 static CK_MECHANISM S_specialize_mechanism(pTHX_ CK_MECHANISM_TYPE type, SV** array, size_t array_len) {
 	CK_MECHANISM result = { type, NULL, 0 };
@@ -1149,7 +1157,7 @@ static const map security_domains = {
 #define get_security_domain(input) map_get(security_domains, input, "security domain")
 
 typedef struct Attributes {
-	size_t length;
+	CK_ULONG length;
 	CK_ATTRIBUTE* member;
 } Attributes;
 
@@ -1355,9 +1363,7 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 					break;
 				}
 				case StrAttr: {
-					STRLEN len;
-					current->pValue = (void*)SvPVutf8(value, len);
-					current->ulValueLen = len;
+					current->pValue = get_text(value, &current->ulValueLen);
 					break;
 				}
 				case BigIntAttr:
@@ -1432,8 +1438,8 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 					SAVEFREEPV(values);
 					for (i = 0; i < av_count(array); ++i)
 						values[i] = (CK_ULONG)SvUV(*av_fetch(array, i, FALSE));
-					current->pValue = value;
-					current->ulValueLen = av_count(array);
+					current->pValue = values;
+					current->ulValueLen = (CK_ULONG) (av_count(array) * sizeof(CK_ULONG));
 					break;
 				}
 				case MechanismArrayAttr: {
@@ -1444,15 +1450,15 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 					Newxz(values, av_count(array), CK_ULONG);
 					SAVEFREEPV(values);
 					for (i = 0; i < av_count(array); ++i)
-						values[i] = (CK_ULONG)get_mechanism_type(*av_fetch(array, i, FALSE));
-					current->pValue = value;
-					current->ulValueLen = av_count(array);
+						values[i] = get_mechanism_type(*av_fetch(array, i, FALSE));
+					current->pValue = values;
+					current->ulValueLen = (CK_ULONG) (av_count(array) * sizeof(CK_ULONG));
 					break;
 				}
 				case AttrAttr: {
 					struct Attributes child = get_attributes(value);
 					current->pValue = child.member;
-					current->ulValueLen = child.length * sizeof(CK_ATTRIBUTE);
+					current->ulValueLen = (CK_ULONG) (child.length * sizeof(CK_ATTRIBUTE));
 					break;
 				}
 				default:
@@ -1517,7 +1523,7 @@ static SV* S_reverse_attribute(pTHX_ CK_ATTRIBUTE* attribute) {
 				SV* temp = sv_2mortal(newSVpvn("\0\0\0\0\0\0\0\0", IVSIZE));
 				if (length)
 					sv_insert(temp, IVSIZE - length, length, pointer, length);
-				const char* buffer = SvPV_nolen(temp);
+				const char* buffer = SvPVbyte_nolen(temp);
 				if (unpackstring(integer_pattern, integer_pattern + 2, buffer, buffer + IVSIZE, 0) != 1)
 					die("Could not decode integer");
 			}
@@ -1593,7 +1599,7 @@ static SV* S_reverse_attribute(pTHX_ CK_ATTRIBUTE* attribute) {
 			for (i = 0; i < elems; ++i) {
 				const attribute_entry* reversed2 = attribute_reverse_find(attribute->type);
 				if (reversed2)
-					hv_store(result, reversed2->key, reversed2->length, reverse_attribute(&values[i]), 0);
+					hv_store(result, reversed2->key, (I32)reversed2->length, reverse_attribute(&values[i]), 0);
 			}
 			return newRV_noinc((SV*)result);
 		}
@@ -1999,7 +2005,7 @@ CODE:
 	CK_SESSION_HANDLE handle;
 
 	CK_ULONG flags = CKF_SERIAL_SESSION;
-	size_t current = 1;
+	ssize_t current = 1;
 	for (current = 1; current + 2 <= items; current += 2) {
 		CK_ULONG internal = map_get(session_flags, ST(current), "session flag");
 		if (SvTRUE(ST(current + 1)))
@@ -2053,13 +2059,13 @@ CODE:
 void init_token(Crypt::HSM::Slot self, SV* pin, SV* label)
 CODE:
 	CK_BYTE label_buffer[32];
-	STRLEN pin_len, label_len;
-	char* pinPV = SvPVutf8(pin, pin_len);
-	char* labelPV = SvPVutf8(label, label_len);
+	CK_ULONG pin_len, label_len;
+	CK_UTF8CHAR* pinPV = get_text(pin, &pin_len);
+	CK_UTF8CHAR* labelPV = get_text(label, &label_len);
 	memset(label_buffer, ' ', 32);
 	memcpy(label_buffer, labelPV, MIN(label_len, 32));
 
-	CK_RV result = self->provider->funcs->C_InitToken(self->slot, (CK_BYTE*)pinPV, pin_len, label_buffer);
+	CK_RV result = self->provider->funcs->C_InitToken(self->slot, pinPV, pin_len, label_buffer);
 	if (result != CKR_OK)
 		croak_with("Could not initialize token", result);
 
@@ -2174,10 +2180,10 @@ OUTPUT:
 
 void login(Crypt::HSM::Session self, CK_USER_TYPE type, SV* pin)
 CODE:
-	STRLEN pin_len = 0;
-	CK_BYTE* pinPV = NULL;
+	CK_ULONG pin_len = 0;
+	CK_UTF8CHAR* pinPV = NULL;
 	if (SvOK(pin))
-		pinPV = (CK_BYTE*)SvPVutf8(pin, pin_len);
+		pinPV = get_text(pin, &pin_len);
 	CK_RV result = self->provider->funcs->C_Login(self->handle, type, pinPV, pin_len);
 	if (result != CKR_OK)
 		croak_with("Could not log in", result);
@@ -2192,10 +2198,10 @@ CODE:
 
 void init_pin(Crypt::HSM::Session self, SV* pin)
 CODE:
-	STRLEN pin_len = 0;
-	CK_BYTE* pinPV = NULL;
+	CK_ULONG pin_len = 0;
+	CK_UTF8CHAR* pinPV = NULL;
 	if (SvOK(pin))
-		pinPV = (CK_BYTE*)SvPVutf8(pin, pin_len);
+		pinPV = get_text(pin, &pin_len);
 
 	CK_RV result = self->provider->funcs->C_InitPIN(self->handle, pinPV, pin_len);
 	if (result != CKR_OK)
@@ -2204,12 +2210,12 @@ CODE:
 
 void set_pin(Crypt::HSM::Session self, SV* old_pin, SV* new_pin)
 CODE:
-	STRLEN old_pin_len = 0, new_pin_len = 0;
-	CK_BYTE* old_pinPV = NULL, *new_pinPV = NULL;
+	CK_ULONG old_pin_len = 0, new_pin_len = 0;
+	CK_UTF8CHAR* old_pinPV = NULL, *new_pinPV = NULL;
 	if (SvOK(old_pin))
-		old_pinPV = (CK_BYTE*)SvPVutf8(old_pin, old_pin_len);
+		old_pinPV = get_text(old_pin, &old_pin_len);
 	if (SvOK(new_pin))
-		new_pinPV = (CK_BYTE*)SvPVutf8(new_pin, new_pin_len);
+		new_pinPV = get_text(new_pin, &new_pin_len);
 
 	CK_RV result = self->provider->funcs->C_SetPIN(self->handle, old_pinPV, old_pin_len, new_pinPV, new_pin_len);
 	if (result != CKR_OK)
@@ -2236,10 +2242,9 @@ PPCODE:
 
 	CK_ULONG actual = 0;
 	do {
-		static const CK_ULONG buffer_size = 16;
-		CK_OBJECT_HANDLE current[buffer_size];
+		CK_OBJECT_HANDLE current[16];
 		CK_ULONG iter;
-		CK_RV result = self->provider->funcs->C_FindObjects(self->handle, current, buffer_size, &actual);
+		CK_RV result = self->provider->funcs->C_FindObjects(self->handle, current, sizeof(current) / sizeof(*current), &actual);
 		if (result != CKR_OK) {
 			self->provider->funcs->C_FindObjectsFinal(self->handle);
 			croak_with("Could not find objects", result);
@@ -2651,11 +2656,11 @@ OUTPUT:
 HV* get_attributes(Crypt::HSM::Object self, AV* attributes_av)
 CODE:
 	Attributes attributes;
-	attributes.length = av_count(attributes_av);
+	attributes.length = (CK_ULONG)av_count(attributes_av);
 	Newxz(attributes.member, attributes.length, CK_ATTRIBUTE);
 	SAVEFREEPV(attributes.member);
 
-	size_t i;
+	CK_ULONG i;
 	for (i = 0; i < attributes.length; ++i) {
 		STRLEN name_length;
 		const char* name = SvPVutf8(*av_fetch(attributes_av, i, FALSE), name_length);
@@ -2723,8 +2728,8 @@ OUTPUT:
 
 void set_state(Crypt::HSM::Stream self, SV* state)
 CODE:
-	STRLEN stateLen;
-	CK_BYTE* statePV = (CK_BYTE*)SvPVbyte(state, stateLen);
+	CK_ULONG stateLen;
+	CK_BYTE* statePV = get_buffer(state, &stateLen);
 	CK_RV result = self->session->provider->funcs->C_SetOperationState(self->session->handle, statePV, stateLen, self->encrypt_key, self->sign_key);
 	if (result != CKR_OK)
 		croak_with("Couldn't set operation state", result);

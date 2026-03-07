@@ -137,6 +137,10 @@ minimum number of keys. I< Optional. Type integer.  >
 
 maximum number of keys. I< Optional. Type integer.  > 
 
+=head2 update
+
+Update instructions to get value from an external file when  running "cme update". This require Config::Model >= 2.157. I< Optional. Type node of class L<Itself::CommonElement::Update|Config::Model::models::Itself::CommonElement::Update> .  > 
+
 =head2 default
 
 Specify default value. This default value is written in the configuration data. I< Optional. Type string.  > 
@@ -231,7 +235,7 @@ always create the number of id specified in this integer. I< Optional. Type stri
 
 =head2 default_with_init
 
-specify a set of keys to create and initialization on some elements . E.g. ' foo => "X=Av Y=Bv", bar => "Y=Av Z=Cz"' I< Optional. Type hash of string.  > 
+specify a set of keys and values to create and initialize some elements . E.g. initialize of hash of nodes with ' foo => "X=Av Y=Bv", bar => "Y=Av Z=Cz"' or initialize a list of string with '0 => "foo", 1 => "bar"'. The values follows the syntax specified in L<Config::Model::Loader/"load string syntax"> I< Optional. Type hash of string.  > 
 
 =head2 max_nb
 
@@ -318,6 +322,10 @@ L<cme>
 =item *
 
 L<Config::Model::models::Itself::CommonElement::Assert>
+
+=item *
+
+L<Config::Model::models::Itself::CommonElement::Update>
 
 =item *
 

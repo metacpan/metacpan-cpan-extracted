@@ -12,6 +12,7 @@ alienfile
 dist.ini
 lib/Alien/hiredis.pm
 prereqs.yml
+src/hiredis-1.3.0.tar.gz
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/alien.t

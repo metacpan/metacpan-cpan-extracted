@@ -8,9 +8,7 @@ use FindBin;
 use lib $FindBin::Dir . "/../lib";
 use App::codefork;
 
-App::codefork->new_with_options(
-  config => (shift @ARGV)
-);
+App::codefork->run(@ARGV);
 
 
 1;
@@ -19,58 +17,148 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 codefork - Worlds dumbest code forker
 
 =head1 VERSION
 
-version 0.001
+version 1.000
 
 =head1 SYNOPSIS
 
-  codefork fork.conf # changes files in the current directory and down under
+  # Preview changes as unified diff (default config: fork.conf)
+  codefork
 
-Sample fork.conf
+  # Preview with a different config file
+  codefork other.conf
+
+  # Apply changes to disk
+  codefork apply
+  codefork apply other.conf
+
+  # Save diff to a file (e.g. for review or patch(1))
+  codefork output patch.diff
+  codefork output other.conf patch.diff
+
+  # Enable debug output
+  CODEFORK_DEBUG=1 codefork
+
+=head1 DESCRIPTION
+
+B<codefork> performs systematic text replacements across an entire directory
+tree, modifying both filenames and file contents. It is intended for forking
+a codebase by renaming a project, module, or namespace throughout.
+
+By default, codefork does B<not> modify any files. It shows a unified diff
+of what would change, so you can review before committing to the changes.
+Use the C<apply> command to actually write changes to disk, or C<output> to
+save the diff to a file for use with C<patch(1)>.
+
+The default config file is C<fork.conf> in the current directory.
+
+=head1 COMMANDS
+
+=over 4
+
+=item C<codefork> [I<config>]
+
+Show a unified diff of all changes that would be made. This is the default
+action and is completely safe — nothing is modified on disk.
+
+=item C<codefork apply> [I<config>]
+
+Apply all changes to files in the current directory tree. Filenames are
+renamed and file contents are modified in place.
+
+=item C<codefork output> [I<config>] I<filename>
+
+Write the unified diff to I<filename> instead of printing it. The output
+is compatible with C<patch -p1>.
+
+=back
+
+=head1 CONFIG FORMAT
+
+The config file contains one replacement rule per line:
+
+=over 4
+
+=item C<from|to>
+
+Regex replacement: applies C<s/from/to/g> to filenames and file contents.
+
+=item C<from%to>
+
+Word-boundary replacement: only replaces C<from> when surrounded by
+non-alphanumeric characters, preventing partial matches inside longer words.
+
+=back
+
+Lines without a C<|> or C<%> separator are ignored.
+
+Example config:
 
   HomeHive|AqHive
   homehive|aqhive
   hh%ah
 
-=head1 DESCRIPTION
+=head1 UPGRADE NOTICE
 
-Modifies filename and file content, doesn't care about filetypes.
+B<The command-line interface changed in version 1.000.>
 
-=encoding utf8
+The old C<--config>, C<--dir>, and C<--debug> flags are no longer supported.
+Use positional commands instead:
 
-=head1 CONFIG
+  # Old (no longer works):
+  codefork --config fork.conf
+  codefork --config fork.conf --debug
 
-=head2 |
+  # New:
+  codefork fork.conf
+  CODEFORK_DEBUG=1 codefork fork.conf
 
-Ends up as s/$from/$to/g
+=head1 ENVIRONMENT
 
-=head2 %
+=over 4
 
-Ends up as s/([^A-Za-z0-9]+)$from([^A-Za-z0-9]+)/$1$to$2/g
+=item C<CODEFORK_DEBUG>
+
+Set to a true value to enable verbose debug output to STDERR.
+
+=back
 
 =head1 SUPPORT
 
 Repository
 
-  https://github.com/Getty/p5-app-codefork
+  L<https://github.com/Getty/p5-app-codefork>
   Pull request and additional contributors are welcome
 
 Issue Tracker
 
-  https://github.com/Getty/p5-app-codefork/issues
+  L<https://github.com/Getty/p5-app-codefork/issues>
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-app-codefork/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudss.us>
+Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

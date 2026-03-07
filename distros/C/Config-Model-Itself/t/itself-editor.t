@@ -120,8 +120,8 @@ SKIP: {
         open_instance        => sub{$tktree->open('itself_instance.class.MasterModel');1;},
         # save step is mandatory to avoid interaction
         save                 => sub { $cmu -> save ; 1;},
-        'open test window'   => sub { $cmu -> test_model ; },
-        'reopen test window' => sub { $cmu -> test_model ; },
+        'open test window'   => sub { $cmu -> test_model ; 1;},
+        'reopen test window' => sub { $cmu -> test_model ; 1;},
         exit                 => sub { $cmu->quit ; 1;}
     );
 

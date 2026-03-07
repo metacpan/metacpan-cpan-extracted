@@ -21,7 +21,7 @@ Specify with the path of the configuration element that drives the warp, i.e .th
 
 =head2 rules
 
-Each key of the hash is a test (as formula using the variables defined in "follow" element) that are tried in sequences to apply its associated effects. I< Optional. Type hash of warped_node.  > 
+Each key of the ordered hash is a test (as formula using the variables defined in "follow" element) that are tried in sequences to apply its associated effects. Only the first match is applied. I< Optional. Type hash of warped_node.  > 
 
 =head1 SEE ALSO
 
